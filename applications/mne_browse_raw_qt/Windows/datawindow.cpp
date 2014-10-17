@@ -171,7 +171,7 @@ void DataWindow::initMVCSettings()
 
     //connect selection of a channel to selection manager
     connect(ui->m_tableView_rawTableView->selectionModel(),&QItemSelectionModel::selectionChanged,
-            this,&DataWindow::selectChannelsInSelectionManager);
+            this,&DataWindow::highlightChannelsInSelectionManager);
 
     //Set MVC in delegate
     m_pRawDelegate->setModelView(m_pMainWindow->m_pEventWindow->getEventModel(),
@@ -184,6 +184,7 @@ void DataWindow::initMVCSettings()
     //Install event filter to overcome QGrabGesture and QScrollBar problem
     ui->m_tableView_rawTableView->horizontalScrollBar()->installEventFilter(this);
     ui->m_tableView_rawTableView->verticalScrollBar()->installEventFilter(this);
+    ui->m_tableView_rawTableView->verticalHeader()->installEventFilter(this);
 
     //-----------------------------------
     //------ Init "dockable" view -------
@@ -400,7 +401,8 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
 bool DataWindow::eventFilter(QObject *object, QEvent *event)
 {
     if ((object == m_pUndockedDataView->horizontalScrollBar() || object == ui->m_tableView_rawTableView->horizontalScrollBar() ||
-         object == m_pUndockedDataView->verticalScrollBar() || object == ui->m_tableView_rawTableView->verticalScrollBar())
+         object == m_pUndockedDataView->verticalScrollBar() || object == ui->m_tableView_rawTableView->verticalScrollBar() ||
+         object == m_pUndockedDataView->verticalHeader() || object == ui->m_tableView_rawTableView->verticalHeader())
         && event->type() == QEvent::Enter) {
         QScroller::ungrabGesture(m_pUndockedDataView);
         QScroller::ungrabGesture(ui->m_tableView_rawTableView);
@@ -408,7 +410,8 @@ bool DataWindow::eventFilter(QObject *object, QEvent *event)
     }
 
     if ((object == m_pUndockedDataView->horizontalScrollBar() || object == ui->m_tableView_rawTableView->horizontalScrollBar()||
-         object == m_pUndockedDataView->verticalScrollBar() || object == ui->m_tableView_rawTableView->verticalScrollBar())
+         object == m_pUndockedDataView->verticalScrollBar() || object == ui->m_tableView_rawTableView->verticalScrollBar()||
+         object == m_pUndockedDataView->verticalHeader() || object == ui->m_tableView_rawTableView->verticalHeader())
         && event->type() == QEvent::Leave) {
         QScroller::grabGesture(m_pUndockedDataView, QScroller::LeftMouseButtonGesture);
         QScroller::grabGesture(ui->m_tableView_rawTableView, QScroller::LeftMouseButtonGesture);
@@ -607,7 +610,7 @@ void DataWindow::updateMarkerPosition()
 
 //*************************************************************************************************************
 
-void DataWindow::selectChannelsInSelectionManager()
+void DataWindow::highlightChannelsInSelectionManager()
 {
     if(m_pMainWindow->m_pSelectionManagerWindow->isVisible()) {
         QStringList currentSelectedChannelNames;
@@ -619,7 +622,7 @@ void DataWindow::selectChannelsInSelectionManager()
             currentSelectedChannelNames << m_pRawModel->data(index).toString();
         }
 
-        m_pMainWindow->m_pSelectionManagerWindow->selectChannels(currentSelectedChannelNames);
+        m_pMainWindow->m_pSelectionManagerWindow->highlightChannels(currentSelectedChannelNames);
     }
 }
 

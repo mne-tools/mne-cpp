@@ -57,8 +57,7 @@ using namespace MNEBrowseRawQt;
 
 ScaleWindow::ScaleWindow(QWidget *parent) :
     QDockWidget(parent),
-    ui(new Ui::ScaleWindow),
-    m_pMainWindow(static_cast<MainWindow*>(parent))
+    ui(new Ui::ScaleWindow)
 {
     ui->setupUi(this);
 }
@@ -76,25 +75,23 @@ ScaleWindow::~ScaleWindow()
 
 void ScaleWindow::init()
 {
-    connect(m_pMainWindow,&MainWindow::newDataLoaded,
-            this,&ScaleWindow::hideSpinBoxes);
-
+    //Connect spin boxes
     connect(ui->m_doubleSpinBox_MEG_grad,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            m_pMainWindow->m_pDataWindow,&DataWindow::updateDataTableViews);
+            this,&ScaleWindow::scaleValueChanged);
     connect(ui->m_doubleSpinBox_MEG_mag,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            m_pMainWindow->m_pDataWindow,&DataWindow::updateDataTableViews);
+            this,&ScaleWindow::scaleValueChanged);
     connect(ui->m_doubleSpinBox_EEG,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            m_pMainWindow->m_pDataWindow,&DataWindow::updateDataTableViews);
+            this,&ScaleWindow::scaleValueChanged);
     connect(ui->m_doubleSpinBox_EOG,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            m_pMainWindow->m_pDataWindow,&DataWindow::updateDataTableViews);
+            this,&ScaleWindow::scaleValueChanged);
     connect(ui->m_doubleSpinBox_EMG,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            m_pMainWindow->m_pDataWindow,&DataWindow::updateDataTableViews);
+            this,&ScaleWindow::scaleValueChanged);
     connect(ui->m_doubleSpinBox_ECG,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            m_pMainWindow->m_pDataWindow,&DataWindow::updateDataTableViews);
+            this,&ScaleWindow::scaleValueChanged);
     connect(ui->m_doubleSpinBox_MISC,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            m_pMainWindow->m_pDataWindow,&DataWindow::updateDataTableViews);
+            this,&ScaleWindow::scaleValueChanged);
     connect(ui->m_doubleSpinBox_STIM,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            m_pMainWindow->m_pDataWindow,&DataWindow::updateDataTableViews);
+            this,&ScaleWindow::scaleValueChanged);
 }
 
 
@@ -104,7 +101,7 @@ QMap<QString,double> ScaleWindow::getScalingMap()
 {
     QMap<QString,double> scaleMap;
 
-    scaleMap["MEG_grad"] = ui->m_doubleSpinBox_MEG_grad->value() * 1e-15 * 100; //*100 because fT/m not fT/cm
+    scaleMap["MEG_grad"] = ui->m_doubleSpinBox_MEG_grad->value() * 1e-15 * 100; //*100 because data in fiff files is stored as fT/m not fT/cm
     scaleMap["MEG_mag"] = ui->m_doubleSpinBox_MEG_mag->value() * 1e-12;
     scaleMap["MEG_EEG"] = ui->m_doubleSpinBox_EEG->value() * 1e-06;
     scaleMap["MEG_EOG"] = ui->m_doubleSpinBox_EOG->value() * 1e-06;
@@ -119,7 +116,7 @@ QMap<QString,double> ScaleWindow::getScalingMap()
 
 //*************************************************************************************************************
 
-void ScaleWindow::hideSpinBoxes(const FiffInfo *currentFiffInfo)
+void ScaleWindow::hideSpinBoxes(FiffInfo currentFiffInfo)
 {
     //Hide all spin boxes and labels
     ui->m_doubleSpinBox_MEG_grad->hide();
@@ -141,19 +138,19 @@ void ScaleWindow::hideSpinBoxes(const FiffInfo *currentFiffInfo)
     ui->m_label_STIM->hide();
 
     //Show only spin boxes and labels which type are present in the current loaded fiffinfo
-    QList<FiffChInfo> channelList = currentFiffInfo->chs;
-    for(int i = 0; channelList.size(); i++) {
+    QList<FiffChInfo> channelList = currentFiffInfo.chs;
+    for(int i = 0; i<channelList.size(); i++) {
         switch(channelList.at(i).kind) {
         case FIFFV_MEG_CH: {
             qint32 unit = channelList.at(i).unit;
             if(unit == FIFF_UNIT_T_M) {
                 //Gradiometers
-                ui->m_label_MEG_grad->show();
+                ui->m_doubleSpinBox_MEG_grad->show();
                 ui->m_label_MEG_grad->show();
             }
             else if(unit == FIFF_UNIT_T) {
                 //Magnitometers
-                ui->m_label_MEG_mag->show();
+                ui->m_doubleSpinBox_MEG_mag->show();
                 ui->m_label_MEG_mag->show();
             }
 
@@ -198,4 +195,12 @@ void ScaleWindow::hideSpinBoxes(const FiffInfo *currentFiffInfo)
 
         }
     }
+}
+
+
+//*************************************************************************************************************
+
+void ScaleWindow::scaleValueChanged()
+{
+    emit scalingValueChanged();
 }
