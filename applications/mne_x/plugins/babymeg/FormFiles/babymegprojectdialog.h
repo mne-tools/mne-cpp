@@ -33,11 +33,17 @@ public:
     explicit BabyMEGProjectDialog(BabyMEG* p_pBabyMEG, QWidget *parent = 0);
     ~BabyMEGProjectDialog();
 
-    QString getFilePath() const;
-
 private:
+    void addProject();
+    void addSubject();
+
+    void paradigmChanged(const QString &newParadigm);
+
     void scanForProjects();
     void scanForSubjects();
+
+    void selectNewProject(const QString &newProject);
+    void selectNewSubject(const QString &newSubject);
 
     void updateFileName();
 
@@ -45,12 +51,7 @@ private:
 
     Ui::BabyMEGProjectDialog *ui;
 
-    QString m_sBabyMEGDataPath;
-
-    QString m_sCurrentProject;
     QStringList m_sListProjects;
-
-    QString m_sCurrentSubject;
     QStringList m_sListSubjects;
 };
 

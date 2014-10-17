@@ -61,6 +61,8 @@
 
 #include <QList>
 #include <QDebug>
+#include <QDir>
+#include <QDateTime>
 
 
 //*************************************************************************************************************
@@ -81,7 +83,7 @@ BabyMEG::BabyMEG()
 : m_iBlinkStatus(0)
 , m_iBufferSize(-1)
 , m_bWriteToFile(false)
-, m_sRecordFile(qApp->applicationDirPath()+"/mne_x_plugins/resources/babymeg/babymegtest.fif")
+, m_sCurrentParadigm("")
 , m_bIsRunning(false)
 , m_pRawMatrixBuffer(0)
 {
@@ -137,8 +139,44 @@ QSharedPointer<IPlugin> BabyMEG::clone() const
 
 //*************************************************************************************************************
 
+QString BabyMEG::getFilePath(bool currentTime) const
+{
+    QString sFilePath = m_sBabyMEGDataPath + "/" + m_sCurrentProject + "/" + m_sCurrentSubject;
+
+    QString sTimeStamp;
+
+    if(currentTime)
+        sTimeStamp = QDateTime::currentDateTime().toString("yyMMdd_hhmmss");
+    else
+        sTimeStamp = "<YYMMDD_HMS>";
+
+    if(m_sCurrentParadigm.isEmpty())
+        sFilePath.append("/"+ sTimeStamp + "_" + m_sCurrentSubject + "_raw.fif");
+    else
+        sFilePath.append("/"+ sTimeStamp + "_" + m_sCurrentSubject + "_" + m_sCurrentParadigm + "_raw.fif");
+
+    return sFilePath;
+}
+
+
+//*************************************************************************************************************
+
 void BabyMEG::init()
 {
+    //BabyMEGData Path
+    m_sBabyMEGDataPath = QDir::homePath() + "/BabyMEGData";
+    if(!QDir(m_sBabyMEGDataPath).exists())
+        QDir().mkdir(m_sBabyMEGDataPath);
+    //Test Project
+    if(!QDir(m_sBabyMEGDataPath+"/TestProject").exists())
+        QDir().mkdir(m_sBabyMEGDataPath+"/TestProject");
+    QSettings settings;
+    m_sCurrentProject = settings.value(QString("Plugin/%1/currentProject").arg(getName()), "TestProject").toString();
+    //Test Subject
+    if(!QDir(m_sBabyMEGDataPath+"/TestProject/TestSubject").exists())
+        QDir().mkdir(m_sBabyMEGDataPath+"/TestProject/TestSubject");
+    m_sCurrentSubject = settings.value(QString("Plugin/%1/currentSubject").arg(getName()), "TestSubject").toString();
+
     //BabyMEG Inits
     pInfo = QSharedPointer<BabyMEGInfo>(new BabyMEGInfo());
     connect(pInfo.data(), &BabyMEGInfo::fiffInfoAvailable, this, &BabyMEG::setFiffInfo);
@@ -270,6 +308,7 @@ void BabyMEG::toggleRecordingFile()
 
 
         //Initiate the stream for writing to the fif file
+        m_sRecordFile = getFilePath(true);
         m_qFileOut.setFileName(m_sRecordFile);
         if(m_qFileOut.exists())
         {

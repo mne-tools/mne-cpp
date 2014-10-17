@@ -157,6 +157,16 @@ public:
     //=========================================================================================================
     /**
     * Initialise the BabyMEG.
+    *
+    * @param[in] currentTime    insert current time stamp.
+    *
+    * @return the storage filepath
+    */
+    QString getFilePath(bool currentTime = false) const;
+
+    //=========================================================================================================
+    /**
+    * Initialise the BabyMEG.
     */
     virtual void init();
 
@@ -259,7 +269,12 @@ private:
     qint32 m_iBufferSize;                                   /**< The raw data buffer size.*/
 
     bool                                m_bWriteToFile;     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
-    QString                             m_sRecordFile;      /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
+
+    QString m_sBabyMEGDataPath;     /**< The data storage path.*/
+    QString m_sCurrentProject;      /**< The current project which is part of the filename to be recorded.*/
+    QString m_sCurrentSubject;      /**< The current subject which is part of the filename to be recorded.*/
+    QString m_sCurrentParadigm;     /**< The current paradigm which is part of the filename to be recorded.*/
+    QString m_sRecordFile;          /**< Current record file. */
     QFile                               m_qFileOut;         /**< QFile for writing to fif file.*/
     FiffStream::SPtr                    m_pOutfid;          /**< FiffStream to write to.*/
 
@@ -273,8 +288,7 @@ private:
     QAction*                        m_pActionSetupProject;      /**< shows setup project dialog */
     QAction*                        m_pActionRecordFile;        /**< start recording action */
     QAction*                        m_pActionSqdCtrl;           /**< show squid control */
-    QAction*                        m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
-
+    QAction*                        m_pActionUpdateFiffInfo;    /**< Update Fiff Info action */
 
 public:
     double sfreq;
