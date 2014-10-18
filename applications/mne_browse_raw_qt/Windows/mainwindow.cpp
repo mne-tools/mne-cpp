@@ -58,7 +58,7 @@ using namespace MNEBrowseRawQt;
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
-//, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
 //, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
 , m_qSettings()
 , m_rawSettings()
@@ -135,8 +135,10 @@ void MainWindow::setupWindowWidgets()
 
     //Connect window signals
     //Change scaling of the data whenever a spinbox value changed or the user performs a pinch gesture on the view
-    connect(m_pScaleWindow, &ScaleWindow::scalingValueChanged,
+    connect(m_pScaleWindow, &ScaleWindow::scalingChannelValueChanged,
             m_pDataWindow, &DataWindow::updateDataTableViews);
+    connect(m_pScaleWindow, &ScaleWindow::scalingViewValueChanged,
+            m_pDataWindow, &DataWindow::scaleChannelsInView);
     connect(m_pDataWindow, &DataWindow::scaleChannels,
             m_pScaleWindow, &ScaleWindow::scaleAllChannels);
 
