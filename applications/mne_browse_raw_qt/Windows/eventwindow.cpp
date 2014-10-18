@@ -244,5 +244,7 @@ void EventWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & p
             m_pMainWindow->m_pDataWindow->getDataTableView()->horizontalScrollBar()->setValue(sample-rawTableViewColumnWidth/2);
 
         qDebug()<<"Jumping to Event at sample "<<sample<<"rawTableViewColumnWidth"<<rawTableViewColumnWidth;
+
+        m_pMainWindow->m_pDataWindow->updateDataTableViews();
     }
 }

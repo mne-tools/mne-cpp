@@ -58,6 +58,7 @@
 #include <QToolBar>
 #include <QPainter>
 #include <QColor>
+#include <QGesture>
 
 
 //*************************************************************************************************************
@@ -143,6 +144,18 @@ public:
     */
     void updateDataTableViews();
 
+    //=========================================================================================================
+    /**
+    * Only shows the channels defined in the QStringList
+    */
+    void showSelectedChannelsOnly(QStringList selectedChannels);
+
+    //=========================================================================================================
+    /**
+    * Scale the channels in the data views
+    */
+    void scaleChannelsInView(double scale);
+
 private:
     //=========================================================================================================
     /**
@@ -186,6 +199,18 @@ private:
     */
     bool eventFilter(QObject *object, QEvent *event);
 
+    //=========================================================================================================
+    /**
+    * gestureEvent processes gesture events
+    */
+    bool gestureEvent(QGestureEvent *event);
+
+    //=========================================================================================================
+    /**
+    * pinchTriggered processes pinch gesture events
+    */
+    bool pinchTriggered(QPinchGesture *gesture);
+
     Ui::DataWindowDockWidget *ui;                   /**< the ui variabe to initalise and access the ui file with this class */
 
     MainWindow*     m_pMainWindow;                  /**< pointer to the main window (parent) */
@@ -205,6 +230,9 @@ private:
 
     QTableView*     m_pUndockedDataView;
     QVBoxLayout*    m_pUndockedDataViewLayout;
+
+signals:
+    void scaleChannels(double);
 
 protected slots:
     //=========================================================================================================
