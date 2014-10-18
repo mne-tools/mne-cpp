@@ -166,6 +166,15 @@ void DataWindow::showSelectedChannelsOnly(QStringList selectedChannels)
 
 //*************************************************************************************************************
 
+void DataWindow::scaleChannelsInView(double scale)
+{
+    for(int i = 0; i<ui->m_tableView_rawTableView->verticalHeader()->count(); i++)
+        ui->m_tableView_rawTableView->setRowHeight(i, scale);
+}
+
+
+//*************************************************************************************************************
+
 void DataWindow::initMVCSettings()
 {
     //-----------------------------------
@@ -451,7 +460,6 @@ bool DataWindow::eventFilter(QObject *object, QEvent *event)
 
     if (object == ui->m_tableView_rawTableView && event->type() == QEvent::Gesture) {
         QGestureEvent* gestureEventCast = static_cast<QGestureEvent*>(event);
-
         return gestureEvent(static_cast<QGestureEvent*>(gestureEventCast));
     }
 
@@ -680,9 +688,24 @@ bool DataWindow::gestureEvent(QGestureEvent *event)
 
 bool DataWindow::pinchTriggered(QPinchGesture *gesture)
 {
-    qDebug()<<"pinchTriggered";
+    QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
+    if (changeFlags & QPinchGesture::ScaleFactorChanged) {
+        emit scaleChannels(gesture->scaleFactor());
+        qDebug()<<"ungrab";
+        ui->m_tableView_rawTableView->setSelectionMode(QAbstractItemView::NoSelection);
+        QScroller::ungrabGesture(m_pUndockedDataView);
+        QScroller::ungrabGesture(ui->m_tableView_rawTableView);
+    }
 
-    emit scaleChannels(gesture->scaleFactor());
+    if (gesture->state() == Qt::GestureFinished) {
+        qDebug()<<"Finished gesture - grab again";
+        ui->m_tableView_rawTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+        QScroller::grabGesture(m_pUndockedDataView, QScroller::LeftMouseButtonGesture);
+        QScroller::grabGesture(ui->m_tableView_rawTableView, QScroller::LeftMouseButtonGesture);
+    }
+
+
+
 
     return true;
 }

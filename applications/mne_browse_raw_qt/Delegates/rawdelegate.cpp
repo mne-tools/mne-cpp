@@ -102,7 +102,7 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
         //draw special background when channel is marked as bad
         QVariant v = index.model()->data(index,Qt::BackgroundRole);
-        if(v.canConvert<QBrush>() && !(option.state & QStyle::State_Selected)) {
+        if(v.canConvert<QBrush>()/* && !(option.state & QStyle::State_Selected)*/) {
             QPointF oldBO = painter->brushOrigin();
             painter->setBrushOrigin(option.rect.topLeft());
             painter->fillRect(option.rect, qvariant_cast<QBrush>(v));
@@ -110,12 +110,12 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
         }
 
         //Highlight selected channels
-        if(option.state & QStyle::State_Selected) {
-            QPointF oldBO = painter->brushOrigin();
-            painter->setBrushOrigin(option.rect.topLeft());
-            painter->fillRect(option.rect, option.palette.highlight());
-            painter->setBrushOrigin(oldBO);
-        }
+//        if(option.state & QStyle::State_Selected) {
+//            QPointF oldBO = painter->brushOrigin();
+//            painter->setBrushOrigin(option.rect.topLeft());
+//            painter->fillRect(option.rect, option.palette.highlight());
+//            painter->setBrushOrigin(oldBO);
+//        }
 
         //Get data
         QVariant variant = index.model()->data(index,Qt::DisplayRole);
@@ -253,7 +253,7 @@ void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionVie
         for(qint32 j=0; j < listPairs[i].second; ++j)
         {
             double val = *(listPairs[i].first+j);
-            dValue = val*dScaleY;
+            dValue = (val - *(listPairs[0].first))*dScaleY;
 
             double newY = y_base+dValue;
 

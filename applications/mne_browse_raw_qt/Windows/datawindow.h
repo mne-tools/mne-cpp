@@ -150,6 +150,12 @@ public:
     */
     void showSelectedChannelsOnly(QStringList selectedChannels);
 
+    //=========================================================================================================
+    /**
+    * Scale the channels in the data views
+    */
+    void scaleChannelsInView(double scale);
+
 private:
     //=========================================================================================================
     /**

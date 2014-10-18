@@ -129,18 +129,30 @@ public:
 signals:
     //=========================================================================================================
     /**
-    * updateDataTableViews is emmited whenever a connected spin box value changed
+    * updateDataTableViews is emmited whenever a connected data spin box value changed
     */
-    void scalingValueChanged();
+    void scalingChannelValueChanged();
+
+    //=========================================================================================================
+    /**
+    * updateDataTableViews is emmited whenever a connected view spin box value changed
+    */
+    void scalingViewValueChanged(double);
 
 private:
     Ui::ScaleWindow *ui;
 
     //=========================================================================================================
     /**
-    * scaleValueChanged is called whenever a a spin box value changed.
+    * scaleChannelValueChanged is called whenever a data spin box value changed.
     */
-    void scaleValueChanged();
+    void scaleChannelValueChanged();
+
+    //=========================================================================================================
+    /**
+    * scaleViewValueChanged is called whenever a view spin box value changed.
+    */
+    void scaleViewValueChanged();
 
 };
 
