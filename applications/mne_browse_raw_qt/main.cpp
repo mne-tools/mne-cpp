@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
     QPixmap pixmap(":/Resources/Images/splashscreen_mne_browse_raw_qt.png");
     QSplashScreen splash(pixmap);
     splash.show();
-    QThread::sleep(5);
+    QThread::sleep(1);
 
     mainWindow = new MainWindow();
     mainWindow->show();
