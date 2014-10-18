@@ -140,6 +140,13 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
         path = QPainterPath(QPointF(option.rect.x()+t_rawModel->relFiffCursor(),option.rect.y()));
         createPlotPath(index, option, path, listPairs);
 
+        if(option.state & QStyle::State_Selected) {
+            pen.setStyle(Qt::SolidLine);
+            pen.setWidthF(1.35);
+            pen.setColor(Qt::darkBlue);
+            painter->setPen(pen);
+        }
+
         painter->translate(0,t_fPlotHeight/2);
         painter->setRenderHint(QPainter::Antialiasing, true);
         painter->drawPath(path);
