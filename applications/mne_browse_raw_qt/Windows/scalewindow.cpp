@@ -75,23 +75,27 @@ ScaleWindow::~ScaleWindow()
 
 void ScaleWindow::init()
 {
-    //Connect spin boxes
+    //Connect data scaling spin boxes
     connect(ui->m_doubleSpinBox_MEG_grad,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this,&ScaleWindow::scaleValueChanged);
+            this,&ScaleWindow::scaleChannelValueChanged);
     connect(ui->m_doubleSpinBox_MEG_mag,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this,&ScaleWindow::scaleValueChanged);
+            this,&ScaleWindow::scaleChannelValueChanged);
     connect(ui->m_doubleSpinBox_EEG,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this,&ScaleWindow::scaleValueChanged);
+            this,&ScaleWindow::scaleChannelValueChanged);
     connect(ui->m_doubleSpinBox_EOG,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this,&ScaleWindow::scaleValueChanged);
+            this,&ScaleWindow::scaleChannelValueChanged);
     connect(ui->m_doubleSpinBox_EMG,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this,&ScaleWindow::scaleValueChanged);
+            this,&ScaleWindow::scaleChannelValueChanged);
     connect(ui->m_doubleSpinBox_ECG,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this,&ScaleWindow::scaleValueChanged);
+            this,&ScaleWindow::scaleChannelValueChanged);
     connect(ui->m_doubleSpinBox_MISC,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this,&ScaleWindow::scaleValueChanged);
+            this,&ScaleWindow::scaleChannelValueChanged);
     connect(ui->m_doubleSpinBox_STIM,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this,&ScaleWindow::scaleValueChanged);
+            this,&ScaleWindow::scaleChannelValueChanged);
+
+    //Connect view scaling spin boxes
+    connect(ui->m_doubleSpinBox_channelHeight,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this,&ScaleWindow::scaleViewValueChanged);
 }
 
 
@@ -200,7 +204,34 @@ void ScaleWindow::hideSpinBoxes(FiffInfo currentFiffInfo)
 
 //*************************************************************************************************************
 
-void ScaleWindow::scaleValueChanged()
+void ScaleWindow::scaleAllChannels(double scaleValue)
 {
-    emit scalingValueChanged();
+    qDebug()<<scaleValue;
+
+    scaleValue = (scaleValue - 1)*4;
+
+    ui->m_doubleSpinBox_MEG_grad->setValue((scaleValue*ui->m_doubleSpinBox_MEG_grad->singleStep()) + ui->m_doubleSpinBox_MEG_grad->value());
+    ui->m_doubleSpinBox_MEG_mag->setValue((scaleValue*ui->m_doubleSpinBox_MEG_mag->singleStep()) + ui->m_doubleSpinBox_MEG_mag->value());
+    ui->m_doubleSpinBox_EEG->setValue((scaleValue*ui->m_doubleSpinBox_EEG->singleStep()) + ui->m_doubleSpinBox_EEG->value());
+    ui->m_doubleSpinBox_EOG->setValue((scaleValue*ui->m_doubleSpinBox_EOG->singleStep()) + ui->m_doubleSpinBox_EOG->value());
+    ui->m_doubleSpinBox_EMG->setValue((scaleValue*ui->m_doubleSpinBox_EMG->singleStep()) + ui->m_doubleSpinBox_EMG->value());
+    ui->m_doubleSpinBox_ECG->setValue((scaleValue*ui->m_doubleSpinBox_ECG->singleStep()) + ui->m_doubleSpinBox_ECG->value());
+    ui->m_doubleSpinBox_MISC->setValue((scaleValue*ui->m_doubleSpinBox_MISC->singleStep()) + ui->m_doubleSpinBox_MISC->value());
+    ui->m_doubleSpinBox_STIM->setValue((scaleValue*ui->m_doubleSpinBox_STIM->singleStep()) + ui->m_doubleSpinBox_STIM->value());
+}
+
+
+//*************************************************************************************************************
+
+void ScaleWindow::scaleChannelValueChanged()
+{
+    emit scalingChannelValueChanged();
+}
+
+
+//*************************************************************************************************************
+
+void ScaleWindow::scaleViewValueChanged()
+{
+    emit scalingViewValueChanged(ui->m_doubleSpinBox_channelHeight->value());
 }

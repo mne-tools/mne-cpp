@@ -140,6 +140,41 @@ void DataWindow::updateDataTableViews()
 
 //*************************************************************************************************************
 
+void DataWindow::showSelectedChannelsOnly(QStringList selectedChannels)
+{
+    //Hide non selected channels/rows in the data views
+    for(int i = 0; i<m_pRawModel->rowCount(); i++) {
+        QModelIndex index = m_pRawModel->index(i, 0);
+        QString channel = m_pRawModel->data(index, Qt::DisplayRole).toString();
+
+        ui->m_tableView_rawTableView->showRow(i);
+        m_pUndockedDataView->showRow(i);
+
+        if(!selectedChannels.contains(channel)) {
+            ui->m_tableView_rawTableView->hideRow(i);
+            m_pUndockedDataView->hideRow(i);
+        }
+        else {
+            ui->m_tableView_rawTableView->showRow(i);
+            m_pUndockedDataView->showRow(i);
+        }
+    }
+
+    updateDataTableViews();
+}
+
+
+//*************************************************************************************************************
+
+void DataWindow::scaleChannelsInView(double scale)
+{
+    for(int i = 0; i<ui->m_tableView_rawTableView->verticalHeader()->count(); i++)
+        ui->m_tableView_rawTableView->setRowHeight(i, scale);
+}
+
+
+//*************************************************************************************************************
+
 void DataWindow::initMVCSettings()
 {
     //-----------------------------------
@@ -185,6 +220,10 @@ void DataWindow::initMVCSettings()
     ui->m_tableView_rawTableView->horizontalScrollBar()->installEventFilter(this);
     ui->m_tableView_rawTableView->verticalScrollBar()->installEventFilter(this);
     ui->m_tableView_rawTableView->verticalHeader()->installEventFilter(this);
+
+    //Enable gestures for the view
+    ui->m_tableView_rawTableView->grabGesture(Qt::PinchGesture);
+    ui->m_tableView_rawTableView->installEventFilter(this);
 
     //-----------------------------------
     //------ Init "dockable" view -------
@@ -306,7 +345,8 @@ void DataWindow::initMarker()
     }
 
     //Connect current marker to loading a fiff file - no loaded file - no visible marker
-    connect(m_pRawModel, &RawModel::fileLoaded,[this](bool state){
+    connect(m_pRawModel, &RawModel::fileLoaded,[this](){
+        bool state = m_pRawModel->m_bFileloaded;
         if(state) {
             //Inital position of the marker
             m_pDataMarker->move(74, m_pDataMarker->y());
@@ -416,6 +456,11 @@ bool DataWindow::eventFilter(QObject *object, QEvent *event)
         QScroller::grabGesture(m_pUndockedDataView, QScroller::LeftMouseButtonGesture);
         QScroller::grabGesture(ui->m_tableView_rawTableView, QScroller::LeftMouseButtonGesture);
         return true;
+    }
+
+    if (object == ui->m_tableView_rawTableView && event->type() == QEvent::Gesture) {
+        QGestureEvent* gestureEventCast = static_cast<QGestureEvent*>(event);
+        return gestureEvent(static_cast<QGestureEvent*>(gestureEventCast));
     }
 
     return false;
@@ -626,3 +671,41 @@ void DataWindow::highlightChannelsInSelectionManager()
     }
 }
 
+
+//*************************************************************************************************************
+
+bool DataWindow::gestureEvent(QGestureEvent *event)
+{
+    //Pinch event
+    if (QGesture *pinch = event->gesture(Qt::PinchGesture))
+        pinchTriggered(static_cast<QPinchGesture *>(pinch));
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool DataWindow::pinchTriggered(QPinchGesture *gesture)
+{
+    QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
+    if (changeFlags & QPinchGesture::ScaleFactorChanged) {
+        emit scaleChannels(gesture->scaleFactor());
+        qDebug()<<"ungrab";
+        ui->m_tableView_rawTableView->setSelectionMode(QAbstractItemView::NoSelection);
+        QScroller::ungrabGesture(m_pUndockedDataView);
+        QScroller::ungrabGesture(ui->m_tableView_rawTableView);
+    }
+
+    if (gesture->state() == Qt::GestureFinished) {
+        qDebug()<<"Finished gesture - grab again";
+        ui->m_tableView_rawTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+        QScroller::grabGesture(m_pUndockedDataView, QScroller::LeftMouseButtonGesture);
+        QScroller::grabGesture(ui->m_tableView_rawTableView, QScroller::LeftMouseButtonGesture);
+    }
+
+
+
+
+    return true;
+}
