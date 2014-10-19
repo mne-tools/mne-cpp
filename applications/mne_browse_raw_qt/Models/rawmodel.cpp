@@ -328,7 +328,6 @@ bool RawModel::loadFiffData(QFile& qFile)
         m_bStartReached = true;
         if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_data, t_times, m_iAbsFiffCursor, m_iAbsFiffCursor+m_iWindowSize-1))
             return false;
-        emit fileLoaded(true);
         m_bFileloaded = true;
     }
     else {
@@ -348,6 +347,8 @@ bool RawModel::loadFiffData(QFile& qFile)
     genStdFilterOps();
 
     endResetModel();
+
+    emit fileLoaded(true);
 
     return true;
 }
