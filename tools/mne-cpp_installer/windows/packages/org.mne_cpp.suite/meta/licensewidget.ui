@@ -46,14 +46,14 @@
     </widget>
    </item>
    <item>
-    <widget class="QRadioButton" name="acceptLicense">
+    <widget class="QRadioButton" name="acceptLicenseRB">
      <property name="text">
       <string>I accept the license.</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QRadioButton" name="declineLicense">
+    <widget class="QRadioButton" name="declineLicenseRB">
      <property name="text">
       <string>I do not accept the license.</string>
      </property>

@@ -5,4 +5,4 @@
 MNE-CPP_INSTALLER_PRI_INCLUDED = 1
 
 #Adapt to IFW install path
-IFW_INSTALL_PATH = D:/GitHub/build-installerfw-Qt_5_3_2-Release
+IFW_INSTALL_PATH = D:/GitHub/build-installerfw-Qt_5_3_2_static-Release

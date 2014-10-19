@@ -18,4 +18,3 @@ macx {
 }
 
 RESOURCES += \
-    windows/resources/additional.qrc
