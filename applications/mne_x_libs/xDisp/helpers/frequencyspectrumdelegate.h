@@ -89,6 +89,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Set scale type.
+    *
+    * @param [in] ScaleType.
+    */
+    void setScaleType(qint8 ScaleType);
+
+    //=========================================================================================================
+    /**
     * Use the painter and style option to render the item specified by the item index.
     *
     * (sizeHint() must be implemented also)
@@ -156,13 +164,6 @@ private:
     */
     void createGridTick(const QModelIndex &index, const QStyleOptionViewItem &option,  QPainter *painter) const;
 
-    //=========================================================================================================
-    /**
-    * Is called when mouse is moved.
-    * Function is getting the current mouse position for measurement of the real-time curve and to zoom in or out.
-    *
-    * @param [in] mouseEvent pointer to MouseEvent.
-    */
 
     // Scaling
     float m_fMaxValue;     /**< Maximum value of the data to plot  */
@@ -176,6 +177,9 @@ private:
     int m_mousey;            /**< the mouse y pos */
     QRect m_visRect;         /**< visual rect of row of tableview */
     float m_x_rate;          /**< the rate of the cursor position in the raw visual rect */
+
+
+    qint8 m_iScaleType;      /**< scale type */
 
 
 
