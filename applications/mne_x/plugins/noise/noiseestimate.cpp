@@ -74,6 +74,7 @@ NoiseEstimate::NoiseEstimate()
 , m_Fs(600)
 , m_iFFTlength(16384)
 , m_DataLen(6)
+, m_x_scale_type(0)
 {
 }
 
@@ -109,6 +110,7 @@ void NoiseEstimate::init()
     QSettings settings;
     m_iFFTlength = settings.value(QString("Plugin/%1/FFTLength").arg(this->getName()), 16384).toInt();
     m_DataLen = settings.value(QString("Plugin/%1/DataLen").arg(this->getName()), 6).toInt();
+    m_x_scale_type = settings.value(QString("Plugin/%1/ScaleType").arg(this->getName()), 0).toInt();
 
     // Input
     m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "Noise Estimatge In", "Noise Estimate input data");
@@ -126,6 +128,7 @@ void NoiseEstimate::init()
     //Delete Buffer - will be initailzed with first incoming data
     if(!m_pBuffer.isNull())
         m_pBuffer = CircularMatrixBuffer<double>::SPtr();
+
 }
 
 
@@ -139,6 +142,7 @@ void NoiseEstimate::unload()
     QSettings settings;
     settings.setValue(QString("Plugin/%1/FFTLength").arg(this->getName()), m_iFFTlength);
     settings.setValue(QString("Plugin/%1/DataLen").arg(this->getName()), m_DataLen);
+    settings.setValue(QString("Plugin/%1/ScaleType").arg(this->getName()), m_x_scale_type);
 }
 
 
@@ -146,9 +150,13 @@ void NoiseEstimate::unload()
 
 void NoiseEstimate::initConnector()
 {
+    /* init Connector is called after NoiseEstimate::start */
     qDebug() << "void NoiseEstimate::initConnector()";
-    if(m_pFiffInfo)
+    if(m_pFiffInfo){
+        // pass fiff info
         m_pFSOutput->data()->initFromFiffInfo(m_pFiffInfo);
+
+    }
 }
 
 
@@ -164,7 +172,6 @@ bool NoiseEstimate::start()
 
     // Start threads
     QThread::start();
-
     return true;
 }
 
@@ -189,7 +196,6 @@ bool NoiseEstimate::stop()
 
 //        m_pNEOutput->data()->clear();
     }
-
     return true;
 }
 
@@ -217,7 +223,6 @@ QWidget* NoiseEstimate::setupWidget()
     NoiseEstimateSetupWidget* setupWidget = new NoiseEstimateSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
 
     connect(this,&NoiseEstimate::SetNoisePara,setupWidget,&NoiseEstimateSetupWidget::init);
-    //connect(this,&NoiseEstimate::RePlot,setupWidget,&NoiseEstimateSetupWidget::Update);
 
     return setupWidget;
 
@@ -290,6 +295,11 @@ void NoiseEstimate::run()
         msleep(10);// Wait for fiff Info
     }
 
+    // Set up the x-axis scale type
+    m_pFSOutput->data()->initScaleType(m_x_scale_type);
+    qDebug()<< "Scale Type [0-normal; 1-log]:" << m_x_scale_type;
+
+
     // Init Real-Time Noise Spectrum estimator
     //
     // calculate the segments according to the requested data length
@@ -306,11 +316,11 @@ void NoiseEstimate::run()
 
     m_pRtNoise->start();
 
-
     m_bProcessData = true;
 
     while (m_bIsRunning)
     {
+
         if(m_bProcessData)
         {
             /* Dispatch the inputs */
