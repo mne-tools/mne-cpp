@@ -6,7 +6,7 @@
     <ReleaseDate>2014-10-19</ReleaseDate>
     <Name>org.mne_cpp.mne_browse_raw_qt</Name>
     <Licenses>
-        <License name="The BSD 3-Clause License" file="license_mne_browse_raw_qt.txt" />
+        <License name="MNE Browse Raw Qt License (BSD 3-Clause)" file="license_mne_browse_raw_qt.txt" />
     </Licenses>
     <Default>script</Default>
     <Script>installscript.qs</Script>

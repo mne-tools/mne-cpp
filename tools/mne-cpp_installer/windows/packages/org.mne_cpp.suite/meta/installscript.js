@@ -1,38 +1,7 @@
-/**************************************************************************
-**
-** Copyright (C) 2014 Digia Plc and/or its subsidiary(-ies).
-** Contact: http://www.qt-project.org/legal
-**
-** This file is part of the Qt Installer Framework.
-**
-** $QT_BEGIN_LICENSE:LGPL$
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
-** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and Digia.  For licensing terms and
-** conditions see http://qt.digia.com/licensing.  For further information
-** use the contact form at http://qt.digia.com/contact-us.
-**
-** GNU Lesser General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
-**
-** In addition, as a special exception, Digia gives you certain additional
-** rights. These rights are described in the Digia Qt LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
-**
-**
-** $QT_END_LICENSE$
-**
-**************************************************************************/
-
 var ComponentSelectionPage = null;
+
+
+//*************************************************************************************************************
 
 var Dir = new function () {
     this.toNativeSparator = function (path) {
@@ -42,6 +11,9 @@ var Dir = new function () {
     }
 };
 
+
+//*************************************************************************************************************
+
 function Component() {
     if (installer.isInstaller()) {
         component.loaded.connect(this, Component.prototype.installerLoaded);
@@ -49,12 +21,15 @@ function Component() {
 
         installer.setDefaultPageVisible(QInstaller.TargetDirectory, false);
         installer.setDefaultPageVisible(QInstaller.ComponentSelection, false);
-        installer.setDefaultPageVisible(QInstaller.LicenseCheck, false);
+//        installer.setDefaultPageVisible(QInstaller.LicenseCheck, false);
         if (installer.value("os") == "win")
             installer.setDefaultPageVisible(QInstaller.StartMenuSelection, false);
         installer.setDefaultPageVisible(QInstaller.ReadyForInstallation, false);
     }
 }
+
+
+//*************************************************************************************************************
 
 Component.prototype.installerLoaded = function () {
     if (installer.addWizardPage(component, "TargetWidget", QInstaller.TargetDirectory)) {
@@ -79,16 +54,17 @@ Component.prototype.installerLoaded = function () {
             widget.windowTitle = "Please select a installation type";
         }
 
-        if (installer.addWizardPage(component, "LicenseWidget", QInstaller.LicenseCheck)) {
-            var widget = gui.pageWidgetByObjectName("DynamicLicenseWidget");
-            if (widget != null) {
-                widget.acceptLicense.toggled.connect(this, Component.prototype.checkAccepted);
+//        if (installer.addWizardPage(component, "LicenseWidget", QInstaller.LicenseCheck)) {
+//            var widget = gui.pageWidgetByObjectName("DynamicLicenseWidget");
+//            if (widget != null) {
+//                widget.acceptLicenseRB.toggled.connect(this, Component.prototype.checkAccepted);
 
-                widget.complete = false;
-                widget.declineLicense.checked = true;
-                widget.windowTitle = "License Agreement";
-            }
-        }
+//                widget.next.button.enabled = false;
+//                widget.complete = false;
+//                widget.declineLicenseRB.checked = true;
+//                widget.windowTitle = "BSD 3-Clause License";
+//            }
+//        }
 
         if (installer.addWizardPage(component, "ReadyToInstallWidget", QInstaller.ReadyForInstallation)) {
             var widget = gui.pageWidgetByObjectName("DynamicReadyToInstallWidget");
@@ -104,6 +80,9 @@ Component.prototype.installerLoaded = function () {
     }
 }
 
+
+//*************************************************************************************************************
+
 Component.prototype.targetChanged = function (text) {
     var widget = gui.pageWidgetByObjectName("DynamicTargetWidget");
     if (widget != null) {
@@ -118,6 +97,9 @@ Component.prototype.targetChanged = function (text) {
     }
 }
 
+
+//*************************************************************************************************************
+
 Component.prototype.chooseTarget = function () {
     var widget = gui.pageWidgetByObjectName("DynamicTargetWidget");
     if (widget != null) {
@@ -128,6 +110,9 @@ Component.prototype.chooseTarget = function () {
     }
 }
 
+
+//*************************************************************************************************************
+
 Component.prototype.customInstallToggled = function (checked) {
     if (checked) {
         if (ComponentSelectionPage != null)
@@ -135,6 +120,9 @@ Component.prototype.customInstallToggled = function (checked) {
         installer.setDefaultPageVisible(QInstaller.ComponentSelection, true);
     }
 }
+
+
+//*************************************************************************************************************
 
 Component.prototype.defaultInstallToggled = function (checked) {
     if (checked) {
@@ -144,6 +132,9 @@ Component.prototype.defaultInstallToggled = function (checked) {
     }
 }
 
+
+//*************************************************************************************************************
+
 Component.prototype.completeInstallToggled = function (checked) {
     if (checked) {
         if (ComponentSelectionPage != null)
@@ -152,11 +143,20 @@ Component.prototype.completeInstallToggled = function (checked) {
     }
 }
 
-Component.prototype.checkAccepted = function (checked) {
-    var widget = gui.pageWidgetByObjectName("DynamicLicenseWidget");
-    if (widget != null)
-        widget.complete = checked;
-}
+
+//*************************************************************************************************************
+
+//Component.prototype.checkAccepted = function (checked) {
+//    var widget = gui.pageWidgetByObjectName("DynamicLicenseWidget");
+//    if (widget != null)
+//        widget.complete = checked;
+
+////    var result = QMessageBox["question"]("test.quit", "Installer", "Test " + checked, QMessageBox.Ok | QMessageBox.Cancel);
+
+//}
+
+
+//*************************************************************************************************************
 
 Component.prototype.readyToInstallWidgetEntered = function () {
     var widget = gui.pageWidgetByObjectName("DynamicReadyToInstallWidget");

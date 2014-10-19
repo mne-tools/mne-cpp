@@ -60,7 +60,7 @@
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap resource="../../resources/additional.qrc">:/icon.png</pixmap>
+      <pixmap resource="../../../resources/additional.qrc">:/icon.png</pixmap>
      </property>
     </widget>
    </item>
@@ -105,7 +105,7 @@
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap resource="../../resources/additional.qrc">:/icon.png</pixmap>
+      <pixmap resource="../../../resources/additional.qrc">:/icon.png</pixmap>
      </property>
     </widget>
    </item>
@@ -121,7 +121,7 @@
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap resource="../../resources/additional.qrc">:/icon.png</pixmap>
+      <pixmap resource="../../../resources/additional.qrc">:/icon.png</pixmap>
      </property>
     </widget>
    </item>
@@ -249,7 +249,7 @@
   <tabstop>customInstall</tabstop>
  </tabstops>
  <resources>
-  <include location="../../resources/additional.qrc"/>
+  <include location="../../../resources/additional.qrc"/>
  </resources>
  <connections/>
 </ui>
