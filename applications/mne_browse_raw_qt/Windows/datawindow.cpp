@@ -342,6 +342,8 @@ void DataWindow::initMarker()
     if(!m_pRawModel->m_bFileloaded) {
         m_pDataMarker->hide();
         m_pCurrentDataMarkerLabel->hide();
+        ui->m_label_sampleMin->hide();
+        ui->m_label_sampleMax->hide();
     }
 
     //Connect current marker to loading a fiff file - no loaded file - no visible marker
@@ -354,10 +356,16 @@ void DataWindow::initMarker()
 
             m_pDataMarker->show();
             m_pCurrentDataMarkerLabel->show();
+
+            ui->m_label_sampleMin->show();
+            ui->m_label_sampleMax->show();
         }
         else {
             m_pDataMarker->hide();
             m_pCurrentDataMarkerLabel->hide();
+
+            ui->m_label_sampleMin->hide();
+            ui->m_label_sampleMax->hide();
         }
     });
 }
