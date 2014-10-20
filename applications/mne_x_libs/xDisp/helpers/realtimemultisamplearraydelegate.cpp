@@ -250,7 +250,6 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
         }
     }
 
-
     float fValue;
     float fScaleY = option.rect.height()/(2*fMaxValue);
 
