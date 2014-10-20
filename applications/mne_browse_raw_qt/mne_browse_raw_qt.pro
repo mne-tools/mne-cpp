@@ -57,7 +57,7 @@ CONFIG(debug, debug|release) {
 }
 
 #Note that the static flag is ingored when building against a dynamic qt version
-CONFIG += console static #DEBUG
+CONFIG += static #DEBUG console
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
