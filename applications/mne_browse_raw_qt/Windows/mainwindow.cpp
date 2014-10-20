@@ -58,7 +58,7 @@ using namespace MNEBrowseRawQt;
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
-, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+//, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
 //, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
 , m_qSettings()
 , m_rawSettings()
@@ -125,7 +125,7 @@ void MainWindow::setupWindowWidgets()
     //Create selection manager window - QTDesigner used - see /FormFiles
     m_pScaleWindow = new ScaleWindow(this);
     addDockWidget(Qt::RightDockWidgetArea, m_pScaleWindow);
-    //m_pScaleWindow->hide();
+    m_pScaleWindow->hide();
 
     //Init windows
     m_pDataWindow->init();
@@ -200,7 +200,8 @@ void MainWindow::setWindowStatus()
 {
     //Set window title
     QString title;
-    title = QString("%1").arg(CInfo::AppNameShort());
+    //title = QString("%1").arg(CInfo::AppNameShort());
+    title = QString("Visualize and Process");
     setWindowTitle(title);
 
     //Set status bar

@@ -89,13 +89,13 @@ void ChannelSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     //Plot selected item
     if(this->isSelected())
-        painter->setBrush(QBrush(Qt::red));
+        painter->setBrush(QBrush(Qt::yellow));
     else
         painter->setBrush(QBrush(m_cChannelColor));
 
     //Plot highlighted selected item
     if(m_bHighlightItem) {
-        painter->setPen(QPen(Qt::darkGreen, 4));
+        painter->setPen(QPen(Qt::red, 4));
         painter->drawEllipse(-15, -15, 30, 30);
     }
     else {

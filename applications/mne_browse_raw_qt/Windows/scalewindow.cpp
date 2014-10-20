@@ -208,7 +208,7 @@ void ScaleWindow::scaleAllChannels(double scaleValue)
 {
     qDebug()<<scaleValue;
 
-    scaleValue = (scaleValue - 1)*4;
+    scaleValue = (scaleValue - 1)*-4;
 
     ui->m_doubleSpinBox_MEG_grad->setValue((scaleValue*ui->m_doubleSpinBox_MEG_grad->singleStep()) + ui->m_doubleSpinBox_MEG_grad->value());
     ui->m_doubleSpinBox_MEG_mag->setValue((scaleValue*ui->m_doubleSpinBox_MEG_mag->singleStep()) + ui->m_doubleSpinBox_MEG_mag->value());

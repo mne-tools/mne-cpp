@@ -46,10 +46,10 @@
      <string>Windows</string>
     </property>
     <addaction name="m_eventAction"/>
-    <addaction name="m_informationAction"/>
     <addaction name="m_channelSelectionManagerAction"/>
-    <addaction name="m_averageWindowAction"/>
     <addaction name="m_scalingAction"/>
+    <addaction name="m_averageWindowAction"/>
+    <addaction name="m_informationAction"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -100,11 +100,6 @@
   <action name="m_filterAction">
    <property name="text">
     <string>Filter...</string>
-   </property>
-  </action>
-  <action name="m_dataAction">
-   <property name="text">
-    <string>Show data plot...</string>
    </property>
   </action>
   <action name="m_eventAction">
