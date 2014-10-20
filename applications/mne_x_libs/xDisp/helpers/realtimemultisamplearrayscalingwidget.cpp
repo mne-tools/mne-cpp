@@ -81,7 +81,7 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
     if(m_pRTMSAW->m_qMapChScaling.contains(FIFF_UNIT_T))
     {
         QLabel* t_pLabelModality = new QLabel;
-        t_pLabelModality->setText("MAG");
+        t_pLabelModality->setText("MAG (fT/cm)");
         t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
 
         QDoubleValidator* t_pDoubleValidator = new QDoubleValidator(10e-11,1,16,this);
