@@ -152,6 +152,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets Scale type
+    *
+    * @param [in] ScaleType       The corresponding scale type
+    */
+    void setScaleType(qint8 ScaleType);
+
+    //=========================================================================================================
+    /**
     * Adds the frequency estimation
     *
     * @param[in] data   the frequency estimation
@@ -285,6 +293,8 @@ private:
 
     qint32 m_iLowerFrqIdx;  /**< Upper frequency plotting boundary */
     qint32 m_iUpperFrqIdx;  /**< Lower frequency plotting boundary */
+
+    qint8 m_iScaleType;
 
 };
 
