@@ -22,6 +22,9 @@
      <layout class="QGridLayout" name="gridLayout">
       <item row="4" column="1">
        <widget class="QDoubleSpinBox" name="m_doubleSpinBox_EOG">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
         <property name="decimals">
          <number>1</number>
         </property>
@@ -41,6 +44,9 @@
       </item>
       <item row="6" column="1">
        <widget class="QDoubleSpinBox" name="m_doubleSpinBox_EMG">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
         <property name="decimals">
          <number>1</number>
         </property>
@@ -60,6 +66,9 @@
       </item>
       <item row="3" column="1">
        <widget class="QDoubleSpinBox" name="m_doubleSpinBox_EEG">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
         <property name="decimals">
          <number>1</number>
         </property>
@@ -108,12 +117,15 @@
       <item row="2" column="0">
        <widget class="QLabel" name="m_label_MEG_mag">
         <property name="text">
-         <string>MEG mag (pT/cm):</string>
+         <string>MEG mag (pT):</string>
         </property>
        </widget>
       </item>
       <item row="2" column="1">
        <widget class="QDoubleSpinBox" name="m_doubleSpinBox_MEG_mag">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
         <property name="decimals">
          <number>3</number>
         </property>
@@ -167,6 +179,9 @@
       </item>
       <item row="7" column="1">
        <widget class="QDoubleSpinBox" name="m_doubleSpinBox_MISC">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
         <property name="decimals">
          <number>1</number>
         </property>
@@ -180,6 +195,9 @@
       </item>
       <item row="8" column="1">
        <widget class="QDoubleSpinBox" name="m_doubleSpinBox_STIM">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
         <property name="decimals">
          <number>1</number>
         </property>
@@ -200,11 +218,23 @@
       </item>
       <item row="1" column="1">
        <widget class="QDoubleSpinBox" name="m_doubleSpinBox_MEG_grad">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
+        <property name="buttonSymbols">
+         <enum>QAbstractSpinBox::UpDownArrows</enum>
+        </property>
+        <property name="accelerated">
+         <bool>true</bool>
+        </property>
+        <property name="showGroupSeparator" stdset="0">
+         <bool>false</bool>
+        </property>
         <property name="decimals">
          <number>3</number>
         </property>
         <property name="minimum">
-         <double>1.000000000000000</double>
+         <double>40.000000000000000</double>
         </property>
         <property name="maximum">
          <double>100000.000000000000000</double>
@@ -219,6 +249,9 @@
       </item>
       <item row="5" column="1">
        <widget class="QDoubleSpinBox" name="m_doubleSpinBox_ECG">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
         <property name="decimals">
          <number>1</number>
         </property>
@@ -245,6 +278,9 @@
       </item>
       <item row="10" column="1">
        <widget class="QDoubleSpinBox" name="m_doubleSpinBox_channelHeight">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
         <property name="minimum">
          <double>5.000000000000000</double>
         </property>

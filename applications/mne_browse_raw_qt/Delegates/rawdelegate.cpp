@@ -142,8 +142,8 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
         if(option.state & QStyle::State_Selected) {
             pen.setStyle(Qt::SolidLine);
-            pen.setWidthF(1.35);
-            pen.setColor(Qt::darkBlue);
+            pen.setWidthF(1);
+            pen.setColor(Qt::red);
             painter->setPen(pen);
         }
 

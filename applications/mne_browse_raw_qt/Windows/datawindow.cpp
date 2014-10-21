@@ -166,10 +166,10 @@ void DataWindow::showSelectedChannelsOnly(QStringList selectedChannels)
 
 //*************************************************************************************************************
 
-void DataWindow::scaleChannelsInView(double scale)
+void DataWindow::scaleChannelsInView(double height)
 {
     for(int i = 0; i<ui->m_tableView_rawTableView->verticalHeader()->count(); i++)
-        ui->m_tableView_rawTableView->setRowHeight(i, scale);
+        ui->m_tableView_rawTableView->setRowHeight(i, height);
 }
 
 
@@ -199,6 +199,9 @@ void DataWindow::initMVCSettings()
 
     //activate kinetic scrolling
     QScroller::grabGesture(ui->m_tableView_rawTableView, QScroller::LeftMouseButtonGesture);
+    m_pKineticScroller = QScroller::scroller(ui->m_tableView_rawTableView);
+    m_pKineticScroller->setSnapPositionsX(100,100);
+    //m_pKineticScroller->setSnapPositionsY(100,100);
 
     //connect QScrollBar with model in order to reload data samples
     connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
@@ -208,6 +211,10 @@ void DataWindow::initMVCSettings()
     connect(ui->m_tableView_rawTableView->selectionModel(),&QItemSelectionModel::selectionChanged,
             this,&DataWindow::highlightChannelsInSelectionManager);
 
+    //connect selection change to update data views
+    connect(ui->m_tableView_rawTableView->selectionModel(),&QItemSelectionModel::selectionChanged,
+            this,&DataWindow::updateDataTableViews);
+
     //Set MVC in delegate
     m_pRawDelegate->setModelView(m_pMainWindow->m_pEventWindow->getEventModel(),
                                  m_pMainWindow->m_pEventWindow->getEventTableView(),
@@ -216,7 +223,7 @@ void DataWindow::initMVCSettings()
     //Set scale window in delegate
     m_pRawDelegate->setScaleWindow(m_pMainWindow->m_pScaleWindow);
 
-    //Install event filter to overcome QGrabGesture and QScrollBar problem
+    //Install event filter to overcome QGrabGesture and QScrollBar/QHeader problem
     ui->m_tableView_rawTableView->horizontalScrollBar()->installEventFilter(this);
     ui->m_tableView_rawTableView->verticalScrollBar()->installEventFilter(this);
     ui->m_tableView_rawTableView->verticalHeader()->installEventFilter(this);
@@ -224,6 +231,9 @@ void DataWindow::initMVCSettings()
     //Enable gestures for the view
     ui->m_tableView_rawTableView->grabGesture(Qt::PinchGesture);
     ui->m_tableView_rawTableView->installEventFilter(this);
+
+    //Enable event fitlering for the viewport in order to intercept mouse events
+    ui->m_tableView_rawTableView->viewport()->installEventFilter(this);
 
     //-----------------------------------
     //------ Init "dockable" view -------
@@ -301,6 +311,36 @@ void DataWindow::initToolBar()
     undockToWindowAction->setStatusTip(tr("Undock data view to window"));
     connect(undockToWindowAction, SIGNAL(triggered()), this, SLOT(undockDataViewToWindow()));
     toolBar->addAction(undockToWindowAction);
+
+    //Toggle visibility of the event manager
+    QAction* showEventManager = new QAction(QIcon(":/Resources/Images/showEventManager.png"),tr("Toggle event manager"), this);
+    showEventManager->setStatusTip(tr("Toggle the event manager"));
+    connect(showEventManager, &QAction::triggered, m_pMainWindow, &MainWindow::showEventWindow);
+    toolBar->addAction(showEventManager);
+
+    //Toggle visibility of the Selection manager
+    QAction* showSelectionManager = new QAction(QIcon(":/Resources/Images/showSelectionManager.png"),tr("Toggle selection manager"), this);
+    showSelectionManager->setStatusTip(tr("Toggle the selection manager"));
+    connect(showSelectionManager, &QAction::triggered, m_pMainWindow, &MainWindow::showSelectionManagerWindow);
+    toolBar->addAction(showSelectionManager);
+
+    //Toggle visibility of the scaling window
+    QAction* showScalingWindow = new QAction(QIcon(":/Resources/Images/showScalingWindow.png"),tr("Toggle scaling window"), this);
+    showScalingWindow->setStatusTip(tr("Toggle the scaling window"));
+    connect(showScalingWindow, &QAction::triggered, m_pMainWindow, &MainWindow::showScaleWindow);
+    toolBar->addAction(showScalingWindow);
+
+    //Toggle visibility of the average manager
+    QAction* showAverageManager = new QAction(QIcon(":/Resources/Images/showAverageManager.png"),tr("Toggle average manager"), this);
+    showAverageManager->setStatusTip(tr("Toggle the average manager"));
+    connect(showAverageManager, &QAction::triggered, m_pMainWindow, &MainWindow::showAverageWindow);
+    toolBar->addAction(showAverageManager);
+
+    //Toggle visibility of the scaling window
+    QAction* showInformationWindow = new QAction(QIcon(":/Resources/Images/showInformationWindow.png"),tr("Toggle information window"), this);
+    showInformationWindow->setStatusTip(tr("Toggle the information window"));
+    connect(showInformationWindow, &QAction::triggered, m_pMainWindow, &MainWindow::showInformationWindow);
+    toolBar->addAction(showInformationWindow);
 
     int layoutRows = ui->m_gridLayout->rowCount();
     int layoutColumns = ui->m_gridLayout->columnCount();
@@ -447,7 +487,17 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
 //*************************************************************************************************************
 
 bool DataWindow::eventFilter(QObject *object, QEvent *event)
-{
+{    
+    //Detect double mouse clicks and move data marker to current mouse position
+    if (object == ui->m_tableView_rawTableView->viewport() && event->type() == QEvent::MouseButtonDblClick) {
+        QMouseEvent* mouseEventCast = static_cast<QMouseEvent*>(event);
+        if(mouseEventCast->button() == Qt::LeftButton)
+            m_pDataMarker->move(mouseEventCast->localPos().x() + ui->m_tableView_rawTableView->verticalHeader()->width() + ui->m_tableView_rawTableView->x(), m_pDataMarker->y());
+
+        return true;
+    }
+
+    //Deactivate grabbing gesture when scrollbars or vertical header are selected
     if ((object == m_pUndockedDataView->horizontalScrollBar() || object == ui->m_tableView_rawTableView->horizontalScrollBar() ||
          object == m_pUndockedDataView->verticalScrollBar() || object == ui->m_tableView_rawTableView->verticalScrollBar() ||
          object == m_pUndockedDataView->verticalHeader() || object == ui->m_tableView_rawTableView->verticalHeader())
@@ -457,6 +507,7 @@ bool DataWindow::eventFilter(QObject *object, QEvent *event)
         return true;
     }
 
+    //Activate grabbing gesture when scrollbars or vertical header are deselected
     if ((object == m_pUndockedDataView->horizontalScrollBar() || object == ui->m_tableView_rawTableView->horizontalScrollBar()||
          object == m_pUndockedDataView->verticalScrollBar() || object == ui->m_tableView_rawTableView->verticalScrollBar()||
          object == m_pUndockedDataView->verticalHeader() || object == ui->m_tableView_rawTableView->verticalHeader())
@@ -466,6 +517,7 @@ bool DataWindow::eventFilter(QObject *object, QEvent *event)
         return true;
     }
 
+    //Look for swipe gesture in order to scale the channels
     if (object == ui->m_tableView_rawTableView && event->type() == QEvent::Gesture) {
         QGestureEvent* gestureEventCast = static_cast<QGestureEvent*>(event);
         return gestureEvent(static_cast<QGestureEvent*>(gestureEventCast));
@@ -711,9 +763,6 @@ bool DataWindow::pinchTriggered(QPinchGesture *gesture)
         QScroller::grabGesture(m_pUndockedDataView, QScroller::LeftMouseButtonGesture);
         QScroller::grabGesture(ui->m_tableView_rawTableView, QScroller::LeftMouseButtonGesture);
     }
-
-
-
 
     return true;
 }

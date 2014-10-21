@@ -59,6 +59,7 @@
 #include <QPainter>
 #include <QColor>
 #include <QGesture>
+#include <QScroller>
 
 
 //*************************************************************************************************************
@@ -154,7 +155,7 @@ public:
     /**
     * Scale the channels in the data views
     */
-    void scaleChannelsInView(double scale);
+    void scaleChannelsInView(double height);
 
 private:
     //=========================================================================================================
@@ -228,8 +229,10 @@ private:
     RawDelegate*    m_pRawDelegate;                 /**< the QAbstractDelegate being part of the raw model/view framework of Qt */
     RawModel*       m_pRawModel;                    /**< the QAbstractTable model being part of the model/view framework of Qt */
 
-    QTableView*     m_pUndockedDataView;
-    QVBoxLayout*    m_pUndockedDataViewLayout;
+    QTableView*     m_pUndockedDataView;            /**< the QTableView of the undockable widget*/
+    QVBoxLayout*    m_pUndockedDataViewLayout;      /**< the layout of the undockable widget */
+
+    QScroller*      m_pKineticScroller;             /**< the kinetic scroller of the QTableView */
 
 signals:
     void scaleChannels(double);

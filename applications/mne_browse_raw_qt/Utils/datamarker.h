@@ -109,7 +109,21 @@ private:
     */
     void mouseMoveEvent(QMouseEvent *event);
 
+    //=========================================================================================================
+    /**
+    * Reimplemnted enter event handler
+    *
+    * @param event QEvent
+    */
     void enterEvent(QEvent *event);
+
+    //=========================================================================================================
+    /**
+    * Reimplemnted move event handler
+    *
+    * @param event QMoveEvent
+    */
+    void moveEvent(QMoveEvent *event);
 
     QPoint      m_oldPos;               /**< The old mouse position */
 
