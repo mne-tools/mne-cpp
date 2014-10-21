@@ -218,6 +218,14 @@ private:
     */
     QPair<MatrixXd,MatrixXd> readSegment(fiff_int_t from, fiff_int_t to);
 
+    //=========================================================================================================
+    /**
+    * calculateMean
+    *
+    * @param data
+    */
+    VectorXd calculateMean(const MatrixXd &data);
+
     //VARIABLES
     //Reload control
     bool                                    m_bStartReached;            /**< signals, whether the start of the fiff data file is reached */
@@ -240,6 +248,8 @@ private:
     QList<MatrixXdR>                        m_data;                     /**< List that holds the fiff matrix data <n_channels x n_samples> */
     QList<MatrixXdR>                        m_procData;                 /**< List that holds the processed fiff matrix data <n_channels x n_samples> */
     QList<MatrixXdR>                        m_times;                    /**< List that holds the time axis [in secs] */
+    QList<VectorXd>                         m_dataMean;                 /**< List that holds the means of each channel in each data block */
+    QList<VectorXd>                         m_procDataMean;             /**< List that holds the means of each channel in each processed data block */
 
     //Filter operators
     QMap<int,QSharedPointer<MNEOperator> >      m_assignedOperators;    /**< Map of MNEOperator types to channels*/
