@@ -37,10 +37,10 @@ include(mne-cpp.pri)
 
 TEMPLATE = subdirs
 
-#At least version 5.3.0
-!minQtVersion(5, 3, 0) {
+#At least version 5.2.0
+!minQtVersion(5, 2, 0) {
     message("Cannot build MNE-CPP with Qt version $${QT_VERSION}.")
-    error("Use at least Qt 5.3.0.")
+    error("Use at least Qt 5.2.0.")
 }
 
 SUBDIRS += \
