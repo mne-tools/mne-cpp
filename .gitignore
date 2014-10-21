@@ -346,3 +346,7 @@ bin/mne_browse_raw_qt.app/Contents/PkgInfo
 /bin/test_mne_surfaced
 /bin/mne_x_default.xml
 /tools/mne-cpp_installer/*.user
+/tools/build-mne-cpp_installer-Qt_5_3_2_static-Release/windows
+/tools/mne-cpp_installer/windows/packages/org.mne_cpp.suite.mne/data/MNE/libs/*.dll
+/tools/mne-cpp_installer/windows/packages/org.mne_cpp.suite.mne_browse_raw_qt/data/mne_browse_raw_qt/*.dll
+/tools/mne-cpp_installer/windows/packages/org.mne_cpp.suite.mne_browse_raw_qt/data/mne_browse_raw_qt/*.exe

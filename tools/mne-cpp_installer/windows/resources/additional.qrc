@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
         <file>icon.png</file>
-        <file>license.txt</file>
     </qresource>
 </RCC>
