@@ -104,12 +104,12 @@
   </action>
   <action name="m_eventAction">
    <property name="text">
-    <string>Show event list...</string>
+    <string>Toggle event manager...</string>
    </property>
   </action>
   <action name="m_informationAction">
    <property name="text">
-    <string>Show information...</string>
+    <string>Toggle information window...</string>
    </property>
   </action>
   <action name="m_aboutAction">
@@ -119,17 +119,17 @@
   </action>
   <action name="m_channelSelectionManagerAction">
    <property name="text">
-    <string>Show channel selection manager...</string>
+    <string>Toggle channel selection manager...</string>
    </property>
   </action>
   <action name="m_averageWindowAction">
    <property name="text">
-    <string>Show averages...</string>
+    <string>Toggle average manager...</string>
    </property>
   </action>
   <action name="m_scalingAction">
    <property name="text">
-    <string>Show scaling...</string>
+    <string>Toggle scaling window...</string>
    </property>
   </action>
  </widget>
