@@ -81,6 +81,9 @@
 #include <QVector>
 #include <QTimer>
 
+#define MAX_DATA_LEN    2000000000L
+#define MAX_POS         2000000000L
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -180,7 +183,18 @@ public:
 
     void showSqdCtrlDialog();
 
+    //=========================================================================================================
+    /**
+    * Determines current file. And starts a new one.
+    */
+    void splitRecordingFile();
+
+    //=========================================================================================================
+    /**
+    * Starts or stops a file recording depending on the current recording state.
+    */
     void toggleRecordingFile();
+
 
     virtual bool start();
     virtual bool stop();
@@ -275,6 +289,7 @@ private:
     QString m_sCurrentSubject;      /**< The current subject which is part of the filename to be recorded.*/
     QString m_sCurrentParadigm;     /**< The current paradigm which is part of the filename to be recorded.*/
     QString m_sRecordFile;          /**< Current record file. */
+    qint32 m_iSplitCount;           /**< File split count */
     QFile                               m_qFileOut;         /**< QFile for writing to fif file.*/
     FiffStream::SPtr                    m_pOutfid;          /**< FiffStream to write to.*/
 
