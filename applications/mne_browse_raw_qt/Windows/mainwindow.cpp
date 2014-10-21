@@ -96,7 +96,7 @@ void MainWindow::setupWindowWidgets()
 
     //Create dockble event window - QTDesigner used - see /FormFiles
     m_pEventWindow = new EventWindow(this);
-    addDockWidget(Qt::RightDockWidgetArea, m_pEventWindow);
+    addDockWidget(Qt::LeftDockWidgetArea, m_pEventWindow);
     m_pEventWindow->hide();
 
     //Create filter window - QTDesigner used - see /FormFiles
@@ -117,14 +117,14 @@ void MainWindow::setupWindowWidgets()
     addDockWidget(Qt::BottomDockWidgetArea, m_pSelectionManagerWindow);
     m_pSelectionManagerWindow->hide();
 
-    //Create selection manager window - QTDesigner used - see /FormFiles
+    //Create average manager window - QTDesigner used - see /FormFiles
     m_pAverageWindow = new AverageWindow(this);
     addDockWidget(Qt::BottomDockWidgetArea, m_pAverageWindow);
     m_pAverageWindow->hide();
 
-    //Create selection manager window - QTDesigner used - see /FormFiles
+    //Create scale window - QTDesigner used - see /FormFiles
     m_pScaleWindow = new ScaleWindow(this);
-    addDockWidget(Qt::RightDockWidgetArea, m_pScaleWindow);
+    addDockWidget(Qt::LeftDockWidgetArea, m_pScaleWindow);
     m_pScaleWindow->hide();
 
     //Init windows

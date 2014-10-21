@@ -150,6 +150,6 @@ void RawSettings::init()
     m_event_color_32 = Qt::yellow;
     m_event_color_998 = Qt::darkBlue;
     m_event_color_999 = Qt::darkCyan;
-    m_data_marker_color = QColor (93,177,47);
-    //m_data_marker_color = QColor (227,6,19);
+    m_data_marker_color = QColor (93,177,47); //green
+    //m_data_marker_color = QColor (227,6,19); //red
 }

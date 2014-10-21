@@ -137,7 +137,7 @@ signals:
     /**
     * updateDataTableViews is emmited whenever a connected view spin box value changed
     */
-    void scalingViewValueChanged(double);
+    void scalingViewValueChanged(int);
 
 private:
     Ui::ScaleWindow *ui;
