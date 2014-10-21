@@ -166,7 +166,7 @@ void DataWindow::showSelectedChannelsOnly(QStringList selectedChannels)
 
 //*************************************************************************************************************
 
-void DataWindow::scaleChannelsInView(double height)
+void DataWindow::scaleChannelsInView(int height)
 {
     for(int i = 0; i<ui->m_tableView_rawTableView->verticalHeader()->count(); i++)
         ui->m_tableView_rawTableView->setRowHeight(i, height);
@@ -340,6 +340,12 @@ void DataWindow::initToolBar()
     connect(showEventManager, &QAction::triggered, m_pMainWindow, &MainWindow::showEventWindow);
     toolBar->addAction(showEventManager);
 
+    //Toggle visibility of the filter window
+    QAction* showFilterWindow = new QAction(QIcon(":/Resources/Images/showFilterWindow.png"),tr("Toggle filter window"), this);
+    showFilterWindow->setStatusTip(tr("Toggle filter window"));
+    connect(showFilterWindow, &QAction::triggered, m_pMainWindow, &MainWindow::showFilterWindow);
+    toolBar->addAction(showFilterWindow);
+
     //Toggle visibility of the Selection manager
     QAction* showSelectionManager = new QAction(QIcon(":/Resources/Images/showSelectionManager.png"),tr("Toggle selection manager"), this);
     showSelectionManager->setStatusTip(tr("Toggle the selection manager"));
@@ -452,8 +458,8 @@ void DataWindow::initLabels()
 
     //Set color
     QPalette palette;
-    QColor textColor = m_qSettings.value("DataMarker/data_marker_color", QColor (227,6,19)).value<QColor>();
-    textColor.setAlpha(DATA_MARKER_OPACITY);
+    QColor textColor = m_qSettings.value("DataMarker/data_marker_color", QColor(93,177,47)).value<QColor>();
+    //textColor.setAlpha(DATA_MARKER_OPACITY);
     palette.setColor(QPalette::WindowText, textColor);
 
     QColor windowColor;

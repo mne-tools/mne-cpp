@@ -164,12 +164,40 @@ private:
     */
     void keyReleaseEvent(QKeyEvent *keyEvent);
 
+    //=========================================================================================================
+    /**
+    * reimplemented event function - intercepts touch gestures
+    */
     bool event(QEvent *event);
+
+    //=========================================================================================================
+    /**
+    * gestureEvent processes gesture events
+    */
     bool gestureEvent(QGestureEvent *event);
+
+    //=========================================================================================================
+    /**
+    * pinchTriggered processes pan gesture events
+    */
     void panTriggered(QPanGesture*);
+
+    //=========================================================================================================
+    /**
+    * pinchTriggered processes pinch gesture events
+    */
     void pinchTriggered(QPinchGesture*);
+
+    //=========================================================================================================
+    /**
+    * pinchTriggered processes swipe gesture events
+    */
     void swipeTriggered(QSwipeGesture*);
 
+    //=========================================================================================================
+    /**
+    * reimplemented eventFilter - intercepts touch gestures
+    */
     bool eventFilter(QObject *object, QEvent *event);
 };
 

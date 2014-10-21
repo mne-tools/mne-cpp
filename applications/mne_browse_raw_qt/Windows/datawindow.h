@@ -147,15 +147,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Only shows the channels defined in the QStringList
+    * Only shows the channels defined in the QStringList selectedChannels
     */
     void showSelectedChannelsOnly(QStringList selectedChannels);
 
     //=========================================================================================================
     /**
-    * Scale the channels in the data views
+    * Change the channels in the data views to the double value heigt
     */
-    void scaleChannelsInView(double height);
+    void scaleChannelsInView(int height);
 
 private:
     //=========================================================================================================
@@ -196,7 +196,7 @@ private:
 
     //=========================================================================================================
     /**
-    * eventFilter filter events fro mthe table views
+    * eventFilter filter events from the table views
     */
     bool eventFilter(QObject *object, QEvent *event);
 
@@ -221,9 +221,7 @@ private:
     QWidget*        m_pUndockedViewWidget;          /**< widget which is shown whenever the view undock action is triggered */
 
     DataMarker*     m_pDataMarker;                  /**< pointer to the data marker */
-
     QLabel*         m_pCurrentDataMarkerLabel;      /**< the current data marker label to display the marker's position */
-
     int             m_iCurrentMarkerSample;         /**< the current data marker sample value to display the marker's position */
 
     RawDelegate*    m_pRawDelegate;                 /**< the QAbstractDelegate being part of the raw model/view framework of Qt */
@@ -237,6 +235,10 @@ private:
     QAction*        m_pRemoveDCAction;              /**< the action which is used to control DC removal */
 
 signals:
+    //=========================================================================================================
+    /**
+    * scaleChannels gets called whenever the user performed a scaling gesture (pinch)
+    */
     void scaleChannels(double);
 
 protected slots:
