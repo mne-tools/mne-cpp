@@ -58,7 +58,7 @@ using namespace MNEBrowseRawQt;
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
-//, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
 //, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
 , m_qSettings()
 , m_rawSettings()
@@ -383,7 +383,7 @@ void MainWindow::showAboutWindow()
         m_pAboutWindow->raise();
     }
     else // if visible raise the widget to be sure that it is not obscured by other windows
-        m_pAboutWindow->raise();
+        m_pAboutWindow->hide();
 }
 
 
@@ -398,7 +398,7 @@ void MainWindow::showFilterWindow()
         m_pFilterWindow->raise();
     }
     else // if visible raise the widget to be sure that it is not obscured by other windows
-        m_pFilterWindow->raise();
+        m_pFilterWindow->hide();
 }
 
 
@@ -413,7 +413,7 @@ void MainWindow::showEventWindow()
         m_pEventWindow->raise();
     }
     else // if visible raise the widget to be sure that it is not obscured by other windows
-        m_pEventWindow->raise();
+        m_pEventWindow->hide();
 }
 
 
@@ -428,7 +428,7 @@ void MainWindow::showInformationWindow()
         m_pInformationWindow->raise();
     }
     else // if visible raise the widget to be sure that it is not obscured by other windows
-        m_pInformationWindow->raise();
+        m_pInformationWindow->hide();
 }
 
 
@@ -443,7 +443,7 @@ void MainWindow::showSelectionManagerWindow()
         m_pSelectionManagerWindow->raise();
     }
     else // if visible raise the widget to be sure that it is not obscured by other windows
-        m_pSelectionManagerWindow->raise();
+        m_pSelectionManagerWindow->hide();
 }
 
 
@@ -458,7 +458,7 @@ void MainWindow::showAverageWindow()
         m_pAverageWindow->raise();
     }
     else // if visible raise the widget to be sure that it is not obscured by other windows
-        m_pAverageWindow->raise();
+        m_pAverageWindow->hide();
 }
 
 
@@ -473,7 +473,7 @@ void MainWindow::showScaleWindow()
         m_pScaleWindow->raise();
     }
     else // if visible raise the widget to be sure that it is not obscured by other windows
-        m_pScaleWindow->raise();
+        m_pScaleWindow->hide();
 }
 
 

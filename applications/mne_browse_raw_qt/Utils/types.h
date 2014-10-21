@@ -52,7 +52,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
-
+#include <Qt>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -73,6 +73,11 @@ namespace MNEBrowseRawQt
 typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
 typedef QPair<const double*,qint32> RowVectorPair;
 typedef QPair<int,int> QPairInts;
+
+namespace RawModelRoles
+{
+    enum ItemRole{GetChannelMean = Qt::UserRole + 1000};
+}
 
 } //NAMESPACE
 
