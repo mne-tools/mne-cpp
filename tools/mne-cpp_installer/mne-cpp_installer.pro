@@ -1,5 +1,6 @@
 TEMPLATE = subdirs
 
+include (../../mne-cpp.pri)
 include (mne-cpp_installer.pri)
 
 win32 {

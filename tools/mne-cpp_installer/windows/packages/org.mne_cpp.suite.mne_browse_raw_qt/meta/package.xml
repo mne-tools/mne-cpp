@@ -4,7 +4,7 @@
     <Description>A fif data browser.</Description>
     <Version>1.0.0-1</Version>
     <ReleaseDate>2014-10-19</ReleaseDate>
-    <Name>org.mne_cpp.mne_browse_raw_qt</Name>
+    <Name>org.mne_cpp.suite.mne_browse_raw_qt</Name>
     <Licenses>
         <License name="MNE Browse Raw Qt License (BSD 3-Clause)" file="license_mne_browse_raw_qt.txt" />
     </Licenses>
