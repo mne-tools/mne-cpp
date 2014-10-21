@@ -51,6 +51,7 @@
 #include <QWidget>
 #include <QStringList>
 #include <QLineEdit>
+#include <QDoubleSpinBox>
 #include <QMap>
 
 
@@ -91,7 +92,7 @@ public:
     */
     RealTimeMultiSampleArrayScalingWidget(RealTimeMultiSampleArrayWidget *toolbox);
 
-    void updateLineEdit(const QString & text);
+    void updateDoubleSpinBox(const double val);
 
 signals:
     void scalingChanged();
@@ -99,7 +100,7 @@ signals:
 private:
     RealTimeMultiSampleArrayWidget * m_pRTMSAW;     /**< Connected real-time evoked widget */
 
-    QMap<qint32, QLineEdit*>   m_qMapScalingLineEdit;    /**< Map of types and channel scaling line edits */
+    QMap<qint32, QDoubleSpinBox*>   m_qMapScalingDoubleSpinBox;    /**< Map of types and channel scaling line edits */
 };
 
 } // NAMESPACE

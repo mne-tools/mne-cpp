@@ -102,7 +102,7 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
         //draw special background when channel is marked as bad
         QVariant v = index.model()->data(index,Qt::BackgroundRole);
-        if(v.canConvert<QBrush>() && !(option.state & QStyle::State_Selected)) {
+        if(v.canConvert<QBrush>()/* && !(option.state & QStyle::State_Selected)*/) {
             QPointF oldBO = painter->brushOrigin();
             painter->setBrushOrigin(option.rect.topLeft());
             painter->fillRect(option.rect, qvariant_cast<QBrush>(v));
@@ -110,12 +110,12 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
         }
 
         //Highlight selected channels
-        if(option.state & QStyle::State_Selected) {
-            QPointF oldBO = painter->brushOrigin();
-            painter->setBrushOrigin(option.rect.topLeft());
-            painter->fillRect(option.rect, option.palette.highlight());
-            painter->setBrushOrigin(oldBO);
-        }
+//        if(option.state & QStyle::State_Selected) {
+//            QPointF oldBO = painter->brushOrigin();
+//            painter->setBrushOrigin(option.rect.topLeft());
+//            painter->fillRect(option.rect, option.palette.highlight());
+//            painter->setBrushOrigin(oldBO);
+//        }
 
         //Get data
         QVariant variant = index.model()->data(index,Qt::DisplayRole);
@@ -139,6 +139,13 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
         //Plot data path
         path = QPainterPath(QPointF(option.rect.x()+t_rawModel->relFiffCursor(),option.rect.y()));
         createPlotPath(index, option, path, listPairs);
+
+        if(option.state & QStyle::State_Selected) {
+            pen.setStyle(Qt::SolidLine);
+            pen.setWidthF(1.35);
+            pen.setColor(Qt::darkBlue);
+            painter->setPen(pen);
+        }
 
         painter->translate(0,t_fPlotHeight/2);
         painter->setRenderHint(QPainter::Antialiasing, true);
@@ -193,32 +200,50 @@ void RawDelegate::setModelView(EventModel *eventModel, QTableView* eventView, QT
 
 //*************************************************************************************************************
 
+void RawDelegate::setScaleWindow(ScaleWindow *scaleWindow)
+{
+    m_pScaleWindow = scaleWindow;
+}
+
+
+//*************************************************************************************************************
+
 void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs) const
 {
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = (static_cast<const RawModel*>(index.model()))->m_chInfolist[index.row()].kind;
     double dMaxValue = 1e-9;
 
+    QMap<QString,double> scaleMap = m_pScaleWindow->getScalingMap();
+
     switch(kind) {
     case FIFFV_MEG_CH: {
         qint32 unit = (static_cast<const RawModel*>(index.model()))->m_pfiffIO->m_qlistRaw[0]->info.chs[index.row()].unit;
         if(unit == FIFF_UNIT_T_M) {
-            dMaxValue = DELEGATE_MAX_MEG_GRAD;
+            dMaxValue = scaleMap["MEG_grad"];
         }
         else if(unit == FIFF_UNIT_T)
-            dMaxValue = DELEGATE_MAX_MEG_MAG;
+            dMaxValue = scaleMap["MEG_mag"];
         break;
     }
     case FIFFV_EEG_CH: {
-        dMaxValue = DELEGATE_MAX_EEG;
+        dMaxValue = scaleMap["MEG_EEG"];
         break;
     }
     case FIFFV_EOG_CH: {
-        dMaxValue = DELEGATE_MAX_EOG;
+        dMaxValue = scaleMap["MEG_EOG"];
         break;
     }
     case FIFFV_STIM_CH: {
-        dMaxValue = DELEGATE_MAX_STIM;
+        dMaxValue = scaleMap["MEG_STIM"];
+        break;
+    }
+    case FIFFV_EMG_CH: {
+        dMaxValue = scaleMap["MEG_EMG"];
+        break;
+    }
+    case FIFFV_MISC_CH: {
+        dMaxValue = scaleMap["MEG_MISC"];
         break;
     }
     }
@@ -235,7 +260,7 @@ void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionVie
         for(qint32 j=0; j < listPairs[i].second; ++j)
         {
             double val = *(listPairs[i].first+j);
-            dValue = val*dScaleY;
+            dValue = (val - *(listPairs[0].first))*dScaleY;
 
             double newY = y_base+dValue;
 
@@ -343,6 +368,7 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
         QModelIndexList indexes = m_pEventView->selectionModel()->selectedIndexes();
 
         for(int i = 0; i<indexes.size(); i++) {
+            qDebug()<<indexes.at(i).row();
             int currentRow = indexes.at(i).row();
             int sampleValue = m_pEventModel->data(m_pEventModel->index(currentRow,0)).toInt();
             int type = m_pEventModel->data(m_pEventModel->index(currentRow,2)).toInt();

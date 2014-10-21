@@ -46,9 +46,10 @@
      <string>Windows</string>
     </property>
     <addaction name="m_eventAction"/>
-    <addaction name="m_informationAction"/>
     <addaction name="m_channelSelectionManagerAction"/>
-    <addaction name="m_averageWindow_Action"/>
+    <addaction name="m_scalingAction"/>
+    <addaction name="m_averageWindowAction"/>
+    <addaction name="m_informationAction"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -66,10 +67,16 @@
    <property name="text">
     <string>Open...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
   </action>
   <action name="m_writeAction">
    <property name="text">
     <string>Save...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="m_loadEvents">
@@ -95,11 +102,6 @@
     <string>Filter...</string>
    </property>
   </action>
-  <action name="m_dataAction">
-   <property name="text">
-    <string>Show data plot...</string>
-   </property>
-  </action>
   <action name="m_eventAction">
    <property name="text">
     <string>Show event list...</string>
@@ -120,9 +122,14 @@
     <string>Show channel selection manager...</string>
    </property>
   </action>
-  <action name="m_averageWindow_Action">
+  <action name="m_averageWindowAction">
    <property name="text">
-    <string>Show averages</string>
+    <string>Show averages...</string>
+   </property>
+  </action>
+  <action name="m_scalingAction">
+   <property name="text">
+    <string>Show scaling...</string>
    </property>
   </action>
  </widget>

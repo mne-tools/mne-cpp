@@ -2,13 +2,14 @@
 /**
 * @file     frequencyspectrummodel.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     May, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh, Limin Sun and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -61,6 +62,7 @@ FrequencySpectrumModel::FrequencySpectrumModel(QObject *parent)
 , m_bInitialized(false)
 , m_iLowerFrqIdx(0)
 , m_iUpperFrqIdx(0)
+, m_iScaleType(0)
 {
 }
 
@@ -191,6 +193,12 @@ void FrequencySpectrumModel::setInfo(FiffInfo::SPtr &info)
 }
 
 
+//*************************************************************************************************************
+
+void FrequencySpectrumModel::setScaleType(qint8 ScaleType)
+{
+    m_iScaleType = ScaleType;
+}
 
 //*************************************************************************************************************
 
@@ -207,7 +215,11 @@ void FrequencySpectrumModel::addData(const MatrixXd &data)
         double currFreq = 0;
         for(qint32 i = 0; i < m_dataCurrent.cols(); ++i)
         {
-            m_vecFreqScale[i] = log10(currFreq+k);
+            if (m_iScaleType) //log
+                m_vecFreqScale[i] = log10(currFreq+k);
+            else // normal
+                m_vecFreqScale[i] = currFreq;
+
             currFreq += freqRes;
         }
 
