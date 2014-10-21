@@ -158,7 +158,7 @@ int RawModel::rowCount(const QModelIndex & /*parent*/) const
 
 int RawModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 2;
+    return 3;
 }
 
 
@@ -218,8 +218,13 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
 
                 break;
             }
+            }
+        }
 
-            case RawModelRoles::GetChannelMean: { //return the averages of each channel
+        //******** third column (mean data of the channels plot) ********
+        if(index.column()==2) {
+            switch(role) {
+            case RawModelRoles::GetChannelMean: {
                 QVariant v;
 
                 //form RowVectorPair of pointer and length of RowVector

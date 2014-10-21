@@ -110,19 +110,12 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
             painter->setBrushOrigin(oldBO);
         }
 
-        //Highlight selected channels
-//        if(option.state & QStyle::State_Selected) {
-//            QPointF oldBO = painter->brushOrigin();
-//            painter->setBrushOrigin(option.rect.topLeft());
-//            painter->fillRect(option.rect, option.palette.highlight());
-//            painter->setBrushOrigin(oldBO);
-//        }
-
         //Get data and means
         QVariant variant = index.model()->data(index,Qt::DisplayRole);
         QList<RowVectorPair> listPairs = variant.value<QList<RowVectorPair> >();
 
-        QVariant variantMeans = index.model()->data(index,RawModelRoles::GetChannelMean);
+        QModelIndex meanIndex = index.model()->index(index.row(),2);
+        QVariant variantMeans = index.model()->data(meanIndex,RawModelRoles::GetChannelMean);
         QList<RowVectorPair> listPairsMeans = variantMeans.value<QList<RowVectorPair> >();
 
         const RawModel* t_rawModel = (static_cast<const RawModel*>(index.model()));

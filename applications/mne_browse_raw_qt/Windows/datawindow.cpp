@@ -190,6 +190,7 @@ void DataWindow::initMVCSettings()
     //set some settings for m_pRawTableView
     ui->m_tableView_rawTableView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->m_iDefaultPlotHeight);
     ui->m_tableView_rawTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
+    ui->m_tableView_rawTableView->setColumnHidden(2,true); //because we do not want to plot the mean values
     ui->m_tableView_rawTableView->resizeColumnsToContents();
 
     //set context menu
@@ -306,14 +307,18 @@ void DataWindow::initToolBar()
 
     //Add DC removal action
     m_pRemoveDCAction = new QAction(QIcon(":/Resources/Images/removeDC.png"),tr("Remove DC component"), this);
-    m_pRemoveDCAction->setStatusTip(tr("Remove the DC component by subtracting the mean"));
+    m_pRemoveDCAction->setStatusTip(tr("Remove the DC component by subtracting the channel mean"));
     connect(m_pRemoveDCAction,&QAction::triggered, [=](){
         if(m_pRawDelegate->m_bRemoveDC) {
             m_pRemoveDCAction->setIcon(QIcon(":/Resources/Images/removeDC.png"));
+            m_pRemoveDCAction->setToolTip("Remove DC component");
+            m_pRemoveDCAction->setStatusTip(tr("Remove the DC component by subtracting the channel mean"));
             m_pRawDelegate->m_bRemoveDC = false;
         }
         else {
             m_pRemoveDCAction->setIcon(QIcon(":/Resources/Images/addDC.png"));
+            m_pRemoveDCAction->setToolTip("Add DC component");
+            m_pRemoveDCAction->setStatusTip(tr("Add the DC component"));
             m_pRawDelegate->m_bRemoveDC = true;
         }
 
@@ -508,10 +513,12 @@ bool DataWindow::eventFilter(QObject *object, QEvent *event)
     //Detect double mouse clicks and move data marker to current mouse position
     if (object == ui->m_tableView_rawTableView->viewport() && event->type() == QEvent::MouseButtonDblClick) {
         QMouseEvent* mouseEventCast = static_cast<QMouseEvent*>(event);
-        if(mouseEventCast->button() == Qt::LeftButton)
+        if(mouseEventCast->button() == Qt::LeftButton) {
             m_pDataMarker->move(mouseEventCast->localPos().x() + ui->m_tableView_rawTableView->verticalHeader()->width() + ui->m_tableView_rawTableView->x(), m_pDataMarker->y());
 
-        return true;
+            //Deselect channel which was selected through the double click -> dirty hack
+            //ui->m_tableView_rawTableView->selectionModel()->select(ui->m_tableView_rawTableView->selectionModel()->currentIndex(), QItemSelectionModel::Deselect);
+        }
     }
 
     //Deactivate grabbing gesture when scrollbars or vertical header are selected
@@ -688,7 +695,14 @@ void DataWindow::addEventToEventModel()
 
 void DataWindow::undockDataViewToWindow()
 {
-    m_pUndockedViewWidget->show();
+    //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
+    if(!m_pUndockedViewWidget->isVisible())
+    {
+        m_pUndockedViewWidget->show();
+        m_pUndockedViewWidget->raise();
+    }
+    else // if visible raise the widget to be sure that it is not obscured by other windows
+        m_pUndockedViewWidget->hide();
 }
 
 
