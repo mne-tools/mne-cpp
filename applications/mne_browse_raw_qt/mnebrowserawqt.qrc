@@ -8,5 +8,7 @@
         <file alias="showEventManager.png">Resources/Images/Icons/showEventManager.PNG</file>
         <file alias="showInformationWindow.png">Resources/Images/Icons/showInformationWindow.PNG</file>
         <file alias="showScalingWindow.png">Resources/Images/Icons/showScalingWindow.PNG</file>
+        <file alias="addDC.png">Resources/Images/Icons/addDC.png</file>
+        <file alias="removeDC.png">Resources/Images/Icons/removeDC.png</file>
     </qresource>
 </RCC>

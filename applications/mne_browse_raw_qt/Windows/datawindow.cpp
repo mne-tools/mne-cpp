@@ -304,6 +304,23 @@ void DataWindow::initToolBar()
     connect(addEventAction, SIGNAL(triggered()), this, SLOT(addEventToEventModel()));
     toolBar->addAction(addEventAction);
 
+    //Add DC removal action
+    m_pRemoveDCAction = new QAction(QIcon(":/Resources/Images/removeDC.png"),tr("Remove DC component"), this);
+    m_pRemoveDCAction->setStatusTip(tr("Remove the DC component by subtracting the mean"));
+    connect(m_pRemoveDCAction,&QAction::triggered, [=](){
+        if(m_pRawDelegate->m_bRemoveDC) {
+            m_pRemoveDCAction->setIcon(QIcon(":/Resources/Images/removeDC.png"));
+            m_pRawDelegate->m_bRemoveDC = false;
+        }
+        else {
+            m_pRemoveDCAction->setIcon(QIcon(":/Resources/Images/addDC.png"));
+            m_pRawDelegate->m_bRemoveDC = true;
+        }
+
+        updateDataTableViews();
+    });
+    toolBar->addAction(m_pRemoveDCAction);
+
     toolBar->addSeparator();
 
     //undock view into new window (not dock widget)

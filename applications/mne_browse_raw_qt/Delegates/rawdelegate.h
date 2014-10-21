@@ -150,6 +150,7 @@ public:
     int         m_iDefaultPlotHeight;       /**< The height of the plot */
     bool        m_bShowSelectedEventsOnly;  /**< When true all events are plotted otherwise only plot selected event */
     bool        m_bActivateEvents;          /**< Flag for plotting events */
+    bool        m_bRemoveDC;                /**< Flag for DC removal */
 
     // Scaling
     double      m_dMaxValue;                /**< Maximum value of the data to plot */
@@ -164,7 +165,7 @@ private:
     * @param[in] index QModelIndex for accessing associated data and model object.
     * @param[in,out] path The QPointerPath to create for the data plot.
     */
-    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs) const;
+    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs, QList<RowVectorPair> &listPairsMeans) const;
 
     //=========================================================================================================
     /**
