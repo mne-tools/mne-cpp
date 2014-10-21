@@ -122,10 +122,36 @@ void MainWindow::setupWindowWidgets()
     addDockWidget(Qt::BottomDockWidgetArea, m_pAverageWindow);
     m_pAverageWindow->hide();
 
+    //Create selection manager window - QTDesigner used - see /FormFiles
+    m_pScaleWindow = new ScaleWindow(this);
+    addDockWidget(Qt::RightDockWidgetArea, m_pScaleWindow);
+    m_pScaleWindow->hide();
+
     //Init windows
     m_pDataWindow->init();
     m_pEventWindow->init();
     m_pFilterWindow->init();
+    m_pScaleWindow->init();
+
+    //Connect window signals
+    //Change scaling of the data whenever a spinbox value changed or the user performs a pinch gesture on the view
+    connect(m_pScaleWindow, &ScaleWindow::scalingChannelValueChanged,
+            m_pDataWindow, &DataWindow::updateDataTableViews);
+    connect(m_pScaleWindow, &ScaleWindow::scalingViewValueChanged,
+            m_pDataWindow, &DataWindow::scaleChannelsInView);
+    connect(m_pDataWindow, &DataWindow::scaleChannels,
+            m_pScaleWindow, &ScaleWindow::scaleAllChannels);
+
+    //Hide non selected channels
+    connect(m_pSelectionManagerWindow, &SelectionManagerWindow::showSelectedChannelsOnly,
+            m_pDataWindow, &DataWindow::showSelectedChannelsOnly);
+
+    //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels
+    if(m_pDataWindow->getDataModel()->m_bFileloaded) {
+        m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_fiffInfo);
+
+        m_pSelectionManagerWindow->setCurrentlyLoadedFiffChannels(m_pDataWindow->getDataModel()->m_fiffInfo);
+    }
 }
 
 
@@ -147,7 +173,8 @@ void MainWindow::connectMenus()
     connect(ui->m_eventAction, SIGNAL(triggered()), this, SLOT(showEventWindow()));
     connect(ui->m_informationAction, SIGNAL(triggered()), this, SLOT(showInformationWindow()));
     connect(ui->m_channelSelectionManagerAction, SIGNAL(triggered()), this, SLOT(showSelectionManagerWindow()));
-    connect(ui->m_averageWindow_Action, SIGNAL(triggered()), this, SLOT(showAverageWindow()));
+    connect(ui->m_averageWindowAction, SIGNAL(triggered()), this, SLOT(showAverageWindow()));
+    connect(ui->m_scalingAction, SIGNAL(triggered()), this, SLOT(showScaleWindow()));
 
     //Help
     connect(ui->m_aboutAction, SIGNAL(triggered()), this, SLOT(showAboutWindow()));
@@ -173,7 +200,8 @@ void MainWindow::setWindowStatus()
 {
     //Set window title
     QString title;
-    title = QString("%1").arg(CInfo::AppNameShort());
+    //title = QString("%1").arg(CInfo::AppNameShort());
+    title = QString("Visualize and Process");
     setWindowTitle(title);
 
     //Set status bar
@@ -209,21 +237,7 @@ void MainWindow::setWindowStatus()
 //Log
 void MainWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl)
 {
-    if(lglvl<=m_eLogLevelCurrent) {
-        if(lgknd == _LogKndError)
-            m_pTextBrowser_Log->insertHtml("<font color=red><b>Error:</b> "+logMsg+"</font>");
-        else if(lgknd == _LogKndWarning)
-            m_pTextBrowser_Log->insertHtml("<font color=blue><b>Warning:</b> "+logMsg+"</font>");
-        else
-            m_pTextBrowser_Log->insertHtml(logMsg);
-        m_pTextBrowser_Log->insertPlainText("\n"); // new line
-        //scroll down to the latest entry
-        QTextCursor c = m_pTextBrowser_Log->textCursor();
-        c.movePosition(QTextCursor::End);
-        m_pTextBrowser_Log->setTextCursor(c);
-
-        m_pTextBrowser_Log->verticalScrollBar()->setValue(m_pTextBrowser_Log->verticalScrollBar()->maximum());
-    }
+    m_pInformationWindow->writeToLog(logMsg, lgknd, lglvl);
 }
 
 
@@ -231,19 +245,7 @@ void MainWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl
 
 void MainWindow::setLogLevel(LogLevel lvl)
 {
-    switch(lvl) {
-    case _LogLvMin:
-        writeToLog(tr("minimal log level set"), _LogKndMessage, _LogLvMin);
-        break;
-    case _LogLvNormal:
-        writeToLog(tr("normal log level set"), _LogKndMessage, _LogLvMin);
-        break;
-    case _LogLvMax:
-        writeToLog(tr("maximum log level set"), _LogKndMessage, _LogLvMin);
-        break;
-    }
-
-    m_eLogLevelCurrent = lvl;
+    m_pInformationWindow->setLogLevel(lvl);
 }
 
 
@@ -281,13 +283,17 @@ void MainWindow::openFile()
                                                         m_pDataWindow->getDataModel()->lastSample());
 
     //resize columns to contents - needs to be done because the new data file can be shorter than the old one
+    m_pDataWindow->updateDataTableViews();
     m_pDataWindow->getDataTableView()->resizeColumnsToContents();
 
     //Update status bar
     setWindowStatus();
 
-    //Update selection Group All
-    m_pSelectionManagerWindow->createSelectionGroupAll();
+    //Hide not presented channel types and their spin boxes in the scale window
+    m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_fiffInfo);
+
+    //Create group All whenever a new file was loaded
+    m_pSelectionManagerWindow->setCurrentlyLoadedFiffChannels(m_pDataWindow->getDataModel()->m_fiffInfo);
 }
 
 
@@ -454,4 +460,22 @@ void MainWindow::showAverageWindow()
     else // if visible raise the widget to be sure that it is not obscured by other windows
         m_pAverageWindow->raise();
 }
+
+
+//*************************************************************************************************************
+
+void MainWindow::showScaleWindow()
+{
+    //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
+    if(!m_pScaleWindow->isVisible())
+    {
+        m_pScaleWindow->show();
+        m_pScaleWindow->raise();
+    }
+    else // if visible raise the widget to be sure that it is not obscured by other windows
+        m_pScaleWindow->raise();
+}
+
+
+
 

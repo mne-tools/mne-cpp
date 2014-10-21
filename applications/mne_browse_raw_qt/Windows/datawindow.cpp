@@ -55,18 +55,17 @@ using namespace MNEBrowseRawQt;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DataWindow::DataWindow(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::DataWindowDockWidget),
-    m_pMainWindow(static_cast<MainWindow*>(parent)),
-    m_pDataMarker(new DataMarker(this)),
-    m_pCurrentDataMarkerLabel(new QLabel(this)),
-    m_iCurrentMarkerSample(0),
-    m_pUndockedViewWidget(new QWidget(this,Qt::Window))
+DataWindow::DataWindow(QWidget *parent)
+: QWidget(parent)
+, ui(new Ui::DataWindowDockWidget)
+, m_pMainWindow(static_cast<MainWindow*>(parent))
+, m_pDataMarker(new DataMarker(this))
+, m_pCurrentDataMarkerLabel(new QLabel(this))
+, m_iCurrentMarkerSample(0)
+, m_pUndockedViewWidget(new QWidget(this,Qt::Window))
+, m_pUndockedDataView(new QTableView(m_pUndockedViewWidget))
 {
     ui->setupUi(this);
-
-    m_pUndockedDataView = new QTableView(m_pUndockedViewWidget);
 
     //------------------------
     //--- Setup data model ---
@@ -141,6 +140,41 @@ void DataWindow::updateDataTableViews()
 
 //*************************************************************************************************************
 
+void DataWindow::showSelectedChannelsOnly(QStringList selectedChannels)
+{
+    //Hide non selected channels/rows in the data views
+    for(int i = 0; i<m_pRawModel->rowCount(); i++) {
+        QModelIndex index = m_pRawModel->index(i, 0);
+        QString channel = m_pRawModel->data(index, Qt::DisplayRole).toString();
+
+        ui->m_tableView_rawTableView->showRow(i);
+        m_pUndockedDataView->showRow(i);
+
+        if(!selectedChannels.contains(channel)) {
+            ui->m_tableView_rawTableView->hideRow(i);
+            m_pUndockedDataView->hideRow(i);
+        }
+        else {
+            ui->m_tableView_rawTableView->showRow(i);
+            m_pUndockedDataView->showRow(i);
+        }
+    }
+
+    updateDataTableViews();
+}
+
+
+//*************************************************************************************************************
+
+void DataWindow::scaleChannelsInView(double scale)
+{
+    for(int i = 0; i<ui->m_tableView_rawTableView->verticalHeader()->count(); i++)
+        ui->m_tableView_rawTableView->setRowHeight(i, scale);
+}
+
+
+//*************************************************************************************************************
+
 void DataWindow::initMVCSettings()
 {
     //-----------------------------------
@@ -170,14 +204,26 @@ void DataWindow::initMVCSettings()
     connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
             m_pRawModel,&RawModel::updateScrollPos);
 
+    //connect selection of a channel to selection manager
+    connect(ui->m_tableView_rawTableView->selectionModel(),&QItemSelectionModel::selectionChanged,
+            this,&DataWindow::highlightChannelsInSelectionManager);
+
     //Set MVC in delegate
     m_pRawDelegate->setModelView(m_pMainWindow->m_pEventWindow->getEventModel(),
                                  m_pMainWindow->m_pEventWindow->getEventTableView(),
                                  ui->m_tableView_rawTableView);
 
+    //Set scale window in delegate
+    m_pRawDelegate->setScaleWindow(m_pMainWindow->m_pScaleWindow);
+
     //Install event filter to overcome QGrabGesture and QScrollBar problem
     ui->m_tableView_rawTableView->horizontalScrollBar()->installEventFilter(this);
     ui->m_tableView_rawTableView->verticalScrollBar()->installEventFilter(this);
+    ui->m_tableView_rawTableView->verticalHeader()->installEventFilter(this);
+
+    //Enable gestures for the view
+    ui->m_tableView_rawTableView->grabGesture(Qt::PinchGesture);
+    ui->m_tableView_rawTableView->installEventFilter(this);
 
     //-----------------------------------
     //------ Init "dockable" view -------
@@ -204,13 +250,17 @@ void DataWindow::initMVCSettings()
             m_pRawModel,&RawModel::updateScrollPos);
 
     //---------------------------------------------------------
-    //-- Interconnect scrollbars of docked and undocked view --
+    //--------- Interconnect docked and undocked view ---------
     //---------------------------------------------------------
-    //ui->m_tableView_rawTableView ---> m_pUndockedDataView
+    //Scrolling ui->m_tableView_rawTableView ---> m_pUndockedDataView
     connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
             m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::setValue);
     connect(ui->m_tableView_rawTableView->verticalScrollBar(),&QScrollBar::valueChanged,
             m_pUndockedDataView->verticalScrollBar(),&QScrollBar::setValue);
+
+    //Selection ui->m_tableView_rawTableView ---> m_pUndockedDataView
+    connect(ui->m_tableView_rawTableView,&QTableView::clicked,
+            m_pUndockedDataView,&QTableView::setCurrentIndex);
 }
 
 
@@ -292,10 +342,13 @@ void DataWindow::initMarker()
     if(!m_pRawModel->m_bFileloaded) {
         m_pDataMarker->hide();
         m_pCurrentDataMarkerLabel->hide();
+        ui->m_label_sampleMin->hide();
+        ui->m_label_sampleMax->hide();
     }
 
     //Connect current marker to loading a fiff file - no loaded file - no visible marker
-    connect(m_pRawModel, &RawModel::fileLoaded,[this](bool state){
+    connect(m_pRawModel, &RawModel::fileLoaded,[this](){
+        bool state = m_pRawModel->m_bFileloaded;
         if(state) {
             //Inital position of the marker
             m_pDataMarker->move(74, m_pDataMarker->y());
@@ -303,10 +356,16 @@ void DataWindow::initMarker()
 
             m_pDataMarker->show();
             m_pCurrentDataMarkerLabel->show();
+
+            ui->m_label_sampleMin->show();
+            ui->m_label_sampleMax->show();
         }
         else {
             m_pDataMarker->hide();
             m_pCurrentDataMarkerLabel->hide();
+
+            ui->m_label_sampleMin->hide();
+            ui->m_label_sampleMax->hide();
         }
     });
 }
@@ -390,7 +449,8 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
 bool DataWindow::eventFilter(QObject *object, QEvent *event)
 {
     if ((object == m_pUndockedDataView->horizontalScrollBar() || object == ui->m_tableView_rawTableView->horizontalScrollBar() ||
-         object == m_pUndockedDataView->verticalScrollBar() || object == ui->m_tableView_rawTableView->verticalScrollBar())
+         object == m_pUndockedDataView->verticalScrollBar() || object == ui->m_tableView_rawTableView->verticalScrollBar() ||
+         object == m_pUndockedDataView->verticalHeader() || object == ui->m_tableView_rawTableView->verticalHeader())
         && event->type() == QEvent::Enter) {
         QScroller::ungrabGesture(m_pUndockedDataView);
         QScroller::ungrabGesture(ui->m_tableView_rawTableView);
@@ -398,11 +458,17 @@ bool DataWindow::eventFilter(QObject *object, QEvent *event)
     }
 
     if ((object == m_pUndockedDataView->horizontalScrollBar() || object == ui->m_tableView_rawTableView->horizontalScrollBar()||
-         object == m_pUndockedDataView->verticalScrollBar() || object == ui->m_tableView_rawTableView->verticalScrollBar())
+         object == m_pUndockedDataView->verticalScrollBar() || object == ui->m_tableView_rawTableView->verticalScrollBar()||
+         object == m_pUndockedDataView->verticalHeader() || object == ui->m_tableView_rawTableView->verticalHeader())
         && event->type() == QEvent::Leave) {
         QScroller::grabGesture(m_pUndockedDataView, QScroller::LeftMouseButtonGesture);
         QScroller::grabGesture(ui->m_tableView_rawTableView, QScroller::LeftMouseButtonGesture);
         return true;
+    }
+
+    if (object == ui->m_tableView_rawTableView && event->type() == QEvent::Gesture) {
+        QGestureEvent* gestureEventCast = static_cast<QGestureEvent*>(event);
+        return gestureEvent(static_cast<QGestureEvent*>(gestureEventCast));
     }
 
     return false;
@@ -595,3 +661,59 @@ void DataWindow::updateMarkerPosition()
 }
 
 
+//*************************************************************************************************************
+
+void DataWindow::highlightChannelsInSelectionManager()
+{
+    if(m_pMainWindow->m_pSelectionManagerWindow->isVisible()) {
+        QStringList currentSelectedChannelNames;
+
+        QModelIndexList selectedIndexes = ui->m_tableView_rawTableView->selectionModel()->selectedIndexes();
+
+        for(int i = 0; i<selectedIndexes.size(); i++) {
+            QModelIndex index = m_pRawModel->index(selectedIndexes.at(i).row(), 0);
+            currentSelectedChannelNames << m_pRawModel->data(index).toString();
+        }
+
+        m_pMainWindow->m_pSelectionManagerWindow->highlightChannels(currentSelectedChannelNames);
+    }
+}
+
+
+//*************************************************************************************************************
+
+bool DataWindow::gestureEvent(QGestureEvent *event)
+{
+    //Pinch event
+    if (QGesture *pinch = event->gesture(Qt::PinchGesture))
+        pinchTriggered(static_cast<QPinchGesture *>(pinch));
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool DataWindow::pinchTriggered(QPinchGesture *gesture)
+{
+    QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
+    if (changeFlags & QPinchGesture::ScaleFactorChanged) {
+        emit scaleChannels(gesture->scaleFactor());
+        qDebug()<<"ungrab";
+        ui->m_tableView_rawTableView->setSelectionMode(QAbstractItemView::NoSelection);
+        QScroller::ungrabGesture(m_pUndockedDataView);
+        QScroller::ungrabGesture(ui->m_tableView_rawTableView);
+    }
+
+    if (gesture->state() == Qt::GestureFinished) {
+        qDebug()<<"Finished gesture - grab again";
+        ui->m_tableView_rawTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+        QScroller::grabGesture(m_pUndockedDataView, QScroller::LeftMouseButtonGesture);
+        QScroller::grabGesture(ui->m_tableView_rawTableView, QScroller::LeftMouseButtonGesture);
+    }
+
+
+
+
+    return true;
+}

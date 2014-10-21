@@ -82,6 +82,7 @@
 #include "informationwindow.h"
 #include "selectionmanagerwindow.h"
 #include "averagewindow.h"
+#include "scalewindow.h"
 
 
 //*************************************************************************************************************
@@ -144,9 +145,6 @@ namespace MNEBrowseRawQt
 class FilterWindow;
 class EventWindow;
 class DataWindow;
-class InformationWindow;
-class SelectionManagerWindow;
-class AverageWindow;
 
 
 //=============================================================================================================
@@ -158,9 +156,6 @@ class MainWindow : public QMainWindow
     friend class FilterWindow;
     friend class EventWindow;
     friend class DataWindow;
-    friend class InformationWindow;
-    friend class SelectionManagerWindow;
-    friend class AverageWindow;
 
     Q_OBJECT
 public:
@@ -238,6 +233,12 @@ private slots:
     */
     void showAverageWindow();
 
+    //=========================================================================================================
+    /**
+    * showScalingWindow shows the scaling window
+    */
+    void showScaleWindow();
+
 private:
     //=========================================================================================================
     /**
@@ -283,14 +284,11 @@ private:
     InformationWindow*      m_pInformationWindow;       /**< Information widget which displays information about this application (log, etc.)*/
     SelectionManagerWindow* m_pSelectionManagerWindow;  /**< Selection manager window which can be used to select channels*/
     AverageWindow*          m_pAverageWindow;           /**< Average window can be used to plot calculated averages in a 2D layout scene*/
+    ScaleWindow*            m_pScaleWindow;             /**< Scale widget can be used to set the scaling of the different channels types */
 
     //application settings
     QSettings               m_qSettings;
     RawSettings             m_rawSettings;
-
-    //Log
-    QTextBrowser*           m_pTextBrowser_Log;         /** a textbox being part of the log feature */
-    LogLevel                m_eLogLevelCurrent;         /**< Holds the current log level.*/
 
     Ui::MainWindowWidget*   ui;
 };

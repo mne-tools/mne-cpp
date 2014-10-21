@@ -49,7 +49,6 @@
 
 #include <QLabel>
 #include <QGridLayout>
-#include <QDoubleValidator>
 
 #include <QDebug>
 
@@ -81,17 +80,19 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
     if(m_pRTMSAW->m_qMapChScaling.contains(FIFF_UNIT_T))
     {
         QLabel* t_pLabelModality = new QLabel;
-        t_pLabelModality->setText("MAG");
+        t_pLabelModality->setText("MAG (fT/cm)");
         t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
 
-        QDoubleValidator* t_pDoubleValidator = new QDoubleValidator(10e-11,1,16,this);
-        QLineEdit* t_pLineEditScale = new QLineEdit;
-        t_pLineEditScale->setMaximumWidth(100);
-        t_pLineEditScale->setValidator(t_pDoubleValidator);
-        t_pLineEditScale->setText(QString("%1").arg(m_pRTMSAW->m_qMapChScaling[FIFF_UNIT_T]));
-        m_qMapScalingLineEdit.insert(FIFF_UNIT_T,t_pLineEditScale);
-        connect(t_pLineEditScale,&QLineEdit::textEdited,this,&RealTimeMultiSampleArrayScalingWidget::updateLineEdit);
-        t_pGridLayout->addWidget(t_pLineEditScale,i,2,1,1);
+        QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
+        t_pDoubleSpinBoxScale->setMinimum(10e-11);
+        t_pDoubleSpinBoxScale->setMaximum(2000);
+        t_pDoubleSpinBoxScale->setMaximumWidth(100);
+        t_pDoubleSpinBoxScale->setSingleStep(0.1);
+        t_pDoubleSpinBoxScale->setValue(m_pRTMSAW->m_qMapChScaling[FIFF_UNIT_T]/(1e-12));
+        m_qMapScalingDoubleSpinBox.insert(FIFF_UNIT_T,t_pDoubleSpinBoxScale);
+        connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                this,&RealTimeMultiSampleArrayScalingWidget::updateDoubleSpinBox);
+        t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i,2,1,1);
         ++i;
     }
 
@@ -99,17 +100,19 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
     if(m_pRTMSAW->m_qMapChScaling.contains(FIFF_UNIT_T_M))
     {
         QLabel* t_pLabelModality = new QLabel;
-        t_pLabelModality->setText("GRAD");
+        t_pLabelModality->setText("GRAD (pt)");
         t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
 
-        QDoubleValidator* t_pDoubleValidator = new QDoubleValidator(10e-11,1,16,this);
-        QLineEdit* t_pLineEditScale = new QLineEdit;
-        t_pLineEditScale->setMaximumWidth(100);
-        t_pLineEditScale->setValidator(t_pDoubleValidator);
-        t_pLineEditScale->setText(QString("%1").arg(m_pRTMSAW->m_qMapChScaling[FIFF_UNIT_T_M]));
-        m_qMapScalingLineEdit.insert(FIFF_UNIT_T_M,t_pLineEditScale);
-        connect(t_pLineEditScale,&QLineEdit::textEdited,this,&RealTimeMultiSampleArrayScalingWidget::updateLineEdit);
-        t_pGridLayout->addWidget(t_pLineEditScale,i,2,1,1);
+        QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
+        t_pDoubleSpinBoxScale->setMinimum(10e-11);
+        t_pDoubleSpinBoxScale->setMaximum(2000);
+        t_pDoubleSpinBoxScale->setMaximumWidth(100);
+        t_pDoubleSpinBoxScale->setSingleStep(20.0);
+        t_pDoubleSpinBoxScale->setValue(m_pRTMSAW->m_qMapChScaling[FIFF_UNIT_T_M]/(1e-15 * 100));   //*100 because data in fiff files is stored as fT/m not fT/cm
+        m_qMapScalingDoubleSpinBox.insert(FIFF_UNIT_T_M,t_pDoubleSpinBoxScale);
+        connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                this,&RealTimeMultiSampleArrayScalingWidget::updateDoubleSpinBox);
+        t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i,2,1,1);
         ++i;
     }
 
@@ -117,17 +120,19 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
     if(m_pRTMSAW->m_qMapChScaling.contains(FIFFV_EEG_CH))
     {
         QLabel* t_pLabelModality = new QLabel;
-        t_pLabelModality->setText("EEG");
+        t_pLabelModality->setText("EEG (uV)");
         t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
 
-        QDoubleValidator* t_pDoubleValidator = new QDoubleValidator(10e-11,1,16,this);
-        QLineEdit* t_pLineEditScale = new QLineEdit;
-        t_pLineEditScale->setMaximumWidth(100);
-        t_pLineEditScale->setValidator(t_pDoubleValidator);
-        t_pLineEditScale->setText(QString("%1").arg(m_pRTMSAW->m_qMapChScaling[FIFFV_EEG_CH]));
-        m_qMapScalingLineEdit.insert(FIFFV_EEG_CH,t_pLineEditScale);
-        connect(t_pLineEditScale,&QLineEdit::textEdited,this,&RealTimeMultiSampleArrayScalingWidget::updateLineEdit);
-        t_pGridLayout->addWidget(t_pLineEditScale,i,2,1,1);
+        QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
+        t_pDoubleSpinBoxScale->setMinimum(10e-11);
+        t_pDoubleSpinBoxScale->setMaximum(2000);
+        t_pDoubleSpinBoxScale->setMaximumWidth(100);
+        t_pDoubleSpinBoxScale->setSingleStep(1.0);
+        t_pDoubleSpinBoxScale->setValue(m_pRTMSAW->m_qMapChScaling[FIFFV_EEG_CH]/(1e-06));
+        m_qMapScalingDoubleSpinBox.insert(FIFFV_EEG_CH,t_pDoubleSpinBoxScale);
+        connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                this,&RealTimeMultiSampleArrayScalingWidget::updateDoubleSpinBox);
+        t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i,2,1,1);
         ++i;
     }
 
@@ -135,17 +140,19 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
     if(m_pRTMSAW->m_qMapChScaling.contains(FIFFV_EOG_CH))
     {
         QLabel* t_pLabelModality = new QLabel;
-        t_pLabelModality->setText("EOG");
+        t_pLabelModality->setText("EOG (uV)");
         t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
 
-        QDoubleValidator* t_pDoubleValidator = new QDoubleValidator(10e-11,1,16,this);
-        QLineEdit* t_pLineEditScale = new QLineEdit;
-        t_pLineEditScale->setMaximumWidth(100);
-        t_pLineEditScale->setValidator(t_pDoubleValidator);
-        t_pLineEditScale->setText(QString("%1").arg(m_pRTMSAW->m_qMapChScaling[FIFFV_EOG_CH]));
-        m_qMapScalingLineEdit.insert(FIFFV_EOG_CH,t_pLineEditScale);
-        connect(t_pLineEditScale,&QLineEdit::textEdited,this,&RealTimeMultiSampleArrayScalingWidget::updateLineEdit);
-        t_pGridLayout->addWidget(t_pLineEditScale,i,2,1,1);
+        QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
+        t_pDoubleSpinBoxScale->setMinimum(10e-11);
+        t_pDoubleSpinBoxScale->setMaximum(10000);
+        t_pDoubleSpinBoxScale->setMaximumWidth(100);
+        t_pDoubleSpinBoxScale->setSingleStep(10.0);
+        t_pDoubleSpinBoxScale->setValue(m_pRTMSAW->m_qMapChScaling[FIFFV_EOG_CH]/(1e-06));
+        m_qMapScalingDoubleSpinBox.insert(FIFFV_EOG_CH,t_pDoubleSpinBoxScale);
+        connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                this,&RealTimeMultiSampleArrayScalingWidget::updateDoubleSpinBox);
+        t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i,2,1,1);
         ++i;
     }
 
@@ -156,14 +163,16 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
         t_pLabelModality->setText("STIM");
         t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
 
-        QDoubleValidator* t_pDoubleValidator = new QDoubleValidator(10e-11,1,16,this);
-        QLineEdit* t_pLineEditScale = new QLineEdit;
-        t_pLineEditScale->setMaximumWidth(100);
-        t_pLineEditScale->setValidator(t_pDoubleValidator);
-        t_pLineEditScale->setText(QString("%1").arg(m_pRTMSAW->m_qMapChScaling[FIFFV_STIM_CH]));
-        m_qMapScalingLineEdit.insert(FIFFV_STIM_CH,t_pLineEditScale);
-        connect(t_pLineEditScale,&QLineEdit::textEdited,this,&RealTimeMultiSampleArrayScalingWidget::updateLineEdit);
-        t_pGridLayout->addWidget(t_pLineEditScale,i,2,1,1);
+        QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
+        t_pDoubleSpinBoxScale->setMinimum(10e-11);
+        t_pDoubleSpinBoxScale->setMaximum(1000);
+        t_pDoubleSpinBoxScale->setMaximumWidth(100);
+        t_pDoubleSpinBoxScale->setSingleStep(1.0);
+        t_pDoubleSpinBoxScale->setValue(m_pRTMSAW->m_qMapChScaling[FIFFV_STIM_CH]);
+        m_qMapScalingDoubleSpinBox.insert(FIFFV_STIM_CH,t_pDoubleSpinBoxScale);
+        connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                this,&RealTimeMultiSampleArrayScalingWidget::updateDoubleSpinBox);
+        t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i,2,1,1);
         ++i;
     }
 
@@ -174,14 +183,16 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
         t_pLabelModality->setText("MISC");
         t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
 
-        QDoubleValidator* t_pDoubleValidator = new QDoubleValidator(10e-11,1,16,this);
-        QLineEdit* t_pLineEditScale = new QLineEdit;
-        t_pLineEditScale->setMaximumWidth(100);
-        t_pLineEditScale->setValidator(t_pDoubleValidator);
-        t_pLineEditScale->setText(QString("%1").arg(m_pRTMSAW->m_qMapChScaling[FIFFV_MISC_CH]));
-        m_qMapScalingLineEdit.insert(FIFFV_MISC_CH,t_pLineEditScale);
-        connect(t_pLineEditScale,&QLineEdit::textEdited,this,&RealTimeMultiSampleArrayScalingWidget::updateLineEdit);
-        t_pGridLayout->addWidget(t_pLineEditScale,i,2,1,1);
+        QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
+        t_pDoubleSpinBoxScale->setMinimum(10e-11);
+        t_pDoubleSpinBoxScale->setMaximum(1000);
+        t_pDoubleSpinBoxScale->setMaximumWidth(100);
+        t_pDoubleSpinBoxScale->setSingleStep(1.0);
+        t_pDoubleSpinBoxScale->setValue(m_pRTMSAW->m_qMapChScaling[FIFFV_MISC_CH]);
+        m_qMapScalingDoubleSpinBox.insert(FIFFV_MISC_CH,t_pDoubleSpinBoxScale);
+        connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                this,&RealTimeMultiSampleArrayScalingWidget::updateDoubleSpinBox);
+        t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i,2,1,1);
         ++i;
     }
 
@@ -193,13 +204,55 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayScalingWidget::updateLineEdit(const QString & text)
+void RealTimeMultiSampleArrayScalingWidget::updateDoubleSpinBox(const double val)
 {
-    Q_UNUSED(text)
+    Q_UNUSED(val)
 
-    QMap<qint32, QLineEdit*>::iterator it;
-    for (it = m_qMapScalingLineEdit.begin(); it != m_qMapScalingLineEdit.end(); ++it)
-        m_pRTMSAW->m_qMapChScaling[it.key()] = it.value()->text().toDouble();
+    QMap<qint32, QDoubleSpinBox*>::iterator it;
+    for (it = m_qMapScalingDoubleSpinBox.begin(); it != m_qMapScalingDoubleSpinBox.end(); ++it)
+    {
+        double scaleValue = 0;
+
+        switch(it.key())
+        {
+            case FIFF_UNIT_T:
+                //MAG
+                scaleValue = 1e-12;
+                break;
+            case FIFF_UNIT_T_M:
+                //GRAD
+                scaleValue = 1e-15 * 100; //*100 because data in fiff files is stored as fT/m not fT/cm
+                break;
+            case FIFFV_EEG_CH:
+                //EEG
+                scaleValue = 1e-06;
+                break;
+            case FIFFV_EOG_CH:
+                //EOG
+                scaleValue = 1e-06;
+                break;
+            case FIFFV_EMG_CH:
+                //EMG
+                scaleValue = 1e-03;
+                break;
+            case FIFFV_ECG_CH:
+                //ECG
+                scaleValue = 1e-03;
+                break;
+            case FIFFV_MISC_CH:
+                //MISC
+                scaleValue = 1;
+                break;
+            case FIFFV_STIM_CH:
+                //STIM
+                scaleValue = 1;
+                break;
+            default:
+                scaleValue = 1.0;
+        }
+
+        m_pRTMSAW->m_qMapChScaling[it.key()] = it.value()->value() * scaleValue;
+    }
 
     emit scalingChanged();
 }

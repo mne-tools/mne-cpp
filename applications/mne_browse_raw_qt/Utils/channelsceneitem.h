@@ -125,10 +125,17 @@ public:
     */
     QPointF getPosition();
 
+    //=========================================================================================================
+    /**
+    * Sets the highlight flag. Notice that highliting an item is not selecting it
+    */
+    void setHighlightChannel(bool highlightItem);
+
 private:
     QString     m_sChannelName;             /**< Holds the channel's name.*/
     QPointF     m_qpChannelPosition;        /**< Holds the channel's 2D position in the scene.*/
     QColor      m_cChannelColor;            /**< Holds the current channel color.*/
+    bool        m_bHighlightItem;
 };
 
 } // NAMESPACE MNEBrowseRawQt
