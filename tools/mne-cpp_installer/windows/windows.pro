@@ -1,16 +1,23 @@
 TEMPLATE = aux
 
+include (../../../mne-cpp.pri)
 include (../mne-cpp_installer.pri)
+
+#MNE BROWSE RAW QT
+include (./packages/org.mne_cpp.suite.mne/meta/files_mne.pri)
+include (./packages/org.mne_cpp.suite.mne_browse_raw_qt/meta/files_mne_browse_raw_qt.pri)
 
 OTHER_FILES = \
     readme.txt \
     config/config.xml \
     packages/org.mne_cpp.suite/meta/package.xml \
+    packages/org.mne_cpp.suite/meta/installscript.js \
+    packages/org.mne_cpp.suite.mne/meta/package.xml \
+    packages/org.mne_cpp.suite.mne/meta/license_mne.txt \
+    packages/org.mne_cpp.suite.mne/meta/installscript.qs \
     packages/org.mne_cpp.suite.mne_browse_raw_qt/meta/package.xml \
     packages/org.mne_cpp.suite.mne_browse_raw_qt/meta/license_mne_browse_raw_qt.txt \
-    packages/org.mne_cpp.suite.mne_browse_raw_qt/meta/installscript.qs \
-    packages/org.mne_cpp.suite/meta/installscript.js \
-    packages/org.mne_cpp.suite/meta/license_mne_cpp.txt
+    packages/org.mne_cpp.suite.mne_browse_raw_qt/meta/installscript.qs
 
 FORMS += \
     packages/org.mne_cpp.suite/meta/readytoinstallwidget.ui \

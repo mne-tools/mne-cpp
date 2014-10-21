@@ -191,7 +191,7 @@ void BabyMEGClient::ConnectToBabyMEG()
         this->start();
     }
 
-    for(int i=0;i<5;i++){
+    for(int i=0;i<0;i++){
         tcpSocket->connectToHost(name,port,QIODevice::ReadWrite);
         if (tcpSocket->waitForConnected(5000))
         {

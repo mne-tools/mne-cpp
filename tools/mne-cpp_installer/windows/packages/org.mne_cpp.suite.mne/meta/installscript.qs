@@ -17,10 +17,12 @@ Component.prototype.isDefault = function()
 
 Component.prototype.createOperations = function()
 {
-    // create mne_browse_raw_qt shortcut
+    // create mne library shortcut
     component.createOperations();
 
-    if (installer.value("os") === "win") {
-        component.addOperation("CreateShortcut", "@TargetDir@/mne_browse_raw_qt/mne_browse_raw_qt.exe", "@StartMenuDir@/mne_browse_raw_qt.exe.lnk");
-    }
+//    if (installer.value("os") === "win") {
+//        component.addOperation("CreateShortcut", "@TargetDir@/mne_browse_raw_qt/readme.txt", "@StartMenuDir@/MNE Browse Raw Qt/README.lnk",
+//            "workingDirectory=@TargetDir@", "iconPath=%SystemRoot%/system32/SHELL32.dll",
+//            "iconId=2");
+//    }
 }
