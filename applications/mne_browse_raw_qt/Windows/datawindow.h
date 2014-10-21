@@ -234,6 +234,8 @@ private:
 
     QScroller*      m_pKineticScroller;             /**< the kinetic scroller of the QTableView */
 
+    QAction*        m_pRemoveDCAction;              /**< the action which is used to control DC removal */
+
 signals:
     void scaleChannels(double);
 

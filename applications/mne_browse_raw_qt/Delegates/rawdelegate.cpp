@@ -71,6 +71,7 @@ RawDelegate::RawDelegate(QObject *parent)
 , m_qSettings()
 , m_bShowSelectedEventsOnly(false)
 , m_bActivateEvents(true)
+, m_bRemoveDC(false)
 {
     m_iDefaultPlotHeight = DELEGATE_PLOT_HEIGHT;
     m_dDx = DELEGATE_DX;
@@ -117,9 +118,13 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 //            painter->setBrushOrigin(oldBO);
 //        }
 
-        //Get data
+        //Get data and means
         QVariant variant = index.model()->data(index,Qt::DisplayRole);
         QList<RowVectorPair> listPairs = variant.value<QList<RowVectorPair> >();
+
+        QVariant variantMeans = index.model()->data(index,RawModelRoles::GetChannelMean);
+        QList<RowVectorPair> listPairsMeans = variantMeans.value<QList<RowVectorPair> >();
+
         const RawModel* t_rawModel = (static_cast<const RawModel*>(index.model()));
 
         QPainterPath path(QPointF(option.rect.x()+t_rawModel->relFiffCursor()-1,option.rect.y()));
@@ -138,7 +143,7 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
         //Plot data path
         path = QPainterPath(QPointF(option.rect.x()+t_rawModel->relFiffCursor(),option.rect.y()));
-        createPlotPath(index, option, path, listPairs);
+        createPlotPath(index, option, path, listPairs, listPairsMeans);
 
         if(option.state & QStyle::State_Selected) {
             pen.setStyle(Qt::SolidLine);
@@ -208,7 +213,7 @@ void RawDelegate::setScaleWindow(ScaleWindow *scaleWindow)
 
 //*************************************************************************************************************
 
-void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs) const
+void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs, QList<RowVectorPair>& listPairsMeans) const
 {
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = (static_cast<const RawModel*>(index.model()))->m_chInfolist[index.row()].kind;
@@ -260,7 +265,12 @@ void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionVie
         for(qint32 j=0; j < listPairs[i].second; ++j)
         {
             double val = *(listPairs[i].first+j);
-            dValue = (val - *(listPairs[0].first))*dScaleY;
+
+            //subtract mean of the channel here (if wanted by the user)
+            if(m_bRemoveDC)
+                dValue = (val - *(listPairsMeans[i].first))*dScaleY;
+            else
+                dValue = val*dScaleY;
 
             double newY = y_base+dValue;
 
