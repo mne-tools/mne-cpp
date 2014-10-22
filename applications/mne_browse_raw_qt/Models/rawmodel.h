@@ -226,11 +226,11 @@ private:
 
     //=========================================================================================================
     /**
-    * calculateMean
+    * calculateMean calculates the mean for all data stored in m_data
     *
     * @param data
     */
-    VectorXd calculateMean(const MatrixXd &data);
+    VectorXd calculateMean(const QList<MatrixXdR> &data);
 
     //VARIABLES
     //Reload control
@@ -254,8 +254,8 @@ private:
     QList<MatrixXdR>                        m_data;                     /**< List that holds the fiff matrix data <n_channels x n_samples> */
     QList<MatrixXdR>                        m_procData;                 /**< List that holds the processed fiff matrix data <n_channels x n_samples> */
     QList<MatrixXdR>                        m_times;                    /**< List that holds the time axis [in secs] */
-    QList<VectorXd>                         m_dataMean;                 /**< List that holds the means of each channel in each data block */
-    QList<VectorXd>                         m_procDataMean;             /**< List that holds the means of each channel in each processed data block */
+    VectorXd                                m_dataMean;                 /**< List that holds the means of each channel in each data block */
+    VectorXd                                m_procDataMean;             /**< List that holds the means of each channel in each processed data block */
 
     //Filter operators
     QMap<int,QSharedPointer<MNEOperator> >      m_assignedOperators;    /**< Map of MNEOperator types to channels*/

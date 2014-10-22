@@ -116,7 +116,7 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
         QModelIndex meanIndex = index.model()->index(index.row(),2);
         QVariant variantMeans = index.model()->data(meanIndex,RawModelRoles::GetChannelMean);
-        QList<RowVectorPair> listPairsMeans = variantMeans.value<QList<RowVectorPair> >();
+        RowVectorPair pairMeans = variantMeans.value<RowVectorPair>();
 
         const RawModel* t_rawModel = (static_cast<const RawModel*>(index.model()));
 
@@ -136,7 +136,7 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
         //Plot data path
         path = QPainterPath(QPointF(option.rect.x()+t_rawModel->relFiffCursor(),option.rect.y()));
-        createPlotPath(index, option, path, listPairs, listPairsMeans);
+        createPlotPath(index, option, path, listPairs, pairMeans);
 
         if(option.state & QStyle::State_Selected) {
             pen.setStyle(Qt::SolidLine);
@@ -206,7 +206,7 @@ void RawDelegate::setScaleWindow(ScaleWindow *scaleWindow)
 
 //*************************************************************************************************************
 
-void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs, QList<RowVectorPair>& listPairsMeans) const
+void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs, RowVectorPair& pairMeans) const
 {
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = (static_cast<const RawModel*>(index.model()))->m_chInfolist[index.row()].kind;
@@ -261,7 +261,7 @@ void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionVie
 
             //subtract mean of the channel here (if wanted by the user)
             if(m_bRemoveDC)
-                dValue = (val - *(listPairsMeans[i].first))*dScaleY;
+                dValue = (val - *(pairMeans.first))*dScaleY;
             else
                 dValue = val*dScaleY;
 
