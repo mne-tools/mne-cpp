@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     layoutscene.cpp
+* @file     averagescene.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the LayoutScene class.
+* @brief    Contains the implementation of the AverageScene class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "layoutscene.h"
+#include "averagescene.h"
 
 
 //*************************************************************************************************************
@@ -56,7 +56,7 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-LayoutScene::LayoutScene(QGraphicsView* view, QObject* parent)
+AverageScene::AverageScene(QGraphicsView* view, QObject* parent)
 : QGraphicsScene(parent)
 , m_qvView(view)
 , m_dragSceneIsActive(false)
@@ -73,7 +73,7 @@ LayoutScene::LayoutScene(QGraphicsView* view, QObject* parent)
 
 //*************************************************************************************************************
 
-void LayoutScene::setNewLayout(QMap<QString,QVector<double> > layoutMap)
+void AverageScene::setNewLayout(QMap<QString,QVector<double> > layoutMap)
 {
     m_layoutMap = layoutMap;
 
@@ -84,46 +84,31 @@ void LayoutScene::setNewLayout(QMap<QString,QVector<double> > layoutMap)
 
 //*************************************************************************************************************
 
-void LayoutScene::hideItems(QStringList visibleItems)
+void AverageScene::hideItems(QStringList visibleItems)
 {
-    //Hide all items which names are in the the string list visibleItems. All other items' opacity is set to 0.25 an dthey are no longer selectable.
-    QList<QGraphicsItem *> itemList = this->items();
 
-    for(int i = 0; i<itemList.size(); i++) {
-        ChannelSceneItem* item = static_cast<ChannelSceneItem*>(itemList.at(i));
-
-        if(!visibleItems.contains(item->getChannelName())) {
-            item->setFlag(QGraphicsItem::ItemIsSelectable, false);
-            item->setOpacity(0.25);
-        }
-        else {
-            item->setFlag(QGraphicsItem::ItemIsSelectable, true);
-            item->setOpacity(1);
-        }
-    }
 }
 
 
 //*************************************************************************************************************
 
-void LayoutScene::repaintItems()
+void AverageScene::repaintItems()
 {
-    QMapIterator<QString,QVector<double> > i(m_layoutMap);
-
     this->clear();
 
+    QMapIterator<QString,QVector<double> > i(m_layoutMap);
     while (i.hasNext()) {
         i.next();
-        ChannelSceneItem* ChannelSceneItemTemp = new ChannelSceneItem(i.key(), QPointF(i.value().at(0), i.value().at(1)));
+        AverageSceneItem* AverageSceneItemTemp = new AverageSceneItem(i.key(), QPointF(i.value().at(0), i.value().at(1)));
 
-        this->addItem(ChannelSceneItemTemp);
+        this->addItem(AverageSceneItemTemp);
     }
 }
 
 
 //*************************************************************************************************************
 
-void LayoutScene::wheelEvent(QGraphicsSceneWheelEvent* event) {
+void AverageScene::wheelEvent(QGraphicsSceneWheelEvent* event) {
     m_qvView->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
 
     // Scale the view / do the zoom
@@ -140,7 +125,7 @@ void LayoutScene::wheelEvent(QGraphicsSceneWheelEvent* event) {
 
 //*************************************************************************************************************
 
-void LayoutScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent)
+void AverageScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent)
 {
     if(mouseEvent->button() == Qt::LeftButton)
         m_qvView->fitInView(this->itemsBoundingRect(), Qt::KeepAspectRatio);
@@ -151,7 +136,7 @@ void LayoutScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent)
 
 //*************************************************************************************************************
 
-void LayoutScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
+void AverageScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     switch(mouseEvent->button()) {
     case Qt::LeftButton:
@@ -178,7 +163,7 @@ void LayoutScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 //*************************************************************************************************************
 
-void LayoutScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
+void AverageScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     if(m_bDragMode) {
         int diffX = mouseEvent->screenPos().x() - m_mousePressPosition.x();
@@ -196,7 +181,7 @@ void LayoutScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 //*************************************************************************************************************
 
-void LayoutScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
+void AverageScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
 //    if(m_bExtendedSelectionMode) {
 //        qDebug()<<"Extended Selection";
@@ -233,7 +218,7 @@ void LayoutScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 //*************************************************************************************************************
 
-void LayoutScene::keyPressEvent(QKeyEvent *keyEvent)
+void AverageScene::keyPressEvent(QKeyEvent *keyEvent)
 {
     if(keyEvent->key() == Qt::Key_Control)
         m_bExtendedSelectionMode = true;
@@ -244,7 +229,7 @@ void LayoutScene::keyPressEvent(QKeyEvent *keyEvent)
 
 //*************************************************************************************************************
 
-void LayoutScene::keyReleaseEvent(QKeyEvent *keyEvent)
+void AverageScene::keyReleaseEvent(QKeyEvent *keyEvent)
 {
     if(keyEvent->key() == Qt::Key_Control)
         m_bExtendedSelectionMode = false;
@@ -255,7 +240,7 @@ void LayoutScene::keyReleaseEvent(QKeyEvent *keyEvent)
 
 //*************************************************************************************************************
 
-bool LayoutScene::event(QEvent *event)
+bool AverageScene::event(QEvent *event)
 {
     if (event->type() == QEvent::Gesture) {
         QGestureEvent* gestureEventCast = static_cast<QGestureEvent*>(event);
@@ -273,7 +258,7 @@ bool LayoutScene::event(QEvent *event)
 
 //*************************************************************************************************************
 
-bool LayoutScene::gestureEvent(QGestureEvent *event)
+bool AverageScene::gestureEvent(QGestureEvent *event)
 {
     //Pan event
     if (QGesture *pan = event->gesture(Qt::PanGesture))
@@ -289,7 +274,7 @@ bool LayoutScene::gestureEvent(QGestureEvent *event)
 //*************************************************************************************************************
 
 
-void LayoutScene::panTriggered(QPanGesture *gesture)
+void AverageScene::panTriggered(QPanGesture *gesture)
 {
     qDebug()<<"panTriggered";
 
@@ -301,7 +286,7 @@ void LayoutScene::panTriggered(QPanGesture *gesture)
 
 //*************************************************************************************************************
 
-void LayoutScene::pinchTriggered(QPinchGesture *gesture)
+void AverageScene::pinchTriggered(QPinchGesture *gesture)
 {
     qDebug()<<"pinchTriggered";
 
@@ -311,7 +296,7 @@ void LayoutScene::pinchTriggered(QPinchGesture *gesture)
 
 //*************************************************************************************************************
 
-bool LayoutScene::eventFilter(QObject *object, QEvent *event)
+bool AverageScene::eventFilter(QObject *object, QEvent *event)
 {
     if (object == m_qvView && event->type() == QEvent::Gesture) {
         QGestureEvent* gestureEventCast = static_cast<QGestureEvent*>(event);

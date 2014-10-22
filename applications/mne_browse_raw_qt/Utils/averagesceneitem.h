@@ -87,7 +87,7 @@ public:
     /**
     * Constructs a AverageSceneItem.
     */
-    AverageSceneItem(QString channelName, QPointF channelPosition, QColor averageColor);
+    AverageSceneItem(QString channelName, QPointF channelPosition, QColor averageColor = Qt::red);
 
     //=========================================================================================================
     /**

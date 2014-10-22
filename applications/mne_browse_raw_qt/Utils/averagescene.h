@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     layoutscene.h
+* @file     averagescene.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     September, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
@@ -30,19 +30,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the LayoutScene class.
+* @brief    Contains the declaration of the AverageScene class.
 *
 */
 
-#ifndef LAYOUTSCENE_H
-#define LAYOUTSCENE_H
+#ifndef AVERAGESCENE_H
+#define AVERAGESCENE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "channelsceneitem.h"
+#include "averagesceneitem.h"
 
 
 //*************************************************************************************************************
@@ -75,20 +75,20 @@ namespace MNEBrowseRawQt
 
 //=============================================================================================================
 /**
-* LayoutScene...
+* AverageScene...
 *
-* @brief The LayoutScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
+* @brief The AverageScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
 */
-class LayoutScene : public QGraphicsScene
+class AverageScene : public QGraphicsScene
 {
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a LayoutScene.
+    * Constructs a AverageScene.
     */
-    LayoutScene(QGraphicsView* view, QObject *parent = 0);
+    explicit AverageScene(QGraphicsView* view, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -201,4 +201,4 @@ private:
 
 } // NAMESPACE
 
-#endif // LAYOUTSCENE_H
+#endif // AverageScene_H

@@ -134,6 +134,7 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
 //    connect(&m_operatorFutureWatcher,&QFutureWatcher<QPair<int,RowVectorXd> >::resultReadyAt,[this](int index){
 //        insertProcessedData(index);
 //    });
+
     connect(&m_operatorFutureWatcher,&QFutureWatcher<void>::finished,[this](){
         insertProcessedData();
     });
@@ -230,24 +231,17 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
                 //form RowVectorPair of pointer and length of RowVector
                 QPair<const double*,qint32> rowVectorPair;
 
-                //pack all adjacent (after reload) RowVectorPairs into a QList
-                QList<RowVectorPair> listRowVectorPair;
-
-                for(qint16 i=0; i < m_dataMean.size(); ++i) {
-                    //if channel is not filtered or background Processing pending...
-                    if(!m_assignedOperators.contains(index.row()) || (m_bProcessing && m_bReloadBefore && i==0) || (m_bProcessing && !m_bReloadBefore && i==m_dataMean.size()-1)) {
-                        rowVectorPair.first = m_dataMean[i].data() + index.row();
-                        rowVectorPair.second  = m_dataMean[i].cols(); //always 1 because m_dataMean is a row vector
-                    }
-                    else { //if channel IS filtered
-                        rowVectorPair.first = m_procDataMean[i].data() + index.row();
-                        rowVectorPair.second  = m_procDataMean[i].cols(); //always 1 because m_procDataMean is a row vector
-                    }
-
-                    listRowVectorPair.append(rowVectorPair);
+                //if channel is not filtered or background Processing pending...
+                if(!m_assignedOperators.contains(index.row()) || (m_bProcessing && m_bReloadBefore) || (m_bProcessing && !m_bReloadBefore)) {
+                    rowVectorPair.first = m_dataMean.data() + index.row();
+                    rowVectorPair.second  = m_dataMean.cols() + index.row(); //always 1 because m_dataMean is a row vector
+                }
+                else { //if channel IS filtered
+                    rowVectorPair.first = m_procDataMean.data() + index.row();
+                    rowVectorPair.second  = m_procDataMean.cols() + index.row(); //always 1 because m_procDataMean is a row vector
                 }
 
-                v.setValue(listRowVectorPair);
+                v.setValue(rowVectorPair);
                 return v;
                 break;
             }
@@ -374,9 +368,9 @@ bool RawModel::loadFiffData(QFile& qFile)
 
     //set loaded fiff data
     m_data.append(t_data);
-    m_dataMean.append(calculateMean(t_data));
+    m_dataMean = calculateMean(m_data);
     m_procData.append(MatrixXdR::Zero(t_data.rows(),t_data.cols()));
-    m_procDataMean.append(VectorXd::Zero(t_data.rows()));
+    m_procDataMean = VectorXd::Zero(t_data.rows());
     m_times.append(t_times);
 
     loadFiffInfos();
@@ -430,9 +424,9 @@ void RawModel::clearModel()
 
     //data model structure
     m_data.clear();
-    m_dataMean.clear();
+    m_dataMean = VectorXd::Zero(rowCount());
     m_procData.clear();
-    m_procDataMean.clear();
+    m_procDataMean = VectorXd::Zero(rowCount());
     m_times.clear();
 
     //MNEOperators
@@ -456,9 +450,9 @@ void RawModel::resetPosition(qint32 position)
 
     //reset members
     m_data.clear();
-    m_dataMean.clear();
+    m_dataMean = VectorXd::Zero(rowCount());
     m_procData.clear();
-    m_procDataMean.clear();
+    m_procDataMean = VectorXd::Zero(rowCount());
     m_times.clear();
 
     m_bStartReached = false;
@@ -481,9 +475,9 @@ void RawModel::resetPosition(qint32 position)
 
     //append loaded block
     m_data.append(t_data);
-    m_dataMean.append(calculateMean(t_data));
+    m_dataMean = calculateMean(m_data);
     m_procData.append(MatrixXdR::Zero(t_data.rows(),m_iWindowSize));
-    m_procDataMean.append(VectorXd::Zero(t_data.rows()));
+    m_procDataMean = VectorXd::Zero(t_data.rows());
     m_times.append(t_times);
 
     updateOperators();
@@ -566,14 +560,22 @@ QPair<MatrixXd,MatrixXd> RawModel::readSegment(fiff_int_t from, fiff_int_t to)
 
 //*************************************************************************************************************
 
-VectorXd RawModel::calculateMean(const MatrixXd &data)
+VectorXd RawModel::calculateMean(const QList<MatrixXdR> &data)
 {
-    VectorXd channelMeans(data.rows());
+    if(!data.empty() && !m_bReloading) {
+        VectorXd channelMeans(data.at(0).rows());
 
-    for(int i = 0; i<channelMeans.rows(); i++)
-        channelMeans[i] = data.row(i).mean();
+        MatrixXdR dataSum = MatrixXdR::Zero(data.at(0).rows(), data.at(0).cols());
+        for(int i = 0; i<data.size() ;i++)
+            dataSum += data.at(i);
 
-    return channelMeans;
+        for(int i = 0; i<channelMeans.rows(); i++)
+            channelMeans[i] = (dataSum.row(i).sum())/(data.size()*data.at(0).cols());
+
+        return channelMeans;
+    }
+
+    return VectorXd::Zero(rowCount());
 }
 
 
@@ -789,35 +791,31 @@ void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair)
     //extend m_data with reloaded data
     if(m_bReloadBefore) {
         m_data.prepend(dataTimesPair.first);
-        m_dataMean.prepend(calculateMean(dataTimesPair.first));
         m_procData.prepend(MatrixXdR::Zero(m_chInfolist.size(),m_iWindowSize));
-        m_procDataMean.prepend(VectorXd::Zero(m_chInfolist.size()));
         m_times.prepend(dataTimesPair.second);
 
         //maintain at maximum m_maxWindows data windows and drop the rest
         if(m_data.size() > m_maxWindows) {
             m_data.removeLast();
-            m_dataMean.removeLast();
             m_procData.removeLast();
-            m_procDataMean.removeLast();
         }
     }
     else {
         m_data.append(dataTimesPair.first);
-        m_dataMean.append(calculateMean(dataTimesPair.first));
         m_procData.append(MatrixXdR::Zero(m_chInfolist.size(),m_iWindowSize));
-        m_procDataMean.append(VectorXd::Zero(m_chInfolist.size()));
         m_times.append(dataTimesPair.second);
 
         //maintain at maximum m_maxWindows data windows and drop the rest
         if(m_data.size() > m_maxWindows) {
             m_data.removeFirst();
-            m_dataMean.removeFirst();
             m_procData.removeFirst();
-            m_procDataMean.removeFirst();
             m_iAbsFiffCursor += m_iWindowSize;
         }
     }
+
+    //Calculate mean
+    m_dataMean = calculateMean(m_data);
+    m_procDataMean = VectorXd::Zero(m_chInfolist.size());
 
     m_bReloading = false;
 
@@ -874,14 +872,13 @@ void RawModel::insertProcessedData(int index)
 {
     QList<int> listFilteredChs = m_assignedOperators.keys();
 
-    if(m_bReloadBefore) {
+    if(m_bReloadBefore)
         m_procData.first().row(listFilteredChs[index]) = m_listTmpChData[index].second;
-        m_procDataMean.first() = calculateMean(m_procData.first());
-    }
-    else {
+    else
         m_procData.last().row(listFilteredChs[index]) = m_listTmpChData[index].second;
-        m_procDataMean.last() = calculateMean(m_procData.last());
-    }
+
+    //Calculate mean
+    m_procDataMean = calculateMean(m_procData);
 
     emit dataChanged(createIndex(listFilteredChs[index],1),createIndex(listFilteredChs[index],1));
 
@@ -901,6 +898,9 @@ void RawModel::insertProcessedData()
         else
             m_procData.last().row(listFilteredChs[i]) = m_listTmpChData[i].second;
     }
+
+    //Calculate mean
+    m_procDataMean = calculateMean(m_procData);
 
     emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));
 
