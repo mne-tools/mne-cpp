@@ -60,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
 , m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
 //, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
+, m_qEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
 , m_qSettings()
 , m_rawSettings()
 , ui(new Ui::MainWindowWidget)
@@ -118,7 +119,7 @@ void MainWindow::setupWindowWidgets()
     m_pSelectionManagerWindow->hide();
 
     //Create average manager window - QTDesigner used - see /FormFiles
-    m_pAverageWindow = new AverageWindow(this);
+    m_pAverageWindow = new AverageWindow(this, m_qEvokedFile);
     addDockWidget(Qt::BottomDockWidgetArea, m_pAverageWindow);
     m_pAverageWindow->hide();
 
@@ -164,7 +165,8 @@ void MainWindow::connectMenus()
     connect(ui->m_writeAction, SIGNAL(triggered()), this, SLOT(writeFile()));
     connect(ui->m_loadEvents, SIGNAL(triggered()), this, SLOT(loadEvents()));
     connect(ui->m_saveEvents, SIGNAL(triggered()), this, SLOT(saveEvents()));
-    connect(ui->m_quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+    connect(ui->m_loadEvokedAction, SIGNAL(triggered()), this, SLOT(loadEvoked()));
+    connect(ui->m_quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));    
 
     //Adjust
     connect(ui->m_filterAction, SIGNAL(triggered()), this, SLOT(showFilterWindow()));
@@ -221,6 +223,15 @@ void MainWindow::setWindowStatus()
     }
     else
         title.append("  -  No event file");
+
+    if(m_pAverageWindow->getAverageModel()->m_bFileloaded) {
+        int idx = m_qEvokedFile.fileName().lastIndexOf("/");
+        QString filename = m_qEvokedFile.fileName().remove(0,idx+1);
+
+        title.append(QString("  -  Evoked file: %1").arg(filename));
+    }
+    else
+        title.append("  -  No evoked file");
 
     //Add permanent widget to status bar after deleting old one
     QObjectList cildrenList = statusBar()->children();
@@ -342,7 +353,8 @@ void MainWindow::loadEvents()
     setWindowStatus();
 
     //Show event window
-    showEventWindow();
+    if(!m_pEventWindow->isVisible())
+        m_pEventWindow->show();
 }
 
 
@@ -369,6 +381,37 @@ void MainWindow::saveEvents()
     }
     else
         qDebug("ERROR saving fiff event data file %s",filename.toLatin1().data());
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::loadEvoked()
+{
+    QString filename = QFileDialog::getOpenFileName(this,QString("Open evoked fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif evoked data files (*-ave.fif);;fif data files (*.fif)"));
+
+    if(filename.isEmpty())
+    {
+        qDebug("User aborted loading fiff evoked file");
+        return;
+    }
+
+    if(m_qEvokedFile.isOpen())
+        m_qEvokedFile.close();
+
+    m_qEvokedFile.setFileName(filename);
+
+    if(m_pAverageWindow->getAverageModel()->loadEvokedData(m_qEvokedFile))
+        qDebug() << "Fiff evoked data file" << filename << "loaded.";
+    else
+        qDebug("ERROR loading evoked event data file %s",filename.toLatin1().data());
+
+    //Update status bar
+    setWindowStatus();
+
+    //Show average window
+    if(!m_pAverageWindow->isVisible())
+        m_pAverageWindow->show();
 }
 
 

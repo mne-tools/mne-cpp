@@ -144,6 +144,12 @@ class RawModel : public QAbstractTableModel
 public:
     RawModel(QObject *parent);
     RawModel(QFile& qFile, QObject *parent);
+
+    //=========================================================================================================
+    /**
+    * Reimplemented virtual functions
+    *
+    */
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const ;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;

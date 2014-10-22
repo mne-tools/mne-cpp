@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    This class represents the model of the model/view framework of mne_browse_raw_qt application.
+* @brief    This class represents the event model of the model/view framework of mne_browse_raw_qt application.
 *
 */
 

@@ -33,6 +33,8 @@
     <addaction name="m_loadEvents"/>
     <addaction name="m_saveEvents"/>
     <addaction name="separator"/>
+    <addaction name="m_loadEvokedAction"/>
+    <addaction name="separator"/>
     <addaction name="m_quitAction"/>
    </widget>
    <widget class="QMenu" name="menuAdjust">
@@ -130,6 +132,11 @@
   <action name="m_scalingAction">
    <property name="text">
     <string>Scaling window...</string>
+   </property>
+  </action>
+  <action name="m_loadEvokedAction">
+   <property name="text">
+    <string>Load evoked (fif)...</string>
    </property>
   </action>
  </widget>

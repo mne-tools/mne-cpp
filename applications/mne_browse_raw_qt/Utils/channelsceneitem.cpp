@@ -89,7 +89,7 @@ void ChannelSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     //Plot selected item
     if(this->isSelected())
-        painter->setBrush(QBrush(Qt::yellow));
+        painter->setBrush(QBrush(QColor(93,177,47)));
     else
         painter->setBrush(QBrush(m_cChannelColor));
 

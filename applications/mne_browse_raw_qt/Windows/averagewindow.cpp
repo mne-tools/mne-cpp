@@ -55,11 +55,19 @@ using namespace MNEBrowseRawQt;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AverageWindow::AverageWindow(QWidget *parent) :
-    QDockWidget(parent),
-    ui(new Ui::AverageWindow)
+AverageWindow::AverageWindow(QWidget *parent, QFile &file)
+: QDockWidget(parent)
+, ui(new Ui::AverageWindow)
 {
     ui->setupUi(this);
+
+    //------------------------
+    //--- Setup average model ---
+    //------------------------
+    if(file.exists())
+        m_pAverageModel = new AverageModel(file, this);
+    else
+        m_pAverageModel = new AverageModel(this);
 }
 
 
@@ -68,4 +76,12 @@ AverageWindow::AverageWindow(QWidget *parent) :
 AverageWindow::~AverageWindow()
 {
     delete ui;
+}
+
+
+//*************************************************************************************************************
+
+AverageModel* AverageWindow::getAverageModel()
+{
+    return m_pAverageModel;
 }
