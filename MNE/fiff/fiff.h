@@ -806,7 +806,7 @@ public:
     * @param[in] data       The integer data pointer
     * @param[in] nel        Number of integers to write (default = 1)
     */
-    inline static void write_int(FiffStream* p_pStream, fiff_int_t kind, fiff_int_t* data, fiff_int_t nel = 1)
+    inline static void write_int(FiffStream* p_pStream, fiff_int_t kind, const fiff_int_t* data, fiff_int_t nel = 1)
     {
         p_pStream->write_int(kind, data, nel);
     }
