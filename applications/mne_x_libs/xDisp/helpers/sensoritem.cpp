@@ -46,6 +46,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QStaticText>
 #include <QDebug>
 
 
@@ -62,12 +63,11 @@ using namespace XDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SensorItem::SensorItem(const QString& dispChName, qint32 chNumber, const QPointF& coordinate, const QSizeF& size, QGraphicsItem *parent)
+SensorItem::SensorItem(const QString& dispChName, qint32 chNumber, const QPointF& coordinate, QGraphicsItem *parent)
 : QGraphicsObject(parent)
 , m_sDisplayChName(dispChName)
 , m_iChNumber(chNumber)
 , m_qPointFCoord(coordinate)
-, m_qSizeFDim(size)
 , m_bIsSelected(false)
 {
     setZValue(m_iChNumber);
@@ -81,7 +81,7 @@ SensorItem::SensorItem(const QString& dispChName, qint32 chNumber, const QPointF
 
 QRectF SensorItem::boundingRect() const
 {
-    return QRectF(QPointF(0,0), m_qSizeFDim);
+    return QRectF(-25, -30, 50, 50);//QRectF(QPointF(0,0), m_qSizeFDim);
 }
 
 
@@ -90,7 +90,7 @@ QRectF SensorItem::boundingRect() const
 QPainterPath SensorItem::shape() const
 {
     QPainterPath path;
-    path.addRect(QRectF(QPointF(0,0), m_qSizeFDim));
+    path.addRect(-25, -30, 50, 50);
     return path;
 }
 
@@ -101,14 +101,26 @@ void SensorItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 {
     Q_UNUSED(widget)
 
+    // Plot shadow
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(Qt::darkGray);
+    painter->drawEllipse(-12, -12, 30, 30);
+
     if (option->state & QStyle::State_MouseOver)
         painter->setBrush(Qt::lightGray);
 
     painter->setPen(m_bIsSelected ? Qt::red : Qt::darkBlue);
-    painter->drawRect(QRectF(QPointF(0,0), m_qSizeFDim));
+    painter->drawEllipse(-15, -15, 30, 30);
 
-    painter->setFont(QFont("Helvetica [Cronyx]", 6));
-    painter->drawText(QPointF(0+2,m_qSizeFDim.height()-3), m_sDisplayChName);
+//    painter->setFont(QFont("Helvetica [Cronyx]", 6));
+//    painter->drawText(QPointF(0+2,m_qSizeFDim.height()-3), m_sDisplayChName);
+
+    // Plot channel name
+    painter->setPen(QPen(Qt::black, 1));
+    QStaticText staticChName = QStaticText(m_sDisplayChName);
+    QSizeF sizeText = staticChName.size();
+    painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticChName);
+
 }
 
 

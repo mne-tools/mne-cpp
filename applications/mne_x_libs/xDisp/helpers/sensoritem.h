@@ -73,10 +73,9 @@ public:
     * @param [in] dispChName    channel name to display
     * @param [in] chNumber      channel number to store
     * @param [in] coordinate    coordinates of the item
-    * @param [in] size          size of the item
     * @param [in] parent        parent of item
     */
-    SensorItem(const QString& dispChName, qint32 chNumber, const QPointF& coordinate, const QSizeF& size, QGraphicsItem *parent = 0);
+    SensorItem(const QString& dispChName, qint32 chNumber, const QPointF& coordinate, QGraphicsItem *parent = 0);
 
     //=========================================================================================================
     /**
@@ -175,7 +174,6 @@ private:
     QString m_sDisplayChName;   /**< channel name to display */
     qint32 m_iChNumber;         /**< channel number */
     QPointF m_qPointFCoord;     /**< item coordinates */
-    QSizeF m_qSizeFDim;         /**< item dimensions */
     bool m_bIsSelected;         /**< channel selection state */
 };
 
