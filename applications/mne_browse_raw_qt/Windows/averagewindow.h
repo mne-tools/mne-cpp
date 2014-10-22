@@ -45,6 +45,7 @@
 #include "ui_averagewindow.h"
 #include "utils/layoutloader.h"         //MNE-CPP utils
 #include "../Utils/layoutscene.h"       //MNE Browse Raw QT utils
+#include "../Models/averagemodel.h"
 
 
 //*************************************************************************************************************
@@ -88,7 +89,7 @@ public:
     *
     * @param [in] parent pointer to parent widget; If parent is 0, the new AverageWindow becomes a window. If parent is another widget, AverageWindow becomes a child window inside parent. AverageWindow is deleted when its parent is deleted.
     */
-    AverageWindow(QWidget *parent = 0);
+    AverageWindow(QWidget *parent = 0, QFile &file = QFile());
 
     //=========================================================================================================
     /**
@@ -97,8 +98,16 @@ public:
     */
     ~AverageWindow();
 
+    //=========================================================================================================
+    /**
+    * Returns the AverageModel of this window
+    */
+    AverageModel* getAverageModel();
+
 private:
     Ui::AverageWindow *ui;
+
+    AverageModel*           m_pAverageModel;     /**< the QAbstractList model being part of the model/view framework of Qt */
 };
 
 } // NAMESPACE MNEBrowseRawQt

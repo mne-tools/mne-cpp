@@ -199,6 +199,12 @@ private slots:
 
     //=========================================================================================================
     /**
+    * loadEvoked load the evoked data from file.
+    */
+    void loadEvoked();
+
+    //=========================================================================================================
+    /**
      * showAboutWindow opens the about dialog
      */
     void showAboutWindow();
@@ -274,6 +280,7 @@ private:
 
     QFile                   m_qFileRaw;                 /**< Fiff data file to read (set for convenience) */
     QFile                   m_qEventFile;               /**< Fiff event data file to read (set for convenience) */
+    QFile                   m_qEvokedFile;              /**< Fiff event data file to read (set for convenience) */
     QSignalMapper*          m_qSignalMapper;            /**< signal mapper used for signal-slot mapping */
 
     //Window widgets

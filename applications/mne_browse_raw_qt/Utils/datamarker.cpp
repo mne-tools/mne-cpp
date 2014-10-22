@@ -131,5 +131,6 @@ void DataMarker::enterEvent(QEvent *event)
 
 void DataMarker::moveEvent(QMoveEvent *event)
 {
+    Q_UNUSED(event);
     emit markerMoved();
 }

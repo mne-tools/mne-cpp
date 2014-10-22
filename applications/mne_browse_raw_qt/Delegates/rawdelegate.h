@@ -125,6 +125,12 @@ class RawDelegate : public QAbstractItemDelegate
     Q_OBJECT
 public:
     RawDelegate(QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Reimplemented virtual functions
+    *
+    */
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
