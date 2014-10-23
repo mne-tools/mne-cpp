@@ -160,12 +160,6 @@ public:
 private:
     //=========================================================================================================
     /**
-    * Setup the undocked data view window.
-    */
-    void initUndockedWindow();
-
-    //=========================================================================================================
-    /**
     * Setup the tool bar of the data window.
     */
     void initToolBar();
@@ -218,8 +212,6 @@ private:
 
     QSettings       m_qSettings;                    /**< global mne browse raw qt settings */
 
-    QWidget*        m_pUndockedViewWidget;          /**< widget which is shown whenever the view undock action is triggered */
-
     DataMarker*     m_pDataMarker;                  /**< pointer to the data marker */
     QLabel*         m_pCurrentDataMarkerLabel;      /**< the current data marker label to display the marker's position */
     int             m_iCurrentMarkerSample;         /**< the current data marker sample value to display the marker's position */
@@ -227,7 +219,6 @@ private:
     RawDelegate*    m_pRawDelegate;                 /**< the QAbstractDelegate being part of the raw model/view framework of Qt */
     RawModel*       m_pRawModel;                    /**< the QAbstractTable model being part of the model/view framework of Qt */
 
-    QTableView*     m_pUndockedDataView;            /**< the QTableView of the undockable widget*/
     QVBoxLayout*    m_pUndockedDataViewLayout;      /**< the layout of the undockable widget */
 
     QScroller*      m_pKineticScroller;             /**< the kinetic scroller of the QTableView */
@@ -266,12 +257,6 @@ protected slots:
     * Adds an event to the event model and its QTableView
     */
     void addEventToEventModel();
-
-    //=========================================================================================================
-    /**
-    * Undock the table view to a normal window (not dock widget)
-    */
-    void undockDataViewToWindow();
 
     //=========================================================================================================
     /**

@@ -61,8 +61,9 @@ AverageWindow::AverageWindow(QWidget *parent, QFile &file)
 {
     ui->setupUi(this);
 
-    initAverageSceneView();
     initMVC(file);
+    initTableViewWidgets();
+    initAverageSceneView();
 }
 
 
@@ -92,6 +93,42 @@ void AverageWindow::channelSelectionManagerChanged(const QList<QGraphicsItem*> &
 
 //*************************************************************************************************************
 
+void AverageWindow::initMVC(QFile &file)
+{
+    //Setup average model
+    if(file.exists())
+        m_pAverageModel = new AverageModel(file, this);
+    else
+        m_pAverageModel = new AverageModel(this);
+
+    //Set initial selection
+    //m_pAverageModel
+
+    //Setup average delegate
+    m_pAverageDelegate = new AverageDelegate(this);
+
+    //Connect changes in the average data model to average delegate
+    connect(m_pAverageModel, &AverageModel::dataChanged,
+            this, &AverageWindow::onDataChanged);
+}
+
+
+//*************************************************************************************************************
+
+void AverageWindow::initTableViewWidgets()
+{
+    //Set average model to list widget
+    ui->m_tableView_loadedSets->setModel(m_pAverageModel);
+    ui->m_tableView_loadedSets->setColumnHidden(1,true); //hide second column because the average model holds the aspect kind for this column
+    ui->m_tableView_loadedSets->setColumnHidden(4,true); //hide last column because the average model holds the data types for this column
+    ui->m_tableView_loadedSets->resizeColumnsToContents();
+    ui->m_tableView_loadedSets->adjustSize();
+    ui->m_tableView_loadedSets->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+}
+
+
+//*************************************************************************************************************
+
 void AverageWindow::initAverageSceneView()
 {
     //Create average scene and set view
@@ -102,23 +139,7 @@ void AverageWindow::initAverageSceneView()
 
 //*************************************************************************************************************
 
-void AverageWindow::initMVC(QFile &file)
+void AverageWindow::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
-    //Setup average model
-    if(file.exists())
-        m_pAverageModel = new AverageModel(file, this);
-    else
-        m_pAverageModel = new AverageModel(this);
 
-    //Set average model to list widget
-    ui->m_tableView_loadedSets->setModel(m_pAverageModel);
-    ui->m_tableView_loadedSets->setColumnHidden(1,true); //hide second column because the average model holds the aspect kind for this column
-    ui->m_tableView_loadedSets->setColumnHidden(4,true); //hide last column because the average model holds the data types for this column
-    ui->m_tableView_loadedSets->resizeColumnsToContents();
-    ui->m_tableView_loadedSets->adjustSize();
-    ui->m_tableView_loadedSets->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-
-    //Connect data changes to scene and therefore to the scenes delegate which than plots the changes
-//    connect(m_pAverageModel, AverageModel::dataChanged,
-//            m_pAverageScene, AverageScene::repaintItems);
 }
