@@ -109,7 +109,7 @@ public:
     /**
     * call this whenever the external channel selection manager changed
     */
-    void channelSelectionManagerChanged(const QList<ChannelSceneItem*> &selectedChannelItems);
+    void channelSelectionManagerChanged(const QList<QGraphicsItem *> &selectedChannelItems);
 
 private:
     //=========================================================================================================

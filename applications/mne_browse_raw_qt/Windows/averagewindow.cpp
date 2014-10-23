@@ -84,7 +84,7 @@ AverageModel* AverageWindow::getAverageModel()
 
 //*************************************************************************************************************
 
-void AverageWindow::channelSelectionManagerChanged(const QList<ChannelSceneItem*> &selectedChannelItems)
+void AverageWindow::channelSelectionManagerChanged(const QList<QGraphicsItem*> &selectedChannelItems)
 {
     m_pAverageScene->repaintItems(selectedChannelItems);
 }
