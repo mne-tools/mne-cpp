@@ -317,6 +317,8 @@ bool AverageModel::loadEvokedData(QFile& qFile)
 
     endResetModel();
 
+    emit dataChanged(createIndex(0,0), createIndex(rowCount(),columnCount()));
+
     return true;
 }
 
@@ -330,7 +332,7 @@ bool AverageModel::saveEvokedData(QFile& qFile)
     beginResetModel();
     clearModel();
 
-    //TODO: Save events to file
+    //TODO: Save evoked to file
 
     endResetModel();
     return true;

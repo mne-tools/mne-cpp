@@ -46,6 +46,7 @@
 #include "utils/layoutloader.h"             //MNE-CPP utils
 #include "../Utils/averagescene.h"          //MNE Browse Raw QT utils
 #include "../Models/averagemodel.h"         //MNE Browse Raw QT utils
+#include "../Delegates/averagedelegate.h"   //MNE Browse Raw QT utils
 #include "../Utils/channelsceneitem.h"      //MNE Browse Raw QT utils
 
 
@@ -121,13 +122,26 @@ private:
 
     //=========================================================================================================
     /**
-    * inits the average scene of thiss window
+    * inits the table widgets of this window
+    */
+    void initTableViewWidgets();
+
+    //=========================================================================================================
+    /**
+    * inits the average scene of this window
     */
     void initAverageSceneView();
 
+    //=========================================================================================================
+    /**
+    * call this function whenever the average data model has changed
+    */
+    void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
+
     Ui::AverageWindow *ui;
 
-    AverageModel*           m_pAverageModel;        /**< the QAbstractList model being part of the model/view framework of Qt */
+    AverageModel*           m_pAverageModel;        /**< the QAbstractTable average model being part of the model/view framework of Qt */
+    AverageDelegate*        m_pAverageDelegate;     /**< the QItemDelegateaverage delegate being part of the model/view framework of Qt */
     AverageScene*           m_pAverageScene;        /**< holds the pointer to the average scene */
 };
 
