@@ -64,33 +64,15 @@ AverageScene::AverageScene(QGraphicsView* view, QObject* parent)
 
 //*************************************************************************************************************
 
-void AverageScene::setNewLayout(QMap<QString,QVector<double> > layoutMap)
-{
-    m_layoutMap = layoutMap;
-
-    //Redraw all items
-    repaintItems();
-}
-
-
-//*************************************************************************************************************
-
-void AverageScene::hideItems(QStringList visibleItems)
-{
-
-}
-
-
-//*************************************************************************************************************
-
-void AverageScene::repaintItems()
+void AverageScene::repaintItems(const QList<ChannelSceneItem*> &selectedChannelItems)
 {
     this->clear();
 
-    QMapIterator<QString,QVector<double> > i(m_layoutMap);
+    QListIterator<ChannelSceneItem*> i(selectedChannelItems);
     while (i.hasNext()) {
-        i.next();
-        AverageSceneItem* AverageSceneItemTemp = new AverageSceneItem(i.key(), QPointF(i.value().at(0), i.value().at(1)));
+        ChannelSceneItem* ChannelSceneItemTemp = i.next();
+        AverageSceneItem* AverageSceneItemTemp = new AverageSceneItem(ChannelSceneItemTemp->getChannelName(),
+                                                                      ChannelSceneItemTemp->getPosition());
 
         this->addItem(AverageSceneItemTemp);
     }

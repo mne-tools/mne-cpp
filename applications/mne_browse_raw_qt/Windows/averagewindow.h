@@ -45,7 +45,8 @@
 #include "ui_averagewindow.h"
 #include "utils/layoutloader.h"             //MNE-CPP utils
 #include "../Utils/averagescene.h"          //MNE Browse Raw QT utils
-#include "../Models/averagemodel.h"
+#include "../Models/averagemodel.h"         //MNE Browse Raw QT utils
+#include "../Utils/channelsceneitem.h"      //MNE Browse Raw QT utils
 
 
 //*************************************************************************************************************
@@ -103,6 +104,12 @@ public:
     * Returns the AverageModel of this window
     */
     AverageModel* getAverageModel();
+
+    //=========================================================================================================
+    /**
+    * call this whenever the external channel selection manager changed
+    */
+    void channelSelectionManagerChanged(const QList<ChannelSceneItem*> &selectedChannelItems);
 
 private:
     //=========================================================================================================

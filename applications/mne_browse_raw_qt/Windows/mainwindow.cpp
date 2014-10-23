@@ -147,6 +147,10 @@ void MainWindow::setupWindowWidgets()
     connect(m_pSelectionManagerWindow, &SelectionManagerWindow::showSelectedChannelsOnly,
             m_pDataWindow, &DataWindow::showSelectedChannelsOnly);
 
+    //Connect selection manager with average plot
+    connect(m_pSelectionManagerWindow, &SelectionManagerWindow::selectionChanged,
+            m_pAverageWindow, &AverageWindow::channelSelectionManagerChanged);
+
     //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
         m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_fiffInfo);
