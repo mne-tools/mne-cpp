@@ -63,7 +63,7 @@ SelectionManagerWindow::SelectionManagerWindow(QWidget *parent) :
 
     //Init gui elements
     initListWidgets();
-    initGraphicsView();
+    initSelectionSceneView();
     initComboBoxes();
 }
 
@@ -184,7 +184,7 @@ void SelectionManagerWindow::initListWidgets()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::initGraphicsView()
+void SelectionManagerWindow::initSelectionSceneView()
 {    
     //Create layout scene and set to view
     m_pSelectionScene = new SelectionScene(ui->m_graphicsView_layoutPlot);
@@ -280,7 +280,7 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
 
 void SelectionManagerWindow::cleanUpMEGChannels()
 {
-    QMapIterator<QString,QStringList> selectionIndex(m_selectionGroupsMap);
+    /*QMapIterator<QString,QStringList> selectionIndex(m_selectionGroupsMap);
 
     //Iterate through all loaded selection groups
     while (selectionIndex.hasNext()) {
@@ -299,7 +299,7 @@ void SelectionManagerWindow::cleanUpMEGChannels()
 
         //Overwrite old selection groups channels
         m_selectionGroupsMap.insert(selectionIndex.key(), channelList);
-    }
+    }*/
 }
 
 

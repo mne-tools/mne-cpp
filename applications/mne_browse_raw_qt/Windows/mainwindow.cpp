@@ -121,7 +121,7 @@ void MainWindow::setupWindowWidgets()
     //Create average manager window - QTDesigner used - see /FormFiles
     m_pAverageWindow = new AverageWindow(this, m_qEvokedFile);
     addDockWidget(Qt::BottomDockWidgetArea, m_pAverageWindow);
-    m_pAverageWindow->hide();
+    //m_pAverageWindow->hide();
 
     //Create scale window - QTDesigner used - see /FormFiles
     m_pScaleWindow = new ScaleWindow(this);
