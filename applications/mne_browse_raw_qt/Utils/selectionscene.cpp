@@ -90,7 +90,7 @@ void SelectionScene::repaintItems()
     QMapIterator<QString,QVector<double> > i(m_layoutMap);
     while (i.hasNext()) {
         i.next();
-        ChannelSceneItem* ChannelSceneItemTemp = new ChannelSceneItem(i.key(), QPointF(i.value().at(0), i.value().at(1)));
+        ChannelSceneItem* ChannelSceneItemTemp = new ChannelSceneItem(i.key(), i.value().at(3), QPointF(i.value().at(0), i.value().at(1)));
 
         this->addItem(ChannelSceneItemTemp);
     }

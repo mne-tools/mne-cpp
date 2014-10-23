@@ -56,8 +56,9 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChannelSceneItem::ChannelSceneItem(QString channelName, QPointF channelPosition, QColor channelColor)
+ChannelSceneItem::ChannelSceneItem(QString channelName, int channelNumber, QPointF channelPosition, QColor channelColor)
 : m_sChannelName(channelName)
+, m_iChannelNumber(channelNumber)
 , m_qpChannelPosition(channelPosition)
 , m_cChannelColor(channelColor)
 , m_bHighlightItem(false)
@@ -112,45 +113,6 @@ void ChannelSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     this->setPos(10*m_qpChannelPosition.x(), -10*m_qpChannelPosition.y());
 }
 
-
-//*************************************************************************************************************
-
-void ChannelSceneItem::setColor(QColor channelColor)
-{
-    m_cChannelColor = channelColor;
-}
-
-
-//*************************************************************************************************************
-
-QString ChannelSceneItem::getChannelName()
-{
-    return m_sChannelName;
-}
-
-
-//*************************************************************************************************************
-
-void ChannelSceneItem::setPosition(QPointF newPosition)
-{
-    m_qpChannelPosition = newPosition;
-}
-
-
-//*************************************************************************************************************
-
-QPointF ChannelSceneItem::getPosition()
-{
-    return m_qpChannelPosition;
-}
-
-
-//*************************************************************************************************************
-
-void ChannelSceneItem::setHighlightChannel(bool highlightItem)
-{
-    m_bHighlightItem = highlightItem;
-}
 
 
 

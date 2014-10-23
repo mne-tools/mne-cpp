@@ -99,10 +99,10 @@ void SelectionManagerWindow::highlightChannels(QStringList channelList)
 
     for(int i = 0; i<allSceneItems.size(); i++) {
         ChannelSceneItem* item = static_cast<ChannelSceneItem*>(allSceneItems.at(i));
-        if(channelList.contains(item->getChannelName()))
-            item->setHighlightChannel(true);
+        if(channelList.contains(item->m_sChannelName))
+            item->m_bHighlightItem = true;
         else
-            item->setHighlightChannel(false);
+            item->m_bHighlightItem = false;
     }
 
     m_pSelectionScene->update();
@@ -117,7 +117,7 @@ void SelectionManagerWindow::selectChannels(QStringList channelList)
 
     for(int i = 0; i<allSceneItems.size(); i++) {
         ChannelSceneItem* item = static_cast<ChannelSceneItem*>(allSceneItems.at(i));
-        if(channelList.contains(item->getChannelName()))
+        if(channelList.contains(item->m_sChannelName))
             item->setSelected(true);
         else
             item->setSelected(false);
@@ -338,7 +338,7 @@ void SelectionManagerWindow::updateUserDefinedChannels()
 
     for(int i = 0; i<itemList.size(); i++) {
         ChannelSceneItem* item = static_cast<ChannelSceneItem*>(itemList.at(i));
-        userDefinedChannels << item->getChannelName();
+        userDefinedChannels << item->m_sChannelName;
     }
 
     ui->m_listWidget_userDefined->clear();
