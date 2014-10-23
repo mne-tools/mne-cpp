@@ -42,8 +42,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "channelsceneitem.h"
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -62,6 +60,7 @@
 #include <QGraphicsSceneEvent>
 #include <QMutableListIterator>
 #include <QScrollBar>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -77,7 +76,7 @@ namespace MNEBrowseRawQt
 /**
 * LayoutScene...
 *
-* @brief The LayoutScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
+* @brief The LayoutScene class provides a reimplemented QGraphicsScene for 2D layout plotting. This class handles all the user interaction features (subclass in order to use).
 */
 class LayoutScene : public QGraphicsScene
 {
@@ -90,35 +89,14 @@ public:
     */
     LayoutScene(QGraphicsView* view, QObject *parent = 0);
 
-    //=========================================================================================================
-    /**
-    * Updates layout data.
-    * @param [in] layoutMap layout data map.
-    */
-    void setNewLayout(QMap<QString,QVector<double> > layoutMap);
-
-    //=========================================================================================================
-    /**
-    * Hides all items described in list.
-    * @param [in] list string list with items name which are to be hidden.
-    */
-    void hideItems(QStringList visibleItems);
-
-private:
+protected:
     QGraphicsView*                  m_qvView;                       /**< Holds the view which visualizes this scene.*/
-    QMap<QString,QVector<double> >  m_layoutMap;                    /**< Holds the layout data.*/
     bool                            m_dragSceneIsActive;
     QPointF                         m_mousePressPosition;
     bool                            m_bDragMode;
     bool                            m_bExtendedSelectionMode;
     QPainterPath                    m_oldSelectionArea;
     QList<QGraphicsItem *>          m_selectedItems;
-
-    //=========================================================================================================
-    /**
-    * Repaints all items from the layout data in the scene.
-    */
-    void repaintItems();
 
     //=========================================================================================================
     /**

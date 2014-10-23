@@ -86,7 +86,7 @@ SOURCES += \
     Utils/filterplotscene.cpp \
     Utils/layoutscene.cpp \
 #    Utils/averagescene.cpp \
-#    Utils/selectionscene.cpp \
+    Utils/selectionscene.cpp \
     Utils/channelsceneitem.cpp \
     Utils/averagesceneitem.cpp \
     Models/averagemodel.cpp \
@@ -115,7 +115,7 @@ HEADERS += \
     Utils/filterplotscene.h \
     Utils/layoutscene.h \
 #    Utils/averagescene.h \
-#    Utils/selectionscene.h \
+    Utils/selectionscene.h \
     Utils/channelsceneitem.h \
     Utils/averagesceneitem.h \
     Models/averagemodel.h \

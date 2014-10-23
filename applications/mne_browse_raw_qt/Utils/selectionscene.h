@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     averagescene.h
+* @file     selectionscene.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -30,19 +30,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the AverageScene class.
+* @brief    Contains the declaration of the SelectionScene class.
 *
 */
 
-#ifndef AVERAGESCENE_H
-#define AVERAGESCENE_H
+#ifndef SELECTIONSCENE_H
+#define SELECTIONSCENE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "averagesceneitem.h"
+#include "layoutscene.h"
+#include "channelsceneitem.h"
 
 
 //*************************************************************************************************************
@@ -51,17 +52,8 @@
 //=============================================================================================================
 
 #include <QGraphicsScene>
-#include <QGraphicsView>
-#include <QGraphicsSceneMouseEvent>
-#include <QRubberBand>
 #include <QWidget>
-#include <QMouseEvent>
-#include <QGestureEvent>
-#include <QPanGesture>
-#include <QPinchGesture>
-#include <QGraphicsSceneEvent>
 #include <QMutableListIterator>
-#include <QScrollBar>
 
 
 //*************************************************************************************************************
@@ -75,20 +67,20 @@ namespace MNEBrowseRawQt
 
 //=============================================================================================================
 /**
-* AverageScene...
+* SelectionScene...
 *
-* @brief The AverageScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
+* @brief The SelectionScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
 */
-class AverageScene : public QGraphicsScene
+class SelectionScene : public LayoutScene
 {
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a AverageScene.
+    * Constructs a SelectionScene.
     */
-    explicit AverageScene(QGraphicsView* view, QObject *parent = 0);
+    explicit SelectionScene(QGraphicsView* view, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -105,100 +97,15 @@ public:
     void hideItems(QStringList visibleItems);
 
 private:
-    QGraphicsView*                  m_qvView;                       /**< Holds the view which visualizes this scene.*/
     QMap<QString,QVector<double> >  m_layoutMap;                    /**< Holds the layout data.*/
-    bool                            m_dragSceneIsActive;
-    QPointF                         m_mousePressPosition;
-    bool                            m_bDragMode;
-    bool                            m_bExtendedSelectionMode;
-    QPainterPath                    m_oldSelectionArea;
-    QList<QGraphicsItem *>          m_selectedItems;
 
     //=========================================================================================================
     /**
     * Repaints all items from the layout data in the scene.
     */
     void repaintItems();
-
-    //=========================================================================================================
-    /**
-    * Reimplemented wheel event.
-    */
-    void wheelEvent(QGraphicsSceneWheelEvent* event);
-
-    //=========================================================================================================
-    /**
-    * Reimplemented double mouse press event.
-    */
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent);
-
-    //=========================================================================================================
-    /**
-    * Reimplemented mouse press event.
-    */
-    void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
-
-    //=========================================================================================================
-    /**
-    * Reimplemented double mouse move event.
-    */
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent);
-
-    //=========================================================================================================
-    /**
-    * Reimplemented double mouse release event.
-    */
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
-
-    //=========================================================================================================
-    /**
-    * Reimplemented key press event.
-    */
-    void keyPressEvent(QKeyEvent *keyEvent);
-
-    //=========================================================================================================
-    /**
-    * Reimplemented key release event.
-    */
-    void keyReleaseEvent(QKeyEvent *keyEvent);
-
-    //=========================================================================================================
-    /**
-    * reimplemented event function - intercepts touch gestures
-    */
-    bool event(QEvent *event);
-
-    //=========================================================================================================
-    /**
-    * gestureEvent processes gesture events
-    */
-    bool gestureEvent(QGestureEvent *event);
-
-    //=========================================================================================================
-    /**
-    * pinchTriggered processes pan gesture events
-    */
-    void panTriggered(QPanGesture*);
-
-    //=========================================================================================================
-    /**
-    * pinchTriggered processes pinch gesture events
-    */
-    void pinchTriggered(QPinchGesture*);
-
-    //=========================================================================================================
-    /**
-    * pinchTriggered processes swipe gesture events
-    */
-    void swipeTriggered(QSwipeGesture*);
-
-    //=========================================================================================================
-    /**
-    * reimplemented eventFilter - intercepts touch gestures
-    */
-    bool eventFilter(QObject *object, QEvent *event);
 };
 
 } // NAMESPACE
 
-#endif // AverageScene_H
+#endif // SelectionScene_H

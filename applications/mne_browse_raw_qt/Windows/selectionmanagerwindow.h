@@ -45,7 +45,7 @@
 #include "ui_selectionmanagerwindow.h"
 #include "utils/layoutloader.h"         //MNE-CPP utils
 #include "utils/selectionloader.h"         //MNE-CPP utils
-#include "../Utils/layoutscene.h"       //MNE Browse Raw QT utils
+#include "../Utils/selectionscene.h"       //MNE Browse Raw QT utils
 #include "fiff/fiff.h"
 
 //*************************************************************************************************************
@@ -79,8 +79,6 @@ namespace MNEBrowseRawQt
 //=============================================================================================================
 // DEFINE FORWARD DECLARATIONS
 //=============================================================================================================
-
-class LayoutScene;
 
 
 /**
@@ -243,7 +241,7 @@ private:
     QMap<QString,QVector<double> >  m_layoutMap;
     QMap<QString,QStringList>       m_selectionGroupsMap;
 
-    LayoutScene*                    m_pLayoutScene;
+    SelectionScene*                 m_pSelectionScene;
 
     QStringList                     m_currentlyLoadedFiffChannels;
 };

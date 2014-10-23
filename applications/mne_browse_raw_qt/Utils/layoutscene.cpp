@@ -73,56 +73,6 @@ LayoutScene::LayoutScene(QGraphicsView* view, QObject* parent)
 
 //*************************************************************************************************************
 
-void LayoutScene::setNewLayout(QMap<QString,QVector<double> > layoutMap)
-{
-    m_layoutMap = layoutMap;
-
-    //Redraw all items
-    repaintItems();
-}
-
-
-//*************************************************************************************************************
-
-void LayoutScene::hideItems(QStringList visibleItems)
-{
-    //Hide all items which names are in the the string list visibleItems. All other items' opacity is set to 0.25 an dthey are no longer selectable.
-    QList<QGraphicsItem *> itemList = this->items();
-
-    for(int i = 0; i<itemList.size(); i++) {
-        ChannelSceneItem* item = static_cast<ChannelSceneItem*>(itemList.at(i));
-
-        if(!visibleItems.contains(item->getChannelName())) {
-            item->setFlag(QGraphicsItem::ItemIsSelectable, false);
-            item->setOpacity(0.25);
-        }
-        else {
-            item->setFlag(QGraphicsItem::ItemIsSelectable, true);
-            item->setOpacity(1);
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void LayoutScene::repaintItems()
-{
-    QMapIterator<QString,QVector<double> > i(m_layoutMap);
-
-    this->clear();
-
-    while (i.hasNext()) {
-        i.next();
-        ChannelSceneItem* ChannelSceneItemTemp = new ChannelSceneItem(i.key(), QPointF(i.value().at(0), i.value().at(1)));
-
-        this->addItem(ChannelSceneItemTemp);
-    }
-}
-
-
-//*************************************************************************************************************
-
 void LayoutScene::wheelEvent(QGraphicsSceneWheelEvent* event) {
     m_qvView->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
 
