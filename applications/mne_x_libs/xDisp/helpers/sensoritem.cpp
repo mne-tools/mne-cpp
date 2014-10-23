@@ -63,12 +63,13 @@ using namespace XDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SensorItem::SensorItem(const QString& dispChName, qint32 chNumber, const QPointF& coordinate, QGraphicsItem *parent)
+SensorItem::SensorItem(const QString& dispChName, qint32 chNumber, const QPointF& coordinate, const QColor& channelColor, QGraphicsItem *parent)
 : QGraphicsObject(parent)
 , m_sDisplayChName(dispChName)
 , m_iChNumber(chNumber)
 , m_qPointFCoord(coordinate)
-, m_bIsSelected(false)
+, m_qColorChannel(channelColor)
+, m_bIsHighlighted(false)
 {
     setZValue(m_iChNumber);
 
@@ -108,19 +109,25 @@ void SensorItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 
     if (option->state & QStyle::State_MouseOver)
         painter->setBrush(Qt::lightGray);
+    else
+        painter->setBrush(this->isSelected() ? Qt::yellow : m_qColorChannel);
 
-    painter->setPen(m_bIsSelected ? Qt::red : Qt::darkBlue);
+    painter->setPen(Qt::black);
     painter->drawEllipse(-15, -15, 30, 30);
-
-//    painter->setFont(QFont("Helvetica [Cronyx]", 6));
-//    painter->drawText(QPointF(0+2,m_qSizeFDim.height()-3), m_sDisplayChName);
 
     // Plot channel name
     painter->setPen(QPen(Qt::black, 1));
     QStaticText staticChName = QStaticText(m_sDisplayChName);
     QSizeF sizeText = staticChName.size();
     painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticChName);
+}
 
+
+//*************************************************************************************************************
+
+void SensorItem::setColor(const QColor& channelColor)
+{
+    m_qColorChannel = channelColor;
 }
 
 
@@ -151,7 +158,7 @@ void SensorItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void SensorItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsItem::mouseReleaseEvent(event);
-    m_bIsSelected = !m_bIsSelected;
+//    m_bIsSelected = !m_bIsSelected;
     emit itemChanged(this);
     update();
 }
