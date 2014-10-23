@@ -134,9 +134,9 @@ private:
 
     //=========================================================================================================
     /**
-    * call this function whenever the average data model has changed
+    * call this function whenever a selection was made in teh evoked data set list
     */
-    void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
+    void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
     Ui::AverageWindow *ui;
 

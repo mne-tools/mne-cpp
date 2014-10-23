@@ -56,10 +56,10 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AverageSceneItem::AverageSceneItem(QString channelName, QPointF channelPosition, QColor averageColor)
+AverageSceneItem::AverageSceneItem(QString channelName, int channelNumber, QPointF channelPosition, QColor defaultColors)
 : m_sChannelName(channelName)
+, m_iChannelNumber(channelNumber)
 , m_qpChannelPosition(channelPosition)
-, m_cAverageColor(averageColor)
 {
 }
 
@@ -79,61 +79,100 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    // Plot shadow
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(Qt::darkGray);
-    painter->drawEllipse(-12, -12, 30, 30);
-
-    // Plot colored circle
-    painter->setPen(QPen(Qt::black, 1));
-    if(this->isSelected())
-        painter->setBrush(QBrush(Qt::red));
-    else
-        painter->setBrush(QBrush(m_cAverageColor));
-    painter->drawEllipse(-15, -15, 30, 30);
-
-    // Plot electrode name
+    // Plot channel name
     QStaticText staticElectrodeName = QStaticText(m_sChannelName);
     QSizeF sizeText = staticElectrodeName.size();
     painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
 
+    //Plot average data
+    painter->save();
+
+    for(int i = 0; i<m_lAverageData.size(); i++) {
+        path = QPainterPath(QPointF(option.rect.x()+t_rawModel->relFiffCursor(),option.rect.y()));
+        QPen pen;
+        pen.setStyle(Qt::SolidLine);
+        pen.setWidthF(1);
+        painter->setPen(pen);
+
+        createPlotPath(path);
+
+        painter->drawPath(path);
+    }
+
+    painter->restore();
+
+    //set posistion
     this->setPos(10*m_qpChannelPosition.x(), -10*m_qpChannelPosition.y());
 }
 
 
 //*************************************************************************************************************
 
-void AverageSceneItem::setColor(QColor channelColor)
+void AverageSceneItem::createPlotPath(path)
 {
-    m_cAverageColor = channelColor;
+    QMap<QString,double> scaleMap = m_pScaleWindow->getScalingMap();
+
+    double dMaxValue =1e-09;
+
+//    switch(kind) {
+//        case FIFFV_MEG_CH: {
+//            qint32 unit = (static_cast<const RawModel*>(index.model()))->m_pfiffIO->m_qlistRaw[0]->info.chs[index.row()].unit;
+//            if(unit == FIFF_UNIT_T_M) {
+//                dMaxValue = scaleMap["MEG_grad"];
+//            }
+//            else if(unit == FIFF_UNIT_T)
+//                dMaxValue = scaleMap["MEG_mag"];
+//            break;
+//        }
+//        case FIFFV_EEG_CH: {
+//            dMaxValue = scaleMap["MEG_EEG"];
+//            break;
+//        }
+//        case FIFFV_EOG_CH: {
+//            dMaxValue = scaleMap["MEG_EOG"];
+//            break;
+//        }
+//        case FIFFV_STIM_CH: {
+//            dMaxValue = scaleMap["MEG_STIM"];
+//            break;
+//        }
+//        case FIFFV_EMG_CH: {
+//            dMaxValue = scaleMap["MEG_EMG"];
+//            break;
+//        }
+//        case FIFFV_MISC_CH: {
+//            dMaxValue = scaleMap["MEG_MISC"];
+//            break;
+//        }
+//    }
+
+    double dValue;
+    double dScaleY = this->boundingRect().height()/(2*dMaxValue);
+
+    double y_base = -path.currentPosition().y();
+    QPointF qSamplePosition;
+
+    //plot all rows from list of pairs
+    for(qint8 i=0; i < listPairs.size(); ++i) {
+        //create lines from one to the next sample
+        for(qint32 j=0; j < listPairs[i].second; ++j)
+        {
+            double val = *(listPairs[i].first+j);
+
+            //subtract mean of the channel here (if wanted by the user)
+            dValue = (val - channelMean)*dScaleY;
+
+            double newY = y_base+dValue;
+
+            qSamplePosition.setY(-newY);
+            qSamplePosition.setX(path.currentPosition().x()+m_dDx);
+
+            path.lineTo(qSamplePosition);
+        }
+    }
+
+
 }
-
-
-//*************************************************************************************************************
-
-QString AverageSceneItem::getChannelName()
-{
-    return m_sChannelName;
-}
-
-
-//*************************************************************************************************************
-
-void AverageSceneItem::setPosition(QPointF newPosition)
-{
-    m_qpChannelPosition = newPosition;
-}
-
-
-//*************************************************************************************************************
-
-QPointF AverageSceneItem::getPosition()
-{
-    return m_qpChannelPosition;
-}
-
-
-
 
 
 

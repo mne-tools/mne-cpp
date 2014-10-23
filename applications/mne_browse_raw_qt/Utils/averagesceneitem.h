@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include <iostream>
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -56,6 +57,14 @@
 #include <QPainter>
 #include <QStaticText>
 #include <QDebug>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -87,13 +96,7 @@ public:
     /**
     * Constructs a AverageSceneItem.
     */
-    AverageSceneItem(QString channelName, QPointF channelPosition, QColor averageColor = Qt::red);
-
-    //=========================================================================================================
-    /**
-    * Sets the color of the electrode item.
-    */
-    void setColor(QColor electrodeColor);
+    AverageSceneItem(QString channelName, int channelNumber, QPointF channelPosition, QColor defaultColors = Qt::red);
 
     //=========================================================================================================
     /**
@@ -107,28 +110,19 @@ public:
     */
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
+    QString         m_sChannelName;             /**< Holds the channel name.*/
+    int             m_iChannelNumber;           /**< Holds the channel number.*/
+    QPointF         m_qpChannelPosition;        /**< Holds the channels 2D position in the scene.*/
+    QList<QColor>   m_cAverageColors;           /**< Holds the current average color.*/
+    QList<VectorXd> m_lAverageData;             /**< Holds the channels average data which is to be plotted.*/
+    QPair<int>      m_firstLastSample;          /**< Hold the first and last sample.*/
+
+protected:
     //=========================================================================================================
     /**
-    * Returns the channel name.
+    * creates plot path for average data
     */
-    QString getChannelName();
-
-    //=========================================================================================================
-    /**
-    * Updates the electrodes position.
-    */
-    void setPosition(QPointF newPosition);
-
-    //=========================================================================================================
-    /**
-    * Updates the channel's position.
-    */
-    QPointF getPosition();
-
-private:
-    QString     m_sChannelName;           /**< Holds the channel name.*/
-    QPointF     m_qpChannelPosition;      /**< Holds the channels 2D position in the scene.*/
-    QColor      m_cAverageColor;            /**< Holds the current average color.*/
+    void createPlotPath(path);
 };
 
 } // NAMESPACE MNEBrowseRawQt
