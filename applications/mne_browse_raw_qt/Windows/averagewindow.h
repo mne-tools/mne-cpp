@@ -43,8 +43,8 @@
 //=============================================================================================================
 
 #include "ui_averagewindow.h"
-#include "utils/layoutloader.h"         //MNE-CPP utils
-#include "../Utils/layoutscene.h"       //MNE Browse Raw QT utils
+#include "utils/layoutloader.h"             //MNE-CPP utils
+#include "../Utils/averagescene.h"          //MNE Browse Raw QT utils
 #include "../Models/averagemodel.h"
 
 
@@ -105,9 +105,23 @@ public:
     AverageModel* getAverageModel();
 
 private:
+    //=========================================================================================================
+    /**
+    * inits the model view controller paradigm of this window
+    * @param [in] file holds the file which is to be loaded on startup
+    */
+    void initMVC(QFile &file);
+
+    //=========================================================================================================
+    /**
+    * inits the average scene of thiss window
+    */
+    void initAverageSceneView();
+
     Ui::AverageWindow *ui;
 
-    AverageModel*           m_pAverageModel;     /**< the QAbstractList model being part of the model/view framework of Qt */
+    AverageModel*           m_pAverageModel;        /**< the QAbstractList model being part of the model/view framework of Qt */
+    AverageScene*           m_pAverageScene;        /**< holds the pointer to the average scene */
 };
 
 } // NAMESPACE MNEBrowseRawQt

@@ -57,7 +57,7 @@ using namespace MNEBrowseRawQt;
 //=============================================================================================================
 
 AverageModel::AverageModel(QObject *parent)
-: QAbstractListModel(parent)
+: QAbstractTableModel(parent)
 , m_bFileloaded(false)
 , m_pfiffIO(QSharedPointer<FiffIO>(new FiffIO()))
 , m_pEvokedDataSet(new FiffEvokedSet())
@@ -68,7 +68,7 @@ AverageModel::AverageModel(QObject *parent)
 //*************************************************************************************************************
 
 AverageModel::AverageModel(QFile& qFile, QObject *parent)
-: QAbstractListModel(parent)
+: QAbstractTableModel(parent)
 , m_bFileloaded(false)
 , m_pfiffIO(QSharedPointer<FiffIO>(new FiffIO()))
 , m_pEvokedDataSet(new FiffEvokedSet())
@@ -92,15 +92,48 @@ int AverageModel::rowCount(const QModelIndex & /*parent*/) const
 
 //*************************************************************************************************************
 
+int AverageModel::columnCount(const QModelIndex & /*parent*/) const
+{
+    return 5;
+}
+
+
+//*************************************************************************************************************
+
 QVariant AverageModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
         return QVariant();
 
-    //Return the number and description/comment of the fiff evoked data in the set
+    //Return the number and description/comment of the fiff evoked data in the set as vertical header
     if(orientation == Qt::Vertical) {
-        if(section>0 && section<m_pEvokedDataSet->evoked.size())
-            return QString("Evoked set #%1 - %2").arg(section).arg(m_pEvokedDataSet->evoked.at(section).comment);
+        if(section<m_pEvokedDataSet->evoked.size())
+            return QString("Set %1").arg(section);
+    }
+
+    //Return the horizontal header
+    if(orientation == Qt::Horizontal) {
+        switch(section) {
+            case 0:
+                return QString("%1").arg("Comment");
+                break;
+
+            case 1:
+                return QString("%1").arg("Aspect kind");
+                break;
+
+            case 2:
+                return QString("%1").arg("First sample");
+                break;
+
+            case 3:
+                return QString("%1").arg("Last sample");
+                break;
+
+            case 4:
+                return QString("%1").arg("Data types");
+                break;
+        }
     }
 
     return QVariant();
@@ -118,8 +151,76 @@ QVariant AverageModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     if (index.isValid()) {
-        //******** first column (sample index) ********
+        //******** first column (evoked set comment) ********
         if(index.column()==0) {
+            QVariant v;
+
+            switch(role) {
+                case Qt::DisplayRole:
+                    v.setValue(QString("%1").arg(m_pEvokedDataSet->evoked.at(index.row()).comment));
+                    return v;
+                    break;
+
+                case AverageModelRoles::GetComment:
+                    v.setValue(m_pEvokedDataSet->evoked.at(index.row()).comment);
+                    return v;
+                    break;
+            }
+        }//end column check
+
+        //******** second column (evoked set aspect kind) ********
+        if(index.column()==2) {
+            QVariant v;
+
+            switch(role) {
+                case Qt::DisplayRole:
+                    v.setValue(QString("%1").arg(m_pEvokedDataSet->evoked.at(index.row()).aspect_kind));
+                    return v;
+                    break;
+
+                case AverageModelRoles::GetAspectKind:
+                    v.setValue(m_pEvokedDataSet->evoked.at(index.row()).aspect_kind);
+                    return v;
+                    break;
+            }
+        }//end column check
+
+        //******** third column (evoked set first sample) ********
+        if(index.column()==2) {
+            QVariant v;
+
+            switch(role) {
+                case Qt::DisplayRole:
+                    v.setValue(QString("-%1").arg(m_pEvokedDataSet->evoked.at(index.row()).first));
+                    return v;
+                    break;
+
+            case AverageModelRoles::GetFirstSample:
+                v.setValue(m_pEvokedDataSet->evoked.at(index.row()).first);
+                return v;
+                break;
+            }
+        }//end column check
+
+        //******** fourth column (evoked set last sample) ********
+        if(index.column()==3) {
+            QVariant v;
+
+            switch(role) {
+                case Qt::DisplayRole:
+                    v.setValue(QString("%1").arg(m_pEvokedDataSet->evoked.at(index.row()).last));
+                    return v;
+                    break;
+
+            case AverageModelRoles::GetLastSample:
+                v.setValue(m_pEvokedDataSet->evoked.at(index.row()).last);
+                return v;
+                break;
+            }
+        }//end column check
+
+        //******** fifth column (evoked set data types) ********
+        if(index.column()==4) {
             QVariant v;
 
             switch(role) {
@@ -133,26 +234,6 @@ QVariant AverageModel::data(const QModelIndex &index, int role) const
                     return v;
                     break;
 
-                case AverageModelRoles::GetAspectKind:
-                    v.setValue(m_pEvokedDataSet->evoked.at(index.row()).aspect_kind);
-                    return v;
-                    break;
-
-                case AverageModelRoles::GetFirstSample:
-                    v.setValue(m_pEvokedDataSet->evoked.at(index.row()).first);
-                    return v;
-                    break;
-
-                case AverageModelRoles::GetLastSample:
-                    v.setValue(m_pEvokedDataSet->evoked.at(index.row()).last);
-                    return v;
-                    break;
-
-                case AverageModelRoles::GetComment:
-                    v.setValue(m_pEvokedDataSet->evoked.at(index.row()).comment);
-                    return v;
-                    break;
-
                 case AverageModelRoles::GetTimeData:
                     v.setValue(m_pEvokedDataSet->evoked.at(index.row()).times);
                     return v;
@@ -163,8 +244,7 @@ QVariant AverageModel::data(const QModelIndex &index, int role) const
                     return v;
                     break;
             }
-        } //end column check
-
+        }//end column check
     } // end index.valid() check
 
     return QVariant();

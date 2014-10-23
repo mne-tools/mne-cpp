@@ -110,13 +110,16 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
             painter->setBrushOrigin(oldBO);
         }
 
-        //Get data and means
+        //Get data and mean
         QVariant variant = index.model()->data(index,Qt::DisplayRole);
         QList<RowVectorPair> listPairs = variant.value<QList<RowVectorPair> >();
 
-        QModelIndex meanIndex = index.model()->index(index.row(),2);
-        QVariant channelMeanVariant = index.model()->data(meanIndex,RawModelRoles::GetChannelMean);
-        double channelMean = channelMeanVariant.toDouble();
+        double channelMean = 0;
+        if(m_bRemoveDC) {
+            QModelIndex meanIndex = index.model()->index(index.row(),2);
+            QVariant channelMeanVariant = index.model()->data(meanIndex,RawModelRoles::GetChannelMean);
+            channelMean = channelMeanVariant.toDouble();
+        }
 
         const RawModel* t_rawModel = (static_cast<const RawModel*>(index.model()));
 
@@ -260,10 +263,7 @@ void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionVie
             double val = *(listPairs[i].first+j);
 
             //subtract mean of the channel here (if wanted by the user)
-            if(m_bRemoveDC)
-                dValue = (val - channelMean)*dScaleY;
-            else
-                dValue = val*dScaleY;
+            dValue = (val - channelMean)*dScaleY;
 
             double newY = y_base+dValue;
 

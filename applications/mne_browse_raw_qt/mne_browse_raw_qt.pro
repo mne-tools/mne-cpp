@@ -85,7 +85,7 @@ SOURCES += \
     Utils/filteroperator.cpp \
     Utils/filterplotscene.cpp \
     Utils/layoutscene.cpp \
-#    Utils/averagescene.cpp \
+    Utils/averagescene.cpp \
     Utils/selectionscene.cpp \
     Utils/channelsceneitem.cpp \
     Utils/averagesceneitem.cpp \
@@ -114,7 +114,7 @@ HEADERS += \
     Utils/info.h \
     Utils/filterplotscene.h \
     Utils/layoutscene.h \
-#    Utils/averagescene.h \
+    Utils/averagescene.h \
     Utils/selectionscene.h \
     Utils/channelsceneitem.h \
     Utils/averagesceneitem.h \

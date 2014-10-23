@@ -155,7 +155,7 @@ private:
     * Initialises all graphic views in the selection window.
     *
     */
-    void initGraphicsView();
+    void initSelectionSceneView();
 
     //=========================================================================================================
     /**
