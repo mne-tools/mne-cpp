@@ -570,7 +570,9 @@ VectorXd RawModel::calculateMean(const MatrixXd &data)
     VectorXd channelMeans(data.rows());
 
     for(int i = 0; i<channelMeans.rows(); i++)
+    {
         channelMeans[i] = data.row(i).mean();
+    }
 
     return channelMeans;
 }
@@ -663,7 +665,8 @@ void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOpe
     //filter all when chlist is empty
     if(chlist.empty()) {
         for(qint32 i=0; i < m_chInfolist.size(); ++i)
-            chlist.append(createIndex(i,1));
+            if(!m_chInfolist.at(i).ch_name.contains("STI") && !m_chInfolist.at(i).ch_name.contains("MISC"))
+                chlist.append(createIndex(i,1));
     }
 
     for(qint32 i=0; i < chlist.size(); ++i) { //iterate through selected channels to filter

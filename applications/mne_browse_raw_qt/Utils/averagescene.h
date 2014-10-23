@@ -44,6 +44,7 @@
 
 #include "layoutscene.h"
 #include "averagesceneitem.h"
+#include "channelsceneitem.h"
 
 
 //*************************************************************************************************************
@@ -82,26 +83,12 @@ public:
 
     //=========================================================================================================
     /**
-    * Updates layout data.
-    * @param [in] layoutMap layout data map.
-    */
-    void setNewLayout(QMap<QString,QVector<double> > layoutMap);
-
-    //=========================================================================================================
-    /**
-    * Hides all items described in list.
-    * @param [in] list string list with items name which are to be hidden.
-    */
-    void hideItems(QStringList visibleItems);
-
-    //=========================================================================================================
-    /**
     * Repaints all items from the layout data in the scene.
     */
-    void repaintItems();
+    void repaintItems(const QList<ChannelSceneItem*> &selectedChannelItems);
 
 private:
-    QMap<QString,QVector<double> >  m_layoutMap;        /**< Holds the layout data.*/
+    QList<ChannelSceneItem*> m_lSelectedChannelItems ;        /**< Holds the selected channels from the selection manager.*/
 };
 
 } // NAMESPACE

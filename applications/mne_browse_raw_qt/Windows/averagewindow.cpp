@@ -76,6 +76,22 @@ AverageWindow::~AverageWindow()
 
 //*************************************************************************************************************
 
+AverageModel* AverageWindow::getAverageModel()
+{
+    return m_pAverageModel;
+}
+
+
+//*************************************************************************************************************
+
+void AverageWindow::channelSelectionManagerChanged(const QList<ChannelSceneItem*> &selectedChannelItems)
+{
+    m_pAverageScene->repaintItems(selectedChannelItems);
+}
+
+
+//*************************************************************************************************************
+
 void AverageWindow::initAverageSceneView()
 {
     //Create average scene and set view
@@ -105,12 +121,4 @@ void AverageWindow::initMVC(QFile &file)
     //Connect data changes to scene and therefore to the scenes delegate which than plots the changes
 //    connect(m_pAverageModel, AverageModel::dataChanged,
 //            m_pAverageScene, AverageScene::repaintItems);
-}
-
-
-//*************************************************************************************************************
-
-AverageModel* AverageWindow::getAverageModel()
-{
-    return m_pAverageModel;
 }

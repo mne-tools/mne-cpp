@@ -368,6 +368,13 @@ void SelectionManagerWindow::updateDataView()
     }
 
     emit showSelectedChannelsOnly(selectedChannels);
+
+    //emit signal that selection was changed
+//    static_cast<MainWindow*>(parent)
+//    if(!m_pSelectionScene->selectedItems().empty()) {
+//        emit selectionChanged(m_pSelectionScene->selectedItems());
+//    else
+//        emit selectionChanged(m_pSelectionScene->items());
 }
 
 
