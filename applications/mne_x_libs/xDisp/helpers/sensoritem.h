@@ -160,6 +160,21 @@ public:
     */
     inline void setHighlighted(bool highlight);
 
+    //=========================================================================================================
+    /**
+    * Returns the channel selection state
+    *
+    * @return whether channel is selected
+    */
+    inline bool isChoosen() const;
+
+    //=========================================================================================================
+    /**
+    * Set the selection state
+    *
+    * @param [in] choosen      the new choosen state
+    **/
+    inline void setChoosen(bool choosen);
 
 protected:
     //=========================================================================================================
@@ -200,7 +215,8 @@ private:
     qint32 m_iChNumber;         /**< channel number */
     QPointF m_qPointFCoord;     /**< item coordinates */
     QColor m_qColorChannel;     /**< The current channel color.*/
-    bool m_bIsHighlighted;      /**< channel higlighting state */
+    bool m_bIsHighlighted;      /**< Channel higlighting state */
+    bool m_bIsChoosen;          /**< Channel choosen state */
 };
 
 
@@ -254,6 +270,24 @@ inline void SensorItem::setHighlighted(bool highlight)
     m_bIsHighlighted = highlight;
     update();
 }
+
+
+//*************************************************************************************************************
+
+inline bool SensorItem::isChoosen() const
+{
+    return m_bIsChoosen;
+}
+
+
+//*************************************************************************************************************
+
+inline void SensorItem::setChoosen(bool choosen)
+{
+    m_bIsChoosen = choosen;
+    update();
+}
+
 
 } // NAMESPACE
 

@@ -70,6 +70,7 @@ SensorItem::SensorItem(const QString& dispChName, qint32 chNumber, const QPointF
 , m_qPointFCoord(coordinate)
 , m_qColorChannel(channelColor)
 , m_bIsHighlighted(false)
+, m_bIsChoosen(false)
 {
     setZValue(m_iChNumber);
 
@@ -110,7 +111,7 @@ void SensorItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     if (option->state & QStyle::State_MouseOver)
         painter->setBrush(Qt::lightGray);
     else
-        painter->setBrush(this->isSelected() ? Qt::yellow : m_qColorChannel);
+        painter->setBrush(m_bIsChoosen ? Qt::yellow : m_qColorChannel);
 
     painter->setPen(Qt::black);
     painter->drawEllipse(-15, -15, 30, 30);
@@ -158,7 +159,9 @@ void SensorItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void SensorItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsItem::mouseReleaseEvent(event);
-//    m_bIsSelected = !m_bIsSelected;
+    m_bIsChoosen = !m_bIsChoosen;
     emit itemChanged(this);
     update();
 }
+
+
