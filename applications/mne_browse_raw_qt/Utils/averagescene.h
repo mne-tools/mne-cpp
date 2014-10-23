@@ -85,7 +85,7 @@ public:
     /**
     * Repaints all items from the layout data in the scene.
     */
-    void repaintItems(const QList<ChannelSceneItem*> &selectedChannelItems);
+    void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
 
 private:
     QList<ChannelSceneItem*> m_lSelectedChannelItems ;        /**< Holds the selected channels from the selection manager.*/

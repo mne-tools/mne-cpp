@@ -64,13 +64,13 @@ AverageScene::AverageScene(QGraphicsView* view, QObject* parent)
 
 //*************************************************************************************************************
 
-void AverageScene::repaintItems(const QList<ChannelSceneItem*> &selectedChannelItems)
+void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelItems)
 {
     this->clear();
 
-    QListIterator<ChannelSceneItem*> i(selectedChannelItems);
+    QListIterator<QGraphicsItem*> i(selectedChannelItems);
     while (i.hasNext()) {
-        ChannelSceneItem* ChannelSceneItemTemp = i.next();
+        ChannelSceneItem* ChannelSceneItemTemp = static_cast<ChannelSceneItem*>(i.next());
         AverageSceneItem* AverageSceneItemTemp = new AverageSceneItem(ChannelSceneItemTemp->getChannelName(),
                                                                       ChannelSceneItemTemp->getPosition());
 

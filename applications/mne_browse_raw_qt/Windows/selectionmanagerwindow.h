@@ -142,7 +142,7 @@ public:
 signals:
     void showSelectedChannelsOnly(QStringList selectedChannels);
 
-    void selectionChanged(QList<ChannelSceneItem*> &selectedChannelItems);
+    void selectionChanged(QList<QGraphicsItem*> &selectedChannelItems);
 
 private:
     //=========================================================================================================
