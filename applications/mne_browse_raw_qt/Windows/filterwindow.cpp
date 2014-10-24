@@ -111,16 +111,16 @@ void FilterWindow::initSpinBoxes()
 
 void FilterWindow::initButtons()
 {
-    connect(ui->m_pushButton_applyFilter,&QPushButton::clicked,
+    connect(ui->m_pushButton_applyFilter,&QPushButton::released,
                 this,&FilterWindow::applyFilterToAll);
 
-    connect(ui->m_pushButton_undoFiltering,&QPushButton::clicked,
+    connect(ui->m_pushButton_undoFiltering,&QPushButton::released,
                 this,&FilterWindow::undoFilterToAll);
 
-    connect(ui->m_pushButton_exportPlot,&QPushButton::clicked,
+    connect(ui->m_pushButton_exportPlot,&QPushButton::released,
                 this,&FilterWindow::exportFilterPlot);
 
-    connect(ui->m_pushButton_exportFilter,&QPushButton::clicked,
+    connect(ui->m_pushButton_exportFilter,&QPushButton::released,
                 this,&FilterWindow::exportFilterCoefficients);
 }
 

@@ -97,7 +97,7 @@ public:
     void hideItems(QStringList visibleItems);
 
 private:
-    QMap<QString,QVector<double> >  m_layoutMap;                    /**< Holds the layout data.*/
+    QMap<QString,QVector<double> >      m_layoutMap;                /**< Holds the layout data.*/
 
     //=========================================================================================================
     /**
