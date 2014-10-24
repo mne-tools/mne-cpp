@@ -208,9 +208,6 @@ void SelectionManagerWindow::initComboBoxes()
 
     //Initialise layout as neuromag vectorview with all channels
     loadLayout("Vectorview-all.lout");
-
-    //Initialise selection list widgets
-    loadSelectionGroups("mne_browse_raw_vv.sel");
 }
 
 

@@ -144,9 +144,6 @@ QVariant AverageModel::headerData(int section, Qt::Orientation orientation, int 
 
 QVariant AverageModel::data(const QModelIndex &index, int role) const
 {
-   if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
-        return QVariant();
-
     if(index.row() >= m_pEvokedDataSet->evoked.size())
         return QVariant();
 
@@ -226,24 +223,22 @@ QVariant AverageModel::data(const QModelIndex &index, int role) const
             switch(role) {
                 case AverageModelRoles::GetAverageData:
                     v.setValue(m_pEvokedDataSet->evoked.at(index.row()).data);
-                    return v;
                     break;
 
                 case AverageModelRoles::GetFiffInfo:
                     v.setValue(m_pEvokedDataSet->evoked.at(index.row()).info);
-                    return v;
                     break;
 
                 case AverageModelRoles::GetTimeData:
                     v.setValue(m_pEvokedDataSet->evoked.at(index.row()).times);
-                    return v;
                     break;
 
                 case AverageModelRoles::GetProjections:
                     v.setValue(m_pEvokedDataSet->evoked.at(index.row()).proj);
-                    return v;
                     break;
             }
+
+            return v;
         }//end column check
     } // end index.valid() check
 

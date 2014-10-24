@@ -87,14 +87,14 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     //Plot average data
     painter->save();
 
-    for(int i = 0; i<m_lAverageData.size(); i++) {
-        path = QPainterPath(QPointF(option.rect.x()+t_rawModel->relFiffCursor(),option.rect.y()));
+    for(int dataIndex = 0; dataIndex<m_lAverageData.size(); dataIndex++) {
+        QPainterPath path = QPainterPath(QPointF(this->boundingRect().x(),this->boundingRect().y()));
         QPen pen;
         pen.setStyle(Qt::SolidLine);
         pen.setWidthF(1);
         painter->setPen(pen);
 
-        createPlotPath(path);
+        createPlotPath(path, dataIndex);
 
         painter->drawPath(path);
     }
@@ -108,9 +108,9 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
 //*************************************************************************************************************
 
-void AverageSceneItem::createPlotPath(path)
+void AverageSceneItem::createPlotPath(QPainterPath &path, int dataIndex)
 {
-    QMap<QString,double> scaleMap = m_pScaleWindow->getScalingMap();
+    //QMap<QString,double> scaleMap = m_pScaleWindow->getScalingMap();
 
     double dMaxValue =1e-09;
 
@@ -146,32 +146,21 @@ void AverageSceneItem::createPlotPath(path)
 //        }
 //    }
 
-    double dValue;
     double dScaleY = this->boundingRect().height()/(2*dMaxValue);
 
-    double y_base = -path.currentPosition().y();
     QPointF qSamplePosition;
 
-    //plot all rows from list of pairs
-    for(qint8 i=0; i < listPairs.size(); ++i) {
-        //create lines from one to the next sample
-        for(qint32 j=0; j < listPairs[i].second; ++j)
-        {
-            double val = *(listPairs[i].first+j);
+    //plot data from averaged data m_lAverageData
+    VectorXd averageData = m_lAverageData.at(dataIndex);
 
-            //subtract mean of the channel here (if wanted by the user)
-            dValue = (val - channelMean)*dScaleY;
+    for(int i = 0; i < averageData.rows(); ++i) {
+        double val = averageData(i) * dScaleY;
 
-            double newY = y_base+dValue;
+        qSamplePosition.setY(-val);
+        qSamplePosition.setX(path.currentPosition().x()+1);
 
-            qSamplePosition.setY(-newY);
-            qSamplePosition.setX(path.currentPosition().x()+m_dDx);
-
-            path.lineTo(qSamplePosition);
-        }
+        path.lineTo(qSamplePosition);
     }
-
-
 }
 
 
