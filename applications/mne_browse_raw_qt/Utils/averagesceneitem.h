@@ -110,19 +110,19 @@ public:
     */
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    QString         m_sChannelName;             /**< Holds the channel name.*/
-    int             m_iChannelNumber;           /**< Holds the channel number.*/
-    QPointF         m_qpChannelPosition;        /**< Holds the channels 2D position in the scene.*/
-    QList<QColor>   m_cAverageColors;           /**< Holds the current average color.*/
-    QList<VectorXd> m_lAverageData;             /**< Holds the channels average data which is to be plotted.*/
-    QPair<int>      m_firstLastSample;          /**< Hold the first and last sample.*/
+    QString             m_sChannelName;             /**< Holds the channel name.*/
+    int                 m_iChannelNumber;           /**< Holds the channel number.*/
+    QPointF             m_qpChannelPosition;        /**< Holds the channels 2D position in the scene.*/
+    QList<QColor>       m_cAverageColors;           /**< Holds the current average color.*/
+    QList<VectorXd>     m_lAverageData;             /**< Holds the channels average data which is to be plotted.*/
+    QPair<int,int>      m_firstLastSample;          /**< Hold the first and last sample.*/
 
 protected:
     //=========================================================================================================
     /**
     * creates plot path for average data
     */
-    void createPlotPath(path);
+    void createPlotPath(QPainterPath &path, int dataIndex);
 };
 
 } // NAMESPACE MNEBrowseRawQt

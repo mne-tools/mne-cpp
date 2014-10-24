@@ -146,35 +146,40 @@ void AverageWindow::initAverageSceneView()
 
 void AverageWindow::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
+    Q_UNUSED(deselected);
+    Q_UNUSED(selected);
+
     //Get current items from the average scene
     QList<QGraphicsItem *> currentAverageSceneItems = m_pAverageScene->items();
 
-    //Do for all selected evoked sets
-    for(int u = 0; u<selected.indexes().size(); u++) {
-        QModelIndex index = selected.indexes().at(u);
+    //Set new data for all averageSceneItems
+    for(int i = 0; i<currentAverageSceneItems.size(); i++) {
+        AverageSceneItem* averageSceneItemTemp = static_cast<AverageSceneItem*>(currentAverageSceneItems.at(i));
 
-        //Get only the necessary data from the average model (use column 4)
-        FiffInfo fiffInfo = m_pAverageModel->data(m_pAverageModel->index(index.row(), 4), AverageModelRoles::GetFiffInfo).value<FiffInfo>();
-        MatrixXd averageData = m_pAverageModel->data(m_pAverageModel->index(index.row(), 4), AverageModelRoles::GetAverageData).value<MatrixXd>();
-        int first = m_pAverageModel->data(m_pAverageModel->index(index.row(), 2), AverageModelRoles::GetFirstSample).value<MatrixXd>();
-        int last = m_pAverageModel->data(m_pAverageModel->index(index.row(), 3), AverageModelRoles::GetLastSample).value<MatrixXd>();
+        averageSceneItemTemp->m_lAverageData.clear();
 
-        QStringList chNames = fiffInfo.ch_names;
+        //Do for all selected evoked sets
+        for(int u = 0; u<selected.indexes().size(); u++) {
+            //Get only the necessary data from the average model (use column 4)
+            QModelIndex index = selected.indexes().at(u);
 
-        QList<VectorXd> channelAverageData;
+            FiffInfo fiffInfo = m_pAverageModel->data(m_pAverageModel->index(index.row(), 4), AverageModelRoles::GetFiffInfo).value<FiffInfo>();
+            MatrixXd averageData = m_pAverageModel->data(m_pAverageModel->index(index.row(), 4), AverageModelRoles::GetAverageData).value<MatrixXd>();
+            int first = m_pAverageModel->data(m_pAverageModel->index(index.row(), 2), AverageModelRoles::GetFirstSample).toInt();
+            int last = m_pAverageModel->data(m_pAverageModel->index(index.row(), 3), AverageModelRoles::GetLastSample).toInt();
 
-        for(int i = 0; i<currentAverageSceneItems.size(); i++) {
-            AverageSceneItem* averageSceneItemTemp = static_cast<AverageSceneItem*>(currentAverageSceneItems.at(i));
+            //Get the averageScenItem specific data row
+            QStringList chNames = fiffInfo.ch_names;
 
             int channelNumber = chNames.indexOf(averageSceneItemTemp->m_sChannelName);
             if(channelNumber != -1) {
                 averageSceneItemTemp->m_firstLastSample.first = first;
-                averageSceneItemTemp->m_firstLastSample.last = last;
+                averageSceneItemTemp->m_firstLastSample.second = last;
                 averageSceneItemTemp->m_lAverageData.append(averageData.row(channelNumber));
             }
         }
-
-        //Plot the data to the butterfly plot by providing the average delegate with the painter the butterfly scene
     }
+
+    m_pAverageScene->update();
 
 }
