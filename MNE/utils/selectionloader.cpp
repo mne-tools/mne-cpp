@@ -68,6 +68,9 @@ bool SelectionLoader::readMNESelFile(QString path, QMap<QString,QStringList> &se
     if(!path.contains(".sel"))
         return false;
 
+    //clear the map first
+    selectionMap.clear();
+
     QFile file(path);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qDebug()<<"Error opening selection file";
