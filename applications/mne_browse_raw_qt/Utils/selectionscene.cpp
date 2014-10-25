@@ -64,12 +64,17 @@ SelectionScene::SelectionScene(QGraphicsView* view, QObject* parent)
 
 //*************************************************************************************************************
 
-void SelectionScene::setNewLayout(QMap<QString,QVector<double> > layoutMap)
+void SelectionScene::repaintItems(const QMap<QString,QVector<double> > &layoutMap)
 {
-    m_layoutMap = layoutMap;
+    this->clear();
 
-    //Redraw all items
-    repaintItems();
+    QMapIterator<QString,QVector<double> > i(layoutMap);
+    while (i.hasNext()) {
+        i.next();
+        ChannelSceneItem* ChannelSceneItemTemp = new ChannelSceneItem(i.key(), i.value().at(2), QPointF(i.value().at(0), i.value().at(1)));
+
+        this->addItem(ChannelSceneItemTemp);
+    }
 }
 
 
@@ -81,17 +86,3 @@ void SelectionScene::hideItems(QStringList visibleItems)
 }
 
 
-//*************************************************************************************************************
-
-void SelectionScene::repaintItems()
-{
-    this->clear();
-
-    QMapIterator<QString,QVector<double> > i(m_layoutMap);
-    while (i.hasNext()) {
-        i.next();
-        ChannelSceneItem* ChannelSceneItemTemp = new ChannelSceneItem(i.key(), i.value().at(2), QPointF(i.value().at(0), i.value().at(1)));
-
-        this->addItem(ChannelSceneItemTemp);
-    }
-}

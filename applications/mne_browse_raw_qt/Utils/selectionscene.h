@@ -87,7 +87,7 @@ public:
     * Updates layout data.
     * @param [in] layoutMap layout data map.
     */
-    void setNewLayout(QMap<QString,QVector<double> > layoutMap);
+    void repaintItems(const QMap<QString,QVector<double> > &layoutMap);
 
     //=========================================================================================================
     /**
@@ -97,13 +97,7 @@ public:
     void hideItems(QStringList visibleItems);
 
 private:
-    QMap<QString,QVector<double> >      m_layoutMap;                /**< Holds the layout data.*/
 
-    //=========================================================================================================
-    /**
-    * Repaints all items from the layout data in the scene.
-    */
-    void repaintItems();
 };
 
 } // NAMESPACE

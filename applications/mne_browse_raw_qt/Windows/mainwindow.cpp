@@ -121,14 +121,14 @@ void MainWindow::setupWindowWidgets()
     //Create average manager window - QTDesigner used - see /FormFiles
     m_pAverageWindow = new AverageWindow(this, m_qEvokedFile);
     addDockWidget(Qt::BottomDockWidgetArea, m_pAverageWindow);
-    //m_pAverageWindow->hide();
+    m_pAverageWindow->hide();
 
     //Create scale window - QTDesigner used - see /FormFiles
     m_pScaleWindow = new ScaleWindow(this);
     addDockWidget(Qt::LeftDockWidgetArea, m_pScaleWindow);
     m_pScaleWindow->hide();
 
-    //Init windows
+    //Init windows - TODO: get rid of this here, do this inside the window classes
     m_pDataWindow->init();
     m_pEventWindow->init();
     m_pFilterWindow->init();
@@ -143,11 +143,11 @@ void MainWindow::setupWindowWidgets()
     connect(m_pDataWindow, &DataWindow::scaleChannels,
             m_pScaleWindow, &ScaleWindow::scaleAllChannels);
 
-    //Hide non selected channels
+    //Hide non selected channels in the data view
     connect(m_pSelectionManagerWindow, &SelectionManagerWindow::showSelectedChannelsOnly,
             m_pDataWindow, &DataWindow::showSelectedChannelsOnly);
 
-    //Connect selection manager with average plot
+    //Connect selection manager with average manager
     connect(m_pSelectionManagerWindow, &SelectionManagerWindow::selectionChanged,
             m_pAverageWindow, &AverageWindow::channelSelectionManagerChanged);
 
@@ -211,6 +211,7 @@ void MainWindow::setWindowStatus()
     setWindowTitle(title);
 
     //Set status bar
+    //Set data file informations
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
         int idx = m_qFileRaw.fileName().lastIndexOf("/");
         QString filename = m_qFileRaw.fileName().remove(0,idx+1);
@@ -219,6 +220,7 @@ void MainWindow::setWindowStatus()
     else
         title = QString("No data file");
 
+    //Set event file informations
     if(m_pEventWindow->getEventModel()->m_bFileloaded) {
         int idx = m_qEventFile.fileName().lastIndexOf("/");
         QString filename = m_qEventFile.fileName().remove(0,idx+1);
@@ -228,6 +230,7 @@ void MainWindow::setWindowStatus()
     else
         title.append("  -  No event file");
 
+    //Set evoked file informations
     if(m_pAverageWindow->getAverageModel()->m_bFileloaded) {
         int idx = m_qEvokedFile.fileName().lastIndexOf("/");
         QString filename = m_qEvokedFile.fileName().remove(0,idx+1);

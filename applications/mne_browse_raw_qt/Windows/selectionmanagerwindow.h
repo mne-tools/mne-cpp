@@ -137,7 +137,7 @@ public:
     /**
     * gets the item corresponding to text in listWidget
     */
-    QListWidgetItem* getItem(QListWidget *listWidget, QString text);
+    QListWidgetItem* getItem(QListWidget *listWidget, QString channelName);
 
 signals:
     void showSelectedChannelsOnly(QStringList selectedChannels);
