@@ -138,7 +138,7 @@ private:
     */
     void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
-    Ui::AverageWindow *ui;
+    Ui::AverageWindow*      ui;                     /**< Pointer to the qt designer generated ui class*/
 
     AverageModel*           m_pAverageModel;        /**< the QAbstractTable average model being part of the model/view framework of Qt */
     AverageDelegate*        m_pAverageDelegate;     /**< the QItemDelegateaverage delegate being part of the model/view framework of Qt */

@@ -190,7 +190,10 @@ private:
 
     //=========================================================================================================
     /**
-    * eventFilter filter events from the table views
+    * Installed event filter.
+    *
+    * @param [in] obj the qt object for which the event was intercpeted
+    * @param [in] event the current event
     */
     bool eventFilter(QObject *object, QEvent *event);
 
@@ -206,11 +209,11 @@ private:
     */
     bool pinchTriggered(QPinchGesture *gesture);
 
-    Ui::DataWindowDockWidget *ui;                   /**< the ui variabe to initalise and access the ui file with this class */
+    Ui::DataWindowDockWidget *ui;                   /**< Pointer to the qt designer generated ui class*/
 
     MainWindow*     m_pMainWindow;                  /**< pointer to the main window (parent) */
 
-    QSettings       m_qSettings;                    /**< global mne browse raw qt settings */
+    QSettings       m_qSettings;                    /**< QSettings variable used to write or read from independent application sessions */
 
     DataMarker*     m_pDataMarker;                  /**< pointer to the data marker */
     QLabel*         m_pCurrentDataMarkerLabel;      /**< the current data marker label to display the marker's position */

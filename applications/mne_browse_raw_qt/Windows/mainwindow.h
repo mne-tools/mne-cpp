@@ -294,10 +294,10 @@ private:
     ScaleWindow*            m_pScaleWindow;             /**< Scale widget can be used to set the scaling of the different channels types */
 
     //application settings
-    QSettings               m_qSettings;
-    RawSettings             m_rawSettings;
+    QSettings               m_qSettings;                /**< QSettings variable used to write or read from independent application sessions */
+    RawSettings             m_rawSettings;              /**< the software specific mne brose raw qt settings */
 
-    Ui::MainWindowWidget*   ui;
+    Ui::MainWindowWidget*   ui;                         /**< Pointer to the qt designer generated ui class*/
 };
 
 } //NAMESPACE

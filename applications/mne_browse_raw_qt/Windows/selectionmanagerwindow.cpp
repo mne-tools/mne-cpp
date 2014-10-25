@@ -171,7 +171,7 @@ void SelectionManagerWindow::initListWidgets()
 
     //Connect list widgets to update themselves and other list widgets when changed
     connect(ui->m_listWidget_selectionGroups, &QListWidget::itemClicked,
-                this, &SelectionManagerWindow::updateSelectionGroups);
+                this, &SelectionManagerWindow::updateSelectionGroupsList);
 
     connect(ui->m_listWidget_selectionGroups, &QListWidget::itemClicked,
                 this, &SelectionManagerWindow::updateSceneItems);
@@ -191,7 +191,7 @@ void SelectionManagerWindow::initSelectionSceneView()
     ui->m_graphicsView_layoutPlot->setScene(m_pSelectionScene);
 
     connect(m_pSelectionScene, &QGraphicsScene::selectionChanged,
-                this, &SelectionManagerWindow::updateUserDefinedChannels);
+                this, &SelectionManagerWindow::updateUserDefinedChannelsList);
 }
 
 
@@ -268,7 +268,7 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
     ui->m_listWidget_selectionGroups->setCurrentItem(getItem(ui->m_listWidget_selectionGroups, "All"), QItemSelectionModel::Select);
 
     //Update selection
-    updateSelectionGroups(getItem(ui->m_listWidget_selectionGroups, "All"));
+    updateSelectionGroupsList(getItem(ui->m_listWidget_selectionGroups, "All"));
 
     return state;
 }
@@ -303,7 +303,7 @@ void SelectionManagerWindow::cleanUpMEGChannels()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::updateSelectionGroups(QListWidgetItem* item)
+void SelectionManagerWindow::updateSelectionGroupsList(QListWidgetItem* item)
 {
     ui->m_listWidget_visibleChannels->clear();
 
@@ -329,7 +329,7 @@ void SelectionManagerWindow::updateSceneItems()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::updateUserDefinedChannels()
+void SelectionManagerWindow::updateUserDefinedChannelsList()
 {
     QList<QGraphicsItem*> itemList = m_pSelectionScene->selectedItems();
     QStringList userDefinedChannels;
