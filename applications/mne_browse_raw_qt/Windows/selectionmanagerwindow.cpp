@@ -225,7 +225,7 @@ bool SelectionManagerWindow::loadLayout(QString path)
     loadSelectionGroups(ui->m_comboBox_selectionFiles->currentText());
 
     //Update scene
-    m_pSelectionScene->setNewLayout(m_layoutMap);
+    m_pSelectionScene->repaintItems(m_layoutMap);
     m_pSelectionScene->update();
 
     //Fit to view
@@ -251,6 +251,7 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
 
     bool state = manager->readMNESelFile(newPath, m_selectionGroupsMap);
 
+    //Create group 'All' manually (bcause this group depends on the loaded channels from the fiff data file, not on the loaded selection file)
     m_selectionGroupsMap["All"] = m_currentlyLoadedFiffChannels;
 
     //Add selection groups to list widget
