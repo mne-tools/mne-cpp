@@ -152,10 +152,10 @@ QStringList SelectionManagerWindow::getSelectedChannels()
 
 //*************************************************************************************************************
 
-QListWidgetItem* SelectionManagerWindow::getItem(QListWidget* listWidget, QString text)
+QListWidgetItem* SelectionManagerWindow::getItem(QListWidget* listWidget, QString channelName)
 {
     for(int i=0; i<listWidget->count(); i++)
-        if(listWidget->item(i)->text() == text)
+        if(listWidget->item(i)->text() == channelName)
             return listWidget->item(i);
 
     return new QListWidgetItem();
@@ -277,7 +277,7 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
 
 void SelectionManagerWindow::cleanUpMEGChannels()
 {
-    /*QMapIterator<QString,QStringList> selectionIndex(m_selectionGroupsMap);
+    QMapIterator<QString,QStringList> selectionIndex(m_selectionGroupsMap);
 
     //Iterate through all loaded selection groups
     while (selectionIndex.hasNext()) {
@@ -296,7 +296,7 @@ void SelectionManagerWindow::cleanUpMEGChannels()
 
         //Overwrite old selection groups channels
         m_selectionGroupsMap.insert(selectionIndex.key(), channelList);
-    }*/
+    }
 }
 
 
