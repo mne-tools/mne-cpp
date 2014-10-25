@@ -86,19 +86,7 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     //Plot average data
     painter->save();
-
-    for(int dataIndex = 0; dataIndex<m_lAverageData.size(); dataIndex++) {
-        QPainterPath path = QPainterPath(QPointF(this->boundingRect().x(),this->boundingRect().y()));
-        QPen pen;
-        pen.setStyle(Qt::SolidLine);
-        pen.setWidthF(1);
-        painter->setPen(pen);
-
-        createPlotPath(path, dataIndex);
-
-        painter->drawPath(path);
-    }
-
+    paintAveragePath(painter);
     painter->restore();
 
     //set posistion
@@ -108,7 +96,7 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
 //*************************************************************************************************************
 
-void AverageSceneItem::createPlotPath(QPainterPath &path, int dataIndex)
+void AverageSceneItem::paintAveragePath(QPainter *painter)
 {
     //QMap<QString,double> scaleMap = m_pScaleWindow->getScalingMap();
 
@@ -150,16 +138,26 @@ void AverageSceneItem::createPlotPath(QPainterPath &path, int dataIndex)
 
     QPointF qSamplePosition;
 
-    //plot data from averaged data m_lAverageData
-    VectorXd averageData = m_lAverageData.at(dataIndex);
+    for(int dataIndex = 0; dataIndex<m_lAverageData.size(); dataIndex++) {
+        QPainterPath path = QPainterPath(QPointF(this->boundingRect().x(),this->boundingRect().y()));
+        QPen pen;
+        pen.setStyle(Qt::SolidLine);
+        pen.setWidthF(1);
+        painter->setPen(pen);
 
-    for(int i = 0; i < averageData.rows(); ++i) {
-        double val = averageData(i) * dScaleY;
+        //plot data from averaged data m_lAverageData
+        VectorXd averageData = m_lAverageData.at(dataIndex);
 
-        qSamplePosition.setY(-val);
-        qSamplePosition.setX(path.currentPosition().x()+1);
+        for(int i = 0; i < averageData.rows(); ++i) {
+            double val = averageData(i) * dScaleY;
 
-        path.lineTo(qSamplePosition);
+            qSamplePosition.setY(-val);
+            qSamplePosition.setX(path.currentPosition().x()+1);
+
+            path.lineTo(qSamplePosition);
+        }
+
+        painter->drawPath(path);
     }
 }
 

@@ -109,20 +109,25 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the ScaleWindow.
-    * All ScaleWindow's children are deleted first. The application exits if ScaleWindow is the main widget.
+    * Returns the current scaling map which generated out of the current spin box values
+    *
+    * @return the generated scale value map for each channel type
     */
     QMap<QString,double> getScalingMap();
 
     //=========================================================================================================
     /**
     * hideSpinBoxes hides all spin boxes and labels which are not present in the current fiff file.
+    *
+    * @param [in] currentFiffInfo the fiff info file used to hide the spin boxes for not loaded channel types
     */
     void hideSpinBoxes(FiffInfo currentFiffInfo);
 
     //=========================================================================================================
     /**
     * scaleAllChannels scales all channels by scaleValue.
+    *
+    * @param [in] scaleValue the scaling value used to scale the channels
     */
     void scaleAllChannels(double scaleValue);
 
@@ -140,7 +145,7 @@ signals:
     void scalingViewValueChanged(int);
 
 private:
-    Ui::ScaleWindow *ui;
+    Ui::ScaleWindow *ui;            /**< Pointer to the qt designer generated ui class*/
 
     //=========================================================================================================
     /**

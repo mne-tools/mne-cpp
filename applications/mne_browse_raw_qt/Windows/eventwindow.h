@@ -150,11 +150,11 @@ private:
     */
     bool event(QEvent * event);
 
-    Ui::EventWindowDockWidget *ui;
+    Ui::EventWindowDockWidget *ui;                  /**< Pointer to the qt designer generated ui class*/
 
     MainWindow*         m_pMainWindow;
 
-    QSettings           m_qSettings;
+    QSettings           m_qSettings;                /**< QSettings variable used to write or read from independent application sessions */
 
     EventDelegate*      m_pEventDelegate;           /**< the QAbstractDelegate being part of the event model/view framework of Qt */
     EventModel*         m_pEventModel;              /**< the QAbstractTable event model being part of the model/view framework of Qt */

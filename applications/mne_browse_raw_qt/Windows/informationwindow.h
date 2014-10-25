@@ -111,7 +111,7 @@ public:
     void setLogLevel(LogLevel lvl);
 
 private:
-    Ui::InformationWindowWidget *ui;
+    Ui::InformationWindowWidget *ui;                    /**< Pointer to the qt designer generated ui class*/
 
     //Log
     QTextBrowser*           m_pTextBrowser_Log;         /** a textbox being part of the log feature */

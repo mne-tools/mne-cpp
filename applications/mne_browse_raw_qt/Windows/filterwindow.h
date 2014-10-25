@@ -142,14 +142,14 @@ private:
     */
     void updateFilterPlot();
 
-    Ui::FilterWindowWidget *ui;
+    Ui::FilterWindowWidget *ui;                 /**< Pointer to the qt designer generated ui class*/
 
     MainWindow*         m_pMainWindow;
 
     int                 m_iWindowSize;
     int                 m_iFilterTaps;
 
-    QSettings           m_qSettings;
+    QSettings           m_qSettings;            /**< QSettings variable used to write or read from independent application sessions */
 
     FilterPlotScene*    m_pFilterPlotScene;
 

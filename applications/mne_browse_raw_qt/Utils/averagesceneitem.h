@@ -108,7 +108,7 @@ public:
     /**
     * Reimplemented paint function.
     */
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
     QString             m_sChannelName;             /**< Holds the channel name.*/
     int                 m_iChannelNumber;           /**< Holds the channel number.*/
@@ -120,9 +120,11 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * creates plot path for average data
+    * Create a plot path and paint the average data
+    *
+    * @param [in] painter The painter used to plot in this item.
     */
-    void createPlotPath(QPainterPath &path, int dataIndex);
+    void paintAveragePath(QPainter *painter);
 };
 
 } // NAMESPACE MNEBrowseRawQt
