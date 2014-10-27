@@ -182,8 +182,7 @@ bool NoiseEstimate::start()
 
 bool NoiseEstimate::stop()
 {
-    if(m_pRtNoise && m_pRtNoise->isRunning())
-        m_pRtNoise->stop();
+
 
     //Wait until this thread is stopped
     m_qMutex.lock();
@@ -202,6 +201,11 @@ bool NoiseEstimate::stop()
 
     // Stop filling buffers with data from the inputs
     m_bProcessData = false;
+
+    qDebug()<<"NoiseEstimate Thread is stopped.";
+
+//    if(m_pRtNoise && m_pRtNoise->isRunning())
+//        m_pRtNoise->stop();
 
     return true;
 }
@@ -351,6 +355,7 @@ void NoiseEstimate::run()
         }//m_bProcessData
     }//m_bIsRunning
     qDebug()<<"noise estimation [Run] is done!";
+    m_pRtNoise->stop();
 //    delete m_pRtNoise;
 }
 
