@@ -85,6 +85,7 @@ public:
     //=========================================================================================================
     /**
     * Updates layout data.
+    *
     * @param [in] layoutMap layout data map.
     */
     void repaintItems(const QMap<QString,QVector<double> > &layoutMap);
@@ -92,12 +93,10 @@ public:
     //=========================================================================================================
     /**
     * Hides all items described in list.
+    *
     * @param [in] list string list with items name which are to be hidden.
     */
     void hideItems(QStringList visibleItems);
-
-private:
-
 };
 
 } // NAMESPACE

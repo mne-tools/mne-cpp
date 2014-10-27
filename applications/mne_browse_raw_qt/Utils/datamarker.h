@@ -96,32 +96,24 @@ private:
     //=========================================================================================================
     /**
     * Reimplemnted mouse press event handler
-    *
-    * @param event QMouseEvent
     */
     void mousePressEvent(QMouseEvent *event);
 
     //=========================================================================================================
     /**
     * Reimplemnted mouse move event handler
-    *
-    * @param event QMouseEvent
     */
     void mouseMoveEvent(QMouseEvent *event);
 
     //=========================================================================================================
     /**
     * Reimplemnted enter event handler
-    *
-    * @param event QEvent
     */
     void enterEvent(QEvent *event);
 
     //=========================================================================================================
     /**
     * Reimplemnted move event handler
-    *
-    * @param event QMoveEvent
     */
     void moveEvent(QMoveEvent *event);
 
@@ -132,10 +124,11 @@ private:
 
 
 signals:
+    //=========================================================================================================
+    /**
+    * markerMoved is emmitted whenever the data marker was moved
+    */
     void markerMoved();
-
-public slots:
-
 };
 
 } // NAMESPACE MNEBrowseRawQt

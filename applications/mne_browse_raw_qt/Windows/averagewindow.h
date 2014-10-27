@@ -116,6 +116,7 @@ private:
     //=========================================================================================================
     /**
     * inits the model view controller paradigm of this window
+    *
     * @param [in] file holds the file which is to be loaded on startup
     */
     void initMVC(QFile &file);
@@ -138,11 +139,11 @@ private:
     */
     void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
-    Ui::AverageWindow*      ui;                     /**< Pointer to the qt designer generated ui class*/
+    Ui::AverageWindow*      ui;                     /**< Pointer to the qt designer generated ui class.*/
 
-    AverageModel*           m_pAverageModel;        /**< the QAbstractTable average model being part of the model/view framework of Qt */
-    AverageDelegate*        m_pAverageDelegate;     /**< the QItemDelegateaverage delegate being part of the model/view framework of Qt */
-    AverageScene*           m_pAverageScene;        /**< holds the pointer to the average scene */
+    AverageModel*           m_pAverageModel;        /**< the QAbstractTable average model being part of the model/view framework of Qt. */
+    AverageDelegate*        m_pAverageDelegate;     /**< the QItemDelegateaverage delegate being part of the model/view framework of Qt. */
+    AverageScene*           m_pAverageScene;        /**< holds the pointer to the average scene. */
 };
 
 } // NAMESPACE MNEBrowseRawQt

@@ -110,12 +110,12 @@ public:
     */
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    QString             m_sChannelName;             /**< Holds the channel name.*/
-    int                 m_iChannelNumber;           /**< Holds the channel number.*/
-    QPointF             m_qpChannelPosition;        /**< Holds the channels 2D position in the scene.*/
-    QList<QColor>       m_cAverageColors;           /**< Holds the current average color.*/
-    QList<VectorXd>     m_lAverageData;             /**< Holds the channels average data which is to be plotted.*/
-    QPair<int,int>      m_firstLastSample;          /**< Hold the first and last sample.*/
+    QString             m_sChannelName;             /**< The channel name.*/
+    int                 m_iChannelNumber;           /**< The channel number.*/
+    QPointF             m_qpChannelPosition;        /**< The channels 2D position in the scene.*/
+    QList<QColor>       m_cAverageColors;           /**< The current average color.*/
+    QList<VectorXd>     m_lAverageData;             /**< The channels average data which is to be plotted.*/
+    QPair<int,int>      m_firstLastSample;          /**< The first and last sample.*/
 
 protected:
     //=========================================================================================================
