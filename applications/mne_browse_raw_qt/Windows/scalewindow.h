@@ -109,14 +109,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the current scaling map which generated out of the current spin box values
-    *
-    * @return the generated scale value map for each channel type
-    */
-    QMap<QString,double> getScalingMap();
-
-    //=========================================================================================================
-    /**
     * hideSpinBoxes hides all spin boxes and labels which are not present in the current fiff file.
     *
     * @param [in] currentFiffInfo the fiff info file used to hide the spin boxes for not loaded channel types
@@ -134,18 +126,30 @@ public:
 signals:
     //=========================================================================================================
     /**
-    * updateDataTableViews is emmited whenever a connected data spin box value changed
+    * scalingChannelValueChanged is emmited whenever a connected data spin box value changed
+    *
+    * @param [in] QMap<QString,double> map with all channel types and their current scaling value
     */
-    void scalingChannelValueChanged();
+    void scalingChannelValueChanged(QMap<QString,double>);
 
     //=========================================================================================================
     /**
-    * updateDataTableViews is emmited whenever a connected view spin box value changed
+    * scalingViewValueChanged is emmited whenever a connected view spin box value changed
+    *
+    * @param [in] int current scaling value for the views
     */
     void scalingViewValueChanged(int);
 
 private:
     Ui::ScaleWindow *ui;            /**< Pointer to the qt designer generated ui class.*/
+
+    //=========================================================================================================
+    /**
+    * Returns the current scaling map which generated out of the current spin box values
+    *
+    * @return the generated scale value map for each channel type
+    */
+    QMap<QString,double> genereateScalingMap();
 
     //=========================================================================================================
     /**

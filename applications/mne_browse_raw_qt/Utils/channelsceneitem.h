@@ -87,7 +87,7 @@ public:
     /**
     * Constructs a ChannelSceneItem.
     */
-    ChannelSceneItem(QString channelName, int channelNumber, QPointF channelPosition, QColor averageColor = Qt::blue);
+    ChannelSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor averageColor = Qt::blue);
 
     //=========================================================================================================
     /**
@@ -103,6 +103,8 @@ public:
 
     QString     m_sChannelName;             /**< The channel's name.*/
     int         m_iChannelNumber;           /**< The channel number.*/
+    int         m_iChannelKind;             /**< The channel kind.*/
+    int         m_iChannelUnit;             /**< The channel unit.*/
     QPointF     m_qpChannelPosition;        /**< The channel's 2D position in the scene.*/
     QColor      m_cChannelColor;            /**< The current channel color.*/
     bool        m_bHighlightItem;           /**< Whether this item is to be highlighted.*/

@@ -48,6 +48,7 @@
 #include "../Models/averagemodel.h"         //MNE Browse Raw QT utils
 #include "../Delegates/averagedelegate.h"   //MNE Browse Raw QT utils
 #include "../Utils/channelsceneitem.h"      //MNE Browse Raw QT utils
+#include "../Utils/types.h"
 
 
 //*************************************************************************************************************
@@ -56,6 +57,9 @@
 //=============================================================================================================
 
 #include <QDockWidget>
+#include <QFileDialog>
+#include <QStandardPaths>
+#include <QSvgGenerator>
 
 
 //*************************************************************************************************************
@@ -108,11 +112,27 @@ public:
 
     //=========================================================================================================
     /**
-    * call this whenever the external channel selection manager changed
+    * call this whenever the external channel selection manager changes
+    *
+    * * @param [in] selectedChannelItems list of selected graphic items
     */
     void channelSelectionManagerChanged(const QList<QGraphicsItem *> &selectedChannelItems);
 
+    //=========================================================================================================
+    /**
+    * Scales the averaged data according to scaleMap
+    *
+    * @param [in] scaleMap map with all channel types and their current scaling value
+    */
+    void scaleAveragedData(const QMap<QString,double> &scaleMap);
+
 private:
+    //=========================================================================================================
+    /**
+    * Inits all QPushButtons in this window
+    */
+    void initButtons();
+
     //=========================================================================================================
     /**
     * inits the model view controller paradigm of this window
@@ -138,6 +158,12 @@ private:
     * call this function whenever a selection was made in teh evoked data set list
     */
     void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+
+    //=========================================================================================================
+    /**
+    * saves the current layout average plot as png or svg to file
+    */
+    void exportAverageLayoutPlot();
 
     Ui::AverageWindow*      ui;                     /**< Pointer to the qt designer generated ui class.*/
 

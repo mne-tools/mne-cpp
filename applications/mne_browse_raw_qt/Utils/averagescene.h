@@ -83,6 +83,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the scale map to scaleMap.
+    *
+    * @param [in] scaleMap map with all channel types and their current scaling value.
+    */
+    void setScaleMap(const QMap<QString,double> &scaleMap);
+
+    //=========================================================================================================
+    /**
     * Repaints all items from the layout data in the scene.
     *
     *  @param [in] selectedChannelItems items which are to painted to the average scene

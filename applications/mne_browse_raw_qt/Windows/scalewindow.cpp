@@ -101,7 +101,7 @@ void ScaleWindow::init()
 
 //*************************************************************************************************************
 
-QMap<QString,double> ScaleWindow::getScalingMap()
+QMap<QString,double> ScaleWindow::genereateScalingMap()
 {
     QMap<QString,double> scaleMap;
 
@@ -225,7 +225,7 @@ void ScaleWindow::scaleAllChannels(double scaleValue)
 
 void ScaleWindow::scaleChannelValueChanged()
 {
-    emit scalingChannelValueChanged();
+    emit scalingChannelValueChanged(genereateScalingMap());
 }
 
 

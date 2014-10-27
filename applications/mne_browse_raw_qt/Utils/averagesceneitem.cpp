@@ -56,11 +56,22 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AverageSceneItem::AverageSceneItem(QString channelName, int channelNumber, QPointF channelPosition, QColor defaultColors)
+AverageSceneItem::AverageSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor defaultColors)
 : m_sChannelName(channelName)
 , m_iChannelNumber(channelNumber)
 , m_qpChannelPosition(channelPosition)
+, m_iChannelKind(channelKind)
+, m_iChannelUnit(channelUnit)
 {
+    //Init m_scaleMap
+    m_scaleMap["MEG_grad"] = 400 * 1e-15 * 100; //*100 because data in fiff files is stored as fT/m not fT/cm
+    m_scaleMap["MEG_mag"] = 1.2 * 1e-12;
+    m_scaleMap["MEG_EEG"] = 30 * 1e-06;
+    m_scaleMap["MEG_EOG"] = 150 * 1e-06;
+    m_scaleMap["MEG_EMG"] = 1 * 1e-03;
+    m_scaleMap["MEG_ECG"] = 1 * 1e-03;
+    m_scaleMap["MEG_MISC"] = 1 * 1;
+    m_scaleMap["MEG_STIM"] = 5 * 1;
 }
 
 
@@ -68,7 +79,9 @@ AverageSceneItem::AverageSceneItem(QString channelName, int channelNumber, QPoin
 
 QRectF AverageSceneItem::boundingRect() const
 {
-    return QRectF(-25, -35, 50, 70);
+    int height = 80;
+    int width = 500;
+    return QRectF(-width/2, -height/2, width, height);
 }
 
 
@@ -84,13 +97,16 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     QSizeF sizeText = staticElectrodeName.size();
     painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
 
+//    //Plot bounding rect / drawing region of this item
+//    painter->drawRect(this->boundingRect());
+
     //Plot average data
     painter->save();
     paintAveragePath(painter);
     painter->restore();
 
     //set posistion
-    this->setPos(10*m_qpChannelPosition.x(), -10*m_qpChannelPosition.y());
+    this->setPos(60*m_qpChannelPosition.x(), -60*m_qpChannelPosition.y());
 }
 
 
@@ -98,58 +114,66 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
 void AverageSceneItem::paintAveragePath(QPainter *painter)
 {
-    //QMap<QString,double> scaleMap = m_pScaleWindow->getScalingMap();
+    double dMaxValue = 1e-09;
 
-    double dMaxValue =1e-09;
+    switch(m_iChannelKind) {
+        case FIFFV_MEG_CH: {
+            if(m_iChannelUnit == FIFF_UNIT_T_M) {
+                dMaxValue = m_scaleMap["MEG_grad"];
+            }
+            else if(m_iChannelUnit == FIFF_UNIT_T)
+                dMaxValue = m_scaleMap["MEG_mag"];
+            break;
+        }
+        case FIFFV_EEG_CH: {
+            dMaxValue = m_scaleMap["MEG_EEG"];
+            break;
+        }
+        case FIFFV_EOG_CH: {
+            dMaxValue = m_scaleMap["MEG_EOG"];
+            break;
+        }
+        case FIFFV_STIM_CH: {
+            dMaxValue = m_scaleMap["MEG_STIM"];
+            break;
+        }
+        case FIFFV_EMG_CH: {
+            dMaxValue = m_scaleMap["MEG_EMG"];
+            break;
+        }
+        case FIFFV_MISC_CH: {
+            dMaxValue = m_scaleMap["MEG_MISC"];
+            break;
+        }
+    }
 
-//    switch(kind) {
-//        case FIFFV_MEG_CH: {
-//            qint32 unit = (static_cast<const RawModel*>(index.model()))->m_pfiffIO->m_qlistRaw[0]->info.chs[index.row()].unit;
-//            if(unit == FIFF_UNIT_T_M) {
-//                dMaxValue = scaleMap["MEG_grad"];
-//            }
-//            else if(unit == FIFF_UNIT_T)
-//                dMaxValue = scaleMap["MEG_mag"];
-//            break;
-//        }
-//        case FIFFV_EEG_CH: {
-//            dMaxValue = scaleMap["MEG_EEG"];
-//            break;
-//        }
-//        case FIFFV_EOG_CH: {
-//            dMaxValue = scaleMap["MEG_EOG"];
-//            break;
-//        }
-//        case FIFFV_STIM_CH: {
-//            dMaxValue = scaleMap["MEG_STIM"];
-//            break;
-//        }
-//        case FIFFV_EMG_CH: {
-//            dMaxValue = scaleMap["MEG_EMG"];
-//            break;
-//        }
-//        case FIFFV_MISC_CH: {
-//            dMaxValue = scaleMap["MEG_MISC"];
-//            break;
-//        }
-//    }
-
-    double dScaleY = this->boundingRect().height()/(2*dMaxValue);
-
+    //Plot averaged data
+    QRectF boundingRect = this->boundingRect();
+    double dScaleY = (boundingRect.height()*10)/(2*dMaxValue);
     QPointF qSamplePosition;
 
+    //do for all currently stored evoked set data
     for(int dataIndex = 0; dataIndex<m_lAverageData.size(); dataIndex++) {
-        QPainterPath path = QPainterPath(QPointF(this->boundingRect().x(),this->boundingRect().y()));
+        //plot data from averaged data m_lAverageData with the calulacted downsample factor
+        const double* averageData = m_lAverageData.at(dataIndex).first;
+        int totalCols =  m_lAverageData.at(dataIndex).second;
+
+        //Calculate downsampling factor of averaged data in respect to the items width
+        int dsFactor;
+        totalCols / boundingRect.width()<1 ? dsFactor = 1 : dsFactor = totalCols / boundingRect.width();
+
+        //Create path
+        QPainterPath path = QPainterPath(QPointF(boundingRect.x(), boundingRect.y() + boundingRect.height()/2));
         QPen pen;
         pen.setStyle(Qt::SolidLine);
-        pen.setWidthF(1);
+        if(!m_cAverageColors.isEmpty() && !(dataIndex<m_cAverageColors.size()))
+            pen.setColor(m_cAverageColors.at(dataIndex));
+        pen.setWidthF(2);
         painter->setPen(pen);
 
-        //plot data from averaged data m_lAverageData
-        VectorXd averageData = m_lAverageData.at(dataIndex);
-
-        for(int i = 0; i < averageData.rows(); ++i) {
-            double val = averageData(i) * dScaleY;
+        for(int i = 0; i < totalCols && path.elementCount() <= boundingRect.width(); i += dsFactor) {
+            //evoked matrix is stored in column major
+            double val = (*(averageData+(i*m_iTotalNumberChannels)+m_iChannelNumber) * dScaleY);
 
             qSamplePosition.setY(-val);
             qSamplePosition.setX(path.currentPosition().x()+1);

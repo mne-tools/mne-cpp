@@ -121,7 +121,7 @@ void MainWindow::setupWindowWidgets()
     //Create average manager window - QTDesigner used - see /FormFiles
     m_pAverageWindow = new AverageWindow(this, m_qEvokedFile);
     addDockWidget(Qt::BottomDockWidgetArea, m_pAverageWindow);
-    m_pAverageWindow->hide();
+    //m_pAverageWindow->hide();
 
     //Create scale window - QTDesigner used - see /FormFiles
     m_pScaleWindow = new ScaleWindow(this);
@@ -135,13 +135,18 @@ void MainWindow::setupWindowWidgets()
     m_pScaleWindow->init();
 
     //Connect window signals
-    //Change scaling of the data whenever a spinbox value changed or the user performs a pinch gesture on the view
+    //Change scaling of the data and averaged data whenever a spinbox value changed or the user performs a pinch gesture on the view
     connect(m_pScaleWindow, &ScaleWindow::scalingChannelValueChanged,
-            m_pDataWindow, &DataWindow::updateDataTableViews);
+            m_pDataWindow, &DataWindow::scaleData);
+
     connect(m_pScaleWindow, &ScaleWindow::scalingViewValueChanged,
             m_pDataWindow, &DataWindow::scaleChannelsInView);
+
     connect(m_pDataWindow, &DataWindow::scaleChannels,
             m_pScaleWindow, &ScaleWindow::scaleAllChannels);
+
+    connect(m_pScaleWindow, &ScaleWindow::scalingChannelValueChanged,
+            m_pAverageWindow, &AverageWindow::scaleAveragedData);
 
     //Hide non selected channels in the data view
     connect(m_pSelectionManagerWindow, &SelectionManagerWindow::showSelectedChannelsOnly,
@@ -151,7 +156,7 @@ void MainWindow::setupWindowWidgets()
     connect(m_pSelectionManagerWindow, &SelectionManagerWindow::selectionChanged,
             m_pAverageWindow, &AverageWindow::channelSelectionManagerChanged);
 
-    //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels
+    //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels - TODO: dirty move get rid of this here
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
         m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_fiffInfo);
 
