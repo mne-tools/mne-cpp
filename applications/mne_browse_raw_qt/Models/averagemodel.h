@@ -1,15 +1,16 @@
 //=============================================================================================================
 /**
-* @file     averagewindow.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
+* @file     averagemodel.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
 * @date     October, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,32 +31,52 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the AverageWindow class.
+* @brief    This class represents the average model of the model/view framework of mne_browse_raw_qt application.
 *
 */
 
-#ifndef AVERAGEWINDOW_H
-#define AVERAGEWINDOW_H
+#ifndef AVERAGEMODEL_H
+#define AVERAGEMODEL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "ui_averagewindow.h"
-#include "utils/layoutloader.h"             //MNE-CPP utils
-#include "../Utils/averagescene.h"          //MNE Browse Raw QT utils
-#include "../Models/averagemodel.h"         //MNE Browse Raw QT utils
-#include "../Delegates/averagedelegate.h"   //MNE Browse Raw QT utils
-#include "../Utils/channelsceneitem.h"      //MNE Browse Raw QT utils
+#include "../Utils/rawsettings.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QDockWidget>
+#include <QAbstractTableModel>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// MNE INCLUDES
+//=============================================================================================================
+
+#include <fiff/fiff.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace Eigen;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -66,86 +87,74 @@
 namespace MNEBrowseRawQt
 {
 
-
-//*************************************************************************************************************
 //=============================================================================================================
-// DEFINE FORWARD DECLARATIONS
-//=============================================================================================================
-
-class LayoutScene;
-
-
 /**
-* DECLARE CLASS AverageWindow
-*
-* @brief The AverageWindow class provides a dock window for plotting averages.
+* DECLARE CLASS AverageModel
 */
-class AverageWindow : public QDockWidget
+class AverageModel : public QAbstractTableModel
 {
     Q_OBJECT
-
 public:
+    AverageModel(QObject *parent = 0);
+    AverageModel(QFile& qFile, QObject *parent);
+
     //=========================================================================================================
     /**
-    * Constructs a AverageWindow which is a child of parent.
+    * Reimplemented virtual functions
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new AverageWindow becomes a window. If parent is another widget, AverageWindow becomes a child window inside parent. AverageWindow is deleted when its parent is deleted.
     */
-    AverageWindow(QWidget *parent = 0, QFile &file = QFile());
+    virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
+    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
+    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
+    virtual Qt::ItemFlags flags(const QModelIndex & index) const;
+    virtual bool insertRows(int position, int span, const QModelIndex & parent = QModelIndex());
+    virtual bool removeRows(int position, int span, const QModelIndex & parent = QModelIndex());
 
     //=========================================================================================================
     /**
-    * Destroys the AverageWindow.
-    * All AverageWindow's children are deleted first. The application exits if AverageWindow is the main widget.
-    */
-    ~AverageWindow();
-
-    //=========================================================================================================
-    /**
-    * Returns the AverageModel of this window
-    */
-    AverageModel* getAverageModel();
-
-    //=========================================================================================================
-    /**
-    * call this whenever the external channel selection manager changed
-    */
-    void channelSelectionManagerChanged(const QList<QGraphicsItem *> &selectedChannelItems);
-
-private:
-    //=========================================================================================================
-    /**
-    * inits the model view controller paradigm of this window
+    * loadEvokedData loads the fiff evoked data file
     *
-    * @param [in] file holds the file which is to be loaded on startup
+    * @param p_IODevice fiff data evoked file to read from
     */
-    void initMVC(QFile &file);
+    bool loadEvokedData(QFile& qFile);
 
     //=========================================================================================================
     /**
-    * inits the table widgets of this window
+    * saveEvokedData saves the fiff evoked data file
+    *
+    * @param p_IODevice fiff data evoked file to save to
     */
-    void initTableViewWidgets();
+    bool saveEvokedData(QFile& qFile);
+
+    bool                        m_bFileloaded;          /**< true when a Fiff evoked file is loaded. */
+
+protected:
+    FiffEvokedSet*              m_pEvokedDataSet;       /**< QList<FiffEvoked> that holds the evoked data sets which are to be organised and handled by this model. */
+    QSharedPointer<FiffIO>      m_pfiffIO;              /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!). */
 
     //=========================================================================================================
     /**
-    * inits the average scene of this window
+    * clearModel clears all model's members
     */
-    void initAverageSceneView();
+    void clearModel();
 
+signals:
     //=========================================================================================================
     /**
-    * call this function whenever a selection was made in teh evoked data set list
+    * fileLoaded is emitted whenever a file was (tried) to be loaded
     */
-    void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+    void fileLoaded(bool);
 
-    Ui::AverageWindow*      ui;                     /**< Pointer to the qt designer generated ui class.*/
+public slots:
 
-    AverageModel*           m_pAverageModel;        /**< the QAbstractTable average model being part of the model/view framework of Qt. */
-    AverageDelegate*        m_pAverageDelegate;     /**< the QItemDelegateaverage delegate being part of the model/view framework of Qt. */
-    AverageScene*           m_pAverageScene;        /**< holds the pointer to the average scene. */
 };
 
-} // NAMESPACE MNEBrowseRawQt
+} // NAMESPACE
 
-#endif // AVERAGEWINDOW_H
+Q_DECLARE_METATYPE(Eigen::MatrixXd);
+Q_DECLARE_METATYPE(FIFFLIB::FiffInfo);
+Q_DECLARE_METATYPE(Eigen::RowVectorXf);
+
+#endif // AVERAGEMODEL_H

@@ -79,6 +79,18 @@ namespace RawModelRoles
     enum ItemRole{GetChannelMean = Qt::UserRole + 1000};
 }
 
+namespace AverageModelRoles
+{
+    enum ItemRole{GetAverageData = Qt::UserRole + 1001,
+                  GetFiffInfo = Qt::UserRole + 1002,
+                  GetAspectKind = Qt::UserRole + 1003,
+                  GetFirstSample = Qt::UserRole + 1004,
+                  GetLastSample = Qt::UserRole + 1005,
+                  GetComment = Qt::UserRole + 1006,
+                  GetTimeData = Qt::UserRole + 1007,
+                  GetProjections = Qt::UserRole + 1008};
+}
+
 } //NAMESPACE
 
 #endif // TYPES_H

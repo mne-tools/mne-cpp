@@ -10,5 +10,6 @@
         <file alias="showScalingWindow.png">Resources/Images/Icons/showScalingWindow.PNG</file>
         <file alias="addDC.png">Resources/Images/Icons/addDC.png</file>
         <file alias="removeDC.png">Resources/Images/Icons/removeDC.png</file>
+        <file alias="showFilterWindow.png">Resources/Images/Icons/showFilterWindow.png</file>
     </qresource>
 </RCC>

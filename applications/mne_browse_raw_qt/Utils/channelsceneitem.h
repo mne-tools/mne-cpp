@@ -87,13 +87,7 @@ public:
     /**
     * Constructs a ChannelSceneItem.
     */
-    ChannelSceneItem(QString channelName, QPointF channelPosition, QColor channelColor = Qt::blue);
-
-    //=========================================================================================================
-    /**
-    * Sets the color of the electrode item.
-    */
-    void setColor(QColor channelColor);
+    ChannelSceneItem(QString channelName, int channelNumber, QPointF channelPosition, QColor averageColor = Qt::blue);
 
     //=========================================================================================================
     /**
@@ -107,35 +101,11 @@ public:
     */
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    //=========================================================================================================
-    /**
-    * Returns the channel name.
-    */
-    QString getChannelName();
-
-    //=========================================================================================================
-    /**
-    * Updates the channels position.
-    */
-    void setPosition(QPointF newPosition);
-
-    //=========================================================================================================
-    /**
-    * Updates the electrodes position.
-    */
-    QPointF getPosition();
-
-    //=========================================================================================================
-    /**
-    * Sets the highlight flag. Notice that highliting an item is not selecting it
-    */
-    void setHighlightChannel(bool highlightItem);
-
-private:
-    QString     m_sChannelName;             /**< Holds the channel's name.*/
-    QPointF     m_qpChannelPosition;        /**< Holds the channel's 2D position in the scene.*/
-    QColor      m_cChannelColor;            /**< Holds the current channel color.*/
-    bool        m_bHighlightItem;
+    QString     m_sChannelName;             /**< The channel's name.*/
+    int         m_iChannelNumber;           /**< The channel number.*/
+    QPointF     m_qpChannelPosition;        /**< The channel's 2D position in the scene.*/
+    QColor      m_cChannelColor;            /**< The current channel color.*/
+    bool        m_bHighlightItem;           /**< Whether this item is to be highlighted.*/
 };
 
 } // NAMESPACE MNEBrowseRawQt

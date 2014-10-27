@@ -1,12 +1,12 @@
 //=============================================================================================================
 /**
-* @file     eventdelegate.h
+* @file     averagedelegate.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 *           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     August, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
@@ -31,19 +31,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief Contains the declaration of the EventDelegate class.
+* @brief Contains the declaration of the AverageDelegate class.
 *
 */
 
-#ifndef EVENTDELEGATE_H
-#define EVENTDELEGATE_H
+#ifndef AVERAGEDELEGATE_H
+#define AVERAGEDELEGATE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../Models/eventmodel.h"
+#include "../Utils/types.h"
 
 
 //*************************************************************************************************************
@@ -52,11 +52,6 @@
 //=============================================================================================================
 
 #include <QItemDelegate>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
-#include <QComboBox>
-#include <QDebug>
-#include <QSettings>
 
 
 //*************************************************************************************************************
@@ -70,29 +65,33 @@ namespace MNEBrowseRawQt
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EventDelegate
+* DECLARE CLASS AverageDelegate
 */
-class EventDelegate : public QItemDelegate
+
+class AverageDelegate : public QItemDelegate
 {
     Q_OBJECT
-
 public:
-    EventDelegate(QObject *parent = 0);
+    AverageDelegate(QObject *parent = 0);
 
     //=========================================================================================================
     /**
     * Reimplemented virtual functions
     *
     */
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    void setEditorData(QWidget *editor, const QModelIndex &index) const;
-    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
-    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    virtual void paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const;
 
-private:
-    QSettings       m_qSettings;            /**< QSettings variable used to write or read from independent application sessions. */
+protected:
+    //=========================================================================================================
+    /**
+    * createPlotPath creates the QPointer path for the average data plot.
+    *
+    * @param[in] index QModelIndex for accessing associated data and model object.
+    * @param[in,out] path The QPointerPath to create for the data plot.
+    */
+    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs) const;
 };
 
 } //NAMESPACE
 
-#endif // EVENTDELEGATE_H
+#endif // AVERAGEDELEGATE_H
