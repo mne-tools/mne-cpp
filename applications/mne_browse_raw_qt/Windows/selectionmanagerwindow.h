@@ -247,14 +247,14 @@ private:
     */
     bool eventFilter(QObject *obj, QEvent *event);
 
-    Ui::SelectionManagerWindow*     ui;                                 /**< Pointer to the qt designer generated ui class */
+    Ui::SelectionManagerWindow*     ui;                                 /**< Pointer to the qt designer generated ui class. */
 
-    QMap<QString,QVector<double> >  m_layoutMap;                        /**< QMap with the loaded layout. each channel name correspond to a vector [pos_x|pos_y|channel number in the form 113 112 etc.] */
+    QMap<QString,QVector<double> >  m_layoutMap;                        /**< QMap with the loaded layout. each channel name correspond to a vector [pos_x|pos_y|channel number in the form 113 112 etc.]. */
     QMap<QString,QStringList>       m_selectionGroupsMap;               /**< QMap with the loaded selection groups. Each group name holds a string list with the corresponding channels of the group.*/
 
-    SelectionScene*                 m_pSelectionScene;                  /**< Pointer to the selection scene class */
+    SelectionScene*                 m_pSelectionScene;                  /**< Pointer to the selection scene class. */
 
-    QStringList                     m_currentlyLoadedFiffChannels;      /**< List of currently loaded fiff data channels*/
+    QStringList                     m_currentlyLoadedFiffChannels;      /**< List of currently loaded fiff data channels.*/
 };
 
 } // NAMESPACE MNEBrowseRawQt

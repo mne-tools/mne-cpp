@@ -453,7 +453,7 @@ void EventModel::setCurrentMarkerPos(int markerPos)
 
 //*************************************************************************************************************
 
-FiffInfo EventModel::getFiffInfo()
+FiffInfo EventModel::getFiffInfo() const
 {
     return m_fiffInfo;
 }
@@ -461,7 +461,7 @@ FiffInfo EventModel::getFiffInfo()
 
 //*************************************************************************************************************
 
-QPair<int, int> EventModel::getFirstLastSample()
+QPair<int, int> EventModel::getFirstLastSample() const
 {
     QPair<int, int> pair(m_iFirstSample, m_iLastSample);
     return pair;
@@ -502,7 +502,7 @@ void EventModel::setEventFilterType(const QString eventType)
 
 //*************************************************************************************************************
 
-QStringList EventModel::getEventTypeList()
+QStringList EventModel::getEventTypeList() const
 {
     return m_eventTypeList;
 }

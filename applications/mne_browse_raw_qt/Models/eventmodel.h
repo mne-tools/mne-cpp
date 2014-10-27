@@ -163,14 +163,14 @@ public:
     * getFiffInfo returns the fiffinfo
     *
     */
-    FiffInfo getFiffInfo();
+    FiffInfo getFiffInfo() const;
 
     //=========================================================================================================
     /**
     * getFirstLastSample returns the first/last sample in form of a QPair
     *
     */
-    QPair<int, int> getFirstLastSample();
+    QPair<int, int> getFirstLastSample() const;
 
     //=========================================================================================================
     /**
@@ -185,7 +185,7 @@ public:
     * getEventTypeList returns the event type list
     *
     */
-    QStringList getEventTypeList();
+    QStringList getEventTypeList() const;
 
     //=========================================================================================================
     /**
@@ -193,28 +193,32 @@ public:
     */
     void clearModel();
 
-    bool            m_bFileloaded;      /**< true when a Fiff event file is loaded */
+    bool            m_bFileloaded;              /**< true when a Fiff event file is loaded. */
 
 private:
-    QVector<int>    m_dataSamples;              /**< Vector that holds the sample alues for each loaded event */
-    QVector<int>    m_dataTypes;                /**< Vector that holds the type alues for each loaded event */
-    QVector<int>    m_dataIsUserEvent;          /**< Vector that holds the flag whether the event is user defined or loaded from file */
+    QVector<int>    m_dataSamples;              /**< Vector that holds the sample alues for each loaded event. */
+    QVector<int>    m_dataTypes;                /**< Vector that holds the type alues for each loaded event. */
+    QVector<int>    m_dataIsUserEvent;          /**< Vector that holds the flag whether the event is user defined or loaded from file. */
 
-    QVector<int>    m_dataSamples_Filtered;     /**< Filtered Vector that holds the sample alues for each loaded event */
-    QVector<int>    m_dataTypes_Filtered;       /**< Filtered Vector that holds the type alues for each loaded event */
-    QVector<int>    m_dataIsUserEvent_Filtered; /**< Filtered Vector that holds the flag whether the event is user defined or loaded from file */
+    QVector<int>    m_dataSamples_Filtered;     /**< Filtered Vector that holds the sample alues for each loaded event. */
+    QVector<int>    m_dataTypes_Filtered;       /**< Filtered Vector that holds the type alues for each loaded event. */
+    QVector<int>    m_dataIsUserEvent_Filtered; /**< Filtered Vector that holds the flag whether the event is user defined or loaded from file. */
 
-    FiffInfo        m_fiffInfo;                 /**< fiff info of whole fiff file */
+    FiffInfo        m_fiffInfo;                 /**< fiff info of whole fiff file. */
 
-    int             m_iFirstSample;             /**< holds the first/starting sample of the fiff data file */
-    int             m_iLastSample;              /**< holds the last/ending sample of the fiff data file */
-    int             m_iCurrentMarkerPos;        /**< holds the current marker position */
-    QSettings       m_qSettings;                /**< setting paramter to access globally defined values. see rawsettings.cpp and rawsettings.h */
-    QString         m_sFilterEventType;         /**< holds the event txype which is to be filtered*/
+    int             m_iFirstSample;             /**< holds the first/starting sample of the fiff data file. */
+    int             m_iLastSample;              /**< holds the last/ending sample of the fiff data file. */
+    int             m_iCurrentMarkerPos;        /**< holds the current marker position. */
+    QSettings       m_qSettings;                /**< setting paramter to access globally defined values. see rawsettings.cpp and rawsettings.h. */
+    QString         m_sFilterEventType;         /**< holds the event txype which is to be filtered.*/
 
-    QStringList     m_eventTypeList;            /**< holds all loaded event types */
+    QStringList     m_eventTypeList;            /**< holds all loaded event types. */
 
 signals:
+    //=========================================================================================================
+    /**
+    * updateEventTypes is emmited whenever the list of stored event type chnges
+    */
     void updateEventTypes();
 
 };

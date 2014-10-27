@@ -101,10 +101,10 @@ public:
     */
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    QString     m_sChannelName;             /**< Holds the channel's name.*/
-    int         m_iChannelNumber;           /**< Holds the channel number.*/
-    QPointF     m_qpChannelPosition;        /**< Holds the channel's 2D position in the scene.*/
-    QColor      m_cChannelColor;            /**< Holds the current channel color.*/
+    QString     m_sChannelName;             /**< The channel's name.*/
+    int         m_iChannelNumber;           /**< The channel number.*/
+    QPointF     m_qpChannelPosition;        /**< The channel's 2D position in the scene.*/
+    QColor      m_cChannelColor;            /**< The current channel color.*/
     bool        m_bHighlightItem;           /**< Whether this item is to be highlighted.*/
 };
 

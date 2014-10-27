@@ -218,6 +218,7 @@ private:
     //=========================================================================================================
     /**
     * @brief readSegment is the wrapper method to read a segment from the raw fiff file
+    *
     * @param from the start point to read from the file
     * @param to the end point to read from the file
     * @return the data and times matrices
@@ -234,38 +235,38 @@ private:
 
     //VARIABLES
     //Reload control
-    bool                                    m_bStartReached;            /**< signals, whether the start of the fiff data file is reached */
-    bool                                    m_bEndReached;              /**< signals, whether the end of the fiff data file is reached */
-    bool                                    m_bReloadBefore;            /**< bool value indicating if data was reloaded before (1) or after (0) the existing data */
+    bool                                    m_bStartReached;            /**< signals, whether the start of the fiff data file is reached. */
+    bool                                    m_bEndReached;              /**< signals, whether the end of the fiff data file is reached. */
+    bool                                    m_bReloadBefore;            /**< bool value indicating if data was reloaded before (1) or after (0) the existing data. */
 
     //Concurrent reloading
-    QFutureWatcher<QPair<MatrixXd,MatrixXd> > m_reloadFutureWatcher;    /**< QFutureWatcher for watching process of reloading fiff data */
-    bool                                    m_bReloading;               /**< signals when the reloading is ongoing */
+    QFutureWatcher<QPair<MatrixXd,MatrixXd> > m_reloadFutureWatcher;    /**< QFutureWatcher for watching process of reloading fiff data. */
+    bool                                    m_bReloading;               /**< signals when the reloading is ongoing. */
 
     //Concurrent processing
-//    QFutureWatcher<QPair<int,RowVectorXd> > m_operatorFutureWatcher; /**< QFutureWatcher for watching process of applying Operators to reloaded fiff data */
-    QFutureWatcher<void>                    m_operatorFutureWatcher;    /**< QFutureWatcher for watching process of applying Operators to reloaded fiff data */
-    QList<QPair<int,RowVectorXd> >          m_listTmpChData;            /**< contains pairs with a channel number and the corresponding RowVectorXd */
-    bool                                    m_bProcessing;              /**< true when processing in a background-thread is ongoing*/
+//    QFutureWatcher<QPair<int,RowVectorXd> > m_operatorFutureWatcher; /**< QFutureWatcher for watching process of applying Operators to reloaded fiff data. */
+    QFutureWatcher<void>                    m_operatorFutureWatcher;    /**< QFutureWatcher for watching process of applying Operators to reloaded fiff data. */
+    QList<QPair<int,RowVectorXd> >          m_listTmpChData;            /**< contains pairs with a channel number and the corresponding RowVectorXd. */
+    bool                                    m_bProcessing;              /**< true when processing in a background-thread is ongoing.*/
 
-    QMutex                                  m_Mutex;                    /**< mutex for locking against simultaenous access to shared objects > */
+    QMutex                                  m_Mutex;                    /**< mutex for locking against simultaenous access to shared objects >. */
 
     //Fiff data structure
-    QList<MatrixXdR>                        m_data;                     /**< List that holds the fiff matrix data <n_channels x n_samples> */
-    QList<MatrixXdR>                        m_procData;                 /**< List that holds the processed fiff matrix data <n_channels x n_samples> */
-    QList<MatrixXdR>                        m_times;                    /**< List that holds the time axis [in secs] */
-    QList<VectorXd>                         m_dataMean;                 /**< List that holds the means of each channel in each data block */
-    QList<VectorXd>                         m_procDataMean;             /**< List that holds the means of each channel in each processed data block */
+    QList<MatrixXdR>                        m_data;                     /**< List that holds the fiff matrix data <n_channels x n_samples>. */
+    QList<MatrixXdR>                        m_procData;                 /**< List that holds the processed fiff matrix data <n_channels x n_samples>. */
+    QList<MatrixXdR>                        m_times;                    /**< List that holds the time axis [in secs]. */
+    QList<VectorXd>                         m_dataMean;                 /**< List that holds the means of each channel in each data block. */
+    QList<VectorXd>                         m_procDataMean;             /**< List that holds the means of each channel in each processed data block. */
 
     //Filter operators
-    QMap<int,QSharedPointer<MNEOperator> >      m_assignedOperators;    /**< Map of MNEOperator types to channels*/
+    QMap<int,QSharedPointer<MNEOperator> >      m_assignedOperators;    /**< Map of MNEOperator types to channels.*/
 
-    qint32                                  m_iAbsFiffCursor;           /**< Cursor that points to the current position in the fiff data file [in samples] */
-    qint32                                  m_iCurAbsScrollPos;         /**< the current (absolute) ScrollPosition in the fiff data file */
+    qint32                                  m_iAbsFiffCursor;           /**< Cursor that points to the current position in the fiff data file [in samples]. */
+    qint32                                  m_iCurAbsScrollPos;         /**< the current (absolute) ScrollPosition in the fiff data file. */
 
-    qint32                                  m_iWindowSize;              /**< Length of window to load [in samples] */
-    qint32                                  m_reloadPos;                /**< Distance that the current window needs to be off the ends of m_data[i] [in samples] */
-    qint8                                   m_maxWindows;               /**< number of windows that are at maximum remained in m_data */
+    qint32                                  m_iWindowSize;              /**< Length of window to load [in samples]. */
+    qint32                                  m_reloadPos;                /**< Distance that the current window needs to be off the ends of m_data[i] [in samples]. */
+    qint8                                   m_maxWindows;               /**< number of windows that are at maximum remained in m_data. */
     qint16                                  m_iFilterTaps;              /**< Number of Filter taps */
 
 signals:
@@ -293,6 +294,7 @@ public slots:
     //=========================================================================================================
     /**
     * markChBad marks the selected channels as bad/good in m_chInfolist
+    *
     * @param chlist is the list of indices that are selected for marking
     * @param status, status=1 -> mark as bad, status=0 -> mark as good
     */
@@ -301,6 +303,7 @@ public slots:
     //=========================================================================================================
     /**
     * applyOperator applies assigend operators to channel
+    *
     * @param index selects the channel to process
     * @param filter
     */
@@ -309,6 +312,7 @@ public slots:
     //=========================================================================================================
     /**
     * applyOperator applies operators to channels
+    *
     * @param chlist selects the channels to process
     * @param filter
     */
@@ -317,6 +321,7 @@ public slots:
     //=========================================================================================================
     /**
     * applyOperatorsConcurrently updates all applied MNEOperators to a given RowVectorXd and modifies it in-place
+    *
     * @param chdata[in,out] represents the channel data as a RowVectorXd
     */
     void applyOperatorsConcurrently(QPair<int, RowVectorXd>& chdata);
@@ -324,6 +329,7 @@ public slots:
     //=========================================================================================================
     /**
     * updateOperators updates all set operator to channels according to m_assignedOperators
+    *
     * @param chan the channel to which the operators shall be updated
     */
     void updateOperators(QModelIndex chan);
@@ -331,6 +337,7 @@ public slots:
     //=========================================================================================================
     /**
     * updateOperators is an overloaded function to update the operators to a channel list
+    *
     * @param chlist
     */
     void updateOperators(QModelIndexList chlist);
@@ -343,6 +350,7 @@ public slots:
     //=========================================================================================================
     /**
     * undoFilter undoes the filtering operation for filter operations of the type
+    *
     * @param chlist selects the channels to filter
     * @param type determines the filter type TPassType to choose for the undo operation
     */
@@ -351,6 +359,7 @@ public slots:
     //=========================================================================================================
     /**
     * undoFilter undoes the filtering operation for all filter operations
+    *
     * @param chlist selects the channels to filter
     */
     void undoFilter(QModelIndexList chlist);
@@ -365,6 +374,7 @@ private slots:
     //=========================================================================================================
     /**
     * insertReloadedData inserts the reloaded data when the background has finished the operation
+    *
     * @param dataTimesPair contains the reloaded matrices of the data and times so it can be inserted into m_data and m_times
     */
     void insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair);
@@ -378,6 +388,7 @@ private slots:
     //=========================================================================================================
     /**
     * insertProcessedData inserts the processed data into m_procData when background-thread has finished (this method would be used for QtConcurrent::mapped)
+    *
     * @param index represents the row index in m_procData
     */
     void insertProcessedData(int index);

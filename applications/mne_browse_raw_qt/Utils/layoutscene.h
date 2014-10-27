@@ -90,13 +90,11 @@ public:
     LayoutScene(QGraphicsView* view, QObject *parent = 0);
 
 protected:
-    QGraphicsView*                  m_qvView;                       /**< Holds the view which visualizes this scene.*/
-    bool                            m_dragSceneIsActive;
-    QPointF                         m_mousePressPosition;
-    bool                            m_bDragMode;
-    bool                            m_bExtendedSelectionMode;
-    QPainterPath                    m_oldSelectionArea;
-    QList<QGraphicsItem *>          m_selectedItems;
+    QGraphicsView*                  m_qvView;                       /**< The view which visualizes this scene.*/
+    bool                            m_bDragMode;                    /**< Flag whether the drag mode is activated.*/
+    //bool                            m_bExtendedSelectionMode;       /**< Flag whether the extended selection mode.*/
+    QPointF                         m_mousePressPosition;           /**< The current mouse press location.*/
+    //QList<QGraphicsItem *>          m_selectedItems;                /**< The currently selected items during extended selection mode.*/
 
     //=========================================================================================================
     /**

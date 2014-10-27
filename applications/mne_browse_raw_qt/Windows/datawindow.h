@@ -191,9 +191,6 @@ private:
     //=========================================================================================================
     /**
     * Installed event filter.
-    *
-    * @param [in] obj the qt object for which the event was intercpeted
-    * @param [in] event the current event
     */
     bool eventFilter(QObject *object, QEvent *event);
 
@@ -209,24 +206,24 @@ private:
     */
     bool pinchTriggered(QPinchGesture *gesture);
 
-    Ui::DataWindowDockWidget *ui;                   /**< Pointer to the qt designer generated ui class*/
+    Ui::DataWindowDockWidget *ui;                   /**< Pointer to the qt designer generated ui class.*/
 
-    MainWindow*     m_pMainWindow;                  /**< pointer to the main window (parent) */
+    MainWindow*     m_pMainWindow;                  /**< pointer to the main window (parent). */
 
-    QSettings       m_qSettings;                    /**< QSettings variable used to write or read from independent application sessions */
+    QSettings       m_qSettings;                    /**< QSettings variable used to write or read from independent application sessions. */
 
-    DataMarker*     m_pDataMarker;                  /**< pointer to the data marker */
-    QLabel*         m_pCurrentDataMarkerLabel;      /**< the current data marker label to display the marker's position */
-    int             m_iCurrentMarkerSample;         /**< the current data marker sample value to display the marker's position */
+    DataMarker*     m_pDataMarker;                  /**< pointer to the data marker. */
+    QLabel*         m_pCurrentDataMarkerLabel;      /**< the current data marker label to display the marker's position. */
+    int             m_iCurrentMarkerSample;         /**< the current data marker sample value to display the marker's position. */
 
-    RawDelegate*    m_pRawDelegate;                 /**< the QAbstractDelegate being part of the raw model/view framework of Qt */
-    RawModel*       m_pRawModel;                    /**< the QAbstractTable model being part of the model/view framework of Qt */
+    RawDelegate*    m_pRawDelegate;                 /**< the QAbstractDelegate being part of the raw model/view framework of Qt. */
+    RawModel*       m_pRawModel;                    /**< the QAbstractTable model being part of the model/view framework of Qt. */
 
-    QVBoxLayout*    m_pUndockedDataViewLayout;      /**< the layout of the undockable widget */
+    QVBoxLayout*    m_pUndockedDataViewLayout;      /**< the layout of the undockable widget. */
 
-    QScroller*      m_pKineticScroller;             /**< the kinetic scroller of the QTableView */
+    QScroller*      m_pKineticScroller;             /**< the kinetic scroller of the QTableView. */
 
-    QAction*        m_pRemoveDCAction;              /**< the action which is used to control DC removal */
+    QAction*        m_pRemoveDCAction;              /**< the action which is used to control DC removal. */
 
 signals:
     //=========================================================================================================

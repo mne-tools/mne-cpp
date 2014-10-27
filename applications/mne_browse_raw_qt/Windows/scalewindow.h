@@ -145,7 +145,7 @@ signals:
     void scalingViewValueChanged(int);
 
 private:
-    Ui::ScaleWindow *ui;            /**< Pointer to the qt designer generated ui class*/
+    Ui::ScaleWindow *ui;            /**< Pointer to the qt designer generated ui class.*/
 
     //=========================================================================================================
     /**

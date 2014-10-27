@@ -59,9 +59,8 @@ using namespace std;
 LayoutScene::LayoutScene(QGraphicsView* view, QObject* parent)
 : QGraphicsScene(parent)
 , m_qvView(view)
-, m_dragSceneIsActive(false)
 , m_bDragMode(false)
-, m_bExtendedSelectionMode(false)
+//, m_bExtendedSelectionMode(false)
 {
     m_qvView->grabGesture(Qt::PanGesture);
     m_qvView->grabGesture(Qt::PinchGesture);
@@ -185,8 +184,8 @@ void LayoutScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 void LayoutScene::keyPressEvent(QKeyEvent *keyEvent)
 {
-    if(keyEvent->key() == Qt::Key_Control)
-        m_bExtendedSelectionMode = true;
+//    if(keyEvent->key() == Qt::Key_Control)
+//        m_bExtendedSelectionMode = true;
 
     QGraphicsScene::keyPressEvent(keyEvent);
 }
@@ -196,8 +195,8 @@ void LayoutScene::keyPressEvent(QKeyEvent *keyEvent)
 
 void LayoutScene::keyReleaseEvent(QKeyEvent *keyEvent)
 {
-    if(keyEvent->key() == Qt::Key_Control)
-        m_bExtendedSelectionMode = false;
+//    if(keyEvent->key() == Qt::Key_Control)
+//        m_bExtendedSelectionMode = false;
 
     QGraphicsScene::keyReleaseEvent(keyEvent);
 }

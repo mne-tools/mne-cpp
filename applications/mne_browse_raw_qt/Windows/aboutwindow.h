@@ -88,7 +88,7 @@ public:
     ~AboutWindow();
 
 private:
-    Ui::AboutWindow *ui;        /**< Pointer to the qt designer generated ui class*/
+    Ui::AboutWindow *ui;        /**< Pointer to the qt designer generated ui class.*/
 };
 
 } // NAMESPACE MNEBrowseRawQt
