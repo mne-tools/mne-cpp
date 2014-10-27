@@ -148,20 +148,22 @@ public:
     /**
     * setModelView creates the QPointer path for the data plot.
     *
-    * @param[in] scaleWindow holds a pointer to the scale window. This model needs to be set in order to access the event data for plotting.
+    * @param[in] scaleMap map with all channel types and their current scaling value.
     */
-    void setScaleWindow(ScaleWindow *scaleWindow);
+    void setScaleMap(const QMap<QString, double> &scaleMap);
+
+    QMap<QString,double> m_scaleMap;        /**< Map with all channel types and their current scaling value.*/
 
     // Plots settings
-    int         m_iDefaultPlotHeight;       /**< The height of the plot */
-    bool        m_bShowSelectedEventsOnly;  /**< When true all events are plotted otherwise only plot selected event */
-    bool        m_bActivateEvents;          /**< Flag for plotting events */
-    bool        m_bRemoveDC;                /**< Flag for DC removal */
+    int         m_iDefaultPlotHeight;       /**< The height of the plot. */
+    bool        m_bShowSelectedEventsOnly;  /**< When true all events are plotted otherwise only plot selected event. */
+    bool        m_bActivateEvents;          /**< Flag for plotting events. */
+    bool        m_bRemoveDC;                /**< Flag for DC removal. */
 
     // Scaling
-    double      m_dMaxValue;                /**< Maximum value of the data to plot */
-    double      m_dScaleY;                  /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
-    double      m_dDx;                      /**< pixel difference to the next sample */
+    double      m_dMaxValue;                /**< Maximum value of the data to plot. */
+    double      m_dScaleY;                  /**< Maximum amplitude of plot (max is m_dPlotHeight/2). */
+    double      m_dDx;                      /**< pixel difference to the next sample. */
 
 private:
     //=========================================================================================================

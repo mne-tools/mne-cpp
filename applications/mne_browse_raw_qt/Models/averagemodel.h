@@ -44,6 +44,7 @@
 //=============================================================================================================
 
 #include "../Utils/rawsettings.h"
+#include "../Utils/types.h"
 
 
 //*************************************************************************************************************
@@ -146,15 +147,10 @@ signals:
     * fileLoaded is emitted whenever a file was (tried) to be loaded
     */
     void fileLoaded(bool);
-
-public slots:
-
 };
 
 } // NAMESPACE
 
-Q_DECLARE_METATYPE(Eigen::MatrixXd);
-Q_DECLARE_METATYPE(FIFFLIB::FiffInfo);
-Q_DECLARE_METATYPE(Eigen::RowVectorXf);
+
 
 #endif // AVERAGEMODEL_H

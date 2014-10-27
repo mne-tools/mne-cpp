@@ -57,8 +57,6 @@
 //=============================================================================================================
 
 using namespace MNEBrowseRawQt;
-using namespace Eigen;
-using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -80,6 +78,16 @@ RawDelegate::RawDelegate(QObject *parent)
     m_pEventModel = new EventModel(NULL);
     m_pEventView = new QTableView(NULL);
     m_pRawView = new QTableView(NULL);
+
+    //Init m_scaleMap
+    m_scaleMap["MEG_grad"] = 400 * 1e-15 * 100; //*100 because data in fiff files is stored as fT/m not fT/cm
+    m_scaleMap["MEG_mag"] = 1.2 * 1e-12;
+    m_scaleMap["MEG_EEG"] = 30 * 1e-06;
+    m_scaleMap["MEG_EOG"] = 150 * 1e-06;
+    m_scaleMap["MEG_EMG"] = 1 * 1e-03;
+    m_scaleMap["MEG_ECG"] = 1 * 1e-03;
+    m_scaleMap["MEG_MISC"] = 1 * 1;
+    m_scaleMap["MEG_STIM"] = 5 * 1;
 }
 
 
@@ -201,9 +209,9 @@ void RawDelegate::setModelView(EventModel *eventModel, QTableView* eventView, QT
 
 //*************************************************************************************************************
 
-void RawDelegate::setScaleWindow(ScaleWindow *scaleWindow)
+void RawDelegate::setScaleMap(const QMap<QString,double> &scaleMap)
 {
-    m_pScaleWindow = scaleWindow;
+    m_scaleMap = scaleMap;
 }
 
 
@@ -215,36 +223,34 @@ void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionVie
     qint32 kind = (static_cast<const RawModel*>(index.model()))->m_chInfolist[index.row()].kind;
     double dMaxValue = 1e-9;
 
-    QMap<QString,double> scaleMap = m_pScaleWindow->getScalingMap();
-
     switch(kind) {
     case FIFFV_MEG_CH: {
         qint32 unit = (static_cast<const RawModel*>(index.model()))->m_pfiffIO->m_qlistRaw[0]->info.chs[index.row()].unit;
         if(unit == FIFF_UNIT_T_M) {
-            dMaxValue = scaleMap["MEG_grad"];
+            dMaxValue = m_scaleMap["MEG_grad"];
         }
         else if(unit == FIFF_UNIT_T)
-            dMaxValue = scaleMap["MEG_mag"];
+            dMaxValue = m_scaleMap["MEG_mag"];
         break;
     }
     case FIFFV_EEG_CH: {
-        dMaxValue = scaleMap["MEG_EEG"];
+        dMaxValue = m_scaleMap["MEG_EEG"];
         break;
     }
     case FIFFV_EOG_CH: {
-        dMaxValue = scaleMap["MEG_EOG"];
+        dMaxValue = m_scaleMap["MEG_EOG"];
         break;
     }
     case FIFFV_STIM_CH: {
-        dMaxValue = scaleMap["MEG_STIM"];
+        dMaxValue = m_scaleMap["MEG_STIM"];
         break;
     }
     case FIFFV_EMG_CH: {
-        dMaxValue = scaleMap["MEG_EMG"];
+        dMaxValue = m_scaleMap["MEG_EMG"];
         break;
     }
     case FIFFV_MISC_CH: {
-        dMaxValue = scaleMap["MEG_MISC"];
+        dMaxValue = m_scaleMap["MEG_MISC"];
         break;
     }
     }

@@ -64,6 +64,22 @@ AverageScene::AverageScene(QGraphicsView* view, QObject* parent)
 
 //*************************************************************************************************************
 
+void AverageScene::setScaleMap(const QMap<QString,double> &scaleMap)
+{
+    QList<QGraphicsItem*> itemList = this->items();
+
+    QListIterator<QGraphicsItem*> i(itemList);
+    while (i.hasNext()) {
+        AverageSceneItem* AverageSceneItemTemp = static_cast<AverageSceneItem*>(i.next());
+        AverageSceneItemTemp->m_scaleMap = scaleMap;
+    }
+
+    this->update();
+}
+
+
+//*************************************************************************************************************
+
 void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelItems)
 {
     this->clear();
@@ -73,7 +89,9 @@ void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelIte
         ChannelSceneItem* ChannelSceneItemTemp = static_cast<ChannelSceneItem*>(i.next());
         AverageSceneItem* AverageSceneItemTemp = new AverageSceneItem(ChannelSceneItemTemp->m_sChannelName,
                                                                       ChannelSceneItemTemp->m_iChannelNumber,
-                                                                      ChannelSceneItemTemp->m_qpChannelPosition);
+                                                                      ChannelSceneItemTemp->m_qpChannelPosition,
+                                                                      ChannelSceneItemTemp->m_iChannelKind,
+                                                                      ChannelSceneItemTemp->m_iChannelUnit);
 
         this->addItem(AverageSceneItemTemp);
     }

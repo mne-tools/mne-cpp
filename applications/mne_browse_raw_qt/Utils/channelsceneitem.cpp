@@ -56,12 +56,14 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChannelSceneItem::ChannelSceneItem(QString channelName, int channelNumber, QPointF channelPosition, QColor channelColor)
+ChannelSceneItem::ChannelSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor channelColor)
 : m_sChannelName(channelName)
 , m_iChannelNumber(channelNumber)
 , m_qpChannelPosition(channelPosition)
 , m_cChannelColor(channelColor)
 , m_bHighlightItem(false)
+, m_iChannelKind(channelKind)
+, m_iChannelUnit(channelUnit)
 {
     this->setAcceptHoverEvents(true);
     this->setFlag(QGraphicsItem::ItemIsSelectable, true);
