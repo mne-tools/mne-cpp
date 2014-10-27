@@ -77,11 +77,12 @@ RawModel::RawModel(QObject *parent)
     // Generate default filter operator - This needs to be done here so that the filter design tool works without loading a file
     genStdFilterOps();
 
-    //connect signal and slots
+    //connect data reloading - this is done concurrently
     connect(&m_reloadFutureWatcher,&QFutureWatcher<QPair<MatrixXd,MatrixXd> >::finished,[this](){
         insertReloadedData(m_reloadFutureWatcher.future().result());
     });
 
+    //connect filtering reloading - this is done after a new block has been loaded
     connect(this,&RawModel::dataReloaded,[this](){
         if(!m_assignedOperators.empty()) updateOperatorsConcurrently();
     });
@@ -134,6 +135,7 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
 //    connect(&m_operatorFutureWatcher,&QFutureWatcher<QPair<int,RowVectorXd> >::resultReadyAt,[this](int index){
 //        insertProcessedData(index);
 //    });
+
     connect(&m_operatorFutureWatcher,&QFutureWatcher<void>::finished,[this](){
         insertProcessedData();
     });
@@ -227,27 +229,24 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
             case RawModelRoles::GetChannelMean: {
                 QVariant v;
 
-                //form RowVectorPair of pointer and length of RowVector
-                QPair<const double*,qint32> rowVectorPair;
+                //if channel is not filtered or background Processing pending...
+                if(!m_assignedOperators.contains(index.row()) || (m_bProcessing && m_bReloadBefore) || (m_bProcessing && !m_bReloadBefore)) {
+                    //Calculate the global mean of all loaded data in m_dataMean
+                    double sum = 0;
+                    for(int i = 0; i<m_dataMean.size(); i++)
+                        sum += m_dataMean.at(i)[index.row()];
 
-                //pack all adjacent (after reload) RowVectorPairs into a QList
-                QList<RowVectorPair> listRowVectorPair;
+                    v.setValue(sum/m_dataMean.size());
+                }
+                else { //if channel IS filtered
+                    //Calculate the global mean of all loaded data in m_dataMean
+                    double sum = 0;
+                    for(int i = 0; i<m_procDataMean.size(); i++)
+                        sum += m_procDataMean.at(i)[index.row()];
 
-                for(qint16 i=0; i < m_dataMean.size(); ++i) {
-                    //if channel is not filtered or background Processing pending...
-                    if(!m_assignedOperators.contains(index.row()) || (m_bProcessing && m_bReloadBefore && i==0) || (m_bProcessing && !m_bReloadBefore && i==m_dataMean.size()-1)) {
-                        rowVectorPair.first = m_dataMean[i].data() + index.row();
-                        rowVectorPair.second  = m_dataMean[i].cols(); //always 1 because m_dataMean is a row vector
-                    }
-                    else { //if channel IS filtered
-                        rowVectorPair.first = m_procDataMean[i].data() + index.row();
-                        rowVectorPair.second  = m_procDataMean[i].cols(); //always 1 because m_procDataMean is a row vector
-                    }
-
-                    listRowVectorPair.append(rowVectorPair);
+                    v.setValue(sum/m_procDataMean.size());
                 }
 
-                v.setValue(listRowVectorPair);
                 return v;
                 break;
             }
@@ -571,7 +570,9 @@ VectorXd RawModel::calculateMean(const MatrixXd &data)
     VectorXd channelMeans(data.rows());
 
     for(int i = 0; i<channelMeans.rows(); i++)
+    {
         channelMeans[i] = data.row(i).mean();
+    }
 
     return channelMeans;
 }
@@ -664,7 +665,8 @@ void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOpe
     //filter all when chlist is empty
     if(chlist.empty()) {
         for(qint32 i=0; i < m_chInfolist.size(); ++i)
-            chlist.append(createIndex(i,1));
+            if(!m_chInfolist.at(i).ch_name.contains("STI") && !m_chInfolist.at(i).ch_name.contains("MISC"))
+                chlist.append(createIndex(i,1));
     }
 
     for(qint32 i=0; i < chlist.size(); ++i) { //iterate through selected channels to filter
@@ -692,9 +694,6 @@ void RawModel::applyOperatorsConcurrently(QPair<int,RowVectorXd>& chdata)
             chdata.second = filter->applyFFTFilter(chdata.second);
         }
         case MNEOperator::PCA: {
-            //do something
-        }
-        case MNEOperator::AVERAGE: {
             //do something
         }
         }
@@ -901,6 +900,12 @@ void RawModel::insertProcessedData()
         else
             m_procData.last().row(listFilteredChs[i]) = m_listTmpChData[i].second;
     }
+
+    //Calculate mean for filtered data
+    if(m_bReloadBefore)
+        m_procDataMean.first() = calculateMean(m_procData.first());
+    else
+        m_procDataMean.last() = calculateMean(m_procData.last());
 
     emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));
 

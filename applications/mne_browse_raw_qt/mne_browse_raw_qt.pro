@@ -85,10 +85,14 @@ SOURCES += \
     Utils/filteroperator.cpp \
     Utils/filterplotscene.cpp \
     Utils/layoutscene.cpp \
+    Utils/averagescene.cpp \
+    Utils/selectionscene.cpp \
     Utils/channelsceneitem.cpp \
     Utils/averagesceneitem.cpp \
+    Models/averagemodel.cpp \
     Models/rawmodel.cpp \
     Models/eventmodel.cpp \
+    Delegates/averagedelegate.cpp \
     Delegates/rawdelegate.cpp \
     Delegates/eventdelegate.cpp \
     Windows/mainwindow.cpp \
@@ -99,7 +103,7 @@ SOURCES += \
     Windows/informationwindow.cpp \
     Windows/selectionmanagerwindow.cpp \
     Windows/averagewindow.cpp \
-    Windows/scalewindow.cpp
+    Windows/scalewindow.cpp \
 
 HEADERS += \
     Utils/datamarker.h \
@@ -110,10 +114,14 @@ HEADERS += \
     Utils/info.h \
     Utils/filterplotscene.h \
     Utils/layoutscene.h \
+    Utils/averagescene.h \
+    Utils/selectionscene.h \
     Utils/channelsceneitem.h \
     Utils/averagesceneitem.h \
+    Models/averagemodel.h \
     Models/rawmodel.h \
     Models/eventmodel.h \
+    Delegates/averagedelegate.h \
     Delegates/rawdelegate.h \
     Delegates/eventdelegate.h \
     Windows/mainwindow.h \
@@ -124,7 +132,7 @@ HEADERS += \
     Windows/informationwindow.h \
     Windows/selectionmanagerwindow.h \
     Windows/averagewindow.h \
-    Windows/scalewindow.h
+    Windows/scalewindow.h \
 
 FORMS += \
     Windows/filterwindow.ui \

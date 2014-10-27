@@ -1,16 +1,15 @@
 //=============================================================================================================
 /**
-* @file     eventdelegate.h
+* @file     averagescene.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     August, 2014
+* @date     September, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,68 +30,51 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief Contains the declaration of the EventDelegate class.
+* @brief    Contains the implementation of the AverageScene class.
 *
 */
-
-#ifndef EVENTDELEGATE_H
-#define EVENTDELEGATE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../Models/eventmodel.h"
+#include "averagescene.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QItemDelegate>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
-#include <QComboBox>
-#include <QDebug>
-#include <QSettings>
+using namespace MNEBrowseRawQt;
+using namespace std;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEBrowseRawQt
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace MNEBrowseRawQt
+AverageScene::AverageScene(QGraphicsView* view, QObject* parent)
+: LayoutScene(view, parent)
 {
+}
 
 
-//=============================================================================================================
-/**
-* DECLARE CLASS EventDelegate
-*/
-class EventDelegate : public QItemDelegate
+//*************************************************************************************************************
+
+void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelItems)
 {
-    Q_OBJECT
+    this->clear();
 
-public:
-    EventDelegate(QObject *parent = 0);
+    QListIterator<QGraphicsItem*> i(selectedChannelItems);
+    while (i.hasNext()) {
+        ChannelSceneItem* ChannelSceneItemTemp = static_cast<ChannelSceneItem*>(i.next());
+        AverageSceneItem* AverageSceneItemTemp = new AverageSceneItem(ChannelSceneItemTemp->m_sChannelName,
+                                                                      ChannelSceneItemTemp->m_iChannelNumber,
+                                                                      ChannelSceneItemTemp->m_qpChannelPosition);
 
-    //=========================================================================================================
-    /**
-    * Reimplemented virtual functions
-    *
-    */
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    void setEditorData(QWidget *editor, const QModelIndex &index) const;
-    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
-    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-
-private:
-    QSettings       m_qSettings;            /**< QSettings variable used to write or read from independent application sessions. */
-};
-
-} //NAMESPACE
-
-#endif // EVENTDELEGATE_H
+        this->addItem(AverageSceneItemTemp);
+    }
+}

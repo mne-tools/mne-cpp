@@ -62,8 +62,6 @@ DataWindow::DataWindow(QWidget *parent)
 , m_pDataMarker(new DataMarker(this))
 , m_pCurrentDataMarkerLabel(new QLabel(this))
 , m_iCurrentMarkerSample(0)
-, m_pUndockedViewWidget(new QWidget(this,Qt::Window))
-, m_pUndockedDataView(new QTableView(m_pUndockedViewWidget))
 {
     ui->setupUi(this);
 
@@ -90,7 +88,6 @@ DataWindow::~DataWindow()
 void DataWindow::init()
 {
     initMVCSettings();
-    initUndockedWindow();
     initToolBar();
     initMarker();
     initLabels();
@@ -102,14 +99,6 @@ void DataWindow::init()
 QTableView* DataWindow::getDataTableView()
 {
     return ui->m_tableView_rawTableView;
-}
-
-
-//*************************************************************************************************************
-
-QTableView* DataWindow::getUndockedDataTableView()
-{
-    return m_pUndockedDataView;
 }
 
 
@@ -134,7 +123,6 @@ RawDelegate* DataWindow::getDataDelegate()
 void DataWindow::updateDataTableViews()
 {
     ui->m_tableView_rawTableView->viewport()->update();
-    m_pUndockedDataView->viewport()->update();
 }
 
 
@@ -148,16 +136,11 @@ void DataWindow::showSelectedChannelsOnly(QStringList selectedChannels)
         QString channel = m_pRawModel->data(index, Qt::DisplayRole).toString();
 
         ui->m_tableView_rawTableView->showRow(i);
-        m_pUndockedDataView->showRow(i);
 
-        if(!selectedChannels.contains(channel)) {
+        if(!selectedChannels.contains(channel))
             ui->m_tableView_rawTableView->hideRow(i);
-            m_pUndockedDataView->hideRow(i);
-        }
-        else {
+        else
             ui->m_tableView_rawTableView->showRow(i);
-            m_pUndockedDataView->showRow(i);
-        }
     }
 
     updateDataTableViews();
@@ -166,7 +149,7 @@ void DataWindow::showSelectedChannelsOnly(QStringList selectedChannels)
 
 //*************************************************************************************************************
 
-void DataWindow::scaleChannelsInView(double height)
+void DataWindow::scaleChannelsInView(int height)
 {
     for(int i = 0; i<ui->m_tableView_rawTableView->verticalHeader()->count(); i++)
         ui->m_tableView_rawTableView->setRowHeight(i, height);
@@ -235,59 +218,7 @@ void DataWindow::initMVCSettings()
 
     //Enable event fitlering for the viewport in order to intercept mouse events
     ui->m_tableView_rawTableView->viewport()->installEventFilter(this);
-
-    //-----------------------------------
-    //------ Init "dockable" view -------
-    //-----------------------------------
-    m_pUndockedDataView->setModel(m_pRawModel);
-    m_pUndockedDataView->setItemDelegate(m_pRawDelegate);
-
-    m_pUndockedDataView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->m_iDefaultPlotHeight);
-    m_pUndockedDataView->setColumnHidden(0,true); //because content is plotted jointly with column=1
-    m_pUndockedDataView->resizeColumnsToContents();
-
-    m_pUndockedDataView->setAutoScroll(false);
-    m_pUndockedDataView->setSelectionBehavior(QAbstractItemView::SelectItems);
-    m_pUndockedDataView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
-    m_pUndockedDataView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
-    m_pUndockedDataView->setShowGrid(false);
-    m_pUndockedDataView->horizontalHeader()->setVisible(false);
-
-    m_pUndockedDataView->verticalScrollBar()->setVisible(false);
-    m_pUndockedDataView->horizontalScrollBar()->setVisible(false);
-
-    //connect QScrollBar with model in order to reload data samples
-    connect(m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::valueChanged,
-            m_pRawModel,&RawModel::updateScrollPos);
-
-    //---------------------------------------------------------
-    //--------- Interconnect docked and undocked view ---------
-    //---------------------------------------------------------
-    //Scrolling ui->m_tableView_rawTableView ---> m_pUndockedDataView
-    connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
-            m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::setValue);
-    connect(ui->m_tableView_rawTableView->verticalScrollBar(),&QScrollBar::valueChanged,
-            m_pUndockedDataView->verticalScrollBar(),&QScrollBar::setValue);
-
-    //Selection ui->m_tableView_rawTableView ---> m_pUndockedDataView
-    connect(ui->m_tableView_rawTableView,&QTableView::clicked,
-            m_pUndockedDataView,&QTableView::setCurrentIndex);
 }
-
-
-//*************************************************************************************************************
-
-void DataWindow::initUndockedWindow()
-{
-    //Add second data view to undocked window
-    m_pUndockedDataViewLayout = new QVBoxLayout(m_pUndockedViewWidget);
-    m_pUndockedDataViewLayout->addWidget(m_pUndockedDataView);
-    m_pUndockedViewWidget->setLayout(m_pUndockedDataViewLayout);
-    m_pUndockedViewWidget->hide();
-
-    m_pUndockedViewWidget->setWindowTitle("Data plot");
-}
-
 
 //*************************************************************************************************************
 
@@ -339,6 +270,12 @@ void DataWindow::initToolBar()
     showEventManager->setStatusTip(tr("Toggle the event manager"));
     connect(showEventManager, &QAction::triggered, m_pMainWindow, &MainWindow::showEventWindow);
     toolBar->addAction(showEventManager);
+
+    //Toggle visibility of the filter window
+    QAction* showFilterWindow = new QAction(QIcon(":/Resources/Images/showFilterWindow.png"),tr("Toggle filter window"), this);
+    showFilterWindow->setStatusTip(tr("Toggle filter window"));
+    connect(showFilterWindow, &QAction::triggered, m_pMainWindow, &MainWindow::showFilterWindow);
+    toolBar->addAction(showFilterWindow);
 
     //Toggle visibility of the Selection manager
     QAction* showSelectionManager = new QAction(QIcon(":/Resources/Images/showSelectionManager.png"),tr("Toggle selection manager"), this);
@@ -452,8 +389,8 @@ void DataWindow::initLabels()
 
     //Set color
     QPalette palette;
-    QColor textColor = m_qSettings.value("DataMarker/data_marker_color", QColor (227,6,19)).value<QColor>();
-    textColor.setAlpha(DATA_MARKER_OPACITY);
+    QColor textColor = m_qSettings.value("DataMarker/data_marker_color", QColor(93,177,47)).value<QColor>();
+    //textColor.setAlpha(DATA_MARKER_OPACITY);
     palette.setColor(QPalette::WindowText, textColor);
 
     QColor windowColor;
@@ -522,21 +459,19 @@ bool DataWindow::eventFilter(QObject *object, QEvent *event)
     }
 
     //Deactivate grabbing gesture when scrollbars or vertical header are selected
-    if ((object == m_pUndockedDataView->horizontalScrollBar() || object == ui->m_tableView_rawTableView->horizontalScrollBar() ||
-         object == m_pUndockedDataView->verticalScrollBar() || object == ui->m_tableView_rawTableView->verticalScrollBar() ||
-         object == m_pUndockedDataView->verticalHeader() || object == ui->m_tableView_rawTableView->verticalHeader())
+    if ((object == ui->m_tableView_rawTableView->horizontalScrollBar() ||
+         object == ui->m_tableView_rawTableView->verticalScrollBar() ||
+         object == ui->m_tableView_rawTableView->verticalHeader())
         && event->type() == QEvent::Enter) {
-        QScroller::ungrabGesture(m_pUndockedDataView);
         QScroller::ungrabGesture(ui->m_tableView_rawTableView);
         return true;
     }
 
     //Activate grabbing gesture when scrollbars or vertical header are deselected
-    if ((object == m_pUndockedDataView->horizontalScrollBar() || object == ui->m_tableView_rawTableView->horizontalScrollBar()||
-         object == m_pUndockedDataView->verticalScrollBar() || object == ui->m_tableView_rawTableView->verticalScrollBar()||
-         object == m_pUndockedDataView->verticalHeader() || object == ui->m_tableView_rawTableView->verticalHeader())
+    if ((object == ui->m_tableView_rawTableView->horizontalScrollBar() ||
+         object == ui->m_tableView_rawTableView->verticalScrollBar() ||
+         object == ui->m_tableView_rawTableView->verticalHeader())
         && event->type() == QEvent::Leave) {
-        QScroller::grabGesture(m_pUndockedDataView, QScroller::LeftMouseButtonGesture);
         QScroller::grabGesture(ui->m_tableView_rawTableView, QScroller::LeftMouseButtonGesture);
         return true;
     }
@@ -693,21 +628,6 @@ void DataWindow::addEventToEventModel()
 
 //*************************************************************************************************************
 
-void DataWindow::undockDataViewToWindow()
-{
-    //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
-    if(!m_pUndockedViewWidget->isVisible())
-    {
-        m_pUndockedViewWidget->show();
-        m_pUndockedViewWidget->raise();
-    }
-    else // if visible raise the widget to be sure that it is not obscured by other windows
-        m_pUndockedViewWidget->hide();
-}
-
-
-//*************************************************************************************************************
-
 void DataWindow::updateMarkerPosition()
 {
     //Get boundary rect coordinates for table view
@@ -784,14 +704,12 @@ bool DataWindow::pinchTriggered(QPinchGesture *gesture)
         emit scaleChannels(gesture->scaleFactor());
         qDebug()<<"ungrab";
         ui->m_tableView_rawTableView->setSelectionMode(QAbstractItemView::NoSelection);
-        QScroller::ungrabGesture(m_pUndockedDataView);
         QScroller::ungrabGesture(ui->m_tableView_rawTableView);
     }
 
     if (gesture->state() == Qt::GestureFinished) {
         qDebug()<<"Finished gesture - grab again";
         ui->m_tableView_rawTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-        QScroller::grabGesture(m_pUndockedDataView, QScroller::LeftMouseButtonGesture);
         QScroller::grabGesture(ui->m_tableView_rawTableView, QScroller::LeftMouseButtonGesture);
     }
 

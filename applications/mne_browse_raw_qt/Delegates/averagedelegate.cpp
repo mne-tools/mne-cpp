@@ -1,16 +1,16 @@
 //=============================================================================================================
 /**
-* @file     eventdelegate.h
+* @file     averagedelegate.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 *           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     August, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,68 +31,53 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief Contains the declaration of the EventDelegate class.
+* @brief    Implementation of AverageDelegate of mne_browse_raw_qt
 *
 */
-
-#ifndef EVENTDELEGATE_H
-#define EVENTDELEGATE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../Models/eventmodel.h"
+#include "averagedelegate.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
-
-#include <QItemDelegate>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
-#include <QComboBox>
-#include <QDebug>
-#include <QSettings>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEBrowseRawQt
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace MNEBrowseRawQt
-{
+using namespace MNEBrowseRawQt;
+using namespace Eigen;
 
 
+//*************************************************************************************************************
 //=============================================================================================================
-/**
-* DECLARE CLASS EventDelegate
-*/
-class EventDelegate : public QItemDelegate
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+AverageDelegate::AverageDelegate(QObject *parent) :
+    QItemDelegate(parent)
 {
-    Q_OBJECT
+}
 
-public:
-    EventDelegate(QObject *parent = 0);
 
-    //=========================================================================================================
-    /**
-    * Reimplemented virtual functions
-    *
-    */
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    void setEditorData(QWidget *editor, const QModelIndex &index) const;
-    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
-    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+//*************************************************************************************************************
 
-private:
-    QSettings       m_qSettings;            /**< QSettings variable used to write or read from independent application sessions. */
-};
+void AverageDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+}
 
-} //NAMESPACE
 
-#endif // EVENTDELEGATE_H
+//*************************************************************************************************************
+
+void AverageDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs) const
+{
+}

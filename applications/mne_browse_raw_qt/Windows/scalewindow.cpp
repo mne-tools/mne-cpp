@@ -94,7 +94,7 @@ void ScaleWindow::init()
             this,&ScaleWindow::scaleChannelValueChanged);
 
     //Connect view scaling spin boxes
-    connect(ui->m_doubleSpinBox_channelHeight,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+    connect(ui->m_SpinBox_channelHeight,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this,&ScaleWindow::scaleViewValueChanged);
 }
 
@@ -233,5 +233,5 @@ void ScaleWindow::scaleChannelValueChanged()
 
 void ScaleWindow::scaleViewValueChanged()
 {
-    emit scalingViewValueChanged(ui->m_doubleSpinBox_channelHeight->value());
+    emit scalingViewValueChanged(ui->m_SpinBox_channelHeight->value());
 }

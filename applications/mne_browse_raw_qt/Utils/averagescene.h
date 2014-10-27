@@ -1,16 +1,15 @@
 //=============================================================================================================
 /**
-* @file     eventdelegate.h
+* @file     averagescene.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     August, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,19 +30,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief Contains the declaration of the EventDelegate class.
+* @brief    Contains the declaration of the AverageScene class.
 *
 */
 
-#ifndef EVENTDELEGATE_H
-#define EVENTDELEGATE_H
+#ifndef AVERAGESCENE_H
+#define AVERAGESCENE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../Models/eventmodel.h"
+#include "layoutscene.h"
+#include "averagesceneitem.h"
+#include "channelsceneitem.h"
 
 
 //*************************************************************************************************************
@@ -51,17 +52,12 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QItemDelegate>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
-#include <QComboBox>
-#include <QDebug>
-#include <QSettings>
+#include <QGraphicsScene>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEBrowseRawQt
+// DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
 
 namespace MNEBrowseRawQt
@@ -70,29 +66,33 @@ namespace MNEBrowseRawQt
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EventDelegate
+* AverageScene...
+*
+* @brief The AverageScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
 */
-class EventDelegate : public QItemDelegate
+class AverageScene : public LayoutScene
 {
     Q_OBJECT
 
 public:
-    EventDelegate(QObject *parent = 0);
+    //=========================================================================================================
+    /**
+    * Constructs a AverageScene.
+    */
+    explicit AverageScene(QGraphicsView* view, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Reimplemented virtual functions
+    * Repaints all items from the layout data in the scene.
     *
+    *  @param [in] selectedChannelItems items which are to painted to the average scene
     */
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    void setEditorData(QWidget *editor, const QModelIndex &index) const;
-    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
-    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
 
 private:
-    QSettings       m_qSettings;            /**< QSettings variable used to write or read from independent application sessions. */
+    QList<ChannelSceneItem*> m_lSelectedChannelItems ;        /**< Holds the selected channels from the selection manager.*/
 };
 
-} //NAMESPACE
+} // NAMESPACE
 
-#endif // EVENTDELEGATE_H
+#endif // AverageScene_H

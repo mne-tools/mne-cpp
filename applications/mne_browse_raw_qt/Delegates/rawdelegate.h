@@ -125,6 +125,12 @@ class RawDelegate : public QAbstractItemDelegate
     Q_OBJECT
 public:
     RawDelegate(QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Reimplemented virtual functions
+    *
+    */
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
@@ -165,7 +171,7 @@ private:
     * @param[in] index QModelIndex for accessing associated data and model object.
     * @param[in,out] path The QPointerPath to create for the data plot.
     */
-    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs, QList<RowVectorPair> &listPairsMeans) const;
+    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs, double channelMean) const;
 
     //=========================================================================================================
     /**
@@ -186,8 +192,8 @@ private:
     void plotEvents(const QModelIndex &index, const QStyleOptionViewItem &option, QPainter *painter) const;
 
     //Settings
-    qint8           m_nhlines;              /**< Number of horizontal lines for the grid plot */
-    QSettings       m_qSettings;
+    qint8           m_nhlines;              /**< Number of horizontal lines for the grid plot. */
+    QSettings       m_qSettings;            /**< QSettings variable used to write or read from independent application sessions. */
 
     //Event model view
     EventModel*     m_pEventModel;           /**< Pointer to the event model. */

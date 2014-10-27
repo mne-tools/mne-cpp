@@ -110,13 +110,16 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
             painter->setBrushOrigin(oldBO);
         }
 
-        //Get data and means
+        //Get data and mean
         QVariant variant = index.model()->data(index,Qt::DisplayRole);
         QList<RowVectorPair> listPairs = variant.value<QList<RowVectorPair> >();
 
-        QModelIndex meanIndex = index.model()->index(index.row(),2);
-        QVariant variantMeans = index.model()->data(meanIndex,RawModelRoles::GetChannelMean);
-        QList<RowVectorPair> listPairsMeans = variantMeans.value<QList<RowVectorPair> >();
+        double channelMean = 0;
+        if(m_bRemoveDC) {
+            QModelIndex meanIndex = index.model()->index(index.row(),2);
+            QVariant channelMeanVariant = index.model()->data(meanIndex,RawModelRoles::GetChannelMean);
+            channelMean = channelMeanVariant.toDouble();
+        }
 
         const RawModel* t_rawModel = (static_cast<const RawModel*>(index.model()));
 
@@ -136,7 +139,7 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
         //Plot data path
         path = QPainterPath(QPointF(option.rect.x()+t_rawModel->relFiffCursor(),option.rect.y()));
-        createPlotPath(index, option, path, listPairs, listPairsMeans);
+        createPlotPath(index, option, path, listPairs, channelMean);
 
         if(option.state & QStyle::State_Selected) {
             pen.setStyle(Qt::SolidLine);
@@ -206,7 +209,7 @@ void RawDelegate::setScaleWindow(ScaleWindow *scaleWindow)
 
 //*************************************************************************************************************
 
-void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs, QList<RowVectorPair>& listPairsMeans) const
+void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs, double channelMean) const
 {
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = (static_cast<const RawModel*>(index.model()))->m_chInfolist[index.row()].kind;
@@ -260,10 +263,7 @@ void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionVie
             double val = *(listPairs[i].first+j);
 
             //subtract mean of the channel here (if wanted by the user)
-            if(m_bRemoveDC)
-                dValue = (val - *(listPairsMeans[i].first))*dScaleY;
-            else
-                dValue = val*dScaleY;
+            dValue = (val - channelMean)*dScaleY;
 
             double newY = y_base+dValue;
 

@@ -55,11 +55,15 @@ using namespace MNEBrowseRawQt;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AverageWindow::AverageWindow(QWidget *parent) :
-    QDockWidget(parent),
-    ui(new Ui::AverageWindow)
+AverageWindow::AverageWindow(QWidget *parent, QFile &file)
+: QDockWidget(parent)
+, ui(new Ui::AverageWindow)
 {
     ui->setupUi(this);
+
+    initMVC(file);
+    initTableViewWidgets();
+    initAverageSceneView();
 }
 
 
@@ -68,4 +72,114 @@ AverageWindow::AverageWindow(QWidget *parent) :
 AverageWindow::~AverageWindow()
 {
     delete ui;
+}
+
+
+//*************************************************************************************************************
+
+AverageModel* AverageWindow::getAverageModel()
+{
+    return m_pAverageModel;
+}
+
+
+//*************************************************************************************************************
+
+void AverageWindow::channelSelectionManagerChanged(const QList<QGraphicsItem*> &selectedChannelItems)
+{
+    m_pAverageScene->repaintItems(selectedChannelItems);
+}
+
+
+//*************************************************************************************************************
+
+void AverageWindow::initMVC(QFile &file)
+{
+    //Setup average model
+    if(file.exists())
+        m_pAverageModel = new AverageModel(file, this);
+    else
+        m_pAverageModel = new AverageModel(this);
+
+    //Setup average delegate
+    m_pAverageDelegate = new AverageDelegate(this);
+
+    //Connect changes in the average data model to average delegate
+//    connect(m_pAverageModel, &AverageModel::dataChanged,
+//            this, &AverageWindow::onDataChanged);
+}
+
+
+//*************************************************************************************************************
+
+void AverageWindow::initTableViewWidgets()
+{
+    //Set average model to list widget
+    ui->m_tableView_loadedSets->setModel(m_pAverageModel);
+    ui->m_tableView_loadedSets->setColumnHidden(1,true); //hide second column because the average model holds the aspect kind for this column
+    ui->m_tableView_loadedSets->setColumnHidden(4,true); //hide last column because the average model holds the data types for this column
+    ui->m_tableView_loadedSets->resizeColumnsToContents();
+    ui->m_tableView_loadedSets->adjustSize();
+    ui->m_tableView_loadedSets->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+
+    //Set initial selection
+    ui->m_tableView_loadedSets->selectionModel()->select(QItemSelection(m_pAverageModel->index(0,0,QModelIndex()), m_pAverageModel->index(0,3,QModelIndex())),
+                                                         QItemSelectionModel::Select);
+
+    //Connect selection of the loaded evoked files
+    connect(ui->m_tableView_loadedSets->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &AverageWindow::onSelectionChanged);
+}
+
+
+//*************************************************************************************************************
+
+void AverageWindow::initAverageSceneView()
+{
+    //Create average scene and set view
+    m_pAverageScene = new AverageScene(ui->m_graphicsView_layout, this);
+    ui->m_graphicsView_layout->setScene(m_pAverageScene);
+}
+
+
+//*************************************************************************************************************
+
+void AverageWindow::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+{
+    Q_UNUSED(deselected);
+    Q_UNUSED(selected);
+
+    //Get current items from the average scene
+    QList<QGraphicsItem *> currentAverageSceneItems = m_pAverageScene->items();
+
+    //Set new data for all averageSceneItems
+    for(int i = 0; i<currentAverageSceneItems.size(); i++) {
+        AverageSceneItem* averageSceneItemTemp = static_cast<AverageSceneItem*>(currentAverageSceneItems.at(i));
+
+        averageSceneItemTemp->m_lAverageData.clear();
+
+        //Do for all selected evoked sets
+        for(int u = 0; u<selected.indexes().size(); u++) {
+            //Get only the necessary data from the average model (use column 4)
+            QModelIndex index = selected.indexes().at(u);
+
+            FiffInfo fiffInfo = m_pAverageModel->data(m_pAverageModel->index(index.row(), 4), AverageModelRoles::GetFiffInfo).value<FiffInfo>();
+            MatrixXd averageData = m_pAverageModel->data(m_pAverageModel->index(index.row(), 4), AverageModelRoles::GetAverageData).value<MatrixXd>();
+            int first = m_pAverageModel->data(m_pAverageModel->index(index.row(), 2), AverageModelRoles::GetFirstSample).toInt();
+            int last = m_pAverageModel->data(m_pAverageModel->index(index.row(), 3), AverageModelRoles::GetLastSample).toInt();
+
+            //Get the averageScenItem specific data row
+            QStringList chNames = fiffInfo.ch_names;
+
+            int channelNumber = chNames.indexOf(averageSceneItemTemp->m_sChannelName);
+            if(channelNumber != -1) {
+                averageSceneItemTemp->m_firstLastSample.first = first;
+                averageSceneItemTemp->m_firstLastSample.second = last;
+                averageSceneItemTemp->m_lAverageData.append(averageData.row(channelNumber));
+            }
+        }
+    }
+
+    m_pAverageScene->update();
+
 }

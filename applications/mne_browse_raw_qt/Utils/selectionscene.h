@@ -1,16 +1,15 @@
 //=============================================================================================================
 /**
-* @file     eventdelegate.h
+* @file     selectionscene.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     August, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,19 +30,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief Contains the declaration of the EventDelegate class.
+* @brief    Contains the declaration of the SelectionScene class.
 *
 */
 
-#ifndef EVENTDELEGATE_H
-#define EVENTDELEGATE_H
+#ifndef SELECTIONSCENE_H
+#define SELECTIONSCENE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../Models/eventmodel.h"
+#include "layoutscene.h"
+#include "channelsceneitem.h"
 
 
 //*************************************************************************************************************
@@ -51,17 +51,14 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QItemDelegate>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
-#include <QComboBox>
-#include <QDebug>
-#include <QSettings>
+#include <QGraphicsScene>
+#include <QWidget>
+#include <QMutableListIterator>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEBrowseRawQt
+// DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
 
 namespace MNEBrowseRawQt
@@ -70,29 +67,38 @@ namespace MNEBrowseRawQt
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EventDelegate
+* SelectionScene...
+*
+* @brief The SelectionScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
 */
-class EventDelegate : public QItemDelegate
+class SelectionScene : public LayoutScene
 {
     Q_OBJECT
 
 public:
-    EventDelegate(QObject *parent = 0);
+    //=========================================================================================================
+    /**
+    * Constructs a SelectionScene.
+    */
+    explicit SelectionScene(QGraphicsView* view, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Reimplemented virtual functions
+    * Updates layout data.
     *
+    * @param [in] layoutMap layout data map.
     */
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    void setEditorData(QWidget *editor, const QModelIndex &index) const;
-    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
-    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    void repaintItems(const QMap<QString,QVector<double> > &layoutMap);
 
-private:
-    QSettings       m_qSettings;            /**< QSettings variable used to write or read from independent application sessions. */
+    //=========================================================================================================
+    /**
+    * Hides all items described in list.
+    *
+    * @param [in] list string list with items name which are to be hidden.
+    */
+    void hideItems(QStringList visibleItems);
 };
 
-} //NAMESPACE
+} // NAMESPACE
 
-#endif // EVENTDELEGATE_H
+#endif // SelectionScene_H

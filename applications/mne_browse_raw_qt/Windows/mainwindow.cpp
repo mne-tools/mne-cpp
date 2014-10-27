@@ -60,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
 , m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
 //, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
+, m_qEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
 , m_qSettings()
 , m_rawSettings()
 , ui(new Ui::MainWindowWidget)
@@ -96,7 +97,7 @@ void MainWindow::setupWindowWidgets()
 
     //Create dockble event window - QTDesigner used - see /FormFiles
     m_pEventWindow = new EventWindow(this);
-    addDockWidget(Qt::RightDockWidgetArea, m_pEventWindow);
+    addDockWidget(Qt::LeftDockWidgetArea, m_pEventWindow);
     m_pEventWindow->hide();
 
     //Create filter window - QTDesigner used - see /FormFiles
@@ -117,17 +118,17 @@ void MainWindow::setupWindowWidgets()
     addDockWidget(Qt::BottomDockWidgetArea, m_pSelectionManagerWindow);
     m_pSelectionManagerWindow->hide();
 
-    //Create selection manager window - QTDesigner used - see /FormFiles
-    m_pAverageWindow = new AverageWindow(this);
+    //Create average manager window - QTDesigner used - see /FormFiles
+    m_pAverageWindow = new AverageWindow(this, m_qEvokedFile);
     addDockWidget(Qt::BottomDockWidgetArea, m_pAverageWindow);
     m_pAverageWindow->hide();
 
-    //Create selection manager window - QTDesigner used - see /FormFiles
+    //Create scale window - QTDesigner used - see /FormFiles
     m_pScaleWindow = new ScaleWindow(this);
-    addDockWidget(Qt::RightDockWidgetArea, m_pScaleWindow);
+    addDockWidget(Qt::LeftDockWidgetArea, m_pScaleWindow);
     m_pScaleWindow->hide();
 
-    //Init windows
+    //Init windows - TODO: get rid of this here, do this inside the window classes
     m_pDataWindow->init();
     m_pEventWindow->init();
     m_pFilterWindow->init();
@@ -142,9 +143,13 @@ void MainWindow::setupWindowWidgets()
     connect(m_pDataWindow, &DataWindow::scaleChannels,
             m_pScaleWindow, &ScaleWindow::scaleAllChannels);
 
-    //Hide non selected channels
+    //Hide non selected channels in the data view
     connect(m_pSelectionManagerWindow, &SelectionManagerWindow::showSelectedChannelsOnly,
             m_pDataWindow, &DataWindow::showSelectedChannelsOnly);
+
+    //Connect selection manager with average manager
+    connect(m_pSelectionManagerWindow, &SelectionManagerWindow::selectionChanged,
+            m_pAverageWindow, &AverageWindow::channelSelectionManagerChanged);
 
     //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
@@ -164,7 +169,8 @@ void MainWindow::connectMenus()
     connect(ui->m_writeAction, SIGNAL(triggered()), this, SLOT(writeFile()));
     connect(ui->m_loadEvents, SIGNAL(triggered()), this, SLOT(loadEvents()));
     connect(ui->m_saveEvents, SIGNAL(triggered()), this, SLOT(saveEvents()));
-    connect(ui->m_quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+    connect(ui->m_loadEvokedAction, SIGNAL(triggered()), this, SLOT(loadEvoked()));
+    connect(ui->m_quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));    
 
     //Adjust
     connect(ui->m_filterAction, SIGNAL(triggered()), this, SLOT(showFilterWindow()));
@@ -205,6 +211,7 @@ void MainWindow::setWindowStatus()
     setWindowTitle(title);
 
     //Set status bar
+    //Set data file informations
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
         int idx = m_qFileRaw.fileName().lastIndexOf("/");
         QString filename = m_qFileRaw.fileName().remove(0,idx+1);
@@ -213,6 +220,7 @@ void MainWindow::setWindowStatus()
     else
         title = QString("No data file");
 
+    //Set event file informations
     if(m_pEventWindow->getEventModel()->m_bFileloaded) {
         int idx = m_qEventFile.fileName().lastIndexOf("/");
         QString filename = m_qEventFile.fileName().remove(0,idx+1);
@@ -221,6 +229,16 @@ void MainWindow::setWindowStatus()
     }
     else
         title.append("  -  No event file");
+
+    //Set evoked file informations
+    if(m_pAverageWindow->getAverageModel()->m_bFileloaded) {
+        int idx = m_qEvokedFile.fileName().lastIndexOf("/");
+        QString filename = m_qEvokedFile.fileName().remove(0,idx+1);
+
+        title.append(QString("  -  Evoked file: %1").arg(filename));
+    }
+    else
+        title.append("  -  No evoked file");
 
     //Add permanent widget to status bar after deleting old one
     QObjectList cildrenList = statusBar()->children();
@@ -342,7 +360,8 @@ void MainWindow::loadEvents()
     setWindowStatus();
 
     //Show event window
-    showEventWindow();
+    if(!m_pEventWindow->isVisible())
+        m_pEventWindow->show();
 }
 
 
@@ -369,6 +388,37 @@ void MainWindow::saveEvents()
     }
     else
         qDebug("ERROR saving fiff event data file %s",filename.toLatin1().data());
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::loadEvoked()
+{
+    QString filename = QFileDialog::getOpenFileName(this,QString("Open evoked fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif evoked data files (*-ave.fif);;fif data files (*.fif)"));
+
+    if(filename.isEmpty())
+    {
+        qDebug("User aborted loading fiff evoked file");
+        return;
+    }
+
+    if(m_qEvokedFile.isOpen())
+        m_qEvokedFile.close();
+
+    m_qEvokedFile.setFileName(filename);
+
+    if(m_pAverageWindow->getAverageModel()->loadEvokedData(m_qEvokedFile))
+        qDebug() << "Fiff evoked data file" << filename << "loaded.";
+    else
+        qDebug("ERROR loading evoked event data file %s",filename.toLatin1().data());
+
+    //Update status bar
+    setWindowStatus();
+
+    //Show average window
+    if(!m_pAverageWindow->isVisible())
+        m_pAverageWindow->show();
 }
 
 

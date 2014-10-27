@@ -31,35 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    This class represents the model of the model/view framework of mne_browse_raw_qt application.
-*           It is derived from QAbstractTableModel so the virtual functions rowCount(),columnCount() and data()
-*           needed to be reimplemented. The delegate requests the data for any individual table cell by
-*           invoking data(QModelIndex index, int role) and a certain role. DisplayRole is the standard role
-*           for requesting the plain data. Other roles such as BackgroundRole are requested to fill a cell
-*           with a certain background color with respect to the individual index.
-*           For further information see [1].
-*
-*           The way how the data is organized is totally up to the model. In our case, the raw and processed
-*           data is stored in stored in the two matrices m_data[i] and m_procData[i] (both are QList that contains MatrixXdR), respectively. (nchans x m_iWindowSize)
-*           The data is loaded and displayed blockwise. If the user scrolls close (meaning distanced smaller than
-*           m_iReloadPos) to the loaded edge, the subsequent block is loaded from the fiff file. The maximum number
-*           of loaded window blocks is determined by the parameter m_maxWindows. If m_maxWindows is reached and another
-*           block is to be loaded, the first or last block (depending on whether the user scrolls to the right or left edge)
-*           is removed from m_data, pretty much like a circular buffer. The logic of the reloading is managed by the
-*           slot updateScrollPos, which obtains the value from the horizontal QScrollBar being part of the connected TableView.
-*
-*           In order to not freeze the GUI when reloading new data or filtering data, the RawModel class makes heavy use
-*           of the QtConcurrent features. [2]
-*           Therefore, the methods updateOperatorsConcurrently() and readSegment() is run in a background-thread. Once the results
-*           are ready the m_operatorFutureWatcher and m_reloadFutureWatcher emits a signal that is connect to the slots
-*           insertProcessedData() and insertReloadedData(), respectively.
-*
-*           MNEOperators such as FilterOperators are stored in m_Operators. The MNEOperators that are applied to any
-*           individual channel are stored in the QMap m_assignedOperators.
-*
-*           [1] http://qt-project.org/doc/qt-5/QAbstractTableModel.html
-*           [2] http://qt-project.org/doc/qt-5.0/qtconcurrent/qtconcurrent-index.html
-*
+* @brief    This class represents the event model of the model/view framework of mne_browse_raw_qt application.
 */
 
 #ifndef EVEMODEL_H
@@ -131,6 +103,11 @@ public:
     EventModel(QObject *parent);
     EventModel(QFile& qFile, QObject *parent);
 
+    //=========================================================================================================
+    /**
+    * Reimplemented virtual functions
+    *
+    */
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
@@ -186,14 +163,14 @@ public:
     * getFiffInfo returns the fiffinfo
     *
     */
-    FiffInfo getFiffInfo();
+    FiffInfo getFiffInfo() const;
 
     //=========================================================================================================
     /**
     * getFirstLastSample returns the first/last sample in form of a QPair
     *
     */
-    QPair<int, int> getFirstLastSample();
+    QPair<int, int> getFirstLastSample() const;
 
     //=========================================================================================================
     /**
@@ -208,7 +185,7 @@ public:
     * getEventTypeList returns the event type list
     *
     */
-    QStringList getEventTypeList();
+    QStringList getEventTypeList() const;
 
     //=========================================================================================================
     /**
@@ -216,28 +193,32 @@ public:
     */
     void clearModel();
 
-    bool            m_bFileloaded;      /**< true when a Fiff event file is loaded */
+    bool            m_bFileloaded;              /**< true when a Fiff event file is loaded. */
 
 private:
-    QVector<int>    m_dataSamples;              /**< Vector that holds the sample alues for each loaded event */
-    QVector<int>    m_dataTypes;                /**< Vector that holds the type alues for each loaded event */
-    QVector<int>    m_dataIsUserEvent;          /**< Vector that holds the flag whether the event is user defined or loaded from file */
+    QVector<int>    m_dataSamples;              /**< Vector that holds the sample alues for each loaded event. */
+    QVector<int>    m_dataTypes;                /**< Vector that holds the type alues for each loaded event. */
+    QVector<int>    m_dataIsUserEvent;          /**< Vector that holds the flag whether the event is user defined or loaded from file. */
 
-    QVector<int>    m_dataSamples_Filtered;     /**< Filtered Vector that holds the sample alues for each loaded event */
-    QVector<int>    m_dataTypes_Filtered;       /**< Filtered Vector that holds the type alues for each loaded event */
-    QVector<int>    m_dataIsUserEvent_Filtered; /**< Filtered Vector that holds the flag whether the event is user defined or loaded from file */
+    QVector<int>    m_dataSamples_Filtered;     /**< Filtered Vector that holds the sample alues for each loaded event. */
+    QVector<int>    m_dataTypes_Filtered;       /**< Filtered Vector that holds the type alues for each loaded event. */
+    QVector<int>    m_dataIsUserEvent_Filtered; /**< Filtered Vector that holds the flag whether the event is user defined or loaded from file. */
 
-    FiffInfo        m_fiffInfo;                 /**< fiff info of whole fiff file */
+    FiffInfo        m_fiffInfo;                 /**< fiff info of whole fiff file. */
 
-    int             m_iFirstSample;             /**< holds the first/starting sample of the fiff data file */
-    int             m_iLastSample;              /**< holds the last/ending sample of the fiff data file */
-    int             m_iCurrentMarkerPos;        /**< holds the current marker position */
-    QSettings       m_qSettings;                /**< setting paramter to access globally defined values. see rawsettings.cpp and rawsettings.h */
-    QString         m_sFilterEventType;         /**< holds the event txype which is to be filtered*/
+    int             m_iFirstSample;             /**< holds the first/starting sample of the fiff data file. */
+    int             m_iLastSample;              /**< holds the last/ending sample of the fiff data file. */
+    int             m_iCurrentMarkerPos;        /**< holds the current marker position. */
+    QSettings       m_qSettings;                /**< setting paramter to access globally defined values. see rawsettings.cpp and rawsettings.h. */
+    QString         m_sFilterEventType;         /**< holds the event txype which is to be filtered.*/
 
-    QStringList     m_eventTypeList;            /**< holds all loaded event types */
+    QStringList     m_eventTypeList;            /**< holds all loaded event types. */
 
 signals:
+    //=========================================================================================================
+    /**
+    * updateEventTypes is emmited whenever the list of stored event type chnges
+    */
     void updateEventTypes();
 
 };

@@ -63,7 +63,7 @@ SelectionManagerWindow::SelectionManagerWindow(QWidget *parent) :
 
     //Init gui elements
     initListWidgets();
-    initGraphicsView();
+    initSelectionSceneView();
     initComboBoxes();
 }
 
@@ -95,17 +95,17 @@ void SelectionManagerWindow::setCurrentlyLoadedFiffChannels(FiffInfo loadedFiffI
 
 void SelectionManagerWindow::highlightChannels(QStringList channelList)
 {
-    QList<QGraphicsItem *> allSceneItems = m_pLayoutScene->items();
+    QList<QGraphicsItem *> allSceneItems = m_pSelectionScene->items();
 
     for(int i = 0; i<allSceneItems.size(); i++) {
         ChannelSceneItem* item = static_cast<ChannelSceneItem*>(allSceneItems.at(i));
-        if(channelList.contains(item->getChannelName()))
-            item->setHighlightChannel(true);
+        if(channelList.contains(item->m_sChannelName))
+            item->m_bHighlightItem = true;
         else
-            item->setHighlightChannel(false);
+            item->m_bHighlightItem = false;
     }
 
-    m_pLayoutScene->update();
+    m_pSelectionScene->update();
 }
 
 
@@ -113,17 +113,17 @@ void SelectionManagerWindow::highlightChannels(QStringList channelList)
 
 void SelectionManagerWindow::selectChannels(QStringList channelList)
 {
-    QList<QGraphicsItem *> allSceneItems = m_pLayoutScene->items();
+    QList<QGraphicsItem *> allSceneItems = m_pSelectionScene->items();
 
     for(int i = 0; i<allSceneItems.size(); i++) {
         ChannelSceneItem* item = static_cast<ChannelSceneItem*>(allSceneItems.at(i));
-        if(channelList.contains(item->getChannelName()))
+        if(channelList.contains(item->m_sChannelName))
             item->setSelected(true);
         else
             item->setSelected(false);
     }
 
-    m_pLayoutScene->update();
+    m_pSelectionScene->update();
 }
 
 
@@ -152,10 +152,10 @@ QStringList SelectionManagerWindow::getSelectedChannels()
 
 //*************************************************************************************************************
 
-QListWidgetItem* SelectionManagerWindow::getItem(QListWidget* listWidget, QString text)
+QListWidgetItem* SelectionManagerWindow::getItem(QListWidget* listWidget, QString channelName)
 {
     for(int i=0; i<listWidget->count(); i++)
-        if(listWidget->item(i)->text() == text)
+        if(listWidget->item(i)->text() == channelName)
             return listWidget->item(i);
 
     return new QListWidgetItem();
@@ -171,7 +171,7 @@ void SelectionManagerWindow::initListWidgets()
 
     //Connect list widgets to update themselves and other list widgets when changed
     connect(ui->m_listWidget_selectionGroups, &QListWidget::itemClicked,
-                this, &SelectionManagerWindow::updateSelectionGroups);
+                this, &SelectionManagerWindow::updateSelectionGroupsList);
 
     connect(ui->m_listWidget_selectionGroups, &QListWidget::itemClicked,
                 this, &SelectionManagerWindow::updateSceneItems);
@@ -184,14 +184,14 @@ void SelectionManagerWindow::initListWidgets()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::initGraphicsView()
+void SelectionManagerWindow::initSelectionSceneView()
 {    
     //Create layout scene and set to view
-    m_pLayoutScene = new LayoutScene(ui->m_graphicsView_layoutPlot, 0);
-    ui->m_graphicsView_layoutPlot->setScene(m_pLayoutScene);
+    m_pSelectionScene = new SelectionScene(ui->m_graphicsView_layoutPlot);
+    ui->m_graphicsView_layoutPlot->setScene(m_pSelectionScene);
 
-    connect(m_pLayoutScene, &QGraphicsScene::selectionChanged,
-                this, &SelectionManagerWindow::updateUserDefinedChannels);
+    connect(m_pSelectionScene, &QGraphicsScene::selectionChanged,
+                this, &SelectionManagerWindow::updateUserDefinedChannelsList);
 }
 
 
@@ -208,9 +208,6 @@ void SelectionManagerWindow::initComboBoxes()
 
     //Initialise layout as neuromag vectorview with all channels
     loadLayout("Vectorview-all.lout");
-
-    //Initialise selection list widgets
-    loadSelectionGroups("mne_browse_raw_vv.sel");
 }
 
 
@@ -228,11 +225,11 @@ bool SelectionManagerWindow::loadLayout(QString path)
     loadSelectionGroups(ui->m_comboBox_selectionFiles->currentText());
 
     //Update scene
-    m_pLayoutScene->setNewLayout(m_layoutMap);
-    m_pLayoutScene->update();
+    m_pSelectionScene->repaintItems(m_layoutMap);
+    m_pSelectionScene->update();
 
     //Fit to view
-    ui->m_graphicsView_layoutPlot->fitInView(m_pLayoutScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+    ui->m_graphicsView_layoutPlot->fitInView(m_pSelectionScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 
     return state;
 }
@@ -254,6 +251,7 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
 
     bool state = manager->readMNESelFile(newPath, m_selectionGroupsMap);
 
+    //Create group 'All' manually (bcause this group depends on the loaded channels from the fiff data file, not on the loaded selection file)
     m_selectionGroupsMap["All"] = m_currentlyLoadedFiffChannels;
 
     //Add selection groups to list widget
@@ -270,7 +268,7 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
     ui->m_listWidget_selectionGroups->setCurrentItem(getItem(ui->m_listWidget_selectionGroups, "All"), QItemSelectionModel::Select);
 
     //Update selection
-    updateSelectionGroups(getItem(ui->m_listWidget_selectionGroups, "All"));
+    updateSelectionGroupsList(getItem(ui->m_listWidget_selectionGroups, "All"));
 
     return state;
 }
@@ -305,7 +303,7 @@ void SelectionManagerWindow::cleanUpMEGChannels()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::updateSelectionGroups(QListWidgetItem* item)
+void SelectionManagerWindow::updateSelectionGroupsList(QListWidgetItem* item)
 {
     ui->m_listWidget_visibleChannels->clear();
 
@@ -325,20 +323,20 @@ void SelectionManagerWindow::updateSceneItems()
     for(int i = 0; i<ui->m_listWidget_visibleChannels->count(); i++)
         visibleItems << ui->m_listWidget_visibleChannels->item(i)->text();
 
-    m_pLayoutScene->hideItems(visibleItems);
+    m_pSelectionScene->hideItems(visibleItems);
 }
 
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::updateUserDefinedChannels()
+void SelectionManagerWindow::updateUserDefinedChannelsList()
 {
-    QList<QGraphicsItem*> itemList = m_pLayoutScene->selectedItems();
+    QList<QGraphicsItem*> itemList = m_pSelectionScene->selectedItems();
     QStringList userDefinedChannels;
 
     for(int i = 0; i<itemList.size(); i++) {
         ChannelSceneItem* item = static_cast<ChannelSceneItem*>(itemList.at(i));
-        userDefinedChannels << item->getChannelName();
+        userDefinedChannels << item->m_sChannelName;
     }
 
     ui->m_listWidget_userDefined->clear();
@@ -368,6 +366,13 @@ void SelectionManagerWindow::updateDataView()
     }
 
     emit showSelectedChannelsOnly(selectedChannels);
+
+    //emit signal that selection was changed
+
+    if(!m_pSelectionScene->selectedItems().empty())
+        emit selectionChanged(m_pSelectionScene->selectedItems());
+    else
+        emit selectionChanged(m_pSelectionScene->items());
 }
 
 
@@ -378,7 +383,7 @@ void SelectionManagerWindow::resizeEvent(QResizeEvent* event)
     Q_UNUSED(event);
 
     //Fit scene in view
-    //ui->m_graphicsView_layoutPlot->fitInView(m_pLayoutScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+    //ui->m_graphicsView_layoutPlot->fitInView(m_pSelectionScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 
@@ -401,4 +406,6 @@ bool SelectionManagerWindow::eventFilter(QObject *obj, QEvent *event)
         // pass the event on to the parent class
         return QDockWidget::eventFilter(obj, event);
     }
+
+    return false;
 }

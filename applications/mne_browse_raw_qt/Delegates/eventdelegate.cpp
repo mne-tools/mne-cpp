@@ -68,25 +68,27 @@ QWidget *EventDelegate::createEditor(QWidget *parent,
      const QStyleOptionViewItem &/* option */,
      const QModelIndex & index) const
 {
+    const EventModel* pEventModel = static_cast<const EventModel*>(index.model());
+
     switch(index.column()) {
         case 0: {
             QSpinBox *editor = new QSpinBox(parent);
             editor->setMinimum(0);
-            editor->setMaximum(m_pEventModel->getFirstLastSample().second);
+            editor->setMaximum(pEventModel->getFirstLastSample().second);
             return editor;
         }
 
         case 1: {
             QDoubleSpinBox *editor = new QDoubleSpinBox(parent);
             editor->setMinimum(0.0);
-            editor->setMaximum(m_pEventModel->getFirstLastSample().second / m_pEventModel->getFiffInfo().sfreq);
+            editor->setMaximum(pEventModel->getFirstLastSample().second / pEventModel->getFiffInfo().sfreq);
             editor->setSingleStep(0.01);
             return editor;
         }
 
         case 2: {
             QComboBox *editor = new QComboBox(parent);
-            editor->addItems(m_pEventModel->getEventTypeList());
+            editor->addItems(pEventModel->getEventTypeList());
             return editor;
         }
     }
@@ -167,12 +169,3 @@ void EventDelegate::updateEditorGeometry(QWidget *editor,
 {
     editor->setGeometry(option.rect);
 }
-
-
-//*************************************************************************************************************
-
-void EventDelegate::setModelView(EventModel *eventModel)
-{
-    m_pEventModel = eventModel;
-}
-
