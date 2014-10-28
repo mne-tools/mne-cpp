@@ -200,6 +200,7 @@ void AverageWindow::onSelectionChanged(const QItemSelection &selected, const QIt
     }
 
     m_pAverageScene->update();
+    ui->m_graphicsView_layout->fitInView(m_pAverageScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 
