@@ -207,7 +207,7 @@ private:
     float m_DataLen;        /**< the length of data used for spectrum calculation */
     qint8 m_x_scale_type;   /**< Type of x-axis scale: normal (0) or log (1) */
 
-    QMutex mutex;       /**< mutex for spectrum */
+    QMutex m_qMutex;       /**< mutex for spectrum */
 
 };
 
