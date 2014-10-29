@@ -45,10 +45,11 @@
 #include "ui_averagewindow.h"
 #include "utils/layoutloader.h"             //MNE-CPP utils
 #include "../Utils/averagescene.h"          //MNE Browse Raw QT utils
-#include "../Models/averagemodel.h"         //MNE Browse Raw QT utils
-#include "../Delegates/averagedelegate.h"   //MNE Browse Raw QT utils
-#include "../Utils/selectionsceneitem.h"      //MNE Browse Raw QT utils
+#include "../Utils/selectionsceneitem.h"
+#include "../Utils/butterflyscene.h"
 #include "../Utils/types.h"
+#include "../Models/averagemodel.h"
+#include "../Delegates/averagedelegate.h"
 
 
 //*************************************************************************************************************
@@ -167,9 +168,12 @@ private:
 
     Ui::AverageWindow*      ui;                     /**< Pointer to the qt designer generated ui class.*/
 
-    AverageModel*           m_pAverageModel;        /**< the QAbstractTable average model being part of the model/view framework of Qt. */
-    AverageDelegate*        m_pAverageDelegate;     /**< the QItemDelegateaverage delegate being part of the model/view framework of Qt. */
-    AverageScene*           m_pAverageScene;        /**< holds the pointer to the average scene. */
+    AverageModel*           m_pAverageModel;        /**< The QAbstractTable average model being part of the model/view framework of Qt. */
+    AverageDelegate*        m_pAverageDelegate;     /**< The QItemDelegateaverage delegate being part of the model/view framework of Qt. */
+    AverageScene*           m_pAverageScene;        /**< The pointer to the average scene. */
+
+    ButterflyScene*         m_pButterflyScene;      /**< The pointer to the butterfly scene. */
+
 };
 
 } // NAMESPACE MNEBrowseRawQt

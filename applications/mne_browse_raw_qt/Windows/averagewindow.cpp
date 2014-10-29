@@ -97,6 +97,7 @@ void AverageWindow::channelSelectionManagerChanged(const QList<QGraphicsItem*> &
 void AverageWindow::scaleAveragedData(const QMap<QString,double> &scaleMap)
 {
     m_pAverageScene->setScaleMap(scaleMap);
+    m_pButterflyScene->setScaleMap(scaleMap);
 }
 
 
@@ -153,6 +154,10 @@ void AverageWindow::initAverageSceneView()
     //Create average scene and set view
     m_pAverageScene = new AverageScene(ui->m_graphicsView_layout, this);
     ui->m_graphicsView_layout->setScene(m_pAverageScene);
+
+    //Create butterfly average scene and set view
+    m_pButterflyScene = new ButterflyScene(ui->m_graphicsView_butterflyPlot, this);
+    ui->m_graphicsView_butterflyPlot->setScene(m_pButterflyScene);
 }
 
 
@@ -201,6 +206,39 @@ void AverageWindow::onSelectionChanged(const QItemSelection &selected, const QIt
 
     m_pAverageScene->update();
     ui->m_graphicsView_layout->fitInView(m_pAverageScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+
+    //Draw butterfly plot
+    m_pButterflyScene->clear();
+
+    for(int i = 0; i<selected.indexes().size(); i++) {
+        //Get only the necessary data from the average model (use column 4)
+        QModelIndex index = selected.indexes().at(i);
+
+        const FiffInfo* fiffInfo = m_pAverageModel->data(m_pAverageModel->index(index.row(), 4), AverageModelRoles::GetFiffInfo).value<const FiffInfo*>();
+        RowVectorPair averageData = m_pAverageModel->data(m_pAverageModel->index(index.row(), 4), AverageModelRoles::GetAverageData).value<RowVectorPair>();
+        int first = m_pAverageModel->data(m_pAverageModel->index(index.row(), 2), AverageModelRoles::GetFirstSample).toInt();
+        int last = m_pAverageModel->data(m_pAverageModel->index(index.row(), 3), AverageModelRoles::GetLastSample).toInt();
+        QString setName = m_pAverageModel->data(m_pAverageModel->index(index.row(), 0), Qt::DisplayRole).toString();
+
+        //Generate random colors
+        QList<QColor> butterflyColors;
+        for(int i = 0; i<fiffInfo->chs.size(); i++)
+            butterflyColors.append(QColor(qrand()%256, qrand()%256, qrand()%256));
+
+        //Create new butterfly scene item
+        ButterflySceneItem* butterflySceneItemTemp = new ButterflySceneItem(setName, FIFFV_MEG_CH, butterflyColors); //TODO: let the user decide , EEG, MEG_Grad, MEG_mag
+
+        butterflySceneItemTemp->m_lAverageData.first = averageData.first;
+        butterflySceneItemTemp->m_lAverageData.second = averageData.second;
+        butterflySceneItemTemp->m_pFiffInfo = fiffInfo;
+        butterflySceneItemTemp->m_firstLastSample.first = first;
+        butterflySceneItemTemp->m_firstLastSample.second = last;
+
+        m_pButterflyScene->addItem(butterflySceneItemTemp);
+    }
+
+    m_pButterflyScene->update();
+    ui->m_graphicsView_butterflyPlot->fitInView(m_pButterflyScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 

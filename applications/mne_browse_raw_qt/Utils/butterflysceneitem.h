@@ -47,6 +47,7 @@
 #include <fiff/fiff.h>
 #include "types.h"
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -66,6 +67,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -97,7 +99,7 @@ public:
     /**
     * Constructs a ButterflySceneItem.
     */
-    ButterflySceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor defaultColors = Qt::red);
+    ButterflySceneItem(QString setName, int setKind = FIFFV_MEG_CH, QList<QColor> &defaultColors = QList<QColor>());
 
     //=========================================================================================================
     /**
@@ -111,14 +113,12 @@ public:
     */
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    QString                 m_sChannelName;             /**< The channel name.*/
-    int                     m_iChannelNumber;           /**< The channel number.*/
-    int                     m_iChannelKind;             /**< The channel kind.*/
-    int                     m_iChannelUnit;             /**< The channel unit.*/
-    int                     m_iTotalNumberChannels;     /**< The total number of channels loaded in the curent evoked data set.*/
-    QPointF                 m_qpChannelPosition;        /**< The channels 2D position in the scene.*/
+    QString                 m_sSetName;                 /**< The channel name.*/
+    fiff_int_t              m_iSetKind;                 /**< The channel kind which is to be plotted (MEG or EEG).*/
+    const FiffInfo*         m_pFiffInfo;                /**< The fiff info.*/
+
     QList<QColor>           m_cAverageColors;           /**< The current average color.*/
-    QList<RowVectorPair>    m_lAverageData;             /**< The channels average data which is to be plotted.*/
+    RowVectorPair           m_lAverageData;             /**< The channels average data which is to be plotted.*/
     QPair<int,int>          m_firstLastSample;          /**< The first and last sample.*/
     QMap<QString,double>    m_scaleMap;                 /**< Map with all channel types and their current scaling value.*/
 
@@ -129,7 +129,7 @@ protected:
     *
     * @param [in] painter The painter used to plot in this item.
     */
-    void paintAveragePath(QPainter *painter);
+    void paintAveragePaths(QPainter *painter);
 };
 
 } // NAMESPACE MNEBrowseRawQt
