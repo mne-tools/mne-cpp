@@ -88,10 +88,7 @@ void ButterflyScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelI
     while (i.hasNext()) {
         SelectionSceneItem* SelectionSceneItemTemp = static_cast<SelectionSceneItem*>(i.next());
         ButterflySceneItem* ButterflySceneItemTemp = new ButterflySceneItem(SelectionSceneItemTemp->m_sChannelName,
-                                                                          SelectionSceneItemTemp->m_iChannelNumber,
-                                                                          SelectionSceneItemTemp->m_qpChannelPosition,
-                                                                          SelectionSceneItemTemp->m_iChannelKind,
-                                                                          SelectionSceneItemTemp->m_iChannelUnit);
+                                                                          SelectionSceneItemTemp->m_iChannelKind);
 
         this->addItem(ButterflySceneItemTemp);
     }
