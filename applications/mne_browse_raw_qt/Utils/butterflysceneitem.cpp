@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     averagesceneitem.cpp
+* @file     butterflysceneitem.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the AverageSceneItem class.
+* @brief    Contains the implementation of the ButterflySceneItem class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "averagesceneitem.h"
+#include "butterflysceneitem.h"
 
 
 //*************************************************************************************************************
@@ -56,7 +56,7 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AverageSceneItem::AverageSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor defaultColors)
+ButterflySceneItem::ButterflySceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor defaultColors)
 : m_sChannelName(channelName)
 , m_iChannelNumber(channelNumber)
 , m_qpChannelPosition(channelPosition)
@@ -77,7 +77,7 @@ AverageSceneItem::AverageSceneItem(QString channelName, int channelNumber, QPoin
 
 //*************************************************************************************************************
 
-QRectF AverageSceneItem::boundingRect() const
+QRectF ButterflySceneItem::boundingRect() const
 {
     int height = 80;
     int width = 500;
@@ -87,7 +87,7 @@ QRectF AverageSceneItem::boundingRect() const
 
 //*************************************************************************************************************
 
-void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void ButterflySceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
@@ -112,7 +112,7 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
 //*************************************************************************************************************
 
-void AverageSceneItem::paintAveragePath(QPainter *painter)
+void ButterflySceneItem::paintAveragePath(QPainter *painter)
 {
     double dMaxValue = 1e-09;
 

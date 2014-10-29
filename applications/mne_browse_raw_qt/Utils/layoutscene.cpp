@@ -173,8 +173,10 @@ void LayoutScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 //        qDebug()<<m_selectedItems.size();
 //    }
 
-    if(m_bDragMode)
+    if(m_bDragMode) {
         m_bDragMode = false;
+        this->update();
+    }
 
     QGraphicsScene::mouseReleaseEvent(mouseEvent);
 }

@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     channelsceneitem.h
+* @file     butterflyscene.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     September, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
@@ -30,19 +30,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ChannelSceneItem class.
+* @brief    Contains the declaration of the ButterflyScene class.
 *
 */
 
-#ifndef CHANNELSCENEITEM_H
-#define CHANNELSCENEITEM_H
+#ifndef BUTTERFLYSCENE_H
+#define BUTTERFLYSCENE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
+#include "layoutscene.h"
+#include "butterflysceneitem.h"
+#include "selectionsceneitem.h"
 
 
 //*************************************************************************************************************
@@ -50,66 +52,53 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGraphicsItem>
-#include <QString>
-#include <QColor>
-#include <QPainter>
-#include <QStaticText>
-#include <QDebug>
+#include <QGraphicsScene>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEBrowseRawQt
+// DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
 
 namespace MNEBrowseRawQt
 {
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-
 //=============================================================================================================
 /**
-* ChannelSceneItem...
+* ButterflyScene...
 *
-* @brief The ChannelSceneItem class provides a new data structure for visualizing channels in a 2D layout.
+* @brief The ButterflyScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
 */
-class ChannelSceneItem : public QGraphicsItem
+class ButterflyScene : public LayoutScene
 {
+    Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a ChannelSceneItem.
+    * Constructs a ButterflyScene.
     */
-    ChannelSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor averageColor = Qt::blue);
+    explicit ButterflyScene(QGraphicsView* view, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
+    * Sets the scale map to scaleMap.
+    *
+    * @param [in] scaleMap map with all channel types and their current scaling value.
     */
-    QRectF boundingRect() const;
+    void setScaleMap(const QMap<QString,double> &scaleMap);
 
     //=========================================================================================================
     /**
-    * Reimplemented paint function.
+    * Repaints all items from the layout data in the scene.
+    *
+    *  @param [in] selectedChannelItems items which are to painted to the average scene
     */
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
 
-    QString     m_sChannelName;             /**< The channel's name.*/
-    int         m_iChannelNumber;           /**< The channel number.*/
-    int         m_iChannelKind;             /**< The channel kind.*/
-    int         m_iChannelUnit;             /**< The channel unit.*/
-    QPointF     m_qpChannelPosition;        /**< The channel's 2D position in the scene.*/
-    QColor      m_cChannelColor;            /**< The current channel color.*/
-    bool        m_bHighlightItem;           /**< Whether this item is to be highlighted.*/
 };
 
-} // NAMESPACE MNEBrowseRawQt
+} // NAMESPACE
 
-#endif // CHANNELSCENEITEM_H
+#endif // BUTTERFLYSCENE_H

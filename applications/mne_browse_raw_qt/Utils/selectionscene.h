@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "layoutscene.h"
-#include "channelsceneitem.h"
+#include "selectionsceneitem.h"
 #include <fiff/fiff.h>
 
 

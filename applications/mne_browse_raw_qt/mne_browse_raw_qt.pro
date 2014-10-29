@@ -84,11 +84,13 @@ SOURCES += \
     Utils/mneoperator.cpp \
     Utils/filteroperator.cpp \
     Utils/filterplotscene.cpp \
+    Utils/butterflyscene.cpp \
     Utils/layoutscene.cpp \
     Utils/averagescene.cpp \
     Utils/selectionscene.cpp \
-    Utils/channelsceneitem.cpp \
+    Utils/selectionsceneitem.cpp \
     Utils/averagesceneitem.cpp \
+    Utils/butterflysceneitem.cpp \
     Models/averagemodel.cpp \
     Models/rawmodel.cpp \
     Models/eventmodel.cpp \
@@ -113,11 +115,13 @@ HEADERS += \
     Utils/types.h \
     Utils/info.h \
     Utils/filterplotscene.h \
+    Utils/butterflyscene.h \
     Utils/layoutscene.h \
     Utils/averagescene.h \
     Utils/selectionscene.h \
-    Utils/channelsceneitem.h \
+    Utils/selectionsceneitem.h \
     Utils/averagesceneitem.h \
+    Utils/butterflysceneitem.h \
     Models/averagemodel.h \
     Models/rawmodel.h \
     Models/eventmodel.h \

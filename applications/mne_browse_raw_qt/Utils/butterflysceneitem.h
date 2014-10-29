@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     averagescene.h
+* @file     butterflysceneitem.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -30,77 +30,108 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the AverageScene class.
+* @brief    Contains the declaration of the ButterflySceneItem class.
 *
 */
 
-#ifndef AVERAGESCENE_H
-#define AVERAGESCENE_H
+#ifndef BUTTERFLYSCENEITEM_H
+#define BUTTERFLYSCENEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "layoutscene.h"
-#include "averagesceneitem.h"
-#include "selectionsceneitem.h"
-
+#include <iostream>
+#include <Eigen/Core>
+#include <fiff/fiff.h>
+#include "types.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGraphicsScene>
+#include <QGraphicsItem>
+#include <QString>
+#include <QColor>
+#include <QPainter>
+#include <QStaticText>
+#include <QDebug>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace Eigen;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNEBrowseRawQt
 //=============================================================================================================
 
 namespace MNEBrowseRawQt
 {
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+
 //=============================================================================================================
 /**
-* AverageScene...
+* ButterflySceneItem...
 *
-* @brief The AverageScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
+* @brief The ButterflySceneItem class provides a new data structure for visualizing averages in a 2D layout.
 */
-class AverageScene : public LayoutScene
+class ButterflySceneItem : public QGraphicsItem
 {
-    Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a AverageScene.
+    * Constructs a ButterflySceneItem.
     */
-    explicit AverageScene(QGraphicsView* view, QObject *parent = 0);
+    ButterflySceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor defaultColors = Qt::red);
 
     //=========================================================================================================
     /**
-    * Sets the scale map to scaleMap.
-    *
-    * @param [in] scaleMap map with all channel types and their current scaling value.
+    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
     */
-    void setScaleMap(const QMap<QString,double> &scaleMap);
+    QRectF boundingRect() const;
 
     //=========================================================================================================
     /**
-    * Repaints all items from the layout data in the scene.
-    *
-    *  @param [in] selectedChannelItems items which are to painted to the average scene
+    * Reimplemented paint function.
     */
-    void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-private:
-    QList<SelectionSceneItem*> m_lSelectedChannelItems ;        /**< Holds the selected channels from the selection manager.*/
+    QString                 m_sChannelName;             /**< The channel name.*/
+    int                     m_iChannelNumber;           /**< The channel number.*/
+    int                     m_iChannelKind;             /**< The channel kind.*/
+    int                     m_iChannelUnit;             /**< The channel unit.*/
+    int                     m_iTotalNumberChannels;     /**< The total number of channels loaded in the curent evoked data set.*/
+    QPointF                 m_qpChannelPosition;        /**< The channels 2D position in the scene.*/
+    QList<QColor>           m_cAverageColors;           /**< The current average color.*/
+    QList<RowVectorPair>    m_lAverageData;             /**< The channels average data which is to be plotted.*/
+    QPair<int,int>          m_firstLastSample;          /**< The first and last sample.*/
+    QMap<QString,double>    m_scaleMap;                 /**< Map with all channel types and their current scaling value.*/
+
+protected:
+    //=========================================================================================================
+    /**
+    * Create a plot path and paint the average data
+    *
+    * @param [in] painter The painter used to plot in this item.
+    */
+    void paintAveragePath(QPainter *painter);
 };
 
-} // NAMESPACE
+} // NAMESPACE MNEBrowseRawQt
 
-#endif // AverageScene_H
+#endif // BUTTERFLYSCENEITEM_H
