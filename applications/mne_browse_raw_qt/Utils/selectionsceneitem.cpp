@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     ChannelSceneItem.cpp
+* @file     selectionsceneitem.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     June, 2014
+* @date     September, 2014
 *
 * @section  LICENSE
 *
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ChannelSceneItem class.
+* @brief    Contains the implementation of the SelectionSceneItem class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "channelsceneitem.h"
+#include "selectionsceneitem.h"
 
 
 //*************************************************************************************************************
@@ -56,7 +56,7 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChannelSceneItem::ChannelSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor channelColor)
+SelectionSceneItem::SelectionSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor channelColor)
 : m_sChannelName(channelName)
 , m_iChannelNumber(channelNumber)
 , m_qpChannelPosition(channelPosition)
@@ -72,7 +72,7 @@ ChannelSceneItem::ChannelSceneItem(QString channelName, int channelNumber, QPoin
 
 //*************************************************************************************************************
 
-QRectF ChannelSceneItem::boundingRect() const
+QRectF SelectionSceneItem::boundingRect() const
 {
     return QRectF(-25, -30, 50, 50);
 }
@@ -80,7 +80,7 @@ QRectF ChannelSceneItem::boundingRect() const
 
 //*************************************************************************************************************
 
-void ChannelSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void SelectionSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);

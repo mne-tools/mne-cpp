@@ -32,7 +32,7 @@
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
-        <string>Layout View</string>
+        <string>2D Layout</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
@@ -71,7 +71,7 @@
       </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
-        <string>Butterfly Plot</string>
+        <string>Butterfly graph</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_6">
         <item row="0" column="0">
@@ -98,6 +98,13 @@
       </property>
       <property name="selectionBehavior">
        <enum>QAbstractItemView::SelectRows</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Plots:</string>
       </property>
      </widget>
     </item>

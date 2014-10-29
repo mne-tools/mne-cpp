@@ -47,7 +47,7 @@
 #include "../Utils/averagescene.h"          //MNE Browse Raw QT utils
 #include "../Models/averagemodel.h"         //MNE Browse Raw QT utils
 #include "../Delegates/averagedelegate.h"   //MNE Browse Raw QT utils
-#include "../Utils/channelsceneitem.h"      //MNE Browse Raw QT utils
+#include "../Utils/selectionsceneitem.h"      //MNE Browse Raw QT utils
 #include "../Utils/types.h"
 
 

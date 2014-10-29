@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     averagescene.cpp
+* @file     butterflyscene.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the AverageScene class.
+* @brief    Contains the implementation of the ButterflyScene class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "averagescene.h"
+#include "butterflyscene.h"
 
 
 //*************************************************************************************************************
@@ -56,7 +56,7 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AverageScene::AverageScene(QGraphicsView* view, QObject* parent)
+ButterflyScene::ButterflyScene(QGraphicsView* view, QObject* parent)
 : LayoutScene(view, parent)
 {
 }
@@ -64,14 +64,14 @@ AverageScene::AverageScene(QGraphicsView* view, QObject* parent)
 
 //*************************************************************************************************************
 
-void AverageScene::setScaleMap(const QMap<QString,double> &scaleMap)
+void ButterflyScene::setScaleMap(const QMap<QString,double> &scaleMap)
 {
     QList<QGraphicsItem*> itemList = this->items();
 
     QListIterator<QGraphicsItem*> i(itemList);
     while (i.hasNext()) {
-        AverageSceneItem* AverageSceneItemTemp = static_cast<AverageSceneItem*>(i.next());
-        AverageSceneItemTemp->m_scaleMap = scaleMap;
+        ButterflySceneItem* ButterflySceneItemTemp = static_cast<ButterflySceneItem*>(i.next());
+        ButterflySceneItemTemp->m_scaleMap = scaleMap;
     }
 
     this->update();
@@ -80,19 +80,19 @@ void AverageScene::setScaleMap(const QMap<QString,double> &scaleMap)
 
 //*************************************************************************************************************
 
-void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelItems)
+void ButterflyScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelItems)
 {
     this->clear();
 
     QListIterator<QGraphicsItem*> i(selectedChannelItems);
     while (i.hasNext()) {
         SelectionSceneItem* SelectionSceneItemTemp = static_cast<SelectionSceneItem*>(i.next());
-        AverageSceneItem* AverageSceneItemTemp = new AverageSceneItem(SelectionSceneItemTemp->m_sChannelName,
-                                                                      SelectionSceneItemTemp->m_iChannelNumber,
-                                                                      SelectionSceneItemTemp->m_qpChannelPosition,
-                                                                      SelectionSceneItemTemp->m_iChannelKind,
-                                                                      SelectionSceneItemTemp->m_iChannelUnit);
+        ButterflySceneItem* ButterflySceneItemTemp = new ButterflySceneItem(SelectionSceneItemTemp->m_sChannelName,
+                                                                          SelectionSceneItemTemp->m_iChannelNumber,
+                                                                          SelectionSceneItemTemp->m_qpChannelPosition,
+                                                                          SelectionSceneItemTemp->m_iChannelKind,
+                                                                          SelectionSceneItemTemp->m_iChannelUnit);
 
-        this->addItem(AverageSceneItemTemp);
+        this->addItem(ButterflySceneItemTemp);
     }
 }

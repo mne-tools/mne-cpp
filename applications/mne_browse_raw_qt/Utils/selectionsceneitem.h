@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     averagescene.cpp
+* @file     selectionsceneitem.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -30,16 +30,41 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the AverageScene class.
+* @brief    Contains the declaration of the SelectionSceneItem class.
 *
 */
+
+#ifndef SELECTIONSCENEITEM_H
+#define SELECTIONSCENEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "averagescene.h"
+#include <iostream>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QGraphicsItem>
+#include <QString>
+#include <QColor>
+#include <QPainter>
+#include <QStaticText>
+#include <QDebug>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNEBrowseRawQt
+//=============================================================================================================
+
+namespace MNEBrowseRawQt
+{
 
 
 //*************************************************************************************************************
@@ -47,52 +72,44 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEBrowseRawQt;
-using namespace std;
 
-
-//*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-AverageScene::AverageScene(QGraphicsView* view, QObject* parent)
-: LayoutScene(view, parent)
+/**
+* SelectionSceneItem...
+*
+* @brief The SelectionSceneItem class provides a new data structure for visualizing channels in a 2D layout.
+*/
+class SelectionSceneItem : public QGraphicsItem
 {
-}
 
+public:
+    //=========================================================================================================
+    /**
+    * Constructs a SelectionSceneItem.
+    */
+    SelectionSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor averageColor = Qt::blue);
 
-//*************************************************************************************************************
+    //=========================================================================================================
+    /**
+    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
+    */
+    QRectF boundingRect() const;
 
-void AverageScene::setScaleMap(const QMap<QString,double> &scaleMap)
-{
-    QList<QGraphicsItem*> itemList = this->items();
+    //=========================================================================================================
+    /**
+    * Reimplemented paint function.
+    */
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    QListIterator<QGraphicsItem*> i(itemList);
-    while (i.hasNext()) {
-        AverageSceneItem* AverageSceneItemTemp = static_cast<AverageSceneItem*>(i.next());
-        AverageSceneItemTemp->m_scaleMap = scaleMap;
-    }
+    QString     m_sChannelName;             /**< The channel's name.*/
+    int         m_iChannelNumber;           /**< The channel number.*/
+    int         m_iChannelKind;             /**< The channel kind.*/
+    int         m_iChannelUnit;             /**< The channel unit.*/
+    QPointF     m_qpChannelPosition;        /**< The channel's 2D position in the scene.*/
+    QColor      m_cChannelColor;            /**< The current channel color.*/
+    bool        m_bHighlightItem;           /**< Whether this item is to be highlighted.*/
+};
 
-    this->update();
-}
+} // NAMESPACE MNEBrowseRawQt
 
-
-//*************************************************************************************************************
-
-void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelItems)
-{
-    this->clear();
-
-    QListIterator<QGraphicsItem*> i(selectedChannelItems);
-    while (i.hasNext()) {
-        SelectionSceneItem* SelectionSceneItemTemp = static_cast<SelectionSceneItem*>(i.next());
-        AverageSceneItem* AverageSceneItemTemp = new AverageSceneItem(SelectionSceneItemTemp->m_sChannelName,
-                                                                      SelectionSceneItemTemp->m_iChannelNumber,
-                                                                      SelectionSceneItemTemp->m_qpChannelPosition,
-                                                                      SelectionSceneItemTemp->m_iChannelKind,
-                                                                      SelectionSceneItemTemp->m_iChannelUnit);
-
-        this->addItem(AverageSceneItemTemp);
-    }
-}
+#endif // SELECTIONSCENEITEM_H

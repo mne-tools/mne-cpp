@@ -98,7 +98,7 @@ void SelectionManagerWindow::highlightChannels(QStringList channelList)
     QList<QGraphicsItem *> allSceneItems = m_pSelectionScene->items();
 
     for(int i = 0; i<allSceneItems.size(); i++) {
-        ChannelSceneItem* item = static_cast<ChannelSceneItem*>(allSceneItems.at(i));
+        SelectionSceneItem* item = static_cast<SelectionSceneItem*>(allSceneItems.at(i));
         if(channelList.contains(item->m_sChannelName))
             item->m_bHighlightItem = true;
         else
@@ -116,7 +116,7 @@ void SelectionManagerWindow::selectChannels(QStringList channelList)
     QList<QGraphicsItem *> allSceneItems = m_pSelectionScene->items();
 
     for(int i = 0; i<allSceneItems.size(); i++) {
-        ChannelSceneItem* item = static_cast<ChannelSceneItem*>(allSceneItems.at(i));
+        SelectionSceneItem* item = static_cast<SelectionSceneItem*>(allSceneItems.at(i));
         if(channelList.contains(item->m_sChannelName))
             item->setSelected(true);
         else
@@ -335,7 +335,7 @@ void SelectionManagerWindow::updateUserDefinedChannelsList()
     QStringList userDefinedChannels;
 
     for(int i = 0; i<itemList.size(); i++) {
-        ChannelSceneItem* item = static_cast<ChannelSceneItem*>(itemList.at(i));
+        SelectionSceneItem* item = static_cast<SelectionSceneItem*>(itemList.at(i));
         userDefinedChannels << item->m_sChannelName;
     }
 
