@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     ChannelSceneItem.cpp
+* @file     butterflyscene.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     June, 2014
+* @date     September, 2014
 *
 * @section  LICENSE
 *
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ChannelSceneItem class.
+* @brief    Contains the implementation of the ButterflyScene class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "channelsceneitem.h"
+#include "butterflyscene.h"
 
 
 //*************************************************************************************************************
@@ -56,72 +56,40 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChannelSceneItem::ChannelSceneItem(QString channelName, int channelNumber, QPointF channelPosition, QColor channelColor)
-: m_sChannelName(channelName)
-, m_iChannelNumber(channelNumber)
-, m_qpChannelPosition(channelPosition)
-, m_cChannelColor(channelColor)
-, m_bHighlightItem(false)
+ButterflyScene::ButterflyScene(QGraphicsView* view, QObject* parent)
+: LayoutScene(view, parent)
 {
-    this->setAcceptHoverEvents(true);
-    this->setFlag(QGraphicsItem::ItemIsSelectable, true);
 }
 
 
 //*************************************************************************************************************
 
-QRectF ChannelSceneItem::boundingRect() const
+void ButterflyScene::setScaleMap(const QMap<QString,double> &scaleMap)
 {
-    return QRectF(-25, -30, 50, 50);
+    QList<QGraphicsItem*> itemList = this->items();
+
+    QListIterator<QGraphicsItem*> i(itemList);
+    while (i.hasNext()) {
+        ButterflySceneItem* ButterflySceneItemTemp = static_cast<ButterflySceneItem*>(i.next());
+        ButterflySceneItemTemp->m_scaleMap = scaleMap;
+    }
+
+    this->update();
 }
 
 
 //*************************************************************************************************************
 
-void ChannelSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void ButterflyScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelItems)
 {
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
+    this->clear();
 
-    // Plot shadow
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(Qt::darkGray);
-    painter->drawEllipse(-12, -12, 30, 30);
+    QListIterator<QGraphicsItem*> i(selectedChannelItems);
+    while (i.hasNext()) {
+        SelectionSceneItem* SelectionSceneItemTemp = static_cast<SelectionSceneItem*>(i.next());
+        ButterflySceneItem* ButterflySceneItemTemp = new ButterflySceneItem(SelectionSceneItemTemp->m_sChannelName,
+                                                                          SelectionSceneItemTemp->m_iChannelKind);
 
-    //Plot selected item
-    if(this->isSelected())
-        painter->setBrush(QBrush(QColor(93,177,47)));
-    else
-        painter->setBrush(QBrush(m_cChannelColor));
-
-    //Plot highlighted selected item
-    if(m_bHighlightItem) {
-        painter->setPen(QPen(Qt::red, 4));
-        painter->drawEllipse(-15, -15, 30, 30);
+        this->addItem(ButterflySceneItemTemp);
     }
-    else {
-        painter->setPen(QPen(Qt::black, 1));
-        painter->drawEllipse(-15, -15, 30, 30);
-    }
-
-    // Plot electrode name
-    painter->setPen(QPen(Qt::black, 1));
-    QStaticText staticElectrodeName = QStaticText(m_sChannelName);
-    QSizeF sizeText = staticElectrodeName.size();
-    painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
-
-    this->setPos(10*m_qpChannelPosition.x(), -10*m_qpChannelPosition.y());
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

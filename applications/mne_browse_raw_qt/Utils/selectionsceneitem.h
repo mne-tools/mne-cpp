@@ -1,16 +1,15 @@
 //=============================================================================================================
 /**
-* @file     averagemodel.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     selectionsceneitem.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     October, 2014
+* @date     September, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,53 +30,32 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    This class represents the average model of the model/view framework of mne_browse_raw_qt application.
+* @brief    Contains the declaration of the SelectionSceneItem class.
 *
 */
 
-#ifndef AVERAGEMODEL_H
-#define AVERAGEMODEL_H
+#ifndef SELECTIONSCENEITEM_H
+#define SELECTIONSCENEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../Utils/rawsettings.h"
-#include "../Utils/types.h"
+#include <iostream>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QAbstractTableModel>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
-#include <fiff/fiff.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-using namespace FIFFLIB;
+#include <QGraphicsItem>
+#include <QString>
+#include <QColor>
+#include <QPainter>
+#include <QStaticText>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -88,69 +66,50 @@ using namespace FIFFLIB;
 namespace MNEBrowseRawQt
 {
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+
 //=============================================================================================================
 /**
-* DECLARE CLASS AverageModel
+* SelectionSceneItem...
+*
+* @brief The SelectionSceneItem class provides a new data structure for visualizing channels in a 2D layout.
 */
-class AverageModel : public QAbstractTableModel
+class SelectionSceneItem : public QGraphicsItem
 {
-    Q_OBJECT
+
 public:
-    AverageModel(QObject *parent = 0);
-    AverageModel(QFile& qFile, QObject *parent);
+    //=========================================================================================================
+    /**
+    * Constructs a SelectionSceneItem.
+    */
+    SelectionSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor averageColor = Qt::blue);
 
     //=========================================================================================================
     /**
-    * Reimplemented virtual functions
-    *
+    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
     */
-    virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
-    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
-    virtual Qt::ItemFlags flags(const QModelIndex & index) const;
-    virtual bool insertRows(int position, int span, const QModelIndex & parent = QModelIndex());
-    virtual bool removeRows(int position, int span, const QModelIndex & parent = QModelIndex());
+    QRectF boundingRect() const;
 
     //=========================================================================================================
     /**
-    * loadEvokedData loads the fiff evoked data file
-    *
-    * @param p_IODevice fiff data evoked file to read from
+    * Reimplemented paint function.
     */
-    bool loadEvokedData(QFile& qFile);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    //=========================================================================================================
-    /**
-    * saveEvokedData saves the fiff evoked data file
-    *
-    * @param p_IODevice fiff data evoked file to save to
-    */
-    bool saveEvokedData(QFile& qFile);
-
-    bool                        m_bFileloaded;          /**< true when a Fiff evoked file is loaded. */
-
-protected:
-    FiffEvokedSet*              m_pEvokedDataSet;       /**< QList<FiffEvoked> that holds the evoked data sets which are to be organised and handled by this model. */
-    QSharedPointer<FiffIO>      m_pfiffIO;              /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!). */
-
-    //=========================================================================================================
-    /**
-    * clearModel clears all model's members
-    */
-    void clearModel();
-
-signals:
-    //=========================================================================================================
-    /**
-    * fileLoaded is emitted whenever a file was (tried) to be loaded
-    */
-    void fileLoaded(bool);
+    QString     m_sChannelName;             /**< The channel's name.*/
+    int         m_iChannelNumber;           /**< The channel number.*/
+    int         m_iChannelKind;             /**< The channel kind.*/
+    int         m_iChannelUnit;             /**< The channel unit.*/
+    QPointF     m_qpChannelPosition;        /**< The channel's 2D position in the scene.*/
+    QColor      m_cChannelColor;            /**< The current channel color.*/
+    bool        m_bHighlightItem;           /**< Whether this item is to be highlighted.*/
 };
 
-} // NAMESPACE
+} // NAMESPACE MNEBrowseRawQt
 
-
-
-#endif // AVERAGEMODEL_H
+#endif // SELECTIONSCENEITEM_H

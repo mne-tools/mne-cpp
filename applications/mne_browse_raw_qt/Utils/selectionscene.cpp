@@ -71,9 +71,13 @@ void SelectionScene::repaintItems(const QMap<QString,QVector<double> > &layoutMa
     QMapIterator<QString,QVector<double> > i(layoutMap);
     while (i.hasNext()) {
         i.next();
-        ChannelSceneItem* ChannelSceneItemTemp = new ChannelSceneItem(i.key(), i.value().at(2), QPointF(i.value().at(0), i.value().at(1)));
+        SelectionSceneItem* SelectionSceneItemTemp = new SelectionSceneItem(i.key(),
+                                                                      i.value().at(2),
+                                                                      QPointF(i.value().at(0), i.value().at(1)),
+                                                                      FIFFV_MEG_CH,
+                                                                      FIFF_UNIT_T_M);
 
-        this->addItem(ChannelSceneItemTemp);
+        this->addItem(SelectionSceneItemTemp);
     }
 }
 
@@ -86,7 +90,7 @@ void SelectionScene::hideItems(QStringList visibleItems)
     QList<QGraphicsItem *> itemList = this->items();
 
     for(int i = 0; i<itemList.size(); i++) {
-        ChannelSceneItem* item = static_cast<ChannelSceneItem*>(itemList.at(i));
+        SelectionSceneItem* item = static_cast<SelectionSceneItem*>(itemList.at(i));
 
         if(!visibleItems.contains(item->m_sChannelName)) {
             item->setFlag(QGraphicsItem::ItemIsSelectable, false);

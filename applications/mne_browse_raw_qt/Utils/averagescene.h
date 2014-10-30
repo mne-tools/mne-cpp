@@ -44,7 +44,7 @@
 
 #include "layoutscene.h"
 #include "averagesceneitem.h"
-#include "channelsceneitem.h"
+#include "selectionsceneitem.h"
 
 
 //*************************************************************************************************************
@@ -83,6 +83,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the scale map to scaleMap.
+    *
+    * @param [in] scaleMap map with all channel types and their current scaling value.
+    */
+    void setScaleMap(const QMap<QString,double> &scaleMap);
+
+    //=========================================================================================================
+    /**
     * Repaints all items from the layout data in the scene.
     *
     *  @param [in] selectedChannelItems items which are to painted to the average scene
@@ -90,7 +98,7 @@ public:
     void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
 
 private:
-    QList<ChannelSceneItem*> m_lSelectedChannelItems ;        /**< Holds the selected channels from the selection manager.*/
+    QList<SelectionSceneItem*> m_lSelectedChannelItems ;        /**< Holds the selected channels from the selection manager.*/
 };
 
 } // NAMESPACE

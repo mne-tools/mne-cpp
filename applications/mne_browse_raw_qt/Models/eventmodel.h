@@ -193,7 +193,7 @@ public:
     */
     void clearModel();
 
-    bool            m_bFileloaded;              /**< true when a Fiff event file is loaded. */
+    bool            m_bFileloaded;              /**< True when a Fiff event file is loaded. */
 
 private:
     QVector<int>    m_dataSamples;              /**< Vector that holds the sample alues for each loaded event. */
@@ -204,15 +204,15 @@ private:
     QVector<int>    m_dataTypes_Filtered;       /**< Filtered Vector that holds the type alues for each loaded event. */
     QVector<int>    m_dataIsUserEvent_Filtered; /**< Filtered Vector that holds the flag whether the event is user defined or loaded from file. */
 
-    FiffInfo        m_fiffInfo;                 /**< fiff info of whole fiff file. */
+    FiffInfo        m_fiffInfo;                 /**< Fiff info of whole fiff file. */
 
-    int             m_iFirstSample;             /**< holds the first/starting sample of the fiff data file. */
-    int             m_iLastSample;              /**< holds the last/ending sample of the fiff data file. */
-    int             m_iCurrentMarkerPos;        /**< holds the current marker position. */
-    QSettings       m_qSettings;                /**< setting paramter to access globally defined values. see rawsettings.cpp and rawsettings.h. */
-    QString         m_sFilterEventType;         /**< holds the event txype which is to be filtered.*/
+    int             m_iFirstSample;             /**< The first/starting sample of the fiff data file. */
+    int             m_iLastSample;              /**< The last/ending sample of the fiff data file. */
+    int             m_iCurrentMarkerPos;        /**< The current marker position. */
+    QSettings       m_qSettings;                /**< Setting paramter to access globally defined values. see rawsettings.cpp and rawsettings.h. */
+    QString         m_sFilterEventType;         /**< The event txype which is to be filtered.*/
 
-    QStringList     m_eventTypeList;            /**< holds all loaded event types. */
+    QStringList     m_eventTypeList;            /**< All currently loaded event types. */
 
 signals:
     //=========================================================================================================
@@ -220,7 +220,6 @@ signals:
     * updateEventTypes is emmited whenever the list of stored event type chnges
     */
     void updateEventTypes();
-
 };
 
 } // NAMESPACE

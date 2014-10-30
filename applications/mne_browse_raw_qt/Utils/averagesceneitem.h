@@ -44,7 +44,8 @@
 
 #include <iostream>
 #include <Eigen/Core>
-
+#include <fiff/fiff.h>
+#include "types.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -96,7 +97,7 @@ public:
     /**
     * Constructs a AverageSceneItem.
     */
-    AverageSceneItem(QString channelName, int channelNumber, QPointF channelPosition, QColor defaultColors = Qt::red);
+    AverageSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor defaultColors = Qt::red);
 
     //=========================================================================================================
     /**
@@ -110,12 +111,16 @@ public:
     */
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    QString             m_sChannelName;             /**< The channel name.*/
-    int                 m_iChannelNumber;           /**< The channel number.*/
-    QPointF             m_qpChannelPosition;        /**< The channels 2D position in the scene.*/
-    QList<QColor>       m_cAverageColors;           /**< The current average color.*/
-    QList<VectorXd>     m_lAverageData;             /**< The channels average data which is to be plotted.*/
-    QPair<int,int>      m_firstLastSample;          /**< The first and last sample.*/
+    QString                 m_sChannelName;             /**< The channel name.*/
+    int                     m_iChannelNumber;           /**< The channel number.*/
+    int                     m_iChannelKind;             /**< The channel kind.*/
+    int                     m_iChannelUnit;             /**< The channel unit.*/
+    int                     m_iTotalNumberChannels;     /**< The total number of channels loaded in the curent evoked data set.*/
+    QPointF                 m_qpChannelPosition;        /**< The channels 2D position in the scene.*/
+    QList<QColor>           m_cAverageColors;           /**< The current average color.*/
+    QList<RowVectorPair>    m_lAverageData;             /**< The channels average data which is to be plotted.*/
+    QPair<int,int>          m_firstLastSample;          /**< The first and last sample.*/
+    QMap<QString,double>    m_scaleMap;                 /**< Map with all channel types and their current scaling value.*/
 
 protected:
     //=========================================================================================================

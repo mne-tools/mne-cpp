@@ -141,6 +141,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Scales the data according to scaleMap
+    *
+    * @param [in] scaleMap map with all channel types and their current scaling value
+    */
+    void scaleData(const QMap<QString,double> &scaleMap);
+
+    //=========================================================================================================
+    /**
     * Updates the data table views
     */
     void updateDataTableViews();

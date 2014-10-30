@@ -45,9 +45,11 @@
 #include "ui_averagewindow.h"
 #include "utils/layoutloader.h"             //MNE-CPP utils
 #include "../Utils/averagescene.h"          //MNE Browse Raw QT utils
-#include "../Models/averagemodel.h"         //MNE Browse Raw QT utils
-#include "../Delegates/averagedelegate.h"   //MNE Browse Raw QT utils
-#include "../Utils/channelsceneitem.h"      //MNE Browse Raw QT utils
+#include "../Utils/selectionsceneitem.h"
+#include "../Utils/butterflyscene.h"
+#include "../Utils/types.h"
+#include "../Models/averagemodel.h"
+#include "../Delegates/averagedelegate.h"
 
 
 //*************************************************************************************************************
@@ -56,6 +58,9 @@
 //=============================================================================================================
 
 #include <QDockWidget>
+#include <QFileDialog>
+#include <QStandardPaths>
+#include <QSvgGenerator>
 
 
 //*************************************************************************************************************
@@ -108,11 +113,27 @@ public:
 
     //=========================================================================================================
     /**
-    * call this whenever the external channel selection manager changed
+    * call this whenever the external channel selection manager changes
+    *
+    * * @param [in] selectedChannelItems list of selected graphic items
     */
     void channelSelectionManagerChanged(const QList<QGraphicsItem *> &selectedChannelItems);
 
+    //=========================================================================================================
+    /**
+    * Scales the averaged data according to scaleMap
+    *
+    * @param [in] scaleMap map with all channel types and their current scaling value
+    */
+    void scaleAveragedData(const QMap<QString,double> &scaleMap);
+
 private:
+    //=========================================================================================================
+    /**
+    * Inits all QPushButtons in this window
+    */
+    void initButtons();
+
     //=========================================================================================================
     /**
     * inits the model view controller paradigm of this window
@@ -139,11 +160,20 @@ private:
     */
     void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
+    //=========================================================================================================
+    /**
+    * saves the current layout average plot as png or svg to file
+    */
+    void exportAverageLayoutPlot();
+
     Ui::AverageWindow*      ui;                     /**< Pointer to the qt designer generated ui class.*/
 
-    AverageModel*           m_pAverageModel;        /**< the QAbstractTable average model being part of the model/view framework of Qt. */
-    AverageDelegate*        m_pAverageDelegate;     /**< the QItemDelegateaverage delegate being part of the model/view framework of Qt. */
-    AverageScene*           m_pAverageScene;        /**< holds the pointer to the average scene. */
+    AverageModel*           m_pAverageModel;        /**< The QAbstractTable average model being part of the model/view framework of Qt. */
+    AverageDelegate*        m_pAverageDelegate;     /**< The QItemDelegateaverage delegate being part of the model/view framework of Qt. */
+    AverageScene*           m_pAverageScene;        /**< The pointer to the average scene. */
+
+    ButterflyScene*         m_pButterflyScene;      /**< The pointer to the butterfly scene. */
+
 };
 
 } // NAMESPACE MNEBrowseRawQt
