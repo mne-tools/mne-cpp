@@ -252,6 +252,8 @@ void RealTimeMultiSampleArrayScalingWidget::updateDoubleSpinBox(const double val
         }
 
         m_pRTMSAW->m_qMapChScaling[it.key()] = it.value()->value() * scaleValue;
+
+//        qDebug()<<"m_pRTMSAW->m_qMapChScaling[it.key()]" << m_pRTMSAW->m_qMapChScaling[it.key()];
     }
 
     emit scalingChanged();
