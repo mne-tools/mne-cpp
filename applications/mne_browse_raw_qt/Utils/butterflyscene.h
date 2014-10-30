@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     averagescene.cpp
+* @file     butterflyscene.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     September, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
@@ -30,69 +30,75 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the AverageScene class.
+* @brief    Contains the declaration of the ButterflyScene class.
 *
 */
+
+#ifndef BUTTERFLYSCENE_H
+#define BUTTERFLYSCENE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "averagescene.h"
+#include "layoutscene.h"
+#include "butterflysceneitem.h"
+#include "selectionsceneitem.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// QT INCLUDES
 //=============================================================================================================
 
-using namespace MNEBrowseRawQt;
-using namespace std;
+#include <QGraphicsScene>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
 
-AverageScene::AverageScene(QGraphicsView* view, QObject* parent)
-: LayoutScene(view, parent)
+namespace MNEBrowseRawQt
 {
-}
 
 
-//*************************************************************************************************************
-
-void AverageScene::setScaleMap(const QMap<QString,double> &scaleMap)
+//=============================================================================================================
+/**
+* ButterflyScene...
+*
+* @brief The ButterflyScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
+*/
+class ButterflyScene : public LayoutScene
 {
-    QList<QGraphicsItem*> itemList = this->items();
+    Q_OBJECT
 
-    QListIterator<QGraphicsItem*> i(itemList);
-    while (i.hasNext()) {
-        AverageSceneItem* AverageSceneItemTemp = static_cast<AverageSceneItem*>(i.next());
-        AverageSceneItemTemp->m_scaleMap = scaleMap;
-    }
+public:
+    //=========================================================================================================
+    /**
+    * Constructs a ButterflyScene.
+    */
+    explicit ButterflyScene(QGraphicsView* view, QObject *parent = 0);
 
-    this->update();
-}
+    //=========================================================================================================
+    /**
+    * Sets the scale map to scaleMap.
+    *
+    * @param [in] scaleMap map with all channel types and their current scaling value.
+    */
+    void setScaleMap(const QMap<QString,double> &scaleMap);
 
+    //=========================================================================================================
+    /**
+    * Repaints all items from the layout data in the scene.
+    *
+    *  @param [in] selectedChannelItems items which are to painted to the average scene
+    */
+    void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
 
-//*************************************************************************************************************
+};
 
-void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelItems)
-{
-    this->clear();
+} // NAMESPACE
 
-    QListIterator<QGraphicsItem*> i(selectedChannelItems);
-    while (i.hasNext()) {
-        SelectionSceneItem* SelectionSceneItemTemp = static_cast<SelectionSceneItem*>(i.next());
-        AverageSceneItem* AverageSceneItemTemp = new AverageSceneItem(SelectionSceneItemTemp->m_sChannelName,
-                                                                      SelectionSceneItemTemp->m_iChannelNumber,
-                                                                      SelectionSceneItemTemp->m_qpChannelPosition,
-                                                                      SelectionSceneItemTemp->m_iChannelKind,
-                                                                      SelectionSceneItemTemp->m_iChannelUnit);
-
-        this->addItem(AverageSceneItemTemp);
-    }
-}
+#endif // BUTTERFLYSCENE_H

@@ -1,16 +1,15 @@
 //=============================================================================================================
 /**
-* @file     averagemodel.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     butterflysceneitem.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
 * @date     October, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,44 +30,35 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    This class represents the average model of the model/view framework of mne_browse_raw_qt application.
+* @brief    Contains the declaration of the ButterflySceneItem class.
 *
 */
 
-#ifndef AVERAGEMODEL_H
-#define AVERAGEMODEL_H
+#ifndef BUTTERFLYSCENEITEM_H
+#define BUTTERFLYSCENEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../Utils/rawsettings.h"
-#include "../Utils/types.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QAbstractTableModel>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
+#include <iostream>
 #include <Eigen/Core>
+#include <fiff/fiff.h>
+#include "types.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MNE INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff.h>
+#include <QGraphicsItem>
+#include <QString>
+#include <QColor>
+#include <QPainter>
+#include <QStaticText>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -88,69 +78,60 @@ using namespace FIFFLIB;
 namespace MNEBrowseRawQt
 {
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+
 //=============================================================================================================
 /**
-* DECLARE CLASS AverageModel
+* ButterflySceneItem...
+*
+* @brief The ButterflySceneItem class provides a new data structure for visualizing averages in a 2D layout.
 */
-class AverageModel : public QAbstractTableModel
+class ButterflySceneItem : public QGraphicsItem
 {
-    Q_OBJECT
+
 public:
-    AverageModel(QObject *parent = 0);
-    AverageModel(QFile& qFile, QObject *parent);
+    //=========================================================================================================
+    /**
+    * Constructs a ButterflySceneItem.
+    */
+    ButterflySceneItem(QString setName, int setKind = FIFFV_MEG_CH, QList<QColor> &defaultColors = QList<QColor>());
 
     //=========================================================================================================
     /**
-    * Reimplemented virtual functions
-    *
+    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
     */
-    virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
-    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
-    virtual Qt::ItemFlags flags(const QModelIndex & index) const;
-    virtual bool insertRows(int position, int span, const QModelIndex & parent = QModelIndex());
-    virtual bool removeRows(int position, int span, const QModelIndex & parent = QModelIndex());
+    QRectF boundingRect() const;
 
     //=========================================================================================================
     /**
-    * loadEvokedData loads the fiff evoked data file
-    *
-    * @param p_IODevice fiff data evoked file to read from
+    * Reimplemented paint function.
     */
-    bool loadEvokedData(QFile& qFile);
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    //=========================================================================================================
-    /**
-    * saveEvokedData saves the fiff evoked data file
-    *
-    * @param p_IODevice fiff data evoked file to save to
-    */
-    bool saveEvokedData(QFile& qFile);
+    QString                 m_sSetName;                 /**< The channel name.*/
+    fiff_int_t              m_iSetKind;                 /**< The channel kind which is to be plotted (MEG or EEG).*/
+    const FiffInfo*         m_pFiffInfo;                /**< The fiff info.*/
 
-    bool                        m_bFileloaded;          /**< true when a Fiff evoked file is loaded. */
+    QList<QColor>           m_cAverageColors;           /**< The current average color.*/
+    RowVectorPair           m_lAverageData;             /**< The channels average data which is to be plotted.*/
+    QPair<int,int>          m_firstLastSample;          /**< The first and last sample.*/
+    QMap<QString,double>    m_scaleMap;                 /**< Map with all channel types and their current scaling value.*/
 
 protected:
-    FiffEvokedSet*              m_pEvokedDataSet;       /**< QList<FiffEvoked> that holds the evoked data sets which are to be organised and handled by this model. */
-    QSharedPointer<FiffIO>      m_pfiffIO;              /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!). */
-
     //=========================================================================================================
     /**
-    * clearModel clears all model's members
+    * Create a plot path and paint the average data
+    *
+    * @param [in] painter The painter used to plot in this item.
     */
-    void clearModel();
-
-signals:
-    //=========================================================================================================
-    /**
-    * fileLoaded is emitted whenever a file was (tried) to be loaded
-    */
-    void fileLoaded(bool);
+    void paintAveragePaths(QPainter *painter);
 };
 
-} // NAMESPACE
+} // NAMESPACE MNEBrowseRawQt
 
-
-
-#endif // AVERAGEMODEL_H
+#endif // BUTTERFLYSCENEITEM_H

@@ -18,6 +18,13 @@
   </property>
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QGridLayout" name="gridLayout_7">
+    <item row="0" column="0">
+     <widget class="QLabel" name="m_label_EvokedSets">
+      <property name="text">
+       <string>Evoked sets:</string>
+      </property>
+     </widget>
+    </item>
     <item row="1" column="1">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
@@ -25,12 +32,37 @@
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
-        <string>Layout View</string>
+        <string>2D Layout</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
          <layout class="QGridLayout" name="gridLayout">
-          <item row="0" column="0">
+          <item row="1" column="1">
+           <widget class="QPushButton" name="m_pushButton_exportLayoutPlot">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>85</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>85</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>85</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Export plot</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="2">
            <widget class="QGraphicsView" name="m_graphicsView_layout"/>
           </item>
          </layout>
@@ -39,7 +71,7 @@
       </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
-        <string>Butterfly Plot</string>
+        <string>Butterfly graph</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_6">
         <item row="0" column="0">
@@ -53,13 +85,6 @@
       </widget>
      </widget>
     </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="m_label_EvokedSets">
-      <property name="text">
-       <string>Evoked sets:</string>
-      </property>
-     </widget>
-    </item>
     <item row="1" column="0">
      <widget class="QTableView" name="m_tableView_loadedSets">
       <property name="sizePolicy">
@@ -69,10 +94,17 @@
        </sizepolicy>
       </property>
       <property name="selectionMode">
-       <enum>QAbstractItemView::MultiSelection</enum>
+       <enum>QAbstractItemView::SingleSelection</enum>
       </property>
       <property name="selectionBehavior">
        <enum>QAbstractItemView::SelectRows</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Plots:</string>
       </property>
      </widget>
     </item>

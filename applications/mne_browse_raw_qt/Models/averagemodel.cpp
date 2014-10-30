@@ -219,22 +219,33 @@ QVariant AverageModel::data(const QModelIndex &index, int role) const
         //******** fifth column (evoked set data types) ********
         if(index.column()==4) {
             QVariant v;
+            RowVectorPair averagedData;
+            const FiffInfo *fiffInfo;
+            RowVectorPairF timeData;
+            RowVectorPair projections;
 
             switch(role) {
                 case AverageModelRoles::GetAverageData:
-                    v.setValue(m_pEvokedDataSet->evoked.at(index.row()).data);
+                    averagedData.first = m_pEvokedDataSet->evoked.at(index.row()).data.data();
+                    averagedData.second = m_pEvokedDataSet->evoked.at(index.row()).data.cols();
+                    v.setValue(averagedData);
                     break;
 
                 case AverageModelRoles::GetFiffInfo:
-                    v.setValue(m_pEvokedDataSet->evoked.at(index.row()).info);
+                    fiffInfo = &m_pEvokedDataSet->evoked.at(index.row()).info;
+                    v.setValue(fiffInfo);
                     break;
 
                 case AverageModelRoles::GetTimeData:
-                    v.setValue(m_pEvokedDataSet->evoked.at(index.row()).times);
+                    timeData.first = m_pEvokedDataSet->evoked.at(index.row()).times.data();
+                    timeData.second = m_pEvokedDataSet->evoked.at(index.row()).times.cols();
+                    v.setValue(timeData);
                     break;
 
                 case AverageModelRoles::GetProjections:
-                    v.setValue(m_pEvokedDataSet->evoked.at(index.row()).proj);
+                    projections.first = m_pEvokedDataSet->evoked.at(index.row()).proj.data();
+                    projections.second = m_pEvokedDataSet->evoked.at(index.row()).proj.cols();
+                    v.setValue(projections);
                     break;
             }
 
@@ -275,7 +286,7 @@ bool AverageModel::removeRows(int position, int span, const QModelIndex & parent
 Qt::ItemFlags AverageModel::flags(const QModelIndex & index) const
 {
     Q_UNUSED(index);
-    return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+    return Qt::ItemIsEnabled | Qt::ItemIsSelectable /*| Qt::ItemIsEditable*/;
 }
 
 

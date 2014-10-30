@@ -39,20 +39,22 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QPair>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
+// INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
-#include <Qt>
+#include <fiff/fiff.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QPair>
+#include <QList>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -72,6 +74,7 @@ namespace MNEBrowseRawQt
 
 typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
 typedef QPair<const double*,qint32> RowVectorPair;
+typedef QPair<const float*,qint32> RowVectorPairF;
 typedef QPair<int,int> QPairInts;
 
 namespace RawModelRoles
@@ -90,6 +93,12 @@ namespace AverageModelRoles
                   GetTimeData = Qt::UserRole + 1007,
                   GetProjections = Qt::UserRole + 1008};
 }
+
+Q_DECLARE_METATYPE(MNEBrowseRawQt::RowVectorPairF);
+Q_DECLARE_METATYPE(const FIFFLIB::FiffInfo*);
+Q_DECLARE_METATYPE(MNEBrowseRawQt::MatrixXdR);
+Q_DECLARE_METATYPE(MNEBrowseRawQt::RowVectorPair);
+Q_DECLARE_METATYPE(QList<MNEBrowseRawQt::RowVectorPair>);
 
 } //NAMESPACE
 

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     channelsceneitem.h
+* @file     selectionsceneitem.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -30,41 +30,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ChannelSceneItem class.
+* @brief    Contains the implementation of the SelectionSceneItem class.
 *
 */
-
-#ifndef CHANNELSCENEITEM_H
-#define CHANNELSCENEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QGraphicsItem>
-#include <QString>
-#include <QColor>
-#include <QPainter>
-#include <QStaticText>
-#include <QDebug>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNEBrowseRawQt
-//=============================================================================================================
-
-namespace MNEBrowseRawQt
-{
+#include "selectionsceneitem.h"
 
 
 //*************************************************************************************************************
@@ -72,42 +47,83 @@ namespace MNEBrowseRawQt
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace MNEBrowseRawQt;
+using namespace std;
 
+
+//*************************************************************************************************************
 //=============================================================================================================
-/**
-* ChannelSceneItem...
-*
-* @brief The ChannelSceneItem class provides a new data structure for visualizing channels in a 2D layout.
-*/
-class ChannelSceneItem : public QGraphicsItem
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+SelectionSceneItem::SelectionSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor channelColor)
+: m_sChannelName(channelName)
+, m_iChannelNumber(channelNumber)
+, m_qpChannelPosition(channelPosition)
+, m_cChannelColor(channelColor)
+, m_bHighlightItem(false)
+, m_iChannelKind(channelKind)
+, m_iChannelUnit(channelUnit)
 {
+    this->setAcceptHoverEvents(true);
+    this->setFlag(QGraphicsItem::ItemIsSelectable, true);
+}
 
-public:
-    //=========================================================================================================
-    /**
-    * Constructs a ChannelSceneItem.
-    */
-    ChannelSceneItem(QString channelName, int channelNumber, QPointF channelPosition, QColor averageColor = Qt::blue);
 
-    //=========================================================================================================
-    /**
-    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
-    */
-    QRectF boundingRect() const;
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Reimplemented paint function.
-    */
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+QRectF SelectionSceneItem::boundingRect() const
+{
+    return QRectF(-25, -30, 50, 50);
+}
 
-    QString     m_sChannelName;             /**< The channel's name.*/
-    int         m_iChannelNumber;           /**< The channel number.*/
-    QPointF     m_qpChannelPosition;        /**< The channel's 2D position in the scene.*/
-    QColor      m_cChannelColor;            /**< The current channel color.*/
-    bool        m_bHighlightItem;           /**< Whether this item is to be highlighted.*/
-};
 
-} // NAMESPACE MNEBrowseRawQt
+//*************************************************************************************************************
 
-#endif // CHANNELSCENEITEM_H
+void SelectionSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+
+    // Plot shadow
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(Qt::darkGray);
+    painter->drawEllipse(-12, -12, 30, 30);
+
+    //Plot selected item
+    if(this->isSelected())
+        painter->setBrush(QBrush(QColor(93,177,47)));
+    else
+        painter->setBrush(QBrush(m_cChannelColor));
+
+    //Plot highlighted selected item
+    if(m_bHighlightItem) {
+        painter->setPen(QPen(Qt::red, 4));
+        painter->drawEllipse(-15, -15, 30, 30);
+    }
+    else {
+        painter->setPen(QPen(Qt::black, 1));
+        painter->drawEllipse(-15, -15, 30, 30);
+    }
+
+    // Plot electrode name
+    painter->setPen(QPen(Qt::black, 1));
+    QStaticText staticElectrodeName = QStaticText(m_sChannelName);
+    QSizeF sizeText = staticElectrodeName.size();
+    painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
+
+    this->setPos(10*m_qpChannelPosition.x(), -10*m_qpChannelPosition.y());
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
