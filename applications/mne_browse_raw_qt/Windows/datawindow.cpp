@@ -196,16 +196,16 @@ void DataWindow::initMVCSettings()
     //m_pKineticScroller->setSnapPositionsY(100,100);
 
     //connect QScrollBar with model in order to reload data samples
-    connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
-            m_pRawModel,&RawModel::updateScrollPos);
+    connect(ui->m_tableView_rawTableView->horizontalScrollBar(), &QScrollBar::valueChanged,
+            m_pRawModel, &RawModel::updateScrollPos);
 
     //connect selection of a channel to selection manager
-    connect(ui->m_tableView_rawTableView->selectionModel(),&QItemSelectionModel::selectionChanged,
-            this,&DataWindow::highlightChannelsInSelectionManager);
+    connect(ui->m_tableView_rawTableView->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &DataWindow::highlightChannelsInSelectionManager);
 
     //connect selection change to update data views
-    connect(ui->m_tableView_rawTableView->selectionModel(),&QItemSelectionModel::selectionChanged,
-            this,&DataWindow::updateDataTableViews);
+    connect(ui->m_tableView_rawTableView->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &DataWindow::updateDataTableViews);
 
     //Set MVC in delegate
     m_pRawDelegate->setModelView(m_pMainWindow->m_pEventWindow->getEventModel(),

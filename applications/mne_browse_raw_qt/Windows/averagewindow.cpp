@@ -65,6 +65,7 @@ AverageWindow::AverageWindow(QWidget *parent, QFile &file)
     initTableViewWidgets();
     initAverageSceneView();
     initButtons();
+    initComboBoxes();
 }
 
 
@@ -98,15 +99,6 @@ void AverageWindow::scaleAveragedData(const QMap<QString,double> &scaleMap)
 {
     m_pAverageScene->setScaleMap(scaleMap);
     m_pButterflyScene->setScaleMap(scaleMap);
-}
-
-
-//*************************************************************************************************************
-
-void AverageWindow::initButtons()
-{
-    connect(ui->m_pushButton_exportLayoutPlot, &QPushButton::released,
-            this, &AverageWindow::exportAverageLayoutPlot);
 }
 
 
@@ -158,6 +150,34 @@ void AverageWindow::initAverageSceneView()
     //Create butterfly average scene and set view
     m_pButterflyScene = new ButterflyScene(ui->m_graphicsView_butterflyPlot, this);
     ui->m_graphicsView_butterflyPlot->setScene(m_pButterflyScene);
+
+    //Generate random colors for plotting
+    for(int i = 0; i<500; i++)
+        m_lButterflyColors.append(QColor(qrand()%256, qrand()%256, qrand()%256));
+}
+
+
+//*************************************************************************************************************
+
+void AverageWindow::initButtons()
+{
+    connect(ui->m_pushButton_exportLayoutPlot, &QPushButton::released,
+            this, &AverageWindow::exportAverageLayoutPlot);
+
+    connect(ui->m_pushButton_exportButterflyPlot, &QPushButton::released,
+            this, &AverageWindow::exportAverageButterflyPlot);
+}
+
+
+//*************************************************************************************************************
+
+void AverageWindow::initComboBoxes()
+{
+    connect(ui->m_comboBox_channelKind, &QComboBox::currentTextChanged,
+            this, [this](){
+            this->onSelectionChanged(ui->m_tableView_loadedSets->selectionModel()->selection(),
+                                     ui->m_tableView_loadedSets->selectionModel()->selection());
+    });
 }
 
 
@@ -220,13 +240,22 @@ void AverageWindow::onSelectionChanged(const QItemSelection &selected, const QIt
         int last = m_pAverageModel->data(m_pAverageModel->index(index.row(), 3), AverageModelRoles::GetLastSample).toInt();
         QString setName = m_pAverageModel->data(m_pAverageModel->index(index.row(), 0), Qt::DisplayRole).toString();
 
-        //Generate random colors
-        QList<QColor> butterflyColors;
-        for(int i = 0; i<fiffInfo->chs.size(); i++)
-            butterflyColors.append(QColor(qrand()%256, qrand()%256, qrand()%256));
-
         //Create new butterfly scene item
-        ButterflySceneItem* butterflySceneItemTemp = new ButterflySceneItem(setName, FIFFV_MEG_CH, butterflyColors); //TODO: let the user decide , EEG, MEG_Grad, MEG_mag
+        fiff_int_t setUnit, setKind;
+        if(ui->m_comboBox_channelKind->currentText() == "MEG_grad")
+            setUnit = FIFF_UNIT_T_M;
+        else
+            setUnit = FIFF_UNIT_T;
+
+        if(ui->m_comboBox_channelKind->currentText() == "EEG")
+            setKind = FIFFV_EEG_CH;
+        else
+            setKind = FIFFV_MEG_CH;
+
+        ButterflySceneItem* butterflySceneItemTemp = new ButterflySceneItem(setName,
+                                                                            setKind,
+                                                                            setUnit,
+                                                                            m_lButterflyColors);
 
         butterflySceneItemTemp->m_lAverageData.first = averageData.first;
         butterflySceneItemTemp->m_lAverageData.second = averageData.second;
@@ -277,6 +306,47 @@ void AverageWindow::exportAverageLayoutPlot()
 
             QPainter painter(&image);
             m_pAverageScene->render(&painter);
+            image.save(fileName);
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void AverageWindow::exportAverageButterflyPlot()
+{
+    // Open file dialog
+    QDate date;
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    "Save butterfly plot",
+                                                    QString("%1/%2_%3_%4_ButterflyPlot").arg(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
+                                                    tr("Vector graphic(*.svg);;Images (*.png)"));
+
+    if(!fileName.isEmpty())
+    {
+        // Generate screenshot
+        if(fileName.contains(".svg"))
+        {
+            QSvgGenerator svgGen;
+
+            svgGen.setFileName(fileName);
+            QRectF rect = m_pButterflyScene->itemsBoundingRect();
+            svgGen.setSize(QSize(rect.width(), rect.height()));
+            //svgGen.setViewBox(QRect(0, 0, rect.width(), rect.height()));
+
+            QPainter painter(&svgGen);
+            m_pButterflyScene->render(&painter);
+        }
+
+        if(fileName.contains(".png"))
+        {
+            m_pButterflyScene->setSceneRect(m_pButterflyScene->itemsBoundingRect());                  // Re-shrink the scene to it's bounding contents
+            QImage image(m_pButterflyScene->sceneRect().size().toSize(), QImage::Format_ARGB32);       // Create the image with the exact size of the shrunk scene
+            image.fill(Qt::transparent);                                                                // Start all pixels transparent
+
+            QPainter painter(&image);
+            m_pButterflyScene->render(&painter);
             image.save(fileName);
         }
     }

@@ -56,9 +56,10 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ButterflySceneItem::ButterflySceneItem(QString setName, int setKind, QList<QColor> &defaultColors)
+ButterflySceneItem::ButterflySceneItem(QString setName, int setKind, int setUnit, QList<QColor> &defaultColors)
 : m_sSetName(setName)
 , m_iSetKind(setKind)
+, m_iSetUnit(setUnit)
 , m_cAverageColors(defaultColors)
 {
     //Init m_scaleMap
@@ -77,8 +78,8 @@ ButterflySceneItem::ButterflySceneItem(QString setName, int setKind, QList<QColo
 
 QRectF ButterflySceneItem::boundingRect() const
 {
-    int height = 500;
-    int width = 1500;
+    int height = 100;
+    int width = 500;
     return QRectF(-width/2, -height/2, width, height);
 }
 
@@ -90,16 +91,13 @@ void ButterflySceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-//    //Plot bounding rect / drawing region of this item
-//    painter->drawRect(this->boundingRect());
+    //Plot bounding rect / drawing region of this item
+    //painter->drawRect(this->boundingRect());
 
     //Plot average data
     painter->save();
     paintAveragePaths(painter);
     painter->restore();
-
-    //set posistion
-    //this->setPos(60*m_qpChannelPosition.x(), -60*m_qpChannelPosition.y());
 }
 
 
@@ -114,8 +112,9 @@ void ButterflySceneItem::paintAveragePaths(QPainter *painter)
 
         if(m_pFiffInfo->bads.contains(fiffChInfoTemp.ch_name) == false) {
             //Only plot EEG or MEG channels
-            if((fiffChInfoTemp.kind == FIFFV_MEG_CH && m_iSetKind == FIFFV_MEG_CH) ||
-                    (fiffChInfoTemp.kind == FIFFV_EEG_CH && m_iSetKind == FIFFV_EEG_CH)) {
+            if((fiffChInfoTemp.kind == FIFFV_MEG_CH && m_iSetKind == FIFFV_MEG_CH && fiffChInfoTemp.unit == FIFF_UNIT_T_M && m_iSetUnit == FIFF_UNIT_T_M) ||    //MEG grad
+               (fiffChInfoTemp.kind == FIFFV_MEG_CH && m_iSetKind == FIFFV_MEG_CH && fiffChInfoTemp.unit == FIFF_UNIT_T && m_iSetUnit == FIFF_UNIT_T) ||        //MEG mag
+               (fiffChInfoTemp.kind == FIFFV_EEG_CH && m_iSetKind == FIFFV_EEG_CH)) {                                                                           //EEG
                 //Determine channel scaling
                 double dMaxValue = 1e-09;
                 switch(fiffChInfoTemp.kind) {
@@ -151,7 +150,7 @@ void ButterflySceneItem::paintAveragePaths(QPainter *painter)
                 pen.setStyle(Qt::SolidLine);
                 if(!m_cAverageColors.isEmpty() && i<m_cAverageColors.size())
                     pen.setColor(m_cAverageColors.at(i));
-                pen.setWidthF(1);
+                pen.setWidthF(0.25);
                 painter->setPen(pen);
 
                 //Generate plot path
@@ -162,7 +161,7 @@ void ButterflySceneItem::paintAveragePaths(QPainter *painter)
                     double val = (*(averageData+(u*m_pFiffInfo->chs.size())+i) * dScaleY);
 
                     qSamplePosition.setY(-val);
-                    qSamplePosition.setX(path.currentPosition().x()+3);
+                    qSamplePosition.setX(path.currentPosition().x()+1);
 
                     path.lineTo(qSamplePosition);
                 }
