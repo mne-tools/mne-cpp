@@ -99,7 +99,7 @@ public:
     /**
     * Constructs a ButterflySceneItem.
     */
-    ButterflySceneItem(QString setName, int setKind = FIFFV_MEG_CH, QList<QColor> &defaultColors = QList<QColor>());
+    ButterflySceneItem(QString setName, int setKind = FIFFV_MEG_CH, int setUnit = FIFF_UNIT_T_M, QList<QColor> &defaultColors = QList<QColor>());
 
     //=========================================================================================================
     /**
@@ -113,8 +113,9 @@ public:
     */
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    QString                 m_sSetName;                 /**< The channel name.*/
-    fiff_int_t              m_iSetKind;                 /**< The channel kind which is to be plotted (MEG or EEG).*/
+    QString                 m_sSetName;                 /**< The set name.*/
+    fiff_int_t              m_iSetKind;                 /**< The set kind which is to be plotted (MEG or EEG).*/
+    fiff_int_t              m_iSetUnit;                 /**< The set unit. Used to determine whether mag or grad channels are to be plotted.*/
     const FiffInfo*         m_pFiffInfo;                /**< The fiff info.*/
 
     QList<QColor>           m_cAverageColors;           /**< The current average color.*/
