@@ -157,7 +157,7 @@ void DataWindow::showSelectedChannelsOnly(QStringList selectedChannels)
 
 //*************************************************************************************************************
 
-void DataWindow::scaleChannelsInView(int height)
+void DataWindow::changeRowHeight(int height)
 {
     for(int i = 0; i<ui->m_tableView_rawTableView->verticalHeader()->count(); i++)
         ui->m_tableView_rawTableView->setRowHeight(i, height);

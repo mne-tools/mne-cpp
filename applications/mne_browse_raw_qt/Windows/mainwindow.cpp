@@ -140,7 +140,7 @@ void MainWindow::setupWindowWidgets()
             m_pDataWindow, &DataWindow::scaleData);
 
     connect(m_pScaleWindow, &ScaleWindow::scalingViewValueChanged,
-            m_pDataWindow, &DataWindow::scaleChannelsInView);
+            m_pDataWindow, &DataWindow::changeRowHeight);
 
     connect(m_pDataWindow, &DataWindow::scaleChannels,
             m_pScaleWindow, &ScaleWindow::scaleAllChannels);
