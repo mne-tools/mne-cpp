@@ -161,9 +161,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Change the channels in the data views to the double value heigt
+    * Change the channel plot height in the data views to the double value heigt
     */
-    void scaleChannelsInView(int height);
+    void changeRowHeight(int height);
 
 private:
     //=========================================================================================================
