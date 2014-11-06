@@ -112,12 +112,35 @@ public:
     virtual bool insertRows(int position, int span, const QModelIndex & parent = QModelIndex());
     virtual bool removeRows(int position, int span, const QModelIndex & parent = QModelIndex());
 
+    //=========================================================================================================
+    /**
+    * Clears the current data and inits the data of this model with the given fiff info and layout map
+    *
+    * @param fiffInfo fiff info variabel.
+    * @param layoutMap layout map.
+    */
+    void initData(const FiffInfo &fiffInfo, const QMap<QString,QPointF> &layoutMap = QMap<QString,QPointF>());
+
+    //=========================================================================================================
+    /**
+    * Maps the currently loaded channels to the loaded layout file
+    *
+    * @param layoutMap layout map.
+    */
+    void mapLayoutToChannels(const QMap<QString,QPointF> &layoutMap);
+
 protected:
     //=========================================================================================================
     /**
     * clearModel clears all model's members
+    *
     */
     void clearModel();
+
+    FiffInfo                m_fiffInfo;             /**< The fiff info of the currently loaded fiff file. */
+    QMap<QString,QPointF>   m_layoutMap;            /**< The current layout map with a position for all MEG and EEG channels. */
+    QStringList             m_aliasNames;           /**< list of given channel aliases. */
+    QStringList             m_mappedLayoutChNames;  /**< list of given channel aliases. */
 };
 
 } // NAMESPACE

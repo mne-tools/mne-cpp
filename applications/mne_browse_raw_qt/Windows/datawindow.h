@@ -55,7 +55,6 @@
 
 #include <QWidget>
 #include <QResizeEvent>
-#include <QToolBar>
 #include <QPainter>
 #include <QColor>
 #include <QGesture>
@@ -230,8 +229,6 @@ private:
     QVBoxLayout*    m_pUndockedDataViewLayout;      /**< the layout of the undockable widget. */
 
     QScroller*      m_pKineticScroller;             /**< the kinetic scroller of the QTableView. */
-
-    QAction*        m_pRemoveDCAction;              /**< the action which is used to control DC removal. */
 
 signals:
     //=========================================================================================================

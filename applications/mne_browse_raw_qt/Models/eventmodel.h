@@ -137,7 +137,7 @@ public:
     /**
     * setFiffInfo sets the fiff info variabel
     *
-    * @param fiffInfo fiff infp variabel
+    * @param fiffInfo fiff info variabel
     */
     void setFiffInfo(FiffInfo& fiffInfo);
 
