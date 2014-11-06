@@ -80,14 +80,15 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
     if(m_pRTMSAW->m_qMapChScaling.contains(FIFF_UNIT_T))
     {
         QLabel* t_pLabelModality = new QLabel;
-        t_pLabelModality->setText("MAG (fT/cm)");
+        t_pLabelModality->setText("MAG (pT)");
         t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
         t_pDoubleSpinBoxScale->setMinimum(10e-11);
-        t_pDoubleSpinBoxScale->setMaximum(2000);
+        t_pDoubleSpinBoxScale->setMaximum(10e14);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
         t_pDoubleSpinBoxScale->setSingleStep(0.1);
+        t_pDoubleSpinBoxScale->setDecimals(4);
         t_pDoubleSpinBoxScale->setValue(m_pRTMSAW->m_qMapChScaling[FIFF_UNIT_T]/(1e-12));
         m_qMapScalingDoubleSpinBox.insert(FIFF_UNIT_T,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
@@ -100,7 +101,7 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
     if(m_pRTMSAW->m_qMapChScaling.contains(FIFF_UNIT_T_M))
     {
         QLabel* t_pLabelModality = new QLabel;
-        t_pLabelModality->setText("GRAD (pt)");
+        t_pLabelModality->setText("GRAD (fT/cm)");
         t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
@@ -108,6 +109,7 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
         t_pDoubleSpinBoxScale->setMaximum(2000);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
         t_pDoubleSpinBoxScale->setSingleStep(20.0);
+        t_pDoubleSpinBoxScale->setDecimals(4);
         t_pDoubleSpinBoxScale->setValue(m_pRTMSAW->m_qMapChScaling[FIFF_UNIT_T_M]/(1e-15 * 100));   //*100 because data in fiff files is stored as fT/m not fT/cm
         m_qMapScalingDoubleSpinBox.insert(FIFF_UNIT_T_M,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
@@ -128,6 +130,7 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
         t_pDoubleSpinBoxScale->setMaximum(2000);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
         t_pDoubleSpinBoxScale->setSingleStep(1.0);
+        t_pDoubleSpinBoxScale->setDecimals(4);
         t_pDoubleSpinBoxScale->setValue(m_pRTMSAW->m_qMapChScaling[FIFFV_EEG_CH]/(1e-06));
         m_qMapScalingDoubleSpinBox.insert(FIFFV_EEG_CH,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
@@ -148,6 +151,7 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
         t_pDoubleSpinBoxScale->setMaximum(10000);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
         t_pDoubleSpinBoxScale->setSingleStep(10.0);
+        t_pDoubleSpinBoxScale->setDecimals(4);
         t_pDoubleSpinBoxScale->setValue(m_pRTMSAW->m_qMapChScaling[FIFFV_EOG_CH]/(1e-06));
         m_qMapScalingDoubleSpinBox.insert(FIFFV_EOG_CH,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
@@ -168,6 +172,7 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
         t_pDoubleSpinBoxScale->setMaximum(1000);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
         t_pDoubleSpinBoxScale->setSingleStep(1.0);
+        t_pDoubleSpinBoxScale->setDecimals(4);
         t_pDoubleSpinBoxScale->setValue(m_pRTMSAW->m_qMapChScaling[FIFFV_STIM_CH]);
         m_qMapScalingDoubleSpinBox.insert(FIFFV_STIM_CH,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
@@ -188,6 +193,7 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
         t_pDoubleSpinBoxScale->setMaximum(1000);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
         t_pDoubleSpinBoxScale->setSingleStep(1.0);
+        t_pDoubleSpinBoxScale->setDecimals(4);
         t_pDoubleSpinBoxScale->setValue(m_pRTMSAW->m_qMapChScaling[FIFFV_MISC_CH]);
         m_qMapScalingDoubleSpinBox.insert(FIFFV_MISC_CH,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
