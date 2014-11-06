@@ -94,6 +94,7 @@
 
 #include <QFileDialog>
 #include <QScrollBar>
+#include <QToolBar>
 #include <QScroller>
 #include <QTextBrowser>
 #include <QMessageBox>
@@ -254,6 +255,12 @@ private:
 
     //=========================================================================================================
     /**
+    * createToolBar sets up the applications toolbar
+    */
+    void createToolBar();
+
+    //=========================================================================================================
+    /**
     * connectMenus sets up the filemenu
     */
     void connectMenus();
@@ -298,6 +305,8 @@ private:
     RawSettings             m_rawSettings;              /**< the software specific mne brose raw qt settings. */
 
     Ui::MainWindowWidget*   ui;                         /**< Pointer to the qt designer generated ui class.*/
+
+    QAction*                m_pRemoveDCAction;          /**< the action which is used to control DC removal. */
 };
 
 } //NAMESPACE

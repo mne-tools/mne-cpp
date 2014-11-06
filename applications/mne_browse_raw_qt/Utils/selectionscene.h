@@ -89,7 +89,7 @@ public:
     *
     * @param [in] layoutMap layout data map.
     */
-    void repaintItems(const QMap<QString,QVector<double> > &layoutMap);
+    void repaintItems(const QMap<QString, QPointF> &layoutMap);
 
     //=========================================================================================================
     /**

@@ -67,9 +67,9 @@ ChInfoModel::ChInfoModel(QObject *parent)
 int ChInfoModel::rowCount(const QModelIndex & /*parent*/) const
 {
     //Return number of stored evoked sets
-//    if(!m_pEvokedDataSet->evoked.size()==0)
-//        return m_pEvokedDataSet->evoked.size();
-//    else
+    if(!m_fiffInfo.chs.size()==0)
+        return m_fiffInfo.chs.size();
+    else
         return 0;
 }
 
@@ -78,7 +78,7 @@ int ChInfoModel::rowCount(const QModelIndex & /*parent*/) const
 
 int ChInfoModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 5;
+    return 7;
 }
 
 
@@ -91,7 +91,7 @@ QVariant ChInfoModel::headerData(int section, Qt::Orientation orientation, int r
 
     //Return the number and description/comment of the fiff evoked data in the set as vertical header
     if(orientation == Qt::Vertical) {
-        if(section<m_pEvokedDataSet->evoked.size())
+        if(section<m_fiffInfo.chs.size())
             return QString("Set %1").arg(section);
     }
 
@@ -99,23 +99,31 @@ QVariant ChInfoModel::headerData(int section, Qt::Orientation orientation, int r
     if(orientation == Qt::Horizontal) {
         switch(section) {
             case 0:
-                return QString("%1").arg("Comment");
+                return QString("%1").arg("Original name");
                 break;
 
             case 1:
-                return QString("%1").arg("Aspect kind");
+                return QString("%1").arg("Mapped layout name");
                 break;
 
             case 2:
-                return QString("%1").arg("First sample");
+                return QString("%1").arg("Data number");
                 break;
 
             case 3:
-                return QString("%1").arg("Last sample");
+                return QString("%1").arg("Channel kind");
                 break;
 
             case 4:
-                return QString("%1").arg("Data types");
+                return QString("%1").arg("MEG type");
+                break;
+
+            case 5:
+                return QString("%1").arg("Unit");
+                break;
+
+            case 6:
+                return QString("%1").arg("Position");
                 break;
         }
     }
@@ -128,112 +136,163 @@ QVariant ChInfoModel::headerData(int section, Qt::Orientation orientation, int r
 
 QVariant ChInfoModel::data(const QModelIndex &index, int role) const
 {
-    if(index.row() >= m_pEvokedDataSet->evoked.size())
+    if(index.row() >= m_fiffInfo.chs.size())
         return QVariant();
 
     if (index.isValid()) {
-        //******** first column (evoked set comment) ********
+        //******** first column (Original channel name) ********
         if(index.column()==0) {
             QVariant v;
 
             switch(role) {
                 case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_pEvokedDataSet->evoked.at(index.row()).comment));
+                    v.setValue(QString("%1").arg(m_fiffInfo.chs.at(index.row()).ch_name));
                     return v;
                     break;
 
-                case ChInfoModelRoles::GetComment:
-                    v.setValue(m_pEvokedDataSet->evoked.at(index.row()).comment);
+                case ChInfoModelRoles::GetOrigChName:
+                    v.setValue(QString("%1").arg(m_fiffInfo.chs.at(index.row()).ch_name));
                     return v;
                     break;
             }
         }//end column check
 
-        //******** second column (evoked set aspect kind) ********
+        //******** second column (mapped layout channel name) ********
+        if(index.column()==1) {
+            QVariant v;
+
+            switch(role) {
+                case Qt::DisplayRole:
+                    v.setValue(QString("%1").arg(m_mappedLayoutChNames.at(index.row())));
+                    return v;
+                    break;
+
+                case ChInfoModelRoles::GetMappedLayoutChName:
+                    v.setValue(QString("%1").arg(m_mappedLayoutChNames.at(index.row())));
+                    return v;
+                    break;
+            }
+        }//end column check
+
+        //******** third column (channel number - corresponds to row in fiff data matrix) ********
         if(index.column()==2) {
             QVariant v;
 
             switch(role) {
                 case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_pEvokedDataSet->evoked.at(index.row()).aspect_kind));
+                    v.setValue(index.row());
                     return v;
                     break;
 
-                case ChInfoModelRoles::GetAspectKind:
-                    v.setValue(m_pEvokedDataSet->evoked.at(index.row()).aspect_kind);
+                case ChInfoModelRoles::GetChNumber:
+                    v.setValue(index.row());
                     return v;
                     break;
             }
         }//end column check
 
-        //******** third column (evoked set first sample) ********
-        if(index.column()==2) {
-            QVariant v;
-
-            switch(role) {
-                case Qt::DisplayRole:
-                    v.setValue(QString("-%1").arg(m_pEvokedDataSet->evoked.at(index.row()).first));
-                    return v;
-                    break;
-
-            case ChInfoModelRoles::GetFirstSample:
-                v.setValue(m_pEvokedDataSet->evoked.at(index.row()).first);
-                return v;
-                break;
-            }
-        }//end column check
-
-        //******** fourth column (evoked set last sample) ********
+        //******** fourth column (channel kind - MEG, EEG, etc) ********
         if(index.column()==3) {
             QVariant v;
 
             switch(role) {
                 case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_pEvokedDataSet->evoked.at(index.row()).last));
+                    v.setValue(QString("%1").arg(m_fiffInfo.chs.at(index.row()).kind));
                     return v;
                     break;
 
-            case ChInfoModelRoles::GetLastSample:
-                v.setValue(m_pEvokedDataSet->evoked.at(index.row()).last);
-                return v;
-                break;
+                case ChInfoModelRoles::GetChKind:
+                    v.setValue(m_fiffInfo.chs.at(index.row()).kind);
+                    return v;
+                    break;
             }
         }//end column check
 
-        //******** fifth column (evoked set data types) ********
+        //******** fifth column (MEG type) ********
         if(index.column()==4) {
             QVariant v;
-            RowVectorPair averagedData;
-            const FiffInfo *fiffInfo;
-            RowVectorPairF timeData;
-            RowVectorPair projections;
+
+            switch(m_fiffInfo.chs.at(index.row()).kind) {
+                case FIFFV_MEG_CH: {
+                    qint32 unit = m_fiffInfo.chs.at(index.row()).unit;
+                    if(unit == FIFF_UNIT_T_M) {
+                        v.setValue(QString("%1").arg("MEG_grad"));
+                    }
+                    else if(unit == FIFF_UNIT_T)
+                        v.setValue(QString("%1").arg("MEG_mag"));
+                    break;
+                }
+
+                default: {
+                    v.setValue(QString("%1").arg("non_MEG"));
+                    break;
+                }
+            }
 
             switch(role) {
-                case ChInfoModelRoles::GetAverageData:
-                    averagedData.first = m_pEvokedDataSet->evoked.at(index.row()).data.data();
-                    averagedData.second = m_pEvokedDataSet->evoked.at(index.row()).data.cols();
-                    v.setValue(averagedData);
+                case Qt::DisplayRole:
+                    return v;
                     break;
 
-                case ChInfoModelRoles::GetFiffInfo:
-                    fiffInfo = &m_pEvokedDataSet->evoked.at(index.row()).info;
-                    v.setValue(fiffInfo);
-                    break;
-
-                case ChInfoModelRoles::GetTimeData:
-                    timeData.first = m_pEvokedDataSet->evoked.at(index.row()).times.data();
-                    timeData.second = m_pEvokedDataSet->evoked.at(index.row()).times.cols();
-                    v.setValue(timeData);
-                    break;
-
-                case ChInfoModelRoles::GetProjections:
-                    projections.first = m_pEvokedDataSet->evoked.at(index.row()).proj.data();
-                    projections.second = m_pEvokedDataSet->evoked.at(index.row()).proj.cols();
-                    v.setValue(projections);
+                case ChInfoModelRoles::GetMEGType:
+                    return v;
                     break;
             }
 
             return v;
+        }//end column check
+
+        //******** sixth column (channel unit) ********
+        if(index.column()==5) {
+            QVariant v;
+
+            switch(role) {
+                case Qt::DisplayRole:
+                    v.setValue(QString("%1").arg(m_fiffInfo.chs.at(index.row()).unit));
+                    return v;
+                    break;
+
+                case ChInfoModelRoles::GetChUnit:
+                    v.setValue(m_fiffInfo.chs.at(index.row()).unit);
+                    return v;
+                    break;
+            }
+        }//end column check
+
+        //******** sixth column (channel alias) ********
+        if(index.column()==5) {
+            QVariant v;
+
+            switch(role) {
+                case Qt::DisplayRole:
+                    v.setValue(QString("%1").arg(m_aliasNames.at(index.row())));
+                    return v;
+                    break;
+
+                case ChInfoModelRoles::GetChAlias:
+                    v.setValue(m_aliasNames.at(index.row()));
+                    return v;
+                    break;
+            }
+        }//end column check
+
+        //******** seventh column (channel layout position) ********
+        if(index.column()==6) {
+            QVariant v;
+
+            QPointF point = m_layoutMap[m_mappedLayoutChNames.at(index.row())];
+
+            switch(role) {
+                case Qt::DisplayRole:
+                    v.setValue(point);
+                    return v;
+                    break;
+
+                case ChInfoModelRoles::GetChPosition:
+                    v.setValue(point);
+                    return v;
+                    break;
+            }
         }//end column check
     } // end index.valid() check
 
@@ -276,7 +335,7 @@ Qt::ItemFlags ChInfoModel::flags(const QModelIndex & index) const
 
 //*************************************************************************************************************
 
-bool ChInfoModel::setData(const QModelIndex & index, const QVariant & value, int role)
+bool ChInfoModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     Q_UNUSED(index);
     Q_UNUSED(value);
@@ -288,9 +347,37 @@ bool ChInfoModel::setData(const QModelIndex & index, const QVariant & value, int
 
 //*************************************************************************************************************
 
+void ChInfoModel::initData(const FiffInfo &fiffInfo, const QMap<QString,QPointF> &layoutMap)
+{
+    //Clear data
+    clearModel();
+
+    //Set fiff info
+    m_fiffInfo = fiffInfo;
+
+    //Set and if necessary map layout to channels
+    mapLayoutToChannels(layoutMap);
+}
+
+
+//*************************************************************************************************************
+
+void ChInfoModel::mapLayoutToChannels(const QMap<QString,QPointF> &layoutMap)
+{
+    m_layoutMap = layoutMap;
+}
+
+
+//*************************************************************************************************************
+
 void ChInfoModel::clearModel()
 {
     beginResetModel();
+
+//    m_fiffInfo = FiffInfo();
+//    m_layoutMap.clear();
+//    m_aliasNames.clear();
+//    m_mappedLayoutChNames.clear();
 
     endResetModel();
 

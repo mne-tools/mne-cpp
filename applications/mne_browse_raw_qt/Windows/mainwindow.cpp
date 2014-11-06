@@ -134,6 +134,9 @@ void MainWindow::setupWindowWidgets()
     m_pFilterWindow->init();
     m_pScaleWindow->init();
 
+    //Create the toolbar after all indows have been initiliased
+    createToolBar();
+
     //Connect window signals
     //Change scaling of the data and averaged data whenever a spinbox value changed or the user performs a pinch gesture on the view
     connect(m_pScaleWindow, &ScaleWindow::scalingChannelValueChanged,
@@ -162,6 +165,91 @@ void MainWindow::setupWindowWidgets()
 
         m_pSelectionManagerWindow->setCurrentlyLoadedFiffChannels(m_pDataWindow->getDataModel()->m_fiffInfo);
     }
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::createToolBar()
+{
+    //Create toolbar
+    QToolBar *toolBar = new QToolBar(this);
+    toolBar->setOrientation(Qt::Vertical);
+    toolBar->setMovable(true);
+
+    //Add actions to tool bar
+    //Add event
+    QAction* addEventAction = new QAction(QIcon(":/Resources/Images/addEvent.png"),tr("Add event"), this);
+    addEventAction->setStatusTip(tr("Add an event to the event list"));
+    connect(addEventAction, SIGNAL(triggered()), m_pDataWindow, SLOT(addEventToEventModel()));
+    toolBar->addAction(addEventAction);
+
+    //Add DC removal action
+    m_pRemoveDCAction = new QAction(QIcon(":/Resources/Images/removeDC.png"),tr("Remove DC component"), this);
+    m_pRemoveDCAction->setStatusTip(tr("Remove the DC component by subtracting the channel mean"));
+    connect(m_pRemoveDCAction,&QAction::triggered, [=](){
+        if(m_pDataWindow->getDataDelegate()->m_bRemoveDC) {
+            m_pRemoveDCAction->setIcon(QIcon(":/Resources/Images/removeDC.png"));
+            m_pRemoveDCAction->setToolTip("Remove DC component");
+            m_pDataWindow->setStatusTip(tr("Remove the DC component by subtracting the channel mean"));
+            m_pDataWindow->getDataDelegate()->m_bRemoveDC = false;
+        }
+        else {
+            m_pRemoveDCAction->setIcon(QIcon(":/Resources/Images/addDC.png"));
+            m_pRemoveDCAction->setToolTip("Add DC component");
+            m_pRemoveDCAction->setStatusTip(tr("Add the DC component"));
+            m_pDataWindow->getDataDelegate()->m_bRemoveDC = true;
+        }
+
+        m_pDataWindow->updateDataTableViews();
+    });
+    toolBar->addAction(m_pRemoveDCAction);
+
+    toolBar->addSeparator();
+
+    //undock view into new window (not dock widget)
+    QAction* undockToWindowAction = new QAction(QIcon(":/Resources/Images/undockView.png"),tr("Undock data view"), this);
+    undockToWindowAction->setStatusTip(tr("Undock data view to window"));
+    connect(undockToWindowAction, SIGNAL(triggered()), this, SLOT(undockDataViewToWindow()));
+    toolBar->addAction(undockToWindowAction);
+
+    //Toggle visibility of the event manager
+    QAction* showEventManager = new QAction(QIcon(":/Resources/Images/showEventManager.png"),tr("Toggle event manager"), this);
+    showEventManager->setStatusTip(tr("Toggle the event manager"));
+    connect(showEventManager, &QAction::triggered, this, &MainWindow::showEventWindow);
+    toolBar->addAction(showEventManager);
+
+    //Toggle visibility of the filter window
+    QAction* showFilterWindow = new QAction(QIcon(":/Resources/Images/showFilterWindow.png"),tr("Toggle filter window"), this);
+    showFilterWindow->setStatusTip(tr("Toggle filter window"));
+    connect(showFilterWindow, &QAction::triggered, this, &MainWindow::showFilterWindow);
+    toolBar->addAction(showFilterWindow);
+
+    //Toggle visibility of the Selection manager
+    QAction* showSelectionManager = new QAction(QIcon(":/Resources/Images/showSelectionManager.png"),tr("Toggle selection manager"), this);
+    showSelectionManager->setStatusTip(tr("Toggle the selection manager"));
+    connect(showSelectionManager, &QAction::triggered, this, &MainWindow::showSelectionManagerWindow);
+    toolBar->addAction(showSelectionManager);
+
+    //Toggle visibility of the scaling window
+    QAction* showScalingWindow = new QAction(QIcon(":/Resources/Images/showScalingWindow.png"),tr("Toggle scaling window"), this);
+    showScalingWindow->setStatusTip(tr("Toggle the scaling window"));
+    connect(showScalingWindow, &QAction::triggered, this, &MainWindow::showScaleWindow);
+    toolBar->addAction(showScalingWindow);
+
+    //Toggle visibility of the average manager
+    QAction* showAverageManager = new QAction(QIcon(":/Resources/Images/showAverageManager.png"),tr("Toggle average manager"), this);
+    showAverageManager->setStatusTip(tr("Toggle the average manager"));
+    connect(showAverageManager, &QAction::triggered, this, &MainWindow::showAverageWindow);
+    toolBar->addAction(showAverageManager);
+
+    //Toggle visibility of the scaling window
+    QAction* showInformationWindow = new QAction(QIcon(":/Resources/Images/showInformationWindow.png"),tr("Toggle information window"), this);
+    showInformationWindow->setStatusTip(tr("Toggle the information window"));
+    connect(showInformationWindow, &QAction::triggered, this, &MainWindow::showInformationWindow);
+    toolBar->addAction(showInformationWindow);
+
+    this->addToolBar(Qt::RightToolBarArea,toolBar);
 }
 
 

@@ -249,7 +249,7 @@ private:
 
     Ui::SelectionManagerWindow*     ui;                                 /**< Pointer to the qt designer generated ui class. */
 
-    QMap<QString,QVector<double> >  m_layoutMap;                        /**< QMap with the loaded layout. each channel name correspond to a vector [pos_x|pos_y|channel number in the form 113 112 etc.]. */
+    QMap<QString,QPointF>           m_layoutMap;                        /**< QMap with the loaded layout. each channel name correspond to a QPointF variable. */
     QMap<QString,QStringList>       m_selectionGroupsMap;               /**< QMap with the loaded selection groups. Each group name holds a string list with the corresponding channels of the group.*/
 
     SelectionScene*                 m_pSelectionScene;                  /**< Pointer to the selection scene class. */
