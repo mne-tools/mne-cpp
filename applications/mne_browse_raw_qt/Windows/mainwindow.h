@@ -206,45 +206,9 @@ private slots:
 
     //=========================================================================================================
     /**
-     * showAboutWindow opens the about dialog
-     */
-    void showAboutWindow();
-
-    //=========================================================================================================
-    /**
     * showFilterWindow shows the filtering window
     */
-    void showFilterWindow();
-
-    //=========================================================================================================
-    /**
-    * showEventWindow shows the event window
-    */
-    void showEventWindow();
-
-    //=========================================================================================================
-    /**
-    * showInformationWindow shows the information window
-    */
-    void showInformationWindow();
-
-    //=========================================================================================================
-    /**
-    * showSelectionManagerWindow shows the channel selection window
-    */
-    void showSelectionManagerWindow();
-
-    //=========================================================================================================
-    /**
-    * showAverageWindow shows the average window
-    */
-    void showAverageWindow();
-
-    //=========================================================================================================
-    /**
-    * showScalingWindow shows the scaling window
-    */
-    void showScaleWindow();
+    void showWindow(QWidget *window);
 
 private:
     //=========================================================================================================
