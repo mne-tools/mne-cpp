@@ -278,9 +278,11 @@ signals:
 
     //=========================================================================================================
     /**
-    * fileLoaded is emitted whenever a file was (tried) to be loaded
+    * fileLoaded is emitted whenever a file was to be loaded
+    *
+    * @param FiffInfo the current loaded fiffinfo
     */
-    void fileLoaded(bool);
+    void fileLoaded(const FiffInfo&);
 
 public slots:
     //=========================================================================================================
