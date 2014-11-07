@@ -78,7 +78,7 @@ int ChInfoModel::rowCount(const QModelIndex & /*parent*/) const
 
 int ChInfoModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 7;
+    return 8;
 }
 
 
@@ -92,7 +92,7 @@ QVariant ChInfoModel::headerData(int section, Qt::Orientation orientation, int r
     //Return the number and description/comment of the fiff evoked data in the set as vertical header
     if(orientation == Qt::Vertical) {
         if(section<m_fiffInfo.chs.size())
-            return QString("Set %1").arg(section);
+            return QString("Ch %1").arg(section);
     }
 
     //Return the horizontal header
@@ -107,22 +107,26 @@ QVariant ChInfoModel::headerData(int section, Qt::Orientation orientation, int r
                 break;
 
             case 2:
-                return QString("%1").arg("Data number");
+                return QString("%1").arg("Alias");
                 break;
 
             case 3:
-                return QString("%1").arg("Channel kind");
+                return QString("%1").arg("Data number");
                 break;
 
             case 4:
-                return QString("%1").arg("MEG type");
+                return QString("%1").arg("Channel kind");
                 break;
 
             case 5:
-                return QString("%1").arg("Unit");
+                return QString("%1").arg("MEG type");
                 break;
 
             case 6:
+                return QString("%1").arg("Unit");
+                break;
+
+            case 7:
                 return QString("%1").arg("Position");
                 break;
         }
@@ -140,7 +144,7 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     if (index.isValid()) {
-        //******** first column (Original channel name) ********
+        //******** first column (original channel name) ********
         if(index.column()==0) {
             QVariant v;
 
@@ -155,6 +159,8 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
                     return v;
                     break;
             }
+
+            return v;
         }//end column check
 
         //******** second column (mapped layout channel name) ********
@@ -165,134 +171,125 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
                 case Qt::DisplayRole:
                     v.setValue(QString("%1").arg(m_mappedLayoutChNames.at(index.row())));
                     return v;
-                    break;
 
                 case ChInfoModelRoles::GetMappedLayoutChName:
                     v.setValue(QString("%1").arg(m_mappedLayoutChNames.at(index.row())));
                     return v;
-                    break;
-            }
-        }//end column check
-
-        //******** third column (channel number - corresponds to row in fiff data matrix) ********
-        if(index.column()==2) {
-            QVariant v;
-
-            switch(role) {
-                case Qt::DisplayRole:
-                    v.setValue(index.row());
-                    return v;
-                    break;
-
-                case ChInfoModelRoles::GetChNumber:
-                    v.setValue(index.row());
-                    return v;
-                    break;
-            }
-        }//end column check
-
-        //******** fourth column (channel kind - MEG, EEG, etc) ********
-        if(index.column()==3) {
-            QVariant v;
-
-            switch(role) {
-                case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_fiffInfo.chs.at(index.row()).kind));
-                    return v;
-                    break;
-
-                case ChInfoModelRoles::GetChKind:
-                    v.setValue(m_fiffInfo.chs.at(index.row()).kind);
-                    return v;
-                    break;
-            }
-        }//end column check
-
-        //******** fifth column (MEG type) ********
-        if(index.column()==4) {
-            QVariant v;
-
-            switch(m_fiffInfo.chs.at(index.row()).kind) {
-                case FIFFV_MEG_CH: {
-                    qint32 unit = m_fiffInfo.chs.at(index.row()).unit;
-                    if(unit == FIFF_UNIT_T_M) {
-                        v.setValue(QString("%1").arg("MEG_grad"));
-                    }
-                    else if(unit == FIFF_UNIT_T)
-                        v.setValue(QString("%1").arg("MEG_mag"));
-                    break;
-                }
-
-                default: {
-                    v.setValue(QString("%1").arg("non_MEG"));
-                    break;
-                }
-            }
-
-            switch(role) {
-                case Qt::DisplayRole:
-                    return v;
-                    break;
-
-                case ChInfoModelRoles::GetMEGType:
-                    return v;
-                    break;
             }
 
             return v;
         }//end column check
 
-        //******** sixth column (channel unit) ********
-        if(index.column()==5) {
-            QVariant v;
-
-            switch(role) {
-                case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_fiffInfo.chs.at(index.row()).unit));
-                    return v;
-                    break;
-
-                case ChInfoModelRoles::GetChUnit:
-                    v.setValue(m_fiffInfo.chs.at(index.row()).unit);
-                    return v;
-                    break;
-            }
-        }//end column check
-
-        //******** sixth column (channel alias) ********
-        if(index.column()==5) {
+        //******** third column (channel alias) ********
+        if(index.column()==2) {
             QVariant v;
 
             switch(role) {
                 case Qt::DisplayRole:
                     v.setValue(QString("%1").arg(m_aliasNames.at(index.row())));
                     return v;
-                    break;
 
                 case ChInfoModelRoles::GetChAlias:
                     v.setValue(m_aliasNames.at(index.row()));
                     return v;
-                    break;
             }
+
+            return v;
         }//end column check
 
-        //******** seventh column (channel layout position) ********
+        //******** fourth column (channel number - corresponds to row in fiff data matrix) ********
+        if(index.column()==3) {
+            QVariant v;
+
+            switch(role) {
+                case Qt::DisplayRole:
+                    v.setValue(index.row());
+                    return v;
+
+                case ChInfoModelRoles::GetChNumber:
+                    v.setValue(index.row());
+                    return v;
+            }
+
+            return v;
+        }//end column check
+
+        //******** fifth column (channel kind - MEG, EEG, etc) ********
+        if(index.column()==4) {
+            QVariant v;
+
+            switch(role) {
+                case Qt::DisplayRole:
+                    v.setValue(QString("%1").arg(m_fiffInfo.chs.at(index.row()).kind));
+                    return v;
+
+                case ChInfoModelRoles::GetChKind:
+                    v.setValue(m_fiffInfo.chs.at(index.row()).kind);
+                    return v;
+            }
+
+            return v;
+        }//end column check
+
+        //******** sixth column (MEG type) ********
+        if(index.column()==5) {
+            QVariant v;
+
+            v.setValue(QString("%1").arg("non_MEG"));
+
+            if(m_fiffInfo.chs.at(index.row()).kind == FIFFV_MEG_CH) {
+                qint32 unit = m_fiffInfo.chs.at(index.row()).unit;
+                if(unit == FIFF_UNIT_T_M)
+                    v.setValue(QString("%1").arg("MEG_grad"));
+                else if(unit == FIFF_UNIT_T)
+                    v.setValue(QString("%1").arg("MEG_mag"));
+            }
+
+            switch(role) {
+                case Qt::DisplayRole:
+                    return v;
+
+                case ChInfoModelRoles::GetMEGType:
+                    return v;
+            }
+
+            return v;
+        }//end column check
+
+        //******** seventh column (channel unit) ********
         if(index.column()==6) {
+            QVariant v;
+
+            switch(role) {
+                case Qt::DisplayRole:
+                    v.setValue(QString("%1").arg(m_fiffInfo.chs.at(index.row()).unit));
+                    return v;
+
+                case ChInfoModelRoles::GetChUnit:
+                    v.setValue(m_fiffInfo.chs.at(index.row()).unit);
+                    return v;
+            }
+
+            return v;
+        }//end column check
+
+        //******** eigth column (channel layout position) ********
+        if(index.column()==7) {
             QVariant v;
 
             QPointF point = m_layoutMap[m_mappedLayoutChNames.at(index.row())];
 
             switch(role) {
                 case Qt::DisplayRole:
-                    v.setValue(point);
+                    v.setValue(QString("(%1|%2)").arg(point.x()).arg(point.y()));
                     return v;
-                    break;
 
                 case ChInfoModelRoles::GetChPosition:
                     v.setValue(point);
                     return v;
-                    break;
             }
+
+            return v;
         }//end column check
     } // end index.valid() check
 
@@ -347,16 +344,33 @@ bool ChInfoModel::setData(const QModelIndex &index, const QVariant &value, int r
 
 //*************************************************************************************************************
 
-void ChInfoModel::initData(const FiffInfo &fiffInfo, const QMap<QString,QPointF> &layoutMap)
+void ChInfoModel::fiffInfoChanged(const FiffInfo &fiffInfo)
 {
-    //Clear data
-    clearModel();
+    beginResetModel();
 
-    //Set fiff info
     m_fiffInfo = fiffInfo;
+    m_aliasNames = m_fiffInfo.ch_names;
+    m_mappedLayoutChNames = m_fiffInfo.ch_names;
 
-    //Set and if necessary map layout to channels
-    mapLayoutToChannels(layoutMap);
+    endResetModel();
+
+    emit dataChanged(createIndex(0,0), createIndex(rowCount(),columnCount()));
+}
+
+
+//*************************************************************************************************************
+
+void ChInfoModel::layoutChanged(const QMap<QString,QPointF> &layoutMap)
+{
+    beginResetModel();
+
+    m_layoutMap = layoutMap;
+    m_aliasNames = m_fiffInfo.ch_names;
+    m_mappedLayoutChNames = m_fiffInfo.ch_names;
+
+    endResetModel();
+
+    emit dataChanged(createIndex(0,0), createIndex(rowCount(),columnCount()));
 }
 
 
@@ -365,6 +379,8 @@ void ChInfoModel::initData(const FiffInfo &fiffInfo, const QMap<QString,QPointF>
 void ChInfoModel::mapLayoutToChannels(const QMap<QString,QPointF> &layoutMap)
 {
     m_layoutMap = layoutMap;
+
+    //TODO: Map channels to layout
 }
 
 
@@ -374,10 +390,10 @@ void ChInfoModel::clearModel()
 {
     beginResetModel();
 
-//    m_fiffInfo = FiffInfo();
-//    m_layoutMap.clear();
-//    m_aliasNames.clear();
-//    m_mappedLayoutChNames.clear();
+    m_fiffInfo = FiffInfo();
+    m_layoutMap.clear();
+    m_aliasNames.clear();
+    m_mappedLayoutChNames.clear();
 
     endResetModel();
 

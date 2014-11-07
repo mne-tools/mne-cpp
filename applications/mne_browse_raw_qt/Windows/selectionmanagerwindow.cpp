@@ -161,6 +161,13 @@ QListWidgetItem* SelectionManagerWindow::getItem(QListWidget* listWidget, QStrin
     return new QListWidgetItem();
 }
 
+//*************************************************************************************************************
+
+const QMap<QString,QPointF>& SelectionManagerWindow::getLayoutMap()
+{
+    return m_layoutMap;
+}
+
 
 //*************************************************************************************************************
 
@@ -230,6 +237,9 @@ bool SelectionManagerWindow::loadLayout(QString path)
 
     //Fit to view
     ui->m_graphicsView_layoutPlot->fitInView(m_pSelectionScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+
+    if(state)
+        emit loadedLayoutMap(m_layoutMap);
 
     return state;
 }

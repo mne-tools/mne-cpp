@@ -1,16 +1,15 @@
 //=============================================================================================================
 /**
-* @file     chinfomodel.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     chinfowindow.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     November, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,44 +30,30 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    This class represents the channel info model of the model/view framework of mne_browse_raw_qt application.
+* @brief    Contains the declaration of the ChInfoWindow class.
 *
 */
 
-#ifndef CHINFOCLASS_H
-#define CHINFOCLASS_H
+#ifndef CHINFOWINDOW_H
+#define CHINFOWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../Utils/rawsettings.h"
-#include "../Utils/types.h"
+#include "ui_chinfowindow.h"
+#include "fiff/fiff.h"
+
+#include "../Models/chinfomodel.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QAbstractTableModel>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
-#include <fiff/fiff.h>
+#include <QDockWidget>
 
 
 //*************************************************************************************************************
@@ -76,7 +61,6 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
 using namespace FIFFLIB;
 
 
@@ -88,29 +72,35 @@ using namespace FIFFLIB;
 namespace MNEBrowseRawQt
 {
 
+//*************************************************************************************************************
 //=============================================================================================================
+// DEFINE FORWARD DECLARATIONS
+//=============================================================================================================
+
 /**
-* DECLARE CLASS ChInfoModel
+* DECLARE CLASS ChInfoWindow
+*
+* @brief The ChInfoWindow class provides a dock window for informations about every loaded channel.
 */
-class ChInfoModel : public QAbstractTableModel
+class ChInfoWindow : public QDockWidget
 {
     Q_OBJECT
+
 public:
-    ChInfoModel(QObject *parent = 0);
+    //=========================================================================================================
+    /**
+    * Constructs a ChInfoWindow which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new ChInfoWindow becomes a window. If parent is another widget, ChInfoWindow becomes a child window inside parent. ChInfoWindow is deleted when its parent is deleted.
+    */
+    ChInfoWindow(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Reimplemented virtual functions
-    *
+    * Destroys the ChInfoWindow.
+    * All ChInfoWindow's children are deleted first. The application exits if ChInfoWindow is the main widget.
     */
-    virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
-    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
-    virtual Qt::ItemFlags flags(const QModelIndex & index) const;
-    virtual bool insertRows(int position, int span, const QModelIndex & parent = QModelIndex());
-    virtual bool removeRows(int position, int span, const QModelIndex & parent = QModelIndex());
+    ~ChInfoWindow();
 
     //=========================================================================================================
     /**
@@ -128,28 +118,26 @@ public:
     */
     void layoutChanged(const QMap<QString,QPointF> &layoutMap);
 
+private:
     //=========================================================================================================
     /**
-    * Maps the currently loaded channels to the loaded layout file
+    * Inits the model view controller pattern of this window.
     *
-    * @param layoutMap the layout map with the 2D positions.
     */
-    void mapLayoutToChannels(const QMap<QString,QPointF> &layoutMap);
+    void initMVC();
 
-protected:
     //=========================================================================================================
     /**
-    * clearModel clears all model's members
+    * Inits all QTableViews of this window.
     *
     */
-    void clearModel();
+    void initTableViews();
 
-    FiffInfo                m_fiffInfo;             /**< The fiff info of the currently loaded fiff file. */
-    QMap<QString,QPointF>   m_layoutMap;            /**< The current layout map with a position for all MEG and EEG channels. */
-    QStringList             m_aliasNames;           /**< list of given channel aliases. */
-    QStringList             m_mappedLayoutChNames;  /**< list of the mapped layout channel names. */
+    Ui::ChInfoWindow*   ui;                 /**< Pointer to the qt designer generated ui class.*/
+
+    ChInfoModel*        m_pChInfoModel;     /**< The channel info model.*/
 };
 
-} // NAMESPACE
+} // NAMESPACE MNEBrowseRawQt
 
-#endif // CHINFOCLASS_H
+#endif // CHINFOWINDOW_H

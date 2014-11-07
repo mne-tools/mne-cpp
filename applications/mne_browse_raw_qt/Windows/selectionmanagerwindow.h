@@ -148,6 +148,12 @@ public:
     */
     QListWidgetItem* getItem(QListWidget *listWidget, QString channelName);
 
+    //=========================================================================================================
+    /**
+    * returns the current layout map.
+    */
+    const QMap<QString,QPointF>& getLayoutMap();
+
 signals:
     void showSelectedChannelsOnly(QStringList selectedChannels);
 
@@ -158,6 +164,14 @@ signals:
     * @param [in] selectedChannelItems currently user selected channels
     */
     void selectionChanged(QList<QGraphicsItem*> &selectedChannelItems);
+
+    //=========================================================================================================
+    /**
+    * emit this signal whenever a new layout was loaded
+    *
+    * @param [in] layoutMap currently loaded layout
+    */
+    void loadedLayoutMap(const QMap<QString,QPointF> &layoutMap);
 
 private:
     //=========================================================================================================

@@ -95,38 +95,43 @@ void MainWindow::setupWindowWidgets()
     //Create data window
     m_pDataWindow = new DataWindow(this);
 
-    //Create dockble event window - QTDesigner used - see /FormFiles
+    //Create dockble event window - QTDesigner used - see / FormFiles
     m_pEventWindow = new EventWindow(this);
     addDockWidget(Qt::LeftDockWidgetArea, m_pEventWindow);
     m_pEventWindow->hide();
 
-    //Create filter window - QTDesigner used - see /FormFiles
+    //Create filter window - QTDesigner used - see / FormFiles
     m_pFilterWindow = new FilterWindow(this);
     m_pFilterWindow->hide();
 
-    //Create dockable information window - QTDesigner used - see /FormFiles
+    //Create dockable information window - QTDesigner used - see / FormFiles
     m_pInformationWindow = new InformationWindow(this);
     addDockWidget(Qt::BottomDockWidgetArea, m_pInformationWindow);
     m_pInformationWindow->hide();
 
-    //Create about window - QTDesigner used - see /FormFiles
+    //Create about window - QTDesigner used - see / FormFiles
     m_pAboutWindow = new AboutWindow(this);
     m_pAboutWindow->hide();
 
-    //Create selection manager window - QTDesigner used - see /FormFiles
+    //Create selection manager window - QTDesigner used - see / FormFiles
     m_pSelectionManagerWindow = new SelectionManagerWindow(this);
     addDockWidget(Qt::BottomDockWidgetArea, m_pSelectionManagerWindow);
     m_pSelectionManagerWindow->hide();
 
-    //Create average manager window - QTDesigner used - see /FormFiles
+    //Create average manager window - QTDesigner used - see / FormFiles
     m_pAverageWindow = new AverageWindow(this, m_qEvokedFile);
     addDockWidget(Qt::BottomDockWidgetArea, m_pAverageWindow);
-    //m_pAverageWindow->hide();
+    m_pAverageWindow->hide();
 
-    //Create scale window - QTDesigner used - see /FormFiles
+    //Create scale window - QTDesigner used - see / FormFiles
     m_pScaleWindow = new ScaleWindow(this);
     addDockWidget(Qt::LeftDockWidgetArea, m_pScaleWindow);
     m_pScaleWindow->hide();
+
+    //Create channel info window - QTDesigner used - see / FormFiles
+    m_pChInfoWindow = new ChInfoWindow(this);
+    addDockWidget(Qt::BottomDockWidgetArea, m_pChInfoWindow);
+    m_pChInfoWindow->hide();
 
     //Init windows - TODO: get rid of this here, do this inside the window classes
     m_pDataWindow->init();
@@ -159,11 +164,21 @@ void MainWindow::setupWindowWidgets()
     connect(m_pSelectionManagerWindow, &SelectionManagerWindow::selectionChanged,
             m_pAverageWindow, &AverageWindow::channelSelectionManagerChanged);
 
+    //Connect channel info window with raw data model and layout manager
+    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
+            m_pChInfoWindow, &ChInfoWindow::fiffInfoChanged);
+
+    connect(m_pSelectionManagerWindow, &SelectionManagerWindow::loadedLayoutMap,
+            m_pChInfoWindow, &ChInfoWindow::layoutChanged);
+
     //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels - TODO: dirty move get rid of this here
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
         m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_fiffInfo);
 
         m_pSelectionManagerWindow->setCurrentlyLoadedFiffChannels(m_pDataWindow->getDataModel()->m_fiffInfo);
+
+        m_pChInfoWindow->fiffInfoChanged(m_pDataWindow->getDataModel()->m_fiffInfo);
+        m_pChInfoWindow->layoutChanged(m_pSelectionManagerWindow->getLayoutMap());
     }
 }
 
@@ -208,9 +223,11 @@ void MainWindow::createToolBar()
     toolBar->addSeparator();
 
     //undock view into new window (not dock widget)
-    QAction* undockToWindowAction = new QAction(QIcon(":/Resources/Images/undockView.png"),tr("Undock data view"), this);
-    undockToWindowAction->setStatusTip(tr("Undock data view to window"));
-    connect(undockToWindowAction, SIGNAL(triggered()), this, SLOT(undockDataViewToWindow()));
+    QAction* undockToWindowAction = new QAction(QIcon(":/Resources/Images/undockView.png"),tr("Channel info"), this);
+    undockToWindowAction->setStatusTip(tr("Toggle channel info window"));
+    connect(undockToWindowAction, &QAction::triggered, this, [=](){
+        showWindow(m_pChInfoWindow);
+    });
     toolBar->addAction(undockToWindowAction);
 
     //Toggle visibility of the event manager
