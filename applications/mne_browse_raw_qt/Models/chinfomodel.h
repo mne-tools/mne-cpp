@@ -130,11 +130,29 @@ public:
 
     //=========================================================================================================
     /**
-    * Maps the currently loaded channels to the loaded layout file
+    * Updates the layout map
     *
-    * @param layoutMap the layout map with the 2D positions.
+    * @return the current mapped channel list
     */
-    void mapLayoutToChannels(const QMap<QString,QPointF> &layoutMap);
+    const QStringList & getMappedChannelsList();
+
+    //=========================================================================================================
+    /**
+    * Returns the model index for the given input channel fro mthe original channel list
+    *
+    * @param chName the channel name for which the model index is needed.
+    * @return the index number. if channel was not found in the data this functions returns -1
+    */
+    int getIndexFromOrigChName(QString chName);
+
+    //=========================================================================================================
+    /**
+    * Returns the model index for the given input channel fro mthe mapped channel list
+    *
+    * @param chName the channel name for which the model index is needed.
+    * @return the index number. if channel was not found in the data this functions returns -1
+    */
+    int getIndexFromMappedChName(QString chName);
 
 protected:
     //=========================================================================================================
@@ -143,6 +161,14 @@ protected:
     *
     */
     void clearModel();
+
+
+    //=========================================================================================================
+    /**
+    * Maps the currently loaded channels to the loaded layout file
+    *
+    */
+    void mapLayoutToChannels();
 
     FiffInfo                m_fiffInfo;             /**< The fiff info of the currently loaded fiff file. */
     QMap<QString,QPointF>   m_layoutMap;            /**< The current layout map with a position for all MEG and EEG channels. */

@@ -270,7 +270,6 @@ QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role
         case 0: //chname column
             return QVariant();
         case 1: //data plot column
-            return QVariant("data plot");
             switch(role) {
             case Qt::DisplayRole:
                 return QVariant("data plot");

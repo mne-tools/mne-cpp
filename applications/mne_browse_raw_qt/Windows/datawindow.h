@@ -155,6 +155,8 @@ public:
     //=========================================================================================================
     /**
     * Only shows the channels defined in the QStringList selectedChannels
+    *
+    * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
     */
     void showSelectedChannelsOnly(QStringList selectedChannels);
 

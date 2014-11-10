@@ -118,6 +118,20 @@ public:
     */
     void layoutChanged(const QMap<QString,QPointF> &layoutMap);
 
+    //=========================================================================================================
+    /**
+    * Returns the ChInfoModel of this window
+    */
+    ChInfoModel* getDataModel();
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever channels where mapped to a layout
+    *
+    */
+    void channelsMappedToLayout(const QStringList &mappedLayoutChNames);
+
 private:
     //=========================================================================================================
     /**
