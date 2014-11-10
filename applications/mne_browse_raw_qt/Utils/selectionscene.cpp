@@ -64,16 +64,16 @@ SelectionScene::SelectionScene(QGraphicsView* view, QObject* parent)
 
 //*************************************************************************************************************
 
-void SelectionScene::repaintItems(const QMap<QString,QVector<double> > &layoutMap)
+void SelectionScene::repaintItems(const QMap<QString,QPointF> &layoutMap)
 {
     this->clear();
 
-    QMapIterator<QString,QVector<double> > i(layoutMap);
+    QMapIterator<QString,QPointF > i(layoutMap);
     while (i.hasNext()) {
         i.next();
         SelectionSceneItem* SelectionSceneItemTemp = new SelectionSceneItem(i.key(),
-                                                                      i.value().at(2),
-                                                                      QPointF(i.value().at(0), i.value().at(1)),
+                                                                      0,
+                                                                      i.value(),
                                                                       FIFFV_MEG_CH,
                                                                       FIFF_UNIT_T_M);
 

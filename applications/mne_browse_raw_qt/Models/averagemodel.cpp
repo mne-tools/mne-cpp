@@ -166,7 +166,7 @@ QVariant AverageModel::data(const QModelIndex &index, int role) const
         }//end column check
 
         //******** second column (evoked set aspect kind) ********
-        if(index.column()==2) {
+        if(index.column()==1) {
             QVariant v;
 
             switch(role) {
@@ -188,7 +188,7 @@ QVariant AverageModel::data(const QModelIndex &index, int role) const
 
             switch(role) {
                 case Qt::DisplayRole:
-                    v.setValue(QString("-%1").arg(m_pEvokedDataSet->evoked.at(index.row()).first));
+                    v.setValue(QString("%1").arg(m_pEvokedDataSet->evoked.at(index.row()).first));
                     return v;
                     break;
 

@@ -55,9 +55,10 @@ using namespace MNEBrowseRawQt;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SelectionManagerWindow::SelectionManagerWindow(QWidget *parent) :
-    QDockWidget(parent),
-    ui(new Ui::SelectionManagerWindow)
+SelectionManagerWindow::SelectionManagerWindow(QWidget *parent, ChInfoModel* pChInfoModel)
+: QDockWidget(parent)
+, ui(new Ui::SelectionManagerWindow)
+, m_pChInfoModel(pChInfoModel)
 {
     ui->setupUi(this);
 
@@ -78,16 +79,31 @@ SelectionManagerWindow::~SelectionManagerWindow()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::setCurrentlyLoadedFiffChannels(FiffInfo loadedFiffInfo)
+void SelectionManagerWindow::setCurrentlyLoadedFiffChannels(const QStringList &mappedLayoutChNames)
 {
-    QStringList loadedFiffChannels;
+    m_currentlyLoadedFiffChannels = mappedLayoutChNames;
 
-    for(int i = 0; i<loadedFiffInfo.chs.size() ; i++)
-        loadedFiffChannels<<loadedFiffInfo.chs.at(i).ch_name;
+    //Clear the visible channel list
+    ui->m_listWidget_visibleChannels->clear();
 
-    m_currentlyLoadedFiffChannels = loadedFiffChannels;
+    //Keep the entry All in the selection list and m_selectionGroupsMap -> delete the rest
+    ui->m_listWidget_selectionGroups->clear();
 
-    loadLayout(ui->m_comboBox_layoutFile->currentText());
+    //Create group 'All' manually (bcause this group depends on the loaded channels from the fiff data file, not on the loaded selection file)
+    m_selectionGroupsMap["All"] = m_currentlyLoadedFiffChannels;
+
+    //Add selection groups to list widget
+    QMapIterator<QString, QStringList> selectionIndex(m_selectionGroupsMap);
+    while (selectionIndex.hasNext()) {
+        selectionIndex.next();
+        ui->m_listWidget_selectionGroups->insertItem(ui->m_listWidget_selectionGroups->count(), selectionIndex.key());
+    }
+
+    //Set group all as slected item
+    ui->m_listWidget_selectionGroups->setCurrentItem(getItemForChName(ui->m_listWidget_selectionGroups, "All"), QItemSelectionModel::Select);
+
+    //Update selection
+    updateSelectionGroupsList(getItemForChName(ui->m_listWidget_selectionGroups, "All"));
 }
 
 
@@ -152,13 +168,20 @@ QStringList SelectionManagerWindow::getSelectedChannels()
 
 //*************************************************************************************************************
 
-QListWidgetItem* SelectionManagerWindow::getItem(QListWidget* listWidget, QString channelName)
+QListWidgetItem* SelectionManagerWindow::getItemForChName(QListWidget* listWidget, QString channelName)
 {
     for(int i=0; i<listWidget->count(); i++)
         if(listWidget->item(i)->text() == channelName)
             return listWidget->item(i);
 
     return new QListWidgetItem();
+}
+
+//*************************************************************************************************************
+
+const QMap<QString,QPointF>& SelectionManagerWindow::getLayoutMap()
+{
+    return m_layoutMap;
 }
 
 
@@ -231,6 +254,9 @@ bool SelectionManagerWindow::loadLayout(QString path)
     //Fit to view
     ui->m_graphicsView_layoutPlot->fitInView(m_pSelectionScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 
+    if(state)
+        emit loadedLayoutMap(m_layoutMap);
+
     return state;
 }
 
@@ -265,10 +291,10 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
     cleanUpMEGChannels();
 
     //Set group all as slected item
-    ui->m_listWidget_selectionGroups->setCurrentItem(getItem(ui->m_listWidget_selectionGroups, "All"), QItemSelectionModel::Select);
+    ui->m_listWidget_selectionGroups->setCurrentItem(getItemForChName(ui->m_listWidget_selectionGroups, "All"), QItemSelectionModel::Select);
 
     //Update selection
-    updateSelectionGroupsList(getItem(ui->m_listWidget_selectionGroups, "All"));
+    updateSelectionGroupsList(getItemForChName(ui->m_listWidget_selectionGroups, "All"));
 
     return state;
 }
@@ -362,13 +388,21 @@ void SelectionManagerWindow::updateDataView()
 
     for(int i = 0; i<targetListWidget->count(); i++) {
         QListWidgetItem* item = targetListWidget->item(i);
-        selectedChannels << item->text();
+        int indexTemp = m_pChInfoModel->getIndexFromMappedChName(item->text());
+
+        if(indexTemp != -1) {
+            QModelIndex mappedNameIndex = m_pChInfoModel->index(indexTemp,1);
+            QString origChName = m_pChInfoModel->data(mappedNameIndex,ChInfoModelRoles::GetOrigChName).toString();
+
+            selectedChannels << origChName;
+        }
+        else
+            selectedChannels << item->text();
     }
 
     emit showSelectedChannelsOnly(selectedChannels);
 
     //emit signal that selection was changed
-
     if(!m_pSelectionScene->selectedItems().empty())
         emit selectionChanged(m_pSelectionScene->selectedItems());
     else

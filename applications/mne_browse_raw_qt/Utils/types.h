@@ -94,6 +94,19 @@ namespace AverageModelRoles
                   GetProjections = Qt::UserRole + 1008};
 }
 
+namespace ChInfoModelRoles
+{
+    enum ItemRole{GetOrigChName = Qt::UserRole + 1009,
+                  GetMappedLayoutChName = Qt::UserRole + 1010,
+                  GetChNumber = Qt::UserRole + 1011,
+                  GetChKind = Qt::UserRole + 1012,
+                  GetMEGType = Qt::UserRole + 1013,
+                  GetChUnit = Qt::UserRole + 1014,
+                  GetChAlias = Qt::UserRole + 1015,
+                  GetChPosition = Qt::UserRole + 1016};
+}
+
+Q_DECLARE_METATYPE(FIFFLIB::fiff_int_t);
 Q_DECLARE_METATYPE(MNEBrowseRawQt::RowVectorPairF);
 Q_DECLARE_METATYPE(const FIFFLIB::FiffInfo*);
 Q_DECLARE_METATYPE(MNEBrowseRawQt::MatrixXdR);
