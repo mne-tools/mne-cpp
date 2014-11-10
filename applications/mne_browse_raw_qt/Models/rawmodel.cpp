@@ -270,7 +270,6 @@ QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role
         case 0: //chname column
             return QVariant();
         case 1: //data plot column
-            return QVariant("data plot");
             switch(role) {
             case Qt::DisplayRole:
                 return QVariant("data plot");
@@ -367,7 +366,6 @@ bool RawModel::loadFiffData(QFile& qFile)
         qDebug("RawModel: ERROR! Data set does not contain any fiff data!");
         endResetModel();
         m_bFileloaded = false;
-        emit fileLoaded(false);
         return false;
     }
 
@@ -383,7 +381,7 @@ bool RawModel::loadFiffData(QFile& qFile)
 
     endResetModel();
 
-    emit fileLoaded(true);
+    emit fileLoaded(m_fiffInfo);
 
     return true;
 }

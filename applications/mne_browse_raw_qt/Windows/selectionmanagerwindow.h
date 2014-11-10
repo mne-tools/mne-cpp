@@ -47,6 +47,8 @@
 #include "utils/selectionloader.h"         //MNE-CPP utils
 #include "../Utils/selectionscene.h"       //MNE Browse Raw QT utils
 #include "fiff/fiff.h"
+#include "../Models/chinfomodel.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -96,8 +98,9 @@ public:
     * Constructs a SelectionManagerWindow which is a child of parent.
     *
     * @param [in] parent pointer to parent widget; If parent is 0, the new SelectionManagerWindow becomes a window. If parent is another widget, SelectionManagerWindow becomes a child window inside parent. SelectionManagerWindow is deleted when its parent is deleted.
+    * @param [in] pChInfoModel pointer to the channel info model.
     */
-    SelectionManagerWindow(QWidget *parent = 0);
+    SelectionManagerWindow(QWidget *parent = 0, ChInfoModel *pChInfoModel = new ChInfoModel());
 
     //=========================================================================================================
     /**
@@ -110,9 +113,9 @@ public:
     /**
     * Sets the currently loaded fiff channels. used to create the group All.
     *
-    * @param [in] loadedFiffInfo the loaded fiff info
+    * @param [in] mappedLayoutChNames the currently to layout mapped channels
     */
-    void setCurrentlyLoadedFiffChannels(FiffInfo loadedFiffInfo);
+    void setCurrentlyLoadedFiffChannels(const QStringList &mappedLayoutChNames);
 
     //=========================================================================================================
     /**
@@ -146,18 +149,38 @@ public:
     * @param [in] listWidget QListWidget which inhibits the needed item
     * @param [in] channelName the corresponding channel name
     */
-    QListWidgetItem* getItem(QListWidget *listWidget, QString channelName);
+    QListWidgetItem* getItemForChName(QListWidget *listWidget, QString channelName);
+
+    //=========================================================================================================
+    /**
+    * returns the current layout map.
+    */
+    const QMap<QString,QPointF>& getLayoutMap();
 
 signals:
+    //=========================================================================================================
+    /**
+    * emit this signal whenever the user or group selection has changed
+    *
+    * @param [in] selectedChannels currently user selected channels or items which are in the visible list widget
+    */
     void showSelectedChannelsOnly(QStringList selectedChannels);
 
     //=========================================================================================================
     /**
-    * emit this signal whenever the selction in the scene has changed
+    * emit this signal whenever the selection in the scene has changed
     *
     * @param [in] selectedChannelItems currently user selected channels
     */
     void selectionChanged(QList<QGraphicsItem*> &selectedChannelItems);
+
+    //=========================================================================================================
+    /**
+    * emit this signal whenever a new layout was loaded
+    *
+    * @param [in] layoutMap currently loaded layout
+    */
+    void loadedLayoutMap(const QMap<QString,QPointF> &layoutMap);
 
 private:
     //=========================================================================================================
@@ -249,7 +272,9 @@ private:
 
     Ui::SelectionManagerWindow*     ui;                                 /**< Pointer to the qt designer generated ui class. */
 
-    QMap<QString,QVector<double> >  m_layoutMap;                        /**< QMap with the loaded layout. each channel name correspond to a vector [pos_x|pos_y|channel number in the form 113 112 etc.]. */
+    ChInfoModel*                    m_pChInfoModel;                     /**< Pointer to the channel info model. */
+
+    QMap<QString,QPointF>           m_layoutMap;                        /**< QMap with the loaded layout. each channel name correspond to a QPointF variable. */
     QMap<QString,QStringList>       m_selectionGroupsMap;               /**< QMap with the loaded selection groups. Each group name holds a string list with the corresponding channels of the group.*/
 
     SelectionScene*                 m_pSelectionScene;                  /**< Pointer to the selection scene class. */

@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     selectionscene.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* @file     chinfowindow.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     October, 2014
+* @date     November, 2014
 *
 * @section  LICENSE
 *
@@ -30,21 +30,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the SelectionScene class.
+* @brief    Contains the declaration of the ChInfoWindow class.
 *
 */
 
-#ifndef SELECTIONSCENE_H
-#define SELECTIONSCENE_H
+#ifndef CHINFOWINDOW_H
+#define CHINFOWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "layoutscene.h"
-#include "selectionsceneitem.h"
-#include <fiff/fiff.h>
+#include "ui_chinfowindow.h"
+#include "fiff/fiff.h"
+
+#include "../Models/chinfomodel.h"
 
 
 //*************************************************************************************************************
@@ -52,54 +53,105 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGraphicsScene>
-#include <QWidget>
-#include <QMutableListIterator>
+#include <QDockWidget>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace FIFFLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNEBrowseRawQt
 //=============================================================================================================
 
 namespace MNEBrowseRawQt
 {
 
-
+//*************************************************************************************************************
 //=============================================================================================================
+// DEFINE FORWARD DECLARATIONS
+//=============================================================================================================
+
 /**
-* SelectionScene...
+* DECLARE CLASS ChInfoWindow
 *
-* @brief The SelectionScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
+* @brief The ChInfoWindow class provides a dock window for informations about every loaded channel.
 */
-class SelectionScene : public LayoutScene
+class ChInfoWindow : public QDockWidget
 {
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a SelectionScene.
+    * Constructs a ChInfoWindow which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new ChInfoWindow becomes a window. If parent is another widget, ChInfoWindow becomes a child window inside parent. ChInfoWindow is deleted when its parent is deleted.
     */
-    explicit SelectionScene(QGraphicsView* view, QObject *parent = 0);
+    ChInfoWindow(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Updates layout data.
-    *
-    * @param [in] layoutMap layout data map.
+    * Destroys the ChInfoWindow.
+    * All ChInfoWindow's children are deleted first. The application exits if ChInfoWindow is the main widget.
     */
-    void repaintItems(const QMap<QString, QPointF> &layoutMap);
+    ~ChInfoWindow();
 
     //=========================================================================================================
     /**
-    * Hides all items described in list.
+    * Updates the fiff info
     *
-    * @param [in] list string list with items name which are to be hidden.
+    * @param fiffInfo fiff info variabel.
     */
-    void hideItems(QStringList visibleItems);
+    void fiffInfoChanged(const FiffInfo &fiffInfo);
+
+    //=========================================================================================================
+    /**
+    * Updates the layout map
+    *
+    * @param layoutMap the layout map with the 2D positions.
+    */
+    void layoutChanged(const QMap<QString,QPointF> &layoutMap);
+
+    //=========================================================================================================
+    /**
+    * Returns the ChInfoModel of this window
+    */
+    ChInfoModel* getDataModel();
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever channels where mapped to a layout
+    *
+    */
+    void channelsMappedToLayout(const QStringList &mappedLayoutChNames);
+
+private:
+    //=========================================================================================================
+    /**
+    * Inits the model view controller pattern of this window.
+    *
+    */
+    void initMVC();
+
+    //=========================================================================================================
+    /**
+    * Inits all QTableViews of this window.
+    *
+    */
+    void initTableViews();
+
+    Ui::ChInfoWindow*   ui;                 /**< Pointer to the qt designer generated ui class.*/
+
+    ChInfoModel*        m_pChInfoModel;     /**< The channel info model.*/
 };
 
-} // NAMESPACE
+} // NAMESPACE MNEBrowseRawQt
 
-#endif // SelectionScene_H
+#endif // CHINFOWINDOW_H

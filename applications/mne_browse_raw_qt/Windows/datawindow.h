@@ -55,7 +55,6 @@
 
 #include <QWidget>
 #include <QResizeEvent>
-#include <QToolBar>
 #include <QPainter>
 #include <QColor>
 #include <QGesture>
@@ -156,14 +155,16 @@ public:
     //=========================================================================================================
     /**
     * Only shows the channels defined in the QStringList selectedChannels
+    *
+    * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
     */
     void showSelectedChannelsOnly(QStringList selectedChannels);
 
     //=========================================================================================================
     /**
-    * Change the channels in the data views to the double value heigt
+    * Change the channel plot height in the data views to the double value heigt
     */
-    void scaleChannelsInView(int height);
+    void changeRowHeight(int height);
 
 private:
     //=========================================================================================================
@@ -230,8 +231,6 @@ private:
     QVBoxLayout*    m_pUndockedDataViewLayout;      /**< the layout of the undockable widget. */
 
     QScroller*      m_pKineticScroller;             /**< the kinetic scroller of the QTableView. */
-
-    QAction*        m_pRemoveDCAction;              /**< the action which is used to control DC removal. */
 
 signals:
     //=========================================================================================================

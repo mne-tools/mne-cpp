@@ -130,12 +130,6 @@ public:
 private:
     //=========================================================================================================
     /**
-    * Inits all QPushButtons in this window
-    */
-    void initButtons();
-
-    //=========================================================================================================
-    /**
     * inits the model view controller paradigm of this window
     *
     * @param [in] file holds the file which is to be loaded on startup
@@ -156,6 +150,18 @@ private:
 
     //=========================================================================================================
     /**
+    * Inits all QPushButtons in this window
+    */
+    void initButtons();
+
+    //=========================================================================================================
+    /**
+    * Inits all QComboBoxes in this window
+    */
+    void initComboBoxes();
+
+    //=========================================================================================================
+    /**
     * call this function whenever a selection was made in teh evoked data set list
     */
     void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
@@ -166,7 +172,15 @@ private:
     */
     void exportAverageLayoutPlot();
 
+    //=========================================================================================================
+    /**
+    * saves the current butterfly average plot as png or svg to file
+    */
+    void exportAverageButterflyPlot();
+
     Ui::AverageWindow*      ui;                     /**< Pointer to the qt designer generated ui class.*/
+
+    QList<QColor>           m_lButterflyColors;     /**< List which holds 500 randomly generated colors.*/
 
     AverageModel*           m_pAverageModel;        /**< The QAbstractTable average model being part of the model/view framework of Qt. */
     AverageDelegate*        m_pAverageDelegate;     /**< The QItemDelegateaverage delegate being part of the model/view framework of Qt. */

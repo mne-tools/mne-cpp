@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     selectionscene.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* @file     chinfowindow.cpp
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     October, 2014
+* @date     November, 2014
 *
 * @section  LICENSE
 *
@@ -30,76 +30,96 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the SelectionScene class.
+* @brief    Contains the implementation of the ChInfoWindow class.
 *
 */
-
-#ifndef SELECTIONSCENE_H
-#define SELECTIONSCENE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "layoutscene.h"
-#include "selectionsceneitem.h"
-#include <fiff/fiff.h>
+#include "chinfowindow.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QGraphicsScene>
-#include <QWidget>
-#include <QMutableListIterator>
+using namespace MNEBrowseRawQt;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace MNEBrowseRawQt
+ChInfoWindow::ChInfoWindow(QWidget *parent)
+: QDockWidget(parent)
+, ui(new Ui::ChInfoWindow)
 {
+    ui->setupUi(this);
+
+    initMVC();
+    initTableViews();
+}
 
 
-//=============================================================================================================
-/**
-* SelectionScene...
-*
-* @brief The SelectionScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
-*/
-class SelectionScene : public LayoutScene
+//*************************************************************************************************************
+
+ChInfoWindow::~ChInfoWindow()
 {
-    Q_OBJECT
+    delete ui;
+}
 
-public:
-    //=========================================================================================================
-    /**
-    * Constructs a SelectionScene.
-    */
-    explicit SelectionScene(QGraphicsView* view, QObject *parent = 0);
 
-    //=========================================================================================================
-    /**
-    * Updates layout data.
-    *
-    * @param [in] layoutMap layout data map.
-    */
-    void repaintItems(const QMap<QString, QPointF> &layoutMap);
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Hides all items described in list.
-    *
-    * @param [in] list string list with items name which are to be hidden.
-    */
-    void hideItems(QStringList visibleItems);
-};
+void ChInfoWindow::fiffInfoChanged(const FiffInfo &fiffInfo)
+{
+    m_pChInfoModel->fiffInfoChanged(fiffInfo);
 
-} // NAMESPACE
+    emit channelsMappedToLayout(m_pChInfoModel->getMappedChannelsList());
+}
 
-#endif // SelectionScene_H
+
+//*************************************************************************************************************
+
+void ChInfoWindow::layoutChanged(const QMap<QString,QPointF> &layoutMap)
+{
+    m_pChInfoModel->layoutChanged(layoutMap);
+
+    emit channelsMappedToLayout(m_pChInfoModel->getMappedChannelsList());
+}
+
+
+//*************************************************************************************************************
+
+ChInfoModel* ChInfoWindow::getDataModel()
+{
+    return m_pChInfoModel;
+}
+
+
+//*************************************************************************************************************
+
+void ChInfoWindow::initMVC()
+{
+    m_pChInfoModel = new ChInfoModel(this);
+}
+
+
+//*************************************************************************************************************
+
+void ChInfoWindow::initTableViews()
+{
+    ui->m_tableView_chInfos->setModel(m_pChInfoModel);
+    ui->m_tableView_chInfos->verticalHeader()->setVisible(false);
+
+    connect(m_pChInfoModel, &ChInfoModel::dataChanged,
+            ui->m_tableView_chInfos, &QTableView::resizeColumnsToContents);
+}
+
+
+

@@ -1,15 +1,16 @@
 //=============================================================================================================
 /**
-* @file     layoutloader.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* @file     chinfomodel.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     September, 2014
+* @date     November, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,19 +31,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    LayoutLoader class declaration.
+* @brief    This class represents the channel info model of the model/view framework of mne_browse_raw_qt application.
 *
 */
 
-#ifndef LAYOUTLOADER_H
-#define LAYOUTLOADER_H
+#ifndef CHINFOCLASS_H
+#define CHINFOCLASS_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "utils_global.h"
+#include "../Utils/rawsettings.h"
+#include "../Utils/types.h"
 
 
 //*************************************************************************************************************
@@ -50,14 +52,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QVector>
-#include <QFile>
-#include <QTextStream>
-#include <QStringList>
-#include <QDebug>
-#include <QIODevice>
-#include <QString>
+#include <QAbstractTableModel>
 
 
 //*************************************************************************************************************
@@ -70,11 +65,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// MNE INCLUDES
 //=============================================================================================================
 
-namespace UTILSLIB
-{
+#include <fiff/fiff.h>
 
 
 //*************************************************************************************************************
@@ -83,56 +77,105 @@ namespace UTILSLIB
 //=============================================================================================================
 
 using namespace Eigen;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINES
+// DEFINE NAMESPACE MNEBrowseRawQt
 //=============================================================================================================
 
+namespace MNEBrowseRawQt
+{
 
 //=============================================================================================================
 /**
-* Processes layout files (AsA .elc, MNE .lout) files which contain the electrode positions of a EEG/MEG hat.
-*
-* @brief Processes AsA .elc files which contain the electrode positions of a EEG hat.
+* DECLARE CLASS ChInfoModel
 */
-class UTILSSHARED_EXPORT LayoutLoader
+class ChInfoModel : public QAbstractTableModel
 {
+    Q_OBJECT
 public:
-    typedef QSharedPointer<LayoutLoader> SPtr;            /**< Shared pointer type for LayoutLoader. */
-    typedef QSharedPointer<const LayoutLoader> ConstSPtr; /**< Const shared pointer type for LayoutLoader. */
+    ChInfoModel(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Constructs a Filter object.
+    * Reimplemented virtual functions
+    *
     */
-    LayoutLoader();
+    virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
+    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
+    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
+    virtual Qt::ItemFlags flags(const QModelIndex & index) const;
+    virtual bool insertRows(int position, int span, const QModelIndex & parent = QModelIndex());
+    virtual bool removeRows(int position, int span, const QModelIndex & parent = QModelIndex());
 
     //=========================================================================================================
     /**
-    * Reads the specified ANT elc-layout file.
-    * @param [in] path holds the file path of the elc file which is to be read.
-    * @param [in] location3D holds the vector to which the read 3D positions are stored.
-    * @param [in] location2D holds the vector to which the read 2D positions are stored.
-    * @return true if reading was successful, false otherwise.
+    * Updates the fiff info
+    *
+    * @param fiffInfo fiff info variabel.
     */
-    bool readAsaElcFile(QString path, QStringList &channelNames, QVector<QVector<double> > &location3D, QVector<QVector<double> > &location2D, QString &unit);
+    void fiffInfoChanged(const FiffInfo &fiffInfo);
+
+    //=========================================================================================================
+    /**
+    * Updates the layout map
+    *
+    * @param layoutMap the layout map with the 2D positions.
+    */
+    void layoutChanged(const QMap<QString,QPointF> &layoutMap);
+
+    //=========================================================================================================
+    /**
+    * Updates the layout map
+    *
+    * @return the current mapped channel list
+    */
+    const QStringList & getMappedChannelsList();
+
+    //=========================================================================================================
+    /**
+    * Returns the model index for the given input channel fro mthe original channel list
+    *
+    * @param chName the channel name for which the model index is needed.
+    * @return the index number. if channel was not found in the data this functions returns -1
+    */
+    int getIndexFromOrigChName(QString chName);
+
+    //=========================================================================================================
+    /**
+    * Returns the model index for the given input channel fro mthe mapped channel list
+    *
+    * @param chName the channel name for which the model index is needed.
+    * @return the index number. if channel was not found in the data this functions returns -1
+    */
+    int getIndexFromMappedChName(QString chName);
+
+protected:
+    //=========================================================================================================
+    /**
+    * clearModel clears all model's members
+    *
+    */
+    void clearModel();
 
 
     //=========================================================================================================
     /**
-    * Reads the specified MNE .lout file.
-    * @param [in] path holds the file path of the lout file which is to be read.
-    * @param [in] channel data holds the x,y and channel number for every channel. The map keys are the channel names (i.e. 'MEG 0113').
-    * @return bool true if reading was successful, false otherwise.
+    * Maps the currently loaded channels to the loaded layout file
+    *
     */
-    bool readMNELoutFile(QString path, QMap<QString, QPointF> &channelData);
+    void mapLayoutToChannels();
 
-private:
-
+    FiffInfo                m_fiffInfo;             /**< The fiff info of the currently loaded fiff file. */
+    QMap<QString,QPointF>   m_layoutMap;            /**< The current layout map with a position for all MEG and EEG channels. */
+    QStringList             m_aliasNames;           /**< list of given channel aliases. */
+    QStringList             m_mappedLayoutChNames;  /**< list of the mapped layout channel names. */
 };
 
 } // NAMESPACE
 
-#endif // LAYOUTLOADER_H
+#endif // CHINFOCLASS_H

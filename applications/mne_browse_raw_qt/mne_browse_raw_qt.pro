@@ -57,7 +57,7 @@ CONFIG(debug, debug|release) {
 }
 
 #Note that the static flag is ingored when building against a dynamic qt version
-CONFIG += static #DEBUG console
+CONFIG += static console#DEBUG
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
@@ -94,6 +94,7 @@ SOURCES += \
     Models/averagemodel.cpp \
     Models/rawmodel.cpp \
     Models/eventmodel.cpp \
+    Models/chinfomodel.cpp \
     Delegates/averagedelegate.cpp \
     Delegates/rawdelegate.cpp \
     Delegates/eventdelegate.cpp \
@@ -106,6 +107,7 @@ SOURCES += \
     Windows/selectionmanagerwindow.cpp \
     Windows/averagewindow.cpp \
     Windows/scalewindow.cpp \
+    Windows/chinfowindow.cpp
 
 HEADERS += \
     Utils/datamarker.h \
@@ -125,6 +127,7 @@ HEADERS += \
     Models/averagemodel.h \
     Models/rawmodel.h \
     Models/eventmodel.h \
+    Models/chinfomodel.h \
     Delegates/averagedelegate.h \
     Delegates/rawdelegate.h \
     Delegates/eventdelegate.h \
@@ -137,6 +140,7 @@ HEADERS += \
     Windows/selectionmanagerwindow.h \
     Windows/averagewindow.h \
     Windows/scalewindow.h \
+    Windows/chinfowindow.h
 
 FORMS += \
     Windows/filterwindow.ui \
@@ -147,7 +151,8 @@ FORMS += \
     Windows/informationwindow.ui \
     Windows/selectionmanagerwindow.ui \
     Windows/averagewindow.ui \
-    Windows/scalewindow.ui
+    Windows/scalewindow.ui \
+    Windows/chinfowindow.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
