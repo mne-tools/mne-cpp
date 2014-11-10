@@ -79,6 +79,8 @@ ChInfoWindow::~ChInfoWindow()
 void ChInfoWindow::fiffInfoChanged(const FiffInfo &fiffInfo)
 {
     m_pChInfoModel->fiffInfoChanged(fiffInfo);
+
+    emit channelsMappedToLayout(m_pChInfoModel->getMappedChannelsList());
 }
 
 
@@ -87,6 +89,16 @@ void ChInfoWindow::fiffInfoChanged(const FiffInfo &fiffInfo)
 void ChInfoWindow::layoutChanged(const QMap<QString,QPointF> &layoutMap)
 {
     m_pChInfoModel->layoutChanged(layoutMap);
+
+    emit channelsMappedToLayout(m_pChInfoModel->getMappedChannelsList());
+}
+
+
+//*************************************************************************************************************
+
+ChInfoModel* ChInfoWindow::getDataModel()
+{
+    return m_pChInfoModel;
 }
 
 
@@ -104,7 +116,9 @@ void ChInfoWindow::initTableViews()
 {
     ui->m_tableView_chInfos->setModel(m_pChInfoModel);
     ui->m_tableView_chInfos->verticalHeader()->setVisible(false);
-    ui->m_tableView_chInfos->resizeColumnsToContents();
+
+    connect(m_pChInfoModel, &ChInfoModel::dataChanged,
+            ui->m_tableView_chInfos, &QTableView::resizeColumnsToContents);
 }
 
 

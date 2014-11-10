@@ -113,8 +113,13 @@ void MainWindow::setupWindowWidgets()
     m_pAboutWindow = new AboutWindow(this);
     m_pAboutWindow->hide();
 
+    //Create channel info window - QTDesigner used - see / FormFiles
+    m_pChInfoWindow = new ChInfoWindow(this);
+    addDockWidget(Qt::BottomDockWidgetArea, m_pChInfoWindow);
+    m_pChInfoWindow->hide();
+
     //Create selection manager window - QTDesigner used - see / FormFiles
-    m_pSelectionManagerWindow = new SelectionManagerWindow(this);
+    m_pSelectionManagerWindow = new SelectionManagerWindow(this, m_pChInfoWindow->getDataModel());
     addDockWidget(Qt::BottomDockWidgetArea, m_pSelectionManagerWindow);
     m_pSelectionManagerWindow->hide();
 
@@ -127,11 +132,6 @@ void MainWindow::setupWindowWidgets()
     m_pScaleWindow = new ScaleWindow(this);
     addDockWidget(Qt::LeftDockWidgetArea, m_pScaleWindow);
     m_pScaleWindow->hide();
-
-    //Create channel info window - QTDesigner used - see / FormFiles
-    m_pChInfoWindow = new ChInfoWindow(this);
-    addDockWidget(Qt::BottomDockWidgetArea, m_pChInfoWindow);
-    m_pChInfoWindow->hide();
 
     //Init windows - TODO: get rid of this here, do this inside the window classes
     m_pDataWindow->init();
@@ -164,21 +164,22 @@ void MainWindow::setupWindowWidgets()
     connect(m_pSelectionManagerWindow, &SelectionManagerWindow::selectionChanged,
             m_pAverageWindow, &AverageWindow::channelSelectionManagerChanged);
 
-    //Connect channel info window with raw data model and layout manager
+    //Connect channel info window with raw data model, layout manager and the data window
     connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
             m_pChInfoWindow, &ChInfoWindow::fiffInfoChanged);
 
     connect(m_pSelectionManagerWindow, &SelectionManagerWindow::loadedLayoutMap,
             m_pChInfoWindow, &ChInfoWindow::layoutChanged);
 
+    connect(m_pChInfoWindow, &ChInfoWindow::channelsMappedToLayout,
+            m_pSelectionManagerWindow, &SelectionManagerWindow::setCurrentlyLoadedFiffChannels);
+
     //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels - TODO: dirty move get rid of this here
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
         m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_fiffInfo);
-
-        m_pSelectionManagerWindow->setCurrentlyLoadedFiffChannels(m_pDataWindow->getDataModel()->m_fiffInfo);
-
         m_pChInfoWindow->fiffInfoChanged(m_pDataWindow->getDataModel()->m_fiffInfo);
         m_pChInfoWindow->layoutChanged(m_pSelectionManagerWindow->getLayoutMap());
+        m_pSelectionManagerWindow->setCurrentlyLoadedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
     }
 }
 
@@ -445,9 +446,6 @@ void MainWindow::openFile()
 
     //Hide not presented channel types and their spin boxes in the scale window
     m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_fiffInfo);
-
-    //Create group All whenever a new file was loaded
-    m_pSelectionManagerWindow->setCurrentlyLoadedFiffChannels(m_pDataWindow->getDataModel()->m_fiffInfo);
 }
 
 
