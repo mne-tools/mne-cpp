@@ -57,7 +57,7 @@ CONFIG(debug, debug|release) {
 }
 
 #Note that the static flag is ingored when building against a dynamic qt version
-CONFIG += static #DEBUG console
+CONFIG += static console#DEBUG
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
@@ -84,11 +84,18 @@ SOURCES += \
     Utils/mneoperator.cpp \
     Utils/filteroperator.cpp \
     Utils/filterplotscene.cpp \
+    Utils/butterflyscene.cpp \
     Utils/layoutscene.cpp \
-    Utils/channelsceneitem.cpp \
+    Utils/averagescene.cpp \
+    Utils/selectionscene.cpp \
+    Utils/selectionsceneitem.cpp \
     Utils/averagesceneitem.cpp \
+    Utils/butterflysceneitem.cpp \
+    Models/averagemodel.cpp \
     Models/rawmodel.cpp \
     Models/eventmodel.cpp \
+    Models/chinfomodel.cpp \
+    Delegates/averagedelegate.cpp \
     Delegates/rawdelegate.cpp \
     Delegates/eventdelegate.cpp \
     Windows/mainwindow.cpp \
@@ -99,7 +106,8 @@ SOURCES += \
     Windows/informationwindow.cpp \
     Windows/selectionmanagerwindow.cpp \
     Windows/averagewindow.cpp \
-    Windows/scalewindow.cpp
+    Windows/scalewindow.cpp \
+    Windows/chinfowindow.cpp
 
 HEADERS += \
     Utils/datamarker.h \
@@ -109,11 +117,18 @@ HEADERS += \
     Utils/types.h \
     Utils/info.h \
     Utils/filterplotscene.h \
+    Utils/butterflyscene.h \
     Utils/layoutscene.h \
-    Utils/channelsceneitem.h \
+    Utils/averagescene.h \
+    Utils/selectionscene.h \
+    Utils/selectionsceneitem.h \
     Utils/averagesceneitem.h \
+    Utils/butterflysceneitem.h \
+    Models/averagemodel.h \
     Models/rawmodel.h \
     Models/eventmodel.h \
+    Models/chinfomodel.h \
+    Delegates/averagedelegate.h \
     Delegates/rawdelegate.h \
     Delegates/eventdelegate.h \
     Windows/mainwindow.h \
@@ -124,7 +139,8 @@ HEADERS += \
     Windows/informationwindow.h \
     Windows/selectionmanagerwindow.h \
     Windows/averagewindow.h \
-    Windows/scalewindow.h
+    Windows/scalewindow.h \
+    Windows/chinfowindow.h
 
 FORMS += \
     Windows/filterwindow.ui \
@@ -135,7 +151,8 @@ FORMS += \
     Windows/informationwindow.ui \
     Windows/selectionmanagerwindow.ui \
     Windows/averagewindow.ui \
-    Windows/scalewindow.ui
+    Windows/scalewindow.ui \
+    Windows/chinfowindow.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

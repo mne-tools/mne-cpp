@@ -77,11 +77,12 @@ RawModel::RawModel(QObject *parent)
     // Generate default filter operator - This needs to be done here so that the filter design tool works without loading a file
     genStdFilterOps();
 
-    //connect signal and slots
+    //connect data reloading - this is done concurrently
     connect(&m_reloadFutureWatcher,&QFutureWatcher<QPair<MatrixXd,MatrixXd> >::finished,[this](){
         insertReloadedData(m_reloadFutureWatcher.future().result());
     });
 
+    //connect filtering reloading - this is done after a new block has been loaded
     connect(this,&RawModel::dataReloaded,[this](){
         if(!m_assignedOperators.empty()) updateOperatorsConcurrently();
     });
@@ -134,6 +135,7 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
 //    connect(&m_operatorFutureWatcher,&QFutureWatcher<QPair<int,RowVectorXd> >::resultReadyAt,[this](int index){
 //        insertProcessedData(index);
 //    });
+
     connect(&m_operatorFutureWatcher,&QFutureWatcher<void>::finished,[this](){
         insertProcessedData();
     });
@@ -158,7 +160,7 @@ int RawModel::rowCount(const QModelIndex & /*parent*/) const
 
 int RawModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 2;
+    return 3;
 }
 
 
@@ -166,7 +168,7 @@ int RawModel::columnCount(const QModelIndex & /*parent*/) const
 
 QVariant RawModel::data(const QModelIndex &index, int role) const
 {
-    if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
+    if(role != Qt::DisplayRole && role != Qt::BackgroundRole && role != RawModelRoles::GetChannelMean)
         return QVariant();
 
     if (index.isValid()) {
@@ -204,17 +206,48 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
                 return v;
                 break;
             }
-            case Qt::BackgroundRole: {
+
+            case Qt::BackgroundRole: { //plot channel red if marked as red
                 if(m_fiffInfo.bads.contains(m_chInfolist[index.row()].ch_name)) {
                     QBrush brush;
                     brush.setStyle(Qt::SolidPattern);
 //                    qDebug() << m_chInfolist[index.row()].ch_name << "is marked as bad, index:" << index.row();
-                    brush.setColor(Qt::red);
+                    brush.setColor(Qt::darkRed);
                     return QVariant(brush);
                 }
                 else
                     return QVariant();
 
+                break;
+            }
+            }
+        }
+
+        //******** third column (mean data of the channels plot) ********
+        if(index.column()==2) {
+            switch(role) {
+            case RawModelRoles::GetChannelMean: {
+                QVariant v;
+
+                //if channel is not filtered or background Processing pending...
+                if(!m_assignedOperators.contains(index.row()) || (m_bProcessing && m_bReloadBefore) || (m_bProcessing && !m_bReloadBefore)) {
+                    //Calculate the global mean of all loaded data in m_dataMean
+                    double sum = 0;
+                    for(int i = 0; i<m_dataMean.size(); i++)
+                        sum += m_dataMean.at(i)[index.row()];
+
+                    v.setValue(sum/m_dataMean.size());
+                }
+                else { //if channel IS filtered
+                    //Calculate the global mean of all loaded data in m_dataMean
+                    double sum = 0;
+                    for(int i = 0; i<m_procDataMean.size(); i++)
+                        sum += m_procDataMean.at(i)[index.row()];
+
+                    v.setValue(sum/m_procDataMean.size());
+                }
+
+                return v;
                 break;
             }
             } // end role switch
@@ -237,7 +270,6 @@ QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role
         case 0: //chname column
             return QVariant();
         case 1: //data plot column
-            return QVariant("data plot");
             switch(role) {
             case Qt::DisplayRole:
                 return QVariant("data plot");
@@ -334,13 +366,14 @@ bool RawModel::loadFiffData(QFile& qFile)
         qDebug("RawModel: ERROR! Data set does not contain any fiff data!");
         endResetModel();
         m_bFileloaded = false;
-        emit fileLoaded(false);
         return false;
     }
 
     //set loaded fiff data
     m_data.append(t_data);
+    m_dataMean.append(calculateMean(t_data));
     m_procData.append(MatrixXdR::Zero(t_data.rows(),t_data.cols()));
+    m_procDataMean.append(VectorXd::Zero(t_data.rows()));
     m_times.append(t_times);
 
     loadFiffInfos();
@@ -348,7 +381,7 @@ bool RawModel::loadFiffData(QFile& qFile)
 
     endResetModel();
 
-    emit fileLoaded(true);
+    emit fileLoaded(m_fiffInfo);
 
     return true;
 }
@@ -394,7 +427,9 @@ void RawModel::clearModel()
 
     //data model structure
     m_data.clear();
+    m_dataMean.clear();
     m_procData.clear();
+    m_procDataMean.clear();
     m_times.clear();
 
     //MNEOperators
@@ -418,7 +453,9 @@ void RawModel::resetPosition(qint32 position)
 
     //reset members
     m_data.clear();
+    m_dataMean.clear();
     m_procData.clear();
+    m_procDataMean.clear();
     m_times.clear();
 
     m_bStartReached = false;
@@ -441,7 +478,9 @@ void RawModel::resetPosition(qint32 position)
 
     //append loaded block
     m_data.append(t_data);
+    m_dataMean.append(calculateMean(t_data));
     m_procData.append(MatrixXdR::Zero(t_data.rows(),m_iWindowSize));
+    m_procDataMean.append(VectorXd::Zero(t_data.rows()));
     m_times.append(t_times);
 
     updateOperators();
@@ -519,6 +558,21 @@ QPair<MatrixXd,MatrixXd> RawModel::readSegment(fiff_int_t from, fiff_int_t to)
     m_Mutex.unlock();
 
     return datatime;
+}
+
+
+//*************************************************************************************************************
+
+VectorXd RawModel::calculateMean(const MatrixXd &data)
+{
+    VectorXd channelMeans(data.rows());
+
+    for(int i = 0; i<channelMeans.rows(); i++)
+    {
+        channelMeans[i] = data.row(i).mean();
+    }
+
+    return channelMeans;
 }
 
 
@@ -609,7 +663,8 @@ void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOpe
     //filter all when chlist is empty
     if(chlist.empty()) {
         for(qint32 i=0; i < m_chInfolist.size(); ++i)
-            chlist.append(createIndex(i,1));
+            if(!m_chInfolist.at(i).ch_name.contains("STI") && !m_chInfolist.at(i).ch_name.contains("MISC"))
+                chlist.append(createIndex(i,1));
     }
 
     for(qint32 i=0; i < chlist.size(); ++i) { //iterate through selected channels to filter
@@ -637,9 +692,6 @@ void RawModel::applyOperatorsConcurrently(QPair<int,RowVectorXd>& chdata)
             chdata.second = filter->applyFFTFilter(chdata.second);
         }
         case MNEOperator::PCA: {
-            //do something
-        }
-        case MNEOperator::AVERAGE: {
             //do something
         }
         }
@@ -734,25 +786,32 @@ void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair)
     //extend m_data with reloaded data
     if(m_bReloadBefore) {
         m_data.prepend(dataTimesPair.first);
+        m_dataMean.prepend(calculateMean(dataTimesPair.first));
         m_procData.prepend(MatrixXdR::Zero(m_chInfolist.size(),m_iWindowSize));
+        m_procDataMean.prepend(VectorXd::Zero(m_chInfolist.size()));
         m_times.prepend(dataTimesPair.second);
 
         //maintain at maximum m_maxWindows data windows and drop the rest
         if(m_data.size() > m_maxWindows) {
             m_data.removeLast();
+            m_dataMean.removeLast();
             m_procData.removeLast();
+            m_procDataMean.removeLast();
         }
     }
     else {
         m_data.append(dataTimesPair.first);
-
+        m_dataMean.append(calculateMean(dataTimesPair.first));
         m_procData.append(MatrixXdR::Zero(m_chInfolist.size(),m_iWindowSize));
+        m_procDataMean.append(VectorXd::Zero(m_chInfolist.size()));
         m_times.append(dataTimesPair.second);
 
         //maintain at maximum m_maxWindows data windows and drop the rest
         if(m_data.size() > m_maxWindows) {
             m_data.removeFirst();
+            m_dataMean.removeFirst();
             m_procData.removeFirst();
+            m_procDataMean.removeFirst();
             m_iAbsFiffCursor += m_iWindowSize;
         }
     }
@@ -812,10 +871,14 @@ void RawModel::insertProcessedData(int index)
 {
     QList<int> listFilteredChs = m_assignedOperators.keys();
 
-    if(m_bReloadBefore)
+    if(m_bReloadBefore) {
         m_procData.first().row(listFilteredChs[index]) = m_listTmpChData[index].second;
-    else
+        m_procDataMean.first() = calculateMean(m_procData.first());
+    }
+    else {
         m_procData.last().row(listFilteredChs[index]) = m_listTmpChData[index].second;
+        m_procDataMean.last() = calculateMean(m_procData.last());
+    }
 
     emit dataChanged(createIndex(listFilteredChs[index],1),createIndex(listFilteredChs[index],1));
 
@@ -835,6 +898,12 @@ void RawModel::insertProcessedData()
         else
             m_procData.last().row(listFilteredChs[i]) = m_listTmpChData[i].second;
     }
+
+    //Calculate mean for filtered data
+    if(m_bReloadBefore)
+        m_procDataMean.first() = calculateMean(m_procData.first());
+    else
+        m_procDataMean.last() = calculateMean(m_procData.last());
 
     emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));
 

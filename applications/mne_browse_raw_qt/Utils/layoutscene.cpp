@@ -56,97 +56,17 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-LayoutScene::LayoutScene(QGraphicsView* view, QObject* parent, int sceneType)
+LayoutScene::LayoutScene(QGraphicsView* view, QObject* parent)
 : QGraphicsScene(parent)
 , m_qvView(view)
-, m_iSceneType(sceneType)
-, m_dragSceneIsActive(false)
 , m_bDragMode(false)
-, m_bExtendedSelectionMode(false)
+//, m_bExtendedSelectionMode(false)
 {
     m_qvView->grabGesture(Qt::PanGesture);
     m_qvView->grabGesture(Qt::PinchGesture);
 
     //Install event filter to overcome QGrabGesture and QScrollBar problem
     m_qvView->installEventFilter(this);
-}
-
-
-//*************************************************************************************************************
-
-void LayoutScene::setNewLayout(QMap<QString,QVector<double>> layoutMap)
-{
-    m_layoutMap = layoutMap;
-
-    //Redraw all items
-    repaintItems();
-}
-
-
-//*************************************************************************************************************
-
-void LayoutScene::hideItems(QStringList visibleItems)
-{
-    //Hide all items which names are in the the string list visibleItems. All other items' opacity is set to 0.25 an dthey are no longer selectable.
-    QList<QGraphicsItem *> itemList = this->items();
-
-    switch(m_iSceneType) {
-        case 0: //Channel selection plot scene
-            for(int i = 0; i<itemList.size(); i++) {
-                ChannelSceneItem* item = static_cast<ChannelSceneItem*>(itemList.at(i));
-
-                if(!visibleItems.contains(item->getChannelName())) {
-                    item->setFlag(QGraphicsItem::ItemIsSelectable, false);
-                    item->setOpacity(0.25);
-                }
-                else {
-                    item->setFlag(QGraphicsItem::ItemIsSelectable, true);
-                    item->setOpacity(1);
-                }
-            }
-
-        break;
-
-        case 1: //Average plot scene
-
-
-        break;
-    }
-}
-
-
-//*************************************************************************************************************
-
-void LayoutScene::repaintItems()
-{
-    QMapIterator<QString,QVector<double>> i(m_layoutMap);
-
-    switch(m_iSceneType) {
-        case 0: //Channel selection plot scene
-            this->clear();
-
-            while (i.hasNext()) {
-                i.next();
-                ChannelSceneItem* ChannelSceneItemTemp = new ChannelSceneItem(i.key(), QPointF(i.value().at(0), i.value().at(1)));
-
-                this->addItem(ChannelSceneItemTemp);
-            }
-
-        break;
-
-        case 1: //Average plot scene
-//            this->clear();
-
-//            QMapIterator<QString,QVector<double>> i(map);
-//            while (i.hasNext()) {
-//                i.next();
-//                AverageSceneItem* AverageSceneItemTemp = new AverageSceneItem(i.key(), QPointF(i.value().at(0), i.value().at(1)));
-
-//                this->addItem(AverageSceneItemTemp);
-//            }
-
-        break;
-    }
 }
 
 
@@ -253,8 +173,10 @@ void LayoutScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 //        qDebug()<<m_selectedItems.size();
 //    }
 
-    if(m_bDragMode)
+    if(m_bDragMode) {
         m_bDragMode = false;
+        this->update();
+    }
 
     QGraphicsScene::mouseReleaseEvent(mouseEvent);
 }
@@ -264,8 +186,8 @@ void LayoutScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 void LayoutScene::keyPressEvent(QKeyEvent *keyEvent)
 {
-    if(keyEvent->key() == Qt::Key_Control)
-        m_bExtendedSelectionMode = true;
+//    if(keyEvent->key() == Qt::Key_Control)
+//        m_bExtendedSelectionMode = true;
 
     QGraphicsScene::keyPressEvent(keyEvent);
 }
@@ -275,8 +197,8 @@ void LayoutScene::keyPressEvent(QKeyEvent *keyEvent)
 
 void LayoutScene::keyReleaseEvent(QKeyEvent *keyEvent)
 {
-    if(keyEvent->key() == Qt::Key_Control)
-        m_bExtendedSelectionMode = false;
+//    if(keyEvent->key() == Qt::Key_Control)
+//        m_bExtendedSelectionMode = false;
 
     QGraphicsScene::keyReleaseEvent(keyEvent);
 }

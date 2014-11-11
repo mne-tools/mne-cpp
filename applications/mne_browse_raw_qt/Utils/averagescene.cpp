@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     ChannelSceneItem.cpp
+* @file     averagescene.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     June, 2014
+* @date     September, 2014
 *
 * @section  LICENSE
 *
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ChannelSceneItem class.
+* @brief    Contains the implementation of the AverageScene class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "channelsceneitem.h"
+#include "averagescene.h"
 
 
 //*************************************************************************************************************
@@ -56,110 +56,43 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChannelSceneItem::ChannelSceneItem(QString channelName, QPointF channelPosition, QColor channelColor)
-: m_sChannelName(channelName)
-, m_qpChannelPosition(channelPosition)
-, m_cChannelColor(channelColor)
-, m_bHighlightItem(false)
+AverageScene::AverageScene(QGraphicsView* view, QObject* parent)
+: LayoutScene(view, parent)
 {
-    this->setAcceptHoverEvents(true);
-    this->setFlag(QGraphicsItem::ItemIsSelectable, true);
 }
 
 
 //*************************************************************************************************************
 
-QRectF ChannelSceneItem::boundingRect() const
+void AverageScene::setScaleMap(const QMap<QString,double> &scaleMap)
 {
-    return QRectF(-25, -30, 50, 50);
-}
+    QList<QGraphicsItem*> itemList = this->items();
 
-
-//*************************************************************************************************************
-
-void ChannelSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
-
-    // Plot shadow
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(Qt::darkGray);
-    painter->drawEllipse(-12, -12, 30, 30);
-
-    //Plot selected item
-    if(this->isSelected())
-        painter->setBrush(QBrush(Qt::yellow));
-    else
-        painter->setBrush(QBrush(m_cChannelColor));
-
-    //Plot highlighted selected item
-    if(m_bHighlightItem) {
-        painter->setPen(QPen(Qt::red, 4));
-        painter->drawEllipse(-15, -15, 30, 30);
-    }
-    else {
-        painter->setPen(QPen(Qt::black, 1));
-        painter->drawEllipse(-15, -15, 30, 30);
+    QListIterator<QGraphicsItem*> i(itemList);
+    while (i.hasNext()) {
+        AverageSceneItem* AverageSceneItemTemp = static_cast<AverageSceneItem*>(i.next());
+        AverageSceneItemTemp->m_scaleMap = scaleMap;
     }
 
-    // Plot electrode name
-    painter->setPen(QPen(Qt::black, 1));
-    QStaticText staticElectrodeName = QStaticText(m_sChannelName);
-    QSizeF sizeText = staticElectrodeName.size();
-    painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
-
-    this->setPos(10*m_qpChannelPosition.x(), -10*m_qpChannelPosition.y());
+    this->update();
 }
 
 
 //*************************************************************************************************************
 
-void ChannelSceneItem::setColor(QColor channelColor)
+void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelItems)
 {
-    m_cChannelColor = channelColor;
+    this->clear();
+
+    QListIterator<QGraphicsItem*> i(selectedChannelItems);
+    while (i.hasNext()) {
+        SelectionSceneItem* SelectionSceneItemTemp = static_cast<SelectionSceneItem*>(i.next());
+        AverageSceneItem* AverageSceneItemTemp = new AverageSceneItem(SelectionSceneItemTemp->m_sChannelName,
+                                                                      SelectionSceneItemTemp->m_iChannelNumber,
+                                                                      SelectionSceneItemTemp->m_qpChannelPosition,
+                                                                      SelectionSceneItemTemp->m_iChannelKind,
+                                                                      SelectionSceneItemTemp->m_iChannelUnit);
+
+        this->addItem(AverageSceneItemTemp);
+    }
 }
-
-
-//*************************************************************************************************************
-
-QString ChannelSceneItem::getChannelName()
-{
-    return m_sChannelName;
-}
-
-
-//*************************************************************************************************************
-
-void ChannelSceneItem::setPosition(QPointF newPosition)
-{
-    m_qpChannelPosition = newPosition;
-}
-
-
-//*************************************************************************************************************
-
-QPointF ChannelSceneItem::getPosition()
-{
-    return m_qpChannelPosition;
-}
-
-
-//*************************************************************************************************************
-
-void ChannelSceneItem::setHighlightChannel(bool highlightItem)
-{
-    m_bHighlightItem = highlightItem;
-}
-
-
-
-
-
-
-
-
-
-
-
-

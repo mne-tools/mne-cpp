@@ -168,7 +168,9 @@ bool NoiseEstimate::start()
     if(this->isRunning())
         QThread::wait();
 
+    m_qMutex.lock();
     m_bIsRunning = true;
+    m_qMutex.unlock();
 
     // Start threads
     QThread::start();
@@ -180,22 +182,31 @@ bool NoiseEstimate::start()
 
 bool NoiseEstimate::stop()
 {
-    //Wait until this thread is stopped
-    m_bIsRunning = false;
 
-    m_pRtNoise->stop();
+
+    //Wait until this thread is stopped
+    m_qMutex.lock();
+    m_bIsRunning = false;
+    m_qMutex.unlock();
 
     if(m_bProcessData)
     {
-
         //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
         m_pBuffer->releaseFromPop();
         m_pBuffer->releaseFromPush();
 
-        m_pBuffer->clear();
-
+//        m_pBuffer->clear();
 //        m_pNEOutput->data()->clear();
     }
+
+    // Stop filling buffers with data from the inputs
+    m_bProcessData = false;
+
+    qDebug()<<"NoiseEstimate Thread is stopped.";
+
+//    if(m_pRtNoise && m_pRtNoise->isRunning())
+//        m_pRtNoise->stop();
+
     return true;
 }
 
@@ -239,7 +250,7 @@ void NoiseEstimate::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
     {
         //Check if buffer initialized
 
-        mutex.lock();
+        m_qMutex.lock();
         if(!m_pBuffer)
         {
             m_pBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(8, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
@@ -251,7 +262,7 @@ void NoiseEstimate::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             m_pFiffInfo = pRTMSA->info();
             emit fiffInfoAvailable();
         }
-        mutex.unlock();
+        m_qMutex.unlock();
 
         if(m_bProcessData)
         {
@@ -271,9 +282,9 @@ void NoiseEstimate::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 void NoiseEstimate::appendNoiseSpectrum(MatrixXd t_send)
 { 
     qDebug()<<"Spectrum"<<t_send(0,1)<<t_send(0,2)<<t_send(0,3);
-    mutex.lock();
+    m_qMutex.lock();
     m_qVecSpecData.push_back(t_send);
-    mutex.unlock();
+    m_qMutex.unlock();
     qDebug()<<"---------------------------------appendNoiseSpectrum--------------------------------";
 }
 
@@ -288,10 +299,10 @@ void NoiseEstimate::run()
     bool waitForFiffInfo = true;
     while(waitForFiffInfo)
     {
-        mutex.lock();
+        m_qMutex.lock();
         if(m_pFiffInfo)
             waitForFiffInfo = false;
-        mutex.unlock();
+        m_qMutex.unlock();
         msleep(10);// Wait for fiff Info
     }
 
@@ -316,7 +327,9 @@ void NoiseEstimate::run()
 
     m_pRtNoise->start();
 
+    m_qMutex.lock();
     m_bProcessData = true;
+    m_qMutex.unlock();
 
     while (m_bIsRunning)
     {
@@ -331,12 +344,12 @@ void NoiseEstimate::run()
 
            if(m_qVecSpecData.size() > 0)
            {
-               mutex.lock();
+               m_qMutex.lock();
                qDebug()<<"%%%%%%%%%%%%%%%% send spectrum for display %%%%%%%%%%%%%%%%%%%";
                 //send spectrum to the output data
                m_pFSOutput->data()->setValue(m_qVecSpecData[0]);
                m_qVecSpecData.pop_front();
-               mutex.unlock();
+               m_qMutex.unlock();
 
             }
         }//m_bProcessData

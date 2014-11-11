@@ -45,8 +45,10 @@
 #include "ui_selectionmanagerwindow.h"
 #include "utils/layoutloader.h"         //MNE-CPP utils
 #include "utils/selectionloader.h"         //MNE-CPP utils
-#include "../Utils/layoutscene.h"       //MNE Browse Raw QT utils
+#include "../Utils/selectionscene.h"       //MNE Browse Raw QT utils
 #include "fiff/fiff.h"
+#include "../Models/chinfomodel.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -80,8 +82,6 @@ namespace MNEBrowseRawQt
 // DEFINE FORWARD DECLARATIONS
 //=============================================================================================================
 
-class LayoutScene;
-
 
 /**
 * DECLARE CLASS SelectionManagerWindow
@@ -98,8 +98,9 @@ public:
     * Constructs a SelectionManagerWindow which is a child of parent.
     *
     * @param [in] parent pointer to parent widget; If parent is 0, the new SelectionManagerWindow becomes a window. If parent is another widget, SelectionManagerWindow becomes a child window inside parent. SelectionManagerWindow is deleted when its parent is deleted.
+    * @param [in] pChInfoModel pointer to the channel info model.
     */
-    SelectionManagerWindow(QWidget *parent = 0);
+    SelectionManagerWindow(QWidget *parent = 0, ChInfoModel *pChInfoModel = new ChInfoModel());
 
     //=========================================================================================================
     /**
@@ -111,13 +112,17 @@ public:
     //=========================================================================================================
     /**
     * Sets the currently loaded fiff channels. used to create the group All.
+    *
+    * @param [in] mappedLayoutChNames the currently to layout mapped channels
     */
-    void setCurrentlyLoadedFiffChannels(FiffInfo loadedFiffInfo);
+    void setCurrentlyLoadedFiffChannels(const QStringList &mappedLayoutChNames);
 
     //=========================================================================================================
     /**
     * Highlight channels
     * This function highlights channels which were selected outside this selection manager (i.e in the DataWindow's Table View)
+    *
+    * @param [in] channelList channels which are be to set as selected
     */
     void highlightChannels(QStringList channelList);
 
@@ -125,6 +130,8 @@ public:
     /**
     * Select channels
     * This function selects channels which were selected outside this selection manager (i.e in the DataWindow's Table View)
+    *
+    * @param [in] channelList channels which are be to set as selected
     */
     void selectChannels(QStringList channelList);
 
@@ -138,11 +145,42 @@ public:
     //=========================================================================================================
     /**
     * gets the item corresponding to text in listWidget
+    *
+    * @param [in] listWidget QListWidget which inhibits the needed item
+    * @param [in] channelName the corresponding channel name
     */
-    QListWidgetItem* getItem(QListWidget *listWidget, QString text);
+    QListWidgetItem* getItemForChName(QListWidget *listWidget, QString channelName);
+
+    //=========================================================================================================
+    /**
+    * returns the current layout map.
+    */
+    const QMap<QString,QPointF>& getLayoutMap();
 
 signals:
+    //=========================================================================================================
+    /**
+    * emit this signal whenever the user or group selection has changed
+    *
+    * @param [in] selectedChannels currently user selected channels or items which are in the visible list widget
+    */
     void showSelectedChannelsOnly(QStringList selectedChannels);
+
+    //=========================================================================================================
+    /**
+    * emit this signal whenever the selection in the scene has changed
+    *
+    * @param [in] selectedChannelItems currently user selected channels
+    */
+    void selectionChanged(QList<QGraphicsItem*> &selectedChannelItems);
+
+    //=========================================================================================================
+    /**
+    * emit this signal whenever a new layout was loaded
+    *
+    * @param [in] layoutMap currently loaded layout
+    */
+    void loadedLayoutMap(const QMap<QString,QPointF> &layoutMap);
 
 private:
     //=========================================================================================================
@@ -157,7 +195,7 @@ private:
     * Initialises all graphic views in the selection window.
     *
     */
-    void initGraphicsView();
+    void initSelectionSceneView();
 
     //=========================================================================================================
     /**
@@ -191,17 +229,11 @@ private:
 
     //=========================================================================================================
     /**
-    * Updates selection files table widget in this window.
-    *
-    */
-    void updateSelectionFiles(QString text);
-
-    //=========================================================================================================
-    /**
     * Updates selection group widget in this window.
     *
+    * @param [in] item the current selection group list item
     */
-    void updateSelectionGroups(QListWidgetItem *item);
+    void updateSelectionGroupsList(QListWidgetItem *item);
 
     //=========================================================================================================
     /**
@@ -215,7 +247,7 @@ private:
     * Updates user defined selections.
     *
     */
-    void updateUserDefinedChannels();
+    void updateUserDefinedChannelsList();
 
     //=========================================================================================================
     /**
@@ -238,14 +270,16 @@ private:
     */
     bool eventFilter(QObject *obj, QEvent *event);
 
-    Ui::SelectionManagerWindow*     ui;
+    Ui::SelectionManagerWindow*     ui;                                 /**< Pointer to the qt designer generated ui class. */
 
-    QMap<QString,QVector<double> >  m_layoutMap;
-    QMap<QString,QStringList>       m_selectionGroupsMap;
+    ChInfoModel*                    m_pChInfoModel;                     /**< Pointer to the channel info model. */
 
-    LayoutScene*                    m_pLayoutScene;
+    QMap<QString,QPointF>           m_layoutMap;                        /**< QMap with the loaded layout. each channel name correspond to a QPointF variable. */
+    QMap<QString,QStringList>       m_selectionGroupsMap;               /**< QMap with the loaded selection groups. Each group name holds a string list with the corresponding channels of the group.*/
 
-    QStringList                     m_currentlyLoadedFiffChannels;
+    SelectionScene*                 m_pSelectionScene;                  /**< Pointer to the selection scene class. */
+
+    QStringList                     m_currentlyLoadedFiffChannels;      /**< List of currently loaded fiff data channels.*/
 };
 
 } // NAMESPACE MNEBrowseRawQt

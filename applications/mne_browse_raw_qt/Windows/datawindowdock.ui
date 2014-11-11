@@ -137,8 +137,14 @@
          <height>0</height>
         </size>
        </property>
+       <property name="mouseTracking">
+        <bool>false</bool>
+       </property>
        <property name="autoScroll">
         <bool>false</bool>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::ExtendedSelection</enum>
        </property>
        <property name="selectionBehavior">
         <enum>QAbstractItemView::SelectItems</enum>

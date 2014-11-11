@@ -42,8 +42,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "channelsceneitem.h"
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -62,6 +60,7 @@
 #include <QGraphicsSceneEvent>
 #include <QMutableListIterator>
 #include <QScrollBar>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -77,7 +76,7 @@ namespace MNEBrowseRawQt
 /**
 * LayoutScene...
 *
-* @brief The LayoutScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
+* @brief The LayoutScene class provides a reimplemented QGraphicsScene for 2D layout plotting. This class handles all the user interaction features (subclass in order to use).
 */
 class LayoutScene : public QGraphicsScene
 {
@@ -88,39 +87,14 @@ public:
     /**
     * Constructs a LayoutScene.
     */
-    explicit LayoutScene(QGraphicsView* view, QObject *parent = 0, int sceneType = 0);
+    LayoutScene(QGraphicsView* view, QObject *parent = 0);
 
-    //=========================================================================================================
-    /**
-    * Updates layout data.
-    * @param [in] layoutMap layout data map.
-    */
-    void setNewLayout(QMap<QString,QVector<double> > layoutMap);
-
-    //=========================================================================================================
-    /**
-    * Hides all items described in list.
-    * @param [in] list string list with items name which are to be hidden.
-    */
-    void hideItems(QStringList visibleItems);
-
-    int                             m_iSceneType;                   /**< Holds the current scene type (channel selection = 0, average = 1).*/
-
-private:
-    QGraphicsView*                  m_qvView;                       /**< Holds the view which visualizes this scene.*/
-    QMap<QString,QVector<double> >  m_layoutMap;                    /**< Holds the layout data.*/
-    bool                            m_dragSceneIsActive;
-    QPointF                         m_mousePressPosition;
-    bool                            m_bDragMode;
-    bool                            m_bExtendedSelectionMode;
-    QPainterPath                    m_oldSelectionArea;
-    QList<QGraphicsItem *>          m_selectedItems;
-
-    //=========================================================================================================
-    /**
-    * Repaints all items fro mthe layout data in the scene.
-    */
-    void repaintItems();
+protected:
+    QGraphicsView*                  m_qvView;                       /**< The view which visualizes this scene.*/
+    bool                            m_bDragMode;                    /**< Flag whether the drag mode is activated.*/
+    //bool                            m_bExtendedSelectionMode;       /**< Flag whether the extended selection mode.*/
+    QPointF                         m_mousePressPosition;           /**< The current mouse press location.*/
+    //QList<QGraphicsItem *>          m_selectedItems;                /**< The currently selected items during extended selection mode.*/
 
     //=========================================================================================================
     /**
@@ -164,12 +138,43 @@ private:
     */
     void keyReleaseEvent(QKeyEvent *keyEvent);
 
+    //=========================================================================================================
+    /**
+    * reimplemented event function - intercepts touch gestures
+    */
     bool event(QEvent *event);
+
+    //=========================================================================================================
+    /**
+    * gestureEvent processes gesture events
+    */
     bool gestureEvent(QGestureEvent *event);
+
+    //=========================================================================================================
+    /**
+    * pinchTriggered processes pan gesture events
+    */
     void panTriggered(QPanGesture*);
+
+    //=========================================================================================================
+    /**
+    * pinchTriggered processes pinch gesture events
+    */
     void pinchTriggered(QPinchGesture*);
+
+    //=========================================================================================================
+    /**
+    * pinchTriggered processes swipe gesture events
+    */
     void swipeTriggered(QSwipeGesture*);
 
+    //=========================================================================================================
+    /**
+    * Installed event filter.
+    *
+    * @param [in] obj the qt object for which the event was intercpeted
+    * @param [in] event the current event
+    */
     bool eventFilter(QObject *object, QEvent *event);
 };
 

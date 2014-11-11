@@ -286,6 +286,39 @@ void BabyMEG::UpdateFiffInfo()
 
 //*************************************************************************************************************
 
+void BabyMEG::splitRecordingFile()
+{
+    qDebug() << "Split recording file";
+    ++m_iSplitCount;
+    QString nextFileName = m_sRecordFile.remove("_raw.fif");
+    nextFileName += QString("-%1_raw.fif").arg(m_iSplitCount);
+
+    /*
+    * Write the link to the next file
+    */
+    qint32 data;
+    m_pOutfid->start_block(FIFFB_REF);
+    data = FIFFV_ROLE_NEXT_FILE;
+    m_pOutfid->write_int(FIFF_REF_ROLE,&data);
+    m_pOutfid->write_string(FIFF_REF_FILE_NAME, nextFileName);
+    m_pOutfid->write_id(FIFF_REF_FILE_ID);//ToDo meas_id
+    data = m_iSplitCount - 1;
+    m_pOutfid->write_int(FIFF_REF_FILE_NUM, &data);
+    m_pOutfid->end_block(FIFFB_REF);
+
+    //finish file
+    m_pOutfid->finish_writing_raw();
+
+    //start next file
+    m_qFileOut.setFileName(nextFileName);
+    m_pOutfid = Fiff::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals);
+    fiff_int_t first = 0;
+    m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
+}
+
+
+//*************************************************************************************************************
+
 void BabyMEG::toggleRecordingFile()
 {
     //Setup writing to file
@@ -298,6 +331,8 @@ void BabyMEG::toggleRecordingFile()
     }
     else
     {
+        m_iSplitCount = 0;
+
         if(!m_pFiffInfo)
         {
             QMessageBox msgBox;
@@ -511,6 +546,9 @@ void BabyMEG::run()
 
     MatrixXf matValue;
 
+    qint32 size = 0;
+    qint32 split_count = 0;
+
     while(m_bIsRunning)
     {
         if(m_pRawMatrixBuffer)
@@ -520,7 +558,17 @@ void BabyMEG::run()
 
             //Write raw data to fif file
             if(m_bWriteToFile)
+            {
+                size += matValue.rows()*matValue.cols() * 4;
+
+                if(size > MAX_DATA_LEN)
+                {
+                    size = 0;
+                    this->splitRecordingFile();
+                }
+
                 m_pOutfid->write_raw_buffer(matValue.cast<double>());
+            }
 
             if(m_pRTMSABabyMEG)
             {
