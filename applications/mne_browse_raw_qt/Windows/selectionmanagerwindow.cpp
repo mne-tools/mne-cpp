@@ -239,10 +239,9 @@ void SelectionManagerWindow::initComboBoxes()
 bool SelectionManagerWindow::loadLayout(QString path)
 {
     //Read layout
-    LayoutLoader* manager = new LayoutLoader();
     QString newPath = QCoreApplication::applicationDirPath() + path.prepend("/MNE_Browse_Raw_Resources/Templates/Layouts/");
 
-    bool state = manager->readMNELoutFile(newPath, m_layoutMap);
+    bool state = LayoutLoader::readMNELoutFile(newPath, m_layoutMap);
 
     //Load selection groups again because they need to be reinitialised every time a new layout hase been loaded
     loadSelectionGroups(ui->m_comboBox_selectionFiles->currentText());

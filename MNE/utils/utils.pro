@@ -75,12 +75,14 @@ SOURCES += \
     mnemath.cpp \
     ioutils.cpp \
     layoutloader.cpp \
+    layoutmaker.cpp \
     parksmcclellan.cpp \
     filterdata.cpp \
     mp/adaptivemp.cpp \
     mp/atom.cpp \
     mp/fixdictmp.cpp \
-    selectionloader.cpp
+    selectionloader.cpp \
+    minimizersimplex.cpp
 
 HEADERS += \
     kmeans.h\
@@ -88,12 +90,15 @@ HEADERS += \
     mnemath.h \
     ioutils.h \
     layoutloader.h \
+    layoutmaker.h \
     parksmcclellan.h \
     filterdata.h \
     mp/adaptivemp.h \
     mp/atom.h \
     mp/fixdictmp.h \
-    selectionloader.h
+    selectionloader.h \
+    layoutmaker.h \
+    minimizersimplex.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
