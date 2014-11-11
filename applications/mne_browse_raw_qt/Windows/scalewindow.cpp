@@ -94,14 +94,14 @@ void ScaleWindow::init()
             this,&ScaleWindow::scaleChannelValueChanged);
 
     //Connect view scaling spin boxes
-    connect(ui->m_doubleSpinBox_channelHeight,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+    connect(ui->m_SpinBox_channelHeight,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this,&ScaleWindow::scaleViewValueChanged);
 }
 
 
 //*************************************************************************************************************
 
-QMap<QString,double> ScaleWindow::getScalingMap()
+QMap<QString,double> ScaleWindow::genereateScalingMap()
 {
     QMap<QString,double> scaleMap;
 
@@ -225,7 +225,7 @@ void ScaleWindow::scaleAllChannels(double scaleValue)
 
 void ScaleWindow::scaleChannelValueChanged()
 {
-    emit scalingChannelValueChanged();
+    emit scalingChannelValueChanged(genereateScalingMap());
 }
 
 
@@ -233,5 +233,5 @@ void ScaleWindow::scaleChannelValueChanged()
 
 void ScaleWindow::scaleViewValueChanged()
 {
-    emit scalingViewValueChanged(ui->m_doubleSpinBox_channelHeight->value());
+    emit scalingViewValueChanged(ui->m_SpinBox_channelHeight->value());
 }

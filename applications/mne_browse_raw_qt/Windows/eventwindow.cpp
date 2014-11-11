@@ -140,9 +140,6 @@ void EventWindow::initMVCSettings()
     //Update the data views whenever the data in the event model changes
     connect(m_pEventModel,&EventModel::dataChanged,
                 m_pMainWindow->m_pDataWindow,&DataWindow::updateDataTableViews);
-
-    //Set MVC in delegate
-    m_pEventDelegate->setModelView(m_pEventModel);
 }
 
 

@@ -20,8 +20,25 @@
    <layout class="QGridLayout" name="gridLayout_2">
     <item row="0" column="0">
      <layout class="QGridLayout" name="gridLayout">
+      <item row="6" column="0">
+       <widget class="QLabel" name="m_label_EMG">
+        <property name="text">
+         <string>EMG (mV):</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="0" colspan="2">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Scaling view</string>
+        </property>
+       </widget>
+      </item>
       <item row="4" column="1">
        <widget class="QDoubleSpinBox" name="m_doubleSpinBox_EOG">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
         <property name="decimals">
          <number>1</number>
         </property>
@@ -39,27 +56,11 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="1">
-       <widget class="QDoubleSpinBox" name="m_doubleSpinBox_EMG">
-        <property name="decimals">
-         <number>1</number>
-        </property>
-        <property name="minimum">
-         <double>1.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>1000.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>10.000000000000000</double>
-        </property>
-        <property name="value">
-         <double>1.000000000000000</double>
-        </property>
-       </widget>
-      </item>
       <item row="3" column="1">
        <widget class="QDoubleSpinBox" name="m_doubleSpinBox_EEG">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
         <property name="decimals">
          <number>1</number>
         </property>
@@ -77,17 +78,32 @@
         </property>
        </widget>
       </item>
-      <item row="9" column="0" colspan="2">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Scaling view</string>
+      <item row="6" column="1">
+       <widget class="QDoubleSpinBox" name="m_doubleSpinBox_EMG">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="minimum">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>1000.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>10.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
         </property>
        </widget>
       </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="m_label_EMG">
+      <item row="2" column="0">
+       <widget class="QLabel" name="m_label_MEG_mag">
         <property name="text">
-         <string>EMG (mV):</string>
+         <string>MEG mag (pT):</string>
         </property>
        </widget>
       </item>
@@ -105,15 +121,11 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="m_label_MEG_mag">
-        <property name="text">
-         <string>MEG mag (pT/cm):</string>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="1">
        <widget class="QDoubleSpinBox" name="m_doubleSpinBox_MEG_mag">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
         <property name="decimals">
          <number>3</number>
         </property>
@@ -128,13 +140,6 @@
         </property>
         <property name="value">
          <double>1.200000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="0">
-       <widget class="QLabel" name="m_label_MISC">
-        <property name="text">
-         <string>MISC (V):</string>
         </property>
        </widget>
       </item>
@@ -165,60 +170,18 @@
         </property>
        </widget>
       </item>
-      <item row="7" column="1">
-       <widget class="QDoubleSpinBox" name="m_doubleSpinBox_MISC">
-        <property name="decimals">
-         <number>1</number>
-        </property>
-        <property name="minimum">
-         <double>1.000000000000000</double>
-        </property>
-        <property name="value">
-         <double>1.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="1">
-       <widget class="QDoubleSpinBox" name="m_doubleSpinBox_STIM">
-        <property name="decimals">
-         <number>1</number>
-        </property>
-        <property name="minimum">
-         <double>1.000000000000000</double>
-        </property>
-        <property name="value">
-         <double>5.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="0">
-       <widget class="QLabel" name="m_label_STIM">
+      <item row="7" column="0">
+       <widget class="QLabel" name="m_label_MISC">
         <property name="text">
-         <string>STIM:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QDoubleSpinBox" name="m_doubleSpinBox_MEG_grad">
-        <property name="decimals">
-         <number>3</number>
-        </property>
-        <property name="minimum">
-         <double>1.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>100000.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>20.000000000000000</double>
-        </property>
-        <property name="value">
-         <double>400.000000000000000</double>
+         <string>MISC (V):</string>
         </property>
        </widget>
       </item>
       <item row="5" column="1">
        <widget class="QDoubleSpinBox" name="m_doubleSpinBox_ECG">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
         <property name="decimals">
          <number>1</number>
         </property>
@@ -236,6 +199,76 @@
         </property>
        </widget>
       </item>
+      <item row="7" column="1">
+       <widget class="QDoubleSpinBox" name="m_doubleSpinBox_MISC">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="minimum">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1">
+       <widget class="QDoubleSpinBox" name="m_doubleSpinBox_STIM">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="minimum">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>5.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="m_doubleSpinBox_MEG_grad">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
+        <property name="buttonSymbols">
+         <enum>QAbstractSpinBox::UpDownArrows</enum>
+        </property>
+        <property name="accelerated">
+         <bool>true</bool>
+        </property>
+        <property name="showGroupSeparator" stdset="0">
+         <bool>false</bool>
+        </property>
+        <property name="decimals">
+         <number>3</number>
+        </property>
+        <property name="minimum">
+         <double>40.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>100000.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>20.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>400.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0">
+       <widget class="QLabel" name="m_label_STIM">
+        <property name="text">
+         <string>STIM:</string>
+        </property>
+       </widget>
+      </item>
       <item row="10" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
@@ -244,15 +277,18 @@
        </widget>
       </item>
       <item row="10" column="1">
-       <widget class="QDoubleSpinBox" name="m_doubleSpinBox_channelHeight">
+       <widget class="QSpinBox" name="m_SpinBox_channelHeight">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
         <property name="minimum">
-         <double>5.000000000000000</double>
+         <number>2</number>
         </property>
         <property name="maximum">
-         <double>1000.000000000000000</double>
+         <number>4000</number>
         </property>
         <property name="value">
-         <double>40.000000000000000</double>
+         <number>40</number>
         </property>
        </widget>
       </item>

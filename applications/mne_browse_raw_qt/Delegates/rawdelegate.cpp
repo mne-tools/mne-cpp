@@ -57,8 +57,6 @@
 //=============================================================================================================
 
 using namespace MNEBrowseRawQt;
-using namespace Eigen;
-using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -71,6 +69,7 @@ RawDelegate::RawDelegate(QObject *parent)
 , m_qSettings()
 , m_bShowSelectedEventsOnly(false)
 , m_bActivateEvents(true)
+, m_bRemoveDC(false)
 {
     m_iDefaultPlotHeight = DELEGATE_PLOT_HEIGHT;
     m_dDx = DELEGATE_DX;
@@ -79,6 +78,16 @@ RawDelegate::RawDelegate(QObject *parent)
     m_pEventModel = new EventModel(NULL);
     m_pEventView = new QTableView(NULL);
     m_pRawView = new QTableView(NULL);
+
+    //Init m_scaleMap
+    m_scaleMap["MEG_grad"] = 400 * 1e-15 * 100; //*100 because data in fiff files is stored as fT/m not fT/cm
+    m_scaleMap["MEG_mag"] = 1.2 * 1e-12;
+    m_scaleMap["MEG_EEG"] = 30 * 1e-06;
+    m_scaleMap["MEG_EOG"] = 150 * 1e-06;
+    m_scaleMap["MEG_EMG"] = 1 * 1e-03;
+    m_scaleMap["MEG_ECG"] = 1 * 1e-03;
+    m_scaleMap["MEG_MISC"] = 1 * 1;
+    m_scaleMap["MEG_STIM"] = 5 * 1;
 }
 
 
@@ -109,17 +118,17 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
             painter->setBrushOrigin(oldBO);
         }
 
-        //Highlight selected channels
-//        if(option.state & QStyle::State_Selected) {
-//            QPointF oldBO = painter->brushOrigin();
-//            painter->setBrushOrigin(option.rect.topLeft());
-//            painter->fillRect(option.rect, option.palette.highlight());
-//            painter->setBrushOrigin(oldBO);
-//        }
-
-        //Get data
+        //Get data and mean
         QVariant variant = index.model()->data(index,Qt::DisplayRole);
         QList<RowVectorPair> listPairs = variant.value<QList<RowVectorPair> >();
+
+        double channelMean = 0;
+        if(m_bRemoveDC) {
+            QModelIndex meanIndex = index.model()->index(index.row(),2);
+            QVariant channelMeanVariant = index.model()->data(meanIndex,RawModelRoles::GetChannelMean);
+            channelMean = channelMeanVariant.toDouble();
+        }
+
         const RawModel* t_rawModel = (static_cast<const RawModel*>(index.model()));
 
         QPainterPath path(QPointF(option.rect.x()+t_rawModel->relFiffCursor()-1,option.rect.y()));
@@ -138,12 +147,12 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
         //Plot data path
         path = QPainterPath(QPointF(option.rect.x()+t_rawModel->relFiffCursor(),option.rect.y()));
-        createPlotPath(index, option, path, listPairs);
+        createPlotPath(index, option, path, listPairs, channelMean);
 
         if(option.state & QStyle::State_Selected) {
             pen.setStyle(Qt::SolidLine);
-            pen.setWidthF(1.35);
-            pen.setColor(Qt::darkBlue);
+            pen.setWidthF(1);
+            pen.setColor(Qt::red);
             painter->setPen(pen);
         }
 
@@ -200,50 +209,48 @@ void RawDelegate::setModelView(EventModel *eventModel, QTableView* eventView, QT
 
 //*************************************************************************************************************
 
-void RawDelegate::setScaleWindow(ScaleWindow *scaleWindow)
+void RawDelegate::setScaleMap(const QMap<QString,double> &scaleMap)
 {
-    m_pScaleWindow = scaleWindow;
+    m_scaleMap = scaleMap;
 }
 
 
 //*************************************************************************************************************
 
-void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs) const
+void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs, double channelMean) const
 {
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = (static_cast<const RawModel*>(index.model()))->m_chInfolist[index.row()].kind;
     double dMaxValue = 1e-9;
 
-    QMap<QString,double> scaleMap = m_pScaleWindow->getScalingMap();
-
     switch(kind) {
     case FIFFV_MEG_CH: {
         qint32 unit = (static_cast<const RawModel*>(index.model()))->m_pfiffIO->m_qlistRaw[0]->info.chs[index.row()].unit;
         if(unit == FIFF_UNIT_T_M) {
-            dMaxValue = scaleMap["MEG_grad"];
+            dMaxValue = m_scaleMap["MEG_grad"];
         }
         else if(unit == FIFF_UNIT_T)
-            dMaxValue = scaleMap["MEG_mag"];
+            dMaxValue = m_scaleMap["MEG_mag"];
         break;
     }
     case FIFFV_EEG_CH: {
-        dMaxValue = scaleMap["MEG_EEG"];
+        dMaxValue = m_scaleMap["MEG_EEG"];
         break;
     }
     case FIFFV_EOG_CH: {
-        dMaxValue = scaleMap["MEG_EOG"];
+        dMaxValue = m_scaleMap["MEG_EOG"];
         break;
     }
     case FIFFV_STIM_CH: {
-        dMaxValue = scaleMap["MEG_STIM"];
+        dMaxValue = m_scaleMap["MEG_STIM"];
         break;
     }
     case FIFFV_EMG_CH: {
-        dMaxValue = scaleMap["MEG_EMG"];
+        dMaxValue = m_scaleMap["MEG_EMG"];
         break;
     }
     case FIFFV_MISC_CH: {
-        dMaxValue = scaleMap["MEG_MISC"];
+        dMaxValue = m_scaleMap["MEG_MISC"];
         break;
     }
     }
@@ -260,7 +267,9 @@ void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionVie
         for(qint32 j=0; j < listPairs[i].second; ++j)
         {
             double val = *(listPairs[i].first+j);
-            dValue = (val - *(listPairs[0].first))*dScaleY;
+
+            //subtract mean of the channel here (if wanted by the user)
+            dValue = (val - channelMean)*dScaleY;
 
             double newY = y_base+dValue;
 

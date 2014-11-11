@@ -224,6 +224,13 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
             }
             break;
         }
+
+        case FIFFV_REF_MEG_CH: {  /*11/04/14 Added by Limin: MEG reference channel */
+            fMaxValue = 1e-11f;
+            if(t_pModel->getScaling().contains(FIFF_UNIT_T))
+                fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
+            break;
+        }
         case FIFFV_EEG_CH: {
             fMaxValue = 1e-4f;
             if(t_pModel->getScaling().contains(FIFFV_EEG_CH))
@@ -277,6 +284,7 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
     for(i = 1; i < data.size(); ++i) {
         float val = data[i] - data[0]; //remove first sample data[0] as offset
         fValue = val*fScaleY;
+        //qDebug()<<"val"<<val<<"fScaleY"<<fScaleY<<"fValue"<<fValue;
 
         float newY = y_base-fValue;//Reverse direction -> plot the right way
 

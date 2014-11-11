@@ -283,7 +283,7 @@ namespace FIFFLIB
 #define FIFFV_XFIT_MAP_SURF_SPHERE  2  /**< Xfit contours on a spherical surface */
 
 //
-// Blocks
+// Blocks - Standard tags used in all blocks
 //
 #define FIFFB_MEAS               100
 #define FIFFB_MEAS_INFO          101
@@ -312,9 +312,9 @@ namespace FIFFLIB
 #define FIFFB_SSS_CAL_ADJUST     503
 #define FIFFB_SSS_ST_INFO        504
 #define FIFFB_SSS_BASES          505
-    //
-    // Of general interest
-    //
+//
+// Of general interest
+//
 #define FIFF_FILE_ID         100
 #define FIFF_DIR_POINTER     101
 #define FIFF_BLOCK_ID        103
@@ -325,9 +325,20 @@ namespace FIFFLIB
 #define FIFF_NOP             108
 #define FIFF_PARENT_FILE_ID  109
 #define FIFF_PARENT_BLOCK_ID 110
-    //
-    //  Megacq saves the parameters in these tags
-    //
+#define FIFF_BLOCK_NAME      111
+#define FIFF_BLOCK_VERSION   112
+#define FIFF_CREATOR         113   /* Program that created the file (string)  */
+#define FIFF_MODIFIER        114   /* Program that modified the file (string) */
+
+#define FIFF_REF_ROLE        115
+#define FIFF_REF_FILE_ID     116
+#define FIFF_REF_FILE_NUM    117
+#define FIFF_REF_FILE_NAME   118
+/* reserverd                 119 */
+#define FIFF_REF_BLOCK_ID    120
+//
+//  Megacq saves the parameters in these tags
+//
 #define FIFF_DACQ_PARS      150
 #define FIFF_DACQ_STIM      151
 
@@ -817,6 +828,35 @@ namespace FIFFLIB
 #define FIFF_STREAM_SEGMENT    19  /* A segment of data stream */
 
 
+/*
+* Index
+*/
+#define FIFF_INDEX_KIND              5001
+#define FIFF_INDEX                   5002
+
+
+/*======================================================================
+* Enumerated types used as tag values.
+*=====================================================================*/
+
+/* Values for FIFF_REF_ROLE. The role of a reference */
+
+#define FIFFV_ROLE_PREV_FILE   1
+#define FIFFV_ROLE_NEXT_FILE   2
+
+
+/*
+* Method by which a projection is defined (FIFF_PROJ_ITEM_DEFINITION).
+* If tag is not present, FIFF_PROJ_BY_COMPLEMENT should be assumed.
+*/
+#define FIFFV_PROJ_BY_COMPLEMENT     0
+#define FIFFV_PROJ_BY_SPACE          1
+
+
+/* Volume types used in FIFF_VOL_TYPE */
+
+#define FIFFV_VOL_TYPE_HD            1	       /* Hard disk */
+#define FIFFV_VOL_TYPE_MOD           2	       /* Magneto-optical disk */
 
 
 /*
@@ -825,7 +865,6 @@ namespace FIFFLIB
 #define FIFFV_NATIVE_ENDIAN     0        /* This refers to the byte order in the current system */
 #define FIFFV_LITTLE_ENDIAN     1        /* The little-endian (Intel) byte order */
 #define FIFFV_BIG_ENDIAN        2        /* The big-endian (Motorola) byte order */
-
 
 } // NAMESPACE
 

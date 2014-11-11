@@ -43,8 +43,13 @@
 //=============================================================================================================
 
 #include "ui_averagewindow.h"
-#include "utils/layoutloader.h"         //MNE-CPP utils
-#include "../Utils/layoutscene.h"       //MNE Browse Raw QT utils
+#include "utils/layoutloader.h"             //MNE-CPP utils
+#include "../Utils/averagescene.h"          //MNE Browse Raw QT utils
+#include "../Utils/selectionsceneitem.h"
+#include "../Utils/butterflyscene.h"
+#include "../Utils/types.h"
+#include "../Models/averagemodel.h"
+#include "../Delegates/averagedelegate.h"
 
 
 //*************************************************************************************************************
@@ -53,6 +58,9 @@
 //=============================================================================================================
 
 #include <QDockWidget>
+#include <QFileDialog>
+#include <QStandardPaths>
+#include <QSvgGenerator>
 
 
 //*************************************************************************************************************
@@ -88,7 +96,7 @@ public:
     *
     * @param [in] parent pointer to parent widget; If parent is 0, the new AverageWindow becomes a window. If parent is another widget, AverageWindow becomes a child window inside parent. AverageWindow is deleted when its parent is deleted.
     */
-    AverageWindow(QWidget *parent = 0);
+    AverageWindow(QWidget *parent = 0, QFile &file = QFile());
 
     //=========================================================================================================
     /**
@@ -97,8 +105,89 @@ public:
     */
     ~AverageWindow();
 
+    //=========================================================================================================
+    /**
+    * Returns the AverageModel of this window
+    */
+    AverageModel* getAverageModel();
+
+    //=========================================================================================================
+    /**
+    * call this whenever the external channel selection manager changes
+    *
+    * * @param [in] selectedChannelItems list of selected graphic items
+    */
+    void channelSelectionManagerChanged(const QList<QGraphicsItem *> &selectedChannelItems);
+
+    //=========================================================================================================
+    /**
+    * Scales the averaged data according to scaleMap
+    *
+    * @param [in] scaleMap map with all channel types and their current scaling value
+    */
+    void scaleAveragedData(const QMap<QString,double> &scaleMap);
+
 private:
-    Ui::AverageWindow *ui;
+    //=========================================================================================================
+    /**
+    * inits the model view controller paradigm of this window
+    *
+    * @param [in] file holds the file which is to be loaded on startup
+    */
+    void initMVC(QFile &file);
+
+    //=========================================================================================================
+    /**
+    * inits the table widgets of this window
+    */
+    void initTableViewWidgets();
+
+    //=========================================================================================================
+    /**
+    * inits the average scene of this window
+    */
+    void initAverageSceneView();
+
+    //=========================================================================================================
+    /**
+    * Inits all QPushButtons in this window
+    */
+    void initButtons();
+
+    //=========================================================================================================
+    /**
+    * Inits all QComboBoxes in this window
+    */
+    void initComboBoxes();
+
+    //=========================================================================================================
+    /**
+    * call this function whenever a selection was made in teh evoked data set list
+    */
+    void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+
+    //=========================================================================================================
+    /**
+    * saves the current layout average plot as png or svg to file
+    */
+    void exportAverageLayoutPlot();
+
+    //=========================================================================================================
+    /**
+    * saves the current butterfly average plot as png or svg to file
+    */
+    void exportAverageButterflyPlot();
+
+    Ui::AverageWindow*      ui;                     /**< Pointer to the qt designer generated ui class.*/
+
+    QList<QColor>           m_lButterflyColors;     /**< List which holds 500 randomly generated colors.*/
+
+    AverageModel*           m_pAverageModel;        /**< The QAbstractTable average model being part of the model/view framework of Qt. */
+    AverageDelegate*        m_pAverageDelegate;     /**< The QItemDelegateaverage delegate being part of the model/view framework of Qt. */
+    AverageScene*           m_pAverageScene;        /**< The pointer to the average scene. */
+
+    ButterflyScene*         m_pButterflyScene;      /**< The pointer to the butterfly scene. */
+
 };
 
 } // NAMESPACE MNEBrowseRawQt

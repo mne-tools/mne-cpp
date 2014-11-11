@@ -1,15 +1,16 @@
 //=============================================================================================================
 /**
-* @file     channelsceneitem.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* @file     averagemodel.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     September, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,32 +31,53 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ChannelSceneItem class.
+* @brief    This class represents the average model of the model/view framework of mne_browse_raw_qt application.
 *
 */
 
-#ifndef CHANNELSCENEITEM_H
-#define CHANNELSCENEITEM_H
+#ifndef AVERAGEMODEL_H
+#define AVERAGEMODEL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
+#include "../Utils/rawsettings.h"
+#include "../Utils/types.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QGraphicsItem>
-#include <QString>
-#include <QColor>
-#include <QPainter>
-#include <QStaticText>
-#include <QDebug>
+#include <QAbstractTableModel>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// MNE INCLUDES
+//=============================================================================================================
+
+#include <fiff/fiff.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace Eigen;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -66,78 +88,69 @@
 namespace MNEBrowseRawQt
 {
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-
 //=============================================================================================================
 /**
-* ChannelSceneItem...
-*
-* @brief The ChannelSceneItem class provides a new data structure for visualizing channels in a 2D layout.
+* DECLARE CLASS AverageModel
 */
-class ChannelSceneItem : public QGraphicsItem
+class AverageModel : public QAbstractTableModel
 {
-
+    Q_OBJECT
 public:
-    //=========================================================================================================
-    /**
-    * Constructs a ChannelSceneItem.
-    */
-    ChannelSceneItem(QString channelName, QPointF channelPosition, QColor channelColor = Qt::blue);
+    AverageModel(QObject *parent = 0);
+    AverageModel(QFile& qFile, QObject *parent);
 
     //=========================================================================================================
     /**
-    * Sets the color of the electrode item.
+    * Reimplemented virtual functions
+    *
     */
-    void setColor(QColor channelColor);
+    virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
+    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
+    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
+    virtual Qt::ItemFlags flags(const QModelIndex & index) const;
+    virtual bool insertRows(int position, int span, const QModelIndex & parent = QModelIndex());
+    virtual bool removeRows(int position, int span, const QModelIndex & parent = QModelIndex());
 
     //=========================================================================================================
     /**
-    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
+    * loadEvokedData loads the fiff evoked data file
+    *
+    * @param p_IODevice fiff data evoked file to read from
     */
-    QRectF boundingRect() const;
+    bool loadEvokedData(QFile& qFile);
 
     //=========================================================================================================
     /**
-    * Reimplemented paint function.
+    * saveEvokedData saves the fiff evoked data file
+    *
+    * @param p_IODevice fiff data evoked file to save to
     */
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    bool saveEvokedData(QFile& qFile);
+
+    bool                        m_bFileloaded;          /**< true when a Fiff evoked file is loaded. */
+
+protected:
+    FiffEvokedSet*              m_pEvokedDataSet;       /**< QList<FiffEvoked> that holds the evoked data sets which are to be organised and handled by this model. */
+    QSharedPointer<FiffIO>      m_pfiffIO;              /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!). */
 
     //=========================================================================================================
     /**
-    * Returns the channel name.
+    * clearModel clears all model's members
     */
-    QString getChannelName();
+    void clearModel();
 
+signals:
     //=========================================================================================================
     /**
-    * Updates the channels position.
+    * fileLoaded is emitted whenever a file was (tried) to be loaded
     */
-    void setPosition(QPointF newPosition);
-
-    //=========================================================================================================
-    /**
-    * Updates the electrodes position.
-    */
-    QPointF getPosition();
-
-    //=========================================================================================================
-    /**
-    * Sets the highlight flag. Notice that highliting an item is not selecting it
-    */
-    void setHighlightChannel(bool highlightItem);
-
-private:
-    QString     m_sChannelName;             /**< Holds the channel's name.*/
-    QPointF     m_qpChannelPosition;        /**< Holds the channel's 2D position in the scene.*/
-    QColor      m_cChannelColor;            /**< Holds the current channel color.*/
-    bool        m_bHighlightItem;
+    void fileLoaded(bool);
 };
 
-} // NAMESPACE MNEBrowseRawQt
+} // NAMESPACE
 
-#endif // CHANNELSCENEITEM_H
+
+
+#endif // AVERAGEMODEL_H

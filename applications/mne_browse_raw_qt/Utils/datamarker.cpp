@@ -63,7 +63,7 @@ DataMarker::DataMarker(QWidget *parent) :
     //Set background color
     QPalette Pal(palette());
 
-    QColor color = m_qSettings.value("DataMarker/data_marker_color", QColor(227,6,19)).value<QColor>();
+    QColor color = m_qSettings.value("DataMarker/data_marker_color", QColor(93,177,47)).value<QColor>();
     color.setAlpha(DATA_MARKER_OPACITY);
     Pal.setColor(QPalette::Background, color);
 
@@ -103,21 +103,13 @@ void DataMarker::mouseMoveEvent(QMouseEvent *event)
         if(m_movableRegion.contains(newPosition.bottomLeft()) && m_movableRegion.contains(newPosition.bottomRight())) {
             move(x()+delta.x(), y());
             m_oldPos = event->globalPos();
-
-            emit markerMoved();
         }
 
-        if(event->windowPos().x() < m_movableRegion.boundingRect().left()) {
+        if(event->windowPos().x() < m_movableRegion.boundingRect().left())
             move(m_movableRegion.boundingRect().left(), y());
 
-            emit markerMoved();
-        }
-
-        if(event->windowPos().x() > m_movableRegion.boundingRect().right()) {
+        if(event->windowPos().x() > m_movableRegion.boundingRect().right())
             move(m_movableRegion.boundingRect().right()-2, y());
-
-            emit markerMoved();
-        }
 
 //        qDebug()<<"globalPos"<<event->globalPos().x()<<event->globalPos().y();
 //        qDebug()<<"newPosition"<<newPosition.x()<<newPosition.y()<<newPosition.width()<<newPosition.height();
@@ -132,4 +124,13 @@ void DataMarker::enterEvent(QEvent *event)
 {
     Q_UNUSED(event);
     setCursor(QCursor(Qt::SizeHorCursor));
+}
+
+
+//*************************************************************************************************************
+
+void DataMarker::moveEvent(QMoveEvent *event)
+{
+    Q_UNUSED(event);
+    emit markerMoved();
 }

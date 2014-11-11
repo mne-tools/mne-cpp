@@ -185,7 +185,7 @@ bool RtNoise::stop()
 
     m_pRawMatrixBuffer->clear();
 
-    qDebug()<<"Thread is stopped.";
+    qDebug()<<" RtNoise Thread is stopped.";
 
     return true;
 }

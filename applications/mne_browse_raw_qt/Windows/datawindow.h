@@ -55,10 +55,10 @@
 
 #include <QWidget>
 #include <QResizeEvent>
-#include <QToolBar>
 #include <QPainter>
 #include <QColor>
 #include <QGesture>
+#include <QScroller>
 
 
 //*************************************************************************************************************
@@ -140,29 +140,33 @@ public:
 
     //=========================================================================================================
     /**
+    * Scales the data according to scaleMap
+    *
+    * @param [in] scaleMap map with all channel types and their current scaling value
+    */
+    void scaleData(const QMap<QString,double> &scaleMap);
+
+    //=========================================================================================================
+    /**
     * Updates the data table views
     */
     void updateDataTableViews();
 
     //=========================================================================================================
     /**
-    * Only shows the channels defined in the QStringList
+    * Only shows the channels defined in the QStringList selectedChannels
+    *
+    * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
     */
     void showSelectedChannelsOnly(QStringList selectedChannels);
 
     //=========================================================================================================
     /**
-    * Scale the channels in the data views
+    * Change the channel plot height in the data views to the double value heigt
     */
-    void scaleChannelsInView(double scale);
+    void changeRowHeight(int height);
 
 private:
-    //=========================================================================================================
-    /**
-    * Setup the undocked data view window.
-    */
-    void initUndockedWindow();
-
     //=========================================================================================================
     /**
     * Setup the tool bar of the data window.
@@ -195,7 +199,7 @@ private:
 
     //=========================================================================================================
     /**
-    * eventFilter filter events fro mthe table views
+    * Installed event filter.
     */
     bool eventFilter(QObject *object, QEvent *event);
 
@@ -211,27 +215,28 @@ private:
     */
     bool pinchTriggered(QPinchGesture *gesture);
 
-    Ui::DataWindowDockWidget *ui;                   /**< the ui variabe to initalise and access the ui file with this class */
+    Ui::DataWindowDockWidget *ui;                   /**< Pointer to the qt designer generated ui class.*/
 
-    MainWindow*     m_pMainWindow;                  /**< pointer to the main window (parent) */
+    MainWindow*     m_pMainWindow;                  /**< pointer to the main window (parent). */
 
-    QSettings       m_qSettings;                    /**< global mne browse raw qt settings */
+    QSettings       m_qSettings;                    /**< QSettings variable used to write or read from independent application sessions. */
 
-    QWidget*        m_pUndockedViewWidget;          /**< widget which is shown whenever the view undock action is triggered */
+    DataMarker*     m_pDataMarker;                  /**< pointer to the data marker. */
+    QLabel*         m_pCurrentDataMarkerLabel;      /**< the current data marker label to display the marker's position. */
+    int             m_iCurrentMarkerSample;         /**< the current data marker sample value to display the marker's position. */
 
-    DataMarker*     m_pDataMarker;                  /**< pointer to the data marker */
+    RawDelegate*    m_pRawDelegate;                 /**< the QAbstractDelegate being part of the raw model/view framework of Qt. */
+    RawModel*       m_pRawModel;                    /**< the QAbstractTable model being part of the model/view framework of Qt. */
 
-    QLabel*         m_pCurrentDataMarkerLabel;      /**< the current data marker label to display the marker's position */
+    QVBoxLayout*    m_pUndockedDataViewLayout;      /**< the layout of the undockable widget. */
 
-    int             m_iCurrentMarkerSample;         /**< the current data marker sample value to display the marker's position */
-
-    RawDelegate*    m_pRawDelegate;                 /**< the QAbstractDelegate being part of the raw model/view framework of Qt */
-    RawModel*       m_pRawModel;                    /**< the QAbstractTable model being part of the model/view framework of Qt */
-
-    QTableView*     m_pUndockedDataView;
-    QVBoxLayout*    m_pUndockedDataViewLayout;
+    QScroller*      m_pKineticScroller;             /**< the kinetic scroller of the QTableView. */
 
 signals:
+    //=========================================================================================================
+    /**
+    * scaleChannels gets called whenever the user performed a scaling gesture (pinch)
+    */
     void scaleChannels(double);
 
 protected slots:
@@ -259,12 +264,6 @@ protected slots:
     * Adds an event to the event model and its QTableView
     */
     void addEventToEventModel();
-
-    //=========================================================================================================
-    /**
-    * Undock the table view to a normal window (not dock widget)
-    */
-    void undockDataViewToWindow();
 
     //=========================================================================================================
     /**

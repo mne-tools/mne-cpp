@@ -96,6 +96,7 @@ protected:
     //=========================================================================================================
     /**
     * Draws the diagram to plot the magnitude.
+    *
     * @param [in] holds the current sampling frequency
     */
     void plotMagnitudeDiagram(int samplingFreq);
@@ -107,20 +108,20 @@ protected:
     */
     void plotFilterFrequencyResponse();
 
-    QSharedPointer<FilterOperator>      m_pCurrentFilter;
+    QSharedPointer<FilterOperator>      m_pCurrentFilter;       /**< Pointer to the filter operator */
 
-    QGraphicsPathItem*                  m_pGraphicsItemPath;
+    QGraphicsPathItem*                  m_pGraphicsItemPath;    /**< Pointer to the graphics path item in the filterplotscene */
 
-    int             m_iScalingFactor;           /**< Scales the db filter magnitudes by the specified factor in order to provide better plotting */
-    double          m_dMaxMagnitude;            /**< the maximum magnirutde shown in the diagram */
-    int             m_iNumberHorizontalLines;   /**< number of plotted horizontal ()lines */
-    int             m_iNumberVerticalLines;     /**< number of plotted vertical lines */
-    int             m_iAxisTextSize;            /**< point size of the plotted text */
-    int             m_iDiagramMarginsHoriz;     /**< horizontal space between the filter and diagram plot  */
-    int             m_iDiagramMarginsVert;      /**< vertical space between the filter and diagram plot */
-    int             m_iCutOffLow;               /**< cut off frequqency lowpass or lower cut off when filter is a bandpass */
-    int             m_iCutOffHigh;              /**< cut off frequqency highpass or higher cut off when filter is a bandpass */
-    int             m_iCutOffMarkerWidth;       /**< cut off marker width */
+    int             m_iScalingFactor;           /**< Scales the db filter magnitudes by the specified factor in order to provide better plotting. */
+    double          m_dMaxMagnitude;            /**< the maximum magnirutde shown in the diagram. */
+    int             m_iNumberHorizontalLines;   /**< number of plotted horizontal ()lines. */
+    int             m_iNumberVerticalLines;     /**< number of plotted vertical lines. */
+    int             m_iAxisTextSize;            /**< point size of the plotted text. */
+    int             m_iDiagramMarginsHoriz;     /**< horizontal space between the filter and diagram plot.  */
+    int             m_iDiagramMarginsVert;      /**< vertical space between the filter and diagram plot. */
+    int             m_iCutOffLow;               /**< cut off frequqency lowpass or lower cut off when filter is a bandpass. */
+    int             m_iCutOffHigh;              /**< cut off frequqency highpass or higher cut off when filter is a bandpass. */
+    int             m_iCutOffMarkerWidth;       /**< cut off marker width. */
 
 };
 
