@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     layoutloader.h
+* @file     layoutmaker.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -34,15 +34,17 @@
 *
 */
 
-#ifndef LAYOUTLOADER_H
-#define LAYOUTLOADER_H
+#ifndef LAYOUTMAKER_H
+#define LAYOUTMAKER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
+#include "minimizersimplex.h"
 #include "utils_global.h"
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -50,15 +52,12 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
 #include <QVector>
+#include <QList>
+#include <QStringList>
 #include <QFile>
 #include <QTextStream>
-#include <QStringList>
 #include <QDebug>
-#include <QIODevice>
-#include <QString>
-#include <QPoint>
 
 
 //*************************************************************************************************************
@@ -66,7 +65,7 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
+#include <Eigen/Eigen>
 
 
 //*************************************************************************************************************
@@ -90,49 +89,109 @@ using namespace Eigen;
 //=============================================================================================================
 // DEFINES
 //=============================================================================================================
+#ifndef FAIL
+#define FAIL -1
+#endif
 
+#ifndef OK
+#define OK 0
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+#define EPS 1e-6
+
+#ifndef M_PI
+#define  M_PI   3.14159265358979323846  /* pi */
+#endif
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// TYPEDEFS
+//=============================================================================================================
+
+typedef struct {
+  MatrixXf rr;
+  int   np;
+  int   report;
+} *fitUser,fitUserRec;
 
 //=============================================================================================================
 /**
-* Processes layout files (AsA .elc, MNE .lout) files which contain the electrode positions of a EEG/MEG hat.
+* Make layout files from given 3D points
 *
-* @brief Processes AsA .elc files which contain the electrode positions of a EEG hat.
+* @brief Make layout files from given 3D points.
 */
-class UTILSSHARED_EXPORT LayoutLoader
+class UTILSSHARED_EXPORT LayoutMaker
 {
 public:
-    typedef QSharedPointer<LayoutLoader> SPtr;            /**< Shared pointer type for LayoutLoader. */
-    typedef QSharedPointer<const LayoutLoader> ConstSPtr; /**< Const shared pointer type for LayoutLoader. */
-
     //=========================================================================================================
     /**
-    * Constructs a LayoutLoader object.
+    * Constructs a LayoutMaker object.
     */
-    LayoutLoader();
+    LayoutMaker();
 
     //=========================================================================================================
     /**
     * Reads the specified ANT elc-layout file.
-    * @param [in] path holds the file path of the elc file which is to be read.
-    * @param [in] location3D holds the vector to which the read 3D positions are stored.
-    * @param [in] location2D holds the vector to which the read 2D positions are stored.
-    * @return true if reading was successful, false otherwise.
+    * @param [in] inputPoints the input points in 3D space.
+    * @param [in] outputPoints the output layout points in 2D space.
+    * @param [in] names the channel names.
+    * @return true if making layout was successful, false otherwise.
     */
-    static bool readAsaElcFile(QString path, QStringList &channelNames, QVector<QVector<double> > &location3D, QVector<QVector<double> > &location2D, QString &unit);
-
-    //=========================================================================================================
-    /**
-    * Reads the specified MNE .lout file.
-    * @param [in] path holds the file path of the lout file which is to be read.
-    * @param [in] channel data holds the x,y and channel number for every channel. The map keys are the channel names (i.e. 'MEG 0113').
-    * @return bool true if reading was successful, false otherwise.
-    */
-    static bool readMNELoutFile(QString path, QMap<QString, QPointF> &channelData);
+    static bool makeLayout(const QList<QVector<double> > &inputPoints,
+                           QList<QVector<double> > &outputPoints,
+                           const QStringList &names,
+                           QFile &outFile,
+                           bool do_fit,
+                           float prad,
+                           float w,
+                           float h,
+                           bool writeFile = false);
 
 private:
+    static void sphere_coord(float x,
+                      float y,
+                      float z,
+                      float *r,
+                      float *theta,
+                      float *phi);
+
+    static int report_func(int loop,
+                   VectorXf &fitpar,
+                   int npar,
+                   double fval);
+
+    static float fit_eval(VectorXf &fitpar,
+                  int   npar,
+                  void  *user_data);
+
+    static float opt_rad(VectorXf &r0,
+                  fitUser user);
+
+    static void calculate_cm_ave_dist(MatrixXf &rr,
+                               int np,
+                               VectorXf &cm,
+                               float &avep);
+
+    static MatrixXf  make_initial_simplex(VectorXf &pars,
+                                int    npar,
+                                float  size);
+
+    static int fit_sphere_to_points(MatrixXf &rr,
+                             int   np,
+                             float simplex_size,
+                             VectorXf &r0,
+                             float &R);
 
 };
 
-} // NAMESPACE
+} //NAMESPACE
 
-#endif // LAYOUTLOADER_H
+#endif // LAYOUTMAKER_H
