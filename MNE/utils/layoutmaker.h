@@ -168,7 +168,7 @@ private:
                    int npar,
                    double fval);
 
-    static float fit_eval(VectorXf &fitpar,
+    static float fit_eval(const VectorXf &fitpar,
                   int   npar,
                   void  *user_data);
 

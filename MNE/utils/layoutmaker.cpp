@@ -244,7 +244,7 @@ int LayoutMaker::report_func(int loop,
 
 //*************************************************************************************************************
 
-float LayoutMaker::fit_eval(VectorXf &fitpar,
+float LayoutMaker::fit_eval(const VectorXf &fitpar,
                           int   npar,
                           void  *user_data)
 {
