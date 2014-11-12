@@ -113,7 +113,7 @@ public:
                  int   &neval,                                          /* Number of function evaluations */
                  int   report,                                          /* How often to report (-1 = no_reporting) */
                  int   (*report_func)(int loop,
-                              VectorXf &fitpar,
+                              const VectorXf &fitpar,
                               int npar,
                               double fval));                            /* The function to be called when reporting */
 

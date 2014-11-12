@@ -164,7 +164,7 @@ private:
                       float *phi);
 
     static int report_func(int loop,
-                   VectorXf &fitpar,
+                   const VectorXf &fitpar,
                    int npar,
                    double fval);
 
