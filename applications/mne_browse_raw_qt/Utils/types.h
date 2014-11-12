@@ -103,7 +103,8 @@ namespace ChInfoModelRoles
                   GetMEGType = Qt::UserRole + 1013,
                   GetChUnit = Qt::UserRole + 1014,
                   GetChAlias = Qt::UserRole + 1015,
-                  GetChPosition = Qt::UserRole + 1016};
+                  GetChPosition = Qt::UserRole + 1016,
+                  GetChDigitizer = Qt::UserRole + 1017};
 }
 
 Q_DECLARE_METATYPE(FIFFLIB::fiff_int_t);

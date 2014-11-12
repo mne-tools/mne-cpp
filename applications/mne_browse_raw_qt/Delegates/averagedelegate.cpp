@@ -63,8 +63,8 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AverageDelegate::AverageDelegate(QObject *parent) :
-    QItemDelegate(parent)
+AverageDelegate::AverageDelegate(QObject *parent)
+: QItemDelegate(parent)
 {
 }
 

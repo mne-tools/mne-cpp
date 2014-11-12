@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     layoutloader.h
+* @file     minimizersimplex.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    LayoutLoader class declaration.
+* @brief    MinimizerSimplex class declaration.
 *
 */
 
-#ifndef LAYOUTLOADER_H
-#define LAYOUTLOADER_H
+#ifndef MINIMIZERSIMPLEX_H
+#define MINIMIZERSIMPLEX_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -43,22 +43,12 @@
 //=============================================================================================================
 
 #include "utils_global.h"
-
+#include <iostream>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
-
-#include <QSharedPointer>
-#include <QVector>
-#include <QFile>
-#include <QTextStream>
-#include <QStringList>
-#include <QDebug>
-#include <QIODevice>
-#include <QString>
-#include <QPoint>
 
 
 //*************************************************************************************************************
@@ -66,7 +56,7 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
+#include <Eigen/Eigen>
 
 
 //*************************************************************************************************************
@@ -91,48 +81,57 @@ using namespace Eigen;
 // DEFINES
 //=============================================================================================================
 
+#define ALPHA 1.0
+#define BETA 0.5
+#define GAMMA 2.0
+
 
 //=============================================================================================================
 /**
-* Processes layout files (AsA .elc, MNE .lout) files which contain the electrode positions of a EEG/MEG hat.
+* Simplex minimizer code from numerical recipes.
 *
-* @brief Processes AsA .elc files which contain the electrode positions of a EEG hat.
+* @brief Simplex minimizer code from numerical recipes.
 */
-class UTILSSHARED_EXPORT LayoutLoader
+class MinimizerSimplex
 {
 public:
-    typedef QSharedPointer<LayoutLoader> SPtr;            /**< Shared pointer type for LayoutLoader. */
-    typedef QSharedPointer<const LayoutLoader> ConstSPtr; /**< Const shared pointer type for LayoutLoader. */
-
     //=========================================================================================================
     /**
-    * Constructs a LayoutLoader object.
+    * Constructs a MinimizerSimplex object.
     */
-    LayoutLoader();
+    MinimizerSimplex();
 
-    //=========================================================================================================
-    /**
-    * Reads the specified ANT elc-layout file.
-    * @param [in] path holds the file path of the elc file which is to be read.
-    * @param [in] location3D holds the vector to which the read 3D positions are stored.
-    * @param [in] location2D holds the vector to which the read 2D positions are stored.
-    * @return true if reading was successful, false otherwise.
-    */
-    static bool readAsaElcFile(QString path, QStringList &channelNames, QVector<QVector<double> > &location3D, QVector<QVector<double> > &location2D, QString &unit);
-
-    //=========================================================================================================
-    /**
-    * Reads the specified MNE .lout file.
-    * @param [in] path holds the file path of the lout file which is to be read.
-    * @param [in] channel data holds the x,y and channel number for every channel. The map keys are the channel names (i.e. 'MEG 0113').
-    * @return bool true if reading was successful, false otherwise.
-    */
-    static bool readMNELoutFile(QString path, QMap<QString, QPointF> &channelData);
+    static int mne_simplex_minimize(MatrixXf p,                         /* The initial simplex */
+                 VectorXf y,                                            /* Function values at the vertices */
+                 int   ndim,                                            /* Number of variables */
+                 float ftol,                                            /* Relative convergence tolerance */
+                 float (*func)(VectorXf &x,
+                         int npar,
+                         void *user_data),                              /* The function to be evaluated */
+                 void  *user_data,                                      /* Data to be passed to the above function in each evaluation */
+                 int   max_eval,                                        /* Maximum number of function evaluations */
+                 int   &neval,                                          /* Number of function evaluations */
+                 int   report,                                          /* How often to report (-1 = no_reporting) */
+                 int   (*report_func)(int loop,
+                              VectorXf &fitpar,
+                              int npar,
+                              double fval));                            /* The function to be called when reporting */
 
 private:
+    static float tryit(MatrixXf p,
+                 VectorXf y,
+                 VectorXf psum,
+                 int   ndim,
+                 float (*func)(VectorXf &x,
+                               int npar,
+                               void *user_data),                        /* The function to be evaluated */
+                 void  *user_data,                                      /* Data to be passed to the above function in each evaluation */
+                 int   ihi,
+                 int &neval,
+                 float fac);
 
 };
 
-} // NAMESPACE
+} //NAMESPACE
 
-#endif // LAYOUTLOADER_H
+#endif // MINIMIZERSIMPLEX_H
