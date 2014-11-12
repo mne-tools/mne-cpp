@@ -56,6 +56,8 @@
 #include <QList>
 #include <QStringList>
 #include <QFile>
+#include <QTextStream>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -126,7 +128,7 @@ typedef struct {
 *
 * @brief Make layout files from given 3D points.
 */
-class LayoutMaker
+class UTILSSHARED_EXPORT LayoutMaker
 {
 public:
     //=========================================================================================================
@@ -145,42 +147,44 @@ public:
     */
     static bool makeLayout(const QList<QVector<double> > &inputPoints,
                            QList<QVector<double> > &outputPoints,
-                           QStringList &names,
-                           QFile &out, bool do_fit,
+                           const QStringList &names,
+                           QFile &outFile,
+                           bool do_fit,
                            float prad,
                            float w,
-                           float h);
+                           float h,
+                           bool writeFile = false);
 
 private:
-    void sphere_coord (float x,
+    static void sphere_coord(float x,
                       float y,
                       float z,
                       float *r,
                       float *theta,
                       float *phi);
 
-    int report_func(int loop,
+    static int report_func(int loop,
                    VectorXf &fitpar,
                    int npar,
                    double fval);
 
-    float fit_eval(VectorXf &fitpar,
+    static float fit_eval(VectorXf &fitpar,
                   int   npar,
                   void  *user_data);
 
-    float opt_rad(VectorXf &r0,
+    static float opt_rad(VectorXf &r0,
                   fitUser user);
 
-    void calculate_cm_ave_dist(MatrixXf &rr,
+    static void calculate_cm_ave_dist(MatrixXf &rr,
                                int np,
                                VectorXf &cm,
                                float &avep);
 
-    MatrixXf  make_initial_simplex(VectorXf &pars,
+    static MatrixXf  make_initial_simplex(VectorXf &pars,
                                 int    npar,
                                 float  size);
 
-    int fit_sphere_to_points(MatrixXf &rr,
+    static int fit_sphere_to_points(MatrixXf &rr,
                              int   np,
                              float simplex_size,
                              VectorXf &r0,

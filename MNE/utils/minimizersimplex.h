@@ -101,19 +101,19 @@ public:
     */
     MinimizerSimplex();
 
-    static int mne_simplex_minimize(MatrixXf p,                                /* The initial simplex */
+    static int mne_simplex_minimize(MatrixXf p,                         /* The initial simplex */
                  VectorXf y,                                            /* Function values at the vertices */
                  int   ndim,                                            /* Number of variables */
                  float ftol,                                            /* Relative convergence tolerance */
-                 float (*func)(VectorXf x,
-                               int npar,
-                               void *user_data),                        /* The function to be evaluated */
+                 float (*func)(VectorXf &x,
+                         int npar,
+                         void *user_data),                              /* The function to be evaluated */
                  void  *user_data,                                      /* Data to be passed to the above function in each evaluation */
                  int   max_eval,                                        /* Maximum number of function evaluations */
                  int   &neval,                                          /* Number of function evaluations */
                  int   report,                                          /* How often to report (-1 = no_reporting) */
                  int   (*report_func)(int loop,
-                              VectorXf fitpar,
+                              VectorXf &fitpar,
                               int npar,
                               double fval));                            /* The function to be called when reporting */
 
@@ -122,7 +122,9 @@ private:
                  VectorXf y,
                  VectorXf psum,
                  int   ndim,
-                 float (*func)(VectorXf x,int npar,void *user_data),      /* The function to be evaluated */
+                 float (*func)(VectorXf &x,
+                               int npar,
+                               void *user_data),                        /* The function to be evaluated */
                  void  *user_data,                                      /* Data to be passed to the above function in each evaluation */
                  int   ihi,
                  int &neval,

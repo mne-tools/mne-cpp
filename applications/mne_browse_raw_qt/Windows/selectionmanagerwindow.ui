@@ -160,31 +160,6 @@
           <height>16777215</height>
          </size>
         </property>
-        <item>
-         <property name="text">
-          <string>Vectorview-grad.lout</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Vectorview-all.lout</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Vectorview-mag.lout</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>CTF-275.lout</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>magnesWH3600.lout</string>
-         </property>
-        </item>
        </widget>
       </item>
       <item row="3" column="5">
@@ -207,26 +182,6 @@
           <height>16777215</height>
          </size>
         </property>
-        <item>
-         <property name="text">
-          <string>mne_browse_raw_vv.sel</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>mne_browse_raw_vv_new.sel</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>mne_browse_raw_CTF_275.sel</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>mne_browse_raw_Magnes_3600WH.sel</string>
-         </property>
-        </item>
        </widget>
       </item>
       <item row="0" column="7">

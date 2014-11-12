@@ -72,12 +72,13 @@ LayoutMaker::LayoutMaker()
 
 bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
                              QList<QVector<double> > &outputPoints,
-                             QStringList &names,
-                             QFile &out,
+                             const QStringList &names,
+                             QFile &outFile,
                              bool do_fit,
                              float prad,
                              float w,
-                             float h)
+                             float h,
+                             bool writeFile)
 {
     /*
     * Automatically make a layout according to the
@@ -109,18 +110,18 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
         rrs(k,2) = inputPoints.at(k)[2]; //z
     }
 
-    std::cout<<"EEG channels found for layout: "<<neeg<<endl;
+    std::cout<<"EEG channels found for layout: "<<neeg<<std::endl;
 
     //Fit to sphere if wanted by the user
     if (!do_fit)
-        std::cout<<"Using default origin:"<<1000*r0[0]<<1000*r0[1]<<1000*r0[2]<<endl;
+        std::cout<<"Using default origin:"<<1000*r0[0]<<1000*r0[1]<<1000*r0[2]<<std::endl;
     else {
-        if (fit_sphere_to_points(rrs,neeg,0.05,r0,rad) == FAIL) {
-            std::cout<<"Using default origin:"<<1000*r0[0]<<1000*r0[1]<<1000*r0[2]<<endl;
+        if(fit_sphere_to_points(rrs,neeg,0.05,r0,rad) == FAIL) {
+            std::cout<<"Using default origin:"<<1000*r0[0]<<1000*r0[1]<<1000*r0[2]<<std::endl;
         }
-        else {
-            std::cout<<"best fitting sphere:"<<endl;
-            std::cout<<"torigin: "<<1000*r0[0]<<1000*r0[1]<<1000*r0[2]<<1000*rad<<endl<<"tradius: "<<1000*rad<<endl;
+        else{
+            std::cout<<"best fitting sphere:"<<std::endl;
+            std::cout<<"torigin: "<<1000*r0[0]<<1000*r0[1]<<1000*r0[2]<<1000*rad<<std::endl<<"tradius: "<<1000*rad<<std::endl;
         }
     }
 
@@ -128,7 +129,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
     * Do the azimuthal equidistant projection
     */
     for (k = 0; k < neeg; k++) {
-        rr = r0 - rrs.row(k);
+        rr = r0 - static_cast<VectorXf>(rrs.row(k));
         sphere_coord(rr[0],rr[1],rr[2],&rad,&th,&phi);
         xx[k] = prad*(2.0*th/M_PI)*cos(phi);
         yy[k] = prad*(2.0*th/M_PI)*sin(phi);
@@ -140,7 +141,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
     xmin = xmax = xx[0];
     ymin = ymax = yy[0];
 
-    for (k = 1; k < neeg; k++) {
+    for(k = 1; k < neeg; k++) {
         if (xx[k] > xmax)
             xmax = xx[k];
         else if (xx[k] < xmin)
@@ -151,8 +152,8 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
             ymin = yy[k];
     }
 
-    if (xmin == xmax || ymin == ymax) {
-        std::cout<<"Cannot make a layout. All positions are identical"<<endl;
+    if(xmin == xmax || ymin == ymax) {
+        std::cout<<"Cannot make a layout. All positions are identical"<<std::endl;
         return res;
     }
 
@@ -170,23 +171,27 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
     for(k = 0; k < neeg; k++) {
         point.clear();
         point.append(xx[k]-0.5*w);
-        point.append(yy[k]-0.5*h);
-        outputPoints.append();
+        point.append(-(yy[k]-0.5*h)); //rotate 180 - mirror y axis
+        outputPoints.append(point);
     }
 
-//    if((out = fopen(dest,"w")) == NULL) {
-//        err_set_sys_error(dest);
-//        goto out;
-//    }
-//    fprintf(out,"%8.2f %8.2f %8.2f %8.2f\n",xmin,xmax,ymin,ymax);
-//    for (k = 0; k < neeg; k++)
-//        fprintf(out,"%03d %8.2f %8.2f %8.2f %8.2f %s\n",
-//    k+1,xx[k]-0.5*w,yy[k]-0.5*h,w,h,names[k]);
+    /*
+    * Write to file
+    */
+    if(writeFile) {
+        if (!outFile.open(QIODevice::WriteOnly)) {
+            qDebug()<<"could not open output file";
+            return FAIL;
+        }
 
-//    fclose(out);
-//    out = NULL;
+        QTextStream out(&outFile);
 
-//    fprintf(stderr,"Wrote %d viewports to %s\n",neeg,dest);
+        for (k = 0; k < neeg; k++)
+            out << k+1 << " " << xx[k]-0.5*w << " " << yy[k]-0.5*h << " " << w << " " << h << " " << names.at(k)<<endl;
+
+        outFile.close();
+    }
+
     res = OK;
 
     return res;
@@ -231,7 +236,7 @@ int LayoutMaker::report_func(int loop,
     */
     VectorXf r0 = fitpar;
 
-    std::cout<<"loop: "<<loop<<"r0: "<<1000*r0[0]<<1000*r0[1]<<1000*r0[2]<<"fval: "<<fval<<endl;
+    std::cout<<"loop: "<<loop<<"r0: "<<1000*r0[0]<<1000*r0[1]<<1000*r0[2]<<"fval: "<<fval<<std::endl;
 
     return OK;
 }
@@ -254,15 +259,15 @@ float LayoutMaker::fit_eval(VectorXf &fitpar,
     float sum,sum2,one,F;
 
     for (k = 0, sum = sum2 = 0.0; k < user->np; k++) {
-        diff = r0 - user->rr.row(k);
+        diff = r0 - static_cast<VectorXf>(user->rr.row(k));
         one = sqrt(pow(diff(0),2) + pow(diff(1),2) + pow(diff(2),2));
         sum  += one;
         sum2 += one*one;
     }
     F = sum2 - sum*sum/user->np;
 
-    if (user->report)
-        std::cout<<"r0: "<<1000*r0[0]<<1000*r0[1]<<1000*r0[2]<<"R: "<<1000*sum/user->np<<"fval: "<<F<<endl;,
+    if(user->report)
+        std::cout<<"r0: "<<1000*r0[0]<<1000*r0[1]<<1000*r0[2]<<"R: "<<1000*sum/user->np<<"fval: "<<F<<std::endl;
 
     return F;
 }
@@ -277,8 +282,8 @@ float LayoutMaker::opt_rad(VectorXf &r0,fitUser user)
   int   k;
 
   for (k = 0, sum = 0.0; k < user->np; k++) {
-    diff = r0 - user->rr.row(k);
-    one = VEC_LEN(diff);
+    diff = r0 - static_cast<VectorXf>(user->rr.row(k));
+    one = sqrt(pow(diff(0),2) + pow(diff(1),2) + pow(diff(2),2));
     sum  += one;
   }
 
@@ -294,7 +299,8 @@ void LayoutMaker::calculate_cm_ave_dist(MatrixXf &rr,
                                         float &avep)
 {
     int k,q;
-    float ave,diff[3];
+    float ave;
+    VectorXf diff(3);
 
     for (q = 0; q < 3; q++)
         cm[q] = 0.0;
@@ -375,7 +381,7 @@ int LayoutMaker::fit_sphere_to_points(MatrixXf &rr,
     user.report = FALSE;
 
     for (k = 0; k < 4; k++)
-        init_vals[k] = fit_eval(init_simplex.row(k),3,&user);
+        init_vals[k] = fit_eval(static_cast<VectorXf>(init_simplex.row(k)),3,&user);
 
     user.report = FALSE;
 
@@ -387,14 +393,14 @@ int LayoutMaker::fit_sphere_to_points(MatrixXf &rr,
                             fit_eval,                       /* The function to be evaluated */
                             &user,                          /* Data to be passed to the above function in each evaluation */
                             max_eval,                       /* Maximum number of function evaluations */
-                            &neval,                         /* Number of function evaluations */
+                            neval,                          /* Number of function evaluations */
                             report_interval,                /* How often to report (-1 = no_reporting) */
                             report_func) != OK)             /* The function to be called when reporting */
-        return;
+        return FALSE;
 
-    r0[0] = init_simplex[0][0];
-    r0[1] = init_simplex[0][1];
-    r0[2] = init_simplex[0][2];
+    r0[0] = init_simplex(0,0);
+    r0[1] = init_simplex(0,1);
+    r0[2] = init_simplex(0,2);
     R = opt_rad(r0,&user);
 
     res = OK;

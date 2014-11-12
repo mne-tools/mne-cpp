@@ -72,7 +72,7 @@ int MinimizerSimplex::mne_simplex_minimize(MatrixXf p,
                                            VectorXf y,
                                            int   ndim,
                                            float ftol,
-                                           float (*func)(VectorXf x,
+                                           float (*func)(VectorXf &x,
                                                          int npar,
                                                          void *user_data),
                                            void  *user_data,
@@ -80,7 +80,7 @@ int MinimizerSimplex::mne_simplex_minimize(MatrixXf p,
                                            int   &neval,
                                            int   report,
                                            int   (*report_func)(int loop,
-                                                        VectorXf fitpar,
+                                                        VectorXf &fitpar,
                                                         int npar,
                                                         double fval))
 {
@@ -99,7 +99,7 @@ int MinimizerSimplex::mne_simplex_minimize(MatrixXf p,
         psum[j] = sum;
     }
     if (report_func != NULL && report > 0)
-        (void)report_func (0,p.row(0),ndim,-1.0);
+        (void)report_func(0,static_cast<VectorXf>(p.row(0)),ndim,-1.0);
 
     for (;;count++,loop++) {
         ilo = 1;
@@ -119,7 +119,7 @@ int MinimizerSimplex::mne_simplex_minimize(MatrixXf p,
         * Report that we are proceeding...
         */
         if (count == report && report_func != NULL) {
-            if (report_func (loop,p.row(ilo),ndim,y[ilo])) {
+            if (report_func(loop,static_cast<VectorXf>(p.row(ilo)),ndim,y[ilo])) {
                 std::cout<<"Interation interrupted.";
                 result = -1;
                 break;
@@ -169,7 +169,7 @@ float MinimizerSimplex::tryit(MatrixXf p,
                               VectorXf y,
                               VectorXf psum,
                               int   ndim,
-                              float (*func)(VectorXf x,int npar,void *user_data),
+                              float (*func)(VectorXf &x,int npar,void *user_data),
                               void  *user_data,
                               int   ihi,
                               int &neval,
