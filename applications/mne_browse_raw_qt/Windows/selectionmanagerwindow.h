@@ -43,9 +43,10 @@
 //=============================================================================================================
 
 #include "ui_selectionmanagerwindow.h"
-#include "utils/layoutloader.h"         //MNE-CPP utils
-#include "utils/selectionloader.h"         //MNE-CPP utils
-#include "../Utils/selectionscene.h"       //MNE Browse Raw QT utils
+#include "utils/layoutloader.h"             //MNE-CPP utils
+#include "utils/selectionloader.h"          //MNE-CPP utils
+#include "utils/layoutmaker.h"              //MNE-CPP utils
+#include "../Utils/selectionscene.h"        //MNE Browse Raw QT utils
 #include "fiff/fiff.h"
 #include "../Models/chinfomodel.h"
 
@@ -100,7 +101,7 @@ public:
     * @param [in] parent pointer to parent widget; If parent is 0, the new SelectionManagerWindow becomes a window. If parent is another widget, SelectionManagerWindow becomes a child window inside parent. SelectionManagerWindow is deleted when its parent is deleted.
     * @param [in] pChInfoModel pointer to the channel info model.
     */
-    SelectionManagerWindow(QWidget *parent = 0, ChInfoModel *pChInfoModel = new ChInfoModel());
+    SelectionManagerWindow(QWidget *parent = 0, ChInfoModel *pChInfoModel = 0);
 
     //=========================================================================================================
     /**
@@ -111,11 +112,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the currently loaded fiff channels. used to create the group All.
+    * Sets the currently mapped fiff channels. used to create the group All.
     *
     * @param [in] mappedLayoutChNames the currently to layout mapped channels
     */
-    void setCurrentlyLoadedFiffChannels(const QStringList &mappedLayoutChNames);
+    void setCurrentlyMappedFiffChannels(const QStringList &mappedLayoutChNames);
 
     //=========================================================================================================
     /**
@@ -156,6 +157,12 @@ public:
     * returns the current layout map.
     */
     const QMap<QString,QPointF>& getLayoutMap();
+
+    //=========================================================================================================
+    /**
+    * call this whenever a new file was loaded.
+    */
+    void newFiffFileLoaded();
 
 signals:
     //=========================================================================================================
