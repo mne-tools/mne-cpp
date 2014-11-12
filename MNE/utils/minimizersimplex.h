@@ -105,7 +105,7 @@ public:
                  VectorXf y,                                            /* Function values at the vertices */
                  int   ndim,                                            /* Number of variables */
                  float ftol,                                            /* Relative convergence tolerance */
-                 float (*func)(VectorXf &x,
+                 float (*func)(const VectorXf &x,
                          int npar,
                          void *user_data),                              /* The function to be evaluated */
                  void  *user_data,                                      /* Data to be passed to the above function in each evaluation */
@@ -122,7 +122,7 @@ private:
                  VectorXf y,
                  VectorXf psum,
                  int   ndim,
-                 float (*func)(VectorXf &x,
+                 float (*func)(const VectorXf &x,
                                int npar,
                                void *user_data),                        /* The function to be evaluated */
                  void  *user_data,                                      /* Data to be passed to the above function in each evaluation */
