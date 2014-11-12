@@ -80,7 +80,7 @@ int MinimizerSimplex::mne_simplex_minimize(MatrixXf p,
                                            int   &neval,
                                            int   report,
                                            int   (*report_func)(int loop,
-                                                        VectorXf &fitpar,
+                                                        const VectorXf &fitpar,
                                                         int npar,
                                                         double fval))
 {

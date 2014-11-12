@@ -227,7 +227,7 @@ void LayoutMaker::sphere_coord (float x,
 
 
 int LayoutMaker::report_func(int loop,
-                             VectorXf &fitpar,
+                             const VectorXf &fitpar,
                              int npar,
                              double fval)
 {
