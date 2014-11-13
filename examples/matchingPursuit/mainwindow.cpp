@@ -370,8 +370,8 @@ void MainWindow::open_file()
     last_to = _to;
     last_sample_count = _to - _from + 1;
 
-    ui->dsb_from->setMaximum((_last_sample - 63) / _sample_rate - _offset_time);
-    ui->dsb_to->setMinimum((_first_sample + 63) / _sample_rate - _offset_time);
+    ui->dsb_from->setMaximum((_last_sample - 63) / _sample_rate);
+    ui->dsb_to->setMinimum((_first_sample + 63) / _sample_rate);
     ui->lb_from->setToolTip(QString("minimum: %1 seconds").arg(_first_sample / _sample_rate));
     ui->lb_to->setToolTip(QString("maximum: %1 seconds").arg(_last_sample / _sample_rate));
     ui->dsb_from->setToolTip(QString("sample: %1").arg(_from));
@@ -379,8 +379,8 @@ void MainWindow::open_file()
     ui->sb_sample_count->setToolTip(QString("epoch: %1 sec").arg((_to - _from + 1) / _sample_rate));
     ui->lb_samples->setToolTip(QString("min: 64 (%1 sec)\nmax: 4096 (%2 sec)").arg(64 / _sample_rate).arg(4096 / _sample_rate));
 
-    ui->dsb_from->setValue((_from / _sample_rate) - _offset_time);
-    ui->dsb_to->setValue(_to / _sample_rate - _offset_time);
+    ui->dsb_from->setValue((_from / _sample_rate) + _offset_time);
+    ui->dsb_to->setValue(_to / _sample_rate + _offset_time);
     _samplecount = _to - _from + 1;
     ui->sb_sample_count->setValue(_to - _from + 1);
 
@@ -533,9 +533,14 @@ bool MainWindow::read_fiff_ave(QString file_name)
     for(qint32 channels = 0; channels <  _pick_evoked.data.rows(); channels++)
         _signal_matrix.col(channels) = _pick_evoked.data.row(channels);
 
-    _offset_time = abs(_pick_evoked.times[0]);
-    _from = _first_sample = 0;
-    _to = _last_sample = _signal_matrix.rows() - 1;
+
+    _offset_time = _pick_evoked.times[0];
+    _from = 0;
+    _first_sample = _pick_evoked.first;
+    _to =  _signal_matrix.rows() - 1;
+    _last_sample = _pick_evoked.last;
+
+    reference_matrix = _signal_matrix;
 
     return true;
 }
@@ -548,25 +553,37 @@ void MainWindow::read_fiff_ave_new()
     qint32 selected_chn = 0;
 
     qint32 size = 0;
-    for(qint32 i = 0; i < original_signal_matrix.cols(); i++)
+    for(qint32 i = 0; i < reference_matrix.cols(); i++)
         if(select_channel_map[i] == true)
             size++;
 
     _signal_matrix = MatrixXd::Zero(_to - _from, size);
 
     _colors.clear();
-    for(qint32 channels = 0; channels < original_signal_matrix.cols(); channels++)
+    for(qint32 channels = 0; channels < reference_matrix.cols(); channels++)
         if(select_channel_map[channels] == true)
         {
             row_number = 0;
             _colors.append(original_colors.at(channels));
             for(qint32 i = _from; i < _to; i++)
             {
-                _signal_matrix(row_number, selected_chn) = original_signal_matrix(row_number, channels);
+                _signal_matrix(row_number, selected_chn) = reference_matrix(i, channels);
                 row_number++;
             }
             selected_chn++;
         }
+
+    //resize original signal matrix so that all channels are still in memory and only time is changed
+    original_signal_matrix = MatrixXd::Zero(_signal_matrix.rows(), reference_matrix.cols());
+    for(qint32 channels = 0; channels < reference_matrix.cols(); channels++)
+    {
+        row_number = 0;
+        for(qint32 i = _from; i < _to; i++ )
+        {
+            original_signal_matrix(row_number, channels) = reference_matrix(i, channels);
+            row_number++;
+        }
+    }
 
     _atom_sum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
     _residuum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
@@ -1132,12 +1149,12 @@ void XAxisWindow::paint_axis(MatrixXd signalMatrix, QSize windowSize)
         {
             if(j == 20)
             {
-                painter.drawText(j * scaleXAchse + 37, 20, QString::number(j * scaleXText + _from / _sample_rate - _offset_time, 'f', 2));    // scalevalue as string
+                painter.drawText(j * scaleXAchse + 37, 20, QString::number(j * scaleXText + _from / _sample_rate + _offset_time, 'f', 2));    // scalevalue as string
                 painter.drawLine(j * scaleXAchse + 55, 5 + 2, j * scaleXAchse + 55 , 5 - 2);                    // scalelines
             }
             else
             {
-                painter.drawText(j * scaleXAchse + 45, 20, QString::number(j * scaleXText + _from / _sample_rate  - _offset_time, 'f', 2));    // scalevalue as string
+                painter.drawText(j * scaleXAchse + 45, 20, QString::number(j * scaleXText + _from / _sample_rate  + _offset_time, 'f', 2));    // scalevalue as string
                 painter.drawLine(j * scaleXAchse + 55, 5 + 2, j * scaleXAchse + 55 , 5 - 2);                    // scalelines
             }
         }
@@ -1288,7 +1305,7 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
 
         QTableWidgetItem* atomEnergieItem = new QTableWidgetItem(QString::number(100 * temp_atom.energy / max_energy, 'f', 2));
         QTableWidgetItem* atomScaleItem = new QTableWidgetItem(QString::number(temp_atom.scale / _sample_rate, 'g', 3));
-        QTableWidgetItem* atomTranslationItem = new QTableWidgetItem(QString::number(temp_atom.translation / qreal(_sample_rate) + _from  / _sample_rate, 'g', 4));
+        QTableWidgetItem* atomTranslationItem = new QTableWidgetItem(QString::number(temp_atom.translation / qreal(_sample_rate) + _from  / _sample_rate + _offset_time, 'g', 4));
         QTableWidgetItem* atomModulationItem = new QTableWidgetItem(QString::number(temp_atom.modulation * _sample_rate / temp_atom.sample_count, 'g', 3));
         QTableWidgetItem* atomPhaseItem = new QTableWidgetItem(QString::number(phase, 'g', 3));
 
@@ -1779,7 +1796,7 @@ QString MainWindow::create_display_text(FixDictAtom global_best_matching)
 
             display_text = QString("Gaboratom: scale: %0 sec, translation: %1 sec, modulation: %2 Hz, phase: %3 rad")
                     .arg(QString::number(global_best_matching.gabor_atom.scale / _sample_rate, 'f', 2))
-                    .arg(QString::number(global_best_matching.translation / qreal(_sample_rate) + _from  / _sample_rate, 'f', 2))
+                    .arg(QString::number(global_best_matching.translation / qreal(_sample_rate) + _from + _offset_time  / _sample_rate, 'f', 2))
                     .arg(QString::number(global_best_matching.gabor_atom.modulation * _sample_rate / global_best_matching.sample_count, 'f', 2))
                     .arg(QString::number(phase, 'f', 2));
         }
@@ -1790,7 +1807,7 @@ QString MainWindow::create_display_text(FixDictAtom global_best_matching)
 
             display_text = QString("Chripatom: scale: %0 sec, translation: %1 sec, modulation: %2 Hz, phase: %3 rad, chirp: %4")
                     .arg(QString::number(global_best_matching.chirp_atom.scale  / _sample_rate, 'f', 2))
-                    .arg(QString::number(global_best_matching.translation / qreal(_sample_rate) + _from  / _sample_rate, 'f', 2))
+                    .arg(QString::number(global_best_matching.translation / qreal(_sample_rate) + _from + _offset_time  / _sample_rate, 'f', 2))
                     .arg(QString::number(global_best_matching.chirp_atom.modulation * _sample_rate / global_best_matching.sample_count, 'f', 2))
                     .arg(QString::number(phase, 'f', 2))
                     .arg(QString::number(global_best_matching.chirp_atom.chirp, 'f', 2));
@@ -1924,8 +1941,8 @@ void MainWindow::on_dsb_sample_rate_editingFinished()
     {
         read_fiff_changed = true;
         if(_from != 0)
-            ui->dsb_from->setValue(_from / _sample_rate - _offset_time);
-        ui->dsb_to->setValue(_to / _sample_rate - _offset_time);
+            ui->dsb_from->setValue(_from / _sample_rate + _offset_time);
+        ui->dsb_to->setValue(_to / _sample_rate + _offset_time);
         read_fiff_changed = false;
     }
     callXAxisWindow->update();
@@ -1937,7 +1954,7 @@ void MainWindow::on_dsb_from_editingFinished()
 {   
     if(read_fiff_changed || _from == last_from) return;
     if(ui->dsb_from->value() * _sample_rate < _first_sample)
-        ui->dsb_from->setValue(_first_sample / _sample_rate - _offset_time);
+        ui->dsb_from->setValue(_first_sample / _sample_rate + _offset_time);
 
     if(file_name.split('.').last() == "fif")
     {
@@ -1994,17 +2011,22 @@ void MainWindow::on_dsb_from_valueChanged(double arg1)
     if(read_fiff_changed) return;
 
     read_fiff_changed = true;
-    _from = floor((arg1 + _offset_time) * _sample_rate);
+    _from = floor((arg1 - _offset_time) * _sample_rate);
+    if(_from < 0)//stay consistent despite negative time values
+    {
+        ui->dsb_from->setValue(_offset_time);
+        _from = 0;
+    }
     _to = _from + ui->sb_sample_count->value() - 1;
 
-    if(_to >= _last_sample)
+    if(_to >= _last_sample - _offset_time * _sample_rate)
     {
-        _to = _last_sample;
+        _to = _last_sample - _offset_time * _sample_rate;
         _samplecount = _to - _from + 1;
         ui->sb_sample_count->setValue(_samplecount);
     }
 
-    ui->dsb_to->setValue(_to / _sample_rate);
+    ui->dsb_to->setValue(_to / _sample_rate + _offset_time);
     read_fiff_changed = false;
 
     ui->dsb_from->setToolTip(QString("sample: %1").arg(_from));
@@ -2018,17 +2040,22 @@ void MainWindow::on_dsb_to_valueChanged(double arg1)
     if(read_fiff_changed) return;
 
     read_fiff_changed = true;
-    _to = floor((arg1 + _offset_time) * _sample_rate);
+    _to = floor((arg1 - _offset_time) * _sample_rate);
+    if(_to > _last_sample - _offset_time * _sample_rate)
+    {
+        ui->dsb_to->setValue(_last_sample / _sample_rate);
+        _to = _last_sample - _offset_time * _sample_rate;
+    }
     _from = _to - ui->sb_sample_count->value() + 1;
 
-    if(_from <= _first_sample)
+    if(_from + _offset_time * _sample_rate <= _first_sample)
     {
-        _from = _first_sample;
+        _from = _first_sample - _offset_time * _sample_rate;
         _samplecount = _to - _from + 1;
         ui->sb_sample_count->setValue(_samplecount);
     }
 
-    ui->dsb_from->setValue(_from / _sample_rate - _offset_time);
+    ui->dsb_from->setValue(_from / _sample_rate + _offset_time);
     read_fiff_changed = false;
 
      ui->dsb_to->setToolTip(QString("sample: %1").arg(_to));
@@ -2043,14 +2070,14 @@ void MainWindow::on_sb_sample_count_valueChanged(int arg1)
     read_fiff_changed = true;
     _to = _from + arg1 - 1;
 
-    if(_to > _last_sample)
+    if(_to > _last_sample - _offset_time * _sample_rate)
     {
-        _to = _last_sample;
+        _to = _last_sample - _offset_time * _sample_rate;
         _samplecount = _to - _from + 1;
         ui->sb_sample_count->setValue(_samplecount);
     }
     _samplecount = arg1;
-    ui->dsb_to->setValue(_to / _sample_rate);
+    ui->dsb_to->setValue(_to / _sample_rate + _offset_time);
     read_fiff_changed = false;
 
     ui->sb_sample_count->setToolTip(QString("epoch: %1 sec").arg((_samplecount) / _sample_rate));
@@ -2225,7 +2252,7 @@ void MainWindow::save_fif_file()
     ui->actionSpeicher->setEnabled(false);
     ui->actionSpeicher_unter->setEnabled(false);
 
-    emit to_save(file_name, save_path, _from, _to, _atom_sum_matrix, select_channel_map, picks);
+    emit to_save(file_name, save_path, _from + _offset_time, _to, _atom_sum_matrix, select_channel_map, picks);
     save_thread->start();
 }
 
@@ -2652,7 +2679,7 @@ void GraphWindow::mouseMoveEvent(QMouseEvent *event)
    {
        qint32 temp_pos = mapFromGlobal(QCursor::pos()).x() - 55;
        qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_to -_from);
-       qreal time = (qreal)_from / _sample_rate - _offset_time + (qreal)temp_pos / stretch_factor / _sample_rate;
+       qreal time = (qreal)_from / _sample_rate + _offset_time + (qreal)temp_pos / stretch_factor / _sample_rate;
        if(mapFromGlobal(QCursor::pos()).x() >= 55 && mapFromGlobal(QCursor::pos()).x() <= (this->width() - 15))
            this->setToolTip(QString("time: %1 sec").arg(time));
        if(event->buttons() == Qt::LeftButton)
@@ -2671,7 +2698,7 @@ void AtomSumWindow::mouseMoveEvent(QMouseEvent *event)
     {
         qint32 temp_pos = mapFromGlobal(QCursor::pos()).x() - 55;
         qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_samplecount);
-        qreal time = (qreal)_from / _sample_rate - _offset_time + (qreal)temp_pos / stretch_factor / _sample_rate;
+        qreal time = (qreal)_from / _sample_rate + _offset_time + (qreal)temp_pos / stretch_factor / _sample_rate;
         if(mapFromGlobal(QCursor::pos()).x() >= 55 && mapFromGlobal(QCursor::pos()).x() <= (this->width() - 15))
             this->setToolTip(QString("time: %1 sec").arg(time));
        setCursor(Qt::CrossCursor);
@@ -2687,7 +2714,7 @@ void ResiduumWindow::mouseMoveEvent(QMouseEvent *event)
     {
         qint32 temp_pos = mapFromGlobal(QCursor::pos()).x() - 55;
         qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_samplecount);
-        qreal time = (qreal)_from / _sample_rate - _offset_time+ (qreal)temp_pos / stretch_factor / _sample_rate;
+        qreal time = (qreal)_from / _sample_rate + _offset_time+ (qreal)temp_pos / stretch_factor / _sample_rate;
         if(mapFromGlobal(QCursor::pos()).x() >= 55 && mapFromGlobal(QCursor::pos()).x() <= (this->width() - 15))
             this->setToolTip(QString("time: %1 sec").arg(time));
 
@@ -2721,15 +2748,15 @@ void GraphWindow::mouseReleaseEvent(QMouseEvent *event)
         qint32 old_to = _to;
         _from += floor((_press_pos - release_pos) / stretch_factor);
         _to = _from + _samplecount - 1;
-        if(_from < _first_sample)
+        if(_from < _first_sample - _offset_time * _sample_rate)
         {
-            _from = _first_sample;
+            _from = _first_sample - _offset_time * _sample_rate;
              _to = _from + _samplecount - 1;
         }
 
-        if(_to > _last_sample)
+        if(_to > _last_sample - _offset_time * _sample_rate)
         {
-            _to = _last_sample;
+            _to = _last_sample - _offset_time * _sample_rate;
             _from = _to - _samplecount + 1;
         }
 
@@ -2770,15 +2797,15 @@ void GraphWindow::wheelEvent(QWheelEvent *event)
 
         _to = _from + _samplecount - 1;
 
-        if(_from < _first_sample)
+        if(_from < _first_sample - _offset_time * _sample_rate)
         {
-            _from = _first_sample;
+            _from = _first_sample  - _offset_time * _sample_rate;
             _samplecount = _to - _from + 1;
         }
 
-        if(_to > _last_sample)
+        if(_to > _last_sample - _offset_time * _sample_rate)
         {
-            _to = _last_sample;
+            _to = _last_sample - _offset_time * _sample_rate;
             _samplecount = _to - _from + 1;
         }
         emit read_new();
@@ -2791,8 +2818,8 @@ void MainWindow::on_mouse_button_release()
 {
     read_fiff_changed = true;
 
-    ui->dsb_from->setValue(_from / _sample_rate - _offset_time);
-    ui->dsb_to->setValue(_to / _sample_rate - _offset_time);
+    ui->dsb_from->setValue(_from / _sample_rate + _offset_time);
+    ui->dsb_to->setValue(_to / _sample_rate + _offset_time);
     ui->sb_sample_count->setValue(_samplecount);
 
     read_fiff_changed = false;

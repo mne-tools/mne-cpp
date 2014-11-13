@@ -585,6 +585,7 @@ private:
     RowVectorXf times_vec;
     MatrixXd times;
     MatrixXd original_signal_matrix;
+    MatrixXd reference_matrix;
     MatrixXd real_residuum_matrix;
     QTime counter_time;
     Ui::MainWindow *ui;    
