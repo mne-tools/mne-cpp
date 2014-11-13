@@ -87,6 +87,7 @@ void EventWindow::init()
     initMVCSettings();
     initCheckBoxes();
     initComboBoxes();
+    initToolButtons();
 }
 
 
@@ -132,6 +133,7 @@ void EventWindow::initMVCSettings()
 
     //Resize columns to contents
     ui->m_tableView_eventTableView->resizeColumnsToContents();
+    ui->m_tableView_eventTableView->adjustSize();
 
     //Connect selection in event window to jumpEvent slot
     connect(ui->m_tableView_eventTableView->selectionModel(),&QItemSelectionModel::currentRowChanged,
@@ -183,6 +185,32 @@ void EventWindow::initComboBoxes()
 
 //*************************************************************************************************************
 
+void EventWindow::initToolButtons()
+{
+    QToolBar *toolBar = new QToolBar(this);
+    toolBar->setOrientation(Qt::Vertical);
+    toolBar->setMovable(false);
+
+    //Add event
+    QAction* addEventAction = new QAction(QIcon(":/Resources/Images/addEvent.png"),tr("Add event"), this);
+    addEventAction->setStatusTip(tr("Add an event to the event list"));
+    toolBar->addAction(addEventAction);
+    connect(addEventAction, &QAction::triggered,
+            this, &EventWindow::addEventToEventModel);
+
+    //Remove event
+    QAction* removeEvent = new QAction(QIcon(":/Resources/Images/removeEvent.png"),tr("Remove event"), this);
+    removeEvent->setStatusTip(tr("Remove an event from the event list"));
+    toolBar->addAction(removeEvent);
+    connect(removeEvent, &QAction::triggered,
+            this, &EventWindow::removeEventfromEventModel);
+
+    ui->m_gridLayout_Main->addWidget(toolBar,0,2,4,1);
+}
+
+
+//*************************************************************************************************************
+
 void EventWindow::updateComboBox()
 {
     ui->m_comboBox_filterTypes->clear();
@@ -205,12 +233,8 @@ bool EventWindow::event(QEvent * event)
     //Delete selected row on delete key press event
     if(event->type() == QEvent::KeyPress && ui->m_tableView_eventTableView->hasFocus()) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-        if(keyEvent->key() == Qt::Key_Delete) {
-            QModelIndexList indexList = ui->m_tableView_eventTableView->selectionModel()->selectedIndexes();
-
-            for(int i = 0; i<indexList.size(); i++)
-                m_pEventModel->removeRow(indexList.at(i).row() - i); // - i because the internal data structure gets smaller by one with each succession in this for statement
-       }
+        if(keyEvent->key() == Qt::Key_Delete)
+            removeEventfromEventModel();
     }
 
     return QDockWidget::event(event);
@@ -244,4 +268,23 @@ void EventWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & p
 
         m_pMainWindow->m_pDataWindow->updateDataTableViews();
     }
+}
+
+
+//*************************************************************************************************************
+
+void EventWindow::removeEventfromEventModel()
+{
+    QModelIndexList indexList = ui->m_tableView_eventTableView->selectionModel()->selectedIndexes();
+
+    for(int i = 0; i<indexList.size(); i++)
+        m_pEventModel->removeRow(indexList.at(i).row() - i); // - i because the internal data structure gets smaller by one with each succession in this for statement
+}
+
+
+//*************************************************************************************************************
+
+void EventWindow::addEventToEventModel()
+{
+    m_pEventModel->insertRow(0, QModelIndex());
 }

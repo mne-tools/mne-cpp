@@ -198,13 +198,6 @@ void MainWindow::createToolBar()
     toolBar->setOrientation(Qt::Vertical);
     toolBar->setMovable(true);
 
-    //Add actions to tool bar
-    //Add event
-    QAction* addEventAction = new QAction(QIcon(":/Resources/Images/addEvent.png"),tr("Add event"), this);
-    addEventAction->setStatusTip(tr("Add an event to the event list"));
-    connect(addEventAction, SIGNAL(triggered()), m_pDataWindow, SLOT(addEventToEventModel()));
-    toolBar->addAction(addEventAction);
-
     //Add DC removal action
     m_pRemoveDCAction = new QAction(QIcon(":/Resources/Images/removeDC.png"),tr("Remove DC component"), this);
     m_pRemoveDCAction->setStatusTip(tr("Remove the DC component by subtracting the channel mean"));

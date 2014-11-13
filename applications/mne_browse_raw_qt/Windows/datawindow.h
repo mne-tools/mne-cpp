@@ -261,12 +261,6 @@ protected slots:
 
     //=========================================================================================================
     /**
-    * Adds an event to the event model and its QTableView
-    */
-    void addEventToEventModel();
-
-    //=========================================================================================================
-    /**
     * Updates the marker position
     */
     void updateMarkerPosition();
