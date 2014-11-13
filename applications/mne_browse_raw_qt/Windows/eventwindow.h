@@ -148,7 +148,7 @@ private:
     /**
     * Updates the event filter type combo box whenever a new event file was loaded
     */
-    void updateComboBox();
+    void updateComboBox(const QString &currentEventType);
 
     //=========================================================================================================
     /**
@@ -186,6 +186,12 @@ protected slots:
     * Adds an event to the event model and its QTableView
     */
     void addEventToEventModel();
+
+    //=========================================================================================================
+    /**
+    * call this function whenever the event type combo box changed
+    */
+    void onEventTypeComboBox(const QString &text);
 };
 
 } // NAMESPACE MNEBrowseRawQt

@@ -169,14 +169,12 @@ void EventWindow::initComboBoxes()
 {
     ui->m_comboBox_filterTypes->addItem("All");
     ui->m_comboBox_filterTypes->addItems(m_pEventModel->getEventTypeList());
+    ui->m_comboBox_filterTypes->addItem("Add type");
     ui->m_comboBox_filterTypes->setCurrentText("All");
 
     //Connect filter types to event model
     connect(ui->m_comboBox_filterTypes,&QComboBox::currentTextChanged,
-                this,[=](QString string){
-            m_pEventModel->setEventFilterType(string);
-            m_pMainWindow->m_pDataWindow->updateDataTableViews();
-    });
+                this, &EventWindow::onEventTypeComboBox);
 
     connect(m_pEventModel,&EventModel::updateEventTypes,
             this, &EventWindow::updateComboBox);
@@ -211,12 +209,14 @@ void EventWindow::initToolButtons()
 
 //*************************************************************************************************************
 
-void EventWindow::updateComboBox()
+void EventWindow::updateComboBox(const QString &currentEventType)
 {
     ui->m_comboBox_filterTypes->clear();
     ui->m_comboBox_filterTypes->addItem("All");
     ui->m_comboBox_filterTypes->addItems(m_pEventModel->getEventTypeList());
-    ui->m_comboBox_filterTypes->setCurrentText("All");
+    ui->m_comboBox_filterTypes->addItem("Add type");
+    if(m_pEventModel->getEventTypeList().contains(currentEventType))
+        ui->m_comboBox_filterTypes->setCurrentText(currentEventType);
 }
 
 
@@ -287,4 +287,22 @@ void EventWindow::removeEventfromEventModel()
 void EventWindow::addEventToEventModel()
 {
     m_pEventModel->insertRow(0, QModelIndex());
+}
+
+
+//*************************************************************************************************************
+
+void EventWindow::onEventTypeComboBox(const QString &text)
+{
+    //If 'Add type' was not selected
+    if(text != "Add type"){
+        m_pEventModel->setEventFilterType(text);
+        m_pMainWindow->m_pDataWindow->updateDataTableViews();
+    }
+    else {
+        //Open add event type dialog
+        m_pEventModel->addNewEventType(QString("55"), QColor(255,5,55));
+        m_pEventModel->setEventFilterType(QString("55"));
+        m_pMainWindow->m_pDataWindow->updateDataTableViews();
+    }
 }
