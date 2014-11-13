@@ -58,6 +58,7 @@ using namespace std;
 
 SelectionScene::SelectionScene(QGraphicsView* view, QObject* parent)
 : LayoutScene(view, parent)
+, m_iChannelTypeMode(FIFFV_MEG_CH)
 {
 }
 
@@ -71,11 +72,20 @@ void SelectionScene::repaintItems(const QMap<QString,QPointF> &layoutMap)
     QMapIterator<QString,QPointF > i(layoutMap);
     while (i.hasNext()) {
         i.next();
-        SelectionSceneItem* SelectionSceneItemTemp = new SelectionSceneItem(i.key(),
-                                                                      0,
-                                                                      i.value(),
-                                                                      FIFFV_MEG_CH,
-                                                                      FIFF_UNIT_T_M);
+        SelectionSceneItem* SelectionSceneItemTemp;
+
+        if(i.key().contains("EEG"))
+            SelectionSceneItemTemp = new SelectionSceneItem(i.key(),
+                                                              0,
+                                                              i.value(),
+                                                              FIFFV_EEG_CH,
+                                                              FIFF_UNIT_T_M);
+        else
+            SelectionSceneItemTemp = new SelectionSceneItem(i.key(),
+                                                              0,
+                                                              i.value(),
+                                                              FIFFV_MEG_CH,
+                                                              FIFF_UNIT_T_M);
 
         this->addItem(SelectionSceneItemTemp);
     }
@@ -92,14 +102,20 @@ void SelectionScene::hideItems(QStringList visibleItems)
     for(int i = 0; i<itemList.size(); i++) {
         SelectionSceneItem* item = static_cast<SelectionSceneItem*>(itemList.at(i));
 
-        if(!visibleItems.contains(item->m_sChannelName)) {
-            item->setFlag(QGraphicsItem::ItemIsSelectable, false);
-            item->setOpacity(0.25);
+        if(item->m_iChannelKind == m_iChannelTypeMode) {
+            item->show();
+
+            if(!visibleItems.contains(item->m_sChannelName)) {
+                item->setFlag(QGraphicsItem::ItemIsSelectable, false);
+                item->setOpacity(0.25);
+            }
+            else {
+                item->setFlag(QGraphicsItem::ItemIsSelectable, true);
+                item->setOpacity(1);
+            }
         }
-        else {
-            item->setFlag(QGraphicsItem::ItemIsSelectable, true);
-            item->setOpacity(1);
-        }
+        else
+            item->hide();
     }
 }
 

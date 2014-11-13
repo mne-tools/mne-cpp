@@ -79,7 +79,7 @@ SelectionManagerWindow::~SelectionManagerWindow()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::setCurrentlyLoadedFiffChannels(const QStringList &mappedLayoutChNames)
+void SelectionManagerWindow::setCurrentlyMappedFiffChannels(const QStringList &mappedLayoutChNames)
 {
     m_currentlyLoadedFiffChannels = mappedLayoutChNames;
 
@@ -177,11 +177,20 @@ QListWidgetItem* SelectionManagerWindow::getItemForChName(QListWidget* listWidge
     return new QListWidgetItem();
 }
 
+
 //*************************************************************************************************************
 
 const QMap<QString,QPointF>& SelectionManagerWindow::getLayoutMap()
 {
     return m_layoutMap;
+}
+
+
+//*************************************************************************************************************
+
+void SelectionManagerWindow::newFiffFileLoaded()
+{
+    loadLayout(ui->m_comboBox_layoutFile->currentText());
 }
 
 
@@ -222,6 +231,22 @@ void SelectionManagerWindow::initSelectionSceneView()
 
 void SelectionManagerWindow::initComboBoxes()
 {
+    ui->m_comboBox_layoutFile->clear();
+    ui->m_comboBox_layoutFile->insertItems(0, QStringList()
+     << QApplication::translate("SelectionManagerWindow", "Vectorview-grad.lout", 0)
+     << QApplication::translate("SelectionManagerWindow", "Vectorview-all.lout", 0)
+     << QApplication::translate("SelectionManagerWindow", "Vectorview-mag.lout", 0)
+//     << QApplication::translate("SelectionManagerWindow", "CTF-275.lout", 0)
+//     << QApplication::translate("SelectionManagerWindow", "magnesWH3600.lout", 0)
+    );
+    ui->m_comboBox_selectionFiles->clear();
+    ui->m_comboBox_selectionFiles->insertItems(0, QStringList()
+     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_vv.sel", 0)
+     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_vv_new.sel", 0)
+//     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_CTF_275.sel", 0)
+//     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_Magnes_3600WH.sel", 0)
+    );
+
     //Connect the layout and selection group loader
     connect(ui->m_comboBox_selectionFiles, &QComboBox::currentTextChanged,
                 this, &SelectionManagerWindow::loadSelectionGroups);
@@ -239,17 +264,63 @@ void SelectionManagerWindow::initComboBoxes()
 bool SelectionManagerWindow::loadLayout(QString path)
 {
     //Read layout
-    LayoutLoader* manager = new LayoutLoader();
     QString newPath = QCoreApplication::applicationDirPath() + path.prepend("/MNE_Browse_Raw_Resources/Templates/Layouts/");
 
-    bool state = manager->readMNELoutFile(newPath, m_layoutMap);
+    bool state = LayoutLoader::readMNELoutFile(newPath, m_layoutMap);
 
     //Load selection groups again because they need to be reinitialised every time a new layout hase been loaded
     loadSelectionGroups(ui->m_comboBox_selectionFiles->currentText());
 
+    //if no layout for EEG is specified generate from digitizer points
+    QList<QVector<double> > inputPoints;
+    QList<QVector<double> > outputPoints;
+    QStringList names;
+    QFile out;//(/*"./MNE_Browse_Raw_Resources/Templates/ChannelSelection/*/"manualLayout.lout");
+
+    for(int i = 0; i<m_pChInfoModel->rowCount(); i++) {
+        QModelIndex digIndex = m_pChInfoModel->index(i,1);
+        QString chName = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetOrigChName).toString();
+
+        digIndex = m_pChInfoModel->index(i,8);
+        QVector3D channelDig = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetChDigitizer).value<QVector3D>();
+
+        digIndex = m_pChInfoModel->index(i,4);
+        int kind = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetChKind).toInt();
+
+        if(kind == FIFFV_EEG_CH) { //FIFFV_MEG_CH
+            QVector<double> temp;
+            temp.append(channelDig.x());
+            temp.append(channelDig.y());
+            temp.append(-channelDig.z());
+            inputPoints.append(temp);
+
+            names<<chName;
+        }
+    }
+
+    float prad = 60.0;
+    float width = 5.0;
+    float height = 4.0;
+
+    if(inputPoints.size()>0)
+        LayoutMaker::makeLayout(inputPoints,
+                                outputPoints,
+                                names,
+                                out,
+                                true,
+                                prad,
+                                width,
+                                height,
+                                true);
+
+    //Add new EEG points to Layout Map
+    for(int i = 0; i<outputPoints.size(); i++)
+        m_layoutMap[names.at(i)] = QPointF(outputPoints.at(i)[0],outputPoints.at(i)[1]);
+
     //Update scene
     m_pSelectionScene->repaintItems(m_layoutMap);
     m_pSelectionScene->update();
+    updateSceneItems();
 
     //Fit to view
     ui->m_graphicsView_layoutPlot->fitInView(m_pSelectionScene->itemsBoundingRect(), Qt::KeepAspectRatio);
@@ -277,8 +348,23 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
 
     bool state = manager->readMNESelFile(newPath, m_selectionGroupsMap);
 
-    //Create group 'All' manually (bcause this group depends on the loaded channels from the fiff data file, not on the loaded selection file)
+    //Create group 'All' and 'All EEG' manually (bcause this group depends on the loaded channels from the fiff data file, not on the loaded selection file)
     m_selectionGroupsMap["All"] = m_currentlyLoadedFiffChannels;
+
+    QStringList names;
+    for(int i = 0; i<m_pChInfoModel->rowCount(); i++) {
+        QModelIndex digIndex = m_pChInfoModel->index(i,1);
+        QString chName = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetOrigChName).toString();
+
+        digIndex = m_pChInfoModel->index(i,4);
+        int kind = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetChKind).toInt();
+
+        if(kind == FIFFV_EEG_CH) //FIFFV_MEG_CH
+            names<<chName;
+    }
+
+    //Add 'Add EEG' group to selection groups
+    m_selectionGroupsMap["All EEG"] = names;
 
     //Add selection groups to list widget
     QMapIterator<QString, QStringList> selectionIndex(m_selectionGroupsMap);
@@ -287,14 +373,14 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
         ui->m_listWidget_selectionGroups->insertItem(ui->m_listWidget_selectionGroups->count(), selectionIndex.key());
     }
 
-    //Delete all MEG channels from the selection groups which are not in the loaded layout
-    cleanUpMEGChannels();
+    //Update selection
+    updateSelectionGroupsList(getItemForChName(ui->m_listWidget_selectionGroups, "All"));
 
     //Set group all as slected item
     ui->m_listWidget_selectionGroups->setCurrentItem(getItemForChName(ui->m_listWidget_selectionGroups, "All"), QItemSelectionModel::Select);
 
-    //Update selection
-    updateSelectionGroupsList(getItemForChName(ui->m_listWidget_selectionGroups, "All"));
+    //Delete all MEG channels from the selection groups which are not in the loaded layout
+    cleanUpMEGChannels();
 
     return state;
 }
@@ -331,6 +417,11 @@ void SelectionManagerWindow::cleanUpMEGChannels()
 
 void SelectionManagerWindow::updateSelectionGroupsList(QListWidgetItem* item)
 {
+    if(item->text().contains("EEG"))
+        m_pSelectionScene->m_iChannelTypeMode = FIFFV_EEG_CH;
+    else
+        m_pSelectionScene->m_iChannelTypeMode = FIFFV_MEG_CH;
+
     ui->m_listWidget_visibleChannels->clear();
 
     //update channel list

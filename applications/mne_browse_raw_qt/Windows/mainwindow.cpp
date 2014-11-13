@@ -172,14 +172,19 @@ void MainWindow::setupWindowWidgets()
             m_pChInfoWindow, &ChInfoWindow::layoutChanged);
 
     connect(m_pChInfoWindow, &ChInfoWindow::channelsMappedToLayout,
-            m_pSelectionManagerWindow, &SelectionManagerWindow::setCurrentlyLoadedFiffChannels);
+            m_pSelectionManagerWindow, &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
+
+    //Connect selection manager with a new file loaded signal
+    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
+            m_pSelectionManagerWindow, &SelectionManagerWindow::newFiffFileLoaded);
 
     //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels - TODO: dirty move get rid of this here
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
         m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_fiffInfo);
         m_pChInfoWindow->fiffInfoChanged(m_pDataWindow->getDataModel()->m_fiffInfo);
         m_pChInfoWindow->layoutChanged(m_pSelectionManagerWindow->getLayoutMap());
-        m_pSelectionManagerWindow->setCurrentlyLoadedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
+        m_pSelectionManagerWindow->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
+        m_pSelectionManagerWindow->newFiffFileLoaded();
     }
 }
 
