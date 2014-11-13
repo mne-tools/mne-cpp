@@ -205,9 +205,6 @@ void SelectionManagerWindow::initListWidgets()
     connect(ui->m_listWidget_selectionGroups, &QListWidget::itemClicked,
                 this, &SelectionManagerWindow::updateSelectionGroupsList);
 
-    connect(ui->m_listWidget_selectionGroups, &QListWidget::itemClicked,
-                this, &SelectionManagerWindow::updateSceneItems);
-
     //Update data view whenever a drag and drop item movement is performed - TODO: This is inefficient because updateDataView is called everytime the list's viewport is entered
     connect(ui->m_listWidget_userDefined->model(), &QAbstractTableModel::dataChanged,
                 this, &SelectionManagerWindow::updateDataView);
@@ -424,9 +421,13 @@ void SelectionManagerWindow::updateSelectionGroupsList(QListWidgetItem* item)
 
     ui->m_listWidget_visibleChannels->clear();
 
-    //update channel list
+    //update visible channel list widget
     ui->m_listWidget_visibleChannels->addItems(m_selectionGroupsMap[item->text()]);
 
+    //update scene items based o nthe new selection group
+    updateSceneItems();
+
+    //update the channels plotted in the data view
     updateDataView();
 }
 
@@ -497,7 +498,17 @@ void SelectionManagerWindow::updateDataView()
     if(!m_pSelectionScene->selectedItems().empty())
         emit selectionChanged(m_pSelectionScene->selectedItems());
     else
-        emit selectionChanged(m_pSelectionScene->items());
+    {
+        //only return visible items (EEG or MEG channels)
+        QList<QGraphicsItem*> visibleItemList =  m_pSelectionScene->items();
+        QMutableListIterator<QGraphicsItem*> i(visibleItemList);
+        while (i.hasNext()) {
+            if(!i.next()->isVisible())
+                i.remove();
+        }
+
+        emit selectionChanged(visibleItemList);
+    }
 }
 
 

@@ -92,6 +92,9 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
+    //set posistion
+    this->setPos(60*m_qpChannelPosition.x(), -60*m_qpChannelPosition.y());
+
     // Plot channel name
     QStaticText staticElectrodeName = QStaticText(m_sChannelName);
     QSizeF sizeText = staticElectrodeName.size();
@@ -104,9 +107,6 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->save();
     paintAveragePath(painter);
     painter->restore();
-
-    //set posistion
-    this->setPos(60*m_qpChannelPosition.x(), -60*m_qpChannelPosition.y());
 }
 
 
