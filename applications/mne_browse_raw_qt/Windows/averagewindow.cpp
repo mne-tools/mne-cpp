@@ -135,8 +135,8 @@ void AverageWindow::initTableViewWidgets()
     ui->m_tableView_loadedSets->setColumnHidden(1,true); //hide second column because the average model holds the aspect kind for this column
     ui->m_tableView_loadedSets->setColumnHidden(4,true); //hide last column because the average model holds the data types for this column
     ui->m_tableView_loadedSets->resizeColumnsToContents();
+
     ui->m_tableView_loadedSets->adjustSize();
-    ui->m_tableView_loadedSets->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
     //Set initial selection
     ui->m_tableView_loadedSets->selectionModel()->select(QItemSelection(m_pAverageModel->index(0,0,QModelIndex()), m_pAverageModel->index(0,3,QModelIndex())),
@@ -357,4 +357,12 @@ void AverageWindow::exportAverageButterflyPlot()
             image.save(fileName);
         }
     }
+}
+
+
+//*************************************************************************************************************
+
+void AverageWindow::resizeEvent(QResizeEvent *event)
+{
+    Q_UNUSED(event);
 }

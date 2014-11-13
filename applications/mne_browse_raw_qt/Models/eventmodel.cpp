@@ -106,6 +106,9 @@ QVariant EventModel::headerData(int section, Qt::Orientation orientation, int ro
     if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
         return QVariant();
 
+    if(role==Qt::TextAlignmentRole)
+        return Qt::AlignHCenter + Qt::AlignVCenter;
+
     if(orientation == Qt::Horizontal) {
         switch(section) {
             case 0: //sample column

@@ -140,6 +140,12 @@ private:
 
     //=========================================================================================================
     /**
+    * Inits all the QCheckBoxes of the event window.
+    */
+    void initToolButtons();
+
+    //=========================================================================================================
+    /**
     * Updates the event filter type combo box whenever a new event file was loaded
     */
     void updateComboBox();
@@ -159,7 +165,6 @@ private:
     EventDelegate*      m_pEventDelegate;           /**< the QAbstractDelegate being part of the event model/view framework of Qt. */
     EventModel*         m_pEventModel;              /**< the QAbstractTable event model being part of the model/view framework of Qt. */
 
-
 protected slots:
     //=========================================================================================================
     /**
@@ -169,6 +174,18 @@ protected slots:
     * @param [in] previous model item focused in the view
     */
     void jumpToEvent(const QModelIndex &current, const QModelIndex &previous);
+
+    //=========================================================================================================
+    /**
+    * jumpToEvent jumps to a event specified in the event table view
+    */
+    void removeEventfromEventModel();
+
+    //=========================================================================================================
+    /**
+    * Adds an event to the event model and its QTableView
+    */
+    void addEventToEventModel();
 };
 
 } // NAMESPACE MNEBrowseRawQt
