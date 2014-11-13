@@ -168,13 +168,12 @@ void EEGoSports::setUpFiffInfo()
     //
     //Read electrode positions from .elc file
     //
-    LayoutLoader *asaObject = new LayoutLoader();
     QVector< QVector<double> > elcLocation3D;
     QVector< QVector<double> > elcLocation2D;
     QString unit;
     QStringList elcChannelNames;
 
-    if(!asaObject->readAsaElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
+    if(!LayoutLoader::readAsaElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
         qDebug() << "Error: Reading elc file.";
 
     //qDebug() << elcLocation3D;

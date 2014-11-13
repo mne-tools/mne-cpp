@@ -98,6 +98,8 @@ public:
     * @param [in] list string list with items name which are to be hidden.
     */
     void hideItems(QStringList visibleItems);
+
+    int         m_iChannelTypeMode;
 };
 
 } // NAMESPACE

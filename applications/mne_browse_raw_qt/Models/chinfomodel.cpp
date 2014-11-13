@@ -78,7 +78,7 @@ int ChInfoModel::rowCount(const QModelIndex & /*parent*/) const
 
 int ChInfoModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 8;
+    return 9;
 }
 
 
@@ -132,6 +132,10 @@ QVariant ChInfoModel::headerData(int section, Qt::Orientation orientation, int r
 
                     case 7:
                         return QString("%1").arg("Position");
+                        break;
+
+                    case 8:
+                        return QString("%1").arg("Digitizer (cm)");
                         break;
                 }
             }
@@ -305,6 +309,28 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
                     return Qt::AlignHCenter + Qt::AlignVCenter;
             }
         }//end column check
+
+        //******** ninth column (channel digitizer position) ********
+        if(index.column()==8) {
+            QVariant v;
+
+            QVector3D point3D(m_fiffInfo.chs.at(index.row()).loc(0,0) * 100, //convert to cm
+                            m_fiffInfo.chs.at(index.row()).loc(1,0) * 100,
+                            m_fiffInfo.chs.at(index.row()).loc(2,0) * 100);
+
+            switch(role) {
+                case Qt::DisplayRole:
+                    v.setValue(QString("(%1|%2|%3)").arg(point3D.x()).arg(point3D.y()).arg(point3D.z()));
+                    return v;
+
+                case ChInfoModelRoles::GetChDigitizer:
+                    v.setValue(point3D);
+                    return v;
+
+                case Qt::TextAlignmentRole:
+                    return Qt::AlignHCenter + Qt::AlignVCenter;
+            }
+        }//end column check
     } // end index.valid() check
 
     return QVariant();
@@ -430,7 +456,6 @@ void ChInfoModel::mapLayoutToChannels()
         QString chName = chInfo.ch_name;
         QRegExp regExpRemove;
         bool flagOk = false;
-        int chNumber;
 
         switch(chInfo.kind) {
             case FIFFV_MEG_CH:
@@ -440,17 +465,7 @@ void ChInfoModel::mapLayoutToChannels()
 
                 //After cleaning the string try to convert the residual to an int number
                 flagOk = false;
-                chNumber = chName.toInt(&flagOk);
-
-                //If conversion is correct append the new channel name to the m_mappedLayoutChNames variable
-                if(flagOk) {
-                    if(chNumber/100 < 10)//if number is only 3 digits long add 0 in front
-                        m_mappedLayoutChNames.replace(i, QString("%1 0%2").arg("MEG").arg(chNumber));
-                    else
-                        m_mappedLayoutChNames.replace(i, QString("%1 %2").arg("MEG").arg(chNumber));
-                }
-                else
-                    m_mappedLayoutChNames.append(chInfo.ch_name);
+                m_mappedLayoutChNames.replace(i, QString("%1 %2").arg("MEG").arg(chName));
 
                 break;
 
@@ -461,17 +476,8 @@ void ChInfoModel::mapLayoutToChannels()
 
                 //After cleaning the string try to convert the residual to an int number
                 flagOk = false;
-                chNumber = chName.toInt(&flagOk);
+                m_mappedLayoutChNames.replace(i, QString("%1 %2").arg("EEG").arg(chName));
 
-                //If conversion is correct append the new channel name to the m_mappedLayoutChNames variable
-                if(flagOk) {
-                    if(chNumber/10 < 10)//if number is only 2 digits long add 0 in front
-                        m_mappedLayoutChNames.replace(i, QString("%1 0%2").arg("EEG").arg(chNumber));
-                    else
-                        m_mappedLayoutChNames.replace(i, QString("%1 %2").arg("EEG").arg(chNumber));
-                }
-                else
-                    m_mappedLayoutChNames.append(chInfo.ch_name);
                 break;
             }
         }
