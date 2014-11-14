@@ -54,6 +54,7 @@
 //=============================================================================================================
 
 #include <QDockWidget>
+#include <QColorDialog>
 
 
 //*************************************************************************************************************
@@ -146,6 +147,12 @@ private:
 
     //=========================================================================================================
     /**
+    * Inits all the QPushButtons of the event window.
+    */
+    void initPushButtons();
+
+    //=========================================================================================================
+    /**
     * Updates the event filter type combo box whenever a new event file was loaded
     */
     void updateComboBox(const QString &currentEventType);
@@ -164,6 +171,8 @@ private:
 
     EventDelegate*      m_pEventDelegate;           /**< the QAbstractDelegate being part of the event model/view framework of Qt. */
     EventModel*         m_pEventModel;              /**< the QAbstractTable event model being part of the model/view framework of Qt. */
+
+    QColorDialog*       m_pColordialog;             /**< The qt color dialog for changing event type colors.*/
 
 protected slots:
     //=========================================================================================================
@@ -189,9 +198,9 @@ protected slots:
 
     //=========================================================================================================
     /**
-    * call this function whenever the event type combo box changed
+    * call this function whenever a new event type is to be added
     */
-    void onEventTypeComboBox(const QString &text);
+    void addNewEventType();
 };
 
 } // NAMESPACE MNEBrowseRawQt
