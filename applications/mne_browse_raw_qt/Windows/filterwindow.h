@@ -144,6 +144,12 @@ private:
 
     //=========================================================================================================
     /**
+    * eventFilter reimplemented virtual function to handle object specific events
+    */
+    bool eventFilter(QObject *obj, QEvent *event);
+
+    //=========================================================================================================
+    /**
     * updates the filter plot scene with the newly generated filter
     */
     void updateFilterPlot();
