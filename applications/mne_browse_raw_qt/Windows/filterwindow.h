@@ -184,13 +184,13 @@ protected slots:
     /**
     * This function applies the user defined filter to all channels.
     */
-    void applyFilterToAll();
+    void applyFilter();
 
     //=========================================================================================================
     /**
     * This function undoes the user defined filter to all channels.
     */
-    void undoFilterToAll();
+    void undoFilter();
 
     //=========================================================================================================
     /**
