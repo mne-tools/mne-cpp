@@ -1643,7 +1643,22 @@ void MainWindow::calc_thread_finished()
     ui->tbv_Results->setItem(ui->tbv_Results->rowCount() - 1, 0, energy_item);
     ui->tbv_Results->setItem(ui->tbv_Results->rowCount() - 1, 1, residuum_item);
     ui->tbv_Results->setSpan(ui->tbv_Results->rowCount() - 1, 1, 1, 4);
+/*
+    //ToDo
+    //figure of merit to evaluate the alogorithm, here we use correlation between signal and atom_sum_matrix
+    qreal correlation = 0;
+    qreal divisor_sig = 0;
+    qreal divisor_app = 0;
+    for(qint32 channel = 0; channel < _atom_sum_matrix.cols(); channel++)
+    {
+        correlation += _signal_matrix.col(channel).dot(_atom_sum_matrix.col(channel));
+        divisor_sig +=
 
+    }
+
+    correlation /= (_atom_sum_matrix.rows() * _atom_sum_matrix.cols());
+    cout << "\ncorrelation:  "<<correlation;
+*/
     tbv_is_loading = false;
 
     update();
