@@ -182,6 +182,16 @@ void FilterWindow::resizeEvent(QResizeEvent* event)
 
 //*************************************************************************************************************
 
+void FilterWindow::keyPressEvent(QKeyEvent * event)
+{
+    qDebug()<<"Key pressed"<<event->key();
+    if(event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+        applyFilterToAll();
+}
+
+
+//*************************************************************************************************************
+
 void FilterWindow::changeStateSpinBoxes(int currentIndex)
 {
     //Change visibility of sin boxes depending on filter type
@@ -274,6 +284,9 @@ void FilterWindow::filterParametersChanged()
 
 void FilterWindow::applyFilterToAll()
 {
+    //Undo all previous filters first
+    undoFilterToAll();
+
     QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pMainWindow->m_pDataWindow->getDataModel()->m_Operators);
 
     while(it.hasNext()) {
