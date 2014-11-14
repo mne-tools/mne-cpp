@@ -1,23 +1,23 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     utils.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-# @version  1.0
-# @date     July, 2012
+# @file utils.pro
+# @author Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+# Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+# @version 1.0
+# @date July, 2012
 #
-# @section  LICENSE
+# @section LICENSE
 #
 # Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
-#     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
-#       following disclaimer.
-#     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
-#       the following disclaimer in the documentation and/or other materials provided with the distribution.
-#     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
-#       to endorse or promote products derived from this software without specific prior written permission.
+# * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+# following disclaimer.
+# * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+# the following disclaimer in the documentation and/or other materials provided with the distribution.
+# * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+# to endorse or promote products derived from this software without specific prior written permission.
 #
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the Utils library.
+# @brief This project file builds the Utils library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -37,82 +37,69 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       -= gui
-QT       += xml
-QT       += xml core
-QT       += network concurrent
+QT -= gui
+QT += xml core
+QT += network concurrent
 
 DEFINES += UTILS_LIBRARY
 
 TARGET = Utils
 TARGET = $$join(TARGET,,MNE$$MNE_LIB_VERSION,)
 CONFIG(debug, debug|release) {
-    TARGET = $$join(TARGET,,,d)
+	TARGET = $$join(TARGET,,,d)
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
 
-#
-# win32: copy dll's to bin dir
-# unix: add lib folder to LD_LIBRARY_PATH
-#
-win32 {
-    FILE = $${DESTDIR}/$${TARGET}.dll
-    BINDIR = $${DESTDIR}/../bin
-    FILE ~= s,/,\\,g
-    BINDIR ~= s,/,\\,g
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
 contains(MNECPP_CONFIG, build_MNECPP_Static_Lib) {
-    CONFIG += staticlib
-    DEFINES += BUILD_MNECPP_STATIC_LIB
+	CONFIG += staticlib
+	DEFINES += BUILD_MNECPP_STATIC_LIB
 }
 else {
-    CONFIG += dll
+	CONFIG += dll
 
-    #
-    # win32: copy dll's to bin dir
-    # unix: add lib folder to LD_LIBRARY_PATH
-    #
-    win32 {
-        FILE = $${DESTDIR}/$${TARGET}.dll
-        BINDIR = $${DESTDIR}/../bin
-        FILE ~= s,/,\\,g
-        BINDIR ~= s,/,\\,g
-        QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
-    }
+	#
+	# win32: copy dll's to bin dir
+	# unix: add lib folder to LD_LIBRARY_PATH
+	#
+	win32 {
+		FILE = $${DESTDIR}/$${TARGET}.dll
+		BINDIR = $${DESTDIR}/../bin
+		FILE ~= s,/,\\,g
+		BINDIR ~= s,/,\\,g
+		QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
+	}
 }
 
 SOURCES += \
-    kmeans.cpp \
-    mnemath.cpp \
-    ioutils.cpp \
-    asaelc.cpp \
-    layoutloader.cpp \
-    layoutmaker.cpp \
-    parksmcclellan.cpp \
-    filterdata.cpp \
-    mp/adaptivemp.cpp \
-    mp/atom.cpp \
-    mp/fixdictmp.cpp \
-    selectionloader.cpp \
-    minimizersimplex.cpp
+	kmeans.cpp \
+	mnemath.cpp \
+	ioutils.cpp \
+	layoutloader.cpp \
+	layoutmaker.cpp \
+	parksmcclellan.cpp \
+	filterdata.cpp \
+	mp/adaptivemp.cpp \
+	mp/atom.cpp \
+	mp/fixdictmp.cpp \
+	selectionloader.cpp \
+	minimizersimplex.cpp
 
 HEADERS += \
-    kmeans.h\
-    utils_global.h \
-    mnemath.h \
-    ioutils.h \
-    asaelc.h \
-    layoutloader.h \
-    layoutmaker.h \
-    parksmcclellan.h \
-    filterdata.h \
-    mp/adaptivemp.h \
-    mp/atom.h \
-    mp/fixdictmp.h \
-    selectionloader.h \
-    layoutmaker.h \
-    minimizersimplex.h
+	kmeans.h\
+	utils_global.h \
+	mnemath.h \
+	ioutils.h \
+	layoutloader.h \
+	layoutmaker.h \
+	parksmcclellan.h \
+	filterdata.h \
+	mp/adaptivemp.h \
+	mp/atom.h \
+	mp/fixdictmp.h \
+	selectionloader.h \
+	layoutmaker.h \
+	minimizersimplex.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -124,4 +111,3 @@ header_files.path = $${MNE_INCLUDE_DIR}/utils
 INSTALLS += header_files
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
-
