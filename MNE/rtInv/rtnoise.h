@@ -179,6 +179,8 @@ protected:
     */
     virtual void run();
 
+    QVector <float> hanning(int N, short itype);
+
 private:
     QMutex      mutex;                  /**< Provides access serialization between threads*/
 
@@ -191,6 +193,8 @@ private:
     bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
 
     CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
+
+    QVector <float> m_fWin;
 
     double m_Fs;
 

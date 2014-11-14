@@ -55,25 +55,23 @@ using namespace MNEBrowseRawQt;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DataWindow::DataWindow(QWidget *parent) :
-    QDockWidget(parent),
-    ui(new Ui::DataWindowDockWidget),
-    m_pMainWindow(static_cast<MainWindow*>(parent)),
-    m_pDataMarker(new DataMarker(this)),
-    m_pCurrentDataMarkerLabel(new QLabel(this)),
-    m_iCurrentMarkerSample(0)
+DataWindow::DataWindow(QWidget *parent)
+: QWidget(parent)
+, ui(new Ui::DataWindowDockWidget)
+, m_pMainWindow(static_cast<MainWindow*>(parent))
+, m_pDataMarker(new DataMarker(this))
+, m_pCurrentDataMarkerLabel(new QLabel(this))
+, m_iCurrentMarkerSample(0)
 {
     ui->setupUi(this);
 
-    initToolBar();
-    initMarker();
-    initLabels();
-
-    //Setup when the dock widget is to be manually resized
-    connect(this,&QDockWidget::topLevelChanged,
-                this,&DataWindow::manualResize);
-    connect(this,&QDockWidget::visibilityChanged,
-                this,&DataWindow::manualResize);
+    //------------------------
+    //--- Setup data model ---
+    //------------------------
+    if(m_pMainWindow->m_qFileRaw.exists())
+        m_pRawModel = new RawModel(m_pMainWindow->m_qFileRaw, this);
+    else
+        m_pRawModel = new RawModel(this);
 }
 
 
@@ -87,11 +85,102 @@ DataWindow::~DataWindow()
 
 //*************************************************************************************************************
 
-void DataWindow::initRawViewSettings()
+void DataWindow::init()
 {
+    initMVCSettings();
+    initMarker();
+    initLabels();
+}
+
+
+//*************************************************************************************************************
+
+QTableView* DataWindow::getDataTableView()
+{
+    return ui->m_tableView_rawTableView;
+}
+
+
+//*************************************************************************************************************
+
+RawModel* DataWindow::getDataModel()
+{
+    return m_pRawModel;
+}
+
+
+//*************************************************************************************************************
+
+RawDelegate* DataWindow::getDataDelegate()
+{
+    return m_pRawDelegate;
+}
+
+
+//*************************************************************************************************************
+
+void DataWindow::scaleData(const QMap<QString,double> &scaleMap)
+{
+    m_pRawDelegate->setScaleMap(scaleMap);
+    updateDataTableViews();
+}
+
+//*************************************************************************************************************
+
+void DataWindow::updateDataTableViews()
+{
+    ui->m_tableView_rawTableView->viewport()->update();
+}
+
+
+//*************************************************************************************************************
+
+void DataWindow::showSelectedChannelsOnly(QStringList selectedChannels)
+{
+    //Hide non selected channels/rows in the data views
+    for(int i = 0; i<m_pRawModel->rowCount(); i++) {
+        QModelIndex index = m_pRawModel->index(i, 0);
+        QString channel = m_pRawModel->data(index, Qt::DisplayRole).toString();
+
+        ui->m_tableView_rawTableView->showRow(i);
+
+        if(!selectedChannels.contains(channel))
+            ui->m_tableView_rawTableView->hideRow(i);
+        else
+            ui->m_tableView_rawTableView->showRow(i);
+    }
+
+    updateDataTableViews();
+}
+
+
+//*************************************************************************************************************
+
+void DataWindow::changeRowHeight(int height)
+{
+    for(int i = 0; i<ui->m_tableView_rawTableView->verticalHeader()->count(); i++)
+        ui->m_tableView_rawTableView->setRowHeight(i, height);
+}
+
+
+//*************************************************************************************************************
+
+void DataWindow::initMVCSettings()
+{
+    //-----------------------------------
+    //------ Init data window view ------
+    //-----------------------------------
+    //Set MVC model
+    ui->m_tableView_rawTableView->setModel(m_pRawModel);
+
+    //Set MVC delegate
+    m_pRawDelegate = new RawDelegate(this);
+    ui->m_tableView_rawTableView->setItemDelegate(m_pRawDelegate);
+
     //set some settings for m_pRawTableView
-    ui->m_tableView_rawTableView->verticalHeader()->setDefaultSectionSize(m_pMainWindow->m_pRawDelegate->m_iDefaultPlotHeight);
+    ui->m_tableView_rawTableView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->m_iDefaultPlotHeight);
     ui->m_tableView_rawTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
+    ui->m_tableView_rawTableView->setColumnHidden(2,true); //because we do not want to plot the mean values
     ui->m_tableView_rawTableView->resizeColumnsToContents();
 
     //set context menu
@@ -100,41 +189,101 @@ void DataWindow::initRawViewSettings()
             this,&DataWindow::customContextMenuRequested);
 
     //activate kinetic scrolling
-    QScroller::grabGesture(ui->m_tableView_rawTableView, QScroller::MiddleMouseButtonGesture);
+    QScroller::grabGesture(ui->m_tableView_rawTableView, QScroller::LeftMouseButtonGesture);
+    m_pKineticScroller = QScroller::scroller(ui->m_tableView_rawTableView);
+    m_pKineticScroller->setSnapPositionsX(100,100);
+    //m_pKineticScroller->setSnapPositionsY(100,100);
 
     //connect QScrollBar with model in order to reload data samples
-    connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
-            m_pMainWindow->m_pRawModel,&RawModel::updateScrollPos);
+    connect(ui->m_tableView_rawTableView->horizontalScrollBar(), &QScrollBar::valueChanged,
+            m_pRawModel, &RawModel::updateScrollPos);
+
+    //connect selection of a channel to selection manager
+    connect(ui->m_tableView_rawTableView->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &DataWindow::highlightChannelsInSelectionManager);
+
+    //connect selection change to update data views
+    connect(ui->m_tableView_rawTableView->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &DataWindow::updateDataTableViews);
+
+    //Set MVC in delegate
+    m_pRawDelegate->setModelView(m_pMainWindow->m_pEventWindow->getEventModel(),
+                                 m_pMainWindow->m_pEventWindow->getEventTableView(),
+                                 ui->m_tableView_rawTableView);
+
+    //Install event filter to overcome QGrabGesture and QScrollBar/QHeader problem
+    ui->m_tableView_rawTableView->horizontalScrollBar()->installEventFilter(this);
+    ui->m_tableView_rawTableView->verticalScrollBar()->installEventFilter(this);
+    ui->m_tableView_rawTableView->verticalHeader()->installEventFilter(this);
+
+    //Enable gestures for the view
+    ui->m_tableView_rawTableView->grabGesture(Qt::PinchGesture);
+    ui->m_tableView_rawTableView->installEventFilter(this);
+
+    //Enable event fitlering for the viewport in order to intercept mouse events
+    ui->m_tableView_rawTableView->viewport()->installEventFilter(this);
 }
 
 
 //*************************************************************************************************************
 
-QTableView* DataWindow::getTableView()
+void DataWindow::initMarker()
 {
-    return ui->m_tableView_rawTableView;
-}
+    //Set marker as front top-most widget
+    m_pDataMarker->raise();
 
+    //Get boundary rect coordinates for table view
+    double boundingLeft = ui->m_tableView_rawTableView->verticalHeader()->geometry().right() + ui->m_tableView_rawTableView->geometry().left();
+    double boundingRight = ui->m_tableView_rawTableView->geometry().right() - ui->m_tableView_rawTableView->verticalScrollBar()->width() + 1;
+    QRect boundingRect;
+    boundingRect.setLeft(boundingLeft);
+    boundingRect.setRight(boundingRight);
 
-//*************************************************************************************************************
+    //Inital position of the marker
+    m_pDataMarker->move(boundingRect.x(), boundingRect.y() + 1);
 
-void DataWindow::initToolBar()
-{
-    //Create toolbar
-    QToolBar *toolBar = new QToolBar();
-    toolBar->setOrientation(Qt::Vertical);
-    toolBar->setMovable(false);
+    //Create Region from bounding rect - this region is used to restrain the marker inside the data view
+    QRegion region(boundingRect);
+    m_pDataMarker->setMovementBoundary(region);
 
-    //Add actions to tool bar
-    QAction* addEventAction = new QAction(QIcon(":/Resources/Images/addEvent.png"),tr("Add event"), this);
-    addEventAction->setStatusTip(tr("Add an event to the event list"));
-    connect(addEventAction, SIGNAL(triggered()), this, SLOT(addEventToEventModel()));
-    toolBar->addAction(addEventAction);
+    //Set marker size to table view size minus horizontal scroll bar height
+    m_pDataMarker->resize(DATA_MARKER_WIDTH,
+                          boundingRect.height() - ui->m_tableView_rawTableView->horizontalScrollBar()->height()-1);
 
-    int layoutRows = ui->m_gridLayout->rowCount();
-    int layoutColumns = ui->m_gridLayout->columnCount();
+    //Connect current marker to marker move signal
+    connect(m_pDataMarker,&DataMarker::markerMoved,
+            this,&DataWindow::updateMarkerPosition);
 
-    ui->m_gridLayout->addWidget(toolBar, 1, layoutColumns, layoutRows-1, 1);
+    //If no file has been loaded yet dont show the marker and its label
+    if(!m_pRawModel->m_bFileloaded) {
+        m_pDataMarker->hide();
+        m_pCurrentDataMarkerLabel->hide();
+        ui->m_label_sampleMin->hide();
+        ui->m_label_sampleMax->hide();
+    }
+
+    //Connect current marker to loading a fiff file - no loaded file - no visible marker
+    connect(m_pRawModel, &RawModel::fileLoaded,[this](){
+        bool state = m_pRawModel->m_bFileloaded;
+        if(state) {
+            //Inital position of the marker
+            m_pDataMarker->move(74, m_pDataMarker->y());
+            m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() + (DATA_MARKER_WIDTH/2) - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
+
+            m_pDataMarker->show();
+            m_pCurrentDataMarkerLabel->show();
+
+            ui->m_label_sampleMin->show();
+            ui->m_label_sampleMax->show();
+        }
+        else {
+            m_pDataMarker->hide();
+            m_pCurrentDataMarkerLabel->hide();
+
+            ui->m_label_sampleMin->hide();
+            ui->m_label_sampleMax->hide();
+        }
+    });
 }
 
 
@@ -149,6 +298,7 @@ void DataWindow::initLabels()
 
     //Setup marker label
     //Set current marker sample label to vertical spacer position and initalize text
+    m_pCurrentDataMarkerLabel->resize(150, m_pCurrentDataMarkerLabel->height());
     m_pCurrentDataMarkerLabel->setAlignment(Qt::AlignHCenter);
     m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left(), m_pDataMarker->geometry().top() + 5);
     QString numberString = QString().number(m_iCurrentMarkerSample);
@@ -156,8 +306,8 @@ void DataWindow::initLabels()
 
     //Set color
     QPalette palette;
-    QColor textColor = m_qSettings.value("DataMarker/data_marker_color").value<QColor>();
-    textColor.setAlpha(m_qSettings.value("DataMarker/data_marker_opacity").toInt());
+    QColor textColor = m_qSettings.value("DataMarker/data_marker_color", QColor(93,177,47)).value<QColor>();
+    //textColor.setAlpha(DATA_MARKER_OPACITY);
     palette.setColor(QPalette::WindowText, textColor);
 
     QColor windowColor;
@@ -179,46 +329,15 @@ void DataWindow::initLabels()
 
 //*************************************************************************************************************
 
-void DataWindow::initMarker()
-{
-    //Set marker as front top-most widget
-    m_pDataMarker->raise();
-
-    //Get boundary rect coordinates for table view
-    QRect boundingRect = ui->m_tableView_rawTableView->geometry();
-    boundingRect.setLeft(boundingRect.x() + ui->m_tableView_rawTableView->verticalHeader()->width());
-    boundingRect.setRight(boundingRect.right() - ui->m_tableView_rawTableView->verticalScrollBar()->width() + 1);
-
-    //Inital position of the marker
-    m_pDataMarker->move(boundingRect.x() + 66, boundingRect.y() + 1);
-
-    //Create Region from bounding rect - this region is used to restrain the marker inside the data view
-    QRegion region(boundingRect);
-    m_pDataMarker->setMovementBoundary(region);
-
-    //Set marker size to table view size minus horizontal scroll bar height
-    m_pDataMarker->resize(m_qSettings.value("DataMarker/data_marker_width").toInt(),
-                          boundingRect.height() - ui->m_tableView_rawTableView->horizontalScrollBar()->height()-1);
-}
-
-
-//*************************************************************************************************************
-
 void DataWindow::resizeEvent(QResizeEvent * event)
 {
-    //Manually resize QDockWidget when not floating
-    //This needs to be done because there is no typical central widget in QMainWindow
-    //QT does not do a good job when resizing dock widgets (known issue)
-    if(isFloating() == false && (event->size() != event->oldSize()))
-        manualResize();
-
     //On every resize update marker position
     updateMarkerPosition();
 
     //On every resize set sample informaiton
     setRangeSampleLabels();
 
-    return QDockWidget::resizeEvent(event);
+    return QWidget::resizeEvent(event);
 }
 
 
@@ -237,24 +356,51 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
         break;
     }
 
-    return QDockWidget::keyPressEvent(event);
+    return QWidget::keyPressEvent(event);
 }
 
 
 //*************************************************************************************************************
 
-void DataWindow::manualResize()
-{
-    int newWidth;
+bool DataWindow::eventFilter(QObject *object, QEvent *event)
+{    
+    //Detect double mouse clicks and move data marker to current mouse position
+    if (object == ui->m_tableView_rawTableView->viewport() && event->type() == QEvent::MouseButtonDblClick) {
+        QMouseEvent* mouseEventCast = static_cast<QMouseEvent*>(event);
+        if(mouseEventCast->button() == Qt::LeftButton) {
+            m_pDataMarker->move(mouseEventCast->localPos().x() + ui->m_tableView_rawTableView->verticalHeader()->width() + ui->m_tableView_rawTableView->x(), m_pDataMarker->y());
 
-    if(m_pMainWindow->m_pEventWindow->isHidden() || m_pMainWindow->m_pEventWindow->isFloating())
-        newWidth = m_pMainWindow->size().width() - m_pMainWindow->centralWidget()->size().width() - 1;
-    else
-        newWidth = m_pMainWindow->size().width() - m_pMainWindow->m_pEventWindow->size().width() - 5;
+            //Deselect channel which was selected through the double click -> dirty hack
+            //ui->m_tableView_rawTableView->selectionModel()->select(ui->m_tableView_rawTableView->selectionModel()->currentIndex(), QItemSelectionModel::Deselect);
+        }
+    }
 
-    resize(newWidth, this->size().height());
+    //Deactivate grabbing gesture when scrollbars or vertical header are selected
+    if ((object == ui->m_tableView_rawTableView->horizontalScrollBar() ||
+         object == ui->m_tableView_rawTableView->verticalScrollBar() ||
+         object == ui->m_tableView_rawTableView->verticalHeader())
+        && event->type() == QEvent::Enter) {
+        QScroller::ungrabGesture(ui->m_tableView_rawTableView);
+        return true;
+    }
+
+    //Activate grabbing gesture when scrollbars or vertical header are deselected
+    if ((object == ui->m_tableView_rawTableView->horizontalScrollBar() ||
+         object == ui->m_tableView_rawTableView->verticalScrollBar() ||
+         object == ui->m_tableView_rawTableView->verticalHeader())
+        && event->type() == QEvent::Leave) {
+        QScroller::grabGesture(ui->m_tableView_rawTableView, QScroller::LeftMouseButtonGesture);
+        return true;
+    }
+
+    //Look for swipe gesture in order to scale the channels
+    if (object == ui->m_tableView_rawTableView && event->type() == QEvent::Gesture) {
+        QGestureEvent* gestureEventCast = static_cast<QGestureEvent*>(event);
+        return gestureEvent(static_cast<QGestureEvent*>(gestureEventCast));
+    }
+
+    return false;
 }
-
 
 //*************************************************************************************************************
 
@@ -274,24 +420,24 @@ void DataWindow::customContextMenuRequested(QPoint pos)
 
     QAction* doMarkChBad = markingSubMenu->addAction(tr("Mark as bad"));
     connect(doMarkChBad,&QAction::triggered, [=](){
-        m_pMainWindow->m_pRawModel->markChBad(selected,1);
+        m_pRawModel->markChBad(selected,1);
     });
 
     QAction* doMarkChGood = markingSubMenu->addAction(tr("Mark as good"));
     connect(doMarkChGood,&QAction::triggered, [=](){
-        m_pMainWindow->m_pRawModel->markChBad(selected,0);
+        m_pRawModel->markChBad(selected,0);
     });
 
     //**************** FilterOperators ****************
     //selected channels
     QMenu *filtOpSubMenu = new QMenu("Apply FilterOperator to selected channel",menu);
-    QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pMainWindow->m_pRawModel->m_Operators);
+    QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pRawModel->m_Operators);
     while(it.hasNext()) {
         it.next();
         QAction* doApplyFilter = filtOpSubMenu->addAction(tr("%1").arg(it.key()));
 
         connect(doApplyFilter,&QAction::triggered, [=](){
-            m_pMainWindow->m_pRawModel->applyOperator(selected,it.value());
+            m_pRawModel->applyOperator(selected,it.value());
         });
     }
 
@@ -303,7 +449,7 @@ void DataWindow::customContextMenuRequested(QPoint pos)
         QAction* doApplyFilter = filtOpAllSubMenu->addAction(tr("%1").arg(it.key()));
 
         connect(doApplyFilter,&QAction::triggered, [=](){
-            m_pMainWindow->m_pRawModel->applyOperator(QModelIndexList(),it.value());
+            m_pRawModel->applyOperator(QModelIndexList(),it.value());
         });
     }
 
@@ -318,7 +464,7 @@ void DataWindow::customContextMenuRequested(QPoint pos)
         QAction* undoApplyFilter = undoFiltOpSelSubMenu->addAction(tr("%1").arg(it.key()));
 
         connect(undoApplyFilter,&QAction::triggered, [=](){
-            m_pMainWindow->m_pRawModel->undoFilter(selected,it.value());
+            m_pRawModel->undoFilter(selected,it.value());
         });
     }
 
@@ -327,13 +473,13 @@ void DataWindow::customContextMenuRequested(QPoint pos)
     //undo all filterting to selected channels
     QAction* undoApplyFilterSel = undoFiltOpSubMenu->addAction(tr("Undo FilterOperators to selected channels"));
     connect(undoApplyFilterSel,&QAction::triggered, [=](){
-        m_pMainWindow->m_pRawModel->undoFilter(selected);
+        m_pRawModel->undoFilter(selected);
     });
 
     //undo all filtering to all channels
     QAction* undoApplyFilterAll = undoFiltOpSubMenu->addAction(tr("Undo FilterOperators to all channels"));
     connect(undoApplyFilterAll,&QAction::triggered, [=](){
-        m_pMainWindow->m_pRawModel->undoFilter();
+        m_pRawModel->undoFilter();
     });
 
     //add everything to main contextmenu
@@ -343,7 +489,7 @@ void DataWindow::customContextMenuRequested(QPoint pos)
     menu->addMenu(undoFiltOpSubMenu);
 
     //show context menu
-    menu->popup(m_pMainWindow->m_pRawTableView->viewport()->mapToGlobal(pos));
+    menu->popup(ui->m_tableView_rawTableView->viewport()->mapToGlobal(pos));
 }
 
 
@@ -362,9 +508,9 @@ void DataWindow::setRangeSampleLabels()
 
     //Set values as string
     QString stringTemp;
-    int minSampleRangeSec = (minSampleRange/m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq)*1000;
+    int minSampleRangeSec = (minSampleRange/m_pRawModel->m_fiffInfo.sfreq)*1000;
     ui->m_label_sampleMin->setText(QString("%1 / %2 sec").arg(stringTemp.number(minSampleRange)).arg(stringTemp.number((double)minSampleRangeSec/1000,'g')));
-    int maxSampleRangeSec = (maxSampleRange/m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq)*1000;
+    int maxSampleRangeSec = (maxSampleRange/m_pRawModel->m_fiffInfo.sfreq)*1000;
     ui->m_label_sampleMax->setText(QString("%1 / %2 sec").arg(stringTemp.number(maxSampleRange)).arg(stringTemp.number((double)maxSampleRangeSec/1000,'g')));
 }
 
@@ -379,14 +525,12 @@ void DataWindow::setMarkerSampleLabel()
     m_iCurrentMarkerSample = ui->m_tableView_rawTableView->horizontalScrollBar()->value() +
             (m_pDataMarker->geometry().x() - ui->m_tableView_rawTableView->geometry().x() - ui->m_tableView_rawTableView->verticalHeader()->width());
 
-    int currentSeconds = (m_iCurrentMarkerSample/m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq)*1000;
+    int currentSeconds = (m_iCurrentMarkerSample/m_pRawModel->m_fiffInfo.sfreq)*1000;
 
     QString numberString = QString("%1 / %2 sec").arg(QString().number(m_iCurrentMarkerSample)).arg(QString().number((double)currentSeconds/1000,'g'));
     m_pCurrentDataMarkerLabel->setText(numberString);
 
-    m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() + (m_qSettings.value("DataMarker/data_marker_width").toInt()/2) - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
-
-    //qDebug()<<"marker moved"<<m_iCurrentMarkerSample;
+    m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() + (DATA_MARKER_WIDTH/2) - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
 }
 
 
@@ -394,8 +538,8 @@ void DataWindow::setMarkerSampleLabel()
 
 void DataWindow::addEventToEventModel()
 {
-    m_pMainWindow->m_pEventModel->setCurrentMarkerPos(m_iCurrentMarkerSample);
-    m_pMainWindow->m_pEventModel->insertRow(0, QModelIndex());
+    m_pMainWindow->m_pEventWindow->getEventModel()->setCurrentMarkerPos(m_iCurrentMarkerSample);
+    m_pMainWindow->m_pEventWindow->getEventModel()->insertRow(0, QModelIndex());
 }
 
 
@@ -406,16 +550,12 @@ void DataWindow::updateMarkerPosition()
     //Get boundary rect coordinates for table view
     QRect boundingRect = ui->m_tableView_rawTableView->geometry();
 
-    //When window is docked the geometry is somehow corrupted - manual fix necessary :-(
-    if(!this->isFloating()) {
-        boundingRect.setTop(boundingRect.top() + 22);
-        boundingRect.setBottom(boundingRect.bottom() + 22);
-    }
-
     m_pDataMarker->move(m_pDataMarker->x(), boundingRect.y()+1);
 
-    boundingRect.setLeft(boundingRect.left() + ui->m_tableView_rawTableView->verticalHeader()->width());
-    boundingRect.setRight(boundingRect.right() - ui->m_tableView_rawTableView->verticalScrollBar()->width() + 1);
+    double boundingLeft = ui->m_tableView_rawTableView->verticalHeader()->geometry().right() + ui->m_tableView_rawTableView->geometry().left();
+    double boundingRight = ui->m_tableView_rawTableView->geometry().right() - ui->m_tableView_rawTableView->verticalScrollBar()->width() + 1;
+    boundingRect.setLeft(boundingLeft);
+    boundingRect.setRight(boundingRight);
 
     //Create Region from bounding rect - this region is used to restrain the marker inside the data view
     QRegion region(boundingRect);
@@ -433,10 +573,62 @@ void DataWindow::updateMarkerPosition()
     }
 
     //Set marker size to table view size minus horizontal scroll bar height
-    m_pDataMarker->resize(m_qSettings.value("DataMarker/data_marker_width").toInt(),
+    m_pDataMarker->resize(DATA_MARKER_WIDTH,
                           boundingRect.height() - ui->m_tableView_rawTableView->horizontalScrollBar()->height()-1);
 
     //Update current marker sample lable
     m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
 }
 
+
+//*************************************************************************************************************
+
+void DataWindow::highlightChannelsInSelectionManager()
+{
+    if(m_pMainWindow->m_pSelectionManagerWindow->isVisible()) {
+        QStringList currentSelectedChannelNames;
+
+        QModelIndexList selectedIndexes = ui->m_tableView_rawTableView->selectionModel()->selectedIndexes();
+
+        for(int i = 0; i<selectedIndexes.size(); i++) {
+            QModelIndex index = m_pRawModel->index(selectedIndexes.at(i).row(), 0);
+            currentSelectedChannelNames << m_pRawModel->data(index).toString();
+        }
+
+        m_pMainWindow->m_pSelectionManagerWindow->highlightChannels(currentSelectedChannelNames);
+    }
+}
+
+
+//*************************************************************************************************************
+
+bool DataWindow::gestureEvent(QGestureEvent *event)
+{
+    //Pinch event
+    if (QGesture *pinch = event->gesture(Qt::PinchGesture))
+        pinchTriggered(static_cast<QPinchGesture *>(pinch));
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool DataWindow::pinchTriggered(QPinchGesture *gesture)
+{
+    QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
+    if (changeFlags & QPinchGesture::ScaleFactorChanged) {
+        emit scaleChannels(gesture->scaleFactor());
+        qDebug()<<"ungrab";
+        ui->m_tableView_rawTableView->setSelectionMode(QAbstractItemView::NoSelection);
+        QScroller::ungrabGesture(ui->m_tableView_rawTableView);
+    }
+
+    if (gesture->state() == Qt::GestureFinished) {
+        qDebug()<<"Finished gesture - grab again";
+        ui->m_tableView_rawTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+        QScroller::grabGesture(ui->m_tableView_rawTableView, QScroller::LeftMouseButtonGesture);
+    }
+
+    return true;
+}

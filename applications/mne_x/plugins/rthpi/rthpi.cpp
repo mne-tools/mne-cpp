@@ -213,7 +213,7 @@ void RtHpi::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
     {
         //Check if buffer initialized
         if(!m_pRtHpiBuffer)
-            m_pRtHpiBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
+            m_pRtHpiBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
 
         //Fiff information
         if(!m_pFiffInfo)
@@ -224,12 +224,13 @@ void RtHpi::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
         if(m_bProcessData)
         {
-            MatrixXd t_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
+            MatrixXd t_mat;
 
             for(qint32 i = 0; i < pRTMSA->getMultiArraySize(); ++i)
-                t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
-
-            m_pRtHpiBuffer->push(&t_mat);
+            {
+                t_mat = pRTMSA->getMultiSampleArray()[i];
+                m_pRtHpiBuffer->push(&t_mat);
+            }
         }
     }
 }

@@ -66,6 +66,7 @@
 namespace MNEBrowseRawQt
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE FORWARD DECLARATIONS
@@ -97,6 +98,12 @@ public:
     * All FilterWindow's children are deleted first. The application exits if FilterWindow is the main widget.
     */
     ~FilterWindow();
+
+    //=========================================================================================================
+    /**
+    * Initialises this window.
+    */
+    void init();
 
 private:
     //=========================================================================================================
@@ -135,21 +142,22 @@ private:
     */
     void updateFilterPlot();
 
-    Ui::FilterWindowWidget *ui;
+    Ui::FilterWindowWidget *ui;                 /**< Pointer to the qt designer generated ui class.*/
 
-    MainWindow*         m_pMainWindow;
+    MainWindow*         m_pMainWindow;          /**< Pointer to the parent, the MainWindow class.*/
 
-    int                 m_iWindowSize;
-    int                 m_iFilterTaps;
+    int                 m_iWindowSize;          /**< The current window size of the loaded fiff data in the DataWindow class.*/
+    int                 m_iFilterTaps;          /**< The current number of filter taps.*/
 
-    QSettings           m_qSettings;
+    QSettings           m_qSettings;            /**< QSettings variable used to write or read from independent application sessions.*/
 
-    FilterPlotScene*    m_pFilterPlotScene;
+    FilterPlotScene*    m_pFilterPlotScene;     /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
 
 protected slots:
     //=========================================================================================================
     /**
     * This function gets called whenever the combo box is altered by the user via the gui.
+    *
     * @param currentIndex holds the current index of the combo box
     */
     void changeStateSpinBoxes(int currentIndex);
@@ -158,7 +166,7 @@ protected slots:
     /**
     * This function gets called whenever the filter parameters are altered by the user via the gui.
     */
-    void changeFilterParameters();
+    void filterParametersChanged();
 
     //=========================================================================================================
     /**

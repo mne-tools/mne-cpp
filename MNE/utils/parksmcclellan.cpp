@@ -89,8 +89,7 @@ ParksMcClellan::ParksMcClellan()
 //*************************************************************************************************************
 
 ParksMcClellan::ParksMcClellan(int NumTaps, double OmegaC, double BW, double ParksWidth, TPassType PassType)
-: FirCoeff(NumTaps)
-, ExchangeIndex(SMALL)
+: ExchangeIndex(SMALL)
 , LeGrangeD(SMALL)
 , Alpha(SMALL)
 , CosOfGrid(SMALL)
@@ -103,6 +102,7 @@ ParksMcClellan::ParksMcClellan(int NumTaps, double OmegaC, double BW, double Par
 , Grid(BIG)
 , Weight(BIG)
 {
+    FirCoeff = RowVectorXd::Zero(NumTaps);
     init(NumTaps, OmegaC, BW, ParksWidth, PassType);
 }
 

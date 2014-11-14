@@ -56,7 +56,8 @@ contains(MNECPP_CONFIG, withGui) {
                     mne_3d_widget \
                     test_mne_cluster \
                     test_mne_surface \
-                    test_mne_stc
+                    test_mne_stc \
+                    test_mne_cluster_eval
 #            }
         }
     }

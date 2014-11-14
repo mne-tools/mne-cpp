@@ -39,19 +39,21 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QPair>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
+// INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
+#include <fiff/fiff.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QPair>
+#include <QList>
 
 
 //*************************************************************************************************************
@@ -72,7 +74,45 @@ namespace MNEBrowseRawQt
 
 typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
 typedef QPair<const double*,qint32> RowVectorPair;
+typedef QPair<const float*,qint32> RowVectorPairF;
 typedef QPair<int,int> QPairInts;
+
+namespace RawModelRoles
+{
+    enum ItemRole{GetChannelMean = Qt::UserRole + 1000};
+}
+
+namespace AverageModelRoles
+{
+    enum ItemRole{GetAverageData = Qt::UserRole + 1001,
+                  GetFiffInfo = Qt::UserRole + 1002,
+                  GetAspectKind = Qt::UserRole + 1003,
+                  GetFirstSample = Qt::UserRole + 1004,
+                  GetLastSample = Qt::UserRole + 1005,
+                  GetComment = Qt::UserRole + 1006,
+                  GetTimeData = Qt::UserRole + 1007,
+                  GetProjections = Qt::UserRole + 1008};
+}
+
+namespace ChInfoModelRoles
+{
+    enum ItemRole{GetOrigChName = Qt::UserRole + 1009,
+                  GetMappedLayoutChName = Qt::UserRole + 1010,
+                  GetChNumber = Qt::UserRole + 1011,
+                  GetChKind = Qt::UserRole + 1012,
+                  GetMEGType = Qt::UserRole + 1013,
+                  GetChUnit = Qt::UserRole + 1014,
+                  GetChAlias = Qt::UserRole + 1015,
+                  GetChPosition = Qt::UserRole + 1016,
+                  GetChDigitizer = Qt::UserRole + 1017};
+}
+
+Q_DECLARE_METATYPE(FIFFLIB::fiff_int_t);
+Q_DECLARE_METATYPE(MNEBrowseRawQt::RowVectorPairF);
+Q_DECLARE_METATYPE(const FIFFLIB::FiffInfo*);
+Q_DECLARE_METATYPE(MNEBrowseRawQt::MatrixXdR);
+Q_DECLARE_METATYPE(MNEBrowseRawQt::RowVectorPair);
+Q_DECLARE_METATYPE(QList<MNEBrowseRawQt::RowVectorPair>);
 
 } //NAMESPACE
 

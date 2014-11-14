@@ -251,7 +251,7 @@ void SensorModel::mapChannelInfo(const QList<XMEASLIB::RealTimeSampleArrayChInfo
 
 void SensorModel::updateChannelState(SensorItem* item)
 {
-    m_qMapSelection[item->getChNumber()] = item->isSelected();
+    m_qMapSelection[item->getChNumber()] = item->isChoosen();
     createSelection();
 }
 

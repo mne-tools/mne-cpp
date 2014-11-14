@@ -30,9 +30,19 @@ isEmpty( MNE_BINARY_DIR ) {
 }
 
 #QT Packages use new qtHaveModule(<package>):
-#MNE cpp config
+### MNE cpp config ###
 MNECPP_CONFIG += withGui
 #MNECPP_CONFIG += withPython
+
+#Build MNE-CPP libraries as static libs
+#MNECPP_CONFIG += build_MNECPP_Static_Lib
+
+linux-g++ {
+#    system( g++ --version | grep -e "\<4.[0-4]" ) {
+        # g++ version < 4.5 not found
+        MNECPP_CONFIG += oldCompiler
+#    }
+}
 
 contains(MNECPP_CONFIG, withPython) {
     message(Configure Python!)
@@ -55,3 +65,27 @@ contains(MNECPP_CONFIG, withPython) {
 QMAKE_TARGET_PRODUCT = mne-cpp
 QMAKE_TARGET_DESCRIPTION = MNE Qt 5 based C++ library.
 QMAKE_TARGET_COPYRIGHT = Copyright (C) 2014 Authors of mne-cpp. All rights reserved.
+
+#Define minQtVersion Test
+defineTest(minQtVersion) {
+    maj = $$1
+    min = $$2
+    patch = $$3
+    isEqual(QT_MAJOR_VERSION, $$maj) {
+        isEqual(QT_MINOR_VERSION, $$min) {
+            isEqual(QT_PATCH_VERSION, $$patch) {
+                return(true)
+            }
+            greaterThan(QT_PATCH_VERSION, $$patch) {
+                return(true)
+            }
+        }
+        greaterThan(QT_MINOR_VERSION, $$min) {
+            return(true)
+        }
+    }
+    greaterThan(QT_MAJOR_VERSION, $$maj) {
+        return(true)
+    }
+    return(false)
+}
