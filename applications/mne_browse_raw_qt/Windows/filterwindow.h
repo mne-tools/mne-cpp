@@ -138,6 +138,12 @@ private:
 
     //=========================================================================================================
     /**
+    * keyPressEvent reimplemented virtual function to handle key events
+    */
+    virtual void keyPressEvent(QKeyEvent * event);
+
+    //=========================================================================================================
+    /**
     * updates the filter plot scene with the newly generated filter
     */
     void updateFilterPlot();
