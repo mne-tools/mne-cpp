@@ -658,6 +658,29 @@ void RawModel::applyOperator(QModelIndex chan, const QSharedPointer<MNEOperator>
 
 //*************************************************************************************************************
 
+void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator>& operatorPtr, const QString &chType, bool reset)
+{
+    //clear channel list becuase we will generate a new one
+    chlist.clear();
+
+    //filter only channels which include chType in their names
+    if(chType == "All") {
+        for(qint32 i=0; i < m_chInfolist.size(); ++i)
+            if(!m_chInfolist.at(i).ch_name.contains("STI") && !m_chInfolist.at(i).ch_name.contains("MISC"))
+                applyOperator(createIndex(i,1),operatorPtr,reset);
+    }
+    else {
+        for(qint32 i=0; i < m_chInfolist.size(); ++i)
+            if(!m_chInfolist.at(i).ch_name.contains("STI") && !m_chInfolist.at(i).ch_name.contains("MISC") && m_chInfolist.at(i).ch_name.contains(chType))
+                applyOperator(createIndex(i,1),operatorPtr,reset);
+    }
+
+    qDebug() << "RawModel: using FilterType" << operatorPtr->m_sName;
+}
+
+
+//*************************************************************************************************************
+
 void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator>& operatorPtr, bool reset)
 {
     //filter all when chlist is empty
@@ -769,6 +792,22 @@ void RawModel::undoFilter(QModelIndexList chlist)
         qDebug() << "RawModel: All filter operator removed of type for channel" << chlist[i].row();
     }
 }
+
+
+//*************************************************************************************************************
+
+void RawModel::undoFilter(const QString &chType)
+{
+    if(chType == "All")
+        undoFilter();
+    else {
+        //filter only channels which include chType in their names
+        for(qint32 i=0; i < m_chInfolist.size(); ++i)
+            if(m_chInfolist.at(i).ch_name.contains(chType))
+                m_assignedOperators.remove(i);
+    }
+}
+
 
 
 //*************************************************************************************************************

@@ -150,22 +150,84 @@
       <item row="5" column="0">
        <widget class="QPushButton" name="m_pushButton_applyFilter">
         <property name="text">
-         <string>Apply filter</string>
+         <string>Apply filter to</string>
         </property>
        </widget>
       </item>
       <item row="5" column="1">
-       <widget class="QComboBox" name="m_comboBox_filterApplyTo"/>
+       <widget class="QComboBox" name="m_comboBox_filterApplyTo">
+        <item>
+         <property name="text">
+          <string>All</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>MEG</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>EEG</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>ECG</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>EOG</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>EMG</string>
+         </property>
+        </item>
+       </widget>
       </item>
       <item row="6" column="0">
        <widget class="QPushButton" name="m_pushButton_undoFiltering">
         <property name="text">
-         <string>Undo filter</string>
+         <string>Undo filter to</string>
         </property>
        </widget>
       </item>
       <item row="6" column="1">
-       <widget class="QComboBox" name="m_comboBox_filterUndoTo"/>
+       <widget class="QComboBox" name="m_comboBox_filterUndoTo">
+        <item>
+         <property name="text">
+          <string>All</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>MEG</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>EEG</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>ECG</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>EOG</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>EMG</string>
+         </property>
+        </item>
+       </widget>
       </item>
       <item row="0" column="1">
        <widget class="QComboBox" name="m_comboBox_filterType">

@@ -117,10 +117,10 @@ void FilterWindow::initSpinBoxes()
 void FilterWindow::initButtons()
 {
     connect(ui->m_pushButton_applyFilter,&QPushButton::released,
-                this,&FilterWindow::applyFilterToAll);
+                this,&FilterWindow::applyFilter);
 
     connect(ui->m_pushButton_undoFiltering,&QPushButton::released,
-                this,&FilterWindow::undoFilterToAll);
+                this,&FilterWindow::undoFilter);
 
     connect(ui->m_pushButton_exportPlot,&QPushButton::released,
                 this,&FilterWindow::exportFilterPlot);
@@ -145,6 +145,10 @@ void FilterWindow::initComboBoxes()
     ui->m_doubleSpinBox_highpass->setVisible(false);
     ui->m_label_highpass->setVisible(false);
     ui->m_doubleSpinBox_highpass->setEnabled(false);
+
+    //If add filter to channel type combo box changes -> also change combo box for undo filtering
+    connect(ui->m_comboBox_filterApplyTo, &QComboBox::currentTextChanged,
+            ui->m_comboBox_filterUndoTo, &QComboBox::setCurrentText);
 }
 
 
@@ -191,10 +195,10 @@ void FilterWindow::keyPressEvent(QKeyEvent * event)
 {
     qDebug()<<"Key pressed"<<event->key();
     if(event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
-        applyFilterToAll();
+        applyFilter();
 
     if((event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_Z) || event->key() == Qt::Key_Delete)
-        undoFilterToAll();
+        undoFilter();
 }
 
 
@@ -208,7 +212,7 @@ bool FilterWindow::eventFilter(QObject *obj, QEvent *event)
             qDebug("Ate key press %d", keyEvent->key());
 
             if((keyEvent->modifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_Z) || keyEvent->key() == Qt::Key_Delete)
-                undoFilterToAll();
+                undoFilter();
             else // standard event processing
                 return QObject::eventFilter(obj, event);
 
@@ -218,6 +222,8 @@ bool FilterWindow::eventFilter(QObject *obj, QEvent *event)
             return QObject::eventFilter(obj, event);
         }
     }
+
+    return true;
 }
 
 
@@ -313,17 +319,17 @@ void FilterWindow::filterParametersChanged()
 
 //*************************************************************************************************************
 
-void FilterWindow::applyFilterToAll()
+void FilterWindow::applyFilter()
 {
     //Undo all previous filters first
-    undoFilterToAll();
+    m_pMainWindow->m_pDataWindow->getDataModel()->undoFilter(ui->m_comboBox_filterApplyTo->currentText());
 
     QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pMainWindow->m_pDataWindow->getDataModel()->m_Operators);
 
     while(it.hasNext()) {
         it.next();
         if(it.key() == "User defined (See 'Adjust/Filter')") {
-            m_pMainWindow->m_pDataWindow->getDataModel()->applyOperator(QModelIndexList(),it.value());
+            m_pMainWindow->m_pDataWindow->getDataModel()->applyOperator(QModelIndexList(), it.value(), ui->m_comboBox_filterApplyTo->currentText());
         }
     }
 
@@ -333,9 +339,9 @@ void FilterWindow::applyFilterToAll()
 
 //*************************************************************************************************************
 
-void FilterWindow::undoFilterToAll()
+void FilterWindow::undoFilter()
 {
-    m_pMainWindow->m_pDataWindow->getDataModel()->undoFilter();
+    m_pMainWindow->m_pDataWindow->getDataModel()->undoFilter(ui->m_comboBox_filterUndoTo->currentText());
 
     m_pMainWindow->m_pDataWindow->updateDataTableViews();
 }
