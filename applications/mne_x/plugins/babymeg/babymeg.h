@@ -257,6 +257,8 @@ protected:
     virtual void run();
 
 private:
+    MatrixXf calibrate(const MatrixXf& data);
+
     void changeRecordingButton();
 
     QSharedPointer<QTimer> m_pTimerRecordingChange;
@@ -279,22 +281,22 @@ private:
 
     QSharedPointer<BabyMEGSQUIDControlDgl> SQUIDCtrlDlg; // added by Dr. Limin Sun for nonmodal dialog
 
-    FiffInfo::SPtr m_pFiffInfo;                             /**< Fiff measurement info.*/
-    qint32 m_iBufferSize;                                   /**< The raw data buffer size.*/
+    FiffInfo::SPtr  m_pFiffInfo;            /**< Fiff measurement info.*/
+    qint32          m_iBufferSize;          /**< The raw data buffer size.*/
 
-    bool                                m_bWriteToFile;     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
+    bool            m_bWriteToFile;         /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
 
-    QString m_sBabyMEGDataPath;     /**< The data storage path.*/
-    QString m_sCurrentProject;      /**< The current project which is part of the filename to be recorded.*/
-    QString m_sCurrentSubject;      /**< The current subject which is part of the filename to be recorded.*/
-    QString m_sCurrentParadigm;     /**< The current paradigm which is part of the filename to be recorded.*/
-    QString m_sRecordFile;          /**< Current record file. */
-    qint32 m_iSplitCount;           /**< File split count */
-    QFile                               m_qFileOut;         /**< QFile for writing to fif file.*/
-    FiffStream::SPtr                    m_pOutfid;          /**< FiffStream to write to.*/
+    QString             m_sBabyMEGDataPath; /**< The data storage path.*/
+    QString             m_sCurrentProject;  /**< The current project which is part of the filename to be recorded.*/
+    QString             m_sCurrentSubject;  /**< The current subject which is part of the filename to be recorded.*/
+    QString             m_sCurrentParadigm; /**< The current paradigm which is part of the filename to be recorded.*/
+    QString             m_sRecordFile;      /**< Current record file. */
+    qint32              m_iSplitCount;      /**< File split count */
+    QFile               m_qFileOut;         /**< QFile for writing to fif file.*/
+    FiffStream::SPtr    m_pOutfid;          /**< FiffStream to write to.*/
 
-    MatrixXd                            m_cals;
-
+    MatrixXd            m_cals;
+    MatrixXd            proj;               /**< SSP operator to apply to the data. */
 
     bool    m_bIsRunning;
 
