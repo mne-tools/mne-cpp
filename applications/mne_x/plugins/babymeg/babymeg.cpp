@@ -61,6 +61,8 @@
 
 #include <QList>
 #include <QDebug>
+#include <QDir>
+#include <QDateTime>
 
 
 //*************************************************************************************************************
@@ -81,7 +83,7 @@ BabyMEG::BabyMEG()
 : m_iBlinkStatus(0)
 , m_iBufferSize(-1)
 , m_bWriteToFile(false)
-, m_sRecordFile(qApp->applicationDirPath()+"/mne_x_plugins/resources/babymeg/babymegtest.fif")
+, m_sCurrentParadigm("")
 , m_bIsRunning(false)
 , m_pRawMatrixBuffer(0)
 {
@@ -102,7 +104,7 @@ BabyMEG::BabyMEG()
     connect(m_pActionRecordFile, &QAction::triggered, this, &BabyMEG::toggleRecordingFile);
     addPluginAction(m_pActionRecordFile);
 
-    m_pActionRecordFile->setEnabled(false);
+    //m_pActionRecordFile->setEnabled(false);
 
     m_pActionSqdCtrl = new QAction(QIcon(":/images/sqdctrl.png"), tr("Squid Control"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
@@ -137,13 +139,50 @@ QSharedPointer<IPlugin> BabyMEG::clone() const
 
 //*************************************************************************************************************
 
+QString BabyMEG::getFilePath(bool currentTime) const
+{
+    QString sFilePath = m_sBabyMEGDataPath + "/" + m_sCurrentProject + "/" + m_sCurrentSubject;
+
+    QString sTimeStamp;
+
+    if(currentTime)
+        sTimeStamp = QDateTime::currentDateTime().toString("yyMMdd_hhmmss");
+    else
+        sTimeStamp = "<YYMMDD_HMS>";
+
+    if(m_sCurrentParadigm.isEmpty())
+        sFilePath.append("/"+ sTimeStamp + "_" + m_sCurrentSubject + "_raw.fif");
+    else
+        sFilePath.append("/"+ sTimeStamp + "_" + m_sCurrentSubject + "_" + m_sCurrentParadigm + "_raw.fif");
+
+    return sFilePath;
+}
+
+
+//*************************************************************************************************************
+
 void BabyMEG::init()
 {
+    //BabyMEGData Path
+    m_sBabyMEGDataPath = QDir::homePath() + "/BabyMEGData";
+    if(!QDir(m_sBabyMEGDataPath).exists())
+        QDir().mkdir(m_sBabyMEGDataPath);
+    //Test Project
+    if(!QDir(m_sBabyMEGDataPath+"/TestProject").exists())
+        QDir().mkdir(m_sBabyMEGDataPath+"/TestProject");
+    QSettings settings;
+    m_sCurrentProject = settings.value(QString("Plugin/%1/currentProject").arg(getName()), "TestProject").toString();
+    //Test Subject
+    if(!QDir(m_sBabyMEGDataPath+"/TestProject/TestSubject").exists())
+        QDir().mkdir(m_sBabyMEGDataPath+"/TestProject/TestSubject");
+    m_sCurrentSubject = settings.value(QString("Plugin/%1/currentSubject").arg(getName()), "TestSubject").toString();
+
     //BabyMEG Inits
     pInfo = QSharedPointer<BabyMEGInfo>(new BabyMEGInfo());
     connect(pInfo.data(), &BabyMEGInfo::fiffInfoAvailable, this, &BabyMEG::setFiffInfo);
     connect(pInfo.data(), &BabyMEGInfo::SendDataPackage, this, &BabyMEG::setFiffData);
     connect(pInfo.data(), &BabyMEGInfo::SendCMDPackage, this, &BabyMEG::setCMDData);
+    connect(pInfo.data(), &BabyMEGInfo::GainInfoUpdate, this, &BabyMEG::setFiffGainInfo);
 
     myClient = QSharedPointer<BabyMEGClient>(new BabyMEGClient(6340,this));
     myClient->SetInfo(pInfo);
@@ -183,7 +222,7 @@ void BabyMEG::initConnector()
         m_pRTMSABabyMEG->data()->setName(this->getName());//Provide name to auto store widget settings
 
         m_pRTMSABabyMEG->data()->initFromFiffInfo(m_pFiffInfo);
-        m_pRTMSABabyMEG->data()->setMultiArraySize(500);
+        m_pRTMSABabyMEG->data()->setMultiArraySize(2);
 
         m_pRTMSABabyMEG->data()->setSamplingRate(m_pFiffInfo->sfreq);
 
@@ -236,12 +275,45 @@ void BabyMEG::UpdateFiffInfo()
 {
 
     // read gain info and save them to the m_pFiffInfo.range
-    myClientComm->SendCommandToBabyMEGShortConnection("INFO");
+    myClientComm->SendCommandToBabyMEGShortConnection("INFG");
 
-    sleep(0.5);
+    //sleep(0.5);
 
-    m_pActionRecordFile->setEnabled(true);
+    //m_pActionRecordFile->setEnabled(true);
 
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::splitRecordingFile()
+{
+    qDebug() << "Split recording file";
+    ++m_iSplitCount;
+    QString nextFileName = m_sRecordFile.remove("_raw.fif");
+    nextFileName += QString("-%1_raw.fif").arg(m_iSplitCount);
+
+    /*
+    * Write the link to the next file
+    */
+    qint32 data;
+    m_pOutfid->start_block(FIFFB_REF);
+    data = FIFFV_ROLE_NEXT_FILE;
+    m_pOutfid->write_int(FIFF_REF_ROLE,&data);
+    m_pOutfid->write_string(FIFF_REF_FILE_NAME, nextFileName);
+    m_pOutfid->write_id(FIFF_REF_FILE_ID);//ToDo meas_id
+    data = m_iSplitCount - 1;
+    m_pOutfid->write_int(FIFF_REF_FILE_NUM, &data);
+    m_pOutfid->end_block(FIFFB_REF);
+
+    //finish file
+    m_pOutfid->finish_writing_raw();
+
+    //start next file
+    m_qFileOut.setFileName(nextFileName);
+    m_pOutfid = Fiff::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals);
+    fiff_int_t first = 0;
+    m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
 }
 
 
@@ -256,9 +328,12 @@ void BabyMEG::toggleRecordingFile()
         m_bWriteToFile = false;
         m_pTimerRecordingChange->stop();
         m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
+        m_iSplitCount = 0;
     }
     else
     {
+        m_iSplitCount = 0;
+
         if(!m_pFiffInfo)
         {
             QMessageBox msgBox;
@@ -269,6 +344,7 @@ void BabyMEG::toggleRecordingFile()
 
 
         //Initiate the stream for writing to the fif file
+        m_sRecordFile = getFilePath(true);
         m_qFileOut.setFileName(m_sRecordFile);
         if(m_qFileOut.exists())
         {
@@ -343,6 +419,29 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
     emit fiffInfoAvailable();
 }
 
+//*************************************************************************************************************
+
+void BabyMEG::setFiffGainInfo(QStringList GainInfo)
+{
+    if(!m_pFiffInfo)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("FiffInfo missing!");
+        msgBox.exec();
+        return;
+    }
+    else
+    {
+        //set up the gain info
+        qDebug()<<"Set Gain Info";
+        for(qint32 i = 0; i < m_pFiffInfo->nchan; i++)
+        {
+            m_pFiffInfo->chs[i].range = 1.0f/GainInfo.at(i).toFloat();//1; // set gain
+            //qDebug()<<i<<"="<<m_pFiffInfo->chs[i].ch_name<<","<<m_pFiffInfo->chs[i].range;
+        }
+    }
+
+}
 //*************************************************************************************************************
 
 void BabyMEG::setCMDData(QByteArray DATA)
@@ -443,10 +542,315 @@ QWidget* BabyMEG::setupWidget()
 
 //*************************************************************************************************************
 
+MatrixXf BabyMEG::calibrate(const MatrixXf& data)
+{
+//    if(m_pFiffInfo)
+//    {
+//        bool projAvailable = true;
+
+//        if (this->proj.size() == 0)
+//            projAvailable = false;
+
+//        //
+//        //  Initialize the data and calibration vector
+//        //
+//        qint32 nchan = this->info.nchan;
+//        qint32 dest  = 0;//1;
+//        qint32 i, k, r;
+
+//        typedef Eigen::Triplet<double> T;
+//        std::vector<T> tripletList;
+//        tripletList.reserve(nchan);
+//        for(i = 0; i < nchan; ++i)
+//            tripletList.push_back(T(i, i, this->cals[i]));
+
+//        SparseMatrix<double> cal(nchan, nchan);
+//        cal.setFromTriplets(tripletList.begin(), tripletList.end());
+//    //    cal.makeCompressed();
+
+//        MatrixXd mult_full;
+//        //
+//        if (sel.size() == 0)
+//        {
+//            data = MatrixXd(nchan, to-from+1);
+//    //            data->setZero();
+//            if (projAvailable || this->comp.kind != -1)
+//            {
+//                if (!projAvailable)
+//                    mult_full = this->comp.data->data*cal;
+//                else if (this->comp.kind == -1)
+//                    mult_full = this->proj*cal;
+//                else
+//                    mult_full = this->proj*this->comp.data->data*cal;
+//            }
+//        }
+//        else
+//        {
+//            data = MatrixXd(sel.size(),to-from+1);
+//    //            data->setZero();
+
+//            MatrixXd selVect(sel.size(), nchan);
+
+//            selVect.setZero();
+
+//            if (!projAvailable && this->comp.kind == -1)
+//            {
+//                tripletList.clear();
+//                tripletList.reserve(sel.size());
+//                for(i = 0; i < sel.size(); ++i)
+//                    tripletList.push_back(T(i, i, this->cals[sel[i]]));
+//                cal = SparseMatrix<double>(sel.size(), sel.size());
+//                cal.setFromTriplets(tripletList.begin(), tripletList.end());
+//            }
+//            else
+//            {
+//                if (!projAvailable)
+//                {
+//                    qDebug() << "This has to be debugged! #1";
+//                    for( i = 0; i  < sel.size(); ++i)
+//                        selVect.row(i) = this->comp.data->data.block(sel[i],0,1,nchan);
+//                    mult_full = selVect*cal;
+//                }
+//                else if (this->comp.kind == -1)
+//                {
+//                    for( i = 0; i  < sel.size(); ++i)
+//                        selVect.row(i) = this->proj.block(sel[i],0,1,nchan);
+
+//                    mult_full = selVect*cal;
+//                }
+//                else
+//                {
+//                    qDebug() << "This has to be debugged! #3";
+//                    for( i = 0; i  < sel.size(); ++i)
+//                        selVect.row(i) = this->proj.block(sel[i],0,1,nchan);
+
+//                    mult_full = selVect*this->comp.data->data*cal;
+//                }
+//            }
+//        }
+
+//        bool do_debug = false;
+//        //
+//        // Make mult sparse
+//        //
+//        tripletList.clear();
+//        tripletList.reserve(mult_full.rows()*mult_full.cols());
+//        for(i = 0; i < mult_full.rows(); ++i)
+//            for(k = 0; k < mult_full.cols(); ++k)
+//                if(mult_full(i,k) != 0)
+//                    tripletList.push_back(T(i, k, mult_full(i,k)));
+
+//        SparseMatrix<double> mult(mult_full.rows(),mult_full.cols());
+//        if(tripletList.size() > 0)
+//            mult.setFromTriplets(tripletList.begin(), tripletList.end());
+//    //    mult.makeCompressed();
+
+//        //
+
+//        FiffStream::SPtr fid;
+//        if (!this->file->device()->isOpen())
+//        {
+//            if (!this->file->device()->open(QIODevice::ReadOnly))
+//            {
+//                printf("Cannot open file %s",this->info.filename.toUtf8().constData());
+//            }
+//            fid = this->file;
+//        }
+//        else
+//        {
+//            fid = this->file;
+//        }
+
+//        MatrixXd one;
+//        fiff_int_t first_pick, last_pick, picksamp;
+//        for(k = 0; k < this->rawdir.size(); ++k)
+//        {
+//            FiffRawDir thisRawDir = this->rawdir[k];
+//            //
+//            //  Do we need this buffer
+//            //
+//            if (thisRawDir.last > from)
+//            {
+//                if (thisRawDir.ent.kind == -1)
+//                {
+//                    //
+//                    //  Take the easy route: skip is translated to zeros
+//                    //
+//                    if(do_debug)
+//                        printf("S");
+//                    if (sel.cols() <= 0)
+//                        one.resize(nchan,thisRawDir.nsamp);
+//                    else
+//                        one.resize(sel.cols(),thisRawDir.nsamp);
+
+//                    one.setZero();
+//                }
+//                else
+//                {
+//                    FiffTag::SPtr t_pTag;
+//                    FiffTag::read_tag(fid.data(), t_pTag, thisRawDir.ent.pos);
+//                    //
+//                    //   Depending on the state of the projection and selection
+//                    //   we proceed a little bit differently
+//                    //
+//                    if (mult.cols() == 0)
+//                    {
+//                        if (sel.cols() == 0)
+//                        {
+//                            if (t_pTag->type == FIFFT_DAU_PACK16)
+//                                one = cal*(Map< MatrixDau16 >( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp)).cast<double>();
+//                            else if(t_pTag->type == FIFFT_INT)
+//                                one = cal*(Map< MatrixXi >( t_pTag->toInt(),nchan, thisRawDir.nsamp)).cast<double>();
+//                            else if(t_pTag->type == FIFFT_FLOAT)
+//                                one = cal*(Map< MatrixXf >( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
+//                            else
+//                                printf("Data Storage Format not known jet [1]!! Type: %d\n", t_pTag->type);
+//                        }
+//                        else
+//                        {
+
+//                            //ToDo find a faster solution for this!! --> make cal and mul sparse like in MATLAB
+//                            MatrixXd newData(sel.cols(), thisRawDir.nsamp); //ToDo this can be done much faster, without newData
+
+//                            if (t_pTag->type == FIFFT_DAU_PACK16)
+//                            {
+//                                MatrixXd tmp_data = (Map< MatrixDau16 > ( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp)).cast<double>();
+
+//                                for(r = 0; r < sel.size(); ++r)
+//                                    newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel[r],0,1,thisRawDir.nsamp);
+//                            }
+//                            else if(t_pTag->type == FIFFT_INT)
+//                            {
+//                                MatrixXd tmp_data = (Map< MatrixXi >( t_pTag->toInt(),nchan, thisRawDir.nsamp)).cast<double>();
+
+//                                for(r = 0; r < sel.size(); ++r)
+//                                    newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel[r],0,1,thisRawDir.nsamp);
+//                            }
+//                            else if(t_pTag->type == FIFFT_FLOAT)
+//                            {
+//                                MatrixXd tmp_data = (Map< MatrixXf > ( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
+
+//                                for(r = 0; r < sel.size(); ++r)
+//                                    newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel[r],0,1,thisRawDir.nsamp);
+//                            }
+//                            else
+//                            {
+//                                printf("Data Storage Format not known jet [2]!! Type: %d\n", t_pTag->type);
+//                            }
+
+//                            one = cal*newData;
+//                        }
+//                    }
+//                    else
+//                    {
+//                        if (t_pTag->type == FIFFT_DAU_PACK16)
+//                            one = mult*(Map< MatrixDau16 >( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp)).cast<double>();
+//                        else if(t_pTag->type == FIFFT_INT)
+//                            one = mult*(Map< MatrixXi >( t_pTag->toInt(),nchan, thisRawDir.nsamp)).cast<double>();
+//                        else if(t_pTag->type == FIFFT_FLOAT)
+//                            one = mult*(Map< MatrixXf >( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
+//                        else
+//                            printf("Data Storage Format not known jet [3]!! Type: %d\n", t_pTag->type);
+//                    }
+//                }
+//                //
+//                //  The picking logic is a bit complicated
+//                //
+//                if (to >= thisRawDir.last && from <= thisRawDir.first)
+//                {
+//                    //
+//                    //  We need the whole buffer
+//                    //
+//                    first_pick = 0;//1;
+//                    last_pick  = thisRawDir.nsamp - 1;
+//                    if (do_debug)
+//                        printf("W");
+//                }
+//                else if (from > thisRawDir.first)
+//                {
+//                    first_pick = from - thisRawDir.first;// + 1;
+//                    if(to < thisRawDir.last)
+//                    {
+//                        //
+//                        //  Something from the middle
+//                        //
+//    //                    qDebug() << "This needs to be debugged!";
+//                        last_pick = thisRawDir.nsamp + to - thisRawDir.last - 1;//is this alright?
+//                        if (do_debug)
+//                            printf("M");
+//                    }
+//                    else
+//                    {
+//                        //
+//                        //  From the middle to the end
+//                        //
+//                        last_pick = thisRawDir.nsamp - 1;
+//                        if (do_debug)
+//                            printf("E");
+//                    }
+//                }
+//                else
+//                {
+//                    //
+//                    //  From the beginning to the middle
+//                    //
+//                    first_pick = 0;//1;
+//                    last_pick  = to - thisRawDir.first;// + 1;
+//                    if (do_debug)
+//                        printf("B");
+//                }
+//                //
+//                //  Now we are ready to pick
+//                //
+//                picksamp = last_pick - first_pick + 1;
+
+//                if(do_debug)
+//                {
+//                    qDebug() << "first_pick: " << first_pick;
+//                    qDebug() << "last_pick: " << last_pick;
+//                    qDebug() << "picksamp: " << picksamp;
+//                }
+
+//                if (picksamp > 0)
+//                {
+//    //                    for(r = 0; r < data->rows(); ++r)
+//    //                        for(c = 0; c < picksamp; ++c)
+//    //                            (*data)(r,dest + c) = one(r,first_pick + c);
+//                    data.block(0,dest,data.rows(),picksamp) = one.block(0, first_pick, data.rows(), picksamp);
+
+//                    dest += picksamp;
+//                }
+//            }
+//            //
+//            //  Done?
+//            //
+//            if (thisRawDir.last >= to)
+//            {
+//                printf(" [done]\n");
+//                break;
+//            }
+//        }
+
+//    //        fclose(fid);
+
+//        times = MatrixXd(1, to-from+1);
+
+//        for (i = 0; i < times.cols(); ++i)
+//            times(0, i) = ((float)(from+i)) / this->info.sfreq;
+
+//    }
+    return data;
+}
+
+
+//*************************************************************************************************************
+
 void BabyMEG::run()
 {
 
     MatrixXf matValue;
+
+    qint32 size = 0;
 
     while(m_bIsRunning)
     {
@@ -457,14 +861,27 @@ void BabyMEG::run()
 
             //Write raw data to fif file
             if(m_bWriteToFile)
-                m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
+            {
+                size += matValue.rows()*matValue.cols() * 4;
+
+                if(size > MAX_DATA_LEN)
+                {
+                    size = 0;
+                    this->splitRecordingFile();
+                }
+
+                m_pOutfid->write_raw_buffer(matValue.cast<double>());
+            }
+            else
+                size = 0;
 
             if(m_pRTMSABabyMEG)
             {
                 //std::cout << "matValue" << matValue.block(0,0,2,2) << std::endl;
                 //emit values
-                for(qint32 i = 0; i < matValue.cols(); ++i)
-                    m_pRTMSABabyMEG->data()->setValue(matValue.col(i).cast<double>());
+//                for(qint32 i = 0; i < matValue.cols(); ++i)
+//                    m_pRTMSABabyMEG->data()->setValue(matValue.col(i).cast<double>());
+                m_pRTMSABabyMEG->data()->setValue(matValue.cast<double>());
             }
         }
     }

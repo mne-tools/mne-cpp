@@ -311,7 +311,7 @@ void Averaging::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
     {
         //Check if buffer initialized
         if(!m_pAveragingBuffer)
-            m_pAveragingBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
+            m_pAveragingBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
 
         //Fiff information
         if(!m_pFiffInfo)
@@ -334,33 +334,32 @@ void Averaging::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
         if(m_bProcessData)
         {
-            MatrixXd t_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
-
-            for(qint32 i = 0; i < pRTMSA->getMultiArraySize(); ++i)
-                t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
-
+            for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i)
+            {
+                MatrixXd t_mat = pRTMSA->getMultiSampleArray()[i];
 
 #ifdef DEBUG_AVERAGING
-            qsrand(time(NULL)+m_iTestCount);
+                qsrand(time(NULL)+m_iTestCount);
 
-            t_mat = MatrixXd::Zero(t_mat.rows(), t_mat.cols());
+                t_mat = MatrixXd::Zero(t_mat.rows(), t_mat.cols());
 
-            if(m_iTestCount%10 == 0)//GEN test stim
-            {
-                qint32 samp = (qrand() % (t_mat.cols()/8))+1; //exclude buggy 0
-                if(m_iTestCount2 % 5 == 0) // create zero every 5 generations
-                    samp = 0;
-                RowVectorXd stim = RowVectorXd::Ones(8)*5;
-                t_mat.block(m_iTestStimCh,samp,1,8) = stim;
+                if(m_iTestCount%10 == 0)//GEN test stim
+                {
+                    qint32 samp = (qrand() % (t_mat.cols()/8))+1; //exclude buggy 0
+                    if(m_iTestCount2 % 5 == 0) // create zero every 5 generations
+                        samp = 0;
+                    RowVectorXd stim = RowVectorXd::Ones(8)*5;
+                    t_mat.block(m_iTestStimCh,samp,1,8) = stim;
 
-                t_mat.block(0,samp+1,m_iTestStimCh, t_mat.cols()-(samp+1)) = MatrixXd::Ones(m_iTestStimCh, t_mat.cols()-(samp+1));
+                    t_mat.block(0,samp+1,m_iTestStimCh, t_mat.cols()-(samp+1)) = MatrixXd::Ones(m_iTestStimCh, t_mat.cols()-(samp+1));
 
-                qDebug() << "Pos:" << samp;
-                ++m_iTestCount2;
-            }
-            ++m_iTestCount;
+                    qDebug() << "Pos:" << samp;
+                    ++m_iTestCount2;
+                }
+                ++m_iTestCount;
 #endif
-            m_pAveragingBuffer->push(&t_mat);
+                m_pAveragingBuffer->push(&t_mat);
+            }
         }
     }
 }
@@ -389,6 +388,7 @@ void Averaging::appendEvoked(FiffEvoked::SPtr p_pEvoked)
 
 void Averaging::run()
 {
+    qDebug() << "START void Averaging::run()";
     //
     // Read Fiff Info
     //
@@ -443,7 +443,6 @@ void Averaging::run()
             if(m_qVecEvokedData.size() > 0)
             {
                 FiffEvoked t_fiffEvoked = *m_qVecEvokedData[0].data();
-
 
 #ifdef DEBUG_AVERAGING
                 std::cout << "EVK:" << t_fiffEvoked.data.row(0) << std::endl;

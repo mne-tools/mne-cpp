@@ -183,13 +183,12 @@ void TMSI::setUpFiffInfo()
     //
     //Read electrode positions from .elc file
     //
-    AsAElc *asaObject = new AsAElc();
     QVector< QVector<double> > elcLocation3D;
     QVector< QVector<double> > elcLocation2D;
     QString unit;
     QStringList elcChannelNames;
 
-    if(!asaObject->readElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
+    if(!LayoutLoader::readAsaElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
         qDebug() << "Error: Reading elc file.";
 
     //qDebug() << elcLocation3D;
@@ -717,8 +716,7 @@ void TMSI::run()
             }
 
             //emit values to real time multi sample array
-            for(qint32 i = 0; i < matValue.cols(); ++i)
-                m_pRMTSA_TMSI->data()->setValue(matValue.col(i).cast<double>());
+            m_pRMTSA_TMSI->data()->setValue(matValue.cast<double>());
 
             // Reset keyboard trigger
             m_iTriggerType = 0;

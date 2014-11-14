@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    This class represents the model of the model/view framework of mne_browse_raw_qt application.
+* @brief    This class represents the event model of the model/view framework of mne_browse_raw_qt application.
 *
 */
 
@@ -62,6 +62,8 @@ EventModel::EventModel(QObject *parent)
 , m_bFileloaded(false)
 , m_sFilterEventType("All")
 {
+    //Create default event type list
+    m_eventTypeList<<"1"<<"2"<<"3"<<"4"<<"4"<<"5"<<"32"<<"998"<<"999";
 }
 
 
@@ -127,7 +129,7 @@ QVariant EventModel::headerData(int section, Qt::Orientation orientation, int ro
 QVariant EventModel::data(const QModelIndex &index, int role) const
 {
     if(role == Qt::TextAlignmentRole)
-        return Qt::AlignCenter | Qt::AlignVCenter;
+        return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
 
     if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
         return QVariant();
@@ -189,51 +191,47 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
 
                     switch(m_dataTypes_Filtered.at(index.row())) {
                         default:
-                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_default").value<QColor>());
+                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_default", QColor(Qt::black)).value<QColor>());
                         break;
 
                         case 1:
-                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_1").value<QColor>());
+                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_1", QColor(Qt::black)).value<QColor>());
                         break;
 
                         case 2:
-                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_2").value<QColor>());
+                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_2", QColor(Qt::magenta)).value<QColor>());
                         break;
 
                         case 3:
-                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_3").value<QColor>());
+                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_3", QColor(Qt::green)).value<QColor>());
                         break;
 
                         case 4:
-                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_4").value<QColor>());
+                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_4", QColor(Qt::red)).value<QColor>());
                         break;
 
                         case 5:
-                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_5").value<QColor>());
+                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_5", QColor(Qt::cyan)).value<QColor>());
                         break;
 
                         case 32:
-                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_32").value<QColor>());
+                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_32", QColor(Qt::yellow)).value<QColor>());
                         break;
 
                         case 998:
-                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_998").value<QColor>());
+                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_998", QColor(Qt::darkBlue)).value<QColor>());
                         break;
 
                         case 999:
-                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_999").value<QColor>());
+                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_999", QColor(Qt::darkCyan)).value<QColor>());
                         break;
                     }
 
                     QColor colorTemp = brush.color();
-                    colorTemp.setAlpha(m_qSettings.value("EventDesignParameters/event_marker_opacity").toInt());
+                    colorTemp.setAlpha(EVENT_MARKER_OPACITY);
                     brush.setColor(colorTemp);
                     return QVariant(brush);
                 }
-
-                case Qt::TextAlignmentRole:
-                    qDebug()<<"alignment";
-                    return Qt::AlignCenter;
             }
         }
 
@@ -395,6 +393,14 @@ bool EventModel::loadEventData(QFile& qFile)
     m_dataTypes_Filtered = m_dataTypes;
     m_dataIsUserEvent_Filtered = m_dataIsUserEvent;
 
+    //Create type string list
+    m_eventTypeList.clear();
+    for(int i = 0; i<m_dataTypes.size(); i++)
+        if(!m_eventTypeList.contains(QString().number(m_dataTypes[i])))
+            m_eventTypeList<<QString().number(m_dataTypes[i]);
+
+    emit updateEventTypes();
+
     endResetModel();
 
     m_bFileloaded = true;
@@ -447,7 +453,7 @@ void EventModel::setCurrentMarkerPos(int markerPos)
 
 //*************************************************************************************************************
 
-FiffInfo EventModel::getFiffInfo()
+FiffInfo EventModel::getFiffInfo() const
 {
     return m_fiffInfo;
 }
@@ -455,7 +461,7 @@ FiffInfo EventModel::getFiffInfo()
 
 //*************************************************************************************************************
 
-QPair<int, int> EventModel::getFirstLastSample()
+QPair<int, int> EventModel::getFirstLastSample() const
 {
     QPair<int, int> pair(m_iFirstSample, m_iLastSample);
     return pair;
@@ -496,8 +502,17 @@ void EventModel::setEventFilterType(const QString eventType)
 
 //*************************************************************************************************************
 
+QStringList EventModel::getEventTypeList() const
+{
+    return m_eventTypeList;
+}
+
+
+//*************************************************************************************************************
+
 void EventModel::clearModel()
 {
+    beginResetModel();
     //clear event data model structure
     m_dataSamples.clear();
     m_dataTypes.clear();
@@ -506,6 +521,10 @@ void EventModel::clearModel()
     m_dataSamples_Filtered.clear();
     m_dataTypes_Filtered.clear();
     m_dataIsUserEvent_Filtered.clear();
+
+    m_bFileloaded = false;
+
+    endResetModel();
 
     qDebug("EventModel cleared.");
 }

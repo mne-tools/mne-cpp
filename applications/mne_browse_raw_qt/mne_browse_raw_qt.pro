@@ -1,7 +1,8 @@
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     applications.pro
-# @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+# @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+#           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 #           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 #           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
@@ -10,7 +11,7 @@
 #
 # @section  LICENSE
 #
-# Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+# Copyright (C) 2014, Lorenz Esch, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -39,15 +40,24 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += network core widgets concurrent svg
+QT += gui network core widgets concurrent svg
 
 TARGET = mne_browse_raw_qt
+
+#If one single executable is to be build
+#-> comment out flag in .pri file
+#-> add DEFINES += BUILD_MNECPP_STATIC_LIB in projects .pro file
+#-> This needs to be done in order to avoid problem with the Q_DECL_EXPORT/Q_DECL_IMPORT flag in the global headers
+contains(MNECPP_CONFIG, build_MNECPP_Static_Lib) {
+    DEFINES += BUILD_MNECPP_STATIC_LIB
+}
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-CONFIG += console #DEBUG
+#Note that the static flag is ingored when building against a dynamic qt version
+CONFIG += static console#DEBUG
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
@@ -74,16 +84,30 @@ SOURCES += \
     Utils/mneoperator.cpp \
     Utils/filteroperator.cpp \
     Utils/filterplotscene.cpp \
+    Utils/butterflyscene.cpp \
+    Utils/layoutscene.cpp \
+    Utils/averagescene.cpp \
+    Utils/selectionscene.cpp \
+    Utils/selectionsceneitem.cpp \
+    Utils/averagesceneitem.cpp \
+    Utils/butterflysceneitem.cpp \
+    Models/averagemodel.cpp \
     Models/rawmodel.cpp \
     Models/eventmodel.cpp \
+    Models/chinfomodel.cpp \
+    Delegates/averagedelegate.cpp \
     Delegates/rawdelegate.cpp \
+    Delegates/eventdelegate.cpp \
     Windows/mainwindow.cpp \
     Windows/filterwindow.cpp \
     Windows/eventwindow.cpp \
     Windows/datawindow.cpp \
     Windows/aboutwindow.cpp \
     Windows/informationwindow.cpp \
-    Delegates/eventdelegate.cpp \ 
+    Windows/selectionmanagerwindow.cpp \
+    Windows/averagewindow.cpp \
+    Windows/scalewindow.cpp \
+    Windows/chinfowindow.cpp
 
 HEADERS += \
     Utils/datamarker.h \
@@ -93,16 +117,30 @@ HEADERS += \
     Utils/types.h \
     Utils/info.h \
     Utils/filterplotscene.h \
+    Utils/butterflyscene.h \
+    Utils/layoutscene.h \
+    Utils/averagescene.h \
+    Utils/selectionscene.h \
+    Utils/selectionsceneitem.h \
+    Utils/averagesceneitem.h \
+    Utils/butterflysceneitem.h \
+    Models/averagemodel.h \
     Models/rawmodel.h \
     Models/eventmodel.h \
+    Models/chinfomodel.h \
+    Delegates/averagedelegate.h \
     Delegates/rawdelegate.h \
+    Delegates/eventdelegate.h \
     Windows/mainwindow.h \
     Windows/filterwindow.h \
     Windows/eventwindow.h \
     Windows/datawindow.h \
     Windows/aboutwindow.h \
     Windows/informationwindow.h \
-    Delegates/eventdelegate.h \
+    Windows/selectionmanagerwindow.h \
+    Windows/averagewindow.h \
+    Windows/scalewindow.h \
+    Windows/chinfowindow.h
 
 FORMS += \
     Windows/filterwindow.ui \
@@ -110,7 +148,11 @@ FORMS += \
     Windows/datawindowdock.ui \
     Windows/mainwindow.ui \
     Windows/aboutwindow.ui \
-    Windows/informationwindow.ui
+    Windows/informationwindow.ui \
+    Windows/selectionmanagerwindow.ui \
+    Windows/averagewindow.ui \
+    Windows/scalewindow.ui \
+    Windows/chinfowindow.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -130,3 +172,5 @@ macx {
 
 RESOURCES += \
     mnebrowserawqt.qrc
+
+RC_FILE = Resources/Images/ApplicationIcons/browse_raw.rc

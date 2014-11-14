@@ -73,10 +73,18 @@ public:
     * @param [in] dispChName    channel name to display
     * @param [in] chNumber      channel number to store
     * @param [in] coordinate    coordinates of the item
-    * @param [in] size          size of the item
+    * @param [in] channelColor  coordinates of the item
     * @param [in] parent        parent of item
     */
-    SensorItem(const QString& dispChName, qint32 chNumber, const QPointF& coordinate, const QSizeF& size, QGraphicsItem *parent = 0);
+    SensorItem(const QString& dispChName, qint32 chNumber, const QPointF& coordinate, const QColor& channelColor, QGraphicsItem *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Sets the color of the channel item.
+    *
+    * @param [in] channelColor  color to set
+    */
+    void setColor(const QColor& channelColor);
 
     //=========================================================================================================
     /**
@@ -122,20 +130,51 @@ public:
 
     //=========================================================================================================
     /**
+    * Updates the channels position.
+    *
+    * @param [in] newPosition   new channel position
+    */
+    inline void setPosition(QPointF newPosition);
+
+    //=========================================================================================================
+    /**
+    * Returns the channel position.
+    *
+    * @return position
+    */
+    inline QPointF getPosition();
+
+    //=========================================================================================================
+    /**
     * Returns the channel selection state
     *
     * @return whether channel is selected
     */
-    inline bool isSelected() const;
+    inline bool isHighlighted() const;
 
     //=========================================================================================================
     /**
     * Set the selection state
     *
-    * @param [in] selected      sthe new selection state
+    * @param [in] highlight     the new selection state
     */
-    inline void setSelected(bool selected);
+    inline void setHighlighted(bool highlight);
 
+    //=========================================================================================================
+    /**
+    * Returns the channel selection state
+    *
+    * @return whether channel is selected
+    */
+    inline bool isChoosen() const;
+
+    //=========================================================================================================
+    /**
+    * Set the selection state
+    *
+    * @param [in] choosen      the new choosen state
+    **/
+    inline void setChoosen(bool choosen);
 
 protected:
     //=========================================================================================================
@@ -175,8 +214,9 @@ private:
     QString m_sDisplayChName;   /**< channel name to display */
     qint32 m_iChNumber;         /**< channel number */
     QPointF m_qPointFCoord;     /**< item coordinates */
-    QSizeF m_qSizeFDim;         /**< item dimensions */
-    bool m_bIsSelected;         /**< channel selection state */
+    QColor m_qColorChannel;     /**< The current channel color.*/
+    bool m_bIsHighlighted;      /**< Channel higlighting state */
+    bool m_bIsChoosen;          /**< Channel choosen state */
 };
 
 
@@ -201,19 +241,53 @@ inline qint32 SensorItem::getChNumber() const
 
 //*************************************************************************************************************
 
-inline bool SensorItem::isSelected() const
+inline void SensorItem::setPosition(QPointF newPosition)
 {
-    return m_bIsSelected;
+    m_qPointFCoord = newPosition;
 }
 
 
 //*************************************************************************************************************
 
-inline void SensorItem::setSelected(bool selected)
+inline QPointF SensorItem::getPosition()
 {
-    m_bIsSelected = selected;
+    return m_qPointFCoord;
+}
+
+
+//*************************************************************************************************************
+
+inline bool SensorItem::isHighlighted() const
+{
+    return m_bIsHighlighted;
+}
+
+
+//*************************************************************************************************************
+
+inline void SensorItem::setHighlighted(bool highlight)
+{
+    m_bIsHighlighted = highlight;
     update();
 }
+
+
+//*************************************************************************************************************
+
+inline bool SensorItem::isChoosen() const
+{
+    return m_bIsChoosen;
+}
+
+
+//*************************************************************************************************************
+
+inline void SensorItem::setChoosen(bool choosen)
+{
+    m_bIsChoosen = choosen;
+    update();
+}
+
 
 } // NAMESPACE
 

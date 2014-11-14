@@ -127,14 +127,25 @@ public:
 
     ~RawSettings();
 
-private:
+    QColor m_event_color_default, m_event_color_1, m_event_color_2, m_event_color_3, m_event_color_4, m_event_color_5,
+        m_event_color_32, m_event_color_998, m_event_color_999, m_data_marker_color;
+
+    int m_mainwindow_size_w, m_mainwindow_size_h, m_mainwindow_position_x, m_mainwindow_position_y;
+
     //=========================================================================================================
     /**
-    * init initializes all the application settings values from the macros
+    * write writes all the application settings values from the macros
+    */
+    void write();
+
+private:
+    QSettings m_qSettings;  /**< QSettings object that initializes all the RawSettings */
+
+    //=========================================================================================================
+    /**
+    * init inits all the application settings values
     */
     void init();
-
-    QSettings m_qSettings;  /**< QSettings object that initializes all the RawSettings */
 };
 
 } //NAMESPACE
