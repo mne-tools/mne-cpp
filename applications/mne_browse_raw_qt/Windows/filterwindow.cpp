@@ -104,6 +104,11 @@ void FilterWindow::initSpinBoxes()
 
     connect(ui->m_doubleSpinBox_transitionband,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                 this,&FilterWindow::filterParametersChanged);
+
+    //Intercept events from the spin boxes to get control over key events
+    ui->m_doubleSpinBox_lowpass->installEventFilter(this);
+    ui->m_doubleSpinBox_highpass->installEventFilter(this);
+    ui->m_doubleSpinBox_transitionband->installEventFilter(this);
 }
 
 
@@ -187,6 +192,32 @@ void FilterWindow::keyPressEvent(QKeyEvent * event)
     qDebug()<<"Key pressed"<<event->key();
     if(event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
         applyFilterToAll();
+
+    if((event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_Z) || event->key() == Qt::Key_Delete)
+        undoFilterToAll();
+}
+
+
+//*************************************************************************************************************
+
+bool FilterWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    if(obj == ui->m_doubleSpinBox_highpass || obj == ui->m_doubleSpinBox_lowpass || obj == ui->m_doubleSpinBox_transitionband) {
+        if (event->type() == QEvent::KeyPress) {
+            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+            qDebug("Ate key press %d", keyEvent->key());
+
+            if((keyEvent->modifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_Z) || keyEvent->key() == Qt::Key_Delete)
+                undoFilterToAll();
+            else // standard event processing
+                return QObject::eventFilter(obj, event);
+
+            return true;
+        } else {
+            // standard event processing
+            return QObject::eventFilter(obj, event);
+        }
+    }
 }
 
 
