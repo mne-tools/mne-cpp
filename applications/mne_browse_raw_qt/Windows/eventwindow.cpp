@@ -55,12 +55,16 @@ using namespace MNEBrowseRawQt;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EventWindow::EventWindow(QWidget *parent) :
-    QDockWidget(parent),
-    ui(new Ui::EventWindowDockWidget),
-    m_pMainWindow(static_cast<MainWindow*>(parent))
+EventWindow::EventWindow(QWidget *parent)
+: QDockWidget(parent)
+, ui(new Ui::EventWindowDockWidget)
+, m_pMainWindow(static_cast<MainWindow*>(parent))
+, m_pColordialog(new QColorDialog(this))
 {
     ui->setupUi(this);
+
+    //hide the color dialog
+    m_pColordialog->hide();
 
     //------------------------
     //--- Setup data model ---
@@ -88,6 +92,7 @@ void EventWindow::init()
     initCheckBoxes();
     initComboBoxes();
     initToolButtons();
+    initPushButtons();
 }
 
 
@@ -169,12 +174,13 @@ void EventWindow::initComboBoxes()
 {
     ui->m_comboBox_filterTypes->addItem("All");
     ui->m_comboBox_filterTypes->addItems(m_pEventModel->getEventTypeList());
-    ui->m_comboBox_filterTypes->addItem("Add type");
     ui->m_comboBox_filterTypes->setCurrentText("All");
 
     //Connect filter types to event model
-    connect(ui->m_comboBox_filterTypes,&QComboBox::currentTextChanged,
-                this, &EventWindow::onEventTypeComboBox);
+    connect(ui->m_comboBox_filterTypes, &QComboBox::currentTextChanged,[=](QString string){
+        m_pEventModel->setEventFilterType(string);
+        m_pMainWindow->m_pDataWindow->updateDataTableViews();
+    });
 
     connect(m_pEventModel,&EventModel::updateEventTypes,
             this, &EventWindow::updateComboBox);
@@ -203,7 +209,16 @@ void EventWindow::initToolButtons()
     connect(removeEvent, &QAction::triggered,
             this, &EventWindow::removeEventfromEventModel);
 
-    ui->m_gridLayout_Main->addWidget(toolBar,0,2,4,1);
+    ui->m_gridLayout_Main->addWidget(toolBar,0,1,1,1);
+}
+
+
+//*************************************************************************************************************
+
+void EventWindow::initPushButtons()
+{
+    connect(ui->m_pushButton_addEventType, &QPushButton::clicked,
+            this, &EventWindow::addNewEventType);
 }
 
 
@@ -214,7 +229,6 @@ void EventWindow::updateComboBox(const QString &currentEventType)
     ui->m_comboBox_filterTypes->clear();
     ui->m_comboBox_filterTypes->addItem("All");
     ui->m_comboBox_filterTypes->addItems(m_pEventModel->getEventTypeList());
-    ui->m_comboBox_filterTypes->addItem("Add type");
     if(m_pEventModel->getEventTypeList().contains(currentEventType))
         ui->m_comboBox_filterTypes->setCurrentText(currentEventType);
 }
@@ -292,17 +306,10 @@ void EventWindow::addEventToEventModel()
 
 //*************************************************************************************************************
 
-void EventWindow::onEventTypeComboBox(const QString &text)
+void EventWindow::addNewEventType()
 {
-    //If 'Add type' was not selected
-    if(text != "Add type"){
-        m_pEventModel->setEventFilterType(text);
-        m_pMainWindow->m_pDataWindow->updateDataTableViews();
-    }
-    else {
-        //Open add event type dialog
-        m_pEventModel->addNewEventType(QString("55"), QColor(255,5,55));
-        m_pEventModel->setEventFilterType(QString("55"));
-        m_pMainWindow->m_pDataWindow->updateDataTableViews();
-    }
+    //Open add event type dialog
+    m_pEventModel->addNewEventType(QString().number(ui->m_spinBox_addEventType->value()), m_pColordialog->getColor(Qt::black, this));
+    m_pEventModel->setEventFilterType(QString().number(ui->m_spinBox_addEventType->value()));
+    m_pMainWindow->m_pDataWindow->updateDataTableViews();
 }
