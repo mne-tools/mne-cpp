@@ -84,7 +84,7 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>10</pointsize>
+         <pointsize>9</pointsize>
          <weight>75</weight>
          <bold>true</bold>
         </font>
@@ -109,15 +109,14 @@
      
     QGroupBox::title  {
         subcontrol-origin: margin;
-        subcontrol-position: top center; /* position at the top center */
-        padding: 0 3px;
-        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                          stop: 0 #FFOECE, stop: 1 #FFFFFF);
+		left: 12px;
+        subcontrol-position: top left; /* position at the top center */
+        padding: 1px;       
     }
 </string>
        </property>
        <property name="title">
-        <string>adaptive MP:</string>
+        <string>adaptive MP</string>
        </property>
        <property name="flat">
         <bool>false</bool>
@@ -279,6 +278,12 @@ border-radius: 4px;
         </item>
         <item>
          <layout class="QGridLayout" name="gridLayout">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="spacing">
+           <number>6</number>
+          </property>
           <item row="0" column="1">
            <widget class="QSpinBox" name="sb_adaptive_iteration">
             <property name="maximumSize">
@@ -698,6 +703,13 @@ border-radius: 4px;
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
        <property name="toolTip">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;reset all&lt;/span&gt;&lt;/p&gt;&lt;p&gt;WARNING: pushing this button will reset all settings, including window positions, sizes, all algorithmic parameters and signal types&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
@@ -712,10 +724,9 @@ border-radius: 4px;
      
     QGroupBox::title  {
         subcontrol-origin: margin;
-        subcontrol-position: top center; /* position at the top center */
-        padding: 0 3px;
-        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                          stop: 0 #FFOECE, stop: 1 #FFFFFF);
+		left: 12px;
+        subcontrol-position: top left; /* position at the top center */
+        padding: 1px;       
     }
 </string>
        </property>
@@ -803,7 +814,7 @@ border-radius: 4px;
       <widget class="QGroupBox" name="gb_export">
        <property name="font">
         <font>
-         <pointsize>10</pointsize>
+         <pointsize>9</pointsize>
          <weight>75</weight>
          <bold>true</bold>
         </font>
@@ -822,15 +833,14 @@ border-radius: 4px;
      
     QGroupBox::title  {
         subcontrol-origin: margin;
-        subcontrol-position: top center; /* position at the top center */
-        padding: 0 3px;
-        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                          stop: 0 #FFOECE, stop: 1 #FFFFFF);
+		left: 12px;
+        subcontrol-position: top left; /* position at the top center */
+        padding: 1px;       
     }
 </string>
        </property>
        <property name="title">
-        <string>export:</string>
+        <string>export</string>
        </property>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
@@ -900,7 +910,7 @@ border-radius: 4px;
        </property>
        <property name="font">
         <font>
-         <pointsize>10</pointsize>
+         <pointsize>9</pointsize>
          <weight>75</weight>
          <bold>true</bold>
         </font>
@@ -919,15 +929,14 @@ border-radius: 4px;
      
     QGroupBox::title  {
         subcontrol-origin: margin;
-        subcontrol-position: top center; /* position at the top center */
-        padding: 0 3px;
-        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                          stop: 0 #FFOECE, stop: 1 #FFFFFF);
+		left: 12px;
+        subcontrol-position: top left; /* position at the top center */
+        padding: 1px;       
     }
 </string>
        </property>
        <property name="title">
-        <string>fixdict MP:</string>
+        <string>fixdict MP</string>
        </property>
        <property name="flat">
         <bool>false</bool>
@@ -1183,6 +1192,13 @@ border-radius: 4px;
      </item>
      <item row="3" column="1" rowspan="3">
       <widget class="QGroupBox" name="gb_remaining_set">
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
        <property name="styleSheet">
         <string notr="true">    QGroupBox  {
         background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
@@ -1194,10 +1210,9 @@ border-radius: 4px;
      
     QGroupBox::title  {
         subcontrol-origin: margin;
-        subcontrol-position: top center; /* position at the top center */
-        padding: 0 3px;
-        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                          stop: 0 #FFOECE, stop: 1 #FFFFFF);
+		left: 12px;
+        subcontrol-position: top left; /* position at the top center */
+        padding: 1px;       
     }
 </string>
        </property>

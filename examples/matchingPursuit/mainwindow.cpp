@@ -393,6 +393,7 @@ void MainWindow::open_file()
     ui->lb_samples->setHidden(false);
     ui->sb_sample_count->setHidden(false);
     ui->tbv_Results->setRowCount(0);
+    ui->lb_figure_of_merit->setHidden(true);
     callXAxisWindow->setMinimumHeight(22);
     callXAxisWindow->setMaximumHeight(22);
 
@@ -597,6 +598,7 @@ void MainWindow::read_fiff_ave_new()
     ui->lb_timer->setHidden(true);
     ui->progressBarCalc->setHidden(true);
     ui->actionExport->setEnabled(false);
+    ui->lb_figure_of_merit->setHidden(true);
 
     has_warning = false;
     _new_paint = true;
@@ -714,6 +716,7 @@ void MainWindow::read_fiff_file_new(QString file_name)
     ui->lb_timer->setHidden(true);
     ui->progressBarCalc->setHidden(true);
     ui->actionExport->setEnabled(false);
+    ui->lb_figure_of_merit->setHidden(true);
 
     has_warning = false;
     _new_paint = true;
@@ -870,6 +873,7 @@ void MainWindow::read_matlab_file_new()
     ui->lb_timer->setHidden(true);
     ui->progressBarCalc->setHidden(true);
     ui->actionExport->setEnabled(false);
+    ui->lb_figure_of_merit->setHidden(true);
 
     has_warning = false;
     _new_paint = true;
@@ -1203,7 +1207,7 @@ void MainWindow::on_btt_Calc_clicked()
             }
         }
 
-        ui->frame->setEnabled(false);
+        ui->gb_trunc->setEnabled(false);
         ui->btt_OpenSignal->setEnabled(false);
         ui->btt_Calc->setText("cancel");
         ui->cb_channels->setEnabled(false);
@@ -1216,6 +1220,7 @@ void MainWindow::on_btt_Calc_clicked()
         ui->cb_all_select->setHidden(false);
         ui->lb_timer->setHidden(false);
         ui->actionExport->setEnabled(false);
+        ui->lb_figure_of_merit->setHidden(true);
 
         _adaptive_atom_list.clear();
         _fix_dict_atom_list.clear();
@@ -1596,7 +1601,7 @@ void MainWindow::calc_thread_finished()
 
 
     _counter_timer->stop();
-    ui->frame->setEnabled(true);
+    ui->gb_trunc->setEnabled(true);
     ui->btt_OpenSignal->setEnabled(true);
     ui->progressBarCalc->setValue(ui->progressBarCalc->maximum());
 
@@ -1643,22 +1648,27 @@ void MainWindow::calc_thread_finished()
     ui->tbv_Results->setItem(ui->tbv_Results->rowCount() - 1, 0, energy_item);
     ui->tbv_Results->setItem(ui->tbv_Results->rowCount() - 1, 1, residuum_item);
     ui->tbv_Results->setSpan(ui->tbv_Results->rowCount() - 1, 1, 1, 4);
-/*
+
     //ToDo
     //figure of merit to evaluate the alogorithm, here we use correlation between signal and atom_sum_matrix
     qreal correlation = 0;
     qreal divisor_sig = 0;
     qreal divisor_app = 0;
+
     for(qint32 channel = 0; channel < _atom_sum_matrix.cols(); channel++)
     {
         correlation += _signal_matrix.col(channel).dot(_atom_sum_matrix.col(channel));
-        divisor_sig +=
+        divisor_sig += _signal_matrix.col(channel).dot(_signal_matrix.col(channel));
+        divisor_app += _atom_sum_matrix.col(channel).dot(_atom_sum_matrix.col(channel));
 
     }
 
-    correlation /= (_atom_sum_matrix.rows() * _atom_sum_matrix.cols());
+    qreal divisor = sqrt(divisor_app * divisor_sig);
+    correlation /= divisor;
     cout << "\ncorrelation:  "<<correlation;
-*/
+    ui->lb_figure_of_merit->setText(QString("FOM: %1").arg((QString::number(correlation, 'f', 3))));
+    ui->lb_figure_of_merit->setHidden(false);
+
     tbv_is_loading = false;
 
     update();
