@@ -66,12 +66,37 @@
          <number>6</number>
         </property>
         <item>
-         <widget class="QFrame" name="frame">
-          <property name="frameShape">
-           <enum>QFrame::Box</enum>
+         <widget class="QGroupBox" name="gb_trunc">
+          <property name="font">
+           <font>
+            <pointsize>9</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
           </property>
-          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;truncation criterion&lt;/span&gt;&lt;/p&gt;&lt;p&gt;criterion at which the matching pursuit algorithm stops&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">    QGroupBox  {
+        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                          stop: 0 #E0E0E0, stop: 1 #FFFFFF);
+        border: 1px solid gray;
+        border-radius: 5px;
+        margin-top: 3ex; /* leave space at the top for the title */
+    }
+     
+    QGroupBox::title  {
+        subcontrol-origin: margin;
+		left: 12px;
+        subcontrol-position: top left; /* position at the top center */
+        padding: 1px;       
+    }
+
+</string>
+          </property>
+          <property name="title">
+           <string>truncation criterion</string>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout">
            <property name="leftMargin">
@@ -91,7 +116,7 @@
              <property name="spacing">
               <number>5</number>
              </property>
-             <item row="5" column="0" colspan="2">
+             <item row="4" column="0" colspan="2">
               <widget class="QCheckBox" name="chb_Iterations">
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;maximum iterations&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...algorithm will expire if the selected number of iterations (found atoms) is reached&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -104,7 +129,27 @@
                </property>
               </widget>
              </item>
-             <item row="7" column="0" colspan="2">
+             <item row="9" column="0" colspan="2">
+              <widget class="QRadioButton" name="rb_OwnDictionary">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;own dictionary&lt;/span&gt;&lt;/p&gt;&lt;p&gt;…uses fix dictionaries which have been built by the user&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>own dictionary:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="10" column="0" colspan="2">
+              <widget class="QLabel" name="label">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;sample rate&lt;/span&gt;&lt;/p&gt;&lt;p&gt;the sample rate which was used for data aquisition has to be entered here. In case of fif-files it is set automatically&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>sample rate:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="0" colspan="2">
               <widget class="QCheckBox" name="chb_ResEnergy">
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;residual energy&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...algorithm will expire if residue reaches selected percentage of the input signal&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -117,33 +162,7 @@
                </property>
               </widget>
              </item>
-             <item row="11" column="0" colspan="2">
-              <widget class="QLabel" name="label">
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;sample rate&lt;/span&gt;&lt;/p&gt;&lt;p&gt;the sample rate which was used for data aquisition has to be entered here. In case of fif-files it is set automatically&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>sample rate:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0" colspan="2">
-              <widget class="QLabel" name="lb_Criterion">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;truncation criterion&lt;/span&gt;&lt;/p&gt;&lt;p&gt;criterion at which the matching pursuit algorithm stops&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>truncation criterion</string>
-               </property>
-              </widget>
-             </item>
-             <item row="9" column="0" colspan="2">
+             <item row="8" column="0" colspan="2">
               <widget class="QRadioButton" name="rb_adativMp">
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;adaptive MP&lt;/span&gt;&lt;br/&gt;&lt;br/&gt;...use matching pursuit algorithm of Stephan Mallat and Zhifeng Zhang&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -156,17 +175,7 @@
                </property>
               </widget>
              </item>
-             <item row="10" column="0" colspan="2">
-              <widget class="QRadioButton" name="rb_OwnDictionary">
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;own dictionary&lt;/span&gt;&lt;/p&gt;&lt;p&gt;…uses fix dictionaries which have been built by the user&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>own dictionary:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="10" column="2" colspan="2">
+             <item row="9" column="2" colspan="2">
               <widget class="QComboBox" name="cb_Dicts">
                <property name="enabled">
                 <bool>false</bool>
@@ -182,26 +191,7 @@
                </property>
               </widget>
              </item>
-             <item row="5" column="3">
-              <widget class="QSpinBox" name="sb_Iterations">
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0 ... 5000&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-               <property name="minimum">
-                <number>1</number>
-               </property>
-               <property name="maximum">
-                <number>5000</number>
-               </property>
-               <property name="value">
-                <number>80</number>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="3">
+             <item row="6" column="3">
               <widget class="QDoubleSpinBox" name="dsb_energy">
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0,1% ... 99,9%&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -226,7 +216,26 @@
                </property>
               </widget>
              </item>
-             <item row="11" column="3">
+             <item row="4" column="3">
+              <widget class="QSpinBox" name="sb_Iterations">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0 ... 5000&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>5000</number>
+               </property>
+               <property name="value">
+                <number>80</number>
+               </property>
+              </widget>
+             </item>
+             <item row="10" column="3">
               <widget class="QDoubleSpinBox" name="dsb_sample_rate">
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;...enter sample rate here, in case of fif-files this value will be set automatically&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -727,6 +736,16 @@ QProgressBar::background{
         </property>
        </spacer>
       </item>
+      <item>
+       <widget class="QLabel" name="lb_figure_of_merit">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;FOM&lt;/span&gt;&lt;/p&gt;&lt;p&gt;shows the correlation between original signal and approximation after finishing calculation to validate the algorithms figure of merit (FOM)&lt;br/&gt;&lt;br/&gt;range: 0...1 (0 means no correlation, 1 means maximal correlation)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
    </layout>
@@ -897,38 +916,5 @@ QProgressBar::background{
  <resources>
   <include location="Ressourcen.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>chb_Iterations</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>sb_Iterations</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>103</x>
-     <y>70</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>202</x>
-     <y>72</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>rb_OwnDictionary</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>cb_Dicts</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>114</x>
-     <y>142</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>681</x>
-     <y>144</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
