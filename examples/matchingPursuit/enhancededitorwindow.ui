@@ -276,21 +276,29 @@
     </layout>
    </item>
    <item>
-    <widget class="QFrame" name="fr_A">
+    <widget class="QGroupBox" name="gb_A">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="lineWidth">
-      <number>2</number>
+     <property name="styleSheet">
+      <string notr="true">    QGroupBox  {
+        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                          stop: 0 #E0E0E0, stop: 1 #FFFFFF);
+        border: 1px solid gray;
+        border-radius: 5px;
+        margin-top: 3ex; /* leave space at the top for the title */
+    }
+     
+    QGroupBox::title  {
+        subcontrol-origin: margin;
+		left: 12px;
+        subcontrol-position: top left; /* position at the top center */
+        padding: 1px;       
+    }
+</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_8">
       <item>
@@ -473,21 +481,29 @@
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="fr_B">
+    <widget class="QGroupBox" name="gb_B">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="lineWidth">
-      <number>2</number>
+     <property name="styleSheet">
+      <string notr="true">    QGroupBox  {
+        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                          stop: 0 #E0E0E0, stop: 1 #FFFFFF);
+        border: 1px solid gray;
+        border-radius: 5px;
+        margin-top: 3ex; /* leave space at the top for the title */
+    }
+     
+    QGroupBox::title  {
+        subcontrol-origin: margin;
+		left: 12px;
+        subcontrol-position: top left; /* position at the top center */
+        padding: 1px;       
+    }
+</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_7">
       <item>
@@ -670,21 +686,29 @@
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="fr_C">
+    <widget class="QGroupBox" name="gb_C">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="lineWidth">
-      <number>2</number>
+     <property name="styleSheet">
+      <string notr="true">    QGroupBox  {
+        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                          stop: 0 #E0E0E0, stop: 1 #FFFFFF);
+        border: 1px solid gray;
+        border-radius: 5px;
+        margin-top: 3ex; /* leave space at the top for the title */
+    }
+     
+    QGroupBox::title  {
+        subcontrol-origin: margin;
+		left: 12px;
+        subcontrol-position: top left; /* position at the top center */
+        padding: 1px;       
+    }
+</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_6">
       <item>
@@ -867,21 +891,29 @@
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="fr_D">
+    <widget class="QGroupBox" name="gb_D">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="lineWidth">
-      <number>2</number>
+     <property name="styleSheet">
+      <string notr="true">    QGroupBox  {
+        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                          stop: 0 #E0E0E0, stop: 1 #FFFFFF);
+        border: 1px solid gray;
+        border-radius: 5px;
+        margin-top: 3ex; /* leave space at the top for the title */
+    }
+     
+    QGroupBox::title  {
+        subcontrol-origin: margin;
+		left: 12px;
+        subcontrol-position: top left; /* position at the top center */
+        padding: 1px;       
+    }
+</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
@@ -1064,21 +1096,29 @@
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="fr_E">
+    <widget class="QGroupBox" name="gb_E">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="lineWidth">
-      <number>2</number>
+     <property name="styleSheet">
+      <string notr="true">    QGroupBox  {
+        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                          stop: 0 #E0E0E0, stop: 1 #FFFFFF);
+        border: 1px solid gray;
+        border-radius: 5px;
+        margin-top: 3ex; /* leave space at the top for the title */
+    }
+     
+    QGroupBox::title  {
+        subcontrol-origin: margin;
+		left: 12px;
+        subcontrol-position: top left; /* position at the top center */
+        padding: 1px;       
+    }
+</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
@@ -1261,21 +1301,29 @@
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="fr_F">
+    <widget class="QGroupBox" name="gb_F">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="lineWidth">
-      <number>2</number>
+     <property name="styleSheet">
+      <string notr="true">    QGroupBox  {
+        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                          stop: 0 #E0E0E0, stop: 1 #FFFFFF);
+        border: 1px solid gray;
+        border-radius: 5px;
+        margin-top: 3ex; /* leave space at the top for the title */
+    }
+     
+    QGroupBox::title  {
+        subcontrol-origin: margin;
+		left: 12px;
+        subcontrol-position: top left; /* position at the top center */
+        padding: 1px;       
+    }
+</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_5">
       <item>
@@ -1458,21 +1506,29 @@
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="fr_G">
+    <widget class="QGroupBox" name="gb_G">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="lineWidth">
-      <number>2</number>
+     <property name="styleSheet">
+      <string notr="true">    QGroupBox  {
+        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                          stop: 0 #E0E0E0, stop: 1 #FFFFFF);
+        border: 1px solid gray;
+        border-radius: 5px;
+        margin-top: 3ex; /* leave space at the top for the title */
+    }
+     
+    QGroupBox::title  {
+        subcontrol-origin: margin;
+		left: 12px;
+        subcontrol-position: top left; /* position at the top center */
+        padding: 1px;       
+    }
+</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_9">
       <item>
@@ -1655,21 +1711,29 @@
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="fr_H">
+    <widget class="QGroupBox" name="gb_H">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="lineWidth">
-      <number>2</number>
+     <property name="styleSheet">
+      <string notr="true">    QGroupBox  {
+        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                          stop: 0 #E0E0E0, stop: 1 #FFFFFF);
+        border: 1px solid gray;
+        border-radius: 5px;
+        margin-top: 3ex; /* leave space at the top for the title */
+    }
+     
+    QGroupBox::title  {
+        subcontrol-origin: margin;
+		left: 12px;
+        subcontrol-position: top left; /* position at the top center */
+        padding: 1px;       
+    }
+</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_10">
       <item>

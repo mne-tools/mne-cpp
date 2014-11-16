@@ -318,25 +318,25 @@ void Enhancededitorwindow::on_cb_AtomFormula_currentIndexChanged(const QString &
         }
     }
 
-    ui->fr_A->setHidden(true);
-    ui->fr_B->setHidden(true);
-    ui->fr_C->setHidden(true);
-    ui->fr_D->setHidden(true);
-    ui->fr_E->setHidden(true);
-    ui->fr_F->setHidden(true);
-    ui->fr_G->setHidden(true);
-    ui->fr_H->setHidden(true);
+    ui->gb_A->setHidden(true);
+    ui->gb_B->setHidden(true);
+    ui->gb_C->setHidden(true);
+    ui->gb_D->setHidden(true);
+    ui->gb_E->setHidden(true);
+    ui->gb_F->setHidden(true);
+    ui->gb_G->setHidden(true);
+    ui->gb_H->setHidden(true);
 
     for(qint32 j = 0; j < foundChar.length(); j++)
     {
-        if(foundChar.at(j) =='A') ui->fr_A->setHidden(false);
-        else if(foundChar.at(j) =='B') ui->fr_B->setHidden(false);
-        else if(foundChar.at(j) =='C') ui->fr_C->setHidden(false);
-        else if(foundChar.at(j) =='D') ui->fr_D->setHidden(false);
-        else if(foundChar.at(j) =='E') ui->fr_E->setHidden(false);
-        else if(foundChar.at(j) =='F') ui->fr_F->setHidden(false);
-        else if(foundChar.at(j) =='G') ui->fr_G->setHidden(false);
-        else if(foundChar.at(j) =='H') ui->fr_H->setHidden(false);
+        if(foundChar.at(j) =='A') ui->gb_A->setHidden(false);
+        else if(foundChar.at(j) =='B') ui->gb_B->setHidden(false);
+        else if(foundChar.at(j) =='C') ui->gb_C->setHidden(false);
+        else if(foundChar.at(j) =='D') ui->gb_D->setHidden(false);
+        else if(foundChar.at(j) =='E') ui->gb_E->setHidden(false);
+        else if(foundChar.at(j) =='F') ui->gb_F->setHidden(false);
+        else if(foundChar.at(j) =='G') ui->gb_G->setHidden(false);
+        else if(foundChar.at(j) =='H') ui->gb_H->setHidden(false);
     }
 
     resize(minimumSize());
