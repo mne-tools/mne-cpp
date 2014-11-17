@@ -58,6 +58,8 @@ using namespace MNEBrowseRawQt;
 //=============================================================================================================
 
 MNEOperator::MNEOperator()
+: m_OperatorType(UNKNOWN)
+, m_sName("unknown")
 {
 }
 
@@ -75,6 +77,7 @@ MNEOperator::MNEOperator(const MNEOperator& obj)
 
 MNEOperator::MNEOperator(OperatorType type)
 : m_OperatorType(type)
+, m_sName("unknown")
 {
 }
 

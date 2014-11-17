@@ -284,6 +284,14 @@ signals:
     */
     void fileLoaded(const FiffInfo&);
 
+    //=========================================================================================================
+    /**
+    * fileLoaded is emitted whenever a file was to be loaded
+    *
+    * @param the currentl assigned operators
+    */
+    void assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOperator> >&);
+
 public slots:
     //=========================================================================================================
     /**
@@ -306,10 +314,21 @@ public slots:
     /**
     * applyOperator applies assigend operators to channel
     *
-    * @param index selects the channel to process
+    * @param chan selects the channel to process
     * @param filter
     */
     void applyOperator(QModelIndex chan, const QSharedPointer<MNEOperator> &operatorPtr, bool reset=false);
+
+    //=========================================================================================================
+    /**
+    * applyOperator applies assigend operators to channel which include a scpefic string in their channel names
+    *
+    * @param chlist selects the channels to process
+    * @param operatorPtr
+    * @param chType the string which need to be included in the channels name to get filtered
+    * @param reset
+    */
+    void applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator>& operatorPtr, const QString &chType, bool reset=false);
 
     //=========================================================================================================
     /**
@@ -326,7 +345,7 @@ public slots:
     *
     * @param chdata[in,out] represents the channel data as a RowVectorXd
     */
-    void applyOperatorsConcurrently(QPair<int, RowVectorXd>& chdata);
+    void applyOperatorsConcurrently(QPair<int, RowVectorXd>& chdata) const;
 
     //=========================================================================================================
     /**
@@ -365,6 +384,14 @@ public slots:
     * @param chlist selects the channels to filter
     */
     void undoFilter(QModelIndexList chlist);
+
+    //=========================================================================================================
+    /**
+    * undoFilter undoes the filtering operation for all filter operations for channel which include chType in their channel name
+    *
+    * @param chType channel names which include this paramter in their channel name get undone
+    */
+    void undoFilter(const QString &chType);
 
     //=========================================================================================================
     /**

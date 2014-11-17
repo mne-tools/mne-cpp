@@ -140,6 +140,8 @@ public:
 
     int             m_iFilterOrder;     /**< represents the order of the filter instance. */
     int             m_iFFTlength;       /**< represents the filter length. */
+    double          m_dCenterFreq;      /**< contains center freq of the filter. */
+    double          m_dBandwidth;       /**< contains bandwidth of the filter. */
 
     RowVectorXd     m_dCoeffA;          /**< contains the forward filter coefficient set. */
     RowVectorXd     m_dCoeffB;          /**< contains the backward filter coefficient set (empty if FIR filter). */
