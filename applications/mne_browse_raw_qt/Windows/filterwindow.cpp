@@ -306,9 +306,6 @@ void FilterWindow::filterParametersChanged()
 
     double trans_width = ui->m_doubleSpinBox_transitionband->value();
 
-//    double bw = highpassHz-lowpassHz;
-//    double center = (lowpassHz+highpassHz)/2;
-
     double bw = highpassHz-lowpassHz;
     double center = lowpassHz+bw/2;
 
@@ -316,6 +313,9 @@ void FilterWindow::filterParametersChanged()
     double nyquistFrequency = samplingFrequency/2;
 
     int filterTaps = ui->m_spinBox_filterTaps->value();
+    int fftLength = m_iWindowSize+filterTaps;
+    int exp = ceil(log2(fftLength));
+    fftLength = pow(2, exp);
 
     //Update min max of spin boxes to nyquist
     ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
@@ -325,17 +325,17 @@ void FilterWindow::filterParametersChanged()
 
     if(ui->m_comboBox_filterType->currentText() == "Lowpass") {
         userDefinedFilterOperator = QSharedPointer<MNEOperator>(
-                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::LPF,filterTaps,lowpassHz/nyquistFrequency,0.2,(double)trans_width/nyquistFrequency,(m_iWindowSize+m_iFilterTaps)));
+                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::LPF,filterTaps,lowpassHz/nyquistFrequency,0.2,(double)trans_width/nyquistFrequency,fftLength));
     }
 
     if(ui->m_comboBox_filterType->currentText() == "Highpass") {
         userDefinedFilterOperator = QSharedPointer<MNEOperator>(
-                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::HPF,filterTaps,highpassHz/nyquistFrequency,0.2,(double)trans_width/nyquistFrequency,(m_iWindowSize+m_iFilterTaps)));
+                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::HPF,filterTaps,highpassHz/nyquistFrequency,0.2,(double)trans_width/nyquistFrequency,fftLength));
     }
 
     if(ui->m_comboBox_filterType->currentText() == "Bandpass") {
         userDefinedFilterOperator = QSharedPointer<MNEOperator>(
-                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::BPF,filterTaps,(double)center/nyquistFrequency,(double)bw/nyquistFrequency,(double)trans_width/nyquistFrequency,(m_iWindowSize+m_iFilterTaps)));
+                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::BPF,filterTaps,(double)center/nyquistFrequency,(double)bw/nyquistFrequency,(double)trans_width/nyquistFrequency,fftLength));
     }
 
     //Replace old with new filter operator
