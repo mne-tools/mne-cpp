@@ -145,7 +145,7 @@ void ButterflySceneItem::paintAveragePaths(QPainter *painter)
                 double dScaleY = (boundingRect.height())/(2*dMaxValue);
 
                 //Setup the painter
-                QPainterPath path = QPainterPath(QPointF(boundingRect.x(), boundingRect.y() + boundingRect.height()/2));
+                QPainterPath path = QPainterPath(QPointF(boundingRect.x(), *(averageData+(0*m_pFiffInfo->chs.size())+i) * -dScaleY));
                 QPen pen;
                 pen.setStyle(Qt::SolidLine);
                 if(!m_cAverageColors.isEmpty() && i<m_cAverageColors.size())

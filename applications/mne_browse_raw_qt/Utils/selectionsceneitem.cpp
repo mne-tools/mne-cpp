@@ -85,6 +85,8 @@ void SelectionSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
+    this->setPos(10*m_qpChannelPosition.x(), -10*m_qpChannelPosition.y());
+
     // Plot shadow
     painter->setPen(Qt::NoPen);
     painter->setBrush(Qt::darkGray);
@@ -111,8 +113,6 @@ void SelectionSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     QStaticText staticElectrodeName = QStaticText(m_sChannelName);
     QSizeF sizeText = staticElectrodeName.size();
     painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
-
-    this->setPos(10*m_qpChannelPosition.x(), -10*m_qpChannelPosition.y());
 }
 
 
