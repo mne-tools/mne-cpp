@@ -268,6 +268,8 @@ protected:
 private:
     MatrixXd calibrate(const MatrixXf& data);
 
+    bool readProjectors();
+
     void changeRecordingButton();
 
     QSharedPointer<QTimer> m_pTimerRecordingChange;
