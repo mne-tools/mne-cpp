@@ -223,7 +223,7 @@ bool FiffIO::write(QFile& p_QFile, const fiff_int_t type, const fiff_int_t idx) 
 
 bool FiffIO::write_raw(QIODevice& p_IODevice, const fiff_int_t idx) const {
 
-    MatrixXd cals;
+    RowVectorXd cals;
 
 //    std::cout << "Writing file " << QFile(&p_IODevice).fileName().toLatin1() << std::endl;
     FiffStream::SPtr outfid = Fiff::start_writing_raw(p_IODevice,this->m_qlistRaw[idx]->info,cals);
