@@ -401,7 +401,7 @@ public:
     *
     * @return the started fiff file
     */
-    static FiffStream::SPtr start_writing_raw(QIODevice &p_IODevice, const FiffInfo& info, MatrixXd& cals, MatrixXi sel = defaultMatrixXi);
+    static FiffStream::SPtr start_writing_raw(QIODevice &p_IODevice, const FiffInfo& info, RowVectorXd& cals, MatrixXi sel = defaultMatrixXi);
 
     //=========================================================================================================
     /**
