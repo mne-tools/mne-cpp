@@ -100,10 +100,6 @@ void MainWindow::setupWindowWidgets()
     addDockWidget(Qt::LeftDockWidgetArea, m_pEventWindow);
     m_pEventWindow->hide();
 
-    //Create filter window - QTDesigner used - see / FormFiles
-    m_pFilterWindow = new FilterWindow(this);
-    m_pFilterWindow->hide();
-
     //Create dockable information window - QTDesigner used - see / FormFiles
     m_pInformationWindow = new InformationWindow(this);
     addDockWidget(Qt::BottomDockWidgetArea, m_pInformationWindow);
@@ -132,6 +128,11 @@ void MainWindow::setupWindowWidgets()
     m_pScaleWindow = new ScaleWindow(this);
     addDockWidget(Qt::LeftDockWidgetArea, m_pScaleWindow);
     m_pScaleWindow->hide();
+
+    //Create filter window - QTDesigner used - see / FormFiles
+    m_pFilterWindow = new FilterWindow(this);
+    addDockWidget(Qt::BottomDockWidgetArea, m_pFilterWindow);
+    m_pFilterWindow->hide();
 
     //Init windows - TODO: get rid of this here, do this inside the window classes
     m_pDataWindow->init();
@@ -166,12 +167,15 @@ void MainWindow::setupWindowWidgets()
 
     //Connect channel info window with raw data model, layout manager and the data window
     connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
-            m_pChInfoWindow, &ChInfoWindow::fiffInfoChanged);
+            m_pChInfoWindow->getDataModel(), &ChInfoModel::fiffInfoChanged);
+
+    connect(m_pDataWindow->getDataModel(), &RawModel::assignedOperatorsChanged,
+            m_pChInfoWindow->getDataModel(), &ChInfoModel::assignedOperatorsChanged);
 
     connect(m_pSelectionManagerWindow, &SelectionManagerWindow::loadedLayoutMap,
-            m_pChInfoWindow, &ChInfoWindow::layoutChanged);
+            m_pChInfoWindow->getDataModel(), &ChInfoModel::layoutChanged);
 
-    connect(m_pChInfoWindow, &ChInfoWindow::channelsMappedToLayout,
+    connect(m_pChInfoWindow->getDataModel(), &ChInfoModel::channelsMappedToLayout,
             m_pSelectionManagerWindow, &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
 
     //Connect selection manager with a new file loaded signal
@@ -181,8 +185,8 @@ void MainWindow::setupWindowWidgets()
     //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels - TODO: dirty move get rid of this here
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
         m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_fiffInfo);
-        m_pChInfoWindow->fiffInfoChanged(m_pDataWindow->getDataModel()->m_fiffInfo);
-        m_pChInfoWindow->layoutChanged(m_pSelectionManagerWindow->getLayoutMap());
+        m_pChInfoWindow->getDataModel()->fiffInfoChanged(m_pDataWindow->getDataModel()->m_fiffInfo);
+        m_pChInfoWindow->getDataModel()->layoutChanged(m_pSelectionManagerWindow->getLayoutMap());
         m_pSelectionManagerWindow->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
         m_pSelectionManagerWindow->newFiffFileLoaded();
     }

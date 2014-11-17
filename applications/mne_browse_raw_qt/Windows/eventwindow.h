@@ -80,6 +80,7 @@ class MainWindow;
 class EventWindow : public QDockWidget
 {
     Q_OBJECT
+
 public:
     //=========================================================================================================
     /**

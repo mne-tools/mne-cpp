@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "ui_filterwindow.h"
+#include "ui_filterwindowdock.h"
 #include "mainwindow.h"
 #include "../Utils/filterplotscene.h"
 
@@ -79,7 +79,7 @@ class MainWindow;
 *
 * @brief The FilterWindow class provides the filter window.
 */
-class FilterWindow : public QWidget
+class FilterWindow : public QDockWidget
 {
     Q_OBJECT
 
@@ -132,6 +132,12 @@ private:
 
     //=========================================================================================================
     /**
+    * inits the table views.
+    */
+    void initTableViews();
+
+    //=========================================================================================================
+    /**
     * resizeEvent reimplemented virtual function to handle resize events of the filter window
     */
     void resizeEvent(QResizeEvent * event);
@@ -154,7 +160,7 @@ private:
     */
     void updateFilterPlot();
 
-    Ui::FilterWindowWidget *ui;                 /**< Pointer to the qt designer generated ui class.*/
+    Ui::FilterWindowDockWidget *ui;             /**< Pointer to the qt designer generated ui class.*/
 
     MainWindow*         m_pMainWindow;          /**< Pointer to the parent, the MainWindow class.*/
 

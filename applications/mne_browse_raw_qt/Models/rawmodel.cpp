@@ -304,29 +304,30 @@ void RawModel::genStdFilterOps()
     //HPF
     double cutoffFreqHz = 50; //in Hz
     QString name = QString("HPF_%1").arg(cutoffFreqHz);
-    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::HPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
+    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::HPF,m_iFilterTaps,cutoffFreqHz/sfreq,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
 
     //LPF
     cutoffFreqHz = 30; //in Hz
     name = QString("LPF_%1").arg(cutoffFreqHz);
-    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
+    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqHz/sfreq,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
     cutoffFreqHz = 10; //in Hz
     name = QString("LPF_%1").arg(cutoffFreqHz);
-    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
+    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqHz/sfreq,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
 
     //BPF
     double from_freqHz = 30;
     double to_freqHz = 40;
     double trans_width = 15;
-    double bw = to_freqHz/from_freqHz;
-    double center = from_freqHz+bw/2;
+    double center = (to_freqHz - from_freqHz)/2; //double center = from_freqHz+bw/2;
+    double bw = to_freqHz-from_freqHz; //double bw = to_freqHz/from_freqHz;
+
     name = QString("BPF_%1-%2").arg(from_freqHz).arg(to_freqHz);
-    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::BPF,80,(double)center/nyquist_freq,(double)bw/nyquist_freq,(double)trans_width/nyquist_freq,(m_iWindowSize+m_iFilterTaps))));
+    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::BPF,80,(double)center/sfreq,(double)bw/sfreq,(double)trans_width/nyquist_freq,(m_iWindowSize+m_iFilterTaps))));
 
     //Own/manual set filter - only an entry i nthe operator list generated which is called when the filterwindow is used
     cutoffFreqHz = 40;
     name = QString("User defined (See 'Adjust/Filter')");
-    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
+    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqHz/sfreq,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
 
     //**********
     //filter debugging -> store filter coefficients to plain text file
@@ -382,6 +383,7 @@ bool RawModel::loadFiffData(QFile& qFile)
     endResetModel();
 
     emit fileLoaded(m_fiffInfo);
+    emit assignedOperatorsChanged(m_assignedOperators);
 
     return true;
 }
@@ -548,6 +550,7 @@ void RawModel::reloadFiffData(bool before)
 
 QPair<MatrixXd,MatrixXd> RawModel::readSegment(fiff_int_t from, fiff_int_t to)
 {
+    qDebug()<<"in readSegment";
     QPair<MatrixXd,MatrixXd> datatime;
 
     m_Mutex.lock();
@@ -556,6 +559,8 @@ QPair<MatrixXd,MatrixXd> RawModel::readSegment(fiff_int_t from, fiff_int_t to)
         return datatime;
     }
     m_Mutex.unlock();
+
+    qDebug()<<"out readSegment";
 
     return datatime;
 }
@@ -648,9 +653,10 @@ void RawModel::applyOperator(QModelIndex chan, const QSharedPointer<MNEOperator>
     }
 
     //adds filtered channel to m_assignedOperators
-    if(!m_assignedOperators.values(chan.row()).contains(operatorPtr)) m_assignedOperators.insertMulti(chan.row(),operatorPtr);
+    if(!m_assignedOperators.values(chan.row()).contains(operatorPtr))
+        m_assignedOperators.insertMulti(chan.row(),operatorPtr);
 
-    qDebug() << "RawModel: Filter" << filter->m_sName << "applied to channel#" << chan.row();
+    //qDebug() << "RawModel: Filter" << filter->m_sName << "applied to channel#" << chan.row();
 
     emit dataChanged(chan,chan);
 }
@@ -675,6 +681,8 @@ void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOpe
                 applyOperator(createIndex(i,1),operatorPtr,reset);
     }
 
+    emit assignedOperatorsChanged(m_assignedOperators);
+
     qDebug() << "RawModel: using FilterType" << operatorPtr->m_sName;
 }
 
@@ -694,18 +702,19 @@ void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOpe
         applyOperator(chlist[i],operatorPtr,reset);
     }
 
+    emit assignedOperatorsChanged(m_assignedOperators);
+
     qDebug() << "RawModel: using FilterType" << operatorPtr->m_sName;
 }
 
 
 //*************************************************************************************************************
 
-void RawModel::applyOperatorsConcurrently(QPair<int,RowVectorXd>& chdata)
+void RawModel::applyOperatorsConcurrently(QPair<int,RowVectorXd>& chdata) const
 {
-    QMutableMapIterator<int,QSharedPointer<MNEOperator> > it(m_assignedOperators);
     QSharedPointer<FilterOperator> filter;
 
-    QList<int> listFilteredChs = m_assignedOperators.keys();
+    //QList<int> listFilteredChs = m_assignedOperators.keys();
 
     QList<QSharedPointer<MNEOperator> > ops = m_assignedOperators.values(chdata.first);
     for(qint32 i=0; i < ops.size(); ++i) {
@@ -719,7 +728,6 @@ void RawModel::applyOperatorsConcurrently(QPair<int,RowVectorXd>& chdata)
         }
         }
     }
-
 //    return chdata;
 }
 
@@ -780,6 +788,8 @@ void RawModel::undoFilter(QModelIndexList chlist, const QSharedPointer<MNEOperat
             continue;
         }
     }
+
+    emit assignedOperatorsChanged(m_assignedOperators);
 }
 
 
@@ -791,6 +801,8 @@ void RawModel::undoFilter(QModelIndexList chlist)
         m_assignedOperators.remove(chlist[i].row());
         qDebug() << "RawModel: All filter operator removed of type for channel" << chlist[i].row();
     }
+
+    emit assignedOperatorsChanged(m_assignedOperators);
 }
 
 
@@ -806,6 +818,8 @@ void RawModel::undoFilter(const QString &chType)
             if(m_chInfolist.at(i).ch_name.contains(chType))
                 m_assignedOperators.remove(i);
     }
+
+    emit assignedOperatorsChanged(m_assignedOperators);
 }
 
 
@@ -815,6 +829,8 @@ void RawModel::undoFilter(const QString &chType)
 void RawModel::undoFilter()
 {
     m_assignedOperators.clear();
+
+    emit assignedOperatorsChanged(m_assignedOperators);
 }
 
 
@@ -921,7 +937,8 @@ void RawModel::insertProcessedData(int index)
 
     emit dataChanged(createIndex(listFilteredChs[index],1),createIndex(listFilteredChs[index],1));
 
-    if(index==listFilteredChs.last()) m_bProcessing = false;
+    if(index==listFilteredChs.last())
+        m_bProcessing = false;
 }
 
 

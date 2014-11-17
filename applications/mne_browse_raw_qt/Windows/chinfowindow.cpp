@@ -76,26 +76,6 @@ ChInfoWindow::~ChInfoWindow()
 
 //*************************************************************************************************************
 
-void ChInfoWindow::fiffInfoChanged(const FiffInfo &fiffInfo)
-{
-    m_pChInfoModel->fiffInfoChanged(fiffInfo);
-
-    emit channelsMappedToLayout(m_pChInfoModel->getMappedChannelsList());
-}
-
-
-//*************************************************************************************************************
-
-void ChInfoWindow::layoutChanged(const QMap<QString,QPointF> &layoutMap)
-{
-    m_pChInfoModel->layoutChanged(layoutMap);
-
-    emit channelsMappedToLayout(m_pChInfoModel->getMappedChannelsList());
-}
-
-
-//*************************************************************************************************************
-
 ChInfoModel* ChInfoWindow::getDataModel()
 {
     return m_pChInfoModel;
