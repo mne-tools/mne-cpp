@@ -574,6 +574,36 @@ MatrixXd BabyMEG::calibrate(const MatrixXf& data)
 }
 
 
+bool BabyMEG::readProjectors()
+{
+    QFile t_fiffFile("ERio_P8.fif");
+
+    //
+    //   Open the file
+    //
+    FiffStream::SPtr p_pStream(new FiffStream(&t_fiffFile));
+    QString t_sFileName = p_pStream->streamName();
+
+    printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
+
+    FiffDirTree t_Tree;
+    QList<FiffDirEntry> t_Dir;
+
+    if(!p_pStream->open(t_Tree, t_Dir))
+        return false;
+
+    QList<FiffProj> q_ListProj = p_pStream->read_proj(t_Tree);
+
+    if (q_ListProj.size() == 0)
+    {
+        printf("Could not find projectors\n");
+        return false;
+    }
+
+    return true;
+}
+
+
 //*************************************************************************************************************
 
 void BabyMEG::run()
