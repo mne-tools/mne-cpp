@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
         }
     }
     //
-    MatrixXd cals;
+    RowVectorXd cals;
 
     FiffStream::SPtr outfid = Fiff::start_writing_raw(t_fileOut,raw.info, cals/*, picks*/);
     //
