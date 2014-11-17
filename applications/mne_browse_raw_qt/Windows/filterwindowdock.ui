@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>896</width>
-    <height>323</height>
+    <height>341</height>
    </rect>
   </property>
   <property name="allowedAreas">
@@ -61,20 +61,6 @@
            <property name="verticalSpacing">
             <number>6</number>
            </property>
-           <item row="2" column="0">
-            <widget class="QLabel" name="m_label_highpass">
-             <property name="text">
-              <string>Cut-Off High (Hz):</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="m_label_transitionBand">
-             <property name="text">
-              <string>Transition band (Hz):</string>
-             </property>
-            </widget>
-           </item>
            <item row="3" column="1">
             <widget class="QDoubleSpinBox" name="m_doubleSpinBox_transitionband">
              <property name="maximum">
@@ -88,23 +74,17 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
-            <widget class="QDoubleSpinBox" name="m_doubleSpinBox_highpass">
-             <property name="maximum">
-              <double>999.000000000000000</double>
-             </property>
-             <property name="singleStep">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>40.000000000000000</double>
+           <item row="3" column="0">
+            <widget class="QLabel" name="m_label_transitionBand">
+             <property name="text">
+              <string>Transition band (Hz):</string>
              </property>
             </widget>
            </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="m_label_filterType">
+           <item row="2" column="0">
+            <widget class="QLabel" name="m_label_highpass">
              <property name="text">
-              <string>Filter type:</string>
+              <string>Cut-Off High (Hz):</string>
              </property>
             </widget>
            </item>
@@ -133,41 +113,14 @@
              </item>
             </widget>
            </item>
-           <item row="4" column="1">
-            <widget class="QComboBox" name="m_comboBox_filterApplyTo">
-             <item>
-              <property name="text">
-               <string>All</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>MEG</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>EEG</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>ECG</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>EOG</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>EMG</string>
-              </property>
-             </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="m_label_filterType">
+             <property name="text">
+              <string>Filter type:</string>
+             </property>
             </widget>
            </item>
-           <item row="5" column="1">
+           <item row="7" column="1">
             <widget class="QComboBox" name="m_comboBox_filterUndoTo">
              <item>
               <property name="text">
@@ -201,6 +154,79 @@
              </item>
             </widget>
            </item>
+           <item row="2" column="1">
+            <widget class="QDoubleSpinBox" name="m_doubleSpinBox_highpass">
+             <property name="maximum">
+              <double>999.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>1.000000000000000</double>
+             </property>
+             <property name="value">
+              <double>40.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QComboBox" name="m_comboBox_filterApplyTo">
+             <item>
+              <property name="text">
+               <string>All</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>MEG</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>EEG</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>ECG</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>EOG</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>EMG</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="7" column="0">
+            <widget class="QPushButton" name="m_pushButton_undoFiltering">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Undo filter to</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QPushButton" name="m_pushButton_applyFilter">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Apply filter to</string>
+             </property>
+            </widget>
+           </item>
            <item row="1" column="1">
             <widget class="QDoubleSpinBox" name="m_doubleSpinBox_lowpass">
              <property name="maximum">
@@ -214,29 +240,17 @@
              </property>
             </widget>
            </item>
-           <item row="4" column="0">
-            <widget class="QPushButton" name="m_pushButton_applyFilter">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
+           <item row="9" column="0" colspan="2">
+            <widget class="QPushButton" name="m_pushButton_exportFilter">
              <property name="text">
-              <string>Apply filter to</string>
+              <string>Export filter coefficients</string>
              </property>
             </widget>
            </item>
-           <item row="5" column="0">
-            <widget class="QPushButton" name="m_pushButton_undoFiltering">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Undo filter to</string>
+           <item row="8" column="0" colspan="2">
+            <widget class="Line" name="line_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
              </property>
             </widget>
            </item>
@@ -247,24 +261,34 @@
              </property>
             </widget>
            </item>
-           <item row="6" column="0" colspan="2">
-            <widget class="Line" name="line_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="0" colspan="2">
-            <widget class="QPushButton" name="m_pushButton_exportFilter">
+           <item row="4" column="0">
+            <widget class="QLabel" name="label">
              <property name="text">
-              <string>Export filter coefficients</string>
+              <string>Filter taps:</string>
              </property>
             </widget>
            </item>
-           <item row="8" column="0" colspan="2">
+           <item row="10" column="0" colspan="2">
             <widget class="QPushButton" name="m_pushButton_exportPlot">
              <property name="text">
               <string>Export plot</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QSpinBox" name="m_spinBox_filterTaps">
+             <property name="maximum">
+              <number>9999</number>
+             </property>
+             <property name="value">
+              <number>80</number>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0" colspan="2">
+            <widget class="Line" name="line">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
              </property>
             </widget>
            </item>
