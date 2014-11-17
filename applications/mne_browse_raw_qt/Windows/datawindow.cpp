@@ -356,6 +356,9 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
         break;
     }
 
+    if((event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_D))
+        ui->m_tableView_rawTableView->clearSelection();
+
     return QWidget::keyPressEvent(event);
 }
 
