@@ -143,7 +143,6 @@ HEADERS += \
     Windows/chinfowindow.h
 
 FORMS += \
-    Windows/filterwindow.ui \
     Windows/eventwindowdock.ui \
     Windows/datawindowdock.ui \
     Windows/mainwindow.ui \
@@ -152,7 +151,8 @@ FORMS += \
     Windows/selectionmanagerwindow.ui \
     Windows/averagewindow.ui \
     Windows/scalewindow.ui \
-    Windows/chinfowindow.ui
+    Windows/chinfowindow.ui \
+    Windows/filterwindowdock.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

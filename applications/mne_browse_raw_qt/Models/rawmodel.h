@@ -284,6 +284,14 @@ signals:
     */
     void fileLoaded(const FiffInfo&);
 
+    //=========================================================================================================
+    /**
+    * fileLoaded is emitted whenever a file was to be loaded
+    *
+    * @param the currentl assigned operators
+    */
+    void assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOperator> >&);
+
 public slots:
     //=========================================================================================================
     /**
@@ -337,7 +345,7 @@ public slots:
     *
     * @param chdata[in,out] represents the channel data as a RowVectorXd
     */
-    void applyOperatorsConcurrently(QPair<int, RowVectorXd>& chdata);
+    void applyOperatorsConcurrently(QPair<int, RowVectorXd>& chdata) const;
 
     //=========================================================================================================
     /**

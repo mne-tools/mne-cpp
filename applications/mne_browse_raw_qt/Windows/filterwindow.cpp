@@ -56,8 +56,8 @@ using namespace MNEBrowseRawQt;
 //=============================================================================================================
 
 FilterWindow::FilterWindow(QWidget *parent) :
-    QWidget(parent, Qt::Window),
-    ui(new Ui::FilterWindowWidget),
+    QDockWidget(parent),
+    ui(new Ui::FilterWindowDockWidget),
     m_pFilterPlotScene(new FilterPlotScene),
     m_pMainWindow(static_cast<MainWindow*>(parent))
 {
@@ -89,6 +89,7 @@ void FilterWindow::init()
     initButtons();
     initComboBoxes();
     initFilterPlot();
+    initTableViews();
 }
 
 
@@ -157,6 +158,30 @@ void FilterWindow::initComboBoxes()
 void FilterWindow::initFilterPlot()
 {
     ui->m_graphicsView_filterPlot->setScene(m_pFilterPlotScene);
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::initTableViews()
+{
+    ui->m_tableView_activeFilters->setModel(m_pMainWindow->m_pChInfoWindow->getDataModel());
+
+    //Hide columns
+    ui->m_tableView_activeFilters->hideColumn(0);
+    ui->m_tableView_activeFilters->hideColumn(2);
+    ui->m_tableView_activeFilters->hideColumn(3);
+    ui->m_tableView_activeFilters->hideColumn(4);
+    ui->m_tableView_activeFilters->hideColumn(5);
+    ui->m_tableView_activeFilters->hideColumn(6);
+    ui->m_tableView_activeFilters->hideColumn(7);
+    ui->m_tableView_activeFilters->hideColumn(8);
+
+    ui->m_tableView_activeFilters->verticalHeader()->hide();
+
+    ui->m_tableView_activeFilters->resizeColumnsToContents();
+    ui->m_groupBox_activeFilters->adjustSize();
+    ui->m_groupBox_activeFilters->adjustSize();
 }
 
 
