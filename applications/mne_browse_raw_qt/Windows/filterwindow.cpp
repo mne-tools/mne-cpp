@@ -221,7 +221,6 @@ void FilterWindow::resizeEvent(QResizeEvent* event)
 
 void FilterWindow::keyPressEvent(QKeyEvent * event)
 {
-    qDebug()<<"Key pressed"<<event->key();
     if(event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
         applyFilter();
 
@@ -237,9 +236,8 @@ bool FilterWindow::eventFilter(QObject *obj, QEvent *event)
     if(obj == ui->m_doubleSpinBox_highpass || obj == ui->m_doubleSpinBox_lowpass || obj == ui->m_doubleSpinBox_transitionband) {
         if (event->type() == QEvent::KeyPress) {
             QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-            qDebug("Ate key press %d", keyEvent->key());
 
-            if((keyEvent->modifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_Z) || keyEvent->key() == Qt::Key_Delete)
+            if((keyEvent->modifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_Z)/* || keyEvent->key() == Qt::Key_Delete*/)
                 undoFilter();
             else // standard event processing
                 return QObject::eventFilter(obj, event);
@@ -305,32 +303,39 @@ void FilterWindow::filterParametersChanged()
     //User defined filter parameters
     double lowpassHz = ui->m_doubleSpinBox_lowpass->value();
     double highpassHz = ui->m_doubleSpinBox_highpass->value();
-    double center = (lowpassHz+highpassHz)/2;
+
     double trans_width = ui->m_doubleSpinBox_transitionband->value();
+
+//    double bw = highpassHz-lowpassHz;
+//    double center = (lowpassHz+highpassHz)/2;
+
     double bw = highpassHz-lowpassHz;
+    double center = lowpassHz+bw/2;
+
     double samplingFrequency = m_pMainWindow->m_pDataWindow->getDataModel()->m_fiffInfo.sfreq;
+    double nyquistFrequency = samplingFrequency/2;
 
     int filterTaps = ui->m_spinBox_filterTaps->value();
 
     //Update min max of spin boxes to nyquist
-    ui->m_doubleSpinBox_highpass->setMaximum(samplingFrequency/2);
-    ui->m_doubleSpinBox_lowpass->setMaximum(samplingFrequency/2);
+    ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
+    ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
 
     QSharedPointer<MNEOperator> userDefinedFilterOperator;
 
     if(ui->m_comboBox_filterType->currentText() == "Lowpass") {
         userDefinedFilterOperator = QSharedPointer<MNEOperator>(
-                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::LPF,filterTaps,lowpassHz/samplingFrequency,0.2,(double)trans_width/samplingFrequency,(m_iWindowSize+m_iFilterTaps)));
+                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::LPF,filterTaps,lowpassHz/nyquistFrequency,0.2,(double)trans_width/nyquistFrequency,(m_iWindowSize+m_iFilterTaps)));
     }
 
     if(ui->m_comboBox_filterType->currentText() == "Highpass") {
         userDefinedFilterOperator = QSharedPointer<MNEOperator>(
-                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::HPF,filterTaps,highpassHz/samplingFrequency,0.2,(double)trans_width/samplingFrequency,(m_iWindowSize+m_iFilterTaps)));
+                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::HPF,filterTaps,highpassHz/nyquistFrequency,0.2,(double)trans_width/nyquistFrequency,(m_iWindowSize+m_iFilterTaps)));
     }
 
     if(ui->m_comboBox_filterType->currentText() == "Bandpass") {
         userDefinedFilterOperator = QSharedPointer<MNEOperator>(
-                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::BPF,filterTaps,(double)center/samplingFrequency,(double)bw/samplingFrequency,(double)trans_width/samplingFrequency,(m_iWindowSize+m_iFilterTaps)));
+                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::BPF,filterTaps,(double)center/nyquistFrequency,(double)bw/nyquistFrequency,(double)trans_width/nyquistFrequency,(m_iWindowSize+m_iFilterTaps)));
     }
 
     //Replace old with new filter operator

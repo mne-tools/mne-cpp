@@ -354,27 +354,27 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
 
                     switch(filterOperator->m_Type) {
                         case FilterOperator::LPF: {
-                            v.setValue(QString("%1|%2").arg("LP").arg(filterOperator->m_dCenterFreq*m_fiffInfo.sfreq));
+                            v.setValue(QString("%1|%2").arg("LP").arg(filterOperator->m_dCenterFreq*m_fiffInfo.sfreq/2));
                             return v;
                         }
 
                         case FilterOperator::HPF: {
-                            v.setValue(QString("%1|%2").arg("HP").arg(filterOperator->m_dCenterFreq*m_fiffInfo.sfreq));
+                            v.setValue(QString("%1|%2").arg("HP").arg(filterOperator->m_dCenterFreq*m_fiffInfo.sfreq/2));
                             return v;
                         }
 
                         case FilterOperator::BPF: {
                             double fsample = m_fiffInfo.sfreq;
-                            double low = (filterOperator->m_dCenterFreq*fsample) - (filterOperator->m_dBandwidth*fsample/2);
-                            double high = (filterOperator->m_dCenterFreq*fsample) + (filterOperator->m_dBandwidth*fsample/2);
+                            double low = (filterOperator->m_dCenterFreq*fsample/2) - (filterOperator->m_dBandwidth*fsample/4); // /4 because we also need to devide by 2 to get the nyquist freq
+                            double high = (filterOperator->m_dCenterFreq*fsample/2) + (filterOperator->m_dBandwidth*fsample/4);
                             v.setValue(QString("%1|%2|%3").arg("BP").arg(low).arg(high));
                             return v;
                         }
 
                         case FilterOperator::NOTCH: {
                             double fsample = m_fiffInfo.sfreq;
-                            double low = (filterOperator->m_dCenterFreq*fsample) - (filterOperator->m_dBandwidth*fsample/2);
-                            double high = (filterOperator->m_dCenterFreq*fsample) + (filterOperator->m_dBandwidth*fsample/2);
+                            double low = (filterOperator->m_dCenterFreq*fsample/2) - (filterOperator->m_dBandwidth*fsample/4);
+                            double high = (filterOperator->m_dCenterFreq*fsample/2) + (filterOperator->m_dBandwidth*fsample/4);
                             v.setValue(QString("%1|%2|%3").arg("NOTCH").arg(low).arg(high));
                             return v;
                         }

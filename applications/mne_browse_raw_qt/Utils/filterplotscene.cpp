@@ -103,7 +103,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq)
     //Get row vector with filter coefficients
     RowVectorXcd coefficientsAFreq = m_pCurrentFilter->m_dFFTCoeffA;
 
-    int numberCoeff = coefficientsAFreq.cols()/2; //Divide by 2 because we do not want the conjugate complex part
+    int numberCoeff = coefficientsAFreq.cols(); //Divide by 2 because we do not want the conjugate complex part
     int fMax = samplingFreq/2; //nyquist frequency
 
     addRect(-m_iDiagramMarginsHoriz,
@@ -193,7 +193,7 @@ void FilterPlotScene::plotFilterFrequencyResponse()
     //Get row vector with filter coefficients and norm to 1
     RowVectorXcd coefficientsAFreq = m_pCurrentFilter->m_dFFTCoeffA;
 
-    int numberCoeff = coefficientsAFreq.cols()/2; //Divide by 2 because we do not want the conjugate complex part
+    int numberCoeff = coefficientsAFreq.cols(); //Divide by 2 because we do not want the conjugate complex part
 
     double max = 0;
     for(int i = 0; i<numberCoeff; i++)
