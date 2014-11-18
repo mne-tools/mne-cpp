@@ -104,33 +104,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Updates the fiff info
-    *
-    * @param fiffInfo fiff info variabel.
-    */
-    void fiffInfoChanged(const FiffInfo &fiffInfo);
-
-    //=========================================================================================================
-    /**
-    * Updates the layout map
-    *
-    * @param layoutMap the layout map with the 2D positions.
-    */
-    void layoutChanged(const QMap<QString,QPointF> &layoutMap);
-
-    //=========================================================================================================
-    /**
     * Returns the ChInfoModel of this window
     */
     ChInfoModel* getDataModel();
-
-signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever channels where mapped to a layout
-    *
-    */
-    void channelsMappedToLayout(const QStringList &mappedLayoutChNames);
 
 private:
     //=========================================================================================================

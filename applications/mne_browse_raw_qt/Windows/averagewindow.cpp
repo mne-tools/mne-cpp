@@ -89,7 +89,15 @@ AverageModel* AverageWindow::getAverageModel()
 
 void AverageWindow::channelSelectionManagerChanged(const QList<QGraphicsItem*> &selectedChannelItems)
 {
+    //Repaint the average items in the average scene based on the input parameter
     m_pAverageScene->repaintItems(selectedChannelItems);
+
+    //call the onSelection function manually to replot the data for the givven average items
+    onSelectionChanged(ui->m_tableView_loadedSets->selectionModel()->selection(), QItemSelection());
+
+    //fit everything in the view and update the scene
+    ui->m_graphicsView_layout->fitInView(m_pAverageScene->sceneRect(), Qt::KeepAspectRatio);
+    m_pAverageScene->update(m_pAverageScene->sceneRect());
 }
 
 
@@ -97,6 +105,7 @@ void AverageWindow::channelSelectionManagerChanged(const QList<QGraphicsItem*> &
 
 void AverageWindow::scaleAveragedData(const QMap<QString,double> &scaleMap)
 {
+    //Set the scale map received from the scale window
     m_pAverageScene->setScaleMap(scaleMap);
     m_pButterflyScene->setScaleMap(scaleMap);
 }
@@ -126,8 +135,8 @@ void AverageWindow::initTableViewWidgets()
     ui->m_tableView_loadedSets->setColumnHidden(1,true); //hide second column because the average model holds the aspect kind for this column
     ui->m_tableView_loadedSets->setColumnHidden(4,true); //hide last column because the average model holds the data types for this column
     ui->m_tableView_loadedSets->resizeColumnsToContents();
+
     ui->m_tableView_loadedSets->adjustSize();
-    ui->m_tableView_loadedSets->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
     //Set initial selection
     ui->m_tableView_loadedSets->selectionModel()->select(QItemSelection(m_pAverageModel->index(0,0,QModelIndex()), m_pAverageModel->index(0,3,QModelIndex())),
@@ -225,7 +234,6 @@ void AverageWindow::onSelectionChanged(const QItemSelection &selected, const QIt
     }
 
     m_pAverageScene->update();
-    ui->m_graphicsView_layout->fitInView(m_pAverageScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 
     //Draw butterfly plot
     m_pButterflyScene->clear();
@@ -267,7 +275,6 @@ void AverageWindow::onSelectionChanged(const QItemSelection &selected, const QIt
     }
 
     m_pButterflyScene->update();
-    ui->m_graphicsView_butterflyPlot->fitInView(m_pButterflyScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 
@@ -350,4 +357,12 @@ void AverageWindow::exportAverageButterflyPlot()
             image.save(fileName);
         }
     }
+}
+
+
+//*************************************************************************************************************
+
+void AverageWindow::resizeEvent(QResizeEvent *event)
+{
+    Q_UNUSED(event);
 }

@@ -45,6 +45,7 @@
 
 #include "../Utils/rawsettings.h"
 #include "../Utils/types.h"
+#include "../Utils/filteroperator.h"
 
 
 //*************************************************************************************************************
@@ -123,6 +124,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Updates the fiff info
+    *
+    * @param assignedOperators the filter operators which are currently active.
+    */
+    void assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOperator> > &assignedOperators);
+
+    //=========================================================================================================
+    /**
     * Updates the layout map
     *
     * @param layoutMap the layout map with the 2D positions.
@@ -155,6 +164,14 @@ public:
     */
     int getIndexFromMappedChName(QString chName);
 
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever channels where mapped to a layout
+    *
+    */
+    void channelsMappedToLayout(const QStringList &mappedLayoutChNames);
+
 protected:
     //=========================================================================================================
     /**
@@ -175,6 +192,8 @@ protected:
     QMap<QString,QPointF>   m_layoutMap;            /**< The current layout map with a position for all MEG and EEG channels. */
     QStringList             m_aliasNames;           /**< list of given channel aliases. */
     QStringList             m_mappedLayoutChNames;  /**< list of the mapped layout channel names. */
+    QMap<int,QSharedPointer<MNEOperator> >      m_assignedOperators;    /**< Map of MNEOperator types to channels.*/
+
 };
 
 } // NAMESPACE

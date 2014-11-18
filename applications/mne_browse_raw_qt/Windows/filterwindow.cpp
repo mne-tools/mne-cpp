@@ -56,8 +56,8 @@ using namespace MNEBrowseRawQt;
 //=============================================================================================================
 
 FilterWindow::FilterWindow(QWidget *parent) :
-    QWidget(parent, Qt::Window),
-    ui(new Ui::FilterWindowWidget),
+    QDockWidget(parent),
+    ui(new Ui::FilterWindowDockWidget),
     m_pFilterPlotScene(new FilterPlotScene),
     m_pMainWindow(static_cast<MainWindow*>(parent))
 {
@@ -89,6 +89,7 @@ void FilterWindow::init()
     initButtons();
     initComboBoxes();
     initFilterPlot();
+    initTableViews();
 }
 
 
@@ -104,6 +105,14 @@ void FilterWindow::initSpinBoxes()
 
     connect(ui->m_doubleSpinBox_transitionband,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                 this,&FilterWindow::filterParametersChanged);
+
+    connect(ui->m_spinBox_filterTaps,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+                this,&FilterWindow::filterParametersChanged);
+
+    //Intercept events from the spin boxes to get control over key events
+    ui->m_doubleSpinBox_lowpass->installEventFilter(this);
+    ui->m_doubleSpinBox_highpass->installEventFilter(this);
+    ui->m_doubleSpinBox_transitionband->installEventFilter(this);
 }
 
 
@@ -112,10 +121,10 @@ void FilterWindow::initSpinBoxes()
 void FilterWindow::initButtons()
 {
     connect(ui->m_pushButton_applyFilter,&QPushButton::released,
-                this,&FilterWindow::applyFilterToAll);
+                this,&FilterWindow::applyFilter);
 
     connect(ui->m_pushButton_undoFiltering,&QPushButton::released,
-                this,&FilterWindow::undoFilterToAll);
+                this,&FilterWindow::undoFilter);
 
     connect(ui->m_pushButton_exportPlot,&QPushButton::released,
                 this,&FilterWindow::exportFilterPlot);
@@ -140,6 +149,10 @@ void FilterWindow::initComboBoxes()
     ui->m_doubleSpinBox_highpass->setVisible(false);
     ui->m_label_highpass->setVisible(false);
     ui->m_doubleSpinBox_highpass->setEnabled(false);
+
+    //If add filter to channel type combo box changes -> also change combo box for undo filtering
+    connect(ui->m_comboBox_filterApplyTo, &QComboBox::currentTextChanged,
+            ui->m_comboBox_filterUndoTo, &QComboBox::setCurrentText);
 }
 
 
@@ -148,6 +161,30 @@ void FilterWindow::initComboBoxes()
 void FilterWindow::initFilterPlot()
 {
     ui->m_graphicsView_filterPlot->setScene(m_pFilterPlotScene);
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::initTableViews()
+{
+    ui->m_tableView_activeFilters->setModel(m_pMainWindow->m_pChInfoWindow->getDataModel());
+
+    //Hide columns
+    ui->m_tableView_activeFilters->hideColumn(0);
+    ui->m_tableView_activeFilters->hideColumn(2);
+    ui->m_tableView_activeFilters->hideColumn(3);
+    ui->m_tableView_activeFilters->hideColumn(4);
+    ui->m_tableView_activeFilters->hideColumn(5);
+    ui->m_tableView_activeFilters->hideColumn(6);
+    ui->m_tableView_activeFilters->hideColumn(7);
+    ui->m_tableView_activeFilters->hideColumn(8);
+
+    ui->m_tableView_activeFilters->verticalHeader()->hide();
+
+    ui->m_tableView_activeFilters->resizeColumnsToContents();
+    ui->m_groupBox_activeFilters->adjustSize();
+    ui->m_groupBox_activeFilters->adjustSize();
 }
 
 
@@ -177,6 +214,44 @@ void FilterWindow::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
     ui->m_graphicsView_filterPlot->fitInView(m_pFilterPlotScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::keyPressEvent(QKeyEvent * event)
+{
+    qDebug()<<"Key pressed"<<event->key();
+    if(event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+        applyFilter();
+
+    if((event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_Z) || event->key() == Qt::Key_Delete)
+        undoFilter();
+}
+
+
+//*************************************************************************************************************
+
+bool FilterWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    if(obj == ui->m_doubleSpinBox_highpass || obj == ui->m_doubleSpinBox_lowpass || obj == ui->m_doubleSpinBox_transitionband) {
+        if (event->type() == QEvent::KeyPress) {
+            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+            qDebug("Ate key press %d", keyEvent->key());
+
+            if((keyEvent->modifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_Z) || keyEvent->key() == Qt::Key_Delete)
+                undoFilter();
+            else // standard event processing
+                return QObject::eventFilter(obj, event);
+
+            return true;
+        } else {
+            // standard event processing
+            return QObject::eventFilter(obj, event);
+        }
+    }
+
+    return true;
 }
 
 
@@ -235,6 +310,8 @@ void FilterWindow::filterParametersChanged()
     double bw = highpassHz-lowpassHz;
     double samplingFrequency = m_pMainWindow->m_pDataWindow->getDataModel()->m_fiffInfo.sfreq;
 
+    int filterTaps = ui->m_spinBox_filterTaps->value();
+
     //Update min max of spin boxes to nyquist
     ui->m_doubleSpinBox_highpass->setMaximum(samplingFrequency/2);
     ui->m_doubleSpinBox_lowpass->setMaximum(samplingFrequency/2);
@@ -243,17 +320,17 @@ void FilterWindow::filterParametersChanged()
 
     if(ui->m_comboBox_filterType->currentText() == "Lowpass") {
         userDefinedFilterOperator = QSharedPointer<MNEOperator>(
-                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::LPF,m_iFilterTaps,lowpassHz/samplingFrequency,0.2,(double)trans_width/samplingFrequency,(m_iWindowSize+m_iFilterTaps)));
+                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::LPF,filterTaps,lowpassHz/samplingFrequency,0.2,(double)trans_width/samplingFrequency,(m_iWindowSize+m_iFilterTaps)));
     }
 
     if(ui->m_comboBox_filterType->currentText() == "Highpass") {
         userDefinedFilterOperator = QSharedPointer<MNEOperator>(
-                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::HPF,m_iFilterTaps,highpassHz/samplingFrequency,0.2,(double)trans_width/samplingFrequency,(m_iWindowSize+m_iFilterTaps)));
+                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::HPF,filterTaps,highpassHz/samplingFrequency,0.2,(double)trans_width/samplingFrequency,(m_iWindowSize+m_iFilterTaps)));
     }
 
     if(ui->m_comboBox_filterType->currentText() == "Bandpass") {
         userDefinedFilterOperator = QSharedPointer<MNEOperator>(
-                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::BPF,m_iFilterTaps,(double)center/samplingFrequency,(double)bw/samplingFrequency,(double)trans_width/samplingFrequency,(m_iWindowSize+m_iFilterTaps)));
+                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::BPF,filterTaps,(double)center/samplingFrequency,(double)bw/samplingFrequency,(double)trans_width/samplingFrequency,(m_iWindowSize+m_iFilterTaps)));
     }
 
     //Replace old with new filter operator
@@ -272,14 +349,17 @@ void FilterWindow::filterParametersChanged()
 
 //*************************************************************************************************************
 
-void FilterWindow::applyFilterToAll()
+void FilterWindow::applyFilter()
 {
+    //Undo all previous filters first
+    m_pMainWindow->m_pDataWindow->getDataModel()->undoFilter(ui->m_comboBox_filterApplyTo->currentText());
+
     QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pMainWindow->m_pDataWindow->getDataModel()->m_Operators);
 
     while(it.hasNext()) {
         it.next();
         if(it.key() == "User defined (See 'Adjust/Filter')") {
-            m_pMainWindow->m_pDataWindow->getDataModel()->applyOperator(QModelIndexList(),it.value());
+            m_pMainWindow->m_pDataWindow->getDataModel()->applyOperator(QModelIndexList(), it.value(), ui->m_comboBox_filterApplyTo->currentText());
         }
     }
 
@@ -289,9 +369,9 @@ void FilterWindow::applyFilterToAll()
 
 //*************************************************************************************************************
 
-void FilterWindow::undoFilterToAll()
+void FilterWindow::undoFilter()
 {
-    m_pMainWindow->m_pDataWindow->getDataModel()->undoFilter();
+    m_pMainWindow->m_pDataWindow->getDataModel()->undoFilter(ui->m_comboBox_filterUndoTo->currentText());
 
     m_pMainWindow->m_pDataWindow->updateDataTableViews();
 }
