@@ -2314,14 +2314,15 @@ void MainWindow::recieve_save_progress(qint32 current_progress, qint32 finished)
 //*****************************************************************************************************************
 
 void SaveFifFile::save_fif_file(QString source_path, QString save_path, fiff_int_t start_change, fiff_int_t end_change, MatrixXd changes, select_map select_channel_map, RowVectorXi picks)
-{    
+{
     QFile t_fileIn(source_path);
     QFile t_fileOut(save_path);
 
     //   Setup for reading the raw data   
     FiffRawData raw(t_fileIn);
 
-    MatrixXd cals;
+    //ToDO, here was MatrixXd cals instead of RowVectorXd cals, why was it like that, whats the meaning, is it ok now with ROWVECTOR?
+    RowVectorXd cals;
     FiffStream::SPtr outfid = Fiff::start_writing_raw(t_fileOut, raw.info, cals, picks);
 
     //   Set up the reading parameters
@@ -2424,7 +2425,7 @@ void SaveFifFile::save_fif_file(QString source_path, QString save_path, fiff_int
     printf("[done]\n");
 
     outfid->finish_writing_raw();
-    printf("Finished\n");    
+    printf("Finished\n");
 }
 
 //*****************************************************************************************************************
@@ -2662,6 +2663,7 @@ void MainWindow::on_cb_Dicts_currentIndexChanged(const QString &arg1)
 
 void MainWindow::on_rb_adativMp_clicked()
 {
+    ui->cb_Dicts->setEnabled(false);
     ui->lb_info_content->setText("");
     ui->lb_info_content->repaint();
     has_warning = false;
@@ -2863,4 +2865,9 @@ void MainWindow::on_mouse_button_release()
     }
     else
         read_matlab_file_new();
+}
+
+void MainWindow::on_rb_OwnDictionary_clicked()
+{
+    ui->cb_Dicts->setEnabled(true);
 }
