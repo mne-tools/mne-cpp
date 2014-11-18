@@ -74,6 +74,15 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+#include <Eigen/SparseCore>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -257,7 +266,9 @@ protected:
     virtual void run();
 
 private:
-    MatrixXf calibrate(const MatrixXf& data);
+    MatrixXd calibrate(const MatrixXf& data);
+
+    bool readProjectors();
 
     void changeRecordingButton();
 
@@ -295,7 +306,8 @@ private:
     QFile               m_qFileOut;         /**< QFile for writing to fif file.*/
     FiffStream::SPtr    m_pOutfid;          /**< FiffStream to write to.*/
 
-    MatrixXd            m_cals;
+    RowVectorXd             m_cals;
+    SparseMatrix<double>    m_sparseMatCals;
     MatrixXd            proj;               /**< SSP operator to apply to the data. */
 
     bool    m_bIsRunning;

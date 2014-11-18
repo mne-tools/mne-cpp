@@ -1,16 +1,14 @@
 //=============================================================================================================
 /**
-* @file     mneoperator.h
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
+* @file     main.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2014
+* @date     November, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,61 +29,101 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains all MNEOperators.
+* @brief    Example of the computation of a test ssp
 *
 */
-#ifndef MNEOPERATOR_H
-#define MNEOPERATOR_H
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QObject>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MNE INCLUDES
+// INCLUDES
 //=============================================================================================================
 
+#include <fs/label.h>
+#include <fs/surface.h>
+#include <fs/annotationset.h>
+
+#include <fiff/fiff_evoked.h>
 #include <fiff/fiff.h>
+#include <mne/mne.h>
+
+#include <mne/mne_epoch_data_list.h>
+
+#include <mne/mne_sourceestimate.h>
+#include <inverse/minimumNorm/minimumnorm.h>
+
+
+#include <utils/mnemath.h>
+
+#include <iostream>
+
+#include <fstream>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEBrowseRawQt
+// QT INCLUDES
 //=============================================================================================================
 
-namespace MNEBrowseRawQt
-{
+#include <QGuiApplication>
+#include <QSet>
+#include <QElapsedTimer>
+
+//#define BENCHMARK
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace MNELIB;
+using namespace FSLIB;
+using namespace FIFFLIB;
+using namespace UTILSLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// MAIN
+//=============================================================================================================
 
 //=============================================================================================================
 /**
-* DECLARE CLASS MNEOperator
+* The function main marks the entry point of the program.
+* By default, main has the storage class extern.
+*
+* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
 */
-class MNEOperator
+int main(int argc, char *argv[])
 {
-public:
-    enum OperatorType {
-        FILTER,
-        PCA,
-        AVERAGE,
-        UNKNOWN
-    } m_OperatorType;
+    QGuiApplication a(argc, argv);
 
-    MNEOperator();
+    QFile t_fiffFile("ERio_P8.fif");
 
-    MNEOperator(const MNEOperator& obj);
+    //
+    //   Open the file
+    //
+    FiffStream::SPtr p_pStream(new FiffStream(&t_fiffFile));
+    QString t_sFileName = p_pStream->streamName();
 
-    MNEOperator(OperatorType type);
+    printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
 
-    ~MNEOperator();
+    FiffDirTree t_Tree;
+    QList<FiffDirEntry> t_Dir;
 
-    QString m_sName;
-};
+    if(!p_pStream->open(t_Tree, t_Dir))
+        return false;
 
-} // NAMESPACE
+    QList<FiffProj> q_ListProj = p_pStream->read_proj(t_Tree);
 
-#endif // MNEOPERATOR_H
+    if (q_ListProj.size() == 0)
+    {
+        printf("Could not find projectors\n");
+        return false;
+    }
+
+    return a.exec();
+}

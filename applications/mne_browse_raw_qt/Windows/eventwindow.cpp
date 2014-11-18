@@ -55,12 +55,16 @@ using namespace MNEBrowseRawQt;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EventWindow::EventWindow(QWidget *parent) :
-    QDockWidget(parent),
-    ui(new Ui::EventWindowDockWidget),
-    m_pMainWindow(static_cast<MainWindow*>(parent))
+EventWindow::EventWindow(QWidget *parent)
+: QDockWidget(parent)
+, ui(new Ui::EventWindowDockWidget)
+, m_pMainWindow(static_cast<MainWindow*>(parent))
+, m_pColordialog(new QColorDialog(this))
 {
     ui->setupUi(this);
+
+    //hide the color dialog
+    m_pColordialog->hide();
 
     //------------------------
     //--- Setup data model ---
@@ -87,6 +91,8 @@ void EventWindow::init()
     initMVCSettings();
     initCheckBoxes();
     initComboBoxes();
+    initToolButtons();
+    initPushButtons();
 }
 
 
@@ -132,6 +138,7 @@ void EventWindow::initMVCSettings()
 
     //Resize columns to contents
     ui->m_tableView_eventTableView->resizeColumnsToContents();
+    ui->m_tableView_eventTableView->adjustSize();
 
     //Connect selection in event window to jumpEvent slot
     connect(ui->m_tableView_eventTableView->selectionModel(),&QItemSelectionModel::currentRowChanged,
@@ -170,10 +177,9 @@ void EventWindow::initComboBoxes()
     ui->m_comboBox_filterTypes->setCurrentText("All");
 
     //Connect filter types to event model
-    connect(ui->m_comboBox_filterTypes,&QComboBox::currentTextChanged,
-                this,[=](QString string){
-            m_pEventModel->setEventFilterType(string);
-            m_pMainWindow->m_pDataWindow->updateDataTableViews();
+    connect(ui->m_comboBox_filterTypes, &QComboBox::currentTextChanged,[=](QString string){
+        m_pEventModel->setEventFilterType(string);
+        m_pMainWindow->m_pDataWindow->updateDataTableViews();
     });
 
     connect(m_pEventModel,&EventModel::updateEventTypes,
@@ -183,12 +189,48 @@ void EventWindow::initComboBoxes()
 
 //*************************************************************************************************************
 
-void EventWindow::updateComboBox()
+void EventWindow::initToolButtons()
+{
+    QToolBar *toolBar = new QToolBar(this);
+    toolBar->setOrientation(Qt::Vertical);
+    toolBar->setMovable(false);
+
+    //Add event
+    QAction* addEventAction = new QAction(QIcon(":/Resources/Images/addEvent.png"),tr("Add event"), this);
+    addEventAction->setStatusTip(tr("Add an event to the event list"));
+    toolBar->addAction(addEventAction);
+    connect(addEventAction, &QAction::triggered,
+            this, &EventWindow::addEventToEventModel);
+
+    //Remove event
+    QAction* removeEvent = new QAction(QIcon(":/Resources/Images/removeEvent.png"),tr("Remove event"), this);
+    removeEvent->setStatusTip(tr("Remove an event from the event list"));
+    toolBar->addAction(removeEvent);
+    connect(removeEvent, &QAction::triggered,
+            this, &EventWindow::removeEventfromEventModel);
+
+    ui->m_gridLayout_Main->addWidget(toolBar,0,1,1,1);
+}
+
+
+//*************************************************************************************************************
+
+void EventWindow::initPushButtons()
+{
+    connect(ui->m_pushButton_addEventType, &QPushButton::clicked,
+            this, &EventWindow::addNewEventType);
+}
+
+
+//*************************************************************************************************************
+
+void EventWindow::updateComboBox(const QString &currentEventType)
 {
     ui->m_comboBox_filterTypes->clear();
     ui->m_comboBox_filterTypes->addItem("All");
     ui->m_comboBox_filterTypes->addItems(m_pEventModel->getEventTypeList());
-    ui->m_comboBox_filterTypes->setCurrentText("All");
+    if(m_pEventModel->getEventTypeList().contains(currentEventType))
+        ui->m_comboBox_filterTypes->setCurrentText(currentEventType);
 }
 
 
@@ -205,12 +247,8 @@ bool EventWindow::event(QEvent * event)
     //Delete selected row on delete key press event
     if(event->type() == QEvent::KeyPress && ui->m_tableView_eventTableView->hasFocus()) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-        if(keyEvent->key() == Qt::Key_Delete) {
-            QModelIndexList indexList = ui->m_tableView_eventTableView->selectionModel()->selectedIndexes();
-
-            for(int i = 0; i<indexList.size(); i++)
-                m_pEventModel->removeRow(indexList.at(i).row() - i); // - i because the internal data structure gets smaller by one with each succession in this for statement
-       }
+        if(keyEvent->key() == Qt::Key_Delete)
+            removeEventfromEventModel();
     }
 
     return QDockWidget::event(event);
@@ -244,4 +282,34 @@ void EventWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & p
 
         m_pMainWindow->m_pDataWindow->updateDataTableViews();
     }
+}
+
+
+//*************************************************************************************************************
+
+void EventWindow::removeEventfromEventModel()
+{
+    QModelIndexList indexList = ui->m_tableView_eventTableView->selectionModel()->selectedIndexes();
+
+    for(int i = 0; i<indexList.size(); i++)
+        m_pEventModel->removeRow(indexList.at(i).row() - i); // - i because the internal data structure gets smaller by one with each succession in this for statement
+}
+
+
+//*************************************************************************************************************
+
+void EventWindow::addEventToEventModel()
+{
+    m_pEventModel->insertRow(0, QModelIndex());
+}
+
+
+//*************************************************************************************************************
+
+void EventWindow::addNewEventType()
+{
+    //Open add event type dialog
+    m_pEventModel->addNewEventType(QString().number(ui->m_spinBox_addEventType->value()), m_pColordialog->getColor(Qt::black, this));
+    m_pEventModel->setEventFilterType(QString().number(ui->m_spinBox_addEventType->value()));
+    m_pMainWindow->m_pDataWindow->updateDataTableViews();
 }

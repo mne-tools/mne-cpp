@@ -54,6 +54,7 @@
 //=============================================================================================================
 
 #include <QDockWidget>
+#include <QColorDialog>
 
 
 //*************************************************************************************************************
@@ -79,6 +80,7 @@ class MainWindow;
 class EventWindow : public QDockWidget
 {
     Q_OBJECT
+
 public:
     //=========================================================================================================
     /**
@@ -140,9 +142,21 @@ private:
 
     //=========================================================================================================
     /**
+    * Inits all the QCheckBoxes of the event window.
+    */
+    void initToolButtons();
+
+    //=========================================================================================================
+    /**
+    * Inits all the QPushButtons of the event window.
+    */
+    void initPushButtons();
+
+    //=========================================================================================================
+    /**
     * Updates the event filter type combo box whenever a new event file was loaded
     */
-    void updateComboBox();
+    void updateComboBox(const QString &currentEventType);
 
     //=========================================================================================================
     /**
@@ -159,6 +173,7 @@ private:
     EventDelegate*      m_pEventDelegate;           /**< the QAbstractDelegate being part of the event model/view framework of Qt. */
     EventModel*         m_pEventModel;              /**< the QAbstractTable event model being part of the model/view framework of Qt. */
 
+    QColorDialog*       m_pColordialog;             /**< The qt color dialog for changing event type colors.*/
 
 protected slots:
     //=========================================================================================================
@@ -169,6 +184,24 @@ protected slots:
     * @param [in] previous model item focused in the view
     */
     void jumpToEvent(const QModelIndex &current, const QModelIndex &previous);
+
+    //=========================================================================================================
+    /**
+    * jumpToEvent jumps to a event specified in the event table view
+    */
+    void removeEventfromEventModel();
+
+    //=========================================================================================================
+    /**
+    * Adds an event to the event model and its QTableView
+    */
+    void addEventToEventModel();
+
+    //=========================================================================================================
+    /**
+    * call this function whenever a new event type is to be added
+    */
+    void addNewEventType();
 };
 
 } // NAMESPACE MNEBrowseRawQt
