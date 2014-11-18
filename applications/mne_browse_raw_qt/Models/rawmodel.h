@@ -227,11 +227,12 @@ private:
 
     //=========================================================================================================
     /**
-    * calculateMean calculates the mean for all data stored in m_data
+    * calculateMean calculates the mean for all data stored in data (matrix wise)
     *
-    * @param data
+    * @param data the data matrix
+    * @return the means of each row of the input data matrix
     */
-    VectorXd calculateMean(const MatrixXd &data);
+    VectorXd calculateMean(const MatrixXd &dataMat);
 
     //VARIABLES
     //Reload control
