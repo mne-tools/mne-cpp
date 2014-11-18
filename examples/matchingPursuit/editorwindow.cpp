@@ -954,6 +954,10 @@ void EditorWindow::on_rb_NoStepModu_toggled(bool checked)
 {
     if(checked) ui->lb_StartValueModu->setText("value:");
     else ui->lb_StartValueModu->setText("start value:");
+
+    ui->dspb_LinStepModu->setEnabled(false);
+    ui->dspb_ExpStepModu->setEnabled(false);
+
     ui->lb_EndValueModu->setDisabled(checked);
     if(!checked)
     {
@@ -973,6 +977,7 @@ void EditorWindow::on_rb_NoStepModu_toggled(bool checked)
 void EditorWindow::on_rb_LinStepModu_toggled(bool checked)
 {
     if(checked) linStepWidthModu = ui->dspb_LinStepModu->value();
+    ui->dspb_LinStepModu->setEnabled(true);
     calc_modu_value();
 }
 
@@ -981,6 +986,7 @@ void EditorWindow::on_rb_LinStepModu_toggled(bool checked)
 void EditorWindow::on_rb_ExpStepModu_toggled(bool checked)
 {
     if(checked) expStepWidthModu = ui->dspb_ExpStepModu->value();
+    ui->dspb_ExpStepModu->setEnabled(true);
     calc_modu_value();
 }
 
