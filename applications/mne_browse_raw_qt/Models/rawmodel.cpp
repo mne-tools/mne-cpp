@@ -889,6 +889,7 @@ void RawModel::updateOperatorsConcurrently()
     QList<int> listFilteredChs = m_assignedOperators.keys();
     m_listTmpChData.clear();
 
+    //get the rows which are to be filtered out of the m_data matrix. Note that this is done windows wise, hence jumps in the filteres signal might be visible
     for(qint32 i=0; i < listFilteredChs.size(); ++i) {
         if(m_bReloadBefore)
             m_listTmpChData.append(QPair<int,RowVectorXd>(listFilteredChs[i],m_data.first().row(listFilteredChs[i])));
