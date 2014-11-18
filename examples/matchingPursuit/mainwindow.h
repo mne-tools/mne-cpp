@@ -547,6 +547,8 @@ private slots:
     void on_actionBeenden_triggered();
     void on_mouse_button_release();
 
+    void on_rb_OwnDictionary_clicked();
+
 signals:
 
     void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, bool fix_phase, qint32 boost, qint32 simplex_it,
