@@ -1654,17 +1654,20 @@ void MainWindow::calc_thread_finished()
     qreal correlation = 0;
     qreal divisor_sig = 0;
     qreal divisor_app = 0;
-
+    MatrixXd sig_no_mean = (_signal_matrix.array() - _signal_matrix.mean()).matrix();
+    MatrixXd app_no_mean = (_atom_sum_matrix.array() - _atom_sum_matrix.mean()).matrix();
     for(qint32 channel = 0; channel < _atom_sum_matrix.cols(); channel++)
     {
-        correlation += _signal_matrix.col(channel).dot(_atom_sum_matrix.col(channel));
-        divisor_sig += _signal_matrix.col(channel).dot(_signal_matrix.col(channel));
-        divisor_app += _atom_sum_matrix.col(channel).dot(_atom_sum_matrix.col(channel));
-
+        correlation += sig_no_mean.col(channel).dot(app_no_mean.col(channel));
+        divisor_sig += sig_no_mean.col(channel).dot(sig_no_mean.col(channel));
+        divisor_app += app_no_mean.col(channel).dot(app_no_mean.col(channel));
     }
 
     qreal divisor = sqrt(divisor_app * divisor_sig);
     correlation /= divisor;
+    correlation *= 1000;
+    qint32 corr = correlation;
+    correlation = qreal(corr) / 1000;
     cout << "\ncorrelation:  "<<correlation;
     ui->lb_figure_of_merit->setText(QString("FOM: %1").arg((QString::number(correlation, 'f', 3))));
     ui->lb_figure_of_merit->setHidden(false);
@@ -2841,6 +2844,8 @@ void GraphWindow::wheelEvent(QWheelEvent *event)
 
 void MainWindow::on_mouse_button_release()
 {
+    if(QString::compare(ui->btt_Calc->text(), "cancel", Qt::CaseInsensitive) == 0 || QString::compare(ui->btt_Calc->text(), "wait...", Qt::CaseInsensitive) == 0)
+        return;
     read_fiff_changed = true;
 
     ui->dsb_from->setValue(_from / _sample_rate + _offset_time);
