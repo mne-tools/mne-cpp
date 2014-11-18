@@ -350,3 +350,4 @@ bin/mne_browse_raw_qt.app/Contents/PkgInfo
 /tools/mne-cpp_installer/windows/packages/org.mne_cpp.suite.mne/data/MNE/libs/*.dll
 /tools/mne-cpp_installer/windows/packages/org.mne_cpp.suite.mne_browse_raw_qt/data/mne_browse_raw_qt/*.dll
 /tools/mne-cpp_installer/windows/packages/org.mne_cpp.suite.mne_browse_raw_qt/data/mne_browse_raw_qt/*.exe
+/bin/ERio_P8.fif.gz

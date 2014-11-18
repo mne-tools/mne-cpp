@@ -162,6 +162,9 @@ QVariant AverageModel::data(const QModelIndex &index, int role) const
                     v.setValue(m_pEvokedDataSet->evoked.at(index.row()).comment);
                     return v;
                     break;
+
+                case Qt::TextAlignmentRole:
+                    return Qt::AlignHCenter + Qt::AlignVCenter;
             }
         }//end column check
 
@@ -179,6 +182,9 @@ QVariant AverageModel::data(const QModelIndex &index, int role) const
                     v.setValue(m_pEvokedDataSet->evoked.at(index.row()).aspect_kind);
                     return v;
                     break;
+
+                case Qt::TextAlignmentRole:
+                    return Qt::AlignHCenter + Qt::AlignVCenter;
             }
         }//end column check
 
@@ -196,6 +202,9 @@ QVariant AverageModel::data(const QModelIndex &index, int role) const
                 v.setValue(m_pEvokedDataSet->evoked.at(index.row()).first);
                 return v;
                 break;
+
+            case Qt::TextAlignmentRole:
+                return Qt::AlignHCenter + Qt::AlignVCenter;
             }
         }//end column check
 
@@ -213,6 +222,9 @@ QVariant AverageModel::data(const QModelIndex &index, int role) const
                 v.setValue(m_pEvokedDataSet->evoked.at(index.row()).last);
                 return v;
                 break;
+
+            case Qt::TextAlignmentRole:
+                return Qt::AlignHCenter + Qt::AlignVCenter;
             }
         }//end column check
 
@@ -247,6 +259,9 @@ QVariant AverageModel::data(const QModelIndex &index, int role) const
                     projections.second = m_pEvokedDataSet->evoked.at(index.row()).proj.cols();
                     v.setValue(projections);
                     break;
+
+                case Qt::TextAlignmentRole:
+                    return Qt::AlignHCenter + Qt::AlignVCenter;
             }
 
             return v;

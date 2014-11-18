@@ -45,6 +45,7 @@
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 #include <fiff/fiff.h>
+#include "filteroperator.h"
 
 
 //*************************************************************************************************************
@@ -54,6 +55,7 @@
 
 #include <QPair>
 #include <QList>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -104,8 +106,11 @@ namespace ChInfoModelRoles
                   GetChUnit = Qt::UserRole + 1014,
                   GetChAlias = Qt::UserRole + 1015,
                   GetChPosition = Qt::UserRole + 1016,
-                  GetChDigitizer = Qt::UserRole + 1017};
+                  GetChDigitizer = Qt::UserRole + 1017,
+                  GetChActiveFilter = Qt::UserRole + 1018,};
 }
+
+} //NAMESPACE
 
 Q_DECLARE_METATYPE(FIFFLIB::fiff_int_t);
 Q_DECLARE_METATYPE(MNEBrowseRawQt::RowVectorPairF);
@@ -113,7 +118,6 @@ Q_DECLARE_METATYPE(const FIFFLIB::FiffInfo*);
 Q_DECLARE_METATYPE(MNEBrowseRawQt::MatrixXdR);
 Q_DECLARE_METATYPE(MNEBrowseRawQt::RowVectorPair);
 Q_DECLARE_METATYPE(QList<MNEBrowseRawQt::RowVectorPair>);
-
-} //NAMESPACE
+Q_DECLARE_METATYPE(QSharedPointer<MNEBrowseRawQt::MNEOperator>);
 
 #endif // TYPES_H
