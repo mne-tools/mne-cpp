@@ -130,6 +130,6 @@ RowVectorXd FilterOperator::applyFFTFilter(RowVectorXd& data)
     RowVectorXd t_filteredTime;
     fft.inv(t_filteredTime,t_filteredFreq);
 
-    //cuts off ends at front and end and return result
-    return t_filteredTime.segment(m_iFilterOrder/2+1,m_iFFTlength-(m_iFilterOrder/2));
+    //cuts off ends at front and end and return result. segment(i,n): Block containing n elements, starting at position i
+    return t_filteredTime.segment(m_iFilterOrder/2+1,data.cols());
 }
