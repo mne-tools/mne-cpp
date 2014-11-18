@@ -317,6 +317,8 @@ void FilterWindow::filterParametersChanged()
     int exp = ceil(log2(fftLength));
     fftLength = pow(2, exp);
 
+    ui->m_label_fftLength->setText(QString().number(fftLength));
+
     //Update min max of spin boxes to nyquist
     ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
     ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
