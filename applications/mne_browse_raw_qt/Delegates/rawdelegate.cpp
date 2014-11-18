@@ -318,6 +318,8 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
 
     QColor colorTemp;
 
+    QMap<int, QColor> eventTypeColor = m_pEventModel->getEventTypeColors();
+
     if(!m_bShowSelectedEventsOnly) { //Plot all events
         for(int i = 0; i<m_pEventModel->rowCount(); i++) {
             int sampleValue = m_pEventModel->data(m_pEventModel->index(i,0)).toInt();
@@ -325,43 +327,7 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
 
             if(sampleValue>=sampleRangeLow && sampleValue<=sampleRangeHigh) {
                 //Set color for pen depending on current event type
-                switch(type) {
-                    default:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_default", QColor(Qt::black)).value<QColor>());
-                    break;
-
-                    case 1:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_1", QColor(Qt::black)).value<QColor>());
-                    break;
-
-                    case 2:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_2", QColor(Qt::magenta)).value<QColor>());
-                    break;
-
-                    case 3:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_3", QColor(Qt::green)).value<QColor>());
-                    break;
-
-                    case 4:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_4", QColor(Qt::red)).value<QColor>());
-                    break;
-
-                    case 5:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_5", QColor(Qt::cyan)).value<QColor>());
-                    break;
-
-                    case 32:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_32", QColor(Qt::yellow)).value<QColor>());
-                    break;
-
-                    case 998:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_998", QColor(Qt::darkBlue)).value<QColor>());
-                    break;
-
-                    case 999:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_999", QColor(Qt::darkCyan)).value<QColor>());
-                    break;
-                }
+                pen.setColor(eventTypeColor.value(type, Qt::black));
 
                 colorTemp = pen.color();
                 colorTemp.setAlpha(EVENT_MARKER_OPACITY);
@@ -386,43 +352,7 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
                 //qDebug()<<"currentRow"<<currentRow<<"sampleValue"<<sampleValue<<"sampleRangeLow"<<sampleRangeLow<<"sampleRangeHigh"<<sampleRangeHigh;
 
                 //Set color for pen depending on current event type
-                switch(type) {
-                    default:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_default", QColor(Qt::black)).value<QColor>());
-                    break;
-
-                    case 1:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_1", QColor(Qt::black)).value<QColor>());
-                    break;
-
-                    case 2:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_2", QColor(Qt::magenta)).value<QColor>());
-                    break;
-
-                    case 3:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_3", QColor(Qt::green)).value<QColor>());
-                    break;
-
-                    case 4:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_4", QColor(Qt::red)).value<QColor>());
-                    break;
-
-                    case 5:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_5", QColor(Qt::cyan)).value<QColor>());
-                    break;
-
-                    case 32:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_32", QColor(Qt::yellow)).value<QColor>());
-                    break;
-
-                    case 998:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_998", QColor(Qt::darkBlue)).value<QColor>());
-                    break;
-
-                    case 999:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_999", QColor(Qt::darkCyan)).value<QColor>());
-                    break;
-                }
+                pen.setColor(eventTypeColor.value(type, Qt::black));
 
                 colorTemp = pen.color();
                 colorTemp.setAlpha(EVENT_MARKER_OPACITY);

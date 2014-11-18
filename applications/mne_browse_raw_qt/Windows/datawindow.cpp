@@ -531,15 +531,9 @@ void DataWindow::setMarkerSampleLabel()
     m_pCurrentDataMarkerLabel->setText(numberString);
 
     m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() + (DATA_MARKER_WIDTH/2) - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
-}
 
-
-//*************************************************************************************************************
-
-void DataWindow::addEventToEventModel()
-{
+    //Set current marker posisiton in event model
     m_pMainWindow->m_pEventWindow->getEventModel()->setCurrentMarkerPos(m_iCurrentMarkerSample);
-    m_pMainWindow->m_pEventWindow->getEventModel()->insertRow(0, QModelIndex());
 }
 
 

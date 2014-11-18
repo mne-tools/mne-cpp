@@ -11,5 +11,8 @@
         <file alias="addDC.png">Resources/Images/Icons/addDC.png</file>
         <file alias="removeDC.png">Resources/Images/Icons/removeDC.png</file>
         <file alias="showFilterWindow.png">Resources/Images/Icons/showFilterWindow.png</file>
+        <file alias="addAverage.png">Resources/Images/Icons/addAverage.png</file>
+        <file alias="removeAverage.pmg">Resources/Images/Icons/removeAverage.png</file>
+        <file alias="removeEvent.png">Resources/Images/Icons/removeEvent.png</file>
     </qresource>
 </RCC>
