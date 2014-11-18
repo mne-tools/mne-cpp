@@ -131,5 +131,5 @@ RowVectorXd FilterOperator::applyFFTFilter(RowVectorXd& data)
     fft.inv(t_filteredTime,t_filteredFreq);
 
     //cuts off ends at front and end and return result
-    return t_filteredTime.segment(m_iFilterOrder/2+1,m_iFFTlength-m_iFilterOrder);
+    return t_filteredTime.segment(m_iFilterOrder/2+1,m_iFFTlength-(m_iFilterOrder/2));
 }

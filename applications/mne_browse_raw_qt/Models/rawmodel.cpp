@@ -295,7 +295,7 @@ QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role
 void RawModel::genStdFilterOps()
 {
     //clear operators
-    m_Operators.clear();
+    //m_Operators.clear();
 
     //regenerate them with the correct sampling frequency (only required for naming of filter)
     double sfreq = (m_fiffInfo.sfreq>=0) ? m_fiffInfo.sfreq : 600.0;
@@ -326,8 +326,11 @@ void RawModel::genStdFilterOps()
 
     //Own/manual set filter - only an entry i nthe operator list generated which is called when the filterwindow is used
     cutoffFreqHz = 40;
-    name = QString("User defined (See 'Adjust/Filter')");
-    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
+    //only create if filter does not exist yet
+    if(!m_Operators.contains(QString("User defined (See 'Adjust/Filter')"))) {
+        name = QString("User defined (See 'Adjust/Filter')");
+        m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
+    }
 
     //**********
     //filter debugging -> store filter coefficients to plain text file
@@ -489,8 +492,8 @@ void RawModel::resetPosition(qint32 position)
 
     endResetModel();
 
-    if(!(m_iAbsFiffCursor<=firstSample()))
-        updateScrollPos(m_iCurAbsScrollPos-firstSample()); //little hack: if the m_iCurAbsScrollPos is now close to the edge -> force reloading w/o scrolling
+//    if(!(m_iAbsFiffCursor<=firstSample()))
+//        updateScrollPos(m_iCurAbsScrollPos-firstSample()); //little hack: if the m_iCurAbsScrollPos is now close to the edge -> force reloading w/o scrolling
 
     qDebug() << "RawModel: Model Position RESET, samples from " << m_iAbsFiffCursor << "to" << m_iAbsFiffCursor+m_iWindowSize-1 << "reloaded.";
 
@@ -517,7 +520,7 @@ void RawModel::reloadFiffData(bool before)
             qDebug() << "RawModel: Start of fiff file reached.";
 
             m_iAbsFiffCursor = firstSample();
-            resetPosition(m_iAbsFiffCursor);
+            //resetPosition(m_iAbsFiffCursor);
             return;
         }
     }
@@ -568,16 +571,27 @@ QPair<MatrixXd,MatrixXd> RawModel::readSegment(fiff_int_t from, fiff_int_t to)
 
 //*************************************************************************************************************
 
-VectorXd RawModel::calculateMean(const MatrixXd &data)
+VectorXd RawModel::calculateMean(const MatrixXd &dataMat)
 {
-    VectorXd channelMeans(data.rows());
+    VectorXd returnVector;
 
-    for(int i = 0; i<channelMeans.rows(); i++)
-    {
-        channelMeans[i] = data.row(i).mean();
+    if(dataMat.cols() == 1) { //operate only on one single vector
+        VectorXd channelMean(1);
+
+        channelMean[0] = dataMat.mean();
+
+        returnVector = channelMean;
+    }
+    else { //operate on a matrix
+        VectorXd channelMeans(dataMat.rows());
+    
+        for(int i = 0; i<channelMeans.rows(); i++)
+            channelMeans[i] = dataMat.row(i).mean();
+
+        returnVector = channelMeans;
     }
 
-    return channelMeans;
+    return returnVector;
 }
 
 
@@ -650,6 +664,9 @@ void RawModel::applyOperator(QModelIndex chan, const QSharedPointer<MNEOperator>
             tmp = m_procData[j].row(chan.row());
 
         m_procData[j].row(chan.row()) = filter->applyFFTFilter(tmp);
+
+        //calculate mean for the current row
+        m_procDataMean[j].row(chan.row()) = calculateMean(m_procData[j].row(chan.row()));
     }
 
     //adds filtered channel to m_assignedOperators
@@ -929,11 +946,11 @@ void RawModel::insertProcessedData(int index)
 
     if(m_bReloadBefore) {
         m_procData.first().row(listFilteredChs[index]) = m_listTmpChData[index].second;
-        m_procDataMean.first() = calculateMean(m_procData.first());
+        m_procDataMean.first().row(listFilteredChs[index]) = calculateMean(m_procData.first()).row(listFilteredChs[index]);
     }
     else {
         m_procData.last().row(listFilteredChs[index]) = m_listTmpChData[index].second;
-        m_procDataMean.last() = calculateMean(m_procData.last());
+        m_procDataMean.last().row(listFilteredChs[index]) = calculateMean(m_procData.last()).row(listFilteredChs[index]);
     }
 
     emit dataChanged(createIndex(listFilteredChs[index],1),createIndex(listFilteredChs[index],1));
