@@ -46,7 +46,6 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QLabel>
 #include <QGridLayout>
 
 #include <QDebug>
@@ -77,13 +76,18 @@ void ProjectorWidget::createUI()
 {
     if(m_pFiffInfo)
     {
+        m_qListCheckBox.clear();
         // Projection Selection
-
         QGridLayout *topLayout = new QGridLayout;
         for(qint32 i = 0; i < m_pFiffInfo->projs.size(); ++i)
         {
-            QLabel *label = new QLabel(m_pFiffInfo->projs[i].desc);
-            topLayout->addWidget(label, i, 0);
+            QCheckBox* checkBox = new QCheckBox(m_pFiffInfo->projs[i].desc);
+            checkBox->setChecked(m_pFiffInfo->projs[i].active);
+
+            m_qListCheckBox.append(checkBox);
+
+            connect(checkBox, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged), this, &ProjectorWidget::checkStatusChanged);
+            topLayout->addWidget(checkBox, i, 1);
         }
 
         setLayout(topLayout);
@@ -91,7 +95,19 @@ void ProjectorWidget::createUI()
 
 
 
+}
 
+
+//*************************************************************************************************************
+
+void ProjectorWidget::checkStatusChanged(int status)
+{
+    Q_UNUSED(status)
+
+    for(qint32 i = 0; i < m_qListCheckBox.size(); ++i)
+        this->m_pFiffInfo->projs[i].active = m_qListCheckBox[i]->isChecked();
+
+    emit projectorSelectionChanged();
 }
 
 

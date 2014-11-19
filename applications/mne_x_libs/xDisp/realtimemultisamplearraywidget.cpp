@@ -475,10 +475,15 @@ void RealTimeMultiSampleArrayWidget::showProjectionWidget()
 {
     if(m_pRTMSA->info())
     {
-        for(qint32 i = 0; i < m_pRTMSA->info()->projs.size(); ++i)
+        if(!m_pProjectorSelectionWidget)
         {
-            qDebug() << "Projection " << m_pRTMSA->info()->projs[i].desc;
+            m_pProjectorSelectionWidget = QSharedPointer<ProjectorWidget>(new ProjectorWidget);
+
+            m_pProjectorSelectionWidget->setFiffInfo(m_pRTMSA->info());
         }
+
+
+        m_pProjectorSelectionWidget->show();
     }
 }
 
