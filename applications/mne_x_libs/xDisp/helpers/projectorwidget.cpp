@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the SensorWidget Class.
+* @brief    Implementation of the ProjectorWidget Class.
 *
 */
 
@@ -92,9 +92,6 @@ void ProjectorWidget::createUI()
 
         setLayout(topLayout);
     }
-
-
-
 }
 
 
@@ -107,7 +104,17 @@ void ProjectorWidget::checkStatusChanged(int status)
     for(qint32 i = 0; i < m_qListCheckBox.size(); ++i)
         this->m_pFiffInfo->projs[i].active = m_qListCheckBox[i]->isChecked();
 
-    emit projectorSelectionChanged();
+    //
+    //   Create the projector
+    //
+
+    MatrixXd proj;
+    this->m_pFiffInfo->make_projector(proj);
+
+    qDebug() << "Projection Calculate";
+
+
+//    emit projectorChanged(proj);
 }
 
 
