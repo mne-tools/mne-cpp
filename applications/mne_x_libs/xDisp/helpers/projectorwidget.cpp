@@ -111,10 +111,9 @@ void ProjectorWidget::checkStatusChanged(int status)
     MatrixXd proj;
     this->m_pFiffInfo->make_projector(proj);
 
-    qDebug() << "Projection Calculate";
+    qDebug() << "New projection calculated.";
 
-
-//    emit projectorChanged(proj);
+    emit projectorChanged(proj);
 }
 
 

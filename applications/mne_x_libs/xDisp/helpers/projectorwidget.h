@@ -113,7 +113,7 @@ public:
     void setFiffInfo(FiffInfo::SPtr& p_pFiffInfo);
 
 signals:
-//    void projectorChanged(Eigen::MatrixXd proj);
+    void projectorChanged(Eigen::MatrixXd proj);
 
 private:
     void checkStatusChanged(int state);
@@ -123,5 +123,10 @@ private:
 };
 
 } // NAMESPACE
+
+#ifndef metatype_matrixxd
+#define metatype_matrixxd
+Q_DECLARE_METATYPE(Eigen::MatrixXd);    /**< Provides QT META type declaration of the Eigen::MatrixXd type. For signal/slot usage.*/
+#endif
 
 #endif // PROJECTORWIDGET_H
