@@ -133,19 +133,33 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     connect(m_pSpinBoxTimeScale, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &RealTimeMultiSampleArrayWidget::timeWindowChanged);
     addDisplayWidget(m_pSpinBoxTimeScale);
 
-    m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F12)"),this);
-    m_pActionSelectSensors->setShortcut(tr("F12"));
-    m_pActionSelectSensors->setStatusTip(tr("Shows the region selection widget (F12)"));
+    m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F10)"),this);
+    m_pActionSelectSensors->setShortcut(tr("F10"));
+    m_pActionSelectSensors->setStatusTip(tr("Shows the region selection widget (F10)"));
     m_pActionSelectSensors->setVisible(false);
     connect(m_pActionSelectSensors, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showSensorSelectionWidget);
     addDisplayAction(m_pActionSelectSensors);
 
     m_pActionChScaling = new QAction(QIcon(":/images/channelScaling.png"), tr("Shows the channel scaling widget (F11)"),this);
     m_pActionChScaling->setShortcut(tr("F11"));
-    m_pActionChScaling->setStatusTip(tr("Shows the covariance modality selection widget (F11)"));
+    m_pActionChScaling->setStatusTip(tr("Shows the channel scaling widget (F11)"));
     connect(m_pActionChScaling, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showChScalingWidget);
     addDisplayAction(m_pActionChScaling);
     m_pActionChScaling->setVisible(false);
+
+
+    m_pActionProjection = new QAction(QIcon(":/images/iconSSP.png"), tr("Shows the SSP widget (F12)"),this);
+    m_pActionProjection->setShortcut(tr("F12"));
+    m_pActionProjection->setStatusTip(tr("Shows the SSP widget (F12)"));
+    connect(m_pActionProjection, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showProjectionWidget);
+    addDisplayAction(m_pActionProjection);
+    m_pActionProjection->setVisible(true);
+
+
+
+
+
+
 
     if(m_pTableView)
         delete m_pTableView;
@@ -452,6 +466,20 @@ void RealTimeMultiSampleArrayWidget::timeWindowChanged(int T)
 {
     m_iT = T;
     m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, T, m_fDesiredSamplingRate);
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayWidget::showProjectionWidget()
+{
+    if(m_pRTMSA->info())
+    {
+        for(qint32 i = 0; i < m_pRTMSA->info()->projs.size(); ++i)
+        {
+            qDebug() << "Projection " << m_pRTMSA->info()->projs[i].desc;
+        }
+    }
 }
 
 
