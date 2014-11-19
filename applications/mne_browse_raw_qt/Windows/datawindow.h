@@ -240,6 +240,8 @@ private:
 
     QStringList     m_slSelectedChannels;           /**< the currently selected channels from the selection manager window. */
 
+    bool            m_bHideBadChannels;             /**< hide bad channels flag. */
+
 signals:
     //=========================================================================================================
     /**
