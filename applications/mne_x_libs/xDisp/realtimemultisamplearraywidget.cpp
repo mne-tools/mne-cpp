@@ -473,7 +473,7 @@ void RealTimeMultiSampleArrayWidget::timeWindowChanged(int T)
 
 void RealTimeMultiSampleArrayWidget::showProjectionWidget()
 {
-    if(m_pRTMSA->info())
+    if(m_pRTMSA->info() && m_pRTMSA->info()->projs.size() > 0)
     {
         if(!m_pProjectorSelectionWidget)
         {
