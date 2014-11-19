@@ -49,6 +49,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QCheckBox>
 #include <QWidget>
 #include <QGraphicsView>
 #include <QGraphicsScene>
@@ -96,10 +97,14 @@ public:
     void setFiffInfo(FIFFLIB::FiffInfo::SPtr& p_pFiffInfo);
 
 signals:
-    void projectionChanged();
+    void projectorSelectionChanged();
 
 private:
-    FIFFLIB::FiffInfo::SPtr     m_pFiffInfo;   /**< Connected fiff info. */
+    void checkStatusChanged(int state);
+
+    QList<QCheckBox*>           m_qListCheckBox;    /**< List of CheckBox. */
+
+    FIFFLIB::FiffInfo::SPtr     m_pFiffInfo;        /**< Connected fiff info. */
 };
 
 } // NAMESPACE
