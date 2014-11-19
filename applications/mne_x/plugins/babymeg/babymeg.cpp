@@ -414,6 +414,12 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
 {
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(p_FiffInfo));
 
+    if(!readProjectors())
+    {
+        qDebug() << "Not able to read projectors";
+        return;
+    }
+
     m_iBufferSize = pInfo->dataLength;
     sfreq = pInfo->sfreq;
 
@@ -584,18 +590,18 @@ bool BabyMEG::readProjectors()
     //
     //   Open the file
     //
-    FiffStream::SPtr p_pStream(new FiffStream(&t_headerFiffFile));
-    QString t_sFileName = p_pStream->streamName();
+    FiffStream::SPtr t_pStream(new FiffStream(&t_headerFiffFile));
+    QString t_sFileName = t_pStream->streamName();
 
     printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
 
     FiffDirTree t_Tree;
     QList<FiffDirEntry> t_Dir;
 
-    if(!p_pStream->open(t_Tree, t_Dir))
+    if(!t_pStream->open(t_Tree, t_Dir))
         return false;
 
-    QList<FiffProj> q_ListProj = p_pStream->read_proj(t_Tree);
+    QList<FiffProj> q_ListProj = t_pStream->read_proj(t_Tree);
 
     if (q_ListProj.size() == 0)
     {
@@ -604,6 +610,9 @@ bool BabyMEG::readProjectors()
     }
 
     m_pFiffInfo->projs = q_ListProj;
+
+    //garbage collecting
+    t_pStream->device()->close();
 
     return true;
 }
