@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
 {
     QGuiApplication a(argc, argv);
 
-    QFile t_fiffFile("ERio_P8.fif");
+    QFile t_fiffFile(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/header.fif");
 
     //
     //   Open the file
