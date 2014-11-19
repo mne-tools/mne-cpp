@@ -125,6 +125,7 @@ void DataWindow::scaleData(const QMap<QString,double> &scaleMap)
     updateDataTableViews();
 }
 
+
 //*************************************************************************************************************
 
 void DataWindow::updateDataTableViews()
@@ -137,6 +138,8 @@ void DataWindow::updateDataTableViews()
 
 void DataWindow::showSelectedChannelsOnly(QStringList selectedChannels)
 {
+    m_slSelectedChannels = selectedChannels;
+
     //Hide non selected channels/rows in the data views
     for(int i = 0; i<m_pRawModel->rowCount(); i++) {
         QModelIndex index = m_pRawModel->index(i, 0);
@@ -160,6 +163,28 @@ void DataWindow::changeRowHeight(int height)
 {
     for(int i = 0; i<ui->m_tableView_rawTableView->verticalHeader()->count(); i++)
         ui->m_tableView_rawTableView->setRowHeight(i, height);
+
+    updateDataTableViews();
+}
+
+
+//*************************************************************************************************************
+
+void DataWindow::hideBadChannels(bool hideChannels)
+{
+    //Hide non selected channels/rows in the data views
+    for(int i = 0; i<m_pRawModel->rowCount(); i++) {
+        QVariant v = m_pRawModel->data(m_pRawModel->index(i,1),Qt::BackgroundRole);
+        QString chName = m_pRawModel->data(m_pRawModel->index(i,0),Qt::DisplayRole).toString();
+
+        //Check if channel is marked as bad
+        if(v.canConvert<QBrush>() && hideChannels)
+            ui->m_tableView_rawTableView->hideRow(i);
+        else if(m_slSelectedChannels.contains(chName))
+            ui->m_tableView_rawTableView->showRow(i);
+    }
+
+    updateDataTableViews();
 }
 
 

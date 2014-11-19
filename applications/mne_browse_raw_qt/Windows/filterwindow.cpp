@@ -55,11 +55,11 @@ using namespace MNEBrowseRawQt;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FilterWindow::FilterWindow(QWidget *parent) :
-    QDockWidget(parent),
-    ui(new Ui::FilterWindowDockWidget),
-    m_pFilterPlotScene(new FilterPlotScene),
-    m_pMainWindow(static_cast<MainWindow*>(parent))
+FilterWindow::FilterWindow(MainWindow *mainWindow, QWidget *parent)
+: QDockWidget(parent)
+, ui(new Ui::FilterWindowDockWidget)
+, m_pFilterPlotScene(new FilterPlotScene)
+, m_pMainWindow(mainWindow)
 {
     ui->setupUi(this);
 
@@ -67,6 +67,7 @@ FilterWindow::FilterWindow(QWidget *parent) :
     initButtons();
     initComboBoxes();
     initFilterPlot();
+    initTableViews();
 
     m_iWindowSize = MODEL_WINDOW_SIZE;
     m_iFilterTaps = MODEL_NUM_FILTER_TAPS;
@@ -83,13 +84,16 @@ FilterWindow::~FilterWindow()
 
 //*************************************************************************************************************
 
-void FilterWindow::init()
+void FilterWindow::newFileLoaded()
 {
-    initSpinBoxes();
-    initButtons();
-    initComboBoxes();
-    initFilterPlot();
-    initTableViews();
+    filterParametersChanged();
+
+    //Update min max of spin boxes to nyquist
+    double samplingFrequency = m_pMainWindow->m_pDataWindow->getDataModel()->m_fiffInfo.sfreq;
+    double nyquistFrequency = samplingFrequency/2;
+
+    ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
+    ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
 }
 
 
@@ -318,10 +322,6 @@ void FilterWindow::filterParametersChanged()
     fftLength = pow(2, exp);
 
     ui->m_label_fftLength->setText(QString().number(fftLength));
-
-    //Update min max of spin boxes to nyquist
-    ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
-    ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
 
     QSharedPointer<MNEOperator> userDefinedFilterOperator;
 
