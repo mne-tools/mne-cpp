@@ -49,6 +49,7 @@
 
 #include "helpers/realtimemultisamplearrayscalingwidget.h"
 #include "helpers/sensorwidget.h"
+#include "helpers/projectorwidget.h"
 
 
 //*************************************************************************************************************
@@ -262,6 +263,12 @@ private:
 
     //=========================================================================================================
     /**
+    * Shows the projection widget
+    */
+    void showProjectionWidget();
+
+    //=========================================================================================================
+    /**
     * Shows sensor selection widget
     */
     void showSensorSelectionWidget();
@@ -293,6 +300,10 @@ private:
 
     QMap< qint32,float > m_qMapChScaling;                   /**< Sensor selection widget. */
     QAction* m_pActionChScaling;                            /**< Show channel scaling Action. */
+
+    QAction* m_pActionProjection;                                   /**< Show projections Action. */
+    QSharedPointer<ProjectorWidget> m_pProjectorSelectionWidget;    /**< Projector selection widget. */
+
 
     QSharedPointer<RealTimeMultiSampleArrayScalingWidget> m_pRTMSAScalingWidget;   /**< Channel scaling widget. */
 
