@@ -247,7 +247,7 @@ private:
     //Concurrent processing
 //    QFutureWatcher<QPair<int,RowVectorXd> > m_operatorFutureWatcher; /**< QFutureWatcher for watching process of applying Operators to reloaded fiff data. */
     QFutureWatcher<void>                    m_operatorFutureWatcher;    /**< QFutureWatcher for watching process of applying Operators to reloaded fiff data. */
-    QList<QPair<int,RowVectorXd> >          m_listTmpChData;            /**< contains pairs with a channel number and the corresponding RowVectorXd. */
+    QList<QPair<QPair<int,int>,RowVectorXd> > m_listTmpChData;          /**< contains pairs with a channel number and the corresponding RowVectorXd. */
     bool                                    m_bProcessing;              /**< true when processing in a background-thread is ongoing.*/
 
     QMutex                                  m_Mutex;                    /**< mutex for locking against simultaenous access to shared objects >. */
@@ -346,7 +346,7 @@ public slots:
     *
     * @param chdata[in,out] represents the channel data as a RowVectorXd
     */
-    void applyOperatorsConcurrently(QPair<int, RowVectorXd>& chdata) const;
+    void applyOperatorsConcurrently(QPair<QPair<int,int>, RowVectorXd> &chdata) const;
 
     //=========================================================================================================
     /**

@@ -192,6 +192,7 @@ void MainWindow::setupWindowWidgets()
         m_pChInfoWindow->getDataModel()->layoutChanged(m_pSelectionManagerWindow->getLayoutMap());
         m_pSelectionManagerWindow->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
         m_pSelectionManagerWindow->newFiffFileLoaded();
+        m_pFilterWindow->newFileLoaded();
     }
 }
 

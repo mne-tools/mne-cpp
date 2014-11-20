@@ -136,7 +136,16 @@ public:
     */
     void fftTransformCoeffs();
 
-    RowVectorXd applyFFTFilter(RowVectorXd& data);
+    //=========================================================================================================
+    /**
+    * FilterOperator::FilterOperator
+    *
+    * @param data the input data which is to be filtered
+    * @param addedFront number of samples which were added to the front of the data to get rid of the "einschwing" process of the filter
+    * @param addedBack number of samples which were added to the back of the data to get rid of the "ausschwing" process of the filter
+    * @return
+    */
+    RowVectorXd applyFFTFilter(RowVectorXd& data, int addedFront=0, int addedBack=0);
 
     int             m_iFilterOrder;     /**< represents the order of the filter instance. */
     int             m_iFFTlength;       /**< represents the filter length. */

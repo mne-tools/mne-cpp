@@ -301,18 +301,23 @@ void RawModel::genStdFilterOps()
     double sfreq = (m_fiffInfo.sfreq>=0) ? m_fiffInfo.sfreq : 600.0;
     double nyquist_freq = sfreq/2;
 
+    int filterTaps = m_iFilterTaps;
+    int fftLength = m_iWindowSize+2*filterTaps; //2*filterTaps because we need to add data at the front and back
+    int exp = ceil(log2(fftLength));
+    fftLength = pow(2, exp);
+
     //HPF
     double cutoffFreqHz = 50; //in Hz
     QString name = QString("HPF_%1").arg(cutoffFreqHz);
-    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::HPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
+    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::HPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,0.2,0.1,fftLength)));
 
     //LPF
     cutoffFreqHz = 30; //in Hz
     name = QString("LPF_%1").arg(cutoffFreqHz);
-    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
+    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,0.2,0.1,fftLength)));
     cutoffFreqHz = 10; //in Hz
     name = QString("LPF_%1").arg(cutoffFreqHz);
-    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
+    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,0.2,0.1,fftLength)));
 
     //BPF
     double from_freqHz = 30;
@@ -322,7 +327,7 @@ void RawModel::genStdFilterOps()
     double bw = to_freqHz-from_freqHz; //double bw = to_freqHz/from_freqHz;
 
     name = QString("BPF_%1-%2").arg(from_freqHz).arg(to_freqHz);
-    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::BPF,80,(double)center/nyquist_freq,(double)bw/nyquist_freq,(double)trans_width/nyquist_freq,(m_iWindowSize+m_iFilterTaps))));
+    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::BPF,80,(double)center/nyquist_freq,(double)bw/nyquist_freq,(double)trans_width/nyquist_freq,fftLength)));
 
     //Own/manual set filter - only an entry i nthe operator list generated which is called when the filterwindow is used
     cutoffFreqHz = 40;
@@ -652,28 +657,73 @@ void RawModel::applyOperator(QModelIndex chan, const QSharedPointer<MNEOperator>
 {
     //cast to QSharedPointer<FilterOperator>
     QSharedPointer<FilterOperator> filter;
-    if(operatorPtr->m_OperatorType==MNEOperator::FILTER)
+    if(operatorPtr->m_OperatorType==MNEOperator::FILTER) {
         filter = operatorPtr.staticCast<FilterOperator>();
 
-    //iterate through m_data list in order to filter them all, ToDo: do not filter already filtered blocks -> check it somehow
-    for(qint8 j=0; j < m_data.size(); ++j) {
-        RowVectorXd tmp;
-        if(!m_assignedOperators.contains(chan.row()) || reset)
-            tmp = m_data[j].row(chan.row());
-        else
-            tmp = m_procData[j].row(chan.row());
+        int filterOrder = filter->m_iFilterOrder;
 
-        m_procData[j].row(chan.row()) = filter->applyFFTFilter(tmp);
+        //iterate through m_data list in order to filter them all, ToDo: do not filter already filtered blocks -> check it somehow
+        for(qint8 j=0; j < m_data.size(); ++j) {
+            RowVectorXd tmp(m_data[j].cols() + filterOrder);
+            if(!m_assignedOperators.contains(chan.row()) || reset)
+                tmp.segment(filterOrder/2, m_data[j].cols()) = m_data[j].row(chan.row());
+            else
+                tmp.segment(filterOrder/2, m_data[j].cols()) = m_procData[j].row(chan.row());
 
-        //calculate mean for the current row
-        m_procDataMean[j].row(chan.row()) = calculateMean(m_procData[j].row(chan.row()));
+            //Add data from pre and post blocks to the data to get rid of the filter "einschwing" process
+            switch(m_data.size()) {
+                case 1: {
+                    tmp.segment(0, filterOrder/2) = m_data[j].row(chan.row()).segment(0,filterOrder/2);
+                    tmp.segment(m_data[j].cols()+filterOrder/2, filterOrder/2) = m_data[j].row(chan.row()).segment(m_data[j].cols()-filterOrder/2, filterOrder/2);
+
+                    break;
+                }
+
+                case 2: {
+                    if(j==0) { //If first data block mirror data
+                        tmp.segment(0, filterOrder/2) = m_data[j].row(chan.row()).segment(0,filterOrder/2);
+                        tmp.segment(m_data[j+1].cols()+filterOrder/2, filterOrder/2) = m_data[j+1].row(chan.row()).segment(m_data[j+1].cols()-filterOrder/2, filterOrder/2);
+                    }
+                    else if(j==m_data.size()-1) { //If last data block mirror data
+                        tmp.segment(0, filterOrder/2) = m_data[j-1].row(chan.row()).segment(0,filterOrder/2);
+                        tmp.segment(m_data[j].cols()+filterOrder/2, filterOrder/2) = m_data[j].row(chan.row()).segment(m_data[j].cols()-filterOrder/2, filterOrder/2);
+                    }
+
+                    break;
+                }
+
+                default: {
+                    if(j==0) { //If first data block mirror data
+                        tmp.segment(0, filterOrder/2) = m_data[j].row(chan.row()).segment(0,filterOrder/2);
+                        tmp.segment(m_data[j+1].cols()+filterOrder/2, filterOrder/2) = m_data[j+1].row(chan.row()).segment(m_data[j+1].cols()-filterOrder/2, filterOrder/2);
+                    }
+                    else if(j==m_data.size()-1) { //If last data block mirror data
+                        tmp.segment(0, filterOrder/2) = m_data[j-1].row(chan.row()).segment(0,filterOrder/2);
+                        tmp.segment(m_data[j].cols()+filterOrder/2, filterOrder/2) = m_data[j].row(chan.row()).segment(m_data[j].cols()-filterOrder/2, filterOrder/2);
+                    }
+                    else { // If in between data block get data from pre and post block
+                        tmp.segment(0, filterOrder/2) = m_data[j-1].row(chan.row()).segment(0,filterOrder/2);
+                        tmp.segment(m_data[j+1].cols()+filterOrder/2, filterOrder/2) = m_data[j+1].row(chan.row()).segment(m_data[j+1].cols()-filterOrder/2, filterOrder/2);
+                    }
+
+                    break;
+                }
+            }
+
+            //Apply filter
+            RowVectorXd tmpch = filter->applyFFTFilter(tmp, filterOrder/2, filterOrder/2);
+            m_procData[j].row(chan.row()) = tmpch;
+
+            //calculate mean for the current row
+            m_procDataMean[j].row(chan.row()) = calculateMean(m_procData[j].row(chan.row()));
+        }
+
+        //adds filtered channel to m_assignedOperators
+        if(!m_assignedOperators.values(chan.row()).contains(operatorPtr))
+            m_assignedOperators.insertMulti(chan.row(),operatorPtr);
+
+        //qDebug() << "RawModel: Filter" << filter->m_sName << "applied to channel#" << chan.row();
     }
-
-    //adds filtered channel to m_assignedOperators
-    if(!m_assignedOperators.values(chan.row()).contains(operatorPtr))
-        m_assignedOperators.insertMulti(chan.row(),operatorPtr);
-
-    //qDebug() << "RawModel: Filter" << filter->m_sName << "applied to channel#" << chan.row();
 
     emit dataChanged(chan,chan);
 }
@@ -689,12 +739,12 @@ void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOpe
     //filter only channels which include chType in their names
     if(chType == "All") {
         for(qint32 i=0; i < m_chInfolist.size(); ++i)
-            if(!m_chInfolist.at(i).ch_name.contains("STI") && !m_chInfolist.at(i).ch_name.contains("MISC"))
+            if(!m_chInfolist.at(i).ch_name.contains("STI") && !m_chInfolist.at(i).ch_name.contains("MISC") && !m_chInfolist.at(i).ch_name.contains("TRG"))
                 applyOperator(createIndex(i,1),operatorPtr,reset);
     }
     else {
         for(qint32 i=0; i < m_chInfolist.size(); ++i)
-            if(!m_chInfolist.at(i).ch_name.contains("STI") && !m_chInfolist.at(i).ch_name.contains("MISC") && m_chInfolist.at(i).ch_name.contains(chType))
+            if(!m_chInfolist.at(i).ch_name.contains("STI") && !m_chInfolist.at(i).ch_name.contains("MISC") && !m_chInfolist.at(i).ch_name.contains("TRG") && m_chInfolist.at(i).ch_name.contains(chType))
                 applyOperator(createIndex(i,1),operatorPtr,reset);
     }
 
@@ -711,7 +761,7 @@ void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOpe
     //filter all when chlist is empty
     if(chlist.empty()) {
         for(qint32 i=0; i < m_chInfolist.size(); ++i)
-            if(!m_chInfolist.at(i).ch_name.contains("STI") && !m_chInfolist.at(i).ch_name.contains("MISC"))
+            if(!m_chInfolist.at(i).ch_name.contains("STI") && !m_chInfolist.at(i).ch_name.contains("MISC") && !m_chInfolist.at(i).ch_name.contains("TRG"))
                 chlist.append(createIndex(i,1));
     }
 
@@ -727,18 +777,19 @@ void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOpe
 
 //*************************************************************************************************************
 
-void RawModel::applyOperatorsConcurrently(QPair<int,RowVectorXd>& chdata) const
+void RawModel::applyOperatorsConcurrently(QPair<QPair<int,int>,RowVectorXd>& chdata) const
 {
     QSharedPointer<FilterOperator> filter;
 
     //QList<int> listFilteredChs = m_assignedOperators.keys();
 
-    QList<QSharedPointer<MNEOperator> > ops = m_assignedOperators.values(chdata.first);
+    QList<QSharedPointer<MNEOperator> > ops = m_assignedOperators.values(chdata.first.first);
     for(qint32 i=0; i < ops.size(); ++i) {
         switch(ops[i]->m_OperatorType) {
         case MNEOperator::FILTER: {
             filter = ops[i].staticCast<FilterOperator>();
-            chdata.second = filter->applyFFTFilter(chdata.second);
+            RowVectorXd tmp = filter->applyFFTFilter(chdata.second, chdata.first.second, chdata.first.second);
+            chdata.second = tmp;
         }
         case MNEOperator::PCA: {
             //do something
@@ -906,12 +957,72 @@ void RawModel::updateOperatorsConcurrently()
     QList<int> listFilteredChs = m_assignedOperators.keys();
     m_listTmpChData.clear();
 
+    //Preload data to append at the end or front
+    MatrixXd segmentDataTemp;
+    MatrixXd segmentTimeTemp;
+
+    int loadFrom = 0;
+    if(m_bReloadBefore) //scrolling left
+        loadFrom = m_iAbsFiffCursor - m_iWindowSize;
+    else //scrolling right
+        loadFrom = m_iAbsFiffCursor + sizeOfPreloadedData();
+
+    if(loadFrom<firstSample())
+        loadFrom = firstSample();
+
+    if(loadFrom>lastSample())
+        loadFrom = lastSample();
+
+    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(segmentDataTemp, segmentTimeTemp, loadFrom, loadFrom+128)) { //256 is the maximum filter tap size - 256/2 = 128
+        printf("RawModel: Error when reading temp raw data for updateOperatorsConcurrently()!");
+        return;
+    }
+
     //get the rows which are to be filtered out of the m_data matrix. Note that this is done windows wise, hence jumps in the filteres signal might be visible
     for(qint32 i=0; i < listFilteredChs.size(); ++i) {
-        if(m_bReloadBefore)
-            m_listTmpChData.append(QPair<int,RowVectorXd>(listFilteredChs[i],m_data.first().row(listFilteredChs[i])));
-        else
-            m_listTmpChData.append(QPair<int,RowVectorXd>(listFilteredChs[i],m_data.last().row(listFilteredChs[i])));
+        int filterOrder = 0;
+        QList<QSharedPointer<MNEOperator> > ops = m_assignedOperators.values(i);
+        QSharedPointer<FilterOperator> filter;
+
+        //Find highest filter order
+        for(qint32 j=0; j < ops.size(); ++j) {
+            switch(ops[j]->m_OperatorType) {
+                case MNEOperator::FILTER: {
+                    filter = ops[j].staticCast<FilterOperator>();
+                    if(filter->m_iFilterOrder>filterOrder)
+                        filterOrder = filter->m_iFilterOrder;
+                }
+            }
+        }
+
+        RowVectorXd tmp(m_data[0].cols() + filterOrder);
+
+        if(m_bReloadBefore) { //scrolling left
+            //Add data at the front
+            tmp.segment(0, filterOrder/2) = segmentDataTemp.row(listFilteredChs[i]).segment(segmentDataTemp.cols()-filterOrder/2, filterOrder/2);
+
+            //Add data in the middle
+            tmp.segment(filterOrder/2, m_data.first().cols()) = m_data.first().row(listFilteredChs[i]);
+
+            //Add data at the end
+            tmp.segment(m_data[0].cols()+filterOrder/2, filterOrder/2) = m_data[1].row(listFilteredChs[i]).segment(0, filterOrder/2);
+
+            //first -> QPair<int,int> - first int is channel number - second int is filter order (number of samples added in front and back to the data)
+            m_listTmpChData.append(QPair<QPair<int, int>, RowVectorXd>(QPair<int,int>(listFilteredChs[i],filterOrder/2),tmp));
+        }
+        else { //scrolling right
+            //Add data at the front
+            tmp.segment(0, filterOrder/2) = m_data[m_data.size()-2].row(listFilteredChs[i]).segment(m_data[0].cols()-filterOrder/2, filterOrder/2);
+
+            //Add data in the middle
+            tmp.segment(filterOrder/2, m_data.last().cols()) = m_data.last().row(listFilteredChs[i]);
+
+            //Add data at the end
+            tmp.segment(m_data[0].cols()+filterOrder/2, filterOrder/2) = segmentDataTemp.row(listFilteredChs[i]).segment(0, filterOrder/2);
+
+            //first -> QPair<int,int> - first int is channel number - second int is filter order (number of samples added in front and back to the data)
+            m_listTmpChData.append(QPair<QPair<int, int>, RowVectorXd>(QPair<int,int>(listFilteredChs[i], filterOrder/2), tmp));
+        }
     }
 
     qDebug() << "RawModel: Starting of concurrent PROCESSING operation of" << listFilteredChs.size() << "items";
@@ -928,7 +1039,7 @@ void RawModel::updateOperatorsConcurrently()
 //    QFuture<QPair<int,RowVectorXd> > future = QtConcurrent::mapped(m_listTmpChData.begin(),m_listTmpChData.end(),applyOps);
     //**************************************************************************************************************************************************************************
 
-    QFuture<void > future = QtConcurrent::map(m_listTmpChData,[this](QPair<int,RowVectorXd>& chdata) {
+    QFuture<void > future = QtConcurrent::map(m_listTmpChData,[this](QPair<QPair<int,int >,RowVectorXd>& chdata) {
         return applyOperatorsConcurrently(chdata);
     });
 
