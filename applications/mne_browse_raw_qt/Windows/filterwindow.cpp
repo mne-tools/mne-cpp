@@ -317,9 +317,12 @@ void FilterWindow::filterParametersChanged()
     double nyquistFrequency = samplingFrequency/2;
 
     int filterTaps = ui->m_spinBox_filterTaps->value();
-    int fftLength = m_iWindowSize+filterTaps;
+    int fftLength = m_iWindowSize+2*filterTaps; //2*filterTaps because we need to add data at the front and back
     int exp = ceil(log2(fftLength));
     fftLength = pow(2, exp);
+
+    ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
+    ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
 
     ui->m_label_fftLength->setText(QString().number(fftLength));
 

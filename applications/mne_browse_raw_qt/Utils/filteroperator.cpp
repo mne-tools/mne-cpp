@@ -109,7 +109,7 @@ void FilterOperator::fftTransformCoeffs()
 
 //*************************************************************************************************************
 
-RowVectorXd FilterOperator::applyFFTFilter(RowVectorXd& data)
+RowVectorXd FilterOperator::applyFFTFilter(RowVectorXd& data, int addedFront, int addedBack)
 {
     //zero-pad data to m_iFFTlength
     RowVectorXd t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
@@ -131,5 +131,5 @@ RowVectorXd FilterOperator::applyFFTFilter(RowVectorXd& data)
     fft.inv(t_filteredTime,t_filteredFreq);
 
     //cuts off ends at front and end and return result. segment(i,n): Block containing n elements, starting at position i
-    return t_filteredTime.segment(m_iFilterOrder/2+1,data.cols());
+    return t_filteredTime.segment(m_iFilterOrder/2+addedFront, data.cols()-(addedFront+addedBack));
 }
