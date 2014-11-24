@@ -869,6 +869,10 @@ void EditorWindow::on_rb_NoStepScale_toggled(bool checked)
 {
     if(checked) ui->lb_StartValueScale->setText("value:");
     else ui->lb_StartValueScale->setText("start value:");
+
+    ui->dspb_LinStepScale->setEnabled(false);
+    ui->dspb_ExpStepScale->setEnabled(false);
+
     ui->lb_EndValueScale->setDisabled(checked);
     if(!checked)
     {
@@ -888,6 +892,10 @@ void EditorWindow::on_rb_NoStepScale_toggled(bool checked)
 void EditorWindow::on_rb_LinStepScale_toggled(bool checked)
 {
     if(checked) linStepWidthScale = ui->dspb_LinStepScale->value();
+
+    ui->dspb_LinStepScale->setEnabled(true);
+    ui->dspb_ExpStepScale->setEnabled(false);
+
     calc_scale_value();
 }
 
@@ -896,6 +904,10 @@ void EditorWindow::on_rb_LinStepScale_toggled(bool checked)
 void EditorWindow::on_rb_ExpStepScale_toggled(bool checked)
 {
     if(checked) expStepWidthScale = ui->dspb_ExpStepScale->value();
+
+    ui->dspb_ExpStepScale->setEnabled(true);
+    ui->dspb_LinStepScale->setEnabled(false);
+
     calc_scale_value();
 }
 
@@ -978,6 +990,8 @@ void EditorWindow::on_rb_LinStepModu_toggled(bool checked)
 {
     if(checked) linStepWidthModu = ui->dspb_LinStepModu->value();
     ui->dspb_LinStepModu->setEnabled(true);
+    ui->dspb_ExpStepModu->setEnabled(false);
+
     calc_modu_value();
 }
 
@@ -987,6 +1001,7 @@ void EditorWindow::on_rb_ExpStepModu_toggled(bool checked)
 {
     if(checked) expStepWidthModu = ui->dspb_ExpStepModu->value();
     ui->dspb_ExpStepModu->setEnabled(true);
+    ui->dspb_LinStepModu->setEnabled(false);
     calc_modu_value();
 }
 
@@ -1045,6 +1060,10 @@ void EditorWindow::on_rb_NoStepPhase_toggled(bool checked)
 {
     if(checked) ui->lb_StartValuePhase->setText("value:");
     else ui->lb_StartValuePhase->setText("start value:");
+
+    ui->dspb_ExpStepPhase->setEnabled(false);
+    ui->dspb_LinStepPhase->setEnabled(false);
+
     ui->lb_EndValuePhase->setDisabled(checked);
     if(!checked)
     {
@@ -1064,6 +1083,10 @@ void EditorWindow::on_rb_NoStepPhase_toggled(bool checked)
 void EditorWindow::on_rb_LinStepPhase_toggled(bool checked)
 {
     if(checked) linStepWidthPhase = ui->dspb_LinStepPhase->value();
+
+    ui->dspb_LinStepPhase->setEnabled(true);
+    ui->dspb_ExpStepPhase->setEnabled(false);
+
     calc_phase_value();
 }
 
@@ -1072,6 +1095,10 @@ void EditorWindow::on_rb_LinStepPhase_toggled(bool checked)
 void EditorWindow::on_rb_ExpStepPhase_toggled(bool checked)
 {
     if(checked) expStepWidthPhase = ui->dspb_ExpStepPhase->value();
+
+    ui->dspb_ExpStepPhase->setEnabled(true);
+    ui->dspb_LinStepPhase->setEnabled(false);
+
     calc_phase_value();
 }
 
@@ -1130,6 +1157,10 @@ void EditorWindow::on_rb_NoStepChirp_toggled(bool checked)
 {
     if(checked) ui->lb_StartValueChirp->setText("value:");
     else ui->lb_StartValueChirp->setText("start value:");
+
+    ui->dspb_ExpStepChirp->setEnabled(false);
+    ui->dspb_LinStepChirp->setEnabled(false);
+
     ui->lb_EndValueChirp->setDisabled(checked);
     if(!checked)
     {
@@ -1153,6 +1184,10 @@ void EditorWindow::on_rb_NoStepChirp_toggled(bool checked)
 void EditorWindow::on_rb_LinStepChirp_toggled(bool checked)
 {
      if(checked) linStepWidthChirp = ui->dspb_LinStepChirp->value();
+
+     ui->dspb_LinStepChirp->setEnabled(true);
+     ui->dspb_ExpStepChirp->setEnabled(false);
+
      calc_chirp_value();
 }
 
@@ -1161,6 +1196,10 @@ void EditorWindow::on_rb_LinStepChirp_toggled(bool checked)
 void EditorWindow::on_rb_ExpStepChirp_toggled(bool checked)
 {
     if(checked) expStepWidthChirp = ui->dspb_ExpStepChirp->value();
+
+    ui->dspb_ExpStepChirp->setEnabled(true);
+    ui->dspb_LinStepChirp->setEnabled(false);
+
     calc_chirp_value();
 }
 
