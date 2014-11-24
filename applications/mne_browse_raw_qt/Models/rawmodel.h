@@ -74,6 +74,7 @@
 #include "../Utils/types.h"
 #include "../Utils/filteroperator.h"
 #include "../Utils/rawsettings.h"
+#include "../Utils/datapackage.h"
 
 
 //*************************************************************************************************************
@@ -247,13 +248,13 @@ private:
     //Concurrent processing
 //    QFutureWatcher<QPair<int,RowVectorXd> > m_operatorFutureWatcher; /**< QFutureWatcher for watching process of applying Operators to reloaded fiff data. */
     QFutureWatcher<void>                    m_operatorFutureWatcher;    /**< QFutureWatcher for watching process of applying Operators to reloaded fiff data. */
-    QList<QPair<QPair<int,int>,RowVectorXd> > m_listTmpChData;          /**< contains pairs with a channel number and the corresponding RowVectorXd. */
+    QList<QPair<int,RowVectorXd> >          m_listTmpChData;            /**< contains pairs with a channel number and the corresponding RowVectorXd. */
     bool                                    m_bProcessing;              /**< true when processing in a background-thread is ongoing.*/
 
     QMutex                                  m_Mutex;                    /**< mutex for locking against simultaenous access to shared objects >. */
 
     //Fiff data structure
-    QList<MatrixXdR>                        m_data;                     /**< List that holds the fiff matrix data <n_channels x n_samples>. */
+    QList<QSharedPointer<DataPackage> >     m_data;                     /**< List that holds the fiff matrix data <n_channels x n_samples>. */
     QList<MatrixXdR>                        m_procData;                 /**< List that holds the processed fiff matrix data <n_channels x n_samples>. */
     QList<MatrixXdR>                        m_times;                    /**< List that holds the time axis [in secs]. */
     QList<VectorXd>                         m_dataMean;                 /**< List that holds the means of each channel in each data block. */
@@ -346,7 +347,7 @@ public slots:
     *
     * @param chdata[in,out] represents the channel data as a RowVectorXd
     */
-    void applyOperatorsConcurrently(QPair<QPair<int,int>, RowVectorXd> &chdata) const;
+    void applyOperatorsConcurrently(QPair<int, RowVectorXd> &chdata) const;
 
     //=========================================================================================================
     /**

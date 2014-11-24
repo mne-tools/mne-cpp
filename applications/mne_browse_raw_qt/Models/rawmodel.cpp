@@ -191,12 +191,12 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
                 for(qint16 i=0; i < m_data.size(); ++i) {
                     //if channel is not filtered or background Processing pending...
                     if(!m_assignedOperators.contains(index.row()) || (m_bProcessing && m_bReloadBefore && i==0) || (m_bProcessing && !m_bReloadBefore && i==m_data.size()-1)) {
-                        rowVectorPair.first = m_data[i].data() + index.row()*m_data[i].cols();
-                        rowVectorPair.second  = m_data[i].cols();
+                        rowVectorPair.first = m_data[i]->dataRaw().data() + index.row()*m_data[i]->dataRaw().cols();
+                        rowVectorPair.second  = m_data[i]->dataRaw().cols();
                     }
                     else { //if channel IS filtered
-                        rowVectorPair.first = m_procData[i].data() + index.row()*m_procData[i].cols();
-                        rowVectorPair.second  = m_procData[i].cols();
+                        rowVectorPair.first = m_data[i]->dataProc().data() + index.row()*m_data[i]->dataProc().cols();
+                        rowVectorPair.second  = m_data[i]->dataProc().cols();
                     }
 
                     listRowVectorPair.append(rowVectorPair);
@@ -362,13 +362,26 @@ bool RawModel::loadFiffData(QFile& qFile)
     clearModel();
 
     MatrixXd t_data,t_times; //type is later on (when append to m_data) casted into MatrixXdR (Row-Major)
+    QSharedPointer<DataPackage> newDataPackage;
 
     m_pfiffIO = QSharedPointer<FiffIO>(new FiffIO(qFile));
     if(!m_pfiffIO->m_qlistRaw.empty()) {
         m_iAbsFiffCursor = m_pfiffIO->m_qlistRaw[0]->first_samp; //Set cursor somewhere into fiff file [in samples]
         m_bStartReached = true;
-        if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_data, t_times, m_iAbsFiffCursor, m_iAbsFiffCursor+m_iWindowSize-1))
+
+        int start = m_iAbsFiffCursor - MODEL_MAX_NUM_FILTER_TAPS/2;
+        int end = start + m_iWindowSize - 1 + MODEL_MAX_NUM_FILTER_TAPS;
+
+        if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_data, t_times, start, end))
             return false;
+
+        //This is the first data laoded, hence no data to the left possible, but needed for correct filtering -> mirror data to the front
+        MatrixXdR tempMat(t_data.rows(), t_data.cols() + MODEL_MAX_NUM_FILTER_TAPS/2);
+        tempMat.block(0,0,t_data.rows(),MODEL_MAX_NUM_FILTER_TAPS/2) = t_data.block(0,0,t_data.rows(),MODEL_MAX_NUM_FILTER_TAPS/2);
+        tempMat.block(0,MODEL_MAX_NUM_FILTER_TAPS/2,t_data.rows(),t_data.cols()) = t_data;
+
+        newDataPackage = QSharedPointer<DataPackage>(new DataPackage(tempMat, MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2));
+
         m_bFileloaded = true;
     }
     else {
@@ -379,7 +392,7 @@ bool RawModel::loadFiffData(QFile& qFile)
     }
 
     //set loaded fiff data
-    m_data.append(t_data);
+    m_data.append(newDataPackage);
     m_dataMean.append(calculateMean(t_data));
     m_procData.append(MatrixXdR::Zero(t_data.rows(),t_data.cols()));
     m_procDataMean.append(VectorXd::Zero(t_data.rows()));
@@ -408,7 +421,8 @@ bool RawModel::writeFiffData(QFile &qFile)
         qDebug() << "Done saving as fiff file" << qFile.fileName() << "...";
         return true;
     }
-    else return false;
+    else
+        return false;
 }
 
 
@@ -481,13 +495,33 @@ void RawModel::resetPosition(qint32 position)
 
     MatrixXd t_data,t_times; //type is later on (when append to m_data) casted into MatrixXdR (Row-Major)
 
+    int start = m_iAbsFiffCursor - MODEL_MAX_NUM_FILTER_TAPS/2;
+    int end = start + m_iWindowSize - 1 + MODEL_MAX_NUM_FILTER_TAPS;
+
     m_Mutex.lock();
-    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_data, t_times, m_iAbsFiffCursor, m_iAbsFiffCursor+m_iWindowSize-1))
+    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_data, t_times, start, end))
         qDebug() << "RawModel: Error resetting position of Fiff file!";
     m_Mutex.unlock();
 
+    //Possible position of the reset can cause no data to the left or right available, but needed for correct filtering -> mirror data to the front or back
+    MatrixXdR tempMat(t_data.rows(), t_data.cols() + MODEL_MAX_NUM_FILTER_TAPS/2);
+    QSharedPointer<DataPackage> newDataPackage;
+
+    if(start<firstSample()) { //no data to the left - mirror data to the left
+        tempMat.block(0,0,t_data.rows(),MODEL_MAX_NUM_FILTER_TAPS/2) = t_data.block(0,0,t_data.rows(),MODEL_MAX_NUM_FILTER_TAPS/2);
+        tempMat.block(0,MODEL_MAX_NUM_FILTER_TAPS/2,t_data.rows(),t_data.cols()) = t_data;
+        newDataPackage = QSharedPointer<DataPackage>(new DataPackage(DataPackage(tempMat, MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2)));
+    }
+    else if(end>lastSample()) { //no data to the right - mirror data to the right
+        tempMat.block(0,0,t_data.rows(),t_data.cols()) = t_data;
+        tempMat.block(0,t_data.cols(),t_data.rows(),MODEL_MAX_NUM_FILTER_TAPS/2) = t_data.block(0,t_data.cols()-MODEL_MAX_NUM_FILTER_TAPS/2,t_data.rows(),MODEL_MAX_NUM_FILTER_TAPS/2);
+        newDataPackage = QSharedPointer<DataPackage>(new DataPackage(DataPackage(tempMat, MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2)));
+    }
+    else
+        newDataPackage = QSharedPointer<DataPackage>(new DataPackage((MatrixXdR)t_data, MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2));
+
     //append loaded block
-    m_data.append(t_data);
+    m_data.append(newDataPackage);
     m_dataMean.append(calculateMean(t_data));
     m_procData.append(MatrixXdR::Zero(t_data.rows(),m_iWindowSize));
     m_procDataMean.append(VectorXd::Zero(t_data.rows()));
@@ -509,15 +543,17 @@ void RawModel::resetPosition(qint32 position)
 //*************************************************************************************************************
 
 void RawModel::reloadFiffData(bool before)
-{
+{    
+    qDebug()<<"lastSample: "<<lastSample();
+
     m_bReloadBefore = before;
 
     //update scroll position
     fiff_int_t start,end;
     if(before) {
         m_iAbsFiffCursor -= m_iWindowSize;
-        start = m_iAbsFiffCursor;
-        end = start + m_iWindowSize - 1;
+        start = m_iAbsFiffCursor - MODEL_MAX_NUM_FILTER_TAPS/2;
+        end = start + m_iWindowSize - 1 + MODEL_MAX_NUM_FILTER_TAPS;
 
         //check if start of fiff file is reached
         if(start < firstSample()) {
@@ -530,11 +566,12 @@ void RawModel::reloadFiffData(bool before)
         }
     }
     else {
-        start = m_iAbsFiffCursor + sizeOfPreloadedData();
-        end = start + m_iWindowSize -1;
+        start = m_iAbsFiffCursor + sizeOfPreloadedData() - MODEL_MAX_NUM_FILTER_TAPS/2;
+        end = start + m_iWindowSize - 1 + MODEL_MAX_NUM_FILTER_TAPS;
 
         //check if end of fiff file is reached
         if(end > lastSample()) {
+            //Reload one more time
             if(m_bEndReached)
                 return;
             else
@@ -548,9 +585,11 @@ void RawModel::reloadFiffData(bool before)
     m_bReloading = true;
 
     //read data with respect to start and end point
-    QFuture<QPair<MatrixXd,MatrixXd> > future = QtConcurrent::run(this,&RawModel::readSegment,start,end);
+//    QFuture<QPair<MatrixXd,MatrixXd> > future = QtConcurrent::run(this,&RawModel::readSegment,start,end);
 
-    m_reloadFutureWatcher.setFuture(future);
+//    m_reloadFutureWatcher.setFuture(future);
+
+    insertReloadedData(readSegment(start, end));
 }
 
 
@@ -614,7 +653,7 @@ void RawModel::updateScrollPos(int value)
         return;
     }
 
-    //reload data if end of loaded range is reached
+    //reload data if end of loaded range is reached and no relaoding is currently active
     //front
     if(!m_bReloading && (m_iCurAbsScrollPos-m_iAbsFiffCursor < m_reloadPos) && !m_bStartReached) {
         qDebug() << "RawModel: Reload requested at FRONT of loaded fiff data, m_iAbsFiffCursor:" << m_iAbsFiffCursor << "m_iCurAbsScrollPos:" << m_iCurAbsScrollPos;
@@ -660,59 +699,12 @@ void RawModel::applyOperator(QModelIndex chan, const QSharedPointer<MNEOperator>
     if(operatorPtr->m_OperatorType==MNEOperator::FILTER) {
         filter = operatorPtr.staticCast<FilterOperator>();
 
-        int filterOrder = filter->m_iFilterOrder;
-
         //iterate through m_data list in order to filter them all, ToDo: do not filter already filtered blocks -> check it somehow
         for(qint8 j=0; j < m_data.size(); ++j) {
-            RowVectorXd tmp(m_data[j].cols() + filterOrder);
             if(!m_assignedOperators.contains(chan.row()) || reset)
-                tmp.segment(filterOrder/2, m_data[j].cols()) = m_data[j].row(chan.row());
+                m_data[j]->applyFFTFilter(chan.row(), filter, true);
             else
-                tmp.segment(filterOrder/2, m_data[j].cols()) = m_procData[j].row(chan.row());
-
-            //Add data from pre and post blocks to the data to get rid of the filter "einschwing" process
-            switch(m_data.size()) {
-                case 1: {
-                    tmp.segment(0, filterOrder/2) = m_data[j].row(chan.row()).segment(0,filterOrder/2);
-                    tmp.segment(m_data[j].cols()+filterOrder/2, filterOrder/2) = m_data[j].row(chan.row()).segment(m_data[j].cols()-filterOrder/2, filterOrder/2);
-
-                    break;
-                }
-
-                case 2: {
-                    if(j==0) { //If first data block mirror data
-                        tmp.segment(0, filterOrder/2) = m_data[j].row(chan.row()).segment(0,filterOrder/2);
-                        tmp.segment(m_data[j+1].cols()+filterOrder/2, filterOrder/2) = m_data[j+1].row(chan.row()).segment(m_data[j+1].cols()-filterOrder/2, filterOrder/2);
-                    }
-                    else if(j==m_data.size()-1) { //If last data block mirror data
-                        tmp.segment(0, filterOrder/2) = m_data[j-1].row(chan.row()).segment(0,filterOrder/2);
-                        tmp.segment(m_data[j].cols()+filterOrder/2, filterOrder/2) = m_data[j].row(chan.row()).segment(m_data[j].cols()-filterOrder/2, filterOrder/2);
-                    }
-
-                    break;
-                }
-
-                default: {
-                    if(j==0) { //If first data block mirror data
-                        tmp.segment(0, filterOrder/2) = m_data[j].row(chan.row()).segment(0,filterOrder/2);
-                        tmp.segment(m_data[j+1].cols()+filterOrder/2, filterOrder/2) = m_data[j+1].row(chan.row()).segment(m_data[j+1].cols()-filterOrder/2, filterOrder/2);
-                    }
-                    else if(j==m_data.size()-1) { //If last data block mirror data
-                        tmp.segment(0, filterOrder/2) = m_data[j-1].row(chan.row()).segment(0,filterOrder/2);
-                        tmp.segment(m_data[j].cols()+filterOrder/2, filterOrder/2) = m_data[j].row(chan.row()).segment(m_data[j].cols()-filterOrder/2, filterOrder/2);
-                    }
-                    else { // If in between data block get data from pre and post block
-                        tmp.segment(0, filterOrder/2) = m_data[j-1].row(chan.row()).segment(0,filterOrder/2);
-                        tmp.segment(m_data[j+1].cols()+filterOrder/2, filterOrder/2) = m_data[j+1].row(chan.row()).segment(m_data[j+1].cols()-filterOrder/2, filterOrder/2);
-                    }
-
-                    break;
-                }
-            }
-
-            //Apply filter
-            RowVectorXd tmpch = filter->applyFFTFilter(tmp, filterOrder/2, filterOrder/2);
-            m_procData[j].row(chan.row()) = tmpch;
+                m_data[j]->applyFFTFilter(chan.row(), filter, false);
 
             //calculate mean for the current row
             m_procDataMean[j].row(chan.row()) = calculateMean(m_procData[j].row(chan.row()));
@@ -777,18 +769,18 @@ void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOpe
 
 //*************************************************************************************************************
 
-void RawModel::applyOperatorsConcurrently(QPair<QPair<int,int>,RowVectorXd>& chdata) const
+void RawModel::applyOperatorsConcurrently(QPair<int,RowVectorXd>& chdata) const
 {
     QSharedPointer<FilterOperator> filter;
 
     //QList<int> listFilteredChs = m_assignedOperators.keys();
 
-    QList<QSharedPointer<MNEOperator> > ops = m_assignedOperators.values(chdata.first.first);
+    QList<QSharedPointer<MNEOperator> > ops = m_assignedOperators.values(chdata.first);
     for(qint32 i=0; i < ops.size(); ++i) {
         switch(ops[i]->m_OperatorType) {
         case MNEOperator::FILTER: {
             filter = ops[i].staticCast<FilterOperator>();
-            RowVectorXd tmp = filter->applyFFTFilter(chdata.second, chdata.first.second, chdata.first.second);
+            RowVectorXd tmp = filter->applyFFTFilter(chdata.second);
             chdata.second = tmp;
         }
         case MNEOperator::PCA: {
@@ -906,9 +898,27 @@ void RawModel::undoFilter()
 //private SLOTS
 void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair)
 {
+    //Check if end or beginning of fiff file reached. If so -> mirror data to front or back
+    MatrixXdR tempMat(dataTimesPair.first.rows(), dataTimesPair.first.cols() + MODEL_MAX_NUM_FILTER_TAPS/2);
+
+
+//    if(m_bStartReached) { //start reached - no data to the left - mirror data to the left
+//        tempMat.block(0,0,dataTimesPair.first.rows(),MODEL_MAX_NUM_FILTER_TAPS/2) = dataTimesPair.first.block(0,0,dataTimesPair.first.rows(),MODEL_MAX_NUM_FILTER_TAPS/2);
+//        tempMat.block(0,MODEL_MAX_NUM_FILTER_TAPS/2,dataTimesPair.first.rows(),dataTimesPair.first.cols()) = dataTimesPair.first;
+//        newDataPackage = new DataPackage(tempMat, MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
+//    }
+//    else if(m_bEndReached) { //end reached - no data to the right - mirror data to the right
+//        tempMat.block(0,0,dataTimesPair.first.rows(),dataTimesPair.first.cols()) = dataTimesPair.first;
+//        tempMat.block(0,dataTimesPair.first.cols(),dataTimesPair.first.rows(),MODEL_MAX_NUM_FILTER_TAPS/2) = dataTimesPair.first.block(0,dataTimesPair.first.cols()-MODEL_MAX_NUM_FILTER_TAPS/2,dataTimesPair.first.rows(),MODEL_MAX_NUM_FILTER_TAPS/2);
+//        newDataPackage = new DataPackage(tempMat, MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
+//    }
+//    else
+
+    QSharedPointer<DataPackage> newDataPackage = QSharedPointer<DataPackage>(new DataPackage((MatrixXdR)dataTimesPair.first, MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2));
+
     //extend m_data with reloaded data
     if(m_bReloadBefore) {
-        m_data.prepend(dataTimesPair.first);
+        m_data.prepend(newDataPackage);
         m_dataMean.prepend(calculateMean(dataTimesPair.first));
         m_procData.prepend(MatrixXdR::Zero(m_chInfolist.size(),m_iWindowSize));
         m_procDataMean.prepend(VectorXd::Zero(m_chInfolist.size()));
@@ -923,7 +933,7 @@ void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair)
         }
     }
     else {
-        m_data.append(dataTimesPair.first);
+        m_data.append(newDataPackage);
         m_dataMean.append(calculateMean(dataTimesPair.first));
         m_procData.append(MatrixXdR::Zero(m_chInfolist.size(),m_iWindowSize));
         m_procDataMean.append(VectorXd::Zero(m_chInfolist.size()));
@@ -944,6 +954,8 @@ void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair)
     emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size()-1,1));
     emit dataReloaded();
 
+    //delete newDataPackage;
+
     qDebug() << "RawModel: Fiff data REloaded from " << dataTimesPair.second.coeff(0) << "secs to" << dataTimesPair.second.coeff(dataTimesPair.second.cols()-1) << "secs";
 }
 
@@ -957,72 +969,12 @@ void RawModel::updateOperatorsConcurrently()
     QList<int> listFilteredChs = m_assignedOperators.keys();
     m_listTmpChData.clear();
 
-    //Preload data to append at the end or front
-    MatrixXd segmentDataTemp;
-    MatrixXd segmentTimeTemp;
-
-    int loadFrom = 0;
-    if(m_bReloadBefore) //scrolling left
-        loadFrom = m_iAbsFiffCursor - m_iWindowSize;
-    else //scrolling right
-        loadFrom = m_iAbsFiffCursor + sizeOfPreloadedData();
-
-    if(loadFrom<firstSample())
-        loadFrom = firstSample();
-
-    if(loadFrom>lastSample())
-        loadFrom = lastSample();
-
-    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(segmentDataTemp, segmentTimeTemp, loadFrom, loadFrom+128)) { //256 is the maximum filter tap size - 256/2 = 128
-        printf("RawModel: Error when reading temp raw data for updateOperatorsConcurrently()!");
-        return;
-    }
-
-    //get the rows which are to be filtered out of the m_data matrix. Note that this is done windows wise, hence jumps in the filteres signal might be visible
+    //get the rows which are to be filtered out of the m_data matrix. Note that this is done windows wise, hence jumps in the filtered signal might be visible
     for(qint32 i=0; i < listFilteredChs.size(); ++i) {
-        int filterOrder = 0;
-        QList<QSharedPointer<MNEOperator> > ops = m_assignedOperators.values(i);
-        QSharedPointer<FilterOperator> filter;
-
-        //Find highest filter order
-        for(qint32 j=0; j < ops.size(); ++j) {
-            switch(ops[j]->m_OperatorType) {
-                case MNEOperator::FILTER: {
-                    filter = ops[j].staticCast<FilterOperator>();
-                    if(filter->m_iFilterOrder>filterOrder)
-                        filterOrder = filter->m_iFilterOrder;
-                }
-            }
-        }
-
-        RowVectorXd tmp(m_data[0].cols() + filterOrder);
-
-        if(m_bReloadBefore) { //scrolling left
-            //Add data at the front
-            tmp.segment(0, filterOrder/2) = segmentDataTemp.row(listFilteredChs[i]).segment(segmentDataTemp.cols()-filterOrder/2, filterOrder/2);
-
-            //Add data in the middle
-            tmp.segment(filterOrder/2, m_data.first().cols()) = m_data.first().row(listFilteredChs[i]);
-
-            //Add data at the end
-            tmp.segment(m_data[0].cols()+filterOrder/2, filterOrder/2) = m_data[1].row(listFilteredChs[i]).segment(0, filterOrder/2);
-
-            //first -> QPair<int,int> - first int is channel number - second int is filter order (number of samples added in front and back to the data)
-            m_listTmpChData.append(QPair<QPair<int, int>, RowVectorXd>(QPair<int,int>(listFilteredChs[i],filterOrder/2),tmp));
-        }
-        else { //scrolling right
-            //Add data at the front
-            tmp.segment(0, filterOrder/2) = m_data[m_data.size()-2].row(listFilteredChs[i]).segment(m_data[0].cols()-filterOrder/2, filterOrder/2);
-
-            //Add data in the middle
-            tmp.segment(filterOrder/2, m_data.last().cols()) = m_data.last().row(listFilteredChs[i]);
-
-            //Add data at the end
-            tmp.segment(m_data[0].cols()+filterOrder/2, filterOrder/2) = segmentDataTemp.row(listFilteredChs[i]).segment(0, filterOrder/2);
-
-            //first -> QPair<int,int> - first int is channel number - second int is filter order (number of samples added in front and back to the data)
-            m_listTmpChData.append(QPair<QPair<int, int>, RowVectorXd>(QPair<int,int>(listFilteredChs[i], filterOrder/2), tmp));
-        }
+        if(m_bReloadBefore)
+            m_listTmpChData.append(QPair<int,RowVectorXd>(listFilteredChs[i],m_data.first()->dataRawOrig().row(listFilteredChs[i])));
+        else
+            m_listTmpChData.append(QPair<int,RowVectorXd>(listFilteredChs[i],m_data.last()->dataRawOrig().row(listFilteredChs[i])));
     }
 
     qDebug() << "RawModel: Starting of concurrent PROCESSING operation of" << listFilteredChs.size() << "items";
@@ -1039,7 +991,7 @@ void RawModel::updateOperatorsConcurrently()
 //    QFuture<QPair<int,RowVectorXd> > future = QtConcurrent::mapped(m_listTmpChData.begin(),m_listTmpChData.end(),applyOps);
     //**************************************************************************************************************************************************************************
 
-    QFuture<void > future = QtConcurrent::map(m_listTmpChData,[this](QPair<QPair<int,int >,RowVectorXd>& chdata) {
+    QFuture<void > future = QtConcurrent::map(m_listTmpChData,[this](QPair<int,RowVectorXd>& chdata) {
         return applyOperatorsConcurrently(chdata);
     });
 
@@ -1079,16 +1031,20 @@ void RawModel::insertProcessedData()
 
     for(qint32 i=0; i < listFilteredChs.size(); ++i) {
         if(m_bReloadBefore)
-            m_procData.first().row(listFilteredChs[i]) = m_listTmpChData[i].second;
+            m_data.first()->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i]);
         else
-            m_procData.last().row(listFilteredChs[i]) = m_listTmpChData[i].second;
+            m_data.last()->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i]);
     }
 
-    //Calculate mean for filtered data
-    if(m_bReloadBefore)
+    //Cut original data to window size and calculate mean for filtered data
+    if(m_bReloadBefore) {
         m_procDataMean.first() = calculateMean(m_procData.first());
-    else
-        m_procDataMean.last() = calculateMean(m_procData.last());
+        m_data.first()->cutOrigProcData(MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
+    }
+    else {
+        m_procDataMean.last() = calculateMean(m_procData.last());        
+        m_data.last()->cutOrigProcData(MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
+    }
 
     emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));
 
