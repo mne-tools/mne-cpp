@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     projectorwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2014
+* @date     May, 2014
 *
 * @section  LICENSE
 *
@@ -29,35 +29,27 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of the computation of a test ssp
+* @brief    Declaration of the ProjectorWidget Class.
 *
 */
 
+#ifndef PROJECTORWIDGET_H
+#define PROJECTORWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <fs/label.h>
-#include <fs/surface.h>
-#include <fs/annotationset.h>
-
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff.h>
-#include <mne/mne.h>
-
-#include <mne/mne_epoch_data_list.h>
-
-#include <mne/mne_sourceestimate.h>
-#include <inverse/minimumNorm/minimumnorm.h>
+#include <fiff/fiff_info.h>
 
 
-#include <utils/mnemath.h>
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
-#include <iostream>
-
-#include <fstream>
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -65,65 +57,76 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGuiApplication>
-#include <QSet>
-#include <QElapsedTimer>
+#include <QCheckBox>
+#include <QWidget>
+#include <QGraphicsView>
+#include <QGraphicsScene>
 
-//#define BENCHMARK
 
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE XDISPLIB
+//=============================================================================================================
+
+namespace XDISPLIB
+{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FSLIB;
+using namespace Eigen;
 using namespace FIFFLIB;
-using namespace UTILSLIB;
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MAIN
-//=============================================================================================================
 
 //=============================================================================================================
 /**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
+* DECLARE CLASS ProjectorWidget
 *
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+* @brief The ProjectorWidget class provides the sensor selection widget
 */
-int main(int argc, char *argv[])
+class ProjectorWidget : public QWidget
 {
-    QGuiApplication a(argc, argv);
+    Q_OBJECT
+public:
 
-    QFile t_fiffFile(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/header.fif");
+    //=========================================================================================================
+    /**
+    * Constructs a ProjectorWidget which is a child of parent.
+    *
+    * @param [in] parent    parent of widget
+    * @param [in] f         widget flags
+    */
+    ProjectorWidget(QWidget *parent = 0, Qt::WindowFlags f = 0);
 
-    //
-    //   Open the file
-    //
-    FiffStream::SPtr p_pStream(new FiffStream(&t_fiffFile));
-    QString t_sFileName = p_pStream->streamName();
+    //=========================================================================================================
+    /**
+    * Create the user interface
+    */
+    void createUI();
 
-    printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
+    //=========================================================================================================
+    /**
+    * Set fiff info
+    */
+    void setFiffInfo(FiffInfo::SPtr& p_pFiffInfo);
 
-    FiffDirTree t_Tree;
-    QList<FiffDirEntry> t_Dir;
+signals:
+    void projectorChanged(Eigen::MatrixXd proj);
 
-    if(!p_pStream->open(t_Tree, t_Dir))
-        return false;
+private:
+    void checkStatusChanged(int state);
 
-    QList<FiffProj> q_ListProj = p_pStream->read_proj(t_Tree);
+    QList<QCheckBox*>   m_qListCheckBox;    /**< List of CheckBox. */
+    FiffInfo::SPtr      m_pFiffInfo;        /**< Connected fiff info. */
+};
 
-    if (q_ListProj.size() == 0)
-    {
-        printf("Could not find projectors\n");
-        return false;
-    }
+} // NAMESPACE
 
-    return a.exec();
-}
+#ifndef metatype_matrixxd
+#define metatype_matrixxd
+Q_DECLARE_METATYPE(Eigen::MatrixXd);    /**< Provides QT META type declaration of the Eigen::MatrixXd type. For signal/slot usage.*/
+#endif
+
+#endif // PROJECTORWIDGET_H
