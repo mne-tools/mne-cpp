@@ -55,24 +55,31 @@ using namespace MNEBrowseRawQt;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DataPackage::DataPackage(MatrixXdR &originalRawData, int cutFront, int cutBack)
+DataPackage::DataPackage(const MatrixXdR &originalRawData, const MatrixXdR &originalRawTime, int cutFront, int cutBack)
 : m_iCutFront(cutFront)
 , m_iCutBack(cutBack)
 {
     if(originalRawData.rows() != 0 && originalRawData.cols() != 0) {
         setOrigRawData(originalRawData);
-        cutOrigRawData(cutFront, cutBack);
+        m_dataRawMapped = cutData(originalRawData, cutFront, cutBack);
+
+        m_timeRawOriginal = originalRawTime;
+        m_timeRawMapped = cutData(m_timeRawOriginal, cutFront, cutBack);
     }
 
     //Init processed data with zero
     m_dataProcOriginal = MatrixXdR::Zero(m_dataRawOriginal.rows(), m_dataRawOriginal.cols());
     m_dataProcMapped = MatrixXdR::Zero(m_dataRawMapped.rows(), m_dataRawMapped.cols());
+
+    //Init mean data
+    m_dataRawMean = calculateMatMean(m_dataRawMapped);
+    m_dataProcMean = calculateMatMean(m_dataProcMapped);
 }
 
 
 //*************************************************************************************************************
 
-void DataPackage::setOrigRawData(MatrixXdR &originalRawData)
+void DataPackage::setOrigRawData(const MatrixXdR &originalRawData)
 {
     //set orignal data
     m_dataRawOriginal = originalRawData;
@@ -81,7 +88,7 @@ void DataPackage::setOrigRawData(MatrixXdR &originalRawData)
 
 //*************************************************************************************************************
 
-void DataPackage::setOrigRawData(RowVectorXd &originalRawData, int row)
+void DataPackage::setOrigRawData(const RowVectorXd &originalRawData, int row)
 {
     if(originalRawData.cols() != m_dataRawOriginal.cols() || row >= m_dataRawOriginal.rows()){
         qDebug()<<"DataPackage::setOrigRawData - cannot set row data to m_dataRawOriginal";
@@ -95,16 +102,29 @@ void DataPackage::setOrigRawData(RowVectorXd &originalRawData, int row)
 
 //*************************************************************************************************************
 
-void DataPackage::setOrigProcData(MatrixXdR &originalProcData)
+void DataPackage::setOrigProcData(const MatrixXdR &originalProcData)
 {
     //set orignal processed data
     m_dataProcOriginal = originalProcData;
 }
 
 
+
 //*************************************************************************************************************
 
-void DataPackage::setOrigProcData(RowVectorXd &originalProcData, int row)
+void DataPackage::cutOrigRawData(int cutFront, int cutBack)
+{
+    //Cut data
+    m_dataRawMapped = cutData(m_dataRawOriginal, cutFront, cutBack);
+
+    //Calculate mean
+    m_dataRawMean = calculateMatMean(m_dataRawMapped);
+}
+
+
+//*************************************************************************************************************
+
+void DataPackage::setOrigProcData(const RowVectorXd &originalProcData, int row)
 {
     if(originalProcData.cols() != m_dataProcOriginal.cols() || row >= m_dataProcOriginal.rows()){
         qDebug()<<"DataPackage::setOrigProcData - cannot set row data to m_dataProcOriginal";
@@ -118,41 +138,13 @@ void DataPackage::setOrigProcData(RowVectorXd &originalProcData, int row)
 
 //*************************************************************************************************************
 
-void DataPackage::cutOrigRawData(int cutFront, int cutBack)
-{
-    if(m_dataRawOriginal.cols()-cutFront-cutBack < 0 || cutFront>m_dataRawOriginal.cols()) {
-        qDebug()<<"DataPackage::cutOrigRawData - cutFront or cutBack do not fit. Aborting mapping of m_dataRawOriginal.";
-        return;
-    }
-
-    //Cut original data using block
-    m_dataRawMapped = m_dataRawOriginal.block(0, cutFront, m_dataRawOriginal.rows(), m_dataRawOriginal.cols()-cutFront-cutBack);
-
-    if(cutFront != m_iCutFront)
-        m_iCutFront = cutFront;
-
-    if(cutBack != m_iCutBack)
-        m_iCutBack = cutBack;
-}
-
-
-//*************************************************************************************************************
-
 void DataPackage::cutOrigProcData(int cutFront, int cutBack)
 {
-    if(m_dataProcOriginal.cols()-cutFront-cutBack < 0 || cutFront>m_dataProcOriginal.cols()) {
-        qDebug()<<"DataPackage::cutOrigProcData - cutFront or cutBack do not fit. Aborting mapping of m_dataProcOriginal.";
-        return;
-    }
+    //Cut data
+    m_dataProcMapped = cutData(m_dataProcOriginal, cutFront, cutBack);
 
-    //Cut original data using block
-    m_dataProcMapped = m_dataProcOriginal.block(0, cutFront, m_dataProcOriginal.rows(), m_dataProcOriginal.cols()-cutFront-cutBack);
-
-    if(cutFront != m_iCutFront)
-        m_iCutFront = cutFront;
-
-    if(cutBack != m_iCutBack)
-        m_iCutBack = cutBack;
+    //Calculate mean
+    m_dataProcMean = calculateMatMean(m_dataProcMapped);
 }
 
 
@@ -190,6 +182,28 @@ const MatrixXdR & DataPackage::dataProc()
 
 //*************************************************************************************************************
 
+double DataPackage::dataProcMean(int row)
+{
+    if(row>=m_dataProcMean.rows())
+        return 0;
+
+    return m_dataProcMean(row);
+}
+
+
+//*************************************************************************************************************
+
+double DataPackage::dataRawMean(int row)
+{
+    if(row>=m_dataRawMean.rows())
+        return 0;
+
+    return m_dataRawMean(row);
+}
+
+
+//*************************************************************************************************************
+
 void DataPackage::applyFFTFilter(int channelNumber, QSharedPointer<FilterOperator> filter, bool useRawData)
 {
     if(channelNumber >= m_dataRawOriginal.rows()){
@@ -203,8 +217,75 @@ void DataPackage::applyFFTFilter(int channelNumber, QSharedPointer<FilterOperato
         m_dataProcOriginal.row(channelNumber) = filter->applyFFTFilter(m_dataProcOriginal.row(channelNumber)).eval();
 
     //Cut filtered m_dataProcOriginal
-    cutOrigProcData(m_iCutFront, m_iCutBack);
+    m_dataProcMapped = cutData(m_dataProcOriginal, m_iCutFront, m_iCutBack);
+
+    //Calculate mean
+    m_dataProcMean(channelNumber) = calculateRowMean(m_dataProcMapped);
 }
+
+
+//*************************************************************************************************************
+
+MatrixXdR DataPackage::cutData(const MatrixXdR &originalData, int cutFront, int cutBack)
+{
+    if(originalData.cols()-cutFront-cutBack < 0 || cutFront>originalData.cols()) {
+        qDebug()<<"DataPackage::cutData - cutFront or cutBack do not fit. Aborting mapping and returning original data.";
+        MatrixXdR returnMat = originalData;
+        return returnMat;
+    }
+
+    if(cutFront != m_iCutFront)
+        m_iCutFront = cutFront;
+
+    if(cutBack != m_iCutBack)
+        m_iCutBack = cutBack;
+
+    //Cut original data using block
+    return (MatrixXdR)originalData.block(0, cutFront, originalData.rows(), originalData.cols()-cutFront-cutBack);
+}
+
+
+//*************************************************************************************************************
+
+RowVectorXd DataPackage::cutData(const RowVectorXd &originalData, int cutFront, int cutBack)
+{
+    if(originalData.cols()-cutFront-cutBack < 0 || cutFront>originalData.cols()) {
+        qDebug()<<"DataPackage::cutData - cutFront or cutBack do not fit. Aborting mapping and returning original data.";
+        RowVectorXd returnVec = originalData;
+        return returnVec;
+    }
+
+    if(cutFront != m_iCutFront)
+        m_iCutFront = cutFront;
+
+    if(cutBack != m_iCutBack)
+        m_iCutBack = cutBack;
+
+    //Cut original data using segment
+    return (RowVectorXd)originalData.segment(cutFront, originalData.cols()-cutFront-cutBack);
+}
+
+
+//*************************************************************************************************************
+
+VectorXd DataPackage::calculateMatMean(const MatrixXd &dataMat)
+{
+    VectorXd channelMeans(dataMat.rows());
+
+    for(int i = 0; i<channelMeans.rows(); i++)
+        channelMeans[i] = dataMat.row(i).mean();
+
+    return channelMeans;
+}
+
+
+//*************************************************************************************************************
+
+double DataPackage::calculateRowMean(const VectorXd &dataRow)
+{
+    return dataRow.mean();
+}
+
 
 
 

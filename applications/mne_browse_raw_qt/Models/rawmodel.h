@@ -226,15 +226,6 @@ private:
     */
     QPair<MatrixXd,MatrixXd> readSegment(fiff_int_t from, fiff_int_t to);
 
-    //=========================================================================================================
-    /**
-    * calculateMean calculates the mean for all data stored in data (matrix wise)
-    *
-    * @param data the data matrix
-    * @return the means of each row of the input data matrix
-    */
-    VectorXd calculateMean(const MatrixXd &dataMat);
-
     //VARIABLES
     //Reload control
     bool                                    m_bStartReached;            /**< signals, whether the start of the fiff data file is reached. */
@@ -255,10 +246,6 @@ private:
 
     //Fiff data structure
     QList<QSharedPointer<DataPackage> >     m_data;                     /**< List that holds the fiff matrix data <n_channels x n_samples>. */
-    QList<MatrixXdR>                        m_procData;                 /**< List that holds the processed fiff matrix data <n_channels x n_samples>. */
-    QList<MatrixXdR>                        m_times;                    /**< List that holds the time axis [in secs]. */
-    QList<VectorXd>                         m_dataMean;                 /**< List that holds the means of each channel in each data block. */
-    QList<VectorXd>                         m_procDataMean;             /**< List that holds the means of each channel in each processed data block. */
 
     //Filter operators
     QMap<int,QSharedPointer<MNEOperator> >      m_assignedOperators;    /**< Map of MNEOperator types to channels.*/
@@ -415,6 +402,14 @@ private slots:
     * updateOperatorsConcurrently runs the processing of the MNEOperators in a background-thread
     */
     void updateOperatorsConcurrently();
+
+    //=========================================================================================================
+    /**
+    * updateOperatorsConcurrently runs the processing of the MNEOperators in a background-thread for a given index of the data package list m_data
+    *
+    * @param windowIndex the index of m_data which is to be filtered
+    */
+    void updateOperatorsConcurrently(int windowIndex);
 
     //=========================================================================================================
     /**
