@@ -252,6 +252,11 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
         m_dataCurrent.remove(0, m_iMaxSamples);
     }
 
+
+    //Apply Projector
+
+
+
     //Update data content
     QModelIndex topLeft = this->index(0,1);
     QModelIndex bottomRight = this->index(m_qListChInfo.size()-1,1);

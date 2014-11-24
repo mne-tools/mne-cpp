@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     projectorwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2014
+* @date     May, 2014
 *
 * @section  LICENSE
 *
@@ -29,47 +29,26 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of the computation of a test ssp
+* @brief    Implementation of the ProjectorWidget Class.
 *
 */
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <fs/label.h>
-#include <fs/surface.h>
-#include <fs/annotationset.h>
-
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff.h>
-#include <mne/mne.h>
-
-#include <mne/mne_epoch_data_list.h>
-
-#include <mne/mne_sourceestimate.h>
-#include <inverse/minimumNorm/minimumnorm.h>
-
-
-#include <utils/mnemath.h>
-
-#include <iostream>
-
-#include <fstream>
+#include "projectorwidget.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QGuiApplication>
-#include <QSet>
-#include <QElapsedTimer>
+#include <QGridLayout>
 
-//#define BENCHMARK
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -77,53 +56,71 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FSLIB;
-using namespace FIFFLIB;
-using namespace UTILSLIB;
+using namespace XDISPLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MAIN
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-//=============================================================================================================
-/**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
-*
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
-*/
-int main(int argc, char *argv[])
+ProjectorWidget::ProjectorWidget(QWidget *parent, Qt::WindowFlags f)
+: QWidget(parent, f)
 {
-    QGuiApplication a(argc, argv);
+}
 
-    QFile t_fiffFile(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/header.fif");
 
-    //
-    //   Open the file
-    //
-    FiffStream::SPtr p_pStream(new FiffStream(&t_fiffFile));
-    QString t_sFileName = p_pStream->streamName();
+//*************************************************************************************************************
 
-    printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
-
-    FiffDirTree t_Tree;
-    QList<FiffDirEntry> t_Dir;
-
-    if(!p_pStream->open(t_Tree, t_Dir))
-        return false;
-
-    QList<FiffProj> q_ListProj = p_pStream->read_proj(t_Tree);
-
-    if (q_ListProj.size() == 0)
+void ProjectorWidget::createUI()
+{
+    if(m_pFiffInfo)
     {
-        printf("Could not find projectors\n");
-        return false;
-    }
+        m_qListCheckBox.clear();
+        // Projection Selection
+        QGridLayout *topLayout = new QGridLayout;
+        for(qint32 i = 0; i < m_pFiffInfo->projs.size(); ++i)
+        {
+            QCheckBox* checkBox = new QCheckBox(m_pFiffInfo->projs[i].desc);
+            checkBox->setChecked(m_pFiffInfo->projs[i].active);
 
-    return a.exec();
+            m_qListCheckBox.append(checkBox);
+
+            connect(checkBox, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged), this, &ProjectorWidget::checkStatusChanged);
+            topLayout->addWidget(checkBox, i, 1);
+        }
+
+        setLayout(topLayout);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void ProjectorWidget::checkStatusChanged(int status)
+{
+    Q_UNUSED(status)
+
+    for(qint32 i = 0; i < m_qListCheckBox.size(); ++i)
+        this->m_pFiffInfo->projs[i].active = m_qListCheckBox[i]->isChecked();
+
+    //
+    //   Create the projector
+    //
+
+    MatrixXd proj;
+    this->m_pFiffInfo->make_projector(proj);
+
+    qDebug() << "New projection calculated.";
+
+    emit projectorChanged(proj);
+}
+
+
+//*************************************************************************************************************
+
+void ProjectorWidget::setFiffInfo(FIFFLIB::FiffInfo::SPtr& p_pFiffInfo)
+{
+    this->m_pFiffInfo = p_pFiffInfo;
+    createUI();
 }
