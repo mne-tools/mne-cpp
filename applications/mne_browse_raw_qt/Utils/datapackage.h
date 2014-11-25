@@ -103,8 +103,10 @@ public:
     * Sets the original long raw data matrix read from the file. Optional: Also cuts the original raw data to a specific size.
     *
     * @param originalRawData the original raw data
+    * @param cutFront the amount to be cutted from orignal data from the front
+    * @param cutBack the amount to be cutted from orignal data from the back
     */
-    void setOrigRawData(const MatrixXdR &originalRawData);
+    void setOrigRawData(const MatrixXdR &originalRawData, int cutFront, int cutBack);
 
     //=========================================================================================================
     /**
@@ -112,16 +114,20 @@ public:
     *
     * @param originalRawData the original raw data in form of a row
     * @param row the row number
+    * @param cutFront the amount to be cutted from orignal data from the front
+    * @param cutBack the amount to be cutted from orignal data from the back
     */
-    void setOrigRawData(const RowVectorXd &originalRawData, int row);
+    void setOrigRawData(const RowVectorXd &originalRawData, int row, int cutFront, int cutBack);
 
     //=========================================================================================================
     /**
     * Sets the original long processed data matrix calculated. Optional: Also cuts the original processed data to a specific size.
     *
     * @param originalProcData the original processed data
+    * @param cutFront the amount to be cutted from orignal data from the front
+    * @param cutBack the amount to be cutted from orignal data from the back
     */
-    void setOrigProcData(const MatrixXdR &originalProcData);
+    void setOrigProcData(const MatrixXdR &originalProcData, int cutFront, int cutBack);
 
     //=========================================================================================================
     /**
@@ -129,26 +135,10 @@ public:
     *
     * @param originalProcData the original raw data in form of a row
     * @param row the row number
-    */
-    void setOrigProcData(const RowVectorXd &originalProcData, int row);
-
-    //=========================================================================================================
-    /**
-    * Cuts the original raw data and recalculates the mean.
-    *
     * @param cutFront the amount to be cutted from orignal data from the front
     * @param cutBack the amount to be cutted from orignal data from the back
     */
-    void cutOrigRawData(int cutFront, int cutBack);
-
-    //=========================================================================================================
-    /**
-    * Cuts the original processed data and recalculates the mean.
-    *
-    * @param cutFront the amount to be cutted from orignal data from the front
-    * @param cutBack the amount to be cutted from orignal data from the back
-    */
-    void cutOrigProcData(int cutFront, int cutBack);
+    void setOrigProcData(const RowVectorXd &originalProcData, int row, int cutFront, int cutBack);
 
     //=========================================================================================================
     /**
