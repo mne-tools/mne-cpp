@@ -65,6 +65,7 @@ RawModel::RawModel(QObject *parent)
 , m_bProcessing(false)
 , m_fiffInfo(FiffInfo())
 , m_pfiffIO(QSharedPointer<FiffIO>(new FiffIO()))
+, m_filterChType("All")
 {
     m_iWindowSize = MODEL_WINDOW_SIZE;
     m_reloadPos = MODEL_RELOAD_POS;
@@ -84,19 +85,19 @@ RawModel::RawModel(QObject *parent)
 
     //connect filtering reloading - this is done after a new block has been loaded
     connect(this,&RawModel::dataReloaded,[this](){
-        if(!m_assignedOperators.empty()) updateOperatorsConcurrently();
+        if(!m_assignedOperators.empty())
+            updateOperatorsConcurrently();
     });
 
 //    connect(&m_operatorFutureWatcher,&QFutureWatcher<QPair<int,RowVectorXd> >::resultReadyAt,[this](int index){
 //        insertProcessedData(index);
 //    });
     connect(&m_operatorFutureWatcher,&QFutureWatcher<void>::finished,[this](){
-        insertProcessedData();
+        insertProcessedDataAll();
     });
-
-    connect(&m_operatorFutureWatcher,&QFutureWatcher<QPair<int,RowVectorXd> >::progressValueChanged,[this](int progressValue){
-        qDebug() << "RawModel: ProgressValue m_operatorFutureWatcher, " << progressValue << " items processed out of" << m_listTmpChData.size();
-    });
+//    connect(&m_operatorFutureWatcher,&QFutureWatcher<QPair<int,RowVectorXd> >::progressValueChanged,[this](int progressValue){
+//        qDebug() << "RawModel: ProgressValue m_operatorFutureWatcher, " << progressValue << " items processed out of" << m_listTmpChData.size();
+//    });
 }
 
 
@@ -111,6 +112,7 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
 , m_bProcessing(false)
 , m_fiffInfo(FiffInfo())
 , m_pfiffIO(QSharedPointer<FiffIO>(new FiffIO()))
+, m_filterChType("All")
 {
     m_iWindowSize = MODEL_WINDOW_SIZE;
     m_reloadPos = MODEL_RELOAD_POS;
@@ -129,20 +131,19 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
     });
 
     connect(this,&RawModel::dataReloaded,[this](){
-        if(!m_assignedOperators.empty()) updateOperatorsConcurrently();
+        if(!m_assignedOperators.empty())
+            updateOperatorsConcurrently();
     });
 
 //    connect(&m_operatorFutureWatcher,&QFutureWatcher<QPair<int,RowVectorXd> >::resultReadyAt,[this](int index){
 //        insertProcessedData(index);
 //    });
-
     connect(&m_operatorFutureWatcher,&QFutureWatcher<void>::finished,[this](){
-        insertProcessedData();
+        insertProcessedDataAll();
     });
-
-    connect(&m_operatorFutureWatcher,&QFutureWatcher<QPair<int,RowVectorXd> >::progressValueChanged,[this](int progressValue){
-        qDebug() << "RawModel: ProgressValue m_operatorFutureWatcher, " << progressValue << " items processed out of" << m_listTmpChData.size();
-    });
+//    connect(&m_operatorFutureWatcher,&QFutureWatcher<QPair<int,RowVectorXd> >::progressValueChanged,[this](int progressValue){
+//        qDebug() << "RawModel: ProgressValue m_operatorFutureWatcher, " << progressValue << " items processed out of" << m_listTmpChData.size();
+//    });
 }
 
 
@@ -527,9 +528,7 @@ void RawModel::resetPosition(qint32 position)
 //*************************************************************************************************************
 
 void RawModel::reloadFiffData(bool before)
-{    
-    qDebug()<<"lastSample: "<<lastSample();
-
+{
     m_bReloadBefore = before;
 
     //update scroll position
@@ -571,6 +570,10 @@ void RawModel::reloadFiffData(bool before)
     //read data with respect to start and end point
     QFuture<QPair<MatrixXd,MatrixXd> > future = QtConcurrent::run(this,&RawModel::readSegment,start,end);
 
+    //Wait for thread reloading is finished, then insert reloaded data
+//    future.waitForFinished();
+//    insertReloadedData(future.result());
+
     m_reloadFutureWatcher.setFuture(future);
 }
 
@@ -579,7 +582,6 @@ void RawModel::reloadFiffData(bool before)
 
 QPair<MatrixXd,MatrixXd> RawModel::readSegment(fiff_int_t from, fiff_int_t to)
 {
-    qDebug()<<"in readSegment";
     QPair<MatrixXd,MatrixXd> datatime;
 
     m_Mutex.lock();
@@ -588,8 +590,6 @@ QPair<MatrixXd,MatrixXd> RawModel::readSegment(fiff_int_t from, fiff_int_t to)
         return datatime;
     }
     m_Mutex.unlock();
-
-    qDebug()<<"out readSegment";
 
     return datatime;
 }
@@ -648,30 +648,10 @@ void RawModel::markChBad(QModelIndexList chlist, bool status)
 
 //*************************************************************************************************************
 
-void RawModel::applyOperator(QModelIndex chan, const QSharedPointer<MNEOperator>& operatorPtr, bool reset)
+void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator>& operatorPtr, const QString &chType)
 {
-    //cast to QSharedPointer<FilterOperator>
-    QSharedPointer<FilterOperator> filter;
-    if(operatorPtr->m_OperatorType==MNEOperator::FILTER) {
-        filter = operatorPtr.staticCast<FilterOperator>();
+    m_filterChType = chType;
 
-        //adds filtered channel to m_assignedOperators
-        if(!m_assignedOperators.values(chan.row()).contains(operatorPtr))
-            m_assignedOperators.insertMulti(chan.row(),operatorPtr);
-
-        //qDebug() << "RawModel: Filter" << filter->m_sName << "applied to channel#" << chan.row();
-    }
-
-    updateOperatorsConcurrently();
-
-    emit assignedOperatorsChanged(m_assignedOperators);
-}
-
-
-//*************************************************************************************************************
-
-void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator>& operatorPtr, const QString &chType, bool reset)
-{
     //clear channel list becuase we will generate a new one
     chlist.clear();
 
@@ -702,7 +682,7 @@ void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOpe
 
 //*************************************************************************************************************
 
-void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator>& operatorPtr, bool reset)
+void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator>& operatorPtr)
 {
     //filter all when chlist is empty
     if(chlist.empty()) {
@@ -723,7 +703,8 @@ void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOpe
         }
     }
 
-    updateOperatorsConcurrently();
+    for(int i=0; i<m_data.size(); i++)
+        updateOperatorsConcurrently(i);
 
     emit assignedOperatorsChanged(m_assignedOperators);
 
@@ -760,8 +741,17 @@ void RawModel::applyOperatorsConcurrently(QPair<int,RowVectorXd>& chdata) const
 
 void RawModel::updateOperators(QModelIndex chan)
 {
-    for(qint32 i=0; i < m_assignedOperators.values(chan.row()).size(); ++i)
-        applyOperator(chan,m_assignedOperators.values(chan.row())[i],true);
+    for(qint32 i=0; i < m_assignedOperators.values(chan.row()).size(); ++i) {
+        for(qint32 j=0; j < m_assignedOperators.values(chan.row()).size(); ++j) {
+            if(!m_assignedOperators.values(chan.row()).contains(m_assignedOperators.values(chan.row())[j]))
+                m_assignedOperators.insertMulti(chan.row(), m_assignedOperators.values(chan.row())[j]);
+        }
+    }
+
+    for(int i=0; i<m_data.size(); i++)
+        updateOperatorsConcurrently(i);
+
+    emit assignedOperatorsChanged(m_assignedOperators);
 }
 
 
@@ -774,10 +764,16 @@ void RawModel::updateOperators(QModelIndexList chlist)
             chlist.append(createIndex(i,1));
 
     for(qint32 i=0; i < chlist.size(); ++i) {
-        if(m_assignedOperators.contains(chlist[i].row()))
-            for(qint32 j=0; j < m_assignedOperators.values(chlist[i].row()).size(); ++j)
-                applyOperator(chlist[i],m_assignedOperators.values(chlist[i].row())[j],true);
+        for(qint32 j=0; j < m_assignedOperators.values(chlist[i].row()).size(); ++j) {
+            if(!m_assignedOperators.values(chlist[i].row()).contains(m_assignedOperators.values(chlist[i].row())[j]))
+                m_assignedOperators.insertMulti(chlist[i].row(), m_assignedOperators.values(chlist[i].row())[j]);
+        }
     }
+
+    for(int i=0; i<m_data.size(); i++)
+        updateOperatorsConcurrently(i);
+
+    emit assignedOperatorsChanged(m_assignedOperators);
 }
 
 
@@ -890,7 +886,7 @@ void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair)
 
     //delete newDataPackage;
 
-    qDebug() << "RawModel: Fiff data REloaded from " << dataTimesPair.second.coeff(0) << "secs to" << dataTimesPair.second.coeff(dataTimesPair.second.cols()-1) << "secs";
+    qDebug() << "RawModel: Fiff data Reloaded from " << dataTimesPair.second.coeff(0) << "secs to" << dataTimesPair.second.coeff(dataTimesPair.second.cols()-1) << "secs";
 }
 
 
@@ -931,7 +927,12 @@ void RawModel::updateOperatorsConcurrently()
 
     m_operatorFutureWatcher.setFuture(future);
 
-    qDebug() << "RawModel: operatorFutureWatcher on!";
+    //Wait for thread to be finished processig the data, then insert data
+    //future.waitForFinished();
+
+    qDebug() << "RawModel: finished concurrent PROCESSING operation of" << listFilteredChs.size() << "items";
+
+    //insertProcessedDataAll();
 }
 
 
@@ -939,8 +940,8 @@ void RawModel::updateOperatorsConcurrently()
 
 void RawModel::updateOperatorsConcurrently(int windowIndex)
 {
-    if(windowIndex>=m_data.size() || windowIndex<0)
-        windowIndex=0;
+    if(windowIndex >= m_data.size() || windowIndex < 0)
+        windowIndex = 0;
 
     m_bProcessing = true;
 
@@ -973,37 +974,69 @@ void RawModel::updateOperatorsConcurrently(int windowIndex)
         return applyOperatorsConcurrently(chdata);
     });
 
-    m_operatorFutureWatcher.setFuture(future);
+    //Wait for thread to be finished processig the data, then insert data
+    future.waitForFinished();
 
-    qDebug() << "RawModel: operatorFutureWatcher on!";
+    qDebug() << "RawModel: finished concurrent PROCESSING operation of" << listFilteredChs.size() << "items";
+
+    insertProcessedDataAll(windowIndex);
 }
 
 
 //*************************************************************************************************************
 
-void RawModel::insertProcessedData(int index)
+void RawModel::insertProcessedDataRow(int rowIndex)
 {
     QList<int> listFilteredChs = m_assignedOperators.keys();
 
     if(m_bReloadBefore) {
-        m_data.first()->setOrigProcData(m_listTmpChData[index].second, m_listTmpChData[index].first);
+        m_data.first()->setOrigProcData(m_listTmpChData[rowIndex].second, m_listTmpChData[rowIndex].first);
         m_data.first()->cutOrigProcData(MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
     }
     else {
-        m_data.last()->setOrigProcData(m_listTmpChData[index].second, m_listTmpChData[index].first);
+        m_data.last()->setOrigProcData(m_listTmpChData[rowIndex].second, m_listTmpChData[rowIndex].first);
         m_data.last()->cutOrigProcData(MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
     }
 
-    emit dataChanged(createIndex(listFilteredChs[index],1),createIndex(listFilteredChs[index],1));
+    emit dataChanged(createIndex(listFilteredChs[rowIndex],1),createIndex(listFilteredChs[rowIndex],1));
 
-    if(index==listFilteredChs.last())
+    if(rowIndex == listFilteredChs.last())
         m_bProcessing = false;
 }
 
 
 //*************************************************************************************************************
 
-void RawModel::insertProcessedData()
+void RawModel::insertProcessedDataAll(int windowIndex)
+{
+    if(windowIndex >= m_data.size() || windowIndex < 0)
+        windowIndex = 0;
+
+    QList<int> listFilteredChs = m_assignedOperators.keys();
+
+    for(qint32 i=0; i < listFilteredChs.size(); ++i) {
+        if(m_bReloadBefore)
+            m_data[windowIndex]->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i]);
+        else
+            m_data[windowIndex]->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i]);
+    }
+
+    //Cut original data to window size and calculate mean for filtered data
+    if(m_bReloadBefore)
+        m_data[windowIndex]->cutOrigProcData(MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
+    else
+        m_data[windowIndex]->cutOrigProcData(MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
+
+    emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));
+
+    qDebug() << "RawModel: Finished inserting" << listFilteredChs.size() << "channels.";
+    m_bProcessing = false;
+}
+
+
+//*************************************************************************************************************
+
+void RawModel::insertProcessedDataAll()
 {
     QList<int> listFilteredChs = m_assignedOperators.keys();
 
@@ -1022,6 +1055,6 @@ void RawModel::insertProcessedData()
 
     emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));
 
-    qDebug() << "RawModel: Finished concurrently processing" << listFilteredChs.size() << "channels.";
+    qDebug() << "RawModel: Finished inserting" << listFilteredChs.size() << "channels.";
     m_bProcessing = false;
 }
