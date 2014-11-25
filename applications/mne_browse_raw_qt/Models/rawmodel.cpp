@@ -989,14 +989,10 @@ void RawModel::insertProcessedDataRow(int rowIndex)
 {
     QList<int> listFilteredChs = m_assignedOperators.keys();
 
-    if(m_bReloadBefore) {
-        m_data.first()->setOrigProcData(m_listTmpChData[rowIndex].second, m_listTmpChData[rowIndex].first);
-        m_data.first()->cutOrigProcData(MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
-    }
-    else {
-        m_data.last()->setOrigProcData(m_listTmpChData[rowIndex].second, m_listTmpChData[rowIndex].first);
-        m_data.last()->cutOrigProcData(MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
-    }
+    if(m_bReloadBefore)
+        m_data.first()->setOrigProcData(m_listTmpChData[rowIndex].second, m_listTmpChData[rowIndex].first,MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
+    else
+        m_data.last()->setOrigProcData(m_listTmpChData[rowIndex].second, m_listTmpChData[rowIndex].first,MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
 
     emit dataChanged(createIndex(listFilteredChs[rowIndex],1),createIndex(listFilteredChs[rowIndex],1));
 
@@ -1014,18 +1010,13 @@ void RawModel::insertProcessedDataAll(int windowIndex)
 
     QList<int> listFilteredChs = m_assignedOperators.keys();
 
+    //Set and cut original data to window size and calculate mean for filtered data
     for(qint32 i=0; i < listFilteredChs.size(); ++i) {
         if(m_bReloadBefore)
-            m_data[windowIndex]->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i]);
+            m_data[windowIndex]->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i], MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
         else
-            m_data[windowIndex]->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i]);
+            m_data[windowIndex]->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i], MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
     }
-
-    //Cut original data to window size and calculate mean for filtered data
-    if(m_bReloadBefore)
-        m_data[windowIndex]->cutOrigProcData(MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
-    else
-        m_data[windowIndex]->cutOrigProcData(MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
 
     emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));
 
@@ -1040,18 +1031,13 @@ void RawModel::insertProcessedDataAll()
 {
     QList<int> listFilteredChs = m_assignedOperators.keys();
 
+    //Set and cut original data to window size and calculate mean for filtered data
     for(qint32 i=0; i < listFilteredChs.size(); ++i) {
         if(m_bReloadBefore)
-            m_data.first()->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i]);
+            m_data.first()->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i],MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
         else
-            m_data.last()->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i]);
+            m_data.last()->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i],MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
     }
-
-    //Cut original data to window size and calculate mean for filtered data
-    if(m_bReloadBefore)
-        m_data.first()->cutOrigProcData(MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
-    else
-        m_data.last()->cutOrigProcData(MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
 
     emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));
 

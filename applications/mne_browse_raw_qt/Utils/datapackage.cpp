@@ -60,8 +60,7 @@ DataPackage::DataPackage(const MatrixXdR &originalRawData, const MatrixXdR &orig
 , m_iCutBack(cutBack)
 {
     if(originalRawData.rows() != 0 && originalRawData.cols() != 0) {
-        setOrigRawData(originalRawData);
-        m_dataRawMapped = cutData(originalRawData, cutFront, cutBack);
+        setOrigRawData(originalRawData, cutFront, cutBack);
 
         m_timeRawOriginal = originalRawTime;
         m_timeRawMapped = cutData(m_timeRawOriginal, cutFront, cutBack);
@@ -79,41 +78,11 @@ DataPackage::DataPackage(const MatrixXdR &originalRawData, const MatrixXdR &orig
 
 //*************************************************************************************************************
 
-void DataPackage::setOrigRawData(const MatrixXdR &originalRawData)
+void DataPackage::setOrigRawData(const MatrixXdR &originalRawData, int cutFront, int cutBack)
 {
     //set orignal data
     m_dataRawOriginal = originalRawData;
-}
 
-
-//*************************************************************************************************************
-
-void DataPackage::setOrigRawData(const RowVectorXd &originalRawData, int row)
-{
-    if(originalRawData.cols() != m_dataRawOriginal.cols() || row >= m_dataRawOriginal.rows()){
-        qDebug()<<"DataPackage::setOrigRawData - cannot set row data to m_dataRawOriginal";
-        return;
-    }
-
-    //set orignal data at row row
-    m_dataRawOriginal.row(row) = originalRawData;
-}
-
-
-//*************************************************************************************************************
-
-void DataPackage::setOrigProcData(const MatrixXdR &originalProcData)
-{
-    //set orignal processed data
-    m_dataProcOriginal = originalProcData;
-}
-
-
-
-//*************************************************************************************************************
-
-void DataPackage::cutOrigRawData(int cutFront, int cutBack)
-{
     //Cut data
     m_dataRawMapped = cutData(m_dataRawOriginal, cutFront, cutBack);
 
@@ -124,7 +93,42 @@ void DataPackage::cutOrigRawData(int cutFront, int cutBack)
 
 //*************************************************************************************************************
 
-void DataPackage::setOrigProcData(const RowVectorXd &originalProcData, int row)
+void DataPackage::setOrigRawData(const RowVectorXd &originalRawData, int row, int cutFront, int cutBack)
+{
+    if(originalRawData.cols() != m_dataRawOriginal.cols() || row >= m_dataRawOriginal.rows()){
+        qDebug()<<"DataPackage::setOrigRawData - cannot set row data to m_dataRawOriginal";
+        return;
+    }
+
+    //set orignal data at row row
+    m_dataRawOriginal.row(row) = originalRawData;
+
+    //Cut data
+    m_dataRawMapped.row(row) = cutData(m_dataRawOriginal, cutFront, cutBack);
+
+    //Calculate mean
+    m_dataRawMean(row) = calculateRowMean(m_dataRawMapped.row(row));
+}
+
+
+//*************************************************************************************************************
+
+void DataPackage::setOrigProcData(const MatrixXdR &originalProcData, int cutFront, int cutBack)
+{
+    //set orignal processed data
+    m_dataProcOriginal = originalProcData;
+
+    //Cut data
+    m_dataProcMapped = cutData(m_dataProcOriginal, cutFront, cutBack);
+
+    //Calculate mean
+    m_dataProcMean = calculateMatMean(m_dataProcMapped);
+}
+
+
+//*************************************************************************************************************
+
+void DataPackage::setOrigProcData(const RowVectorXd &originalProcData, int row, int cutFront, int cutBack)
 {
     if(originalProcData.cols() != m_dataProcOriginal.cols() || row >= m_dataProcOriginal.rows()){
         qDebug()<<"DataPackage::setOrigProcData - cannot set row data to m_dataProcOriginal";
@@ -133,18 +137,12 @@ void DataPackage::setOrigProcData(const RowVectorXd &originalProcData, int row)
 
     //set orignal data at row row
     m_dataProcOriginal.row(row) = originalProcData;
-}
 
-
-//*************************************************************************************************************
-
-void DataPackage::cutOrigProcData(int cutFront, int cutBack)
-{
     //Cut data
-    m_dataProcMapped = cutData(m_dataProcOriginal, cutFront, cutBack);
+    m_dataProcMapped.row(row) = cutData(originalProcData, cutFront, cutBack);
 
     //Calculate mean
-    m_dataProcMean = calculateMatMean(m_dataProcMapped);
+    m_dataProcMean(row) = calculateRowMean(m_dataProcMapped.row(row));
 }
 
 
