@@ -59,8 +59,8 @@ using namespace MNEBrowseRawQt;
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
 , m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
-, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
-, m_qEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
+//, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
+//, m_qEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
 , m_qSettings()
 , m_rawSettings()
 , ui(new Ui::MainWindowWidget)
@@ -130,14 +130,13 @@ void MainWindow::setupWindowWidgets()
     m_pScaleWindow->hide();
 
     //Create filter window - QTDesigner used - see / FormFiles
-    m_pFilterWindow = new FilterWindow(this);
+    m_pFilterWindow = new FilterWindow(this, this);
     addDockWidget(Qt::BottomDockWidgetArea, m_pFilterWindow);
     m_pFilterWindow->hide();
 
     //Init windows - TODO: get rid of this here, do this inside the window classes
     m_pDataWindow->init();
     m_pEventWindow->init();
-    m_pFilterWindow->init();
     m_pScaleWindow->init();
 
     //Create the toolbar after all indows have been initiliased
@@ -182,6 +181,10 @@ void MainWindow::setupWindowWidgets()
     connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
             m_pSelectionManagerWindow, &SelectionManagerWindow::newFiffFileLoaded);
 
+    //Connect filter window with new file loaded signal
+    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
+            m_pFilterWindow, &FilterWindow::newFileLoaded);
+
     //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels - TODO: dirty move get rid of this here
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
         m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_fiffInfo);
@@ -189,6 +192,7 @@ void MainWindow::setupWindowWidgets()
         m_pChInfoWindow->getDataModel()->layoutChanged(m_pSelectionManagerWindow->getLayoutMap());
         m_pSelectionManagerWindow->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
         m_pSelectionManagerWindow->newFiffFileLoaded();
+        m_pFilterWindow->newFileLoaded();
     }
 }
 
@@ -222,6 +226,25 @@ void MainWindow::createToolBar()
         m_pDataWindow->updateDataTableViews();
     });
     toolBar->addAction(m_pRemoveDCAction);
+
+    //Add show/hide bad channel button
+    m_pHideBadAction = new QAction(QIcon(":/Resources/Images/hideBad.png"),tr("Hide all bad channels"), this);
+    m_pHideBadAction->setStatusTip(tr("Hide all bad channels"));
+    connect(m_pHideBadAction,&QAction::triggered, [=](){
+        if(m_pHideBadAction->toolTip() == "Show all bad channels") {
+            m_pHideBadAction->setIcon(QIcon(":/Resources/Images/hideBad.png"));
+            m_pHideBadAction->setToolTip("Hide all bad channels");
+            m_pDataWindow->setStatusTip(tr("Hide all bad channels"));
+            m_pDataWindow->hideBadChannels(false);
+        }
+        else {
+            m_pHideBadAction->setIcon(QIcon(":/Resources/Images/showBad.png"));
+            m_pHideBadAction->setToolTip("Show all bad channels");
+            m_pHideBadAction->setStatusTip(tr("Show all bad channels"));
+            m_pDataWindow->hideBadChannels(true);
+        }
+    });
+    toolBar->addAction(m_pHideBadAction);
 
     toolBar->addSeparator();
 
