@@ -338,6 +338,7 @@ bool AverageModel::loadEvokedData(QFile& qFile)
 
     endResetModel();
 
+    emit fileLoaded(true);
     emit dataChanged(createIndex(0,0), createIndex(rowCount(),columnCount()));
 
     return true;

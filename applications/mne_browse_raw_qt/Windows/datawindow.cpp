@@ -62,6 +62,7 @@ DataWindow::DataWindow(QWidget *parent)
 , m_pDataMarker(new DataMarker(this))
 , m_pCurrentDataMarkerLabel(new QLabel(this))
 , m_iCurrentMarkerSample(0)
+, m_bHideBadChannels(false)
 {
     ui->setupUi(this);
 
@@ -125,6 +126,7 @@ void DataWindow::scaleData(const QMap<QString,double> &scaleMap)
     updateDataTableViews();
 }
 
+
 //*************************************************************************************************************
 
 void DataWindow::updateDataTableViews()
@@ -137,17 +139,21 @@ void DataWindow::updateDataTableViews()
 
 void DataWindow::showSelectedChannelsOnly(QStringList selectedChannels)
 {
+    m_slSelectedChannels = selectedChannels;
+
     //Hide non selected channels/rows in the data views
     for(int i = 0; i<m_pRawModel->rowCount(); i++) {
-        QModelIndex index = m_pRawModel->index(i, 0);
-        QString channel = m_pRawModel->data(index, Qt::DisplayRole).toString();
-
-        ui->m_tableView_rawTableView->showRow(i);
+        QString channel = m_pRawModel->data(m_pRawModel->index(i, 0), Qt::DisplayRole).toString();
+        QVariant v = m_pRawModel->data(m_pRawModel->index(i,1), Qt::BackgroundRole);
 
         if(!selectedChannels.contains(channel))
             ui->m_tableView_rawTableView->hideRow(i);
         else
             ui->m_tableView_rawTableView->showRow(i);
+
+        //if channel is a bad channel and bad channels are to be hidden -> do not show
+        if(v.canConvert<QBrush>() && m_bHideBadChannels)
+            ui->m_tableView_rawTableView->hideRow(i);
     }
 
     updateDataTableViews();
@@ -160,6 +166,30 @@ void DataWindow::changeRowHeight(int height)
 {
     for(int i = 0; i<ui->m_tableView_rawTableView->verticalHeader()->count(); i++)
         ui->m_tableView_rawTableView->setRowHeight(i, height);
+
+    updateDataTableViews();
+}
+
+
+//*************************************************************************************************************
+
+void DataWindow::hideBadChannels(bool hideChannels)
+{
+    m_bHideBadChannels = hideChannels;
+
+    //Hide non selected channels/rows in the data views
+    for(int i = 0; i<m_pRawModel->rowCount(); i++) {
+        QVariant v = m_pRawModel->data(m_pRawModel->index(i,1),Qt::BackgroundRole);
+        QString chName = m_pRawModel->data(m_pRawModel->index(i,0),Qt::DisplayRole).toString();
+
+        //Check if channel is marked as bad
+        if(v.canConvert<QBrush>() && m_bHideBadChannels)
+            ui->m_tableView_rawTableView->hideRow(i);
+        else if(m_slSelectedChannels.contains(chName))
+            ui->m_tableView_rawTableView->showRow(i);
+    }
+
+    updateDataTableViews();
 }
 
 
@@ -355,6 +385,9 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
         horizontalScrollBar->setValue(horizontalScrollBar->value() + 25);
         break;
     }
+
+    if((event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_D))
+        ui->m_tableView_rawTableView->clearSelection();
 
     return QWidget::keyPressEvent(event);
 }
