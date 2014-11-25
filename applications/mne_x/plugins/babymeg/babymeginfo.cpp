@@ -238,7 +238,7 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
     m_FiffInfo.meas_date[1] = 0;
     m_FiffInfo.sfreq = sfreq;
     m_FiffInfo.highpass = 0;
-    m_FiffInfo.lowpass = m_FiffInfo.sfreq/2;
+    m_FiffInfo.lowpass = m_FiffInfo.sfreq;
     m_FiffInfo.acq_pars = QString("BabyMEG");
     m_FiffInfo.acq_stim = QString("");
     m_FiffInfo.filename = QString("");
