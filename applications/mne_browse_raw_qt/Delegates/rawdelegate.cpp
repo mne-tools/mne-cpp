@@ -146,7 +146,7 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
         painter->restore();
 
         //Plot data path
-        path = QPainterPath(QPointF(option.rect.x()+t_rawModel->relFiffCursor(),option.rect.y()));
+        path = QPainterPath(QPointF(option.rect.x()+t_rawModel->relFiffCursor(), option.rect.y()));
         createPlotPath(index, option, path, listPairs, channelMean);
 
         if(option.state & QStyle::State_Selected) {
@@ -260,6 +260,8 @@ void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionVie
 
     double y_base = -path.currentPosition().y();
     QPointF qSamplePosition;
+
+    path.moveTo(path.currentPosition().x(), -(y_base + ((*(listPairs[0].first) - channelMean)*dScaleY)));
 
     //plot all rows from list of pairs
     for(qint8 i=0; i < listPairs.size(); ++i) {

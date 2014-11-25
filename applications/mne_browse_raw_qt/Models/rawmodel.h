@@ -241,6 +241,7 @@ private:
     QFutureWatcher<void>                    m_operatorFutureWatcher;    /**< QFutureWatcher for watching process of applying Operators to reloaded fiff data. */
     QList<QPair<int,RowVectorXd> >          m_listTmpChData;            /**< contains pairs with a channel number and the corresponding RowVectorXd. */
     bool                                    m_bProcessing;              /**< true when processing in a background-thread is ongoing.*/
+    QString                                 m_filterChType;
 
     QMutex                                  m_Mutex;                    /**< mutex for locking against simultaenous access to shared objects >. */
 
@@ -301,23 +302,13 @@ public slots:
 
     //=========================================================================================================
     /**
-    * applyOperator applies assigend operators to channel
-    *
-    * @param chan selects the channel to process
-    * @param filter
-    */
-    void applyOperator(QModelIndex chan, const QSharedPointer<MNEOperator> &operatorPtr, bool reset=false);
-
-    //=========================================================================================================
-    /**
     * applyOperator applies assigend operators to channel which include a scpefic string in their channel names
     *
     * @param chlist selects the channels to process
     * @param operatorPtr
     * @param chType the string which need to be included in the channels name to get filtered
-    * @param reset
     */
-    void applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator>& operatorPtr, const QString &chType, bool reset=false);
+    void applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator>& operatorPtr, const QString &chType);
 
     //=========================================================================================================
     /**
@@ -326,7 +317,7 @@ public slots:
     * @param chlist selects the channels to process
     * @param filter
     */
-    void applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator> &operatorPtr, bool reset=false);
+    void applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator> &operatorPtr);
 
     //=========================================================================================================
     /**
@@ -413,17 +404,25 @@ private slots:
 
     //=========================================================================================================
     /**
-    * insertProcessedData inserts the processed data into m_procData when background-thread has finished (this method would be used for QtConcurrent::mapped)
+    * insertProcessedDataRow inserts the processed data row into m_data when background-thread has finished (this method would be used for QtConcurrent::mapped)
     *
-    * @param index represents the row index in m_procData
+    * @param index represents the row index in m_data
     */
-    void insertProcessedData(int index);
+    void insertProcessedDataRow(int rowIndex);
 
     //=========================================================================================================
     /**
-    * insertProcessedData inserts the processed data into m_procData when background-thread has finished (this method would be used for QtConcurrent::map)
+    * insertProcessedDataAll inserts all the processed data into m_data[windowIndex] when background-thread has finished
+    *
+    * @param index represents the window index in m_data
     */
-    void insertProcessedData();
+    void insertProcessedDataAll(int windowIndex);
+
+    //=========================================================================================================
+    /**
+    * insertProcessedDataAll inserts all the processed data into m_data in front (m_ReloadFront = true) or back (m_ReloadFront = false) when background-thread has finished (this method would be used for QtConcurrent::map)
+    */
+    void insertProcessedDataAll();
 
 public:
     //=========================================================================================================
