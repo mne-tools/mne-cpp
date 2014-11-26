@@ -64,21 +64,68 @@ FilterOperator::FilterOperator()
 
 //*************************************************************************************************************
 
-FilterOperator::FilterOperator(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, qint32 fftlength)
+FilterOperator::FilterOperator(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, double sFreq, qint32 fftlength, DesignMethod designMethod)
 : MNEOperator(OperatorType::FILTER)
 , m_Type(type)
 , m_iFilterOrder(order)
 , m_iFFTlength(fftlength)
 , m_dCenterFreq(centerfreq)
 , m_dBandwidth(bandwidth)
+, m_sFreq(sFreq)
+, m_designMethod(designMethod)
+, m_sName(unique_name)
 {
-    m_sName = unique_name;
+    switch(designMethod) {
+        case Tschebyscheff: {
+            ParksMcClellan filter(order, centerfreq, bandwidth, parkswidth, (ParksMcClellan::TPassType)type);
+            m_dCoeffA = filter.FirCoeff;
 
-    ParksMcClellan filter(order, centerfreq, bandwidth, parkswidth, (ParksMcClellan::TPassType)type);
-    m_dCoeffA = filter.FirCoeff;
+            //fft-transform m_dCoeffA in order to be able to perform frequency-domain filtering
+            fftTransformCoeffs();
 
-    //fft-transform m_dCoeffA in order to be able to perform frequency-domain filtering
-    fftTransformCoeffs();
+            break;
+        }
+
+        case Cosine: {
+            CosineFilter filtercos;
+
+            switch(type) {
+                case FilterType::LPF:
+                    filtercos = CosineFilter (fftlength,
+                                            (centerfreq)*(sFreq/2),
+                                            parkswidth*(sFreq/2),
+                                            (centerfreq)*(sFreq/2),
+                                            parkswidth*(sFreq/2),
+                                            sFreq,
+                                            (CosineFilter::TPassType)type);
+                    break;
+
+                case FilterType::HPF:
+                    filtercos = CosineFilter (fftlength,
+                                            (centerfreq)*(sFreq/2),
+                                            parkswidth*(sFreq/2),
+                                            (centerfreq)*(sFreq/2),
+                                            parkswidth*(sFreq/2),
+                                            sFreq,
+                                            (CosineFilter::TPassType)type);
+                    break;
+
+                case FilterType::BPF:
+                    filtercos = CosineFilter (fftlength,
+                                            (centerfreq + bandwidth/2)*(sFreq/2),
+                                            parkswidth*(sFreq/2),
+                                            (centerfreq - bandwidth/2)*(sFreq/2),
+                                            parkswidth*(sFreq/2),
+                                            sFreq,
+                                            (CosineFilter::TPassType)type);
+                    break;
+            }
+
+            m_dFFTCoeffA = filtercos.m_dFFTCoeffA;
+
+            break;
+        }
+    }
 }
 
 
@@ -131,5 +178,8 @@ RowVectorXd FilterOperator::applyFFTFilter(const RowVectorXd& data)
     fft.inv(t_filteredTime,t_filteredFreq);
 
     //cuts off ends at front and end and return result. segment(i,n): Block containing n elements, starting at position i
-    return t_filteredTime.segment(m_iFilterOrder/2, data.cols());
+    if(m_designMethod == Tschebyscheff)
+        return t_filteredTime.segment(m_iFilterOrder/2, data.cols());
+
+    return t_filteredTime.segment(0, data.cols());
 }

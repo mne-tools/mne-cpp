@@ -307,35 +307,37 @@ void RawModel::genStdFilterOps()
     int exp = ceil(log2(fftLength));
     fftLength = pow(2, exp);
 
+    FilterOperator::DesignMethod dMethod = FilterOperator::Cosine;
+
     //HPF
     double cutoffFreqHz = 50; //in Hz
     QString name = QString("HPF_%1").arg(cutoffFreqHz);
-    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::HPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,0.2,0.1,fftLength)));
+    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::HPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,5/nyquist_freq,1/nyquist_freq,sfreq,fftLength,dMethod)));
 
     //LPF
     cutoffFreqHz = 30; //in Hz
     name = QString("LPF_%1").arg(cutoffFreqHz);
-    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,0.2,0.1,fftLength)));
+    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,5/nyquist_freq,1/nyquist_freq,sfreq,fftLength,dMethod)));
     cutoffFreqHz = 10; //in Hz
     name = QString("LPF_%1").arg(cutoffFreqHz);
-    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,0.2,0.1,fftLength)));
+    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,5/nyquist_freq,1/nyquist_freq,sfreq,fftLength,dMethod)));
 
     //BPF
     double from_freqHz = 30;
     double to_freqHz = 40;
-    double trans_width = 15;
-    double center = (to_freqHz - from_freqHz)/2; //double center = from_freqHz+bw/2;
+    double trans_width = 5;
     double bw = to_freqHz-from_freqHz; //double bw = to_freqHz/from_freqHz;
+    double center = from_freqHz+bw/2;
 
     name = QString("BPF_%1-%2").arg(from_freqHz).arg(to_freqHz);
-    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::BPF,80,(double)center/nyquist_freq,(double)bw/nyquist_freq,(double)trans_width/nyquist_freq,fftLength)));
+    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::BPF,80,(double)center/nyquist_freq,(double)bw/nyquist_freq,(double)trans_width/nyquist_freq,sfreq,fftLength,dMethod)));
 
     //Own/manual set filter - only an entry i nthe operator list generated which is called when the filterwindow is used
     cutoffFreqHz = 40;
     //only create if filter does not exist yet
     if(!m_Operators.contains(QString("User defined (See 'Adjust/Filter')"))) {
         name = QString("User defined (See 'Adjust/Filter')");
-        m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
+        m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,5/nyquist_freq,1/nyquist_freq,sfreq,(m_iWindowSize+m_iFilterTaps),dMethod)));
     }
 
     //**********

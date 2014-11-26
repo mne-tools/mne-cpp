@@ -82,7 +82,8 @@ SOURCES += \
     mp/atom.cpp \
     mp/fixdictmp.cpp \
     selectionloader.cpp \
-    minimizersimplex.cpp
+    minimizersimplex.cpp \
+    cosinefilter.cpp
 
 HEADERS += \
     kmeans.h\
@@ -98,7 +99,8 @@ HEADERS += \
     mp/fixdictmp.h \
     selectionloader.h \
     layoutmaker.h \
-    minimizersimplex.h
+    minimizersimplex.h \
+    cosinefilter.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
