@@ -74,6 +74,7 @@
 #include "../Utils/types.h"
 #include "../Utils/filteroperator.h"
 #include "../Utils/rawsettings.h"
+#include "../Utils/datapackage.h"
 
 
 //*************************************************************************************************************
@@ -225,14 +226,6 @@ private:
     */
     QPair<MatrixXd,MatrixXd> readSegment(fiff_int_t from, fiff_int_t to);
 
-    //=========================================================================================================
-    /**
-    * calculateMean calculates the mean for all data stored in m_data
-    *
-    * @param data
-    */
-    VectorXd calculateMean(const MatrixXd &data);
-
     //VARIABLES
     //Reload control
     bool                                    m_bStartReached;            /**< signals, whether the start of the fiff data file is reached. */
@@ -248,15 +241,12 @@ private:
     QFutureWatcher<void>                    m_operatorFutureWatcher;    /**< QFutureWatcher for watching process of applying Operators to reloaded fiff data. */
     QList<QPair<int,RowVectorXd> >          m_listTmpChData;            /**< contains pairs with a channel number and the corresponding RowVectorXd. */
     bool                                    m_bProcessing;              /**< true when processing in a background-thread is ongoing.*/
+    QString                                 m_filterChType;
 
     QMutex                                  m_Mutex;                    /**< mutex for locking against simultaenous access to shared objects >. */
 
     //Fiff data structure
-    QList<MatrixXdR>                        m_data;                     /**< List that holds the fiff matrix data <n_channels x n_samples>. */
-    QList<MatrixXdR>                        m_procData;                 /**< List that holds the processed fiff matrix data <n_channels x n_samples>. */
-    QList<MatrixXdR>                        m_times;                    /**< List that holds the time axis [in secs]. */
-    QList<VectorXd>                         m_dataMean;                 /**< List that holds the means of each channel in each data block. */
-    QList<VectorXd>                         m_procDataMean;             /**< List that holds the means of each channel in each processed data block. */
+    QList<QSharedPointer<DataPackage> >     m_data;                     /**< List that holds the fiff matrix data <n_channels x n_samples>. */
 
     //Filter operators
     QMap<int,QSharedPointer<MNEOperator> >      m_assignedOperators;    /**< Map of MNEOperator types to channels.*/
@@ -312,23 +302,13 @@ public slots:
 
     //=========================================================================================================
     /**
-    * applyOperator applies assigend operators to channel
-    *
-    * @param chan selects the channel to process
-    * @param filter
-    */
-    void applyOperator(QModelIndex chan, const QSharedPointer<MNEOperator> &operatorPtr, bool reset=false);
-
-    //=========================================================================================================
-    /**
     * applyOperator applies assigend operators to channel which include a scpefic string in their channel names
     *
     * @param chlist selects the channels to process
     * @param operatorPtr
     * @param chType the string which need to be included in the channels name to get filtered
-    * @param reset
     */
-    void applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator>& operatorPtr, const QString &chType, bool reset=false);
+    void applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator>& operatorPtr, const QString &chType);
 
     //=========================================================================================================
     /**
@@ -337,7 +317,7 @@ public slots:
     * @param chlist selects the channels to process
     * @param filter
     */
-    void applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator> &operatorPtr, bool reset=false);
+    void applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator> &operatorPtr);
 
     //=========================================================================================================
     /**
@@ -345,7 +325,7 @@ public slots:
     *
     * @param chdata[in,out] represents the channel data as a RowVectorXd
     */
-    void applyOperatorsConcurrently(QPair<int, RowVectorXd>& chdata) const;
+    void applyOperatorsConcurrently(QPair<int, RowVectorXd> &chdata) const;
 
     //=========================================================================================================
     /**
@@ -416,17 +396,33 @@ private slots:
 
     //=========================================================================================================
     /**
-    * insertProcessedData inserts the processed data into m_procData when background-thread has finished (this method would be used for QtConcurrent::mapped)
+    * updateOperatorsConcurrently runs the processing of the MNEOperators in a background-thread for a given index of the data package list m_data
     *
-    * @param index represents the row index in m_procData
+    * @param windowIndex the index of m_data which is to be filtered
     */
-    void insertProcessedData(int index);
+    void updateOperatorsConcurrently(int windowIndex);
 
     //=========================================================================================================
     /**
-    * insertProcessedData inserts the processed data into m_procData when background-thread has finished (this method would be used for QtConcurrent::map)
+    * insertProcessedDataRow inserts the processed data row into m_data when background-thread has finished (this method would be used for QtConcurrent::mapped)
+    *
+    * @param index represents the row index in m_data
     */
-    void insertProcessedData();
+    void insertProcessedDataRow(int rowIndex);
+
+    //=========================================================================================================
+    /**
+    * insertProcessedDataAll inserts all the processed data into m_data[windowIndex] when background-thread has finished
+    *
+    * @param index represents the window index in m_data
+    */
+    void insertProcessedDataAll(int windowIndex);
+
+    //=========================================================================================================
+    /**
+    * insertProcessedDataAll inserts all the processed data into m_data in front (m_ReloadFront = true) or back (m_ReloadFront = false) when background-thread has finished (this method would be used for QtConcurrent::map)
+    */
+    void insertProcessedDataAll();
 
 public:
     //=========================================================================================================
