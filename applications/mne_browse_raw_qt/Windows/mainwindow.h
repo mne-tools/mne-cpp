@@ -273,6 +273,7 @@ private:
     Ui::MainWindowWidget*   ui;                         /**< Pointer to the qt designer generated ui class.*/
 
     QAction*                m_pRemoveDCAction;          /**< The action which is used to control DC removal. */
+    QAction*                m_pHideBadAction;           /**< The action which is used to control hide bad channel functionality. */
 };
 
 } //NAMESPACE
