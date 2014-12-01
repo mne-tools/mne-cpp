@@ -433,6 +433,22 @@
    </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>m_comboBox_designMethod</tabstop>
+  <tabstop>m_comboBox_filterType</tabstop>
+  <tabstop>m_doubleSpinBox_lowpass</tabstop>
+  <tabstop>m_doubleSpinBox_highpass</tabstop>
+  <tabstop>m_doubleSpinBox_transitionband</tabstop>
+  <tabstop>m_spinBox_filterTaps</tabstop>
+  <tabstop>m_comboBox_filterApplyTo</tabstop>
+  <tabstop>m_pushButton_applyFilter</tabstop>
+  <tabstop>m_comboBox_filterUndoTo</tabstop>
+  <tabstop>m_pushButton_undoFiltering</tabstop>
+  <tabstop>m_pushButton_exportFilter</tabstop>
+  <tabstop>m_pushButton_exportPlot</tabstop>
+  <tabstop>m_graphicsView_filterPlot</tabstop>
+  <tabstop>m_tableView_activeFilters</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

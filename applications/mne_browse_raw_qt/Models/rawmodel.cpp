@@ -1036,9 +1036,9 @@ void RawModel::insertProcessedDataAll()
     //Set and cut original data to window size and calculate mean for filtered data
     for(qint32 i=0; i < listFilteredChs.size(); ++i) {
         if(m_bReloadBefore)
-            m_data.first()->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i],MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
+            m_data.first()->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i], MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
         else
-            m_data.last()->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i],MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
+            m_data.last()->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i], MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
     }
 
     emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));

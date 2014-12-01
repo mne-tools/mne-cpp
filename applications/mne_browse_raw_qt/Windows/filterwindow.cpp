@@ -342,14 +342,20 @@ void FilterWindow::filterParametersChanged()
     int exp = ceil(log2(fftLength));
     fftLength = pow(2, exp);
 
-    ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
-    ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
+    //set maximum and minimum of for cut of frequency spin boxes
+    if(ui->m_comboBox_filterType->currentText() == "Bandpass") {
+        ui->m_doubleSpinBox_highpass->setMinimum(ui->m_doubleSpinBox_lowpass->value());
+        ui->m_doubleSpinBox_lowpass->setMaximum(ui->m_doubleSpinBox_highpass->value());
+    }
+    else {
+        ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
+        ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
+    }
 
+    //set current fft length
     ui->m_label_fftLength->setText(QString().number(fftLength));
 
-    ui->m_doubleSpinBox_highpass->setMinimum(ui->m_doubleSpinBox_lowpass->value());
-    ui->m_doubleSpinBox_lowpass->setMaximum(ui->m_doubleSpinBox_highpass->value());
-
+    //set filter design method
     FilterOperator::DesignMethod dMethod;
     if(ui->m_comboBox_designMethod->currentText() == "Tschebyscheff")
         dMethod = FilterOperator::Tschebyscheff;

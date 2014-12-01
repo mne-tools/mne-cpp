@@ -314,9 +314,6 @@
         </widget>
        </item>
       </layout>
-      <zorder>label_2</zorder>
-      <zorder>label_2</zorder>
-      <zorder>m_SpinBox_channelHeight</zorder>
      </widget>
     </item>
     <item>
@@ -335,6 +332,17 @@
    </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>m_doubleSpinBox_MEG_grad</tabstop>
+  <tabstop>m_doubleSpinBox_MEG_mag</tabstop>
+  <tabstop>m_doubleSpinBox_EEG</tabstop>
+  <tabstop>m_doubleSpinBox_EOG</tabstop>
+  <tabstop>m_doubleSpinBox_ECG</tabstop>
+  <tabstop>m_doubleSpinBox_EMG</tabstop>
+  <tabstop>m_doubleSpinBox_MISC</tabstop>
+  <tabstop>m_doubleSpinBox_STIM</tabstop>
+  <tabstop>m_SpinBox_channelHeight</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
