@@ -337,12 +337,13 @@ void FilterWindow::filterParametersChanged()
     double samplingFrequency = m_pMainWindow->m_pDataWindow->getDataModel()->m_fiffInfo.sfreq;
     double nyquistFrequency = samplingFrequency/2;
 
+    //Calculate the needed fft length
     int filterTaps = ui->m_spinBox_filterTaps->value();
-    int fftLength = m_iWindowSize+2*filterTaps; //2*filterTaps because we need to add data at the front and back
+    int fftLength = m_iWindowSize+MODEL_MAX_NUM_FILTER_TAPS; //MODEL_MAX_NUM_FILTER_TAPS because we need to add data at the front and back
     int exp = ceil(log2(fftLength));
-    fftLength = pow(2, exp);
+    fftLength = pow(2, exp+1);
 
-    //set maximum and minimum of for cut of frequency spin boxes
+    //set maximum and minimum for cut off frequency spin boxes
     if(ui->m_comboBox_filterType->currentText() == "Bandpass") {
         ui->m_doubleSpinBox_highpass->setMinimum(ui->m_doubleSpinBox_lowpass->value());
         ui->m_doubleSpinBox_lowpass->setMaximum(ui->m_doubleSpinBox_highpass->value());
@@ -352,7 +353,7 @@ void FilterWindow::filterParametersChanged()
         ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
     }
 
-    //set current fft length
+    //set current fft length info label
     ui->m_label_fftLength->setText(QString().number(fftLength));
 
     //set filter design method
@@ -363,6 +364,7 @@ void FilterWindow::filterParametersChanged()
     if(ui->m_comboBox_designMethod->currentText() == "Cosine")
         dMethod = FilterOperator::Cosine;
 
+    //Generate filters
     QSharedPointer<MNEOperator> userDefinedFilterOperator;
 
     if(ui->m_comboBox_filterType->currentText() == "Lowpass") {

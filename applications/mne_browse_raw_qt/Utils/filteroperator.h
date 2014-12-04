@@ -149,7 +149,7 @@ public:
     * @param data the input data which is to be filtered
     * @return a row vector truncated by numberFilterTaps/2 at front and end
     */
-    RowVectorXd applyFFTFilter(const RowVectorXd& data);
+    RowVectorXd applyFFTFilter(const RowVectorXd& data) const;
 
     double          m_sFreq;            /**< the sampling frequency. */
     int             m_iFilterOrder;     /**< represents the order of the filter instance. */

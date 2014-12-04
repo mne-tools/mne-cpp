@@ -56,18 +56,23 @@ using namespace MNEBrowseRawQt;
 //=============================================================================================================
 
 DataPackage::DataPackage(const MatrixXdR &originalRawData, const MatrixXdR &originalRawTime, int cutFront, int cutBack)
-: m_iCutFront(cutFront)
-, m_iCutBack(cutBack)
+: m_iCutFrontRaw(cutFront)
+, m_iCutBackRaw(cutBack)
+, m_iCutFrontProc(cutFront)
+, m_iCutBackProc(cutBack)
 {
     if(originalRawData.rows() != 0 && originalRawData.cols() != 0) {
-        setOrigRawData(originalRawData, cutFront, cutBack);
+        setOrigRawData(originalRawData, m_iCutFrontRaw, m_iCutBackRaw);
 
         m_timeRawOriginal = originalRawTime;
-        m_timeRawMapped = cutData(m_timeRawOriginal, cutFront, cutBack);
+        m_timeRawMapped = cutData(m_timeRawOriginal, m_iCutFrontRaw, m_iCutBackRaw);
     }
 
-    //Init processed data with zero
-    m_dataProcOriginal = MatrixXdR::Zero(m_dataRawOriginal.rows(), m_dataRawOriginal.cols());
+    //Init processed data with zero and double the multiple integer of 2 (because of zero padding)
+    int exp = ceil(log2(originalRawTime.cols()));
+    int length = pow(2, exp+1);
+
+    m_dataProcOriginal = MatrixXdR::Zero(m_dataRawOriginal.rows(), length);
     m_dataProcMapped = MatrixXdR::Zero(m_dataRawMapped.rows(), m_dataRawMapped.cols());
 
     //Init mean data
@@ -85,6 +90,12 @@ void DataPackage::setOrigRawData(const MatrixXdR &originalRawData, int cutFront,
 
     //Cut data
     m_dataRawMapped = cutData(m_dataRawOriginal, cutFront, cutBack);
+
+    if(cutFront != m_iCutFrontRaw)
+        m_iCutFrontRaw = cutFront;
+
+    if(cutBack != m_iCutBackRaw)
+        m_iCutBackRaw = cutBack;
 
     //Calculate mean
     m_dataRawMean = calculateMatMean(m_dataRawMapped);
@@ -106,6 +117,12 @@ void DataPackage::setOrigRawData(const RowVectorXd &originalRawData, int row, in
     //Cut data
     m_dataRawMapped.row(row) = cutData(m_dataRawOriginal, cutFront, cutBack);
 
+    if(cutFront != m_iCutFrontRaw)
+        m_iCutFrontRaw = cutFront;
+
+    if(cutBack != m_iCutBackRaw)
+        m_iCutBackRaw = cutBack;
+
     //Calculate mean
     m_dataRawMean(row) = calculateRowMean(m_dataRawMapped.row(row));
 }
@@ -120,6 +137,12 @@ void DataPackage::setOrigProcData(const MatrixXdR &originalProcData, int cutFron
 
     //Cut data
     m_dataProcMapped = cutData(m_dataProcOriginal, cutFront, cutBack);
+
+    if(cutFront != m_iCutFrontProc)
+        m_iCutFrontProc = cutFront;
+
+    if(cutBack != m_iCutBackProc)
+        m_iCutBackProc = cutBack;
 
     //Calculate mean
     m_dataProcMean = calculateMatMean(m_dataProcMapped);
@@ -140,6 +163,12 @@ void DataPackage::setOrigProcData(const RowVectorXd &originalProcData, int row, 
 
     //Cut data
     m_dataProcMapped.row(row) = cutData(originalProcData, cutFront, cutBack);
+
+    if(cutFront != m_iCutFrontProc)
+        m_iCutFrontProc = cutFront;
+
+    if(cutBack != m_iCutBackProc)
+        m_iCutBackProc = cutBack;
 
     //Calculate mean
     m_dataProcMean(row) = calculateRowMean(m_dataProcMapped.row(row));
@@ -215,7 +244,7 @@ void DataPackage::applyFFTFilter(int channelNumber, QSharedPointer<FilterOperato
         m_dataProcOriginal.row(channelNumber) = filter->applyFFTFilter(m_dataProcOriginal.row(channelNumber)).eval();
 
     //Cut filtered m_dataProcOriginal
-    m_dataProcMapped = cutData(m_dataProcOriginal, m_iCutFront, m_iCutBack);
+    m_dataProcMapped = cutData(m_dataProcOriginal, m_iCutFrontProc, m_iCutBackProc);
 
     //Calculate mean
     m_dataProcMean(channelNumber) = calculateRowMean(m_dataProcMapped);
@@ -232,12 +261,6 @@ MatrixXdR DataPackage::cutData(const MatrixXdR &originalData, int cutFront, int 
         return returnMat;
     }
 
-    if(cutFront != m_iCutFront)
-        m_iCutFront = cutFront;
-
-    if(cutBack != m_iCutBack)
-        m_iCutBack = cutBack;
-
     //Cut original data using block
     return (MatrixXdR)originalData.block(0, cutFront, originalData.rows(), originalData.cols()-cutFront-cutBack);
 }
@@ -252,12 +275,6 @@ RowVectorXd DataPackage::cutData(const RowVectorXd &originalData, int cutFront, 
         RowVectorXd returnVec = originalData;
         return returnVec;
     }
-
-    if(cutFront != m_iCutFront)
-        m_iCutFront = cutFront;
-
-    if(cutBack != m_iCutBack)
-        m_iCutBack = cutBack;
 
     //Cut original data using segment
     return (RowVectorXd)originalData.segment(cutFront, originalData.cols()-cutFront-cutBack);

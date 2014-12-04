@@ -303,9 +303,10 @@ void RawModel::genStdFilterOps()
     double nyquist_freq = sfreq/2;
 
     int filterTaps = m_iFilterTaps;
-    int fftLength = m_iWindowSize+2*filterTaps; //2*filterTaps because we need to add data at the front and back
+    int fftLength = m_iWindowSize+MODEL_MAX_NUM_FILTER_TAPS; //MODEL_MAX_NUM_FILTER_TAPS because we need to add data at the front and back
     int exp = ceil(log2(fftLength));
-    fftLength = pow(2, exp);
+    fftLength = pow(2, exp+1);
+    m_iCurrentFFTLength = fftLength;
 
     FilterOperator::DesignMethod dMethod = FilterOperator::Cosine;
 
@@ -845,7 +846,6 @@ void RawModel::undoFilter(const QString &chType)
 }
 
 
-
 //*************************************************************************************************************
 
 void RawModel::undoFilter()
@@ -991,10 +991,15 @@ void RawModel::insertProcessedDataRow(int rowIndex)
 {
     QList<int> listFilteredChs = m_assignedOperators.keys();
 
+    int cutFront = m_iCurrentFFTLength/2;
+    int cutBack = m_listTmpChData[0].second.cols()-m_iCurrentFFTLength/2-m_iWindowSize;
+
     if(m_bReloadBefore)
-        m_data.first()->setOrigProcData(m_listTmpChData[rowIndex].second, m_listTmpChData[rowIndex].first,MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
+        m_data.first()->setOrigProcData(m_listTmpChData[rowIndex].second, m_listTmpChData[rowIndex].first, cutFront, cutBack);
     else
-        m_data.last()->setOrigProcData(m_listTmpChData[rowIndex].second, m_listTmpChData[rowIndex].first,MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
+        m_data.last()->setOrigProcData(m_listTmpChData[rowIndex].second, m_listTmpChData[rowIndex].first, cutFront, cutBack);
+
+    performOverlapAdd();
 
     emit dataChanged(createIndex(listFilteredChs[rowIndex],1),createIndex(listFilteredChs[rowIndex],1));
 
@@ -1007,18 +1012,28 @@ void RawModel::insertProcessedDataRow(int rowIndex)
 
 void RawModel::insertProcessedDataAll(int windowIndex)
 {
-    if(windowIndex >= m_data.size() || windowIndex < 0)
+    if(windowIndex >= m_data.size() || windowIndex < 0 || m_assignedOperators.empty())
         windowIndex = 0;
 
     QList<int> listFilteredChs = m_assignedOperators.keys();
 
+    int cutFront = m_iCurrentFFTLength/2;
+    int cutBack = m_listTmpChData[0].second.cols()-m_iCurrentFFTLength/2-m_iWindowSize;
+
     //Set and cut original data to window size and calculate mean for filtered data
-    for(qint32 i=0; i < listFilteredChs.size(); ++i) {
-        if(m_bReloadBefore)
-            m_data[windowIndex]->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i], MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
-        else
-            m_data[windowIndex]->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i], MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
-    }
+    for(qint32 i=0; i < listFilteredChs.size(); ++i)
+        m_data[windowIndex]->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i], cutFront, cutBack);// MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
+
+    QFile file("D:/t_filteredTime.txt");
+    file.open(QFile::WriteOnly | QFile::Text);
+    QTextStream out(&file);
+
+    for(int i=0; i < m_listTmpChData[0].second.cols(); ++i)
+        out << m_listTmpChData[0].second(0,i) << endl;
+
+    file.close();
+
+    performOverlapAdd();
 
     emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));
 
@@ -1033,16 +1048,79 @@ void RawModel::insertProcessedDataAll()
 {
     QList<int> listFilteredChs = m_assignedOperators.keys();
 
+    int cutFront = m_iCurrentFFTLength/2;
+    int cutBack = m_listTmpChData[0].second.cols()-m_iCurrentFFTLength/2-m_iWindowSize;
+
     //Set and cut original data to window size and calculate mean for filtered data
-    for(qint32 i=0; i < listFilteredChs.size(); ++i) {
+    for(int i=0; i < listFilteredChs.size(); ++i) {
         if(m_bReloadBefore)
-            m_data.first()->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i], MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
+            m_data.first()->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i], cutFront, cutBack);
         else
-            m_data.last()->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i], MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
+            m_data.last()->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i], cutFront, cutBack);
     }
+
+    performOverlapAdd();
 
     emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));
 
     qDebug() << "RawModel: Finished inserting" << listFilteredChs.size() << "channels.";
     m_bProcessing = false;
+}
+
+
+//*************************************************************************************************************
+
+void RawModel::performOverlapAdd()
+{
+    if(m_data.empty() || m_data.size()<2)
+        return;
+
+    QList<int> listFilteredChs = m_assignedOperators.keys();
+
+    //Overlap add window data
+    int numberWin = m_data.size();
+    int cols = m_data[0]->dataProcOrig().cols();
+    int zeroTaper = m_iCurrentFFTLength/2;
+    int zeroFFT = m_iCurrentFFTLength-m_data[0]->dataProcOrig().cols();
+
+    RowVectorXd front = RowVectorXd::Zero(cols);
+    RowVectorXd back = RowVectorXd::Zero(cols);
+
+    //Iterate through window data
+    for(int i = 0; i<numberWin; i++) {
+        for(int j = 0; j<listFilteredChs.size(); j++) {
+            //First window
+            if(i==0) {
+                back.segment(cols-zeroTaper-zeroFFT, zeroTaper+zeroFFT) =
+                        m_data[i+1]->dataProcOrig().row(j).segment(0,zeroTaper);
+            }
+
+            //Middle windows
+            if(i > 0 && i < numberWin-1) {
+                front.segment(0, zeroTaper) =
+                        m_data[i-1]->dataProcOrig().row(j).segment(cols-zeroTaper-zeroFFT, zeroTaper);
+
+                back.segment(cols-zeroTaper-zeroFFT, zeroTaper) =
+                        m_data[i+1]->dataProcOrig().row(j).segment(0, zeroTaper);
+            }
+
+            //Last window
+            if(i == numberWin-1) {
+                front.segment(0, zeroTaper) =
+                        m_data[i-1]->dataProcOrig().row(j).segment(cols-zeroTaper-zeroFFT, zeroTaper);
+            }
+
+            //Do the overlap add
+            m_data[i]->setOrigProcData(m_listTmpChData[j].second+front+back, listFilteredChs[j], zeroTaper, zeroTaper+zeroFFT);
+        }
+    }
+
+    QFile file("D:/t_filteredTime.txt");
+    file.open(QFile::WriteOnly | QFile::Text);
+    QTextStream out(&file);
+
+    for(int i=0; i < m_listTmpChData[0].second.cols(); ++i)
+        out << m_listTmpChData[0].second(0,i) << endl;
+
+    file.close();
 }
