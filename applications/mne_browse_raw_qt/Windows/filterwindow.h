@@ -90,7 +90,7 @@ public:
     *
     * @param [in] parent pointer to parent widget; If parent is 0, the new FilterWindow becomes a window. If parent is another widget, FilterWindow becomes a child window inside parent. FilterWindow is deleted when its parent is deleted.
     */
-    FilterWindow(QWidget *parent = 0);
+    FilterWindow(MainWindow *mainWindow, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -101,9 +101,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Initialises this window.
+    * On new file loaded.
     */
-    void init();
+    void newFileLoaded();
 
 private:
     //=========================================================================================================

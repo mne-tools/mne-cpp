@@ -57,7 +57,7 @@ CONFIG(debug, debug|release) {
 }
 
 #Note that the static flag is ingored when building against a dynamic qt version
-CONFIG += static #DEBUG console
+CONFIG += static console #DEBUG console
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
@@ -107,7 +107,8 @@ SOURCES += \
     Windows/selectionmanagerwindow.cpp \
     Windows/averagewindow.cpp \
     Windows/scalewindow.cpp \
-    Windows/chinfowindow.cpp
+    Windows/chinfowindow.cpp \
+    Utils/datapackage.cpp
 
 HEADERS += \
     Utils/datamarker.h \
@@ -140,7 +141,8 @@ HEADERS += \
     Windows/selectionmanagerwindow.h \
     Windows/averagewindow.h \
     Windows/scalewindow.h \
-    Windows/chinfowindow.h
+    Windows/chinfowindow.h \
+    Utils/datapackage.h
 
 FORMS += \
     Windows/eventwindowdock.ui \
