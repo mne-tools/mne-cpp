@@ -131,6 +131,22 @@ CosineFilter::CosineFilter(int fftLength, float lowpass, float lowpass_width, fl
     }
 
     m_dFFTCoeffA = filterFreqResp;
+
+//    //Generate windowed impulse response
+//    Eigen::FFT<double> fft;
+//    fft.SetFlag(fft.HalfSpectrum);
+
+//    //invert to time domain and
+//    fft.inv(m_dCoeffA, filterFreqResp);
+//    m_dCoeffA = m_dCoeffA.segment(0,1024).eval();
+
+//    //window/zero-pad m_dCoeffA to m_iFFTlength
+//    RowVectorXd t_coeffAzeroPad = RowVectorXd::Zero(fftLength);
+//    t_coeffAzeroPad.head(m_dCoeffA.cols()) = m_dCoeffA;
+
+//    //fft-transform filter coeffs
+//    m_dFFTCoeffA = RowVectorXcd::Zero(fftLength);
+//    fft.fwd(m_dFFTCoeffA,t_coeffAzeroPad);
 }
 
 

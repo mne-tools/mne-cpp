@@ -140,6 +140,7 @@ FilterOperator::~FilterOperator()
 
 void FilterOperator::fftTransformCoeffs()
 {
+    //This function only nneds to be called when using the Tschebyscheff design method
     //zero-pad m_dCoeffA to m_iFFTlength
     RowVectorXd t_coeffAzeroPad = RowVectorXd::Zero(m_iFFTlength);
     t_coeffAzeroPad.head(m_dCoeffA.cols()) = m_dCoeffA;
@@ -156,11 +157,27 @@ void FilterOperator::fftTransformCoeffs()
 
 //*************************************************************************************************************
 
-RowVectorXd FilterOperator::applyFFTFilter(const RowVectorXd& data)
+RowVectorXd FilterOperator::applyFFTFilter(const RowVectorXd& data) const
 {
-    //zero-pad data to m_iFFTlength
-    RowVectorXd t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
-    t_dataZeroPad.head(data.cols()) = data;
+    RowVectorXd t_dataZeroPad;
+
+//    t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
+//    t_dataZeroPad.head(data.cols()) = data;
+    t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
+    t_dataZeroPad.segment(m_iFFTlength/2, data.cols()) = data;
+
+//    //zero-pad data to m_iFFTlength
+//    //If Tschebyscheff design method, append zeros at the end
+//    if(m_designMethod == Tschebyscheff) {
+//        t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
+//        t_dataZeroPad.head(data.cols()) = data;
+//    }
+
+//    //If Cosine design method, append zeros of data/signal length at the front and end
+//    if(m_designMethod == Cosine) {
+//        t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength*2);
+//        t_dataZeroPad.segment(m_iFFTlength/2, data.cols()) = data;
+//    }
 
     //generate fft object
     Eigen::FFT<double> fft;
@@ -179,7 +196,8 @@ RowVectorXd FilterOperator::applyFFTFilter(const RowVectorXd& data)
 
     //cuts off ends at front and end and return result. segment(i,n): Block containing n elements, starting at position i
     if(m_designMethod == Tschebyscheff)
-        return t_filteredTime.segment(m_iFilterOrder/2, data.cols());
+        return t_filteredTime;//.segment(m_iFilterOrder/2, data.cols());
 
-    return t_filteredTime.segment(0, data.cols());
+    //design method = cosine
+    return t_filteredTime;//.segment(0, data.cols());
 }

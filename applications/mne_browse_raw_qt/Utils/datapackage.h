@@ -92,7 +92,8 @@ public:
     /**
     * Constructs a DataPackage.
     *
-    * @param originalRawData the original data
+    * @param originalRawData the original raw data
+    * @param originalRawTime the original raw time data
     * @param cutFront the amount to be cutted from orignal data from the front
     * @param cutBack the amount to be cutted from orignal data from the back
     */
@@ -255,8 +256,10 @@ private:
     VectorXd    m_dataProcMean;         /**< The mean of the mapped/cut processed/filtered data */
 
     //Cutting parameters
-    int m_iCutFront;                    /**< The last used cut front value */
-    int m_iCutBack;                     /**< The last used cut back value */
+    int m_iCutFrontRaw;                 /**< The last used cut front value of the raw data */
+    int m_iCutBackRaw;                  /**< The last used cut back value of the raw data*/
+    int m_iCutFrontProc;                /**< The last used cut front value of the raw data */
+    int m_iCutBackProc;                 /**< The last used cut back value of the raw data*/
 };
 
 } // NAMESPACE
