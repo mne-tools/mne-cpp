@@ -151,6 +151,24 @@ void DataPackage::setOrigProcData(const MatrixXdR &originalProcData, int cutFron
 
 //*************************************************************************************************************
 
+void DataPackage::setMappedProcData(const MatrixXdR &originalProcData, int cutFront, int cutBack)
+{
+    //Cut data
+    m_dataProcMapped = cutData(originalProcData, cutFront, cutBack);
+
+    if(cutFront != m_iCutFrontProc)
+        m_iCutFrontProc = cutFront;
+
+    if(cutBack != m_iCutBackProc)
+        m_iCutBackProc = cutBack;
+
+    //Calculate mean
+    m_dataProcMean = calculateMatMean(m_dataProcMapped);
+}
+
+
+//*************************************************************************************************************
+
 void DataPackage::setOrigProcData(const RowVectorXd &originalProcData, int row, int cutFront, int cutBack)
 {
     if(originalProcData.cols() != m_dataProcOriginal.cols() || row >= m_dataProcOriginal.rows()){

@@ -431,6 +431,14 @@ private slots:
     */
     void performOverlapAdd();
 
+    //=========================================================================================================
+    /**
+    * performs overlap add method to the processed data
+    *
+    * @param windowIndex the window index
+    */
+    void performOverlapAdd(int windowIndex);
+
 public:
     //=========================================================================================================
     /**

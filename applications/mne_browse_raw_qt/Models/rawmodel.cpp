@@ -291,7 +291,7 @@ QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role
 }
 
 
-//*********************+****************************************************************************************
+//*************************************************************************************************************
 
 void RawModel::genStdFilterOps()
 {
@@ -302,8 +302,7 @@ void RawModel::genStdFilterOps()
     double sfreq = (m_fiffInfo.sfreq>=0) ? m_fiffInfo.sfreq : 600.0;
     double nyquist_freq = sfreq/2;
 
-    int filterTaps = m_iFilterTaps;
-    int fftLength = m_iWindowSize+MODEL_MAX_NUM_FILTER_TAPS; //MODEL_MAX_NUM_FILTER_TAPS because we need to add data at the front and back
+    int fftLength = m_iWindowSize;
     int exp = ceil(log2(fftLength));
     fftLength = pow(2, exp+1);
     m_iCurrentFFTLength = fftLength;
@@ -1125,5 +1124,54 @@ void RawModel::performOverlapAdd()
 
 //            file3.close();
         }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RawModel::performOverlapAdd(int windowIndex)
+{
+    if(windowIndex<0 || windowIndex>m_data.size()-1)
+        return;
+
+    QList<int> listFilteredChs = m_assignedOperators.keys();
+
+    //Overlap add window data
+    int numberWin = m_data.size();
+    int cols = m_data[windowIndex]->dataProcOrig().cols();
+    int filterLength = m_iCurrentFFTLength/2; //Total number of zeros which needed to be added to compensate the covolution size increasement. zeroTaper/2 zeros were added at front and back of the data
+    int zeroFFT = m_iCurrentFFTLength - filterLength - m_iWindowSize; //The total number of zeros added to compensate for multiple integer of 2^x
+
+    for(int j = 0; j<listFilteredChs.size(); j++) {
+        RowVectorXd front = RowVectorXd::Zero(cols);
+        RowVectorXd back = RowVectorXd::Zero(cols);
+
+        //First window
+        if(windowIndex==0) {
+            back.segment(cols-filterLength-zeroFFT, filterLength) =
+                    m_data[windowIndex+1]->dataProcOrig().row(j).segment(0, filterLength);
+        }
+
+        //Middle windows
+        if(windowIndex > 0 && windowIndex < numberWin-1) {
+            front.segment(0, filterLength) =
+                    m_data[windowIndex-1]->dataProcOrig().row(j).segment(cols-filterLength-zeroFFT, filterLength);
+
+            back.segment(cols-filterLength-zeroFFT, filterLength) =
+                    m_data[windowIndex+1]->dataProcOrig().row(j).segment(0, filterLength);
+        }
+
+        //Last window
+        if(windowIndex == numberWin-1) {
+            front.segment(0, filterLength) =
+                    m_data[windowIndex-1]->dataProcOrig().row(j).segment(cols-filterLength-zeroFFT, filterLength);
+        }
+
+        //Do the overlap add
+        m_data[windowIndex]->setMappedProcData(m_data[windowIndex]->dataProcOrig().row(j)+front+back,
+                                   listFilteredChs[j],
+                                   filterLength/2,
+                                   filterLength/2+zeroFFT);
     }
 }
