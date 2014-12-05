@@ -515,7 +515,8 @@ void RawModel::resetPosition(qint32 position)
     //append loaded block
     m_data.append(newDataPackage);
 
-    updateOperators();
+    if(m_assignedOperators.empty())
+        updateOperators();
 
     endResetModel();
 
@@ -574,10 +575,10 @@ void RawModel::reloadFiffData(bool before)
     QFuture<QPair<MatrixXd,MatrixXd> > future = QtConcurrent::run(this,&RawModel::readSegment,start,end);
 
     //Wait for thread reloading is finished, then insert reloaded data
-//    future.waitForFinished();
-//    insertReloadedData(future.result());
+    future.waitForFinished();
+    insertReloadedData(future.result());
 
-    m_reloadFutureWatcher.setFuture(future);
+    //m_reloadFutureWatcher.setFuture(future);
 }
 
 
@@ -886,8 +887,6 @@ void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair)
     emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size()-1,1));
     emit dataReloaded();
 
-    //delete newDataPackage;
-
     qDebug() << "RawModel: Fiff data Reloaded from " << dataTimesPair.second.coeff(0) << "secs to" << dataTimesPair.second.coeff(dataTimesPair.second.cols()-1) << "secs";
 }
 
@@ -927,14 +926,14 @@ void RawModel::updateOperatorsConcurrently()
         return applyOperatorsConcurrently(chdata);
     });
 
-    m_operatorFutureWatcher.setFuture(future);
+    //m_operatorFutureWatcher.setFuture(future);
 
     //Wait for thread to be finished processig the data, then insert data
-    //future.waitForFinished();
+    future.waitForFinished();
 
     qDebug() << "RawModel: finished concurrent PROCESSING operation of" << listFilteredChs.size() << "items";
 
-    //insertProcessedDataAll();
+    insertProcessedDataAll();
 }
 
 
@@ -991,8 +990,8 @@ void RawModel::insertProcessedDataRow(int rowIndex)
 {
     QList<int> listFilteredChs = m_assignedOperators.keys();
 
-    int cutFront = m_iCurrentFFTLength/2;
-    int cutBack = m_listTmpChData[0].second.cols()-m_iCurrentFFTLength/2-m_iWindowSize;
+    int cutFront = m_iCurrentFFTLength/4;
+    int cutBack = m_iCurrentFFTLength/4 + (m_listTmpChData[0].second.cols()-m_iCurrentFFTLength/2-m_iWindowSize);
 
     if(m_bReloadBefore)
         m_data.first()->setOrigProcData(m_listTmpChData[rowIndex].second, m_listTmpChData[rowIndex].first, cutFront, cutBack);
@@ -1017,21 +1016,12 @@ void RawModel::insertProcessedDataAll(int windowIndex)
 
     QList<int> listFilteredChs = m_assignedOperators.keys();
 
-    int cutFront = m_iCurrentFFTLength/2;
-    int cutBack = m_listTmpChData[0].second.cols()-m_iCurrentFFTLength/2-m_iWindowSize;
+    int cutFront = m_iCurrentFFTLength/4;
+    int cutBack = m_iCurrentFFTLength/4 + (m_listTmpChData[0].second.cols()-m_iCurrentFFTLength/2-m_iWindowSize);
 
     //Set and cut original data to window size and calculate mean for filtered data
     for(qint32 i=0; i < listFilteredChs.size(); ++i)
         m_data[windowIndex]->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i], cutFront, cutBack);// MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
-
-    QFile file("D:/t_filteredTime.txt");
-    file.open(QFile::WriteOnly | QFile::Text);
-    QTextStream out(&file);
-
-    for(int i=0; i < m_listTmpChData[0].second.cols(); ++i)
-        out << m_listTmpChData[0].second(0,i) << endl;
-
-    file.close();
 
     performOverlapAdd();
 
@@ -1048,8 +1038,8 @@ void RawModel::insertProcessedDataAll()
 {
     QList<int> listFilteredChs = m_assignedOperators.keys();
 
-    int cutFront = m_iCurrentFFTLength/2;
-    int cutBack = m_listTmpChData[0].second.cols()-m_iCurrentFFTLength/2-m_iWindowSize;
+    int cutFront = m_iCurrentFFTLength/4;
+    int cutBack = m_iCurrentFFTLength/4 + (m_listTmpChData[0].second.cols()-m_iCurrentFFTLength/2-m_iWindowSize);
 
     //Set and cut original data to window size and calculate mean for filtered data
     for(int i=0; i < listFilteredChs.size(); ++i) {
@@ -1080,47 +1070,78 @@ void RawModel::performOverlapAdd()
     //Overlap add window data
     int numberWin = m_data.size();
     int cols = m_data[0]->dataProcOrig().cols();
-    int zeroTaper = m_iCurrentFFTLength/2;
-    int zeroFFT = m_iCurrentFFTLength-m_data[0]->dataProcOrig().cols();
-
-    RowVectorXd front = RowVectorXd::Zero(cols);
-    RowVectorXd back = RowVectorXd::Zero(cols);
+    int filterLength = m_iCurrentFFTLength/2; //Total number of zeros which needed to be added to compensate the covolution size increasement. zeroTaper/2 zeros were added at front and back of the data
+    int zeroFFT = m_iCurrentFFTLength - filterLength - m_iWindowSize; //The total number of zeros added to compensate for multiple integer of 2^x
 
     //Iterate through window data
     for(int i = 0; i<numberWin; i++) {
         for(int j = 0; j<listFilteredChs.size(); j++) {
+            RowVectorXd front = RowVectorXd::Zero(cols);
+            RowVectorXd back = RowVectorXd::Zero(cols);
+
             //First window
             if(i==0) {
-                back.segment(cols-zeroTaper-zeroFFT, zeroTaper+zeroFFT) =
-                        m_data[i+1]->dataProcOrig().row(j).segment(0,zeroTaper);
+                back.segment(cols-filterLength-zeroFFT, filterLength) =
+                        m_data[i+1]->dataProcOrig().row(j).segment(0, filterLength);
             }
 
             //Middle windows
             if(i > 0 && i < numberWin-1) {
-                front.segment(0, zeroTaper) =
-                        m_data[i-1]->dataProcOrig().row(j).segment(cols-zeroTaper-zeroFFT, zeroTaper);
+                front.segment(0, filterLength) =
+                        m_data[i-1]->dataProcOrig().row(j).segment(cols-filterLength-zeroFFT, filterLength);
 
-                back.segment(cols-zeroTaper-zeroFFT, zeroTaper) =
-                        m_data[i+1]->dataProcOrig().row(j).segment(0, zeroTaper);
+                back.segment(cols-filterLength-zeroFFT, filterLength) =
+                        m_data[i+1]->dataProcOrig().row(j).segment(0, filterLength);
             }
 
             //Last window
             if(i == numberWin-1) {
-                front.segment(0, zeroTaper) =
-                        m_data[i-1]->dataProcOrig().row(j).segment(cols-zeroTaper-zeroFFT, zeroTaper);
+                front.segment(0, filterLength) =
+                        m_data[i-1]->dataProcOrig().row(j).segment(cols-filterLength-zeroFFT, filterLength);
             }
 
             //Do the overlap add
-            m_data[i]->setOrigProcData(m_listTmpChData[j].second+front+back, listFilteredChs[j], zeroTaper, zeroTaper+zeroFFT);
+            m_data[i]->setMappedProcData(m_data[i]->dataProcOrig().row(j)+front+back,
+                                       listFilteredChs[j],
+                                       filterLength/2,
+                                       filterLength/2+zeroFFT);
+
+//            QFile file("D:/inputData.txt");
+//            file.open(QFile::WriteOnly | QFile::Text);
+//            QTextStream out(&file);
+
+//            for(int i=0; i < m_listTmpChData[0].second.cols(); ++i)
+//                out << m_listTmpChData[0].second(0,i) << endl;
+
+//            file.close();
+
+//            QFile file1("D:/front.txt");
+//            file1.open(QFile::WriteOnly | QFile::Text);
+//            QTextStream out1(&file1);
+
+//            for(int i=0; i < front.cols(); ++i)
+//                out1 << front(0,i) << endl;
+
+//            file1.close();
+
+//            QFile file2("D:/back.txt");
+//            file2.open(QFile::WriteOnly | QFile::Text);
+//            QTextStream out2(&file2);
+
+//            for(int i=0; i < back.cols(); ++i)
+//                out2 << back(0,i) << endl;
+
+//            file2.close();
+
+//            RowVectorXd result = m_listTmpChData[j].second+front+back;
+//            QFile file3("D:/result.txt");
+//            file3.open(QFile::WriteOnly | QFile::Text);
+//            QTextStream out3(&file3);
+
+//            for(int i=0; i < result.cols(); ++i)
+//                out3 << result(0,i) << endl;
+
+//            file3.close();
         }
     }
-
-    QFile file("D:/t_filteredTime.txt");
-    file.open(QFile::WriteOnly | QFile::Text);
-    QTextStream out(&file);
-
-    for(int i=0; i < m_listTmpChData[0].second.cols(); ++i)
-        out << m_listTmpChData[0].second(0,i) << endl;
-
-    file.close();
 }

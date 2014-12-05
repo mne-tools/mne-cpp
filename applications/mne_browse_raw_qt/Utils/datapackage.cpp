@@ -177,6 +177,28 @@ void DataPackage::setOrigProcData(const RowVectorXd &originalProcData, int row, 
 
 //*************************************************************************************************************
 
+void DataPackage::setMappedProcData(const RowVectorXd &originalProcData, int row, int cutFront, int cutBack)
+{
+    if(originalProcData.cols()-cutFront-cutBack != m_dataProcMapped.cols() || row >= m_dataProcMapped.rows()){
+        qDebug()<<"DataPackage::setOrigProcData - cannot set row data to m_dataProcOriginal";
+        return;
+    }
+
+    //Cut data
+    m_dataProcMapped.row(row) = cutData(originalProcData, cutFront, cutBack);
+
+    if(cutFront != m_iCutFrontProc)
+        m_iCutFrontProc = cutFront;
+
+    if(cutBack != m_iCutBackProc)
+        m_iCutBackProc = cutBack;
+
+    //Calculate mean
+    m_dataProcMean(row) = calculateRowMean(m_dataProcMapped.row(row));
+}
+
+//*************************************************************************************************************
+
 const MatrixXdR & DataPackage::dataRawOrig()
 {
     return m_dataRawOriginal;
