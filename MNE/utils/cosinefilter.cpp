@@ -70,7 +70,7 @@ CosineFilter::CosineFilter(int fftLength, float lowpass, float lowpass_width, fl
     int k,s,w;
     int resp_size = fftLength/2+1; //Take half because we are not interested in the conjugate complex part of the spectrum
 
-    float pi4 = M_PI/4.0;
+    double pi4 = M_PI/4.0;
     float mult,add,c;
 
     RowVectorXcd filterFreqResp = RowVectorXcd::Ones(resp_size);

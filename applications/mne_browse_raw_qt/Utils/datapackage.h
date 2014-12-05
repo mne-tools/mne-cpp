@@ -101,7 +101,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the original long raw data matrix read from the file. Also cuts the original raw data to a specific size.
+    * Sets the original long raw data matrix read from the file. Optional: Also cuts the original raw data to a specific size.
     *
     * @param originalRawData the original raw data
     * @param cutFront the amount to be cutted from orignal data from the front
@@ -111,7 +111,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets a row of the original long raw data matrix read from the file. Also cuts the original raw data to a specific size.
+    * Sets a row of the original long raw data matrix read from the file. Optional: Also cuts the original raw data to a specific size.
     *
     * @param originalRawData the original raw data in form of a row
     * @param row the row number
@@ -122,13 +122,24 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the original long processed data matrix calculated. Also cuts the original processed data to a specific size.
+    * Sets the original long processed data matrix calculated. Optional: Also cuts the original processed data to a specific size.
     *
     * @param originalProcData the original processed data
     * @param cutFront the amount to be cutted from orignal data from the front
     * @param cutBack the amount to be cutted from orignal data from the back
     */
     void setOrigProcData(const MatrixXdR &originalProcData, int cutFront=0, int cutBack=0);
+
+    //=========================================================================================================
+    /**
+    * Sets the mapped processed data matrix calculated.
+    *
+    * @param originalProcData the original processed data
+    * @param cutFront the amount to be cutted from orignal data from the front
+    * @param cutBack the amount to be cutted from orignal data from the back
+    */
+    void setMappedProcData(const MatrixXdR &originalProcData, int cutFront, int cutBack);
+
 
     //=========================================================================================================
     /**

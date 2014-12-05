@@ -339,7 +339,7 @@ void FilterWindow::filterParametersChanged()
 
     //Calculate the needed fft length
     int filterTaps = ui->m_spinBox_filterTaps->value();
-    int fftLength = m_iWindowSize+MODEL_MAX_NUM_FILTER_TAPS; //MODEL_MAX_NUM_FILTER_TAPS because we need to add data at the front and back
+    int fftLength = m_iWindowSize;
     int exp = ceil(log2(fftLength));
     fftLength = pow(2, exp+1);
 
