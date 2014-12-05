@@ -556,10 +556,10 @@ void RawModel::reloadFiffData(bool before)
     QFuture<QPair<MatrixXd,MatrixXd> > future = QtConcurrent::run(this,&RawModel::readSegment,start,end);
 
     //Wait for thread reloading is finished, then insert reloaded data
-    future.waitForFinished();
-    insertReloadedData(future.result());
+    //future.waitForFinished();
+    //insertReloadedData(future.result());
 
-    //m_reloadFutureWatcher.setFuture(future);
+    m_reloadFutureWatcher.setFuture(future);
 }
 
 
@@ -907,14 +907,14 @@ void RawModel::updateOperatorsConcurrently()
         return applyOperatorsConcurrently(chdata);
     });
 
-    //m_operatorFutureWatcher.setFuture(future);
+    m_operatorFutureWatcher.setFuture(future);
 
     //Wait for thread to be finished processig the data, then insert data
-    future.waitForFinished();
+    //future.waitForFinished();
 
     qDebug() << "RawModel: finished concurrent PROCESSING operation of" << listFilteredChs.size() << "items";
 
-    insertProcessedDataAll();
+    //insertProcessedDataAll();
 }
 
 
@@ -1004,7 +1004,7 @@ void RawModel::insertProcessedDataAll(int windowIndex)
     for(qint32 i=0; i < listFilteredChs.size(); ++i)
         m_data[windowIndex]->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i], cutFront, cutBack);
 
-    performOverlapAdd();
+    performOverlapAdd(windowIndex);
 
     emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));
 
@@ -1132,7 +1132,7 @@ void RawModel::performOverlapAdd()
 
 void RawModel::performOverlapAdd(int windowIndex)
 {
-    if(windowIndex<0 || windowIndex>m_data.size()-1)
+    if(windowIndex<0 || windowIndex>m_data.size()-1 || m_data.size()<2)
         return;
 
     QList<int> listFilteredChs = m_assignedOperators.keys();
