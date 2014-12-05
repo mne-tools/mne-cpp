@@ -90,6 +90,7 @@ CosineFilter::CosineFilter(int fftLength, float lowpass, float lowpass_width, fl
         highpass_widths = 3;
 
     //Calculate filter freq response - use cosine
+    //Build high pass filter
     if(type != LPF) {
         if (highpasss > highpass_widths + 1) {
             w    = highpass_widths;
@@ -108,6 +109,7 @@ CosineFilter::CosineFilter(int fftLength, float lowpass, float lowpass_width, fl
         }
     }
 
+    //Build low pass filter
     if(type != HPF) {
         if (lowpass_widths > 0) {
             w    = lowpass_widths;
