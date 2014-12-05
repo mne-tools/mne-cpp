@@ -373,18 +373,13 @@ bool RawModel::loadFiffData(QFile& qFile)
         m_iAbsFiffCursor = m_pfiffIO->m_qlistRaw[0]->first_samp; //Set cursor somewhere into fiff file [in samples]
         m_bStartReached = true;
 
-        int start = m_iAbsFiffCursor - MODEL_MAX_NUM_FILTER_TAPS/2;
-        int end = start + m_iWindowSize - 1 + MODEL_MAX_NUM_FILTER_TAPS;
+        int start = m_iAbsFiffCursor;
+        int end = start + m_iWindowSize - 1;
 
         if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_data, t_times, start, end))
             return false;
 
-        //This is the first data laoded, hence no data to the left possible, but needed for correct filtering -> mirror data to the front
-        MatrixXdR tempMat(t_data.rows(), t_data.cols() + MODEL_MAX_NUM_FILTER_TAPS/2);
-        tempMat.block(0,0,t_data.rows(),MODEL_MAX_NUM_FILTER_TAPS/2) = t_data.block(0,0,t_data.rows(),MODEL_MAX_NUM_FILTER_TAPS/2);
-        tempMat.block(0,MODEL_MAX_NUM_FILTER_TAPS/2,t_data.rows(),t_data.cols()) = t_data;
-
-        newDataPackage = QSharedPointer<DataPackage>(new DataPackage(tempMat, (MatrixXdR)t_times, MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2));
+        newDataPackage = QSharedPointer<DataPackage>(new DataPackage(t_data, (MatrixXdR)t_times));
 
         m_bFileloaded = true;
     }
@@ -487,35 +482,22 @@ void RawModel::resetPosition(qint32 position)
 
     MatrixXd t_data,t_times; //type is later on (when append to m_data) casted into MatrixXdR (Row-Major)
 
-    int start = m_iAbsFiffCursor - MODEL_MAX_NUM_FILTER_TAPS/2;
-    int end = start + m_iWindowSize - 1 + MODEL_MAX_NUM_FILTER_TAPS;
+    int start = m_iAbsFiffCursor;
+    int end = start + m_iWindowSize - 1;
 
     m_Mutex.lock();
     if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_data, t_times, start, end))
         qDebug() << "RawModel: Error resetting position of Fiff file!";
     m_Mutex.unlock();
 
-    //Possible position of the reset can cause no data to the left or right available, but needed for correct filtering -> mirror data to the front or back
-    MatrixXdR tempMat(t_data.rows(), t_data.cols() + MODEL_MAX_NUM_FILTER_TAPS/2);
+    //build data package
     QSharedPointer<DataPackage> newDataPackage;
-
-    if(start<firstSample()) { //no data to the left - mirror data to the left
-        tempMat.block(0,0,t_data.rows(),MODEL_MAX_NUM_FILTER_TAPS/2) = t_data.block(0,0,t_data.rows(),MODEL_MAX_NUM_FILTER_TAPS/2);
-        tempMat.block(0,MODEL_MAX_NUM_FILTER_TAPS/2,t_data.rows(),t_data.cols()) = t_data;
-        newDataPackage = QSharedPointer<DataPackage>(new DataPackage(DataPackage(tempMat, (MatrixXdR)t_times, MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2)));
-    }
-    else if(end>lastSample()) { //no data to the right - mirror data to the right
-        tempMat.block(0,0,t_data.rows(),t_data.cols()) = t_data;
-        tempMat.block(0,t_data.cols(),t_data.rows(),MODEL_MAX_NUM_FILTER_TAPS/2) = t_data.block(0,t_data.cols()-MODEL_MAX_NUM_FILTER_TAPS/2,t_data.rows(),MODEL_MAX_NUM_FILTER_TAPS/2);
-        newDataPackage = QSharedPointer<DataPackage>(new DataPackage(DataPackage(tempMat, (MatrixXdR)t_times, MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2)));
-    }
-    else
-        newDataPackage = QSharedPointer<DataPackage>(new DataPackage((MatrixXdR)t_data, (MatrixXdR)t_times, MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2));
+    newDataPackage = QSharedPointer<DataPackage>(new DataPackage((MatrixXdR)t_data, (MatrixXdR)t_times));
 
     //append loaded block
     m_data.append(newDataPackage);
 
-    if(m_assignedOperators.empty())
+    if(!m_assignedOperators.empty())
         updateOperators();
 
     endResetModel();
@@ -539,8 +521,8 @@ void RawModel::reloadFiffData(bool before)
     fiff_int_t start,end;
     if(before) {
         m_iAbsFiffCursor -= m_iWindowSize;
-        start = m_iAbsFiffCursor - MODEL_MAX_NUM_FILTER_TAPS/2;
-        end = start + m_iWindowSize - 1 + MODEL_MAX_NUM_FILTER_TAPS;
+        start = m_iAbsFiffCursor;
+        end = start + m_iWindowSize - 1;
 
         //check if start of fiff file is reached
         if(start < firstSample()) {
@@ -553,8 +535,8 @@ void RawModel::reloadFiffData(bool before)
         }
     }
     else {
-        start = m_iAbsFiffCursor + sizeOfPreloadedData() - MODEL_MAX_NUM_FILTER_TAPS/2;
-        end = start + m_iWindowSize - 1 + MODEL_MAX_NUM_FILTER_TAPS;
+        start = m_iAbsFiffCursor + sizeOfPreloadedData();
+        end = start + m_iWindowSize - 1;
 
         //check if end of fiff file is reached
         if(end > lastSample()) {
@@ -861,7 +843,7 @@ void RawModel::undoFilter()
 //private SLOTS
 void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair)
 {
-    QSharedPointer<DataPackage> newDataPackage = QSharedPointer<DataPackage>(new DataPackage((MatrixXdR)dataTimesPair.first, (MatrixXdR)dataTimesPair.second, MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2));
+    QSharedPointer<DataPackage> newDataPackage = QSharedPointer<DataPackage>(new DataPackage((MatrixXdR)dataTimesPair.first, (MatrixXdR)dataTimesPair.second));
 
     //extend m_data with reloaded data
     if(m_bReloadBefore) {
@@ -1021,7 +1003,7 @@ void RawModel::insertProcessedDataAll(int windowIndex)
 
     //Set and cut original data to window size and calculate mean for filtered data
     for(qint32 i=0; i < listFilteredChs.size(); ++i)
-        m_data[windowIndex]->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i], cutFront, cutBack);// MODEL_MAX_NUM_FILTER_TAPS/2, MODEL_MAX_NUM_FILTER_TAPS/2);
+        m_data[windowIndex]->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i], cutFront, cutBack);
 
     performOverlapAdd();
 

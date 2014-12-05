@@ -107,7 +107,7 @@ public:
     * @param cutFront the amount to be cutted from orignal data from the front
     * @param cutBack the amount to be cutted from orignal data from the back
     */
-    void setOrigRawData(const MatrixXdR &originalRawData, int cutFront, int cutBack);
+    void setOrigRawData(const MatrixXdR &originalRawData, int cutFront=0, int cutBack=0);
 
     //=========================================================================================================
     /**
@@ -118,7 +118,7 @@ public:
     * @param cutFront the amount to be cutted from orignal data from the front
     * @param cutBack the amount to be cutted from orignal data from the back
     */
-    void setOrigRawData(const RowVectorXd &originalRawData, int row, int cutFront, int cutBack);
+    void setOrigRawData(const RowVectorXd &originalRawData, int row, int cutFront=0, int cutBack=0);
 
     //=========================================================================================================
     /**
@@ -128,19 +128,28 @@ public:
     * @param cutFront the amount to be cutted from orignal data from the front
     * @param cutBack the amount to be cutted from orignal data from the back
     */
-    void setOrigProcData(const MatrixXdR &originalProcData, int cutFront, int cutBack);
+    void setOrigProcData(const MatrixXdR &originalProcData, int cutFront=0, int cutBack=0);
 
     //=========================================================================================================
     /**
     * Sets a row of the original long processed data matrix read from the file. Optional: Also cuts the original processed data to a specific size.
     *
-    * @param originalProcData the original raw data in form of a row
+    * @param originalProcData the original processed data in form of a row
     * @param row the row number
     * @param cutFront the amount to be cutted from orignal data from the front
     * @param cutBack the amount to be cutted from orignal data from the back
     */
-    void setOrigProcData(const RowVectorXd &originalProcData, int row, int cutFront, int cutBack);
+    void setOrigProcData(const RowVectorXd &originalProcData, int row, int cutFront=0, int cutBack=0);
 
+    //=========================================================================================================
+    /**
+    * Sets a row of the mapped processed data matrix read from the file.
+    *
+    * @param originalProcData the original processed data in form of a row
+    * @param row the row number
+    * @param cutFront the amount to be cutted from orignal data from the front
+    * @param cutBack the amount to be cutted from orignal data from the back
+    */
     void setMappedProcData(const RowVectorXd &originalProcData, int row, int cutFront, int cutBack);
 
     //=========================================================================================================
