@@ -141,6 +141,8 @@ public:
     */
     void setOrigProcData(const RowVectorXd &originalProcData, int row, int cutFront, int cutBack);
 
+    void setMappedProcData(const RowVectorXd &originalProcData, int row, int cutFront, int cutBack);
+
     //=========================================================================================================
     /**
     * Returns the original full raw data.

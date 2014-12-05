@@ -164,7 +164,7 @@ RowVectorXd FilterOperator::applyFFTFilter(const RowVectorXd& data) const
 //    t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
 //    t_dataZeroPad.head(data.cols()) = data;
     t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
-    t_dataZeroPad.segment(m_iFFTlength/2, data.cols()) = data;
+    t_dataZeroPad.segment(m_iFFTlength/4, data.cols()) = data;
 
 //    //zero-pad data to m_iFFTlength
 //    //If Tschebyscheff design method, append zeros at the end
