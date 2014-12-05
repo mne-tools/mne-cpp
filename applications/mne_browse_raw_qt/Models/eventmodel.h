@@ -208,7 +208,7 @@ public:
     * @param [in] eventType the type to be added
     * @param [in] typeColor the type color to be added
     */
-    void addNewEventType(QString &eventType, QColor &typeColor);
+    void addNewEventType(const QString &eventType, const QColor &typeColor);
 
     bool            m_bFileloaded;              /**< True when a Fiff event file is loaded. */
 
