@@ -99,7 +99,7 @@ public:
     /**
     * Constructs a ButterflySceneItem.
     */
-    ButterflySceneItem(QString setName, int setKind = FIFFV_MEG_CH, int setUnit = FIFF_UNIT_T_M, QList<QColor> &defaultColors = QList<QColor>());
+    ButterflySceneItem(QString setName, int setKind = FIFFV_MEG_CH, int setUnit = FIFF_UNIT_T_M, const QList<QColor> &defaultColors = QList<QColor>());
 
     //=========================================================================================================
     /**
