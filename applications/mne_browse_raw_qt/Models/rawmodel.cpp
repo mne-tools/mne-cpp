@@ -397,6 +397,8 @@ bool RawModel::loadFiffData(QFile& qFile)
 
     endResetModel();
 
+    qFile.close();
+
     emit fileLoaded(m_fiffInfo);
     emit assignedOperatorsChanged(m_assignedOperators);
 

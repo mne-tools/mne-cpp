@@ -58,7 +58,7 @@ using namespace MNEBrowseRawQt;
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
-, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+//, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
 //, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
 //, m_qEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
 , m_qSettings()
@@ -471,6 +471,8 @@ void MainWindow::openFile()
 
     //Hide not presented channel types and their spin boxes in the scale window
     m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_fiffInfo);
+
+    m_qFileRaw.close();
 }
 
 
@@ -488,29 +490,47 @@ void MainWindow::writeFile()
         return;
     }
 
-    QFile* qFileOutput = new QFile(filename);
+    if(filename == m_qFileRaw.fileName()) {
+        QMessageBox msgBox;
+        msgBox.setText("You are trying to write to the file you are currently loading the data from. Please choose another file to write to.");
+        msgBox.exec();
+        return;
+    }
+
+    //Create output file, progress dialog and future watcher
+    QFile qFileOutput (filename);
+    if(qFileOutput.isOpen())
+        qFileOutput.close();
+
     QFutureWatcher<bool> writeFileFutureWatcher;
+    QProgressDialog progressDialog("Writing to fif file...", QString(), 0, 0, this, Qt::Dialog);
 
-    QProgressDialog progressDialog(this, Qt::Dialog);
-    progressDialog.setLabel(new QLabel("Writing to fif file..."));
+    //Connect future watcher and dialog
+    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::finished,
+            &progressDialog, &QProgressDialog::reset);
 
-    connect(&writeFileFutureWatcher, SIGNAL(finished()), &progressDialog, SLOT(reset()));
-    connect(&progressDialog, SIGNAL(canceled()), &writeFileFutureWatcher, SLOT(cancel()));
-    connect(&writeFileFutureWatcher, SIGNAL(progressRangeChanged(int,int)), &progressDialog, SLOT(setRange(int,int)));
-    connect(&writeFileFutureWatcher, SIGNAL(progressValueChanged(int)), &progressDialog, SLOT(setValue(int)));
+    connect(&progressDialog, &QProgressDialog::canceled,
+            &writeFileFutureWatcher, &QFutureWatcher<bool>::cancel);
 
+    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::progressRangeChanged,
+            &progressDialog, &QProgressDialog::setRange);
+
+    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::progressValueChanged,
+            &progressDialog, &QProgressDialog::setValue);
+
+    //Run the file writing in seperate thread
     writeFileFutureWatcher.setFuture(QtConcurrent::run(m_pDataWindow->getDataModel(),
                                                          &RawModel::writeFiffData,
-                                                         qFileOutput));
+                                                         &qFileOutput));
 
     progressDialog.exec();
 
     writeFileFutureWatcher.waitForFinished();
 
     if(!writeFileFutureWatcher.future().result())
-        qDebug() << "MainWindow: ERROR writing fiff data file" << qFileOutput->fileName() << "!";
+        qDebug() << "MainWindow: ERROR writing fiff data file" << qFileOutput.fileName() << "!";
     else
-        qDebug() << "MainWindow: Successfully written to" << qFileOutput->fileName() << "!";
+        qDebug() << "MainWindow: Successfully written to" << qFileOutput.fileName() << "!";
 }
 
 
@@ -518,7 +538,10 @@ void MainWindow::writeFile()
 
 void MainWindow::loadEvents()
 {
-    QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff event data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
+    QString filename = QFileDialog::getOpenFileName(this,
+                                                    QString("Open fiff event data file"),
+                                                    QString("./MNE-sample-data/MEG/sample/"),
+                                                    tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
 
     if(filename.isEmpty())
     {

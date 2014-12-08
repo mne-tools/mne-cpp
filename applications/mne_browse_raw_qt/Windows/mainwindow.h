@@ -103,6 +103,7 @@
 #include <QSignalMapper>
 #include <QFutureWatcher>
 #include <QProgressDialog>
+#include <QMessageBox>
 
 
 //*************************************************************************************************************
