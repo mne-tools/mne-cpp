@@ -120,7 +120,7 @@ void FiffRawData::clear()
 
 //*************************************************************************************************************
 
-bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t from, fiff_int_t to, const RowVectorXi& sel)
+bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t from, fiff_int_t to, const RowVectorXi& sel, SparseMatrix<double>& multSegment)
 {
     bool projAvailable = true;
 
@@ -425,6 +425,10 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
         }
     }
 
+    if(mult.cols()==0)
+        multSegment = cal;
+    else
+        multSegment = mult;
 //        fclose(fid);
 
     times = MatrixXd(1, to-from+1);

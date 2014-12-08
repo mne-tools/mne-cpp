@@ -478,18 +478,39 @@ void MainWindow::openFile()
 
 void MainWindow::writeFile()
 {
-    QString filename = QFileDialog::getSaveFileName(this,QString("Write fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif data files (*.fif)"));
+    QString filename = QFileDialog::getSaveFileName(this,
+                                                    QString("Write fiff data file"),
+                                                    QString("./MNE-sample-data/MEG/sample/"),
+                                                    tr("fif data files (*.fif)"));
 
-    if(filename.isEmpty())
-    {
+    if(filename.isEmpty()) {
         qDebug("User aborted saving to fiff data file");
         return;
     }
 
-    QFile t_fileRaw(filename);
+    QFile* qFileOutput = new QFile(filename);
+    QFutureWatcher<bool> writeFileFutureWatcher;
 
-    if(!m_pDataWindow->getDataModel()->writeFiffData(t_fileRaw))
-        qDebug() << "MainWindow: ERROR writing fiff data file" << t_fileRaw.fileName() << "!";
+    QProgressDialog progressDialog(this, Qt::Dialog);
+    progressDialog.setLabel(new QLabel("Writing to fif file..."));
+
+    connect(&writeFileFutureWatcher, SIGNAL(finished()), &progressDialog, SLOT(reset()));
+    connect(&progressDialog, SIGNAL(canceled()), &writeFileFutureWatcher, SLOT(cancel()));
+    connect(&writeFileFutureWatcher, SIGNAL(progressRangeChanged(int,int)), &progressDialog, SLOT(setRange(int,int)));
+    connect(&writeFileFutureWatcher, SIGNAL(progressValueChanged(int)), &progressDialog, SLOT(setValue(int)));
+
+    writeFileFutureWatcher.setFuture(QtConcurrent::run(m_pDataWindow->getDataModel(),
+                                                         &RawModel::writeFiffData,
+                                                         qFileOutput));
+
+    progressDialog.exec();
+
+    writeFileFutureWatcher.waitForFinished();
+
+    if(!writeFileFutureWatcher.future().result())
+        qDebug() << "MainWindow: ERROR writing fiff data file" << qFileOutput->fileName() << "!";
+    else
+        qDebug() << "MainWindow: Successfully written to" << qFileOutput->fileName() << "!";
 }
 
 

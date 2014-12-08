@@ -91,6 +91,8 @@
 
 #include <QtConcurrent>
 
+#include <QProgressDialog>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -171,7 +173,7 @@ public:
     * @param p_IODevice fiff data file to write
     * @return
     */
-    bool writeFiffData(QFile &qFile);
+    bool writeFiffData(QFile *qFile);
 
     //VARIABLES
     bool                                        m_bFileloaded;  /**< true when a Fiff file is loaded */

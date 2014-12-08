@@ -406,13 +406,13 @@ bool RawModel::loadFiffData(QFile& qFile)
 
 //*************************************************************************************************************
 
-bool RawModel::writeFiffData(QFile &qFile)
+bool RawModel::writeFiffData(QFile *qFile)
 {
     //replace m_fiffInfo with the one contained in the m_pfiffIO object (for replacing bad channels)
     m_pfiffIO->m_qlistRaw[0]->info = m_fiffInfo;
 
-    if (m_pfiffIO->write_raw(qFile,0)) { ; //ToDo: by now, fiff data file is completely written new -> substitute only FiffInfo in old file?
-        qDebug() << "Done saving as fiff file" << qFile.fileName() << "...";
+    if (m_pfiffIO->write_raw(*qFile,0)) { ; //ToDo: by now, fiff data file is completely written new -> substitute only FiffInfo in old file?
+        qDebug() << "Done saving as fiff file" << qFile->fileName() << "...";
         return true;
     }
     else

@@ -101,6 +101,8 @@
 #include <QMessageBox>
 #include <QPixmap>
 #include <QSignalMapper>
+#include <QFutureWatcher>
+#include <QProgressDialog>
 
 
 //*************************************************************************************************************
