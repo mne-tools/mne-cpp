@@ -504,7 +504,11 @@ void RawModel::resetPosition(qint32 position)
 //    if(!(m_iAbsFiffCursor<=firstSample()))
 //        updateScrollPos(m_iCurAbsScrollPos-firstSample()); //little hack: if the m_iCurAbsScrollPos is now close to the edge -> force reloading w/o scrolling
 
-    qDebug() << "RawModel: Model Position RESET, samples from " << m_iAbsFiffCursor << "to" << m_iAbsFiffCursor+m_iWindowSize-1 << "reloaded.";
+    qDebug() << "RawModel: Model Position RESET, samples from " << m_iAbsFiffCursor << "to" << m_iAbsFiffCursor+m_iWindowSize-1 << "reloaded. actual loaded t_data cols: " << t_data.cols();
+    qDebug() << "newDataPackage->dataProc().cols(): "<<newDataPackage->dataProc().cols();
+    qDebug() << "newDataPackage->dataProcOrig().cols(): "<<newDataPackage->dataProcOrig().cols();
+    qDebug() << "newDataPackage->dataRaw().cols(): "<<newDataPackage->dataRaw().cols();
+    qDebug() << "newDataPackage->dataRawOrig().cols(): "<<newDataPackage->dataRawOrig().cols();
 
     emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));
 }
@@ -971,8 +975,14 @@ void RawModel::insertProcessedDataRow(int rowIndex)
 {
     QList<int> listFilteredChs = m_assignedOperators.keys();
 
+    int dataLength = m_iWindowSize;
+    if(m_bReloadBefore)
+        dataLength = m_data.first()->dataRaw().cols();
+    else
+        dataLength = m_data.last()->dataRaw().cols();
+
     int cutFront = m_iCurrentFFTLength/4;
-    int cutBack = m_iCurrentFFTLength/4 + (m_listTmpChData[0].second.cols()-m_iCurrentFFTLength/2-m_iWindowSize);
+    int cutBack = m_iCurrentFFTLength/4 + (m_listTmpChData[0].second.cols()-m_iCurrentFFTLength/2-dataLength);
 
     if(m_bReloadBefore)
         m_data.first()->setOrigProcData(m_listTmpChData[rowIndex].second, m_listTmpChData[rowIndex].first, cutFront, cutBack);
@@ -997,8 +1007,14 @@ void RawModel::insertProcessedDataAll(int windowIndex)
 
     QList<int> listFilteredChs = m_assignedOperators.keys();
 
+    int dataLength = m_iWindowSize;
+    if(m_bReloadBefore)
+        dataLength = m_data.first()->dataRaw().cols();
+    else
+        dataLength = m_data.last()->dataRaw().cols();
+
     int cutFront = m_iCurrentFFTLength/4;
-    int cutBack = m_iCurrentFFTLength/4 + (m_listTmpChData[0].second.cols()-m_iCurrentFFTLength/2-m_iWindowSize);
+    int cutBack = m_iCurrentFFTLength/4 + (m_listTmpChData[0].second.cols()-m_iCurrentFFTLength/2-dataLength);
 
     //Set and cut original data to window size and calculate mean for filtered data
     for(qint32 i=0; i < listFilteredChs.size(); ++i)
@@ -1019,8 +1035,14 @@ void RawModel::insertProcessedDataAll()
 {
     QList<int> listFilteredChs = m_assignedOperators.keys();
 
+    int dataLength = m_iWindowSize;
+    if(m_bReloadBefore)
+        dataLength = m_data.first()->dataRaw().cols();
+    else
+        dataLength = m_data.last()->dataRaw().cols();
+
     int cutFront = m_iCurrentFFTLength/4;
-    int cutBack = m_iCurrentFFTLength/4 + (m_listTmpChData[0].second.cols()-m_iCurrentFFTLength/2-m_iWindowSize);
+    int cutBack = m_iCurrentFFTLength/4 + (m_listTmpChData[0].second.cols()-m_iCurrentFFTLength/2-dataLength);
 
     //Set and cut original data to window size and calculate mean for filtered data
     for(int i=0; i < listFilteredChs.size(); ++i) {
@@ -1052,7 +1074,7 @@ void RawModel::performOverlapAdd()
     int numberWin = m_data.size();
     int cols = m_data[0]->dataProcOrig().cols();
     int filterLength = m_iCurrentFFTLength/2; //Total number of zeros which needed to be added to compensate the covolution size increasement. zeroTaper/2 zeros were added at front and back of the data
-    int zeroFFT = m_iCurrentFFTLength - filterLength - m_iWindowSize; //The total number of zeros added to compensate for multiple integer of 2^x
+    int zeroFFT;
 
     //Iterate through window data
     for(int i = 0; i<numberWin; i++) {
@@ -1062,26 +1084,31 @@ void RawModel::performOverlapAdd()
 
             //First window
             if(i==0) {
+                zeroFFT = m_iCurrentFFTLength - filterLength - m_data[i]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
                 back.segment(cols-filterLength-zeroFFT, filterLength) =
                         m_data[i+1]->dataProcOrig().row(j).segment(0, filterLength);
             }
 
             //Middle windows
             if(i > 0 && i < numberWin-1) {
+                zeroFFT = m_iCurrentFFTLength - filterLength - m_data[i-1]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
                 front.segment(0, filterLength) =
                         m_data[i-1]->dataProcOrig().row(j).segment(cols-filterLength-zeroFFT, filterLength);
 
+                zeroFFT = m_iCurrentFFTLength - filterLength - m_data[i]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
                 back.segment(cols-filterLength-zeroFFT, filterLength) =
                         m_data[i+1]->dataProcOrig().row(j).segment(0, filterLength);
             }
 
             //Last window
             if(i == numberWin-1) {
+                zeroFFT = m_iCurrentFFTLength - filterLength - m_data[i-1]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
                 front.segment(0, filterLength) =
                         m_data[i-1]->dataProcOrig().row(j).segment(cols-filterLength-zeroFFT, filterLength);
             }
 
             //Do the overlap add
+            zeroFFT = m_iCurrentFFTLength - filterLength - m_data[i]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
             m_data[i]->setMappedProcData(m_data[i]->dataProcOrig().row(j)+front+back,
                                        listFilteredChs[j],
                                        filterLength/2,
@@ -1141,7 +1168,7 @@ void RawModel::performOverlapAdd(int windowIndex)
     int numberWin = m_data.size();
     int cols = m_data[windowIndex]->dataProcOrig().cols();
     int filterLength = m_iCurrentFFTLength/2; //Total number of zeros which needed to be added to compensate the covolution size increasement. zeroTaper/2 zeros were added at front and back of the data
-    int zeroFFT = m_iCurrentFFTLength - filterLength - m_iWindowSize; //The total number of zeros added to compensate for multiple integer of 2^x
+    int zeroFFT;
 
     for(int j = 0; j<listFilteredChs.size(); j++) {
         RowVectorXd front = RowVectorXd::Zero(cols);
@@ -1149,26 +1176,31 @@ void RawModel::performOverlapAdd(int windowIndex)
 
         //First window
         if(windowIndex==0) {
+            zeroFFT = m_iCurrentFFTLength - filterLength - m_data[windowIndex]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
             back.segment(cols-filterLength-zeroFFT, filterLength) =
                     m_data[windowIndex+1]->dataProcOrig().row(j).segment(0, filterLength);
         }
 
         //Middle windows
         if(windowIndex > 0 && windowIndex < numberWin-1) {
+            zeroFFT = m_iCurrentFFTLength - filterLength - m_data[windowIndex-1]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
             front.segment(0, filterLength) =
                     m_data[windowIndex-1]->dataProcOrig().row(j).segment(cols-filterLength-zeroFFT, filterLength);
 
+            zeroFFT = m_iCurrentFFTLength - filterLength - m_data[windowIndex]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
             back.segment(cols-filterLength-zeroFFT, filterLength) =
                     m_data[windowIndex+1]->dataProcOrig().row(j).segment(0, filterLength);
         }
 
         //Last window
         if(windowIndex == numberWin-1) {
+            zeroFFT = m_iCurrentFFTLength - filterLength - m_data[windowIndex-1]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
             front.segment(0, filterLength) =
                     m_data[windowIndex-1]->dataProcOrig().row(j).segment(cols-filterLength-zeroFFT, filterLength);
         }
 
         //Do the overlap add
+        zeroFFT = m_iCurrentFFTLength - filterLength - m_data[windowIndex]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
         m_data[windowIndex]->setMappedProcData(m_data[windowIndex]->dataProcOrig().row(j)+front+back,
                                    listFilteredChs[j],
                                    filterLength/2,

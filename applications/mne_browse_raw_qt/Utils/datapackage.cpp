@@ -198,7 +198,10 @@ void DataPackage::setOrigProcData(const RowVectorXd &originalProcData, int row, 
 void DataPackage::setMappedProcData(const RowVectorXd &originalProcData, int row, int cutFront, int cutBack)
 {
     if(originalProcData.cols()-cutFront-cutBack != m_dataProcMapped.cols() || row >= m_dataProcMapped.rows()){
-        qDebug()<<"DataPackage::setOrigProcData - cannot set row data to m_dataProcOriginal";
+        qDebug()<<"DataPackage::setMappedProcData - cannot set row data to m_dataProcOriginal";
+        qDebug()<<"cutFront"<<cutFront<<"cutBack"<<cutBack;
+        qDebug()<<"DataPackage::setMappedProcData - originalProcData.cols()-cutFront-cutBack"<<originalProcData.cols()-cutFront-cutBack;
+        qDebug()<<"DataPackage::setMappedProcData - m_dataProcMapped.cols()"<<m_dataProcMapped.cols();
         return;
     }
 
