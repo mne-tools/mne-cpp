@@ -505,10 +505,6 @@ void RawModel::resetPosition(qint32 position)
 //        updateScrollPos(m_iCurAbsScrollPos-firstSample()); //little hack: if the m_iCurAbsScrollPos is now close to the edge -> force reloading w/o scrolling
 
     qDebug() << "RawModel: Model Position RESET, samples from " << m_iAbsFiffCursor << "to" << m_iAbsFiffCursor+m_iWindowSize-1 << "reloaded. actual loaded t_data cols: " << t_data.cols();
-    qDebug() << "newDataPackage->dataProc().cols(): "<<newDataPackage->dataProc().cols();
-    qDebug() << "newDataPackage->dataProcOrig().cols(): "<<newDataPackage->dataProcOrig().cols();
-    qDebug() << "newDataPackage->dataRaw().cols(): "<<newDataPackage->dataRaw().cols();
-    qDebug() << "newDataPackage->dataRawOrig().cols(): "<<newDataPackage->dataRawOrig().cols();
 
     emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));
 }
@@ -616,21 +612,23 @@ void RawModel::updateScrollPos(int value)
 
 void RawModel::markChBad(QModelIndexList chlist, bool status)
 {
-    for(qint8 i=0; i < chlist.size(); ++i) {
-        if(status) {
-            if(!m_fiffInfo.bads.contains(m_chInfolist[chlist[i].row()].ch_name))
-                m_fiffInfo.bads.append(m_chInfolist[chlist[i].row()].ch_name);
-            qDebug() << "RawModel:" << m_chInfolist[chlist[i].row()].ch_name << "marked as bad.";
-        }
-        else {
-            if(m_fiffInfo.bads.contains(m_chInfolist[chlist[i].row()].ch_name)) {
-                int index = m_fiffInfo.bads.indexOf(m_chInfolist[chlist[i].row()].ch_name);
-                m_fiffInfo.bads.removeAt(index);
-                qDebug() << "RawModel:" << m_chInfolist[chlist[i].row()].ch_name << "marked as good.";
+    for(int i=0; i < chlist.size(); ++i) {
+        if(chlist[i].column() == 1) {//only process indexes corresponding to column 1 (data)
+            if(status) {
+                if(!m_fiffInfo.bads.contains(m_chInfolist[chlist[i].row()].ch_name))
+                    m_fiffInfo.bads.append(m_chInfolist[chlist[i].row()].ch_name);
+                qDebug() << "RawModel:" << m_chInfolist[chlist[i].row()].ch_name << "marked as bad.";
             }
-        }
+            else {
+                if(m_fiffInfo.bads.contains(m_chInfolist[chlist[i].row()].ch_name)) {
+                    int index = m_fiffInfo.bads.indexOf(m_chInfolist[chlist[i].row()].ch_name);
+                    m_fiffInfo.bads.removeAt(index);
+                    qDebug() << "RawModel:" << m_chInfolist[chlist[i].row()].ch_name << "marked as good.";
+                }
+            }
 
-        emit dataChanged(chlist[i],chlist[i]);
+            emit dataChanged(chlist[i],chlist[i]);
+        }
     }
 }
 
