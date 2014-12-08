@@ -646,6 +646,21 @@ public:
     /**
     * fiff_write_raw_buffer
     *
+    * ### MNE toolbox root function ###
+    *
+    * Writes a raw buffer.
+    *
+    * @param[in] buf        the buffer to write
+    * @param[in] mult       the used multiplication matrix consisting out of projection,calibration and compensation
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool write_raw_buffer(const MatrixXd& buf, const SparseMatrix<double>& mult);
+
+    //=========================================================================================================
+    /**
+    * fiff_write_raw_buffer
+    *
     *
     * Writes a raw buffer without calibrations.
     *

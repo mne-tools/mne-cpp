@@ -2462,6 +2462,26 @@ bool FiffStream::write_raw_buffer(const MatrixXd& buf, const RowVectorXd& cals)
 
 //*************************************************************************************************************
 
+bool FiffStream::write_raw_buffer(const MatrixXd& buf, const SparseMatrix<double>& mult)
+{
+    if (buf.rows() != mult.cols()) {
+        printf("buffer and mult sizes do not match\n");
+        return false;
+    }
+
+    SparseMatrix<double> inv_mult(mult.rows(), mult.cols());
+    for (int k=0; k<inv_mult.outerSize(); ++k)
+      for (SparseMatrix<double>::InnerIterator it(mult,k); it; ++it)
+        inv_mult.coeffRef(it.row(),it.col()) = 1/it.value();
+
+    MatrixXf tmp = (inv_mult*buf).cast<float>();
+    this->write_float(FIFF_DATA_BUFFER,tmp.data(),tmp.rows()*tmp.cols());
+    return true;
+}
+
+
+//*************************************************************************************************************
+
 bool FiffStream::write_raw_buffer(const MatrixXd& buf)
 {
     MatrixXf tmp = buf.cast<float>();

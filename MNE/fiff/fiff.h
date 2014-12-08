@@ -550,9 +550,9 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool read_raw_segment(FiffRawData& raw, MatrixXd& data, MatrixXd& times, fiff_int_t from = -1, fiff_int_t to = -1, MatrixXi sel = defaultMatrixXi)
+    inline static bool read_raw_segment(FiffRawData& raw, MatrixXd& data, MatrixXd& times, fiff_int_t from = -1, fiff_int_t to = -1, MatrixXi sel = defaultMatrixXi, SparseMatrix<double>& mult=SparseMatrix<double>())
     {
-        return raw.read_raw_segment(data, times, from, to, sel);
+        return raw.read_raw_segment(data, times, from, to, sel, mult);
     }
 
     //=========================================================================================================
