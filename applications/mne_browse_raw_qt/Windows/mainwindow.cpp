@@ -134,6 +134,11 @@ void MainWindow::setupWindowWidgets()
     addDockWidget(Qt::BottomDockWidgetArea, m_pFilterWindow);
     m_pFilterWindow->hide();
 
+    //Create filter window - QTDesigner used - see / FormFiles
+    m_pProjectionWindow = new ProjectionWindow(this);
+    addDockWidget(Qt::LeftDockWidgetArea, m_pProjectionWindow);
+    m_pProjectionWindow->hide();
+
     //Init windows - TODO: get rid of this here, do this inside the window classes
     m_pDataWindow->init();
     m_pEventWindow->init();
@@ -296,6 +301,14 @@ void MainWindow::createToolBar()
     });
     toolBar->addAction(showAverageManager);
 
+    //Toggle visibility of the average manager
+    QAction* showProjectionManager = new QAction(QIcon(":/Resources/Images/showProjectionManager.png"),tr("Toggle projection manager"), this);
+    showProjectionManager->setStatusTip(tr("Toggle the projection manager"));
+    connect(showProjectionManager, &QAction::triggered, this, [=](){
+        showWindow(m_pProjectionWindow);
+    });
+    toolBar->addAction(showProjectionManager);
+
     //Toggle visibility of the scaling window
     QAction* showInformationWindow = new QAction(QIcon(":/Resources/Images/showInformationWindow.png"),tr("Toggle information window"), this);
     showInformationWindow->setStatusTip(tr("Toggle the information window"));
@@ -340,6 +353,12 @@ void MainWindow::connectMenus()
     });
     connect(ui->m_scalingAction, &QAction::triggered, this, [=](){
         showWindow(m_pScaleWindow);
+    });
+    connect(ui->m_ChInformationAction, &QAction::triggered, this, [=](){
+        showWindow(m_pChInfoWindow);
+    });
+    connect(ui->m_projectionManagerAction, &QAction::triggered, this, [=](){
+        showWindow(m_pProjectionWindow);
     });
 
     //Help
