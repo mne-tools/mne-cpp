@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>295</width>
+    <height>460</height>
    </rect>
   </property>
   <property name="allowedAreas">
@@ -21,7 +21,16 @@
     <item row="0" column="0">
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
-       <widget class="QTableView" name="m_tableView_availableProjections"/>
+       <widget class="QGroupBox" name="groupBox">
+        <property name="title">
+         <string>Available projections</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="0" column="0">
+          <widget class="QTableView" name="m_tableView_availableProjections"/>
+         </item>
+        </layout>
+       </widget>
       </item>
      </layout>
     </item>
