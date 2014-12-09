@@ -56,7 +56,7 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ButterflySceneItem::ButterflySceneItem(QString setName, int setKind, int setUnit, QList<QColor> &defaultColors)
+ButterflySceneItem::ButterflySceneItem(QString setName, int setKind, int setUnit, const QList<QColor> &defaultColors)
 : m_sSetName(setName)
 , m_iSetKind(setKind)
 , m_iSetUnit(setUnit)
