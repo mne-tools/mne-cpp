@@ -58,9 +58,9 @@ using namespace MNEBrowseRawQt;
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
-//, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
-//, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
-//, m_qEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
+, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
+, m_qEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
 , m_qSettings()
 , m_rawSettings()
 , ui(new Ui::MainWindowWidget)
@@ -190,6 +190,10 @@ void MainWindow::setupWindowWidgets()
     connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
             m_pFilterWindow, &FilterWindow::newFileLoaded);
 
+    //Connect projection manager with fif file loading
+    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
+            m_pProjectionWindow->getDataModel(), static_cast<void (ProjectionModel::*)(const FiffInfo&)>(&ProjectionModel::addProjections));
+
     //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels - TODO: dirty move get rid of this here
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
         m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_fiffInfo);
@@ -198,6 +202,7 @@ void MainWindow::setupWindowWidgets()
         m_pSelectionManagerWindow->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
         m_pSelectionManagerWindow->newFiffFileLoaded();
         m_pFilterWindow->newFileLoaded();
+        m_pProjectionWindow->getDataModel()->addProjections(m_pDataWindow->getDataModel()->m_fiffInfo);
     }
 }
 
@@ -464,7 +469,14 @@ void MainWindow::openFile()
 
     if(m_qFileRaw.isOpen())
         m_qFileRaw.close();
+
     m_qFileRaw.setFileName(filename);
+
+    //Clear projection manager model
+    m_pProjectionWindow->getDataModel()->clearModel();
+
+    //Clear event model
+    m_pEventWindow->getEventModel()->clearModel();
 
 //    QFutureWatcher<bool> writeFileFutureWatcher;
 //    QProgressDialog progressDialog("Loading fif file...", QString(), 0, 0, this, Qt::Dialog);
@@ -500,9 +512,6 @@ void MainWindow::openFile()
         qDebug() << "Fiff data file" << filename << "loaded.";
     else
         qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
-
-    //Clear event model
-    m_pEventWindow->getEventModel()->clearModel();
 
     //set position of QScrollArea
     m_pDataWindow->getDataTableView()->horizontalScrollBar()->setValue(0);

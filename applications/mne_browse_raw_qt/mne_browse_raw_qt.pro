@@ -95,6 +95,7 @@ SOURCES += \
     Models/rawmodel.cpp \
     Models/eventmodel.cpp \
     Models/chinfomodel.cpp \
+    Models/projectionmodel.cpp \
     Delegates/averagedelegate.cpp \
     Delegates/rawdelegate.cpp \
     Delegates/eventdelegate.cpp \
@@ -130,6 +131,7 @@ HEADERS += \
     Models/rawmodel.h \
     Models/eventmodel.h \
     Models/chinfomodel.h \
+    Models/projectionmodel.h \
     Delegates/averagedelegate.h \
     Delegates/rawdelegate.h \
     Delegates/eventdelegate.h \
