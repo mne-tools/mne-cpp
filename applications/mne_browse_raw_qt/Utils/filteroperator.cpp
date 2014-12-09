@@ -123,6 +123,7 @@ FilterOperator::FilterOperator(QString unique_name, FilterType type, int order, 
                     break;
             }
 
+            m_dCoeffA = filtercos.m_dCoeffA;
             m_dFFTCoeffA = filtercos.m_dFFTCoeffA;
 
             break;
