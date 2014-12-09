@@ -445,32 +445,37 @@ void MainWindow::openFile()
         m_qFileRaw.close();
     m_qFileRaw.setFileName(filename);
 
-    QFutureWatcher<bool> writeFileFutureWatcher;
-    QProgressDialog progressDialog("Loading fif file...", QString(), 0, 0, this, Qt::Dialog);
+//    QFutureWatcher<bool> writeFileFutureWatcher;
+//    QProgressDialog progressDialog("Loading fif file...", QString(), 0, 0, this, Qt::Dialog);
 
-    //Connect future watcher and dialog
-    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::finished,
-            &progressDialog, &QProgressDialog::reset);
+//    //Connect future watcher and dialog
+//    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::finished,
+//            &progressDialog, &QProgressDialog::reset);
 
-    connect(&progressDialog, &QProgressDialog::canceled,
-            &writeFileFutureWatcher, &QFutureWatcher<bool>::cancel);
+//    connect(&progressDialog, &QProgressDialog::canceled,
+//            &writeFileFutureWatcher, &QFutureWatcher<bool>::cancel);
 
-    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::progressRangeChanged,
-            &progressDialog, &QProgressDialog::setRange);
+//    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::progressRangeChanged,
+//            &progressDialog, &QProgressDialog::setRange);
 
-    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::progressValueChanged,
-            &progressDialog, &QProgressDialog::setValue);
+//    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::progressValueChanged,
+//            &progressDialog, &QProgressDialog::setValue);
 
-    //Run the file writing in seperate thread
-    writeFileFutureWatcher.setFuture(QtConcurrent::run(m_pDataWindow->getDataModel(),
-                                                         &RawModel::loadFiffData,
-                                                         &m_qFileRaw));
+//    //Run the file writing in seperate thread
+//    writeFileFutureWatcher.setFuture(QtConcurrent::run(m_pDataWindow->getDataModel(),
+//                                                         &RawModel::loadFiffData,
+//                                                         &m_qFileRaw));
 
-    progressDialog.exec();
+//    progressDialog.exec();
 
-    writeFileFutureWatcher.waitForFinished();
+//    writeFileFutureWatcher.waitForFinished();
 
-    if(!writeFileFutureWatcher.future().result())
+//    if(!writeFileFutureWatcher.future().result())
+//        qDebug() << "Fiff data file" << filename << "loaded.";
+//    else
+//        qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
+
+    if(!m_pDataWindow->getDataModel()->loadFiffData(&m_qFileRaw))
         qDebug() << "Fiff data file" << filename << "loaded.";
     else
         qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
