@@ -120,7 +120,7 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
     m_iFilterTaps = MODEL_NUM_FILTER_TAPS;
 
     //read fiff data
-    loadFiffData(qFile);
+    loadFiffData(&qFile);
 
     //generator FilterOperator objects
     genStdFilterOps();
@@ -359,7 +359,7 @@ void RawModel::genStdFilterOps()
 
 //*************************************************************************************************************
 
-bool RawModel::loadFiffData(QFile& qFile)
+bool RawModel::loadFiffData(QFile* qFile)
 {
     beginResetModel();
     clearModel();
@@ -367,7 +367,7 @@ bool RawModel::loadFiffData(QFile& qFile)
     MatrixXd t_data,t_times; //type is later on (when append to m_data) casted into MatrixXdR (Row-Major)
     QSharedPointer<DataPackage> newDataPackage;
 
-    m_pfiffIO = QSharedPointer<FiffIO>(new FiffIO(qFile));
+    m_pfiffIO = QSharedPointer<FiffIO>(new FiffIO(*qFile));
     if(!m_pfiffIO->m_qlistRaw.empty()) {
         m_iAbsFiffCursor = m_pfiffIO->m_qlistRaw[0]->first_samp; //Set cursor somewhere into fiff file [in samples]
         m_bStartReached = true;
@@ -397,7 +397,7 @@ bool RawModel::loadFiffData(QFile& qFile)
 
     endResetModel();
 
-    qFile.close();
+    qFile->close();
 
     emit fileLoaded(m_fiffInfo);
     emit assignedOperatorsChanged(m_assignedOperators);
