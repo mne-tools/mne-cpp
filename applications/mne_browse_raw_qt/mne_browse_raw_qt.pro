@@ -108,7 +108,8 @@ SOURCES += \
     Windows/averagewindow.cpp \
     Windows/scalewindow.cpp \
     Windows/chinfowindow.cpp \
-    Utils/datapackage.cpp
+    Windows/projectionwindow.cpp \
+    Utils/datapackage.cpp \    
 
 HEADERS += \
     Utils/datamarker.h \
@@ -142,7 +143,8 @@ HEADERS += \
     Windows/averagewindow.h \
     Windows/scalewindow.h \
     Windows/chinfowindow.h \
-    Utils/datapackage.h
+    Windows/projectionwindow.h \
+    Utils/datapackage.h \
 
 FORMS += \
     Windows/eventwindowdock.ui \
@@ -154,7 +156,8 @@ FORMS += \
     Windows/averagewindow.ui \
     Windows/scalewindow.ui \
     Windows/chinfowindow.ui \
-    Windows/filterwindowdock.ui
+    Windows/filterwindowdock.ui \
+    Windows/projectionwindow.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
