@@ -253,14 +253,6 @@ void MainWindow::createToolBar()
 
     toolBar->addSeparator();
 
-    //undock view into new window (not dock widget)
-    QAction* undockToWindowAction = new QAction(QIcon(":/Resources/Images/undockView.png"),tr("Channel info"), this);
-    undockToWindowAction->setStatusTip(tr("Toggle channel info window"));
-    connect(undockToWindowAction, &QAction::triggered, this, [=](){
-        showWindow(m_pChInfoWindow);
-    });
-    toolBar->addAction(undockToWindowAction);
-
     //Toggle visibility of the event manager
     QAction* showEventManager = new QAction(QIcon(":/Resources/Images/showEventManager.png"),tr("Toggle event manager"), this);
     showEventManager->setStatusTip(tr("Toggle the event manager"));
@@ -301,15 +293,25 @@ void MainWindow::createToolBar()
     });
     toolBar->addAction(showAverageManager);
 
-    //Toggle visibility of the average manager
-    QAction* showProjectionManager = new QAction(QIcon(":/Resources/Images/showProjectionManager.png"),tr("Toggle projection manager"), this);
+    //Toggle visibility of the projection manager
+    QAction* showProjectionManager = new QAction(QIcon(":/Resources/Images/showProjectionWindow.png"),tr("Toggle projection manager"), this);
     showProjectionManager->setStatusTip(tr("Toggle the projection manager"));
     connect(showProjectionManager, &QAction::triggered, this, [=](){
         showWindow(m_pProjectionWindow);
     });
     toolBar->addAction(showProjectionManager);
 
-    //Toggle visibility of the scaling window
+    toolBar->addSeparator();
+
+    //Toggle visibility of the channel information window manager
+    QAction* showChInfo = new QAction(QIcon(":/Resources/Images/undockView.png"),tr("Channel info"), this);
+    showChInfo->setStatusTip(tr("Toggle channel info window"));
+    connect(showChInfo, &QAction::triggered, this, [=](){
+        showWindow(m_pChInfoWindow);
+    });
+    toolBar->addAction(showChInfo);
+
+    //Toggle visibility of the information window
     QAction* showInformationWindow = new QAction(QIcon(":/Resources/Images/showInformationWindow.png"),tr("Toggle information window"), this);
     showInformationWindow->setStatusTip(tr("Toggle the information window"));
     connect(showInformationWindow, &QAction::triggered, this, [=](){
