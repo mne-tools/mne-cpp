@@ -99,6 +99,8 @@ void InformationWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLeve
 
 void InformationWindow::setLogLevel(LogLevel lvl)
 {
+    m_eLogLevelCurrent = lvl;
+
     switch(lvl) {
     case _LogLvMin:
         writeToLog(tr("minimal log level set"), _LogKndMessage, _LogLvMin);
@@ -110,6 +112,4 @@ void InformationWindow::setLogLevel(LogLevel lvl)
         writeToLog(tr("maximum log level set"), _LogKndMessage, _LogLvMin);
         break;
     }
-
-    m_eLogLevelCurrent = lvl;
 }
