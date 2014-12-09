@@ -64,6 +64,9 @@ AverageWindow::AverageWindow(QWidget *parent, QFile &file)
     init();
 }
 
+
+//*************************************************************************************************************
+
 AverageWindow::AverageWindow(QWidget *parent)
 : QDockWidget(parent)
 , ui(new Ui::AverageWindow)
@@ -73,7 +76,14 @@ AverageWindow::AverageWindow(QWidget *parent)
     init();
 }
 
-AverageWindow::AverageWindow() : AverageWindow(0) { }
+
+//*************************************************************************************************************
+
+AverageWindow::AverageWindow()
+: AverageWindow(0)
+{
+}
+
 
 //*************************************************************************************************************
 
