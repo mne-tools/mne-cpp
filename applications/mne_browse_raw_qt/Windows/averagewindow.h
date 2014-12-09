@@ -96,7 +96,9 @@ public:
     *
     * @param [in] parent pointer to parent widget; If parent is 0, the new AverageWindow becomes a window. If parent is another widget, AverageWindow becomes a child window inside parent. AverageWindow is deleted when its parent is deleted.
     */
-    AverageWindow(QWidget *parent = 0, QFile &file = QFile());
+    AverageWindow(QWidget *parent, QFile &file);
+    AverageWindow(QWidget *parent);
+    AverageWindow();
 
     //=========================================================================================================
     /**
@@ -128,6 +130,13 @@ public:
     void scaleAveragedData(const QMap<QString,double> &scaleMap);
 
 private:
+
+    //=========================================================================================================
+    /**
+    * called by constructor to perform common initialization step
+    */
+    void init();
+
     //=========================================================================================================
     /**
     * inits the model view controller paradigm of this window
@@ -135,6 +144,7 @@ private:
     * @param [in] file holds the file which is to be loaded on startup
     */
     void initMVC(QFile &file);
+    void initMVC();
 
     //=========================================================================================================
     /**
