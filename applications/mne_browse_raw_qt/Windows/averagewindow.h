@@ -95,9 +95,22 @@ public:
     * Constructs a AverageWindow which is a child of parent.
     *
     * @param [in] parent pointer to parent widget; If parent is 0, the new AverageWindow becomes a window. If parent is another widget, AverageWindow becomes a child window inside parent. AverageWindow is deleted when its parent is deleted.
+    * @param [in] file default file used to read the evoked data from.
     */
     AverageWindow(QWidget *parent, QFile &file);
+
+    //=========================================================================================================
+    /**
+    * Constructs a AverageWindow which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new AverageWindow becomes a window. If parent is another widget, AverageWindow becomes a child window inside parent. AverageWindow is deleted when its parent is deleted.
+    */
     AverageWindow(QWidget *parent);
+
+    //=========================================================================================================
+    /**
+    * Constructs a AverageWindow which is a child of parent.
+    */
     AverageWindow();
 
     //=========================================================================================================
@@ -144,6 +157,11 @@ private:
     * @param [in] file holds the file which is to be loaded on startup
     */
     void initMVC(QFile &file);
+
+    //=========================================================================================================
+    /**
+    * inits the model view controller paradigm of this window
+    */
     void initMVC();
 
     //=========================================================================================================
