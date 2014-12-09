@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "ui_projectionwindow.h"
-
+#include "../Models/projectionmodel.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -85,8 +85,41 @@ public:
     */
     ProjectionWindow(QWidget *parent = 0);
 
+    //=========================================================================================================
+    /**
+    * Constructs a ProjectionWindow which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new ProjectionWindow becomes a window. If parent is another widget, ProjectionWindow becomes a child window inside parent. ProjectionWindow is deleted when its parent is deleted.
+    * @param [in] qFile file to read the projectors from.
+    */
+    ProjectionWindow(QWidget *parent, QFile& qFile);
+
+    //=========================================================================================================
+    /**
+    * Constructs a ProjectionWindow which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new ProjectionWindow becomes a window. If parent is another widget, ProjectionWindow becomes a child window inside parent. ProjectionWindow is deleted when its parent is deleted.
+    * @param [in] dataProjs list with already loaded projectors.
+    */
+    ProjectionWindow(QWidget *parent, QList<FiffProj>& dataProjs);
+
+    //=========================================================================================================
+    /**
+    * Returns the ProjectionModel of this window
+    */
+    ProjectionModel* getDataModel();
+
+
 private:
-    Ui::ProjectionWindow *ui;
+    //=========================================================================================================
+    /**
+    * inits the table widgets of this window
+    */
+    void initTableViewWidgets();
+
+    Ui::ProjectionWindow *ui;                       /**< Pointer to the qt designer generated ui class.*/
+
+    ProjectionModel*    m_pProjectionModel;         /**< Pointer to the projection data model.*/
 };
 
 } // NAMESPACE MNEBrowseRawQt

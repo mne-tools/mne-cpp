@@ -110,6 +110,14 @@ namespace ChInfoModelRoles
                   GetChActiveFilter = Qt::UserRole + 1018,};
 }
 
+namespace ProjectionModelRoles
+{
+    enum ItemRole{GetProjectionData = Qt::UserRole + 1019,
+                  GetProjectionName = Qt::UserRole + 1020,
+                  GetProjectionState = Qt::UserRole + 1021,
+                  GetProjectionDimension = Qt::UserRole + 1022};
+}
+
 } //NAMESPACE
 
 Q_DECLARE_METATYPE(FIFFLIB::fiff_int_t);

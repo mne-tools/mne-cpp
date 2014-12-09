@@ -1,12 +1,12 @@
 //=============================================================================================================
 /**
-* @file     chinfomodel.h
+* @file     projectionmodel.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 *           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     November, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
@@ -31,21 +31,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    This class represents the channel info model of the model/view framework of mne_browse_raw_qt application.
+* @brief    This class represents the projection model of the model/view framework of mne_browse_raw_qt application.
 *
 */
 
-#ifndef CHINFOCLASS_H
-#define CHINFOCLASS_H
+#ifndef PROJECTIONMODEL_H
+#define PROJECTIONMODEL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../Utils/rawsettings.h"
 #include "../Utils/types.h"
-#include "../Utils/filteroperator.h"
 
 
 //*************************************************************************************************************
@@ -54,7 +52,6 @@
 //=============================================================================================================
 
 #include <QAbstractTableModel>
-#include <QVector3D>
 
 
 //*************************************************************************************************************
@@ -92,18 +89,19 @@ namespace MNEBrowseRawQt
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ChInfoModel
+* DECLARE CLASS ProjectionModel
 */
-class ChInfoModel : public QAbstractTableModel
+class ProjectionModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    ChInfoModel(QObject *parent = 0);
+    ProjectionModel(QObject *parent = 0);
+    ProjectionModel(QObject *parent, QFile& qFile);
+    ProjectionModel(QObject *parent, QList<FiffProj>& dataProjs);
 
     //=========================================================================================================
     /**
     * Reimplemented virtual functions
-    *
     */
     virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -116,85 +114,57 @@ public:
 
     //=========================================================================================================
     /**
-    * Updates the fiff info
+    * loadProjections loads projections from a fif file
     *
-    * @param fiffInfo fiff info variabel.
+    * @param qFile fiff data file containing the projections
     */
-    void fiffInfoChanged(const FiffInfo &fiffInfo);
+    bool loadProjections(QFile& qFile);
 
     //=========================================================================================================
     /**
-    * Updates the fiff info
+    * saveProjections saves projections to a fif file
     *
-    * @param assignedOperators the filter operators which are currently active.
+    * @param qFile fiff data file containing the projections
     */
-    void assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOperator> > &assignedOperators);
+    bool saveProjections(QFile& qFile);
 
     //=========================================================================================================
     /**
-    * Updates the layout map
+    * addProjections adds projections to the data
     *
-    * @param layoutMap the layout map with the 2D positions.
+    * @param dataProjs fiff list with already loaded projectors.
     */
-    void layoutChanged(const QMap<QString,QPointF> &layoutMap);
+    void addProjections(const QList<FiffProj>& dataProjs);
 
     //=========================================================================================================
     /**
-    * Updates the layout map
+    * addProjections adds projections to the data
     *
-    * @return the current mapped channel list
+    * @param fiffInfo fiff info with already loaded projectors.
     */
-    const QStringList & getMappedChannelsList();
+    void addProjections(const FiffInfo &fiffInfo);
+
+    bool                        m_bFileloaded;          /**< true when a Fiff evoked file is loaded. */
 
     //=========================================================================================================
     /**
-    * Returns the model index for the given input channel fro mthe original channel list
-    *
-    * @param chName the channel name for which the model index is needed.
-    * @return the index number. if channel was not found in the data this functions returns -1
+    * clearModel clears all model's members
     */
-    int getIndexFromOrigChName(QString chName);
+    void clearModel();
 
-    //=========================================================================================================
-    /**
-    * Returns the model index for the given input channel fro mthe mapped channel list
-    *
-    * @param chName the channel name for which the model index is needed.
-    * @return the index number. if channel was not found in the data this functions returns -1
-    */
-    int getIndexFromMappedChName(QString chName);
+protected:
+    QList<FiffProj>             m_dataProjs;            /**< current projector data. */
 
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever channels where mapped to a layout
-    *
+    * fileLoaded is emitted whenever a file was (tried) to be loaded
     */
-    void channelsMappedToLayout(const QStringList &mappedLayoutChNames);
-
-protected:
-    //=========================================================================================================
-    /**
-    * clearModel clears all model's members
-    *
-    */
-    void clearModel();
-
-    //=========================================================================================================
-    /**
-    * Maps the currently loaded channels to the loaded layout file
-    *
-    */
-    void mapLayoutToChannels();
-
-    FiffInfo                m_fiffInfo;             /**< The fiff info of the currently loaded fiff file. */
-    QMap<QString,QPointF>   m_layoutMap;            /**< The current layout map with a position for all MEG and EEG channels. */
-    QStringList             m_aliasNames;           /**< list of given channel aliases. */
-    QStringList             m_mappedLayoutChNames;  /**< list of the mapped layout channel names. */
-    QMap<int,QSharedPointer<MNEOperator> >      m_assignedOperators;    /**< Map of MNEOperator types to channels.*/
-
+    void fileLoaded(bool);
 };
 
 } // NAMESPACE
 
-#endif // CHINFOCLASS_H
+
+
+#endif // PROJECTIONMODEL_H

@@ -58,10 +58,58 @@ using namespace MNEBrowseRawQt;
 ProjectionWindow::ProjectionWindow(QWidget *parent)
 : QDockWidget(parent)
 , ui(new Ui::ProjectionWindow)
+, m_pProjectionModel(new ProjectionModel(this))
 {
     ui->setupUi(this);
+
+    initTableViewWidgets();
 }
 
 
 //*************************************************************************************************************
 
+ProjectionWindow::ProjectionWindow(QWidget *parent, QFile& qFile)
+: QDockWidget(parent)
+, ui(new Ui::ProjectionWindow)
+, m_pProjectionModel(new ProjectionModel(this, qFile))
+{
+    ui->setupUi(this);
+
+    initTableViewWidgets();
+}
+
+
+//*************************************************************************************************************
+
+ProjectionWindow::ProjectionWindow(QWidget *parent, QList<FiffProj>& dataProjs)
+: QDockWidget(parent)
+, ui(new Ui::ProjectionWindow)
+, m_pProjectionModel(new ProjectionModel(this, dataProjs))
+{
+    ui->setupUi(this);
+
+    initTableViewWidgets();
+}
+
+
+//*************************************************************************************************************
+
+void ProjectionWindow::initTableViewWidgets()
+{
+    //Set model
+    ui->m_tableView_availableProjections->setModel(m_pProjectionModel);
+
+    connect(m_pProjectionModel, &ProjectionModel::dataChanged,
+            ui->m_tableView_availableProjections, &QTableView::resizeColumnsToContents);
+
+    //Hide data column in view
+    ui->m_tableView_availableProjections->setColumnHidden(3, true);
+}
+
+
+//*************************************************************************************************************
+
+ProjectionModel* ProjectionWindow::getDataModel()
+{
+    return m_pProjectionModel;
+}
