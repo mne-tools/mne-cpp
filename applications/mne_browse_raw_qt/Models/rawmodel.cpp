@@ -663,6 +663,8 @@ void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOpe
     for(int i=0; i<m_data.size(); i++)
         updateOperatorsConcurrently(i);
 
+    performOverlapAdd();
+
     emit assignedOperatorsChanged(m_assignedOperators);
 
     qDebug() << "RawModel: using FilterType" << operatorPtr->m_sName;
@@ -694,6 +696,8 @@ void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOpe
 
     for(int i=0; i<m_data.size(); i++)
         updateOperatorsConcurrently(i);
+
+    performOverlapAdd();
 
     emit assignedOperatorsChanged(m_assignedOperators);
 
@@ -740,6 +744,8 @@ void RawModel::updateOperators(QModelIndex chan)
     for(int i=0; i<m_data.size(); i++)
         updateOperatorsConcurrently(i);
 
+    performOverlapAdd();
+
     emit assignedOperatorsChanged(m_assignedOperators);
 }
 
@@ -761,6 +767,8 @@ void RawModel::updateOperators(QModelIndexList chlist)
 
     for(int i=0; i<m_data.size(); i++)
         updateOperatorsConcurrently(i);
+
+    performOverlapAdd();
 
     emit assignedOperatorsChanged(m_assignedOperators);
 }
@@ -1019,8 +1027,6 @@ void RawModel::insertProcessedDataAll(int windowIndex)
     //Set and cut original data to window size and calculate mean for filtered data
     for(qint32 i=0; i < listFilteredChs.size(); ++i)
         m_data[windowIndex]->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i], cutFront, cutBack);
-
-    performOverlapAdd(windowIndex);
 
     emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));
 
