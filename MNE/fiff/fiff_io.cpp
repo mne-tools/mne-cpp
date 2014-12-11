@@ -224,14 +224,11 @@ bool FiffIO::write(QFile& p_QFile, const fiff_int_t type, const fiff_int_t idx) 
 bool FiffIO::write_raw(QIODevice &p_IODevice, const fiff_int_t idx) const {
 
     RowVectorXd cals;
-    SparseMatrix<double> multSegment;
+    SparseMatrix<double> mult;
     RowVectorXi sel;
 
 //    std::cout << "Writing file " << QFile(&p_IODevice).fileName().toLatin1() << std::endl;
     FiffStream::SPtr outfid = Fiff::start_writing_raw(p_IODevice,this->m_qlistRaw[idx]->info,cals);
-
-    for(int i = 0; i<cals.cols(); i++)
-        qDebug()<<cals[i];
 
     //Setup reading parameters
     fiff_int_t from = m_qlistRaw[idx]->first_samp;
@@ -254,7 +251,7 @@ bool FiffIO::write_raw(QIODevice &p_IODevice, const fiff_int_t idx) const {
         if (last > to)
             last = to;
 
-        if (!m_qlistRaw[idx]->read_raw_segment(data,times,first,last,sel,multSegment)) {
+        if (!m_qlistRaw[idx]->read_raw_segment(data,times,mult,first,last,sel)) {
             qDebug("error during read_raw_segment\n");
             return false;
         }
@@ -265,7 +262,7 @@ bool FiffIO::write_raw(QIODevice &p_IODevice, const fiff_int_t idx) const {
                outfid->write_int(FIFF_FIRST_SAMPLE,&first);
            first_buffer = false;
         }
-        outfid->write_raw_buffer(data,multSegment);
+        outfid->write_raw_buffer(data,mult);
         qDebug("[done]\n");
     }
 
