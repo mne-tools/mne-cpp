@@ -550,9 +550,33 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    inline static bool read_raw_segment(FiffRawData& raw, MatrixXd& data, MatrixXd& times, fiff_int_t from = -1, fiff_int_t to = -1, MatrixXi sel = defaultMatrixXi, SparseMatrix<double>& mult=SparseMatrix<double>())
+    inline static bool read_raw_segment(FiffRawData& raw, MatrixXd& data, MatrixXd& times, fiff_int_t from = -1, fiff_int_t to = -1, MatrixXi sel = defaultMatrixXi)
     {
-        return raw.read_raw_segment(data, times, from, to, sel, mult);
+        return raw.read_raw_segment(data, times, from, to, sel);
+    }
+
+    /**
+    * fiff_read_raw_segment
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffRawData read_raw_segment member function
+    *
+    * Read a specific raw data segment
+    *
+    * @param[in] raw        structure returned by fiff_setup_read_raw
+    * @param[out] data      returns the data matrix (channels x samples)
+    * @param[out] times     returns the time values corresponding to the samples
+    * @param[out] mult      matrix to store used multiplication matrix (compensator,projection,calibration)
+    * @param[in] from       first sample to include. If omitted, defaults to the first sample in data (optional)
+    * @param[in] to         last sample to include. If omitted, defaults to the last sample in data (optional)
+    * @param[in] sel        channel selection vector (optional)
+    *
+    * @return true if succeeded, false otherwise
+    */
+    inline static bool read_raw_segment(FiffRawData& raw, MatrixXd& data, MatrixXd& times, SparseMatrix<double>& mult, fiff_int_t from = -1, fiff_int_t to = -1, MatrixXi sel = defaultMatrixXi)
+    {
+        return raw.read_raw_segment(data, times, mult, from, to, sel);
     }
 
     //=========================================================================================================

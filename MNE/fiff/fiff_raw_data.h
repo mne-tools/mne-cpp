@@ -156,7 +156,24 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t from = -1, fiff_int_t to = -1, const RowVectorXi& sel = defaultRowVectorXi, SparseMatrix<double>& multSegment = SparseMatrix<double>(0,0));
+    bool read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t from = -1, fiff_int_t to = -1, const RowVectorXi& sel = defaultRowVectorXi);
+
+    //=========================================================================================================
+    /**
+    * ### MNE toolbox root function ###: Implementation of the fiff_read_raw_segment function
+    *
+    * Read a specific raw data segment
+    *
+    * @param[out] data      returns the data matrix (channels x samples)
+    * @param[out] times     returns the time values corresponding to the samples
+    * @param[out] multSegment used multiplication matrix (compensator,projection,calibration)
+    * @param[in] from       first sample to include. If omitted, defaults to the first sample in data (optional)
+    * @param[in] to         last sample to include. If omitted, defaults to the last sample in data (optional)
+    * @param[in] sel        channel selection vector (optional)
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool read_raw_segment(MatrixXd& data, MatrixXd& times, SparseMatrix<double>& multSegment, fiff_int_t from = -1, fiff_int_t to = -1, const RowVectorXi& sel = defaultRowVectorXi);
 
     //=========================================================================================================
     /**
