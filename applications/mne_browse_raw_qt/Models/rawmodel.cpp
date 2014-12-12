@@ -1070,11 +1070,7 @@ void RawModel::insertProcessedDataAll(int windowIndex)
 
     QList<int> listFilteredChs = m_assignedOperators.keys();
 
-    int dataLength = m_iWindowSize;
-    if(m_bReloadBefore)
-        dataLength = m_data.first()->dataRaw().cols();
-    else
-        dataLength = m_data.last()->dataRaw().cols();
+    int dataLength = m_data[windowIndex]->dataRaw().cols();;
 
     int cutFront = m_iCurrentFFTLength/4;
     int cutBack = m_iCurrentFFTLength/4 + (m_listTmpChData[0].second.cols()-m_iCurrentFFTLength/2-dataLength);
