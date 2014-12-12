@@ -103,7 +103,7 @@ void SelectionManagerWindow::setCurrentlyMappedFiffChannels(const QStringList &m
     ui->m_listWidget_selectionGroups->setCurrentItem(getItemForChName(ui->m_listWidget_selectionGroups, "All"), QItemSelectionModel::Select);
 
     //Update selection
-    updateSelectionGroupsList(getItemForChName(ui->m_listWidget_selectionGroups, "All"));
+    updateSelectionGroupsList(getItemForChName(ui->m_listWidget_selectionGroups, "All"), new QListWidgetItem());
 }
 
 
@@ -202,7 +202,7 @@ void SelectionManagerWindow::initListWidgets()
     ui->m_listWidget_userDefined->installEventFilter(this);
 
     //Connect list widgets to update themselves and other list widgets when changed
-    connect(ui->m_listWidget_selectionGroups, &QListWidget::itemClicked,
+    connect(ui->m_listWidget_selectionGroups, &QListWidget::currentItemChanged,
                 this, &SelectionManagerWindow::updateSelectionGroupsList);
 
     //Update data view whenever a drag and drop item movement is performed - TODO: This is inefficient because updateDataView is called everytime the list's viewport is entered
@@ -371,7 +371,7 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
     }
 
     //Update selection
-    updateSelectionGroupsList(getItemForChName(ui->m_listWidget_selectionGroups, "All"));
+    updateSelectionGroupsList(getItemForChName(ui->m_listWidget_selectionGroups, "All"), new QListWidgetItem());
 
     //Set group all as slected item
     ui->m_listWidget_selectionGroups->setCurrentItem(getItemForChName(ui->m_listWidget_selectionGroups, "All"), QItemSelectionModel::Select);
@@ -412,9 +412,14 @@ void SelectionManagerWindow::cleanUpMEGChannels()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::updateSelectionGroupsList(QListWidgetItem* item)
+void SelectionManagerWindow::updateSelectionGroupsList(QListWidgetItem* current, QListWidgetItem* previous)
 {
-    if(item->text().contains("EEG"))
+    Q_UNUSED(previous);
+
+    if(current == 0)
+        return;
+
+    if(current->text().contains("EEG"))
         m_pSelectionScene->m_iChannelTypeMode = FIFFV_EEG_CH;
     else
         m_pSelectionScene->m_iChannelTypeMode = FIFFV_MEG_CH;
@@ -422,7 +427,7 @@ void SelectionManagerWindow::updateSelectionGroupsList(QListWidgetItem* item)
     ui->m_listWidget_visibleChannels->clear();
 
     //update visible channel list widget
-    ui->m_listWidget_visibleChannels->addItems(m_selectionGroupsMap[item->text()]);
+    ui->m_listWidget_visibleChannels->addItems(m_selectionGroupsMap[current->text()]);
 
     //update scene items based o nthe new selection group
     updateSceneItems();
