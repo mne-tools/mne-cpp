@@ -572,10 +572,10 @@ void MainWindow::writeFile()
     connect(&progressDialog, &QProgressDialog::canceled,
             &writeFileFutureWatcher, &QFutureWatcher<bool>::cancel);
 
-    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::progressRangeChanged,
+    connect(m_pDataWindow->getDataModel(), &RawModel::writeProgressRangeChanged,
             &progressDialog, &QProgressDialog::setRange);
 
-    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::progressValueChanged,
+    connect(m_pDataWindow->getDataModel(), &RawModel::writeProgressChanged,
             &progressDialog, &QProgressDialog::setValue);
 
     //Run the file writing in seperate thread
