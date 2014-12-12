@@ -238,9 +238,10 @@ private:
     /**
     * Updates selection group widget in this window.
     *
-    * @param [in] item the current selection group list item
+    * @param [in] current the current selection group list item
+    * @param [in] previous the previous selection group list item
     */
-    void updateSelectionGroupsList(QListWidgetItem *item);
+    void updateSelectionGroupsList(QListWidgetItem* current, QListWidgetItem* previous);
 
     //=========================================================================================================
     /**
