@@ -51,9 +51,9 @@
     <addaction name="m_channelSelectionManagerAction"/>
     <addaction name="m_scalingAction"/>
     <addaction name="m_averageWindowAction"/>
-    <addaction name="m_informationAction"/>
     <addaction name="m_ChInformationAction"/>
     <addaction name="m_projectionManagerAction"/>
+    <addaction name="m_informationAction"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -113,7 +113,7 @@
   </action>
   <action name="m_informationAction">
    <property name="text">
-    <string>Information window...</string>
+    <string>Log window...</string>
    </property>
   </action>
   <action name="m_aboutAction">
