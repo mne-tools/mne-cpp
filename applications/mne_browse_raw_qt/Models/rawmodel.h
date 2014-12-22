@@ -91,6 +91,8 @@
 
 #include <QtConcurrent>
 
+#include <QProgressDialog>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -162,7 +164,7 @@ public:
     *
     * @param p_IODevice fiff data file to write
     */
-    bool loadFiffData(QFile& qFile);
+    bool loadFiffData(QFile *qFile);
 
     //=========================================================================================================
     /**
@@ -171,7 +173,7 @@ public:
     * @param p_IODevice fiff data file to write
     * @return
     */
-    bool writeFiffData(QFile &qFile);
+    bool writeFiffData(QFile *qFile);
 
     //VARIABLES
     bool                                        m_bFileloaded;  /**< true when a Fiff file is loaded */
@@ -258,6 +260,7 @@ private:
     qint32                                  m_reloadPos;                /**< Distance that the current window needs to be off the ends of m_data[i] [in samples]. */
     qint8                                   m_maxWindows;               /**< number of windows that are at maximum remained in m_data. */
     qint16                                  m_iFilterTaps;              /**< Number of Filter taps */
+    int                                     m_iCurrentFFTLength;        /**< Currently used fft length */
 
 signals:
     //=========================================================================================================
@@ -423,6 +426,20 @@ private slots:
     * insertProcessedDataAll inserts all the processed data into m_data in front (m_ReloadFront = true) or back (m_ReloadFront = false) when background-thread has finished (this method would be used for QtConcurrent::map)
     */
     void insertProcessedDataAll();
+
+    //=========================================================================================================
+    /**
+    * performs overlap add method to the processed data
+    */
+    void performOverlapAdd();
+
+    //=========================================================================================================
+    /**
+    * performs overlap add method to the processed data
+    *
+    * @param windowIndex the window index
+    */
+    void performOverlapAdd(int windowIndex);
 
 public:
     //=========================================================================================================

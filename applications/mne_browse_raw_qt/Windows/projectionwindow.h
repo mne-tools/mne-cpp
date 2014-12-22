@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     butterflysceneitem.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* @file     projectionwindow.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     October, 2014
+* @date     December, 2014
 *
 * @section  LICENSE
 *
@@ -30,44 +30,27 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ButterflySceneItem class.
+* @brief    Contains the declaration of the ProjectionWindow class.
 *
 */
 
-#ifndef BUTTERFLYSCENEITEM_H
-#define BUTTERFLYSCENEITEM_H
+#ifndef PROJECTIONWINDOW_H
+#define PROJECTIONWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-#include <Eigen/Core>
-#include <fiff/fiff.h>
-#include "types.h"
-
+#include "ui_projectionwindow.h"
+#include "../Models/projectionmodel.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGraphicsItem>
-#include <QString>
-#include <QColor>
-#include <QPainter>
-#include <QStaticText>
-#include <QDebug>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-using namespace FIFFLIB;
+#include <QDockWidget>
 
 
 //*************************************************************************************************************
@@ -81,58 +64,64 @@ namespace MNEBrowseRawQt
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE FORWARD DECLARATIONS
 //=============================================================================================================
 
-
-//=============================================================================================================
 /**
-* ButterflySceneItem...
+* DECLARE CLASS ProjectionWindow
 *
-* @brief The ButterflySceneItem class provides a new data structure for visualizing averages in a 2D layout.
+* @brief The ProjectionWindow class provides a dock window for managing SSP operator projcetions.
 */
-class ButterflySceneItem : public QGraphicsItem
+class ProjectionWindow : public QDockWidget
 {
+    Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a ButterflySceneItem.
-    */
-    ButterflySceneItem(QString setName, int setKind = FIFFV_MEG_CH, int setUnit = FIFF_UNIT_T_M, const QList<QColor> &defaultColors = QList<QColor>());
-
-    //=========================================================================================================
-    /**
-    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
-    */
-    QRectF boundingRect() const;
-
-    //=========================================================================================================
-    /**
-    * Reimplemented paint function.
-    */
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-
-    QString                 m_sSetName;                 /**< The set name.*/
-    fiff_int_t              m_iSetKind;                 /**< The set kind which is to be plotted (MEG or EEG).*/
-    fiff_int_t              m_iSetUnit;                 /**< The set unit. Used to determine whether mag or grad channels are to be plotted.*/
-    const FiffInfo*         m_pFiffInfo;                /**< The fiff info.*/
-
-    QList<QColor>           m_cAverageColors;           /**< The current average color.*/
-    RowVectorPair           m_lAverageData;             /**< The channels average data which is to be plotted.*/
-    QPair<int,int>          m_firstLastSample;          /**< The first and last sample.*/
-    QMap<QString,double>    m_scaleMap;                 /**< Map with all channel types and their current scaling value.*/
-
-protected:
-    //=========================================================================================================
-    /**
-    * Create a plot path and paint the average data
+    * Constructs a ProjectionWindow which is a child of parent.
     *
-    * @param [in] painter The painter used to plot in this item.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new ProjectionWindow becomes a window. If parent is another widget, ProjectionWindow becomes a child window inside parent. ProjectionWindow is deleted when its parent is deleted.
     */
-    void paintAveragePaths(QPainter *painter);
+    ProjectionWindow(QWidget *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Constructs a ProjectionWindow which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new ProjectionWindow becomes a window. If parent is another widget, ProjectionWindow becomes a child window inside parent. ProjectionWindow is deleted when its parent is deleted.
+    * @param [in] qFile file to read the projectors from.
+    */
+    ProjectionWindow(QWidget *parent, QFile& qFile);
+
+    //=========================================================================================================
+    /**
+    * Constructs a ProjectionWindow which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new ProjectionWindow becomes a window. If parent is another widget, ProjectionWindow becomes a child window inside parent. ProjectionWindow is deleted when its parent is deleted.
+    * @param [in] dataProjs list with already loaded projectors.
+    */
+    ProjectionWindow(QWidget *parent, QList<FiffProj>& dataProjs);
+
+    //=========================================================================================================
+    /**
+    * Returns the ProjectionModel of this window
+    */
+    ProjectionModel* getDataModel();
+
+
+private:
+    //=========================================================================================================
+    /**
+    * inits the table widgets of this window
+    */
+    void initTableViewWidgets();
+
+    Ui::ProjectionWindow *ui;                       /**< Pointer to the qt designer generated ui class.*/
+
+    ProjectionModel*    m_pProjectionModel;         /**< Pointer to the projection data model.*/
 };
 
 } // NAMESPACE MNEBrowseRawQt
 
-#endif // BUTTERFLYSCENEITEM_H
+#endif // PROJECTIONWINDOW_H

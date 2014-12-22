@@ -1,16 +1,16 @@
 //=============================================================================================================
 /**
-* @file     filteroperator.h
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+* @file     projectionmodel.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 *           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     February, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,41 +31,27 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    The FilterOperator class represents a derived class from an arbitrary MNEOperator class object.
-*           Thus, it is a filter object that generates the FIR filter coefficients using Park's McClellan's
-*           filter design algorithm [1] and offers a overlap-add method [2] for frequency filtering of an input
-*           sequence. In this regard, the filter coefficients of a certain filter order are zero-padded to fill
-*           a length of an multiple integer of a power of 2 in order to efficiently compute a FFT. The length of
-*           the FFT is given by the next power of 2 of the length of the input sequence. In order to avoid
-*           circular-convolution, the input sequence is given by the FFT-length-NumFilterTaps.
+* @brief    This class represents the projection model of the model/view framework of mne_browse_raw_qt application.
 *
-*           e.g. FFT length=4096, NumFilterTaps=80 -> input sequence 4096-80=4016
-*
-*
-*           [1] http://en.wikipedia.org/wiki/Parks%E2%80%93McClellan_filter_design_algorithm
-*           [2] http://en.wikipedia.org/wiki/Overlap_add
 */
-#ifndef FILTEROPERATOR_H
-#define FILTEROPERATOR_H
+
+#ifndef PROJECTIONMODEL_H
+#define PROJECTIONMODEL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "mneoperator.h"
-#include "types.h"
+#include "../Utils/types.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MNE INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff.h>
-#include <mne/mne.h>
-#include <utils/parksmcclellan.h>
-#include <utils/cosinefilter.h>
+#include <QAbstractTableModel>
 
 
 //*************************************************************************************************************
@@ -74,12 +60,14 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
-#include <Eigen/SparseCore>
-#include <unsupported/Eigen/FFT>
 
-#ifndef EIGEN_FFTW_DEFAULT
-#define EIGEN_FFTW_DEFAULT
-#endif
+
+//*************************************************************************************************************
+//=============================================================================================================
+// MNE INCLUDES
+//=============================================================================================================
+
+#include <fiff/fiff.h>
 
 
 //*************************************************************************************************************
@@ -87,9 +75,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
 using namespace Eigen;
-using namespace UTILSLIB;
+using namespace FIFFLIB;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -101,71 +89,82 @@ namespace MNEBrowseRawQt
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FilterOperator
+* DECLARE CLASS ProjectionModel
 */
-class FilterOperator : public MNEOperator
+class ProjectionModel : public QAbstractTableModel
 {
+    Q_OBJECT
 public:
-    enum DesignMethod {
-       Tschebyscheff,
-       Cosine} m_designMethod;
-
-    enum FilterType {
-       LPF,
-       HPF,
-       BPF,
-       NOTCH
-    } m_Type;
-
-    FilterOperator();
+    ProjectionModel(QObject *parent = 0);
+    ProjectionModel(QObject *parent, QFile& qFile);
+    ProjectionModel(QObject *parent, QList<FiffProj>& dataProjs);
 
     //=========================================================================================================
     /**
-    * FilterOperator::FilterOperator
+    * Reimplemented virtual functions
+    */
+    virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
+    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
+    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
+    virtual Qt::ItemFlags flags(const QModelIndex & index) const;
+    virtual bool insertRows(int position, int span, const QModelIndex & parent = QModelIndex());
+    virtual bool removeRows(int position, int span, const QModelIndex & parent = QModelIndex());
+
+    //=========================================================================================================
+    /**
+    * loadProjections loads projections from a fif file
     *
-    * @param unique_name defines the name of the generated filter
-    * @param type of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType)
-    * @param order represents the order of the filter, the higher the higher is the stopband attenuation
-    * @param centerfreq determines the center of the frequency
-    * @param bandwidth ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband
-    * @param parkswidth determines the width of the filter slopes (steepness)
-    * @param sFreq sampling frequency
-    * @param fftlength length of the fft (multiple integer of 2^x)
+    * @param qFile fiff data file containing the projections
     */
-    FilterOperator(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, double sFreq, qint32 fftlength=4096, DesignMethod method = Cosine);
-
-    ~FilterOperator();
+    bool loadProjections(QFile& qFile);
 
     //=========================================================================================================
     /**
-    * Transforms the calculated filter coefficients to frequency-domain
-    */
-    void fftTransformCoeffs();
-
-    //=========================================================================================================
-    /**
-    * FilterOperator::FilterOperator
+    * saveProjections saves projections to a fif file
     *
-    * @param data the input data which is to be filtered
-    * @return a row vector truncated by numberFilterTaps/2 at front and end
+    * @param qFile fiff data file containing the projections
     */
-    RowVectorXd applyFFTFilter(const RowVectorXd& data) const;
+    bool saveProjections(QFile& qFile);
 
-    double          m_sFreq;            /**< the sampling frequency. */
-    int             m_iFilterOrder;     /**< represents the order of the filter instance. */
-    int             m_iFFTlength;       /**< represents the filter length. */
-    double          m_dCenterFreq;      /**< contains center freq of the filter. */
-    double          m_dBandwidth;       /**< contains bandwidth of the filter. */
+    //=========================================================================================================
+    /**
+    * addProjections adds projections to the data
+    *
+    * @param dataProjs fiff list with already loaded projectors.
+    */
+    void addProjections(const QList<FiffProj>& dataProjs);
 
-    QString         m_sName;            /**< contains name of the filter. */
+    //=========================================================================================================
+    /**
+    * addProjections adds projections to the data
+    *
+    * @param fiffInfo fiff info with already loaded projectors.
+    */
+    void addProjections(const FiffInfo &fiffInfo);
 
-    RowVectorXd     m_dCoeffA;          /**< contains the forward filter coefficient set. */
-    RowVectorXd     m_dCoeffB;          /**< contains the backward filter coefficient set (empty if FIR filter). */
+    bool                        m_bFileloaded;          /**< true when a Fiff evoked file is loaded. */
 
-    RowVectorXcd    m_dFFTCoeffA;       /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
-    RowVectorXcd    m_dFFTCoeffB;       /**< the FFT-transformed backward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
+    //=========================================================================================================
+    /**
+    * clearModel clears all model's members
+    */
+    void clearModel();
+
+protected:
+    QList<FiffProj>             m_dataProjs;            /**< current projector data. */
+
+signals:
+    //=========================================================================================================
+    /**
+    * fileLoaded is emitted whenever a file was (tried) to be loaded
+    */
+    void fileLoaded(bool);
 };
 
 } // NAMESPACE
 
-#endif // FILTEROPERATOR_H
+
+
+#endif // PROJECTIONMODEL_H

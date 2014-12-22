@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     informationwindow.h
+* @file     projectionwindow.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2014
+* @date     December, 2014
 *
 * @section  LICENSE
 *
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the InformationWindow class.
+* @brief    Contains the implementation of the ProjectionWindow class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "informationwindow.h"
+#include "projectionwindow.h"
 
 
 //*************************************************************************************************************
@@ -55,61 +55,61 @@ using namespace MNEBrowseRawQt;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InformationWindow::InformationWindow(QWidget *parent) :
-    QDockWidget(parent),
-    ui(new Ui::InformationWindowWidget)
+ProjectionWindow::ProjectionWindow(QWidget *parent)
+: QDockWidget(parent)
+, ui(new Ui::ProjectionWindow)
+, m_pProjectionModel(new ProjectionModel(this))
 {
     ui->setupUi(this);
 
-    m_pTextBrowser_Log = (QTextBrowser*)ui->tab_log->childAt(50,50);
+    initTableViewWidgets();
 }
 
 
 //*************************************************************************************************************
 
-InformationWindow::~InformationWindow()
+ProjectionWindow::ProjectionWindow(QWidget *parent, QFile& qFile)
+: QDockWidget(parent)
+, ui(new Ui::ProjectionWindow)
+, m_pProjectionModel(new ProjectionModel(this, qFile))
 {
-    delete ui;
+    ui->setupUi(this);
+
+    initTableViewWidgets();
 }
 
 
 //*************************************************************************************************************
 
-void InformationWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl)
+ProjectionWindow::ProjectionWindow(QWidget *parent, QList<FiffProj>& dataProjs)
+: QDockWidget(parent)
+, ui(new Ui::ProjectionWindow)
+, m_pProjectionModel(new ProjectionModel(this, dataProjs))
 {
-    if(lglvl<=m_eLogLevelCurrent) {
-        if(lgknd == _LogKndError)
-            m_pTextBrowser_Log->insertHtml("<font color=red><b>Error:</b> "+logMsg+"</font>");
-        else if(lgknd == _LogKndWarning)
-            m_pTextBrowser_Log->insertHtml("<font color=blue><b>Warning:</b> "+logMsg+"</font>");
-        else
-            m_pTextBrowser_Log->insertHtml(logMsg);
-        m_pTextBrowser_Log->insertPlainText("\n"); // new line
-        //scroll down to the latest entry
-        QTextCursor c = m_pTextBrowser_Log->textCursor();
-        c.movePosition(QTextCursor::End);
-        m_pTextBrowser_Log->setTextCursor(c);
+    ui->setupUi(this);
 
-        m_pTextBrowser_Log->verticalScrollBar()->setValue(m_pTextBrowser_Log->verticalScrollBar()->maximum());
-    }
+    initTableViewWidgets();
 }
 
 
 //*************************************************************************************************************
 
-void InformationWindow::setLogLevel(LogLevel lvl)
+void ProjectionWindow::initTableViewWidgets()
 {
-    m_eLogLevelCurrent = lvl;
+    //Set model
+    ui->m_tableView_availableProjections->setModel(m_pProjectionModel);
 
-    switch(lvl) {
-    case _LogLvMin:
-        writeToLog(tr("minimal log level set"), _LogKndMessage, _LogLvMin);
-        break;
-    case _LogLvNormal:
-        writeToLog(tr("normal log level set"), _LogKndMessage, _LogLvMin);
-        break;
-    case _LogLvMax:
-        writeToLog(tr("maximum log level set"), _LogKndMessage, _LogLvMin);
-        break;
-    }
+    connect(m_pProjectionModel, &ProjectionModel::dataChanged,
+            ui->m_tableView_availableProjections, &QTableView::resizeColumnsToContents);
+
+    //Hide data column in view
+    ui->m_tableView_availableProjections->setColumnHidden(3, true);
+}
+
+
+//*************************************************************************************************************
+
+ProjectionModel* ProjectionWindow::getDataModel()
+{
+    return m_pProjectionModel;
 }

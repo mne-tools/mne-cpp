@@ -142,10 +142,13 @@ void FilterWindow::initButtons()
 
 void FilterWindow::initComboBoxes()
 {
+    connect(ui->m_comboBox_designMethod,static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+                this,&FilterWindow::changeStateSpinBoxes);
+
     connect(ui->m_comboBox_filterType,static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
                 this,&FilterWindow::changeStateSpinBoxes);
 
-    //Initial selection is a lowpass
+    //Initial selection is a lowpass and Cosine design method
     ui->m_doubleSpinBox_lowpass->setVisible(true);
     ui->m_label_lowpass->setVisible(true);
     ui->m_label_lowpass->setText("Cut-Off (Hz):");
@@ -153,6 +156,9 @@ void FilterWindow::initComboBoxes()
     ui->m_doubleSpinBox_highpass->setVisible(false);
     ui->m_label_highpass->setVisible(false);
     ui->m_doubleSpinBox_highpass->setEnabled(false);
+
+    ui->m_spinBox_filterTaps->setVisible(false);
+    ui->m_label_filterTaps->setVisible(false);
 
     //If add filter to channel type combo box changes -> also change combo box for undo filtering
     connect(ui->m_comboBox_filterApplyTo, &QComboBox::currentTextChanged,
@@ -261,8 +267,23 @@ bool FilterWindow::eventFilter(QObject *obj, QEvent *event)
 
 void FilterWindow::changeStateSpinBoxes(int currentIndex)
 {
-    //Change visibility of sin boxes depending on filter type
-    switch(currentIndex) {
+    Q_UNUSED(currentIndex);
+
+    //Change visibility offilter tap spin boxes depending on filter design method
+    switch(ui->m_comboBox_designMethod->currentIndex()) {
+        case 0: //Cosine
+            ui->m_spinBox_filterTaps->setVisible(false);
+            ui->m_label_filterTaps->setVisible(false);
+            break;
+
+        case 1: //Tschebyscheff
+            ui->m_spinBox_filterTaps->setVisible(true);
+            ui->m_label_filterTaps->setVisible(true);
+            break;
+    }
+
+    //Change visibility of spin boxes depending on filter type
+    switch(ui->m_comboBox_filterType->currentIndex()) {
         case 0: //Lowpass
             ui->m_doubleSpinBox_lowpass->setVisible(true);
             ui->m_label_lowpass->setVisible(true);
@@ -316,31 +337,49 @@ void FilterWindow::filterParametersChanged()
     double samplingFrequency = m_pMainWindow->m_pDataWindow->getDataModel()->m_fiffInfo.sfreq;
     double nyquistFrequency = samplingFrequency/2;
 
+    //Calculate the needed fft length
     int filterTaps = ui->m_spinBox_filterTaps->value();
-    int fftLength = m_iWindowSize+2*filterTaps; //2*filterTaps because we need to add data at the front and back
+    int fftLength = m_iWindowSize;
     int exp = ceil(log2(fftLength));
-    fftLength = pow(2, exp);
+    fftLength = pow(2, exp+1);
 
-    ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
-    ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
+    //set maximum and minimum for cut off frequency spin boxes
+    if(ui->m_comboBox_filterType->currentText() == "Bandpass") {
+        ui->m_doubleSpinBox_highpass->setMinimum(ui->m_doubleSpinBox_lowpass->value());
+        ui->m_doubleSpinBox_lowpass->setMaximum(ui->m_doubleSpinBox_highpass->value());
+    }
+    else {
+        ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
+        ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
+    }
 
+    //set current fft length info label
     ui->m_label_fftLength->setText(QString().number(fftLength));
 
+    //set filter design method
+    FilterOperator::DesignMethod dMethod;
+    if(ui->m_comboBox_designMethod->currentText() == "Tschebyscheff")
+        dMethod = FilterOperator::Tschebyscheff;
+
+    if(ui->m_comboBox_designMethod->currentText() == "Cosine")
+        dMethod = FilterOperator::Cosine;
+
+    //Generate filters
     QSharedPointer<MNEOperator> userDefinedFilterOperator;
 
     if(ui->m_comboBox_filterType->currentText() == "Lowpass") {
         userDefinedFilterOperator = QSharedPointer<MNEOperator>(
-                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::LPF,filterTaps,lowpassHz/nyquistFrequency,0.2,(double)trans_width/nyquistFrequency,fftLength));
+                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::LPF,filterTaps,lowpassHz/nyquistFrequency,0.2,(double)trans_width/nyquistFrequency,samplingFrequency,fftLength,dMethod));
     }
 
     if(ui->m_comboBox_filterType->currentText() == "Highpass") {
         userDefinedFilterOperator = QSharedPointer<MNEOperator>(
-                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::HPF,filterTaps,highpassHz/nyquistFrequency,0.2,(double)trans_width/nyquistFrequency,fftLength));
+                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::HPF,filterTaps,highpassHz/nyquistFrequency,0.2,(double)trans_width/nyquistFrequency,samplingFrequency,fftLength,dMethod));
     }
 
     if(ui->m_comboBox_filterType->currentText() == "Bandpass") {
         userDefinedFilterOperator = QSharedPointer<MNEOperator>(
-                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::BPF,filterTaps,(double)center/nyquistFrequency,(double)bw/nyquistFrequency,(double)trans_width/nyquistFrequency,fftLength));
+                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::BPF,filterTaps,(double)center/nyquistFrequency,(double)bw/nyquistFrequency,(double)trans_width/nyquistFrequency,samplingFrequency,fftLength,dMethod));
     }
 
     //Replace old with new filter operator

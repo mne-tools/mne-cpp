@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     informationwindow.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
+* @file     cosinefilter.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     August, 2014
+* @date     November, 2014
 *
 * @section  LICENSE
 *
@@ -30,16 +30,43 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the InformationWindow class.
+* @brief    Declaration of the CosineFilter class
 *
 */
+
+#ifndef COSINEFILTER_H
+#define COSINEFILTER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "informationwindow.h"
+#include "utils_global.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+#include <unsupported/Eigen/FFT>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNELIB
+//=============================================================================================================
+
+namespace UTILSLIB
+{
 
 
 //*************************************************************************************************************
@@ -47,69 +74,58 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEBrowseRawQt;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINES
 //=============================================================================================================
+#ifndef M_PI
+#define	M_PI		3.14159265358979323846	/* pi */
+#endif
 
-InformationWindow::InformationWindow(QWidget *parent) :
-    QDockWidget(parent),
-    ui(new Ui::InformationWindowWidget)
+#ifndef EIGEN_FFTW_DEFAULT
+#define EIGEN_FFTW_DEFAULT
+#endif
+
+
+//=============================================================================================================
+/**
+* Creates a cosine filter response in the frequency domain.
+*
+* @brief Creates a cosine filter response in the frequency domain.
+*/
+class UTILSSHARED_EXPORT CosineFilter
 {
-    ui->setupUi(this);
+public:
+    enum TPassType {LPF, HPF, BPF, NOTCH };
 
-    m_pTextBrowser_Log = (QTextBrowser*)ui->tab_log->childAt(50,50);
-}
+    //=========================================================================================================
+    /**
+    * Constructs a CosineFilter object.
+    *
+    */
+    CosineFilter();
 
+    //=========================================================================================================
+    /**
+    * Constructs a CosineFilter object.
+    *
+    * @param fftLength length of the fft (multiple integer of 2^x)
+    * @param lowpass low cutoff frequency in Hz (not normed to sampling freq)
+    * @param lowpass_width determines the width of the filter slopes (steepness) in Hz (not normed to sampling freq)
+    * @param highpass highpass high cutoff frequency in Hz (not normed to sampling freq)
+    * @param highpass_width determines the width of the filter slopes (steepness) in Hz (not normed to sampling freq)
+    * @param sFreq sampling frequency
+    * @param type filter type (lowpass, highpass, etc.)
+    */
+    CosineFilter(int fftLength, float lowpass, float lowpass_width, float highpass, float highpass_width, double sFreq, TPassType type);
 
-//*************************************************************************************************************
+    RowVectorXcd    m_dFFTCoeffA;   /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
+    RowVectorXd     m_dCoeffA;      /**< the time filter coefficient set*/
+};
 
-InformationWindow::~InformationWindow()
-{
-    delete ui;
-}
+} // NAMESPACE
 
-
-//*************************************************************************************************************
-
-void InformationWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl)
-{
-    if(lglvl<=m_eLogLevelCurrent) {
-        if(lgknd == _LogKndError)
-            m_pTextBrowser_Log->insertHtml("<font color=red><b>Error:</b> "+logMsg+"</font>");
-        else if(lgknd == _LogKndWarning)
-            m_pTextBrowser_Log->insertHtml("<font color=blue><b>Warning:</b> "+logMsg+"</font>");
-        else
-            m_pTextBrowser_Log->insertHtml(logMsg);
-        m_pTextBrowser_Log->insertPlainText("\n"); // new line
-        //scroll down to the latest entry
-        QTextCursor c = m_pTextBrowser_Log->textCursor();
-        c.movePosition(QTextCursor::End);
-        m_pTextBrowser_Log->setTextCursor(c);
-
-        m_pTextBrowser_Log->verticalScrollBar()->setValue(m_pTextBrowser_Log->verticalScrollBar()->maximum());
-    }
-}
-
-
-//*************************************************************************************************************
-
-void InformationWindow::setLogLevel(LogLevel lvl)
-{
-    m_eLogLevelCurrent = lvl;
-
-    switch(lvl) {
-    case _LogLvMin:
-        writeToLog(tr("minimal log level set"), _LogKndMessage, _LogLvMin);
-        break;
-    case _LogLvNormal:
-        writeToLog(tr("normal log level set"), _LogKndMessage, _LogLvMin);
-        break;
-    case _LogLvMax:
-        writeToLog(tr("maximum log level set"), _LogKndMessage, _LogLvMin);
-        break;
-    }
-}
+#endif // COSINEFILTER_H

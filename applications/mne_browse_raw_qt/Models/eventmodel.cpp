@@ -525,7 +525,7 @@ void EventModel::clearModel()
 
 //*************************************************************************************************************
 
-void EventModel::addNewEventType(QString &eventType, QColor &typeColor)
+void EventModel::addNewEventType(const QString &eventType, const QColor &typeColor)
 {
     //Add type color
     m_eventTypeColor[eventType.toInt()] = typeColor;
