@@ -279,6 +279,16 @@
    </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>m_comboBox_layoutFile</tabstop>
+  <tabstop>m_comboBox_selectionFiles</tabstop>
+  <tabstop>pushButton_changeSelection</tabstop>
+  <tabstop>m_pushButton_saveSelection</tabstop>
+  <tabstop>m_graphicsView_layoutPlot</tabstop>
+  <tabstop>m_listWidget_selectionGroups</tabstop>
+  <tabstop>m_listWidget_visibleChannels</tabstop>
+  <tabstop>m_listWidget_userDefined</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

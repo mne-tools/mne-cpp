@@ -16,5 +16,6 @@
         <file alias="removeEvent.png">Resources/Images/Icons/removeEvent.png</file>
         <file alias="hideBad.png">Resources/Images/Icons/hideBad.png</file>
         <file alias="showBad.png">Resources/Images/Icons/showBad.png</file>
+        <file alias="showProjectionWindow.png">Resources/Images/Icons/showProjectionWindow.png</file>
     </qresource>
 </RCC>

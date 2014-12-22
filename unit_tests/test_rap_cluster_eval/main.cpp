@@ -115,8 +115,8 @@ int main(int argc, char *argv[])
 
             qint32 event = 1;
 
-            float tmin = 0.05f;
-            float tmax = 0.15f;
+            float tmin = 0.1f;
+            float tmax = 0.2f;
 
 
             bool doMovie = false;//true;
