@@ -511,8 +511,6 @@ bool MainWindow::read_fiff_ave(QString file_name)
     bool want_eeg   = chn_name_map["EEG"].toBool();
     bool want_stim  = chn_name_map["STI"].toBool();
 
-    picks = evoked.info.pick_types(want_meg, want_eeg, want_stim);
-    pick_info = evoked.info.pick_info(picks);
 
     QStringList filter_list;
     for(qint32 i = 0; i < evoked.info.ch_names.length(); i++)
@@ -523,11 +521,15 @@ bool MainWindow::read_fiff_ave(QString file_name)
     }
 
     _pick_evoked = evoked.pick_channels(filter_list);
+    picks = _pick_evoked.info.pick_types(want_meg, want_eeg, want_stim);
+    pick_info = _pick_evoked.info.pick_info();
+
     if(_pick_evoked.isEmpty())
         return false;
 
     ui->dsb_sample_rate->setValue(_pick_evoked.info.sfreq);
     _sample_rate = _pick_evoked.info.sfreq;
+
 
     _signal_matrix = MatrixXd::Zero(_pick_evoked.data.cols(), _pick_evoked.data.rows());
 
@@ -747,8 +749,8 @@ void MainWindow::fill_channel_combobox()
 
 
 
-    cout << "chn_name_lenght: " << chn_names.length() << "\n";
-    cout << "channelcount: " << _signal_matrix.cols() << "\n";
+    //cout << "chn_name_lenght: " << chn_names.length() << "\n";
+    //cout << "channelcount: " << _signal_matrix.cols() << "\n";
     for(qint32 channels = 1; channels <= _signal_matrix.cols(); channels++)
     {
         if(settings.value("pastell_colors", false).toBool())
