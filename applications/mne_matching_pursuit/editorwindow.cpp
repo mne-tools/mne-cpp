@@ -117,6 +117,8 @@ EditorWindow::EditorWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::Ed
     move(settings.value("pos_editor", QPoint(200, 200)).toPoint());
     resize(settings.value("size_editor", QSize(606, 948)).toSize());
     this->restoreState(settings.value("editor_state").toByteArray());
+    ui->dspb_StartValuePhase->setMaximum(ui->dspb_EndValueScale->value());
+    ui->dspb_EndValuePhase->setMaximum(ui->dspb_EndValueScale->value());
 
 
     ui->dspb_StartValueScale->setMaximum(ui->spb_AtomLength->value());    
@@ -707,12 +709,14 @@ void EditorWindow::on_chb_CombAllPara_toggled(bool checked)
     endValuePhase = ui->dspb_EndValuePhase->value();
     endValueChirp = ui->dspb_EndValueChirp->value();
 
+    ui->dspb_StartValuePhase->setMaximum( ui->dspb_EndValueScale->value());
+    ui->dspb_EndValuePhase->setMaximum( ui->dspb_EndValueScale->value());
+    //ui->dspb_StartValueChirpValueChirp->setMinim ui->spb_AtomLength->value() / 2);
+
     calc_scale_value();
     calc_modu_value();
     calc_phase_value();
     calc_chirp_value();
-
-
 
     // update ui
     is_loading = true;
@@ -730,12 +734,12 @@ void EditorWindow::on_spb_AtomLength_editingFinished()
     // set max startvalue of scale
     ui->dspb_StartValueScale->setMaximum(ui->spb_AtomLength->value());
     ui->dspb_StartValueModu->setMaximum(ui->spb_AtomLength->value() / 2);
-    ui->dspb_StartValuePhase->setMaximum(ui->spb_AtomLength->value());
+    //ui->dspb_StartValuePhase->setMaximum(ui->spb_AtomLength->value());
     ui->dspb_StartValueChirp->setMaximum(ui->spb_AtomLength->value() / 2);
 
     ui->dspb_EndValueScale->setMaximum(ui->spb_AtomLength->value());
     ui->dspb_EndValueModu->setMaximum(ui->spb_AtomLength->value() / 2);
-    ui->dspb_EndValuePhase->setMaximum(ui->spb_AtomLength->value());
+    //ui->dspb_EndValuePhase->setMaximum(ui->spb_AtomLength->value());
     ui->dspb_EndValueChirp->setMaximum(ui->spb_AtomLength->value() / 2);
 
     ui->dspb_LinStepScale->setMaximum(ui->spb_AtomLength->value());
@@ -859,6 +863,8 @@ void EditorWindow::on_dspb_StartValueScale_editingFinished()
 
 void EditorWindow::on_dspb_EndValueScale_editingFinished()
 {
+    ui->dspb_StartValuePhase->setMaximum( ui->dspb_EndValueScale->value());
+    ui->dspb_EndValuePhase->setMaximum( ui->dspb_EndValueScale->value());
     endValueScale = ui->dspb_EndValueScale->value();
     calc_scale_value();
 }
@@ -896,6 +902,9 @@ void EditorWindow::on_rb_LinStepScale_toggled(bool checked)
     ui->dspb_LinStepScale->setEnabled(true);
     ui->dspb_ExpStepScale->setEnabled(false);
 
+    ui->dspb_StartValuePhase->setMaximum( ui->dspb_EndValueScale->value());
+    ui->dspb_EndValuePhase->setMaximum( ui->dspb_EndValueScale->value());
+
     calc_scale_value();
 }
 
@@ -908,6 +917,9 @@ void EditorWindow::on_rb_ExpStepScale_toggled(bool checked)
     ui->dspb_ExpStepScale->setEnabled(true);
     ui->dspb_LinStepScale->setEnabled(false);
 
+
+    ui->dspb_StartValuePhase->setMaximum( ui->dspb_EndValueScale->value());
+    ui->dspb_EndValuePhase->setMaximum( ui->dspb_EndValueScale->value());
     calc_scale_value();
 }
 
@@ -1654,34 +1666,31 @@ void EditorWindow::on_btt_SaveDicts_clicked()
         QDomElement xml_root= xml_pdict.documentElement();
 
         QDomNodeList node_list = xml_root.childNodes();
-        qint32 count = node_list.count();
-        for(qint32 ii = 0; ii < count; ii++)
+
+        bool hasElement = false;
+        QDomElement built = node_list.at(0).toElement();
+        if(built.hasChildNodes())
         {
-            bool hasElement = false;
-            QDomElement built = node_list.at(0).toElement();
-            if(built.hasChildNodes())
+            QDomNodeList write_list = built.childNodes();       //old:   .elementsByTagName("built_Atoms");
+            qint32 count_2 = write_list.count();
+            for(qint32 k = 0; k < count_2; k++)
             {
-                QDomNodeList write_list = header.elementsByTagName("built_Atoms");
-                qint32 count_2 = write_list.count();
-                for(qint32 k = 0; k < count_2; k++)
+                QDomElement write_element = write_list.at(k).toElement();
+                if((built.attribute("source_dict", built.text())) == (write_element.attribute("source_dict", write_element.text())))
                 {
-                    QDomElement write_element = write_list.at(k).toElement();
-                    if((built.attribute("source_dict", built.text())) == (write_element.attribute("source_dict", write_element.text())))
-                    {
-                        hasElement = true;
-                        break;
-                    }
+                    hasElement = true;
+                    break;
                 }
-                if(!hasElement)
+            }
+            if(!hasElement)
+            {
+                summarize_atoms += (built.attribute("atom_count", built.text())).toInt();
+                header.appendChild(built);
+                QDomElement atom = built.firstChild().toElement();
+                while(!atom.isNull())
                 {
-                    summarize_atoms += (built.attribute("atom_count", built.text())).toInt();
-                    header.appendChild(built);
-                    QDomElement atom = built.firstChild().toElement();
-                    while(!atom.isNull())
-                    {
-                        built.appendChild(atom);
-                        atom = atom.nextSibling().toElement();
-                    }
+                    built.appendChild(atom);
+                    atom = atom.nextSibling().toElement();
                 }
             }
         }
