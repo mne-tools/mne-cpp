@@ -49,7 +49,7 @@ CONFIG   -= app_bundle
 
 
 
-TARGET = matchingPursuit
+TARGET = mne_matching_pursuit
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
