@@ -180,7 +180,6 @@ protected:
     */
     void clearModel();
 
-
     //=========================================================================================================
     /**
     * Maps the currently loaded channels to the loaded layout file

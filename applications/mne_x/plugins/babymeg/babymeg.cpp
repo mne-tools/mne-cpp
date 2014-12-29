@@ -86,6 +86,7 @@ BabyMEG::BabyMEG()
 , m_sCurrentParadigm("")
 , m_bIsRunning(false)
 , m_pRawMatrixBuffer(0)
+, m_sFiffHeader(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/header.fif")
 {
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup Project"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
@@ -413,6 +414,12 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
 {
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(p_FiffInfo));
 
+    if(!readProjectors())
+    {
+        qDebug() << "Not able to read projectors";
+        return;
+    }
+
     m_iBufferSize = pInfo->dataLength;
     sfreq = pInfo->sfreq;
 
@@ -574,31 +581,38 @@ MatrixXd BabyMEG::calibrate(const MatrixXf& data)
 }
 
 
+//*************************************************************************************************************
+
 bool BabyMEG::readProjectors()
 {
-    QFile t_fiffFile("ERio_P8.fif");
+    QFile t_headerFiffFile(m_sFiffHeader);
 
     //
     //   Open the file
     //
-    FiffStream::SPtr p_pStream(new FiffStream(&t_fiffFile));
-    QString t_sFileName = p_pStream->streamName();
+    FiffStream::SPtr t_pStream(new FiffStream(&t_headerFiffFile));
+    QString t_sFileName = t_pStream->streamName();
 
     printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
 
     FiffDirTree t_Tree;
     QList<FiffDirEntry> t_Dir;
 
-    if(!p_pStream->open(t_Tree, t_Dir))
+    if(!t_pStream->open(t_Tree, t_Dir))
         return false;
 
-    QList<FiffProj> q_ListProj = p_pStream->read_proj(t_Tree);
+    QList<FiffProj> q_ListProj = t_pStream->read_proj(t_Tree);
 
     if (q_ListProj.size() == 0)
     {
         printf("Could not find projectors\n");
         return false;
     }
+
+    m_pFiffInfo->projs = q_ListProj;
+
+    //garbage collecting
+    t_pStream->device()->close();
 
     return true;
 }

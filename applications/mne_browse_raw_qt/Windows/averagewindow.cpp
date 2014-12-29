@@ -60,12 +60,28 @@ AverageWindow::AverageWindow(QWidget *parent, QFile &file)
 , ui(new Ui::AverageWindow)
 {
     ui->setupUi(this);
-
     initMVC(file);
-    initTableViewWidgets();
-    initAverageSceneView();
-    initButtons();
-    initComboBoxes();
+    init();
+}
+
+
+//*************************************************************************************************************
+
+AverageWindow::AverageWindow(QWidget *parent)
+: QDockWidget(parent)
+, ui(new Ui::AverageWindow)
+{
+    ui->setupUi(this);
+    initMVC();
+    init();
+}
+
+
+//*************************************************************************************************************
+
+AverageWindow::AverageWindow()
+: AverageWindow(0)
+{
 }
 
 
@@ -113,6 +129,14 @@ void AverageWindow::scaleAveragedData(const QMap<QString,double> &scaleMap)
 
 //*************************************************************************************************************
 
+void AverageWindow::init()
+{
+    initTableViewWidgets();
+    initAverageSceneView();
+    initButtons();
+    initComboBoxes();
+}
+
 void AverageWindow::initMVC(QFile &file)
 {
     //Setup average model
@@ -120,6 +144,14 @@ void AverageWindow::initMVC(QFile &file)
         m_pAverageModel = new AverageModel(file, this);
     else
         m_pAverageModel = new AverageModel(this);
+
+    //Setup average delegate
+    m_pAverageDelegate = new AverageDelegate(this);
+}
+
+void AverageWindow::initMVC()
+{
+    m_pAverageModel = new AverageModel(this);
 
     //Setup average delegate
     m_pAverageDelegate = new AverageDelegate(this);

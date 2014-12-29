@@ -306,9 +306,9 @@ private:
     QFile               m_qFileOut;         /**< QFile for writing to fif file.*/
     FiffStream::SPtr    m_pOutfid;          /**< FiffStream to write to.*/
 
+    QString                 m_sFiffHeader;  /**< Fiff header information */
     RowVectorXd             m_cals;
     SparseMatrix<double>    m_sparseMatCals;
-    MatrixXd            proj;               /**< SSP operator to apply to the data. */
 
     bool    m_bIsRunning;
 
