@@ -83,7 +83,7 @@ void FilterPlotScene::updateFilter(QSharedPointer<MNEOperator> operatorFilter, i
     m_iCutOffHigh = cutOffHigh;
 
     //Clear the scene
-    clear();
+    this->clear();
 
     if(operatorFilter->m_OperatorType == MNEOperator::FILTER)
         m_pCurrentFilter = operatorFilter.staticCast<FilterOperator>();
@@ -103,7 +103,12 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq)
     //Get row vector with filter coefficients
     RowVectorXcd coefficientsAFreq = m_pCurrentFilter->m_dFFTCoeffA;
 
-    int numberCoeff = coefficientsAFreq.cols()/2; //Divide by 2 because we do not want the conjugate complex part
+    int numberCoeff = coefficientsAFreq.cols();
+    if(numberCoeff>2000) {//if to large downsample
+        int dsFactor = numberCoeff/2000;
+        numberCoeff = numberCoeff/dsFactor;
+    }
+
     int fMax = samplingFreq/2; //nyquist frequency
 
     addRect(-m_iDiagramMarginsHoriz,
@@ -193,10 +198,13 @@ void FilterPlotScene::plotFilterFrequencyResponse()
     //Get row vector with filter coefficients and norm to 1
     RowVectorXcd coefficientsAFreq = m_pCurrentFilter->m_dFFTCoeffA;
 
-    int numberCoeff = coefficientsAFreq.cols()/2; //Divide by 2 because we do not want the conjugate complex part
+    int numberCoeff = coefficientsAFreq.cols();
+    int dsFactor = 0;
+    if(numberCoeff>2000)
+        dsFactor = numberCoeff/2000;
 
     double max = 0;
-    for(int i = 0; i<numberCoeff; i++)
+    for(int i = 0; i<numberCoeff-dsFactor; i++)
         if(abs(coefficientsAFreq(i)) > max)
             max = abs(coefficientsAFreq(i));
 
@@ -204,13 +212,19 @@ void FilterPlotScene::plotFilterFrequencyResponse()
 
     //Create painter path
     QPainterPath path;
-    path.moveTo(0, -20 * log10(abs(coefficientsAFreq(0))) * m_iScalingFactor); //convert to db
+    double y = -20 * log10(abs(coefficientsAFreq(0))) * m_iScalingFactor; //-1 because we want to plot upwards
+    if(y > m_dMaxMagnitude)
+        y = m_dMaxMagnitude;
+    y -= m_iDiagramMarginsVert;
 
-    for(int i = 0; i<numberCoeff; i++) {
-        double y = -20 * log10(abs(coefficientsAFreq(i))) * m_iScalingFactor; //-1 because we want to plot upwards
+    path.moveTo(-m_iDiagramMarginsVert, y); //convert to db
+
+    for(int i = 0; i<numberCoeff; i+=dsFactor) {
+        y = -20 * log10(abs(coefficientsAFreq(i))) * m_iScalingFactor; //-1 because we want to plot upwards
         if(y > m_dMaxMagnitude)
             y = m_dMaxMagnitude;
 
+        y -= m_iDiagramMarginsVert;
         path.lineTo(path.currentPosition().x()+1,y);
     }
 

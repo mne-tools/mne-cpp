@@ -72,34 +72,36 @@ else {
 }
 
 SOURCES += \
-	kmeans.cpp \
-	mnemath.cpp \
-	ioutils.cpp \
-	layoutloader.cpp \
-	layoutmaker.cpp \
-	parksmcclellan.cpp \
-	filterdata.cpp \
-	mp/adaptivemp.cpp \
-	mp/atom.cpp \
-	mp/fixdictmp.cpp \
-	selectionloader.cpp \
-	minimizersimplex.cpp
+    kmeans.cpp \
+    mnemath.cpp \
+    ioutils.cpp \
+    layoutloader.cpp \
+    layoutmaker.cpp \
+    parksmcclellan.cpp \
+    filterdata.cpp \
+    mp/adaptivemp.cpp \
+    mp/atom.cpp \
+    mp/fixdictmp.cpp \
+    selectionloader.cpp \
+    minimizersimplex.cpp \
+    cosinefilter.cpp
 
 HEADERS += \
-	kmeans.h\
-	utils_global.h \
-	mnemath.h \
-	ioutils.h \
-	layoutloader.h \
-	layoutmaker.h \
-	parksmcclellan.h \
-	filterdata.h \
-	mp/adaptivemp.h \
-	mp/atom.h \
-	mp/fixdictmp.h \
-	selectionloader.h \
-	layoutmaker.h \
-	minimizersimplex.h
+    kmeans.h\
+    utils_global.h \
+    mnemath.h \
+    ioutils.h \
+    layoutloader.h \
+    layoutmaker.h \
+    parksmcclellan.h \
+    filterdata.h \
+    mp/adaptivemp.h \
+    mp/atom.h \
+    mp/fixdictmp.h \
+    selectionloader.h \
+    layoutmaker.h \
+    minimizersimplex.h \
+    cosinefilter.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -111,3 +113,4 @@ header_files.path = $${MNE_INCLUDE_DIR}/utils
 INSTALLS += header_files
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+

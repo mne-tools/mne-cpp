@@ -2321,7 +2321,6 @@ void SaveFifFile::save_fif_file(QString source_path, QString save_path, fiff_int
     //   Setup for reading the raw data   
     FiffRawData raw(t_fileIn);
 
-    //ToDO, here was MatrixXd cals instead of RowVectorXd cals, why was it like that, whats the meaning, is it ok now with ROWVECTOR?
     RowVectorXd cals;
     FiffStream::SPtr outfid = Fiff::start_writing_raw(t_fileOut, raw.info, cals, picks);
 

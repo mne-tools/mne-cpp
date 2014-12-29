@@ -84,6 +84,7 @@
 #include "averagewindow.h"
 #include "scalewindow.h"
 #include "chinfowindow.h"
+#include "projectionwindow.h"
 
 
 //*************************************************************************************************************
@@ -101,6 +102,9 @@
 #include <QMessageBox>
 #include <QPixmap>
 #include <QSignalMapper>
+#include <QFutureWatcher>
+#include <QProgressDialog>
+#include <QMessageBox>
 
 
 //*************************************************************************************************************
@@ -265,6 +269,7 @@ private:
     AverageWindow*          m_pAverageWindow;           /**< Average window can be used to plot calculated averages in a 2D layout scene.*/
     ScaleWindow*            m_pScaleWindow;             /**< Scale widget can be used to set the scaling of the different channels types. */
     ChInfoWindow*           m_pChInfoWindow;            /**< Dock window which shows the information about the curretly loaded data channels. */
+    ProjectionWindow*       m_pProjectionWindow;        /**< Dock widget to hold he projection manager. */
 
     //application settings
     QSettings               m_qSettings;                /**< QSettings variable used to write or read from independent application sessions. */
@@ -273,6 +278,7 @@ private:
     Ui::MainWindowWidget*   ui;                         /**< Pointer to the qt designer generated ui class.*/
 
     QAction*                m_pRemoveDCAction;          /**< The action which is used to control DC removal. */
+    QAction*                m_pHideBadAction;           /**< The action which is used to control hide bad channel functionality. */
 };
 
 } //NAMESPACE
