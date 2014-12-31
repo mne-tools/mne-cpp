@@ -1258,7 +1258,7 @@ border-radius: 4px;
          <item row="3" column="0">
           <widget class="QCheckBox" name="cb_color_scheme">
            <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;...obvious, or?&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;pastell colors to draw graphs&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...change color scheme for drawings&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
             <string>pastell colors to draw graphs</string>

@@ -112,10 +112,4 @@ header_files.path = $${MNE_INCLUDE_DIR}/utils
 
 INSTALLS += header_files
 
-<<<<<<< .mine
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
-
-=======
-unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
-
->>>>>>> .theirs
