@@ -118,7 +118,7 @@ EditorWindow::EditorWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::Ed
     resize(settings.value("size_editor", QSize(606, 948)).toSize());
     this->restoreState(settings.value("editor_state").toByteArray());
     ui->dspb_StartValuePhase->setMaximum(ui->dspb_EndValueScale->value());
-    ui->dspb_EndValuePhase->setMaximum(ui->dspb_EndValueScale->value());
+    ui->dspb_EndValuePhase->setMaximum(ui->spb_AtomLength->value());
 
 
     ui->dspb_StartValueScale->setMaximum(ui->spb_AtomLength->value());    
@@ -734,12 +734,12 @@ void EditorWindow::on_spb_AtomLength_editingFinished()
     // set max startvalue of scale
     ui->dspb_StartValueScale->setMaximum(ui->spb_AtomLength->value());
     ui->dspb_StartValueModu->setMaximum(ui->spb_AtomLength->value() / 2);
-    //ui->dspb_StartValuePhase->setMaximum(ui->spb_AtomLength->value());
+    ui->dspb_StartValuePhase->setMaximum(ui->spb_AtomLength->value());
     ui->dspb_StartValueChirp->setMaximum(ui->spb_AtomLength->value() / 2);
 
     ui->dspb_EndValueScale->setMaximum(ui->spb_AtomLength->value());
     ui->dspb_EndValueModu->setMaximum(ui->spb_AtomLength->value() / 2);
-    //ui->dspb_EndValuePhase->setMaximum(ui->spb_AtomLength->value());
+    ui->dspb_EndValuePhase->setMaximum(ui->spb_AtomLength->value());
     ui->dspb_EndValueChirp->setMaximum(ui->spb_AtomLength->value() / 2);
 
     ui->dspb_LinStepScale->setMaximum(ui->spb_AtomLength->value());
@@ -1365,8 +1365,8 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                             if(scaleList.length() > 0 && scaleCount < scaleList.length()) tempScale = scaleList.at(scaleCount);
                             qreal tempModu = ui->dspb_StartValueModu->value();
                             if(moduList.length() > 0 && moduCount < moduList.length()) tempModu = moduList.at(moduCount);
-                            qreal tempPhase = 2 * PI * ui->dspb_StartValuePhase->value() / tempScale;
-                            if(phaseList.length() > 0 && phaseCount < phaseList.length()) tempPhase = 2 * PI * phaseList.at(phaseCount) / tempScale;
+                            qreal tempPhase = 2 * PI * ui->dspb_StartValuePhase->value() / tempModu;//old tempScale
+                            if(phaseList.length() > 0 && phaseCount < phaseList.length()) tempPhase = 2 * PI * phaseList.at(phaseCount) / tempModu;
                             qreal tempChirp = ui->dspb_StartValueChirp->value();
                             if(chirpList.length() > 0 && chirpCount < chirpList.length()) tempChirp = chirpList.at(chirpCount);
 
@@ -1439,8 +1439,8 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                 if(scaleList.length() > 0 && i < scaleList.length()) tempScale = scaleList.at(i);
                 qreal tempModu = ui->dspb_StartValueModu->value();
                 if(moduList.length() > 0 && i < moduList.length()) tempModu = moduList.at(i);
-                qreal tempPhase = 2 * PI * ui->dspb_StartValuePhase->value() / tempScale;
-                if(phaseList.length() > 0 && i < phaseList.length()) tempPhase = 2 * PI * phaseList.at(i) / tempScale;
+                qreal tempPhase = 2 * PI * ui->dspb_StartValuePhase->value() / tempModu;//old tempScale
+                if(phaseList.length() > 0 && i < phaseList.length()) tempPhase = 2 * PI * phaseList.at(i) / tempModu;
                 qreal tempChirp = ui->dspb_StartValueChirp->value();
                 if(chirpList.length() > 0 && i < chirpList.length()) tempChirp = chirpList.at(i);
 
@@ -1668,29 +1668,35 @@ void EditorWindow::on_btt_SaveDicts_clicked()
         QDomNodeList node_list = xml_root.childNodes();
 
         bool hasElement = false;
-        QDomElement built = node_list.at(0).toElement();
-        if(built.hasChildNodes())
+
+        qint32 node_count = node_list.count(); // to iterate over all nodes(part dictionaries) containing several atoms
+        for(qint32 pdict_count = 0; pdict_count < node_count; pdict_count++)
         {
-            QDomNodeList write_list = built.childNodes();       //old:   .elementsByTagName("built_Atoms");
-            qint32 count_2 = write_list.count();
-            for(qint32 k = 0; k < count_2; k++)
+            QDomElement built = node_list.at(0).toElement(); //take next p_dict
+
+            if(built.hasChildNodes())
             {
-                QDomElement write_element = write_list.at(k).toElement();
-                if((built.attribute("source_dict", built.text())) == (write_element.attribute("source_dict", write_element.text())))
+                QDomNodeList write_list = built.childNodes();       //old:   .elementsByTagName("built_Atoms");
+                qint32 count_2 = write_list.count();
+                for(qint32 k = 0; k < count_2; k++)
                 {
-                    hasElement = true;
-                    break;
+                    QDomElement write_element = write_list.at(k).toElement();
+                    if((built.attribute("source_dict", built.text())) == (write_element.attribute("source_dict", write_element.text())))
+                    {
+                        hasElement = true;
+                        break;
+                    }
                 }
-            }
-            if(!hasElement)
-            {
-                summarize_atoms += (built.attribute("atom_count", built.text())).toInt();
-                header.appendChild(built);
-                QDomElement atom = built.firstChild().toElement();
-                while(!atom.isNull())
+                if(!hasElement)
                 {
-                    built.appendChild(atom);
-                    atom = atom.nextSibling().toElement();
+                    summarize_atoms += (built.attribute("atom_count", built.text())).toInt();
+                    header.appendChild(built);
+                    QDomElement atom = built.firstChild().toElement();
+                    while(!atom.isNull())
+                    {
+                        built.appendChild(atom);
+                        atom = atom.nextSibling().toElement();
+                    }
                 }
             }
         }

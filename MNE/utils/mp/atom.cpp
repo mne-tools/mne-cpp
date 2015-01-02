@@ -229,12 +229,12 @@ VectorXd ChirpAtom::create_real(qint32 sample_count, qreal scale, quint32 transl
 
     if(scale == sample_count)
         for(qint32 i = 0; i < sample_count; i++)
-            real_atom[i] = 1 / sqrt(sample_count) * cos( 2 * PI * modulation / sample_count * qreal(i) + chirp / 2 * (i - translation) + phase);
+            real_atom[i] = 1 / sqrt(sample_count) * cos( 2 * PI * modulation / sample_count * qreal(i) +(chirp / (sample_count * qreal(2))) * pow(qreal(i) - qreal(translation), 2) + phase);
     else
     {
         VectorXd envelope = GaborAtom::gauss_function(sample_count, scale, translation);
         for(qint32 i = 0; i < sample_count; i++)
-            real_atom[i] = envelope[i] * cos(2 * PI * modulation / sample_count * qreal(i) + chirp / 2 * (i - translation) + phase);
+            real_atom[i] = envelope[i] * cos(2 * PI * modulation / sample_count * qreal(i) + (chirp / (sample_count * qreal(2))) * pow(qreal(i) - qreal(translation), 2) + phase);
     }
 
     //normalization
