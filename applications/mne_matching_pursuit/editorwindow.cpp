@@ -120,6 +120,9 @@ EditorWindow::EditorWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::Ed
     ui->dspb_StartValuePhase->setMaximum(ui->dspb_EndValueScale->value());
     ui->dspb_EndValuePhase->setMaximum(ui->spb_AtomLength->value());
 
+    //under construction, thats why invisible
+    ui->rb_ChirpAtomType->setVisible(false);
+    ui->fr_Chirp->setVisible(false);
 
     ui->dspb_StartValueScale->setMaximum(ui->spb_AtomLength->value());    
     read_dicts();
@@ -1365,8 +1368,8 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                             if(scaleList.length() > 0 && scaleCount < scaleList.length()) tempScale = scaleList.at(scaleCount);
                             qreal tempModu = ui->dspb_StartValueModu->value();
                             if(moduList.length() > 0 && moduCount < moduList.length()) tempModu = moduList.at(moduCount);
-                            qreal tempPhase = 2 * PI * ui->dspb_StartValuePhase->value() / tempModu;//old tempScale
-                            if(phaseList.length() > 0 && phaseCount < phaseList.length()) tempPhase = 2 * PI * phaseList.at(phaseCount) / tempModu;
+                            qreal tempPhase = 2 * PI * ui->dspb_StartValuePhase->value() / tempScale;
+                            if(phaseList.length() > 0 && phaseCount < phaseList.length()) tempPhase = 2 * PI * phaseList.at(phaseCount) / tempScale;
                             qreal tempChirp = ui->dspb_StartValueChirp->value();
                             if(chirpList.length() > 0 && chirpCount < chirpList.length()) tempChirp = chirpList.at(chirpCount);
 
@@ -1439,8 +1442,8 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                 if(scaleList.length() > 0 && i < scaleList.length()) tempScale = scaleList.at(i);
                 qreal tempModu = ui->dspb_StartValueModu->value();
                 if(moduList.length() > 0 && i < moduList.length()) tempModu = moduList.at(i);
-                qreal tempPhase = 2 * PI * ui->dspb_StartValuePhase->value() / tempModu;//old tempScale
-                if(phaseList.length() > 0 && i < phaseList.length()) tempPhase = 2 * PI * phaseList.at(i) / tempModu;
+                qreal tempPhase = 2 * PI * ui->dspb_StartValuePhase->value() / tempScale;
+                if(phaseList.length() > 0 && i < phaseList.length()) tempPhase = 2 * PI * phaseList.at(i) / tempScale;
                 qreal tempChirp = ui->dspb_StartValueChirp->value();
                 if(chirpList.length() > 0 && i < chirpList.length()) tempChirp = chirpList.at(i);
 
