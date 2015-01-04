@@ -330,6 +330,8 @@ void MainWindow::open_file()
      this->cb_model->clear();
     this->cb_items.clear();
 
+    this->setWindowTitle(string_list.last().append(" - Matching-Pursuit-Toolbox"));//show current file in header of mainwindow
+
     ui->dsb_sample_rate->setEnabled(true);
 
     QFile file(file_name);
@@ -337,6 +339,7 @@ void MainWindow::open_file()
     {
         QMessageBox::warning(this, tr("Error"),
         tr("error: disable to open signal file."));
+        this->setWindowTitle("Matching-Pursuit-Toolbox");
         return;
     }
     file.close();
@@ -349,7 +352,11 @@ void MainWindow::open_file()
     if(file_name.endsWith(".fif", Qt::CaseInsensitive))
     {
         if(!read_fiff_ave(file_name))
-            if(!read_fiff_file(file_name)) return;
+            if(!read_fiff_file(file_name))
+            {
+                this->setWindowTitle("Matching-Pursuit-Toolbox");
+                return;
+            }
 
         ui->dsb_sample_rate->setEnabled(false);
         original_signal_matrix = _signal_matrix;
@@ -358,7 +365,11 @@ void MainWindow::open_file()
     else
     {
 
-        if(!read_matlab_file(file_name)) return;
+        if(!read_matlab_file(file_name))
+        {
+            this->setWindowTitle("Matching-Pursuit-Toolbox");
+            return;
+        }
         // ToDo: change samplerate
         //ui->dsb_sample_rate->setEnabled(false);
         ui->dsb_sample_rate->setEnabled(true);
@@ -2302,7 +2313,12 @@ void MainWindow::recieve_save_progress(qint32 current_progress, qint32 finished)
     }
     else if(finished == 2)
     {
-        QMessageBox::warning(this, "Error", "error: Save unsucessful.");
+        QMessageBox::warning(this, "Error", "error: no success on save.");
+        ui->progress_bar_save->setHidden(true);
+    }
+    else if(finished == 4)
+    {
+        QMessageBox::warning(this, "Error", "error: unable to save -ave.fif files");
         ui->progress_bar_save->setHidden(true);
     }
     else
@@ -2319,6 +2335,13 @@ void SaveFifFile::save_fif_file(QString source_path, QString save_path, fiff_int
 {
     QFile t_fileIn(source_path);
     QFile t_fileOut(save_path);
+
+    //ToDo: no save for ave data at the moment
+    if(source_path.contains("-ave."))
+    {
+        emit save_progress(100, 4);
+        return;
+    }
 
     //   Setup for reading the raw data   
     FiffRawData raw(t_fileIn);
