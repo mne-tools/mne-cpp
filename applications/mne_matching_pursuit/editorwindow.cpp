@@ -1368,8 +1368,8 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                             if(scaleList.length() > 0 && scaleCount < scaleList.length()) tempScale = scaleList.at(scaleCount);
                             qreal tempModu = ui->dspb_StartValueModu->value();
                             if(moduList.length() > 0 && moduCount < moduList.length()) tempModu = moduList.at(moduCount);
-                            qreal tempPhase = 2 * PI * ui->dspb_StartValuePhase->value() / tempScale;
-                            if(phaseList.length() > 0 && phaseCount < phaseList.length()) tempPhase = 2 * PI * phaseList.at(phaseCount) / tempScale;
+                            qreal tempPhase = 2 * PI * ui->dspb_StartValuePhase->value() / ui->spb_AtomLength->value();
+                            if(phaseList.length() > 0 && phaseCount < phaseList.length()) tempPhase = 2 * PI * phaseList.at(phaseCount) / ui->spb_AtomLength->value();
                             qreal tempChirp = ui->dspb_StartValueChirp->value();
                             if(chirpList.length() > 0 && chirpCount < chirpList.length()) tempChirp = chirpList.at(chirpCount);
 
@@ -1442,8 +1442,8 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                 if(scaleList.length() > 0 && i < scaleList.length()) tempScale = scaleList.at(i);
                 qreal tempModu = ui->dspb_StartValueModu->value();
                 if(moduList.length() > 0 && i < moduList.length()) tempModu = moduList.at(i);
-                qreal tempPhase = 2 * PI * ui->dspb_StartValuePhase->value() / tempScale;
-                if(phaseList.length() > 0 && i < phaseList.length()) tempPhase = 2 * PI * phaseList.at(i) / tempScale;
+                qreal tempPhase = 2 * PI * ui->dspb_StartValuePhase->value() / ui->spb_AtomLength->value();
+                if(phaseList.length() > 0 && i < phaseList.length()) tempPhase = 2 * PI * phaseList.at(i) / ui->spb_AtomLength->value();
                 qreal tempChirp = ui->dspb_StartValueChirp->value();
                 if(chirpList.length() > 0 && i < chirpList.length()) tempChirp = chirpList.at(i);
 
