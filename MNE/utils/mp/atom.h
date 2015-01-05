@@ -90,6 +90,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 #define PI 3.1415926535897932384626433832795
+enum AtomType{GABORATOM, CHIRPATOM, FORMULAATOM};
 
 //=============================================================================================================
 
@@ -98,22 +99,86 @@ using namespace Eigen;
 *
 * @brief basic core parameters of atoms
 */
-class UTILSSHARED_EXPORT Atom// : public QObject // Atom class to build and call atoms or their parameters
+class UTILSSHARED_EXPORT Atom// Atom class to build and call atoms or their parameters
 {
     // Q_OBJECT
 public:
 
-    bool SaveToRam;
     qint32 sample_count;
-    qreal scale;
-    qint32 translation;
-    qreal modulation;
-    qreal max_scalar_product;
-    MatrixXd residuum;
     qreal energy;
-    QList<qreal> phase_list;
+    qreal max_scalar_product;
+    MatrixXd residuum;     
     QList<qreal> max_scalar_list;
 
+};
+
+//=============================================================================================================
+
+/**
+* FixDictAtom class inherited from Atom with additional functions
+*
+* @brief FixDictAtom used in fix dict MP Algorithm
+*/
+class UTILSSHARED_EXPORT FixDictAtom : public Atom
+{
+
+public:
+
+
+    //=========================================================================================================
+    /**
+    * Copy constructor.
+    *
+    * FixDictAtom class inherited from Atom with additional functions
+    */
+    FixDictAtom();
+    FixDictAtom(qint32 _id, qint32 _sample_count, QString _dict_source);
+    //=========================================================================================================
+    /**
+    * Copy deconstructor.
+    *
+    */
+    ~FixDictAtom();
+    //=========================================================================================================
+    QString atom_formula;
+    QString display_text;
+    VectorXd atom_samples;
+
+    qint32 id;
+    QString dict_source;
+    AtomType type;
+    qreal translation;
+
+    struct GaborATOM
+    {
+        qreal scale;
+        qreal modulation;
+        qreal phase;
+    };
+
+    struct ChirpATOM
+    {
+        qreal scale;
+        qreal modulation;
+        qreal phase;
+        qreal chirp;
+    };
+
+    struct formulaATOM
+    {
+        qreal a;
+        qreal b;
+        qreal c;
+        qreal d;
+        qreal e;
+        qreal f;
+        qreal g;
+        qreal h;
+    };
+
+    GaborATOM gabor_atom;
+    ChirpATOM chirp_atom;
+    formulaATOM formula_atom;
 };
 
 //=============================================================================================================
@@ -127,7 +192,12 @@ class UTILSSHARED_EXPORT GaborAtom : public Atom
 {
 
 public:
+
+    qreal scale;
+    qint32 translation;
+    qreal modulation;
     qreal phase;
+    QList<qreal> phase_list;
 
     //=========================================================================================================
     /**
@@ -205,25 +275,28 @@ public:
     *
     * @return GaborAtom as String
     */
-    QStringList CreateStringValues(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qreal phase);
+    QStringList create_string_values(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qreal phase);
 
 };
 
-    class UTILSSHARED_EXPORT ChirpAtom : public Atom
-    {
+class UTILSSHARED_EXPORT ChirpAtom : public Atom
+{
 
-    public:
+public:
 
-        qreal phase;
-        qreal chirp;
+    qreal scale;
+    qint32 translation;
+    qreal modulation;
+    qreal phase;
+    qreal chirp;
 
-        ChirpAtom(qint32 sampleCount, qreal scale, quint32 translation, qreal modulation, qreal phase, qreal chirp, bool saveToRam = false);
+    ChirpAtom();
+    ~ChirpAtom();
+    VectorXd gauss_function (qint32 sample_count, qreal scale, quint32 translation);
+    VectorXd create_real(qint32 sample_count, qreal scale, quint32 translation, qreal modulation, qreal phase, qreal chirp);
+    QStringList create_string_values(qint32 sample_count, qreal scale, quint32 translation, qreal modulation, qreal phase, qreal chirp);
 
-        VectorXcd CreateComplex();
-        VectorXd CreateReal();
-        QStringList CreateStringValues();
-
-    };
+};
 
 
 }

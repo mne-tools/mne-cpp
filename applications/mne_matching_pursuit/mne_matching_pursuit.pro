@@ -1,10 +1,10 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     applications.pro
+# @file     matchingPursuit.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     May, 2013
+# @date     July, 2012
 #
 # @section  LICENSE
 #
@@ -29,37 +29,88 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all applications.
+# @brief    ToDo Documentation...
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../mne-cpp.pri)
+include(../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = app
 
-SUBDIRS += \
-    mne_rt_server\
+VERSION = $${MNE_CPP_VERSION}
+
+QT += gui
+QT += widgets  
+QT += network core widgets concurrent
+QT += xml
+
+CONFIG   += console
+CONFIG   -= app_bundle
 
 
-contains(MNECPP_CONFIG, withGui) {
-    SUBDIRS += \
-        mne_x_libs \
-        mne_x \
 
+TARGET = mne_matching_pursuit
 
-    !contains(MNECPP_CONFIG, oldCompiler) {
-        message(mne_browse_raw_qt configured!)
-        SUBDIRS += \
-            mne_browse_raw_qt \
-    }
-
-    qtHaveModule(3d) {
-        message(Qt3D available: disp3D library configured!)
-        SUBDIRS += \
-            mne_viewer \
-            mne_viewer_parent \
-            mne_matching_pursuit
-    }
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
 }
 
-CONFIG += ordered
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Dispd
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Disp
+}
+
+DESTDIR =  $${MNE_BINARY_DIR}
+
+SOURCES += \
+        main.cpp \
+    editorwindow.cpp \
+    enhancededitorwindow.cpp \
+    formulaeditor.cpp \
+    deletemessagebox.cpp \
+    mainwindow.cpp \
+    processdurationmessagebox.cpp \
+    treebaseddictwindow.cpp \
+    settingwindow.cpp
+
+HEADERS += \
+    editorwindow.h \
+    enhancededitorwindow.h \
+    formulaeditor.h \
+    deletemessagebox.h \
+    mainwindow.h \
+    processdurationmessagebox.h \
+    treebaseddictwindow.h \
+    settingwindow.h
+
+FORMS += \
+    editorwindow.ui \
+    enhancededitorwindow.ui \
+    formulaeditor.ui \
+    deletemessagebox.ui \
+    mainwindow.ui \
+    processdurationmessagebox.ui \
+    treebaseddictwindow.ui \
+    settingwindow.ui
+
+RESOURCES += \
+    Ressourcen.qrc
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
+
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+
