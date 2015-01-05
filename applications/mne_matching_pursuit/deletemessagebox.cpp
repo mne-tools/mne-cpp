@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     processdurationmessagebox.h
+* @file     deletemessagebox.cpp
 * @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
 *           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
 *           Sebastian Krause <sebastian.krause@tu-ilmenau.de>
@@ -30,43 +30,60 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ProcessDurationMessagebox class declaration which gives the notice that calculation might take long.
+* @brief    Implementation of the DeleteMesssageBox Class.
+*
 */
 
-#ifndef PROCESSDURATIONMESSAGEBOX_H
-#define PROCESSDURATIONMESSAGEBOX_H
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// INCLUDES
 //=============================================================================================================
-#include <QDialog>
 
-//=============================================================================================================
-// USED NAMESPACES
-
-namespace Ui {
+#include "deletemessagebox.h"
+#include "ui_deletemessagebox.h"
+#include "QtGui"
 
 //=============================================================================================================
 
-class processdurationmessagebox;
+QString parentName;
+
+// CONSTRUCTOR
+DeleteMessageBox::DeleteMessageBox(QWidget *parent) :    QDialog(parent),    ui(new Ui::DeleteMessageBox)
+{
+    parentName =  parent->accessibleName();
+    ui->setupUi(this);
 }
 
-class processdurationmessagebox : public QDialog
+DeleteMessageBox::DeleteMessageBox(QString msg_text, QString caption, QString btt_left_text, QString btt_right_text, QWidget *parent)  :    QDialog(parent),    ui(new Ui::DeleteMessageBox)
 {
-    Q_OBJECT
-    
-public:
-    explicit processdurationmessagebox(QWidget *parent = 0);
-    ~processdurationmessagebox();
-    
-private slots:
-    void on_pushButton_clicked();
+    ui->setupUi(this);
+    ui->lb_MessageText->setText(msg_text);
+    ui->btt_yes->setText(btt_left_text);
+    ui->btt_No->setText(btt_right_text);
+    this->setWindowTitle(caption);
+}
 
-    void on_chb_NoMessageBox_toggled(bool checked);
+DeleteMessageBox::~DeleteMessageBox()
+{
+    delete ui;
+}
 
-private:
-    Ui::processdurationmessagebox *ui;
-};
+void DeleteMessageBox::on_btt_yes_clicked()
+{
+    setResult(1);
+    hide();
+}
 
-#endif // PROCESSDURATIONMESSAGEBOX_H
+void DeleteMessageBox::on_btt_No_clicked()
+{
+    setResult(0);
+    hide();
+}
+
+void DeleteMessageBox::on_chb_NoMessageBox_toggled(bool checked)
+{
+    QSettings settings;
+    settings.setValue("show_warnings", !checked);
+}
+

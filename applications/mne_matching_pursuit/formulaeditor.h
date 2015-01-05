@@ -79,16 +79,85 @@ class Formulaeditor : public QWidget
     
 public:
 
+    //*********************************************************************************************************
+    //constructor
     explicit Formulaeditor(QWidget *parent = 0);
     ~Formulaeditor();
-    QString GetFormula();
+    //*********************************************************************************************************
+
+    //========================================================================================================
+    /**
+    * FormlaEditor_get_formula
+    *
+    * ### MP toolbox FormulaEditor function ###
+    *
+    * gets formula
+    *
+    * @return QString   formula
+    */
+    QString get_formula();
+
+    //========================================================================================================
+    /**
+    * FormlaEditor_strip_formula
+    *
+    * ### MP toolbox FormulaEditor function ###
+    *
+    * adapts formula for calculation
+    *
+    * @param QString    strformula
+    *
+    * @return void
+    */
     void strip_formula(QString& strFormula);
+
+    //========================================================================================================
+    /**
+    * FormlaEditor_set_formula
+    *
+    * ### MP toolbox FormulaEditor function ###
+    *
+    * sets formula
+    *
+    * @param QString      Formula
+    *
+    * @return void
+    */
     void set_formula(QString Formula);
+
+    //========================================================================================================
+    /**
+    * FormlaEditor_set_funct_const
+    *
+    * ### MP toolbox FormulaEditor function ###
+    *
+    * sets formula
+    *
+    * @param    int index       index of paramters
+    * @param    double val      value of paramters
+    *
+    * @return void
+    */
     void set_funct_const(int index, double val);
+
+    //========================================================================================================
+    /**
+    * FormlaEditor_calculation
+    *
+    * ### MP toolbox FormulaEditor function ###
+    *
+    * calculation of function values
+    *
+    * @param    QString strFormula      formula
+    * @param    qreal xValue            value of paramters
+    * @param    bool strip              read in correct formula (true)
+    *
+    * @return   double calculation      function value
+    */
     double calculation(QString strFormula, qreal xValue, bool strip  =true);
+    //========================================================================================================
     
 private slots:
-
     void on_tb_A_textChanged(const QString &arg1);
     void on_tb_B_textChanged(const QString &arg1);
     void on_tb_C_textChanged(const QString &arg1);
@@ -103,18 +172,22 @@ private slots:
     void on_dsb_StartValue_editingFinished();
     void on_dsb_StepWidth_editingFinished();
 
-private:
+signals:
+    void formula_saved();
+
+private:    
     Ui::Formulaeditor *ui;
     AtomPaintWindow *callAtomPaintWindow;
 
+    //========================================================================================================
+    // formula methods    Copyright: 2004, Ralf Wirtz
     QString m_strFormula;
     QString m_strFunction;
     QString m_strErrortext;
-
+    QStringList m_strStandardFunction;
     static QString g_strF;
     double m_dFktValue;
-    double m_dFunctionConstant[ANZFUNKTKONST];
-    QStringList m_strStandardFunction;
+    double m_dFunctionConstant[ANZFUNKTKONST];    
 
     qreal sign_factor(qint32 &nPosition, QString& strCharacter);
     double expression(int& nPosition, QString& strCharacter);
@@ -136,6 +209,9 @@ private:
     double ArTanh(double x);
     double ArCoth(double x);
     double sqr(double x);
+    void closeEvent(QCloseEvent * event);
+    // end formula methods    Copyright: 2004, Ralf Wirtz
+    //========================================================================================================
 
 };
 
@@ -143,9 +219,10 @@ class AtomPaintWindow : public QWidget
 {
     Q_OBJECT
 
-protected:
-   void paint_event(QPaintEvent *event);
-public:
+protected:    
+   void paintEvent(QPaintEvent *event);
+
+public:   
    void paint_signal(QList<qreal> valueList, QSize windowSize);
 
 };

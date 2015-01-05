@@ -76,14 +76,28 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QStringList GaborAtom::CreateStringValues(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qreal phase)
+//*************************************************************************************************************
+
+FixDictAtom::FixDictAtom(qint32 _id, qint32 _sample_count, QString _dict_source)
 {
-    VectorXd atomValues = create_real(sample_count, scale, translation, modulation, phase);
-    QStringList atomStringValues;
-    for(qint32 i = 0; i < atomValues.rows(); i++)
-        atomStringValues.append(QString("%1").arg(atomValues[i]));
-    return atomStringValues;
+    id = _id;
+    sample_count = _sample_count;
+    dict_source = _dict_source;
+    energy = 0;
+    max_scalar_product = 0;
 }
+
+//*************************************************************************************************************
+
+FixDictAtom::FixDictAtom()
+{
+    energy = 0;
+    max_scalar_product = 0;
+}
+
+//*************************************************************************************************************
+
+FixDictAtom::~FixDictAtom() {}
 
 //*************************************************************************************************************
 
@@ -91,6 +105,29 @@ GaborAtom::GaborAtom()
 {
     energy = 0;
     max_scalar_product = 0;
+}
+
+//*************************************************************************************************************
+
+GaborAtom::~GaborAtom() {}
+
+//*************************************************************************************************************
+
+ChirpAtom::ChirpAtom() {}
+
+//*************************************************************************************************************
+
+ChirpAtom::~ChirpAtom() {}
+
+//************************************************************************************************************
+
+QStringList GaborAtom::create_string_values(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qreal phase)
+{
+    VectorXd atomValues = create_real(sample_count, scale, translation, modulation, phase);
+    QStringList atomStringValues;
+    for(qint32 i = 0; i < atomValues.rows(); i++)
+        atomStringValues.append(QString("%1").arg(atomValues[i]));
+    return atomStringValues;
 }
 
 //*************************************************************************************************************
@@ -148,7 +185,7 @@ VectorXcd GaborAtom::create_complex(qint32 sample_count, qreal scale, quint32 tr
 VectorXd GaborAtom::create_real(qint32 sample_count, qreal scale, quint32 translation, qreal modulation, qreal phase)
 {
     VectorXd real_atom(sample_count);
-    qreal norm_atom = 0;
+    qreal norm = 0;
 
     if(scale == sample_count)
         for(qint32 i = 0; i < sample_count; i++)
@@ -157,60 +194,61 @@ VectorXd GaborAtom::create_real(qint32 sample_count, qreal scale, quint32 transl
     {
         VectorXd envelope = GaborAtom::gauss_function(sample_count, scale, translation);
         for(qint32 i = 0; i < sample_count; i++)
-        {
-            qreal t = (qreal(i) - translation) / scale;
             real_atom[i] = envelope[i] * cos(2 * PI * modulation / sample_count * qreal(i) + phase);
-            Q_UNUSED(t);
-        }
     }
 
     //normalization
-    for(qint32 i = 0; i < sample_count; i++)
-        norm_atom += pow(real_atom[i], 2);
-
-    norm_atom = sqrt(norm_atom);
-
-    if(norm_atom != 0)
-        for(qint32 i = 0; i < sample_count; i++)
-            real_atom[i] = real_atom[i] / norm_atom;
+    norm = real_atom.norm();
+    if(norm != 0) real_atom /= norm;
 
     return real_atom; //length of the vector realAtom is 1 after normalization
 }
 
 //*************************************************************************************************************
 
-ChirpAtom::ChirpAtom(qint32 sample_count, qreal scale, quint32 translation, qreal modulation, qreal phase, qreal chirp, bool saveToRam)
+VectorXd ChirpAtom::gauss_function (qint32 sample_count, qreal scale, quint32 translation)
 {
-    ChirpAtom::sample_count = sample_count;
-    ChirpAtom::scale = scale;
-    ChirpAtom::translation = translation;
-    ChirpAtom::modulation = modulation;
-    ChirpAtom::phase = phase;
-    ChirpAtom::chirp = chirp;
-    ChirpAtom::SaveToRam = saveToRam;
+    VectorXd gauss = VectorXd::Zero(sample_count);
+
+    for(qint32 n = 0; n < sample_count; n++)
+    {
+        qreal t = (qreal(n)-translation)/scale;
+        gauss[n] = exp(-PI * pow(t, 2))*pow(sqrt(scale),(-1))*pow(qreal(2),(0.25));
+    }
+
+    return gauss;
 }
 
 //*************************************************************************************************************
 
-VectorXcd ChirpAtom::CreateComplex()
+VectorXd ChirpAtom::create_real(qint32 sample_count, qreal scale, quint32 translation, qreal modulation, qreal phase, qreal chirp)
 {
-    VectorXcd vec;
-    return vec;
+    VectorXd real_atom(sample_count);
+    qreal norm = 0;
+
+
+    if(scale == sample_count)
+        for(qint32 i = 0; i < sample_count; i++)
+            real_atom[i] = 1 / sqrt(sample_count) * cos( 2 * PI * modulation / sample_count * qreal(i) +(chirp / (sample_count * qreal(2))) * pow(qreal(i) - qreal(translation), 2) + phase);
+    else
+    {
+        VectorXd envelope = GaborAtom::gauss_function(sample_count, scale, translation);
+        for(qint32 i = 0; i < sample_count; i++)
+            real_atom[i] = envelope[i] * cos(2 * PI * modulation / sample_count * qreal(i) + (chirp / (sample_count * qreal(2))) * pow(qreal(i) - qreal(translation), 2) + phase);
+    }
+
+    //normalization
+    norm = real_atom.norm();
+    if(norm != 0) real_atom /= norm;
+
+    return real_atom; //length of the vector realAtom is 1 after normalization
 }
 
 //*************************************************************************************************************
 
-VectorXd ChirpAtom::CreateReal()
+QStringList ChirpAtom::create_string_values(qint32 sample_count, qreal scale, quint32 translation, qreal modulation, qreal phase, qreal chirp)
 {
-    VectorXd vec;
-    return vec;
-}
-
-//*************************************************************************************************************
-
-QStringList ChirpAtom::CreateStringValues()
-{
-    VectorXd atomValues = CreateReal();
+    VectorXd atomValues = create_real(sample_count, scale, translation, modulation, phase, chirp);
     QStringList atomStringValues;
     for(qint32 i = 0; i < atomValues.rows(); i++)
         atomStringValues.append(QString("%1").arg(atomValues[i]));
@@ -219,6 +257,4 @@ QStringList ChirpAtom::CreateStringValues()
 
 //*************************************************************************************************************
 
-GaborAtom::~GaborAtom()
-{
-}
+

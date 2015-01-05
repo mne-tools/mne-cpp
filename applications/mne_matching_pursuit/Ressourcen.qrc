@@ -23,5 +23,11 @@
         <file>icons/sinus.png</file>
         <file>icons/spanner.png</file>
         <file>icons/warning.png</file>
+        <file>icons/tree.png</file>
+        <file>icons/settings.png</file>
+        <file>icons/arrowReset.png</file>
+        <file>icons/progressbar_brush.png</file>
+        <file>icons/chirp_fml.png</file>
+        <file>icons/gabor_fml.png</file>
     </qresource>
 </RCC>

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     enhancededitorwindow.h
+* @file     deletemessagebox.h
 * @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
 *           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
 *           Sebastian Krause <sebastian.krause@tu-ilmenau.de>
@@ -30,54 +30,55 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    EnhancedEditorWindow class declaration which enables the adaption of parameters for stored
+* @brief    DeleteMessageBox class declaration, which asked for acknowledgment to delete dictionaries or
 *           formulas.
 *
 */
-#ifndef ENHANCEDEDITORWINDOW_H
-#define ENHANCEDEDITORWINDOW_H
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
 
-
+#ifndef DELETEMESSAGEBOX_H
+#define DELETEMESSAGEBOX_H
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
+#include <QDialog>
 
+//*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE Ui
+//=============================================================================================================
 
 namespace Ui
 {
 
 //=============================================================================================================
 
-    class Enhancededitorwindow;
+class DeleteMessageBox;
 }
 
-class Enhancededitorwindow : public QWidget
+class DeleteMessageBox : public QDialog
 {
     Q_OBJECT
     
 public:
-    explicit Enhancededitorwindow(QWidget *parent = 0);
-    ~Enhancededitorwindow();
-    
+
+    //*********************************************************************************************************
+    //constructor
+    explicit DeleteMessageBox(QWidget *parent = 0);
+    DeleteMessageBox(QString msg_text, QString caption, QString btt_left_text, QString btt_right_text, QWidget *parent = 0);
+    //*********************************************************************************************************
+
+    ~DeleteMessageBox();
+
 private slots:
-    void on_chb_allCombined_toggled(bool checked);
-    void on_sb_Atomcount_editingFinished();
-    void on_cb_AtomFormula_currentIndexChanged(const QString &arg1);
-    void on_sb_Atomcount_valueChanged(int arg1);
-    void on_btt_DeleteFormula_clicked();
+    void on_btt_yes_clicked();
+    void on_btt_No_clicked();
+    void on_chb_NoMessageBox_toggled(bool checked);
 
 private:
-    Ui::Enhancededitorwindow *ui;
+    Ui::DeleteMessageBox *ui;
 };
 
-#endif // ENHANCEDEDITORWINDOW_H
+#endif // DELETEMESSAGEBOX_H

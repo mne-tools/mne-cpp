@@ -38,12 +38,14 @@ include(../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    mne_rt_server
+    mne_rt_server\
+
 
 contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += \
         mne_x_libs \
-        mne_x
+        mne_x \
+
 
     !contains(MNECPP_CONFIG, oldCompiler) {
         message(mne_browse_raw_qt configured!)
@@ -55,7 +57,8 @@ contains(MNECPP_CONFIG, withGui) {
         message(Qt3D available: disp3D library configured!)
         SUBDIRS += \
             mne_viewer \
-            mne_viewer_parent
+            mne_viewer_parent \
+            mne_matching_pursuit
     }
 }
 
