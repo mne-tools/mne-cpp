@@ -81,7 +81,7 @@
 #define MODEL_RELOAD_POS 2000 //Distance that the current window needs to be off the ends of m_data[i] [in samples]
 #define MODEL_MAX_WINDOWS 3 //number of windows that are at maximum remained in m_data
 #define MODEL_NUM_FILTER_TAPS 80 //number of filter taps, required to take into account because of FFT convolution (zero padding)
-#define MODEL_MAX_NUM_FILTER_TAPS 256 //number of maximal filter taps
+#define MODEL_MAX_NUM_FILTER_TAPS 0 //number of maximal filter taps
 
 //RawDelegate
 //Look

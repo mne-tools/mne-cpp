@@ -59,8 +59,8 @@ using namespace MNEBrowseRawQt;
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
 , m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
-//, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
-//, m_qEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
+, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
+, m_qEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
 , m_qSettings()
 , m_rawSettings()
 , ui(new Ui::MainWindowWidget)
@@ -134,6 +134,11 @@ void MainWindow::setupWindowWidgets()
     addDockWidget(Qt::BottomDockWidgetArea, m_pFilterWindow);
     m_pFilterWindow->hide();
 
+    //Create filter window - QTDesigner used - see / FormFiles
+    m_pProjectionWindow = new ProjectionWindow(this);
+    addDockWidget(Qt::LeftDockWidgetArea, m_pProjectionWindow);
+    m_pProjectionWindow->hide();
+
     //Init windows - TODO: get rid of this here, do this inside the window classes
     m_pDataWindow->init();
     m_pEventWindow->init();
@@ -185,6 +190,10 @@ void MainWindow::setupWindowWidgets()
     connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
             m_pFilterWindow, &FilterWindow::newFileLoaded);
 
+    //Connect projection manager with fif file loading
+    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
+            m_pProjectionWindow->getDataModel(), static_cast<void (ProjectionModel::*)(const FiffInfo&)>(&ProjectionModel::addProjections));
+
     //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels - TODO: dirty move get rid of this here
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
         m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_fiffInfo);
@@ -193,6 +202,7 @@ void MainWindow::setupWindowWidgets()
         m_pSelectionManagerWindow->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
         m_pSelectionManagerWindow->newFiffFileLoaded();
         m_pFilterWindow->newFileLoaded();
+        m_pProjectionWindow->getDataModel()->addProjections(m_pDataWindow->getDataModel()->m_fiffInfo);
     }
 }
 
@@ -248,14 +258,6 @@ void MainWindow::createToolBar()
 
     toolBar->addSeparator();
 
-    //undock view into new window (not dock widget)
-    QAction* undockToWindowAction = new QAction(QIcon(":/Resources/Images/undockView.png"),tr("Channel info"), this);
-    undockToWindowAction->setStatusTip(tr("Toggle channel info window"));
-    connect(undockToWindowAction, &QAction::triggered, this, [=](){
-        showWindow(m_pChInfoWindow);
-    });
-    toolBar->addAction(undockToWindowAction);
-
     //Toggle visibility of the event manager
     QAction* showEventManager = new QAction(QIcon(":/Resources/Images/showEventManager.png"),tr("Toggle event manager"), this);
     showEventManager->setStatusTip(tr("Toggle the event manager"));
@@ -296,7 +298,25 @@ void MainWindow::createToolBar()
     });
     toolBar->addAction(showAverageManager);
 
-    //Toggle visibility of the scaling window
+    //Toggle visibility of the projection manager
+    QAction* showProjectionManager = new QAction(QIcon(":/Resources/Images/showProjectionWindow.png"),tr("Toggle projection manager"), this);
+    showProjectionManager->setStatusTip(tr("Toggle the projection manager"));
+    connect(showProjectionManager, &QAction::triggered, this, [=](){
+        showWindow(m_pProjectionWindow);
+    });
+    toolBar->addAction(showProjectionManager);
+
+    toolBar->addSeparator();
+
+    //Toggle visibility of the channel information window manager
+    QAction* showChInfo = new QAction(QIcon(":/Resources/Images/undockView.png"),tr("Channel info"), this);
+    showChInfo->setStatusTip(tr("Toggle channel info window"));
+    connect(showChInfo, &QAction::triggered, this, [=](){
+        showWindow(m_pChInfoWindow);
+    });
+    toolBar->addAction(showChInfo);
+
+    //Toggle visibility of the information window
     QAction* showInformationWindow = new QAction(QIcon(":/Resources/Images/showInformationWindow.png"),tr("Toggle information window"), this);
     showInformationWindow->setStatusTip(tr("Toggle the information window"));
     connect(showInformationWindow, &QAction::triggered, this, [=](){
@@ -340,6 +360,12 @@ void MainWindow::connectMenus()
     });
     connect(ui->m_scalingAction, &QAction::triggered, this, [=](){
         showWindow(m_pScaleWindow);
+    });
+    connect(ui->m_ChInformationAction, &QAction::triggered, this, [=](){
+        showWindow(m_pChInfoWindow);
+    });
+    connect(ui->m_projectionManagerAction, &QAction::triggered, this, [=](){
+        showWindow(m_pProjectionWindow);
     });
 
     //Help
@@ -443,15 +469,49 @@ void MainWindow::openFile()
 
     if(m_qFileRaw.isOpen())
         m_qFileRaw.close();
+
     m_qFileRaw.setFileName(filename);
 
-    if(m_pDataWindow->getDataModel()->loadFiffData(m_qFileRaw))
-        qDebug() << "Fiff data file" << filename << "loaded.";
-    else
-        qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
+    //Clear projection manager model
+    m_pProjectionWindow->getDataModel()->clearModel();
 
     //Clear event model
     m_pEventWindow->getEventModel()->clearModel();
+
+//    QFutureWatcher<bool> writeFileFutureWatcher;
+//    QProgressDialog progressDialog("Loading fif file...", QString(), 0, 0, this, Qt::Dialog);
+
+//    //Connect future watcher and dialog
+//    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::finished,
+//            &progressDialog, &QProgressDialog::reset);
+
+//    connect(&progressDialog, &QProgressDialog::canceled,
+//            &writeFileFutureWatcher, &QFutureWatcher<bool>::cancel);
+
+//    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::progressRangeChanged,
+//            &progressDialog, &QProgressDialog::setRange);
+
+//    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::progressValueChanged,
+//            &progressDialog, &QProgressDialog::setValue);
+
+//    //Run the file writing in seperate thread
+//    writeFileFutureWatcher.setFuture(QtConcurrent::run(m_pDataWindow->getDataModel(),
+//                                                         &RawModel::loadFiffData,
+//                                                         &m_qFileRaw));
+
+//    progressDialog.exec();
+
+//    writeFileFutureWatcher.waitForFinished();
+
+//    if(!writeFileFutureWatcher.future().result())
+//        qDebug() << "Fiff data file" << filename << "loaded.";
+//    else
+//        qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
+
+    if(!m_pDataWindow->getDataModel()->loadFiffData(&m_qFileRaw))
+        qDebug() << "Fiff data file" << filename << "loaded.";
+    else
+        qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
 
     //set position of QScrollArea
     m_pDataWindow->getDataTableView()->horizontalScrollBar()->setValue(0);
@@ -471,6 +531,8 @@ void MainWindow::openFile()
 
     //Hide not presented channel types and their spin boxes in the scale window
     m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_fiffInfo);
+
+    m_qFileRaw.close();
 }
 
 
@@ -478,18 +540,57 @@ void MainWindow::openFile()
 
 void MainWindow::writeFile()
 {
-    QString filename = QFileDialog::getSaveFileName(this,QString("Write fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif data files (*.fif)"));
+    QString filename = QFileDialog::getSaveFileName(this,
+                                                    QString("Write fiff data file"),
+                                                    QString("./MNE-sample-data/MEG/sample/"),
+                                                    tr("fif data files (*.fif)"));
 
-    if(filename.isEmpty())
-    {
+    if(filename.isEmpty()) {
         qDebug("User aborted saving to fiff data file");
         return;
     }
 
-    QFile t_fileRaw(filename);
+    if(filename == m_qFileRaw.fileName()) {
+        QMessageBox msgBox;
+        msgBox.setText("You are trying to write to the file you are currently loading the data from. Please choose another file to write to.");
+        msgBox.exec();
+        return;
+    }
 
-    if(!m_pDataWindow->getDataModel()->writeFiffData(t_fileRaw))
-        qDebug() << "MainWindow: ERROR writing fiff data file" << t_fileRaw.fileName() << "!";
+    //Create output file, progress dialog and future watcher
+    QFile qFileOutput (filename);
+    if(qFileOutput.isOpen())
+        qFileOutput.close();
+
+    QFutureWatcher<bool> writeFileFutureWatcher;
+    QProgressDialog progressDialog("Writing to fif file...", QString(), 0, 0, this, Qt::Dialog);
+
+    //Connect future watcher and dialog
+    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::finished,
+            &progressDialog, &QProgressDialog::reset);
+
+    connect(&progressDialog, &QProgressDialog::canceled,
+            &writeFileFutureWatcher, &QFutureWatcher<bool>::cancel);
+
+    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::progressRangeChanged,
+            &progressDialog, &QProgressDialog::setRange);
+
+    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::progressValueChanged,
+            &progressDialog, &QProgressDialog::setValue);
+
+    //Run the file writing in seperate thread
+    writeFileFutureWatcher.setFuture(QtConcurrent::run(m_pDataWindow->getDataModel(),
+                                                         &RawModel::writeFiffData,
+                                                         &qFileOutput));
+
+    progressDialog.exec();
+
+    writeFileFutureWatcher.waitForFinished();
+
+    if(!writeFileFutureWatcher.future().result())
+        qDebug() << "MainWindow: ERROR writing fiff data file" << qFileOutput.fileName() << "!";
+    else
+        qDebug() << "MainWindow: Successfully written to" << qFileOutput.fileName() << "!";
 }
 
 
@@ -497,7 +598,10 @@ void MainWindow::writeFile()
 
 void MainWindow::loadEvents()
 {
-    QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff event data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
+    QString filename = QFileDialog::getOpenFileName(this,
+                                                    QString("Open fiff event data file"),
+                                                    QString("./MNE-sample-data/MEG/sample/"),
+                                                    tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
 
     if(filename.isEmpty())
     {

@@ -13,5 +13,6 @@ Authors
   * Luise Lang <luise.lang@tu-ilmenau.de> 2014
   * Felix Arndt <felix.arndt@tu-ilmenau.de> 2014
   * Daniel Knobl <daniel.knobl@tu-ilmenau.de> 2014
+  * Martin Henfling <martin.henfling@tu-ilmenau.de> 2014
   * Seok Lew <slew@nmr.mgh.harvard.edu> 2014
   * Chiran Doshi <chiran.doshi@childrens.harvard.edu> 2014

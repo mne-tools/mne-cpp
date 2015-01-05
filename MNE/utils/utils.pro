@@ -37,8 +37,9 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       -= gui
-QT       += xml core
+QT -= gui
+QT += xml core
+QT += network concurrent # Check with HP-UX
 
 DEFINES += UTILS_LIBRARY
 
@@ -82,7 +83,8 @@ SOURCES += \
     mp/atom.cpp \
     mp/fixdictmp.cpp \
     selectionloader.cpp \
-    minimizersimplex.cpp
+    minimizersimplex.cpp \
+    cosinefilter.cpp
 
 HEADERS += \
     kmeans.h\
@@ -98,7 +100,8 @@ HEADERS += \
     mp/fixdictmp.h \
     selectionloader.h \
     layoutmaker.h \
-    minimizersimplex.h
+    minimizersimplex.h \
+    cosinefilter.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -110,4 +113,3 @@ header_files.path = $${MNE_INCLUDE_DIR}/utils
 INSTALLS += header_files
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
-

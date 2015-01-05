@@ -52,6 +52,8 @@
     <addaction name="m_scalingAction"/>
     <addaction name="m_averageWindowAction"/>
     <addaction name="m_informationAction"/>
+    <addaction name="m_ChInformationAction"/>
+    <addaction name="m_projectionManagerAction"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -137,6 +139,16 @@
   <action name="m_loadEvokedAction">
    <property name="text">
     <string>Load evoked (fif)...</string>
+   </property>
+  </action>
+  <action name="m_ChInformationAction">
+   <property name="text">
+    <string>Channel informations...</string>
+   </property>
+  </action>
+  <action name="m_projectionManagerAction">
+   <property name="text">
+    <string>Projection manager...</string>
    </property>
   </action>
  </widget>
