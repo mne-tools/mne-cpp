@@ -346,6 +346,17 @@ public:
     */
     template<typename T>
     static inline bool compareTripletSecondEntry( const Triplet<T>& lhs, const Triplet<T> & rhs);
+
+    //=========================================================================================================
+    /**
+    * Compute log2 of given number
+    *
+    * @param[in] d  input value
+    *
+    * @return double result of log2 operation
+    */
+    template<typename T>
+    static inline double log2( const T d);
 };
 
 //*************************************************************************************************************
@@ -455,6 +466,15 @@ template<typename T>
 inline bool MNEMath::compareTripletSecondEntry( const Triplet<T>& lhs, const Triplet<T> & rhs)
 {
     return lhs.col() < rhs.col();
+}
+
+
+//*************************************************************************************************************
+
+template<typename T>
+inline double MNEMath::log2( const T d)
+{
+    return log(d)/log(2);
 }
 
 } // NAMESPACE

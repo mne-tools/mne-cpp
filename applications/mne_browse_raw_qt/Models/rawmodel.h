@@ -173,7 +173,7 @@ public:
     * @param p_IODevice fiff data file to write
     * @return
     */
-    bool writeFiffData(QFile *qFile);
+    bool writeFiffData(QIODevice *p_IODevice);
 
     //VARIABLES
     bool                                        m_bFileloaded;  /**< true when a Fiff file is loaded */
@@ -284,6 +284,10 @@ signals:
     * @param the currentl assigned operators
     */
     void assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOperator> >&);
+
+    void writeProgressChanged(int);
+
+    void writeProgressRangeChanged(int,int);
 
 public slots:
     //=========================================================================================================

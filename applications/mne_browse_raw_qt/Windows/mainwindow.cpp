@@ -309,7 +309,7 @@ void MainWindow::createToolBar()
     toolBar->addSeparator();
 
     //Toggle visibility of the channel information window manager
-    QAction* showChInfo = new QAction(QIcon(":/Resources/Images/undockView.png"),tr("Channel info"), this);
+    QAction* showChInfo = new QAction(QIcon(":/Resources/Images/showChInformationWindow.png"),tr("Channel info"), this);
     showChInfo->setStatusTip(tr("Toggle channel info window"));
     connect(showChInfo, &QAction::triggered, this, [=](){
         showWindow(m_pChInfoWindow);
@@ -317,12 +317,12 @@ void MainWindow::createToolBar()
     toolBar->addAction(showChInfo);
 
     //Toggle visibility of the information window
-    QAction* showInformationWindow = new QAction(QIcon(":/Resources/Images/showInformationWindow.png"),tr("Toggle information window"), this);
-    showInformationWindow->setStatusTip(tr("Toggle the information window"));
-    connect(showInformationWindow, &QAction::triggered, this, [=](){
-        showWindow(m_pInformationWindow);
-    });
-    toolBar->addAction(showInformationWindow);
+//    QAction* showInformationWindow = new QAction(QIcon(":/Resources/Images/showInformationWindow.png"),tr("Toggle information window"), this);
+//    showInformationWindow->setStatusTip(tr("Toggle the information window"));
+//    connect(showInformationWindow, &QAction::triggered, this, [=](){
+//        showWindow(m_pInformationWindow);
+//    });
+//    toolBar->addAction(showInformationWindow);
 
     this->addToolBar(Qt::RightToolBarArea,toolBar);
 }
@@ -459,7 +459,10 @@ void MainWindow::setLogLevel(LogLevel lvl)
 // SLOTS
 void MainWindow::openFile()
 {
-    QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif data files (*.fif)"));
+    QString filename = QFileDialog::getOpenFileName(this,
+                                                    QString("Open fiff data file"),
+                                                    QString("./MNE-sample-data/MEG/sample/"),
+                                                    tr("fif data files (*.fif)"));
 
     if(filename.isEmpty())
     {
@@ -478,6 +481,8 @@ void MainWindow::openFile()
     //Clear event model
     m_pEventWindow->getEventModel()->clearModel();
 
+    // This thread based opening code does not properly work because the .exec blocks all other windows and their threads.
+    // However, the function loadFiffData communicates with these windows and their threads. Therefore chrashes occur.
 //    QFutureWatcher<bool> writeFileFutureWatcher;
 //    QProgressDialog progressDialog("Loading fif file...", QString(), 0, 0, this, Qt::Dialog);
 
@@ -572,10 +577,10 @@ void MainWindow::writeFile()
     connect(&progressDialog, &QProgressDialog::canceled,
             &writeFileFutureWatcher, &QFutureWatcher<bool>::cancel);
 
-    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::progressRangeChanged,
+    connect(m_pDataWindow->getDataModel(), &RawModel::writeProgressRangeChanged,
             &progressDialog, &QProgressDialog::setRange);
 
-    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::progressValueChanged,
+    connect(m_pDataWindow->getDataModel(), &RawModel::writeProgressChanged,
             &progressDialog, &QProgressDialog::setValue);
 
     //Run the file writing in seperate thread
@@ -674,7 +679,7 @@ void MainWindow::loadEvoked()
     if(m_pAverageWindow->getAverageModel()->loadEvokedData(m_qEvokedFile))
         qDebug() << "Fiff evoked data file" << filename << "loaded.";
     else
-        qDebug("ERROR loading evoked event data file %s",filename.toLatin1().data());
+        qDebug("ERROR loading evoked data file %s",filename.toLatin1().data());
 
     //Update status bar
     setWindowStatus();

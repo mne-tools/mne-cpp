@@ -132,7 +132,7 @@ public:
     bool                        m_bFileloaded;          /**< true when a Fiff evoked file is loaded. */
 
 protected:
-    FiffEvokedSet*              m_pEvokedDataSet;       /**< QList<FiffEvoked> that holds the evoked data sets which are to be organised and handled by this model. */
+    FiffEvokedSet               m_pEvokedDataSet;       /**< QList<FiffEvoked> that holds the evoked data sets which are to be organised and handled by this model. */
     QSharedPointer<FiffIO>      m_pfiffIO;              /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!). */
 
     //=========================================================================================================
