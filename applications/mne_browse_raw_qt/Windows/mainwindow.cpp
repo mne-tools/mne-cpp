@@ -459,7 +459,10 @@ void MainWindow::setLogLevel(LogLevel lvl)
 // SLOTS
 void MainWindow::openFile()
 {
-    QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif data files (*.fif)"));
+    QString filename = QFileDialog::getOpenFileName(this,
+                                                    QString("Open fiff data file"),
+                                                    QString("./MNE-sample-data/MEG/sample/"),
+                                                    tr("fif data files (*.fif)"));
 
     if(filename.isEmpty())
     {
@@ -676,7 +679,7 @@ void MainWindow::loadEvoked()
     if(m_pAverageWindow->getAverageModel()->loadEvokedData(m_qEvokedFile))
         qDebug() << "Fiff evoked data file" << filename << "loaded.";
     else
-        qDebug("ERROR loading evoked event data file %s",filename.toLatin1().data());
+        qDebug("ERROR loading evoked data file %s",filename.toLatin1().data());
 
     //Update status bar
     setWindowStatus();
