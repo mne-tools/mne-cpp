@@ -303,7 +303,7 @@ void RawModel::genStdFilterOps()
     double nyquist_freq = sfreq/2;
 
     int fftLength = m_iWindowSize;
-    int exp = ceil(log2(fftLength));
+    int exp = ceil(MNEMath::log2(fftLength));
     fftLength = pow(2, exp+1);
     m_iCurrentFFTLength = fftLength;
 
