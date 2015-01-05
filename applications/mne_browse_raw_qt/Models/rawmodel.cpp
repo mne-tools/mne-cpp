@@ -303,7 +303,7 @@ void RawModel::genStdFilterOps()
     double nyquist_freq = sfreq/2;
 
     int fftLength = m_iWindowSize;
-    int exp = ceil(log2(fftLength));
+    int exp = ceil(MNEMath::log2(fftLength));
     fftLength = pow(2, exp+1);
     m_iCurrentFFTLength = fftLength;
 
@@ -408,17 +408,58 @@ bool RawModel::loadFiffData(QFile* qFile)
 
 //*************************************************************************************************************
 
-bool RawModel::writeFiffData(QFile *qFile)
+bool RawModel::writeFiffData(QIODevice *p_IODevice)
 {
-    //replace m_fiffInfo with the one contained in the m_pfiffIO object (for replacing bad channels)
-    m_pfiffIO->m_qlistRaw[0]->info = m_fiffInfo;
+    RowVectorXd cals;
+    SparseMatrix<double> mult;
+    RowVectorXi sel;
 
-    if (m_pfiffIO->write_raw(*qFile,0)) { ; //ToDo: by now, fiff data file is completely written new -> substitute only FiffInfo in old file?
-        qDebug() << "Done saving as fiff file" << qFile->fileName() << "...";
-        return true;
+//    std::cout << "Writing file " << QFile(&p_IODevice).fileName().toLatin1() << std::endl;
+    FiffStream::SPtr outfid = Fiff::start_writing_raw(*p_IODevice,m_fiffInfo,cals);
+
+    //Setup reading parameters
+    fiff_int_t from = firstSample();
+    fiff_int_t to = lastSample();
+    float quantum_sec = 10.0f;//read and write in 10 sec junks
+    fiff_int_t quantum = ceil(quantum_sec*m_fiffInfo.sfreq);
+
+    // Uncomment to read the whole file at once. Warning MAtrix may be none-initialisable because its huge
+    //quantum = to - from + 1;
+
+    // Read and write all the data
+    bool first_buffer = true;
+
+    fiff_int_t first, last;
+    MatrixXd data;
+    MatrixXd times;
+
+    emit writeProgressRangeChanged(from, to);
+
+    for(first = from; first < to; first+=quantum) {
+        last = first+quantum-1;
+        if (last > to)
+            last = to;
+
+        if (!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(data,times,mult,first,last,sel)) {
+            qDebug("error during read_raw_segment\n");
+            return false;
+        }
+
+        qDebug("Writing...");
+        if (first_buffer) {
+           if (first > 0)
+               outfid->write_int(FIFF_FIRST_SAMPLE,&first);
+           first_buffer = false;
+        }
+        outfid->write_raw_buffer(data,mult);
+        qDebug("[done]\n");
+
+        emit writeProgressChanged(first);
     }
-    else
-        return false;
+
+    outfid->finish_writing_raw();
+
+    return true;
 }
 
 
@@ -1029,11 +1070,7 @@ void RawModel::insertProcessedDataAll(int windowIndex)
 
     QList<int> listFilteredChs = m_assignedOperators.keys();
 
-    int dataLength = m_iWindowSize;
-    if(m_bReloadBefore)
-        dataLength = m_data.first()->dataRaw().cols();
-    else
-        dataLength = m_data.last()->dataRaw().cols();
+    int dataLength = m_data[windowIndex]->dataRaw().cols();;
 
     int cutFront = m_iCurrentFFTLength/4;
     int cutBack = m_iCurrentFFTLength/4 + (m_listTmpChData[0].second.cols()-m_iCurrentFFTLength/2-dataLength);

@@ -111,7 +111,7 @@ public:
     /**
     * Constructs a AverageWindow which is a child of parent.
     */
-    AverageWindow();
+//    AverageWindow();
 
     //=========================================================================================================
     /**
