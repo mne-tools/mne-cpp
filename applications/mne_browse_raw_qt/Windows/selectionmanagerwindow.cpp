@@ -527,8 +527,8 @@ void SelectionManagerWindow::resizeEvent(QResizeEvent* event)
 
 bool SelectionManagerWindow::eventFilter(QObject *obj, QEvent *event)
 {
-    //Setup delte key on user defined channel list
-    if (obj == ui->m_listWidget_userDefined) {
+    //Setup delete key on user defined channel list
+    if (obj == ui->m_listWidget_userDefined && event->type() == QEvent::KeyRelease) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
 
         if(keyEvent->key() == Qt::Key_Delete) {

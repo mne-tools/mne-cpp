@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>896</width>
-    <height>360</height>
+    <width>909</width>
+    <height>386</height>
    </rect>
   </property>
   <property name="allowedAreas">
@@ -62,26 +62,6 @@
             <number>6</number>
            </property>
            <item row="3" column="1">
-            <widget class="QDoubleSpinBox" name="m_doubleSpinBox_transitionband">
-             <property name="maximum">
-              <double>999.000000000000000</double>
-             </property>
-             <property name="singleStep">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>5.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="m_label_transitionBand">
-             <property name="text">
-              <string>Transition band (Hz):</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
             <widget class="QDoubleSpinBox" name="m_doubleSpinBox_highpass">
              <property name="maximum">
               <double>999.000000000000000</double>
@@ -94,10 +74,10 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
+           <item row="1" column="1">
             <widget class="QComboBox" name="m_comboBox_filterType">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -119,14 +99,47 @@
              </item>
             </widget>
            </item>
-           <item row="0" column="0">
+           <item row="4" column="0">
+            <widget class="QLabel" name="m_label_transitionBand">
+             <property name="text">
+              <string>Transition band (Hz):</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QDoubleSpinBox" name="m_doubleSpinBox_transitionband">
+             <property name="maximum">
+              <double>999.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>1.000000000000000</double>
+             </property>
+             <property name="value">
+              <double>5.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
             <widget class="QLabel" name="m_label_filterType">
              <property name="text">
               <string>Filter type:</string>
              </property>
             </widget>
            </item>
-           <item row="8" column="1">
+           <item row="2" column="1">
+            <widget class="QDoubleSpinBox" name="m_doubleSpinBox_lowpass">
+             <property name="maximum">
+              <double>999.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>1.000000000000000</double>
+             </property>
+             <property name="value">
+              <double>5.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="9" column="1">
             <widget class="QComboBox" name="m_comboBox_filterUndoTo">
              <item>
               <property name="text">
@@ -160,27 +173,7 @@
              </item>
             </widget>
            </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="m_label_highpass">
-             <property name="text">
-              <string>Cut-Off High (Hz):</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QDoubleSpinBox" name="m_doubleSpinBox_lowpass">
-             <property name="maximum">
-              <double>999.000000000000000</double>
-             </property>
-             <property name="singleStep">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>5.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="0">
+           <item row="9" column="0">
             <widget class="QPushButton" name="m_pushButton_undoFiltering">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -193,20 +186,28 @@
              </property>
             </widget>
            </item>
-           <item row="7" column="0">
-            <widget class="QPushButton" name="m_pushButton_applyFilter">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
+           <item row="3" column="0">
+            <widget class="QLabel" name="m_label_highpass">
              <property name="text">
-              <string>Apply filter to</string>
+              <string>Cut-Off High (Hz):</string>
              </property>
             </widget>
            </item>
-           <item row="7" column="1">
+           <item row="12" column="0" colspan="2">
+            <widget class="QPushButton" name="m_pushButton_exportPlot">
+             <property name="text">
+              <string>Export plot</string>
+             </property>
+            </widget>
+           </item>
+           <item row="11" column="0" colspan="2">
+            <widget class="QPushButton" name="m_pushButton_exportFilter">
+             <property name="text">
+              <string>Export filter coefficients</string>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="1">
             <widget class="QComboBox" name="m_comboBox_filterApplyTo">
              <item>
               <property name="text">
@@ -240,42 +241,55 @@
              </item>
             </widget>
            </item>
-           <item row="10" column="0" colspan="2">
-            <widget class="QPushButton" name="m_pushButton_exportFilter">
+           <item row="8" column="0">
+            <widget class="QPushButton" name="m_pushButton_applyFilter">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="text">
-              <string>Export filter coefficients</string>
+              <string>Apply filter to</string>
              </property>
             </widget>
            </item>
-           <item row="9" column="0" colspan="2">
+           <item row="10" column="0" colspan="2">
             <widget class="Line" name="line_2">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
             </widget>
            </item>
-           <item row="11" column="0" colspan="2">
-            <widget class="QPushButton" name="m_pushButton_exportPlot">
+           <item row="2" column="0">
+            <widget class="QLabel" name="m_label_lowpass">
              <property name="text">
-              <string>Export plot</string>
+              <string>Cut-Off Low (Hz):</string>
              </property>
             </widget>
            </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label">
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_2">
              <property name="text">
-              <string>Filter taps:</string>
+              <string>FFT length:</string>
              </property>
             </widget>
            </item>
-           <item row="6" column="0" colspan="2">
+           <item row="7" column="0" colspan="2">
             <widget class="Line" name="line">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
             </widget>
            </item>
-           <item row="4" column="1">
+           <item row="6" column="1">
+            <widget class="QLabel" name="m_label_fftLength">
+             <property name="text">
+              <string>4096</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
             <widget class="QSpinBox" name="m_spinBox_filterTaps">
              <property name="minimum">
               <number>9</number>
@@ -288,24 +302,31 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="m_label_lowpass">
-             <property name="text">
-              <string>Cut-Off Low (Hz):</string>
-             </property>
-            </widget>
-           </item>
            <item row="5" column="0">
-            <widget class="QLabel" name="label_2">
+            <widget class="QLabel" name="m_label_filterTaps">
              <property name="text">
-              <string>FFT length:</string>
+              <string>Filter taps:</string>
              </property>
             </widget>
            </item>
-           <item row="5" column="1">
-            <widget class="QLabel" name="m_label_fftLength">
+           <item row="0" column="1">
+            <widget class="QComboBox" name="m_comboBox_designMethod">
+             <item>
+              <property name="text">
+               <string>Cosine</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Tschebyscheff</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="m_label_designMethod">
              <property name="text">
-              <string>4096</string>
+              <string>Design method:</string>
              </property>
             </widget>
            </item>
@@ -412,6 +433,22 @@
    </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>m_comboBox_designMethod</tabstop>
+  <tabstop>m_comboBox_filterType</tabstop>
+  <tabstop>m_doubleSpinBox_lowpass</tabstop>
+  <tabstop>m_doubleSpinBox_highpass</tabstop>
+  <tabstop>m_doubleSpinBox_transitionband</tabstop>
+  <tabstop>m_spinBox_filterTaps</tabstop>
+  <tabstop>m_comboBox_filterApplyTo</tabstop>
+  <tabstop>m_pushButton_applyFilter</tabstop>
+  <tabstop>m_comboBox_filterUndoTo</tabstop>
+  <tabstop>m_pushButton_undoFiltering</tabstop>
+  <tabstop>m_pushButton_exportFilter</tabstop>
+  <tabstop>m_pushButton_exportPlot</tabstop>
+  <tabstop>m_graphicsView_filterPlot</tabstop>
+  <tabstop>m_tableView_activeFilters</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

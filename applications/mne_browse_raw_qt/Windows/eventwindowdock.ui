@@ -285,6 +285,14 @@
    </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>m_checkBox_activateEvents</tabstop>
+  <tabstop>m_checkBox_showSelectedEventsOnly</tabstop>
+  <tabstop>m_comboBox_filterTypes</tabstop>
+  <tabstop>m_pushButton_addEventType</tabstop>
+  <tabstop>m_spinBox_addEventType</tabstop>
+  <tabstop>m_tableView_eventTableView</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -54,6 +54,7 @@
 //=============================================================================================================
 
 #include <utils/mp/atom.h>
+#include <utils/mp/adaptivemp.h>
 #include <utils/utils_global.h>
 
 //*************************************************************************************************************
@@ -71,6 +72,8 @@
 //=============================================================================================================
 
 #include <QThread>
+#include <QtConcurrent/QtConcurrent>
+#include <QFuture>
 #include <QFile>
 #include <QStringList>
 #include <QtXml/QtXml>
@@ -92,6 +95,50 @@ using namespace Eigen;
 using namespace std;
 
 //*************************************************************************************************************
+
+
+class UTILSSHARED_EXPORT Dictionary
+{
+
+public:
+
+    //=========================================================================================================
+    /**
+    * dicitionary_Dicitionary
+    *
+    * ### MP toolbox function ###
+    *
+    * Constructor
+    *
+    * constructs Dicitionary class
+    *
+    */
+    Dictionary();
+    //=========================================================================================================
+    /**
+    *  dicitionary_Dicitionary
+    *
+    * ### MP toolbox function ###
+    *
+    * Deconstructor
+    *
+    * deconstructs Dicitionary class
+    *
+    */
+    ~Dictionary();
+    //=========================================================================================================
+
+    QList<FixDictAtom> atoms;
+    AtomType type;
+    QString source;
+    QString atom_formula;
+    qint32 sample_count;
+
+    qint32 atom_count();
+
+};//class
+
+
 /**
 * DECLARE CLASS FixDictMp
 *
@@ -103,8 +150,21 @@ class UTILSSHARED_EXPORT FixDictMp : public QThread
 
 public:
 
-    //typedef QList<GaborAtom> gabor_atom_list;
+    typedef Eigen::VectorXd VectorXd;
+    typedef Eigen::MatrixXd MatrixXd;
+    typedef QList<GaborAtom> adaptive_atom_list;
+    typedef QList<FixDictAtom> fix_dict_atom_list;
 
+    qreal signal_energy;
+    qreal current_energy;
+    qreal epsilon;
+    qint32 it;
+    qint32 max_iterations;
+    MatrixXd residuum;
+    QList<FixDictAtom> fix_dict_list;
+    QList<GaborAtom> adaptive_list;
+
+    //=========================================================================================================
     /**
     * fixdictMp_fixdictMP
     *
@@ -116,29 +176,99 @@ public:
     *
     */
     FixDictMp();
+    //=========================================================================================================
+    /**
+    * fixdictMp_fixdictMP
+    *
+    * ### MP toolbox function ###
+    *
+    * Deconstructor
+    *
+    * deconstructs FixDictMp class
+    *
+    */
+    ~FixDictMp();
 
-    qint32 test();
-
-    QList<GaborAtom> matching_pursuit(QFile &currentDict, VectorXd signalSamples, qint32 iterationsCount);
-
-    QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
-
-    static void create_tree_dict(QString save_path);
     //=========================================================================================================
 
-    qreal create_molecules(VectorXd compare_atom, qreal phase, qreal modulation, quint32 translation, qint32 sample_count, GaborAtom* gabor_Atom, qreal scale);
+    FixDictAtom correlation(Dictionary current_pdict, MatrixXd current_resid, qint32 boost);
+
+    //=========================================================================================================
+
+    //static void create_tree_dict(QString save_path);
+
+    //=========================================================================================================
+
+    //qreal create_molecules(VectorXd compare_atom, qreal phase, qreal modulation, quint32 translation, qint32 sample_count, GaborAtom* gabor_Atom, qreal scale);
+
+    //=========================================================================================================
+
+    struct find_best_matching
+    {
+        Dictionary pdict;
+        MatrixXd current_resid;
+        qint32 boost;
+
+        FixDictAtom parallel_correlation() const
+        {
+            FixDictAtom best_matching;
+            FixDictMp fix_dict_mp;
+            best_matching = fix_dict_mp.correlation(this->pdict, this->current_resid, this->boost);
+            return best_matching;
+        }
+    };
+
+    QList<Dictionary> parse_xml_dict(QString path);
+
+    //=========================================================================================================
+
+    Dictionary fill_dict(const QDomNode &pdict);
+
+    //=========================================================================================================
+
+    QString create_display_text(FixDictAtom global_best_matching);
+
+    //=========================================================================================================
+
+    //static void build_molecule_xml_file(qint32 level_counter);
+
+
 public slots:
-    //void send_result();
-    //void matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon);
-    //void process();
-    //void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon);
+
+    void matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal epsilon, qint32 boost, QString path, qreal delta);
+    void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon, qint32 boost, QString path, qreal delta);
 
     //=========================================================================================================
 
 signals:
-    //void current_result(qint32 current_iteration, qint32 max_iteration, qreal current_energy, qreal max_energy, gabor_atom_list atom_list);
-    //void finished();
+
+    void current_result(qint32 current_iteration, qint32 max_iteration, qreal current_energy, qreal max_energy, MatrixXd residuum,
+                        adaptive_atom_list adaptive_atom_list, fix_dict_atom_list fix_dict_atom_list);
+
+    void finished_calc();
+    void parse_in_thread();
+    void send_warning(qint32 warning);
+
 };//class
+
+//=========================================================================================================
+
+struct parse_node
+{
+    QDomNode node;
+
+    Dictionary fill_dict_in_map() const
+    {
+        Dictionary add_to_map;
+        FixDictMp fix_dict_mp;
+        add_to_map = fix_dict_mp.fill_dict(this->node);
+        return add_to_map;
+    }
+};
+
+//=========================================================================================================
+
+
 
 }//NAMESPACE
 

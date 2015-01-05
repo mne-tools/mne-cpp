@@ -92,7 +92,8 @@ public:
     /**
     * Constructs a DataPackage.
     *
-    * @param originalRawData the original data
+    * @param originalRawData the original raw data
+    * @param originalRawTime the original raw time data
     * @param cutFront the amount to be cutted from orignal data from the front
     * @param cutBack the amount to be cutted from orignal data from the back
     */
@@ -106,7 +107,7 @@ public:
     * @param cutFront the amount to be cutted from orignal data from the front
     * @param cutBack the amount to be cutted from orignal data from the back
     */
-    void setOrigRawData(const MatrixXdR &originalRawData, int cutFront, int cutBack);
+    void setOrigRawData(const MatrixXdR &originalRawData, int cutFront=0, int cutBack=0);
 
     //=========================================================================================================
     /**
@@ -117,7 +118,7 @@ public:
     * @param cutFront the amount to be cutted from orignal data from the front
     * @param cutBack the amount to be cutted from orignal data from the back
     */
-    void setOrigRawData(const RowVectorXd &originalRawData, int row, int cutFront, int cutBack);
+    void setOrigRawData(const RowVectorXd &originalRawData, int row, int cutFront=0, int cutBack=0);
 
     //=========================================================================================================
     /**
@@ -127,18 +128,40 @@ public:
     * @param cutFront the amount to be cutted from orignal data from the front
     * @param cutBack the amount to be cutted from orignal data from the back
     */
-    void setOrigProcData(const MatrixXdR &originalProcData, int cutFront, int cutBack);
+    void setOrigProcData(const MatrixXdR &originalProcData, int cutFront=0, int cutBack=0);
+
+    //=========================================================================================================
+    /**
+    * Sets the mapped processed data matrix calculated.
+    *
+    * @param originalProcData the original processed data
+    * @param cutFront the amount to be cutted from orignal data from the front
+    * @param cutBack the amount to be cutted from orignal data from the back
+    */
+    void setMappedProcData(const MatrixXdR &originalProcData, int cutFront, int cutBack);
+
 
     //=========================================================================================================
     /**
     * Sets a row of the original long processed data matrix read from the file. Optional: Also cuts the original processed data to a specific size.
     *
-    * @param originalProcData the original raw data in form of a row
+    * @param originalProcData the original processed data in form of a row
     * @param row the row number
     * @param cutFront the amount to be cutted from orignal data from the front
     * @param cutBack the amount to be cutted from orignal data from the back
     */
-    void setOrigProcData(const RowVectorXd &originalProcData, int row, int cutFront, int cutBack);
+    void setOrigProcData(const RowVectorXd &originalProcData, int row, int cutFront=0, int cutBack=0);
+
+    //=========================================================================================================
+    /**
+    * Sets a row of the mapped processed data matrix read from the file.
+    *
+    * @param originalProcData the original processed data in form of a row
+    * @param row the row number
+    * @param cutFront the amount to be cutted from orignal data from the front
+    * @param cutBack the amount to be cutted from orignal data from the back
+    */
+    void setMappedProcData(const RowVectorXd &originalProcData, int row, int cutFront, int cutBack);
 
     //=========================================================================================================
     /**
@@ -150,7 +173,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the raw data mapped to i.e. fit the current window size.
+    * Returns the raw data mapped i.e. to fit the current window size.
     *
     * @return the mapped data
     */
@@ -241,22 +264,24 @@ private:
     double calculateRowMean(const VectorXd &dataRow);
 
     //Time data
-    MatrixXdR   m_timeRawMapped;
-    MatrixXdR   m_timeRawOriginal;
+    MatrixXdR   m_timeRawMapped;        /**< The mapped/cut time data */
+    MatrixXdR   m_timeRawOriginal;      /**< the original time data */
 
     //Raw data
-    MatrixXdR   m_dataRawMapped;
-    MatrixXdR   m_dataRawOriginal;
-    VectorXd    m_dataRawMean;
+    MatrixXdR   m_dataRawMapped;        /**< The mapped/cut raw data */
+    MatrixXdR   m_dataRawOriginal;      /**< The original raw data */
+    VectorXd    m_dataRawMean;          /**< The mean of the mapped/cut raw data */
 
     //Processed data
-    MatrixXdR   m_dataProcOriginal;
-    MatrixXdR   m_dataProcMapped;
-    VectorXd    m_dataProcMean;
+    MatrixXdR   m_dataProcOriginal;     /**< The mapped/cut processed/filtered data */
+    MatrixXdR   m_dataProcMapped;       /**< The original processed/filtered data */
+    VectorXd    m_dataProcMean;         /**< The mean of the mapped/cut processed/filtered data */
 
     //Cutting parameters
-    int m_iCutFront;
-    int m_iCutBack;
+    int m_iCutFrontRaw;                 /**< The last used cut front value of the raw data */
+    int m_iCutBackRaw;                  /**< The last used cut back value of the raw data*/
+    int m_iCutFrontProc;                /**< The last used cut front value of the raw data */
+    int m_iCutBackProc;                 /**< The last used cut back value of the raw data*/
 };
 
 } // NAMESPACE
