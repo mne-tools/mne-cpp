@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     matchingPursuit.pro
+# @file     test_mne_cluster_eval.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2012
+# @date     July, 2014
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    ToDo Documentation...
+# @brief    Builds original RAP-MUSIC cluster test
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,17 +39,12 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-QT += gui
-QT += widgets
-QT += network core widgets concurrent
-QT += xml
+QT       += 3d
 
 CONFIG   += console
 CONFIG   -= app_bundle
 
-
-
-TARGET = matchingPursuit
+TARGET = test_orig_rap_cluster_eval
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -62,7 +57,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}Dispd
+            -lMNE$${MNE_LIB_VERSION}Inversed
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -70,44 +65,15 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}Disp
+            -lMNE$${MNE_LIB_VERSION}Inverse
 }
 
 DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
         main.cpp \
-    editorwindow.cpp \
-    enhancededitorwindow.cpp \
-    formulaeditor.cpp \
-    deletemessagebox.cpp \
-    mainwindow.cpp \
-    processdurationmessagebox.cpp \
-    treebaseddictwindow.cpp
 
 HEADERS += \
-    editorwindow.h \
-    enhancededitorwindow.h \
-    formulaeditor.h \
-    deletemessagebox.h \
-    mainwindow.h \
-    processdurationmessagebox.h \
-    treebaseddictwindow.h
-
-FORMS += \
-    editorwindow.ui \
-    enhancededitorwindow.ui \
-    formulaeditor.ui \
-    deletemessagebox.ui \
-    mainwindow.ui \
-    processdurationmessagebox.ui \
-    treebaseddictwindow.ui
-
-RESOURCES += \
-    Ressourcen.qrc
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-
-unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
-

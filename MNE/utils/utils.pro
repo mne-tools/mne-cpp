@@ -37,8 +37,9 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       -= gui
-QT       += xml core
+QT -= gui
+QT += xml core
+QT += network concurrent # Check with HP-UX
 
 DEFINES += UTILS_LIBRARY
 
@@ -112,4 +113,3 @@ header_files.path = $${MNE_INCLUDE_DIR}/utils
 INSTALLS += header_files
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
-

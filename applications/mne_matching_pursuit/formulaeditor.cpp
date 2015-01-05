@@ -67,8 +67,6 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-#define PI 3.14159265358979323846
-
 QString oldStringX = "";
 QString oldStringA = "";
 QString oldStringB = "";
@@ -95,9 +93,11 @@ Formulaeditor::Formulaeditor(QWidget *parent) :    QWidget(parent),    ui(new Ui
 {
     ui->setupUi(this);
 
-    callAtomPaintWindow = new AtomPaintWindow();
+    QSettings settings;
+    move(settings.value("pos_formula_editor", QPoint(200, 200)).toPoint());
+    resize(settings.value("size_formula_editor", QSize(555, 418)).toSize());
 
-    callAtomPaintWindow->setFixedSize(510,200);
+    callAtomPaintWindow = new AtomPaintWindow();
     ui->l_PaintAtom->addWidget(callAtomPaintWindow);
 
     atomList.clear();
@@ -130,17 +130,38 @@ Formulaeditor::Formulaeditor(QWidget *parent) :    QWidget(parent),    ui(new Ui
     m_strStandardFunction.append("GGT");
 
     callAtomPaintWindow->update();
+    //update();
 }
+
+//*************************************************************************************************************************************
 
 Formulaeditor::~Formulaeditor()
 {
     delete ui;
 }
 
-void AtomPaintWindow::paint_event(QPaintEvent *event)
-{    
-    paint_signal(atomList, QSize(510,200));
+//*************************************************************************************************************************************
+
+void Formulaeditor::closeEvent(QCloseEvent * event)
+{
+    Q_UNUSED(event);
+    QSettings settings;
+    if(!this->isMaximized())
+    {
+        settings.setValue("pos_formula_editor", pos());
+        settings.setValue("size_formula_editor", size());
+    }
 }
+
+//*************************************************************************************************************************************
+
+void AtomPaintWindow::paintEvent(QPaintEvent *event)
+{
+    Q_UNUSED(event);
+    paint_signal(atomList, this->size());
+}
+
+//*************************************************************************************************************************************
 
 void AtomPaintWindow::paint_signal(QList<qreal> valueList, QSize windowSize)
 {
@@ -321,9 +342,10 @@ void AtomPaintWindow::paint_signal(QList<qreal> valueList, QSize windowSize)
     painter.end();
 }
 
+//*************************************************************************************************************************************
+
 void Formulaeditor::on_tb_Formula_textChanged(const QString &arg1)
 {
-
     ui->btt_Save->setEnabled(false);
     QList<QChar> foundChar;
     foundChar.clear();
@@ -441,6 +463,8 @@ void Formulaeditor::on_tb_Formula_textChanged(const QString &arg1)
     }
 }
 
+//*************************************************************************************************************************************
+
 void Formulaeditor::on_tb_A_textChanged(const QString &arg1)
 {
     bool ok = false;
@@ -515,8 +539,8 @@ void Formulaeditor::on_dsb_StepWidth_editingFinished()
     ui->dsb_EndValue->setMinimum(ui->dsb_StartValue->value() + ui->dsb_StepWidth->value());
 }
 
+//*************************************************************************************************************************************
 
-//***************************************************************************************************************
 void Formulaeditor::on_btt_Test_clicked()
 {
     Formulaeditor FormulaParser;
@@ -538,7 +562,7 @@ void Formulaeditor::on_btt_Test_clicked()
             ui->btt_Save->setEnabled(true);
         if(retValue < 0.0000000000001 && retValue > -0.0000000000001)
             retValue = 0;
-        ui->lb_Result->setText(QString("Ergebnis vom Startwert = %1").arg(retValue));
+        ui->lb_Result->setText(QString("result start value = %1").arg(retValue));
     }
     else
     {
@@ -554,7 +578,7 @@ void Formulaeditor::on_btt_Test_clicked()
     stepWidth = ui->dsb_StepWidth->value();
     if(stepWidth == 0)
     {
-        QMessageBox::warning(this, tr("Fehler"), tr("Die Schrittweite darf nicht null sein."));
+        QMessageBox::warning(this, tr("error"), tr("Increment can not be null."));
         return;
     }
 
@@ -569,7 +593,7 @@ void Formulaeditor::on_btt_Test_clicked()
     else
     {
         qreal result = FormulaParser.calculation(ui->tb_Formula->text(), internStartValue );
-        ui->lb_Result->setText(QString("Ergebnis = %1").arg(result));
+        ui->lb_Result->setText(QString("result = %1").arg(result));
     }
 
     atomList = resultsList;
@@ -579,10 +603,12 @@ void Formulaeditor::on_btt_Test_clicked()
     update();
 }
 
-// access when "Speichern" clicked
+//*************************************************************************************************************************************
+
+// access when "sforumla save" clicked
 void Formulaeditor::on_btt_Save_clicked()
 {    
-    QFile saveFile("Matching-Pursuit-Toolbox/user.fml");
+    QFile saveFile(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox/user.fml");
     if(!saveFile.exists())
     {
         if (saveFile.open(QIODevice::ReadWrite | QIODevice::Text))
@@ -596,11 +622,26 @@ void Formulaeditor::on_btt_Save_clicked()
     }
     saveFile.close();
 
+    ui->tb_Formula->clear();
+    ui->tb_A->setText("0");
+    ui->tb_B->setText("0");
+    ui->tb_C->setText("0");
+    ui->tb_D->setText("0");
+    ui->tb_E->setText("0");
+    ui->tb_F->setText("0");
+    ui->tb_G->setText("0");
+    ui->tb_H->setText("0");
+    ui->lb_Result->setText("result start value = ---");
+    atomList.clear();
+    update();
+
+    emit formula_saved();
 }
 
-//**********************************************************************************************************************
-// formula methods ******************************************************************************************************
-//**********************************************************************************************************************
+//*************************************************************************************************************************************
+// formula methods    Copyright: 2004, Ralf Wirtz   adapted to qt for formula editor by Daniel Knobl **********************************
+// this Code is licensed under The Code Project Open License (CPOL) 1.02 **************************************************************
+//*************************************************************************************************************************************
 
 qreal Formulaeditor::sign_factor(qint32& nPosition, QString& strCharacter)
 {
@@ -611,6 +652,8 @@ qreal Formulaeditor::sign_factor(qint32& nPosition, QString& strCharacter)
     }
   else return factor(nPosition, strCharacter);
 }
+
+//*************************************************************************************************************************************
 
 void Formulaeditor::strip_formula(QString &strFormula)
 {
@@ -726,11 +769,13 @@ void Formulaeditor::strip_formula(QString &strFormula)
     strFormula.replace("|", "");
 }
 
+//*************************************************************************************************************************************
+
 double Formulaeditor::calculation(QString strFormula, qreal xValue, bool strip)
 {
     qint32  nPosition;
     QString strCharacter;
-    qreal	ergebnis;
+    qreal	result;
 
     if (strFormula.length() < 1) return 0.0;
 
@@ -745,10 +790,12 @@ double Formulaeditor::calculation(QString strFormula, qreal xValue, bool strip)
     nPosition = 0;
     char_n(nPosition, strCharacter);
 
-    ergebnis = expression(nPosition, strCharacter);
+    result = expression(nPosition, strCharacter);
 
-    return ergebnis;
+    return result;
 }
+
+//*************************************************************************************************************************************
 
 double Formulaeditor::expression(int& nPosition, QString& strCharacter)
 {
@@ -767,6 +814,8 @@ double Formulaeditor::expression(int& nPosition, QString& strCharacter)
   return erg;
 }
 
+//*************************************************************************************************************************************
+
 double Formulaeditor::simple_expression(int& nPosition, QString& strCharacter)
 {
     double s,dum;
@@ -782,11 +831,13 @@ double Formulaeditor::simple_expression(int& nPosition, QString& strCharacter)
         {
             dum = term(nPosition, strCharacter);
             if (dum != 0)   s = s / dum;
-            else    errorText = QString("Dividieren durch 0 ist nicht möglich.");
+            else    errorText = QString("Divide by 0 is not possible.");
         }
     }
     return s;
 }
+
+//*************************************************************************************************************************************
 
 double Formulaeditor::term(int& nPosition, QString& strCharacter)
 {
@@ -797,11 +848,13 @@ double Formulaeditor::term(int& nPosition, QString& strCharacter)
       char_n(nPosition, strCharacter);
       vz = sign_factor(nPosition, strCharacter);
 
-      if ((t <= 0 && fabs(vz) <= 1) || (t <= 0 && vz != qint32(vz))) errorText = QString("Radizieren negativer Zahlen ist im Reelen nicht möglich.");
+      if ((t <= 0 && fabs(vz) <= 1) || (t <= 0 && vz != qint32(vz))) errorText = QString("Extraction of square root of negative numbers is not possible using dense matrix algebra.");
       else    t = pow(t,vz);
   }
   return t;
 }
+
+//*************************************************************************************************************************************
 
 double Formulaeditor::char_n(int& nPosition, QString& strCharacter)
 {
@@ -818,15 +871,21 @@ double Formulaeditor::char_n(int& nPosition, QString& strCharacter)
     return nPosition;
 }
 
+//*************************************************************************************************************************************
+
 void Formulaeditor::set_formula(QString Formula)
 {
     m_strFormula = Formula;
 }
 
-QString Formulaeditor::GetFormula()
+//*************************************************************************************************************************************
+
+QString Formulaeditor::get_formula()
 {
     return m_strFormula;
 }
+
+//*************************************************************************************************************************************
 
 double Formulaeditor::factor(qint32& nPosition, QString& strCharacter)
 {
@@ -1007,11 +1066,13 @@ double Formulaeditor::factor(qint32& nPosition, QString& strCharacter)
     return f;
 }
 
+//*************************************************************************************************************************************
+
 void Formulaeditor::set_funct_const(int index, double val)
 {
     //between 0 and 9
     if (index >= 0 && index < 9)   m_dFunctionConstant[index] = val;
-    else errorText = QString("Programmfehler in SetFunctConst()");
+    else errorText = QString("Error in SetFunctConst()");
 }
 
 QString Formulaeditor::str_char(QString DecimalZahl)
@@ -1101,7 +1162,7 @@ double Formulaeditor::sqr(double x)
     return x*x;
 }
 
-//**********************************************************************************************************************
-//**********************************************************************************************************************
-//**********************************************************************************************************************
+//*************************************************************************************************************************************
+// end formula methods    Copyright: 2004, Ralf Wirtz   adapted to qt for formula editor by Daniel Knobl ******************************
+//*************************************************************************************************************************************
 
