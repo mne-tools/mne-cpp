@@ -69,7 +69,7 @@ DataPackage::DataPackage(const MatrixXdR &originalRawData, const MatrixXdR &orig
     }
 
     //Init processed data with zero and double the multiple integer of 2 (because of zero padding)
-    int exp = ceil(log2(originalRawTime.cols()));
+    int exp = ceil(MNEMath::log2(originalRawTime.cols()));
     int length = pow(2, exp+1);
 
     m_dataProcOriginal = MatrixXdR::Zero(m_dataRawOriginal.rows(), length);
