@@ -377,7 +377,7 @@ Dictionary FixDictMp::fill_dict(const QDomNode &pdict)
 
     if(current_dict.atom_formula == QString("Gaboratom"))
     {
-        current_dict.type = AtomType::GABORATOM;
+        current_dict.type = GABORATOM;
 
         while(!atom.isNull())
         {
@@ -402,7 +402,7 @@ Dictionary FixDictMp::fill_dict(const QDomNode &pdict)
     }
     else if(current_dict.atom_formula == QString("Chirpatom"))
     {
-        current_dict.type = AtomType::CHIRPATOM;
+        current_dict.type = CHIRPATOM;
 
         while(!atom.isNull())
         {
@@ -428,7 +428,7 @@ Dictionary FixDictMp::fill_dict(const QDomNode &pdict)
     }
     else
     {
-        current_dict.type = AtomType::FORMULAATOM;
+        current_dict.type = FORMULAATOM;
 
         while(!atom.isNull())
         {
@@ -472,7 +472,7 @@ qint32 Dictionary::atom_count()
 QString FixDictMp::create_display_text(FixDictAtom global_best_matching)
 {
     QString display_text = "";
-    if(global_best_matching.type == AtomType::GABORATOM)
+    if(global_best_matching.type == GABORATOM)
     {
         display_text = QString("Gaboratom: scale: %0, translation: %1, modulation: %2, phase: %3")
                 .arg(QString::number(global_best_matching.gabor_atom.scale, 'f', 2))
@@ -480,7 +480,7 @@ QString FixDictMp::create_display_text(FixDictAtom global_best_matching)
                 .arg(QString::number(global_best_matching.gabor_atom.modulation, 'f', 2))
                 .arg(QString::number(global_best_matching.gabor_atom.phase, 'f', 2));
     }
-    else if(global_best_matching.type == AtomType::CHIRPATOM)
+    else if(global_best_matching.type == CHIRPATOM)
     {
         display_text = QString("Chripatom: scale: %0, translation: %1, modulation: %2, phase: %3, chirp: %4")
                 .arg(QString::number(global_best_matching.chirp_atom.scale, 'f', 2))
@@ -489,7 +489,7 @@ QString FixDictMp::create_display_text(FixDictAtom global_best_matching)
                 .arg(QString::number(global_best_matching.chirp_atom.phase, 'f', 2))
                 .arg(QString::number(global_best_matching.chirp_atom.chirp, 'f', 2));
     }
-    else if(global_best_matching.type == AtomType::FORMULAATOM)
+    else if(global_best_matching.type == FORMULAATOM)
     {
         display_text = QString("%0:  transl: %1 a: %2, b: %3 c: %4, d: %5, e: %6, f: %7, g: %8, h: %9")
                 .arg(global_best_matching.atom_formula)
