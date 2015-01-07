@@ -104,16 +104,7 @@ void ProjectorWidget::checkStatusChanged(int status)
     for(qint32 i = 0; i < m_qListCheckBox.size(); ++i)
         this->m_pFiffInfo->projs[i].active = m_qListCheckBox[i]->isChecked();
 
-    //
-    //   Create the projector
-    //
-
-    MatrixXd proj;
-    this->m_pFiffInfo->make_projector(proj);
-
-    qDebug() << "New projection calculated.";
-
-    emit projectorChanged(proj);
+    emit projSelectionChanged();
 }
 
 

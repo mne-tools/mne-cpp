@@ -211,6 +211,34 @@ void RealTimeMultiSampleArrayModel::setChannelInfo(QList<RealTimeSampleArrayChIn
 
 //*************************************************************************************************************
 
+void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
+{
+    if(p_pFiffInfo)
+    {
+        RowVectorXi sel;
+        QStringList emptyExclude;
+
+        sel = FiffInfoBase::pick_channels(p_pFiffInfo->ch_names, p_pFiffInfo->bads, emptyExclude);
+        m_vecBadIdcs = sel;
+
+        this->m_pFiffInfo = p_pFiffInfo;
+
+        //
+        //  Create the initial SSP projector
+        //
+        this->m_pFiffInfo->make_projector(m_matProj);
+        qDebug() << "setFiffInfo:: New projection calculated.";
+    }
+    else
+    {
+        m_vecBadIdcs = RowVectorXi(0,0);
+        m_matProj = MatrixXd(0,0);
+    }
+}
+
+
+//*************************************************************************************************************
+
 void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T, float dest_sps)
 {
     beginResetModel();
@@ -238,8 +266,25 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
     for(qint32 b = 0; b < data.size(); ++b)
     {
         qint32 i;
+
+        bool doProj = false;
+
+        if(data[b].cols() > 0 && data[b].col(0).size() == m_matProj.rows())
+            doProj = true;
+
         for(i = m_iCurrentSample; i < data[b].cols(); i += m_iDownsampling)
+        {
             m_dataCurrent.append(data[b].col(i));
+
+            //SSP
+            //set bad channels to zero
+            for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
+                m_dataCurrent.last()[m_vecBadIdcs[j]] = 0;
+
+            //apply projector
+            if(doProj)
+                m_dataCurrent.last() = m_matProj * m_dataCurrent.last();
+        }
 
         //store for next buffer
         m_iCurrentSample = i - data[b].cols();
@@ -251,11 +296,6 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
         m_dataLast = m_dataCurrent.mid(0,m_iMaxSamples); // Store last data to keep as background in the display
         m_dataCurrent.remove(0, m_iMaxSamples);
     }
-
-
-    //Apply Projector
-
-
 
     //Update data content
     QModelIndex topLeft = this->index(0,1);
@@ -374,4 +414,19 @@ void RealTimeMultiSampleArrayModel::setScaling(const QMap< qint32,float >& p_qMa
     beginResetModel();
     m_qMapChScaling = p_qMapChScaling;
     endResetModel();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::updateProjection()
+{
+    //
+    //  Update the SSP projector
+    //
+    if(m_pFiffInfo)
+    {
+        this->m_pFiffInfo->make_projector(m_matProj);
+        qDebug() << "updateProjection :: New projection calculated.";
+    }
 }
