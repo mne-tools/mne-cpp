@@ -266,28 +266,59 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
     for(qint32 b = 0; b < data.size(); ++b)
     {
         qint32 i;
+        qint32 count = 0;
+        //Downsample the data
+        for(i = m_iCurrentSample; i < data[b].cols(); i += m_iDownsampling)
+            ++count;
 
-        bool doProj = false;
+        MatrixXd dsData(data[b].rows(),count);
 
-        if(data[b].cols() > 0 && data[b].col(0).size() == m_matProj.rows())
-            doProj = true;
-
+        count = 0;
         for(i = m_iCurrentSample; i < data[b].cols(); i += m_iDownsampling)
         {
-            m_dataCurrent.append(data[b].col(i));
-
-            //SSP
-            //set bad channels to zero
-            for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
-                m_dataCurrent.last()[m_vecBadIdcs[j]] = 0;
-
-            //apply projector
-            if(doProj)
-                m_dataCurrent.last() = m_matProj * m_dataCurrent.last();
+            dsData.col(count) = data[b].col(i);
+            ++count;
         }
 
         //store for next buffer
         m_iCurrentSample = i - data[b].cols();
+
+//            m_dataCurrent.append(data[b].col(i));
+
+        bool doProj = false;
+
+        if(data[b].cols() > 0 && dsData.col(0).size() == m_matProj.rows())
+            doProj = true;
+
+        //SSP
+        //set bad channels to zero
+        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
+            dsData.row(m_vecBadIdcs[j]).setZero();
+
+        //Do SSP Projection
+
+
+
+        //store data
+        for(i = 0; i < dsData.cols(); ++i)
+            m_dataCurrent.append(dsData.col(i));
+
+        // - old -
+//        //SSP
+//        //set bad channels to zero
+//        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
+//            m_dataCurrent.last()[m_vecBadIdcs[j]] = 0;
+
+//        //apply projector
+//        if(doProj)
+//            m_dataCurrent.last() = m_matProj * m_dataCurrent.last();
+
+//        //Downsampling
+//        for(i = m_iCurrentSample; i < data[b].cols(); i += m_iDownsampling)
+//            m_dataCurrent.append(data[b].col(i));
+
+//        //store for next buffer
+//        m_iCurrentSample = i - data[b].cols();
     }
 
     //ToDo separate worker thread? ToDo 2000 -> size of screen
