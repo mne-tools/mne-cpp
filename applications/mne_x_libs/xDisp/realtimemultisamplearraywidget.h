@@ -285,7 +285,8 @@ private:
 
     bool m_bInitialized;                                    /**< Is Initialized */
 
-    QList<RealTimeSampleArrayChInfo> m_qListChInfo;         /**< Channel info list. ToDo: check if this is obsolete later on*/
+    QList<RealTimeSampleArrayChInfo> m_qListChInfo;         /**< Channel info list. ToDo: check if this is obsolete later on -> ToDo use fiff Info instead*/
+    FiffInfo::SPtr m_pFiffInfo;                             /**< FiffInfo, which is used insteadd of ListChInfo*/
 
     qint32 m_iT;                                            /**< Display window size in seconds */
     float m_fSamplingRate;                                  /**< Sampling rate */

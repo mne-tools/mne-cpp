@@ -113,7 +113,7 @@ public:
     void setFiffInfo(FiffInfo::SPtr& p_pFiffInfo);
 
 signals:
-    void projectorChanged(Eigen::MatrixXd proj);
+    void projSelectionChanged();
 
 private:
     void checkStatusChanged(int state);

@@ -155,12 +155,6 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     addDisplayAction(m_pActionProjection);
     m_pActionProjection->setVisible(true);
 
-
-
-
-
-
-
     if(m_pTableView)
         delete m_pTableView;
     m_pTableView = new QTableView;
@@ -227,7 +221,9 @@ void RealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
     {
         if(m_pRTMSA->isChInit())
         {
-            m_qListChInfo = m_pRTMSA->chInfo();
+            m_qListChInfo = m_pRTMSA->chInfo(); //ToDo Obsolete -> use fiffInfo instead
+            m_pFiffInfo = m_pRTMSA->info();
+
             m_fSamplingRate = m_pRTMSA->getSamplingRate();
 
             QFile file(m_pRTMSA->getXMLLayoutFile());
@@ -262,7 +258,8 @@ void RealTimeMultiSampleArrayWidget::init()
             delete m_pRTMSAModel;
         m_pRTMSAModel = new RealTimeMultiSampleArrayModel(this);
 
-        m_pRTMSAModel->setChannelInfo(m_qListChInfo);
+        m_pRTMSAModel->setFiffInfo(m_pFiffInfo);
+        m_pRTMSAModel->setChannelInfo(m_qListChInfo);//ToDo Obsolete
         m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, m_iT, m_fDesiredSamplingRate);
 
         if(m_pRTMSADelegate)
@@ -473,13 +470,16 @@ void RealTimeMultiSampleArrayWidget::timeWindowChanged(int T)
 
 void RealTimeMultiSampleArrayWidget::showProjectionWidget()
 {
-    if(m_pRTMSA->info() && m_pRTMSA->info()->projs.size() > 0)
+    //SSP selection
+    if(m_pFiffInfo && m_pFiffInfo->projs.size() > 0)
     {
         if(!m_pProjectorSelectionWidget)
         {
             m_pProjectorSelectionWidget = QSharedPointer<ProjectorWidget>(new ProjectorWidget);
 
-            m_pProjectorSelectionWidget->setFiffInfo(m_pRTMSA->info());
+            m_pProjectorSelectionWidget->setFiffInfo(m_pFiffInfo);
+
+            connect(m_pProjectorSelectionWidget.data(), &ProjectorWidget::projSelectionChanged, this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::updateProjection);
         }
 
 
