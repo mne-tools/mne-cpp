@@ -1796,7 +1796,7 @@ QString MainWindow::create_display_text(FixDictAtom global_best_matching)
 
     if(!settings.value("show_phys_params", false).toBool())
     {
-        if(global_best_matching.type == AtomType::GABORATOM)
+        if(global_best_matching.type == GABORATOM)
         {
             display_text = QString("Gaboratom: scale: %0, translation: %1, modulation: %2, phase: %3")
                     .arg(QString::number(global_best_matching.gabor_atom.scale, 'f', 2))
@@ -1804,7 +1804,7 @@ QString MainWindow::create_display_text(FixDictAtom global_best_matching)
                     .arg(QString::number(global_best_matching.gabor_atom.modulation, 'f', 2))
                     .arg(QString::number(global_best_matching.gabor_atom.phase, 'f', 2));
         }
-        else if(global_best_matching.type == AtomType::CHIRPATOM)
+        else if(global_best_matching.type == CHIRPATOM)
         {
             display_text = QString("Chripatom: scale: %0, translation: %1, modulation: %2, phase: %3, chirp: %4")
                     .arg(QString::number(global_best_matching.chirp_atom.scale, 'f', 2))
@@ -1813,7 +1813,7 @@ QString MainWindow::create_display_text(FixDictAtom global_best_matching)
                     .arg(QString::number(global_best_matching.chirp_atom.phase, 'f', 2))
                     .arg(QString::number(global_best_matching.chirp_atom.chirp, 'f', 2));
         }
-        else if(global_best_matching.type == AtomType::FORMULAATOM)
+        else if(global_best_matching.type == FORMULAATOM)
         {
             display_text = QString("%0:  transl: %1 a: %2, b: %3 c: %4, d: %5, e: %6, f: %7, g: %8, h: %9")
                     .arg(global_best_matching.atom_formula)
@@ -1830,7 +1830,7 @@ QString MainWindow::create_display_text(FixDictAtom global_best_matching)
     }
     else
     {
-        if(global_best_matching.type == AtomType::GABORATOM)
+        if(global_best_matching.type == GABORATOM)
         {
             qreal phase = global_best_matching.gabor_atom.phase;
             if(global_best_matching.gabor_atom.phase > 2*PI) phase -= 2*PI;
@@ -1841,7 +1841,7 @@ QString MainWindow::create_display_text(FixDictAtom global_best_matching)
                     .arg(QString::number(global_best_matching.gabor_atom.modulation * _sample_rate / global_best_matching.sample_count, 'f', 2))
                     .arg(QString::number(phase, 'f', 2));
         }
-        else if(global_best_matching.type == AtomType::CHIRPATOM)
+        else if(global_best_matching.type == CHIRPATOM)
         {
             qreal phase = global_best_matching.chirp_atom.phase;
             if(global_best_matching.chirp_atom.phase > 2*PI) phase -= 2*PI;
@@ -1853,7 +1853,7 @@ QString MainWindow::create_display_text(FixDictAtom global_best_matching)
                     .arg(QString::number(phase, 'f', 2))
                     .arg(QString::number(global_best_matching.chirp_atom.chirp, 'f', 2));
         }
-        else if(global_best_matching.type == AtomType::FORMULAATOM)
+        else if(global_best_matching.type == FORMULAATOM)
         {
             display_text = QString("%0:  transl: %1 a: %2, b: %3 c: %4, d: %5, e: %6, f: %7, g: %8, h: %9")
                     .arg(global_best_matching.atom_formula)
@@ -2484,14 +2484,14 @@ void MainWindow::save_parameters()
                 xmlWriter.writeAttribute("dict_source", fix_atom.dict_source);
                 xmlWriter.writeStartElement("PARAMETER");
 
-                if(fix_atom.type == AtomType::GABORATOM)
+                if(fix_atom.type == GABORATOM)
                 {
                     xmlWriter.writeAttribute("scale", QString::number(fix_atom.gabor_atom.scale));
                     xmlWriter.writeAttribute("translation", QString::number(fix_atom.translation));
                     xmlWriter.writeAttribute("modulation", QString::number(fix_atom.gabor_atom.modulation));
                     xmlWriter.writeAttribute("phase", QString::number(fix_atom.gabor_atom.phase));
                 }
-                else if(fix_atom.type == AtomType::CHIRPATOM)
+                else if(fix_atom.type == CHIRPATOM)
                 {                   
                     xmlWriter.writeAttribute("scale", QString::number(fix_atom.chirp_atom.scale));
                     xmlWriter.writeAttribute("translation", QString::number(fix_atom.translation));
@@ -2499,7 +2499,7 @@ void MainWindow::save_parameters()
                     xmlWriter.writeAttribute("phase", QString::number(fix_atom.chirp_atom.phase));
                     xmlWriter.writeAttribute("chirp", QString::number(fix_atom.chirp_atom.chirp));
                 }
-                else if(fix_atom.type == AtomType::FORMULAATOM)
+                else if(fix_atom.type == FORMULAATOM)
                 {                    
                     xmlWriter.writeAttribute("translation", QString::number(fix_atom.translation));
                     xmlWriter.writeAttribute("a", QString::number(fix_atom.formula_atom.a));
