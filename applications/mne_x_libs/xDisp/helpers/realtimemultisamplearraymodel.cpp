@@ -35,6 +35,8 @@
 
 #include "realtimemultisamplearraymodel.h"
 
+#include <iostream>
+
 #include <QDebug>
 #include <QBrush>
 #include <QThread>
@@ -211,6 +213,33 @@ void RealTimeMultiSampleArrayModel::setChannelInfo(QList<RealTimeSampleArrayChIn
 
 //*************************************************************************************************************
 
+void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
+{
+    if(p_pFiffInfo)
+    {
+        RowVectorXi sel;
+        QStringList emptyExclude;
+
+        sel = FiffInfoBase::pick_channels(p_pFiffInfo->ch_names, p_pFiffInfo->bads, emptyExclude);
+        m_vecBadIdcs = sel;
+
+        this->m_pFiffInfo = p_pFiffInfo;
+
+        //
+        //  Create the initial SSP projector
+        //
+        updateProjection();
+    }
+    else
+    {
+        m_vecBadIdcs = RowVectorXi(0,0);
+        m_matProj = MatrixXd(0,0);
+    }
+}
+
+
+//*************************************************************************************************************
+
 void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T, float dest_sps)
 {
     beginResetModel();
@@ -236,13 +265,71 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
     //Downsampling ->ToDo make this more accurate
 
     for(qint32 b = 0; b < data.size(); ++b)
-    {
+    {        
         qint32 i;
+        qint32 count = 0;
+        //Downsample the data
         for(i = m_iCurrentSample; i < data[b].cols(); i += m_iDownsampling)
-            m_dataCurrent.append(data[b].col(i));
+            ++count;
+
+        MatrixXd dsData(data[b].rows(),count);
+
+        count = 0;
+        for(i = m_iCurrentSample; i < data[b].cols(); i += m_iDownsampling)
+        {
+            dsData.col(count) = data[b].col(i);
+            ++count;
+        }
+
+
+//        qDebug() << "nchan" << dsData.rows() << "proj rows" << m_matProj.rows();
+
 
         //store for next buffer
         m_iCurrentSample = i - data[b].cols();
+
+//            m_dataCurrent.append(data[b].col(i));
+
+        bool doProj = false;
+
+        if(dsData.cols() > 0 && dsData.rows() == m_matProj.cols())
+            doProj = true;
+
+        //SSP
+        //set bad channels to zero
+        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
+            dsData.row(m_vecBadIdcs[j]).setZero();
+
+        //Do SSP Projection
+        if(doProj)
+        {
+            MatrixXd projDsData = m_matSparseProj * dsData;
+            for(i = 0; i < projDsData.cols(); ++i)
+                m_dataCurrent.append(projDsData.col(i));
+        }
+        else
+        {
+            //store data
+            for(i = 0; i < dsData.cols(); ++i)
+                m_dataCurrent.append(dsData.col(i));
+        }
+
+        // - old -
+//        //SSP
+//        //set bad channels to zero
+//        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
+//            m_dataCurrent.last()[m_vecBadIdcs[j]] = 0;
+
+//        //apply projector
+//        if(doProj)
+//            m_dataCurrent.last() = m_matProj * m_dataCurrent.last();
+
+//        //Downsampling
+//        for(i = m_iCurrentSample; i < data[b].cols(); i += m_iDownsampling)
+//            m_dataCurrent.append(data[b].col(i));
+
+//        //store for next buffer
+//        m_iCurrentSample = i - data[b].cols();
     }
 
     //ToDo separate worker thread? ToDo 2000 -> size of screen
@@ -251,11 +338,6 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
         m_dataLast = m_dataCurrent.mid(0,m_iMaxSamples); // Store last data to keep as background in the display
         m_dataCurrent.remove(0, m_iMaxSamples);
     }
-
-
-    //Apply Projector
-
-
 
     //Update data content
     QModelIndex topLeft = this->index(0,1);
@@ -374,4 +456,40 @@ void RealTimeMultiSampleArrayModel::setScaling(const QMap< qint32,float >& p_qMa
     beginResetModel();
     m_qMapChScaling = p_qMapChScaling;
     endResetModel();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::updateProjection()
+{
+    //
+    //  Update the SSP projector
+    //
+    if(m_pFiffInfo)
+    {
+        this->m_pFiffInfo->make_projector(m_matProj);
+        qDebug() << "updateProjection :: New projection calculated.";
+
+        qint32 nchan = this->m_pFiffInfo->nchan;
+        qint32 i, k;
+
+        typedef Eigen::Triplet<double> T;
+        std::vector<T> tripletList;
+        tripletList.reserve(nchan);
+
+        //
+        // Make proj sparse
+        //
+        tripletList.clear();
+        tripletList.reserve(m_matProj.rows()*m_matProj.cols());
+        for(i = 0; i < m_matProj.rows(); ++i)
+            for(k = 0; k < m_matProj.cols(); ++k)
+                if(m_matProj(i,k) != 0)
+                    tripletList.push_back(T(i, k, m_matProj(i,k)));
+
+        m_matSparseProj = SparseMatrix<double>(m_matProj.rows(),m_matProj.cols());
+        if(tripletList.size() > 0)
+            m_matSparseProj.setFromTriplets(tripletList.begin(), tripletList.end());
+    }
 }
