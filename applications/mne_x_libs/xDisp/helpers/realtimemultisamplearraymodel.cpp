@@ -35,6 +35,8 @@
 
 #include "realtimemultisamplearraymodel.h"
 
+#include <iostream>
+
 #include <QDebug>
 #include <QBrush>
 #include <QThread>
@@ -226,8 +228,7 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
         //
         //  Create the initial SSP projector
         //
-        this->m_pFiffInfo->make_projector(m_matProj);
-        qDebug() << "setFiffInfo:: New projection calculated.";
+        updateProjection();
     }
     else
     {
@@ -264,7 +265,7 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
     //Downsampling ->ToDo make this more accurate
 
     for(qint32 b = 0; b < data.size(); ++b)
-    {
+    {        
         qint32 i;
         qint32 count = 0;
         //Downsample the data
@@ -280,6 +281,10 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
             ++count;
         }
 
+
+//        qDebug() << "nchan" << dsData.rows() << "proj rows" << m_matProj.rows();
+
+
         //store for next buffer
         m_iCurrentSample = i - data[b].cols();
 
@@ -287,7 +292,7 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
 
         bool doProj = false;
 
-        if(data[b].cols() > 0 && dsData.col(0).size() == m_matProj.rows())
+        if(dsData.cols() > 0 && dsData.rows() == m_matProj.cols())
             doProj = true;
 
         //SSP
@@ -296,12 +301,18 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
             dsData.row(m_vecBadIdcs[j]).setZero();
 
         //Do SSP Projection
-
-
-
-        //store data
-        for(i = 0; i < dsData.cols(); ++i)
-            m_dataCurrent.append(dsData.col(i));
+        if(doProj)
+        {
+            MatrixXd projDsData = m_matSparseProj * dsData;
+            for(i = 0; i < projDsData.cols(); ++i)
+                m_dataCurrent.append(projDsData.col(i));
+        }
+        else
+        {
+            //store data
+            for(i = 0; i < dsData.cols(); ++i)
+                m_dataCurrent.append(dsData.col(i));
+        }
 
         // - old -
 //        //SSP
@@ -459,5 +470,26 @@ void RealTimeMultiSampleArrayModel::updateProjection()
     {
         this->m_pFiffInfo->make_projector(m_matProj);
         qDebug() << "updateProjection :: New projection calculated.";
+
+        qint32 nchan = this->m_pFiffInfo->nchan;
+        qint32 i, k;
+
+        typedef Eigen::Triplet<double> T;
+        std::vector<T> tripletList;
+        tripletList.reserve(nchan);
+
+        //
+        // Make proj sparse
+        //
+        tripletList.clear();
+        tripletList.reserve(m_matProj.rows()*m_matProj.cols());
+        for(i = 0; i < m_matProj.rows(); ++i)
+            for(k = 0; k < m_matProj.cols(); ++k)
+                if(m_matProj(i,k) != 0)
+                    tripletList.push_back(T(i, k, m_matProj(i,k)));
+
+        m_matSparseProj = SparseMatrix<double>(m_matProj.rows(),m_matProj.cols());
+        if(tripletList.size() > 0)
+            m_matSparseProj.setFromTriplets(tripletList.begin(), tripletList.end());
     }
 }

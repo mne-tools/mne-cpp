@@ -61,6 +61,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 
 //*************************************************************************************************************
@@ -298,6 +299,7 @@ private:
     FiffInfo::SPtr  m_pFiffInfo;                    /**< Fiff info */
     RowVectorXi     m_vecBadIdcs;                   /**< Idcs of bad channels */
     MatrixXd        m_matProj;                      /**< SSP projector */
+    SparseMatrix<double> m_matSparseProj;           /**< Sparse SSP projector */
 
     QMap<qint32,qint32> m_qMapIdxRowSelection;      /**< Selection mapping.*/
 
