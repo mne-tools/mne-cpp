@@ -300,6 +300,7 @@ private:
     RowVectorXi     m_vecBadIdcs;                   /**< Idcs of bad channels */
     MatrixXd        m_matProj;                      /**< SSP projector */
     SparseMatrix<double> m_matSparseProj;           /**< Sparse SSP projector */
+    bool m_bProjActivated;                          /**< Proj activated */
 
     QMap<qint32,qint32> m_qMapIdxRowSelection;      /**< Selection mapping.*/
 
