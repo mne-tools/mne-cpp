@@ -220,7 +220,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
         std::cout << "      after comparison to NoEnvelope " << ":\n"<< "scale: " << gabor_Atom->scale << " trans: " << gabor_Atom->translation <<
                      " modu: " << gabor_Atom->modulation << " phase: " << gabor_Atom->phase << " sclr_prdct: " << gabor_Atom->max_scalar_product << "\n\n";
 
-        //Maximisation Simplex Algorithm implemented by Bozoa Jia, adapted to the MP Algorithm by Martin Henfling. Copyright (C) 2010 Botao Jia
+        //Maximisation Simplex Algorithm implemented by Botao Jia, adapted to the MP Algorithm by Martin Henfling. Copyright (C) 2010 Botao Jia
         //todo change to clean use of EIGEN, @present its mixed with Namespace std and <vector>
 
         //simplexfunction to find minimum of target among parameters s, p, k
