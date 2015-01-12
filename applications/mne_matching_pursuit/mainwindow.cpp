@@ -374,6 +374,7 @@ void MainWindow::open_file()
         //ui->dsb_sample_rate->setEnabled(false);
         ui->dsb_sample_rate->setEnabled(true);
     }
+
     //initial
     read_fiff_changed = true;
 
@@ -2293,7 +2294,7 @@ void MainWindow::save_fif_file()
     ui->actionSpeicher->setEnabled(false);
     ui->actionSpeicher_unter->setEnabled(false);
 
-    emit to_save(file_name, save_path, _from + _offset_time, _to, _atom_sum_matrix, select_channel_map, picks);
+    emit to_save(file_name, save_path, _from, _to, _atom_sum_matrix, select_channel_map, picks);
     save_thread->start();
 }
 
@@ -2349,6 +2350,7 @@ void SaveFifFile::save_fif_file(QString source_path, QString save_path, fiff_int
     RowVectorXd cals;
     FiffStream::SPtr outfid = Fiff::start_writing_raw(t_fileOut, raw.info, cals, picks);
 
+
     //   Set up the reading parameters
     fiff_int_t from = raw.first_samp;
     fiff_int_t to = raw.last_samp;
@@ -2364,12 +2366,12 @@ void SaveFifFile::save_fif_file(QString source_path, QString save_path, fiff_int
     MatrixXd times;
 
     // from 0 to start of change
-    for(first = from; first < start_change; first+=quantum)
+    for(first = from; first < start_change; first += quantum)
     {
-        last = first+quantum-1;
+        last = first + quantum - 1;
         if (last > start_change)
         {
-            last = start_change;
+            last = start_change - 1;
         }
         if (!raw.read_raw_segment(data ,times, first, last, picks))
         {
@@ -2381,7 +2383,7 @@ void SaveFifFile::save_fif_file(QString source_path, QString save_path, fiff_int
         if (first_buffer)
         {
            if (first > 0)
-               outfid->write_int(FIFF_FIRST_SAMPLE,&first);
+               outfid->write_int(FIFF_FIRST_SAMPLE, &first);
            first_buffer = false;
         }
         outfid->write_raw_buffer(data, cals);
@@ -2409,44 +2411,40 @@ void SaveFifFile::save_fif_file(QString source_path, QString save_path, fiff_int
             index++;
         }
     }
+    printf("Writing new data...");
     if (first_buffer)
     {
        if (start_change > 0)
-           outfid->write_int(FIFF_FIRST_SAMPLE,&start_change);
+           outfid->write_int(FIFF_FIRST_SAMPLE, &start_change);
        first_buffer = false;
-    }
-    printf("Writing new data...");
-    outfid->write_raw_buffer(data,cals);
+    }    
+    outfid->write_raw_buffer(data, cals);
     printf("[done]\n");
 
     //************************************************************************************
 
     // from end of change to end
-    for(first = end_change; first < to; first+=quantum)
+    for(first = end_change + 1; first < to; first += quantum)
     {
-        last = first+quantum-1;
+        last = first + quantum - 1;
         if (last > to)
         {
             last = to;
         }
-        if (!raw.read_raw_segment(data,times,first,last, picks))
+        if (!raw.read_raw_segment(data, times, first, last, picks))
         {
             printf("error during read_raw_segment\n");
             emit save_progress(first, 2);
             return;
         }
         printf("Writing...");
-        outfid->write_raw_buffer(data,cals);
+        outfid->write_raw_buffer(data, cals);
         printf("[done]\n");
 
         emit save_progress(first, false);
     }
 
     emit save_progress(to, true);
-
-    printf("Writing...");
-    outfid->write_raw_buffer(data,cals);
-    printf("[done]\n");
 
     outfid->finish_writing_raw();
     printf("Finished\n");
