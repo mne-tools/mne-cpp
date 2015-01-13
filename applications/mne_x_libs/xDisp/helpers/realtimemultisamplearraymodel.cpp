@@ -57,6 +57,7 @@ using namespace XDISPLIB;
 
 RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 : QAbstractTableModel(parent)
+, m_bProjActivated(false)
 , m_fSps(1024.0f)
 , m_iT(10)
 , m_iDownsampling(10)
@@ -292,17 +293,17 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
 
         bool doProj = false;
 
-        if(dsData.cols() > 0 && dsData.rows() == m_matProj.cols())
+        if(m_bProjActivated && dsData.cols() > 0 && dsData.rows() == m_matProj.cols())
             doProj = true;
 
         //SSP
-        //set bad channels to zero
-        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
-            dsData.row(m_vecBadIdcs[j]).setZero();
-
-        //Do SSP Projection
         if(doProj)
         {
+            //set bad channels to zero
+            for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
+                dsData.row(m_vecBadIdcs[j]).setZero();
+
+            //Do SSP Projection
             MatrixXd projDsData = m_matSparseProj * dsData;
             for(i = 0; i < projDsData.cols(); ++i)
                 m_dataCurrent.append(projDsData.col(i));
@@ -468,6 +469,11 @@ void RealTimeMultiSampleArrayModel::updateProjection()
     //
     if(m_pFiffInfo)
     {
+        m_bProjActivated = false;
+        for(qint32 i = 0; i < this->m_pFiffInfo->projs.size(); ++i)
+            if(this->m_pFiffInfo->projs[i].active)
+                m_bProjActivated = true;
+
         this->m_pFiffInfo->make_projector(m_matProj);
         qDebug() << "updateProjection :: New projection calculated.";
 
