@@ -419,11 +419,11 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
 
         if(abs(atom_fxc_params[4]) > abs(max_scalar_product) /*&& atom_fxc_params[0] < sample_count && atom_fxc_params[0] > 0*/ && atom_fxc_params[1] < sample_count && atom_fxc_params[1] > 0)//ToDo: find a way to make the simplex not running out of bounds
         {
-            max_scalar_product = atom_fxc_params[4];             //scalarProduct
-            gabor_Atom->scale              = atom_fxc_params[0];//scale
-            gabor_Atom->translation        = atom_fxc_params[1];//translation
-            gabor_Atom->modulation         = atom_fxc_params[2];//phase
-            gabor_Atom->phase              = atom_fxc_params[3];
+            max_scalar_product = atom_fxc_params[4];
+            gabor_Atom->scale              = atom_fxc_params[0];    //scalarProduct
+            gabor_Atom->translation        = atom_fxc_params[1];    //scale
+            gabor_Atom->modulation         = atom_fxc_params[2];    //translation
+            gabor_Atom->phase              = atom_fxc_params[3];    //phase
             gabor_Atom->max_scalar_product   = max_scalar_product;
         }
 
