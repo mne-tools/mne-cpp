@@ -204,6 +204,31 @@ public:
     static VectorXd calculate_atom(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue return_value, bool fix_phase);
 
     //=========================================================================================================
+    /**
+    * adaptiveMP_simplex_maximisation
+    *
+    * ### MP toolbox root function ###
+    *
+    * varies mp Algorithm parameters to find Optimum
+    *
+    * @param[in] simplex_it                 number of maximal iterations of simplex algorithm
+    * @param[in] simplex_reflection         simplex parameter reflection
+    * @param[in] simplex_expansion          simplex parameter expansion
+    * @param[in] simplex_contraction        simplex parameter contraction
+    * @param[in] simplex_full_contraction   simplex parameter full contraction
+    * @param[in] gabor_Atom                 atom to be optimised
+    * @param[in] max_scalar_product         figure of merit of the atom
+    * @param[in] sample_count               number of samples in the atom
+    * @param[in] fix_phase                  whether fix phase or varying
+    * @param[in] residuum                   the signalresiduun after each MP Algorithm iterationstep
+    *
+    * @return depending on returnValue returning the real atom calculated or the manipulated parameters: scale, translation, modulation, phase, scalarproduct
+    */
+    void simplex_maximisation(qint32 simplex_it, qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction,
+                              GaborAtom *gabor_Atom, qreal max_scalar_product, qint32 sample_count, bool fix_phase, MatrixXd residuum);
+
+    //=========================================================================================================
+
 
 public slots:
 
