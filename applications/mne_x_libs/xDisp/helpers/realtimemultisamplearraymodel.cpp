@@ -218,7 +218,7 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
 {
     if(p_pFiffInfo)
     {
-        RowVectorXi sel(0);
+        RowVectorXi sel = RowVectorXi(0,0);
         QStringList emptyExclude;
 
         if(p_pFiffInfo->bads.size() > 0)
@@ -490,6 +490,11 @@ void RealTimeMultiSampleArrayModel::updateProjection()
         std::vector<T> tripletList;
         tripletList.reserve(nchan);
 
+        qDebug() << "Channel names" << this->m_pFiffInfo->ch_names;
+
+        qDebug() << "Proj row names" << this->m_pFiffInfo->projs[0].data->row_names;
+
+        qDebug() << "Proj col names" << this->m_pFiffInfo->projs[0].data->col_names;
         //
         // Make proj sparse
         //
