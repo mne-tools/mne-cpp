@@ -61,6 +61,7 @@
 #include <QMap>
 #include <QtConcurrent>
 #include <qtconcurrentrun.h>
+
 #include "QtGui"
 
 //*************************************************************************************************************
@@ -415,7 +416,7 @@ void MainWindow::open_file()
 
     ui->progressBarCalc->reset();
     ui->progressBarCalc->setVisible(false);
-    ui->lb_info_content->setText("");
+    ui->lb_info_content->clear();
     ui->cb_all_select->setHidden(true);
     ui->lb_timer->setHidden(true);
     ui->actionSpeicher->setEnabled(false);
@@ -607,7 +608,7 @@ void MainWindow::read_fiff_ave_new()
     ui->tbv_Results->setRowCount(0);
     ui->actionSpeicher->setEnabled(false);
     ui->actionSpeicher_unter->setEnabled(false);
-    ui->lb_info_content->setText("");
+    ui->lb_info_content->clear();
     ui->cb_all_select->setHidden(true);
     ui->lb_timer->setHidden(true);
     ui->progressBarCalc->setHidden(true);
@@ -725,7 +726,7 @@ void MainWindow::read_fiff_file_new(QString file_name)
     ui->tbv_Results->setRowCount(0);
     ui->actionSpeicher->setEnabled(false);
     ui->actionSpeicher_unter->setEnabled(false);
-    ui->lb_info_content->setText("");
+    ui->lb_info_content->clear();
     ui->cb_all_select->setHidden(true);    
     ui->lb_timer->setHidden(true);
     ui->progressBarCalc->setHidden(true);
@@ -839,7 +840,7 @@ bool MainWindow::read_matlab_file(QString fileName)
 
     _signal_matrix = MatrixXd::Zero(_to - _from + 1, 1);
 
-    for(qint32 i = _from; i < _to; i++)
+    for(qint32 i = _from; i <= _to; i++)
     {
         qreal value = matlab_signal.at(i).toFloat(&isFloat);
         if(!isFloat)
@@ -863,9 +864,9 @@ void MainWindow::read_matlab_file_new()
     bool isFloat;
     qint32 row_number = 0;
 
-    _signal_matrix = MatrixXd::Zero(_to - _from, 1);
+    _signal_matrix = MatrixXd::Zero(_to - _from + 1, 1);
 
-    for(qint32 i = _from; i < _to; i++)
+    for(qint32 i = _from; i <= _to; i++)
     {
         qreal value = matlab_signal.at(i).toFloat(&isFloat);
         if(!isFloat)        
@@ -882,7 +883,7 @@ void MainWindow::read_matlab_file_new()
     ui->tbv_Results->setRowCount(0);
     ui->actionSpeicher->setEnabled(false);
     ui->actionSpeicher_unter->setEnabled(false);
-    ui->lb_info_content->setText("");
+    ui->lb_info_content->clear();
     ui->cb_all_select->setHidden(true);
     ui->lb_timer->setHidden(true);
     ui->progressBarCalc->setHidden(true);
@@ -1160,7 +1161,7 @@ void XAxisWindow::paint_axis(MatrixXd signalMatrix, QSize windowSize)
     if(signalMatrix.rows() > 0 && signalMatrix.cols() > 0)
     {
         qint32 borderMarginWidth = 15;
-        qreal scaleXText = (qreal)signalMatrix.rows() /  (qreal)_sample_rate / (qreal)20;                       // divide signallength
+        qreal scaleXText = (qreal)(signalMatrix.rows() - 1) /  (qreal)_sample_rate / (qreal)20;                       // divide signallength
         qreal scaleXAchse = (qreal)(windowSize.width() - 55 - borderMarginWidth) / (qreal)20;
 
         for(qint32 j = 0; j < 21; j++)
@@ -1235,6 +1236,7 @@ void MainWindow::on_btt_Calc_clicked()
         ui->lb_timer->setHidden(false);
         ui->actionExport->setEnabled(false);
         ui->lb_figure_of_merit->setHidden(true);
+        ui->lb_info_content->clear();
 
         _adaptive_atom_list.clear();
         _fix_dict_atom_list.clear();
@@ -1242,11 +1244,11 @@ void MainWindow::on_btt_Calc_clicked()
         //reset progressbar text color to black
         pal.setColor(QPalette::Text, Qt::black);
         ui->progressBarCalc->setPalette(pal);
+        ui->progressBarCalc->setFormat("residual energy: 100%            iterations: 0");
         is_white = false;
 
         is_saved = false;
         has_warning = false;
-        ui->lb_info_content->setText("");
 
         _residuum_matrix = _signal_matrix;
         _atom_sum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols());      
@@ -1838,7 +1840,7 @@ QString MainWindow::create_display_text(FixDictAtom global_best_matching)
 
             display_text = QString("Gaboratom: scale: %0 sec, translation: %1 sec, modulation: %2 Hz, phase: %3 rad")
                     .arg(QString::number(global_best_matching.gabor_atom.scale / _sample_rate, 'f', 2))
-                    .arg(QString::number(global_best_matching.translation / qreal(_sample_rate) + _from + _offset_time  / _sample_rate, 'f', 2))
+                    .arg(QString::number((global_best_matching.translation + _from) / _sample_rate + _offset_time, 'f', 2))
                     .arg(QString::number(global_best_matching.gabor_atom.modulation * _sample_rate / global_best_matching.sample_count, 'f', 2))
                     .arg(QString::number(phase, 'f', 2));
         }
@@ -1849,7 +1851,7 @@ QString MainWindow::create_display_text(FixDictAtom global_best_matching)
 
             display_text = QString("Chripatom: scale: %0 sec, translation: %1 sec, modulation: %2 Hz, phase: %3 rad, chirp: %4")
                     .arg(QString::number(global_best_matching.chirp_atom.scale  / _sample_rate, 'f', 2))
-                    .arg(QString::number(global_best_matching.translation / qreal(_sample_rate) + _from + _offset_time  / _sample_rate, 'f', 2))
+                    .arg(QString::number((global_best_matching.translation + _from) / _sample_rate + _offset_time, 'f', 2))
                     .arg(QString::number(global_best_matching.chirp_atom.modulation * _sample_rate / global_best_matching.sample_count, 'f', 2))
                     .arg(QString::number(phase, 'f', 2))
                     .arg(QString::number(global_best_matching.chirp_atom.chirp, 'f', 2));
@@ -1858,7 +1860,7 @@ QString MainWindow::create_display_text(FixDictAtom global_best_matching)
         {
             display_text = QString("%0:  transl: %1 a: %2, b: %3 c: %4, d: %5, e: %6, f: %7, g: %8, h: %9")
                     .arg(global_best_matching.atom_formula)
-                    .arg(QString::number(global_best_matching.translation,    'f', 2))
+                    .arg(QString::number((global_best_matching.translation + _from) / _sample_rate + _offset_time, 'f', 2))
                     .arg(QString::number(global_best_matching.formula_atom.a, 'f', 2))
                     .arg(QString::number(global_best_matching.formula_atom.b, 'f', 2))
                     .arg(QString::number(global_best_matching.formula_atom.c, 'f', 2))
@@ -2676,8 +2678,8 @@ bool MainWindow::sort_energie_fix(const FixDictAtom atom_1, const FixDictAtom at
 void MainWindow::on_cb_Dicts_currentIndexChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
-    ui->lb_info_content->setText("");
-    ui->lb_info_content->repaint();
+    ui->lb_info_content->clear();
+    //ui->lb_info_content->repaint();
     has_warning = false;
 }
 
@@ -2686,8 +2688,8 @@ void MainWindow::on_cb_Dicts_currentIndexChanged(const QString &arg1)
 void MainWindow::on_rb_adativMp_clicked()
 {
     ui->cb_Dicts->setEnabled(false);
-    ui->lb_info_content->setText("");
-    ui->lb_info_content->repaint();
+    ui->lb_info_content->clear();
+    //ui->lb_info_content->repaint();
     has_warning = false;
 }
 

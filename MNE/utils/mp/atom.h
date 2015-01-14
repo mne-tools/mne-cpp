@@ -147,7 +147,7 @@ public:
     qint32 id;
     QString dict_source;
     AtomType type;
-    qreal translation;
+    qreal translation; //in samples
 
     struct GaborATOM
     {

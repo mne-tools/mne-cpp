@@ -55,10 +55,14 @@ processdurationmessagebox::processdurationmessagebox(QWidget *parent):QDialog(pa
     ui->setupUi(this);
 }
 
+//*****************************************************************************************************************
+
 processdurationmessagebox::~processdurationmessagebox()
 {
     delete ui;
 }
+
+//*****************************************************************************************************************
 
 void processdurationmessagebox::on_chb_NoMessageBox_toggled(bool checked)
 {
@@ -66,10 +70,12 @@ void processdurationmessagebox::on_chb_NoMessageBox_toggled(bool checked)
    settings.setValue("show_warnings", !checked);
 }
 
+//*****************************************************************************************************************
+
 void processdurationmessagebox::on_pushButton_clicked()
 {
     setResult(1);
     hide();
 }
 
-
+//*****************************************************************************************************************
