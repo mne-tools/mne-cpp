@@ -94,6 +94,8 @@ qreal _max_neg;
 qreal _sample_rate;
 qreal _signal_maximum;
 qreal _signal_negative_scale;
+qreal _border_margin_height;
+qint32 _x_axis_height;
 
 QList<QColor> _colors;
 MatrixXd _signal_matrix;
@@ -304,20 +306,6 @@ void MainWindow::closeEvent(QCloseEvent * event)
 
 //*************************************************************************************************************************************
 
-void MainWindow::fill_dict_combobox()
-{    
-    QDir dir(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox");
-    QStringList filterList;
-    filterList.append("*.dict");
-    QFileInfoList fileList =  dir.entryInfoList(filterList);
-
-    ui->cb_Dicts->clear();
-    for(int i = 0; i < fileList.length(); i++)
-        ui->cb_Dicts->addItem(QIcon(":/images/icons/DictIcon.png"), fileList.at(i).baseName());
-}
-
-//*************************************************************************************************************************************
-
 void MainWindow::open_file()
 {
     QString temp_file_name = QFileDialog::getOpenFileName(this, "Please select signal file.", last_open_path,"(*.fif *.txt)");
@@ -425,68 +413,6 @@ void MainWindow::open_file()
     if(_signal_matrix.cols() == 0) ui->btt_Calc->setEnabled(false);
     else ui->btt_Calc->setEnabled(true);
     has_warning = false;
-
-    _new_paint = true;
-    update();
-}
-
-//*************************************************************************************************************************************
-
-void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight)
-{
-    Q_UNUSED(bottomRight);    
-
-    QStandardItem* cb_item = this->cb_items[topLeft.row()];
-    if(topLeft.row() == 0)
-    {
-        if(cb_item->checkState() == Qt::Checked)
-        {
-            for(qint32 i = 1; i < ui->cb_channels->count(); i++)
-                if(this->cb_items[i]->checkState() == Qt::Unchecked)
-                    this->cb_items[i]->setData(Qt::Checked, Qt::CheckStateRole);
-        }
-        else
-        {
-            for(qint32 i = 1; i < ui->cb_channels->count(); i++)
-                if(this->cb_items[i]->checkState() == Qt::Checked)
-                    this->cb_items[i]->setData(Qt::Unchecked, Qt::CheckStateRole);
-        }
-        return;
-    }
-
-    ui->tbv_Results->clearContents();
-    ui->tbv_Results->setRowCount(0);
-    ui->actionSpeicher->setEnabled(false);
-    ui->actionSpeicher_unter->setEnabled(false);
-    ui->actionExport->setEnabled(false);
-
-    if(cb_item->checkState() == Qt::Unchecked)
-        select_channel_map[topLeft.row() - 1] = false;
-    else if(cb_item->checkState() == Qt::Checked)
-        select_channel_map[topLeft.row() - 1] = true;
-
-    qint32 size = 0;
-    for(qint32 i = 0; i < original_signal_matrix.cols(); i++)
-        if(select_channel_map[i] == true)
-            size++;
-
-
-    _signal_matrix = MatrixXd::Zero(original_signal_matrix.rows(), size);
-    _atom_sum_matrix = MatrixXd::Zero(original_signal_matrix.rows(), size);
-    _residuum_matrix = MatrixXd::Zero(original_signal_matrix.rows(), size);
-
-    _colors.clear();
-    qint32 selected_chn = 0;
-    for(qint32 channels = 0; channels < original_signal_matrix.cols(); channels++)
-        if(select_channel_map[channels] == true)
-        {
-            _colors.append(original_colors.at(channels));
-            _signal_matrix.col(selected_chn) = original_signal_matrix.col(channels);
-            selected_chn++;
-        }
-
-    if(_signal_matrix.cols() == 0) ui->btt_Calc->setEnabled(false);
-    else ui->btt_Calc->setEnabled(true);
 
     _new_paint = true;
     update();
@@ -740,6 +666,98 @@ void MainWindow::read_fiff_file_new(QString file_name)
 
 //*************************************************************************************************************************************
 
+// ToDo: change samplerate --> update times (_from _to)
+bool MainWindow::read_matlab_file(QString fileName)
+{
+    QFile file(fileName);
+    file.open(QIODevice::ReadOnly);
+
+    QTextStream stream(&file);
+    bool isFloat;
+    qint32 row_number = 0;
+
+    matlab_signal = stream.readAll().split('\n', QString::SkipEmptyParts);
+    _first_sample = 0;
+    _last_sample = matlab_signal.length() - 1;
+
+    _from = _first_sample;
+    if(_from + 511 <= _last_sample)
+        _to = _from + 511;
+    else
+        _to = _last_sample;
+
+    _signal_matrix = MatrixXd::Zero(_to - _from + 1, 1);
+
+    for(qint32 i = _from; i <= _to; i++)
+    {
+        qreal value = matlab_signal.at(i).toFloat(&isFloat);
+        if(!isFloat)
+        {
+             _signal_matrix = MatrixXd::Zero(0, 0);
+            QMessageBox::critical(this, "error", QString("error reading matlab file. Could not read line %1 from file %2.").arg(i).arg(fileName));
+            return false;
+        }
+        _signal_matrix(row_number, 0) = value;
+        row_number++;
+    }
+    file.close();
+
+    return true;
+}
+
+//*************************************************************************************************************************************
+
+void MainWindow::read_matlab_file_new()
+{
+    bool isFloat;
+    qint32 row_number = 0;
+
+    _signal_matrix = MatrixXd::Zero(_to - _from + 1, 1);
+
+    for(qint32 i = _from; i <= _to; i++)
+    {
+        qreal value = matlab_signal.at(i).toFloat(&isFloat);
+        if(!isFloat)        
+             _signal_matrix = MatrixXd::Zero(0, 0);
+
+        _signal_matrix(row_number, 0) = value;
+        row_number++;
+    }
+
+    _atom_sum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
+    _residuum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
+
+    ui->tbv_Results->clearContents();
+    ui->tbv_Results->setRowCount(0);
+    ui->actionSpeicher->setEnabled(false);
+    ui->actionSpeicher_unter->setEnabled(false);
+    ui->lb_info_content->clear();
+    ui->cb_all_select->setHidden(true);
+    ui->lb_timer->setHidden(true);
+    ui->progressBarCalc->setHidden(true);
+    ui->actionExport->setEnabled(false);
+    ui->lb_figure_of_merit->setHidden(true);
+
+    has_warning = false;
+    _new_paint = true;
+    update();
+}
+//*************************************************************************************************************************************
+
+void MainWindow::fill_dict_combobox()
+{
+    QDir dir(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox");
+    QStringList filterList;
+    filterList.append("*.dict");
+    QFileInfoList fileList =  dir.entryInfoList(filterList);
+
+    ui->cb_Dicts->clear();
+    for(int i = 0; i < fileList.length(); i++)
+        ui->cb_Dicts->addItem(QIcon(":/images/icons/DictIcon.png"), fileList.at(i).baseName());
+}
+
+//*************************************************************************************************************************************
+
 void MainWindow::fill_channel_combobox()
 {
     //select all channels item
@@ -818,83 +836,65 @@ void MainWindow::fill_channel_combobox()
 
 //*************************************************************************************************************************************
 
-// ToDo: change samplerate --> update times (_from _to)
-bool MainWindow::read_matlab_file(QString fileName)
+void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
-    QFile file(fileName);
-    file.open(QIODevice::ReadOnly);
+    Q_UNUSED(bottomRight);
 
-    QTextStream stream(&file);
-    bool isFloat;
-    qint32 row_number = 0;
-
-    matlab_signal = stream.readAll().split('\n', QString::SkipEmptyParts);
-    _first_sample = 0;
-    _last_sample = matlab_signal.length() - 1;
-
-    _from = _first_sample;
-    if(_from + 511 <= _last_sample)
-        _to = _from + 511;
-    else
-        _to = _last_sample;
-
-    _signal_matrix = MatrixXd::Zero(_to - _from + 1, 1);
-
-    for(qint32 i = _from; i <= _to; i++)
+    QStandardItem* cb_item = this->cb_items[topLeft.row()];
+    if(topLeft.row() == 0)
     {
-        qreal value = matlab_signal.at(i).toFloat(&isFloat);
-        if(!isFloat)
+        if(cb_item->checkState() == Qt::Checked)
         {
-             _signal_matrix = MatrixXd::Zero(0, 0);
-            QMessageBox::critical(this, "error", QString("error reading matlab file. Could not read line %1 from file %2.").arg(i).arg(fileName));
-            return false;
+            for(qint32 i = 1; i < ui->cb_channels->count(); i++)
+                if(this->cb_items[i]->checkState() == Qt::Unchecked)
+                    this->cb_items[i]->setData(Qt::Checked, Qt::CheckStateRole);
         }
-        _signal_matrix(row_number, 0) = value;
-        row_number++;
+        else
+        {
+            for(qint32 i = 1; i < ui->cb_channels->count(); i++)
+                if(this->cb_items[i]->checkState() == Qt::Checked)
+                    this->cb_items[i]->setData(Qt::Unchecked, Qt::CheckStateRole);
+        }
+        return;
     }
-    file.close();
-
-    return true;
-}
-
-//*************************************************************************************************************************************
-
-void MainWindow::read_matlab_file_new()
-{
-    bool isFloat;
-    qint32 row_number = 0;
-
-    _signal_matrix = MatrixXd::Zero(_to - _from + 1, 1);
-
-    for(qint32 i = _from; i <= _to; i++)
-    {
-        qreal value = matlab_signal.at(i).toFloat(&isFloat);
-        if(!isFloat)        
-             _signal_matrix = MatrixXd::Zero(0, 0);
-
-        _signal_matrix(row_number, 0) = value;
-        row_number++;
-    }
-
-    _atom_sum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
-    _residuum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
 
     ui->tbv_Results->clearContents();
     ui->tbv_Results->setRowCount(0);
     ui->actionSpeicher->setEnabled(false);
     ui->actionSpeicher_unter->setEnabled(false);
-    ui->lb_info_content->clear();
-    ui->cb_all_select->setHidden(true);
-    ui->lb_timer->setHidden(true);
-    ui->progressBarCalc->setHidden(true);
     ui->actionExport->setEnabled(false);
-    ui->lb_figure_of_merit->setHidden(true);
 
-    has_warning = false;
+    if(cb_item->checkState() == Qt::Unchecked)
+        select_channel_map[topLeft.row() - 1] = false;
+    else if(cb_item->checkState() == Qt::Checked)
+        select_channel_map[topLeft.row() - 1] = true;
+
+    qint32 size = 0;
+    for(qint32 i = 0; i < original_signal_matrix.cols(); i++)
+        if(select_channel_map[i] == true)
+            size++;
+
+
+    _signal_matrix = MatrixXd::Zero(original_signal_matrix.rows(), size);
+    _atom_sum_matrix = MatrixXd::Zero(original_signal_matrix.rows(), size);
+    _residuum_matrix = MatrixXd::Zero(original_signal_matrix.rows(), size);
+
+    _colors.clear();
+    qint32 selected_chn = 0;
+    for(qint32 channels = 0; channels < original_signal_matrix.cols(); channels++)
+        if(select_channel_map[channels] == true)
+        {
+            _colors.append(original_colors.at(channels));
+            _signal_matrix.col(selected_chn) = original_signal_matrix.col(channels);
+            selected_chn++;
+        }
+
+    if(_signal_matrix.cols() == 0) ui->btt_Calc->setEnabled(false);
+    else ui->btt_Calc->setEnabled(true);
+
     _new_paint = true;
     update();
 }
-
 
 //*************************************************************************************************************************************
 
@@ -916,12 +916,13 @@ void GraphWindow::paint_signal(MatrixXd signalMatrix, QSize windowSize)
 
     if(signalMatrix.rows() > 0 && signalMatrix.cols() > 0)
     {
-        qint32 maxStrLenght = 55;           // max lenght in pixel of x-axis string
-        qint32 borderMarginHeigth = 15;     // reduce paintspace in GraphWindow of borderMargin pixels
-        qint32 borderMarginWidth = 15;      // reduce paintspace in GraphWindow of borderMargin pixels
-        qreal maxPos = 0.0;                 // highest signalvalue
-        qreal maxNeg = 0.0;                 // smalest signalvalue
-        qreal maxmax = 0.0;                 // absolute difference maxpos - maxneg
+        qint32 maxStrLenght = 55;                                  // max lenght in pixel of x-axis string
+        qint32 borderMarginHeigth = 5 + windowSize.height() / 10;  // adapt bordermargin to avoid painting out of range
+        _border_margin_height = borderMarginHeigth;
+        qint32 borderMarginWidth = 15;                             // reduce paintspace in GraphWindow of borderMargin pixels
+        qreal maxPos = 0.0;                                        // highest signalvalue
+        qreal maxNeg = 0.0;                                        // smalest signalvalue
+        qreal maxmax = 0.0;                                        // absolute difference maxpos - maxneg
 
         qreal scaleYText = 0.0;
         qint32 negScale  = 0;
@@ -947,6 +948,7 @@ void GraphWindow::paint_signal(MatrixXd signalMatrix, QSize windowSize)
         if(_max_pos <= 0) negScale = -10;
         _signal_negative_scale = negScale;  // to globe _signal_negative_scale
 
+
         // scale signal
         qreal scaleX = ((qreal)(windowSize.width() - maxStrLenght - borderMarginWidth))/ (qreal)signalMatrix.rows();
         qreal scaleY = (qreal)(windowSize.height() - borderMarginHeigth) / _signal_maximum;
@@ -959,6 +961,7 @@ void GraphWindow::paint_signal(MatrixXd signalMatrix, QSize windowSize)
         {
             if(negScale == 0)                                                       // x-Axis reached (y-value = 0)
             {
+
                 // append scaled signalpoints
                 for(qint32 channel = 0; channel < signalMatrix.cols(); channel++)   // over all Channels
                 {
@@ -967,7 +970,7 @@ void GraphWindow::paint_signal(MatrixXd signalMatrix, QSize windowSize)
                         poly.append(QPointF((h * scaleX) + maxStrLenght,  -((signalMatrix(h, channel) * scaleY + ((i - 1) * scaleYAchse) - (windowSize.height()) + borderMarginHeigth / 2))));
                     QPen pen(_colors.at(channel), 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
                     painter.setPen(pen);
-                    painter.drawPolyline(poly);
+                    painter.drawPolyline(poly);                    
                 }
                 // paint x-axis
                 for(qint32 j = 1; j < 21; j++)
@@ -982,6 +985,8 @@ void GraphWindow::paint_signal(MatrixXd signalMatrix, QSize windowSize)
                     painter.setPen(pen);
                     painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - 2)), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + 2)));   // scalelines
                 }
+
+                _x_axis_height = -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2);// position of x axis in height
                 painter.drawLine(maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), windowSize.width()-5, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));
             }
             painter.drawText(3, -((i - 1) * scaleYAchse - windowSize.height()) - borderMarginHeigth/2 + 4, QString::number(negScale * scaleYText, 'g', 3));     // paint scalevalue y-axis
@@ -1015,8 +1020,8 @@ void AtomSumWindow::paint_atom_sum(MatrixXd atom_matrix, QSize windowSize, qreal
     if(atom_matrix.rows() > 0 && atom_matrix.cols() > 0  && _signal_matrix.rows() > 0 && _signal_matrix.cols() > 0)
     {
         qint32 maxStrLenght = 55;
-        qint32 borderMarginHeigth = 15;                     // reduce paintspace in GraphWindow of borderMargin pixels
-        qint32 borderMarginWidth = 15;                      // reduce paintspace in GraphWindow of borderMargin pixels
+        qint32 borderMarginHeigth = 5 + windowSize.height() / 10;  // adapt bordermargin to avoid painting out of range
+        qint32 borderMarginWidth = 15;                             // reduce paintspace in GraphWindow of borderMargin pixels
 
         // scale axis title
         qreal scaleYText = (qreal)signalMaximum / (qreal)10;
@@ -1089,8 +1094,8 @@ void ResiduumWindow::paint_residuum(MatrixXd residuum_matrix, QSize windowSize, 
     if(residuum_matrix.rows() > 0 && residuum_matrix.cols() > 0 && _signal_matrix.rows() > 0 && _signal_matrix.cols() > 0)
     {
         qint32 maxStrLenght = 55;
-        qint32 borderMarginHeigth = 15;                 // reduce paintspace in GraphWindow of borderMargin pixels
-        qint32 borderMarginWidth = 15;                  // reduce paintspace in GraphWindow of borderMargin pixels
+        qint32 borderMarginHeigth = 5 + windowSize.height() / 10;  // adapt bordermargin to avoid painting out of range
+        qint32 borderMarginWidth = 15;                             // reduce paintspace in GraphWindow of borderMargin pixels
 
         // scale axis title
         qreal scaleYText = (qreal)signalMaximum / (qreal)10;
@@ -2109,6 +2114,8 @@ void MainWindow::on_dsb_to_valueChanged(double arg1)
 
 void MainWindow::on_sb_sample_count_valueChanged(int arg1)
 {
+    ui->sb_sample_count->setToolTip(QString("epoch: %1 sec").arg((arg1) / _sample_rate));
+
     if(read_fiff_changed) return;
 
     read_fiff_changed = true;
@@ -2124,7 +2131,6 @@ void MainWindow::on_sb_sample_count_valueChanged(int arg1)
     ui->dsb_to->setValue(_to / _sample_rate + _offset_time);
     read_fiff_changed = false;
 
-    ui->sb_sample_count->setToolTip(QString("epoch: %1 sec").arg((_samplecount) / _sample_rate));
 }
 
 //*****************************************************************************************************************
@@ -2731,11 +2737,18 @@ void GraphWindow::mouseMoveEvent(QMouseEvent *event)
 {
    if(_to - _from != 0)
    {
-       qint32 temp_pos = mapFromGlobal(QCursor::pos()).x() - 55;
+       qint32 temp_pos_x = mapFromGlobal(QCursor::pos()).x() - 55;
+       qreal stretch_factor_y = ((this->height()) - _border_margin_height - 1) / _signal_maximum;
+       qreal temp_pos_y  =  ((this->height() - mapFromGlobal(QCursor::pos()).y())) / stretch_factor_y - (qreal(this->height()) - _x_axis_height) / stretch_factor_y;//+ floor(_max_neg) + 0.5;
+
        qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_to -_from);
-       qreal time = (qreal)_from / _sample_rate + _offset_time + (qreal)temp_pos / stretch_factor / _sample_rate;
+       qreal time = (qreal)_from / _sample_rate + _offset_time + (qreal)temp_pos_x / stretch_factor / _sample_rate;
+
+
        if(mapFromGlobal(QCursor::pos()).x() >= 55 && mapFromGlobal(QCursor::pos()).x() <= (this->width() - 15))
-           this->setToolTip(QString("time: %1 sec").arg(time));
+           this->setToolTip(QString("time: %1 sec\nampl: %2").arg(time)
+                                                             .arg(QString::number(temp_pos_y)));
+
        if(event->buttons() == Qt::LeftButton)
                setCursor(Qt::ClosedHandCursor);
        else
@@ -2754,7 +2767,8 @@ void AtomSumWindow::mouseMoveEvent(QMouseEvent *event)
         qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_samplecount);
         qreal time = (qreal)_from / _sample_rate + _offset_time + (qreal)temp_pos / stretch_factor / _sample_rate;
         if(mapFromGlobal(QCursor::pos()).x() >= 55 && mapFromGlobal(QCursor::pos()).x() <= (this->width() - 15))
-            this->setToolTip(QString("time: %1 sec").arg(time));
+            this->setToolTip(QString("time: %1 sec\nampl: %2").arg(time)
+                                                              .arg(QString::number(mapFromGlobal(QCursor::pos()).x())));
        setCursor(Qt::CrossCursor);
    }
 }
@@ -2766,11 +2780,16 @@ void ResiduumWindow::mouseMoveEvent(QMouseEvent *event)
     Q_UNUSED(event);
     if(_to - _from != 0)
     {
-        qint32 temp_pos = mapFromGlobal(QCursor::pos()).x() - 55;
+        qreal scaleY = (this->height() - 15 /*borderMarginHeigth*/) * _max_neg / _signal_maximum;
+        qint32 temp_pos_x = mapFromGlobal(QCursor::pos()).x() - 55;
+        qreal temp_pos_y =  (this->height() - mapFromGlobal(QCursor::pos()).y()) / _max_neg;
+        //qreal temp_pos_y =  (this->height() - (mapFromGlobal(QCursor::pos()).y())) / _signal_maximum;// + scaleY);//- 15) / _signal_maximum;// + _signal_negative_scale;
         qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_samplecount);
-        qreal time = (qreal)_from / _sample_rate + _offset_time+ (qreal)temp_pos / stretch_factor / _sample_rate;
+        qreal time = (qreal)_from / _sample_rate + _offset_time+ (qreal)temp_pos_x / stretch_factor / _sample_rate;
+        qreal amplitude = 0;
         if(mapFromGlobal(QCursor::pos()).x() >= 55 && mapFromGlobal(QCursor::pos()).x() <= (this->width() - 15))
-            this->setToolTip(QString("time: %1 sec").arg(time));
+            this->setToolTip(QString("time: %1 sec\nampl: %2").arg(time)
+                                                              .arg(QString::number(temp_pos_y)));
 
         setCursor(Qt::CrossCursor);
     }
