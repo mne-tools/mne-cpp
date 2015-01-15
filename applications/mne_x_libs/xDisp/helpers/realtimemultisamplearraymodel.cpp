@@ -218,10 +218,12 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
 {
     if(p_pFiffInfo)
     {
-        RowVectorXi sel;
+        RowVectorXi sel = RowVectorXi(0,0);
         QStringList emptyExclude;
 
-        sel = FiffInfoBase::pick_channels(p_pFiffInfo->ch_names, p_pFiffInfo->bads, emptyExclude);
+        if(p_pFiffInfo->bads.size() > 0)
+            sel = FiffInfoBase::pick_channels(p_pFiffInfo->ch_names, p_pFiffInfo->bads, emptyExclude);
+
         m_vecBadIdcs = sel;
 
         this->m_pFiffInfo = p_pFiffInfo;
@@ -476,6 +478,10 @@ void RealTimeMultiSampleArrayModel::updateProjection()
 
         this->m_pFiffInfo->make_projector(m_matProj);
         qDebug() << "updateProjection :: New projection calculated.";
+
+//        std::cout << "Bads\n" << m_vecBadIdcs << std::endl;
+//        std::cout << "Proj\n";
+//        std::cout << m_matProj.block(0,0,10,10) << std::endl;
 
         qint32 nchan = this->m_pFiffInfo->nchan;
         qint32 i, k;
