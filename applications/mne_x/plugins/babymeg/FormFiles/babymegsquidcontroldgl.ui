@@ -82,6 +82,9 @@ background-color:rgb(216, 216, 216);</string>
            <layout class="QGridLayout" name="gridLayout_3">
             <item row="0" column="3">
              <widget class="QPushButton" name="m_Qbn_mirco_reset">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>MicroReset</string>
               </property>
@@ -89,6 +92,9 @@ background-color:rgb(216, 216, 216);</string>
             </item>
             <item row="0" column="2">
              <widget class="QPushButton" name="m_Qbn_int_reset">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>Integrator Reset</string>
               </property>
