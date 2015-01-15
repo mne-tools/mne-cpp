@@ -490,11 +490,6 @@ void RealTimeMultiSampleArrayModel::updateProjection()
         std::vector<T> tripletList;
         tripletList.reserve(nchan);
 
-        qDebug() << "Channel names" << this->m_pFiffInfo->ch_names;
-
-        qDebug() << "Proj row names" << this->m_pFiffInfo->projs[0].data->row_names;
-
-        qDebug() << "Proj col names" << this->m_pFiffInfo->projs[0].data->col_names;
         //
         // Make proj sparse
         //
