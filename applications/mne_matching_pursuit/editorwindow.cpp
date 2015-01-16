@@ -71,6 +71,7 @@ using namespace UTILSLIB;
 
 bool allCombined = false;
 bool is_loading =  false;
+bool is_expanded = false;
 
 qreal linStepWidthScale = 1;
 qreal linStepWidthModu = 1;
@@ -99,6 +100,7 @@ QList<qreal> moduList;
 QList<qreal> phaseList;
 QList<qreal> chirpList;
 
+qint32 old_width = 0;
 qint32 atomCount = 1;
 
 EditorWindow::AtomType atomType;
@@ -115,7 +117,7 @@ EditorWindow::EditorWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::Ed
     ui->setupUi(this);
     QSettings settings;
     move(settings.value("pos_editor", QPoint(200, 200)).toPoint());
-    resize(settings.value("size_editor", QSize(606, 948)).toSize());
+    //resize(settings.value("size_editor", QSize(606, 948)).toSize());
     this->restoreState(settings.value("editor_state").toByteArray());
     ui->dspb_StartValuePhase->setMaximum(ui->dspb_EndValueScale->value());
     ui->dspb_EndValuePhase->setMaximum(ui->spb_AtomLength->value());
@@ -126,6 +128,7 @@ EditorWindow::EditorWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::Ed
 
     ui->dspb_StartValueScale->setMaximum(ui->spb_AtomLength->value());    
     read_dicts();
+    old_width = this->width();
 }
 
 //*************************************************************************************************************
@@ -1741,4 +1744,43 @@ void EditorWindow::keyReleaseEvent(QKeyEvent *event)
 void EditorWindow::on_save_dicts()
 {
     read_dicts();
+}
+
+
+void EditorWindow::on_pushButton_clicked()
+{
+    QPropertyAnimation *animation = new QPropertyAnimation(this, "size");
+    connect(animation, SIGNAL(finished()), this, SLOT(animation_finished()));
+    if(old_width == this->width())
+    {
+        is_expanded = true;
+        animation->setDuration(1000);
+        animation->setStartValue(QSize(this->size().width(), this->size().height()));
+        animation->setEndValue(QSize(this->size().width() + 200,  this->size().height()));
+        animation->start();
+    }
+    else
+    {
+        is_expanded = false;
+        animation->setDuration(1000);
+        animation->setStartValue(QSize(this->size().width(), this->size().height()));
+        animation->setEndValue(QSize(this->size().width() - 200,  this->size().height()));
+        animation->start();
+    }
+}
+
+void EditorWindow::animation_finished()
+{
+    if(old_width == this->width())
+        ui->pushButton->setText(">");
+    else
+        ui->pushButton->setText("<");
+}
+void EditorWindow::resizeEvent(QResizeEvent *event)
+{
+    if(!is_expanded)
+        old_width = this->size().width();
+
+    if(this->size().width() < 650 || this->size().height() < 968)
+        resize(650,968);
 }
