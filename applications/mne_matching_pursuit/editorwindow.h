@@ -413,6 +413,9 @@ private slots:
     void on_btt_SaveDicts_clicked();
     void on_save_dicts();
 
+    void on_pushButton_clicked();
+    void animation_finished();
+
 signals:
     void dict_saved();
 
@@ -420,6 +423,7 @@ signals:
 private:    
     Ui::EditorWindow *ui;
     void closeEvent(QCloseEvent * event);
+    void resizeEvent(QResizeEvent *event);
 
 protected:
     void keyReleaseEvent(QKeyEvent *event);
