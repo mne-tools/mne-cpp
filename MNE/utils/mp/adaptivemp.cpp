@@ -220,9 +220,6 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
         std::cout << "      after comparison to NoEnvelope " << ":\n"<< "scale: " << gabor_Atom->scale << " trans: " << gabor_Atom->translation <<
                      " modu: " << gabor_Atom->modulation << " phase: " << gabor_Atom->phase << " sclr_prdct: " << gabor_Atom->max_scalar_product << "\n\n";
 
-        //Maximisation Simplex Algorithm implemented by Botao Jia, adapted to the MP Algorithm by Martin Henfling. Copyright (C) 2010 Botao Jia
-        //todo change to clean use of EIGEN, @present its mixed with Namespace std and <vector>
-
         //simplexfunction to find minimum of target among parameters s, p, k
         simplex_maximisation(simplex_it, simplex_reflection, simplex_expansion, simplex_contraction, simplex_full_contraction,
                              gabor_Atom, max_scalar_product, sample_count, fix_phase, residuum);
@@ -353,6 +350,8 @@ VectorXd AdaptiveMp::calculate_atom(qint32 sample_count, qreal scale, qint32 tra
 void AdaptiveMp::simplex_maximisation(qint32 simplex_it, qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction,
                                       GaborAtom *gabor_Atom, qreal max_scalar_product, qint32 sample_count, bool fix_phase, MatrixXd residuum)
 {
+    //Maximisation Simplex Algorithm implemented by Botao Jia, adapted to the MP Algorithm by Martin Henfling. Copyright (C) 2010 Botao Jia
+    //todo change to clean use of EIGEN, @present its mixed with Namespace std and <vector>
     qint32 chn = 0;
     std::vector<double> init;
 

@@ -571,6 +571,8 @@ private:
     fiff_int_t last_from;
     qint32 last_sample_count;
     qreal residuum_energy;
+    qreal signal_energy;
+    qreal composed_energy;
     qint32 recieved_result_counter;
     qint32 max_tbv_header_width;
     QString save_path;

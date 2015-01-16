@@ -316,7 +316,7 @@ void MainWindow::open_file()
     for(qint32 i = 0; i < string_list.length() - 1; i++)
         last_open_path += string_list.at(i) + '/';
     file_name = temp_file_name;
-     this->cb_model->clear();
+    this->cb_model->clear();
     this->cb_items.clear();
 
     this->setWindowTitle(string_list.last().append(" - Matching-Pursuit-Toolbox"));//show current file in header of mainwindow
@@ -359,8 +359,7 @@ void MainWindow::open_file()
             this->setWindowTitle("Matching-Pursuit-Toolbox");
             return;
         }
-        // ToDo: change samplerate
-        //ui->dsb_sample_rate->setEnabled(false);
+
         ui->dsb_sample_rate->setEnabled(true);
     }
 
@@ -404,6 +403,12 @@ void MainWindow::open_file()
 
     ui->progressBarCalc->reset();
     ui->progressBarCalc->setVisible(false);
+    ui->lb_signal_energy->clear();
+    ui->lb_approx_energy->clear();
+    ui->lb_residual_energy->clear();
+    ui->lb_signal_energy_text->clear();
+    ui->lb_approx_energy_text->clear();
+    ui->lb_residual_energy_text->clear();
     ui->lb_info_content->clear();
     ui->cb_all_select->setHidden(true);
     ui->lb_timer->setHidden(true);
@@ -540,6 +545,12 @@ void MainWindow::read_fiff_ave_new()
     ui->progressBarCalc->setHidden(true);
     ui->actionExport->setEnabled(false);
     ui->lb_figure_of_merit->setHidden(true);
+    ui->lb_signal_energy->clear();
+    ui->lb_approx_energy->clear();
+    ui->lb_residual_energy->clear();
+    ui->lb_signal_energy_text->clear();
+    ui->lb_approx_energy_text->clear();
+    ui->lb_residual_energy_text->clear();
 
     has_warning = false;
     _new_paint = true;
@@ -658,6 +669,12 @@ void MainWindow::read_fiff_file_new(QString file_name)
     ui->progressBarCalc->setHidden(true);
     ui->actionExport->setEnabled(false);
     ui->lb_figure_of_merit->setHidden(true);
+    ui->lb_signal_energy->clear();
+    ui->lb_approx_energy->clear();
+    ui->lb_residual_energy->clear();
+    ui->lb_signal_energy_text->clear();
+    ui->lb_approx_energy_text->clear();
+    ui->lb_residual_energy_text->clear();
 
     has_warning = false;
     _new_paint = true;
@@ -666,7 +683,6 @@ void MainWindow::read_fiff_file_new(QString file_name)
 
 //*************************************************************************************************************************************
 
-// ToDo: change samplerate --> update times (_from _to)
 bool MainWindow::read_matlab_file(QString fileName)
 {
     QFile file(fileName);
@@ -701,6 +717,9 @@ bool MainWindow::read_matlab_file(QString fileName)
         row_number++;
     }
     file.close();
+
+    _sample_rate = 1;
+    ui->dsb_sample_rate->setValue(_sample_rate);
 
     return true;
 }
@@ -737,6 +756,12 @@ void MainWindow::read_matlab_file_new()
     ui->progressBarCalc->setHidden(true);
     ui->actionExport->setEnabled(false);
     ui->lb_figure_of_merit->setHidden(true);
+    ui->lb_signal_energy->clear();
+    ui->lb_approx_energy->clear();
+    ui->lb_residual_energy->clear();
+    ui->lb_signal_energy_text->clear();
+    ui->lb_approx_energy_text->clear();
+    ui->lb_residual_energy_text->clear();
 
     has_warning = false;
     _new_paint = true;
@@ -916,22 +941,22 @@ void GraphWindow::paint_signal(MatrixXd signalMatrix, QSize windowSize)
 
     if(signalMatrix.rows() > 0 && signalMatrix.cols() > 0)
     {
-        qint32 maxStrLenght = 55;                                  // max lenght in pixel of x-axis string
-        qint32 borderMarginHeigth = 5 + windowSize.height() / 10;  // adapt bordermargin to avoid painting out of range
-        _border_margin_height = borderMarginHeigth;
-        qint32 borderMarginWidth = 15;                             // reduce paintspace in GraphWindow of borderMargin pixels
-        qreal maxPos = 0.0;                                        // highest signalvalue
-        qreal maxNeg = 0.0;                                        // smalest signalvalue
-        qreal maxmax = 0.0;                                        // absolute difference maxpos - maxneg
-
+        const qint32 maxStrLenght = 55; // max lenght in pixel of x-axis string
+        qint32 borderMarginWidth = 15;  // reduce paintspace in GraphWindow of borderMargin pixels
+        qreal maxPos = 0.0;             // highest signalvalue
+        qreal maxNeg = 0.0;             // smalest signalvalue
+        qreal maxmax = 0.0;             // absolute difference maxpos - maxneg
         qreal scaleYText = 0.0;
         qint32 negScale  = 0;
+
+        _border_margin_height = 5 + windowSize.height() / 10;     // adapt bordermargin to avoid painting out of range
+
         if(_new_paint)
         {
             maxPos = signalMatrix.maxCoeff();
             maxNeg = signalMatrix.minCoeff();
 
-            // absolute signalheight to globe
+            // absolute signalheight
             if(maxNeg <= 0) maxmax = maxPos - maxNeg;
             else  maxmax = maxPos + maxNeg;
 
@@ -941,59 +966,63 @@ void GraphWindow::paint_signal(MatrixXd signalMatrix, QSize windowSize)
             _new_paint = false;
         }
 
-        // scale axis title
+        // scale axis text
         scaleYText = _signal_maximum / 10.0;
-        if(_max_neg < 0)
-            negScale = floor((_max_neg * 10 / _signal_maximum) + 0.5);
+
+        if(_max_neg < 0)  negScale = floor((_max_neg * 10 / _signal_maximum) + 0.5);
         if(_max_pos <= 0) negScale = -10;
         _signal_negative_scale = negScale;  // to globe _signal_negative_scale
 
-
         // scale signal
-        qreal scaleX = ((qreal)(windowSize.width() - maxStrLenght - borderMarginWidth))/ (qreal)signalMatrix.rows();
-        qreal scaleY = (qreal)(windowSize.height() - borderMarginHeigth) / _signal_maximum;
+        qreal scaleX = (windowSize.width() - maxStrLenght - borderMarginWidth) / qreal(signalMatrix.rows() - 1);
+        qreal scaleY = (windowSize.height() - _border_margin_height) / _signal_maximum;
 
         //scale axis
-        qreal scaleXAchse = (qreal)(windowSize.width() - maxStrLenght - borderMarginWidth) / (qreal)20;
-        qreal scaleYAchse = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)10;
+        qreal scaleXAchse = (windowSize.width() - maxStrLenght - borderMarginWidth) / 20.0;
+        qreal scaleYAchse = (windowSize.height() - _border_margin_height) / 10.0;
 
-        for(qint32 i = 1; i <= 11; i++)
+        for(qint32 i = 0; i < 11; i++)
         {
-            if(negScale == 0)                                                       // x-Axis reached (y-value = 0)
+            if(negScale == 0)   // x-Axis reached (y-value = 0)
             {
+                _x_axis_height = i * scaleYAchse - windowSize.height() + _border_margin_height / 2;   // position of x axis in height
 
-                // append scaled signalpoints
+                // append scaled signalpoints and paint signal
                 for(qint32 channel = 0; channel < signalMatrix.cols(); channel++)   // over all Channels
                 {
                     QPolygonF poly;
                     for(qint32 h = 0; h < signalMatrix.rows(); h++)
-                        poly.append(QPointF((h * scaleX) + maxStrLenght,  -((signalMatrix(h, channel) * scaleY + ((i - 1) * scaleYAchse) - (windowSize.height()) + borderMarginHeigth / 2))));
+                        poly.append(QPointF((h * scaleX) + maxStrLenght, -(signalMatrix(h, channel) * scaleY + _x_axis_height)));
                     QPen pen(_colors.at(channel), 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
                     painter.setPen(pen);
                     painter.drawPolyline(poly);                    
                 }
+
                 // paint x-axis
                 for(qint32 j = 1; j < 21; j++)
                 {
-                    if(fmod(j, 4.0) == 0)
+                    if(fmod(j, 4.0) == 0)   //draw light grey sectors
                     {
                         QPen pen(Qt::darkGray, 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
                         painter.setPen(pen);
-                        painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - windowSize.height())), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + windowSize.height())));   // scalelines
+                        painter.drawLine(j * scaleXAchse + maxStrLenght, -(_x_axis_height - windowSize.height()),
+                                         j * scaleXAchse + maxStrLenght , -(_x_axis_height + windowSize.height()));   // scalelines x-axis
                     }
                     QPen pen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
                     painter.setPen(pen);
-                    painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - 2)), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + 2)));   // scalelines
+                    painter.drawLine(j * scaleXAchse + maxStrLenght, -(_x_axis_height - 2),
+                                     j * scaleXAchse + maxStrLenght , -(_x_axis_height + 2));   // scalelines x-axis
                 }
-
-                _x_axis_height = -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2);// position of x axis in height
-                painter.drawLine(maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), windowSize.width()-5, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));
+                painter.drawLine(maxStrLenght - 40, -_x_axis_height, windowSize.width()-5, -_x_axis_height);    // paint x-axis
             }
-            painter.drawText(3, -((i - 1) * scaleYAchse - windowSize.height()) - borderMarginHeigth/2 + 4, QString::number(negScale * scaleYText, 'g', 3));     // paint scalevalue y-axis
-            painter.drawLine(maxStrLenght - 2, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), maxStrLenght + 2, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));  // scalelines y-axis
+            painter.drawText(3, -(i * scaleYAchse - windowSize.height()) - _border_margin_height / 2 + 4, QString::number(negScale * scaleYText, 'g', 3));     // paint scalevalue y-axis
+
+            painter.drawLine(maxStrLenght - 2, -((i * scaleYAchse)-(windowSize.height()) + _border_margin_height / 2),
+                             maxStrLenght + 2, -((i * scaleYAchse)-(windowSize.height()) + _border_margin_height / 2));  // scalelines y-axis
+
             negScale++;
         }
-        painter.drawLine(maxStrLenght, 2, maxStrLenght, windowSize.height() - 2);     // paint y-axis       
+        painter.drawLine(maxStrLenght, 2, maxStrLenght, windowSize.height() - 2);     // paint y-axis
     }
     painter.end();    
 }
@@ -1019,31 +1048,30 @@ void AtomSumWindow::paint_atom_sum(MatrixXd atom_matrix, QSize windowSize, qreal
     // can also checked of zerovector, then you paint no empty axis
     if(atom_matrix.rows() > 0 && atom_matrix.cols() > 0  && _signal_matrix.rows() > 0 && _signal_matrix.cols() > 0)
     {
-        qint32 maxStrLenght = 55;
-        qint32 borderMarginHeigth = 5 + windowSize.height() / 10;  // adapt bordermargin to avoid painting out of range
-        qint32 borderMarginWidth = 15;                             // reduce paintspace in GraphWindow of borderMargin pixels
+        const qint32 maxStrLenght = 55;
+        qint32 borderMarginWidth = 15;  // reduce paintspace in GraphWindow of borderMargin pixels
 
         // scale axis title
-        qreal scaleYText = (qreal)signalMaximum / (qreal)10;
+        qreal scaleYText = signalMaximum / 10.0;
 
         // scale signal
-        qreal scaleX = ((qreal)(windowSize.width() - maxStrLenght - borderMarginWidth)) / (qreal)atom_matrix.rows();
-        qreal scaleY = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)signalMaximum;
+        qreal scaleX = (windowSize.width() - maxStrLenght - borderMarginWidth) / qreal(atom_matrix.rows() - 1);
+        qreal scaleY = (windowSize.height() - _border_margin_height) / signalMaximum;
 
         //scale axis
-        qreal scaleXAchse = (qreal)(windowSize.width() - maxStrLenght - borderMarginWidth) / (qreal)20;
-        qreal scaleYAchse = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)10;     
+        qreal scaleXAchse = (windowSize.width() - maxStrLenght - borderMarginWidth) / 20.0;
+        qreal scaleYAchse = (windowSize.height() - _border_margin_height) / 10.0;
 
-        for(qint32 i = 1; i <= 11; i++)
+        for(qint32 i = 0; i < 11; i++)
         {
             if(signalNegativeMaximum == 0)                                          // x-Axis reached (y-value = 0)
             {
-                // append scaled signalpoints
+                // append scaled signalpoints and paint signal
                 for(qint32 channel = 0; channel < atom_matrix.cols(); channel++)    // over all Channels
                 {
                     QPolygonF poly;                   
                     for(qint32 h = 0; h < atom_matrix.rows(); h++)
-                        poly.append(QPointF((h * scaleX) + maxStrLenght,  -((atom_matrix(h, channel) * scaleY + ((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2))));
+                        poly.append(QPointF((h * scaleX) + maxStrLenght, -(atom_matrix(h, channel) * scaleY + _x_axis_height)));
                     QPen pen(_colors.at(channel), 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
                     painter.setPen(pen);
                     painter.drawPolyline(poly);
@@ -1051,21 +1079,25 @@ void AtomSumWindow::paint_atom_sum(MatrixXd atom_matrix, QSize windowSize, qreal
                 // paint x-axis                
                 for(qint32 j = 1; j < 21; j++)
                 {
-                    if(fmod(j, 4.0) == 0)
+                    if(fmod(j, 4.0) == 0)   //draw light grey sectors
                     {
                         QPen pen(Qt::darkGray, 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
                         painter.setPen(pen);
-                        painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - windowSize.height())), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + windowSize.height())));   // scalelines
+                        painter.drawLine(j * scaleXAchse + maxStrLenght, -(_x_axis_height - windowSize.height()),
+                                         j * scaleXAchse + maxStrLenght, -(_x_axis_height + windowSize.height()));   // scalelines x-axis
                     }
                     QPen pen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
                     painter.setPen(pen);
-                    painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - 2)), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + 2)));   // scalelines
+                    painter.drawLine(j * scaleXAchse + maxStrLenght, -(_x_axis_height - 2),
+                                     j * scaleXAchse + maxStrLenght, -(_x_axis_height + 2));   // scalelines x-axis
                 }
-                painter.drawLine(maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), windowSize.width()-5, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));
+                painter.drawLine(maxStrLenght - 40, -_x_axis_height, windowSize.width()-5, -_x_axis_height);    // paint x-axis
             }
 
-            painter.drawText(3, -((i - 1) * scaleYAchse - windowSize.height()) - borderMarginHeigth/2 + 4, QString::number(signalNegativeMaximum * scaleYText, 'g', 3));     // paint scalvalue Y-axis
-            painter.drawLine(maxStrLenght - 2, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), maxStrLenght + 2, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));  // scalelines y-axis
+            painter.drawText(3, -(i * scaleYAchse - windowSize.height()) - _border_margin_height / 2 + 4, QString::number(signalNegativeMaximum * scaleYText, 'g', 3));     // paint scalvalue Y-axis
+            painter.drawLine(maxStrLenght - 2, -((i * scaleYAchse)-(windowSize.height()) + _border_margin_height / 2),
+                             maxStrLenght + 2, -((i * scaleYAchse)-(windowSize.height()) + _border_margin_height / 2));  // scalelines y-axis
+
             signalNegativeMaximum++;
         }
         painter.drawLine(maxStrLenght, 2, maxStrLenght, windowSize.height() - 2);     // paint y-axis      
@@ -1093,31 +1125,30 @@ void ResiduumWindow::paint_residuum(MatrixXd residuum_matrix, QSize windowSize, 
 
     if(residuum_matrix.rows() > 0 && residuum_matrix.cols() > 0 && _signal_matrix.rows() > 0 && _signal_matrix.cols() > 0)
     {
-        qint32 maxStrLenght = 55;
-        qint32 borderMarginHeigth = 5 + windowSize.height() / 10;  // adapt bordermargin to avoid painting out of range
+        const qint32 maxStrLenght = 55;
         qint32 borderMarginWidth = 15;                             // reduce paintspace in GraphWindow of borderMargin pixels
 
         // scale axis title
-        qreal scaleYText = (qreal)signalMaximum / (qreal)10;
+        qreal scaleYText = signalMaximum / 10.0;
 
         // scale signal
-        qreal scaleX = ((qreal)(windowSize.width() - maxStrLenght - borderMarginWidth))/ (qreal)residuum_matrix.rows();
-        qreal scaleY = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)signalMaximum;
+        qreal scaleX = (windowSize.width() - maxStrLenght - borderMarginWidth) / qreal(residuum_matrix.rows() - 1);
+        qreal scaleY = (windowSize.height() - _border_margin_height) / signalMaximum;
 
         //scale axis
-        qreal scaleXAchse = (qreal)(windowSize.width() - maxStrLenght - borderMarginWidth) / (qreal)20;
-        qreal scaleYAchse = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)10;
+        qreal scaleXAchse = (windowSize.width() - maxStrLenght - borderMarginWidth) / 20.0;
+        qreal scaleYAchse = (windowSize.height() - _border_margin_height) / 10.0;
 
-        for(qint32 i = 1; i <= 11; i++)
+        for(qint32 i = 0; i < 11; i++)
         {
             if(signalNegativeMaximum == 0)                                              // x-axis reached (y-value = 0)
             {
-                // append scaled signalpoints
+                // append scaled signalpoints and paint signal
                 for(qint32 channel = 0; channel < residuum_matrix.cols(); channel++)    // over all Channels
                 {
                     QPolygonF poly;                    
                     for(qint32 h = 0; h < residuum_matrix.rows(); h++)
-                        poly.append(QPointF((h * scaleX) + maxStrLenght,  -((residuum_matrix(h, channel) * scaleY + ((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2))));
+                        poly.append(QPointF(h * scaleX + maxStrLenght,  - (residuum_matrix(h, channel) * scaleY + _x_axis_height)));
                     QPen pen(_colors.at(channel), 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
                     painter.setPen(pen);
                     painter.drawPolyline(poly);
@@ -1125,21 +1156,25 @@ void ResiduumWindow::paint_residuum(MatrixXd residuum_matrix, QSize windowSize, 
                 // paint x-axis
                 for(qint32 j = 1; j < 21; j++)
                 {
-                    if(fmod(j, 4.0) == 0)
+                    if(fmod(j, 4.0) == 0)   //draw light grey sectors
                     {
                         QPen pen(Qt::darkGray, 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
                         painter.setPen(pen);
-                        painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - windowSize.height())), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + windowSize.height())));   // scalelines
+                        painter.drawLine(j * scaleXAchse + maxStrLenght, -(_x_axis_height - windowSize.height()),
+                                         j * scaleXAchse + maxStrLenght, -(_x_axis_height + windowSize.height()));   // scalelines x-axis
                     }                   
                     QPen pen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
                     painter.setPen(pen);
-                    painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - 2)), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + 2)));   // scalelines
+                    painter.drawLine(j * scaleXAchse + maxStrLenght, -(_x_axis_height - 2),
+                                     j * scaleXAchse + maxStrLenght, -(_x_axis_height + 2));   // scalelines x-axis
                 }
-                painter.drawLine(maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), windowSize.width()-5, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));
+                painter.drawLine(maxStrLenght - 40, -_x_axis_height, windowSize.width()-5, -_x_axis_height);    // paint x-axis
             }
 
-            painter.drawText(3, -((i - 1) * scaleYAchse - windowSize.height()) - borderMarginHeigth/2 + 4, QString::number(signalNegativeMaximum * scaleYText, 'g', 3));     // paint scalevalue y-axis
-            painter.drawLine(maxStrLenght - 2, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), maxStrLenght + 2, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));  // scalelines y-axis
+            painter.drawText(3, -(i * scaleYAchse - windowSize.height()) - _border_margin_height/2 + 4, QString::number(signalNegativeMaximum * scaleYText, 'g', 3));     // paint scalevalue y-axis
+            painter.drawLine(maxStrLenght - 2, -((i * scaleYAchse)-(windowSize.height()) + _border_margin_height / 2),
+                             maxStrLenght + 2, -((i * scaleYAchse)-(windowSize.height()) + _border_margin_height / 2));  // scalelines y-axis
+
             signalNegativeMaximum++;
         }
 
@@ -1165,21 +1200,24 @@ void XAxisWindow::paint_axis(MatrixXd signalMatrix, QSize windowSize)
 
     if(signalMatrix.rows() > 0 && signalMatrix.cols() > 0)
     {
+        const qint32 maxStrLenght = 55;
         qint32 borderMarginWidth = 15;
-        qreal scaleXText = (qreal)(signalMatrix.rows() - 1) /  (qreal)_sample_rate / (qreal)20;                       // divide signallength
-        qreal scaleXAchse = (qreal)(windowSize.width() - 55 - borderMarginWidth) / (qreal)20;
+        qreal scaleXText = (signalMatrix.rows() - 1) /  _sample_rate / 20.0;                       // divide signallength
+        qreal scaleXAchse = (windowSize.width() - maxStrLenght - borderMarginWidth) / 20.0;
 
         for(qint32 j = 0; j < 21; j++)
         {
             if(j == 20)
             {
                 painter.drawText(j * scaleXAchse + 37, 20, QString::number(j * scaleXText + _from / _sample_rate + _offset_time, 'f', 2));    // scalevalue as string
-                painter.drawLine(j * scaleXAchse + 55, 5 + 2, j * scaleXAchse + 55 , 5 - 2);                    // scalelines
+                painter.drawLine(j * scaleXAchse + maxStrLenght, 5 + 2,
+                                 j * scaleXAchse + maxStrLenght, 5 - 2);                    // scalelines
             }
             else
             {
                 painter.drawText(j * scaleXAchse + 45, 20, QString::number(j * scaleXText + _from / _sample_rate  + _offset_time, 'f', 2));    // scalevalue as string
-                painter.drawLine(j * scaleXAchse + 55, 5 + 2, j * scaleXAchse + 55 , 5 - 2);                    // scalelines
+                painter.drawLine(j * scaleXAchse + maxStrLenght, 5 + 2,
+                                 j * scaleXAchse + maxStrLenght, 5 - 2);                    // scalelines
             }
         }
         painter.drawText(5 , 20, "[sec]");  // unit
@@ -1320,6 +1358,7 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
     QSettings settings;
     qreal percent = ui->dsb_energy->value();
     residuum_energy = 100 * (max_energy - current_energy) / max_energy;
+    signal_energy = max_energy;
 
     //current atoms list update
     if(fix_dict_atom_res_list.isEmpty())
@@ -1354,7 +1393,8 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
             qSort(adaptive_atom_res_list.begin(), adaptive_atom_res_list.end(), sort_energie_adaptive);
             qSort(_adaptive_atom_list.begin(), _adaptive_atom_list.end(), sort_energie_adaptive);
         }
-        // ToDo: index = _adaptive_atom_list.indexOf(temp_atom);
+        // ToDo: qint32 index = adaptive_atom_res_list.indexOf(temp_atom);
+
         qint32 index = 0;
         while(index < adaptive_atom_res_list.length())
         {
@@ -1545,13 +1585,21 @@ void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelI
     {
         if(item->checkState())
         {
-            for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)            
+            for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
+            {
                 _atom_sum_matrix.col(channels) += real_residuum_matrix.col(channels);
+                _residuum_matrix.col(channels) -= real_residuum_matrix.col(channels);
+            }
+            composed_energy += residuum_energy;
         }
         else
         {
-            for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)            
+            for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
+            {
                 _atom_sum_matrix.col(channels) -= real_residuum_matrix.col(channels);
+                _residuum_matrix.col(channels) += real_residuum_matrix.col(channels);
+            }
+            composed_energy -= residuum_energy;
         }
     }
     else
@@ -1568,6 +1616,7 @@ void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelI
                 {
                     _atom_sum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
                     _residuum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
+                    composed_energy += 100 * atom.energy / signal_energy;
                 }
             }
             else
@@ -1576,6 +1625,7 @@ void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelI
                 {
                     _atom_sum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
                     _residuum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
+                    composed_energy -= 100 * atom.energy / signal_energy;
                 }
             }
         }
@@ -1591,6 +1641,7 @@ void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelI
                 {
                     _atom_sum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.atom_samples;
                     _residuum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.atom_samples;
+                    composed_energy += 100 * atom.energy / signal_energy;
                 }
             }
             else
@@ -1599,10 +1650,19 @@ void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelI
                 {
                     _atom_sum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.atom_samples;
                     _residuum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.atom_samples;
+                    composed_energy -= 100 * atom.energy / signal_energy;
                 }
             }
         }
     }
+
+    ui->lb_signal_energy_text->setText("absolute signal energy:");
+    ui->lb_signal_energy->setText(QString::number(signal_energy, 'g', 2));
+    ui->lb_approx_energy_text->setText("approximation energy:");
+    ui->lb_approx_energy->setText(QString::number(abs(composed_energy), 'f', 2) + "%");
+    ui->lb_residual_energy_text->setText("remaining residual energy:");
+    ui->lb_residual_energy->setText(QString::number(abs(100 - composed_energy), 'f', 2) + "%");
+
     callAtomSumWindow->update();
     callResidumWindow->update();
 }
@@ -1670,7 +1730,14 @@ void MainWindow::calc_thread_finished()
     ui->tbv_Results->setItem(ui->tbv_Results->rowCount() - 1, 1, residuum_item);
     ui->tbv_Results->setSpan(ui->tbv_Results->rowCount() - 1, 1, 1, 4);
 
-    //ToDo
+    composed_energy = 100 - residuum_energy;
+    ui->lb_signal_energy_text->setText("absolute signal energy:");
+    ui->lb_signal_energy->setText(QString::number(signal_energy, 'g', 2));
+    ui->lb_approx_energy_text->setText("approximation energy:");
+    ui->lb_approx_energy->setText(QString::number(abs(composed_energy), 'f', 2) + "%");
+    ui->lb_residual_energy_text->setText("remaining residual energy:");
+    ui->lb_residual_energy->setText(QString::number(abs(100 - composed_energy), 'f', 2) + "%");
+
     //figure of merit to evaluate the alogorithm, here we use correlation between signal and atom_sum_matrix
     qreal correlation = 0;
     qreal divisor_sig = 0;
@@ -2738,16 +2805,17 @@ void GraphWindow::mouseMoveEvent(QMouseEvent *event)
    if(_to - _from != 0)
    {
        qint32 temp_pos_x = mapFromGlobal(QCursor::pos()).x() - 55;
-       qreal stretch_factor_y = ((this->height()) - _border_margin_height - 1) / _signal_maximum;
-       qreal temp_pos_y  =  ((this->height() - mapFromGlobal(QCursor::pos()).y())) / stretch_factor_y - (qreal(this->height()) - _x_axis_height) / stretch_factor_y;//+ floor(_max_neg) + 0.5;
+       qint32 temp_pos_y = this->height() - mapFromGlobal(QCursor::pos()).y();
 
-       qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_to -_from);
-       qreal time = (qreal)_from / _sample_rate + _offset_time + (qreal)temp_pos_x / stretch_factor / _sample_rate;
+       qreal stretch_factor_x = (this->width() - 55/*left_margin*/ - 15/*right_margin*/) / qreal(_samplecount - 1);
+       qreal stretch_factor_y = (this->height() - _border_margin_height) / _signal_maximum;
 
+       qreal time = _from / _sample_rate + _offset_time + temp_pos_x / stretch_factor_x / _sample_rate;
+       qreal amplitude =  temp_pos_y / stretch_factor_y - (this->height() + _x_axis_height) / stretch_factor_y;
 
        if(mapFromGlobal(QCursor::pos()).x() >= 55 && mapFromGlobal(QCursor::pos()).x() <= (this->width() - 15))
-           this->setToolTip(QString("time: %1 sec\nampl: %2").arg(time)
-                                                             .arg(QString::number(temp_pos_y)));
+           this->setToolTip(QString("time: %1 sec\namplitude: %2").arg(time).arg(QString::number(amplitude, 'g', 3)));
+       else this->setToolTip(QString("amplitude: %1").arg(QString::number(amplitude, 'g', 3)));
 
        if(event->buttons() == Qt::LeftButton)
                setCursor(Qt::ClosedHandCursor);
@@ -2763,12 +2831,19 @@ void AtomSumWindow::mouseMoveEvent(QMouseEvent *event)
     Q_UNUSED(event);
     if(_to - _from != 0)
     {
-        qint32 temp_pos = mapFromGlobal(QCursor::pos()).x() - 55;
-        qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_samplecount);
-        qreal time = (qreal)_from / _sample_rate + _offset_time + (qreal)temp_pos / stretch_factor / _sample_rate;
+        qint32 temp_pos_x = mapFromGlobal(QCursor::pos()).x() - 55;
+        qint32 temp_pos_y = this->height() - mapFromGlobal(QCursor::pos()).y();
+
+        qreal stretch_factor_x = (this->width() - 55/*left_margin*/ - 15/*right_margin*/) / qreal(_samplecount - 1);
+        qreal stretch_factor_y = (this->height() - _border_margin_height) / _signal_maximum;
+
+        qreal time = _from / _sample_rate + _offset_time + temp_pos_x / stretch_factor_x / _sample_rate;
+        qreal amplitude =  temp_pos_y / stretch_factor_y - (this->height() + _x_axis_height) / stretch_factor_y;
+
         if(mapFromGlobal(QCursor::pos()).x() >= 55 && mapFromGlobal(QCursor::pos()).x() <= (this->width() - 15))
-            this->setToolTip(QString("time: %1 sec\nampl: %2").arg(time)
-                                                              .arg(QString::number(mapFromGlobal(QCursor::pos()).x())));
+            this->setToolTip(QString("time: %1 sec\namplitude: %2").arg(time).arg(QString::number(amplitude, 'g', 3)));
+        else this->setToolTip(QString("amplitude: %1").arg(QString::number(amplitude, 'g', 3)));
+
        setCursor(Qt::CrossCursor);
    }
 }
@@ -2780,16 +2855,18 @@ void ResiduumWindow::mouseMoveEvent(QMouseEvent *event)
     Q_UNUSED(event);
     if(_to - _from != 0)
     {
-        qreal scaleY = (this->height() - 15 /*borderMarginHeigth*/) * _max_neg / _signal_maximum;
         qint32 temp_pos_x = mapFromGlobal(QCursor::pos()).x() - 55;
-        qreal temp_pos_y =  (this->height() - mapFromGlobal(QCursor::pos()).y()) / _max_neg;
-        //qreal temp_pos_y =  (this->height() - (mapFromGlobal(QCursor::pos()).y())) / _signal_maximum;// + scaleY);//- 15) / _signal_maximum;// + _signal_negative_scale;
-        qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_samplecount);
-        qreal time = (qreal)_from / _sample_rate + _offset_time+ (qreal)temp_pos_x / stretch_factor / _sample_rate;
-        qreal amplitude = 0;
+        qint32 temp_pos_y = this->height() - mapFromGlobal(QCursor::pos()).y();
+
+        qreal stretch_factor_x = (this->width() - 55/*left_margin*/ - 15/*right_margin*/) / qreal(_samplecount - 1);
+        qreal stretch_factor_y = (this->height() - _border_margin_height) / _signal_maximum;
+
+        qreal time = _from / _sample_rate + _offset_time + temp_pos_x / stretch_factor_x / _sample_rate;
+        qreal amplitude =  temp_pos_y / stretch_factor_y - (this->height() + _x_axis_height) / stretch_factor_y;
+
         if(mapFromGlobal(QCursor::pos()).x() >= 55 && mapFromGlobal(QCursor::pos()).x() <= (this->width() - 15))
-            this->setToolTip(QString("time: %1 sec\nampl: %2").arg(time)
-                                                              .arg(QString::number(temp_pos_y)));
+            this->setToolTip(QString("time: %1 sec\namplitude: %2").arg(time).arg(QString::number(amplitude, 'g', 3)));
+        else this->setToolTip(QString("amplitude: %1").arg(QString::number(amplitude, 'g', 3)));
 
         setCursor(Qt::CrossCursor);
     }
