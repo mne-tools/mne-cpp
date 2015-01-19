@@ -348,8 +348,6 @@ void MainWindow::open_file()
             }
 
         ui->dsb_sample_rate->setEnabled(false);
-        original_signal_matrix = _signal_matrix;
-        fill_channel_combobox();
     }
     else
     {
@@ -364,6 +362,8 @@ void MainWindow::open_file()
     }
 
     //initial
+    original_signal_matrix = _signal_matrix;
+    fill_channel_combobox();
     read_fiff_changed = true;
 
     last_from = _from;
@@ -690,31 +690,40 @@ bool MainWindow::read_matlab_file(QString fileName)
 
     QTextStream stream(&file);
     bool isFloat;
-    qint32 row_number = 0;
 
-    matlab_signal = stream.readAll().split('\n', QString::SkipEmptyParts);
-    _first_sample = 0;
-    _last_sample = matlab_signal.length() - 1;
+    matlab_channels = stream.readAll().split('\n', QString::SkipEmptyParts);
 
-    _from = _first_sample;
-    if(_from + 511 <= _last_sample)
-        _to = _from + 511;
-    else
-        _to = _last_sample;
-
-    _signal_matrix = MatrixXd::Zero(_to - _from + 1, 1);
-
-    for(qint32 i = _from; i <= _to; i++)
+    for(qint32 k = 0; k < matlab_channels.length(); k++)
     {
-        qreal value = matlab_signal.at(i).toFloat(&isFloat);
-        if(!isFloat)
+        qint32 row_number = 0;
+        QStringList signal_samples = matlab_channels.at(k).split(',', QString::SkipEmptyParts);
+
+        if(k==0)
         {
-             _signal_matrix = MatrixXd::Zero(0, 0);
-            QMessageBox::critical(this, "error", QString("error reading matlab file. Could not read line %1 from file %2.").arg(i).arg(fileName));
-            return false;
+            _first_sample = 0;
+            _last_sample = signal_samples.length() - 1;
+            _from = _first_sample;
+
+            if(_from + 511 <= _last_sample)
+                _to = _from + 511;
+            else
+                _to = _last_sample;
+
+            _signal_matrix = MatrixXd::Zero(_to - _from + 1, matlab_channels.length());
         }
-        _signal_matrix(row_number, 0) = value;
-        row_number++;
+
+        for(qint32 i = _from; i <= _to; i++)
+        {
+            qreal value = signal_samples.at(i).toFloat(&isFloat);
+            if(!isFloat)
+            {
+                _signal_matrix = MatrixXd::Zero(0, 0);
+                QMessageBox::critical(this, "error", QString("error reading matlab file. Could not read line %1 from file %2.").arg(i).arg(fileName));
+                return false;
+            }
+            _signal_matrix(row_number, k) = value;
+            row_number++;
+        }
     }
     file.close();
 
@@ -729,19 +738,44 @@ bool MainWindow::read_matlab_file(QString fileName)
 void MainWindow::read_matlab_file_new()
 {
     bool isFloat;
-    qint32 row_number = 0;
+    qint32 selected_chn = 0;
 
-    _signal_matrix = MatrixXd::Zero(_to - _from + 1, 1);
+    _signal_matrix = MatrixXd::Zero(_to - _from + 1, matlab_channels.length());
 
-    for(qint32 i = _from; i <= _to; i++)
+    for(qint32 k = 0;k <matlab_channels.length(); k++)
     {
-        qreal value = matlab_signal.at(i).toFloat(&isFloat);
-        if(!isFloat)        
-             _signal_matrix = MatrixXd::Zero(0, 0);
+        qint32 row_number = 0;
+        QStringList signal_samples = matlab_channels.at(k).split(',', QString::SkipEmptyParts);
 
-        _signal_matrix(row_number, 0) = value;
-        row_number++;
+        for(qint32 i = _from; i <= _to; i++)
+        {
+            qreal value = signal_samples.at(i).toFloat(&isFloat);
+            if(!isFloat)
+                _signal_matrix = MatrixXd::Zero(0, 0);
+
+            _signal_matrix(row_number, k) = value;
+            row_number++;
+        }
     }
+
+    original_signal_matrix = _signal_matrix;
+
+    qint32 size = 0;
+    for(qint32 i = 0; i < original_signal_matrix.cols(); i++)
+        if(select_channel_map[i] == true)
+            size++;
+
+    _colors.clear();
+    _signal_matrix = MatrixXd::Zero(original_signal_matrix.rows(), size);
+
+    for(qint32 channels = 0; channels < original_signal_matrix.cols(); channels++)
+        if(select_channel_map[channels] == true)
+        {
+            _colors.append(original_colors.at(channels));
+            _signal_matrix.col(selected_chn) = original_signal_matrix.col(channels);
+            selected_chn++;
+        }
+
 
     _atom_sum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
     _residuum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
@@ -1363,7 +1397,7 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
     //current atoms list update
     if(fix_dict_atom_res_list.isEmpty())
     {
-        GaborAtom temp_atom = adaptive_atom_res_list.last();
+        GaborAtom temp_atom = adaptive_atom_res_list.last().last();
 
         qreal phase = temp_atom.phase;
         if(temp_atom.phase > 2*PI) phase -= 2*PI;
@@ -1390,18 +1424,18 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         _adaptive_atom_list.append(temp_atom);
         if(settings.value("sort_results", true).toBool())
         {
-            qSort(adaptive_atom_res_list.begin(), adaptive_atom_res_list.end(), sort_energie_adaptive);
+            qSort(adaptive_atom_res_list.last().begin(), adaptive_atom_res_list.last().end(), sort_energie_adaptive);
             qSort(_adaptive_atom_list.begin(), _adaptive_atom_list.end(), sort_energie_adaptive);
         }
-        // ToDo: qint32 index = adaptive_atom_res_list.indexOf(temp_atom);
 
+        // ToDo: qint32 index = adaptive_atom_res_list.indexOf(temp_atom);
         qint32 index = 0;
-        while(index < adaptive_atom_res_list.length())
+        while(index < _adaptive_atom_list.length())
         {
-            if(temp_atom.scale == adaptive_atom_res_list.at(index).scale
-                    && temp_atom.modulation == adaptive_atom_res_list.at(index).modulation
-                    && temp_atom.translation == adaptive_atom_res_list.at(index).translation
-                    && temp_atom.energy == adaptive_atom_res_list.at(index).energy)
+            if(temp_atom.scale == _adaptive_atom_list.at(index).scale
+                    && temp_atom.modulation == _adaptive_atom_list.at(index).modulation
+                    && temp_atom.translation == _adaptive_atom_list.at(index).translation
+                    && temp_atom.energy == _adaptive_atom_list.at(index).energy)
                 break;
             index++;
         }
@@ -1416,9 +1450,22 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         //update residuum and atom sum for painting and later save to hdd
         for(qint32 i = 0; i < _signal_matrix.cols(); i++)
         {
-            VectorXd atom_vec = temp_atom.max_scalar_list.at(i) * temp_atom.create_real(temp_atom.sample_count, temp_atom.scale, temp_atom.translation, temp_atom.modulation, temp_atom.phase_list.at(i));
-            _residuum_matrix.col(i) -= atom_vec;
-            _atom_sum_matrix.col(i) += atom_vec;
+            if(settings.value("trial_separation", false).toBool())
+            {
+                VectorXd atom_vec = adaptive_atom_res_list.last().at(i).max_scalar_product * temp_atom.create_real(adaptive_atom_res_list.last().at(i).sample_count,
+                                                                                                                   adaptive_atom_res_list.last().at(i).scale,
+                                                                                                                   adaptive_atom_res_list.last().at(i).translation,
+                                                                                                                   adaptive_atom_res_list.last().at(i).modulation,
+                                                                                                                   adaptive_atom_res_list.last().at(i).phase);
+                _residuum_matrix.col(i) -= atom_vec;
+                _atom_sum_matrix.col(i) += atom_vec;
+            }
+            else
+            {
+                VectorXd atom_vec = temp_atom.max_scalar_list.at(i) * temp_atom.create_real(temp_atom.sample_count, temp_atom.scale, temp_atom.translation, temp_atom.modulation, temp_atom.phase_list.at(i));
+                _residuum_matrix.col(i) -= atom_vec;
+                _atom_sum_matrix.col(i) += atom_vec;
+            }
         }
     }
     else if(adaptive_atom_res_list.isEmpty())
@@ -1776,8 +1823,8 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
     mp_Thread = new QThread;
     adaptive_Mp->moveToThread(mp_Thread);
 
-    connect(this, SIGNAL(send_input(MatrixXd, qint32, qreal, bool, qint32, qint32, qreal, qreal, qreal, qreal)),
-            adaptive_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, bool, qint32, qint32, qreal, qreal, qreal, qreal)));
+    connect(this, SIGNAL(send_input(MatrixXd, qint32, qreal, bool, qint32, qint32, qreal, qreal, qreal, qreal, bool)),
+            adaptive_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, bool, qint32, qint32, qreal, qreal, qreal, qreal, bool)));
     connect(adaptive_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, MatrixXd, adaptive_atom_list, fix_dict_atom_list)),
                  this, SLOT(recieve_result(qint32, qint32, qreal, qreal, MatrixXd, adaptive_atom_list, fix_dict_atom_list)));
     connect(adaptive_Mp, SIGNAL(finished_calc()), mp_Thread, SLOT(quit()));
@@ -1789,6 +1836,7 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
 
     QSettings settings;
     bool fixphase = settings.value("fixPhase", false).toBool();
+    bool trial_separation = settings.value("trial_separation", false).toBool();
     qint32 boost = settings.value("boost", 100).toInt();
     qint32 iterations = settings.value("adaptive_iterations", 1E3).toInt();
     qreal reflection = settings.value("adaptive_reflection", 1.00).toDouble();
@@ -1799,19 +1847,19 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
     {
         case Iterations:        
             emit send_input(signal, ui->sb_Iterations->value(), qreal(MININT32), fixphase, boost, iterations,
-                            reflection, expansion, contraction, fullcontraction);
+                            reflection, expansion, contraction, fullcontraction, trial_separation);
             mp_Thread->start();        
             break;
 
         case SignalEnergy:        
             emit send_input(signal, MAXINT32, res_energy, fixphase, boost, iterations,
-                            reflection, expansion, contraction, fullcontraction);
+                            reflection, expansion, contraction, fullcontraction, trial_separation);
             mp_Thread->start();        
             break;
 
         case Both:
             emit send_input(signal, ui->sb_Iterations->value(), res_energy, fixphase, boost, iterations,
-                            reflection, expansion, contraction, fullcontraction);
+                            reflection, expansion, contraction, fullcontraction, trial_separation);
             mp_Thread->start();        
             break;
     }       

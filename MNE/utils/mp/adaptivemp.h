@@ -135,7 +135,7 @@ public:
 
     //=========================================================================================================
 
-    typedef QList<GaborAtom> adaptive_atom_list;
+    typedef QList<QList<GaborAtom>> adaptive_atom_list;
     typedef QList<FixDictAtom> fix_dict_atom_list;
     typedef Eigen::VectorXd VectorXd;
     typedef Eigen::MatrixXd MatrixXd;
@@ -149,7 +149,8 @@ public:
     qint32 max_iterations;
     VectorXd best_match;
     MatrixXd signal;
-    QList<GaborAtom> atom_list;
+    QList<QList<GaborAtom>> atom_list;
+    QList<GaborAtom> atoms_in_chns;
     QList<FixDictAtom> fix_dict_list;
 
     //=========================================================================================================
@@ -225,17 +226,18 @@ public:
     * @return depending on returnValue returning the real atom calculated or the manipulated parameters: scale, translation, modulation, phase, scalarproduct
     */
     void simplex_maximisation(qint32 simplex_it, qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction,
-                              GaborAtom *gabor_Atom, qreal max_scalar_product, qint32 sample_count, bool fix_phase, MatrixXd residuum);
+                              GaborAtom *gabor_Atom, VectorXd max_scalar_product, qint32 sample_count, bool fix_phase, MatrixXd residuum, bool trial_separation, qint32 chn);
 
     //=========================================================================================================
 
 
 public slots:
 
-    QList<GaborAtom> matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase, qint32 boost, qint32 simplex_it,
-                                       qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction);
+    //ToDo: incapsulate settings in own class and give them to matching_pursuit()
+    QList<QList<GaborAtom>> matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase, qint32 boost, qint32 simplex_it,
+                                       qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction, bool trial_separation);
     void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase, qint32 boost, qint32 simplex_it,
-                       qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction);
+                       qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction, bool trial_separation);
 
     //=========================================================================================================
 
