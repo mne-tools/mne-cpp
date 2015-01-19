@@ -132,7 +132,7 @@ public:
     ~MainWindow();
     //**********************************************************************************************************
 
-    typedef QList<GaborAtom> adaptive_atom_list;
+    typedef QList<QList<GaborAtom>> adaptive_atom_list;
     typedef QList<FixDictAtom> fix_dict_atom_list;
     typedef QMap<qint32, bool> select_map;
     typedef Eigen::VectorXd VectorXd;
@@ -552,7 +552,7 @@ private slots:
 signals:
 
     void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, bool fix_phase, qint32 boost, qint32 simplex_it,
-                    qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction);
+                    qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction, bool trial_separation);
     void send_input_fix_dict(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, qint32 boost, QString path, qreal delta);
     void to_save(QString source_path, QString save_path, fiff_int_t start_change, fiff_int_t end_change, MatrixXd changes, select_map select_channel_map, RowVectorXi picks);
 
@@ -579,7 +579,7 @@ private:
     QString file_name;
     QString last_open_path;
     QString last_save_path;
-    QStringList matlab_signal;
+    QStringList matlab_channels;
     QMap<qint32, bool> select_channel_map;
     QMap<qint32, bool> select_atoms_map;
     QList<QColor> original_colors;
