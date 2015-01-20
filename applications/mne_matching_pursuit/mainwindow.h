@@ -579,7 +579,6 @@ private:
     QString file_name;
     QString last_open_path;
     QString last_save_path;
-    QStringList matlab_channels;
     QMap<qint32, bool> select_channel_map;
     QMap<qint32, bool> select_atoms_map;
     QList<QColor> original_colors;

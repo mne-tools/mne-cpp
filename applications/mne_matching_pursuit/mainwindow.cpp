@@ -43,7 +43,6 @@
 #include <math.h>
 #include <fiff/fiff.h>
 #include <mne/mne.h>
-#include <disp/plot.h>
 
 #include "math.h"
 #include "mainwindow.h"
@@ -71,7 +70,6 @@
 
 using namespace MNELIB;
 using namespace UTILSLIB;
-using namespace DISPLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -98,6 +96,7 @@ qreal _border_margin_height;
 qint32 _x_axis_height;
 
 QList<QColor> _colors;
+QStringList _matlab_channels;
 MatrixXd _signal_matrix;
 MatrixXd _atom_sum_matrix;
 MatrixXd _residuum_matrix;
@@ -691,12 +690,12 @@ bool MainWindow::read_matlab_file(QString fileName)
     QTextStream stream(&file);
     bool isFloat;
 
-    matlab_channels = stream.readAll().split('\n', QString::SkipEmptyParts);
+    _matlab_channels = stream.readAll().split('\n', QString::SkipEmptyParts);
 
-    for(qint32 k = 0; k < matlab_channels.length(); k++)
+    for(qint32 k = 0; k < _matlab_channels.length(); k++)
     {
         qint32 row_number = 0;
-        QStringList signal_samples = matlab_channels.at(k).split(',', QString::SkipEmptyParts);
+        QStringList signal_samples = _matlab_channels.at(k).split(',', QString::SkipEmptyParts);
 
         if(k==0)
         {
@@ -709,7 +708,7 @@ bool MainWindow::read_matlab_file(QString fileName)
             else
                 _to = _last_sample;
 
-            _signal_matrix = MatrixXd::Zero(_to - _from + 1, matlab_channels.length());
+            _signal_matrix = MatrixXd::Zero(_to - _from + 1, _matlab_channels.length());
         }
 
         for(qint32 i = _from; i <= _to; i++)
@@ -740,12 +739,12 @@ void MainWindow::read_matlab_file_new()
     bool isFloat;
     qint32 selected_chn = 0;
 
-    _signal_matrix = MatrixXd::Zero(_to - _from + 1, matlab_channels.length());
+    _signal_matrix = MatrixXd::Zero(_to - _from + 1, _matlab_channels.length());
 
-    for(qint32 k = 0;k <matlab_channels.length(); k++)
+    for(qint32 k = 0;k < _matlab_channels.length(); k++)
     {
         qint32 row_number = 0;
-        QStringList signal_samples = matlab_channels.at(k).split(',', QString::SkipEmptyParts);
+        QStringList signal_samples = _matlab_channels.at(k).split(',', QString::SkipEmptyParts);
 
         for(qint32 i = _from; i <= _to; i++)
         {
@@ -2363,17 +2362,13 @@ void MainWindow::on_actionSpeicher_unter_triggered()
     }
 
     if(file_name.split('.').last() != "fif")
-    {
         save_path = QFileDialog::getSaveFileName(this, "Save file as...", last_save_path + "/" + save_name,"(*.txt)");
-        save_parameters();
-        QMessageBox::information(this, tr("information"),
-        tr("No fif file for save. Only parameter.txt saved."));
-        return;
-    }
+    else
+        save_path = QFileDialog::getSaveFileName(this, "Save file as...", last_save_path + "/" + save_name,"(*.fif)");
 
-    save_path = QFileDialog::getSaveFileName(this, "Save file as...", last_save_path + "/" + save_name,"(*.fif)");
     if(save_path.isEmpty()) return;
 
+    // savepath without filename, memorise last savepath
     QStringList string_list = save_path.split('/');
     last_save_path = "";
     for(qint32 i = 0; i < string_list.length() - 1; i++)
@@ -2461,116 +2456,133 @@ void SaveFifFile::save_fif_file(QString source_path, QString save_path, fiff_int
     QFile t_fileOut(save_path);
 
     //ToDo: no save for ave data at the moment
-    if(source_path.contains("-ave."))
+    if(source_path.contains("-ave.", Qt::CaseInsensitive))
     {
         emit save_progress(100, 4);
         return;
     }
-
-    //   Setup for reading the raw data   
-    FiffRawData raw(t_fileIn);
-
-    RowVectorXd cals;
-    FiffStream::SPtr outfid = Fiff::start_writing_raw(t_fileOut, raw.info, cals, picks);
-
-
-    //   Set up the reading parameters
-    fiff_int_t from = raw.first_samp;
-    fiff_int_t to = raw.last_samp;
-    float quantum_sec = 10.0f;//read and write in 10 sec junks
-    fiff_int_t quantum = ceil(quantum_sec*raw.info.sfreq);  //   To read the whole file at once set quantum     = to - from + 1;
-
-    //   Read and write all the data
-    //************************************************************************************
-    bool first_buffer = true;
-    fiff_int_t first;
-    fiff_int_t last;
-    MatrixXd data;
-    MatrixXd times;
-
-    // from 0 to start of change
-    for(first = from; first < start_change; first += quantum)
+    else if(QString::compare(source_path.split('.').last(), "txt", Qt::CaseInsensitive) == 0)
     {
-        last = first + quantum - 1;
-        if (last > start_change)
+        //QTextStream matlab_stream(t_fileOut);
+
+        for(qint32 k = 0; k < _matlab_channels.length(); k++)
         {
-            last = start_change - 1;
+            QStringList signal_samples = _matlab_channels.at(k).split(',', QString::SkipEmptyParts);
+            for(qint32 i = start_change; i <= end_change; i++)
+            {
+                //signal_samples.replace(i, changes[k,i].toString());//ToDo: ready
+            }
         }
-        if (!raw.read_raw_segment(data ,times, first, last, picks))
+    }
+    else if(QString::compare(source_path.split('.').last(), "fif", Qt::CaseInsensitive) == 0)
+    {
+
+        //   Setup for reading the raw data
+        FiffRawData raw(t_fileIn);
+
+        RowVectorXd cals;
+        FiffStream::SPtr outfid = Fiff::start_writing_raw(t_fileOut, raw.info, cals, picks);
+
+
+        //   Set up the reading parameters
+        fiff_int_t from = raw.first_samp;
+        fiff_int_t to = raw.last_samp;
+        float quantum_sec = 10.0f;//read and write in 10 sec junks
+        fiff_int_t quantum = ceil(quantum_sec*raw.info.sfreq);  //   To read the whole file at once set quantum     = to - from + 1;
+
+        //   Read and write all the data
+        //************************************************************************************
+        bool first_buffer = true;
+        fiff_int_t first;
+        fiff_int_t last;
+        MatrixXd data;
+        MatrixXd times;
+
+        // from 0 to start of change
+        for(first = from; first < start_change; first += quantum)
         {
+            last = first + quantum - 1;
+            if (last > start_change)
+            {
+                last = start_change - 1;
+            }
+            if (!raw.read_raw_segment(data ,times, first, last, picks))
+            {
                 printf("error during read_raw_segment\n");
                 emit save_progress(first, 2);
                 return;
+            }
+            printf("Writing...");
+            if (first_buffer)
+            {
+                if (first > 0)
+                    outfid->write_int(FIFF_FIRST_SAMPLE, &first);
+                first_buffer = false;
+            }
+            outfid->write_raw_buffer(data, cals);
+            printf("[done]\n");
+
+            emit save_progress(first, 0);
         }
-        printf("Writing...");
+
+        //************************************************************************************
+
+        // from start of change to end of change
+        if (!raw.read_raw_segment(data, times, start_change ,end_change,picks))
+        {
+            printf("error during read_raw_segment\n");
+            emit save_progress(first, 2);
+            return;
+        }
+
+        qint32 index = 0;
+        for(qint32 channels = 0; channels < data.rows(); channels++)
+        {
+            if(select_channel_map[channels])
+            {
+                data.row(channels) =  changes.col(index)  ;
+                index++;
+            }
+        }
+        printf("Writing new data...");
         if (first_buffer)
         {
-           if (first > 0)
-               outfid->write_int(FIFF_FIRST_SAMPLE, &first);
-           first_buffer = false;
+            if (start_change > 0)
+                outfid->write_int(FIFF_FIRST_SAMPLE, &start_change);
+            first_buffer = false;
         }
         outfid->write_raw_buffer(data, cals);
         printf("[done]\n");
 
-        emit save_progress(first, 0);
-    }
 
-    //************************************************************************************
+        //************************************************************************************
 
-    // from start of change to end of change
-    if (!raw.read_raw_segment(data, times, start_change ,end_change,picks))
-    {
-            printf("error during read_raw_segment\n");
-            emit save_progress(first, 2);
-            return;
-    }
-
-    qint32 index = 0;
-    for(qint32 channels = 0; channels < data.rows(); channels++)
-    {
-        if(select_channel_map[channels])
+        // from end of change to end
+        for(first = end_change + 1; first < to; first += quantum)
         {
-            data.row(channels) =  changes.col(index)  ;
-            index++;
+            last = first + quantum - 1;
+            if (last > to)
+            {
+                last = to;
+            }
+            if (!raw.read_raw_segment(data, times, first, last, picks))
+            {
+                printf("error during read_raw_segment\n");
+                emit save_progress(first, 2);
+                return;
+            }
+            printf("Writing...");
+            outfid->write_raw_buffer(data, cals);
+            printf("[done]\n");
+
+            emit save_progress(first, false);
         }
+
+        emit save_progress(to, true);
+
+        outfid->finish_writing_raw();
+        printf("Finished\n");
     }
-    printf("Writing new data...");
-    if (first_buffer)
-    {
-       if (start_change > 0)
-           outfid->write_int(FIFF_FIRST_SAMPLE, &start_change);
-       first_buffer = false;
-    }    
-    outfid->write_raw_buffer(data, cals);
-    printf("[done]\n");
-
-    //************************************************************************************
-
-    // from end of change to end
-    for(first = end_change + 1; first < to; first += quantum)
-    {
-        last = first + quantum - 1;
-        if (last > to)
-        {
-            last = to;
-        }
-        if (!raw.read_raw_segment(data, times, first, last, picks))
-        {
-            printf("error during read_raw_segment\n");
-            emit save_progress(first, 2);
-            return;
-        }
-        printf("Writing...");
-        outfid->write_raw_buffer(data, cals);
-        printf("[done]\n");
-
-        emit save_progress(first, false);
-    }
-
-    emit save_progress(to, true);
-
-    outfid->finish_writing_raw();
-    printf("Finished\n");
 }
 
 //*****************************************************************************************************************
