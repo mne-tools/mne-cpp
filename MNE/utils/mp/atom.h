@@ -109,6 +109,7 @@ public:
     qreal max_scalar_product;
     MatrixXd residuum;     
     QList<qreal> max_scalar_list;
+    qint32 bm_channel;
 
 };
 
