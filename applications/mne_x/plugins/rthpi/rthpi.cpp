@@ -246,109 +246,103 @@ void RtHpi::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void RtHpi::run()
 {
-//    Eigen::MatrixXd data;
-//    struct sens sensors;
-//    struct coilParam coil;
-//    float a, b, c;
-//    int num_sensors = 270, i;
-//    std::string line;
+    struct sens sensors;
+    struct coilParam coil;
+    int numCoils = 4;
 
-//    /*********************************************************************************/
-//    // Read the sensor locations
-//    sensors.coilpos = Eigen::MatrixXd::Zero(num_sensors,3);
-//    i=0;
-//    std::ifstream myfile ("C:\\Users\\cdoshi\\Desktop\\HPI_min\\FieldTrip_DipoleFit_BabyMEG\\simulation_seok\\sensorspos.txt");
-//    if (myfile.is_open())
-//    {
-//      while ( getline (myfile,line) )
-//      {
-//        sscanf_s (line.c_str(),"%f %f %f",&a, &b, &c);
-//        sensors.coilpos(i,0) = a;sensors.coilpos(i,1) = b;sensors.coilpos(i,2) = c;
-//        i++;
-//      }
-//      myfile.close();
-//    }
-//    myfile.close();
-//    /*********************************************************************************/
-//    // Read the sensor orientations
-//    sensors.coilori = Eigen::MatrixXd::Zero(num_sensors,3);
-//    i=0;
-//    myfile.open("C:\\Users\\cdoshi\\Desktop\\HPI_min\\FieldTrip_DipoleFit_BabyMEG\\simulation_seok\\sensorsori.txt");
-//    if (myfile.is_open())
-//    {
-//      while ( getline (myfile,line) )
-//      {
-//        sscanf_s (line.c_str(),"%f %f %f",&a, &b, &c);
-//        sensors.coilori(i,0) = a;sensors.coilori(i,1) = b;sensors.coilori(i,2) = c;
-//        i++;
-//      }
-//      myfile.close();
-//    }
-//    myfile.close();
+    coil.pos = Eigen::MatrixXd::Zero(numCoils,3);
+    coil.mom = Eigen::MatrixXd::Zero(numCoils,3);
 
-//    /*********************************************************************************/
-//    // sensors tra
-//    sensors.tra = Eigen::MatrixXd::Identity(num_sensors,num_sensors);
-
-//    /*********************************************************************************/
-//    // Read the data for 1st dipole
-//    data = Eigen::MatrixXd::Zero(num_sensors,1);
-//    i=0;
-//    myfile.open("C:\\Users\\cdoshi\\Desktop\\HPI_min\\FieldTrip_DipoleFit_BabyMEG\\simulation_seok\\data_dipole1.txt");
-//    if (myfile.is_open())
-//    {
-//      while ( getline (myfile,line) )
-//      {
-//        sscanf_s (line.c_str(),"%f",&a);
-//        data(i,0) = a;
-//        i++;
-//      }
-//      myfile.close();
-//    }
-//    myfile.close();
-
-//    /*********************************************************************************/
-//    coil.pos = Eigen::MatrixXd::Zero(1,3);
-//    coil.mom = Eigen::MatrixXd::Zero(1,3);
-
-//    coil = dipfit(coil, sensors, data);
-
-//    std::cout << coil.pos << std::endl;
-
-
+    int numCh = m_pFiffInfo->nchan;
     //
     // Read Fiff Info
     //
-    while(!m_pFiffInfo)
-        msleep(10);// Wait for fiff Info
+    while(!m_pFiffInfo) msleep(10);// Wait for fiff Info
 
     m_bProcessData = true;
 
-    // TODO : find indices of all good channels of inner layer for localization and indices of reference channels
+    QVector<int> refind(0); // Reference Indices
 
-    int samF = m_pFiffInfo->sfreq, blockSize = 100; // Find out the block size detail
-    int numLoc = 3; // Number of times to localize in a second
-    int numBlock = (samF/blockSize)/numLoc;
+    for(int j=0;j<numCh;j++) {
+        if (m_pFiffInfo->ch_names[j].indexOf("TRG_013") >= 0) {
+           refind.append(j);
+        }
+        if (m_pFiffInfo->ch_names[j].indexOf("TRG_014") >= 0) {
+           refind.append(j);
+        }
+        if (m_pFiffInfo->ch_names[j].indexOf("TRG_015") >= 0) {
+           refind.append(j);
+        }
+        if (m_pFiffInfo->ch_names[j].indexOf("TRG_016") >= 0) {
+           refind.append(j);
+        }
+    }
+
+    QVector<int> innerind(0); // Inner layer channels
+
+    for (int i=0;i<numCh;i++) {
+        int j = 0;
+        if(m_pFiffInfo->chs[i].coil_type == 7002) {
+            // Check if the sensor is bad, if not get the position
+            // and orientation
+            if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names[i]))) {
+                innerind.append(j);
+                sensors.coilpos(j,0) = m_pFiffInfo->chs[i].loc(0);
+                sensors.coilpos(j,1) = m_pFiffInfo->chs[i].loc(1);
+                sensors.coilpos(j,2) = m_pFiffInfo->chs[i].loc(2);
+                sensors.coilori(j,0) = m_pFiffInfo->chs[i].loc(10);
+                sensors.coilori(j,1) = m_pFiffInfo->chs[i].loc(11);
+                sensors.coilori(j,2) = m_pFiffInfo->chs[i].loc(12);
+                j++;
+            }
+        }
+    }
+
+    int samF = m_pFiffInfo->sfreq;
+
+    int numLoc = 3, numBlock, samLoc, phase; // numLoc : Number of times to localize in a second
+    samLoc = samF/numLoc; // minimum samples required to localize numLoc times in a second
+
     QVector<MatrixXd> buffer;
+    Eigen::MatrixXd amp(innerind.size(),numCoils);
 
-    while (m_bIsRunning)
-    {
-        if(m_bProcessData)
-        {
+    while (m_bIsRunning) {
+        if(m_bProcessData) {
             /* Dispatch the inputs */
             MatrixXd t_mat = m_pRtHpiBuffer->pop();
 
             buffer.append(t_mat);
 
-            if(buffer.size() >= numBlock)
-            {
-                // TODO: Append the buffer data into a matrix variable
-                // TODO: Seperate block of data of inner layer channels and reference
-                // TODO: Get the amplitude and phase of all channels. Use that for coil localization
+            if(buffer.size()*t_mat.cols() >= samLoc) {
 
-                coil = dipfit(coil, sensors, data);
+                Eigen::MatrixXd alldata(t_mat.rows(),buffer.size()*t_mat.cols());
+                // Concatenate data into a matrix
+                for(int i=0;i<buffer.size();i++) alldata << buffer[i];
 
-                std::cout << coil.pos << std::endl;
+                // Get the data from inner layer channels
+                Eigen::MatrixXd innerdata(innerind.size(),samLoc);
+                Eigen::MatrixXd refdata(numCoils,samLoc);
+
+                numBlock = alldata.cols()/samLoc;
+
+                // Loop for localizing coils
+                for(int i = 0;i<numBlock;i++) {
+                    for(int j = 0;j < innerind.size();j++)
+                        innerdata.row(j) << alldata.block(innerind[j],i*samLoc,1,samLoc);
+                    for(int j = 0;j < refind.size();j++)
+                        refdata.row(j) << alldata.block(refind[j],i*samLoc,1,samLoc);
+
+                    // Once we have the required data, compute the amplitude and phase of the channels
+                    for(int j = 0;j < numCoils;j++) {
+                        for(int k = 0;k < innerind.size();k++) {
+                            amp(k,j) = innerdata.row(k).cwiseProduct(refdata.row(j)).sum();
+                            phase = amp(k,j)/abs(amp(k,j));
+                            amp(k,j) = amp(k,j)*phase;
+                        }
+                    }
+
+                    coil = dipfit(coil, sensors, amp);
+                }
 
                 buffer.clear();
             }
@@ -361,7 +355,7 @@ void RtHpi::run()
 
 /*********************************************************************************
  * dipfit function is adapted from Fieldtrip Software. It has been
- * heavity edited for use with MNE-X Software
+ * heavily edited for use with MNE-X Software
  *********************************************************************************/
 
 coilParam RtHpi::dipfit(struct coilParam coil, struct sens sensors, Eigen::MatrixXd data)
@@ -685,6 +679,48 @@ Eigen::MatrixXd RtHpi::magnetic_dipole(Eigen::MatrixXd pos, Eigen::MatrixXd pnt,
 
 bool RtHpi::compar (int a, int b){
   return ((base_arr)[a] < (base_arr)[b]);
+}
+
+Eigen::Matrix4d computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT)
+{
+    Eigen::MatrixXd xdiff, ydiff, zdiff, C, Q;
+    Eigen::Matrix4d trans = Eigen::Matrix4d::Identity(4,4), Rot = Eigen::Matrix4d::Zero(4,4), Trans = Eigen::Matrix4d::Identity(4,4);
+    double meanx,meany,meanz,normf;
+
+    for(int i = 0;i < 50;i++) {
+        zdiff = NH.col(2) - BT.col(2);
+        ydiff = NH.col(1) - BT.col(1);
+        xdiff = NH.col(0) - BT.col(0);
+
+        meanx=xdiff.mean();
+        meany=ydiff.mean();
+        meanz=zdiff.mean();
+
+        for (int j=0;j<NH.rows();j++) {
+            BT(j,0) = BT(j,0) + meanx;
+            BT(j,1) = BT(j,1) + meany;
+            BT(j,2) = BT(j,2) + meanz;
+        }
+
+        C = BT.transpose() * NH;
+
+        Eigen::JacobiSVD< Eigen::MatrixXd > svd(C ,Eigen::ComputeThinU | Eigen::ComputeThinV);
+
+        Q = svd.matrixU() * svd.matrixV().transpose();
+
+        BT = BT * Q;
+
+        normf = (NH.transpose()-BT.transpose()).norm();
+
+        for(int j=0;j<3;j++) {
+            for(int k=0;k<3;k++) Rot(j,k) = Q(k,j);
+        }
+
+        Rot(3,3) = 1;
+        Trans(0,3) = meanx;Trans(1,3) = meany;Trans(2,3) = meanz;
+        trans = Rot * Trans * trans;
+    }
+    return trans;
 }
 
 Eigen::MatrixXd RtHpi::pinv(Eigen::MatrixXd a)
