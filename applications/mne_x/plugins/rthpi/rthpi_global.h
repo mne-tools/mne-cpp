@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
 * @file     rthpi_global.h
-* @author   Chiran Doshi <chiran.doshi.harvard.edu>;
+* @author   Chiran Doshi <chiran.doshi@childrens.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     June, 2014
