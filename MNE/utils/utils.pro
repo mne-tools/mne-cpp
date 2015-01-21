@@ -37,8 +37,9 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       -= gui
-QT       += xml
+QT -= gui
+QT += xml core
+QT += network concurrent # Check with HP-UX
 
 DEFINES += UTILS_LIBRARY
 
@@ -50,16 +51,24 @@ CONFIG(debug, debug|release) {
 
 DESTDIR = $${MNE_LIBRARY_DIR}
 
-#
-# win32: copy dll's to bin dir
-# unix: add lib folder to LD_LIBRARY_PATH
-#
-win32 {
-    FILE = $${DESTDIR}/$${TARGET}.dll
-    BINDIR = $${DESTDIR}/../bin
-    FILE ~= s,/,\\,g
-    BINDIR ~= s,/,\\,g
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
+contains(MNECPP_CONFIG, build_MNECPP_Static_Lib) {
+    CONFIG += staticlib
+    DEFINES += BUILD_MNECPP_STATIC_LIB
+}
+else {
+    CONFIG += dll
+
+    #
+    # win32: copy dll's to bin dir
+    # unix: add lib folder to LD_LIBRARY_PATH
+    #
+    win32 {
+        FILE = $${DESTDIR}/$${TARGET}.dll
+        BINDIR = $${DESTDIR}/../bin
+        FILE ~= s,/,\\,g
+        BINDIR ~= s,/,\\,g
+        QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
+    }
 }
 
 SOURCES += \
@@ -67,11 +76,15 @@ SOURCES += \
     mnemath.cpp \
     ioutils.cpp \
     layoutloader.cpp \
+    layoutmaker.cpp \
     parksmcclellan.cpp \
     filterdata.cpp \
     mp/adaptivemp.cpp \
     mp/atom.cpp \
-    mp/fixdictmp.cpp
+    mp/fixdictmp.cpp \
+    selectionloader.cpp \
+    minimizersimplex.cpp \
+    cosinefilter.cpp
 
 HEADERS += \
     kmeans.h\
@@ -79,11 +92,16 @@ HEADERS += \
     mnemath.h \
     ioutils.h \
     layoutloader.h \
+    layoutmaker.h \
     parksmcclellan.h \
     filterdata.h \
     mp/adaptivemp.h \
     mp/atom.h \
-    mp/fixdictmp.h
+    mp/fixdictmp.h \
+    selectionloader.h \
+    layoutmaker.h \
+    minimizersimplex.h \
+    cosinefilter.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

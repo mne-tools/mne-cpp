@@ -667,16 +667,16 @@ void BabyMEGSQUIDControlDgl::UpdateGUI()
         ui->m_Qbn_amp->setEnabled(true);
     else
         ui->m_Qbn_amp->setDisabled(true);
-    //integrator Reset
-    if(m_GUISM.IntegratorReset == 0)
-        ui->m_Qbn_int_reset->setEnabled(true);
-    else
-        ui->m_Qbn_int_reset->setDisabled(true);
-    //MicroReset
-    if(m_GUISM.MicroReset == 0)
-        ui->m_Qbn_mirco_reset->setEnabled(true);
-    else
-        ui->m_Qbn_mirco_reset->setDisabled(true);
+//    //integrator Reset
+//    if(m_GUISM.IntegratorReset == 0)
+//        ui->m_Qbn_int_reset->setEnabled(true);
+//    else
+//        ui->m_Qbn_int_reset->setDisabled(true);
+//    //MicroReset
+//    if(m_GUISM.MicroReset == 0)
+//        ui->m_Qbn_mirco_reset->setEnabled(true);
+//    else
+//        ui->m_Qbn_mirco_reset->setDisabled(true);
 
     //set Bar Graph
     //slew

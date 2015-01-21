@@ -214,11 +214,14 @@ void FrequencySpectrumWidget::init()
         m_pFSModel = new FrequencySpectrumModel(this);
 
         m_pFSModel->setInfo(m_pFS->getFiffInfo());
+        m_pFSModel->setScaleType(m_pFS->getScaleType()); /*Added by Limin; 10/19/2014 for passing the scale type to the model*/
 
         if(m_pFSDelegate)
             delete m_pFSDelegate;
 //        m_pFSDelegate = new FrequencySpectrumDelegate(this);
         m_pFSDelegate = new FrequencySpectrumDelegate(m_pTableView,this);
+        m_pFSDelegate->setScaleType(m_pFS->getScaleType()); /*Added by Limin; 10/19/2014 for passing the scale type to the delegate*/
+
 
         connect(m_pTableView, &QTableView::doubleClicked, m_pFSModel, &FrequencySpectrumModel::toggleFreeze);
 

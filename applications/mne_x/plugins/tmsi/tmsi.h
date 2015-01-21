@@ -262,7 +262,7 @@ private:
     QFile                               m_fileOut;                          /**< QFile for writing to fif file.*/
     FiffStream::SPtr                    m_pOutfid;                          /**< QFile for writing to fif file.*/
     QSharedPointer<FiffInfo>            m_pFiffInfo;                        /**< Fiff measurement info.*/
-    MatrixXd                            m_cals;
+    RowVectorXd                         m_cals;
 
     QSharedPointer<RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/
 

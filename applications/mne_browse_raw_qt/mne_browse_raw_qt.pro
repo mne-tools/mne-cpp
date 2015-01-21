@@ -40,15 +40,24 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += network core widgets concurrent svg
+QT += gui network core widgets concurrent svg
 
 TARGET = mne_browse_raw_qt
+
+#If one single executable is to be build
+#-> comment out flag in .pri file
+#-> add DEFINES += BUILD_MNECPP_STATIC_LIB in projects .pro file
+#-> This needs to be done in order to avoid problem with the Q_DECL_EXPORT/Q_DECL_IMPORT flag in the global headers
+contains(MNECPP_CONFIG, build_MNECPP_Static_Lib) {
+    DEFINES += BUILD_MNECPP_STATIC_LIB
+}
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-CONFIG += console #DEBUG
+#Note that the static flag is ingored when building against a dynamic qt version
+CONFIG += static console #DEBUG console
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
@@ -75,10 +84,19 @@ SOURCES += \
     Utils/mneoperator.cpp \
     Utils/filteroperator.cpp \
     Utils/filterplotscene.cpp \
+    Utils/butterflyscene.cpp \
     Utils/layoutscene.cpp \
-    Utils/channelsceneitem.cpp \
+    Utils/averagescene.cpp \
+    Utils/selectionscene.cpp \
+    Utils/selectionsceneitem.cpp \
+    Utils/averagesceneitem.cpp \
+    Utils/butterflysceneitem.cpp \
+    Models/averagemodel.cpp \
     Models/rawmodel.cpp \
     Models/eventmodel.cpp \
+    Models/chinfomodel.cpp \
+    Models/projectionmodel.cpp \
+    Delegates/averagedelegate.cpp \
     Delegates/rawdelegate.cpp \
     Delegates/eventdelegate.cpp \
     Windows/mainwindow.cpp \
@@ -87,7 +105,12 @@ SOURCES += \
     Windows/datawindow.cpp \
     Windows/aboutwindow.cpp \
     Windows/informationwindow.cpp \
-    Windows/selectionmanagerwindow.cpp
+    Windows/selectionmanagerwindow.cpp \
+    Windows/averagewindow.cpp \
+    Windows/scalewindow.cpp \
+    Windows/chinfowindow.cpp \
+    Windows/projectionwindow.cpp \
+    Utils/datapackage.cpp \    
 
 HEADERS += \
     Utils/datamarker.h \
@@ -97,10 +120,19 @@ HEADERS += \
     Utils/types.h \
     Utils/info.h \
     Utils/filterplotscene.h \
+    Utils/butterflyscene.h \
     Utils/layoutscene.h \
-    Utils/channelsceneitem.h \
+    Utils/averagescene.h \
+    Utils/selectionscene.h \
+    Utils/selectionsceneitem.h \
+    Utils/averagesceneitem.h \
+    Utils/butterflysceneitem.h \
+    Models/averagemodel.h \
     Models/rawmodel.h \
     Models/eventmodel.h \
+    Models/chinfomodel.h \
+    Models/projectionmodel.h \
+    Delegates/averagedelegate.h \
     Delegates/rawdelegate.h \
     Delegates/eventdelegate.h \
     Windows/mainwindow.h \
@@ -109,16 +141,25 @@ HEADERS += \
     Windows/datawindow.h \
     Windows/aboutwindow.h \
     Windows/informationwindow.h \
-    Windows/selectionmanagerwindow.h
+    Windows/selectionmanagerwindow.h \
+    Windows/averagewindow.h \
+    Windows/scalewindow.h \
+    Windows/chinfowindow.h \
+    Windows/projectionwindow.h \
+    Utils/datapackage.h \
 
 FORMS += \
-    Windows/filterwindow.ui \
     Windows/eventwindowdock.ui \
     Windows/datawindowdock.ui \
     Windows/mainwindow.ui \
     Windows/aboutwindow.ui \
     Windows/informationwindow.ui \
-    Windows/selectionmanagerwindow.ui
+    Windows/selectionmanagerwindow.ui \
+    Windows/averagewindow.ui \
+    Windows/scalewindow.ui \
+    Windows/chinfowindow.ui \
+    Windows/filterwindowdock.ui \
+    Windows/projectionwindow.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -139,4 +180,4 @@ macx {
 RESOURCES += \
     mnebrowserawqt.qrc
 
-RC_FILE = Resources/Images/ApplicationIcons/myapp.rc
+RC_FILE = Resources/Images/ApplicationIcons/browse_raw.rc

@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "ui_filterwindow.h"
+#include "ui_filterwindowdock.h"
 #include "mainwindow.h"
 #include "../Utils/filterplotscene.h"
 
@@ -66,6 +66,7 @@
 namespace MNEBrowseRawQt
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE FORWARD DECLARATIONS
@@ -78,7 +79,7 @@ class MainWindow;
 *
 * @brief The FilterWindow class provides the filter window.
 */
-class FilterWindow : public QWidget
+class FilterWindow : public QDockWidget
 {
     Q_OBJECT
 
@@ -89,7 +90,7 @@ public:
     *
     * @param [in] parent pointer to parent widget; If parent is 0, the new FilterWindow becomes a window. If parent is another widget, FilterWindow becomes a child window inside parent. FilterWindow is deleted when its parent is deleted.
     */
-    FilterWindow(QWidget *parent = 0);
+    FilterWindow(MainWindow *mainWindow, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -100,9 +101,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Initialises this window.
+    * On new file loaded.
     */
-    void init();
+    void newFileLoaded();
 
 private:
     //=========================================================================================================
@@ -131,9 +132,27 @@ private:
 
     //=========================================================================================================
     /**
+    * inits the table views.
+    */
+    void initTableViews();
+
+    //=========================================================================================================
+    /**
     * resizeEvent reimplemented virtual function to handle resize events of the filter window
     */
     void resizeEvent(QResizeEvent * event);
+
+    //=========================================================================================================
+    /**
+    * keyPressEvent reimplemented virtual function to handle key events
+    */
+    virtual void keyPressEvent(QKeyEvent * event);
+
+    //=========================================================================================================
+    /**
+    * eventFilter reimplemented virtual function to handle object specific events
+    */
+    bool eventFilter(QObject *obj, QEvent *event);
 
     //=========================================================================================================
     /**
@@ -141,21 +160,22 @@ private:
     */
     void updateFilterPlot();
 
-    Ui::FilterWindowWidget *ui;
+    Ui::FilterWindowDockWidget *ui;             /**< Pointer to the qt designer generated ui class.*/
 
-    MainWindow*         m_pMainWindow;
+    MainWindow*         m_pMainWindow;          /**< Pointer to the parent, the MainWindow class.*/
 
-    int                 m_iWindowSize;
-    int                 m_iFilterTaps;
+    int                 m_iWindowSize;          /**< The current window size of the loaded fiff data in the DataWindow class.*/
+    int                 m_iFilterTaps;          /**< The current number of filter taps.*/
 
-    QSettings           m_qSettings;
+    QSettings           m_qSettings;            /**< QSettings variable used to write or read from independent application sessions.*/
 
-    FilterPlotScene*    m_pFilterPlotScene;
+    FilterPlotScene*    m_pFilterPlotScene;     /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
 
 protected slots:
     //=========================================================================================================
     /**
     * This function gets called whenever the combo box is altered by the user via the gui.
+    *
     * @param currentIndex holds the current index of the combo box
     */
     void changeStateSpinBoxes(int currentIndex);
@@ -170,13 +190,13 @@ protected slots:
     /**
     * This function applies the user defined filter to all channels.
     */
-    void applyFilterToAll();
+    void applyFilter();
 
     //=========================================================================================================
     /**
     * This function undoes the user defined filter to all channels.
     */
-    void undoFilterToAll();
+    void undoFilter();
 
     //=========================================================================================================
     /**

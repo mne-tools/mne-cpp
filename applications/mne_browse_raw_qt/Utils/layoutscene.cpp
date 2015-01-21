@@ -56,92 +56,24 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-LayoutScene::LayoutScene(QGraphicsView* view, QObject* parent, int sceneType)
+LayoutScene::LayoutScene(QGraphicsView* view, QObject* parent)
 : QGraphicsScene(parent)
 , m_qvView(view)
-, m_iSceneType(sceneType)
-, m_dragSceneIsActive(false)
+, m_bDragMode(false)
+//, m_bExtendedSelectionMode(false)
 {
-}
+    m_qvView->grabGesture(Qt::PanGesture);
+    m_qvView->grabGesture(Qt::PinchGesture);
 
-
-//*************************************************************************************************************
-
-void LayoutScene::setNewLayout(QMap<QString,QVector<double>> layoutMap)
-{
-    m_layoutMap = layoutMap;
-
-    //Redraw all items
-    repaintItems();
-}
-
-
-//*************************************************************************************************************
-
-void LayoutScene::hideItems(QStringList list)
-{
-    QList<QGraphicsItem *> itemList = this->items();
-
-    switch(m_iSceneType) {
-        case 0: //Channel selection plot scene
-            for(int i = 0; i<itemList.size(); i++) {
-                ChannelSceneItem* item = static_cast<ChannelSceneItem*>(itemList.at(i));
-
-                if(!list.contains(item->getElectrodeName()))
-                    item->hide();
-                else
-                    item->show();
-            }
-
-        break;
-
-        case 1: //Average plot scene
-
-
-        break;
-    }
-}
-
-
-//*************************************************************************************************************
-
-void LayoutScene::repaintItems()
-{
-    QMapIterator<QString,QVector<double>> i(m_layoutMap);
-
-    switch(m_iSceneType) {
-        case 0: //Channel selection plot scene
-            this->clear();
-
-            while (i.hasNext()) {
-                i.next();
-                ChannelSceneItem* ChannelSceneItemTemp = new ChannelSceneItem(i.key(), QPointF(i.value().at(0), i.value().at(1)));
-
-                this->addItem(ChannelSceneItemTemp);
-            }
-
-        break;
-
-        case 1: //Average plot scene
-//            this->clear();
-
-//            QMapIterator<QString,QVector<double>> i(map);
-//            while (i.hasNext()) {
-//                i.next();
-//                AverageSceneItem* AverageSceneItemTemp = new AverageSceneItem(i.key(), QPointF(i.value().at(0), i.value().at(1)));
-
-//                this->addItem(AverageSceneItemTemp);
-//            }
-
-        break;
-    }
+    //Install event filter to overcome QGrabGesture and QScrollBar problem
+    m_qvView->installEventFilter(this);
 }
 
 
 //*************************************************************************************************************
 
 void LayoutScene::wheelEvent(QGraphicsSceneWheelEvent* event) {
-    m_qvView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+    m_qvView->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
 
     // Scale the view / do the zoom
     double scaleFactor = 1.15;
@@ -172,14 +104,21 @@ void LayoutScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     switch(mouseEvent->button()) {
     case Qt::LeftButton:
-        m_qvView->setDragMode(QGraphicsView::ScrollHandDrag);
-        break;
-    default:
-        m_qvView->setDragMode(QGraphicsView::NoDrag);
-        break;
-    case Qt::RightButton:
         m_qvView->setDragMode(QGraphicsView::RubberBandDrag);
+
+//        //If a normal left lick occurs without holding down CTRL -> Delete all selected items
+//        if(!m_bExtendedSelectionMode)
+//            m_selectedItems.clear();
+
         break;
+
+    case Qt::RightButton:
+        m_bDragMode = true;
+        m_qvView->setDragMode(QGraphicsView::NoDrag);
+        m_mousePressPosition = mouseEvent->screenPos();
+
+        //return so that no selection event is called
+        return;
     }
 
     QGraphicsScene::mousePressEvent(mouseEvent);
@@ -190,6 +129,16 @@ void LayoutScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 void LayoutScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
+    if(m_bDragMode) {
+        int diffX = mouseEvent->screenPos().x() - m_mousePressPosition.x();
+        int diffY = mouseEvent->screenPos().y() - m_mousePressPosition.y();
+
+        m_mousePressPosition = mouseEvent->screenPos();
+
+        m_qvView->verticalScrollBar()->setValue(m_qvView->verticalScrollBar()->value() - diffY);
+        m_qvView->horizontalScrollBar()->setValue(m_qvView->horizontalScrollBar()->value() - diffX);
+    }
+
     QGraphicsScene::mouseMoveEvent(mouseEvent);
 }
 
@@ -198,11 +147,128 @@ void LayoutScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 void LayoutScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    m_qvView->setDragMode(QGraphicsView::NoDrag);
+//    if(m_bExtendedSelectionMode) {
+//        qDebug()<<"Extended Selection";
+//        //List of selected items during last rubberband action
+//        QList<QGraphicsItem *> currentSelectedItemsList = this->selectedItems();
+
+//        //Generate list of all selected items (dont add duplicates)
+//        for(int i = 0; i<currentSelectedItemsList.size(); i++) {
+//            if(!m_selectedItems.contains(currentSelectedItemsList.at(i))) {
+//                //Duplicate not found - new item was selected since the last extended selection
+//                qDebug()<<"add item to m_selectedItems";
+//                m_selectedItems << currentSelectedItemsList.at(i);
+//            }
+//            else {
+//                qDebug()<<"delete item from m_selectedItems";
+//                //Duplicate found - already selected item was selected again since the last extended selection
+//                m_selectedItems.removeAll(currentSelectedItemsList.at(i));
+//                currentSelectedItemsList.at(i)->setSelected(false);
+//            }
+//        }
+
+//        for(int i = 0; i<m_selectedItems.size(); i++)
+//            m_selectedItems.at(i)->setSelected(true);
+
+//        qDebug()<<m_selectedItems.size();
+//    }
+
+    if(m_bDragMode) {
+        m_bDragMode = false;
+        this->update();
+    }
 
     QGraphicsScene::mouseReleaseEvent(mouseEvent);
 }
 
 
+//*************************************************************************************************************
+
+void LayoutScene::keyPressEvent(QKeyEvent *keyEvent)
+{
+//    if(keyEvent->key() == Qt::Key_Control)
+//        m_bExtendedSelectionMode = true;
+
+    QGraphicsScene::keyPressEvent(keyEvent);
+}
 
 
+//*************************************************************************************************************
+
+void LayoutScene::keyReleaseEvent(QKeyEvent *keyEvent)
+{
+//    if(keyEvent->key() == Qt::Key_Control)
+//        m_bExtendedSelectionMode = false;
+
+    QGraphicsScene::keyReleaseEvent(keyEvent);
+}
+
+
+//*************************************************************************************************************
+
+bool LayoutScene::event(QEvent *event)
+{
+    if (event->type() == QEvent::Gesture) {
+        QGestureEvent* gestureEventCast = static_cast<QGestureEvent*>(event);
+
+//        QList<QGesture *> gestureList = gestureEventCast->gestures();
+//        for(int i = 0; i<gestureList.size(); i++)
+//            qDebug()<<gestureList.at(i)->gestureType();
+//        qDebug()<<"-----------------------";
+
+        return gestureEvent(static_cast<QGestureEvent*>(gestureEventCast));
+    }
+
+    return QGraphicsScene::event(event);
+}
+
+//*************************************************************************************************************
+
+bool LayoutScene::gestureEvent(QGestureEvent *event)
+{
+    //Pan event
+    if (QGesture *pan = event->gesture(Qt::PanGesture))
+        panTriggered(static_cast<QPanGesture *>(pan));
+
+    //Pinch event
+    if (QGesture *pinch = event->gesture(Qt::PinchGesture))
+        pinchTriggered(static_cast<QPinchGesture *>(pinch));
+
+    return true;
+}
+
+//*************************************************************************************************************
+
+
+void LayoutScene::panTriggered(QPanGesture *gesture)
+{
+    qDebug()<<"panTriggered";
+
+    QPointF delta = gesture->delta();
+
+    m_qvView->verticalScrollBar()->setValue(m_qvView->verticalScrollBar()->value() + delta.y());
+    m_qvView->horizontalScrollBar()->setValue(m_qvView->horizontalScrollBar()->value() + delta.x());
+}
+
+//*************************************************************************************************************
+
+void LayoutScene::pinchTriggered(QPinchGesture *gesture)
+{
+    qDebug()<<"pinchTriggered";
+
+    m_qvView->setTransformationAnchor(QGraphicsView::NoAnchor);
+    m_qvView->scale(gesture->scaleFactor(), gesture->scaleFactor());
+}
+
+//*************************************************************************************************************
+
+bool LayoutScene::eventFilter(QObject *object, QEvent *event)
+{
+    if (object == m_qvView && event->type() == QEvent::Gesture) {
+        QGestureEvent* gestureEventCast = static_cast<QGestureEvent*>(event);
+
+        return gestureEvent(static_cast<QGestureEvent*>(gestureEventCast));
+    }
+
+    return false;
+}

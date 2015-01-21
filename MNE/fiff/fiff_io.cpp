@@ -221,9 +221,11 @@ bool FiffIO::write(QFile& p_QFile, const fiff_int_t type, const fiff_int_t idx) 
 
 //*************************************************************************************************************
 
-bool FiffIO::write_raw(QIODevice& p_IODevice, const fiff_int_t idx) const {
+bool FiffIO::write_raw(QIODevice &p_IODevice, const fiff_int_t idx) const {
 
-    MatrixXd cals;
+    RowVectorXd cals;
+    SparseMatrix<double> mult;
+    RowVectorXi sel;
 
 //    std::cout << "Writing file " << QFile(&p_IODevice).fileName().toLatin1() << std::endl;
     FiffStream::SPtr outfid = Fiff::start_writing_raw(p_IODevice,this->m_qlistRaw[idx]->info,cals);
@@ -234,8 +236,8 @@ bool FiffIO::write_raw(QIODevice& p_IODevice, const fiff_int_t idx) const {
     float quantum_sec = 10.0f;//read and write in 10 sec junks
     fiff_int_t quantum = ceil(quantum_sec*m_qlistRaw[idx]->info.sfreq);
 
-    // Uncomment to read the whole file at once
-    quantum = to - from + 1;
+    // Uncomment to read the whole file at once. Warning MAtrix may be none-initialisable because its huge
+    //quantum = to - from + 1;
 
     // Read and write all the data
     bool first_buffer = true;
@@ -249,9 +251,9 @@ bool FiffIO::write_raw(QIODevice& p_IODevice, const fiff_int_t idx) const {
         if (last > to)
             last = to;
 
-        if (!m_qlistRaw[idx]->read_raw_segment(data,times,first,last)) {
-                qDebug("error during read_raw_segment\n");
-                return false;
+        if (!m_qlistRaw[idx]->read_raw_segment(data,times,mult,first,last,sel)) {
+            qDebug("error during read_raw_segment\n");
+            return false;
         }
 
         qDebug("Writing...");
@@ -260,7 +262,7 @@ bool FiffIO::write_raw(QIODevice& p_IODevice, const fiff_int_t idx) const {
                outfid->write_int(FIFF_FIRST_SAMPLE,&first);
            first_buffer = false;
         }
-        outfid->write_raw_buffer(data,cals);
+        outfid->write_raw_buffer(data,mult);
         qDebug("[done]\n");
     }
 

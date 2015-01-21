@@ -55,9 +55,10 @@
 
 #include <QWidget>
 #include <QResizeEvent>
-#include <QToolBar>
 #include <QPainter>
 #include <QColor>
+#include <QGesture>
+#include <QScroller>
 
 
 //*************************************************************************************************************
@@ -74,6 +75,7 @@ namespace MNEBrowseRawQt
 //=============================================================================================================
 
 class MainWindow;
+class RawDelegate;
 
 /**
 * DECLARE CLASS DataWindow
@@ -108,6 +110,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Setup the model view controller of the data window
+    */
+    void initMVCSettings();
+
+    //=========================================================================================================
+    /**
     * Returns the data QTableView of this window
     */
     QTableView* getDataTableView();
@@ -130,19 +138,41 @@ public:
     */
     RawDelegate* getDataDelegate();
 
+    //=========================================================================================================
+    /**
+    * Scales the data according to scaleMap
+    *
+    * @param [in] scaleMap map with all channel types and their current scaling value
+    */
+    void scaleData(const QMap<QString,double> &scaleMap);
+
+    //=========================================================================================================
+    /**
+    * Updates the data table views
+    */
+    void updateDataTableViews();
+
+    //=========================================================================================================
+    /**
+    * Only shows the channels defined in the QStringList selectedChannels
+    *
+    * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
+    */
+    void showSelectedChannelsOnly(QStringList selectedChannels);
+
+    //=========================================================================================================
+    /**
+    * Change the channel plot height in the data views to the double value heigt
+    */
+    void changeRowHeight(int height);
+
+    //=========================================================================================================
+    /**
+    * hide all bad channels
+    */
+    void hideBadChannels(bool hideChannels);
+
 private:
-    //=========================================================================================================
-    /**
-    * Setup the model view controller of the data window
-    */
-    void initMVCSettings();
-
-    //=========================================================================================================
-    /**
-    * Setup the undocked data view window.
-    */
-    void initUndockedWindow();
-
     //=========================================================================================================
     /**
     * Setup the tool bar of the data window.
@@ -173,25 +203,51 @@ private:
     */
     void keyPressEvent(QKeyEvent* event);
 
-    Ui::DataWindowDockWidget *ui;                   /**< the ui variabe to initalise and access the ui file with this class */
+    //=========================================================================================================
+    /**
+    * Installed event filter.
+    */
+    bool eventFilter(QObject *object, QEvent *event);
 
-    MainWindow*     m_pMainWindow;                  /**< pointer to the main window (parent) */
+    //=========================================================================================================
+    /**
+    * gestureEvent processes gesture events
+    */
+    bool gestureEvent(QGestureEvent *event);
 
-    QSettings       m_qSettings;                    /**< global mne browse raw qt settings */
+    //=========================================================================================================
+    /**
+    * pinchTriggered processes pinch gesture events
+    */
+    bool pinchTriggered(QPinchGesture *gesture);
 
-    QWidget*        m_pUndockedViewWidget;          /**< widget which is shown whenever the view undock action is triggered */
+    Ui::DataWindowDockWidget *ui;                   /**< Pointer to the qt designer generated ui class.*/
 
-    DataMarker*     m_pDataMarker;                  /**< pointer to the data marker */
+    MainWindow*     m_pMainWindow;                  /**< pointer to the main window (parent). */
 
-    QLabel*         m_pCurrentDataMarkerLabel;      /**< the current data marker label to display the marker's position */
+    QSettings       m_qSettings;                    /**< QSettings variable used to write or read from independent application sessions. */
 
-    int             m_iCurrentMarkerSample;         /**< the current data marker sample value to display the marker's position */
+    DataMarker*     m_pDataMarker;                  /**< pointer to the data marker. */
+    QLabel*         m_pCurrentDataMarkerLabel;      /**< the current data marker label to display the marker's position. */
+    int             m_iCurrentMarkerSample;         /**< the current data marker sample value to display the marker's position. */
 
-    RawDelegate*    m_pRawDelegate;                 /**< the QAbstractDelegate being part of the raw model/view framework of Qt */
-    RawModel*       m_pRawModel;                    /**< the QAbstractTable model being part of the model/view framework of Qt */
+    RawDelegate*    m_pRawDelegate;                 /**< the QAbstractDelegate being part of the raw model/view framework of Qt. */
+    RawModel*       m_pRawModel;                    /**< the QAbstractTable model being part of the model/view framework of Qt. */
 
-    QTableView*     m_pUndockedDataView;
-    QVBoxLayout*    m_pUndockedDataViewLayout;
+    QVBoxLayout*    m_pUndockedDataViewLayout;      /**< the layout of the undockable widget. */
+
+    QScroller*      m_pKineticScroller;             /**< the kinetic scroller of the QTableView. */
+
+    QStringList     m_slSelectedChannels;           /**< the currently selected channels from the selection manager window. */
+
+    bool            m_bHideBadChannels;             /**< hide bad channels flag. */
+
+signals:
+    //=========================================================================================================
+    /**
+    * scaleChannels gets called whenever the user performed a scaling gesture (pinch)
+    */
+    void scaleChannels(double);
 
 protected slots:
     //=========================================================================================================
@@ -215,21 +271,15 @@ protected slots:
 
     //=========================================================================================================
     /**
-    * Adds an event to the event model and its QTableView
-    */
-    void addEventToEventModel();
-
-    //=========================================================================================================
-    /**
-    * Undock the table view to a normal window (not dock widget)
-    */
-    void undockDataViewToWindow();
-
-    //=========================================================================================================
-    /**
     * Updates the marker position
     */
     void updateMarkerPosition();
+
+    //=========================================================================================================
+    /**
+    * Highlights the current selected channels in the 2D plot of selection manager
+    */
+    void highlightChannelsInSelectionManager();
 };
 
 } // NAMESPACE MNEBrowseRawQt

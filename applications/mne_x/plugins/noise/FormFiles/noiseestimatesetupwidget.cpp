@@ -73,6 +73,8 @@ NoiseEstimateSetupWidget::NoiseEstimateSetupWidget(NoiseEstimate* toolbox, QWidg
 
     connect(ui.m_qComboBoxnFFT, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &NoiseEstimateSetupWidget::chgnFFT);
     connect(ui.m_qSpinDataLen, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &NoiseEstimateSetupWidget::chgDataLen);
+    connect(ui.m_cb_logscale, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), this, &NoiseEstimateSetupWidget::chgXAxisType);
+
 }
 
 
@@ -105,6 +107,13 @@ void NoiseEstimateSetupWidget::init()
 
     //set up the data length for spectrum calculation
     ui.m_qSpinDataLen->setValue(6);
+
+    //set up the default x-scale type of spectrum
+    if ( m_pNoiseEstimate->m_x_scale_type == 0)
+        ui.m_cb_logscale->setChecked(false);
+    else
+        ui.m_cb_logscale->setChecked(true);
+
 }
 
 
@@ -112,13 +121,30 @@ void NoiseEstimateSetupWidget::init()
 
 void NoiseEstimateSetupWidget::chgnFFT(int idx)
 {
-//    qDebug() << "ui.m_qComboBoxnFFT->itemData(idx).toInt();" << ui.m_qComboBoxnFFT->itemText(idx).toInt();
+    //qDebug() << "ui.m_qComboBoxnFFT->itemData(idx).toInt();" << ui.m_qComboBoxnFFT->itemText(idx).toInt();
     m_pNoiseEstimate->m_iFFTlength = ui.m_qComboBoxnFFT->itemText(idx).toInt();
 }
 
+//*************************************************************************************************************
+
 void NoiseEstimateSetupWidget::chgDataLen(int idx)
 {
-//    qDebug() << "ui.m_qComboBoxnFFT->itemData(idx).toInt();" << ui.m_qComboBoxnFFT->itemText(idx).toInt();
     m_pNoiseEstimate->m_DataLen = idx;
+    //qDebug() << "m_pNoiseEstimate->m_DataLen" <<m_pNoiseEstimate->m_DataLen;
+}
+
+//*************************************************************************************************************
+
+void NoiseEstimateSetupWidget::chgXAxisType()
+{
+
+    //qDebug()<<"Check state1";
+    bool checkstatus = ui.m_cb_logscale->isChecked();
+    if ( checkstatus)
+        m_pNoiseEstimate->m_x_scale_type = 1;
+    else
+        m_pNoiseEstimate->m_x_scale_type = 0;
+
+    qDebug() << "setup widget scale type" << m_pNoiseEstimate->m_x_scale_type ;
 }
 

@@ -37,9 +37,10 @@ include(mne-cpp.pri)
 
 TEMPLATE = subdirs
 
-#At least major version 5
-lessThan(QT_MAJOR_VERSION, 5){
-    error(mne-cpp requires at least Qt version 5!)
+#At least version 5.2.0
+!minQtVersion(5, 2, 0) {
+    message("Cannot build MNE-CPP with Qt version $${QT_VERSION}.")
+    error("Use at least Qt 5.2.0.")
 }
 
 SUBDIRS += \
@@ -49,6 +50,3 @@ SUBDIRS += \
     applications
 
 CONFIG += ordered
-
-RESOURCES += \
-    applications/mne_x/plugins/rapmusictoolbox/mne.qrc

@@ -56,6 +56,8 @@
 #include "../Utils/types.h"
 #include "../Utils/rawsettings.h"
 
+#include "../Windows/scalewindow.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -106,6 +108,14 @@ using namespace MNELIB;
 namespace MNEBrowseRawQt
 {
 
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE FORWARD DECLARATIONS
+//=============================================================================================================
+
+class ScaleWindow;
+
+
 //=============================================================================================================
 /**
 * DECLARE CLASS RawDelegate
@@ -115,6 +125,12 @@ class RawDelegate : public QAbstractItemDelegate
     Q_OBJECT
 public:
     RawDelegate(QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Reimplemented virtual functions
+    *
+    */
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
@@ -128,15 +144,26 @@ public:
     */
     void setModelView(EventModel *eventModel, QTableView* eventView, QTableView *rawView);
 
+    //=========================================================================================================
+    /**
+    * setModelView creates the QPointer path for the data plot.
+    *
+    * @param[in] scaleMap map with all channel types and their current scaling value.
+    */
+    void setScaleMap(const QMap<QString, double> &scaleMap);
+
+    QMap<QString,double> m_scaleMap;        /**< Map with all channel types and their current scaling value.*/
+
     // Plots settings
-    int         m_iDefaultPlotHeight;       /**< The height of the plot */
-    bool        m_bShowSelectedEventsOnly;  /**< When true all events are plotted otherwise only plot selected event */
-    bool        m_bActivateEvents;          /**< Flag for plotting events */
+    int         m_iDefaultPlotHeight;       /**< The height of the plot. */
+    bool        m_bShowSelectedEventsOnly;  /**< When true all events are plotted otherwise only plot selected event. */
+    bool        m_bActivateEvents;          /**< Flag for plotting events. */
+    bool        m_bRemoveDC;                /**< Flag for DC removal. */
 
     // Scaling
-    double      m_dMaxValue;                /**< Maximum value of the data to plot */
-    double      m_dScaleY;                  /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
-    double      m_dDx;                      /**< pixel difference to the next sample */
+    double      m_dMaxValue;                /**< Maximum value of the data to plot. */
+    double      m_dScaleY;                  /**< Maximum amplitude of plot (max is m_dPlotHeight/2). */
+    double      m_dDx;                      /**< pixel difference to the next sample. */
 
 private:
     //=========================================================================================================
@@ -146,7 +173,7 @@ private:
     * @param[in] index QModelIndex for accessing associated data and model object.
     * @param[in,out] path The QPointerPath to create for the data plot.
     */
-    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs) const;
+    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs, double channelMean) const;
 
     //=========================================================================================================
     /**
@@ -167,13 +194,14 @@ private:
     void plotEvents(const QModelIndex &index, const QStyleOptionViewItem &option, QPainter *painter) const;
 
     //Settings
-    qint8           m_nhlines;              /**< Number of horizontal lines for the grid plot */
-    QSettings       m_qSettings;
+    qint8           m_nhlines;              /**< Number of horizontal lines for the grid plot. */
+    QSettings       m_qSettings;            /**< QSettings variable used to write or read from independent application sessions. */
 
     //Event model view
     EventModel*     m_pEventModel;           /**< Pointer to the event model. */
     QTableView*     m_pEventView;            /**< Pointer to the event view. */
     QTableView*     m_pRawView;              /**< Pointer to the raw view. */
+    ScaleWindow*    m_pScaleWindow;          /**< Pointer to the scale window. */
 };
 
 } // NAMESPACE

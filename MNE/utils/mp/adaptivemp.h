@@ -74,6 +74,7 @@
 //=============================================================================================================
 
 #include <QThread>
+#include <QtConcurrent/QtConcurrent>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -105,7 +106,7 @@ class UTILSSHARED_EXPORT AdaptiveMp : public QThread
 {
     Q_OBJECT
 
-public:    
+public:
 
     /**
     * adaptiveMP_adaptiveMP
@@ -134,15 +135,22 @@ public:
 
     //=========================================================================================================
 
-    typedef QList<GaborAtom> gabor_atom_list;
-    qint32 it;
-    qint32 max_it;
+    typedef QList<GaborAtom> adaptive_atom_list;
+    typedef QList<FixDictAtom> fix_dict_atom_list;
+    typedef Eigen::VectorXd VectorXd;
+    typedef Eigen::MatrixXd MatrixXd;
+
+    bool fix_phase;
     qreal signal_energy;
     qreal current_energy;
-    QList<GaborAtom> atom_list;
-    MatrixXd signal;
-    qint32 max_iterations;
     qreal epsilon;
+    qint32 it;
+    qint32 max_it;
+    qint32 max_iterations;
+    VectorXd best_match;
+    MatrixXd signal;
+    QList<GaborAtom> atom_list;
+    QList<FixDictAtom> fix_dict_list;
 
     //=========================================================================================================
     /*
@@ -193,23 +201,26 @@ public:
     *
     * @return depending on returnValue returning the real atom calculated or the manipulated parameters: scale, translation, modulation, phase, scalarproduct
     */
-    VectorXd calculate_atom(qint32 sampleCount, qreal scale, quint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue return_value);
+    static VectorXd calculate_atom(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue return_value, bool fix_phase);
 
     //=========================================================================================================
 
 public slots:
 
-    void send_result();
-    QList<GaborAtom> matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon);
-    void process();
-    void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon);
+    QList<GaborAtom> matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase, qint32 boost, qint32 simplex_it,
+                                       qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction);
+    void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase, qint32 boost, qint32 simplex_it,
+                       qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction);
 
     //=========================================================================================================
 
 signals:
 
-    void current_result(qint32 current_iteration, qint32 max_iteration, qreal current_energy, qreal max_energy, gabor_atom_list atom_list);
-    void finished();
+    void current_result(qint32 current_iteration, qint32 max_iteration, qreal current_energy, qreal max_energy, MatrixXd residuum,
+                        adaptive_atom_list atom_list, fix_dict_atom_list fix_dict_list);
+    void finished_calc();
+
+    void send_warning(qint32 warning);
 
 };
 

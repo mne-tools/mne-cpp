@@ -57,16 +57,24 @@ else {
 
 DESTDIR = $${MNE_LIBRARY_DIR}
 
-#
-# win32: copy dll's to bin dir
-# unix: add lib folder to LD_LIBRARY_PATH
-#
-win32 {
-    FILE = $${DESTDIR}/$${TARGET}.dll
-    BINDIR = $${DESTDIR}/../bin
-    FILE ~= s,/,\\,g
-    BINDIR ~= s,/,\\,g
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
+contains(MNECPP_CONFIG, build_MNECPP_Static_Lib) {
+    CONFIG += staticlib
+    DEFINES += BUILD_MNECPP_STATIC_LIB
+}
+else {
+    CONFIG += dll
+
+    #
+    # win32: copy dll's to bin dir
+    # unix: add lib folder to LD_LIBRARY_PATH
+    #
+    win32 {
+        FILE = $${DESTDIR}/$${TARGET}.dll
+        BINDIR = $${DESTDIR}/../bin
+        FILE ~= s,/,\\,g
+        BINDIR ~= s,/,\\,g
+        QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
+    }
 }
 
 SOURCES += \

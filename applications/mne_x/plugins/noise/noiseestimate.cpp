@@ -74,6 +74,7 @@ NoiseEstimate::NoiseEstimate()
 , m_Fs(600)
 , m_iFFTlength(16384)
 , m_DataLen(6)
+, m_x_scale_type(0)
 {
 }
 
@@ -109,6 +110,7 @@ void NoiseEstimate::init()
     QSettings settings;
     m_iFFTlength = settings.value(QString("Plugin/%1/FFTLength").arg(this->getName()), 16384).toInt();
     m_DataLen = settings.value(QString("Plugin/%1/DataLen").arg(this->getName()), 6).toInt();
+    m_x_scale_type = settings.value(QString("Plugin/%1/ScaleType").arg(this->getName()), 0).toInt();
 
     // Input
     m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "Noise Estimatge In", "Noise Estimate input data");
@@ -126,6 +128,7 @@ void NoiseEstimate::init()
     //Delete Buffer - will be initailzed with first incoming data
     if(!m_pBuffer.isNull())
         m_pBuffer = CircularMatrixBuffer<double>::SPtr();
+
 }
 
 
@@ -139,6 +142,7 @@ void NoiseEstimate::unload()
     QSettings settings;
     settings.setValue(QString("Plugin/%1/FFTLength").arg(this->getName()), m_iFFTlength);
     settings.setValue(QString("Plugin/%1/DataLen").arg(this->getName()), m_DataLen);
+    settings.setValue(QString("Plugin/%1/ScaleType").arg(this->getName()), m_x_scale_type);
 }
 
 
@@ -146,9 +150,13 @@ void NoiseEstimate::unload()
 
 void NoiseEstimate::initConnector()
 {
+    /* init Connector is called after NoiseEstimate::start */
     qDebug() << "void NoiseEstimate::initConnector()";
-    if(m_pFiffInfo)
+    if(m_pFiffInfo){
+        // pass fiff info
         m_pFSOutput->data()->initFromFiffInfo(m_pFiffInfo);
+
+    }
 }
 
 
@@ -160,11 +168,12 @@ bool NoiseEstimate::start()
     if(this->isRunning())
         QThread::wait();
 
+    m_qMutex.lock();
     m_bIsRunning = true;
+    m_qMutex.unlock();
 
     // Start threads
     QThread::start();
-
     return true;
 }
 
@@ -173,22 +182,30 @@ bool NoiseEstimate::start()
 
 bool NoiseEstimate::stop()
 {
-    //Wait until this thread is stopped
-    m_bIsRunning = false;
 
-    m_pRtNoise->stop();
+
+    //Wait until this thread is stopped
+    m_qMutex.lock();
+    m_bIsRunning = false;
+    m_qMutex.unlock();
 
     if(m_bProcessData)
     {
-
         //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
         m_pBuffer->releaseFromPop();
         m_pBuffer->releaseFromPush();
 
-        m_pBuffer->clear();
-
+//        m_pBuffer->clear();
 //        m_pNEOutput->data()->clear();
     }
+
+    // Stop filling buffers with data from the inputs
+    m_bProcessData = false;
+
+    qDebug()<<"NoiseEstimate Thread is stopped.";
+
+//    if(m_pRtNoise && m_pRtNoise->isRunning())
+//        m_pRtNoise->stop();
 
     return true;
 }
@@ -217,7 +234,6 @@ QWidget* NoiseEstimate::setupWidget()
     NoiseEstimateSetupWidget* setupWidget = new NoiseEstimateSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
 
     connect(this,&NoiseEstimate::SetNoisePara,setupWidget,&NoiseEstimateSetupWidget::init);
-    //connect(this,&NoiseEstimate::RePlot,setupWidget,&NoiseEstimateSetupWidget::Update);
 
     return setupWidget;
 
@@ -233,8 +249,12 @@ void NoiseEstimate::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
     if(pRTMSA)
     {
         //Check if buffer initialized
+
+        m_qMutex.lock();
         if(!m_pBuffer)
-            m_pBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
+        {
+            m_pBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(8, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
+        }
 
         //Fiff information
         if(!m_pFiffInfo)
@@ -242,15 +262,17 @@ void NoiseEstimate::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             m_pFiffInfo = pRTMSA->info();
             emit fiffInfoAvailable();
         }
+        m_qMutex.unlock();
 
         if(m_bProcessData)
         {
-            MatrixXd t_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
+            MatrixXd t_mat;
 
             for(qint32 i = 0; i < pRTMSA->getMultiArraySize(); ++i)
-                t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
-
-            m_pBuffer->push(&t_mat);
+            {
+                t_mat = pRTMSA->getMultiSampleArray()[i];
+                m_pBuffer->push(&t_mat);
+            }
         }
     }
 }
@@ -260,9 +282,9 @@ void NoiseEstimate::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 void NoiseEstimate::appendNoiseSpectrum(MatrixXd t_send)
 { 
     qDebug()<<"Spectrum"<<t_send(0,1)<<t_send(0,2)<<t_send(0,3);
-    mutex.lock();
+    m_qMutex.lock();
     m_qVecSpecData.push_back(t_send);
-    mutex.unlock();
+    m_qMutex.unlock();
     qDebug()<<"---------------------------------appendNoiseSpectrum--------------------------------";
 }
 
@@ -274,15 +296,27 @@ void NoiseEstimate::run()
     //
     // Read Fiff Info
     //
-    while(!m_pFiffInfo)
+    bool waitForFiffInfo = true;
+    while(waitForFiffInfo)
+    {
+        m_qMutex.lock();
+        if(m_pFiffInfo)
+            waitForFiffInfo = false;
+        m_qMutex.unlock();
         msleep(10);// Wait for fiff Info
+    }
+
+    // Set up the x-axis scale type
+    m_pFSOutput->data()->initScaleType(m_x_scale_type);
+    qDebug()<< "Scale Type [0-normal; 1-log]:" << m_x_scale_type;
+
 
     // Init Real-Time Noise Spectrum estimator
     //
     // calculate the segments according to the requested data length
     // here 500 is the number of samples for a block specified in babyMEG plugin
     m_Fs = m_pFiffInfo->sfreq;
-    int segments =  (qint32) ((m_DataLen * m_pFiffInfo->sfreq)/500.0);
+    int segments =  (qint32) ((m_DataLen * m_pFiffInfo->sfreq)/m_pBuffer->cols());
 
     qDebug()<<"+++++++++++segments :"<<segments<< "m_DataLen"<<m_DataLen<<"m_Fs"<<m_Fs<<"++++++++++++++++++++++++";
 
@@ -293,11 +327,13 @@ void NoiseEstimate::run()
 
     m_pRtNoise->start();
 
-
+    m_qMutex.lock();
     m_bProcessData = true;
+    m_qMutex.unlock();
 
     while (m_bIsRunning)
     {
+
         if(m_bProcessData)
         {
             /* Dispatch the inputs */
@@ -308,16 +344,17 @@ void NoiseEstimate::run()
 
            if(m_qVecSpecData.size() > 0)
            {
-               mutex.lock();
+               m_qMutex.lock();
                qDebug()<<"%%%%%%%%%%%%%%%% send spectrum for display %%%%%%%%%%%%%%%%%%%";
                 //send spectrum to the output data
                m_pFSOutput->data()->setValue(m_qVecSpecData[0]);
                m_qVecSpecData.pop_front();
-               mutex.unlock();
+               m_qMutex.unlock();
 
             }
         }//m_bProcessData
     }//m_bIsRunning
+    qDebug()<<"noise estimation [Run] is done!";
     m_pRtNoise->stop();
 //    delete m_pRtNoise;
 }

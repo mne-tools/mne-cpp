@@ -106,7 +106,7 @@ MainWindow::MainWindow(QWidget *parent)
 , m_pPluginSceneManager(new PluginSceneManager(this))
 , m_eLogLevelCurrent(_LogLvMax)
 {
-    qDebug() << "Clinical Sensing and Analysis - Version" << CInfo::AppVersion();
+    qDebug() << "MNE-X - Version" << CInfo::AppVersion();
 
     setCentralWidget(m_pStartUpWidget);
 

@@ -60,6 +60,7 @@
 #include <QTextStream>
 #include <QStandardPaths>
 #include <QDir>
+#include <QSettings>
 
 
 //*************************************************************************************************************
@@ -107,7 +108,17 @@ PluginGui::PluginGui(PluginManager *pPluginManager, PluginSceneManager *pPluginS
     setWindowTitle(tr("PluginScene"));
     setUnifiedTitleAndToolBarOnMac(true);
 
-    loadConfig(QStandardPaths::writableLocation(QStandardPaths::DataLocation), "default.xml");
+    //To prevent deadlock on loading with a broken plugin -> save loading state
+    QSettings settings;
+    bool loadingState = settings.value(QString("MNE-X/loadingState"), false).toBool();
+
+    if(loadingState)
+    {
+        settings.setValue(QString("MNE-X/loadingState"), false);
+        loadConfig(QStandardPaths::writableLocation(QStandardPaths::DataLocation), "default.xml");
+    }
+
+    settings.setValue(QString("MNE-X/loadingState"), true);
 }
 
 

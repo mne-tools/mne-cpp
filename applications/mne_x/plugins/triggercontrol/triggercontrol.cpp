@@ -336,22 +336,23 @@ void TriggerControl::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
     {
         //Check if buffer initialized
         if(!m_pDataMatrixBuffer)
-            m_pDataMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
+            m_pDataMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
 
-//        MatrixXd t_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
+//        MatrixXd t_mat;
 
-//        for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i)
-//            t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
+//        for(qint32 i = 0; i < pRTMSA->getMultiArraySize(); ++i)
+//        {
+//            t_mat = pRTMSA->getMultiSampleArray()[i];
+//            m_pDataMatrixBuffer->push(&t_mat);
+//        }
 
-//        m_pDataMatrixBuffer->push(&t_mat);
+////        m_qMutex.lock();
+////        m_iNumChs = pRTMSA->getNumChannels();
 
-//        m_qMutex.lock();
-//        m_iNumChs = pRTMSA->getNumChannels();
-
-//        qint32 t_iSize = pRTMSA->getMultiSampleArray().size();
-//        for(qint32 i = 0; i < t_iSize; ++i)
-//            m_pData.append(pRTMSA->getMultiSampleArray()[i]);//Append sample wise
-//        m_qMutex.unlock();
+////        qint32 t_iSize = pRTMSA->getMultiSampleArray().size();
+////        for(qint32 i = 0; i < t_iSize; ++i)
+////            m_pData.append(pRTMSA->getMultiSampleArray()[i]);//Append sample wise
+////        m_qMutex.unlock();
     }
     // ENDE Zeitmessung */
 }

@@ -71,7 +71,8 @@ public:
     enum OperatorType {
         FILTER,
         PCA,
-        AVERAGE
+        AVERAGE,
+        UNKNOWN
     } m_OperatorType;
 
     MNEOperator();

@@ -81,6 +81,7 @@
 #define MODEL_RELOAD_POS 2000 //Distance that the current window needs to be off the ends of m_data[i] [in samples]
 #define MODEL_MAX_WINDOWS 3 //number of windows that are at maximum remained in m_data
 #define MODEL_NUM_FILTER_TAPS 80 //number of filter taps, required to take into account because of FFT convolution (zero padding)
+#define MODEL_MAX_NUM_FILTER_TAPS 0 //number of maximal filter taps
 
 //RawDelegate
 //Look
@@ -127,14 +128,25 @@ public:
 
     ~RawSettings();
 
-private:
+    QColor m_event_color_default, m_event_color_1, m_event_color_2, m_event_color_3, m_event_color_4, m_event_color_5,
+        m_event_color_32, m_event_color_998, m_event_color_999, m_data_marker_color;
+
+    int m_mainwindow_size_w, m_mainwindow_size_h, m_mainwindow_position_x, m_mainwindow_position_y;
+
     //=========================================================================================================
     /**
-    * init initializes all the application settings values from the macros
+    * write writes all the application settings values from the macros
+    */
+    void write();
+
+private:
+    QSettings m_qSettings;  /**< QSettings object that initializes all the RawSettings */
+
+    //=========================================================================================================
+    /**
+    * init inits all the application settings values
     */
     void init();
-
-    QSettings m_qSettings;  /**< QSettings object that initializes all the RawSettings */
 };
 
 } //NAMESPACE

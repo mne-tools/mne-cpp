@@ -50,10 +50,18 @@
 // DEFINES
 //=============================================================================================================
 
-#if defined(FIFF_LIBRARY)
-#  define FIFFSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(BUILD_MNECPP_STATIC_LIB)
+#  define FIFFSHARED_EXPORT
+#elif defined(FIFF_LIBRARY)
+#  define FIFFSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define FIFFSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define FIFFSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+//#if defined(FIFF_LIBRARY)
+//#  define FIFFSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+//#else
+//#  define FIFFSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+//#endif
 
 #endif // FIFF_GLOBAL_H

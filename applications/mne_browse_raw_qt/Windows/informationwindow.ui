@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="allowedAreas">
-   <set>Qt::BottomDockWidgetArea</set>
+   <set>Qt::BottomDockWidgetArea|Qt::TopDockWidgetArea</set>
   </property>
   <property name="windowTitle">
    <string>Information</string>

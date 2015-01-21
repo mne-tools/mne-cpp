@@ -168,13 +168,12 @@ void EEGoSports::setUpFiffInfo()
     //
     //Read electrode positions from .elc file
     //
-    LayoutLoader *asaObject = new LayoutLoader();
     QVector< QVector<double> > elcLocation3D;
     QVector< QVector<double> > elcLocation2D;
     QString unit;
     QStringList elcChannelNames;
 
-    if(!asaObject->readAsaElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
+    if(!LayoutLoader::readAsaElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
         qDebug() << "Error: Reading elc file.";
 
     //qDebug() << elcLocation3D;
@@ -447,7 +446,7 @@ bool EEGoSports::start()
 
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
     m_pRMTSA_EEGoSports->data()->initFromFiffInfo(m_pFiffInfo);
-    m_pRMTSA_EEGoSports->data()->setMultiArraySize(m_iSamplesPerBlock);
+    m_pRMTSA_EEGoSports->data()->setMultiArraySize(1);//m_iSamplesPerBlock);
     m_pRMTSA_EEGoSports->data()->setSamplingRate(m_iSamplingFreq);
 
     //Buffer
@@ -583,8 +582,7 @@ void EEGoSports::run()
             }
 
             //emit values to real time multi sample array
-            for(qint32 i = 0; i < matValue.cols(); ++i)
-                m_pRMTSA_EEGoSports->data()->setValue(matValue.col(i).cast<double>());
+            m_pRMTSA_EEGoSports->data()->setValue(matValue.cast<double>());
         }
     }
 

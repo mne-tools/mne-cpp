@@ -115,6 +115,7 @@ public:
     void init();
     void chgnFFT(int idx);
     void chgDataLen(int idx);
+    void chgXAxisType();
 
 private slots:
 

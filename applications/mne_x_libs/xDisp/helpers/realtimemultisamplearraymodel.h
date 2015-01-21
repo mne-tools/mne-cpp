@@ -44,6 +44,7 @@
 
 #include <xMeas/realtimesamplearraychinfo.h>
 #include <fiff/fiff_types.h>
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -60,6 +61,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 
 //*************************************************************************************************************
@@ -144,12 +146,20 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
     //=========================================================================================================
-    /**
+    /** ToDo: Obsolete
     * Sets corresponding channel information
     *
     * @param [in] chInfo        The corresponding channel information list
     */
     void setChannelInfo(QList<RealTimeSampleArrayChInfo> &chInfo);
+
+    //=========================================================================================================
+    /**
+    * Sets corresponding fiff information
+    *
+    * @param [in] p_pFiffInfo   The corresponding fiff information
+    */
+    void setFiffInfo(FIFFLIB::FiffInfo::SPtr& p_pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -167,7 +177,7 @@ public:
     *
     * @param[in] data       data to add (Time points of channel samples)
     */
-    void addData(const QVector<VectorXd> &data);
+    void addData(const QList<MatrixXd> &data);
 
     //=========================================================================================================
     /**
@@ -269,6 +279,12 @@ public:
     */
     void setScaling(const QMap< qint32,float >& p_qMapChScaling);
 
+    //=========================================================================================================
+    /**
+    * Update the SSP projection
+    */
+    void updateProjection();
+
 signals:
     //=========================================================================================================
     /**
@@ -279,7 +295,12 @@ signals:
     void newSelection(QList<qint32> selection);
 
 private:
-    QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
+    QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list. ToDo: Obsolete*/
+    FiffInfo::SPtr  m_pFiffInfo;                    /**< Fiff info */
+    RowVectorXi     m_vecBadIdcs;                   /**< Idcs of bad channels */
+    MatrixXd        m_matProj;                      /**< SSP projector */
+    SparseMatrix<double> m_matSparseProj;           /**< Sparse SSP projector */
+    bool m_bProjActivated;                          /**< Proj activated */
 
     QMap<qint32,qint32> m_qMapIdxRowSelection;      /**< Selection mapping.*/
 

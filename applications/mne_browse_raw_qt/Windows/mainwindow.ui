@@ -33,6 +33,8 @@
     <addaction name="m_loadEvents"/>
     <addaction name="m_saveEvents"/>
     <addaction name="separator"/>
+    <addaction name="m_loadEvokedAction"/>
+    <addaction name="separator"/>
     <addaction name="m_quitAction"/>
    </widget>
    <widget class="QMenu" name="menuAdjust">
@@ -46,8 +48,12 @@
      <string>Windows</string>
     </property>
     <addaction name="m_eventAction"/>
-    <addaction name="m_informationAction"/>
     <addaction name="m_channelSelectionManagerAction"/>
+    <addaction name="m_scalingAction"/>
+    <addaction name="m_averageWindowAction"/>
+    <addaction name="m_ChInformationAction"/>
+    <addaction name="m_projectionManagerAction"/>
+    <addaction name="m_informationAction"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -65,10 +71,16 @@
    <property name="text">
     <string>Open...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
   </action>
   <action name="m_writeAction">
    <property name="text">
     <string>Save...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="m_loadEvents">
@@ -94,19 +106,14 @@
     <string>Filter...</string>
    </property>
   </action>
-  <action name="m_dataAction">
-   <property name="text">
-    <string>Show data plot...</string>
-   </property>
-  </action>
   <action name="m_eventAction">
    <property name="text">
-    <string>Show event list...</string>
+    <string>Event manager...</string>
    </property>
   </action>
   <action name="m_informationAction">
    <property name="text">
-    <string>Show information...</string>
+    <string>Log window...</string>
    </property>
   </action>
   <action name="m_aboutAction">
@@ -116,7 +123,32 @@
   </action>
   <action name="m_channelSelectionManagerAction">
    <property name="text">
-    <string>Show channel selection manager</string>
+    <string>Channel selection manager...</string>
+   </property>
+  </action>
+  <action name="m_averageWindowAction">
+   <property name="text">
+    <string>Average manager...</string>
+   </property>
+  </action>
+  <action name="m_scalingAction">
+   <property name="text">
+    <string>Scaling window...</string>
+   </property>
+  </action>
+  <action name="m_loadEvokedAction">
+   <property name="text">
+    <string>Load evoked (fif)...</string>
+   </property>
+  </action>
+  <action name="m_ChInformationAction">
+   <property name="text">
+    <string>Channel informations...</string>
+   </property>
+  </action>
+  <action name="m_projectionManagerAction">
+   <property name="text">
+    <string>Projection manager...</string>
    </property>
   </action>
  </widget>

@@ -671,7 +671,7 @@ int main(int argc, char *argv[])
 
     //Write averaged data to file
     QFile m_fileOut(t_sAvrFileName);
-    MatrixXd m_cals;
+    RowVectorXd m_cals;
 
     FiffStream::SPtr m_pOutfid = Fiff::start_writing_raw(m_fileOut, raw.info, m_cals);
     fiff_int_t first = 0;

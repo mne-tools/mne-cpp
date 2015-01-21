@@ -61,6 +61,8 @@
 
 #include <QList>
 #include <QDebug>
+#include <QDir>
+#include <QDateTime>
 
 
 //*************************************************************************************************************
@@ -81,9 +83,10 @@ BabyMEG::BabyMEG()
 : m_iBlinkStatus(0)
 , m_iBufferSize(-1)
 , m_bWriteToFile(false)
-, m_sRecordFile(qApp->applicationDirPath()+"/mne_x_plugins/resources/babymeg/babymegtest.fif")
+, m_sCurrentParadigm("")
 , m_bIsRunning(false)
 , m_pRawMatrixBuffer(0)
+, m_sFiffHeader(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/header.fif")
 {
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup Project"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
@@ -137,13 +140,50 @@ QSharedPointer<IPlugin> BabyMEG::clone() const
 
 //*************************************************************************************************************
 
+QString BabyMEG::getFilePath(bool currentTime) const
+{
+    QString sFilePath = m_sBabyMEGDataPath + "/" + m_sCurrentProject + "/" + m_sCurrentSubject;
+
+    QString sTimeStamp;
+
+    if(currentTime)
+        sTimeStamp = QDateTime::currentDateTime().toString("yyMMdd_hhmmss");
+    else
+        sTimeStamp = "<YYMMDD_HMS>";
+
+    if(m_sCurrentParadigm.isEmpty())
+        sFilePath.append("/"+ sTimeStamp + "_" + m_sCurrentSubject + "_raw.fif");
+    else
+        sFilePath.append("/"+ sTimeStamp + "_" + m_sCurrentSubject + "_" + m_sCurrentParadigm + "_raw.fif");
+
+    return sFilePath;
+}
+
+
+//*************************************************************************************************************
+
 void BabyMEG::init()
 {
+    //BabyMEGData Path
+    m_sBabyMEGDataPath = QDir::homePath() + "/BabyMEGData";
+    if(!QDir(m_sBabyMEGDataPath).exists())
+        QDir().mkdir(m_sBabyMEGDataPath);
+    //Test Project
+    if(!QDir(m_sBabyMEGDataPath+"/TestProject").exists())
+        QDir().mkdir(m_sBabyMEGDataPath+"/TestProject");
+    QSettings settings;
+    m_sCurrentProject = settings.value(QString("Plugin/%1/currentProject").arg(getName()), "TestProject").toString();
+    //Test Subject
+    if(!QDir(m_sBabyMEGDataPath+"/TestProject/TestSubject").exists())
+        QDir().mkdir(m_sBabyMEGDataPath+"/TestProject/TestSubject");
+    m_sCurrentSubject = settings.value(QString("Plugin/%1/currentSubject").arg(getName()), "TestSubject").toString();
+
     //BabyMEG Inits
     pInfo = QSharedPointer<BabyMEGInfo>(new BabyMEGInfo());
     connect(pInfo.data(), &BabyMEGInfo::fiffInfoAvailable, this, &BabyMEG::setFiffInfo);
     connect(pInfo.data(), &BabyMEGInfo::SendDataPackage, this, &BabyMEG::setFiffData);
     connect(pInfo.data(), &BabyMEGInfo::SendCMDPackage, this, &BabyMEG::setCMDData);
+    connect(pInfo.data(), &BabyMEGInfo::GainInfoUpdate, this, &BabyMEG::setFiffGainInfo);
 
     myClient = QSharedPointer<BabyMEGClient>(new BabyMEGClient(6340,this));
     myClient->SetInfo(pInfo);
@@ -183,7 +223,7 @@ void BabyMEG::initConnector()
         m_pRTMSABabyMEG->data()->setName(this->getName());//Provide name to auto store widget settings
 
         m_pRTMSABabyMEG->data()->initFromFiffInfo(m_pFiffInfo);
-        m_pRTMSABabyMEG->data()->setMultiArraySize(500);
+        m_pRTMSABabyMEG->data()->setMultiArraySize(2);
 
         m_pRTMSABabyMEG->data()->setSamplingRate(m_pFiffInfo->sfreq);
 
@@ -236,12 +276,45 @@ void BabyMEG::UpdateFiffInfo()
 {
 
     // read gain info and save them to the m_pFiffInfo.range
-    myClientComm->SendCommandToBabyMEGShortConnection("INFO");
+    myClientComm->SendCommandToBabyMEGShortConnection("INFG");
 
-    sleep(0.5);
+    //sleep(0.5);
 
     //m_pActionRecordFile->setEnabled(true);
 
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::splitRecordingFile()
+{
+    qDebug() << "Split recording file";
+    ++m_iSplitCount;
+    QString nextFileName = m_sRecordFile.remove("_raw.fif");
+    nextFileName += QString("-%1_raw.fif").arg(m_iSplitCount);
+
+    /*
+    * Write the link to the next file
+    */
+    qint32 data;
+    m_pOutfid->start_block(FIFFB_REF);
+    data = FIFFV_ROLE_NEXT_FILE;
+    m_pOutfid->write_int(FIFF_REF_ROLE,&data);
+    m_pOutfid->write_string(FIFF_REF_FILE_NAME, nextFileName);
+    m_pOutfid->write_id(FIFF_REF_FILE_ID);//ToDo meas_id
+    data = m_iSplitCount - 1;
+    m_pOutfid->write_int(FIFF_REF_FILE_NUM, &data);
+    m_pOutfid->end_block(FIFFB_REF);
+
+    //finish file
+    m_pOutfid->finish_writing_raw();
+
+    //start next file
+    m_qFileOut.setFileName(nextFileName);
+    m_pOutfid = Fiff::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals);
+    fiff_int_t first = 0;
+    m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
 }
 
 
@@ -256,9 +329,12 @@ void BabyMEG::toggleRecordingFile()
         m_bWriteToFile = false;
         m_pTimerRecordingChange->stop();
         m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
+        m_iSplitCount = 0;
     }
     else
     {
+        m_iSplitCount = 0;
+
         if(!m_pFiffInfo)
         {
             QMessageBox msgBox;
@@ -269,6 +345,7 @@ void BabyMEG::toggleRecordingFile()
 
 
         //Initiate the stream for writing to the fif file
+        m_sRecordFile = getFilePath(true);
         m_qFileOut.setFileName(m_sRecordFile);
         if(m_qFileOut.exists())
         {
@@ -337,12 +414,61 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
 {
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(p_FiffInfo));
 
+    if(!readProjectors())
+    {
+        qDebug() << "Not able to read projectors";
+        return;
+    }
+
     m_iBufferSize = pInfo->dataLength;
     sfreq = pInfo->sfreq;
+
+    //
+    //   Add the calibration factors
+    //
+    m_cals = RowVectorXd(m_pFiffInfo->nchan);
+    m_cals.setZero();
+    for (qint32 k = 0; k < m_pFiffInfo->nchan; ++k)
+        m_cals[k] = m_pFiffInfo->chs[k].range*m_pFiffInfo->chs[k].cal;
+
+    //
+    //  Initialize the data and calibration vector
+    //
+    typedef Eigen::Triplet<double> T;
+    std::vector<T> tripletList;
+    tripletList.reserve(m_pFiffInfo->nchan);
+    for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i)
+        tripletList.push_back(T(i, i, this->m_cals[i]));
+
+    m_sparseMatCals = SparseMatrix<double>(m_pFiffInfo->nchan, m_pFiffInfo->nchan);
+    m_sparseMatCals.setFromTriplets(tripletList.begin(), tripletList.end());
 
     emit fiffInfoAvailable();
 }
 
+//*************************************************************************************************************
+
+void BabyMEG::setFiffGainInfo(QStringList GainInfo)
+{
+    if(!m_pFiffInfo)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("FiffInfo missing!");
+        msgBox.exec();
+        return;
+    }
+    else
+    {
+        //set up the gain info
+        qDebug()<<"Set Gain Info";
+        for(qint32 i = 0; i < m_pFiffInfo->nchan; i++)
+        {
+            m_pFiffInfo->chs[i].range = 1.0f/GainInfo.at(i).toFloat();//1; // set gain
+            //qDebug()<<i<<"="<<m_pFiffInfo->chs[i].ch_name<<","<<m_pFiffInfo->chs[i].range;
+        }
+    }
+
+}
 //*************************************************************************************************************
 
 void BabyMEG::setCMDData(QByteArray DATA)
@@ -443,10 +569,63 @@ QWidget* BabyMEG::setupWidget()
 
 //*************************************************************************************************************
 
+MatrixXd BabyMEG::calibrate(const MatrixXf& data)
+{
+    MatrixXd one;
+    if(m_pFiffInfo && m_sparseMatCals.cols() == m_pFiffInfo->nchan)
+        one = m_sparseMatCals*data.cast<double>();
+    else
+        one = data.cast<double>();
+
+    return one;
+}
+
+
+//*************************************************************************************************************
+
+bool BabyMEG::readProjectors()
+{
+    QFile t_headerFiffFile(m_sFiffHeader);
+
+    //
+    //   Open the file
+    //
+    FiffStream::SPtr t_pStream(new FiffStream(&t_headerFiffFile));
+    QString t_sFileName = t_pStream->streamName();
+
+    printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
+
+    FiffDirTree t_Tree;
+    QList<FiffDirEntry> t_Dir;
+
+    if(!t_pStream->open(t_Tree, t_Dir))
+        return false;
+
+    QList<FiffProj> q_ListProj = t_pStream->read_proj(t_Tree);
+
+    if (q_ListProj.size() == 0)
+    {
+        printf("Could not find projectors\n");
+        return false;
+    }
+
+    m_pFiffInfo->projs = q_ListProj;
+
+    //garbage collecting
+    t_pStream->device()->close();
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
 void BabyMEG::run()
 {
 
     MatrixXf matValue;
+
+    qint32 size = 0;
 
     while(m_bIsRunning)
     {
@@ -457,15 +636,22 @@ void BabyMEG::run()
 
             //Write raw data to fif file
             if(m_bWriteToFile)
+            {
+                size += matValue.rows()*matValue.cols() * 4;
+
+                if(size > MAX_DATA_LEN)
+                {
+                    size = 0;
+                    this->splitRecordingFile();
+                }
+
                 m_pOutfid->write_raw_buffer(matValue.cast<double>());
+            }
+            else
+                size = 0;
 
             if(m_pRTMSABabyMEG)
-            {
-                //std::cout << "matValue" << matValue.block(0,0,2,2) << std::endl;
-                //emit values
-                for(qint32 i = 0; i < matValue.cols(); ++i)
-                    m_pRTMSABabyMEG->data()->setValue(matValue.col(i).cast<double>());
-            }
+                m_pRTMSABabyMEG->data()->setValue(this->calibrate(matValue));
         }
     }
 

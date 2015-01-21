@@ -2,13 +2,14 @@
 /**
 * @file     frequencyspectrum.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh, Limin Sun and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -112,6 +113,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Init Scale Type
+    *
+    * @param[in] ScaleType     Scale type to init from
+    */
+    void initScaleType(qint8 ScaleType);
+
+    //=========================================================================================================
+    /**
     * Returns whether channel info is initialized
     *
     * @return true whether the channel info is available.
@@ -125,6 +134,14 @@ public:
     * @return the reference to the orig FiffInfo.
     */
     inline FiffInfo::SPtr& getFiffInfo();
+
+    //=========================================================================================================
+    /**
+    * Returns the scale type.
+    *
+    * @return the scale type.
+    */
+    inline qint8 getScaleType();
 
     //=========================================================================================================
     /**
@@ -158,6 +175,10 @@ private:
 
     bool m_bIsInit;             /**< If channel info is initialized.*/
     bool m_bContainsValues;     /**< If values are stored.*/
+
+    /* Begin : Added by Limin, 10/19/14  for passing scaletype parameter from noisee stimate to spectrum model*/
+    qint8 m_xScaleType;         /**< The scale type of x axis: 0-normal; 1-log.  */
+    /* End */
 };
 
 
@@ -180,6 +201,12 @@ inline FiffInfo::SPtr& FrequencySpectrum::getFiffInfo()
     return m_pFiffInfo;
 }
 
+//*************************************************************************************************************
+
+inline qint8 FrequencySpectrum::getScaleType()
+{
+    return m_xScaleType;
+}
 
 //*************************************************************************************************************
 

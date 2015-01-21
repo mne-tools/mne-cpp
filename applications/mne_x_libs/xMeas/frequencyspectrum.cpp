@@ -2,13 +2,14 @@
 /**
 * @file     frequencyspectrum.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh, Limin Sun and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -85,6 +86,14 @@ void FrequencySpectrum::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
     m_pFiffInfo = p_pFiffInfo;
 
     m_bIsInit = true;
+}
+
+//*************************************************************************************************************
+
+void FrequencySpectrum::initScaleType(qint8 ScaleType)
+{
+    m_xScaleType = ScaleType;
+
 }
 
 

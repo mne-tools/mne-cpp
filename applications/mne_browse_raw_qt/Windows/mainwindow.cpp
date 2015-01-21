@@ -60,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
 , m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
 , m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
+, m_qEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
 , m_qSettings()
 , m_rawSettings()
 , ui(new Ui::MainWindowWidget)
@@ -94,31 +95,236 @@ void MainWindow::setupWindowWidgets()
     //Create data window
     m_pDataWindow = new DataWindow(this);
 
-    //Create dockble event window - QTDesigner used - see /FormFiles
+    //Create dockble event window - QTDesigner used - see / FormFiles
     m_pEventWindow = new EventWindow(this);
-    addDockWidget(Qt::RightDockWidgetArea, m_pEventWindow);
+    addDockWidget(Qt::LeftDockWidgetArea, m_pEventWindow);
+    m_pEventWindow->hide();
 
-    //Create filter window - QTDesigner used - see /FormFiles
-    m_pFilterWindow = new FilterWindow(this);
-    m_pFilterWindow->hide();
-
-    //Create dockble information window - QTDesigner used - see /FormFiles
+    //Create dockable information window - QTDesigner used - see / FormFiles
     m_pInformationWindow = new InformationWindow(this);
     addDockWidget(Qt::BottomDockWidgetArea, m_pInformationWindow);
     m_pInformationWindow->hide();
 
-    //Create about window - QTDesigner used - see /FormFiles
+    //Create about window - QTDesigner used - see / FormFiles
     m_pAboutWindow = new AboutWindow(this);
     m_pAboutWindow->hide();
 
-    //Create about window - QTDesigner used - see /FormFiles
-    m_pSelectionManagerWindow = new SelectionManagerWindow(this);
-    addDockWidget(Qt::BottomDockWidgetArea, m_pSelectionManagerWindow);
+    //Create channel info window - QTDesigner used - see / FormFiles
+    m_pChInfoWindow = new ChInfoWindow(this);
+    addDockWidget(Qt::BottomDockWidgetArea, m_pChInfoWindow);
+    m_pChInfoWindow->hide();
 
-    //Init windows
+    //Create selection manager window - QTDesigner used - see / FormFiles
+    m_pSelectionManagerWindow = new SelectionManagerWindow(this, m_pChInfoWindow->getDataModel());
+    addDockWidget(Qt::BottomDockWidgetArea, m_pSelectionManagerWindow);
+    m_pSelectionManagerWindow->hide();
+
+    //Create average manager window - QTDesigner used - see / FormFiles
+    m_pAverageWindow = new AverageWindow(this, m_qEvokedFile);
+    addDockWidget(Qt::BottomDockWidgetArea, m_pAverageWindow);
+    m_pAverageWindow->hide();
+
+    //Create scale window - QTDesigner used - see / FormFiles
+    m_pScaleWindow = new ScaleWindow(this);
+    addDockWidget(Qt::LeftDockWidgetArea, m_pScaleWindow);
+    m_pScaleWindow->hide();
+
+    //Create filter window - QTDesigner used - see / FormFiles
+    m_pFilterWindow = new FilterWindow(this, this);
+    addDockWidget(Qt::BottomDockWidgetArea, m_pFilterWindow);
+    m_pFilterWindow->hide();
+
+    //Create filter window - QTDesigner used - see / FormFiles
+    m_pProjectionWindow = new ProjectionWindow(this);
+    addDockWidget(Qt::LeftDockWidgetArea, m_pProjectionWindow);
+    m_pProjectionWindow->hide();
+
+    //Init windows - TODO: get rid of this here, do this inside the window classes
     m_pDataWindow->init();
     m_pEventWindow->init();
-    m_pFilterWindow->init();
+    m_pScaleWindow->init();
+
+    //Create the toolbar after all indows have been initiliased
+    createToolBar();
+
+    //Connect window signals
+    //Change scaling of the data and averaged data whenever a spinbox value changed or the user performs a pinch gesture on the view
+    connect(m_pScaleWindow, &ScaleWindow::scalingChannelValueChanged,
+            m_pDataWindow, &DataWindow::scaleData);
+
+    connect(m_pScaleWindow, &ScaleWindow::scalingViewValueChanged,
+            m_pDataWindow, &DataWindow::changeRowHeight);
+
+    connect(m_pDataWindow, &DataWindow::scaleChannels,
+            m_pScaleWindow, &ScaleWindow::scaleAllChannels);
+
+    connect(m_pScaleWindow, &ScaleWindow::scalingChannelValueChanged,
+            m_pAverageWindow, &AverageWindow::scaleAveragedData);
+
+    //Hide non selected channels in the data view
+    connect(m_pSelectionManagerWindow, &SelectionManagerWindow::showSelectedChannelsOnly,
+            m_pDataWindow, &DataWindow::showSelectedChannelsOnly);
+
+    //Connect selection manager with average manager
+    connect(m_pSelectionManagerWindow, &SelectionManagerWindow::selectionChanged,
+            m_pAverageWindow, &AverageWindow::channelSelectionManagerChanged);
+
+    //Connect channel info window with raw data model, layout manager and the data window
+    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
+            m_pChInfoWindow->getDataModel(), &ChInfoModel::fiffInfoChanged);
+
+    connect(m_pDataWindow->getDataModel(), &RawModel::assignedOperatorsChanged,
+            m_pChInfoWindow->getDataModel(), &ChInfoModel::assignedOperatorsChanged);
+
+    connect(m_pSelectionManagerWindow, &SelectionManagerWindow::loadedLayoutMap,
+            m_pChInfoWindow->getDataModel(), &ChInfoModel::layoutChanged);
+
+    connect(m_pChInfoWindow->getDataModel(), &ChInfoModel::channelsMappedToLayout,
+            m_pSelectionManagerWindow, &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
+
+    //Connect selection manager with a new file loaded signal
+    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
+            m_pSelectionManagerWindow, &SelectionManagerWindow::newFiffFileLoaded);
+
+    //Connect filter window with new file loaded signal
+    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
+            m_pFilterWindow, &FilterWindow::newFileLoaded);
+
+    //Connect projection manager with fif file loading
+    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
+            m_pProjectionWindow->getDataModel(), static_cast<void (ProjectionModel::*)(const FiffInfo&)>(&ProjectionModel::addProjections));
+
+    //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels - TODO: dirty move get rid of this here
+    if(m_pDataWindow->getDataModel()->m_bFileloaded) {
+        m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_fiffInfo);
+        m_pChInfoWindow->getDataModel()->fiffInfoChanged(m_pDataWindow->getDataModel()->m_fiffInfo);
+        m_pChInfoWindow->getDataModel()->layoutChanged(m_pSelectionManagerWindow->getLayoutMap());
+        m_pSelectionManagerWindow->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
+        m_pSelectionManagerWindow->newFiffFileLoaded();
+        m_pFilterWindow->newFileLoaded();
+        m_pProjectionWindow->getDataModel()->addProjections(m_pDataWindow->getDataModel()->m_fiffInfo);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::createToolBar()
+{
+    //Create toolbar
+    QToolBar *toolBar = new QToolBar(this);
+    toolBar->setOrientation(Qt::Vertical);
+    toolBar->setMovable(true);
+
+    //Add DC removal action
+    m_pRemoveDCAction = new QAction(QIcon(":/Resources/Images/removeDC.png"),tr("Remove DC component"), this);
+    m_pRemoveDCAction->setStatusTip(tr("Remove the DC component by subtracting the channel mean"));
+    connect(m_pRemoveDCAction,&QAction::triggered, [=](){
+        if(m_pDataWindow->getDataDelegate()->m_bRemoveDC) {
+            m_pRemoveDCAction->setIcon(QIcon(":/Resources/Images/removeDC.png"));
+            m_pRemoveDCAction->setToolTip("Remove DC component");
+            m_pDataWindow->setStatusTip(tr("Remove the DC component by subtracting the channel mean"));
+            m_pDataWindow->getDataDelegate()->m_bRemoveDC = false;
+        }
+        else {
+            m_pRemoveDCAction->setIcon(QIcon(":/Resources/Images/addDC.png"));
+            m_pRemoveDCAction->setToolTip("Add DC component");
+            m_pRemoveDCAction->setStatusTip(tr("Add the DC component"));
+            m_pDataWindow->getDataDelegate()->m_bRemoveDC = true;
+        }
+
+        m_pDataWindow->updateDataTableViews();
+    });
+    toolBar->addAction(m_pRemoveDCAction);
+
+    //Add show/hide bad channel button
+    m_pHideBadAction = new QAction(QIcon(":/Resources/Images/hideBad.png"),tr("Hide all bad channels"), this);
+    m_pHideBadAction->setStatusTip(tr("Hide all bad channels"));
+    connect(m_pHideBadAction,&QAction::triggered, [=](){
+        if(m_pHideBadAction->toolTip() == "Show all bad channels") {
+            m_pHideBadAction->setIcon(QIcon(":/Resources/Images/hideBad.png"));
+            m_pHideBadAction->setToolTip("Hide all bad channels");
+            m_pDataWindow->setStatusTip(tr("Hide all bad channels"));
+            m_pDataWindow->hideBadChannels(false);
+        }
+        else {
+            m_pHideBadAction->setIcon(QIcon(":/Resources/Images/showBad.png"));
+            m_pHideBadAction->setToolTip("Show all bad channels");
+            m_pHideBadAction->setStatusTip(tr("Show all bad channels"));
+            m_pDataWindow->hideBadChannels(true);
+        }
+    });
+    toolBar->addAction(m_pHideBadAction);
+
+    toolBar->addSeparator();
+
+    //Toggle visibility of the event manager
+    QAction* showEventManager = new QAction(QIcon(":/Resources/Images/showEventManager.png"),tr("Toggle event manager"), this);
+    showEventManager->setStatusTip(tr("Toggle the event manager"));
+    connect(showEventManager, &QAction::triggered, this, [=](){
+        showWindow(m_pEventWindow);
+    });
+    toolBar->addAction(showEventManager);
+
+    //Toggle visibility of the filter window
+    QAction* showFilterWindow = new QAction(QIcon(":/Resources/Images/showFilterWindow.png"),tr("Toggle filter window"), this);
+    showFilterWindow->setStatusTip(tr("Toggle filter window"));
+    connect(showFilterWindow, &QAction::triggered, this, [=](){
+        showWindow(m_pFilterWindow);
+    });
+    toolBar->addAction(showFilterWindow);
+
+    //Toggle visibility of the Selection manager
+    QAction* showSelectionManager = new QAction(QIcon(":/Resources/Images/showSelectionManager.png"),tr("Toggle selection manager"), this);
+    showSelectionManager->setStatusTip(tr("Toggle the selection manager"));
+    connect(showSelectionManager, &QAction::triggered, this, [=](){
+        showWindow(m_pSelectionManagerWindow);
+    });
+    toolBar->addAction(showSelectionManager);
+
+    //Toggle visibility of the scaling window
+    QAction* showScalingWindow = new QAction(QIcon(":/Resources/Images/showScalingWindow.png"),tr("Toggle scaling window"), this);
+    showScalingWindow->setStatusTip(tr("Toggle the scaling window"));
+    connect(showScalingWindow, &QAction::triggered, this, [=](){
+        showWindow(m_pScaleWindow);
+    });
+    toolBar->addAction(showScalingWindow);
+
+    //Toggle visibility of the average manager
+    QAction* showAverageManager = new QAction(QIcon(":/Resources/Images/showAverageManager.png"),tr("Toggle average manager"), this);
+    showAverageManager->setStatusTip(tr("Toggle the average manager"));
+    connect(showAverageManager, &QAction::triggered, this, [=](){
+        showWindow(m_pAverageWindow);
+    });
+    toolBar->addAction(showAverageManager);
+
+    //Toggle visibility of the projection manager
+    QAction* showProjectionManager = new QAction(QIcon(":/Resources/Images/showProjectionWindow.png"),tr("Toggle projection manager"), this);
+    showProjectionManager->setStatusTip(tr("Toggle the projection manager"));
+    connect(showProjectionManager, &QAction::triggered, this, [=](){
+        showWindow(m_pProjectionWindow);
+    });
+    toolBar->addAction(showProjectionManager);
+
+    toolBar->addSeparator();
+
+    //Toggle visibility of the channel information window manager
+    QAction* showChInfo = new QAction(QIcon(":/Resources/Images/showChInformationWindow.png"),tr("Channel info"), this);
+    showChInfo->setStatusTip(tr("Toggle channel info window"));
+    connect(showChInfo, &QAction::triggered, this, [=](){
+        showWindow(m_pChInfoWindow);
+    });
+    toolBar->addAction(showChInfo);
+
+    //Toggle visibility of the information window
+//    QAction* showInformationWindow = new QAction(QIcon(":/Resources/Images/showInformationWindow.png"),tr("Toggle information window"), this);
+//    showInformationWindow->setStatusTip(tr("Toggle the information window"));
+//    connect(showInformationWindow, &QAction::triggered, this, [=](){
+//        showWindow(m_pInformationWindow);
+//    });
+//    toolBar->addAction(showInformationWindow);
+
+    this->addToolBar(Qt::RightToolBarArea,toolBar);
 }
 
 
@@ -131,18 +337,41 @@ void MainWindow::connectMenus()
     connect(ui->m_writeAction, SIGNAL(triggered()), this, SLOT(writeFile()));
     connect(ui->m_loadEvents, SIGNAL(triggered()), this, SLOT(loadEvents()));
     connect(ui->m_saveEvents, SIGNAL(triggered()), this, SLOT(saveEvents()));
-    connect(ui->m_quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+    connect(ui->m_loadEvokedAction, SIGNAL(triggered()), this, SLOT(loadEvoked()));
+    connect(ui->m_quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));    
 
     //Adjust
-    connect(ui->m_filterAction, SIGNAL(triggered()), this, SLOT(showFilterWindow()));
+    connect(ui->m_filterAction, &QAction::triggered, this, [=](){
+        showWindow(m_pFilterWindow);
+    });
 
     //Windows
-    connect(ui->m_eventAction, SIGNAL(triggered()), this, SLOT(showEventWindow()));
-    connect(ui->m_informationAction, SIGNAL(triggered()), this, SLOT(showInformationWindow()));
-    connect(ui->m_channelSelectionManagerAction, SIGNAL(triggered()), this, SLOT(showSelectionManagerWindow()));
+    connect(ui->m_eventAction, &QAction::triggered, this, [=](){
+        showWindow(m_pEventWindow);
+    });
+    connect(ui->m_informationAction, &QAction::triggered, this, [=](){
+        showWindow(m_pInformationWindow);
+    });
+    connect(ui->m_channelSelectionManagerAction, &QAction::triggered, this, [=](){
+        showWindow(m_pSelectionManagerWindow);
+    });
+    connect(ui->m_averageWindowAction, &QAction::triggered, this, [=](){
+        showWindow(m_pAverageWindow);
+    });
+    connect(ui->m_scalingAction, &QAction::triggered, this, [=](){
+        showWindow(m_pScaleWindow);
+    });
+    connect(ui->m_ChInformationAction, &QAction::triggered, this, [=](){
+        showWindow(m_pChInfoWindow);
+    });
+    connect(ui->m_projectionManagerAction, &QAction::triggered, this, [=](){
+        showWindow(m_pProjectionWindow);
+    });
 
     //Help
-    connect(ui->m_aboutAction, SIGNAL(triggered()), this, SLOT(showAboutWindow()));
+    connect(ui->m_aboutAction, &QAction::triggered, this, [=](){
+        showWindow(m_pAboutWindow);
+    });
 }
 
 
@@ -151,14 +380,11 @@ void MainWindow::connectMenus()
 void MainWindow::setupMainWindow()
 {
     //set Window functions
-    resize(m_qSettings.value("MainWindow/size").toSize()); //Resize to predefined default size
-    move(m_qSettings.value("MainWindow/position").toPoint()); // Move this main window to position 50/50 on the screen
+    resize(m_qSettings.value("MainWindow/size", QSize(MAINWINDOW_WINDOW_SIZE_W, MAINWINDOW_WINDOW_SIZE_H)).toSize()); //Resize to predefined default size
+    move(m_qSettings.value("MainWindow/position", QPoint(MAINWINDOW_WINDOW_POSITION_X, MAINWINDOW_WINDOW_POSITION_Y)).toPoint()); // Move this main window to position 50/50 on the screen
 
     //Set data window as central widget - This is needed because we are using QDockWidgets
     setCentralWidget(m_pDataWindow);
-
-    //Set window icon for MNE browse Raw Qt
-    setWindowIcon(QIcon(":/Resources/Images/application_icon_mne_browse_raw_qt.png"));
 }
 
 
@@ -168,10 +394,12 @@ void MainWindow::setWindowStatus()
 {
     //Set window title
     QString title;
-    title = QString("%1").arg(CInfo::AppNameShort());
+    //title = QString("%1").arg(CInfo::AppNameShort());
+    title = QString("Visualize and Process");
     setWindowTitle(title);
 
     //Set status bar
+    //Set data file informations
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
         int idx = m_qFileRaw.fileName().lastIndexOf("/");
         QString filename = m_qFileRaw.fileName().remove(0,idx+1);
@@ -180,6 +408,7 @@ void MainWindow::setWindowStatus()
     else
         title = QString("No data file");
 
+    //Set event file informations
     if(m_pEventWindow->getEventModel()->m_bFileloaded) {
         int idx = m_qEventFile.fileName().lastIndexOf("/");
         QString filename = m_qEventFile.fileName().remove(0,idx+1);
@@ -188,6 +417,16 @@ void MainWindow::setWindowStatus()
     }
     else
         title.append("  -  No event file");
+
+    //Set evoked file informations
+    if(m_pAverageWindow->getAverageModel()->m_bFileloaded) {
+        int idx = m_qEvokedFile.fileName().lastIndexOf("/");
+        QString filename = m_qEvokedFile.fileName().remove(0,idx+1);
+
+        title.append(QString("  -  Evoked file: %1").arg(filename));
+    }
+    else
+        title.append("  -  No evoked file");
 
     //Add permanent widget to status bar after deleting old one
     QObjectList cildrenList = statusBar()->children();
@@ -204,21 +443,7 @@ void MainWindow::setWindowStatus()
 //Log
 void MainWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl)
 {
-    if(lglvl<=m_eLogLevelCurrent) {
-        if(lgknd == _LogKndError)
-            m_pTextBrowser_Log->insertHtml("<font color=red><b>Error:</b> "+logMsg+"</font>");
-        else if(lgknd == _LogKndWarning)
-            m_pTextBrowser_Log->insertHtml("<font color=blue><b>Warning:</b> "+logMsg+"</font>");
-        else
-            m_pTextBrowser_Log->insertHtml(logMsg);
-        m_pTextBrowser_Log->insertPlainText("\n"); // new line
-        //scroll down to the latest entry
-        QTextCursor c = m_pTextBrowser_Log->textCursor();
-        c.movePosition(QTextCursor::End);
-        m_pTextBrowser_Log->setTextCursor(c);
-
-        m_pTextBrowser_Log->verticalScrollBar()->setValue(m_pTextBrowser_Log->verticalScrollBar()->maximum());
-    }
+    m_pInformationWindow->writeToLog(logMsg, lgknd, lglvl);
 }
 
 
@@ -226,19 +451,7 @@ void MainWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl
 
 void MainWindow::setLogLevel(LogLevel lvl)
 {
-    switch(lvl) {
-    case _LogLvMin:
-        writeToLog(tr("minimal log level set"), _LogKndMessage, _LogLvMin);
-        break;
-    case _LogLvNormal:
-        writeToLog(tr("normal log level set"), _LogKndMessage, _LogLvMin);
-        break;
-    case _LogLvMax:
-        writeToLog(tr("maximum log level set"), _LogKndMessage, _LogLvMin);
-        break;
-    }
-
-    m_eLogLevelCurrent = lvl;
+    m_pInformationWindow->setLogLevel(lvl);
 }
 
 
@@ -246,7 +459,10 @@ void MainWindow::setLogLevel(LogLevel lvl)
 // SLOTS
 void MainWindow::openFile()
 {
-    QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif data files (*.fif)"));
+    QString filename = QFileDialog::getOpenFileName(this,
+                                                    QString("Open fiff data file"),
+                                                    QString("./MNE-sample-data/MEG/sample/"),
+                                                    tr("fif data files (*.fif)"));
 
     if(filename.isEmpty())
     {
@@ -256,18 +472,55 @@ void MainWindow::openFile()
 
     if(m_qFileRaw.isOpen())
         m_qFileRaw.close();
+
     m_qFileRaw.setFileName(filename);
 
-    if(m_pDataWindow->getDataModel()->loadFiffData(m_qFileRaw))
-        qDebug() << "Fiff data file" << filename << "loaded.";
-    else
-        qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
+    //Clear projection manager model
+    m_pProjectionWindow->getDataModel()->clearModel();
 
     //Clear event model
     m_pEventWindow->getEventModel()->clearModel();
 
+    // This thread based opening code does not properly work because the .exec blocks all other windows and their threads.
+    // However, the function loadFiffData communicates with these windows and their threads. Therefore chrashes occur.
+//    QFutureWatcher<bool> writeFileFutureWatcher;
+//    QProgressDialog progressDialog("Loading fif file...", QString(), 0, 0, this, Qt::Dialog);
+
+//    //Connect future watcher and dialog
+//    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::finished,
+//            &progressDialog, &QProgressDialog::reset);
+
+//    connect(&progressDialog, &QProgressDialog::canceled,
+//            &writeFileFutureWatcher, &QFutureWatcher<bool>::cancel);
+
+//    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::progressRangeChanged,
+//            &progressDialog, &QProgressDialog::setRange);
+
+//    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::progressValueChanged,
+//            &progressDialog, &QProgressDialog::setValue);
+
+//    //Run the file writing in seperate thread
+//    writeFileFutureWatcher.setFuture(QtConcurrent::run(m_pDataWindow->getDataModel(),
+//                                                         &RawModel::loadFiffData,
+//                                                         &m_qFileRaw));
+
+//    progressDialog.exec();
+
+//    writeFileFutureWatcher.waitForFinished();
+
+//    if(!writeFileFutureWatcher.future().result())
+//        qDebug() << "Fiff data file" << filename << "loaded.";
+//    else
+//        qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
+
+    if(!m_pDataWindow->getDataModel()->loadFiffData(&m_qFileRaw))
+        qDebug() << "Fiff data file" << filename << "loaded.";
+    else
+        qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
+
     //set position of QScrollArea
     m_pDataWindow->getDataTableView()->horizontalScrollBar()->setValue(0);
+    m_pDataWindow->initMVCSettings();
 
     //Set fiffInfo in event model
     m_pEventWindow->getEventModel()->setFiffInfo(m_pDataWindow->getDataModel()->m_fiffInfo);
@@ -275,10 +528,16 @@ void MainWindow::openFile()
                                                         m_pDataWindow->getDataModel()->lastSample());
 
     //resize columns to contents - needs to be done because the new data file can be shorter than the old one
+    m_pDataWindow->updateDataTableViews();
     m_pDataWindow->getDataTableView()->resizeColumnsToContents();
 
     //Update status bar
     setWindowStatus();
+
+    //Hide not presented channel types and their spin boxes in the scale window
+    m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_fiffInfo);
+
+    m_qFileRaw.close();
 }
 
 
@@ -286,18 +545,57 @@ void MainWindow::openFile()
 
 void MainWindow::writeFile()
 {
-    QString filename = QFileDialog::getSaveFileName(this,QString("Write fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif data files (*.fif)"));
+    QString filename = QFileDialog::getSaveFileName(this,
+                                                    QString("Write fiff data file"),
+                                                    QString("./MNE-sample-data/MEG/sample/"),
+                                                    tr("fif data files (*.fif)"));
 
-    if(filename.isEmpty())
-    {
+    if(filename.isEmpty()) {
         qDebug("User aborted saving to fiff data file");
         return;
     }
 
-    QFile t_fileRaw(filename);
+    if(filename == m_qFileRaw.fileName()) {
+        QMessageBox msgBox;
+        msgBox.setText("You are trying to write to the file you are currently loading the data from. Please choose another file to write to.");
+        msgBox.exec();
+        return;
+    }
 
-    if(!m_pDataWindow->getDataModel()->writeFiffData(t_fileRaw))
-        qDebug() << "MainWindow: ERROR writing fiff data file" << t_fileRaw.fileName() << "!";
+    //Create output file, progress dialog and future watcher
+    QFile qFileOutput (filename);
+    if(qFileOutput.isOpen())
+        qFileOutput.close();
+
+    QFutureWatcher<bool> writeFileFutureWatcher;
+    QProgressDialog progressDialog("Writing to fif file...", QString(), 0, 0, this, Qt::Dialog);
+
+    //Connect future watcher and dialog
+    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::finished,
+            &progressDialog, &QProgressDialog::reset);
+
+    connect(&progressDialog, &QProgressDialog::canceled,
+            &writeFileFutureWatcher, &QFutureWatcher<bool>::cancel);
+
+    connect(m_pDataWindow->getDataModel(), &RawModel::writeProgressRangeChanged,
+            &progressDialog, &QProgressDialog::setRange);
+
+    connect(m_pDataWindow->getDataModel(), &RawModel::writeProgressChanged,
+            &progressDialog, &QProgressDialog::setValue);
+
+    //Run the file writing in seperate thread
+    writeFileFutureWatcher.setFuture(QtConcurrent::run(m_pDataWindow->getDataModel(),
+                                                         &RawModel::writeFiffData,
+                                                         &qFileOutput));
+
+    progressDialog.exec();
+
+    writeFileFutureWatcher.waitForFinished();
+
+    if(!writeFileFutureWatcher.future().result())
+        qDebug() << "MainWindow: ERROR writing fiff data file" << qFileOutput.fileName() << "!";
+    else
+        qDebug() << "MainWindow: Successfully written to" << qFileOutput.fileName() << "!";
 }
 
 
@@ -305,7 +603,10 @@ void MainWindow::writeFile()
 
 void MainWindow::loadEvents()
 {
-    QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff event data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
+    QString filename = QFileDialog::getOpenFileName(this,
+                                                    QString("Open fiff event data file"),
+                                                    QString("./MNE-sample-data/MEG/sample/"),
+                                                    tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
 
     if(filename.isEmpty())
     {
@@ -327,7 +628,8 @@ void MainWindow::loadEvents()
     setWindowStatus();
 
     //Show event window
-    showEventWindow();
+    if(!m_pEventWindow->isVisible())
+        m_pEventWindow->show();
 }
 
 
@@ -359,74 +661,45 @@ void MainWindow::saveEvents()
 
 //*************************************************************************************************************
 
-void MainWindow::showAboutWindow()
+void MainWindow::loadEvoked()
 {
-    //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
-    if(!m_pAboutWindow->isVisible())
+    QString filename = QFileDialog::getOpenFileName(this,QString("Open evoked fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif evoked data files (*-ave.fif);;fif data files (*.fif)"));
+
+    if(filename.isEmpty())
     {
-        m_pAboutWindow->show();
-        m_pAboutWindow->raise();
+        qDebug("User aborted loading fiff evoked file");
+        return;
     }
-    else // if visible raise the widget to be sure that it is not obscured by other windows
-        m_pAboutWindow->raise();
+
+    if(m_qEvokedFile.isOpen())
+        m_qEvokedFile.close();
+
+    m_qEvokedFile.setFileName(filename);
+
+    if(m_pAverageWindow->getAverageModel()->loadEvokedData(m_qEvokedFile))
+        qDebug() << "Fiff evoked data file" << filename << "loaded.";
+    else
+        qDebug("ERROR loading evoked data file %s",filename.toLatin1().data());
+
+    //Update status bar
+    setWindowStatus();
+
+    //Show average window
+    if(!m_pAverageWindow->isVisible())
+        m_pAverageWindow->show();
 }
 
 
 //*************************************************************************************************************
 
-void MainWindow::showFilterWindow()
+void MainWindow::showWindow(QWidget *window)
 {
     //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
-    if(!m_pFilterWindow->isVisible())
+    if(!window->isVisible())
     {
-        m_pFilterWindow->show();
-        m_pFilterWindow->raise();
+        window->show();
+        window->raise();
     }
     else // if visible raise the widget to be sure that it is not obscured by other windows
-        m_pFilterWindow->raise();
-}
-
-
-//*************************************************************************************************************
-
-void MainWindow::showEventWindow()
-{
-    //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
-    if(!m_pEventWindow->isVisible())
-    {
-        m_pEventWindow->show();
-        m_pEventWindow->raise();
-    }
-    else // if visible raise the widget to be sure that it is not obscured by other windows
-        m_pEventWindow->raise();
-}
-
-
-//*************************************************************************************************************
-
-void MainWindow::showInformationWindow()
-{
-    //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
-    if(!m_pInformationWindow->isVisible())
-    {
-        m_pInformationWindow->show();
-        m_pInformationWindow->raise();
-    }
-    else // if visible raise the widget to be sure that it is not obscured by other windows
-        m_pInformationWindow->raise();
-}
-
-
-//*************************************************************************************************************
-
-void MainWindow::showSelectionManagerWindow()
-{
-    //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
-    if(!m_pSelectionManagerWindow->isVisible())
-    {
-        m_pSelectionManagerWindow->show();
-        m_pSelectionManagerWindow->raise();
-    }
-    else // if visible raise the widget to be sure that it is not obscured by other windows
-        m_pSelectionManagerWindow->raise();
+        window->hide();
 }

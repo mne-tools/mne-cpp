@@ -49,10 +49,18 @@
 // DEFINES
 //=============================================================================================================
 
-#if defined(UTILS_LIBRARY)
+#if defined(BUILD_MNECPP_STATIC_LIB)
+#  define UTILSSHARED_EXPORT
+#elif defined(UTILS_LIBRARY)
 #  define UTILSSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
 #  define UTILSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+//#if defined(UTILS_LIBRARY)
+//#  define UTILSSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+//#else
+//#  define UTILSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+//#endif
 
 #endif // MNEUTILS_GLOBAL_H

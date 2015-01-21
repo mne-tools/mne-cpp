@@ -113,4 +113,6 @@ INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 RESOURCES += \
     mainApp.qrc
 
+RC_FILE = images/appIcons/mne-x.rc
+
 unix: QMAKE_CXXFLAGS += -Wno-attributes
