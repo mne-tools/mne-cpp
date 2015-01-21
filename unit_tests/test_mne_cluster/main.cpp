@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
     parser.addVersionOption();
 
     // MEG Source Directory
-    QCommandLineOption srcDirectoryOption(QStringList() << "ms" << "meg-source-directory",
+    QCommandLineOption srcDirectoryOption(QStringList() << "s" << "meg-source-directory",
             QCoreApplication::translate("main", "Read MEG (fwd, cov, raw, eve) source files from <directory>."),
             QCoreApplication::translate("main", "directory"),
             "./MNE-sample-data/MEG/sample/");
@@ -227,11 +227,7 @@ int main(int argc, char *argv[])
     QString sTargetPrefix = parser.value(targetPrefixOption);
     qDebug() << "Target Prefix" << sTargetPrefix;
 
-/*
-
-
-
-
+    //OLD
 //    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
 //    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
 //    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
@@ -239,13 +235,15 @@ int main(int argc, char *argv[])
 //    AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
 //    SurfaceSet t_surfSet("sample", 2, "white", "./MNE-sample-data/subjects");
 
-    QFile t_fileFwd("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
-    QFile t_fileCov("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
-    QFile t_fileRaw("D:/Data/MEG/mind006/mind006_051209_auditory01_raw.fif");
-    QString t_sEventName = "D:/Data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
-    AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "D:/Data/subjects");
-    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Data/subjects");
+//    QFile t_fileFwd("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
+//    QFile t_fileCov("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
+//    QFile t_fileRaw("D:/Data/MEG/mind006/mind006_051209_auditory01_raw.fif");
+//    QString t_sEventName = "D:/Data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
+//    AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "D:/Data/subjects");
+//    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Data/subjects");
 
+
+ /*
     qint32 event = 1;
 
     float tmin = -0.2f;
