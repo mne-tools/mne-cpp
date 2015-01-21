@@ -136,7 +136,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F10)"),this);
     m_pActionSelectSensors->setShortcut(tr("F10"));
     m_pActionSelectSensors->setStatusTip(tr("Shows the region selection widget (F10)"));
-    m_pActionSelectSensors->setVisible(false);
+    m_pActionSelectSensors->setVisible(true);
     connect(m_pActionSelectSensors, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showSensorSelectionWidget);
     addDisplayAction(m_pActionSelectSensors);
 
@@ -492,21 +492,27 @@ void RealTimeMultiSampleArrayWidget::showProjectionWidget()
 
 void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
 {
-    if(!m_pSensorSelectionWidget)
+//    if(!m_pSensorSelectionWidget)
+//    {
+//        m_pSensorSelectionWidget = QSharedPointer<SensorWidget>(new SensorWidget);
+
+//        m_pSensorSelectionWidget->setWindowTitle("Channel Selection");
+
+//        if(m_pSensorModel)
+//        {
+//            m_pSensorSelectionWidget->setModel(m_pSensorModel);
+
+//            connect(m_pSensorModel, &SensorModel::newSelection, m_pRTMSAModel, &RealTimeMultiSampleArrayModel::selectRows);
+//        }
+
+//    }
+//    m_pSensorSelectionWidget->show();
+
+    if(!m_pSelectionManagerWindow)
     {
-        m_pSensorSelectionWidget = QSharedPointer<SensorWidget>(new SensorWidget);
-
-        m_pSensorSelectionWidget->setWindowTitle("Channel Selection");
-
-        if(m_pSensorModel)
-        {
-            m_pSensorSelectionWidget->setModel(m_pSensorModel);
-
-            connect(m_pSensorModel, &SensorModel::newSelection, m_pRTMSAModel, &RealTimeMultiSampleArrayModel::selectRows);
-        }
-
+        m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow);
     }
-    m_pSensorSelectionWidget->show();
+    m_pSelectionManagerWindow->show();
 }
 
 

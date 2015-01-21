@@ -58,7 +58,8 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lxMeasd
+            -lxMeasd \
+            -lMNE$${MNE_LIB_VERSION}Utilsd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -67,7 +68,8 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Disp \
-            -lxMeas
+            -lxMeas \
+            -lMNE$${MNE_LIB_VERSION}Utils
 }
 
 qtHaveModule(3d) {
@@ -116,7 +118,11 @@ SOURCES += \
     helpers/evokedmodalitywidget.cpp \
     helpers/frequencyspectrumsettingswidget.cpp \
     helpers/realtimemultisamplearrayscalingwidget.cpp \
-    helpers/projectorwidget.cpp
+    helpers/projectorwidget.cpp \
+    helpers/layoutscene.cpp \
+    helpers/selectionmanagerwindow.cpp \
+    helpers/selectionscene.cpp \
+    helpers/selectionsceneitem.cpp
 
 HEADERS += \
     xdisp_global.h \
@@ -142,10 +148,15 @@ HEADERS += \
     helpers/evokedmodalitywidget.h \
     helpers/frequencyspectrumsettingswidget.h \
     helpers/realtimemultisamplearrayscalingwidget.h \
-    helpers/projectorwidget.h
+    helpers/projectorwidget.h \
+    helpers/layoutscene.h \
+    helpers/selectionmanagerwindow.h \
+    helpers/selectionscene.h \
+    helpers/selectionsceneitem.h
 
 FORMS += \
-    realtimesamplearraywidget.ui
+    realtimesamplearraywidget.ui \
+    helpers/selectionmanagerwindow.ui
 
 qtHaveModule(3d) {
     SOURCES += realtimesourceestimatewidget.cpp

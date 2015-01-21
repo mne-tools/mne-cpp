@@ -47,7 +47,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEBrowseRawQt;
+using namespace XDISPLIB;
 
 
 //*************************************************************************************************************
@@ -55,10 +55,9 @@ using namespace MNEBrowseRawQt;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SelectionManagerWindow::SelectionManagerWindow(QWidget *parent, ChInfoModel* pChInfoModel)
+SelectionManagerWindow::SelectionManagerWindow(QWidget *parent)
 : QDockWidget(parent)
 , ui(new Ui::SelectionManagerWindow)
-, m_pChInfoModel(pChInfoModel)
 {
     ui->setupUi(this);
 
@@ -230,10 +229,10 @@ void SelectionManagerWindow::initComboBoxes()
 {
     ui->m_comboBox_layoutFile->clear();
     ui->m_comboBox_layoutFile->insertItems(0, QStringList()
+     << QApplication::translate("SelectionManagerWindow", "babymeg_all.lout", 0)
      << QApplication::translate("SelectionManagerWindow", "Vectorview-grad.lout", 0)
      << QApplication::translate("SelectionManagerWindow", "Vectorview-all.lout", 0)
      << QApplication::translate("SelectionManagerWindow", "Vectorview-mag.lout", 0)
-     << QApplication::translate("SelectionManagerWindow", "babymeg_all.lout", 0)
 //     << QApplication::translate("SelectionManagerWindow", "CTF-275.lout", 0)
 //     << QApplication::translate("SelectionManagerWindow", "magnesWH3600.lout", 0)
     );
@@ -253,7 +252,7 @@ void SelectionManagerWindow::initComboBoxes()
                 this, &SelectionManagerWindow::loadLayout);
 
     //Initialise layout as neuromag vectorview with all channels
-    loadLayout("Vectorview-grad.lout");
+    loadLayout("babymeg_all.lout");
 }
 
 
@@ -275,26 +274,26 @@ bool SelectionManagerWindow::loadLayout(QString path)
     QStringList names;
     QFile out;//(/*"./MNE_Browse_Raw_Resources/Templates/ChannelSelection/*/"manualLayout.lout");
 
-    for(int i = 0; i<m_pChInfoModel->rowCount(); i++) {
-        QModelIndex digIndex = m_pChInfoModel->index(i,1);
-        QString chName = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetOrigChName).toString();
+//    for(int i = 0; i<m_pChInfoModel->rowCount(); i++) {
+//        QModelIndex digIndex = m_pChInfoModel->index(i,1);
+//        QString chName = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetOrigChName).toString();
 
-        digIndex = m_pChInfoModel->index(i,8);
-        QVector3D channelDig = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetChDigitizer).value<QVector3D>();
+//        digIndex = m_pChInfoModel->index(i,8);
+//        QVector3D channelDig = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetChDigitizer).value<QVector3D>();
 
-        digIndex = m_pChInfoModel->index(i,4);
-        int kind = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetChKind).toInt();
+//        digIndex = m_pChInfoModel->index(i,4);
+//        int kind = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetChKind).toInt();
 
-        if(kind == FIFFV_EEG_CH) { //FIFFV_MEG_CH
-            QVector<double> temp;
-            temp.append(channelDig.x());
-            temp.append(channelDig.y());
-            temp.append(-channelDig.z());
-            inputPoints.append(temp);
+//        if(kind == FIFFV_EEG_CH) { //FIFFV_MEG_CH
+//            QVector<double> temp;
+//            temp.append(channelDig.x());
+//            temp.append(channelDig.y());
+//            temp.append(-channelDig.z());
+//            inputPoints.append(temp);
 
-            names<<chName;
-        }
-    }
+//            names<<chName;
+//        }
+//    }
 
     float prad = 60.0;
     float width = 5.0;
@@ -350,16 +349,16 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
     m_selectionGroupsMap["All"] = m_currentlyLoadedFiffChannels;
 
     QStringList names;
-    for(int i = 0; i<m_pChInfoModel->rowCount(); i++) {
-        QModelIndex digIndex = m_pChInfoModel->index(i,1);
-        QString chName = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetOrigChName).toString();
+//    for(int i = 0; i<m_pChInfoModel->rowCount(); i++) {
+//        QModelIndex digIndex = m_pChInfoModel->index(i,1);
+//        QString chName = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetOrigChName).toString();
 
-        digIndex = m_pChInfoModel->index(i,4);
-        int kind = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetChKind).toInt();
+//        digIndex = m_pChInfoModel->index(i,4);
+//        int kind = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetChKind).toInt();
 
-        if(kind == FIFFV_EEG_CH) //FIFFV_MEG_CH
-            names<<chName;
-    }
+//        if(kind == FIFFV_EEG_CH) //FIFFV_MEG_CH
+//            names<<chName;
+//    }
 
     //Add 'Add EEG' group to selection groups
     m_selectionGroupsMap["All EEG"] = names;
@@ -484,19 +483,19 @@ void SelectionManagerWindow::updateDataView()
     //Create list of channels which are to be visible in the view
     QStringList selectedChannels;
 
-    for(int i = 0; i<targetListWidget->count(); i++) {
-        QListWidgetItem* item = targetListWidget->item(i);
-        int indexTemp = m_pChInfoModel->getIndexFromMappedChName(item->text());
+//    for(int i = 0; i<targetListWidget->count(); i++) {
+//        QListWidgetItem* item = targetListWidget->item(i);
+//        int indexTemp = m_pChInfoModel->getIndexFromMappedChName(item->text());
 
-        if(indexTemp != -1) {
-            QModelIndex mappedNameIndex = m_pChInfoModel->index(indexTemp,1);
-            QString origChName = m_pChInfoModel->data(mappedNameIndex,ChInfoModelRoles::GetOrigChName).toString();
+//        if(indexTemp != -1) {
+//            QModelIndex mappedNameIndex = m_pChInfoModel->index(indexTemp,1);
+//            QString origChName = m_pChInfoModel->data(mappedNameIndex,ChInfoModelRoles::GetOrigChName).toString();
 
-            selectedChannels << origChName;
-        }
-        else
-            selectedChannels << item->text();
-    }
+//            selectedChannels << origChName;
+//        }
+//        else
+//            selectedChannels << item->text();
+//    }
 
     emit showSelectedChannelsOnly(selectedChannels);
 

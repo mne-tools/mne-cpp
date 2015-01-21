@@ -50,6 +50,7 @@
 #include "helpers/realtimemultisamplearrayscalingwidget.h"
 #include "helpers/sensorwidget.h"
 #include "helpers/projectorwidget.h"
+#include "helpers/selectionmanagerwindow.h"
 
 
 //*************************************************************************************************************
@@ -298,6 +299,7 @@ private:
 
     SensorModel* m_pSensorModel;                            /**< Sensor model for channel selection */
     QSharedPointer<SensorWidget> m_pSensorSelectionWidget;  /**< Sensor selection widget. */
+    QSharedPointer<SelectionManagerWindow> m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */
 
     QMap< qint32,float > m_qMapChScaling;                   /**< Sensor selection widget. */
     QAction* m_pActionChScaling;                            /**< Show channel scaling Action. */
