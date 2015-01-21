@@ -81,6 +81,10 @@ using namespace MNELIB;
 */
 int main(int argc, char *argv[])
 {
+    //
+    // Please notice that this example only works in release mode.
+    // Debug mode somehow corrupts the simplex coder. ToDo: Fix this!
+    //
     QCoreApplication a(argc, argv);
 
     // Get fiff info
