@@ -252,7 +252,7 @@ QList<QList<GaborAtom> > AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 ma
 
         //simplexfunction to find minimum of target among parameters s, p, k
 
-        if(trial_separation)
+        if(trial_separation && simplex_it != 0)
         {
             for(qint32 chn = 0; chn < atoms_in_chns.length(); chn++)
             {
@@ -262,7 +262,7 @@ QList<QList<GaborAtom> > AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 ma
 
             }
         }
-        else
+        else if(simplex_it != 0)
             simplex_maximisation(simplex_it, simplex_reflection, simplex_expansion, simplex_contraction, simplex_full_contraction,
                                  gabor_Atom, max_scalar_product, sample_count, fix_phase, residuum, trial_separation, gabor_Atom->bm_channel);
 
@@ -277,6 +277,7 @@ QList<QList<GaborAtom> > AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 ma
             if(trial_separation)
             {
                 *gabor_Atom = atoms_in_chns.at(chn);
+                gabor_Atom->energy = 0;
                 best_match = gabor_Atom->create_real(gabor_Atom->sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, gabor_Atom->phase);
             }
             else
@@ -304,8 +305,8 @@ QList<QList<GaborAtom> > AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 ma
             if(trial_separation)
             {
                 atoms_in_chns.replace(chn, *gabor_Atom);            // change energy
-                residuum_energy -= atoms_in_chns.at(chn).energy;
-                current_energy  += atoms_in_chns.at(chn).energy;
+                residuum_energy -= atoms_in_chns.at(chn).energy;// / channel_count;;
+                current_energy  += atoms_in_chns.at(chn).energy;// / channel_count;;
             }
         }
 
@@ -314,6 +315,12 @@ QList<QList<GaborAtom> > AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 ma
             residuum_energy -= gabor_Atom->energy;
             current_energy  += gabor_Atom->energy;
         }
+        else
+            /*for(qint32 i = 0; i < atoms_in_chns.length(); i++)
+            {
+                residuum_energy -= atoms_in_chns.at(i).energy / channel_count;
+                current_energy  += atoms_in_chns.at(i).energy / channel_count;
+            }*/
 
         std::cout << "absolute energy of residue: " << residuum_energy << "\n";
 

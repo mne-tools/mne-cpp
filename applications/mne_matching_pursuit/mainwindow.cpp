@@ -1397,11 +1397,18 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
     if(fix_dict_atom_res_list.isEmpty())
     {
         GaborAtom temp_atom = adaptive_atom_res_list.last().last();
+        qreal atom_energy = 0;
+
+        for(qint32 i = 0; i < adaptive_atom_res_list.last().length(); i++)
+        {
+            atom_energy += adaptive_atom_res_list.last().at(i).energy;
+        }
+
 
         qreal phase = temp_atom.phase;
         if(temp_atom.phase > 2*PI) phase -= 2*PI;
 
-        QTableWidgetItem* atomEnergieItem = new QTableWidgetItem(QString::number(100 * temp_atom.energy / max_energy, 'f', 2));
+        QTableWidgetItem* atomEnergieItem = new QTableWidgetItem(QString::number(100 * atom_energy / max_energy, 'f', 2));
         QTableWidgetItem* atomScaleItem = new QTableWidgetItem(QString::number(temp_atom.scale / _sample_rate, 'g', 3));
         QTableWidgetItem* atomTranslationItem = new QTableWidgetItem(QString::number(temp_atom.translation / qreal(_sample_rate) + _from  / _sample_rate + _offset_time, 'g', 4));
         QTableWidgetItem* atomModulationItem = new QTableWidgetItem(QString::number(temp_atom.modulation * _sample_rate / temp_atom.sample_count, 'g', 3));
@@ -1458,6 +1465,7 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
                                                                                                                    adaptive_atom_res_list.last().at(i).phase);
                 _residuum_matrix.col(i) -= atom_vec;
                 _atom_sum_matrix.col(i) += atom_vec;
+                //_residuum_matrix = residuum;
             }
             else
             {
@@ -2447,35 +2455,57 @@ void MainWindow::recieve_save_progress(qint32 current_progress, qint32 finished)
         ui->actionSpeicher_unter->setEnabled(true);
     }
 }
-
 //*****************************************************************************************************************
 
 void SaveFifFile::save_fif_file(QString source_path, QString save_path, fiff_int_t start_change, fiff_int_t end_change, MatrixXd changes, select_map select_channel_map, RowVectorXi picks)
 {
     QFile t_fileIn(source_path);
-    QFile t_fileOut(save_path);
+    QFile t_fileOut(save_path.append(".txt"));
+    std::cout << save_path.toStdString();
 
     //ToDo: no save for ave data at the moment
     if(source_path.contains("-ave.", Qt::CaseInsensitive))
     {
-        emit save_progress(100, 4);
-        return;
+        //temporary ToD: revert this temp if no creating matlab signals is needed anymore
+        if (t_fileOut.open(QFile::WriteOnly | QFile::Truncate))
+        {
+            QTextStream matlab_stream(&t_fileOut);
+
+            for(qint32 channel = 0; channel < _atom_sum_matrix.cols(); channel++)
+            {
+                for(qint32 sample = 0; sample < _atom_sum_matrix.rows(); sample++)
+                    matlab_stream << QString::number(_atom_sum_matrix(sample, channel)) << ",";
+
+                matlab_stream<< "\n";
+            }
+        }
+
+        //end temporary
+        //emit save_progress(100, 4);
+        //return;
     }
     else if(QString::compare(source_path.split('.').last(), "txt", Qt::CaseInsensitive) == 0)
     {
-        //QTextStream matlab_stream(t_fileOut);
-
-        for(qint32 k = 0; k < _matlab_channels.length(); k++)
+        if (t_fileOut.open(QFile::WriteOnly | QFile::Truncate))
         {
-            QStringList signal_samples = _matlab_channels.at(k).split(',', QString::SkipEmptyParts);
-            for(qint32 i = start_change; i <= end_change; i++)
+            QTextStream matlab_stream(&t_fileOut);
+
+            for(qint32 k = 0; k < _matlab_channels.length(); k++)
             {
-                //signal_samples.replace(i, changes[k,i].toString());//ToDo: ready
+                QStringList signal_samples = _matlab_channels.at(k).split(',', QString::SkipEmptyParts);
+                for(qint32 i = start_change; i <= end_change; i++)
+                {
+                    signal_samples.replace(i, QString::number(changes(i, k)));//ToDo: ready
+                }
+                for(qint32 j = 0; j < signal_samples.length(); j++)
+                    matlab_stream << signal_samples.at(j) << ",";
+                matlab_stream<< "\n";
+
             }
         }
     }
     else if(QString::compare(source_path.split('.').last(), "fif", Qt::CaseInsensitive) == 0)
-    {
+    {/*
 
         //   Setup for reading the raw data
         FiffRawData raw(t_fileIn);
@@ -2582,7 +2612,7 @@ void SaveFifFile::save_fif_file(QString source_path, QString save_path, fiff_int
 
         outfid->finish_writing_raw();
         printf("Finished\n");
-    }
+    */}
 }
 
 //*****************************************************************************************************************
