@@ -53,8 +53,7 @@ SUBDIRS += \
     fiffIO
 
 contains(MNECPP_CONFIG, withGui) {
-	SUBDIRS += \
-		matchingPursuit
+	SUBDIRS +=
 
     qtHaveModule(3d) {
         message(Qt3D available: readFwdDisp3D configured!)

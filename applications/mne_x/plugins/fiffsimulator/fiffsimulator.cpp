@@ -143,7 +143,7 @@ void FiffSimulator::initConnector()
     if(m_pFiffInfo)
     {
         m_pRTMSA_FiffSimulator->data()->initFromFiffInfo(m_pFiffInfo);
-        m_pRTMSA_FiffSimulator->data()->setMultiArraySize(100);
+        m_pRTMSA_FiffSimulator->data()->setMultiArraySize(1);
         m_pRTMSA_FiffSimulator->data()->setVisibility(true);
         m_pRTMSA_FiffSimulator->data()->setXMLLayoutFile("./mne_x_plugins/resources/FiffSimulator/VectorViewSimLayout.xml");
     }
@@ -402,10 +402,7 @@ void FiffSimulator::run()
         //pop matrix
         matValue = m_pRawMatrixBuffer_In->pop();
 
-//        std::cout << "Mat Value\n" << matValue.row(306) << std::endl;
-
         //emit values
-        for(qint32 i = 0; i < matValue.cols(); ++i)
-            m_pRTMSA_FiffSimulator->data()->setValue(matValue.col(i).cast<double>());
+        m_pRTMSA_FiffSimulator->data()->setValue(matValue.cast<double>());
     }
 }

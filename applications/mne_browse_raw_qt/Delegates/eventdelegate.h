@@ -40,7 +40,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// INCLUDES
 //=============================================================================================================
 
 #include "../Models/eventmodel.h"
@@ -79,22 +79,18 @@ class EventDelegate : public QItemDelegate
 public:
     EventDelegate(QObject *parent = 0);
 
+    //=========================================================================================================
+    /**
+    * Reimplemented virtual functions
+    *
+    */
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     void setEditorData(QWidget *editor, const QModelIndex &index) const;
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
     void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-    //=========================================================================================================
-    /**
-    * setModelView creates the QPointer path for the data plot.
-    *
-    * @param[in] model holds a pointer to the event model. This model needs to be set in order to access the event data for plotting.
-    */
-    void setModelView(EventModel *eventModel);
-
 private:
-    QSettings       m_qSettings;
-    EventModel*     m_pEventModel;
+    QSettings       m_qSettings;            /**< QSettings variable used to write or read from independent application sessions. */
 };
 
 } //NAMESPACE

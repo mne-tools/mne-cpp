@@ -1474,10 +1474,10 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
     //
     //   Add the calibration factors
     //
-    MatrixXd cals(1,data.info.nchan);
+    RowVectorXd cals(data.info.nchan);
     cals.setZero();
     for (qint32 k = 0; k < data.info.nchan; ++k)
-        cals(0,k) = data.info.chs.at(k).range*data.info.chs[k].cal;
+        cals[k] = data.info.chs[k].range*data.info.chs[k].cal;
     //
     data.cals       = cals;
     data.rawdir     = rawdir;
@@ -1540,7 +1540,7 @@ FiffStream::SPtr FiffStream::start_file(QIODevice& p_IODevice)
 
 //*************************************************************************************************************
 
-FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const FiffInfo& info, MatrixXd& cals, MatrixXi sel)
+FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const FiffInfo& info, RowVectorXd& cals, MatrixXi sel)
 {
     //
     //   We will always write floats
@@ -1672,7 +1672,7 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
     //
     //    Channel info
     //
-    cals = MatrixXd(1,nchan);
+    cals = RowVectorXd(nchan);
 
     for(k = 0; k < nchan; ++k)
     {
@@ -1681,7 +1681,7 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
         //
         chs[k].scanno = k+1;//+1 because
         //chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
-        cals(0,k) = chs[k].cal;
+        cals[k] = chs[k].cal;
         t_pStream->write_ch_info(&chs[k]);
     }
     //
@@ -2455,6 +2455,26 @@ bool FiffStream::write_raw_buffer(const MatrixXd& buf, const RowVectorXd& cals)
     inv_calsMat.setFromTriplets(tripletList.begin(), tripletList.end());
 
     MatrixXf tmp = (inv_calsMat*buf).cast<float>();
+    this->write_float(FIFF_DATA_BUFFER,tmp.data(),tmp.rows()*tmp.cols());
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool FiffStream::write_raw_buffer(const MatrixXd& buf, const SparseMatrix<double>& mult)
+{
+    if (buf.rows() != mult.cols()) {
+        printf("buffer and mult sizes do not match\n");
+        return false;
+    }
+
+    SparseMatrix<double> inv_mult(mult.rows(), mult.cols());
+    for (int k=0; k<inv_mult.outerSize(); ++k)
+      for (SparseMatrix<double>::InnerIterator it(mult,k); it; ++it)
+        inv_mult.coeffRef(it.row(),it.col()) = 1/it.value();
+
+    MatrixXf tmp = (inv_mult*buf).cast<float>();
     this->write_float(FIFF_DATA_BUFFER,tmp.data(),tmp.rows()*tmp.cols());
     return true;
 }

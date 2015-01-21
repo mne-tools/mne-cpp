@@ -41,7 +41,8 @@ SUBDIRS += \
     test_mne_libs \
     test_mne_rt \
     mne_x_plugin_com \
-    test_mne_future
+    test_mne_future \
+    test_ssp
 
 contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += \
@@ -56,7 +57,10 @@ contains(MNECPP_CONFIG, withGui) {
                     mne_3d_widget \
                     test_mne_cluster \
                     test_mne_surface \
-                    test_mne_stc
+                    test_mne_stc \
+                    test_mne_cluster_eval \
+                    test_rap_cluster_eval \
+#                    test_orig_rap_cluster_eval
 #            }
         }
     }

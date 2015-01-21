@@ -57,8 +57,6 @@
 //=============================================================================================================
 
 using namespace MNEBrowseRawQt;
-using namespace Eigen;
-using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -71,14 +69,25 @@ RawDelegate::RawDelegate(QObject *parent)
 , m_qSettings()
 , m_bShowSelectedEventsOnly(false)
 , m_bActivateEvents(true)
+, m_bRemoveDC(false)
 {
-    m_iDefaultPlotHeight = m_qSettings.value("RawDelegate/plotheight").toDouble();
-    m_dDx = m_qSettings.value("RawDelegate/dx").toDouble();
-    m_nhlines = m_qSettings.value("RawDelegate/nhlines").toDouble();
+    m_iDefaultPlotHeight = DELEGATE_PLOT_HEIGHT;
+    m_dDx = DELEGATE_DX;
+    m_nhlines = DELEGATE_NHLINES;
 
     m_pEventModel = new EventModel(NULL);
     m_pEventView = new QTableView(NULL);
     m_pRawView = new QTableView(NULL);
+
+    //Init m_scaleMap
+    m_scaleMap["MEG_grad"] = 400 * 1e-15 * 100; //*100 because data in fiff files is stored as fT/m not fT/cm
+    m_scaleMap["MEG_mag"] = 1.2 * 1e-12;
+    m_scaleMap["MEG_EEG"] = 30 * 1e-06;
+    m_scaleMap["MEG_EOG"] = 150 * 1e-06;
+    m_scaleMap["MEG_EMG"] = 1 * 1e-03;
+    m_scaleMap["MEG_ECG"] = 1 * 1e-03;
+    m_scaleMap["MEG_MISC"] = 1 * 1;
+    m_scaleMap["MEG_STIM"] = 5 * 1;
 }
 
 
@@ -102,24 +111,24 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
         //draw special background when channel is marked as bad
         QVariant v = index.model()->data(index,Qt::BackgroundRole);
-        if(v.canConvert<QBrush>() && !(option.state & QStyle::State_Selected)) {
+        if(v.canConvert<QBrush>()/* && !(option.state & QStyle::State_Selected)*/) {
             QPointF oldBO = painter->brushOrigin();
             painter->setBrushOrigin(option.rect.topLeft());
             painter->fillRect(option.rect, qvariant_cast<QBrush>(v));
             painter->setBrushOrigin(oldBO);
         }
 
-        //Highlight selected channels
-        if(option.state & QStyle::State_Selected) {
-            QPointF oldBO = painter->brushOrigin();
-            painter->setBrushOrigin(option.rect.topLeft());
-            painter->fillRect(option.rect, option.palette.highlight());
-            painter->setBrushOrigin(oldBO);
-        }
-
-        //Get data
+        //Get data and mean
         QVariant variant = index.model()->data(index,Qt::DisplayRole);
         QList<RowVectorPair> listPairs = variant.value<QList<RowVectorPair> >();
+
+        double channelMean = 0;
+        if(m_bRemoveDC) {
+            QModelIndex meanIndex = index.model()->index(index.row(),2);
+            QVariant channelMeanVariant = index.model()->data(meanIndex,RawModelRoles::GetChannelMean);
+            channelMean = channelMeanVariant.toDouble();
+        }
+
         const RawModel* t_rawModel = (static_cast<const RawModel*>(index.model()));
 
         QPainterPath path(QPointF(option.rect.x()+t_rawModel->relFiffCursor()-1,option.rect.y()));
@@ -137,8 +146,15 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
         painter->restore();
 
         //Plot data path
-        path = QPainterPath(QPointF(option.rect.x()+t_rawModel->relFiffCursor(),option.rect.y()));
-        createPlotPath(index, option, path, listPairs);
+        path = QPainterPath(QPointF(option.rect.x()+t_rawModel->relFiffCursor(), option.rect.y()));
+        createPlotPath(index, option, path, listPairs, channelMean);
+
+        if(option.state & QStyle::State_Selected) {
+            pen.setStyle(Qt::SolidLine);
+            pen.setWidthF(1);
+            pen.setColor(Qt::red);
+            painter->setPen(pen);
+        }
 
         painter->translate(0,t_fPlotHeight/2);
         painter->setRenderHint(QPainter::Antialiasing, true);
@@ -154,10 +170,6 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
         break;
         }
     }
-
-    //Update raw table view widget's viewport manually. This needs to be done because the user is working with the event view widget and thus the delegate of the raw view widget is not getting called
-    //Note: If you inherit QAbstractItemView and intend to update the contents of the viewport, you should use viewport->update() instead of update() as all painting operations take place on the viewport.
-    m_pRawView->viewport()->update();
 }
 
 
@@ -197,7 +209,15 @@ void RawDelegate::setModelView(EventModel *eventModel, QTableView* eventView, QT
 
 //*************************************************************************************************************
 
-void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs) const
+void RawDelegate::setScaleMap(const QMap<QString,double> &scaleMap)
+{
+    m_scaleMap = scaleMap;
+}
+
+
+//*************************************************************************************************************
+
+void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs, double channelMean) const
 {
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = (static_cast<const RawModel*>(index.model()))->m_chInfolist[index.row()].kind;
@@ -207,22 +227,30 @@ void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionVie
     case FIFFV_MEG_CH: {
         qint32 unit = (static_cast<const RawModel*>(index.model()))->m_pfiffIO->m_qlistRaw[0]->info.chs[index.row()].unit;
         if(unit == FIFF_UNIT_T_M) {
-            dMaxValue = m_qSettings.value("RawDelegate/max_meg_grad").toDouble();
+            dMaxValue = m_scaleMap["MEG_grad"];
         }
         else if(unit == FIFF_UNIT_T)
-            dMaxValue = m_qSettings.value("RawDelegate/max_meg_mag").toDouble();
+            dMaxValue = m_scaleMap["MEG_mag"];
         break;
     }
     case FIFFV_EEG_CH: {
-        dMaxValue = m_qSettings.value("RawDelegate/max_eeg").toDouble();
+        dMaxValue = m_scaleMap["MEG_EEG"];
         break;
     }
     case FIFFV_EOG_CH: {
-        dMaxValue = m_qSettings.value("RawDelegate/max_eog").toDouble();
+        dMaxValue = m_scaleMap["MEG_EOG"];
         break;
     }
     case FIFFV_STIM_CH: {
-        dMaxValue = m_qSettings.value("RawDelegate/max_stim").toDouble();
+        dMaxValue = m_scaleMap["MEG_STIM"];
+        break;
+    }
+    case FIFFV_EMG_CH: {
+        dMaxValue = m_scaleMap["MEG_EMG"];
+        break;
+    }
+    case FIFFV_MISC_CH: {
+        dMaxValue = m_scaleMap["MEG_MISC"];
         break;
     }
     }
@@ -233,13 +261,17 @@ void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionVie
     double y_base = -path.currentPosition().y();
     QPointF qSamplePosition;
 
+    path.moveTo(path.currentPosition().x(), -(y_base + ((*(listPairs[0].first) - channelMean)*dScaleY)));
+
     //plot all rows from list of pairs
     for(qint8 i=0; i < listPairs.size(); ++i) {
         //create lines from one to the next sample
         for(qint32 j=0; j < listPairs[i].second; ++j)
         {
             double val = *(listPairs[i].first+j);
-            dValue = val*dScaleY;
+
+            //subtract mean of the channel here (if wanted by the user)
+            dValue = (val - channelMean)*dScaleY;
 
             double newY = y_base+dValue;
 
@@ -284,9 +316,11 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
     qint32 sampleRangeHigh = sampleRangeLow + rawModel->sizeOfPreloadedData();
 
     QPen pen;
-    pen.setWidth(m_qSettings.value("EventDesignParameters/event_marker_width").toInt());
+    pen.setWidth(EVENT_MARKER_WIDTH);
 
     QColor colorTemp;
+
+    QMap<int, QColor> eventTypeColor = m_pEventModel->getEventTypeColors();
 
     if(!m_bShowSelectedEventsOnly) { //Plot all events
         for(int i = 0; i<m_pEventModel->rowCount(); i++) {
@@ -295,51 +329,15 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
 
             if(sampleValue>=sampleRangeLow && sampleValue<=sampleRangeHigh) {
                 //Set color for pen depending on current event type
-                switch(type) {
-                    default:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_default").value<QColor>());
-                    break;
-
-                    case 1:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_1").value<QColor>());
-                    break;
-
-                    case 2:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_2").value<QColor>());
-                    break;
-
-                    case 3:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_3").value<QColor>());
-                    break;
-
-                    case 4:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_4").value<QColor>());
-                    break;
-
-                    case 5:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_5").value<QColor>());
-                    break;
-
-                    case 32:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_32").value<QColor>());
-                    break;
-
-                    case 998:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_998").value<QColor>());
-                    break;
-
-                    case 999:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_999").value<QColor>());
-                    break;
-                }
+                pen.setColor(eventTypeColor.value(type, Qt::black));
 
                 colorTemp = pen.color();
-                colorTemp.setAlpha(m_qSettings.value("EventDesignParameters/event_marker_opacity").toInt());
+                colorTemp.setAlpha(EVENT_MARKER_OPACITY);
                 pen.setColor(colorTemp);
                 painter->setPen(pen);
 
                 //Draw line from sample position (x) and highest to lowest y position of the column widget - Add -m_qSettings.value("EventDesignParameters/event_marker_width").toInt() to avoid painting ovre the edge of the column widget
-                painter->drawLine(option.rect.x() + sampleValue, option.rect.y(), option.rect.x() + sampleValue, option.rect.y() + option.rect.height() - m_qSettings.value("EventDesignParameters/event_marker_width").toInt());
+                painter->drawLine(option.rect.x() + sampleValue, option.rect.y(), option.rect.x() + sampleValue, option.rect.y() + option.rect.height() - EVENT_MARKER_WIDTH);
             } // END for statement
         } // END if statement event in data range
     } // END if statement plot all
@@ -347,6 +345,7 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
         QModelIndexList indexes = m_pEventView->selectionModel()->selectedIndexes();
 
         for(int i = 0; i<indexes.size(); i++) {
+            qDebug()<<indexes.at(i).row();
             int currentRow = indexes.at(i).row();
             int sampleValue = m_pEventModel->data(m_pEventModel->index(currentRow,0)).toInt();
             int type = m_pEventModel->data(m_pEventModel->index(currentRow,2)).toInt();
@@ -355,51 +354,15 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
                 //qDebug()<<"currentRow"<<currentRow<<"sampleValue"<<sampleValue<<"sampleRangeLow"<<sampleRangeLow<<"sampleRangeHigh"<<sampleRangeHigh;
 
                 //Set color for pen depending on current event type
-                switch(type) {
-                    default:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_default").value<QColor>());
-                    break;
-
-                    case 1:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_1").value<QColor>());
-                    break;
-
-                    case 2:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_2").value<QColor>());
-                    break;
-
-                    case 3:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_3").value<QColor>());
-                    break;
-
-                    case 4:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_4").value<QColor>());
-                    break;
-
-                    case 5:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_5").value<QColor>());
-                    break;
-
-                    case 32:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_32").value<QColor>());
-                    break;
-
-                    case 998:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_998").value<QColor>());
-                    break;
-
-                    case 999:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_999").value<QColor>());
-                    break;
-                }
+                pen.setColor(eventTypeColor.value(type, Qt::black));
 
                 colorTemp = pen.color();
-                colorTemp.setAlpha(m_qSettings.value("EventDesignParameters/event_marker_opacity").toInt());
+                colorTemp.setAlpha(EVENT_MARKER_OPACITY);
                 pen.setColor(colorTemp);
                 painter->setPen(pen);
 
                 //Draw line from sample position (x) and highest to lowest y position of the column widget - Add +m_qSettings.value("EventDesignParameters/event_marker_width").toInt() to avoid painting ovre the edge of the column widget
-                painter->drawLine(option.rect.x() + sampleValue, option.rect.y(), option.rect.x() + sampleValue, option.rect.y() - option.rect.height() + m_qSettings.value("EventDesignParameters/event_marker_width").toInt());
+                painter->drawLine(option.rect.x() + sampleValue, option.rect.y(), option.rect.x() + sampleValue, option.rect.y() - option.rect.height() + EVENT_MARKER_WIDTH);
             } // END for statement
         } // END if statement
     } // END else statement

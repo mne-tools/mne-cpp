@@ -401,7 +401,7 @@ public:
     *
     * @return the started fiff file
     */
-    static FiffStream::SPtr start_writing_raw(QIODevice &p_IODevice, const FiffInfo& info, MatrixXd& cals, MatrixXi sel = defaultMatrixXi);
+    static FiffStream::SPtr start_writing_raw(QIODevice &p_IODevice, const FiffInfo& info, RowVectorXd& cals, MatrixXi sel = defaultMatrixXi);
 
     //=========================================================================================================
     /**
@@ -641,6 +641,21 @@ public:
     * @return true if succeeded, false otherwise
     */
     bool write_raw_buffer(const MatrixXd& buf, const RowVectorXd& cals);
+
+    //=========================================================================================================
+    /**
+    * fiff_write_raw_buffer
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Writes a raw buffer.
+    *
+    * @param[in] buf        the buffer to write
+    * @param[in] mult       the used multiplication matrix consisting out of projection,calibration and compensation
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool write_raw_buffer(const MatrixXd& buf, const SparseMatrix<double>& mult);
 
     //=========================================================================================================
     /**

@@ -73,7 +73,7 @@ RawSettings::~RawSettings()
 
 //*************************************************************************************************************
 
-void RawSettings::init()
+void RawSettings::write()
 {
     //MainWindow
     //ToDo: ask for already stored setting in OS environment before setting them
@@ -81,32 +81,9 @@ void RawSettings::init()
 
     //Window settings
     m_qSettings.beginGroup("MainWindow");
-        m_qSettings.setValue("size",QSize(MAINWINDOW_WINDOW_SIZE_W,MAINWINDOW_WINDOW_SIZE_H));
-        m_qSettings.setValue("position",QPoint(MAINWINDOW_WINDOW_POSITION_X,MAINWINDOW_WINDOW_POSITION_Y));
-    m_qSettings.endGroup();
 
-    //RawModel
-    m_qSettings.beginGroup("RawModel");
-        m_qSettings.setValue("window_size",MODEL_WINDOW_SIZE);
-        m_qSettings.setValue("reload_pos",MODEL_RELOAD_POS);
-        m_qSettings.setValue("max_windows",MODEL_MAX_WINDOWS);
-        m_qSettings.setValue("num_filter_taps",MODEL_NUM_FILTER_TAPS);
-    m_qSettings.endGroup();
-
-    //RawDelegate
-    m_qSettings.beginGroup("RawDelegate");
-
-        //look
-        m_qSettings.setValue("plotheight",DELEGATE_PLOT_HEIGHT);
-        m_qSettings.setValue("dx",DELEGATE_DX);
-        m_qSettings.setValue("nhlines",DELEGATE_NHLINES);
-
-        //maximum values for different channels types according to FiffChInfo
-        m_qSettings.setValue("max_meg_grad",DELEGATE_MAX_MEG_GRAD);
-        m_qSettings.setValue("max_meg_mag",DELEGATE_MAX_MEG_MAG);
-        m_qSettings.setValue("max_eeg",DELEGATE_MAX_EEG);
-        m_qSettings.setValue("max_eog",DELEGATE_MAX_EOG);
-        m_qSettings.setValue("max_stim",DELEGATE_MAX_STIM);
+        m_qSettings.setValue("size",QSize(m_mainwindow_size_w, m_mainwindow_size_h));
+        m_qSettings.setValue("position",QPoint(m_mainwindow_position_x, m_mainwindow_position_y));
 
     m_qSettings.endGroup();
 
@@ -115,30 +92,32 @@ void RawSettings::init()
 
         //Event colors
         QVariant variant;
-        variant = QColor(Qt::black);
+        variant = m_event_color_default;
         m_qSettings.setValue("event_color_default",variant);
-        variant = QColor(Qt::blue);
+
+        variant = m_event_color_1;
         m_qSettings.setValue("event_color_1",variant);
-        variant = QColor(Qt::magenta);
+
+        variant = m_event_color_2;
         m_qSettings.setValue("event_color_2",variant);
-        variant = QColor(Qt::green);
+
+        variant = m_event_color_3;
         m_qSettings.setValue("event_color_3",variant);
-        variant = QColor(Qt::red);
+
+        variant = m_event_color_4;
         m_qSettings.setValue("event_color_4",variant);
-        variant = QColor(Qt::cyan);
+
+        variant = m_event_color_5;
         m_qSettings.setValue("event_color_5",variant);
-        variant = QColor(Qt::yellow);
+
+        variant = m_event_color_32;
         m_qSettings.setValue("event_color_32",variant);
-        variant = QColor(Qt::darkBlue);
+
+        variant = m_event_color_998;
         m_qSettings.setValue("event_color_998",variant);
-        variant = QColor(Qt::darkCyan);
+
+        variant = m_event_color_999;
         m_qSettings.setValue("event_color_999",variant);
-
-        //Event marker width
-        m_qSettings.setValue("event_marker_width",EVENT_MARKER_WIDTH);
-
-        //Event marker opacity
-        m_qSettings.setValue("event_marker_opacity",EVENT_MARKER_OPACITY);
 
     m_qSettings.endGroup();
 
@@ -146,10 +125,31 @@ void RawSettings::init()
     m_qSettings.beginGroup("DataMarker");
 
         //data marker color and width colors
-        variant = QColor (227,6,19);
+        variant = m_data_marker_color;
         m_qSettings.setValue("data_marker_color",variant);
-        m_qSettings.setValue("data_marker_opacity",DATA_MARKER_OPACITY);
-        m_qSettings.setValue("data_marker_width",DATA_MARKER_WIDTH);
 
     m_qSettings.endGroup();
+}
+
+
+//*************************************************************************************************************
+
+void RawSettings::init()
+{
+    m_mainwindow_size_w = MAINWINDOW_WINDOW_SIZE_W;
+    m_mainwindow_size_h = MAINWINDOW_WINDOW_SIZE_H;
+    m_mainwindow_position_x = MAINWINDOW_WINDOW_POSITION_X;
+    m_mainwindow_position_y = MAINWINDOW_WINDOW_POSITION_Y;
+
+    m_event_color_default = Qt::black;
+    m_event_color_1 = Qt::black;
+    m_event_color_2 = Qt::magenta;
+    m_event_color_3 = Qt::green;
+    m_event_color_4 = Qt::red;
+    m_event_color_5 = Qt::cyan;
+    m_event_color_32 = Qt::yellow;
+    m_event_color_998 = Qt::darkBlue;
+    m_event_color_999 = Qt::darkCyan;
+    m_data_marker_color = QColor (93,177,47); //green
+    //m_data_marker_color = QColor (227,6,19); //red
 }

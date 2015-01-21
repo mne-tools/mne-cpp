@@ -42,9 +42,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mainwindow.h"
 #include "ui_informationwindow.h"
-
+#include "../Utils/info.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -52,6 +51,7 @@
 //=============================================================================================================
 
 #include <QDockWidget>
+#include <QScrollBar>
 
 
 //*************************************************************************************************************
@@ -66,8 +66,6 @@ namespace MNEBrowseRawQt
 //=============================================================================================================
 // DEFINE FORWARD DECLARATIONS
 //=============================================================================================================
-
-class MainWindow;
 
 /**
 * DECLARE CLASS InformationWindow
@@ -94,10 +92,31 @@ public:
     */
     ~InformationWindow();
 
-private:
-    Ui::InformationWindowWidget *ui;
+    //=========================================================================================================
+    /**
+    * Writes to MainWindow log.
+    *
+    * @param [in] logMsg message
+    * @param [in] lgknd message kind; Message is formated depending on its kind.
+    * @param [in] lglvl message level; Message is displayed depending on its level.
+    */
+    void writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl);
 
-    MainWindow*     m_pMainWindow;
+    //=========================================================================================================
+    /**
+    * Sets the log level
+    *
+    * @param [in] lvl message level; Message is displayed depending on its level.
+    */
+    void setLogLevel(LogLevel lvl);
+
+private:
+    Ui::InformationWindowWidget *ui;                    /**< Pointer to the qt designer generated ui class.*/
+
+    //Log
+    QTextBrowser*           m_pTextBrowser_Log;         /** A textbox being part of the log feature. */
+    LogLevel                m_eLogLevelCurrent;         /**< Holds the current log level.*/
+
 };
 
 } // NAMESPACE MNEBrowseRawQt

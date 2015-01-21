@@ -38,6 +38,14 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "rawsettings.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -88,33 +96,39 @@ private:
     //=========================================================================================================
     /**
     * Reimplemnted mouse press event handler
-    *
-    * @param event QMouseEvent
     */
     void mousePressEvent(QMouseEvent *event);
 
     //=========================================================================================================
     /**
     * Reimplemnted mouse move event handler
-    *
-    * @param event QMouseEvent
     */
     void mouseMoveEvent(QMouseEvent *event);
 
+    //=========================================================================================================
+    /**
+    * Reimplemnted enter event handler
+    */
     void enterEvent(QEvent *event);
 
-    QPoint      m_oldPos;               /**< The old mouse position */
+    //=========================================================================================================
+    /**
+    * Reimplemnted move event handler
+    */
+    void moveEvent(QMoveEvent *event);
 
+    QPoint      m_oldPos;               /**< The old mouse position */
     QRegion     m_movableRegion;        /**< The movement boundary */
 
-    QSettings   m_qSettings;
+    QSettings   m_qSettings;            /**< QSettings variable used to write or read from independent application sessions */
 
 
 signals:
+    //=========================================================================================================
+    /**
+    * markerMoved is emmitted whenever the data marker was moved
+    */
     void markerMoved();
-
-public slots:
-
 };
 
 } // NAMESPACE MNEBrowseRawQt

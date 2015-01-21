@@ -267,7 +267,7 @@ public:
     * Opens a fif file and provides the directory of tags
     *
     * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
-    * @param[out] p_pStream     file which is openened
+    * @param[out] p_pStream    file which is openened
     * @param[out] p_Tree       tag directory organized into a tree
     * @param[out] p_Dir        the sequential tag directory
     *
@@ -555,6 +555,30 @@ public:
         return raw.read_raw_segment(data, times, from, to, sel);
     }
 
+    /**
+    * fiff_read_raw_segment
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffRawData read_raw_segment member function
+    *
+    * Read a specific raw data segment
+    *
+    * @param[in] raw        structure returned by fiff_setup_read_raw
+    * @param[out] data      returns the data matrix (channels x samples)
+    * @param[out] times     returns the time values corresponding to the samples
+    * @param[out] mult      matrix to store used multiplication matrix (compensator,projection,calibration)
+    * @param[in] from       first sample to include. If omitted, defaults to the first sample in data (optional)
+    * @param[in] to         last sample to include. If omitted, defaults to the last sample in data (optional)
+    * @param[in] sel        channel selection vector (optional)
+    *
+    * @return true if succeeded, false otherwise
+    */
+    inline static bool read_raw_segment(FiffRawData& raw, MatrixXd& data, MatrixXd& times, SparseMatrix<double>& mult, fiff_int_t from = -1, fiff_int_t to = -1, MatrixXi sel = defaultMatrixXi)
+    {
+        return raw.read_raw_segment(data, times, mult, from, to, sel);
+    }
+
     //=========================================================================================================
     /**
     * fiff_read_tag
@@ -648,7 +672,7 @@ public:
     *
     * Writes a FIFF_BLOCK_START tag
     *
-    * @param[in] p_pStream    An open fif file to write to
+    * @param[in] p_pStream  An open fif file to write to
     * @param[in] kind       The block kind to start
     */
     inline static void start_block(FiffStream* p_pStream, fiff_int_t kind)
@@ -685,14 +709,14 @@ public:
     *
     * function [fid,cals] = fiff_start_writing_raw(name,info,sel)
     *
-    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] p_IODevice     A fiff IO device like a fiff QFile or QTCPSocket
     * @param[in] info           The measurement info block of the source file
     * @param[out] cals          Thecalibration matrix
     * @param[in] sel            Which channels will be included in the output file (optional)
     *
     * @return the started fiff file
     */
-    inline static FiffStream::SPtr start_writing_raw(QIODevice &p_IODevice, const FiffInfo& info, MatrixXd& cals, MatrixXi sel = defaultMatrixXi)
+    inline static FiffStream::SPtr start_writing_raw(QIODevice &p_IODevice, const FiffInfo& info, RowVectorXd& cals, MatrixXi sel = defaultMatrixXi)
     {
         return FiffStream::start_writing_raw(p_IODevice, info, cals, sel);
     }
@@ -709,7 +733,7 @@ public:
     * The type, cal, unit, and pos members are explained in Table 9.5
     * of the MNE manual
     *
-    * @param[in] p_pStream    An open fif file
+    * @param[in] p_pStream  An open fif file
     * @param[in] ch         The channel information structure to write
     */
     inline static void write_ch_info(FiffStream* p_pStream, FiffChInfo* ch)
@@ -727,7 +751,7 @@ public:
     *
     * Writes a coordinate transformation structure
     *
-    * @param[in] p_pStream    An open fif file
+    * @param[in] p_pStream  An open fif file
     * @param[in] trans      The coordinate transfomation structure
     */
     inline static void write_coord_trans(FiffStream* p_pStream, FiffCoordTrans& trans)
@@ -745,7 +769,7 @@ public:
     *
     * Writes the CTF compensation data into a fif file
     *
-    * @param[in] p_pStream    An open fif file
+    * @param[in] p_pStream  An open fif file
     * @param[in] comps      The compensation data to write
     */
     inline static void write_ctf_comp(FiffStream* p_pStream, QList<FiffCtfComp>& comps)
@@ -763,7 +787,7 @@ public:
     *
     * Writes a digitizer data point into a fif file
     *
-    * @param[in] p_pStream    An open fif file
+    * @param[in] p_pStream  An open fif file
     * @param[in] dig        The point to write
     */
     inline static void write_dig_point(FiffStream* p_pStream, FiffDigPoint& dig)
@@ -782,7 +806,7 @@ public:
     * Writes fiff id
     * If the id argument is missing it will be generated here
     *
-    * @param[in] p_pStream    An open fif file
+    * @param[in] p_pStream  An open fif file
     * @param[in] kind       The tag kind
     * @param[in] id         The id to write
     */
@@ -801,12 +825,12 @@ public:
     *
     * Writes a 32-bit integer tag to a fif file
     *
-    * @param[in] p_pStream    An open fif file
+    * @param[in] p_pStream  An open fif file
     * @param[in] kind       Tag kind
     * @param[in] data       The integer data pointer
     * @param[in] nel        Number of integers to write (default = 1)
     */
-    inline static void write_int(FiffStream* p_pStream, fiff_int_t kind, fiff_int_t* data, fiff_int_t nel = 1)
+    inline static void write_int(FiffStream* p_pStream, fiff_int_t kind, const fiff_int_t* data, fiff_int_t nel = 1)
     {
         p_pStream->write_int(kind, data, nel);
     }
@@ -821,7 +845,7 @@ public:
     *
     * Writes a single-precision floating point tag to a fif file
     *
-    * @param[in] p_pStream    An open fif file
+    * @param[in] p_pStream  An open fif file
     * @param[in] kind       Tag kind
     * @param[in] data       The float data pointer
     * @param[in] nel        Number of floats to write (default = 1)

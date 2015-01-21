@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    This class represents the model of the model/view framework of mne_browse_raw_qt application.
+* @brief    This class represents the event model of the model/view framework of mne_browse_raw_qt application.
 *
 */
 
@@ -62,6 +62,17 @@ EventModel::EventModel(QObject *parent)
 , m_bFileloaded(false)
 , m_sFilterEventType("All")
 {
+    //Create default event type color map
+    m_eventTypeColor[1] = QColor(Qt::black);
+    m_eventTypeColor[2] = QColor(Qt::magenta);
+    m_eventTypeColor[3] = QColor(Qt::green);
+    m_eventTypeColor[4] = QColor(Qt::red);
+    m_eventTypeColor[5] = QColor(Qt::cyan);
+    m_eventTypeColor[32] = QColor(Qt::yellow);
+    m_eventTypeColor[998] = QColor(Qt::darkBlue);
+    m_eventTypeColor[999] = QColor(Qt::darkCyan);
+
+    //m_eventTypeList<<"1"<<"2"<<"3"<<"4"<<"4"<<"5"<<"32"<<"998"<<"999";
 }
 
 
@@ -73,6 +84,16 @@ EventModel::EventModel(QFile &qFile, QObject *parent)
 , m_bFileloaded(false)
 , m_sFilterEventType("All")
 {
+    //Create default event type color map
+    m_eventTypeColor[1] = QColor(Qt::black);
+    m_eventTypeColor[2] = QColor(Qt::magenta);
+    m_eventTypeColor[3] = QColor(Qt::green);
+    m_eventTypeColor[4] = QColor(Qt::red);
+    m_eventTypeColor[5] = QColor(Qt::cyan);
+    m_eventTypeColor[32] = QColor(Qt::yellow);
+    m_eventTypeColor[998] = QColor(Qt::darkBlue);
+    m_eventTypeColor[999] = QColor(Qt::darkCyan);
+
     loadEventData(qFile);
 }
 
@@ -104,6 +125,9 @@ QVariant EventModel::headerData(int section, Qt::Orientation orientation, int ro
     if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
         return QVariant();
 
+    if(role==Qt::TextAlignmentRole)
+        return Qt::AlignHCenter + Qt::AlignVCenter;
+
     if(orientation == Qt::Horizontal) {
         switch(section) {
             case 0: //sample column
@@ -127,7 +151,7 @@ QVariant EventModel::headerData(int section, Qt::Orientation orientation, int ro
 QVariant EventModel::data(const QModelIndex &index, int role) const
 {
     if(role == Qt::TextAlignmentRole)
-        return Qt::AlignCenter | Qt::AlignVCenter;
+        return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
 
     if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
         return QVariant();
@@ -186,47 +210,10 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
                 case Qt::BackgroundRole: {
                     QBrush brush;
                     brush.setStyle(Qt::SolidPattern);
-
-                    switch(m_dataTypes_Filtered.at(index.row())) {
-                        default:
-                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_default").value<QColor>());
-                        break;
-
-                        case 1:
-                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_1").value<QColor>());
-                        break;
-
-                        case 2:
-                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_2").value<QColor>());
-                        break;
-
-                        case 3:
-                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_3").value<QColor>());
-                        break;
-
-                        case 4:
-                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_4").value<QColor>());
-                        break;
-
-                        case 5:
-                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_5").value<QColor>());
-                        break;
-
-                        case 32:
-                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_32").value<QColor>());
-                        break;
-
-                        case 998:
-                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_998").value<QColor>());
-                        break;
-
-                        case 999:
-                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_999").value<QColor>());
-                        break;
-                    }
+                    brush.setColor(m_eventTypeColor.value(m_dataTypes_Filtered.at(index.row()), Qt::black));
 
                     QColor colorTemp = brush.color();
-                    colorTemp.setAlpha(m_qSettings.value("EventDesignParameters/event_marker_opacity").toInt());
+                    colorTemp.setAlpha(EVENT_MARKER_OPACITY);
                     brush.setColor(colorTemp);
                     return QVariant(brush);
                 }
@@ -338,15 +325,15 @@ bool EventModel::setData(const QModelIndex & index, const QVariant & value, int 
     if(role == Qt::EditRole) {
         int column = index.column();
         switch(column) {
-            case 0:
+            case 0: //sample values
                 m_dataSamples[index.row()] = value.toInt() + m_iFirstSample;
                 break;
 
-            case 1:
+            case 1: //time values
                 m_dataSamples[index.row()] = value.toDouble() * m_fiffInfo.sfreq + m_iFirstSample;
                 break;
 
-            case 2:
+            case 2: //type
                 QString string = value.toString();
                 m_dataTypes[index.row()] = string.toInt();
                 break;
@@ -397,7 +384,7 @@ bool EventModel::loadEventData(QFile& qFile)
         if(!m_eventTypeList.contains(QString().number(m_dataTypes[i])))
             m_eventTypeList<<QString().number(m_dataTypes[i]);
 
-    emit updateEventTypes();
+    emit updateEventTypes("All");
 
     endResetModel();
 
@@ -451,7 +438,7 @@ void EventModel::setCurrentMarkerPos(int markerPos)
 
 //*************************************************************************************************************
 
-FiffInfo EventModel::getFiffInfo()
+FiffInfo EventModel::getFiffInfo() const
 {
     return m_fiffInfo;
 }
@@ -459,7 +446,7 @@ FiffInfo EventModel::getFiffInfo()
 
 //*************************************************************************************************************
 
-QPair<int, int> EventModel::getFirstLastSample()
+QPair<int, int> EventModel::getFirstLastSample() const
 {
     QPair<int, int> pair(m_iFirstSample, m_iLastSample);
     return pair;
@@ -493,16 +480,24 @@ void EventModel::setEventFilterType(const QString eventType)
         }
     }
 
-    emit dataChanged(createIndex(0,0),createIndex(m_dataSamples_Filtered.size(),0));
+    emit dataChanged(createIndex(0,0), createIndex(m_dataSamples_Filtered.size(), 0));
     emit headerDataChanged(Qt::Vertical, 0, m_dataSamples_Filtered.size());
 }
 
 
 //*************************************************************************************************************
 
-QStringList EventModel::getEventTypeList()
+QStringList EventModel::getEventTypeList() const
 {
     return m_eventTypeList;
+}
+
+
+//*************************************************************************************************************
+
+const QMap<int, QColor> & EventModel::getEventTypeColors()
+{
+    return m_eventTypeColor;
 }
 
 
@@ -525,4 +520,19 @@ void EventModel::clearModel()
     endResetModel();
 
     qDebug("EventModel cleared.");
+}
+
+
+//*************************************************************************************************************
+
+void EventModel::addNewEventType(const QString &eventType, const QColor &typeColor)
+{
+    //Add type color
+    m_eventTypeColor[eventType.toInt()] = typeColor;
+
+    //Add event type to event type list
+    if(!m_eventTypeList.contains(eventType))
+        m_eventTypeList<<eventType;
+
+    emit updateEventTypes(eventType);
 }

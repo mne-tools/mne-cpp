@@ -74,12 +74,24 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+#include <Eigen/SparseCore>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QtWidgets>
 #include <QVector>
 #include <QTimer>
+
+#define MAX_DATA_LEN    2000000000L
+#define MAX_POS         2000000000L
 
 
 //*************************************************************************************************************
@@ -157,6 +169,16 @@ public:
     //=========================================================================================================
     /**
     * Initialise the BabyMEG.
+    *
+    * @param[in] currentTime    insert current time stamp.
+    *
+    * @return the storage filepath
+    */
+    QString getFilePath(bool currentTime = false) const;
+
+    //=========================================================================================================
+    /**
+    * Initialise the BabyMEG.
     */
     virtual void init();
 
@@ -170,7 +192,18 @@ public:
 
     void showSqdCtrlDialog();
 
+    //=========================================================================================================
+    /**
+    * Determines current file. And starts a new one.
+    */
+    void splitRecordingFile();
+
+    //=========================================================================================================
+    /**
+    * Starts or stops a file recording depending on the current recording state.
+    */
     void toggleRecordingFile();
+
 
     virtual bool start();
     virtual bool stop();
@@ -183,6 +216,8 @@ public:
     void setFiffInfo(FIFFLIB::FiffInfo);
     void setFiffData(QByteArray DATA);
     void setCMDData(QByteArray DATA);
+    void setFiffGainInfo(QStringList);
+
 
     //=========================================================================================================
     /**
@@ -231,6 +266,10 @@ protected:
     virtual void run();
 
 private:
+    MatrixXd calibrate(const MatrixXf& data);
+
+    bool readProjectors();
+
     void changeRecordingButton();
 
     QSharedPointer<QTimer> m_pTimerRecordingChange;
@@ -253,16 +292,23 @@ private:
 
     QSharedPointer<BabyMEGSQUIDControlDgl> SQUIDCtrlDlg; // added by Dr. Limin Sun for nonmodal dialog
 
-    FiffInfo::SPtr m_pFiffInfo;                             /**< Fiff measurement info.*/
-    qint32 m_iBufferSize;                                   /**< The raw data buffer size.*/
+    FiffInfo::SPtr  m_pFiffInfo;            /**< Fiff measurement info.*/
+    qint32          m_iBufferSize;          /**< The raw data buffer size.*/
 
-    bool                                m_bWriteToFile;     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
-    QString                             m_sRecordFile;      /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
-    QFile                               m_qFileOut;         /**< QFile for writing to fif file.*/
-    FiffStream::SPtr                    m_pOutfid;          /**< FiffStream to write to.*/
+    bool            m_bWriteToFile;         /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
 
-    MatrixXd                            m_cals;
+    QString             m_sBabyMEGDataPath; /**< The data storage path.*/
+    QString             m_sCurrentProject;  /**< The current project which is part of the filename to be recorded.*/
+    QString             m_sCurrentSubject;  /**< The current subject which is part of the filename to be recorded.*/
+    QString             m_sCurrentParadigm; /**< The current paradigm which is part of the filename to be recorded.*/
+    QString             m_sRecordFile;      /**< Current record file. */
+    qint32              m_iSplitCount;      /**< File split count */
+    QFile               m_qFileOut;         /**< QFile for writing to fif file.*/
+    FiffStream::SPtr    m_pOutfid;          /**< FiffStream to write to.*/
 
+    QString                 m_sFiffHeader;  /**< Fiff header information */
+    RowVectorXd             m_cals;
+    SparseMatrix<double>    m_sparseMatCals;
 
     bool    m_bIsRunning;
 
@@ -271,8 +317,7 @@ private:
     QAction*                        m_pActionSetupProject;      /**< shows setup project dialog */
     QAction*                        m_pActionRecordFile;        /**< start recording action */
     QAction*                        m_pActionSqdCtrl;           /**< show squid control */
-    QAction*                        m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
-
+    QAction*                        m_pActionUpdateFiffInfo;    /**< Update Fiff Info action */
 
 public:
     double sfreq;

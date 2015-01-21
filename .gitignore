@@ -312,7 +312,6 @@ bin/mne_browse_raw_qt.app/Contents/PkgInfo
 /bin/mne_x_plugins/resources/tmsi/*.fif
 /bin/*.stc
 /examples/rawClusteredInversePwlRapMusic/*.user
-/bin/mne_x_plugins/resources/babymeg/*.fif
 /bin/ClusterInfoLH.txt
 /bin/ClusterInfoRH.txt
 /bin/centroids_ClusterInfoLH.txt
@@ -345,3 +344,9 @@ bin/mne_browse_raw_qt.app/Contents/PkgInfo
 /bin/test_mne_stcd
 /bin/test_mne_surfaced
 /bin/mne_x_default.xml
+/tools/mne-cpp_installer/*.user
+/tools/build-mne-cpp_installer-Qt_5_3_2_static-Release/windows
+/tools/mne-cpp_installer/windows/packages/org.mne_cpp.suite.mne/data/MNE/libs/*.dll
+/tools/mne-cpp_installer/windows/packages/org.mne_cpp.suite.mne_browse_raw_qt/data/mne_browse_raw_qt/*.dll
+/tools/mne-cpp_installer/windows/packages/org.mne_cpp.suite.mne_browse_raw_qt/data/mne_browse_raw_qt/*.exe
+/bin/mne_x_plugins/resources/babymeg/ERio_P8.fif.gz
