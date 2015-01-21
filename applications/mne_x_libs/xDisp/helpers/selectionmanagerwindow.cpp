@@ -229,7 +229,9 @@ void SelectionManagerWindow::initComboBoxes()
 {
     ui->m_comboBox_layoutFile->clear();
     ui->m_comboBox_layoutFile->insertItems(0, QStringList()
-     << QApplication::translate("SelectionManagerWindow", "babymeg_all.lout", 0)
+     << QApplication::translate("SelectionManagerWindow", "babymeg_mag_all.lout", 0)
+     << QApplication::translate("SelectionManagerWindow", "babymeg_mag_ref.lout", 0)
+     << QApplication::translate("SelectionManagerWindow", "babymeg_mag.lout", 0)
      << QApplication::translate("SelectionManagerWindow", "Vectorview-grad.lout", 0)
      << QApplication::translate("SelectionManagerWindow", "Vectorview-all.lout", 0)
      << QApplication::translate("SelectionManagerWindow", "Vectorview-mag.lout", 0)
@@ -252,7 +254,7 @@ void SelectionManagerWindow::initComboBoxes()
                 this, &SelectionManagerWindow::loadLayout);
 
     //Initialise layout as neuromag vectorview with all channels
-    loadLayout("babymeg_all.lout");
+    loadLayout("babymeg_mag_all.lout");
 }
 
 
