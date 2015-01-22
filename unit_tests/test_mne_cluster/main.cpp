@@ -69,6 +69,7 @@
 #include <QGuiApplication>
 #include <QSet>
 #include <QElapsedTimer>
+#include <QCommandLineParser>
 
 //#define BENCHMARK
 
@@ -88,6 +89,20 @@ using namespace UTILSLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Enums
+//=============================================================================================================
+
+enum CommandLineParseResult
+{
+    CommandLineOk,
+    CommandLineError,
+    CommandLineVersionRequested,
+    CommandLineHelpRequested
+};
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // MAIN
 //=============================================================================================================
 
@@ -102,8 +117,117 @@ using namespace UTILSLIB;
 */
 int main(int argc, char *argv[])
 {
-    QGuiApplication a(argc, argv);
+    QGuiApplication app(argc, argv);
+    QGuiApplication::setApplicationName("MNE ROI Cluster Evaluation");
+    QGuiApplication::setApplicationVersion("Revision 2");
 
+    ///////////////////////////////////// CLI Parser /////////////////////////////////////
+    QCommandLineParser parser;
+    parser.setApplicationDescription("MNE ROI Cluster Evaluation");
+    parser.addHelpOption();
+    parser.addVersionOption();
+
+    // MEG Source Directory
+    QCommandLineOption srcDirectoryOption(QStringList() << "s" << "meg-source-directory",
+            QCoreApplication::translate("main", "Read MEG (fwd, cov, raw, eve) source files from <directory>."),
+            QCoreApplication::translate("main", "directory"),
+            "./MNE-sample-data/MEG/sample/");
+    parser.addOption(srcDirectoryOption);
+
+    // Forward Solution File
+    QCommandLineOption fwdFileOption(QStringList() << "fwd" << "forward-solution",
+            QCoreApplication::translate("main", "The forward solution <file>."),
+            QCoreApplication::translate("main", "file"),
+            "sample_audvis-meg-eeg-oct-6-fwd.fif");
+    parser.addOption(fwdFileOption);
+
+    // Covariance File
+    QCommandLineOption covFileOption(QStringList() << "cov" << "covariance",
+            QCoreApplication::translate("main", "The covariance <file>."),
+            QCoreApplication::translate("main", "file"),
+            "sample_audvis-cov.fif");
+    parser.addOption(covFileOption);
+
+    // Raw MEG File
+    QCommandLineOption rawFileOption(QStringList() << "raw" << "raw-file",
+            QCoreApplication::translate("main", "The raw MEG data <file>."),
+            QCoreApplication::translate("main", "file"),
+            "sample_audvis_raw.fif");
+    parser.addOption(rawFileOption);
+
+    // Event File
+    QCommandLineOption eveFileOption(QStringList() << "eve" << "event-file",
+            QCoreApplication::translate("main", "The event <file>."),
+            QCoreApplication::translate("main", "file"),
+            "sample_audvis_raw-eve.fif");
+    parser.addOption(eveFileOption);
+
+    // FS Subject Directory
+    QCommandLineOption subjDirectoryOption(QStringList() << "subjdir" << "subject-directory",
+            QCoreApplication::translate("main", "The FreeSurfer <subjects directory>."),
+            QCoreApplication::translate("main", "directory"),
+            "./MNE-sample-data/subjects");
+    parser.addOption(subjDirectoryOption);
+
+    // FS Subject
+    QCommandLineOption subjIdOption(QStringList() << "subjid" << "subject-id",
+            QCoreApplication::translate("main", "The FreeSurfer <subject id>."),
+            QCoreApplication::translate("main", "subject id"),
+            "sample");
+    parser.addOption(subjIdOption);
+
+    // Target Directory
+    QCommandLineOption targetDirectoryOption(QStringList() << "t" << "target-directory",
+            QCoreApplication::translate("main", "Copy all result files into <directory>."),
+            QCoreApplication::translate("main", "directory"));
+    parser.addOption(targetDirectoryOption);
+
+    // Target Prefix
+    QCommandLineOption targetPrefixOption(QStringList() << "p" << "prefix",
+            QCoreApplication::translate("main", "The result file's <prefix>."),
+            QCoreApplication::translate("main", "prefix"));
+    parser.addOption(targetPrefixOption);
+
+
+    // Process the actual command line arguments given by the user
+    parser.process(app);
+
+
+    //////////////////////////////// get parsed values /////////////////////////////////
+
+    //Sources
+    QString sFwdName = parser.value(srcDirectoryOption)+parser.value(fwdFileOption);
+    qDebug() << "Forward Solution" << sFwdName;
+    QFile t_fileFwd(sFwdName);
+
+    QString sCovName = parser.value(srcDirectoryOption)+parser.value(covFileOption);
+    qDebug() << "Covariance matrix" << sCovName;
+    QFile t_fileCov(sCovName);
+
+    QString sRawName = parser.value(srcDirectoryOption)+parser.value(rawFileOption);
+    qDebug() << "Raw data" << sRawName;
+    QFile t_fileRaw(sRawName);
+
+    QString t_sEventName = parser.value(srcDirectoryOption)+parser.value(eveFileOption);
+    qDebug() << "Events" << t_sEventName;
+
+    QString t_sSubjectsDir = parser.value(subjDirectoryOption);
+    qDebug() << "Subjects Directory" << t_sSubjectsDir;
+
+    QString t_sSubject = parser.value(subjIdOption);
+    qDebug() << "Subject" << t_sSubject;
+
+    AnnotationSet t_annotationSet(t_sSubject, 2, "aparc.a2009s", t_sSubjectsDir);
+    SurfaceSet t_surfSet(t_sSubject, 2, "white", t_sSubjectsDir);
+
+    //Targets
+    QString sTargetDir = parser.value(targetDirectoryOption);
+    qDebug() << "Target Directory" << sTargetDir;
+
+    QString sTargetPrefix = parser.value(targetPrefixOption);
+    qDebug() << "Target Prefix" << sTargetPrefix;
+
+    //OLD
 //    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
 //    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
 //    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
@@ -111,13 +235,15 @@ int main(int argc, char *argv[])
 //    AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
 //    SurfaceSet t_surfSet("sample", 2, "white", "./MNE-sample-data/subjects");
 
-    QFile t_fileFwd("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
-    QFile t_fileCov("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
-    QFile t_fileRaw("D:/Data/MEG/mind006/mind006_051209_auditory01_raw.fif");
-    QString t_sEventName = "D:/Data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
-    AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "D:/Data/subjects");
-    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Data/subjects");
+//    QFile t_fileFwd("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
+//    QFile t_fileCov("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
+//    QFile t_fileRaw("D:/Data/MEG/mind006/mind006_051209_auditory01_raw.fif");
+//    QString t_sEventName = "D:/Data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
+//    AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "D:/Data/subjects");
+//    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Data/subjects");
 
+
+ /*
     qint32 event = 1;
 
     float tmin = -0.2f;
@@ -839,5 +965,5 @@ int main(int argc, char *argv[])
     }
 
 //*/
-    return a.exec();//1;//a.exec();
+    return CommandLineOk;//1;//a.exec();
 }
