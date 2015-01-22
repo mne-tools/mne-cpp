@@ -123,7 +123,7 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F12)"),this);
     m_pActionSelectSensors->setShortcut(tr("F12"));
     m_pActionSelectSensors->setStatusTip(tr("Shows the region selection widget (F12)"));
-    m_pActionSelectSensors->setVisible(true);
+    m_pActionSelectSensors->setVisible(false);
     connect(m_pActionSelectSensors, &QAction::triggered, this, &RealTimeEvokedWidget::showSensorSelectionWidget);
     addDisplayAction(m_pActionSelectSensors);
 
@@ -307,7 +307,8 @@ void RealTimeEvokedWidget::init()
 
         m_pButterflyPlot->setSettings(m_qListModalities);
 
-        m_pActionSelectModality->setVisible(true);
+        m_pActionSelectModality->setVisible(true);        
+        m_pActionSelectSensors->setVisible(true);
 
         //Set up selection manager
         connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::showSelectedChannelsOnly,
