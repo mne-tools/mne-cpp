@@ -91,58 +91,60 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
 
         for(qint32 r = 0; r < m_iNumChannels; ++r)
         {
-            qint32 kind = m_pRealTimeEvokedModel->getKind(r);
+            if(m_lSelectedChannels.contains(r)) {
+                qint32 kind = m_pRealTimeEvokedModel->getKind(r);
 
-            //Display only selected kinds
-            switch(kind) {
-                case FIFFV_MEG_CH: {
-                    qint32 unit = m_pRealTimeEvokedModel->getUnit(r);
-                    if(unit == FIFF_UNIT_T_M) {
-                        if(showGRAD)
+                //Display only selected kinds
+                switch(kind) {
+                    case FIFFV_MEG_CH: {
+                        qint32 unit = m_pRealTimeEvokedModel->getUnit(r);
+                        if(unit == FIFF_UNIT_T_M) {
+                            if(showGRAD)
+                                break;
+                            else
+                                continue;
+                        }
+                        else if(unit == FIFF_UNIT_T)
+                        {
+                            if(showMAG)
+                                break;
+                            else
+                                continue;
+                        }
+                        continue;
+                    }
+                    case FIFFV_EEG_CH: {
+                        if(showEEG)
                             break;
                         else
                             continue;
                     }
-                    else if(unit == FIFF_UNIT_T)
-                    {
-                        if(showMAG)
+                    case FIFFV_EOG_CH: {
+                        if(showEOG)
                             break;
                         else
                             continue;
                     }
-                    continue;
-                }
-                case FIFFV_EEG_CH: {
-                    if(showEEG)
-                        break;
-                    else
+                    case FIFFV_MISC_CH: {
+                        if(showMISC)
+                            break;
+                        else
+                            continue;
+                    }
+                    default:
                         continue;
                 }
-                case FIFFV_EOG_CH: {
-                    if(showEOG)
-                        break;
-                    else
-                        continue;
-                }
-                case FIFFV_MISC_CH: {
-                    if(showMISC)
-                        break;
-                    else
-                        continue;
-                }
-                default:
-                    continue;
+
+                painter.save();
+                painter.setPen(QPen(m_pRealTimeEvokedModel->getColor(r), 1));
+
+                QPainterPath path(QPointF(1,0));
+                createPlotPath(r,path);
+
+                painter.drawPath(path);
+
+                painter.restore();
             }
-
-            painter.save();
-            painter.setPen(QPen(m_pRealTimeEvokedModel->getColor(r), 1));
-
-            QPainterPath path(QPointF(1,0));
-            createPlotPath(r,path);
-
-            painter.drawPath(path);
-
-            painter.restore();
         }
     }
 }
@@ -290,5 +292,15 @@ void RealTimeButterflyPlot::setSettings(const QList< Modality >& p_qListModaliti
 
         }
     }
+    update();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeButterflyPlot::setSelectedChannels(const QList<int> &selectedChannels)
+{
+    m_lSelectedChannels = selectedChannels;
+
     update();
 }

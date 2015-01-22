@@ -48,6 +48,7 @@
 #include "utils/layoutmaker.h"              //MNE-CPP utils
 #include "selectionscene.h"        //MNE Browse Raw QT utils
 #include "fiff/fiff.h"
+#include "chinfomodel.h"
 
 
 //*************************************************************************************************************
@@ -70,7 +71,7 @@ using namespace UTILSLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE XDISPLIB
+// DEFINE NAMESPACE MNEBrowseRawQt
 //=============================================================================================================
 
 namespace XDISPLIB
@@ -98,8 +99,9 @@ public:
     * Constructs a SelectionManagerWindow which is a child of parent.
     *
     * @param [in] parent pointer to parent widget; If parent is 0, the new SelectionManagerWindow becomes a window. If parent is another widget, SelectionManagerWindow becomes a child window inside parent. SelectionManagerWindow is deleted when its parent is deleted.
+    * @param [in] pChInfoModel pointer to the channel info model.
     */
-    SelectionManagerWindow(QWidget *parent = 0);
+    SelectionManagerWindow(QWidget *parent = 0, ChInfoModel *pChInfoModel = 0);
 
     //=========================================================================================================
     /**
@@ -123,7 +125,7 @@ public:
     *
     * @param [in] channelList channels which are be to set as selected
     */
-    void highlightChannels(QStringList channelList);
+    void highlightChannels(QModelIndexList channelIndexList);
 
     //=========================================================================================================
     /**
@@ -277,6 +279,8 @@ private:
     bool eventFilter(QObject *obj, QEvent *event);
 
     Ui::SelectionManagerWindow*     ui;                                 /**< Pointer to the qt designer generated ui class. */
+
+    ChInfoModel*                    m_pChInfoModel;                     /**< Pointer to the channel info model. */
 
     QMap<QString,QPointF>           m_layoutMap;                        /**< QMap with the loaded layout. each channel name correspond to a QPointF variable. */
     QMap<QString,QStringList>       m_selectionGroupsMap;               /**< QMap with the loaded selection groups. Each group name holds a string list with the corresponding channels of the group.*/
