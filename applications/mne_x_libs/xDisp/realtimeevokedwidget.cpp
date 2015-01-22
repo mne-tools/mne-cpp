@@ -109,7 +109,6 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
 , m_pButterflyPlot(Q_NULLPTR)
 , m_pRTE(pRTE)
 , m_bInitialized(false)
-, m_pSensorModel(Q_NULLPTR)
 {
     Q_UNUSED(pTime)
 
@@ -121,13 +120,12 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
 
     m_pActionSelectModality->setVisible(false);
 
-//    m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F12)"),this);
-//    m_pActionSelectSensors->setShortcut(tr("F12"));
-//    m_pActionSelectSensors->setStatusTip(tr("Shows the region selection widget (F12)"));
-//    m_pActionSelectSensors->setVisible(false);
-//    connect(m_pActionSelectSensors, &QAction::triggered, this, &RealTimeEvokedWidget::showSensorSelectionWidget);
-//    addDisplayAction(m_pActionSelectSensors);
-
+    m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F12)"),this);
+    m_pActionSelectSensors->setShortcut(tr("F12"));
+    m_pActionSelectSensors->setStatusTip(tr("Shows the region selection widget (F12)"));
+    m_pActionSelectSensors->setVisible(true);
+    connect(m_pActionSelectSensors, &QAction::triggered, this, &RealTimeEvokedWidget::showSensorSelectionWidget);
+    addDisplayAction(m_pActionSelectSensors);
 
     //set vertical layout
     m_pRteLayout = new QVBoxLayout(this);
@@ -146,10 +144,12 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
 
     m_pRteLayout->addWidget(m_pButterflyPlot);
 
-
-
     //set layouts
     this->setLayout(m_pRteLayout);
+
+    //Create pointers for selection manager
+    m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(this));
+    m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel.data()));
 
     getData();
 }
@@ -217,6 +217,7 @@ void RealTimeEvokedWidget::getData()
 //            }
 
             m_qListChInfo = m_pRTE->chInfo();
+            m_fiffInfo = m_pRTE->info();
 
             init();
 
@@ -307,6 +308,20 @@ void RealTimeEvokedWidget::init()
         m_pButterflyPlot->setSettings(m_qListModalities);
 
         m_pActionSelectModality->setVisible(true);
+
+        //Set up selection manager
+        connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::showSelectedChannelsOnly,
+                this, &RealTimeEvokedWidget::showSelectedChannelsOnly);
+
+        //Connect channel info model
+        connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::loadedLayoutMap,
+                m_pChInfoModel.data(), &ChInfoModel::layoutChanged);
+
+        connect(m_pChInfoModel.data(), &ChInfoModel::channelsMappedToLayout,
+                m_pSelectionManagerWindow.data(), &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
+
+        m_pChInfoModel->fiffInfoChanged(m_fiffInfo);
+
         // Initialized
         m_bInitialized = true;
     }
@@ -319,7 +334,7 @@ void RealTimeEvokedWidget::showModalitySelectionWidget()
 {
     if(!m_pEvokedModalityWidget)
     {
-        m_pEvokedModalityWidget = QSharedPointer<EvokedModalityWidget>(new EvokedModalityWidget(this));
+        m_pEvokedModalityWidget = QSharedPointer<EvokedModalityWidget>(new EvokedModalityWidget(this, this));
 
         m_pEvokedModalityWidget->setWindowTitle("Modality Selection");
 
@@ -333,21 +348,11 @@ void RealTimeEvokedWidget::showModalitySelectionWidget()
 
 void RealTimeEvokedWidget::showSensorSelectionWidget()
 {
-    if(!m_pSensorSelectionWidget)
-    {
-        m_pSensorSelectionWidget = QSharedPointer<SensorWidget>(new SensorWidget);
-
-        m_pSensorSelectionWidget->setWindowTitle("Channel Selection");
-
-        if(m_pSensorModel)
-        {
-            m_pSensorSelectionWidget->setModel(m_pSensorModel);
-
-//            connect(m_pSensorModel, &SensorModel::newSelection, m_pRTMSAModel, &RealTimeMultiSampleArrayModel::selectRows);
-        }
-
+    if(!m_pSelectionManagerWindow) {
+        m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow);
     }
-    m_pSensorSelectionWidget->show();
+
+    m_pSelectionManagerWindow->show();
 }
 
 
@@ -357,7 +362,7 @@ void RealTimeEvokedWidget::applySelection()
 {
 //    m_pRTMSAModel->selectRows(m_qListCurrentSelection);
 
-    m_pSensorModel->silentUpdateSelection(m_qListCurrentSelection);
+//    m_pSensorModel->silentUpdateSelection(m_qListCurrentSelection);
 }
 
 
@@ -373,3 +378,15 @@ void RealTimeEvokedWidget::resetSelection()
 //    applySelection();
 }
 
+
+//*************************************************************************************************************
+
+void RealTimeEvokedWidget::showSelectedChannelsOnly(QStringList selectedChannels)
+{
+    QList<int> selectedChannelsIndexes;
+
+    for(int i = 0; i<selectedChannels.size(); i++)
+        selectedChannelsIndexes<<m_pChInfoModel->getIndexFromOrigChName(selectedChannels.at(i));
+
+    m_pButterflyPlot->setSelectedChannels(selectedChannelsIndexes);
+}

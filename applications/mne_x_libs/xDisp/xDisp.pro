@@ -102,11 +102,11 @@ SOURCES += \
     realtimesamplearraywidget.cpp \
     helpers/realtimemultisamplearraymodel.cpp \
     helpers/realtimemultisamplearraydelegate.cpp \
-    helpers/sensorgroup.cpp \
-    helpers/sensoritem.cpp \
-    helpers/sensorlayout.cpp \
-    helpers/sensormodel.cpp \
-    helpers/sensorwidget.cpp \
+#    helpers/sensorgroup.cpp \
+#    helpers/sensoritem.cpp \
+#    helpers/sensorlayout.cpp \
+#    helpers/sensormodel.cpp \
+#    helpers/sensorwidget.cpp \
     helpers/realtimeevokedmodel.cpp \
     realtimeevokedwidget.cpp \
     helpers/realtimebutterflyplot.cpp \
@@ -122,7 +122,8 @@ SOURCES += \
     helpers/layoutscene.cpp \
     helpers/selectionmanagerwindow.cpp \
     helpers/selectionscene.cpp \
-    helpers/selectionsceneitem.cpp
+    helpers/selectionsceneitem.cpp \
+    helpers/chinfomodel.cpp
 
 HEADERS += \
     xdisp_global.h \
@@ -132,11 +133,11 @@ HEADERS += \
     realtimesamplearraywidget.h \
     helpers/realtimemultisamplearraymodel.h \
     helpers/realtimemultisamplearraydelegate.h \
-    helpers/sensorgroup.h \
-    helpers/sensoritem.h \
-    helpers/sensorlayout.h \
-    helpers/sensormodel.h \
-    helpers/sensorwidget.h \
+#    helpers/sensorgroup.h \
+#    helpers/sensoritem.h \
+#    helpers/sensorlayout.h \
+#    helpers/sensormodel.h \
+#    helpers/sensorwidget.h \
     helpers/realtimeevokedmodel.h \
     realtimeevokedwidget.h \
     helpers/realtimebutterflyplot.h \
@@ -152,7 +153,8 @@ HEADERS += \
     helpers/layoutscene.h \
     helpers/selectionmanagerwindow.h \
     helpers/selectionscene.h \
-    helpers/selectionsceneitem.h
+    helpers/selectionsceneitem.h \
+    helpers/chinfomodel.h
 
 FORMS += \
     realtimesamplearraywidget.ui \

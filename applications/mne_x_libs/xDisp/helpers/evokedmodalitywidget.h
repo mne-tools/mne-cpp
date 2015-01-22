@@ -89,7 +89,14 @@ public:
     *
     * @param [in] toolbox   connected real-time evoked widget
     */
-    EvokedModalityWidget(RealTimeEvokedWidget *toolbox);
+    EvokedModalityWidget(QWidget *parent, RealTimeEvokedWidget *toolbox);
+
+    //=========================================================================================================
+    /**
+    * Destroys the EvokedModalityWidget.
+    * All EvokedModalityWidget's children are deleted first. The application exits if EvokedModalityWidget is the main widget.
+    */
+    ~EvokedModalityWidget();
 
     void updateCheckbox(qint32 state);
 

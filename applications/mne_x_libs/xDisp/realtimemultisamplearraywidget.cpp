@@ -42,7 +42,7 @@
 
 #include "realtimemultisamplearraywidget.h"
 //#include "annotationwindow.h"
-
+#include <helpers/chinfomodel.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 
 #include <Eigen/Core>
@@ -112,7 +112,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 , m_iT(10)
 , m_fSamplingRate(1024)
 , m_fDesiredSamplingRate(128)
-, m_pSensorModel(NULL)
+, m_bHideBadChannels(false)
 {
     Q_UNUSED(pTime)
 
@@ -166,6 +166,10 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 
     //set layouts
     this->setLayout(rtmsaLayout);
+
+    //Create pointers for selection manager
+    m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(this));
+    m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel.data()));
 
     init();
 }
@@ -224,21 +228,9 @@ void RealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
             m_qListChInfo = m_pRTMSA->chInfo(); //ToDo Obsolete -> use fiffInfo instead
             m_pFiffInfo = m_pRTMSA->info();
 
-            m_fSamplingRate = m_pRTMSA->getSamplingRate();
+            emit fiffFileUpdated(*m_pFiffInfo.data());
 
-            QFile file(m_pRTMSA->getXMLLayoutFile());
-            if (!file.open(QFile::ReadOnly | QFile::Text))
-            {
-                qDebug() << QString("Cannot read file %1:\n%2.").arg(m_pRTMSA->getXMLLayoutFile()).arg(file.errorString());
-                m_pSensorModel = new SensorModel(this);
-                m_pSensorModel->mapChannelInfo(m_qListChInfo);
-            }
-            else
-            {
-                m_pSensorModel = new SensorModel(&file, this);
-                m_pSensorModel->mapChannelInfo(m_qListChInfo);
-                m_pActionSelectSensors->setVisible(true);
-            }
+            m_fSamplingRate = m_pRTMSA->getSamplingRate();
 
             init();
         }
@@ -322,6 +314,19 @@ void RealTimeMultiSampleArrayWidget::init()
 
             m_pActionChScaling->setVisible(true);
         }
+
+        //Set up selection manager
+        connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::showSelectedChannelsOnly,
+                this, &RealTimeMultiSampleArrayWidget::showSelectedChannelsOnly);
+
+        //Connect channel info model
+        connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::loadedLayoutMap,
+                m_pChInfoModel.data(), &ChInfoModel::layoutChanged);
+
+        connect(m_pChInfoModel.data(), &ChInfoModel::channelsMappedToLayout,
+                m_pSelectionManagerWindow.data(), &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
+
+        m_pChInfoModel->fiffInfoChanged(*m_pFiffInfo.data());
 
         m_bInitialized = true;
     }
@@ -482,7 +487,6 @@ void RealTimeMultiSampleArrayWidget::showProjectionWidget()
             connect(m_pProjectorSelectionWidget.data(), &ProjectorWidget::projSelectionChanged, this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::updateProjection);
         }
 
-
         m_pProjectorSelectionWidget->show();
     }
 }
@@ -492,26 +496,10 @@ void RealTimeMultiSampleArrayWidget::showProjectionWidget()
 
 void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
 {
-//    if(!m_pSensorSelectionWidget)
-//    {
-//        m_pSensorSelectionWidget = QSharedPointer<SensorWidget>(new SensorWidget);
-
-//        m_pSensorSelectionWidget->setWindowTitle("Channel Selection");
-
-//        if(m_pSensorModel)
-//        {
-//            m_pSensorSelectionWidget->setModel(m_pSensorModel);
-
-//            connect(m_pSensorModel, &SensorModel::newSelection, m_pRTMSAModel, &RealTimeMultiSampleArrayModel::selectRows);
-//        }
-
-//    }
-//    m_pSensorSelectionWidget->show();
-
-    if(!m_pSelectionManagerWindow)
-    {
+    if(!m_pSelectionManagerWindow) {
         m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow);
     }
+
     m_pSelectionManagerWindow->show();
 }
 
@@ -521,8 +509,6 @@ void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
 void RealTimeMultiSampleArrayWidget::applySelection()
 {
     m_pRTMSAModel->selectRows(m_qListCurrentSelection);
-
-    m_pSensorModel->silentUpdateSelection(m_qListCurrentSelection);
 }
 
 
@@ -536,5 +522,28 @@ void RealTimeMultiSampleArrayWidget::resetSelection()
         m_qListCurrentSelection.append(i);
 
     applySelection();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayWidget::showSelectedChannelsOnly(QStringList selectedChannels)
+{
+    m_slSelectedChannels = selectedChannels;
+
+    //Hide non selected channels/rows in the data views
+    for(int i = 0; i<m_pRTMSAModel->rowCount(); i++) {
+        QString channel = m_pRTMSAModel->data(m_pRTMSAModel->index(i, 0), Qt::DisplayRole).toString();
+        QVariant v = m_pRTMSAModel->data(m_pRTMSAModel->index(i,1), Qt::BackgroundRole);
+
+        if(!selectedChannels.contains(channel))
+            m_pTableView->hideRow(i);
+        else
+            m_pTableView->showRow(i);
+
+        //if channel is a bad channel and bad channels are to be hidden -> do not show
+        if(v.canConvert<QBrush>() && m_bHideBadChannels)
+            m_pTableView->hideRow(i);
+    }
 }
 
