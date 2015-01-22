@@ -1756,7 +1756,7 @@ void EditorWindow::on_pushButton_clicked()
         is_expanded = true;
         animation->setDuration(1000);
         animation->setStartValue(QSize(this->size().width(), this->size().height()));
-        animation->setEndValue(QSize(this->size().width() + 200,  this->size().height()));
+        animation->setEndValue(QSize(this->size().width() + 500,  this->size().height()));
         animation->start();
     }
     else
@@ -1764,7 +1764,7 @@ void EditorWindow::on_pushButton_clicked()
         is_expanded = false;
         animation->setDuration(1000);
         animation->setStartValue(QSize(this->size().width(), this->size().height()));
-        animation->setEndValue(QSize(this->size().width() - 200,  this->size().height()));
+        animation->setEndValue(QSize(this->size().width() - 500,  this->size().height()));
         animation->start();
     }
 }
