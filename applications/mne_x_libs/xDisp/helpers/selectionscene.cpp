@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     evokedmodalitywidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     selectionscene.cpp
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     May, 2014
+* @date     September, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,89 +30,93 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the EvokedModalityWidget Class.
+* @brief    Contains the implementation of the SelectionScene class.
 *
 */
-
-#ifndef EVOKEDMODALITYWIDGET_H
-#define EVOKEDMODALITYWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
+#include "selectionscene.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QCheckBox>
-#include <QStringList>
-#include <QLineEdit>
+using namespace XDISPLIB;
+using namespace std;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE XDISPLIB
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace XDISPLIB
+SelectionScene::SelectionScene(QGraphicsView* view, QObject* parent)
+: LayoutScene(view, parent)
+, m_iChannelTypeMode(FIFFV_MEG_CH)
 {
+}
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
 
-class RealTimeEvokedWidget;
-struct Modality;
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS EvokedModalityWidget
-*
-* @brief The EvokedModalityWidget class provides the sensor selection widget
-*/
-class EvokedModalityWidget : public QWidget
+void SelectionScene::repaintItems(const QMap<QString,QPointF> &layoutMap)
 {
-    Q_OBJECT
-public:
+    this->clear();
 
-    //=========================================================================================================
-    /**
-    * Constructs a EvokedModalityWidget which is a child of parent evoked widget.
-    *
-    * @param [in] toolbox   connected real-time evoked widget
-    */
-    EvokedModalityWidget(QWidget *parent, RealTimeEvokedWidget *toolbox);
+    QMapIterator<QString,QPointF > i(layoutMap);
+    while (i.hasNext()) {
+        i.next();
+        SelectionSceneItem* SelectionSceneItemTemp;
 
-    //=========================================================================================================
-    /**
-    * Destroys the EvokedModalityWidget.
-    * All EvokedModalityWidget's children are deleted first. The application exits if EvokedModalityWidget is the main widget.
-    */
-    ~EvokedModalityWidget();
+        if(i.key().contains("EEG"))
+            SelectionSceneItemTemp = new SelectionSceneItem(i.key(),
+                                                              0,
+                                                              i.value(),
+                                                              FIFFV_EEG_CH,
+                                                              FIFF_UNIT_T_M);
+        else
+            SelectionSceneItemTemp = new SelectionSceneItem(i.key(),
+                                                              0,
+                                                              i.value(),
+                                                              FIFFV_MEG_CH,
+                                                              FIFF_UNIT_T_M);
 
-    void updateCheckbox(qint32 state);
+        this->addItem(SelectionSceneItemTemp);
+    }
+}
 
-    void updateLineEdit(const QString & text);
 
-signals:
-    void settingsChanged();
+//*************************************************************************************************************
 
-private:
-    RealTimeEvokedWidget * m_pRealTimeEvokedWidget; /**< Connected real-time evoked widget */
+void SelectionScene::hideItems(QStringList visibleItems)
+{
+    //Hide all items which names are in the the string list visibleItems. All other items' opacity is set to 0.25 an dthey are no longer selectable.
+    QList<QGraphicsItem *> itemList = this->items();
 
-    QList<QCheckBox*>   m_qListModalityCheckBox;    /**< List of modality checkboxes */
-    QList<QLineEdit*>   m_qListModalityLineEdit;    /**< List of modality scalings */
-};
+    for(int i = 0; i<itemList.size(); i++) {
+        SelectionSceneItem* item = static_cast<SelectionSceneItem*>(itemList.at(i));
 
-} // NAMESPACE
+        if(item->m_iChannelKind == m_iChannelTypeMode) {
+            item->show();
 
-#endif // EVOKEDMODALITYWIDGET_H
+            if(!visibleItems.contains(item->m_sChannelName)) {
+                item->setFlag(QGraphicsItem::ItemIsSelectable, false);
+                item->setOpacity(0.25);
+            }
+            else {
+                item->setFlag(QGraphicsItem::ItemIsSelectable, true);
+                item->setOpacity(1);
+            }
+        }
+        else
+            item->hide();
+    }
+}
+
+

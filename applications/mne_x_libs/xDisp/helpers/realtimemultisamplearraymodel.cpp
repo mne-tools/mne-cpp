@@ -218,7 +218,7 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
 {
     if(p_pFiffInfo)
     {
-        RowVectorXi sel = RowVectorXi(0,0);
+        RowVectorXi sel;// = RowVectorXi(0,0);
         QStringList emptyExclude;
 
         if(p_pFiffInfo->bads.size() > 0)

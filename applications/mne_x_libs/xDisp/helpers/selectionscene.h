@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     evokedmodalitywidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     selectionscene.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     May, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,18 +30,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the EvokedModalityWidget Class.
+* @brief    Contains the declaration of the SelectionScene class.
 *
 */
 
-#ifndef EVOKEDMODALITYWIDGET_H
-#define EVOKEDMODALITYWIDGET_H
+#ifndef SELECTIONSCENE_H
+#define SELECTIONSCENE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
+#include "layoutscene.h"
+#include "selectionsceneitem.h"
+#include <fiff/fiff.h>
 
 
 //*************************************************************************************************************
@@ -48,10 +52,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QGraphicsScene>
 #include <QWidget>
-#include <QCheckBox>
-#include <QStringList>
-#include <QLineEdit>
+#include <QMutableListIterator>
 
 
 //*************************************************************************************************************
@@ -63,55 +66,42 @@ namespace XDISPLIB
 {
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class RealTimeEvokedWidget;
-struct Modality;
-
-
 //=============================================================================================================
 /**
-* DECLARE CLASS EvokedModalityWidget
+* SelectionScene...
 *
-* @brief The EvokedModalityWidget class provides the sensor selection widget
+* @brief The SelectionScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
 */
-class EvokedModalityWidget : public QWidget
+class SelectionScene : public LayoutScene
 {
     Q_OBJECT
+
 public:
+    //=========================================================================================================
+    /**
+    * Constructs a SelectionScene.
+    */
+    explicit SelectionScene(QGraphicsView* view, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Constructs a EvokedModalityWidget which is a child of parent evoked widget.
+    * Updates layout data.
     *
-    * @param [in] toolbox   connected real-time evoked widget
+    * @param [in] layoutMap layout data map.
     */
-    EvokedModalityWidget(QWidget *parent, RealTimeEvokedWidget *toolbox);
+    void repaintItems(const QMap<QString, QPointF> &layoutMap);
 
     //=========================================================================================================
     /**
-    * Destroys the EvokedModalityWidget.
-    * All EvokedModalityWidget's children are deleted first. The application exits if EvokedModalityWidget is the main widget.
+    * Hides all items described in list.
+    *
+    * @param [in] list string list with items name which are to be hidden.
     */
-    ~EvokedModalityWidget();
+    void hideItems(QStringList visibleItems);
 
-    void updateCheckbox(qint32 state);
-
-    void updateLineEdit(const QString & text);
-
-signals:
-    void settingsChanged();
-
-private:
-    RealTimeEvokedWidget * m_pRealTimeEvokedWidget; /**< Connected real-time evoked widget */
-
-    QList<QCheckBox*>   m_qListModalityCheckBox;    /**< List of modality checkboxes */
-    QList<QLineEdit*>   m_qListModalityLineEdit;    /**< List of modality scalings */
+    int         m_iChannelTypeMode;
 };
 
 } // NAMESPACE
 
-#endif // EVOKEDMODALITYWIDGET_H
+#endif // SelectionScene_H

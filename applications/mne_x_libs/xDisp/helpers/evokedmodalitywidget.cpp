@@ -68,8 +68,9 @@ using namespace XDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EvokedModalityWidget::EvokedModalityWidget(RealTimeEvokedWidget *toolbox)
-: m_pRealTimeEvokedWidget(toolbox)
+EvokedModalityWidget::EvokedModalityWidget(QWidget *parent, RealTimeEvokedWidget *toolbox)
+: QWidget(parent)
+, m_pRealTimeEvokedWidget(toolbox)
 {
     this->setWindowTitle("Covariance Modality Settings");
     this->setMinimumWidth(330);
@@ -105,6 +106,13 @@ EvokedModalityWidget::EvokedModalityWidget(RealTimeEvokedWidget *toolbox)
 
     this->setLayout(t_pGridLayout);
 
+}
+
+
+//*************************************************************************************************************
+
+EvokedModalityWidget::~EvokedModalityWidget()
+{
 }
 
 

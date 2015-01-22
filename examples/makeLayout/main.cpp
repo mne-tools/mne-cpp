@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     evokedmodalitywidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     main.cpp
+* @author   Lorenz Esc <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     May, 2014
+* @date     January, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,18 +29,23 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the EvokedModalityWidget Class.
+* @brief    Builds example for making a 2D layout from 3D points
 *
 */
-
-#ifndef EVOKEDMODALITYWIDGET_H
-#define EVOKEDMODALITYWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
+#include <iostream>
+#include <vector>
+#include <math.h>
+
+
+#include <utils/layoutmaker.h>
+#include <fiff/fiff.h>
+#include <mne/mne.h>
 
 
 //*************************************************************************************************************
@@ -48,70 +53,87 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QCheckBox>
-#include <QStringList>
-#include <QLineEdit>
+#include <QtCore/QCoreApplication>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE XDISPLIB
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace XDISPLIB
-{
+using namespace FIFFLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// MAIN
 //=============================================================================================================
-
-class RealTimeEvokedWidget;
-struct Modality;
-
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EvokedModalityWidget
+* The function main marks the entry point of the program.
+* By default, main has the storage class extern.
 *
-* @brief The EvokedModalityWidget class provides the sensor selection widget
+* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
 */
-class EvokedModalityWidget : public QWidget
+int main(int argc, char *argv[])
 {
-    Q_OBJECT
-public:
+    //
+    // Please notice that this example only works in release mode.
+    // Debug mode somehow corrupts the simplex coder. ToDo: Fix this!
+    //
+    QCoreApplication a(argc, argv);
 
-    //=========================================================================================================
-    /**
-    * Constructs a EvokedModalityWidget which is a child of parent evoked widget.
-    *
-    * @param [in] toolbox   connected real-time evoked widget
-    */
-    EvokedModalityWidget(QWidget *parent, RealTimeEvokedWidget *toolbox);
+    // Get fiff info
+    QFile t_fileRaw("./MNE-sample-data/baby_meg/babymegtest1.fif");
 
-    //=========================================================================================================
-    /**
-    * Destroys the EvokedModalityWidget.
-    * All EvokedModalityWidget's children are deleted first. The application exits if EvokedModalityWidget is the main widget.
-    */
-    ~EvokedModalityWidget();
+    FiffRawData raw(t_fileRaw);
 
-    void updateCheckbox(qint32 state);
+    FiffInfo fiffInfo = raw.info;
 
-    void updateLineEdit(const QString & text);
+    //get 3d locations from fiff file
+    QList<QVector<double> > inputPoints;
+    QList<QVector<double> > outputPoints;
+    QStringList names;
+    QFile out("./MNE_Browse_Raw_Resources/Templates/Layouts/babymeg.lout");
 
-signals:
-    void settingsChanged();
+    for(int i = 0; i<fiffInfo.ch_names.size(); i++) {
+        int kind = fiffInfo.chs.at(i).kind;
 
-private:
-    RealTimeEvokedWidget * m_pRealTimeEvokedWidget; /**< Connected real-time evoked widget */
+        if(kind == FIFFV_MEG_CH) { //FIFFV_MEG_CH FIFFV_EEG_CH
+            QVector<double> temp;
+            double x = fiffInfo.chs.at(i).loc(0,0) * 100;
+            double y = fiffInfo.chs.at(i).loc(1,0) * 100;
+            double z = fiffInfo.chs.at(i).loc(2,0) * 100;
 
-    QList<QCheckBox*>   m_qListModalityCheckBox;    /**< List of modality checkboxes */
-    QList<QLineEdit*>   m_qListModalityLineEdit;    /**< List of modality scalings */
-};
+            temp.append(x);
+            temp.append(y);
+            temp.append(-z);
+            inputPoints.append(temp);
 
-} // NAMESPACE
+            std::cout << x << " " << y << " " << z <<std::endl;
+            names<<fiffInfo.ch_names.at(i);
+        }
+    }
 
-#endif // EVOKEDMODALITYWIDGET_H
+    float prad = 60.0;
+    float width = 5.0;
+    float height = 4.0;
+
+    // convert 3d points to layout
+    if(inputPoints.size()>0)
+        LayoutMaker::makeLayout(inputPoints,
+                                outputPoints,
+                                names,
+                                out,
+                                true,
+                                prad,
+                                width,
+                                height,
+                                true);
+
+    return a.exec();
+}
