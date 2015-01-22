@@ -48,7 +48,8 @@
 #include "helpers/realtimebutterflyplot.h"
 
 #include "helpers/evokedmodalitywidget.h"
-#include "helpers/sensorwidget.h"
+#include "helpers/selectionmanagerwindow.h"
+#include "helpers/chinfomodel.h"
 
 
 //*************************************************************************************************************
@@ -193,29 +194,37 @@ private:
     */
     void showModalitySelectionWidget();
 
+    //=========================================================================================================
+    /**
+    * Only shows the channels defined in the QStringList selectedChannels
+    *
+    * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
+    */
+    void showSelectedChannelsOnly(QStringList selectedChannels);
 
     QVBoxLayout *m_pRteLayout;  /**< RTE Widget layout */
     QLabel *m_pLabelInit;       /**< Initialization LAbel */
 
-    RealTimeEvokedModel*        m_pRTEModel;            /**< RTE data model */
-    RealTimeButterflyPlot*      m_pButterflyPlot;       /**< Butterfly plot */
+    RealTimeEvokedModel*        m_pRTEModel;                /**< RTE data model */
+    RealTimeButterflyPlot*      m_pButterflyPlot;           /**< Butterfly plot */
 
-    QAction* m_pActionSelectModality;           /**< Modality selection action */
+    QAction* m_pActionSelectModality;                       /**< Modality selection action */
 
     QSharedPointer<RealTimeEvoked> m_pRTE;                  /**< The real-time evoked measurement. */
 
     bool m_bInitialized;                                    /**< Is Initialized */
 
     QList<RealTimeSampleArrayChInfo>    m_qListChInfo;      /**< Channel info list. ToDo: check if this is obsolete later on*/
+    FiffInfo m_fiffInfo;                                    /**< FiffInfo, which is used insteadd of ListChInfo*/
 
     QAction*    m_pActionSelectSensors;                     /**< show roi select widget */
 
-    SensorModel* m_pSensorModel;                            /**< Sensor model for channel selection */
-    QSharedPointer<SensorWidget> m_pSensorSelectionWidget;  /**< Sensor selection widget. */
+    QSharedPointer<SelectionManagerWindow> m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */
+    QSharedPointer<ChInfoModel> m_pChInfoModel;             /**< channel info model. */
+    bool            m_bHideBadChannels;                     /**< hide bad channels flag. */
 
     QSharedPointer<EvokedModalityWidget> m_pEvokedModalityWidget;   /**< Evoked modality widget. */
     QList< Modality > m_qListModalities;
-
 
     QList<qint32> m_qListCurrentSelection;  /**< Current selection list -> hack around C++11 lambda  */
     void applySelection();                  /**< apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
