@@ -180,6 +180,7 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     connect(ui->tbv_Results->model(), SIGNAL(dataChanged ( const QModelIndex&, const QModelIndex&)), this, SLOT(tbv_selection_changed(const QModelIndex&, const QModelIndex&)));
     connect(_counter_timer, SIGNAL(timeout()), this, SLOT(on_time_out()));
 
+    qRegisterMetaType<source_file_type>("source_file_type");
     qRegisterMetaType<Eigen::MatrixXd>("MatrixXd");
     qRegisterMetaType<Eigen::VectorXd>("VectorXd");
     qRegisterMetaType<Eigen::RowVectorXi>("RowVectorXi");
@@ -488,6 +489,7 @@ bool MainWindow::read_fiff_ave(QString file_name)
 
     reference_matrix = _signal_matrix;
 
+    file_type = AVE;
     return true;
 }
 
@@ -628,6 +630,7 @@ bool MainWindow::read_fiff_file(QString fileName)
     for(qint32 channels = 0; channels < datas.rows(); channels++)
         _signal_matrix.col(channels) = datas.row(channels);
 
+    file_type = RAW;
     return true;
 }
 
@@ -728,6 +731,8 @@ bool MainWindow::read_matlab_file(QString fileName)
 
     _sample_rate = 1;
     ui->dsb_sample_rate->setValue(_sample_rate);
+
+    file_type = TXT;
 
     return true;
 }
@@ -1263,7 +1268,7 @@ void XAxisWindow::paint_axis(MatrixXd signalMatrix, QSize windowSize)
 // starts MP-algorithm
 void MainWindow::on_btt_Calc_clicked()
 {
-    TruncationCriterion criterion;
+    truncation_criterion criterion;
 
     if(ui->chb_Iterations->isChecked() && !ui->chb_ResEnergy->isChecked())
         criterion = Iterations;
@@ -1427,21 +1432,24 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         atomModulationItem->setTextAlignment(0x0082);
         atomPhaseItem->setTextAlignment(0x0082);
 
-        _adaptive_atom_list.append(temp_atom);
-        if(settings.value("sort_results", true).toBool())
+        //_adaptive_atom_list.append(temp_atom); //old
+        _adaptive_atom_list.append(adaptive_atom_res_list.last());
+
+        //ToDo: sort_results for trial_separation
+        if(settings.value("sort_results", true).toBool())// && !settings.value("trial_separation", false).toBool())
         {
-            qSort(adaptive_atom_res_list.last().begin(), adaptive_atom_res_list.last().end(), sort_energie_adaptive);
-            qSort(_adaptive_atom_list.begin(), _adaptive_atom_list.end(), sort_energie_adaptive);
+            qSort(adaptive_atom_res_list.begin(), adaptive_atom_res_list.end(), sort_energy_adaptive);
+            qSort(_adaptive_atom_list.begin(), _adaptive_atom_list.end(), sort_energy_adaptive);
         }
 
         // ToDo: qint32 index = adaptive_atom_res_list.indexOf(temp_atom);
         qint32 index = 0;
         while(index < _adaptive_atom_list.length())
         {
-            if(temp_atom.scale == _adaptive_atom_list.at(index).scale
-                    && temp_atom.modulation == _adaptive_atom_list.at(index).modulation
-                    && temp_atom.translation == _adaptive_atom_list.at(index).translation
-                    && temp_atom.energy == _adaptive_atom_list.at(index).energy)
+            if(temp_atom.scale == _adaptive_atom_list.at(index).last().scale
+                    && temp_atom.modulation == _adaptive_atom_list.at(index).last().modulation
+                    && temp_atom.translation == _adaptive_atom_list.at(index).last().translation
+                    && temp_atom.energy == _adaptive_atom_list.at(index).last().energy)
                 break;
             index++;
         }
@@ -1503,8 +1511,8 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         _fix_dict_atom_list.append(temp_atom);
         if(settings.value("sort_results", true).toBool())
         {
-            qSort(fix_dict_atom_res_list.begin(),fix_dict_atom_res_list.end(), sort_energie_fix);
-            qSort(_fix_dict_atom_list.begin(),_fix_dict_atom_list.end(), sort_energie_fix);
+            qSort(fix_dict_atom_res_list.begin(),fix_dict_atom_res_list.end(), sort_energy_fix);
+            qSort(_fix_dict_atom_list.begin(),_fix_dict_atom_list.end(), sort_energy_fix);
         }
         // ToDo: index = _adaptive_atom_list.indexOf(temp_atom);
         qint32 index = 0;
@@ -1623,6 +1631,7 @@ void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelI
     Q_UNUSED(bottomRight);
     bool all_selected = true;
     bool all_deselected = true;
+    QSettings settings;
 
     if(tbv_is_loading) return;
 
@@ -1660,27 +1669,54 @@ void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelI
     {
         if(ui->tbv_Results->columnCount() > 2)
         {
-            GaborAtom  atom = _adaptive_atom_list.at(topLeft.row());
-            if(!auto_change)
-                select_atoms_map[topLeft.row()] = item->checkState();
-
-            if(item->checkState())
+            if(!settings.value("trial_separation", false).toBool())//normal adaptive mp with global bestmatching atom
             {
-                for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
+                GaborAtom  atom = _adaptive_atom_list.at(topLeft.row()).last();
+                if(!auto_change)
+                    select_atoms_map[topLeft.row()] = item->checkState();
+
+                if(item->checkState())
                 {
-                    _atom_sum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
-                    _residuum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
-                    composed_energy += 100 * atom.energy / signal_energy;
+                    for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
+                    {
+                        _atom_sum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
+                        _residuum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
+                        composed_energy += 100 * atom.energy / signal_energy;
+                    }
+                }
+                else
+                {
+                    for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
+                    {
+                        _atom_sum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
+                        _residuum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
+                        composed_energy -= 100 * atom.energy / signal_energy;
+                    }
                 }
             }
-            else
+            else    //trial separation
             {
-                for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
+                if(item->checkState())
                 {
-                    _atom_sum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
-                    _residuum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
-                    composed_energy -= 100 * atom.energy / signal_energy;
+                    for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
+                    {
+                        GaborAtom  atom = _adaptive_atom_list.at(topLeft.row()).at(channels);
+                        _atom_sum_matrix.col(channels) += atom.max_scalar_product * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase);
+                        _residuum_matrix.col(channels) -= atom.max_scalar_product * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase);
+                        composed_energy += 100 * atom.energy / signal_energy;
+                    }
                 }
+                else
+                {
+                    for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
+                    {
+                        GaborAtom  atom = _adaptive_atom_list.at(topLeft.row()).at(channels);
+                        _atom_sum_matrix.col(channels) -= atom.max_scalar_product * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase);
+                        _residuum_matrix.col(channels) += atom.max_scalar_product * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase);
+                        composed_energy -= 100 * atom.energy / signal_energy;
+                    }
+                }
+
             }
         }
         else
@@ -1821,7 +1857,7 @@ void MainWindow::calc_thread_finished()
 
 //*************************************************************************************************************
 
-void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
+void MainWindow::calc_adaptiv_mp(MatrixXd signal, truncation_criterion criterion)
 {
     adaptive_Mp = new AdaptiveMp();
     qreal res_energy = ui->dsb_energy->value();
@@ -1874,7 +1910,7 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
 
 //************************************************************************************************************************************
 
-void MainWindow::calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion criterion)
+void MainWindow::calc_fix_mp(QString path, MatrixXd signal, truncation_criterion criterion)
 {
     fixDict_Mp = new FixDictMp();
     qreal res_energy = ui->dsb_energy->value();
@@ -2396,8 +2432,8 @@ void MainWindow::save_fif_file()
 
     save_Fif->moveToThread(save_thread);
 
-    connect(this, SIGNAL(to_save(QString, QString, fiff_int_t, fiff_int_t, MatrixXd, select_map, RowVectorXi )),
-            save_Fif, SLOT(save_fif_file(QString, QString, fiff_int_t, fiff_int_t, MatrixXd, select_map, RowVectorXi )));
+    connect(this, SIGNAL(to_save(QString, QString, fiff_int_t, fiff_int_t, MatrixXd, MatrixXd, select_map, RowVectorXi, source_file_type )),
+            save_Fif, SLOT(save_fif_file(QString, QString, fiff_int_t, fiff_int_t, MatrixXd, MatrixXd, select_map, RowVectorXi, source_file_type )));
     connect(save_Fif, SIGNAL(save_progress(qint32, qint32)), this, SLOT(recieve_save_progress(qint32, qint32)));
     connect(save_thread, SIGNAL(finished()), save_thread, SLOT(deleteLater()));
     connect(save_Fif, SIGNAL(finished()), save_Fif, SLOT(quit()));
@@ -2420,7 +2456,7 @@ void MainWindow::save_fif_file()
     ui->actionSpeicher->setEnabled(false);
     ui->actionSpeicher_unter->setEnabled(false);
 
-    emit to_save(file_name, save_path, _from, _to, _atom_sum_matrix, select_channel_map, picks);
+    emit to_save(file_name, save_path, _from, _to, _atom_sum_matrix, original_signal_matrix, select_channel_map, picks, file_type);
     save_thread->start();
 }
 
@@ -2428,7 +2464,7 @@ void MainWindow::save_fif_file()
 
 void MainWindow::recieve_save_progress(qint32 current_progress, qint32 finished)
 {
-    if(finished == 0)
+    if(finished == 0)   //save in progress
     {
         ui->progress_bar_save->setValue(current_progress);
         if(ui->progress_bar_save->value() > ui->progress_bar_save->maximum() / 2 && !is_save_white)
@@ -2438,17 +2474,15 @@ void MainWindow::recieve_save_progress(qint32 current_progress, qint32 finished)
             is_save_white = true;
         }
     }
-    else if(finished == 2)
+    else if(finished == 2)  // error on save
     {
         QMessageBox::warning(this, "Error", "error: no success on save.");
         ui->progress_bar_save->setHidden(true);
     }
-    else if(finished == 4)
-    {
-        QMessageBox::warning(this, "Error", "error: unable to save -ave.fif files");
-        ui->progress_bar_save->setHidden(true);
-    }
-    else
+    else if(finished == 4) // save .txt instead of ave.fif as long as mne-cpp do not serve that function
+        QMessageBox::warning(this, "Error", "error: unable to save -ave.fif files\nSignal data saved to:\n"  + save_path + ".txt");
+
+    else    //save is successfully finished
     {
         ui->progress_bar_save->setHidden(true);        
         ui->actionSpeicher->setEnabled(true);
@@ -2457,169 +2491,203 @@ void MainWindow::recieve_save_progress(qint32 current_progress, qint32 finished)
 }
 //*****************************************************************************************************************
 
-void SaveFifFile::save_fif_file(QString source_path, QString save_path, fiff_int_t start_change, fiff_int_t end_change, MatrixXd changes, select_map select_channel_map, RowVectorXi picks)
+void SaveFifFile::save_fif_file(QString source_path, QString save_path, fiff_int_t start_change, fiff_int_t end_change, MatrixXd changes, MatrixXd original_signal,
+                                select_map select_channel_map, RowVectorXi picks, source_file_type file_type)
 {
     QFile t_fileIn(source_path);
-    QFile t_fileOut(save_path.append(".txt"));
-    std::cout << save_path.toStdString();
+    QFile t_fileOut(save_path);
 
-    //ToDo: no save for ave data at the moment
-    if(source_path.contains("-ave.", Qt::CaseInsensitive))
+    switch(file_type)
     {
-        //temporary ToD: revert this temp if no creating matlab signals is needed anymore
-        if (t_fileOut.open(QFile::WriteOnly | QFile::Truncate))
+        case RAW: // if(QString::compare(source_path.split('.').last(), "fif", Qt::CaseInsensitive) == 0)
         {
-            QTextStream matlab_stream(&t_fileOut);
+            //   Setup for reading the raw data
+            FiffRawData raw(t_fileIn);
 
-            for(qint32 channel = 0; channel < _atom_sum_matrix.cols(); channel++)
+            RowVectorXd cals;
+            FiffStream::SPtr outfid = Fiff::start_writing_raw(t_fileOut, raw.info, cals, picks);
+
+            //   Set up the reading parameters
+            fiff_int_t from = raw.first_samp;
+            fiff_int_t to = raw.last_samp;
+            float quantum_sec = 10.0f;//read and write in 10 sec junks
+            fiff_int_t quantum = ceil(quantum_sec*raw.info.sfreq);  //   To read the whole file at once set quantum     = to - from + 1;
+
+            //   Read and write all the data
+            //************************************************************************************
+            bool first_buffer = true;
+            fiff_int_t first;
+            fiff_int_t last;
+            MatrixXd data;
+            MatrixXd times;
+
+            // from 0 to start of change
+            for(first = from; first < start_change; first += quantum)
             {
-                for(qint32 sample = 0; sample < _atom_sum_matrix.rows(); sample++)
-                    matlab_stream << QString::number(_atom_sum_matrix(sample, channel)) << ",";
-
-                matlab_stream<< "\n";
-            }
-        }
-
-        //end temporary
-        //emit save_progress(100, 4);
-        //return;
-    }
-    else if(QString::compare(source_path.split('.').last(), "txt", Qt::CaseInsensitive) == 0)
-    {
-        if (t_fileOut.open(QFile::WriteOnly | QFile::Truncate))
-        {
-            QTextStream matlab_stream(&t_fileOut);
-
-            for(qint32 k = 0; k < _matlab_channels.length(); k++)
-            {
-                QStringList signal_samples = _matlab_channels.at(k).split(',', QString::SkipEmptyParts);
-                for(qint32 i = start_change; i <= end_change; i++)
+                last = first + quantum - 1;
+                if (last > start_change)
                 {
-                    signal_samples.replace(i, QString::number(changes(i, k)));//ToDo: ready
+                    last = start_change - 1;
                 }
-                for(qint32 j = 0; j < signal_samples.length(); j++)
-                    matlab_stream << signal_samples.at(j) << ",";
-                matlab_stream<< "\n";
+                if (!raw.read_raw_segment(data ,times, first, last, picks))
+                {
+                    printf("error during read_raw_segment\n");
+                    emit save_progress(first, 2);
+                    return;
+                }
+                printf("Writing...");
+                if (first_buffer)
+                {
+                    if (first > 0)
+                        outfid->write_int(FIFF_FIRST_SAMPLE, &first);
+                    first_buffer = false;
+                }
+                outfid->write_raw_buffer(data, cals);
+                printf("[done]\n");
 
+                emit save_progress(first, 0);
             }
-        }
-    }
-    else if(QString::compare(source_path.split('.').last(), "fif", Qt::CaseInsensitive) == 0)
-    {/*
 
-        //   Setup for reading the raw data
-        FiffRawData raw(t_fileIn);
+            //************************************************************************************
 
-        RowVectorXd cals;
-        FiffStream::SPtr outfid = Fiff::start_writing_raw(t_fileOut, raw.info, cals, picks);
-
-
-        //   Set up the reading parameters
-        fiff_int_t from = raw.first_samp;
-        fiff_int_t to = raw.last_samp;
-        float quantum_sec = 10.0f;//read and write in 10 sec junks
-        fiff_int_t quantum = ceil(quantum_sec*raw.info.sfreq);  //   To read the whole file at once set quantum     = to - from + 1;
-
-        //   Read and write all the data
-        //************************************************************************************
-        bool first_buffer = true;
-        fiff_int_t first;
-        fiff_int_t last;
-        MatrixXd data;
-        MatrixXd times;
-
-        // from 0 to start of change
-        for(first = from; first < start_change; first += quantum)
-        {
-            last = first + quantum - 1;
-            if (last > start_change)
-            {
-                last = start_change - 1;
-            }
-            if (!raw.read_raw_segment(data ,times, first, last, picks))
+            // from start of change to end of change
+            if (!raw.read_raw_segment(data, times, start_change ,end_change,picks))
             {
                 printf("error during read_raw_segment\n");
                 emit save_progress(first, 2);
                 return;
             }
-            printf("Writing...");
+
+            qint32 index = 0;
+            for(qint32 channels = 0; channels < data.rows(); channels++)
+            {
+                if(select_channel_map[channels])
+                {
+                    data.row(channels) =  changes.col(index)  ;
+                    index++;
+                }
+            }
+            printf("Writing new data...");
             if (first_buffer)
             {
-                if (first > 0)
-                    outfid->write_int(FIFF_FIRST_SAMPLE, &first);
+                if (start_change > 0)
+                    outfid->write_int(FIFF_FIRST_SAMPLE, &start_change);
                 first_buffer = false;
             }
             outfid->write_raw_buffer(data, cals);
             printf("[done]\n");
 
-            emit save_progress(first, 0);
+
+            //************************************************************************************
+
+            // from end of change to end
+            for(first = end_change + 1; first < to; first += quantum)
+            {
+                last = first + quantum - 1;
+                if (last > to)
+                {
+                    last = to;
+                }
+                if (!raw.read_raw_segment(data, times, first, last, picks))
+                {
+                    printf("error during read_raw_segment\n");
+                    emit save_progress(first, 2);
+                    return;
+                }
+                printf("Writing...");
+                outfid->write_raw_buffer(data, cals);
+                printf("[done]\n");
+
+                emit save_progress(first, false);
+            }
+
+            emit save_progress(to, true);
+
+            outfid->finish_writing_raw();
+            printf("Finished\n");
+            break;
         }
 
-        //************************************************************************************
-
-        // from start of change to end of change
-        if (!raw.read_raw_segment(data, times, start_change ,end_change,picks))
+        case AVE: // if(source_path.contains("-ave.", Qt::CaseInsensitive))
         {
-            printf("error during read_raw_segment\n");
-            emit save_progress(first, 2);
+            //temporary ToDo: revert this temp if saving AVE is possible in MNE-CPP
+            emit save_progress(0, 4);
+
+            t_fileOut.setFileName(save_path.append(".txt"));
+
+            if (t_fileOut.open(QFile::WriteOnly | QFile::Truncate))
+            {
+                QTextStream matlab_stream(&t_fileOut);
+
+                for(qint32 k = 0; k < original_signal.cols(); k++)
+                {
+                    if(select_channel_map[k])//changes in this channels
+                    {
+                        for(qint32 sample = 0; sample < _atom_sum_matrix.rows(); sample++)
+                            matlab_stream << QString::number(_atom_sum_matrix(sample, k)) << ",";
+
+                        matlab_stream<< "\n";
+                    }
+                    else //no changes in this channel, just save original channel
+                    {
+                        for(qint32 i = 0; i < _atom_sum_matrix.rows(); i++)
+                            matlab_stream << QString::number(original_signal(i, k)) << ",";
+                        matlab_stream<< "\n";
+                    }
+                    emit save_progress((k + 1) * (original_signal.rows() /original_signal.cols()), 0);
+                }
+            }
+            emit save_progress(original_signal.rows(), true);
+            //end temporary
+
+            break;
+        }
+
+        case TXT: // if(QString::compare(source_path.split('.').last(), "txt", Qt::CaseInsensitive) == 0)
+        {
+            if (t_fileOut.open(QFile::WriteOnly | QFile::Truncate))
+            {
+                QTextStream matlab_stream(&t_fileOut);
+
+                for(qint32 k = 0; k < _matlab_channels.length(); k++)
+                {
+                    if(select_channel_map[k])//changes in this channels
+                    {
+                        QStringList signal_samples = _matlab_channels.at(k).split(',', QString::SkipEmptyParts);
+                        for(qint32 i = start_change; i <= end_change; i++)
+                        {
+                            signal_samples.replace(i, QString::number(changes(i, k)));//ToDo: ready
+                        }
+                        for(qint32 j = 0; j < signal_samples.length(); j++)
+                            matlab_stream << signal_samples.at(j) << ",";
+                        matlab_stream<< "\n";
+                    }
+                    else //no changes in this channel, just save original channel
+                    {
+                        for(qint32 i = 0; i < _matlab_channels.at(k).split(',', QString::SkipEmptyParts).length(); i++)
+                            matlab_stream << _matlab_channels.at(k).split(',', QString::SkipEmptyParts).at(i) << ",";
+                        matlab_stream<< "\n";
+                    }
+                    emit save_progress((k + 1) * (_matlab_channels.at(0).split(',', QString::SkipEmptyParts).length() /_matlab_channels.length()), 0);
+                }
+            }
+            emit save_progress(_matlab_channels.at(0).split(',', QString::SkipEmptyParts).length(), true);
+            break;
+        }
+
+        default:
+        {
+            emit save_progress(0, 2);
             return;
         }
-
-        qint32 index = 0;
-        for(qint32 channels = 0; channels < data.rows(); channels++)
-        {
-            if(select_channel_map[channels])
-            {
-                data.row(channels) =  changes.col(index)  ;
-                index++;
-            }
-        }
-        printf("Writing new data...");
-        if (first_buffer)
-        {
-            if (start_change > 0)
-                outfid->write_int(FIFF_FIRST_SAMPLE, &start_change);
-            first_buffer = false;
-        }
-        outfid->write_raw_buffer(data, cals);
-        printf("[done]\n");
-
-
-        //************************************************************************************
-
-        // from end of change to end
-        for(first = end_change + 1; first < to; first += quantum)
-        {
-            last = first + quantum - 1;
-            if (last > to)
-            {
-                last = to;
-            }
-            if (!raw.read_raw_segment(data, times, first, last, picks))
-            {
-                printf("error during read_raw_segment\n");
-                emit save_progress(first, 2);
-                return;
-            }
-            printf("Writing...");
-            outfid->write_raw_buffer(data, cals);
-            printf("[done]\n");
-
-            emit save_progress(first, false);
-        }
-
-        emit save_progress(to, true);
-
-        outfid->finish_writing_raw();
-        printf("Finished\n");
-    */}
+    }
 }
 
 //*****************************************************************************************************************
 
 void MainWindow::save_parameters()
 {
-    QString save_parameter_path = save_path.split(".").first() + ".txt";
+    QString save_parameter_path = save_path.split(".").first() + "_params.txt";
     QString original_file_name = file_name.split("/").last().split(".").first();
     QFile xml_file(save_parameter_path);
     if(xml_file.open(QIODevice::WriteOnly))
@@ -2677,9 +2745,9 @@ void MainWindow::save_parameters()
                 xmlWriter.writeEndElement();    //PARAMETER
                 xmlWriter.writeEndElement();    //ATOM
             }
-            else
+            else //ToDo: does not work for trial separation like this
             {
-                GaborAtom gabor_atom = _adaptive_atom_list.at(i);
+                GaborAtom gabor_atom = _adaptive_atom_list.at(i).last();
                 xmlWriter.writeStartElement("ATOM");
                 xmlWriter.writeAttribute("formula", "GABORATOM");
                 xmlWriter.writeAttribute("sample_count", QString::number(gabor_atom.sample_count));
@@ -2750,13 +2818,13 @@ void MainWindow::on_actionExport_triggered()
             {
                 xmlWriter.writeStartElement("built_Atoms");
                 xmlWriter.writeAttribute("formula", "Gaboratom");
-                xmlWriter.writeAttribute("sample_count", QString::number(_adaptive_atom_list.first().sample_count));
+                xmlWriter.writeAttribute("sample_count", QString::number(_adaptive_atom_list.first().last().sample_count));
                 xmlWriter.writeAttribute("atom_count", QString::number(div));
                 xmlWriter.writeAttribute("source_dict", save_path.split('/').last().split('.').first() + "_" + QString::number(j));
 
                 for(qint32 i = 0; i < div; i++)
                 {
-                    GaborAtom gabor_atom = _adaptive_atom_list.at(i + j * div);
+                    GaborAtom gabor_atom = _adaptive_atom_list.at(i + j * div).last();
                     QStringList result_list = gabor_atom.create_string_values(gabor_atom.sample_count, gabor_atom.scale, gabor_atom.sample_count / 2, gabor_atom.modulation, gabor_atom.phase);
 
                     xmlWriter.writeStartElement("ATOM");
@@ -2786,13 +2854,13 @@ void MainWindow::on_actionExport_triggered()
         {
             xmlWriter.writeStartElement("built_Atoms");
             xmlWriter.writeAttribute("formula", "Gaboratom");
-            xmlWriter.writeAttribute("sample_count", QString::number(_adaptive_atom_list.first().sample_count));
+            xmlWriter.writeAttribute("sample_count", QString::number(_adaptive_atom_list.first().last().sample_count));
             xmlWriter.writeAttribute("atom_count", QString::number(mod));
             xmlWriter.writeAttribute("source_dict", save_path.split('/').last().split('.').first()  + "_" + QString::number(8));
 
             for(qint32 i = 0; i < mod; i++)
             {
-                GaborAtom gabor_atom = _adaptive_atom_list.at(i + pdict_count * div);
+                GaborAtom gabor_atom = _adaptive_atom_list.at(i + pdict_count * div).last();
                 QStringList result_list = gabor_atom.create_string_values(gabor_atom.sample_count, gabor_atom.scale, gabor_atom.sample_count / 2, gabor_atom.modulation, gabor_atom.phase);
 
                 xmlWriter.writeStartElement("ATOM");
@@ -2824,14 +2892,22 @@ void MainWindow::on_actionExport_triggered()
 
 //*****************************************************************************************************************
 
-bool MainWindow::sort_energie_adaptive(const GaborAtom atom_1, const GaborAtom atom_2)
+bool MainWindow::sort_energy_adaptive(const QList<GaborAtom> atom_1, const QList<GaborAtom> atom_2)
 {
-    return (atom_1.energy > atom_2.energy);
+    qreal energy_1 = 0;
+    qreal energy_2 = 0;
+
+    for(qint32 i = 0; i < atom_1.length(); i++)
+    {
+        energy_1 += atom_1.at(i).energy;
+        energy_2 += atom_2.at(i).energy;
+    }
+    return (energy_1 > energy_2);
 }
 
 //*****************************************************************************************************************
 
-bool MainWindow::sort_energie_fix(const FixDictAtom atom_1, const FixDictAtom atom_2)
+bool MainWindow::sort_energy_fix(const FixDictAtom atom_1, const FixDictAtom atom_2)
 {
     return (atom_1.energy > atom_2.energy);
 }
