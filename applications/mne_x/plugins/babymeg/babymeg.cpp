@@ -87,6 +87,7 @@ BabyMEG::BabyMEG()
 , m_bIsRunning(false)
 , m_pRawMatrixBuffer(0)
 , m_sFiffHeader(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/header.fif")
+, m_sBadChannels(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/both.bad")
 {
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup Project"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
@@ -420,6 +421,12 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
         return;
     }
 
+    if(!readBadChannels())
+    {
+        qDebug() << "Not able to read bad channels";
+        return;
+    }
+
     m_iBufferSize = pInfo->dataLength;
     sfreq = pInfo->sfreq;
 
@@ -613,6 +620,38 @@ bool BabyMEG::readProjectors()
 
     //garbage collecting
     t_pStream->device()->close();
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool BabyMEG::readBadChannels()
+{
+    //
+    // Bad Channels
+    //
+    QFile t_badChannelsFile(m_sBadChannels);
+
+    if (!t_badChannelsFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        return false;
+
+    printf("Reading bad channels from %s...\n", m_sBadChannels.toUtf8().constData());
+
+    QTextStream in(&t_badChannelsFile);
+    qint32 count = 0;
+    QStringList t_sListbads;
+    while (!in.atEnd()) {
+        QString channel = in.readLine();
+        if(channel.isEmpty())
+            continue;
+        ++count;
+        printf("Channel %i: %s\n",count,channel.toUtf8().constData());
+        t_sListbads << channel;
+    }
+
+    m_pFiffInfo->bads = t_sListbads;
 
     return true;
 }
