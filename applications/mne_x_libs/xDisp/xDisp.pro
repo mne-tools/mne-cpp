@@ -58,7 +58,8 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lxMeasd
+            -lxMeasd \
+            -lMNE$${MNE_LIB_VERSION}Utilsd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -67,7 +68,8 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Disp \
-            -lxMeas
+            -lxMeas \
+            -lMNE$${MNE_LIB_VERSION}Utils
 }
 
 qtHaveModule(3d) {
@@ -100,11 +102,11 @@ SOURCES += \
     realtimesamplearraywidget.cpp \
     helpers/realtimemultisamplearraymodel.cpp \
     helpers/realtimemultisamplearraydelegate.cpp \
-    helpers/sensorgroup.cpp \
-    helpers/sensoritem.cpp \
-    helpers/sensorlayout.cpp \
-    helpers/sensormodel.cpp \
-    helpers/sensorwidget.cpp \
+#    helpers/sensorgroup.cpp \
+#    helpers/sensoritem.cpp \
+#    helpers/sensorlayout.cpp \
+#    helpers/sensormodel.cpp \
+#    helpers/sensorwidget.cpp \
     helpers/realtimeevokedmodel.cpp \
     realtimeevokedwidget.cpp \
     helpers/realtimebutterflyplot.cpp \
@@ -116,7 +118,12 @@ SOURCES += \
     helpers/evokedmodalitywidget.cpp \
     helpers/frequencyspectrumsettingswidget.cpp \
     helpers/realtimemultisamplearrayscalingwidget.cpp \
-    helpers/projectorwidget.cpp
+    helpers/projectorwidget.cpp \
+    helpers/layoutscene.cpp \
+    helpers/selectionmanagerwindow.cpp \
+    helpers/selectionscene.cpp \
+    helpers/selectionsceneitem.cpp \
+    helpers/chinfomodel.cpp
 
 HEADERS += \
     xdisp_global.h \
@@ -126,11 +133,11 @@ HEADERS += \
     realtimesamplearraywidget.h \
     helpers/realtimemultisamplearraymodel.h \
     helpers/realtimemultisamplearraydelegate.h \
-    helpers/sensorgroup.h \
-    helpers/sensoritem.h \
-    helpers/sensorlayout.h \
-    helpers/sensormodel.h \
-    helpers/sensorwidget.h \
+#    helpers/sensorgroup.h \
+#    helpers/sensoritem.h \
+#    helpers/sensorlayout.h \
+#    helpers/sensormodel.h \
+#    helpers/sensorwidget.h \
     helpers/realtimeevokedmodel.h \
     realtimeevokedwidget.h \
     helpers/realtimebutterflyplot.h \
@@ -142,10 +149,16 @@ HEADERS += \
     helpers/evokedmodalitywidget.h \
     helpers/frequencyspectrumsettingswidget.h \
     helpers/realtimemultisamplearrayscalingwidget.h \
-    helpers/projectorwidget.h
+    helpers/projectorwidget.h \
+    helpers/layoutscene.h \
+    helpers/selectionmanagerwindow.h \
+    helpers/selectionscene.h \
+    helpers/selectionsceneitem.h \
+    helpers/chinfomodel.h
 
 FORMS += \
-    realtimesamplearraywidget.ui
+    realtimesamplearraywidget.ui \
+    helpers/selectionmanagerwindow.ui
 
 qtHaveModule(3d) {
     SOURCES += realtimesourceestimatewidget.cpp
