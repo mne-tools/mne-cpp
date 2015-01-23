@@ -99,7 +99,7 @@ QList<QList<GaborAtom> > AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 ma
     }
     std::cout << "absolute energy of signal: " << residuum_energy << "\n";
 
-    while(it < max_iterations && (energy_threshold/*[signal_channel]*/ < residuum_energy/*[signal_channel]*/ ))
+    while(it < max_iterations && (energy_threshold < residuum_energy) && sample_count > 1)
     {
         channel_count = channel_count * (boost / 100.0); //reducing the number of observed channels in the algorithm to increase speed performance
         if(boost == 0 || channel_count == 0)
@@ -215,6 +215,8 @@ QList<QList<GaborAtom> > AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 ma
         //iteration for multichannel, depending on boost setting
         for(qint32 chn = 0; chn < channel_count; chn++)
         {
+            k = 0;
+
             while(k < sample_count / 2)
             {
                 VectorXd parameters_no_envelope = calculate_atom(sample_count, s, p, k, chn, residuum, RETURNPARAMETERS, fix_phase);
@@ -278,14 +280,19 @@ QList<QList<GaborAtom> > AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 ma
             {
                 *gabor_Atom = atoms_in_chns.at(chn);
                 gabor_Atom->energy = 0;
-                best_match = gabor_Atom->create_real(gabor_Atom->sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, gabor_Atom->phase);
+                best_match = gabor_Atom->create_real(gabor_Atom->sample_count, gabor_Atom->scale, gabor_Atom->translation,
+                                                     gabor_Atom->modulation, gabor_Atom->phase);
             }
             else
             {
-                VectorXd channel_params = calculate_atom(sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, chn, residuum, RETURNPARAMETERS, fix_phase);
+                VectorXd channel_params = calculate_atom(sample_count, gabor_Atom->scale, gabor_Atom->translation,
+                                                         gabor_Atom->modulation, chn, residuum, RETURNPARAMETERS, fix_phase);
                 gabor_Atom->phase_list.append(channel_params[3]);
+
                 gabor_Atom->max_scalar_list.append(channel_params[4]);
-                best_match = gabor_Atom->create_real(gabor_Atom->sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, gabor_Atom->phase_list.at(chn));
+
+                best_match = gabor_Atom->create_real(gabor_Atom->sample_count, gabor_Atom->scale, gabor_Atom->translation,
+                                                     gabor_Atom->modulation, gabor_Atom->phase_list.at(chn));
             }
 
             //substract best matching Atom from Residuum in each channel
