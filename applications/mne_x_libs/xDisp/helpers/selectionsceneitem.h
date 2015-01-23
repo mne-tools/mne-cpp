@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     evokedmodalitywidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     selectionsceneitem.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     May, 2014
+* @date     September, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,18 +30,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the EvokedModalityWidget Class.
+* @brief    Contains the declaration of the SelectionSceneItem class.
 *
 */
 
-#ifndef EVOKEDMODALITYWIDGET_H
-#define EVOKEDMODALITYWIDGET_H
+#ifndef SELECTIONSCENEITEM_H
+#define SELECTIONSCENEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -48,10 +50,12 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QCheckBox>
-#include <QStringList>
-#include <QLineEdit>
+#include <QGraphicsItem>
+#include <QString>
+#include <QColor>
+#include <QPainter>
+#include <QStaticText>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -65,53 +69,47 @@ namespace XDISPLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
 //=============================================================================================================
-
-class RealTimeEvokedWidget;
-struct Modality;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EvokedModalityWidget
+* SelectionSceneItem...
 *
-* @brief The EvokedModalityWidget class provides the sensor selection widget
+* @brief The SelectionSceneItem class provides a new data structure for visualizing channels in a 2D layout.
 */
-class EvokedModalityWidget : public QWidget
+class SelectionSceneItem : public QGraphicsItem
 {
-    Q_OBJECT
+
 public:
+    //=========================================================================================================
+    /**
+    * Constructs a SelectionSceneItem.
+    */
+    SelectionSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor averageColor = Qt::blue);
 
     //=========================================================================================================
     /**
-    * Constructs a EvokedModalityWidget which is a child of parent evoked widget.
-    *
-    * @param [in] toolbox   connected real-time evoked widget
+    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
     */
-    EvokedModalityWidget(QWidget *parent, RealTimeEvokedWidget *toolbox);
+    QRectF boundingRect() const;
 
     //=========================================================================================================
     /**
-    * Destroys the EvokedModalityWidget.
-    * All EvokedModalityWidget's children are deleted first. The application exits if EvokedModalityWidget is the main widget.
+    * Reimplemented paint function.
     */
-    ~EvokedModalityWidget();
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    void updateCheckbox(qint32 state);
-
-    void updateLineEdit(const QString & text);
-
-signals:
-    void settingsChanged();
-
-private:
-    RealTimeEvokedWidget * m_pRealTimeEvokedWidget; /**< Connected real-time evoked widget */
-
-    QList<QCheckBox*>   m_qListModalityCheckBox;    /**< List of modality checkboxes */
-    QList<QLineEdit*>   m_qListModalityLineEdit;    /**< List of modality scalings */
+    QString     m_sChannelName;             /**< The channel's name.*/
+    int         m_iChannelNumber;           /**< The channel number.*/
+    int         m_iChannelKind;             /**< The channel kind.*/
+    int         m_iChannelUnit;             /**< The channel unit.*/
+    QPointF     m_qpChannelPosition;        /**< The channel's 2D position in the scene.*/
+    QColor      m_cChannelColor;            /**< The current channel color.*/
+    bool        m_bHighlightItem;           /**< Whether this item is to be highlighted.*/
 };
 
-} // NAMESPACE
+} // NAMESPACE MNEBrowseRawQt
 
-#endif // EVOKEDMODALITYWIDGET_H
+#endif // SELECTIONSCENEITEM_H

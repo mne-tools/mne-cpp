@@ -613,16 +613,9 @@ void DataWindow::updateMarkerPosition()
 void DataWindow::highlightChannelsInSelectionManager()
 {
     if(m_pMainWindow->m_pSelectionManagerWindow->isVisible()) {
-        QStringList currentSelectedChannelNames;
-
         QModelIndexList selectedIndexes = ui->m_tableView_rawTableView->selectionModel()->selectedIndexes();
 
-        for(int i = 0; i<selectedIndexes.size(); i++) {
-            QModelIndex index = m_pRawModel->index(selectedIndexes.at(i).row(), 0);
-            currentSelectedChannelNames << m_pRawModel->data(index).toString();
-        }
-
-        m_pMainWindow->m_pSelectionManagerWindow->highlightChannels(currentSelectedChannelNames);
+        m_pMainWindow->m_pSelectionManagerWindow->highlightChannels(selectedIndexes);
     }
 }
 
