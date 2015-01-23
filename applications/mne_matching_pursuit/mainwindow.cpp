@@ -77,6 +77,7 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 bool _new_paint;
+bool _has_file;
 
 fiff_int_t _from;
 fiff_int_t _to;
@@ -201,10 +202,12 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     last_open_path = settings.value("last_open_path", QDir::homePath()+ "/" + "Matching-Pursuit-Toolbox").toString();
     last_save_path = settings.value("last_save_path", QDir::homePath()+ "/" + "Matching-Pursuit-Toolbox").toString();
 
+    //infolabel is invisible
     if(!settings.value("show_infos", true).toBool())
     {
         ui->lb_info_content->setHidden(true);
         ui->lb_info->setHidden(true);
+        ui->lb_figure_of_merit->setHidden(true);
     }
 }
 
@@ -230,7 +233,6 @@ MainWindow::~MainWindow()
 
     delete this->cb_model;
     delete ui;
-
 }
 
 //*************************************************************************************************************************************
@@ -327,7 +329,7 @@ void MainWindow::open_file()
     if (!file.open(QIODevice::ReadOnly))
     {
         QMessageBox::warning(this, tr("Error"),
-        tr("error: disable to open signal file."));
+        tr("error: unable to open signal file."));
         this->setWindowTitle("Matching-Pursuit-Toolbox");
         return;
     }
@@ -420,6 +422,7 @@ void MainWindow::open_file()
     has_warning = false;
 
     _new_paint = true;
+    _has_file = true;
     update();
 }
 
@@ -721,6 +724,28 @@ bool MainWindow::read_matlab_file(QString fileName)
             {
                 _signal_matrix = MatrixXd::Zero(0, 0);
                 QMessageBox::critical(this, "error", QString("error reading matlab file. Could not read line %1 from file %2.").arg(i).arg(fileName));
+                //reset ui
+                ui->tbv_Results->clear();
+                ui->tbv_Results->clearContents();
+                ui->tbv_Results->setRowCount(0);
+                ui->tbv_Results->setColumnCount(0);
+                ui->btt_Calc->setDisabled(true);
+                //reset progressbar text color to black
+                pal.setColor(QPalette::Text, Qt::black);
+                ui->progressBarCalc->setPalette(pal);
+                ui->progressBarCalc->setFormat("residual energy: 100%            iterations: 0");
+                //reset infolabels
+                ui->lb_signal_energy->setHidden(true);
+                ui->lb_signal_energy_text->setHidden(true);
+                ui->lb_approx_energy->setHidden(true);
+                ui->lb_approx_energy_text->setHidden(true);
+                ui->lb_residual_energy->setHidden(true);
+                ui->lb_residual_energy_text->setHidden(true);
+
+                is_white = false;
+
+                is_saved = false;
+                has_warning = false;
                 return false;
             }
             _signal_matrix(row_number, k) = value;
@@ -1322,10 +1347,18 @@ void MainWindow::on_btt_Calc_clicked()
         _adaptive_atom_list.clear();
         _fix_dict_atom_list.clear();
 
-        //reset progressbar text color to black
+        //reset progressbar text color to black, reset infos
         pal.setColor(QPalette::Text, Qt::black);
         ui->progressBarCalc->setPalette(pal);
         ui->progressBarCalc->setFormat("residual energy: 100%            iterations: 0");
+
+        ui->lb_signal_energy->setHidden(true);
+        ui->lb_signal_energy_text->setHidden(true);
+        ui->lb_approx_energy->setHidden(true);
+        ui->lb_approx_energy_text->setHidden(true);
+        ui->lb_residual_energy->setHidden(true);
+        ui->lb_residual_energy_text->setHidden(true);
+
         is_white = false;
 
         is_saved = false;
@@ -1402,6 +1435,7 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
     if(fix_dict_atom_res_list.isEmpty())
     {
         GaborAtom temp_atom = adaptive_atom_res_list.last().last();
+        QList<GaborAtom> temp_channel_list= adaptive_atom_res_list.last();
         qreal atom_energy = 0;
 
         for(qint32 i = 0; i < adaptive_atom_res_list.last().length(); i++)
@@ -1466,11 +1500,11 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         {
             if(settings.value("trial_separation", false).toBool())
             {
-                VectorXd atom_vec = adaptive_atom_res_list.last().at(i).max_scalar_product * temp_atom.create_real(adaptive_atom_res_list.last().at(i).sample_count,
-                                                                                                                   adaptive_atom_res_list.last().at(i).scale,
-                                                                                                                   adaptive_atom_res_list.last().at(i).translation,
-                                                                                                                   adaptive_atom_res_list.last().at(i).modulation,
-                                                                                                                   adaptive_atom_res_list.last().at(i).phase);
+                VectorXd atom_vec = temp_channel_list.at(i).max_scalar_product * temp_atom.create_real(temp_channel_list.at(i).sample_count,
+                                                                                                                   temp_channel_list.at(i).scale,
+                                                                                                                   temp_channel_list.at(i).translation,
+                                                                                                                   temp_channel_list.at(i).modulation,
+                                                                                                                   temp_channel_list.at(i).phase);
                 _residuum_matrix.col(i) -= atom_vec;
                 _atom_sum_matrix.col(i) += atom_vec;
                 //_residuum_matrix = residuum;
@@ -1681,8 +1715,8 @@ void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelI
                     {
                         _atom_sum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
                         _residuum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
-                        composed_energy += 100 * atom.energy / signal_energy;
                     }
+                    composed_energy += 100 * atom.energy / signal_energy;
                 }
                 else
                 {
@@ -1690,8 +1724,8 @@ void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelI
                     {
                         _atom_sum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
                         _residuum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
-                        composed_energy -= 100 * atom.energy / signal_energy;
                     }
+                    composed_energy -= 100 * atom.energy / signal_energy;
                 }
             }
             else    //trial separation
@@ -1820,6 +1854,7 @@ void MainWindow::calc_thread_finished()
     ui->tbv_Results->setItem(ui->tbv_Results->rowCount() - 1, 1, residuum_item);
     ui->tbv_Results->setSpan(ui->tbv_Results->rowCount() - 1, 1, 1, 4);
 
+    //calc energy infos
     composed_energy = 100 - residuum_energy;
     ui->lb_signal_energy_text->setText("absolute signal energy:");
     ui->lb_signal_energy->setText(QString::number(signal_energy, 'g', 2));
@@ -1827,28 +1862,39 @@ void MainWindow::calc_thread_finished()
     ui->lb_approx_energy->setText(QString::number(abs(composed_energy), 'f', 2) + "%");
     ui->lb_residual_energy_text->setText("remaining residual energy:");
     ui->lb_residual_energy->setText(QString::number(abs(100 - composed_energy), 'f', 2) + "%");
+    //show energy infos
+    ui->lb_signal_energy->setHidden(false);
+    ui->lb_signal_energy_text->setHidden(false);
+    ui->lb_approx_energy->setHidden(false);
+    ui->lb_approx_energy_text->setHidden(false);
+    ui->lb_residual_energy->setHidden(false);
+    ui->lb_residual_energy_text->setHidden(false);
 
     //figure of merit to evaluate the alogorithm, here we use correlation between signal and atom_sum_matrix
-    qreal correlation = 0;
-    qreal divisor_sig = 0;
-    qreal divisor_app = 0;
-    MatrixXd sig_no_mean = (_signal_matrix.array() - _signal_matrix.mean()).matrix();
-    MatrixXd app_no_mean = (_atom_sum_matrix.array() - _atom_sum_matrix.mean()).matrix();
-    for(qint32 channel = 0; channel < _atom_sum_matrix.cols(); channel++)
+    QSettings settings;
+    if(settings.value("show_infos", true).toBool())
     {
-        correlation += sig_no_mean.col(channel).dot(app_no_mean.col(channel));
-        divisor_sig += sig_no_mean.col(channel).dot(sig_no_mean.col(channel));
-        divisor_app += app_no_mean.col(channel).dot(app_no_mean.col(channel));
-    }
+        qreal correlation = 0;
+        qreal divisor_sig = 0;
+        qreal divisor_app = 0;
+        MatrixXd sig_no_mean = (_signal_matrix.array() - _signal_matrix.mean()).matrix();
+        MatrixXd app_no_mean = (_atom_sum_matrix.array() - _atom_sum_matrix.mean()).matrix();
+        for(qint32 channel = 0; channel < _atom_sum_matrix.cols(); channel++)
+        {
+            correlation += sig_no_mean.col(channel).dot(app_no_mean.col(channel));
+            divisor_sig += sig_no_mean.col(channel).dot(sig_no_mean.col(channel));
+            divisor_app += app_no_mean.col(channel).dot(app_no_mean.col(channel));
+        }
 
-    qreal divisor = sqrt(divisor_app * divisor_sig);
-    correlation /= divisor;
-    correlation *= 1000;
-    qint32 corr = correlation;
-    correlation = qreal(corr) / 1000;
-    cout << "\ncorrelation:  "<<correlation;
-    ui->lb_figure_of_merit->setText(QString("FOM: %1").arg((QString::number(correlation, 'f', 3))));
-    ui->lb_figure_of_merit->setHidden(false);
+        qreal divisor = sqrt(divisor_app * divisor_sig);
+        correlation /= divisor;
+        correlation *= 1000;
+        qint32 corr = correlation;
+        correlation = qreal(corr) / 1000;
+        cout << "\ncorrelation:  "<<correlation;
+        ui->lb_figure_of_merit->setText(QString("FOM: %1").arg((QString::number(correlation, 'f', 3))));
+        ui->lb_figure_of_merit->setHidden(false);
+    }
 
     tbv_is_loading = false;
 
@@ -2435,9 +2481,11 @@ void MainWindow::save_fif_file()
     connect(this, SIGNAL(to_save(QString, QString, fiff_int_t, fiff_int_t, MatrixXd, MatrixXd, select_map, RowVectorXi, source_file_type )),
             save_Fif, SLOT(save_fif_file(QString, QString, fiff_int_t, fiff_int_t, MatrixXd, MatrixXd, select_map, RowVectorXi, source_file_type )));
     connect(save_Fif, SIGNAL(save_progress(qint32, qint32)), this, SLOT(recieve_save_progress(qint32, qint32)));
+    connect(this, SIGNAL(kill_save_thread()), save_thread, SLOT(quit()));
+    connect(this, SIGNAL(kill_save_thread()), save_Fif, SLOT(deleteLater()));
+    //connect(save_thread, SIGNAL(finished()), save_Fif, SLOT(deleteLater()));
     connect(save_thread, SIGNAL(finished()), save_thread, SLOT(deleteLater()));
-    connect(save_Fif, SIGNAL(finished()), save_Fif, SLOT(quit()));
-    connect(save_Fif, SIGNAL(finished()), save_Fif, SLOT(deleteLater()));
+    connect(save_Fif, SIGNAL(finished()), save_thread, SLOT(deleteLater()));
 
     is_saved = true;
     ui->lb_timer->setHidden(true);
@@ -2456,7 +2504,7 @@ void MainWindow::save_fif_file()
     ui->actionSpeicher->setEnabled(false);
     ui->actionSpeicher_unter->setEnabled(false);
 
-    emit to_save(file_name, save_path, _from, _to, _atom_sum_matrix, original_signal_matrix, select_channel_map, picks, file_type);
+    emit to_save(file_name, save_path, _from, _to, _atom_sum_matrix, reference_matrix, select_channel_map, picks, file_type);
     save_thread->start();
 }
 
@@ -2478,15 +2526,18 @@ void MainWindow::recieve_save_progress(qint32 current_progress, qint32 finished)
     {
         QMessageBox::warning(this, "Error", "error: no success on save.");
         ui->progress_bar_save->setHidden(true);
+        emit kill_save_thread();
     }
     else if(finished == 4) // save .txt instead of ave.fif as long as mne-cpp do not serve that function
-        QMessageBox::warning(this, "Error", "error: unable to save -ave.fif files\nSignal data saved to:\n"  + save_path + ".txt");
+        QMessageBox::warning(this, "Error", "error: unable to save -ave.fif files\nDecomposition data saved to:\n"  + save_path + ".txt");
 
     else    //save is successfully finished
     {
         ui->progress_bar_save->setHidden(true);        
         ui->actionSpeicher->setEnabled(true);
         ui->actionSpeicher_unter->setEnabled(true);
+
+        emit kill_save_thread();
     }
 }
 //*****************************************************************************************************************
@@ -2610,6 +2661,7 @@ void SaveFifFile::save_fif_file(QString source_path, QString save_path, fiff_int
 
         case AVE: // if(source_path.contains("-ave.", Qt::CaseInsensitive))
         {
+        std::cout << "thread\n";
             //temporary ToDo: revert this temp if saving AVE is possible in MNE-CPP
             emit save_progress(0, 4);
 
@@ -2618,23 +2670,29 @@ void SaveFifFile::save_fif_file(QString source_path, QString save_path, fiff_int
             if (t_fileOut.open(QFile::WriteOnly | QFile::Truncate))
             {
                 QTextStream matlab_stream(&t_fileOut);
-
-                for(qint32 k = 0; k < original_signal.cols(); k++)
+                qint32 channel_index = 0;
+                for(qint32 channel = 0; channel < original_signal.cols(); channel++)
                 {
-                    if(select_channel_map[k])//changes in this channels
+                    qint32 sample_index = 0;
+                    if(select_channel_map[channel])//changes in this channels
                     {
-                        for(qint32 sample = 0; sample < _atom_sum_matrix.rows(); sample++)
-                            matlab_stream << QString::number(_atom_sum_matrix(sample, k)) << ",";
-
+                        for(qint32 sample = 0; sample < original_signal.rows(); sample++)
+                            if(sample >= start_change && sample < end_change)
+                            {
+                                matlab_stream << QString::number(changes(sample_index, channel_index)) << ",";
+                                sample_index++;
+                            }
+                            else  matlab_stream << QString::number(original_signal(sample, channel)) << ",";
                         matlab_stream<< "\n";
-                    }
+                        channel_index++;
+                    }                            
                     else //no changes in this channel, just save original channel
                     {
-                        for(qint32 i = 0; i < _atom_sum_matrix.rows(); i++)
-                            matlab_stream << QString::number(original_signal(i, k)) << ",";
+                        for(qint32 sample = 0; sample < original_signal.rows(); sample++)
+                            matlab_stream << QString::number(original_signal(sample, channel)) << ",";
                         matlab_stream<< "\n";
                     }
-                    emit save_progress((k + 1) * (original_signal.rows() /original_signal.cols()), 0);
+                    emit save_progress((channel + 1) * (original_signal.rows() /original_signal.cols()), 0);
                 }
             }
             emit save_progress(original_signal.rows(), true);
@@ -2649,26 +2707,28 @@ void SaveFifFile::save_fif_file(QString source_path, QString save_path, fiff_int
             {
                 QTextStream matlab_stream(&t_fileOut);
 
-                for(qint32 k = 0; k < _matlab_channels.length(); k++)
+                qint32 index = 0;
+                for(qint32 channel = 0; channel < _matlab_channels.length(); channel++)
                 {
-                    if(select_channel_map[k])//changes in this channels
+                    if(select_channel_map[channel])//changes in this channels
                     {
-                        QStringList signal_samples = _matlab_channels.at(k).split(',', QString::SkipEmptyParts);
-                        for(qint32 i = start_change; i <= end_change; i++)
+                        QStringList signal_samples = _matlab_channels.at(channel).split(',', QString::SkipEmptyParts);
+                        for(qint32 sample = start_change; sample <= end_change; sample++)
                         {
-                            signal_samples.replace(i, QString::number(changes(i, k)));//ToDo: ready
+                            signal_samples.replace(sample, QString::number(changes(sample - start_change, index)));//ToDo: ready
                         }
-                        for(qint32 j = 0; j < signal_samples.length(); j++)
-                            matlab_stream << signal_samples.at(j) << ",";
-                        matlab_stream<< "\n";
+                        for(qint32 sample = 0; sample < signal_samples.length() - 1; sample++)
+                            matlab_stream << signal_samples.at(sample) << ",";
+                        matlab_stream << signal_samples.last();
+                        matlab_stream << "\n";   //next channel
+                        index++;
                     }
                     else //no changes in this channel, just save original channel
                     {
-                        for(qint32 i = 0; i < _matlab_channels.at(k).split(',', QString::SkipEmptyParts).length(); i++)
-                            matlab_stream << _matlab_channels.at(k).split(',', QString::SkipEmptyParts).at(i) << ",";
-                        matlab_stream<< "\n";
+                        matlab_stream << _matlab_channels.at(channel);
+                        matlab_stream << "\n";   //next channel
                     }
-                    emit save_progress((k + 1) * (_matlab_channels.at(0).split(',', QString::SkipEmptyParts).length() /_matlab_channels.length()), 0);
+                    emit save_progress((channel + 1) * (_matlab_channels.at(0).split(',', QString::SkipEmptyParts).length() /_matlab_channels.length()), 0);
                 }
             }
             emit save_progress(_matlab_channels.at(0).split(',', QString::SkipEmptyParts).length(), true);
@@ -2928,6 +2988,8 @@ void MainWindow::on_rb_adativMp_clicked()
 {
     ui->cb_Dicts->setEnabled(false);
     ui->lb_info_content->clear();
+    if(_has_file)
+        ui->btt_Calc->setEnabled(true);
     //ui->lb_info_content->repaint();
     has_warning = false;
 }
@@ -3156,4 +3218,8 @@ void MainWindow::on_mouse_button_release()
 void MainWindow::on_rb_OwnDictionary_clicked()
 {
     ui->cb_Dicts->setEnabled(true);
+    if(ui->cb_Dicts->itemText(0) == "")
+        ui->btt_Calc->setEnabled(false);
+    else if(_has_file)
+        ui->btt_Calc->setEnabled(true);
 }

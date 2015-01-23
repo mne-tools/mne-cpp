@@ -562,6 +562,7 @@ signals:
                     qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction, bool trial_separation);
     void send_input_fix_dict(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, qint32 boost, QString path, qreal delta);
     void to_save(QString source_path, QString save_path, fiff_int_t start_change, fiff_int_t end_change, MatrixXd changes, MatrixXd original_signal, select_map select_channel_map, RowVectorXi picks, source_file_type file_type);
+    void kill_save_thread();
 
 private:
 
@@ -983,6 +984,7 @@ private slots:
 
 signals:
     void save_progress(qint32 current_progress, qint32 finished);
+
 };
 
 //*************************************************************************************************************

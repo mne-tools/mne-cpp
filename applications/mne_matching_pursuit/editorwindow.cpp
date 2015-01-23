@@ -1778,6 +1778,7 @@ void EditorWindow::animation_finished()
 }
 void EditorWindow::resizeEvent(QResizeEvent *event)
 {
+    Q_UNUSED(event)
     if(!is_expanded)
         old_width = this->size().width();
 
