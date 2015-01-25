@@ -599,10 +599,12 @@ int main(int argc, char *argv[])
     // Cluster forward solution;
     //
     MatrixXd D;
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20, D, noise_cov, evoked.info);
 
-    t_clusteredFwd.src[0].cluster_info.write("ClusterInfoLH.txt");
-    t_clusteredFwd.src[1].cluster_info.write("ClusterInfoRH.txt");
+    MNEForwardSolution t_clusteredFwdEc = t_Fwd.cluster_forward_solution(t_annotationSet, 20, D, noise_cov, evoked.info, "sqeuclidean");//, "cityblock");
+
+
+    t_clusteredFwdEc.src[0].cluster_info.write("ClusterInfoLH.txt");
+    t_clusteredFwdEc.src[1].cluster_info.write("ClusterInfoRH.txt");
 
 //    std::cout << "D " << D.rows() << " x " << D.cols() << std::endl;
 
@@ -627,7 +629,7 @@ int main(int argc, char *argv[])
         return 1;
 
     MatrixXd D_selected;
-    MNEForwardSolution t_selectedFwd = t_selectedRawFwd.reduce_forward_solution(t_clusteredFwd.isFixedOrient() ? t_clusteredFwd.sol->data.cols() : t_clusteredFwd.sol->data.cols()/3, D_selected);
+    MNEForwardSolution t_selectedFwd = t_selectedRawFwd.reduce_forward_solution(t_clusteredFwdEc.isFixedOrient() ? t_clusteredFwdEc.sol->data.cols() : t_clusteredFwdEc.sol->data.cols()/3, D_selected);
 
 //    qDebug() << "#### t_selectedFwd" << t_selectedFwd.sol->data.rows() << "x" << t_selectedFwd.sol->data.cols();
 
@@ -635,7 +637,7 @@ int main(int argc, char *argv[])
 
 //    qDebug() << "#### [1] ####";
 
-    MNEInverseOperator inverse_operator_clustered(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
+    MNEInverseOperator inverse_operator_clustered(info, t_clusteredFwdEc, noise_cov, 0.2f, 0.8f);
 
 //    qDebug() << "#### [2] ####";
 
@@ -710,7 +712,7 @@ int main(int argc, char *argv[])
     //////////////// L2 calculations
 
     MatrixXd D_MT;
-    MatrixXd MT_clustered = minimumNorm.getPreparedInverseOperator().cluster_kernel(t_annotationSet, 20, D_MT);
+    MatrixXd MT_clustered_ec = minimumNorm.getPreparedInverseOperator().cluster_kernel(t_annotationSet, 20, D_MT, "sqeuclidean");//, "cityblock");
 
 
     // #### R calculation ####
@@ -760,11 +762,11 @@ int main(int argc, char *argv[])
     std::ofstream ofs_R_clustered(sRClusteredEc.toUtf8().constData(), std::ofstream::out);//, std::ofstream::out);
     if (ofs_R_clustered.is_open())
     {
-        printf("writing to %s\n",sRClusteredEc.toUtf8().constData());
+        printf("writing to %s\n", sRClusteredEc.toUtf8().constData());
         ofs_R_clustered << R_clustered << '\n';
     }
     else
-        printf("Not writing to %s\n",sRClusteredEc.toUtf8().constData());
+        printf("Not writing to %s\n", sRClusteredEc.toUtf8().constData());
     ofs_R_clustered.close();
 
     M_clusterd.resize(0,0);
@@ -785,7 +787,7 @@ int main(int argc, char *argv[])
 
     //option c)
     printf("[5]\n");
-    MatrixXd R_MT_clustered = MT_clustered.transpose() * t_FwdFixed.sol->data;
+    MatrixXd R_MT_clustered = MT_clustered_ec.transpose() * t_FwdFixed.sol->data;
 
     QString sRMTClustEc = sTargetDir + sTargetPrefix + QString("R_MT_clustered_ec.txt");
     std::ofstream ofs_R_MT_clustered(sRMTClustEc.toUtf8().constData(), std::ofstream::out);
@@ -926,15 +928,15 @@ int main(int argc, char *argv[])
     VectorXd s;
 
     double t_dConditionNumber = MNEMath::getConditionNumber(t_Fwd.sol->data, s);
-    double t_dConditionNumberClustered = MNEMath::getConditionNumber(t_clusteredFwd.sol->data, s);
+    double t_dConditionNumberClusteredEc = MNEMath::getConditionNumber(t_clusteredFwdEc.sol->data, s);
 
 
     std::cout << "Condition Number:\n" << t_dConditionNumber << std::endl;
-    std::cout << "Clustered Condition Number:\n" << t_dConditionNumberClustered << std::endl;
+    std::cout << "Clustered Ec Condition Number:\n" << t_dConditionNumberClusteredEc << std::endl;
 
     std::cout << "ForwardSolution" << t_Fwd.sol->data.block(0,0,10,10) << std::endl;
 
-    std::cout << "Clustered ForwardSolution" << t_clusteredFwd.sol->data.block(0,0,10,10) << std::endl;
+    std::cout << "Clustered ForwardSolution" << t_clusteredFwdEc.sol->data.block(0,0,10,10) << std::endl;
 
 
 //    double t_dConditionNumberMags = MNEMath::getConditionNumber(mags, s);
