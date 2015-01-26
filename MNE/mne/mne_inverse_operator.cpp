@@ -327,8 +327,10 @@ bool MNEInverseOperator::check_ch_names(const FiffInfo &info) const
 
 //*************************************************************************************************************
 
-MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D) const
+MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D, QString p_sMethod) const
 {
+    printf("Cluster kernel using %s.\n", p_sMethod.toUtf8().constData());
+
     MatrixXd p_outMT = this->m_K.transpose();
 
     QList<MNEClusterInfo> t_qListMNEClusterInfo;
@@ -459,6 +461,8 @@ MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet
                     for(qint32 j = 0; j < nSens; ++j)
                         for(qint32 k = 0; k < t_sensMT.matRoiMT.rows(); ++k)
                             t_sensMT.matRoiMT.block(k,j*3,1,3) = t_MT.block(j,k*3,1,3);
+
+                    t_sensMT.sDistMeasure = p_sMethod;
 
                     m_qListRegionMTIn.append(t_sensMT);
 
