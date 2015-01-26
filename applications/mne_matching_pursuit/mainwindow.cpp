@@ -342,10 +342,13 @@ void MainWindow::open_file()
     _from = -1;
     if(file_name.endsWith(".fif", Qt::CaseInsensitive))
     {
+        _has_file = true;
+
         if(!read_fiff_ave(file_name))
             if(!read_fiff_file(file_name))
             {
                 this->setWindowTitle("Matching-Pursuit-Toolbox");
+                _has_file = false;
                 return;
             }
 
@@ -353,10 +356,12 @@ void MainWindow::open_file()
     }
     else
     {
+        _has_file = true;
 
         if(!read_matlab_file(file_name))
         {
             this->setWindowTitle("Matching-Pursuit-Toolbox");
+            _has_file = false;
             return;
         }
 
@@ -422,7 +427,7 @@ void MainWindow::open_file()
     has_warning = false;
 
     _new_paint = true;
-    _has_file = true;
+
     update();
 }
 
@@ -842,6 +847,13 @@ void MainWindow::fill_dict_combobox()
     ui->cb_Dicts->clear();
     for(int i = 0; i < fileList.length(); i++)
         ui->cb_Dicts->addItem(QIcon(":/images/icons/DictIcon.png"), fileList.at(i).baseName());
+
+    //dis-/enable button calc, if dicts are existing
+    if(ui->cb_Dicts->itemText(0) == "" && ui->rb_OwnDictionary->isChecked())
+        ui->btt_Calc->setEnabled(false);
+    else if(_has_file && ui->rb_OwnDictionary->isChecked())
+        ui->btt_Calc->setEnabled(true);
+
 }
 
 //*************************************************************************************************************************************
