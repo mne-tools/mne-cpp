@@ -131,11 +131,11 @@ QVariant ChInfoModel::headerData(int section, Qt::Orientation orientation, int r
                         break;
 
                     case 7:
-                        return QString("%1").arg("Position");
+                        return QString("%1").arg("2D loc (cm)");
                         break;
 
                     case 8:
-                        return QString("%1").arg("Digitizer (cm)");
+                        return QString("%1").arg("3D loc (cm)");
                         break;
 
                     case 9:
@@ -260,6 +260,14 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
                     v.setValue(QString("MEG_grad"));
                 else if(unit == FIFF_UNIT_T)
                     v.setValue(QString("MEG_mag"));
+            }
+
+            if(m_fiffInfo.chs.at(index.row()).kind == FIFFV_REF_MEG_CH) {
+                qint32 unit = m_fiffInfo.chs.at(index.row()).unit;
+                if(unit == FIFF_UNIT_T_M)
+                    v.setValue(QString("MEG_grad_ref"));
+                else if(unit == FIFF_UNIT_T)
+                    v.setValue(QString("MEG_mag_ref"));
             }
 
             switch(role) {
@@ -540,6 +548,17 @@ void ChInfoModel::mapLayoutToChannels()
 
         switch(chInfo.kind) {
             case FIFFV_MEG_CH:
+                //Scan for MEG string and other characters
+                regExpRemove = QRegExp("(MEG|-|_|/|\| )");
+                chName.remove(regExpRemove);
+
+                //After cleaning the string try to convert the residual to an int number
+                flagOk = false;
+                m_mappedLayoutChNames.replace(i, QString("%1 %2").arg("MEG").arg(chName));
+
+                break;
+
+            case FIFFV_REF_MEG_CH:
                 //Scan for MEG string and other characters
                 regExpRemove = QRegExp("(MEG|-|_|/|\| )");
                 chName.remove(regExpRemove);
