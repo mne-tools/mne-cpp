@@ -18,10 +18,11 @@ var searchData=
   ['bcifeaturewindowclass',['BCIFeatureWindowClass',['../class_ui_1_1_b_c_i_feature_window_class.html',1,'Ui']]],
   ['bcisetupclass',['BCISetupClass',['../class_ui_1_1_b_c_i_setup_class.html',1,'Ui']]],
   ['bcisetupwidget',['BCISetupWidget',['../class_b_c_i_plugin_1_1_b_c_i_setup_widget.html',1,'BCIPlugin']]],
-  ['brainmonitor',['BrainMonitor',['../class_brain_monitor_plugin_1_1_brain_monitor.html',1,'BrainMonitorPlugin']]],
-  ['brainmonitoraboutwidget',['BrainMonitorAboutWidget',['../class_brain_monitor_plugin_1_1_brain_monitor_about_widget.html',1,'BrainMonitorPlugin']]],
-  ['brainmonitorrunwidget',['BrainMonitorRunWidget',['../class_brain_monitor_plugin_1_1_brain_monitor_run_widget.html',1,'BrainMonitorPlugin']]],
-  ['brainmonitorsetupwidget',['BrainMonitorSetupWidget',['../class_brain_monitor_plugin_1_1_brain_monitor_setup_widget.html',1,'BrainMonitorPlugin']]],
+  ['brainmonitoraboutwidgetclass',['BrainMonitorAboutWidgetClass',['../class_ui_1_1_brain_monitor_about_widget_class.html',1,'Ui']]],
+  ['brainmonitorrunwidgetclass',['BrainMonitorRunWidgetClass',['../class_ui_1_1_brain_monitor_run_widget_class.html',1,'Ui']]],
+  ['brainmonitorsetupwidgetclass',['BrainMonitorSetupWidgetClass',['../class_ui_1_1_brain_monitor_setup_widget_class.html',1,'Ui']]],
   ['brainview',['BrainView',['../class_d_i_s_p3_d_l_i_b_1_1_brain_view.html',1,'DISP3DLIB']]],
-  ['buffer',['Buffer',['../class_i_o_buffer_1_1_buffer.html',1,'IOBuffer']]]
+  ['buffer',['Buffer',['../class_i_o_buffer_1_1_buffer.html',1,'IOBuffer']]],
+  ['butterflyscene',['ButterflyScene',['../class_m_n_e_browse_raw_qt_1_1_butterfly_scene.html',1,'MNEBrowseRawQt']]],
+  ['butterflysceneitem',['ButterflySceneItem',['../class_m_n_e_browse_raw_qt_1_1_butterfly_scene_item.html',1,'MNEBrowseRawQt']]]
 ];
