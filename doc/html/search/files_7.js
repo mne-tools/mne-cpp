@@ -5,6 +5,7 @@ var searchData=
   ['iio_2eh',['IIO.h',['../_i_i_o_8h.html',1,'']]],
   ['imagesc_2ecpp',['imagesc.cpp',['../imagesc_8cpp.html',1,'']]],
   ['imagesc_2eh',['imagesc.h',['../imagesc_8h.html',1,'']]],
+  ['informationwindow_2eh',['informationwindow.h',['../informationwindow_8h.html',1,'']]],
   ['inverse_5fglobal_2eh',['inverse_global.h',['../inverse__global_8h.html',1,'']]],
   ['inverseview_2ecpp',['inverseview.cpp',['../inverseview_8cpp.html',1,'']]],
   ['inverseview_2eh',['inverseview.h',['../inverseview_8h.html',1,'']]],

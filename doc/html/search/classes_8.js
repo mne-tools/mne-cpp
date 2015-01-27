@@ -1,11 +1,14 @@
 var searchData=
 [
   ['ialgorithm',['IAlgorithm',['../class_m_n_e_x_1_1_i_algorithm.html',1,'MNEX']]],
+  ['iamplifier',['IAmplifier',['../class_e_e_go_sports_plugin_1_1_i_amplifier.html',1,'EEGoSportsPlugin']]],
+  ['ibuffer',['IBuffer',['../class_e_e_go_sports_plugin_1_1_i_buffer.html',1,'EEGoSportsPlugin']]],
   ['icommand',['ICommand',['../class_i_command.html',1,'']]],
   ['iconnector',['IConnector',['../class_r_t_s_e_r_v_e_r_1_1_i_connector.html',1,'RTSERVER']]],
   ['iinversealgorithm',['IInverseAlgorithm',['../class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html',1,'INVERSELIB']]],
   ['iio',['IIO',['../class_m_n_e_x_1_1_i_i_o.html',1,'MNEX']]],
   ['imagesc',['ImageSc',['../class_d_i_s_p_l_i_b_1_1_image_sc.html',1,'DISPLIB']]],
+  ['informationwindow',['InformationWindow',['../class_m_n_e_browse_raw_qt_1_1_information_window.html',1,'MNEBrowseRawQt']]],
   ['inverseview',['InverseView',['../class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html',1,'DISP3DLIB']]],
   ['inverseviewproducer',['InverseViewProducer',['../class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html',1,'DISP3DLIB']]],
   ['iobserver',['IObserver',['../class_i_observer.html',1,'']]],

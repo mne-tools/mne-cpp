@@ -6,6 +6,8 @@ var searchData=
   ['neuromagproducer_2eh',['neuromagproducer.h',['../neuromagproducer_8h.html',1,'']]],
   ['neuromagsetupwidget_2ecpp',['neuromagsetupwidget.cpp',['../neuromagsetupwidget_8cpp.html',1,'']]],
   ['neuromagsetupwidget_2eh',['neuromagsetupwidget.h',['../neuromagsetupwidget_8h.html',1,'']]],
+  ['newbrainview_2ecpp',['newbrainview.cpp',['../newbrainview_8cpp.html',1,'']]],
+  ['newbrainview_2eh',['newbrainview.h',['../newbrainview_8h.html',1,'']]],
   ['newmeasurement_2ecpp',['newmeasurement.cpp',['../newmeasurement_8cpp.html',1,'']]],
   ['newmeasurement_2eh',['newmeasurement.h',['../newmeasurement_8h.html',1,'']]],
   ['newmeasurementwidget_2eh',['newmeasurementwidget.h',['../newmeasurementwidget_8h.html',1,'']]],
@@ -13,10 +15,9 @@ var searchData=
   ['newrealtimemultisamplearray_2eh',['newrealtimemultisamplearray.h',['../newrealtimemultisamplearray_8h.html',1,'']]],
   ['newrealtimesamplearray_2ecpp',['newrealtimesamplearray.cpp',['../newrealtimesamplearray_8cpp.html',1,'']]],
   ['newrealtimesamplearray_2eh',['newrealtimesamplearray.h',['../newrealtimesamplearray_8h.html',1,'']]],
-  ['newrealtimesamplearraywidget_2ecpp',['newrealtimesamplearraywidget.cpp',['../newrealtimesamplearraywidget_8cpp.html',1,'']]],
-  ['newrealtimesamplearraywidget_2eh',['newrealtimesamplearraywidget.h',['../newrealtimesamplearraywidget_8h.html',1,'']]],
-  ['numeric_2ecpp',['numeric.cpp',['../numeric_8cpp.html',1,'']]],
-  ['numeric_2eh',['numeric.h',['../numeric_8h.html',1,'']]],
-  ['numericwidget_2ecpp',['numericwidget.cpp',['../numericwidget_8cpp.html',1,'']]],
-  ['numericwidget_2eh',['numericwidget.h',['../numericwidget_8h.html',1,'']]]
+  ['noiseestimate_2ecpp',['noiseestimate.cpp',['../noiseestimate_8cpp.html',1,'']]],
+  ['noiseestimate_2eh',['noiseestimate.h',['../noiseestimate_8h.html',1,'']]],
+  ['noiseestimate_5fglobal_2eh',['noiseestimate_global.h',['../noiseestimate__global_8h.html',1,'']]],
+  ['noiseestimatesetupwidget_2ecpp',['noiseestimatesetupwidget.cpp',['../noiseestimatesetupwidget_8cpp.html',1,'']]],
+  ['noiseestimatesetupwidget_2eh',['noiseestimatesetupwidget.h',['../noiseestimatesetupwidget_8h.html',1,'']]]
 ];
