@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     QList<QVector<double> > inputPoints;
     QList<QVector<double> > outputPoints;
     QStringList names;
-    QFile out("./MNE_Browse_Raw_Resources/Templates/Layouts/babymeg.lout");
+    QFile out("./MNE_Browse_Raw_Resources/Templates/Layouts/babymeg-mag-outer-layer.lout");
     QFile out_file_3d("./MNE_Browse_Raw_Resources/Templates/Layouts/3D_points_all.lout");
     QTextStream out3D(&out_file_3d);
 
@@ -108,9 +108,9 @@ int main(int argc, char *argv[])
     }
 
     for(int i = 0; i<fiffInfo.ch_names.size(); i++) {
-        int kind = fiffInfo.chs.at(i).kind;
+        int kind = fiffInfo.chs.at(i).coil_type;
 
-        if(kind == FIFFV_REF_MEG_CH) { //FIFFV_MEG_CH FIFFV_EEG_CH FIFFV_REF_MEG_CH
+        if(kind == FIFFV_COIL_BABY_REF_MAG) { //FIFFV_MEG_CH FIFFV_EEG_CH FIFFV_REF_MEG_CH
             QVector<double> temp;
             double x = fiffInfo.chs.at(i).loc(0,0) * 100;
             double y = fiffInfo.chs.at(i).loc(1,0) * 100;

@@ -107,7 +107,8 @@ namespace ChInfoModelRoles
                   GetChAlias = Qt::UserRole + 1015,
                   GetChPosition = Qt::UserRole + 1016,
                   GetChDigitizer = Qt::UserRole + 1017,
-                  GetChActiveFilter = Qt::UserRole + 1018,};
+                  GetChActiveFilter = Qt::UserRole + 1018,
+                  GetChCoilType = Qt::UserRole + 1019};
 }
 
 namespace ProjectionModelRoles
