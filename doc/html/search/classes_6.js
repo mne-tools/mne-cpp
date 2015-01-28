@@ -33,8 +33,19 @@ var searchData=
   ['fifftag',['FiffTag',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html',1,'FIFFLIB']]],
   ['filterdata',['FilterData',['../class_u_t_i_l_s_l_i_b_1_1_filter_data.html',1,'UTILSLIB']]],
   ['filteroperator',['FilterOperator',['../class_m_n_e_browse_raw_qt_1_1_filter_operator.html',1,'MNEBrowseRawQt']]],
-  ['fllconfig',['FLLConfig',['../struct_mne_rt_client_plugin_1_1_f_l_l_config.html',1,'MneRtClientPlugin']]],
+  ['filterplotscene',['FilterPlotScene',['../class_m_n_e_browse_raw_qt_1_1_filter_plot_scene.html',1,'MNEBrowseRawQt']]],
+  ['filterwindow',['FilterWindow',['../class_m_n_e_browse_raw_qt_1_1_filter_window.html',1,'MNEBrowseRawQt']]],
+  ['find_5fbest_5fmatching',['find_best_matching',['../struct_u_t_i_l_s_l_i_b_1_1_fix_dict_mp_1_1find__best__matching.html',1,'UTILSLIB::FixDictMp']]],
+  ['fituser',['fitUser',['../struct_u_t_i_l_s_l_i_b_1_1fit_user.html',1,'UTILSLIB']]],
+  ['fixdictatom',['FixDictAtom',['../class_u_t_i_l_s_l_i_b_1_1_fix_dict_atom.html',1,'UTILSLIB']]],
+  ['fixdictmp',['FixDictMp',['../class_u_t_i_l_s_l_i_b_1_1_fix_dict_mp.html',1,'UTILSLIB']]],
   ['fllconfig',['FLLConfig',['../struct_baby_m_e_g_plugin_1_1_f_l_l_config.html',1,'BabyMEGPlugin']]],
-  ['fllpara',['FLLPara',['../struct_mne_rt_client_plugin_1_1_f_l_l_para.html',1,'MneRtClientPlugin']]],
-  ['fllpara',['FLLPara',['../struct_baby_m_e_g_plugin_1_1_f_l_l_para.html',1,'BabyMEGPlugin']]]
+  ['fllpara',['FLLPara',['../struct_baby_m_e_g_plugin_1_1_f_l_l_para.html',1,'BabyMEGPlugin']]],
+  ['formulaatom',['formulaATOM',['../struct_u_t_i_l_s_l_i_b_1_1_fix_dict_atom_1_1formula_a_t_o_m.html',1,'UTILSLIB::FixDictAtom']]],
+  ['formulaeditor',['Formulaeditor',['../class_formulaeditor.html',1,'']]],
+  ['frequencyspectrum',['FrequencySpectrum',['../class_x_m_e_a_s_l_i_b_1_1_frequency_spectrum.html',1,'XMEASLIB']]],
+  ['frequencyspectrumdelegate',['FrequencySpectrumDelegate',['../class_x_d_i_s_p_l_i_b_1_1_frequency_spectrum_delegate.html',1,'XDISPLIB']]],
+  ['frequencyspectrummodel',['FrequencySpectrumModel',['../class_x_d_i_s_p_l_i_b_1_1_frequency_spectrum_model.html',1,'XDISPLIB']]],
+  ['frequencyspectrumsettingswidget',['FrequencySpectrumSettingsWidget',['../class_x_d_i_s_p_l_i_b_1_1_frequency_spectrum_settings_widget.html',1,'XDISPLIB']]],
+  ['frequencyspectrumwidget',['FrequencySpectrumWidget',['../class_x_d_i_s_p_l_i_b_1_1_frequency_spectrum_widget.html',1,'XDISPLIB']]]
 ];

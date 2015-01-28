@@ -2,6 +2,7 @@ var searchData=
 [
   ['save_5fcalibrated',['save_calibrated',['../class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a2c42e307469c490de4fcb0b878fdf32c',1,'FIFFLIB::FiffCtfComp']]],
   ['scanno',['scanno',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html#ad70dfc43719627c0bc2aa10bf3a422ac',1,'FIFFLIB::FiffChInfo']]],
+  ['sdistmeasure',['sDistMeasure',['../struct_m_n_e_l_i_b_1_1_region_data.html#a7c3c331ea44528d68ce08a77bf37b0a7',1,'MNELIB::RegionData::sDistMeasure()'],['../struct_m_n_e_l_i_b_1_1_region_m_t.html#abfbd5c12ea4a2ee92e53715852f70bb5',1,'MNELIB::RegionMT::sDistMeasure()']]],
   ['secs',['secs',['../struct_f_i_f_f_l_i_b_1_1__fiff_time_rec.html#aad08009ec30781943ec62c2ae883eb83',1,'FIFFLIB::_fiffTimeRec']]],
   ['sfreq',['sfreq',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#a963c80bf73b01ed07eb1a31540cf308c',1,'FIFFLIB::FiffInfo']]],
   ['sigma',['sigma',['../class_m_n_e_l_i_b_1_1_m_n_e_surface.html#aea0cba23540bb4eafc8c6fa92879f8ba',1,'MNELIB::MNESurface']]],
