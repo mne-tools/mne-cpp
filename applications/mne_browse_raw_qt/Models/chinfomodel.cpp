@@ -78,7 +78,7 @@ int ChInfoModel::rowCount(const QModelIndex & /*parent*/) const
 
 int ChInfoModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 10;
+    return 11;
 }
 
 
@@ -140,6 +140,10 @@ QVariant ChInfoModel::headerData(int section, Qt::Orientation orientation, int r
 
                     case 9:
                         return QString("%1").arg("Active filter");
+                        break;
+
+                    case 10:
+                        return QString("%1").arg("Coil Type");
                         break;
                 }
             }
@@ -401,6 +405,24 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
                     v.setValue(operatorPtr);
                     return v;
                 }
+
+                case Qt::TextAlignmentRole:
+                    return Qt::AlignHCenter + Qt::AlignVCenter;
+            }
+        }//end column check
+
+        //******** eleventh column (coil type) ********
+        if(index.column()==10) {
+            QVariant v;
+
+            switch(role) {
+                case Qt::DisplayRole:
+                    v.setValue(QString("%1").arg(m_fiffInfo.chs.at(index.row()).coil_type));
+                    return v;
+
+                case ChInfoModelRoles::GetChCoilType:
+                    v.setValue(m_fiffInfo.chs.at(index.row()).coil_type);
+                    return v;
 
                 case Qt::TextAlignmentRole:
                     return Qt::AlignHCenter + Qt::AlignVCenter;
