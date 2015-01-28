@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
     QGuiApplication::setApplicationName("MNE ROI Cluster Evaluation");
     QGuiApplication::setApplicationVersion("Revision 2");
 
-    ///////////////////////////////////// CLI Parser /////////////////////////////////////
+    ///////////////////////////////////// #1 CLI Parser /////////////////////////////////////
     QCommandLineParser parser;
     parser.setApplicationDescription("MNE ROI Cluster Evaluation");
     parser.addHelpOption();
@@ -188,12 +188,39 @@ int main(int argc, char *argv[])
             QCoreApplication::translate("main", "prefix"));
     parser.addOption(targetPrefixOption);
 
+    //// Source estimate parameters ////
+    // SNR
+    QCommandLineOption snrOption(QStringList() << "snr" << "signal-to-noise-ratio",
+            QCoreApplication::translate("main", "The <snr> estimation for the given data file."),
+            QCoreApplication::translate("main", "snr"),
+            "1.0");//0.1f;//1.0f;//3.0f;
+    parser.addOption(snrOption);
+
+    // METHOD
+    QCommandLineOption methodOption(QStringList() << "m" << "method",
+            QCoreApplication::translate("main", "The estimation <method>."),
+            QCoreApplication::translate("main", "method"),
+            "dSPM");//"MNE" | "dSPM" | "sLORETA"
+    parser.addOption(methodOption);
+
+    // File Name Clustered Inverse Operator
+    QCommandLineOption clustInvFileOption(QStringList() << "icf" << "inverse-clustered-file",
+            QCoreApplication::translate("main", "Target <file> to store clustered inverse operator to."),
+            QCoreApplication::translate("main", "file"));
+    parser.addOption(clustInvFileOption);
+
+    // File Name of the Source Estimate
+    QCommandLineOption stcFileOption(QStringList() << "stcf" << "stc-file",
+            QCoreApplication::translate("main", "Target <stcfile> to store stc to."),
+            QCoreApplication::translate("main", "file"));//"mind006_051209_auditory01.stc"
+    parser.addOption(stcFileOption);
+
 
     // Process the actual command line arguments given by the user
     parser.process(app);
 
 
-    //////////////////////////////// get parsed values /////////////////////////////////
+    //////////////////////////////// #2 get parsed values /////////////////////////////////
 
     //Sources
     QString sFwdName = parser.value(srcDirectoryOption)+parser.value(fwdFileOption);
@@ -227,6 +254,22 @@ int main(int argc, char *argv[])
     QString sTargetPrefix = parser.value(targetPrefixOption);
     qDebug() << "Target Prefix" << sTargetPrefix;
 
+    //// Source estimate parameters ////
+    double snr = parser.value(snrOption).toFloat();
+    qDebug() << "SNR" << snr;
+
+    QString method = parser.value(methodOption);
+    qDebug() << "Method" << method;
+
+    QString t_sFileNameClusteredInv = parser.value(clustInvFileOption);
+    qDebug() << "Store clustered inverse operator to:" << t_sFileNameClusteredInv;
+
+    QString t_sFileNameStc = parser.value(stcFileOption);
+    qDebug() << "Store stc to:" << t_sFileNameStc;
+
+
+
+
     //OLD
 //    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
 //    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
@@ -243,7 +286,7 @@ int main(int argc, char *argv[])
 //    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Data/subjects");
 
 
- /*
+    ///////////////////////////////////// #3 read data //////////////////////////////////////
     qint32 event = 1;
 
     float tmin = -0.2f;
@@ -280,8 +323,7 @@ int main(int argc, char *argv[])
         bool want_eeg   = false;
         bool want_stim  = false;
 
-//        picks = Fiff::pick_types(raw.info, want_meg, want_eeg, want_stim, include, raw.info.bads);
-        picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);//prefer member function
+        picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
     }
 
     QStringList ch_names;
@@ -305,7 +347,6 @@ int main(int argc, char *argv[])
         //
         //   Create the projector
         //
-//        fiff_int_t nproj = MNE::make_projector_info(raw.info, raw.proj); Using the member function instead
         fiff_int_t nproj = raw.info.make_projector(raw.proj);
 
         if (nproj == 0)
@@ -321,7 +362,6 @@ int main(int argc, char *argv[])
     //
     //   Set up the CTF compensator
     //
-//    qint32 current_comp = MNE::get_current_comp(raw.info);
     qint32 current_comp = raw.info.get_current_comp();
     if (current_comp > 0)
         printf("Current compensation grade : %d\n",current_comp);
@@ -334,7 +374,6 @@ int main(int argc, char *argv[])
         qDebug() << "This part needs to be debugged";
         if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp))
         {
-//            raw.info.chs = MNE::set_current_comp(raw.info.chs,dest_comp);
             raw.info.set_current_comp(dest_comp);
             printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
         }
@@ -361,8 +400,6 @@ int main(int argc, char *argv[])
             printf("Raw file name does not end properly\n");
             return 0;
         }
-//        events = mne_read_events(t_sEventName);
-
         t_EventFile.setFileName(t_sEventName);
         MNE::read_events(t_EventFile, events);
         printf("Events read from %s\n",t_sEventName.toUtf8().constData());
@@ -492,18 +529,419 @@ int main(int argc, char *argv[])
         }
     }
 
+    //DEBUG Output
     if(data.size() > 0)
     {
+        printf("Sampling frequency, %f\n", raw.info.sfreq);
+
         printf("Read %d epochs, %d samples each.\n",data.size(),(qint32)data[0]->epoch.cols());
+//        //DEBUG
+//        std::cout << data[0]->epoch.block(0,0,10,10) << std::endl;
+//        qDebug() << data[0]->epoch.rows() << " x " << data[0]->epoch.cols();
 
-        //DEBUG
-        std::cout << data[0]->epoch.block(0,0,10,10) << std::endl;
-        qDebug() << data[0]->epoch.rows() << " x " << data[0]->epoch.cols();
-
-        std::cout << times.block(0,0,1,10) << std::endl;
-        qDebug() << times.rows() << " x " << times.cols();
+//        std::cout << times.block(0,0,1,10) << std::endl;
+//        qDebug() << times.rows() << " x " << times.cols();
     }
 
+    /////////////////////////////////// #4 process data /////////////////////////////////////
+
+    //
+    // calculate the average
+    //
+    FiffEvoked evoked = data.average(raw.info, tmin*raw.info.sfreq, floor(tmax*raw.info.sfreq + 0.5));
+
+
+    //########################################################################################
+    // Source Estimate
+
+    double lambda2 = 1.0 / pow(snr, 2);
+    qDebug() << "Start calculation with: SNR" << snr << "; Lambda" << lambda2 << "; Method" << method << "; stc:" << t_sFileNameStc;
+
+//    // Load data
+//    fiff_int_t setno = 1;
+//    QPair<QVariant, QVariant> baseline(QVariant(), 0);
+//    FiffEvoked evoked(t_fileEvoked, setno, baseline);
+//    if(evoked.isEmpty())
+//        return 1;
+
+
+    MNEForwardSolution t_Fwd(t_fileFwd);
+    if(t_Fwd.isEmpty())
+        return 1;
+
+    FiffCov noise_cov(t_fileCov);
+
+    // regularize noise covariance
+    noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
+
+    //
+    // Cluster forward solution;
+    //
+    MatrixXd D;
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20, D, noise_cov, evoked.info);
+
+    t_clusteredFwd.src[0].cluster_info.write("ClusterInfoLH.txt");
+    t_clusteredFwd.src[1].cluster_info.write("ClusterInfoRH.txt");
+
+    std::cout << "D " << D.rows() << " x " << D.cols() << std::endl;
+
+    //
+    // make an inverse operators
+    //
+    FiffInfo info = evoked.info;
+
+    QFile t_fileSelectedFwd(sFwdName);
+
+
+    //    QFile t_fileFwd("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
+    //    QFile t_fileCov("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
+    //    QFile t_fileRaw("D:/Data/MEG/mind006/mind006_051209_auditory01_raw.fif");
+    //    QString t_sEventName = "D:/Data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
+    //    AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "D:/Data/subjects");
+    //    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Data/subjects");
+
+
+    MNEForwardSolution t_selectedRawFwd(t_fileSelectedFwd);
+    if(t_selectedRawFwd.isEmpty())
+        return 1;
+
+    MatrixXd D_selected;
+    MNEForwardSolution t_selectedFwd = t_selectedRawFwd.reduce_forward_solution(t_clusteredFwd.isFixedOrient() ? t_clusteredFwd.sol->data.cols() : t_clusteredFwd.sol->data.cols()/3, D_selected);
+
+    qDebug() << "#### t_selectedFwd" << t_selectedFwd.sol->data.rows() << "x" << t_selectedFwd.sol->data.cols();
+
+    MNEInverseOperator inverse_operator_selected(info, t_selectedFwd, noise_cov, 0.2f, 0.8f);
+
+    qDebug() << "#### [1] ####";
+
+    MNEInverseOperator inverse_operator_clustered(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
+
+    qDebug() << "#### [2] ####";
+
+    MNEInverseOperator inverse_operator(info, t_Fwd, noise_cov, 0.2f, 0.8f);
+
+    qDebug() << "#### [3] ####";
+
+    //
+    // save clustered inverse
+    //
+    if(!t_sFileNameClusteredInv.isEmpty())
+    {
+        QFile t_fileClusteredInverse(t_sFileNameClusteredInv);
+        inverse_operator_clustered.write(t_fileClusteredInverse);
+    }
+
+
+
+    //
+    // Compute inverse solution
+    //
+
+    MinimumNorm minimumNormSelected(inverse_operator_selected, lambda2, method);
+    MinimumNorm minimumNormClustered(inverse_operator_clustered, lambda2, method);
+    MinimumNorm minimumNorm(inverse_operator, lambda2, method);
+
+
+#ifdef BENCHMARK
+    //
+    //   Set up the inverse according to the parameters
+    //
+    minimumNormClustered.doInverseSetup(vecSel.size(),false);
+
+    MNESourceEstimate sourceEstimate;
+    QList<qint64> qVecElapsedTime;
+    for(qint32 i = 0; i < 100; ++i)
+    {
+        //Benchmark time
+        QElapsedTimer timer;
+        timer.start();
+        sourceEstimate = minimumNormClustered.calculateInverse(evoked.data, evoked.times(0), evoked.times(1)-evoked.times(0));
+        qVecElapsedTime.append(timer.elapsed());
+    }
+
+    double meanTime = 0.0;
+    qint32 offset = 19;
+    qint32 c = 0;
+    for(qint32 i = offset; i < qVecElapsedTime.size(); ++i)
+    {
+        meanTime += qVecElapsedTime[i];
+        ++c;
+    }
+
+    meanTime /= (double)c;
+
+    double varTime = 0;
+    for(qint32 i = offset; i < qVecElapsedTime.size(); ++i)
+        varTime += pow(qVecElapsedTime[i] - meanTime,2);
+
+    varTime /= (double)c - 1.0f;
+    varTime = sqrt(varTime);
+
+    qDebug() << "MNE calculation took" << meanTime << "+-" << varTime << "ms in average";
+
+#else
+    MNESourceEstimate sourceEstimateSelected = minimumNormSelected.calculateInverse(evoked);
+    MNESourceEstimate sourceEstimateClustered = minimumNormClustered.calculateInverse(evoked);
+    MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
+#endif
+
+    qDebug() << "#### [4] ####";
+
+
+    //Option c
+//    qDebug() << "Cluster Kernel";
+//    MatrixXd D_MT;
+//    MatrixXd MT_clustered = minimumNorm.getPreparedInverseOperator().cluster_kernel(t_annotationSet, 20, D_MT);
+
+//    qDebug() << "Cluster Kernel" << MT_clustered.rows() << "x" << MT_clustered.cols();
+
+//    qDebug() << "D_MT" << D_MT.rows() << "x" << D_MT.cols();
+
+    // #### R calculation ####
+    QFile t_fileFwdFixed("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-oct-6-fwd-fixed.fif");
+    MNEForwardSolution t_FwdFixed(t_fileFwdFixed);
+    if(t_FwdFixed.isEmpty())
+        return 1;
+//    qDebug() << "t_FwdFixed" << t_FwdFixed.sol->data.rows() << "x" << t_FwdFixed.sol->data.cols();
+
+//    //Option b)
+//    printf("[1]\n");
+//    MatrixXd M = D.transpose() * minimumNorm.getKernel();
+
+//    printf("[2]\n");
+//    MatrixXd R = M * t_FwdFixed.sol->data;
+
+//    std::ofstream ofs_R("R_ec.txt", std::ofstream::out);
+//    if (ofs_R.is_open())
+//    {
+//        printf("writing to R_ec.txt\n");
+//        ofs_R << R << '\n';
+//    }
+//    else
+//        printf("Not writing to R_ec.txt\n");
+//    ofs_R.close();
+
+//    M.resize(0,0);
+//    R.resize(0,0);
+
+//    //Option a)
+//    printf("[3]\n");
+//    MatrixXd M_clusterd = minimumNormClustered.getKernel();
+
+//    printf("[4]\n");
+//    MatrixXd R_clustered = M_clusterd * t_FwdFixed.sol->data;
+
+//    std::ofstream ofs_R_clustered("R_clustered_ec.txt", std::ofstream::out);
+//    if (ofs_R_clustered.is_open())
+//    {
+//        printf("writing to R_clustered_ec.txt\n");
+//        ofs_R_clustered << R_clustered << '\n';
+//    }
+//    else
+//        printf("Not writing to R_clustered_ec.txt\n");
+//    ofs_R_clustered.close();
+
+//    M_clusterd.resize(0,0);
+//    R_clustered.resize(0,0);
+
+////Cluster Operator D
+//    std::ofstream ofs_D("D_ec.txt", std::ofstream::out);
+//    if (ofs_D.is_open())
+//    {
+//        printf("writing to D_ec.txt\n");
+//        ofs_D << D << '\n';
+//    }
+//    else
+//        printf("Not writing to D_ec.txt\n");
+//    ofs_D.close();
+
+
+//    //option c)
+//    printf("[5]\n");
+//    MatrixXd R_MT_clustered = MT_clustered.transpose() * t_FwdFixed.sol->data;
+
+//    std::ofstream ofs_R_MT_clustered("R_MT_clustered_ec.txt", std::ofstream::out);
+//    if (ofs_R_MT_clustered.is_open())
+//    {
+//        printf("writing to R_MT_clustered_ec.txt\n");
+//        ofs_R_MT_clustered << R_MT_clustered << '\n';
+//    }
+//    else
+//        printf("Not writing to R_MT_clustered_ec.txt\n");
+//    ofs_R_MT_clustered.close();
+
+//    R_MT_clustered.resize(0,0);
+
+//    //Cluster Operator D
+//    std::ofstream ofs_D_MT("D_MT_ec.txt", std::ofstream::out);
+//    if (ofs_D_MT.is_open())
+//    {
+//        printf("writing to D_MT_ec.txt\n");
+//        ofs_D_MT << D_MT << '\n';
+//    }
+//    else
+//        printf("Not writing to D_MT_ec.txt\n");
+//    ofs_D_MT.close();
+
+
+
+    //option d)
+    printf("[6]\n");
+    MatrixXd M_selected = minimumNormSelected.getKernel();
+
+    qDebug() << "M_selected: " << M_selected.rows() << "x" << M_selected.cols();
+
+
+    printf("[7]\n");
+    MatrixXd R_selected= M_selected * t_FwdFixed.sol->data;
+
+    std::ofstream ofs_R_selected("R_selected.txt", std::ofstream::out);
+    if (ofs_R_selected.is_open())
+    {
+        printf("writing to R_selected.txt\n");
+        ofs_R_selected << R_selected << '\n';
+    }
+    else
+        printf("Not writing to R_selected.txt\n");
+    ofs_R_selected.close();
+
+    R_selected.resize(0,0);
+
+    //Cluster Operator D
+    std::ofstream ofs_D_selected("D_selected.txt", std::ofstream::out);
+    if (ofs_D_selected.is_open())
+    {
+        printf("writing to D_selected.txt\n");
+        ofs_D_selected << D_selected << '\n';
+    }
+    else
+        printf("Not writing to D_selected.txt\n");
+    ofs_D_selected.close();
+
+    // #### R calculation end ####
+
+
+    if(sourceEstimateClustered.isEmpty())
+        return 1;
+
+    // View activation time-series
+    std::cout << "\nsourceEstimate:\n" << sourceEstimateClustered.data.block(0,0,10,10) << std::endl;
+    std::cout << "time\n" << sourceEstimateClustered.times.block(0,0,1,10) << std::endl;
+    std::cout << "timeMin\n" << sourceEstimateClustered.times[0] << std::endl;
+    std::cout << "timeMax\n" << sourceEstimateClustered.times[sourceEstimateClustered.times.size()-1] << std::endl;
+    std::cout << "time step\n" << sourceEstimateClustered.tstep << std::endl;
+
+    //Condition Numbers
+//    MatrixXd mags(102, t_Fwd.sol->data.cols());
+//    qint32 count = 0;
+//    for(qint32 i = 2; i < 306; i += 3)
+//    {
+//        mags.row(count) = t_Fwd.sol->data.row(i);
+//        ++count;
+//    }
+//    MatrixXd magsClustered(102, t_clusteredFwd.sol->data.cols());
+//    count = 0;
+//    for(qint32 i = 2; i < 306; i += 3)
+//    {
+//        magsClustered.row(count) = t_clusteredFwd.sol->data.row(i);
+//        ++count;
+//    }
+
+//    MatrixXd grads(204, t_Fwd.sol->data.cols());
+//    count = 0;
+//    for(qint32 i = 0; i < 306; i += 3)
+//    {
+//        grads.row(count) = t_Fwd.sol->data.row(i);
+//        ++count;
+//        grads.row(count) = t_Fwd.sol->data.row(i+1);
+//        ++count;
+//    }
+//    MatrixXd gradsClustered(204, t_clusteredFwd.sol->data.cols());
+//    count = 0;
+//    for(qint32 i = 0; i < 306; i += 3)
+//    {
+//        gradsClustered.row(count) = t_clusteredFwd.sol->data.row(i);
+//        ++count;
+//        gradsClustered.row(count) = t_clusteredFwd.sol->data.row(i+1);
+//        ++count;
+//    }
+
+    VectorXd s;
+
+    double t_dConditionNumber = MNEMath::getConditionNumber(t_Fwd.sol->data, s);
+    double t_dConditionNumberClustered = MNEMath::getConditionNumber(t_clusteredFwd.sol->data, s);
+
+
+    std::cout << "Condition Number:\n" << t_dConditionNumber << std::endl;
+    std::cout << "Clustered Condition Number:\n" << t_dConditionNumberClustered << std::endl;
+
+    std::cout << "ForwardSolution" << t_Fwd.sol->data.block(0,0,10,10) << std::endl;
+
+    std::cout << "Clustered ForwardSolution" << t_clusteredFwd.sol->data.block(0,0,10,10) << std::endl;
+
+
+//    double t_dConditionNumberMags = MNEMath::getConditionNumber(mags, s);
+//    double t_dConditionNumberMagsClustered = MNEMath::getConditionNumber(magsClustered, s);
+
+//    std::cout << "Condition Number Magnetometers:\n" << t_dConditionNumberMags << std::endl;
+//    std::cout << "Clustered Condition Number Magnetometers:\n" << t_dConditionNumberMagsClustered << std::endl;
+
+//    double t_dConditionNumberGrads = MNEMath::getConditionNumber(grads, s);
+//    double t_dConditionNumberGradsClustered = MNEMath::getConditionNumber(gradsClustered, s);
+
+//    std::cout << "Condition Number Gradiometers:\n" << t_dConditionNumberGrads << std::endl;
+//    std::cout << "Clustered Condition Number Gradiometers:\n" << t_dConditionNumberGradsClustered << std::endl;
+
+
+    //Source Estimate end
+    //########################################################################################
+
+    if(!t_sFileNameStc.isEmpty())
+    {
+        QFile t_fileClusteredStc(t_sFileNameStc);
+        sourceEstimateClustered.write(t_fileClusteredStc);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* OLD
     //
     // calculate the average
     //
@@ -591,6 +1029,12 @@ int main(int argc, char *argv[])
     // regularize noise covariance
     noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
 
+
+
+
+//--------------------
+
+
     //
     // Cluster forward solution;
     //
@@ -608,6 +1052,7 @@ int main(int argc, char *argv[])
     FiffInfo info = evoked.info;
 
 
+//--------------------
 
 
     QFile t_fileSelectedFwd("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-oct-5-fwd.fif");
@@ -632,6 +1077,9 @@ int main(int argc, char *argv[])
     MNEInverseOperator inverse_operator(info, t_Fwd, noise_cov, 0.2f, 0.8f);
 
     qDebug() << "#### [3] ####";
+
+
+//---------------------
 
     //
     // save clustered inverse
