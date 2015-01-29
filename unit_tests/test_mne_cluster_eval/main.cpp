@@ -589,6 +589,11 @@ int main(int argc, char *argv[])
     if(t_Fwd.isEmpty())
         return 1;
 
+    QFile t_fileFwdFixed(sXFwdName);
+    MNEForwardSolution t_FwdFixed(t_fileFwdFixed);
+    if(t_FwdFixed.isEmpty())
+        return 1;
+
     QFile t_fileCov(sCovName);
     FiffCov noise_cov(t_fileCov);
 
@@ -598,15 +603,31 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-    MatrixXd D;
-
-    MNEForwardSolution t_clusteredFwdEc = t_Fwd.cluster_forward_solution(t_annotationSet, 20, D, noise_cov, evoked.info, "sqeuclidean");//, "cityblock");
+    MatrixXd D_L1;
 
 
-    t_clusteredFwdEc.src[0].cluster_info.write("ClusterInfoLH.txt");
-    t_clusteredFwdEc.src[1].cluster_info.write("ClusterInfoRH.txt");
+    std::cout << "t_Fwd " << t_Fwd.sol->data.rows() << " x " << t_Fwd.sol->data.cols() << std::endl;
 
-//    std::cout << "D " << D.rows() << " x " << D.cols() << std::endl;
+    MNEForwardSolution t_clusteredFwd_L1 = t_Fwd.cluster_forward_solution(t_annotationSet, 20, D_L1, noise_cov, evoked.info, "cityblock");
+    QString sCILHL1 = sTargetDir + sTargetPrefix + QString("ClusterInfoLH_L1.txt");
+    t_clusteredFwd_L1.src[0].cluster_info.write(sCILHL1);
+    QString sCIRHL1 = sTargetDir + sTargetPrefix + QString("ClusterInfoRH_L1.txt");
+    t_clusteredFwd_L1.src[1].cluster_info.write(sCIRHL1);
+
+    std::cout << "D_L1 " << D_L1.rows() << " x " << D_L1.cols() << std::endl;
+    std::cout << "t_clusteredFwd_L1 " << t_clusteredFwd_L1.sol->data.rows() << " x " << t_clusteredFwd_L1.sol->data.cols() << std::endl;
+
+    MatrixXd D_L2;
+
+    MNEForwardSolution t_clusteredFwd_L2 = t_Fwd.cluster_forward_solution(t_annotationSet, 20, D_L2, noise_cov, evoked.info, "sqeuclidean");
+    QString sCILH_L2 = sTargetDir + sTargetPrefix + QString("ClusterInfoLH_L2.txt");
+    t_clusteredFwd_L2.src[0].cluster_info.write(sCILH_L2);
+    QString sCIRH_L2 = sTargetDir + sTargetPrefix + QString("ClusterInfoRH_L2.txt");
+    t_clusteredFwd_L2.src[1].cluster_info.write(sCIRH_L2);
+
+    std::cout << "D_L2 " << D_L2.rows() << " x " << D_L2.cols() << std::endl;
+    std::cout << "t_clusteredFwd_L2 " << t_clusteredFwd_L2.sol->data.rows() << " x " << t_clusteredFwd_L2.sol->data.cols() << std::endl;
+
 
     //
     // make an inverse operators
@@ -616,12 +637,12 @@ int main(int argc, char *argv[])
     QFile t_fileSelectedFwd(sFwdName);
 
 
-    //    QFile t_fileFwd("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
-    //    QFile t_fileCov("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
-    //    QFile t_fileRaw("D:/Data/MEG/mind006/mind006_051209_auditory01_raw.fif");
-    //    QString t_sEventName = "D:/Data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
-    //    AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "D:/Data/subjects");
-    //    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Data/subjects");
+//    QFile t_fileFwd("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
+//    QFile t_fileCov("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
+//    QFile t_fileRaw("D:/Data/MEG/mind006/mind006_051209_auditory01_raw.fif");
+//    QString t_sEventName = "D:/Data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
+//    AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "D:/Data/subjects");
+//    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Data/subjects");
 
 
     MNEForwardSolution t_selectedRawFwd(t_fileSelectedFwd);
@@ -629,37 +650,37 @@ int main(int argc, char *argv[])
         return 1;
 
     MatrixXd D_selected;
-    MNEForwardSolution t_selectedFwd = t_selectedRawFwd.reduce_forward_solution(t_clusteredFwdEc.isFixedOrient() ? t_clusteredFwdEc.sol->data.cols() : t_clusteredFwdEc.sol->data.cols()/3, D_selected);
+    MNEForwardSolution t_selectedFwd = t_selectedRawFwd.reduce_forward_solution(t_clusteredFwd_L2.isFixedOrient() ? t_clusteredFwd_L2.sol->data.cols() : t_clusteredFwd_L2.sol->data.cols()/3, D_selected);
 
 //    qDebug() << "#### t_selectedFwd" << t_selectedFwd.sol->data.rows() << "x" << t_selectedFwd.sol->data.cols();
 
     MNEInverseOperator inverse_operator_selected(info, t_selectedFwd, noise_cov, 0.2f, 0.8f);
 
-//    qDebug() << "#### [1] ####";
+    MNEInverseOperator inverse_operator_clustered_L1(info, t_clusteredFwd_L1, noise_cov, 0.2f, 0.8f);
 
-    MNEInverseOperator inverse_operator_clustered(info, t_clusteredFwdEc, noise_cov, 0.2f, 0.8f);
-
-//    qDebug() << "#### [2] ####";
+    MNEInverseOperator inverse_operator_clustered_L2(info, t_clusteredFwd_L2, noise_cov, 0.2f, 0.8f);
 
     MNEInverseOperator inverse_operator(info, t_Fwd, noise_cov, 0.2f, 0.8f);
 
-//    qDebug() << "#### [3] ####";
-
-    //
-    // save clustered inverse
-    //
-    if(!t_sFileNameClusteredInv.isEmpty())
-    {
-        QFile t_fileClusteredInverse(t_sFileNameClusteredInv);
-        inverse_operator_clustered.write(t_fileClusteredInverse);
-    }
+//    //
+//    // save clustered inverse
+//    //
+//    if(!t_sFileNameClusteredInv.isEmpty())
+//    {
+//        QFile t_fileClusteredInverse(t_sFileNameClusteredInv);
+//        inverse_operator_clustered_L2.write(t_fileClusteredInverse);
+//    }
 
 
     //
     // Compute inverse solution
     //
     MinimumNorm minimumNormSelected(inverse_operator_selected, lambda2, method);
-    MinimumNorm minimumNormClustered(inverse_operator_clustered, lambda2, method);
+
+    MinimumNorm minimumNormClustered_L1(inverse_operator_clustered_L1, lambda2, method);
+
+    MinimumNorm minimumNormClustered_L2(inverse_operator_clustered_L2, lambda2, method);
+
     MinimumNorm minimumNorm(inverse_operator, lambda2, method);
 
 
@@ -701,30 +722,35 @@ int main(int argc, char *argv[])
 //    qDebug() << "MNE calculation took" << meanTime << "+-" << varTime << "ms in average";
 
 //#else
-//    MNESourceEstimate sourceEstimateSelected = minimumNormSelected.calculateInverse(evoked);
-//    MNESourceEstimate sourceEstimateClustered = minimumNormClustered.calculateInverse(evoked);
-//    MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
+//    MNESourceEstimate sourceEstimateSelected =
+
+    minimumNormSelected.calculateInverse(evoked);
+
+//    MNESourceEstimate sourceEstimateClustered_L1 =
+
+    minimumNormClustered_L1.calculateInverse(evoked);
+
+//    MNESourceEstimate sourceEstimateClustered_L2 =
+
+    minimumNormClustered_L2.calculateInverse(evoked);
+
+//    MNESourceEstimate sourceEstimate =
+
+    minimumNorm.calculateInverse(evoked);
 //#endif
 
-    qDebug() << "#### [4] ####";
 
+    ////////////////////////////////// L1 calculations
 
-    //////////////// L2 calculations
-
-    MatrixXd D_MT;
-    MatrixXd MT_clustered_ec = minimumNorm.getPreparedInverseOperator().cluster_kernel(t_annotationSet, 20, D_MT, "sqeuclidean");//, "cityblock");
-
+    MatrixXd D_MT_L1;
+    MatrixXd MT_clustered_L1 = minimumNorm.getPreparedInverseOperator().cluster_kernel(t_annotationSet, 20, D_MT_L1, "cityblock");
 
     // #### R calculation ####
-    QFile t_fileFwdFixed(sXFwdName);
-    MNEForwardSolution t_FwdFixed(t_fileFwdFixed);
-    if(t_FwdFixed.isEmpty())
-        return 1;
+    //// Option II_L1
+    //Cluster Inverse operator
+    MatrixXd M_L1 = D_L1.transpose() * minimumNorm.getKernel();
 
-    MatrixXd M = D.transpose() * minimumNorm.getKernel();
-
-    MatrixXd R = M * t_FwdFixed.sol->data;
-
+    MatrixXd R_L1 = M_L1 * t_FwdFixed.sol->data;
 
 
 //    QString sTargetDir = parser.value(targetDirectoryOption);
@@ -734,88 +760,194 @@ int main(int argc, char *argv[])
 //    qDebug() << "Target Prefix" << sTargetPrefix;
 
 
-    QString sRec = sTargetDir + sTargetPrefix + QString("R_ec.txt");
+    QString sR_L1 = sTargetDir + sTargetPrefix + QString("R_L1.txt");
 
-    std::ofstream ofs_R(sRec.toUtf8().constData(), std::ofstream::out);//"R_ec.txt", std::ofstream::out);
-    if (ofs_R.is_open())
+    std::ofstream ofs_R_L1(sR_L1.toUtf8().constData(), std::ofstream::out);//"R_L1.txt", std::ofstream::out);
+    if (ofs_R_L1.is_open())
     {
-        printf("writing to %s\n",sRec.toUtf8().constData());
+        printf("writing to %s\n",sR_L1.toUtf8().constData());
 
-        ofs_R << R << '\n';
+        ofs_R_L1 << R_L1 << '\n';
     }
     else
-        printf("Not writing to %s\n",sRec.toUtf8().constData());
-    ofs_R.close();
+        printf("Not writing to %s\n",sR_L1.toUtf8().constData());
+    ofs_R_L1.close();
 
-    M.resize(0,0);
-    R.resize(0,0);
+    M_L1.resize(0,0);
+    R_L1.resize(0,0);
 
-
-    //Option a)
+    //// Option I_L1
     printf("[3]\n");
-    MatrixXd M_clusterd = minimumNormClustered.getKernel();
+    MatrixXd M_clusterd_L1 = minimumNormClustered_L1.getKernel();
 
     printf("[4]\n");
-    MatrixXd R_clustered = M_clusterd * t_FwdFixed.sol->data;
+    MatrixXd R_clustered_L1 = M_clusterd_L1 * t_FwdFixed.sol->data;
 
-    QString sRClusteredEc = sTargetDir + sTargetPrefix + QString("R_clustered_ec.txt");
-    std::ofstream ofs_R_clustered(sRClusteredEc.toUtf8().constData(), std::ofstream::out);//, std::ofstream::out);
-    if (ofs_R_clustered.is_open())
+    QString sRClustered_L1 = sTargetDir + sTargetPrefix + QString("R_clustered_L1.txt");
+    std::ofstream ofs_R_clustered_L1(sRClustered_L1.toUtf8().constData(), std::ofstream::out);//, std::ofstream::out);
+    if (ofs_R_clustered_L1.is_open())
     {
-        printf("writing to %s\n", sRClusteredEc.toUtf8().constData());
-        ofs_R_clustered << R_clustered << '\n';
+        printf("writing to %s\n", sRClustered_L1.toUtf8().constData());
+        ofs_R_clustered_L1 << R_clustered_L1 << '\n';
     }
     else
-        printf("Not writing to %s\n", sRClusteredEc.toUtf8().constData());
-    ofs_R_clustered.close();
+        printf("Not writing to %s\n", sRClustered_L1.toUtf8().constData());
+    ofs_R_clustered_L1.close();
 
-    M_clusterd.resize(0,0);
-    R_clustered.resize(0,0);
+    M_clusterd_L1.resize(0,0);
+    R_clustered_L1.resize(0,0);
 
-//Cluster Operator D
-    QString sDec = sTargetDir + sTargetPrefix + QString("D_ec.txt");
-    std::ofstream ofs_D(sDec.toUtf8().constData(), std::ofstream::out);//"D_ec.txt", std::ofstream::out);
-    if (ofs_D.is_open())
+//Cluster Operator D_L1
+    QString sD_L1 = sTargetDir + sTargetPrefix + QString("D_L1.txt");
+    std::ofstream ofs_D_L1(sD_L1.toUtf8().constData(), std::ofstream::out);//"D_L1.txt", std::ofstream::out);
+    if (ofs_D_L1.is_open())
     {
-        printf("writing to %s\n",sDec.toUtf8().constData());
-        ofs_D << D << '\n';
+        printf("writing to %s\n",sD_L1.toUtf8().constData());
+        ofs_D_L1 << D_L1 << '\n';
     }
     else
-        printf("Not writing to %s\n",sDec.toUtf8().constData());
-    ofs_D.close();
+        printf("Not writing to %s\n",sD_L1.toUtf8().constData());
+    ofs_D_L1.close();
 
 
-    //option c)
+    //// Option III_L1
     printf("[5]\n");
-    MatrixXd R_MT_clustered = MT_clustered_ec.transpose() * t_FwdFixed.sol->data;
+    MatrixXd R_MT_clustered_L1 = MT_clustered_L1.transpose() * t_FwdFixed.sol->data;
 
-    QString sRMTClustEc = sTargetDir + sTargetPrefix + QString("R_MT_clustered_ec.txt");
-    std::ofstream ofs_R_MT_clustered(sRMTClustEc.toUtf8().constData(), std::ofstream::out);
-    if (ofs_R_MT_clustered.is_open())
+    QString sRMTClust_L1 = sTargetDir + sTargetPrefix + QString("R_MT_clustered_L1.txt");
+    std::ofstream ofs_R_MT_clustered_L1(sRMTClust_L1.toUtf8().constData(), std::ofstream::out);
+    if (ofs_R_MT_clustered_L1.is_open())
     {
-        printf("writing to %s\n",sRMTClustEc.toUtf8().constData());
-        ofs_R_MT_clustered << R_MT_clustered << '\n';
+        printf("writing to %s\n",sRMTClust_L1.toUtf8().constData());
+        ofs_R_MT_clustered_L1 << R_MT_clustered_L1 << '\n';
     }
     else
-        printf("Not writing to %s\n",sRMTClustEc.toUtf8().constData());
-    ofs_R_MT_clustered.close();
+        printf("Not writing to %s\n",sRMTClust_L1.toUtf8().constData());
+    ofs_R_MT_clustered_L1.close();
 
-    R_MT_clustered.resize(0,0);
+    R_MT_clustered_L1.resize(0,0);
 
     //Cluster Operator D
-    QString sDMTEc = sTargetDir + sTargetPrefix + QString("D_MT_ec.txt");
-    std::ofstream ofs_D_MT(sDMTEc.toUtf8().constData(), std::ofstream::out);
-    if (ofs_D_MT.is_open())
+    QString sDMT_L1 = sTargetDir + sTargetPrefix + QString("D_MT_L1.txt");
+    std::ofstream ofs_D_MT_L1(sDMT_L1.toUtf8().constData(), std::ofstream::out);
+    if (ofs_D_MT_L1.is_open())
     {
-        printf("writing to %s\n",sDMTEc.toUtf8().constData());
-        ofs_D_MT << D_MT << '\n';
+        printf("writing to %s\n",sDMT_L1.toUtf8().constData());
+        ofs_D_MT_L1 << D_MT_L1 << '\n';
     }
     else
-        printf("Not writing to %s\n",sDMTEc.toUtf8().constData());
-    ofs_D_MT.close();
+        printf("Not writing to %s\n",sDMT_L1.toUtf8().constData());
+    ofs_D_MT_L1.close();
 
 
-    /////////// Selection calculation
+
+
+
+    ////////////////////////////////// L2 calculations
+
+    MatrixXd D_MT_L2;
+    MatrixXd MT_clustered_L2 = minimumNorm.getPreparedInverseOperator().cluster_kernel(t_annotationSet, 20, D_MT_L2, "sqeuclidean");
+
+    // #### R calculation ####
+
+    //// Option II_L2
+    MatrixXd M_L2 = D_L2.transpose() * minimumNorm.getKernel();
+
+    MatrixXd R_L2 = M_L2 * t_FwdFixed.sol->data;
+
+
+//    QString sTargetDir = parser.value(targetDirectoryOption);
+//    qDebug() << "Target Directory" << sTargetDir;
+
+//    QString sTargetPrefix = parser.value(targetPrefixOption);
+//    qDebug() << "Target Prefix" << sTargetPrefix;
+
+
+    QString sR_L2 = sTargetDir + sTargetPrefix + QString("R_L2.txt");
+
+    std::ofstream ofs_R_L2(sR_L2.toUtf8().constData(), std::ofstream::out);//"R_L2.txt", std::ofstream::out);
+    if (ofs_R_L2.is_open())
+    {
+        printf("writing to %s\n",sR_L2.toUtf8().constData());
+
+        ofs_R_L2 << R_L2 << '\n';
+    }
+    else
+        printf("Not writing to %s\n",sR_L2.toUtf8().constData());
+    ofs_R_L2.close();
+
+    M_L2.resize(0,0);
+    R_L2.resize(0,0);
+
+
+    //// Option I_L2
+    printf("[3]\n");
+    MatrixXd M_clusterd_L2 = minimumNormClustered_L2.getKernel();
+
+    printf("[4]\n");
+    MatrixXd R_clustered_L2 = M_clusterd_L2 * t_FwdFixed.sol->data;
+
+    QString sRClustered_L2 = sTargetDir + sTargetPrefix + QString("R_clustered_L2.txt");
+    std::ofstream ofs_R_clustered_L2(sRClustered_L2.toUtf8().constData(), std::ofstream::out);//, std::ofstream::out);
+    if (ofs_R_clustered_L2.is_open())
+    {
+        printf("writing to %s\n", sRClustered_L2.toUtf8().constData());
+        ofs_R_clustered_L2 << R_clustered_L2 << '\n';
+    }
+    else
+        printf("Not writing to %s\n", sRClustered_L2.toUtf8().constData());
+    ofs_R_clustered_L2.close();
+
+    M_clusterd_L2.resize(0,0);
+    R_clustered_L2.resize(0,0);
+
+//Cluster Operator D_L2
+    QString sD_L2 = sTargetDir + sTargetPrefix + QString("D_L2.txt");
+    std::ofstream ofs_D_L2(sD_L2.toUtf8().constData(), std::ofstream::out);//"D_L2.txt", std::ofstream::out);
+    if (ofs_D_L2.is_open())
+    {
+        printf("writing to %s\n",sD_L2.toUtf8().constData());
+        ofs_D_L2 << D_L2 << '\n';
+    }
+    else
+        printf("Not writing to %s\n",sD_L2.toUtf8().constData());
+    ofs_D_L2.close();
+
+
+    //// Option III_L2
+    printf("[5]\n");
+    MatrixXd R_MT_clustered_L2 = MT_clustered_L2.transpose() * t_FwdFixed.sol->data;
+
+    QString sRMTClust_L2 = sTargetDir + sTargetPrefix + QString("R_MT_clustered_L2.txt");
+    std::ofstream ofs_R_MT_clustered_L2(sRMTClust_L2.toUtf8().constData(), std::ofstream::out);
+    if (ofs_R_MT_clustered_L2.is_open())
+    {
+        printf("writing to %s\n",sRMTClust_L2.toUtf8().constData());
+        ofs_R_MT_clustered_L2 << R_MT_clustered_L2 << '\n';
+    }
+    else
+        printf("Not writing to %s\n",sRMTClust_L2.toUtf8().constData());
+    ofs_R_MT_clustered_L2.close();
+
+    R_MT_clustered_L2.resize(0,0);
+
+    //Cluster Operator D
+    QString sDMT_L2 = sTargetDir + sTargetPrefix + QString("D_MT_L2.txt");
+    std::ofstream ofs_D_MT_L2(sDMT_L2.toUtf8().constData(), std::ofstream::out);
+    if (ofs_D_MT_L2.is_open())
+    {
+        printf("writing to %s\n",sDMT_L2.toUtf8().constData());
+        ofs_D_MT_L2 << D_MT_L2 << '\n';
+    }
+    else
+        printf("Not writing to %s\n",sDMT_L2.toUtf8().constData());
+    ofs_D_MT_L2.close();
+
+
+
+
+
+    ////////////////////////////////// Selection calculation
 
     //option d)
     MatrixXd M_selected = minimumNormSelected.getKernel();
@@ -928,15 +1060,11 @@ int main(int argc, char *argv[])
     VectorXd s;
 
     double t_dConditionNumber = MNEMath::getConditionNumber(t_Fwd.sol->data, s);
-    double t_dConditionNumberClusteredEc = MNEMath::getConditionNumber(t_clusteredFwdEc.sol->data, s);
+    double t_dConditionNumberClustered_L2 = MNEMath::getConditionNumber(t_clusteredFwd_L2.sol->data, s);
 
 
     std::cout << "Condition Number:\n" << t_dConditionNumber << std::endl;
-    std::cout << "Clustered Ec Condition Number:\n" << t_dConditionNumberClusteredEc << std::endl;
-
-    std::cout << "ForwardSolution" << t_Fwd.sol->data.block(0,0,10,10) << std::endl;
-
-    std::cout << "Clustered ForwardSolution" << t_clusteredFwdEc.sol->data.block(0,0,10,10) << std::endl;
+    std::cout << "Clustered L2 Condition Number:\n" << t_dConditionNumberClustered_L2 << std::endl;
 
 
 //    double t_dConditionNumberMags = MNEMath::getConditionNumber(mags, s);
