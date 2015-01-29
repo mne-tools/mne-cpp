@@ -78,7 +78,7 @@ int ChInfoModel::rowCount(const QModelIndex & /*parent*/) const
 
 int ChInfoModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 10;
+    return 11;
 }
 
 
@@ -131,15 +131,19 @@ QVariant ChInfoModel::headerData(int section, Qt::Orientation orientation, int r
                         break;
 
                     case 7:
-                        return QString("%1").arg("Position");
+                        return QString("%1").arg("2D loc (cm)");
                         break;
 
                     case 8:
-                        return QString("%1").arg("Digitizer (cm)");
+                        return QString("%1").arg("3D loc (cm)");
                         break;
 
                     case 9:
                         return QString("%1").arg("Active filter");
+                        break;
+
+                    case 10:
+                        return QString("%1").arg("Coil Type");
                         break;
                 }
             }
@@ -260,6 +264,14 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
                     v.setValue(QString("MEG_grad"));
                 else if(unit == FIFF_UNIT_T)
                     v.setValue(QString("MEG_mag"));
+            }
+
+            if(m_fiffInfo.chs.at(index.row()).kind == FIFFV_REF_MEG_CH) {
+                qint32 unit = m_fiffInfo.chs.at(index.row()).unit;
+                if(unit == FIFF_UNIT_T_M)
+                    v.setValue(QString("MEG_grad_ref"));
+                else if(unit == FIFF_UNIT_T)
+                    v.setValue(QString("MEG_mag_ref"));
             }
 
             switch(role) {
@@ -393,6 +405,24 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
                     v.setValue(operatorPtr);
                     return v;
                 }
+
+                case Qt::TextAlignmentRole:
+                    return Qt::AlignHCenter + Qt::AlignVCenter;
+            }
+        }//end column check
+
+        //******** eleventh column (coil type) ********
+        if(index.column()==10) {
+            QVariant v;
+
+            switch(role) {
+                case Qt::DisplayRole:
+                    v.setValue(QString("%1").arg(m_fiffInfo.chs.at(index.row()).coil_type));
+                    return v;
+
+                case ChInfoModelRoles::GetChCoilType:
+                    v.setValue(m_fiffInfo.chs.at(index.row()).coil_type);
+                    return v;
 
                 case Qt::TextAlignmentRole:
                     return Qt::AlignHCenter + Qt::AlignVCenter;
@@ -540,6 +570,17 @@ void ChInfoModel::mapLayoutToChannels()
 
         switch(chInfo.kind) {
             case FIFFV_MEG_CH:
+                //Scan for MEG string and other characters
+                regExpRemove = QRegExp("(MEG|-|_|/|\| )");
+                chName.remove(regExpRemove);
+
+                //After cleaning the string try to convert the residual to an int number
+                flagOk = false;
+                m_mappedLayoutChNames.replace(i, QString("%1 %2").arg("MEG").arg(chName));
+
+                break;
+
+            case FIFFV_REF_MEG_CH:
                 //Scan for MEG string and other characters
                 regExpRemove = QRegExp("(MEG|-|_|/|\| )");
                 chName.remove(regExpRemove);
