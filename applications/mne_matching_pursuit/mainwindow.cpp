@@ -2205,6 +2205,14 @@ void MainWindow::on_dsb_sample_rate_editingFinished()
     if(!read_fiff_changed)
     {
         read_fiff_changed = true;
+
+        ui->dsb_from->setMaximum((_last_sample - 63) / _sample_rate);
+        ui->dsb_to->setMinimum((_first_sample + 63) / _sample_rate);
+        ui->lb_from->setToolTip(QString("minimum: %1 seconds").arg(_first_sample / _sample_rate));
+        ui->lb_to->setToolTip(QString("maximum: %1 seconds").arg(_last_sample / _sample_rate));
+        ui->sb_sample_count->setToolTip(QString("epoch: %1 sec").arg((_to - _from + 1) / _sample_rate));
+        ui->lb_samples->setToolTip(QString("min: 64 (%1 sec)\nmax: 4096 (%2 sec)").arg(64 / _sample_rate).arg(4096 / _sample_rate));
+
         if(_from != 0)
             ui->dsb_from->setValue(_from / _sample_rate + _offset_time);
         ui->dsb_to->setValue(_to / _sample_rate + _offset_time);
@@ -2880,80 +2888,87 @@ void MainWindow::on_actionExport_triggered()
         xmlWriter.writeStartDocument();
 
         xmlWriter.writeStartElement("COUNT");
-        xmlWriter.writeAttribute("of_atoms", QString::number(_adaptive_atom_list.length()));
+        xmlWriter.writeAttribute("of_atoms", QString::number(_adaptive_atom_list.length() * _adaptive_atom_list.first().length()));
 
+        qint16 built_count = 0;
         qint32 div = floor(_adaptive_atom_list.length() / (qreal)pdict_count);
         qint32 mod = _adaptive_atom_list.length() % pdict_count;
-        if(div != 0)
-        {
-            for(qint32 j = 0; j < pdict_count; j++)
+            if(div != 0)
+            {
+                for(qint32 j = 0; j < pdict_count; j++)
+                {
+                    xmlWriter.writeStartElement("built_Atoms");
+                    xmlWriter.writeAttribute("formula", "Gaboratom");
+                    xmlWriter.writeAttribute("sample_count", QString::number(_adaptive_atom_list.first().first().sample_count));
+                    xmlWriter.writeAttribute("atom_count", QString::number(div * _adaptive_atom_list.first().length()));
+                    xmlWriter.writeAttribute("source_dict", save_path.split('/').last().split('.').first() + "_" + QString::number(j));
+
+                    for(qint32 i = 0; i < div; i++)
+                    {
+                        for(qint32 chn = 0; chn < _adaptive_atom_list.first().length(); chn++)
+                        {
+                            GaborAtom gabor_atom = _adaptive_atom_list.at(i + j * div).at(chn);
+                            QStringList result_list = gabor_atom.create_string_values(gabor_atom.sample_count, gabor_atom.scale, gabor_atom.sample_count / 2, gabor_atom.modulation, gabor_atom.phase);
+
+                            xmlWriter.writeStartElement("ATOM");
+                            xmlWriter.writeAttribute("ID", QString::number(i * _adaptive_atom_list.first().length() + chn));
+                            xmlWriter.writeAttribute("scale", QString::number(gabor_atom.scale));
+                            xmlWriter.writeAttribute("modu", QString::number(gabor_atom.modulation));
+                            xmlWriter.writeAttribute("phase", QString::number(gabor_atom.phase));
+
+                            xmlWriter.writeStartElement("samples");
+                            QString samples_to_xml;
+                            for (qint32 it = 0; it < result_list.length(); it++)
+                            {
+                                samples_to_xml.append(result_list.at(it));
+                                samples_to_xml.append(":");
+                            }
+                            xmlWriter.writeAttribute("samples", samples_to_xml);
+                            xmlWriter.writeEndElement();    //samples
+
+                            xmlWriter.writeEndElement();    //ATOM
+                        }
+                        built_count++;
+                    }
+                    xmlWriter.writeEndElement();    //built_atoms
+                } //builds
+            }
+
+            if(mod != 0)
             {
                 xmlWriter.writeStartElement("built_Atoms");
                 xmlWriter.writeAttribute("formula", "Gaboratom");
-                xmlWriter.writeAttribute("sample_count", QString::number(_adaptive_atom_list.first().last().sample_count));
-                xmlWriter.writeAttribute("atom_count", QString::number(div));
-                xmlWriter.writeAttribute("source_dict", save_path.split('/').last().split('.').first() + "_" + QString::number(j));
+                xmlWriter.writeAttribute("sample_count", QString::number(_adaptive_atom_list.first().first().sample_count));
+                xmlWriter.writeAttribute("atom_count", QString::number(mod * _adaptive_atom_list.first().length()));
+                xmlWriter.writeAttribute("source_dict", save_path.split('/').last().split('.').first()  + "_" + QString::number(built_count));
 
-                for(qint32 i = 0; i < div; i++)
+                for(qint32 i = 0; i < mod; i++)
                 {
-                    GaborAtom gabor_atom = _adaptive_atom_list.at(i + j * div).last();
-                    QStringList result_list = gabor_atom.create_string_values(gabor_atom.sample_count, gabor_atom.scale, gabor_atom.sample_count / 2, gabor_atom.modulation, gabor_atom.phase);
-
-                    xmlWriter.writeStartElement("ATOM");
-                    xmlWriter.writeAttribute("ID", QString::number(i));
-                    xmlWriter.writeAttribute("scale", QString::number(gabor_atom.scale));
-                    xmlWriter.writeAttribute("modu", QString::number(gabor_atom.modulation));
-                    xmlWriter.writeAttribute("phase", QString::number(gabor_atom.phase));
-
-                    xmlWriter.writeStartElement("samples");
-                    QString samples_to_xml;
-                    for (qint32 it = 0; it < result_list.length(); it++)
+                    for(qint32 chn = 0; chn < _adaptive_atom_list.first().length(); chn++)
                     {
-                        samples_to_xml.append(result_list.at(it));
-                        samples_to_xml.append(":");
+                        GaborAtom gabor_atom = _adaptive_atom_list.at(i + pdict_count * div).at(chn);
+                        QStringList result_list = gabor_atom.create_string_values(gabor_atom.sample_count, gabor_atom.scale, gabor_atom.sample_count / 2, gabor_atom.modulation, gabor_atom.phase);
+
+                        xmlWriter.writeStartElement("ATOM");
+                        xmlWriter.writeAttribute("ID", QString::number(i * _adaptive_atom_list.first().length() + chn));
+                        xmlWriter.writeAttribute("scale", QString::number(gabor_atom.scale));
+                        xmlWriter.writeAttribute("modu", QString::number(gabor_atom.modulation));
+                        xmlWriter.writeAttribute("phase", QString::number(gabor_atom.phase));
+
+                        xmlWriter.writeStartElement("samples");
+                        QString samples_to_xml;
+                        for (qint32 it = 0; it < result_list.length(); it++)
+                        {
+                            samples_to_xml.append(result_list.at(it));
+                            samples_to_xml.append(":");
+                        }
+                        xmlWriter.writeAttribute("samples", samples_to_xml);
+                        xmlWriter.writeEndElement();    //samples
+
+                        xmlWriter.writeEndElement();    //ATOM
                     }
-                    xmlWriter.writeAttribute("samples", samples_to_xml);
-                    xmlWriter.writeEndElement();    //samples
-
-                    xmlWriter.writeEndElement();    //ATOM
-
                 }
                 xmlWriter.writeEndElement();    //built_atoms
-            } //builds
-        }
-
-        if(mod != 0)
-        {
-            xmlWriter.writeStartElement("built_Atoms");
-            xmlWriter.writeAttribute("formula", "Gaboratom");
-            xmlWriter.writeAttribute("sample_count", QString::number(_adaptive_atom_list.first().last().sample_count));
-            xmlWriter.writeAttribute("atom_count", QString::number(mod));
-            xmlWriter.writeAttribute("source_dict", save_path.split('/').last().split('.').first()  + "_" + QString::number(8));
-
-            for(qint32 i = 0; i < mod; i++)
-            {
-                GaborAtom gabor_atom = _adaptive_atom_list.at(i + pdict_count * div).last();
-                QStringList result_list = gabor_atom.create_string_values(gabor_atom.sample_count, gabor_atom.scale, gabor_atom.sample_count / 2, gabor_atom.modulation, gabor_atom.phase);
-
-                xmlWriter.writeStartElement("ATOM");
-                xmlWriter.writeAttribute("ID", QString::number(i));
-                xmlWriter.writeAttribute("scale", QString::number(gabor_atom.scale));
-                xmlWriter.writeAttribute("modu", QString::number(gabor_atom.modulation));
-                xmlWriter.writeAttribute("phase", QString::number(gabor_atom.phase));
-
-                xmlWriter.writeStartElement("samples");
-                QString samples_to_xml;
-                for (qint32 it = 0; it < result_list.length(); it++)
-                {
-                    samples_to_xml.append(result_list.at(it));
-                    samples_to_xml.append(":");
-                }
-                xmlWriter.writeAttribute("samples", samples_to_xml);
-                xmlWriter.writeEndElement();    //samples
-
-                xmlWriter.writeEndElement();    //ATOM
-            }
-            xmlWriter.writeEndElement();    //built_atoms
         }
         xmlWriter.writeEndElement();    //COUNT
         xmlWriter.writeEndDocument();
