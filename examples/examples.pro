@@ -50,7 +50,8 @@ SUBDIRS += \
     findEvoked \
     evokedGradAmp \
     cancelNoise \
-    fiffIO
+    fiffIO \
+    makeLayout
 
 contains(MNECPP_CONFIG, withGui) {
 	SUBDIRS +=

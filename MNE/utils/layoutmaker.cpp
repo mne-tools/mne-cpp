@@ -82,7 +82,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
 {
     /*
     * Automatically make a layout according to the
-    * electrode locations in inputPoints
+    * channel locations in inputPoints
     */
     int         res = FAIL;
     VectorXf    r0(3);
@@ -110,18 +110,18 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
         rrs(k,2) = inputPoints.at(k)[2]; //z
     }
 
-    std::cout<<"EEG channels found for layout: "<<neeg<<std::endl;
+    std::cout<<"Channels found for layout: "<<neeg<<std::endl;
 
     //Fit to sphere if wanted by the user
     if (!do_fit)
-        std::cout<<"Using default origin:"<<1000*r0[0]<<1000*r0[1]<<1000*r0[2]<<std::endl;
+        std::cout<<"Using default origin:"<<r0[0]<<r0[1]<<r0[2]<<std::endl;
     else {
         if(fit_sphere_to_points(rrs,neeg,0.05,r0,rad) == FAIL) {
-            std::cout<<"Using default origin:"<<1000*r0[0]<<1000*r0[1]<<1000*r0[2]<<std::endl;
+            std::cout<<"Using default origin:"<<r0[0]<<r0[1]<<r0[2]<<std::endl;
         }
         else{
             std::cout<<"best fitting sphere:"<<std::endl;
-            std::cout<<"torigin: "<<1000*r0[0]<<1000*r0[1]<<1000*r0[2]<<1000*rad<<std::endl<<"tradius: "<<1000*rad<<std::endl;
+            std::cout<<"torigin: "<<r0[0]<<r0[1]<<r0[2]<<rad<<std::endl<<"tradius: "<<rad<<std::endl;
         }
     }
 
@@ -152,10 +152,10 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
             ymin = yy[k];
     }
 
-    if(xmin == xmax || ymin == ymax) {
-        std::cout<<"Cannot make a layout. All positions are identical"<<std::endl;
-        return res;
-    }
+//    if(xmin == xmax || ymin == ymax) {
+//        std::cout<<"Cannot make a layout. All positions are identical"<<std::endl;
+//        return res;
+//    }
 
     xmax = xmax + 0.6*w;
     xmin = xmin - 0.6*w;
@@ -167,27 +167,30 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
     * Compose the viewports
     */
     QVector<double> point;
+    QTextStream out;
 
-    for(k = 0; k < neeg; k++) {
-        point.clear();
-        point.append(xx[k]-0.5*w);
-        point.append(-(yy[k]-0.5*h)); //rotate 180 - mirror y axis
-        outputPoints.append(point);
-    }
-
-    /*
-    * Write to file
-    */
     if(writeFile) {
         if (!outFile.open(QIODevice::WriteOnly)) {
+            std::cout<<"could not open output file";
             qDebug()<<"could not open output file";
             return FAIL;
         }
 
-        QTextStream out(&outFile);
+        out.setDevice(&outFile);
+    }
 
-        for (k = 0; k < neeg; k++)
-            out << k+1 << " " << xx[k]-0.5*w << " " << yy[k]-0.5*h << " " << w << " " << h << " " << names.at(k)<<endl;
+    for(k = 0; k < neeg; k++) {
+        point.clear();
+        point.append(xx[k]-0.5*w);
+        point.append(-(yy[k]-0.5*h)); //mirror y axis
+        outputPoints.append(point);
+
+        if(writeFile)
+            out << k+1 << " " << point[0] << " " << point[1] << " " << w << " " << h << " " << names.at(k)<<endl;
+    }
+
+    if(writeFile) {
+        std::cout<<"success while wrtiting to output file";
 
         outFile.close();
     }
@@ -377,6 +380,8 @@ int LayoutMaker::fit_sphere_to_points(MatrixXf &rr,
     calculate_cm_ave_dist(rr,np,cm,R0);
 
     init_simplex = make_initial_simplex(cm,3,simplex_size);
+
+    std::cout << "sphere origin calcuated" << cm[0] << " " << cm[1] << " " << cm[2] << std::endl;
 
     user.report = FALSE;
 

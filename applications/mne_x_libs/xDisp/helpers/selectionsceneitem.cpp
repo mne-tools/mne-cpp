@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     evokedmodalitywidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     selectionsceneitem.cpp
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     May, 2014
+* @date     September, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,89 +30,100 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the EvokedModalityWidget Class.
+* @brief    Contains the implementation of the SelectionSceneItem class.
 *
 */
-
-#ifndef EVOKEDMODALITYWIDGET_H
-#define EVOKEDMODALITYWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
+#include "selectionsceneitem.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QCheckBox>
-#include <QStringList>
-#include <QLineEdit>
+using namespace XDISPLIB;
+using namespace std;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE XDISPLIB
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace XDISPLIB
+SelectionSceneItem::SelectionSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor channelColor)
+: m_sChannelName(channelName)
+, m_iChannelNumber(channelNumber)
+, m_qpChannelPosition(channelPosition)
+, m_cChannelColor(channelColor)
+, m_bHighlightItem(false)
+, m_iChannelKind(channelKind)
+, m_iChannelUnit(channelUnit)
 {
+    this->setAcceptHoverEvents(true);
+    this->setFlag(QGraphicsItem::ItemIsSelectable, true);
+}
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
 
-class RealTimeEvokedWidget;
-struct Modality;
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS EvokedModalityWidget
-*
-* @brief The EvokedModalityWidget class provides the sensor selection widget
-*/
-class EvokedModalityWidget : public QWidget
+QRectF SelectionSceneItem::boundingRect() const
 {
-    Q_OBJECT
-public:
+    return QRectF(-25, -30, 50, 50);
+}
 
-    //=========================================================================================================
-    /**
-    * Constructs a EvokedModalityWidget which is a child of parent evoked widget.
-    *
-    * @param [in] toolbox   connected real-time evoked widget
-    */
-    EvokedModalityWidget(QWidget *parent, RealTimeEvokedWidget *toolbox);
 
-    //=========================================================================================================
-    /**
-    * Destroys the EvokedModalityWidget.
-    * All EvokedModalityWidget's children are deleted first. The application exits if EvokedModalityWidget is the main widget.
-    */
-    ~EvokedModalityWidget();
+//*************************************************************************************************************
 
-    void updateCheckbox(qint32 state);
+void SelectionSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
 
-    void updateLineEdit(const QString & text);
+    this->setPos(10*m_qpChannelPosition.x(), -10*m_qpChannelPosition.y());
 
-signals:
-    void settingsChanged();
+    // Plot shadow
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(Qt::darkGray);
+    painter->drawEllipse(-12, -12, 30, 30);
 
-private:
-    RealTimeEvokedWidget * m_pRealTimeEvokedWidget; /**< Connected real-time evoked widget */
+    //Plot selected item
+    if(this->isSelected())
+        painter->setBrush(QBrush(QColor(93,177,47)));
+    else
+        painter->setBrush(QBrush(m_cChannelColor));
 
-    QList<QCheckBox*>   m_qListModalityCheckBox;    /**< List of modality checkboxes */
-    QList<QLineEdit*>   m_qListModalityLineEdit;    /**< List of modality scalings */
-};
+    //Plot highlighted selected item
+    if(m_bHighlightItem) {
+        painter->setPen(QPen(Qt::red, 4));
+        painter->drawEllipse(-15, -15, 30, 30);
+    }
+    else {
+        painter->setPen(QPen(Qt::black, 1));
+        painter->drawEllipse(-15, -15, 30, 30);
+    }
 
-} // NAMESPACE
+    // Plot electrode name
+    painter->setPen(QPen(Qt::black, 1));
+    QStaticText staticElectrodeName = QStaticText(m_sChannelName);
+    QSizeF sizeText = staticElectrodeName.size();
+    painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
+}
 
-#endif // EVOKEDMODALITYWIDGET_H
+
+
+
+
+
+
+
+
+
+
+
+

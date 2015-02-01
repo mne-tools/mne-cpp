@@ -1,16 +1,15 @@
 //=============================================================================================================
 /**
-* @file     types.h
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+* @file     selectionsceneitem.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     January, 2014
+* @date     September, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,31 +30,41 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains general application specific types
+* @brief    Contains the declaration of the SelectionSceneItem class.
 *
 */
-#ifndef TYPES_H
-#define TYPES_H
+
+#ifndef SELECTIONSCENEITEM_H
+#define SELECTIONSCENEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
-#include <Eigen/SparseCore>
-#include <fiff/fiff.h>
-#include "filteroperator.h"
+#include <iostream>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QPair>
-#include <QList>
-#include <QSharedPointer>
+#include <QGraphicsItem>
+#include <QString>
+#include <QColor>
+#include <QPainter>
+#include <QStaticText>
+#include <QDebug>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE XDISPLIB
+//=============================================================================================================
+
+namespace XDISPLIB
+{
 
 
 //*************************************************************************************************************
@@ -63,70 +72,44 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
 
-
-//*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEBrowseRawQt
-//=============================================================================================================
-
-namespace MNEBrowseRawQt
+/**
+* SelectionSceneItem...
+*
+* @brief The SelectionSceneItem class provides a new data structure for visualizing channels in a 2D layout.
+*/
+class SelectionSceneItem : public QGraphicsItem
 {
 
-typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
-typedef QPair<const double*,qint32> RowVectorPair;
-typedef QPair<const float*,qint32> RowVectorPairF;
-typedef QPair<int,int> QPairInts;
+public:
+    //=========================================================================================================
+    /**
+    * Constructs a SelectionSceneItem.
+    */
+    SelectionSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor averageColor = Qt::blue);
 
-namespace RawModelRoles
-{
-    enum ItemRole{GetChannelMean = Qt::UserRole + 1000};
-}
+    //=========================================================================================================
+    /**
+    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
+    */
+    QRectF boundingRect() const;
 
-namespace AverageModelRoles
-{
-    enum ItemRole{GetAverageData = Qt::UserRole + 1001,
-                  GetFiffInfo = Qt::UserRole + 1002,
-                  GetAspectKind = Qt::UserRole + 1003,
-                  GetFirstSample = Qt::UserRole + 1004,
-                  GetLastSample = Qt::UserRole + 1005,
-                  GetComment = Qt::UserRole + 1006,
-                  GetTimeData = Qt::UserRole + 1007,
-                  GetProjections = Qt::UserRole + 1008};
-}
+    //=========================================================================================================
+    /**
+    * Reimplemented paint function.
+    */
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-namespace ChInfoModelRoles
-{
-    enum ItemRole{GetOrigChName = Qt::UserRole + 1009,
-                  GetMappedLayoutChName = Qt::UserRole + 1010,
-                  GetChNumber = Qt::UserRole + 1011,
-                  GetChKind = Qt::UserRole + 1012,
-                  GetMEGType = Qt::UserRole + 1013,
-                  GetChUnit = Qt::UserRole + 1014,
-                  GetChAlias = Qt::UserRole + 1015,
-                  GetChPosition = Qt::UserRole + 1016,
-                  GetChDigitizer = Qt::UserRole + 1017,
-                  GetChActiveFilter = Qt::UserRole + 1018,
-                  GetChCoilType = Qt::UserRole + 1019};
-}
+    QString     m_sChannelName;             /**< The channel's name.*/
+    int         m_iChannelNumber;           /**< The channel number.*/
+    int         m_iChannelKind;             /**< The channel kind.*/
+    int         m_iChannelUnit;             /**< The channel unit.*/
+    QPointF     m_qpChannelPosition;        /**< The channel's 2D position in the scene.*/
+    QColor      m_cChannelColor;            /**< The current channel color.*/
+    bool        m_bHighlightItem;           /**< Whether this item is to be highlighted.*/
+};
 
-namespace ProjectionModelRoles
-{
-    enum ItemRole{GetProjectionData = Qt::UserRole + 1019,
-                  GetProjectionName = Qt::UserRole + 1020,
-                  GetProjectionState = Qt::UserRole + 1021,
-                  GetProjectionDimension = Qt::UserRole + 1022};
-}
+} // NAMESPACE MNEBrowseRawQt
 
-} //NAMESPACE
-
-Q_DECLARE_METATYPE(FIFFLIB::fiff_int_t);
-Q_DECLARE_METATYPE(MNEBrowseRawQt::RowVectorPairF);
-Q_DECLARE_METATYPE(const FIFFLIB::FiffInfo*);
-Q_DECLARE_METATYPE(MNEBrowseRawQt::MatrixXdR);
-Q_DECLARE_METATYPE(MNEBrowseRawQt::RowVectorPair);
-Q_DECLARE_METATYPE(QList<MNEBrowseRawQt::RowVectorPair>);
-Q_DECLARE_METATYPE(QSharedPointer<MNEBrowseRawQt::MNEOperator>);
-
-#endif // TYPES_H
+#endif // SELECTIONSCENEITEM_H

@@ -48,8 +48,9 @@
 #include "helpers/realtimemultisamplearraydelegate.h"
 
 #include "helpers/realtimemultisamplearrayscalingwidget.h"
-#include "helpers/sensorwidget.h"
 #include "helpers/projectorwidget.h"
+#include "helpers/selectionmanagerwindow.h"
+#include "helpers/chinfomodel.h"
 
 
 //*************************************************************************************************************
@@ -238,6 +239,15 @@ protected:
     */
     virtual void wheelEvent(QWheelEvent* wheelEvent);
 
+signals:
+    //=========================================================================================================
+    /**
+    * fiffFileUpdated is emitted whenever the fiff info changed
+    *
+    * @param FiffInfo the current loaded fiffinfo
+    */
+    void fiffFileUpdated(const FiffInfo&);
+
 private:
     //=========================================================================================================
     /**
@@ -273,6 +283,14 @@ private:
     */
     void showSensorSelectionWidget();
 
+    //=========================================================================================================
+    /**
+    * Only shows the channels defined in the QStringList selectedChannels
+    *
+    * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
+    */
+    void showSelectedChannelsOnly(QStringList selectedChannels);
+
     RealTimeMultiSampleArrayModel*      m_pRTMSAModel;      /**< RTMSA data model */
     RealTimeMultiSampleArrayDelegate*   m_pRTMSADelegate;   /**< RTMSA data delegate */
     QTableView* m_pTableView;                               /**< the QTableView being part of the model/view framework of Qt */
@@ -296,8 +314,7 @@ private:
 
     QAction*    m_pActionSelectSensors;                     /**< show roi select widget */
 
-    SensorModel* m_pSensorModel;                            /**< Sensor model for channel selection */
-    QSharedPointer<SensorWidget> m_pSensorSelectionWidget;  /**< Sensor selection widget. */
+    QSharedPointer<SelectionManagerWindow> m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */
 
     QMap< qint32,float > m_qMapChScaling;                   /**< Sensor selection widget. */
     QAction* m_pActionChScaling;                            /**< Show channel scaling Action. */
@@ -306,7 +323,11 @@ private:
     QSharedPointer<ProjectorWidget> m_pProjectorSelectionWidget;    /**< Projector selection widget. */
 
 
+    QStringList     m_slSelectedChannels;                   /**< the currently selected channels from the selection manager window. */
+    bool            m_bHideBadChannels;                     /**< hide bad channels flag. */
+
     QSharedPointer<RealTimeMultiSampleArrayScalingWidget> m_pRTMSAScalingWidget;   /**< Channel scaling widget. */
+    QSharedPointer<ChInfoModel> m_pChInfoModel;             /**< channel info model. */
 
     QList<qint32> m_qListCurrentSelection;  /**< Current selection list -> hack around C++11 lambda  */
     void applySelection();                  /**< apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */

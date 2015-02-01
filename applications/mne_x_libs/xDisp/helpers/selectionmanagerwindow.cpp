@@ -47,7 +47,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEBrowseRawQt;
+using namespace XDISPLIB;
 
 
 //*************************************************************************************************************
@@ -56,7 +56,7 @@ using namespace MNEBrowseRawQt;
 //=============================================================================================================
 
 SelectionManagerWindow::SelectionManagerWindow(QWidget *parent, ChInfoModel* pChInfoModel)
-: QDockWidget(parent)
+    : QDockWidget(parent,Qt::Window)
 , ui(new Ui::SelectionManagerWindow)
 , m_pChInfoModel(pChInfoModel)
 {
@@ -81,6 +81,7 @@ SelectionManagerWindow::~SelectionManagerWindow()
 
 void SelectionManagerWindow::setCurrentlyMappedFiffChannels(const QStringList &mappedLayoutChNames)
 {
+    std::cout<<"SelectionManagerWindow::setCurrentlyMappedFiffChannels"<<std::endl;
     m_currentlyLoadedFiffChannels = mappedLayoutChNames;
 
     //Clear the visible channel list
@@ -220,7 +221,7 @@ void SelectionManagerWindow::initListWidgets()
 //*************************************************************************************************************
 
 void SelectionManagerWindow::initSelectionSceneView()
-{    
+{
     //Create layout scene and set to view
     m_pSelectionScene = new SelectionScene(ui->m_graphicsView_layoutPlot);
     ui->m_graphicsView_layoutPlot->setScene(m_pSelectionScene);

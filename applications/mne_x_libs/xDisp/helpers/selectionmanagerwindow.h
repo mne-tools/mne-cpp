@@ -42,13 +42,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "ui_selectionmanagerwindow.h"
+#include "../ui_selectionmanagerwindow.h"
 #include "utils/layoutloader.h"             //MNE-CPP utils
 #include "utils/selectionloader.h"          //MNE-CPP utils
 #include "utils/layoutmaker.h"              //MNE-CPP utils
-#include "../Utils/selectionscene.h"        //MNE Browse Raw QT utils
+#include "selectionscene.h"        //MNE Browse Raw QT utils
 #include "fiff/fiff.h"
-#include "../Models/chinfomodel.h"
+#include "chinfomodel.h"
 
 
 //*************************************************************************************************************
@@ -74,7 +74,7 @@ using namespace UTILSLIB;
 // DEFINE NAMESPACE MNEBrowseRawQt
 //=============================================================================================================
 
-namespace MNEBrowseRawQt
+namespace XDISPLIB
 {
 
 

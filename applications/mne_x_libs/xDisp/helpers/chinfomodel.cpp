@@ -48,7 +48,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEBrowseRawQt;
+using namespace XDISPLIB;
 
 
 //*************************************************************************************************************
@@ -131,11 +131,11 @@ QVariant ChInfoModel::headerData(int section, Qt::Orientation orientation, int r
                         break;
 
                     case 7:
-                        return QString("%1").arg("2D loc (cm)");
+                        return QString("%1").arg("Position");
                         break;
 
                     case 8:
-                        return QString("%1").arg("3D loc (cm)");
+                        return QString("%1").arg("Digitizer (cm)");
                         break;
 
                     case 9:
@@ -266,14 +266,6 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
                     v.setValue(QString("MEG_mag"));
             }
 
-            if(m_fiffInfo.chs.at(index.row()).kind == FIFFV_REF_MEG_CH) {
-                qint32 unit = m_fiffInfo.chs.at(index.row()).unit;
-                if(unit == FIFF_UNIT_T_M)
-                    v.setValue(QString("MEG_grad_ref"));
-                else if(unit == FIFF_UNIT_T)
-                    v.setValue(QString("MEG_mag_ref"));
-            }
-
             switch(role) {
                 case Qt::DisplayRole:
                     return v;
@@ -350,83 +342,85 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
         if(index.column()==9) {
             QVariant v;
 
-            //Check if mne operator is a filter operator
-            QSharedPointer<MNEOperator> operatorPtr = m_assignedOperators.value(index.row(), QSharedPointer<MNEOperator>(new MNEOperator()));
-            QSharedPointer<FilterOperator> filterOperator;
+//            //Check if mne operator is a filter operator
+//            QSharedPointer<MNEOperator> operatorPtr = m_assignedOperators.value(index.row(), QSharedPointer<MNEOperator>(new MNEOperator()));
+//            QSharedPointer<FilterOperator> filterOperator;
 
             switch(role) {
                 case Qt::DisplayRole: {
-                    if(operatorPtr->m_OperatorType == MNEOperator::FILTER) {
-                        filterOperator = operatorPtr.staticCast<FilterOperator>();
-                    }
-                    else {
-                        v.setValue(QString("%1").arg("none"));
-                        return v;
-                    }
-
-                    switch(filterOperator->m_Type) {
-                        case FilterOperator::LPF: {
-                            v.setValue(QString("%1 | %2").arg("LP").arg(filterOperator->m_dCenterFreq*m_fiffInfo.sfreq/2));
-                            return v;
-                        }
-
-                        case FilterOperator::HPF: {
-                            v.setValue(QString("%1 | %2").arg("HP").arg(filterOperator->m_dCenterFreq*m_fiffInfo.sfreq/2));
-                            return v;
-                        }
-
-                        case FilterOperator::BPF: {
-                            double fsample = m_fiffInfo.sfreq;
-                            double low = (filterOperator->m_dCenterFreq*fsample/2) - (filterOperator->m_dBandwidth*fsample/4); // /4 because we also need to devide by 2 to get the nyquist freq
-                            double high = (filterOperator->m_dCenterFreq*fsample/2) + (filterOperator->m_dBandwidth*fsample/4);
-                            v.setValue(QString("%1 | %2 | %3").arg("BP").arg(low).arg(high));
-                            return v;
-                        }
-
-                        case FilterOperator::NOTCH: {
-                            double fsample = m_fiffInfo.sfreq;
-                            double low = (filterOperator->m_dCenterFreq*fsample/2) - (filterOperator->m_dBandwidth*fsample/4);
-                            double high = (filterOperator->m_dCenterFreq*fsample/2) + (filterOperator->m_dBandwidth*fsample/4);
-                            v.setValue(QString("%1 | %2 | %3").arg("NOTCH").arg(low).arg(high));
-                            return v;
-                        }
-                    }
-                }
-
-                case ChInfoModelRoles::GetChActiveFilter: {
-                    if(operatorPtr->m_OperatorType == MNEOperator::FILTER) {
-                        filterOperator = operatorPtr.staticCast<FilterOperator>();
-                    }
-                    else {
-                        v.setValue(QString("%1").arg("none"));
-                        return v;
-                    }
-
-                    v.setValue(operatorPtr);
                     return v;
                 }
+//                    if(operatorPtr->m_OperatorType == MNEOperator::FILTER) {
+//                        filterOperator = operatorPtr.staticCast<FilterOperator>();
+//                    }
+//                    else {
+//                        v.setValue(QString("%1").arg("none"));
+//                        return v;
+//                    }
+
+//                    switch(filterOperator->m_Type) {
+//                        case FilterOperator::LPF: {
+//                            v.setValue(QString("%1 | %2").arg("LP").arg(filterOperator->m_dCenterFreq*m_fiffInfo.sfreq/2));
+//                            return v;
+//                        }
+
+//                        case FilterOperator::HPF: {
+//                            v.setValue(QString("%1 | %2").arg("HP").arg(filterOperator->m_dCenterFreq*m_fiffInfo.sfreq/2));
+//                            return v;
+//                        }
+
+//                        case FilterOperator::BPF: {
+//                            double fsample = m_fiffInfo.sfreq;
+//                            double low = (filterOperator->m_dCenterFreq*fsample/2) - (filterOperator->m_dBandwidth*fsample/4); // /4 because we also need to devide by 2 to get the nyquist freq
+//                            double high = (filterOperator->m_dCenterFreq*fsample/2) + (filterOperator->m_dBandwidth*fsample/4);
+//                            v.setValue(QString("%1 | %2 | %3").arg("BP").arg(low).arg(high));
+//                            return v;
+//                        }
+
+//                        case FilterOperator::NOTCH: {
+//                            double fsample = m_fiffInfo.sfreq;
+//                            double low = (filterOperator->m_dCenterFreq*fsample/2) - (filterOperator->m_dBandwidth*fsample/4);
+//                            double high = (filterOperator->m_dCenterFreq*fsample/2) + (filterOperator->m_dBandwidth*fsample/4);
+//                            v.setValue(QString("%1 | %2 | %3").arg("NOTCH").arg(low).arg(high));
+//                            return v;
+//                        }
+//                    }
+//                }
+
+//                case ChInfoModelRoles::GetChActiveFilter: {
+//                    if(operatorPtr->m_OperatorType == MNEOperator::FILTER) {
+//                        filterOperator = operatorPtr.staticCast<FilterOperator>();
+//                    }
+//                    else {
+//                        v.setValue(QString("%1").arg("none"));
+//                        return v;
+//                    }
+
+//                    v.setValue(operatorPtr);
+//                    return v;
+//                }
 
                 case Qt::TextAlignmentRole:
                     return Qt::AlignHCenter + Qt::AlignVCenter;
             }
-        }//end column check
 
-        //******** eleventh column (coil type) ********
-        if(index.column()==10) {
-            QVariant v;
+            //******** eleventh column (coil type) ********
+            if(index.column()==10) {
+                QVariant v;
 
-            switch(role) {
-                case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_fiffInfo.chs.at(index.row()).coil_type));
-                    return v;
+                switch(role) {
+                    case Qt::DisplayRole:
+                        v.setValue(QString("%1").arg(m_fiffInfo.chs.at(index.row()).coil_type));
+                        return v;
 
-                case ChInfoModelRoles::GetChCoilType:
-                    v.setValue(m_fiffInfo.chs.at(index.row()).coil_type);
-                    return v;
+                    case ChInfoModelRoles::GetChCoilType:
+                        v.setValue(m_fiffInfo.chs.at(index.row()).coil_type);
+                        return v;
 
-                case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
-            }
+                    case Qt::TextAlignmentRole:
+                        return Qt::AlignHCenter + Qt::AlignVCenter;
+                }
+            }//end column check
         }//end column check
     } // end index.valid() check
 
@@ -499,16 +493,16 @@ void ChInfoModel::fiffInfoChanged(const FiffInfo &fiffInfo)
 
 //*************************************************************************************************************
 
-void ChInfoModel::assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOperator> > &assignedOperators)
-{
-    beginResetModel();
+//void ChInfoModel::assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOperator> > &assignedOperators)
+//{
+//    beginResetModel();
 
-    m_assignedOperators = assignedOperators;
+//    m_assignedOperators = assignedOperators;
 
-    endResetModel();
+//    endResetModel();
 
-    emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
-}
+//    emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
+//}
 
 
 //*************************************************************************************************************
@@ -570,17 +564,6 @@ void ChInfoModel::mapLayoutToChannels()
 
         switch(chInfo.kind) {
             case FIFFV_MEG_CH:
-                //Scan for MEG string and other characters
-                regExpRemove = QRegExp("(MEG|-|_|/|\| )");
-                chName.remove(regExpRemove);
-
-                //After cleaning the string try to convert the residual to an int number
-                flagOk = false;
-                m_mappedLayoutChNames.replace(i, QString("%1 %2").arg("MEG").arg(chName));
-
-                break;
-
-            case FIFFV_REF_MEG_CH:
                 //Scan for MEG string and other characters
                 regExpRemove = QRegExp("(MEG|-|_|/|\| )");
                 chName.remove(regExpRemove);
