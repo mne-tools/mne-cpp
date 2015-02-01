@@ -45,6 +45,8 @@ public:
 
     void setSettings(const QList< Modality >& p_qListModalities);
 
+    void setSelectedChannels(const QList<int> &selectedChannels);
+
 protected:
     //=========================================================================================================
     /**
@@ -77,12 +79,13 @@ private:
     float fMaxEOG;       /**< Scale for EEG channels */
     float fMaxMISC;      /**< Scale for Miscellaneous channels */
 
-    RealTimeEvokedModel* m_pRealTimeEvokedModel;
+    RealTimeEvokedModel*    m_pRealTimeEvokedModel;
 
-    qint32              m_iNumChannels;
+    qint32                  m_iNumChannels;
 
-    bool m_bIsInit;
+    bool                    m_bIsInit;
 
+    QList<int>              m_lSelectedChannels;
 };
 
 

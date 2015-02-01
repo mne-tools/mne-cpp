@@ -125,7 +125,7 @@ public:
     *
     * @param [in] channelList channels which are be to set as selected
     */
-    void highlightChannels(QStringList channelList);
+    void highlightChannels(QModelIndexList channelIndexList);
 
     //=========================================================================================================
     /**

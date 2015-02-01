@@ -45,6 +45,7 @@ contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += \
         mne_x_libs \
         mne_x \
+        mne_analyze_qt
 
 
     !contains(MNECPP_CONFIG, oldCompiler) {

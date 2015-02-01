@@ -2,6 +2,7 @@ var searchData=
 [
   ['babymegaboutwidget_2ecpp',['babymegaboutwidget.cpp',['../babymegaboutwidget_8cpp.html',1,'']]],
   ['babymegaboutwidget_2eh',['babymegaboutwidget.h',['../babymegaboutwidget_8h.html',1,'']]],
+  ['babymegprojectdialog_2ecpp',['babymegprojectdialog.cpp',['../babymegprojectdialog_8cpp.html',1,'']]],
   ['babymegsetupwidget_2ecpp',['babymegsetupwidget.cpp',['../babymegsetupwidget_8cpp.html',1,'']]],
   ['babymegsetupwidget_2eh',['babymegsetupwidget.h',['../babymegsetupwidget_8h.html',1,'']]],
   ['babymegsquidcontroldgl_2ecpp',['babymegsquidcontroldgl.cpp',['../babymegsquidcontroldgl_8cpp.html',1,'']]],
@@ -15,16 +16,12 @@ var searchData=
   ['bcifeaturewindow_2eh',['bcifeaturewindow.h',['../bcifeaturewindow_8h.html',1,'']]],
   ['bcisetupwidget_2ecpp',['bcisetupwidget.cpp',['../bcisetupwidget_8cpp.html',1,'']]],
   ['bcisetupwidget_2eh',['bcisetupwidget.h',['../bcisetupwidget_8h.html',1,'']]],
-  ['brainmonitor_2ecpp',['brainmonitor.cpp',['../brainmonitor_8cpp.html',1,'']]],
-  ['brainmonitor_2eh',['brainmonitor.h',['../brainmonitor_8h.html',1,'']]],
-  ['brainmonitor_5fglobal_2eh',['brainmonitor_global.h',['../brainmonitor__global_8h.html',1,'']]],
-  ['brainmonitoraboutwidget_2ecpp',['brainmonitoraboutwidget.cpp',['../brainmonitoraboutwidget_8cpp.html',1,'']]],
-  ['brainmonitoraboutwidget_2eh',['brainmonitoraboutwidget.h',['../brainmonitoraboutwidget_8h.html',1,'']]],
-  ['brainmonitorrunwidget_2ecpp',['brainmonitorrunwidget.cpp',['../brainmonitorrunwidget_8cpp.html',1,'']]],
-  ['brainmonitorrunwidget_2eh',['brainmonitorrunwidget.h',['../brainmonitorrunwidget_8h.html',1,'']]],
-  ['brainmonitorsetupwidget_2eh',['brainmonitorsetupwidget.h',['../brainmonitorsetupwidget_8h.html',1,'']]],
   ['brainview_2ecpp',['brainview.cpp',['../brainview_8cpp.html',1,'']]],
   ['brainview_2eh',['brainview.h',['../brainview_8h.html',1,'']]],
   ['buffer_2ecpp',['buffer.cpp',['../buffer_8cpp.html',1,'']]],
-  ['buffer_2eh',['buffer.h',['../buffer_8h.html',1,'']]]
+  ['buffer_2eh',['buffer.h',['../buffer_8h.html',1,'']]],
+  ['butterflyscene_2ecpp',['butterflyscene.cpp',['../butterflyscene_8cpp.html',1,'']]],
+  ['butterflyscene_2eh',['butterflyscene.h',['../butterflyscene_8h.html',1,'']]],
+  ['butterflysceneitem_2ecpp',['butterflysceneitem.cpp',['../butterflysceneitem_8cpp.html',1,'']]],
+  ['butterflysceneitem_2eh',['butterflysceneitem.h',['../butterflysceneitem_8h.html',1,'']]]
 ];

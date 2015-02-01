@@ -109,8 +109,14 @@ void SelectionManagerWindow::setCurrentlyMappedFiffChannels(const QStringList &m
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::highlightChannels(QStringList channelList)
+void SelectionManagerWindow::highlightChannels(QModelIndexList channelIndexList)
 {
+    QStringList channelList;
+    for(int i = 0; i<channelIndexList.size(); i++) {
+        QModelIndex nameIndex = m_pChInfoModel->index(channelIndexList.at(i).row(),3);
+        channelList<<m_pChInfoModel->data(nameIndex, ChInfoModelRoles::GetMappedLayoutChName).toString();
+    }
+
     QList<QGraphicsItem *> allSceneItems = m_pSelectionScene->items();
 
     for(int i = 0; i<allSceneItems.size(); i++) {
@@ -233,6 +239,9 @@ void SelectionManagerWindow::initComboBoxes()
      << QApplication::translate("SelectionManagerWindow", "Vectorview-grad.lout", 0)
      << QApplication::translate("SelectionManagerWindow", "Vectorview-all.lout", 0)
      << QApplication::translate("SelectionManagerWindow", "Vectorview-mag.lout", 0)
+     << QApplication::translate("SelectionManagerWindow", "babymeg-mag-inner-layer.lout", 0)
+     << QApplication::translate("SelectionManagerWindow", "babymeg-mag-outer-layer.lout", 0)
+     << QApplication::translate("SelectionManagerWindow", "babymeg-mag-ref.lout", 0)
 //     << QApplication::translate("SelectionManagerWindow", "CTF-275.lout", 0)
 //     << QApplication::translate("SelectionManagerWindow", "magnesWH3600.lout", 0)
     );

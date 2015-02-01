@@ -143,13 +143,20 @@ struct RegionData
 
     VectorXi    idcs;           /**< Get source space indeces */
     qint32      iLabelIdxIn;    /**< Label ID */
+    QString     sDistMeasure;   /**< "cityblock" or "sqeuclidean" */
 
     RegionDataOut cluster() const
     {
+        QString t_sDistMeasure;
+        if(sDistMeasure.isEmpty())
+            t_sDistMeasure = QString("cityblock");
+        else
+            t_sDistMeasure = sDistMeasure;
+
         // Kmeans Reduction
         RegionDataOut p_RegionDataOut;
 
-        KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);//QString("cityblock")sqeuclidean
+        KMeans t_kMeans(t_sDistMeasure, QString("sample"), 5);
 
         if(bUseWhitened)
         {
@@ -252,10 +259,11 @@ public:
     * @param[out]   p_D                 The cluster operator
     * @param[in]    p_pNoise_cov
     * @param[in]    p_pInfo
+    * @param[in]    p_sMethod           "cityblock" or "sqeuclidean"
     *
     * @return clustered MNE forward solution
     */
-    MNEForwardSolution cluster_forward_solution(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D = defaultD, const FiffCov &p_pNoise_cov = defaultCov, const FiffInfo &p_pInfo = defaultInfo) const;
+    MNEForwardSolution cluster_forward_solution(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D = defaultD, const FiffCov &p_pNoise_cov = defaultCov, const FiffInfo &p_pInfo = defaultInfo, QString p_sMethod = "cityblock") const;
 
     //=========================================================================================================
     /**

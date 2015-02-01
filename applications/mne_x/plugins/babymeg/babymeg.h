@@ -270,6 +270,8 @@ private:
 
     bool readProjectors();
 
+    bool readBadChannels();
+
     void changeRecordingButton();
 
     QSharedPointer<QTimer> m_pTimerRecordingChange;
@@ -307,6 +309,7 @@ private:
     FiffStream::SPtr    m_pOutfid;          /**< FiffStream to write to.*/
 
     QString                 m_sFiffHeader;  /**< Fiff header information */
+    QString                 m_sBadChannels; /**< Filename which contains a list of bad channels */
     RowVectorXd             m_cals;
     SparseMatrix<double>    m_sparseMatCals;
 

@@ -133,12 +133,20 @@ struct RegionMT
     VectorXi    idcs;           /**< Get source space indeces */
     qint32      iLabelIdxIn;    /**< Label ID */
 
+    QString     sDistMeasure;   /**< "cityblock" or "sqeuclidean" */
+
     RegionMTOut cluster() const
     {
+        QString t_sDistMeasure;
+         if(sDistMeasure.isEmpty())
+             t_sDistMeasure = QString("cityblock");
+         else
+             t_sDistMeasure = sDistMeasure;
+
         // Kmeans Reduction
         RegionMTOut p_RegionMTOut;
 
-        KMeans t_kMeans(QString("sqeuclidean"), QString("sample"), 5);//QString("cityblock")
+        KMeans t_kMeans(t_sDistMeasure, QString("sample"), 5);
 
         t_kMeans.calculate(this->matRoiMT, this->nClusters, p_RegionMTOut.roiIdx, p_RegionMTOut.ctrs, p_RegionMTOut.sumd, p_RegionMTOut.D);
 
@@ -239,10 +247,11 @@ public:
     * @param[in]    p_AnnotationSet     Annotation set containing the annotation of left & right hemisphere
     * @param[in]    p_iClusterSize      Maximal cluster size per roi
     * @param[out]   p_D                 The cluster operator
+    * @param[in]    p_sMethod           "cityblock" or "sqeuclidean"
     *
     * @return the clustered kernel
     */
-    MatrixXd cluster_kernel(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D) const;
+    MatrixXd cluster_kernel(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D, QString p_sMethod = "cityblock") const;
 
     //=========================================================================================================
     /**
