@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>446</width>
-    <height>411</height>
+    <height>430</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,13 +19,13 @@
   <property name="minimumSize">
    <size>
     <width>446</width>
-    <height>411</height>
+    <height>430</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>446</width>
-    <height>4411</height>
+    <height>430</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -1222,6 +1222,9 @@ border-radius: 4px;
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <widget class="QCheckBox" name="chb_trial_separation">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;trial separation (only multi-channel-signals)&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...if checked each channel in multichannel signals will be analysed seperately, means in each iteartion step there is not one global best matching atom but one per each channel.&lt;br/&gt;Use this for signals with less correlated channels to get faster approximation but loose cross-channel-relation of the atoms found.&lt;/p&gt;&lt;p&gt;Trial separation is useful to describe signals parametrically, but might be less useful for artefact reduction&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>trial separation</string>
           </property>
