@@ -91,32 +91,31 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
 
     float       xmin,xmax,ymin,ymax;
     int         k;
-    int         neeg = inputPoints.size();
     int         nchan = inputPoints.size();
 
-    MatrixXf rrs(neeg,3);
-    VectorXf xx(neeg);
-    VectorXf yy(neeg);
+    MatrixXf rrs(nchan,3);
+    VectorXf xx(nchan);
+    VectorXf yy(nchan);
 
-    if (neeg <= 0) {
+    if (nchan <= 0) {
         std::cout<<"No input points to lay out.";
         return false;
     }
 
     //Fill matrix with 3D points
-    for(k = 0; k<neeg; k++) {
+    for(k = 0; k<nchan; k++) {
         rrs(k,0) = inputPoints.at(k)[0]; //x
         rrs(k,1) = inputPoints.at(k)[1]; //y
         rrs(k,2) = inputPoints.at(k)[2]; //z
     }
 
-    std::cout<<"Channels found for layout: "<<neeg<<std::endl;
+    std::cout<<"Channels found for layout: "<<nchan<<std::endl;
 
     //Fit to sphere if wanted by the user
     if (!do_fit)
         std::cout<<"Using default origin:"<<r0[0]<<r0[1]<<r0[2]<<std::endl;
     else {
-        if(fit_sphere_to_points(rrs,neeg,0.05,r0,rad) == FAIL) {
+        if(fit_sphere_to_points(rrs,nchan,0.05,r0,rad) == FAIL) {
             std::cout<<"Using default origin:"<<r0[0]<<r0[1]<<r0[2]<<std::endl;
         }
         else{
@@ -128,7 +127,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
     /*
     * Do the azimuthal equidistant projection
     */
-    for (k = 0; k < neeg; k++) {
+    for (k = 0; k < nchan; k++) {
         rr = r0 - static_cast<VectorXf>(rrs.row(k));
         sphere_coord(rr[0],rr[1],rr[2],&rad,&th,&phi);
         xx[k] = prad*(2.0*th/M_PI)*cos(phi);
@@ -141,7 +140,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
     xmin = xmax = xx[0];
     ymin = ymax = yy[0];
 
-    for(k = 1; k < neeg; k++) {
+    for(k = 1; k < nchan; k++) {
         if (xx[k] > xmax)
             xmax = xx[k];
         else if (xx[k] < xmin)
@@ -152,10 +151,10 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
             ymin = yy[k];
     }
 
-//    if(xmin == xmax || ymin == ymax) {
-//        std::cout<<"Cannot make a layout. All positions are identical"<<std::endl;
-//        return res;
-//    }
+    if(xmin == xmax || ymin == ymax) {
+        std::cout<<"Cannot make a layout. All positions are identical"<<std::endl;
+        return res;
+    }
 
     xmax = xmax + 0.6*w;
     xmin = xmin - 0.6*w;
@@ -179,7 +178,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
         out.setDevice(&outFile);
     }
 
-    for(k = 0; k < neeg; k++) {
+    for(k = 0; k < nchan; k++) {
         point.clear();
         point.append(xx[k]-0.5*w);
         point.append(-(yy[k]-0.5*h)); //mirror y axis
