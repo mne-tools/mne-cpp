@@ -1,16 +1,17 @@
 //=============================================================================================================
 /**
-* @file     types.h
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+* @file     main.cpp
+* @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
+*			Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 *           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     January, 2014
+* @date     January, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2015, Franco Polo, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,21 +32,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains general application specific types
+* @brief    Implements the mne_analyze_qt GUI application.
 *
 */
-#ifndef TYPES_H
-#define TYPES_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
-#include <Eigen/SparseCore>
-#include <fiff/fiff.h>
-#include "filteroperator.h"
+#include <stdio.h>
+#include "info.h"
 
 
 //*************************************************************************************************************
@@ -53,9 +50,11 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QPair>
-#include <QList>
-#include <QSharedPointer>
+#include <QtGui>
+#include <QApplication>
+#include <QDateTime>
+#include <QSplashScreen>
+#include <QThread>
 
 
 //*************************************************************************************************************
@@ -63,70 +62,30 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
+using namespace MNEAnalyzeQt;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEBrowseRawQt
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNEBrowseRawQt
-{
 
-typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
-typedef QPair<const double*,qint32> RowVectorPair;
-typedef QPair<const float*,qint32> RowVectorPairF;
-typedef QPair<int,int> QPairInts;
-
-namespace RawModelRoles
+//=============================================================================================================
+// MAIN
+int main(int argc, char *argv[])
 {
-    enum ItemRole{GetChannelMean = Qt::UserRole + 1000};
+    QApplication a(argc, argv);
+
+    //set application settings
+    QCoreApplication::setOrganizationName(CInfo::OrganizationName());
+    QCoreApplication::setApplicationName(CInfo::AppNameShort());
+
+    //show splash screen for 1 second
+    QPixmap pixmap(":/Resources/images/splashscreen_mne_analyze_qt.png");
+    QSplashScreen splash(pixmap);
+    splash.show();
+    QThread::sleep(1);
+
+    return a.exec();
 }
-
-namespace AverageModelRoles
-{
-    enum ItemRole{GetAverageData = Qt::UserRole + 1001,
-                  GetFiffInfo = Qt::UserRole + 1002,
-                  GetAspectKind = Qt::UserRole + 1003,
-                  GetFirstSample = Qt::UserRole + 1004,
-                  GetLastSample = Qt::UserRole + 1005,
-                  GetComment = Qt::UserRole + 1006,
-                  GetTimeData = Qt::UserRole + 1007,
-                  GetProjections = Qt::UserRole + 1008};
-}
-
-namespace ChInfoModelRoles
-{
-    enum ItemRole{GetOrigChName = Qt::UserRole + 1009,
-                  GetMappedLayoutChName = Qt::UserRole + 1010,
-                  GetChNumber = Qt::UserRole + 1011,
-                  GetChKind = Qt::UserRole + 1012,
-                  GetMEGType = Qt::UserRole + 1013,
-                  GetChUnit = Qt::UserRole + 1014,
-                  GetChAlias = Qt::UserRole + 1015,
-                  GetChPosition = Qt::UserRole + 1016,
-                  GetChDigitizer = Qt::UserRole + 1017,
-                  GetChActiveFilter = Qt::UserRole + 1018,
-                  GetChCoilType = Qt::UserRole + 1019};
-}
-
-namespace ProjectionModelRoles
-{
-    enum ItemRole{GetProjectionData = Qt::UserRole + 1019,
-                  GetProjectionName = Qt::UserRole + 1020,
-                  GetProjectionState = Qt::UserRole + 1021,
-                  GetProjectionDimension = Qt::UserRole + 1022};
-}
-
-} //NAMESPACE
-
-Q_DECLARE_METATYPE(FIFFLIB::fiff_int_t);
-Q_DECLARE_METATYPE(MNEBrowseRawQt::RowVectorPairF);
-Q_DECLARE_METATYPE(const FIFFLIB::FiffInfo*);
-Q_DECLARE_METATYPE(MNEBrowseRawQt::MatrixXdR);
-Q_DECLARE_METATYPE(MNEBrowseRawQt::RowVectorPair);
-Q_DECLARE_METATYPE(QList<MNEBrowseRawQt::RowVectorPair>);
-Q_DECLARE_METATYPE(QSharedPointer<MNEBrowseRawQt::MNEOperator>);
-
-#endif // TYPES_H
