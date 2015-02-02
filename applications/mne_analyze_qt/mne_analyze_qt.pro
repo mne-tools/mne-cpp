@@ -42,7 +42,7 @@ TEMPLATE = app
 
 QT += gui widgets
 
-TARGET = mne_browse_raw_qt
+TARGET = mne_analyze_qt
 
 #If one single executable is to be build
 #-> comment out flag in .pri file
