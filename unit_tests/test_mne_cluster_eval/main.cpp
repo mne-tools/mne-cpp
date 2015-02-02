@@ -740,6 +740,31 @@ int main(int argc, char *argv[])
 //#endif
 
 
+//    ////////////////////////////////// original
+//    // #### R calculation ####
+//    printf("R original calculation\n");
+//    MatrixXd M_orig = minimumNorm.getKernel();
+
+//    MatrixXd R_orig = M_orig * t_FwdFixed.sol->data;
+
+//    QString sROrig = sTargetDir + sTargetPrefix + QString("R_orig.txt");
+//    std::ofstream ofs_R_orig(sROrig.toUtf8().constData(), std::ofstream::out);//, std::ofstream::out);
+//    if (ofs_R_orig.is_open())
+//    {
+//        printf("writing to %s\n", sROrig.toUtf8().constData());
+//        ofs_R_orig << R_orig << '\n';
+//    }
+//    else
+//        printf("Not writing to %s\n", sROrig.toUtf8().constData());
+//    ofs_R_orig.close();
+
+//    R_orig.resize(0,0);
+
+
+//    //ToDo:just original
+//    return CommandLineOk;
+
+
     ////////////////////////////////// L1 calculations
 
     MatrixXd D_MT_L1;
