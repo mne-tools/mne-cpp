@@ -136,6 +136,8 @@ public:
 
     qint32 atom_count();
 
+    void clear();
+
 };//class
 
 
