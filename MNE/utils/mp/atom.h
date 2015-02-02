@@ -109,6 +109,7 @@ public:
     qreal max_scalar_product;
     MatrixXd residuum;     
     QList<qreal> max_scalar_list;
+    qint32 bm_channel;
 
 };
 
@@ -147,7 +148,7 @@ public:
     qint32 id;
     QString dict_source;
     AtomType type;
-    qreal translation;
+    qreal translation; //in samples
 
     struct GaborATOM
     {

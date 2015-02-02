@@ -109,11 +109,18 @@ namespace Ui
 }
 
 
-enum TruncationCriterion
+enum truncation_criterion
 {
     Iterations,
     SignalEnergy,
     Both
+};
+
+enum source_file_type
+{
+    AVE,
+    RAW,
+    TXT
 };
 
 class GraphWindow;
@@ -132,7 +139,7 @@ public:
     ~MainWindow();
     //**********************************************************************************************************
 
-    typedef QList<GaborAtom> adaptive_atom_list;
+    typedef QList<QList<GaborAtom>> adaptive_atom_list;
     typedef QList<FixDictAtom> fix_dict_atom_list;
     typedef QMap<qint32, bool> select_map;
     typedef Eigen::VectorXd VectorXd;
@@ -151,8 +158,19 @@ public:
 
     //==========================================================================================================
 
-
+    //==========================================================================================================
+    /**
+    * MainWindow_fill_dict_combobox
+    *
+    * ### MP toolbox main window function ###
+    *
+    * save files
+    *
+    * @return void
+    */
     void save_fif_file();
+
+
 private slots:
     //==========================================================================================================
     /**
@@ -552,9 +570,10 @@ private slots:
 signals:
 
     void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, bool fix_phase, qint32 boost, qint32 simplex_it,
-                    qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction);
+                    qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction, bool trial_separation);
     void send_input_fix_dict(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, qint32 boost, QString path, qreal delta);
-    void to_save(QString source_path, QString save_path, fiff_int_t start_change, fiff_int_t end_change, MatrixXd changes, select_map select_channel_map, RowVectorXi picks);
+    void to_save(QString source_path, QString save_path, fiff_int_t start_change, fiff_int_t end_change, MatrixXd changes, MatrixXd original_signal, select_map select_channel_map, RowVectorXi picks, source_file_type file_type);
+    void kill_save_thread();
 
 private:
 
@@ -571,17 +590,19 @@ private:
     fiff_int_t last_from;
     qint32 last_sample_count;
     qreal residuum_energy;
+    qreal signal_energy;
+    qreal composed_energy;
     qint32 recieved_result_counter;
     qint32 max_tbv_header_width;
     QString save_path;
     QString file_name;
+    source_file_type file_type;
     QString last_open_path;
     QString last_save_path;
-    QStringList matlab_signal;
     QMap<qint32, bool> select_channel_map;
     QMap<qint32, bool> select_atoms_map;
     QList<QColor> original_colors;
-    QList<GaborAtom> _adaptive_atom_list;
+    QList<QList<GaborAtom>> _adaptive_atom_list;
     QList<FixDictAtom> _fix_dict_atom_list;
     MatrixXd datas;
     RowVectorXf times_vec;
@@ -660,7 +681,7 @@ private:
     *
     * @return void
     */
-    void calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion);
+    void calc_adaptiv_mp(MatrixXd signal, truncation_criterion criterion);
 
     //==========================================================================================================
     /**
@@ -755,7 +776,7 @@ private:
     *
     * @return   void
     */
-    void calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion criterion);
+    void calc_fix_mp(QString path, MatrixXd signal, truncation_criterion criterion);
 
     //==========================================================================================================
     /**
@@ -798,7 +819,7 @@ private:
     *
     * @return   static bool     sort_energie_adaptive
     */
-    static bool sort_energie_adaptive(const GaborAtom atom_1, const GaborAtom atom_2);
+    static bool sort_energy_adaptive(const QList<GaborAtom> atom_1, const QList<GaborAtom> atom_2);
 
     //==========================================================================================================
     /**
@@ -813,7 +834,7 @@ private:
     *
     * @return   sort_energie_fix    ???
     */
-    static bool sort_energie_fix(const FixDictAtom atom_1, const FixDictAtom atom_2);
+    static bool sort_energy_fix(const FixDictAtom atom_1, const FixDictAtom atom_2);
 
     //==========================================================================================================
 };
@@ -970,10 +991,11 @@ private slots:
     *
     * @return   void
     */
-    void save_fif_file(QString source_path, QString save_path, fiff_int_t start_change, fiff_int_t end_change, MatrixXd changes, select_map select_channel_map, RowVectorXi picks);
+    void save_fif_file(QString source_path, QString save_path, fiff_int_t start_change, fiff_int_t end_change, MatrixXd changes, MatrixXd original_signal, select_map select_channel_map, RowVectorXi picks, source_file_type file_type);
 
 signals:
     void save_progress(qint32 current_progress, qint32 finished);
+
 };
 
 //*************************************************************************************************************
