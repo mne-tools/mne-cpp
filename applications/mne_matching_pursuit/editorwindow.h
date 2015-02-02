@@ -42,6 +42,14 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <mne/mne.h>
+#include <utils/mp/fixdictmp.h>
+
+//*************************************************************************************************************
+//=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
 
@@ -53,13 +61,16 @@
 //=============================================================================================================
 // USED NAMESPACES
 
+using namespace MNELIB;
+
 namespace Ui
 {
-
+    class EditorWindow;
+}
 //=============================================================================================================
 
-class EditorWindow;
-}
+class AtomWindow;
+class XAxisAtomWindow;
 
 class EditorWindow : public QMainWindow
 {
@@ -412,21 +423,101 @@ private slots:
     void on_list_NewDict_itemSelectionChanged();
     void on_btt_SaveDicts_clicked();
     void on_save_dicts();
-
-    void on_pushButton_clicked();
     void animation_finished();
+    void on_btt_extended_clicked();
+    void on_li_all_dicts_itemSelectionChanged();
+    void on_btt_next_dict_clicked();
+    void on_btt_prev_dict_clicked();
+    void atom_changed(qint32 atom_number);
+
+    void on_spb_atom_number_editingFinished();
+
+    void on_gb_atom_editor_toggled(bool arg1);
+
+    void on_gb_dict_editor_toggled(bool arg1);
+
+    void on_gb_atom_viewer_toggled(bool arg1);
 
 signals:
     void dict_saved();
 
 
 private:    
+    qint32 current_atom_number;
     Ui::EditorWindow *ui;
+    AtomWindow *callAtomWindow;
+    XAxisAtomWindow *callXAxisAtomWindow;
+    Dictionary current_dict;
     void closeEvent(QCloseEvent * event);
     void resizeEvent(QResizeEvent *event);
 
 protected:
     void keyReleaseEvent(QKeyEvent *event);
 };
+
+//*************************************************************************************************************
+// Widget to paint inputsignal
+class AtomWindow : public QWidget
+{
+    Q_OBJECT
+//private:
+    //fiff_int_t press_pos;
+
+protected:
+   void paintEvent(QPaintEvent *event);
+   //void mouseMoveEvent(QMouseEvent *event);
+   //void mousePressEvent(QMouseEvent *event);
+   //void mouseReleaseEvent(QMouseEvent *event);
+   //void wheelEvent (QWheelEvent *event);
+
+public:
+   //==========================================================================================================
+   /**
+   * AtomWindow_paint_signal
+   *
+   * ### MP toolbox GUI function ###
+   *
+   * painting input signal of chosen channels in butterfly plot
+   *
+   * @param[in] atom_matrix    matrix of input signal
+   * @param[in] window_size      size (height,width) of window
+   *
+   * @return void
+   */
+   void paint_signal(MatrixXd atom_matrix, QSize window_size);
+
+//signals:
+  //  void read_new();
+
+   //==========================================================================================================
+};
+
+// Widget to paint x-axis
+class XAxisAtomWindow : public QWidget
+{
+    Q_OBJECT
+
+protected:
+   void paintEvent(QPaintEvent *event);
+
+public:
+   //==========================================================================================================
+   /**
+   * XAxisAtomWindow_paint_signal
+   *
+   * ### MP toolbox GUI function ###
+   *
+   * painting x-axis of chosen channels in butterfly plot
+   *
+   * @param[in] atom_matrix    matrix of input signal
+   * @param[in] window_size      size (height,width) of window
+   *
+   * @return void
+   */
+   void paint_axis(MatrixXd atom_matrix, QSize window_size);
+
+   //==========================================================================================================
+};
+
 
 #endif // EDITORWINDOW_H
