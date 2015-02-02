@@ -167,17 +167,8 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
     * Compose the viewports
     */
     QVector<double> point;
+    QTextStream out;
 
-    for(k = 0; k < neeg; k++) {
-        point.clear();
-        point.append(xx[k]-0.5*w);
-        point.append(-(yy[k]-0.5*h)); //rotate 180 - mirror y axis
-        outputPoints.append(point);
-    }
-
-    /*
-    * Write to file
-    */
     if(writeFile) {
         if (!outFile.open(QIODevice::WriteOnly)) {
             std::cout<<"could not open output file";
@@ -185,11 +176,20 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
             return FAIL;
         }
 
-        QTextStream out(&outFile);
+        out.setDevice(&outFile);
+    }
 
-        for (k = 0; k < neeg; k++)
-            out << k+1 << " " << xx[k]-0.5*w << " " << -(yy[k]-0.5*h) << " " << w << " " << h << " " << names.at(k)<<endl;
+    for(k = 0; k < neeg; k++) {
+        point.clear();
+        point.append(xx[k]-0.5*w);
+        point.append(-(yy[k]-0.5*h)); //mirror y axis
+        outputPoints.append(point);
 
+        if(writeFile)
+            out << k+1 << " " << point[0] << " " << point[1] << " " << w << " " << h << " " << names.at(k)<<endl;
+    }
+
+    if(writeFile) {
         std::cout<<"success while wrtiting to output file";
 
         outFile.close();
