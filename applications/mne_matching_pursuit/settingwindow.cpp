@@ -1,7 +1,50 @@
+//=============================================================================================================
+/**
+* @file     settingswindow.cpp
+* @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
+*           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
+*           Sebastian Krause <sebastian.krause@tu-ilmenau.de>
+* @version  1.0
+* @date     July, 2014
+*
+* @section  LICENSE
+*
+* Copyright (C) 2014, Martin Henfling, Daniel Knobl and Sebastian Krause. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Implementation of the DeleteMesssageBox Class.
+*
+*/
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
 #include "settingwindow.h"
 #include "ui_settingwindow.h"
 #include "mainwindow.h"
 #include "QToolTip"
+
+//*************************************************************************************************************************************
 
 settingwindow::settingwindow(QWidget *parent) :    QWidget(parent),    ui(new Ui::settingwindow)
 {    
@@ -38,11 +81,12 @@ void settingwindow::set_values()
     ui->dsb_adaptive_contraction->setValue(settings.value("adaptive_contraction", 0.5).toDouble());
     ui->dsb_adaptive_fullcontraction->setValue(settings.value("adaptive_fullcontraction", 0.50).toDouble());
     ui->sb_div_dict->setValue(settings.value("pdict_count", 8).toInt());
-    ui->cb_color_scheme->setChecked(settings.value("pastell_colors", false).toBool());
+    ui->chb_color_scheme->setChecked(settings.value("pastell_colors", false).toBool());
     ui->dsb_delta_energy->setValue(settings.value("delta_energy", 0.0005).toDouble());
     ui->sl_boost_fixDict->setValue(-1 * (settings.value("boost_fixDict", 0).toInt()));
     ui->sl_boost->setValue(-1 * (settings.value("boost", 0).toInt()));
-    ui->cb_phys_params->setChecked(settings.value("show_phys_params", false).toBool());
+    ui->chb_phys_params->setChecked(settings.value("show_phys_params", false).toBool());
+    ui->chb_trial_separation->setChecked(settings.value("trial_separation", false).toBool());
 
     if(settings.value("boost").toInt()== 0)
         ui->sl_boost->setToolTip("only 1 channel consulted");
@@ -83,8 +127,9 @@ void settingwindow::on_btt_close_clicked()
     settings.setValue("show_warnings", ui->chb_show_warnings->isChecked());
     settings.setValue("sort_results", ui->chb_sort_results->isChecked());
     settings.setValue("pdict_count", ui->sb_div_dict->value());
-    settings.setValue("pastell_colors", ui->cb_color_scheme->isChecked());
-    settings.setValue("show_phys_params", ui->cb_phys_params->isChecked());
+    settings.setValue("pastell_colors", ui->chb_color_scheme->isChecked());
+    settings.setValue("show_phys_params", ui->chb_phys_params->isChecked());
+    settings.setValue("trial_separation", ui->chb_trial_separation->isChecked());
 
     emit change_info_label();
 
@@ -250,3 +295,5 @@ void settingwindow::on_pushButton_clicked()
     settings.clear();
     set_values();
 }
+
+//*****************************************************************************************************************

@@ -40,7 +40,6 @@
 //=============================================================================================================
 
 #include <utils/mp/atom.h>
-
 #include "mainwindow.h"
 #include "editorwindow.h"
 #include "ui_editorwindow.h"
@@ -71,6 +70,7 @@ using namespace UTILSLIB;
 
 bool allCombined = false;
 bool is_loading =  false;
+bool is_expanded = false;
 
 qreal linStepWidthScale = 1;
 qreal linStepWidthModu = 1;
@@ -99,9 +99,16 @@ QList<qreal> moduList;
 QList<qreal> phaseList;
 QList<qreal> chirpList;
 
+qint32 old_width = 0;
 qint32 atomCount = 1;
 
+MatrixXd _atom_matrix;
+QList<QColor> _atom_colors;
 EditorWindow::AtomType atomType;
+
+const qint32 window_height = 900;
+const qint32 window_width = 605;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -115,7 +122,6 @@ EditorWindow::EditorWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::Ed
     ui->setupUi(this);
     QSettings settings;
     move(settings.value("pos_editor", QPoint(200, 200)).toPoint());
-    resize(settings.value("size_editor", QSize(606, 948)).toSize());
     this->restoreState(settings.value("editor_state").toByteArray());
     ui->dspb_StartValuePhase->setMaximum(ui->dspb_EndValueScale->value());
     ui->dspb_EndValuePhase->setMaximum(ui->spb_AtomLength->value());
@@ -126,6 +132,27 @@ EditorWindow::EditorWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::Ed
 
     ui->dspb_StartValueScale->setMaximum(ui->spb_AtomLength->value());    
     read_dicts();
+    old_width = this->width();
+
+    callAtomWindow = new AtomWindow();
+    callAtomWindow->setMouseTracking(true);
+    callAtomWindow->setMinimumHeight(500);
+    callAtomWindow->setMinimumWidth(500);
+    ui->l_paint_atom->addWidget(callAtomWindow);
+
+    callXAxisAtomWindow = new XAxisAtomWindow();
+    callXAxisAtomWindow->setMaximumHeight(0);
+    callXAxisAtomWindow->setToolTip("samples");
+    ui->l_XAxis->addWidget(callXAxisAtomWindow);
+
+    ui->gb_atom_viewer->setHidden(true);
+    ui->gb_atom_viewer->setAlignment(Qt::AlignLeft);
+
+    this->setMinimumSize(window_width, window_height);
+    this->setMaximumSize(this->minimumSize());
+
+    _atom_colors.clear();
+    _atom_colors.append(QColor(0, 0, 0));
 }
 
 //*************************************************************************************************************
@@ -141,11 +168,9 @@ void EditorWindow::closeEvent(QCloseEvent * event)
 {
     Q_UNUSED(event);
     QSettings settings;
-    if(!this->isMaximized())
-    {
-        settings.setValue("pos_editor", pos());
-        settings.setValue("size_editor", size());
-    }
+    if(!this->isMaximized())    
+        settings.setValue("pos_editor", pos());       
+
     settings.setValue("editor_state", this->saveState());
 }
 
@@ -178,12 +203,18 @@ void EditorWindow::read_dicts()
              tooltip = QString("%1.pdict").arg(file.baseName());
         }
 
-        QListWidgetItem *item = new QListWidgetItem;
-        item->setToolTip(tooltip);
-        item->setIcon(dictIcon);
-        item->setText(fileList.at(i).baseName());
+        QListWidgetItem *item1 = new QListWidgetItem;
+        item1->setToolTip(tooltip);
+        item1->setIcon(dictIcon);
+        item1->setText(fileList.at(i).baseName());
 
-        ui->list_AllDict->addItem(item);
+        QListWidgetItem *item2 = new QListWidgetItem;
+        item2->setToolTip(tooltip);
+        item2->setIcon(dictIcon);
+        item2->setText(fileList.at(i).baseName());
+
+        ui->list_AllDict->addItem(item1);
+        ui->li_all_dicts->addItem(item2);
     }
     if(ui->list_AllDict->count() > 1) ui->list_AllDict->itemAt(0, 0)->setSelected(true);
     update();
@@ -1728,7 +1759,7 @@ void EditorWindow::on_btt_SaveDicts_clicked()
     emit dict_saved();
 }
 
-//*************************************************************************************************************
+//*************************************************************************************************************************************
 
 void EditorWindow::keyReleaseEvent(QKeyEvent *event)
 {
@@ -1738,7 +1769,282 @@ void EditorWindow::keyReleaseEvent(QKeyEvent *event)
     }
 }
 
+//*************************************************************************************************************************************
+
 void EditorWindow::on_save_dicts()
 {
     read_dicts();
+}
+
+//begin atom viewer
+//==========================================================================================================================================================================================================
+//*************************************************************************************************************************************
+
+void EditorWindow::on_btt_extended_clicked()
+{
+    QPropertyAnimation *animation = new QPropertyAnimation(this, "size");
+    connect(animation, SIGNAL(finished()), this, SLOT(animation_finished()));
+    if(window_width == this->width())
+    {
+        this->setMaximumWidth(16777215);
+        animation->setDuration(1000);
+        animation->setStartValue(QSize(this->size().width(), this->size().height()));
+        QSettings settings;
+        qint32 expanded_width = settings.value("size_expanded_editor", 1200).toInt();
+        animation->setEndValue(QSize(expanded_width,  this->size().height()));
+        animation->start();
+    }
+    else
+    {
+        is_expanded = false;
+        ui->gb_atom_viewer->setHidden(true);
+        animation->setDuration(1000);
+        animation->setStartValue(QSize(this->size().width(), this->size().height()));
+        animation->setEndValue(QSize(window_width,  this->size().height()));
+        animation->start();        
+    }
+}
+
+//*************************************************************************************************************************************
+
+void EditorWindow::animation_finished()
+{
+    if(window_width == this->width())
+    {        
+        this->setMaximumSize(this->minimumSize());
+        is_expanded = false;        
+        ui->btt_extended->setIcon(QIcon(":/images/icons/greenArrowRight.png"));
+    }
+    else
+    {
+        QSettings settings;
+        settings.setValue("size_expanded_editor", this->width());
+        is_expanded = true;
+        ui->gb_atom_viewer->setVisible(true);
+        ui->btt_extended->setIcon(QIcon(":/images/icons/greenArrowLeft.png"));
+    }
+}
+
+//*************************************************************************************************************************************
+
+void EditorWindow::resizeEvent(QResizeEvent *event)
+{
+    Q_UNUSED(event)
+    if(is_expanded)
+    {
+        QSettings settings;
+        settings.setValue("size_expanded_editor", this->width());
+        if(this->size().width() < 1200)
+            resize(1200, window_height);
+    }
+}
+
+//*************************************************************************************************************************************
+
+void AtomWindow::paintEvent(QPaintEvent* event)
+{
+    Q_UNUSED(event);
+    paint_signal(_atom_matrix, this->size());
+}
+
+//*************************************************************************************************************************************
+
+void AtomWindow::paint_signal(MatrixXd atom_matrix, QSize window_size)
+{
+
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.fillRect(0,0,window_size.width(),window_size.height(),QBrush(Qt::white));     // paint window white
+    painter.drawRect(0,0, window_size.width(), window_size.height());
+
+    if(atom_matrix.rows() > 0 && atom_matrix.cols() > 0)
+    {
+        const qint32 maxStrLenght = 55;                                 // max lenght in pixel of x-axis string
+        qint32 borderMarginWidth = 15;                                  // reduce paintspace in GraphWindow of borderMargin pixels
+        qreal border_margin_height = 5 + window_size.height() / 10;     // adapt bordermargin to avoid painting out of range
+        qreal maxPos = 0.0;                                             // highest signalvalue
+        qreal maxNeg = 0.0;                                             // smalest signalvalue
+        qreal maxmax = 0.0;                                             // absolute difference maxpos - maxneg
+        qreal scaleYText = 0.0;
+        qint32 negScale  = 0;
+
+        maxPos = atom_matrix.maxCoeff();
+        maxNeg = atom_matrix.minCoeff();
+
+        // absolute signalheight
+        if(maxNeg <= 0) maxmax = maxPos - maxNeg;
+        else  maxmax = maxPos + maxNeg;
+
+        // scale axis text
+        scaleYText = maxmax / 10.0;
+
+        if(maxNeg < 0)  negScale = floor((maxNeg * 10 / maxmax) + 0.5);
+        if(maxPos <= 0) negScale = -10;
+        //qreal signal_negative_scale = negScale;  // to globe _signal_negative_scale
+
+        // scale signal
+        qreal scaleX = (window_size.width() - maxStrLenght - borderMarginWidth) / qreal(atom_matrix.rows() - 1);
+        qreal scaleY = (window_size.height() - border_margin_height) / maxmax;
+
+        //scale axis
+        qreal scaleXAchse = (window_size.width() - maxStrLenght - borderMarginWidth) / 20.0;
+        qreal scaleYAchse = (window_size.height() - border_margin_height) / 10.0;
+
+        for(qint32 i = 0; i < 11; i++)
+        {
+            if(negScale == 0)   // x-Axis reached (y-value = 0)
+            {
+                qint32 x_axis_height = i * scaleYAchse - window_size.height() + border_margin_height / 2;   // position of x axis in height
+
+                // append scaled signalpoints and paint signal
+                for(qint32 channel = 0; channel < atom_matrix.cols(); channel++)   // over all Channels
+                {
+                    QPolygonF poly;
+                    for(qint32 h = 0; h < atom_matrix.rows(); h++)
+                        poly.append(QPointF((h * scaleX) + maxStrLenght, -(atom_matrix(h, channel) * scaleY + x_axis_height)));
+                    QPen pen(_atom_colors.at(channel), 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+                    painter.setPen(pen);
+                    painter.drawPolyline(poly);
+                }
+
+                // paint x-axis
+                for(qint32 j = 1; j < 21; j++)
+                {
+                    if(fmod(j, 4.0) == 0)   //draw light grey sectors
+                    {
+                        QPen pen(Qt::darkGray, 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+                        painter.setPen(pen);
+                        painter.drawLine(j * scaleXAchse + maxStrLenght, -(x_axis_height - window_size.height()),
+                                         j * scaleXAchse + maxStrLenght , -(x_axis_height + window_size.height()));   // scalelines x-axis
+                    }
+                    QPen pen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+                    painter.setPen(pen);
+                    painter.drawLine(j * scaleXAchse + maxStrLenght, -(x_axis_height - 2),
+                                     j * scaleXAchse + maxStrLenght , -(x_axis_height + 2));   // scalelines x-axis
+                }
+                painter.drawLine(maxStrLenght - 40, -x_axis_height, window_size.width()-5, -x_axis_height);    // paint x-axis
+            }
+            painter.drawText(3, -(i * scaleYAchse - window_size.height()) - border_margin_height / 2 + 4, QString::number(negScale * scaleYText, 'g', 3));     // paint scalevalue y-axis
+
+            painter.drawLine(maxStrLenght - 2, -((i * scaleYAchse)-(window_size.height()) + border_margin_height / 2),
+                             maxStrLenght + 2, -((i * scaleYAchse)-(window_size.height()) + border_margin_height / 2));  // scalelines y-axis
+
+            negScale++;
+        }
+        painter.drawLine(maxStrLenght, 2, maxStrLenght, window_size.height() - 2);     // paint y-axis
+    }
+    painter.end();
+}
+
+//*************************************************************************************************************************************
+
+void XAxisAtomWindow::paintEvent(QPaintEvent* event)
+{
+    Q_UNUSED(event);
+    paint_axis(_atom_matrix, this->size());
+}
+
+//*************************************************************************************************************************************
+
+void XAxisAtomWindow::paint_axis(MatrixXd atom_matrix, QSize window_size)
+{
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+
+    if(atom_matrix.rows() > 0 && atom_matrix.cols() > 0)
+    {
+        const qint32 maxStrLenght = 55;
+        qint32 borderMarginWidth = 15;
+        qreal scaleXText = (atom_matrix.rows() - 1) / 20.0;                       // divide signallength
+        qreal scaleXAchse = (window_size.width() - maxStrLenght - borderMarginWidth) / 20.0;
+
+        for(qint32 j = 0; j < 21; j++)
+        {
+            painter.drawText(j * scaleXAchse + 47, 20, QString::number(j * scaleXText, 'f', 0));    // scalevalue as string
+            painter.drawLine(j * scaleXAchse + maxStrLenght, 5 + 2,
+                             j * scaleXAchse + maxStrLenght, 5 - 2);                    // scalelines
+        }
+        painter.drawText(5 , 20, "[sample]");  // unit
+        painter.drawLine(5, 5, window_size.width()-5, 5);  // paint y-line
+    }
+}
+
+//*************************************************************************************************************************************
+
+void EditorWindow::on_li_all_dicts_itemSelectionChanged()
+{
+    FixDictMp *fix_mp = new FixDictMp();
+    QList<Dictionary> dicts = fix_mp->parse_xml_dict(QString(QDir::homePath() + "/Matching-Pursuit-Toolbox/%1").arg( ui->li_all_dicts->selectedItems().at(0)->toolTip()));
+
+    current_dict.clear();
+    for(qint32 i = 0; i < dicts.length(); i++)
+        current_dict.atoms.append(dicts.at(i).atoms);
+
+    current_atom_number = 1;
+    atom_changed(current_atom_number);
+
+    ui->spb_atom_number->setEnabled(true);
+    ui->spb_atom_number->setMaximum(current_dict.atom_count());
+    ui->l_max_dict_number->setText(QString(" / %1").arg(current_dict.atom_count()));
+
+    callXAxisAtomWindow->setMinimumHeight(22);
+    callXAxisAtomWindow->setMaximumHeight(22);    
+    update();
+}
+
+//*************************************************************************************************************************************
+
+void EditorWindow::on_btt_next_dict_clicked()
+{
+    atom_changed(++current_atom_number);
+}
+
+//*************************************************************************************************************************************
+
+void EditorWindow::on_btt_prev_dict_clicked()
+{
+    atom_changed(--current_atom_number);
+}
+
+//*************************************************************************************************************************************
+
+void EditorWindow::on_spb_atom_number_editingFinished()
+{
+    current_atom_number = ui->spb_atom_number->value();
+    atom_changed(current_atom_number);
+}
+
+//*************************************************************************************************************************************
+
+void EditorWindow::atom_changed(qint32 atom_number)
+{
+    if(current_atom_number == current_dict.atom_count()) ui->btt_next_dict->setEnabled(false);
+    else ui->btt_next_dict->setEnabled(true);
+
+    if(current_atom_number == 1) ui->btt_prev_dict->setEnabled(false);
+    else ui->btt_prev_dict->setEnabled(true);
+
+    ui->spb_atom_number->setValue(current_atom_number);
+
+    _atom_matrix = MatrixXd::Zero(current_dict.atoms.at(atom_number - 1).atom_samples.rows(), 1);
+    _atom_matrix.col(0) = current_dict.atoms.at(atom_number - 1).atom_samples;
+    update();
+}
+
+//*************************************************************************************************************************************
+
+
+void EditorWindow::on_gb_atom_editor_toggled(bool arg1)
+{
+    ui->gb_atom_editor->setChecked(true);
+}
+
+void EditorWindow::on_gb_dict_editor_toggled(bool arg1)
+{
+    ui->gb_dict_editor->setChecked(true);
+}
+
+void EditorWindow::on_gb_atom_viewer_toggled(bool arg1)
+{
+    ui->gb_atom_viewer->setChecked(true);
 }
