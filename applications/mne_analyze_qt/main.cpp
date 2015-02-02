@@ -1,16 +1,17 @@
-//MATCHING PURSUIT
 //=============================================================================================================
 /**
 * @file     main.cpp
-* @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
-*           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
-*           Sebastian Krause <sebastian.krause@tu-ilmenau.de>
+* @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
+*			Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     July, 2014
+* @date     January, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Martin Henfling, Daniel Knobl and Sebastian Krause. All rights reserved.
+* Copyright (C) 2015, Franco Polo, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,7 +32,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Main.cpp starts program.
+* @brief    Implements the mne_analyze_qt GUI application.
+*
 */
 
 //*************************************************************************************************************
@@ -39,67 +41,51 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-#include <vector>
-#include <math.h>
-#include <fiff/fiff.h>
-#include <mne/mne.h>
-#include <utils/mp/atom.h>
-#include <utils/mp/adaptivemp.h>
-#include "mainwindow.h"
+#include <stdio.h>
+#include "info.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
 #include <QtGui>
 #include <QApplication>
 #include <QDateTime>
+#include <QSplashScreen>
+#include <QThread>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace UTILSLIB;
+using namespace MNEAnalyzeQt;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-MainWindow* mainWindow = NULL;
 
-//*************************************************************************************************************
 //=============================================================================================================
 // MAIN
-//=============================================================================================================
-
-/**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
-*
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
-*/
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
     //set application settings
-    QCoreApplication::setOrganizationName("DKnobl MHenfling");
-    QApplication::setApplicationName("MatchingPursuit Viewer");
+    QCoreApplication::setOrganizationName(CInfo::OrganizationName());
+    QCoreApplication::setApplicationName(CInfo::AppNameShort());
 
-    QSettings settings;
-    bool was_maximized = settings.value("maximized", false).toBool();
-    mainWindow = new MainWindow();
-    if(was_maximized)
-        mainWindow->showMaximized();
-    else
-        mainWindow->show();
+    //show splash screen for 1 second
+    QPixmap pixmap(":/Resources/images/splashscreen_mne_analyze_qt.png");
+    QSplashScreen splash(pixmap);
+    splash.show();
+    QThread::sleep(1);
 
     return a.exec();
 }

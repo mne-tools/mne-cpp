@@ -1,14 +1,17 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     matchingPursuit.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+# @file     mne_analyze_qt.pro
+# @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
+#			Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+#           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 # @version  1.0
-# @date     July, 2012
+# @date     January, 2015
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2015, Franco Polo, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -18,7 +21,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,7 +32,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the mne_matching_pursuit project
+# @brief    This project file builds the mne_analyze_qt project
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -37,80 +40,60 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-VERSION = $${MNE_CPP_VERSION}
+QT += gui widgets
 
-QT += gui
-QT += widgets  
-QT += network core widgets concurrent
-QT += xml
+TARGET = mne_analyze_qt
 
-CONFIG   += console
-CONFIG   -= app_bundle
-
-
-
-TARGET = mne_matching_pursuit
+#If one single executable is to be build
+#-> comment out flag in .pri file
+#-> add DEFINES += BUILD_MNECPP_STATIC_LIB in projects .pro file
+#-> This needs to be done in order to avoid problem with the Q_DECL_EXPORT/Q_DECL_IMPORT flag in the global headers
+contains(MNECPP_CONFIG, build_MNECPP_Static_Lib) {
+    DEFINES += BUILD_MNECPP_STATIC_LIB
+}
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
+#Note that the static flag is ingored when building against a dynamic qt version
+CONFIG += static console #DEBUG console
+
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
-            -lMNE$${MNE_LIB_VERSION}Fsd \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}Dispd
+    LIBS += -lMNE$${MNE_LIB_VERSION}disp3Dd
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
-            -lMNE$${MNE_LIB_VERSION}Utils \
-            -lMNE$${MNE_LIB_VERSION}Fs \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}Disp
+    LIBS += -lMNE$${MNE_LIB_VERSION}disp3D
 }
 
-DESTDIR =  $${MNE_BINARY_DIR}
+DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += \
-        main.cpp \
-    editorwindow.cpp \
-    enhancededitorwindow.cpp \
-    formulaeditor.cpp \
-    deletemessagebox.cpp \
-    mainwindow.cpp \
-    processdurationmessagebox.cpp \
-    treebaseddictwindow.cpp \
-    settingwindow.cpp
+    main.cpp 
 
 HEADERS += \
-    editorwindow.h \
-    enhancededitorwindow.h \
-    formulaeditor.h \
-    deletemessagebox.h \
-    mainwindow.h \
-    processdurationmessagebox.h \
-    treebaseddictwindow.h \
-    settingwindow.h
+    info.h
 
 FORMS += \
-    editorwindow.ui \
-    enhancededitorwindow.ui \
-    formulaeditor.ui \
-    deletemessagebox.ui \
-    mainwindow.ui \
-    processdurationmessagebox.ui \
-    treebaseddictwindow.ui \
-    settingwindow.ui
-
-RESOURCES += \
-    Ressourcen.qrc
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
-unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+unix:!macx {
+    QMAKE_CXXFLAGS += -std=c++0x
+    QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
+    # suppress visibility warnings
+    QMAKE_CXXFLAGS += -Wno-attributes
+}
+macx {
+    QMAKE_CXXFLAGS = -mmacosx-version-min=10.7 -std=gnu0x -stdlib=libc+
+    CONFIG +=c++11
+}
+
+RESOURCES += \
+    mneanalyzeqt.qrc
+
+RC_FILE = resources/images/appIcons/mne-analyze.rc

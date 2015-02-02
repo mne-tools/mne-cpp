@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     applications.pro
+# @file     mne_browse_raw_qt.pro
 # @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 #           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 #           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;

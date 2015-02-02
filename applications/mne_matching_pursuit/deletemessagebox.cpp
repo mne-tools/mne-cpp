@@ -48,6 +48,8 @@
 
 QString parentName;
 
+//*************************************************************************************************************************************
+
 // CONSTRUCTOR
 DeleteMessageBox::DeleteMessageBox(QWidget *parent) :    QDialog(parent),    ui(new Ui::DeleteMessageBox)
 {
@@ -55,7 +57,10 @@ DeleteMessageBox::DeleteMessageBox(QWidget *parent) :    QDialog(parent),    ui(
     ui->setupUi(this);
 }
 
-DeleteMessageBox::DeleteMessageBox(QString msg_text, QString caption, QString btt_left_text, QString btt_right_text, QWidget *parent)  :    QDialog(parent),    ui(new Ui::DeleteMessageBox)
+//*************************************************************************************************************************************
+
+DeleteMessageBox::DeleteMessageBox(QString msg_text, QString caption, QString btt_left_text, QString btt_right_text, QWidget *parent)
+    :    QDialog(parent),    ui(new Ui::DeleteMessageBox)
 {
     ui->setupUi(this);
     ui->lb_MessageText->setText(msg_text);
@@ -64,10 +69,14 @@ DeleteMessageBox::DeleteMessageBox(QString msg_text, QString caption, QString bt
     this->setWindowTitle(caption);
 }
 
+//*************************************************************************************************************************************
+
 DeleteMessageBox::~DeleteMessageBox()
 {
     delete ui;
 }
+
+//*************************************************************************************************************************************
 
 void DeleteMessageBox::on_btt_yes_clicked()
 {
@@ -75,11 +84,15 @@ void DeleteMessageBox::on_btt_yes_clicked()
     hide();
 }
 
+//*************************************************************************************************************************************
+
 void DeleteMessageBox::on_btt_No_clicked()
 {
     setResult(0);
     hide();
 }
+
+//*************************************************************************************************************************************
 
 void DeleteMessageBox::on_chb_NoMessageBox_toggled(bool checked)
 {
@@ -87,3 +100,4 @@ void DeleteMessageBox::on_chb_NoMessageBox_toggled(bool checked)
     settings.setValue("show_warnings", !checked);
 }
 
+//*************************************************************************************************************************************
