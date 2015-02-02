@@ -29,5 +29,6 @@
         <file>icons/progressbar_brush.png</file>
         <file>icons/chirp_fml.png</file>
         <file>icons/gabor_fml.png</file>
+        <file>icons/lupe.png</file>
     </qresource>
 </RCC>

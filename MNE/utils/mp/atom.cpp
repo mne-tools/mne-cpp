@@ -138,7 +138,7 @@ VectorXd GaborAtom::gauss_function (qint32 sample_count, qreal scale, quint32 tr
 
     for(qint32 n = 0; n < sample_count; n++)
     {
-        qreal t = (qreal(n)-translation)/scale;
+        qreal t = (qreal(n) - translation) / scale;
         gauss[n] = exp(-PI * pow(t, 2))*pow(sqrt(scale),(-1))*pow(qreal(2),(0.25));
     }
 
@@ -212,8 +212,8 @@ VectorXd ChirpAtom::gauss_function (qint32 sample_count, qreal scale, quint32 tr
 
     for(qint32 n = 0; n < sample_count; n++)
     {
-        qreal t = (qreal(n)-translation)/scale;
-        gauss[n] = exp(-PI * pow(t, 2))*pow(sqrt(scale),(-1))*pow(qreal(2),(0.25));
+        qreal t = (qreal(n) - translation) / scale;
+        gauss[n] = exp(-PI * pow(t, 2)) * pow(sqrt(scale), (-1)) * pow(qreal(2),(0.25));
     }
 
     return gauss;
