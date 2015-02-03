@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     mainwindow.h
 * @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
 *			Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
@@ -32,18 +32,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_analyze_qt GUI application.
+* @brief
 *
+*
+*@file
+*       mainwindow.cpp
+*       mainwindow.ui
 */
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
-#include <stdio.h>
-#include "info.h"
-#include "Windows/mainwindow.h"
+#include "viewerwidget.h"
+#include "aboutwindow.h"
 
 
 //*************************************************************************************************************
@@ -51,48 +55,39 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QtGui>
-#include <QApplication>
-#include <QDateTime>
-#include <QSplashScreen>
-#include <QThread>
-
+#include <QMainWindow>
+#include <QtWidgets/QGridLayout>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace MNEAnalyzeQt;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE FORWARD DECLARATIONS
 //=============================================================================================================
 
 
 //=============================================================================================================
-// MAIN
-MainWindow *mainWindow;
-int main(int argc, char *argv[])
-{
-    QApplication a(argc, argv);
-
-    //set application settings
-    QCoreApplication::setOrganizationName(CInfo::OrganizationName());
-    QCoreApplication::setApplicationName(CInfo::AppNameShort());
-
-    //show splash screen for 1 second
-    QPixmap pixmap(":/resources/images/splashscreen_mne_analyze_qt.png");
-    QSplashScreen splash(pixmap);
-    splash.show();
-    QThread::sleep(1);
-
-    mainWindow = new MainWindow();
-    mainWindow->show();
-
-    splash.finish(mainWindow);
-
-    return a.exec();
+/**
+* DECLARE CLASS MainWindow
+*/
+namespace Ui {
+class MainWindow;
 }
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = 0);
+    ~MainWindow();
+
+private slots:
+    void on_actionAbout_triggered();
+
+private:
+    Ui::MainWindow *ui;
+    ViewerWidget *m_viewerWidget;
+    AboutWindow *m_about;
+
+};
+
+#endif // MAINWINDOW_H
