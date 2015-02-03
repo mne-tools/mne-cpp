@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     mainwindow.cpp
 * @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
 *			Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
@@ -32,30 +32,27 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_analyze_qt GUI application.
+* @brief
 *
+* @file
+*       mainwindow.h
+*       mainwindow.ui
 */
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QtWidgets/QGridLayout>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <stdio.h>
-#include "info.h"
-#include "Windows/mainwindow.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QtGui>
-#include <QApplication>
-#include <QDateTime>
-#include <QSplashScreen>
-#include <QThread>
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include "viewerwidget.h"
 
 
 //*************************************************************************************************************
@@ -63,36 +60,28 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEAnalyzeQt;
-
-
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
 
-//=============================================================================================================
-// MAIN
-MainWindow *mainWindow;
-int main(int argc, char *argv[])
+MainWindow::MainWindow(QWidget *parent)
+: QMainWindow(parent)
+, ui(new Ui::MainWindow)
 {
-    QApplication a(argc, argv);
+    ui->setupUi(this);
+    m_viewerWidget = new ViewerWidget(this);
+    this->setCentralWidget(m_viewerWidget);
+}
 
-    //set application settings
-    QCoreApplication::setOrganizationName(CInfo::OrganizationName());
-    QCoreApplication::setApplicationName(CInfo::AppNameShort());
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
 
-    //show splash screen for 1 second
-    QPixmap pixmap(":/resources/images/splashscreen_mne_analyze_qt.png");
-    QSplashScreen splash(pixmap);
-    splash.show();
-    QThread::sleep(1);
-
-    mainWindow = new MainWindow();
-    mainWindow->show();
-
-    splash.finish(mainWindow);
-
-    return a.exec();
+void MainWindow::on_actionAbout_triggered()
+{
+    m_about = new AboutWindow();
+    m_about->show();
 }

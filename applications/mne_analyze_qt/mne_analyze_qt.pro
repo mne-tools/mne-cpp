@@ -41,6 +41,7 @@ include(../../mne-cpp.pri)
 TEMPLATE = app
 
 QT += gui widgets
+QT += quick 3d
 
 TARGET = mne_analyze_qt
 
@@ -70,12 +71,25 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += \
-    main.cpp 
+    main.cpp \   
+    Windows/mainwindow.cpp \
+    Windows/aboutwindow.cpp \
+    Windows/viewerwidget.cpp \
+    Views/baseview.cpp \
+    Views/view3d.cpp
 
 HEADERS += \
-    info.h
+    info.h \
+    Windows/mainwindow.h \
+    Windows/aboutwindow.h \
+    Windows/viewerwidget.h \
+    Views/baseview.h \
+    Views/view3d.h
 
 FORMS += \
+    Windows/mainwindow.ui \
+    Windows/aboutwindow.ui \
+    Windows/viewerwidget.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
