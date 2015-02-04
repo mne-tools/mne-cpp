@@ -39,30 +39,96 @@
 *           viewerwidget.h
 *           viewerwidget.ui
 */
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
 
-#include <QtWidgets/QHBoxLayout>
 #include "viewerwidget.h"
 #include "ui_viewerwidget.h"
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+// ViewerWidget constructor
+//=============================================================================================================
 
 ViewerWidget::ViewerWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ViewerWidget)
 {
+    //Ui setup
     ui->setupUi(this);
-    this->resize(512,512);
+    //QGridLayout is used so the viewer and MdiArea can fit always the size of MainWindow
     m_gridLayout = new QGridLayout(this);
-    m_horizontalLayout = new QHBoxLayout(this);
+    //Multiple Display Area, created inside ViewerWidget
     m_MdiArea = new QMdiArea(this);
+    m_gridLayout->addWidget(m_MdiArea);
 
-    m_horizontalLayout->addWidget(m_MdiArea);
-    m_gridLayout->addLayout(m_horizontalLayout,0,0,1,1);
+    //
+    //Pial surface
+    //
+    //A new View3D object is created, in charge of the subwindow and the displaying of the 3D surface
+    m_view3d_pial = new View3D(1);
+    //A new subwindow is created
+    m_MdiArea->addSubWindow(m_view3d_pial);
+    m_view3d_pial->setWindowTitle("Pial surface");
 
-    m_view3d_test = new View3D();
-    m_MdiArea->addSubWindow(m_view3d_test);
 
-    //QMdiSubWindow *m_newsubwindow = m_MdiArea->addSubWindow(m_view3d_test)->setGeometry(0,256,256,256);
-    //m_newsubwindow->show();
+    //
+    //Inflated surface
+    //
+    //A new View3D object is created, in charge of the subwindow and the displaying of the 3D surface
+    m_view3d_inflated = new View3D(2);
+    //A new subwindow is created
+    m_MdiArea->addSubWindow(m_view3d_inflated);
+    m_view3d_inflated->setWindowTitle("Inflated surface");
+
+
+//    //
+//    //Original surface
+//    //
+//    //A new View3D object is created, in charge of the subwindow and the displaying of the 3D surface
+//    m_view3d_original = new View3D(3);
+//    //A new subwindow is created
+//    m_MdiArea->addSubWindow(m_view3d_original);
+//    m_view3d_original->setWindowTitle("Original surface");
+
+    //
+    //White matter
+    //
+    //A new View3D object is created, in charge of the subwindow and the displaying of the 3D surface
+    m_vie3d_white = new View3D(4);
+    //A new subwindow is created
+    m_MdiArea->addSubWindow(m_vie3d_white);
+    m_vie3d_white->setWindowTitle("White matter");
+
+    //Cascade subwindows
+    this->m_MdiArea->tileSubWindows();
 }
+
+//*************************************************************************************************************
+//=============================================================================================================
+//Arrange subwindows with a cascade mode
+//=============================================================================================================
+void ViewerWidget::CascadeSubWindows()
+{
+    this->m_MdiArea->cascadeSubWindows();
+}
+
+//*************************************************************************************************************
+//=============================================================================================================
+//Arrange subwindows with a tile mode
+//=============================================================================================================
+
+void ViewerWidget::TileSubWindows()
+{
+    this->m_MdiArea->cascadeSubWindows();
+}
+//*************************************************************************************************************
+//=============================================================================================================
+// ViewerWidget destructor
+//=============================================================================================================
 
 ViewerWidget::~ViewerWidget()
 {
