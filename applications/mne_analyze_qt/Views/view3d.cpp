@@ -37,46 +37,70 @@
 *@file
 *       view3d.h
 */
-
-#include <QWindow>
-#include <QQuickView>
-#include <QPushButton>
-#include <disp3D/brainview.h>
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
 
 #include "view3d.h"
 
-using namespace FSLIB;
-using namespace DISP3DLIB;
 
-View3D::View3D()
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+// View3D constructor
+//=============================================================================================================
+
+View3D::View3D(int surface_type)
 {
-    this->resize(128,128);
+    //Resizing the created QMdiSubwindow to fit the minimun size of the container used later
+    this->resize(256,256);
+    //QGridLayout is used so the container constantly resizes to the size of the QMdiSubwindow
     m_view3d_gridlayout = new QGridLayout(this);
-    m_view3d_hboxlayout = new QHBoxLayout(this);
 
-    //FreeSurfer example
+    //*************************************************************************************************************
+    //=============================================================================================================
+    // Loading a FreeSurfer example from BrainView class
+    //=============================================================================================================
+
+    switch(surface_type){
+    case 1:
     //
     // pial
     //
-    BrainView t_pialBrainView("sample", 2, "pial", "./MNE-sample-data/subjects");
-
-    if (t_pialBrainView.stereoType() != QGLView::RedCyanAnaglyph)
-        t_pialBrainView.camera()->setEyeSeparation(0.3f);
-
-    //t_pialBrainView.setTitle(QString("Pial surface"));
-    //t_pialBrainView.show();
-
-    m_view3d_container = QWidget::createWindowContainer(&t_pialBrainView);
+        m_BrainView = new BrainView("sample", 2, "pial", "./MNE-sample-data/subjects");
+        break;
+    case 2:
+    //
+    // inflated
+    //
+        m_BrainView = new BrainView("sample", 2, "inflated", "./MNE-sample-data/subjects");
+        break;
+    case 3:
+    //
+    // orig
+    //
+        m_BrainView = new BrainView("sample", 2, "orig", "./MNE-sample-data/subjects");
+        break;
+    case 4:
+    //
+    // white
+    //
+        m_BrainView = new BrainView("sample", 2, "white", "./MNE-sample-data/subjects");
+        break;
+    }
+    //A container is created to contain the QWindow that comes from BrainView, then a minimum size is set
+    m_view3d_container = QWidget::createWindowContainer(m_BrainView);
     m_view3d_container->setMinimumSize(256,256);
-    m_view3d_container->setMaximumSize(256,256);
+    //m_view3d_container->setMaximumSize(256,256);
     m_view3d_container->setFocusPolicy(Qt::TabFocus);
-    //m_view3d_container->show();
-
-    m_view3d_hboxlayout->addWidget(m_view3d_container);
-    m_view3d_gridlayout->addLayout(m_view3d_hboxlayout,0,0,1,1);
-
-    this->setLayout(m_view3d_gridlayout);
+    //The loaded surfaces, as a QWindow is added to the created container
+    m_view3d_gridlayout->addWidget(m_view3d_container);
 }
+//*************************************************************************************************************
+//=============================================================================================================
+// View3D destructor
+//=============================================================================================================
 
 View3D::~View3D()
 {

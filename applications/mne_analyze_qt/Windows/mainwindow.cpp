@@ -34,17 +34,12 @@
 *
 * @brief
 *
+* MNE Analyze allows the user to perform different interactive analysis.
+*
 * @file
 *       mainwindow.h
 *       mainwindow.ui
 */
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QtWidgets/QGridLayout>
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
@@ -71,8 +66,11 @@ MainWindow::MainWindow(QWidget *parent)
 , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    //this->resize(1024,1024);
+    this->setWindowState(Qt::WindowMaximized);
     m_viewerWidget = new ViewerWidget(this);
     this->setCentralWidget(m_viewerWidget);
+    CreateDockWindows();
 }
 
 MainWindow::~MainWindow()
@@ -84,4 +82,47 @@ void MainWindow::on_actionAbout_triggered()
 {
     m_about = new AboutWindow();
     m_about->show();
+}
+
+void MainWindow::on_actionCascade_triggered()
+{
+    this->m_viewerWidget->CascadeSubWindows();
+}
+
+void MainWindow::on_actionTile_triggered()
+{
+    this->m_viewerWidget->TileSubWindows();
+}
+
+void MainWindow::on_actionOpen_data_file_triggered()
+{
+    //Open a FIFF file
+
+    //Get the path
+    m_fiffFileName = QFileDialog::getOpenFileName(this,
+                                                    ("Open File"),
+                                                    "C:/",
+                                                    ("fiff File(*.fiff)"));
+    QFile m_fiffFile(m_fiffFileName);
+}
+
+void MainWindow::CreateDockWindows()
+{
+    //
+    //Layers DockWidget
+    //
+    m_layersDock = new QDockWidget(tr("Layers"), this);
+    m_layersDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    addDockWidget(Qt::RightDockWidgetArea,m_layersDock);
+    m_layersDock->setMinimumWidth(128);
+    m_layersDock->setMinimumHeight(128);
+
+    //
+    //Information DockWidget
+    //
+    m_informationDock = new QDockWidget(tr("Information"), this);
+    m_informationDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    addDockWidget(Qt::RightDockWidgetArea,m_informationDock);
+    m_informationDock->setMinimumWidth(128);
+
 }

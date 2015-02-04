@@ -39,6 +39,8 @@
     <property name="title">
      <string>Windows</string>
     </property>
+    <addaction name="actionCascade"/>
+    <addaction name="actionTile"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -65,6 +67,16 @@
   <action name="actionLoad_surface">
    <property name="text">
     <string>Load surface</string>
+   </property>
+  </action>
+  <action name="actionCascade">
+   <property name="text">
+    <string>Cascade</string>
+   </property>
+  </action>
+  <action name="actionTile">
+   <property name="text">
+    <string>Tile</string>
    </property>
   </action>
  </widget>
