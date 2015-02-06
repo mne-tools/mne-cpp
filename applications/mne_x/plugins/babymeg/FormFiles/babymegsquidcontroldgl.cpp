@@ -370,18 +370,18 @@ void BabyMEGSQUIDControlDgl::RestLock(int index)
 
 void BabyMEGSQUIDControlDgl::PreGaini(int index)
 {
-    ProcCmd("UPDEPREGAINI",index,"Pre Gain is changed !");
+    ProcCmd("UPDEPREGAINI",++index,"Pre Gain is changed !");
 }
 
 void BabyMEGSQUIDControlDgl::PostGain(int index)
 {
-    ProcCmd("UPDEPOSTGAIN",index,"Post Gain is changed !");
+    ProcCmd("UPDEPOSTGAIN",++index,"Post Gain is changed !");
 }
 
 
 void BabyMEGSQUIDControlDgl::SlewSele(int index)
 {
-    ProcCmd("UPDESLEWSELE",index,"Slew Selection is changed !");
+    ProcCmd("UPDESLEWSELE",++index,"Slew Selection is changed !");
 }
 
 
