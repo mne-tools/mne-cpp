@@ -370,18 +370,18 @@ void BabyMEGSQUIDControlDgl::RestLock(int index)
 
 void BabyMEGSQUIDControlDgl::PreGaini(int index)
 {
-    ProcCmd("UPDEPREGAINI",index,"Pre Gain is changed !");
+    ProcCmd("UPDEPREGAINI",++index,"Pre Gain is changed !");
 }
 
 void BabyMEGSQUIDControlDgl::PostGain(int index)
 {
-    ProcCmd("UPDEPOSTGAIN",index,"Post Gain is changed !");
+    ProcCmd("UPDEPOSTGAIN",++index,"Post Gain is changed !");
 }
 
 
 void BabyMEGSQUIDControlDgl::SlewSele(int index)
 {
-    ProcCmd("UPDESLEWSELE",index,"Slew Selection is changed !");
+    ProcCmd("UPDESLEWSELE",++index,"Slew Selection is changed !");
 }
 
 
@@ -534,7 +534,22 @@ void BabyMEGSQUIDControlDgl::InitChannels(QString sReply)
 //    QList < QString > tmp = sReply.split("|");
 //    ui->m_Qcb_channel->addItems(tmp);
 
-    chanNames =  sReply.split("|");
+//    chanNames =  sReply.split("|");
+//    ui->m_Qcb_channel->addItems(chanNames);
+
+    // select the MEG channels we need
+    QList <QString> t_chanNames = sReply.split("|");
+
+    chanNames.clear();
+
+    for (int i=0;i<t_chanNames.size();i++)
+    {
+        QString T = t_chanNames.at(i);
+        if (T.left(3)=="MEG")
+            chanNames.push_back(T);
+    }
+
+
     ui->m_Qcb_channel->addItems(chanNames);
 
 }
