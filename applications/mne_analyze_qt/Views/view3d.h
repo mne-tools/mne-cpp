@@ -53,7 +53,6 @@
 
 #include <QWidget>
 #include <QtWidgets/QHBoxLayout>
-#include <QQuickView>
 #include <QPushButton>
 #include <disp3D/brainview.h>
 
@@ -91,7 +90,6 @@ private:
     //Layout
     QWidget *m_view3d_container;
     QGridLayout *m_view3d_gridlayout;
-    QQuickView *m_view3d_quickview;
     //Surface
     BrainView *m_BrainView;
 
