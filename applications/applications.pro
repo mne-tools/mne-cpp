@@ -44,9 +44,7 @@ SUBDIRS += \
 contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += \
         mne_x_libs \
-        mne_x \
-        mne_analyze_qt
-
+        mne_x
 
     !contains(MNECPP_CONFIG, oldCompiler) {
         message(mne_browse_raw_qt configured!)
@@ -59,7 +57,8 @@ contains(MNECPP_CONFIG, withGui) {
         SUBDIRS += \
             mne_viewer \
             mne_viewer_parent \
-            mne_matching_pursuit
+            mne_matching_pursuit \
+            mne_analyze_qt
     }
 }
 
