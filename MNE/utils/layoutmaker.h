@@ -189,7 +189,6 @@ private:
                              float simplex_size,
                              VectorXf &r0,
                              float &R);
-
 };
 
 } //NAMESPACE
