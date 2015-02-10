@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>294</width>
     <height>600</height>
    </rect>
   </property>
@@ -19,7 +19,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>294</width>
      <height>20</height>
     </rect>
    </property>
@@ -29,6 +29,7 @@
     </property>
     <addaction name="actionOpen_data_file"/>
     <addaction name="actionLoad_surface"/>
+    <addaction name="actionReload_surfaces"/>
    </widget>
    <widget class="QMenu" name="menuAdjust">
     <property name="title">
@@ -77,6 +78,11 @@
   <action name="actionTile">
    <property name="text">
     <string>Tile</string>
+   </property>
+  </action>
+  <action name="actionReload_surfaces">
+   <property name="text">
+    <string>Reload surfaces</string>
    </property>
   </action>
  </widget>

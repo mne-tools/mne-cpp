@@ -63,51 +63,67 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE FORWARD DECLARATIONS
+// DECLARE NAMESPACE Ui
 //=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* DECLARE CLASS MainWindow
-*/
 namespace Ui {
 class MainWindow;
 }
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE FORWARD DECLARATIONS
+//=============================================================================================================
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+//=============================================================================================================
+
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+//=============================================================================================================
+
 private slots:
+
+    //AboutWindow
     void on_actionAbout_triggered();
 
+    //MdiArea subwindows
     void on_actionCascade_triggered();
-
     void on_actionTile_triggered();
 
+    //Open a FIFF file
     void on_actionOpen_data_file_triggered();
 
+    //Docks
     void CreateDockWindows();
+    void on_actionReload_surfaces_triggered();
+
+//=============================================================================================================
 
 private:
+
     //Ui setup
-    Ui::MainWindow *ui;
+    Ui::MainWindow          *ui;
+
     //ViewerWIdget
-    ViewerWidget *m_viewerWidget;
+    ViewerWidget            *m_viewerWidget;
+
     //AboutWindow
-    AboutWindow *m_about;
+    AboutWindow             *m_about;
+
     //FIFF File management
-    QString m_fiffFileName;
+    QString                 m_fiffFileName;
+
     //QFile m_fiffFile;
 
     //Dock Widgets
-    QDockWidget *m_layersDock;
-    QDockWidget *m_informationDock;
+    QDockWidget             *m_layersDock;
+    QDockWidget             *m_informationDock;
 
 };
 

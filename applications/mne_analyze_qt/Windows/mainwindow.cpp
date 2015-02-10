@@ -34,7 +34,7 @@
 *
 * @brief
 *
-* MNE Analyze allows the user to perform different interactive analysis.
+* MNE Analyze allows the user to perform different interactive analysis. Still in development.
 *
 * @file
 *       mainwindow.h
@@ -49,12 +49,6 @@
 #include "ui_mainwindow.h"
 #include "viewerwidget.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -66,33 +60,49 @@ MainWindow::MainWindow(QWidget *parent)
 , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    //this->resize(1024,1024);
     this->setWindowState(Qt::WindowMaximized);
+    //Instance of ViewerWIdget
     m_viewerWidget = new ViewerWidget(this);
     this->setCentralWidget(m_viewerWidget);
+    //Dock windows
     CreateDockWindows();
 }
+
+//*************************************************************************************************************
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 
+//*************************************************************************************************************
+
 void MainWindow::on_actionAbout_triggered()
 {
+    //AboutWindow pops up with info about the software
     m_about = new AboutWindow();
     m_about->show();
 }
 
+//*************************************************************************************************************
+
 void MainWindow::on_actionCascade_triggered()
 {
+    //Since we need to acces some private attributes from ViewerWIdget, we need a method to do it
+    //Used to arrange the subwindows that contains the surfaces and 2D plots, in a Cascade mode
     this->m_viewerWidget->CascadeSubWindows();
 }
 
+//*************************************************************************************************************
+
 void MainWindow::on_actionTile_triggered()
 {
+    //Since we need to acces some private attributes from ViewerWIdget, we need a method to do it
+    //Used to arrange the subwindows that contains the surfaces and 2D plots, in a Tile mode
     this->m_viewerWidget->TileSubWindows();
 }
+
+//*************************************************************************************************************
 
 void MainWindow::on_actionOpen_data_file_triggered()
 {
@@ -103,8 +113,11 @@ void MainWindow::on_actionOpen_data_file_triggered()
                                                     ("Open File"),
                                                     "C:/",
                                                     ("fiff File(*.fiff)"));
+    //Open file
     QFile m_fiffFile(m_fiffFileName);
 }
+
+//*************************************************************************************************************
 
 void MainWindow::CreateDockWindows()
 {
@@ -125,4 +138,11 @@ void MainWindow::CreateDockWindows()
     addDockWidget(Qt::RightDockWidgetArea,m_informationDock);
     m_informationDock->setMinimumWidth(128);
 
+}
+
+//*************************************************************************************************************
+
+void MainWindow::on_actionReload_surfaces_triggered()
+{
+        //m_viewerWidget->ReloadSurfaces();
 }
