@@ -50,7 +50,6 @@
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
-// ViewerWidget constructor
 //=============================================================================================================
 
 ViewerWidget::ViewerWidget(QWidget *parent) :
@@ -65,6 +64,7 @@ ViewerWidget::ViewerWidget(QWidget *parent) :
     m_MdiArea = new QMdiArea(this);
     m_gridLayout->addWidget(m_MdiArea);
 
+    //=============================================================================================================
     //
     //Pial surface
     //
@@ -104,31 +104,39 @@ ViewerWidget::ViewerWidget(QWidget *parent) :
     m_vie3d_white->setWindowTitle("White matter");
 
     //Cascade subwindows
+    this->m_MdiArea->cascadeSubWindows();
+}
+
+//*************************************************************************************************************
+
+void ViewerWidget::CascadeSubWindows()
+{
+    //Arrange subwindows in a Tile mode    //Arrange subwindows in a Tile mode
+    this->m_MdiArea->cascadeSubWindows();
+}
+
+//*************************************************************************************************************
+
+void ViewerWidget::TileSubWindows()
+{
+    //Arrange subwindows in a Tile mode
     this->m_MdiArea->tileSubWindows();
 }
 
 //*************************************************************************************************************
-//=============================================================================================================
-//Arrange subwindows with a cascade mode
-//=============================================================================================================
-void ViewerWidget::CascadeSubWindows()
-{
-    this->m_MdiArea->cascadeSubWindows();
-}
 
-//*************************************************************************************************************
-//=============================================================================================================
-//Arrange subwindows with a tile mode
-//=============================================================================================================
-
-void ViewerWidget::TileSubWindows()
+void ViewerWidget::ReloadSurfaces()
 {
-    this->m_MdiArea->cascadeSubWindows();
+//    //Not working at the time
+//    m_MdiArea->addSubWindow(m_view3d_pial);
+//    m_view3d_pial->setWindowTitle("Pial surface");
+//    m_MdiArea->addSubWindow(m_view3d_inflated);
+//    m_view3d_inflated->setWindowTitle("Inflated surface");
+//    m_MdiArea->addSubWindow(m_vie3d_white);
+//    m_vie3d_white->setWindowTitle("White matter");
+
 }
 //*************************************************************************************************************
-//=============================================================================================================
-// ViewerWidget destructor
-//=============================================================================================================
 
 ViewerWidget::~ViewerWidget()
 {

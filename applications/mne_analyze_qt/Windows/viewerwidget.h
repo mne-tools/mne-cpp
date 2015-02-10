@@ -75,7 +75,7 @@ class ViewerWidget;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE FORWARD DECLARATIONS
 //=============================================================================================================
 
 class ViewerWidget : public QWidget
@@ -89,19 +89,29 @@ public:
     void CascadeSubWindows();
     //Tile subwindows
     void TileSubWindows();
+    //Reload demo surfaces
+    void ReloadSurfaces();
     //Destructor
     ~ViewerWidget();
 
 //=============================================================================================================
 private:
+
     //Ui settings
-    Ui::ViewerWidget *ui;
+    Ui::ViewerWidget        *ui;
+
     //Layout
-    QGridLayout *m_gridLayout;
+    QGridLayout             *m_gridLayout;
+
     //ViewD object
-    View3D *m_view3d_test,*m_view3d_pial,*m_view3d_inflated,*m_view3d_original,*m_vie3d_white;
+    View3D                  *m_view3d_test,
+                            *m_view3d_pial,
+                            *m_view3d_inflated,
+                            *m_view3d_original,
+                            *m_vie3d_white;
+
     //Multiple Display Area
-    QMdiArea *m_MdiArea;
+    QMdiArea                *m_MdiArea;
 };
 
 #endif // VIEWERWIDGET_H
