@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     mainwindow.h
 * @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
 *			Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
@@ -32,18 +32,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_analyze_qt GUI application.
+* @brief
 *
+*
+*@file
+*       mainwindow.cpp
+*       mainwindow.ui
 */
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
-#include <stdio.h>
-#include "info.h"
-#include "Windows/mainwindow.h"
+#include "viewerwidget.h"
+#include "aboutwindow.h"
 
 
 //*************************************************************************************************************
@@ -51,49 +55,76 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QtGui>
-#include <QApplication>
-#include <QDateTime>
-#include <QSplashScreen>
-#include <QThread>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace MNEAnalyzeQt;
-
+#include <QMainWindow>
+#include <QString>
+#include <QFileDialog>
+#include <QDockWidget>
+#include <QtWidgets/QGridLayout>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DECLARE NAMESPACE Ui
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-
-MainWindow *mainWindow;
-int main(int argc, char *argv[])
-{
-    QApplication a(argc, argv);
-
-    //set application settings
-    QCoreApplication::setOrganizationName(CInfo::OrganizationName());
-    QCoreApplication::setApplicationName(CInfo::AppNameShort());
-
-    //show splash screen for 1 second
-    QPixmap pixmap(":/resources/images/splashscreen_mne_analyze_qt.png");
-    QSplashScreen splash(pixmap);
-    splash.show();
-    QThread::sleep(1);
-
-    //New main window instance
-    mainWindow = new MainWindow();
-    mainWindow->show();
-
-    splash.finish(mainWindow);
-
-    return a.exec();
+namespace Ui {
+class MainWindow;
 }
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE FORWARD DECLARATIONS
+//=============================================================================================================
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+//=============================================================================================================
+
+public:
+    explicit MainWindow(QWidget *parent = 0);
+    ~MainWindow();
+
+//=============================================================================================================
+
+private slots:
+
+    //AboutWindow
+    void on_actionAbout_triggered();
+
+    //MdiArea subwindows
+    void on_actionCascade_triggered();
+    void on_actionTile_triggered();
+
+    //Open a FIFF file
+    void on_actionOpen_data_file_triggered();
+
+    //Docks
+    void CreateDockWindows();
+    void on_actionReload_surfaces_triggered();
+
+//=============================================================================================================
+
+private:
+
+    //Ui setup
+    Ui::MainWindow          *ui;
+
+    //ViewerWIdget
+    ViewerWidget            *m_viewerWidget;
+
+    //AboutWindow
+    AboutWindow             *m_about;
+
+    //FIFF File management
+    QString                 m_fiffFileName;
+
+    //QFile m_fiffFile;
+
+    //Dock Widgets
+    QDockWidget             *m_layersDock;
+    QDockWidget             *m_informationDock;
+
+};
+
+#endif // MAINWINDOW_H

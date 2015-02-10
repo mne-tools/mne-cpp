@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     viewerwidget.cpp
 * @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
 *			Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
@@ -32,68 +32,113 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_analyze_qt GUI application.
+* @brief
 *
+*
+* @file
+*           viewerwidget.h
+*           viewerwidget.ui
 */
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <stdio.h>
-#include "info.h"
-#include "Windows/mainwindow.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QtGui>
-#include <QApplication>
-#include <QDateTime>
-#include <QSplashScreen>
-#include <QThread>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace MNEAnalyzeQt;
-
+#include "viewerwidget.h"
+#include "ui_viewerwidget.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+ViewerWidget::ViewerWidget(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::ViewerWidget)
+{
+    //Ui setup
+    ui->setupUi(this);
+    //QGridLayout is used so the viewer and MdiArea can fit always the size of MainWindow
+    m_gridLayout = new QGridLayout(this);
+    //Multiple Display Area, created inside ViewerWidget
+    m_MdiArea = new QMdiArea(this);
+    m_gridLayout->addWidget(m_MdiArea);
+
+    //=============================================================================================================
+    //
+    //Pial surface
+    //
+    //A new View3D object is created, in charge of the subwindow and the displaying of the 3D surface
+    m_view3d_pial = new View3D(1);
+    //A new subwindow is created
+    m_MdiArea->addSubWindow(m_view3d_pial);
+    m_view3d_pial->setWindowTitle("Pial surface");
+
+
+    //
+    //Inflated surface
+    //
+    //A new View3D object is created, in charge of the subwindow and the displaying of the 3D surface
+    m_view3d_inflated = new View3D(2);
+    //A new subwindow is created
+    m_MdiArea->addSubWindow(m_view3d_inflated);
+    m_view3d_inflated->setWindowTitle("Inflated surface");
+
+
+//    //
+//    //Original surface
+//    //
+//    //A new View3D object is created, in charge of the subwindow and the displaying of the 3D surface
+//    m_view3d_original = new View3D(3);
+//    //A new subwindow is created
+//    m_MdiArea->addSubWindow(m_view3d_original);
+//    m_view3d_original->setWindowTitle("Original surface");
+
+    //
+    //White matter
+    //
+    //A new View3D object is created, in charge of the subwindow and the displaying of the 3D surface
+    m_vie3d_white = new View3D(4);
+    //A new subwindow is created
+    m_MdiArea->addSubWindow(m_vie3d_white);
+    m_vie3d_white->setWindowTitle("White matter");
+
+    //Cascade subwindows
+    this->m_MdiArea->cascadeSubWindows();
+}
 
 //*************************************************************************************************************
 
-MainWindow *mainWindow;
-int main(int argc, char *argv[])
+void ViewerWidget::CascadeSubWindows()
 {
-    QApplication a(argc, argv);
+    //Arrange subwindows in a Tile mode    //Arrange subwindows in a Tile mode
+    this->m_MdiArea->cascadeSubWindows();
+}
 
-    //set application settings
-    QCoreApplication::setOrganizationName(CInfo::OrganizationName());
-    QCoreApplication::setApplicationName(CInfo::AppNameShort());
+//*************************************************************************************************************
 
-    //show splash screen for 1 second
-    QPixmap pixmap(":/resources/images/splashscreen_mne_analyze_qt.png");
-    QSplashScreen splash(pixmap);
-    splash.show();
-    QThread::sleep(1);
+void ViewerWidget::TileSubWindows()
+{
+    //Arrange subwindows in a Tile mode
+    this->m_MdiArea->tileSubWindows();
+}
 
-    //New main window instance
-    mainWindow = new MainWindow();
-    mainWindow->show();
+//*************************************************************************************************************
 
-    splash.finish(mainWindow);
+void ViewerWidget::ReloadSurfaces()
+{
+//    //Not working at the time
+//    m_MdiArea->addSubWindow(m_view3d_pial);
+//    m_view3d_pial->setWindowTitle("Pial surface");
+//    m_MdiArea->addSubWindow(m_view3d_inflated);
+//    m_view3d_inflated->setWindowTitle("Inflated surface");
+//    m_MdiArea->addSubWindow(m_vie3d_white);
+//    m_vie3d_white->setWindowTitle("White matter");
 
-    return a.exec();
+}
+//*************************************************************************************************************
+
+ViewerWidget::~ViewerWidget()
+{
+    delete ui;
 }

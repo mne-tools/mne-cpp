@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     viewerwidget.h
 * @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
 *			Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
@@ -32,68 +32,86 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_analyze_qt GUI application.
+* @brief
 *
+*
+* @file
+*           viewerwidget.cpp
+*           viewerwidget.ui
 */
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INCLUDES
+// DEFINE
 //=============================================================================================================
 
-#include <stdio.h>
-#include "info.h"
-#include "Windows/mainwindow.h"
-
+#ifndef VIEWERWIDGET_H
+#define VIEWERWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QtGui>
-#include <QApplication>
-#include <QDateTime>
-#include <QSplashScreen>
-#include <QThread>
-
+#include <QWidget>
+#include <QtWidgets/QHBoxLayout>
+#include <QMdiArea>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// INCLUDES
 //=============================================================================================================
 
-using namespace MNEAnalyzeQt;
-
+#include "../Views/view3d.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE NAMESPACE
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-
-MainWindow *mainWindow;
-int main(int argc, char *argv[])
-{
-    QApplication a(argc, argv);
-
-    //set application settings
-    QCoreApplication::setOrganizationName(CInfo::OrganizationName());
-    QCoreApplication::setApplicationName(CInfo::AppNameShort());
-
-    //show splash screen for 1 second
-    QPixmap pixmap(":/resources/images/splashscreen_mne_analyze_qt.png");
-    QSplashScreen splash(pixmap);
-    splash.show();
-    QThread::sleep(1);
-
-    //New main window instance
-    mainWindow = new MainWindow();
-    mainWindow->show();
-
-    splash.finish(mainWindow);
-
-    return a.exec();
+namespace Ui {
+class ViewerWidget;
 }
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE FORWARD DECLARATIONS
+//=============================================================================================================
+
+class ViewerWidget : public QWidget
+{
+    Q_OBJECT
+//=============================================================================================================
+public:
+    //Constructor
+    explicit ViewerWidget(QWidget *parent = 0);
+    //Cascade subwindows
+    void CascadeSubWindows();
+    //Tile subwindows
+    void TileSubWindows();
+    //Reload demo surfaces
+    void ReloadSurfaces();
+    //Destructor
+    ~ViewerWidget();
+
+//=============================================================================================================
+private:
+
+    //Ui settings
+    Ui::ViewerWidget        *ui;
+
+    //Layout
+    QGridLayout             *m_gridLayout;
+
+    //ViewD object
+    View3D                  *m_view3d_test,
+                            *m_view3d_pial,
+                            *m_view3d_inflated,
+                            *m_view3d_original,
+                            *m_vie3d_white;
+
+    //Multiple Display Area
+    QMdiArea                *m_MdiArea;
+};
+
+#endif // VIEWERWIDGET_H

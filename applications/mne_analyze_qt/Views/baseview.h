@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     baseview.h
 * @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
 *			Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
@@ -32,68 +32,37 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_analyze_qt GUI application.
+* @brief
 *
+* @file
+*       basewindow.h
 */
-
 //*************************************************************************************************************
 //=============================================================================================================
-// INCLUDES
+// DEFINES
 //=============================================================================================================
 
-#include <stdio.h>
-#include "info.h"
-#include "Windows/mainwindow.h"
-
+#ifndef BASEVIEW_H
+#define BASEVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QtGui>
-#include <QApplication>
-#include <QDateTime>
-#include <QSplashScreen>
-#include <QThread>
-
+#include <QObject>
+#include <QWidget>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE FORWARD DECLARATIONS
 //=============================================================================================================
 
-using namespace MNEAnalyzeQt;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-
-MainWindow *mainWindow;
-int main(int argc, char *argv[])
+class BaseView : public QWidget
 {
-    QApplication a(argc, argv);
+public:
+    BaseView();
+    ~BaseView();
+};
 
-    //set application settings
-    QCoreApplication::setOrganizationName(CInfo::OrganizationName());
-    QCoreApplication::setApplicationName(CInfo::AppNameShort());
-
-    //show splash screen for 1 second
-    QPixmap pixmap(":/resources/images/splashscreen_mne_analyze_qt.png");
-    QSplashScreen splash(pixmap);
-    splash.show();
-    QThread::sleep(1);
-
-    //New main window instance
-    mainWindow = new MainWindow();
-    mainWindow->show();
-
-    splash.finish(mainWindow);
-
-    return a.exec();
-}
+#endif // BASEVIEW_H
