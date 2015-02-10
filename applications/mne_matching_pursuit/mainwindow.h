@@ -139,7 +139,7 @@ public:
     ~MainWindow();
     //**********************************************************************************************************
 
-    typedef QList<QList<GaborAtom>> adaptive_atom_list;
+    typedef QList<QList<GaborAtom> > adaptive_atom_list;
     typedef QList<FixDictAtom> fix_dict_atom_list;
     typedef QMap<qint32, bool> select_map;
     typedef Eigen::VectorXd VectorXd;
@@ -602,7 +602,7 @@ private:
     QMap<qint32, bool> select_channel_map;
     QMap<qint32, bool> select_atoms_map;
     QList<QColor> original_colors;
-    QList<QList<GaborAtom>> _adaptive_atom_list;
+    QList<QList<GaborAtom> > _adaptive_atom_list;
     QList<FixDictAtom> _fix_dict_atom_list;
     MatrixXd datas;
     RowVectorXf times_vec;
