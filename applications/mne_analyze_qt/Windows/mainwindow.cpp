@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     mainwindow.cpp
 * @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
 *			Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
@@ -32,68 +32,117 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_analyze_qt GUI application.
+* @brief
 *
+* MNE Analyze allows the user to perform different interactive analysis. Still in development.
+*
+* @file
+*       mainwindow.h
+*       mainwindow.ui
 */
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <stdio.h>
-#include "info.h"
-#include "Windows/mainwindow.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QtGui>
-#include <QApplication>
-#include <QDateTime>
-#include <QSplashScreen>
-#include <QThread>
-
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include "viewerwidget.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace MNEAnalyzeQt;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
 
-//*************************************************************************************************************
-
-MainWindow *mainWindow;
-int main(int argc, char *argv[])
+MainWindow::MainWindow(QWidget *parent)
+: QMainWindow(parent)
+, ui(new Ui::MainWindow)
 {
-    QApplication a(argc, argv);
+    ui->setupUi(this);
+    this->setWindowState(Qt::WindowMaximized);
+    //Instance of ViewerWIdget
+    m_viewerWidget = new ViewerWidget(this);
+    this->setCentralWidget(m_viewerWidget);
+    //Dock windows
+    CreateDockWindows();
+}
 
-    //set application settings
-    QCoreApplication::setOrganizationName(CInfo::OrganizationName());
-    QCoreApplication::setApplicationName(CInfo::AppNameShort());
+//*************************************************************************************************************
 
-    //show splash screen for 1 second
-    QPixmap pixmap(":/resources/images/splashscreen_mne_analyze_qt.png");
-    QSplashScreen splash(pixmap);
-    splash.show();
-    QThread::sleep(1);
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
 
-    //New main window instance
-    mainWindow = new MainWindow();
-    mainWindow->show();
+//*************************************************************************************************************
 
-    splash.finish(mainWindow);
+void MainWindow::on_actionAbout_triggered()
+{
+    //AboutWindow pops up with info about the software
+    m_about = new AboutWindow();
+    m_about->show();
+}
 
-    return a.exec();
+//*************************************************************************************************************
+
+void MainWindow::on_actionCascade_triggered()
+{
+    //Since we need to acces some private attributes from ViewerWIdget, we need a method to do it
+    //Used to arrange the subwindows that contains the surfaces and 2D plots, in a Cascade mode
+    this->m_viewerWidget->CascadeSubWindows();
+}
+
+//*************************************************************************************************************
+
+void MainWindow::on_actionTile_triggered()
+{
+    //Since we need to acces some private attributes from ViewerWIdget, we need a method to do it
+    //Used to arrange the subwindows that contains the surfaces and 2D plots, in a Tile mode
+    this->m_viewerWidget->TileSubWindows();
+}
+
+//*************************************************************************************************************
+
+void MainWindow::on_actionOpen_data_file_triggered()
+{
+    //Open a FIFF file
+
+    //Get the path
+    m_fiffFileName = QFileDialog::getOpenFileName(this,
+                                                    ("Open File"),
+                                                    "C:/",
+                                                    ("fiff File(*.fiff)"));
+    //Open file
+    QFile m_fiffFile(m_fiffFileName);
+}
+
+//*************************************************************************************************************
+
+void MainWindow::CreateDockWindows()
+{
+    //
+    //Layers DockWidget
+    //
+    m_layersDock = new QDockWidget(tr("Layers"), this);
+    m_layersDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    addDockWidget(Qt::RightDockWidgetArea,m_layersDock);
+    m_layersDock->setMinimumWidth(128);
+    m_layersDock->setMinimumHeight(128);
+
+    //
+    //Information DockWidget
+    //
+    m_informationDock = new QDockWidget(tr("Information"), this);
+    m_informationDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    addDockWidget(Qt::RightDockWidgetArea,m_informationDock);
+    m_informationDock->setMinimumWidth(128);
+
+}
+
+//*************************************************************************************************************
+
+void MainWindow::on_actionReload_surfaces_triggered()
+{
+        //m_viewerWidget->ReloadSurfaces();
 }

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     view3d.h
 * @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
 *			Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
@@ -32,68 +32,69 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_analyze_qt GUI application.
+* @brief
 *
+* @file
+*       view3d.cpp
 */
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INCLUDES
+// DEFINE
 //=============================================================================================================
 
-#include <stdio.h>
-#include "info.h"
-#include "Windows/mainwindow.h"
-
+#ifndef VIEW3D_H
+#define VIEW3D_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QtGui>
-#include <QApplication>
-#include <QDateTime>
-#include <QSplashScreen>
-#include <QThread>
-
+#include <QWidget>
+#include <QtWidgets/QHBoxLayout>
+#include <QQuickView>
+#include <QPushButton>
+#include <disp3D/brainview.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// INCLUDES
 //=============================================================================================================
 
-using namespace MNEAnalyzeQt;
+#include "baseview.h"
 
+//*************************************************************************************************************
+//=============================================================================================================
+// NAMESPACES
+//=============================================================================================================
+
+using namespace FSLIB;
+using namespace DISP3DLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-
-MainWindow *mainWindow;
-int main(int argc, char *argv[])
+class View3D : public BaseView
 {
-    QApplication a(argc, argv);
+//=============================================================================================================
+public:
+    //int surface_type is only for testing purposes, to show every surface
+    View3D(int surface_type);
+    ~View3D();
 
-    //set application settings
-    QCoreApplication::setOrganizationName(CInfo::OrganizationName());
-    QCoreApplication::setApplicationName(CInfo::AppNameShort());
+//=============================================================================================================
 
-    //show splash screen for 1 second
-    QPixmap pixmap(":/resources/images/splashscreen_mne_analyze_qt.png");
-    QSplashScreen splash(pixmap);
-    splash.show();
-    QThread::sleep(1);
+private:
+    //Layout
+    QWidget *m_view3d_container;
+    QGridLayout *m_view3d_gridlayout;
+    QQuickView *m_view3d_quickview;
+    //Surface
+    BrainView *m_BrainView;
 
-    //New main window instance
-    mainWindow = new MainWindow();
-    mainWindow->show();
+};
 
-    splash.finish(mainWindow);
-
-    return a.exec();
-}
+#endif // VIEW3D_H

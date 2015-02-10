@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     view3d.cpp
 * @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
 *			Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
@@ -32,68 +32,78 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_analyze_qt GUI application.
+* @brief
 *
+*@file
+*       view3d.h
 */
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <stdio.h>
-#include "info.h"
-#include "Windows/mainwindow.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QtGui>
-#include <QApplication>
-#include <QDateTime>
-#include <QSplashScreen>
-#include <QThread>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace MNEAnalyzeQt;
+#include "view3d.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
+// View3D constructor
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-
-MainWindow *mainWindow;
-int main(int argc, char *argv[])
+View3D::View3D(int surface_type)
 {
-    QApplication a(argc, argv);
+    //Resizing the created QMdiSubwindow to fit the minimun size of the container used later
+    this->resize(256,256);
+    //QGridLayout is used so the container constantly resizes to the size of the QMdiSubwindow
+    m_view3d_gridlayout = new QGridLayout(this);
 
-    //set application settings
-    QCoreApplication::setOrganizationName(CInfo::OrganizationName());
-    QCoreApplication::setApplicationName(CInfo::AppNameShort());
+    //*************************************************************************************************************
+    //=============================================================================================================
+    // Loading a FreeSurfer example from BrainView class
+    //=============================================================================================================
 
-    //show splash screen for 1 second
-    QPixmap pixmap(":/resources/images/splashscreen_mne_analyze_qt.png");
-    QSplashScreen splash(pixmap);
-    splash.show();
-    QThread::sleep(1);
-
-    //New main window instance
-    mainWindow = new MainWindow();
-    mainWindow->show();
-
-    splash.finish(mainWindow);
-
-    return a.exec();
+    switch(surface_type){
+    case 1:
+    //
+    // pial
+    //
+        m_BrainView = new BrainView("sample", 2, "pial", "./MNE-sample-data/subjects");
+        break;
+    case 2:
+    //
+    // inflated
+    //
+        m_BrainView = new BrainView("sample", 2, "inflated", "./MNE-sample-data/subjects");
+        break;
+    case 3:
+    //
+    // orig
+    //
+        m_BrainView = new BrainView("sample", 2, "orig", "./MNE-sample-data/subjects");
+        break;
+    case 4:
+    //
+    // white
+    //
+        m_BrainView = new BrainView("sample", 2, "white", "./MNE-sample-data/subjects");
+        break;
+    }
+    //A container is created to contain the QWindow that comes from BrainView, then a minimum size is set
+    m_view3d_container = QWidget::createWindowContainer(m_BrainView);
+    m_view3d_container->setMinimumSize(256,256);
+    //m_view3d_container->setMaximumSize(256,256);
+    m_view3d_container->setFocusPolicy(Qt::TabFocus);
+    //The loaded surfaces, as a QWindow is added to the created container
+    m_view3d_gridlayout->addWidget(m_view3d_container);
 }
+//*************************************************************************************************************
+//=============================================================================================================
+// View3D destructor
+//=============================================================================================================
+
+View3D::~View3D()
+{
+
+}
+
