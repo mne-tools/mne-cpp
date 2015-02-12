@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       += widgets 3d concurrent
+QT       += widgets 3dcore 3drenderer 3dinput concurrent
 
 DEFINES += DISP3DNEW_LIBRARY
 
