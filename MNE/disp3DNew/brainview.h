@@ -52,12 +52,39 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include "qglview.h"
-#include <QGeometryData>
-#include <QGLColorMaterial>
-
 #include <QString>
+#include <QSharedPointer>
 
+#include <Qt3DCore/window.h>
+#include <Qt3DCore/qcamera.h>
+#include <Qt3DCore/qentity.h>
+#include <Qt3DCore/qcameralens.h>
+#include <Qt3DCore/qaspectengine.h>
+
+#include <Qt3DInput/QInputAspect>
+
+#include <Qt3DRenderer/qtorusmesh.h>
+#include <Qt3DRenderer/qmesh.h>
+#include <Qt3DRenderer/qtechnique.h>
+#include <Qt3DRenderer/qmaterial.h>
+#include <Qt3DRenderer/qeffect.h>
+#include <Qt3DRenderer/qtexture.h>
+#include <Qt3DRenderer/qrenderpass.h>
+#include <Qt3DRenderer/qsceneloader.h>
+
+#include <Qt3DCore/qtranslatetransform.h>
+#include <Qt3DCore/qmatrixtransform.h>
+#include <Qt3DCore/qrotatetransform.h>
+#include <Qt3DCore/qlookattransform.h>
+#include <Qt3DCore/qtransform.h>
+
+#include <Qt3DRenderer/qcameraselector.h>
+#include <Qt3DRenderer/qrenderpassfilter.h>
+#include <Qt3DRenderer/qtechniquefilter.h>
+#include <Qt3DRenderer/qviewport.h>
+#include <Qt3DRenderer/qrenderaspect.h>
+#include <Qt3DRenderer/qframegraph.h>
+#include <Qt3DRenderer/qclearbuffer.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -103,54 +130,18 @@ using namespace Eigen;
 *
 * @brief FreeSurfer surface visualisation
 */
-class DISP3DNEWSHARED_EXPORT BrainView : public QGLView
+class DISP3DNEWSHARED_EXPORT BrainView : public Qt3D::Window
 {
     Q_OBJECT
 public:
     typedef QSharedPointer<BrainView> SPtr;             /**< Shared pointer type for BrainView class. */
     typedef QSharedPointer<const BrainView> ConstSPtr;  /**< Const shared pointer type for BrainView class. */
 
-    enum ViewOption {
-        ShowCurvature = 0x0
-    };
-    Q_DECLARE_FLAGS(ViewOptions, ViewOption)
-
     //=========================================================================================================
     /**
     * Default constructor
     */
     BrainView();
-
-    //=========================================================================================================
-    /**
-    * Constructs the BrainView set by reading it of the given surface.
-    *
-    * @param[in] subject_id         Name of subject
-    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
-    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
-    * @param[in] subjects_dir       Subjects directory
-    */
-    explicit BrainView(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
-
-    //=========================================================================================================
-    /**
-    * Constructs the BrainView set by reading it of the given surface.
-    *
-    * @param[in] subject_id         Name of subject
-    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
-    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
-    * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...)
-    * @param[in] subjects_dir       Subjects directory
-    */
-    explicit BrainView(const QString &subject_id, qint32 hemi, const QString &surf, const QString &atlas, const QString &subjects_dir);
-
-    //=========================================================================================================
-    /**
-    * Constructs the brain view by reading a given surface.
-    *
-    * @param[in] p_sFile    Surface file name with path
-    */
-    explicit BrainView(const QString& p_sFile);
 
     //=========================================================================================================
     /**
@@ -161,102 +152,16 @@ public:
     void init();
 
 protected:
-    //=========================================================================================================
-    /**
-    * Initializes the current GL context represented by painter.
-    *
-    * @param[in] painter    GL painter which should be initialized
-    */
-    void initializeGL(QGLPainter *painter);
+    Qt3D::QAspectEngine m_Engine;
+    Qt3D::QInputAspect *m_aspectInput;
+    QVariantMap m_data;
 
-    //=========================================================================================================
-    /**
-    * Paints the scene onto painter. The color and depth buffers will have already been cleared, and the camera() position set.
-    *
-    * @param[in] painter    GL painter which is updated
-    */
-    void paintGL(QGLPainter *painter);
-
-    //=========================================================================================================
-    /**
-    * Processes the key press event e.
-    *
-    * @param[in] e      the key press event.
-    */
-    void keyPressEvent(QKeyEvent *e);
-
-    //=========================================================================================================
-    /**
-    * Processes the mouse move event e.
-    *
-    * @param[in] e      the mouse move event.
-    */
-    void mouseMoveEvent(QMouseEvent *e);
-
-    //=========================================================================================================
-    /**
-    * Processes the mouse press event e.
-    *
-    * @param[in] e      the mouse press event.
-    */
-    void mousePressEvent(QMouseEvent *e);
+    Qt3D::QEntity *m_rootEntity;
+    Qt3D::QEntity *m_torusEntity;
 
 private:
-    //=========================================================================================================
-    /**
-    * Generates the geometry with attributes per vertex. Used to display e.g. the corresponding curvature.
-    * The generated scene is stored in m_pSceneNode.
-    */
-    void genSurfacePerVertex();
 
-    //=========================================================================================================
-    /**
-    * Generates the geometry with material per region. Used to display e.g. the brain atlas.
-    * The generated scene is stored in m_pSceneNode.
-    */
-    void genSurfacePerRegion();
-
-    //=========================================================================================================
-    /**
-    * Generates the geometry with one material per hemisphere. Used to display e.g. an whole brain surface.
-    * The generated scene is stored in m_pSceneNode.
-    */
-    void genSurface();
-
-    //=========================================================================================================
-    /**
-    * Calculates the bounding box and stores it to m_vecBoundingBoxMin, m_vecBoundingBoxMax and m_vecBoundingBoxCenter.
-    */
-    void calcBoundingBox();
-
-    ViewOptions m_viewOptionFlags;
-
-    SurfaceSet m_SurfaceSet;            /**< Surface set */
-    AnnotationSet m_AnnotationSet;      /**< Annotation set */
-
-
-    // GL Stuff
-    bool m_bStereo;             /**< Whether stereo is turned on. */
-    bool m_bRenderPerVertex;    /**< Whether rendering per vertex applies. */
-
-    float m_fOffsetZ;                               /**< Z offset for pop-out effect. */
-    float m_fOffsetZEye;                            /**< Z offset eye. */
-
-    QGLSceneNode *m_pSceneNodeBrain;                /**< Scene node of the hemisphere models. */
-    QGLSceneNode *m_pSceneNode;                     /**< Node of the scene. */
-
-    QGLLightModel *m_pLightModel;                   /**< The selected light model. */
-    QGLLightParameters *m_pLightParametersScene;    /**< The selected light parameters. */
-
-    QGLColorMaterial material;
-
-
-    QVector3D m_vecBoundingBoxMin;                  /**< X, Y, Z minima. */
-    QVector3D m_vecBoundingBoxMax;                  /**< X, Y, Z maxima. */
-    QVector3D m_vecBoundingBoxCenter;               /**< X, Y, Z center. */
 };
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(BrainView::ViewOptions)
 
 } // NAMESPACE
 

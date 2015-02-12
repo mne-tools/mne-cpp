@@ -39,7 +39,7 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-QT       += 3d
+QT += 3dcore 3drenderer 3dinput
 
 CONFIG   += console
 CONFIG   -= app_bundle
