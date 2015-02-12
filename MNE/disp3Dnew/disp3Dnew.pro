@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     disp3Dnew.pro
+# @file     disp3DNew.pro
 # @author   Lorenz Esch <Lorenz.Esch@tu-ilmenauu.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -49,10 +49,18 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += 
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
 }
 else {
-    LIBS += 
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
@@ -80,15 +88,14 @@ else {
 SOURCES += \
 
 
-HEADERS += \
-
+HEADERS += \disp3DNew_global.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 # Install headers to include directory
 header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/disp3D
+header_files.path = $${MNE_INCLUDE_DIR}/disp3DNew
 
 INSTALLS += header_files
 
