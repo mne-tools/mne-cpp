@@ -54,7 +54,7 @@ contains(MNECPP_CONFIG, withGui) {
     qtHaveModule(3d) {
         message(Qt3D available: disp3D library configured!)
         SUBDIRS += disp3D \
-                   disp3Dnew
+                   disp3DNew
     }
 }
 
