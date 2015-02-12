@@ -86,9 +86,13 @@ else {
 }
 
 SOURCES += \
+    brainview.cpp
 
 
-HEADERS += \disp3DNew_global.h
+HEADERS += \
+    disp3DNew_global.h \
+    brainview.h
+
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
