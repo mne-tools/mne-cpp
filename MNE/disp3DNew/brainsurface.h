@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brainview.h
+* @file     brainsurface.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,13 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BrainView class declaration with qt3d 2.0 support
+* @brief    Declaration of BrainSurface which holds the basic functionality of a freesurfer brain surface.
 *
 */
 
-#ifndef BRAINVIEW_H
-#define BRAINVIEW_H
+#ifndef BRAINSURFACE_H
+#define BRAINSURFACE_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -43,10 +44,8 @@
 
 #include "disp3DNew_global.h"
 
-#include "brainsurface.h"
-
-#include <fs/surfaceset.h>
-#include <fs/annotationset.h>
+#include "lefthemisphere.h"
+#include "righthemisphere.h"
 
 
 //*************************************************************************************************************
@@ -54,52 +53,12 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QSharedPointer>
-
-#include <Qt3DCore/window.h>
-#include <Qt3DCore/qcamera.h>
-#include <Qt3DCore/qentity.h>
-#include <Qt3DCore/qcameralens.h>
-#include <Qt3DCore/qaspectengine.h>
-
-#include <Qt3DInput/QInputAspect>
-
-#include <Qt3DRenderer/qtorusmesh.h>
-#include <Qt3DRenderer/qmesh.h>
-#include <Qt3DRenderer/qtechnique.h>
-#include <Qt3DRenderer/qmaterial.h>
-#include <Qt3DRenderer/qeffect.h>
-#include <Qt3DRenderer/qtexture.h>
-#include <Qt3DRenderer/qrenderpass.h>
-#include <Qt3DRenderer/qsceneloader.h>
-
-#include <Qt3DCore/qtranslatetransform.h>
-#include <Qt3DCore/qmatrixtransform.h>
-#include <Qt3DCore/qrotatetransform.h>
-#include <Qt3DCore/qlookattransform.h>
-#include <Qt3DCore/qtransform.h>
-
-#include <Qt3DRenderer/qcameraselector.h>
-#include <Qt3DRenderer/qrenderpassfilter.h>
-#include <Qt3DRenderer/qtechniquefilter.h>
-#include <Qt3DRenderer/qviewport.h>
-#include <Qt3DRenderer/qrenderaspect.h>
-#include <Qt3DRenderer/qframegraph.h>
-#include <Qt3DRenderer/qclearbuffer.h>
-
+#include <Qt3DRenderer/qt3drenderer_global.h>
+#include <QEntity>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
 //=============================================================================================================
 
 
@@ -113,11 +72,16 @@ namespace DISP3DNEWLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FSLIB;
-using namespace Eigen;
+using namespace Qt3D;
 
 
 //*************************************************************************************************************
@@ -128,44 +92,31 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* ToDo: derive this from geometryview!
-* Visualizes FreeSurfer surfaces.
+* Basic functionalities for freesurfer surface.
 *
-* @brief FreeSurfer surface visualisation
+* @brief Holds the data of one hemisphere in form of a mesh.
 */
-class DISP3DNEWSHARED_EXPORT BrainView : public Qt3D::Window
+class DISP3DNEWSHARED_EXPORT BrainSurface : public QEntity
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<BrainView> SPtr;             /**< Shared pointer type for BrainView class. */
-    typedef QSharedPointer<const BrainView> ConstSPtr;  /**< Const shared pointer type for BrainView class. */
-
     //=========================================================================================================
     /**
     * Default constructor
+    *
+    * @param[in] parent         The parent node
     */
-    BrainView();
-
-    //=========================================================================================================
-    /**
-    * Default destructor
-    */
-    ~BrainView();
-
-    void init();
+    explicit BrainSurface(QEntity *parent = 0);
 
 protected:
-    Qt3D::QAspectEngine m_Engine;
-    Qt3D::QInputAspect *m_aspectInput;
-    QVariantMap m_data;
+    void init();
 
-    Qt3D::QEntity *m_rootEntity;
-    Qt3D::QEntity *m_torusEntity;
+    LeftHemisphere* m_leftHemisphere;
+    RightHemisphere* m_rightHemisphere;
 
 private:
-
 };
 
 } // NAMESPACE
 
-#endif // BRAINVIEW_H
+#endif // BRAINSURFACE_H
