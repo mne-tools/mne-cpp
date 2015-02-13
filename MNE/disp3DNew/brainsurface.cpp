@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brainview.cpp
+* @file     brainsurface.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,24 +29,23 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the BrainView class with qt3d 2.0 support.
+* @brief    Implementation of BrainSurface.
 *
 */
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "brainview.h"
+#include "brainsurface.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QMouseEvent>
 
 
 //*************************************************************************************************************
@@ -62,42 +61,20 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainView::BrainView()
-: Qt3D::Window()
+BrainSurface::BrainSurface(QEntity *parent)
+: QEntity(parent)
 {
     init();
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
-BrainView::~BrainView()
+void BrainSurface::init()
 {
-}
-
-
-//*************************************************************************************************************
-
-void BrainView::init()
-{
-    m_Engine.registerAspect(new Qt3D::QRenderAspect());
-    Qt3D::QInputAspect *m_aspectInput = new Qt3D::QInputAspect;
-    m_Engine.registerAspect(m_aspectInput);
-    m_Engine.initialize();
-
-    m_data.insert(QStringLiteral("surface"), QVariant::fromValue(static_cast<QSurface *>(this)));
-    m_data.insert(QStringLiteral("eventSource"), QVariant::fromValue(this));
-    m_Engine.setData(m_data);
-
-    // Root entity
-    m_rootEntity = new Qt3D::QEntity();
-    m_rootEntity->setObjectName(QStringLiteral("m_rootEntity"));
-
-    // Surface
-    m_brainSurfaceEntity = new Qt3D::QEntity(m_rootEntity);
-
-    // Torus shape data
-    m_brainSurfaceEntity->addComponent(torus);
+    //Create hemispheres
+    m_leftHemisphere = new LeftHemisphere(this);
+    m_rightHemisphere = new RightHemisphere(this);
 
     // TorusMesh Transform
     Qt3D::QTranslateTransform *torusTranslation = new Qt3D::QTranslateTransform();
@@ -109,51 +86,10 @@ void BrainView::init()
     torusRotation->setAngleDeg(35.0f);
     torusTransforms->addTransform(torusTranslation);
     torusTransforms->addTransform(torusRotation);
-    m_brainSurfaceEntity->addComponent(torusTransforms);
+    this->addComponent(torusTransforms);
 
-    // Scene file
-    Qt3D::QEntity *sceneEntity = new Qt3D::QEntity(m_rootEntity);
-    Qt3D::QSceneLoader  *scene = new Qt3D::QSceneLoader();
-    scene->setObjectName(QStringLiteral("scene"));
-    Qt3D::QTransform *sceneTransform = new Qt3D::QTransform();
-    Qt3D::QTranslateTransform *sceneTranslateTransform = new Qt3D::QTranslateTransform();
-    sceneTranslateTransform->setDx(2.5);
-    sceneTranslateTransform->setDy(0.5);
-    sceneTranslateTransform->setDz(-10);
-    sceneTransform->addTransform(sceneTranslateTransform);
-    sceneEntity->addComponent(sceneTransform);
-//    scene->setSource(":/assets/gltf/wine/wine.json");
-    scene->setSource(":/assets/test_scene.dae");
-    sceneEntity->addComponent(scene);
+    // Torus shape data
+    this->addComponent(torus);
 
-    // Camera
-    Qt3D::QCamera *cameraEntity = new Qt3D::QCamera(m_rootEntity);
-    cameraEntity->setObjectName(QStringLiteral("cameraEntity"));
-
-    cameraEntity->lens()->setPerspectiveProjection(60.0f, 16.0f/9.0f, 0.1f, 1000.0f);
-    cameraEntity->setPosition(QVector3D(-5, 0, -20.0f));
-    cameraEntity->setViewCenter(QVector3D(11, 0, 5));
-    cameraEntity->setUpVector(QVector3D(0, 1, 0));
-    m_aspectInput->setCamera(cameraEntity);
-
-    // FrameGraph
-    Qt3D::QFrameGraph *frameGraph = new Qt3D::QFrameGraph();
-    Qt3D::QTechniqueFilter *techniqueFilter = new Qt3D::QTechniqueFilter();
-    Qt3D::QViewport *viewport = new Qt3D::QViewport(techniqueFilter);
-    Qt3D::QClearBuffer *clearBuffer = new Qt3D::QClearBuffer(viewport);
-    Qt3D::QCameraSelector *cameraSelector = new Qt3D::QCameraSelector(clearBuffer);
-    (void) new Qt3D::QRenderPassFilter(cameraSelector);
-
-    // TechiqueFilter and renderPassFilter are not implement yet
-    viewport->setRect(QRectF(0, 0, 1, 1));
-    clearBuffer->setBuffers(Qt3D::QClearBuffer::ColorDepthBuffer);
-    cameraSelector->setCamera(cameraEntity);
-    frameGraph->setActiveFrameGraph(techniqueFilter);
-
-    // Setting the FrameGraph
-    m_rootEntity->addComponent(frameGraph);
-
-    // Set root object of the scene
-    m_Engine.setRootEntity(m_rootEntity);
 }
 
