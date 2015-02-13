@@ -65,21 +65,6 @@
 
 #include <Qt3DInput/QInputAspect>
 
-#include <Qt3DRenderer/qtorusmesh.h>
-#include <Qt3DRenderer/qmesh.h>
-#include <Qt3DRenderer/qtechnique.h>
-#include <Qt3DRenderer/qmaterial.h>
-#include <Qt3DRenderer/qeffect.h>
-#include <Qt3DRenderer/qtexture.h>
-#include <Qt3DRenderer/qrenderpass.h>
-#include <Qt3DRenderer/qsceneloader.h>
-
-#include <Qt3DCore/qtranslatetransform.h>
-#include <Qt3DCore/qmatrixtransform.h>
-#include <Qt3DCore/qrotatetransform.h>
-#include <Qt3DCore/qlookattransform.h>
-#include <Qt3DCore/qtransform.h>
-
 #include <Qt3DRenderer/qcameraselector.h>
 #include <Qt3DRenderer/qrenderpassfilter.h>
 #include <Qt3DRenderer/qtechniquefilter.h>
@@ -152,9 +137,9 @@ public:
     */
     ~BrainView();
 
+protected:
     void init();
 
-protected:
     Qt3D::QAspectEngine m_Engine;
     Qt3D::QInputAspect *m_aspectInput;
     QVariantMap m_data;
@@ -162,6 +147,7 @@ protected:
     Qt3D::QEntity *m_rootEntity;
     Qt3D::QEntity *m_torusEntity;
 
+    BrainSurface *m_brainSurfaceEntity;
 private:
 
 };

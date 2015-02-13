@@ -94,37 +94,7 @@ void BrainView::init()
     m_rootEntity->setObjectName(QStringLiteral("m_rootEntity"));
 
     // Surface
-    m_brainSurfaceEntity = new Qt3D::QEntity(m_rootEntity);
-
-    // Torus shape data
-    m_brainSurfaceEntity->addComponent(torus);
-
-    // TorusMesh Transform
-    Qt3D::QTranslateTransform *torusTranslation = new Qt3D::QTranslateTransform();
-    Qt3D::QRotateTransform *torusRotation = new Qt3D::QRotateTransform();
-    Qt3D::QTransform *torusTransforms = new Qt3D::QTransform();
-
-    torusTranslation->setTranslation(QVector3D(-5.0f, 3.5f, 2.0f));
-    torusRotation->setAxis(QVector3D(1, 0, 0));
-    torusRotation->setAngleDeg(35.0f);
-    torusTransforms->addTransform(torusTranslation);
-    torusTransforms->addTransform(torusRotation);
-    m_brainSurfaceEntity->addComponent(torusTransforms);
-
-    // Scene file
-    Qt3D::QEntity *sceneEntity = new Qt3D::QEntity(m_rootEntity);
-    Qt3D::QSceneLoader  *scene = new Qt3D::QSceneLoader();
-    scene->setObjectName(QStringLiteral("scene"));
-    Qt3D::QTransform *sceneTransform = new Qt3D::QTransform();
-    Qt3D::QTranslateTransform *sceneTranslateTransform = new Qt3D::QTranslateTransform();
-    sceneTranslateTransform->setDx(2.5);
-    sceneTranslateTransform->setDy(0.5);
-    sceneTranslateTransform->setDz(-10);
-    sceneTransform->addTransform(sceneTranslateTransform);
-    sceneEntity->addComponent(sceneTransform);
-//    scene->setSource(":/assets/gltf/wine/wine.json");
-    scene->setSource(":/assets/test_scene.dae");
-    sceneEntity->addComponent(scene);
+    m_brainSurfaceEntity = new BrainSurface(m_rootEntity);
 
     // Camera
     Qt3D::QCamera *cameraEntity = new Qt3D::QCamera(m_rootEntity);
@@ -132,7 +102,7 @@ void BrainView::init()
 
     cameraEntity->lens()->setPerspectiveProjection(60.0f, 16.0f/9.0f, 0.1f, 1000.0f);
     cameraEntity->setPosition(QVector3D(-5, 0, -20.0f));
-    cameraEntity->setViewCenter(QVector3D(11, 0, 5));
+    cameraEntity->setViewCenter(QVector3D(0, 0, 0));
     cameraEntity->setUpVector(QVector3D(0, 1, 0));
     m_aspectInput->setCamera(cameraEntity);
 
