@@ -72,24 +72,20 @@ BrainSurface::BrainSurface(QEntity *parent)
 
 void BrainSurface::init()
 {
-    //Create hemispheres
+    //Create hemispheres and add as childs
     m_leftHemisphere = new LeftHemisphere(this);
     m_rightHemisphere = new RightHemisphere(this);
 
     // TorusMesh Transform
-    Qt3D::QTranslateTransform *torusTranslation = new Qt3D::QTranslateTransform();
-    Qt3D::QRotateTransform *torusRotation = new Qt3D::QRotateTransform();
-    Qt3D::QTransform *torusTransforms = new Qt3D::QTransform();
+    m_brainTranslation = new Qt3D::QTranslateTransform();
+    m_brainRotation = new Qt3D::QRotateTransform();
+    m_brainTransforms = new Qt3D::QTransform();
 
-    torusTranslation->setTranslation(QVector3D(-5.0f, 3.5f, 2.0f));
-    torusRotation->setAxis(QVector3D(1, 0, 0));
-    torusRotation->setAngleDeg(35.0f);
-    torusTransforms->addTransform(torusTranslation);
-    torusTransforms->addTransform(torusRotation);
-    this->addComponent(torusTransforms);
-
-    // Torus shape data
-    this->addComponent(torus);
-
+    m_brainTranslation->setTranslation(QVector3D(0.0f, 0.0f, 0.0f));
+    m_brainRotation->setAxis(QVector3D(1, 0, 0));
+    m_brainRotation->setAngleDeg(90.0f);
+    m_brainTransforms->addTransform(m_brainTranslation);
+    m_brainTransforms->addTransform(m_brainRotation);
+    this->addComponent(m_brainTransforms);
 }
 

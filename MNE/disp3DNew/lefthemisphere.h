@@ -109,6 +109,8 @@ public:
     explicit LeftHemisphere(QEntity *parent = 0);
 
 protected:
+    void init();
+
     MeshHemisphere* m_meshHemisphere;
 
 private:

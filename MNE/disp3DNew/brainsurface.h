@@ -56,6 +56,13 @@
 #include <Qt3DRenderer/qt3drenderer_global.h>
 #include <QEntity>
 
+#include <Qt3DCore/qtranslatetransform.h>
+#include <Qt3DCore/qmatrixtransform.h>
+#include <Qt3DCore/qrotatetransform.h>
+#include <Qt3DCore/qlookattransform.h>
+#include <Qt3DCore/qtransform.h>
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
@@ -113,6 +120,10 @@ protected:
 
     LeftHemisphere* m_leftHemisphere;
     RightHemisphere* m_rightHemisphere;
+
+    QTranslateTransform *m_brainTranslation;
+    QRotateTransform *m_brainRotation;
+    Qt3D::QTransform *m_brainTransforms;
 
 private:
 };

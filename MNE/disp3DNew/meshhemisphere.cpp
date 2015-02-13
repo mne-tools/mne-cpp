@@ -109,10 +109,10 @@ QMeshDataPtr createHemisphereMesh(const MNESourceSpace &sourceSpace)
     QMeshDataPtr mesh(new QMeshData(QMeshData::Triangles));
 
     int rings = 16;
-    int slices = 16;
-    float radius = 1.0;
+    int slices = 1;
+    float radius = 5.0;
     float minorRadius = 1.0;
-    int sides = 3;
+    int sides = 6;
 
     int nVerts  = sides * ( rings + 1 );
     QByteArray bufferBytes;

@@ -63,10 +63,15 @@ using namespace DISP3DNEWLIB;
 LeftHemisphere::LeftHemisphere(QEntity *parent)
 : QEntity(parent)
 {
+    init();
 }
 
 
 //*************************************************************************************************************
 
-
+void LeftHemisphere::init()
+{
+    m_meshHemisphere = new MeshHemisphere();
+    this->addComponent(m_meshHemisphere);
+}
 
