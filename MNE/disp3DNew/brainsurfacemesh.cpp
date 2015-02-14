@@ -158,11 +158,12 @@ QMeshDataPtr createHemisphereMesh(const Surface &surface)
 
     //Generate faces out of tri information
     QByteArray indexBytes;
-    int number_faces = faces.cols(); // two tris per side, for all rings
+    int number_faces = faces.cols();
     int indices = number_faces * 3;
+    stride = 3 * sizeof(float);
 
-    indexBytes.resize(indices * sizeof(quint16));
-    quint16* indexPtr = reinterpret_cast<quint16*>(indexBytes.data());
+    indexBytes.resize(indices * sizeof(quint32));
+    quint32* indexPtr = reinterpret_cast<quint32*>(indexBytes.data());
 
     for(int i = 0; i < number_faces; i++)
     {
@@ -174,7 +175,7 @@ QMeshDataPtr createHemisphereMesh(const Surface &surface)
     BufferPtr indexBuffer(new Buffer(QOpenGLBuffer::IndexBuffer));
     indexBuffer->setUsage(QOpenGLBuffer::StaticDraw);
     indexBuffer->setData(indexBytes);
-    mesh->setIndexAttribute(AttributePtr(new Attribute(indexBuffer, GL_UNSIGNED_SHORT, indices, 0, 0)));
+    mesh->setIndexAttribute(AttributePtr(new Attribute(indexBuffer, GL_UNSIGNED_INT, indices, 0, 0)));
 
     mesh->computeBoundsFromAttribute(QMeshData::defaultPositionAttributeName());
 
