@@ -189,7 +189,7 @@ protected:
     QVariantMap m_data;
 
     Qt3D::QEntity *m_pRootEntity;
-    BrainSurface *m_pBrainSurfaceEntity;
+    BrainSurface::SPtr m_pBrainSurfaceEntity;
 
 private:
 

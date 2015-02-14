@@ -123,25 +123,52 @@ void BrainSurface::init()
     //Create hemispheres and add as childs / 0 -> lh, 1 -> rh
     for(int i = 0; i<m_SurfaceSet.size(); i++) {
         if(m_SurfaceSet[i].hemi() == 0)
-            m_pLeftHemisphere = new BrainHemisphere(m_SurfaceSet[i], this);
+            m_pLeftHemisphere = QSharedPointer<BrainHemisphere>(new BrainHemisphere(m_SurfaceSet[i], this));
 
         if(m_SurfaceSet[i].hemi() == 1)
-            m_pRightHemisphere = new BrainHemisphere(m_SurfaceSet[i], this);
+            m_pRightHemisphere = QSharedPointer<BrainHemisphere>(new BrainHemisphere(m_SurfaceSet[i], this));
     }
 
     std::cout << "Number of children "<<this->children().size()<<std::endl;
+
+    // Calculate bounding box
+    calcBoundingBox();
 
     // Brain surface Transform
     m_pBrainTranslation = new Qt3D::QTranslateTransform();
     m_pBrainRotation = new Qt3D::QRotateTransform();
     m_pBrainTransforms = new Qt3D::QTransform();
 
-//    m_pBrainTranslation->setTranslation(QVector3D(0.0f, 0.0f, 0.0f));
-//    m_pBrainRotation->setAxis(QVector3D(1, 0, 0));
-//    m_pBrainRotation->setAngleDeg(0.0f);
-//    m_pBrainTransforms->addTransform(m_pBrainTranslation);
-//    m_pBrainTransforms->addTransform(m_pBrainRotation);
+    //m_pBrainTranslation->setTranslation(-m_vecBoundingBoxCenter); //Translate to origin
+    m_pBrainRotation->setAxis(QVector3D(1, 0, 0));
+    m_pBrainRotation->setAngleDeg(0.0f);
+    m_pBrainTransforms->addTransform(m_pBrainTranslation);
+    m_pBrainTransforms->addTransform(m_pBrainRotation);
 
 //    this->addComponent(m_pBrainTransforms);
 }
 
+
+//*************************************************************************************************************
+
+void BrainSurface::calcBoundingBox()
+{
+    QMap<qint32, Surface>::const_iterator it = m_SurfaceSet.data().constBegin();
+
+    QVector3D min(it.value().rr().col(0).minCoeff(), it.value().rr().col(1).minCoeff(), it.value().rr().col(2).minCoeff());
+    QVector3D max(it.value().rr().col(0).maxCoeff(), it.value().rr().col(1).maxCoeff(), it.value().rr().col(2).maxCoeff());
+
+    for (it = m_SurfaceSet.data().begin()+1; it != m_SurfaceSet.data().end(); ++it)
+    {
+        for(qint32 i = 0; i < 3; ++i)
+        {
+            min[i] = min[i] > it.value().rr().col(i).minCoeff() ? it.value().rr().col(i).minCoeff() : min[i];
+            max[i] = max[i] < it.value().rr().col(i).maxCoeff() ? it.value().rr().col(i).maxCoeff() : max[i];
+        }
+    }
+    m_vecBoundingBoxMin = min;
+    m_vecBoundingBoxMax = max;
+
+    for(qint32 i = 0; i < 3; ++i)
+        m_vecBoundingBoxCenter[i] = (m_vecBoundingBoxMin[i]+m_vecBoundingBoxMax[i])/2.0f;
+}

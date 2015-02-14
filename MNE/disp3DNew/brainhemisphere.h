@@ -133,7 +133,7 @@ public:
 protected:
     void init();
 
-    BrainSurfaceMesh* m_pSurfaceMesh;
+    BrainSurfaceMesh::SPtr m_pSurfaceMesh;
 
     Surface m_surface;
 
