@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     hemisphere.h
+* @file     hemisphere.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,59 +29,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of on brain Hemisphere which holds the data of the right or left brain hemisphere in form of a mesh.
+* @brief    Implementation of Hemisphere.
 *
 */
-
-#ifndef HEMISPHERE_H
-#define HEMISPHERE_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "disp3DNew_global.h"
-
-#include "brainsurfacemesh.h"
-#include "renderableentity.h"
-
-#include <fs/surfaceset.h>
+#include "brainhemisphere.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
-//=============================================================================================================
-
-#include <Qt3DRenderer/qt3drenderer_global.h>
-#include <QEntity>
-
-#include <Qt3DCore/qtranslatetransform.h>
-#include <Qt3DCore/qmatrixtransform.h>
-#include <Qt3DCore/qrotatetransform.h>
-#include <Qt3DCore/qlookattransform.h>
-#include <Qt3DCore/qtransform.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
-//=============================================================================================================
-
-namespace DISP3DNEWLIB
-{
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
 //=============================================================================================================
 
 
@@ -90,56 +52,43 @@ namespace DISP3DNEWLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Qt3D;
-using namespace FSLIB;
+using namespace DISP3DNEWLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* Holds the data of one hemisphere in form of a mesh.
-*
-* @brief Holds the data of one hemisphere in form of a mesh.
-*/
-class DISP3DNEWSHARED_EXPORT Hemisphere : public RenderableEntity
+BrainHemisphere::BrainHemisphere(QNode *parent)
+: RenderableEntity(parent)
 {
-    Q_OBJECT
-public:
-    typedef QSharedPointer<Hemisphere> SPtr;             /**< Shared pointer type for Hemisphere class. */
-    typedef QSharedPointer<const Hemisphere> ConstSPtr;  /**< Const shared pointer type for Hemisphere class. */
+    init();
+}
 
-    //=========================================================================================================
-    /**
-    * Default constructor
-    *
-    * @param[in] parent         The parent node
-    */
-    explicit Hemisphere(QNode *parent = 0);
 
-    //=========================================================================================================
-    /**
-    * Default constructor
-    *
-    * @param[in] surf           The surface data
-    * @param[in] parent         The parent node
-    */
-    explicit Hemisphere(const Surface &surf, QNode *parent = 0);
+//*************************************************************************************************************
 
-protected:
-    void init();
+BrainHemisphere::BrainHemisphere(const Surface &surf, QNode *parent)
+: RenderableEntity(parent)
+, m_surface(surf)
+{
+    init();
+}
 
-    BrainSurfaceMesh* m_pSurfaceMesh;
 
-    Surface m_surface;
+//*************************************************************************************************************
 
-private:
-};
+void BrainHemisphere::init()
+{
+    //Create mesh for left hemisphere
+    m_pSurfaceMesh = new BrainSurfaceMesh(m_surface);
+    this->addComponent(m_pSurfaceMesh);
 
-} // NAMESPACE
+    this->scaleTransform()->setScale(1000);
 
-#endif // HEMISPHERE_H
+    //Translate to the right if this hemisphere is right hemisphere and is inflated
+    if(m_surface.surf() == "inflated" && m_surface.hemi() == 1)
+        this->translateTransform()->setDx(10);
+}
+

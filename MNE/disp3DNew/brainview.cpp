@@ -65,7 +65,34 @@ using namespace DISP3DNEWLIB;
 BrainView::BrainView()
 : Qt3D::Window()
 {
-    init();
+    init(QString(), QString(), -1, QString(), QString(), QString());
+}
+
+
+//*************************************************************************************************************
+
+BrainView::BrainView(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir)
+: Qt3D::Window()
+{
+    init(QString(), subject_id, hemi, surf, QString(), subjects_dir);
+}
+
+
+//*************************************************************************************************************
+
+BrainView::BrainView(const QString &subject_id, qint32 hemi, const QString &surf, const QString &atlas, const QString &subjects_dir)
+: Qt3D::Window()
+{
+    init(QString(), subject_id, hemi, surf, atlas, subjects_dir);
+}
+
+
+//*************************************************************************************************************
+
+BrainView::BrainView(const QString& p_sFile)
+: Qt3D::Window()
+{
+    init(p_sFile, QString(), -1, QString(), QString(), QString());
 }
 
 
@@ -78,7 +105,7 @@ BrainView::~BrainView()
 
 //*************************************************************************************************************
 
-void BrainView::init()
+void BrainView::init(const QString& p_sFile, const QString &subject_id, qint32 hemi, const QString &surf, const QString &atlas, const QString &subjects_dir)
 {
     m_Engine.registerAspect(new Qt3D::QRenderAspect());
     Qt3D::QInputAspect *m_pAspectInput = new Qt3D::QInputAspect;
@@ -94,7 +121,7 @@ void BrainView::init()
     m_pRootEntity->setObjectName(QStringLiteral("m_pRootEntity"));
 
     // Surface
-    m_pBrainSurfaceEntity = new BrainSurface("sample", 2, "orig", "./MNE-sample-data/subjects", m_pRootEntity);
+    m_pBrainSurfaceEntity = new BrainSurface(subject_id, hemi, surf, subjects_dir, m_pRootEntity);
 
     // Camera
     Qt3D::QCamera *cameraEntity = new Qt3D::QCamera(m_pRootEntity);

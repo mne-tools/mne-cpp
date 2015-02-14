@@ -129,8 +129,40 @@ public:
     //=========================================================================================================
     /**
     * Default constructor
+    *
     */
-    BrainView();
+    explicit BrainView();
+
+    //=========================================================================================================
+    /**
+    * Construts the BrainView set by reading it of the given surface.
+    *
+    * @param[in] subject_id         Name of subject
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
+    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+    * @param[in] subjects_dir       Subjects directory
+    */
+    explicit BrainView(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
+
+    //=========================================================================================================
+    /**
+    * Construts the BrainView set by reading it of the given surface.
+    *
+    * @param[in] subject_id         Name of subject
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
+    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+    * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...)
+    * @param[in] subjects_dir       Subjects directory
+    */
+    explicit BrainView(const QString &subject_id, qint32 hemi, const QString &surf, const QString &atlas, const QString &subjects_dir);
+
+    //=========================================================================================================
+    /**
+    * Construts the BrainView by reading a given surface.
+    *
+    * @param[in] p_sFile            Surface file name with path
+    */
+    explicit BrainView(const QString& p_sFile);
 
     //=========================================================================================================
     /**
@@ -139,7 +171,18 @@ public:
     ~BrainView();
 
 protected:
-    void init();
+    //=========================================================================================================
+    /**
+    * Initializes the Brain View.
+    *
+    * @param[in] p_sFile            Surface file name with path
+    * @param[in] subject_id         Name of subject
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
+    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+    * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...)
+    * @param[in] subjects_dir       Subjects directory
+    */
+    void init(const QString& p_sFile, const QString &subject_id, qint32 hemi, const QString &surf, const QString &atlas, const QString &subjects_dir);
 
     QAspectEngine m_Engine;
     QInputAspect *m_pAspectInput;

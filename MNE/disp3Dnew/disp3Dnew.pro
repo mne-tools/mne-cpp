@@ -89,8 +89,8 @@ SOURCES += \
     brainview.cpp \
     brainsurface.cpp \
     renderableentity.cpp \
-    hemisphere.cpp \
-    brainsurfacemesh.cpp
+    brainsurfacemesh.cpp \
+    brainhemisphere.cpp
 
 
 HEADERS += \
@@ -98,8 +98,8 @@ HEADERS += \
     brainview.h \
     brainsurface.h \
     renderableentity.h \
-    hemisphere.h \
-    brainsurfacemesh.h
+    brainsurfacemesh.h \
+    brainhemisphere.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 {
     QGuiApplication a(argc, argv);
 
-    BrainView testWindow;
+    BrainView testWindow("sample", 2, "pial", "./MNE-sample-data/subjects");
 
     testWindow.show();
 

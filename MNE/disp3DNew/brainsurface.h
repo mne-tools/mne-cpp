@@ -44,7 +44,7 @@
 
 #include "disp3DNew_global.h"
 
-#include "hemisphere.h"
+#include "brainhemisphere.h"
 
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
@@ -155,14 +155,20 @@ public:
     */
     explicit BrainSurface(const QString& p_sFile, QEntity *parent = 0);
 
+    //=========================================================================================================
+    /**
+    * Default destructor
+    */
+    ~BrainSurface();
+
 protected:
     void init();
 
-    Hemisphere* m_pLeftHemisphere;
-    Hemisphere* m_pRightHemisphere;
+    BrainHemisphere* m_pLeftHemisphere;
+    BrainHemisphere* m_pRightHemisphere;
 
-    QTranslateTransform *m_pBrainTranslation;
-    QRotateTransform *m_pBrainRotation;
+    Qt3D::QTranslateTransform *m_pBrainTranslation;
+    Qt3D::QRotateTransform *m_pBrainRotation;
     Qt3D::QTransform *m_pBrainTransforms;
 
     SurfaceSet m_SurfaceSet;                    /**< Surface set */
