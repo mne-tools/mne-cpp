@@ -81,8 +81,8 @@ BrainView::~BrainView()
 void BrainView::init()
 {
     m_Engine.registerAspect(new Qt3D::QRenderAspect());
-    Qt3D::QInputAspect *m_aspectInput = new Qt3D::QInputAspect;
-    m_Engine.registerAspect(m_aspectInput);
+    Qt3D::QInputAspect *m_pAspectInput = new Qt3D::QInputAspect;
+    m_Engine.registerAspect(m_pAspectInput);
     m_Engine.initialize();
 
     m_data.insert(QStringLiteral("surface"), QVariant::fromValue(static_cast<QSurface *>(this)));
@@ -90,21 +90,21 @@ void BrainView::init()
     m_Engine.setData(m_data);
 
     // Root entity
-    m_rootEntity = new Qt3D::QEntity();
-    m_rootEntity->setObjectName(QStringLiteral("m_rootEntity"));
+    m_pRootEntity = new Qt3D::QEntity();
+    m_pRootEntity->setObjectName(QStringLiteral("m_pRootEntity"));
 
     // Surface
-    m_brainSurfaceEntity = new BrainSurface(m_rootEntity);
+    m_pBrainSurfaceEntity = new BrainSurface("sample", 2, "orig", "./MNE-sample-data/subjects", m_pRootEntity);
 
     // Camera
-    Qt3D::QCamera *cameraEntity = new Qt3D::QCamera(m_rootEntity);
+    Qt3D::QCamera *cameraEntity = new Qt3D::QCamera(m_pRootEntity);
     cameraEntity->setObjectName(QStringLiteral("cameraEntity"));
 
     cameraEntity->lens()->setPerspectiveProjection(60.0f, 16.0f/9.0f, 0.1f, 1000.0f);
     cameraEntity->setPosition(QVector3D(-5, 0, -20.0f));
     cameraEntity->setViewCenter(QVector3D(0, 0, 0));
     cameraEntity->setUpVector(QVector3D(0, 1, 0));
-    m_aspectInput->setCamera(cameraEntity);
+    m_pAspectInput->setCamera(cameraEntity);
 
     // FrameGraph
     Qt3D::QFrameGraph *frameGraph = new Qt3D::QFrameGraph();
@@ -121,9 +121,9 @@ void BrainView::init()
     frameGraph->setActiveFrameGraph(techniqueFilter);
 
     // Setting the FrameGraph
-    m_rootEntity->addComponent(frameGraph);
+    m_pRootEntity->addComponent(frameGraph);
 
     // Set root object of the scene
-    m_Engine.setRootEntity(m_rootEntity);
+    m_Engine.setRootEntity(m_pRootEntity);
 }
 

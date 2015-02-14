@@ -103,6 +103,7 @@ namespace DISP3DNEWLIB
 
 using namespace FSLIB;
 using namespace Eigen;
+using namespace Qt3D;
 
 
 //*************************************************************************************************************
@@ -140,14 +141,13 @@ public:
 protected:
     void init();
 
-    Qt3D::QAspectEngine m_Engine;
-    Qt3D::QInputAspect *m_aspectInput;
+    QAspectEngine m_Engine;
+    QInputAspect *m_pAspectInput;
     QVariantMap m_data;
 
-    Qt3D::QEntity *m_rootEntity;
-    Qt3D::QEntity *m_torusEntity;
+    Qt3D::QEntity *m_pRootEntity;
+    BrainSurface *m_pBrainSurfaceEntity;
 
-    BrainSurface *m_brainSurfaceEntity;
 private:
 
 };

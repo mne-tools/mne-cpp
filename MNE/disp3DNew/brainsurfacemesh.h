@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     lefthemisphere.h
+* @file     brainsurfacemesh.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of LeftHemisphere which holds the data of the left brain hemisphere in form of a mesh.
+* @brief    Declaration of BrainSurfaceMesh which holds the data of one hemisphere in form of a mesh.
 *
 */
 
-#ifndef LEFTHEMISPHERE_H
-#define LEFTHEMISPHERE_H
+#ifndef BRAINSURFACEMESH_H
+#define BRAINSURFACEMESH_H
 
 
 //*************************************************************************************************************
@@ -43,8 +43,10 @@
 //=============================================================================================================
 
 #include "disp3DNew_global.h"
+#include <mne/mne_sourcespace.h>
 
-#include "meshhemisphere.h"
+#include <fs/surfaceset.h>
+#include <fs/annotationset.h>
 
 
 //*************************************************************************************************************
@@ -53,7 +55,7 @@
 //=============================================================================================================
 
 #include <Qt3DRenderer/qt3drenderer_global.h>
-#include <QEntity>
+#include <Qt3DRenderer/qabstractmesh.h>
 
 
 //*************************************************************************************************************
@@ -75,6 +77,8 @@ namespace DISP3DNEWLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class BrainSurfaceMeshPrivate;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -82,6 +86,8 @@ namespace DISP3DNEWLIB
 //=============================================================================================================
 
 using namespace Qt3D;
+using namespace MNELIB;
+using namespace FSLIB;
 
 
 //*************************************************************************************************************
@@ -96,26 +102,56 @@ using namespace Qt3D;
 *
 * @brief Holds the data of one hemisphere in form of a mesh.
 */
-class DISP3DNEWSHARED_EXPORT LeftHemisphere : public QEntity
+class DISP3DNEWSHARED_EXPORT BrainSurfaceMesh : public QAbstractMesh
 {
     Q_OBJECT
 public:
+    typedef QSharedPointer<BrainSurfaceMesh> SPtr;             /**< Shared pointer type for BrainSurfaceMesh class. */
+    typedef QSharedPointer<const BrainSurfaceMesh> ConstSPtr;  /**< Const shared pointer type for BrainSurfaceMesh class. */
+
     //=========================================================================================================
     /**
     * Default constructor
     *
-    * @param[in] parent         The parent entity
+    * @param[in] parent         The parent node
     */
-    explicit LeftHemisphere(QEntity *parent = 0);
+    explicit BrainSurfaceMesh(QNode *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Default constructor
+    *
+    * @param[in] sourceSpace  Source space which contains the geometry information
+    * @param[in] parent         The parent node
+    */
+    explicit BrainSurfaceMesh(const Surface &surf, QNode *parent = 0);
+
+    QAbstractMeshFunctorPtr meshFunctor() const;
 
 protected:
-    void init();
+    void copy(const QNode *ref);
 
-    MeshHemisphere* m_meshHemisphere;
+    Surface m_surface;
 
 private:
+    Q_DECLARE_PRIVATE(BrainSurfaceMesh)
+    QT3D_CLONEABLE(BrainSurfaceMesh)
 };
+
+
+class DISP3DNEWSHARED_EXPORT BrainSurfaceMeshFunctor : public QAbstractMeshFunctor
+{
+
+public:
+    BrainSurfaceMeshFunctor(const Surface &surf);
+    QMeshDataPtr operator ()();
+    bool operator ==(const QAbstractMeshFunctor &other) const;
+
+private:
+    Surface m_surface;
+};
+
 
 } // NAMESPACE
 
-#endif // LEFTHEMISPHERE_H
+#endif // BRAINSURFACEMESH_H
