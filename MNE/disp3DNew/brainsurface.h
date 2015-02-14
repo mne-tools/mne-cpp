@@ -44,8 +44,10 @@
 
 #include "disp3DNew_global.h"
 
-#include "lefthemisphere.h"
-#include "righthemisphere.h"
+#include "hemisphere.h"
+
+#include <fs/surfaceset.h>
+#include <fs/annotationset.h>
 
 
 //*************************************************************************************************************
@@ -89,6 +91,7 @@ namespace DISP3DNEWLIB
 //=============================================================================================================
 
 using namespace Qt3D;
+using namespace FSLIB;
 
 
 //*************************************************************************************************************
@@ -107,6 +110,9 @@ class DISP3DNEWSHARED_EXPORT BrainSurface : public QEntity
 {
     Q_OBJECT
 public:
+    typedef QSharedPointer<BrainSurface> SPtr;             /**< Shared pointer type for BrainSurface class. */
+    typedef QSharedPointer<const BrainSurface> ConstSPtr;  /**< Const shared pointer type for BrainSurface class. */
+
     //=========================================================================================================
     /**
     * Default constructor
@@ -115,15 +121,52 @@ public:
     */
     explicit BrainSurface(QEntity *parent = 0);
 
+    //=========================================================================================================
+    /**
+    * Construts the BrainSurface set by reading it of the given surface.
+    *
+    * @param[in] subject_id         Name of subject
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
+    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+    * @param[in] subjects_dir       Subjects directory
+    * @param[in] parent             The parent node
+    */
+    explicit BrainSurface(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, QEntity *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Construts the BrainSurface set by reading it of the given surface.
+    *
+    * @param[in] subject_id         Name of subject
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
+    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+    * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...)
+    * @param[in] subjects_dir       Subjects directory
+    * @param[in] parent             The parent node
+    */
+    explicit BrainSurface(const QString &subject_id, qint32 hemi, const QString &surf, const QString &atlas, const QString &subjects_dir, QEntity *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Construts the BrainSurface by reading a given surface.
+    *
+    * @param[in] p_sFile            Surface file name with path
+    * @param[in] parent             The parent node
+    */
+    explicit BrainSurface(const QString& p_sFile, QEntity *parent = 0);
+
 protected:
     void init();
 
-    LeftHemisphere* m_leftHemisphere;
-    RightHemisphere* m_rightHemisphere;
+    Hemisphere* m_pLeftHemisphere;
+    Hemisphere* m_pRightHemisphere;
 
-    QTranslateTransform *m_brainTranslation;
-    QRotateTransform *m_brainRotation;
-    Qt3D::QTransform *m_brainTransforms;
+    QTranslateTransform *m_pBrainTranslation;
+    QRotateTransform *m_pBrainRotation;
+    Qt3D::QTransform *m_pBrainTransforms;
+
+    SurfaceSet m_SurfaceSet;                    /**< Surface set */
+    AnnotationSet m_AnnotationSet;              /**< Annotation set */
 
 private:
 };

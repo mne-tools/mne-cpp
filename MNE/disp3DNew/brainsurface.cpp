@@ -63,29 +63,78 @@ using namespace DISP3DNEWLIB;
 
 BrainSurface::BrainSurface(QEntity *parent)
 : QEntity(parent)
+, m_pLeftHemisphere(NULL)
+, m_pRightHemisphere(NULL)
 {
     init();
 }
 
 
-//=============================================================================================================
+//*************************************************************************************************************
+
+BrainSurface::BrainSurface(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, QEntity *parent)
+: QEntity(parent)
+, m_SurfaceSet(subject_id, hemi, surf, subjects_dir)
+, m_pLeftHemisphere(NULL)
+, m_pRightHemisphere(NULL)
+{
+    init();
+}
+
+
+//*************************************************************************************************************
+
+BrainSurface::BrainSurface(const QString &subject_id, qint32 hemi, const QString &surf, const QString &atlas, const QString &subjects_dir, QEntity *parent)
+: QEntity(parent)
+, m_SurfaceSet(subject_id, hemi, surf, subjects_dir)
+, m_AnnotationSet(subject_id, hemi, atlas, subjects_dir)
+, m_pLeftHemisphere(NULL)
+, m_pRightHemisphere(NULL)
+{
+    init();
+}
+
+
+//*************************************************************************************************************
+
+BrainSurface::BrainSurface(const QString& p_sFile, QEntity *parent)
+: QEntity(parent)
+, m_pLeftHemisphere(NULL)
+, m_pRightHemisphere(NULL)
+{
+    Surface t_Surf(p_sFile);
+    m_SurfaceSet.insert(t_Surf);
+
+    init();
+}
+
+
+//*************************************************************************************************************
 
 void BrainSurface::init()
 {
-    //Create hemispheres and add as childs
-    m_leftHemisphere = new LeftHemisphere(this);
-    m_rightHemisphere = new RightHemisphere(this);
+    //Create hemispheres and add as childs / 0 -> lh, 1 -> rh
+    for(int i = 0; i<m_SurfaceSet.size(); i++) {
+        if(m_SurfaceSet[i].hemi() == 0)
+            m_pLeftHemisphere = new Hemisphere(m_SurfaceSet[i], this);
 
-    // TorusMesh Transform
-    m_brainTranslation = new Qt3D::QTranslateTransform();
-    m_brainRotation = new Qt3D::QRotateTransform();
-    m_brainTransforms = new Qt3D::QTransform();
+        if(m_SurfaceSet[i].hemi() == 1)
+            m_pRightHemisphere = new Hemisphere(m_SurfaceSet[i], this);
+    }
 
-    m_brainTranslation->setTranslation(QVector3D(0.0f, 0.0f, 0.0f));
-    m_brainRotation->setAxis(QVector3D(1, 0, 0));
-    m_brainRotation->setAngleDeg(90.0f);
-    m_brainTransforms->addTransform(m_brainTranslation);
-    m_brainTransforms->addTransform(m_brainRotation);
-    this->addComponent(m_brainTransforms);
+    std::cout << "Number of children "<<this->children().size()<<std::endl;
+
+    // Brain surface Transform
+    m_pBrainTranslation = new Qt3D::QTranslateTransform();
+    m_pBrainRotation = new Qt3D::QRotateTransform();
+    m_pBrainTransforms = new Qt3D::QTransform();
+
+//    m_pBrainTranslation->setTranslation(QVector3D(0.0f, 0.0f, 0.0f));
+//    m_pBrainRotation->setAxis(QVector3D(1, 0, 0));
+//    m_pBrainRotation->setAngleDeg(0.0f);
+//    m_pBrainTransforms->addTransform(m_pBrainTranslation);
+//    m_pBrainTransforms->addTransform(m_pBrainRotation);
+
+//    this->addComponent(m_pBrainTransforms);
 }
 

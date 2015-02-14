@@ -87,19 +87,19 @@ else {
 
 SOURCES += \
     brainview.cpp \
-    meshhemisphere.cpp \
     brainsurface.cpp \
-    lefthemisphere.cpp \
-    righthemisphere.cpp
+    renderableentity.cpp \
+    hemisphere.cpp \
+    brainsurfacemesh.cpp
 
 
 HEADERS += \
     disp3DNew_global.h \
     brainview.h \
-    meshhemisphere.h \
     brainsurface.h \
-    lefthemisphere.h \
-    righthemisphere.h
+    renderableentity.h \
+    hemisphere.h \
+    brainsurfacemesh.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
