@@ -82,13 +82,14 @@ BrainHemisphere::BrainHemisphere(const Surface &surf, QNode *parent)
 void BrainHemisphere::init()
 {
     //Create mesh for left hemisphere
-    m_pSurfaceMesh = new BrainSurfaceMesh(m_surface);
-    this->addComponent(m_pSurfaceMesh);
+    m_pSurfaceMesh = QSharedPointer<BrainSurfaceMesh>(new BrainSurfaceMesh(m_surface));
+    this->addComponent(m_pSurfaceMesh.data());
 
-    this->scaleTransform()->setScale(1000);
+    int scale = 500;
+    this->scaleTransform()->setScale(scale);
 
     //Translate to the right if this hemisphere is right hemisphere and is inflated
     if(m_surface.surf() == "inflated" && m_surface.hemi() == 1)
-        this->translateTransform()->setDx(10);
+        this->translateTransform()->setDx(scale/10);
 }
 

@@ -162,17 +162,31 @@ public:
     ~BrainSurface();
 
 protected:
+    //=========================================================================================================
+    /**
+    * Initializes the BrainSurface.
+    */
     void init();
 
-    BrainHemisphere* m_pLeftHemisphere;
-    BrainHemisphere* m_pRightHemisphere;
+    //=========================================================================================================
+    /**
+    * Calculates the bounding box and stores it to m_vecBoundingBoxMin, m_vecBoundingBoxMax and m_vecBoundingBoxCenter.
+    */
+    void calcBoundingBox();
+
+    BrainHemisphere::SPtr m_pLeftHemisphere;
+    BrainHemisphere::SPtr m_pRightHemisphere;
 
     Qt3D::QTranslateTransform *m_pBrainTranslation;
     Qt3D::QRotateTransform *m_pBrainRotation;
     Qt3D::QTransform *m_pBrainTransforms;
 
-    SurfaceSet m_SurfaceSet;                    /**< Surface set */
-    AnnotationSet m_AnnotationSet;              /**< Annotation set */
+    SurfaceSet m_SurfaceSet;                        /**< Surface set */
+    AnnotationSet m_AnnotationSet;                  /**< Annotation set */
+
+    QVector3D m_vecBoundingBoxMin;                  /**< X, Y, Z minima. */
+    QVector3D m_vecBoundingBoxMax;                  /**< X, Y, Z maxima. */
+    QVector3D m_vecBoundingBoxCenter;               /**< X, Y, Z center. */
 
 private:
 };
