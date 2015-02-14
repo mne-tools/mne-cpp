@@ -102,7 +102,7 @@ void BrainSurfaceMesh::copy(const QNode *ref)
 
 QMeshDataPtr createHemisphereMesh(const Surface &surface)
 {
-    QMeshDataPtr mesh(new QMeshData(QMeshData::Points));
+    QMeshDataPtr mesh(new QMeshData(QMeshData::Triangles));
 
     //Return if empty surface
     if(surface.isEmpty() == -1)
@@ -156,33 +156,25 @@ QMeshDataPtr createHemisphereMesh(const Surface &surface)
     mesh->addAttribute(QMeshData::defaultNormalAttributeName(), QAbstractAttributePtr(new Attribute(buf, GL_FLOAT_VEC3, nVerts, offset, stride)));
     offset += sizeof(float) * 3;
 
-//    QByteArray indexBytes;
-//    int number_faces = faces.cols(); // two tris per side, for all rings
-//    int indices = number_faces * 3;
-//    Q_ASSERT(indices < 65536);
-//    indexBytes.resize(indices * sizeof(quint16));
-//    quint16* indexPtr = reinterpret_cast<quint16*>(indexBytes.data());
+    //Generate faces out of tri information
+    QByteArray indexBytes;
+    int number_faces = faces.cols(); // two tris per side, for all rings
+    int indices = number_faces * 3;
 
-//    for ( int ring = 0; ring < rings; ring++ )
-//    {
-//        int ringStart = ring * sides;
-//        int nextRingStart = ( ring + 1 ) * sides;
-//        for ( int side = 0; side < sides; side++ )
-//        {
-//            int nextSide = ( side + 1 ) % sides;
-//            *indexPtr++ = ( ringStart + side );
-//            *indexPtr++ = ( nextRingStart + side );
-//            *indexPtr++ = ( nextRingStart + nextSide );
-//            *indexPtr++ = ringStart + side;
-//            *indexPtr++ = nextRingStart + nextSide;
-//            *indexPtr++ = ( ringStart + nextSide );
-//        }
-//    }
+    indexBytes.resize(indices * sizeof(quint16));
+    quint16* indexPtr = reinterpret_cast<quint16*>(indexBytes.data());
 
-//    BufferPtr indexBuffer(new Buffer(QOpenGLBuffer::IndexBuffer));
-//    indexBuffer->setUsage(QOpenGLBuffer::StaticDraw);
-//    //indexBuffer->setData(indexBytes);
-//    mesh->setIndexAttribute(AttributePtr(new Attribute(indexBuffer, GL_UNSIGNED_SHORT, indices, 0, 0)));
+    for(int i = 0; i < number_faces; i++)
+    {
+        *indexPtr++ = faces(0,i);
+        *indexPtr++ = faces(1,i);
+        *indexPtr++ = faces(2,i);
+    }
+
+    BufferPtr indexBuffer(new Buffer(QOpenGLBuffer::IndexBuffer));
+    indexBuffer->setUsage(QOpenGLBuffer::StaticDraw);
+    indexBuffer->setData(indexBytes);
+    mesh->setIndexAttribute(AttributePtr(new Attribute(indexBuffer, GL_UNSIGNED_SHORT, indices, 0, 0)));
 
     mesh->computeBoundsFromAttribute(QMeshData::defaultPositionAttributeName());
 

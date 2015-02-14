@@ -111,15 +111,22 @@ BrainSurface::BrainSurface(const QString& p_sFile, QEntity *parent)
 
 //*************************************************************************************************************
 
+BrainSurface::~BrainSurface()
+{
+}
+
+
+//*************************************************************************************************************
+
 void BrainSurface::init()
 {
     //Create hemispheres and add as childs / 0 -> lh, 1 -> rh
     for(int i = 0; i<m_SurfaceSet.size(); i++) {
         if(m_SurfaceSet[i].hemi() == 0)
-            m_pLeftHemisphere = new Hemisphere(m_SurfaceSet[i], this);
+            m_pLeftHemisphere = new BrainHemisphere(m_SurfaceSet[i], this);
 
         if(m_SurfaceSet[i].hemi() == 1)
-            m_pRightHemisphere = new Hemisphere(m_SurfaceSet[i], this);
+            m_pRightHemisphere = new BrainHemisphere(m_SurfaceSet[i], this);
     }
 
     std::cout << "Number of children "<<this->children().size()<<std::endl;
