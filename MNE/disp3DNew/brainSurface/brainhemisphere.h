@@ -56,13 +56,8 @@
 //=============================================================================================================
 
 #include <Qt3DRenderer/qt3drenderer_global.h>
-#include <QEntity>
-
-#include <Qt3DCore/qtranslatetransform.h>
-#include <Qt3DCore/qmatrixtransform.h>
-#include <Qt3DCore/qrotatetransform.h>
-#include <Qt3DCore/qlookattransform.h>
-#include <Qt3DCore/qtransform.h>
+#include <Qt3DRenderer/QPhongMaterial>
+#include <Qt3DRenderer/QDiffuseMapMaterial>
 
 
 //*************************************************************************************************************

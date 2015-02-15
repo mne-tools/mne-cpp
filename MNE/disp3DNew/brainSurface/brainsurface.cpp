@@ -62,7 +62,7 @@ using namespace DISP3DNEWLIB;
 //=============================================================================================================
 
 BrainSurface::BrainSurface(QEntity *parent)
-: QEntity(parent)
+: RenderableEntity(parent)
 , m_pLeftHemisphere(NULL)
 , m_pRightHemisphere(NULL)
 {
@@ -73,7 +73,7 @@ BrainSurface::BrainSurface(QEntity *parent)
 //*************************************************************************************************************
 
 BrainSurface::BrainSurface(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, QEntity *parent)
-: QEntity(parent)
+: RenderableEntity(parent)
 , m_SurfaceSet(subject_id, hemi, surf, subjects_dir)
 , m_pLeftHemisphere(NULL)
 , m_pRightHemisphere(NULL)
@@ -85,7 +85,7 @@ BrainSurface::BrainSurface(const QString &subject_id, qint32 hemi, const QString
 //*************************************************************************************************************
 
 BrainSurface::BrainSurface(const QString &subject_id, qint32 hemi, const QString &surf, const QString &atlas, const QString &subjects_dir, QEntity *parent)
-: QEntity(parent)
+: RenderableEntity(parent)
 , m_SurfaceSet(subject_id, hemi, surf, subjects_dir)
 , m_AnnotationSet(subject_id, hemi, atlas, subjects_dir)
 , m_pLeftHemisphere(NULL)
@@ -98,7 +98,7 @@ BrainSurface::BrainSurface(const QString &subject_id, qint32 hemi, const QString
 //*************************************************************************************************************
 
 BrainSurface::BrainSurface(const QString& p_sFile, QEntity *parent)
-: QEntity(parent)
+: RenderableEntity(parent)
 , m_pLeftHemisphere(NULL)
 , m_pRightHemisphere(NULL)
 {
@@ -135,17 +135,8 @@ void BrainSurface::init()
     calcBoundingBox();
 
     // Brain surface Transform
-    m_pBrainTranslation = new Qt3D::QTranslateTransform();
-    m_pBrainRotation = new Qt3D::QRotateTransform();
-    m_pBrainTransforms = new Qt3D::QTransform();
-
-    //m_pBrainTranslation->setTranslation(-m_vecBoundingBoxCenter); //Translate to origin
-    m_pBrainRotation->setAxis(QVector3D(1, 0, 0));
-    m_pBrainRotation->setAngleDeg(0.0f);
-    m_pBrainTransforms->addTransform(m_pBrainTranslation);
-    m_pBrainTransforms->addTransform(m_pBrainRotation);
-
-//    this->addComponent(m_pBrainTransforms);
+    int scale = 300;
+    this->scaleTransform()->setScale(scale);
 }
 
 

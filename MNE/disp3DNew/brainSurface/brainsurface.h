@@ -46,6 +46,8 @@
 
 #include "brainhemisphere.h"
 
+#include "../helpers/renderableentity.h"
+
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 
@@ -56,13 +58,6 @@
 //=============================================================================================================
 
 #include <Qt3DRenderer/qt3drenderer_global.h>
-#include <QEntity>
-
-#include <Qt3DCore/qtranslatetransform.h>
-#include <Qt3DCore/qmatrixtransform.h>
-#include <Qt3DCore/qrotatetransform.h>
-#include <Qt3DCore/qlookattransform.h>
-#include <Qt3DCore/qtransform.h>
 
 
 //*************************************************************************************************************
@@ -106,7 +101,7 @@ using namespace FSLIB;
 *
 * @brief Holds the data of one hemisphere in form of a mesh.
 */
-class DISP3DNEWSHARED_EXPORT BrainSurface : public QEntity
+class DISP3DNEWSHARED_EXPORT BrainSurface : public RenderableEntity
 {
     Q_OBJECT
 public:
@@ -176,10 +171,6 @@ protected:
 
     BrainHemisphere::SPtr m_pLeftHemisphere;
     BrainHemisphere::SPtr m_pRightHemisphere;
-
-    Qt3D::QTranslateTransform *m_pBrainTranslation;
-    Qt3D::QRotateTransform *m_pBrainRotation;
-    Qt3D::QTransform *m_pBrainTransforms;
 
     SurfaceSet m_SurfaceSet;                        /**< Surface set */
     AnnotationSet m_AnnotationSet;                  /**< Annotation set */

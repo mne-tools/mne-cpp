@@ -122,6 +122,7 @@ void BrainView::init(const QString& p_sFile, const QString &subject_id, qint32 h
 
     // Surface
     m_pBrainSurfaceEntity = QSharedPointer<BrainSurface>(new BrainSurface(subject_id, hemi, surf, subjects_dir, m_pRootEntity));
+    m_pBrainSurfaceEntity->setObjectName(QStringLiteral("m_pBrainSurfaceEntity"));
 
     // Camera
     Qt3D::QCamera *cameraEntity = new Qt3D::QCamera(m_pRootEntity);
@@ -135,17 +136,10 @@ void BrainView::init(const QString& p_sFile, const QString &subject_id, qint32 h
 
     // FrameGraph
     Qt3D::QFrameGraph *frameGraph = new Qt3D::QFrameGraph();
-    Qt3D::QTechniqueFilter *techniqueFilter = new Qt3D::QTechniqueFilter();
-    Qt3D::QViewport *viewport = new Qt3D::QViewport(techniqueFilter);
-    Qt3D::QClearBuffer *clearBuffer = new Qt3D::QClearBuffer(viewport);
-    Qt3D::QCameraSelector *cameraSelector = new Qt3D::QCameraSelector(clearBuffer);
-    (void) new Qt3D::QRenderPassFilter(cameraSelector);
-
-    // TechiqueFilter and renderPassFilter are not implement yet
-    viewport->setRect(QRectF(0, 0, 1, 1));
-    clearBuffer->setBuffers(Qt3D::QClearBuffer::ColorDepthBuffer);
-    cameraSelector->setCamera(cameraEntity);
-    frameGraph->setActiveFrameGraph(techniqueFilter);
+    Qt3D::QForwardRenderer *forwardRenderer = new Qt3D::QForwardRenderer();
+    forwardRenderer->setClearColor(QColor::fromRgbF(1.0, 1.0, 1.0, 1.0));
+    forwardRenderer->setCamera(cameraEntity);
+    frameGraph->setActiveFrameGraph(forwardRenderer);
 
     // Setting the FrameGraph
     m_pRootEntity->addComponent(frameGraph);

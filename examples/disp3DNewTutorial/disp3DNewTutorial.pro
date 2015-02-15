@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     disp3DTutorial.pro
+# @file     disp3DNewTutorial.pro
 # @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -44,7 +44,7 @@ QT += 3dcore 3drenderer 3dinput
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = disp3DTutorial
+TARGET = disp3DNewTutorial
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -58,7 +58,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Inversed \
-            -lMNE$${MNE_LIB_VERSION}Dispd \
             -lMNE$${MNE_LIB_VERSION}Disp3DNewd
 }
 else {
@@ -68,7 +67,6 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Inverse \
-            -lMNE$${MNE_LIB_VERSION}Disp \
             -lMNE$${MNE_LIB_VERSION}Disp3DNew
 }
 

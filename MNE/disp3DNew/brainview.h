@@ -67,7 +67,7 @@
 
 #include <Qt3DRenderer/qcameraselector.h>
 #include <Qt3DRenderer/qrenderpassfilter.h>
-#include <Qt3DRenderer/qtechniquefilter.h>
+#include <Qt3DRenderer/qforwardrenderer.h>
 #include <Qt3DRenderer/qviewport.h>
 #include <Qt3DRenderer/qrenderaspect.h>
 #include <Qt3DRenderer/qframegraph.h>
