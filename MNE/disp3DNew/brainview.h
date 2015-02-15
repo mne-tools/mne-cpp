@@ -43,7 +43,7 @@
 
 #include "disp3DNew_global.h"
 
-#include "brainsurface.h"
+#include "brainSurface/brainsurface.h"
 
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
