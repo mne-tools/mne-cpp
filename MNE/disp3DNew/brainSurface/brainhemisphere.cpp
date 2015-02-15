@@ -85,11 +85,22 @@ void BrainHemisphere::init()
     m_pSurfaceMesh = QSharedPointer<BrainSurfaceMesh>(new BrainSurfaceMesh(m_surface));
     this->addComponent(m_pSurfaceMesh.data());
 
-    int scale = 5000;
-    this->scaleTransform()->setScale(scale);
-
     //Translate to the right if this hemisphere is right hemisphere and is inflated
     if(m_surface.surf() == "inflated" && m_surface.hemi() == 1)
-        this->translateTransform()->setDx(scale/10);
+        this->translateTransform()->setDx(this->scaleTransform()->scale()/10);
+
+    //Set material
+    QPhongMaterial *phongMaterial = new QPhongMaterial();
+    phongMaterial->setDiffuse(QColor(40, 40, 40));
+    phongMaterial->setAmbient(Qt::gray);
+    phongMaterial->setSpecular(Qt::white);
+    phongMaterial->setShininess(50.0f);
+    this->addComponent(phongMaterial);
+
+//    QDiffuseMapMaterial *diffuseMapMaterial = new QDiffuseMapMaterial();
+//    diffuseMapMaterial->setAmbient(Qt::gray);
+//    diffuseMapMaterial->setSpecular(Qt::white);
+//    diffuseMapMaterial->setShininess(5.0f);
+//    this->addComponent(diffuseMapMaterial);
 }
 

@@ -115,7 +115,7 @@ QMeshDataPtr createHemisphereMesh(const Surface &surface)
 
     int nVerts  = vertices.cols();
 
-    quint32 elementSize = 3 + 2 + 3; // vec3 pos, vec2 texCoord, vec3 normal
+    quint32 elementSize = 3 /*+ 2*/ + 3 + 3; // vec3 pos, vec2 texCoord, vec3 color, vec3 normal
     quint32 stride = elementSize * sizeof(float);
 
     QByteArray bufferBytes;
@@ -130,6 +130,11 @@ QMeshDataPtr createHemisphereMesh(const Surface &surface)
         *fptr++ = vertices(2,i);
 
         //texture u v
+//        *fptr++ = 1;
+//        *fptr++ = 1;
+
+        //color rgb
+        *fptr++ = 1;
         *fptr++ = 1;
         *fptr++ = 1;
 
@@ -148,9 +153,12 @@ QMeshDataPtr createHemisphereMesh(const Surface &surface)
     mesh->addAttribute(QMeshData::defaultPositionAttributeName(), QAbstractAttributePtr(new Attribute(buf, GL_FLOAT_VEC3, nVerts, 0, stride)));
     quint32 offset = sizeof(float) * 3;
 
-    //Set textures to OpenGL buffer
-    mesh->addAttribute(QMeshData::defaultTextureCoordinateAttributeName(), QAbstractAttributePtr(new Attribute(buf, GL_FLOAT_VEC2, nVerts, offset, stride)));
-    offset += sizeof(float) * 2;
+//    //Set textures to OpenGL buffer
+//    mesh->addAttribute(QMeshData::defaultTextureCoordinateAttributeName(), QAbstractAttributePtr(new Attribute(buf, GL_FLOAT_VEC2, nVerts, offset, stride)));
+//    offset += sizeof(float) * 2;
+
+    mesh->addAttribute(QMeshData::defaultColorAttributeName(), QAbstractAttributePtr(new Attribute(buf, GL_FLOAT_VEC3, nVerts, offset, stride)));
+    offset += sizeof(float) * 3;
 
     //Set normals to OpenGL buffer
     mesh->addAttribute(QMeshData::defaultNormalAttributeName(), QAbstractAttributePtr(new Attribute(buf, GL_FLOAT_VEC3, nVerts, offset, stride)));
