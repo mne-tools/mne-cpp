@@ -72,6 +72,6 @@ contains(MNECPP_CONFIG, withGui) {
             stClusteredInversePwlRapMusic  \
             roiClusteredInversePwlRapMusic \
             fsSurface \
-            #disp3DTutorial #Uncomment this if you have Qt3D 2.0 compiled
+            disp3DNewTutorial #Uncomment this if you have Qt3D 2.0 compiled
     }
 }
