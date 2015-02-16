@@ -94,13 +94,13 @@ BrainSurfaceMesh::BrainSurfaceMesh(const Surface &surf, QNode *parent)
 void BrainSurfaceMesh::copy(const QNode *ref)
 {
     QAbstractMesh::copy(ref);
-    const BrainSurfaceMesh *mesh = static_cast<const BrainSurfaceMesh*>(ref);
+//    const BrainSurfaceMesh *mesh = static_cast<const BrainSurfaceMesh*>(ref);
 //    d_func()->m_surface = mesh->d_func()->m_surface;
 }
 
 //*************************************************************************************************************
 
-QMeshDataPtr createHemisphereMesh(const Surface &surface)
+QMeshDataPtr createSurfaceMesh(const Surface &surface)
 {
     QMeshDataPtr mesh(new QMeshData(QMeshData::Triangles));
 
@@ -133,10 +133,24 @@ QMeshDataPtr createHemisphereMesh(const Surface &surface)
 //        *fptr++ = 1;
 //        *fptr++ = 1;
 
-        //color rgb
-        *fptr++ = 1;
-        *fptr++ = 1;
-        *fptr++ = 1;
+        //color rgb - if inflated color sulci and gyrus differently
+        //if(surface.surf() == "inflated") {
+            if(surface.curv()[i] >= 0){
+                *fptr++ = (float)(100.0 / 255.0);
+                *fptr++ = (float)(200.0 / 255.0);
+                *fptr++ = (float)(25.0 / 255.0);
+            }
+            else {
+                *fptr++ = (float)(24.0 / 255.0);
+                *fptr++ = (float)(100.0 / 255.0);
+                *fptr++ = (float)(75.0 / 255.0);
+            }
+//        }
+//        else {
+//            *fptr++ = (float)(1.0 / 255.0);
+//            *fptr++ = (float)(1.0 / 255.0);
+//            *fptr++ = (float)(1.0 / 255.0);
+//        }
 
         //normals x y z
         *fptr++ = normals(0,i);
@@ -157,7 +171,7 @@ QMeshDataPtr createHemisphereMesh(const Surface &surface)
 //    mesh->addAttribute(QMeshData::defaultTextureCoordinateAttributeName(), QAbstractAttributePtr(new Attribute(buf, GL_FLOAT_VEC2, nVerts, offset, stride)));
 //    offset += sizeof(float) * 2;
 
-    mesh->addAttribute(QMeshData::defaultColorAttributeName(), QAbstractAttributePtr(new Attribute(buf, GL_FLOAT_VEC3, nVerts, offset, stride)));
+    mesh->addAttribute(QMeshData::defaultColorAttributeName(), QAbstractAttributePtr(new Attribute(buf, GL_FLOAT_VEC4, nVerts, offset, stride)));
     offset += sizeof(float) * 3;
 
     //Set normals to OpenGL buffer
@@ -181,7 +195,7 @@ QMeshDataPtr createHemisphereMesh(const Surface &surface)
     }
 
     BufferPtr indexBuffer(new Buffer(QOpenGLBuffer::IndexBuffer));
-    indexBuffer->setUsage(QOpenGLBuffer::StaticDraw);
+    indexBuffer->setUsage(QOpenGLBuffer::DynamicDraw);
     indexBuffer->setData(indexBytes);
     mesh->setIndexAttribute(AttributePtr(new Attribute(indexBuffer, GL_UNSIGNED_INT, indices, 0, 0)));
 
@@ -212,7 +226,7 @@ BrainSurfaceMeshFunctor::BrainSurfaceMeshFunctor(const Surface &surf)
 
 QMeshDataPtr BrainSurfaceMeshFunctor::operator ()()
 {
-    return createHemisphereMesh(m_surface);
+    return createSurfaceMesh(m_surface);
 }
 
 

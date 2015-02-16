@@ -90,12 +90,18 @@ void BrainHemisphere::init()
         this->translateTransform()->setDx(this->scaleTransform()->scale()/10);
 
     //Set material
-    QPhongMaterial *phongMaterial = new QPhongMaterial();
-    phongMaterial->setDiffuse(QColor(40, 40, 40));
-    phongMaterial->setAmbient(Qt::gray);
-    phongMaterial->setSpecular(Qt::white);
-    phongMaterial->setShininess(50.0f);
-    this->addComponent(phongMaterial);
+    QPerVertexMaterial *qVertexMaterial = new QPerVertexMaterial();
+    this->addComponent(qVertexMaterial);
+
+//    QMaterial *qMaterial = new QMaterial();
+//    this->addComponent(qMaterial);
+
+//    QPhongMaterial *phongMaterial = new QPhongMaterial();
+//    phongMaterial->setDiffuse(QColor(40, 40, 40));
+//    phongMaterial->setAmbient(Qt::gray);
+//    phongMaterial->setSpecular(Qt::white);
+//    phongMaterial->setShininess(50.0f);
+//    this->addComponent(phongMaterial);
 
 //    QDiffuseMapMaterial *diffuseMapMaterial = new QDiffuseMapMaterial();
 //    diffuseMapMaterial->setAmbient(Qt::gray);

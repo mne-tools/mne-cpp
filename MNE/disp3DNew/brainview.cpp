@@ -107,6 +107,9 @@ BrainView::~BrainView()
 
 void BrainView::init(const QString& p_sFile, const QString &subject_id, qint32 hemi, const QString &surf, const QString &atlas, const QString &subjects_dir)
 {
+    Q_UNUSED(atlas)
+    Q_UNUSED(p_sFile)
+
     m_Engine.registerAspect(new Qt3D::QRenderAspect());
     Qt3D::QInputAspect *m_pAspectInput = new Qt3D::QInputAspect;
     m_Engine.registerAspect(m_pAspectInput);
@@ -123,6 +126,9 @@ void BrainView::init(const QString& p_sFile, const QString &subject_id, qint32 h
     // Surface
     m_pBrainSurfaceEntity = QSharedPointer<BrainSurface>(new BrainSurface(subject_id, hemi, surf, subjects_dir, m_pRootEntity));
     m_pBrainSurfaceEntity->setObjectName(QStringLiteral("m_pBrainSurfaceEntity"));
+
+    // Build Coordinate System
+    createCoordSystem(m_pRootEntity);
 
     // Camera
     Qt3D::QCamera *cameraEntity = new Qt3D::QCamera(m_pRootEntity);
@@ -148,3 +154,75 @@ void BrainView::init(const QString& p_sFile, const QString &subject_id, qint32 h
     m_Engine.setRootEntity(m_pRootEntity);
 }
 
+
+//*************************************************************************************************************
+
+void BrainView::createCoordSystem(QEntity *rootEntity)
+{
+    // X
+    Qt3D::QCylinderMesh *XAxis = new Qt3D::QCylinderMesh();
+    XAxis->setRadius(0.1f);
+    XAxis->setLength(3);
+    XAxis->setRings(100);
+    XAxis->setSlices(20);
+
+    m_XAxisEntity = QSharedPointer<Qt3D::QEntity>(new Qt3D::QEntity(rootEntity));
+    m_XAxisEntity->addComponent(XAxis);
+
+    QPhongMaterial *phongMaterialX = new QPhongMaterial();
+    phongMaterialX->setDiffuse(QColor(255, 0, 0));
+    phongMaterialX->setAmbient(Qt::gray);
+    phongMaterialX->setSpecular(Qt::white);
+    phongMaterialX->setShininess(50.0f);
+    m_XAxisEntity->addComponent(phongMaterialX);
+
+    // Y
+    Qt3D::QCylinderMesh *YAxis = new Qt3D::QCylinderMesh();
+    YAxis->setRadius(0.1f);
+    YAxis->setLength(3);
+    YAxis->setRings(100);
+    YAxis->setSlices(20);
+
+    Qt3D::QRotateTransform *rotationY = new Qt3D::QRotateTransform();
+    Qt3D::QTransform *transformY = new Qt3D::QTransform();
+
+    rotationY->setAngleDeg(90.0f);
+    rotationY->setAxis(QVector3D(1, 0, 0));
+    transformY->addTransform(rotationY);
+
+    m_YAxisEntity = QSharedPointer<Qt3D::QEntity>(new Qt3D::QEntity(rootEntity));
+    m_YAxisEntity->addComponent(YAxis);
+    m_YAxisEntity->addComponent(transformY);
+
+    QPhongMaterial *phongMaterialY = new QPhongMaterial();
+    phongMaterialY->setDiffuse(QColor(0, 0, 255));
+    phongMaterialY->setAmbient(Qt::gray);
+    phongMaterialY->setSpecular(Qt::white);
+    phongMaterialY->setShininess(50.0f);
+    m_YAxisEntity->addComponent(phongMaterialY);
+
+    // Z
+    Qt3D::QCylinderMesh *ZAxis = new Qt3D::QCylinderMesh();
+    ZAxis->setRadius(0.1f);
+    ZAxis->setLength(3);
+    ZAxis->setRings(100);
+    ZAxis->setSlices(20);
+
+    Qt3D::QRotateTransform *rotationZ = new Qt3D::QRotateTransform();
+    Qt3D::QTransform *transformZ = new Qt3D::QTransform();
+
+    rotationZ->setAngleDeg(90.0f);
+    rotationZ->setAxis(QVector3D(0, 0, 1));
+    transformZ->addTransform(rotationZ);
+
+    m_ZAxisEntity = QSharedPointer<Qt3D::QEntity>(new Qt3D::QEntity(rootEntity));
+    m_ZAxisEntity->addComponent(ZAxis);
+    m_ZAxisEntity->addComponent(transformZ);
+
+    QPhongMaterial *phongMaterialZ = new QPhongMaterial();
+    phongMaterialZ->setDiffuse(QColor(0, 255, 0));
+    phongMaterialZ->setAmbient(Qt::gray);
+    phongMaterialZ->setSpecular(Qt::white);
+    phongMaterialZ->setShininess(50.0f);
+    m_ZAxisEntity->addComponent(phongMaterialZ);
+}
