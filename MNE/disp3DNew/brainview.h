@@ -73,6 +73,8 @@
 #include <Qt3DRenderer/qframegraph.h>
 #include <Qt3DRenderer/qclearbuffer.h>
 
+#include <Qt3DRenderer/qcylindermesh.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -184,11 +186,17 @@ protected:
     */
     void init(const QString& p_sFile, const QString &subject_id, qint32 hemi, const QString &surf, const QString &atlas, const QString &subjects_dir);
 
+    void createCoordSystem(QEntity *rootEntity);
+
     QAspectEngine m_Engine;
     QInputAspect *m_pAspectInput;
     QVariantMap m_data;
 
-    Qt3D::QEntity *m_pRootEntity;
+    Qt3D::QEntity * m_pRootEntity;
+    QSharedPointer<Qt3D::QEntity> m_XAxisEntity;
+    QSharedPointer<Qt3D::QEntity> m_YAxisEntity;
+    QSharedPointer<Qt3D::QEntity> m_ZAxisEntity;
+
     BrainSurface::SPtr m_pBrainSurfaceEntity;
 
 private:
