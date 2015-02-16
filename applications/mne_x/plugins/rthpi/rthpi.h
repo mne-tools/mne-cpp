@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
 * @file     rthpi.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @author   Chiran Doshi <chiran.doshi@childrens.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     June, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Chiran Doshi and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -86,8 +86,25 @@ using namespace IOBuffer;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// Declare all structures to be used
 //=============================================================================================================
+
+struct coilParam {
+    Eigen::MatrixXd pos;
+    Eigen::MatrixXd mom;
+};
+
+struct dipError {
+    double error;
+    Eigen::MatrixXd moment;
+};
+
+struct sens {
+    Eigen::MatrixXd coilpos;
+    Eigen::MatrixXd coilori;
+    Eigen::MatrixXd tra;
+};
+
 
 
 //=============================================================================================================
@@ -145,6 +162,14 @@ public:
 
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
+    dipError dipfitError (Eigen::MatrixXd, Eigen::MatrixXd, struct sens);
+    Eigen::MatrixXd ft_compute_leadfield(Eigen::MatrixXd, struct sens);
+    Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd, Eigen::MatrixXd, Eigen::MatrixXd);
+    coilParam dipfit(struct coilParam, struct sens, Eigen::MatrixXd);
+    coilParam fminsearch(Eigen::MatrixXd,int, int, int, Eigen::MatrixXd, struct sens);
+    static bool compar (int, int);
+    Eigen::MatrixXd pinv(Eigen::MatrixXd);
+
 signals:
     //=========================================================================================================
     /**
@@ -172,6 +197,9 @@ private:
 
     bool m_bIsRunning;      /**< If source lab is running */
     bool m_bProcessData;    /**< If data should be received for processing */
+
+    static std::vector <double>base_arr;
+
 };
 
 } // NAMESPACE
