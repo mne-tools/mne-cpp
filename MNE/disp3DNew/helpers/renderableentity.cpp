@@ -40,7 +40,7 @@ using namespace DISP3DNEWLIB;
 
 RenderableEntity::RenderableEntity(Qt3D::QNode *parent)
     : Qt3D::QEntity(parent)
-    , m_mesh(new Qt3D::QMesh())
+    //, m_mesh(new Qt3D::QMesh())
     , m_transform(new Qt3D::QTransform())
     , m_rotateTransform(new Qt3D::QRotateTransform())
     , m_scaleTransform(new Qt3D::QScaleTransform())
@@ -58,15 +58,18 @@ RenderableEntity::~RenderableEntity()
 
 }
 
-void RenderableEntity::setMesh(Qt3D::QMesh* mesh)
-{
-    m_mesh = mesh;
-}
+//void RenderableEntity::setMesh(Qt3D::QMesh* mesh)
+//{
+//    if(m_mesh)
+//        delete m_mesh;
 
-Qt3D::QMesh *RenderableEntity::mesh() const
-{
-    return m_mesh;
-}
+//    m_mesh = mesh;
+//}
+
+//Qt3D::QMesh *RenderableEntity::mesh() const
+//{
+//    return m_mesh;
+//}
 
 Qt3D::QScaleTransform *RenderableEntity::scaleTransform() const
 {

@@ -55,7 +55,7 @@
 //=============================================================================================================
 
 #include <Qt3DRenderer/qt3drenderer_global.h>
-#include <Qt3DRenderer/qabstractmesh.h>
+#include <Qt3DRenderer/QMesh.h>
 
 
 //*************************************************************************************************************
@@ -102,7 +102,7 @@ using namespace FSLIB;
 *
 * @brief Holds the data of one hemisphere in form of a mesh.
 */
-class DISP3DNEWSHARED_EXPORT BrainSurfaceMesh : public QAbstractMesh
+class DISP3DNEWSHARED_EXPORT BrainSurfaceMesh : public QMesh
 {
     Q_OBJECT
 public:

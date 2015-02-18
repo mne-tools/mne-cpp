@@ -73,7 +73,7 @@ using namespace DISP3DNEWLIB;
 //=============================================================================================================
 
 BrainSurfaceMesh::BrainSurfaceMesh(QNode *parent)
-: QAbstractMesh(parent)
+: QMesh(parent)
 {
     update();
 }
@@ -82,7 +82,7 @@ BrainSurfaceMesh::BrainSurfaceMesh(QNode *parent)
 //*************************************************************************************************************
 
 BrainSurfaceMesh::BrainSurfaceMesh(const Surface &surf, QNode *parent)
-: QAbstractMesh(parent)
+: QMesh(parent)
 , m_surface(surf)
 {
     update();
@@ -115,74 +115,75 @@ QMeshDataPtr createSurfaceMesh(const Surface &surface)
 
     int nVerts  = vertices.cols();
 
-    quint32 elementSize = 3 /*+ 2*/ + 3 + 3; // vec3 pos, vec2 texCoord, vec3 color, vec3 normal
-    quint32 stride = elementSize * sizeof(float);
+    quint32 elementSizeVertNorm = 3 + 3; // vec3 pos, vec3 normal
+    quint32 elementSizeColor = 3; // vec3 color
+    quint32 strideVertNorm = elementSizeVertNorm * sizeof(float);
+    quint32 strideColor = elementSizeColor * sizeof(float);
 
-    QByteArray bufferBytes;
-    bufferBytes.resize(stride * nVerts);
+    QByteArray bufferBytesVertNorm;
+    bufferBytesVertNorm.resize(strideVertNorm * nVerts);
 
-    float* fptr = reinterpret_cast<float*>(bufferBytes.data());
+    float* fptrVertNorm = reinterpret_cast<float*>(bufferBytesVertNorm.data());
+
+    QByteArray bufferBytesColor;
+    bufferBytesColor.resize(strideColor * nVerts);
+
+    float* fptrColor = reinterpret_cast<float*>(bufferBytesColor.data());
 
     for(int i = 0; i<vertices.cols(); i++) {
         //position x y z
-        *fptr++ = vertices(0,i);
-        *fptr++ = vertices(1,i);
-        *fptr++ = vertices(2,i);
+        *fptrVertNorm++ = vertices(0,i);
+        *fptrVertNorm++ = vertices(1,i);
+        *fptrVertNorm++ = vertices(2,i);
 
-        //texture u v
-//        *fptr++ = 1;
-//        *fptr++ = 1;
+        //normals x y z
+        *fptrVertNorm++ = normals(0,i);
+        *fptrVertNorm++ = normals(1,i);
+        *fptrVertNorm++ = normals(2,i);
 
         //color rgb - if inflated color sulci and gyrus differently
         //if(surface.surf() == "inflated") {
             if(surface.curv()[i] >= 0){
-                *fptr++ = (float)(100.0 / 255.0);
-                *fptr++ = (float)(200.0 / 255.0);
-                *fptr++ = (float)(25.0 / 255.0);
+                *fptrColor++ = (float)(50.0 / 255.0);   //100
+                *fptrColor++ = (float)(50.0 / 255.0);   //200
+                *fptrColor++ = (float)(50.0 / 255.0);   //25
             }
             else {
-                *fptr++ = (float)(24.0 / 255.0);
-                *fptr++ = (float)(100.0 / 255.0);
-                *fptr++ = (float)(75.0 / 255.0);
+                *fptrColor++ = (float)(100.0 / 255.0);   //24
+                *fptrColor++ = (float)(100.0 / 255.0);   //100
+                *fptrColor++ = (float)(100.0 / 255.0);   //75
             }
 //        }
 //        else {
-//            *fptr++ = (float)(1.0 / 255.0);
-//            *fptr++ = (float)(1.0 / 255.0);
-//            *fptr++ = (float)(1.0 / 255.0);
+//            *fptrColor++ = (float)(1.0 / 255.0);
+//            *fptrColor++ = (float)(1.0 / 255.0);
+//            *fptrColor++ = (float)(1.0 / 255.0);
 //        }
-
-        //normals x y z
-        *fptr++ = normals(0,i);
-        *fptr++ = normals(1,i);
-        *fptr++ = normals(2,i);
     }
 
-    //Create OpenGL buffer
-    BufferPtr buf(new Buffer(QOpenGLBuffer::VertexBuffer));
-    buf->setUsage(QOpenGLBuffer::StaticDraw);
-    buf->setData(bufferBytes);
+    //Create OpenGL buffers
+    BufferPtr bufVertNormnew(new Buffer(QOpenGLBuffer::VertexBuffer));
+    bufVertNormnew->setUsage(QOpenGLBuffer::StaticDraw);
+    bufVertNormnew->setData(bufferBytesVertNorm);
+
+    BufferPtr bufColor(new Buffer(QOpenGLBuffer::VertexBuffer));
+    bufColor->setUsage(QOpenGLBuffer::DynamicDraw);
+    bufColor->setData(bufferBytesColor);
 
     //Set vertices to OpenGL buffer
-    mesh->addAttribute(QMeshData::defaultPositionAttributeName(), QAbstractAttributePtr(new Attribute(buf, GL_FLOAT_VEC3, nVerts, 0, stride)));
+    mesh->addAttribute(QMeshData::defaultPositionAttributeName(), QAbstractAttributePtr(new Attribute(bufVertNormnew, GL_FLOAT_VEC3, nVerts, 0, strideVertNorm)));
     quint32 offset = sizeof(float) * 3;
 
-//    //Set textures to OpenGL buffer
-//    mesh->addAttribute(QMeshData::defaultTextureCoordinateAttributeName(), QAbstractAttributePtr(new Attribute(buf, GL_FLOAT_VEC2, nVerts, offset, stride)));
-//    offset += sizeof(float) * 2;
-
-    mesh->addAttribute(QMeshData::defaultColorAttributeName(), QAbstractAttributePtr(new Attribute(buf, GL_FLOAT_VEC4, nVerts, offset, stride)));
-    offset += sizeof(float) * 3;
-
     //Set normals to OpenGL buffer
-    mesh->addAttribute(QMeshData::defaultNormalAttributeName(), QAbstractAttributePtr(new Attribute(buf, GL_FLOAT_VEC3, nVerts, offset, stride)));
-    offset += sizeof(float) * 3;
+    mesh->addAttribute(QMeshData::defaultNormalAttributeName(), QAbstractAttributePtr(new Attribute(bufVertNormnew, GL_FLOAT_VEC3, nVerts, offset, strideVertNorm)));
+
+    //Set color to OpenGL buffer
+    mesh->addAttribute(QMeshData::defaultColorAttributeName(), QAbstractAttributePtr(new Attribute(bufColor, GL_FLOAT_VEC3, nVerts, 0, strideColor)));
 
     //Generate faces out of tri information
     QByteArray indexBytes;
     int number_faces = faces.cols();
     int indices = number_faces * 3;
-    stride = 3 * sizeof(float);
 
     indexBytes.resize(indices * sizeof(quint32));
     quint32* indexPtr = reinterpret_cast<quint32*>(indexBytes.data());
@@ -195,12 +196,13 @@ QMeshDataPtr createSurfaceMesh(const Surface &surface)
     }
 
     BufferPtr indexBuffer(new Buffer(QOpenGLBuffer::IndexBuffer));
-    indexBuffer->setUsage(QOpenGLBuffer::DynamicDraw);
+    indexBuffer->setUsage(QOpenGLBuffer::StaticDraw);
     indexBuffer->setData(indexBytes);
     mesh->setIndexAttribute(AttributePtr(new Attribute(indexBuffer, GL_UNSIGNED_INT, indices, 0, 0)));
 
     mesh->computeBoundsFromAttribute(QMeshData::defaultPositionAttributeName());
 
+    std::cout<<"Created QMeshData"<<std::endl;
     return mesh;
 }
 

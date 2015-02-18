@@ -152,6 +152,7 @@ void BrainView::init(const QString& p_sFile, const QString &subject_id, qint32 h
 
     // Set root object of the scene
     m_Engine.setRootEntity(m_pRootEntity);
+
 }
 
 
@@ -225,4 +226,16 @@ void BrainView::createCoordSystem(QEntity *rootEntity)
     phongMaterialZ->setSpecular(Qt::white);
     phongMaterialZ->setShininess(50.0f);
     m_ZAxisEntity->addComponent(phongMaterialZ);
+}
+
+void BrainView::mousePressEvent(QMouseEvent *e)
+{
+std::cout<<"mouse click"<<std::endl;
+    if(e->buttons() & Qt::RightButton)
+    {
+        std::cout<<"mouse click"<<std::endl;
+    }
+
+    m_pBrainSurfaceEntity->changeColor();
+
 }
