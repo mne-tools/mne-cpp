@@ -188,6 +188,14 @@ protected:
 
     void createCoordSystem(QEntity *rootEntity);
 
+    //=========================================================================================================
+    /**
+    * Processes the mouse press event e.
+    *
+    * @param[in] e      the mouse press event.
+    */
+    void mousePressEvent(QMouseEvent *e);
+
     QAspectEngine m_Engine;
     QInputAspect *m_pAspectInput;
     QVariantMap m_data;

@@ -83,6 +83,9 @@ void BrainHemisphere::init()
 {
     //Create mesh for left hemisphere
     m_pSurfaceMesh = QSharedPointer<BrainSurfaceMesh>(new BrainSurfaceMesh(m_surface));
+    m_pSurfaceMesh->setObjectName("m_pSurfaceMesh");
+
+    //this->setMesh(m_pSurfaceMesh.data());
     this->addComponent(m_pSurfaceMesh.data());
 
     //Translate to the right if this hemisphere is right hemisphere and is inflated
@@ -90,7 +93,7 @@ void BrainHemisphere::init()
         this->translateTransform()->setDx(this->scaleTransform()->scale()/10);
 
     //Set material
-    QPerVertexMaterial *qVertexMaterial = new QPerVertexMaterial();
+    QVertexMaterial *qVertexMaterial = new QVertexMaterial();
     this->addComponent(qVertexMaterial);
 
 //    QMaterial *qMaterial = new QMaterial();

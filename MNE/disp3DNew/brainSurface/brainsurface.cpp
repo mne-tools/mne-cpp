@@ -113,6 +113,88 @@ BrainSurface::BrainSurface(const QString& p_sFile, QEntity *parent)
 
 BrainSurface::~BrainSurface()
 {
+
+}
+
+
+//*************************************************************************************************************
+
+void BrainSurface::changeColor()
+{
+    // Find color buffer, create colors and change color for vertices
+    std::cout << "changeColor"<<std::endl;
+
+    int indexSurfaceMesh;
+    QComponentList componentsList = m_pLeftHemisphere->components();
+    for(int i = 0; i<componentsList.size(); i++)
+        if(componentsList.at(i)->objectName() == "m_pSurfaceMesh")
+            indexSurfaceMesh = i;
+
+    std::cout << "indexSurfaceMesh "<<indexSurfaceMesh<<std::endl;
+
+    QMesh *mesh = (QMesh*)componentsList.at(indexSurfaceMesh);
+
+    QAbstractMeshFunctorPtr functor = mesh->meshFunctor();
+    QMeshDataPtr dataMesh = functor->operator ()();
+    QList<QAbstractBufferPtr> buffers = dataMesh->buffers();
+
+    int colorBufferListIndex;
+    for(int i = 0; i<dataMesh->attributeNames().size(); i++)
+        if(dataMesh->attributeNames().at(i) == "vertexColor")
+            colorBufferListIndex = i;
+
+    std::cout << "colorBufferListIndex "<<colorBufferListIndex<<std::endl;
+
+    QAbstractBufferPtr currentColorBuffer = buffers.at(colorBufferListIndex);
+    QByteArray currentColors = currentColorBuffer->data();
+    float* fptrCurrentColor = reinterpret_cast<float*>(currentColors.data());
+
+
+    std::cout << "elements in color buffer "<<currentColors.size()/(3*sizeof(float))<<std::endl;
+
+    std::cout<<*fptrCurrentColor++<<" "<<*fptrCurrentColor++<<" "<<*fptrCurrentColor<<std::endl;
+
+//    for(int i = 0; i<2; i++) {
+//        std::cout<<(float)currentColors.at(i)<<" "<<(float)currentColors.at(i+1)<<" "<<(float)currentColors.at(i+2)<<std::endl;
+//    }
+
+//    QByteArray newColorBuffer;
+//    newColorBuffer.resize(currentColors.size());
+//    float* fptrColor = reinterpret_cast<float*>(newColorBuffer.data());
+//    int numberVertices = newColorBuffer.size()/(3*sizeof(float));
+
+//    for(int i = 0; i<numberVertices; i++) {
+//        //position x y z
+//        *fptrColor++ = (float)(255.0 / 255.0);
+//        *fptrColor++ = (float)(10.0 / 255.0);
+//        *fptrColor++ = (float)(10.0 / 255.0);
+//        //std::cout<<i<<std::endl;
+//    }
+
+//    fptrColor = reinterpret_cast<float*>(newColorBuffer.data());
+//    for(int i = 0; i<5; i++) {
+//        std::cout<<*fptrColor++<<" "<<*fptrColor++<<" "<<*fptrColor++<<std::endl;
+//    }
+
+//    QAbstractMeshFunctorPtr functorAfter = mesh->meshFunctor();
+//    QMeshDataPtr dataMeshAfter = functorAfter->operator ()();
+//    QList<QAbstractBufferPtr> buffersAfter = dataMesh->buffers();
+
+
+//    for(int i = 0; i<dataMeshAfter->attributeNames().size(); i++)
+//        if(dataMeshAfter->attributeNames().at(i) == "vertexColor")
+//            colorBufferListIndex = i;
+
+//    QAbstractBufferPtr currentColorBufferAfter = buffersAfter.at(colorBufferListIndex);
+//    QByteArray currentColorsAfter = currentColorBufferAfter->data();
+//    float* fptrCurrentColorAfter = reinterpret_cast<float*>(currentColorsAfter.data());
+
+//    for(int i = 0; i<5; i++) {
+//        std::cout<<*fptrCurrentColorAfter++<<" "<<*fptrCurrentColorAfter++<<" "<<*fptrCurrentColorAfter++<<std::endl;
+//    }
+
+//    currentColorBuffer->setData(newColorBuffer);
+//    mesh->update();
 }
 
 
@@ -130,6 +212,9 @@ void BrainSurface::init()
     }
 
     std::cout << "Number of children "<<this->children().size()<<std::endl;
+
+
+    changeColor();
 
     // Calculate bounding box
     calcBoundingBox();
