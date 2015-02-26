@@ -265,16 +265,16 @@ void RtHpi::run()
     QVector<int> refind(0); // Reference Indices
 
     for(int j=0;j<numCh;j++) {
-        if (m_pFiffInfo->ch_names[j].indexOf("TRG_013") >= 0) {
+        if (m_pFiffInfo->ch_names[j].indexOf("TRG013") >= 0) {
            refind.append(j);
         }
-        if (m_pFiffInfo->ch_names[j].indexOf("TRG_014") >= 0) {
+        if (m_pFiffInfo->ch_names[j].indexOf("TRG014") >= 0) {
            refind.append(j);
         }
-        if (m_pFiffInfo->ch_names[j].indexOf("TRG_015") >= 0) {
+        if (m_pFiffInfo->ch_names[j].indexOf("TRG015") >= 0) {
            refind.append(j);
         }
-        if (m_pFiffInfo->ch_names[j].indexOf("TRG_016") >= 0) {
+        if (m_pFiffInfo->ch_names[j].indexOf("TRG016") >= 0) {
            refind.append(j);
         }
     }
