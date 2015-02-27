@@ -119,93 +119,40 @@ BrainSurface::~BrainSurface()
 
 //*************************************************************************************************************
 
-void BrainSurface::changeColor()
+void BrainSurface::updateActivation(const QList<QColor> &activationRightHemi, const QList<QColor> &activationLeftHemi)
 {
-    // Find color buffer, create colors and change color for vertices
-    std::cout << "changeColor"<<std::endl;
+    // LEFT HEMISPHERE
+    //Find brain mesh as component
+    int indexSurfaceMeshLeftHemi;
+    QComponentList componentsListLeftHemi = m_pLeftHemisphere->components();
+    for(int i = 0; i<componentsListLeftHemi.size(); i++)
+        if(componentsListLeftHemi.at(i)->objectName() == "m_pSurfaceMesh")
+            indexSurfaceMeshLeftHemi = i;
 
-    //Find mesh as component
-    int indexSurfaceMesh;
-    QComponentList componentsList = m_pLeftHemisphere->components();
-    for(int i = 0; i<componentsList.size(); i++)
-        if(componentsList.at(i)->objectName() == "m_pSurfaceMesh")
-            indexSurfaceMesh = i;
+    BrainSurfaceMesh *meshLeftHemi = (BrainSurfaceMesh*)componentsListLeftHemi.at(indexSurfaceMeshLeftHemi);
 
-    std::cout << "indexSurfaceMesh " << indexSurfaceMesh << std::endl;
+    //Update activation
+    //meshLeftHemi->updateActivation(activationLeftHemi);
 
-    QMesh *mesh = (QMesh*)componentsList.at(indexSurfaceMesh);
+    // RIGHT HEMISPHERE
+    //Find brain mesh as component
+    int indexSurfaceMeshRightHemi;
+    QComponentList componentsListRightHemi = m_pRightHemisphere->components();
+    for(int i = 0; i<componentsListRightHemi.size(); i++)
+        if(componentsListRightHemi.at(i)->objectName() == "m_pSurfaceMesh")
+            indexSurfaceMeshRightHemi = i;
 
-    //Get ptr to mesh data buffers
-    QAbstractMeshFunctorPtr functor = mesh->meshFunctor();
-    QMeshDataPtr dataMesh = functor->operator ()();
-    QList<QAbstractBufferPtr> buffers = dataMesh->buffers();
+    BrainSurfaceMesh *meshRightHemi = (BrainSurfaceMesh*)componentsListRightHemi.at(indexSurfaceMeshRightHemi);
 
-    //Find color buffer
-    int colorBufferListIndex;
-    for(int i = 0; i<dataMesh->attributeNames().size(); i++) {
-        std::cout<<dataMesh->attributeNames().at(i).toStdString()<<std::endl;
-        if(dataMesh->attributeNames().at(i) == "vertexColor")
-            colorBufferListIndex = i;
-    }
+    //Update activation
+    m_qlColors.clear();
+    for(int i = 0; i<m_SurfaceSet[1].rr().rows() ; i++)
+        if(m_SurfaceSet[1].curv()[i] >= 0)
+            m_qlColors<<QColor(255.0, 50.0, 50.0);
+        else
+            m_qlColors<<QColor(80.0, 60.0, 100.0);
 
-    std::cout << "colorBufferListIndex "<<colorBufferListIndex<<std::endl;
-
-    QAbstractBufferPtr currentColorBuffer = buffers.at(colorBufferListIndex);
-    QByteArray currentColors = currentColorBuffer->data();
-
-    std::cout << "elements in color buffer "<<currentColors.size()/(3*sizeof(float))<<std::endl;
-
-    float* fptrCurrentColor = reinterpret_cast<float*>(currentColors.data());
-
-    std::cout<<*fptrCurrentColor++<<" "<<*fptrCurrentColor++<<" "<<*fptrCurrentColor<<std::endl;
-
-
-//    std::cout<<*fptrCurrentColor++<<" "<<*fptrCurrentColor++<<" "<<*fptrCurrentColor<<std::endl;
-
-//    for(int i = 0; i<2; i++) {
-//        std::cout<<(float)currentColors.at(i)<<" "<<(float)currentColors.at(i+1)<<" "<<(float)currentColors.at(i+2)<<std::endl;
-//    }
-
-//    QByteArray newColorBuffer;
-//    newColorBuffer.resize(currentColors.size());
-//    float* fptrColor = reinterpret_cast<float*>(newColorBuffer.data());
-//    int numberVertices = newColorBuffer.size()/(3*sizeof(float));
-
-//    for(int i = 0; i<numberVertices; i++) {
-//        //position x y z
-//        newColorBuffer[i] = (float)(255.0 / 255.0);
-//        newColorBuffer[i+1] = (float)(10.0 / 255.0);
-//        newColorBuffer[i+2] = (float)(10.0 / 255.0);
-
-//        *fptrColor++ = (float)(255.0 / 255.0);
-//        *fptrColor++ = (float)(10.0 / 255.0);
-//        *fptrColor++ = (float)(10.0 / 255.0);
-        //std::cout<<i<<std::endl;
-//    }
-
-//    for(int i = 0; i<2; i++) {
-//        std::cout<<(float)newColorBuffer.at(i)<<" "<<(float)newColorBuffer.at(i+1)<<" "<<(float)newColorBuffer.at(i+2)<<std::endl;
-//    }
-
-//    QAbstractMeshFunctorPtr functorAfter = mesh->meshFunctor();
-//    QMeshDataPtr dataMeshAfter = functorAfter->operator ()();
-//    QList<QAbstractBufferPtr> buffersAfter = dataMesh->buffers();
-
-
-//    for(int i = 0; i<dataMeshAfter->attributeNames().size(); i++)
-//        if(dataMeshAfter->attributeNames().at(i) == "vertexColor")
-//            colorBufferListIndex = i;
-
-//    QAbstractBufferPtr currentColorBufferAfter = buffersAfter.at(colorBufferListIndex);
-//    QByteArray currentColorsAfter = currentColorBufferAfter->data();
-//    float* fptrCurrentColorAfter = reinterpret_cast<float*>(currentColorsAfter.data());
-
-//    for(int i = 0; i<5; i++) {
-//        std::cout<<*fptrCurrentColorAfter++<<" "<<*fptrCurrentColorAfter++<<" "<<*fptrCurrentColorAfter++<<std::endl;
-//    }
-
-//    currentColorBuffer->setData(newColorBuffer);
-//    mesh->update();
+    meshRightHemi->updateActivation(m_qlColors);
 }
 
 
@@ -223,9 +170,6 @@ void BrainSurface::init()
     }
 
     std::cout << "Number of children "<<this->children().size()<<std::endl;
-
-
-    changeColor();
 
     // Calculate bounding box
     calcBoundingBox();

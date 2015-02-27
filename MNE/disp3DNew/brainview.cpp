@@ -112,7 +112,7 @@ void BrainView::init(const QString& p_sFile, const QString &subject_id, qint32 h
 
     m_Engine.registerAspect(new Qt3D::QRenderAspect());
     Qt3D::QInputAspect *m_pAspectInput = new Qt3D::QInputAspect;
-    m_Engine.registerAspect(m_pAspectInput);
+    //m_Engine.registerAspect(m_pAspectInput);
     m_Engine.initialize();
 
     m_data.insert(QStringLiteral("surface"), QVariant::fromValue(static_cast<QSurface *>(this)));
@@ -230,12 +230,15 @@ void BrainView::createCoordSystem(QEntity *rootEntity)
 
 void BrainView::mousePressEvent(QMouseEvent *e)
 {
-std::cout<<"mouse click"<<std::endl;
+    std::cout<<"mouse click"<<std::endl;
     if(e->buttons() & Qt::RightButton)
     {
         std::cout<<"mouse click"<<std::endl;
     }
 
-    m_pBrainSurfaceEntity->changeColor();
+    QList<QColor> left;
+    QList<QColor> right;
+
+    m_pBrainSurfaceEntity->updateActivation(left, right);
 
 }
