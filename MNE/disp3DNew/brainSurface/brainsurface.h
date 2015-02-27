@@ -158,7 +158,14 @@ public:
     */
     ~BrainSurface();
 
-    void changeColor();
+    //=========================================================================================================
+    /**
+    * Updates the current activation.
+    *
+    * @param[in] activationRightHemi            activation already color coded for the right hemisphere
+    * @param[in] activationLeftHemi             activation already color coded for the left hemisphere
+    */
+    void updateActivation(const QList<QColor> &activationRightHemi, const QList<QColor> &activationLeftHemi);
 
 protected:
     //=========================================================================================================
@@ -178,6 +185,7 @@ protected:
 
     SurfaceSet m_SurfaceSet;                        /**< Surface set */
     AnnotationSet m_AnnotationSet;                  /**< Annotation set */
+    QList<QColor> m_qlColors;                       /**< current colors which also reflect the activation */
 
     QVector3D m_vecBoundingBoxMin;                  /**< X, Y, Z minima. */
     QVector3D m_vecBoundingBoxMax;                  /**< X, Y, Z maxima. */

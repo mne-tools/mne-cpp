@@ -56,6 +56,7 @@
 
 #include <Qt3DRenderer/qt3drenderer_global.h>
 #include <Qt3DRenderer/QMesh.h>
+#include <QColor>
 
 
 //*************************************************************************************************************
@@ -122,16 +123,20 @@ public:
     * Default constructor
     *
     * @param[in] sourceSpace  Source space which contains the geometry information
+    * @param[in] vertexColor  color representing the source activation
     * @param[in] parent         The parent node
     */
-    explicit BrainSurfaceMesh(const Surface &surf, QNode *parent = 0);
+    explicit BrainSurfaceMesh(const Surface &surf, const QList<QColor> &vertexColor, QNode *parent = 0);
 
     QAbstractMeshFunctorPtr meshFunctor() const;
+
+    void updateActivation(const QList<QColor> &vertexColor);
 
 protected:
     void copy(const QNode *ref);
 
     Surface m_surface;
+    QList<QColor> m_qlVertexColor;
 
 private:
     Q_DECLARE_PRIVATE(BrainSurfaceMesh)
@@ -143,12 +148,13 @@ class DISP3DNEWSHARED_EXPORT BrainSurfaceMeshFunctor : public QAbstractMeshFunct
 {
 
 public:
-    BrainSurfaceMeshFunctor(const Surface &surf);
+    BrainSurfaceMeshFunctor(const Surface &surf, const QList<QColor> &vertexColor);
     QMeshDataPtr operator ()();
     bool operator ==(const QAbstractMeshFunctor &other) const;
 
 private:
-    Surface m_surface;
+    const Surface m_surface;
+    const QList<QColor> m_qlVertexColor;
 };
 
 

@@ -132,6 +132,7 @@ protected:
     BrainSurfaceMesh::SPtr m_pSurfaceMesh;
 
     Surface m_surface;
+    QList<QColor> m_qlColors;
 
 private:
 };
