@@ -102,7 +102,7 @@ using namespace FSLIB;
 *
 * @brief Holds the data of one hemisphere in form of a mesh.
 */
-class DISP3DNEWSHARED_EXPORT BrainSurfaceMesh : public QMesh
+class DISP3DNEWSHARED_EXPORT BrainSurfaceMesh : public QAbstractMesh
 {
     Q_OBJECT
 public:

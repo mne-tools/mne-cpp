@@ -73,7 +73,7 @@ using namespace DISP3DNEWLIB;
 //=============================================================================================================
 
 BrainSurfaceMesh::BrainSurfaceMesh(QNode *parent)
-: QMesh(parent)
+: QAbstractMesh(parent)
 {
     update();
 }
@@ -82,7 +82,7 @@ BrainSurfaceMesh::BrainSurfaceMesh(QNode *parent)
 //*************************************************************************************************************
 
 BrainSurfaceMesh::BrainSurfaceMesh(const Surface &surf, QNode *parent)
-: QMesh(parent)
+: QAbstractMesh(parent)
 , m_surface(surf)
 {
     update();
@@ -117,8 +117,10 @@ QMeshDataPtr createSurfaceMesh(const Surface &surface)
 
     quint32 elementSizeVertNorm = 3 + 3; // vec3 pos, vec3 normal
     quint32 elementSizeColor = 3; // vec3 color
+    quint32 elementSizeColorIndex = 3; // 1 int color index
     quint32 strideVertNorm = elementSizeVertNorm * sizeof(float);
     quint32 strideColor = elementSizeColor * sizeof(float);
+    quint32 strideColorIndex = elementSizeColorIndex * sizeof(float);
 
     QByteArray bufferBytesVertNorm;
     bufferBytesVertNorm.resize(strideVertNorm * nVerts);
@@ -130,6 +132,11 @@ QMeshDataPtr createSurfaceMesh(const Surface &surface)
 
     float* fptrColor = reinterpret_cast<float*>(bufferBytesColor.data());
 
+    QByteArray bufferBytesColorIndex;
+    bufferBytesColorIndex.resize(strideColorIndex * nVerts);
+
+    float* fptrColorIndex = reinterpret_cast<float*>(bufferBytesColor.data());
+
     for(int i = 0; i<vertices.cols(); i++) {
         //position x y z
         *fptrVertNorm++ = vertices(0,i);
@@ -140,6 +147,9 @@ QMeshDataPtr createSurfaceMesh(const Surface &surface)
         *fptrVertNorm++ = normals(0,i);
         *fptrVertNorm++ = normals(1,i);
         *fptrVertNorm++ = normals(2,i);
+
+        //color index
+        *fptrColorIndex++ = i;
 
         //color rgb - if inflated color sulci and gyrus differently
         //if(surface.surf() == "inflated") {
@@ -167,8 +177,12 @@ QMeshDataPtr createSurfaceMesh(const Surface &surface)
     bufVertNormnew->setData(bufferBytesVertNorm);
 
     BufferPtr bufColor(new Buffer(QOpenGLBuffer::VertexBuffer));
-    bufColor->setUsage(QOpenGLBuffer::DynamicDraw);
+    bufColor->setUsage(QOpenGLBuffer::StaticDraw);
     bufColor->setData(bufferBytesColor);
+
+    BufferPtr bufColorIndex(new Buffer(QOpenGLBuffer::VertexBuffer));
+    bufColorIndex->setUsage(QOpenGLBuffer::StaticDraw);
+    bufColorIndex->setData(bufferBytesColorIndex);
 
     //Set vertices to OpenGL buffer
     mesh->addAttribute(QMeshData::defaultPositionAttributeName(), QAbstractAttributePtr(new Attribute(bufVertNormnew, GL_FLOAT_VEC3, nVerts, 0, strideVertNorm)));
@@ -179,6 +193,9 @@ QMeshDataPtr createSurfaceMesh(const Surface &surface)
 
     //Set color to OpenGL buffer
     mesh->addAttribute(QMeshData::defaultColorAttributeName(), QAbstractAttributePtr(new Attribute(bufColor, GL_FLOAT_VEC3, nVerts, 0, strideColor)));
+
+    //Set color index to OpenGL buffer
+    mesh->addAttribute("vertexColorIndex", QAbstractAttributePtr(new Attribute(bufColorIndex, GL_INT , nVerts, 0, strideColorIndex)));
 
     //Generate faces out of tri information
     QByteArray indexBytes;

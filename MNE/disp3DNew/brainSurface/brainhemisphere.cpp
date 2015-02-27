@@ -94,6 +94,7 @@ void BrainHemisphere::init()
 
     //Set material
     QVertexMaterial *qVertexMaterial = new QVertexMaterial();
+    qVertexMaterial->addParameter(QParameter("testParam", QVector3D(1.0,2.0,3.0)));
     this->addComponent(qVertexMaterial);
 
 //    QMaterial *qMaterial = new QMaterial();
