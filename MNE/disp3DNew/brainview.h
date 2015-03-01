@@ -137,7 +137,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Construts the BrainView set by reading it of the given surface.
+    * Constructs the BrainView set by reading it of the given surface.
     *
     * @param[in] subject_id         Name of subject
     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
@@ -148,7 +148,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Construts the BrainView set by reading it of the given surface.
+    * Constructs the BrainView set by reading it of the given surface.
     *
     * @param[in] subject_id         Name of subject
     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
@@ -160,7 +160,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Construts the BrainView by reading a given surface.
+    * Constructs the BrainView by reading a given surface.
     *
     * @param[in] p_sFile            Surface file name with path
     */
@@ -171,6 +171,14 @@ public:
     * Default destructor
     */
     ~BrainView();
+
+    //=========================================================================================================
+    /**
+    * Appends a new source estimate to the internal inverse producer
+    *
+    * @param[in] p_sourceEstimate   Source estimate to push
+    */
+    //void pushSourceEstimate(MNESourceEstimate &p_sourceEstimate);
 
 protected:
     //=========================================================================================================

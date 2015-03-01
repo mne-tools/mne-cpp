@@ -181,6 +181,12 @@ void BrainSurface::init()
     //Brain initial rotation
     this->rotateTransform()->setAxis(QVector3D(1,0,0));
     this->rotateTransform()->setAngleDeg(-90);
+
+    //Color change test
+//    QList<QColor> left;
+//    QList<QColor> right;
+
+//    updateActivation(left, right);
 }
 
 

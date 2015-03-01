@@ -152,7 +152,6 @@ void BrainView::init(const QString& p_sFile, const QString &subject_id, qint32 h
 
     // Set root object of the scene
     m_Engine.setRootEntity(m_pRootEntity);
-
 }
 
 
