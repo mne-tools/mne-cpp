@@ -65,7 +65,7 @@ using namespace DISP3DNEWLIB;
 StcDataWorker::StcDataWorker(QObject *parent)
 : QThread(parent)
 , m_bIsRunning(false)
-, m_bIsLooping(false)
+, m_bIsLooping(true)
 , m_iAverageSamples(10)
 , m_iCurrentSample(0)
 , m_iUSecIntervall(100)

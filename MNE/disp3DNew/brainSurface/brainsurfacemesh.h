@@ -132,6 +132,8 @@ public:
 
     void updateActivation(const QList<QColor> &vertexColor);
 
+    int getNumberOfVertices();
+
 protected:
     void copy(const QNode *ref);
 

@@ -64,6 +64,7 @@ using namespace DISP3DNEWLIB;
 
 BrainView::BrainView()
 : Qt3D::Window()
+, m_pStcDataModel(QSharedPointer<StcDataModel>(new StcDataModel(this)))
 {
     init(QString(), QString(), -1, QString(), QString(), QString());
 }
@@ -73,6 +74,7 @@ BrainView::BrainView()
 
 BrainView::BrainView(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir)
 : Qt3D::Window()
+, m_pStcDataModel(QSharedPointer<StcDataModel>(new StcDataModel(this)))
 {
     init(QString(), subject_id, hemi, surf, QString(), subjects_dir);
 }
@@ -82,6 +84,7 @@ BrainView::BrainView(const QString &subject_id, qint32 hemi, const QString &surf
 
 BrainView::BrainView(const QString &subject_id, qint32 hemi, const QString &surf, const QString &atlas, const QString &subjects_dir)
 : Qt3D::Window()
+, m_pStcDataModel(QSharedPointer<StcDataModel>(new StcDataModel(this)))
 {
     init(QString(), subject_id, hemi, surf, atlas, subjects_dir);
 }
@@ -91,6 +94,7 @@ BrainView::BrainView(const QString &subject_id, qint32 hemi, const QString &surf
 
 BrainView::BrainView(const QString& p_sFile)
 : Qt3D::Window()
+, m_pStcDataModel(QSharedPointer<StcDataModel>(new StcDataModel(this)))
 {
     init(p_sFile, QString(), -1, QString(), QString(), QString());
 }
@@ -105,6 +109,14 @@ BrainView::~BrainView()
 
 //*************************************************************************************************************
 
+void BrainView::addSourceEstimate(MNESourceEstimate &p_sourceEstimate)
+{
+    m_pStcDataModel->addData(p_sourceEstimate);
+}
+
+
+//*************************************************************************************************************
+
 void BrainView::init(const QString& p_sFile, const QString &subject_id, qint32 hemi, const QString &surf, const QString &atlas, const QString &subjects_dir)
 {
     Q_UNUSED(atlas)
@@ -112,7 +124,7 @@ void BrainView::init(const QString& p_sFile, const QString &subject_id, qint32 h
 
     m_Engine.registerAspect(new Qt3D::QRenderAspect());
     Qt3D::QInputAspect *m_pAspectInput = new Qt3D::QInputAspect;
-    //m_Engine.registerAspect(m_pAspectInput);
+    m_Engine.registerAspect(m_pAspectInput);
     m_Engine.initialize();
 
     m_data.insert(QStringLiteral("surface"), QVariant::fromValue(static_cast<QSurface *>(this)));
@@ -152,6 +164,9 @@ void BrainView::init(const QString& p_sFile, const QString &subject_id, qint32 h
 
     // Set root object of the scene
     m_Engine.setRootEntity(m_pRootEntity);
+
+    //Set stc models to views
+    m_pBrainSurfaceEntity->setModel(m_pStcDataModel);
 }
 
 
@@ -234,10 +249,4 @@ void BrainView::mousePressEvent(QMouseEvent *e)
     {
         std::cout<<"mouse click"<<std::endl;
     }
-
-    QList<QColor> left;
-    QList<QColor> right;
-
-    m_pBrainSurfaceEntity->updateActivation(left, right);
-
 }

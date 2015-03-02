@@ -85,9 +85,9 @@ void BrainHemisphere::init()
     m_qlColors.clear();
     for(int i = 0; i<m_surface.rr().rows() ; i++)
         if(m_surface.curv()[i] >= 0)
-            m_qlColors<<QColor(50.0, 50.0, 50.0);
+            m_qlColors<<QColor(50, 50, 50);
         else
-            m_qlColors<<QColor(100.0, 100.0, 100.0);
+            m_qlColors<<QColor(100, 100, 100);
 
     //Create mesh for left hemisphere
     m_pSurfaceMesh = QSharedPointer<BrainSurfaceMesh>(new BrainSurfaceMesh(m_surface, m_qlColors));

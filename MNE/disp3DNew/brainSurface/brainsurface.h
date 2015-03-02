@@ -47,9 +47,12 @@
 #include "brainhemisphere.h"
 
 #include "../helpers/renderableentity.h"
+#include "../models/stcdatamodel.h"
 
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
+
+#include <disp/colormap.h>
 
 
 //*************************************************************************************************************
@@ -89,6 +92,7 @@ namespace DISP3DNEWLIB
 
 using namespace Qt3D;
 using namespace FSLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -163,9 +167,26 @@ public:
     * Updates the current activation.
     *
     * @param[in] activationRightHemi            activation already color coded for the right hemisphere
-    * @param[in] activationLeftHemi             activation already color coded for the left hemisphere
     */
-    void updateActivation(const QList<QColor> &activationRightHemi, const QList<QColor> &activationLeftHemi);
+    void updateActivation(const QList<QColor> &newActivation);
+
+    //=========================================================================================================
+    /**
+    * Informs the view about the changed data from the set model
+    *
+    * @param[in] topLeft
+    * @param[in] bottomRight
+    * @param[in] roles
+    */
+    void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int> ());
+
+    //=========================================================================================================
+    /**
+    * Sets the data model
+    *
+    * @param[in] model
+    */
+    void setModel(StcDataModel::SPtr model);
 
 protected:
     //=========================================================================================================
@@ -190,6 +211,10 @@ protected:
     QVector3D m_vecBoundingBoxMin;                  /**< X, Y, Z minima. */
     QVector3D m_vecBoundingBoxMax;                  /**< X, Y, Z maxima. */
     QVector3D m_vecBoundingBoxCenter;               /**< X, Y, Z center. */
+
+    StcDataModel::SPtr m_pStcDataModel;
+
+    QList<QColor> m_currentActivationRGB;
 
 private:
 };
