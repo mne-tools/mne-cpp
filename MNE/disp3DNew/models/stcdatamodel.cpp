@@ -140,21 +140,34 @@ QVariant StcDataModel::data(const QModelIndex &index, int role) const
             {
                 if(m_bDataInit && role == Qt::DisplayRole)
                 {
-                    QList<qint32> selVec;
                     QVariant v;
-                    if(row < m_iLHSize)
-                        selVec = m_qMapLabelIdChannelLH.values(m_qListLabels[row].label_id);
-                    else
-                        selVec = m_qMapLabelIdChannelRH.values(m_qListLabels[row].label_id);
 
-                    VectorXd valVec(selVec.size());
+                    VectorXd valVec(m_vecCurRelStc.size());
 
                     if(index.column() == 2) //stc data
-                        for(qint32 i = 0; i < selVec.size(); ++i)
-                            valVec(i) = m_vecCurStc(selVec[i]);
+                        for(qint32 i = 0; i < valVec.rows(); ++i)
+                            valVec(i) = m_vecCurStc(i);
                     else // relative stc data
-                        for(qint32 i = 0; i < selVec.size(); ++i)
-                            valVec(i) = m_vecCurRelStc(selVec[i]);
+                        for(qint32 i = 0; i < valVec.rows(); ++i)
+                            valVec(i) = m_vecCurRelStc(i);
+
+//                    //Cluster version
+//                    QList<qint32> selVec;
+//                    QVariant v;
+//                    if(row < m_iLHSize)
+//                        selVec = m_qMapLabelIdChannelLH.values(m_qListLabels[row].label_id);
+//                    else
+//                        selVec = m_qMapLabelIdChannelRH.values(m_qListLabels[row].label_id);
+
+//                    VectorXd valVec(selVec.size());
+
+//                    if(index.column() == 2) //stc data
+//                        for(qint32 i = 0; i < selVec.size(); ++i)
+//                            valVec(i) = m_vecCurStc(selVec[i]);
+//                    else // relative stc data
+//                        for(qint32 i = 0; i < selVec.size(); ++i)
+//                            valVec(i) = m_vecCurRelStc(selVec[i]);
+
                     v.setValue(valVec);
                     return v;//m_vecCurStc(row));
                 }

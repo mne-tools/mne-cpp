@@ -44,6 +44,7 @@
 #include "disp3DNew_global.h"
 
 #include "brainSurface/brainsurface.h"
+#include "models/stcdatamodel.h"
 
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
@@ -178,7 +179,7 @@ public:
     *
     * @param[in] p_sourceEstimate   Source estimate to push
     */
-    //void pushSourceEstimate(MNESourceEstimate &p_sourceEstimate);
+    void addSourceEstimate(MNESourceEstimate &p_sourceEstimate);
 
 protected:
     //=========================================================================================================
@@ -214,6 +215,8 @@ protected:
     QSharedPointer<Qt3D::QEntity> m_ZAxisEntity;
 
     BrainSurface::SPtr m_pBrainSurfaceEntity;
+
+    StcDataModel::SPtr m_pStcDataModel;
 
 private:
 

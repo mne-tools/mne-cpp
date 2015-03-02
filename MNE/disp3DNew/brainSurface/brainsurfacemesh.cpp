@@ -112,14 +112,24 @@ QAbstractMeshFunctorPtr BrainSurfaceMesh::meshFunctor() const
 
 void BrainSurfaceMesh::updateActivation(const QList<QColor> &vertexColor)
 {
-    if(vertexColor.size() != m_qlVertexColor.size())
+    if(vertexColor.size() != m_qlVertexColor.size()) {
+        std::cout<<"newly provided colors from source estimate do not match loaded number of vertices"<<std::endl;
         return;
+    }
 
     std::cout<<"Updating activation"<<std::endl;
 
     m_qlVertexColor = vertexColor;
 
     update();
+}
+
+
+//*************************************************************************************************************
+
+int BrainSurfaceMesh::getNumberOfVertices()
+{
+    return m_surface.rr().rows();
 }
 
 
@@ -213,7 +223,8 @@ QMeshDataPtr createSurfaceMesh(const Surface &surface, const QList<QColor> &vert
 
     mesh->computeBoundsFromAttribute(QMeshData::defaultPositionAttributeName());
 
-    std::cout<<"Created QMeshData"<<std::endl;
+    //std::cout<<"Created QMeshData"<<std::endl;
+
     return mesh;
 }
 
