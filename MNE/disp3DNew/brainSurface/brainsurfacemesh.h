@@ -129,17 +129,18 @@ public:
     */
     explicit BrainSurfaceMesh(const Surface &surf, const QMap<int, QColor> &qmVertexColor, QNode *parent = 0);
 
-    QAbstractMeshFunctorPtr meshFunctor() const;
+    QAbstractMeshFunctorPtr meshFunctor() const Q_DECL_OVERRIDE;
 
     void updateActivation(const QMap<int, QColor> &vertexColor);
 
     int getNumberOfVertices();
 
 protected:
-    void copy(const QNode *ref);
+    void copy(const QNode *ref) Q_DECL_OVERRIDE;
 
     Surface m_surface;
     QMap<int, QColor> m_qmVertexColor;
+    QAbstractMeshFunctorPtr m_pMeshFunctorPtr;
 
 private:
     Q_DECLARE_PRIVATE(BrainSurfaceMesh)
@@ -152,14 +153,13 @@ class DISP3DNEWSHARED_EXPORT BrainSurfaceMeshFunctor : public QAbstractMeshFunct
 
 public:
     BrainSurfaceMeshFunctor(const Surface &surf, const QMap<int, QColor> &qmVertexColor);
-    QMeshDataPtr operator ()();
-    bool operator ==(const QAbstractMeshFunctor &other) const;
+    QMeshDataPtr operator ()() Q_DECL_OVERRIDE;
+    bool operator ==(const QAbstractMeshFunctor &other) const Q_DECL_OVERRIDE;
 
 private:
     const Surface m_surface;
     const QMap<int, QColor> m_qmVertexColor;
 };
-
 
 } // NAMESPACE
 

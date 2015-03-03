@@ -95,8 +95,9 @@ BrainSurfaceMesh::BrainSurfaceMesh(const Surface &surf, const QMap<int, QColor> 
 void BrainSurfaceMesh::copy(const QNode *ref)
 {
     QAbstractMesh::copy(ref);
-//    const BrainSurfaceMesh *mesh = static_cast<const BrainSurfaceMesh*>(ref);
-//    d_func()->m_surface = mesh->d_func()->m_surface;
+    const BrainSurfaceMesh *mesh = static_cast<const BrainSurfaceMesh*>(ref);
+    m_surface = mesh->m_surface;
+    m_qmVertexColor = mesh->m_qmVertexColor;
 }
 
 
@@ -266,5 +267,6 @@ bool BrainSurfaceMeshFunctor::operator ==(const QAbstractMeshFunctor &other) con
 //    if (otherFunctor != Q_NULLPTR)
 //        return (otherFunctor->m_surface == m_surface &&
 //                otherFunctor->m_qlVertexColor == m_qlVertexColor);
+
     return false;
 }
