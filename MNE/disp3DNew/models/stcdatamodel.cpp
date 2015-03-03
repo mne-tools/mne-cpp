@@ -97,8 +97,8 @@ StcDataModel::~StcDataModel()
 //virtual functions
 int StcDataModel::rowCount(const QModelIndex & /*parent*/) const
 {
-    if(!m_qListLabels.empty())
-        return m_qListLabels.size();
+    if(m_vecCurStc.rows() != 0)
+        return m_vecCurStc.rows();
     else
         return 0;
 }
@@ -129,25 +129,25 @@ QVariant StcDataModel::data(const QModelIndex &index, int role) const
                 break;
             }
             case 1: { // vertex index
-//                std::cout<<"StcDataModel::data() - LH - vertno.rows(): "<<m_pForwardSolution.src[0].vertno.rows()<<std::endl;
-//                std::cout<<"StcDataModel::data() - RH - vertno.rows(): "<<m_pForwardSolution.src[1].vertno.rows()<<std::endl;
+//                std::cout<<"StcDataModel::data() - LH - vertno.rows(): "<<m_forwardSolution.src[0].vertno.rows()<<std::endl;
+//                std::cout<<"StcDataModel::data() - RH - vertno.rows(): "<<m_forwardSolution.src[1].vertno.rows()<<std::endl;
 
                 if(m_bDataInit && role == StcDataModelRoles::GetIndexLH)
-                    return QVariant(m_pForwardSolution.src[0].vertno(row));
+                    return QVariant(m_forwardSolution.src[0].vertno(row));
                     //return QVariant(m_qListLabels[row].label_id);//m_vertLabelIds(row));
 
                 if(m_bDataInit && role == StcDataModelRoles::GetIndexRH)
-                    return QVariant(m_pForwardSolution.src[1].vertno(row));
+                    return QVariant(m_forwardSolution.src[1].vertno(row));
 
                 break;
             }
             case 2: // stc data
             {
-                int numDipolesLH = m_pForwardSolution.src[0].vertno.rows();
-                int numDipolesRH = m_pForwardSolution.src[1].vertno.rows();
+                int numDipolesLH = m_forwardSolution.src[0].vertno.rows();
+                int numDipolesRH = m_forwardSolution.src[1].vertno.rows();
 
-                std::cout<<"StcDataModel::data() - numDipolesLH: "<<numDipolesLH<<std::endl;
-                std::cout<<"StcDataModel::data() - numDipolesRH: "<<numDipolesRH<<std::endl;
+                //std::cout<<"StcDataModel::data() - numDipolesLH: "<<numDipolesLH<<std::endl;
+                //std::cout<<"StcDataModel::data() - numDipolesRH: "<<numDipolesRH<<std::endl;
 
                 QVariant v;
                 if(m_bDataInit && role == StcDataModelRoles::GetStcValLH) {
@@ -172,12 +172,12 @@ QVariant StcDataModel::data(const QModelIndex &index, int role) const
             }
             case 3: // relative stc data
             {
-                int numDipolesLH = m_pForwardSolution.src[0].vertno.rows();
-                int numDipolesRH = m_pForwardSolution.src[1].vertno.rows();
+                int numDipolesLH = m_forwardSolution.src[0].vertno.rows();
+                int numDipolesRH = m_forwardSolution.src[1].vertno.rows();
 
-                std::cout<<"StcDataModel::data() - numDipolesLH: "<<numDipolesLH<<std::endl;
-                std::cout<<"StcDataModel::data() - numDipolesRH: "<<numDipolesRH<<std::endl;
-                std::cout<<"StcDataModel::data() - m_bDataInit: "<<m_bDataInit<<std::endl;
+                //std::cout<<"StcDataModel::data() - numDipolesLH: "<<numDipolesLH<<std::endl;
+                //std::cout<<"StcDataModel::data() - numDipolesRH: "<<numDipolesRH<<std::endl;
+                //std::cout<<"StcDataModel::data() - m_bDataInit: "<<m_bDataInit<<std::endl;
 
                 QVariant v;
                 if(m_bDataInit && role == StcDataModelRoles::GetRelStcValLH) {
@@ -186,7 +186,7 @@ QVariant StcDataModel::data(const QModelIndex &index, int role) const
                     for(qint32 i = 0; i < valVec.rows(); ++i)
                         valVec(i) = m_vecCurRelStc(i);
 
-                    std::cout<<"StcDataModel::data() - LH - valVec.rows(): "<<valVec.rows()<<std::endl;
+                    //std::cout<<"StcDataModel::data() - LH - valVec.rows(): "<<valVec.rows()<<std::endl;
 
                     v.setValue(valVec);
                 }
@@ -197,7 +197,7 @@ QVariant StcDataModel::data(const QModelIndex &index, int role) const
                     for(qint32 i = numDipolesLH; i < numDipolesLH+numDipolesRH; ++i)
                         valVec(i-numDipolesLH) = m_vecCurRelStc(i);
 
-                    std::cout<<"StcDataModel::data() - RH - valVec.rows(): "<<valVec.rows()<<std::endl;
+                    //std::cout<<"StcDataModel::data() - RH - valVec.rows(): "<<valVec.rows()<<std::endl;
 
                     v.setValue(valVec);
                 }
@@ -299,7 +299,7 @@ QVariant StcDataModel::headerData(int section, Qt::Orientation orientation, int 
 
 void StcDataModel::addData(const MNESourceEstimate &stc)
 {
-    std::cout<<"START - StcDataModel::addData()"<<std::endl;
+    //std::cout<<"START - StcDataModel::addData()"<<std::endl;
 
     if(!m_bModelInit || stc.isEmpty()) {
         std::cout<<"stc is empty or model was not correctly initialized"<<std::endl;
@@ -332,7 +332,7 @@ void StcDataModel::addData(const MNESourceEstimate &stc)
 
     m_bDataInit = true;
 
-    std::cout<<"END - StcDataModel::addData()"<<std::endl;
+    //std::cout<<"END - StcDataModel::addData()"<<std::endl;
 }
 
 
@@ -341,103 +341,105 @@ void StcDataModel::addData(const MNESourceEstimate &stc)
 void StcDataModel::init(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, const QString &atlas, const MNEForwardSolution &forwardSolution)
 {
     beginResetModel();
-    m_pForwardSolution = forwardSolution;
-    m_surfSet = SurfaceSet(subject_id, hemi, surf, subjects_dir);
-    m_annotationSet = AnnotationSet(subject_id, hemi, atlas, subjects_dir);
-    m_annotationSet.toLabels(m_surfSet, m_qListLabels, m_qListRGBAs);
+    m_forwardSolution = forwardSolution;
+//    SurfaceSet(subject_id, hemi, surf, subjects_dir);
+//    m_surfSet = SurfaceSet(subject_id, hemi, surf, subjects_dir);
+//    m_annotationSet = AnnotationSet(subject_id, hemi, atlas, subjects_dir);
+//    m_annotationSet.toLabels(m_surfSet, m_qListLabels, m_qListRGBAs);
 
-    float lhOffset = 0;
-    float rhOffset = 0;
-    // MIN MAX
-    for(qint32 h = 0; h < m_annotationSet.size(); ++h)
-    {
-        if(h == 0)
-        {
-            if(QString::compare(m_surfSet.surf(),"inflated") == 0)
-                lhOffset = m_surfSet[h].rr().col(0).maxCoeff(); // X
+//    float lhOffset = 0;
+//    float rhOffset = 0;
+//    // MIN MAX
+//    for(qint32 h = 0; h < m_annotationSet.size(); ++h)
+//    {
+//        if(h == 0)
+//        {
+//            if(QString::compare(m_surfSet.surf(),"inflated") == 0)
+//                lhOffset = m_surfSet[h].rr().col(0).maxCoeff(); // X
 
-            m_vecMinRR.setX(m_surfSet[h].rr().col(0).minCoeff()-lhOffset); // X
-            m_vecMinRR.setY(m_surfSet[h].rr().col(1).minCoeff()); // Y
-            m_vecMinRR.setZ(m_surfSet[h].rr().col(2).minCoeff()); // Z
-            m_vecMaxRR.setX(m_surfSet[h].rr().col(0).maxCoeff()-lhOffset); // X
-            m_vecMaxRR.setY(m_surfSet[h].rr().col(1).maxCoeff()); // Y
-            m_vecMaxRR.setZ(m_surfSet[h].rr().col(2).maxCoeff()); // Z
-        }
-        else
-        {
-            if(QString::compare(m_surfSet.surf(),"inflated") == 0)
-                rhOffset = m_surfSet[h].rr().col(0).maxCoeff(); // X
+//            m_vecMinRR.setX(m_surfSet[h].rr().col(0).minCoeff()-lhOffset); // X
+//            m_vecMinRR.setY(m_surfSet[h].rr().col(1).minCoeff()); // Y
+//            m_vecMinRR.setZ(m_surfSet[h].rr().col(2).minCoeff()); // Z
+//            m_vecMaxRR.setX(m_surfSet[h].rr().col(0).maxCoeff()-lhOffset); // X
+//            m_vecMaxRR.setY(m_surfSet[h].rr().col(1).maxCoeff()); // Y
+//            m_vecMaxRR.setZ(m_surfSet[h].rr().col(2).maxCoeff()); // Z
+//        }
+//        else
+//        {
+//            if(QString::compare(m_surfSet.surf(),"inflated") == 0)
+//                rhOffset = m_surfSet[h].rr().col(0).maxCoeff(); // X
 
-            m_vecMinRR.setX(m_vecMinRR.x() < m_surfSet[h].rr().col(0).minCoeff()+rhOffset ? m_vecMinRR.x() : m_surfSet[h].rr().col(0).minCoeff()+rhOffset); // X
-            m_vecMinRR.setY(m_vecMinRR.y() < m_surfSet[h].rr().col(1).minCoeff() ? m_vecMinRR.y() : m_surfSet[h].rr().col(1).minCoeff()); // Y
-            m_vecMinRR.setZ(m_vecMinRR.z() < m_surfSet[h].rr().col(2).minCoeff() ? m_vecMinRR.z() : m_surfSet[h].rr().col(2).minCoeff()); // Z
-            m_vecMaxRR.setX(m_vecMaxRR.x() > m_surfSet[h].rr().col(0).maxCoeff()+rhOffset ? m_vecMaxRR.x() : m_surfSet[h].rr().col(0).maxCoeff()+rhOffset); // X
-            m_vecMaxRR.setY(m_vecMaxRR.y() > m_surfSet[h].rr().col(1).maxCoeff() ? m_vecMaxRR.y() : m_surfSet[h].rr().col(1).maxCoeff()); // Y
-            m_vecMaxRR.setZ(m_vecMaxRR.z() > m_surfSet[h].rr().col(2).maxCoeff() ? m_vecMaxRR.z() : m_surfSet[h].rr().col(2).maxCoeff()); // Z
-        }
-    }
+//            m_vecMinRR.setX(m_vecMinRR.x() < m_surfSet[h].rr().col(0).minCoeff()+rhOffset ? m_vecMinRR.x() : m_surfSet[h].rr().col(0).minCoeff()+rhOffset); // X
+//            m_vecMinRR.setY(m_vecMinRR.y() < m_surfSet[h].rr().col(1).minCoeff() ? m_vecMinRR.y() : m_surfSet[h].rr().col(1).minCoeff()); // Y
+//            m_vecMinRR.setZ(m_vecMinRR.z() < m_surfSet[h].rr().col(2).minCoeff() ? m_vecMinRR.z() : m_surfSet[h].rr().col(2).minCoeff()); // Z
+//            m_vecMaxRR.setX(m_vecMaxRR.x() > m_surfSet[h].rr().col(0).maxCoeff()+rhOffset ? m_vecMaxRR.x() : m_surfSet[h].rr().col(0).maxCoeff()+rhOffset); // X
+//            m_vecMaxRR.setY(m_vecMaxRR.y() > m_surfSet[h].rr().col(1).maxCoeff() ? m_vecMaxRR.y() : m_surfSet[h].rr().col(1).maxCoeff()); // Y
+//            m_vecMaxRR.setZ(m_vecMaxRR.z() > m_surfSet[h].rr().col(2).maxCoeff() ? m_vecMaxRR.z() : m_surfSet[h].rr().col(2).maxCoeff()); // Z
+//        }
+//    }
 
-    QVector3D vecCenterRR;
-    vecCenterRR.setX((m_vecMinRR.x()+m_vecMaxRR.x())/2.0f);
-    vecCenterRR.setY((m_vecMinRR.y()+m_vecMaxRR.y())/2.0f);
-    vecCenterRR.setZ((m_vecMinRR.z()+m_vecMaxRR.z())/2.0f);
+//    QVector3D vecCenterRR;
+//    vecCenterRR.setX((m_vecMinRR.x()+m_vecMaxRR.x())/2.0f);
+//    vecCenterRR.setY((m_vecMinRR.y()+m_vecMaxRR.y())/2.0f);
+//    vecCenterRR.setZ((m_vecMinRR.z()+m_vecMaxRR.z())/2.0f);
 
-    // Regions -> ToDo QtConcurrent
-//    qDebug() << "Before ROI";
-    for(qint32 h = 0; h < m_annotationSet.size(); ++h)
-    {
-        MatrixX3i tris;
-        MatrixX3f rr = m_surfSet[h].rr();
+//    // Regions -> ToDo QtConcurrent
+////    qDebug() << "Before ROI";
+//    for(qint32 h = 0; h < m_annotationSet.size(); ++h)
+//    {
+//        MatrixX3i tris;
+//        MatrixX3f rr = m_surfSet[h].rr();
 
-        //Centralize
-        if(QString::compare(m_surfSet.surf(),"inflated") == 0)
-        {
-            if(h == 0) //X
-                rr.col(0) = (rr.col(0).array() - lhOffset) - vecCenterRR.x();
-            else
-                rr.col(0) = (rr.col(0).array() + rhOffset) - vecCenterRR.x();
-        }
-        else
-            rr.col(0) = rr.col(0).array() - vecCenterRR.x(); // X
+//        //Centralize
+//        if(QString::compare(m_surfSet.surf(),"inflated") == 0)
+//        {
+//            if(h == 0) //X
+//                rr.col(0) = (rr.col(0).array() - lhOffset) - vecCenterRR.x();
+//            else
+//                rr.col(0) = (rr.col(0).array() + rhOffset) - vecCenterRR.x();
+//        }
+//        else
+//            rr.col(0) = rr.col(0).array() - vecCenterRR.x(); // X
 
-        rr.col(1) = rr.col(1).array() - vecCenterRR.y(); // Y
-        rr.col(2) = rr.col(2).array() - vecCenterRR.z(); // Z
-
-
-        //
-        // Create each ROI
-        //
-        for(qint32 k = 0; k < m_qListLabels.size(); ++k)
-        {
-            //check if label hemi fits current hemi
-            if(m_qListLabels[k].hemi != h)
-                continue;
-
-            //Generate label tri information
-            tris = m_qListLabels[k].selectTris(m_surfSet[h]); //ToDO very slow -> QtConcurrent
+//        rr.col(1) = rr.col(1).array() - vecCenterRR.y(); // Y
+//        rr.col(2) = rr.col(2).array() - vecCenterRR.z(); // Z
 
 
-            Matrix3Xf triCoords(3,3*tris.rows());
+//        //
+//        // Create each ROI
+//        //
+//        for(qint32 k = 0; k < m_qListLabels.size(); ++k)
+//        {
+//            //check if label hemi fits current hemi
+//            if(m_qListLabels[k].hemi != h)
+//                continue;
 
-            for(qint32 i = 0; i < tris.rows(); ++i)
-            {
-                triCoords.col(i*3) = rr.row( tris(i,0) ).transpose();
-                triCoords.col(i*3+1) = rr.row( tris(i,1) ).transpose();
-                triCoords.col(i*3+2) = rr.row( tris(i,2) ).transpose();
-            }
+//            //Generate label tri information
+//            tris = m_qListLabels[k].selectTris(m_surfSet[h]); //ToDO very slow -> QtConcurrent
 
-            m_qListTriRRs.append(triCoords);
-        }
-    }
+
+//            Matrix3Xf triCoords(3,3*tris.rows());
+
+//            for(qint32 i = 0; i < tris.rows(); ++i)
+//            {
+//                triCoords.col(i*3) = rr.row( tris(i,0) ).transpose();
+//                triCoords.col(i*3+1) = rr.row( tris(i,1) ).transpose();
+//                triCoords.col(i*3+2) = rr.row( tris(i,2) ).transpose();
+//            }
+
+//            m_qListTriRRs.append(triCoords);
+//        }
+//    }
 //    qDebug() << "After ROI";
 
-    m_iLHSize = 0;
-    for(qint32 k = 0; k < m_qListLabels.size(); ++k)
-        if(m_qListLabels[k].hemi == 0)
-            ++m_iLHSize;
+//    m_iLHSize = 0;
+//    for(qint32 k = 0; k < m_qListLabels.size(); ++k)
+//        if(m_qListLabels[k].hemi == 0)
+//            ++m_iLHSize;
+
+    m_bModelInit = true;
 
     endResetModel();
-    m_bModelInit = true;
 
     //start the worker
     m_pWorker->start();
@@ -477,12 +479,12 @@ void StcDataModel::setStcSample(const VectorXd &sample)
 
     m_vecCurRelStc = sample/m_dStcNorm;
 
-    std::cout<<"StcDataModel::setStcSample() - m_vecCurStc.rows(): "<<m_vecCurStc.rows()<<std::endl;
-    std::cout<<"StcDataModel::setStcSample() - m_vecCurRelStc.rows(): "<<m_vecCurRelStc.rows()<<std::endl;
+    //std::cout<<"StcDataModel::setStcSample() - m_vecCurStc.rows(): "<<m_vecCurStc.rows()<<std::endl;
+    //std::cout<<"StcDataModel::setStcSample() - m_vecCurRelStc.rows(): "<<m_vecCurRelStc.rows()<<std::endl;
 
     //Update data content -> Bug in QTableView which updates the whole table http://qt-project.org/forums/viewthread/14723
     QModelIndex topLeft = this->index(0,2);
-    QModelIndex bottomRight = this->index(m_qListLabels.size()-1,3);
+    QModelIndex bottomRight = this->index(this->rowCount()-1,3);
     QVector<int> roles; roles << Qt::DisplayRole;
     emit dataChanged(topLeft, bottomRight, roles);
 

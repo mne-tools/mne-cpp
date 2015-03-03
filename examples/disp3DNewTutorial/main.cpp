@@ -424,9 +424,9 @@ int main(int argc, char *argv[])
      // Create the test view
     std::cout<<"Creating BrainView"<<std::endl;
 
-    BrainView testWindow("sample", 2, "orig", "./MNE-sample-data/subjects");
+    BrainView testWindow("sample", 2, "inflated", "./MNE-sample-data/subjects");
 
-    testWindow.initStcDataModel("sample", 2, "orig", "./MNE-sample-data/subjects", "aparc.a2009s", t_Fwd);
+    testWindow.initStcDataModel("sample", 2, "inflated", "./MNE-sample-data/subjects", "aparc.a2009s", t_Fwd);
 
     testWindow.addSourceEstimate(sourceEstimate);
 

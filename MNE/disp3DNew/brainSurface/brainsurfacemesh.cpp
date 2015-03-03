@@ -112,10 +112,10 @@ QAbstractMeshFunctorPtr BrainSurfaceMesh::meshFunctor() const
 
 void BrainSurfaceMesh::updateActivation(const QMap<int, QColor> &qmVertexColor)
 {
-    std::cout<<"START::BrainSurfaceMesh::updateActivation"<<std::endl;
-    std::cout<<"vertexColor.size()"<<qmVertexColor.size()<<std::endl;
-    std::cout<<"m_qlVertexColor.size()"<<m_qmVertexColor.size()<<std::endl;
-    std::cout<<"m_surface.rr().cols()"<<m_surface.rr().rows()<<std::endl;
+    //std::cout<<"START::BrainSurfaceMesh::updateActivation"<<std::endl;
+    //std::cout<<"vertexColor.size()"<<qmVertexColor.size()<<std::endl;
+    //std::cout<<"m_qlVertexColor.size()"<<m_qmVertexColor.size()<<std::endl;
+    //std::cout<<"m_surface.rr().cols()"<<m_surface.rr().rows()<<std::endl;
 
     if(qmVertexColor.size() != m_qmVertexColor.size()) {
         std::cout<<"newly provided colors from source estimate do not match loaded number of vertices"<<std::endl;
@@ -128,7 +128,7 @@ void BrainSurfaceMesh::updateActivation(const QMap<int, QColor> &qmVertexColor)
     m_qmVertexColor = qmVertexColor;
 
     update();
-    std::cout<<"END::BrainSurfaceMesh::updateActivation"<<std::endl;
+    //std::cout<<"END::BrainSurfaceMesh::updateActivation"<<std::endl;
 }
 
 

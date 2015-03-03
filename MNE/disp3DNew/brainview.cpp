@@ -153,6 +153,12 @@ void BrainView::init(const QString& p_sFile, const QString &subject_id, qint32 h
     m_pBrainSurfaceEntity = QSharedPointer<BrainSurface>(new BrainSurface(subject_id, hemi, surf, subjects_dir, m_pRootEntity));
     m_pBrainSurfaceEntity->setObjectName(QStringLiteral("m_pBrainSurfaceEntity"));
 
+    // Light source
+    Qt3D::QPointLight *light1 = new Qt3D::QPointLight();
+    light1->setColor(Qt::white);
+    light1->setIntensity(0.1f);
+    m_pRootEntity->addComponent(light1);
+
     // Build Coordinate System
     createCoordSystem(m_pRootEntity);
 
