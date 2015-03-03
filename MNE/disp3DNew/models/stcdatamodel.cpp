@@ -40,7 +40,6 @@
 
 #include "stcdatamodel.h"
 #include <mne/mne_sourceestimate.h>
-#include <iostream>
 
 
 //*************************************************************************************************************
@@ -84,7 +83,6 @@ StcDataModel::StcDataModel(QObject *parent)
 
 //    m_pWorker->setLoop(true);
 
-    m_pWorker->start();
 }
 
 
@@ -118,8 +116,8 @@ int StcDataModel::columnCount(const QModelIndex & /*parent*/) const
 
 QVariant StcDataModel::data(const QModelIndex &index, int role) const
 {
-    if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
-        return QVariant();
+//    if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
+//        return QVariant();
 
     if (index.isValid()) {
         qint32 row = index.row();
@@ -130,27 +128,84 @@ QVariant StcDataModel::data(const QModelIndex &index, int role) const
                     return QVariant(row);
                 break;
             }
-            case 1: { // vertex
-                if(m_bDataInit && role == Qt::DisplayRole)
-                    return QVariant(m_qListLabels[row].label_id);//m_vertLabelIds(row));
+            case 1: { // vertex index
+//                std::cout<<"StcDataModel::data() - LH - vertno.rows(): "<<m_pForwardSolution.src[0].vertno.rows()<<std::endl;
+//                std::cout<<"StcDataModel::data() - RH - vertno.rows(): "<<m_pForwardSolution.src[1].vertno.rows()<<std::endl;
+
+                if(m_bDataInit && role == StcDataModelRoles::GetIndexLH)
+                    return QVariant(m_pForwardSolution.src[0].vertno(row));
+                    //return QVariant(m_qListLabels[row].label_id);//m_vertLabelIds(row));
+
+                if(m_bDataInit && role == StcDataModelRoles::GetIndexRH)
+                    return QVariant(m_pForwardSolution.src[1].vertno(row));
+
                 break;
             }
             case 2: // stc data
+            {
+                int numDipolesLH = m_pForwardSolution.src[0].vertno.rows();
+                int numDipolesRH = m_pForwardSolution.src[1].vertno.rows();
+
+                std::cout<<"StcDataModel::data() - numDipolesLH: "<<numDipolesLH<<std::endl;
+                std::cout<<"StcDataModel::data() - numDipolesRH: "<<numDipolesRH<<std::endl;
+
+                QVariant v;
+                if(m_bDataInit && role == StcDataModelRoles::GetStcValLH) {
+                    VectorXd valVec(numDipolesLH);
+
+                    for(qint32 i = 0; i < valVec.rows(); ++i)
+                        valVec(i) = m_vecCurStc(i);
+
+                    v.setValue(valVec);
+                }
+
+                if(m_bDataInit && role == StcDataModelRoles::GetStcValRH) {
+                    VectorXd valVec(numDipolesRH);
+
+                    for(qint32 i = numDipolesLH; i < numDipolesLH+numDipolesRH; ++i)
+                        valVec(i-numDipolesLH) = m_vecCurStc(i);
+
+                    v.setValue(valVec);
+                }
+
+                return v;
+            }
             case 3: // relative stc data
             {
-                if(m_bDataInit && role == Qt::DisplayRole)
-                {
-                    QVariant v;
+                int numDipolesLH = m_pForwardSolution.src[0].vertno.rows();
+                int numDipolesRH = m_pForwardSolution.src[1].vertno.rows();
 
-                    VectorXd valVec(m_vecCurRelStc.size());
+                std::cout<<"StcDataModel::data() - numDipolesLH: "<<numDipolesLH<<std::endl;
+                std::cout<<"StcDataModel::data() - numDipolesRH: "<<numDipolesRH<<std::endl;
+                std::cout<<"StcDataModel::data() - m_bDataInit: "<<m_bDataInit<<std::endl;
 
-                    if(index.column() == 2) //stc data
-                        for(qint32 i = 0; i < valVec.rows(); ++i)
-                            valVec(i) = m_vecCurStc(i);
-                    else // relative stc data
-                        for(qint32 i = 0; i < valVec.rows(); ++i)
-                            valVec(i) = m_vecCurRelStc(i);
+                QVariant v;
+                if(m_bDataInit && role == StcDataModelRoles::GetRelStcValLH) {
+                    VectorXd valVec(numDipolesLH);
 
+                    for(qint32 i = 0; i < valVec.rows(); ++i)
+                        valVec(i) = m_vecCurRelStc(i);
+
+                    std::cout<<"StcDataModel::data() - LH - valVec.rows(): "<<valVec.rows()<<std::endl;
+
+                    v.setValue(valVec);
+                }
+
+                if(m_bDataInit && role == StcDataModelRoles::GetRelStcValRH) {
+                    VectorXd valVec(numDipolesRH);
+
+                    for(qint32 i = numDipolesLH; i < numDipolesLH+numDipolesRH; ++i)
+                        valVec(i-numDipolesLH) = m_vecCurRelStc(i);
+
+                    std::cout<<"StcDataModel::data() - RH - valVec.rows(): "<<valVec.rows()<<std::endl;
+
+                    v.setValue(valVec);
+                }
+
+                return v;
+
+//                if(m_bDataInit && role == Qt::DisplayRole)
+//                {
 //                    //Cluster version
 //                    QList<qint32> selVec;
 //                    QVariant v;
@@ -168,9 +223,9 @@ QVariant StcDataModel::data(const QModelIndex &index, int role) const
 //                        for(qint32 i = 0; i < selVec.size(); ++i)
 //                            valVec(i) = m_vecCurRelStc(selVec[i]);
 
-                    v.setValue(valVec);
-                    return v;//m_vecCurStc(row));
-                }
+//                    v.setValue(valVec);
+//                    return v;//m_vecCurStc(row));
+//                }
                 break;
             }
             case 4: { // Label
@@ -244,16 +299,21 @@ QVariant StcDataModel::headerData(int section, Qt::Orientation orientation, int 
 
 void StcDataModel::addData(const MNESourceEstimate &stc)
 {
-    if(!m_bModelInit || stc.isEmpty())
+    std::cout<<"START - StcDataModel::addData()"<<std::endl;
+
+    if(!m_bModelInit || stc.isEmpty()) {
+        std::cout<<"stc is empty or model was not correctly initialized"<<std::endl;
         return;
+    }
 
     if(m_vertLabelIds.size() != stc.data.rows())
     {
         //TODO MAP data 416 to labels 150!!!!!!!!
         //ToDo Map the indices to the regions
         setVertLabelIDs(stc.vertices);
-        m_bDataInit = true;
+
     }
+
 
     QList<VectorXd> data;
     for(qint32 i = 0; i < stc.data.cols(); ++i)
@@ -269,16 +329,21 @@ void StcDataModel::addData(const MNESourceEstimate &stc)
     }
 
     m_pWorker->addData(data);
+
+    m_bDataInit = true;
+
+    std::cout<<"END - StcDataModel::addData()"<<std::endl;
 }
 
 
 //*************************************************************************************************************
 
-void StcDataModel::init(const AnnotationSet &annotationSet, const SurfaceSet &surfSet)
+void StcDataModel::init(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, const QString &atlas, const MNEForwardSolution &forwardSolution)
 {
     beginResetModel();
-    m_annotationSet = annotationSet;
-    m_surfSet = surfSet;
+    m_pForwardSolution = forwardSolution;
+    m_surfSet = SurfaceSet(subject_id, hemi, surf, subjects_dir);
+    m_annotationSet = AnnotationSet(subject_id, hemi, atlas, subjects_dir);
     m_annotationSet.toLabels(m_surfSet, m_qListLabels, m_qListRGBAs);
 
     float lhOffset = 0;
@@ -288,7 +353,7 @@ void StcDataModel::init(const AnnotationSet &annotationSet, const SurfaceSet &su
     {
         if(h == 0)
         {
-            if(QString::compare(surfSet.surf(),"inflated") == 0)
+            if(QString::compare(m_surfSet.surf(),"inflated") == 0)
                 lhOffset = m_surfSet[h].rr().col(0).maxCoeff(); // X
 
             m_vecMinRR.setX(m_surfSet[h].rr().col(0).minCoeff()-lhOffset); // X
@@ -300,7 +365,7 @@ void StcDataModel::init(const AnnotationSet &annotationSet, const SurfaceSet &su
         }
         else
         {
-            if(QString::compare(surfSet.surf(),"inflated") == 0)
+            if(QString::compare(m_surfSet.surf(),"inflated") == 0)
                 rhOffset = m_surfSet[h].rr().col(0).maxCoeff(); // X
 
             m_vecMinRR.setX(m_vecMinRR.x() < m_surfSet[h].rr().col(0).minCoeff()+rhOffset ? m_vecMinRR.x() : m_surfSet[h].rr().col(0).minCoeff()+rhOffset); // X
@@ -325,7 +390,7 @@ void StcDataModel::init(const AnnotationSet &annotationSet, const SurfaceSet &su
         MatrixX3f rr = m_surfSet[h].rr();
 
         //Centralize
-        if(QString::compare(surfSet.surf(),"inflated") == 0)
+        if(QString::compare(m_surfSet.surf(),"inflated") == 0)
         {
             if(h == 0) //X
                 rr.col(0) = (rr.col(0).array() - lhOffset) - vecCenterRR.x();
@@ -371,10 +436,11 @@ void StcDataModel::init(const AnnotationSet &annotationSet, const SurfaceSet &su
         if(m_qListLabels[k].hemi == 0)
             ++m_iLHSize;
 
-    m_vecCurStc = VectorXd::Zero(416);//m_qListLabels.size(),1);
-    m_vecCurRelStc = VectorXd::Zero(416);//m_qListLabels.size(),1);;
     endResetModel();
     m_bModelInit = true;
+
+    //start the worker
+    m_pWorker->start();
 }
 
 
@@ -406,9 +472,13 @@ void StcDataModel::setNormalization(qint32 fraction)
 
 void StcDataModel::setStcSample(const VectorXd &sample)
 {
+    //std::cout<<"StcDataModel::setStcSample()"<<std::endl;
     m_vecCurStc = sample;
 
     m_vecCurRelStc = sample/m_dStcNorm;
+
+    std::cout<<"StcDataModel::setStcSample() - m_vecCurStc.rows(): "<<m_vecCurStc.rows()<<std::endl;
+    std::cout<<"StcDataModel::setStcSample() - m_vecCurRelStc.rows(): "<<m_vecCurRelStc.rows()<<std::endl;
 
     //Update data content -> Bug in QTableView which updates the whole table http://qt-project.org/forums/viewthread/14723
     QModelIndex topLeft = this->index(0,2);
@@ -438,7 +508,6 @@ void StcDataModel::setVertLabelIDs(const VectorXi &vertLabelIDs)
     QMap<qint32, qint32> t_qMapLabelIdChannel;
     for(qint32 i = 0; i < vertLabelIDs.size(); ++i)
         t_qMapLabelIdChannel.insertMulti(vertLabelIDs(i),i);
-
 
     QList<qint32> qListLastIdcs = t_qMapLabelIdChannel.values(vertLabelIDs(vertLabelIDs.size() - 1));
 

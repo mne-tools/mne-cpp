@@ -69,9 +69,10 @@ BrainHemisphere::BrainHemisphere(QNode *parent)
 
 //*************************************************************************************************************
 
-BrainHemisphere::BrainHemisphere(const Surface &surf, QNode *parent)
+BrainHemisphere::BrainHemisphere(const Surface &surf, const QMap<int, QColor> &qmIndexColors, QNode *parent)
 : RenderableEntity(parent)
 , m_surface(surf)
+, m_qmIndexColors(qmIndexColors)
 {
     init();
 }
@@ -81,16 +82,8 @@ BrainHemisphere::BrainHemisphere(const Surface &surf, QNode *parent)
 
 void BrainHemisphere::init()
 {
-    //Init colors
-    m_qlColors.clear();
-    for(int i = 0; i<m_surface.rr().rows() ; i++)
-        if(m_surface.curv()[i] >= 0)
-            m_qlColors<<QColor(50, 50, 50);
-        else
-            m_qlColors<<QColor(100, 100, 100);
-
     //Create mesh for left hemisphere
-    m_pSurfaceMesh = QSharedPointer<BrainSurfaceMesh>(new BrainSurfaceMesh(m_surface, m_qlColors));
+    m_pSurfaceMesh = QSharedPointer<BrainSurfaceMesh>(new BrainSurfaceMesh(m_surface, m_qmIndexColors));
     m_pSurfaceMesh->setObjectName("m_pSurfaceMesh");
 
     //this->setMesh(m_pSurfaceMesh.data());

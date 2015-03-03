@@ -49,6 +49,10 @@
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 
+#include <iostream>
+
+#include "MNE/mne_forwardsolution.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -96,6 +100,22 @@ using namespace Eigen;
 using namespace MNELIB;
 using namespace FSLIB;
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Define model roles
+//=============================================================================================================
+
+namespace StcDataModelRoles
+{
+    enum ItemRole{GetIndexLH = Qt::UserRole + 1001,
+                  GetIndexRH = Qt::UserRole + 1002,
+                  GetStcValLH = Qt::UserRole + 1003,
+                  GetStcValRH = Qt::UserRole + 1004,
+                  GetRelStcValLH = Qt::UserRole + 1005,
+                  GetRelStcValRH = Qt::UserRole + 1006};
+}
+
 //=============================================================================================================
 /**
 * Source estimation informations are provided in a table. They can be accessed via data(row, col).
@@ -133,7 +153,7 @@ public:
 
     void addData(const MNESourceEstimate &stc);
 
-    void init(const AnnotationSet &annotationSet, const SurfaceSet &surfSet);
+    void init(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, const QString &atlas, const MNEForwardSolution &forwardSolution);
 
     inline QVector3D getMin() const;
     inline QVector3D getMax() const;
@@ -150,7 +170,6 @@ public:
 
     void setVertLabelIDs(const VectorXi &vertLabelIDs);
 
-
 private:
     StcDataWorker::SPtr    m_pWorker;
 
@@ -164,7 +183,6 @@ private:
     QMap<qint32, qint32> m_qMapLabelIdChannelLH;
     QMap<qint32, qint32> m_qMapLabelIdChannelRH;
 
-
     VectorXd m_vecCurStc;
     double m_dStcNormMax;
     double m_dStcNorm;
@@ -173,8 +191,6 @@ private:
     //ToDo implement this model as a state pattern -> to be used as ROIStc model and full Stc model
 
     //ROI Stuff
-
-
     QList<Label> m_qListLabels;
     qint32 m_iLHSize;
     QList<RowVector4i> m_qListRGBAs;
@@ -182,6 +198,7 @@ private:
 
     AnnotationSet m_annotationSet;
     SurfaceSet m_surfSet;
+    MNEForwardSolution m_pForwardSolution;
 
     QVector3D m_vecMinRR;                  /**< X, Y, Z minima. */
     QVector3D m_vecMaxRR;                  /**< X, Y, Z maxima. */

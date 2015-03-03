@@ -49,6 +49,8 @@
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 
+#include "MNE/mne_forwardsolution.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -180,6 +182,9 @@ public:
     * @param[in] p_sourceEstimate   Source estimate to push
     */
     void addSourceEstimate(MNESourceEstimate &p_sourceEstimate);
+
+
+    void initStcDataModel(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, const QString &atlas, const MNEForwardSolution &forwardSolution);
 
 protected:
     //=========================================================================================================

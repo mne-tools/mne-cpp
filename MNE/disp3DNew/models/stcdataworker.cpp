@@ -66,9 +66,9 @@ StcDataWorker::StcDataWorker(QObject *parent)
 : QThread(parent)
 , m_bIsRunning(false)
 , m_bIsLooping(true)
-, m_iAverageSamples(10)
+, m_iAverageSamples(1)
 , m_iCurrentSample(0)
-, m_iUSecIntervall(100)
+, m_iUSecIntervall(10000)
 {
     m_data.clear();
 }
@@ -87,11 +87,15 @@ StcDataWorker::~StcDataWorker()
 
 void StcDataWorker::addData(QList<VectorXd> &data)
 {
+    std::cout<<"START::StcDataWorker::addData"<<std::endl;
+
     QMutexLocker locker(&m_qMutex);
     if(data.size() == 0)
         return;
 
     m_data.append(data);
+
+    std::cout<<"END::StcDataWorker::addData"<<std::endl;
 }
 
 
@@ -165,7 +169,7 @@ void StcDataWorker::run()
             m_qMutex.unlock();
         }
 
-        QThread::usleep(m_iUSecIntervall);
+        QThread::msleep(m_iUSecIntervall);
     }
 }
 

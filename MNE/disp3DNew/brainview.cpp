@@ -111,7 +111,21 @@ BrainView::~BrainView()
 
 void BrainView::addSourceEstimate(MNESourceEstimate &p_sourceEstimate)
 {
+    std::cout<<"BrainView::addSourceEstimate()"<<std::endl;
+
     m_pStcDataModel->addData(p_sourceEstimate);
+}
+
+
+//*************************************************************************************************************
+
+void BrainView::initStcDataModel(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, const QString &atlas, const MNEForwardSolution &forwardSolution)
+{
+    // Init stc data model
+    m_pStcDataModel->init(subject_id, hemi, surf, subjects_dir, atlas, forwardSolution);
+
+    //Set stc models to views
+    m_pBrainSurfaceEntity->setModel(m_pStcDataModel);
 }
 
 
@@ -164,9 +178,6 @@ void BrainView::init(const QString& p_sFile, const QString &subject_id, qint32 h
 
     // Set root object of the scene
     m_Engine.setRootEntity(m_pRootEntity);
-
-    //Set stc models to views
-    m_pBrainSurfaceEntity->setModel(m_pStcDataModel);
 }
 
 
