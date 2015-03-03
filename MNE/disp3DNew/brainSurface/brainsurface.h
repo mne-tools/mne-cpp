@@ -166,9 +166,8 @@ public:
     /**
     * Updates the current activation.
     *
-    * @param[in] activationRightHemi            activation already color coded for the right hemisphere
     */
-    void updateActivation(const QList<QColor> &newActivation);
+    void updateActivation();
 
     //=========================================================================================================
     /**
@@ -214,7 +213,10 @@ protected:
 
     StcDataModel::SPtr m_pStcDataModel;
 
-    QList<QColor> m_currentActivationRGB;
+    QMap<int, QColor> m_qmDefaultVertexColorLH;
+    QMap<int, QColor> m_qmDefaultVertexColorRH;
+    QMap<int, QColor> m_qmVertexActivationColorLH;
+    QMap<int, QColor> m_qmVertexActivationColorRH;
 
 private:
 };

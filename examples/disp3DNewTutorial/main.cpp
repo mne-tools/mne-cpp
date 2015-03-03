@@ -331,14 +331,17 @@ int main(int argc, char *argv[])
 
     //
     // calculate the average
-    //
-    //Option 2
-    VectorXi vecSel(20);
 
-//    vecSel << 76, 74, 13, 61, 97, 94, 75, 71, 60, 56, 26, 57, 56, 0, 52, 72, 33, 86, 96, 67;
+    //Option 1
+    qint32 numAverages = 99;
+    VectorXi vecSel(numAverages);
+    srand (time(NULL)); // initialize random seed
 
-    vecSel << 65, 22, 47, 55, 16, 29, 14, 36, 57, 97, 89, 46, 9, 93, 83, 52, 71, 52, 3, 96;
-
+    for(qint32 i = 0; i < vecSel.size(); ++i)
+    {
+        qint32 val = rand() % data.size();
+        vecSel(i) = val;
+    }
 
     std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
 
@@ -392,15 +395,13 @@ int main(int argc, char *argv[])
     // Cluster forward solution;
     //
     MatrixXd D;
-    MNEForwardSolution t_clusteredFwd = t_Fwd;
-    //MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20, D, noise_cov, evoked.info);
 
     //
     // make an inverse operators
     //
     FiffInfo info = evoked.info;
 
-    MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
+    MNEInverseOperator inverse_operator(info, t_Fwd, noise_cov, 0.2f, 0.8f);
 
     //
     // save clustered inverse
@@ -420,11 +421,12 @@ int main(int argc, char *argv[])
 
     if(sourceEstimate.isEmpty())
         return 1;
-
-    // Create the test view
+     // Create the test view
     std::cout<<"Creating BrainView"<<std::endl;
 
     BrainView testWindow("sample", 2, "orig", "./MNE-sample-data/subjects");
+
+    testWindow.initStcDataModel("sample", 2, "orig", "./MNE-sample-data/subjects", "aparc.a2009s", t_Fwd);
 
     testWindow.addSourceEstimate(sourceEstimate);
 

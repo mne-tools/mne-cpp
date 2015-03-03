@@ -81,10 +81,10 @@ BrainSurfaceMesh::BrainSurfaceMesh(QNode *parent)
 
 //*************************************************************************************************************
 
-BrainSurfaceMesh::BrainSurfaceMesh(const Surface &surf, const QList<QColor> &vertexColor, QNode *parent)
+BrainSurfaceMesh::BrainSurfaceMesh(const Surface &surf, const QMap<int, QColor> &qmVertexColor, QNode *parent)
 : QAbstractMesh(parent)
 , m_surface(surf)
-, m_qlVertexColor(vertexColor)
+, m_qmVertexColor(qmVertexColor)
 {
     update();
 }
@@ -104,24 +104,31 @@ void BrainSurfaceMesh::copy(const QNode *ref)
 
 QAbstractMeshFunctorPtr BrainSurfaceMesh::meshFunctor() const
 {
-    return QAbstractMeshFunctorPtr(new BrainSurfaceMeshFunctor(m_surface, m_qlVertexColor));
+    return QAbstractMeshFunctorPtr(new BrainSurfaceMeshFunctor(m_surface, m_qmVertexColor));
 }
 
 
 //*************************************************************************************************************
 
-void BrainSurfaceMesh::updateActivation(const QList<QColor> &vertexColor)
+void BrainSurfaceMesh::updateActivation(const QMap<int, QColor> &qmVertexColor)
 {
-    if(vertexColor.size() != m_qlVertexColor.size()) {
+    std::cout<<"START::BrainSurfaceMesh::updateActivation"<<std::endl;
+    std::cout<<"vertexColor.size()"<<qmVertexColor.size()<<std::endl;
+    std::cout<<"m_qlVertexColor.size()"<<m_qmVertexColor.size()<<std::endl;
+    std::cout<<"m_surface.rr().cols()"<<m_surface.rr().rows()<<std::endl;
+
+    if(qmVertexColor.size() != m_qmVertexColor.size()) {
         std::cout<<"newly provided colors from source estimate do not match loaded number of vertices"<<std::endl;
+        std::cout<<"vertexColor.size()"<<qmVertexColor.size()<<std::endl;
+        std::cout<<"m_qlVertexColor.size()"<<m_qmVertexColor.size()<<std::endl;
+
         return;
     }
 
-    std::cout<<"Updating activation"<<std::endl;
-
-    m_qlVertexColor = vertexColor;
+    m_qmVertexColor = qmVertexColor;
 
     update();
+    std::cout<<"END::BrainSurfaceMesh::updateActivation"<<std::endl;
 }
 
 
@@ -135,13 +142,15 @@ int BrainSurfaceMesh::getNumberOfVertices()
 
 //*************************************************************************************************************
 
-QMeshDataPtr createSurfaceMesh(const Surface &surface, const QList<QColor> &vertexColor)
+QMeshDataPtr createSurfaceMesh(const Surface &surface, const QMap<int, QColor> &qmVertexColor)
 {
     QMeshDataPtr mesh(new QMeshData(QMeshData::Triangles));
 
     //Return if empty surface
-    if(surface.isEmpty() == -1)
+    if(surface.isEmpty() == -1) {
+        std::cout<<"BrainSurfaceMesh - createSurfaceMesh() - Given surface is empty"<<std::endl;
         return mesh;
+    }
 
     //Create opengl data structure
     Matrix3Xf vertices = surface.rr().transpose();
@@ -177,9 +186,11 @@ QMeshDataPtr createSurfaceMesh(const Surface &surface, const QList<QColor> &vert
         *fptrVertNorm++ = normals(2,i);
 
         //color rgb
-        *fptrColor++ = vertexColor.at(i).redF();
-        *fptrColor++ = vertexColor.at(i).greenF();
-        *fptrColor++ = vertexColor.at(i).blueF();
+        *fptrColor++ = (float)qmVertexColor[i].redF();
+        *fptrColor++ = (float)qmVertexColor[i].greenF();
+        *fptrColor++ = (float)qmVertexColor[i].blueF();
+
+        //std::cout<<qmVertexColor[i].redF()<<" "<<qmVertexColor[i].greenF()<<" "<<qmVertexColor[i].blueF()<<std::endl;
     }
 
     //Create OpenGL buffers
@@ -223,7 +234,7 @@ QMeshDataPtr createSurfaceMesh(const Surface &surface, const QList<QColor> &vert
 
     mesh->computeBoundsFromAttribute(QMeshData::defaultPositionAttributeName());
 
-    //std::cout<<"Created QMeshData"<<std::endl;
+    std::cout<<"Created QMeshData"<<std::endl;
 
     return mesh;
 }
@@ -231,10 +242,10 @@ QMeshDataPtr createSurfaceMesh(const Surface &surface, const QList<QColor> &vert
 
 //*************************************************************************************************************
 
-BrainSurfaceMeshFunctor::BrainSurfaceMeshFunctor(const Surface &surf, const QList<QColor> &vertexColor)
+BrainSurfaceMeshFunctor::BrainSurfaceMeshFunctor(const Surface &surf, const QMap<int, QColor> &qmVertexColor)
 : QAbstractMeshFunctor()
 , m_surface(surf)
-, m_qlVertexColor(vertexColor)
+, m_qmVertexColor(qmVertexColor)
 {
 }
 
@@ -243,7 +254,7 @@ BrainSurfaceMeshFunctor::BrainSurfaceMeshFunctor(const Surface &surf, const QLis
 
 QMeshDataPtr BrainSurfaceMeshFunctor::operator ()()
 {
-    return createSurfaceMesh(m_surface, m_qlVertexColor);
+    return createSurfaceMesh(m_surface, m_qmVertexColor);
 }
 
 
@@ -252,7 +263,7 @@ QMeshDataPtr BrainSurfaceMeshFunctor::operator ()()
 bool BrainSurfaceMeshFunctor::operator ==(const QAbstractMeshFunctor &other) const
 {
     const BrainSurfaceMeshFunctor *otherFunctor = dynamic_cast<const BrainSurfaceMeshFunctor *>(&other);
-    if (otherFunctor != Q_NULLPTR)
+//    if (otherFunctor != Q_NULLPTR)
 //        return (otherFunctor->m_surface == m_surface &&
 //                otherFunctor->m_qlVertexColor == m_qlVertexColor);
     return false;

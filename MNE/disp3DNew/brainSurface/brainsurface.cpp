@@ -119,8 +119,10 @@ BrainSurface::~BrainSurface()
 
 //*************************************************************************************************************
 
-void BrainSurface::updateActivation(const QList<QColor> &newActivation)
+void BrainSurface::updateActivation()
 {
+    std::cout<<"START - BrainSurface::updateActivation()"<<std::endl;
+
     // LEFT HEMISPHERE
     //Find brain mesh as component
     int indexSurfaceMeshLeftHemi;
@@ -132,10 +134,7 @@ void BrainSurface::updateActivation(const QList<QColor> &newActivation)
     BrainSurfaceMesh *meshLeftHemi = (BrainSurfaceMesh*)componentsListLeftHemi.at(indexSurfaceMeshLeftHemi);
 
     //Update activation
-    int from = 0;
-    int to = meshLeftHemi->getNumberOfVertices()-1;
-
-    meshLeftHemi->updateActivation(newActivation.mid(from, to));
+    meshLeftHemi->updateActivation(m_qmVertexActivationColorLH);
 
     // RIGHT HEMISPHERE
     //Find brain mesh as component
@@ -148,9 +147,9 @@ void BrainSurface::updateActivation(const QList<QColor> &newActivation)
     BrainSurfaceMesh *meshRightHemi = (BrainSurfaceMesh*)componentsListRightHemi.at(indexSurfaceMeshRightHemi);
 
     //Update activation
-    from = meshLeftHemi->getNumberOfVertices();
-    to = from + meshRightHemi->getNumberOfVertices()-1;
-    meshRightHemi->updateActivation(newActivation.mid(from, to));
+    meshRightHemi->updateActivation(m_qmVertexActivationColorRH);
+
+    std::cout<<"END - BrainSurface::updateActivation()"<<std::endl;
 }
 
 
@@ -158,31 +157,62 @@ void BrainSurface::updateActivation(const QList<QColor> &newActivation)
 
 void BrainSurface::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
+    std::cout<<"START - BrainSurface::dataChanged()"<<std::endl;
+
     //check wether realtive stc data column (3) has changed
     if(topLeft.column() > 3 || bottomRight.column() < 3)
         return;
 
-    VectorXd currentActivation = m_pStcDataModel->data(0,3).value<VectorXd>();
+    //Get LH activation and transform to index/color map
+    VectorXd currentActivationLH = m_pStcDataModel->data(0,3,StcDataModelRoles::GetRelStcValLH).value<VectorXd>();
 
-    m_currentActivationRGB.clear();
+    m_qmVertexActivationColorLH = m_qmDefaultVertexColorLH;
 
-    for(qint32 i = 0; i < currentActivation.rows(); ++i) {
-        qint32 iVal = currentActivation(i) * 255;
+    std::cout<<"BrainSurface::dataChanged() - currentActivationLH.rows(): "<<currentActivationLH.rows()<<std::endl;
+
+    for(qint32 i = 0; i < currentActivationLH.rows(); ++i) {
+        qint32 iVal = currentActivationLH(i) * 255;
 
         iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
 
         QRgb qRgb;
-        qRgb = ColorMap::valueToHotNegative1((double)iVal/255.0);
+        qRgb = ColorMap::valueToHotNegative1((float)iVal/255.0);
 //        qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
 //        qRgb = ColorMap::valueToHot((double)iVal/255.0);
 
-        m_currentActivationRGB<<QColor(qRgb);
+        int vertexIndex = m_pStcDataModel->data(i,1,StcDataModelRoles::GetIndexLH).toInt();
+
+//        std::cout<<"BrainSurface::dataChanged() - vertexIndex: "<<vertexIndex<<std::endl;
+//        std::cout<<"BrainSurface::dataChanged() - qRgb: "<<QColor(qRgb).redF()<<" "<<QColor(qRgb).greenF()<<" "<<QColor(qRgb).blueF()<<std::endl;
+
+        m_qmVertexActivationColorLH[vertexIndex] = QColor(qRgb);
     }
 
-    updateActivation(m_currentActivationRGB);
+    //Get RH activation and transform to index/color map
+    VectorXd currentActivationRH = m_pStcDataModel->data(0,3,StcDataModelRoles::GetRelStcValRH).value<VectorXd>();
 
-    Q_UNUSED( roles );
+    m_qmVertexActivationColorRH = m_qmDefaultVertexColorRH;
 
+    for(qint32 i = 0; i < currentActivationRH.rows(); ++i) {
+        qint32 iVal = currentActivationRH(i) * 255;
+
+        iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
+
+        QRgb qRgb;
+        qRgb = ColorMap::valueToHotNegative1((float)iVal/255.0);
+//        qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
+//        qRgb = ColorMap::valueToHot((double)iVal/255.0);
+
+        int vertexIndex = m_pStcDataModel->data(i,1,StcDataModelRoles::GetIndexRH).toInt();
+
+        m_qmVertexActivationColorRH[vertexIndex] = QColor(qRgb);
+    }
+
+    updateActivation();
+
+    Q_UNUSED(roles);
+
+    std::cout<<"END - BrainSurface::dataChanged()"<<std::endl;
 }
 
 
@@ -201,16 +231,32 @@ void BrainSurface::setModel(StcDataModel::SPtr model)
 
 void BrainSurface::init()
 {
+    //Init sulci gyri colors for LH and RH
+    m_qmDefaultVertexColorLH.clear();
+    for(int i = 0; i<m_SurfaceSet[0].rr().rows() ; i++)
+        if(m_SurfaceSet[0].curv()[i] >= 0)
+            m_qmDefaultVertexColorLH.insertMulti(i, QColor(255.0, 50.0, 50.0));
+        else
+            m_qmDefaultVertexColorLH.insertMulti(i, QColor(80.0, 60.0, 100.0));
+
+    m_qmDefaultVertexColorRH.clear();
+    for(int i = 0; i<m_SurfaceSet[1].rr().rows() ; i++)
+        if(m_SurfaceSet[1].curv()[i] >= 0)
+            m_qmDefaultVertexColorRH.insertMulti(i, QColor(255.0, 50.0, 50.0));
+        else
+            m_qmDefaultVertexColorRH.insertMulti(i, QColor(80.0, 60.0, 100.0));
+
+    m_qmVertexActivationColorLH = m_qmDefaultVertexColorLH;
+    m_qmVertexActivationColorRH = m_qmDefaultVertexColorRH;
+
     //Create hemispheres and add as childs / 0 -> lh, 1 -> rh
     for(int i = 0; i<m_SurfaceSet.size(); i++) {
         if(m_SurfaceSet[i].hemi() == 0)
-            m_pLeftHemisphere = QSharedPointer<BrainHemisphere>(new BrainHemisphere(m_SurfaceSet[i], this));
+            m_pLeftHemisphere = QSharedPointer<BrainHemisphere>(new BrainHemisphere(m_SurfaceSet[i], m_qmVertexActivationColorLH, this));
 
         if(m_SurfaceSet[i].hemi() == 1)
-            m_pRightHemisphere = QSharedPointer<BrainHemisphere>(new BrainHemisphere(m_SurfaceSet[i], this));
+            m_pRightHemisphere = QSharedPointer<BrainHemisphere>(new BrainHemisphere(m_SurfaceSet[i], m_qmVertexActivationColorRH, this));
     }
-
-    std::cout << "Number of children "<<this->children().size()<<std::endl;
 
     // Calculate bounding box
     calcBoundingBox();
@@ -222,16 +268,6 @@ void BrainSurface::init()
     //Brain initial rotation
     this->rotateTransform()->setAxis(QVector3D(1,0,0));
     this->rotateTransform()->setAngleDeg(-90);
-
-    //Init sulci gyri colors
-    m_currentActivationRGB.clear();
-    for(int i = 0; i<m_SurfaceSet[1].rr().rows() ; i++)
-        if(m_SurfaceSet[1].curv()[i] >= 0)
-            m_currentActivationRGB<<QColor(255.0, 50.0, 50.0);
-        else
-            m_currentActivationRGB<<QColor(80.0, 60.0, 100.0);
-
-    updateActivation(m_currentActivationRGB);
 }
 
 
