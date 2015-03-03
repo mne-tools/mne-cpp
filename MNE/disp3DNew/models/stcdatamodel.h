@@ -198,7 +198,7 @@ private:
 
     AnnotationSet m_annotationSet;
     SurfaceSet m_surfSet;
-    MNEForwardSolution m_pForwardSolution;
+    MNEForwardSolution m_forwardSolution;
 
     QVector3D m_vecMinRR;                  /**< X, Y, Z minima. */
     QVector3D m_vecMaxRR;                  /**< X, Y, Z maxima. */

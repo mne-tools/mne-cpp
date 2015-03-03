@@ -218,6 +218,9 @@ protected:
     QMap<int, QColor> m_qmVertexActivationColorLH;
     QMap<int, QColor> m_qmVertexActivationColorRH;
 
+    QColor m_ColorSulci;
+    QColor m_ColorGyri;
+
 private:
 };
 

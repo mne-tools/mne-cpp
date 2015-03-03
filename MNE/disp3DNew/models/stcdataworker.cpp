@@ -68,7 +68,7 @@ StcDataWorker::StcDataWorker(QObject *parent)
 , m_bIsLooping(true)
 , m_iAverageSamples(1)
 , m_iCurrentSample(0)
-, m_iUSecIntervall(10000)
+, m_iUSecIntervall(1)
 {
     m_data.clear();
 }
@@ -87,7 +87,7 @@ StcDataWorker::~StcDataWorker()
 
 void StcDataWorker::addData(QList<VectorXd> &data)
 {
-    std::cout<<"START::StcDataWorker::addData"<<std::endl;
+    //std::cout<<"START::StcDataWorker::addData"<<std::endl;
 
     QMutexLocker locker(&m_qMutex);
     if(data.size() == 0)
@@ -95,7 +95,7 @@ void StcDataWorker::addData(QList<VectorXd> &data)
 
     m_data.append(data);
 
-    std::cout<<"END::StcDataWorker::addData"<<std::endl;
+    //std::cout<<"END::StcDataWorker::addData"<<std::endl;
 }
 
 
@@ -112,7 +112,7 @@ void StcDataWorker::clear()
 
 void StcDataWorker::run()
 {
-    VectorXd m_vecAverage(0,0);
+    VectorXd t_vecAverage(0,0);
 
     m_bIsRunning = true;
 
@@ -137,20 +137,20 @@ void StcDataWorker::run()
             {
                 m_qMutex.lock();
                 //Down sampling in loop mode
-                if(m_vecAverage.rows() != m_data[0].rows())
-                    m_vecAverage = m_data[m_iCurrentSample%m_data.size()];
+                if(t_vecAverage.rows() != m_data[0].rows())
+                    t_vecAverage = m_data[m_iCurrentSample%m_data.size()];
                 else
-                    m_vecAverage += m_data[m_iCurrentSample%m_data.size()];
+                    t_vecAverage += m_data[m_iCurrentSample%m_data.size()];
                 m_qMutex.unlock();
             }
             else
             {
                 m_qMutex.lock();
                 //Down sampling in stream mode
-                if(m_vecAverage.rows() != m_data[0].rows())
-                    m_vecAverage = m_data.front();
+                if(t_vecAverage.rows() != m_data[0].rows())
+                    t_vecAverage = m_data.front();
                 else
-                    m_vecAverage += m_data.front();
+                    t_vecAverage += m_data.front();
 
                 m_data.pop_front();
                 m_qMutex.unlock();
@@ -161,10 +161,10 @@ void StcDataWorker::run()
 
             if(m_iCurrentSample%m_iAverageSamples == 0)
             {
-                m_vecAverage /= (double)m_iAverageSamples;
+                t_vecAverage /= (double)m_iAverageSamples;
 
-                emit stcSample(m_vecAverage);
-                m_vecAverage = VectorXd::Zero(m_vecAverage.rows());
+                emit stcSample(t_vecAverage);
+                t_vecAverage = VectorXd::Zero(t_vecAverage.rows());
             }
             m_qMutex.unlock();
         }
