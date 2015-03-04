@@ -66,9 +66,9 @@ StcDataWorker::StcDataWorker(QObject *parent)
 : QThread(parent)
 , m_bIsRunning(false)
 , m_bIsLooping(true)
-, m_iAverageSamples(1)
+, m_iAverageSamples(10)
 , m_iCurrentSample(0)
-, m_iUSecIntervall(1)
+, m_iUSecIntervall(100)
 {
     m_data.clear();
 }
@@ -118,6 +118,7 @@ void StcDataWorker::run()
 
     while(true)
     {
+        std::cout<<"StcDataWorker Running ... "<<std::endl;
         {
             QMutexLocker locker(&m_qMutex);
             if(!m_bIsRunning)
@@ -137,6 +138,9 @@ void StcDataWorker::run()
             {
                 m_qMutex.lock();
                 //Down sampling in loop mode
+//                std::cout<<"StcDataWorker::run() - m_data.size(): "<<m_data.size()<<std::endl;
+//                std::cout<<"StcDataWorker::run() - m_iCurrentSample: "<<m_iCurrentSample<<std::endl;
+
                 if(t_vecAverage.rows() != m_data[0].rows())
                     t_vecAverage = m_data[m_iCurrentSample%m_data.size()];
                 else
@@ -157,9 +161,9 @@ void StcDataWorker::run()
             }
 
             m_qMutex.lock();
-            ++m_iCurrentSample;
+            m_iCurrentSample+=1;
 
-            if(m_iCurrentSample%m_iAverageSamples == 0)
+            if((m_iCurrentSample/1)%m_iAverageSamples == 0)
             {
                 t_vecAverage /= (double)m_iAverageSamples;
 

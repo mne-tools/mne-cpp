@@ -124,18 +124,20 @@ public:
     * Default constructor
     *
     * @param[in] surf           The surface data
-    * @param[in] qmIndexColors  The surface color data
+    * @param[in] qmVertexColors The surface color data
     * @param[in] parent         The parent node
     */
-    explicit BrainHemisphere(const Surface &surf, const QMap<int, QColor> &qmIndexColors, QNode *parent = 0);
+    explicit BrainHemisphere(const Surface &surf, const QMap<int, QColor> &qmVertexColors, QNode *parent = 0);
+
+    void updateActivation(const QMap<int, QColor> &vertexColor);
 
 protected:
     void init();
 
-    BrainSurfaceMesh::SPtr m_pSurfaceMesh;
+    BrainSurfaceMesh* m_pSurfaceMesh;
 
     Surface m_surface;
-    QMap<int, QColor> m_qmIndexColors;
+    QMap<int, QColor> m_qmVertexColors;
 
 private:
 };

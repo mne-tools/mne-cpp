@@ -143,7 +143,38 @@ int BrainSurfaceMesh::getNumberOfVertices()
 
 //*************************************************************************************************************
 
-QMeshDataPtr createSurfaceMesh(const Surface &surface, const QMap<int, QColor> &qmVertexColor)
+BrainSurfaceMeshFunctor::BrainSurfaceMeshFunctor(const Surface &surf, const QMap<int, QColor> &qmVertexColor)
+: QAbstractMeshFunctor()
+, m_surface(surf)
+, m_qmVertexColor(qmVertexColor)
+{
+}
+
+
+//*************************************************************************************************************
+
+QMeshDataPtr BrainSurfaceMeshFunctor::operator ()()
+{
+    m_qMeshDataPtr = createSurfaceMesh(m_surface, m_qmVertexColor);
+    return m_qMeshDataPtr;
+}
+
+
+//*************************************************************************************************************
+
+bool BrainSurfaceMeshFunctor::operator ==(const QAbstractMeshFunctor &other) const
+{
+    const BrainSurfaceMeshFunctor *otherFunctor = dynamic_cast<const BrainSurfaceMeshFunctor *>(&other);
+//    if (otherFunctor != Q_NULLPTR)
+//        return (otherFunctor->m_surface == m_surface &&
+//                otherFunctor->m_qlVertexColor == m_qlVertexColor);
+
+    return false;
+}
+
+//*************************************************************************************************************
+
+QMeshDataPtr BrainSurfaceMeshFunctor::createSurfaceMesh(const Surface &surface, const QMap<int, QColor> &qmVertexColor)
 {
     QMeshDataPtr mesh(new QMeshData(QMeshData::Triangles));
 
@@ -235,38 +266,8 @@ QMeshDataPtr createSurfaceMesh(const Surface &surface, const QMap<int, QColor> &
 
     mesh->computeBoundsFromAttribute(QMeshData::defaultPositionAttributeName());
 
-    std::cout<<"Created QMeshData"<<std::endl;
+    //std::cout<<"Created QMeshData"<<std::endl;
 
     return mesh;
 }
 
-
-//*************************************************************************************************************
-
-BrainSurfaceMeshFunctor::BrainSurfaceMeshFunctor(const Surface &surf, const QMap<int, QColor> &qmVertexColor)
-: QAbstractMeshFunctor()
-, m_surface(surf)
-, m_qmVertexColor(qmVertexColor)
-{
-}
-
-
-//*************************************************************************************************************
-
-QMeshDataPtr BrainSurfaceMeshFunctor::operator ()()
-{
-    return createSurfaceMesh(m_surface, m_qmVertexColor);
-}
-
-
-//*************************************************************************************************************
-
-bool BrainSurfaceMeshFunctor::operator ==(const QAbstractMeshFunctor &other) const
-{
-    const BrainSurfaceMeshFunctor *otherFunctor = dynamic_cast<const BrainSurfaceMeshFunctor *>(&other);
-//    if (otherFunctor != Q_NULLPTR)
-//        return (otherFunctor->m_surface == m_surface &&
-//                otherFunctor->m_qlVertexColor == m_qlVertexColor);
-
-    return false;
-}

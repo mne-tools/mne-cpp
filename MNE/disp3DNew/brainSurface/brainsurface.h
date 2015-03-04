@@ -200,8 +200,8 @@ protected:
     */
     void calcBoundingBox();
 
-    BrainHemisphere::SPtr m_pLeftHemisphere;
-    BrainHemisphere::SPtr m_pRightHemisphere;
+    BrainHemisphere* m_pLeftHemisphere;
+    BrainHemisphere* m_pRightHemisphere;
 
     SurfaceSet m_SurfaceSet;                        /**< Surface set */
     AnnotationSet m_AnnotationSet;                  /**< Annotation set */

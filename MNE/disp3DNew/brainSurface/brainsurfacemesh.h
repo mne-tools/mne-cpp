@@ -159,6 +159,9 @@ public:
 private:
     const Surface m_surface;
     const QMap<int, QColor> m_qmVertexColor;
+    QMeshDataPtr m_qMeshDataPtr;
+
+    QMeshDataPtr createSurfaceMesh(const Surface &surface, const QMap<int, QColor> &qmVertexColor);
 };
 
 } // NAMESPACE
