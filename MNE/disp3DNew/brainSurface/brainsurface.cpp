@@ -80,7 +80,7 @@ BrainSurface::BrainSurface(const QString &subject_id, qint32 hemi, const QString
 , m_pLeftHemisphere(NULL)
 , m_pRightHemisphere(NULL)
 , m_ColorSulci(QColor(50.0, 50.0, 50.0, 255.0))
-, m_ColorGyri(QColor(200.0, 200.0, 200.0, 255.0))
+, m_ColorGyri(QColor(100.0, 100.0, 100.0, 255.0))
 {
     init();
 }
@@ -129,33 +129,53 @@ BrainSurface::~BrainSurface()
 
 void BrainSurface::updateActivation()
 {
-    //std::cout<<"START - BrainSurface::updateActivation()"<<std::endl;
+    std::cout<<"START - BrainSurface::updateActivation()"<<std::endl;
 
     // LEFT HEMISPHERE
     //Find brain mesh as component
-    int indexSurfaceMeshLeftHemi;
-    QComponentList componentsListLeftHemi = m_pLeftHemisphere->components();
-    for(int i = 0; i<componentsListLeftHemi.size(); i++)
-        if(componentsListLeftHemi.at(i)->objectName() == "m_pSurfaceMesh")
-            indexSurfaceMeshLeftHemi = i;
+//    int indexSurfaceMeshLeftHemi;
+//    QComponentList componentsListLeftHemi = m_pLeftHemisphere->components();
+//    for(int i = 0; i<componentsListLeftHemi.size(); i++)
+//        if(componentsListLeftHemi.at(i)->objectName() == "m_pSurfaceMesh")
+//            indexSurfaceMeshLeftHemi = i;
 
-    BrainSurfaceMesh *meshLeftHemi = (BrainSurfaceMesh*)componentsListLeftHemi.at(indexSurfaceMeshLeftHemi);
+//    //Remove mesh component
+//    m_pLeftHemisphere->removeComponent(componentsListLeftHemi.at(indexSurfaceMeshLeftHemi));
+
+//    //Create new mesh component
+//    if(m_pLeftHemisphere)
+//        delete m_pLeftHemisphere;
+
+//    m_pLeftHemisphere = new BrainHemisphere(m_SurfaceSet[0], m_qmVertexActivationColorLH, this);
+
+//    BrainSurfaceMesh *meshLeftHemi = (BrainSurfaceMesh*)componentsListLeftHemi.at(indexSurfaceMeshLeftHemi);
 
     //Update activation
-    meshLeftHemi->updateActivation(m_qmVertexActivationColorLH);
+    if(m_pLeftHemisphere)
+        m_pLeftHemisphere->updateActivation(m_qmVertexActivationColorLH);
 
     // RIGHT HEMISPHERE
     //Find brain mesh as component
-    int indexSurfaceMeshRightHemi;
-    QComponentList componentsListRightHemi = m_pRightHemisphere->components();
-    for(int i = 0; i<componentsListRightHemi.size(); i++)
-        if(componentsListRightHemi.at(i)->objectName() == "m_pSurfaceMesh")
-            indexSurfaceMeshRightHemi = i;
+//    int indexSurfaceMeshRightHemi;
+//    QComponentList componentsListRightHemi = m_pRightHemisphere->components();
+//    for(int i = 0; i<componentsListRightHemi.size(); i++)
+//        if(componentsListRightHemi.at(i)->objectName() == "m_pSurfaceMesh")
+//            indexSurfaceMeshRightHemi = i;
 
-    BrainSurfaceMesh *meshRightHemi = (BrainSurfaceMesh*)componentsListRightHemi.at(indexSurfaceMeshRightHemi);
+//    //Remove mesh component
+//    m_pRightHemisphere->removeComponent(componentsListRightHemi.at(indexSurfaceMeshRightHemi));
+
+//    //Create new mesh component
+//    if(m_pRightHemisphere)
+//        delete m_pRightHemisphere;
+
+//    m_pRightHemisphere = new BrainHemisphere(m_SurfaceSet[1], m_qmVertexActivationColorRH, this);
+
+//    BrainSurfaceMesh *meshRightHemi = (BrainSurfaceMesh*)componentsListRightHemi.at(indexSurfaceMeshRightHemi);
 
     //Update activation
-    meshRightHemi->updateActivation(m_qmVertexActivationColorRH);
+    if(m_pRightHemisphere)
+        m_pRightHemisphere->updateActivation(m_qmVertexActivationColorRH);
 
     //std::cout<<"END - BrainSurface::updateActivation()"<<std::endl;
 }
@@ -184,21 +204,22 @@ void BrainSurface::dataChanged(const QModelIndex &topLeft, const QModelIndex &bo
     std::cout<<"BrainSurface::dataChanged() - currentActivationLH.rows(): "<<currentActivationLH.rows()<<std::endl;
 
     for(qint32 i = 0; i < currentActivationLH.rows(); ++i) {
-        qint32 iVal = currentActivationLH(i) * 10;
+        qint32 iVal = currentActivationLH(i) * 60;
 
         iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
 
         QRgb qRgb;
-        qRgb = ColorMap::valueToHotNegative1((float)iVal/255.0);
-//        qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
-//        qRgb = ColorMap::valueToHot((double)iVal/255.0);
+//        qRgb = ColorMap::valueToHotNegative1((float)iVal/255.0);
+        qRgb = ColorMap::valueToHotNegative2((float)iVal/255.0);
+//        qRgb = ColorMap::valueToHot((float)iVal/255.0);
 
         int vertexIndex = m_pStcDataModel->data(i,1,StcDataModelRoles::GetIndexLH).toInt();
 
 //        std::cout<<"BrainSurface::dataChanged() - vertexIndex: "<<vertexIndex<<std::endl;
 //        std::cout<<"BrainSurface::dataChanged() - qRgb: "<<QColor(qRgb).redF()<<" "<<QColor(qRgb).greenF()<<" "<<QColor(qRgb).blueF()<<std::endl;
 
-        m_qmVertexActivationColorLH[vertexIndex] = QColor(qRgb);
+        if(iVal>150)
+            m_qmVertexActivationColorLH[vertexIndex] = QColor(qRgb);
     }
 
     //Get RH activation and transform to index/color map
@@ -207,18 +228,19 @@ void BrainSurface::dataChanged(const QModelIndex &topLeft, const QModelIndex &bo
     //m_qmVertexActivationColorRH = m_qmDefaultVertexColorRH;
 
     for(qint32 i = 0; i < currentActivationRH.rows(); ++i) {
-        qint32 iVal = currentActivationRH(i) * 10;
+        qint32 iVal = currentActivationRH(i) * 60;
 
         iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
 
         QRgb qRgb;
-        qRgb = ColorMap::valueToHotNegative1((float)iVal/255.0);
-//        qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
-//        qRgb = ColorMap::valueToHot((double)iVal/255.0);
+//        qRgb = ColorMap::valueToHotNegative1((float)iVal/255.0);
+        qRgb = ColorMap::valueToHotNegative2((float)iVal/255.0);
+//        qRgb = ColorMap::valueToHot((float)iVal/255.0);
 
         int vertexIndex = m_pStcDataModel->data(i,1,StcDataModelRoles::GetIndexRH).toInt();
 
-        m_qmVertexActivationColorRH[vertexIndex] = QColor(qRgb);
+        if(iVal>150)
+            m_qmVertexActivationColorRH[vertexIndex] = QColor(qRgb);
     }
 
     updateActivation();
@@ -265,10 +287,10 @@ void BrainSurface::init()
     //Create hemispheres and add as childs / 0 -> lh, 1 -> rh
     for(int i = 0; i<m_SurfaceSet.size(); i++) {
         if(m_SurfaceSet[i].hemi() == 0)
-            m_pLeftHemisphere = QSharedPointer<BrainHemisphere>(new BrainHemisphere(m_SurfaceSet[i], m_qmVertexActivationColorLH, this));
+            m_pLeftHemisphere = new BrainHemisphere(m_SurfaceSet[i], m_qmVertexActivationColorLH, this);
 
         if(m_SurfaceSet[i].hemi() == 1)
-            m_pRightHemisphere = QSharedPointer<BrainHemisphere>(new BrainHemisphere(m_SurfaceSet[i], m_qmVertexActivationColorRH, this));
+            m_pRightHemisphere = new BrainHemisphere(m_SurfaceSet[i], m_qmVertexActivationColorRH, this);
     }
 
     // Calculate bounding box

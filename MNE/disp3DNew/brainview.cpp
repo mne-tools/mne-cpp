@@ -160,7 +160,7 @@ void BrainView::init(const QString& p_sFile, const QString &subject_id, qint32 h
     m_pRootEntity->addComponent(light1);
 
     // Build Coordinate System
-    createCoordSystem(m_pRootEntity);
+    //createCoordSystem(m_pRootEntity);
 
     // Camera
     Qt3D::QCamera *cameraEntity = new Qt3D::QCamera(m_pRootEntity);

@@ -73,7 +73,7 @@ StcDataModel::StcDataModel(QObject *parent)
 , m_bDataInit(false)
 , m_bIntervallSet(false)
 , m_dStcNormMax(10.0)
-, m_dStcNorm(1.0)
+, m_dStcNorm(15)
 {
     qRegisterMetaType<MatrixXd>("MatrixXd");
     qRegisterMetaType<VectorXd>("VectorXd");
@@ -319,14 +319,14 @@ void StcDataModel::addData(const MNESourceEstimate &stc)
     for(qint32 i = 0; i < stc.data.cols(); ++i)
         data.append(stc.data.col(i));
 
-    if(!m_bIntervallSet)
-    {
-        int usec = floor(stc.tstep*1000000);
-        if(usec <= 0)
-            return;
-        m_pWorker->setInterval(usec);
-        m_bIntervallSet = true;
-    }
+//    if(!m_bIntervallSet)
+//    {
+//        int usec = floor(stc.tstep*1000000);
+//        if(usec <= 0)
+//            return;
+//        m_pWorker->setInterval(usec);
+//        m_bIntervallSet = true;
+//    }
 
     m_pWorker->addData(data);
 
