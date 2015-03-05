@@ -129,7 +129,7 @@ BrainSurface::~BrainSurface()
 
 void BrainSurface::updateActivation()
 {
-    std::cout<<"START - BrainSurface::updateActivation()"<<std::endl;
+    //std::cout<<"START - BrainSurface::updateActivation()"<<std::endl;
 
     // LEFT HEMISPHERE
     //Find brain mesh as component
@@ -204,9 +204,11 @@ void BrainSurface::dataChanged(const QModelIndex &topLeft, const QModelIndex &bo
     std::cout<<"BrainSurface::dataChanged() - currentActivationLH.rows(): "<<currentActivationLH.rows()<<std::endl;
 
     for(qint32 i = 0; i < currentActivationLH.rows(); ++i) {
-        qint32 iVal = currentActivationLH(i) * 60;
+        qint32 iVal = currentActivationLH(i) * 255;
 
         iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
+
+        //std::cout<<(int)iVal<<std::endl;
 
         QRgb qRgb;
 //        qRgb = ColorMap::valueToHotNegative1((float)iVal/255.0);
@@ -218,7 +220,7 @@ void BrainSurface::dataChanged(const QModelIndex &topLeft, const QModelIndex &bo
 //        std::cout<<"BrainSurface::dataChanged() - vertexIndex: "<<vertexIndex<<std::endl;
 //        std::cout<<"BrainSurface::dataChanged() - qRgb: "<<QColor(qRgb).redF()<<" "<<QColor(qRgb).greenF()<<" "<<QColor(qRgb).blueF()<<std::endl;
 
-        if(iVal>150)
+        //if(iVal>150)
             m_qmVertexActivationColorLH[vertexIndex] = QColor(qRgb);
     }
 
@@ -228,7 +230,7 @@ void BrainSurface::dataChanged(const QModelIndex &topLeft, const QModelIndex &bo
     //m_qmVertexActivationColorRH = m_qmDefaultVertexColorRH;
 
     for(qint32 i = 0; i < currentActivationRH.rows(); ++i) {
-        qint32 iVal = currentActivationRH(i) * 60;
+        qint32 iVal = currentActivationRH(i) * 255;
 
         iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
 
@@ -239,7 +241,7 @@ void BrainSurface::dataChanged(const QModelIndex &topLeft, const QModelIndex &bo
 
         int vertexIndex = m_pStcDataModel->data(i,1,StcDataModelRoles::GetIndexRH).toInt();
 
-        if(iVal>150)
+        //if(iVal>150)
             m_qmVertexActivationColorRH[vertexIndex] = QColor(qRgb);
     }
 
