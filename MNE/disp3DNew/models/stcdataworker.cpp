@@ -68,7 +68,7 @@ StcDataWorker::StcDataWorker(QObject *parent)
 , m_bIsLooping(true)
 , m_iAverageSamples(10)
 , m_iCurrentSample(0)
-, m_iUSecIntervall(100)
+, m_iUSecIntervall(50)
 {
     m_data.clear();
 }
@@ -118,7 +118,7 @@ void StcDataWorker::run()
 
     while(true)
     {
-        std::cout<<"StcDataWorker Running ... "<<std::endl;
+        //std::cout<<"StcDataWorker Running ... "<<std::endl;
         {
             QMutexLocker locker(&m_qMutex);
             if(!m_bIsRunning)

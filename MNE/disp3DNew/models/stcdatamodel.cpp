@@ -73,7 +73,7 @@ StcDataModel::StcDataModel(QObject *parent)
 , m_bDataInit(false)
 , m_bIntervallSet(false)
 , m_dStcNormMax(10.0)
-, m_dStcNorm(15)
+, m_dStcNorm(1)
 {
     qRegisterMetaType<MatrixXd>("MatrixXd");
     qRegisterMetaType<VectorXd>("VectorXd");

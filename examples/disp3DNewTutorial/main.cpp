@@ -392,25 +392,11 @@ int main(int argc, char *argv[])
     noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
 
     //
-    // Cluster forward solution;
-    //
-    MatrixXd D;
-
-    //
     // make an inverse operators
     //
     FiffInfo info = evoked.info;
 
     MNEInverseOperator inverse_operator(info, t_Fwd, noise_cov, 0.2f, 0.8f);
-
-    //
-    // save clustered inverse
-    //
-    if(!t_sFileNameClusteredInv.isEmpty())
-    {
-        QFile t_fileClusteredInverse(t_sFileNameClusteredInv);
-        inverse_operator.write(t_fileClusteredInverse);
-    }
 
     //
     // Compute inverse solution
