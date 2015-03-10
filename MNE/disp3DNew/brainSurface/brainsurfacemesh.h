@@ -55,7 +55,9 @@
 //=============================================================================================================
 
 #include <Qt3DRenderer/qt3drenderer_global.h>
-#include <Qt3DRenderer/qabstractmesh.h>
+#include <Qt3DRenderer/QMesh.h>
+#include <QColor>
+#include <QMap>
 
 
 //*************************************************************************************************************
@@ -121,17 +123,24 @@ public:
     /**
     * Default constructor
     *
-    * @param[in] sourceSpace  Source space which contains the geometry information
+    * @param[in] sourceSpace    Source space which contains the geometry information
+    * @param[in] qmVertexColor  index color map representing the source activation
     * @param[in] parent         The parent node
     */
-    explicit BrainSurfaceMesh(const Surface &surf, QNode *parent = 0);
+    explicit BrainSurfaceMesh(const Surface &surf, const QMap<int, QColor> &qmVertexColor, QNode *parent = 0);
 
-    QAbstractMeshFunctorPtr meshFunctor() const;
+    QAbstractMeshFunctorPtr meshFunctor() const Q_DECL_OVERRIDE;
+
+    void updateActivation(const QMap<int, QColor> &vertexColor);
+
+    int getNumberOfVertices();
 
 protected:
-    void copy(const QNode *ref);
+    void copy(const QNode *ref) Q_DECL_OVERRIDE;
 
     Surface m_surface;
+    QMap<int, QColor> m_qmVertexColor;
+    QAbstractMeshFunctorPtr m_pMeshFunctorPtr;
 
 private:
     Q_DECLARE_PRIVATE(BrainSurfaceMesh)
@@ -143,14 +152,17 @@ class DISP3DNEWSHARED_EXPORT BrainSurfaceMeshFunctor : public QAbstractMeshFunct
 {
 
 public:
-    BrainSurfaceMeshFunctor(const Surface &surf);
-    QMeshDataPtr operator ()();
-    bool operator ==(const QAbstractMeshFunctor &other) const;
+    BrainSurfaceMeshFunctor(const Surface &surf, const QMap<int, QColor> &qmVertexColor);
+    QMeshDataPtr operator ()() Q_DECL_OVERRIDE;
+    bool operator ==(const QAbstractMeshFunctor &other) const Q_DECL_OVERRIDE;
 
 private:
-    Surface m_surface;
-};
+    const Surface m_surface;
+    const QMap<int, QColor> m_qmVertexColor;
+    QMeshDataPtr m_qMeshDataPtr;
 
+    QMeshDataPtr createSurfaceMesh(const Surface &surface, const QMap<int, QColor> &qmVertexColor);
+};
 
 } // NAMESPACE
 

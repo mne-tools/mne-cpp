@@ -64,6 +64,7 @@ using namespace DISP3DNEWLIB;
 
 BrainView::BrainView()
 : Qt3D::Window()
+, m_pStcDataModel(QSharedPointer<StcDataModel>(new StcDataModel(this)))
 {
     init(QString(), QString(), -1, QString(), QString(), QString());
 }
@@ -73,6 +74,7 @@ BrainView::BrainView()
 
 BrainView::BrainView(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir)
 : Qt3D::Window()
+, m_pStcDataModel(QSharedPointer<StcDataModel>(new StcDataModel(this)))
 {
     init(QString(), subject_id, hemi, surf, QString(), subjects_dir);
 }
@@ -82,6 +84,7 @@ BrainView::BrainView(const QString &subject_id, qint32 hemi, const QString &surf
 
 BrainView::BrainView(const QString &subject_id, qint32 hemi, const QString &surf, const QString &atlas, const QString &subjects_dir)
 : Qt3D::Window()
+, m_pStcDataModel(QSharedPointer<StcDataModel>(new StcDataModel(this)))
 {
     init(QString(), subject_id, hemi, surf, atlas, subjects_dir);
 }
@@ -91,6 +94,7 @@ BrainView::BrainView(const QString &subject_id, qint32 hemi, const QString &surf
 
 BrainView::BrainView(const QString& p_sFile)
 : Qt3D::Window()
+, m_pStcDataModel(QSharedPointer<StcDataModel>(new StcDataModel(this)))
 {
     init(p_sFile, QString(), -1, QString(), QString(), QString());
 }
@@ -100,6 +104,28 @@ BrainView::BrainView(const QString& p_sFile)
 
 BrainView::~BrainView()
 {
+}
+
+
+//*************************************************************************************************************
+
+void BrainView::addSourceEstimate(MNESourceEstimate &p_sourceEstimate)
+{
+    std::cout<<"BrainView::addSourceEstimate()"<<std::endl;
+
+    m_pStcDataModel->addData(p_sourceEstimate);
+}
+
+
+//*************************************************************************************************************
+
+void BrainView::initStcDataModel(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, const QString &atlas, const MNEForwardSolution &forwardSolution)
+{
+    // Init stc data model
+    m_pStcDataModel->init(subject_id, hemi, surf, subjects_dir, atlas, forwardSolution);
+
+    //Set stc models to views
+    m_pBrainSurfaceEntity->setModel(m_pStcDataModel);
 }
 
 
@@ -127,8 +153,14 @@ void BrainView::init(const QString& p_sFile, const QString &subject_id, qint32 h
     m_pBrainSurfaceEntity = QSharedPointer<BrainSurface>(new BrainSurface(subject_id, hemi, surf, subjects_dir, m_pRootEntity));
     m_pBrainSurfaceEntity->setObjectName(QStringLiteral("m_pBrainSurfaceEntity"));
 
+    // Light source
+    Qt3D::QPointLight *light1 = new Qt3D::QPointLight();
+    light1->setColor(Qt::white);
+    light1->setIntensity(0.1f);
+    m_pRootEntity->addComponent(light1);
+
     // Build Coordinate System
-    createCoordSystem(m_pRootEntity);
+    //createCoordSystem(m_pRootEntity);
 
     // Camera
     Qt3D::QCamera *cameraEntity = new Qt3D::QCamera(m_pRootEntity);
@@ -225,4 +257,13 @@ void BrainView::createCoordSystem(QEntity *rootEntity)
     phongMaterialZ->setSpecular(Qt::white);
     phongMaterialZ->setShininess(50.0f);
     m_ZAxisEntity->addComponent(phongMaterialZ);
+}
+
+void BrainView::mousePressEvent(QMouseEvent *e)
+{
+    std::cout<<"mouse click"<<std::endl;
+    if(e->buttons() & Qt::RightButton)
+    {
+        std::cout<<"mouse click"<<std::endl;
+    }
 }
