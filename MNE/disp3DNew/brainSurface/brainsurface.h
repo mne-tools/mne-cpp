@@ -47,9 +47,12 @@
 #include "brainhemisphere.h"
 
 #include "../helpers/renderableentity.h"
+#include "../models/stcdatamodel.h"
 
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
+
+#include <disp/colormap.h>
 
 
 //*************************************************************************************************************
@@ -58,6 +61,8 @@
 //=============================================================================================================
 
 #include <Qt3DRenderer/qt3drenderer_global.h>
+#include <Qt3DCore/QAbstractBuffer>
+#include <QByteArray>
 
 
 //*************************************************************************************************************
@@ -87,6 +92,7 @@ namespace DISP3DNEWLIB
 
 using namespace Qt3D;
 using namespace FSLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -156,6 +162,31 @@ public:
     */
     ~BrainSurface();
 
+    //=========================================================================================================
+    /**
+    * Updates the current activation.
+    *
+    */
+    void updateActivation();
+
+    //=========================================================================================================
+    /**
+    * Informs the view about the changed data from the set model
+    *
+    * @param[in] topLeft
+    * @param[in] bottomRight
+    * @param[in] roles
+    */
+    void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int> ());
+
+    //=========================================================================================================
+    /**
+    * Sets the data model
+    *
+    * @param[in] model
+    */
+    void setModel(StcDataModel::SPtr model);
+
 protected:
     //=========================================================================================================
     /**
@@ -169,15 +200,26 @@ protected:
     */
     void calcBoundingBox();
 
-    BrainHemisphere::SPtr m_pLeftHemisphere;
-    BrainHemisphere::SPtr m_pRightHemisphere;
+    BrainHemisphere* m_pLeftHemisphere;
+    BrainHemisphere* m_pRightHemisphere;
 
     SurfaceSet m_SurfaceSet;                        /**< Surface set */
     AnnotationSet m_AnnotationSet;                  /**< Annotation set */
+    QList<QColor> m_qlColors;                       /**< current colors which also reflect the activation */
 
     QVector3D m_vecBoundingBoxMin;                  /**< X, Y, Z minima. */
     QVector3D m_vecBoundingBoxMax;                  /**< X, Y, Z maxima. */
     QVector3D m_vecBoundingBoxCenter;               /**< X, Y, Z center. */
+
+    StcDataModel::SPtr m_pStcDataModel;
+
+    QMap<int, QColor> m_qmDefaultVertexColorLH;
+    QMap<int, QColor> m_qmDefaultVertexColorRH;
+    QMap<int, QColor> m_qmVertexActivationColorLH;
+    QMap<int, QColor> m_qmVertexActivationColorRH;
+
+    QColor m_ColorSulci;
+    QColor m_ColorGyri;
 
 private:
 };

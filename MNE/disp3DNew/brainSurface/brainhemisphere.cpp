@@ -69,9 +69,10 @@ BrainHemisphere::BrainHemisphere(QNode *parent)
 
 //*************************************************************************************************************
 
-BrainHemisphere::BrainHemisphere(const Surface &surf, QNode *parent)
+BrainHemisphere::BrainHemisphere(const Surface &surf, const QMap<int, QColor> &qmVertexColors, QNode *parent)
 : RenderableEntity(parent)
 , m_surface(surf)
+, m_qmVertexColors(qmVertexColors)
 {
     init();
 }
@@ -79,22 +80,45 @@ BrainHemisphere::BrainHemisphere(const Surface &surf, QNode *parent)
 
 //*************************************************************************************************************
 
+void BrainHemisphere::updateActivation(const QMap<int, QColor> &qmVertexColor)
+{
+    //std::cout<<"START BrainHemisphere::updateActivation()"<<std::endl;
+
+    m_pSurfaceMesh->updateActivation(qmVertexColor);
+//    this->removeComponent(m_pSurfaceMesh);
+
+//    if(m_pSurfaceMesh)
+//        delete m_pSurfaceMesh;
+
+//    //Create mesh for left hemisphere
+//    m_pSurfaceMesh = new BrainSurfaceMesh(m_surface, qmVertexColor);
+//    m_pSurfaceMesh->setObjectName("m_pSurfaceMesh");
+
+//    //this->setMesh(m_pSurfaceMesh.data());
+//    this->addComponent(m_pSurfaceMesh);
+
+//    //m_pSurfaceMesh->update();
+    //std::cout<<"END BrainHemisphere::updateActivation()"<<std::endl;
+}
+
+//*************************************************************************************************************
+
 void BrainHemisphere::init()
 {
     //Create mesh for left hemisphere
-    m_pSurfaceMesh = QSharedPointer<BrainSurfaceMesh>(new BrainSurfaceMesh(m_surface));
-    this->addComponent(m_pSurfaceMesh.data());
+    m_pSurfaceMesh = new BrainSurfaceMesh(m_surface, m_qmVertexColors);
+    m_pSurfaceMesh->setObjectName("m_pSurfaceMesh");
+
+    //this->setMesh(m_pSurfaceMesh.data());
+    this->addComponent(m_pSurfaceMesh);
 
     //Translate to the right if this hemisphere is right hemisphere and is inflated
     if(m_surface.surf() == "inflated" && m_surface.hemi() == 1)
         this->translateTransform()->setDx(this->scaleTransform()->scale()/10);
 
     //Set material
-    QPerVertexMaterial *qVertexMaterial = new QPerVertexMaterial();
+    QVertexMaterial *qVertexMaterial = new QVertexMaterial();
     this->addComponent(qVertexMaterial);
-
-//    QMaterial *qMaterial = new QMaterial();
-//    this->addComponent(qMaterial);
 
 //    QPhongMaterial *phongMaterial = new QPhongMaterial();
 //    phongMaterial->setDiffuse(QColor(40, 40, 40));

@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     brainhemisphere.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     stcdataworker.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2015
+* @date     March, 2015
 *
 * @section  LICENSE
 *
@@ -29,25 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of brain BrainHemisphere which holds the data of the right or left brain hemisphere in form of a mesh.
+* @brief    StcDataWorker class declaration
 *
 */
 
-#ifndef BRAINHEMISPHERE_H
-#define BRAINHEMISPHERE_H
-
+#ifndef STCDATAWORKER_H
+#define STCDATAWORKER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "disp3DNew_global.h"
-
-#include "brainsurfacemesh.h"
-#include "../helpers/renderableentity.h"
-
-#include <fs/surfaceset.h>
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -55,18 +49,19 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <Qt3DRenderer/qt3drenderer_global.h>
-#include <Qt3DRenderer/QPhongMaterial>
-#include <Qt3DRenderer/QDiffuseMapMaterial>
-#include <Qt3DRenderer/QVertexMaterial>
-
-#include <QRgb>
+#include <QObject>
+#include <QList>
+#include <QThread>
+#include <QSharedPointer>
+#include <QMutex>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -79,69 +74,60 @@ namespace DISP3DNEWLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Qt3D;
-using namespace FSLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
+using namespace Eigen;
 
 //=============================================================================================================
 /**
-* Holds the data of one hemisphere in form of a mesh.
+* Worker which schedules data with the right timing
 *
-* @brief Holds the data of one hemisphere in form of a mesh.
+* @brief Data scheduler
 */
-class DISP3DNEWSHARED_EXPORT BrainHemisphere : public RenderableEntity
+class StcDataWorker : public QThread
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<BrainHemisphere> SPtr;             /**< Shared pointer type for Hemisphere class. */
-    typedef QSharedPointer<const BrainHemisphere> ConstSPtr;  /**< Const shared pointer type for Hemisphere class. */
+    typedef QSharedPointer<StcDataWorker> SPtr;            /**< Shared pointer type for StcDataWorker class. */
+    typedef QSharedPointer<const StcDataWorker> ConstSPtr; /**< Const shared pointer type for StcDataWorker class. */
 
-    //=========================================================================================================
-    /**
-    * Default constructor
-    *
-    * @param[in] parent         The parent node
-    */
-    explicit BrainHemisphere(QNode *parent = 0);
+    StcDataWorker(QObject *parent = 0);
 
-    //=========================================================================================================
-    /**
-    * Default constructor
-    *
-    * @param[in] surf           The surface data
-    * @param[in] qmVertexColors The surface color data
-    * @param[in] parent         The parent node
-    */
-    explicit BrainHemisphere(const Surface &surf, const QMap<int, QColor> &qmVertexColors, QNode *parent = 0);
+    ~StcDataWorker();
 
-    void updateActivation(const QMap<int, QColor> &vertexColor);
+//    void setIntervall(int intervall);
+
+    void addData(QList<VectorXd> &data);
+
+    void clear();
+
+    void setAverage(qint32 samples);
+
+    void setInterval(int usec);
+
+    void setLoop(bool looping);
+
+    void stop();
+
+signals:
+    void stcSample(Eigen::VectorXd sample);
 
 protected:
-    void init();
-
-    BrainSurfaceMesh* m_pSurfaceMesh;
-
-    Surface m_surface;
-    QMap<int, QColor> m_qmVertexColors;
+    virtual void run();
 
 private:
+    QMutex m_qMutex;
+    QList<VectorXd> m_data;   /**< List that holds the fiff matrix data <n_channels x n_samples> */
+
+    bool m_bIsRunning;
+    bool m_bIsLooping;
+
+    qint32 m_iAverageSamples;
+    qint32 m_iCurrentSample;
+    qint32 m_iUSecIntervall;
 };
 
 } // NAMESPACE
 
-#endif // HEMISPHERE_H
+#endif // STCDATAWORKER_H

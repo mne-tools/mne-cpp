@@ -53,14 +53,14 @@ public:
     RenderableEntity(Qt3D::QNode *parent = 0);
     ~RenderableEntity();
 
-    Qt3D::QMesh *mesh() const;
-    void setMesh(Qt3D::QMesh *mesh);
+    //Qt3D::QMesh *mesh() const;
+    //void setMesh(Qt3D::QMesh *mesh);
     Qt3D::QScaleTransform *scaleTransform() const;
     Qt3D::QTranslateTransform *translateTransform() const;
     Qt3D::QRotateTransform *rotateTransform() const;
 
 private:
-    Qt3D::QMesh *m_mesh;
+    //Qt3D::QMesh *m_mesh;
     Qt3D::QTransform *m_transform;
     Qt3D::QRotateTransform *m_rotateTransform;
     Qt3D::QScaleTransform *m_scaleTransform;
