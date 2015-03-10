@@ -100,8 +100,13 @@ BabyMEG::BabyMEG()
     connect(m_pActionUpdateFiffInfo, &QAction::triggered, this, &BabyMEG::UpdateFiffInfo);
     addPluginAction(m_pActionUpdateFiffInfo);
 
+    m_pActionUpdateFiffInfoForHPI = new QAction(QIcon(":/images/latestFiffInfoHPI.png"), tr("Update HPI to Fiff Info"),this);
+    m_pActionUpdateFiffInfoForHPI->setStatusTip(tr("Update HPI to Fiff Info"));
+    connect(m_pActionUpdateFiffInfoForHPI, &QAction::triggered, this, &BabyMEG::SetFiffInfoForHPI);
+    addPluginAction(m_pActionUpdateFiffInfoForHPI);
+
+
     m_pActionRecordFile = new QAction(QIcon(":/images/record.png"), tr("Start Recording"),this);
-//    m_pActionSetupProject->setShortcut(tr("F12"));
     m_pActionRecordFile->setStatusTip(tr("Start Recording"));
     connect(m_pActionRecordFile, &QAction::triggered, this, &BabyMEG::toggleRecordingFile);
     addPluginAction(m_pActionRecordFile);
@@ -285,6 +290,38 @@ void BabyMEG::UpdateFiffInfo()
 
 }
 
+//*************************************************************************************************************
+
+void BabyMEG::SetFiffInfoForHPI()
+{
+    if(!m_pFiffInfo)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("FiffInfo missing!");
+        msgBox.exec();
+        return;
+    }
+    else
+    {
+        qDebug()<<" Start to load Polhemus File";
+        if (HPIDlg == NULL)
+            HPIDlg = QSharedPointer<babymeghpidgl>(new babymeghpidgl(this));
+
+        if (!HPIDlg->isVisible())
+        {
+            HPIDlg->show();
+            HPIDlg->raise();
+        }
+
+    }
+}
+
+void BabyMEG::RecvHPIFiffInfo(FiffInfo info)
+{
+    // show the HPI info
+    qDebug()<<"saved HPI" << m_pFiffInfo->dig.at(0).r[0];
+    qDebug()<<"HPI"<< info.dig.at(0).kind << info.dig.at(0).r[0];
+}
 
 //*************************************************************************************************************
 

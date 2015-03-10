@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_selectionmanagerwindow.h"
+#include "ui_selectionmanagerwindow.h"
 #include "utils/layoutloader.h"             //MNE-CPP utils
 #include "utils/selectionloader.h"          //MNE-CPP utils
 #include "utils/layoutmaker.h"              //MNE-CPP utils

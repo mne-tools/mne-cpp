@@ -254,29 +254,24 @@ void RtHpi::run()
     coil.pos = Eigen::MatrixXd::Zero(numCoils,3);
     coil.mom = Eigen::MatrixXd::Zero(numCoils,3);
 
-    int numCh = m_pFiffInfo->nchan;
     //
     // Read Fiff Info
     //
     while(!m_pFiffInfo) msleep(10);// Wait for fiff Info
+    int numCh = m_pFiffInfo->nchan;
 
     m_bProcessData = true;
 
     QVector<int> refind(0); // Reference Indices
 
     for(int j=0;j<numCh;j++) {
-        if (m_pFiffInfo->ch_names[j].indexOf("TRG_013") >= 0) {
-           refind.append(j);
-        }
-        if (m_pFiffInfo->ch_names[j].indexOf("TRG_014") >= 0) {
-           refind.append(j);
-        }
-        if (m_pFiffInfo->ch_names[j].indexOf("TRG_015") >= 0) {
-           refind.append(j);
-        }
-        if (m_pFiffInfo->ch_names[j].indexOf("TRG_016") >= 0) {
-           refind.append(j);
-        }
+        if (m_pFiffInfo->ch_names[j].indexOf("EEG001") >= 0) refind.append(j);
+
+        if (m_pFiffInfo->ch_names[j].indexOf("EEG002") >= 0) refind.append(j);
+
+        if (m_pFiffInfo->ch_names[j].indexOf("EEG024") >= 0) refind.append(j);
+
+        if (m_pFiffInfo->ch_names[j].indexOf("EEG025") >= 0) refind.append(j);
     }
 
     QVector<int> innerind(0); // Inner layer channels
@@ -288,16 +283,28 @@ void RtHpi::run()
             // and orientation
             if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names[i]))) {
                 innerind.append(j);
-                sensors.coilpos(j,0) = m_pFiffInfo->chs[i].loc(0);
-                sensors.coilpos(j,1) = m_pFiffInfo->chs[i].loc(1);
-                sensors.coilpos(j,2) = m_pFiffInfo->chs[i].loc(2);
-                sensors.coilori(j,0) = m_pFiffInfo->chs[i].loc(10);
-                sensors.coilori(j,1) = m_pFiffInfo->chs[i].loc(11);
-                sensors.coilori(j,2) = m_pFiffInfo->chs[i].loc(12);
+
                 j++;
             }
         }
     }
+
+    sensors.coilpos = Eigen::MatrixXd::Zero(innerind.size(),3);
+    sensors.coilori = Eigen::MatrixXd::Zero(innerind.size(),3);
+    sensors.tra = Eigen::MatrixXd::Identity(innerind.size(),innerind.size());
+
+
+    for(int i=0;i<innerind.size();i++) {
+        sensors.coilpos(i,0) = m_pFiffInfo->chs[innerind.at(i)].loc(0,0);
+        sensors.coilpos(i,1) = m_pFiffInfo->chs[innerind.at(i)].loc(1,0);
+        sensors.coilpos(i,2) = m_pFiffInfo->chs[innerind.at(i)].loc(2,0);
+        sensors.coilori(i,0) = m_pFiffInfo->chs[innerind.at(i)].loc(9,0);
+        sensors.coilori(i,1) = m_pFiffInfo->chs[innerind.at(i)].loc(10,0);
+        sensors.coilori(i,2) = m_pFiffInfo->chs[innerind.at(i)].loc(11,0);
+        qDebug()<<"Sensors coilpos "<< i<<"[" << sensors.coilpos(i,0)<<sensors.coilpos(i,1) <<sensors.coilpos(i,2) <<" ]";
+        qDebug()<<"Sensors coilori"<< i<<"[" << sensors.coilori(i,0)<<sensors.coilori(i,1) <<sensors.coilori(i,2) <<" ]";
+    }
+
 
     int samF = m_pFiffInfo->sfreq;
 
@@ -342,14 +349,30 @@ void RtHpi::run()
                         }
                     }
 
-                    coil = dipfit(coil, sensors, amp);
+                    coil = dipfit(coil, sensors, amp, numCoils);
+
                 }
 
                 buffer.clear();
             }
 
-            for(qint32 i = 0; i < t_mat.cols(); ++i)
+            for(qint32 i = 0; i < t_mat.cols(); ++i){
                 m_pRTMSAOutput->data()->setValue(t_mat.col(i));
+//                qDebug()<<"Matrix: col" <<i <<"\n";
+//                for (int ii=0;ii<t_mat.rows();ii++)
+//                    qDebug() << t_mat(ii,i);
+//                qDebug()<<"End of Matrix";
+            }
+            qDebug()<<"saved HPI" << m_pFiffInfo->dig.at(0).r[0];
+            qDebug()<<"dev_head_t :Matrix From"<< m_pFiffInfo->dev_head_t.from;
+            qDebug()<<"dev_head_t :Matrix To"<< m_pFiffInfo->dev_head_t.to;
+            qDebug()<<"dev_head_t :Matrix Trans"<< m_pFiffInfo->dev_head_t.trans(0,0)<<m_pFiffInfo->dev_head_t.trans(0,1);
+
+
+
+            //m_pFiffInfo->dev_head_t.trans(1,1) = 1.0;
+
+
         }
     }
 }
@@ -359,18 +382,20 @@ void RtHpi::run()
  * heavily edited for use with MNE-X Software
  *********************************************************************************/
 
-coilParam RtHpi::dipfit(struct coilParam coil, struct sens sensors, Eigen::MatrixXd data)
+coilParam RtHpi::dipfit(struct coilParam coil, struct sens sensors, Eigen::MatrixXd data, int numCoils)
 {
     // Initialize variables
     int display = 0;
     int maxiter = 100;
+
     dipError temp;
 
-    coil = fminsearch(coil.pos, maxiter, 2 * maxiter * coil.pos.cols(), display, data, sensors);
+    for(int i = 0;i<numCoils;i++) {
+        coil.pos.row(i).array() = fminsearch(coil.pos.row(i), maxiter, 2 * maxiter * coil.pos.cols(), display, data, sensors);
+        temp = dipfitError(coil.pos.row(i), data.col(i), sensors);
+        coil.mom = temp.moment.transpose();
+    }
 
-    temp = dipfitError(coil.pos, data, sensors);
-
-    coil.mom = temp.moment;
 
     return coil;
 }
@@ -381,7 +406,7 @@ coilParam RtHpi::dipfit(struct coilParam coil, struct sens sensors, Eigen::Matri
  * attempts to find a local minimizer
  *********************************************************************************/
 
-coilParam RtHpi::fminsearch(Eigen::MatrixXd pos,int maxiter, int maxfun, int display, Eigen::MatrixXd data, struct sens sensors)
+Eigen::MatrixXd RtHpi::fminsearch(Eigen::MatrixXd pos,int maxiter, int maxfun, int display, Eigen::MatrixXd data, struct sens sensors)
 {
     double tolx, tolf, rho, chi, psi, sigma, func_evals, usual_delta, zero_term_delta, temp1, temp2;
     std::string header, how;
@@ -389,7 +414,7 @@ coilParam RtHpi::fminsearch(Eigen::MatrixXd pos,int maxiter, int maxfun, int dis
     Eigen::MatrixXd onesn, two2np1, one2n, v, y, v1, tempX1, tempX2, xbar, xr, x, xe, xc, xcc, xin;
     std::vector <double> fv, fv1;
     std::vector <int> idx;
-    coilParam coil;
+
     dipError tempdip, fxr, fxe, fxc, fxcc;
 
     tolx = tolf = 1e-4;
@@ -573,8 +598,8 @@ coilParam RtHpi::fminsearch(Eigen::MatrixXd pos,int maxiter, int maxfun, int dis
 
     x = v.col(0).transpose();
     std::cout << x << std::endl;
-    coil.pos = x;
-    return coil;
+
+    return x;
 }
 
 
@@ -594,7 +619,6 @@ dipError RtHpi::dipfitError(Eigen::MatrixXd pos, Eigen::MatrixXd data, struct se
     // Compute lead field for a magnetic dipole in infinite vacuum
     lf = ft_compute_leadfield(pos, sensors);
 
-    //e.moment = pinv(lf)*data;
     e.moment = pinv(lf) * data;
 
     dif = data - lf * e.moment;
