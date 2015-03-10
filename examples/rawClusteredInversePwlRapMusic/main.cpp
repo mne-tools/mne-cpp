@@ -68,7 +68,7 @@
 #include <QSet>
 #include <QElapsedTimer>
 
-#define BENCHMARK
+//#define BENCHMARK
 
 
 //*************************************************************************************************************
@@ -102,17 +102,24 @@ int main(int argc, char *argv[])
 {
     QGuiApplication a(argc, argv);
 
-//    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-//    QString t_sEventName = "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
-//    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-//    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
-//    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
+    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QString t_sEventName = "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
+    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
+    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
 
-    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw.fif");
-    QString t_sEventName = "E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
-    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
-    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
+//    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw.fif");
+//    QString t_sEventName = "E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
+//    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
+//    AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "E:/Data/sl_data/subjects");
+//    SurfaceSet t_surfSet("mind006", 2, "white", "E:/Data/sl_data/subjects");
+
+//    QFile t_fileRaw("D:/Users/Christoph/SkyDrive/Thesis_Data/MIND/mind006_051210_median02_raw.fif");
+//    QString t_sEventName = "D:/Users/Christoph/SkyDrive/Thesis_Data/MIND/mind006_051210_median02_raw-eve.fif";
+//    QFile t_fileFwd("D:/Users/Christoph/SkyDrive/Thesis_Data/MIND/mind006_051210_median02_raw-oct-6-fwd.fif");
+//    AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "D:/Users/Christoph/SkyDrive/Thesis_Data/subjects");
+//    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Users/Christoph/SkyDrive/Thesis_Data/subjects");
+
 
 //    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw.fif");
 //    QString t_sEventName = "E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw-eve.fif";
@@ -123,7 +130,7 @@ int main(int argc, char *argv[])
     QString t_sFileNameStc("");//("mind006_051209_auditory01.stc");
 
 
-    bool doMovie = false;//true;//false;
+    bool doMovie = true;//false;
 
     qint32 numDipolePairs = 7;
 
