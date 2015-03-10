@@ -165,8 +165,8 @@ public:
     dipError dipfitError (Eigen::MatrixXd, Eigen::MatrixXd, struct sens);
     Eigen::MatrixXd ft_compute_leadfield(Eigen::MatrixXd, struct sens);
     Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd, Eigen::MatrixXd, Eigen::MatrixXd);
-    coilParam dipfit(struct coilParam, struct sens, Eigen::MatrixXd);
-    coilParam fminsearch(Eigen::MatrixXd,int, int, int, Eigen::MatrixXd, struct sens);
+    coilParam dipfit(struct coilParam, struct sens, Eigen::MatrixXd, int numCoils);
+    Eigen::MatrixXd fminsearch(Eigen::MatrixXd,int, int, int, Eigen::MatrixXd, struct sens);
     static bool compar (int, int);
     Eigen::MatrixXd pinv(Eigen::MatrixXd);
 
