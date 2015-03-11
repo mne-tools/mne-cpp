@@ -68,6 +68,7 @@
 #include <QSet>
 #include <QElapsedTimer>
 #include <QCommandLineParser>
+#include <QDir>
 
 
 //*************************************************************************************************************
@@ -169,12 +170,19 @@ int main(int argc, char *argv[])
             QCoreApplication::translate("main", "prefix"));
     parser.addOption(targetPrefixOption);
 
-//    // File Name of the Source Estimate
-//    QCommandLineOption stcFileOption(QStringList() << "stcf" << "stc-file",
-//            QCoreApplication::translate("main", "Target <stcfile> to store stc to."),
-//            QCoreApplication::translate("main", "file"));//"mind006_051209_auditory01.stc"
-//    parser.addOption(stcFileOption);
+    // tmin
+    QCommandLineOption tMinOption(QStringList() << "tmin" << "t-min",
+            QCoreApplication::translate("main", "The starting time point <tmin>."),
+            QCoreApplication::translate("main", "tmin"),
+            "0.1");
+    parser.addOption(tMinOption);
 
+    // tmax
+    QCommandLineOption tMaxOption(QStringList() << "tmax" << "t-max",
+            QCoreApplication::translate("main", "The end time point <tmax>."),
+            QCoreApplication::translate("main", "tmax"),
+            "0.2");
+    parser.addOption(tMaxOption);
 
     // Process the actual command line arguments given by the user
     parser.process(app);
@@ -208,6 +216,12 @@ int main(int argc, char *argv[])
     QString sTargetPrefix = parser.value(targetPrefixOption);
     qDebug() << "Target Prefix" << sTargetPrefix;
 
+    //Parameters
+    float tmin = (float)parser.value(tMinOption).toFloat();
+    qDebug() << "tMin" << tmin;
+
+    float tmax = (float)parser.value(tMaxOption).toFloat();
+    qDebug() << "tMax" << tmax;
 
     QFile t_fileFwd(sFwdName);
     //
@@ -220,6 +234,8 @@ int main(int argc, char *argv[])
 
     AnnotationSet t_annotationSet(t_sSubject, 2, "aparc.a2009s", t_sSubjectsDir);
 
+//    std::cout << "LabelIDs:\n" << t_annotationSet[0].getColortable().getLabelIds() << std::endl;
+
     //
     // Cluster forward solution;
     //
@@ -228,11 +244,7 @@ int main(int argc, char *argv[])
     QFile t_fileRaw(sRawName);
 
 
-
-    float tmin = 0.1f;
-    float tmax = 0.2f;
-
-    bool doMovie = false;//true;
+//    bool doMovie = false;//true;
 
     qint32 numDipolePairs = 1;
 
@@ -411,6 +423,8 @@ int main(int argc, char *argv[])
         }
     }
 
+//    std::cout << "Events:\n" << events << std::endl;
+
     //
     //    Select the desired events
     //
@@ -491,6 +505,12 @@ int main(int argc, char *argv[])
 
 
 
+    //
+    // Init RAP-MUSIC
+    //
+    PwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
+
+
 
 
     //
@@ -512,14 +532,14 @@ int main(int argc, char *argv[])
                 vecSel(i) = val;
             }
 
-            std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
+//            std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
 
-            QString sSelFile = QString("aveInfo_%1_%2.txt").arg(numAverages).arg(it);
-            std::ofstream selFile(sSelFile.toLatin1().constData());
-            if (selFile.is_open())
-            {
-              selFile << vecSel << '\n';
-            }
+//            QString sSelFile = QString("aveInfo_%1_%2.txt").arg(numAverages).arg(it);
+//            std::ofstream selFile(sSelFile.toLatin1().constData());
+//            if (selFile.is_open())
+//            {
+//              selFile << vecSel << '\n';
+//            }
 
 
             FiffEvoked evoked = data.average(raw.info, tmin*raw.info.sfreq, floor(tmax*raw.info.sfreq + 0.5), vecSel);
@@ -530,68 +550,40 @@ int main(int argc, char *argv[])
             FiffEvoked pickedEvoked = evoked.pick_channels(ch_sel_names);
 
 
-//            //########################################################################################
-//            // RAP MUSIC Source Estimate
-
-//            //
-//            // Compute inverse solution
-//            //
-//            PwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
+            //########################################################################################
+            // RAP MUSIC Source Estimate
 
 //            if(doMovie)
 //                t_pwlRapMusic.setStcAttr(200,0.5);
 
+            MNESourceEstimate sourceEstimate = t_pwlRapMusic.calculateInverse(pickedEvoked);
 
-////        #ifdef BENCHMARK
-////            MNESourceEstimate sourceEstimate;
-////            QList<qint64> qVecElapsedTime;
-////            for(qint32 i = 0; i < 100; ++i)
-////            {
-////                //Benchmark time
-////                QElapsedTimer timer;
-////                timer.start();
-////                sourceEstimate = t_pwlRapMusic.calculateInverse(pickedEvoked);
-////                qVecElapsedTime.append(timer.elapsed());
-////            }
+//            std::cout << "Source Estimate:\n" << sourceEstimate.data << std::endl;
 
-////            double meanTime = 0.0;
-////            qint32 offset = 19;
-////            qint32 c = 0;
-////            for(qint32 i = offset; i < qVecElapsedTime.size(); ++i)
-////            {
-////                meanTime += qVecElapsedTime[i];
-////                ++c;
-////            }
+//            std::cout << "Source Estimate vertices:\n" << sourceEstimate.vertices << std::endl;
 
-////            meanTime /= (double)c;
 
-////            double varTime = 0;
-////            for(qint32 i = offset; i < qVecElapsedTime.size(); ++i)
-////                varTime += pow(qVecElapsedTime[i] - meanTime,2);
 
-////            varTime /= (double)c - 1.0f;
-////            varTime = sqrt(varTime);
+            if(!sourceEstimate.isEmpty())
+            {
+                QString t_sFileNameStc = sTargetDir+QString("%1_%2_ave_it_%3.stc").arg(sTargetPrefix).arg(numAverages).arg(it);
 
-////            qDebug() << "RAP-MUSIC calculation took" << meanTime << "+-" << varTime << "ms in average";
+                qDebug() << "Write to:" << t_sFileNameStc;
 
-////        #else
-//            MNESourceEstimate sourceEstimate = t_pwlRapMusic.calculateInverse(pickedEvoked);
-////        #endif
 
-//            if(sourceEstimate.isEmpty())
-//                return 1;
+                QDir dir(sTargetDir);
+                if (!dir.exists()) {
+                    dir.mkpath(".");
+                }
 
-//            QString t_sFileNameStc = QString("mind006_051209_auditory01_rap_%1_ave_it_%2.stc").arg(numAverages).arg(it);
-
-//            if(!t_sFileNameStc.isEmpty())
-//            {
-//                QFile t_fileClusteredStc(t_sFileNameStc);
-//                sourceEstimate.write(t_fileClusteredStc);
-//            }
+                if(!t_sFileNameStc.isEmpty())
+                {
+                    QFile t_fileClusteredStc(t_sFileNameStc);
+                    sourceEstimate.write(t_fileClusteredStc);
+                }
+            }
         }
     }
-
-
 
     return 0;//app.exec();
 }
