@@ -6,6 +6,6 @@
         <file alias="latestFiffInfo.png">images/icons/latestFiffInfo.png</file>
         <file alias="record_active.png">images/icons/record_active.png</file>
         <file alias="sqdctrl.png">images/icons/sqdctrl.png</file>
-        <file>images/icons/latestFiffInfoHPI.png</file>
+        <file alias="latestFiffInfoHPI.png">images/icons/latestFiffInfoHPI.png</file>
     </qresource>
 </RCC>
