@@ -54,6 +54,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}Dispd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -61,6 +62,7 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}Disp
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
@@ -91,6 +93,8 @@ SOURCES += \
     brainSurface\brainsurfacemesh.cpp \
     brainSurface\brainhemisphere.cpp \
     helpers\renderableentity.cpp \
+    models\stcdatamodel.cpp \
+    models\stcdataworker.cpp
 
 HEADERS += \
     disp3DNew_global.h \
@@ -99,6 +103,8 @@ HEADERS += \
     brainSurface\brainsurfacemesh.h \
     brainSurface\brainhemisphere.h \
     helpers\renderableentity.h \
+    models\stcdatamodel.h \
+    models\stcdataworker.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
