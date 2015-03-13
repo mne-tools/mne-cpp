@@ -60,6 +60,7 @@ contains(MNECPP_CONFIG, withGui) {
                     test_mne_stc \
                     test_mne_cluster_eval \
                     test_rap_cluster_eval \
+                    test_rtc_eval
 #                    test_orig_rap_cluster_eval
 #            }
         }

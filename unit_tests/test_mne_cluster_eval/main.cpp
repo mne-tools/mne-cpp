@@ -600,11 +600,60 @@ int main(int argc, char *argv[])
     // regularize noise covariance
     noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
 
+
+    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 1. t_Fwd <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+
+    QString sG = sTargetDir + sTargetPrefix + QString("G.txt");
+    std::ofstream ofs_G(sG.toUtf8().constData(), std::ofstream::out);
+    if (ofs_G.is_open())
+    {
+        printf("writing to %s\n",sG.toUtf8().constData());
+        ofs_G << t_Fwd.sol->data << '\n';
+    }
+    else
+        printf("Not writing to %s\n",sG.toUtf8().constData());
+    ofs_G.close();
+
+//    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 1. t_Fwd_whitened <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+//    //
+//    // Whiten L1 gain matrix
+//    //
+//    MatrixXd t_Fwd_whitened(0,0);
+
+//    //
+//    // Whiten gain matrix before clustering -> cause diffenerent units Magnetometer, Gradiometer and EEG
+//    //
+//    if(!noise_cov.isEmpty() && !evoked.info.isEmpty())
+//    {
+//        FiffInfo p_outFwdInfo;
+//        FiffCov p_outNoiseCov;
+//        MatrixXd p_outWhitener;
+//        qint32 p_outNumNonZero;
+//        //do whitening with noise cov
+//        t_Fwd.prepare_forward(evoked.info, noise_cov, false, p_outFwdInfo, t_Fwd_whitened, p_outNoiseCov, p_outWhitener, p_outNumNonZero);
+//        printf("\tWhitening the forward solution.\n");
+
+//        t_Fwd_whitened = p_outWhitener*t_Fwd_whitened;
+//    }
+
+//    QString sG_Whitened = sTargetDir + sTargetPrefix + QString("G_whitened.txt");
+//    std::ofstream ofs_G_Whitened(sG_Whitened.toUtf8().constData(), std::ofstream::out);//"G_whitened.txt", std::ofstream::out);
+//    if (ofs_G_Whitened.is_open())
+//    {
+//        printf("writing to %s\n",sG_Whitened.toUtf8().constData());
+//        ofs_G_Whitened << t_Fwd_whitened << '\n';
+//    }
+//    else
+//        printf("Not writing to %s\n",sG_Whitened.toUtf8().constData());
+//    ofs_G_Whitened.close();
+
+//    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
     //
     // Cluster forward solution;
     //
     MatrixXd D_L1;
-
 
     std::cout << "t_Fwd " << t_Fwd.sol->data.rows() << " x " << t_Fwd.sol->data.cols() << std::endl;
 
@@ -613,6 +662,57 @@ int main(int argc, char *argv[])
     t_clusteredFwd_L1.src[0].cluster_info.write(sCILHL1);
     QString sCIRHL1 = sTargetDir + sTargetPrefix + QString("ClusterInfoRH_L1.txt");
     t_clusteredFwd_L1.src[1].cluster_info.write(sCIRHL1);
+
+
+    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 2. t_clusteredFwd_L1 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+
+    QString sG_L1 = sTargetDir + sTargetPrefix + QString("G_L1.txt");
+    std::ofstream ofs_G_L1(sG_L1.toUtf8().constData(), std::ofstream::out);
+    if (ofs_G_L1.is_open())
+    {
+        printf("writing to %s\n",sG_L1.toUtf8().constData());
+        ofs_G_L1 << t_clusteredFwd_L1.sol->data << '\n';
+    }
+    else
+        printf("Not writing to %s\n",sG_L1.toUtf8().constData());
+    ofs_G_L1.close();
+
+
+//    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 2. t_clusteredFwd_L1_whitened <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+//    //
+//    // Whiten L1 gain matrix
+//    //
+//    MatrixXd t_clusteredFwd_L1_whitened(0,0);
+
+//    //
+//    // Whiten gain matrix before clustering -> cause diffenerent units Magnetometer, Gradiometer and EEG
+//    //
+//    if(!noise_cov.isEmpty() && !evoked.info.isEmpty())
+//    {
+//        FiffInfo p_outFwdInfo;
+//        FiffCov p_outNoiseCov;
+//        MatrixXd p_outWhitener;
+//        qint32 p_outNumNonZero;
+//        //do whitening with noise cov
+//        t_clusteredFwd_L1.prepare_forward(evoked.info, noise_cov, false, p_outFwdInfo, t_clusteredFwd_L1_whitened, p_outNoiseCov, p_outWhitener, p_outNumNonZero);
+//        printf("\tWhitening the forward solution.\n");
+
+//        t_clusteredFwd_L1_whitened = p_outWhitener*t_clusteredFwd_L1_whitened;
+//    }
+
+//    QString sG_L1_Whitened = sTargetDir + sTargetPrefix + QString("G_L1_whitened.txt");
+//    std::ofstream ofs_G_L1_Whitened(sG_L1_Whitened.toUtf8().constData(), std::ofstream::out);//"G_L1_whitened.txt", std::ofstream::out);
+//    if (ofs_G_L1_Whitened.is_open())
+//    {
+//        printf("writing to %s\n",sG_L1_Whitened.toUtf8().constData());
+//        ofs_G_L1_Whitened << t_clusteredFwd_L1_whitened << '\n';
+//    }
+//    else
+//        printf("Not writing to %s\n",sG_L1_Whitened.toUtf8().constData());
+//    ofs_G_L1_Whitened.close();
+
+//    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     std::cout << "D_L1 " << D_L1.rows() << " x " << D_L1.cols() << std::endl;
     std::cout << "t_clusteredFwd_L1 " << t_clusteredFwd_L1.sol->data.rows() << " x " << t_clusteredFwd_L1.sol->data.cols() << std::endl;
@@ -627,6 +727,57 @@ int main(int argc, char *argv[])
 
     std::cout << "D_L2 " << D_L2.rows() << " x " << D_L2.cols() << std::endl;
     std::cout << "t_clusteredFwd_L2 " << t_clusteredFwd_L2.sol->data.rows() << " x " << t_clusteredFwd_L2.sol->data.cols() << std::endl;
+
+
+    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 3. t_clusteredFwd_L2 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+
+    QString sG_L2 = sTargetDir + sTargetPrefix + QString("G_L2.txt");
+    std::ofstream ofs_G_L2(sG_L2.toUtf8().constData(), std::ofstream::out);
+    if (ofs_G_L2.is_open())
+    {
+        printf("writing to %s\n",sG_L2.toUtf8().constData());
+        ofs_G_L2 << t_clusteredFwd_L2.sol->data << '\n';
+    }
+    else
+        printf("Not writing to %s\n",sG_L2.toUtf8().constData());
+    ofs_G_L2.close();
+
+//    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 3. t_clusteredFwd_L2_whitened <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+//    //
+//    // Whiten L1 gain matrix
+//    //
+//    MatrixXd t_clusteredFwd_L2_whitened(0,0);
+
+//    //
+//    // Whiten gain matrix before clustering -> cause diffenerent units Magnetometer, Gradiometer and EEG
+//    //
+//    if(!noise_cov.isEmpty() && !evoked.info.isEmpty())
+//    {
+//        FiffInfo p_outFwdInfo;
+//        FiffCov p_outNoiseCov;
+//        MatrixXd p_outWhitener;
+//        qint32 p_outNumNonZero;
+//        //do whitening with noise cov
+//        t_clusteredFwd_L2.prepare_forward(evoked.info, noise_cov, false, p_outFwdInfo, t_clusteredFwd_L2_whitened, p_outNoiseCov, p_outWhitener, p_outNumNonZero);
+//        printf("\tWhitening the forward solution.\n");
+
+//        t_clusteredFwd_L2_whitened = p_outWhitener*t_clusteredFwd_L2_whitened;
+//    }
+
+//    QString sG_L2_Whitened = sTargetDir + sTargetPrefix + QString("G_L2_whitened.txt");
+//    std::ofstream ofs_G_L2_Whitened(sG_L2_Whitened.toUtf8().constData(), std::ofstream::out);//"G_L2_whitened.txt", std::ofstream::out);
+//    if (ofs_G_L2_Whitened.is_open())
+//    {
+//        printf("writing to %s\n",sG_L2_Whitened.toUtf8().constData());
+//        ofs_G_L2_Whitened << t_clusteredFwd_L2_whitened << '\n';
+//    }
+//    else
+//        printf("Not writing to %s\n",sG_L2_Whitened.toUtf8().constData());
+//    ofs_G_L2_Whitened.close();
+
+    return CommandLineOk;
+
+//    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     //
@@ -1081,15 +1232,105 @@ int main(int argc, char *argv[])
 
 
 
-    //Condition Numbers
-    VectorXd s;
-
-    double t_dConditionNumber = MNEMath::getConditionNumber(t_Fwd.sol->data, s);
-    double t_dConditionNumberClustered_L2 = MNEMath::getConditionNumber(t_clusteredFwd_L2.sol->data, s);
 
 
-    std::cout << "Condition Number:\n" << t_dConditionNumber << std::endl;
-    std::cout << "Clustered L2 Condition Number:\n" << t_dConditionNumberClustered_L2 << std::endl;
+
+
+
+
+
+
+
+
+
+
+//    //Condition Numbers Attention - Condition only with fixed orientation!!!!!!!!!
+//    VectorXd s;
+
+//    double t_dConditionNumber = MNEMath::getConditionNumber(t_Fwd.sol->data, s);
+//    std::cout << "Condition Number:\n" << t_dConditionNumber << std::endl;
+
+//    //
+//    QString sKappa = sTargetDir + sTargetPrefix + QString("Kappa.txt");
+//    std::ofstream ofs_Kappa(sKappa.toUtf8().constData(), std::ofstream::out);
+//    if (ofs_Kappa.is_open())
+//    {
+//        printf("writing to %s\n",sKappa.toUtf8().constData());
+//        ofs_Kappa << t_dConditionNumber << '\n';
+//    }
+//    else
+//        printf("Not writing to %s\n",sKappa.toUtf8().constData());
+//    ofs_Kappa.close();
+
+//    // s
+//    QString sS = sTargetDir + sTargetPrefix + QString("S.txt");
+//    std::ofstream ofs_sS(sS.toUtf8().constData(), std::ofstream::out);
+//    if (ofs_sS.is_open())
+//    {
+//        printf("writing to %s\n",sS.toUtf8().constData());
+//        ofs_sS << s << '\n';
+//    }
+//    else
+//        printf("Not writing to %s\n",sS.toUtf8().constData());
+//    ofs_sS.close();
+
+
+
+//    double t_dConditionNumberClustered_L1 = MNEMath::getConditionNumber(t_clusteredFwd_L1.sol->data, s);
+//    std::cout << "Clustered L1 Condition Number:\n" << t_dConditionNumberClustered_L1 << std::endl;
+
+//    //
+//    QString sKappaL1 = sTargetDir + sTargetPrefix + QString("Kappa_L1.txt");
+//    std::ofstream ofs_KappaL1(sKappaL1.toUtf8().constData(), std::ofstream::out);
+//    if (ofs_KappaL1.is_open())
+//    {
+//        printf("writing to %s\n",sKappaL1.toUtf8().constData());
+//        ofs_KappaL1 << t_dConditionNumberClustered_L1 << '\n';
+//    }
+//    else
+//        printf("Not writing to %s\n",sKappaL1.toUtf8().constData());
+//    ofs_KappaL1.close();
+
+//    // s
+//    QString sSL1 = sTargetDir + sTargetPrefix + QString("S_L1.txt");
+//    std::ofstream ofs_SL1(sSL1.toUtf8().constData(), std::ofstream::out);
+//    if (ofs_SL1.is_open())
+//    {
+//        printf("writing to %s\n",sSL1.toUtf8().constData());
+//        ofs_SL1 << s << '\n';
+//    }
+//    else
+//        printf("Not writing to %s\n",sSL1.toUtf8().constData());
+//    ofs_SL1.close();
+
+
+
+//    double t_dConditionNumberClustered_L2 = MNEMath::getConditionNumber(t_clusteredFwd_L2.sol->data, s);
+//    std::cout << "Clustered L2 Condition Number:\n" << t_dConditionNumberClustered_L2 << std::endl;
+
+//    // Kappa
+//    QString sKappaL2 = sTargetDir + sTargetPrefix + QString("Kappa_L2.txt");
+//    std::ofstream ofs_KappaL2(sKappaL2.toUtf8().constData(), std::ofstream::out);
+//    if (ofs_KappaL2.is_open())
+//    {
+//        printf("writing to %s\n",sKappaL2.toUtf8().constData());
+//        ofs_KappaL2 << t_dConditionNumberClustered_L2 << '\n';
+//    }
+//    else
+//        printf("Not writing to %s\n",sKappaL2.toUtf8().constData());
+//    ofs_KappaL2.close();
+
+//    // s
+//    QString sSL2 = sTargetDir + sTargetPrefix + QString("S_L2.txt");
+//    std::ofstream ofs_SL2(sSL2.toUtf8().constData(), std::ofstream::out);
+//    if (ofs_SL2.is_open())
+//    {
+//        printf("writing to %s\n",sSL2.toUtf8().constData());
+//        ofs_SL2 << s << '\n';
+//    }
+//    else
+//        printf("Not writing to %s\n",sSL2.toUtf8().constData());
+//    ofs_SL2.close();
 
 
 //    double t_dConditionNumberMags = MNEMath::getConditionNumber(mags, s);

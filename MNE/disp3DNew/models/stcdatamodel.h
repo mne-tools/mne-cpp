@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     brainhemisphere.h
+* @file     stcdatamodel.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2015
+* @date     March, 2015
 *
 * @section  LICENSE
 *
@@ -29,44 +29,58 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of brain BrainHemisphere which holds the data of the right or left brain hemisphere in form of a mesh.
+* @brief    StcDataModel class declaration
 *
 */
 
-#ifndef BRAINHEMISPHERE_H
-#define BRAINHEMISPHERE_H
-
+#ifndef STCDATAMODEL_H
+#define STCDATAMODEL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "disp3DNew_global.h"
+#include "../disp3DNew_global.h"
 
-#include "brainsurfacemesh.h"
-#include "../helpers/renderableentity.h"
+#include "stcdataworker.h"
 
+#include <fs/label.h>
 #include <fs/surfaceset.h>
+#include <fs/annotationset.h>
+
+#include <iostream>
+
+#include "MNE/mne_forwardsolution.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <Qt3DRenderer/qt3drenderer_global.h>
-#include <Qt3DRenderer/QPhongMaterial>
-#include <Qt3DRenderer/QDiffuseMapMaterial>
-#include <Qt3DRenderer/QVertexMaterial>
-
-#include <QRgb>
+#include <QAbstractTableModel>
+#include <QVector3D>
+#include <QMap>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace MNELIB
+{
+    class MNESourceEstimate;
+}
 
 
 //*************************************************************************************************************
@@ -79,69 +93,148 @@ namespace DISP3DNEWLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Qt3D;
+using namespace Eigen;
+using namespace MNELIB;
 using namespace FSLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// Define model roles
 //=============================================================================================================
 
+namespace StcDataModelRoles
+{
+    enum ItemRole{GetIndexLH = Qt::UserRole + 1001,
+                  GetIndexRH = Qt::UserRole + 1002,
+                  GetStcValLH = Qt::UserRole + 1003,
+                  GetStcValRH = Qt::UserRole + 1004,
+                  GetRelStcValLH = Qt::UserRole + 1005,
+                  GetRelStcValRH = Qt::UserRole + 1006};
+}
 
 //=============================================================================================================
 /**
-* Holds the data of one hemisphere in form of a mesh.
+* Source estimation informations are provided in a table. They can be accessed via data(row, col).
 *
-* @brief Holds the data of one hemisphere in form of a mesh.
+* @brief Table model which prepares source estimate information
 */
-class DISP3DNEWSHARED_EXPORT BrainHemisphere : public RenderableEntity
+class DISP3DNEWSHARED_EXPORT StcDataModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<BrainHemisphere> SPtr;             /**< Shared pointer type for Hemisphere class. */
-    typedef QSharedPointer<const BrainHemisphere> ConstSPtr;  /**< Const shared pointer type for Hemisphere class. */
+    typedef QSharedPointer<StcDataModel> SPtr;            /**< Shared pointer type for StcDataModel class. */
+    typedef QSharedPointer<const StcDataModel> ConstSPtr; /**< Const shared pointer type for StcDataModel class. */
+
+    StcDataModel(QObject *parent = 0);
+
+    ~StcDataModel();
+
+    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const ;
+    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
 
     //=========================================================================================================
     /**
-    * Default constructor
+    * Data for the row and column and given display role
     *
-    * @param[in] parent         The parent node
-    */
-    explicit BrainHemisphere(QNode *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Default constructor
+    * @param [in] row       index row
+    * @param [in] column    index column
+    * @param [in] role      display role to access
     *
-    * @param[in] surf           The surface data
-    * @param[in] qmVertexColors The surface color data
-    * @param[in] parent         The parent node
+    * @return the accessed data
     */
-    explicit BrainHemisphere(const Surface &surf, const QMap<int, QColor> &qmVertexColors, QNode *parent = 0);
+    inline QVariant data(int row, int column, int role = Qt::DisplayRole) const;
 
-    void updateActivation(const QMap<int, QColor> &vertexColor);
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
-protected:
-    void init();
+    void addData(const MNESourceEstimate &stc);
 
-    BrainSurfaceMesh* m_pSurfaceMesh;
+    void init(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, const QString &atlas, const MNEForwardSolution &forwardSolution);
 
-    Surface m_surface;
-    QMap<int, QColor> m_qmVertexColors;
+    inline QVector3D getMin() const;
+    inline QVector3D getMax() const;
+
+    //1..10000
+    void setAverage(qint32 samples);
+
+    void setLoop(bool looping);
+
+    //1..100
+    void setNormalization(qint32 fraction);
+
+    void setStcSample(const VectorXd &sample);
+
+    void setVertLabelIDs(const VectorXi &vertLabelIDs);
 
 private:
+    StcDataWorker::SPtr    m_pWorker;
+
+    bool m_bRTMode;
+    bool m_bModelInit;
+    bool m_bDataInit;
+    bool m_bIntervallSet;
+
+    VectorXi m_vertLabelIds;
+
+    QMap<qint32, qint32> m_qMapLabelIdChannelLH;
+    QMap<qint32, qint32> m_qMapLabelIdChannelRH;
+
+    VectorXd m_vecCurStc;
+    double m_dStcNormMax;
+    double m_dStcNorm;
+    VectorXd m_vecCurRelStc;
+
+    //ToDo implement this model as a state pattern -> to be used as ROIStc model and full Stc model
+
+    //ROI Stuff
+    QList<Label> m_qListLabels;
+    qint32 m_iLHSize;
+    QList<RowVector4i> m_qListRGBAs;
+    QList<Matrix3Xf> m_qListTriRRs;
+
+    AnnotationSet m_annotationSet;
+    SurfaceSet m_surfSet;
+    MNEForwardSolution m_forwardSolution;
+
+    QVector3D m_vecMinRR;                  /**< X, Y, Z minima. */
+    QVector3D m_vecMaxRR;                  /**< X, Y, Z maxima. */
 };
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline QVariant StcDataModel::data(int row, int column, int role) const
+{
+    return data(index(row, column), role);
+}
+
+
+//*************************************************************************************************************
+
+inline QVector3D StcDataModel::getMin() const
+{
+    return m_vecMinRR;
+}
+
+
+//*************************************************************************************************************
+
+inline QVector3D StcDataModel::getMax() const
+{
+    return m_vecMaxRR;
+}
 
 } // NAMESPACE
 
-#endif // HEMISPHERE_H
+Q_DECLARE_METATYPE(Eigen::Matrix3Xf);
+Q_DECLARE_METATYPE(Eigen::VectorXd);
+Q_DECLARE_METATYPE(FSLIB::Label);
+
+#endif // STCDATAMODEL_H
