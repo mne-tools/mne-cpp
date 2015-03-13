@@ -71,7 +71,7 @@ void babymeghpidgl::OKProc(QAbstractButton *b)
 {
     qDebug()<<"Clicked group button";
 
-    auto s(b->text());
+    QString s(b->text());
     qDebug()<<"Clicked group button:"<<s;
 
     if (s == "OK") {

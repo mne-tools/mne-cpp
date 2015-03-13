@@ -209,7 +209,7 @@ QList<QList<GaborAtom> > AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 ma
         k = 0;
         s = sample_count;
         p = floor(sample_count / 2);
-        j = floor(log10(sample_count));//log(sample_count) / log(2));
+        j = floor(log10(sample_count)/log10(2));//log(sample_count) / log(2));
         phase = 0;
 
         //iteration for multichannel, depending on boost setting
