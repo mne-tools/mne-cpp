@@ -169,6 +169,8 @@ public:
     Eigen::MatrixXd fminsearch(Eigen::MatrixXd,int, int, int, Eigen::MatrixXd, struct sens);
     static bool compar (int, int);
     Eigen::MatrixXd pinv(Eigen::MatrixXd);
+    Eigen::Matrix4d computeTransformation(Eigen::MatrixXd, Eigen::MatrixXd);
+
 
 signals:
     //=========================================================================================================
@@ -197,6 +199,7 @@ private:
 
     bool m_bIsRunning;      /**< If source lab is running */
     bool m_bProcessData;    /**< If data should be received for processing */
+    QMutex m_qMutex;       /**< mutex for hpi */
 
     static std::vector <double>base_arr;
 
