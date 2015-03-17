@@ -113,10 +113,11 @@ void RtHpi::init()
 
     // Output
     m_pRTMSAOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "Rt HPI Out", "RT HPI output data");
+    m_pRTMSAOutput->data()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pRTMSAOutput);
 
-    m_pRTMSAOutput->data()->setMultiArraySize(100);
-    m_pRTMSAOutput->data()->setVisibility(true);
+//    m_pRTMSAOutput->data()->setMultiArraySize(100);
+//    m_pRTMSAOutput->data()->setVisibility(true);
 
     //init channels when fiff info is available
     connect(this, &RtHpi::fiffInfoAvailable, this, &RtHpi::initConnector);
@@ -167,7 +168,10 @@ bool RtHpi::start()
 bool RtHpi::stop()
 {
     //Wait until this thread is stopped
+    m_qMutex.lock();
     m_bIsRunning = false;
+    m_qMutex.unlock();
+
 
     if(m_bProcessData)
     {
@@ -175,9 +179,9 @@ bool RtHpi::stop()
         m_pRtHpiBuffer->releaseFromPop();
         m_pRtHpiBuffer->releaseFromPush();
 
-        m_pRtHpiBuffer->clear();
+//        m_pRtHpiBuffer->clear();
 
-        m_pRTMSAOutput->data()->clear();
+//        m_pRTMSAOutput->data()->clear();
     }
 
     return true;
@@ -217,9 +221,10 @@ void RtHpi::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
     if(pRTMSA)
     {
+        m_qMutex.lock();
         //Check if buffer initialized
         if(!m_pRtHpiBuffer)
-            m_pRtHpiBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
+            m_pRtHpiBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(8, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
 
         //Fiff information
         if(!m_pFiffInfo)
@@ -228,6 +233,7 @@ void RtHpi::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             emit fiffInfoAvailable();
         }
 
+        m_qMutex.unlock();
         if(m_bProcessData)
         {
             MatrixXd t_mat;
@@ -247,51 +253,65 @@ void RtHpi::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void RtHpi::run()
 {
+    //
+    // Read Fiff Info and wait if absent
+    //
+    bool waitForFiffInfo = true;
+    while(waitForFiffInfo)
+    {
+        m_qMutex.lock();
+
+        if(m_pFiffInfo) waitForFiffInfo = false;
+
+        m_qMutex.unlock();
+        msleep(10);// Wait for fiff Info
+    }
+
+    m_qMutex.lock();
+    m_bProcessData = true;
+    m_qMutex.unlock();
+
+
     struct sens sensors;
     struct coilParam coil;
     int numCoils = 4;
+    int numCh = m_pFiffInfo->nchan;
+    int samF = m_pFiffInfo->sfreq;
+    int numLoc = 3, numBlock, samLoc, phase; // numLoc : Number of times to localize in a second
+    samLoc = samF/numLoc; // minimum samples required to localize numLoc times in a second
 
+    // Initialize HPI coils location and moment
     coil.pos = Eigen::MatrixXd::Zero(numCoils,3);
     coil.mom = Eigen::MatrixXd::Zero(numCoils,3);
 
-    //
-    // Read Fiff Info
-    //
-    while(!m_pFiffInfo) msleep(10);// Wait for fiff Info
-    int numCh = m_pFiffInfo->nchan;
 
-    m_bProcessData = true;
+    // Get the indices of reference channels
+    QVector<int> refind(0);
+    if (m_pFiffInfo->ch_names.indexOf("TRG013",0) >= 0) refind.append(m_pFiffInfo->ch_names.indexOf("TRG013",0)+1);
+    if (m_pFiffInfo->ch_names.indexOf("TRG014",0) >= 0) refind.append(m_pFiffInfo->ch_names.indexOf("TRG014",0)+1);
+    if (m_pFiffInfo->ch_names.indexOf("TRG015",0) >= 0) refind.append(m_pFiffInfo->ch_names.indexOf("TRG015",0)+1);
+    if (m_pFiffInfo->ch_names.indexOf("TRG016",0) >= 0) refind.append(m_pFiffInfo->ch_names.indexOf("TRG016",0)+1);
 
-    QVector<int> refind(0); // Reference Indices
-
-    for(int j=0;j<numCh;j++) {
-        if (m_pFiffInfo->ch_names[j].indexOf("EEG001") >= 0) refind.append(j);
-
-        if (m_pFiffInfo->ch_names[j].indexOf("EEG002") >= 0) refind.append(j);
-
-        if (m_pFiffInfo->ch_names[j].indexOf("EEG024") >= 0) refind.append(j);
-
-        if (m_pFiffInfo->ch_names[j].indexOf("EEG025") >= 0) refind.append(j);
-    }
-
-    QVector<int> innerind(0); // Inner layer channels
-
-    for (int i=0;i<numCh;i++) {
-        int j = 0;
+    // Get the indices of inner layer channels
+    QVector<int> innerind(0);
+    int j = 0;
+    for (int i = 0;i < numCh;i++) {
         if(m_pFiffInfo->chs[i].coil_type == 7002) {
-            // Check if the sensor is bad, if not get the position
-            // and orientation
-            if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names[i]))) {
-                innerind.append(j);
 
+            // Check if the sensor is bad, if not append to innerind
+            if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) {
+                innerind.append(j);
                 j++;
             }
+
         }
     }
 
+    // Initialize inner layer sensors
     sensors.coilpos = Eigen::MatrixXd::Zero(innerind.size(),3);
     sensors.coilori = Eigen::MatrixXd::Zero(innerind.size(),3);
     sensors.tra = Eigen::MatrixXd::Identity(innerind.size(),innerind.size());
+
 
 
     for(int i=0;i<innerind.size();i++) {
@@ -301,22 +321,27 @@ void RtHpi::run()
         sensors.coilori(i,0) = m_pFiffInfo->chs[innerind.at(i)].loc(9,0);
         sensors.coilori(i,1) = m_pFiffInfo->chs[innerind.at(i)].loc(10,0);
         sensors.coilori(i,2) = m_pFiffInfo->chs[innerind.at(i)].loc(11,0);
-        qDebug()<<"Sensors coilpos "<< i<<"[" << sensors.coilpos(i,0)<<sensors.coilpos(i,1) <<sensors.coilpos(i,2) <<" ]";
-        qDebug()<<"Sensors coilori"<< i<<"[" << sensors.coilori(i,0)<<sensors.coilori(i,1) <<sensors.coilori(i,2) <<" ]";
     }
 
+    //load polhemus HPI
+    Eigen::MatrixXd headHPI(numCoils,3);
+    for (int i=0;i<numCoils;i++) {
+        headHPI(i,0) = m_pFiffInfo->dig.at(i+3).r[0];
+        headHPI(i,1) = m_pFiffInfo->dig.at(i+3).r[1];
+        headHPI(i,2) = m_pFiffInfo->dig.at(i+3).r[2];
+    }
 
-    int samF = m_pFiffInfo->sfreq;
+    std::cout<<headHPI(0,0)<<" "<<headHPI(0,1)<<" "<<headHPI(0,2)<<std::endl;
 
-    int numLoc = 3, numBlock, samLoc, phase; // numLoc : Number of times to localize in a second
-    samLoc = samF/numLoc; // minimum samples required to localize numLoc times in a second
 
     QVector<MatrixXd> buffer;
     Eigen::MatrixXd amp(innerind.size(),numCoils);
-
+    Eigen::Matrix4d trans;
     while (m_bIsRunning) {
         if(m_bProcessData) {
+
             /* Dispatch the inputs */
+
             MatrixXd t_mat = m_pRtHpiBuffer->pop();
 
             buffer.append(t_mat);
@@ -335,8 +360,10 @@ void RtHpi::run()
 
                 // Loop for localizing coils
                 for(int i = 0;i<numBlock;i++) {
+
                     for(int j = 0;j < innerind.size();j++)
                         innerdata.row(j) << alldata.block(innerind[j],i*samLoc,1,samLoc);
+
                     for(int j = 0;j < refind.size();j++)
                         refdata.row(j) << alldata.block(refind[j],i*samLoc,1,samLoc);
 
@@ -346,32 +373,38 @@ void RtHpi::run()
                             amp(k,j) = innerdata.row(k).cwiseProduct(refdata.row(j)).sum();
                             phase = amp(k,j)/abs(amp(k,j));
                             amp(k,j) = amp(k,j)*phase;
+                            qDebug()<<"Amp "<<amp(k,j);
                         }
                     }
 
+
+
                     coil = dipfit(coil, sensors, amp, numCoils);
+
+                    qDebug()<<"HPI head "<<headHPI(0,0)<<" "<<headHPI(0,1)<<" "<<headHPI(0,2);
+                    qDebug()<<"HPI head "<<headHPI(1,0)<<" "<<headHPI(1,1)<<" "<<headHPI(1,2);
+                    qDebug()<<"HPI head "<<headHPI(2,0)<<" "<<headHPI(2,1)<<" "<<headHPI(2,2);
+                    qDebug()<<"HPI head "<<headHPI(3,0)<<" "<<headHPI(3,1)<<" "<<headHPI(3,2);
+
+
+//                    qDebug()<<"HPI device "<<coil.pos(0,0)<<" "<<coil.pos(0,1)<<" "<<coil.pos(0,2);
+//                    qDebug()<<"HPI device "<<coil.pos(1,0)<<" "<<coil.pos(1,1)<<" "<<coil.pos(1,2);
+//                    qDebug()<<"HPI device "<<coil.pos(2,0)<<" "<<coil.pos(2,1)<<" "<<coil.pos(2,2);
+//                    qDebug()<<"HPI device "<<coil.pos(3,0)<<" "<<coil.pos(3,1)<<" "<<coil.pos(3,2);
+
+                    trans = computeTransformation(coil.pos,headHPI);
+                    //qDebug()<<"Before: "<<m_pFiffInfo->dev_head_t.trans(0,0);
+
+                    for(int ti =0; ti<4;ti++)
+                        for(int tj=0;tj<4;tj++)
+                    m_pFiffInfo->dev_head_t.trans(ti,tj) = trans(ti,tj);
+
+                    //qDebug()<<"After: "<<m_pFiffInfo->dev_head_t.trans(0,0)<<trans(0,0);
 
                 }
 
                 buffer.clear();
             }
-
-            for(qint32 i = 0; i < t_mat.cols(); ++i){
-                m_pRTMSAOutput->data()->setValue(t_mat.col(i));
-//                qDebug()<<"Matrix: col" <<i <<"\n";
-//                for (int ii=0;ii<t_mat.rows();ii++)
-//                    qDebug() << t_mat(ii,i);
-//                qDebug()<<"End of Matrix";
-            }
-            qDebug()<<"saved HPI" << m_pFiffInfo->dig.at(0).r[0];
-            qDebug()<<"dev_head_t :Matrix From"<< m_pFiffInfo->dev_head_t.from;
-            qDebug()<<"dev_head_t :Matrix To"<< m_pFiffInfo->dev_head_t.to;
-            qDebug()<<"dev_head_t :Matrix Trans"<< m_pFiffInfo->dev_head_t.trans(0,0)<<m_pFiffInfo->dev_head_t.trans(0,1);
-
-
-
-            //m_pFiffInfo->dev_head_t.trans(1,1) = 1.0;
-
 
         }
     }
@@ -391,7 +424,7 @@ coilParam RtHpi::dipfit(struct coilParam coil, struct sens sensors, Eigen::Matri
     dipError temp;
 
     for(int i = 0;i<numCoils;i++) {
-        coil.pos.row(i).array() = fminsearch(coil.pos.row(i), maxiter, 2 * maxiter * coil.pos.cols(), display, data, sensors);
+        coil.pos.row(i).array() = fminsearch(coil.pos.row(i), maxiter, 2 * maxiter * coil.pos.cols(), display, data.col(i), sensors);
         temp = dipfitError(coil.pos.row(i), data.col(i), sensors);
         coil.mom = temp.moment.transpose();
     }
@@ -510,7 +543,7 @@ Eigen::MatrixXd RtHpi::fminsearch(Eigen::MatrixXd pos,int maxiter, int maxfun, i
         xr = (1+rho) * xbar - rho * v.block(0,n,v.rows(),1);
 
         x = xr.transpose();
-        std::cout << "Iteration Count: " << itercount << ":" << x << std::endl;
+        //std::cout << "Iteration Count: " << itercount << ":" << x << std::endl;
 
         fxr = dipfitError(x, data, sensors);
 
@@ -706,13 +739,13 @@ bool RtHpi::compar (int a, int b){
   return ((base_arr)[a] < (base_arr)[b]);
 }
 
-Eigen::Matrix4d computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT)
+Eigen::Matrix4d RtHpi::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT)
 {
     Eigen::MatrixXd xdiff, ydiff, zdiff, C, Q;
     Eigen::Matrix4d trans = Eigen::Matrix4d::Identity(4,4), Rot = Eigen::Matrix4d::Zero(4,4), Trans = Eigen::Matrix4d::Identity(4,4);
     double meanx,meany,meanz,normf;
 
-    for(int i = 0;i < 50;i++) {
+    for(int i = 0;i < 15;i++) {
         zdiff = NH.col(2) - BT.col(2);
         ydiff = NH.col(1) - BT.col(1);
         xdiff = NH.col(0) - BT.col(0);
