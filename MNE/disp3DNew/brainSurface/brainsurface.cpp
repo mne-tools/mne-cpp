@@ -150,7 +150,6 @@ void BrainSurface::updateActivation()
 
 //    BrainSurfaceMesh *meshLeftHemi = (BrainSurfaceMesh*)componentsListLeftHemi.at(indexSurfaceMeshLeftHemi);
 
-    //Update activation
     if(m_pLeftHemisphere)
         m_pLeftHemisphere->updateActivation(m_qmVertexActivationColorLH);
 
@@ -173,7 +172,6 @@ void BrainSurface::updateActivation()
 
 //    BrainSurfaceMesh *meshRightHemi = (BrainSurfaceMesh*)componentsListRightHemi.at(indexSurfaceMeshRightHemi);
 
-    //Update activation
     if(m_pRightHemisphere)
         m_pRightHemisphere->updateActivation(m_qmVertexActivationColorRH);
 
@@ -190,6 +188,9 @@ void BrainSurface::dataChanged(const QModelIndex &topLeft, const QModelIndex &bo
     //std::cout<<"BrainSurface::dataChanged() - topLeft.column(): "<<topLeft.column()<<std::endl;
     //std::cout<<"BrainSurface::dataChanged() - bottomRight.column(): "<<bottomRight.column()<<std::endl;
 
+    int stcDataRoleLH = StcDataModelRoles::GetSmoothedStcValLH;
+    int stcDataRoleRH = StcDataModelRoles::GetSmoothedStcValRH;
+
     //check wether realtive stc data column (3) has changed
     if(topLeft.column() > 3 || bottomRight.column() < 3) {
         std::cout<<"BrainSurface::dataChanged() - stc data did not change"<<std::endl;
@@ -197,14 +198,14 @@ void BrainSurface::dataChanged(const QModelIndex &topLeft, const QModelIndex &bo
     }
 
     //Get LH activation and transform to index/color map
-    VectorXd currentActivationLH = m_pStcDataModel->data(0,3,StcDataModelRoles::GetRelStcValLH).value<VectorXd>();
+    VectorXd currentActivationLH = m_pStcDataModel->data(0,4,stcDataRoleLH).value<VectorXd>();
 
-    //m_qmVertexActivationColorLH = m_qmDefaultVertexColorLH;
+    m_qmVertexActivationColorLH = m_qmDefaultVertexColorLH;
 
     std::cout<<"BrainSurface::dataChanged() - currentActivationLH.rows(): "<<currentActivationLH.rows()<<std::endl;
 
     for(qint32 i = 0; i < currentActivationLH.rows(); ++i) {
-        qint32 iVal = currentActivationLH(i) * 255;
+        qint32 iVal = currentActivationLH(i) * 20;
 
         iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
 
@@ -215,22 +216,24 @@ void BrainSurface::dataChanged(const QModelIndex &topLeft, const QModelIndex &bo
         qRgb = ColorMap::valueToHotNegative2((float)iVal/255.0);
 //        qRgb = ColorMap::valueToHot((float)iVal/255.0);
 
-        int vertexIndex = m_pStcDataModel->data(i,1,StcDataModelRoles::GetIndexLH).toInt();
+        int vertexIndex = i;
+        if(stcDataRoleLH == StcDataModelRoles::GetRelStcValLH || stcDataRoleLH == StcDataModelRoles::GetStcValLH)
+            vertexIndex = m_pStcDataModel->data(i,1,StcDataModelRoles::GetIndexLH).toInt();
 
 //        std::cout<<"BrainSurface::dataChanged() - vertexIndex: "<<vertexIndex<<std::endl;
 //        std::cout<<"BrainSurface::dataChanged() - qRgb: "<<QColor(qRgb).redF()<<" "<<QColor(qRgb).greenF()<<" "<<QColor(qRgb).blueF()<<std::endl;
 
-        //if(iVal>150)
+        if(iVal>0)
             m_qmVertexActivationColorLH[vertexIndex] = QColor(qRgb);
     }
 
     //Get RH activation and transform to index/color map
-    VectorXd currentActivationRH = m_pStcDataModel->data(0,3,StcDataModelRoles::GetRelStcValRH).value<VectorXd>();
+    VectorXd currentActivationRH = m_pStcDataModel->data(0,4,stcDataRoleRH).value<VectorXd>();
 
-    //m_qmVertexActivationColorRH = m_qmDefaultVertexColorRH;
+    m_qmVertexActivationColorRH = m_qmDefaultVertexColorRH;
 
     for(qint32 i = 0; i < currentActivationRH.rows(); ++i) {
-        qint32 iVal = currentActivationRH(i) * 255;
+        qint32 iVal = currentActivationRH(i) * 20;
 
         iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
 
@@ -239,9 +242,11 @@ void BrainSurface::dataChanged(const QModelIndex &topLeft, const QModelIndex &bo
         qRgb = ColorMap::valueToHotNegative2((float)iVal/255.0);
 //        qRgb = ColorMap::valueToHot((float)iVal/255.0);
 
-        int vertexIndex = m_pStcDataModel->data(i,1,StcDataModelRoles::GetIndexRH).toInt();
+        int vertexIndex = i;
+        if(stcDataRoleLH == StcDataModelRoles::GetRelStcValRH || stcDataRoleLH == StcDataModelRoles::GetStcValRH)
+            vertexIndex = m_pStcDataModel->data(i,1,StcDataModelRoles::GetIndexRH).toInt();
 
-        //if(iVal>150)
+        if(iVal>0)
             m_qmVertexActivationColorRH[vertexIndex] = QColor(qRgb);
     }
 
