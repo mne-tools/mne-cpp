@@ -113,7 +113,9 @@ namespace StcDataModelRoles
                   GetStcValLH = Qt::UserRole + 1003,
                   GetStcValRH = Qt::UserRole + 1004,
                   GetRelStcValLH = Qt::UserRole + 1005,
-                  GetRelStcValRH = Qt::UserRole + 1006};
+                  GetRelStcValRH = Qt::UserRole + 1006,
+                  GetSmoothedStcValLH = Qt::UserRole + 1007,
+                  GetSmoothedStcValRH = Qt::UserRole + 1008};
 }
 
 //=============================================================================================================
@@ -170,6 +172,8 @@ public:
 
     void setVertLabelIDs(const VectorXi &vertLabelIDs);
 
+    VectorXd smoothEstimates(int niter, int hemi) const;
+
 private:
     StcDataWorker::SPtr    m_pWorker;
 
@@ -184,9 +188,10 @@ private:
     QMap<qint32, qint32> m_qMapLabelIdChannelRH;
 
     VectorXd m_vecCurStc;
+    VectorXd m_vecCurRelStc;
+
     double m_dStcNormMax;
     double m_dStcNorm;
-    VectorXd m_vecCurRelStc;
 
     //ToDo implement this model as a state pattern -> to be used as ROIStc model and full Stc model
 
