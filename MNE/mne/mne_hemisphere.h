@@ -189,7 +189,7 @@ public:
 public:
     fiff_int_t type;            /**< Type of the source space: 1 = "surf" or 2 = "vol". ToDo not used jet. */
     fiff_int_t id;              /**< Id information */
-    fiff_int_t np;              /**< Number of source points */
+    fiff_int_t np;              /**< Number of vertices of the whole/original surface used to create the source locations. */
     fiff_int_t ntri;            /**< Number of available triangles */
     fiff_int_t coord_frame;     /**< Coil coordinate system definition */
     MatrixX3f rr;               /**< Source locations of available dipoles. */
@@ -212,6 +212,9 @@ public:
     MatrixX3d use_tri_cent;     /**< Triangle centers of used triangles */
     MatrixX3d use_tri_nn;       /**< Triangle normals of used triangles */
     VectorXd use_tri_area;      /**< Triangle areas of used triangles */
+
+    QMap<int, QVector<int>> neighbor_tri;       /**< Map of neighboring triangles for each vertex */
+    QMap<int, QVector<int>> neighbor_vert;      /**< Map of neighboring vertices for each vertex */
 
     MNEClusterInfo cluster_info; /**< Holds the cluster information. */
 private:

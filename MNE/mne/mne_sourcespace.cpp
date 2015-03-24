@@ -763,9 +763,66 @@ bool MNESourceSpace::complete_source_space_info(MNEHemisphere& p_Hemisphere)
 //        qDebug() << "p_Hemisphere.use_tri_nn:" << p_Hemisphere.use_tri_nn(0,0) << p_Hemisphere.use_tri_nn(0,1) << p_Hemisphere.use_tri_nn(0,2);
 //        qDebug() << "p_Hemisphere.use_tri_nn:" << p_Hemisphere.use_tri_nn(2,0) << p_Hemisphere.use_tri_nn(2,1) << p_Hemisphere.use_tri_nn(2,2);
 
+    printf("\tCompleting triangle and vertex neighboring info...");
+    add_geometry_info(p_Hemisphere);
+    printf("[done]\n");
+
     return true;
 }
 
+
+//*************************************************************************************************************
+
+bool MNESourceSpace::add_geometry_info(MNEHemisphere& p_Hemisphere)
+{
+    int k,c,p,q;
+    bool found;
+
+    //Clear neighboring triangle list
+    p_Hemisphere.neighbor_tri.clear();
+
+    //Create neighbor_tri information
+    for (p = 0; p < p_Hemisphere.tris.rows(); p++)
+        for (k = 0; k < 3; k++)
+            p_Hemisphere.neighbor_tri[p_Hemisphere.tris(p,k)].append(p);
+
+    std::cout<<"MNESourceSpace::add_geometry_info() - p_Hemisphere.neighbor_tri[100].size(): "<<p_Hemisphere.neighbor_tri[100].size()<<std::endl;
+
+    //Determine the neighboring vertices
+    p_Hemisphere.neighbor_vert.clear();
+
+    for (k = 0; k < p_Hemisphere.np; k++) {
+        for (p = 0; p < p_Hemisphere.neighbor_tri[k].size(); p++) {
+            //Fit in the other vertices of the neighboring triangle
+            for (c = 0; c < 3; c++) {
+                int vert = p_Hemisphere.tris(p_Hemisphere.neighbor_tri[k][p], c);
+
+                if (vert != k) {
+                    found = false;
+
+                    for (q = 0; q < p_Hemisphere.neighbor_vert[k].size(); q++) {
+                        if (p_Hemisphere.neighbor_vert[k][q] == vert) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if(!found) {
+                        //std::cout<<"MNESourceSpace::add_geometry_info() - Found vert: "<<vert<<std::endl;
+                        p_Hemisphere.neighbor_vert[k].append(vert);
+                    }
+                }
+            }
+        }
+    }
+
+//    for (k = 0; k < p_Hemisphere.np; k++)
+//        std::cout<<"MNESourceSpace::add_geometry_info() - p_Hemisphere.neighbor_vert[k].size(): "<< p_Hemisphere.neighbor_vert[k].size() <<std::endl;
+
+    std::cout<<"MNESourceSpace::add_geometry_info() - p_Hemisphere.neighbor_vert[100].size(): "<<p_Hemisphere.neighbor_tri[100].size()<<std::endl;
+
+    return true;
+}
 
 //*************************************************************************************************************
 
