@@ -223,7 +223,7 @@ void BrainSurface::dataChanged(const QModelIndex &topLeft, const QModelIndex &bo
 //        std::cout<<"BrainSurface::dataChanged() - vertexIndex: "<<vertexIndex<<std::endl;
 //        std::cout<<"BrainSurface::dataChanged() - qRgb: "<<QColor(qRgb).redF()<<" "<<QColor(qRgb).greenF()<<" "<<QColor(qRgb).blueF()<<std::endl;
 
-        if(iVal>0)
+        if(iVal>150)
             m_qmVertexActivationColorLH[vertexIndex] = QColor(qRgb);
     }
 
@@ -246,7 +246,7 @@ void BrainSurface::dataChanged(const QModelIndex &topLeft, const QModelIndex &bo
         if(stcDataRoleLH == StcDataModelRoles::GetRelStcValRH || stcDataRoleLH == StcDataModelRoles::GetStcValRH)
             vertexIndex = m_pStcDataModel->data(i,1,StcDataModelRoles::GetIndexRH).toInt();
 
-        if(iVal>0)
+        if(iVal>150)
             m_qmVertexActivationColorRH[vertexIndex] = QColor(qRgb);
     }
 

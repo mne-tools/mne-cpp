@@ -175,11 +175,11 @@ QVariant StcDataModel::data(const QModelIndex &index, int role) const
             {
                 QVariant v;
                 if(m_bDataInit && role == StcDataModelRoles::GetSmoothedStcValLH) {
-                    v.setValue(smoothEstimates(1, 0));
+                    v.setValue(smoothEstimates(6, 0));
                 }
 
                 if(m_bDataInit && role == StcDataModelRoles::GetSmoothedStcValRH) {
-                    v.setValue(smoothEstimates(1, 1));
+                    v.setValue(smoothEstimates(6, 1));
                 }
 
                 return v;
@@ -398,6 +398,30 @@ VectorXd StcDataModel::smoothEstimates(int niter, int hemi) const
 {
     std::cout<<"START - StcDataModel::smoothEstimates()"<<std::endl;
 
+//    VectorXd vecCurSmoothedStc;
+
+//    //Get data
+//    for (int it = 0; it < niter; it++) {
+//        if(hemi == 0) {
+//            std::cout<<"smoothoperator.size(): "<< m_forwardSolution.src[hemi].m_smoothOperator.rows()<<" "<<m_forwardSolution.src[hemi].m_smoothOperator.cols()<<std::endl;
+
+//            vecCurSmoothedStc += m_forwardSolution.src[hemi].m_smoothOperator * m_vecCurRelStc.head(m_forwardSolution.src[hemi].vertno.rows());
+
+//            std::cout<<"vecCurSmoothedStc.size(): "<< vecCurSmoothedStc.rows()<<std::endl;
+//            std::cout<<"m_numberNeighborsSources.size(): "<< m_forwardSolution.src[hemi].m_numberNeighborsSources.rows()<<std::endl;
+
+//            vecCurSmoothedStc = vecCurSmoothedStc.cwiseQuotient(m_forwardSolution.src[hemi].m_numberNeighborsSources);
+//        }
+//        else {
+//            vecCurSmoothedStc += m_forwardSolution.src[hemi].m_smoothOperator * m_vecCurRelStc.tail(m_forwardSolution.src[hemi].vertno.rows());
+//            vecCurSmoothedStc = vecCurSmoothedStc.cwiseQuotient(m_forwardSolution.src[hemi].m_numberNeighborsSources);
+//        }
+//    }
+
+
+
+//    std::cout<<"vecCurSmoothedStc.rows(): "<<vecCurSmoothedStc.rows()<<std::endl;
+
     //smooth data for both hemispheres
     MNEHemisphere sp = m_forwardSolution.src[hemi];
     VectorXi vertno = sp.vertno;
@@ -458,3 +482,22 @@ VectorXd StcDataModel::smoothEstimates(int niter, int hemi) const
 
     return vecCurSmoothedStc;
 }
+
+
+//*************************************************************************************************************
+
+//double StcDataModel::calculateSmoothedEstimate(const int vertexIndex) const
+//{
+
+//}
+
+
+////*************************************************************************************************************
+
+//void StcDataModel::reduceToFinalSmoothedEstimates(VectorXd &finalSmoothedEstimates, const double smoothedEstimate) const
+//{
+
+//}
+
+
+

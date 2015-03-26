@@ -68,7 +68,7 @@ StcDataWorker::StcDataWorker(QObject *parent)
 , m_bIsLooping(true)
 , m_iAverageSamples(1)
 , m_iCurrentSample(0)
-, m_iUSecIntervall(1000)
+, m_iUSecIntervall(250)
 {
     m_data.clear();
 }
