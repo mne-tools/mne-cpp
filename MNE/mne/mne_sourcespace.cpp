@@ -816,8 +816,20 @@ bool MNESourceSpace::add_geometry_info(MNEHemisphere& p_Hemisphere)
         }
     }
 
-//    for (k = 0; k < p_Hemisphere.np; k++)
-//        std::cout<<"MNESourceSpace::add_geometry_info() - p_Hemisphere.neighbor_vert[k].size(): "<< p_Hemisphere.neighbor_vert[k].size() <<std::endl;
+//    //Create number of neighbor vector
+//    m_numberNeighborsSources = VectorXi::Zeros(p_Hemisphere.vertno.size());
+//    for (k = 0; k < p_Hemisphere.vertno.size(); k++) {
+//        m_numberNeighborsSources(k) = p_Hemisphere.neighbor_vert[p_Hemisphere.vertno(k)].size();
+//    }
+
+//    //Create smooth operator as matrix
+//    p_Hemisphere.m_smoothOperator = MatrixXi::Zeros(p_Hemisphere.nuse, p_Hemisphere.nuse);
+//    for (k = 0; k < p_Hemisphere.vertno.size(); k++) {
+//        for (w = 0; w < p_Hemisphere.vertno.size(); w++) {
+//            p_Hemisphere.m_smoothOperator(k,w) = 1;
+
+//        }
+//    }
 
     std::cout<<"MNESourceSpace::add_geometry_info() - p_Hemisphere.neighbor_vert[100].size(): "<<p_Hemisphere.neighbor_tri[100].size()<<std::endl;
 
