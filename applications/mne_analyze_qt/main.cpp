@@ -2,7 +2,7 @@
 /**
 * @file     main.cpp
 * @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
-*			Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 *           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
