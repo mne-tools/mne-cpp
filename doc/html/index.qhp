@@ -446,6 +446,131 @@
                 <section title="showDebugTable" ref="class_d_i_s_p3_d_l_i_b_1_1_new_brain_view.html#a612c3437de7739cd7fb3d20f8dc03b19" />
               </section>
             </section>
+            <section title="DISP3DNEWLIB">
+              <section title="BrainHemisphere" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html">
+                <section title="ConstSPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#a9d0a6f7cdb9abeae43977d641e1c126b" />
+                <section title="SPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#ac1de408b4de21dea23e4edb3836e1936" />
+                <section title="BrainHemisphere" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#a63cbc241539e2ff71872d3d4d025f111" />
+                <section title="BrainHemisphere" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#a3ee2e9f87bd1d78c2d7d30670fcc66ea" />
+                <section title="init" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#ac1439bbdf431b9cbf31bbdf88f06669d" />
+                <section title="updateActivation" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#afb9fff18872b54c89434fbcd405ed4bf" />
+                <section title="m_pSurfaceMesh" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#abd760ef5aca0e6f5130f322b98ef8be5" />
+                <section title="m_qmVertexColors" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#a460a1fcf1e97d097f187cc1c51e1e35c" />
+                <section title="m_surface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#aa51806b1b9d3626e0bdcbff4b7f25f54" />
+              </section>
+              <section title="BrainSurface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html">
+                <section title="ConstSPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a877c849cd8d6ad17ec304c8f4928d2a6" />
+                <section title="SPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#af5db79a315f98dca0100fa6022c0a37f" />
+                <section title="BrainSurface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a6bf154cdc24d56ae926c460269565864" />
+                <section title="BrainSurface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a4d9fdf8635e0c2c6b892da4a85024a6a" />
+                <section title="BrainSurface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a9eb29857c68f705ada3bd4e9b8151b50" />
+                <section title="BrainSurface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#aba4cf607a84a1a39fa28d68b23c73cbc" />
+                <section title="~BrainSurface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#aac806b66eb2a9ff9e94916d4bccc8468" />
+                <section title="calcBoundingBox" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a5578bd2d2b0e1af3a9fac47515424b72" />
+                <section title="dataChanged" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a514d6b74e04e452ca9ccfe68aa09ba51" />
+                <section title="init" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#aefbf9c0a013d89eef31a33bcd7a3a231" />
+                <section title="setModel" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a517a77fcd3ca14c910c8590fbe3c29f2" />
+                <section title="updateActivation" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#aaefe5b26d83f62ce5e6e0c89d1944f8a" />
+                <section title="m_AnnotationSet" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a1e253341906522f79655b1fda6f3bba7" />
+                <section title="m_ColorGyri" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#aeba72e058a27707a1e9edaeb74a3849f" />
+                <section title="m_ColorSulci" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a1d14f5403b6f6c5479347d48b0f25709" />
+                <section title="m_pLeftHemisphere" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#abdddc589253cea0f439abc332f62eed6" />
+                <section title="m_pRightHemisphere" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a3c0d1988269144b9b524af95b08e5a3f" />
+                <section title="m_pStcDataModel" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#ae7756e262080029321af19818238f4ed" />
+                <section title="m_qlColors" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#aa7284faa66fd14c3bc837d4f7c513920" />
+                <section title="m_qmDefaultVertexColorLH" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a01a87cdef7e832f5b72c85e441a7e3ed" />
+                <section title="m_qmDefaultVertexColorRH" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a728ef25a40fc556422ba1c156a0c4fbd" />
+                <section title="m_qmVertexActivationColorLH" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a788a347255f513adbbf0c6d64b0af6b0" />
+                <section title="m_qmVertexActivationColorRH" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#acea28ef79b0866f3c964de5e7584b846" />
+                <section title="m_SurfaceSet" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a89c7fd9705cfe2be6b37c31c5044f48a" />
+                <section title="m_vecBoundingBoxCenter" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a0473f76bc4d7a1426c9d98c513fbd89b" />
+                <section title="m_vecBoundingBoxMax" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a404c9ddafbca8e58313d0733f3e4ab78" />
+                <section title="m_vecBoundingBoxMin" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#ab2662bed392a61b898f593f1fa9b021a" />
+              </section>
+              <section title="BrainSurfaceMesh" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html">
+                <section title="ConstSPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a4095b26db02205d984c3c8da6994c0a6" />
+                <section title="SPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a36fbb73d0b338541a0764be92aeda30c" />
+                <section title="BrainSurfaceMesh" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a2910030003ad5051213c51f766c22bd2" />
+                <section title="BrainSurfaceMesh" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a5343552a191aa4278bf419f73aae0f82" />
+                <section title="copy" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#aec8ec4cbabab636a05be23d9ee57aa3a" />
+                <section title="getNumberOfVertices" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a416bc1a6db8c1ca73875e13cecf51221" />
+                <section title="meshFunctor" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#ac431c1040ece9fdb0e860e53c264eda4" />
+                <section title="updateActivation" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a5cfd2006d05d97004a89ab1f0327cea6" />
+                <section title="m_pMeshFunctorPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#afba2cb6d627aaefd1da066498f3ba805" />
+                <section title="m_qmVertexColor" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a6a170e712fa734ae4388d7a9e4620dc2" />
+                <section title="m_surface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a91661dfe5098a217bce7ba1c284bbfdd" />
+              </section>
+              <section title="BrainSurfaceMeshFunctor" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh_functor.html">
+                <section title="BrainSurfaceMeshFunctor" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh_functor.html#ae7dfd0b53c843e5642aab31b782fa9f4" />
+                <section title="operator()" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh_functor.html#a8af0d4249401129b7e188017d791dc7b" />
+                <section title="operator==" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh_functor.html#aa5811135b33552a36ac94a3c344c1e35" />
+              </section>
+              <section title="BrainView" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html">
+                <section title="ConstSPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a53adce869196ff16774901b1cdb41583" />
+                <section title="SPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a7f510d0408f6072a2251e99be3a01dfd" />
+                <section title="BrainView" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#ad37273d6fd7ad16fc06f71385396ee9f" />
+                <section title="BrainView" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a4a8fa70494483efc56abd6b0ac633fb0" />
+                <section title="BrainView" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a53257ad41ac0490bce0fdb5a8eed396e" />
+                <section title="BrainView" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a3ec70de4d06d3343458b3ed6656c3fa4" />
+                <section title="~BrainView" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a25a6cb87ec4cb9b614d20337c510eee8" />
+                <section title="addSourceEstimate" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a98dbbc84d15131ec78d7c0763dbf139c" />
+                <section title="createCoordSystem" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#ae1ddda0eec6d0eec495b9f4607e69392" />
+                <section title="init" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a967dd3c8d68de154aad76980ebbecab2" />
+                <section title="initStcDataModel" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a7b0cfa14c1097134e8d37769b9917c79" />
+                <section title="mousePressEvent" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a485f9eede056b5819847cc32ab9190da" />
+                <section title="m_data" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a156e56f0804c2d30bf00498e8bd0286f" />
+                <section title="m_Engine" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a9536b33c75f9a8f66f16f7f5e206356a" />
+                <section title="m_pAspectInput" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a52d18e17456b251f8a6cd7fa2c9131e9" />
+                <section title="m_pBrainSurfaceEntity" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a571148cf3afbe80d4d59d1e8b2589d0a" />
+                <section title="m_pRootEntity" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#af45fbc0413c41c14401e8637a5f2fb7d" />
+                <section title="m_pStcDataModel" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a7b852ebae32aa536062bfd0a24389e51" />
+                <section title="m_XAxisEntity" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a2e8abdd2c9fd972c56462c40a90002ed" />
+                <section title="m_YAxisEntity" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a60debc351a6d6be7d3e0e33edb96e5d2" />
+                <section title="m_ZAxisEntity" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#aa4e8da5aa5d25a69616086b03322da53" />
+              </section>
+              <section title="RenderableEntity" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity.html">
+                <section title="RenderableEntity" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity.html#a0cbf5c8ce3f5aac7c47bf05ecdb042ce" />
+                <section title="~RenderableEntity" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity.html#a82e5e715a6953ca662986624361b1944" />
+                <section title="rotateTransform" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity.html#a40934bdfad9e1a8d55113cae00058594" />
+                <section title="scaleTransform" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity.html#ad3845193dbe9b69088d41d67b2465d0e" />
+                <section title="translateTransform" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity.html#a99493424cfc43fe9c73066c8184dc390" />
+              </section>
+              <section title="StcDataModel" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html">
+                <section title="ConstSPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a45d02188c1e309b9b13c17dc3e59dac6" />
+                <section title="SPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#aea6ed1b00945bdddc8384801994431c9" />
+                <section title="StcDataModel" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a1d62ade0d3c8c2b595f8bd8c50c27097" />
+                <section title="~StcDataModel" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#ae2ef17cba99e0c34642b9b3128d26fb2" />
+                <section title="addData" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a611191b0692bfae956acc58b095ab94c" />
+                <section title="columnCount" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#afcdcc994197a97dfc2e262e3f5b8295f" />
+                <section title="data" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#aefa378cbbd606ba489a391817daee0c8" />
+                <section title="data" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a7bf85696d900cb8b5fe9eda3d1930384" />
+                <section title="getMax" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#ad958c648f5a9dd9521a941f8e749c007" />
+                <section title="getMin" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a10f9dbf20e630019e5ad86486a822952" />
+                <section title="headerData" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a7ed4e178df360f3e0478837e15d35ea2" />
+                <section title="init" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#ae9f565d1153d736c4b073f0442e6d54f" />
+                <section title="rowCount" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a2d5bc5dba69f71fe4d09f5799438629e" />
+                <section title="setAverage" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a7e1f5c40548f383a26b254dc1342aa97" />
+                <section title="setLoop" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a95cf4689710db7e35772d30708bebcb8" />
+                <section title="setNormalization" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#ab3aeeffba6871f74c0712b87f8beac69" />
+                <section title="setStcSample" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a5427dabf4004db13bb6083421cf5e226" />
+                <section title="setVertLabelIDs" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a3bbb9f4ac444094dd48cb4bdc6b66270" />
+                <section title="smoothEstimates" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a04df0be6fdb9fc2c8ab24e6f0b27fdaf" />
+              </section>
+              <section title="StcDataWorker" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html">
+                <section title="ConstSPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a122d2de401f505f644046298278bede9" />
+                <section title="SPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a5d45e7a2d4d24d72d5e8fae699178611" />
+                <section title="StcDataWorker" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#aa1b2f5d5e92e0d57051b0b61abe496dc" />
+                <section title="~StcDataWorker" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a1f086d100a7b4d0b1cf43e79fa2a990a" />
+                <section title="addData" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#aefce60fdea308fdebf35154e59873924" />
+                <section title="clear" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a79a3e4399c7034f16b084b066523dbd8" />
+                <section title="run" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#ae920258d1b9eb3b6c39066dac42b4b10" />
+                <section title="setAverage" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a82527bc98171186ffcdacf312eece44c" />
+                <section title="setInterval" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a13334bf69d8738068183026a246a2125" />
+                <section title="setLoop" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#af497e40d345e1748e6b1de7a164c7324" />
+                <section title="stcSample" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a7a28db5856eeca9e0bb2588fb49db549" />
+                <section title="stop" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a526e63c61b744566cc9de191f86015fd" />
+              </section>
+            </section>
             <section title="DISPLIB">
               <section title="ColorMap" ref="class_d_i_s_p_l_i_b_1_1_color_map.html">
                 <section title="ConstSPtr" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a96f919a6067a0092192a16d4ce2d58e4" />
@@ -1483,6 +1608,9 @@
                 <section title="push" ref="class_i_o_buffer_1_1_circular_multi_channel_buffer__old.html#ac76b214119f0c05571c309f5da6ea4fb" />
               </section>
             </section>
+            <section title="MNEAnalyzeQt">
+              <section title="CInfo" ref="class_m_n_e_analyze_qt_1_1_c_info.html" />
+            </section>
             <section title="MNEBrowseRawQt">
               <section title="AboutWindow" ref="class_m_n_e_browse_raw_qt_1_1_about_window.html">
                 <section title="AboutWindow" ref="class_m_n_e_browse_raw_qt_1_1_about_window.html#aeb482a2e3164a7c8314c50f603686293" />
@@ -2025,6 +2153,8 @@
                 <section title="inuse" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a1a7ba6a83b5b474df998aaf25eb6ade1" />
                 <section title="nearest" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ac5480868a444c31d040a123f926d537f" />
                 <section title="nearest_dist" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aaf1380e5dffa62b3b3e4cdb44f0be303" />
+                <section title="neighbor_tri" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae7f8d800b94a9e292e343d439a66e757" />
+                <section title="neighbor_vert" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ad5ab1beed9e998dccda1963824f0c73c" />
                 <section title="nn" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a92b928637b438f118a00c860e929ecae" />
                 <section title="np" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aed488c023af9e17d490f3abdea867eeb" />
                 <section title="ntri" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a6a322c8dadb0d6e9f19b0065d859e297" />
@@ -2777,6 +2907,14 @@
               </section>
             </section>
             <section title="RtHpiPlugin">
+              <section title="coilParam" ref="struct_rt_hpi_plugin_1_1coil_param.html">
+                <section title="mom" ref="struct_rt_hpi_plugin_1_1coil_param.html#a6a595b2a164e820c19ccfe9a3d4be7dc" />
+                <section title="pos" ref="struct_rt_hpi_plugin_1_1coil_param.html#ab8b31ba321b56557f3b898c0006c5a5c" />
+              </section>
+              <section title="dipError" ref="struct_rt_hpi_plugin_1_1dip_error.html">
+                <section title="error" ref="struct_rt_hpi_plugin_1_1dip_error.html#ab9a07a320a8f03ee5f7139ef7f1857ad" />
+                <section title="moment" ref="struct_rt_hpi_plugin_1_1dip_error.html#a0bdcd6edb2bf71fd7b5013a5892baa72" />
+              </section>
               <section title="RtHpi" ref="class_rt_hpi_plugin_1_1_rt_hpi.html">
                 <section title="fiffInfoAvailable" ref="class_rt_hpi_plugin_1_1_rt_hpi.html#a978218e49da5eccc9a25ade11d4fa73f" />
                 <section title="run" ref="class_rt_hpi_plugin_1_1_rt_hpi.html#a5bca4001737d864bedf5f5da6ff9e720" />
@@ -2788,6 +2926,11 @@
               <section title="RtHpiSetupWidget" ref="class_rt_hpi_plugin_1_1_rt_hpi_setup_widget.html">
                 <section title="RtHpiSetupWidget" ref="class_rt_hpi_plugin_1_1_rt_hpi_setup_widget.html#a8907de785231da5c103a91a481741eab" />
                 <section title="~RtHpiSetupWidget" ref="class_rt_hpi_plugin_1_1_rt_hpi_setup_widget.html#a6d47a80b508b6750d42cafb5d69a58da" />
+              </section>
+              <section title="sens" ref="struct_rt_hpi_plugin_1_1sens.html">
+                <section title="coilori" ref="struct_rt_hpi_plugin_1_1sens.html#aa75248d7606667f9a01e70f8011d9951" />
+                <section title="coilpos" ref="struct_rt_hpi_plugin_1_1sens.html#a5a64ce3ee01dce81786d2e7183fa460d" />
+                <section title="tra" ref="struct_rt_hpi_plugin_1_1sens.html#a7abe4c1e934c20ddba77a6fd8866a9c1" />
               </section>
             </section>
             <section title="RTINVLIB">
@@ -3241,7 +3384,7 @@
             </section>
             <section title="UTILSLIB">
               <section title="AdaptiveMp" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html">
-                <section title="adaptive_atom_list" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a7b4aac4f46450f66eb76631e5f90e6ac" />
+                <section title="adaptive_atom_list" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#adc5b378055eeb8f76a1b71ed09f1fd35" />
                 <section title="fix_dict_atom_list" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#aa031af00dcceaf4b22e98bbe55d6d7d3" />
                 <section title="MatrixXd" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#aa3e576838ef666570eddacf52bfcf188" />
                 <section title="VectorXd" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a13a8e3fcc3d0e1a31cb2539827e09816" />
@@ -3249,11 +3392,13 @@
                 <section title="~AdaptiveMp" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a834f7b5712c44f5fff87ff73c6000ae0" />
                 <section title="current_result" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a00f825210324eb013948ab48da6b1792" />
                 <section title="finished_calc" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a4464cd60f58ff1f23807da72580bcb14" />
-                <section title="matching_pursuit" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a1e8088d153f0f50b194acd4a7f788688" />
+                <section title="matching_pursuit" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a898f01967a679ed3c52436bb80534a09" />
                 <section title="modulation_function" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a0d00568d44b833629094d3971ae85ff6" />
-                <section title="recieve_input" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a2186074fd7a509d33c62fe32199f7daf" />
+                <section title="recieve_input" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a0ba040d963191e847a6b80d5cc2c963f" />
                 <section title="send_warning" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a70bbb6f633b251e18ffc7a88316fb44b" />
-                <section title="atom_list" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a8dfd9de79226187aea10ce72a4670fe0" />
+                <section title="simplex_maximisation" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a1be5896dce6126b69cace01a068c71c4" />
+                <section title="atom_list" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a18515f2e6bd8731e6fe1106a69f010d0" />
+                <section title="atoms_in_chns" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#ab79f1e05c5e6d68d75d95257d0217d35" />
                 <section title="best_match" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a5bed9474f1f9632b22c25549b2a1bbce" />
                 <section title="current_energy" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a8dcb0c6f054a1bb8a5c71d1e62cf6f4d" />
                 <section title="epsilon" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a56faf05f2f1c4e3a07b32d5bd24cfcbc" />
@@ -3266,6 +3411,7 @@
                 <section title="signal_energy" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a202544fe887c9bbe4d01dc98daa47481" />
               </section>
               <section title="Atom" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html">
+                <section title="bm_channel" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#af9bc534dce868d36390d5d47c13f36d9" />
                 <section title="energy" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#a037921c38f535977eeb0a763ed538e9e" />
                 <section title="max_scalar_list" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#ade7e721033c2f527de0fe8003a46eb6f" />
                 <section title="max_scalar_product" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#acb6f17718c3cc0452f8c06577fb6e1d7" />
@@ -3300,6 +3446,7 @@
                 <section title="Dictionary" ref="class_u_t_i_l_s_l_i_b_1_1_dictionary.html#aee8d612bc9d323c38faba045ba384b8b" />
                 <section title="~Dictionary" ref="class_u_t_i_l_s_l_i_b_1_1_dictionary.html#aa36f24073d9c9001768517aa2322cb82" />
                 <section title="atom_count" ref="class_u_t_i_l_s_l_i_b_1_1_dictionary.html#a70e69f9fb926290f8381e76d2bdcf20b" />
+                <section title="clear" ref="class_u_t_i_l_s_l_i_b_1_1_dictionary.html#a2d54b74d14335da04ad9d64e49536d9a" />
                 <section title="atom_formula" ref="class_u_t_i_l_s_l_i_b_1_1_dictionary.html#a4b4d3d700ee75624379dd6c43f0ddeaa" />
                 <section title="atoms" ref="class_u_t_i_l_s_l_i_b_1_1_dictionary.html#a6e3d4e0fa7bb2ee78e499ed067b77d82" />
                 <section title="sample_count" ref="class_u_t_i_l_s_l_i_b_1_1_dictionary.html#a0c024c0fc0d747db7fc6bc3ffd789e5f" />
@@ -3934,6 +4081,10 @@
                 <section title="m_bStcSend" ref="class_x_m_e_a_s_l_i_b_1_1_real_time_source_estimate.html#a1284fc5e1431be35602927bdf392e523" />
               </section>
             </section>
+            <section title="AboutWindow" ref="class_about_window.html">
+              <section title="AboutWindow" ref="class_about_window.html#aeb482a2e3164a7c8314c50f603686293" />
+              <section title="~AboutWindow" ref="class_about_window.html#a4fd010283844ef86e381a72cf836769c" />
+            </section>
             <section title="AtomPaintWindow" ref="class_atom_paint_window.html">
               <section title="paint_signal" ref="class_atom_paint_window.html#afe5291a4224f899c0ff2a37901cc0e50" />
               <section title="paintEvent" ref="class_atom_paint_window.html#a5ad680945bb2c7c993eb3afafe60fbec" />
@@ -3942,6 +4093,10 @@
               <section title="mouseMoveEvent" ref="class_atom_sum_window.html#a4dee81aa23074aeb71718554764f8c5a" />
               <section title="paint_atom_sum" ref="class_atom_sum_window.html#a8f98cc375df5f08774ca19a610f819c5" />
               <section title="paintEvent" ref="class_atom_sum_window.html#ac9a5549b01d282f69bdd08d97727811c" />
+            </section>
+            <section title="AtomWindow" ref="class_atom_window.html">
+              <section title="paint_signal" ref="class_atom_window.html#a852d58c98568038a289186b5222d4421" />
+              <section title="paintEvent" ref="class_atom_window.html#a55b366ec9ef37251939e75d409d85751" />
             </section>
             <section title="AXPOS" ref="struct_a_x_p_o_s.html">
               <section title="axlabel" ref="struct_a_x_p_o_s.html#a11d0db592d1f74461959999dc3d07f25" />
@@ -4059,6 +4214,10 @@
               <section title="lm_ch_scales" ref="class_baby_m_e_g_info.html#a0244820e07f4a00bb32312858ffe0f31" />
               <section title="sfreq" ref="class_baby_m_e_g_info.html#a456050f595f13b961be44c100a24af80" />
             </section>
+            <section title="BaseView" ref="class_base_view.html">
+              <section title="BaseView" ref="class_base_view.html#a1036eacb49987dfb2b1c776ea059278a" />
+              <section title="~BaseView" ref="class_base_view.html#a0b87986502d132344f08be851cdb15d2" />
+            </section>
             <section title="CTypeName" ref="class_c_type_name.html" />
             <section title="DeleteMessageBox" ref="class_delete_message_box.html">
               <section title="DeleteMessageBox" ref="class_delete_message_box.html#ae220cf1643bf19c858b28d6d4cd91668" />
@@ -4123,18 +4282,21 @@
               <section title="update" ref="class_i_observer.html#a8499f376f794502fdd9ef197edd77b53" />
             </section>
             <section title="MainWindow" ref="class_main_window.html">
-              <section title="adaptive_atom_list" ref="class_main_window.html#afe27dcfbb3baf8164db5c0ba6e05008f" />
+              <section title="adaptive_atom_list" ref="class_main_window.html#a643d202f62666b6816afc61300096525" />
               <section title="fix_dict_atom_list" ref="class_main_window.html#aebafdca46b1571cb9062afb6a296ee39" />
               <section title="RowVectorXi" ref="class_main_window.html#a55b2826c7e01c04180839e80597bdfd5" />
               <section title="select_map" ref="class_main_window.html#a9a9d76682ea5b6dfa6539cd42ca693a1" />
               <section title="VectorXd" ref="class_main_window.html#a350703bcdbd7db9ba669d59976fa97cf" />
               <section title="MainWindow" ref="class_main_window.html#a8b244be8b7b7db1b08de2a2acb9409db" />
               <section title="~MainWindow" ref="class_main_window.html#ae98d00a93bc118200eeef9f9bba1dba7" />
+              <section title="MainWindow" ref="class_main_window.html#a8b244be8b7b7db1b08de2a2acb9409db" />
+              <section title="~MainWindow" ref="class_main_window.html#ae98d00a93bc118200eeef9f9bba1dba7" />
               <section title="fill_dict_combobox" ref="class_main_window.html#a3f9c305abccd2da91f29972dc5e6b1bd" />
+              <section title="kill_save_thread" ref="class_main_window.html#a3e8c36cfa7023e39fc7775ad17a00377" />
               <section title="save_fif_file" ref="class_main_window.html#ac4d337f76fea56f98f35761bfba8297a" />
-              <section title="send_input" ref="class_main_window.html#a262f5884020ce327e7c586fc2ec61624" />
+              <section title="send_input" ref="class_main_window.html#ae28e5f0b8ce12cb9500d05e4d5f75bcc" />
               <section title="send_input_fix_dict" ref="class_main_window.html#a97b4d2a1dd730e1d62b44349e93d5aab" />
-              <section title="to_save" ref="class_main_window.html#a246883a25adda9854c270eb1ff419055" />
+              <section title="to_save" ref="class_main_window.html#a81eb86be195c7c59e594598e1bfd516c" />
             </section>
             <section title="PlotSettings" ref="class_plot_settings.html">
               <section title="PlotSettings" ref="class_plot_settings.html#acf6e5ffc85b66759c8711fd07e146332" />
@@ -5428,6 +5590,21 @@
               <section title="widget1" ref="class_ui___trigger_control_setup_widget_class.html#a1d5359e11d8716de9ffc0874b926fdaa" />
               <section title="widget2" ref="class_ui___trigger_control_setup_widget_class.html#ac7e67f8e5985f7302506db80c6273205" />
             </section>
+            <section title="View3D" ref="class_view3_d.html">
+              <section title="View3D" ref="class_view3_d.html#a342aceb5d3fd2d490935b1b814bbc647" />
+              <section title="~View3D" ref="class_view3_d.html#a54e79a96844ebb7e5337622cf65188aa" />
+            </section>
+            <section title="ViewerWidget" ref="class_viewer_widget.html">
+              <section title="ViewerWidget" ref="class_viewer_widget.html#a7eb1e739fcdfafb922e554e145b0f0e0" />
+              <section title="~ViewerWidget" ref="class_viewer_widget.html#a3759ff8f5d933bcf1680f8913f63c5e0" />
+              <section title="CascadeSubWindows" ref="class_viewer_widget.html#a788e3a82ad1b2228417a413a332a1960" />
+              <section title="ReloadSurfaces" ref="class_viewer_widget.html#a6af88a5aa9b1fb97cda12411f56d605a" />
+              <section title="TileSubWindows" ref="class_viewer_widget.html#a469265cde62dc55e3975e249792a25ff" />
+            </section>
+            <section title="XAxisAtomWindow" ref="class_x_axis_atom_window.html">
+              <section title="paint_axis" ref="class_x_axis_atom_window.html#afd95eb2bf3c5081deff8ea7be01a8a6e" />
+              <section title="paintEvent" ref="class_x_axis_atom_window.html#a0b7d661114686ace94c3347111516071" />
+            </section>
             <section title="XAxisWindow" ref="class_x_axis_window.html">
               <section title="paint_axis" ref="class_x_axis_window.html#ac5e736300f96f203c6c58a13d31c4da9" />
               <section title="paintEvent" ref="class_x_axis_window.html#ab29eb88ad6683fb31f3bc26a7a354a5d" />
@@ -5463,7 +5640,9 @@
             <section title="UTILSLIB::FixDictAtom::ChirpATOM" ref="struct_u_t_i_l_s_l_i_b_1_1_fix_dict_atom_1_1_chirp_a_t_o_m.html" />
             <section title="MNEBrowseRawQt::CInfo" ref="class_m_n_e_browse_raw_qt_1_1_c_info.html" />
             <section title="MNEX::CInfo" ref="class_m_n_e_x_1_1_c_info.html" />
+            <section title="MNEAnalyzeQt::CInfo" ref="class_m_n_e_analyze_qt_1_1_c_info.html" />
             <section title="IOBuffer::CircularBuffer&lt; _Tp &gt;" ref="class_i_o_buffer_1_1_circular_buffer.html" />
+            <section title="RtHpiPlugin::coilParam" ref="struct_rt_hpi_plugin_1_1coil_param.html" />
             <section title="DISPLIB::ColorMap" ref="class_d_i_s_p_l_i_b_1_1_color_map.html" />
             <section title="FSLIB::Colortable" ref="class_f_s_l_i_b_1_1_colortable.html" />
             <section title="FiffSimulatorPlugin::FiffSimulator::Commands" ref="struct_fiff_simulator_plugin_1_1_fiff_simulator_1_1_commands.html" />
@@ -5474,6 +5653,7 @@
             <section title="NeuromagPlugin::dacqShmClient" ref="struct_neuromag_plugin_1_1dacq_shm_client.html" />
             <section title="MNEBrowseRawQt::DataPackage" ref="class_m_n_e_browse_raw_qt_1_1_data_package.html" />
             <section title="UTILSLIB::Dictionary" ref="class_u_t_i_l_s_l_i_b_1_1_dictionary.html" />
+            <section title="RtHpiPlugin::dipError" ref="struct_rt_hpi_plugin_1_1dip_error.html" />
             <section title="INVERSELIB::Dipole&lt; T &gt;" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html" />
             <section title="INVERSELIB::DipolePair&lt; T &gt;" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html" />
             <section title="ECGSimulatorPlugin::ECGSimChannel" ref="class_e_c_g_simulator_plugin_1_1_e_c_g_sim_channel.html" />
@@ -5558,8 +5738,15 @@
             <section title="QAbstractItemView">
               <section title="RawView" ref="class_raw_view.html" />
             </section>
+            <section title="QAbstractMesh">
+              <section title="DISP3DNEWLIB::BrainSurfaceMesh" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html" />
+            </section>
+            <section title="QAbstractMeshFunctor">
+              <section title="DISP3DNEWLIB::BrainSurfaceMeshFunctor" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh_functor.html" />
+            </section>
             <section title="QAbstractTableModel">
               <section title="DISP3DLIB::ClustStcModel" ref="class_d_i_s_p3_d_l_i_b_1_1_clust_stc_model.html" />
+              <section title="DISP3DNEWLIB::StcDataModel" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html" />
               <section title="MNEBrowseRawQt::AverageModel" ref="class_m_n_e_browse_raw_qt_1_1_average_model.html" />
               <section title="MNEBrowseRawQt::ChInfoModel" ref="class_m_n_e_browse_raw_qt_1_1_ch_info_model.html" />
               <section title="MNEBrowseRawQt::EventModel" ref="class_m_n_e_browse_raw_qt_1_1_event_model.html" />
@@ -5578,6 +5765,7 @@
               <section title="FIFFLIB::FiffStream" ref="class_f_i_f_f_l_i_b_1_1_fiff_stream.html" />
             </section>
             <section title="QDialog">
+              <section title="AboutWindow" ref="class_about_window.html" />
               <section title="AveragingPlugin::AveragingAboutWidget" ref="class_averaging_plugin_1_1_averaging_about_widget.html" />
               <section title="BabyMEGPlugin::BabyMEGAboutWidget" ref="class_baby_m_e_g_plugin_1_1_baby_m_e_g_about_widget.html" />
               <section title="BabyMEGPlugin::BabyMEGProjectDialog" ref="class_baby_m_e_g_plugin_1_1_baby_m_e_g_project_dialog.html" />
@@ -5609,6 +5797,12 @@
               <section title="MNEBrowseRawQt::ScaleWindow" ref="class_m_n_e_browse_raw_qt_1_1_scale_window.html" />
               <section title="MNEBrowseRawQt::SelectionManagerWindow" ref="class_m_n_e_browse_raw_qt_1_1_selection_manager_window.html" />
               <section title="XDISPLIB::SelectionManagerWindow" ref="class_x_d_i_s_p_l_i_b_1_1_selection_manager_window.html" />
+            </section>
+            <section title="QEntity">
+              <section title="DISP3DNEWLIB::RenderableEntity" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity.html">
+                <section title="DISP3DNEWLIB::BrainHemisphere" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html" />
+                <section title="DISP3DNEWLIB::BrainSurface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html" />
+              </section>
             </section>
             <section title="QGLView">
               <section title="DISP3DLIB::BrainView" ref="class_d_i_s_p3_d_l_i_b_1_1_brain_view.html" />
@@ -5658,6 +5852,7 @@
             </section>
             <section title="QMainWindow">
               <section title="EditorWindow" ref="class_editor_window.html" />
+              <section title="MainWindow" ref="class_main_window.html" />
               <section title="MainWindow" ref="class_main_window.html" />
               <section title="MNEBrowseRawQt::MainWindow" ref="class_m_n_e_browse_raw_qt_1_1_main_window.html" />
               <section title="MNEX::MainWindow" ref="class_m_n_e_x_1_1_main_window.html" />
@@ -5738,6 +5933,7 @@
               <section title="DirectRecord" ref="class_direct_record.html" />
               <section title="DISP3DLIB::ClustStcWorker" ref="class_d_i_s_p3_d_l_i_b_1_1_clust_stc_worker.html" />
               <section title="DISP3DLIB::InverseViewProducer" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html" />
+              <section title="DISP3DNEWLIB::StcDataWorker" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html" />
               <section title="ECGSimulatorPlugin::ECGProducer" ref="class_e_c_g_simulator_plugin_1_1_e_c_g_producer.html" />
               <section title="EEGoSportsPlugin::EEGoSportsProducer" ref="class_e_e_go_sports_plugin_1_1_e_e_go_sports_producer.html" />
               <section title="FiffSimulatorPlugin::FiffProducer" ref="class_fiff_simulator_plugin_1_1_fiff_producer.html" />
@@ -5787,9 +5983,13 @@
             <section title="QWidget">
               <section title="AtomPaintWindow" ref="class_atom_paint_window.html" />
               <section title="AtomSumWindow" ref="class_atom_sum_window.html" />
+              <section title="AtomWindow" ref="class_atom_window.html" />
               <section title="AveragingPlugin::AveragingSettingsWidget" ref="class_averaging_plugin_1_1_averaging_settings_widget.html" />
               <section title="AveragingPlugin::AveragingSetupWidget" ref="class_averaging_plugin_1_1_averaging_setup_widget.html" />
               <section title="BabyMEGPlugin::BabyMEGSetupWidget" ref="class_baby_m_e_g_plugin_1_1_baby_m_e_g_setup_widget.html" />
+              <section title="BaseView" ref="class_base_view.html">
+                <section title="View3D" ref="class_view3_d.html" />
+              </section>
               <section title="BCIPlugin::BCIFeatureWindow" ref="class_b_c_i_plugin_1_1_b_c_i_feature_window.html" />
               <section title="BCIPlugin::BCISetupWidget" ref="class_b_c_i_plugin_1_1_b_c_i_setup_widget.html" />
               <section title="CovariancePlugin::CovarianceSettingsWidget" ref="class_covariance_plugin_1_1_covariance_settings_widget.html" />
@@ -5830,6 +6030,8 @@
               <section title="TMSIPlugin::TMSISetupWidget" ref="class_t_m_s_i_plugin_1_1_t_m_s_i_setup_widget.html" />
               <section title="TreebasedDictWindow" ref="class_treebased_dict_window.html" />
               <section title="TriggerControlPlugin::TriggerControlSetupWidget" ref="class_trigger_control_plugin_1_1_trigger_control_setup_widget.html" />
+              <section title="ViewerWidget" ref="class_viewer_widget.html" />
+              <section title="XAxisAtomWindow" ref="class_x_axis_atom_window.html" />
               <section title="XAxisWindow" ref="class_x_axis_window.html" />
               <section title="XDISPLIB::CovModalityWidget" ref="class_x_d_i_s_p_l_i_b_1_1_cov_modality_widget.html" />
               <section title="XDISPLIB::EvokedModalityWidget" ref="class_x_d_i_s_p_l_i_b_1_1_evoked_modality_widget.html" />
@@ -5856,6 +6058,7 @@
             <section title="RtSssAlgo" ref="class_rt_sss_algo.html" />
             <section title="RtSssAlgoTest" ref="class_rt_sss_algo_test.html" />
             <section title="UTILSLIB::SelectionLoader" ref="class_u_t_i_l_s_l_i_b_1_1_selection_loader.html" />
+            <section title="RtHpiPlugin::sens" ref="struct_rt_hpi_plugin_1_1sens.html" />
             <section title="XDISPLIB::SensorGroup" ref="class_x_d_i_s_p_l_i_b_1_1_sensor_group.html" />
             <section title="XDISPLIB::SensorLayout" ref="class_x_d_i_s_p_l_i_b_1_1_sensor_layout.html" />
             <section title="TriggerControlPlugin::SerialPort::Settings" ref="struct_trigger_control_plugin_1_1_serial_port_1_1_settings.html" />
@@ -6044,6 +6247,9 @@
             <section title="Ui_TriggerControlSetupWidgetClass" ref="class_ui___trigger_control_setup_widget_class.html">
               <section title="Ui::TriggerControlSetupWidgetClass" ref="class_ui_1_1_trigger_control_setup_widget_class.html" />
             </section>
+            <section title="Window">
+              <section title="DISP3DNEWLIB::BrainView" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html" />
+            </section>
           </section>
           <section title="Class Members" ref="functions.html">
             <section title="All" ref="functions.html">
@@ -6142,6 +6348,65 @@
         <section title="Files">
           <section title="File List" ref="files.html">
             <section title="applications" ref="dir_a6e4fee11f07c3b70486e88fe92cbbdc.html">
+              <section title="mne_analyze_qt" ref="dir_4b1655844132f8cc94b682ef778c7235.html">
+                <section title="Views" ref="dir_20fc0a50bd4684a19a08c327d8117109.html">
+                  <section title="baseview.cpp" ref="baseview_8cpp.html" />
+                  <section title="baseview.h" ref="baseview_8h.html">
+                    <section title="BaseView" ref="class_base_view.html">
+                      <section title="BaseView" ref="class_base_view.html#a1036eacb49987dfb2b1c776ea059278a" />
+                      <section title="~BaseView" ref="class_base_view.html#a0b87986502d132344f08be851cdb15d2" />
+                    </section>
+                  </section>
+                  <section title="view3d.cpp" ref="view3d_8cpp.html" />
+                  <section title="view3d.h" ref="view3d_8h.html">
+                    <section title="View3D" ref="class_view3_d.html">
+                      <section title="View3D" ref="class_view3_d.html#a342aceb5d3fd2d490935b1b814bbc647" />
+                      <section title="~View3D" ref="class_view3_d.html#a54e79a96844ebb7e5337622cf65188aa" />
+                    </section>
+                  </section>
+                </section>
+                <section title="Windows" ref="dir_a89ba2879cf001b76d371350a31cfa66.html">
+                  <section title="aboutwindow.cpp" ref="mne__analyze__qt_2_windows_2aboutwindow_8cpp.html" />
+                  <section title="aboutwindow.h" ref="mne__analyze__qt_2_windows_2aboutwindow_8h.html">
+                    <section title="AboutWindow" ref="class_about_window.html">
+                      <section title="AboutWindow" ref="class_about_window.html#aeb482a2e3164a7c8314c50f603686293" />
+                      <section title="~AboutWindow" ref="class_about_window.html#a4fd010283844ef86e381a72cf836769c" />
+                    </section>
+                  </section>
+                  <section title="mainwindow.cpp" ref="mne__analyze__qt_2_windows_2mainwindow_8cpp.html" />
+                  <section title="mainwindow.h" ref="mne__analyze__qt_2_windows_2mainwindow_8h.html">
+                    <section title="MainWindow" ref="class_main_window.html">
+                      <section title="adaptive_atom_list" ref="class_main_window.html#a643d202f62666b6816afc61300096525" />
+                      <section title="fix_dict_atom_list" ref="class_main_window.html#aebafdca46b1571cb9062afb6a296ee39" />
+                      <section title="RowVectorXi" ref="class_main_window.html#a55b2826c7e01c04180839e80597bdfd5" />
+                      <section title="select_map" ref="class_main_window.html#a9a9d76682ea5b6dfa6539cd42ca693a1" />
+                      <section title="VectorXd" ref="class_main_window.html#a350703bcdbd7db9ba669d59976fa97cf" />
+                      <section title="MainWindow" ref="class_main_window.html#a8b244be8b7b7db1b08de2a2acb9409db" />
+                      <section title="~MainWindow" ref="class_main_window.html#ae98d00a93bc118200eeef9f9bba1dba7" />
+                      <section title="MainWindow" ref="class_main_window.html#a8b244be8b7b7db1b08de2a2acb9409db" />
+                      <section title="~MainWindow" ref="class_main_window.html#ae98d00a93bc118200eeef9f9bba1dba7" />
+                      <section title="fill_dict_combobox" ref="class_main_window.html#a3f9c305abccd2da91f29972dc5e6b1bd" />
+                      <section title="kill_save_thread" ref="class_main_window.html#a3e8c36cfa7023e39fc7775ad17a00377" />
+                      <section title="save_fif_file" ref="class_main_window.html#ac4d337f76fea56f98f35761bfba8297a" />
+                      <section title="send_input" ref="class_main_window.html#ae28e5f0b8ce12cb9500d05e4d5f75bcc" />
+                      <section title="send_input_fix_dict" ref="class_main_window.html#a97b4d2a1dd730e1d62b44349e93d5aab" />
+                      <section title="to_save" ref="class_main_window.html#a81eb86be195c7c59e594598e1bfd516c" />
+                    </section>
+                  </section>
+                  <section title="viewerwidget.cpp" ref="viewerwidget_8cpp.html" />
+                  <section title="viewerwidget.h" ref="viewerwidget_8h.html">
+                    <section title="ViewerWidget" ref="class_viewer_widget.html">
+                      <section title="ViewerWidget" ref="class_viewer_widget.html#a7eb1e739fcdfafb922e554e145b0f0e0" />
+                      <section title="~ViewerWidget" ref="class_viewer_widget.html#a3759ff8f5d933bcf1680f8913f63c5e0" />
+                      <section title="CascadeSubWindows" ref="class_viewer_widget.html#a788e3a82ad1b2228417a413a332a1960" />
+                      <section title="ReloadSurfaces" ref="class_viewer_widget.html#a6af88a5aa9b1fb97cda12411f56d605a" />
+                      <section title="TileSubWindows" ref="class_viewer_widget.html#a469265cde62dc55e3975e249792a25ff" />
+                    </section>
+                  </section>
+                </section>
+                <section title="info.h" ref="mne__analyze__qt_2info_8h_source.html" />
+                <section title="main.cpp" ref="applications_2mne__analyze__qt_2main_8cpp_source.html" />
+              </section>
               <section title="mne_browse_raw_qt" ref="dir_65eb5ee1265c0bdbfc750ac7f32cd8f3.html">
                 <section title="Delegates" ref="dir_732a35b9fd77df916fb6cf6c320d3497.html">
                   <section title="averagedelegate.cpp" ref="averagedelegate_8cpp.html" />
@@ -6532,6 +6797,7 @@
                       <section title="GetChPosition" ref="types_8h.html#a634a7601f4674af159eb3ce252a79588aefd8dad3bc582c0bbc8a651afc0dc2c9" />
                       <section title="GetChDigitizer" ref="types_8h.html#a634a7601f4674af159eb3ce252a79588a1d81ff23b9db32d3a48d77d30e813f04" />
                       <section title="GetChActiveFilter" ref="types_8h.html#a634a7601f4674af159eb3ce252a79588a9816a8a41141308d0f64ee2217d0b237" />
+                      <section title="GetChCoilType" ref="types_8h.html#a634a7601f4674af159eb3ce252a79588a85719a4d7f13f5fdfd5dc1a511ec692c" />
                     </section>
                     <section title="ItemRole" ref="types_8h.html#ad14e05bc4f08911d578663020eced6db">
                       <section title="GetProjectionData" ref="types_8h.html#ad14e05bc4f08911d578663020eced6dba0cc63e3184b236f7c3b043f3c374e5f0" />
@@ -6553,13 +6819,8 @@
                   <section title="rawview.h" ref="rawview_8h_source.html" />
                 </section>
                 <section title="Windows" ref="dir_2607aab2303fe750a4e9f3edc6da9333.html">
-                  <section title="aboutwindow.cpp" ref="aboutwindow_8cpp_source.html" />
-                  <section title="aboutwindow.h" ref="aboutwindow_8h.html">
-                    <section title="AboutWindow" ref="class_m_n_e_browse_raw_qt_1_1_about_window.html">
-                      <section title="AboutWindow" ref="class_m_n_e_browse_raw_qt_1_1_about_window.html#aeb482a2e3164a7c8314c50f603686293" />
-                      <section title="~AboutWindow" ref="class_m_n_e_browse_raw_qt_1_1_about_window.html#a4fd010283844ef86e381a72cf836769c" />
-                    </section>
-                  </section>
+                  <section title="aboutwindow.cpp" ref="mne__browse__raw__qt_2_windows_2aboutwindow_8cpp_source.html" />
+                  <section title="aboutwindow.h" ref="mne__browse__raw__qt_2_windows_2aboutwindow_8h_source.html" />
                   <section title="averagewindow.cpp" ref="averagewindow_8cpp.html" />
                   <section title="averagewindow.h" ref="averagewindow_8h.html">
                     <section title="AverageWindow" ref="class_m_n_e_browse_raw_qt_1_1_average_window.html">
@@ -6681,6 +6942,8 @@
                   </section>
                 </section>
                 <section title="editorwindow.cpp" ref="editorwindow_8cpp.html">
+                  <section title="_atom_colors" ref="editorwindow_8cpp.html#ad631941d5dff68de3d0055bc3a9dbb49" />
+                  <section title="_atom_matrix" ref="editorwindow_8cpp.html#a95a1b50f6ed5650483e78277cb019d12" />
                   <section title="allCombined" ref="editorwindow_8cpp.html#a9e2eeff51cf54bfed1647d010c3b0145" />
                   <section title="atomCount" ref="editorwindow_8cpp.html#a3719b784c25fa785098cf70c531f8354" />
                   <section title="atomType" ref="editorwindow_8cpp.html#aa17a9203780d92cdc7a1804f85dac59d" />
@@ -6693,12 +6956,14 @@
                   <section title="expStepWidthModu" ref="editorwindow_8cpp.html#a0986fe76d8ba48722db28a3109fc3ea0" />
                   <section title="expStepWidthPhase" ref="editorwindow_8cpp.html#a035becde3901b28ad61ed7fec348059e" />
                   <section title="expStepWidthScale" ref="editorwindow_8cpp.html#a4b106d23ab60937487a841f65468aab9" />
+                  <section title="is_expanded" ref="editorwindow_8cpp.html#af3b1badba54924dd1170c25ac5e5c7da" />
                   <section title="is_loading" ref="editorwindow_8cpp.html#a4f5bb751baa7a467a16ac7a20ae82c69" />
                   <section title="linStepWidthChirp" ref="editorwindow_8cpp.html#ac2e9bc85c55cf8db4a88a3220e122e19" />
                   <section title="linStepWidthModu" ref="editorwindow_8cpp.html#a2e8b101468f91e9653c0666dfaabee06" />
                   <section title="linStepWidthPhase" ref="editorwindow_8cpp.html#aea4caedb89c68eb6e1ff8582b0dc50c3" />
                   <section title="linStepWidthScale" ref="editorwindow_8cpp.html#aba64240f7ead308aa24ef39507b32210" />
                   <section title="moduList" ref="editorwindow_8cpp.html#a94afeb54c344cfa2fd81a525378c151d" />
+                  <section title="old_width" ref="editorwindow_8cpp.html#ab3d49e63e1bbd19f75b6ff9769822cb8" />
                   <section title="partDictName" ref="editorwindow_8cpp.html#af683d1d83526abc3576d5a957cf1bb35" />
                   <section title="phaseList" ref="editorwindow_8cpp.html#a3baf5ee8551966486216e2b0450d6f64" />
                   <section title="scaleList" ref="editorwindow_8cpp.html#a5258abb62ec11d383783b5db7394c625" />
@@ -6706,6 +6971,8 @@
                   <section title="startValueModu" ref="editorwindow_8cpp.html#a001ecb13e404e77b85db85325747bfe8" />
                   <section title="startValuePhase" ref="editorwindow_8cpp.html#a9f2ffa003df5ab79c450b8cdd27c7ef3" />
                   <section title="startValueScale" ref="editorwindow_8cpp.html#a2e66b301ccde4f663c40189fd45146fb" />
+                  <section title="window_height" ref="editorwindow_8cpp.html#ad1fe26ec9c6b6cee29d1e95af97f5657" />
+                  <section title="window_width" ref="editorwindow_8cpp.html#ae7343d8686d99f902e4951dbfc6b2788" />
                 </section>
                 <section title="editorwindow.h" ref="editorwindow_8h.html">
                   <section title="EditorWindow" ref="class_editor_window.html">
@@ -6717,6 +6984,14 @@
                     <section title="~EditorWindow" ref="class_editor_window.html#a7dd5c84136960d8ba831b04993811cf3" />
                     <section title="dict_saved" ref="class_editor_window.html#a874aa2dc73225bdcef11df073132062a" />
                     <section title="keyReleaseEvent" ref="class_editor_window.html#a5dcb651eba45f5cac84cfdbc2a67469f" />
+                  </section>
+                  <section title="AtomWindow" ref="class_atom_window.html">
+                    <section title="paint_signal" ref="class_atom_window.html#a852d58c98568038a289186b5222d4421" />
+                    <section title="paintEvent" ref="class_atom_window.html#a55b366ec9ef37251939e75d409d85751" />
+                  </section>
+                  <section title="XAxisAtomWindow" ref="class_x_axis_atom_window.html">
+                    <section title="paint_axis" ref="class_x_axis_atom_window.html#afd95eb2bf3c5081deff8ea7be01a8a6e" />
+                    <section title="paintEvent" ref="class_x_axis_atom_window.html#a0b7d661114686ace94c3347111516071" />
                   </section>
                 </section>
                 <section title="enhancededitorwindow.cpp" ref="enhancededitorwindow_8cpp.html">
@@ -8033,8 +8308,23 @@
                         </section>
                       </section>
                     </section>
-                    <section title="rthpi.cpp" ref="rthpi_8cpp.html" />
+                    <section title="rthpi.cpp" ref="rthpi_8cpp.html">
+                      <section title="computeTransformation" ref="rthpi_8cpp.html#ad2dffa432aeeb9cb739f9780c224a660" />
+                    </section>
                     <section title="rthpi.h" ref="rthpi_8h.html">
+                      <section title="coilParam" ref="struct_rt_hpi_plugin_1_1coil_param.html">
+                        <section title="mom" ref="struct_rt_hpi_plugin_1_1coil_param.html#a6a595b2a164e820c19ccfe9a3d4be7dc" />
+                        <section title="pos" ref="struct_rt_hpi_plugin_1_1coil_param.html#ab8b31ba321b56557f3b898c0006c5a5c" />
+                      </section>
+                      <section title="dipError" ref="struct_rt_hpi_plugin_1_1dip_error.html">
+                        <section title="error" ref="struct_rt_hpi_plugin_1_1dip_error.html#ab9a07a320a8f03ee5f7139ef7f1857ad" />
+                        <section title="moment" ref="struct_rt_hpi_plugin_1_1dip_error.html#a0bdcd6edb2bf71fd7b5013a5892baa72" />
+                      </section>
+                      <section title="sens" ref="struct_rt_hpi_plugin_1_1sens.html">
+                        <section title="coilori" ref="struct_rt_hpi_plugin_1_1sens.html#aa75248d7606667f9a01e70f8011d9951" />
+                        <section title="coilpos" ref="struct_rt_hpi_plugin_1_1sens.html#a5a64ce3ee01dce81786d2e7183fa460d" />
+                        <section title="tra" ref="struct_rt_hpi_plugin_1_1sens.html#a7abe4c1e934c20ddba77a6fd8866a9c1" />
+                      </section>
                       <section title="RtHpi" ref="class_rt_hpi_plugin_1_1_rt_hpi.html">
                         <section title="fiffInfoAvailable" ref="class_rt_hpi_plugin_1_1_rt_hpi.html#a978218e49da5eccc9a25ade11d4fa73f" />
                         <section title="run" ref="class_rt_hpi_plugin_1_1_rt_hpi.html#a5bca4001737d864bedf5f5da6ff9e720" />
@@ -9288,6 +9578,9 @@
               <section title="computeInverseRaw" ref="dir_6ffe8b1c42496304561ecde189debf2e.html">
                 <section title="main.cpp" ref="examples_2compute_inverse_raw_2main_8cpp_source.html" />
               </section>
+              <section title="disp3DNewTutorial" ref="dir_7e3599464dab0a8d6cecc75ec53bcb3e.html">
+                <section title="main.cpp" ref="examples_2disp3_d_new_tutorial_2main_8cpp_source.html" />
+              </section>
               <section title="evokedGradAmp" ref="dir_c874809651a6a0233fa00d009b9708b2.html">
                 <section title="main.cpp" ref="examples_2evoked_grad_amp_2main_8cpp_source.html" />
               </section>
@@ -9528,27 +9821,8 @@
                     </section>
                   </section>
                 </section>
-                <section title="brainview.cpp" ref="brainview_8cpp.html" />
-                <section title="brainview.h" ref="brainview_8h.html">
-                  <section title="BrainView" ref="class_d_i_s_p3_d_l_i_b_1_1_brain_view.html">
-                    <section title="ConstSPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_brain_view.html#a99e3b42e647c2ce018926af12035a58b" />
-                    <section title="SPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_brain_view.html#ace6011f1821da7b16c354c76cb4a406a" />
-                    <section title="ViewOption" ref="class_d_i_s_p3_d_l_i_b_1_1_brain_view.html#af87d45da2c2af25f6a9e0a30ff79c1a3">
-                      <section title="ShowCurvature" ref="class_d_i_s_p3_d_l_i_b_1_1_brain_view.html#af87d45da2c2af25f6a9e0a30ff79c1a3a579f6082ce332d65e81934c238ba187e" />
-                    </section>
-                    <section title="BrainView" ref="class_d_i_s_p3_d_l_i_b_1_1_brain_view.html#ad37273d6fd7ad16fc06f71385396ee9f" />
-                    <section title="BrainView" ref="class_d_i_s_p3_d_l_i_b_1_1_brain_view.html#a4a8fa70494483efc56abd6b0ac633fb0" />
-                    <section title="BrainView" ref="class_d_i_s_p3_d_l_i_b_1_1_brain_view.html#a53257ad41ac0490bce0fdb5a8eed396e" />
-                    <section title="BrainView" ref="class_d_i_s_p3_d_l_i_b_1_1_brain_view.html#a3ec70de4d06d3343458b3ed6656c3fa4" />
-                    <section title="~BrainView" ref="class_d_i_s_p3_d_l_i_b_1_1_brain_view.html#a25a6cb87ec4cb9b614d20337c510eee8" />
-                    <section title="init" ref="class_d_i_s_p3_d_l_i_b_1_1_brain_view.html#ae08cc4f139dcffac64f889a1044ac126" />
-                    <section title="initializeGL" ref="class_d_i_s_p3_d_l_i_b_1_1_brain_view.html#aa055f632260cf708bf6bb0e475ae31f6" />
-                    <section title="keyPressEvent" ref="class_d_i_s_p3_d_l_i_b_1_1_brain_view.html#a9038126d04f2c970768ae2dc572788df" />
-                    <section title="mouseMoveEvent" ref="class_d_i_s_p3_d_l_i_b_1_1_brain_view.html#a38556a43878b7c0cd0bf78d5bd6f0308" />
-                    <section title="mousePressEvent" ref="class_d_i_s_p3_d_l_i_b_1_1_brain_view.html#a485f9eede056b5819847cc32ab9190da" />
-                    <section title="paintGL" ref="class_d_i_s_p3_d_l_i_b_1_1_brain_view.html#aa719accc7fdacbfd7c542cc2f979d28d" />
-                  </section>
-                </section>
+                <section title="brainview.cpp" ref="brainview_8cpp_source.html" />
+                <section title="brainview.h" ref="brainview_8h_source.html" />
                 <section title="disp3D_global.h" ref="disp3_d__global_8h.html">
                   <section title="DISP3DSHARED_EXPORT" ref="disp3_d__global_8h.html#a9e0813af0c7548e2ee60e9033fdf045e" />
                 </section>
@@ -9623,6 +9897,142 @@
                     <section title="showDebugTable" ref="class_d_i_s_p3_d_l_i_b_1_1_new_brain_view.html#a612c3437de7739cd7fb3d20f8dc03b19" />
                   </section>
                 </section>
+              </section>
+              <section title="disp3DNew" ref="dir_d565da9b92ed48264c0f0df333344a24.html">
+                <section title="brainSurface" ref="dir_79e736c0c30b8032501546a2b9b90052.html">
+                  <section title="brainhemisphere.cpp" ref="brainhemisphere_8cpp_source.html" />
+                  <section title="brainhemisphere.h" ref="brainhemisphere_8h.html">
+                    <section title="BrainHemisphere" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html">
+                      <section title="ConstSPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#a9d0a6f7cdb9abeae43977d641e1c126b" />
+                      <section title="SPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#ac1de408b4de21dea23e4edb3836e1936" />
+                      <section title="BrainHemisphere" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#a63cbc241539e2ff71872d3d4d025f111" />
+                      <section title="BrainHemisphere" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#a3ee2e9f87bd1d78c2d7d30670fcc66ea" />
+                      <section title="init" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#ac1439bbdf431b9cbf31bbdf88f06669d" />
+                      <section title="updateActivation" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#afb9fff18872b54c89434fbcd405ed4bf" />
+                      <section title="m_pSurfaceMesh" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#abd760ef5aca0e6f5130f322b98ef8be5" />
+                      <section title="m_qmVertexColors" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#a460a1fcf1e97d097f187cc1c51e1e35c" />
+                      <section title="m_surface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#aa51806b1b9d3626e0bdcbff4b7f25f54" />
+                    </section>
+                  </section>
+                  <section title="brainsurface.cpp" ref="brainsurface_8cpp.html" />
+                  <section title="brainsurface.h" ref="brainsurface_8h.html">
+                    <section title="BrainSurface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html">
+                      <section title="ConstSPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a877c849cd8d6ad17ec304c8f4928d2a6" />
+                      <section title="SPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#af5db79a315f98dca0100fa6022c0a37f" />
+                      <section title="BrainSurface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a6bf154cdc24d56ae926c460269565864" />
+                      <section title="BrainSurface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a4d9fdf8635e0c2c6b892da4a85024a6a" />
+                      <section title="BrainSurface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a9eb29857c68f705ada3bd4e9b8151b50" />
+                      <section title="BrainSurface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#aba4cf607a84a1a39fa28d68b23c73cbc" />
+                      <section title="~BrainSurface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#aac806b66eb2a9ff9e94916d4bccc8468" />
+                      <section title="calcBoundingBox" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a5578bd2d2b0e1af3a9fac47515424b72" />
+                      <section title="dataChanged" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a514d6b74e04e452ca9ccfe68aa09ba51" />
+                      <section title="init" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#aefbf9c0a013d89eef31a33bcd7a3a231" />
+                      <section title="setModel" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a517a77fcd3ca14c910c8590fbe3c29f2" />
+                      <section title="updateActivation" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#aaefe5b26d83f62ce5e6e0c89d1944f8a" />
+                      <section title="m_AnnotationSet" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a1e253341906522f79655b1fda6f3bba7" />
+                      <section title="m_ColorGyri" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#aeba72e058a27707a1e9edaeb74a3849f" />
+                      <section title="m_ColorSulci" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a1d14f5403b6f6c5479347d48b0f25709" />
+                      <section title="m_pLeftHemisphere" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#abdddc589253cea0f439abc332f62eed6" />
+                      <section title="m_pRightHemisphere" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a3c0d1988269144b9b524af95b08e5a3f" />
+                      <section title="m_pStcDataModel" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#ae7756e262080029321af19818238f4ed" />
+                      <section title="m_qlColors" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#aa7284faa66fd14c3bc837d4f7c513920" />
+                      <section title="m_qmDefaultVertexColorLH" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a01a87cdef7e832f5b72c85e441a7e3ed" />
+                      <section title="m_qmDefaultVertexColorRH" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a728ef25a40fc556422ba1c156a0c4fbd" />
+                      <section title="m_qmVertexActivationColorLH" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a788a347255f513adbbf0c6d64b0af6b0" />
+                      <section title="m_qmVertexActivationColorRH" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#acea28ef79b0866f3c964de5e7584b846" />
+                      <section title="m_SurfaceSet" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a89c7fd9705cfe2be6b37c31c5044f48a" />
+                      <section title="m_vecBoundingBoxCenter" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a0473f76bc4d7a1426c9d98c513fbd89b" />
+                      <section title="m_vecBoundingBoxMax" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a404c9ddafbca8e58313d0733f3e4ab78" />
+                      <section title="m_vecBoundingBoxMin" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#ab2662bed392a61b898f593f1fa9b021a" />
+                    </section>
+                  </section>
+                  <section title="brainsurfacemesh.cpp" ref="brainsurfacemesh_8cpp.html">
+                    <section title="_USE_MATH_DEFINES" ref="brainsurfacemesh_8cpp.html#a525335710b53cb064ca56b936120431e" />
+                  </section>
+                  <section title="brainsurfacemesh.h" ref="brainsurfacemesh_8h.html">
+                    <section title="BrainSurfaceMesh" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html">
+                      <section title="ConstSPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a4095b26db02205d984c3c8da6994c0a6" />
+                      <section title="SPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a36fbb73d0b338541a0764be92aeda30c" />
+                      <section title="BrainSurfaceMesh" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a2910030003ad5051213c51f766c22bd2" />
+                      <section title="BrainSurfaceMesh" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a5343552a191aa4278bf419f73aae0f82" />
+                      <section title="copy" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#aec8ec4cbabab636a05be23d9ee57aa3a" />
+                      <section title="getNumberOfVertices" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a416bc1a6db8c1ca73875e13cecf51221" />
+                      <section title="meshFunctor" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#ac431c1040ece9fdb0e860e53c264eda4" />
+                      <section title="updateActivation" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a5cfd2006d05d97004a89ab1f0327cea6" />
+                      <section title="m_pMeshFunctorPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#afba2cb6d627aaefd1da066498f3ba805" />
+                      <section title="m_qmVertexColor" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a6a170e712fa734ae4388d7a9e4620dc2" />
+                      <section title="m_surface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a91661dfe5098a217bce7ba1c284bbfdd" />
+                    </section>
+                    <section title="BrainSurfaceMeshFunctor" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh_functor.html">
+                      <section title="BrainSurfaceMeshFunctor" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh_functor.html#ae7dfd0b53c843e5642aab31b782fa9f4" />
+                      <section title="operator()" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh_functor.html#a8af0d4249401129b7e188017d791dc7b" />
+                      <section title="operator==" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh_functor.html#aa5811135b33552a36ac94a3c344c1e35" />
+                    </section>
+                  </section>
+                </section>
+                <section title="helpers" ref="dir_a0d72ecf8d12d9850944a6d87f7406b7.html">
+                  <section title="renderableentity.cpp" ref="renderableentity_8cpp_source.html" />
+                  <section title="renderableentity.h" ref="renderableentity_8h_source.html" />
+                </section>
+                <section title="models" ref="dir_158d5f76fe22640c718cda233661ca47.html">
+                  <section title="stcdatamodel.cpp" ref="stcdatamodel_8cpp.html" />
+                  <section title="stcdatamodel.h" ref="stcdatamodel_8h.html">
+                    <section title="StcDataModel" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html">
+                      <section title="ConstSPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a45d02188c1e309b9b13c17dc3e59dac6" />
+                      <section title="SPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#aea6ed1b00945bdddc8384801994431c9" />
+                      <section title="StcDataModel" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a1d62ade0d3c8c2b595f8bd8c50c27097" />
+                      <section title="~StcDataModel" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#ae2ef17cba99e0c34642b9b3128d26fb2" />
+                      <section title="addData" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a611191b0692bfae956acc58b095ab94c" />
+                      <section title="columnCount" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#afcdcc994197a97dfc2e262e3f5b8295f" />
+                      <section title="data" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#aefa378cbbd606ba489a391817daee0c8" />
+                      <section title="data" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a7bf85696d900cb8b5fe9eda3d1930384" />
+                      <section title="getMax" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#ad958c648f5a9dd9521a941f8e749c007" />
+                      <section title="getMin" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a10f9dbf20e630019e5ad86486a822952" />
+                      <section title="headerData" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a7ed4e178df360f3e0478837e15d35ea2" />
+                      <section title="init" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#ae9f565d1153d736c4b073f0442e6d54f" />
+                      <section title="rowCount" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a2d5bc5dba69f71fe4d09f5799438629e" />
+                      <section title="setAverage" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a7e1f5c40548f383a26b254dc1342aa97" />
+                      <section title="setLoop" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a95cf4689710db7e35772d30708bebcb8" />
+                      <section title="setNormalization" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#ab3aeeffba6871f74c0712b87f8beac69" />
+                      <section title="setStcSample" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a5427dabf4004db13bb6083421cf5e226" />
+                      <section title="setVertLabelIDs" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a3bbb9f4ac444094dd48cb4bdc6b66270" />
+                      <section title="smoothEstimates" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a04df0be6fdb9fc2c8ab24e6f0b27fdaf" />
+                    </section>
+                    <section title="ItemRole" ref="stcdatamodel_8h.html#a3f6d5a48949c1aa0ae8c542b5e11b19d">
+                      <section title="GetIndexLH" ref="stcdatamodel_8h.html#a3f6d5a48949c1aa0ae8c542b5e11b19daeed90f4410940a05541f1296cce5bb90" />
+                      <section title="GetIndexRH" ref="stcdatamodel_8h.html#a3f6d5a48949c1aa0ae8c542b5e11b19daa0e7a81cf8ea8f30c7cfcf67a7df3e51" />
+                      <section title="GetStcValLH" ref="stcdatamodel_8h.html#a3f6d5a48949c1aa0ae8c542b5e11b19daaaae9fb4c8a35154c158771c85c0dd3c" />
+                      <section title="GetStcValRH" ref="stcdatamodel_8h.html#a3f6d5a48949c1aa0ae8c542b5e11b19dadb78b80c1d89964ad762bc2dfbae323d" />
+                      <section title="GetRelStcValLH" ref="stcdatamodel_8h.html#a3f6d5a48949c1aa0ae8c542b5e11b19da42811c6638c024ebfe078f84200f40db" />
+                      <section title="GetRelStcValRH" ref="stcdatamodel_8h.html#a3f6d5a48949c1aa0ae8c542b5e11b19da875fcba4b3c33128496d24210c1f01cc" />
+                      <section title="GetSmoothedStcValLH" ref="stcdatamodel_8h.html#a3f6d5a48949c1aa0ae8c542b5e11b19da6304741f13d90bbf9345c745643bc9ac" />
+                      <section title="GetSmoothedStcValRH" ref="stcdatamodel_8h.html#a3f6d5a48949c1aa0ae8c542b5e11b19da39171a795ca4b24bfd649e08efdfa34f" />
+                    </section>
+                    <section title="Q_DECLARE_METATYPE" ref="stcdatamodel_8h.html#a5be230a2eed0dfbd4c4a526f6e53ecdf" />
+                    <section title="Q_DECLARE_METATYPE" ref="stcdatamodel_8h.html#ae4003b3ab4b64a5469289f81246ff9e0" />
+                    <section title="Q_DECLARE_METATYPE" ref="stcdatamodel_8h.html#ad076db5ff300222faa50574f5ee66c26" />
+                  </section>
+                  <section title="stcdataworker.cpp" ref="stcdataworker_8cpp.html" />
+                  <section title="stcdataworker.h" ref="stcdataworker_8h.html">
+                    <section title="StcDataWorker" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html">
+                      <section title="ConstSPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a122d2de401f505f644046298278bede9" />
+                      <section title="SPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a5d45e7a2d4d24d72d5e8fae699178611" />
+                      <section title="StcDataWorker" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#aa1b2f5d5e92e0d57051b0b61abe496dc" />
+                      <section title="~StcDataWorker" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a1f086d100a7b4d0b1cf43e79fa2a990a" />
+                      <section title="addData" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#aefce60fdea308fdebf35154e59873924" />
+                      <section title="clear" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a79a3e4399c7034f16b084b066523dbd8" />
+                      <section title="run" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#ae920258d1b9eb3b6c39066dac42b4b10" />
+                      <section title="setAverage" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a82527bc98171186ffcdacf312eece44c" />
+                      <section title="setInterval" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a13334bf69d8738068183026a246a2125" />
+                      <section title="setLoop" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#af497e40d345e1748e6b1de7a164c7324" />
+                      <section title="stcSample" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a7a28db5856eeca9e0bb2588fb49db549" />
+                      <section title="stop" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a526e63c61b744566cc9de191f86015fd" />
+                    </section>
+                  </section>
+                </section>
+                <section title="brainview.cpp" ref="ew_2brainview_8cpp_source.html" />
+                <section title="brainview.h" ref="ew_2brainview_8h_source.html" />
+                <section title="disp3DNew_global.h" ref="disp3_d_new__global_8h_source.html" />
               </section>
               <section title="fiff" ref="dir_02d6b00d369dfdccb62582dcf5f74964.html">
                 <section title="fiff.cpp" ref="fiff_8cpp.html" />
@@ -11212,6 +11622,8 @@
                     <section title="inuse" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a1a7ba6a83b5b474df998aaf25eb6ade1" />
                     <section title="nearest" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ac5480868a444c31d040a123f926d537f" />
                     <section title="nearest_dist" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aaf1380e5dffa62b3b3e4cdb44f0be303" />
+                    <section title="neighbor_tri" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae7f8d800b94a9e292e343d439a66e757" />
+                    <section title="neighbor_vert" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ad5ab1beed9e998dccda1963824f0c73c" />
                     <section title="nn" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a92b928637b438f118a00c860e929ecae" />
                     <section title="np" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aed488c023af9e17d490f3abdea867eeb" />
                     <section title="ntri" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a6a322c8dadb0d6e9f19b0065d859e297" />
@@ -11591,7 +12003,7 @@
                   <section title="adaptivemp.cpp" ref="adaptivemp_8cpp.html" />
                   <section title="adaptivemp.h" ref="adaptivemp_8h.html">
                     <section title="AdaptiveMp" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html">
-                      <section title="adaptive_atom_list" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a7b4aac4f46450f66eb76631e5f90e6ac" />
+                      <section title="adaptive_atom_list" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#adc5b378055eeb8f76a1b71ed09f1fd35" />
                       <section title="fix_dict_atom_list" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#aa031af00dcceaf4b22e98bbe55d6d7d3" />
                       <section title="MatrixXd" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#aa3e576838ef666570eddacf52bfcf188" />
                       <section title="VectorXd" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a13a8e3fcc3d0e1a31cb2539827e09816" />
@@ -11599,11 +12011,13 @@
                       <section title="~AdaptiveMp" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a834f7b5712c44f5fff87ff73c6000ae0" />
                       <section title="current_result" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a00f825210324eb013948ab48da6b1792" />
                       <section title="finished_calc" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a4464cd60f58ff1f23807da72580bcb14" />
-                      <section title="matching_pursuit" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a1e8088d153f0f50b194acd4a7f788688" />
+                      <section title="matching_pursuit" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a898f01967a679ed3c52436bb80534a09" />
                       <section title="modulation_function" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a0d00568d44b833629094d3971ae85ff6" />
-                      <section title="recieve_input" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a2186074fd7a509d33c62fe32199f7daf" />
+                      <section title="recieve_input" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a0ba040d963191e847a6b80d5cc2c963f" />
                       <section title="send_warning" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a70bbb6f633b251e18ffc7a88316fb44b" />
-                      <section title="atom_list" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a8dfd9de79226187aea10ce72a4670fe0" />
+                      <section title="simplex_maximisation" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a1be5896dce6126b69cace01a068c71c4" />
+                      <section title="atom_list" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a18515f2e6bd8731e6fe1106a69f010d0" />
+                      <section title="atoms_in_chns" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#ab79f1e05c5e6d68d75d95257d0217d35" />
                       <section title="best_match" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a5bed9474f1f9632b22c25549b2a1bbce" />
                       <section title="current_energy" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a8dcb0c6f054a1bb8a5c71d1e62cf6f4d" />
                       <section title="epsilon" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a56faf05f2f1c4e3a07b32d5bd24cfcbc" />
@@ -11623,6 +12037,7 @@
                   <section title="atom.cpp" ref="atom_8cpp.html" />
                   <section title="atom.h" ref="atom_8h.html">
                     <section title="Atom" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html">
+                      <section title="bm_channel" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#af9bc534dce868d36390d5d47c13f36d9" />
                       <section title="energy" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#a037921c38f535977eeb0a763ed538e9e" />
                       <section title="max_scalar_list" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#ade7e721033c2f527de0fe8003a46eb6f" />
                       <section title="max_scalar_product" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#acb6f17718c3cc0452f8c06577fb6e1d7" />
@@ -11907,6 +12322,7 @@
       <keyword name="parentName" id="deletemessagebox.cpp::parentName" ref="deletemessagebox_8cpp.html#a4ee0b2e58ac0c4cd890bf848f0dbff15" />
       <keyword name="allCombined" id="editorwindow.cpp::allCombined" ref="editorwindow_8cpp.html#a9e2eeff51cf54bfed1647d010c3b0145" />
       <keyword name="is_loading" id="editorwindow.cpp::is_loading" ref="editorwindow_8cpp.html#a4f5bb751baa7a467a16ac7a20ae82c69" />
+      <keyword name="is_expanded" id="editorwindow.cpp::is_expanded" ref="editorwindow_8cpp.html#af3b1badba54924dd1170c25ac5e5c7da" />
       <keyword name="linStepWidthScale" id="editorwindow.cpp::linStepWidthScale" ref="editorwindow_8cpp.html#aba64240f7ead308aa24ef39507b32210" />
       <keyword name="linStepWidthModu" id="editorwindow.cpp::linStepWidthModu" ref="editorwindow_8cpp.html#a2e8b101468f91e9653c0666dfaabee06" />
       <keyword name="linStepWidthPhase" id="editorwindow.cpp::linStepWidthPhase" ref="editorwindow_8cpp.html#aea4caedb89c68eb6e1ff8582b0dc50c3" />
@@ -11928,8 +12344,13 @@
       <keyword name="moduList" id="editorwindow.cpp::moduList" ref="editorwindow_8cpp.html#a94afeb54c344cfa2fd81a525378c151d" />
       <keyword name="phaseList" id="editorwindow.cpp::phaseList" ref="editorwindow_8cpp.html#a3baf5ee8551966486216e2b0450d6f64" />
       <keyword name="chirpList" id="editorwindow.cpp::chirpList" ref="editorwindow_8cpp.html#a6520a90c9fa49e10577ca2fb53325b43" />
+      <keyword name="old_width" id="editorwindow.cpp::old_width" ref="editorwindow_8cpp.html#ab3d49e63e1bbd19f75b6ff9769822cb8" />
       <keyword name="atomCount" id="editorwindow.cpp::atomCount" ref="editorwindow_8cpp.html#a3719b784c25fa785098cf70c531f8354" />
+      <keyword name="_atom_matrix" id="editorwindow.cpp::_atom_matrix" ref="editorwindow_8cpp.html#a95a1b50f6ed5650483e78277cb019d12" />
+      <keyword name="_atom_colors" id="editorwindow.cpp::_atom_colors" ref="editorwindow_8cpp.html#ad631941d5dff68de3d0055bc3a9dbb49" />
       <keyword name="atomType" id="editorwindow.cpp::atomType" ref="editorwindow_8cpp.html#aa17a9203780d92cdc7a1804f85dac59d" />
+      <keyword name="window_height" id="editorwindow.cpp::window_height" ref="editorwindow_8cpp.html#ad1fe26ec9c6b6cee29d1e95af97f5657" />
+      <keyword name="window_width" id="editorwindow.cpp::window_width" ref="editorwindow_8cpp.html#ae7343d8686d99f902e4951dbfc6b2788" />
       <keyword name="_atom_count" id="enhancededitorwindow.cpp::_atom_count" ref="enhancededitorwindow_8cpp.html#afc11583f4de0212c86e78fd1f17e1d9a" />
       <keyword name="_sample_count" id="enhancededitorwindow.cpp::_sample_count" ref="enhancededitorwindow_8cpp.html#a2dd5f571dde082743c1beb294200b2e3" />
       <keyword name="value_a_list" id="enhancededitorwindow.cpp::value_a_list" ref="enhancededitorwindow_8cpp.html#a9d47964668a9eab5e1d23933fd26cbda" />
@@ -12087,6 +12508,7 @@
       <keyword name="CREATEAMPLIFIER" id="eegosportsdriver.h::CREATEAMPLIFIER" ref="eegosportsdriver_8h.html#a3efa3acac8d2e73d4bfc306845f42677" />
       <keyword name="NOISE_ESTIMATESHARED_EXPORT" id="noiseestimate_global.h::NOISE_ESTIMATESHARED_EXPORT" ref="noiseestimate__global_8h.html#a55618b6e0e38b025eb895f2941f0218b" />
       <keyword name="RAPMUSICTOOLBOXSHARED_EXPORT" id="rapmusictoolbox_global.h::RAPMUSICTOOLBOXSHARED_EXPORT" ref="rapmusictoolbox__global_8h.html#a17ce923506d19ca71b07d2faeb2ea155" />
+      <keyword name="computeTransformation" id="rthpi.cpp::computeTransformation" ref="rthpi_8cpp.html#ad2dffa432aeeb9cb739f9780c224a660" />
       <keyword name="RTHPISHARED_EXPORT" id="rthpi_global.h::RTHPISHARED_EXPORT" ref="rthpi__global_8h.html#a2e519c159892de826dd366691e7801d3" />
       <keyword name="rt_sss" id="rtsss.cpp::rt_sss" ref="rtsss_8cpp.html#a05a250cad105c71f37baabbd65e0acfe" />
       <keyword name="rsss" id="rtsss.cpp::rsss" ref="rtsss_8cpp.html#a65e8fbeb5170122569caec45bb639401" />
@@ -12211,6 +12633,9 @@
       <keyword name="Q_DECLARE_METATYPE" id="cluststcmodel.h::Q_DECLARE_METATYPE" ref="cluststcmodel_8h.html#a5be230a2eed0dfbd4c4a526f6e53ecdf" />
       <keyword name="Q_DECLARE_METATYPE" id="cluststcmodel.h::Q_DECLARE_METATYPE" ref="cluststcmodel_8h.html#ae4003b3ab4b64a5469289f81246ff9e0" />
       <keyword name="Q_DECLARE_METATYPE" id="cluststcmodel.h::Q_DECLARE_METATYPE" ref="cluststcmodel_8h.html#ad076db5ff300222faa50574f5ee66c26" />
+      <keyword name="Q_DECLARE_METATYPE" id="stcdatamodel.h::Q_DECLARE_METATYPE" ref="stcdatamodel_8h.html#a5be230a2eed0dfbd4c4a526f6e53ecdf" />
+      <keyword name="Q_DECLARE_METATYPE" id="stcdatamodel.h::Q_DECLARE_METATYPE" ref="stcdatamodel_8h.html#ae4003b3ab4b64a5469289f81246ff9e0" />
+      <keyword name="Q_DECLARE_METATYPE" id="stcdatamodel.h::Q_DECLARE_METATYPE" ref="stcdatamodel_8h.html#ad076db5ff300222faa50574f5ee66c26" />
       <keyword name="FIFFC_FAIL" id="fiff_constants.h::FIFFC_FAIL" ref="fiff__constants_8h.html#a164d7d917910d0200ae0951263a63224" />
       <keyword name="FIFFC_OK" id="fiff_constants.h::FIFFC_OK" ref="fiff__constants_8h.html#a0775517d1b8500074bafd144010494c0" />
       <keyword name="FIFFV_TRUE" id="fiff_constants.h::FIFFV_TRUE" ref="fiff__constants_8h.html#a68709efc74e274c14b549d168299cb08" />
@@ -12856,6 +13281,8 @@
       <keyword name="UTILSSHARED_EXPORT" id="utils_global.h::UTILSSHARED_EXPORT" ref="utils__global_8h.html#a66e92968c1d28ba0dcd8b83fd51f6c95" />
       <keyword name="SourceConnector" id="SourceConnector" ref="md__d_1__users__christoph__git_hub_mne-cpp_applications_mne_rt_server__r_e_a_d_m_e.html" />
       <keyword name="MainWindow user interface" id="MainWindow user interface" ref="group___class.html" />
+      <keyword name="AboutWindow" id="AboutWindow" ref="class_about_window.html" />
+      <keyword name="AboutWindow" id="AboutWindow::AboutWindow" ref="class_about_window.html#aeb482a2e3164a7c8314c50f603686293" />
       <keyword name="AtomPaintWindow" id="AtomPaintWindow" ref="class_atom_paint_window.html" />
       <keyword name="paint_signal" id="AtomPaintWindow::paint_signal" ref="class_atom_paint_window.html#afe5291a4224f899c0ff2a37901cc0e50" />
       <keyword name="paintEvent" id="AtomPaintWindow::paintEvent" ref="class_atom_paint_window.html#a5ad680945bb2c7c993eb3afafe60fbec" />
@@ -12863,6 +13290,9 @@
       <keyword name="paint_atom_sum" id="AtomSumWindow::paint_atom_sum" ref="class_atom_sum_window.html#a8f98cc375df5f08774ca19a610f819c5" />
       <keyword name="paintEvent" id="AtomSumWindow::paintEvent" ref="class_atom_sum_window.html#ac9a5549b01d282f69bdd08d97727811c" />
       <keyword name="mouseMoveEvent" id="AtomSumWindow::mouseMoveEvent" ref="class_atom_sum_window.html#a4dee81aa23074aeb71718554764f8c5a" />
+      <keyword name="AtomWindow" id="AtomWindow" ref="class_atom_window.html" />
+      <keyword name="paint_signal" id="AtomWindow::paint_signal" ref="class_atom_window.html#a852d58c98568038a289186b5222d4421" />
+      <keyword name="paintEvent" id="AtomWindow::paintEvent" ref="class_atom_window.html#a55b366ec9ef37251939e75d409d85751" />
       <keyword name="AXPOS" id="AXPOS" ref="struct_a_x_p_o_s.html" />
       <keyword name="axnum" id="AXPOS::axnum" ref="struct_a_x_p_o_s.html#a2e671a33c4250086e29fc9ed368126ed" />
       <keyword name="x" id="AXPOS::x" ref="struct_a_x_p_o_s.html#a7de9eab2c71838e5c38ad79b5552bb01" />
@@ -12974,6 +13404,7 @@
       <keyword name="lm_ch_coiltype" id="BabyMEGInfo::lm_ch_coiltype" ref="class_baby_m_e_g_info.html#a429575b1cdd4628666bc2db97f15b15b" />
       <keyword name="lm_ch_calicoef" id="BabyMEGInfo::lm_ch_calicoef" ref="class_baby_m_e_g_info.html#ac396317578f818d5cb5d6ac285be5033" />
       <keyword name="lm_ch_gain" id="BabyMEGInfo::lm_ch_gain" ref="class_baby_m_e_g_info.html#ae9e636c07578cc01f0e7450a934649f9" />
+      <keyword name="BaseView" id="BaseView" ref="class_base_view.html" />
       <keyword name="CTypeName" id="CTypeName" ref="class_c_type_name.html" />
       <keyword name="name" id="CTypeName::name" ref="class_c_type_name.html#ae1c92fafa161460cdc8555d45581c84c" />
       <keyword name="DeleteMessageBox" id="DeleteMessageBox" ref="class_delete_message_box.html" />
@@ -13021,14 +13452,16 @@
       <keyword name="~IObserver" id="IObserver::~IObserver" ref="class_i_observer.html#afdfe9e2ebd9aa794142968de574daa9a" />
       <keyword name="update" id="IObserver::update" ref="class_i_observer.html#a8499f376f794502fdd9ef197edd77b53" />
       <keyword name="MainWindow" id="MainWindow" ref="class_main_window.html" />
-      <keyword name="adaptive_atom_list" id="MainWindow::adaptive_atom_list" ref="class_main_window.html#afe27dcfbb3baf8164db5c0ba6e05008f" />
+      <keyword name="adaptive_atom_list" id="MainWindow::adaptive_atom_list" ref="class_main_window.html#a643d202f62666b6816afc61300096525" />
       <keyword name="fix_dict_atom_list" id="MainWindow::fix_dict_atom_list" ref="class_main_window.html#aebafdca46b1571cb9062afb6a296ee39" />
       <keyword name="select_map" id="MainWindow::select_map" ref="class_main_window.html#a9a9d76682ea5b6dfa6539cd42ca693a1" />
       <keyword name="VectorXd" id="MainWindow::VectorXd" ref="class_main_window.html#a350703bcdbd7db9ba669d59976fa97cf" />
       <keyword name="RowVectorXi" id="MainWindow::RowVectorXi" ref="class_main_window.html#a55b2826c7e01c04180839e80597bdfd5" />
-      <keyword name="send_input" id="MainWindow::send_input" ref="class_main_window.html#a262f5884020ce327e7c586fc2ec61624" />
+      <keyword name="send_input" id="MainWindow::send_input" ref="class_main_window.html#ae28e5f0b8ce12cb9500d05e4d5f75bcc" />
       <keyword name="send_input_fix_dict" id="MainWindow::send_input_fix_dict" ref="class_main_window.html#a97b4d2a1dd730e1d62b44349e93d5aab" />
-      <keyword name="to_save" id="MainWindow::to_save" ref="class_main_window.html#a246883a25adda9854c270eb1ff419055" />
+      <keyword name="to_save" id="MainWindow::to_save" ref="class_main_window.html#a81eb86be195c7c59e594598e1bfd516c" />
+      <keyword name="kill_save_thread" id="MainWindow::kill_save_thread" ref="class_main_window.html#a3e8c36cfa7023e39fc7775ad17a00377" />
+      <keyword name="MainWindow" id="MainWindow::MainWindow" ref="class_main_window.html#a8b244be8b7b7db1b08de2a2acb9409db" />
       <keyword name="MainWindow" id="MainWindow::MainWindow" ref="class_main_window.html#a8b244be8b7b7db1b08de2a2acb9409db" />
       <keyword name="fill_dict_combobox" id="MainWindow::fill_dict_combobox" ref="class_main_window.html#a3f9c305abccd2da91f29972dc5e6b1bd" />
       <keyword name="save_fif_file" id="MainWindow::save_fif_file" ref="class_main_window.html#ac4d337f76fea56f98f35761bfba8297a" />
@@ -14242,6 +14675,16 @@
       <keyword name="horizontalLayout_6" id="Ui_TriggerControlSetupWidgetClass::horizontalLayout_6" ref="class_ui___trigger_control_setup_widget_class.html#a9b66a36184e1723566b749c1cd4e7d57" />
       <keyword name="m_qComboBox_ChannelList" id="Ui_TriggerControlSetupWidgetClass::m_qComboBox_ChannelList" ref="class_ui___trigger_control_setup_widget_class.html#a1a527419710710f3bd025190fbe13fdb" />
       <keyword name="m_qPushButton_ConnectChannel" id="Ui_TriggerControlSetupWidgetClass::m_qPushButton_ConnectChannel" ref="class_ui___trigger_control_setup_widget_class.html#a7f274d4e8837959592ec00485678a9d6" />
+      <keyword name="View3D" id="View3D" ref="class_view3_d.html" />
+      <keyword name="View3D" id="View3D::View3D" ref="class_view3_d.html#a342aceb5d3fd2d490935b1b814bbc647" />
+      <keyword name="ViewerWidget" id="ViewerWidget" ref="class_viewer_widget.html" />
+      <keyword name="ViewerWidget" id="ViewerWidget::ViewerWidget" ref="class_viewer_widget.html#a7eb1e739fcdfafb922e554e145b0f0e0" />
+      <keyword name="CascadeSubWindows" id="ViewerWidget::CascadeSubWindows" ref="class_viewer_widget.html#a788e3a82ad1b2228417a413a332a1960" />
+      <keyword name="TileSubWindows" id="ViewerWidget::TileSubWindows" ref="class_viewer_widget.html#a469265cde62dc55e3975e249792a25ff" />
+      <keyword name="ReloadSurfaces" id="ViewerWidget::ReloadSurfaces" ref="class_viewer_widget.html#a6af88a5aa9b1fb97cda12411f56d605a" />
+      <keyword name="XAxisAtomWindow" id="XAxisAtomWindow" ref="class_x_axis_atom_window.html" />
+      <keyword name="paint_axis" id="XAxisAtomWindow::paint_axis" ref="class_x_axis_atom_window.html#afd95eb2bf3c5081deff8ea7be01a8a6e" />
+      <keyword name="paintEvent" id="XAxisAtomWindow::paintEvent" ref="class_x_axis_atom_window.html#a0b7d661114686ace94c3347111516071" />
       <keyword name="XAxisWindow" id="XAxisWindow" ref="class_x_axis_window.html" />
       <keyword name="paint_axis" id="XAxisWindow::paint_axis" ref="class_x_axis_window.html#ac5e736300f96f203c6c58a13d31c4da9" />
       <keyword name="paintEvent" id="XAxisWindow::paintEvent" ref="class_x_axis_window.html#ab29eb88ad6683fb31f3bc26a7a354a5d" />
@@ -14685,6 +15128,126 @@
       <keyword name="~NewBrainView" id="DISP3DLIB::NewBrainView::~NewBrainView" ref="class_d_i_s_p3_d_l_i_b_1_1_new_brain_view.html#a3555753ceac474f22f8b92a63638181e" />
       <keyword name="init" id="DISP3DLIB::NewBrainView::init" ref="class_d_i_s_p3_d_l_i_b_1_1_new_brain_view.html#a4f81d07d02213f7f4ff346ec94fd89fd" />
       <keyword name="showDebugTable" id="DISP3DLIB::NewBrainView::showDebugTable" ref="class_d_i_s_p3_d_l_i_b_1_1_new_brain_view.html#a612c3437de7739cd7fb3d20f8dc03b19" />
+      <keyword name="DISP3DNEWLIB::BrainHemisphere" id="DISP3DNEWLIB::BrainHemisphere" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html" />
+      <keyword name="SPtr" id="DISP3DNEWLIB::BrainHemisphere::SPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#ac1de408b4de21dea23e4edb3836e1936" />
+      <keyword name="ConstSPtr" id="DISP3DNEWLIB::BrainHemisphere::ConstSPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#a9d0a6f7cdb9abeae43977d641e1c126b" />
+      <keyword name="BrainHemisphere" id="DISP3DNEWLIB::BrainHemisphere::BrainHemisphere" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#a63cbc241539e2ff71872d3d4d025f111" />
+      <keyword name="BrainHemisphere" id="DISP3DNEWLIB::BrainHemisphere::BrainHemisphere" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#a3ee2e9f87bd1d78c2d7d30670fcc66ea" />
+      <keyword name="updateActivation" id="DISP3DNEWLIB::BrainHemisphere::updateActivation" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#afb9fff18872b54c89434fbcd405ed4bf" />
+      <keyword name="RenderableEntity" id="DISP3DNEWLIB::RenderableEntity::RenderableEntity" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity.html#a0cbf5c8ce3f5aac7c47bf05ecdb042ce" />
+      <keyword name="scaleTransform" id="DISP3DNEWLIB::RenderableEntity::scaleTransform" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity.html#ad3845193dbe9b69088d41d67b2465d0e" />
+      <keyword name="translateTransform" id="DISP3DNEWLIB::RenderableEntity::translateTransform" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity.html#a99493424cfc43fe9c73066c8184dc390" />
+      <keyword name="rotateTransform" id="DISP3DNEWLIB::RenderableEntity::rotateTransform" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity.html#a40934bdfad9e1a8d55113cae00058594" />
+      <keyword name="init" id="DISP3DNEWLIB::BrainHemisphere::init" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#ac1439bbdf431b9cbf31bbdf88f06669d" />
+      <keyword name="m_pSurfaceMesh" id="DISP3DNEWLIB::BrainHemisphere::m_pSurfaceMesh" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#abd760ef5aca0e6f5130f322b98ef8be5" />
+      <keyword name="m_surface" id="DISP3DNEWLIB::BrainHemisphere::m_surface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#aa51806b1b9d3626e0bdcbff4b7f25f54" />
+      <keyword name="m_qmVertexColors" id="DISP3DNEWLIB::BrainHemisphere::m_qmVertexColors" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html#a460a1fcf1e97d097f187cc1c51e1e35c" />
+      <keyword name="DISP3DNEWLIB::BrainSurface" id="DISP3DNEWLIB::BrainSurface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html" />
+      <keyword name="SPtr" id="DISP3DNEWLIB::BrainSurface::SPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#af5db79a315f98dca0100fa6022c0a37f" />
+      <keyword name="ConstSPtr" id="DISP3DNEWLIB::BrainSurface::ConstSPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a877c849cd8d6ad17ec304c8f4928d2a6" />
+      <keyword name="BrainSurface" id="DISP3DNEWLIB::BrainSurface::BrainSurface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a6bf154cdc24d56ae926c460269565864" />
+      <keyword name="BrainSurface" id="DISP3DNEWLIB::BrainSurface::BrainSurface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a4d9fdf8635e0c2c6b892da4a85024a6a" />
+      <keyword name="BrainSurface" id="DISP3DNEWLIB::BrainSurface::BrainSurface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a9eb29857c68f705ada3bd4e9b8151b50" />
+      <keyword name="BrainSurface" id="DISP3DNEWLIB::BrainSurface::BrainSurface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#aba4cf607a84a1a39fa28d68b23c73cbc" />
+      <keyword name="~BrainSurface" id="DISP3DNEWLIB::BrainSurface::~BrainSurface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#aac806b66eb2a9ff9e94916d4bccc8468" />
+      <keyword name="updateActivation" id="DISP3DNEWLIB::BrainSurface::updateActivation" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#aaefe5b26d83f62ce5e6e0c89d1944f8a" />
+      <keyword name="dataChanged" id="DISP3DNEWLIB::BrainSurface::dataChanged" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a514d6b74e04e452ca9ccfe68aa09ba51" />
+      <keyword name="setModel" id="DISP3DNEWLIB::BrainSurface::setModel" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a517a77fcd3ca14c910c8590fbe3c29f2" />
+      <keyword name="RenderableEntity" id="DISP3DNEWLIB::RenderableEntity::RenderableEntity" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity.html#a0cbf5c8ce3f5aac7c47bf05ecdb042ce" />
+      <keyword name="scaleTransform" id="DISP3DNEWLIB::RenderableEntity::scaleTransform" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity.html#ad3845193dbe9b69088d41d67b2465d0e" />
+      <keyword name="translateTransform" id="DISP3DNEWLIB::RenderableEntity::translateTransform" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity.html#a99493424cfc43fe9c73066c8184dc390" />
+      <keyword name="rotateTransform" id="DISP3DNEWLIB::RenderableEntity::rotateTransform" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity.html#a40934bdfad9e1a8d55113cae00058594" />
+      <keyword name="init" id="DISP3DNEWLIB::BrainSurface::init" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#aefbf9c0a013d89eef31a33bcd7a3a231" />
+      <keyword name="calcBoundingBox" id="DISP3DNEWLIB::BrainSurface::calcBoundingBox" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a5578bd2d2b0e1af3a9fac47515424b72" />
+      <keyword name="m_pLeftHemisphere" id="DISP3DNEWLIB::BrainSurface::m_pLeftHemisphere" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#abdddc589253cea0f439abc332f62eed6" />
+      <keyword name="m_pRightHemisphere" id="DISP3DNEWLIB::BrainSurface::m_pRightHemisphere" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a3c0d1988269144b9b524af95b08e5a3f" />
+      <keyword name="m_SurfaceSet" id="DISP3DNEWLIB::BrainSurface::m_SurfaceSet" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a89c7fd9705cfe2be6b37c31c5044f48a" />
+      <keyword name="m_AnnotationSet" id="DISP3DNEWLIB::BrainSurface::m_AnnotationSet" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a1e253341906522f79655b1fda6f3bba7" />
+      <keyword name="m_qlColors" id="DISP3DNEWLIB::BrainSurface::m_qlColors" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#aa7284faa66fd14c3bc837d4f7c513920" />
+      <keyword name="m_vecBoundingBoxMin" id="DISP3DNEWLIB::BrainSurface::m_vecBoundingBoxMin" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#ab2662bed392a61b898f593f1fa9b021a" />
+      <keyword name="m_vecBoundingBoxMax" id="DISP3DNEWLIB::BrainSurface::m_vecBoundingBoxMax" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a404c9ddafbca8e58313d0733f3e4ab78" />
+      <keyword name="m_vecBoundingBoxCenter" id="DISP3DNEWLIB::BrainSurface::m_vecBoundingBoxCenter" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a0473f76bc4d7a1426c9d98c513fbd89b" />
+      <keyword name="m_pStcDataModel" id="DISP3DNEWLIB::BrainSurface::m_pStcDataModel" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#ae7756e262080029321af19818238f4ed" />
+      <keyword name="m_qmDefaultVertexColorLH" id="DISP3DNEWLIB::BrainSurface::m_qmDefaultVertexColorLH" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a01a87cdef7e832f5b72c85e441a7e3ed" />
+      <keyword name="m_qmDefaultVertexColorRH" id="DISP3DNEWLIB::BrainSurface::m_qmDefaultVertexColorRH" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a728ef25a40fc556422ba1c156a0c4fbd" />
+      <keyword name="m_qmVertexActivationColorLH" id="DISP3DNEWLIB::BrainSurface::m_qmVertexActivationColorLH" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a788a347255f513adbbf0c6d64b0af6b0" />
+      <keyword name="m_qmVertexActivationColorRH" id="DISP3DNEWLIB::BrainSurface::m_qmVertexActivationColorRH" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#acea28ef79b0866f3c964de5e7584b846" />
+      <keyword name="m_ColorSulci" id="DISP3DNEWLIB::BrainSurface::m_ColorSulci" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a1d14f5403b6f6c5479347d48b0f25709" />
+      <keyword name="m_ColorGyri" id="DISP3DNEWLIB::BrainSurface::m_ColorGyri" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#aeba72e058a27707a1e9edaeb74a3849f" />
+      <keyword name="DISP3DNEWLIB::BrainSurfaceMesh" id="DISP3DNEWLIB::BrainSurfaceMesh" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html" />
+      <keyword name="SPtr" id="DISP3DNEWLIB::BrainSurfaceMesh::SPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a36fbb73d0b338541a0764be92aeda30c" />
+      <keyword name="ConstSPtr" id="DISP3DNEWLIB::BrainSurfaceMesh::ConstSPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a4095b26db02205d984c3c8da6994c0a6" />
+      <keyword name="BrainSurfaceMesh" id="DISP3DNEWLIB::BrainSurfaceMesh::BrainSurfaceMesh" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a2910030003ad5051213c51f766c22bd2" />
+      <keyword name="BrainSurfaceMesh" id="DISP3DNEWLIB::BrainSurfaceMesh::BrainSurfaceMesh" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a5343552a191aa4278bf419f73aae0f82" />
+      <keyword name="meshFunctor" id="DISP3DNEWLIB::BrainSurfaceMesh::meshFunctor" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#ac431c1040ece9fdb0e860e53c264eda4" />
+      <keyword name="updateActivation" id="DISP3DNEWLIB::BrainSurfaceMesh::updateActivation" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a5cfd2006d05d97004a89ab1f0327cea6" />
+      <keyword name="getNumberOfVertices" id="DISP3DNEWLIB::BrainSurfaceMesh::getNumberOfVertices" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a416bc1a6db8c1ca73875e13cecf51221" />
+      <keyword name="copy" id="DISP3DNEWLIB::BrainSurfaceMesh::copy" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#aec8ec4cbabab636a05be23d9ee57aa3a" />
+      <keyword name="m_surface" id="DISP3DNEWLIB::BrainSurfaceMesh::m_surface" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a91661dfe5098a217bce7ba1c284bbfdd" />
+      <keyword name="m_qmVertexColor" id="DISP3DNEWLIB::BrainSurfaceMesh::m_qmVertexColor" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#a6a170e712fa734ae4388d7a9e4620dc2" />
+      <keyword name="m_pMeshFunctorPtr" id="DISP3DNEWLIB::BrainSurfaceMesh::m_pMeshFunctorPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html#afba2cb6d627aaefd1da066498f3ba805" />
+      <keyword name="DISP3DNEWLIB::BrainSurfaceMeshFunctor" id="DISP3DNEWLIB::BrainSurfaceMeshFunctor" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh_functor.html" />
+      <keyword name="BrainSurfaceMeshFunctor" id="DISP3DNEWLIB::BrainSurfaceMeshFunctor::BrainSurfaceMeshFunctor" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh_functor.html#ae7dfd0b53c843e5642aab31b782fa9f4" />
+      <keyword name="operator()" id="DISP3DNEWLIB::BrainSurfaceMeshFunctor::operator()" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh_functor.html#a8af0d4249401129b7e188017d791dc7b" />
+      <keyword name="operator==" id="DISP3DNEWLIB::BrainSurfaceMeshFunctor::operator==" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh_functor.html#aa5811135b33552a36ac94a3c344c1e35" />
+      <keyword name="DISP3DNEWLIB::BrainView" id="DISP3DNEWLIB::BrainView" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html" />
+      <keyword name="SPtr" id="DISP3DNEWLIB::BrainView::SPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a7f510d0408f6072a2251e99be3a01dfd" />
+      <keyword name="ConstSPtr" id="DISP3DNEWLIB::BrainView::ConstSPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a53adce869196ff16774901b1cdb41583" />
+      <keyword name="BrainView" id="DISP3DNEWLIB::BrainView::BrainView" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#ad37273d6fd7ad16fc06f71385396ee9f" />
+      <keyword name="BrainView" id="DISP3DNEWLIB::BrainView::BrainView" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a4a8fa70494483efc56abd6b0ac633fb0" />
+      <keyword name="BrainView" id="DISP3DNEWLIB::BrainView::BrainView" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a53257ad41ac0490bce0fdb5a8eed396e" />
+      <keyword name="BrainView" id="DISP3DNEWLIB::BrainView::BrainView" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a3ec70de4d06d3343458b3ed6656c3fa4" />
+      <keyword name="~BrainView" id="DISP3DNEWLIB::BrainView::~BrainView" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a25a6cb87ec4cb9b614d20337c510eee8" />
+      <keyword name="addSourceEstimate" id="DISP3DNEWLIB::BrainView::addSourceEstimate" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a98dbbc84d15131ec78d7c0763dbf139c" />
+      <keyword name="initStcDataModel" id="DISP3DNEWLIB::BrainView::initStcDataModel" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a7b0cfa14c1097134e8d37769b9917c79" />
+      <keyword name="init" id="DISP3DNEWLIB::BrainView::init" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a967dd3c8d68de154aad76980ebbecab2" />
+      <keyword name="createCoordSystem" id="DISP3DNEWLIB::BrainView::createCoordSystem" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#ae1ddda0eec6d0eec495b9f4607e69392" />
+      <keyword name="mousePressEvent" id="DISP3DNEWLIB::BrainView::mousePressEvent" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a485f9eede056b5819847cc32ab9190da" />
+      <keyword name="m_Engine" id="DISP3DNEWLIB::BrainView::m_Engine" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a9536b33c75f9a8f66f16f7f5e206356a" />
+      <keyword name="m_pAspectInput" id="DISP3DNEWLIB::BrainView::m_pAspectInput" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a52d18e17456b251f8a6cd7fa2c9131e9" />
+      <keyword name="m_data" id="DISP3DNEWLIB::BrainView::m_data" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a156e56f0804c2d30bf00498e8bd0286f" />
+      <keyword name="m_pRootEntity" id="DISP3DNEWLIB::BrainView::m_pRootEntity" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#af45fbc0413c41c14401e8637a5f2fb7d" />
+      <keyword name="m_XAxisEntity" id="DISP3DNEWLIB::BrainView::m_XAxisEntity" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a2e8abdd2c9fd972c56462c40a90002ed" />
+      <keyword name="m_YAxisEntity" id="DISP3DNEWLIB::BrainView::m_YAxisEntity" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a60debc351a6d6be7d3e0e33edb96e5d2" />
+      <keyword name="m_ZAxisEntity" id="DISP3DNEWLIB::BrainView::m_ZAxisEntity" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#aa4e8da5aa5d25a69616086b03322da53" />
+      <keyword name="m_pBrainSurfaceEntity" id="DISP3DNEWLIB::BrainView::m_pBrainSurfaceEntity" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a571148cf3afbe80d4d59d1e8b2589d0a" />
+      <keyword name="m_pStcDataModel" id="DISP3DNEWLIB::BrainView::m_pStcDataModel" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html#a7b852ebae32aa536062bfd0a24389e51" />
+      <keyword name="DISP3DNEWLIB::RenderableEntity" id="DISP3DNEWLIB::RenderableEntity" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity.html" />
+      <keyword name="RenderableEntity" id="DISP3DNEWLIB::RenderableEntity::RenderableEntity" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity.html#a0cbf5c8ce3f5aac7c47bf05ecdb042ce" />
+      <keyword name="scaleTransform" id="DISP3DNEWLIB::RenderableEntity::scaleTransform" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity.html#ad3845193dbe9b69088d41d67b2465d0e" />
+      <keyword name="translateTransform" id="DISP3DNEWLIB::RenderableEntity::translateTransform" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity.html#a99493424cfc43fe9c73066c8184dc390" />
+      <keyword name="rotateTransform" id="DISP3DNEWLIB::RenderableEntity::rotateTransform" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity.html#a40934bdfad9e1a8d55113cae00058594" />
+      <keyword name="DISP3DNEWLIB::StcDataModel" id="DISP3DNEWLIB::StcDataModel" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html" />
+      <keyword name="SPtr" id="DISP3DNEWLIB::StcDataModel::SPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#aea6ed1b00945bdddc8384801994431c9" />
+      <keyword name="ConstSPtr" id="DISP3DNEWLIB::StcDataModel::ConstSPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a45d02188c1e309b9b13c17dc3e59dac6" />
+      <keyword name="StcDataModel" id="DISP3DNEWLIB::StcDataModel::StcDataModel" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a1d62ade0d3c8c2b595f8bd8c50c27097" />
+      <keyword name="rowCount" id="DISP3DNEWLIB::StcDataModel::rowCount" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a2d5bc5dba69f71fe4d09f5799438629e" />
+      <keyword name="columnCount" id="DISP3DNEWLIB::StcDataModel::columnCount" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#afcdcc994197a97dfc2e262e3f5b8295f" />
+      <keyword name="data" id="DISP3DNEWLIB::StcDataModel::data" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#aefa378cbbd606ba489a391817daee0c8" />
+      <keyword name="data" id="DISP3DNEWLIB::StcDataModel::data" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a7bf85696d900cb8b5fe9eda3d1930384" />
+      <keyword name="headerData" id="DISP3DNEWLIB::StcDataModel::headerData" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a7ed4e178df360f3e0478837e15d35ea2" />
+      <keyword name="addData" id="DISP3DNEWLIB::StcDataModel::addData" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a611191b0692bfae956acc58b095ab94c" />
+      <keyword name="init" id="DISP3DNEWLIB::StcDataModel::init" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#ae9f565d1153d736c4b073f0442e6d54f" />
+      <keyword name="getMin" id="DISP3DNEWLIB::StcDataModel::getMin" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a10f9dbf20e630019e5ad86486a822952" />
+      <keyword name="getMax" id="DISP3DNEWLIB::StcDataModel::getMax" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#ad958c648f5a9dd9521a941f8e749c007" />
+      <keyword name="setAverage" id="DISP3DNEWLIB::StcDataModel::setAverage" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a7e1f5c40548f383a26b254dc1342aa97" />
+      <keyword name="setLoop" id="DISP3DNEWLIB::StcDataModel::setLoop" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a95cf4689710db7e35772d30708bebcb8" />
+      <keyword name="setNormalization" id="DISP3DNEWLIB::StcDataModel::setNormalization" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#ab3aeeffba6871f74c0712b87f8beac69" />
+      <keyword name="setStcSample" id="DISP3DNEWLIB::StcDataModel::setStcSample" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a5427dabf4004db13bb6083421cf5e226" />
+      <keyword name="setVertLabelIDs" id="DISP3DNEWLIB::StcDataModel::setVertLabelIDs" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a3bbb9f4ac444094dd48cb4bdc6b66270" />
+      <keyword name="smoothEstimates" id="DISP3DNEWLIB::StcDataModel::smoothEstimates" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html#a04df0be6fdb9fc2c8ab24e6f0b27fdaf" />
+      <keyword name="DISP3DNEWLIB::StcDataWorker" id="DISP3DNEWLIB::StcDataWorker" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html" />
+      <keyword name="SPtr" id="DISP3DNEWLIB::StcDataWorker::SPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a5d45e7a2d4d24d72d5e8fae699178611" />
+      <keyword name="ConstSPtr" id="DISP3DNEWLIB::StcDataWorker::ConstSPtr" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a122d2de401f505f644046298278bede9" />
+      <keyword name="stcSample" id="DISP3DNEWLIB::StcDataWorker::stcSample" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a7a28db5856eeca9e0bb2588fb49db549" />
+      <keyword name="StcDataWorker" id="DISP3DNEWLIB::StcDataWorker::StcDataWorker" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#aa1b2f5d5e92e0d57051b0b61abe496dc" />
+      <keyword name="addData" id="DISP3DNEWLIB::StcDataWorker::addData" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#aefce60fdea308fdebf35154e59873924" />
+      <keyword name="clear" id="DISP3DNEWLIB::StcDataWorker::clear" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a79a3e4399c7034f16b084b066523dbd8" />
+      <keyword name="setAverage" id="DISP3DNEWLIB::StcDataWorker::setAverage" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a82527bc98171186ffcdacf312eece44c" />
+      <keyword name="setInterval" id="DISP3DNEWLIB::StcDataWorker::setInterval" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a13334bf69d8738068183026a246a2125" />
+      <keyword name="setLoop" id="DISP3DNEWLIB::StcDataWorker::setLoop" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#af497e40d345e1748e6b1de7a164c7324" />
+      <keyword name="stop" id="DISP3DNEWLIB::StcDataWorker::stop" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#a526e63c61b744566cc9de191f86015fd" />
+      <keyword name="run" id="DISP3DNEWLIB::StcDataWorker::run" ref="class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html#ae920258d1b9eb3b6c39066dac42b4b10" />
       <keyword name="DISPLIB::ColorMap" id="DISPLIB::ColorMap" ref="class_d_i_s_p_l_i_b_1_1_color_map.html" />
       <keyword name="SPtr" id="DISPLIB::ColorMap::SPtr" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#aa3086eee9052119ceea08c709ed608c3" />
       <keyword name="ConstSPtr" id="DISPLIB::ColorMap::ConstSPtr" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a96f919a6067a0092192a16d4ce2d58e4" />
@@ -15927,6 +16490,15 @@
       <keyword name="clear" id="IOBuffer::CircularMultiChannelBuffer_old::clear" ref="class_i_o_buffer_1_1_circular_multi_channel_buffer__old.html#a1d5936bcc33e0e19a317fe0fe3b4a51b" />
       <keyword name="Buffer" id="IOBuffer::Buffer::Buffer" ref="class_i_o_buffer_1_1_buffer.html#a2071703c082f507144349ffbccf6b2f3" />
       <keyword name="getTypeId" id="IOBuffer::Buffer::getTypeId" ref="class_i_o_buffer_1_1_buffer.html#a587586f369e9d5df00a7fc77fc8f7f86" />
+      <keyword name="MNEAnalyzeQt::CInfo" id="MNEAnalyzeQt::CInfo" ref="class_m_n_e_analyze_qt_1_1_c_info.html" />
+      <keyword name="AppNameShort" id="MNEAnalyzeQt::CInfo::AppNameShort" ref="class_m_n_e_analyze_qt_1_1_c_info.html#a4f1c1b36cdee081ead2ee6f493e4a2e1" />
+      <keyword name="AppName" id="MNEAnalyzeQt::CInfo::AppName" ref="class_m_n_e_analyze_qt_1_1_c_info.html#aa79cfd3860066bee0f4b3242684dd464" />
+      <keyword name="OrganizationName" id="MNEAnalyzeQt::CInfo::OrganizationName" ref="class_m_n_e_analyze_qt_1_1_c_info.html#afb9d74c01069c1402751277128816422" />
+      <keyword name="MajorVersion" id="MNEAnalyzeQt::CInfo::MajorVersion" ref="class_m_n_e_analyze_qt_1_1_c_info.html#a2b6c351c034b03e2c88d3ebd43a30eab" />
+      <keyword name="MinorVersion" id="MNEAnalyzeQt::CInfo::MinorVersion" ref="class_m_n_e_analyze_qt_1_1_c_info.html#a301e78e934794f22ee1cff27ddc2a722" />
+      <keyword name="RevisionVersion" id="MNEAnalyzeQt::CInfo::RevisionVersion" ref="class_m_n_e_analyze_qt_1_1_c_info.html#a4539f842a91b8cf3d7ad211d7d7b1c03" />
+      <keyword name="BuildVersion" id="MNEAnalyzeQt::CInfo::BuildVersion" ref="class_m_n_e_analyze_qt_1_1_c_info.html#aec31b1dd2392578d48f737e55d69857a" />
+      <keyword name="AppVersion" id="MNEAnalyzeQt::CInfo::AppVersion" ref="class_m_n_e_analyze_qt_1_1_c_info.html#abcfefc2b01a7469171956e0362bdd057" />
       <keyword name="MNEBrowseRawQt::AboutWindow" id="MNEBrowseRawQt::AboutWindow" ref="class_m_n_e_browse_raw_qt_1_1_about_window.html" />
       <keyword name="AboutWindow" id="MNEBrowseRawQt::AboutWindow::AboutWindow" ref="class_m_n_e_browse_raw_qt_1_1_about_window.html#aeb482a2e3164a7c8314c50f603686293" />
       <keyword name="~AboutWindow" id="MNEBrowseRawQt::AboutWindow::~AboutWindow" ref="class_m_n_e_browse_raw_qt_1_1_about_window.html#a4fd010283844ef86e381a72cf836769c" />
@@ -16525,6 +17097,8 @@
       <keyword name="use_tri_cent" id="MNELIB::MNEHemisphere::use_tri_cent" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#abcdf7fdbdf1b74ca244853ad1eddd2c7" />
       <keyword name="use_tri_nn" id="MNELIB::MNEHemisphere::use_tri_nn" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a553c07a84f09d208127e3208c02df639" />
       <keyword name="use_tri_area" id="MNELIB::MNEHemisphere::use_tri_area" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a20af1d147844772705c759ee287f4160" />
+      <keyword name="neighbor_tri" id="MNELIB::MNEHemisphere::neighbor_tri" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae7f8d800b94a9e292e343d439a66e757" />
+      <keyword name="neighbor_vert" id="MNELIB::MNEHemisphere::neighbor_vert" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ad5ab1beed9e998dccda1963824f0c73c" />
       <keyword name="cluster_info" id="MNELIB::MNEHemisphere::cluster_info" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab1012beacc853d8443acdcd62364cbd6" />
       <keyword name="MNELIB::MNEInverseOperator" id="MNELIB::MNEInverseOperator" ref="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html" />
       <keyword name="SPtr" id="MNELIB::MNEInverseOperator::SPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a1343809e3e89bc6fb10c54765484f3e6" />
@@ -17352,6 +17926,12 @@
       <keyword name="~ICommand" id="ICommand::~ICommand" ref="class_i_command.html#a0e0226af93b945e84b58405e9d5343b1" />
       <keyword name="SPtr" id="ICommand::SPtr" ref="class_i_command.html#ab5ffbc84194021299bae0e0dd2b325c4" />
       <keyword name="ConstSPtr" id="ICommand::ConstSPtr" ref="class_i_command.html#aae1a463d6544072516ecf3404cad4d96" />
+      <keyword name="RtHpiPlugin::coilParam" id="RtHpiPlugin::coilParam" ref="struct_rt_hpi_plugin_1_1coil_param.html" />
+      <keyword name="pos" id="RtHpiPlugin::coilParam::pos" ref="struct_rt_hpi_plugin_1_1coil_param.html#ab8b31ba321b56557f3b898c0006c5a5c" />
+      <keyword name="mom" id="RtHpiPlugin::coilParam::mom" ref="struct_rt_hpi_plugin_1_1coil_param.html#a6a595b2a164e820c19ccfe9a3d4be7dc" />
+      <keyword name="RtHpiPlugin::dipError" id="RtHpiPlugin::dipError" ref="struct_rt_hpi_plugin_1_1dip_error.html" />
+      <keyword name="error" id="RtHpiPlugin::dipError::error" ref="struct_rt_hpi_plugin_1_1dip_error.html#ab9a07a320a8f03ee5f7139ef7f1857ad" />
+      <keyword name="moment" id="RtHpiPlugin::dipError::moment" ref="struct_rt_hpi_plugin_1_1dip_error.html#a0bdcd6edb2bf71fd7b5013a5892baa72" />
       <keyword name="RtHpiPlugin::RtHpi" id="RtHpiPlugin::RtHpi" ref="class_rt_hpi_plugin_1_1_rt_hpi.html" />
       <keyword name="fiffInfoAvailable" id="RtHpiPlugin::RtHpi::fiffInfoAvailable" ref="class_rt_hpi_plugin_1_1_rt_hpi.html#a978218e49da5eccc9a25ade11d4fa73f" />
       <keyword name="run" id="RtHpiPlugin::RtHpi::run" ref="class_rt_hpi_plugin_1_1_rt_hpi.html#a5bca4001737d864bedf5f5da6ff9e720" />
@@ -17376,6 +17956,10 @@
       <keyword name="RtHpiPlugin::RtHpiSetupWidget" id="RtHpiPlugin::RtHpiSetupWidget" ref="class_rt_hpi_plugin_1_1_rt_hpi_setup_widget.html" />
       <keyword name="RtHpiSetupWidget" id="RtHpiPlugin::RtHpiSetupWidget::RtHpiSetupWidget" ref="class_rt_hpi_plugin_1_1_rt_hpi_setup_widget.html#a8907de785231da5c103a91a481741eab" />
       <keyword name="~RtHpiSetupWidget" id="RtHpiPlugin::RtHpiSetupWidget::~RtHpiSetupWidget" ref="class_rt_hpi_plugin_1_1_rt_hpi_setup_widget.html#a6d47a80b508b6750d42cafb5d69a58da" />
+      <keyword name="RtHpiPlugin::sens" id="RtHpiPlugin::sens" ref="struct_rt_hpi_plugin_1_1sens.html" />
+      <keyword name="coilpos" id="RtHpiPlugin::sens::coilpos" ref="struct_rt_hpi_plugin_1_1sens.html#a5a64ce3ee01dce81786d2e7183fa460d" />
+      <keyword name="coilori" id="RtHpiPlugin::sens::coilori" ref="struct_rt_hpi_plugin_1_1sens.html#aa75248d7606667f9a01e70f8011d9951" />
+      <keyword name="tra" id="RtHpiPlugin::sens::tra" ref="struct_rt_hpi_plugin_1_1sens.html#a7abe4c1e934c20ddba77a6fd8866a9c1" />
       <keyword name="RTINVLIB::RtAve" id="RTINVLIB::RtAve" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html" />
       <keyword name="SPtr" id="RTINVLIB::RtAve::SPtr" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#ab503e21f35941a11a010beaf25b1db33" />
       <keyword name="ConstSPtr" id="RTINVLIB::RtAve::ConstSPtr" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#a9332acb3c6f0f5ae3f1e8c5771e215c6" />
@@ -18863,18 +19447,19 @@
       <keyword name="m_qComboBox_ChannelList" id="Ui_TriggerControlSetupWidgetClass::m_qComboBox_ChannelList" ref="class_ui___trigger_control_setup_widget_class.html#a1a527419710710f3bd025190fbe13fdb" />
       <keyword name="m_qPushButton_ConnectChannel" id="Ui_TriggerControlSetupWidgetClass::m_qPushButton_ConnectChannel" ref="class_ui___trigger_control_setup_widget_class.html#a7f274d4e8837959592ec00485678a9d6" />
       <keyword name="UTILSLIB::AdaptiveMp" id="UTILSLIB::AdaptiveMp" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html" />
-      <keyword name="adaptive_atom_list" id="UTILSLIB::AdaptiveMp::adaptive_atom_list" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a7b4aac4f46450f66eb76631e5f90e6ac" />
+      <keyword name="adaptive_atom_list" id="UTILSLIB::AdaptiveMp::adaptive_atom_list" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#adc5b378055eeb8f76a1b71ed09f1fd35" />
       <keyword name="fix_dict_atom_list" id="UTILSLIB::AdaptiveMp::fix_dict_atom_list" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#aa031af00dcceaf4b22e98bbe55d6d7d3" />
       <keyword name="VectorXd" id="UTILSLIB::AdaptiveMp::VectorXd" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a13a8e3fcc3d0e1a31cb2539827e09816" />
       <keyword name="MatrixXd" id="UTILSLIB::AdaptiveMp::MatrixXd" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#aa3e576838ef666570eddacf52bfcf188" />
-      <keyword name="matching_pursuit" id="UTILSLIB::AdaptiveMp::matching_pursuit" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a1e8088d153f0f50b194acd4a7f788688" />
-      <keyword name="recieve_input" id="UTILSLIB::AdaptiveMp::recieve_input" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a2186074fd7a509d33c62fe32199f7daf" />
+      <keyword name="matching_pursuit" id="UTILSLIB::AdaptiveMp::matching_pursuit" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a898f01967a679ed3c52436bb80534a09" />
+      <keyword name="recieve_input" id="UTILSLIB::AdaptiveMp::recieve_input" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a0ba040d963191e847a6b80d5cc2c963f" />
       <keyword name="current_result" id="UTILSLIB::AdaptiveMp::current_result" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a00f825210324eb013948ab48da6b1792" />
       <keyword name="finished_calc" id="UTILSLIB::AdaptiveMp::finished_calc" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a4464cd60f58ff1f23807da72580bcb14" />
       <keyword name="send_warning" id="UTILSLIB::AdaptiveMp::send_warning" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a70bbb6f633b251e18ffc7a88316fb44b" />
       <keyword name="AdaptiveMp" id="UTILSLIB::AdaptiveMp::AdaptiveMp" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a5f45639e0ba949c9318d30ef4e9e3681" />
       <keyword name="~AdaptiveMp" id="UTILSLIB::AdaptiveMp::~AdaptiveMp" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a834f7b5712c44f5fff87ff73c6000ae0" />
       <keyword name="modulation_function" id="UTILSLIB::AdaptiveMp::modulation_function" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a0d00568d44b833629094d3971ae85ff6" />
+      <keyword name="simplex_maximisation" id="UTILSLIB::AdaptiveMp::simplex_maximisation" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a1be5896dce6126b69cace01a068c71c4" />
       <keyword name="calculate_atom" id="UTILSLIB::AdaptiveMp::calculate_atom" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a7799a37f1c0a2b6dcd15fb36a4136701" />
       <keyword name="fix_phase" id="UTILSLIB::AdaptiveMp::fix_phase" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a75d72b86727b52fc5c641403248ba8b6" />
       <keyword name="signal_energy" id="UTILSLIB::AdaptiveMp::signal_energy" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a202544fe887c9bbe4d01dc98daa47481" />
@@ -18885,7 +19470,8 @@
       <keyword name="max_iterations" id="UTILSLIB::AdaptiveMp::max_iterations" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a2dd9ca3a725ddfc28b24ec430cd2613b" />
       <keyword name="best_match" id="UTILSLIB::AdaptiveMp::best_match" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a5bed9474f1f9632b22c25549b2a1bbce" />
       <keyword name="signal" id="UTILSLIB::AdaptiveMp::signal" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a0b8b4987380c42caa72ceffad1013247" />
-      <keyword name="atom_list" id="UTILSLIB::AdaptiveMp::atom_list" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a8dfd9de79226187aea10ce72a4670fe0" />
+      <keyword name="atom_list" id="UTILSLIB::AdaptiveMp::atom_list" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a18515f2e6bd8731e6fe1106a69f010d0" />
+      <keyword name="atoms_in_chns" id="UTILSLIB::AdaptiveMp::atoms_in_chns" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#ab79f1e05c5e6d68d75d95257d0217d35" />
       <keyword name="fix_dict_list" id="UTILSLIB::AdaptiveMp::fix_dict_list" ref="class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a52f229abf399f51c1b8bda274358dec5" />
       <keyword name="UTILSLIB::Atom" id="UTILSLIB::Atom" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html" />
       <keyword name="sample_count" id="UTILSLIB::Atom::sample_count" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#adfadb539bf073a9643f84fed191fe430" />
@@ -18893,6 +19479,7 @@
       <keyword name="max_scalar_product" id="UTILSLIB::Atom::max_scalar_product" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#acb6f17718c3cc0452f8c06577fb6e1d7" />
       <keyword name="residuum" id="UTILSLIB::Atom::residuum" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#ae047aae0d4a68a18fa1d05fbe2da0fbf" />
       <keyword name="max_scalar_list" id="UTILSLIB::Atom::max_scalar_list" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#ade7e721033c2f527de0fe8003a46eb6f" />
+      <keyword name="bm_channel" id="UTILSLIB::Atom::bm_channel" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#af9bc534dce868d36390d5d47c13f36d9" />
       <keyword name="UTILSLIB::ChirpAtom" id="UTILSLIB::ChirpAtom" ref="class_u_t_i_l_s_l_i_b_1_1_chirp_atom.html" />
       <keyword name="gauss_function" id="UTILSLIB::ChirpAtom::gauss_function" ref="class_u_t_i_l_s_l_i_b_1_1_chirp_atom.html#a30a3ea253bbe840a93780f89ae1e488e" />
       <keyword name="create_real" id="UTILSLIB::ChirpAtom::create_real" ref="class_u_t_i_l_s_l_i_b_1_1_chirp_atom.html#aa0552e1d217a15ecd51dcfa18a126777" />
@@ -18907,6 +19494,7 @@
       <keyword name="max_scalar_product" id="UTILSLIB::Atom::max_scalar_product" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#acb6f17718c3cc0452f8c06577fb6e1d7" />
       <keyword name="residuum" id="UTILSLIB::Atom::residuum" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#ae047aae0d4a68a18fa1d05fbe2da0fbf" />
       <keyword name="max_scalar_list" id="UTILSLIB::Atom::max_scalar_list" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#ade7e721033c2f527de0fe8003a46eb6f" />
+      <keyword name="bm_channel" id="UTILSLIB::Atom::bm_channel" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#af9bc534dce868d36390d5d47c13f36d9" />
       <keyword name="UTILSLIB::CosineFilter" id="UTILSLIB::CosineFilter" ref="class_u_t_i_l_s_l_i_b_1_1_cosine_filter.html" />
       <keyword name="CosineFilter" id="UTILSLIB::CosineFilter::CosineFilter" ref="class_u_t_i_l_s_l_i_b_1_1_cosine_filter.html#aa47309286a5f3eb425456c06adc79634" />
       <keyword name="CosineFilter" id="UTILSLIB::CosineFilter::CosineFilter" ref="class_u_t_i_l_s_l_i_b_1_1_cosine_filter.html#a6192ffc9835b4bbeb3ce0ff8b0fcbbc0" />
@@ -18916,6 +19504,7 @@
       <keyword name="Dictionary" id="UTILSLIB::Dictionary::Dictionary" ref="class_u_t_i_l_s_l_i_b_1_1_dictionary.html#aee8d612bc9d323c38faba045ba384b8b" />
       <keyword name="~Dictionary" id="UTILSLIB::Dictionary::~Dictionary" ref="class_u_t_i_l_s_l_i_b_1_1_dictionary.html#aa36f24073d9c9001768517aa2322cb82" />
       <keyword name="atom_count" id="UTILSLIB::Dictionary::atom_count" ref="class_u_t_i_l_s_l_i_b_1_1_dictionary.html#a70e69f9fb926290f8381e76d2bdcf20b" />
+      <keyword name="clear" id="UTILSLIB::Dictionary::clear" ref="class_u_t_i_l_s_l_i_b_1_1_dictionary.html#a2d54b74d14335da04ad9d64e49536d9a" />
       <keyword name="atoms" id="UTILSLIB::Dictionary::atoms" ref="class_u_t_i_l_s_l_i_b_1_1_dictionary.html#a6e3d4e0fa7bb2ee78e499ed067b77d82" />
       <keyword name="type" id="UTILSLIB::Dictionary::type" ref="class_u_t_i_l_s_l_i_b_1_1_dictionary.html#a203dc8cb33e0c93f36b3549710fac0e6" />
       <keyword name="source" id="UTILSLIB::Dictionary::source" ref="class_u_t_i_l_s_l_i_b_1_1_dictionary.html#a195baa33df2c640ea574c5755e0eac98" />
@@ -18955,6 +19544,7 @@
       <keyword name="max_scalar_product" id="UTILSLIB::Atom::max_scalar_product" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#acb6f17718c3cc0452f8c06577fb6e1d7" />
       <keyword name="residuum" id="UTILSLIB::Atom::residuum" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#ae047aae0d4a68a18fa1d05fbe2da0fbf" />
       <keyword name="max_scalar_list" id="UTILSLIB::Atom::max_scalar_list" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#ade7e721033c2f527de0fe8003a46eb6f" />
+      <keyword name="bm_channel" id="UTILSLIB::Atom::bm_channel" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#af9bc534dce868d36390d5d47c13f36d9" />
       <keyword name="UTILSLIB::FixDictAtom::ChirpATOM" id="UTILSLIB::FixDictAtom::ChirpATOM" ref="struct_u_t_i_l_s_l_i_b_1_1_fix_dict_atom_1_1_chirp_a_t_o_m.html" />
       <keyword name="scale" id="UTILSLIB::FixDictAtom::ChirpATOM::scale" ref="struct_u_t_i_l_s_l_i_b_1_1_fix_dict_atom_1_1_chirp_a_t_o_m.html#acae03a7018df7e54bec07c9b3d3b6337" />
       <keyword name="modulation" id="UTILSLIB::FixDictAtom::ChirpATOM::modulation" ref="struct_u_t_i_l_s_l_i_b_1_1_fix_dict_atom_1_1_chirp_a_t_o_m.html#ad1d7a075c37b356bd7ac7ece4d0ffc05" />
@@ -19020,6 +19610,7 @@
       <keyword name="max_scalar_product" id="UTILSLIB::Atom::max_scalar_product" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#acb6f17718c3cc0452f8c06577fb6e1d7" />
       <keyword name="residuum" id="UTILSLIB::Atom::residuum" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#ae047aae0d4a68a18fa1d05fbe2da0fbf" />
       <keyword name="max_scalar_list" id="UTILSLIB::Atom::max_scalar_list" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#ade7e721033c2f527de0fe8003a46eb6f" />
+      <keyword name="bm_channel" id="UTILSLIB::Atom::bm_channel" ref="class_u_t_i_l_s_l_i_b_1_1_atom.html#af9bc534dce868d36390d5d47c13f36d9" />
       <keyword name="UTILSLIB::IOUtils" id="UTILSLIB::IOUtils" ref="class_u_t_i_l_s_l_i_b_1_1_i_o_utils.html" />
       <keyword name="SPtr" id="UTILSLIB::IOUtils::SPtr" ref="class_u_t_i_l_s_l_i_b_1_1_i_o_utils.html#a4f014172f5041789ac17d0ac863853a6" />
       <keyword name="ConstSPtr" id="UTILSLIB::IOUtils::ConstSPtr" ref="class_u_t_i_l_s_l_i_b_1_1_i_o_utils.html#a5a749cbd6480dd699afae67b94372a6b" />
@@ -19688,12 +20279,10 @@
       <file>search/mag_sel.png</file>
       <file>search/search.css</file>
       <file>search/search.js</file>
-      <file>averagedelegate_8cpp_source.html</file>
-      <file>averagedelegate_8h_source.html</file>
-      <file>eventdelegate_8cpp_source.html</file>
-      <file>eventdelegate_8h_source.html</file>
-      <file>rawdelegate_8cpp_source.html</file>
-      <file>rawdelegate_8h_source.html</file>
+      <file>mne__analyze__qt_2info_8h_source.html</file>
+      <file>mne__browse__raw__qt_2_utils_2info_8h_source.html</file>
+      <file>mne__x_2mne__x_2info_8h_source.html</file>
+      <file>applications_2mne__analyze__qt_2main_8cpp_source.html</file>
       <file>applications_2mne__browse__raw__qt_2main_8cpp_source.html</file>
       <file>applications_2mne__matching__pursuit_2main_8cpp_source.html</file>
       <file>applications_2mne__rt__server_2mne__rt__server_2main_8cpp_source.html</file>
@@ -19706,6 +20295,7 @@
       <file>examples_2compute_inverse_pwl_rap_music_2main_8cpp_source.html</file>
       <file>examples_2compute_inverse_rap_music_2main_8cpp_source.html</file>
       <file>examples_2compute_inverse_raw_2main_8cpp_source.html</file>
+      <file>examples_2disp3_d_new_tutorial_2main_8cpp_source.html</file>
       <file>examples_2evoked_grad_amp_2main_8cpp_source.html</file>
       <file>examples_2fiff_i_o_2main_8cpp_source.html</file>
       <file>examples_2find_evoked_2main_8cpp_source.html</file>
@@ -19726,6 +20316,30 @@
       <file>examples_2read_write_raw_2main_8cpp_source.html</file>
       <file>examples_2roi_clustered_inverse_pwl_rap_music_2main_8cpp_source.html</file>
       <file>examples_2st_clustered_inverse_pwl_rap_music_2main_8cpp_source.html</file>
+      <file>baseview_8cpp_source.html</file>
+      <file>baseview_8h_source.html</file>
+      <file>view3d_8cpp_source.html</file>
+      <file>view3d_8h_source.html</file>
+      <file>mne__analyze__qt_2_windows_2aboutwindow_8cpp_source.html</file>
+      <file>mne__browse__raw__qt_2_windows_2aboutwindow_8cpp_source.html</file>
+      <file>mne__analyze__qt_2_windows_2aboutwindow_8h_source.html</file>
+      <file>mne__browse__raw__qt_2_windows_2aboutwindow_8h_source.html</file>
+      <file>mne__analyze__qt_2_windows_2mainwindow_8cpp_source.html</file>
+      <file>mne__browse__raw__qt_2_windows_2mainwindow_8cpp_source.html</file>
+      <file>mne__matching__pursuit_2mainwindow_8cpp_source.html</file>
+      <file>mne__x_2mne__x_2mainwindow_8cpp_source.html</file>
+      <file>mne__analyze__qt_2_windows_2mainwindow_8h_source.html</file>
+      <file>mne__browse__raw__qt_2_windows_2mainwindow_8h_source.html</file>
+      <file>mne__matching__pursuit_2mainwindow_8h_source.html</file>
+      <file>mne__x_2mne__x_2mainwindow_8h_source.html</file>
+      <file>viewerwidget_8cpp_source.html</file>
+      <file>viewerwidget_8h_source.html</file>
+      <file>averagedelegate_8cpp_source.html</file>
+      <file>averagedelegate_8h_source.html</file>
+      <file>eventdelegate_8cpp_source.html</file>
+      <file>eventdelegate_8h_source.html</file>
+      <file>rawdelegate_8cpp_source.html</file>
+      <file>rawdelegate_8h_source.html</file>
       <file>averagemodel_8cpp_source.html</file>
       <file>averagemodel_8h_source.html</file>
       <file>mne__browse__raw__qt_2_models_2chinfomodel_8cpp_source.html</file>
@@ -19754,8 +20368,6 @@
       <file>filteroperator_8h_source.html</file>
       <file>filterplotscene_8cpp_source.html</file>
       <file>filterplotscene_8h_source.html</file>
-      <file>mne__browse__raw__qt_2_utils_2info_8h_source.html</file>
-      <file>mne__x_2mne__x_2info_8h_source.html</file>
       <file>mne__browse__raw__qt_2_utils_2layoutscene_8cpp_source.html</file>
       <file>mne__x__libs_2x_disp_2helpers_2layoutscene_8cpp_source.html</file>
       <file>mne__browse__raw__qt_2_utils_2layoutscene_8h_source.html</file>
@@ -19777,8 +20389,6 @@
       <file>types_8h_source.html</file>
       <file>rawview_8cpp_source.html</file>
       <file>rawview_8h_source.html</file>
-      <file>aboutwindow_8cpp_source.html</file>
-      <file>aboutwindow_8h_source.html</file>
       <file>averagewindow_8cpp_source.html</file>
       <file>averagewindow_8h_source.html</file>
       <file>chinfowindow_8cpp_source.html</file>
@@ -19791,12 +20401,6 @@
       <file>filterwindow_8h_source.html</file>
       <file>informationwindow_8cpp_source.html</file>
       <file>informationwindow_8h_source.html</file>
-      <file>mne__browse__raw__qt_2_windows_2mainwindow_8cpp_source.html</file>
-      <file>mne__matching__pursuit_2mainwindow_8cpp_source.html</file>
-      <file>mne__x_2mne__x_2mainwindow_8cpp_source.html</file>
-      <file>mne__browse__raw__qt_2_windows_2mainwindow_8h_source.html</file>
-      <file>mne__matching__pursuit_2mainwindow_8h_source.html</file>
-      <file>mne__x_2mne__x_2mainwindow_8h_source.html</file>
       <file>projectionwindow_8cpp_source.html</file>
       <file>projectionwindow_8h_source.html</file>
       <file>scalewindow_8cpp_source.html</file>
@@ -20206,7 +20810,9 @@
       <file>rtplot_8cpp_source.html</file>
       <file>rtplot_8h_source.html</file>
       <file>brainview_8cpp_source.html</file>
+      <file>ew_2brainview_8cpp_source.html</file>
       <file>brainview_8h_source.html</file>
+      <file>ew_2brainview_8h_source.html</file>
       <file>disp3_d__global_8h_source.html</file>
       <file>geometryview_8cpp_source.html</file>
       <file>geometryview_8h_source.html</file>
@@ -20226,6 +20832,19 @@
       <file>labelview_8h_source.html</file>
       <file>newbrainview_8cpp_source.html</file>
       <file>newbrainview_8h_source.html</file>
+      <file>brainhemisphere_8cpp_source.html</file>
+      <file>brainhemisphere_8h_source.html</file>
+      <file>brainsurface_8cpp_source.html</file>
+      <file>brainsurface_8h_source.html</file>
+      <file>brainsurfacemesh_8cpp_source.html</file>
+      <file>brainsurfacemesh_8h_source.html</file>
+      <file>disp3_d_new__global_8h_source.html</file>
+      <file>renderableentity_8cpp_source.html</file>
+      <file>renderableentity_8h_source.html</file>
+      <file>stcdatamodel_8cpp_source.html</file>
+      <file>stcdatamodel_8h_source.html</file>
+      <file>stcdataworker_8cpp_source.html</file>
+      <file>stcdataworker_8h_source.html</file>
       <file>fiff_8cpp_source.html</file>
       <file>fiff_8h_source.html</file>
       <file>fiff__ch__info_8cpp_source.html</file>
@@ -20390,6 +21009,16 @@
       <file>selectionloader_8cpp_source.html</file>
       <file>selectionloader_8h_source.html</file>
       <file>utils__global_8h_source.html</file>
+      <file>baseview_8cpp.html</file>
+      <file>baseview_8h.html</file>
+      <file>view3d_8cpp.html</file>
+      <file>view3d_8h.html</file>
+      <file>mne__analyze__qt_2_windows_2aboutwindow_8cpp.html</file>
+      <file>mne__analyze__qt_2_windows_2aboutwindow_8h.html</file>
+      <file>mne__analyze__qt_2_windows_2mainwindow_8cpp.html</file>
+      <file>mne__analyze__qt_2_windows_2mainwindow_8h.html</file>
+      <file>viewerwidget_8cpp.html</file>
+      <file>viewerwidget_8h.html</file>
       <file>averagedelegate_8cpp.html</file>
       <file>averagedelegate_8h.html</file>
       <file>eventdelegate_8cpp.html</file>
@@ -20423,7 +21052,6 @@
       <file>rawsettings_8cpp.html</file>
       <file>rawsettings_8h.html</file>
       <file>types_8h.html</file>
-      <file>aboutwindow_8h.html</file>
       <file>averagewindow_8cpp.html</file>
       <file>averagewindow_8h.html</file>
       <file>chinfowindow_8cpp.html</file>
@@ -20714,8 +21342,6 @@
       <file>plot_8h.html</file>
       <file>rtplot_8cpp.html</file>
       <file>rtplot_8h.html</file>
-      <file>brainview_8cpp.html</file>
-      <file>brainview_8h.html</file>
       <file>disp3_d__global_8h.html</file>
       <file>geometryview_8cpp.html</file>
       <file>geometryview_8h.html</file>
@@ -20735,6 +21361,15 @@
       <file>labelview_8h.html</file>
       <file>newbrainview_8cpp.html</file>
       <file>newbrainview_8h.html</file>
+      <file>brainhemisphere_8h.html</file>
+      <file>brainsurface_8cpp.html</file>
+      <file>brainsurface_8h.html</file>
+      <file>brainsurfacemesh_8cpp.html</file>
+      <file>brainsurfacemesh_8h.html</file>
+      <file>stcdatamodel_8cpp.html</file>
+      <file>stcdatamodel_8h.html</file>
+      <file>stcdataworker_8cpp.html</file>
+      <file>stcdataworker_8h.html</file>
       <file>fiff_8cpp.html</file>
       <file>fiff_8h.html</file>
       <file>fiff__ch__info_8cpp.html</file>
@@ -20887,12 +21522,18 @@
       <file>utils__global_8h.html</file>
       <file>md__d_1__users__christoph__git_hub_mne-cpp_applications_mne_rt_server__r_e_a_d_m_e.html</file>
       <file>group___class.html</file>
+      <file>class_about_window.html</file>
+      <file>class_about_window.png</file>
+      <file>class_about_window-members.html</file>
       <file>class_atom_paint_window.html</file>
       <file>class_atom_paint_window.png</file>
       <file>class_atom_paint_window-members.html</file>
       <file>class_atom_sum_window.html</file>
       <file>class_atom_sum_window.png</file>
       <file>class_atom_sum_window-members.html</file>
+      <file>class_atom_window.html</file>
+      <file>class_atom_window.png</file>
+      <file>class_atom_window-members.html</file>
       <file>struct_a_x_p_o_s.html</file>
       <file>struct_a_x_p_o_s-members.html</file>
       <file>class_baby_m_e_g_client.html</file>
@@ -20901,6 +21542,9 @@
       <file>class_baby_m_e_g_info.html</file>
       <file>class_baby_m_e_g_info.png</file>
       <file>class_baby_m_e_g_info-members.html</file>
+      <file>class_base_view.html</file>
+      <file>class_base_view.png</file>
+      <file>class_base_view-members.html</file>
       <file>class_c_type_name.html</file>
       <file>class_c_type_name-members.html</file>
       <file>class_delete_message_box.html</file>
@@ -21145,6 +21789,15 @@
       <file>class_ui___trigger_control_setup_widget_class.html</file>
       <file>class_ui___trigger_control_setup_widget_class.png</file>
       <file>class_ui___trigger_control_setup_widget_class-members.html</file>
+      <file>class_view3_d.html</file>
+      <file>class_view3_d.png</file>
+      <file>class_view3_d-members.html</file>
+      <file>class_viewer_widget.html</file>
+      <file>class_viewer_widget.png</file>
+      <file>class_viewer_widget-members.html</file>
+      <file>class_x_axis_atom_window.html</file>
+      <file>class_x_axis_atom_window.png</file>
+      <file>class_x_axis_atom_window-members.html</file>
       <file>class_x_axis_window.html</file>
       <file>class_x_axis_window.png</file>
       <file>class_x_axis_window-members.html</file>
@@ -21235,6 +21888,30 @@
       <file>class_d_i_s_p3_d_l_i_b_1_1_new_brain_view.html</file>
       <file>class_d_i_s_p3_d_l_i_b_1_1_new_brain_view.png</file>
       <file>class_d_i_s_p3_d_l_i_b_1_1_new_brain_view-members.html</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.html</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere.png</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_hemisphere-members.html</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.png</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface-members.html</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.html</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh.png</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh-members.html</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh_functor.html</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh_functor.png</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface_mesh_functor-members.html</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.html</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view.png</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_view-members.html</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity.html</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity.png</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_renderable_entity-members.html</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.html</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model.png</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_model-members.html</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.html</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker.png</file>
+      <file>class_d_i_s_p3_d_n_e_w_l_i_b_1_1_stc_data_worker-members.html</file>
       <file>class_d_i_s_p_l_i_b_1_1_color_map.html</file>
       <file>class_d_i_s_p_l_i_b_1_1_color_map-members.html</file>
       <file>class_d_i_s_p_l_i_b_1_1_graph.html</file>
@@ -21422,6 +22099,8 @@
       <file>class_i_o_buffer_1_1_circular_multi_channel_buffer__old.html</file>
       <file>class_i_o_buffer_1_1_circular_multi_channel_buffer__old.png</file>
       <file>class_i_o_buffer_1_1_circular_multi_channel_buffer__old-members.html</file>
+      <file>class_m_n_e_analyze_qt_1_1_c_info.html</file>
+      <file>class_m_n_e_analyze_qt_1_1_c_info-members.html</file>
       <file>class_m_n_e_browse_raw_qt_1_1_about_window.html</file>
       <file>class_m_n_e_browse_raw_qt_1_1_about_window.png</file>
       <file>class_m_n_e_browse_raw_qt_1_1_about_window-members.html</file>
@@ -21698,6 +22377,10 @@
       <file>class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_raw_command.html</file>
       <file>class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_raw_command.png</file>
       <file>class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_raw_command-members.html</file>
+      <file>struct_rt_hpi_plugin_1_1coil_param.html</file>
+      <file>struct_rt_hpi_plugin_1_1coil_param-members.html</file>
+      <file>struct_rt_hpi_plugin_1_1dip_error.html</file>
+      <file>struct_rt_hpi_plugin_1_1dip_error-members.html</file>
       <file>class_rt_hpi_plugin_1_1_rt_hpi.html</file>
       <file>class_rt_hpi_plugin_1_1_rt_hpi.png</file>
       <file>class_rt_hpi_plugin_1_1_rt_hpi-members.html</file>
@@ -21707,6 +22390,8 @@
       <file>class_rt_hpi_plugin_1_1_rt_hpi_setup_widget.html</file>
       <file>class_rt_hpi_plugin_1_1_rt_hpi_setup_widget.png</file>
       <file>class_rt_hpi_plugin_1_1_rt_hpi_setup_widget-members.html</file>
+      <file>struct_rt_hpi_plugin_1_1sens.html</file>
+      <file>struct_rt_hpi_plugin_1_1sens-members.html</file>
       <file>class_r_t_i_n_v_l_i_b_1_1_rt_ave.html</file>
       <file>class_r_t_i_n_v_l_i_b_1_1_rt_ave.png</file>
       <file>class_r_t_i_n_v_l_i_b_1_1_rt_ave-members.html</file>
@@ -22166,6 +22851,7 @@
       <file>dir_04a5ad4b46ac5ce0a2babc9eee9199e0.html</file>
       <file>dir_e70914d4e8ad85c3a80e873c58236696.html</file>
       <file>dir_e0553f06023551ea2c53a3ef9a44fb76.html</file>
+      <file>dir_79e736c0c30b8032501546a2b9b90052.html</file>
       <file>dir_f05f2068c6bc8e77ae06141ff13d690e.html</file>
       <file>dir_2e5087eb17d93870d09c251f6924575f.html</file>
       <file>dir_67c6f8ce9f8abb6a9fd5cd77f30993cd.html</file>
@@ -22177,6 +22863,8 @@
       <file>dir_732a35b9fd77df916fb6cf6c320d3497.html</file>
       <file>dir_3724822b9604f2d84f3a550bba2b646c.html</file>
       <file>dir_a0f69d5cb4834a722f5c816edde5c66b.html</file>
+      <file>dir_d565da9b92ed48264c0f0df333344a24.html</file>
+      <file>dir_7e3599464dab0a8d6cecc75ec53bcb3e.html</file>
       <file>dir_f70ee18a6b5df60abc993576a3872722.html</file>
       <file>dir_1264eb8807daa61a4b38792a1358a120.html</file>
       <file>dir_53714e77953b69723eb4d2d6705912a7.html</file>
@@ -22206,6 +22894,7 @@
       <file>dir_a748eac5b594e51c109d7d0850221d09.html</file>
       <file>dir_f486997cd07e2bbe06121e2557468122.html</file>
       <file>dir_8c43bcebab952c471a35c0699670040c.html</file>
+      <file>dir_a0d72ecf8d12d9850944a6d87f7406b7.html</file>
       <file>dir_e3d20f528ed85075b69f5fd6a869dcdc.html</file>
       <file>dir_f40dc88ac7186b9f0e5e3cede13890a5.html</file>
       <file>dir_9e7cdd9e4886ffc91697b47d07e69877.html</file>
@@ -22218,6 +22907,7 @@
       <file>dir_2818de1e5b67557da8c9b7d659dc1661.html</file>
       <file>dir_fba7b6d30909f9ec66000534e18b073e.html</file>
       <file>dir_bcd7d44b2f856ea5feec281b16a213ac.html</file>
+      <file>dir_4b1655844132f8cc94b682ef778c7235.html</file>
       <file>dir_65eb5ee1265c0bdbfc750ac7f32cd8f3.html</file>
       <file>dir_ffa8a54a6e7e86b98127b9c4013d0cd0.html</file>
       <file>dir_3188689bf004a01f7f750e6fd335f90a.html</file>
@@ -22229,6 +22919,7 @@
       <file>dir_362befb8814e314b111c15c41bbf89c8.html</file>
       <file>dir_e9d3418bb395041d1538cae5b825af7d.html</file>
       <file>dir_090b07d6d2e60a4f32d0cc8625c28786.html</file>
+      <file>dir_158d5f76fe22640c718cda233661ca47.html</file>
       <file>dir_2fa6e5bc98950d7da550b0285dacd21d.html</file>
       <file>dir_1da05deba79e625e869c91d9c33ce16d.html</file>
       <file>dir_9ae0bd158324223ac8478c5f71070bb4.html</file>
@@ -22263,7 +22954,9 @@
       <file>dir_0eb5c52225c067648f3f5a2d310612be.html</file>
       <file>dir_77757c48fbca9da1d4a0f1cbd3a84a3a.html</file>
       <file>dir_34731d62befdc2e73f134ee8654af176.html</file>
+      <file>dir_20fc0a50bd4684a19a08c327d8117109.html</file>
       <file>dir_2607aab2303fe750a4e9f3edc6da9333.html</file>
+      <file>dir_a89ba2879cf001b76d371350a31cfa66.html</file>
       <file>dir_9c66c9abd79e929c3ce1fbdd7904f481.html</file>
       <file>dir_b009d902d9e81f775e3d807322330fdc.html</file>
       <file>dir_2c73d83680a2e0f26a5cff8b4f8b2202.html</file>

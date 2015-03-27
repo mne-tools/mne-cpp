@@ -2,6 +2,8 @@ var searchData=
 [
   ['mainsplashscreen_2ecpp',['mainsplashscreen.cpp',['../mainsplashscreen_8cpp.html',1,'']]],
   ['mainsplashscreen_2eh',['mainsplashscreen.h',['../mainsplashscreen_8h.html',1,'']]],
+  ['mainwindow_2ecpp',['mainwindow.cpp',['../mne__analyze__qt_2_windows_2mainwindow_8cpp.html',1,'']]],
+  ['mainwindow_2eh',['mainwindow.h',['../mne__analyze__qt_2_windows_2mainwindow_8h.html',1,'']]],
   ['measurementtypes_2ecpp',['measurementtypes.cpp',['../measurementtypes_8cpp.html',1,'']]],
   ['measurementtypes_2eh',['measurementtypes.h',['../measurementtypes_8h.html',1,'']]],
   ['measurementwidget_2ecpp',['measurementwidget.cpp',['../measurementwidget_8cpp.html',1,'']]],

@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['aboutwindow_2eh',['aboutwindow.h',['../aboutwindow_8h.html',1,'']]],
+  ['aboutwindow_2ecpp',['aboutwindow.cpp',['../mne__analyze__qt_2_windows_2aboutwindow_8cpp.html',1,'']]],
+  ['aboutwindow_2eh',['aboutwindow.h',['../mne__analyze__qt_2_windows_2aboutwindow_8h.html',1,'']]],
   ['adaptivemp_2ecpp',['adaptivemp.cpp',['../adaptivemp_8cpp.html',1,'']]],
   ['adaptivemp_2eh',['adaptivemp.h',['../adaptivemp_8h.html',1,'']]],
   ['annotation_2ecpp',['annotation.cpp',['../annotation_8cpp.html',1,'']]],

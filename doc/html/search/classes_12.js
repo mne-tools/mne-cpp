@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['xaxiswindow',['XAxisWindow',['../class_x_axis_window.html',1,'']]]
+  ['view3d',['View3D',['../class_view3_d.html',1,'']]],
+  ['viewerwidget',['ViewerWidget',['../class_viewer_widget.html',1,'']]]
 ];

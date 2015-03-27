@@ -9,6 +9,8 @@ var searchData=
   ['ncol',['ncol',['../class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#acfa5db29e4def540654ba39c16b8455d',1,'FIFFLIB::FiffNamedMatrix']]],
   ['nearest',['nearest',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ac5480868a444c31d040a123f926d537f',1,'MNELIB::MNEHemisphere']]],
   ['nearest_5fdist',['nearest_dist',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aaf1380e5dffa62b3b3e4cdb44f0be303',1,'MNELIB::MNEHemisphere']]],
+  ['neighbor_5ftri',['neighbor_tri',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae7f8d800b94a9e292e343d439a66e757',1,'MNELIB::MNEHemisphere']]],
+  ['neighbor_5fvert',['neighbor_vert',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ad5ab1beed9e998dccda1963824f0c73c',1,'MNELIB::MNEHemisphere']]],
   ['nent',['nent',['../class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a37e90c64f3b2e3a5cd89204ec7fbfa53',1,'FIFFLIB::FiffDirTree']]],
   ['nent_5ftree',['nent_tree',['../class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#aea824dcf71b31ad4a3867c6b7fb60e1a',1,'FIFFLIB::FiffDirTree']]],
   ['next',['next',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ae95266b76119bf235b6dd25b71288ed4',1,'FIFFLIB::FiffTag']]],

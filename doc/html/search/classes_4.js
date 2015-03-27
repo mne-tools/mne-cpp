@@ -9,6 +9,7 @@ var searchData=
   ['datawindow',['DataWindow',['../class_m_n_e_browse_raw_qt_1_1_data_window.html',1,'MNEBrowseRawQt']]],
   ['deletemessagebox',['DeleteMessageBox',['../class_delete_message_box.html',1,'']]],
   ['dictionary',['Dictionary',['../class_u_t_i_l_s_l_i_b_1_1_dictionary.html',1,'UTILSLIB']]],
+  ['diperror',['dipError',['../struct_rt_hpi_plugin_1_1dip_error.html',1,'RtHpiPlugin']]],
   ['dipole',['Dipole',['../class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html',1,'INVERSELIB']]],
   ['dipolepair',['DipolePair',['../struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html',1,'INVERSELIB']]],
   ['directrecord',['DirectRecord',['../class_direct_record.html',1,'']]],

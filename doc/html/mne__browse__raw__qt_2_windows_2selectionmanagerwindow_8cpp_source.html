@@ -297,9 +297,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;     &lt;&lt; QApplication::translate(<span class="stringliteral">&quot;SelectionManagerWindow&quot;</span>, <span class="stringliteral">&quot;Vectorview-grad.lout&quot;</span>, 0)</div>
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;     &lt;&lt; QApplication::translate(<span class="stringliteral">&quot;SelectionManagerWindow&quot;</span>, <span class="stringliteral">&quot;Vectorview-all.lout&quot;</span>, 0)</div>
 <div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;     &lt;&lt; QApplication::translate(<span class="stringliteral">&quot;SelectionManagerWindow&quot;</span>, <span class="stringliteral">&quot;Vectorview-mag.lout&quot;</span>, 0)</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;     &lt;&lt; QApplication::translate(<span class="stringliteral">&quot;SelectionManagerWindow&quot;</span>, <span class="stringliteral">&quot;babymeg_all.lout&quot;</span>, 0)</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;     &lt;&lt; QApplication::translate(<span class="stringliteral">&quot;SelectionManagerWindow&quot;</span>, <span class="stringliteral">&quot;babymeg_mag_ref.lout&quot;</span>, 0)</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;     &lt;&lt; QApplication::translate(<span class="stringliteral">&quot;SelectionManagerWindow&quot;</span>, <span class="stringliteral">&quot;babymeg_mag.lout&quot;</span>, 0)</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;     &lt;&lt; QApplication::translate(<span class="stringliteral">&quot;SelectionManagerWindow&quot;</span>, <span class="stringliteral">&quot;babymeg-mag-inner-layer.lout&quot;</span>, 0)</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;     &lt;&lt; QApplication::translate(<span class="stringliteral">&quot;SelectionManagerWindow&quot;</span>, <span class="stringliteral">&quot;babymeg-mag-outer-layer.lout&quot;</span>, 0)</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;     &lt;&lt; QApplication::translate(<span class="stringliteral">&quot;SelectionManagerWindow&quot;</span>, <span class="stringliteral">&quot;babymeg-mag-ref.lout&quot;</span>, 0)</div>
 <div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;<span class="comment">//     &lt;&lt; QApplication::translate(&quot;SelectionManagerWindow&quot;, &quot;CTF-275.lout&quot;, 0)</span></div>
 <div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;<span class="comment">//     &lt;&lt; QApplication::translate(&quot;SelectionManagerWindow&quot;, &quot;magnesWH3600.lout&quot;, 0)</span></div>
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    );</div>
@@ -365,264 +365,271 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    <span class="keywordtype">float</span> prad = 60.0;</div>
 <div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;    <span class="keywordtype">float</span> width = 5.0;</div>
 <div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    <span class="keywordtype">float</span> height = 4.0;</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    <span class="keywordflow">if</span>(inputPoints.size()&gt;0)</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;        LayoutMaker::makeLayout(inputPoints,</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;                                outputPoints,</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;                                names,</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;                                out,</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;                                <span class="keyword">true</span>,</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;                                prad,</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;                                width,</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;                                height,</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;                                <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;    <span class="comment">//Add new EEG points to Layout Map</span></div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i&lt;outputPoints.size(); i++)</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;        m_layoutMap[names.at(i)] = QPointF(outputPoints.at(i)[0],outputPoints.at(i)[1]);</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    <span class="comment">//Update scene</span></div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    m_pSelectionScene-&gt;<a class="code" href="class_m_n_e_browse_raw_qt_1_1_selection_scene.html#a5ca7be8e893e8c7067eb8b9665cbbb3b">repaintItems</a>(m_layoutMap);</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    m_pSelectionScene-&gt;update();</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;    updateSceneItems();</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    <span class="comment">//Fit to view</span></div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;    ui-&gt;m_graphicsView_layoutPlot-&gt;fitInView(m_pSelectionScene-&gt;itemsBoundingRect(), Qt::KeepAspectRatio);</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    <span class="keywordflow">if</span>(state)</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;        emit <a class="code" href="class_m_n_e_browse_raw_qt_1_1_selection_manager_window.html#a38601f13f8ae00f2525725e7a1ed8eda">loadedLayoutMap</a>(m_layoutMap);</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;    <span class="keywordflow">return</span> state;</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;}</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;    <span class="keywordtype">int</span> numberTries = 0;</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    <span class="keywordflow">if</span>(inputPoints.size()&gt;0)</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;        <span class="keywordflow">while</span>(numberTries&lt;10) {</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;            <span class="keywordflow">if</span>(LayoutMaker::makeLayout(inputPoints,</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;                                       outputPoints,</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;                                       names,</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;                                       out,</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;                                       <span class="keyword">true</span>,</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;                                       prad,</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;                                       width,</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;                                       height,</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;                                       <span class="keyword">false</span>) == -1)</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;                numberTries++;</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;            <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;                numberTries = 11;</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;        }</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;    <span class="comment">//Add new EEG points to Layout Map</span></div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i&lt;outputPoints.size(); i++)</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;        m_layoutMap[names.at(i)] = QPointF(outputPoints.at(i)[0],outputPoints.at(i)[1]);</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    <span class="comment">//Update scene</span></div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    m_pSelectionScene-&gt;<a class="code" href="class_m_n_e_browse_raw_qt_1_1_selection_scene.html#a5ca7be8e893e8c7067eb8b9665cbbb3b">repaintItems</a>(m_layoutMap);</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;    m_pSelectionScene-&gt;update();</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;    updateSceneItems();</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;    <span class="comment">//Fit to view</span></div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;    ui-&gt;m_graphicsView_layoutPlot-&gt;fitInView(m_pSelectionScene-&gt;itemsBoundingRect(), Qt::KeepAspectRatio);</div>
 <div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;<span class="keywordtype">bool</span> SelectionManagerWindow::loadSelectionGroups(QString path)</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;{</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    <span class="comment">//Clear the visible channel list</span></div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;    ui-&gt;m_listWidget_visibleChannels-&gt;clear();</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;    <span class="keywordflow">if</span>(state)</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;        emit <a class="code" href="class_m_n_e_browse_raw_qt_1_1_selection_manager_window.html#a38601f13f8ae00f2525725e7a1ed8eda">loadedLayoutMap</a>(m_layoutMap);</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;    <span class="keywordflow">return</span> state;</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;}</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;</div>
 <div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;    <span class="comment">//Keep the entry All in the selection list and m_selectionGroupsMap -&gt; delete the rest</span></div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;    ui-&gt;m_listWidget_selectionGroups-&gt;clear();</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;    <span class="comment">//Read selection from file and store to map</span></div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;    <a class="code" href="class_u_t_i_l_s_l_i_b_1_1_selection_loader.html">SelectionLoader</a>* manager = <span class="keyword">new</span> <a class="code" href="class_u_t_i_l_s_l_i_b_1_1_selection_loader.html">SelectionLoader</a>();</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;    QString newPath = QCoreApplication::applicationDirPath() + path.prepend(<span class="stringliteral">&quot;/MNE_Browse_Raw_Resources/Templates/ChannelSelection/&quot;</span>);</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;<span class="keywordtype">bool</span> SelectionManagerWindow::loadSelectionGroups(QString path)</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;{</div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;    <span class="comment">//Clear the visible channel list</span></div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;    ui-&gt;m_listWidget_visibleChannels-&gt;clear();</div>
 <div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;    <span class="keywordtype">bool</span> state = manager-&gt;<a class="code" href="class_u_t_i_l_s_l_i_b_1_1_selection_loader.html#aff7a63e73380eb5fe9bf0d2c2fcbffdb">readMNESelFile</a>(newPath, m_selectionGroupsMap);</div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;    <span class="comment">//Create group &#39;All&#39; and &#39;All EEG&#39; manually (bcause this group depends on the loaded channels from the fiff data file, not on the loaded selection file)</span></div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    m_selectionGroupsMap[<span class="stringliteral">&quot;All&quot;</span>] = m_currentlyLoadedFiffChannels;</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;    QStringList names;</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i&lt;m_pChInfoModel-&gt;<a class="code" href="class_m_n_e_browse_raw_qt_1_1_ch_info_model.html#a0b6db30cfaf94d4a76b306b0029c1a3e">rowCount</a>(); i++) {</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;        QModelIndex digIndex = m_pChInfoModel-&gt;index(i,1);</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;        QString chName = m_pChInfoModel-&gt;data(digIndex,ChInfoModelRoles::GetOrigChName).toString();</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;        digIndex = m_pChInfoModel-&gt;index(i,4);</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;        <span class="keywordtype">int</span> kind = m_pChInfoModel-&gt;data(digIndex,ChInfoModelRoles::GetChKind).toInt();</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;        <span class="keywordflow">if</span>(kind == FIFFV_EEG_CH) <span class="comment">//FIFFV_MEG_CH</span></div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;            names&lt;&lt;chName;</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;    }</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;    <span class="comment">//Keep the entry All in the selection list and m_selectionGroupsMap -&gt; delete the rest</span></div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;    ui-&gt;m_listWidget_selectionGroups-&gt;clear();</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    <span class="comment">//Read selection from file and store to map</span></div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;    <a class="code" href="class_u_t_i_l_s_l_i_b_1_1_selection_loader.html">SelectionLoader</a>* manager = <span class="keyword">new</span> <a class="code" href="class_u_t_i_l_s_l_i_b_1_1_selection_loader.html">SelectionLoader</a>();</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;    QString newPath = QCoreApplication::applicationDirPath() + path.prepend(<span class="stringliteral">&quot;/MNE_Browse_Raw_Resources/Templates/ChannelSelection/&quot;</span>);</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    <span class="keywordtype">bool</span> state = manager-&gt;<a class="code" href="class_u_t_i_l_s_l_i_b_1_1_selection_loader.html#aff7a63e73380eb5fe9bf0d2c2fcbffdb">readMNESelFile</a>(newPath, m_selectionGroupsMap);</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;    <span class="comment">//Create group &#39;All&#39; and &#39;All EEG&#39; manually (bcause this group depends on the loaded channels from the fiff data file, not on the loaded selection file)</span></div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;    m_selectionGroupsMap[<span class="stringliteral">&quot;All&quot;</span>] = m_currentlyLoadedFiffChannels;</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;    QStringList names;</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i&lt;m_pChInfoModel-&gt;<a class="code" href="class_m_n_e_browse_raw_qt_1_1_ch_info_model.html#a0b6db30cfaf94d4a76b306b0029c1a3e">rowCount</a>(); i++) {</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;        QModelIndex digIndex = m_pChInfoModel-&gt;index(i,1);</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;        QString chName = m_pChInfoModel-&gt;data(digIndex,ChInfoModelRoles::GetOrigChName).toString();</div>
 <div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;    <span class="comment">//Add &#39;Add EEG&#39; group to selection groups</span></div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;    m_selectionGroupsMap[<span class="stringliteral">&quot;All EEG&quot;</span>] = names;</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;        digIndex = m_pChInfoModel-&gt;index(i,4);</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;        <span class="keywordtype">int</span> kind = m_pChInfoModel-&gt;data(digIndex,ChInfoModelRoles::GetChKind).toInt();</div>
 <div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    <span class="comment">//Add selection groups to list widget</span></div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;    QMapIterator&lt;QString, QStringList&gt; selectionIndex(m_selectionGroupsMap);</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;    <span class="keywordflow">while</span> (selectionIndex.hasNext()) {</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;        selectionIndex.next();</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;        ui-&gt;m_listWidget_selectionGroups-&gt;insertItem(ui-&gt;m_listWidget_selectionGroups-&gt;count(), selectionIndex.key());</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;    }</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;        <span class="keywordflow">if</span>(kind == FIFFV_EEG_CH) <span class="comment">//FIFFV_MEG_CH</span></div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;            names&lt;&lt;chName;</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;    }</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;    <span class="comment">//Add &#39;Add EEG&#39; group to selection groups</span></div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;    m_selectionGroupsMap[<span class="stringliteral">&quot;All EEG&quot;</span>] = names;</div>
 <div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;    <span class="comment">//Update selection</span></div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    updateSelectionGroupsList(<a class="code" href="class_m_n_e_browse_raw_qt_1_1_selection_manager_window.html#a5a66731d0d025dd27abe11d1947fd745">getItemForChName</a>(ui-&gt;m_listWidget_selectionGroups, <span class="stringliteral">&quot;All&quot;</span>), <span class="keyword">new</span> QListWidgetItem());</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;    <span class="comment">//Set group all as slected item</span></div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;    ui-&gt;m_listWidget_selectionGroups-&gt;setCurrentItem(<a class="code" href="class_m_n_e_browse_raw_qt_1_1_selection_manager_window.html#a5a66731d0d025dd27abe11d1947fd745">getItemForChName</a>(ui-&gt;m_listWidget_selectionGroups, <span class="stringliteral">&quot;All&quot;</span>), QItemSelectionModel::Select);</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;    <span class="comment">//Delete all MEG channels from the selection groups which are not in the loaded layout</span></div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;    cleanUpMEGChannels();</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;    <span class="keywordflow">return</span> state;</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;}</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;    <span class="comment">//Add selection groups to list widget</span></div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    QMapIterator&lt;QString, QStringList&gt; selectionIndex(m_selectionGroupsMap);</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;    <span class="keywordflow">while</span> (selectionIndex.hasNext()) {</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;        selectionIndex.next();</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;        ui-&gt;m_listWidget_selectionGroups-&gt;insertItem(ui-&gt;m_listWidget_selectionGroups-&gt;count(), selectionIndex.key());</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    }</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;    <span class="comment">//Update selection</span></div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;    updateSelectionGroupsList(<a class="code" href="class_m_n_e_browse_raw_qt_1_1_selection_manager_window.html#a5a66731d0d025dd27abe11d1947fd745">getItemForChName</a>(ui-&gt;m_listWidget_selectionGroups, <span class="stringliteral">&quot;All&quot;</span>), <span class="keyword">new</span> QListWidgetItem());</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    <span class="comment">//Set group all as slected item</span></div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;    ui-&gt;m_listWidget_selectionGroups-&gt;setCurrentItem(<a class="code" href="class_m_n_e_browse_raw_qt_1_1_selection_manager_window.html#a5a66731d0d025dd27abe11d1947fd745">getItemForChName</a>(ui-&gt;m_listWidget_selectionGroups, <span class="stringliteral">&quot;All&quot;</span>), QItemSelectionModel::Select);</div>
 <div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;<span class="keywordtype">void</span> SelectionManagerWindow::cleanUpMEGChannels()</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;{</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;    QMapIterator&lt;QString,QStringList&gt; selectionIndex(m_selectionGroupsMap);</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;    <span class="comment">//Delete all MEG channels from the selection groups which are not in the loaded layout</span></div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;    cleanUpMEGChannels();</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;    <span class="keywordflow">return</span> state;</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;}</div>
 <div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;    <span class="comment">//Iterate through all loaded selection groups</span></div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    <span class="keywordflow">while</span> (selectionIndex.hasNext()) {</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;        selectionIndex.next();</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;        QStringList channelList = selectionIndex.value();</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;        <span class="comment">//Search the current selection group for MEG channels which are not in the currently loaded layout file and delete them</span></div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;        QMutableStringListIterator stringListIndex(channelList);</div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;        <span class="keywordflow">while</span> (stringListIndex.hasNext()) {</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;            stringListIndex.next();</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;<span class="keywordtype">void</span> SelectionManagerWindow::cleanUpMEGChannels()</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;{</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;    QMapIterator&lt;QString,QStringList&gt; selectionIndex(m_selectionGroupsMap);</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;    <span class="comment">//Iterate through all loaded selection groups</span></div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;    <span class="keywordflow">while</span> (selectionIndex.hasNext()) {</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;        selectionIndex.next();</div>
 <div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;            <span class="keywordflow">if</span>(!m_layoutMap.contains(stringListIndex.value()) &amp;&amp; stringListIndex.value().contains(<span class="stringliteral">&quot;MEG&quot;</span>))</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;                stringListIndex.remove();</div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;        }</div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;</div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;        <span class="comment">//Overwrite old selection groups channels</span></div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;        m_selectionGroupsMap.insert(selectionIndex.key(), channelList);</div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;    }</div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;}</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;<span class="keywordtype">void</span> SelectionManagerWindow::updateSelectionGroupsList(QListWidgetItem* current, QListWidgetItem* previous)</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;{</div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;    Q_UNUSED(previous);</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;        QStringList channelList = selectionIndex.value();</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;        <span class="comment">//Search the current selection group for MEG channels which are not in the currently loaded layout file and delete them</span></div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;        QMutableStringListIterator stringListIndex(channelList);</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;        <span class="keywordflow">while</span> (stringListIndex.hasNext()) {</div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;            stringListIndex.next();</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;</div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;            <span class="keywordflow">if</span>(!m_layoutMap.contains(stringListIndex.value()) &amp;&amp; stringListIndex.value().contains(<span class="stringliteral">&quot;MEG&quot;</span>))</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;                stringListIndex.remove();</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;        }</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;        <span class="comment">//Overwrite old selection groups channels</span></div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;        m_selectionGroupsMap.insert(selectionIndex.key(), channelList);</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;    }</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;}</div>
 <div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;</div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;    <span class="keywordflow">if</span>(current == 0)</div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;        <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;</div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;</div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    <span class="keywordflow">if</span>(current-&gt;text().contains(<span class="stringliteral">&quot;EEG&quot;</span>))</div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;        m_pSelectionScene-&gt;m_iChannelTypeMode = FIFFV_EEG_CH;</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;        m_pSelectionScene-&gt;m_iChannelTypeMode = FIFFV_MEG_CH;</div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;</div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    ui-&gt;m_listWidget_visibleChannels-&gt;clear();</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;<span class="keywordtype">void</span> SelectionManagerWindow::updateSelectionGroupsList(QListWidgetItem* current, QListWidgetItem* previous)</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;{</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    Q_UNUSED(previous);</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;    <span class="keywordflow">if</span>(current == 0)</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;        <span class="keywordflow">return</span>;</div>
 <div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;</div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;    <span class="comment">//update visible channel list widget</span></div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;    ui-&gt;m_listWidget_visibleChannels-&gt;addItems(m_selectionGroupsMap[current-&gt;text()]);</div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;</div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;    <span class="comment">//update scene items based o nthe new selection group</span></div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;    updateSceneItems();</div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;</div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;    <span class="comment">//update the channels plotted in the data view</span></div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;    updateDataView();</div>
-<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;}</div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;    <span class="keywordflow">if</span>(current-&gt;text().contains(<span class="stringliteral">&quot;EEG&quot;</span>))</div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;        m_pSelectionScene-&gt;m_iChannelTypeMode = FIFFV_EEG_CH;</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;        m_pSelectionScene-&gt;m_iChannelTypeMode = FIFFV_MEG_CH;</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;</div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;    ui-&gt;m_listWidget_visibleChannels-&gt;clear();</div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;    <span class="comment">//update visible channel list widget</span></div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;    ui-&gt;m_listWidget_visibleChannels-&gt;addItems(m_selectionGroupsMap[current-&gt;text()]);</div>
 <div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;</div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;</div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;    <span class="comment">//update scene items based o nthe new selection group</span></div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;    updateSceneItems();</div>
 <div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;</div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;<span class="keywordtype">void</span> SelectionManagerWindow::updateSceneItems()</div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;{</div>
-<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;    QStringList visibleItems;</div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;    <span class="comment">//update the channels plotted in the data view</span></div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;    updateDataView();</div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;}</div>
 <div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;</div>
-<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i&lt;ui-&gt;m_listWidget_visibleChannels-&gt;count(); i++)</div>
-<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;        visibleItems &lt;&lt; ui-&gt;m_listWidget_visibleChannels-&gt;item(i)-&gt;text();</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;</div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;</div>
-<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;    m_pSelectionScene-&gt;<a class="code" href="class_m_n_e_browse_raw_qt_1_1_selection_scene.html#ae73b6caeab85d620857cdce4205ee04f">hideItems</a>(visibleItems);</div>
-<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;}</div>
-<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;</div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;<span class="keywordtype">void</span> SelectionManagerWindow::updateSceneItems()</div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;{</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;    QStringList visibleItems;</div>
 <div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;</div>
-<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;</div>
-<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;<span class="keywordtype">void</span> SelectionManagerWindow::updateUserDefinedChannelsList()</div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;{</div>
-<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;    QList&lt;QGraphicsItem*&gt; itemList = m_pSelectionScene-&gt;selectedItems();</div>
-<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;    QStringList userDefinedChannels;</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i&lt;ui-&gt;m_listWidget_visibleChannels-&gt;count(); i++)</div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;        visibleItems &lt;&lt; ui-&gt;m_listWidget_visibleChannels-&gt;item(i)-&gt;text();</div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;</div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;    m_pSelectionScene-&gt;<a class="code" href="class_m_n_e_browse_raw_qt_1_1_selection_scene.html#ae73b6caeab85d620857cdce4205ee04f">hideItems</a>(visibleItems);</div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;}</div>
+<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;</div>
 <div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;</div>
-<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i&lt;itemList.size(); i++) {</div>
-<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;        <a class="code" href="class_m_n_e_browse_raw_qt_1_1_selection_scene_item.html">SelectionSceneItem</a>* item = <span class="keyword">static_cast&lt;</span><a class="code" href="class_m_n_e_browse_raw_qt_1_1_selection_scene_item.html">SelectionSceneItem</a>*<span class="keyword">&gt;</span>(itemList.at(i));</div>
-<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;        userDefinedChannels &lt;&lt; item-&gt;<a class="code" href="class_m_n_e_browse_raw_qt_1_1_selection_scene_item.html#a2d2b76eaaf90d57ad50e7945ecdfa83e">m_sChannelName</a>;</div>
-<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;    }</div>
-<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;</div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;    ui-&gt;m_listWidget_userDefined-&gt;clear();</div>
-<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;    ui-&gt;m_listWidget_userDefined-&gt;addItems(userDefinedChannels);</div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;</div>
-<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;    updateDataView();</div>
-<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;}</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;</div>
+<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;</div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;<span class="keywordtype">void</span> SelectionManagerWindow::updateUserDefinedChannelsList()</div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;{</div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;    QList&lt;QGraphicsItem*&gt; itemList = m_pSelectionScene-&gt;selectedItems();</div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;    QStringList userDefinedChannels;</div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i&lt;itemList.size(); i++) {</div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;        <a class="code" href="class_m_n_e_browse_raw_qt_1_1_selection_scene_item.html">SelectionSceneItem</a>* item = <span class="keyword">static_cast&lt;</span><a class="code" href="class_m_n_e_browse_raw_qt_1_1_selection_scene_item.html">SelectionSceneItem</a>*<span class="keyword">&gt;</span>(itemList.at(i));</div>
+<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;        userDefinedChannels &lt;&lt; item-&gt;<a class="code" href="class_m_n_e_browse_raw_qt_1_1_selection_scene_item.html#a2d2b76eaaf90d57ad50e7945ecdfa83e">m_sChannelName</a>;</div>
+<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;    }</div>
 <div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;</div>
-<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;</div>
-<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;<span class="keywordtype">void</span> SelectionManagerWindow::updateDataView()</div>
-<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;{</div>
-<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;    <span class="comment">//if no channels have been selected by the user -&gt; show selected group channels</span></div>
-<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;    QListWidget* targetListWidget;</div>
-<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;    <span class="keywordflow">if</span>(ui-&gt;m_listWidget_userDefined-&gt;count()&gt;0)</div>
-<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;        targetListWidget = ui-&gt;m_listWidget_userDefined;</div>
-<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;        targetListWidget = ui-&gt;m_listWidget_visibleChannels;</div>
-<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;</div>
-<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;    <span class="comment">//Create list of channels which are to be visible in the view</span></div>
-<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;    QStringList selectedChannels;</div>
-<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;</div>
-<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i&lt;targetListWidget-&gt;count(); i++) {</div>
-<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;        QListWidgetItem* item = targetListWidget-&gt;item(i);</div>
-<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;        <span class="keywordtype">int</span> indexTemp = m_pChInfoModel-&gt;<a class="code" href="class_m_n_e_browse_raw_qt_1_1_ch_info_model.html#a2404fb63deb9ee3e43fb3435133e845a">getIndexFromMappedChName</a>(item-&gt;text());</div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;    ui-&gt;m_listWidget_userDefined-&gt;clear();</div>
+<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;    ui-&gt;m_listWidget_userDefined-&gt;addItems(userDefinedChannels);</div>
+<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;</div>
+<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;    updateDataView();</div>
+<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;}</div>
+<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;</div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;</div>
+<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;</div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;<span class="keywordtype">void</span> SelectionManagerWindow::updateDataView()</div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;{</div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;    <span class="comment">//if no channels have been selected by the user -&gt; show selected group channels</span></div>
+<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;    QListWidget* targetListWidget;</div>
+<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;    <span class="keywordflow">if</span>(ui-&gt;m_listWidget_userDefined-&gt;count()&gt;0)</div>
+<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;        targetListWidget = ui-&gt;m_listWidget_userDefined;</div>
+<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;        targetListWidget = ui-&gt;m_listWidget_visibleChannels;</div>
 <div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;</div>
-<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;        <span class="keywordflow">if</span>(indexTemp != -1) {</div>
-<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;            QModelIndex mappedNameIndex = m_pChInfoModel-&gt;index(indexTemp,1);</div>
-<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;            QString origChName = m_pChInfoModel-&gt;data(mappedNameIndex,ChInfoModelRoles::GetOrigChName).toString();</div>
-<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;</div>
-<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;            selectedChannels &lt;&lt; origChName;</div>
-<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;        }</div>
-<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;            selectedChannels &lt;&lt; item-&gt;text();</div>
-<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;    }</div>
-<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;</div>
-<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;    emit <a class="code" href="class_m_n_e_browse_raw_qt_1_1_selection_manager_window.html#aa3108e11f2471fd0a0c317c36d198b39">showSelectedChannelsOnly</a>(selectedChannels);</div>
-<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;</div>
-<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;    <span class="comment">//emit signal that selection was changed</span></div>
-<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;    <span class="keywordflow">if</span>(!m_pSelectionScene-&gt;selectedItems().empty())</div>
-<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;        emit <a class="code" href="class_m_n_e_browse_raw_qt_1_1_selection_manager_window.html#a537efd3fecd3c35cedee151d7b349589">selectionChanged</a>(m_pSelectionScene-&gt;selectedItems());</div>
-<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;    {</div>
-<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;        <span class="comment">//only return visible items (EEG or MEG channels)</span></div>
-<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;        QList&lt;QGraphicsItem*&gt; visibleItemList =  m_pSelectionScene-&gt;items();</div>
-<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;        QMutableListIterator&lt;QGraphicsItem*&gt; i(visibleItemList);</div>
-<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;        <span class="keywordflow">while</span> (i.hasNext()) {</div>
-<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;            <span class="keywordflow">if</span>(!i.next()-&gt;isVisible())</div>
-<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;                i.remove();</div>
-<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;        }</div>
-<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;</div>
-<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;        emit <a class="code" href="class_m_n_e_browse_raw_qt_1_1_selection_manager_window.html#a537efd3fecd3c35cedee151d7b349589">selectionChanged</a>(visibleItemList);</div>
-<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;    }</div>
-<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;}</div>
-<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;</div>
-<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;</div>
-<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;    <span class="comment">//Create list of channels which are to be visible in the view</span></div>
+<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;    QStringList selectedChannels;</div>
+<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;</div>
+<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i&lt;targetListWidget-&gt;count(); i++) {</div>
+<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;        QListWidgetItem* item = targetListWidget-&gt;item(i);</div>
+<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;        <span class="keywordtype">int</span> indexTemp = m_pChInfoModel-&gt;<a class="code" href="class_m_n_e_browse_raw_qt_1_1_ch_info_model.html#a2404fb63deb9ee3e43fb3435133e845a">getIndexFromMappedChName</a>(item-&gt;text());</div>
+<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;</div>
+<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;        <span class="keywordflow">if</span>(indexTemp != -1) {</div>
+<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;            QModelIndex mappedNameIndex = m_pChInfoModel-&gt;index(indexTemp,1);</div>
+<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;            QString origChName = m_pChInfoModel-&gt;data(mappedNameIndex,ChInfoModelRoles::GetOrigChName).toString();</div>
+<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;</div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;            selectedChannels &lt;&lt; origChName;</div>
+<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;        }</div>
+<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;            selectedChannels &lt;&lt; item-&gt;text();</div>
+<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;    }</div>
+<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;</div>
+<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;    emit <a class="code" href="class_m_n_e_browse_raw_qt_1_1_selection_manager_window.html#aa3108e11f2471fd0a0c317c36d198b39">showSelectedChannelsOnly</a>(selectedChannels);</div>
+<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;</div>
+<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;    <span class="comment">//emit signal that selection was changed</span></div>
+<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;    <span class="keywordflow">if</span>(!m_pSelectionScene-&gt;selectedItems().empty())</div>
+<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;        emit <a class="code" href="class_m_n_e_browse_raw_qt_1_1_selection_manager_window.html#a537efd3fecd3c35cedee151d7b349589">selectionChanged</a>(m_pSelectionScene-&gt;selectedItems());</div>
+<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;    {</div>
+<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;        <span class="comment">//only return visible items (EEG or MEG channels)</span></div>
+<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;        QList&lt;QGraphicsItem*&gt; visibleItemList =  m_pSelectionScene-&gt;items();</div>
+<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;        QMutableListIterator&lt;QGraphicsItem*&gt; i(visibleItemList);</div>
+<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;        <span class="keywordflow">while</span> (i.hasNext()) {</div>
+<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;            <span class="keywordflow">if</span>(!i.next()-&gt;isVisible())</div>
+<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;                i.remove();</div>
+<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;        }</div>
 <div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;</div>
-<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;<span class="keywordtype">void</span> SelectionManagerWindow::resizeEvent(QResizeEvent* event)</div>
-<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;{</div>
-<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;    Q_UNUSED(event);</div>
+<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;        emit <a class="code" href="class_m_n_e_browse_raw_qt_1_1_selection_manager_window.html#a537efd3fecd3c35cedee151d7b349589">selectionChanged</a>(visibleItemList);</div>
+<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;    }</div>
+<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;}</div>
 <div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;</div>
-<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;    <span class="comment">//Fit scene in view</span></div>
-<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;    <span class="comment">//ui-&gt;m_graphicsView_layoutPlot-&gt;fitInView(m_pSelectionScene-&gt;itemsBoundingRect(), Qt::KeepAspectRatio);</span></div>
-<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;}</div>
-<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;</div>
-<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;</div>
-<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;</div>
+<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;</div>
+<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;<span class="keywordtype">void</span> SelectionManagerWindow::resizeEvent(QResizeEvent* event)</div>
+<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;{</div>
+<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;    Q_UNUSED(event);</div>
 <div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;</div>
-<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;<span class="keywordtype">bool</span> SelectionManagerWindow::eventFilter(QObject *obj, QEvent *event)</div>
-<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;{</div>
-<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;    <span class="comment">//Setup delete key on user defined channel list</span></div>
-<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;    <span class="keywordflow">if</span> (obj == ui-&gt;m_listWidget_userDefined &amp;&amp; event-&gt;type() == QEvent::KeyRelease) {</div>
-<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;        QKeyEvent *keyEvent = <span class="keyword">static_cast&lt;</span>QKeyEvent*<span class="keyword">&gt;</span>(event);</div>
-<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;</div>
-<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;        <span class="keywordflow">if</span>(keyEvent-&gt;key() == Qt::Key_Delete) {</div>
-<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;            qDeleteAll(ui-&gt;m_listWidget_userDefined-&gt;selectedItems());</div>
-<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;            updateDataView();</div>
-<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;        }</div>
-<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;    }</div>
-<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;    <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;        <span class="comment">// pass the event on to the parent class</span></div>
-<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;        <span class="keywordflow">return</span> QDockWidget::eventFilter(obj, event);</div>
-<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;    }</div>
-<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;</div>
-<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;}</div>
+<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;    <span class="comment">//Fit scene in view</span></div>
+<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;    <span class="comment">//ui-&gt;m_graphicsView_layoutPlot-&gt;fitInView(m_pSelectionScene-&gt;itemsBoundingRect(), Qt::KeepAspectRatio);</span></div>
+<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;}</div>
+<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;</div>
+<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;</div>
+<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;</div>
+<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;<span class="keywordtype">bool</span> SelectionManagerWindow::eventFilter(QObject *obj, QEvent *event)</div>
+<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;{</div>
+<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;    <span class="comment">//Setup delete key on user defined channel list</span></div>
+<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;    <span class="keywordflow">if</span> (obj == ui-&gt;m_listWidget_userDefined &amp;&amp; event-&gt;type() == QEvent::KeyRelease) {</div>
+<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;        QKeyEvent *keyEvent = <span class="keyword">static_cast&lt;</span>QKeyEvent*<span class="keyword">&gt;</span>(event);</div>
+<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;</div>
+<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;        <span class="keywordflow">if</span>(keyEvent-&gt;key() == Qt::Key_Delete) {</div>
+<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;            qDeleteAll(ui-&gt;m_listWidget_userDefined-&gt;selectedItems());</div>
+<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;            updateDataView();</div>
+<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;        }</div>
+<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;    }</div>
+<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;    <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;        <span class="comment">// pass the event on to the parent class</span></div>
+<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;        <span class="keywordflow">return</span> QDockWidget::eventFilter(obj, event);</div>
+<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;    }</div>
+<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;</div>
+<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;}</div>
 <div class="ttc" id="class_m_n_e_browse_raw_qt_1_1_selection_scene_html_a5ca7be8e893e8c7067eb8b9665cbbb3b"><div class="ttname"><a href="class_m_n_e_browse_raw_qt_1_1_selection_scene.html#a5ca7be8e893e8c7067eb8b9665cbbb3b">MNEBrowseRawQt::SelectionScene::repaintItems</a></div><div class="ttdeci">void repaintItems(const QMap&lt; QString, QPointF &gt; &amp;layoutMap)</div><div class="ttdef"><b>Definition:</b> <a href="mne__browse__raw__qt_2_utils_2selectionscene_8cpp_source.html#l00068">selectionscene.cpp:68</a></div></div>
 <div class="ttc" id="class_m_n_e_browse_raw_qt_1_1_selection_manager_window_html_af40c73ed35200734aed5f0f733e96bf0"><div class="ttname"><a href="class_m_n_e_browse_raw_qt_1_1_selection_manager_window.html#af40c73ed35200734aed5f0f733e96bf0">MNEBrowseRawQt::SelectionManagerWindow::~SelectionManagerWindow</a></div><div class="ttdeci">~SelectionManagerWindow()</div><div class="ttdef"><b>Definition:</b> <a href="mne__browse__raw__qt_2_windows_2selectionmanagerwindow_8cpp_source.html#l00074">selectionmanagerwindow.cpp:74</a></div></div>
 <div class="ttc" id="class_m_n_e_browse_raw_qt_1_1_selection_manager_window_html_a8793dadf7ccd9436ebb02363087bd0d9"><div class="ttname"><a href="class_m_n_e_browse_raw_qt_1_1_selection_manager_window.html#a8793dadf7ccd9436ebb02363087bd0d9">MNEBrowseRawQt::SelectionManagerWindow::selectChannels</a></div><div class="ttdeci">void selectChannels(QStringList channelList)</div><div class="ttdef"><b>Definition:</b> <a href="mne__browse__raw__qt_2_windows_2selectionmanagerwindow_8cpp_source.html#l00136">selectionmanagerwindow.cpp:136</a></div></div>
 <div class="ttc" id="class_m_n_e_browse_raw_qt_1_1_selection_manager_window_html_a052617c0444b2cd51ca9e95b6d1a3a94"><div class="ttname"><a href="class_m_n_e_browse_raw_qt_1_1_selection_manager_window.html#a052617c0444b2cd51ca9e95b6d1a3a94">MNEBrowseRawQt::SelectionManagerWindow::getSelectedChannels</a></div><div class="ttdeci">QStringList getSelectedChannels()</div><div class="ttdef"><b>Definition:</b> <a href="mne__browse__raw__qt_2_windows_2selectionmanagerwindow_8cpp_source.html#l00154">selectionmanagerwindow.cpp:154</a></div></div>
 <div class="ttc" id="class_m_n_e_browse_raw_qt_1_1_selection_scene_item_html_ab69a82248b3517d155cf3d2fbedc51e9"><div class="ttname"><a href="class_m_n_e_browse_raw_qt_1_1_selection_scene_item.html#ab69a82248b3517d155cf3d2fbedc51e9">MNEBrowseRawQt::SelectionSceneItem::m_bHighlightItem</a></div><div class="ttdeci">bool m_bHighlightItem</div><div class="ttdef"><b>Definition:</b> <a href="mne__browse__raw__qt_2_utils_2selectionsceneitem_8h_source.html#l00110">selectionsceneitem.h:110</a></div></div>
-<div class="ttc" id="namespace_ui_html"><div class="ttname"><a href="namespace_ui.html">Ui</a></div><div class="ttdef"><b>Definition:</b> <a href="deletemessagebox_8h_source.html#l00053">deletemessagebox.h:53</a></div></div>
+<div class="ttc" id="namespace_ui_html"><div class="ttname"><a href="namespace_ui.html">Ui</a></div><div class="ttdef"><b>Definition:</b> <a href="mne__analyze__qt_2_windows_2aboutwindow_8h_source.html#l00052">aboutwindow.h:52</a></div></div>
 <div class="ttc" id="class_m_n_e_browse_raw_qt_1_1_selection_manager_window_html"><div class="ttname"><a href="class_m_n_e_browse_raw_qt_1_1_selection_manager_window.html">MNEBrowseRawQt::SelectionManagerWindow</a></div><div class="ttdoc">The SelectionManagerWindow class provides a channel selection window. </div><div class="ttdef"><b>Definition:</b> <a href="mne__browse__raw__qt_2_windows_2selectionmanagerwindow_8h_source.html#l00092">selectionmanagerwindow.h:92</a></div></div>
 <div class="ttc" id="class_m_n_e_browse_raw_qt_1_1_ch_info_model_html_a0b6db30cfaf94d4a76b306b0029c1a3e"><div class="ttname"><a href="class_m_n_e_browse_raw_qt_1_1_ch_info_model.html#a0b6db30cfaf94d4a76b306b0029c1a3e">MNEBrowseRawQt::ChInfoModel::rowCount</a></div><div class="ttdeci">virtual int rowCount(const QModelIndex &amp;parent=QModelIndex()) const </div><div class="ttdef"><b>Definition:</b> <a href="mne__browse__raw__qt_2_models_2chinfomodel_8cpp_source.html#l00067">chinfomodel.cpp:67</a></div></div>
 <div class="ttc" id="namespace_m_n_e_browse_raw_qt_html"><div class="ttname"><a href="namespace_m_n_e_browse_raw_qt.html">MNEBrowseRawQt</a></div><div class="ttdef"><b>Definition:</b> <a href="averagedelegate_8h_source.html#l00062">averagedelegate.h:62</a></div></div>
@@ -642,11 +649,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="class_m_n_e_browse_raw_qt_1_1_selection_manager_window_html_a5a66731d0d025dd27abe11d1947fd745"><div class="ttname"><a href="class_m_n_e_browse_raw_qt_1_1_selection_manager_window.html#a5a66731d0d025dd27abe11d1947fd745">MNEBrowseRawQt::SelectionManagerWindow::getItemForChName</a></div><div class="ttdeci">QListWidgetItem * getItemForChName(QListWidget *listWidget, QString channelName)</div><div class="ttdef"><b>Definition:</b> <a href="mne__browse__raw__qt_2_windows_2selectionmanagerwindow_8cpp_source.html#l00177">selectionmanagerwindow.cpp:177</a></div></div>
 <div class="ttc" id="class_m_n_e_browse_raw_qt_1_1_selection_manager_window_html_ae8bbc0a0a21e322c06b0cf295478bb21"><div class="ttname"><a href="class_m_n_e_browse_raw_qt_1_1_selection_manager_window.html#ae8bbc0a0a21e322c06b0cf295478bb21">MNEBrowseRawQt::SelectionManagerWindow::setCurrentlyMappedFiffChannels</a></div><div class="ttdeci">void setCurrentlyMappedFiffChannels(const QStringList &amp;mappedLayoutChNames)</div><div class="ttdef"><b>Definition:</b> <a href="mne__browse__raw__qt_2_windows_2selectionmanagerwindow_8cpp_source.html#l00082">selectionmanagerwindow.cpp:82</a></div></div>
 <div class="ttc" id="class_m_n_e_browse_raw_qt_1_1_selection_scene_item_html_a2d2b76eaaf90d57ad50e7945ecdfa83e"><div class="ttname"><a href="class_m_n_e_browse_raw_qt_1_1_selection_scene_item.html#a2d2b76eaaf90d57ad50e7945ecdfa83e">MNEBrowseRawQt::SelectionSceneItem::m_sChannelName</a></div><div class="ttdeci">QString m_sChannelName</div><div class="ttdef"><b>Definition:</b> <a href="mne__browse__raw__qt_2_utils_2selectionsceneitem_8h_source.html#l00104">selectionsceneitem.h:104</a></div></div>
-<div class="ttc" id="class_m_n_e_browse_raw_qt_1_1_ch_info_model_html_a2404fb63deb9ee3e43fb3435133e845a"><div class="ttname"><a href="class_m_n_e_browse_raw_qt_1_1_ch_info_model.html#a2404fb63deb9ee3e43fb3435133e845a">MNEBrowseRawQt::ChInfoModel::getIndexFromMappedChName</a></div><div class="ttdeci">int getIndexFromMappedChName(QString chName)</div><div class="ttdef"><b>Definition:</b> <a href="mne__browse__raw__qt_2_models_2chinfomodel_8cpp_source.html#l00521">chinfomodel.cpp:521</a></div></div>
+<div class="ttc" id="class_m_n_e_browse_raw_qt_1_1_ch_info_model_html_a2404fb63deb9ee3e43fb3435133e845a"><div class="ttname"><a href="class_m_n_e_browse_raw_qt_1_1_ch_info_model.html#a2404fb63deb9ee3e43fb3435133e845a">MNEBrowseRawQt::ChInfoModel::getIndexFromMappedChName</a></div><div class="ttdeci">int getIndexFromMappedChName(QString chName)</div><div class="ttdef"><b>Definition:</b> <a href="mne__browse__raw__qt_2_models_2chinfomodel_8cpp_source.html#l00551">chinfomodel.cpp:551</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jan 27 2015 08:53:51 for MNE-CPP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Mar 27 2015 22:54:25 for MNE-CPP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>
