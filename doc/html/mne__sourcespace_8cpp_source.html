@@ -822,84 +822,141 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;<span class="comment">//        qDebug() &lt;&lt; &quot;p_Hemisphere.use_tri_nn:&quot; &lt;&lt; p_Hemisphere.use_tri_nn(0,0) &lt;&lt; p_Hemisphere.use_tri_nn(0,1) &lt;&lt; p_Hemisphere.use_tri_nn(0,2);</span></div>
 <div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;<span class="comment">//        qDebug() &lt;&lt; &quot;p_Hemisphere.use_tri_nn:&quot; &lt;&lt; p_Hemisphere.use_tri_nn(2,0) &lt;&lt; p_Hemisphere.use_tri_nn(2,1) &lt;&lt; p_Hemisphere.use_tri_nn(2,2);</span></div>
 <div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;</div>
-<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;}</div>
-<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;</div>
+<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;    printf(<span class="stringliteral">&quot;\tCompleting triangle and vertex neighboring info...&quot;</span>);</div>
+<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;    add_geometry_info(p_Hemisphere);</div>
+<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;    printf(<span class="stringliteral">&quot;[done]\n&quot;</span>);</div>
 <div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;</div>
-<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;</div>
-<div class="line"><a name="l00772"></a><span class="lineno"><a class="line" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ae078c1f063f047c677e933366cac1ffc">  772</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ae078c1f063f047c677e933366cac1ffc">MNESourceSpace::writeToStream</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a>* p_pStream)</div>
-<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;{</div>
-<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;    <span class="keywordflow">for</span>(qint32 h = 0; h &lt; m_qListHemispheres.size(); ++h)</div>
-<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;    {</div>
-<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;        printf(<span class="stringliteral">&quot;\tWrite a source space... &quot;</span>);</div>
-<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;        p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aca5c9df67313a344df12ebf61e57409c">start_block</a>(FIFFB_MNE_SOURCE_SPACE);</div>
-<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;        m_qListHemispheres[h].writeToStream(p_pStream);</div>
-<div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;        p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a904df8f48da1564a8d5a975a22aa6b54">end_block</a>(FIFFB_MNE_SOURCE_SPACE);</div>
-<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160;        printf(<span class="stringliteral">&quot;[done]\n&quot;</span>);</div>
-<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;    }</div>
-<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160;    printf(<span class="stringliteral">&quot;\t%d source spaces written\n&quot;</span>, m_qListHemispheres.size());</div>
-<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;}</div>
-<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160;</div>
-<div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160;</div>
-<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;</div>
-<div class="line"><a name="l00788"></a><span class="lineno"><a class="line" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a9fdcb79e8f83c49c77282872db8425a7">  788</a></span>&#160;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a>&amp; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a9fdcb79e8f83c49c77282872db8425a7">MNESourceSpace::operator[] </a>(qint32 idx)</div>
-<div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;{</div>
-<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;    <span class="keywordflow">if</span>(m_qListHemispheres.size() &gt; idx)</div>
-<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;        <span class="keywordflow">return</span> m_qListHemispheres[idx];</div>
-<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;    {</div>
-<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;        qWarning(<span class="stringliteral">&quot;Warning: Index out of bound! Returning last element.&quot;</span>);</div>
-<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;        <span class="keywordflow">return</span> m_qListHemispheres[m_qListHemispheres.size()-1];</div>
-<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;    }</div>
-<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;}</div>
-<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;</div>
+<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;}</div>
+<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;</div>
+<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;</div>
+<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;</div>
+<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;<span class="keywordtype">bool</span> MNESourceSpace::add_geometry_info(<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a>&amp; p_Hemisphere)</div>
+<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;{</div>
+<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;    <span class="keywordtype">int</span> k,c,p,q;</div>
+<div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;    <span class="keywordtype">bool</span> found;</div>
+<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160;</div>
+<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;    <span class="comment">//Clear neighboring triangle list</span></div>
+<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160;    p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae7f8d800b94a9e292e343d439a66e757">neighbor_tri</a>.clear();</div>
+<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;</div>
+<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160;    <span class="comment">//Create neighbor_tri information</span></div>
+<div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160;    <span class="keywordflow">for</span> (p = 0; p &lt; p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab2084cf6ed3de33ef78ef11c0e6f83b6">tris</a>.rows(); p++)</div>
+<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;        <span class="keywordflow">for</span> (k = 0; k &lt; 3; k++)</div>
+<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;            p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae7f8d800b94a9e292e343d439a66e757">neighbor_tri</a>[p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab2084cf6ed3de33ef78ef11c0e6f83b6">tris</a>(p,k)].append(p);</div>
+<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;</div>
+<div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;    std::cout&lt;&lt;<span class="stringliteral">&quot;MNESourceSpace::add_geometry_info() - p_Hemisphere.neighbor_tri[100].size(): &quot;</span>&lt;&lt;p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae7f8d800b94a9e292e343d439a66e757">neighbor_tri</a>[100].size()&lt;&lt;std::endl;</div>
+<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;</div>
+<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;    <span class="comment">//Determine the neighboring vertices</span></div>
+<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;    p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ad5ab1beed9e998dccda1963824f0c73c">neighbor_vert</a>.clear();</div>
+<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;</div>
+<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;    <span class="keywordflow">for</span> (k = 0; k &lt; p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aed488c023af9e17d490f3abdea867eeb">np</a>; k++) {</div>
+<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;        <span class="keywordflow">for</span> (p = 0; p &lt; p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae7f8d800b94a9e292e343d439a66e757">neighbor_tri</a>[k].size(); p++) {</div>
+<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;            <span class="comment">//Fit in the other vertices of the neighboring triangle</span></div>
+<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;            <span class="keywordflow">for</span> (c = 0; c &lt; 3; c++) {</div>
+<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;                <span class="keywordtype">int</span> vert = p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab2084cf6ed3de33ef78ef11c0e6f83b6">tris</a>(p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae7f8d800b94a9e292e343d439a66e757">neighbor_tri</a>[k][p], c);</div>
 <div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;</div>
-<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;</div>
-<div class="line"><a name="l00802"></a><span class="lineno"><a class="line" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a096b8b6aa75f866b3bbaae5afcf0418b">  802</a></span>&#160;<span class="keyword">const</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a>&amp; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a9fdcb79e8f83c49c77282872db8425a7">MNESourceSpace::operator[] </a>(qint32 idx)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;    <span class="keywordflow">if</span>(m_qListHemispheres.size() &gt; idx)</div>
-<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;        <span class="keywordflow">return</span> m_qListHemispheres[idx];</div>
-<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;    {</div>
-<div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;        qWarning(<span class="stringliteral">&quot;Warning: Index out of bound! Returning last element.&quot;</span>);</div>
-<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;        <span class="keywordflow">return</span> m_qListHemispheres[m_qListHemispheres.size()-1];</div>
-<div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;    }</div>
-<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;}</div>
-<div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160;</div>
-<div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;</div>
-<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;</div>
-<div class="line"><a name="l00816"></a><span class="lineno"><a class="line" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ad9f6c2409ccec6fec539ff65b63b214a">  816</a></span>&#160;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a>&amp; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a9fdcb79e8f83c49c77282872db8425a7">MNESourceSpace::operator[] </a>(QString idt)</div>
-<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;{</div>
-<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;    <span class="keywordflow">if</span>(idt.compare(<span class="stringliteral">&quot;lh&quot;</span>) == 0)</div>
-<div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;        <span class="keywordflow">return</span> m_qListHemispheres[0];</div>
-<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(idt.compare(<span class="stringliteral">&quot;rh&quot;</span>) == 0)</div>
-<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;        <span class="keywordflow">return</span> m_qListHemispheres[1];</div>
-<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;    {</div>
-<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;        qWarning(<span class="stringliteral">&quot;Warning: Identifier is not &#39;lh&#39; or &#39;rh&#39;! Returning &#39;lh&#39;.&quot;</span>);</div>
-<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;        <span class="keywordflow">return</span> m_qListHemispheres[0];</div>
-<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;    }</div>
-<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;}</div>
+<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;                <span class="keywordflow">if</span> (vert != k) {</div>
+<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;                    found = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;</div>
+<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;                    <span class="keywordflow">for</span> (q = 0; q &lt; p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ad5ab1beed9e998dccda1963824f0c73c">neighbor_vert</a>[k].size(); q++) {</div>
+<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;                        <span class="keywordflow">if</span> (p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ad5ab1beed9e998dccda1963824f0c73c">neighbor_vert</a>[k][q] == vert) {</div>
+<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;                            found = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;                            <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;                        }</div>
+<div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;                    }</div>
+<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;</div>
+<div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;                    <span class="keywordflow">if</span>(!found) {</div>
+<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;                        <span class="comment">//std::cout&lt;&lt;&quot;MNESourceSpace::add_geometry_info() - Found vert: &quot;&lt;&lt;vert&lt;&lt;std::endl;</span></div>
+<div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160;                        p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ad5ab1beed9e998dccda1963824f0c73c">neighbor_vert</a>[k].append(vert);</div>
+<div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;                    }</div>
+<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;                }</div>
+<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;            }</div>
+<div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160;        }</div>
+<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;    }</div>
+<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;</div>
+<div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;<span class="comment">//    for (k = 0; k &lt; p_Hemisphere.np; k++)</span></div>
+<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;<span class="comment">//        std::cout&lt;&lt;&quot;MNESourceSpace::add_geometry_info() - p_Hemisphere.neighbor_vert[k].size(): &quot;&lt;&lt; p_Hemisphere.neighbor_vert[k].size() &lt;&lt;std::endl;</span></div>
+<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;</div>
+<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;    std::cout&lt;&lt;<span class="stringliteral">&quot;MNESourceSpace::add_geometry_info() - p_Hemisphere.neighbor_vert[100].size(): &quot;</span>&lt;&lt;p_Hemisphere.<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae7f8d800b94a9e292e343d439a66e757">neighbor_tri</a>[100].size()&lt;&lt;std::endl;</div>
+<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;</div>
+<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;}</div>
+<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;</div>
+<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;</div>
-<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;</div>
-<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;</div>
-<div class="line"><a name="l00832"></a><span class="lineno"><a class="line" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a378906997381ceb75c424dd6e3cafe05">  832</a></span>&#160;<span class="keyword">const</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a>&amp; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a9fdcb79e8f83c49c77282872db8425a7">MNESourceSpace::operator[] </a>(QString idt)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;    <span class="keywordflow">if</span>(idt.compare(<span class="stringliteral">&quot;lh&quot;</span>) == 0)</div>
-<div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160;        <span class="keywordflow">return</span> m_qListHemispheres[0];</div>
-<div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(idt.compare(<span class="stringliteral">&quot;rh&quot;</span>) == 0)</div>
-<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;        <span class="keywordflow">return</span> m_qListHemispheres[1];</div>
-<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;    {</div>
-<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;        qWarning(<span class="stringliteral">&quot;Warning: Identifier is not &#39;lh&#39; or &#39;rh&#39;! Returning &#39;lh&#39;.&quot;</span>);</div>
-<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;        <span class="keywordflow">return</span> m_qListHemispheres[0];</div>
-<div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160;    }</div>
-<div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160;}</div>
+<div class="line"><a name="l00829"></a><span class="lineno"><a class="line" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ae078c1f063f047c677e933366cac1ffc">  829</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ae078c1f063f047c677e933366cac1ffc">MNESourceSpace::writeToStream</a>(<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html">FiffStream</a>* p_pStream)</div>
+<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;{</div>
+<div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;    <span class="keywordflow">for</span>(qint32 h = 0; h &lt; m_qListHemispheres.size(); ++h)</div>
+<div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160;    {</div>
+<div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160;        printf(<span class="stringliteral">&quot;\tWrite a source space... &quot;</span>);</div>
+<div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;        p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aca5c9df67313a344df12ebf61e57409c">start_block</a>(FIFFB_MNE_SOURCE_SPACE);</div>
+<div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160;        m_qListHemispheres[h].writeToStream(p_pStream);</div>
+<div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160;        p_pStream-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a904df8f48da1564a8d5a975a22aa6b54">end_block</a>(FIFFB_MNE_SOURCE_SPACE);</div>
+<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;        printf(<span class="stringliteral">&quot;[done]\n&quot;</span>);</div>
+<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;    }</div>
+<div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;    printf(<span class="stringliteral">&quot;\t%d source spaces written\n&quot;</span>, m_qListHemispheres.size());</div>
+<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;}</div>
+<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;</div>
+<div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160;</div>
+<div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00844"></a><span class="lineno">  844</span>&#160;</div>
+<div class="line"><a name="l00845"></a><span class="lineno"><a class="line" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a9fdcb79e8f83c49c77282872db8425a7">  845</a></span>&#160;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a>&amp; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a9fdcb79e8f83c49c77282872db8425a7">MNESourceSpace::operator[] </a>(qint32 idx)</div>
+<div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160;{</div>
+<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;    <span class="keywordflow">if</span>(m_qListHemispheres.size() &gt; idx)</div>
+<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160;        <span class="keywordflow">return</span> m_qListHemispheres[idx];</div>
+<div class="line"><a name="l00849"></a><span class="lineno">  849</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00850"></a><span class="lineno">  850</span>&#160;    {</div>
+<div class="line"><a name="l00851"></a><span class="lineno">  851</span>&#160;        qWarning(<span class="stringliteral">&quot;Warning: Index out of bound! Returning last element.&quot;</span>);</div>
+<div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;        <span class="keywordflow">return</span> m_qListHemispheres[m_qListHemispheres.size()-1];</div>
+<div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;    }</div>
+<div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;}</div>
+<div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;</div>
+<div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;</div>
+<div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00858"></a><span class="lineno">  858</span>&#160;</div>
+<div class="line"><a name="l00859"></a><span class="lineno"><a class="line" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a096b8b6aa75f866b3bbaae5afcf0418b">  859</a></span>&#160;<span class="keyword">const</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a>&amp; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a9fdcb79e8f83c49c77282872db8425a7">MNESourceSpace::operator[] </a>(qint32 idx)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00860"></a><span class="lineno">  860</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00861"></a><span class="lineno">  861</span>&#160;    <span class="keywordflow">if</span>(m_qListHemispheres.size() &gt; idx)</div>
+<div class="line"><a name="l00862"></a><span class="lineno">  862</span>&#160;        <span class="keywordflow">return</span> m_qListHemispheres[idx];</div>
+<div class="line"><a name="l00863"></a><span class="lineno">  863</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00864"></a><span class="lineno">  864</span>&#160;    {</div>
+<div class="line"><a name="l00865"></a><span class="lineno">  865</span>&#160;        qWarning(<span class="stringliteral">&quot;Warning: Index out of bound! Returning last element.&quot;</span>);</div>
+<div class="line"><a name="l00866"></a><span class="lineno">  866</span>&#160;        <span class="keywordflow">return</span> m_qListHemispheres[m_qListHemispheres.size()-1];</div>
+<div class="line"><a name="l00867"></a><span class="lineno">  867</span>&#160;    }</div>
+<div class="line"><a name="l00868"></a><span class="lineno">  868</span>&#160;}</div>
+<div class="line"><a name="l00869"></a><span class="lineno">  869</span>&#160;</div>
+<div class="line"><a name="l00870"></a><span class="lineno">  870</span>&#160;</div>
+<div class="line"><a name="l00871"></a><span class="lineno">  871</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00872"></a><span class="lineno">  872</span>&#160;</div>
+<div class="line"><a name="l00873"></a><span class="lineno"><a class="line" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ad9f6c2409ccec6fec539ff65b63b214a">  873</a></span>&#160;<a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a>&amp; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a9fdcb79e8f83c49c77282872db8425a7">MNESourceSpace::operator[] </a>(QString idt)</div>
+<div class="line"><a name="l00874"></a><span class="lineno">  874</span>&#160;{</div>
+<div class="line"><a name="l00875"></a><span class="lineno">  875</span>&#160;    <span class="keywordflow">if</span>(idt.compare(<span class="stringliteral">&quot;lh&quot;</span>) == 0)</div>
+<div class="line"><a name="l00876"></a><span class="lineno">  876</span>&#160;        <span class="keywordflow">return</span> m_qListHemispheres[0];</div>
+<div class="line"><a name="l00877"></a><span class="lineno">  877</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(idt.compare(<span class="stringliteral">&quot;rh&quot;</span>) == 0)</div>
+<div class="line"><a name="l00878"></a><span class="lineno">  878</span>&#160;        <span class="keywordflow">return</span> m_qListHemispheres[1];</div>
+<div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00880"></a><span class="lineno">  880</span>&#160;    {</div>
+<div class="line"><a name="l00881"></a><span class="lineno">  881</span>&#160;        qWarning(<span class="stringliteral">&quot;Warning: Identifier is not &#39;lh&#39; or &#39;rh&#39;! Returning &#39;lh&#39;.&quot;</span>);</div>
+<div class="line"><a name="l00882"></a><span class="lineno">  882</span>&#160;        <span class="keywordflow">return</span> m_qListHemispheres[0];</div>
+<div class="line"><a name="l00883"></a><span class="lineno">  883</span>&#160;    }</div>
+<div class="line"><a name="l00884"></a><span class="lineno">  884</span>&#160;}</div>
+<div class="line"><a name="l00885"></a><span class="lineno">  885</span>&#160;</div>
+<div class="line"><a name="l00886"></a><span class="lineno">  886</span>&#160;</div>
+<div class="line"><a name="l00887"></a><span class="lineno">  887</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00888"></a><span class="lineno">  888</span>&#160;</div>
+<div class="line"><a name="l00889"></a><span class="lineno"><a class="line" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a378906997381ceb75c424dd6e3cafe05">  889</a></span>&#160;<span class="keyword">const</span> <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNEHemisphere</a>&amp; <a class="code" href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a9fdcb79e8f83c49c77282872db8425a7">MNESourceSpace::operator[] </a>(QString idt)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00890"></a><span class="lineno">  890</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00891"></a><span class="lineno">  891</span>&#160;    <span class="keywordflow">if</span>(idt.compare(<span class="stringliteral">&quot;lh&quot;</span>) == 0)</div>
+<div class="line"><a name="l00892"></a><span class="lineno">  892</span>&#160;        <span class="keywordflow">return</span> m_qListHemispheres[0];</div>
+<div class="line"><a name="l00893"></a><span class="lineno">  893</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(idt.compare(<span class="stringliteral">&quot;rh&quot;</span>) == 0)</div>
+<div class="line"><a name="l00894"></a><span class="lineno">  894</span>&#160;        <span class="keywordflow">return</span> m_qListHemispheres[1];</div>
+<div class="line"><a name="l00895"></a><span class="lineno">  895</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00896"></a><span class="lineno">  896</span>&#160;    {</div>
+<div class="line"><a name="l00897"></a><span class="lineno">  897</span>&#160;        qWarning(<span class="stringliteral">&quot;Warning: Identifier is not &#39;lh&#39; or &#39;rh&#39;! Returning &#39;lh&#39;.&quot;</span>);</div>
+<div class="line"><a name="l00898"></a><span class="lineno">  898</span>&#160;        <span class="keywordflow">return</span> m_qListHemispheres[0];</div>
+<div class="line"><a name="l00899"></a><span class="lineno">  899</span>&#160;    }</div>
+<div class="line"><a name="l00900"></a><span class="lineno">  900</span>&#160;}</div>
 <div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_source_space_html_a2f8b00c1ed22ac6d76b5bb94771f37ab"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a2f8b00c1ed22ac6d76b5bb94771f37ab">MNELIB::MNESourceSpace::find_source_space_hemi</a></div><div class="ttdeci">static qint32 find_source_space_hemi(MNEHemisphere &amp;p_Hemisphere)</div><div class="ttdef"><b>Definition:</b> <a href="mne__sourcespace_8cpp_source.html#l00317">mne_sourcespace.cpp:317</a></div></div>
 <div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere_html_abcdf7fdbdf1b74ca244853ad1eddd2c7"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#abcdf7fdbdf1b74ca244853ad1eddd2c7">MNELIB::MNEHemisphere::use_tri_cent</a></div><div class="ttdeci">MatrixX3d use_tri_cent</div><div class="ttdef"><b>Definition:</b> <a href="mne__hemisphere_8h_source.html#l00212">mne_hemisphere.h:212</a></div></div>
 <div class="ttc" id="fiff__constants_8h_html_a95d9fd959918262db89fc80cbc6023f1"><div class="ttname"><a href="fiff__constants_8h.html#a95d9fd959918262db89fc80cbc6023f1">FIFF_MNE_SOURCE_SPACE_NPOINTS</a></div><div class="ttdeci">#define FIFF_MNE_SOURCE_SPACE_NPOINTS</div><div class="ttdef"><b>Definition:</b> <a href="fiff__constants_8h_source.html#l00539">fiff_constants.h:539</a></div></div>
@@ -907,7 +964,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="fiff__constants_8h_html_ad0ac5e591febf8f0fdeb42a66c08d235"><div class="ttname"><a href="fiff__constants_8h.html#ad0ac5e591febf8f0fdeb42a66c08d235">FIFF_MNE_SOURCE_SPACE_NUSE</a></div><div class="ttdeci">#define FIFF_MNE_SOURCE_SPACE_NUSE</div><div class="ttdef"><b>Definition:</b> <a href="fiff__constants_8h_source.html#l00541">fiff_constants.h:541</a></div></div>
 <div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere_html_aed488c023af9e17d490f3abdea867eeb"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#aed488c023af9e17d490f3abdea867eeb">MNELIB::MNEHemisphere::np</a></div><div class="ttdeci">fiff_int_t np</div><div class="ttdef"><b>Definition:</b> <a href="mne__hemisphere_8h_source.html#l00192">mne_hemisphere.h:192</a></div></div>
 <div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_source_space_html_a2dcc53eec782e14a65530db6195ec629"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a2dcc53eec782e14a65530db6195ec629">MNELIB::MNESourceSpace::~MNESourceSpace</a></div><div class="ttdeci">~MNESourceSpace()</div><div class="ttdef"><b>Definition:</b> <a href="mne__sourcespace_8cpp_source.html#l00078">mne_sourcespace.cpp:78</a></div></div>
-<div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_source_space_html_ae078c1f063f047c677e933366cac1ffc"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ae078c1f063f047c677e933366cac1ffc">MNELIB::MNESourceSpace::writeToStream</a></div><div class="ttdeci">void writeToStream(FiffStream *p_pStream)</div><div class="ttdef"><b>Definition:</b> <a href="mne__sourcespace_8cpp_source.html#l00772">mne_sourcespace.cpp:772</a></div></div>
+<div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_source_space_html_ae078c1f063f047c677e933366cac1ffc"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ae078c1f063f047c677e933366cac1ffc">MNELIB::MNESourceSpace::writeToStream</a></div><div class="ttdeci">void writeToStream(FiffStream *p_pStream)</div><div class="ttdef"><b>Definition:</b> <a href="mne__sourcespace_8cpp_source.html#l00829">mne_sourcespace.cpp:829</a></div></div>
 <div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere_html_a8a3b109a01a3750900d1d80369dacaa1"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a8a3b109a01a3750900d1d80369dacaa1">MNELIB::MNEHemisphere::id</a></div><div class="ttdeci">fiff_int_t id</div><div class="ttdef"><b>Definition:</b> <a href="mne__hemisphere_8h_source.html#l00191">mne_hemisphere.h:191</a></div></div>
 <div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_source_space_html"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">MNELIB::MNESourceSpace</a></div><div class="ttdoc">Source Space descritpion. </div><div class="ttdef"><b>Definition:</b> <a href="mne__sourcespace_8h_source.html#l00115">mne_sourcespace.h:115</a></div></div>
 <div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree_html_a589bc602a07f1f2e5d9b8c7585cd1530"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a589bc602a07f1f2e5d9b8c7585cd1530">FIFFLIB::FiffDirTree::find_tag</a></div><div class="ttdeci">bool find_tag(FiffStream *p_pStream, fiff_int_t findkind, QSharedPointer&lt; FiffTag &gt; &amp;p_pTag) const </div><div class="ttdef"><b>Definition:</b> <a href="fiff__dir__tree_8cpp_source.html#l00309">fiff_dir_tree.cpp:309</a></div></div>
@@ -927,19 +984,20 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="fiff__constants_8h_html_a6501b7bb7283d561625351d15e2663df"><div class="ttname"><a href="fiff__constants_8h.html#a6501b7bb7283d561625351d15e2663df">FIFF_MNE_SOURCE_SPACE_POINTS</a></div><div class="ttdeci">#define FIFF_MNE_SOURCE_SPACE_POINTS</div><div class="ttdef"><b>Definition:</b> <a href="fiff__constants_8h_source.html#l00537">fiff_constants.h:537</a></div></div>
 <div class="ttc" id="namespace_u_t_i_l_s_l_i_b_html"><div class="ttname"><a href="namespace_u_t_i_l_s_l_i_b.html">UTILSLIB</a></div><div class="ttdef"><b>Definition:</b> <a href="cosinefilter_8h_source.html#l00068">cosinefilter.h:68</a></div></div>
 <div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_source_space_html_a9da28f6120a0f8164824c2a5e693e6cd"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a9da28f6120a0f8164824c2a5e693e6cd">MNELIB::MNESourceSpace::readFromStream</a></div><div class="ttdeci">static bool readFromStream(FiffStream::SPtr &amp;p_pStream, bool add_geom, FiffDirTree &amp;p_Tree, MNESourceSpace &amp;p_SourceSpace)</div><div class="ttdef"><b>Definition:</b> <a href="mne__sourcespace_8cpp_source.html#l00256">mne_sourcespace.cpp:256</a></div></div>
-<div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere_html_a6024518e9dc0ee496db6a44d007e4c58"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a6024518e9dc0ee496db6a44d007e4c58">MNELIB::MNEHemisphere::clear</a></div><div class="ttdeci">void clear()</div><div class="ttdef"><b>Definition:</b> <a href="mne__hemisphere_8cpp_source.html#l00134">mne_hemisphere.cpp:134</a></div></div>
+<div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere_html_a6024518e9dc0ee496db6a44d007e4c58"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a6024518e9dc0ee496db6a44d007e4c58">MNELIB::MNEHemisphere::clear</a></div><div class="ttdeci">void clear()</div><div class="ttdef"><b>Definition:</b> <a href="mne__hemisphere_8cpp_source.html#l00136">mne_hemisphere.cpp:136</a></div></div>
+<div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere_html_ad5ab1beed9e998dccda1963824f0c73c"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ad5ab1beed9e998dccda1963824f0c73c">MNELIB::MNEHemisphere::neighbor_vert</a></div><div class="ttdeci">QMap&lt; int, QVector&lt; int &gt; &gt; neighbor_vert</div><div class="ttdef"><b>Definition:</b> <a href="mne__hemisphere_8h_source.html#l00217">mne_hemisphere.h:217</a></div></div>
 <div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_stream_html_afc5bb6ae857cf5e93e4e0271bf0bee05"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#afc5bb6ae857cf5e93e4e0271bf0bee05">FIFFLIB::FiffStream::SPtr</a></div><div class="ttdeci">QSharedPointer&lt; FiffStream &gt; SPtr</div><div class="ttdef"><b>Definition:</b> <a href="fiff__stream_8h_source.html#l00132">fiff_stream.h:132</a></div></div>
 <div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_source_space_html_a44fb91f875e76b12a2c8717fb8ab1744"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a44fb91f875e76b12a2c8717fb8ab1744">MNELIB::MNESourceSpace::clear</a></div><div class="ttdeci">void clear()</div><div class="ttdef"><b>Definition:</b> <a href="mne__sourcespace_8cpp_source.html#l00086">mne_sourcespace.cpp:86</a></div></div>
 <div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere_html_a1fac01b2c5a0d1f43607b773fd6fe421"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a1fac01b2c5a0d1f43607b773fd6fe421">MNELIB::MNEHemisphere::dist</a></div><div class="ttdeci">SparseMatrix&lt; double &gt; dist</div><div class="ttdef"><b>Definition:</b> <a href="mne__hemisphere_8h_source.html#l00208">mne_hemisphere.h:208</a></div></div>
 <div class="ttc" id="class_f_s_l_i_b_1_1_label_html_a846b65c0b3a8ce5a56a944cca3d95378"><div class="ttname"><a href="class_f_s_l_i_b_1_1_label.html#a846b65c0b3a8ce5a56a944cca3d95378">FSLIB::Label::hemi</a></div><div class="ttdeci">qint32 hemi</div><div class="ttdef"><b>Definition:</b> <a href="label_8h_source.html#l00182">label.h:182</a></div></div>
 <div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere_html_ab9eb4c710479364bdd279dd7167257cb"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ab9eb4c710479364bdd279dd7167257cb">MNELIB::MNEHemisphere::use_tris</a></div><div class="ttdeci">MatrixX3i use_tris</div><div class="ttdef"><b>Definition:</b> <a href="mne__hemisphere_8h_source.html#l00202">mne_hemisphere.h:202</a></div></div>
-<div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_source_space_html_a506dcb62cbc44957b2e4be9e7e32b429"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a506dcb62cbc44957b2e4be9e7e32b429">MNELIB::MNESourceSpace::size</a></div><div class="ttdeci">qint32 size() const </div><div class="ttdef"><b>Definition:</b> <a href="mne__sourcespace_8h_source.html#l00345">mne_sourcespace.h:345</a></div></div>
+<div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_source_space_html_a506dcb62cbc44957b2e4be9e7e32b429"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a506dcb62cbc44957b2e4be9e7e32b429">MNELIB::MNESourceSpace::size</a></div><div class="ttdeci">qint32 size() const </div><div class="ttdef"><b>Definition:</b> <a href="mne__sourcespace_8h_source.html#l00355">mne_sourcespace.h:355</a></div></div>
 <div class="ttc" id="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math_html_a8a4a8e78dbcf3f06ad8b5d7e6e186022"><div class="ttname"><a href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a8a4a8e78dbcf3f06ad8b5d7e6e186022">UTILSLIB::MNEMath::intersect</a></div><div class="ttdeci">static VectorXi intersect(const VectorXi &amp;v1, const VectorXi &amp;v2, VectorXi &amp;idx_sel)</div><div class="ttdef"><b>Definition:</b> <a href="mnemath_8cpp_source.html#l00158">mnemath.cpp:158</a></div></div>
 <div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_stream_html_aca5c9df67313a344df12ebf61e57409c"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#aca5c9df67313a344df12ebf61e57409c">FIFFLIB::FiffStream::start_block</a></div><div class="ttdeci">void start_block(fiff_int_t kind)</div><div class="ttdef"><b>Definition:</b> <a href="fiff__stream_8cpp_source.html#l01507">fiff_stream.cpp:1507</a></div></div>
 <div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere_html_a3cd7edb277a5b79e169dec04e2ea38ba"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a3cd7edb277a5b79e169dec04e2ea38ba">MNELIB::MNEHemisphere::nuse_tri</a></div><div class="ttdeci">qint32 nuse_tri</div><div class="ttdef"><b>Definition:</b> <a href="mne__hemisphere_8h_source.html#l00201">mne_hemisphere.h:201</a></div></div>
 <div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere_html_a553c07a84f09d208127e3208c02df639"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a553c07a84f09d208127e3208c02df639">MNELIB::MNEHemisphere::use_tri_nn</a></div><div class="ttdeci">MatrixX3d use_tri_nn</div><div class="ttdef"><b>Definition:</b> <a href="mne__hemisphere_8h_source.html#l00213">mne_hemisphere.h:213</a></div></div>
 <div class="ttc" id="fiff__constants_8h_html_a5e8530c5938e3207eb775617904c79bc"><div class="ttname"><a href="fiff__constants_8h.html#a5e8530c5938e3207eb775617904c79bc">FIFF_MNE_SOURCE_SPACE_NEAREST_DIST</a></div><div class="ttdeci">#define FIFF_MNE_SOURCE_SPACE_NEAREST_DIST</div><div class="ttdef"><b>Definition:</b> <a href="fiff__constants_8h_source.html#l00543">fiff_constants.h:543</a></div></div>
-<div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_source_space_html_a9fdcb79e8f83c49c77282872db8425a7"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a9fdcb79e8f83c49c77282872db8425a7">MNELIB::MNESourceSpace::operator[]</a></div><div class="ttdeci">MNEHemisphere &amp; operator[](qint32 idx)</div><div class="ttdef"><b>Definition:</b> <a href="mne__sourcespace_8cpp_source.html#l00788">mne_sourcespace.cpp:788</a></div></div>
+<div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_source_space_html_a9fdcb79e8f83c49c77282872db8425a7"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a9fdcb79e8f83c49c77282872db8425a7">MNELIB::MNESourceSpace::operator[]</a></div><div class="ttdeci">MNEHemisphere &amp; operator[](qint32 idx)</div><div class="ttdef"><b>Definition:</b> <a href="mne__sourcespace_8cpp_source.html#l00845">mne_sourcespace.cpp:845</a></div></div>
 <div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere_html"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html">MNELIB::MNEHemisphere</a></div><div class="ttdoc">Hemisphere provides geometry information. </div><div class="ttdef"><b>Definition:</b> <a href="mne__hemisphere_8h_source.html#l00103">mne_hemisphere.h:103</a></div></div>
 <div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree_html"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html">FIFFLIB::FiffDirTree</a></div><div class="ttdoc">Directory tree structure. </div><div class="ttdef"><b>Definition:</b> <a href="fiff__dir__tree_8h_source.html#l00080">fiff_dir_tree.h:80</a></div></div>
 <div class="ttc" id="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math_html_a72a917dd5c42a6be016f09ca3075a24d"><div class="ttname"><a href="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a72a917dd5c42a6be016f09ca3075a24d">UTILSLIB::MNEMath::sort</a></div><div class="ttdeci">static VectorXi sort(Matrix&lt; T, Dynamic, 1 &gt; &amp;v, bool desc=true)</div><div class="ttdef"><b>Definition:</b> <a href="mnemath_8h_source.html#l00368">mnemath.h:368</a></div></div>
@@ -964,6 +1022,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="fiff__constants_8h_html_a9462e157ffe22cf60488405e3ee20039"><div class="ttname"><a href="fiff__constants_8h.html#a9462e157ffe22cf60488405e3ee20039">FIFF_BEM_SURF_NTRI</a></div><div class="ttdeci">#define FIFF_BEM_SURF_NTRI</div><div class="ttdef"><b>Definition:</b> <a href="fiff__constants_8h_source.html#l00436">fiff_constants.h:436</a></div></div>
 <div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere_html_a1a7ba6a83b5b474df998aaf25eb6ade1"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a1a7ba6a83b5b474df998aaf25eb6ade1">MNELIB::MNEHemisphere::inuse</a></div><div class="ttdeci">VectorXi inuse</div><div class="ttdef"><b>Definition:</b> <a href="mne__hemisphere_8h_source.html#l00199">mne_hemisphere.h:199</a></div></div>
 <div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere_html_a433b5da63208d426f26317f7c0c236c8"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a433b5da63208d426f26317f7c0c236c8">MNELIB::MNEHemisphere::nuse</a></div><div class="ttdeci">fiff_int_t nuse</div><div class="ttdef"><b>Definition:</b> <a href="mne__hemisphere_8h_source.html#l00198">mne_hemisphere.h:198</a></div></div>
+<div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere_html_ae7f8d800b94a9e292e343d439a66e757"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#ae7f8d800b94a9e292e343d439a66e757">MNELIB::MNEHemisphere::neighbor_tri</a></div><div class="ttdeci">QMap&lt; int, QVector&lt; int &gt; &gt; neighbor_tri</div><div class="ttdef"><b>Definition:</b> <a href="mne__hemisphere_8h_source.html#l00216">mne_hemisphere.h:216</a></div></div>
 <div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere_html_a6ebd8487fd11dbdcef92960c27b1465a"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a6ebd8487fd11dbdcef92960c27b1465a">MNELIB::MNEHemisphere::patch_inds</a></div><div class="ttdeci">VectorXi patch_inds</div><div class="ttdef"><b>Definition:</b> <a href="mne__hemisphere_8h_source.html#l00206">mne_hemisphere.h:206</a></div></div>
 <div class="ttc" id="class_f_s_l_i_b_1_1_label_html"><div class="ttname"><a href="class_f_s_l_i_b_1_1_label.html">FSLIB::Label</a></div><div class="ttdoc">Freesurfer/MNE label. </div><div class="ttdef"><b>Definition:</b> <a href="label_8h_source.html#l00097">label.h:97</a></div></div>
 <div class="ttc" id="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere_html_a139bc83d26deda30a6ac4663b9bac838"><div class="ttname"><a href="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a139bc83d26deda30a6ac4663b9bac838">MNELIB::MNEHemisphere::tri_area</a></div><div class="ttdeci">VectorXd tri_area</div><div class="ttdef"><b>Definition:</b> <a href="mne__hemisphere_8h_source.html#l00211">mne_hemisphere.h:211</a></div></div>
@@ -980,7 +1039,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jan 27 2015 08:53:57 for MNE-CPP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Mar 27 2015 22:54:32 for MNE-CPP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

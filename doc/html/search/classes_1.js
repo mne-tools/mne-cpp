@@ -1,6 +1,7 @@
 var searchData=
 [
   ['aboutwindow',['AboutWindow',['../class_m_n_e_browse_raw_qt_1_1_about_window.html',1,'MNEBrowseRawQt']]],
+  ['aboutwindow',['AboutWindow',['../class_about_window.html',1,'']]],
   ['adaptivemp',['AdaptiveMp',['../class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html',1,'UTILSLIB']]],
   ['annotation',['Annotation',['../class_f_s_l_i_b_1_1_annotation.html',1,'FSLIB']]],
   ['annotationset',['AnnotationSet',['../class_f_s_l_i_b_1_1_annotation_set.html',1,'FSLIB']]],
@@ -8,6 +9,7 @@ var searchData=
   ['atom',['Atom',['../class_u_t_i_l_s_l_i_b_1_1_atom.html',1,'UTILSLIB']]],
   ['atompaintwindow',['AtomPaintWindow',['../class_atom_paint_window.html',1,'']]],
   ['atomsumwindow',['AtomSumWindow',['../class_atom_sum_window.html',1,'']]],
+  ['atomwindow',['AtomWindow',['../class_atom_window.html',1,'']]],
   ['averagedelegate',['AverageDelegate',['../class_m_n_e_browse_raw_qt_1_1_average_delegate.html',1,'MNEBrowseRawQt']]],
   ['averagemodel',['AverageModel',['../class_m_n_e_browse_raw_qt_1_1_average_model.html',1,'MNEBrowseRawQt']]],
   ['averagescene',['AverageScene',['../class_m_n_e_browse_raw_qt_1_1_average_scene.html',1,'MNEBrowseRawQt']]],

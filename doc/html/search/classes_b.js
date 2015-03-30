@@ -1,9 +1,9 @@
 var searchData=
 [
   ['mainsplashscreen',['MainSplashScreen',['../class_m_n_e_x_1_1_main_splash_screen.html',1,'MNEX']]],
-  ['mainwindow',['MainWindow',['../class_m_n_e_browse_raw_qt_1_1_main_window.html',1,'MNEBrowseRawQt']]],
   ['mainwindow',['MainWindow',['../class_m_n_e_x_1_1_main_window.html',1,'MNEX']]],
   ['mainwindow',['MainWindow',['../class_main_window.html',1,'']]],
+  ['mainwindow',['MainWindow',['../class_m_n_e_browse_raw_qt_1_1_main_window.html',1,'MNEBrowseRawQt']]],
   ['measurementtypes',['MeasurementTypes',['../class_x_m_e_a_s_l_i_b_1_1_measurement_types.html',1,'XMEASLIB']]],
   ['measurementwidget',['MeasurementWidget',['../class_x_d_i_s_p_l_i_b_1_1_measurement_widget.html',1,'XDISPLIB']]],
   ['minimizersimplex',['MinimizerSimplex',['../class_u_t_i_l_s_l_i_b_1_1_minimizer_simplex.html',1,'UTILSLIB']]],

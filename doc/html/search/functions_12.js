@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['save_5ffif_5ffile',['save_fif_file',['../class_main_window.html#ac4d337f76fea56f98f35761bfba8297a',1,'MainWindow']]],
   ['saveconfig',['saveConfig',['../class_m_n_e_x_1_1_plugin_gui.html#a0f047340224eee126a2d6a173aa5a33c',1,'MNEX::PluginGui']]],
   ['saveeventdata',['saveEventData',['../class_m_n_e_browse_raw_qt_1_1_event_model.html#a86ed3fba304b1a67740d7de96cb315fd',1,'MNEBrowseRawQt::EventModel']]],
   ['saveevokeddata',['saveEvokedData',['../class_m_n_e_browse_raw_qt_1_1_average_model.html#ae9339b9af60c0a7a72fda2e5176717b4',1,'MNEBrowseRawQt::AverageModel']]],
@@ -77,7 +78,7 @@ var searchData=
   ['setmetadata',['setMetaData',['../class_r_t_s_e_r_v_e_r_1_1_i_connector.html#a512847b425820509472fe03cf912a223',1,'RTSERVER::IConnector']]],
   ['setmethod',['setMethod',['../class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#ad4b70afa3ff6d7de780ffe248b5fd120',1,'INVERSELIB::MinimumNorm::setMethod(QString method)'],['../class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#a46c8154877896582b9d510afe3d28820',1,'INVERSELIB::MinimumNorm::setMethod(bool dSPM, bool sLORETA)']]],
   ['setminvalue',['setMinValue',['../class_x_m_e_a_s_l_i_b_1_1_new_real_time_sample_array.html#a32ccd96f2336c991798df14c6a0ffdf6',1,'XMEASLIB::NewRealTimeSampleArray::setMinValue()'],['../class_x_m_e_a_s_l_i_b_1_1_real_time_sample_array_ch_info.html#a10eb104cf0b34dfec2466975fde74a80',1,'XMEASLIB::RealTimeSampleArrayChInfo::setMinValue()']]],
-  ['setmodel',['setModel',['../class_x_d_i_s_p_l_i_b_1_1_sensor_widget.html#ad84e9f83c85147d9a416081f027ec2eb',1,'XDISPLIB::SensorWidget']]],
+  ['setmodel',['setModel',['../class_d_i_s_p3_d_n_e_w_l_i_b_1_1_brain_surface.html#a517a77fcd3ca14c910c8590fbe3c29f2',1,'DISP3DNEWLIB::BrainSurface::setModel()'],['../class_x_d_i_s_p_l_i_b_1_1_sensor_widget.html#ad84e9f83c85147d9a416081f027ec2eb',1,'XDISPLIB::SensorWidget::setModel()']]],
   ['setmodelview',['setModelView',['../class_m_n_e_browse_raw_qt_1_1_raw_delegate.html#a04ede5aac1c94b7dd5a8f7988367bb8d',1,'MNEBrowseRawQt::RawDelegate']]],
   ['setmovementboundary',['setMovementBoundary',['../class_m_n_e_browse_raw_qt_1_1_data_marker.html#ab4a4284516518b58a690d9fdf9662275',1,'MNEBrowseRawQt::DataMarker']]],
   ['setmultiarraysize',['setMultiArraySize',['../class_x_m_e_a_s_l_i_b_1_1_new_real_time_multi_sample_array.html#a99e94eca40191a8e61b3642c079d8b2f',1,'XMEASLIB::NewRealTimeMultiSampleArray']]],
@@ -130,6 +131,7 @@ var searchData=
   ['showsetupprojectdialog',['showSetupProjectDialog',['../class_e_e_go_sports_plugin_1_1_e_e_go_sports.html#a81a1a4c31d8214490036c6a4f39c440b',1,'EEGoSportsPlugin::EEGoSports::showSetupProjectDialog()'],['../class_t_m_s_i_plugin_1_1_t_m_s_i.html#adf79f6366066eb53de410971d713cbea',1,'TMSIPlugin::TMSI::showSetupProjectDialog()']]],
   ['showstartrecording',['showStartRecording',['../class_e_e_go_sports_plugin_1_1_e_e_go_sports.html#a5f3a5f22feac76b095590cbdcd75169b',1,'EEGoSportsPlugin::EEGoSports::showStartRecording()'],['../class_t_m_s_i_plugin_1_1_t_m_s_i.html#a1a9076d592942d65e60566980caed56f',1,'TMSIPlugin::TMSI::showStartRecording()']]],
   ['silentupdateselection',['silentUpdateSelection',['../class_x_d_i_s_p_l_i_b_1_1_sensor_model.html#aecadeee5ac284918d98e836dfc025919',1,'XDISPLIB::SensorModel']]],
+  ['simplex_5fmaximisation',['simplex_maximisation',['../class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html#a1be5896dce6126b69cace01a068c71c4',1,'UTILSLIB::AdaptiveMp']]],
   ['size',['size',['../class_f_s_l_i_b_1_1_annotation_set.html#a8fe85b503b0400b9fe1914950d5b99fe',1,'FSLIB::AnnotationSet::size()'],['../class_f_s_l_i_b_1_1_surface_set.html#a4b8e5cd5d5290709bbf8bd3cbdded8cb',1,'FSLIB::SurfaceSet::size()'],['../class_i_o_buffer_1_1_circular_matrix_buffer.html#aad526a1017128c5d6aaf9cbaa92508ef',1,'IOBuffer::CircularMatrixBuffer::size()'],['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a506dcb62cbc44957b2e4be9e7e32b429',1,'MNELIB::MNESourceSpace::size()']]],
   ['sizehint',['sizeHint',['../class_d_i_s_p3_d_l_i_b_1_1_clust_stc_table_delegate.html#afeb3d38e87fd3e81fccc4ae458f65f1d',1,'DISP3DLIB::ClustStcTableDelegate::sizeHint()'],['../class_x_d_i_s_p_l_i_b_1_1_frequency_spectrum_delegate.html#a92e0d21aa7ade8a33326bc96c53d7f81',1,'XDISPLIB::FrequencySpectrumDelegate::sizeHint()'],['../class_x_d_i_s_p_l_i_b_1_1_real_time_multi_sample_array_delegate.html#a70b231a703151e0f199dd9922f009008',1,'XDISPLIB::RealTimeMultiSampleArrayDelegate::sizeHint()']]],
   ['sizeoffiffdata',['sizeOfFiffData',['../class_m_n_e_browse_raw_qt_1_1_raw_model.html#ae1490fcd2ba1a0052916ab841e358ba8',1,'MNEBrowseRawQt::RawModel']]],
