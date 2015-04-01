@@ -55,32 +55,86 @@ using namespace UTILSLIB;
 
 FilterData::FilterData()
 {
+
 }
+
+
+//*************************************************************************************************************
+
+FilterData::FilterData(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, double sFreq, qint32 fftlength, DesignMethod designMethod)
+: m_Type(type)
+, m_iFilterOrder(order)
+, m_iFFTlength(fftlength)
+{
+    switch(designMethod) {
+        case Tschebyscheff: {
+            ParksMcClellan filter(order, centerfreq, bandwidth, parkswidth, (ParksMcClellan::TPassType)type);
+            m_dCoeffA = filter.FirCoeff;
+
+            //fft-transform m_dCoeffA in order to be able to perform frequency-domain filtering
+            fftTransformCoeffs();
+
+            break;
+        }
+
+        case Cosine: {
+            m_iFilterOrder = 0;
+
+            CosineFilter filtercos;
+
+            switch(type) {
+                case FilterType::LPF:
+                    filtercos = CosineFilter (fftlength,
+                                            (centerfreq)*(sFreq/2),
+                                            parkswidth*(sFreq/2),
+                                            (centerfreq)*(sFreq/2),
+                                            parkswidth*(sFreq/2),
+                                            sFreq,
+                                            (CosineFilter::TPassType)type);
+                    break;
+
+                case FilterType::HPF:
+                    filtercos = CosineFilter (fftlength,
+                                            (centerfreq)*(sFreq/2),
+                                            parkswidth*(sFreq/2),
+                                            (centerfreq)*(sFreq/2),
+                                            parkswidth*(sFreq/2),
+                                            sFreq,
+                                            (CosineFilter::TPassType)type);
+                    break;
+
+                case FilterType::BPF:
+                    filtercos = CosineFilter (fftlength,
+                                            (centerfreq + bandwidth/2)*(sFreq/2),
+                                            parkswidth*(sFreq/2),
+                                            (centerfreq - bandwidth/2)*(sFreq/2),
+                                            parkswidth*(sFreq/2),
+                                            sFreq,
+                                            (CosineFilter::TPassType)type);
+                    break;
+            }
+
+            m_dCoeffA = filtercos.m_dCoeffA;
+            m_dFFTCoeffA = filtercos.m_dFFTCoeffA;
+
+            break;
+        }
+    }
+}
+
+
+//*************************************************************************************************************
 
 FilterData::~FilterData()
 {
 }
 
-//*************************************************************************************************************
-
-FilterData::FilterData(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, qint32 fftlength)
-: m_Type(type)
-, m_iFilterOrder(order)
-, m_iFFTlength(fftlength)
-{
-    ParksMcClellan filter(order, centerfreq, bandwidth, parkswidth, (ParksMcClellan::TPassType)type);
-    m_dCoeffA = filter.FirCoeff;
-
-    //fft-transform m_dCoeffA in order to be able to perform frequency-domain filtering
-    fftTransformCoeffs();
-
-    Q_UNUSED(unique_name);
-}
 
 //*************************************************************************************************************
 
 void FilterData::fftTransformCoeffs()
 {
+    //This function only nneds to be called when using the Tschebyscheff design method
     //zero-pad m_dCoeffA to m_iFFTlength
     RowVectorXd t_coeffAzeroPad = RowVectorXd::Zero(m_iFFTlength);
     t_coeffAzeroPad.head(m_dCoeffA.cols()) = m_dCoeffA;
@@ -94,13 +148,16 @@ void FilterData::fftTransformCoeffs()
     fft.fwd(m_dFFTCoeffA,t_coeffAzeroPad);
 }
 
+
 //*************************************************************************************************************
 
-RowVectorXd FilterData::applyFFTFilter(RowVectorXd& data)
+RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepZeros) const
 {
-    //zero-pad data to m_iFFTlength
+    //std::cout<<"START FilterData::applyFFTFilter"<<std::endl;
+
+    //Zero pad in front and back
     RowVectorXd t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
-    t_dataZeroPad.head(data.cols()) = data;
+    t_dataZeroPad.segment(m_iFFTlength/4-m_iFilterOrder/2, data.cols()) = data;
 
     //generate fft object
     Eigen::FFT<double> fft;
@@ -117,6 +174,11 @@ RowVectorXd FilterData::applyFFTFilter(RowVectorXd& data)
     RowVectorXd t_filteredTime;
     fft.inv(t_filteredTime,t_filteredFreq);
 
-    //cuts off ends at front and end and return result
-    return t_filteredTime.segment(m_iFilterOrder/2+1,m_iFFTlength-m_iFilterOrder);
+    //std::cout<<"END FilterData::applyFFTFilter"<<std::endl;
+
+    //Return filtered data still with zeros at front and end depending on keepZeros flag
+    if(!keepZeros)
+        return t_filteredTime.segment(m_iFFTlength/4-m_iFilterOrder/2, data.cols());
+
+    return t_filteredTime;
 }

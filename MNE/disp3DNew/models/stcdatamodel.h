@@ -62,6 +62,8 @@
 #include <QAbstractTableModel>
 #include <QVector3D>
 #include <QMap>
+#include <QFuture>
+#include <QtConcurrent>
 
 
 //*************************************************************************************************************
@@ -172,8 +174,6 @@ public:
 
     void setVertLabelIDs(const VectorXi &vertLabelIDs);
 
-    VectorXd smoothEstimates(int niter, int hemi) const;
-
 private:
     StcDataWorker::SPtr    m_pWorker;
 
@@ -189,6 +189,8 @@ private:
 
     VectorXd m_vecCurStc;
     VectorXd m_vecCurRelStc;
+
+    int m_curHemi;
 
     double m_dStcNormMax;
     double m_dStcNorm;
@@ -207,6 +209,10 @@ private:
 
     QVector3D m_vecMinRR;                  /**< X, Y, Z minima. */
     QVector3D m_vecMaxRR;                  /**< X, Y, Z maxima. */
+
+    VectorXd smoothEstimates(int niter, int hemi, int stcType) const;
+//    QPair<int,double> calculateSmoothedEstimate(const QPair<VectorXd &, QPair<int, QVector<int> > > vertexIndex);
+//    void reduceToFinalSmoothedEstimates(VectorXd &finalSmoothedEstimates, const QPair<int, double> &smoothedEstimate);
 };
 
 
