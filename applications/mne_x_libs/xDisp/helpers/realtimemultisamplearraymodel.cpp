@@ -64,7 +64,7 @@ RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 , m_iMaxSamples(1024)
 , m_iCurrentSample(0)
 , m_bIsFreezed(false)
-, m_doFiltering(true)
+, m_doFiltering(false)
 {
 }
 
