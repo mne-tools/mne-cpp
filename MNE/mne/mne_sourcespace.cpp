@@ -780,58 +780,102 @@ bool MNESourceSpace::add_geometry_info(MNEHemisphere& p_Hemisphere)
 
     //Clear neighboring triangle list
     p_Hemisphere.neighbor_tri.clear();
+    QVector<int> temp;
+    for(int i=0; i<p_Hemisphere.tris.rows(); i++) {
+        QPair<int, QVector<int> > tempPair (i,temp);
+        p_Hemisphere.neighbor_tri.append(tempPair);
+    }
 
     //Create neighbor_tri information
     for (p = 0; p < p_Hemisphere.tris.rows(); p++)
         for (k = 0; k < 3; k++)
-            p_Hemisphere.neighbor_tri[p_Hemisphere.tris(p,k)].append(p);
+            p_Hemisphere.neighbor_tri[p_Hemisphere.tris(p,k)].second.append(p);
 
-    std::cout<<"MNESourceSpace::add_geometry_info() - p_Hemisphere.neighbor_tri[100].size(): "<<p_Hemisphere.neighbor_tri[100].size()<<std::endl;
+    //std::cout<<"MNESourceSpace::add_geometry_info() - p_Hemisphere.neighbor_tri[100].size(): "<<p_Hemisphere.neighbor_tri[100].size()<<std::endl;
 
-    //Determine the neighboring vertices
+    //Determine the neighboring vertices and smooth operator
     p_Hemisphere.neighbor_vert.clear();
+    for(int i=0; i<p_Hemisphere.np; i++) {
+        QPair<int, QVector<int> > tempPair (i,temp);
+        p_Hemisphere.neighbor_vert.append(tempPair);
+    }
 
     for (k = 0; k < p_Hemisphere.np; k++) {
-        for (p = 0; p < p_Hemisphere.neighbor_tri[k].size(); p++) {
+        for (p = 0; p < p_Hemisphere.neighbor_tri[k].second.size(); p++) {
             //Fit in the other vertices of the neighboring triangle
             for (c = 0; c < 3; c++) {
-                int vert = p_Hemisphere.tris(p_Hemisphere.neighbor_tri[k][p], c);
+                int vert = p_Hemisphere.tris(p_Hemisphere.neighbor_tri[k].second[p], c);
 
                 if (vert != k) {
                     found = false;
 
-                    for (q = 0; q < p_Hemisphere.neighbor_vert[k].size(); q++) {
-                        if (p_Hemisphere.neighbor_vert[k][q] == vert) {
+                    for (q = 0; q < p_Hemisphere.neighbor_vert[k].second.size(); q++) {
+                        if (p_Hemisphere.neighbor_vert[k].second[q] == vert) {
                             found = true;
                             break;
                         }
                     }
 
                     if(!found) {
-                        //std::cout<<"MNESourceSpace::add_geometry_info() - Found vert: "<<vert<<std::endl;
-                        p_Hemisphere.neighbor_vert[k].append(vert);
+//                        std::cout<<"MNESourceSpace::add_geometry_info() - Found vert: "<<vert<<std::endl;
+                        p_Hemisphere.neighbor_vert[k].second.append(vert);
                     }
                 }
             }
         }
     }
 
-//    //Create number of neighbor vector
-//    m_numberNeighborsSources = VectorXi::Zeros(p_Hemisphere.vertno.size());
-//    for (k = 0; k < p_Hemisphere.vertno.size(); k++) {
-//        m_numberNeighborsSources(k) = p_Hemisphere.neighbor_vert[p_Hemisphere.vertno(k)].size();
+//    //Create smooth operators - This takes way too long, due to about 600000 element entries in the sparse matrix -> split into sub matrices
+//    std::cout<<"Creating smooth operator matrices "<<std::endl;
+//    p_Hemisphere.smoothOperatorList.clear();
+
+//    SparseMatrix<double> sparseSmoothMatrix;
+//    int numberMatrix = 10000;
+//    int numberVerticesForMatrix;
+//    int matrixCount = numberMatrix;
+//    int last = p_Hemisphere.np % 10;
+//    if(last!=0)
+//        matrixCount++;
+
+//    std::cout<<"last "<<last<<std::endl;
+//    std::cout<<"numberMatrix "<<numberMatrix<<std::endl;
+//    std::cout<<"numberVerticesForMatrix "<<numberVerticesForMatrix<<std::endl;
+//    std::cout<<"matrixCount "<<matrixCount<<std::endl;
+
+//    int vertexIndex = 0;
+
+//    for(int i=0; i<matrixCount; i++) {
+//        //std::cout<<"matrixCount "<<i<<std::endl;
+
+//        if(i==matrixCount-1 && last!=0)
+//            numberVerticesForMatrix = last;
+//        else
+//            numberVerticesForMatrix = p_Hemisphere.np/numberMatrix;
+
+//        sparseSmoothMatrix = SparseMatrix<double>(numberVerticesForMatrix, p_Hemisphere.np);
+
+//        //std::cout<<"before "<<std::endl;
+//        for(int r=0; r<numberVerticesForMatrix; r++)
+//            for(int v=0; v<p_Hemisphere.neighbor_vert[r+vertexIndex].size(); v++)
+//                sparseSmoothMatrix.insert(r, p_Hemisphere.neighbor_vert[r+vertexIndex][v]) = 1 / p_Hemisphere.neighbor_vert[r+vertexIndex].size();
+//        //std::cout<<"after "<<std::endl;
+
+//        if(i==matrixCount-1 && last!=0)
+//            vertexIndex += last;
+//        else
+//            vertexIndex += p_Hemisphere.np/numberMatrix;
+
+//        //std::cout<<"appending before "<<std::endl;
+//        p_Hemisphere.smoothOperatorList.push_back(sparseSmoothMatrix);
+//        //std::cout<<"appending after "<<std::endl;
 //    }
 
-//    //Create smooth operator as matrix
-//    p_Hemisphere.m_smoothOperator = MatrixXi::Zeros(p_Hemisphere.nuse, p_Hemisphere.nuse);
-//    for (k = 0; k < p_Hemisphere.vertno.size(); k++) {
-//        for (w = 0; w < p_Hemisphere.vertno.size(); w++) {
-//            p_Hemisphere.m_smoothOperator(k,w) = 1;
-
-//        }
-//    }
-
-    std::cout<<"MNESourceSpace::add_geometry_info() - p_Hemisphere.neighbor_vert[100].size(): "<<p_Hemisphere.neighbor_tri[100].size()<<std::endl;
+//    std::cout<<"size smooth operator list "<<p_Hemisphere.smoothOperatorList.size()<<std::endl;
+//    std::cout<<"nonzero() "<<p_Hemisphere.smoothOperatorList[0].nonZeros()<<std::endl;
+//    std::cout<<"rows() "<<p_Hemisphere.smoothOperatorList[0].rows()<<std::endl;
+//    std::cout<<"cols() "<<p_Hemisphere.smoothOperatorList[0].cols()<<std::endl;
+//    std::cout<<"innerSize() "<<p_Hemisphere.smoothOperatorList.innerSize()<<std::endl;
+//    std::cout<<"outerSize() "<<p_Hemisphere.smoothOperatorList.outerSize()<<std::endl;
 
     return true;
 }

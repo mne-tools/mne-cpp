@@ -37,7 +37,7 @@ include(../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT += widgets svg xml
+QT += widgets concurrent svg xml
 
 qtHaveModule(3d) {
     QT += 3d

@@ -1,4 +1,3 @@
-
 //=============================================================================================================
 /**
 * @file     mne_hemisphere.cpp
@@ -116,6 +115,7 @@ MNEHemisphere::MNEHemisphere(const MNEHemisphere& p_MNEHemisphere)
 , use_tri_area(p_MNEHemisphere.use_tri_area)
 , neighbor_tri(p_MNEHemisphere.neighbor_tri)
 , neighbor_vert(p_MNEHemisphere.neighbor_vert)
+, smoothOperatorList(p_MNEHemisphere.smoothOperatorList)
 , cluster_info(p_MNEHemisphere.cluster_info)
 , m_TriCoords(p_MNEHemisphere.m_TriCoords)
 {
@@ -161,8 +161,8 @@ void MNEHemisphere::clear()
     use_tri_nn = MatrixX3d::Zero(0,3);
     use_tri_area = VectorXd::Zero(0);
 
-    neighbor_tri = QMap<int, QVector<int>>();
-    neighbor_vert = QMap<int, QVector<int>>();
+    neighbor_tri = QList<QPair<int, QVector<int> > >();
+    neighbor_vert = QList<QPair<int, QVector<int> > >();
 
     cluster_info.clear();
 

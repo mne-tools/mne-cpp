@@ -64,6 +64,7 @@ RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 , m_iMaxSamples(1024)
 , m_iCurrentSample(0)
 , m_bIsFreezed(false)
+, m_doFiltering(true)
 {
 }
 
@@ -114,34 +115,60 @@ QVariant RealTimeMultiSampleArrayModel::data(const QModelIndex &index, int role)
                     {
                         // data freeze
                         QVector<float> data;
-                        for(qint32 i = 0; i < m_dataCurrentFreeze.size(); ++i)
-                            data.append(m_dataCurrentFreeze[i](row));
-                        qListVector.append(data);
+                        if(!m_doFiltering) {
+                            for(qint32 i=0; i < m_dataCurrentFreeze.size(); ++i)
+                                data.append(m_dataCurrentFreeze[i](row));
+                            qListVector.append(data);
 
-                        // last data freeze
-                        QVector<float> lastData;
-                        for(qint32 i=0; i < m_dataLastFreeze.size(); ++i)
-                            lastData.append(m_dataLastFreeze[i](row));
-                        qListVector.append(lastData);
+                            // last data freeze
+                            QVector<float> lastData;
+                            for(qint32 i=0; i < m_dataLastFreeze.size(); ++i)
+                                lastData.append(m_dataLastFreeze[i](row));
+                            qListVector.append(lastData);
+                        } else {
+                            for(qint32 i=0; i < m_dataFilteredCurrentFreeze.size(); ++i)
+                                data.append(m_dataFilteredCurrentFreeze[i](row));
+                            qListVector.append(data);
+
+                            // last data freeze
+                            QVector<float> lastData;
+                            for(qint32 i=0; i < m_dataFilteredLastFreeze.size(); ++i)
+                                lastData.append(m_dataFilteredLastFreeze[i](row));
+                            qListVector.append(lastData);
+                        }
 
                         v.setValue(qListVector);
                     }
                     else
                     {
                         // data
-                        QVector<float> data;
-                        for(qint32 i = 0; i < m_dataCurrent.size(); ++i)
-                            data.append(m_dataCurrent[i](row));
-                        qListVector.append(data);
+                        if(!m_doFiltering) {
+                            QVector<float> data;
+                            for(qint32 i = 0; i < m_dataCurrent.size(); ++i)
+                                data.append(m_dataCurrent[i](row));
+                            qListVector.append(data);
 
-                        // last data
-                        QVector<float> lastData;
-                        for(qint32 i=0; i < m_dataLast.size(); ++i)
-                            lastData.append(m_dataLast[i](row));
-                        qListVector.append(lastData);
+                            // last data
+                            QVector<float> lastData;
+                            for(qint32 i=0; i < m_dataLast.size(); ++i)
+                                lastData.append(m_dataLast[i](row));
+                            qListVector.append(lastData);
+                        } else {
+                            QVector<float> data;
+                            for(qint32 i = 0; i < m_dataFilteredCurrent.size(); ++i)
+                                data.append(m_dataFilteredCurrent[i](row));
+                            qListVector.append(data);
+
+                            // last data
+                            QVector<float> lastData;
+                            for(qint32 i=0; i < m_dataFilteredLast.size(); ++i)
+                                lastData.append(m_dataFilteredLast[i](row));
+                            qListVector.append(lastData);
+                        }
 
                         v.setValue(qListVector);
                     }
+
                     return v;
                     break;
                 }
@@ -227,6 +254,8 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
         m_vecBadIdcs = sel;
 
         this->m_pFiffInfo = p_pFiffInfo;
+
+        updateFilterParameters();
 
         //
         //  Create the initial SSP projector
@@ -317,6 +346,10 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
                 m_dataCurrent.append(dsData.col(i));
         }
 
+        //TODO: Filter current data
+        //if(m_doFiltering)
+            filterChannelsConcurrently();
+
         // - old -
 //        //SSP
 //        //set bad channels to zero
@@ -340,6 +373,11 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
     {
         m_dataLast = m_dataCurrent.mid(0,m_iMaxSamples); // Store last data to keep as background in the display
         m_dataCurrent.remove(0, m_iMaxSamples);
+
+        if(m_doFiltering) {
+            m_dataFilteredLast = m_dataFilteredCurrent.mid(0,m_iMaxSamples); // Store last data to keep as background in the display
+            m_dataFilteredCurrent.remove(0, m_iMaxSamples);
+        }
     }
 
     //Update data content
@@ -438,10 +476,11 @@ void RealTimeMultiSampleArrayModel::toggleFreeze(const QModelIndex &)
 {
     m_bIsFreezed = !m_bIsFreezed;
 
-    if(m_bIsFreezed)
-    {
+    if(m_bIsFreezed) {
         m_dataCurrentFreeze = m_dataCurrent;
         m_dataLastFreeze = m_dataLast;
+        m_dataFilteredCurrentFreeze = m_dataFilteredCurrent;
+        m_dataFilteredLastFreeze = m_dataLastFreeze;
     }
 
     //Update data content
@@ -505,3 +544,93 @@ void RealTimeMultiSampleArrayModel::updateProjection()
             m_matSparseProj.setFromTriplets(tripletList.begin(), tripletList.end());
     }
 }
+
+
+//*************************************************************************************************************
+
+void doFilterPerChannel(QPair<FilterData,RowVectorXd> &channelDataTime)
+{
+    //std::cout<<"START doFilterPerChannel"<<std::endl;
+
+    RowVectorXd tmp = channelDataTime.first.applyFFTFilter(channelDataTime.second, false);
+    channelDataTime.second = tmp;
+
+    //std::cout<<"END doFilterPerChannel"<<std::endl;
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
+{
+    //std::cout<<"START RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
+
+    //Clear m_dataFilteredCurrent
+    m_dataFilteredCurrent.clear();
+
+    //Update filter because the length of the data is changing over time
+    updateFilterParameters();
+
+//    std::cout<<"m_dataCurrent.size() "<<m_dataCurrent.size()<<std::endl;
+//    std::cout<<"m_dataCurrent.first().rows() "<<m_dataCurrent.first().rows()<<std::endl;
+//    std::cout<<"fftLength "<<m_filterData.m_iFFTlength<<std::endl;
+
+    QList<QPair<FilterData,RowVectorXd> > timeData;
+    MatrixXd currentMatData = dataCurrentToMatrix();
+
+    for(qint32 i=0; i<m_dataCurrent.last().rows(); ++i) {
+        timeData.append(QPair<FilterData,RowVectorXd>(m_filterData,currentMatData.row(i)));
+    }
+
+    QFuture<void> future = QtConcurrent::map(timeData,
+                                             doFilterPerChannel);
+
+    future.waitForFinished();
+
+    // Reform list to old QVector structure in global m_dataFilteredCurrent variabel
+    //std::cout<<"Before Set global m_dataFilteredCurrent"<<std::endl;
+
+    for(int r=0; r<timeData.first().second.cols(); r++) {
+        VectorXd colVector(timeData.size());
+
+        for(int c=0; c<timeData.size(); c++)
+            colVector(c) = timeData[c].second(r);
+
+        m_dataFilteredCurrent.append(colVector);
+    }
+
+    //std::cout<<"After Set global m_dataFilteredCurrent"<<std::endl;
+
+    //std::cout<<"END RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::updateFilterParameters()
+{
+    double sfreq = (m_pFiffInfo->sfreq>=0) ? m_pFiffInfo->sfreq : 600.0;
+    double nyquist_freq = sfreq/2;
+    int filterTaps = 80;
+
+    int fftLength = m_dataCurrent.size();
+    int exp = ceil(MNEMath::log2(fftLength));
+    fftLength = pow(2, exp+1);
+    if(fftLength < 512)
+        fftLength = 512;
+
+    double cutoffFreqHz = 15; //in Hz
+
+    FilterData::DesignMethod dMethod = FilterData::Cosine;
+
+    m_filterData = FilterData(QString("babyMEG_01"),
+                              FilterData::LPF,
+                              filterTaps,
+                              cutoffFreqHz/nyquist_freq,
+                              5/nyquist_freq,
+                              1/nyquist_freq,
+                              sfreq,
+                              fftLength,
+                              dMethod);
+}
+

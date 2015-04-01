@@ -175,11 +175,11 @@ QVariant StcDataModel::data(const QModelIndex &index, int role) const
             {
                 QVariant v;
                 if(m_bDataInit && role == StcDataModelRoles::GetSmoothedStcValLH) {
-                    v.setValue(smoothEstimates(6, 0));
+                    v.setValue(smoothEstimates(3, 0, 0)); //return relative stc with type = 0, normal with type = 1
                 }
 
                 if(m_bDataInit && role == StcDataModelRoles::GetSmoothedStcValRH) {
-                    v.setValue(smoothEstimates(6, 1));
+                    v.setValue(smoothEstimates(3, 1, 0));
                 }
 
                 return v;
@@ -394,14 +394,193 @@ void StcDataModel::setVertLabelIDs(const VectorXi &vertLabelIDs)
 
 //*************************************************************************************************************
 
-VectorXd StcDataModel::smoothEstimates(int niter, int hemi) const
+QPair<int, QPair<int, double> > calculateSmoothedEstimate(const QPair<VectorXd*, QPair<int, QVector<int> > > &vertexIndex)
+{
+    //std::cout<<"Smoothing vertex: "<<vertexIndex.second.first<<std::endl;
+
+    VectorXd* stcData = vertexIndex.first;
+
+    double sum = 0;
+
+    for (int p = 0; p < vertexIndex.second.second.size(); p++)
+        sum += stcData->coeff(vertexIndex.second.second[p]);
+
+    QPair<int, double> tempPair;
+    tempPair.first = vertexIndex.second.first;
+    tempPair.second = sum/vertexIndex.second.second.size();
+
+    QPair<int, QPair<int, double> > result;
+    result.first = stcData->rows();
+    result.second = tempPair;
+
+    return result;
+
+//    MNEHemisphere sp = m_forwardSolution.src[hemi];
+//    VectorXi vertno = sp.vertno;
+//    int nvert = sp.vertno.rows();
+
+//    VectorXi undef = VectorXi::Ones(sp.np);
+//    VectorXi prev_undef(sp.np);
+//    VectorXd prev_val(sp.np);
+
+//    VectorXd vecCurSmoothedStc = VectorXd::Zero(sp.np);
+
+//    int    n,k,p,it,nv;
+//    float  sum;
+
+//    if(hemi == 0) {
+//        for (k = 0; k < nvert; k++) {
+//            undef[vertno[k]] = 0;
+//            vecCurSmoothedStc[vertno[k]] = m_vecCurRelStc[k];
+//        }
+//    }
+//    else {
+//        for (k = 0 ; k < nvert; k++) {
+//            undef[vertno[k]] = 0;
+//            vecCurSmoothedStc[vertno[k]] = m_vecCurRelStc[m_forwardSolution.src[0].nuse+k];
+//        }
+//    }
+
+//    for (it = 0; it < niter; it++) {
+//        prev_undef = undef;
+//        prev_val  = vecCurSmoothedStc;
+
+//        for (k = 0; k < sp.np; k++) {
+//            sum = 0;
+//            n   = 0;
+
+//            if (prev_undef[k] == 1) {
+//                sum = vecCurSmoothedStc[k];
+//                n = 1;
+//            }
+
+//            for (p = 0; p < sp.neighbor_vert[k].size(); p++) {
+//                nv = sp.neighbor_vert[k][p];
+
+//                if (prev_undef[nv] == 0) {
+//                    sum += prev_val[nv];
+//                    n++;
+//                }
+//            }
+
+//            if (n > 0) {
+//                vecCurSmoothedStc[k] = sum/n;
+//                undef[k] = 0;
+//            }
+//        }
+//    }
+}
+
+
+//*************************************************************************************************************
+
+void reduceToFinalSmoothedEstimates(VectorXd &finalSmoothedEstimates, const QPair<int, QPair<int, double> > &smoothedEstimate)
+{
+    //std::cout<<"Adding vertex: "<<smoothedEstimate.second.first<<std::endl;
+
+    if(finalSmoothedEstimates.rows() == 0)
+        finalSmoothedEstimates.resize(smoothedEstimate.first);
+
+    finalSmoothedEstimates(smoothedEstimate.second.first) = smoothedEstimate.second.second;
+}
+
+
+//*************************************************************************************************************
+
+VectorXd StcDataModel::smoothEstimates(int niter, int hemi, int stcType) const
 {
     std::cout<<"START - StcDataModel::smoothEstimates()"<<std::endl;
 
-//    VectorXd vecCurSmoothedStc;
+    //Init hemisphere data
+    std::cout<<"StcDataModel::smoothEstimates() Init hemisphere data"<<std::endl;
+    VectorXd vecCurStcData;
+
+    if(hemi<0 || hemi>1)
+        return vecCurStcData;
+
+    if(hemi == 0) //left hemi
+        if(stcType == 0) //Relative stc
+            vecCurStcData = m_vecCurRelStc.head(m_forwardSolution.src[hemi].vertno.rows());
+        else
+            vecCurStcData = m_vecCurStc.head(m_forwardSolution.src[hemi].vertno.rows());
+    else //right hemi
+        if(stcType == 0) //Relative stc
+            vecCurStcData = m_vecCurRelStc.tail(m_forwardSolution.src[hemi].vertno.rows());
+        else
+            vecCurStcData = m_vecCurStc.tail(m_forwardSolution.src[hemi].vertno.rows());
+
+    //Init smoothed values with current estimate data
+    std::cout<<"StcDataModel::smoothEstimates() Init values with estimates"<<std::endl;
+    VectorXd vecCurSmoothedStc(m_forwardSolution.src[hemi].np);
+    vecCurSmoothedStc.setZero();
+
+    for(int i=0; i<vecCurStcData.rows(); i++)
+        vecCurSmoothedStc(m_forwardSolution.src[hemi].vertno(i)) = vecCurStcData(i);
+
+    // Create input list for mappedReduce
+    std::cout<<"StcDataModel::smoothEstimates() Init map reduce list"<<std::endl;
+    QList<QPair<VectorXd*, QPair<int, QVector<int> > > > inputMappedReduced;
+    for(int i=0; i<m_forwardSolution.src[hemi].neighbor_vert.size(); i++) {
+        QPair<VectorXd*, QPair<int, QVector<int> > > temp;
+        temp.first = &vecCurSmoothedStc;
+        temp.second = m_forwardSolution.src[hemi].neighbor_vert[i];
+        inputMappedReduced.append(temp);
+    }
+
+    //Use map reduce to speed up smoothing
+    QFuture<VectorXd> finalSmoothingResult;
+    for(int i=0; i<niter; i++) {
+        std::cout<<"StcDataModel::smoothEstimates() Starting mapReduced for iteration: "<<i<<std::endl;
+
+        finalSmoothingResult =  QtConcurrent::mappedReduced(inputMappedReduced,
+                                                            calculateSmoothedEstimate,
+                                                            reduceToFinalSmoothedEstimates,
+                                                            QtConcurrent::UnorderedReduce);
+
+//        finalSmoothinResult =  QtConcurrent::mappedReduced(inputMappedReduced.begin(),
+//                                                            inputMappedReduced.end(),
+//                                                            [this](QPair<VectorXd&, QPair<int, QVector<int> > >& vert) {
+//                                                                return calculateSmoothedEstimate(vert);
+//                                                            },
+//                                                            [this](VectorXd &finalSmoothedEstimates, QPair<int,double> smoothedEstimate) {
+//                                                                return reduceToFinalSmoothedEstimates(finalSmoothedEstimates, smoothedEstimate);
+//                                                            },
+//                                                            QtConcurrent::UnorderedReduce);
+
+        finalSmoothingResult.waitForFinished();
+    }
+
+    std::cout<<"StcDataModel::smoothEstimates() Finished smoothing: "<<std::endl;
+
+//    //Init smoothed values with current estimate data
+//    VectorXd vecCurSmoothedStc (m_forwardSolution.src[hemi].np);
+//    vecCurSmoothedStc.setZero();
+
+//    for(int i=0; i<vecCurStcData.rows(); i++)
+//        vecCurSmoothedStc(m_forwardSolution.src[hemi].vertno(i)) = vecCurStcData(i);
+
+//    //Perform smoothing
+//    std::cout<<"StcDataModel::smoothEstimates: vecCurSmoothedStc.rows() "<<vecCurSmoothedStc.rows()<<std::endl;
+//    std::cout<<"StcDataModel::smoothEstimates: m_smoothOperator.rows() "<<m_forwardSolution.src[hemi].m_smoothOperator.rows()<<std::endl;
+
+//    if(vecCurSmoothedStc.rows() != m_forwardSolution.src[hemi].smoothOperator.rows()) {
+//        std::cout<<"StcDataModel::smoothEstimates - smoothing operator and estimates do not align. returning non smoothed values."<<std::endl;
+//        return vecCurSmoothedStc;
+//    }
+
+//    VectorXd smoothingSum(vecCurSmoothedStc.rows());
+//    smoothingSum.setZero();
+
+//    for (int it = 0; it < niter; it++)
+//        if(it==0)
+//            smoothingSum += m_forwardSolution.src[hemi].smoothOperator * vecCurSmoothedStc;
+//        else
+//            smoothingSum += m_forwardSolution.src[hemi].smoothOperator * smoothingSum;
 
 //    //Get data
-//    for (int it = 0; it < niter; it++) {
+//    for(int it = 0; it < niter; it++) {
+
+//    }
 //        if(hemi == 0) {
 //            std::cout<<"smoothoperator.size(): "<< m_forwardSolution.src[hemi].m_smoothOperator.rows()<<" "<<m_forwardSolution.src[hemi].m_smoothOperator.cols()<<std::endl;
 
@@ -419,85 +598,66 @@ VectorXd StcDataModel::smoothEstimates(int niter, int hemi) const
 //    }
 
 
+//    //smooth data for both hemispheres
+//    MNEHemisphere sp = m_forwardSolution.src[hemi];
+//    VectorXi vertno = sp.vertno;
+//    int nvert = sp.vertno.rows();
 
-//    std::cout<<"vecCurSmoothedStc.rows(): "<<vecCurSmoothedStc.rows()<<std::endl;
+//    VectorXi undef = VectorXi::Ones(sp.np);
+//    VectorXi prev_undef(sp.np);
+//    VectorXd prev_val(sp.np);
 
-    //smooth data for both hemispheres
-    MNEHemisphere sp = m_forwardSolution.src[hemi];
-    VectorXi vertno = sp.vertno;
-    int nvert = sp.vertno.rows();
+//    VectorXd vecCurSmoothedStc = VectorXd::Zero(sp.np);
 
-    VectorXi undef = VectorXi::Ones(sp.np);
-    VectorXi prev_undef(sp.np);
-    VectorXd prev_val(sp.np);
+//    int    n,k,p,it,nv;
+//    float  sum;
 
-    VectorXd vecCurSmoothedStc = VectorXd::Zero(sp.np);
+//    if(hemi == 0) {
+//        for (k = 0; k < nvert; k++) {
+//            undef[vertno[k]] = 0;
+//            vecCurSmoothedStc[vertno[k]] = m_vecCurRelStc[k];
+//        }
+//    }
+//    else {
+//        for (k = 0 ; k < nvert; k++) {
+//            undef[vertno[k]] = 0;
+//            vecCurSmoothedStc[vertno[k]] = m_vecCurRelStc[m_forwardSolution.src[0].nuse+k];
+//        }
+//    }
 
-    int    n,k,p,it,nv;
-    float  sum;
+//    for (it = 0; it < niter; it++) {
+//        prev_undef = undef;
+//        prev_val  = vecCurSmoothedStc;
 
-    if(hemi == 0) {
-        for (k = 0; k < nvert; k++) {
-            undef[vertno[k]] = 0;
-            vecCurSmoothedStc[vertno[k]] = m_vecCurRelStc[k];
-        }
-    }
-    else {
-        for (k = 0 ; k < nvert; k++) {
-            undef[vertno[k]] = 0;
-            vecCurSmoothedStc[vertno[k]] = m_vecCurRelStc[m_forwardSolution.src[0].nuse+k];
-        }
-    }
+//        for (k = 0; k < sp.np; k++) {
+//            sum = 0;
+//            n   = 0;
 
-    for (it = 0; it < niter; it++) {
-        prev_undef = undef;
-        prev_val  = vecCurSmoothedStc;
+//            if (prev_undef[k] == 1) {
+//                sum = vecCurSmoothedStc[k];
+//                n = 1;
+//            }
 
-        for (k = 0; k < sp.np; k++) {
-            sum = 0;
-            n   = 0;
+//            for (p = 0; p < sp.neighbor_vert[k].size(); p++) {
+//                nv = sp.neighbor_vert[k][p];
 
-            if (prev_undef[k] == 1) {
-                sum = vecCurSmoothedStc[k];
-                n = 1;
-            }
+//                if (prev_undef[nv] == 0) {
+//                    sum += prev_val[nv];
+//                    n++;
+//                }
+//            }
 
-            for (p = 0; p < sp.neighbor_vert[k].size(); p++) {
-                nv = sp.neighbor_vert[k][p];
+//            if (n > 0) {
+//                vecCurSmoothedStc[k] = sum/n;
+//                undef[k] = 0;
+//            }
+//        }
+//    }
 
-                if (prev_undef[nv] == 0) {
-                    sum += prev_val[nv];
-                    n++;
-                }
-            }
-
-            if (n > 0) {
-                vecCurSmoothedStc[k] = sum/n;
-                undef[k] = 0;
-            }
-        }
-    }
+//    std::cout<<"END - StcDataModel::smoothEstimates() vecCurSmoothedStc.rows() "<<vecCurSmoothedStc.rows()<<std::endl;
 
     std::cout<<"END - StcDataModel::smoothEstimates()"<<std::endl;
 
-    return vecCurSmoothedStc;
+    return finalSmoothingResult.result();
 }
-
-
-//*************************************************************************************************************
-
-//double StcDataModel::calculateSmoothedEstimate(const int vertexIndex) const
-//{
-
-//}
-
-
-////*************************************************************************************************************
-
-//void StcDataModel::reduceToFinalSmoothedEstimates(VectorXd &finalSmoothedEstimates, const double smoothedEstimate) const
-//{
-
-//}
-
-
 

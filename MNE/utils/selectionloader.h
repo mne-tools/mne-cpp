@@ -85,7 +85,7 @@ namespace UTILSLIB
 
 //=============================================================================================================
 /**
-* Processes selection files (mne .sel) files which contain the chanels for each selection group.
+* Processes selection files (mne .sel) files which contain the channels for each selection group.
 *
 * @brief Processes selection files (mne .sel) files which contain the chanels for each selection group.
 */
