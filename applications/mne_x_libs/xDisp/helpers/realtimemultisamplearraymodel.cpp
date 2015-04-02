@@ -64,7 +64,7 @@ RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 , m_iMaxSamples(1024)
 , m_iCurrentSample(0)
 , m_bIsFreezed(false)
-, m_doFiltering(false)
+, m_doFiltering(true)
 {
 }
 
@@ -619,7 +619,7 @@ void RealTimeMultiSampleArrayModel::updateFilterParameters()
     if(fftLength < 512)
         fftLength = 512;
 
-    double cutoffFreqHz = 15; //in Hz
+    double cutoffFreqHz = 20; //in Hz
 
     FilterData::DesignMethod dMethod = FilterData::Cosine;
 

@@ -101,6 +101,7 @@ const QString FiffSimulator::Commands::SIMFILE      = "simfile";
 
 FiffSimulator::FiffSimulator()
 : m_pFiffProducer(new FiffProducer(this))
+//, m_sResourceDataPath(QString("%1/MNE-sample-data/baby_meg/babymegtest1.fif").arg(QCoreApplication::applicationDirPath()))
 , m_sResourceDataPath(QString("%1/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(QCoreApplication::applicationDirPath()))
 //, m_sResourceDataPath(QString("%1/MNE-sample-data/MEG/sample/baby_sample_raw.fif").arg(QCoreApplication::applicationDirPath()))
 , m_uiBufferSampleSize(100)//(4)
