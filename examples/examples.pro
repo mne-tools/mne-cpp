@@ -51,7 +51,8 @@ SUBDIRS += \
     evokedGradAmp \
     cancelNoise \
     fiffIO \
-    makeLayout
+    makeLayout \
+    bmtiExample \
 
 contains(MNECPP_CONFIG, withGui) {
 	SUBDIRS +=
