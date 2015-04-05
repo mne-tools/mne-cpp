@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     cosinefilter.cpp
+* @file     cosinefilter.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -30,16 +30,43 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the CosineFilter class
+* @brief    Declaration of the CosineFilter class
 *
 */
+
+#ifndef COSINEFILTER_H
+#define COSINEFILTER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "cosinefilter.h"
+#include "filtertools_global.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+#include <unsupported/Eigen/FFT>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE FILTERTOOLSLIB
+//=============================================================================================================
+
+namespace FILTERTOOLSLIB
+{
 
 
 //*************************************************************************************************************
@@ -47,109 +74,58 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace UTILSLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINES
 //=============================================================================================================
+#ifndef M_PI
+#define	M_PI		3.14159265358979323846	/* pi */
+#endif
 
-CosineFilter::CosineFilter()
+#ifndef EIGEN_FFTW_DEFAULT
+#define EIGEN_FFTW_DEFAULT
+#endif
+
+
+//=============================================================================================================
+/**
+* Creates a cosine filter response in the frequency domain.
+*
+* @brief Creates a cosine filter response in the frequency domain.
+*/
+class FILTERTOOLSSHARED_EXPORT CosineFilter
 {
+public:
+    enum TPassType {LPF, HPF, BPF, NOTCH };
 
-}
+    //=========================================================================================================
+    /**
+    * Constructs a CosineFilter object.
+    *
+    */
+    CosineFilter();
 
+    //=========================================================================================================
+    /**
+    * Constructs a CosineFilter object.
+    *
+    * @param fftLength length of the fft (multiple integer of 2^x)
+    * @param lowpass low cutoff frequency in Hz (not normed to sampling freq)
+    * @param lowpass_width determines the width of the filter slopes (steepness) in Hz (not normed to sampling freq)
+    * @param highpass highpass high cutoff frequency in Hz (not normed to sampling freq)
+    * @param highpass_width determines the width of the filter slopes (steepness) in Hz (not normed to sampling freq)
+    * @param sFreq sampling frequency
+    * @param type filter type (lowpass, highpass, etc.)
+    */
+    CosineFilter(int fftLength, float lowpass, float lowpass_width, float highpass, float highpass_width, double sFreq, TPassType type);
 
-//*************************************************************************************************************
+    RowVectorXcd    m_dFFTCoeffA;   /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
+    RowVectorXd     m_dCoeffA;      /**< the time filter coefficient set*/
+};
 
-CosineFilter::CosineFilter(int fftLength, float lowpass, float lowpass_width, float highpass, float highpass_width, double sFreq, TPassType type)
-{
-    int highpasss,lowpasss;
-    int highpass_widths,lowpass_widths;
-    int k,s,w;
-    int resp_size = fftLength/2+1; //Take half because we are not interested in the conjugate complex part of the spectrum
+} // NAMESPACE
 
-    double pi4 = M_PI/4.0;
-    float mult,add,c;
-
-    RowVectorXcd filterFreqResp = RowVectorXcd::Ones(resp_size);
-
-    //Transform frequencies into samples
-    highpasss = ((resp_size-1)*highpass)/(0.5*sFreq);
-    lowpasss = ((resp_size-1)*lowpass)/(0.5*sFreq);
-
-    lowpass_widths = ((resp_size-1)*lowpass_width)/(0.5*sFreq);
-    lowpass_widths = (lowpass_widths+1)/2;
-
-    if (highpass_width > 0.0) {
-        highpass_widths = ((resp_size-1)*highpass_width)/(0.5*sFreq);
-        highpass_widths  = (highpass_widths+1)/2;
-    }
-    else
-        highpass_widths = 3;
-
-    //Calculate filter freq response - use cosine
-    //Build high pass filter
-    if(type != LPF) {
-        if (highpasss > highpass_widths + 1) {
-            w    = highpass_widths;
-            mult = 1.0/w;
-            add  = 3.0;
-
-            for (k = 0; k < highpasss-w+1; k++)
-                filterFreqResp(k) = 0.0;
-
-            for (k = -w+1, s = highpasss-w+1; k < w; k++, s++) {
-                if (s >= 0 && s < resp_size) {
-                    c = cos(pi4*(k*mult+add));
-                    filterFreqResp(s) = filterFreqResp(s).real()*c*c;
-                }
-            }
-        }
-    }
-
-    //Build low pass filter
-    if(type != HPF) {
-        if (lowpass_widths > 0) {
-            w    = lowpass_widths;
-            mult = 1.0/w;
-            add  = 1.0;
-
-            for (k = -w+1, s = lowpasss-w+1; k < w; k++, s++) {
-                if (s >= 0 && s < resp_size) {
-                    c = cos(pi4*(k*mult+add));
-                    filterFreqResp(s) = filterFreqResp(s).real()*c*c;
-                }
-            }
-
-            for (k = s; k < resp_size; k++)
-                filterFreqResp(k) = 0.0;
-        }
-        else {
-            for (k = lowpasss; k < resp_size; k++)
-                filterFreqResp(k) = 0.0;
-        }
-    }
-
-    m_dFFTCoeffA = filterFreqResp;
-
-    //Generate windowed impulse response - invert fft coeeficients to time domain
-    Eigen::FFT<double> fft;
-    fft.SetFlag(fft.HalfSpectrum);
-
-    //invert to time domain and
-    fft.inv(m_dCoeffA, filterFreqResp);/*
-    m_dCoeffA = m_dCoeffA.segment(0,1024).eval();
-
-    //window/zero-pad m_dCoeffA to m_iFFTlength
-    RowVectorXd t_coeffAzeroPad = RowVectorXd::Zero(fftLength);
-    t_coeffAzeroPad.head(m_dCoeffA.cols()) = m_dCoeffA;
-
-    //fft-transform filter coeffs
-    m_dFFTCoeffA = RowVectorXcd::Zero(fftLength);
-    fft.fwd(m_dFFTCoeffA,t_coeffAzeroPad);*/
-}
-
-
-//*************************************************************************************************************
+#endif // COSINEFILTER_H

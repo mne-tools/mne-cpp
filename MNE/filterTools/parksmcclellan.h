@@ -63,19 +63,40 @@
 #ifndef PARKSMCCLELLAN_H
 #define PARKSMCCLELLAN_H
 
+//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
+//=============================================================================================================
 
-#include "utils_global.h"
+#include "filtertools_global.h"
 #include <vector>
+#include <math.h>
+#include <new>
 
-//Eigen
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 
-//Qt
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
 #include <QObject>
 #include <QMetaObject>
+#include <QtCore/qmath.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINES
+//=============================================================================================================
 
 #define BIG 4096    // Used to define array sizes. Must be somewhat larger than 8 * MaxNumTaps
 #define SMALL 256
@@ -83,17 +104,23 @@
 #define ITRMAX 50             // Max Number of Iterations. Some filters require as many as 45 iterations.
 #define MIN_TEST_VAL 1.0E-6   // Min value used in LeGrangeInterp and GEE
 
+
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE UTILSLIB
+// DEFINE NAMESPACE FILTERTOOLSLIB
 //=============================================================================================================
 
 using namespace Eigen;
 
-namespace UTILSLIB
+namespace FILTERTOOLSLIB
 {
 
-class UTILSSHARED_EXPORT ParksMcClellan : public QObject
+/**
+* DECLARE CLASS ParksMcClellan
+*
+* @brief The ParksMcClellan class provides the ParksMcClellan filter desing algorithm.
+*/
+class FILTERTOOLSSHARED_EXPORT ParksMcClellan : public QObject
 {
     Q_OBJECT
     Q_ENUMS(TPassType) //makes enum available to the class' Qt meta object

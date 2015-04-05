@@ -46,7 +46,7 @@
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_info.h>
 
-#include <utils/filterdata.h>
+#include <filterTools/filterdata.h>
 #include <utils/mnemath.h>
 
 
@@ -88,6 +88,7 @@ using namespace XMEASLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
 using namespace UTILSLIB;
+using namespace FILTERTOOLSLIB;
 
 
 //=============================================================================================================

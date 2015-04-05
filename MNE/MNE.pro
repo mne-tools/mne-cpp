@@ -42,12 +42,12 @@ SUBDIRS += \
     utils \
     fs \
     fiff \
+    filterTools \
     mne \
     inverse \
     rtCommand \
     rtClient \
-    rtInv \
-    bmti
+    rtInv
 
 contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += disp
@@ -55,7 +55,7 @@ contains(MNECPP_CONFIG, withGui) {
     qtHaveModule(3d) {
         message(Qt3D available: disp3D library configured!)
         SUBDIRS += disp3D \
-                   disp3DNew #Uncomment this if you have Qt3D 2.0 compiled
+                   #disp3DNew #Uncomment this if you have Qt3D 2.0 compiled
     }
 }
 

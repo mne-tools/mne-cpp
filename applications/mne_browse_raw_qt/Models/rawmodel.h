@@ -115,7 +115,7 @@
 
 #include <fiff/fiff.h>
 #include <mne/mne.h>
-#include <utils/parksmcclellan.h>
+#include <filterTools/parksmcclellan.h>
 
 
 //*************************************************************************************************************
