@@ -83,7 +83,7 @@ FilterData::FilterData(QString unique_name, FilterType type, int order, double c
             CosineFilter filtercos;
 
             switch(type) {
-                case FilterType::LPF:
+                case LPF:
                     filtercos = CosineFilter (fftlength,
                                             (centerfreq)*(sFreq/2),
                                             parkswidth*(sFreq/2),
@@ -93,7 +93,7 @@ FilterData::FilterData(QString unique_name, FilterType type, int order, double c
                                             (CosineFilter::TPassType)type);
                     break;
 
-                case FilterType::HPF:
+                case HPF:
                     filtercos = CosineFilter (fftlength,
                                             (centerfreq)*(sFreq/2),
                                             parkswidth*(sFreq/2),
@@ -103,7 +103,7 @@ FilterData::FilterData(QString unique_name, FilterType type, int order, double c
                                             (CosineFilter::TPassType)type);
                     break;
 
-                case FilterType::BPF:
+                case BPF:
                     filtercos = CosineFilter (fftlength,
                                             (centerfreq + bandwidth/2)*(sFreq/2),
                                             parkswidth*(sFreq/2),
