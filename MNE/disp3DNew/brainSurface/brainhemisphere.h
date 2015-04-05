@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "disp3DNew_global.h"
+#include "../disp3dnew_global.h"
 
 #include "brainsurfacemesh.h"
 #include "../helpers/renderableentity.h"

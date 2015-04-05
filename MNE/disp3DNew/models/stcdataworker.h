@@ -43,6 +43,8 @@
 
 #include <iostream>
 
+#include "../disp3dnew_global.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -85,7 +87,7 @@ using namespace Eigen;
 *
 * @brief Data scheduler
 */
-class StcDataWorker : public QThread
+class DISP3DNEWSHARED_EXPORT StcDataWorker : public QThread
 {
     Q_OBJECT
 public:
