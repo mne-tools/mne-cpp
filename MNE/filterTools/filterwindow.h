@@ -185,9 +185,9 @@ private:
     FilterPlotScene*    m_pFilterPlotScene;     /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
 
 signals:
-    void undoFilter(QString &channelType);
+    void undoFilter(QString channelType);
 
-    void applyFilter(QString &channelType);
+    void applyFilter(QString channelType);
 
 protected slots:
     //=========================================================================================================
