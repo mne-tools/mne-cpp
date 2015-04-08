@@ -46,7 +46,7 @@
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_info.h>
 
-#include <filterTools/filterdata.h>
+#include <utils/filterTools/filterdata.h>
 #include <utils/mnemath.h>
 
 
@@ -88,7 +88,6 @@ using namespace XMEASLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
 using namespace UTILSLIB;
-using namespace FILTERTOOLSLIB;
 
 
 //=============================================================================================================
@@ -293,6 +292,30 @@ public:
     */
     void updateProjection();
 
+    //=========================================================================================================
+    /**
+    * Activate filter functionality
+    *
+    * @param[in] activate    flag used to turn on or off filters
+    */
+    void activateFilter(bool activate);
+
+    //=========================================================================================================
+    /**
+    * Apply filters to channels
+    *
+    * @param[in] activate    flag used to turn on or off filters
+    */
+    void applyFilter(QString channelType);
+
+    //=========================================================================================================
+    /**
+    * Filter parameters changed
+    *
+    * @param[in] filterData    pointer to the current filter
+    */
+    void filterChanged(FilterData &filterData);
+
 signals:
     //=========================================================================================================
     /**
@@ -305,15 +328,23 @@ signals:
 private:
     //=========================================================================================================
     /**
-    * Calculates the filtered version of the channels in dataTime
+    * Updates the current filter parameters
     */
-    void filterChannelsConcurrently();
+    void updateFilterParameters();
 
     //=========================================================================================================
     /**
-    * Updates the filter parameters
+    * Undo filters from channels
+    *
+    * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
     */
-    void updateFilterParameters();
+    void createFilterChannelList(QString channelType);
+
+    //=========================================================================================================
+    /**
+    * Calculates the filtered version of the channels in dataTime
+    */
+    void filterChannelsConcurrently();
 
     //=========================================================================================================
     /**
@@ -339,6 +370,8 @@ private:
     bool m_bProjActivated;                          /**< Proj activated */
 
     QMap<qint32,qint32> m_qMapIdxRowSelection;      /**< Selection mapping.*/
+
+    QStringList         m_filterChannelList;        /**< List of channels which are to be filtered.*/
 
     //Fiff data structure
     QVector<VectorXd> m_dataCurrent;                /**< List that holds the current data*/

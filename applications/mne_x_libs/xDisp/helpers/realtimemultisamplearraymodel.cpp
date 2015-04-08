@@ -347,7 +347,7 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
         }
 
         //TODO: Filter current data
-        //if(m_doFiltering)
+        if(m_doFiltering)
             filterChannelsConcurrently();
 
         // - old -
@@ -548,6 +548,49 @@ void RealTimeMultiSampleArrayModel::updateProjection()
 
 //*************************************************************************************************************
 
+void RealTimeMultiSampleArrayModel::activateFilter(bool activate)
+{
+    m_doFiltering = activate;
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::applyFilter(QString channelType)
+{
+    createFilterChannelList(channelType);
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::filterChanged(FilterData &filterData)
+{
+    m_filterData = filterData;
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::createFilterChannelList(QString channelType)
+{
+    m_filterChannelList.clear();
+
+    for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
+        if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
+            m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
+            m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH) && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
+            if(channelType == "All")
+                m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
+            else if(m_pFiffInfo->chs.at(i).ch_name.contains(channelType))
+                m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
 void doFilterPerChannel(QPair<FilterData,RowVectorXd> &channelDataTime)
 {
     //std::cout<<"START doFilterPerChannel"<<std::endl;
@@ -632,5 +675,23 @@ void RealTimeMultiSampleArrayModel::updateFilterParameters()
                               sfreq,
                               fftLength,
                               dMethod);
+
+//    int fftLength = m_dataCurrent.size();
+//    int exp = ceil(MNEMath::log2(fftLength));
+//    fftLength = pow(2, exp+1);
+//    if(fftLength < 512)
+//        fftLength = 512;
+
+//    FilterData filterDataTemp = FilterData(QString("babyMEG_01"),
+//                              m_filterData.m_Type,
+//                              m_filterData.m_iFilterOrder,
+//                              m_filterData.m_dCenterFreq,
+//                              m_filterData.m_dBandwidth,
+//                              m_filterData.m_dParksWidth,
+//                              m_filterData.m_sFreq,
+//                              fftLength,
+//                              m_filterData.m_designMethod);
+
+//    m_filterData = filterDataTemp;
 }
 

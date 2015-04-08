@@ -64,8 +64,8 @@
 
 #include <fiff/fiff.h>
 #include <mne/mne.h>
-#include <filtertools/parksmcclellan.h>
-#include <filtertools/cosinefilter.h>
+#include <utils/filterTools/parksmcclellan.h>
+#include <utils/filterTools/cosinefilter.h>
 
 
 //*************************************************************************************************************
@@ -89,7 +89,7 @@
 
 using namespace MNELIB;
 using namespace Eigen;
-using namespace FILTERTOOLSLIB;
+using namespace UTILSLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================

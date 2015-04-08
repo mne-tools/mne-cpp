@@ -102,6 +102,6 @@ public:
     int         m_iChannelTypeMode;
 };
 
-} // NAMESPACE
+} // NAMESPACE XDISPLIB
 
 #endif // SelectionScene_H
