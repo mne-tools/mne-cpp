@@ -42,7 +42,6 @@ SUBDIRS += \
     utils \
     fs \
     fiff \
-    filterTools \
     mne \
     inverse \
     rtCommand \

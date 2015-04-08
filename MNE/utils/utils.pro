@@ -38,7 +38,7 @@ include(../../mne-cpp.pri)
 TEMPLATE = lib
 
 QT -= gui
-QT += xml core widgets svg
+QT += xml core widgets
 QT += network concurrent # Check with HP-UX
 
 DEFINES += UTILS_LIBRARY
@@ -82,6 +82,9 @@ SOURCES += \
     mp/fixdictmp.cpp \
     selectionloader.cpp \
     minimizersimplex.cpp \
+    filterTools/cosinefilter.cpp \
+    filterTools/filterdata.cpp \
+    filterTools/parksmcclellan.cpp
 
 HEADERS += \
     kmeans.h\
@@ -96,6 +99,9 @@ HEADERS += \
     selectionloader.h \
     layoutmaker.h \
     minimizersimplex.h \
+    filterTools/cosinefilter.h \
+    filterTools/filterdata.h \
+    filterTools/parksmcclellan.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

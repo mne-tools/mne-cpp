@@ -65,7 +65,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}FilterToolsd \
             -lMNE$${MNE_LIB_VERSION}Mned
 }
 else {
@@ -73,7 +72,6 @@ else {
             -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}FilterTools \
             -lMNE$${MNE_LIB_VERSION}Mne
 }
 

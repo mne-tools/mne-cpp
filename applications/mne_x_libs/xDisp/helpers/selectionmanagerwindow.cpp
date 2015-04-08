@@ -56,7 +56,7 @@ using namespace XDISPLIB;
 //=============================================================================================================
 
 SelectionManagerWindow::SelectionManagerWindow(QWidget *parent, ChInfoModel* pChInfoModel)
-    : QDockWidget(parent,Qt::Window)
+: QDockWidget(parent,Qt::Window)
 , ui(new Ui::SelectionManagerWindow)
 , m_pChInfoModel(pChInfoModel)
 {

@@ -46,7 +46,7 @@
 #include "utils/layoutloader.h"             //MNE-CPP utils
 #include "utils/selectionloader.h"          //MNE-CPP utils
 #include "utils/layoutmaker.h"              //MNE-CPP utils
-#include "selectionscene.h"        //MNE Browse Raw QT utils
+#include "selectionscene.h"
 #include "fiff/fiff.h"
 #include "chinfomodel.h"
 
@@ -290,6 +290,6 @@ private:
     QStringList                     m_currentlyLoadedFiffChannels;      /**< List of currently loaded fiff data channels.*/
 };
 
-} // NAMESPACE MNEBrowseRawQt
+} // NAMESPACE XDISPLIB
 
 #endif // SELECTIONMANAGERWINDOW_H
