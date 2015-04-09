@@ -139,18 +139,18 @@ void FiffSimulator::comBufsize(Command p_command)
     {
 //        printf("bufsize %d\n", t_uiBuffSize);
 
-            bool t_bWasRunning = m_bIsRunning;
+        bool t_bWasRunning = m_bIsRunning;
 
-            if(m_bIsRunning)
-            {
-                m_pFiffProducer->stop();
-                this->stop();
-            }
+        if(m_bIsRunning)
+        {
+            m_pFiffProducer->stop();
+            this->stop();
+        }
 
-            m_uiBufferSampleSize = t_uiBuffSize;
+        m_uiBufferSampleSize = t_uiBuffSize;
 
-            if(t_bWasRunning)
-                this->start();
+        if(t_bWasRunning)
+            this->start();
 
         QString str = QString("\tSet %1 buffer sample size to %2 samples\r\n\n").arg(getName()).arg(t_uiBuffSize);
 
