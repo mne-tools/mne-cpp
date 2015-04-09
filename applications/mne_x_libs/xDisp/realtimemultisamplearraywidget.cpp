@@ -159,8 +159,8 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     m_pActionProjection->setStatusTip(tr("Shows the SSP widget (F12)"));
     connect(m_pActionProjection, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showProjectionWidget);
     addDisplayAction(m_pActionProjection);
-    m_pActionProjection->setVisible(true);
 
+    m_pActionProjection->setVisible(true);
     if(m_pTableView)
         delete m_pTableView;
     m_pTableView = new QTableView;
@@ -246,6 +246,8 @@ void RealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
 
 void RealTimeMultiSampleArrayWidget::init()
 {
+
+
     if(m_qListChInfo.size() > 0)
     {
         if(m_pRTMSAModel)
@@ -317,11 +319,11 @@ void RealTimeMultiSampleArrayWidget::init()
             m_pActionChScaling->setVisible(true);
         }
 
-        //Create pointers for filter window and init windowyy
+        //Create pointers for filter window and init window
         m_pFilterWindow = QSharedPointer<FilterWindow>(new FilterWindow(this));
 
         m_pFilterWindow->setFiffInfo(*m_pFiffInfo.data());
-        m_pRTMSAModel->filterChanged(m_pFilterWindow->getCurrentFilter());
+        //m_pRTMSAModel->filterChanged(m_pFilterWindow->getCurrentFilter());
 
         connect(m_pFilterWindow.data(), &FilterWindow::activateFilter,
                 m_pRTMSAModel, &RealTimeMultiSampleArrayModel::activateFilter);

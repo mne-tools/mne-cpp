@@ -66,8 +66,8 @@ RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 , m_bIsFreezed(false)
 , m_doFiltering(false)
 {
+    init();
 }
-
 
 //*************************************************************************************************************
 //virtual functions
@@ -229,6 +229,37 @@ QVariant RealTimeMultiSampleArrayModel::headerData(int section, Qt::Orientation 
 
 //*************************************************************************************************************
 
+void RealTimeMultiSampleArrayModel::init()
+{
+    double sfreq = 600.0;
+    double nyquist_freq = sfreq/2;
+    int filterTaps = 80;
+
+    int fftLength = m_iMaxSamples;
+    int exp = ceil(MNEMath::log2(fftLength));
+    fftLength = pow(2, exp+1);
+    if(fftLength < 512)
+        fftLength = 512;
+
+    double cutoffFreqHz = 100; //in Hz
+
+    FilterData::DesignMethod dMethod = FilterData::Cosine;
+
+    m_filterData = FilterData(QString("babyMEG_01"),
+                              FilterData::LPF,
+                              filterTaps,
+                              cutoffFreqHz/nyquist_freq,
+                              5/nyquist_freq,
+                              1/nyquist_freq,
+                              sfreq,
+                              fftLength,
+                              dMethod);
+
+}
+
+
+//*************************************************************************************************************
+
 void RealTimeMultiSampleArrayModel::setChannelInfo(QList<RealTimeSampleArrayChInfo> &chInfo)
 {
     beginResetModel();
@@ -254,6 +285,8 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
         m_vecBadIdcs = sel;
 
         this->m_pFiffInfo = p_pFiffInfo;
+
+        createFilterChannelList("All");
 
         updateFilterParameters();
 
@@ -285,6 +318,8 @@ void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T, float dest
 
     float maxSamples = sps * T;
     m_iMaxSamples = (qint32)ceil(maxSamples/(sps/dest_sps)); // Max Samples / Downsampling
+
+    updateFilterParameters();
 
     endResetModel();
 }
@@ -346,7 +381,7 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
                 m_dataCurrent.append(dsData.col(i));
         }
 
-        //TODO: Filter current data
+        //Filter current data concurrently
         if(m_doFiltering)
             filterChannelsConcurrently();
 
@@ -591,14 +626,9 @@ void RealTimeMultiSampleArrayModel::createFilterChannelList(QString channelType)
 
 //*************************************************************************************************************
 
-void doFilterPerChannel(QPair<FilterData,RowVectorXd> &channelDataTime)
+void doFilterPerChannel(QPair<FilterData,QPair<int,RowVectorXd> > &channelDataTime)
 {
-    //std::cout<<"START doFilterPerChannel"<<std::endl;
-
-    RowVectorXd tmp = channelDataTime.first.applyFFTFilter(channelDataTime.second, false);
-    channelDataTime.second = tmp;
-
-    //std::cout<<"END doFilterPerChannel"<<std::endl;
+    channelDataTime.second.second = channelDataTime.first.applyFFTFilter(channelDataTime.second.second, false);
 }
 
 
@@ -611,38 +641,37 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
     //Clear m_dataFilteredCurrent
     m_dataFilteredCurrent.clear();
 
-    //Update filter because the length of the data is changing over time
-    updateFilterParameters();
-
 //    std::cout<<"m_dataCurrent.size() "<<m_dataCurrent.size()<<std::endl;
 //    std::cout<<"m_dataCurrent.first().rows() "<<m_dataCurrent.first().rows()<<std::endl;
 //    std::cout<<"fftLength "<<m_filterData.m_iFFTlength<<std::endl;
 
-    QList<QPair<FilterData,RowVectorXd> > timeData;
+    QList<QPair<FilterData,QPair<int,RowVectorXd> > > timeData;
     MatrixXd currentMatData = dataCurrentToMatrix();
 
     for(qint32 i=0; i<m_dataCurrent.last().rows(); ++i) {
-        timeData.append(QPair<FilterData,RowVectorXd>(m_filterData,currentMatData.row(i)));
+        if(m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name))
+            timeData.append(QPair<FilterData,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,currentMatData.row(i))));
     }
 
-    QFuture<void> future = QtConcurrent::map(timeData,
+    if(!timeData.isEmpty()) {
+        QFuture<void> future = QtConcurrent::map(timeData,
                                              doFilterPerChannel);
 
-    future.waitForFinished();
+        future.waitForFinished();
 
-    // Reform list to old QVector structure in global m_dataFilteredCurrent variabel
-    //std::cout<<"Before Set global m_dataFilteredCurrent"<<std::endl;
+        // Restrucutre list to old QVector structure in global m_dataFilteredCurrent variabel
+        VectorXd colVector(currentMatData.rows());
 
-    for(int r=0; r<timeData.first().second.cols(); r++) {
-        VectorXd colVector(timeData.size());
+        for(int r=0; r<timeData.first().second.second.cols(); r++) {
+            colVector = currentMatData.col(r);
 
-        for(int c=0; c<timeData.size(); c++)
-            colVector(c) = timeData[c].second(r);
+            for(int c=0; c<timeData.size(); c++)
+                colVector(timeData[c].second.first) = timeData[c].second.second(r);
 
-        m_dataFilteredCurrent.append(colVector);
-    }
-
-    //std::cout<<"After Set global m_dataFilteredCurrent"<<std::endl;
+            m_dataFilteredCurrent.append(colVector);
+        }
+    } else
+        m_dataFilteredCurrent = m_dataCurrent;
 
     //std::cout<<"END RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
 }
@@ -652,46 +681,44 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
 
 void RealTimeMultiSampleArrayModel::updateFilterParameters()
 {
-    double sfreq = (m_pFiffInfo->sfreq>=0) ? m_pFiffInfo->sfreq : 600.0;
-    double nyquist_freq = sfreq/2;
-    int filterTaps = 80;
+//    double sfreq = (m_pFiffInfo->sfreq>=0) ? m_pFiffInfo->sfreq : 600.0;
+//    double nyquist_freq = sfreq/2;
+//    int filterTaps = 80;
 
-    int fftLength = m_dataCurrent.size();
-    int exp = ceil(MNEMath::log2(fftLength));
-    fftLength = pow(2, exp+1);
-    if(fftLength < 512)
-        fftLength = 512;
-
-    double cutoffFreqHz = 100; //in Hz
-
-    FilterData::DesignMethod dMethod = FilterData::Cosine;
-
-    m_filterData = FilterData(QString("babyMEG_01"),
-                              FilterData::LPF,
-                              filterTaps,
-                              cutoffFreqHz/nyquist_freq,
-                              5/nyquist_freq,
-                              1/nyquist_freq,
-                              sfreq,
-                              fftLength,
-                              dMethod);
-
-//    int fftLength = m_dataCurrent.size();
+//    int fftLength = m_iMaxSamples; //m_dataCurrent.size();
 //    int exp = ceil(MNEMath::log2(fftLength));
 //    fftLength = pow(2, exp+1);
 //    if(fftLength < 512)
 //        fftLength = 512;
 
-//    FilterData filterDataTemp = FilterData(QString("babyMEG_01"),
-//                              m_filterData.m_Type,
-//                              m_filterData.m_iFilterOrder,
-//                              m_filterData.m_dCenterFreq,
-//                              m_filterData.m_dBandwidth,
-//                              m_filterData.m_dParksWidth,
-//                              m_filterData.m_sFreq,
-//                              fftLength,
-//                              m_filterData.m_designMethod);
+//    double cutoffFreqHz = 100; //in Hz
 
-//    m_filterData = filterDataTemp;
+//    FilterData::DesignMethod dMethod = FilterData::Cosine;
+
+//    m_filterData = FilterData(QString("babyMEG_01"),
+//                              FilterData::LPF,
+//                              filterTaps,
+//                              cutoffFreqHz/nyquist_freq,
+//                              5/nyquist_freq,
+//                              1/nyquist_freq,
+//                              sfreq,
+//                              fftLength,
+//                              dMethod);
+
+    int fftLength = m_iMaxSamples; //m_dataCurrent.size();
+    int exp = ceil(MNEMath::log2(fftLength));
+    fftLength = pow(2, exp+1);
+    if(fftLength < 512)
+        fftLength = 512;
+
+    m_filterData = FilterData(QString("babyMEG_01"),
+                              m_filterData.m_Type,
+                              m_filterData.m_iFilterOrder,
+                              m_filterData.m_dCenterFreq,
+                              m_filterData.m_dBandwidth,
+                              m_filterData.m_dParksWidth,
+                              m_filterData.m_sFreq,
+                              fftLength,
+                              m_filterData.m_designMethod);
 }
 
