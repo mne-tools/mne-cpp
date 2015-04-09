@@ -147,7 +147,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     addDisplayAction(m_pActionChScaling);
     m_pActionChScaling->setVisible(false);
 
-    m_pActionFiltering = new QAction(QIcon(":/images/filter.png"), tr("Shows the filter window (F11)"),this);
+    m_pActionFiltering = new QAction(QIcon(":/images/showFilterWindow.png"), tr("Shows the filter window (F11)"),this);
     m_pActionFiltering->setShortcut(tr("F11"));
     m_pActionFiltering->setStatusTip(tr("Shows the filter window (F11)"));
     connect(m_pActionFiltering, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showFilterWidget);
@@ -246,8 +246,6 @@ void RealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
 
 void RealTimeMultiSampleArrayWidget::init()
 {
-
-
     if(m_qListChInfo.size() > 0)
     {
         if(m_pRTMSAModel)
