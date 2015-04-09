@@ -288,7 +288,7 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
 
         createFilterChannelList("All");
 
-        updateFilterParameters();
+        createDefaultFilter();
 
         //
         //  Create the initial SSP projector
@@ -319,7 +319,7 @@ void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T, float dest
     float maxSamples = sps * T;
     m_iMaxSamples = (qint32)ceil(maxSamples/(sps/dest_sps)); // Max Samples / Downsampling
 
-    updateFilterParameters();
+    createDefaultFilter();
 
     endResetModel();
 }
@@ -679,11 +679,31 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::updateFilterParameters()
+void RealTimeMultiSampleArrayModel::createDefaultFilter()
 {
-//    double sfreq = (m_pFiffInfo->sfreq>=0) ? m_pFiffInfo->sfreq : 600.0;
-//    double nyquist_freq = sfreq/2;
-//    int filterTaps = 80;
+    double sfreq = (m_pFiffInfo->sfreq>=0) ? m_pFiffInfo->sfreq : 600.0;
+    double nyquist_freq = sfreq/2;
+    int filterTaps = 80;
+
+    int fftLength = m_iMaxSamples;
+    int exp = ceil(MNEMath::log2(fftLength));
+    fftLength = pow(2, exp+1);
+    if(fftLength < 512)
+        fftLength = 512;
+
+    double cutoffFreqHz = 100; //in Hz
+
+    FilterData::DesignMethod dMethod = FilterData::Cosine;
+
+    m_filterData = FilterData(QString("babyMEG_01"),
+                              FilterData::LPF,
+                              filterTaps,
+                              cutoffFreqHz/nyquist_freq,
+                              5/nyquist_freq,
+                              1/nyquist_freq,
+                              sfreq,
+                              fftLength,
+                              dMethod);
 
 //    int fftLength = m_iMaxSamples; //m_dataCurrent.size();
 //    int exp = ceil(MNEMath::log2(fftLength));
@@ -691,34 +711,14 @@ void RealTimeMultiSampleArrayModel::updateFilterParameters()
 //    if(fftLength < 512)
 //        fftLength = 512;
 
-//    double cutoffFreqHz = 100; //in Hz
-
-//    FilterData::DesignMethod dMethod = FilterData::Cosine;
-
 //    m_filterData = FilterData(QString("babyMEG_01"),
-//                              FilterData::LPF,
-//                              filterTaps,
-//                              cutoffFreqHz/nyquist_freq,
-//                              5/nyquist_freq,
-//                              1/nyquist_freq,
-//                              sfreq,
+//                              m_filterData.m_Type,
+//                              m_filterData.m_iFilterOrder,
+//                              m_filterData.m_dCenterFreq,
+//                              m_filterData.m_dBandwidth,
+//                              m_filterData.m_dParksWidth,
+//                              m_filterData.m_sFreq,
 //                              fftLength,
-//                              dMethod);
-
-    int fftLength = m_iMaxSamples; //m_dataCurrent.size();
-    int exp = ceil(MNEMath::log2(fftLength));
-    fftLength = pow(2, exp+1);
-    if(fftLength < 512)
-        fftLength = 512;
-
-    m_filterData = FilterData(QString("babyMEG_01"),
-                              m_filterData.m_Type,
-                              m_filterData.m_iFilterOrder,
-                              m_filterData.m_dCenterFreq,
-                              m_filterData.m_dBandwidth,
-                              m_filterData.m_dParksWidth,
-                              m_filterData.m_sFreq,
-                              fftLength,
-                              m_filterData.m_designMethod);
+//                              m_filterData.m_designMethod);
 }
 

@@ -334,9 +334,9 @@ private:
 
     //=========================================================================================================
     /**
-    * Updates the current filter parameters
+    * Creates the default filter with the current fiff info
     */
-    void updateFilterParameters();
+    void createDefaultFilter();
 
     //=========================================================================================================
     /**

@@ -41,39 +41,7 @@
 //=============================================================================================================
 
 #include "realtimemultisamplearraywidget.h"
-//#include "annotationwindow.h"
-#include <helpers/chinfomodel.h>
-#include <xMeas/newrealtimemultisamplearray.h>
 
-#include <Eigen/Core>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
-#include <math.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QPaintEvent>
-#include <QPainter>
-#include <QTimer>
-#include <QTime>
-#include <QVBoxLayout>
-#include <QHeaderView>
-#include <QMenu>
-#include <QMessageBox>
-#include <QSettings>
-
-#include <QScroller>
-
-#include <QDebug>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -321,7 +289,6 @@ void RealTimeMultiSampleArrayWidget::init()
         m_pFilterWindow = QSharedPointer<FilterWindow>(new FilterWindow(this));
 
         m_pFilterWindow->setFiffInfo(*m_pFiffInfo.data());
-        //m_pRTMSAModel->filterChanged(m_pFilterWindow->getCurrentFilter());
 
         connect(m_pFilterWindow.data(), &FilterWindow::activateFilter,
                 m_pRTMSAModel, &RealTimeMultiSampleArrayModel::activateFilter);

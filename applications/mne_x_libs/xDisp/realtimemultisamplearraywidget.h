@@ -43,16 +43,31 @@
 //=============================================================================================================
 
 #include "xdisp_global.h"
+
 #include "newmeasurementwidget.h"
+
+#include <xMeas/newrealtimemultisamplearray.h>
+
+//#include "annotationwindow.h"
+
 #include "helpers/realtimemultisamplearraymodel.h"
 #include "helpers/realtimemultisamplearraydelegate.h"
-
 #include "helpers/realtimemultisamplearrayscalingwidget.h"
 #include "helpers/projectorwidget.h"
 #include "helpers/selectionmanagerwindow.h"
 #include "helpers/chinfomodel.h"
 
 #include "disp/filterwindow.h"
+
+#include <math.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -67,7 +82,17 @@
 #include <QAction>
 #include <QSpinBox>
 #include <QDoubleSpinBox>
-
+#include <QPaintEvent>
+#include <QPainter>
+#include <QTimer>
+#include <QTime>
+#include <QVBoxLayout>
+#include <QHeaderView>
+#include <QMenu>
+#include <QMessageBox>
+#include <QSettings>
+#include <QScroller>
+#include <QDebug>
 
 //*************************************************************************************************************
 //=============================================================================================================
