@@ -428,7 +428,11 @@ void RealTimeMultiSampleArrayWidget::showChScalingWidget()
 
         connect(m_pRTMSAScalingWidget.data(), &RealTimeMultiSampleArrayScalingWidget::scalingChanged, this, &RealTimeMultiSampleArrayWidget::broadcastScaling);
     }
-    m_pRTMSAScalingWidget->show();
+
+    if(m_pRTMSAScalingWidget->isVisible())
+        m_pRTMSAScalingWidget->hide();
+    else
+        m_pRTMSAScalingWidget->show();
 }
 
 
@@ -474,7 +478,10 @@ void RealTimeMultiSampleArrayWidget::showProjectionWidget()
             connect(m_pProjectorSelectionWidget.data(), &ProjectorWidget::projSelectionChanged, this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::updateProjection);
         }
 
-        m_pProjectorSelectionWidget->show();
+        if(m_pProjectorSelectionWidget->isVisible())
+            m_pProjectorSelectionWidget->hide();
+        else
+            m_pProjectorSelectionWidget->show();
     }
 }
 
@@ -487,7 +494,10 @@ void RealTimeMultiSampleArrayWidget::showFilterWidget()
         m_pFilterWindow = QSharedPointer<FilterWindow>(new FilterWindow);
     }
 
-    m_pFilterWindow->show();
+    if(m_pFilterWindow->isVisible())
+        m_pFilterWindow->hide();
+    else
+        m_pFilterWindow->show();
 }
 
 //*************************************************************************************************************
@@ -498,7 +508,10 @@ void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
         m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow);
     }
 
-    m_pSelectionManagerWindow->show();
+    if(m_pSelectionManagerWindow->isVisible())
+        m_pSelectionManagerWindow->hide();
+    else
+        m_pSelectionManagerWindow->show();
 }
 
 
