@@ -350,7 +350,7 @@ private:
     /**
     * Calculates the filtered version of the channels in dataTime
     */
-    void filterChannelsConcurrently();
+    void filterChannelsConcurrently(bool filterLastDataTime = false);
 
     //=========================================================================================================
     /**
@@ -358,7 +358,7 @@ private:
     *
     * @return the current data as a matrix
     */
-    inline const MatrixXd dataCurrentToMatrix() const;
+    inline const MatrixXd dataToMatrix(QVector<VectorXd> &vector) const;
 
     //=========================================================================================================
     /**
@@ -452,16 +452,16 @@ inline const QMap< qint32,float >& RealTimeMultiSampleArrayModel::getScaling() c
 
 //*************************************************************************************************************
 
-inline const MatrixXd RealTimeMultiSampleArrayModel::dataCurrentToMatrix() const
+inline const MatrixXd RealTimeMultiSampleArrayModel::dataToMatrix(QVector<VectorXd> &vector) const
 {
-    if(m_dataCurrent.size() == 0)
+    if(vector.size() == 0)
         return MatrixXd();
 
-    MatrixXd matCurrent(m_dataCurrent.first().rows(), m_dataCurrent.size());
+    MatrixXd matCurrent(vector.first().rows(), vector.size());
 
-    for(qint32 r = 0; r < m_dataCurrent.first().rows(); ++r)
-        for(qint32 c = 0; c < m_dataCurrent.size(); ++c)
-            matCurrent(r,c) = m_dataCurrent[c].coeff(r);
+    for(qint32 r = 0; r < vector.first().rows(); ++r)
+        for(qint32 c = 0; c < vector.size(); ++c)
+            matCurrent(r,c) = vector[c].coeff(r);
 
     return matCurrent;
 }

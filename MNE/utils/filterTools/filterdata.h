@@ -111,6 +111,11 @@ public:
        NOTCH
     } m_Type;
 
+    enum CompensateEdgeEffects {
+       ZeroPad,
+       MirrorData
+    } m_compensateEdgeEffects;
+
     /**
     * FilterData::FilterData
     * @param unique_name defines the name of the generated filter
@@ -121,8 +126,10 @@ public:
     * @param parkswidth determines the width of the filter slopes (steepness)
     * @param sFreq sampling frequency
     * @param fftlength length of the fft (multiple integer of 2^x)
+    * @param designMethod specifies the design method to use. Choose between Cosind and Tschebyscheff
+    * @param compensateEdgeEffects defines how the edge effects should be handlted. Choose between ZeroPad and Mirroring
     */
-    FilterData(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, double sFreq, qint32 fftlength=4096, DesignMethod designMethod = Cosine);
+    FilterData(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, double sFreq, qint32 fftlength=4096, DesignMethod designMethod = Cosine, CompensateEdgeEffects compensateEdgeEffects = ZeroPad);
 
     FilterData();
 
@@ -133,7 +140,7 @@ public:
      */
     void fftTransformCoeffs();
 
-    RowVectorXd applyFFTFilter(const RowVectorXd& data, bool keepZeros = true) const;
+    RowVectorXd applyFFTFilter(const RowVectorXd& data, bool keepOverhead = true) const;
 
     double          m_sFreq;            /**< the sampling frequency. */
     int             m_iFilterOrder;     /**< represents the order of the filter instance. */
