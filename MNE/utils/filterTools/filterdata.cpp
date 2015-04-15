@@ -61,7 +61,7 @@ FilterData::FilterData()
 
 //*************************************************************************************************************
 
-FilterData::FilterData(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, double sFreq, qint32 fftlength, DesignMethod designMethod, CompensateEdgeEffects compensateEdgeEffects)
+FilterData::FilterData(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, double sFreq, qint32 fftlength, DesignMethod designMethod)
 : m_Type(type)
 , m_iFilterOrder(order)
 , m_iFFTlength(fftlength)
@@ -71,7 +71,6 @@ FilterData::FilterData(QString unique_name, FilterType type, int order, double c
 , m_dCenterFreq(centerfreq)
 , m_dBandwidth(bandwidth)
 , m_sFreq(sFreq)
-, m_compensateEdgeEffects(compensateEdgeEffects)
 {
     //std::cout<<"START FilterData::FilterData()"<<std::endl;
     switch(designMethod) {
@@ -135,13 +134,6 @@ FilterData::FilterData(QString unique_name, FilterType type, int order, double c
 
 //*************************************************************************************************************
 
-FilterData::~FilterData()
-{
-}
-
-
-//*************************************************************************************************************
-
 void FilterData::fftTransformCoeffs()
 {
     //This function only nneds to be called when using the Tschebyscheff design method
@@ -161,12 +153,15 @@ void FilterData::fftTransformCoeffs()
 
 //*************************************************************************************************************
 
-RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhead) const
+RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhead, CompensateEdgeEffects compensateEdgeEffects) const
 {
     //Zero pad or mirror in front and back of the data
     RowVectorXd t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
 
-    switch(m_compensateEdgeEffects) {
+//    std::cout<<"data.cols()"<<data.cols()<<std::endl;
+//    std::cout<<"m_iFFTlength"<<m_iFFTlength<<std::endl;
+
+    switch(compensateEdgeEffects) {
         case MirrorData:
             t_dataZeroPad.head(data.cols()) = data.reverse(); //front
             t_dataZeroPad.segment(data.cols(), data.cols()) = data; //middle
@@ -195,7 +190,7 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
 
     //Return filtered data still with zeros at front and end depending on keepZeros flag
     if(!keepOverhead) {
-        switch(m_compensateEdgeEffects) {
+        switch(compensateEdgeEffects) {
             case MirrorData:
                 switch(m_designMethod) {
                     case Cosine:
@@ -222,6 +217,7 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
 }
 
 
+//OLD
 ////*************************************************************************************************************
 
 //RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepZeros) const

@@ -161,9 +161,6 @@ void FilterWindow::initComboBoxes()
     connect(ui->m_comboBox_filterType,static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
                 this,&FilterWindow::changeStateSpinBoxes);
 
-    connect(ui->m_comboBox_compensateEdgeEffects,static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-                this,&FilterWindow::filterParametersChanged);
-
     //Initial selection is a lowpass and Cosine design method
     ui->m_doubleSpinBox_lowpass->setVisible(true);
     ui->m_label_lowpass->setVisible(true);
@@ -346,15 +343,6 @@ void FilterWindow::filterParametersChanged()
     if(ui->m_comboBox_designMethod->currentText() == "Cosine")
         dMethod = FilterData::Cosine;
 
-    //set flag how to compensate edge effects
-    FilterData::CompensateEdgeEffects compensateSideEffects = FilterData::MirrorData;
-
-    if(ui->m_comboBox_compensateEdgeEffects->currentText() == "Zero padding")
-        compensateSideEffects = FilterData::ZeroPad;
-
-    if(ui->m_comboBox_compensateEdgeEffects->currentText() == "Mirror data")
-        compensateSideEffects = FilterData::MirrorData;
-
     //Generate filters
     QSharedPointer<FilterData> userDefinedFilterOperator;
 
@@ -368,8 +356,7 @@ void FilterWindow::filterParametersChanged()
                                                                (double)trans_width/nyquistFrequency,
                                                                samplingFrequency,
                                                                fftLength,
-                                                               dMethod,
-                                                               compensateSideEffects));
+                                                               dMethod));
     }
 
     if(ui->m_comboBox_filterType->currentText() == "Highpass") {
@@ -382,8 +369,7 @@ void FilterWindow::filterParametersChanged()
                                             (double)trans_width/nyquistFrequency,
                                             samplingFrequency,
                                             fftLength,
-                                            dMethod,
-                                            compensateSideEffects));
+                                            dMethod));
     }
 
     if(ui->m_comboBox_filterType->currentText() == "Bandpass") {
@@ -396,8 +382,7 @@ void FilterWindow::filterParametersChanged()
                                   (double)trans_width/nyquistFrequency,
                                   samplingFrequency,
                                   fftLength,
-                                  dMethod,
-                                  compensateSideEffects));
+                                  dMethod));
     }
 
     //Replace old with new filter operator
