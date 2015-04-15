@@ -113,34 +113,43 @@ public:
 
     enum CompensateEdgeEffects {
        ZeroPad,
-       MirrorData
-    } m_compensateEdgeEffects;
+       MirrorData,
+       NoEdgeEffectCompensation
+    };
 
     /**
-    * FilterData::FilterData
-    * @param unique_name defines the name of the generated filter
-    * @param type of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType)
-    * @param order represents the order of the filter, the higher the higher is the stopband attenuation
-    * @param centerfreq determines the center of the frequency
-    * @param bandwidth ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband
-    * @param parkswidth determines the width of the filter slopes (steepness)
-    * @param sFreq sampling frequency
-    * @param fftlength length of the fft (multiple integer of 2^x)
-    * @param designMethod specifies the design method to use. Choose between Cosind and Tschebyscheff
-    * @param compensateEdgeEffects defines how the edge effects should be handlted. Choose between ZeroPad and Mirroring
+    * Constructs a FilterData object
+    * @param [in] unique_name defines the name of the generated filter
+    * @param [in] type of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType)
+    * @param [in] order represents the order of the filter, the higher the higher is the stopband attenuation
+    * @param [in] centerfreq determines the center of the frequency
+    * @param [in] bandwidth ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband
+    * @param [in] parkswidth determines the width of the filter slopes (steepness)
+    * @param [in] sFreq sampling frequency
+    * @param [in] fftlength length of the fft (multiple integer of 2^x)
+    * @param [in] designMethod specifies the design method to use. Choose between Cosind and Tschebyscheff
     */
-    FilterData(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, double sFreq, qint32 fftlength=4096, DesignMethod designMethod = Cosine, CompensateEdgeEffects compensateEdgeEffects = ZeroPad);
+    FilterData(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, double sFreq, qint32 fftlength=4096, DesignMethod designMethod = Cosine);
 
     FilterData();
-
-    ~FilterData();
 
     /**
      * @brief fftTransformCoeffs transforms the calculated filter coefficients to frequency-domain
      */
     void fftTransformCoeffs();
 
-    RowVectorXd applyFFTFilter(const RowVectorXd& data, bool keepOverhead = true) const;
+    /**
+    *
+    *
+    * Applies the current filter to the input data
+    *
+    * @param [in] data holds the data to be filtered
+    * @param [in] keepOverhead whether the result should still include the overhead information in front and back of the data
+    * @param [in] compensateEdgeEffects defines how the edge effects should be handlted. Choose between ZeroPad and Mirroring
+    *
+    * @return the filtered data in form of a RoVecotrXd
+    */
+    RowVectorXd applyFFTFilter(const RowVectorXd& data, bool keepOverhead = true, CompensateEdgeEffects compensateEdgeEffects = ZeroPad) const;
 
     double          m_sFreq;            /**< the sampling frequency. */
     int             m_iFilterOrder;     /**< represents the order of the filter instance. */

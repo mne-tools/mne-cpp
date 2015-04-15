@@ -394,14 +394,14 @@ private:
 
     FilterData m_filterData;
 
-    float m_fSps;               /**< Sampling rate */
-    qint32 m_iT;                /**< Time window */
-    qint32 m_iDownsampling;     /**< Down sampling factor */
-    qint32 m_iMaxSamples;       /**< Max samples per window */
-    qint32 m_iCurrentSample;    /**< Accurate Downsampling */
+    float m_fSps;                   /**< Sampling rate */
+    qint32 m_iT;                    /**< Time window */
+    qint32 m_iDownsampling;         /**< Down sampling factor */
+    qint32 m_iMaxSamples;           /**< Max samples per window */
+    qint32 m_iCurrentSample;        /**< Accurate Downsampling */
 
-    bool m_bIsFreezed;          /**< Display is freezed */
-    bool m_doFiltering;         /**< Do Filtering flag */
+    bool m_bIsFreezed;              /**< Display is freezed */
+    bool m_doFiltering;             /**< Do Filtering flag */
 
     QMap< qint32,float > m_qMapChScaling;   /**< Sensor selection widget. */
 };

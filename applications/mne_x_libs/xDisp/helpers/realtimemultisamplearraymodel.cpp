@@ -383,13 +383,13 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
         filterChannelsConcurrently(false);
 
     //ToDo separate worker thread? ToDo 2000 -> size of screen
-    if(m_dataCurrent.size() > m_iMaxSamples)
-    {
+    if(m_dataCurrent.size() > m_iMaxSamples) {
         m_dataLast = m_dataCurrent.mid(0,m_iMaxSamples); // Store last data to keep as background in the display
         m_dataCurrent.remove(0, m_iMaxSamples);
 
-        //If max data for display has been reached -> calculate filtered version
-        filterChannelsConcurrently(true );
+        //If max data for display has been reached -> calculate filtered version even if fitlering is deactivated.
+        //This way the last filtered data drawn in the background are always up to date.
+        filterChannelsConcurrently(true);
         m_dataFilteredLast = m_dataFilteredCurrent.mid(0,m_iMaxSamples); // Store last data to keep as background in the display
         m_dataFilteredCurrent.remove(0, m_iMaxSamples);
     }
@@ -607,7 +607,7 @@ void RealTimeMultiSampleArrayModel::createFilterChannelList(QString channelType)
 
 void doFilterPerChannel(QPair<FilterData,QPair<int,RowVectorXd> > &channelDataTime)
 {
-    channelDataTime.second.second = channelDataTime.first.applyFFTFilter(channelDataTime.second.second, false);
+    channelDataTime.second.second = channelDataTime.first.applyFFTFilter(channelDataTime.second.second, false, FilterData::MirrorData);
 }
 
 
@@ -620,30 +620,54 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(bool filterLastDa
     //Clear m_dataFilteredCurrent
     m_dataFilteredCurrent.clear();
 
+    //Generate QList structure which can be handled by the QConcurrent framework
     QList<QPair<FilterData,QPair<int,RowVectorXd> > > timeData;
-    MatrixXd matData;
-
-    if(!filterLastDataTime)
-        matData = dataToMatrix(m_dataCurrent);
-    else
-        matData = dataToMatrix(m_dataLast);
+    MatrixXd matDataCurrent = dataToMatrix(m_dataCurrent);
+    MatrixXd matDataLast = dataToMatrix(m_dataLast);
 
     for(qint32 i=0; i<m_dataCurrent.last().rows(); ++i) {
-        if(m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name))
-            timeData.append(QPair<FilterData,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,matData.row(i))));
+        if(m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name)) {
+            RowVectorXd data;
+
+            if(filterLastDataTime && matDataLast.rows()!=0)
+                data = matDataLast.row(i);
+            else {
+                if(matDataLast.rows() == 0) //if no m_dataLast has been set yet
+                    data = matDataCurrent.row(i);
+                else {
+                    RowVectorXd temp (matDataLast.cols()+matDataCurrent.cols());
+                    temp << matDataLast.row(i), matDataCurrent.row(i);
+                    data = temp;
+                }
+            }
+
+            timeData.append(QPair<FilterData,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,data)));
+        }
     }
 
+    //Do the concurrent filtering
     if(!timeData.isEmpty()) {
         QFuture<void> future = QtConcurrent::map(timeData,
                                              doFilterPerChannel);
 
         future.waitForFinished();
 
-        // Restrucutre list to old QVector structure in global m_dataFilteredCurrent variabel
-        VectorXd colVector(matData.rows());
+        // Restructure list to old QVector structure in global m_dataFilteredCurrent variabel
+        VectorXd colVector(matDataCurrent.rows());
 
-        for(int r=0; r<timeData.first().second.second.cols(); r++) {
-            colVector = matData.col(r);
+        int r = matDataLast.cols();
+        if(filterLastDataTime)
+            r = 0;
+
+        int colCount = 0;
+
+        for(r; r<timeData.first().second.second.cols(); r++) {
+            if(filterLastDataTime)
+                colVector = matDataLast.col(colCount);
+            else
+                colVector = matDataCurrent.col(colCount);
+
+            colCount++;
 
             for(int c=0; c<timeData.size(); c++)
                 colVector(timeData[c].second.first) = timeData[c].second.second(r);
@@ -652,6 +676,9 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(bool filterLastDa
         }
     } else
         m_dataFilteredCurrent = m_dataCurrent;
+
+//    std::cout<<"m_dataCurrent.size(): "<<m_dataCurrent.size()<<std::endl;
+//    std::cout<<"m_dataLast.size(): "<<m_dataLast.size()<<std::endl;
 
     //std::cout<<"END RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
 }
@@ -665,7 +692,7 @@ void RealTimeMultiSampleArrayModel::createDefaultFilter()
     double nyquist_freq = sfreq/2;
     int filterTaps = 80;
 
-    int fftLength = m_iMaxSamples;
+    int fftLength = m_iMaxSamples*3;
     int exp = ceil(MNEMath::log2(fftLength));
     fftLength = pow(2, exp+1);
     if(fftLength < 512)
@@ -683,7 +710,6 @@ void RealTimeMultiSampleArrayModel::createDefaultFilter()
                               1/nyquist_freq,
                               sfreq,
                               fftLength,
-                              dMethod,
-                              FilterData::MirrorData);
+                              dMethod);
 }
 
