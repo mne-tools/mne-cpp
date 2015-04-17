@@ -117,11 +117,19 @@ public:
 
     //=========================================================================================================
     /**
-    * On new file loaded.
+    * Sets the new fiff info.
     *
     * @param[in] fiffInfo the new fiffInfo
     */
     void setFiffInfo(const FiffInfo &fiffInfo);
+
+    //=========================================================================================================
+    /**
+    * Sets the new window size for the filter.
+    *
+    * @param[in] iWindowSize length of the data which is to be filtered
+    */
+    void setWindowSize(int iWindowSize);
 
     //=========================================================================================================
     /**

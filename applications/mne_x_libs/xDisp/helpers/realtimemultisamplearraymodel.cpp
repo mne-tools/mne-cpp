@@ -692,7 +692,7 @@ void RealTimeMultiSampleArrayModel::createDefaultFilter()
     double nyquist_freq = sfreq/2;
     int filterTaps = 80;
 
-    int fftLength = m_iMaxSamples*3;
+    int fftLength = m_iMaxSamples;
     int exp = ceil(MNEMath::log2(fftLength));
     fftLength = pow(2, exp+1);
     if(fftLength < 512)

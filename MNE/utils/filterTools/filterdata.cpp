@@ -161,11 +161,31 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
 //    std::cout<<"data.cols()"<<data.cols()<<std::endl;
 //    std::cout<<"m_iFFTlength"<<m_iFFTlength<<std::endl;
 
+    //Calculate starting and end point of data block
+    int startData = m_iFFTlength/2-data.cols()/2;
+    int dataInFFTLength = m_iFFTlength/data.cols();
+    int dataInFFTLengthRest = m_iFFTlength%data.cols();
+
+    if(dataInFFTLengthRest!=0)
+        dataInFFTLength++;
+
     switch(compensateEdgeEffects) {
         case MirrorData:
-            t_dataZeroPad.head(data.cols()) = data.reverse(); //front
-            t_dataZeroPad.segment(data.cols(), data.cols()) = data; //middle
-            t_dataZeroPad.segment(2*data.cols(), data.cols()) = data.reverse(); //back
+            for(int i=0; i<dataInFFTLength; i++)
+                if(dataInFFTLengthRest!=0 && i==dataInFFTLength-1)
+                    if(i%2==0)
+                        t_dataZeroPad.segment(i*data.cols(),dataInFFTLengthRest) = data.head(dataInFFTLengthRest).reverse();
+                    else
+                        t_dataZeroPad.segment(i*data.cols(),dataInFFTLengthRest) = data.head(dataInFFTLengthRest);
+                else
+                    if(i%2==0)
+                        t_dataZeroPad.segment(i*data.cols(),data.cols()) = data.reverse();
+                    else
+                        t_dataZeroPad.segment(i*data.cols(),data.cols()) = data;
+
+//            t_dataZeroPad.head(data.cols()) = data.reverse(); //front
+//            t_dataZeroPad.segment(data.cols(), data.cols()) = data; //middle
+//            t_dataZeroPad.segment(2*data.cols(), data.cols()) = data.reverse(); //back
             break;
 
         case ZeroPad:
@@ -194,10 +214,10 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
             case MirrorData:
                 switch(m_designMethod) {
                     case Cosine:
-                        return t_filteredTime.segment(data.cols(), data.cols());
+                        return t_filteredTime.segment(startData, data.cols());
 
                     case Tschebyscheff:
-                        return t_filteredTime.segment(data.cols()+m_iFilterOrder/2, data.cols());
+                        return t_filteredTime.segment(startData+m_iFilterOrder/2, data.cols());
                 }
                 break;
 
