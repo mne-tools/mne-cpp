@@ -289,6 +289,7 @@ void RealTimeMultiSampleArrayWidget::init()
         m_pFilterWindow = QSharedPointer<FilterWindow>(new FilterWindow(this));
 
         m_pFilterWindow->setFiffInfo(*m_pFiffInfo.data());
+        m_pFilterWindow->setWindowSize(m_pRTMSAModel->getMaxSamples());
 
         connect(m_pFilterWindow.data(), &FilterWindow::activateFilter,
                 m_pRTMSAModel, &RealTimeMultiSampleArrayModel::activateFilter);

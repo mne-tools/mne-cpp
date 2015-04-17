@@ -101,6 +101,14 @@ void FilterWindow::setFiffInfo(const FiffInfo &fiffInfo)
 
 //*************************************************************************************************************
 
+void FilterWindow::setWindowSize(int iWindowSize)
+{
+    m_iWindowSize = iWindowSize;
+}
+
+
+//*************************************************************************************************************
+
 FilterData& FilterWindow::getCurrentFilter()
 {
     return m_filterData;
