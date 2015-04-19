@@ -50,12 +50,16 @@
 #ifndef FILTERDATA_H
 #define FILTERDATA_H
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <utils/parksmcclellan.h>
+#include "../utils_global.h"
+#include "parksmcclellan.h"
+#include "cosinefilter.h"
+#include "iostream"
 
 
 //*************************************************************************************************************
@@ -72,9 +76,10 @@
 #define EIGEN_FFTW_DEFAULT
 #endif
 
+
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
 namespace UTILSLIB
@@ -88,11 +93,17 @@ namespace UTILSLIB
 
 using namespace Eigen;
 
+
 //*************************************************************************************************************
 
 class UTILSSHARED_EXPORT FilterData
 {
+
 public:
+    enum DesignMethod {
+       Tschebyscheff,
+       Cosine} m_designMethod;
+
     enum FilterType {
        LPF,
        HPF,
@@ -100,37 +111,46 @@ public:
        NOTCH
     } m_Type;
 
-    FilterData();
-    ~FilterData();
-
     /**
     * FilterData::FilterData
-    * @param [in] unique_name defines the name of the generated filter
-    * @param [in] type of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType)
-    * @param [in] order represents the order of the filter, the higher the higher is the stopband attenuation
-    * @param [in] centerfreq determines the center of the frequency
-    * @param [in] bandwidth ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband
-    * @param [in] parkswidth determines the width of the filter slopes (steepness)
+    * @param unique_name defines the name of the generated filter
+    * @param type of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType)
+    * @param order represents the order of the filter, the higher the higher is the stopband attenuation
+    * @param centerfreq determines the center of the frequency
+    * @param bandwidth ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband
+    * @param parkswidth determines the width of the filter slopes (steepness)
+    * @param sFreq sampling frequency
+    * @param fftlength length of the fft (multiple integer of 2^x)
     */
-    FilterData(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, qint32 fftlength=4096);
+    FilterData(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, double sFreq, qint32 fftlength=4096, DesignMethod designMethod = Cosine);
+
+    FilterData();
+
+    ~FilterData();
 
     /**
      * @brief fftTransformCoeffs transforms the calculated filter coefficients to frequency-domain
      */
     void fftTransformCoeffs();
 
-    RowVectorXd applyFFTFilter(RowVectorXd& data);
+    RowVectorXd applyFFTFilter(const RowVectorXd& data, bool keepZeros = true) const;
 
-    int m_iFilterOrder;       /**< represents the order of the filter instance */
-    int m_iFFTlength;        /**< represents the filter length */
+    double          m_sFreq;            /**< the sampling frequency. */
+    int             m_iFilterOrder;     /**< represents the order of the filter instance. */
+    int             m_iFFTlength;       /**< represents the filter length. */
+    double          m_dCenterFreq;      /**< contains center freq of the filter. */
+    double          m_dBandwidth;       /**< contains bandwidth of the filter. */
+    double          m_dParksWidth;      /**< contains the parksmcallen width. */
 
-    RowVectorXd m_dCoeffA;      /**< contains the forward filter coefficient set */
-    RowVectorXd m_dCoeffB;      /**< contains the backward filter coefficient set (empty if FIR filter) */
+    QString         m_sName;            /**< contains name of the filter. */
 
-    RowVectorXcd m_dFFTCoeffA;  /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength */
-    RowVectorXcd m_dFFTCoeffB;  /**< the FFT-transformed backward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength */
+    RowVectorXd     m_dCoeffA;          /**< contains the forward filter coefficient set. */
+    RowVectorXd     m_dCoeffB;          /**< contains the backward filter coefficient set (empty if FIR filter). */
+
+    RowVectorXcd    m_dFFTCoeffA;       /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
+    RowVectorXcd    m_dFFTCoeffB;       /**< the FFT-transformed backward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
 };
 
-} // NAMESPACE
+} // NAMESPACE UTILSLIB
 
 #endif // FILTERDATA_H

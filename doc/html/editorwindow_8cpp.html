@@ -118,6 +118,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>allCombined</b> = fal
 <tr class="memitem:a4f5bb751baa7a467a16ac7a20ae82c69"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4f5bb751baa7a467a16ac7a20ae82c69"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>is_loading</b> = false</td></tr>
 <tr class="separator:a4f5bb751baa7a467a16ac7a20ae82c69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af3b1badba54924dd1170c25ac5e5c7da"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af3b1badba54924dd1170c25ac5e5c7da"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>is_expanded</b> = false</td></tr>
+<tr class="separator:af3b1badba54924dd1170c25ac5e5c7da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aba64240f7ead308aa24ef39507b32210"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aba64240f7ead308aa24ef39507b32210"></a>
 qreal&#160;</td><td class="memItemRight" valign="bottom"><b>linStepWidthScale</b> = 1</td></tr>
 <tr class="separator:aba64240f7ead308aa24ef39507b32210"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -181,12 +184,27 @@ QList&lt; qreal &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>phase
 <tr class="memitem:a6520a90c9fa49e10577ca2fb53325b43"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6520a90c9fa49e10577ca2fb53325b43"></a>
 QList&lt; qreal &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>chirpList</b></td></tr>
 <tr class="separator:a6520a90c9fa49e10577ca2fb53325b43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3d49e63e1bbd19f75b6ff9769822cb8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab3d49e63e1bbd19f75b6ff9769822cb8"></a>
+qint32&#160;</td><td class="memItemRight" valign="bottom"><b>old_width</b> = 0</td></tr>
+<tr class="separator:ab3d49e63e1bbd19f75b6ff9769822cb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3719b784c25fa785098cf70c531f8354"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3719b784c25fa785098cf70c531f8354"></a>
 qint32&#160;</td><td class="memItemRight" valign="bottom"><b>atomCount</b> = 1</td></tr>
 <tr class="separator:a3719b784c25fa785098cf70c531f8354"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a95a1b50f6ed5650483e78277cb019d12"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a95a1b50f6ed5650483e78277cb019d12"></a>
+MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><b>_atom_matrix</b></td></tr>
+<tr class="separator:a95a1b50f6ed5650483e78277cb019d12"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad631941d5dff68de3d0055bc3a9dbb49"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad631941d5dff68de3d0055bc3a9dbb49"></a>
+QList&lt; QColor &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_atom_colors</b></td></tr>
+<tr class="separator:ad631941d5dff68de3d0055bc3a9dbb49"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa17a9203780d92cdc7a1804f85dac59d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa17a9203780d92cdc7a1804f85dac59d"></a>
 EditorWindow::AtomType&#160;</td><td class="memItemRight" valign="bottom"><b>atomType</b></td></tr>
 <tr class="separator:aa17a9203780d92cdc7a1804f85dac59d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1fe26ec9c6b6cee29d1e95af97f5657"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad1fe26ec9c6b6cee29d1e95af97f5657"></a>
+const qint32&#160;</td><td class="memItemRight" valign="bottom"><b>window_height</b> = 900</td></tr>
+<tr class="separator:ad1fe26ec9c6b6cee29d1e95af97f5657"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7343d8686d99f902e4951dbfc6b2788"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae7343d8686d99f902e4951dbfc6b2788"></a>
+const qint32&#160;</td><td class="memItemRight" valign="bottom"><b>window_width</b> = 605</td></tr>
+<tr class="separator:ae7343d8686d99f902e4951dbfc6b2788"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Implementation of the <a class="el" href="class_editor_window.html">EditorWindow</a> class. </p>
@@ -207,7 +225,7 @@ LICENSE</h1>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jan 27 2015 08:53:58 for MNE-CPP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Mar 27 2015 22:54:33 for MNE-CPP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

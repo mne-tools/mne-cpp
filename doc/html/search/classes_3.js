@@ -1,10 +1,11 @@
 var searchData=
 [
-  ['chinfomodel',['ChInfoModel',['../class_x_d_i_s_p_l_i_b_1_1_ch_info_model.html',1,'XDISPLIB']]],
   ['chinfomodel',['ChInfoModel',['../class_m_n_e_browse_raw_qt_1_1_ch_info_model.html',1,'MNEBrowseRawQt']]],
+  ['chinfomodel',['ChInfoModel',['../class_x_d_i_s_p_l_i_b_1_1_ch_info_model.html',1,'XDISPLIB']]],
   ['chinfowindow',['ChInfoWindow',['../class_m_n_e_browse_raw_qt_1_1_ch_info_window.html',1,'MNEBrowseRawQt']]],
   ['chirpatom',['ChirpATOM',['../struct_u_t_i_l_s_l_i_b_1_1_fix_dict_atom_1_1_chirp_a_t_o_m.html',1,'UTILSLIB::FixDictAtom']]],
   ['chirpatom',['ChirpAtom',['../class_u_t_i_l_s_l_i_b_1_1_chirp_atom.html',1,'UTILSLIB']]],
+  ['cinfo',['CInfo',['../class_m_n_e_analyze_qt_1_1_c_info.html',1,'MNEAnalyzeQt']]],
   ['cinfo',['CInfo',['../class_m_n_e_browse_raw_qt_1_1_c_info.html',1,'MNEBrowseRawQt']]],
   ['cinfo',['CInfo',['../class_m_n_e_x_1_1_c_info.html',1,'MNEX']]],
   ['circularbuffer',['CircularBuffer',['../class_i_o_buffer_1_1_circular_buffer.html',1,'IOBuffer']]],
@@ -17,6 +18,7 @@ var searchData=
   ['cluststctabledelegate',['ClustStcTableDelegate',['../class_d_i_s_p3_d_l_i_b_1_1_clust_stc_table_delegate.html',1,'DISP3DLIB']]],
   ['cluststcview',['ClustStcView',['../class_d_i_s_p3_d_l_i_b_1_1_clust_stc_view.html',1,'DISP3DLIB']]],
   ['cluststcworker',['ClustStcWorker',['../class_d_i_s_p3_d_l_i_b_1_1_clust_stc_worker.html',1,'DISP3DLIB']]],
+  ['coilparam',['coilParam',['../struct_rt_hpi_plugin_1_1coil_param.html',1,'RtHpiPlugin']]],
   ['collectorsocket',['CollectorSocket',['../class_neuromag_plugin_1_1_collector_socket.html',1,'NeuromagPlugin']]],
   ['colormap',['ColorMap',['../class_d_i_s_p_l_i_b_1_1_color_map.html',1,'DISPLIB']]],
   ['colortable',['Colortable',['../class_f_s_l_i_b_1_1_colortable.html',1,'FSLIB']]],

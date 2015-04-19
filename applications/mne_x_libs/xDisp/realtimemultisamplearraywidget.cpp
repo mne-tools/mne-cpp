@@ -41,39 +41,7 @@
 //=============================================================================================================
 
 #include "realtimemultisamplearraywidget.h"
-//#include "annotationwindow.h"
-#include <helpers/chinfomodel.h>
-#include <xMeas/newrealtimemultisamplearray.h>
 
-#include <Eigen/Core>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
-#include <math.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QPaintEvent>
-#include <QPainter>
-#include <QTimer>
-#include <QTime>
-#include <QVBoxLayout>
-#include <QHeaderView>
-#include <QMenu>
-#include <QMessageBox>
-#include <QSettings>
-
-#include <QScroller>
-
-#include <QDebug>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -133,28 +101,34 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     connect(m_pSpinBoxTimeScale, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &RealTimeMultiSampleArrayWidget::timeWindowChanged);
     addDisplayWidget(m_pSpinBoxTimeScale);
 
-    m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F10)"),this);
-    m_pActionSelectSensors->setShortcut(tr("F10"));
-    m_pActionSelectSensors->setStatusTip(tr("Shows the region selection widget (F10)"));
+    m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F9)"),this);
+    m_pActionSelectSensors->setShortcut(tr("F9"));
+    m_pActionSelectSensors->setStatusTip(tr("Shows the region selection widget (F9)"));
     m_pActionSelectSensors->setVisible(true);
     connect(m_pActionSelectSensors, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showSensorSelectionWidget);
     addDisplayAction(m_pActionSelectSensors);
 
-    m_pActionChScaling = new QAction(QIcon(":/images/channelScaling.png"), tr("Shows the channel scaling widget (F11)"),this);
-    m_pActionChScaling->setShortcut(tr("F11"));
-    m_pActionChScaling->setStatusTip(tr("Shows the channel scaling widget (F11)"));
+    m_pActionChScaling = new QAction(QIcon(":/images/channelScaling.png"), tr("Shows the channel scaling widget (F10)"),this);
+    m_pActionChScaling->setShortcut(tr("F10"));
+    m_pActionChScaling->setStatusTip(tr("Shows the channel scaling widget (F10)"));
     connect(m_pActionChScaling, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showChScalingWidget);
     addDisplayAction(m_pActionChScaling);
     m_pActionChScaling->setVisible(false);
 
+    m_pActionFiltering = new QAction(QIcon(":/images/showFilterWindow.png"), tr("Shows the filter window (F11)"),this);
+    m_pActionFiltering->setShortcut(tr("F11"));
+    m_pActionFiltering->setStatusTip(tr("Shows the filter window (F11)"));
+    connect(m_pActionFiltering, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showFilterWidget);
+    addDisplayAction(m_pActionFiltering);
+    m_pActionFiltering->setVisible(true);
 
     m_pActionProjection = new QAction(QIcon(":/images/iconSSP.png"), tr("Shows the SSP widget (F12)"),this);
     m_pActionProjection->setShortcut(tr("F12"));
     m_pActionProjection->setStatusTip(tr("Shows the SSP widget (F12)"));
     connect(m_pActionProjection, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showProjectionWidget);
     addDisplayAction(m_pActionProjection);
-    m_pActionProjection->setVisible(true);
 
+    m_pActionProjection->setVisible(true);
     if(m_pTableView)
         delete m_pTableView;
     m_pTableView = new QTableView;
@@ -166,10 +140,6 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 
     //set layouts
     this->setLayout(rtmsaLayout);
-
-    //Create pointers for selection manager
-    m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(this));
-    m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel.data()));
 
     init();
 }
@@ -315,7 +285,24 @@ void RealTimeMultiSampleArrayWidget::init()
             m_pActionChScaling->setVisible(true);
         }
 
-        //Set up selection manager
+        //Create pointers for filter window and init window
+        m_pFilterWindow = QSharedPointer<FilterWindow>(new FilterWindow(this));
+
+        m_pFilterWindow->setFiffInfo(*m_pFiffInfo.data());
+
+        connect(m_pFilterWindow.data(), &FilterWindow::activateFilter,
+                m_pRTMSAModel, &RealTimeMultiSampleArrayModel::activateFilter);
+
+        connect(m_pFilterWindow.data(), &FilterWindow::applyFilter,
+                m_pRTMSAModel, &RealTimeMultiSampleArrayModel::applyFilter);
+
+        connect(m_pFilterWindow.data(), &FilterWindow::filterChanged,
+                m_pRTMSAModel, &RealTimeMultiSampleArrayModel::filterChanged);
+
+        //Create pointers for selection manager
+        m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(this));
+        m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel.data()));
+
         connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::showSelectedChannelsOnly,
                 this, &RealTimeMultiSampleArrayWidget::showSelectedChannelsOnly);
 
@@ -491,6 +478,17 @@ void RealTimeMultiSampleArrayWidget::showProjectionWidget()
     }
 }
 
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayWidget::showFilterWidget()
+{
+    if(!m_pFilterWindow) {
+        m_pFilterWindow = QSharedPointer<FilterWindow>(new FilterWindow);
+    }
+
+    m_pFilterWindow->show();
+}
 
 //*************************************************************************************************************
 

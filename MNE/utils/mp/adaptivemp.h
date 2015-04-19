@@ -135,7 +135,7 @@ public:
 
     //=========================================================================================================
 
-    typedef QList<QList<GaborAtom>> adaptive_atom_list;
+    typedef QList<QList<GaborAtom> > adaptive_atom_list;
     typedef QList<FixDictAtom> fix_dict_atom_list;
     typedef Eigen::VectorXd VectorXd;
     typedef Eigen::MatrixXd MatrixXd;
@@ -149,7 +149,7 @@ public:
     qint32 max_iterations;
     VectorXd best_match;
     MatrixXd signal;
-    QList<QList<GaborAtom>> atom_list;
+    QList<QList<GaborAtom> > atom_list;
     QList<GaborAtom> atoms_in_chns;
     QList<FixDictAtom> fix_dict_list;
 
@@ -234,7 +234,7 @@ public:
 public slots:
 
     //ToDo: incapsulate settings in own class and give them to matching_pursuit()
-    QList<QList<GaborAtom>> matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase, qint32 boost, qint32 simplex_it,
+    QList<QList<GaborAtom> > matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase, qint32 boost, qint32 simplex_it,
                                        qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction, bool trial_separation);
     void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase, qint32 boost, qint32 simplex_it,
                        qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction, bool trial_separation);

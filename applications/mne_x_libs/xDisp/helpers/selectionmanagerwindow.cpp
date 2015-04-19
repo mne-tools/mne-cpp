@@ -56,7 +56,7 @@ using namespace XDISPLIB;
 //=============================================================================================================
 
 SelectionManagerWindow::SelectionManagerWindow(QWidget *parent, ChInfoModel* pChInfoModel)
-    : QDockWidget(parent,Qt::Window)
+: QDockWidget(parent,Qt::Window)
 , ui(new Ui::SelectionManagerWindow)
 , m_pChInfoModel(pChInfoModel)
 {
@@ -308,17 +308,23 @@ bool SelectionManagerWindow::loadLayout(QString path)
     float prad = 60.0;
     float width = 5.0;
     float height = 4.0;
+    int numberTries = 0;
 
     if(inputPoints.size()>0)
-        LayoutMaker::makeLayout(inputPoints,
-                                outputPoints,
-                                names,
-                                out,
-                                true,
-                                prad,
-                                width,
-                                height,
-                                true);
+        while(numberTries<10) {
+            if(LayoutMaker::makeLayout(inputPoints,
+                                       outputPoints,
+                                       names,
+                                       out,
+                                       true,
+                                       prad,
+                                       width,
+                                       height,
+                                       false) == -1)
+                numberTries++;
+            else
+                numberTries = 11;
+        }
 
     //Add new EEG points to Layout Map
     for(int i = 0; i<outputPoints.size(); i++)
@@ -353,6 +359,7 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
     SelectionLoader* manager = new SelectionLoader();
     QString newPath = QCoreApplication::applicationDirPath() + path.prepend("/MNE_Browse_Raw_Resources/Templates/ChannelSelection/");
 
+    m_selectionGroupsMap.clear();
     bool state = manager->readMNESelFile(newPath, m_selectionGroupsMap);
 
     //Create group 'All' and 'All EEG' manually (bcause this group depends on the loaded channels from the fiff data file, not on the loaded selection file)

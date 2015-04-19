@@ -429,18 +429,18 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;</div>
 <div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;<span class="keywordtype">void</span> BabyMEGSQUIDControlDgl::PreGaini(<span class="keywordtype">int</span> index)</div>
 <div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;{</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;    ProcCmd(<span class="stringliteral">&quot;UPDEPREGAINI&quot;</span>,index,<span class="stringliteral">&quot;Pre Gain is changed !&quot;</span>);</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;    ProcCmd(<span class="stringliteral">&quot;UPDEPREGAINI&quot;</span>,++index,<span class="stringliteral">&quot;Pre Gain is changed !&quot;</span>);</div>
 <div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;}</div>
 <div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;</div>
 <div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;<span class="keywordtype">void</span> BabyMEGSQUIDControlDgl::PostGain(<span class="keywordtype">int</span> index)</div>
 <div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;{</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;    ProcCmd(<span class="stringliteral">&quot;UPDEPOSTGAIN&quot;</span>,index,<span class="stringliteral">&quot;Post Gain is changed !&quot;</span>);</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;    ProcCmd(<span class="stringliteral">&quot;UPDEPOSTGAIN&quot;</span>,++index,<span class="stringliteral">&quot;Post Gain is changed !&quot;</span>);</div>
 <div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;}</div>
 <div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;</div>
 <div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;</div>
 <div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;<span class="keywordtype">void</span> BabyMEGSQUIDControlDgl::SlewSele(<span class="keywordtype">int</span> index)</div>
 <div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;{</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;    ProcCmd(<span class="stringliteral">&quot;UPDESLEWSELE&quot;</span>,index,<span class="stringliteral">&quot;Slew Selection is changed !&quot;</span>);</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;    ProcCmd(<span class="stringliteral">&quot;UPDESLEWSELE&quot;</span>,++index,<span class="stringliteral">&quot;Slew Selection is changed !&quot;</span>);</div>
 <div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;}</div>
 <div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;</div>
 <div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;</div>
@@ -593,223 +593,238 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;<span class="comment">//    QList &lt; QString &gt; tmp = sReply.split(&quot;|&quot;);</span></div>
 <div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;<span class="comment">//    ui-&gt;m_Qcb_channel-&gt;addItems(tmp);</span></div>
 <div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;</div>
-<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;    chanNames =  sReply.split(<span class="stringliteral">&quot;|&quot;</span>);</div>
-<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;    ui-&gt;m_Qcb_channel-&gt;addItems(chanNames);</div>
+<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;<span class="comment">//    chanNames =  sReply.split(&quot;|&quot;);</span></div>
+<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;<span class="comment">//    ui-&gt;m_Qcb_channel-&gt;addItems(chanNames);</span></div>
 <div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;</div>
-<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;}</div>
-<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;</div>
-<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;<span class="keywordtype">void</span> BabyMEGSQUIDControlDgl::UpdateGUI()</div>
-<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;{</div>
-<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;    <span class="comment">// according to m_GUISM to set the items status in the GUI</span></div>
-<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;    <span class="comment">//set CommType 255-group, 11-single channel</span></div>
-<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;    <span class="keywordtype">int</span> curindex = 0;</div>
-<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;</div>
-<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;    <span class="keywordflow">switch</span> (m_GUISM.CommType){</div>
-<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;    <span class="keywordflow">case</span> 255:</div>
-<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;        curindex = 0;</div>
-<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;        <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;    <span class="keywordflow">case</span> 11:</div>
-<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;        curindex = 9;</div>
-<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;        <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;    <span class="keywordflow">default</span>:</div>
-<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;        curindex = m_GUISM.CommType - 130;</div>
-<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;        <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;    }</div>
-<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;</div>
-<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;    ui-&gt;m_Qcb_commtype-&gt;setCurrentIndex( curindex );</div>
-<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;</div>
-<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;    <span class="comment">//set Channel</span></div>
-<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;    ui-&gt;m_Qcb_channel-&gt;setCurrentIndex( m_GUISM.ChannelSel );</div>
-<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;</div>
-<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;    QString newline = QString(<span class="stringliteral">&quot;Debug: ChannelStat = &quot;</span>)+tr(<span class="stringliteral">&quot;%1&quot;</span>).arg(m_GUISM.ChannelStat);</div>
-<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;    UpdateInfo(newline);</div>
-<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;</div>
-<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;    <span class="keywordflow">if</span> (m_GUISM.ChannelStat == 0)</div>
-<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;        ui-&gt;m_Qcb_channel-&gt;setEnabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;        ui-&gt;m_Qcb_channel-&gt;setDisabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;</div>
-<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;    <span class="comment">//set operate mode</span></div>
-<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;    ui-&gt;m_Qcb_opermode-&gt;setCurrentIndex( m_GUISM.OperMode );</div>
-<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;</div>
-<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;    <span class="comment">//set Retune</span></div>
-<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;    <span class="keywordflow">if</span>(m_GUISM.Retune == 0)</div>
-<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;        ui-&gt;m_Qbn_retune-&gt;setEnabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;        ui-&gt;m_Qbn_retune-&gt;setDisabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;    <span class="comment">//set Heat this</span></div>
-<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;    <span class="keywordflow">if</span>(m_GUISM.HeatThis == 0)</div>
-<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;        ui-&gt;m_Qbn_heat-&gt;setEnabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;        ui-&gt;m_Qbn_heat-&gt;setDisabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;</div>
-<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;    <span class="comment">//Atune</span></div>
-<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;    <span class="keywordflow">if</span>(m_GUISM.Atune == 0)</div>
-<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;        ui-&gt;m_Qbn_atune-&gt;setEnabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;        ui-&gt;m_Qbn_atune-&gt;setDisabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;</div>
-<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;    <span class="comment">//reset</span></div>
-<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;    <span class="keywordflow">if</span>(m_GUISM.Reset == 0)</div>
-<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;        ui-&gt;m_Qbn_reset-&gt;setEnabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;        ui-&gt;m_Qbn_reset-&gt;setDisabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;    <span class="comment">//Heat&amp;Tune</span></div>
-<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;    <span class="keywordflow">if</span>(m_GUISM.HeatAndTune == 0)</div>
-<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;        ui-&gt;m_Qbn_heatTune-&gt;setEnabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;        ui-&gt;m_Qbn_heatTune-&gt;setDisabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;</div>
-<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;    <span class="comment">//save</span></div>
-<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;    <span class="keywordflow">if</span>(m_GUISM.Save == 0)</div>
-<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;        ui-&gt;m_Qbn_save-&gt;setEnabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;        ui-&gt;m_Qbn_save-&gt;setDisabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;</div>
-<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;    <span class="comment">//_save --- %$save</span></div>
-<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;    <span class="keywordflow">if</span>(m_GUISM._Save == 0)</div>
-<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;        ui-&gt;m_Qbn_save1-&gt;setEnabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;        ui-&gt;m_Qbn_save1-&gt;setDisabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;</div>
-<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;    <span class="comment">//Group Heat</span></div>
-<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;    <span class="keywordflow">if</span>(m_GUISM.GroupHeat == 0)</div>
-<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;        ui-&gt;m_Qbn_groupheat-&gt;setEnabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;        ui-&gt;m_Qbn_groupheat-&gt;setDisabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;</div>
-<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;    <span class="comment">//Last</span></div>
-<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;    <span class="keywordflow">if</span>(m_GUISM.Last == 0)</div>
-<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;        ui-&gt;m_Qbn_last-&gt;setEnabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;        ui-&gt;m_Qbn_last-&gt;setDisabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;</div>
-<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;    <span class="comment">//Default</span></div>
-<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;    <span class="keywordflow">if</span>(m_GUISM.Default == 0)</div>
-<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;        ui-&gt;m_Qbn_default-&gt;setEnabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;        ui-&gt;m_Qbn_default-&gt;setDisabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;</div>
-<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;    <span class="comment">// high pass</span></div>
-<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;    ui-&gt;m_Qcb_hp-&gt;setCurrentIndex( m_GUISM.HighPass );</div>
-<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;    <span class="comment">// low pass</span></div>
-<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;    ui-&gt;m_Qcb_lp-&gt;setCurrentIndex( m_GUISM.LowPass );</div>
-<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;    <span class="comment">//pregain</span></div>
-<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;    ui-&gt;m_Qcb_pregain-&gt;setCurrentIndex( m_GUISM.PreGain-1 );</div>
-<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;    <span class="comment">//postgain</span></div>
-<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;    ui-&gt;m_Qcb_postgain-&gt;setCurrentIndex( m_GUISM.PostGain-1 );</div>
-<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;    <span class="comment">//slew</span></div>
-<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;    ui-&gt;m_Qcb_slew-&gt;setCurrentIndex( m_GUISM.Slew-1);</div>
-<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;</div>
-<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;    <span class="comment">//heattime</span></div>
-<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;    ui-&gt;m_Qsb_heattime-&gt;setValue(m_GUISM.HeatTime);</div>
-<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;    <span class="comment">//cooltime</span></div>
-<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;    ui-&gt;m_Qsb_cooltime-&gt;setValue(m_GUISM.CoolTime);</div>
-<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;    <span class="comment">//offset</span></div>
-<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;    ui-&gt;m_Qsb_offset-&gt;setValue(m_GUISM.offset);</div>
-<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;    <span class="comment">//bias</span></div>
-<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;    ui-&gt;m_Qsb_bias-&gt;setValue(m_GUISM.bias);</div>
-<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;    <span class="comment">//modulation</span></div>
-<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;    ui-&gt;m_Qsb_mod-&gt;setValue(m_GUISM.modulation);</div>
-<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;    <span class="comment">//autoreset</span></div>
-<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;    ui-&gt;m_Qcb_auto_reset-&gt;setCurrentIndex(m_GUISM.AutoRest);</div>
-<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;    <span class="comment">//resetlock</span></div>
-<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;    ui-&gt;m_Qcb_reset_lock-&gt;setCurrentIndex(m_GUISM.ResetLock);</div>
+<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;    <span class="comment">// select the MEG channels we need</span></div>
+<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;    QList &lt;QString&gt; t_chanNames = sReply.split(<span class="stringliteral">&quot;|&quot;</span>);</div>
+<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;</div>
+<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;    chanNames.clear();</div>
+<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;</div>
+<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0;i&lt;t_chanNames.size();i++)</div>
+<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;    {</div>
+<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;        QString T = t_chanNames.at(i);</div>
+<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;        <span class="keywordflow">if</span> (T.left(3)==<span class="stringliteral">&quot;MEG&quot;</span>)</div>
+<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;            chanNames.push_back(T);</div>
+<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;    }</div>
+<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;</div>
+<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;</div>
+<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;    ui-&gt;m_Qcb_channel-&gt;addItems(chanNames);</div>
+<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;</div>
+<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;}</div>
+<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;</div>
+<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;<span class="keywordtype">void</span> BabyMEGSQUIDControlDgl::UpdateGUI()</div>
+<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;{</div>
+<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;    <span class="comment">// according to m_GUISM to set the items status in the GUI</span></div>
+<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;    <span class="comment">//set CommType 255-group, 11-single channel</span></div>
+<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;    <span class="keywordtype">int</span> curindex = 0;</div>
+<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;</div>
+<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;    <span class="keywordflow">switch</span> (m_GUISM.CommType){</div>
+<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;    <span class="keywordflow">case</span> 255:</div>
+<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;        curindex = 0;</div>
+<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;        <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;    <span class="keywordflow">case</span> 11:</div>
+<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;        curindex = 9;</div>
+<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;        <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;    <span class="keywordflow">default</span>:</div>
+<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;        curindex = m_GUISM.CommType - 130;</div>
+<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;        <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;    }</div>
+<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;</div>
+<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;    ui-&gt;m_Qcb_commtype-&gt;setCurrentIndex( curindex );</div>
+<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;</div>
+<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;    <span class="comment">//set Channel</span></div>
+<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;    ui-&gt;m_Qcb_channel-&gt;setCurrentIndex( m_GUISM.ChannelSel );</div>
+<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;</div>
+<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;    QString newline = QString(<span class="stringliteral">&quot;Debug: ChannelStat = &quot;</span>)+tr(<span class="stringliteral">&quot;%1&quot;</span>).arg(m_GUISM.ChannelStat);</div>
+<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;    UpdateInfo(newline);</div>
+<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;</div>
+<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;    <span class="keywordflow">if</span> (m_GUISM.ChannelStat == 0)</div>
+<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;        ui-&gt;m_Qcb_channel-&gt;setEnabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;        ui-&gt;m_Qcb_channel-&gt;setDisabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;</div>
+<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;    <span class="comment">//set operate mode</span></div>
+<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;    ui-&gt;m_Qcb_opermode-&gt;setCurrentIndex( m_GUISM.OperMode );</div>
+<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;</div>
+<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;    <span class="comment">//set Retune</span></div>
+<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;    <span class="keywordflow">if</span>(m_GUISM.Retune == 0)</div>
+<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;        ui-&gt;m_Qbn_retune-&gt;setEnabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;        ui-&gt;m_Qbn_retune-&gt;setDisabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;    <span class="comment">//set Heat this</span></div>
+<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;    <span class="keywordflow">if</span>(m_GUISM.HeatThis == 0)</div>
+<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;        ui-&gt;m_Qbn_heat-&gt;setEnabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;        ui-&gt;m_Qbn_heat-&gt;setDisabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;</div>
+<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;    <span class="comment">//Atune</span></div>
+<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;    <span class="keywordflow">if</span>(m_GUISM.Atune == 0)</div>
+<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;        ui-&gt;m_Qbn_atune-&gt;setEnabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;        ui-&gt;m_Qbn_atune-&gt;setDisabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;</div>
+<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;    <span class="comment">//reset</span></div>
+<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;    <span class="keywordflow">if</span>(m_GUISM.Reset == 0)</div>
+<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;        ui-&gt;m_Qbn_reset-&gt;setEnabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;        ui-&gt;m_Qbn_reset-&gt;setDisabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;    <span class="comment">//Heat&amp;Tune</span></div>
+<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;    <span class="keywordflow">if</span>(m_GUISM.HeatAndTune == 0)</div>
+<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;        ui-&gt;m_Qbn_heatTune-&gt;setEnabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;        ui-&gt;m_Qbn_heatTune-&gt;setDisabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;</div>
+<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;    <span class="comment">//save</span></div>
+<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;    <span class="keywordflow">if</span>(m_GUISM.Save == 0)</div>
+<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;        ui-&gt;m_Qbn_save-&gt;setEnabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;        ui-&gt;m_Qbn_save-&gt;setDisabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;</div>
+<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;    <span class="comment">//_save --- %$save</span></div>
+<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;    <span class="keywordflow">if</span>(m_GUISM._Save == 0)</div>
+<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;        ui-&gt;m_Qbn_save1-&gt;setEnabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;        ui-&gt;m_Qbn_save1-&gt;setDisabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;</div>
+<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;    <span class="comment">//Group Heat</span></div>
+<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;    <span class="keywordflow">if</span>(m_GUISM.GroupHeat == 0)</div>
+<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;        ui-&gt;m_Qbn_groupheat-&gt;setEnabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;        ui-&gt;m_Qbn_groupheat-&gt;setDisabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;</div>
+<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;    <span class="comment">//Last</span></div>
+<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;    <span class="keywordflow">if</span>(m_GUISM.Last == 0)</div>
+<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;        ui-&gt;m_Qbn_last-&gt;setEnabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;        ui-&gt;m_Qbn_last-&gt;setDisabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;</div>
+<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;    <span class="comment">//Default</span></div>
+<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;    <span class="keywordflow">if</span>(m_GUISM.Default == 0)</div>
+<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;        ui-&gt;m_Qbn_default-&gt;setEnabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;        ui-&gt;m_Qbn_default-&gt;setDisabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;</div>
+<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;    <span class="comment">// high pass</span></div>
+<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;    ui-&gt;m_Qcb_hp-&gt;setCurrentIndex( m_GUISM.HighPass );</div>
+<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;    <span class="comment">// low pass</span></div>
+<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;    ui-&gt;m_Qcb_lp-&gt;setCurrentIndex( m_GUISM.LowPass );</div>
+<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;    <span class="comment">//pregain</span></div>
+<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;    ui-&gt;m_Qcb_pregain-&gt;setCurrentIndex( m_GUISM.PreGain-1 );</div>
+<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;    <span class="comment">//postgain</span></div>
+<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;    ui-&gt;m_Qcb_postgain-&gt;setCurrentIndex( m_GUISM.PostGain-1 );</div>
+<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;    <span class="comment">//slew</span></div>
+<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;    ui-&gt;m_Qcb_slew-&gt;setCurrentIndex( m_GUISM.Slew-1);</div>
 <div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;</div>
-<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;    <span class="comment">//tunecheck</span></div>
-<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;    <span class="keywordflow">if</span>(m_GUISM.TuneCheck == 0)</div>
-<div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;        ui-&gt;m_Qbn_tunecheck-&gt;setEnabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;        ui-&gt;m_Qbn_tunecheck-&gt;setDisabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;    <span class="comment">//amp</span></div>
-<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;    <span class="keywordflow">if</span>(m_GUISM.Amp == 0)</div>
-<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;        ui-&gt;m_Qbn_amp-&gt;setEnabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;        ui-&gt;m_Qbn_amp-&gt;setDisabled(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;<span class="comment">//    //integrator Reset</span></div>
-<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;<span class="comment">//    if(m_GUISM.IntegratorReset == 0)</span></div>
-<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;<span class="comment">//        ui-&gt;m_Qbn_int_reset-&gt;setEnabled(true);</span></div>
-<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;<span class="comment">//    else</span></div>
-<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;<span class="comment">//        ui-&gt;m_Qbn_int_reset-&gt;setDisabled(true);</span></div>
-<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;<span class="comment">//    //MicroReset</span></div>
-<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;<span class="comment">//    if(m_GUISM.MicroReset == 0)</span></div>
-<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;<span class="comment">//        ui-&gt;m_Qbn_mirco_reset-&gt;setEnabled(true);</span></div>
-<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;<span class="comment">//    else</span></div>
-<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;<span class="comment">//        ui-&gt;m_Qbn_mirco_reset-&gt;setDisabled(true);</span></div>
-<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;</div>
-<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;    <span class="comment">//set Bar Graph</span></div>
-<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;    <span class="comment">//slew</span></div>
-<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;    ui-&gt;m_Qcb_bar_graph_select-&gt;setCurrentIndex( m_GUISM.BarGraphSelect);</div>
-<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;</div>
-<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;    <span class="comment">//Update Bar Graph  -- m_GUISM.ParaGraph</span></div>
-<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;    <span class="comment">//std::cout &lt;&lt; &quot;Start Update Para Graph ------------------ \n&quot; &lt;&lt;std::endl;</span></div>
-<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;    UpdateParaGraph();</div>
-<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;    <span class="comment">//std::cout &lt;&lt; &quot;End Update Para Graph ------------------ \n&quot; &lt;&lt;std::endl;</span></div>
-<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;</div>
-<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;}</div>
-<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;<span class="keywordtype">void</span> BabyMEGSQUIDControlDgl::InitGUIConfig(QString sReply)</div>
-<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;{</div>
-<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;    QList &lt; QString &gt; tmp = sReply.split(<span class="stringliteral">&quot;|&quot;</span>);</div>
-<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;</div>
-<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;    <span class="keywordtype">int</span> ind = 0;</div>
-<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;    <span class="comment">// Set the current status of GUI Status Machine</span></div>
-<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;    m_GUISM.CommType = tmp[ind].toInt();</div>
-<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;    m_GUISM.ChannelSel = tmp[ind+1].toInt();</div>
-<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;    m_GUISM.ChannelStat = tmp[ind+2].toInt();</div>
-<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;    m_GUISM.OperMode = tmp[ind+3].toInt();</div>
-<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;</div>
-<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;    m_GUISM.Retune = tmp[ind+4].toInt();</div>
-<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;    m_GUISM.HeatThis = tmp[ind+5].toInt();</div>
-<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;    m_GUISM.Atune = tmp[ind+6].toInt();</div>
-<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;    m_GUISM.Reset = tmp[ind+7].toInt();</div>
-<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;    m_GUISM.HeatAndTune = tmp[ind+8].toInt();</div>
-<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;    m_GUISM.GroupHeat = tmp[ind+9].toInt();</div>
-<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;    m_GUISM.Last = tmp[ind+10].toInt();</div>
-<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;    m_GUISM.Default = tmp[ind+11].toInt();</div>
-<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;    m_GUISM.Save = tmp[ind+12].toInt();</div>
-<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;    m_GUISM._Save = tmp[ind+13].toInt();</div>
-<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;</div>
-<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;</div>
-<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;    m_GUISM.HighPass = tmp[ind+14].toInt();</div>
-<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;    m_GUISM.LowPass = tmp[ind+15].toInt();</div>
-<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;    m_GUISM.Slew    = tmp[ind+16].toInt();</div>
-<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;    m_GUISM.PreGain = tmp[ind+17].toInt();</div>
-<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;    m_GUISM.PostGain= tmp[ind+18].toInt();</div>
-<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;    m_GUISM.AutoRest= tmp[ind+19].toInt();</div>
-<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;    m_GUISM.ResetLock=tmp[ind+20].toInt();</div>
-<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;</div>
-<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;    m_GUISM.offset = tmp[ind+21].toFloat();</div>
-<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;    m_GUISM.bias   = tmp[ind+22].toFloat();</div>
-<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;    m_GUISM.modulation = tmp[ind+23].toFloat();</div>
-<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;    m_GUISM.HeatTime = tmp[ind+24].toFloat();</div>
-<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;    m_GUISM.CoolTime = tmp[ind+25].toFloat();</div>
+<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;    <span class="comment">//heattime</span></div>
+<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;    ui-&gt;m_Qsb_heattime-&gt;setValue(m_GUISM.HeatTime);</div>
+<div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;    <span class="comment">//cooltime</span></div>
+<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;    ui-&gt;m_Qsb_cooltime-&gt;setValue(m_GUISM.CoolTime);</div>
+<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;    <span class="comment">//offset</span></div>
+<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;    ui-&gt;m_Qsb_offset-&gt;setValue(m_GUISM.offset);</div>
+<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;    <span class="comment">//bias</span></div>
+<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;    ui-&gt;m_Qsb_bias-&gt;setValue(m_GUISM.bias);</div>
+<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;    <span class="comment">//modulation</span></div>
+<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;    ui-&gt;m_Qsb_mod-&gt;setValue(m_GUISM.modulation);</div>
+<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;    <span class="comment">//autoreset</span></div>
+<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;    ui-&gt;m_Qcb_auto_reset-&gt;setCurrentIndex(m_GUISM.AutoRest);</div>
+<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;    <span class="comment">//resetlock</span></div>
+<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;    ui-&gt;m_Qcb_reset_lock-&gt;setCurrentIndex(m_GUISM.ResetLock);</div>
+<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;</div>
+<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;    <span class="comment">//tunecheck</span></div>
+<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;    <span class="keywordflow">if</span>(m_GUISM.TuneCheck == 0)</div>
+<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;        ui-&gt;m_Qbn_tunecheck-&gt;setEnabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;        ui-&gt;m_Qbn_tunecheck-&gt;setDisabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;    <span class="comment">//amp</span></div>
+<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;    <span class="keywordflow">if</span>(m_GUISM.Amp == 0)</div>
+<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;        ui-&gt;m_Qbn_amp-&gt;setEnabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;        ui-&gt;m_Qbn_amp-&gt;setDisabled(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;<span class="comment">//    //integrator Reset</span></div>
+<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;<span class="comment">//    if(m_GUISM.IntegratorReset == 0)</span></div>
+<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;<span class="comment">//        ui-&gt;m_Qbn_int_reset-&gt;setEnabled(true);</span></div>
+<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;<span class="comment">//    else</span></div>
+<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;<span class="comment">//        ui-&gt;m_Qbn_int_reset-&gt;setDisabled(true);</span></div>
+<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;<span class="comment">//    //MicroReset</span></div>
+<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;<span class="comment">//    if(m_GUISM.MicroReset == 0)</span></div>
+<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;<span class="comment">//        ui-&gt;m_Qbn_mirco_reset-&gt;setEnabled(true);</span></div>
+<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;<span class="comment">//    else</span></div>
+<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;<span class="comment">//        ui-&gt;m_Qbn_mirco_reset-&gt;setDisabled(true);</span></div>
+<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;</div>
+<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;    <span class="comment">//set Bar Graph</span></div>
+<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;    <span class="comment">//slew</span></div>
+<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;    ui-&gt;m_Qcb_bar_graph_select-&gt;setCurrentIndex( m_GUISM.BarGraphSelect);</div>
+<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;</div>
+<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;    <span class="comment">//Update Bar Graph  -- m_GUISM.ParaGraph</span></div>
+<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;    <span class="comment">//std::cout &lt;&lt; &quot;Start Update Para Graph ------------------ \n&quot; &lt;&lt;std::endl;</span></div>
+<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;    UpdateParaGraph();</div>
+<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;    <span class="comment">//std::cout &lt;&lt; &quot;End Update Para Graph ------------------ \n&quot; &lt;&lt;std::endl;</span></div>
+<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;</div>
+<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;}</div>
+<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;<span class="keywordtype">void</span> BabyMEGSQUIDControlDgl::InitGUIConfig(QString sReply)</div>
+<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;{</div>
+<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;    QList &lt; QString &gt; tmp = sReply.split(<span class="stringliteral">&quot;|&quot;</span>);</div>
+<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;</div>
+<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;    <span class="keywordtype">int</span> ind = 0;</div>
+<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;    <span class="comment">// Set the current status of GUI Status Machine</span></div>
+<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;    m_GUISM.CommType = tmp[ind].toInt();</div>
+<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;    m_GUISM.ChannelSel = tmp[ind+1].toInt();</div>
+<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;    m_GUISM.ChannelStat = tmp[ind+2].toInt();</div>
+<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;    m_GUISM.OperMode = tmp[ind+3].toInt();</div>
+<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;</div>
+<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;    m_GUISM.Retune = tmp[ind+4].toInt();</div>
+<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;    m_GUISM.HeatThis = tmp[ind+5].toInt();</div>
+<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;    m_GUISM.Atune = tmp[ind+6].toInt();</div>
+<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;    m_GUISM.Reset = tmp[ind+7].toInt();</div>
+<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;    m_GUISM.HeatAndTune = tmp[ind+8].toInt();</div>
+<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;    m_GUISM.GroupHeat = tmp[ind+9].toInt();</div>
+<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;    m_GUISM.Last = tmp[ind+10].toInt();</div>
+<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;    m_GUISM.Default = tmp[ind+11].toInt();</div>
+<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;    m_GUISM.Save = tmp[ind+12].toInt();</div>
+<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;    m_GUISM._Save = tmp[ind+13].toInt();</div>
 <div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;</div>
-<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;    m_GUISM.TuneCheck = tmp[ind+26].toInt();</div>
-<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;    m_GUISM.Amp = tmp[ind+27].toInt();</div>
-<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;    m_GUISM.IntegratorReset = tmp[ind+28].toInt();</div>
-<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;    m_GUISM.MicroReset = tmp[ind+29].toInt();</div>
-<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;</div>
-<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;    <span class="comment">// get the status of Bar graph select</span></div>
-<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;    m_GUISM.BarGraphSelect = tmp[ind+30].toInt();</div>
-<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;    <span class="comment">//get the graph wave data</span></div>
-<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;    <span class="keywordtype">int</span> count = tmp[ind+31].toInt();</div>
-<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;    <span class="comment">//set ParaGraph</span></div>
-<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;    <span class="keywordflow">if</span> (m_GUISM.ParaGraph.size()&gt;0) m_GUISM.ParaGraph.clear();</div>
-<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0;i&lt;count;i++)</div>
-<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;        m_GUISM.ParaGraph.append(tmp[ind+32+i].toFloat());</div>
-<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;</div>
-<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;}</div>
-<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;</div>
-<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;<span class="keywordtype">void</span> BabyMEGSQUIDControlDgl::ProcCmd(QString cmd, <span class="keywordtype">int</span> index, QString Info)</div>
-<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;{</div>
-<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;    QString A = tr(<span class="stringliteral">&quot;%1&quot;</span>).arg(index);</div>
-<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;    QString CMDStr = cmd+<span class="stringliteral">&quot;|&quot;</span>+A+<span class="stringliteral">&quot;|&quot;</span>;</div>
-<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;    QString newline = Info+<span class="stringliteral">&quot;|&quot;</span>+CMDStr+<span class="stringliteral">&quot;index&quot;</span>+A;</div>
-<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;    UpdateInfo(newline);</div>
-<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;    SendCMD(CMDStr);</div>
-<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;}</div>
+<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;</div>
+<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;    m_GUISM.HighPass = tmp[ind+14].toInt();</div>
+<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;    m_GUISM.LowPass = tmp[ind+15].toInt();</div>
+<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;    m_GUISM.Slew    = tmp[ind+16].toInt();</div>
+<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;    m_GUISM.PreGain = tmp[ind+17].toInt();</div>
+<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;    m_GUISM.PostGain= tmp[ind+18].toInt();</div>
+<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;    m_GUISM.AutoRest= tmp[ind+19].toInt();</div>
+<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;    m_GUISM.ResetLock=tmp[ind+20].toInt();</div>
+<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;</div>
+<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;    m_GUISM.offset = tmp[ind+21].toFloat();</div>
+<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;    m_GUISM.bias   = tmp[ind+22].toFloat();</div>
+<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;    m_GUISM.modulation = tmp[ind+23].toFloat();</div>
+<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;    m_GUISM.HeatTime = tmp[ind+24].toFloat();</div>
+<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;    m_GUISM.CoolTime = tmp[ind+25].toFloat();</div>
+<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;</div>
+<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;    m_GUISM.TuneCheck = tmp[ind+26].toInt();</div>
+<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;    m_GUISM.Amp = tmp[ind+27].toInt();</div>
+<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;    m_GUISM.IntegratorReset = tmp[ind+28].toInt();</div>
+<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;    m_GUISM.MicroReset = tmp[ind+29].toInt();</div>
+<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;</div>
+<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;    <span class="comment">// get the status of Bar graph select</span></div>
+<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;    m_GUISM.BarGraphSelect = tmp[ind+30].toInt();</div>
+<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;    <span class="comment">//get the graph wave data</span></div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;    <span class="keywordtype">int</span> count = tmp[ind+31].toInt();</div>
+<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;    <span class="comment">//set ParaGraph</span></div>
+<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;    <span class="keywordflow">if</span> (m_GUISM.ParaGraph.size()&gt;0) m_GUISM.ParaGraph.clear();</div>
+<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0;i&lt;count;i++)</div>
+<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;        m_GUISM.ParaGraph.append(tmp[ind+32+i].toFloat());</div>
+<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;</div>
+<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;}</div>
+<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;</div>
+<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;<span class="keywordtype">void</span> BabyMEGSQUIDControlDgl::ProcCmd(QString cmd, <span class="keywordtype">int</span> index, QString Info)</div>
+<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;{</div>
+<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;    QString A = tr(<span class="stringliteral">&quot;%1&quot;</span>).arg(index);</div>
+<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;    QString CMDStr = cmd+<span class="stringliteral">&quot;|&quot;</span>+A+<span class="stringliteral">&quot;|&quot;</span>;</div>
+<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;    QString newline = Info+<span class="stringliteral">&quot;|&quot;</span>+CMDStr+<span class="stringliteral">&quot;index&quot;</span>+A;</div>
+<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;    UpdateInfo(newline);</div>
+<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;    SendCMD(CMDStr);</div>
+<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;}</div>
 <div class="ttc" id="classplotter_html"><div class="ttname"><a href="classplotter.html">plotter</a></div><div class="ttdef"><b>Definition:</b> <a href="plotter_8h_source.html#l00016">plotter.h:16</a></div></div>
-<div class="ttc" id="namespace_ui_html"><div class="ttname"><a href="namespace_ui.html">Ui</a></div><div class="ttdef"><b>Definition:</b> <a href="deletemessagebox_8h_source.html#l00053">deletemessagebox.h:53</a></div></div>
+<div class="ttc" id="namespace_ui_html"><div class="ttname"><a href="namespace_ui.html">Ui</a></div><div class="ttdef"><b>Definition:</b> <a href="mne__analyze__qt_2_windows_2aboutwindow_8h_source.html#l00052">aboutwindow.h:52</a></div></div>
 <div class="ttc" id="class_baby_m_e_g_plugin_1_1_baby_m_e_g_html"><div class="ttname"><a href="class_baby_m_e_g_plugin_1_1_baby_m_e_g.html">BabyMEGPlugin::BabyMEG</a></div><div class="ttdoc">The BabyMEG class provides a Fiff data simulator. </div><div class="ttdef"><b>Definition:</b> <a href="mne__rt__server_2connectors_2_baby_m_e_g_2babymeg_8h_source.html#l00101">babymeg.h:101</a></div></div>
 <div class="ttc" id="class_baby_m_e_g_plugin_1_1_baby_m_e_g_html_a9a21deceedb4e1ce708bfe43838307b2"><div class="ttname"><a href="class_baby_m_e_g_plugin_1_1_baby_m_e_g.html#a9a21deceedb4e1ce708bfe43838307b2">BabyMEGPlugin::BabyMEG::DataToSquidCtrlGUI</a></div><div class="ttdeci">void DataToSquidCtrlGUI(MatrixXf tmp)</div></div>
 <div class="ttc" id="namespace_baby_m_e_g_plugin_html"><div class="ttname"><a href="namespace_baby_m_e_g_plugin.html">BabyMEGPlugin</a></div><div class="ttdef"><b>Definition:</b> <a href="mne__rt__server_2connectors_2_baby_m_e_g_2babymeg_8h_source.html#l00077">babymeg.h:77</a></div></div>
@@ -819,7 +834,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jan 27 2015 08:53:52 for MNE-CPP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Mar 27 2015 22:54:26 for MNE-CPP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

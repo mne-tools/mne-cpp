@@ -40,9 +40,9 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += gui widgets
+QT += gui widgets 3d
 
-TARGET = mne_browse_raw_qt
+TARGET = mne_analyze_qt
 
 #If one single executable is to be build
 #-> comment out flag in .pri file
@@ -61,21 +61,46 @@ CONFIG += static console #DEBUG console
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}disp3Dd
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lMNE$${MNE_LIB_VERSION}Disp3Dd
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}disp3D
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}Disp \
+            -lMNE$${MNE_LIB_VERSION}Disp3D
 }
 
 DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += \
-    main.cpp 
+    main.cpp \   
+    Windows/mainwindow.cpp \
+    Windows/aboutwindow.cpp \
+    Windows/viewerwidget.cpp \
+    Views/baseview.cpp \
+    Views/view3d.cpp
 
 HEADERS += \
-    info.h
+    info.h \
+    Windows/mainwindow.h \
+    Windows/aboutwindow.h \
+    Windows/viewerwidget.h \
+    Views/baseview.h \
+    Views/view3d.h
 
 FORMS += \
+    Windows/mainwindow.ui \
+    Windows/aboutwindow.ui \
+    Windows/viewerwidget.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
