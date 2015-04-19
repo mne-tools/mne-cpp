@@ -37,7 +37,7 @@ include(../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT += widgets svg xml
+QT += widgets concurrent xml svg
 
 qtHaveModule(3d) {
     QT += 3d
@@ -53,23 +53,23 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lxMeasd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Disp \
             -lxMeas \
-            -lMNE$${MNE_LIB_VERSION}Utils
 }
 
 qtHaveModule(3d) {
@@ -123,7 +123,7 @@ SOURCES += \
     helpers/selectionmanagerwindow.cpp \
     helpers/selectionscene.cpp \
     helpers/selectionsceneitem.cpp \
-    helpers/chinfomodel.cpp
+    helpers/chinfomodel.cpp \
 
 HEADERS += \
     xdisp_global.h \
@@ -154,11 +154,11 @@ HEADERS += \
     helpers/selectionmanagerwindow.h \
     helpers/selectionscene.h \
     helpers/selectionsceneitem.h \
-    helpers/chinfomodel.h
+    helpers/chinfomodel.h \
 
 FORMS += \
     realtimesamplearraywidget.ui \
-    helpers/selectionmanagerwindow.ui
+    helpers/selectionmanagerwindow.ui \
 
 qtHaveModule(3d) {
     SOURCES += realtimesourceestimatewidget.cpp

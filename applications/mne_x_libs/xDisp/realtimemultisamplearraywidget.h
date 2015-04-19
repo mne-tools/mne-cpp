@@ -43,14 +43,31 @@
 //=============================================================================================================
 
 #include "xdisp_global.h"
+
 #include "newmeasurementwidget.h"
+
+#include <xMeas/newrealtimemultisamplearray.h>
+
+//#include "annotationwindow.h"
+
 #include "helpers/realtimemultisamplearraymodel.h"
 #include "helpers/realtimemultisamplearraydelegate.h"
-
 #include "helpers/realtimemultisamplearrayscalingwidget.h"
 #include "helpers/projectorwidget.h"
 #include "helpers/selectionmanagerwindow.h"
 #include "helpers/chinfomodel.h"
+
+#include "disp/filterwindow.h"
+
+#include <math.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -65,7 +82,17 @@
 #include <QAction>
 #include <QSpinBox>
 #include <QDoubleSpinBox>
-
+#include <QPaintEvent>
+#include <QPainter>
+#include <QTimer>
+#include <QTime>
+#include <QVBoxLayout>
+#include <QHeaderView>
+#include <QMenu>
+#include <QMessageBox>
+#include <QSettings>
+#include <QScroller>
+#include <QDebug>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -74,10 +101,7 @@
 
 class QTime;
 
-namespace XMEASLIB
-{
-class NewRealTimeMultiSampleArray;
-}
+namespace XMEASLIB{class NewRealTimeMultiSampleArray;}
 
 
 //*************************************************************************************************************
@@ -87,6 +111,7 @@ class NewRealTimeMultiSampleArray;
 
 namespace XDISPLIB
 {
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -100,6 +125,7 @@ namespace XDISPLIB
 //=============================================================================================================
 
 using namespace XMEASLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -120,9 +146,9 @@ using namespace XMEASLIB;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RealTimeMultiSampleArrayNewWidget
+* DECLARE CLASS RealTimeMultiSampleArrayWidget
 *
-* @brief The RealTimeMultiSampleArrayNewWidget class provides a real-time curve display.
+* @brief The RealTimeMultiSampleArrayWidget class provides a real-time curve display.
 */
 class XDISPSHARED_EXPORT RealTimeMultiSampleArrayWidget : public NewMeasurementWidget
 {
@@ -279,6 +305,12 @@ private:
 
     //=========================================================================================================
     /**
+    * Shows the filter widget
+    */
+    void showFilterWidget();
+
+    //=========================================================================================================
+    /**
     * Shows sensor selection widget
     */
     void showSensorSelectionWidget();
@@ -314,7 +346,10 @@ private:
 
     QAction*    m_pActionSelectSensors;                     /**< show roi select widget */
 
-    QSharedPointer<SelectionManagerWindow> m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */
+    QSharedPointer<SelectionManagerWindow> m_pSelectionManagerWindow;   /**< SelectionManagerWindow. */
+    QSharedPointer<FilterWindow> m_pFilterWindow;                       /**< SelectionManagerWindow. */
+
+    QAction*    m_pActionFiltering;                         /**< show filter window */
 
     QMap< qint32,float > m_qMapChScaling;                   /**< Sensor selection widget. */
     QAction* m_pActionChScaling;                            /**< Show channel scaling Action. */
@@ -334,6 +369,6 @@ private:
     void resetSelection();                  /**< reset the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
 };
 
-} // NAMESPACE
+} // NAMESPACE XDISPLIB
 
 #endif // REALTIMEMULTISAMPLEARRAYWIDGET_H

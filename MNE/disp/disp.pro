@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT  += core widgets
+QT  += core widgets svg
 
 DEFINES += DISP_LIBRARY
 
@@ -49,13 +49,17 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Fsd \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Inversed
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Fs \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Inverse
@@ -88,7 +92,9 @@ SOURCES += \
     imagesc.cpp \
     plot.cpp \
     graph.cpp \
-    rtplot.cpp
+    rtplot.cpp \
+    filterplotscene.cpp \
+    filterwindow.cpp
 
 
 HEADERS += \
@@ -97,7 +103,9 @@ HEADERS += \
     imagesc.h \
     plot.h \
     graph.h \
-    rtplot.h
+    rtplot.h \
+    filterplotscene.h \
+    filterwindow.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
@@ -109,6 +117,7 @@ header_files.path = $${MNE_INCLUDE_DIR}/disp
 
 INSTALLS += header_files
 
-FORMS +=
+FORMS += \
+    filterwindowwidget.ui
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR

@@ -178,6 +178,6 @@ protected:
     bool eventFilter(QObject *object, QEvent *event);
 };
 
-} // NAMESPACE
+} // NAMESPACE XDISPLIB
 
 #endif // LAYOUTSCENE_H

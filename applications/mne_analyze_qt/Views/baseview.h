@@ -1,16 +1,17 @@
 //=============================================================================================================
 /**
-* @file     filterdata.cpp
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+* @file     baseview.h
+* @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
+*			Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 *           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     February, 2014
+* @date     January, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Florian Schlembach, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Franco Polo, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,92 +32,37 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains all FilterData.
+* @brief
 *
+* @file
+*       basewindow.h
 */
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINES
+//=============================================================================================================
+
+#ifndef BASEVIEW_H
+#define BASEVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include "filterdata.h"
-
+#include <QObject>
+#include <QWidget>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE FORWARD DECLARATIONS
 //=============================================================================================================
 
-using namespace UTILSLIB;
-
-
-//*************************************************************************************************************
-
-FilterData::FilterData()
+class BaseView : public QWidget
 {
-}
+public:
+    BaseView();
+    ~BaseView();
+};
 
-FilterData::~FilterData()
-{
-}
-
-//*************************************************************************************************************
-
-FilterData::FilterData(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, qint32 fftlength)
-: m_Type(type)
-, m_iFilterOrder(order)
-, m_iFFTlength(fftlength)
-{
-    ParksMcClellan filter(order, centerfreq, bandwidth, parkswidth, (ParksMcClellan::TPassType)type);
-    m_dCoeffA = filter.FirCoeff;
-
-    //fft-transform m_dCoeffA in order to be able to perform frequency-domain filtering
-    fftTransformCoeffs();
-
-    Q_UNUSED(unique_name);
-}
-
-//*************************************************************************************************************
-
-void FilterData::fftTransformCoeffs()
-{
-    //zero-pad m_dCoeffA to m_iFFTlength
-    RowVectorXd t_coeffAzeroPad = RowVectorXd::Zero(m_iFFTlength);
-    t_coeffAzeroPad.head(m_dCoeffA.cols()) = m_dCoeffA;
-
-    //generate fft object
-    Eigen::FFT<double> fft;
-    fft.SetFlag(fft.HalfSpectrum);
-
-    //fft-transform filter coeffs
-    m_dFFTCoeffA = RowVectorXcd::Zero(m_iFFTlength);
-    fft.fwd(m_dFFTCoeffA,t_coeffAzeroPad);
-}
-
-//*************************************************************************************************************
-
-RowVectorXd FilterData::applyFFTFilter(RowVectorXd& data)
-{
-    //zero-pad data to m_iFFTlength
-    RowVectorXd t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
-    t_dataZeroPad.head(data.cols()) = data;
-
-    //generate fft object
-    Eigen::FFT<double> fft;
-    fft.SetFlag(fft.HalfSpectrum);
-
-    //fft-transform data sequence
-    RowVectorXcd t_freqData;
-    fft.fwd(t_freqData,t_dataZeroPad);
-
-    //perform frequency-domain filtering
-    RowVectorXcd t_filteredFreq = m_dFFTCoeffA.array()*t_freqData.array();
-
-    //inverse-FFT
-    RowVectorXd t_filteredTime;
-    fft.inv(t_filteredTime,t_filteredFreq);
-
-    //cuts off ends at front and end and return result
-    return t_filteredTime.segment(m_iFilterOrder/2+1,m_iFFTlength-m_iFilterOrder);
-}
+#endif // BASEVIEW_H

@@ -2,7 +2,7 @@
 /**
 * @file     main.cpp
 * @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
-*			Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 *           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
@@ -43,6 +43,7 @@
 
 #include <stdio.h>
 #include "info.h"
+#include "Windows/mainwindow.h"
 
 
 //*************************************************************************************************************
@@ -71,8 +72,9 @@ using namespace MNEAnalyzeQt;
 //=============================================================================================================
 
 
-//=============================================================================================================
-// MAIN
+//*************************************************************************************************************
+
+MainWindow *mainWindow;
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -82,10 +84,16 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName(CInfo::AppNameShort());
 
     //show splash screen for 1 second
-    QPixmap pixmap(":/Resources/images/splashscreen_mne_analyze_qt.png");
+    QPixmap pixmap(":/resources/images/splashscreen_mne_analyze_qt.png");
     QSplashScreen splash(pixmap);
     splash.show();
     QThread::sleep(1);
+
+    //New main window instance
+    mainWindow = new MainWindow();
+    mainWindow->show();
+
+    splash.finish(mainWindow);
 
     return a.exec();
 }

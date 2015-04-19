@@ -64,8 +64,8 @@
 
 #include <fiff/fiff.h>
 #include <mne/mne.h>
-#include <utils/parksmcclellan.h>
-#include <utils/cosinefilter.h>
+#include <utils/filterTools/parksmcclellan.h>
+#include <utils/filterTools/cosinefilter.h>
 
 
 //*************************************************************************************************************

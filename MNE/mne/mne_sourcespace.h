@@ -313,6 +313,16 @@ private:
 
     //=========================================================================================================
     /**
+    * Add vertex normals and neighbourhood information
+    *
+    * @param [in, out] p_pHemisphere   Hemisphere to be completed
+    *
+    * @return true if succeeded, false otherwise
+    */
+    static bool add_geometry_info(MNEHemisphere& p_Hemisphere);
+
+    //=========================================================================================================
+    /**
     * Implementation of the read_source_space function in e.g. mne_read_source_spaces.m, mne_read_bem_surfaces.m
     *
     * Reads a single source space (hemisphere)
