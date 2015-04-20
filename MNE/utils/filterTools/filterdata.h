@@ -59,6 +59,7 @@
 #include "../utils_global.h"
 #include "parksmcclellan.h"
 #include "cosinefilter.h"
+#include "../mnemath.h"
 #include "iostream"
 
 
@@ -139,9 +140,16 @@ public:
     void fftTransformCoeffs();
 
     /**
+    * Applies the current filter to the input data using convolution in time domain
     *
+    * @param [in] data holds the data to be filtered
     *
-    * Applies the current filter to the input data
+    * @return the filtered data in form of a RoVecotrXd
+    */
+    RowVectorXd applyConvFilter(const RowVectorXd& data) const;
+
+    /**
+    * Applies the current filter to the input data using multiplication in frequency domain
     *
     * @param [in] data holds the data to be filtered
     * @param [in] keepOverhead whether the result should still include the overhead information in front and back of the data

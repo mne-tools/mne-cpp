@@ -198,9 +198,10 @@ void FilterPlotScene::plotFilterFrequencyResponse()
 
     int numberCoeff = coefficientsAFreq.cols();
     int dsFactor = 0;
-    if(numberCoeff>2000)
+    if(numberCoeff>2000) {
         dsFactor = numberCoeff/2000;
-
+        dsFactor--;
+    }
     double max = 0;
     for(int i = 0; i<numberCoeff-dsFactor; i++)
         if(abs(coefficientsAFreq(i)) > max)
@@ -217,7 +218,7 @@ void FilterPlotScene::plotFilterFrequencyResponse()
 
     path.moveTo(-m_iDiagramMarginsVert, y); //convert to db
 
-    for(int i = 0; i<numberCoeff; i+=dsFactor) {
+    for(int i = 0; i<numberCoeff; i+=1+dsFactor) {
         y = -20 * log10(abs(coefficientsAFreq(i))) * m_iScalingFactor; //-1 because we want to plot upwards
         if(y > m_dMaxMagnitude)
             y = m_dMaxMagnitude;
