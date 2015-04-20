@@ -85,8 +85,6 @@ FilterData::FilterData(QString unique_name, FilterType type, int order, double c
         }
 
         case Cosine: {
-            m_iFilterOrder = 0;
-
             CosineFilter filtercos;
 
             switch(type) {
@@ -121,7 +119,7 @@ FilterData::FilterData(QString unique_name, FilterType type, int order, double c
                     break;
             }
 
-            m_dCoeffA = filtercos.m_dCoeffA;
+            m_dCoeffA = filtercos.m_dCoeffA.head(order);
             m_dFFTCoeffA = filtercos.m_dFFTCoeffA;
 
             break;
@@ -148,6 +146,28 @@ void FilterData::fftTransformCoeffs()
     //fft-transform filter coeffs
     m_dFFTCoeffA = RowVectorXcd::Zero(m_iFFTlength);
     fft.fwd(m_dFFTCoeffA,t_coeffAzeroPad);
+}
+
+
+//*************************************************************************************************************
+
+RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data) const
+{
+    //Zero pad in front and make filter coeff causal
+    RowVectorXd dCoeffA = m_dCoeffA.head(m_dCoeffA.cols()/2);
+
+    RowVectorXd t_dataZeroPad = RowVectorXd::Zero(dCoeffA.cols() + data.cols() + dCoeffA.cols());
+    t_dataZeroPad.segment(dCoeffA.cols(), data.cols()) = data;
+
+    RowVectorXd t_filteredTime = RowVectorXd::Zero(data.cols()+dCoeffA.cols());
+
+    for(int i=dCoeffA.cols(); i<dCoeffA.cols()+data.cols()+dCoeffA.cols(); i++) {
+        for(int u=0; u<dCoeffA.cols(); u++) {
+            t_filteredTime(i-dCoeffA.cols()) += t_dataZeroPad(i-u) * m_dCoeffA(u);
+        }
+    }
+
+    return t_filteredTime.segment(dCoeffA.cols(),data.cols());
 }
 
 
