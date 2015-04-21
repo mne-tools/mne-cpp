@@ -80,7 +80,8 @@ FilterData::FilterData(QString unique_name, FilterType type, int order, double c
 
 //*************************************************************************************************************
 
-FilterData::FilterData(QString &path)
+FilterData::FilterData(QString &path, double sFreq)
+: m_sFreq(sFreq)
 {
     //std::cout<<"START FilterData::FilterData()"<<std::endl;
 
@@ -189,9 +190,6 @@ RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data) const
 {
     //Zero pad in front and make filter coeff causal
     RowVectorXd dCoeffA = m_dCoeffA.head(m_dCoeffA.cols()/2).reverse();
-
-    std::cout<<"dCoeffA.cols(): "<<dCoeffA.cols()<<std::endl;
-    //dCoeffA(0) = 0;
 
     RowVectorXd t_dataZeroPad = RowVectorXd::Zero(2*dCoeffA.cols() + data.cols());
     t_dataZeroPad.segment(dCoeffA.cols(), data.cols()) = data;
