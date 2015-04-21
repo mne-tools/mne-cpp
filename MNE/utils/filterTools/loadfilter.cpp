@@ -62,7 +62,7 @@ LoadFilter::LoadFilter()
 
 //*************************************************************************************************************
 
-bool LoadFilter::readFilterFile(QString path, RowVectorXd &coefficients, QString &type, QString &name, int &order)
+bool LoadFilter::readFilter(QString path, RowVectorXd &coefficients, QString &type, QString &name, int &order, double &sFreq)
 {
     //Open .txt file
     if(!path.contains(".txt"))
@@ -70,7 +70,7 @@ bool LoadFilter::readFilterFile(QString path, RowVectorXd &coefficients, QString
 
     QFile file(path);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug()<<"Error opening txt file";
+        qDebug()<<"Error opening filter txt file for reading";
         return false;
     }
 
@@ -91,15 +91,20 @@ bool LoadFilter::readFilterFile(QString path, RowVectorXd &coefficients, QString
         if(line.contains("#")) //Filter meta information commented areas in file
         {
             //Read filter order
+            if(line.contains("sFreq") && fields.size()==2)
+                sFreq = fields.at(1).toDouble();
+
+            //Read filter order
             if(line.contains("name"))
-                name = fields.at(1);
+                for(int i=1; i<fields.size(); i++)
+                    name.append(fields.at(i));
 
             //Read the filter order
-            if(line.contains("order"))
+            if(line.contains("order") && fields.size()==2)
                 order = fields.at(1).toInt();
 
             //Read the filter type
-            if(line.contains("type"))
+            if(line.contains("type") && fields.size()==2)
                 type = fields.at(1);
 
         } else // Read filter coefficients
@@ -116,4 +121,39 @@ bool LoadFilter::readFilterFile(QString path, RowVectorXd &coefficients, QString
     file.close();
 
     return true;
+}
+
+
+//*************************************************************************************************************
+
+bool LoadFilter::writeFilter(const QString &path, const RowVectorXd &coefficients, const QString &type, const QString &name, const int &order, const double &sFreq)
+{
+    // Open file dialog
+    if(!path.isEmpty())
+    {
+        QFile file(path);
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)){
+            qDebug()<<"Error opening filter txt file for writing";
+            return false;
+        }
+
+        //Write coefficients to file
+        QTextStream out(&file);
+
+        out << "#sFreq " << sFreq << "\n";
+        out << "#name " << name << "\n";
+        out << "#type " << type << "\n";
+        out << "#order " << order << "\n";
+
+        for(int i = 0 ; i<coefficients.cols() ;i++)
+            out << coefficients(i) << "\n";
+
+        file.close();
+
+        return true;
+    }
+
+    qDebug()<<"Error Filter File path is empty";
+
+    return false;
 }

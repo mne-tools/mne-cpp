@@ -80,14 +80,14 @@ FilterData::FilterData(QString unique_name, FilterType type, int order, double c
 
 //*************************************************************************************************************
 
-FilterData::FilterData(QString &path, double sFreq)
-: m_sFreq(sFreq)
+FilterData::FilterData(QString &path, qint32 fftlength)
+: m_iFFTlength(fftlength)
 {
     //std::cout<<"START FilterData::FilterData()"<<std::endl;
 
     QString type;
 
-    if(LoadFilter::readFilterFile(path, m_dCoeffA, type, m_sName, m_iFilterOrder)) {
+    if(LoadFilter::readFilter(path, m_dCoeffA, type, m_sName, m_iFilterOrder, m_sFreq)) {
         if(type == "HPF")
             m_Type = FilterData::HPF;
 
@@ -156,7 +156,9 @@ void FilterData::designFilter()
                     break;
             }
 
-            m_dCoeffA = filtercos.m_dCoeffA.head(m_iFilterOrder);
+            m_dCoeffA.resize(m_iFilterOrder);
+            m_dCoeffA.head(m_iFilterOrder/2) = filtercos.m_dCoeffA.tail(m_iFilterOrder/2);
+            m_dCoeffA.tail(m_iFilterOrder/2) = filtercos.m_dCoeffA.head(m_iFilterOrder/2);
             m_dFFTCoeffA = filtercos.m_dFFTCoeffA;
 
             break;
@@ -189,7 +191,7 @@ void FilterData::fftTransformCoeffs()
 RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data) const
 {
     //Zero pad in front and make filter coeff causal
-    RowVectorXd dCoeffA = m_dCoeffA.head(m_dCoeffA.cols()/2).reverse();
+    RowVectorXd dCoeffA = m_dCoeffA.head(m_dCoeffA.cols()/2+1).reverse();
 
     RowVectorXd t_dataZeroPad = RowVectorXd::Zero(2*dCoeffA.cols() + data.cols());
     t_dataZeroPad.segment(dCoeffA.cols(), data.cols()) = data;
@@ -201,9 +203,6 @@ RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data) const
             t_filteredTime(i-dCoeffA.cols()) += t_dataZeroPad(i-u) * dCoeffA(u);
         }
     }
-
-    if(m_designMethod == Cosine)
-        return t_filteredTime.segment(dCoeffA.cols(),data.cols());
 
     return t_filteredTime.head(data.cols());
 }

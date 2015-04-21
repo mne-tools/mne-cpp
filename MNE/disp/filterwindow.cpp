@@ -156,6 +156,9 @@ void FilterWindow::initButtons()
 
     connect(ui->m_pushButton_exportFilter,&QPushButton::released,
                 this,&FilterWindow::onBtnExportFilterCoefficients);
+
+    connect(ui->m_pushButton_loadFilter,&QPushButton::released,
+                this,&FilterWindow::onBtnLoadFilter);
 }
 
 
@@ -181,8 +184,8 @@ void FilterWindow::initComboBoxes()
     ui->m_label_highpass->setVisible(false);
     ui->m_doubleSpinBox_highpass->setEnabled(false);
 
-    ui->m_spinBox_filterTaps->setVisible(false);
-    ui->m_label_filterTaps->setVisible(false);
+    ui->m_spinBox_filterTaps->setVisible(true);
+    ui->m_label_filterTaps->setVisible(true);
 
     connect(ui->m_comboBox_filterApplyTo, &QComboBox::currentTextChanged,
             this, &FilterWindow::onSpinBoxFilterChannelType);
@@ -265,8 +268,10 @@ void FilterWindow::changeStateSpinBoxes(int currentIndex)
     //Change visibility of filter tap spin boxes depending on filter design method
     switch(ui->m_comboBox_designMethod->currentIndex()) {
         case 0: //Cosine
-            ui->m_spinBox_filterTaps->setVisible(false);
-            ui->m_label_filterTaps->setVisible(false);
+//            ui->m_spinBox_filterTaps->setVisible(false);
+//            ui->m_label_filterTaps->setVisible(false);
+            ui->m_spinBox_filterTaps->setVisible(true);
+            ui->m_label_filterTaps->setVisible(true);
             break;
 
         case 1: //Tschebyscheff
@@ -320,9 +325,13 @@ void FilterWindow::changeDefaultFilter(int currentIndex)
 {
     Q_UNUSED(currentIndex);
 
-    if(ui->m_comboBox_defaultFilters->currentText() == "NOTCH 60Hz") {
+    if(ui->m_comboBox_defaultFilters->currentText() == "NOTCH 60Hz Fs 1kHz") {
         //Replace old with new filter operator
-        m_filterData = FilterData(QString(""), 1000.0);
+        int fftLength = m_iWindowSize;
+        int exp = ceil(MNEMath::log2(fftLength));
+        fftLength = pow(2, exp+1);
+
+        m_filterData = FilterData(QString("%1/mne_x_plugins/resources/2015_4_21_FilterCoeffs.txt").arg(QCoreApplication::applicationDirPath()), fftLength);
 
         emit filterChanged(m_filterData);
 
@@ -486,26 +495,51 @@ void FilterWindow::onBtnExportFilterPlot()
 
 void FilterWindow::onBtnExportFilterCoefficients()
 {
-    // Open file dialog
     QDate date;
     QString fileName = QFileDialog::getSaveFileName(this,
                                                     "Save filter coefficients",
                                                     QString("%1/%2_%3_%4_FilterCoeffs").arg(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
                                                     tr("Text file(*.txt)"));
 
-    if(!fileName.isEmpty())
-    {
-        QFile file(fileName);
-        if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-            return;
+    QString type;
 
-        //Write coefficients to file
-        QTextStream out(&file);
-        for(int i = 0 ; i<m_filterData.m_dCoeffA.cols() ;i++)
-            out << m_filterData.m_dCoeffA(i) << "\n";
+    if(m_filterData.m_Type == FilterData::HPF)
+        type = "HPF";
 
-        file.close();
+    if(m_filterData.m_Type == FilterData::LPF)
+        type = "LPF";
+
+    if(m_filterData.m_Type == FilterData::BPF)
+        type = "BPF";
+
+    LoadFilter::writeFilter(fileName, m_filterData.m_dCoeffA, type, m_filterData.m_sName, m_filterData.m_iFilterOrder, m_filterData.m_sFreq);
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::onBtnLoadFilter()
+{
+    QString path = QFileDialog::getOpenFileName(this,
+                                                QString("Load filter"),
+                                                QString("./"),
+                                                tr("txt files (*.txt)"));
+
+    if(!path.isEmpty()) {
+        //Replace old with new filter operator
+        int fftLength = m_iWindowSize;
+        int exp = ceil(MNEMath::log2(fftLength));
+        fftLength = pow(2, exp+1);
+
+        m_filterData = FilterData(path, fftLength);
+
+        emit filterChanged(m_filterData);
+
+        //update filter plot
+        updateFilterPlot();
     }
+    else
+        qDebug()<<"Could not load filter.";
 }
 
 
