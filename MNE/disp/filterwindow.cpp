@@ -104,6 +104,8 @@ void FilterWindow::setFiffInfo(const FiffInfo &fiffInfo)
 void FilterWindow::setWindowSize(int iWindowSize)
 {
     m_iWindowSize = iWindowSize;
+
+    ui->m_spinBox_filterTaps->setMaximum(iWindowSize);
 }
 
 
@@ -178,7 +180,7 @@ void FilterWindow::initComboBoxes()
     //Initial selection is a lowpass and Cosine design method
     ui->m_doubleSpinBox_lowpass->setVisible(true);
     ui->m_label_lowpass->setVisible(true);
-    ui->m_label_lowpass->setText("Cut-Off (Hz):");
+    ui->m_label_lowpass->setText("Highpass (Hz):");
 
     ui->m_doubleSpinBox_highpass->setVisible(false);
     ui->m_label_highpass->setVisible(false);
@@ -285,7 +287,7 @@ void FilterWindow::changeStateSpinBoxes(int currentIndex)
         case 0: //Lowpass
             ui->m_doubleSpinBox_lowpass->setVisible(true);
             ui->m_label_lowpass->setVisible(true);
-            ui->m_label_lowpass->setText("Cut-Off (Hz):");
+            ui->m_label_lowpass->setText("Highpass (Hz):");
 
             ui->m_doubleSpinBox_highpass->setVisible(false);
             ui->m_label_highpass->setVisible(false);
@@ -295,7 +297,7 @@ void FilterWindow::changeStateSpinBoxes(int currentIndex)
         case 1: //Highpass
             ui->m_doubleSpinBox_highpass->setVisible(true);
             ui->m_label_highpass->setVisible(true);
-            ui->m_label_highpass->setText("Cut-Off (Hz):");
+            ui->m_label_highpass->setText("Lowpass (Hz):");
 
             ui->m_doubleSpinBox_lowpass->setVisible(false);
             ui->m_label_lowpass->setVisible(false);
@@ -306,12 +308,12 @@ void FilterWindow::changeStateSpinBoxes(int currentIndex)
             ui->m_doubleSpinBox_highpass->setVisible(true);
             ui->m_label_highpass->setVisible(true);
             ui->m_doubleSpinBox_lowpass->setVisible(true);
-            ui->m_label_lowpass->setText("Cut-Off Low (Hz):");
+            ui->m_label_lowpass->setText("Highpass (Hz):");
 
             ui->m_label_lowpass->setVisible(true);
             ui->m_doubleSpinBox_lowpass->setEnabled(true);
             ui->m_doubleSpinBox_highpass->setEnabled(true);
-            ui->m_label_highpass->setText("Cut-Off High (Hz):");
+            ui->m_label_highpass->setText("Lowpass (Hz):");
             break;
     }
 
@@ -511,6 +513,9 @@ void FilterWindow::onBtnExportFilterCoefficients()
 
     if(m_filterData.m_Type == FilterData::BPF)
         type = "BPF";
+
+    if(m_filterData.m_Type == FilterData::NOTCH)
+        type = "NOTCH";
 
     LoadFilter::writeFilter(fileName, m_filterData.m_dCoeffA, type, m_filterData.m_sName, m_filterData.m_iFilterOrder, m_filterData.m_sFreq);
 }

@@ -97,6 +97,9 @@ FilterData::FilterData(QString &path, qint32 fftlength)
         if(type == "LPF")
             m_Type = FilterData::LPF;
 
+        if(type == "NOTCH")
+            m_Type = FilterData::NOTCH;
+
         fftTransformCoeffs();
     }
     else
@@ -191,20 +194,20 @@ void FilterData::fftTransformCoeffs()
 RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data) const
 {
     //Zero pad in front and make filter coeff causal
-    RowVectorXd dCoeffA = m_dCoeffA.head(m_dCoeffA.cols()/2+1).reverse();
+    RowVectorXd dCoeffA = m_dCoeffA;
 
     RowVectorXd t_dataZeroPad = RowVectorXd::Zero(2*dCoeffA.cols() + data.cols());
     t_dataZeroPad.segment(dCoeffA.cols(), data.cols()) = data;
 
-    RowVectorXd t_filteredTime = RowVectorXd::Zero(data.cols()+2*dCoeffA.cols());
+    RowVectorXd t_filteredTime = RowVectorXd::Zero(2*dCoeffA.cols() + data.cols());
 
-    for(int i=dCoeffA.cols(); i<dCoeffA.cols()+data.cols(); i++) {
+    for(int i=dCoeffA.cols(); i<2*dCoeffA.cols() + data.cols(); i++) {
         for(int u=0; u<dCoeffA.cols(); u++) {
             t_filteredTime(i-dCoeffA.cols()) += t_dataZeroPad(i-u) * dCoeffA(u);
         }
     }
 
-    return t_filteredTime.head(data.cols());
+    return t_filteredTime.segment(dCoeffA.cols()/2, data.cols());
 }
 
 

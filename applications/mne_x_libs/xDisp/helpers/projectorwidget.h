@@ -118,6 +118,8 @@ signals:
 private:
     void checkStatusChanged(int state);
 
+    void enableDisableAll(int status);
+
     QList<QCheckBox*>   m_qListCheckBox;    /**< List of CheckBox. */
     FiffInfo::SPtr      m_pFiffInfo;        /**< Connected fiff info. */
 };
