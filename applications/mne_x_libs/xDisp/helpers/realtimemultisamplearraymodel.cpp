@@ -344,6 +344,8 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
         //SSP
         if(doProj)
         {
+            //std::cout<<"Doing SSP projectors"<<std::endl;
+
             //set bad channels to zero
             for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
                 dsData.row(m_vecBadIdcs[j]).setZero();

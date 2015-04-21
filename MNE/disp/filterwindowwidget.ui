@@ -279,7 +279,7 @@
            <item row="4" column="0">
             <widget class="QLabel" name="m_label_highpass">
              <property name="text">
-              <string>Cut-Off High (Hz):</string>
+              <string>Lowpass (Hz):</string>
              </property>
             </widget>
            </item>
@@ -316,7 +316,7 @@
            <item row="3" column="0">
             <widget class="QLabel" name="m_label_lowpass">
              <property name="text">
-              <string>Cut-Off Low (Hz):</string>
+              <string>Highpass (Hz):</string>
              </property>
             </widget>
            </item>
