@@ -84,7 +84,8 @@ SOURCES += \
     minimizersimplex.cpp \
     filterTools/cosinefilter.cpp \
     filterTools/filterdata.cpp \
-    filterTools/parksmcclellan.cpp
+    filterTools/parksmcclellan.cpp \
+    filterTools/loadfilter.cpp
 
 HEADERS += \
     kmeans.h\
@@ -101,7 +102,8 @@ HEADERS += \
     minimizersimplex.h \
     filterTools/cosinefilter.h \
     filterTools/filterdata.h \
-    filterTools/parksmcclellan.h
+    filterTools/parksmcclellan.h \
+    filterTools/loadfilter.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
