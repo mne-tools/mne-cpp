@@ -258,6 +258,13 @@ protected slots:
     * This function exports the filter coefficients to a txt file.
     */
     void onBtnExportFilterCoefficients();
+
+    //=========================================================================================================
+    /**
+    * This function loads a filter from a txt file.
+    */
+    void onBtnLoadFilter();
+
 };
 
 } // NAMESPACE DISPLIB

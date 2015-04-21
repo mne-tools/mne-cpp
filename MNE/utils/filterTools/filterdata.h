@@ -148,10 +148,10 @@ public:
     /**
     * Constructs a FilterData object
     *
-    * @param [in] sFreq sampling frequency
-    * @param [in] filePath path to txt file which contains filter coeffiecients
+    * @param [in] path path to txt file which contains filter coeffiecients
+    * @param [in] fftlength length of the fft (multiple integer of 2^x)
     */
-    FilterData(QString &path, double sFreq);
+    FilterData(QString &path, qint32 fftlength);
 
     /**
      * @brief fftTransformCoeffs transforms the calculated filter coefficients to frequency-domain

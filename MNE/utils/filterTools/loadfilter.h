@@ -121,10 +121,24 @@ public:
     * @param [out] type holds filter type (HPF, LPF, BPF).
     * @param [out] name holds the filter name.
     * @param [out] order holds the filter order.
+    * @param [out] sFreq holds the filters sampling frequency.
     *
     * @return true if reading was successful, false otherwise.
     */
-    static bool readFilterFile(QString path, RowVectorXd &coefficients, QString &type, QString &name, int &order);
+    static bool readFilter(QString path, RowVectorXd &coefficients, QString &type, QString &name, int &order, double &sFreq);
+
+    //=========================================================================================================
+    /**
+    * Writes a given filter to txt file .
+    * @param [in] path holds the file path of the txt file which is to be written to.
+    * @param [in] coefficients holds the filter coefficients.
+    * @param [in] type holds filter type (HPF, LPF, BPF).
+    * @param [in] name holds the filter name.
+    * @param [in] order holds the filter order.
+    *
+    * @return true if reading was successful, false otherwise.
+    */
+    static bool writeFilter(const QString &path, const RowVectorXd &coefficients, const QString &type, const QString &name, const int &order, const double &sFreq);
 
 private:
 
