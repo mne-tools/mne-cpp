@@ -73,9 +73,45 @@ FilterData::FilterData(QString unique_name, FilterType type, int order, double c
 , m_sFreq(sFreq)
 {
     //std::cout<<"START FilterData::FilterData()"<<std::endl;
-    switch(designMethod) {
+    designFilter();
+    //std::cout<<"END FilterData::FilterData()"<<std::endl;
+}
+
+
+//*************************************************************************************************************
+
+FilterData::FilterData(QString &path)
+{
+    //std::cout<<"START FilterData::FilterData()"<<std::endl;
+
+    QString type;
+
+    if(LoadFilter::readFilterFile(path, m_dCoeffA, type, m_sName, m_iFilterOrder)) {
+        if(type == "HPF")
+            m_Type = FilterData::HPF;
+
+        if(type == "BPF")
+            m_Type = FilterData::BPF;
+
+        if(type == "LPF")
+            m_Type = FilterData::LPF;
+
+        fftTransformCoeffs();
+    }
+    else
+        qDebug()<<"Could not read filter file!";
+
+    //std::cout<<"END FilterData::FilterData()"<<std::endl;
+}
+
+
+//*************************************************************************************************************
+
+void FilterData::designFilter()
+{
+    switch(m_designMethod) {
         case Tschebyscheff: {
-            ParksMcClellan filter(order, centerfreq, bandwidth, parkswidth, (ParksMcClellan::TPassType)type);
+            ParksMcClellan filter(m_iFilterOrder, m_dCenterFreq, m_dBandwidth, m_dParksWidth, (ParksMcClellan::TPassType)m_Type);
             m_dCoeffA = filter.FirCoeff;
 
             //fft-transform m_dCoeffA in order to be able to perform frequency-domain filtering
@@ -87,48 +123,46 @@ FilterData::FilterData(QString unique_name, FilterType type, int order, double c
         case Cosine: {
             CosineFilter filtercos;
 
-            switch(type) {
+            switch(m_Type) {
                 case LPF:
-                    filtercos = CosineFilter (fftlength,
-                                            (centerfreq)*(sFreq/2),
-                                            parkswidth*(sFreq/2),
-                                            (centerfreq)*(sFreq/2),
-                                            parkswidth*(sFreq/2),
-                                            sFreq,
-                                            (CosineFilter::TPassType)type);
+                    filtercos = CosineFilter (m_iFFTlength,
+                                            (m_dCenterFreq)*(m_sFreq/2),
+                                            m_dParksWidth*(m_sFreq/2),
+                                            (m_dCenterFreq)*(m_sFreq/2),
+                                            m_dParksWidth*(m_sFreq/2),
+                                            m_sFreq,
+                                            (CosineFilter::TPassType)m_Type);
                     break;
 
                 case HPF:
-                    filtercos = CosineFilter (fftlength,
-                                            (centerfreq)*(sFreq/2),
-                                            parkswidth*(sFreq/2),
-                                            (centerfreq)*(sFreq/2),
-                                            parkswidth*(sFreq/2),
-                                            sFreq,
-                                            (CosineFilter::TPassType)type);
+                    filtercos = CosineFilter (m_iFFTlength,
+                                            (m_dCenterFreq)*(m_sFreq/2),
+                                            m_dParksWidth*(m_sFreq/2),
+                                            (m_dCenterFreq)*(m_sFreq/2),
+                                            m_dParksWidth*(m_sFreq/2),
+                                            m_sFreq,
+                                            (CosineFilter::TPassType)m_Type);
                     break;
 
                 case BPF:
-                    filtercos = CosineFilter (fftlength,
-                                            (centerfreq + bandwidth/2)*(sFreq/2),
-                                            parkswidth*(sFreq/2),
-                                            (centerfreq - bandwidth/2)*(sFreq/2),
-                                            parkswidth*(sFreq/2),
-                                            sFreq,
-                                            (CosineFilter::TPassType)type);
+                    filtercos = CosineFilter (m_iFFTlength,
+                                            (m_dCenterFreq + m_dBandwidth/2)*(m_sFreq/2),
+                                            m_dParksWidth*(m_sFreq/2),
+                                            (m_dCenterFreq - m_dBandwidth/2)*(m_sFreq/2),
+                                            m_dParksWidth*(m_sFreq/2),
+                                            m_sFreq,
+                                            (CosineFilter::TPassType)m_Type);
                     break;
             }
 
-            m_dCoeffA = filtercos.m_dCoeffA.head(order);
+            m_dCoeffA = filtercos.m_dCoeffA.head(m_iFilterOrder);
             m_dFFTCoeffA = filtercos.m_dFFTCoeffA;
 
             break;
         }
     }
 
-    //std::cout<<"END FilterData::FilterData()"<<std::endl;
 }
-
 
 //*************************************************************************************************************
 
@@ -154,20 +188,26 @@ void FilterData::fftTransformCoeffs()
 RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data) const
 {
     //Zero pad in front and make filter coeff causal
-    RowVectorXd dCoeffA = m_dCoeffA.head(m_dCoeffA.cols()/2);
+    RowVectorXd dCoeffA = m_dCoeffA.head(m_dCoeffA.cols()/2).reverse();
 
-    RowVectorXd t_dataZeroPad = RowVectorXd::Zero(dCoeffA.cols() + data.cols() + dCoeffA.cols());
+    std::cout<<"dCoeffA.cols(): "<<dCoeffA.cols()<<std::endl;
+    //dCoeffA(0) = 0;
+
+    RowVectorXd t_dataZeroPad = RowVectorXd::Zero(2*dCoeffA.cols() + data.cols());
     t_dataZeroPad.segment(dCoeffA.cols(), data.cols()) = data;
 
-    RowVectorXd t_filteredTime = RowVectorXd::Zero(data.cols()+dCoeffA.cols());
+    RowVectorXd t_filteredTime = RowVectorXd::Zero(data.cols()+2*dCoeffA.cols());
 
-    for(int i=dCoeffA.cols(); i<dCoeffA.cols()+data.cols()+dCoeffA.cols(); i++) {
+    for(int i=dCoeffA.cols(); i<dCoeffA.cols()+data.cols(); i++) {
         for(int u=0; u<dCoeffA.cols(); u++) {
-            t_filteredTime(i-dCoeffA.cols()) += t_dataZeroPad(i-u) * m_dCoeffA(u);
+            t_filteredTime(i-dCoeffA.cols()) += t_dataZeroPad(i-u) * dCoeffA(u);
         }
     }
 
-    return t_filteredTime.segment(dCoeffA.cols(),data.cols());
+    if(m_designMethod == Cosine)
+        return t_filteredTime.segment(dCoeffA.cols(),data.cols());
+
+    return t_filteredTime.head(data.cols());
 }
 
 
@@ -191,6 +231,7 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
 
     switch(compensateEdgeEffects) {
         case MirrorData:
+            //Fill front and back with available data as much as possible
             for(int i=0; i<dataInFFTLength; i++)
                 if(dataInFFTLengthRest!=0 && i==dataInFFTLength-1)
                     if(i%2==0)
@@ -203,6 +244,9 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
                     else
                         t_dataZeroPad.segment(i*data.cols(),data.cols()) = data;
 
+            t_dataZeroPad.segment(startData, data.cols()) = data; //actual data
+
+//            startData = data.cols();
 //            t_dataZeroPad.head(data.cols()) = data.reverse(); //front
 //            t_dataZeroPad.segment(data.cols(), data.cols()) = data; //middle
 //            t_dataZeroPad.segment(2*data.cols(), data.cols()) = data.reverse(); //back

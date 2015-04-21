@@ -607,7 +607,7 @@ void RealTimeMultiSampleArrayModel::createFilterChannelList(QString channelType)
 
 void doFilterPerChannel(QPair<FilterData,QPair<int,RowVectorXd> > &channelDataTime)
 {
-    //channelDataTime.second.second = channelDataTime.first.applyFFTFilter(channelDataTime.second.second, false, FilterData::ZeroPad);
+    //channelDataTime.second.second = channelDataTime.first.applyFFTFilter(channelDataTime.second.second, false, FilterData::MirrorData);
     channelDataTime.second.second = channelDataTime.first.applyConvFilter(channelDataTime.second.second);
 }
 

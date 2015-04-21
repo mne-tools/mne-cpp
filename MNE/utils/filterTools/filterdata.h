@@ -58,9 +58,20 @@
 
 #include "../utils_global.h"
 #include "parksmcclellan.h"
+#include "loadfilter.h"
 #include "cosinefilter.h"
 #include "../mnemath.h"
 #include "iostream"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QFile>
+#include <QTextStream>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -118,6 +129,8 @@ public:
        NoEdgeEffectCompensation
     };
 
+    FilterData();
+
     /**
     * Constructs a FilterData object
     * @param [in] unique_name defines the name of the generated filter
@@ -132,7 +145,11 @@ public:
     */
     FilterData(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, double sFreq, qint32 fftlength=4096, DesignMethod designMethod = Cosine);
 
-    FilterData();
+    /**
+    * Constructs a FilterData object
+    * @param [in] filePath path to txt file which contains filter coeffiecients
+    */
+    FilterData(QString &path);
 
     /**
      * @brief fftTransformCoeffs transforms the calculated filter coefficients to frequency-domain
@@ -140,7 +157,12 @@ public:
     void fftTransformCoeffs();
 
     /**
-    * Applies the current filter to the input data using convolution in time domain
+     * @brief designFilter designs the actual filter with the given parameters
+     */
+    void designFilter();
+
+    /**
+    * Applies the current filter to the input data using convolution in time domain. Pro: Uses only past samples (real-time capable) Con: Might not be as ideal as acausal version (steepness etc.)
     *
     * @param [in] data holds the data to be filtered
     *
@@ -149,7 +171,7 @@ public:
     RowVectorXd applyConvFilter(const RowVectorXd& data) const;
 
     /**
-    * Applies the current filter to the input data using multiplication in frequency domain
+    * Applies the current filter to the input data using multiplication in frequency domain. Pro: Fast, good filter parameters Con: Smears in error from future samples. Uses future samples (nor real time capable)
     *
     * @param [in] data holds the data to be filtered
     * @param [in] keepOverhead whether the result should still include the overhead information in front and back of the data
