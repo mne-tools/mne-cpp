@@ -223,6 +223,14 @@ protected slots:
 
     //=========================================================================================================
     /**
+    * This function gets called whenever default filter combo box is altered by the user via the gui.
+    *
+    * @param currentIndex holds the current index of the combo box
+    */
+    void changeDefaultFilter(int currentIndex);
+
+    //=========================================================================================================
+    /**
     * This function gets called whenever the filter parameters are altered by the user via the gui.
     */
     void filterParametersChanged();

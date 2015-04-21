@@ -169,6 +169,9 @@ void FilterWindow::initComboBoxes()
     connect(ui->m_comboBox_filterType,static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
                 this,&FilterWindow::changeStateSpinBoxes);
 
+    connect(ui->m_comboBox_defaultFilters,static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+                this,&FilterWindow::changeDefaultFilter);
+
     //Initial selection is a lowpass and Cosine design method
     ui->m_doubleSpinBox_lowpass->setVisible(true);
     ui->m_label_lowpass->setVisible(true);
@@ -308,6 +311,24 @@ void FilterWindow::changeStateSpinBoxes(int currentIndex)
     }
 
     filterParametersChanged();
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::changeDefaultFilter(int currentIndex)
+{
+    Q_UNUSED(currentIndex);
+
+    if(ui->m_comboBox_defaultFilters->currentText() == "NOTCH 60Hz") {
+        //Replace old with new filter operator
+        m_filterData = FilterData(QString(""), 1000.0);
+
+        emit filterChanged(m_filterData);
+
+        //update filter plot
+        updateFilterPlot();
+    }
 }
 
 
