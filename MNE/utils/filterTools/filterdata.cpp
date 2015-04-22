@@ -271,13 +271,7 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
 
     //Return filtered data
     if(!keepOverhead)
-        switch(m_designMethod) {
-            case Cosine:
-                return t_filteredTime.segment(m_dCoeffA.cols(), data.cols());
-
-            case Tschebyscheff:
-                return t_filteredTime.segment(m_dCoeffA.cols(), data.cols());
-        }
+        return t_filteredTime.segment(m_dCoeffA.cols(), data.cols());
 
     return t_filteredTime;
 }
