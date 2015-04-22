@@ -200,9 +200,16 @@ RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data) const
     RowVectorXd t_dataZeroPad = RowVectorXd::Zero(2*dCoeffA.cols() + data.cols());
     t_dataZeroPad.segment(dCoeffA.cols(), data.cols()) = data;
 
+    //Mirror data to the end
+    int mirrorLength = dCoeffA.cols();
+    if(dCoeffA.cols() > data.cols())
+        mirrorLength = data.cols();
+
+    t_dataZeroPad.segment(dCoeffA.cols()+data.cols(), mirrorLength) = data.tail(mirrorLength).reverse();
+
     RowVectorXd t_filteredTime = RowVectorXd::Zero(2*dCoeffA.cols() + data.cols());
 
-    for(int i=dCoeffA.cols(); i<2*dCoeffA.cols() + data.cols(); i++)
+    for(int i=dCoeffA.cols(); i<t_filteredTime.cols(); i++)
         t_filteredTime(i-dCoeffA.cols()) = t_dataZeroPad.segment(i-dCoeffA.cols(),dCoeffA.cols()) * dCoeffA.transpose();
 
     return t_filteredTime.segment(dCoeffA.cols()/2, data.cols());
