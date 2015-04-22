@@ -70,7 +70,7 @@ FilterWindow::FilterWindow(QWidget *parent)
     initFilterPlot();
 
     m_iWindowSize = 4016;
-    m_iFilterTaps = 80;
+    m_iFilterTaps = 128;
 }
 
 
