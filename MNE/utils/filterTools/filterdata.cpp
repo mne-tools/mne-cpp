@@ -170,6 +170,7 @@ void FilterData::designFilter()
 
 }
 
+
 //*************************************************************************************************************
 
 void FilterData::fftTransformCoeffs()
@@ -201,11 +202,8 @@ RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data) const
 
     RowVectorXd t_filteredTime = RowVectorXd::Zero(2*dCoeffA.cols() + data.cols());
 
-    for(int i=dCoeffA.cols(); i<2*dCoeffA.cols() + data.cols(); i++) {
-        for(int u=0; u<dCoeffA.cols(); u++) {
-            t_filteredTime(i-dCoeffA.cols()) += t_dataZeroPad(i-u) * dCoeffA(u);
-        }
-    }
+    for(int i=dCoeffA.cols(); i<2*dCoeffA.cols() + data.cols(); i++)
+        t_filteredTime(i-dCoeffA.cols()) = t_dataZeroPad.segment(i-dCoeffA.cols(),dCoeffA.cols()) * dCoeffA.transpose();
 
     return t_filteredTime.segment(dCoeffA.cols()/2, data.cols());
 }
