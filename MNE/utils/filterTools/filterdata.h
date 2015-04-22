@@ -167,10 +167,11 @@ public:
     * Applies the current filter to the input data using convolution in time domain. Pro: Uses only past samples (real-time capable) Con: Might not be as ideal as acausal version (steepness etc.)
     *
     * @param [in] data holds the data to be filtered
+    * @param [in] keepOverhead whether the result should still include the overhead information in front and back of the data
     *
     * @return the filtered data in form of a RoVecotrXd
     */
-    RowVectorXd applyConvFilter(const RowVectorXd& data) const;
+    RowVectorXd applyConvFilter(const RowVectorXd& data, bool keepOverhead = false, CompensateEdgeEffects compensateEdgeEffects = MirrorData) const;
 
     /**
     * Applies the current filter to the input data using multiplication in frequency domain. Pro: Fast, good filter parameters Con: Smears in error from future samples. Uses future samples (nor real time capable)
@@ -181,7 +182,7 @@ public:
     *
     * @return the filtered data in form of a RoVecotrXd
     */
-    RowVectorXd applyFFTFilter(const RowVectorXd& data, bool keepOverhead = true, CompensateEdgeEffects compensateEdgeEffects = ZeroPad) const;
+    RowVectorXd applyFFTFilter(const RowVectorXd& data, bool keepOverhead = false, CompensateEdgeEffects compensateEdgeEffects = MirrorData) const;
 
     double          m_sFreq;            /**< the sampling frequency. */
     int             m_iFilterOrder;     /**< represents the order of the filter instance. */

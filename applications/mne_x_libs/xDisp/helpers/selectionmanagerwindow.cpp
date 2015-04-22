@@ -262,7 +262,7 @@ void SelectionManagerWindow::initComboBoxes()
                 this, &SelectionManagerWindow::loadLayout);
 
     //Initialise layout as neuromag vectorview with all channels
-    loadLayout("Vectorview-grad.lout");
+    loadLayout("babymeg-mag-inner-layer.lout");
 }
 
 
