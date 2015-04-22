@@ -72,9 +72,7 @@ FilterData::FilterData(QString unique_name, FilterType type, int order, double c
 , m_dBandwidth(bandwidth)
 , m_sFreq(sFreq)
 {
-    //std::cout<<"START FilterData::FilterData()"<<std::endl;
     designFilter();
-    //std::cout<<"END FilterData::FilterData()"<<std::endl;
 }
 
 
@@ -159,10 +157,13 @@ void FilterData::designFilter()
                     break;
             }
 
+            //This filter is designed in the frequency domain, hence the time domain impulse response need to be shortend by the users dependent number of taps
             m_dCoeffA.resize(m_iFilterOrder);
             m_dCoeffA.head(m_iFilterOrder/2) = filtercos.m_dCoeffA.tail(m_iFilterOrder/2);
             m_dCoeffA.tail(m_iFilterOrder/2) = filtercos.m_dCoeffA.head(m_iFilterOrder/2);
-            m_dFFTCoeffA = filtercos.m_dFFTCoeffA;
+
+            //Now generate the fft version of the shortened impulse response
+            fftTransformCoeffs();
 
             break;
         }
@@ -175,7 +176,6 @@ void FilterData::designFilter()
 
 void FilterData::fftTransformCoeffs()
 {
-    //This function only nneds to be called when using the Tschebyscheff design method
     //zero-pad m_dCoeffA to m_iFFTlength
     RowVectorXd t_coeffAzeroPad = RowVectorXd::Zero(m_iFFTlength);
     t_coeffAzeroPad.head(m_dCoeffA.cols()) = m_dCoeffA;
@@ -192,27 +192,36 @@ void FilterData::fftTransformCoeffs()
 
 //*************************************************************************************************************
 
-RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data) const
+RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data, bool keepOverhead, CompensateEdgeEffects compensateEdgeEffects) const
 {
-    //Zero pad in front and make filter coeff causal
-    RowVectorXd dCoeffA = m_dCoeffA;
+    if(data.cols()<m_dCoeffA.cols() && compensateEdgeEffects==MirrorData)
+        return data;
 
-    RowVectorXd t_dataZeroPad = RowVectorXd::Zero(2*dCoeffA.cols() + data.cols());
-    t_dataZeroPad.segment(dCoeffA.cols(), data.cols()) = data;
+    //Do zero padding or mirroring depending on user input
+    RowVectorXd t_dataZeroPad = RowVectorXd::Zero(2*m_dCoeffA.cols() + data.cols());
+    switch(compensateEdgeEffects) {
+        case MirrorData:
+            t_dataZeroPad.head(m_dCoeffA.cols()) = data.head(m_dCoeffA.cols()).reverse();   //front
+            t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;                    //middle
+            t_dataZeroPad.tail(m_dCoeffA.cols()) = data.tail(m_dCoeffA.cols()).reverse();   //back
+            break;
 
-    //Mirror data to the end
-    int mirrorLength = dCoeffA.cols();
-    if(dCoeffA.cols() > data.cols())
-        mirrorLength = data.cols();
+        case ZeroPad:
+            t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;
+            break;
+    }
 
-    t_dataZeroPad.segment(dCoeffA.cols()+data.cols(), mirrorLength) = data.tail(mirrorLength).reverse();
+    //Do the convolution
+    RowVectorXd t_filteredTime = RowVectorXd::Zero(2*m_dCoeffA.cols() + data.cols());
 
-    RowVectorXd t_filteredTime = RowVectorXd::Zero(2*dCoeffA.cols() + data.cols());
+    for(int i=m_dCoeffA.cols(); i<t_filteredTime.cols(); i++)
+        t_filteredTime(i-m_dCoeffA.cols()) = t_dataZeroPad.segment(i-m_dCoeffA.cols(),m_dCoeffA.cols()) * m_dCoeffA.transpose();
 
-    for(int i=dCoeffA.cols(); i<t_filteredTime.cols(); i++)
-        t_filteredTime(i-dCoeffA.cols()) = t_dataZeroPad.segment(i-dCoeffA.cols(),dCoeffA.cols()) * dCoeffA.transpose();
+    //Return filtered data
+    if(!keepOverhead)
+        return t_filteredTime.segment(m_dCoeffA.cols()/2, data.cols());
 
-    return t_filteredTime.segment(dCoeffA.cols()/2, data.cols());
+    return t_filteredTime;
 }
 
 
@@ -220,45 +229,28 @@ RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data) const
 
 RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhead, CompensateEdgeEffects compensateEdgeEffects) const
 {
-    //Zero pad or mirror in front and back of the data
+    if(data.cols()<m_dCoeffA.cols() && compensateEdgeEffects==MirrorData) {
+        qDebug()<<"Error in FilterData: Number of filter taps bigger then data size. Not enough data to perform mirroring!";
+        return data;
+    }
+
+    if(2*m_dCoeffA.cols() + data.cols()>m_iFFTlength) {
+        qDebug()<<"Error in FilterData: Number of mirroring size plus data size is bigger then fft length!";
+        return data;
+    }
+
+    //Do zero padding or mirroring depending on user input
     RowVectorXd t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
-
-//    std::cout<<"data.cols()"<<data.cols()<<std::endl;
-//    std::cout<<"m_iFFTlength"<<m_iFFTlength<<std::endl;
-
-    //Calculate starting and end point of data block
-    int startData = m_iFFTlength/2-data.cols()/2;
-    int dataInFFTLength = m_iFFTlength/data.cols();
-    int dataInFFTLengthRest = m_iFFTlength%data.cols();
-
-    if(dataInFFTLengthRest!=0)
-        dataInFFTLength++;
 
     switch(compensateEdgeEffects) {
         case MirrorData:
-            //Fill front and back with available data as much as possible
-            for(int i=0; i<dataInFFTLength; i++)
-                if(dataInFFTLengthRest!=0 && i==dataInFFTLength-1)
-                    if(i%2==0)
-                        t_dataZeroPad.segment(i*data.cols(),dataInFFTLengthRest) = data.head(dataInFFTLengthRest).reverse();
-                    else
-                        t_dataZeroPad.segment(i*data.cols(),dataInFFTLengthRest) = data.head(dataInFFTLengthRest);
-                else
-                    if(i%2==0)
-                        t_dataZeroPad.segment(i*data.cols(),data.cols()) = data.reverse();
-                    else
-                        t_dataZeroPad.segment(i*data.cols(),data.cols()) = data;
-
-            t_dataZeroPad.segment(startData, data.cols()) = data; //actual data
-
-//            startData = data.cols();
-//            t_dataZeroPad.head(data.cols()) = data.reverse(); //front
-//            t_dataZeroPad.segment(data.cols(), data.cols()) = data; //middle
-//            t_dataZeroPad.segment(2*data.cols(), data.cols()) = data.reverse(); //back
+            t_dataZeroPad.head(m_dCoeffA.cols()/2) = data.head(m_dCoeffA.cols()/2).reverse();   //front
+            t_dataZeroPad.segment(m_dCoeffA.cols()/2, data.cols()) = data;                      //middle
+            t_dataZeroPad.tail(m_dCoeffA.cols()/2) = data.tail(m_dCoeffA.cols()/2).reverse();   //back
             break;
 
         case ZeroPad:
-            t_dataZeroPad.segment(m_iFilterOrder/2, data.cols()) = data;
+            t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;
             break;
     }
 
@@ -277,30 +269,15 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
     RowVectorXd t_filteredTime;
     fft.inv(t_filteredTime,t_filteredFreq);
 
-    //Return filtered data still with zeros at front and end depending on keepZeros flag
-    if(!keepOverhead) {
-        switch(compensateEdgeEffects) {
-            case MirrorData:
-                switch(m_designMethod) {
-                    case Cosine:
-                        return t_filteredTime.segment(startData, data.cols());
+    //Return filtered data
+    if(!keepOverhead)
+        switch(m_designMethod) {
+            case Cosine:
+                return t_filteredTime.segment(m_dCoeffA.cols(), data.cols());
 
-                    case Tschebyscheff:
-                        return t_filteredTime.segment(startData+m_iFilterOrder/2, data.cols());
-                }
-                break;
-
-            case ZeroPad:
-                switch(m_designMethod) {
-                    case Cosine:
-                        return t_filteredTime.segment(0, data.cols());
-
-                    case Tschebyscheff:
-                        return t_filteredTime.segment(m_iFilterOrder/2, data.cols());
-                }
-                break;
+            case Tschebyscheff:
+                return t_filteredTime.segment(m_dCoeffA.cols(), data.cols());
         }
-    }
 
     return t_filteredTime;
 }
