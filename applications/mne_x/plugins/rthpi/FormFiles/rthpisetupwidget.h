@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
 * @file     rthpisetupwidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @author   Chiran Doshi <chiran.doshi@childrens.harvard.edu>
+*           Limin Sun <liminsun@nmr.mgh.harvard.edu>
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     March, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Chiran Doshi, Limin Sun and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -44,6 +45,13 @@
 
 #include "../ui_rthpisetup.h"
 
+//*************************************************************************************************************
+//=============================================================================================================
+// FIFF INCLUDES
+//=============================================================================================================
+
+#include <fiff/fiff_info.h>
+#include <fiff/fiff.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -75,6 +83,8 @@ namespace RtHpiPlugin
 
 class RtHpi;
 
+using namespace FIFFLIB;
+
 
 //=============================================================================================================
 /**
@@ -104,6 +114,11 @@ public:
     */
     ~RtHpiSetupWidget();
 
+//    void ReadPolhemusDig(QString fileName);
+
+//    bool read_hpi_info(FiffStream *t_pStream, const FiffDirTree& p_Node, FiffInfo& info);
+signals:
+
 
 private slots:
     //=========================================================================================================
@@ -112,6 +127,12 @@ private slots:
     *
     */
     void showAboutDialog();
+//    //=========================================================================================================
+//    /**
+//    * Load a Polhemus file
+//    *
+//    */
+//    void bnLoadPolhemusFile();
 
 private:
 
