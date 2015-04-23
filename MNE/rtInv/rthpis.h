@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     rthpi.h
+* @file     rthpis.h
 * @author   Chiran Doshi <chiran.doshi@childrens.harvard.edu>;
 *           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     June, 2014
+* @date     March, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Chiran Doshi, Limin Sun and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Chiran Doshi, Limin Sun, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,32 +30,35 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RTHPI class.
+* @brief     RtHPIS class declaration.
 *
 */
 
-#ifndef RTHPI_H
-#define RTHPI_H
-
+#ifndef RTHPIS_H
+#define RTHPIS_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "rthpi_global.h"
-
-#include <mne_x/Interfaces/IAlgorithm.h>
-#include <generics/circularmatrixbuffer.h>
-#include <xMeas/newrealtimemultisamplearray.h>
-#include <rtInv/rthpis.h>
+#include "rtinv_global.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FIFF INCLUDES
 //=============================================================================================================
 
+#include <fiff/fiff_cov.h>
 #include <fiff/fiff_info.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Generics INCLUDES
+//=============================================================================================================
+
+#include <generics/circularmatrixbuffer.h>
 
 
 //*************************************************************************************************************
@@ -63,15 +66,25 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QThread>
+#include <QMutex>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RtHpiPlugin
+// Eigen INCLUDES
 //=============================================================================================================
 
-namespace RtHpiPlugin
+#include <Eigen/Core>
+#include <unsupported/Eigen/FFT>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE INVRTLIB
+//=============================================================================================================
+
+namespace RTINVLIB
 {
 
 
@@ -80,10 +93,9 @@ namespace RtHpiPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEX;
-using namespace XMEASLIB;
+using namespace Eigen;
 using namespace IOBuffer;
-using namespace RTINVLIB;
+using namespace FIFFLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -107,98 +119,151 @@ struct sens {
 };
 
 
-
 //=============================================================================================================
 /**
-* DECLARE CLASS RTHPI
+* Real-time Head Coil Positions estimation
 *
-* @brief The RtHpi class provides a RtHpi algorithm structure.
+* @brief Real-time HPI estimation
 */
-//class DUMMYTOOLBOXSHARED_EXPORT DummyToolbox : public IAlgorithm
-class RTHPISHARED_EXPORT RtHpi : public IAlgorithm
+class RTINVSHARED_EXPORT RtHPIS : public QThread
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "rthpi.json") //NEW Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::IAlgorithm)
-
 public:
-    //=========================================================================================================
-    /**
-    * Constructs a RtHpi.
-    */
-    RtHpi();
+    typedef QSharedPointer<RtHPIS> SPtr;             /**< Shared pointer type for RtHPIS. */
+    typedef QSharedPointer<const RtHPIS> ConstSPtr;  /**< Const shared pointer type for RtHPIS. */
 
     //=========================================================================================================
     /**
-    * Destroys the RtHpi.
+    * Creates the real-time HPIS estimation object.
+    *
+    * @param[in] p_iMaxSamples      Number of samples to use for each data chunk
+    * @param[in] p_pFiffInfo        Associated Fiff Information
+    * @param[in] parent     Parent QObject (optional)
     */
-    ~RtHpi();
+    explicit RtHPIS(FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
+    * Destroys the Real-time HPI estimation object.
     */
-    virtual void init();
+    ~RtHPIS();
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    * Slot to receive incoming data.
+    *
+    * @param[in] p_DataSegment  Data to estimate the spectrum from -> ToDo Replace this by shared data pointer
     */
-    virtual void unload();
+    void append(const MatrixXd &p_DataSegment);
 
     //=========================================================================================================
     /**
-    * Clone the plugin
+    * Returns true if is running, otherwise false.
+    *
+    * @return true if is running, false otherwise
     */
-    virtual QSharedPointer<IPlugin> clone() const;
+    inline bool isRunning();
 
+
+    //=========================================================================================================
+    /**
+    * Starts the RtHPIS by starting the producer's thread.
+    *
+    * @return true if succeeded, false otherwise
+    */
     virtual bool start();
+
+    //=========================================================================================================
+    /**
+    * Stops the RtHPIS by stopping the producer's thread.
+    *
+    * @return true if succeeded, false otherwise
+    */
     virtual bool stop();
 
-    virtual IPlugin::PluginType getType() const;
-    virtual QString getName() const;
+    dipError dipfitError (Eigen::MatrixXd, Eigen::MatrixXd, struct sens);
+    Eigen::MatrixXd ft_compute_leadfield(Eigen::MatrixXd, struct sens);
+    Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd, Eigen::MatrixXd, Eigen::MatrixXd);
+    coilParam dipfit(struct coilParam, struct sens, Eigen::MatrixXd, int numCoils);
+    Eigen::MatrixXd fminsearch(Eigen::MatrixXd,int, int, int, Eigen::MatrixXd, struct sens);
+    static bool compar (int, int);
+    Eigen::MatrixXd pinv(Eigen::MatrixXd);
+    Eigen::Matrix4d computeTransformation(Eigen::MatrixXd, Eigen::MatrixXd);
 
-    virtual QWidget* setupWidget();
-
-    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
-
-
+    void test();
 
 signals:
     //=========================================================================================================
     /**
-    * Emitted when fiffInfo is available
+    * Signal which is emitted when a new data Matrix is estimated.
+    *
+    * @param[out]
     */
-    void fiffInfoAvailable();
+    void HPICalculated(Eigen::MatrixXd);
 
 protected:
+    //=========================================================================================================
+    /**
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
+    */
     virtual void run();
 
 private:
-    //=========================================================================================================
-    /**
-    * Initialises the output connector.
-    */
-    void initConnector();
+    QMutex      mutex;                  /**< Provides access serialization between threads*/
 
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pRTMSAInput;      /**< The NewRealTimeMultiSampleArray of the RtHpi input.*/
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAOutput;    /**< The NewRealTimeMultiSampleArray of the RtHpi output.*/
+    quint32      m_iMaxSamples;         /**< Maximal amount of samples received, before covariance is estimated.*/
+
+    quint32      m_iNewMaxSamples;      /**< New maximal amount of samples received, before covariance is estimated.*/
+
+    FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
+
+    bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
+
+    CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
+
+//    QVector <float> m_fWin;
+
+//    double m_Fs;
+
+//    qint32 m_iFFTlength;
+//    qint32 m_dataLength;
+
+    static std::vector <double>base_arr;
 
 
-    FiffInfo::SPtr  m_pFiffInfo;                            /**< Fiff measurement info.*/
+//protected:
+//    int NumOfBlocks;
+//    int BlockSize  ;
+//    int Sensors    ;
+//    int BlockIndex ;
 
-    CircularMatrixBuffer<double>::SPtr   m_pRtHpiBuffer;    /**< Holds incoming data.*/
+//    MatrixXd CircBuf;
 
-    bool m_bIsRunning;      /**< If source lab is running */
-    bool m_bProcessData;    /**< If data should be received for processing */
-    QMutex m_qMutex;       /**< mutex for hpi */
+public:
+    MatrixXd SpecData;
+    QMutex ReadMutex;
 
-    RtHPIS::SPtr m_pRtHPIS;                       /**< Real-time HPI Estimation. */
-
+    bool SendDataToBuffer;
 
 };
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool RtHPIS::isRunning()
+{
+    return m_bIsRunning;
+}
+
 } // NAMESPACE
 
-#endif // RTHPI_H
+#ifndef metatype_matrix
+#define metatype_matrix
+Q_DECLARE_METATYPE(Eigen::MatrixXd); /**< Provides QT META type declaration of the MatrixXd type. For signal/slot usage.*/
+#endif
+
+#endif // RtHPIS_H
