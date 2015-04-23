@@ -46,6 +46,9 @@
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_info.h>
 
+#include <utils/filterTools/filterdata.h>
+#include <utils/mnemath.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -53,6 +56,9 @@
 //=============================================================================================================
 
 #include <QAbstractTableModel>
+
+#include <QtConcurrent/QtConcurrent>
+#include <QFuture>
 
 
 //*************************************************************************************************************
@@ -81,6 +87,7 @@ namespace XDISPLIB
 using namespace XMEASLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
+using namespace UTILSLIB;
 
 
 //=============================================================================================================
@@ -285,6 +292,30 @@ public:
     */
     void updateProjection();
 
+    //=========================================================================================================
+    /**
+    * Activate filter functionality
+    *
+    * @param[in] activate    flag used to turn on or off filters
+    */
+    void activateFilter(bool activate);
+
+    //=========================================================================================================
+    /**
+    * Apply filters to channels
+    *
+    * @param[in] activate    flag used to turn on or off filters
+    */
+    void applyFilter(QString channelType);
+
+    //=========================================================================================================
+    /**
+    * Filter parameters changed
+    *
+    * @param[in] filterData    pointer to the current filter
+    */
+    void filterChanged(FilterData &filterData);
+
 signals:
     //=========================================================================================================
     /**
@@ -295,6 +326,48 @@ signals:
     void newSelection(QList<qint32> selection);
 
 private:
+    //=========================================================================================================
+    /**
+    * Inits this model
+    */
+    void init();
+
+    //=========================================================================================================
+    /**
+    * Creates the default filter with the current fiff info
+    */
+    void createDefaultFilter();
+
+    //=========================================================================================================
+    /**
+    * Undo filters from channels
+    *
+    * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
+    */
+    void createFilterChannelList(QString channelType);
+
+    //=========================================================================================================
+    /**
+    * Calculates the filtered version of the channels in dataTime
+    */
+    void filterChannelsConcurrently(bool filterLastDataTime = false);
+
+    //=========================================================================================================
+    /**
+    * Returns the current data in matrix form
+    *
+    * @return the current data as a matrix
+    */
+    inline const MatrixXd dataToMatrix(QVector<VectorXd> &vector) const;
+
+    //=========================================================================================================
+    /**
+    * Returns the last data in matrix form
+    *
+    * @return the last data as a matrix
+    */
+    inline const MatrixXd dataLastToMatrix() const;
+
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list. ToDo: Obsolete*/
     FiffInfo::SPtr  m_pFiffInfo;                    /**< Fiff info */
     RowVectorXi     m_vecBadIdcs;                   /**< Idcs of bad channels */
@@ -304,20 +377,31 @@ private:
 
     QMap<qint32,qint32> m_qMapIdxRowSelection;      /**< Selection mapping.*/
 
+    QStringList         m_filterChannelList;        /**< List of channels which are to be filtered.*/
+
     //Fiff data structure
-    QVector<VectorXd> m_dataCurrent;        /**< List that holds the current data*/
-    QVector<VectorXd> m_dataLast;           /**< List that holds the last data */
+    QVector<VectorXd> m_dataCurrent;                /**< List that holds the current data*/
+    QVector<VectorXd> m_dataFilteredCurrent;        /**< List that holds the current filtered data */
 
-    QVector<VectorXd> m_dataCurrentFreeze;  /**< List that holds the current data when freezed*/
-    QVector<VectorXd> m_dataLastFreeze;     /**< List that holds the last data when freezed*/
+    QVector<VectorXd> m_dataLast;                   /**< List that holds the last data */
+    QVector<VectorXd> m_dataFilteredLast;           /**< List that holds the last filtered data */
 
-    float m_fSps;               /**< Sampling rate */
-    qint32 m_iT;                /**< Time window */
-    qint32 m_iDownsampling;     /**< Down sampling factor */
-    qint32 m_iMaxSamples;       /**< Max samples per window */
-    qint32 m_iCurrentSample;    /**< Accurate Downsampling */
+    QVector<VectorXd> m_dataCurrentFreeze;          /**< List that holds the current data when freezed*/
+    QVector<VectorXd> m_dataFilteredCurrentFreeze;  /**< List that holds the current filtered data when freezed*/
 
-    bool m_bIsFreezed;          /**< Display is freezed */
+    QVector<VectorXd> m_dataLastFreeze;             /**< List that holds the last data when freezed*/
+    QVector<VectorXd> m_dataFilteredLastFreeze;     /**< List that holds the last filtered data when freezed*/
+
+    FilterData m_filterData;
+
+    float m_fSps;                   /**< Sampling rate */
+    qint32 m_iT;                    /**< Time window */
+    qint32 m_iDownsampling;         /**< Down sampling factor */
+    qint32 m_iMaxSamples;           /**< Max samples per window */
+    qint32 m_iCurrentSample;        /**< Accurate Downsampling */
+
+    bool m_bIsFreezed;              /**< Display is freezed */
+    bool m_doFiltering;             /**< Do Filtering flag */
 
     QMap< qint32,float > m_qMapChScaling;   /**< Sensor selection widget. */
 };
@@ -364,6 +448,41 @@ inline const QMap< qint32,float >& RealTimeMultiSampleArrayModel::getScaling() c
 {
     return m_qMapChScaling;
 }
+
+
+//*************************************************************************************************************
+
+inline const MatrixXd RealTimeMultiSampleArrayModel::dataToMatrix(QVector<VectorXd> &vector) const
+{
+    if(vector.size() == 0)
+        return MatrixXd();
+
+    MatrixXd matCurrent(vector.first().rows(), vector.size());
+
+    for(qint32 r = 0; r < vector.first().rows(); ++r)
+        for(qint32 c = 0; c < vector.size(); ++c)
+            matCurrent(r,c) = vector[c].coeff(r);
+
+    return matCurrent;
+}
+
+
+//*************************************************************************************************************
+
+inline const MatrixXd RealTimeMultiSampleArrayModel::dataLastToMatrix() const
+{
+    if(m_dataLast.size() == 0)
+        return MatrixXd();
+
+    MatrixXd matLast(m_dataLast.first().rows(), m_dataLast.size());
+
+    for(qint32 r = 0; r < m_dataLast.first().rows(); ++r)
+        for(qint32 c = 0; c < m_dataLast.size(); ++c)
+            matLast(r,c) = m_dataLast[r].coeff(c);
+
+    return matLast;
+}
+
 
 } // NAMESPACE
 

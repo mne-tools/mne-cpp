@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "disp3DNew_global.h"
+#include "../disp3dnew_global.h"
 
 #include "brainsurfacemesh.h"
 #include "../helpers/renderableentity.h"
@@ -58,7 +58,7 @@
 #include <Qt3DRenderer/qt3drenderer_global.h>
 #include <Qt3DRenderer/QPhongMaterial>
 #include <Qt3DRenderer/QDiffuseMapMaterial>
-#include <Qt3DRenderer/QVertexMaterial>
+#include <Qt3DRenderer/QPerVertexColorMaterial>
 
 #include <QRgb>
 

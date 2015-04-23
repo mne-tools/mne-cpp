@@ -97,7 +97,7 @@ SOURCES += \
     models\stcdataworker.cpp
 
 HEADERS += \
-    disp3DNew_global.h \
+    disp3dnew_global.h \
     brainview.h \
     brainSurface\brainsurface.h \
     brainSurface\brainsurfacemesh.h \

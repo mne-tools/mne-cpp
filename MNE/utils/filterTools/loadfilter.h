@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     cosinefilter.h
+* @file     loadfilter.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2014
+* @date     April, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,25 +30,32 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the CosineFilter class
+* @brief    LoadFilter class declaration.
 *
 */
 
-#ifndef COSINEFILTER_H
-#define COSINEFILTER_H
+#ifndef LOADFILTER_H
+#define LOADFILTER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "utils_global.h"
+#include "../utils_global.h"
+#include "filterdata.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
+
+#include <QSharedPointer>
+#include <QVector>
+#include <QFile>
+#include <QTextStream>
+#include <QStringList>
 
 
 //*************************************************************************************************************
@@ -57,7 +64,6 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
-#include <unsupported/Eigen/FFT>
 
 
 //*************************************************************************************************************
@@ -81,51 +87,63 @@ using namespace Eigen;
 //=============================================================================================================
 // DEFINES
 //=============================================================================================================
-#ifndef M_PI
-#define	M_PI		3.14159265358979323846	/* pi */
-#endif
 
-#ifndef EIGEN_FFTW_DEFAULT
-#define EIGEN_FFTW_DEFAULT
-#endif
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE FORWARD DECLARATIONS
+//=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* Creates a cosine filter response in the frequency domain.
+* Processes txt files which hold filter coefficients.
 *
-* @brief Creates a cosine filter response in the frequency domain.
+* @brief Processes txt files which hold filter coefficients.
 */
-class UTILSSHARED_EXPORT CosineFilter
+class UTILSSHARED_EXPORT LoadFilter
 {
 public:
-    enum TPassType {LPF, HPF, BPF, NOTCH };
+    typedef QSharedPointer<LoadFilter> SPtr;            /**< Shared pointer type for LoadFilter. */
+    typedef QSharedPointer<const LoadFilter> ConstSPtr; /**< Const shared pointer type for LoadFilter. */
 
     //=========================================================================================================
     /**
-    * Constructs a CosineFilter object.
-    *
+    * Constructs a LoadFilter object.
     */
-    CosineFilter();
+    LoadFilter();
 
     //=========================================================================================================
     /**
-    * Constructs a CosineFilter object.
+    * Reads a given txt file and scans it for filter coefficients. Pls see sample file for file syntax.
+    * @param [in] path holds the file path of the txt file which is to be read.
+    * @param [out] coefficients holds the filter coefficients.
+    * @param [out] type holds filter type (HPF, LPF, BPF).
+    * @param [out] name holds the filter name.
+    * @param [out] order holds the filter order.
+    * @param [out] sFreq holds the filters sampling frequency.
     *
-    * @param fftLength length of the fft (multiple integer of 2^x)
-    * @param lowpass low cutoff frequency in Hz (not normed to sampling freq)
-    * @param lowpass_width determines the width of the filter slopes (steepness) in Hz (not normed to sampling freq)
-    * @param highpass highpass high cutoff frequency in Hz (not normed to sampling freq)
-    * @param highpass_width determines the width of the filter slopes (steepness) in Hz (not normed to sampling freq)
-    * @param sFreq sampling frequency
-    * @param type filter type (lowpass, highpass, etc.)
+    * @return true if reading was successful, false otherwise.
     */
-    CosineFilter(int fftLength, float lowpass, float lowpass_width, float highpass, float highpass_width, double sFreq, TPassType type);
+    static bool readFilter(QString path, RowVectorXd &coefficients, QString &type, QString &name, int &order, double &sFreq);
 
-    RowVectorXcd    m_dFFTCoeffA;   /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
-    RowVectorXd     m_dCoeffA;      /**< the time filter coefficient set*/
+    //=========================================================================================================
+    /**
+    * Writes a given filter to txt file .
+    * @param [in] path holds the file path of the txt file which is to be written to.
+    * @param [in] coefficients holds the filter coefficients.
+    * @param [in] type holds filter type (HPF, LPF, BPF).
+    * @param [in] name holds the filter name.
+    * @param [in] order holds the filter order.
+    *
+    * @return true if reading was successful, false otherwise.
+    */
+    static bool writeFilter(const QString &path, const RowVectorXd &coefficients, const QString &type, const QString &name, const int &order, const double &sFreq);
+
+private:
+
 };
 
 } // NAMESPACE
 
-#endif // COSINEFILTER_H
+#endif // LOADFILTER_H

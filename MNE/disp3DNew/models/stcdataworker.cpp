@@ -66,9 +66,9 @@ StcDataWorker::StcDataWorker(QObject *parent)
 : QThread(parent)
 , m_bIsRunning(false)
 , m_bIsLooping(true)
-, m_iAverageSamples(10)
+, m_iAverageSamples(1)
 , m_iCurrentSample(0)
-, m_iUSecIntervall(50)
+, m_iUSecIntervall(1000)
 {
     m_data.clear();
 }

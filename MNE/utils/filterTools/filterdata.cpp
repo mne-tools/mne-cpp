@@ -1,0 +1,312 @@
+//=============================================================================================================
+/**
+* @file     filterdata.cpp
+* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
+* @version  1.0
+* @date     February, 2014
+*
+* @section  LICENSE
+*
+* Copyright (C) 2014, Florian Schlembach, Christoph Dinh and Matti Hamalainen. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Contains all FilterData.
+*
+*/
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "filterdata.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace UTILSLIB;
+
+
+//*************************************************************************************************************
+
+FilterData::FilterData()
+{
+
+}
+
+
+//*************************************************************************************************************
+
+FilterData::FilterData(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, double sFreq, qint32 fftlength, DesignMethod designMethod)
+: m_Type(type)
+, m_iFilterOrder(order)
+, m_iFFTlength(fftlength)
+, m_sName(unique_name)
+, m_dParksWidth(parkswidth)
+, m_designMethod(designMethod)
+, m_dCenterFreq(centerfreq)
+, m_dBandwidth(bandwidth)
+, m_sFreq(sFreq)
+{
+    designFilter();
+}
+
+
+//*************************************************************************************************************
+
+FilterData::FilterData(QString &path, qint32 fftlength)
+: m_iFFTlength(fftlength)
+{
+    //std::cout<<"START FilterData::FilterData()"<<std::endl;
+
+    QString type;
+
+    if(LoadFilter::readFilter(path, m_dCoeffA, type, m_sName, m_iFilterOrder, m_sFreq)) {
+        if(type == "HPF")
+            m_Type = FilterData::HPF;
+
+        if(type == "BPF")
+            m_Type = FilterData::BPF;
+
+        if(type == "LPF")
+            m_Type = FilterData::LPF;
+
+        if(type == "NOTCH")
+            m_Type = FilterData::NOTCH;
+
+        fftTransformCoeffs();
+    }
+    else
+        qDebug()<<"Could not read filter file!";
+
+    //std::cout<<"END FilterData::FilterData()"<<std::endl;
+}
+
+
+//*************************************************************************************************************
+
+void FilterData::designFilter()
+{
+    switch(m_designMethod) {
+        case Tschebyscheff: {
+            ParksMcClellan filter(m_iFilterOrder, m_dCenterFreq, m_dBandwidth, m_dParksWidth, (ParksMcClellan::TPassType)m_Type);
+            m_dCoeffA = filter.FirCoeff;
+
+            //fft-transform m_dCoeffA in order to be able to perform frequency-domain filtering
+            fftTransformCoeffs();
+
+            break;
+        }
+
+        case Cosine: {
+            CosineFilter filtercos;
+
+            switch(m_Type) {
+                case LPF:
+                    filtercos = CosineFilter (m_iFFTlength,
+                                            (m_dCenterFreq)*(m_sFreq/2),
+                                            m_dParksWidth*(m_sFreq/2),
+                                            (m_dCenterFreq)*(m_sFreq/2),
+                                            m_dParksWidth*(m_sFreq/2),
+                                            m_sFreq,
+                                            (CosineFilter::TPassType)m_Type);
+                    break;
+
+                case HPF:
+                    filtercos = CosineFilter (m_iFFTlength,
+                                            (m_dCenterFreq)*(m_sFreq/2),
+                                            m_dParksWidth*(m_sFreq/2),
+                                            (m_dCenterFreq)*(m_sFreq/2),
+                                            m_dParksWidth*(m_sFreq/2),
+                                            m_sFreq,
+                                            (CosineFilter::TPassType)m_Type);
+                    break;
+
+                case BPF:
+                    filtercos = CosineFilter (m_iFFTlength,
+                                            (m_dCenterFreq + m_dBandwidth/2)*(m_sFreq/2),
+                                            m_dParksWidth*(m_sFreq/2),
+                                            (m_dCenterFreq - m_dBandwidth/2)*(m_sFreq/2),
+                                            m_dParksWidth*(m_sFreq/2),
+                                            m_sFreq,
+                                            (CosineFilter::TPassType)m_Type);
+                    break;
+            }
+
+            //This filter is designed in the frequency domain, hence the time domain impulse response need to be shortend by the users dependent number of taps
+            m_dCoeffA.resize(m_iFilterOrder);
+            m_dCoeffA.head(m_iFilterOrder/2) = filtercos.m_dCoeffA.tail(m_iFilterOrder/2);
+            m_dCoeffA.tail(m_iFilterOrder/2) = filtercos.m_dCoeffA.head(m_iFilterOrder/2);
+
+            //Now generate the fft version of the shortened impulse response
+            fftTransformCoeffs();
+
+            break;
+        }
+    }
+
+}
+
+
+//*************************************************************************************************************
+
+void FilterData::fftTransformCoeffs()
+{
+    //zero-pad m_dCoeffA to m_iFFTlength
+    RowVectorXd t_coeffAzeroPad = RowVectorXd::Zero(m_iFFTlength);
+    t_coeffAzeroPad.head(m_dCoeffA.cols()) = m_dCoeffA;
+
+    //generate fft object
+    Eigen::FFT<double> fft;
+    fft.SetFlag(fft.HalfSpectrum);
+
+    //fft-transform filter coeffs
+    m_dFFTCoeffA = RowVectorXcd::Zero(m_iFFTlength);
+    fft.fwd(m_dFFTCoeffA,t_coeffAzeroPad);
+}
+
+
+//*************************************************************************************************************
+
+RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data, bool keepOverhead, CompensateEdgeEffects compensateEdgeEffects) const
+{
+    if(data.cols()<m_dCoeffA.cols() && compensateEdgeEffects==MirrorData)
+        return data;
+
+    //Do zero padding or mirroring depending on user input
+    RowVectorXd t_dataZeroPad = RowVectorXd::Zero(2*m_dCoeffA.cols() + data.cols());
+    switch(compensateEdgeEffects) {
+        case MirrorData:
+            t_dataZeroPad.head(m_dCoeffA.cols()) = data.head(m_dCoeffA.cols()).reverse();   //front
+            t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;                    //middle
+            t_dataZeroPad.tail(m_dCoeffA.cols()) = data.tail(m_dCoeffA.cols()).reverse();   //back
+            break;
+
+        case ZeroPad:
+            t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;
+            break;
+    }
+
+    //Do the convolution
+    RowVectorXd t_filteredTime = RowVectorXd::Zero(2*m_dCoeffA.cols() + data.cols());
+
+    for(int i=m_dCoeffA.cols(); i<t_filteredTime.cols(); i++)
+        t_filteredTime(i-m_dCoeffA.cols()) = t_dataZeroPad.segment(i-m_dCoeffA.cols(),m_dCoeffA.cols()) * m_dCoeffA.transpose();
+
+    //Return filtered data
+    if(!keepOverhead)
+        return t_filteredTime.segment(m_dCoeffA.cols()/2, data.cols());
+
+    return t_filteredTime;
+}
+
+
+//*************************************************************************************************************
+
+RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhead, CompensateEdgeEffects compensateEdgeEffects) const
+{
+    if(data.cols()<m_dCoeffA.cols() && compensateEdgeEffects==MirrorData) {
+        qDebug()<<"Error in FilterData: Number of filter taps bigger then data size. Not enough data to perform mirroring!";
+        return data;
+    }
+
+    if(2*m_dCoeffA.cols() + data.cols()>m_iFFTlength) {
+        qDebug()<<"Error in FilterData: Number of mirroring size plus data size is bigger then fft length!";
+        return data;
+    }
+
+    //Do zero padding or mirroring depending on user input
+    RowVectorXd t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
+
+    switch(compensateEdgeEffects) {
+        case MirrorData:
+            t_dataZeroPad.head(m_dCoeffA.cols()/2) = data.head(m_dCoeffA.cols()/2).reverse();   //front
+            t_dataZeroPad.segment(m_dCoeffA.cols()/2, data.cols()) = data;                      //middle
+            t_dataZeroPad.tail(m_dCoeffA.cols()/2) = data.tail(m_dCoeffA.cols()/2).reverse();   //back
+            break;
+
+        case ZeroPad:
+            t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;
+            break;
+    }
+
+    //generate fft object
+    Eigen::FFT<double> fft;
+    fft.SetFlag(fft.HalfSpectrum);
+
+    //fft-transform data sequence
+    RowVectorXcd t_freqData;
+    fft.fwd(t_freqData,t_dataZeroPad);
+
+    //perform frequency-domain filtering
+    RowVectorXcd t_filteredFreq = m_dFFTCoeffA.array()*t_freqData.array();
+
+    //inverse-FFT
+    RowVectorXd t_filteredTime;
+    fft.inv(t_filteredTime,t_filteredFreq);
+
+    //Return filtered data
+    if(!keepOverhead)
+        return t_filteredTime.segment(m_dCoeffA.cols(), data.cols());
+
+    return t_filteredTime;
+}
+
+
+//OLD
+////*************************************************************************************************************
+
+//RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepZeros) const
+//{
+//    //Zero pad in front and back
+//    RowVectorXd t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
+//    t_dataZeroPad.segment(m_iFFTlength/4-m_iFilterOrder/2, data.cols()) = data;
+
+//    //generate fft object
+//    Eigen::FFT<double> fft;
+//    fft.SetFlag(fft.HalfSpectrum);
+
+//    //fft-transform data sequence
+//    RowVectorXcd t_freqData;
+//    fft.fwd(t_freqData,t_dataZeroPad);
+
+//    //perform frequency-domain filtering
+//    RowVectorXcd t_filteredFreq = m_dFFTCoeffA.array()*t_freqData.array();
+
+//    //inverse-FFT
+//    RowVectorXd t_filteredTime;
+//    fft.inv(t_filteredTime,t_filteredFreq);
+
+//    //Return filtered data still with zeros at front and end depending on keepZeros flag
+//    if(!keepZeros)
+//        if(m_designMethod == Tschebyscheff)
+//            return t_filteredTime.segment(m_iFFTlength/4, data.cols());
+//        else
+//            return t_filteredTime.segment(m_iFFTlength/4-m_iFilterOrder/2, data.cols());
+
+//    return t_filteredTime;
+//}

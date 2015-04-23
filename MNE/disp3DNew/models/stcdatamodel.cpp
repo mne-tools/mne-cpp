@@ -170,65 +170,24 @@ QVariant StcDataModel::data(const QModelIndex &index, int role) const
 
                 return v;
             }
-            case 3: // relative stc data
+
+            case 4: // smoothed stc data
             {
-                int numDipolesLH = m_forwardSolution.src[0].vertno.rows();
-                int numDipolesRH = m_forwardSolution.src[1].vertno.rows();
-
-                //std::cout<<"StcDataModel::data() - numDipolesLH: "<<numDipolesLH<<std::endl;
-                //std::cout<<"StcDataModel::data() - numDipolesRH: "<<numDipolesRH<<std::endl;
-                //std::cout<<"StcDataModel::data() - m_bDataInit: "<<m_bDataInit<<std::endl;
-
                 QVariant v;
-                if(m_bDataInit && role == StcDataModelRoles::GetRelStcValLH) {
-                    VectorXd valVec(numDipolesLH);
-
-                    for(qint32 i = 0; i < valVec.rows(); ++i)
-                        valVec(i) = m_vecCurRelStc(i);
-
-                    //std::cout<<"StcDataModel::data() - LH - valVec.rows(): "<<valVec.rows()<<std::endl;
-
-                    v.setValue(valVec);
+                if(m_bDataInit && role == StcDataModelRoles::GetSmoothedStcValLH) {
+                    v.setValue(smoothEstimates(3, 0, 0)); //return relative stc with type = 0, normal with type = 1
                 }
 
-                if(m_bDataInit && role == StcDataModelRoles::GetRelStcValRH) {
-                    VectorXd valVec(numDipolesRH);
-
-                    for(qint32 i = numDipolesLH; i < numDipolesLH+numDipolesRH; ++i)
-                        valVec(i-numDipolesLH) = m_vecCurRelStc(i);
-
-                    //std::cout<<"StcDataModel::data() - RH - valVec.rows(): "<<valVec.rows()<<std::endl;
-
-                    v.setValue(valVec);
+                if(m_bDataInit && role == StcDataModelRoles::GetSmoothedStcValRH) {
+                    v.setValue(smoothEstimates(3, 1, 0));
                 }
 
                 return v;
 
-//                if(m_bDataInit && role == Qt::DisplayRole)
-//                {
-//                    //Cluster version
-//                    QList<qint32> selVec;
-//                    QVariant v;
-//                    if(row < m_iLHSize)
-//                        selVec = m_qMapLabelIdChannelLH.values(m_qListLabels[row].label_id);
-//                    else
-//                        selVec = m_qMapLabelIdChannelRH.values(m_qListLabels[row].label_id);
-
-//                    VectorXd valVec(selVec.size());
-
-//                    if(index.column() == 2) //stc data
-//                        for(qint32 i = 0; i < selVec.size(); ++i)
-//                            valVec(i) = m_vecCurStc(selVec[i]);
-//                    else // relative stc data
-//                        for(qint32 i = 0; i < selVec.size(); ++i)
-//                            valVec(i) = m_vecCurRelStc(selVec[i]);
-
-//                    v.setValue(valVec);
-//                    return v;//m_vecCurStc(row));
-//                }
                 break;
             }
-            case 4: { // Label
+
+            case 5: { // Label
                 if(role == Qt::DisplayRole)
                 {
                     QVariant v;
@@ -237,12 +196,13 @@ QVariant StcDataModel::data(const QModelIndex &index, int role) const
                 }
                 break;
             }
-            case 5: { // Color
+
+            case 6: { // Color
                 if(role == Qt::DisplayRole)
                     return QVariant(QColor(m_qListRGBAs[row](0),m_qListRGBAs[row](1),m_qListRGBAs[row](2),255));
                 break;
             }
-            case 6: { // Tri RRs
+            case 7: { // Tri RRs
                 if(role == Qt::DisplayRole)
                 {
                     QVariant v;
@@ -275,11 +235,13 @@ QVariant StcDataModel::headerData(int section, Qt::Orientation orientation, int 
                 return QVariant("STC");
             case 3: //realtive stc data column
                 return QVariant("Relative STC");
-            case 4: //roi name column
+            case 4: //smoothed stc data column
+                return QVariant("Smoothed STC");
+            case 5: //roi name column
                 return QVariant("Label");
-            case 5: //roi color column
+            case 6: //roi color column
                 return QVariant("Color");
-            case 6: //roi Tri Coords
+            case 7: //roi Tri Coords
                 return QVariant("Tri Coords");
         }
     }
@@ -311,22 +273,11 @@ void StcDataModel::addData(const MNESourceEstimate &stc)
         //TODO MAP data 416 to labels 150!!!!!!!!
         //ToDo Map the indices to the regions
         setVertLabelIDs(stc.vertices);
-
     }
-
 
     QList<VectorXd> data;
     for(qint32 i = 0; i < stc.data.cols(); ++i)
         data.append(stc.data.col(i));
-
-//    if(!m_bIntervallSet)
-//    {
-//        int usec = floor(stc.tstep*1000000);
-//        if(usec <= 0)
-//            return;
-//        m_pWorker->setInterval(usec);
-//        m_bIntervallSet = true;
-//    }
 
     m_pWorker->addData(data);
 
@@ -342,100 +293,6 @@ void StcDataModel::init(const QString &subject_id, qint32 hemi, const QString &s
 {
     beginResetModel();
     m_forwardSolution = forwardSolution;
-//    SurfaceSet(subject_id, hemi, surf, subjects_dir);
-//    m_surfSet = SurfaceSet(subject_id, hemi, surf, subjects_dir);
-//    m_annotationSet = AnnotationSet(subject_id, hemi, atlas, subjects_dir);
-//    m_annotationSet.toLabels(m_surfSet, m_qListLabels, m_qListRGBAs);
-
-//    float lhOffset = 0;
-//    float rhOffset = 0;
-//    // MIN MAX
-//    for(qint32 h = 0; h < m_annotationSet.size(); ++h)
-//    {
-//        if(h == 0)
-//        {
-//            if(QString::compare(m_surfSet.surf(),"inflated") == 0)
-//                lhOffset = m_surfSet[h].rr().col(0).maxCoeff(); // X
-
-//            m_vecMinRR.setX(m_surfSet[h].rr().col(0).minCoeff()-lhOffset); // X
-//            m_vecMinRR.setY(m_surfSet[h].rr().col(1).minCoeff()); // Y
-//            m_vecMinRR.setZ(m_surfSet[h].rr().col(2).minCoeff()); // Z
-//            m_vecMaxRR.setX(m_surfSet[h].rr().col(0).maxCoeff()-lhOffset); // X
-//            m_vecMaxRR.setY(m_surfSet[h].rr().col(1).maxCoeff()); // Y
-//            m_vecMaxRR.setZ(m_surfSet[h].rr().col(2).maxCoeff()); // Z
-//        }
-//        else
-//        {
-//            if(QString::compare(m_surfSet.surf(),"inflated") == 0)
-//                rhOffset = m_surfSet[h].rr().col(0).maxCoeff(); // X
-
-//            m_vecMinRR.setX(m_vecMinRR.x() < m_surfSet[h].rr().col(0).minCoeff()+rhOffset ? m_vecMinRR.x() : m_surfSet[h].rr().col(0).minCoeff()+rhOffset); // X
-//            m_vecMinRR.setY(m_vecMinRR.y() < m_surfSet[h].rr().col(1).minCoeff() ? m_vecMinRR.y() : m_surfSet[h].rr().col(1).minCoeff()); // Y
-//            m_vecMinRR.setZ(m_vecMinRR.z() < m_surfSet[h].rr().col(2).minCoeff() ? m_vecMinRR.z() : m_surfSet[h].rr().col(2).minCoeff()); // Z
-//            m_vecMaxRR.setX(m_vecMaxRR.x() > m_surfSet[h].rr().col(0).maxCoeff()+rhOffset ? m_vecMaxRR.x() : m_surfSet[h].rr().col(0).maxCoeff()+rhOffset); // X
-//            m_vecMaxRR.setY(m_vecMaxRR.y() > m_surfSet[h].rr().col(1).maxCoeff() ? m_vecMaxRR.y() : m_surfSet[h].rr().col(1).maxCoeff()); // Y
-//            m_vecMaxRR.setZ(m_vecMaxRR.z() > m_surfSet[h].rr().col(2).maxCoeff() ? m_vecMaxRR.z() : m_surfSet[h].rr().col(2).maxCoeff()); // Z
-//        }
-//    }
-
-//    QVector3D vecCenterRR;
-//    vecCenterRR.setX((m_vecMinRR.x()+m_vecMaxRR.x())/2.0f);
-//    vecCenterRR.setY((m_vecMinRR.y()+m_vecMaxRR.y())/2.0f);
-//    vecCenterRR.setZ((m_vecMinRR.z()+m_vecMaxRR.z())/2.0f);
-
-//    // Regions -> ToDo QtConcurrent
-////    qDebug() << "Before ROI";
-//    for(qint32 h = 0; h < m_annotationSet.size(); ++h)
-//    {
-//        MatrixX3i tris;
-//        MatrixX3f rr = m_surfSet[h].rr();
-
-//        //Centralize
-//        if(QString::compare(m_surfSet.surf(),"inflated") == 0)
-//        {
-//            if(h == 0) //X
-//                rr.col(0) = (rr.col(0).array() - lhOffset) - vecCenterRR.x();
-//            else
-//                rr.col(0) = (rr.col(0).array() + rhOffset) - vecCenterRR.x();
-//        }
-//        else
-//            rr.col(0) = rr.col(0).array() - vecCenterRR.x(); // X
-
-//        rr.col(1) = rr.col(1).array() - vecCenterRR.y(); // Y
-//        rr.col(2) = rr.col(2).array() - vecCenterRR.z(); // Z
-
-
-//        //
-//        // Create each ROI
-//        //
-//        for(qint32 k = 0; k < m_qListLabels.size(); ++k)
-//        {
-//            //check if label hemi fits current hemi
-//            if(m_qListLabels[k].hemi != h)
-//                continue;
-
-//            //Generate label tri information
-//            tris = m_qListLabels[k].selectTris(m_surfSet[h]); //ToDO very slow -> QtConcurrent
-
-
-//            Matrix3Xf triCoords(3,3*tris.rows());
-
-//            for(qint32 i = 0; i < tris.rows(); ++i)
-//            {
-//                triCoords.col(i*3) = rr.row( tris(i,0) ).transpose();
-//                triCoords.col(i*3+1) = rr.row( tris(i,1) ).transpose();
-//                triCoords.col(i*3+2) = rr.row( tris(i,2) ).transpose();
-//            }
-
-//            m_qListTriRRs.append(triCoords);
-//        }
-//    }
-//    qDebug() << "After ROI";
-
-//    m_iLHSize = 0;
-//    for(qint32 k = 0; k < m_qListLabels.size(); ++k)
-//        if(m_qListLabels[k].hemi == 0)
-//            ++m_iLHSize;
 
     m_bModelInit = true;
 
@@ -487,19 +344,6 @@ void StcDataModel::setStcSample(const VectorXd &sample)
     QModelIndex bottomRight = this->index(this->rowCount()-1,3);
     QVector<int> roles; roles << Qt::DisplayRole;
     emit dataChanged(topLeft, bottomRight, roles);
-
-    //Alternative for Table View -> Do update per item instead
-//    QModelIndex topLeft, bottomRight;
-//    QVector<int> roles; roles << Qt::DisplayRole;
-//    for(qint32 i = 0; i < m_qListLabels.size(); ++i)
-//    {
-//        topLeft = this->index(i,2);
-//        bottomRight = this->index(i,2);
-//        emit dataChanged(topLeft, bottomRight, roles);
-//        topLeft = this->index(i,3);
-//        bottomRight = this->index(i,3);
-//        emit dataChanged(topLeft, bottomRight, roles);
-//    }
 }
 
 
@@ -535,7 +379,6 @@ void StcDataModel::setVertLabelIDs(const VectorXi &vertLabelIDs)
     m_qMapLabelIdChannelLH.clear();
     m_qMapLabelIdChannelRH.clear();
 
-
     QMap<qint32, qint32>::iterator it;
     for (it = t_qMapLabelIdChannel.begin(); it != t_qMapLabelIdChannel.end(); ++it)
     {
@@ -546,5 +389,275 @@ void StcDataModel::setVertLabelIDs(const VectorXi &vertLabelIDs)
     }
 
     m_vertLabelIds = vertLabelIDs;
+}
+
+
+//*************************************************************************************************************
+
+QPair<int, QPair<int, double> > calculateSmoothedEstimate(const QPair<VectorXd*, QPair<int, QVector<int> > > &vertexIndex)
+{
+    //std::cout<<"Smoothing vertex: "<<vertexIndex.second.first<<std::endl;
+
+    VectorXd* stcData = vertexIndex.first;
+
+    double sum = 0;
+
+    for (int p = 0; p < vertexIndex.second.second.size(); p++)
+        sum += stcData->coeff(vertexIndex.second.second[p]);
+
+    QPair<int, double> tempPair;
+    tempPair.first = vertexIndex.second.first;
+    tempPair.second = sum/vertexIndex.second.second.size();
+
+    QPair<int, QPair<int, double> > result;
+    result.first = stcData->rows();
+    result.second = tempPair;
+
+    return result;
+
+//    MNEHemisphere sp = m_forwardSolution.src[hemi];
+//    VectorXi vertno = sp.vertno;
+//    int nvert = sp.vertno.rows();
+
+//    VectorXi undef = VectorXi::Ones(sp.np);
+//    VectorXi prev_undef(sp.np);
+//    VectorXd prev_val(sp.np);
+
+//    VectorXd vecCurSmoothedStc = VectorXd::Zero(sp.np);
+
+//    int    n,k,p,it,nv;
+//    float  sum;
+
+//    if(hemi == 0) {
+//        for (k = 0; k < nvert; k++) {
+//            undef[vertno[k]] = 0;
+//            vecCurSmoothedStc[vertno[k]] = m_vecCurRelStc[k];
+//        }
+//    }
+//    else {
+//        for (k = 0 ; k < nvert; k++) {
+//            undef[vertno[k]] = 0;
+//            vecCurSmoothedStc[vertno[k]] = m_vecCurRelStc[m_forwardSolution.src[0].nuse+k];
+//        }
+//    }
+
+//    for (it = 0; it < niter; it++) {
+//        prev_undef = undef;
+//        prev_val  = vecCurSmoothedStc;
+
+//        for (k = 0; k < sp.np; k++) {
+//            sum = 0;
+//            n   = 0;
+
+//            if (prev_undef[k] == 1) {
+//                sum = vecCurSmoothedStc[k];
+//                n = 1;
+//            }
+
+//            for (p = 0; p < sp.neighbor_vert[k].size(); p++) {
+//                nv = sp.neighbor_vert[k][p];
+
+//                if (prev_undef[nv] == 0) {
+//                    sum += prev_val[nv];
+//                    n++;
+//                }
+//            }
+
+//            if (n > 0) {
+//                vecCurSmoothedStc[k] = sum/n;
+//                undef[k] = 0;
+//            }
+//        }
+//    }
+}
+
+
+//*************************************************************************************************************
+
+void reduceToFinalSmoothedEstimates(VectorXd &finalSmoothedEstimates, const QPair<int, QPair<int, double> > &smoothedEstimate)
+{
+    //std::cout<<"Adding vertex: "<<smoothedEstimate.second.first<<std::endl;
+
+    if(finalSmoothedEstimates.rows() == 0)
+        finalSmoothedEstimates.resize(smoothedEstimate.first);
+
+    finalSmoothedEstimates(smoothedEstimate.second.first) = smoothedEstimate.second.second;
+}
+
+
+//*************************************************************************************************************
+
+VectorXd StcDataModel::smoothEstimates(int niter, int hemi, int stcType) const
+{
+    std::cout<<"START - StcDataModel::smoothEstimates()"<<std::endl;
+
+    //Init hemisphere data
+    std::cout<<"StcDataModel::smoothEstimates() Init hemisphere data"<<std::endl;
+    VectorXd vecCurStcData;
+
+    if(hemi<0 || hemi>1)
+        return vecCurStcData;
+
+    if(hemi == 0) //left hemi
+        if(stcType == 0) //Relative stc
+            vecCurStcData = m_vecCurRelStc.head(m_forwardSolution.src[hemi].vertno.rows());
+        else
+            vecCurStcData = m_vecCurStc.head(m_forwardSolution.src[hemi].vertno.rows());
+    else //right hemi
+        if(stcType == 0) //Relative stc
+            vecCurStcData = m_vecCurRelStc.tail(m_forwardSolution.src[hemi].vertno.rows());
+        else
+            vecCurStcData = m_vecCurStc.tail(m_forwardSolution.src[hemi].vertno.rows());
+
+    //Init smoothed values with current estimate data
+    std::cout<<"StcDataModel::smoothEstimates() Init values with estimates"<<std::endl;
+    VectorXd vecCurSmoothedStc(m_forwardSolution.src[hemi].np);
+    vecCurSmoothedStc.setZero();
+
+    for(int i=0; i<vecCurStcData.rows(); i++)
+        vecCurSmoothedStc(m_forwardSolution.src[hemi].vertno(i)) = vecCurStcData(i);
+
+    // Create input list for mappedReduce
+    std::cout<<"StcDataModel::smoothEstimates() Init map reduce list"<<std::endl;
+    QList<QPair<VectorXd*, QPair<int, QVector<int> > > > inputMappedReduced;
+    for(int i=0; i<m_forwardSolution.src[hemi].neighbor_vert.size(); i++) {
+        QPair<VectorXd*, QPair<int, QVector<int> > > temp;
+        temp.first = &vecCurSmoothedStc;
+        temp.second = m_forwardSolution.src[hemi].neighbor_vert[i];
+        inputMappedReduced.append(temp);
+    }
+
+    //Use map reduce to speed up smoothing
+    QFuture<VectorXd> finalSmoothingResult;
+    for(int i=0; i<niter; i++) {
+        std::cout<<"StcDataModel::smoothEstimates() Starting mapReduced for iteration: "<<i<<std::endl;
+
+        finalSmoothingResult =  QtConcurrent::mappedReduced(inputMappedReduced,
+                                                            calculateSmoothedEstimate,
+                                                            reduceToFinalSmoothedEstimates,
+                                                            QtConcurrent::UnorderedReduce);
+
+//        finalSmoothinResult =  QtConcurrent::mappedReduced(inputMappedReduced.begin(),
+//                                                            inputMappedReduced.end(),
+//                                                            [this](QPair<VectorXd&, QPair<int, QVector<int> > >& vert) {
+//                                                                return calculateSmoothedEstimate(vert);
+//                                                            },
+//                                                            [this](VectorXd &finalSmoothedEstimates, QPair<int,double> smoothedEstimate) {
+//                                                                return reduceToFinalSmoothedEstimates(finalSmoothedEstimates, smoothedEstimate);
+//                                                            },
+//                                                            QtConcurrent::UnorderedReduce);
+
+        finalSmoothingResult.waitForFinished();
+    }
+
+    std::cout<<"StcDataModel::smoothEstimates() Finished smoothing: "<<std::endl;
+
+//    //Init smoothed values with current estimate data
+//    VectorXd vecCurSmoothedStc (m_forwardSolution.src[hemi].np);
+//    vecCurSmoothedStc.setZero();
+
+//    for(int i=0; i<vecCurStcData.rows(); i++)
+//        vecCurSmoothedStc(m_forwardSolution.src[hemi].vertno(i)) = vecCurStcData(i);
+
+//    //Perform smoothing
+//    std::cout<<"StcDataModel::smoothEstimates: vecCurSmoothedStc.rows() "<<vecCurSmoothedStc.rows()<<std::endl;
+//    std::cout<<"StcDataModel::smoothEstimates: m_smoothOperator.rows() "<<m_forwardSolution.src[hemi].m_smoothOperator.rows()<<std::endl;
+
+//    if(vecCurSmoothedStc.rows() != m_forwardSolution.src[hemi].smoothOperator.rows()) {
+//        std::cout<<"StcDataModel::smoothEstimates - smoothing operator and estimates do not align. returning non smoothed values."<<std::endl;
+//        return vecCurSmoothedStc;
+//    }
+
+//    VectorXd smoothingSum(vecCurSmoothedStc.rows());
+//    smoothingSum.setZero();
+
+//    for (int it = 0; it < niter; it++)
+//        if(it==0)
+//            smoothingSum += m_forwardSolution.src[hemi].smoothOperator * vecCurSmoothedStc;
+//        else
+//            smoothingSum += m_forwardSolution.src[hemi].smoothOperator * smoothingSum;
+
+//    //Get data
+//    for(int it = 0; it < niter; it++) {
+
+//    }
+//        if(hemi == 0) {
+//            std::cout<<"smoothoperator.size(): "<< m_forwardSolution.src[hemi].m_smoothOperator.rows()<<" "<<m_forwardSolution.src[hemi].m_smoothOperator.cols()<<std::endl;
+
+//            vecCurSmoothedStc += m_forwardSolution.src[hemi].m_smoothOperator * m_vecCurRelStc.head(m_forwardSolution.src[hemi].vertno.rows());
+
+//            std::cout<<"vecCurSmoothedStc.size(): "<< vecCurSmoothedStc.rows()<<std::endl;
+//            std::cout<<"m_numberNeighborsSources.size(): "<< m_forwardSolution.src[hemi].m_numberNeighborsSources.rows()<<std::endl;
+
+//            vecCurSmoothedStc = vecCurSmoothedStc.cwiseQuotient(m_forwardSolution.src[hemi].m_numberNeighborsSources);
+//        }
+//        else {
+//            vecCurSmoothedStc += m_forwardSolution.src[hemi].m_smoothOperator * m_vecCurRelStc.tail(m_forwardSolution.src[hemi].vertno.rows());
+//            vecCurSmoothedStc = vecCurSmoothedStc.cwiseQuotient(m_forwardSolution.src[hemi].m_numberNeighborsSources);
+//        }
+//    }
+
+
+//    //smooth data for both hemispheres
+//    MNEHemisphere sp = m_forwardSolution.src[hemi];
+//    VectorXi vertno = sp.vertno;
+//    int nvert = sp.vertno.rows();
+
+//    VectorXi undef = VectorXi::Ones(sp.np);
+//    VectorXi prev_undef(sp.np);
+//    VectorXd prev_val(sp.np);
+
+//    VectorXd vecCurSmoothedStc = VectorXd::Zero(sp.np);
+
+//    int    n,k,p,it,nv;
+//    float  sum;
+
+//    if(hemi == 0) {
+//        for (k = 0; k < nvert; k++) {
+//            undef[vertno[k]] = 0;
+//            vecCurSmoothedStc[vertno[k]] = m_vecCurRelStc[k];
+//        }
+//    }
+//    else {
+//        for (k = 0 ; k < nvert; k++) {
+//            undef[vertno[k]] = 0;
+//            vecCurSmoothedStc[vertno[k]] = m_vecCurRelStc[m_forwardSolution.src[0].nuse+k];
+//        }
+//    }
+
+//    for (it = 0; it < niter; it++) {
+//        prev_undef = undef;
+//        prev_val  = vecCurSmoothedStc;
+
+//        for (k = 0; k < sp.np; k++) {
+//            sum = 0;
+//            n   = 0;
+
+//            if (prev_undef[k] == 1) {
+//                sum = vecCurSmoothedStc[k];
+//                n = 1;
+//            }
+
+//            for (p = 0; p < sp.neighbor_vert[k].size(); p++) {
+//                nv = sp.neighbor_vert[k][p];
+
+//                if (prev_undef[nv] == 0) {
+//                    sum += prev_val[nv];
+//                    n++;
+//                }
+//            }
+
+//            if (n > 0) {
+//                vecCurSmoothedStc[k] = sum/n;
+//                undef[k] = 0;
+//            }
+//        }
+//    }
+
+//    std::cout<<"END - StcDataModel::smoothEstimates() vecCurSmoothedStc.rows() "<<vecCurSmoothedStc.rows()<<std::endl;
+
+    std::cout<<"END - StcDataModel::smoothEstimates()"<<std::endl;
+
+    return finalSmoothingResult.result();
 }
 

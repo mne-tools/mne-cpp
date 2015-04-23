@@ -44,10 +44,12 @@
 #include <Qt3DCore/QTranslateTransform>
 #include <Qt3DRenderer/QMesh>
 
+#include "../disp3dnew_global.h"
+
 namespace DISP3DNEWLIB
 {
 
-class RenderableEntity : public Qt3D::QEntity
+class DISP3DNEWSHARED_EXPORT RenderableEntity : public Qt3D::QEntity
 {
 public:
     RenderableEntity(Qt3D::QNode *parent = 0);

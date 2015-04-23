@@ -117,8 +117,8 @@ void BrainHemisphere::init()
         this->translateTransform()->setDx(this->scaleTransform()->scale()/10);
 
     //Set material
-    QVertexMaterial *qVertexMaterial = new QVertexMaterial();
-    this->addComponent(qVertexMaterial);
+    QPerVertexColorMaterial *qperVertexColorMaterial = new QPerVertexColorMaterial();
+    this->addComponent(qperVertexColorMaterial);
 
 //    QPhongMaterial *phongMaterial = new QPhongMaterial();
 //    phongMaterial->setDiffuse(QColor(40, 40, 40));

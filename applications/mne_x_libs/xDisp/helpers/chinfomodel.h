@@ -207,6 +207,6 @@ protected:
 
 };
 
-} // NAMESPACE
+} // NAMESPACE XDISPLIB
 
 #endif // CHINFOCLASS_H

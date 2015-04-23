@@ -237,7 +237,7 @@ private:
 
     //=========================================================================================================
     /**
-    * Cuts the original data to a specific size and therfore sets the mapped raw data.
+    * Cuts the original data to a specific size and there+fore sets the mapped raw data.
     *
     * @param originalData input row data
     * @param cutFront the amount to be cutted from orignal data from the front
