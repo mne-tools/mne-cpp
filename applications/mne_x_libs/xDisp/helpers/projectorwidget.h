@@ -116,7 +116,7 @@ signals:
     void projSelectionChanged();
 
 private:
-    void checkStatusChanged(bool state);
+    void checkStatusChanged(int state);
 
     void enableDisableAll(bool status);
 

@@ -106,7 +106,7 @@ void ProjectorWidget::createUI()
 
             m_qListCheckBox.append(checkBox);
 
-            connect(checkBox, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            connect(checkBox, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
                     this, &ProjectorWidget::checkStatusChanged);
 
             topLayout->addWidget(checkBox, i, 1);
@@ -121,7 +121,7 @@ void ProjectorWidget::createUI()
 
 //*************************************************************************************************************
 
-void ProjectorWidget::checkStatusChanged(bool status)
+void ProjectorWidget::checkStatusChanged(int status)
 {
     Q_UNUSED(status)
 
