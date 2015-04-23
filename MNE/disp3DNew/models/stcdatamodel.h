@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3DNew_global.h"
+#include "../disp3dnew_global.h"
 
 #include "stcdataworker.h"
 
@@ -62,6 +62,8 @@
 #include <QAbstractTableModel>
 #include <QVector3D>
 #include <QMap>
+#include <QFuture>
+#include <QtConcurrent>
 
 
 //*************************************************************************************************************
@@ -113,7 +115,9 @@ namespace StcDataModelRoles
                   GetStcValLH = Qt::UserRole + 1003,
                   GetStcValRH = Qt::UserRole + 1004,
                   GetRelStcValLH = Qt::UserRole + 1005,
-                  GetRelStcValRH = Qt::UserRole + 1006};
+                  GetRelStcValRH = Qt::UserRole + 1006,
+                  GetSmoothedStcValLH = Qt::UserRole + 1007,
+                  GetSmoothedStcValRH = Qt::UserRole + 1008};
 }
 
 //=============================================================================================================
@@ -184,9 +188,12 @@ private:
     QMap<qint32, qint32> m_qMapLabelIdChannelRH;
 
     VectorXd m_vecCurStc;
+    VectorXd m_vecCurRelStc;
+
+    int m_curHemi;
+
     double m_dStcNormMax;
     double m_dStcNorm;
-    VectorXd m_vecCurRelStc;
 
     //ToDo implement this model as a state pattern -> to be used as ROIStc model and full Stc model
 
@@ -202,6 +209,10 @@ private:
 
     QVector3D m_vecMinRR;                  /**< X, Y, Z minima. */
     QVector3D m_vecMaxRR;                  /**< X, Y, Z maxima. */
+
+    VectorXd smoothEstimates(int niter, int hemi, int stcType) const;
+//    QPair<int,double> calculateSmoothedEstimate(const QPair<VectorXd &, QPair<int, QVector<int> > > vertexIndex);
+//    void reduceToFinalSmoothedEstimates(VectorXd &finalSmoothedEstimates, const QPair<int, double> &smoothedEstimate);
 };
 
 

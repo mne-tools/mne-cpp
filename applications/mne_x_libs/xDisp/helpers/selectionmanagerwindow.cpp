@@ -56,7 +56,7 @@ using namespace XDISPLIB;
 //=============================================================================================================
 
 SelectionManagerWindow::SelectionManagerWindow(QWidget *parent, ChInfoModel* pChInfoModel)
-    : QDockWidget(parent,Qt::Window)
+: QWidget(parent,Qt::Window)
 , ui(new Ui::SelectionManagerWindow)
 , m_pChInfoModel(pChInfoModel)
 {
@@ -237,12 +237,12 @@ void SelectionManagerWindow::initComboBoxes()
 {
     ui->m_comboBox_layoutFile->clear();
     ui->m_comboBox_layoutFile->insertItems(0, QStringList()
-     << QApplication::translate("SelectionManagerWindow", "Vectorview-grad.lout", 0)
-     << QApplication::translate("SelectionManagerWindow", "Vectorview-all.lout", 0)
-     << QApplication::translate("SelectionManagerWindow", "Vectorview-mag.lout", 0)
-     << QApplication::translate("SelectionManagerWindow", "babymeg-mag-inner-layer.lout", 0)
-     << QApplication::translate("SelectionManagerWindow", "babymeg-mag-outer-layer.lout", 0)
-     << QApplication::translate("SelectionManagerWindow", "babymeg-mag-ref.lout", 0)
+        << QApplication::translate("SelectionManagerWindow", "babymeg-mag-inner-layer.lout", 0)
+        << QApplication::translate("SelectionManagerWindow", "babymeg-mag-outer-layer.lout", 0)
+//        << QApplication::translate("SelectionManagerWindow", "babymeg-mag-ref.lout", 0)
+        << QApplication::translate("SelectionManagerWindow", "Vectorview-grad.lout", 0)
+        << QApplication::translate("SelectionManagerWindow", "Vectorview-all.lout", 0)
+        << QApplication::translate("SelectionManagerWindow", "Vectorview-mag.lout", 0)
 //     << QApplication::translate("SelectionManagerWindow", "CTF-275.lout", 0)
 //     << QApplication::translate("SelectionManagerWindow", "magnesWH3600.lout", 0)
     );
@@ -262,7 +262,7 @@ void SelectionManagerWindow::initComboBoxes()
                 this, &SelectionManagerWindow::loadLayout);
 
     //Initialise layout as neuromag vectorview with all channels
-    loadLayout("Vectorview-grad.lout");
+    loadLayout("babymeg-mag-inner-layer.lout");
 }
 
 
@@ -562,7 +562,7 @@ bool SelectionManagerWindow::eventFilter(QObject *obj, QEvent *event)
     }
     else {
         // pass the event on to the parent class
-        return QDockWidget::eventFilter(obj, event);
+        return QWidget::eventFilter(obj, event);
     }
 
     return false;

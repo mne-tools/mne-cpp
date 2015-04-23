@@ -349,7 +349,7 @@ int main(int argc, char *argv[])
 
     //Source estimation
     double snr = 1.0f;//0.1f;//1.0f;//3.0f;//0.1f;//3.0f;
-    QString method("MNE"); //"MNE" | "dSPM" | "sLORETA"
+    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
     QString t_sFileNameClusteredInv("");
     QString t_sFileNameStc("test_mind006_051209_auditory01.stc");

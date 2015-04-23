@@ -160,16 +160,17 @@ void BrainView::init(const QString& p_sFile, const QString &subject_id, qint32 h
     m_pRootEntity->addComponent(light1);
 
     // Build Coordinate System
-    //createCoordSystem(m_pRootEntity);
+    createCoordSystem(m_pRootEntity);
 
     // Camera
     Qt3D::QCamera *cameraEntity = new Qt3D::QCamera(m_pRootEntity);
     cameraEntity->setObjectName(QStringLiteral("cameraEntity"));
 
     cameraEntity->lens()->setPerspectiveProjection(60.0f, 16.0f/9.0f, 0.1f, 1000.0f);
-    cameraEntity->setPosition(QVector3D(-0, 0, -1.0f));
+    cameraEntity->setPosition(QVector3D(80, 0, -1.0f));
     cameraEntity->setViewCenter(QVector3D(0, 0, 0));
     cameraEntity->setUpVector(QVector3D(0, 1, 0));
+
     m_pAspectInput->setCamera(cameraEntity);
 
     // FrameGraph
@@ -191,7 +192,7 @@ void BrainView::init(const QString& p_sFile, const QString &subject_id, qint32 h
 
 void BrainView::createCoordSystem(QEntity *rootEntity)
 {
-    // X
+    // X - green
     Qt3D::QCylinderMesh *XAxis = new Qt3D::QCylinderMesh();
     XAxis->setRadius(0.1f);
     XAxis->setLength(3);
@@ -208,7 +209,7 @@ void BrainView::createCoordSystem(QEntity *rootEntity)
     phongMaterialX->setShininess(50.0f);
     m_XAxisEntity->addComponent(phongMaterialX);
 
-    // Y
+    // Y - blue
     Qt3D::QCylinderMesh *YAxis = new Qt3D::QCylinderMesh();
     YAxis->setRadius(0.1f);
     YAxis->setLength(3);
@@ -233,7 +234,7 @@ void BrainView::createCoordSystem(QEntity *rootEntity)
     phongMaterialY->setShininess(50.0f);
     m_YAxisEntity->addComponent(phongMaterialY);
 
-    // Z
+    // Z - red
     Qt3D::QCylinderMesh *ZAxis = new Qt3D::QCylinderMesh();
     ZAxis->setRadius(0.1f);
     ZAxis->setLength(3);

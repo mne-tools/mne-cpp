@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     selectionloader.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* @file     filterplotscene.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     October, 2014
+* @date     September, 2014
 *
 * @section  LICENSE
 *
@@ -30,84 +30,109 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    SelectionLoader class declaration.
+* @brief    Contains the declaration of the FilterPlotScene class.
 *
 */
 
-#ifndef SELECTIONLOADER_H
-#define SELECTIONLOADER_H
+#ifndef FILTERPLOTSCENE_H
+#define FILTERPLOTSCENE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "utils_global.h"
+#include "disp_global.h"
+#include "utils/filterTools/filterdata.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
-#include <QMap>
-#include <QStringList>
-#include <QFile>
-#include <QDebug>
-#include <QTextStream>
+
+#include <QGraphicsScene>
+#include <QPainterPath>
+#include <QGraphicsPathItem>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// DEFINE NAMESPACE XDISPLIB
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNELIB
-//=============================================================================================================
-
-namespace UTILSLIB
+namespace DISPLIB
 {
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINES
-//=============================================================================================================
+using namespace UTILSLIB;
 
 
-//=============================================================================================================
 /**
-* Processes selection files (mne .sel) files which contain the channels for each selection group.
+* DECLARE CLASS FilterPlotScene
 *
-* @brief Processes selection files (mne .sel) files which contain the chanels for each selection group.
+* @brief The FilterPlotScene class provides the scene where a filter response can be plotted.
 */
-class UTILSSHARED_EXPORT SelectionLoader
+class DISPSHARED_EXPORT FilterPlotScene : public QGraphicsScene
 {
+    Q_OBJECT
 public:
     //=========================================================================================================
     /**
-    * Constructs a Filter object.
+    * Constructs a FilterPlotScene dialog which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterPlotScene becomes a window. If parent is another widget, FilterPlotScene becomes a child window inside parent. FilterPlotScene is deleted when its parent is deleted.
     */
-    SelectionLoader();
+    FilterPlotScene(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Reads the specified MNE sel file.
-    * @param [in] path holds the file path of the elc file which is to be read.
-    * @param [in] selectionMap holds the map to which the read selection groups are stored.
+    * Updates the current filter.
+    *
+    * @param [in] operatorFilter pointer to the current filter operator which is to be plotted
+    * @param [in] samplingFreq holds the current sampling frequency
+    * @param [in] cutOffLow cut off frequqency lowpass or lower cut off when filter is a bandpass
+    * @param [in] cutOffHigh cut off frequqency highpass or higher cut off when filter is a bandpass
     */
-    bool readMNESelFile(QString path, QMap<QString,QStringList> &selectionMap);
+    void updateFilter(FilterData& operatorFilter, int samplingFreq, int cutOffLow, int cutOffHigh);
+
+protected:
+    //=========================================================================================================
+    /**
+    * Draws the diagram to plot the magnitude.
+    *
+    * @param [in] holds the current sampling frequency
+    */
+    void plotMagnitudeDiagram(int samplingFreq);
+
+    //=========================================================================================================
+    /**
+    * Draws the filter's frequency response.
+    *
+    */
+    void plotFilterFrequencyResponse();
+
+    FilterData      m_pCurrentFilter;                   /**< Pointer to the filter operator */
+
+    QGraphicsPathItem*          m_pGraphicsItemPath;    /**< Pointer to the graphics path item in the filterplotscene */
+
+    int             m_iScalingFactor;           /**< Scales the db filter magnitudes by the specified factor in order to provide better plotting. */
+    double          m_dMaxMagnitude;            /**< the maximum magnirutde shown in the diagram. */
+    int             m_iNumberHorizontalLines;   /**< number of plotted horizontal ()lines. */
+    int             m_iNumberVerticalLines;     /**< number of plotted vertical lines. */
+    int             m_iAxisTextSize;            /**< point size of the plotted text. */
+    int             m_iDiagramMarginsHoriz;     /**< horizontal space between the filter and diagram plot.  */
+    int             m_iDiagramMarginsVert;      /**< vertical space between the filter and diagram plot. */
+    int             m_iCutOffLow;               /**< cut off frequqency lowpass or lower cut off when filter is a bandpass. */
+    int             m_iCutOffHigh;              /**< cut off frequqency highpass or higher cut off when filter is a bandpass. */
+    int             m_iCutOffMarkerWidth;       /**< cut off marker width. */
 
 };
 
-} // NAMESPACE
+} // NAMESPACE DISPLIB
 
-#endif // SELECTIONLOADER_H
+#endif // FILTERPLOTSCENE_H

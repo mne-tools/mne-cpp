@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     hemisphere.cpp
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     cosinefilter.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     February, 2015
+* @date     November, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,22 +30,43 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of Hemisphere.
+* @brief    Declaration of the CosineFilter class
 *
 */
+
+#ifndef COSINEFILTER_H
+#define COSINEFILTER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "brainhemisphere.h"
+#include "../utils_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+#include <unsupported/Eigen/FFT>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE UTILSLIB
+//=============================================================================================================
+
+namespace UTILSLIB
+{
 
 
 //*************************************************************************************************************
@@ -52,85 +74,60 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISP3DNEWLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINES
 //=============================================================================================================
+#ifndef M_PI
+#define	M_PI		3.14159265358979323846	/* pi */
+#endif
 
-BrainHemisphere::BrainHemisphere(QNode *parent)
-: RenderableEntity(parent)
+#ifndef EIGEN_FFTW_DEFAULT
+#define EIGEN_FFTW_DEFAULT
+#endif
+
+
+//=============================================================================================================
+/**
+* Creates a cosine filter response in the frequency domain.
+*
+* @brief Creates a cosine filter response in the frequency domain.
+*/
+class UTILSSHARED_EXPORT CosineFilter
 {
-    init();
-}
+public:
+    enum TPassType {LPF, HPF, BPF, NOTCH };
 
+    //=========================================================================================================
+    /**
+    * Constructs a CosineFilter object.
+    *
+    */
+    CosineFilter();
 
-//*************************************************************************************************************
+    //=========================================================================================================
+    /**
+    * Constructs a CosineFilter object.
+    *
+    * @param fftLength length of the fft (multiple integer of 2^x)
+    * @param lowpass low cutoff frequency in Hz (not normed to sampling freq)
+    * @param lowpass_width determines the width of the filter slopes (steepness) in Hz (not normed to sampling freq)
+    * @param highpass highpass high cutoff frequency in Hz (not normed to sampling freq)
+    * @param highpass_width determines the width of the filter slopes (steepness) in Hz (not normed to sampling freq)
+    * @param sFreq sampling frequency
+    * @param type filter type (lowpass, highpass, etc.)
+    */
+    CosineFilter(int fftLength, float lowpass, float lowpass_width, float highpass, float highpass_width, double sFreq, TPassType type);
 
-BrainHemisphere::BrainHemisphere(const Surface &surf, const QMap<int, QColor> &qmVertexColors, QNode *parent)
-: RenderableEntity(parent)
-, m_surface(surf)
-, m_qmVertexColors(qmVertexColors)
-{
-    init();
-}
+    RowVectorXcd    m_dFFTCoeffA;   /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
+    RowVectorXd     m_dCoeffA;      /**< the time filter coefficient set*/
 
+    int             m_iFilterOrder;
+};
 
-//*************************************************************************************************************
+} // NAMESPACE UTILSLIB
 
-void BrainHemisphere::updateActivation(const QMap<int, QColor> &qmVertexColor)
-{
-    //std::cout<<"START BrainHemisphere::updateActivation()"<<std::endl;
-
-    m_pSurfaceMesh->updateActivation(qmVertexColor);
-//    this->removeComponent(m_pSurfaceMesh);
-
-//    if(m_pSurfaceMesh)
-//        delete m_pSurfaceMesh;
-
-//    //Create mesh for left hemisphere
-//    m_pSurfaceMesh = new BrainSurfaceMesh(m_surface, qmVertexColor);
-//    m_pSurfaceMesh->setObjectName("m_pSurfaceMesh");
-
-//    //this->setMesh(m_pSurfaceMesh.data());
-//    this->addComponent(m_pSurfaceMesh);
-
-//    //m_pSurfaceMesh->update();
-    //std::cout<<"END BrainHemisphere::updateActivation()"<<std::endl;
-}
-
-//*************************************************************************************************************
-
-void BrainHemisphere::init()
-{
-    //Create mesh for left hemisphere
-    m_pSurfaceMesh = new BrainSurfaceMesh(m_surface, m_qmVertexColors);
-    m_pSurfaceMesh->setObjectName("m_pSurfaceMesh");
-
-    //this->setMesh(m_pSurfaceMesh.data());
-    this->addComponent(m_pSurfaceMesh);
-
-    //Translate to the right if this hemisphere is right hemisphere and is inflated
-    if(m_surface.surf() == "inflated" && m_surface.hemi() == 1)
-        this->translateTransform()->setDx(this->scaleTransform()->scale()/10);
-
-    //Set material
-    QPerVertexColorMaterial *qperVertexColorMaterial = new QPerVertexColorMaterial();
-    this->addComponent(qperVertexColorMaterial);
-
-//    QPhongMaterial *phongMaterial = new QPhongMaterial();
-//    phongMaterial->setDiffuse(QColor(40, 40, 40));
-//    phongMaterial->setAmbient(Qt::gray);
-//    phongMaterial->setSpecular(Qt::white);
-//    phongMaterial->setShininess(50.0f);
-//    this->addComponent(phongMaterial);
-
-//    QDiffuseMapMaterial *diffuseMapMaterial = new QDiffuseMapMaterial();
-//    diffuseMapMaterial->setAmbient(Qt::gray);
-//    diffuseMapMaterial->setSpecular(Qt::white);
-//    diffuseMapMaterial->setShininess(5.0f);
-//    this->addComponent(diffuseMapMaterial);
-}
-
+#endif // COSINEFILTER_H

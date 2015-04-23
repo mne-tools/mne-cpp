@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     selectionmanagerwindow.h
+* @file     filterwindow.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2014
+* @date     August, 2014
 *
 * @section  LICENSE
 *
@@ -30,25 +30,23 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the SelectionManagerWindow class.
+* @brief    Contains the declaration of the FilterWindow class.
 *
 */
 
-#ifndef SELECTIONMANAGERWINDOW_H
-#define SELECTIONMANAGERWINDOW_H
+#ifndef FILTERWINDOW_H
+#define FILTERWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_selectionmanagerwindow.h"
-#include "utils/layoutloader.h"             //MNE-CPP utils
-#include "utils/selectionloader.h"          //MNE-CPP utils
-#include "utils/layoutmaker.h"              //MNE-CPP utils
-#include "selectionscene.h"
-#include "fiff/fiff.h"
-#include "chinfomodel.h"
+#include "disp_global.h"
+#include "utils/mnemath.h"
+#include "utils/filterTools/filterdata.h"
+#include "filterplotscene.h"
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -56,7 +54,25 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QMutableStringListIterator>
+#include <QWidget>
+#include <QSettings>
+#include <QGraphicsScene>
+#include <QSvgGenerator>
+#include <QDate>
+#include <QFileDialog>
+#include <QStandardPaths>
+#include <QKeyEvent>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISPLIB
+//=============================================================================================================
+
+namespace Ui {class FilterWindowWidget;} //This must be defined outside of the DISPLIB namespace
+
+namespace DISPLIB
+{
 
 
 //*************************************************************************************************************
@@ -70,225 +86,189 @@ using namespace UTILSLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEBrowseRawQt
-//=============================================================================================================
-
-namespace XDISPLIB
-{
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // DEFINE FORWARD DECLARATIONS
 //=============================================================================================================
 
 
 /**
-* DECLARE CLASS SelectionManagerWindow
+* DECLARE CLASS FilterWindow
 *
-* @brief The SelectionManagerWindow class provides a channel selection window.
+* @brief The FilterWindow class provides the filter window.
 */
-class SelectionManagerWindow : public QWidget
+class DISPSHARED_EXPORT FilterWindow : public QWidget
 {
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a SelectionManagerWindow which is a child of parent.
+    * Constructs a FilterWindow dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new SelectionManagerWindow becomes a window. If parent is another widget, SelectionManagerWindow becomes a child window inside parent. SelectionManagerWindow is deleted when its parent is deleted.
-    * @param [in] pChInfoModel pointer to the channel info model.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterWindow becomes a window. If parent is another widget, FilterWindow becomes a child window inside parent. FilterWindow is deleted when its parent is deleted.
     */
-    SelectionManagerWindow(QWidget *parent = 0, ChInfoModel *pChInfoModel = 0);
+    FilterWindow(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the SelectionManagerWindow.
-    * All SelectionManagerWindow's children are deleted first. The application exits if SelectionManagerWindow is the main widget.
+    * Destroys the FilterWindow.
+    * All FilterWindow's children are deleted first. The application exits if FilterWindow is the main widget.
     */
-    ~SelectionManagerWindow();
+    ~FilterWindow();
 
     //=========================================================================================================
     /**
-    * Sets the currently mapped fiff channels. used to create the group All.
+    * Sets the new fiff info.
     *
-    * @param [in] mappedLayoutChNames the currently to layout mapped channels
+    * @param[in] fiffInfo the new fiffInfo
     */
-    void setCurrentlyMappedFiffChannels(const QStringList &mappedLayoutChNames);
+    void setFiffInfo(const FiffInfo &fiffInfo);
 
     //=========================================================================================================
     /**
-    * Highlight channels
-    * This function highlights channels which were selected outside this selection manager (i.e in the DataWindow's Table View)
+    * Sets the new window size for the filter.
     *
-    * @param [in] channelList channels which are be to set as selected
+    * @param[in] iWindowSize length of the data which is to be filtered
     */
-    void highlightChannels(QModelIndexList channelIndexList);
+    void setWindowSize(int iWindowSize);
 
     //=========================================================================================================
     /**
-    * Select channels
-    * This function selects channels which were selected outside this selection manager (i.e in the DataWindow's Table View)
-    *
-    * @param [in] channelList channels which are be to set as selected
+    * Returns the current filter.
     */
-    void selectChannels(QStringList channelList);
-
-    //=========================================================================================================
-    /**
-    * Current selected channels
-    * This function returns the current channel selection
-    */
-    QStringList getSelectedChannels();
-
-    //=========================================================================================================
-    /**
-    * gets the item corresponding to text in listWidget
-    *
-    * @param [in] listWidget QListWidget which inhibits the needed item
-    * @param [in] channelName the corresponding channel name
-    */
-    QListWidgetItem* getItemForChName(QListWidget *listWidget, QString channelName);
-
-    //=========================================================================================================
-    /**
-    * returns the current layout map.
-    */
-    const QMap<QString,QPointF>& getLayoutMap();
-
-    //=========================================================================================================
-    /**
-    * call this whenever a new file was loaded.
-    */
-    void newFiffFileLoaded();
-
-signals:
-    //=========================================================================================================
-    /**
-    * emit this signal whenever the user or group selection has changed
-    *
-    * @param [in] selectedChannels currently user selected channels or items which are in the visible list widget
-    */
-    void showSelectedChannelsOnly(QStringList selectedChannels);
-
-    //=========================================================================================================
-    /**
-    * emit this signal whenever the selection in the scene has changed
-    *
-    * @param [in] selectedChannelItems currently user selected channels
-    */
-    void selectionChanged(const QList<QGraphicsItem*> &selectedChannelItems);
-
-    //=========================================================================================================
-    /**
-    * emit this signal whenever a new layout was loaded
-    *
-    * @param [in] layoutMap currently loaded layout
-    */
-    void loadedLayoutMap(const QMap<QString,QPointF> &layoutMap);
+    FilterData& getCurrentFilter();
 
 private:
     //=========================================================================================================
     /**
-    * Initialises all tabel widgets in the selection window.
-    *
+    * inits all check boxes.
     */
-    void initListWidgets();
+    void initCheckBoxes();
 
     //=========================================================================================================
     /**
-    * Initialises all graphic views in the selection window.
-    *
+    * inits all spin boxes.
     */
-    void initSelectionSceneView();
+    void initSpinBoxes();
 
     //=========================================================================================================
     /**
-    * Initialises all combo boxes in the selection window.
-    *
+    * inits all buttons.
+    */
+    void initButtons();
+
+    //=========================================================================================================
+    /**
+    * inits the QComboBoxes.
     */
     void initComboBoxes();
 
     //=========================================================================================================
     /**
-    * Loads a new layout from given file path.
-    *
-    * @param [in] path holds file pathloll
+    * inits the filter plot.
     */
-    bool loadLayout(QString path);
+    void initFilterPlot();
 
     //=========================================================================================================
     /**
-    * Loads a new selection from given file path.
-    *
-    * @param [in] path holds file path
+    * resizeEvent reimplemented virtual function to handle resize events of the filter window
     */
-    bool loadSelectionGroups(QString path);
+    void resizeEvent(QResizeEvent * event);
 
     //=========================================================================================================
     /**
-    * Delete all MEG channels from the selection groups which are not in the loaded layout. This needs to be done to guarantee consistency between the selection files and layout files (the selection files always include ALL MEG channels (gradiometers+magnitometers))
-    *
+    * keyPressEvent reimplemented virtual function to handle key events
     */
-    void cleanUpMEGChannels();
+    virtual void keyPressEvent(QKeyEvent * event);
 
     //=========================================================================================================
     /**
-    * Updates selection group widget in this window.
-    *
-    * @param [in] current the current selection group list item
-    * @param [in] previous the previous selection group list item
-    */
-    void updateSelectionGroupsList(QListWidgetItem* current, QListWidgetItem* previous);
-
-    //=========================================================================================================
-    /**
-    * Updates the scene regarding the selecting channel QList.
-    *
-    */
-    void updateSceneItems();
-
-    //=========================================================================================================
-    /**
-    * Updates user defined selections.
-    *
-    */
-    void updateUserDefinedChannelsList();
-
-    //=========================================================================================================
-    /**
-    * Updates data view.
-    *
-    */
-    void updateDataView();
-
-    //=========================================================================================================
-    /**
-    * Reimplemented resize event.
-    *
-    */
-    void resizeEvent(QResizeEvent* event);
-
-    //=========================================================================================================
-    /**
-    * Installed event filter.
-    *
+    * eventFilter reimplemented virtual function to handle object specific events
     */
     bool eventFilter(QObject *obj, QEvent *event);
 
-    Ui::SelectionManagerWindow*     ui;                                 /**< Pointer to the qt designer generated ui class. */
+    //=========================================================================================================
+    /**
+    * updates the filter plot scene with the newly generated filter
+    */
+    void updateFilterPlot();
 
-    ChInfoModel*                    m_pChInfoModel;                     /**< Pointer to the channel info model. */
+    Ui::FilterWindowWidget *ui;                 /**< Pointer to the qt designer generated ui class.*/
 
-    QMap<QString,QPointF>           m_layoutMap;                        /**< QMap with the loaded layout. each channel name correspond to a QPointF variable. */
-    QMap<QString,QStringList>       m_selectionGroupsMap;               /**< QMap with the loaded selection groups. Each group name holds a string list with the corresponding channels of the group.*/
+    FilterData          m_filterData;           /**< The current filter operator.*/
 
-    SelectionScene*                 m_pSelectionScene;                  /**< Pointer to the selection scene class. */
+    int                 m_iWindowSize;          /**< The current window size of the loaded fiff data in the DataWindow class.*/
+    int                 m_iFilterTaps;          /**< The current number of filter taps.*/
 
-    QStringList                     m_currentlyLoadedFiffChannels;      /**< List of currently loaded fiff data channels.*/
+    FiffInfo            m_fiffInfo;             /**< The current fiffInfo.*/
+
+    QSettings           m_qSettings;            /**< QSettings variable used to write or read from independent application sessions.*/
+
+    FilterPlotScene*    m_pFilterPlotScene;     /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
+
+signals:
+    void filterChanged(UTILSLIB::FilterData& filterData);
+
+    void applyFilter(QString channelType);
+
+    void activateFilter(bool active);
+
+protected slots:
+    //=========================================================================================================
+    /**
+    * This function gets called whenever the combo box is altered by the user via the gui.
+    *
+    * @param currentIndex holds the current index of the combo box
+    */
+    void changeStateSpinBoxes(int currentIndex);
+
+    //=========================================================================================================
+    /**
+    * This function gets called whenever default filter combo box is altered by the user via the gui.
+    *
+    * @param currentIndex holds the current index of the combo box
+    */
+    void changeDefaultFilter(int currentIndex);
+
+    //=========================================================================================================
+    /**
+    * This function gets called whenever the filter parameters are altered by the user via the gui.
+    */
+    void filterParametersChanged();
+
+    //=========================================================================================================
+    /**
+    * This function activates the filter functionality.
+    */
+    void onBtnActivateFilter();
+
+    //=========================================================================================================
+    /**
+    * This function applies the user defined filter to all channels.
+    */
+    void onSpinBoxFilterChannelType(QString channelType);
+
+    //=========================================================================================================
+    /**
+    * Saves an svg graphic of the scene if wanted by the user.
+    */
+    void onBtnExportFilterPlot();
+
+    //=========================================================================================================
+    /**
+    * This function exports the filter coefficients to a txt file.
+    */
+    void onBtnExportFilterCoefficients();
+
+    //=========================================================================================================
+    /**
+    * This function loads a filter from a txt file.
+    */
+    void onBtnLoadFilter();
+
 };
 
-} // NAMESPACE XDISPLIB
+} // NAMESPACE DISPLIB
 
-#endif // SELECTIONMANAGERWINDOW_H
+Q_DECLARE_METATYPE(UTILSLIB::FilterData);
+
+#endif // FILTERWINDOW_H

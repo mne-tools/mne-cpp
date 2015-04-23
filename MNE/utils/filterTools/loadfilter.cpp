@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     cosinefilter.cpp
+* @file     loadfilter.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     November, 2014
+* @date     April, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the CosineFilter class
+* @brief    Implementation of the LoadFilter class
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "cosinefilter.h"
+#include "loadfilter.h"
 
 
 //*************************************************************************************************************
@@ -55,101 +55,105 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CosineFilter::CosineFilter()
+LoadFilter::LoadFilter()
 {
-
 }
 
 
 //*************************************************************************************************************
 
-CosineFilter::CosineFilter(int fftLength, float lowpass, float lowpass_width, float highpass, float highpass_width, double sFreq, TPassType type)
+bool LoadFilter::readFilter(QString path, RowVectorXd &coefficients, QString &type, QString &name, int &order, double &sFreq)
 {
-    int highpasss,lowpasss;
-    int highpass_widths,lowpass_widths;
-    int k,s,w;
-    int resp_size = fftLength/2+1; //Take half because we are not interested in the conjugate complex part of the spectrum
+    //Open .txt file
+    if(!path.contains(".txt"))
+        return false;
 
-    double pi4 = M_PI/4.0;
-    float mult,add,c;
-
-    RowVectorXcd filterFreqResp = RowVectorXcd::Ones(resp_size);
-
-    //Transform frequencies into samples
-    highpasss = ((resp_size-1)*highpass)/(0.5*sFreq);
-    lowpasss = ((resp_size-1)*lowpass)/(0.5*sFreq);
-
-    lowpass_widths = ((resp_size-1)*lowpass_width)/(0.5*sFreq);
-    lowpass_widths = (lowpass_widths+1)/2;
-
-    if (highpass_width > 0.0) {
-        highpass_widths = ((resp_size-1)*highpass_width)/(0.5*sFreq);
-        highpass_widths  = (highpass_widths+1)/2;
-    }
-    else
-        highpass_widths = 3;
-
-    //Calculate filter freq response - use cosine
-    //Build high pass filter
-    if(type != LPF) {
-        if (highpasss > highpass_widths + 1) {
-            w    = highpass_widths;
-            mult = 1.0/w;
-            add  = 3.0;
-
-            for (k = 0; k < highpasss-w+1; k++)
-                filterFreqResp(k) = 0.0;
-
-            for (k = -w+1, s = highpasss-w+1; k < w; k++, s++) {
-                if (s >= 0 && s < resp_size) {
-                    c = cos(pi4*(k*mult+add));
-                    filterFreqResp(s) = filterFreqResp(s).real()*c*c;
-                }
-            }
-        }
+    QFile file(path);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug()<<"Error opening filter txt file for reading";
+        return false;
     }
 
-    //Build low pass filter
-    if(type != HPF) {
-        if (lowpass_widths > 0) {
-            w    = lowpass_widths;
-            mult = 1.0/w;
-            add  = 1.0;
+    //Start reading from file
+    QTextStream in(&file);
+    QVector<double> coefficientsTemp;
 
-            for (k = -w+1, s = lowpasss-w+1; k < w; k++, s++) {
-                if (s >= 0 && s < resp_size) {
-                    c = cos(pi4*(k*mult+add));
-                    filterFreqResp(s) = filterFreqResp(s).real()*c*c;
-                }
-            }
+    while(!in.atEnd())
+    {
+        QString line = in.readLine();
 
-            for (k = s; k < resp_size; k++)
-                filterFreqResp(k) = 0.0;
-        }
-        else {
-            for (k = lowpasss; k < resp_size; k++)
-                filterFreqResp(k) = 0.0;
-        }
+        QStringList fields = line.split(QRegExp("\\s+"));
+
+        //Delete last element if it is a blank character
+        if(fields.at(fields.size()-1) == "")
+            fields.removeLast();
+
+        if(line.contains("#")) //Filter meta information commented areas in file
+        {
+            //Read filter order
+            if(line.contains("sFreq") && fields.size()==2)
+                sFreq = fields.at(1).toDouble();
+
+            //Read filter order
+            if(line.contains("name"))
+                for(int i=1; i<fields.size(); i++)
+                    name.append(fields.at(i));
+
+            //Read the filter order
+            if(line.contains("order") && fields.size()==2)
+                order = fields.at(1).toInt();
+
+            //Read the filter type
+            if(line.contains("type") && fields.size()==2)
+                type = fields.at(1);
+
+        } else // Read filter coefficients
+            coefficientsTemp.push_back(fields.first().toDouble());
     }
 
-    m_dFFTCoeffA = filterFreqResp;
+    if(order != coefficientsTemp.size())
+        order = coefficientsTemp.size();
 
-    //Generate windowed impulse response - invert fft coeeficients to time domain
-    Eigen::FFT<double> fft;
-    fft.SetFlag(fft.HalfSpectrum);
+    coefficients = RowVectorXd::Zero(coefficientsTemp.size());
+    for(int i=0; i<coefficients.cols(); i++)
+        coefficients(i) = coefficientsTemp.at(i);
 
-    //invert to time domain and
-    fft.inv(m_dCoeffA, filterFreqResp);/*
-    m_dCoeffA = m_dCoeffA.segment(0,1024).eval();
+    file.close();
 
-    //window/zero-pad m_dCoeffA to m_iFFTlength
-    RowVectorXd t_coeffAzeroPad = RowVectorXd::Zero(fftLength);
-    t_coeffAzeroPad.head(m_dCoeffA.cols()) = m_dCoeffA;
-
-    //fft-transform filter coeffs
-    m_dFFTCoeffA = RowVectorXcd::Zero(fftLength);
-    fft.fwd(m_dFFTCoeffA,t_coeffAzeroPad);*/
+    return true;
 }
 
 
 //*************************************************************************************************************
+
+bool LoadFilter::writeFilter(const QString &path, const RowVectorXd &coefficients, const QString &type, const QString &name, const int &order, const double &sFreq)
+{
+    // Open file dialog
+    if(!path.isEmpty())
+    {
+        QFile file(path);
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)){
+            qDebug()<<"Error opening filter txt file for writing";
+            return false;
+        }
+
+        //Write coefficients to file
+        QTextStream out(&file);
+
+        out << "#sFreq " << sFreq << "\n";
+        out << "#name " << name << "\n";
+        out << "#type " << type << "\n";
+        out << "#order " << order << "\n";
+
+        for(int i = 0 ; i<coefficients.cols() ;i++)
+            out << coefficients(i) << "\n";
+
+        file.close();
+
+        return true;
+    }
+
+    qDebug()<<"Error Filter File path is empty";
+
+    return false;
+}

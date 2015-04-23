@@ -6,5 +6,6 @@
         <file alias="frqResolution.png">images/frqResolution.png</file>
         <file alias="channelScaling.png">images/channelScaling.png</file>
         <file alias="iconSSP.png">images/iconSSP.png</file>
+        <file alias="showFilterWindow.png">images/showFilterWindow.png</file>
     </qresource>
 </RCC>
