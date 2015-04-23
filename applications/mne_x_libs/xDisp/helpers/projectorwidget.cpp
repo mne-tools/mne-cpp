@@ -78,10 +78,24 @@ void ProjectorWidget::createUI()
     {
         m_qListCheckBox.clear();
         // Projection Selection
+        qint32 i = 0;
+
         QGridLayout *topLayout = new QGridLayout;
 
-        qint32 i;
-        for(i = 0; i < m_pFiffInfo->projs.size(); ++i)
+        QCheckBox *enableDisableProjectors = new QCheckBox("Enable/Disable all");
+
+        topLayout->addWidget(enableDisableProjectors, i, 1);
+        connect(enableDisableProjectors, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
+                this, &ProjectorWidget::enableDisableAll);
+
+        QFrame* line = new QFrame();
+        line->setFrameShape(QFrame::HLine);
+        line->setFrameShadow(QFrame::Sunken);
+
+        topLayout->addWidget(line, i+1, 1);
+
+
+        for(i+=2; i < m_pFiffInfo->projs.size(); ++i)
         {
             QCheckBox* checkBox = new QCheckBox(m_pFiffInfo->projs[i].desc);
             checkBox->setChecked(m_pFiffInfo->projs[i].active);
@@ -91,12 +105,6 @@ void ProjectorWidget::createUI()
             connect(checkBox, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged), this, &ProjectorWidget::checkStatusChanged);
             topLayout->addWidget(checkBox, i, 1);
         }
-
-        QCheckBox *enableDisableProjectors = new QCheckBox("Enable/Disable all");
-
-        topLayout->addWidget(enableDisableProjectors, i+1, 1);
-        connect(enableDisableProjectors, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
-                this, &ProjectorWidget::enableDisableAll);
 
         setLayout(topLayout);
     }

@@ -56,7 +56,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDockWidget>
 #include <QMutableStringListIterator>
 
 
@@ -89,7 +88,7 @@ namespace XDISPLIB
 *
 * @brief The SelectionManagerWindow class provides a channel selection window.
 */
-class SelectionManagerWindow : public QDockWidget
+class SelectionManagerWindow : public QWidget
 {
     Q_OBJECT
 
