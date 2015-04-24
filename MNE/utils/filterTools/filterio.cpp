@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     loadfilter.cpp
+* @file     filterio.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the LoadFilter class
+* @brief    Implementation of the FilterIO class
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "loadfilter.h"
+#include "filterio.h"
 
 
 //*************************************************************************************************************
@@ -55,14 +55,14 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-LoadFilter::LoadFilter()
+FilterIO::FilterIO()
 {
 }
 
 
 //*************************************************************************************************************
 
-bool LoadFilter::readFilter(QString path, RowVectorXd &coefficients, QString &type, QString &name, int &order, double &sFreq)
+bool FilterIO::readFilter(QString path, FilterData &filter)
 {
     //Open .txt file
     if(!path.contains(".txt"))
@@ -90,33 +90,51 @@ bool LoadFilter::readFilter(QString path, RowVectorXd &coefficients, QString &ty
 
         if(line.contains("#")) //Filter meta information commented areas in file
         {
-            //Read filter order
+            //Read filter sFreq
             if(line.contains("sFreq") && fields.size()==2)
-                sFreq = fields.at(1).toDouble();
+                filter.m_sFreq = fields.at(1).toDouble();
 
-            //Read filter order
-            if(line.contains("name"))
+            //Read filter name
+            if(line.contains("name")) {
+                filter.m_sName.clear();
                 for(int i=1; i<fields.size(); i++)
-                    name.append(fields.at(i));
+                    filter.m_sName.append(fields.at(i));
+            }
 
             //Read the filter order
             if(line.contains("order") && fields.size()==2)
-                order = fields.at(1).toInt();
+                filter.m_iFilterOrder = fields.at(1).toInt();
 
             //Read the filter type
             if(line.contains("type") && fields.size()==2)
-                type = fields.at(1);
+                filter.m_Type = filter.getFilterTypeForString(fields.at(1));
+
+            //Read the filter LPFreq
+            if(line.contains("LPFreq") && fields.size()==2)
+                filter.m_dLowpassFreq = fields.at(1).toDouble();
+
+            //Read the filter HPFreq
+            if(line.contains("HPFreq") && fields.size()==2)
+                filter.m_dHighFreq = fields.at(1).toDouble();
+
+            //Read the filter CenterFreq
+            if(line.contains("CenterFreq") && fields.size()==2)
+                filter.m_dCenterFreq = fields.at(1).toDouble();
+
+            //Read the filter DesignMethod
+            if(line.contains("DesignMethod") && fields.size()==2)
+                filter.m_designMethod = filter.getDesignMethodForString(fields.at(1));
 
         } else // Read filter coefficients
             coefficientsTemp.push_back(fields.first().toDouble());
     }
 
-    if(order != coefficientsTemp.size())
-        order = coefficientsTemp.size();
+    if(filter.m_iFilterOrder != coefficientsTemp.size())
+        filter.m_iFilterOrder = coefficientsTemp.size();
 
-    coefficients = RowVectorXd::Zero(coefficientsTemp.size());
-    for(int i=0; i<coefficients.cols(); i++)
-        coefficients(i) = coefficientsTemp.at(i);
+    filter.m_dCoeffA = RowVectorXd::Zero(coefficientsTemp.size());
+    for(int i=0; i<filter.m_dCoeffA.cols(); i++)
+        filter.m_dCoeffA(i) = coefficientsTemp.at(i);
 
     file.close();
 
@@ -126,7 +144,7 @@ bool LoadFilter::readFilter(QString path, RowVectorXd &coefficients, QString &ty
 
 //*************************************************************************************************************
 
-bool LoadFilter::writeFilter(const QString &path, const RowVectorXd &coefficients, const QString &type, const QString &name, const int &order, const double &sFreq)
+bool FilterIO::writeFilter(const QString &path, const FilterData &filter)
 {
     // Open file dialog
     if(!path.isEmpty())
@@ -140,13 +158,15 @@ bool LoadFilter::writeFilter(const QString &path, const RowVectorXd &coefficient
         //Write coefficients to file
         QTextStream out(&file);
 
-        out << "#sFreq " << sFreq << "\n";
-        out << "#name " << name << "\n";
-        out << "#type " << type << "\n";
-        out << "#order " << order << "\n";
+        out << "#sFreq " << filter.m_sFreq << "\n";
+        out << "#name " << filter.m_sName << "\n";
+        out << "#type " << filter.m_Type << "\n";
+        out << "#order " << filter.m_iFilterOrder << "\n";
+        out << "#HPFreq " << filter.m_dHighFreq << "\n";
+        out << "#LPFreq " << filter.m_dLowpassFreq<< "\n";
 
-        for(int i = 0 ; i<coefficients.cols() ;i++)
-            out << coefficients(i) << "\n";
+        for(int i = 0 ; i<filter.m_dCoeffA.cols() ;i++)
+            out << filter.m_dCoeffA(i) << "\n";
 
         file.close();
 

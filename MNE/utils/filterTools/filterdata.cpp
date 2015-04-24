@@ -78,33 +78,21 @@ FilterData::FilterData(QString unique_name, FilterType type, int order, double c
 
 //*************************************************************************************************************
 
-FilterData::FilterData(QString &path, qint32 fftlength)
-: m_iFFTlength(fftlength)
-{
-    //std::cout<<"START FilterData::FilterData()"<<std::endl;
+//FilterData::FilterData(QString &path, qint32 fftlength)
+//: m_iFFTlength(fftlength)
+//{
+//    //std::cout<<"START FilterData::FilterData()"<<std::endl;
 
-    QString type;
+//    QString type;
 
-    if(LoadFilter::readFilter(path, m_dCoeffA, type, m_sName, m_iFilterOrder, m_sFreq)) {
-        if(type == "HPF")
-            m_Type = FilterData::HPF;
+//    if(LoadFilter::readFilter(path, this)) {
+//        fftTransformCoeffs();
+//    }
+//    else
+//        qDebug()<<"Could not read filter file!";
 
-        if(type == "BPF")
-            m_Type = FilterData::BPF;
-
-        if(type == "LPF")
-            m_Type = FilterData::LPF;
-
-        if(type == "NOTCH")
-            m_Type = FilterData::NOTCH;
-
-        fftTransformCoeffs();
-    }
-    else
-        qDebug()<<"Could not read filter file!";
-
-    //std::cout<<"END FilterData::FilterData()"<<std::endl;
-}
+//    //std::cout<<"END FilterData::FilterData()"<<std::endl;
+//}
 
 
 //*************************************************************************************************************
@@ -134,6 +122,7 @@ void FilterData::designFilter()
                                             m_dParksWidth*(m_sFreq/2),
                                             m_sFreq,
                                             (CosineFilter::TPassType)m_Type);
+
                     break;
 
                 case HPF:
@@ -144,6 +133,7 @@ void FilterData::designFilter()
                                             m_dParksWidth*(m_sFreq/2),
                                             m_sFreq,
                                             (CosineFilter::TPassType)m_Type);
+
                     break;
 
                 case BPF:
@@ -154,6 +144,7 @@ void FilterData::designFilter()
                                             m_dParksWidth*(m_sFreq/2),
                                             m_sFreq,
                                             (CosineFilter::TPassType)m_Type);
+
                     break;
             }
 
@@ -167,6 +158,23 @@ void FilterData::designFilter()
 
             break;
         }
+    }
+
+    switch(m_Type) {
+        case LPF:
+            m_dLowpassFreq = 0;
+            m_dHighFreq = m_dCenterFreq*(m_sFreq/2);
+        break;
+
+        case HPF:
+            m_dLowpassFreq = m_dCenterFreq*(m_sFreq/2);
+            m_dHighFreq = 0;
+        break;
+
+        case BPF:
+            m_dLowpassFreq = (m_dCenterFreq + m_dBandwidth/2)*(m_sFreq/2);
+            m_dHighFreq = (m_dCenterFreq - m_dBandwidth/2)*(m_sFreq/2);
+        break;
     }
 
 }
