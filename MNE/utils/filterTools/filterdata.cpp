@@ -285,6 +285,87 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
 }
 
 
+//*************************************************************************************************************
+
+QString FilterData::getStringForDesignMethod(const FilterData::DesignMethod &designMethod)
+{
+    QString designMethodString = "External";
+
+    if(designMethod == FilterData::External)
+        designMethodString = "External";
+
+    if(designMethod == FilterData::Cosine)
+        designMethodString = "Cosine";
+
+    if(designMethod == FilterData::Tschebyscheff)
+        designMethodString = "Tschebyscheff";
+
+    return designMethodString;
+}
+
+
+//*************************************************************************************************************
+
+QString FilterData::getStringForFilterType(const FilterData::FilterType &filterType)
+{
+    QString filterTypeString = "LPF";
+
+    if(filterType == FilterData::LPF)
+        filterTypeString = "LPF";
+
+    if(filterType == FilterData::HPF)
+        filterTypeString = "HPF";
+
+    if(filterType == FilterData::BPF)
+        filterTypeString = "BPF";
+
+    if(filterType == FilterData::NOTCH)
+        filterTypeString = "NOTCH";
+
+    return filterTypeString;
+}
+
+
+//*************************************************************************************************************
+
+FilterData::DesignMethod FilterData::getDesignMethodForString(const QString &designMethodString)
+{
+    FilterData::DesignMethod designMethod = FilterData::External;
+
+    if(designMethodString == "External")
+        designMethod = FilterData::External;
+
+    if(designMethodString == "Tschebyscheff")
+        designMethod = FilterData::Tschebyscheff;
+
+    if(designMethodString == "Cosine")
+        designMethod = FilterData::Cosine;
+
+    return designMethod;
+}
+
+
+//*************************************************************************************************************
+
+FilterData::FilterType FilterData::getFilterTypeForString(const QString &filterTypeString)
+{
+    FilterData::FilterType filterType;
+
+    if(filterTypeString == "LPF")
+        filterType = FilterData::LPF;
+
+    if(filterTypeString == "HPF")
+        filterType = FilterData::HPF;
+
+    if(filterTypeString == "BPF")
+        filterType = FilterData::BPF;
+
+    if(filterTypeString == "NOTCH")
+        filterType = FilterData::NOTCH;
+
+    return filterType;
+}
+
 //OLD
 ////*************************************************************************************************************
 
