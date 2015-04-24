@@ -58,7 +58,6 @@
 
 #include "../utils_global.h"
 #include "parksmcclellan.h"
-#include "loadfilter.h"
 #include "cosinefilter.h"
 #include "../mnemath.h"
 #include "iostream"
@@ -189,22 +188,22 @@ public:
     /**
      * @brief getStringForDesignMethod returns the current design method as a string
      */
-    inline QString getStringForDesignMethod(const FilterData::DesignMethod &designMethod);
+    static QString getStringForDesignMethod(const FilterData::DesignMethod &designMethod);
 
     /**
      * @brief getStringFilterType returns the current filter type as a string
      */
-    inline QString getStringForFilterType(const FilterData::FilterType &filterType);
+    static QString getStringForFilterType(const FilterData::FilterType &filterType);
 
     /**
      * @brief getStringForDesignMethod returns the current design dependent on an input string
      */
-    inline FilterData::DesignMethod getDesignMethodForString(const QString &designMethodString);
+    static FilterData::DesignMethod getDesignMethodForString(const QString &designMethodString);
 
     /**
      * @brief getFilterTypeForString returns the current filter type dependent on an input string
      */
-    inline FilterData::FilterType getFilterTypeForString(const QString &filerTypeString);
+    static FilterData::FilterType getFilterTypeForString(const QString &filerTypeString);
 
     double          m_sFreq;            /**< the sampling frequency. */
     int             m_iFilterOrder;     /**< represents the order of the filter instance. */
@@ -231,84 +230,7 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline QString FilterData::getStringForDesignMethod(const FilterData::DesignMethod &designMethod)
-{
-    QString designMethodString = "External";
 
-    if(designMethod == FilterData::External)
-        designMethodString = "External";
-
-    if(designMethod == FilterData::Cosine)
-        designMethodString = "Cosine";
-
-    if(designMethod == FilterData::Tschebyscheff)
-        designMethodString = "Tschebyscheff";
-
-    return designMethodString;
-}
-
-
-//*************************************************************************************************************
-
-inline QString FilterData::getStringForFilterType(const FilterData::FilterType &filterType)
-{
-    QString filterTypeString = "LPF";
-
-    if(filterType == FilterData::LPF)
-        filterTypeString = "LPF";
-
-    if(filterType == FilterData::HPF)
-        filterTypeString = "HPF";
-
-    if(filterType == FilterData::BPF)
-        filterTypeString = "BPF";
-
-    if(filterType == FilterData::NOTCH)
-        filterTypeString = "NOTCH";
-
-    return filterTypeString;
-}
-
-
-//*************************************************************************************************************
-
-inline FilterData::DesignMethod FilterData::getDesignMethodForString(const QString &designMethodString)
-{
-    FilterData::DesignMethod designMethod = FilterData::External;
-
-    if(designMethodString == "External")
-        designMethod = FilterData::External;
-
-    if(designMethodString == "Tschebyscheff")
-        designMethod = FilterData::Tschebyscheff;
-
-    if(designMethodString == "Cosine")
-        designMethod = FilterData::Cosine;
-
-    return designMethod;
-}
-
-
-//*************************************************************************************************************
-
-inline FilterData::FilterType FilterData::getFilterTypeForString(const QString &filterTypeString)
-{
-    FilterData::FilterType filterType;
-
-    if(filterTypeString == "LPF")
-        filterType = FilterData::LPF;
-
-    if(filterTypeString == "HPF")
-        filterType = FilterData::HPF;
-
-    if(filterTypeString == "BPF")
-        filterType = FilterData::BPF;
-
-    if(filterTypeString == "NOTCH")
-        filterType = FilterData::NOTCH;
-
-    return filterType;
-}
 
 } // NAMESPACE UTILSLIB
 

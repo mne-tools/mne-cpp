@@ -465,7 +465,7 @@ void RealTimeMultiSampleArrayWidget::showChScalingWidget()
         m_pRTMSAScalingWidget = QSharedPointer<RealTimeMultiSampleArrayScalingWidget>(new RealTimeMultiSampleArrayScalingWidget(this));
 
         m_pRTMSAScalingWidget->setWindowTitle("Channel Scaling");
-        m_pRTMSAScalingWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
+        //m_pRTMSAScalingWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
         connect(m_pRTMSAScalingWidget.data(), &RealTimeMultiSampleArrayScalingWidget::scalingChanged, this, &RealTimeMultiSampleArrayWidget::broadcastScaling);
     }
@@ -489,7 +489,7 @@ void RealTimeMultiSampleArrayWidget::showProjectionWidget()
             m_pProjectorSelectionWidget = QSharedPointer<ProjectorWidget>(new ProjectorWidget);
 
             m_pProjectorSelectionWidget->setFiffInfo(m_pFiffInfo);
-            m_pProjectorSelectionWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
+            //m_pProjectorSelectionWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
             connect(m_pProjectorSelectionWidget.data(), &ProjectorWidget::projSelectionChanged, this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::updateProjection);
         }
@@ -508,7 +508,7 @@ void RealTimeMultiSampleArrayWidget::showFilterWidget()
 {
     if(!m_pFilterWindow) {
         m_pFilterWindow = QSharedPointer<FilterWindow>(new FilterWindow());
-        m_pFilterWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
+        //m_pFilterWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
 
         m_pFilterWindow->setFiffInfo(*m_pFiffInfo.data());
         m_pFilterWindow->setWindowSize(m_pRTMSAModel->getMaxSamples());
@@ -538,7 +538,7 @@ void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
         m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel());
 
         m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(0, m_pChInfoModel.data()));
-        m_pSelectionManagerWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
+        //m_pSelectionManagerWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
 
         connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::showSelectedChannelsOnly,
                 this, &RealTimeMultiSampleArrayWidget::showSelectedChannelsOnly);
