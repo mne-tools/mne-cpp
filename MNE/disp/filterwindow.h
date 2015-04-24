@@ -45,6 +45,7 @@
 #include "disp_global.h"
 #include "utils/mnemath.h"
 #include "utils/filterTools/filterdata.h"
+#include "utils/filterTools/filterio.h"
 #include "filterplotscene.h"
 #include <fiff/fiff_info.h>
 

@@ -333,7 +333,8 @@ void FilterWindow::changeDefaultFilter(int currentIndex)
         int exp = ceil(MNEMath::log2(fftLength));
         fftLength = pow(2, exp+1);
 
-        m_filterData = FilterData(QString("%1/mne_x_plugins/resources/2015_4_21_FilterCoeffs.txt").arg(QCoreApplication::applicationDirPath()), fftLength);
+        FilterIO::readFilter(QString("%1/mne_x_libs/xDisp/2015_4_21_FilterCoeffs.txt").arg(QCoreApplication::applicationDirPath()),
+                             m_filterData);
 
         emit filterChanged(m_filterData);
 
@@ -503,21 +504,7 @@ void FilterWindow::onBtnExportFilterCoefficients()
                                                     QString("%1/%2_%3_%4_FilterCoeffs").arg(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
                                                     tr("Text file(*.txt)"));
 
-    QString type;
-
-    if(m_filterData.m_Type == FilterData::HPF)
-        type = "HPF";
-
-    if(m_filterData.m_Type == FilterData::LPF)
-        type = "LPF";
-
-    if(m_filterData.m_Type == FilterData::BPF)
-        type = "BPF";
-
-    if(m_filterData.m_Type == FilterData::NOTCH)
-        type = "NOTCH";
-
-    LoadFilter::writeFilter(fileName, m_filterData.m_dCoeffA, type, m_filterData.m_sName, m_filterData.m_iFilterOrder, m_filterData.m_sFreq);
+    FilterIO::writeFilter(fileName, m_filterData);
 }
 
 
@@ -536,7 +523,7 @@ void FilterWindow::onBtnLoadFilter()
         int exp = ceil(MNEMath::log2(fftLength));
         fftLength = pow(2, exp+1);
 
-        m_filterData = FilterData(path, fftLength);
+        FilterIO::readFilter(path, m_filterData);
 
         emit filterChanged(m_filterData);
 

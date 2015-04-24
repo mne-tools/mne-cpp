@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     loadfilter.h
+* @file     filterio.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    LoadFilter class declaration.
+* @brief    FilterIO class declaration.
 *
 */
 
-#ifndef LOADFILTER_H
-#define LOADFILTER_H
+#ifndef FILTERIO_H
+#define FILTERIO_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -68,7 +68,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
 namespace UTILSLIB
@@ -101,44 +101,39 @@ using namespace Eigen;
 *
 * @brief Processes txt files which hold filter coefficients.
 */
-class UTILSSHARED_EXPORT LoadFilter
+class UTILSSHARED_EXPORT FilterIO
 {
 public:
-    typedef QSharedPointer<LoadFilter> SPtr;            /**< Shared pointer type for LoadFilter. */
-    typedef QSharedPointer<const LoadFilter> ConstSPtr; /**< Const shared pointer type for LoadFilter. */
+    typedef QSharedPointer<FilterIO> SPtr;            /**< Shared pointer type for FilterIO. */
+    typedef QSharedPointer<const FilterIO> ConstSPtr; /**< Const shared pointer type for FilterIO. */
 
     //=========================================================================================================
     /**
-    * Constructs a LoadFilter object.
+    * Constructs a FilterIO object.
     */
-    LoadFilter();
+    FilterIO();
 
     //=========================================================================================================
     /**
     * Reads a given txt file and scans it for filter coefficients. Pls see sample file for file syntax.
+    *
     * @param [in] path holds the file path of the txt file which is to be read.
-    * @param [out] coefficients holds the filter coefficients.
-    * @param [out] type holds filter type (HPF, LPF, BPF).
-    * @param [out] name holds the filter name.
-    * @param [out] order holds the filter order.
-    * @param [out] sFreq holds the filters sampling frequency.
+    * @param [out] filter holds the filter which the read parameters are to be saved to.
     *
     * @return true if reading was successful, false otherwise.
     */
-    static bool readFilter(QString path, RowVectorXd &coefficients, QString &type, QString &name, int &order, double &sFreq);
+    static bool readFilter(QString path, FilterData &filter);
 
     //=========================================================================================================
     /**
     * Writes a given filter to txt file .
+    *
     * @param [in] path holds the file path of the txt file which is to be written to.
-    * @param [in] coefficients holds the filter coefficients.
-    * @param [in] type holds filter type (HPF, LPF, BPF).
-    * @param [in] name holds the filter name.
-    * @param [in] order holds the filter order.
+    * @param [in] filter holds the filter which is to be written to file.
     *
     * @return true if reading was successful, false otherwise.
     */
-    static bool writeFilter(const QString &path, const RowVectorXd &coefficients, const QString &type, const QString &name, const int &order, const double &sFreq);
+    static bool writeFilter(const QString &path, const FilterData &filter);
 
 private:
 
@@ -146,4 +141,4 @@ private:
 
 } // NAMESPACE
 
-#endif // LOADFILTER_H
+#endif // FILTERIO_H
