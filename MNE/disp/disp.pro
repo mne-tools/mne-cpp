@@ -95,7 +95,7 @@ SOURCES += \
     rtplot.cpp \
     filterplotscene.cpp \
     filterwindow.cpp \
- #   helpers/filterdatadelegate.cpp \
+#    helpers/filterdatadelegate.cpp \
 #    helpers/filterdatamodel.cpp
 
 
@@ -108,7 +108,7 @@ HEADERS += \
     rtplot.h \
     filterplotscene.h \
     filterwindow.h \
- #   helpers/filterdatadelegate.h \
+#    helpers/filterdatadelegate.h \
 #    helpers/filterdatamodel.h
 
 
