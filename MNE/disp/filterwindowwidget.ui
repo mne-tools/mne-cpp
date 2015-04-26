@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>969</width>
-    <height>369</height>
+    <height>497</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -363,12 +363,12 @@
           <widget class="QComboBox" name="m_comboBox_defaultFilters">
            <item>
             <property name="text">
-             <string>NOTCH 60Hz Fs 1kHz</string>
+             <string>None selected</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>NOTCH 50Hz Fs 1kHz</string>
+             <string>NOTCH 60Hz Fs 1kHz</string>
             </property>
            </item>
           </widget>
