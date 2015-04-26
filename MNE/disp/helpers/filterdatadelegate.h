@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     realtimemultisamplearraydelegate.h
+* @file     filterdatadelegate.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the RealTimeMultiSampleArrayDelegate Class.
+* @brief    Declaration of the FilterDataDelegate Class.
 *
 */
 
-#ifndef REALTIMEMULTISAMPLEARRAYDELEGATE_H
-#define REALTIMEMULTISAMPLEARRAYDELEGATE_H
+#ifndef FILTERDATADELEGATE_H
+#define FILTERDATADELEGATE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -51,17 +51,17 @@
 // DEFINE NAMESPACE XDISPLIB
 //=============================================================================================================
 
-namespace XDISPLIB
+namespace DISPLIB
 {
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RealTimeMultiSampleArrayDelegate
+* DECLARE CLASS FilterDataDelegate
 *
-* @brief The RealTimeMultiSampleArrayDelegate class represents a RTMSA delegate which creates the plot paths
+* @brief The FilterDataDelegate class represents a filter data view delegate which creates a custom table view plot
 */
-class RealTimeMultiSampleArrayDelegate : public QAbstractItemDelegate
+class FilterDataDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
 public:
@@ -71,7 +71,7 @@ public:
     *
     * @param[in] parent     Parent of the delegate
     */
-    RealTimeMultiSampleArrayDelegate(QObject *parent = 0);
+    FilterDataDelegate(QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -95,32 +95,9 @@ public:
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
 private:
-    //=========================================================================================================
-    /**
-    * createPlotPath creates the QPointer path for the data plot.
-    *
-    * @param[in] index QModelIndex for accessing associated data and model object.
-    * @param[in,out] path The QPointerPath to create for the data plot.
-    */
-    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPainterPath& lastPath, QVector<float>& data, QVector<float>& lastData) const;
 
-    //=========================================================================================================
-    /**
-    * createGridPath Creates the QPointer path for the grid plot.
-    *
-    * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
-    * @param[in] data The row vector of the data matrix <1 x nsamples>.
-    */
-    void createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<  QVector<float> >& data) const;
-
-    //Settings
-//    QSettings m_qSettings;
-
-    // Scaling
-    float m_fMaxValue;     /**< Maximum value of the data to plot  */
-    float m_fScaleY;       /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
 };
 
 } // NAMESPACE
 
-#endif // REALTIMEMULTISAMPLEARRAYDELEGATE_H
+#endif // FILTERDATADELEGATE_H
