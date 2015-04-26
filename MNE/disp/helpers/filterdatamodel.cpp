@@ -152,11 +152,11 @@ QVariant FilterDataModel::data(const QModelIndex &index, int role) const
 
             switch(role) {
                 case Qt::DisplayRole:
-                    v.setValue(m_filterData.at(index).m_sName);
+                    v.setValue(m_filterData.at(index.row()).m_sName);
                     return v;
 
                 case FilterDataModelRoles::GetFilterName:
-                    v.setValue(m_filterData.at(index).m_sName);
+                    v.setValue(m_filterData.at(index.row()).m_sName);
                     return v;
 
                 case Qt::TextAlignmentRole:
@@ -170,13 +170,13 @@ QVariant FilterDataModel::data(const QModelIndex &index, int role) const
 
             QString filterType("Unknown");
 
-            if(m_filterData.at(index).m_Type == FilterData::HPF)
+            if(m_filterData.at(index.row()).m_Type == FilterData::HPF)
                 filterType = "HP";
-            if(m_filterData.at(index).m_Type == FilterData::LPF)
+            if(m_filterData.at(index.row()).m_Type == FilterData::LPF)
                 filterType = "LP";
-            if(m_filterData.at(index).m_Type == FilterData::BPF)
+            if(m_filterData.at(index.row()).m_Type == FilterData::BPF)
                 filterType = "BP";
-            if(m_filterData.at(index).m_Type == FilterData::NOTCH)
+            if(m_filterData.at(index.row()).m_Type == FilterData::NOTCH)
                 filterType = "NOTCH";
 
             switch(role) {
@@ -191,231 +191,6 @@ QVariant FilterDataModel::data(const QModelIndex &index, int role) const
                 case Qt::TextAlignmentRole:
                     return Qt::AlignHCenter + Qt::AlignVCenter;
             }
-        }//end column check
-
-        //******** third column (filter HP freq) ********
-        if(index.column()==2) {
-            QVariant v;
-
-            switch(role) {
-                case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_aliasNames.at(index.row())));
-                    return v;
-
-                case FilterDataModelRoles::GetFiltertHP:
-                    v.setValue(m_aliasNames.at(index.row()));
-                    return v;
-
-                case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
-            }
-        }//end column check
-
-        //******** fourth column (mapped layout channel name) ********
-        if(index.column()==3) {
-            QVariant v;
-
-            switch(role) {
-                case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_mappedLayoutChNames.at(index.row())));
-                    return v;
-
-                case FilterDataModelRoles::GetMappedLayoutChName:
-                    v.setValue(QString("%1").arg(m_mappedLayoutChNames.at(index.row())));
-                    return v;
-
-                case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
-            }
-        }//end column check
-
-        //******** fifth column (channel kind - MEG, EEG, etc) ********
-        if(index.column()==4) {
-            QVariant v;
-
-            switch(role) {
-                case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_fiffInfo.chs.at(index.row()).kind));
-                    return v;
-
-                case FilterDataModelRoles::GetChKind:
-                    v.setValue(m_fiffInfo.chs.at(index.row()).kind);
-                    return v;
-
-                case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
-            }
-        }//end column check
-
-        //******** sixth column (MEG type) ********
-        if(index.column()==5) {
-            QVariant v;
-
-            v.setValue(QString("%1").arg("non_MEG"));
-
-            if(m_fiffInfo.chs.at(index.row()).kind == FIFFV_MEG_CH) {
-                qint32 unit = m_fiffInfo.chs.at(index.row()).unit;
-                if(unit == FIFF_UNIT_T_M)
-                    v.setValue(QString("MEG_grad"));
-                else if(unit == FIFF_UNIT_T)
-                    v.setValue(QString("MEG_mag"));
-            }
-
-            switch(role) {
-                case Qt::DisplayRole:
-                    return v;
-
-                case FilterDataModelRoles::GetMEGType:
-                    return v;
-
-                case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
-            }
-        }//end column check
-
-        //******** seventh column (channel unit) ********
-        if(index.column()==6) {
-            QVariant v;
-
-            switch(role) {
-                case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_fiffInfo.chs.at(index.row()).unit));
-                    return v;
-
-                case FilterDataModelRoles::GetChUnit:
-                    v.setValue(m_fiffInfo.chs.at(index.row()).unit);
-                    return v;
-
-                case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
-            }
-        }//end column check
-
-        //******** eigth column (channel layout position) ********
-        if(index.column()==7) {
-            QVariant v;
-
-            QPointF point = m_layoutMap[m_mappedLayoutChNames.at(index.row())];
-
-            switch(role) {
-                case Qt::DisplayRole:
-                    v.setValue(QString("(%1|%2)").arg(point.x()).arg(point.y()));
-                    return v;
-
-                case FilterDataModelRoles::GetChPosition:
-                    v.setValue(point);
-                    return v;
-
-                case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
-            }
-        }//end column check
-
-        //******** ninth column (channel digitizer position) ********
-        if(index.column()==8) {
-            QVariant v;
-
-            QVector3D point3D(m_fiffInfo.chs.at(index.row()).loc(0,0) * 100, //convert to cm
-                            m_fiffInfo.chs.at(index.row()).loc(1,0) * 100,
-                            m_fiffInfo.chs.at(index.row()).loc(2,0) * 100);
-
-            switch(role) {
-                case Qt::DisplayRole:
-                    v.setValue(QString("(%1|%2|%3)").arg(point3D.x()).arg(point3D.y()).arg(point3D.z()));
-                    return v;
-
-                case FilterDataModelRoles::GetChDigitizer:
-                    v.setValue(point3D);
-                    return v;
-
-                case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
-            }
-        }//end column check
-
-        //******** tenth column (active channel filter type) ********
-        if(index.column()==9) {
-            QVariant v;
-
-//            //Check if mne operator is a filter operator
-//            QSharedPointer<MNEOperator> operatorPtr = m_assignedOperators.value(index.row(), QSharedPointer<MNEOperator>(new MNEOperator()));
-//            QSharedPointer<FilterOperator> filterOperator;
-
-            switch(role) {
-                case Qt::DisplayRole: {
-                    return v;
-                }
-//                    if(operatorPtr->m_OperatorType == MNEOperator::FILTER) {
-//                        filterOperator = operatorPtr.staticCast<FilterOperator>();
-//                    }
-//                    else {
-//                        v.setValue(QString("%1").arg("none"));
-//                        return v;
-//                    }
-
-//                    switch(filterOperator->m_Type) {
-//                        case FilterOperator::LPF: {
-//                            v.setValue(QString("%1 | %2").arg("LP").arg(filterOperator->m_dCenterFreq*m_fiffInfo.sfreq/2));
-//                            return v;
-//                        }
-
-//                        case FilterOperator::HPF: {
-//                            v.setValue(QString("%1 | %2").arg("HP").arg(filterOperator->m_dCenterFreq*m_fiffInfo.sfreq/2));
-//                            return v;
-//                        }
-
-//                        case FilterOperator::BPF: {
-//                            double fsample = m_fiffInfo.sfreq;
-//                            double low = (filterOperator->m_dCenterFreq*fsample/2) - (filterOperator->m_dBandwidth*fsample/4); // /4 because we also need to devide by 2 to get the nyquist freq
-//                            double high = (filterOperator->m_dCenterFreq*fsample/2) + (filterOperator->m_dBandwidth*fsample/4);
-//                            v.setValue(QString("%1 | %2 | %3").arg("BP").arg(low).arg(high));
-//                            return v;
-//                        }
-
-//                        case FilterOperator::NOTCH: {
-//                            double fsample = m_fiffInfo.sfreq;
-//                            double low = (filterOperator->m_dCenterFreq*fsample/2) - (filterOperator->m_dBandwidth*fsample/4);
-//                            double high = (filterOperator->m_dCenterFreq*fsample/2) + (filterOperator->m_dBandwidth*fsample/4);
-//                            v.setValue(QString("%1 | %2 | %3").arg("NOTCH").arg(low).arg(high));
-//                            return v;
-//                        }
-//                    }
-//                }
-
-//                case FilterDataModelRoles::GetChActiveFilter: {
-//                    if(operatorPtr->m_OperatorType == MNEOperator::FILTER) {
-//                        filterOperator = operatorPtr.staticCast<FilterOperator>();
-//                    }
-//                    else {
-//                        v.setValue(QString("%1").arg("none"));
-//                        return v;
-//                    }
-
-//                    v.setValue(operatorPtr);
-//                    return v;
-//                }
-
-                case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
-            }
-
-            //******** eleventh column (coil type) ********
-            if(index.column()==10) {
-                QVariant v;
-
-                switch(role) {
-                    case Qt::DisplayRole:
-                        v.setValue(QString("%1").arg(m_fiffInfo.chs.at(index.row()).coil_type));
-                        return v;
-
-                    case FilterDataModelRoles::GetChCoilType:
-                        v.setValue(m_fiffInfo.chs.at(index.row()).coil_type);
-                        return v;
-
-                    case Qt::TextAlignmentRole:
-                        return Qt::AlignHCenter + Qt::AlignVCenter;
-                }
-            }//end column check
         }//end column check
     } // end index.valid() check
 
@@ -470,133 +245,11 @@ bool FilterDataModel::setData(const QModelIndex &index, const QVariant &value, i
 
 //*************************************************************************************************************
 
-void FilterDataModel::fiffInfoChanged(const FiffInfo &fiffInfo)
-{
-    beginResetModel();
-
-    m_fiffInfo = fiffInfo;
-    m_aliasNames = m_fiffInfo.ch_names;
-    m_mappedLayoutChNames = m_fiffInfo.ch_names;
-
-    mapLayoutToChannels();
-
-    endResetModel();
-
-    emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
-}
-
-
-//*************************************************************************************************************
-
-//void FilterDataModel::assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOperator> > &assignedOperators)
-//{
-//    beginResetModel();
-
-//    m_assignedOperators = assignedOperators;
-
-//    endResetModel();
-
-//    emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
-//}
-
-
-//*************************************************************************************************************
-
-void FilterDataModel::layoutChanged(const QMap<QString,QPointF> &layoutMap)
-{
-    beginResetModel();
-
-    m_layoutMap = layoutMap;
-    m_aliasNames = m_fiffInfo.ch_names;
-    m_mappedLayoutChNames = m_fiffInfo.ch_names;
-
-    mapLayoutToChannels();
-
-    endResetModel();
-
-    emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
-}
-
-
-//*************************************************************************************************************
-
-const QStringList & FilterDataModel::getMappedChannelsList()
-{
-
-    return m_mappedLayoutChNames;
-}
-
-
-//*************************************************************************************************************
-
-int FilterDataModel::getIndexFromOrigChName(QString chName)
-{
-    return m_fiffInfo.ch_names.indexOf(chName);
-}
-
-
-//*************************************************************************************************************
-
-int FilterDataModel::getIndexFromMappedChName(QString chName)
-{
-    return m_mappedLayoutChNames.indexOf(chName);
-}
-
-
-//*************************************************************************************************************
-
-void FilterDataModel::mapLayoutToChannels()
-{
-    //TODO: Move this to layout loader in MNE-CPP Utils?
-    //Map channels to layout
-    QList<FiffChInfo> channelList = m_fiffInfo.chs;
-    for(int i = 0; i<channelList.size(); i++) {
-        //Get current channel information
-        FiffChInfo chInfo = channelList.at(i);
-        QString chName = chInfo.ch_name;
-        QRegExp regExpRemove;
-        bool flagOk = false;
-
-        switch(chInfo.kind) {
-            case FIFFV_MEG_CH:
-                //Scan for MEG string and other characters
-                regExpRemove = QRegExp("(MEG|-|_|/|\| )");
-                chName.remove(regExpRemove);
-
-                //After cleaning the string try to convert the residual to an int number
-                flagOk = false;
-                m_mappedLayoutChNames.replace(i, QString("%1 %2").arg("MEG").arg(chName));
-
-                break;
-
-            case FIFFV_EEG_CH: {
-                //Scan for EEG string and other characters
-                regExpRemove = QRegExp("(EEG|-|_|/|\| )");
-                chName.remove(regExpRemove);
-
-                //After cleaning the string try to convert the residual to an int number
-                flagOk = false;
-                m_mappedLayoutChNames.replace(i, QString("%1 %2").arg("EEG").arg(chName));
-
-                break;
-            }
-        }
-    } //end fiff chs
-
-    emit channelsMappedToLayout(m_mappedLayoutChNames);
-}
-
-
-//*************************************************************************************************************
-
 void FilterDataModel::clearModel()
 {
     beginResetModel();
 
-    m_fiffInfo = FiffInfo();
-    m_layoutMap.clear();
-    m_aliasNames.clear();
-    m_mappedLayoutChNames.clear();
+    m_filterData.clear();
 
     endResetModel();
 
