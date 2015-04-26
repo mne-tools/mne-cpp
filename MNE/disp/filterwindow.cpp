@@ -208,7 +208,7 @@ void FilterWindow::updateFilterPlot()
 {
     //Update the filter of the scene
     m_pFilterPlotScene->updateFilter(m_filterData,
-                                     m_fiffInfo.sfreq,
+                                     m_filterData.m_sFreq,
                                      ui->m_doubleSpinBox_lowpass->value(),
                                      ui->m_doubleSpinBox_highpass->value());
 
@@ -333,7 +333,7 @@ void FilterWindow::changeDefaultFilter(int currentIndex)
         int exp = ceil(MNEMath::log2(fftLength));
         fftLength = pow(2, exp+1);
 
-        FilterIO::readFilter(QString("%1/mne_x_libs/xDisp/2015_4_21_FilterCoeffs.txt").arg(QCoreApplication::applicationDirPath()),
+        FilterIO::readFilter(QString("%1/mne_x_libs/xDisp/default_filters/NOTCH_60Hz_Fs_1kHz.txt").arg(QCoreApplication::applicationDirPath()),
                              m_filterData);
 
         emit filterChanged(m_filterData);
