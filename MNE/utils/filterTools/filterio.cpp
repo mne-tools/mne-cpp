@@ -91,8 +91,8 @@ bool FilterIO::readFilter(QString path, FilterData &filter)
         if(line.contains("#")) //Filter meta information commented areas in file
         {
             //Read filter sFreq
-//            if(line.contains("sFreq") && fields.size()==2)
-//                filter.m_sFreq = fields.at(1).toDouble();
+            if(line.contains("sFreq") && fields.size()==2)
+                filter.m_sFreq = fields.at(1).toDouble();
 
             //Read filter name
             if(line.contains("name")) {
@@ -173,7 +173,7 @@ bool FilterIO::writeFilter(const QString &path, const FilterData &filter)
         //Write coefficients to file
         QTextStream out(&file);
 
-        //out << "#sFreq " << filter.m_sFreq << "\n";
+        out << "#sFreq " << filter.m_sFreq << "\n";
         out << "#name " << filter.m_sName << "\n";
         out << "#type " << FilterData::getStringForFilterType(filter.m_Type) << "\n";
         out << "#order " << filter.m_iFilterOrder << "\n";

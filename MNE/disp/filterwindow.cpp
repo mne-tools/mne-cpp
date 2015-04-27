@@ -205,22 +205,26 @@ void FilterWindow::initFilterPlot()
 
 void FilterWindow::initMVC()
 {
-    m_pFilterDataModel = FilterDataModel::SPtr(new FilterDataModel());
+    m_pFilterDataModel = FilterDataModel::SPtr(new FilterDataModel(this));
+    m_pFilterDataDelegate = FilterDataDelegate::SPtr(new FilterDataDelegate(this));
 
     ui->m_tableView_filterDataView->setModel(m_pFilterDataModel.data());
+    ui->m_tableView_filterDataView->setItemDelegate(m_pFilterDataDelegate.data());
 
-    //Only show the name of the filter
-    ui->m_tableView_filterDataView->hideColumn(1);
+    //Only show the names of the filter and activity check boxes
+    ui->m_tableView_filterDataView->verticalHeader()->hide();
     ui->m_tableView_filterDataView->hideColumn(2);
     ui->m_tableView_filterDataView->hideColumn(3);
     ui->m_tableView_filterDataView->hideColumn(4);
     ui->m_tableView_filterDataView->hideColumn(5);
     ui->m_tableView_filterDataView->hideColumn(6);
+    ui->m_tableView_filterDataView->hideColumn(7);
 
     //Connect selection in event window to jumpEvent slot
     connect(ui->m_tableView_filterDataView->selectionModel(),&QItemSelectionModel::currentRowChanged,
                 this, &FilterWindow::filterSelectionChanged);
 }
+
 
 //*************************************************************************************************************
 
@@ -293,7 +297,7 @@ void FilterWindow::updateFilterPlot()
 {
     //Update the filter of the scene
     m_pFilterPlotScene->updateFilter(m_filterData,
-                                     m_filterData.m_sFreq,
+                                     m_filterData.m_sFreq,//m_fiffInfo.sfreq,
                                      ui->m_doubleSpinBox_lowpass->value(),
                                      ui->m_doubleSpinBox_highpass->value());
 
@@ -542,7 +546,6 @@ void FilterWindow::onBtnLoadFilter()
 
         emit filterChanged(m_filterData);
 
-        //update filter plot
         updateFilterPlot();
     }
     else
@@ -555,11 +558,14 @@ void FilterWindow::onBtnLoadFilter()
 void FilterWindow::filterSelectionChanged(const QModelIndex &current, const QModelIndex &previous)
 {
     Q_UNUSED(previous);
+
     //Get filter from model and set as current filter
-    m_filterData = m_pFilterDataModel->data(current, FilterDataModelRoles::GetFilter).value<FilterData>();
+    QModelIndex index = m_pFilterDataModel->index(current.row(), 7);
+
+    m_filterData = m_pFilterDataModel->data(index, FilterDataModelRoles::GetFilter).value<FilterData>();
+
     emit filterChanged(m_filterData);
 
-    //update filter plot
     updateFilterPlot();
 }
 
