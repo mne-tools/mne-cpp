@@ -166,6 +166,10 @@ QVariant FilterDataModel::headerData(int section, Qt::Orientation orientation, i
 
 QVariant FilterDataModel::data(const QModelIndex &index, int role) const
 {
+    if(role!=Qt::DisplayRole || role!=Qt::TextAlignmentRole)
+        if(role<Qt::UserRole + 1009 && role > Qt::UserRole + 1016)
+            return QVariant();
+
     if(index.row() >= m_filterData.size())
         return QVariant();
 
@@ -175,9 +179,9 @@ QVariant FilterDataModel::data(const QModelIndex &index, int role) const
             QVariant v;
 
             switch(role) {
-                case Qt::DisplayRole:
-                    v.setValue(m_isActive.at(index.row()));
-                    return v;
+//                case Qt::DisplayRole:
+//                    v.setValue(m_isActive.at(index.row()));
+//                    return v;
 
                 case FilterDataModelRoles::GetFilterName:
                     v.setValue(m_isActive.at(index.row()));
@@ -340,8 +344,10 @@ bool FilterDataModel::removeRows(int position, int span, const QModelIndex & par
 
 Qt::ItemFlags FilterDataModel::flags(const QModelIndex & index) const
 {
-    Q_UNUSED(index);
-    return Qt::ItemIsEnabled | Qt::ItemIsSelectable /*| Qt::ItemIsEditable*/;
+    if(index.column() == 0)
+        return Qt::ItemIsEnabled | Qt::ItemIsEditable;
+
+    return Qt::ItemIsEnabled;
 }
 
 

@@ -45,17 +45,6 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QPainter>
-#include <QPainterPath>
-#include <QDebug>
-#include <QThread>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -68,7 +57,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 FilterDataDelegate::FilterDataDelegate(QObject *parent)
-: QItemDelegate(parent)
+: QItemDelegate (parent)
 {
 
 }
@@ -76,15 +65,31 @@ FilterDataDelegate::FilterDataDelegate(QObject *parent)
 
 //*************************************************************************************************************
 
+void FilterDataDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    switch(index.column()) {
+        case 0: { //filter state
+            drawCheck(painter, option, option.rect, index.data().toBool() ? Qt::Checked : Qt::Unchecked);
+            break;
+        }
+        case 1: { //filter names
+            drawDisplay(painter, option, option.rect, index.model()->data(index,Qt::DisplayRole).toString());
+            break;
+        }
+    }
+}
+
+//*************************************************************************************************************
+
 QWidget *FilterDataDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem & option , const QModelIndex & index) const
 {
     Q_UNUSED(option);
- std::cout<<"createEditor"<<std::endl;
-    if(index.column() == 0) {
-        std::cout<<"createEditor"<<std::endl;
-        QCheckBox *checkBox = new QCheckBox(parent);
-        return checkBox;
-    }
+    Q_UNUSED(index);
+
+//    if(index.column() == 0) {
+//        QCheckBox *checkBox = new QCheckBox("Inactive", parent);
+//        return checkBox;
+//    }
 
     QWidget *returnWidget = new QWidget();
     return returnWidget;
@@ -95,13 +100,18 @@ QWidget *FilterDataDelegate::createEditor(QWidget *parent, const QStyleOptionVie
 
 void FilterDataDelegate::setEditorData(QWidget *checkBox, const QModelIndex &index) const
 {
-    if(index.column() != 0)
-        return;
+//    if(index.column() != 0)
+//        return;
 
-    bool value = index.model()->data(index, Qt::DisplayRole).toBool();
+//    bool value = index.model()->data(index, Qt::DisplayRole).toBool();
 
-    QCheckBox *checkBoxState = static_cast<QCheckBox*>(checkBox);
-    checkBoxState->setChecked(value);
+//    QCheckBox *checkBoxState = static_cast<QCheckBox*>(checkBox);
+//    checkBoxState->setChecked(value);
+
+//    if(value)
+//        checkBoxState->setText("Active");
+//    else
+//        checkBoxState->setText("Inactive");
 }
 
 
@@ -109,14 +119,14 @@ void FilterDataDelegate::setEditorData(QWidget *checkBox, const QModelIndex &ind
 
 void FilterDataDelegate::setModelData(QWidget *checkBox, QAbstractItemModel *model, const QModelIndex &index) const
 {
-    if(index.column() != 0)
-        return;
+//    if(index.column() != 0)
+//        return;
 
-    QCheckBox *checkBoxState = static_cast<QCheckBox*>(checkBox);
-//    checkBoxState->interpretText();
-    bool value = checkBoxState->isChecked();
+//    QCheckBox *checkBoxState = static_cast<QCheckBox*>(checkBox);
 
-    model->setData(index, value, Qt::EditRole);
+//    bool value = checkBoxState->isChecked();
+
+//    model->setData(index, value, Qt::EditRole);
 }
 
 
