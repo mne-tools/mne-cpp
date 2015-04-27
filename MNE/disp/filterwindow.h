@@ -43,10 +43,13 @@
 //=============================================================================================================
 
 #include "disp_global.h"
+#include "helpers/filterdatamodel.h"
+#include "filterplotscene.h"
+
 #include "utils/mnemath.h"
 #include "utils/filterTools/filterdata.h"
 #include "utils/filterTools/filterio.h"
-#include "filterplotscene.h"
+
 #include <fiff/fiff_info.h>
 
 
@@ -171,6 +174,18 @@ private:
 
     //=========================================================================================================
     /**
+    * inits the Model View Controller.
+    */
+    void initMVC();
+
+    //=========================================================================================================
+    /**
+    * inits the default filters.
+    */
+    void initDefaultFilters();
+
+    //=========================================================================================================
+    /**
     * resizeEvent reimplemented virtual function to handle resize events of the filter window
     */
     void resizeEvent(QResizeEvent * event);
@@ -193,18 +208,19 @@ private:
     */
     void updateFilterPlot();
 
-    Ui::FilterWindowWidget *ui;                 /**< Pointer to the qt designer generated ui class.*/
+    Ui::FilterWindowWidget *ui;                     /**< Pointer to the qt designer generated ui class.*/
 
-    FilterData          m_filterData;           /**< The current filter operator.*/
+    FilterData              m_filterData;           /**< The current filter operator.*/
+    FilterDataModel::SPtr   m_pFilterDataModel;     /**< The model to hold current filters.*/
 
-    int                 m_iWindowSize;          /**< The current window size of the loaded fiff data in the DataWindow class.*/
-    int                 m_iFilterTaps;          /**< The current number of filter taps.*/
+    int                     m_iWindowSize;          /**< The current window size of the loaded fiff data in the DataWindow class.*/
+    int                     m_iFilterTaps;          /**< The current number of filter taps.*/
 
-    FiffInfo            m_fiffInfo;             /**< The current fiffInfo.*/
+    FiffInfo                m_fiffInfo;             /**< The current fiffInfo.*/
 
-    QSettings           m_qSettings;            /**< QSettings variable used to write or read from independent application sessions.*/
+    QSettings               m_qSettings;            /**< QSettings variable used to write or read from independent application sessions.*/
 
-    FilterPlotScene*    m_pFilterPlotScene;     /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
+    FilterPlotScene*        m_pFilterPlotScene;     /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
 
 signals:
     void filterChanged(UTILSLIB::FilterData& filterData);
@@ -221,14 +237,6 @@ protected slots:
     * @param currentIndex holds the current index of the combo box
     */
     void changeStateSpinBoxes(int currentIndex);
-
-    //=========================================================================================================
-    /**
-    * This function gets called whenever default filter combo box is altered by the user via the gui.
-    *
-    * @param currentIndex holds the current index of the combo box
-    */
-    void changeDefaultFilter(int currentIndex);
 
     //=========================================================================================================
     /**
@@ -266,10 +274,17 @@ protected slots:
     */
     void onBtnLoadFilter();
 
+    //=========================================================================================================
+    /**
+    * This function updates the filter window to the currently selected filter in view.
+    *
+    * @param current holds the current index of the model view
+    * @param previous holds the previous index of the model view
+    */
+    void filterSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
+
 };
 
 } // NAMESPACE DISPLIB
-
-Q_DECLARE_METATYPE(UTILSLIB::FilterData);
 
 #endif // FILTERWINDOW_H

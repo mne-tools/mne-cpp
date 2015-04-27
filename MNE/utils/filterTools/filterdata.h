@@ -118,10 +118,11 @@ public:
     } m_designMethod;
 
     enum FilterType {
-       LPF,
-       HPF,
-       BPF,
-       NOTCH
+        LPF,
+        HPF,
+        BPF,
+        NOTCH,
+        UNKNOWN
     } m_Type;
 
     enum CompensateEdgeEffects {
@@ -130,6 +131,9 @@ public:
        NoEdgeEffectCompensation
     };
 
+    /**
+     * @brief FilterData creates a default FilterData object
+     */
     FilterData();
 
     /**
@@ -145,14 +149,6 @@ public:
     * @param [in] designMethod specifies the design method to use. Choose between Cosind and Tschebyscheff
     */
     FilterData(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, double sFreq, qint32 fftlength=4096, DesignMethod designMethod = Cosine);
-
-    /**
-    * Constructs a FilterData object
-    *
-    * @param [in] path path to txt file which contains filter coeffiecients
-    * @param [in] fftlength length of the fft (multiple integer of 2^x)
-    */
-//    FilterData(QString &path, qint32 fftlength);
 
     /**
      * @brief fftTransformCoeffs transforms the calculated filter coefficients to frequency-domain
@@ -213,7 +209,7 @@ public:
     double          m_dParksWidth;      /**< contains the parksmcallen width. */
 
     double          m_dLowpassFreq;     /**< lowpass freq (higher cut off) of the filter. */
-    double          m_dHighFreq;        /**< lowpass freq (lower cut off) of the filter. */
+    double          m_dHighpassFreq;        /**< lowpass freq (lower cut off) of the filter. */
 
     QString         m_sName;            /**< contains name of the filter. */
 
@@ -224,12 +220,10 @@ public:
     RowVectorXcd    m_dFFTCoeffB;       /**< the FFT-transformed backward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
 };
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 
 
 } // NAMESPACE UTILSLIB
