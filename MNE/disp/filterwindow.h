@@ -44,6 +44,7 @@
 
 #include "disp_global.h"
 #include "helpers/filterdatamodel.h"
+#include "helpers/filterdatadelegate.h"
 #include "filterplotscene.h"
 
 #include "utils/mnemath.h"
@@ -208,19 +209,20 @@ private:
     */
     void updateFilterPlot();
 
-    Ui::FilterWindowWidget *ui;                     /**< Pointer to the qt designer generated ui class.*/
+    Ui::FilterWindowWidget *ui;                         /**< Pointer to the qt designer generated ui class.*/
 
-    FilterData              m_filterData;           /**< The current filter operator.*/
-    FilterDataModel::SPtr   m_pFilterDataModel;     /**< The model to hold current filters.*/
+    FilterData                  m_filterData;           /**< The current filter operator.*/
+    FilterDataModel::SPtr       m_pFilterDataModel;     /**< The model to hold current filters.*/
+    FilterDataDelegate::SPtr    m_pFilterDataDelegate;  /**< The delegate to plot the activation check boxes in column one.*/
 
-    int                     m_iWindowSize;          /**< The current window size of the loaded fiff data in the DataWindow class.*/
-    int                     m_iFilterTaps;          /**< The current number of filter taps.*/
+    int                         m_iWindowSize;          /**< The current window size of the loaded fiff data in the DataWindow class.*/
+    int                         m_iFilterTaps;          /**< The current number of filter taps.*/
 
-    FiffInfo                m_fiffInfo;             /**< The current fiffInfo.*/
+    FiffInfo                    m_fiffInfo;             /**< The current fiffInfo.*/
 
-    QSettings               m_qSettings;            /**< QSettings variable used to write or read from independent application sessions.*/
+    QSettings                   m_qSettings;            /**< QSettings variable used to write or read from independent application sessions.*/
 
-    FilterPlotScene*        m_pFilterPlotScene;     /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
+    FilterPlotScene*            m_pFilterPlotScene;     /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
 
 signals:
     void filterChanged(UTILSLIB::FilterData& filterData);

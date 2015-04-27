@@ -41,9 +41,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QAbstractItemDelegate>
-#include <QTableView>
-#include <QMap>
+#include <QItemDelegate>
+#include <QCheckBox>
 
 
 //*************************************************************************************************************
@@ -61,38 +60,22 @@ namespace DISPLIB
 *
 * @brief The FilterDataDelegate class represents a filter data view delegate which creates a custom table view plot
 */
-class FilterDataDelegate : public QAbstractItemDelegate
+class FilterDataDelegate : public QItemDelegate
 {
     Q_OBJECT
+
 public:
-    //=========================================================================================================
-    /**
-    * Creates a new abstract item delegate with the given parent.
-    *
-    * @param[in] parent     Parent of the delegate
-    */
+    typedef QSharedPointer<FilterDataDelegate> SPtr;            /**< Shared pointer type for FilterDataDelegate class. */
+    typedef QSharedPointer<const FilterDataDelegate> ConstSPtr; /**< Const shared pointer type for FilterDataDelegate class. */
+
     FilterDataDelegate(QObject *parent = 0);
 
-    //=========================================================================================================
-    /**
-    * Use the painter and style option to render the item specified by the item index.
-    *
-    * (sizeHint() must be implemented also)
-    *
-    * @param[in] painter    Low-level painting on widgets and other paint devices
-    * @param[in] option     Describes the parameters used to draw an item in a view widget
-    * @param[in] index      Used to locate data in a data model.
-    */
-    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-    //=========================================================================================================
-    /**
-    * Item size
-    *
-    * @param[in] option     Describes the parameters used to draw an item in a view widget
-    * @param[in] index      Used to locate data in a data model.
-    */
-    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    void setEditorData(QWidget *checkBox, const QModelIndex &index) const;
+    void setModelData(QWidget *checkBox, QAbstractItemModel *model, const QModelIndex &index) const;
+
+    void updateEditorGeometry(QWidget *checkBox, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
 private:
 

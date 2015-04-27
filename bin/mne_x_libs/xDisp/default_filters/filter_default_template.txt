@@ -1,0 +1,10 @@
+#sFreq 1000
+#name NOTCH_60Hz
+#type NOTCH
+#order 403
+#HPFreq 57
+#LPFreq 63
+#CenterFreq 60
+#DesignMethod External
+
+- Put your filter coefficients here (each seperated by a linebreak) -

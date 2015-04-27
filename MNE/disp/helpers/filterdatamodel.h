@@ -109,12 +109,12 @@ namespace FilterDataModelRoles
 class FilterDataModel : public QAbstractTableModel
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<FilterDataModel> SPtr;            /**< Shared pointer type for FilterDataModel class. */
     typedef QSharedPointer<const FilterDataModel> ConstSPtr; /**< Const shared pointer type for FilterDataModel class. */
 
     FilterDataModel(QObject *parent = 0);
-    FilterDataModel(QObject *parent, QString &path);
     FilterDataModel(QObject *parent, FilterData &dataFilter);
     FilterDataModel(QObject *parent, QList<FilterData> &dataFilter);
 

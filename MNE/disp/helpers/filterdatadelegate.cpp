@@ -68,7 +68,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 FilterDataDelegate::FilterDataDelegate(QObject *parent)
-: QAbstractItemDelegate(parent)
+: QItemDelegate(parent)
 {
 
 }
@@ -76,32 +76,61 @@ FilterDataDelegate::FilterDataDelegate(QObject *parent)
 
 //*************************************************************************************************************
 
-void FilterDataDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+QWidget *FilterDataDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem & option , const QModelIndex & index) const
 {
-
-}
-
-
-//*************************************************************************************************************
-
-QSize FilterDataDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
-{
-    QSize size;
-
-    switch(index.column()) {
-    case 0:
-        size = QSize(20,option.rect.height());
-        break;
-    case 1:
-        QList< QVector<float> > data = index.model()->data(index).value< QList<QVector<float> > >();
-//        qint32 nsamples = (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->lastSample()-(static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->firstSample();
-
-//        size = QSize(nsamples*m_dDx,m_dPlotHeight);
-        Q_UNUSED(option);
-        break;
+    Q_UNUSED(option);
+ std::cout<<"createEditor"<<std::endl;
+    if(index.column() == 0) {
+        std::cout<<"createEditor"<<std::endl;
+        QCheckBox *checkBox = new QCheckBox(parent);
+        return checkBox;
     }
 
-
-    return size;
+    QWidget *returnWidget = new QWidget();
+    return returnWidget;
 }
+
+
+//*************************************************************************************************************
+
+void FilterDataDelegate::setEditorData(QWidget *checkBox, const QModelIndex &index) const
+{
+    if(index.column() != 0)
+        return;
+
+    bool value = index.model()->data(index, Qt::DisplayRole).toBool();
+
+    QCheckBox *checkBoxState = static_cast<QCheckBox*>(checkBox);
+    checkBoxState->setChecked(value);
+}
+
+
+//*************************************************************************************************************
+
+void FilterDataDelegate::setModelData(QWidget *checkBox, QAbstractItemModel *model, const QModelIndex &index) const
+{
+    if(index.column() != 0)
+        return;
+
+    QCheckBox *checkBoxState = static_cast<QCheckBox*>(checkBox);
+//    checkBoxState->interpretText();
+    bool value = checkBoxState->isChecked();
+
+    model->setData(index, value, Qt::EditRole);
+}
+
+
+//*************************************************************************************************************
+
+void FilterDataDelegate::updateEditorGeometry(QWidget *checkBox, const QStyleOptionViewItem &option, const QModelIndex & index) const
+{
+    Q_UNUSED(index);
+
+    if(index.column() != 0)
+        return;
+
+    checkBox->setGeometry(option.rect);
+}
+
+
 

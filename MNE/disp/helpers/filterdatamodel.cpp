@@ -82,8 +82,9 @@ FilterDataModel::FilterDataModel(QObject *parent, QList<FilterData> &dataFilter)
 
 //*************************************************************************************************************
 //virtual functions
-int FilterDataModel::rowCount(const QModelIndex & /*parent*/) const
+int FilterDataModel::rowCount(const QModelIndex & parent) const
 {
+    Q_UNUSED(parent);
     //Return number of stored evoked sets
     if(!m_filterData.size()==0)
         return m_filterData.size();
@@ -94,9 +95,10 @@ int FilterDataModel::rowCount(const QModelIndex & /*parent*/) const
 
 //*************************************************************************************************************
 
-int FilterDataModel::columnCount(const QModelIndex & /*parent*/) const
+int FilterDataModel::columnCount(const QModelIndex & parent) const
 {
-    return 7;
+    Q_UNUSED(parent);
+    return 8;
 }
 
 
@@ -121,31 +123,35 @@ QVariant FilterDataModel::headerData(int section, Qt::Orientation orientation, i
             if(orientation == Qt::Horizontal) {
                 switch(section) {
                     case 0:
-                        return QString("%1").arg("Name");
+                        return QString("%1").arg("State");
                         break;
 
                     case 1:
-                        return QString("%1").arg("Type");
+                        return QString("%1").arg("Name");
                         break;
 
                     case 2:
-                        return QString("%1").arg("HP (Hz)");
+                        return QString("%1").arg("Type");
                         break;
 
                     case 3:
-                        return QString("%1").arg("LP (Hz)");
+                        return QString("%1").arg("HP (Hz)");
                         break;
 
                     case 4:
-                        return QString("%1").arg("Order");
+                        return QString("%1").arg("LP (Hz)");
                         break;
 
                     case 5:
-                        return QString("%1").arg("sFreq");
+                        return QString("%1").arg("Order");
                         break;
 
                     case 6:
-                        return QString("%1").arg("State");
+                        return QString("%1").arg("sFreq");
+                        break;
+
+                    case 7:
+                        return QString("%1").arg("Filter");
                         break;
                 }
             }
@@ -164,8 +170,26 @@ QVariant FilterDataModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     if (index.isValid()) {
-        //******** first column (filter name) ********
+        //******** zeroth column (filter state) ********
         if(index.column()==0) {
+            QVariant v;
+
+            switch(role) {
+                case Qt::DisplayRole:
+                    v.setValue(m_isActive.at(index.row()));
+                    return v;
+
+                case FilterDataModelRoles::GetFilterName:
+                    v.setValue(m_isActive.at(index.row()));
+                    return v;
+
+                case Qt::TextAlignmentRole:
+                    return Qt::AlignHCenter + Qt::AlignVCenter;
+            }
+        }//end column check
+
+        //******** first column (filter name) ********
+        if(index.column()==1) {
             QVariant v;
 
             switch(role) {
@@ -183,7 +207,7 @@ QVariant FilterDataModel::data(const QModelIndex &index, int role) const
         }//end column check
 
         //******** second column (Filter type) ********
-        if(index.column()==1) {
+        if(index.column()==2) {
             QVariant v;
 
             QString filterType = FilterData::getStringForFilterType(m_filterData.at(index.row()).m_Type);
@@ -203,7 +227,7 @@ QVariant FilterDataModel::data(const QModelIndex &index, int role) const
         }//end column check
 
         //******** third column (HP (Hz)) ********
-        if(index.column()==2) {
+        if(index.column()==3) {
             QVariant v;
 
             switch(role) {
@@ -221,7 +245,7 @@ QVariant FilterDataModel::data(const QModelIndex &index, int role) const
         }//end column check
 
         //******** fourth column (LP (Hz)) ********
-        if(index.column()==3) {
+        if(index.column()==4) {
             QVariant v;
 
             switch(role) {
@@ -239,7 +263,7 @@ QVariant FilterDataModel::data(const QModelIndex &index, int role) const
         }//end column check
 
         //******** fifth column (Order) ********
-        if(index.column()==4) {
+        if(index.column()==5) {
             QVariant v;
 
             switch(role) {
@@ -257,7 +281,7 @@ QVariant FilterDataModel::data(const QModelIndex &index, int role) const
         }//end column check
 
         //******** sixth column (sFreq) ********
-        if(index.column()==5) {
+        if(index.column()==6) {
             QVariant v;
 
             switch(role) {
@@ -275,31 +299,13 @@ QVariant FilterDataModel::data(const QModelIndex &index, int role) const
         }//end column check
 
 
-        //******** seventh column (Activation state) ********
-        if(index.column()==6) {
-            QVariant v;
-
-            switch(role) {
-                case Qt::DisplayRole:
-                    v.setValue(m_isActive.at(index.row()));
-                    return v;
-
-                case FilterDataModelRoles::GetFilterState:
-                    v.setValue(m_isActive.at(index.row()));
-                    return v;
-
-                case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
-            }
-        }//end column check
-
-        //******** eigth column (filter data object) ********
-        if(FilterDataModelRoles::GetFilter) {
+        //******** seventh column (Filter data) ********
+        if(index.column()==7 && FilterDataModelRoles::GetFilter) {
             QVariant v;
             v.setValue(m_filterData.at(index.row()));
             return v;
-
         }//end column check
+
     } // end index.valid() check
 
     return QVariant();
