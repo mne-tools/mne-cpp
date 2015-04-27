@@ -43,6 +43,11 @@
 
 #include <QItemDelegate>
 #include <QCheckBox>
+#include <QPainter>
+#include <QPainterPath>
+#include <QDebug>
+#include <QThread>
+#include <QStyledItemDelegate>
 
 
 //*************************************************************************************************************
@@ -70,12 +75,16 @@ public:
 
     FilterDataDelegate(QObject *parent = 0);
 
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-
-    void setEditorData(QWidget *checkBox, const QModelIndex &index) const;
-    void setModelData(QWidget *checkBox, QAbstractItemModel *model, const QModelIndex &index) const;
-
-    void updateEditorGeometry(QWidget *checkBox, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    //=========================================================================================================
+    /**
+    * Reimplemented virtual functions
+    *
+    */
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    virtual QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    virtual void setEditorData(QWidget *checkBox, const QModelIndex &index) const;
+    virtual void setModelData(QWidget *checkBox, QAbstractItemModel *model, const QModelIndex &index) const;
+    virtual void updateEditorGeometry(QWidget *checkBox, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
 private:
 

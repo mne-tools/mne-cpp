@@ -210,6 +210,9 @@
            <property name="sizeAdjustPolicy">
             <enum>QAbstractScrollArea::AdjustIgnored</enum>
            </property>
+           <property name="editTriggers">
+            <set>QAbstractItemView::CurrentChanged</set>
+           </property>
            <property name="alternatingRowColors">
             <bool>true</bool>
            </property>
