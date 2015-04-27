@@ -44,6 +44,7 @@
 //=============================================================================================================
 
 #include "utils/filterTools/filterdata.h"
+#include "utils/filterTools/filterio.h"
 
 
 //*************************************************************************************************************
@@ -85,19 +86,20 @@ using namespace UTILSLIB;
 // DEFINE NAMESPACE DISP
 //=============================================================================================================
 
-namespace DISP
+namespace DISPLIB
 {
 
 //Declare type roles
 namespace FilterDataModelRoles
 {
     enum ItemRole{GetFilterName = Qt::UserRole + 1009,
-                  GetFilterType = Qt::UserRole + 1010,
-                  GetFiltertHP = Qt::UserRole + 1011,
-                  GetFiltertLP = Qt::UserRole + 1012,
-                  GetFiltertOrder = Qt::UserRole + 1013,
-                  GetFilterSamplingFrequency = Qt::UserRole + 1014,
-                  GetFilterState = Qt::UserRole + 1015};
+                    GetFilterType = Qt::UserRole + 1010,
+                    GetFiltertHP = Qt::UserRole + 1011,
+                    GetFiltertLP = Qt::UserRole + 1012,
+                    GetFiltertOrder = Qt::UserRole + 1013,
+                    GetFilterSamplingFrequency = Qt::UserRole + 1014,
+                    GetFilterState = Qt::UserRole + 1015,
+                    GetFilter = Qt::UserRole + 1016};
 }
 
 //=============================================================================================================
@@ -108,7 +110,13 @@ class FilterDataModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
+    typedef QSharedPointer<FilterDataModel> SPtr;            /**< Shared pointer type for FilterDataModel class. */
+    typedef QSharedPointer<const FilterDataModel> ConstSPtr; /**< Const shared pointer type for FilterDataModel class. */
+
     FilterDataModel(QObject *parent = 0);
+    FilterDataModel(QObject *parent, QString &path);
+    FilterDataModel(QObject *parent, FilterData &dataFilter);
+    FilterDataModel(QObject *parent, QList<FilterData> &dataFilter);
 
     //=========================================================================================================
     /**
@@ -124,6 +132,22 @@ public:
     virtual bool insertRows(int position, int span, const QModelIndex & parent = QModelIndex());
     virtual bool removeRows(int position, int span, const QModelIndex & parent = QModelIndex());
 
+    //=========================================================================================================
+    /**
+    * addFilter adds filter to the model data
+    *
+    * @param dataFilter filter list with already loaded filters.
+    */
+    void addFilter(const QList<FilterData>& dataFilter);
+
+    //=========================================================================================================
+    /**
+    * addFilter adds filter to the model data
+    *
+    * @param dataFilter filter data with an already loaded filter.
+    */
+    void addFilter(const FilterData &dataFilter);
+
 signals:
 
 
@@ -135,9 +159,12 @@ protected:
     */
     void clearModel();
 
-    QList<FilterData>       m_filterData;           /**< list of the loaded filters and their data. */
+    QList<FilterData>       m_filterData;       /**< list of the loaded filters and their data. */
+    QList<bool>             m_isActive;         /**< list of the current activation state of the filters. */
 
 };
+
+Q_DECLARE_METATYPE(UTILSLIB::FilterData);
 
 } // NAMESPACE DISP
 

@@ -68,6 +68,8 @@ FilterWindow::FilterWindow(QWidget *parent)
     initButtons();
     initComboBoxes();
     initFilterPlot();
+    initMVC();
+    initDefaultFilters();
 
     m_iWindowSize = 4016;
     m_iFilterTaps = 128;
@@ -90,7 +92,7 @@ void FilterWindow::setFiffInfo(const FiffInfo &fiffInfo)
 
     filterParametersChanged();
 
-    //Update min max of spin boxes to nyquis
+    //Update min max of spin boxes to nyquist
     double samplingFrequency = m_fiffInfo.sfreq;
     double nyquistFrequency = samplingFrequency/2;
 
@@ -174,9 +176,6 @@ void FilterWindow::initComboBoxes()
     connect(ui->m_comboBox_filterType,static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
                 this,&FilterWindow::changeStateSpinBoxes);
 
-    connect(ui->m_comboBox_defaultFilters,static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-                this,&FilterWindow::changeDefaultFilter);
-
     //Initial selection is a lowpass and Cosine design method
     ui->m_doubleSpinBox_lowpass->setVisible(true);
     ui->m_label_lowpass->setVisible(true);
@@ -204,15 +203,42 @@ void FilterWindow::initFilterPlot()
 
 //*************************************************************************************************************
 
-void FilterWindow::updateFilterPlot()
+void FilterWindow::initMVC()
 {
-    //Update the filter of the scene
-    m_pFilterPlotScene->updateFilter(m_filterData,
-                                     m_filterData.m_sFreq,
-                                     ui->m_doubleSpinBox_lowpass->value(),
-                                     ui->m_doubleSpinBox_highpass->value());
+    m_pFilterDataModel = FilterDataModel::SPtr(new FilterDataModel());
 
-    ui->m_graphicsView_filterPlot->fitInView(m_pFilterPlotScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+    ui->m_tableView_filterDataView->setModel(m_pFilterDataModel.data());
+
+    //Only show the name of the filter
+    ui->m_tableView_filterDataView->hideColumn(1);
+    ui->m_tableView_filterDataView->hideColumn(2);
+    ui->m_tableView_filterDataView->hideColumn(3);
+    ui->m_tableView_filterDataView->hideColumn(4);
+    ui->m_tableView_filterDataView->hideColumn(5);
+    ui->m_tableView_filterDataView->hideColumn(6);
+
+    //Connect selection in event window to jumpEvent slot
+    connect(ui->m_tableView_filterDataView->selectionModel(),&QItemSelectionModel::currentRowChanged,
+                this, &FilterWindow::filterSelectionChanged);
+}
+
+//*************************************************************************************************************
+
+void FilterWindow::initDefaultFilters()
+{
+    //Init filter data model with all default filters located in the resource directory
+    QStringList defaultFilters;
+
+    defaultFilters << "NOTCH_60Hz.txt"
+                   << "NOTCH_50Hz.txt";
+
+    for(int i = 0; i<defaultFilters.size(); i++) {
+        FilterData tmpFilter;
+        QString fileName = defaultFilters.at(i);
+        QString path = QCoreApplication::applicationDirPath() + fileName.prepend("/mne_x_libs/xDisp/default_filters/");
+        if(FilterIO::readFilter(path, tmpFilter))
+            m_pFilterDataModel->addFilter(tmpFilter);
+    }
 }
 
 
@@ -258,6 +284,20 @@ bool FilterWindow::eventFilter(QObject *obj, QEvent *event)
     }
 
     return true;
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::updateFilterPlot()
+{
+    //Update the filter of the scene
+    m_pFilterPlotScene->updateFilter(m_filterData,
+                                     m_filterData.m_sFreq,
+                                     ui->m_doubleSpinBox_lowpass->value(),
+                                     ui->m_doubleSpinBox_highpass->value());
+
+    ui->m_graphicsView_filterPlot->fitInView(m_pFilterPlotScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 
@@ -318,29 +358,6 @@ void FilterWindow::changeStateSpinBoxes(int currentIndex)
     }
 
     filterParametersChanged();
-}
-
-
-//*************************************************************************************************************
-
-void FilterWindow::changeDefaultFilter(int currentIndex)
-{
-    Q_UNUSED(currentIndex);
-
-    if(ui->m_comboBox_defaultFilters->currentText() == "NOTCH 60Hz Fs 1kHz") {
-        //Replace old with new filter operator
-        int fftLength = m_iWindowSize;
-        int exp = ceil(MNEMath::log2(fftLength));
-        fftLength = pow(2, exp+1);
-
-        FilterIO::readFilter(QString("%1/mne_x_libs/xDisp/default_filters/NOTCH_60Hz_Fs_1kHz.txt").arg(QCoreApplication::applicationDirPath()),
-                             m_filterData);
-
-        emit filterChanged(m_filterData);
-
-        //update filter plot
-        updateFilterPlot();
-    }
 }
 
 
@@ -519,11 +536,9 @@ void FilterWindow::onBtnLoadFilter()
 
     if(!path.isEmpty()) {
         //Replace old with new filter operator
-        int fftLength = m_iWindowSize;
-        int exp = ceil(MNEMath::log2(fftLength));
-        fftLength = pow(2, exp+1);
-
         FilterIO::readFilter(path, m_filterData);
+
+        m_pFilterDataModel->addFilter(m_filterData);
 
         emit filterChanged(m_filterData);
 
@@ -532,6 +547,20 @@ void FilterWindow::onBtnLoadFilter()
     }
     else
         qDebug()<<"Could not load filter.";
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::filterSelectionChanged(const QModelIndex &current, const QModelIndex &previous)
+{
+    Q_UNUSED(previous);
+    //Get filter from model and set as current filter
+    m_filterData = m_pFilterDataModel->data(current, FilterDataModelRoles::GetFilter).value<FilterData>();
+    emit filterChanged(m_filterData);
+
+    //update filter plot
+    updateFilterPlot();
 }
 
 

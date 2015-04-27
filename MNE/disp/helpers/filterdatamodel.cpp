@@ -48,7 +48,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISP;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -59,6 +59,24 @@ using namespace DISP;
 FilterDataModel::FilterDataModel(QObject *parent)
 : QAbstractTableModel(parent)
 {
+}
+
+
+//*************************************************************************************************************
+
+FilterDataModel::FilterDataModel(QObject *parent, FilterData &dataFilter)
+: QAbstractTableModel(parent)
+{
+    addFilter(dataFilter);
+}
+
+
+//*************************************************************************************************************
+
+FilterDataModel::FilterDataModel(QObject *parent, QList<FilterData> &dataFilter)
+: QAbstractTableModel(parent)
+{
+    addFilter(dataFilter);
 }
 
 
@@ -78,7 +96,7 @@ int FilterDataModel::rowCount(const QModelIndex & /*parent*/) const
 
 int FilterDataModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 5;
+    return 7;
 }
 
 
@@ -168,16 +186,7 @@ QVariant FilterDataModel::data(const QModelIndex &index, int role) const
         if(index.column()==1) {
             QVariant v;
 
-            QString filterType("Unknown");
-
-            if(m_filterData.at(index.row()).m_Type == FilterData::HPF)
-                filterType = "HP";
-            if(m_filterData.at(index.row()).m_Type == FilterData::LPF)
-                filterType = "LP";
-            if(m_filterData.at(index.row()).m_Type == FilterData::BPF)
-                filterType = "BP";
-            if(m_filterData.at(index.row()).m_Type == FilterData::NOTCH)
-                filterType = "NOTCH";
+            QString filterType = FilterData::getStringForFilterType(m_filterData.at(index.row()).m_Type);
 
             switch(role) {
                 case Qt::DisplayRole:
@@ -191,6 +200,105 @@ QVariant FilterDataModel::data(const QModelIndex &index, int role) const
                 case Qt::TextAlignmentRole:
                     return Qt::AlignHCenter + Qt::AlignVCenter;
             }
+        }//end column check
+
+        //******** third column (HP (Hz)) ********
+        if(index.column()==2) {
+            QVariant v;
+
+            switch(role) {
+                case Qt::DisplayRole:
+                    v.setValue(m_filterData.at(index.row()).m_dHighpassFreq);
+                    return v;
+
+                case FilterDataModelRoles::GetFiltertHP:
+                    v.setValue(m_filterData.at(index.row()).m_dHighpassFreq);
+                    return v;
+
+                case Qt::TextAlignmentRole:
+                    return Qt::AlignHCenter + Qt::AlignVCenter;
+            }
+        }//end column check
+
+        //******** fourth column (LP (Hz)) ********
+        if(index.column()==3) {
+            QVariant v;
+
+            switch(role) {
+                case Qt::DisplayRole:
+                    v.setValue(m_filterData.at(index.row()).m_dLowpassFreq);
+                    return v;
+
+                case FilterDataModelRoles::GetFiltertLP:
+                    v.setValue(m_filterData.at(index.row()).m_dLowpassFreq);
+                    return v;
+
+                case Qt::TextAlignmentRole:
+                    return Qt::AlignHCenter + Qt::AlignVCenter;
+            }
+        }//end column check
+
+        //******** fifth column (Order) ********
+        if(index.column()==4) {
+            QVariant v;
+
+            switch(role) {
+                case Qt::DisplayRole:
+                    v.setValue(m_filterData.at(index.row()).m_iFilterOrder);
+                    return v;
+
+                case FilterDataModelRoles::GetFiltertOrder:
+                    v.setValue(m_filterData.at(index.row()).m_iFilterOrder);
+                    return v;
+
+                case Qt::TextAlignmentRole:
+                    return Qt::AlignHCenter + Qt::AlignVCenter;
+            }
+        }//end column check
+
+        //******** sixth column (sFreq) ********
+        if(index.column()==5) {
+            QVariant v;
+
+            switch(role) {
+                case Qt::DisplayRole:
+                    v.setValue(m_filterData.at(index.row()).m_sFreq);
+                    return v;
+
+                case FilterDataModelRoles::GetFilterSamplingFrequency:
+                    v.setValue(m_filterData.at(index.row()).m_sFreq);
+                    return v;
+
+                case Qt::TextAlignmentRole:
+                    return Qt::AlignHCenter + Qt::AlignVCenter;
+            }
+        }//end column check
+
+
+        //******** seventh column (Activation state) ********
+        if(index.column()==6) {
+            QVariant v;
+
+            switch(role) {
+                case Qt::DisplayRole:
+                    v.setValue(m_isActive.at(index.row()));
+                    return v;
+
+                case FilterDataModelRoles::GetFilterState:
+                    v.setValue(m_isActive.at(index.row()));
+                    return v;
+
+                case Qt::TextAlignmentRole:
+                    return Qt::AlignHCenter + Qt::AlignVCenter;
+            }
+        }//end column check
+
+        //******** eigth column (filter data object) ********
+        if(FilterDataModelRoles::GetFilter) {
+            QVariant v;
+            v.setValue(m_filterData.at(index.row()));
+            return v;
+
         }//end column check
     } // end index.valid() check
 
@@ -245,11 +353,42 @@ bool FilterDataModel::setData(const QModelIndex &index, const QVariant &value, i
 
 //*************************************************************************************************************
 
+void FilterDataModel::addFilter(const QList<FilterData>& dataFilter)
+{
+    m_filterData.append(dataFilter);
+
+    //set inactive by default
+    for(int i=0; i<dataFilter.size(); i++)
+        m_isActive.append(false);
+
+    emit dataChanged(createIndex(0,0), createIndex(rowCount(),columnCount()));
+    emit headerDataChanged(Qt::Vertical, 0, rowCount());
+}
+
+
+//*************************************************************************************************************
+
+void FilterDataModel::addFilter(const FilterData &dataFilter)
+{
+    m_filterData.append(dataFilter);
+
+    //set inactive by default
+    m_isActive.append(false);
+
+    emit dataChanged(createIndex(0,0), createIndex(rowCount(),columnCount()));
+    emit headerDataChanged(Qt::Vertical, 0, rowCount());
+}
+
+
+
+//*************************************************************************************************************
+
 void FilterDataModel::clearModel()
 {
     beginResetModel();
 
     m_filterData.clear();
+    m_isActive.clear();
 
     endResetModel();
 

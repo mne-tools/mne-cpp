@@ -54,6 +54,15 @@ using namespace UTILSLIB;
 //*************************************************************************************************************
 
 FilterData::FilterData()
+: m_Type(UNKNOWN)
+, m_iFilterOrder(80)
+, m_iFFTlength(4096)
+, m_sName("Unknown")
+, m_dParksWidth(0.1)
+, m_designMethod(External)
+, m_dCenterFreq(0.5)
+, m_dBandwidth(0.1)
+, m_sFreq(1000)
 {
 
 }
@@ -74,25 +83,6 @@ FilterData::FilterData(QString unique_name, FilterType type, int order, double c
 {
     designFilter();
 }
-
-
-//*************************************************************************************************************
-
-//FilterData::FilterData(QString &path, qint32 fftlength)
-//: m_iFFTlength(fftlength)
-//{
-//    //std::cout<<"START FilterData::FilterData()"<<std::endl;
-
-//    QString type;
-
-//    if(LoadFilter::readFilter(path, this)) {
-//        fftTransformCoeffs();
-//    }
-//    else
-//        qDebug()<<"Could not read filter file!";
-
-//    //std::cout<<"END FilterData::FilterData()"<<std::endl;
-//}
 
 
 //*************************************************************************************************************
@@ -163,17 +153,17 @@ void FilterData::designFilter()
     switch(m_Type) {
         case LPF:
             m_dLowpassFreq = 0;
-            m_dHighFreq = m_dCenterFreq*(m_sFreq/2);
+            m_dHighpassFreq = m_dCenterFreq*(m_sFreq/2);
         break;
 
         case HPF:
             m_dLowpassFreq = m_dCenterFreq*(m_sFreq/2);
-            m_dHighFreq = 0;
+            m_dHighpassFreq = 0;
         break;
 
         case BPF:
             m_dLowpassFreq = (m_dCenterFreq + m_dBandwidth/2)*(m_sFreq/2);
-            m_dHighFreq = (m_dCenterFreq - m_dBandwidth/2)*(m_sFreq/2);
+            m_dHighpassFreq = (m_dCenterFreq - m_dBandwidth/2)*(m_sFreq/2);
         break;
     }
 

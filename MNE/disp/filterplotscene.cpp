@@ -77,6 +77,9 @@ FilterPlotScene::FilterPlotScene(QObject *parent) :
 
 void FilterPlotScene::updateFilter(FilterData& operatorFilter, int samplingFreq, int cutOffLow, int cutOffHigh)
 {
+    if(operatorFilter.m_dCoeffA.cols() == 0)
+        return;
+
     m_pCurrentFilter = operatorFilter;
 
     //set member variables
