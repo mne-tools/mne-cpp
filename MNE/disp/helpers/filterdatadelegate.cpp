@@ -76,6 +76,9 @@ void FilterDataDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
             drawDisplay(painter, option, option.rect, index.model()->data(index, Qt::DisplayRole).toString());
             break;
         }
+        default:
+            QItemDelegate::paint(painter, option, index);
+            break;
     }
 }
 
