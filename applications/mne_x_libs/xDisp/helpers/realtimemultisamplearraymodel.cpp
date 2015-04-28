@@ -580,7 +580,7 @@ void RealTimeMultiSampleArrayModel::applyFilter(QString channelType)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::filterChanged(FilterData &filterData)
+void RealTimeMultiSampleArrayModel::filterChanged(QList<FilterData> filterData)
 {
     m_filterData = filterData;
 }
@@ -607,10 +607,12 @@ void RealTimeMultiSampleArrayModel::createFilterChannelList(QString channelType)
 
 //*************************************************************************************************************
 
-void doFilterPerChannel(QPair<FilterData,QPair<int,RowVectorXd> > &channelDataTime)
+void doFilterPerChannel(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
 {
-   //channelDataTime.second.second = channelDataTime.first.applyFFTFilter(channelDataTime.second.second, false, FilterData::MirrorData);
-   channelDataTime.second.second = channelDataTime.first.applyConvFilter(channelDataTime.second.second, false, FilterData::MirrorData);
+    for(int i=0; i<channelDataTime.first.size(); i++)
+        channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, false, FilterData::MirrorData);
+      //channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, false, FilterData::MirrorData);
+
 }
 
 
@@ -624,7 +626,7 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(bool filterLastDa
     m_dataFilteredCurrent.clear();
 
     //Generate QList structure which can be handled by the QConcurrent framework
-    QList<QPair<FilterData,QPair<int,RowVectorXd> > > timeData;
+    QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;
     MatrixXd matDataCurrent = dataToMatrix(m_dataCurrent);
     MatrixXd matDataLast = dataToMatrix(m_dataLast);
 
@@ -644,7 +646,7 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(bool filterLastDa
                 }
             }
 
-            timeData.append(QPair<FilterData,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,data)));
+            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,data)));
         }
     }
 
@@ -705,7 +707,7 @@ void RealTimeMultiSampleArrayModel::createDefaultFilter()
 
     FilterData::DesignMethod dMethod = FilterData::Cosine;
 
-    m_filterData = FilterData(QString("babyMEG_01"),
+    FilterData defaultFilter = FilterData(QString("babyMEG_01"),
                               FilterData::LPF,
                               filterTaps,
                               cutoffFreqHz/nyquist_freq,
@@ -714,5 +716,7 @@ void RealTimeMultiSampleArrayModel::createDefaultFilter()
                               sfreq,
                               fftLength,
                               dMethod);
+
+    m_filterData.append(defaultFilter);
 }
 

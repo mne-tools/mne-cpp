@@ -312,9 +312,9 @@ public:
     /**
     * Filter parameters changed
     *
-    * @param[in] filterData    pointer to the current filter
+    * @param[in] filterData    list of the currently active filter
     */
-    void filterChanged(FilterData &filterData);
+    void filterChanged(QList<FilterData> filterData);
 
 signals:
     //=========================================================================================================
@@ -392,7 +392,7 @@ private:
     QVector<VectorXd> m_dataLastFreeze;             /**< List that holds the last data when freezed*/
     QVector<VectorXd> m_dataFilteredLastFreeze;     /**< List that holds the last filtered data when freezed*/
 
-    FilterData m_filterData;
+    QList<FilterData> m_filterData;
 
     float m_fSps;                   /**< Sampling rate */
     qint32 m_iT;                    /**< Time window */

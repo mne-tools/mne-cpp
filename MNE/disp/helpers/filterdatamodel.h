@@ -99,7 +99,8 @@ namespace FilterDataModelRoles
                     GetFiltertOrder = Qt::UserRole + 1013,
                     GetFilterSamplingFrequency = Qt::UserRole + 1014,
                     GetFilterState = Qt::UserRole + 1015,
-                    GetFilter = Qt::UserRole + 1016};
+                    GetFilter = Qt::UserRole + 1016,
+                    GetActiveFilters = Qt::UserRole + 1017};
 }
 
 //=============================================================================================================
@@ -165,6 +166,8 @@ protected:
 };
 
 Q_DECLARE_METATYPE(UTILSLIB::FilterData);
+Q_DECLARE_METATYPE(QList<UTILSLIB::FilterData>);
+
 
 } // NAMESPACE DISP
 
