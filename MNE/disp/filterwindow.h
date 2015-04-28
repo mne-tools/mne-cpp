@@ -139,8 +139,10 @@ public:
     //=========================================================================================================
     /**
     * Returns the current filter.
+    *
+    * @return returns the list with the currently active filters
     */
-    FilterData& getCurrentFilter();
+    QList<FilterData> getCurrentFilter();
 
 private:
     //=========================================================================================================
@@ -181,9 +183,9 @@ private:
 
     //=========================================================================================================
     /**
-    * inits the default filters.
+    * inits the default and current filter.
     */
-    void initDefaultFilters();
+    void initFilters();
 
     //=========================================================================================================
     /**
@@ -225,7 +227,7 @@ private:
     FilterPlotScene*            m_pFilterPlotScene;     /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
 
 signals:
-    void filterChanged(UTILSLIB::FilterData& filterData);
+    void filterChanged(QList<UTILSLIB::FilterData> activeFilter);
 
     void applyFilter(QString channelType);
 
@@ -255,6 +257,8 @@ protected slots:
     //=========================================================================================================
     /**
     * This function applies the user defined filter to all channels.
+    *
+    * @param channelType holds the current text of the connected spin box
     */
     void onSpinBoxFilterChannelType(QString channelType);
 

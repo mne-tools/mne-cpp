@@ -69,7 +69,7 @@ FilterWindow::FilterWindow(QWidget *parent)
     initComboBoxes();
     initFilterPlot();
     initMVC();
-    initDefaultFilters();
+    initFilters();
 
     m_iWindowSize = 4016;
     m_iFilterTaps = 128;
@@ -92,12 +92,17 @@ void FilterWindow::setFiffInfo(const FiffInfo &fiffInfo)
 
     filterParametersChanged();
 
+    //Init m_filterData with designed filter and add to model
+    m_pFilterDataModel->addFilter(m_filterData);
+
     //Update min max of spin boxes to nyquist
     double samplingFrequency = m_fiffInfo.sfreq;
     double nyquistFrequency = samplingFrequency/2;
 
     ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
     ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
+
+    updateFilterPlot();
 }
 
 
@@ -113,9 +118,12 @@ void FilterWindow::setWindowSize(int iWindowSize)
 
 //*************************************************************************************************************
 
-FilterData& FilterWindow::getCurrentFilter()
+QList<FilterData> FilterWindow::getCurrentFilter()
 {
-    return m_filterData;
+    //Get active filters
+    QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData>>();
+
+    return activeFilters;
 }
 
 
@@ -221,6 +229,7 @@ void FilterWindow::initMVC()
     ui->m_tableView_filterDataView->hideColumn(5);
     ui->m_tableView_filterDataView->hideColumn(6);
     ui->m_tableView_filterDataView->hideColumn(7);
+    ui->m_tableView_filterDataView->hideColumn(8);
 
     //Connect selection in event window to jumpEvent slot
     connect(ui->m_tableView_filterDataView->selectionModel(),&QItemSelectionModel::currentRowChanged,
@@ -230,7 +239,7 @@ void FilterWindow::initMVC()
 
 //*************************************************************************************************************
 
-void FilterWindow::initDefaultFilters()
+void FilterWindow::initFilters()
 {
     //Init filter data model with all default filters located in the resource directory
     QStringList defaultFilters;
@@ -242,6 +251,7 @@ void FilterWindow::initDefaultFilters()
         FilterData tmpFilter;
         QString fileName = defaultFilters.at(i);
         QString path = QCoreApplication::applicationDirPath() + fileName.prepend("/mne_x_libs/xDisp/default_filters/");
+
         if(FilterIO::readFilter(path, tmpFilter))
             m_pFilterDataModel->addFilter(tmpFilter);
     }
@@ -380,7 +390,7 @@ void FilterWindow::filterParametersChanged()
     double bw = highpassHz-lowpassHz;
     double center = lowpassHz+bw/2;
 
-    double samplingFrequency = m_fiffInfo.sfreq;
+    double samplingFrequency = m_fiffInfo.sfreq <= 0 ? 600 : m_fiffInfo.sfreq;
     double nyquistFrequency = samplingFrequency/2;
 
     //Calculate the needed fft length
@@ -412,7 +422,7 @@ void FilterWindow::filterParametersChanged()
 
     if(ui->m_comboBox_filterType->currentText() == "Lowpass") {
         userDefinedFilterOperator = QSharedPointer<FilterData>(
-                                                new FilterData("User defined (See 'Adjust/Filter')",
+                                                new FilterData("Designed",
                                                                FilterData::LPF,
                                                                filterTaps,
                                                                lowpassHz/nyquistFrequency,
@@ -425,7 +435,7 @@ void FilterWindow::filterParametersChanged()
 
     if(ui->m_comboBox_filterType->currentText() == "Highpass") {
         userDefinedFilterOperator = QSharedPointer<FilterData>(
-                                        new FilterData("User defined (See 'Adjust/Filter')",
+                                        new FilterData("Designed",
                                             FilterData::HPF,
                                             filterTaps,
                                             highpassHz/nyquistFrequency,
@@ -438,7 +448,7 @@ void FilterWindow::filterParametersChanged()
 
     if(ui->m_comboBox_filterType->currentText() == "Bandpass") {
         userDefinedFilterOperator = QSharedPointer<FilterData>(
-                   new FilterData("User defined (See 'Adjust/Filter')",
+                   new FilterData("Designed",
                                   FilterData::BPF,
                                   filterTaps,
                                   (double)center/nyquistFrequency,
@@ -452,7 +462,10 @@ void FilterWindow::filterParametersChanged()
     //Replace old with new filter operator
     m_filterData = *userDefinedFilterOperator.data();
 
-    emit filterChanged(m_filterData);
+    QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData>>();
+    std::cout<<"activeFilters.size()"<<activeFilters.size()<<std::endl;
+
+    emit filterChanged(activeFilters);
 
     //update filter plot
     updateFilterPlot();
@@ -546,7 +559,8 @@ void FilterWindow::onBtnLoadFilter()
 
         m_pFilterDataModel->addFilter(m_filterData);
 
-        emit filterChanged(m_filterData);
+        QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData>>();
+        emit filterChanged(activeFilters);
 
         updateFilterPlot();
     }
@@ -566,7 +580,8 @@ void FilterWindow::filterSelectionChanged(const QModelIndex &current, const QMod
 
     m_filterData = m_pFilterDataModel->data(index, FilterDataModelRoles::GetFilter).value<FilterData>();
 
-    emit filterChanged(m_filterData);
+    QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData>>();
+    emit filterChanged(activeFilters);
 
     updateFilterPlot();
 }

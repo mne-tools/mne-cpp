@@ -98,7 +98,7 @@ int FilterDataModel::rowCount(const QModelIndex & parent) const
 int FilterDataModel::columnCount(const QModelIndex & parent) const
 {
     Q_UNUSED(parent);
-    return 8;
+    return 9;
 }
 
 
@@ -153,6 +153,10 @@ QVariant FilterDataModel::headerData(int section, Qt::Orientation orientation, i
                     case 7:
                         return QString("%1").arg("Filter");
                         break;
+
+                    case 8:
+                        return QString("%1").arg("ActiveFilters");
+                        break;
                 }
             }
         }
@@ -167,7 +171,7 @@ QVariant FilterDataModel::headerData(int section, Qt::Orientation orientation, i
 QVariant FilterDataModel::data(const QModelIndex &index, int role) const
 {
     if(role!=Qt::DisplayRole || role!=Qt::TextAlignmentRole)
-        if(role<Qt::UserRole + 1009 && role > Qt::UserRole + 1016)
+        if(role<Qt::UserRole + 1009 && role > Qt::UserRole + 1017)
             return QVariant();
 
     if(index.row() >= m_filterData.size() || index.column()>=columnCount())
@@ -307,6 +311,19 @@ QVariant FilterDataModel::data(const QModelIndex &index, int role) const
         if(index.column()==7 && FilterDataModelRoles::GetFilter) {
             QVariant v;
             v.setValue(m_filterData.at(index.row()));
+            return v;
+        }//end column check
+
+        //******** eigth column (Active Filters) ********
+        if(index.column()==8 && FilterDataModelRoles::GetActiveFilters) {
+            QVariant v;
+
+            QList<FilterData> activeFilters;
+            for(int i=0; i<m_filterData.size(); i++)
+                if(m_isActive.at(i))
+                    activeFilters.append(m_filterData.at(i));
+
+            v.setValue(activeFilters);
             return v;
         }//end column check
 
