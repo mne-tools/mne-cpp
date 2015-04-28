@@ -170,7 +170,7 @@ QVariant FilterDataModel::data(const QModelIndex &index, int role) const
         if(role<Qt::UserRole + 1009 && role > Qt::UserRole + 1016)
             return QVariant();
 
-    if(index.row() >= m_filterData.size())
+    if(index.row() >= m_filterData.size() || index.column()>=columnCount())
         return QVariant();
 
     if (index.isValid()) {
@@ -179,9 +179,9 @@ QVariant FilterDataModel::data(const QModelIndex &index, int role) const
             QVariant v;
 
             switch(role) {
-//                case Qt::DisplayRole:
-//                    v.setValue(m_isActive.at(index.row()));
-//                    return v;
+                case Qt::DisplayRole:
+                    v.setValue(m_isActive.at(index.row()));
+                    return v;
 
                 case FilterDataModelRoles::GetFilterName:
                     v.setValue(m_isActive.at(index.row()));
@@ -345,9 +345,9 @@ bool FilterDataModel::removeRows(int position, int span, const QModelIndex & par
 Qt::ItemFlags FilterDataModel::flags(const QModelIndex & index) const
 {
     if(index.column() == 0)
-        return Qt::ItemIsEnabled | Qt::ItemIsEditable;
+        return Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable;
 
-    return Qt::ItemIsEnabled;
+    return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
 
@@ -355,9 +355,13 @@ Qt::ItemFlags FilterDataModel::flags(const QModelIndex & index) const
 
 bool FilterDataModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    Q_UNUSED(index);
-    Q_UNUSED(value);
-    Q_UNUSED(role);
+    if(index.row()>=rowCount() || index.column()>=columnCount())
+        return false;
+
+    std::cout<<"setting active flag for"<<index.row()<<std::endl;
+
+    if(index.column() == 0 && role == Qt::EditRole)
+        m_isActive[index.row()] = value.toBool();
 
     return true;
 }

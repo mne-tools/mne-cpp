@@ -211,6 +211,8 @@ void FilterWindow::initMVC()
     ui->m_tableView_filterDataView->setModel(m_pFilterDataModel.data());
     ui->m_tableView_filterDataView->setItemDelegate(m_pFilterDataDelegate.data());
 
+    ui->m_tableView_filterDataView->resizeColumnToContents(0);
+
     //Only show the names of the filter and activity check boxes
     ui->m_tableView_filterDataView->verticalHeader()->hide();
     ui->m_tableView_filterDataView->hideColumn(2);

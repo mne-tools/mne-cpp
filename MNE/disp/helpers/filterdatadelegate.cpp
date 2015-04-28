@@ -73,7 +73,7 @@ void FilterDataDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
             break;
         }
         case 1: { //filter names
-            drawDisplay(painter, option, option.rect, index.model()->data(index,Qt::DisplayRole).toString());
+            drawDisplay(painter, option, option.rect, index.model()->data(index, Qt::DisplayRole).toString());
             break;
         }
     }
@@ -86,13 +86,13 @@ QWidget *FilterDataDelegate::createEditor(QWidget *parent, const QStyleOptionVie
     Q_UNUSED(option);
     Q_UNUSED(index);
 
-//    if(index.column() == 0) {
-//        QCheckBox *checkBox = new QCheckBox("Inactive", parent);
-//        return checkBox;
-//    }
+    if(index.column() == 0) {
+        BooleanWidget* widget = new BooleanWidget(parent);
 
-    QWidget *returnWidget = new QWidget();
-    return returnWidget;
+        return widget;
+    }
+
+    return 0;
 }
 
 
@@ -100,18 +100,14 @@ QWidget *FilterDataDelegate::createEditor(QWidget *parent, const QStyleOptionVie
 
 void FilterDataDelegate::setEditorData(QWidget *checkBox, const QModelIndex &index) const
 {
-//    if(index.column() != 0)
-//        return;
+    if(index.column() != 0)
+        return;
 
-//    bool value = index.model()->data(index, Qt::DisplayRole).toBool();
+    bool value = index.model()->data(index, Qt::DisplayRole).toBool();
 
-//    QCheckBox *checkBoxState = static_cast<QCheckBox*>(checkBox);
-//    checkBoxState->setChecked(value);
+    BooleanWidget *checkBoxState = static_cast<BooleanWidget*>(checkBox);
 
-//    if(value)
-//        checkBoxState->setText("Active");
-//    else
-//        checkBoxState->setText("Inactive");
+    checkBoxState->setChecked(value);
 }
 
 
@@ -119,14 +115,14 @@ void FilterDataDelegate::setEditorData(QWidget *checkBox, const QModelIndex &ind
 
 void FilterDataDelegate::setModelData(QWidget *checkBox, QAbstractItemModel *model, const QModelIndex &index) const
 {
-//    if(index.column() != 0)
-//        return;
+    if(index.column() != 0)
+        return;
 
-//    QCheckBox *checkBoxState = static_cast<QCheckBox*>(checkBox);
+    BooleanWidget *checkBoxState = static_cast<BooleanWidget*>(checkBox);
 
-//    bool value = checkBoxState->isChecked();
+    bool value = checkBoxState->isChecked();
 
-//    model->setData(index, value, Qt::EditRole);
+    model->setData(index, value, Qt::EditRole);
 }
 
 
@@ -141,6 +137,3 @@ void FilterDataDelegate::updateEditorGeometry(QWidget *checkBox, const QStyleOpt
 
     checkBox->setGeometry(option.rect);
 }
-
-
-

@@ -48,6 +48,8 @@
 #include <QDebug>
 #include <QThread>
 #include <QStyledItemDelegate>
+#include <QHBoxLayout>
+#include <QEvent>
 
 
 //*************************************************************************************************************
@@ -58,6 +60,31 @@
 namespace DISPLIB
 {
 
+//=============================================================================================================
+/**
+* DECLARE CLASS BooleanWidget
+*
+* @brief The BooleanWidget class provides a QCheckBox inside of a Qwidget with including Layout
+*/
+class BooleanWidget : public QWidget
+{
+    Q_OBJECT
+
+    public:
+
+    QCheckBox * m_pCheckBox;
+
+    BooleanWidget(QWidget * parent = 0)
+        : QWidget(parent)
+    {
+        m_pCheckBox = new QCheckBox(this);
+        QHBoxLayout * layout = new QHBoxLayout(this);
+        layout->addWidget(m_pCheckBox,0, Qt::AlignCenter);
+    }
+
+    bool isChecked(){return m_pCheckBox->isChecked();}
+    void setChecked(bool value){m_pCheckBox->setChecked(value);}
+};
 
 //=============================================================================================================
 /**
@@ -85,8 +112,6 @@ public:
     virtual void setEditorData(QWidget *checkBox, const QModelIndex &index) const;
     virtual void setModelData(QWidget *checkBox, QAbstractItemModel *model, const QModelIndex &index) const;
     virtual void updateEditorGeometry(QWidget *checkBox, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-
-private:
 
 };
 
