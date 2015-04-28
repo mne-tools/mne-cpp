@@ -225,8 +225,8 @@ void FilterWindow::initMVC()
     ui->m_tableView_filterDataView->hideColumn(2);
     ui->m_tableView_filterDataView->hideColumn(3);
     ui->m_tableView_filterDataView->hideColumn(4);
-    ui->m_tableView_filterDataView->hideColumn(5);
-    ui->m_tableView_filterDataView->hideColumn(6);
+    //ui->m_tableView_filterDataView->hideColumn(5);
+    //ui->m_tableView_filterDataView->hideColumn(6);
     ui->m_tableView_filterDataView->hideColumn(7);
     ui->m_tableView_filterDataView->hideColumn(8);
 
@@ -421,7 +421,7 @@ void FilterWindow::filterParametersChanged()
 
     if(ui->m_comboBox_filterType->currentText() == "Lowpass") {
         userDefinedFilterOperator = QSharedPointer<FilterData>(
-                                                new FilterData("Designed",
+                                                new FilterData("User Design",
                                                                FilterData::LPF,
                                                                filterTaps,
                                                                lowpassHz/nyquistFrequency,
@@ -434,7 +434,7 @@ void FilterWindow::filterParametersChanged()
 
     if(ui->m_comboBox_filterType->currentText() == "Highpass") {
         userDefinedFilterOperator = QSharedPointer<FilterData>(
-                                        new FilterData("Designed",
+                                        new FilterData("User Design",
                                             FilterData::HPF,
                                             filterTaps,
                                             highpassHz/nyquistFrequency,
@@ -447,7 +447,7 @@ void FilterWindow::filterParametersChanged()
 
     if(ui->m_comboBox_filterType->currentText() == "Bandpass") {
         userDefinedFilterOperator = QSharedPointer<FilterData>(
-                   new FilterData("Designed",
+                   new FilterData("User Design",
                                   FilterData::BPF,
                                   filterTaps,
                                   (double)center/nyquistFrequency,

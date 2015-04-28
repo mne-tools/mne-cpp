@@ -297,7 +297,7 @@ QVariant FilterDataModel::data(const QModelIndex &index, int role) const
 
             switch(role) {
                 case Qt::DisplayRole:
-                    v.setValue(m_filterData.at(index.row()).m_sFreq);
+                    v.setValue((int)m_filterData.at(index.row()).m_sFreq);
                     return v;
 
                 case FilterDataModelRoles::GetFilterSamplingFrequency:
@@ -400,7 +400,7 @@ void FilterDataModel::addFilter(const QList<FilterData>& dataFilter)
 
     //check for user designed filter
     for(int i=0; i<m_filterData.size(); i++)
-        if(m_filterData.at(i).m_sName == "Designed")
+        if(m_filterData.at(i).m_sName == "User Design")
             m_iDesignFilterIndex = i;
 
     emit dataChanged(createIndex(0,0), createIndex(rowCount(),columnCount()));
@@ -419,7 +419,7 @@ void FilterDataModel::addFilter(const FilterData &dataFilter)
 
     //check for user designed filter
     for(int i=0; i<m_filterData.size(); i++)
-        if(m_filterData.at(i).m_sName == "Designed")
+        if(m_filterData.at(i).m_sName == "User Design")
             m_iDesignFilterIndex = i;
 
     emit dataChanged(createIndex(0,0), createIndex(rowCount(),columnCount()));

@@ -211,7 +211,7 @@ private:
     */
     void updateFilterPlot();
 
-    Ui::FilterWindowWidget *ui;                         /**< Pointer to the qt designer generated ui class.*/
+    Ui::FilterWindowWidget *    ui;                     /**< Pointer to the qt designer generated ui class.*/
 
     FilterData                  m_filterData;           /**< The current filter operator.*/
     FilterDataModel::SPtr       m_pFilterDataModel;     /**< The model to hold current filters.*/
