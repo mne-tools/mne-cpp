@@ -1,5 +1,5 @@
 #sFreq 1000
-#name NOTCH_60Hz
+#name NOTCH_60Hz_Fs1kHz
 #type NOTCH
 #order 403
 #HPFreq 57
