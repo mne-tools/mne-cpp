@@ -294,14 +294,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Activate filter functionality
-    *
-    * @param[in] activate    flag used to turn on or off filters
-    */
-    void activateFilter(bool activate);
-
-    //=========================================================================================================
-    /**
     * Apply filters to channels
     *
     * @param[in] activate    flag used to turn on or off filters
@@ -336,7 +328,7 @@ private:
     /**
     * Creates the default filter with the current fiff info
     */
-    void createDefaultFilter();
+    //void createDefaultFilter();
 
     //=========================================================================================================
     /**
@@ -401,7 +393,6 @@ private:
     qint32 m_iCurrentSample;        /**< Accurate Downsampling */
 
     bool m_bIsFreezed;              /**< Display is freezed */
-    bool m_doFiltering;             /**< Do Filtering flag */
 
     QMap< qint32,float > m_qMapChScaling;   /**< Sensor selection widget. */
 };

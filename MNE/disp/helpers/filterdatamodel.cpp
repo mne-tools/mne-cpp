@@ -58,6 +58,7 @@ using namespace DISPLIB;
 
 FilterDataModel::FilterDataModel(QObject *parent)
 : QAbstractTableModel(parent)
+, m_iDesignFilterIndex(-1)
 {
 }
 
@@ -66,6 +67,7 @@ FilterDataModel::FilterDataModel(QObject *parent)
 
 FilterDataModel::FilterDataModel(QObject *parent, FilterData &dataFilter)
 : QAbstractTableModel(parent)
+, m_iDesignFilterIndex(-1)
 {
     addFilter(dataFilter);
 }
@@ -75,6 +77,7 @@ FilterDataModel::FilterDataModel(QObject *parent, FilterData &dataFilter)
 
 FilterDataModel::FilterDataModel(QObject *parent, QList<FilterData> &dataFilter)
 : QAbstractTableModel(parent)
+, m_iDesignFilterIndex(-1)
 {
     addFilter(dataFilter);
 }
@@ -375,10 +378,11 @@ bool FilterDataModel::setData(const QModelIndex &index, const QVariant &value, i
     if(index.row()>=rowCount() || index.column()>=columnCount())
         return false;
 
-    std::cout<<"setting active flag for"<<index.row()<<std::endl;
-
     if(index.column() == 0 && role == Qt::EditRole)
         m_isActive[index.row()] = value.toBool();
+
+    if(index.column() == 7 && role == Qt::EditRole)
+        m_filterData[index.row()] = value.value<FilterData>();
 
     return true;
 }
@@ -394,6 +398,11 @@ void FilterDataModel::addFilter(const QList<FilterData>& dataFilter)
     for(int i=0; i<dataFilter.size(); i++)
         m_isActive.append(false);
 
+    //check for user designed filter
+    for(int i=0; i<m_filterData.size(); i++)
+        if(m_filterData.at(i).m_sName == "Designed")
+            m_iDesignFilterIndex = i;
+
     emit dataChanged(createIndex(0,0), createIndex(rowCount(),columnCount()));
     emit headerDataChanged(Qt::Vertical, 0, rowCount());
 }
@@ -408,10 +417,22 @@ void FilterDataModel::addFilter(const FilterData &dataFilter)
     //set inactive by default
     m_isActive.append(false);
 
+    //check for user designed filter
+    for(int i=0; i<m_filterData.size(); i++)
+        if(m_filterData.at(i).m_sName == "Designed")
+            m_iDesignFilterIndex = i;
+
     emit dataChanged(createIndex(0,0), createIndex(rowCount(),columnCount()));
     emit headerDataChanged(Qt::Vertical, 0, rowCount());
 }
 
+
+//*************************************************************************************************************
+
+int FilterDataModel::getUserDesignedFilterIndex()
+{
+    return m_iDesignFilterIndex;
+}
 
 
 //*************************************************************************************************************

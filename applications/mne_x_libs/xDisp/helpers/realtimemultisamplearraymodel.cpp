@@ -64,7 +64,6 @@ RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 , m_iMaxSamples(1024)
 , m_iCurrentSample(0)
 , m_bIsFreezed(false)
-, m_doFiltering(false)
 {
     init();
 }
@@ -115,7 +114,7 @@ QVariant RealTimeMultiSampleArrayModel::data(const QModelIndex &index, int role)
                     {
                         // data freeze
                         QVector<float> data;
-                        if(!m_doFiltering) {
+                        if(m_filterData.isEmpty()) {
                             for(qint32 i=0; i < m_dataCurrentFreeze.size(); ++i)
                                 data.append(m_dataCurrentFreeze[i](row));
                             qListVector.append(data);
@@ -142,7 +141,7 @@ QVariant RealTimeMultiSampleArrayModel::data(const QModelIndex &index, int role)
                     else
                     {
                         // data
-                        if(!m_doFiltering) {
+                        if(m_filterData.isEmpty()) {
                             QVector<float> data;
                             for(qint32 i = 0; i < m_dataCurrent.size(); ++i)
                                 data.append(m_dataCurrent[i](row));
@@ -233,7 +232,7 @@ void RealTimeMultiSampleArrayModel::init()
 {
     m_pFiffInfo = FiffInfo::SPtr(new FiffInfo());
 
-    createDefaultFilter();
+//    createDefaultFilter();
 }
 
 
@@ -267,7 +266,7 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
 
         createFilterChannelList("All");
 
-        createDefaultFilter();
+//        createDefaultFilter();
 
         //
         //  Create the initial SSP projector
@@ -298,7 +297,7 @@ void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T, float dest
     float maxSamples = sps * T;
     m_iMaxSamples = (qint32)ceil(maxSamples/(sps/dest_sps)); // Max Samples / Downsampling
 
-    createDefaultFilter();
+//    createDefaultFilter();
 
     endResetModel();
 }
@@ -381,7 +380,7 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
     }
 
     //Filter current data concurrently
-    if(m_doFiltering)
+    if(!m_filterData.isEmpty())
         filterChannelsConcurrently(false);
 
     //ToDo separate worker thread? ToDo 2000 -> size of screen
@@ -564,14 +563,6 @@ void RealTimeMultiSampleArrayModel::updateProjection()
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::activateFilter(bool activate)
-{
-    m_doFiltering = activate;
-}
-
-
-//*************************************************************************************************************
-
 void RealTimeMultiSampleArrayModel::applyFilter(QString channelType)
 {
     createFilterChannelList(channelType);
@@ -691,32 +682,32 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(bool filterLastDa
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::createDefaultFilter()
-{
-    double sfreq = (m_pFiffInfo->sfreq>=0) ? m_pFiffInfo->sfreq : 600.0;
-    double nyquist_freq = sfreq/2;
-    int filterTaps = 80;
+//void RealTimeMultiSampleArrayModel::createDefaultFilter()
+//{
+//    double sfreq = (m_pFiffInfo->sfreq>=0) ? m_pFiffInfo->sfreq : 600.0;
+//    double nyquist_freq = sfreq/2;
+//    int filterTaps = 80;
 
-    int fftLength = m_iMaxSamples;
-    int exp = ceil(MNEMath::log2(fftLength));
-    fftLength = pow(2, exp+1);
-    if(fftLength < 512)
-        fftLength = 512;
+//    int fftLength = m_iMaxSamples;
+//    int exp = ceil(MNEMath::log2(fftLength));
+//    fftLength = pow(2, exp+1);
+//    if(fftLength < 512)
+//        fftLength = 512;
 
-    double cutoffFreqHz = 100; //in Hz
+//    double cutoffFreqHz = 100; //in Hz
 
-    FilterData::DesignMethod dMethod = FilterData::Cosine;
+//    FilterData::DesignMethod dMethod = FilterData::Cosine;
 
-    FilterData defaultFilter = FilterData(QString("babyMEG_01"),
-                              FilterData::LPF,
-                              filterTaps,
-                              cutoffFreqHz/nyquist_freq,
-                              5/nyquist_freq,
-                              1/nyquist_freq,
-                              sfreq,
-                              fftLength,
-                              dMethod);
+//    FilterData defaultFilter = FilterData(QString("babyMEG_01"),
+//                              FilterData::LPF,
+//                              filterTaps,
+//                              cutoffFreqHz/nyquist_freq,
+//                              5/nyquist_freq,
+//                              1/nyquist_freq,
+//                              sfreq,
+//                              fftLength,
+//                              dMethod);
 
-    m_filterData.append(defaultFilter);
-}
+//    m_filterData.append(defaultFilter);
+//}
 

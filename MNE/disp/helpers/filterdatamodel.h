@@ -54,6 +54,7 @@
 
 #include <QAbstractTableModel>
 #include <QVector3D>
+#include <QList>
 
 
 //*************************************************************************************************************
@@ -135,7 +136,7 @@ public:
 
     //=========================================================================================================
     /**
-    * addFilter adds filter to the model data
+    * addFilter adds filter to the model data.
     *
     * @param dataFilter filter list with already loaded filters.
     */
@@ -149,8 +150,13 @@ public:
     */
     void addFilter(const FilterData &dataFilter);
 
-signals:
-
+    //=========================================================================================================
+    /**
+    * getUserDesignedFilterIndex returns the index of the user designed filter.
+    *
+    * @return index of the user designed filter.
+    */
+    int getUserDesignedFilterIndex();
 
 protected:
     //=========================================================================================================
@@ -160,9 +166,10 @@ protected:
     */
     void clearModel();
 
-    QList<FilterData>       m_filterData;       /**< list of the loaded filters and their data. */
-    QList<bool>             m_isActive;         /**< list of the current activation state of the filters. */
+    QList<FilterData>       m_filterData;           /**< list of the loaded filters and their data. */
+    QList<bool>             m_isActive;             /**< list of the current activation state of the filters. */
 
+    int                     m_iDesignFilterIndex;   /**< index of the user designed filter. */
 };
 
 Q_DECLARE_METATYPE(UTILSLIB::FilterData);
