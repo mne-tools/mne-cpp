@@ -131,8 +131,7 @@ QList<FilterData> FilterWindow::getCurrentFilter()
 
 void FilterWindow::initCheckBoxes()
 {
-    connect(ui->m_checkBox_activateFilter,static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
-                this,&FilterWindow::onBtnActivateFilter);
+
 }
 
 
@@ -462,21 +461,22 @@ void FilterWindow::filterParametersChanged()
     //Replace old with new filter operator
     m_filterData = *userDefinedFilterOperator.data();
 
-    QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData>>();
-    std::cout<<"activeFilters.size()"<<activeFilters.size()<<std::endl;
+    QList<FilterData> activeFilters = m_pFilterDataModel->data(m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData>>();
 
     emit filterChanged(activeFilters);
 
+    //set user designed filter in filter data model
+    int userDesignedFilterIndex = m_pFilterDataModel->getUserDesignedFilterIndex();
+
+    if(userDesignedFilterIndex!=-1){
+        QVariant variant;
+        variant.setValue(m_filterData);
+
+        m_pFilterDataModel->setData(m_pFilterDataModel->index(userDesignedFilterIndex,7), variant, Qt::EditRole);
+    }
+
     //update filter plot
     updateFilterPlot();
-}
-
-//*************************************************************************************************************
-
-void FilterWindow::onBtnActivateFilter()
-{
-    //Undo all previous filters
-    emit activateFilter(ui->m_checkBox_activateFilter->isChecked());
 }
 
 

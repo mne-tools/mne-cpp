@@ -231,8 +231,6 @@ signals:
 
     void applyFilter(QString channelType);
 
-    void activateFilter(bool active);
-
 protected slots:
     //=========================================================================================================
     /**
@@ -247,12 +245,6 @@ protected slots:
     * This function gets called whenever the filter parameters are altered by the user via the gui.
     */
     void filterParametersChanged();
-
-    //=========================================================================================================
-    /**
-    * This function activates the filter functionality.
-    */
-    void onBtnActivateFilter();
 
     //=========================================================================================================
     /**
