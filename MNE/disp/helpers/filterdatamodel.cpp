@@ -101,7 +101,7 @@ int FilterDataModel::rowCount(const QModelIndex & parent) const
 int FilterDataModel::columnCount(const QModelIndex & parent) const
 {
     Q_UNUSED(parent);
-    return 9;
+    return 10;
 }
 
 
@@ -154,11 +154,15 @@ QVariant FilterDataModel::headerData(int section, Qt::Orientation orientation, i
                         break;
 
                     case 7:
-                        return QString("%1").arg("Filter");
+                        return QString("%1").arg("Filter data");
                         break;
 
                     case 8:
-                        return QString("%1").arg("ActiveFilters");
+                        return QString("%1").arg("Active Filters");
+                        break;
+
+                    case 9:
+                        return QString("%1").arg("All Filters");
                         break;
                 }
             }
@@ -174,7 +178,7 @@ QVariant FilterDataModel::headerData(int section, Qt::Orientation orientation, i
 QVariant FilterDataModel::data(const QModelIndex &index, int role) const
 {
     if(role!=Qt::DisplayRole || role!=Qt::TextAlignmentRole)
-        if(role<Qt::UserRole + 1009 && role > Qt::UserRole + 1017)
+        if(role<Qt::UserRole + 1009 && role > Qt::UserRole + 1019)
             return QVariant();
 
     if(index.row() >= m_filterData.size() || index.column()>=columnCount())
@@ -190,7 +194,7 @@ QVariant FilterDataModel::data(const QModelIndex &index, int role) const
                     v.setValue(m_isActive.at(index.row()));
                     return v;
 
-                case FilterDataModelRoles::GetFilterName:
+                case FilterDataModelRoles::GetFilterState:
                     v.setValue(m_isActive.at(index.row()));
                     return v;
 
@@ -309,7 +313,6 @@ QVariant FilterDataModel::data(const QModelIndex &index, int role) const
             }
         }//end column check
 
-
         //******** seventh column (Filter data) ********
         if(index.column()==7 && FilterDataModelRoles::GetFilter) {
             QVariant v;
@@ -327,6 +330,14 @@ QVariant FilterDataModel::data(const QModelIndex &index, int role) const
                     activeFilters.append(m_filterData.at(i));
 
             v.setValue(activeFilters);
+            return v;
+        }//end column check
+
+        //******** ninth column (All Filters) ********
+        if(index.column()==9 && FilterDataModelRoles::GetAllFilters) {
+            QVariant v;
+
+            v.setValue(m_filterData);
             return v;
         }//end column check
 
@@ -381,8 +392,14 @@ bool FilterDataModel::setData(const QModelIndex &index, const QVariant &value, i
     if(index.column() == 0 && role == Qt::EditRole)
         m_isActive[index.row()] = value.toBool();
 
-    if(index.column() == 7 && role == Qt::EditRole)
-        m_filterData[index.row()] = value.value<FilterData>();
+    if(role == FilterDataModelRoles::SetUserDesignedFilter)
+        if(m_iDesignFilterIndex!=-1)
+            m_filterData[m_iDesignFilterIndex] = value.value<FilterData>();
+        else
+            return false;
+
+    emit dataChanged(createIndex(0,0), createIndex(rowCount(),columnCount()));
+    emit headerDataChanged(Qt::Vertical, 0, rowCount());
 
     return true;
 }
@@ -424,14 +441,6 @@ void FilterDataModel::addFilter(const FilterData &dataFilter)
 
     emit dataChanged(createIndex(0,0), createIndex(rowCount(),columnCount()));
     emit headerDataChanged(Qt::Vertical, 0, rowCount());
-}
-
-
-//*************************************************************************************************************
-
-int FilterDataModel::getUserDesignedFilterIndex()
-{
-    return m_iDesignFilterIndex;
 }
 
 

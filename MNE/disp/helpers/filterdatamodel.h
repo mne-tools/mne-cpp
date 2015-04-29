@@ -101,7 +101,9 @@ namespace FilterDataModelRoles
                     GetFilterSamplingFrequency = Qt::UserRole + 1014,
                     GetFilterState = Qt::UserRole + 1015,
                     GetFilter = Qt::UserRole + 1016,
-                    GetActiveFilters = Qt::UserRole + 1017};
+                    GetActiveFilters = Qt::UserRole + 1017,
+                    GetAllFilters = Qt::UserRole + 1018,
+                    SetUserDesignedFilter = Qt::UserRole + 1019};
 }
 
 //=============================================================================================================
