@@ -236,10 +236,6 @@ void FilterWindow::initMVC()
 //    connect(ui->m_tableView_filterDataView->selectionModel(),&QItemSelectionModel::currentRowChanged,
 //                this, &FilterWindow::filterSelectionChanged);
 
-    //Connect filter data model to filterSelectionChanged
-//    connect(m_pFilterDataModel.data(),&FilterDataModel::dataChanged,
-//                this, &FilterWindow::filterSelectionChanged);
-
     //Connect filter data model to updateFilterActivationWidget
     connect(m_pFilterDataModel.data(),&FilterDataModel::dataChanged,
                 this, &FilterWindow::updateFilterActivationWidget);
