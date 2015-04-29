@@ -215,24 +215,34 @@ void FilterWindow::initMVC()
     m_pFilterDataModel = FilterDataModel::SPtr(new FilterDataModel(this));
     m_pFilterDataDelegate = FilterDataDelegate::SPtr(new FilterDataDelegate(this));
 
-    ui->m_tableView_filterDataView->setModel(m_pFilterDataModel.data());
-    ui->m_tableView_filterDataView->setItemDelegate(m_pFilterDataDelegate.data());
+    //Unncomment this if zou want the tableview
+    ui->m_tableView_filterDataView->hide();
+//    ui->m_tableView_filterDataView->setModel(m_pFilterDataModel.data());
+//    ui->m_tableView_filterDataView->setItemDelegate(m_pFilterDataDelegate.data());
+//    ui->m_tableView_filterDataView->resizeColumnToContents(0);
 
-    ui->m_tableView_filterDataView->resizeColumnToContents(0);
+//    //Only show the names of the filter and activity check boxes
+//    ui->m_tableView_filterDataView->verticalHeader()->hide();
+//    ui->m_tableView_filterDataView->hideColumn(2);
+//    ui->m_tableView_filterDataView->hideColumn(3);
+//    ui->m_tableView_filterDataView->hideColumn(4);
+//    //ui->m_tableView_filterDataView->hideColumn(5);
+//    //ui->m_tableView_filterDataView->hideColumn(6);
+//    ui->m_tableView_filterDataView->hideColumn(7);
+//    ui->m_tableView_filterDataView->hideColumn(8);
+//    ui->m_tableView_filterDataView->hideColumn(9);
 
-    //Only show the names of the filter and activity check boxes
-    ui->m_tableView_filterDataView->verticalHeader()->hide();
-    ui->m_tableView_filterDataView->hideColumn(2);
-    ui->m_tableView_filterDataView->hideColumn(3);
-    ui->m_tableView_filterDataView->hideColumn(4);
-    //ui->m_tableView_filterDataView->hideColumn(5);
-    //ui->m_tableView_filterDataView->hideColumn(6);
-    ui->m_tableView_filterDataView->hideColumn(7);
-    ui->m_tableView_filterDataView->hideColumn(8);
+//    //Connect selection in in filter table view to handle user changing the filter and updating the filter plot scene
+//    connect(ui->m_tableView_filterDataView->selectionModel(),&QItemSelectionModel::currentRowChanged,
+//                this, &FilterWindow::filterSelectionChanged);
 
-    //Connect selection in event window to jumpEvent slot
-    connect(ui->m_tableView_filterDataView->selectionModel(),&QItemSelectionModel::currentRowChanged,
+    //Connect filter data model to filterSelectionChanged
+    connect(m_pFilterDataModel.data(),&FilterDataModel::dataChanged,
                 this, &FilterWindow::filterSelectionChanged);
+
+    //Connect filter data model to updateFilterActivationWidget
+    connect(m_pFilterDataModel.data(),&FilterDataModel::dataChanged,
+                this, &FilterWindow::updateFilterActivationWidget);
 }
 
 
@@ -298,7 +308,57 @@ bool FilterWindow::eventFilter(QObject *obj, QEvent *event)
         }
     }
 
+    for(int i=0; i<m_lActivationCheckBoxList.size(); i++) {
+        if(obj == m_lActivationCheckBoxList.at(i)) {
+            if (event->type() == QEvent::HoverEnter) {
+                int filterModelRowIndex = -1;
+                for(int z=0; z<m_pFilterDataModel->rowCount(); z++) {
+                    if(m_pFilterDataModel->data(m_pFilterDataModel->index(z,1), FilterDataModelRoles::GetFilterName).toString() == m_lActivationCheckBoxList.at(i)->text())
+                        filterModelRowIndex = z;
+                }
+
+                filterSelectionChanged(m_pFilterDataModel->index(filterModelRowIndex,0), QModelIndex());
+
+                return true;
+            } else {
+                // standard event processing
+                return QObject::eventFilter(obj, event);
+            }
+        }
+    }
+
     return true;
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::updateFilterActivationWidget(const QModelIndex & topLeft, const QModelIndex & bottomRight, const QVector<int> & roles)
+{
+    Q_UNUSED(topLeft);
+    Q_UNUSED(bottomRight);
+    Q_UNUSED(roles);
+
+    QList<FilterData> activeFilters = m_pFilterDataModel->data(m_pFilterDataModel->index(0,9), FilterDataModelRoles::GetAllFilters).value<QList<FilterData>>();
+
+    if(m_lActivationCheckBoxList.size()==activeFilters.size())
+        return;
+
+    while(!ui->m_layout_filterActivation->isEmpty())
+        ui->m_layout_filterActivation->removeItem(ui->m_layout_filterActivation->itemAt(0));
+
+    m_lActivationCheckBoxList.clear();
+    for(int i = 0; i<activeFilters.size(); i++) {
+        QCheckBox *checkBox = new QCheckBox(activeFilters.at(i).m_sName);
+        connect(checkBox,&QCheckBox::clicked,
+                    this,&FilterWindow::onChkBoxFilterActivation);
+
+        checkBox->installEventFilter(this);
+
+        m_lActivationCheckBoxList.append(checkBox);
+
+        ui->m_layout_filterActivation->addWidget(checkBox);
+    }
 }
 
 
@@ -466,14 +526,10 @@ void FilterWindow::filterParametersChanged()
     emit filterChanged(activeFilters);
 
     //set user designed filter in filter data model
-    int userDesignedFilterIndex = m_pFilterDataModel->getUserDesignedFilterIndex();
+    QVariant variant;
+    variant.setValue(m_filterData);
 
-    if(userDesignedFilterIndex!=-1){
-        QVariant variant;
-        variant.setValue(m_filterData);
-
-        m_pFilterDataModel->setData(m_pFilterDataModel->index(userDesignedFilterIndex,7), variant, Qt::EditRole);
-    }
+    m_pFilterDataModel->setData(m_pFilterDataModel->index(0,7), variant, FilterDataModelRoles::SetUserDesignedFilter);
 
     //update filter plot
     updateFilterPlot();
@@ -559,13 +615,35 @@ void FilterWindow::onBtnLoadFilter()
 
         m_pFilterDataModel->addFilter(m_filterData);
 
-        QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData>>();
+        QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData> >();
         emit filterChanged(activeFilters);
 
         updateFilterPlot();
     }
     else
         qDebug()<<"Could not load filter.";
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::onChkBoxFilterActivation(bool state)
+{
+    Q_UNUSED(state);
+
+    for(int i=0; i<m_lActivationCheckBoxList.size(); i++) {
+        QVariant variant;
+        variant.setValue(m_lActivationCheckBoxList.at(i)->isChecked());
+
+        int filterModelRowIndex = -1;
+        for(int z=0; z<m_pFilterDataModel->rowCount(); z++) {
+            if(m_pFilterDataModel->data( m_pFilterDataModel->index(z,1), FilterDataModelRoles::GetFilterName).toString() == m_lActivationCheckBoxList.at(i)->text())
+                filterModelRowIndex = z;
+        }
+
+        if(filterModelRowIndex != -1)
+            m_pFilterDataModel->setData(m_pFilterDataModel->index(filterModelRowIndex,0), variant, Qt::EditRole);
+    }
 }
 
 

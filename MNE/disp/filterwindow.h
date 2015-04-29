@@ -217,6 +217,8 @@ private:
     FilterDataModel::SPtr       m_pFilterDataModel;     /**< The model to hold current filters.*/
     FilterDataDelegate::SPtr    m_pFilterDataDelegate;  /**< The delegate to plot the activation check boxes in column one.*/
 
+    QList<QCheckBox*>           m_lActivationCheckBoxList;
+
     int                         m_iWindowSize;          /**< The current window size of the loaded fiff data in the DataWindow class.*/
     int                         m_iFilterTaps;          /**< The current number of filter taps.*/
 
@@ -232,6 +234,12 @@ signals:
     void applyFilter(QString channelType);
 
 protected slots:
+    //=========================================================================================================
+    /**
+    * updates the filter activation layout
+    */
+    void updateFilterActivationWidget(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
+
     //=========================================================================================================
     /**
     * This function gets called whenever the combo box is altered by the user via the gui.
@@ -271,6 +279,14 @@ protected slots:
     * This function loads a filter from a txt file.
     */
     void onBtnLoadFilter();
+
+    //=========================================================================================================
+    /**
+    * This function connects the activation checkboxes to the filter data model.
+    *
+    * @param [in] state holds the current state of the connected check box
+    */
+    void onChkBoxFilterActivation(bool state);
 
     //=========================================================================================================
     /**

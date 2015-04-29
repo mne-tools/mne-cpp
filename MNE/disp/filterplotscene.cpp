@@ -93,13 +93,13 @@ void FilterPlotScene::updateFilter(FilterData& operatorFilter, int samplingFreq,
     plotFilterFrequencyResponse();
 
     //Plot the magnitude diagram
-    plotMagnitudeDiagram(samplingFreq);
+    plotMagnitudeDiagram(samplingFreq, operatorFilter.m_sName);
 }
 
 
 //*************************************************************************************************************
 
-void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq)
+void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq, QString filtername)
 {
     //Get row vector with filter coefficients
     RowVectorXcd coefficientsAFreq = m_pCurrentFilter.m_dFFTCoeffA;
@@ -116,6 +116,10 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq)
             -m_iDiagramMarginsVert,
             numberCoeff+(m_iDiagramMarginsHoriz*2),
             m_dMaxMagnitude+(m_iDiagramMarginsVert*2));
+
+    //Plot filter name on top
+    QGraphicsTextItem * text = addText(filtername, QFont("Times", m_iAxisTextSize));
+    text->setPos((numberCoeff+(m_iDiagramMarginsHoriz*2))/2.4,-70);
 
     //HORIZONTAL
     //Draw horizontal lines
