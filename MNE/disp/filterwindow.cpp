@@ -237,8 +237,8 @@ void FilterWindow::initMVC()
 //                this, &FilterWindow::filterSelectionChanged);
 
     //Connect filter data model to filterSelectionChanged
-    connect(m_pFilterDataModel.data(),&FilterDataModel::dataChanged,
-                this, &FilterWindow::filterSelectionChanged);
+//    connect(m_pFilterDataModel.data(),&FilterDataModel::dataChanged,
+//                this, &FilterWindow::filterSelectionChanged);
 
     //Connect filter data model to updateFilterActivationWidget
     connect(m_pFilterDataModel.data(),&FilterDataModel::dataChanged,
@@ -254,7 +254,9 @@ void FilterWindow::initFilters()
     QStringList defaultFilters;
 
     defaultFilters << "NOTCH_60Hz.txt"
-                   << "NOTCH_50Hz.txt";
+                   << "NOTCH_50Hz.txt"
+                   << "BP_1Hz_70Hz_Fs1kHz.txt"
+                   << "BP_1Hz_40Hz_Fs1kHz.txt";
 
     for(int i = 0; i<defaultFilters.size(); i++) {
         FilterData tmpFilter;
@@ -644,6 +646,9 @@ void FilterWindow::onChkBoxFilterActivation(bool state)
         if(filterModelRowIndex != -1)
             m_pFilterDataModel->setData(m_pFilterDataModel->index(filterModelRowIndex,0), variant, Qt::EditRole);
     }
+
+    QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData>>();
+    emit filterChanged(activeFilters);
 }
 
 
