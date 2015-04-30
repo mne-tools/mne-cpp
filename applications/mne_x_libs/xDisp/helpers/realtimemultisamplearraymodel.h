@@ -100,7 +100,6 @@ class RealTimeMultiSampleArrayModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-
     //=========================================================================================================
     /**
     * Constructs an real-time multi sample array table model for the given parent.
@@ -368,11 +367,11 @@ private:
     qint32  m_iMaxSamples;          /**< Max samples per window */
     qint32  m_iCurrentSample;       /**< Accurate Downsampling */
 
-    FiffInfo::SPtr  m_pFiffInfo;                    /**< Fiff info */
+    FiffInfo::SPtr          m_pFiffInfo;            /**< Fiff info */
 
-    RowVectorXi     m_vecBadIdcs;                   /**< Idcs of bad channels */
-    MatrixXd        m_matProj;                      /**< SSP projector */
-    SparseMatrix<double> m_matSparseProj;           /**< Sparse SSP projector */
+    RowVectorXi             m_vecBadIdcs;           /**< Idcs of bad channels */
+    MatrixXd                m_matProj;              /**< SSP projector */
+    SparseMatrix<double>    m_matSparseProj;        /**< Sparse SSP projector */
 
     QVector<VectorXd> m_dataCurrent;                /**< List that holds the current data*/
     QVector<VectorXd> m_dataFilteredCurrent;        /**< List that holds the current filtered data */
@@ -388,8 +387,6 @@ private:
     QList<RealTimeSampleArrayChInfo>    m_qListChInfo;          /**< Channel info list. ToDo: Obsolete*/
     QStringList                         m_filterChannelList;    /**< List of channels which are to be filtered.*/
     QMap<qint32,qint32>                 m_qMapIdxRowSelection;  /**< Selection mapping.*/
-
-
 };
 
 
