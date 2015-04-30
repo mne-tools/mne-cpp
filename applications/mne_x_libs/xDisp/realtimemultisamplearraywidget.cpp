@@ -90,6 +90,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     m_pSpinBoxDSFactor->setSingleStep(1);
     m_pSpinBoxDSFactor->setValue(10);
     m_pSpinBoxDSFactor->setSuffix(" x");
+    m_pSpinBoxDSFactor->setToolTip(tr("Downsample factor"));
     m_pSpinBoxDSFactor->setStatusTip(tr("Downsample factor"));
     connect(m_pSpinBoxDSFactor, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &RealTimeMultiSampleArrayWidget::dsFactorChanged);
@@ -101,6 +102,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     m_pDoubleSpinBoxZoom->setSingleStep(0.1);
     m_pDoubleSpinBoxZoom->setValue(1.0);
     m_pDoubleSpinBoxZoom->setSuffix(" x");
+    m_pDoubleSpinBoxZoom->setToolTip(tr("Row height"));
     m_pDoubleSpinBoxZoom->setStatusTip(tr("Row height"));
     connect(m_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &RealTimeMultiSampleArrayWidget::zoomChanged);
@@ -111,6 +113,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     m_pSpinBoxTimeScale->setMaximum(20);
     m_pSpinBoxTimeScale->setValue(m_iT);
     m_pSpinBoxTimeScale->setSuffix(" s");
+    m_pSpinBoxTimeScale->setToolTip(tr("Time window length"));
     m_pSpinBoxTimeScale->setStatusTip(tr("Time window length"));
     connect(m_pSpinBoxTimeScale, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &RealTimeMultiSampleArrayWidget::timeWindowChanged);
@@ -118,7 +121,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 
     m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F9)"),this);
     m_pActionSelectSensors->setShortcut(tr("F9"));
-    m_pActionSelectSensors->setStatusTip(tr("Shows the region selection widget (F9)"));
+    m_pActionSelectSensors->setToolTip(tr("Shows the region selection widget (F9)"));
     m_pActionSelectSensors->setVisible(true);
     connect(m_pActionSelectSensors, &QAction::triggered, this,
             &RealTimeMultiSampleArrayWidget::showSensorSelectionWidget);
@@ -502,10 +505,12 @@ void RealTimeMultiSampleArrayWidget::showChScalingWidget()
         connect(m_pRTMSAScalingWidget.data(), &RealTimeMultiSampleArrayScalingWidget::scalingChanged, this, &RealTimeMultiSampleArrayWidget::broadcastScaling);
     }
 
-    if(m_pRTMSAScalingWidget->isVisible())
+    if(m_pRTMSAScalingWidget->isActiveWindow())
         m_pRTMSAScalingWidget->hide();
-    else
+    else {
+        m_pRTMSAScalingWidget->activateWindow();
         m_pRTMSAScalingWidget->show();
+    }
 }
 
 
@@ -526,10 +531,12 @@ void RealTimeMultiSampleArrayWidget::showProjectionWidget()
             connect(m_pProjectorSelectionWidget.data(), &ProjectorWidget::projSelectionChanged, this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::updateProjection);
         }
 
-        if(m_pProjectorSelectionWidget->isVisible())
+        if(m_pProjectorSelectionWidget->isActiveWindow())
             m_pProjectorSelectionWidget->hide();
-        else
+        else {
+            m_pProjectorSelectionWidget->activateWindow();
             m_pProjectorSelectionWidget->show();
+        }
     }
 }
 
@@ -552,10 +559,12 @@ void RealTimeMultiSampleArrayWidget::showFilterWidget()
                 m_pRTMSAModel, &RealTimeMultiSampleArrayModel::filterChanged);
     }
 
-    if(m_pFilterWindow->isVisible())
+    if(m_pFilterWindow->isActiveWindow())
         m_pFilterWindow->hide();
-    else
+    else {
+        m_pFilterWindow->activateWindow();
         m_pFilterWindow->show();
+    }
 }
 
 
@@ -582,10 +591,12 @@ void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
         m_pChInfoModel->fiffInfoChanged(*m_pFiffInfo.data());
     }
 
-    if(m_pSelectionManagerWindow->isVisible())
+    if(m_pSelectionManagerWindow->isActiveWindow())
         m_pSelectionManagerWindow->hide();
-    else
+    else {
+        m_pSelectionManagerWindow->activateWindow();
         m_pSelectionManagerWindow->show();
+    }
 }
 
 
