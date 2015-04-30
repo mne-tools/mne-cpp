@@ -360,41 +360,36 @@ private:
     */
     inline const MatrixXd dataLastToMatrix() const;
 
-    QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list. ToDo: Obsolete*/
+    bool    m_bProjActivated;       /**< Proj activated */
+    bool    m_bIsFreezed;           /**< Display is freezed */
+    float   m_fSps;                 /**< Sampling rate */
+    qint32  m_iT;                   /**< Time window */
+    qint32  m_iDownsampling;        /**< Down sampling factor */
+    qint32  m_iMaxSamples;          /**< Max samples per window */
+    qint32  m_iCurrentSample;       /**< Accurate Downsampling */
+
     FiffInfo::SPtr  m_pFiffInfo;                    /**< Fiff info */
+
     RowVectorXi     m_vecBadIdcs;                   /**< Idcs of bad channels */
     MatrixXd        m_matProj;                      /**< SSP projector */
     SparseMatrix<double> m_matSparseProj;           /**< Sparse SSP projector */
-    bool m_bProjActivated;                          /**< Proj activated */
 
-    QMap<qint32,qint32> m_qMapIdxRowSelection;      /**< Selection mapping.*/
-
-    QStringList         m_filterChannelList;        /**< List of channels which are to be filtered.*/
-
-    //Fiff data structure
     QVector<VectorXd> m_dataCurrent;                /**< List that holds the current data*/
     QVector<VectorXd> m_dataFilteredCurrent;        /**< List that holds the current filtered data */
-
     QVector<VectorXd> m_dataLast;                   /**< List that holds the last data */
     QVector<VectorXd> m_dataFilteredLast;           /**< List that holds the last filtered data */
-
     QVector<VectorXd> m_dataCurrentFreeze;          /**< List that holds the current data when freezed*/
     QVector<VectorXd> m_dataFilteredCurrentFreeze;  /**< List that holds the current filtered data when freezed*/
-
     QVector<VectorXd> m_dataLastFreeze;             /**< List that holds the last data when freezed*/
     QVector<VectorXd> m_dataFilteredLastFreeze;     /**< List that holds the last filtered data when freezed*/
 
-    QList<FilterData> m_filterData;
+    QMap< qint32,float>                 m_qMapChScaling;        /**< Sensor selection widget. */
+    QList<FilterData>                   m_filterData;           /**< List of currently active filters. */
+    QList<RealTimeSampleArrayChInfo>    m_qListChInfo;          /**< Channel info list. ToDo: Obsolete*/
+    QStringList                         m_filterChannelList;    /**< List of channels which are to be filtered.*/
+    QMap<qint32,qint32>                 m_qMapIdxRowSelection;  /**< Selection mapping.*/
 
-    float m_fSps;                   /**< Sampling rate */
-    qint32 m_iT;                    /**< Time window */
-    qint32 m_iDownsampling;         /**< Down sampling factor */
-    qint32 m_iMaxSamples;           /**< Max samples per window */
-    qint32 m_iCurrentSample;        /**< Accurate Downsampling */
 
-    bool m_bIsFreezed;              /**< Display is freezed */
-
-    QMap< qint32,float > m_qMapChScaling;   /**< Sensor selection widget. */
 };
 
 
