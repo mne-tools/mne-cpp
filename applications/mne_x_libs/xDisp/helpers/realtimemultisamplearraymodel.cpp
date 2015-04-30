@@ -295,7 +295,7 @@ void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T, float dest
     m_iT = T;
 
     float maxSamples = sps * T;
-    m_iMaxSamples = (qint32)ceil(maxSamples/(sps/dest_sps)); // Max Samples / Downsampling
+    m_iMaxSamples = (qint32)ceil(maxSamples/(m_iDownsampling)); // Max Samples / Downsampling
 
 //    createDefaultFilter();
 

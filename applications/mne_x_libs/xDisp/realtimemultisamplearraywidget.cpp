@@ -84,13 +84,26 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 {
     Q_UNUSED(pTime)
 
+    m_pSpinBoxDSFactor = new QSpinBox(this);
+    m_pSpinBoxDSFactor->setMinimum(1);
+    m_pSpinBoxDSFactor->setMaximum(100.0);
+    m_pSpinBoxDSFactor->setSingleStep(1);
+    m_pSpinBoxDSFactor->setValue(10);
+    m_pSpinBoxDSFactor->setSuffix(" x");
+    m_pSpinBoxDSFactor->setStatusTip(tr("Downsample factor"));
+    connect(m_pSpinBoxDSFactor, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &RealTimeMultiSampleArrayWidget::dsFactorChanged);
+    addDisplayWidget(m_pSpinBoxDSFactor);
+
     m_pDoubleSpinBoxZoom = new QDoubleSpinBox(this);
     m_pDoubleSpinBoxZoom->setMinimum(0.3);
     m_pDoubleSpinBoxZoom->setMaximum(4.0);
     m_pDoubleSpinBoxZoom->setSingleStep(0.1);
     m_pDoubleSpinBoxZoom->setValue(1.0);
     m_pDoubleSpinBoxZoom->setSuffix(" x");
-    connect(m_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RealTimeMultiSampleArrayWidget::zoomChanged);
+    m_pDoubleSpinBoxZoom->setStatusTip(tr("Row height"));
+    connect(m_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &RealTimeMultiSampleArrayWidget::zoomChanged);
     addDisplayWidget(m_pDoubleSpinBoxZoom);
 
     m_pSpinBoxTimeScale = new QSpinBox(this);
@@ -98,34 +111,40 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     m_pSpinBoxTimeScale->setMaximum(20);
     m_pSpinBoxTimeScale->setValue(m_iT);
     m_pSpinBoxTimeScale->setSuffix(" s");
-    connect(m_pSpinBoxTimeScale, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &RealTimeMultiSampleArrayWidget::timeWindowChanged);
+    m_pSpinBoxTimeScale->setStatusTip(tr("Time window length"));
+    connect(m_pSpinBoxTimeScale, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &RealTimeMultiSampleArrayWidget::timeWindowChanged);
     addDisplayWidget(m_pSpinBoxTimeScale);
 
     m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F9)"),this);
     m_pActionSelectSensors->setShortcut(tr("F9"));
     m_pActionSelectSensors->setStatusTip(tr("Shows the region selection widget (F9)"));
     m_pActionSelectSensors->setVisible(true);
-    connect(m_pActionSelectSensors, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showSensorSelectionWidget);
+    connect(m_pActionSelectSensors, &QAction::triggered, this,
+            &RealTimeMultiSampleArrayWidget::showSensorSelectionWidget);
     addDisplayAction(m_pActionSelectSensors);
 
     m_pActionChScaling = new QAction(QIcon(":/images/channelScaling.png"), tr("Shows the channel scaling widget (F10)"),this);
     m_pActionChScaling->setShortcut(tr("F10"));
     m_pActionChScaling->setStatusTip(tr("Shows the channel scaling widget (F10)"));
-    connect(m_pActionChScaling, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showChScalingWidget);
+    connect(m_pActionChScaling, &QAction::triggered, this,
+            &RealTimeMultiSampleArrayWidget::showChScalingWidget);
     addDisplayAction(m_pActionChScaling);
     m_pActionChScaling->setVisible(false);
 
     m_pActionFiltering = new QAction(QIcon(":/images/showFilterWindow.png"), tr("Shows the filter window (F11)"),this);
     m_pActionFiltering->setShortcut(tr("F11"));
     m_pActionFiltering->setStatusTip(tr("Shows the filter window (F11)"));
-    connect(m_pActionFiltering, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showFilterWidget);
+    connect(m_pActionFiltering, &QAction::triggered, this,
+            &RealTimeMultiSampleArrayWidget::showFilterWidget);
     addDisplayAction(m_pActionFiltering);
     m_pActionFiltering->setVisible(true);
 
     m_pActionProjection = new QAction(QIcon(":/images/iconSSP.png"), tr("Shows the SSP widget (F12)"),this);
     m_pActionProjection->setShortcut(tr("F12"));
     m_pActionProjection->setStatusTip(tr("Shows the SSP widget (F12)"));
-    connect(m_pActionProjection, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showProjectionWidget);
+    connect(m_pActionProjection, &QAction::triggered, this,
+            &RealTimeMultiSampleArrayWidget::showProjectionWidget);
     addDisplayAction(m_pActionProjection);
 
     m_pActionProjection->setVisible(true);
@@ -405,9 +424,22 @@ void RealTimeMultiSampleArrayWidget::zoomChanged(double zoomFac)
 
 //*************************************************************************************************************
 
+void RealTimeMultiSampleArrayWidget::dsFactorChanged(int dsFactor)
+{
+    m_iDSFactor = dsFactor;
+    m_fDesiredSamplingRate = m_fSamplingRate/m_pSpinBoxDSFactor->value();
+
+    std::cout<<"m_fDesiredSamplingRate: "<<m_fDesiredSamplingRate<<std::endl;
+    m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, m_iT, m_fDesiredSamplingRate);
+}
+
+
+//*************************************************************************************************************
+
 void RealTimeMultiSampleArrayWidget::timeWindowChanged(int T)
 {
     m_iT = T;
+
     m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, T, m_fDesiredSamplingRate);
 }
 
