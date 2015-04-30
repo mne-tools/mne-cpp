@@ -60,6 +60,8 @@ FilterWindow::FilterWindow(QWidget *parent)
 : QWidget(parent,Qt::Window)
 , ui(new Ui::FilterWindowWidget)
 , m_pFilterPlotScene(new FilterPlotScene)
+, m_iWindowSize(4016)
+, m_iFilterTaps(128)
 {
     ui->setupUi(this);
 
@@ -67,12 +69,9 @@ FilterWindow::FilterWindow(QWidget *parent)
     initSpinBoxes();
     initButtons();
     initComboBoxes();
-    initFilterPlot();
     initMVC();
     initFilters();
-
-    m_iWindowSize = 4016;
-    m_iFilterTaps = 128;
+    initFilterPlot();
 }
 
 
@@ -131,10 +130,6 @@ QList<FilterData> FilterWindow::getCurrentFilter()
 
 void FilterWindow::initCheckBoxes()
 {
-//    connect(ui->m_checkBox_activateUserDesignedFilter,static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::toggled),
-//                this,&FilterWindow::onChkBoxFilterActivation);
-
-//    ui->m_checkBox_activateUserDesignedFilter->installEventFilter(this);
 }
 
 
@@ -208,6 +203,8 @@ void FilterWindow::initComboBoxes()
 void FilterWindow::initFilterPlot()
 {
     ui->m_graphicsView_filterPlot->setScene(m_pFilterPlotScene);
+
+    filterSelectionChanged(m_pFilterDataModel->index(m_pFilterDataModel->rowCount()-1,0), QModelIndex());
 }
 
 

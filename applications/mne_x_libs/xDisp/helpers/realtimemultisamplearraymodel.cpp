@@ -495,7 +495,7 @@ void RealTimeMultiSampleArrayModel::toggleFreeze(const QModelIndex &)
         m_dataCurrentFreeze = m_dataCurrent;
         m_dataLastFreeze = m_dataLast;
         m_dataFilteredCurrentFreeze = m_dataFilteredCurrent;
-        m_dataFilteredLastFreeze = m_dataLastFreeze;
+        m_dataFilteredLastFreeze = m_dataFilteredLast;
     }
 
     //Update data content
@@ -603,7 +603,6 @@ void doFilterPerChannel(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channe
     for(int i=0; i<channelDataTime.first.size(); i++)
         channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, false, FilterData::MirrorData);
       //channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, false, FilterData::MirrorData);
-
 }
 
 
