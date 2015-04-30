@@ -131,7 +131,10 @@ QList<FilterData> FilterWindow::getCurrentFilter()
 
 void FilterWindow::initCheckBoxes()
 {
+//    connect(ui->m_checkBox_activateUserDesignedFilter,static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::toggled),
+//                this,&FilterWindow::onChkBoxFilterActivation);
 
+//    ui->m_checkBox_activateUserDesignedFilter->installEventFilter(this);
 }
 
 
@@ -238,7 +241,7 @@ void FilterWindow::initMVC()
 
     //Connect filter data model to updateFilterActivationWidget
     connect(m_pFilterDataModel.data(),&FilterDataModel::dataChanged,
-                this, &FilterWindow::updateFilterActivationWidget);
+                this, &FilterWindow::updateDefaultFiltersActivation);
 }
 
 
@@ -307,11 +310,15 @@ bool FilterWindow::eventFilter(QObject *obj, QEvent *event)
     }
 
     for(int i=0; i<m_lActivationCheckBoxList.size(); i++) {
-        if(obj == m_lActivationCheckBoxList.at(i)) {
+        if(obj == m_lActivationCheckBoxList.at(i) ) {
             if (event->type() == QEvent::HoverEnter) {
                 int filterModelRowIndex = -1;
                 for(int z=0; z<m_pFilterDataModel->rowCount(); z++) {
-                    if(m_pFilterDataModel->data(m_pFilterDataModel->index(z,1), FilterDataModelRoles::GetFilterName).toString() == m_lActivationCheckBoxList.at(i)->text())
+                    QString checkBoxText = m_lActivationCheckBoxList.at(i)->text();
+                    if(checkBoxText == "Activate user designed filter")
+                        checkBoxText = "User Design";
+
+                    if(m_pFilterDataModel->data(m_pFilterDataModel->index(z,1), FilterDataModelRoles::GetFilterName).toString() == checkBoxText)
                         filterModelRowIndex = z;
                 }
 
@@ -331,31 +338,44 @@ bool FilterWindow::eventFilter(QObject *obj, QEvent *event)
 
 //*************************************************************************************************************
 
-void FilterWindow::updateFilterActivationWidget(const QModelIndex & topLeft, const QModelIndex & bottomRight, const QVector<int> & roles)
+void FilterWindow::updateDefaultFiltersActivation(const QModelIndex & topLeft, const QModelIndex & bottomRight, const QVector<int> & roles)
 {
     Q_UNUSED(topLeft);
     Q_UNUSED(bottomRight);
     Q_UNUSED(roles);
 
-    QList<FilterData> activeFilters = m_pFilterDataModel->data(m_pFilterDataModel->index(0,9), FilterDataModelRoles::GetAllFilters).value<QList<FilterData>>();
+    QList<FilterData> allFilters = m_pFilterDataModel->data(m_pFilterDataModel->index(0,9), FilterDataModelRoles::GetAllFilters).value<QList<FilterData>>();
 
-    if(m_lActivationCheckBoxList.size()==activeFilters.size())
+    if(m_lActivationCheckBoxList.size()==allFilters.size())
         return;
 
-    while(!ui->m_layout_filterActivation->isEmpty())
-        ui->m_layout_filterActivation->removeItem(ui->m_layout_filterActivation->itemAt(0));
+    while(!ui->m_layout_defaultFilterActivation->isEmpty())
+        ui->m_layout_defaultFilterActivation->removeItem(ui->m_layout_defaultFilterActivation->itemAt(0));
 
     m_lActivationCheckBoxList.clear();
-    for(int i = 0; i<activeFilters.size(); i++) {
-        QCheckBox *checkBox = new QCheckBox(activeFilters.at(i).m_sName);
-        connect(checkBox,&QCheckBox::clicked,
-                    this,&FilterWindow::onChkBoxFilterActivation);
+    for(int i = 0; i<allFilters.size(); i++) {
+        if(allFilters.at(i).m_sName != "User Design") {
+            QCheckBox *checkBox = new QCheckBox(allFilters.at(i).m_sName);
+            connect(checkBox,&QCheckBox::clicked,
+                        this,&FilterWindow::onChkBoxFilterActivation);
 
-        checkBox->installEventFilter(this);
+            checkBox->installEventFilter(this);
 
-        m_lActivationCheckBoxList.append(checkBox);
+            m_lActivationCheckBoxList.append(checkBox);
 
-        ui->m_layout_filterActivation->addWidget(checkBox);
+            ui->m_layout_defaultFilterActivation->addWidget(checkBox);
+        } else {
+            QCheckBox *checkBox = new QCheckBox("Activate user designed filter");
+            connect(checkBox,&QCheckBox::clicked,
+                        this,&FilterWindow::onChkBoxFilterActivation);
+
+            checkBox->installEventFilter(this);
+
+            m_lActivationCheckBoxList.prepend(checkBox);
+
+            ui->m_layout_designFilter->addWidget(checkBox,ui->m_layout_designFilter->rowCount(),0,
+                                                 1,2);
+        }
     }
 }
 
@@ -629,13 +649,18 @@ void FilterWindow::onChkBoxFilterActivation(bool state)
 {
     Q_UNUSED(state);
 
+    //Check default filters
     for(int i=0; i<m_lActivationCheckBoxList.size(); i++) {
         QVariant variant;
         variant.setValue(m_lActivationCheckBoxList.at(i)->isChecked());
 
+        QString checkBoxText = m_lActivationCheckBoxList.at(i)->text();
+        if(checkBoxText == "Activate user designed filter")
+            checkBoxText = "User Design";
+
         int filterModelRowIndex = -1;
         for(int z=0; z<m_pFilterDataModel->rowCount(); z++) {
-            if(m_pFilterDataModel->data( m_pFilterDataModel->index(z,1), FilterDataModelRoles::GetFilterName).toString() == m_lActivationCheckBoxList.at(i)->text())
+            if(m_pFilterDataModel->data( m_pFilterDataModel->index(z,1), FilterDataModelRoles::GetFilterName).toString() == checkBoxText)
                 filterModelRowIndex = z;
         }
 
