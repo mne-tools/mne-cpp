@@ -238,7 +238,7 @@ protected slots:
     /**
     * updates the filter activation layout
     */
-    void updateFilterActivationWidget(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
+    void updateDefaultFiltersActivation(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
 
     //=========================================================================================================
     /**
