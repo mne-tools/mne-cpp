@@ -148,7 +148,7 @@ public:
 
     OtherClass*    m_pOtherClassObject;       /**< m_pOtherClassObject description */
 
-    //Put your other public members here
+    //Put your other public members here. Try NOT to define mamber variables as public. It is always more safe to declare them under protected or private.
 
 signals: //If you want to use signals you need to specify the Q_Object flag above
     //Put your signals which you want to emit from this class here
