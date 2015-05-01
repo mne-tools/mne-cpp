@@ -138,6 +138,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the new samplingRate.
+    *
+    * @param[in] dSamplingRate the new sampling rate
+    */
+    void setSamplingRate(double dSamplingRate);
+
+    //=========================================================================================================
+    /**
     * Returns the current filter.
     *
     * @return returns the list with the currently active filters
@@ -221,6 +229,7 @@ private:
 
     int                         m_iWindowSize;          /**< The current window size of the loaded fiff data in the DataWindow class.*/
     int                         m_iFilterTaps;          /**< The current number of filter taps.*/
+    double                      m_dSFreq;               /**< The current sampling frequency.*/
 
     FiffInfo                    m_fiffInfo;             /**< The current fiffInfo.*/
 

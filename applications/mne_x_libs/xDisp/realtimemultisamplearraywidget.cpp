@@ -432,7 +432,8 @@ void RealTimeMultiSampleArrayWidget::dsFactorChanged(int dsFactor)
     m_iDSFactor = dsFactor;
     m_fDesiredSamplingRate = m_fSamplingRate/m_pSpinBoxDSFactor->value();
 
-    std::cout<<"m_fDesiredSamplingRate: "<<m_fDesiredSamplingRate<<std::endl;
+    emit samplingRateChanged(m_fDesiredSamplingRate);
+
     m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, m_iT, m_fDesiredSamplingRate);
 }
 
@@ -557,6 +558,9 @@ void RealTimeMultiSampleArrayWidget::showFilterWidget()
 
         connect(m_pFilterWindow.data(), &FilterWindow::filterChanged,
                 m_pRTMSAModel, &RealTimeMultiSampleArrayModel::filterChanged);
+
+        connect(this, &RealTimeMultiSampleArrayWidget::samplingRateChanged,
+                m_pFilterWindow.data(), &FilterWindow::setSamplingRate);
     }
 
     if(m_pFilterWindow->isActiveWindow())
