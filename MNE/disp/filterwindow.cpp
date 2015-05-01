@@ -62,6 +62,7 @@ FilterWindow::FilterWindow(QWidget *parent)
 , m_pFilterPlotScene(new FilterPlotScene)
 , m_iWindowSize(4016)
 , m_iFilterTaps(128)
+, m_dSFreq(600)
 {
     ui->setupUi(this);
 
@@ -94,6 +95,8 @@ void FilterWindow::setFiffInfo(const FiffInfo &fiffInfo)
     //Init m_filterData with designed filter and add to model
     m_pFilterDataModel->addFilter(m_filterData);
 
+    m_dSFreq = m_fiffInfo.sfreq;
+
     //Update min max of spin boxes to nyquist
     double samplingFrequency = m_fiffInfo.sfreq;
     double nyquistFrequency = samplingFrequency/2;
@@ -112,6 +115,16 @@ void FilterWindow::setWindowSize(int iWindowSize)
     m_iWindowSize = iWindowSize;
 
     ui->m_spinBox_filterTaps->setMaximum(iWindowSize);
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::setSamplingRate(double dSamplingRate)
+{
+    m_dSFreq = dSamplingRate;
+
+    filterParametersChanged();
 }
 
 
@@ -464,7 +477,7 @@ void FilterWindow::filterParametersChanged()
     double bw = highpassHz-lowpassHz;
     double center = lowpassHz+bw/2;
 
-    double samplingFrequency = m_fiffInfo.sfreq <= 0 ? 600 : m_fiffInfo.sfreq;
+    double samplingFrequency = m_dSFreq <= 0 ? 600 : m_dSFreq;
     double nyquistFrequency = samplingFrequency/2;
 
     //Calculate the needed fft length

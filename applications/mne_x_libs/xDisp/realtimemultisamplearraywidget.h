@@ -268,6 +268,14 @@ signals:
     */
     void fiffFileUpdated(const FiffInfo&);
 
+    //=========================================================================================================
+    /**
+    * samplingRateChanged is emitted whenever the sampling rate is changed
+    *
+    * @param samplingRate the current (downsampled) sampling rate
+    */
+    void samplingRateChanged(double samplingRate);
+
 private:
     //=========================================================================================================
     /**
