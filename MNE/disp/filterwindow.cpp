@@ -90,12 +90,12 @@ void FilterWindow::setFiffInfo(const FiffInfo &fiffInfo)
 {
     m_fiffInfo = fiffInfo;
 
+    m_dSFreq = m_fiffInfo.sfreq;
+
     filterParametersChanged();
 
     //Init m_filterData with designed filter and add to model
     m_pFilterDataModel->addFilter(m_filterData);
-
-    m_dSFreq = m_fiffInfo.sfreq;
 
     //Update min max of spin boxes to nyquist
     double samplingFrequency = m_fiffInfo.sfreq;
