@@ -66,6 +66,18 @@ TemplateClass(OtherClass *parent);
 
 //*************************************************************************************************************
 
+TemplateClass(const TemplateClass &p_templateClass);
+: m_iParamterOne(p_templateClass.m_iParamterOne)
+, m_dParamterTwo(p_templateClass.m_dParamterTwo)
+, m_bParamterThree(p_templateClass.m_bParamterThree)
+, m_pOtherClassObject(p_templateClass.m_pOtherClassObject)
+{
+
+}
+
+
+//*************************************************************************************************************
+
 TemplateClass::~TemplateClass()
 {
 
