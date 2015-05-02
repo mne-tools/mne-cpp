@@ -54,7 +54,7 @@ using namespace YOURNAMESPACE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TemplateClass(OtherClass *parent);
+TemplateClass::TemplateClass(OtherClass *parent);
 : m_iParamterOne(1)
 , m_dParamterTwo(1.0)
 , m_bParamterThree(false)
@@ -66,7 +66,7 @@ TemplateClass(OtherClass *parent);
 
 //*************************************************************************************************************
 
-TemplateClass(const TemplateClass &p_templateClass);
+TemplateClass::TemplateClass(const TemplateClass &p_templateClass);
 : m_iParamterOne(p_templateClass.m_iParamterOne)
 , m_dParamterTwo(p_templateClass.m_dParamterTwo)
 , m_bParamterThree(p_templateClass.m_bParamterThree)
