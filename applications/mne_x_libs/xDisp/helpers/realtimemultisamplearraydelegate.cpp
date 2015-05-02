@@ -207,12 +207,12 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
     switch(kind) {
         case FIFFV_MEG_CH: {
             qint32 unit =t_pModel->getUnit(index.row());
-            if(unit == FIFF_UNIT_T_M) {
+            if(unit == FIFF_UNIT_T_M) { //gradiometers
                 fMaxValue = 1e-10f;
                 if(t_pModel->getScaling().contains(FIFF_UNIT_T_M))
                     fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T_M];
             }
-            else if(unit == FIFF_UNIT_T)
+            else if(unit == FIFF_UNIT_T) //magnitometers
             {
                 if(t_pModel->getCoil(index.row()) == FIFFV_COIL_BABY_MAG)
                     fMaxValue = 1e-11f;
@@ -221,6 +221,8 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
 
                 if(t_pModel->getScaling().contains(FIFF_UNIT_T))
                     fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
+
+                std::cout<<fMaxValue<<std::endl;
             }
             break;
         }

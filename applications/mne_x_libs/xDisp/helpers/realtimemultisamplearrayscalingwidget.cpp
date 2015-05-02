@@ -69,7 +69,7 @@ using namespace XDISPLIB;
 RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(RealTimeMultiSampleArrayWidget *toolbox)
 : m_pRTMSAW(toolbox)
 {
-    this->setWindowTitle("Covariance Modality Settings");
+    this->setWindowTitle("Scaling");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
 
