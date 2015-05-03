@@ -39,7 +39,6 @@ include(../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
-bmtiExample\
     readRaw \
     readWriteRaw \
     readFwd \

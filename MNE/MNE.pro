@@ -38,7 +38,6 @@ include(../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
-bmti\
     generics \
     utils \
     fs \
