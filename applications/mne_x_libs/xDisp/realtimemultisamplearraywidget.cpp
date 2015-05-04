@@ -561,6 +561,10 @@ void RealTimeMultiSampleArrayWidget::showFilterWidget()
 
         connect(this, &RealTimeMultiSampleArrayWidget::samplingRateChanged,
                 m_pFilterWindow.data(), &FilterWindow::setSamplingRate);
+
+        //Init downsampled sampling frequency
+        m_fDesiredSamplingRate = m_fSamplingRate/m_pSpinBoxDSFactor->value();
+        emit samplingRateChanged(m_fDesiredSamplingRate);
     }
 
     if(m_pFilterWindow->isActiveWindow())
