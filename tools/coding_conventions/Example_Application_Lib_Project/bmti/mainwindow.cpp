@@ -54,8 +54,8 @@ using namespace BMTILIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
+MainWindow::MainWindow(QWidget *pParent) :
+    QMainWindow(pParent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
