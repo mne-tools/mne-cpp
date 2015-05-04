@@ -7,5 +7,7 @@
         <file alias="channelScaling.png">images/channelScaling.png</file>
         <file alias="iconSSP.png">images/iconSSP.png</file>
         <file alias="showFilterWindow.png">images/showFilterWindow.png</file>
+        <file alias="hideBad.png">images/hideBad.png</file>
+        <file alias="showBad.png">images/showBad.png</file>
     </qresource>
 </RCC>
