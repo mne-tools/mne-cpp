@@ -347,6 +347,12 @@ private:
 
     //=========================================================================================================
     /**
+    * hides the in m_qListCurrentSelection stored selection -> hack around C++11 lambda
+    */
+    void hideSelection();
+
+    //=========================================================================================================
+    /**
     * reset the in m_qListCurrentSelection stored selection -> hack around C++11 lambda
     */
     void resetSelection();
