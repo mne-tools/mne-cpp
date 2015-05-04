@@ -95,7 +95,7 @@ QVariant RealTimeMultiSampleArrayModel::data(const QModelIndex &index, int role)
         return QVariant();
 
     if (index.isValid()) {
-        qint32 row = m_qMapIdxRowSelection[index.row()];
+        qint32 row = m_qMapIdxRowSelection.value(index.row(),0);
 
         //******** first column (chname) ********
         if(index.column() == 0 && role == Qt::DisplayRole)
@@ -455,13 +455,28 @@ void RealTimeMultiSampleArrayModel::selectRows(const QList<qint32> &selection)
     m_qMapIdxRowSelection.clear();
 
     qint32 count = 0;
-    for(qint32 i = 0; i < selection.size(); ++i)
-    {
-        if(selection[i] < m_qListChInfo.size())
-        {
+    for(qint32 i = 0; i < selection.size(); ++i) {
+        if(selection[i] < m_qListChInfo.size()) {
             m_qMapIdxRowSelection.insert(count,selection[i]);
             ++count;
         }
+    }
+
+    emit newSelection(selection);
+
+    endResetModel();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::hideRows(const QList<qint32> &selection)
+{
+    beginResetModel();
+
+    for(qint32 i = 0; i < selection.size(); ++i) {
+        if(m_qMapIdxRowSelection.contains(selection.at(i)))
+            m_qMapIdxRowSelection.remove(selection.at(i));
     }
 
     emit newSelection(selection);

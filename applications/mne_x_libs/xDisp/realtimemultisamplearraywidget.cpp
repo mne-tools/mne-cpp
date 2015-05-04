@@ -250,7 +250,8 @@ void RealTimeMultiSampleArrayWidget::init()
             delete m_pRTMSADelegate;
         m_pRTMSADelegate = new RealTimeMultiSampleArrayDelegate(this);
 
-        connect(m_pTableView, &QTableView::doubleClicked, m_pRTMSAModel, &RealTimeMultiSampleArrayModel::toggleFreeze);
+        connect(m_pTableView, &QTableView::doubleClicked, m_pRTMSAModel,
+                &RealTimeMultiSampleArrayModel::toggleFreeze);
 
         m_pTableView->setModel(m_pRTMSAModel);
         m_pTableView->setItemDelegate(m_pRTMSADelegate);
@@ -273,7 +274,8 @@ void RealTimeMultiSampleArrayWidget::init()
 
         //set context menu
         m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
-        connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(channelContextMenu(QPoint)));
+        connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),
+                this,SLOT(channelContextMenu(QPoint)));
 
         //Scaling
         QString t_sRTMSAWName = m_pRTMSA->getName();
@@ -348,12 +350,20 @@ void RealTimeMultiSampleArrayWidget::channelContextMenu(QPoint pos)
 
     //select channels
     QAction* doSelection = menu->addAction(tr("Apply selection"));
-    connect(doSelection, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::applySelection);
+    connect(doSelection, &QAction::triggered, this,
+            &RealTimeMultiSampleArrayWidget::applySelection);
+
+    //select channels
+    QAction* hideSelection = menu->addAction(tr("Hide selection"));
+    connect(hideSelection, &QAction::triggered, this,
+            &RealTimeMultiSampleArrayWidget::hideSelection);
 
     //undo selection
     QAction* resetAppliedSelection = menu->addAction(tr("Reset selection"));
-    connect(resetAppliedSelection,&QAction::triggered, m_pRTMSAModel, &RealTimeMultiSampleArrayModel::resetSelection);
-    connect(resetAppliedSelection,&QAction::triggered, this, &RealTimeMultiSampleArrayWidget::resetSelection);
+    connect(resetAppliedSelection,&QAction::triggered, m_pRTMSAModel,
+            &RealTimeMultiSampleArrayModel::resetSelection);
+    connect(resetAppliedSelection,&QAction::triggered,
+            this, &RealTimeMultiSampleArrayWidget::resetSelection);
 
     //show context menu
     menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
@@ -452,7 +462,25 @@ void RealTimeMultiSampleArrayWidget::timeWindowChanged(int T)
 
 void RealTimeMultiSampleArrayWidget::applySelection()
 {
-    m_pRTMSAModel->selectRows(m_qListCurrentSelection);
+    //Hide non selected channels/rows in the data views
+    for(int i = 0; i<m_pRTMSAModel->rowCount(); i++) {
+        //if channel is a bad channel and bad channels are to be hidden -> do not show
+        if(m_qListCurrentSelection.contains(i) /*&& m_bHideBadChannels*/)
+            m_pTableView->showRow(i);
+        else
+            m_pTableView->hideRow(i);
+    }
+
+    //m_pRTMSAModel->selectRows(m_qListCurrentSelection);
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayWidget::hideSelection()
+{
+    for(int i=0; i<m_qListCurrentSelection.size(); i++)
+        m_pTableView->hideRow(m_qListCurrentSelection.at(i));
 }
 
 
@@ -462,8 +490,10 @@ void RealTimeMultiSampleArrayWidget::resetSelection()
 {
     // non C++11 alternative
     m_qListCurrentSelection.clear();
-    for(qint32 i = 0; i < m_qListChInfo.size(); ++i)
+    for(qint32 i = 0; i < m_qListChInfo.size(); ++i) {
         m_qListCurrentSelection.append(i);
+        m_pTableView->showRow(i);
+    }
 
     applySelection();
 }

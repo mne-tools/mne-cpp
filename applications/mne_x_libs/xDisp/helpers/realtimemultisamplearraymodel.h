@@ -241,6 +241,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Hides the given list of channel
+    *
+    * @param[in] selection      channel index list to select
+    */
+    void hideRows(const QList<qint32> &selection);
+
+    //=========================================================================================================
+    /**
     * Resets the current selection (selects all channels)
     */
     void resetSelection();
