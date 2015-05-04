@@ -309,11 +309,35 @@ private:
 
     //=========================================================================================================
     /**
+    * apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda
+    */
+    void applySelection();
+
+    //=========================================================================================================
+    /**
+    * hides the in m_qListCurrentSelection stored selection -> hack around C++11 lambda
+    */
+    void hideSelection();
+
+    //=========================================================================================================
+    /**
+    * reset the in m_qListCurrentSelection stored selection -> hack around C++11 lambda
+    */
+    void resetSelection();
+
+    //=========================================================================================================
+    /**
     * Only shows the channels defined in the QStringList selectedChannels
     *
     * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
     */
     void showSelectedChannelsOnly(QStringList selectedChannels);
+
+    //=========================================================================================================
+    /**
+    * hides/show all bad channels in the view
+    */
+    void hideBadChannels();
 
     //=========================================================================================================
     /**
@@ -338,24 +362,6 @@ private:
     * Shows sensor selection widget
     */
     void showSensorSelectionWidget();
-
-    //=========================================================================================================
-    /**
-    * apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda
-    */
-    void applySelection();
-
-    //=========================================================================================================
-    /**
-    * hides the in m_qListCurrentSelection stored selection -> hack around C++11 lambda
-    */
-    void hideSelection();
-
-    //=========================================================================================================
-    /**
-    * reset the in m_qListCurrentSelection stored selection -> hack around C++11 lambda
-    */
-    void resetSelection();
 
     RealTimeMultiSampleArrayModel*      m_pRTMSAModel;                  /**< RTMSA data model */
     RealTimeMultiSampleArrayDelegate*   m_pRTMSADelegate;               /**< RTMSA data delegate */
@@ -392,6 +398,8 @@ private:
     QAction*        m_pActionFiltering;                                 /**< show filter window */
     QAction*        m_pActionChScaling;                                 /**< Show channel scaling Action. */
     QAction*        m_pActionProjection;                                /**< Show projections Action. */
+    QAction*        m_pActionHideBad;                                   /**< Hide bad channels. */
+
  };
 
 } // NAMESPACE XDISPLIB

@@ -123,32 +123,38 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     m_pActionSelectSensors->setShortcut(tr("F9"));
     m_pActionSelectSensors->setToolTip(tr("Shows the region selection widget (F9)"));
     m_pActionSelectSensors->setVisible(true);
-    connect(m_pActionSelectSensors, &QAction::triggered, this,
-            &RealTimeMultiSampleArrayWidget::showSensorSelectionWidget);
+    connect(m_pActionSelectSensors, &QAction::triggered,
+            this, &RealTimeMultiSampleArrayWidget::showSensorSelectionWidget);
     addDisplayAction(m_pActionSelectSensors);
 
     m_pActionChScaling = new QAction(QIcon(":/images/channelScaling.png"), tr("Shows the channel scaling widget (F10)"),this);
     m_pActionChScaling->setShortcut(tr("F10"));
     m_pActionChScaling->setStatusTip(tr("Shows the channel scaling widget (F10)"));
-    connect(m_pActionChScaling, &QAction::triggered, this,
-            &RealTimeMultiSampleArrayWidget::showChScalingWidget);
+    connect(m_pActionChScaling, &QAction::triggered,
+            this, &RealTimeMultiSampleArrayWidget::showChScalingWidget);
     addDisplayAction(m_pActionChScaling);
     m_pActionChScaling->setVisible(false);
 
     m_pActionFiltering = new QAction(QIcon(":/images/showFilterWindow.png"), tr("Shows the filter window (F11)"),this);
     m_pActionFiltering->setShortcut(tr("F11"));
     m_pActionFiltering->setStatusTip(tr("Shows the filter window (F11)"));
-    connect(m_pActionFiltering, &QAction::triggered, this,
-            &RealTimeMultiSampleArrayWidget::showFilterWidget);
+    connect(m_pActionFiltering, &QAction::triggered,
+            this, &RealTimeMultiSampleArrayWidget::showFilterWidget);
     addDisplayAction(m_pActionFiltering);
     m_pActionFiltering->setVisible(true);
 
     m_pActionProjection = new QAction(QIcon(":/images/iconSSP.png"), tr("Shows the SSP widget (F12)"),this);
     m_pActionProjection->setShortcut(tr("F12"));
     m_pActionProjection->setStatusTip(tr("Shows the SSP widget (F12)"));
-    connect(m_pActionProjection, &QAction::triggered, this,
-            &RealTimeMultiSampleArrayWidget::showProjectionWidget);
+    connect(m_pActionProjection, &QAction::triggered,
+            this, &RealTimeMultiSampleArrayWidget::showProjectionWidget);
     addDisplayAction(m_pActionProjection);
+
+    m_pActionHideBad = new QAction(QIcon(":/images/hideBad.png"), tr("Toggle all bad channels"),this);
+    m_pActionHideBad->setStatusTip(tr("Toggle all bad channels"));
+    connect(m_pActionHideBad, &QAction::triggered,
+            this, &RealTimeMultiSampleArrayWidget::hideBadChannels);
+    addDisplayAction(m_pActionHideBad);
 
     m_pActionProjection->setVisible(true);
     if(m_pTableView)
@@ -267,6 +273,7 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pTableView->setAutoScroll(false);
         m_pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
+        m_pTableView->setColumnHidden(2,true);
 
         m_pTableView->resizeColumnsToContents();
 
@@ -524,6 +531,33 @@ void RealTimeMultiSampleArrayWidget::showSelectedChannelsOnly(QStringList select
 
 //*************************************************************************************************************
 
+void RealTimeMultiSampleArrayWidget::hideBadChannels()
+{
+    if(m_pActionHideBad->toolTip() == "Show all bad channels") {
+        m_pActionHideBad->setIcon(QIcon(":/images/hideBad.png"));
+        m_pActionHideBad->setToolTip("Hide all bad channels");
+        m_pActionHideBad->setStatusTip(tr("Hide all bad channels"));
+        m_bHideBadChannels = false;
+    }
+    else {
+        m_pActionHideBad->setIcon(QIcon(":/images/showBad.png"));
+        m_pActionHideBad->setToolTip("Show all bad channels");
+        m_pActionHideBad->setStatusTip(tr("Show all bad channels"));
+        m_bHideBadChannels = true;
+    }
+
+    //Hide non selected channels/rows in the data views
+    for(int i = 0; i<m_pRTMSAModel->rowCount(); i++) {
+        if(m_pRTMSAModel->data(m_pRTMSAModel->index(i,2)).toBool() && m_bHideBadChannels)
+            m_pTableView->hideRow(i);
+        else
+            m_pTableView->showRow(i);
+    }
+}
+
+
+//*************************************************************************************************************
+
 void RealTimeMultiSampleArrayWidget::showChScalingWidget()
 {
     if(!m_pRTMSAScalingWidget)
@@ -533,7 +567,8 @@ void RealTimeMultiSampleArrayWidget::showChScalingWidget()
         m_pRTMSAScalingWidget->setWindowTitle("Channel Scaling");
         //m_pRTMSAScalingWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
-        connect(m_pRTMSAScalingWidget.data(), &RealTimeMultiSampleArrayScalingWidget::scalingChanged, this, &RealTimeMultiSampleArrayWidget::broadcastScaling);
+        connect(m_pRTMSAScalingWidget.data(), &RealTimeMultiSampleArrayScalingWidget::scalingChanged,
+                this, &RealTimeMultiSampleArrayWidget::broadcastScaling);
     }
 
     if(m_pRTMSAScalingWidget->isActiveWindow())
@@ -559,7 +594,8 @@ void RealTimeMultiSampleArrayWidget::showProjectionWidget()
             m_pProjectorSelectionWidget->setFiffInfo(m_pFiffInfo);
             //m_pProjectorSelectionWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
-            connect(m_pProjectorSelectionWidget.data(), &ProjectorWidget::projSelectionChanged, this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::updateProjection);
+            connect(m_pProjectorSelectionWidget.data(), &ProjectorWidget::projSelectionChanged,
+                    this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::updateProjection);
         }
 
         if(m_pProjectorSelectionWidget->isActiveWindow())
@@ -636,5 +672,4 @@ void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
         m_pSelectionManagerWindow->show();
     }
 }
-
 
