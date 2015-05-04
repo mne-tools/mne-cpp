@@ -221,8 +221,6 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
 
                 if(t_pModel->getScaling().contains(FIFF_UNIT_T))
                     fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
-
-                std::cout<<fMaxValue<<std::endl;
             }
             break;
         }

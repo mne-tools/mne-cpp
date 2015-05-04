@@ -54,8 +54,8 @@ using namespace BMTILIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Test::Test(QWidget *parent) :
-    QWidget(parent),
+Test::Test(QWidget *pParent) :
+    QWidget(pParent),
     ui(new Ui::Test)
 {
     ui->setupUi(this);

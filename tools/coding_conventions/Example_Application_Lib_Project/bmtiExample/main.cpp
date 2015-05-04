@@ -73,20 +73,20 @@ using namespace BMTILIB;
 * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
 */
 
-MainWindow *mainwindow  = NULL;
-Test *test = NULL;
+MainWindow *m_pMainwindow  = NULL;
+Test *m_pTest = NULL;
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
     //Create main window instance and show
-    mainwindow = new MainWindow();
-    mainwindow->show();
+    m_pMainwindow = new MainWindow();
+    m_pMainwindow->show();
 
     //Create Test widget and show
-    test = new Test();
-    test->show();
+    m_pTest = new Test();
+    m_pTest->show();
 
     return a.exec();
 }
