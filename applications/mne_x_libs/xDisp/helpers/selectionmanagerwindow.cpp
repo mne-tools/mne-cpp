@@ -247,17 +247,20 @@ void SelectionManagerWindow::initComboBoxes()
 //     << QApplication::translate("SelectionManagerWindow", "CTF-275.lout", 0)
 //     << QApplication::translate("SelectionManagerWindow", "magnesWH3600.lout", 0)
     );
-    ui->m_comboBox_selectionFiles->clear();
-    ui->m_comboBox_selectionFiles->insertItems(0, QStringList()
-     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_vv.sel", 0)
-     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_vv_new.sel", 0)
-//     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_CTF_275.sel", 0)
-//     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_Magnes_3600WH.sel", 0)
-    );
 
-    //Connect the layout and selection group loader
-    connect(ui->m_comboBox_selectionFiles, &QComboBox::currentTextChanged,
-                this, &SelectionManagerWindow::loadSelectionGroups);
+//    ui->m_comboBox_selectionFiles->clear();
+//    ui->m_comboBox_selectionFiles->insertItems(0, QStringList()
+//     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_babyMEG.sel", 0)
+//     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_vv.sel", 0)
+//     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_vv_new.sel", 0)
+////     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_CTF_275.sel", 0)
+////     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_Magnes_3600WH.sel", 0)
+//    );
+//    ui->m_comboBox_selectionFiles->hide();
+
+//    //Connect the layout and selection group loader
+//    connect(ui->m_comboBox_selectionFiles, &QComboBox::currentTextChanged,
+//                this, &SelectionManagerWindow::loadSelectionGroups);
 
     connect(ui->m_comboBox_layoutFile, &QComboBox::currentTextChanged,
                 this, &SelectionManagerWindow::loadLayout);
@@ -271,13 +274,14 @@ void SelectionManagerWindow::initComboBoxes()
 
 void SelectionManagerWindow::initButtons()
 {
-    //Connect the layout and selection group loader
     connect(ui->m_pushButton_saveSelection, &QPushButton::clicked,
                 this, &SelectionManagerWindow::onBtnSaveUserSelection);
 
     connect(ui->m_pushButton_loadSelection, &QPushButton::clicked,
                 this, &SelectionManagerWindow::onBtnLoadUserSelection);
 
+    connect(ui->m_pushButton_addToSelectionGroups, &QPushButton::clicked,
+                this, &SelectionManagerWindow::onBtnAddToSelectionGroups);
 }
 
 //*************************************************************************************************************
@@ -290,7 +294,7 @@ bool SelectionManagerWindow::loadLayout(QString path)
     bool state = LayoutLoader::readMNELoutFile(newPath, m_layoutMap);
 
     //Load selection groups again because they need to be reinitialised every time a new layout hase been loaded
-    loadSelectionGroups(ui->m_comboBox_selectionFiles->currentText());
+    loadSelectionGroups("mne_browse_raw_babyMEG.sel");
 
     //if no layout for EEG is specified generate from digitizer points
     QList<QVector<double> > inputPoints;
@@ -551,7 +555,58 @@ void SelectionManagerWindow::updateDataView()
 
 void SelectionManagerWindow::onBtnLoadUserSelection()
 {
+    QString path = QFileDialog::getOpenFileName(this,
+                                                QString("Open selection file"),
+                                                QString("./MNE_Browse_Raw_Resources/Templates/ChannelSelection/"),
+                                                tr("Selection files (*.sel)"));
 
+    if(path.isEmpty())
+        return;
+
+    m_selectionGroupsMap.clear();
+
+    if(!SelectionIO::readMNESelFile(path, m_selectionGroupsMap))
+        return;
+
+    //Clear the visible channel list
+    ui->m_listWidget_visibleChannels->clear();
+
+    //Keep the entry All in the selection list and m_selectionGroupsMap -> delete the rest
+    ui->m_listWidget_selectionGroups->clear();
+
+    //Create group 'All' and 'All EEG' manually (bcause this group depends on the loaded channels from the fiff data file, not on the loaded selection file)
+    m_selectionGroupsMap["All"] = m_currentlyLoadedFiffChannels;
+
+    QStringList names;
+    for(int i = 0; i<m_pChInfoModel->rowCount(); i++) {
+        QModelIndex digIndex = m_pChInfoModel->index(i,1);
+        QString chName = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetOrigChName).toString();
+
+        digIndex = m_pChInfoModel->index(i,4);
+        int kind = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetChKind).toInt();
+
+        if(kind == FIFFV_EEG_CH) //FIFFV_MEG_CH
+            names<<chName;
+    }
+
+    //Add 'Add EEG' group to selection groups
+    m_selectionGroupsMap["All EEG"] = names;
+
+    //Add selection groups to list widget
+    QMapIterator<QString, QStringList> selectionIndex(m_selectionGroupsMap);
+    while (selectionIndex.hasNext()) {
+        selectionIndex.next();
+        ui->m_listWidget_selectionGroups->insertItem(ui->m_listWidget_selectionGroups->count(), selectionIndex.key());
+    }
+
+    //Update selection
+    updateSelectionGroupsList(getItemForChName(ui->m_listWidget_selectionGroups, "All"), new QListWidgetItem());
+
+    //Set group all as slected item
+    ui->m_listWidget_selectionGroups->setCurrentItem(getItemForChName(ui->m_listWidget_selectionGroups, "All"), QItemSelectionModel::Select);
+
+    //Delete all MEG channels from the selection groups which are not in the loaded layout
+    cleanUpMEGChannels();
 }
 
 
@@ -561,20 +616,29 @@ void SelectionManagerWindow::onBtnSaveUserSelection()
 {
     QDate date;
     QString path = QFileDialog::getSaveFileName(this,
-                                                    "Save user channel selection",
-                                                    QString("%1/%2_%3_%4_UserSelection").arg(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
-                                                    tr("Selection file(*.sel)"));
+                                                "Save user channel selection",
+                                                QString("./MNE_Browse_Raw_Resources/Templates/ChannelSelection/%1_%2_%3_UserSelection").arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
+                                                tr("Selection file(*.sel)"));
+
+    QMap<QString, QStringList> tempMap = m_selectionGroupsMap;
+    tempMap.remove("All");
+    tempMap.remove("All EEG");
+
+    if(!path.isEmpty())
+        SelectionIO::writeMNESelFile(path, tempMap);
+}
+
+
+//*************************************************************************************************************
+
+void SelectionManagerWindow::onBtnAddToSelectionGroups()
+{
     QStringList temp;
     for(int i = 0; i<ui->m_listWidget_userDefined->count(); i++)
         temp<<ui->m_listWidget_userDefined->item(i)->text();
 
-    QMap<QString, QStringList> tempMap;
-    tempMap.insert("Current user selection", temp);
-
-    if(!path.isEmpty())
-    {
-        SelectionIO::writeMNESelFile(path,tempMap);
-    }
+    m_selectionGroupsMap.insertMulti(ui->m_lineEdit_selectionGroupName->text(), temp);
+    ui->m_listWidget_selectionGroups->insertItem(ui->m_listWidget_selectionGroups->count(), ui->m_lineEdit_selectionGroupName->text());
 }
 
 
