@@ -131,7 +131,7 @@ bool SelectionIO::writeMNESelFile(QString path, const QMap<QString,QStringList> 
         for(int u=0; u<i.value().size() ; u++)
             out << i.value().at(u) << "|";
 
-        out << "\n";
+        out << "\n" << "\n";
 
         ++i;
     }
