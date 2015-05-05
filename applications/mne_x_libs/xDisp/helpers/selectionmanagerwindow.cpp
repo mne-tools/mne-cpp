@@ -560,13 +560,20 @@ void SelectionManagerWindow::onBtnLoadUserSelection()
 void SelectionManagerWindow::onBtnSaveUserSelection()
 {
     QDate date;
-    QString fileName = QFileDialog::getSaveFileName(this,
+    QString path = QFileDialog::getSaveFileName(this,
                                                     "Save user channel selection",
                                                     QString("%1/%2_%3_%4_UserSelection").arg(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
                                                     tr("Selection file(*.sel)"));
-    if(!fileName.isEmpty())
+    QStringList temp;
+    for(int i = 0; i<ui->m_listWidget_userDefined->count(); i++)
+        temp<<ui->m_listWidget_userDefined->item(i)->text();
+
+    QMap<QString, QStringList> tempMap;
+    tempMap.insert("Current user selection", temp);
+
+    if(!path.isEmpty())
     {
-        //Write user selection to file
+        SelectionIO::writeMNESelFile(path,tempMap);
     }
 }
 

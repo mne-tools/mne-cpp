@@ -106,6 +106,14 @@ public:
     */
     static bool readMNESelFile(QString path, QMap<QString,QStringList> &selectionMap);
 
+    //=========================================================================================================
+    /**
+    * Qrites the specified MNE sel file.
+    * @param [in] path holds the file path of the elc file which is to be read.
+    * @param [in] selectionMap holds the map to which the read selection groups are stored.
+    */
+    static bool writeMNESelFile(QString path, const QMap<QString,QStringList> &selectionMap);
+
 };
 
 } // NAMESPACE

@@ -180,7 +180,7 @@ QVariant RealTimeMultiSampleArrayModel::data(const QModelIndex &index, int role)
                     if(m_pFiffInfo->bads.contains(m_qListChInfo[row].getChannelName())) {
                         QBrush brush;
                         brush.setStyle(Qt::SolidPattern);
-                        qDebug() << m_qListChInfo[row].getChannelName() << "is marked as bad, index:" << row;
+                        //qDebug() << m_qListChInfo[row].getChannelName() << "is marked as bad, index:" << row;
                         brush.setColor(Qt::red);
 
                         return QVariant(brush);
