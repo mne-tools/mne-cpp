@@ -356,10 +356,9 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
     ui->m_listWidget_selectionGroups->clear();
 
     //Read selection from file and store to map
-    SelectionLoader* manager = new SelectionLoader();
     QString newPath = QCoreApplication::applicationDirPath() + path.prepend("/MNE_Browse_Raw_Resources/Templates/ChannelSelection/");
 
-    bool state = manager->readMNESelFile(newPath, m_selectionGroupsMap);
+    bool state = SelectionIO::readMNESelFile(newPath, m_selectionGroupsMap);
 
     //Create group 'All' and 'All EEG' manually (bcause this group depends on the loaded channels from the fiff data file, not on the loaded selection file)
     m_selectionGroupsMap["All"] = m_currentlyLoadedFiffChannels;

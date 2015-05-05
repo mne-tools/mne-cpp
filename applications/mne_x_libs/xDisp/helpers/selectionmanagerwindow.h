@@ -44,7 +44,7 @@
 
 #include "../ui_selectionmanagerwindow.h"
 #include "utils/layoutloader.h"             //MNE-CPP utils
-#include "utils/selectionloader.h"          //MNE-CPP utils
+#include "utils/selectionio.h"              //MNE-CPP utils
 #include "utils/layoutmaker.h"              //MNE-CPP utils
 #include "selectionscene.h"
 #include "fiff/fiff.h"
@@ -57,6 +57,8 @@
 //=============================================================================================================
 
 #include <QMutableStringListIterator>
+#include <QFileDialog>
+#include <QStandardPaths>
 
 
 //*************************************************************************************************************
@@ -212,6 +214,13 @@ private:
 
     //=========================================================================================================
     /**
+    * Initialises all buttons in the selection window.
+    *
+    */
+    void initButtons();
+
+    //=========================================================================================================
+    /**
     * Loads a new layout from given file path.
     *
     * @param [in] path holds file pathloll
@@ -262,6 +271,20 @@ private:
     *
     */
     void updateDataView();
+
+    //=========================================================================================================
+    /**
+    * loads a user selection file.
+    *
+    */
+    void onBtnLoadUserSelection();
+
+    //=========================================================================================================
+    /**
+    * Saves a user selection file.
+    *
+    */
+    void onBtnSaveUserSelection();
 
     //=========================================================================================================
     /**

@@ -26,7 +26,7 @@
      <item row="3" column="8">
       <widget class="QPushButton" name="m_pushButton_saveSelection">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -121,9 +121,9 @@
       </widget>
      </item>
      <item row="2" column="8">
-      <widget class="QPushButton" name="pushButton_changeSelection">
+      <widget class="QPushButton" name="m_pushButton_loadSelection">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
