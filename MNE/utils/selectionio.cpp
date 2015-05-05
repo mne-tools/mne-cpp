@@ -97,7 +97,7 @@ bool SelectionIO::readMNESelFile(QString path, QMap<QString,QStringList> &select
                 secondSplit.removeLast();
 
             //Add to map
-            selectionMap.insert(key, secondSplit);
+            selectionMap.insertMulti(key, secondSplit);
         }
     }
 
