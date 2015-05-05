@@ -285,6 +285,21 @@ void RealTimeMultiSampleArrayWidget::init()
                 this,SLOT(channelContextMenu(QPoint)));
 
         //Scaling
+        //Show only spin boxes and labels which type are present in the current loaded fiffinfo
+        QList<FiffChInfo> channelList = m_pFiffInfo->chs;
+        QList<int> availabeChannelTypes;
+
+        for(int i = 0; i<channelList.size(); i++) {
+            int unit = channelList.at(i).unit;
+            int type = channelList.at(i).kind;
+
+            if(!availabeChannelTypes.contains(unit))
+                availabeChannelTypes.append(unit);
+
+            if(!availabeChannelTypes.contains(type))
+                availabeChannelTypes.append(type);
+        }
+
         QString t_sRTMSAWName = m_pRTMSA->getName();
 
         if(!t_sRTMSAWName.isEmpty())
@@ -293,23 +308,35 @@ void RealTimeMultiSampleArrayWidget::init()
 
             QSettings settings;
             float val = 0.0f;
-            val = settings.value(QString("RTMSAW/%1/scaleMAG").arg(t_sRTMSAWName), 1e-11f).toFloat();
-            m_qMapChScaling.insert(FIFF_UNIT_T, val);
+            if(availabeChannelTypes.contains(FIFF_UNIT_T)) {
+                val = settings.value(QString("RTMSAW/%1/scaleMAG").arg(t_sRTMSAWName), 1e-11f).toFloat();
+                m_qMapChScaling.insert(FIFF_UNIT_T, val);
+            }
 
-            val = settings.value(QString("RTMSAW/%1/scaleGRAD").arg(t_sRTMSAWName), 1e-10f).toFloat();
-            m_qMapChScaling.insert(FIFF_UNIT_T_M, val);
+            if(availabeChannelTypes.contains(FIFF_UNIT_T_M)) {
+                val = settings.value(QString("RTMSAW/%1/scaleGRAD").arg(t_sRTMSAWName), 1e-10f).toFloat();
+                m_qMapChScaling.insert(FIFF_UNIT_T_M, val);
+            }
 
-            val = settings.value(QString("RTMSAW/%1/scaleEEG").arg(t_sRTMSAWName), 1e-4f).toFloat();
-            m_qMapChScaling.insert(FIFFV_EEG_CH, val);
+            if(availabeChannelTypes.contains(FIFFV_EEG_CH)) {
+                val = settings.value(QString("RTMSAW/%1/scaleEEG").arg(t_sRTMSAWName), 1e-4f).toFloat();
+                m_qMapChScaling.insert(FIFFV_EEG_CH, val);
+            }
 
-            val = settings.value(QString("RTMSAW/%1/scaleEOG").arg(t_sRTMSAWName), 1e-3f).toFloat();
-            m_qMapChScaling.insert(FIFFV_EOG_CH, val);
+            if(availabeChannelTypes.contains(FIFFV_EOG_CH)) {
+                val = settings.value(QString("RTMSAW/%1/scaleEOG").arg(t_sRTMSAWName), 1e-3f).toFloat();
+                m_qMapChScaling.insert(FIFFV_EOG_CH, val);
+            }
 
-            val = settings.value(QString("RTMSAW/%1/scaleSTIM").arg(t_sRTMSAWName), 1e-3f).toFloat();
-            m_qMapChScaling.insert(FIFFV_STIM_CH, val);
+            if(availabeChannelTypes.contains(FIFFV_STIM_CH)) {
+                val = settings.value(QString("RTMSAW/%1/scaleSTIM").arg(t_sRTMSAWName), 1e-3f).toFloat();
+                m_qMapChScaling.insert(FIFFV_STIM_CH, val);
+            }
 
-            val = settings.value(QString("RTMSAW/%1/scaleMISC").arg(t_sRTMSAWName), 1e-3f).toFloat();
-            m_qMapChScaling.insert(FIFFV_MISC_CH, val);
+            if(availabeChannelTypes.contains(FIFFV_MISC_CH)) {
+                val = settings.value(QString("RTMSAW/%1/scaleMISC").arg(t_sRTMSAWName), 1e-3f).toFloat();
+                m_qMapChScaling.insert(FIFFV_MISC_CH, val);
+            }
 
             m_pRTMSAModel->setScaling(m_qMapChScaling);
 
@@ -564,7 +591,6 @@ void RealTimeMultiSampleArrayWidget::showChScalingWidget()
     {
         m_pRTMSAScalingWidget = QSharedPointer<RealTimeMultiSampleArrayScalingWidget>(new RealTimeMultiSampleArrayScalingWidget(this));
 
-        m_pRTMSAScalingWidget->setWindowTitle("Channel Scaling");
         //m_pRTMSAScalingWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
         connect(m_pRTMSAScalingWidget.data(), &RealTimeMultiSampleArrayScalingWidget::scalingChanged,
