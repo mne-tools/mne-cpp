@@ -105,3 +105,38 @@ bool SelectionIO::readMNESelFile(QString path, QMap<QString,QStringList> &select
 
     return true;
 }
+
+
+//*************************************************************************************************************
+
+bool SelectionIO::writeMNESelFile(QString path, const QMap<QString,QStringList> &selectionMap)
+{
+    //Open .sel file
+    if(!path.contains(".sel"))
+        return false;
+
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)){
+        qDebug()<<"Error opening filter sel file for writing";
+        return false;
+    }
+
+    //Write selections to file
+    QTextStream out(&file);
+
+    QMap<QString, QStringList>::const_iterator i = selectionMap.constBegin();
+    while (i != selectionMap.constEnd()) {
+        out << i.key() << ":";
+
+        for(int u=0; u<i.value().size() ; u++)
+            out << i.value().at(u) << "|";
+
+        out << "\n";
+
+        ++i;
+    }
+
+    file.close();
+
+    return true;
+}
