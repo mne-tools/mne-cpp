@@ -66,6 +66,7 @@ SelectionManagerWindow::SelectionManagerWindow(QWidget *parent, ChInfoModel* pCh
     initListWidgets();
     initSelectionSceneView();
     initComboBoxes();
+    initButtons();
 }
 
 
@@ -268,6 +269,19 @@ void SelectionManagerWindow::initComboBoxes()
 
 //*************************************************************************************************************
 
+void SelectionManagerWindow::initButtons()
+{
+    //Connect the layout and selection group loader
+    connect(ui->m_pushButton_saveSelection, &QPushButton::clicked,
+                this, &SelectionManagerWindow::onBtnSaveUserSelection);
+
+    connect(ui->m_pushButton_loadSelection, &QPushButton::clicked,
+                this, &SelectionManagerWindow::onBtnLoadUserSelection);
+
+}
+
+//*************************************************************************************************************
+
 bool SelectionManagerWindow::loadLayout(QString path)
 {
     //Read layout
@@ -356,11 +370,10 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
     ui->m_listWidget_selectionGroups->clear();
 
     //Read selection from file and store to map
-    SelectionLoader* manager = new SelectionLoader();
     QString newPath = QCoreApplication::applicationDirPath() + path.prepend("/MNE_Browse_Raw_Resources/Templates/ChannelSelection/");
 
     m_selectionGroupsMap.clear();
-    bool state = manager->readMNESelFile(newPath, m_selectionGroupsMap);
+    bool state = SelectionIO::readMNESelFile(newPath, m_selectionGroupsMap);
 
     //Create group 'All' and 'All EEG' manually (bcause this group depends on the loaded channels from the fiff data file, not on the loaded selection file)
     m_selectionGroupsMap["All"] = m_currentlyLoadedFiffChannels;
@@ -530,6 +543,30 @@ void SelectionManagerWindow::updateDataView()
         }
 
         emit selectionChanged(visibleItemList);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void SelectionManagerWindow::onBtnLoadUserSelection()
+{
+
+}
+
+
+//*************************************************************************************************************
+
+void SelectionManagerWindow::onBtnSaveUserSelection()
+{
+    QDate date;
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    "Save user channel selection",
+                                                    QString("%1/%2_%3_%4_UserSelection").arg(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
+                                                    tr("Selection file(*.sel)"));
+    if(!fileName.isEmpty())
+    {
+        //Write user selection to file
     }
 }
 

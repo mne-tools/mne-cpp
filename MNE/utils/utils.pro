@@ -80,7 +80,7 @@ SOURCES += \
     mp/adaptivemp.cpp \
     mp/atom.cpp \
     mp/fixdictmp.cpp \
-    selectionloader.cpp \
+    selectionio.cpp \
     minimizersimplex.cpp \
     filterTools/cosinefilter.cpp \
     filterTools/parksmcclellan.cpp \
@@ -97,7 +97,7 @@ HEADERS += \
     mp/adaptivemp.h \
     mp/atom.h \
     mp/fixdictmp.h \
-    selectionloader.h \
+    selectionio.h \
     layoutmaker.h \
     minimizersimplex.h \
     filterTools/cosinefilter.h \
