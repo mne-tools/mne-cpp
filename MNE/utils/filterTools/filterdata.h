@@ -225,6 +225,9 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+Q_DECLARE_METATYPE(UTILSLIB::FilterData);
+Q_DECLARE_METATYPE(QList<UTILSLIB::FilterData>);
+
 
 } // NAMESPACE UTILSLIB
 

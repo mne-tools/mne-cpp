@@ -133,7 +133,7 @@ void FilterWindow::setSamplingRate(double dSamplingRate)
 QList<FilterData> FilterWindow::getCurrentFilter()
 {
     //Get active filters
-    QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData>>();
+    QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData> >();
 
     return activeFilters;
 }
@@ -353,7 +353,7 @@ void FilterWindow::updateDefaultFiltersActivation(const QModelIndex & topLeft, c
     Q_UNUSED(bottomRight);
     Q_UNUSED(roles);
 
-    QList<FilterData> allFilters = m_pFilterDataModel->data(m_pFilterDataModel->index(0,9), FilterDataModelRoles::GetAllFilters).value<QList<FilterData>>();
+    QList<FilterData> allFilters = m_pFilterDataModel->data(m_pFilterDataModel->index(0,9), FilterDataModelRoles::GetAllFilters).value<QList<FilterData> >();
 
     if(m_lActivationCheckBoxList.size()==allFilters.size())
         return;
