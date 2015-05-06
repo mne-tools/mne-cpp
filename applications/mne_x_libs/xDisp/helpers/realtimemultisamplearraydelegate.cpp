@@ -101,13 +101,13 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 painter->setBrushOrigin(oldBO);
             }
 
-            //Highlight selected channels
-            if(option.state & QStyle::State_Selected) {
-                QPointF oldBO = painter->brushOrigin();
-                painter->setBrushOrigin(option.rect.topLeft());
-                painter->fillRect(option.rect, option.palette.highlight());
-                painter->setBrushOrigin(oldBO);
-            }
+//            //Highlight selected channels
+//            if(option.state & QStyle::State_Selected) {
+//                QPointF oldBO = painter->brushOrigin();
+//                painter->setBrushOrigin(option.rect.topLeft());
+//                painter->fillRect(option.rect, option.palette.highlight());
+//                painter->setBrushOrigin(oldBO);
+//            }
 
             //Get data
             QVariant variant = index.model()->data(index,Qt::DisplayRole);
