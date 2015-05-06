@@ -182,7 +182,7 @@ QVariant RealTimeMultiSampleArrayModel::data(const QModelIndex &index, int role)
                         brush.setStyle(Qt::SolidPattern);
                         //qDebug() << m_qListChInfo[row].getChannelName() << "is marked as bad, index:" << row;
                         QColor color(254,74,93);
-                        color.setAlpha(50);
+                        color.setAlpha(40);
                         brush.setColor(color);
 
                         return QVariant(brush);

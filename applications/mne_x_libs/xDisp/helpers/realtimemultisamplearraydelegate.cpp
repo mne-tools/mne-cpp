@@ -94,7 +94,8 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
 
             //draw special background when channel is marked as bad
             QVariant v = index.model()->data(index,Qt::BackgroundRole);
-            if(v.canConvert<QBrush>() && !(option.state & QStyle::State_Selected)) {
+            if((v.canConvert<QBrush>() && !(option.state & QStyle::State_Selected)) ||
+               (v.canConvert<QBrush>() && (option.state & QStyle::State_Selected))) {
                 QPointF oldBO = painter->brushOrigin();
                 painter->setBrushOrigin(option.rect.topLeft());
                 painter->fillRect(option.rect, qvariant_cast<QBrush>(v));
