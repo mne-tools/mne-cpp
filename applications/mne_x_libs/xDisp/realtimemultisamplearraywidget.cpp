@@ -673,7 +673,7 @@ void RealTimeMultiSampleArrayWidget::showFilterWidget()
 void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
 {
     if(!m_pSelectionManagerWindow) {
-        m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel());
+        m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(this, m_pFiffInfo));
 
         m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(0, m_pChInfoModel.data()));
         //m_pSelectionManagerWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
@@ -688,7 +688,8 @@ void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
         connect(m_pChInfoModel.data(), &ChInfoModel::channelsMappedToLayout,
                 m_pSelectionManagerWindow.data(), &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
 
-        m_pChInfoModel->fiffInfoChanged(*m_pFiffInfo.data());
+        m_pChInfoModel->fiffInfoChanged(m_pFiffInfo);
+
     }
 
     if(m_pSelectionManagerWindow->isActiveWindow())

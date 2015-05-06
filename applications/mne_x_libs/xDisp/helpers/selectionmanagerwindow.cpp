@@ -82,7 +82,7 @@ SelectionManagerWindow::~SelectionManagerWindow()
 
 void SelectionManagerWindow::setCurrentlyMappedFiffChannels(const QStringList &mappedLayoutChNames)
 {
-    std::cout<<"SelectionManagerWindow::setCurrentlyMappedFiffChannels"<<std::endl;
+    //std::cout<<"SelectionManagerWindow::setCurrentlyMappedFiffChannels"<<std::endl;
     m_currentlyLoadedFiffChannels = mappedLayoutChNames;
 
     //Clear the visible channel list
@@ -91,7 +91,7 @@ void SelectionManagerWindow::setCurrentlyMappedFiffChannels(const QStringList &m
     //Keep the entry All in the selection list and m_selectionGroupsMap -> delete the rest
     ui->m_listWidget_selectionGroups->clear();
 
-    //Create group 'All' manually (bcause this group depends on the loaded channels from the fiff data file, not on the loaded selection file)
+    //Create group 'All' manually (because this group depends on the loaded channels from the fiff data file, not on the loaded selection file)
     m_selectionGroupsMap["All"] = m_currentlyLoadedFiffChannels;
 
     //Add selection groups to list widget
@@ -294,7 +294,8 @@ bool SelectionManagerWindow::loadLayout(QString path)
     bool state = LayoutLoader::readMNELoutFile(newPath, m_layoutMap);
 
     //Load selection groups again because they need to be reinitialised every time a new layout hase been loaded
-    loadSelectionGroups("mne_browse_raw_babyMEG.sel");
+    QString selectionName("mne_browse_raw_babyMEG.sel");
+    loadSelectionGroups(QCoreApplication::applicationDirPath() + selectionName.prepend("/MNE_Browse_Raw_Resources/Templates/ChannelSelection/"));
 
     //if no layout for EEG is specified generate from digitizer points
     QList<QVector<double> > inputPoints;
@@ -374,7 +375,7 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
     ui->m_listWidget_selectionGroups->clear();
 
     //Read selection from file and store to map
-    QString newPath = QCoreApplication::applicationDirPath() + path.prepend("/MNE_Browse_Raw_Resources/Templates/ChannelSelection/");
+    QString newPath = path; //QCoreApplication::applicationDirPath() + path.prepend("/MNE_Browse_Raw_Resources/Templates/ChannelSelection/");
 
     m_selectionGroupsMap.clear();
     bool state = SelectionIO::readMNESelFile(newPath, m_selectionGroupsMap);
@@ -390,6 +391,7 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
         digIndex = m_pChInfoModel->index(i,4);
         int kind = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetChKind).toInt();
 
+        std::cout<<kind<<std::endl;
         if(kind == FIFFV_EEG_CH) //FIFFV_MEG_CH
             names<<chName;
     }
@@ -563,50 +565,7 @@ void SelectionManagerWindow::onBtnLoadUserSelection()
     if(path.isEmpty())
         return;
 
-    m_selectionGroupsMap.clear();
-
-    if(!SelectionIO::readMNESelFile(path, m_selectionGroupsMap))
-        return;
-
-    //Clear the visible channel list
-    ui->m_listWidget_visibleChannels->clear();
-
-    //Keep the entry All in the selection list and m_selectionGroupsMap -> delete the rest
-    ui->m_listWidget_selectionGroups->clear();
-
-    //Create group 'All' and 'All EEG' manually (bcause this group depends on the loaded channels from the fiff data file, not on the loaded selection file)
-    m_selectionGroupsMap["All"] = m_currentlyLoadedFiffChannels;
-
-    QStringList names;
-    for(int i = 0; i<m_pChInfoModel->rowCount(); i++) {
-        QModelIndex digIndex = m_pChInfoModel->index(i,1);
-        QString chName = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetOrigChName).toString();
-
-        digIndex = m_pChInfoModel->index(i,4);
-        int kind = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetChKind).toInt();
-
-        if(kind == FIFFV_EEG_CH) //FIFFV_MEG_CH
-            names<<chName;
-    }
-
-    //Add 'Add EEG' group to selection groups
-    m_selectionGroupsMap["All EEG"] = names;
-
-    //Add selection groups to list widget
-    QMapIterator<QString, QStringList> selectionIndex(m_selectionGroupsMap);
-    while (selectionIndex.hasNext()) {
-        selectionIndex.next();
-        ui->m_listWidget_selectionGroups->insertItem(ui->m_listWidget_selectionGroups->count(), selectionIndex.key());
-    }
-
-    //Update selection
-    updateSelectionGroupsList(getItemForChName(ui->m_listWidget_selectionGroups, "All"), new QListWidgetItem());
-
-    //Set group all as slected item
-    ui->m_listWidget_selectionGroups->setCurrentItem(getItemForChName(ui->m_listWidget_selectionGroups, "All"), QItemSelectionModel::Select);
-
-    //Delete all MEG channels from the selection groups which are not in the loaded layout
-    cleanUpMEGChannels();
+    loadSelectionGroups(path);
 }
 
 
