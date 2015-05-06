@@ -493,6 +493,9 @@ void FilterWindow::filterParametersChanged()
     else {
         ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
         ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
+
+        ui->m_doubleSpinBox_highpass->setMinimum(0);
+        ui->m_doubleSpinBox_lowpass->setMinimum(0);
     }
 
     //set filter design method
