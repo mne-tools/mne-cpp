@@ -174,6 +174,9 @@ protected:
     int                     m_iDesignFilterIndex;   /**< index of the user designed filter. */
 };
 
+Q_DECLARE_METATYPE(FilterData);
+Q_DECLARE_METATYPE(QList<FilterData>);
+
 } // NAMESPACE DISP
 
 #endif // FILTERDATAMODEL_H
