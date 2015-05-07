@@ -123,14 +123,38 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
 
                 QPainterPath path(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor()-1,option.rect.y()));
 
-                //Plot grid
+                //Plot marker
                 painter->setRenderHint(QPainter::Antialiasing, false);
-                createGridPath(index, option, path, data);
+                createMarkerPath(option, path);
 
                 painter->save();
                 QPen pen;
+                pen.setStyle(Qt::DashLine);
+                pen.setWidthF(1.0);
+                pen.setColor(Qt::red);
+                painter->setPen(pen);
+                painter->drawPath(path);
+                painter->restore();
+
+                //Plot amplitude next to marker mouse posistion
+                painter->save();
+
+                QString amplitude;
+                if(m_markerPosistion.x()<data[0].size())
+                    amplitude = QString().number(data[0].at(m_markerPosistion.x())*10000000);
+                else
+                    amplitude = QString().toDouble(0);
+
+                painter->drawText(m_markerPosistion, amplitude);
+                painter->restore();
+
+                //Plot grid
+                painter->setRenderHint(QPainter::Antialiasing, false);
+                createGridPath(index, option, path, data);
                 pen.setStyle(Qt::DotLine);
                 pen.setWidthF(0.5);
+                pen.setColor(Qt::black);
+                painter->save();
                 painter->setPen(pen);
                 painter->drawPath(path);
                 painter->restore();
@@ -192,6 +216,14 @@ QSize RealTimeMultiSampleArrayDelegate::sizeHint(const QStyleOptionViewItem &opt
 
 
     return size;
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayDelegate::markerMoved(QPoint position)
+{
+    m_markerPosistion = position;
 }
 
 
@@ -337,4 +369,19 @@ void RealTimeMultiSampleArrayDelegate::createGridPath(const QModelIndex &index, 
             path.lineTo(x,yEnd);
         }
     }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayDelegate::createMarkerPath(const QStyleOptionViewItem &option, QPainterPath& path) const
+{
+    //horizontal lines
+    float distance = m_markerPosistion.x();
+
+    float yStart = option.rect.topLeft().y();
+    float yEnd = option.rect.bottomRight().y();
+
+    path.moveTo(distance,yStart);
+    path.lineTo(distance,yEnd);
 }

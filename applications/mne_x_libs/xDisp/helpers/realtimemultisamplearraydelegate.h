@@ -94,13 +94,25 @@ public:
     */
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
+    //=========================================================================================================
+    /**
+    * markerMoved is called whenever user moves the mouse inside of the table view viewport
+    *
+    * @param position the current mouse position
+    */
+    void markerMoved(QPoint position);
+
 private:
     //=========================================================================================================
     /**
     * createPlotPath creates the QPointer path for the data plot.
     *
-    * @param[in] index QModelIndex for accessing associated data and model object.
-    * @param[in,out] path The QPointerPath to create for the data plot.
+    * @param[in] index      Used to locate data in a data model.
+    * @param[in] option     Describes the parameters used to draw an item in a view widget
+    * @param[in,out] path   The QPointerPath to create for the data plot.
+    * @param[in] lastPath   last path for the last data.
+    * @param[in] data       Current data for the given row.
+    * @param[in] lastData   Last data for the given row.
     */
     void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPainterPath& lastPath, QVector<float>& data, QVector<float>& lastData) const;
 
@@ -108,17 +120,29 @@ private:
     /**
     * createGridPath Creates the QPointer path for the grid plot.
     *
-    * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
-    * @param[in] data The row vector of the data matrix <1 x nsamples>.
+    * @param[in] index      Used to locate data in a data model.
+    * @param[in] option     Describes the parameters used to draw an item in a view widget
+    * @param[in,out] path   The QPointerPath to create for the data plot.
+    * @param[in] data       Data for the given row.
     */
     void createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<  QVector<float> >& data) const;
+
+    //=========================================================================================================
+    /**
+    * createMarkerPath Creates the QPointer path for the marker plot.
+    *
+    * @param[in] option     Describes the parameters used to draw an item in a view widget.
+    * @param[in,out] path   The QPointerPath to create for the data plot.
+    */
+    void createMarkerPath(const QStyleOptionViewItem &option, QPainterPath& path) const;
 
     //Settings
 //    QSettings m_qSettings;
 
     // Scaling
-    float m_fMaxValue;     /**< Maximum value of the data to plot  */
-    float m_fScaleY;       /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
+    float       m_fMaxValue;        /**< Maximum value of the data to plot  */
+    float       m_fScaleY;          /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
+    QPoint      m_markerPosistion;  /**< Current mouse position used to draw the marker in the plot  */
 };
 
 } // NAMESPACE
