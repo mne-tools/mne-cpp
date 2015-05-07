@@ -363,7 +363,9 @@ void FilterWindow::updateDefaultFiltersActivation(const QModelIndex & topLeft, c
 
     m_lActivationCheckBoxList.clear();
     for(int i = 0; i<allFilters.size(); i++) {
-        if( allFilters.at(i).m_sName != "User Design") { //m_lDefaultFilters.contains(allFilters.at(i).m_sName)) {
+        //Check for user designed filter. This needs to be done because there only should be one filter in the model which holds the user designed filter.
+        //Otherwise everytime a filter is designed a new filter would be added to this model -> too much storage consumption.
+        if(allFilters.at(i).m_sName != "User Design") {
             QCheckBox *checkBox = new QCheckBox(allFilters.at(i).m_sName);
             connect(checkBox,&QCheckBox::clicked,
                         this,&FilterWindow::onChkBoxFilterActivation);
@@ -383,7 +385,6 @@ void FilterWindow::updateDefaultFiltersActivation(const QModelIndex & topLeft, c
             m_lActivationCheckBoxList.prepend(checkBox);
 
             ui->m_layout_designFilter->addWidget(checkBox,6,0,2,2);
-
         }
     }
 }
@@ -395,7 +396,7 @@ void FilterWindow::updateFilterPlot()
 {
     //Update the filter of the scene
     m_pFilterPlotScene->updateFilter(m_filterData,
-                                     m_filterData.m_sFreq,//m_fiffInfo.sfreq,
+                                     m_filterData.m_sFreq, //Pass the filters sampling frequency, not the one from the fiff info. Reason: sFreq from a loaded filter could be different
                                      ui->m_doubleSpinBox_lowpass->value(),
                                      ui->m_doubleSpinBox_highpass->value());
 
@@ -509,6 +510,8 @@ void FilterWindow::filterParametersChanged()
     //Generate filters
     QSharedPointer<FilterData> userDefinedFilterOperator;
 
+    //Note: Always use "User Design" as filter name for user designed filters, which are stored in the model. This needs to be done because there only should be one filter in this model which holds the user designed filter.
+    //Otherwise everytime a filter is designed a new filter would be added to this model -> too much storage consumption.
     if(ui->m_comboBox_filterType->currentText() == "Lowpass") {
         userDefinedFilterOperator = QSharedPointer<FilterData>(
                                                 new FilterData("User Design",
@@ -620,6 +623,7 @@ void FilterWindow::onBtnExportFilterPlot()
 
 void FilterWindow::onBtnExportFilterCoefficients()
 {
+    //Generate appropriate name for the filter to be saved
     QString filtername;
     if(m_filterData.m_Type == FilterData::LPF)
         filtername = QString("%1_%2_Fs%3").arg(FilterData::getStringForFilterType(m_filterData.m_Type)).arg((int)m_filterData.m_dHighpassFreq).arg((int)m_filterData.m_sFreq);
@@ -630,6 +634,7 @@ void FilterWindow::onBtnExportFilterCoefficients()
     if(m_filterData.m_Type == FilterData::BPF)
          filtername = QString("%1_%2_%3_Fs%4").arg(FilterData::getStringForFilterType(m_filterData.m_Type)).arg((int)m_filterData.m_dHighpassFreq).arg((int)m_filterData.m_dLowpassFreq).arg((int)m_filterData.m_sFreq);
 
+    //Do not pass m_filterData because this is most likely the User Defined filter which name should not change due to the filter model implementation. Hence use temporal copy of m_filterData
     FilterData filterWriteTemp = m_filterData;
     filterWriteTemp.m_sName = filtername;
 
