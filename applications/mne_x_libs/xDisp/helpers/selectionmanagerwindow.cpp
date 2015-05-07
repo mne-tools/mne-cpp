@@ -80,6 +80,91 @@ SelectionManagerWindow::~SelectionManagerWindow()
 
 //*************************************************************************************************************
 
+void SelectionManagerWindow::initListWidgets()
+{
+    //Install event filter to receive key press events
+    ui->m_listWidget_userDefined->installEventFilter(this);
+    ui->m_listWidget_selectionGroups->installEventFilter(this);
+
+    //Connect list widgets to update themselves and other list widgets when changed
+    connect(ui->m_listWidget_selectionGroups, &QListWidget::currentItemChanged,
+                this, &SelectionManagerWindow::updateSelectionGroupsList);
+
+    //Update data view whenever a drag and drop item movement is performed
+    //TODO: This is inefficient because updateDataView is called everytime the list's viewport is entered
+    connect(ui->m_listWidget_userDefined->model(), &QAbstractTableModel::dataChanged,
+                this, &SelectionManagerWindow::updateDataView);
+}
+
+
+//*************************************************************************************************************
+
+void SelectionManagerWindow::initSelectionSceneView()
+{
+    //Create layout scene and set to view
+    m_pSelectionScene = new SelectionScene(ui->m_graphicsView_layoutPlot);
+    ui->m_graphicsView_layoutPlot->setScene(m_pSelectionScene);
+
+    connect(m_pSelectionScene, &QGraphicsScene::selectionChanged,
+                this, &SelectionManagerWindow::updateUserDefinedChannelsList);
+}
+
+
+//*************************************************************************************************************
+
+void SelectionManagerWindow::initComboBoxes()
+{
+    ui->m_comboBox_layoutFile->clear();
+    ui->m_comboBox_layoutFile->insertItems(0, QStringList()
+        << QApplication::translate("SelectionManagerWindow", "babymeg-mag-inner-layer.lout", 0)
+        << QApplication::translate("SelectionManagerWindow", "babymeg-mag-outer-layer.lout", 0)
+//        << QApplication::translate("SelectionManagerWindow", "babymeg-mag-ref.lout", 0)
+        << QApplication::translate("SelectionManagerWindow", "Vectorview-grad.lout", 0)
+        << QApplication::translate("SelectionManagerWindow", "Vectorview-all.lout", 0)
+        << QApplication::translate("SelectionManagerWindow", "Vectorview-mag.lout", 0)
+//     << QApplication::translate("SelectionManagerWindow", "CTF-275.lout", 0)
+//     << QApplication::translate("SelectionManagerWindow", "magnesWH3600.lout", 0)
+    );
+
+//    ui->m_comboBox_selectionFiles->clear();
+//    ui->m_comboBox_selectionFiles->insertItems(0, QStringList()
+//     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_babyMEG.sel", 0)
+//     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_vv.sel", 0)
+//     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_vv_new.sel", 0)
+////     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_CTF_275.sel", 0)
+////     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_Magnes_3600WH.sel", 0)
+//    );
+//    ui->m_comboBox_selectionFiles->hide();
+
+//    //Connect the layout and selection group loader
+//    connect(ui->m_comboBox_selectionFiles, &QComboBox::currentTextChanged,
+//                this, &SelectionManagerWindow::loadSelectionGroups);
+
+    connect(ui->m_comboBox_layoutFile, &QComboBox::currentTextChanged,
+                this, &SelectionManagerWindow::loadLayout);
+
+    //Initialise layout as neuromag vectorview with all channels
+    loadLayout("babymeg-mag-inner-layer.lout");
+}
+
+
+//*************************************************************************************************************
+
+void SelectionManagerWindow::initButtons()
+{
+    connect(ui->m_pushButton_saveSelection, &QPushButton::clicked,
+                this, &SelectionManagerWindow::onBtnSaveUserSelection);
+
+    connect(ui->m_pushButton_loadSelection, &QPushButton::clicked,
+                this, &SelectionManagerWindow::onBtnLoadUserSelection);
+
+    connect(ui->m_pushButton_addToSelectionGroups, &QPushButton::clicked,
+                this, &SelectionManagerWindow::onBtnAddToSelectionGroups);
+}
+
+
+//*************************************************************************************************************
+
 void SelectionManagerWindow::setCurrentlyMappedFiffChannels(const QStringList &mappedLayoutChNames)
 {
     //std::cout<<"SelectionManagerWindow::setCurrentlyMappedFiffChannels"<<std::endl;
@@ -201,88 +286,6 @@ void SelectionManagerWindow::newFiffFileLoaded()
     loadLayout(ui->m_comboBox_layoutFile->currentText());
 }
 
-
-//*************************************************************************************************************
-
-void SelectionManagerWindow::initListWidgets()
-{
-    //Install event filter to receive key press events
-    ui->m_listWidget_userDefined->installEventFilter(this);
-
-    //Connect list widgets to update themselves and other list widgets when changed
-    connect(ui->m_listWidget_selectionGroups, &QListWidget::currentItemChanged,
-                this, &SelectionManagerWindow::updateSelectionGroupsList);
-
-    //Update data view whenever a drag and drop item movement is performed - TODO: This is inefficient because updateDataView is called everytime the list's viewport is entered
-    connect(ui->m_listWidget_userDefined->model(), &QAbstractTableModel::dataChanged,
-                this, &SelectionManagerWindow::updateDataView);
-}
-
-
-//*************************************************************************************************************
-
-void SelectionManagerWindow::initSelectionSceneView()
-{
-    //Create layout scene and set to view
-    m_pSelectionScene = new SelectionScene(ui->m_graphicsView_layoutPlot);
-    ui->m_graphicsView_layoutPlot->setScene(m_pSelectionScene);
-
-    connect(m_pSelectionScene, &QGraphicsScene::selectionChanged,
-                this, &SelectionManagerWindow::updateUserDefinedChannelsList);
-}
-
-
-//*************************************************************************************************************
-
-void SelectionManagerWindow::initComboBoxes()
-{
-    ui->m_comboBox_layoutFile->clear();
-    ui->m_comboBox_layoutFile->insertItems(0, QStringList()
-        << QApplication::translate("SelectionManagerWindow", "babymeg-mag-inner-layer.lout", 0)
-        << QApplication::translate("SelectionManagerWindow", "babymeg-mag-outer-layer.lout", 0)
-//        << QApplication::translate("SelectionManagerWindow", "babymeg-mag-ref.lout", 0)
-        << QApplication::translate("SelectionManagerWindow", "Vectorview-grad.lout", 0)
-        << QApplication::translate("SelectionManagerWindow", "Vectorview-all.lout", 0)
-        << QApplication::translate("SelectionManagerWindow", "Vectorview-mag.lout", 0)
-//     << QApplication::translate("SelectionManagerWindow", "CTF-275.lout", 0)
-//     << QApplication::translate("SelectionManagerWindow", "magnesWH3600.lout", 0)
-    );
-
-//    ui->m_comboBox_selectionFiles->clear();
-//    ui->m_comboBox_selectionFiles->insertItems(0, QStringList()
-//     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_babyMEG.sel", 0)
-//     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_vv.sel", 0)
-//     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_vv_new.sel", 0)
-////     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_CTF_275.sel", 0)
-////     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_Magnes_3600WH.sel", 0)
-//    );
-//    ui->m_comboBox_selectionFiles->hide();
-
-//    //Connect the layout and selection group loader
-//    connect(ui->m_comboBox_selectionFiles, &QComboBox::currentTextChanged,
-//                this, &SelectionManagerWindow::loadSelectionGroups);
-
-    connect(ui->m_comboBox_layoutFile, &QComboBox::currentTextChanged,
-                this, &SelectionManagerWindow::loadLayout);
-
-    //Initialise layout as neuromag vectorview with all channels
-    loadLayout("babymeg-mag-inner-layer.lout");
-}
-
-
-//*************************************************************************************************************
-
-void SelectionManagerWindow::initButtons()
-{
-    connect(ui->m_pushButton_saveSelection, &QPushButton::clicked,
-                this, &SelectionManagerWindow::onBtnSaveUserSelection);
-
-    connect(ui->m_pushButton_loadSelection, &QPushButton::clicked,
-                this, &SelectionManagerWindow::onBtnLoadUserSelection);
-
-    connect(ui->m_pushButton_addToSelectionGroups, &QPushButton::clicked,
-                this, &SelectionManagerWindow::onBtnAddToSelectionGroups);
-}
 
 //*************************************************************************************************************
 
@@ -623,14 +626,28 @@ bool SelectionManagerWindow::eventFilter(QObject *obj, QEvent *event)
         if(keyEvent->key() == Qt::Key_Delete) {
             qDeleteAll(ui->m_listWidget_userDefined->selectedItems());
             updateDataView();
+            return true;
         }
         else
             return false;
     }
-    else {
-        // pass the event on to the parent class
-        return QWidget::eventFilter(obj, event);
+
+    if (obj == ui->m_listWidget_selectionGroups && event->type() == QEvent::KeyRelease) {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+
+        if(keyEvent->key() == Qt::Key_Delete) {
+            for(int i = 0; i<ui->m_listWidget_selectionGroups->selectedItems().size(); i++)
+                m_selectionGroupsMap.remove(ui->m_listWidget_selectionGroups->selectedItems().at(i)->text());
+
+            qDeleteAll(ui->m_listWidget_selectionGroups->selectedItems());
+            updateDataView();
+
+            return true;
+        }
+        else
+            return false;
     }
 
-    return false;
+    // pass the event on to the parent class
+    return QWidget::eventFilter(obj, event);
 }

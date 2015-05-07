@@ -96,11 +96,11 @@
            </size>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="List">
            <attribute name="title">
-            <string>Default Filters</string>
+            <string>Loaded Filters</string>
            </attribute>
            <layout class="QFormLayout" name="formLayout_2">
             <item row="0" column="0">

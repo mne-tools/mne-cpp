@@ -415,7 +415,8 @@ void FilterDataModel::addFilter(const QList<FilterData>& dataFilter)
     for(int i=0; i<dataFilter.size(); i++)
         m_isActive.append(false);
 
-    //check for user designed filter
+    //check for user designed filter. This needs to be done because there only should be one filter in this model which holds the user designed filter.
+    //Otherwise everytime a filter is designed a new filter would be added to this model -> too much storage consumption.
     for(int i=0; i<m_filterData.size(); i++)
         if(m_filterData.at(i).m_sName == "User Design")
             m_iDesignFilterIndex = i;
@@ -434,7 +435,8 @@ void FilterDataModel::addFilter(const FilterData &dataFilter)
     //set inactive by default
     m_isActive.append(false);
 
-    //check for user designed filter
+    //check for user designed filter. This needs to be done because there only should be one filter in this model which holds the user designed filter.
+    //Otherwise everytime a filter is designed a new filter would be added to this model -> too much storage consumption.
     for(int i=0; i<m_filterData.size(); i++)
         if(m_filterData.at(i).m_sName == "User Design")
             m_iDesignFilterIndex = i;
