@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     selectionio.cpp
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     April, 2015
+* @date     October, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2105, Lorenz Esch. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example application for the bmti library
+* @brief    Implementation of the SelectionIO class
 *
 */
 
@@ -38,16 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <bmti/test.h>
-#include <bmti/mainwindow.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QApplication>
+#include "selectionio.h"
 
 
 //*************************************************************************************************************
@@ -55,38 +47,96 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BMTILIB;
+using namespace UTILSLIB;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MAIN
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
-*
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
-*/
-
-MainWindow *m_pMainwindow  = NULL;
-Test *m_pTest = NULL;
-
-int main(int argc, char *argv[])
+SelectionIO::SelectionIO()
 {
-    QApplication a(argc, argv);
+}
 
-    //Create main window instance and show
-    m_pMainwindow = new MainWindow();
-    m_pMainwindow->show();
 
-    //Create Test widget and show
-    m_pTest = new Test();
-    m_pTest->show();
+//*************************************************************************************************************
 
-    return a.exec();
+bool SelectionIO::readMNESelFile(QString path, QMap<QString,QStringList> &selectionMap)
+{
+    //Open .sel file
+    if(!path.contains(".sel"))
+        return false;
+
+    //clear the map first
+    selectionMap.clear();
+
+    QFile file(path);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug()<<"Error opening selection file";
+        return false;
+    }
+
+    //Start reading from file
+    QTextStream in(&file);
+
+    while(!in.atEnd()) {
+        QString line = in.readLine();
+
+        if(line.contains("%") == false && line.contains(":") == true) //Skip commented areas in file
+        {
+            QStringList firstSplit = line.split(":");
+
+            //Create new key
+            QString key = firstSplit.at(0);
+
+            QStringList secondSplit = firstSplit.at(1).split("|");
+
+            //Delete last element if it is a blank character
+            if(secondSplit.at(secondSplit.size()-1) == "")
+                secondSplit.removeLast();
+
+            //Add to map
+            selectionMap.insertMulti(key, secondSplit);
+        }
+    }
+
+    file.close();
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool SelectionIO::writeMNESelFile(QString path, const QMap<QString,QStringList> &selectionMap)
+{
+    //Open .sel file
+    if(!path.contains(".sel"))
+        return false;
+
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)){
+        qDebug()<<"Error opening filter sel file for writing";
+        return false;
+    }
+
+    //Write selections to file
+    QTextStream out(&file);
+
+    QMap<QString, QStringList>::const_iterator i = selectionMap.constBegin();
+    while (i != selectionMap.constEnd()) {
+        out << i.key() << ":";
+
+        for(int u=0; u<i.value().size() ; u++)
+            out << i.value().at(u) << "|";
+
+        out << "\n" << "\n";
+
+        ++i;
+    }
+
+    file.close();
+
+    return true;
 }

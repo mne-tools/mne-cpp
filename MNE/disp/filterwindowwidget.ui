@@ -100,10 +100,20 @@
           </property>
           <widget class="QWidget" name="List">
            <attribute name="title">
-            <string>Default Filters</string>
+            <string>Loaded Filters</string>
            </attribute>
-           <layout class="QFormLayout" name="formLayout_3">
-            <item row="1" column="0">
+           <layout class="QFormLayout" name="formLayout_2">
+            <item row="0" column="0">
+             <layout class="QVBoxLayout" name="m_layout_defaultFilterActivation">
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+             </layout>
+            </item>
+            <item row="0" column="1">
              <widget class="QTableView" name="m_tableView_filterDataView">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -143,16 +153,6 @@
               </property>
              </widget>
             </item>
-            <item row="2" column="0">
-             <layout class="QVBoxLayout" name="m_layout_defaultFilterActivation">
-              <property name="rightMargin">
-               <number>0</number>
-              </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-             </layout>
-            </item>
            </layout>
           </widget>
           <widget class="QWidget" name="Design">
@@ -174,52 +174,10 @@
               <property name="verticalSpacing">
                <number>6</number>
               </property>
-              <item row="5" column="1">
-               <widget class="QSpinBox" name="m_spinBox_filterTaps">
-                <property name="minimum">
-                 <number>2</number>
-                </property>
-                <property name="maximum">
-                 <number>256</number>
-                </property>
-                <property name="singleStep">
-                 <number>2</number>
-                </property>
-                <property name="value">
-                 <number>128</number>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QDoubleSpinBox" name="m_doubleSpinBox_lowpass">
-                <property name="maximum">
-                 <double>999.000000000000000</double>
-                </property>
-                <property name="singleStep">
-                 <double>1.000000000000000</double>
-                </property>
-                <property name="value">
-                 <double>100.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="0">
-               <widget class="QLabel" name="m_label_transitionBand">
+              <item row="5" column="0">
+               <widget class="QLabel" name="m_label_filterTaps">
                 <property name="text">
-                 <string>Transition band (Hz):</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QDoubleSpinBox" name="m_doubleSpinBox_highpass">
-                <property name="maximum">
-                 <double>999.000000000000000</double>
-                </property>
-                <property name="singleStep">
-                 <double>1.000000000000000</double>
-                </property>
-                <property name="value">
-                 <double>40.000000000000000</double>
+                 <string>Filter taps:</string>
                 </property>
                </widget>
               </item>
@@ -248,17 +206,73 @@
                 </item>
                </widget>
               </item>
-              <item row="5" column="0">
-               <widget class="QLabel" name="m_label_filterTaps">
+              <item row="0" column="0">
+               <widget class="QLabel" name="m_label_designMethod">
                 <property name="text">
-                 <string>Filter taps:</string>
+                 <string>Design method:</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="m_label_filterType">
+              <item row="2" column="1">
+               <widget class="QDoubleSpinBox" name="m_doubleSpinBox_lowpass">
+                <property name="maximum">
+                 <double>999.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>100.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QSpinBox" name="m_spinBox_filterTaps">
+                <property name="minimum">
+                 <number>2</number>
+                </property>
+                <property name="maximum">
+                 <number>256</number>
+                </property>
+                <property name="singleStep">
+                 <number>2</number>
+                </property>
+                <property name="value">
+                 <number>128</number>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="m_label_highpass">
                 <property name="text">
-                 <string>Filter type:</string>
+                 <string>Lowpass (Hz):</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="m_label_lowpass">
+                <property name="text">
+                 <string>Highpass (Hz):</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QDoubleSpinBox" name="m_doubleSpinBox_highpass">
+                <property name="maximum">
+                 <double>999.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>40.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="m_label_transitionBand">
+                <property name="text">
+                 <string>Transition band (Hz):</string>
                 </property>
                </widget>
               </item>
@@ -272,20 +286,6 @@
                 </property>
                 <property name="value">
                  <double>5.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0">
-               <widget class="QLabel" name="m_label_designMethod">
-                <property name="text">
-                 <string>Design method:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="m_label_highpass">
-                <property name="text">
-                 <string>Lowpass (Hz):</string>
                 </property>
                </widget>
               </item>
@@ -303,10 +303,10 @@
                 </item>
                </widget>
               </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="m_label_lowpass">
+              <item row="1" column="0">
+               <widget class="QLabel" name="m_label_filterType">
                 <property name="text">
-                 <string>Highpass (Hz):</string>
+                 <string>Filter type:</string>
                 </property>
                </widget>
               </item>

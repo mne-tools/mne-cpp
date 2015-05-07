@@ -54,11 +54,11 @@ using namespace YOURNAMESPACE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TemplateClass::TemplateClass(OtherClass *parent);
+TemplateClass::TemplateClass(OtherClass *pParent);
 : m_iParamterOne(1)
 , m_dParamterTwo(1.0)
 , m_bParamterThree(false)
-, m_pOtherClassObject(parent)
+, m_pOtherClassObject(pParent)
 {
 
 }
@@ -66,11 +66,11 @@ TemplateClass::TemplateClass(OtherClass *parent);
 
 //*************************************************************************************************************
 
-TemplateClass::TemplateClass(const TemplateClass &p_templateClass);
-: m_iParamterOne(p_templateClass.m_iParamterOne)
-, m_dParamterTwo(p_templateClass.m_dParamterTwo)
-, m_bParamterThree(p_templateClass.m_bParamterThree)
-, m_pOtherClassObject(p_templateClass.m_pOtherClassObject)
+TemplateClass::TemplateClass(const TemplateClass &pTemplateClass);
+: m_iParamterOne(pTemplateClass.m_iParamterOne)
+, m_dParamterTwo(pTemplateClass.m_dParamterTwo)
+, m_bParamterThree(pTemplateClass.m_bParamterThree)
+, m_pOtherClassObject(pTemplateClass.m_pOtherClassObject)
 {
 
 }

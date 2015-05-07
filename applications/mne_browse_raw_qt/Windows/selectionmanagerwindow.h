@@ -44,7 +44,7 @@
 
 #include "ui_selectionmanagerwindow.h"
 #include "utils/layoutloader.h"             //MNE-CPP utils
-#include "utils/selectionloader.h"          //MNE-CPP utils
+#include "utils/selectionio.h"              //MNE-CPP utils
 #include "utils/layoutmaker.h"              //MNE-CPP utils
 #include "../Utils/selectionscene.h"        //MNE Browse Raw QT utils
 #include "fiff/fiff.h"

@@ -86,7 +86,7 @@ class BMTISHARED_EXPORT Test : public QWidget
     Q_OBJECT
 
 public:
-    explicit Test(QWidget *parent = 0);
+    explicit Test(QWidget *pParent = 0);
     ~Test();
 
 private:

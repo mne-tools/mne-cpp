@@ -93,13 +93,14 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
             painter->save();
 
             //draw special background when channel is marked as bad
-//            QVariant v = index.model()->data(index,Qt::BackgroundRole);
-//            if(v.canConvert<QBrush>() && !(option.state & QStyle::State_Selected)) {
-//                QPointF oldBO = painter->brushOrigin();
-//                painter->setBrushOrigin(option.rect.topLeft());
-//                painter->fillRect(option.rect, qvariant_cast<QBrush>(v));
-//                painter->setBrushOrigin(oldBO);
-//            }
+            QVariant v = index.model()->data(index,Qt::BackgroundRole);
+            if((v.canConvert<QBrush>() && !(option.state & QStyle::State_Selected)) ||
+               (v.canConvert<QBrush>() && (option.state & QStyle::State_Selected))) {
+                QPointF oldBO = painter->brushOrigin();
+                painter->setBrushOrigin(option.rect.topLeft());
+                painter->fillRect(option.rect, qvariant_cast<QBrush>(v));
+                painter->setBrushOrigin(oldBO);
+            }
 
 //            //Highlight selected channels
 //            if(option.state & QStyle::State_Selected) {
@@ -221,8 +222,6 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
 
                 if(t_pModel->getScaling().contains(FIFF_UNIT_T))
                     fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
-
-                std::cout<<fMaxValue<<std::endl;
             }
             break;
         }

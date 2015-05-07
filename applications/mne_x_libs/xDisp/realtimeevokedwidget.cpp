@@ -147,11 +147,13 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     //set layouts
     this->setLayout(m_pRteLayout);
 
+    getData();
+
     //Create pointers for selection manager
-    m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(this));
+    FiffInfo::SPtr fiffPointer = FiffInfo::SPtr(&m_fiffInfo);
+    m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(this, fiffPointer));
     m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel.data()));
 
-    getData();
 }
 
 
@@ -321,7 +323,8 @@ void RealTimeEvokedWidget::init()
         connect(m_pChInfoModel.data(), &ChInfoModel::channelsMappedToLayout,
                 m_pSelectionManagerWindow.data(), &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
 
-        m_pChInfoModel->fiffInfoChanged(m_fiffInfo);
+        FiffInfo::SPtr fiffPointer = FiffInfo::SPtr(&m_fiffInfo);
+        m_pChInfoModel->fiffInfoChanged(fiffPointer);
 
         // Initialized
         m_bInitialized = true;

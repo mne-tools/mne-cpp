@@ -133,7 +133,7 @@ void FilterWindow::setSamplingRate(double dSamplingRate)
 QList<FilterData> FilterWindow::getCurrentFilter()
 {
     //Get active filters
-    QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData>>();
+    QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData> >();
 
     return activeFilters;
 }
@@ -260,16 +260,15 @@ void FilterWindow::initMVC()
 void FilterWindow::initFilters()
 {
     //Init filter data model with all default filters located in the resource directory
-    QStringList defaultFilters;
+    m_lDefaultFilters << "NOTCH_60Hz_Fs1kHz"
+                   << "NOTCH_50Hz_Fs1kHz"
+                   << "BP_1Hz_70Hz_Fs1kHz"
+                   << "BP_1Hz_40Hz_Fs1kHz";
 
-    defaultFilters << "NOTCH_60Hz.txt"
-                   << "NOTCH_50Hz.txt"
-                   << "BP_1Hz_70Hz_Fs1kHz.txt"
-                   << "BP_1Hz_40Hz_Fs1kHz.txt";
-
-    for(int i = 0; i<defaultFilters.size(); i++) {
+    for(int i = 0; i<m_lDefaultFilters.size(); i++) {
         FilterData tmpFilter;
-        QString fileName = defaultFilters.at(i);
+        QString fileName = m_lDefaultFilters.at(i);
+        fileName.append(".txt");
         QString path = QCoreApplication::applicationDirPath() + fileName.prepend("/mne_x_libs/xDisp/default_filters/");
 
         if(FilterIO::readFilter(path, tmpFilter))
@@ -354,7 +353,7 @@ void FilterWindow::updateDefaultFiltersActivation(const QModelIndex & topLeft, c
     Q_UNUSED(bottomRight);
     Q_UNUSED(roles);
 
-    QList<FilterData> allFilters = m_pFilterDataModel->data(m_pFilterDataModel->index(0,9), FilterDataModelRoles::GetAllFilters).value<QList<FilterData>>();
+    QList<FilterData> allFilters = m_pFilterDataModel->data(m_pFilterDataModel->index(0,9), FilterDataModelRoles::GetAllFilters).value<QList<FilterData> >();
 
     if(m_lActivationCheckBoxList.size()==allFilters.size())
         return;
@@ -364,6 +363,8 @@ void FilterWindow::updateDefaultFiltersActivation(const QModelIndex & topLeft, c
 
     m_lActivationCheckBoxList.clear();
     for(int i = 0; i<allFilters.size(); i++) {
+        //Check for user designed filter. This needs to be done because there only should be one filter in the model which holds the user designed filter.
+        //Otherwise everytime a filter is designed a new filter would be added to this model -> too much storage consumption.
         if(allFilters.at(i).m_sName != "User Design") {
             QCheckBox *checkBox = new QCheckBox(allFilters.at(i).m_sName);
             connect(checkBox,&QCheckBox::clicked,
@@ -383,8 +384,7 @@ void FilterWindow::updateDefaultFiltersActivation(const QModelIndex & topLeft, c
 
             m_lActivationCheckBoxList.prepend(checkBox);
 
-            ui->m_layout_designFilter->addWidget(checkBox,ui->m_layout_designFilter->rowCount(),0,
-                                                 1,2);
+            ui->m_layout_designFilter->addWidget(checkBox,6,0,2,2);
         }
     }
 }
@@ -396,7 +396,7 @@ void FilterWindow::updateFilterPlot()
 {
     //Update the filter of the scene
     m_pFilterPlotScene->updateFilter(m_filterData,
-                                     m_filterData.m_sFreq,//m_fiffInfo.sfreq,
+                                     m_filterData.m_sFreq, //Pass the filters sampling frequency, not the one from the fiff info. Reason: sFreq from a loaded filter could be different
                                      ui->m_doubleSpinBox_lowpass->value(),
                                      ui->m_doubleSpinBox_highpass->value());
 
@@ -494,6 +494,9 @@ void FilterWindow::filterParametersChanged()
     else {
         ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
         ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
+
+        ui->m_doubleSpinBox_highpass->setMinimum(0);
+        ui->m_doubleSpinBox_lowpass->setMinimum(0);
     }
 
     //set filter design method
@@ -507,6 +510,8 @@ void FilterWindow::filterParametersChanged()
     //Generate filters
     QSharedPointer<FilterData> userDefinedFilterOperator;
 
+    //Note: Always use "User Design" as filter name for user designed filters, which are stored in the model. This needs to be done because there only should be one filter in this model which holds the user designed filter.
+    //Otherwise everytime a filter is designed a new filter would be added to this model -> too much storage consumption.
     if(ui->m_comboBox_filterType->currentText() == "Lowpass") {
         userDefinedFilterOperator = QSharedPointer<FilterData>(
                                                 new FilterData("User Design",
@@ -523,14 +528,14 @@ void FilterWindow::filterParametersChanged()
     if(ui->m_comboBox_filterType->currentText() == "Highpass") {
         userDefinedFilterOperator = QSharedPointer<FilterData>(
                                         new FilterData("User Design",
-                                            FilterData::HPF,
-                                            filterTaps,
-                                            highpassHz/nyquistFrequency,
-                                            0.2,
-                                            (double)trans_width/nyquistFrequency,
-                                            samplingFrequency,
-                                            fftLength,
-                                            dMethod));
+                                                        FilterData::HPF,
+                                                        filterTaps,
+                                                        highpassHz/nyquistFrequency,
+                                                        0.2,
+                                                        (double)trans_width/nyquistFrequency,
+                                                        samplingFrequency,
+                                                        fftLength,
+                                                        dMethod));
     }
 
     if(ui->m_comboBox_filterType->currentText() == "Bandpass") {
@@ -549,15 +554,15 @@ void FilterWindow::filterParametersChanged()
     //Replace old with new filter operator
     m_filterData = *userDefinedFilterOperator.data();
 
-    QList<FilterData> activeFilters = m_pFilterDataModel->data(m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData>>();
-
-    emit filterChanged(activeFilters);
-
     //set user designed filter in filter data model
     QVariant variant;
     variant.setValue(m_filterData);
 
     m_pFilterDataModel->setData(m_pFilterDataModel->index(0,7), variant, FilterDataModelRoles::SetUserDesignedFilter);
+
+    QList<FilterData> activeFilters = m_pFilterDataModel->data(m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData> >();
+
+    emit filterChanged(activeFilters);
 
     //update filter plot
     updateFilterPlot();
@@ -618,13 +623,27 @@ void FilterWindow::onBtnExportFilterPlot()
 
 void FilterWindow::onBtnExportFilterCoefficients()
 {
-    QDate date;
+    //Generate appropriate name for the filter to be saved
+    QString filtername;
+    if(m_filterData.m_Type == FilterData::LPF)
+        filtername = QString("%1_%2_Fs%3").arg(FilterData::getStringForFilterType(m_filterData.m_Type)).arg((int)m_filterData.m_dHighpassFreq).arg((int)m_filterData.m_sFreq);
+
+    if(m_filterData.m_Type == FilterData::HPF)
+        filtername = QString("%1_%2_Fs%3").arg(FilterData::getStringForFilterType(m_filterData.m_Type)).arg((int)m_filterData.m_dLowpassFreq).arg((int)m_filterData.m_sFreq);
+
+    if(m_filterData.m_Type == FilterData::BPF)
+         filtername = QString("%1_%2_%3_Fs%4").arg(FilterData::getStringForFilterType(m_filterData.m_Type)).arg((int)m_filterData.m_dHighpassFreq).arg((int)m_filterData.m_dLowpassFreq).arg((int)m_filterData.m_sFreq);
+
+    //Do not pass m_filterData because this is most likely the User Defined filter which name should not change due to the filter model implementation. Hence use temporal copy of m_filterData.
+    FilterData filterWriteTemp = m_filterData;
+    filterWriteTemp.m_sName = filtername;
+
     QString fileName = QFileDialog::getSaveFileName(this,
                                                     "Save filter coefficients",
-                                                    QString("%1/%2_%3_%4_FilterCoeffs").arg(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
+                                                    QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)).arg(filtername),
                                                     tr("Text file(*.txt)"));
 
-    FilterIO::writeFilter(fileName, m_filterData);
+    FilterIO::writeFilter(fileName, filterWriteTemp);
 }
 
 
@@ -639,12 +658,17 @@ void FilterWindow::onBtnLoadFilter()
 
     if(!path.isEmpty()) {
         //Replace old with new filter operator
-        FilterIO::readFilter(path, m_filterData);
+        FilterData filterLoadTemp;
 
-        m_pFilterDataModel->addFilter(m_filterData);
+        if(!FilterIO::readFilter(path, filterLoadTemp))
+            return;
+
+        m_pFilterDataModel->addFilter(filterLoadTemp);
 
         QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData> >();
         emit filterChanged(activeFilters);
+
+        m_lDefaultFilters << filterLoadTemp.m_sName;
 
         updateFilterPlot();
     }
@@ -678,7 +702,7 @@ void FilterWindow::onChkBoxFilterActivation(bool state)
             m_pFilterDataModel->setData(m_pFilterDataModel->index(filterModelRowIndex,0), variant, Qt::EditRole);
     }
 
-    QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData>>();
+    QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData> >();
     emit filterChanged(activeFilters);
 }
 
@@ -694,7 +718,7 @@ void FilterWindow::filterSelectionChanged(const QModelIndex &current, const QMod
 
     m_filterData = m_pFilterDataModel->data(index, FilterDataModelRoles::GetFilter).value<FilterData>();
 
-    QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData>>();
+    QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData> >();
     emit filterChanged(activeFilters);
 
     updateFilterPlot();

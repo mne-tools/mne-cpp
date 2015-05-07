@@ -98,7 +98,7 @@ public:
     * @param [in] cutOffLow cut off frequqency lowpass or lower cut off when filter is a bandpass
     * @param [in] cutOffHigh cut off frequqency highpass or higher cut off when filter is a bandpass
     */
-    void updateFilter(FilterData& operatorFilter, int samplingFreq, int cutOffLow, int cutOffHigh);
+    void updateFilter(const FilterData &operatorFilter, int samplingFreq, int cutOffLow, int cutOffHigh);
 
 protected:
     //=========================================================================================================

@@ -72,10 +72,15 @@ RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 //virtual functions
 int RealTimeMultiSampleArrayModel::rowCount(const QModelIndex & /*parent*/) const
 {
-    if(!m_qMapIdxRowSelection.empty())
-        return m_qMapIdxRowSelection.size();
+    if(!m_pFiffInfo->chs.empty())
+        return m_pFiffInfo->chs.size();
     else
         return 0;
+
+//    if(!m_qMapIdxRowSelection.empty())
+//        return m_qMapIdxRowSelection.size();
+//    else
+//        return 0;
 }
 
 
@@ -83,7 +88,7 @@ int RealTimeMultiSampleArrayModel::rowCount(const QModelIndex & /*parent*/) cons
 
 int RealTimeMultiSampleArrayModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 2;
+    return 3;
 }
 
 
@@ -95,7 +100,7 @@ QVariant RealTimeMultiSampleArrayModel::data(const QModelIndex &index, int role)
         return QVariant();
 
     if (index.isValid()) {
-        qint32 row = m_qMapIdxRowSelection[index.row()];
+        qint32 row = m_qMapIdxRowSelection.value(index.row(),0);
 
         //******** first column (chname) ********
         if(index.column() == 0 && role == Qt::DisplayRole)
@@ -172,20 +177,27 @@ QVariant RealTimeMultiSampleArrayModel::data(const QModelIndex &index, int role)
                     break;
                 }
                 case Qt::BackgroundRole: {
-//                    if(m_fiffInfo.bads.contains(m_chInfolist[row].ch_name)) {
-//                        QBrush brush;
-//                        brush.setStyle(Qt::SolidPattern);
-//    //                    qDebug() << m_chInfolist[row].ch_name << "is marked as bad, index:" << row;
-//                        brush.setColor(Qt::red);
-//                        return QVariant(brush);
-//                    }
-//                    else
+                    if(m_pFiffInfo->bads.contains(m_qListChInfo[row].getChannelName())) {
+                        QBrush brush;
+                        brush.setStyle(Qt::SolidPattern);
+                        //qDebug() << m_qListChInfo[row].getChannelName() << "is marked as bad, index:" << row;
+                        QColor color(254,74,93);
+                        color.setAlpha(40);
+                        brush.setColor(color);
+
+                        return QVariant(brush);
+                    }
+                    else
                         return QVariant();
 
                     break;
                 }
             } // end role switch
         } // end column check
+
+        //******** first column (chname) ********
+        if(index.column() == 2 && role == Qt::DisplayRole)
+            return QVariant(m_pFiffInfo->bads.contains(m_qListChInfo[row].getChannelName()));
 
     } // end index.valid() check
 
@@ -455,13 +467,28 @@ void RealTimeMultiSampleArrayModel::selectRows(const QList<qint32> &selection)
     m_qMapIdxRowSelection.clear();
 
     qint32 count = 0;
-    for(qint32 i = 0; i < selection.size(); ++i)
-    {
-        if(selection[i] < m_qListChInfo.size())
-        {
+    for(qint32 i = 0; i < selection.size(); ++i) {
+        if(selection[i] < m_qListChInfo.size()) {
             m_qMapIdxRowSelection.insert(count,selection[i]);
             ++count;
         }
+    }
+
+    emit newSelection(selection);
+
+    endResetModel();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::hideRows(const QList<qint32> &selection)
+{
+    beginResetModel();
+
+    for(qint32 i = 0; i < selection.size(); ++i) {
+        if(m_qMapIdxRowSelection.contains(selection.at(i)))
+            m_qMapIdxRowSelection.remove(selection.at(i));
     }
 
     emit newSelection(selection);
