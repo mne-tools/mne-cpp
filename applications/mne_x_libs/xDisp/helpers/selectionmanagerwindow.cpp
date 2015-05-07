@@ -126,25 +126,17 @@ void SelectionManagerWindow::initComboBoxes()
 //     << QApplication::translate("SelectionManagerWindow", "magnesWH3600.lout", 0)
     );
 
-//    ui->m_comboBox_selectionFiles->clear();
-//    ui->m_comboBox_selectionFiles->insertItems(0, QStringList()
-//     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_babyMEG.sel", 0)
-//     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_vv.sel", 0)
-//     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_vv_new.sel", 0)
-////     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_CTF_275.sel", 0)
-////     << QApplication::translate("SelectionManagerWindow", "mne_browse_raw_Magnes_3600WH.sel", 0)
-//    );
-//    ui->m_comboBox_selectionFiles->hide();
-
-//    //Connect the layout and selection group loader
-//    connect(ui->m_comboBox_selectionFiles, &QComboBox::currentTextChanged,
-//                this, &SelectionManagerWindow::loadSelectionGroups);
-
     connect(ui->m_comboBox_layoutFile, &QComboBox::currentTextChanged,
-                this, &SelectionManagerWindow::loadLayout);
+                this, &SelectionManagerWindow::onComboBoxLayoutChanged);
 
     //Initialise layout as neuromag vectorview with all channels
-    loadLayout("babymeg-mag-inner-layer.lout");
+    QString selectionName("babymeg-mag-inner-layer.lout");
+    loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/MNE_Browse_Raw_Resources/Templates/Layouts/"));
+
+    //Load selection groups again because they need to be reinitialised every time a new layout hase been loaded
+    selectionName = QString("mne_browse_raw_babyMEG.sel");
+    loadSelectionGroups(QCoreApplication::applicationDirPath() + selectionName.prepend("/MNE_Browse_Raw_Resources/Templates/ChannelSelection/"));
+
 }
 
 
@@ -291,14 +283,7 @@ void SelectionManagerWindow::newFiffFileLoaded()
 
 bool SelectionManagerWindow::loadLayout(QString path)
 {
-    //Read layout
-    QString newPath = QCoreApplication::applicationDirPath() + path.prepend("/MNE_Browse_Raw_Resources/Templates/Layouts/");
-
-    bool state = LayoutLoader::readMNELoutFile(newPath, m_layoutMap);
-
-    //Load selection groups again because they need to be reinitialised every time a new layout hase been loaded
-    QString selectionName("mne_browse_raw_babyMEG.sel");
-    loadSelectionGroups(QCoreApplication::applicationDirPath() + selectionName.prepend("/MNE_Browse_Raw_Resources/Templates/ChannelSelection/"));
+    bool state = LayoutLoader::readMNELoutFile(path, m_layoutMap);
 
     //if no layout for EEG is specified generate from digitizer points
     QList<QVector<double> > inputPoints;
@@ -394,7 +379,6 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
         digIndex = m_pChInfoModel->index(i,4);
         int kind = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetChKind).toInt();
 
-        std::cout<<kind<<std::endl;
         if(kind == FIFFV_EEG_CH) //FIFFV_MEG_CH
             names<<chName;
     }
@@ -416,7 +400,7 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
     ui->m_listWidget_selectionGroups->setCurrentItem(getItemForChName(ui->m_listWidget_selectionGroups, "All"), QItemSelectionModel::Select);
 
     //Delete all MEG channels from the selection groups which are not in the loaded layout
-    cleanUpMEGChannels();
+    //cleanUpMEGChannels();
 
     return state;
 }
@@ -463,9 +447,8 @@ void SelectionManagerWindow::updateSelectionGroupsList(QListWidgetItem* current,
     else
         m_pSelectionScene->m_iChannelTypeMode = FIFFV_MEG_CH;
 
+    //update visible channel list widget    
     ui->m_listWidget_visibleChannels->clear();
-
-    //update visible channel list widget
     ui->m_listWidget_visibleChannels->addItems(m_selectionGroupsMap[current->text()]);
 
     //update scene items based o nthe new selection group
@@ -601,6 +584,15 @@ void SelectionManagerWindow::onBtnAddToSelectionGroups()
 
     m_selectionGroupsMap.insertMulti(ui->m_lineEdit_selectionGroupName->text(), temp);
     ui->m_listWidget_selectionGroups->insertItem(ui->m_listWidget_selectionGroups->count(), ui->m_lineEdit_selectionGroupName->text());
+}
+
+
+//*************************************************************************************************************
+
+void SelectionManagerWindow::onComboBoxLayoutChanged()
+{
+    QString selectionName(ui->m_comboBox_layoutFile->currentText());
+    loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/MNE_Browse_Raw_Resources/Templates/Layouts/"));
 }
 
 
