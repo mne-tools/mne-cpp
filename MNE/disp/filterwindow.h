@@ -219,23 +219,24 @@ private:
     */
     void updateFilterPlot();
 
-    Ui::FilterWindowWidget *    ui;                     /**< Pointer to the qt designer generated ui class.*/
+    Ui::FilterWindowWidget *    ui;                         /**< Pointer to the qt designer generated ui class.*/
 
-    FilterData                  m_filterData;           /**< The current filter operator.*/
-    FilterDataModel::SPtr       m_pFilterDataModel;     /**< The model to hold current filters.*/
-    FilterDataDelegate::SPtr    m_pFilterDataDelegate;  /**< The delegate to plot the activation check boxes in column one.*/
+    FilterData                  m_filterData;               /**< The current filter operator.*/
+    FilterDataModel::SPtr       m_pFilterDataModel;         /**< The model to hold current filters.*/
+    FilterDataDelegate::SPtr    m_pFilterDataDelegate;      /**< The delegate to plot the activation check boxes in column one.*/
 
-    QList<QCheckBox*>           m_lActivationCheckBoxList;
+    QList<QCheckBox*>           m_lActivationCheckBoxList;  /**< List of all filter check boxes.*/
+    QStringList                 m_lDefaultFilters;          /**< List with the names of all default filters.*/
 
-    int                         m_iWindowSize;          /**< The current window size of the loaded fiff data in the DataWindow class.*/
-    int                         m_iFilterTaps;          /**< The current number of filter taps.*/
-    double                      m_dSFreq;               /**< The current sampling frequency.*/
+    int                         m_iWindowSize;              /**< The current window size of the loaded fiff data in the DataWindow class.*/
+    int                         m_iFilterTaps;              /**< The current number of filter taps.*/
+    double                      m_dSFreq;                   /**< The current sampling frequency.*/
 
-    FiffInfo                    m_fiffInfo;             /**< The current fiffInfo.*/
+    FiffInfo                    m_fiffInfo;                 /**< The current fiffInfo.*/
 
-    QSettings                   m_qSettings;            /**< QSettings variable used to write or read from independent application sessions.*/
+    QSettings                   m_qSettings;                /**< QSettings variable used to write or read from independent application sessions.*/
 
-    FilterPlotScene*            m_pFilterPlotScene;     /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
+    FilterPlotScene*            m_pFilterPlotScene;         /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
 
 signals:
     void filterChanged(QList<UTILSLIB::FilterData> activeFilter);

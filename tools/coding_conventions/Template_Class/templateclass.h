@@ -103,7 +103,7 @@ public:
     /**
     * Constructs a TemplateClass object.
     */
-    TemplateClass(OtherClass *parent);
+    TemplateClass(OtherClass *pParent);
 
     //=========================================================================================================
     /**
@@ -111,7 +111,7 @@ public:
     *
     * @param[in] p_templateClass   TemplateClass which should be copied
     */
-    TemplateClass(const TemplateClass &p_templateClass);
+    TemplateClass(const TemplateClass &pTemplateClass);
 
     //=========================================================================================================
     /**
