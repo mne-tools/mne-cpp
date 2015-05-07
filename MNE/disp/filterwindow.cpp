@@ -634,7 +634,7 @@ void FilterWindow::onBtnExportFilterCoefficients()
     if(m_filterData.m_Type == FilterData::BPF)
          filtername = QString("%1_%2_%3_Fs%4").arg(FilterData::getStringForFilterType(m_filterData.m_Type)).arg((int)m_filterData.m_dHighpassFreq).arg((int)m_filterData.m_dLowpassFreq).arg((int)m_filterData.m_sFreq);
 
-    //Do not pass m_filterData because this is most likely the User Defined filter which name should not change due to the filter model implementation. Hence use temporal copy of m_filterData
+    //Do not pass m_filterData because this is most likely the User Defined filter which name should not change due to the filter model implementation. Hence use temporal copy of m_filterData.
     FilterData filterWriteTemp = m_filterData;
     filterWriteTemp.m_sName = filtername;
 
