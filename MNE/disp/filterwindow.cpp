@@ -208,6 +208,8 @@ void FilterWindow::initComboBoxes()
 
     connect(ui->m_comboBox_filterApplyTo, &QComboBox::currentTextChanged,
             this, &FilterWindow::onSpinBoxFilterChannelType);
+
+    ui->m_comboBox_filterApplyTo->setCurrentIndex(1);
 }
 
 
