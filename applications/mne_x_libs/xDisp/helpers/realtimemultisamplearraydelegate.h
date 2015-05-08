@@ -114,10 +114,11 @@ private:
     * @param[in,out] path   The QPointerPath to create for the data plot.
     * @param[in] lastPath   last path for the last data.
     * @param[in] ellipsePos Position of the ellipse which is plotted at the current channel signal value.
+    * @param[in] amplitude  String which is to be plotted.
     * @param[in] data       Current data for the given row.
     * @param[in] lastData   Last data for the given row.
     */
-    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPainterPath& lastPath, QPointF &ellipsePos, QVector<float>& data, QVector<float>& lastData) const;
+    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPainterPath& lastPath, QPointF &ellipsePos, QString &amplitude, QVector<float>& data, QVector<float>& lastData) const;
 
     //=========================================================================================================
     /**
@@ -139,16 +140,6 @@ private:
     */
     void createMarkerPath(const QStyleOptionViewItem &option, QPainterPath& path) const;
 
-    //=========================================================================================================
-    /**
-    * createAmplitudeText Creates the QString for the current amplitude values.
-    *
-    * @param[in] amplitude      String which is to be plotted.
-    * @param[in] data           Current data for the given row.
-    * @param[in] lastData       Last data for the given row.
-    */
-    void createAmplitudeText(QString &amplitude, QVector<float>& data, QVector<float>& lastData) const;
-
     //Settings
 //    QSettings m_qSettings;
 
@@ -157,7 +148,7 @@ private:
     float       m_fScaleY;          /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
     int         m_iActiveRow;       /**< The current row which the mouse is moved over  */
 
-    QPoint      m_markerPosistion;  /**< Current mouse position used to draw the marker in the plot  */
+    QPoint      m_markerPosition;  /**< Current mouse position used to draw the marker in the plot  */
 
 };
 
