@@ -139,10 +139,13 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 //Plot amplitude next to marker mouse posistion
                 if(m_iActiveRow == index.row()) {
                     QString amplitude;
-                    createAmplitudeText(index, option, amplitude, data[0], data[1]);
+                    QPoint ellipsePos;
+                    createAmplitudeText(amplitude, data[0], data[1]);
 
                     painter->save();
                     painter->drawText(m_markerPosistion, amplitude);
+                    painter->drawEllipse(ellipsePos,2,2);
+
                     painter->restore();
                 }
 
@@ -158,10 +161,11 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 painter->restore();
 
                 //Plot data path
+                QPointF ellipsePos;
                 path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
                 QPainterPath lastPath(QPointF(option.rect.x(),option.rect.y()));
 
-                createPlotPath(index, option, path, lastPath, data[0], data[1]);
+                createPlotPath(index, option, path, lastPath, ellipsePos, data[0], data[1]);
 
                 painter->save();
                 painter->translate(0,t_fPlotHeight/2);
@@ -185,6 +189,13 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 painter->drawPath(lastPath);
 
                 painter->restore();
+
+                //Plot ellipse
+                if(m_iActiveRow == index.row()) {
+                    painter->save();
+                    painter->drawEllipse(ellipsePos,2,2);
+                    painter->restore();
+                }
             }
             break;
         }
@@ -228,7 +239,7 @@ void RealTimeMultiSampleArrayDelegate::markerMoved(QPoint position, int activeRo
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPainterPath& lastPath, QVector<float>& data, QVector<float>& lastData) const
+void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPainterPath& lastPath, QPointF &ellipsePos, QVector<float>& data, QVector<float>& lastData) const
 {
     const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
 
@@ -324,23 +335,42 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
         qSamplePosition.setX(path.currentPosition().x()+fDx);
 
         path.lineTo(qSamplePosition);
+
+        //Create ellipse position
+        if(i == m_markerPosistion.x()) {
+            ellipsePos.setX(fDx*m_markerPosistion.x());
+            ellipsePos.setY(newY+(option.rect.height()/2));
+        }
     }
 
     //create lines from one to the next sample for last path
     qint32 sample_offset = t_pModel->numVLines() + 1;
     qSamplePosition.setX(qSamplePosition.x() + fDx*sample_offset);
+
+    //start painting from first sample value
+    float val = lastData[i] - lastData[0]; //remove first sample lastData[0] as offset
+    fValue = val*fScaleY;
+    float newY = y_base-fValue;
+    qSamplePosition.setY(newY);
+
     lastPath.moveTo(qSamplePosition);
 
     for(i += sample_offset; i < lastData.size(); ++i) {
-        float val = lastData[i] - lastData[0]; //remove first sample lastData[0] as offset
+        val = lastData[i] - lastData[0]; //remove first sample lastData[0] as offset
         fValue = val*fScaleY;
 
-        float newY = y_base-fValue;
+        newY = y_base-fValue;
 
         qSamplePosition.setY(newY);
         qSamplePosition.setX(lastPath.currentPosition().x()+fDx);
 
         lastPath.lineTo(qSamplePosition);
+
+        //Create ellipse position
+        if(i == m_markerPosistion.x()) {
+            ellipsePos.setX(fDx*m_markerPosistion.x());
+            ellipsePos.setY(newY+(option.rect.height()/2));
+        }
     }
 }
 
@@ -388,96 +418,17 @@ void RealTimeMultiSampleArrayDelegate::createMarkerPath(const QStyleOptionViewIt
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::createAmplitudeText(const QModelIndex &index, const QStyleOptionViewItem &option, QString &amplitude, QVector<float>& data, QVector<float>& lastData) const
+void RealTimeMultiSampleArrayDelegate::createAmplitudeText(QString &amplitude, QVector<float>& data, QVector<float>& lastData) const
 {
-    const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
-
-    //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
-    qint32 kind = t_pModel->getKind(index.row());
-    float fMaxValue = 1e-9f;
-
-    switch(kind) {
-        case FIFFV_MEG_CH: {
-            qint32 unit =t_pModel->getUnit(index.row());
-            if(unit == FIFF_UNIT_T_M) { //gradiometers
-                fMaxValue = 1e-10f;
-                if(t_pModel->getScaling().contains(FIFF_UNIT_T_M))
-                    fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T_M];
-            }
-            else if(unit == FIFF_UNIT_T) //magnitometers
-            {
-                if(t_pModel->getCoil(index.row()) == FIFFV_COIL_BABY_MAG)
-                    fMaxValue = 1e-11f;
-                else
-                    fMaxValue = 1e-11f;
-
-                if(t_pModel->getScaling().contains(FIFF_UNIT_T))
-                    fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
-            }
-            break;
-        }
-
-        case FIFFV_REF_MEG_CH: {  /*11/04/14 Added by Limin: MEG reference channel */
-            fMaxValue = 1e-11f;
-            if(t_pModel->getScaling().contains(FIFF_UNIT_T))
-                fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
-            break;
-        }
-        case FIFFV_EEG_CH: {
-            fMaxValue = 1e-4f;
-            if(t_pModel->getScaling().contains(FIFFV_EEG_CH))
-                fMaxValue = t_pModel->getScaling()[FIFFV_EEG_CH];
-            break;
-        }
-        case FIFFV_EOG_CH: {
-            fMaxValue = 1e-3f;
-            if(t_pModel->getScaling().contains(FIFFV_EOG_CH))
-                fMaxValue = t_pModel->getScaling()[FIFFV_EOG_CH];
-            break;
-        }
-        case FIFFV_STIM_CH: {
-            fMaxValue = 5;
-            if(t_pModel->getScaling().contains(FIFFV_STIM_CH))
-                fMaxValue = t_pModel->getScaling()[FIFFV_STIM_CH];
-            break;
-        }
-        case FIFFV_MISC_CH: {
-            fMaxValue = 1e-3f;
-            if(t_pModel->getScaling().contains(FIFFV_MISC_CH))
-                fMaxValue = t_pModel->getScaling()[FIFFV_MISC_CH];
-            break;
-        }
-    }
-
+    //Create marker text
     if(m_markerPosistion.x()<data.size()) {
-//        std::cout<<data[m_markerPosistion.x()]<<std::endl;
-//        std::cout<<"fMaxValue"<<fMaxValue<<std::endl;
-//        std::cout<<"fMaxValue"<<fMaxValue<<std::endl;
-//        std::cout<<"1/fMaxValue"<<1/fMaxValue<<std::endl;
-//        std::cout<<"m_iActiveRow"<<m_iActiveRow<<std::endl;
-
         float currentValue = (data[m_markerPosistion.x()]);
-//        std::cout<<currentValue<<std::endl;
-
         amplitude = QString::number(currentValue);
 
-//        qDebug()<<amplitude;
-        //amplitude = QString().number(10);
     }
     else if(m_markerPosistion.x()<lastData.size()) {
-//        std::cout<<data[m_markerPosistion.x()]<<std::endl;
-//        std::cout<<"fMaxValue"<<fMaxValue<<std::endl;
-//        std::cout<<"fMaxValue"<<fMaxValue<<std::endl;
-//        std::cout<<"1/fMaxValue"<<1/fMaxValue<<std::endl;
-//        std::cout<<"m_iActiveRow"<<m_iActiveRow<<std::endl;
-
         float currentValue = (lastData[m_markerPosistion.x()]);
-//        std::cout<<currentValue<<std::endl;
-
         amplitude = QString::number(currentValue);
-
-//        qDebug()<<amplitude;
-        //amplitude = QString().number(10);
     }
 }
 
