@@ -472,7 +472,7 @@ bool RealTimeMultiSampleArrayWidget::eventFilter(QObject *object, QEvent *event)
 {
     if (object == m_pTableView->viewport() && event->type() == QEvent::MouseMove) {
         QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-        emit markerMoved(mouseEvent->pos());
+        emit markerMoved(mouseEvent->pos(), m_pTableView->rowAt(mouseEvent->pos().y()));
         return true;
     }
 
