@@ -488,6 +488,9 @@ void FilterWindow::filterParametersChanged()
 
     //set maximum and minimum for cut off frequency spin boxes
     if(ui->m_comboBox_filterType->currentText() == "Bandpass") {
+        if((ui->m_doubleSpinBox_highpass->value() < ui->m_doubleSpinBox_lowpass->value())) {
+            ui->m_doubleSpinBox_highpass->setValue(ui->m_doubleSpinBox_lowpass->value());
+        }
         ui->m_doubleSpinBox_highpass->setMinimum(ui->m_doubleSpinBox_lowpass->value());
         ui->m_doubleSpinBox_lowpass->setMaximum(ui->m_doubleSpinBox_highpass->value());
     }
