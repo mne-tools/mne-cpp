@@ -136,19 +136,6 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 painter->drawPath(path);
                 painter->restore();
 
-                //Plot amplitude next to marker mouse posistion
-                if(m_iActiveRow == index.row()) {
-                    QString amplitude;
-                    QPoint ellipsePos;
-                    createAmplitudeText(amplitude, data[0], data[1]);
-
-                    painter->save();
-                    painter->drawText(m_markerPosistion, amplitude);
-                    painter->drawEllipse(ellipsePos,2,2);
-
-                    painter->restore();
-                }
-
                 //Plot grid
                 createGridPath(index, option, path, data);
 
@@ -162,10 +149,12 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
 
                 //Plot data path
                 QPointF ellipsePos;
+                QString amplitude;
+
                 path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
                 QPainterPath lastPath(QPointF(option.rect.x(),option.rect.y()));
 
-                createPlotPath(index, option, path, lastPath, ellipsePos, data[0], data[1]);
+                createPlotPath(index, option, path, lastPath, ellipsePos, amplitude, data[0], data[1]);
 
                 painter->save();
                 painter->translate(0,t_fPlotHeight/2);
@@ -190,9 +179,14 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
 
                 painter->restore();
 
-                //Plot ellipse
+                //Plot ellipse and amplitude next to marker mouse posistion
                 if(m_iActiveRow == index.row()) {
                     painter->save();
+                    painter->drawEllipse(ellipsePos,2,2);
+                    painter->restore();
+
+                    painter->save();
+                    painter->drawText(m_markerPosition, amplitude);
                     painter->drawEllipse(ellipsePos,2,2);
                     painter->restore();
                 }
@@ -232,14 +226,14 @@ QSize RealTimeMultiSampleArrayDelegate::sizeHint(const QStyleOptionViewItem &opt
 
 void RealTimeMultiSampleArrayDelegate::markerMoved(QPoint position, int activeRow)
 {
-    m_markerPosistion = position;
+    m_markerPosition = position;
     m_iActiveRow = activeRow;
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPainterPath& lastPath, QPointF &ellipsePos, QVector<float>& data, QVector<float>& lastData) const
+void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPainterPath& lastPath, QPointF &ellipsePos, QString &amplitude, QVector<float>& data, QVector<float>& lastData) const
 {
     const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
 
@@ -337,9 +331,11 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
         path.lineTo(qSamplePosition);
 
         //Create ellipse position
-        if(i == m_markerPosistion.x()) {
-            ellipsePos.setX(fDx*m_markerPosistion.x());
+        if(i == (qint32)(m_markerPosition.x()/fDx)) {
+            ellipsePos.setX(path.currentPosition().x()+fDx);
             ellipsePos.setY(newY+(option.rect.height()/2));
+
+            amplitude = QString::number(data[i]);
         }
     }
 
@@ -367,9 +363,11 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
         lastPath.lineTo(qSamplePosition);
 
         //Create ellipse position
-        if(i == m_markerPosistion.x()) {
-            ellipsePos.setX(fDx*m_markerPosistion.x());
+        if(i == (qint32)(m_markerPosition.x()/fDx)) {
+            ellipsePos.setX(lastPath.currentPosition().x()+fDx);
             ellipsePos.setY(newY+(option.rect.height()/2));
+
+            amplitude = QString::number(lastData[i]);
         }
     }
 }
@@ -406,7 +404,7 @@ void RealTimeMultiSampleArrayDelegate::createGridPath(const QModelIndex &index, 
 void RealTimeMultiSampleArrayDelegate::createMarkerPath(const QStyleOptionViewItem &option, QPainterPath& path) const
 {
     //horizontal lines
-    float distance = m_markerPosistion.x();
+    float distance = m_markerPosition.x();
 
     float yStart = option.rect.topLeft().y();
     float yEnd = option.rect.bottomRight().y();
@@ -414,22 +412,3 @@ void RealTimeMultiSampleArrayDelegate::createMarkerPath(const QStyleOptionViewIt
     path.moveTo(distance,yStart);
     path.lineTo(distance,yEnd);
 }
-
-
-//*************************************************************************************************************
-
-void RealTimeMultiSampleArrayDelegate::createAmplitudeText(QString &amplitude, QVector<float>& data, QVector<float>& lastData) const
-{
-    //Create marker text
-    if(m_markerPosistion.x()<data.size()) {
-        float currentValue = (data[m_markerPosistion.x()]);
-        amplitude = QString::number(currentValue);
-
-    }
-    else if(m_markerPosistion.x()<lastData.size()) {
-        float currentValue = (lastData[m_markerPosistion.x()]);
-        amplitude = QString::number(currentValue);
-    }
-}
-
-
