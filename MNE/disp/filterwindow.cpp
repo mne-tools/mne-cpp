@@ -487,19 +487,17 @@ void FilterWindow::filterParametersChanged()
     fftLength = pow(2, exp+1);
 
     //set maximum and minimum for cut off frequency spin boxes
+    ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
+    ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
+    ui->m_doubleSpinBox_highpass->setMinimum(0);
+    ui->m_doubleSpinBox_lowpass->setMinimum(0);
+
     if(ui->m_comboBox_filterType->currentText() == "Bandpass") {
         if((ui->m_doubleSpinBox_highpass->value() < ui->m_doubleSpinBox_lowpass->value())) {
             ui->m_doubleSpinBox_highpass->setValue(ui->m_doubleSpinBox_lowpass->value());
         }
         ui->m_doubleSpinBox_highpass->setMinimum(ui->m_doubleSpinBox_lowpass->value());
         ui->m_doubleSpinBox_lowpass->setMaximum(ui->m_doubleSpinBox_highpass->value());
-    }
-    else {
-        ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
-        ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
-
-        ui->m_doubleSpinBox_highpass->setMinimum(0);
-        ui->m_doubleSpinBox_lowpass->setMinimum(0);
     }
 
     //set filter design method
