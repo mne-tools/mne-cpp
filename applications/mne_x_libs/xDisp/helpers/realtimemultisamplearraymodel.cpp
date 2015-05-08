@@ -115,8 +115,7 @@ QVariant RealTimeMultiSampleArrayModel::data(const QModelIndex &index, int role)
                     //pack all adjacent (after reload) RowVectorPairs into a QList
                     QList< QVector<float> > qListVector;
 
-                    if(m_bIsFreezed)
-                    {
+                    if(m_bIsFreezed) {
                         // data freeze
                         QVector<float> data;
                         if(m_filterData.isEmpty()) {
@@ -143,8 +142,7 @@ QVariant RealTimeMultiSampleArrayModel::data(const QModelIndex &index, int role)
 
                         v.setValue(qListVector);
                     }
-                    else
-                    {
+                    else {
                         // data
                         if(m_filterData.isEmpty()) {
                             QVector<float> data;

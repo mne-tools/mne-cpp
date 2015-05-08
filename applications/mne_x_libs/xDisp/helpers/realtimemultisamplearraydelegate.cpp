@@ -137,20 +137,18 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 painter->restore();
 
                 //Plot amplitude next to marker mouse posistion
-                painter->save();
+                if(m_iActiveRow == index.row()) {
+                    QString amplitude;
+                    createAmplitudeText(index, option, amplitude, data[0], data[1]);
 
-                QString amplitude;
-                if(m_markerPosistion.x()<data[0].size())
-                    amplitude = QString().number(data[0].at(m_markerPosistion.x())*10000000);
-                else
-                    amplitude = QString().toDouble(0);
-
-                painter->drawText(m_markerPosistion, amplitude);
-                painter->restore();
+                    painter->save();
+                    painter->drawText(m_markerPosistion, amplitude);
+                    painter->restore();
+                }
 
                 //Plot grid
-                painter->setRenderHint(QPainter::Antialiasing, false);
                 createGridPath(index, option, path, data);
+
                 pen.setStyle(Qt::DotLine);
                 pen.setWidthF(0.5);
                 pen.setColor(Qt::black);
@@ -221,9 +219,10 @@ QSize RealTimeMultiSampleArrayDelegate::sizeHint(const QStyleOptionViewItem &opt
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::markerMoved(QPoint position)
+void RealTimeMultiSampleArrayDelegate::markerMoved(QPoint position, int activeRow)
 {
     m_markerPosistion = position;
+    m_iActiveRow = activeRow;
 }
 
 
@@ -385,3 +384,101 @@ void RealTimeMultiSampleArrayDelegate::createMarkerPath(const QStyleOptionViewIt
     path.moveTo(distance,yStart);
     path.lineTo(distance,yEnd);
 }
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayDelegate::createAmplitudeText(const QModelIndex &index, const QStyleOptionViewItem &option, QString &amplitude, QVector<float>& data, QVector<float>& lastData) const
+{
+    const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
+
+    //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
+    qint32 kind = t_pModel->getKind(index.row());
+    float fMaxValue = 1e-9f;
+
+    switch(kind) {
+        case FIFFV_MEG_CH: {
+            qint32 unit =t_pModel->getUnit(index.row());
+            if(unit == FIFF_UNIT_T_M) { //gradiometers
+                fMaxValue = 1e-10f;
+                if(t_pModel->getScaling().contains(FIFF_UNIT_T_M))
+                    fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T_M];
+            }
+            else if(unit == FIFF_UNIT_T) //magnitometers
+            {
+                if(t_pModel->getCoil(index.row()) == FIFFV_COIL_BABY_MAG)
+                    fMaxValue = 1e-11f;
+                else
+                    fMaxValue = 1e-11f;
+
+                if(t_pModel->getScaling().contains(FIFF_UNIT_T))
+                    fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
+            }
+            break;
+        }
+
+        case FIFFV_REF_MEG_CH: {  /*11/04/14 Added by Limin: MEG reference channel */
+            fMaxValue = 1e-11f;
+            if(t_pModel->getScaling().contains(FIFF_UNIT_T))
+                fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
+            break;
+        }
+        case FIFFV_EEG_CH: {
+            fMaxValue = 1e-4f;
+            if(t_pModel->getScaling().contains(FIFFV_EEG_CH))
+                fMaxValue = t_pModel->getScaling()[FIFFV_EEG_CH];
+            break;
+        }
+        case FIFFV_EOG_CH: {
+            fMaxValue = 1e-3f;
+            if(t_pModel->getScaling().contains(FIFFV_EOG_CH))
+                fMaxValue = t_pModel->getScaling()[FIFFV_EOG_CH];
+            break;
+        }
+        case FIFFV_STIM_CH: {
+            fMaxValue = 5;
+            if(t_pModel->getScaling().contains(FIFFV_STIM_CH))
+                fMaxValue = t_pModel->getScaling()[FIFFV_STIM_CH];
+            break;
+        }
+        case FIFFV_MISC_CH: {
+            fMaxValue = 1e-3f;
+            if(t_pModel->getScaling().contains(FIFFV_MISC_CH))
+                fMaxValue = t_pModel->getScaling()[FIFFV_MISC_CH];
+            break;
+        }
+    }
+
+    if(m_markerPosistion.x()<data.size()) {
+//        std::cout<<data[m_markerPosistion.x()]<<std::endl;
+//        std::cout<<"fMaxValue"<<fMaxValue<<std::endl;
+//        std::cout<<"fMaxValue"<<fMaxValue<<std::endl;
+//        std::cout<<"1/fMaxValue"<<1/fMaxValue<<std::endl;
+//        std::cout<<"m_iActiveRow"<<m_iActiveRow<<std::endl;
+
+        float currentValue = (data[m_markerPosistion.x()]);
+//        std::cout<<currentValue<<std::endl;
+
+        amplitude = QString::number(currentValue);
+
+//        qDebug()<<amplitude;
+        //amplitude = QString().number(10);
+    }
+    else if(m_markerPosistion.x()<lastData.size()) {
+//        std::cout<<data[m_markerPosistion.x()]<<std::endl;
+//        std::cout<<"fMaxValue"<<fMaxValue<<std::endl;
+//        std::cout<<"fMaxValue"<<fMaxValue<<std::endl;
+//        std::cout<<"1/fMaxValue"<<1/fMaxValue<<std::endl;
+//        std::cout<<"m_iActiveRow"<<m_iActiveRow<<std::endl;
+
+        float currentValue = (lastData[m_markerPosistion.x()]);
+//        std::cout<<currentValue<<std::endl;
+
+        amplitude = QString::number(currentValue);
+
+//        qDebug()<<amplitude;
+        //amplitude = QString().number(10);
+    }
+}
+
+

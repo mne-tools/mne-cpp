@@ -44,6 +44,7 @@
 #include <QAbstractItemDelegate>
 #include <QTableView>
 #include <QMap>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -98,9 +99,10 @@ public:
     /**
     * markerMoved is called whenever user moves the mouse inside of the table view viewport
     *
-    * @param position the current mouse position
+    * @param position   The current mouse position
+    * @param activeRow  The current row which the mouse is moved over
     */
-    void markerMoved(QPoint position);
+    void markerMoved(QPoint position, int activeRow);
 
 private:
     //=========================================================================================================
@@ -125,7 +127,7 @@ private:
     * @param[in,out] path   The QPointerPath to create for the data plot.
     * @param[in] data       Data for the given row.
     */
-    void createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<  QVector<float> >& data) const;
+    void createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<QVector<float> >& data) const;
 
     //=========================================================================================================
     /**
@@ -136,13 +138,28 @@ private:
     */
     void createMarkerPath(const QStyleOptionViewItem &option, QPainterPath& path) const;
 
+    //=========================================================================================================
+    /**
+    * createAmplitudeText Creates the QString for the current amplitude values.
+    *
+    * @param[in] index          Used to locate data in a data model.
+    * @param[in] option         Describes the parameters used to draw an item in a view widget
+    * @param[in] amplitude      String which is to be plotted.
+    * @param[in] data           Current data for the given row.
+    * @param[in] lastData       Last data for the given row.
+    */
+    void createAmplitudeText(const QModelIndex &index, const QStyleOptionViewItem &option, QString &amplitude, QVector<float>& data, QVector<float>& lastData) const;
+
     //Settings
 //    QSettings m_qSettings;
 
     // Scaling
     float       m_fMaxValue;        /**< Maximum value of the data to plot  */
     float       m_fScaleY;          /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
+    int         m_iActiveRow;       /**< The current row which the mouse is moved over  */
+
     QPoint      m_markerPosistion;  /**< Current mouse position used to draw the marker in the plot  */
+
 };
 
 } // NAMESPACE

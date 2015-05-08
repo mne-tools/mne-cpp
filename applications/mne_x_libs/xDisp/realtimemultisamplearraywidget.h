@@ -292,9 +292,10 @@ signals:
     /**
     * position is emitted whenever user moves the mouse inside of the table view viewport
     *
-    * @param position the current mouse position
+    * @param position   the current mouse position
+    * @param activeRow  the current row which the mouse is moved over
     */
-    void markerMoved(QPoint position);
+    void markerMoved(QPoint position, int activeRow);
 
 private:
     //=========================================================================================================
