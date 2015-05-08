@@ -678,6 +678,9 @@ void RealTimeMultiSampleArrayWidget::showFilterWidget()
         //Init downsampled sampling frequency
         m_fDesiredSamplingRate = m_fSamplingRate/m_pSpinBoxDSFactor->value();
         emit samplingRateChanged(m_fDesiredSamplingRate);
+
+        //As default only use MEG channels for filtering
+        m_pRTMSAModel->applyFilter("MEG");
     }
 
     if(m_pFilterWindow->isActiveWindow())
