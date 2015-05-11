@@ -247,6 +247,7 @@ void RealTimeMultiSampleArrayWidget::init()
 {
     if(m_qListChInfo.size() > 0)
     {
+        //Init the model
         if(m_pRTMSAModel)
             delete m_pRTMSAModel;
         m_pRTMSAModel = new RealTimeMultiSampleArrayModel(this);
@@ -255,18 +256,20 @@ void RealTimeMultiSampleArrayWidget::init()
         m_pRTMSAModel->setChannelInfo(m_qListChInfo);//ToDo Obsolete
         m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, m_iT, m_fDesiredSamplingRate);
 
+        //Init the delegate
         if(m_pRTMSADelegate)
             delete m_pRTMSADelegate;
         m_pRTMSADelegate = new RealTimeMultiSampleArrayDelegate(this);
+        m_pRTMSADelegate->initPainterPaths(m_pRTMSAModel);
 
         connect(m_pTableView, &QTableView::doubleClicked,
                 m_pRTMSAModel, &RealTimeMultiSampleArrayModel::toggleFreeze);
-
-        m_pTableView->setModel(m_pRTMSAModel);
-        m_pTableView->setItemDelegate(m_pRTMSADelegate);
-
         connect(this, &RealTimeMultiSampleArrayWidget::markerMoved,
                 m_pRTMSADelegate, &RealTimeMultiSampleArrayDelegate::markerMoved);
+
+        //Init the view
+        m_pTableView->setModel(m_pRTMSAModel);
+        m_pTableView->setItemDelegate(m_pRTMSADelegate);
 
         //set some size settings for m_pTableView
         m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
