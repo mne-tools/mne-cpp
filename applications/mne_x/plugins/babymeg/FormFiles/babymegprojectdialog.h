@@ -37,6 +37,9 @@ private:
     void addProject();
     void addSubject();
 
+    void deleteProject();
+    void deleteSubject();
+
     void paradigmChanged(const QString &newParadigm);
 
     void scanForProjects();

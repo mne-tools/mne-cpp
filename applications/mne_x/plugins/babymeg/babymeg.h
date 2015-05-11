@@ -171,13 +171,22 @@ public:
 
     //=========================================================================================================
     /**
-    * Initialise the BabyMEG.
+    * Returns the babyMEG file path which is to be written to.
     *
     * @param[in] currentTime    insert current time stamp.
     *
     * @return the storage filepath
     */
     QString getFilePath(bool currentTime = false) const;
+
+    //=========================================================================================================
+    /**
+    * Returns the path where the subjects folders are stored.
+    *
+    *
+    * @return the data path
+    */
+    QString getDataPath() const;
 
     //=========================================================================================================
     /**
