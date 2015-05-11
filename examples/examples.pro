@@ -53,6 +53,7 @@ SUBDIRS += \
     fiffIO \
     makeLayout \
     bmtiExample \
+    mghIO \
 
 contains(MNECPP_CONFIG, withGui) {
 	SUBDIRS +=
