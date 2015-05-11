@@ -93,13 +93,14 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
             painter->save();
 
             //draw special background when channel is marked as bad
-//            QVariant v = index.model()->data(index,Qt::BackgroundRole);
-//            if(v.canConvert<QBrush>() && !(option.state & QStyle::State_Selected)) {
-//                QPointF oldBO = painter->brushOrigin();
-//                painter->setBrushOrigin(option.rect.topLeft());
-//                painter->fillRect(option.rect, qvariant_cast<QBrush>(v));
-//                painter->setBrushOrigin(oldBO);
-//            }
+            QVariant v = index.model()->data(index,Qt::BackgroundRole);
+            if((v.canConvert<QBrush>() && !(option.state & QStyle::State_Selected)) ||
+               (v.canConvert<QBrush>() && (option.state & QStyle::State_Selected))) {
+                QPointF oldBO = painter->brushOrigin();
+                painter->setBrushOrigin(option.rect.topLeft());
+                painter->fillRect(option.rect, qvariant_cast<QBrush>(v));
+                painter->setBrushOrigin(oldBO);
+            }
 
 //            //Highlight selected channels
 //            if(option.state & QStyle::State_Selected) {
@@ -122,23 +123,38 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
 
                 QPainterPath path(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor()-1,option.rect.y()));
 
-                //Plot grid
+                //Plot marker
                 painter->setRenderHint(QPainter::Antialiasing, false);
-                createGridPath(index, option, path, data);
+                createMarkerPath(option, path);
 
                 painter->save();
                 QPen pen;
+                pen.setStyle(Qt::DashLine);
+                pen.setWidthF(1.0);
+                pen.setColor(Qt::red);
+                painter->setPen(pen);
+                painter->drawPath(path);
+                painter->restore();
+
+                //Plot grid
+                createGridPath(index, option, path, data);
+
                 pen.setStyle(Qt::DotLine);
                 pen.setWidthF(0.5);
+                pen.setColor(Qt::black);
+                painter->save();
                 painter->setPen(pen);
                 painter->drawPath(path);
                 painter->restore();
 
                 //Plot data path
+                QPointF ellipsePos;
+                QString amplitude;
+
                 path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
                 QPainterPath lastPath(QPointF(option.rect.x(),option.rect.y()));
 
-                createPlotPath(index, option, path, lastPath, data[0], data[1]);
+                createPlotPath(index, option, path, lastPath, ellipsePos, amplitude, data[0], data[1]);
 
                 painter->save();
                 painter->translate(0,t_fPlotHeight/2);
@@ -162,6 +178,18 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 painter->drawPath(lastPath);
 
                 painter->restore();
+
+                //Plot ellipse and amplitude next to marker mouse posistion
+                if(m_iActiveRow == index.row()) {
+                    painter->save();
+                    painter->drawEllipse(ellipsePos,2,2);
+                    painter->restore();
+
+                    painter->save();
+                    painter->drawText(m_markerPosition, amplitude);
+                    painter->drawEllipse(ellipsePos,2,2);
+                    painter->restore();
+                }
             }
             break;
         }
@@ -196,7 +224,16 @@ QSize RealTimeMultiSampleArrayDelegate::sizeHint(const QStyleOptionViewItem &opt
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPainterPath& lastPath, QVector<float>& data, QVector<float>& lastData) const
+void RealTimeMultiSampleArrayDelegate::markerMoved(QPoint position, int activeRow)
+{
+    m_markerPosition = position;
+    m_iActiveRow = activeRow;
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPainterPath& lastPath, QPointF &ellipsePos, QString &amplitude, QVector<float>& data, QVector<float>& lastData) const
 {
     const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
 
@@ -207,12 +244,12 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
     switch(kind) {
         case FIFFV_MEG_CH: {
             qint32 unit =t_pModel->getUnit(index.row());
-            if(unit == FIFF_UNIT_T_M) {
+            if(unit == FIFF_UNIT_T_M) { //gradiometers
                 fMaxValue = 1e-10f;
                 if(t_pModel->getScaling().contains(FIFF_UNIT_T_M))
                     fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T_M];
             }
-            else if(unit == FIFF_UNIT_T)
+            else if(unit == FIFF_UNIT_T) //magnitometers
             {
                 if(t_pModel->getCoil(index.row()) == FIFFV_COIL_BABY_MAG)
                     fMaxValue = 1e-11f;
@@ -292,23 +329,46 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
         qSamplePosition.setX(path.currentPosition().x()+fDx);
 
         path.lineTo(qSamplePosition);
+
+        //Create ellipse position
+        if(i == (qint32)(m_markerPosition.x()/fDx)) {
+            ellipsePos.setX(path.currentPosition().x()+fDx);
+            ellipsePos.setY(newY+(option.rect.height()/2));
+
+            amplitude = QString::number(data[i]);
+        }
     }
 
     //create lines from one to the next sample for last path
     qint32 sample_offset = t_pModel->numVLines() + 1;
     qSamplePosition.setX(qSamplePosition.x() + fDx*sample_offset);
+
+    //start painting from first sample value
+    float val = lastData[i] - lastData[0]; //remove first sample lastData[0] as offset
+    fValue = val*fScaleY;
+    float newY = y_base-fValue;
+    qSamplePosition.setY(newY);
+
     lastPath.moveTo(qSamplePosition);
 
     for(i += sample_offset; i < lastData.size(); ++i) {
-        float val = lastData[i] - lastData[0]; //remove first sample lastData[0] as offset
+        val = lastData[i] - lastData[0]; //remove first sample lastData[0] as offset
         fValue = val*fScaleY;
 
-        float newY = y_base-fValue;
+        newY = y_base-fValue;
 
         qSamplePosition.setY(newY);
         qSamplePosition.setX(lastPath.currentPosition().x()+fDx);
 
         lastPath.lineTo(qSamplePosition);
+
+        //Create ellipse position
+        if(i == (qint32)(m_markerPosition.x()/fDx)) {
+            ellipsePos.setX(lastPath.currentPosition().x()+fDx);
+            ellipsePos.setY(newY+(option.rect.height()/2));
+
+            amplitude = QString::number(lastData[i]);
+        }
     }
 }
 
@@ -336,4 +396,19 @@ void RealTimeMultiSampleArrayDelegate::createGridPath(const QModelIndex &index, 
             path.lineTo(x,yEnd);
         }
     }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayDelegate::createMarkerPath(const QStyleOptionViewItem &option, QPainterPath& path) const
+{
+    //horizontal lines
+    float distance = m_markerPosition.x();
+
+    float yStart = option.rect.topLeft().y();
+    float yEnd = option.rect.bottomRight().y();
+
+    path.moveTo(distance,yStart);
+    path.lineTo(distance,yEnd);
 }

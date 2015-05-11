@@ -1,4 +1,4 @@
-MNE-CPP
+MNE-CPP [![DOI](https://zenodo.org/badge/8729/mne-tools/mne-cpp.svg)](http://dx.doi.org/10.5281/zenodo.17216)
 =========
 
 MNE cross-platform standalone MEG/EEG (real-time) applications using [Qt5](http://qt-project.org/downloads)'s and [Eigen](http://eigen.tuxfamily.org)'s C++ libraries

@@ -509,7 +509,7 @@ void RtAve::run()
             qint32 minSize = (m_iPreStimSamples+m_iPostStimSamples) + (2 * t_nSamplesPerBuf);
             m_qMutex.unlock();
 
-            if(t_nSamplesPerBuf*t_qListRawMatBuf.size() > minSize)
+            if(t_nSamplesPerBuf*t_qListRawMatBuf.size() > (quint32)minSize)
             {
                 //
                 // Average

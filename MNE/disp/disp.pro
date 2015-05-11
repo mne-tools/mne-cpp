@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT  += core widgets
+QT  += core widgets svg
 
 DEFINES += DISP_LIBRARY
 
@@ -92,7 +92,11 @@ SOURCES += \
     imagesc.cpp \
     plot.cpp \
     graph.cpp \
-    rtplot.cpp
+    rtplot.cpp \
+    filterplotscene.cpp \
+    filterwindow.cpp \
+    helpers/filterdatadelegate.cpp \
+    helpers/filterdatamodel.cpp
 
 
 HEADERS += \
@@ -101,7 +105,11 @@ HEADERS += \
     imagesc.h \
     plot.h \
     graph.h \
-    rtplot.h
+    rtplot.h \
+    filterplotscene.h \
+    filterwindow.h \
+    helpers/filterdatadelegate.h \
+    helpers/filterdatamodel.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
@@ -113,6 +121,7 @@ header_files.path = $${MNE_INCLUDE_DIR}/disp
 
 INSTALLS += header_files
 
-FORMS +=
+FORMS += \
+    filterwindowwidget.ui
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR

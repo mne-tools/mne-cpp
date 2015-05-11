@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     selectionloader.h
+* @file     selectionio.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    SelectionLoader class declaration.
+* @brief    SelectionIO class declaration.
 *
 */
 
-#ifndef SELECTIONLOADER_H
-#define SELECTIONLOADER_H
+#ifndef SELECTIONIO_H
+#define SELECTIONIO_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -85,18 +85,18 @@ namespace UTILSLIB
 
 //=============================================================================================================
 /**
-* Processes selection files (mne .sel) files which contain the chanels for each selection group.
+* Processes selection files (mne .sel) files which contain the channels for each selection group.
 *
 * @brief Processes selection files (mne .sel) files which contain the chanels for each selection group.
 */
-class UTILSSHARED_EXPORT SelectionLoader
+class UTILSSHARED_EXPORT SelectionIO
 {
 public:
     //=========================================================================================================
     /**
     * Constructs a Filter object.
     */
-    SelectionLoader();
+    SelectionIO();
 
     //=========================================================================================================
     /**
@@ -104,10 +104,18 @@ public:
     * @param [in] path holds the file path of the elc file which is to be read.
     * @param [in] selectionMap holds the map to which the read selection groups are stored.
     */
-    bool readMNESelFile(QString path, QMap<QString,QStringList> &selectionMap);
+    static bool readMNESelFile(QString path, QMap<QString,QStringList> &selectionMap);
+
+    //=========================================================================================================
+    /**
+    * Qrites the specified MNE sel file.
+    * @param [in] path holds the file path of the elc file which is to be read.
+    * @param [in] selectionMap holds the map to which the read selection groups are stored.
+    */
+    static bool writeMNESelFile(QString path, const QMap<QString,QStringList> &selectionMap);
 
 };
 
 } // NAMESPACE
 
-#endif // SELECTIONLOADER_H
+#endif // SELECTIONIO_H

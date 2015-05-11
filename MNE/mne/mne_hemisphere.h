@@ -213,8 +213,9 @@ public:
     MatrixX3d use_tri_nn;       /**< Triangle normals of used triangles */
     VectorXd use_tri_area;      /**< Triangle areas of used triangles */
 
-    QMap<int, QVector<int>> neighbor_tri;       /**< Map of neighboring triangles for each vertex */
-    QMap<int, QVector<int>> neighbor_vert;      /**< Map of neighboring vertices for each vertex */
+    QList<QPair<int, QVector<int> > > neighbor_tri;           /**< Map of neighboring triangles for each vertex */
+    QList<QPair<int, QVector<int> > > neighbor_vert;          /**< Map of neighboring vertices for each vertex */
+    QVector<SparseMatrix<double> > smoothOperatorList;
 
     MNEClusterInfo cluster_info; /**< Holds the cluster information. */
 private:

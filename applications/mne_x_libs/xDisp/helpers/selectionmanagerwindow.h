@@ -44,9 +44,9 @@
 
 #include "../ui_selectionmanagerwindow.h"
 #include "utils/layoutloader.h"             //MNE-CPP utils
-#include "utils/selectionloader.h"          //MNE-CPP utils
+#include "utils/selectionio.h"              //MNE-CPP utils
 #include "utils/layoutmaker.h"              //MNE-CPP utils
-#include "selectionscene.h"        //MNE Browse Raw QT utils
+#include "selectionscene.h"
 #include "fiff/fiff.h"
 #include "chinfomodel.h"
 
@@ -56,8 +56,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDockWidget>
 #include <QMutableStringListIterator>
+#include <QFileDialog>
+#include <QStandardPaths>
 
 
 //*************************************************************************************************************
@@ -89,7 +90,7 @@ namespace XDISPLIB
 *
 * @brief The SelectionManagerWindow class provides a channel selection window.
 */
-class SelectionManagerWindow : public QDockWidget
+class SelectionManagerWindow : public QWidget
 {
     Q_OBJECT
 
@@ -213,6 +214,13 @@ private:
 
     //=========================================================================================================
     /**
+    * Initialises all buttons in the selection window.
+    *
+    */
+    void initButtons();
+
+    //=========================================================================================================
+    /**
     * Loads a new layout from given file path.
     *
     * @param [in] path holds file pathloll
@@ -266,6 +274,34 @@ private:
 
     //=========================================================================================================
     /**
+    * loads a user selection file.
+    *
+    */
+    void onBtnLoadUserSelection();
+
+    //=========================================================================================================
+    /**
+    * Saves a user selection file.
+    *
+    */
+    void onBtnSaveUserSelection();
+
+    //=========================================================================================================
+    /**
+    * Add the user defined channels to the selection groups.
+    *
+    */
+    void onBtnAddToSelectionGroups();
+
+    //=========================================================================================================
+    /**
+    * Loads a new layout selected from the layout combo box.
+    *
+    */
+    void onComboBoxLayoutChanged();
+
+    //=========================================================================================================
+    /**
     * Reimplemented resize event.
     *
     */
@@ -290,6 +326,6 @@ private:
     QStringList                     m_currentlyLoadedFiffChannels;      /**< List of currently loaded fiff data channels.*/
 };
 
-} // NAMESPACE MNEBrowseRawQt
+} // NAMESPACE XDISPLIB
 
 #endif // SELECTIONMANAGERWINDOW_H

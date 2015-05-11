@@ -43,14 +43,31 @@
 //=============================================================================================================
 
 #include "xdisp_global.h"
+
 #include "newmeasurementwidget.h"
+
+#include <xMeas/newrealtimemultisamplearray.h>
+
+//#include "annotationwindow.h"
+
 #include "helpers/realtimemultisamplearraymodel.h"
 #include "helpers/realtimemultisamplearraydelegate.h"
-
 #include "helpers/realtimemultisamplearrayscalingwidget.h"
 #include "helpers/projectorwidget.h"
 #include "helpers/selectionmanagerwindow.h"
 #include "helpers/chinfomodel.h"
+
+#include "disp/filterwindow.h"
+
+#include <math.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -65,7 +82,17 @@
 #include <QAction>
 #include <QSpinBox>
 #include <QDoubleSpinBox>
-
+#include <QPaintEvent>
+#include <QPainter>
+#include <QTimer>
+#include <QTime>
+#include <QVBoxLayout>
+#include <QHeaderView>
+#include <QMenu>
+#include <QMessageBox>
+#include <QSettings>
+#include <QScroller>
+#include <QDebug>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -74,10 +101,7 @@
 
 class QTime;
 
-namespace XMEASLIB
-{
-class NewRealTimeMultiSampleArray;
-}
+namespace XMEASLIB{class NewRealTimeMultiSampleArray;}
 
 
 //*************************************************************************************************************
@@ -87,6 +111,7 @@ class NewRealTimeMultiSampleArray;
 
 namespace XDISPLIB
 {
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -100,6 +125,7 @@ namespace XDISPLIB
 //=============================================================================================================
 
 using namespace XMEASLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -120,9 +146,9 @@ using namespace XMEASLIB;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RealTimeMultiSampleArrayNewWidget
+* DECLARE CLASS RealTimeMultiSampleArrayWidget
 *
-* @brief The RealTimeMultiSampleArrayNewWidget class provides a real-time curve display.
+* @brief The RealTimeMultiSampleArrayWidget class provides a real-time curve display.
 */
 class XDISPSHARED_EXPORT RealTimeMultiSampleArrayWidget : public NewMeasurementWidget
 {
@@ -226,18 +252,24 @@ protected:
 
     //=========================================================================================================
     /**
-    * Show channel scaling widget
-    */
-    void showChScalingWidget();
-
-    //=========================================================================================================
-    /**
     * Is called when mouse wheel is used.
     * Function is selecting the tool (freezing/annotation);
     *
     * @param [in] wheelEvent pointer to WheelEvent. Depending on the delta movement a tool is selected.
     */
     virtual void wheelEvent(QWheelEvent* wheelEvent);
+
+    //=========================================================================================================
+    /**
+    * Is called when mouse wheel is used.
+    * Function is selecting the tool (freezing/annotation);
+    *
+    * @param object
+    * @param event o
+    *
+    * @return
+    */
+    bool eventFilter(QObject *object, QEvent *event);
 
 signals:
     //=========================================================================================================
@@ -247,6 +279,23 @@ signals:
     * @param FiffInfo the current loaded fiffinfo
     */
     void fiffFileUpdated(const FiffInfo&);
+
+    //=========================================================================================================
+    /**
+    * samplingRateChanged is emitted whenever the sampling rate is changed
+    *
+    * @param samplingRate the current (downsampled) sampling rate
+    */
+    void samplingRateChanged(double samplingRate);
+
+    //=========================================================================================================
+    /**
+    * position is emitted whenever user moves the mouse inside of the table view viewport
+    *
+    * @param position   the current mouse position
+    * @param activeRow  the current row which the mouse is moved over
+    */
+    void markerMoved(QPoint position, int activeRow);
 
 private:
     //=========================================================================================================
@@ -265,6 +314,14 @@ private:
 
     //=========================================================================================================
     /**
+    * Sets new zoom factor
+    *
+    * @param [in] dsFactor downsampling factor
+    */
+    void dsFactorChanged(int dsFactor);
+
+    //=========================================================================================================
+    /**
     * Sets new time window size
     *
     * @param [in] T  time window size;
@@ -273,15 +330,21 @@ private:
 
     //=========================================================================================================
     /**
-    * Shows the projection widget
+    * apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda
     */
-    void showProjectionWidget();
+    void applySelection();
 
     //=========================================================================================================
     /**
-    * Shows sensor selection widget
+    * hides the in m_qListCurrentSelection stored selection -> hack around C++11 lambda
     */
-    void showSensorSelectionWidget();
+    void hideSelection();
+
+    //=========================================================================================================
+    /**
+    * reset the in m_qListCurrentSelection stored selection -> hack around C++11 lambda
+    */
+    void resetSelection();
 
     //=========================================================================================================
     /**
@@ -291,49 +354,75 @@ private:
     */
     void showSelectedChannelsOnly(QStringList selectedChannels);
 
-    RealTimeMultiSampleArrayModel*      m_pRTMSAModel;      /**< RTMSA data model */
-    RealTimeMultiSampleArrayDelegate*   m_pRTMSADelegate;   /**< RTMSA data delegate */
-    QTableView* m_pTableView;                               /**< the QTableView being part of the model/view framework of Qt */
+    //=========================================================================================================
+    /**
+    * hides/show all bad channels in the view
+    */
+    void hideBadChannels();
 
-    float m_fDefaultSectionSize;                            /**< Default row height */
-    float m_fZoomFactor;                                    /**< Zoom factor */
-    QDoubleSpinBox* m_pDoubleSpinBoxZoom;                   /**< Adjust Zoom Factor */
+    //=========================================================================================================
+    /**
+    * Show channel scaling widget
+    */
+    void showChScalingWidget();
 
-    QSharedPointer<NewRealTimeMultiSampleArray> m_pRTMSA;   /**< The real-time sample array measurement. */
+    //=========================================================================================================
+    /**
+    * Shows the projection widget
+    */
+    void showProjectionWidget();
 
-    bool m_bInitialized;                                    /**< Is Initialized */
+    //=========================================================================================================
+    /**
+    * Shows the filter widget
+    */
+    void showFilterWidget();
 
-    QList<RealTimeSampleArrayChInfo> m_qListChInfo;         /**< Channel info list. ToDo: check if this is obsolete later on -> ToDo use fiff Info instead*/
-    FiffInfo::SPtr m_pFiffInfo;                             /**< FiffInfo, which is used insteadd of ListChInfo*/
+    //=========================================================================================================
+    /**
+    * Shows sensor selection widget
+    */
+    void showSensorSelectionWidget();
 
-    qint32 m_iT;                                            /**< Display window size in seconds */
-    float m_fSamplingRate;                                  /**< Sampling rate */
-    float m_fDesiredSamplingRate;                           /**< Desired display sampling rate */
+    RealTimeMultiSampleArrayModel*      m_pRTMSAModel;                  /**< RTMSA data model */
+    RealTimeMultiSampleArrayDelegate*   m_pRTMSADelegate;               /**< RTMSA data delegate */
 
-    QSpinBox*   m_pSpinBoxTimeScale;                        /**< Time scale spin box */
+    bool            m_bInitialized;                                     /**< Is Initialized */
+    bool            m_bHideBadChannels;                                 /**< hide bad channels flag. */
+    float           m_fDefaultSectionSize;                              /**< Default row height */
+    float           m_fZoomFactor;                                      /**< Zoom factor */
+    float           m_fSamplingRate;                                    /**< Sampling rate */
+    float           m_fDesiredSamplingRate;                             /**< Desired display sampling rate */
+    qint32          m_iDSFactor;                                        /**< Downsampling factor */
+    qint32          m_iT;                                               /**< Display window size in seconds */
 
-    QAction*    m_pActionSelectSensors;                     /**< show roi select widget */
+    QStringList     m_slSelectedChannels;                               /**< the currently selected channels from the selection manager window. */
+    QList<qint32>   m_qListCurrentSelection;                            /**< Current selection list -> hack around C++11 lambda  */
+    QList<RealTimeSampleArrayChInfo> m_qListChInfo;                     /**< Channel info list. ToDo: check if this is obsolete later on -> ToDo use fiff Info instead*/
+    QMap< qint32,float > m_qMapChScaling;                               /**< Sensor selection widget. */
 
-    QSharedPointer<SelectionManagerWindow> m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */
+    FiffInfo::SPtr  m_pFiffInfo;                                        /**< FiffInfo, which is used insteadd of ListChInfo*/
 
-    QMap< qint32,float > m_qMapChScaling;                   /**< Sensor selection widget. */
-    QAction* m_pActionChScaling;                            /**< Show channel scaling Action. */
+    QDoubleSpinBox* m_pDoubleSpinBoxZoom;                               /**< Adjust Zoom Factor */
+    QSpinBox*       m_pSpinBoxTimeScale;                                /**< Time scale spin box */
+    QSpinBox*       m_pSpinBoxDSFactor;                                 /**< downsampling factor */
+    QTableView*     m_pTableView;                                       /**< the QTableView being part of the model/view framework of Qt */
 
-    QAction* m_pActionProjection;                                   /**< Show projections Action. */
-    QSharedPointer<ProjectorWidget> m_pProjectorSelectionWidget;    /**< Projector selection widget. */
+    QSharedPointer<ChInfoModel>                     m_pChInfoModel;                 /**< channel info model. */
+    QSharedPointer<NewRealTimeMultiSampleArray>     m_pRTMSA;                       /**< The real-time sample array measurement. */
+    QSharedPointer<SelectionManagerWindow>          m_pSelectionManagerWindow;      /**< SelectionManagerWindow. */
+    QSharedPointer<FilterWindow>                    m_pFilterWindow;                /**< SelectionManagerWindow. */
+    QSharedPointer<ProjectorWidget>                 m_pProjectorSelectionWidget;    /**< Projector selection widget. */
+    QSharedPointer<RealTimeMultiSampleArrayScalingWidget> m_pRTMSAScalingWidget;    /**< Channel scaling widget. */
 
+    QAction*        m_pActionSelectSensors;                             /**< show roi select widget */
+    QAction*        m_pActionFiltering;                                 /**< show filter window */
+    QAction*        m_pActionChScaling;                                 /**< Show channel scaling Action. */
+    QAction*        m_pActionProjection;                                /**< Show projections Action. */
+    QAction*        m_pActionHideBad;                                   /**< Hide bad channels. */
 
-    QStringList     m_slSelectedChannels;                   /**< the currently selected channels from the selection manager window. */
-    bool            m_bHideBadChannels;                     /**< hide bad channels flag. */
+ };
 
-    QSharedPointer<RealTimeMultiSampleArrayScalingWidget> m_pRTMSAScalingWidget;   /**< Channel scaling widget. */
-    QSharedPointer<ChInfoModel> m_pChInfoModel;             /**< channel info model. */
-
-    QList<qint32> m_qListCurrentSelection;  /**< Current selection list -> hack around C++11 lambda  */
-    void applySelection();                  /**< apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
-    void resetSelection();                  /**< reset the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
-};
-
-} // NAMESPACE
+} // NAMESPACE XDISPLIB
 
 #endif // REALTIMEMULTISAMPLEARRAYWIDGET_H

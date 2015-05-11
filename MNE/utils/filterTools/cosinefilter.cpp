@@ -65,6 +65,8 @@ CosineFilter::CosineFilter()
 
 CosineFilter::CosineFilter(int fftLength, float lowpass, float lowpass_width, float highpass, float highpass_width, double sFreq, TPassType type)
 {
+    m_iFilterOrder = fftLength;
+
     int highpasss,lowpasss;
     int highpass_widths,lowpass_widths;
     int k,s,w;

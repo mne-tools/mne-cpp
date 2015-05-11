@@ -110,6 +110,6 @@ public:
     bool        m_bHighlightItem;           /**< Whether this item is to be highlighted.*/
 };
 
-} // NAMESPACE MNEBrowseRawQt
+} // NAMESPACE XDISPLIB
 
 #endif // SELECTIONSCENEITEM_H
