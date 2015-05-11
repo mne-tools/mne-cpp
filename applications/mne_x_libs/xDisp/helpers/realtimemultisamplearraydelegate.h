@@ -45,6 +45,7 @@
 #include <QTableView>
 #include <QMap>
 #include <QDebug>
+#include <QPen>
 
 
 //*************************************************************************************************************
@@ -152,13 +153,20 @@ private:
 //    QSettings m_qSettings;
 
     // Scaling
-    float       m_fMaxValue;        /**< Maximum value of the data to plot.  */
+    float       m_fMaxValue;        /**< Maximum value of the data to plot. */
     float       m_fScaleY;          /**< Maximum amplitude of plot (max is m_dPlotHeight/2). */
-    int         m_iActiveRow;       /**< The current row which the mouse is moved over.  */
+    int         m_iActiveRow;       /**< The current row which the mouse is moved over. */
 
-    QPoint              m_markerPosition;   /**< Current mouse position used to draw the marker in the plot.  */
-    QList<QPainterPath> m_painterPaths;     /**< List of all current painter paths for each row.  */
+    QPoint              m_markerPosition;   /**< Current mouse position used to draw the marker in the plot. */
+    QList<QPainterPath> m_painterPaths;     /**< List of all current painter paths for each row. */
 
+    QPen        m_penMarker;            /**< Pen for drawing the data marker.  */
+    QPen        m_penGrid;              /**< Pen for drawing the data grid.  */
+
+    QPen        m_penFreeze;            /**< Pen for drawing the data when freeze is on.  */
+    QPen        m_penFreezeSelected;    /**< Pen for drawing the data when freeze is on and channel is selected.  */
+    QPen        m_penNormal;            /**< Pen for drawing the data when data is plotted normally without freeze on.  */
+    QPen        m_penNormalSelected;    /**< Pen for drawing the data when data is plotted normally without freeze on and channel is selected.  */
 };
 
 } // NAMESPACE

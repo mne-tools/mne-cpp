@@ -80,6 +80,17 @@ void RealTimeMultiSampleArrayDelegate::initPainterPaths(const QAbstractTableMode
 {
     for(int i = 0; i<model->rowCount(); i++)
         m_painterPaths.append(QPainterPath());
+
+    // Init pens
+    m_penMarker = QPen(Qt::red, 1, Qt::DashLine);
+
+    m_penGrid = QPen(Qt::black, 0.5, Qt::DotLine);
+
+    m_penFreeze = QPen(Qt::darkGray, 1, Qt::SolidLine);
+    m_penFreezeSelected = QPen(Qt::darkRed, 1, Qt::SolidLine);
+
+    m_penNormal = QPen(Qt::darkBlue, 1, Qt::SolidLine);
+    m_penNormalSelected = QPen(Qt::red, 1, Qt::SolidLine);
 }
 
 
@@ -266,36 +277,27 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
             QVariant variant = index.model()->data(index,Qt::DisplayRole);
             QList<QVector<float> > data = variant.value< QList< QVector<float> > >();
 
-
             const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
 
             if(data.size() > 0)
             {
-    //            const RealTimeMultiSampleArrayModel* t_rtmsaModel = (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()));
-
                 QPainterPath path(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor()-1,option.rect.y()));
 
-                //Plot marker
                 painter->setRenderHint(QPainter::Antialiasing, false);
+
+                //Plot marker                
                 createMarkerPath(option, path);
 
                 painter->save();
-                QPen pen;
-                pen.setStyle(Qt::DashLine);
-                pen.setWidthF(1.0);
-                pen.setColor(Qt::red);
-                painter->setPen(pen);
+                painter->setPen(m_penMarker);
                 painter->drawPath(path);
                 painter->restore();
 
                 //Plot grid
                 createGridPath(index, option, path, data);
 
-                pen.setStyle(Qt::DotLine);
-                pen.setWidthF(0.5);
-                pen.setColor(Qt::black);
                 painter->save();
-                painter->setPen(pen);
+                painter->setPen(m_penGrid);
                 painter->drawPath(path);
                 painter->restore();
 
@@ -306,29 +308,48 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
                 QPainterPath lastPath(QPointF(option.rect.x(),option.rect.y()));
 
+                QTime timer;
+
+                timer.start();
                 createPlotPath(index, option, path, lastPath, ellipsePos, amplitude, data[0], data[1]);
+                int timeMS = timer.elapsed();
+                std::cout<<"Time createPlotPath"<<timeMS<<std::endl;
 
-                painter->save();
-                painter->translate(0,t_fPlotHeight/2);
                 painter->setRenderHint(QPainter::Antialiasing, true);
+                painter->save();
+                painter->translate(0, t_fPlotHeight/2);
 
-                if(option.state & QStyle::State_Selected)
-                    painter->setPen(QPen(t_pModel->isFreezed() ? Qt::darkRed : Qt::red, 1, Qt::SolidLine));
-                else
-                    painter->setPen(QPen(t_pModel->isFreezed() ? Qt::darkGray : Qt::darkBlue, 1, Qt::SolidLine));
+                if(t_pModel->isFreezed()) {
+                    if(option.state & QStyle::State_Selected)
+                        painter->setPen(m_penFreezeSelected);
+                    else
+                        painter->setPen(m_penFreeze);
+                } else {
+                    if(option.state & QStyle::State_Selected)
+                        painter->setPen(m_penNormalSelected);
+                    else
+                        painter->setPen(m_penNormal);
+                }
 
+                timer.start();
                 painter->drawPath(path);
+                timeMS = timer.elapsed();
+                std::cout<<"Time drawPath Current data"<<timeMS<<std::endl;
+
                 painter->restore();
 
                 //Plot last data path
-                painter->translate(0,t_fPlotHeight/2);
-                painter->setRenderHint(QPainter::Antialiasing, true);
+                painter->translate(0, t_fPlotHeight/2);
                 if(option.state & QStyle::State_Selected)
                     painter->setPen(QPen(t_pModel->isFreezed() ? Qt::darkRed : Qt::red, 1, Qt::SolidLine));
                 else
                     painter->setPen(QPen(t_pModel->isFreezed() ? Qt::darkGray : Qt::darkBlue, 1, Qt::SolidLine));
 
+                timer.start();
                 painter->drawPath(lastPath);
+                timeMS = timer.elapsed();
+                std::cout<<"Time drawPath last data"<<timeMS<<std::endl;
+                std::cout<<std::endl<<std::endl;
                 painter->restore();
 
                 //Plot ellipse and amplitude next to marker mouse posistion
