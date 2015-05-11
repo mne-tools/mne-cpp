@@ -400,6 +400,7 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
     ui->m_listWidget_selectionGroups->setCurrentItem(getItemForChName(ui->m_listWidget_selectionGroups, "All"), QItemSelectionModel::Select);
 
     //Delete all MEG channels from the selection groups which are not in the loaded layout
+    //TODO: Is this needed anymore? Causes some trouble after a new selection file has been loaded
     //cleanUpMEGChannels();
 
     return state;
@@ -413,7 +414,7 @@ void SelectionManagerWindow::cleanUpMEGChannels()
     QMapIterator<QString,QStringList> selectionIndex(m_selectionGroupsMap);
 
     //Iterate through all loaded selection groups
-    while (selectionIndex.hasNext()) {
+    while(selectionIndex.hasNext()) {
         selectionIndex.next();
 
         QStringList channelList = selectionIndex.value();

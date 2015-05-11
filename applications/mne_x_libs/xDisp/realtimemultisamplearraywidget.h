@@ -259,6 +259,18 @@ protected:
     */
     virtual void wheelEvent(QWheelEvent* wheelEvent);
 
+    //=========================================================================================================
+    /**
+    * Is called when mouse wheel is used.
+    * Function is selecting the tool (freezing/annotation);
+    *
+    * @param object
+    * @param event o
+    *
+    * @return
+    */
+    bool eventFilter(QObject *object, QEvent *event);
+
 signals:
     //=========================================================================================================
     /**
@@ -275,6 +287,15 @@ signals:
     * @param samplingRate the current (downsampled) sampling rate
     */
     void samplingRateChanged(double samplingRate);
+
+    //=========================================================================================================
+    /**
+    * position is emitted whenever user moves the mouse inside of the table view viewport
+    *
+    * @param position   the current mouse position
+    * @param activeRow  the current row which the mouse is moved over
+    */
+    void markerMoved(QPoint position, int activeRow);
 
 private:
     //=========================================================================================================
