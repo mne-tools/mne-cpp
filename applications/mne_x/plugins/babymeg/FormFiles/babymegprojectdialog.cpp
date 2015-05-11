@@ -124,7 +124,24 @@ BabyMEGProjectDialog::~BabyMEGProjectDialog()
 
 void BabyMEGProjectDialog::deleteSubject()
 {
-    QString dirName = m_pBabyMEG->getDataPath() + "/" + ui->m_qComboBox_SubjectSelection->currentText();
+    QMessageBox msgBox;
+    msgBox.setText("Deleting subject.");
+    msgBox.setInformativeText("You are about to delete a subject's folder. Do you want to delete all data corresponding to this subject?");
+    msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::No);
+    msgBox.setWindowModality(Qt::ApplicationModal);
+    int ret = msgBox.exec();
+
+    switch (ret) {
+      case QMessageBox::No:
+          return;
+      case QMessageBox::Cancel:
+          return;
+      default:
+          return;
+    }
+
+    QString dirName = m_pBabyMEG->getDataPath() + "/" + ui->m_qComboBox_ProjectSelection->currentText() + "/" + ui->m_qComboBox_SubjectSelection->currentText();
 
     QDir dir(dirName);
 
@@ -132,6 +149,8 @@ void BabyMEGProjectDialog::deleteSubject()
 
     if(!result)
         qDebug()<<"Could not remove all of the subject folder!";
+    else
+        ui->m_qComboBox_SubjectSelection->removeItem(ui->m_qComboBox_SubjectSelection->currentIndex());
 }
 
 
@@ -139,14 +158,34 @@ void BabyMEGProjectDialog::deleteSubject()
 
 void BabyMEGProjectDialog::deleteProject()
 {
-    QString dirName = m_pBabyMEG->getDataPath() + "/" + ui->m_qComboBox_SubjectSelection->currentText() + "/" + ui->m_qComboBox_ProjectSelection->currentText();
+    QMessageBox msgBox;
+    msgBox.setText("Deleting project.");
+    msgBox.setInformativeText("You are about to delete a project folder. Do you want to delete all data corresponding to this project?");
+    msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::No);
+    msgBox.setWindowModality(Qt::ApplicationModal);
+    int ret = msgBox.exec();
+
+    switch (ret) {
+      case QMessageBox::No:
+          return;
+      case QMessageBox::Cancel:
+          return;
+      default:
+          return;
+    }
+
+    QString dirName = m_pBabyMEG->getDataPath() + "/" + ui->m_qComboBox_ProjectSelection->currentText();
 
     QDir dir(dirName);
 
     bool result = dir.removeRecursively();
 
+
     if(!result)
         qDebug()<<"Could not remove all of the project folder!";
+    else
+        ui->m_qComboBox_ProjectSelection->removeItem(ui->m_qComboBox_ProjectSelection->currentIndex());
 }
 
 
