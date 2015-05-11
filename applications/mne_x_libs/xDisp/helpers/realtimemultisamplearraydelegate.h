@@ -76,6 +76,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Initializes painter path variables to fit number of channels in the model/view.
+    *
+    * @param[in] model     model
+    */
+    void initPainterPaths(const QAbstractTableModel *model);
+
+    //=========================================================================================================
+    /**
     * Use the painter and style option to render the item specified by the item index.
     *
     * (sizeHint() must be implemented also)
@@ -144,11 +152,12 @@ private:
 //    QSettings m_qSettings;
 
     // Scaling
-    float       m_fMaxValue;        /**< Maximum value of the data to plot  */
-    float       m_fScaleY;          /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
-    int         m_iActiveRow;       /**< The current row which the mouse is moved over  */
+    float       m_fMaxValue;        /**< Maximum value of the data to plot.  */
+    float       m_fScaleY;          /**< Maximum amplitude of plot (max is m_dPlotHeight/2). */
+    int         m_iActiveRow;       /**< The current row which the mouse is moved over.  */
 
-    QPoint      m_markerPosition;  /**< Current mouse position used to draw the marker in the plot  */
+    QPoint              m_markerPosition;   /**< Current mouse position used to draw the marker in the plot.  */
+    QList<QPainterPath> m_painterPaths;     /**< List of all current painter paths for each row.  */
 
 };
 
