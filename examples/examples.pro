@@ -52,7 +52,7 @@ SUBDIRS += \
     cancelNoise \
     fiffIO \
     makeLayout\
-    bmtiExample
+    bmtiExample\
 
 contains(MNECPP_CONFIG, withGui) {
 	SUBDIRS +=
