@@ -96,12 +96,15 @@ BabyMEGProjectDialog::BabyMEGProjectDialog(BabyMEG* p_pBabyMEG, QWidget *parent)
     connect(ui->m_qPushButtonNewSubject,&QPushButton::clicked,
                 this,&BabyMEGProjectDialog::addSubject);
 
+    connect(ui->m_qPushButtonDeleteProject,&QPushButton::clicked,
+                this,&BabyMEGProjectDialog::deleteProject);
+
+    connect(ui->m_qPushButtonDeleteSubject,&QPushButton::clicked,
+                this,&BabyMEGProjectDialog::deleteSubject);
+
     ui->m_qLineEditFileName->setReadOnly(true);
 
     updateFileName();
-
-
-
 
 //    QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
 //                                              tr("User name:"), QLineEdit::Normal,
@@ -114,6 +117,36 @@ BabyMEGProjectDialog::BabyMEGProjectDialog(BabyMEG* p_pBabyMEG, QWidget *parent)
 BabyMEGProjectDialog::~BabyMEGProjectDialog()
 {
     delete ui;
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEGProjectDialog::deleteSubject()
+{
+    QString dirName = m_pBabyMEG->getDataPath() + "/" + ui->m_qComboBox_SubjectSelection->currentText();
+
+    QDir dir(dirName);
+
+    bool result = dir.removeRecursively();
+
+    if(!result)
+        qDebug()<<"Could not remove all of the subject folder!";
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEGProjectDialog::deleteProject()
+{
+    QString dirName = m_pBabyMEG->getDataPath() + "/" + ui->m_qComboBox_SubjectSelection->currentText() + "/" + ui->m_qComboBox_ProjectSelection->currentText();
+
+    QDir dir(dirName);
+
+    bool result = dir.removeRecursively();
+
+    if(!result)
+        qDebug()<<"Could not remove all of the project folder!";
 }
 
 

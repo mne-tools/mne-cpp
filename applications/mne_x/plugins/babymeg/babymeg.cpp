@@ -168,6 +168,14 @@ QString BabyMEG::getFilePath(bool currentTime) const
 
 //*************************************************************************************************************
 
+QString BabyMEG::getDataPath() const
+{
+    return m_sBabyMEGDataPath;
+}
+
+
+//*************************************************************************************************************
+
 void BabyMEG::init()
 {
     //BabyMEGData Path
