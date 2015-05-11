@@ -194,7 +194,6 @@ void BabyMEGProjectDialog::deleteProject()
 
         QString dirName = m_pBabyMEG->getDataPath() + "/" + ui->m_qComboBox_ProjectSelection->currentText();
 
-
         QDir dir(dirName);
 
         bool result = dir.removeRecursively();
