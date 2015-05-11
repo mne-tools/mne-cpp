@@ -125,7 +125,7 @@ BabyMEGProjectDialog::~BabyMEGProjectDialog()
 void BabyMEGProjectDialog::deleteSubject()
 {
     QMessageBox msgBox;
-    msgBox.setText("Deleting subject.");
+    msgBox.setText(QString("Deleting subject data '%1'.").arg(ui->m_qComboBox_SubjectSelection->currentText()));
     msgBox.setInformativeText("You are about to delete a subject. Do you want to delete all data corresponding to this subject?");
     msgBox.setIcon(QMessageBox::Warning);
     QPushButton *keepData = msgBox.addButton(tr("Keep data"), QMessageBox::ActionRole);
@@ -138,7 +138,7 @@ void BabyMEGProjectDialog::deleteSubject()
 
     if(msgBox.clickedButton() == deleteData) {
         QMessageBox msgBox;
-        msgBox.setText("Deleting data.");
+        msgBox.setText(QString("Deleting subject data '%1'.").arg(ui->m_qComboBox_SubjectSelection->currentText()));
         msgBox.setInformativeText("Do really want to delete the data permantley? The deleted data cannot be recovered!");
         msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
         msgBox.setDefaultButton(QMessageBox::No);
@@ -168,7 +168,7 @@ void BabyMEGProjectDialog::deleteSubject()
 void BabyMEGProjectDialog::deleteProject()
 {
     QMessageBox msgBox;
-    msgBox.setText("Deleting project.");
+    msgBox.setText(QString("Deleting project data '%1'.").arg(ui->m_qComboBox_ProjectSelection->currentText()));
     msgBox.setInformativeText("You are about to delete a project. Do you want to delete all data corresponding to this project?");
     msgBox.setIcon(QMessageBox::Warning);
     QPushButton *keepData = msgBox.addButton(tr("Keep data"), QMessageBox::ActionRole);
@@ -181,7 +181,7 @@ void BabyMEGProjectDialog::deleteProject()
 
     if(msgBox.clickedButton() == deleteData) {
         QMessageBox msgBox;
-        msgBox.setText("Deleting data.");
+        msgBox.setText(QString("Deleting project data '%1'.").arg(ui->m_qComboBox_ProjectSelection->currentText()));
         msgBox.setInformativeText("Do really want to delete the data permantley? All subject data in this project will be lost! The deleted data cannot be recovered!");
         msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
         msgBox.setDefaultButton(QMessageBox::No);
