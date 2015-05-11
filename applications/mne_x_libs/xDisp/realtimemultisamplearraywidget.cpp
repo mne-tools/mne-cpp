@@ -161,6 +161,10 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
         delete m_pTableView;
     m_pTableView = new QTableView;
 
+    //Install event filter for tracking mouse movements
+    m_pTableView->viewport()->installEventFilter(this);
+    m_pTableView->setMouseTracking(true);
+
     //set vertical layout
     QVBoxLayout *rtmsaLayout = new QVBoxLayout(this);
 
@@ -180,8 +184,7 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
     //
     // Store Settings
     //
-    if(!m_pRTMSA->getName().isEmpty())
-    {
+    if(!m_pRTMSA->getName().isEmpty()) {
         QString t_sRTMSAWName = m_pRTMSA->getName();
 
         QSettings settings;
@@ -256,11 +259,14 @@ void RealTimeMultiSampleArrayWidget::init()
             delete m_pRTMSADelegate;
         m_pRTMSADelegate = new RealTimeMultiSampleArrayDelegate(this);
 
-        connect(m_pTableView, &QTableView::doubleClicked, m_pRTMSAModel,
-                &RealTimeMultiSampleArrayModel::toggleFreeze);
+        connect(m_pTableView, &QTableView::doubleClicked,
+                m_pRTMSAModel, &RealTimeMultiSampleArrayModel::toggleFreeze);
 
         m_pTableView->setModel(m_pRTMSAModel);
         m_pTableView->setItemDelegate(m_pRTMSADelegate);
+
+        connect(this, &RealTimeMultiSampleArrayWidget::markerMoved,
+                m_pRTMSADelegate, &RealTimeMultiSampleArrayDelegate::markerMoved);
 
         //set some size settings for m_pTableView
         m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -458,6 +464,21 @@ void RealTimeMultiSampleArrayWidget::wheelEvent(QWheelEvent* wheelEvent)
 {
     Q_UNUSED(wheelEvent)
 }
+
+
+//*************************************************************************************************************
+
+bool RealTimeMultiSampleArrayWidget::eventFilter(QObject *object, QEvent *event)
+{
+    if (object == m_pTableView->viewport() && event->type() == QEvent::MouseMove) {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+        emit markerMoved(mouseEvent->pos(), m_pTableView->rowAt(mouseEvent->pos().y()));
+        return true;
+    }
+
+    return NewMeasurementWidget::eventFilter(object, event);
+}
+
 
 //*************************************************************************************************************
 
@@ -657,6 +678,9 @@ void RealTimeMultiSampleArrayWidget::showFilterWidget()
         //Init downsampled sampling frequency
         m_fDesiredSamplingRate = m_fSamplingRate/m_pSpinBoxDSFactor->value();
         emit samplingRateChanged(m_fDesiredSamplingRate);
+
+        //As default only use MEG channels for filtering
+        m_pRTMSAModel->applyFilter("MEG");
     }
 
     if(m_pFilterWindow->isActiveWindow())

@@ -44,6 +44,7 @@
 #include <QAbstractItemDelegate>
 #include <QTableView>
 #include <QMap>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -94,31 +95,61 @@ public:
     */
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
+    //=========================================================================================================
+    /**
+    * markerMoved is called whenever user moves the mouse inside of the table view viewport
+    *
+    * @param position   The current mouse position
+    * @param activeRow  The current row which the mouse is moved over
+    */
+    void markerMoved(QPoint position, int activeRow);
+
 private:
     //=========================================================================================================
     /**
     * createPlotPath creates the QPointer path for the data plot.
     *
-    * @param[in] index QModelIndex for accessing associated data and model object.
-    * @param[in,out] path The QPointerPath to create for the data plot.
+    * @param[in] index      Used to locate data in a data model.
+    * @param[in] option     Describes the parameters used to draw an item in a view widget
+    * @param[in,out] path   The QPointerPath to create for the data plot.
+    * @param[in] lastPath   last path for the last data.
+    * @param[in] ellipsePos Position of the ellipse which is plotted at the current channel signal value.
+    * @param[in] amplitude  String which is to be plotted.
+    * @param[in] data       Current data for the given row.
+    * @param[in] lastData   Last data for the given row.
     */
-    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPainterPath& lastPath, QVector<float>& data, QVector<float>& lastData) const;
+    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPainterPath& lastPath, QPointF &ellipsePos, QString &amplitude, QVector<float>& data, QVector<float>& lastData) const;
 
     //=========================================================================================================
     /**
     * createGridPath Creates the QPointer path for the grid plot.
     *
-    * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
-    * @param[in] data The row vector of the data matrix <1 x nsamples>.
+    * @param[in] index      Used to locate data in a data model.
+    * @param[in] option     Describes the parameters used to draw an item in a view widget
+    * @param[in,out] path   The QPointerPath to create for the data plot.
+    * @param[in] data       Data for the given row.
     */
-    void createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<  QVector<float> >& data) const;
+    void createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<QVector<float> >& data) const;
+
+    //=========================================================================================================
+    /**
+    * createMarkerPath Creates the QPointer path for the marker plot.
+    *
+    * @param[in] option     Describes the parameters used to draw an item in a view widget.
+    * @param[in,out] path   The QPointerPath to create for the data plot.
+    */
+    void createMarkerPath(const QStyleOptionViewItem &option, QPainterPath& path) const;
 
     //Settings
 //    QSettings m_qSettings;
 
     // Scaling
-    float m_fMaxValue;     /**< Maximum value of the data to plot  */
-    float m_fScaleY;       /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
+    float       m_fMaxValue;        /**< Maximum value of the data to plot  */
+    float       m_fScaleY;          /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
+    int         m_iActiveRow;       /**< The current row which the mouse is moved over  */
+
+    QPoint      m_markerPosition;  /**< Current mouse position used to draw the marker in the plot  */
+
 };
 
 } // NAMESPACE
