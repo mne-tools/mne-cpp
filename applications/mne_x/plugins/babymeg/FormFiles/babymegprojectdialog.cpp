@@ -126,31 +126,40 @@ void BabyMEGProjectDialog::deleteSubject()
 {
     QMessageBox msgBox;
     msgBox.setText("Deleting subject.");
-    msgBox.setInformativeText("You are about to delete a subject's folder. Do you want to delete all data corresponding to this subject?");
-    msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes | QMessageBox::Cancel);
-    msgBox.setDefaultButton(QMessageBox::No);
-    msgBox.setWindowModality(Qt::ApplicationModal);
-    int ret = msgBox.exec();
+    msgBox.setInformativeText("You are about to delete a subject. Do you want to delete all data corresponding to this subject?");
+    msgBox.setIcon(QMessageBox::Warning);
+    QPushButton *keepData = msgBox.addButton(tr("Keep data"), QMessageBox::ActionRole);
+    QPushButton *deleteData = msgBox.addButton(tr("Delete data"), QMessageBox::ActionRole);
 
-    switch (ret) {
-      case QMessageBox::No:
-          return;
-      case QMessageBox::Cancel:
-          return;
-      default:
-          return;
+    msgBox.exec();
+
+    if(msgBox.clickedButton() == keepData)
+        return;
+
+    if(msgBox.clickedButton() == deleteData) {
+        QMessageBox msgBox;
+        msgBox.setText("Deleting data.");
+        msgBox.setInformativeText("Do really want to delete the data permantley? The deleted data cannot be recovered!");
+        msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
+        msgBox.setDefaultButton(QMessageBox::No);
+        msgBox.setWindowModality(Qt::ApplicationModal);
+        msgBox.setIcon(QMessageBox::Critical);
+        int ret = msgBox.exec();
+
+        if(ret == QMessageBox::No)
+            return;
+
+        QString dirName = m_pBabyMEG->getDataPath() + "/" + ui->m_qComboBox_ProjectSelection->currentText() + "/" + ui->m_qComboBox_SubjectSelection->currentText();
+
+        QDir dir(dirName);
+
+        bool result = dir.removeRecursively();
+
+        if(!result)
+            qDebug()<<"Could not remove all data from the subject folder!";
+        else
+            ui->m_qComboBox_SubjectSelection->removeItem(ui->m_qComboBox_SubjectSelection->currentIndex());
     }
-
-    QString dirName = m_pBabyMEG->getDataPath() + "/" + ui->m_qComboBox_ProjectSelection->currentText() + "/" + ui->m_qComboBox_SubjectSelection->currentText();
-
-    QDir dir(dirName);
-
-    bool result = dir.removeRecursively();
-
-    if(!result)
-        qDebug()<<"Could not remove all of the subject folder!";
-    else
-        ui->m_qComboBox_SubjectSelection->removeItem(ui->m_qComboBox_SubjectSelection->currentIndex());
 }
 
 
@@ -160,32 +169,41 @@ void BabyMEGProjectDialog::deleteProject()
 {
     QMessageBox msgBox;
     msgBox.setText("Deleting project.");
-    msgBox.setInformativeText("You are about to delete a project folder. Do you want to delete all data corresponding to this project?");
-    msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes | QMessageBox::Cancel);
-    msgBox.setDefaultButton(QMessageBox::No);
-    msgBox.setWindowModality(Qt::ApplicationModal);
-    int ret = msgBox.exec();
+    msgBox.setInformativeText("You are about to delete a project. Do you want to delete all data corresponding to this project?");
+    msgBox.setIcon(QMessageBox::Warning);
+    QPushButton *keepData = msgBox.addButton(tr("Keep data"), QMessageBox::ActionRole);
+    QPushButton *deleteData = msgBox.addButton(tr("Delete data"), QMessageBox::ActionRole);
 
-    switch (ret) {
-      case QMessageBox::No:
-          return;
-      case QMessageBox::Cancel:
-          return;
-      default:
-          return;
+    msgBox.exec();
+
+    if(msgBox.clickedButton() == keepData)
+        return;
+
+    if(msgBox.clickedButton() == deleteData) {
+        QMessageBox msgBox;
+        msgBox.setText("Deleting data.");
+        msgBox.setInformativeText("Do really want to delete the data permantley? All subject data in this project will be lost! The deleted data cannot be recovered!");
+        msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
+        msgBox.setDefaultButton(QMessageBox::No);
+        msgBox.setWindowModality(Qt::ApplicationModal);
+        msgBox.setIcon(QMessageBox::Critical);
+        int ret = msgBox.exec();
+
+        if(ret == QMessageBox::No)
+            return;
+
+        QString dirName = m_pBabyMEG->getDataPath() + "/" + ui->m_qComboBox_ProjectSelection->currentText();
+
+
+        QDir dir(dirName);
+
+        bool result = dir.removeRecursively();
+
+        if(!result)
+            qDebug()<<"Could not remove all data from the project folder!";
+        else
+            ui->m_qComboBox_ProjectSelection->removeItem(ui->m_qComboBox_ProjectSelection->currentIndex());
     }
-
-    QString dirName = m_pBabyMEG->getDataPath() + "/" + ui->m_qComboBox_ProjectSelection->currentText();
-
-    QDir dir(dirName);
-
-    bool result = dir.removeRecursively();
-
-
-    if(!result)
-        qDebug()<<"Could not remove all of the project folder!";
-    else
-        ui->m_qComboBox_ProjectSelection->removeItem(ui->m_qComboBox_ProjectSelection->currentIndex());
 }
 
 
