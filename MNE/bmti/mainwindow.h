@@ -65,9 +65,11 @@
 //=============================================================================================================
 // DEFINE NAMESPACE BMTILIB
 //=============================================================================================================
-namespace Ui {class MainWindow;}
+
+namespace Ui {class MainWindow;} //This must be defined outside of the BMTILIB namespace
 
 namespace BMTILIB {
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -83,7 +85,7 @@ class BMTISHARED_EXPORT MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = 0);
+    MainWindow(QWidget *pParent = 0);
     ~MainWindow();
 
 private:

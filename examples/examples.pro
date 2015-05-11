@@ -54,6 +54,7 @@ SUBDIRS += \
     makeLayout \
     bmtiExample \
     mghIO \
+    mriTestViewer
 
 contains(MNECPP_CONFIG, withGui) {
 	SUBDIRS +=
