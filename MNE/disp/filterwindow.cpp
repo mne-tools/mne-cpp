@@ -104,6 +104,9 @@ void FilterWindow::setFiffInfo(const FiffInfo &fiffInfo)
     ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
     ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
 
+    ui->m_doubleSpinBox_highpass->setValue(nyquistFrequency/3);
+    ui->m_doubleSpinBox_lowpass->setValue(nyquistFrequency/2);
+
     updateFilterPlot();
 }
 
@@ -123,6 +126,12 @@ void FilterWindow::setWindowSize(int iWindowSize)
 void FilterWindow::setSamplingRate(double dSamplingRate)
 {
     m_dSFreq = dSamplingRate;
+
+    if(ui->m_doubleSpinBox_highpass->value()>m_dSFreq/2)
+        ui->m_doubleSpinBox_highpass->setValue(m_dSFreq/2);
+
+    if(ui->m_doubleSpinBox_lowpass->value()>m_dSFreq/2)
+        ui->m_doubleSpinBox_lowpass->setValue(m_dSFreq/2);
 
     filterParametersChanged();
 }
