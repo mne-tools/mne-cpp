@@ -262,10 +262,10 @@ void FilterWindow::initMVC()
 void FilterWindow::initFilters()
 {
     //Init filter data model with all default filters located in the resource directory
-    m_lDefaultFilters << "NOTCH_60Hz_Fs1kHz"
-                   << "NOTCH_50Hz_Fs1kHz"
-                   << "BP_1Hz_70Hz_Fs1kHz"
-                   << "BP_1Hz_40Hz_Fs1kHz";
+//    m_lDefaultFilters << "NOTCH_60Hz_Fs1kHz"
+//                   << "NOTCH_50Hz_Fs1kHz"
+//                   << "BP_1Hz_70Hz_Fs1kHz"
+//                   << "BP_1Hz_40Hz_Fs1kHz";
 
     for(int i = 0; i<m_lDefaultFilters.size(); i++) {
         FilterData tmpFilter;
