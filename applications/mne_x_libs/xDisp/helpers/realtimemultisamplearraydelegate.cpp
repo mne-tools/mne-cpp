@@ -286,12 +286,12 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 painter->setRenderHint(QPainter::Antialiasing, false);
 
                 //Plot marker                
-                createMarkerPath(option, path);
+//                createMarkerPath(option, path);
 
-                painter->save();
-                painter->setPen(m_penMarker);
-                painter->drawPath(path);
-                painter->restore();
+//                painter->save();
+//                painter->setPen(m_penMarker);
+//                painter->drawPath(path);
+//                painter->restore();
 
                 //Plot grid
                 createGridPath(index, option, path, data);
@@ -353,16 +353,16 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 painter->restore();
 
                 //Plot ellipse and amplitude next to marker mouse posistion
-                if(m_iActiveRow == index.row()) {
-                    painter->save();
-                    painter->drawEllipse(ellipsePos,2,2);
-                    painter->restore();
+//                if(m_iActiveRow == index.row()) {
+//                    painter->save();
+//                    painter->drawEllipse(ellipsePos,2,2);
+//                    painter->restore();
 
-                    painter->save();
-                    painter->drawText(m_markerPosition, amplitude);
-                    painter->drawEllipse(ellipsePos,2,2);
-                    painter->restore();
-                }
+//                    painter->save();
+//                    painter->drawText(m_markerPosition, amplitude);
+//                    painter->drawEllipse(ellipsePos,2,2);
+//                    painter->restore();
+//                }
             }
             break;
         }
