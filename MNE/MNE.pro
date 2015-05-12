@@ -46,12 +46,14 @@ SUBDIRS += \
     inverse \
     rtCommand \
     rtClient \
+    rtInv \
     bmti \
     mgh \
 
 contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += disp
 
+    qtHaveModule(3d) {
         message(Qt3D available: disp3D library configured!)
         SUBDIRS += disp3D \
                    #disp3DNew #Uncomment this if you have Qt3D 2.0 compiled
