@@ -308,12 +308,12 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
                 QPainterPath lastPath(QPointF(option.rect.x(),option.rect.y()));
 
-                QTime timer;
+                //QTime timer;
 
-                timer.start();
+                //timer.start();
                 createPlotPath(index, option, path, lastPath, ellipsePos, amplitude, data[0], data[1]);
-                int timeMS = timer.elapsed();
-                std::cout<<"Time createPlotPath"<<timeMS<<std::endl;
+                //int timeMS = timer.elapsed();
+                //std::cout<<"Time createPlotPath"<<timeMS<<std::endl;
 
                 painter->setRenderHint(QPainter::Antialiasing, true);
                 painter->save();
@@ -331,10 +331,10 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                         painter->setPen(m_penNormal);
                 }
 
-                timer.start();
+                //timer.start();
                 painter->drawPath(path);
-                timeMS = timer.elapsed();
-                std::cout<<"Time drawPath Current data"<<timeMS<<std::endl;
+                //timeMS = timer.elapsed();
+                //std::cout<<"Time drawPath Current data"<<timeMS<<std::endl;
 
                 painter->restore();
 
@@ -345,11 +345,11 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 else
                     painter->setPen(QPen(t_pModel->isFreezed() ? Qt::darkGray : Qt::darkBlue, 1, Qt::SolidLine));
 
-                timer.start();
+                //timer.start();
                 painter->drawPath(lastPath);
-                timeMS = timer.elapsed();
-                std::cout<<"Time drawPath last data"<<timeMS<<std::endl;
-                std::cout<<std::endl<<std::endl;
+                //timeMS = timer.elapsed();
+                //std::cout<<"Time drawPath last data"<<timeMS<<std::endl;
+                //std::cout<<std::endl<<std::endl;
                 painter->restore();
 
                 //Plot ellipse and amplitude next to marker mouse posistion
