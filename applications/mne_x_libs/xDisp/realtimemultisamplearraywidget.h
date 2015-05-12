@@ -398,6 +398,7 @@ private:
 
     QStringList     m_slSelectedChannels;                               /**< the currently selected channels from the selection manager window. */
     QList<qint32>   m_qListCurrentSelection;                            /**< Current selection list -> hack around C++11 lambda  */
+    QList<qint32>   m_qListBadChannels;                                 /**< Current list of bad channels  */
     QList<RealTimeSampleArrayChInfo> m_qListChInfo;                     /**< Channel info list. ToDo: check if this is obsolete later on -> ToDo use fiff Info instead*/
     QMap< qint32,float > m_qMapChScaling;                               /**< Sensor selection widget. */
 

@@ -352,6 +352,12 @@ void RealTimeMultiSampleArrayWidget::init()
             m_pActionChScaling->setVisible(true);
         }
 
+        //Init bad channel list
+        m_qListBadChannels.clear();
+        for(int i = 0; i<m_pRTMSAModel->rowCount(); i++)
+            if(m_pRTMSAModel->data(m_pRTMSAModel->index(i,2)).toBool())
+                m_qListBadChannels << i;
+
         m_bInitialized = true;
     }
 }
@@ -523,7 +529,7 @@ void RealTimeMultiSampleArrayWidget::applySelection()
     //Hide non selected channels/rows in the data views
     for(int i = 0; i<m_pRTMSAModel->rowCount(); i++) {
         //if channel is a bad channel and bad channels are to be hidden -> do not show
-        if(m_qListCurrentSelection.contains(i) /*&& m_bHideBadChannels*/)
+        if(m_qListCurrentSelection.contains(i))
             m_pTableView->showRow(i);
         else
             m_pTableView->hideRow(i);
@@ -547,13 +553,16 @@ void RealTimeMultiSampleArrayWidget::hideSelection()
 void RealTimeMultiSampleArrayWidget::resetSelection()
 {
     // non C++11 alternative
-    m_qListCurrentSelection.clear();
     for(qint32 i = 0; i < m_qListChInfo.size(); ++i) {
-        m_qListCurrentSelection.append(i);
-        m_pTableView->showRow(i);
+        if(m_qListBadChannels.contains(i)) {
+            if(!m_bHideBadChannels) {
+                m_pTableView->showRow(i);
+            }
+        }
+        else {
+            m_pTableView->showRow(i);
+        }
     }
-
-    applySelection();
 }
 
 
@@ -566,16 +575,12 @@ void RealTimeMultiSampleArrayWidget::showSelectedChannelsOnly(QStringList select
     //Hide non selected channels/rows in the data views
     for(int i = 0; i<m_pRTMSAModel->rowCount(); i++) {
         QString channel = m_pRTMSAModel->data(m_pRTMSAModel->index(i, 0), Qt::DisplayRole).toString();
-        QVariant v = m_pRTMSAModel->data(m_pRTMSAModel->index(i,1), Qt::BackgroundRole);
 
-        if(!selectedChannels.contains(channel))
+        //if channel is a bad channel and bad channels are to be hidden -> do not show
+        if(!selectedChannels.contains(channel) || (m_qListBadChannels.contains(i) && m_bHideBadChannels))
             m_pTableView->hideRow(i);
         else
             m_pTableView->showRow(i);
-
-        //if channel is a bad channel and bad channels are to be hidden -> do not show
-        if(v.canConvert<QBrush>() && m_bHideBadChannels)
-            m_pTableView->hideRow(i);
     }
 }
 
@@ -598,11 +603,11 @@ void RealTimeMultiSampleArrayWidget::hideBadChannels()
     }
 
     //Hide non selected channels/rows in the data views
-    for(int i = 0; i<m_pRTMSAModel->rowCount(); i++) {
-        if(m_pRTMSAModel->data(m_pRTMSAModel->index(i,2)).toBool() && m_bHideBadChannels)
-            m_pTableView->hideRow(i);
+    for(int i = 0; i<m_qListBadChannels.size(); i++) {
+        if(m_bHideBadChannels)
+            m_pTableView->hideRow(m_qListBadChannels.at(i));
         else
-            m_pTableView->showRow(i);
+            m_pTableView->showRow(m_qListBadChannels.at(i));
     }
 }
 
