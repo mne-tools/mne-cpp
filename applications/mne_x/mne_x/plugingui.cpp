@@ -105,6 +105,7 @@ PluginGui::PluginGui(PluginManager *pPluginManager, PluginSceneManager *pPluginS
     m_pGraphicsView = new QGraphicsView(m_pPluginScene);
 
     setCentralWidget(m_pGraphicsView);
+
     setWindowTitle(tr("PluginScene"));
     setUnifiedTitleAndToolBarOnMac(true);
 
@@ -234,6 +235,7 @@ void PluginGui::loadConfig(const QString& sPath, const QString& sFileName)
                     m_pPluginScene->setActionPluginItem(pCurrentAction);
                     m_pPluginScene->setMode(PluginScene::InsertPluginItem);
                     m_pPluginScene->insertItem(pos);
+                    m_pGraphicsView->ensureVisible(m_pPluginScene->sceneRect());
                 }
             }
         }
