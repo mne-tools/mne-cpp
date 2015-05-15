@@ -381,20 +381,20 @@ private:
     qint32  m_iMaxSamples;          /**< Max samples per window */
     qint32  m_iCurrentSample;       /**< Accurate Downsampling */
 
-    FiffInfo::SPtr          m_pFiffInfo;            /**< Fiff info */
+    FiffInfo::SPtr          m_pFiffInfo;                        /**< Fiff info */
 
-    RowVectorXi             m_vecBadIdcs;           /**< Idcs of bad channels */
-    MatrixXd                m_matProj;              /**< SSP projector */
-    SparseMatrix<double>    m_matSparseProj;        /**< Sparse SSP projector */
+    RowVectorXi             m_vecBadIdcs;                       /**< Idcs of bad channels */
+    MatrixXd                m_matProj;                          /**< SSP projector */
+    SparseMatrix<double>    m_matSparseProj;                    /**< Sparse SSP projector */
 
-    QVector<VectorXd> m_dataCurrent;                /**< List that holds the current data*/
-    QVector<VectorXd> m_dataFilteredCurrent;        /**< List that holds the current filtered data */
-    QVector<VectorXd> m_dataLast;                   /**< List that holds the last data */
-    QVector<VectorXd> m_dataFilteredLast;           /**< List that holds the last filtered data */
-    QVector<VectorXd> m_dataCurrentFreeze;          /**< List that holds the current data when freezed*/
-    QVector<VectorXd> m_dataFilteredCurrentFreeze;  /**< List that holds the current filtered data when freezed*/
-    QVector<VectorXd> m_dataLastFreeze;             /**< List that holds the last data when freezed*/
-    QVector<VectorXd> m_dataFilteredLastFreeze;     /**< List that holds the last filtered data when freezed*/
+    QVector<VectorXd>       m_dataCurrent;                      /**< List that holds the current data*/
+    QVector<VectorXd>       m_dataFilteredCurrent;              /**< List that holds the current filtered data */
+    QVector<VectorXd>       m_dataLast;                         /**< List that holds the last data */
+    QVector<VectorXd>       m_dataFilteredLast;                 /**< List that holds the last filtered data */
+    QVector<VectorXd>       m_dataCurrentFreeze;                /**< List that holds the current data when freezed*/
+    QVector<VectorXd>       m_dataFilteredCurrentFreeze;        /**< List that holds the current filtered data when freezed*/
+    QVector<VectorXd>       m_dataLastFreeze;                   /**< List that holds the last data when freezed*/
+    QVector<VectorXd>       m_dataFilteredLastFreeze;           /**< List that holds the last filtered data when freezed*/
 
     QMap< qint32,float>                 m_qMapChScaling;        /**< Sensor selection widget. */
     QList<FilterData>                   m_filterData;           /**< List of currently active filters. */

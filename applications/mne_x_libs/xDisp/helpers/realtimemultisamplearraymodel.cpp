@@ -297,18 +297,21 @@ void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T, float dest
 {
     beginResetModel();
 
+    int dsFactor;
     if(sps > dest_sps)
-        m_iDownsampling = (qint32)ceil(sps/dest_sps);
+        dsFactor = (qint32)ceil(sps/dest_sps);
     else
-        m_iDownsampling = 1;
+        dsFactor = 1;
 
+    //Clear already saved data because it was measured with a different sampling rate
+    if(dsFactor != m_iDownsampling)
+        clearModel();
+
+    m_iDownsampling = dsFactor;
     m_iT = T;
 
     float maxSamples = sps * T;
     m_iMaxSamples = (qint32)ceil(maxSamples/(m_iDownsampling)); // Max Samples / Downsampling
-
-    //Clear already saved data because it was measured with a different sampling rate
-    clearModel();
 
     endResetModel();
 }
