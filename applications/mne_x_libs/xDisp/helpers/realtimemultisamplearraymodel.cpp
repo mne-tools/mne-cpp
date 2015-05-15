@@ -398,7 +398,7 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
         filterChannelsConcurrently(false);
 
     //ToDo separate worker thread? ToDo 2000 -> size of screen
-    if(m_dataCurrent.size() > m_iMaxSamples) {
+    if(m_dataCurrent.size() >= m_iMaxSamples) {
         m_dataLast = m_dataCurrent.mid(0,m_iMaxSamples); // Store last data to keep as background in the display
 //        m_dataCurrent.remove(0, m_iMaxSamples);
         m_dataCurrent.clear();
