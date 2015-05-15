@@ -339,6 +339,12 @@ private:
 
     //=========================================================================================================
     /**
+    * Clears the model
+    */
+    void clearModel();
+
+    //=========================================================================================================
+    /**
     * Undo filters from channels
     *
     * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)

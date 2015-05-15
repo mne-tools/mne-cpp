@@ -307,7 +307,8 @@ void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T, float dest
     float maxSamples = sps * T;
     m_iMaxSamples = (qint32)ceil(maxSamples/(m_iDownsampling)); // Max Samples / Downsampling
 
-//    createDefaultFilter();
+    //Clear already saved data because it was measured with a different sampling rate
+    clearModel();
 
     endResetModel();
 }
@@ -737,3 +738,24 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(bool filterLastDa
 //    m_filterData.append(defaultFilter);
 //}
 
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::clearModel()
+{
+    beginResetModel();
+
+    m_dataCurrent.clear();
+    m_dataFilteredCurrent.clear();
+    m_dataLast.clear();
+    m_dataFilteredLast.clear();
+    m_dataCurrentFreeze.clear();
+    m_dataFilteredCurrentFreeze.clear();
+    m_dataLastFreeze.clear();
+    m_dataFilteredLastFreeze.clear();
+
+    endResetModel();
+
+    qDebug("RealTimeMultiSampleArrayModel cleared.");
+
+}
