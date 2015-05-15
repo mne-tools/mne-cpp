@@ -237,7 +237,7 @@ void BabyMEG::initConnector()
         m_pRTMSABabyMEG->data()->setName(this->getName());//Provide name to auto store widget settings
 
         m_pRTMSABabyMEG->data()->initFromFiffInfo(m_pFiffInfo);
-        m_pRTMSABabyMEG->data()->setMultiArraySize(2);
+        m_pRTMSABabyMEG->data()->setMultiArraySize(1);
 
         m_pRTMSABabyMEG->data()->setSamplingRate(m_pFiffInfo->sfreq);
 
