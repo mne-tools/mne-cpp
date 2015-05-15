@@ -396,13 +396,15 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
     //ToDo separate worker thread? ToDo 2000 -> size of screen
     if(m_dataCurrent.size() > m_iMaxSamples) {
         m_dataLast = m_dataCurrent.mid(0,m_iMaxSamples); // Store last data to keep as background in the display
-        m_dataCurrent.remove(0, m_iMaxSamples);
+//        m_dataCurrent.remove(0, m_iMaxSamples);
+        m_dataCurrent.clear();
 
         //If max data for display has been reached -> calculate filtered version even if fitlering is deactivated.
         //This way the last filtered data drawn in the background are always up to date.
         filterChannelsConcurrently(true);
         m_dataFilteredLast = m_dataFilteredCurrent.mid(0,m_iMaxSamples); // Store last data to keep as background in the display
-        m_dataFilteredCurrent.remove(0, m_iMaxSamples);
+//        m_dataFilteredCurrent.remove(0, m_iMaxSamples);
+        m_dataFilteredCurrent.clear();
     }
 
     //Update data content
