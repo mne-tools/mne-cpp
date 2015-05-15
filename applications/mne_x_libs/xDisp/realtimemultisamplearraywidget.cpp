@@ -110,7 +110,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 
     m_pSpinBoxTimeScale = new QSpinBox(this);
     m_pSpinBoxTimeScale->setMinimum(1);
-    m_pSpinBoxTimeScale->setMaximum(20);
+    m_pSpinBoxTimeScale->setMaximum(10);
     m_pSpinBoxTimeScale->setValue(m_iT);
     m_pSpinBoxTimeScale->setSuffix(" s");
     m_pSpinBoxTimeScale->setToolTip(tr("Time window length"));
