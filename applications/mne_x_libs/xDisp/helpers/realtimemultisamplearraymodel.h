@@ -381,6 +381,8 @@ private:
     qint32  m_iMaxSamples;          /**< Max samples per window */
     qint32  m_iCurrentSample;       /**< Accurate Downsampling */
 
+    QString m_sFilterChannelType;   /**< Kind of channel which is to be filtered */
+
     FiffInfo::SPtr          m_pFiffInfo;                        /**< Fiff info */
 
     RowVectorXi             m_vecBadIdcs;                       /**< Idcs of bad channels */
