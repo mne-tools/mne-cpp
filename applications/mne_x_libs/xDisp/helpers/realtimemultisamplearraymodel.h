@@ -301,19 +301,27 @@ public:
 
     //=========================================================================================================
     /**
-    * Apply filters to channels
-    *
-    * @param[in] activate    flag used to turn on or off filters
-    */
-    void applyFilter(QString channelType);
-
-    //=========================================================================================================
-    /**
     * Filter parameters changed
     *
     * @param[in] filterData    list of the currently active filter
     */
     void filterChanged(QList<FilterData> filterData);
+
+    //=========================================================================================================
+    /**
+    * Create list of channels which are to be filtered based on channel type
+    *
+    * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
+    */
+    void createFilterChannelList(QString channelType);
+
+    //=========================================================================================================
+    /**
+    * Create list of channels which are to be filtered based on channel names
+    *
+    * @param[in] channelNames    the channel names which are to be filtered
+    */
+    void createFilterChannelList(QStringList channelNames);
 
 signals:
     //=========================================================================================================
@@ -342,14 +350,6 @@ private:
     * Clears the model
     */
     void clearModel();
-
-    //=========================================================================================================
-    /**
-    * Undo filters from channels
-    *
-    * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
-    */
-    void createFilterChannelList(QString channelType);
 
     //=========================================================================================================
     /**
