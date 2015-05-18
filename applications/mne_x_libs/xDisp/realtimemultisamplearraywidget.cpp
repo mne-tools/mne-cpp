@@ -106,6 +106,9 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     m_pDoubleSpinBoxZoom->setStatusTip(tr("Row height"));
     connect(m_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &RealTimeMultiSampleArrayWidget::zoomChanged);
+    connect(m_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &RealTimeMultiSampleArrayWidget::visibleRowsChanged);
+
     addDisplayWidget(m_pDoubleSpinBoxZoom);
 
     m_pSpinBoxTimeScale = new QSpinBox(this);
@@ -289,7 +292,7 @@ void RealTimeMultiSampleArrayWidget::init()
         m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 
         connect(m_pTableView->verticalScrollBar(), &QScrollBar::valueChanged,
-                this, &RealTimeMultiSampleArrayWidget::viewableRowsChanged);
+                this, &RealTimeMultiSampleArrayWidget::visibleRowsChanged);
 
         //set context menu
         m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -738,7 +741,7 @@ void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayWidget::viewableRowsChanged(int value)
+void RealTimeMultiSampleArrayWidget::visibleRowsChanged(int value)
 {
     Q_UNUSED(value);
     //std::cout <<"Visible channels: "<< m_pTableView->rowAt(0) << "-" << m_pTableView->rowAt(m_pTableView->height())<<std::endl;

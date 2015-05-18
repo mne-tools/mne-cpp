@@ -605,13 +605,15 @@ void RealTimeMultiSampleArrayModel::createFilterChannelList(QString channelType)
 {
     m_filterChannelList.clear();
 
+    m_sFilterChannelType = channelType;
+
     for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
         if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
             m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
             m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH) && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-            if(channelType == "All")
+            if(m_sFilterChannelType == "All")
                 m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
-            else if(m_pFiffInfo->chs.at(i).ch_name.contains(channelType))
+            else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType))
                 m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
         }
     }
@@ -625,8 +627,14 @@ void RealTimeMultiSampleArrayModel::createFilterChannelList(QStringList channelN
     m_filterChannelList.clear();
 
     for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
-        if(channelNames.contains(m_pFiffInfo->chs.at(i).ch_name))
+        if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
+            m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
+            m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH) && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
+            if(m_sFilterChannelType == "All" && channelNames.contains(m_pFiffInfo->chs.at(i).ch_name))
                 m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
+            else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType) && channelNames.contains(m_pFiffInfo->chs.at(i).ch_name))
+                m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
+        }
     }
 }
 

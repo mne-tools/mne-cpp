@@ -389,7 +389,7 @@ private:
     /**
     * Gets called when the views in the viewport of the table view change
     */
-    void viewableRowsChanged(int value);
+    void visibleRowsChanged(int value);
 
     RealTimeMultiSampleArrayModel*      m_pRTMSAModel;                  /**< RTMSA data model */
     RealTimeMultiSampleArrayDelegate*   m_pRTMSADelegate;               /**< RTMSA data delegate */
