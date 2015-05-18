@@ -355,7 +355,7 @@ private:
     /**
     * Calculates the filtered version of the channels in dataTime
     */
-    void filterChannelsConcurrently(bool filterLastDataTime = false);
+    void filterChannelsConcurrently();
 
     //=========================================================================================================
     /**
