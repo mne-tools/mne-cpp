@@ -93,18 +93,7 @@ BabyMEG::BabyMEG()
 //    m_pActionSetupProject->setShortcut(tr("F12"));
     m_pActionSetupProject->setStatusTip(tr("Setup Project"));
     connect(m_pActionSetupProject, &QAction::triggered, this, &BabyMEG::showProjectDialog);
-    addPluginAction(m_pActionSetupProject);
-
-    m_pActionUpdateFiffInfo = new QAction(QIcon(":/images/latestFiffInfo.png"), tr("Update Fiff Info"),this);
-    m_pActionUpdateFiffInfo->setStatusTip(tr("Update Fiff Info"));
-    connect(m_pActionUpdateFiffInfo, &QAction::triggered, this, &BabyMEG::UpdateFiffInfo);
-    addPluginAction(m_pActionUpdateFiffInfo);
-
-    m_pActionUpdateFiffInfoForHPI = new QAction(QIcon(":/images/latestFiffInfoHPI.png"), tr("Update HPI to Fiff Info"),this);
-    m_pActionUpdateFiffInfoForHPI->setStatusTip(tr("Update HPI to Fiff Info"));
-    connect(m_pActionUpdateFiffInfoForHPI, &QAction::triggered, this, &BabyMEG::SetFiffInfoForHPI);
-    addPluginAction(m_pActionUpdateFiffInfoForHPI);
-
+    addPluginAction(m_pActionSetupProject);    
 
     m_pActionRecordFile = new QAction(QIcon(":/images/record.png"), tr("Start Recording"),this);
     m_pActionRecordFile->setStatusTip(tr("Start Recording"));
@@ -119,6 +108,15 @@ BabyMEG::BabyMEG()
     connect(m_pActionSqdCtrl, &QAction::triggered, this, &BabyMEG::showSqdCtrlDialog);
     addPluginAction(m_pActionSqdCtrl);
 
+    m_pActionUpdateFiffInfo = new QAction(QIcon(":/images/latestFiffInfo.png"), tr("Update Fiff Info"),this);
+    m_pActionUpdateFiffInfo->setStatusTip(tr("Update Fiff Info"));
+    connect(m_pActionUpdateFiffInfo, &QAction::triggered, this, &BabyMEG::UpdateFiffInfo);
+    addPluginAction(m_pActionUpdateFiffInfo);
+
+    m_pActionUpdateFiffInfoForHPI = new QAction(QIcon(":/images/latestFiffInfoHPI.png"), tr("Update HPI to Fiff Info"),this);
+    m_pActionUpdateFiffInfoForHPI->setStatusTip(tr("Update HPI to Fiff Info"));
+    connect(m_pActionUpdateFiffInfoForHPI, &QAction::triggered, this, &BabyMEG::SetFiffInfoForHPI);
+    addPluginAction(m_pActionUpdateFiffInfoForHPI);
 }
 
 
