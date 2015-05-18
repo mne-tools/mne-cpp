@@ -395,7 +395,7 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
 
     //Filter current data concurrently
     if(!m_filterData.isEmpty())
-        filterChannelsConcurrently(false);
+        filterChannelsConcurrently();
 
     //ToDo separate worker thread? ToDo 2000 -> size of screen
     if(m_dataCurrent.size() >= m_iMaxSamples) {
@@ -405,7 +405,6 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
 
         //If max data for display has been reached -> calculate filtered version even if fitlering is deactivated.
         //This way the last filtered data drawn in the background are always up to date.
-        filterChannelsConcurrently(true);
         m_dataFilteredLast = m_dataFilteredCurrent.mid(0,m_iMaxSamples); // Store last data to keep as background in the display
 //        m_dataFilteredCurrent.remove(0, m_iMaxSamples);
         m_dataFilteredCurrent.clear();
@@ -639,7 +638,7 @@ void doFilterPerChannel(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channe
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(bool filterLastDataTime)
+void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
 {
     //std::cout<<"START RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
 
@@ -655,16 +654,12 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(bool filterLastDa
         if(m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name)) {
             RowVectorXd data;
 
-            if(filterLastDataTime && matDataLast.rows()!=0)
-                data = matDataLast.row(i);
+            if(matDataLast.rows() == 0) //if no m_dataLast has been set yet
+                data = matDataCurrent.row(i);
             else {
-                if(matDataLast.rows() == 0) //if no m_dataLast has been set yet
-                    data = matDataCurrent.row(i);
-                else {
-                    RowVectorXd temp (matDataLast.cols()+matDataCurrent.cols());
-                    temp << matDataLast.row(i), matDataCurrent.row(i);
-                    data = temp;
-                }
+                RowVectorXd temp (matDataLast.cols()+matDataCurrent.cols());
+                temp << matDataLast.row(i), matDataCurrent.row(i);
+                data = temp;
             }
 
             timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,data)));
@@ -681,17 +676,10 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(bool filterLastDa
         // Restructure list to old QVector structure in global m_dataFilteredCurrent variabel
         VectorXd colVector(matDataCurrent.rows());
 
-        int r = matDataLast.cols();
-        if(filterLastDataTime)
-            r = 0;
-
         int colCount = 0;
 
-        for(r; r<timeData.first().second.second.cols(); r++) {
-            if(filterLastDataTime)
-                colVector = matDataLast.col(colCount);
-            else
-                colVector = matDataCurrent.col(colCount);
+        for(int r = matDataLast.cols(); r<timeData.first().second.second.cols(); r++) {
+            colVector = matDataCurrent.col(colCount);
 
             colCount++;
 
