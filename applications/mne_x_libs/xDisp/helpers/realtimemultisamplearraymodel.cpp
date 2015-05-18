@@ -593,14 +593,6 @@ void RealTimeMultiSampleArrayModel::updateProjection()
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::applyFilter(QString channelType)
-{
-    createFilterChannelList(channelType);
-}
-
-
-//*************************************************************************************************************
-
 void RealTimeMultiSampleArrayModel::filterChanged(QList<FilterData> filterData)
 {
     m_filterData = filterData;
@@ -622,6 +614,19 @@ void RealTimeMultiSampleArrayModel::createFilterChannelList(QString channelType)
             else if(m_pFiffInfo->chs.at(i).ch_name.contains(channelType))
                 m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
         }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::createFilterChannelList(QStringList channelNames)
+{
+    m_filterChannelList.clear();
+
+    for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
+        if(channelNames.contains(m_pFiffInfo->chs.at(i).ch_name))
+                m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
     }
 }
 

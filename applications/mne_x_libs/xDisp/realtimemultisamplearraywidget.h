@@ -92,6 +92,7 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <QScroller>
+#include <QScrollBar>
 #include <QDebug>
 
 //*************************************************************************************************************
@@ -383,6 +384,12 @@ private:
     * Shows sensor selection widget
     */
     void showSensorSelectionWidget();
+
+    //=========================================================================================================
+    /**
+    * Gets called when the views in the viewport of the table view change
+    */
+    void viewableRowsChanged(int value);
 
     RealTimeMultiSampleArrayModel*      m_pRTMSAModel;                  /**< RTMSA data model */
     RealTimeMultiSampleArrayDelegate*   m_pRTMSADelegate;               /**< RTMSA data delegate */

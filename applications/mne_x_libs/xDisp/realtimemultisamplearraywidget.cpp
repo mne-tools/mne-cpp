@@ -288,6 +288,9 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 
+        connect(m_pTableView->verticalScrollBar(), &QScrollBar::valueChanged,
+                this, &RealTimeMultiSampleArrayWidget::viewableRowsChanged);
+
         //set context menu
         m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
         connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),
@@ -674,8 +677,8 @@ void RealTimeMultiSampleArrayWidget::showFilterWidget()
         m_pFilterWindow->setFiffInfo(*m_pFiffInfo.data());
         m_pFilterWindow->setWindowSize(m_pRTMSAModel->getMaxSamples());
 
-        connect(m_pFilterWindow.data(), &FilterWindow::applyFilter,
-                m_pRTMSAModel, &RealTimeMultiSampleArrayModel::applyFilter);
+        connect(m_pFilterWindow.data(),static_cast<void (FilterWindow::*)(QString)>(&FilterWindow::applyFilter),
+                    m_pRTMSAModel,static_cast<void (RealTimeMultiSampleArrayModel::*)(QString)>(&RealTimeMultiSampleArrayModel::createFilterChannelList));
 
         connect(m_pFilterWindow.data(), &FilterWindow::filterChanged,
                 m_pRTMSAModel, &RealTimeMultiSampleArrayModel::filterChanged);
@@ -688,7 +691,7 @@ void RealTimeMultiSampleArrayWidget::showFilterWidget()
         emit samplingRateChanged(m_fDesiredSamplingRate);
 
         //As default only use MEG channels for filtering
-        m_pRTMSAModel->applyFilter("MEG");
+        m_pRTMSAModel->createFilterChannelList("MEG");
     }
 
     if(m_pFilterWindow->isActiveWindow())
@@ -730,5 +733,34 @@ void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
         m_pSelectionManagerWindow->activateWindow();
         m_pSelectionManagerWindow->show();
     }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayWidget::viewableRowsChanged(int value)
+{
+    Q_UNUSED(value);
+    //std::cout <<"Visible channels: "<< m_pTableView->rowAt(0) << "-" << m_pTableView->rowAt(m_pTableView->height())<<std::endl;
+
+    int from = m_pTableView->rowAt(0);
+    if(from != 0)
+        from--;
+
+    int to = m_pTableView->rowAt(m_pTableView->height()-1);
+    if(to != m_pRTMSAModel->rowCount()-1)
+        to++;
+
+    if(from > to)
+        to = m_pRTMSAModel->rowCount()-1;
+
+    QStringList channelNames;
+
+    for(int i = from; i<=to; i++) {
+        channelNames << m_pRTMSAModel->data(m_pRTMSAModel->index(i, 0), Qt::DisplayRole).toString();
+        //std::cout << m_pRTMSAModel->data(m_pRTMSAModel->index(i, 0), Qt::DisplayRole).toString().toStdString() << std::endl;
+    }
+
+    m_pRTMSAModel->createFilterChannelList(channelNames);
 }
 
