@@ -242,9 +242,9 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
 
     switch(compensateEdgeEffects) {
         case MirrorData:
-            t_dataZeroPad.head(m_dCoeffA.cols()/2) = data.head(m_dCoeffA.cols()/2).reverse();   //front
-            t_dataZeroPad.segment(m_dCoeffA.cols()/2, data.cols()) = data;                      //middle
-            t_dataZeroPad.tail(m_dCoeffA.cols()/2) = data.tail(m_dCoeffA.cols()/2).reverse();   //back
+            t_dataZeroPad.head(m_dCoeffA.cols()) = data.head(m_dCoeffA.cols()).reverse();   //front
+            t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;                      //middle
+            t_dataZeroPad.tail(m_dCoeffA.cols()) = data.tail(m_dCoeffA.cols()).reverse();   //back
             break;
 
         case ZeroPad:

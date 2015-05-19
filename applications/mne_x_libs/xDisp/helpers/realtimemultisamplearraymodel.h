@@ -332,6 +332,14 @@ signals:
     */
     void newSelection(QList<qint32> selection);
 
+    //=========================================================================================================
+    /**
+    * Emmited when the window size/max number of samples changed
+    *
+    * @param [in] windowSize     number of samples in the window
+    */
+    void windowSizeChanged(int windowSize);
+
 private:
     //=========================================================================================================
     /**

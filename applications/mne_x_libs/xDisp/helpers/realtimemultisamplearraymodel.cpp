@@ -313,6 +313,8 @@ void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T, float dest
     float maxSamples = sps * T;
     m_iMaxSamples = (qint32)ceil(maxSamples/(m_iDownsampling)); // Max Samples / Downsampling
 
+    emit windowSizeChanged(m_iMaxSamples);
+
     endResetModel();
 }
 
@@ -644,8 +646,8 @@ void RealTimeMultiSampleArrayModel::createFilterChannelList(QStringList channelN
 void doFilterPerChannel(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
 {
     for(int i=0; i<channelDataTime.first.size(); i++)
-        channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, false, FilterData::MirrorData);
-      //channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, false, FilterData::MirrorData);
+        //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, false, FilterData::MirrorData);
+        channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, false, FilterData::MirrorData);
 }
 
 
@@ -667,13 +669,15 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
         if(m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name)) {
             RowVectorXd data;
 
-            if(matDataLast.rows() == 0) //if no m_dataLast has been set yet
-                data = matDataCurrent.row(i);
-            else {
-                RowVectorXd temp (matDataLast.cols()+matDataCurrent.cols());
-                temp << matDataLast.row(i), matDataCurrent.row(i);
-                data = temp;
-            }
+            data = matDataCurrent.row(i);
+
+//            if(matDataLast.rows() == 0) //if no m_dataLast has been set yet
+//                data = matDataCurrent.row(i);
+//            else {
+//                RowVectorXd temp (matDataLast.cols()+matDataCurrent.cols());
+//                temp << matDataLast.row(i), matDataCurrent.row(i);
+//                data = temp;
+//            }
 
             timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,data)));
         }
