@@ -598,6 +598,13 @@ void RealTimeMultiSampleArrayModel::updateProjection()
 void RealTimeMultiSampleArrayModel::filterChanged(QList<FilterData> filterData)
 {
     m_filterData = filterData;
+
+    m_iMaxFilterLength = 0;
+    for(int i=0; i<filterData.size(); i++)
+        if(m_iMaxFilterLength<filterData.at(i).m_iFilterOrder)
+            m_iMaxFilterLength = filterData.at(i).m_iFilterOrder;
+
+    std::cout<<"m_iMaxFilterLength: "<<m_iMaxFilterLength<<std::endl;
 }
 
 
@@ -646,8 +653,8 @@ void RealTimeMultiSampleArrayModel::createFilterChannelList(QStringList channelN
 void doFilterPerChannel(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
 {
     for(int i=0; i<channelDataTime.first.size(); i++)
-        //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, false, FilterData::MirrorData);
-        channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, false, FilterData::MirrorData);
+        channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, false, FilterData::MirrorData);
+        //channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, false, FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
 }
 
 
@@ -669,15 +676,14 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
         if(m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name)) {
             RowVectorXd data;
 
-            data = matDataCurrent.row(i);
-
-//            if(matDataLast.rows() == 0) //if no m_dataLast has been set yet
-//                data = matDataCurrent.row(i);
-//            else {
-//                RowVectorXd temp (matDataLast.cols()+matDataCurrent.cols());
-//                temp << matDataLast.row(i), matDataCurrent.row(i);
-//                data = temp;
-//            }
+            if(matDataLast.rows() == 0) //if no m_dataLast has been set yet
+                data = matDataCurrent.row(i);
+            else {
+                //Only append needed amount (filterLength) to the data
+                RowVectorXd temp (m_iMaxFilterLength+matDataCurrent.cols());
+                temp << matDataLast.row(i).tail(m_iMaxFilterLength), matDataCurrent.row(i);
+                data = temp;
+            }
 
             timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,data)));
         }
@@ -693,9 +699,13 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
         // Restructure list to old QVector structure in global m_dataFilteredCurrent variabel
         VectorXd colVector(matDataCurrent.rows());
 
+        int r = m_iMaxFilterLength;
+        if(matDataLast.rows() == 0)
+            r = 0;
+
         int colCount = 0;
 
-        for(int r = matDataLast.cols(); r<timeData.first().second.second.cols(); r++) {
+        for(r; r<timeData.first().second.second.cols(); r++) {
             colVector = matDataCurrent.col(colCount);
 
             colCount++;

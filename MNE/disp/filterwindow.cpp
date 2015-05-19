@@ -117,6 +117,12 @@ void FilterWindow::setWindowSize(int iWindowSize)
 {
     m_iWindowSize = iWindowSize;
 
+    //Only set even numbers -> otherwise cosine design method gives wrong results
+    if(m_iWindowSize%2!=0)
+        m_iWindowSize--;
+
+    ui->m_spinBox_filterTaps->setMaximum(m_iWindowSize);
+
     //Update filter depending on new window size
     filterParametersChanged();
 }
@@ -498,9 +504,6 @@ void FilterWindow::filterParametersChanged()
     int exp = ceil(MNEMath::log2(fftLength));
     fftLength = pow(2, exp+1) <4096 ? 4096 : pow(2, exp+1);
 
-    std::cout<<"fftLength: "<<fftLength<<std::endl;
-    std::cout<<"m_iWindowSize: "<<m_iWindowSize<<std::endl;
-
     //set maximum and minimum for cut off frequency spin boxes
     ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
     ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
@@ -537,7 +540,7 @@ void FilterWindow::filterParametersChanged()
                                                                0.2,
                                                                (double)trans_width/nyquistFrequency,
                                                                samplingFrequency,
-                                                               m_iFFTLength,
+                                                               fftLength,
                                                                dMethod));
     }
 
@@ -550,7 +553,7 @@ void FilterWindow::filterParametersChanged()
                                                         0.2,
                                                         (double)trans_width/nyquistFrequency,
                                                         samplingFrequency,
-                                                        m_iFFTLength,
+                                                        fftLength,
                                                         dMethod));
     }
 
@@ -563,7 +566,7 @@ void FilterWindow::filterParametersChanged()
                                   (double)bw/nyquistFrequency,
                                   (double)trans_width/nyquistFrequency,
                                   samplingFrequency,
-                                  m_iFFTLength,
+                                  fftLength,
                                   dMethod));
     }
 
