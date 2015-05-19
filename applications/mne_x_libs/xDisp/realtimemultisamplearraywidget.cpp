@@ -615,6 +615,9 @@ void RealTimeMultiSampleArrayWidget::hideBadChannels()
         else
             m_pTableView->showRow(m_qListBadChannels.at(i));
     }
+
+    //Update the visible channel list which are to be filtered
+    visibleRowsChanged(0);
 }
 
 
