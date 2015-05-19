@@ -192,8 +192,10 @@ void FilterData::fftTransformCoeffs()
 
 RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data, bool keepOverhead, CompensateEdgeEffects compensateEdgeEffects) const
 {
-    if(data.cols()<m_dCoeffA.cols() && compensateEdgeEffects==MirrorData)
+    if(data.cols()<m_dCoeffA.cols() && compensateEdgeEffects==MirrorData){
+        qDebug()<<QString("Error in FilterData: Number of filter taps(%1) bigger then data size(%2). Not enough data to perform mirroring!").arg(m_dCoeffA.cols()).arg(data.cols());
         return data;
+    }
 
     //Do zero padding or mirroring depending on user input
     RowVectorXd t_dataZeroPad = RowVectorXd::Zero(2*m_dCoeffA.cols() + data.cols());
@@ -206,6 +208,10 @@ RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data, bool keepOverhe
 
         case ZeroPad:
             t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;
+            break;
+
+        default:
+            t_dataZeroPad.head(data.cols()) = data;
             break;
     }
 
@@ -228,7 +234,7 @@ RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data, bool keepOverhe
 RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhead, CompensateEdgeEffects compensateEdgeEffects) const
 {
     if(data.cols()<m_dCoeffA.cols() && compensateEdgeEffects==MirrorData) {
-        qDebug()<<"Error in FilterData: Number of filter taps bigger then data size. Not enough data to perform mirroring!";
+        qDebug()<<QString("Error in FilterData: Number of filter taps(%1) bigger then data size(%2). Not enough data to perform mirroring!").arg(m_dCoeffA.cols()).arg(data.cols());
         return data;
     }
 
@@ -250,6 +256,10 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
         case ZeroPad:
             t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;
             break;
+
+        default:
+            t_dataZeroPad.head(data.cols()) = data;
+            break;
     }
 
     //generate fft object
@@ -269,7 +279,7 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
 
     //Return filtered data
     if(!keepOverhead)
-        return t_filteredTime.segment(m_dCoeffA.cols(), data.cols());
+        return t_filteredTime.segment(m_dCoeffA.cols()*1.5, data.cols());
 
     return t_filteredTime;
 }

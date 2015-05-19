@@ -388,6 +388,7 @@ private:
     qint32  m_iDownsampling;        /**< Down sampling factor */
     qint32  m_iMaxSamples;          /**< Max samples per window */
     qint32  m_iCurrentSample;       /**< Accurate Downsampling */
+    qint32  m_iMaxFilterLength;     /**< Max order of the current filters */
 
     QString m_sFilterChannelType;   /**< Kind of channel which is to be filtered */
 
