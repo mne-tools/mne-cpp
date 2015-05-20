@@ -64,6 +64,7 @@ RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 , m_iMaxSamples(1024)
 , m_iCurrentSample(0)
 , m_bIsFreezed(false)
+, m_sFilterChannelType("MEG")
 {
     init();
 }
@@ -241,8 +242,6 @@ QVariant RealTimeMultiSampleArrayModel::headerData(int section, Qt::Orientation 
 void RealTimeMultiSampleArrayModel::init()
 {
     m_pFiffInfo = FiffInfo::SPtr(new FiffInfo());
-
-//    createDefaultFilter();
 }
 
 
@@ -275,8 +274,6 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
         this->m_pFiffInfo = p_pFiffInfo;
 
         createFilterChannelList("All");
-
-//        createDefaultFilter();
 
         //
         //  Create the initial SSP projector
@@ -342,9 +339,7 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
             ++count;
         }
 
-
 //        qDebug() << "nchan" << dsData.rows() << "proj rows" << m_matProj.rows();
-
 
         //store for next buffer
         m_iCurrentSample = i - data[b].cols();
@@ -723,38 +718,6 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
 
     //std::cout<<"END RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
 }
-
-
-//*************************************************************************************************************
-
-//void RealTimeMultiSampleArrayModel::createDefaultFilter()
-//{
-//    double sfreq = (m_pFiffInfo->sfreq>=0) ? m_pFiffInfo->sfreq : 600.0;
-//    double nyquist_freq = sfreq/2;
-//    int filterTaps = 80;
-
-//    int fftLength = m_iMaxSamples;
-//    int exp = ceil(MNEMath::log2(fftLength));
-//    fftLength = pow(2, exp+1);
-//    if(fftLength < 512)
-//        fftLength = 512;
-
-//    double cutoffFreqHz = 100; //in Hz
-
-//    FilterData::DesignMethod dMethod = FilterData::Cosine;
-
-//    FilterData defaultFilter = FilterData(QString("babyMEG_01"),
-//                              FilterData::LPF,
-//                              filterTaps,
-//                              cutoffFreqHz/nyquist_freq,
-//                              5/nyquist_freq,
-//                              1/nyquist_freq,
-//                              sfreq,
-//                              fftLength,
-//                              dMethod);
-
-//    m_filterData.append(defaultFilter);
-//}
 
 
 //*************************************************************************************************************
