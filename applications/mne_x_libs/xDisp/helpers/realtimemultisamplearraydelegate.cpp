@@ -458,6 +458,9 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
 
     float fDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
 
+    int currentSampleIndex = t_pModel->getCurrentSampleIndex();
+    float lastFirstValue = t_pModel->getLastBlockFirstValue(index.row());
+
     //Move to initial starting point
     if(data.second > 0)
     {
@@ -472,9 +475,15 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
         path.moveTo(qSamplePosition);
     }
 
+    float val;
+
     for(qint32 j=0; j < data.second; ++j)
     {
-        float val = *(data.first+j) - *(data.first); //remove first sample data[0] as offset
+        if(j<=currentSampleIndex)
+            val = *(data.first+j) - *(data.first); //remove first sample data[0] as offset
+        else
+            val = *(data.first+j) - lastFirstValue; //do not remove first sample data[0] as offset because this is the last data part
+
         fValue = val*fScaleY;
         //qDebug()<<"val"<<val<<"fScaleY"<<fScaleY<<"fValue"<<fValue;
 

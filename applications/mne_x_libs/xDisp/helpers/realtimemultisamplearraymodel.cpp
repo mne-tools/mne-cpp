@@ -250,6 +250,8 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
         m_matDataRaw.setZero();
         m_matDataFiltered.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
         m_matDataFiltered.setZero();
+        m_vecLastBlockFirstValues.conservativeResize(m_pFiffInfo->chs.size());
+        m_vecLastBlockFirstValues.setZero();
 
         //
         //  Create the initial SSP projector
@@ -289,6 +291,7 @@ void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T, float dest
     //Resize data matrix without touching the stored values
     m_matDataRaw.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
     m_matDataFiltered.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
+    m_vecLastBlockFirstValues.conservativeResize(m_pFiffInfo->chs.size());
 
     emit windowSizeChanged(m_iMaxSamples);
 
@@ -336,7 +339,6 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
 //            std::cout<<"m_iCurrentSample+dataTemp.cols(): "<<m_iCurrentSample+dataTemp.cols()<<std::endl;
 //            std::cout<<"m_matDataRaw.cols(): "<<m_matDataRaw.cols()<<std::endl;
 //            std::cout<<"dataTemp.cols()-residual: "<<dataTemp.cols()-residual<<std::endl<<std::endl;
-
         } else {
             //std::cout<<"incoming data is ok"<<std::endl;
             m_matDataRaw.block(0, m_iCurrentSample, dataTemp.rows(), dataTemp.cols()) = dataTemp;
@@ -345,8 +347,10 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
     }
 
     //Reset m_iCurrentSample and start filling the data matrix from the beginning again
-    if(m_iCurrentSample>=m_iMaxSamples)
+    if(m_iCurrentSample>=m_iMaxSamples) {
         m_iCurrentSample = 0;
+        m_vecLastBlockFirstValues = m_matDataRaw.col(0);
+    }
 
     //Filter current data concurrently
     if(!m_filterData.isEmpty())
@@ -464,11 +468,6 @@ void RealTimeMultiSampleArrayModel::toggleFreeze(const QModelIndex &)
     m_bIsFreezed = !m_bIsFreezed;
 
     if(m_bIsFreezed) {
-        m_dataCurrentFreeze = m_dataCurrent;
-        m_dataLastFreeze = m_dataLast;
-        m_dataFilteredCurrentFreeze = m_dataFilteredCurrent;
-        m_dataFilteredLastFreeze = m_dataFilteredLast;
-
         m_matDataRawFreeze = m_matDataRaw;
         m_matDataFilteredFreeze = m_matDataFiltered;
     }
@@ -659,19 +658,11 @@ void RealTimeMultiSampleArrayModel::clearModel()
 {
     beginResetModel();
 
-    m_dataCurrent.clear();
-    m_dataFilteredCurrent.clear();
-    m_dataLast.clear();
-    m_dataFilteredLast.clear();
-    m_dataCurrentFreeze.clear();
-    m_dataFilteredCurrentFreeze.clear();
-    m_dataLastFreeze.clear();
-    m_dataFilteredLastFreeze.clear();
-
     m_matDataRaw.setZero();
     m_matDataFiltered.setZero();
     m_matDataRawFreeze.setZero();
     m_matDataFilteredFreeze.setZero();
+    m_vecLastBlockFirstValues.setZero();
 
     endResetModel();
 

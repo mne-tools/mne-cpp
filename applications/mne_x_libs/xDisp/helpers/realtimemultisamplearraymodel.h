@@ -233,6 +233,24 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the current sample index which represents the index which the next incoming data will be stored at in the data
+    *
+    * @return the current sample index
+    */
+    inline qint32 getCurrentSampleIndex() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the first value of the last complete data display block
+    *
+    * @param[in] row    row for which the first value is to be returned
+    *
+    * @return the first value of the last complete data display block
+    */
+    inline double getLastBlockFirstValue(int row) const;
+
+    //=========================================================================================================
+    /**
     * Returns a map which conatins the channel idx and its corresponding selection status
     *
     * @return the channel idx to selection status
@@ -381,6 +399,8 @@ private:
     FiffInfo::SPtr          m_pFiffInfo;                        /**< Fiff info */
 
     RowVectorXi             m_vecBadIdcs;                       /**< Idcs of bad channels */
+    VectorXd                m_vecLastBlockFirstValues;          /**< The first value of the last complete data display block */
+
     MatrixXd                m_matProj;                          /**< SSP projector */
     SparseMatrix<double>    m_matSparseProj;                    /**< Sparse SSP projector */
 
@@ -388,15 +408,6 @@ private:
     MatrixXdR               m_matDataFiltered;
     MatrixXdR               m_matDataRawFreeze;
     MatrixXdR               m_matDataFilteredFreeze;
-
-    QVector<VectorXd>       m_dataCurrent;                      /**< List that holds the current data*/
-    QVector<VectorXd>       m_dataFilteredCurrent;              /**< List that holds the current filtered data */
-    QVector<VectorXd>       m_dataLast;                         /**< List that holds the last data */
-    QVector<VectorXd>       m_dataFilteredLast;                 /**< List that holds the last filtered data */
-    QVector<VectorXd>       m_dataCurrentFreeze;                /**< List that holds the current data when freezed*/
-    QVector<VectorXd>       m_dataFilteredCurrentFreeze;        /**< List that holds the current filtered data when freezed*/
-    QVector<VectorXd>       m_dataLastFreeze;                   /**< List that holds the last data when freezed*/
-    QVector<VectorXd>       m_dataFilteredLastFreeze;           /**< List that holds the last filtered data when freezed*/
 
     QMap< qint32,float>                 m_qMapChScaling;        /**< Sensor selection widget. */
     QList<FilterData>                   m_filterData;           /**< List of currently active filters. */
@@ -414,6 +425,25 @@ private:
 inline qint32 RealTimeMultiSampleArrayModel::getMaxSamples() const
 {
     return m_iMaxSamples;
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 RealTimeMultiSampleArrayModel::getCurrentSampleIndex() const
+{
+    return m_iCurrentSample;
+}
+
+
+//*************************************************************************************************************
+
+inline double RealTimeMultiSampleArrayModel::getLastBlockFirstValue(int row) const
+{
+    if(row>m_vecLastBlockFirstValues.rows())
+        return 0;
+
+    return m_vecLastBlockFirstValues[row];
 }
 
 
