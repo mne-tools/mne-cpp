@@ -79,8 +79,9 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 , m_bInitialized(false)
 , m_iT(10)
 , m_fSamplingRate(1024)
-, m_fDesiredSamplingRate(128)
+, m_fDesiredSamplingRate(1024)
 , m_bHideBadChannels(false)
+, m_iDSFactor(1)
 {
     Q_UNUSED(pTime)
 
@@ -88,7 +89,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     m_pSpinBoxDSFactor->setMinimum(1);
     m_pSpinBoxDSFactor->setMaximum(100.0);
     m_pSpinBoxDSFactor->setSingleStep(1);
-    m_pSpinBoxDSFactor->setValue(10);
+    m_pSpinBoxDSFactor->setValue(1);
     m_pSpinBoxDSFactor->setSuffix(" x");
     m_pSpinBoxDSFactor->setToolTip(tr("Downsample factor"));
     m_pSpinBoxDSFactor->setStatusTip(tr("Downsample factor"));
@@ -257,7 +258,7 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pRTMSAModel->setFiffInfo(m_pFiffInfo);
         m_pRTMSAModel->setChannelInfo(m_qListChInfo);//ToDo Obsolete
-        m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, m_iT, m_fDesiredSamplingRate);
+        m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, m_iT, m_fSamplingRate);
 
         //Init the delegate
         if(m_pRTMSADelegate)

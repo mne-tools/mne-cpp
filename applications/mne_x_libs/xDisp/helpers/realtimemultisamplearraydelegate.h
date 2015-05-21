@@ -50,11 +50,35 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE NAMESPACE XDISPLIB
 //=============================================================================================================
 
 namespace XDISPLIB
 {
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE TYPEDEFS
+//=============================================================================================================
+
+typedef QPair<const double*,qint32> RowVectorPair;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace Eigen;
 
 
 //=============================================================================================================
@@ -121,13 +145,11 @@ private:
     * @param[in] index      Used to locate data in a data model.
     * @param[in] option     Describes the parameters used to draw an item in a view widget
     * @param[in,out] path   The QPointerPath to create for the data plot.
-    * @param[in] lastPath   last path for the last data.
     * @param[in] ellipsePos Position of the ellipse which is plotted at the current channel signal value.
     * @param[in] amplitude  String which is to be plotted.
     * @param[in] data       Current data for the given row.
-    * @param[in] lastData   Last data for the given row.
     */
-    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPainterPath& lastPath, QPointF &ellipsePos, QString &amplitude, QVector<float>& data, QVector<float>& lastData) const;
+    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPointF &ellipsePos, QString &amplitude, XDISPLIB::RowVectorPair &data) const;
 
     //=========================================================================================================
     /**
@@ -138,7 +160,7 @@ private:
     * @param[in,out] path   The QPointerPath to create for the data plot.
     * @param[in] data       Data for the given row.
     */
-    void createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<QVector<float> >& data) const;
+    void createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const;
 
     //=========================================================================================================
     /**
