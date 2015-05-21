@@ -479,7 +479,7 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
 
     for(qint32 j=0; j < data.second; ++j)
     {
-        if(j<=currentSampleIndex)
+        if(j<currentSampleIndex)
             val = *(data.first+j) - *(data.first); //remove first sample data[0] as offset
         else
             val = *(data.first+j) - lastFirstValue; //do not remove first sample data[0] as offset because this is the last data part
