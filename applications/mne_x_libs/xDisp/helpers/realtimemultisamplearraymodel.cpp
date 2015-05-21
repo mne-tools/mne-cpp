@@ -110,66 +110,35 @@ QVariant RealTimeMultiSampleArrayModel::data(const QModelIndex &index, int role)
         //******** second column (data plot) ********
         if(index.column()==1) {
             QVariant v;
+            RowVectorPair rowVectorPair;
 
             switch(role) {
                 case Qt::DisplayRole: {
-                    //pack all adjacent (after reload) RowVectorPairs into a QList
-                    QList< QVector<float> > qListVector;
-
                     if(m_bIsFreezed) {
                         // data freeze
-                        QVector<float> data;
                         if(m_filterData.isEmpty()) {
-                            for(qint32 i=0; i < m_dataCurrentFreeze.size(); ++i)
-                                data.append(m_dataCurrentFreeze[i](row));
-                            qListVector.append(data);
-
-                            // last data freeze
-                            QVector<float> lastData;
-                            for(qint32 i=0; i < m_dataLastFreeze.size(); ++i)
-                                lastData.append(m_dataLastFreeze[i](row));
-                            qListVector.append(lastData);
-                        } else {
-                            for(qint32 i=0; i < m_dataFilteredCurrentFreeze.size(); ++i)
-                                data.append(m_dataFilteredCurrentFreeze[i](row));
-                            qListVector.append(data);
-
-                            // last data freeze
-                            QVector<float> lastData;
-                            for(qint32 i=0; i < m_dataFilteredLastFreeze.size(); ++i)
-                                lastData.append(m_dataFilteredLastFreeze[i](row));
-                            qListVector.append(lastData);
+                            rowVectorPair.first = m_matDataRawFreeze.data() + row*m_matDataRawFreeze.cols();
+                            rowVectorPair.second  = m_matDataRawFreeze.cols();
+                            v.setValue(rowVectorPair);
                         }
-
-                        v.setValue(qListVector);
+                        else {
+                            rowVectorPair.first = m_matDataFilteredFreeze.data() + row*m_matDataFilteredFreeze.cols();
+                            rowVectorPair.second  = m_matDataFilteredFreeze.cols();
+                            v.setValue(rowVectorPair);
+                        }
                     }
                     else {
-                        // data
+                        // data stream
                         if(m_filterData.isEmpty()) {
-                            QVector<float> data;
-                            for(qint32 i = 0; i < m_dataCurrent.size(); ++i)
-                                data.append(m_dataCurrent[i](row));
-                            qListVector.append(data);
-
-                            // last data
-                            QVector<float> lastData;
-                            for(qint32 i=0; i < m_dataLast.size(); ++i)
-                                lastData.append(m_dataLast[i](row));
-                            qListVector.append(lastData);
-                        } else {
-                            QVector<float> data;
-                            for(qint32 i = 0; i < m_dataFilteredCurrent.size(); ++i)
-                                data.append(m_dataFilteredCurrent[i](row));
-                            qListVector.append(data);
-
-                            // last data
-                            QVector<float> lastData;
-                            for(qint32 i=0; i < m_dataFilteredLast.size(); ++i)
-                                lastData.append(m_dataFilteredLast[i](row));
-                            qListVector.append(lastData);
+                            rowVectorPair.first = m_matDataRaw.data() + row*m_matDataRaw.cols();
+                            rowVectorPair.second  = m_matDataRaw.cols();
+                            v.setValue(rowVectorPair);
                         }
-
-                        v.setValue(qListVector);
+                        else {
+                            rowVectorPair.first = m_matDataFiltered.data() + row*m_matDataFiltered.cols();
+                            rowVectorPair.second  = m_matDataFiltered.cols();
+                            v.setValue(rowVectorPair);
+                        }
                     }
 
                     return v;
@@ -250,6 +219,7 @@ void RealTimeMultiSampleArrayModel::init()
 void RealTimeMultiSampleArrayModel::setChannelInfo(QList<RealTimeSampleArrayChInfo> &chInfo)
 {
     beginResetModel();
+
     m_qListChInfo = chInfo;
     endResetModel();
 
@@ -271,9 +241,15 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
 
         m_vecBadIdcs = sel;
 
-        this->m_pFiffInfo = p_pFiffInfo;
+        m_pFiffInfo = p_pFiffInfo;
 
-        createFilterChannelList("All");
+        createFilterChannelList(m_sFilterChannelType);
+
+        //Resize data matrix without touching the stored values
+        m_matDataRaw.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
+        m_matDataRaw.setZero();
+        m_matDataFiltered.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
+        m_matDataFiltered.setZero();
 
         //
         //  Create the initial SSP projector
@@ -310,6 +286,10 @@ void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T, float dest
     float maxSamples = sps * T;
     m_iMaxSamples = (qint32)ceil(maxSamples/(m_iDownsampling)); // Max Samples / Downsampling
 
+    //Resize data matrix without touching the stored values
+    m_matDataRaw.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
+    m_matDataFiltered.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
+
     emit windowSizeChanged(m_iMaxSamples);
 
     endResetModel();
@@ -320,92 +300,57 @@ void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T, float dest
 
 void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
 {
-    //Downsampling ->ToDo make this more accurate
+//    std::cout<<"m_iCurrentSample: "<<m_iCurrentSample<<std::endl;
 
-    for(qint32 b = 0; b < data.size(); ++b)
-    {        
-        qint32 i;
-        qint32 count = 0;
-        //Downsample the data
-        for(i = m_iCurrentSample; i < data[b].cols(); i += m_iDownsampling)
-            ++count;
+    //Copy new data into the global data matrix
+    for(qint32 b = 0; b < data.size(); ++b) {
+        MatrixXd dataTemp = data.at(b);
 
-        MatrixXd dsData(data[b].rows(),count);
-
-        count = 0;
-        for(i = m_iCurrentSample; i < data[b].cols(); i += m_iDownsampling)
-        {
-            dsData.col(count) = data[b].col(i);
-            ++count;
+        if(dataTemp.rows() != m_matDataRaw.rows()) {
+//            std::cout<<"incoming data does not match internal data row size. Returning..."<<std::endl;
+            return;
         }
-
-//        qDebug() << "nchan" << dsData.rows() << "proj rows" << m_matProj.rows();
-
-        //store for next buffer
-        m_iCurrentSample = i - data[b].cols();
-
-//            m_dataCurrent.append(data[b].col(i));
-
-        bool doProj = false;
-
-        if(m_bProjActivated && dsData.cols() > 0 && dsData.rows() == m_matProj.cols())
-            doProj = true;
 
         //SSP
+        bool doProj = false;
+
+        if(m_bProjActivated && m_matDataRaw.cols() > 0 && m_matDataRaw.rows() == m_matProj.cols())
+            doProj = true;
+
         if(doProj)
         {
-            //std::cout<<"Doing SSP projectors"<<std::endl;
-
             //set bad channels to zero
             for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
-                dsData.row(m_vecBadIdcs[j]).setZero();
+                dataTemp.row(m_vecBadIdcs[j]).setZero();
 
             //Do SSP Projection
-            MatrixXd projDsData = m_matSparseProj * dsData;
-            for(i = 0; i < projDsData.cols(); ++i)
-                m_dataCurrent.append(projDsData.col(i));
-        }
-        else
-        {
-            //store data
-            for(i = 0; i < dsData.cols(); ++i)
-                m_dataCurrent.append(dsData.col(i));
+            dataTemp = m_matSparseProj * dataTemp;
         }
 
-        // - old -
-//        //SSP
-//        //set bad channels to zero
-//        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
-//            m_dataCurrent.last()[m_vecBadIdcs[j]] = 0;
+        if(m_iCurrentSample+dataTemp.cols() > m_matDataRaw.cols()) {
+            int residual = (m_iCurrentSample+dataTemp.cols()) % m_matDataRaw.cols();
+            m_matDataRaw.block(0, m_iCurrentSample, dataTemp.rows(), dataTemp.cols()-residual) = dataTemp.block(0,0,dataTemp.rows(),dataTemp.cols()-residual);
+            m_iCurrentSample += dataTemp.cols()-residual;
 
-//        //apply projector
-//        if(doProj)
-//            m_dataCurrent.last() = m_matProj * m_dataCurrent.last();
+//            std::cout<<"incoming data exceeds internal data cols by: "<<residual<<std::endl;
+//            std::cout<<"m_iCurrentSample+dataTemp.cols(): "<<m_iCurrentSample+dataTemp.cols()<<std::endl;
+//            std::cout<<"m_matDataRaw.cols(): "<<m_matDataRaw.cols()<<std::endl;
+//            std::cout<<"dataTemp.cols()-residual: "<<dataTemp.cols()-residual<<std::endl<<std::endl;
 
-//        //Downsampling
-//        for(i = m_iCurrentSample; i < data[b].cols(); i += m_iDownsampling)
-//            m_dataCurrent.append(data[b].col(i));
-
-//        //store for next buffer
-//        m_iCurrentSample = i - data[b].cols();
+        } else {
+            //std::cout<<"incoming data is ok"<<std::endl;
+            m_matDataRaw.block(0, m_iCurrentSample, dataTemp.rows(), dataTemp.cols()) = dataTemp;
+            m_iCurrentSample += dataTemp.cols();
+        }
     }
+
+    //Reset m_iCurrentSample and start filling the data matrix from the beginning again
+    if(m_iCurrentSample>=m_iMaxSamples)
+        m_iCurrentSample = 0;
 
     //Filter current data concurrently
     if(!m_filterData.isEmpty())
         filterChannelsConcurrently();
-
-    //ToDo separate worker thread? ToDo 2000 -> size of screen
-    if(m_dataCurrent.size() >= m_iMaxSamples) {
-        m_dataLast = m_dataCurrent.mid(0,m_iMaxSamples); // Store last data to keep as background in the display
-//        m_dataCurrent.remove(0, m_iMaxSamples);
-        m_dataCurrent.clear();
-
-        //If max data for display has been reached -> calculate filtered version even if fitlering is deactivated.
-        //This way the last filtered data drawn in the background are always up to date.
-        m_dataFilteredLast = m_dataFilteredCurrent.mid(0,m_iMaxSamples); // Store last data to keep as background in the display
-//        m_dataFilteredCurrent.remove(0, m_iMaxSamples);
-        m_dataFilteredCurrent.clear();
-    }
 
     //Update data content
     QModelIndex topLeft = this->index(0,1);
@@ -523,6 +468,9 @@ void RealTimeMultiSampleArrayModel::toggleFreeze(const QModelIndex &)
         m_dataLastFreeze = m_dataLast;
         m_dataFilteredCurrentFreeze = m_dataFilteredCurrent;
         m_dataFilteredLastFreeze = m_dataFilteredLast;
+
+        m_matDataRawFreeze = m_matDataRaw;
+        m_matDataFilteredFreeze = m_matDataFiltered;
     }
 
     //Update data content
@@ -659,28 +607,27 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
 {
     //std::cout<<"START RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
 
-    //Clear m_dataFilteredCurrent
-    m_dataFilteredCurrent.clear();
+    m_matDataFiltered = m_matDataRaw;
 
     //Generate QList structure which can be handled by the QConcurrent framework
     QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;
-    MatrixXd matDataCurrent = dataToMatrix(m_dataCurrent);
-    MatrixXd matDataLast = dataToMatrix(m_dataLast);
 
-    for(qint32 i=0; i<m_dataCurrent.last().rows(); ++i) {
+    for(qint32 i=0; i<m_matDataRaw.rows(); ++i) {
         if(m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-            RowVectorXd data;
+//            RowVectorXd data;
 
-            if(matDataLast.rows() == 0) //if no m_dataLast has been set yet
-                data = matDataCurrent.row(i);
-            else {
-                //Only append needed amount (filterLength) to the data
-                RowVectorXd temp (m_iMaxFilterLength+matDataCurrent.cols());
-                temp << matDataLast.row(i).tail(m_iMaxFilterLength), matDataCurrent.row(i);
-                data = temp;
-            }
+//            data = m_matDataRaw.row(i);
 
-            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,data)));
+//            if(matDataLast.rows() == 0) //if no m_dataLast has been set yet
+//                data = m_matDataRaw.row(i);
+//            else {
+//                //Only append needed amount (filterLength) to the data
+//                RowVectorXd temp (m_iMaxFilterLength+m_matDataRaw.cols());
+//                temp << matDataLast.row(i).tail(m_iMaxFilterLength), m_matDataRaw.row(i);
+//                data = temp;
+//            }
+
+            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,m_matDataRaw.row(i))));
         }
     }
 
@@ -691,27 +638,13 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
 
         future.waitForFinished();
 
-        // Restructure list to old QVector structure in global m_dataFilteredCurrent variabel
-        VectorXd colVector(matDataCurrent.rows());
+//        int r = m_iMaxFilterLength;
+//        if(matDataLast.rows() == 0)
+//            r = 0;
 
-        int r = m_iMaxFilterLength;
-        if(matDataLast.rows() == 0)
-            r = 0;
-
-        int colCount = 0;
-
-        for(r; r<timeData.first().second.second.cols(); r++) {
-            colVector = matDataCurrent.col(colCount);
-
-            colCount++;
-
-            for(int c=0; c<timeData.size(); c++)
-                colVector(timeData[c].second.first) = timeData[c].second.second(r);
-
-            m_dataFilteredCurrent.append(colVector);
-        }
-    } else
-        m_dataFilteredCurrent = m_dataCurrent;
+        for(int r = 0; r<timeData.size(); r++)
+            m_matDataFiltered.row(timeData.at(r).second.first) = timeData.at(r).second.second;
+    }
 
 //    std::cout<<"m_dataCurrent.size(): "<<m_dataCurrent.size()<<std::endl;
 //    std::cout<<"m_dataLast.size(): "<<m_dataLast.size()<<std::endl;
@@ -734,6 +667,11 @@ void RealTimeMultiSampleArrayModel::clearModel()
     m_dataFilteredCurrentFreeze.clear();
     m_dataLastFreeze.clear();
     m_dataFilteredLastFreeze.clear();
+
+    m_matDataRaw.setZero();
+    m_matDataFiltered.setZero();
+    m_matDataRawFreeze.setZero();
+    m_matDataFilteredFreeze.setZero();
 
     endResetModel();
 

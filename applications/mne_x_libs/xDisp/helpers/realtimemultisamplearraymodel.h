@@ -90,6 +90,14 @@ using namespace Eigen;
 using namespace UTILSLIB;
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE TYPEDEFS
+//=============================================================================================================
+
+typedef QPair<const double*,qint32> RowVectorPair;
+typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
+
 //=============================================================================================================
 /**
 * DECLARE CLASS RealTimeMultiSampleArrayModel
@@ -349,12 +357,6 @@ private:
 
     //=========================================================================================================
     /**
-    * Creates the default filter with the current fiff info
-    */
-    //void createDefaultFilter();
-
-    //=========================================================================================================
-    /**
     * Clears the model
     */
     void clearModel();
@@ -364,22 +366,6 @@ private:
     * Calculates the filtered version of the channels in dataTime
     */
     void filterChannelsConcurrently();
-
-    //=========================================================================================================
-    /**
-    * Returns the current data in matrix form
-    *
-    * @return the current data as a matrix
-    */
-    inline const MatrixXd dataToMatrix(QVector<VectorXd> &vector) const;
-
-    //=========================================================================================================
-    /**
-    * Returns the last data in matrix form
-    *
-    * @return the last data as a matrix
-    */
-    inline const MatrixXd dataLastToMatrix() const;
 
     bool    m_bProjActivated;       /**< Proj activated */
     bool    m_bIsFreezed;           /**< Display is freezed */
@@ -397,6 +383,11 @@ private:
     RowVectorXi             m_vecBadIdcs;                       /**< Idcs of bad channels */
     MatrixXd                m_matProj;                          /**< SSP projector */
     SparseMatrix<double>    m_matSparseProj;                    /**< Sparse SSP projector */
+
+    MatrixXdR               m_matDataRaw;
+    MatrixXdR               m_matDataFiltered;
+    MatrixXdR               m_matDataRawFreeze;
+    MatrixXdR               m_matDataFilteredFreeze;
 
     QVector<VectorXd>       m_dataCurrent;                      /**< List that holds the current data*/
     QVector<VectorXd>       m_dataFilteredCurrent;              /**< List that holds the current filtered data */
@@ -458,40 +449,11 @@ inline const QMap< qint32,float >& RealTimeMultiSampleArrayModel::getScaling() c
 }
 
 
-//*************************************************************************************************************
-
-inline const MatrixXd RealTimeMultiSampleArrayModel::dataToMatrix(QVector<VectorXd> &vector) const
-{
-    if(vector.size() == 0)
-        return MatrixXd();
-
-    MatrixXd matCurrent(vector.first().rows(), vector.size());
-
-    for(qint32 r = 0; r < vector.first().rows(); ++r)
-        for(qint32 c = 0; c < vector.size(); ++c)
-            matCurrent(r,c) = vector[c].coeff(r);
-
-    return matCurrent;
-}
-
-
-//*************************************************************************************************************
-
-inline const MatrixXd RealTimeMultiSampleArrayModel::dataLastToMatrix() const
-{
-    if(m_dataLast.size() == 0)
-        return MatrixXd();
-
-    MatrixXd matLast(m_dataLast.first().rows(), m_dataLast.size());
-
-    for(qint32 r = 0; r < m_dataLast.first().rows(); ++r)
-        for(qint32 c = 0; c < m_dataLast.size(); ++c)
-            matLast(r,c) = m_dataLast[r].coeff(c);
-
-    return matLast;
-}
-
-
 } // NAMESPACE
+
+#ifndef metatype_rowvectorpair
+#define metatype_rowvectorpair
+Q_DECLARE_METATYPE(XDISPLIB::RowVectorPair);
+#endif
 
 #endif // REALTIMEMULTISAMPLEARRAYMODEL_H
