@@ -337,10 +337,6 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
         }
     }
 
-    //Filter current data concurrently
-    if(!m_filterData.isEmpty())
-        filterChannelsConcurrently();
-
     //Reset m_iCurrentSample and start filling the data matrix from the beginning again
     if(m_iCurrentSample>=m_iMaxSamples) {
         m_iCurrentSample = 0;
@@ -350,6 +346,10 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
             m_vecLastBlockFirstValuesRaw = m_matDataRaw.col(0);
         }
     }
+
+    //Filter current data concurrently
+    if(!m_filterData.isEmpty())
+        filterChannelsConcurrently();
 
     //Update data content
     QModelIndex topLeft = this->index(0,1);
