@@ -297,46 +297,37 @@ void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T)
 
 void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
 {
-//    std::cout<<"m_iCurrentSample: "<<m_iCurrentSample<<std::endl;
+    //SSP
+    bool doProj = m_bProjActivated && m_matDataRaw.cols() > 0 && m_matDataRaw.rows() == m_matProj.cols() ? true : false;
 
     //Copy new data into the global data matrix
     for(qint32 b = 0; b < data.size(); ++b) {
-        MatrixXd dataTemp = data.at(b);
-
-        if(dataTemp.rows() != m_matDataRaw.rows()) {
+        if(data.at(b).rows() != m_matDataRaw.rows()) {
 //            std::cout<<"incoming data does not match internal data row size. Returning..."<<std::endl;
             return;
         }
 
-        //SSP
-        bool doProj = false;
+        if(m_iCurrentSample+data.at(b).cols() > m_matDataRaw.cols()) {
+            int residual = (m_iCurrentSample+data.at(b).cols()) % m_matDataRaw.cols();
+            if(doProj)
+                m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()-residual) = m_matSparseProj * data.at(b).block(0,0,data.at(b).rows(),data.at(b).cols()-residual);
+            else
+                m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()-residual) = data.at(b).block(0,0,data.at(b).rows(),data.at(b).cols()-residual);
 
-        if(m_bProjActivated && m_matDataRaw.cols() > 0 && m_matDataRaw.rows() == m_matProj.cols())
-            doProj = true;
-
-        if(doProj)
-        {
-            //set bad channels to zero
-            for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
-                dataTemp.row(m_vecBadIdcs[j]).setZero();
-
-            //Do SSP Projection
-            dataTemp = m_matSparseProj * dataTemp;
-        }
-
-        if(m_iCurrentSample+dataTemp.cols() > m_matDataRaw.cols()) {
-            int residual = (m_iCurrentSample+dataTemp.cols()) % m_matDataRaw.cols();
-            m_matDataRaw.block(0, m_iCurrentSample, dataTemp.rows(), dataTemp.cols()-residual) = dataTemp.block(0,0,dataTemp.rows(),dataTemp.cols()-residual);
-            m_iCurrentSample += dataTemp.cols()-residual;
+            m_iCurrentSample += data.at(b).cols()-residual;
 
 //            std::cout<<"incoming data exceeds internal data cols by: "<<residual<<std::endl;
-//            std::cout<<"m_iCurrentSample+dataTemp.cols(): "<<m_iCurrentSample+dataTemp.cols()<<std::endl;
+//            std::cout<<"m_iCurrentSample+data.at(b).cols(): "<<m_iCurrentSample+data.at(b).cols()<<std::endl;
 //            std::cout<<"m_matDataRaw.cols(): "<<m_matDataRaw.cols()<<std::endl;
-//            std::cout<<"dataTemp.cols()-residual: "<<dataTemp.cols()-residual<<std::endl<<std::endl;
+//            std::cout<<"data.at(b).cols()-residual: "<<data.at(b).cols()-residual<<std::endl<<std::endl;
         } else {
             //std::cout<<"incoming data is ok"<<std::endl;
-            m_matDataRaw.block(0, m_iCurrentSample, dataTemp.rows(), dataTemp.cols()) = dataTemp;
-            m_iCurrentSample += dataTemp.cols();
+            if(doProj)
+                m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseProj * data.at(b);
+            else
+                m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = data.at(b);
+
+            m_iCurrentSample += data.at(b).cols();
         }
     }
 
@@ -506,6 +497,10 @@ void RealTimeMultiSampleArrayModel::updateProjection()
 
         this->m_pFiffInfo->make_projector(m_matProj);
         qDebug() << "updateProjection :: New projection calculated.";
+
+        //set columns of matrix to zero depending on bad channels indexes
+        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
+            m_matProj.col(m_vecBadIdcs[j]).setZero();
 
 //        std::cout << "Bads\n" << m_vecBadIdcs << std::endl;
 //        std::cout << "Proj\n";
