@@ -248,10 +248,15 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
         //Resize data matrix without touching the stored values
         m_matDataRaw.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
         m_matDataRaw.setZero();
+
         m_matDataFiltered.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
         m_matDataFiltered.setZero();
-        m_vecLastBlockFirstValues.conservativeResize(m_pFiffInfo->chs.size());
-        m_vecLastBlockFirstValues.setZero();
+
+        m_vecLastBlockFirstValuesFiltered.conservativeResize(m_pFiffInfo->chs.size());
+        m_vecLastBlockFirstValuesFiltered.setZero();
+
+        m_vecLastBlockFirstValuesRaw.conservativeResize(m_pFiffInfo->chs.size());
+        m_vecLastBlockFirstValuesRaw.setZero();
 
         //
         //  Create the initial SSP projector
@@ -268,30 +273,19 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T, float dest_sps)
+void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T)
 {
     beginResetModel();
 
-    int dsFactor;
-    if(sps > dest_sps)
-        dsFactor = (qint32)ceil(sps/dest_sps);
-    else
-        dsFactor = 1;
-
-    //Clear already saved data because it was measured with a different sampling rate
-    if(dsFactor != m_iDownsampling)
-        clearModel();
-
-    m_iDownsampling = dsFactor;
     m_iT = T;
 
-    float maxSamples = sps * T;
-    m_iMaxSamples = (qint32)ceil(maxSamples/(m_iDownsampling)); // Max Samples / Downsampling
+    m_iMaxSamples = (qint32)ceil(sps * T); // Max Samples / Downsampling
 
     //Resize data matrix without touching the stored values
     m_matDataRaw.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
     m_matDataFiltered.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
-    m_vecLastBlockFirstValues.conservativeResize(m_pFiffInfo->chs.size());
+    m_vecLastBlockFirstValuesRaw.conservativeResize(m_pFiffInfo->chs.size());
+    m_vecLastBlockFirstValuesFiltered.conservativeResize(m_pFiffInfo->chs.size());
 
     emit windowSizeChanged(m_iMaxSamples);
 
@@ -346,15 +340,19 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
         }
     }
 
-    //Reset m_iCurrentSample and start filling the data matrix from the beginning again
-    if(m_iCurrentSample>=m_iMaxSamples) {
-        m_iCurrentSample = 0;
-        m_vecLastBlockFirstValues = m_matDataRaw.col(0);
-    }
-
     //Filter current data concurrently
     if(!m_filterData.isEmpty())
         filterChannelsConcurrently();
+
+    //Reset m_iCurrentSample and start filling the data matrix from the beginning again
+    if(m_iCurrentSample>=m_iMaxSamples) {
+        m_iCurrentSample = 0;
+
+        if(!m_bIsFreezed) {
+            m_vecLastBlockFirstValuesFiltered = m_matDataFiltered.col(0);
+            m_vecLastBlockFirstValuesRaw = m_matDataRaw.col(0);
+        }
+    }
 
     //Update data content
     QModelIndex topLeft = this->index(0,1);
@@ -470,6 +468,9 @@ void RealTimeMultiSampleArrayModel::toggleFreeze(const QModelIndex &)
     if(m_bIsFreezed) {
         m_matDataRawFreeze = m_matDataRaw;
         m_matDataFilteredFreeze = m_matDataFiltered;
+
+        m_vecLastBlockFirstValuesFiltered = m_matDataFiltered.col(0);
+        m_vecLastBlockFirstValuesRaw = m_matDataRaw.col(0);
     }
 
     //Update data content
@@ -662,7 +663,8 @@ void RealTimeMultiSampleArrayModel::clearModel()
     m_matDataFiltered.setZero();
     m_matDataRawFreeze.setZero();
     m_matDataFilteredFreeze.setZero();
-    m_vecLastBlockFirstValues.setZero();
+    m_vecLastBlockFirstValuesFiltered.setZero();
+    m_vecLastBlockFirstValuesRaw.setZero();
 
     endResetModel();
 

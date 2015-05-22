@@ -315,14 +315,6 @@ private:
 
     //=========================================================================================================
     /**
-    * Sets new zoom factor
-    *
-    * @param [in] dsFactor downsampling factor
-    */
-    void dsFactorChanged(int dsFactor);
-
-    //=========================================================================================================
-    /**
     * Sets new time window size
     *
     * @param [in] T  time window size;
@@ -399,8 +391,6 @@ private:
     float           m_fDefaultSectionSize;                              /**< Default row height */
     float           m_fZoomFactor;                                      /**< Zoom factor */
     float           m_fSamplingRate;                                    /**< Sampling rate */
-    float           m_fDesiredSamplingRate;                             /**< Desired display sampling rate */
-    qint32          m_iDSFactor;                                        /**< Downsampling factor */
     qint32          m_iT;                                               /**< Display window size in seconds */
 
     QStringList     m_slSelectedChannels;                               /**< the currently selected channels from the selection manager window. */
