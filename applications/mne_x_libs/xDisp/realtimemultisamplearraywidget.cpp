@@ -79,23 +79,9 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 , m_bInitialized(false)
 , m_iT(10)
 , m_fSamplingRate(1024)
-, m_fDesiredSamplingRate(1024)
 , m_bHideBadChannels(false)
-, m_iDSFactor(1)
 {
     Q_UNUSED(pTime)
-
-    m_pSpinBoxDSFactor = new QSpinBox(this);
-    m_pSpinBoxDSFactor->setMinimum(1);
-    m_pSpinBoxDSFactor->setMaximum(100.0);
-    m_pSpinBoxDSFactor->setSingleStep(1);
-    m_pSpinBoxDSFactor->setValue(1);
-    m_pSpinBoxDSFactor->setSuffix(" x");
-    m_pSpinBoxDSFactor->setToolTip(tr("Downsample factor"));
-    m_pSpinBoxDSFactor->setStatusTip(tr("Downsample factor"));
-    connect(m_pSpinBoxDSFactor, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &RealTimeMultiSampleArrayWidget::dsFactorChanged);
-    addDisplayWidget(m_pSpinBoxDSFactor);
 
     m_pDoubleSpinBoxZoom = new QDoubleSpinBox(this);
     m_pDoubleSpinBoxZoom->setMinimum(0.3);
@@ -258,7 +244,7 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pRTMSAModel->setFiffInfo(m_pFiffInfo);
         m_pRTMSAModel->setChannelInfo(m_qListChInfo);//ToDo Obsolete
-        m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, m_iT, m_fSamplingRate);
+        m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, m_iT);
 
         //Init the delegate
         if(m_pRTMSADelegate)
@@ -508,24 +494,11 @@ void RealTimeMultiSampleArrayWidget::zoomChanged(double zoomFac)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayWidget::dsFactorChanged(int dsFactor)
-{
-    m_iDSFactor = dsFactor;
-    m_fDesiredSamplingRate = m_fSamplingRate/m_pSpinBoxDSFactor->value();
-
-    emit samplingRateChanged(m_fDesiredSamplingRate);
-
-    m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, m_iT, m_fDesiredSamplingRate);
-}
-
-
-//*************************************************************************************************************
-
 void RealTimeMultiSampleArrayWidget::timeWindowChanged(int T)
 {
     m_iT = T;
 
-    m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, T, m_fDesiredSamplingRate);
+    m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, T);
 }
 
 
@@ -697,8 +670,7 @@ void RealTimeMultiSampleArrayWidget::showFilterWidget()
                 m_pFilterWindow.data(), &FilterWindow::setSamplingRate);
 
         //Init downsampled sampling frequency
-        m_fDesiredSamplingRate = m_fSamplingRate/m_pSpinBoxDSFactor->value();
-        emit samplingRateChanged(m_fDesiredSamplingRate);
+        emit samplingRateChanged(m_fSamplingRate);
 
         //As default only use MEG channels for filtering
         m_pRTMSAModel->createFilterChannelList("MEG");

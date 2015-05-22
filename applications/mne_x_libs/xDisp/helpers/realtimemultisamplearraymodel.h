@@ -181,9 +181,8 @@ public:
     *
     * @param[in] sps        Samples per second of incomming data
     * @param[in] T          Time window length to display
-    * @param[in] dest_sps   Desired samples per second -> resulting downsampling is calculated out of this.
     */
-    void setSamplingInfo(float sps, int T, float dest_sps  = 128.0f);
+    void setSamplingInfo(float sps, int T);
 
     //=========================================================================================================
     /**
@@ -399,7 +398,8 @@ private:
     FiffInfo::SPtr          m_pFiffInfo;                        /**< Fiff info */
 
     RowVectorXi             m_vecBadIdcs;                       /**< Idcs of bad channels */
-    VectorXd                m_vecLastBlockFirstValues;          /**< The first value of the last complete data display block */
+    VectorXd                m_vecLastBlockFirstValuesFiltered;  /**< The first value of the last complete filtered data display block */
+    VectorXd                m_vecLastBlockFirstValuesRaw;       /**< The first value of the last complete raw data display block */
 
     MatrixXd                m_matProj;                          /**< SSP projector */
     SparseMatrix<double>    m_matSparseProj;                    /**< Sparse SSP projector */
@@ -440,10 +440,13 @@ inline qint32 RealTimeMultiSampleArrayModel::getCurrentSampleIndex() const
 
 inline double RealTimeMultiSampleArrayModel::getLastBlockFirstValue(int row) const
 {
-    if(row>m_vecLastBlockFirstValues.rows())
+    if(row>m_vecLastBlockFirstValuesFiltered.rows() || row>m_vecLastBlockFirstValuesRaw.rows())
         return 0;
 
-    return m_vecLastBlockFirstValues[row];
+    if(!m_filterData.isEmpty())
+        return m_vecLastBlockFirstValuesFiltered[row];
+
+    return m_vecLastBlockFirstValuesRaw[row];
 }
 
 
