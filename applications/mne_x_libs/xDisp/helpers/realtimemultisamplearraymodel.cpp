@@ -546,8 +546,6 @@ void RealTimeMultiSampleArrayModel::filterChanged(QList<FilterData> filterData)
     for(int i=0; i<filterData.size(); i++)
         if(m_iMaxFilterLength<filterData.at(i).m_iFilterOrder)
             m_iMaxFilterLength = filterData.at(i).m_iFilterOrder;
-
-    std::cout<<"m_iMaxFilterLength: "<<m_iMaxFilterLength<<std::endl;
 }
 
 
@@ -596,27 +594,17 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
 {
     //std::cout<<"START RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
 
-    m_matDataFiltered = m_matDataRaw;
-
     //Generate QList structure which can be handled by the QConcurrent framework
     QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;
 
     for(qint32 i=0; i<m_matDataRaw.rows(); ++i) {
         if(m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-//            RowVectorXd data;
+            RowVectorXd data(m_matDataRaw.cols()+2*m_iMaxFilterLength);
 
-//            data = m_matDataRaw.row(i);
+            //Only append needed amount (filterLength) to the data
+            data << m_matDataRaw.row(i).tail(m_iMaxFilterLength), m_matDataRaw.row(i), m_matDataRaw.row(i).tail(m_iMaxFilterLength).reverse();
 
-//            if(matDataLast.rows() == 0) //if no m_dataLast has been set yet
-//                data = m_matDataRaw.row(i);
-//            else {
-//                //Only append needed amount (filterLength) to the data
-//                RowVectorXd temp (m_iMaxFilterLength+m_matDataRaw.cols());
-//                temp << matDataLast.row(i).tail(m_iMaxFilterLength), m_matDataRaw.row(i);
-//                data = temp;
-//            }
-
-            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,m_matDataRaw.row(i))));
+            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,data)));
         }
     }
 
@@ -632,7 +620,7 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
 //            r = 0;
 
         for(int r = 0; r<timeData.size(); r++)
-            m_matDataFiltered.row(timeData.at(r).second.first) = timeData.at(r).second.second;
+            m_matDataFiltered.row(timeData.at(r).second.first) = timeData.at(r).second.second.segment(m_iMaxFilterLength, m_matDataRaw.cols());
     }
 
 //    std::cout<<"m_dataCurrent.size(): "<<m_dataCurrent.size()<<std::endl;
