@@ -390,7 +390,8 @@ private:
     qint32  m_iT;                   /**< Time window */
     qint32  m_iDownsampling;        /**< Down sampling factor */
     qint32  m_iMaxSamples;          /**< Max samples per window */
-    qint32  m_iCurrentSample;       /**< Accurate Downsampling */
+    qint32  m_iCurrentSample;       /**< Current sample which holds the current position in the data matrix */
+    qint32  m_iCurrentSampleFreeze; /**< Current sample which holds the current position in the data matrix when freezing tool is active */
     qint32  m_iMaxFilterLength;     /**< Max order of the current filters */
 
     QString m_sFilterChannelType;   /**< Kind of channel which is to be filtered */
@@ -432,6 +433,9 @@ inline qint32 RealTimeMultiSampleArrayModel::getMaxSamples() const
 
 inline qint32 RealTimeMultiSampleArrayModel::getCurrentSampleIndex() const
 {
+    if(m_bIsFreezed)
+        return m_iCurrentSampleFreeze;
+
     return m_iCurrentSample;
 }
 
