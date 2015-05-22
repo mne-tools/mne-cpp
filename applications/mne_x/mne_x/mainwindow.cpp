@@ -509,6 +509,8 @@ void MainWindow::createLogDockWindow()
     m_pDockWidget_Log->setAllowedAreas(Qt::BottomDockWidgetArea);
     addDockWidget(Qt::BottomDockWidgetArea, m_pDockWidget_Log);
 
+    m_pDockWidget_Log->hide();
+
     //dock->setVisible(false);
 
     m_pMenuView->addAction(m_pDockWidget_Log->toggleViewAction());
