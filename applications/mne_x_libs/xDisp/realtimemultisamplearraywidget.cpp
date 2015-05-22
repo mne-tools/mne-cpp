@@ -515,6 +515,9 @@ void RealTimeMultiSampleArrayWidget::applySelection()
             m_pTableView->hideRow(i);
     }
 
+    //Update the visible channel list which are to be filtered
+    visibleRowsChanged(0);
+
     //m_pRTMSAModel->selectRows(m_qListCurrentSelection);
 }
 
@@ -525,6 +528,9 @@ void RealTimeMultiSampleArrayWidget::hideSelection()
 {
     for(int i=0; i<m_qListCurrentSelection.size(); i++)
         m_pTableView->hideRow(m_qListCurrentSelection.at(i));
+
+    //Update the visible channel list which are to be filtered
+    visibleRowsChanged(0);
 }
 
 
@@ -543,6 +549,9 @@ void RealTimeMultiSampleArrayWidget::resetSelection()
             m_pTableView->showRow(i);
         }
     }
+
+    //Update the visible channel list which are to be filtered
+    visibleRowsChanged(0);
 }
 
 
@@ -562,6 +571,9 @@ void RealTimeMultiSampleArrayWidget::showSelectedChannelsOnly(QStringList select
         else
             m_pTableView->showRow(i);
     }
+
+    //Update the visible channel list which are to be filtered
+    visibleRowsChanged(0);
 }
 
 
