@@ -243,8 +243,6 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
 
         m_pFiffInfo = p_pFiffInfo;
 
-        createFilterChannelList(m_sFilterChannelType);
-
         //Resize data matrix without touching the stored values
         m_matDataRaw.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
         m_matDataRaw.setZero();
@@ -258,13 +256,21 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
         m_vecLastBlockFirstValuesRaw.conservativeResize(m_pFiffInfo->chs.size());
         m_vecLastBlockFirstValuesRaw.setZero();
 
-        //
         //  Create the initial SSP projector
-        //
         updateProjection();
+
+        //Initialise filter channel names
+        int visibleInit = 20;
+
+        if(visibleInit>m_pFiffInfo->chs.size()) {
+            while(visibleInit>m_pFiffInfo->chs.size())
+                visibleInit--;
+        }
+
+        for(qint32 b = 0; b < visibleInit; ++b)
+            m_filterChannelList.append(m_pFiffInfo->ch_names.at(b));
     }
-    else
-    {
+    else {
         m_vecBadIdcs = RowVectorXi(0,0);
         m_matProj = MatrixXd(0,0);
     }
@@ -547,22 +553,11 @@ void RealTimeMultiSampleArrayModel::filterChanged(QList<FilterData> filterData)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::createFilterChannelList(QString channelType)
+void RealTimeMultiSampleArrayModel::setFilterChannelType(QString channelType)
 {
-    m_filterChannelList.clear();
-
     m_sFilterChannelType = channelType;
 
-    for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
-        if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
-            m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
-            m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH) && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-            if(m_sFilterChannelType == "All")
-                m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
-            else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType))
-                m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
-        }
-    }
+    createFilterChannelList(m_filterChannelList);
 }
 
 

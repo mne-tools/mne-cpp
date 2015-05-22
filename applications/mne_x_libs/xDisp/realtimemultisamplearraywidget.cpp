@@ -658,7 +658,7 @@ void RealTimeMultiSampleArrayWidget::showFilterWidget()
         m_pFilterWindow->setWindowSize(m_pRTMSAModel->getMaxSamples());
 
         connect(m_pFilterWindow.data(),static_cast<void (FilterWindow::*)(QString)>(&FilterWindow::applyFilter),
-                    m_pRTMSAModel,static_cast<void (RealTimeMultiSampleArrayModel::*)(QString)>(&RealTimeMultiSampleArrayModel::createFilterChannelList));
+                    m_pRTMSAModel,static_cast<void (RealTimeMultiSampleArrayModel::*)(QString)>(&RealTimeMultiSampleArrayModel::setFilterChannelType));
 
         connect(m_pFilterWindow.data(), &FilterWindow::filterChanged,
                 m_pRTMSAModel, &RealTimeMultiSampleArrayModel::filterChanged);
@@ -671,9 +671,6 @@ void RealTimeMultiSampleArrayWidget::showFilterWidget()
 
         //Init downsampled sampling frequency
         emit samplingRateChanged(m_fSamplingRate);
-
-        //As default only use MEG channels for filtering
-        m_pRTMSAModel->createFilterChannelList("MEG");
     }
 
     if(m_pFilterWindow->isActiveWindow())

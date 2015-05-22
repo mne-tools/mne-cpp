@@ -334,11 +334,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Create list of channels which are to be filtered based on channel type
+    * Sets the type of channel which are to be filtered
     *
     * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
     */
-    void createFilterChannelList(QString channelType);
+    void setFilterChannelType(QString channelType);
 
     //=========================================================================================================
     /**
