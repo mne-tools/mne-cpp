@@ -279,7 +279,7 @@ void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T)
 
     m_iT = T;
 
-    m_iMaxSamples = (qint32)ceil(sps * T); // Max Samples / Downsampling
+    m_iMaxSamples = (qint32)ceil(sps * T);
 
     //Resize data matrix without touching the stored values
     m_matDataRaw.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
@@ -469,8 +469,7 @@ void RealTimeMultiSampleArrayModel::toggleFreeze(const QModelIndex &)
         m_matDataRawFreeze = m_matDataRaw;
         m_matDataFilteredFreeze = m_matDataFiltered;
 
-        m_vecLastBlockFirstValuesFiltered = m_matDataFiltered.col(0);
-        m_vecLastBlockFirstValuesRaw = m_matDataRaw.col(0);
+        m_iCurrentSampleFreeze = m_iCurrentSample;
     }
 
     //Update data content
