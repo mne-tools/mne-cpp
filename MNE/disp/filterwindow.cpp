@@ -133,6 +133,9 @@ void FilterWindow::setMaxFilterTaps(int iMaxNumberFilterTaps)
     if(iMaxNumberFilterTaps%2!=0)
         iMaxNumberFilterTaps--;
 
+    if(iMaxNumberFilterTaps>512)
+        iMaxNumberFilterTaps = 512;
+
     ui->m_spinBox_filterTaps->setMaximum(iMaxNumberFilterTaps);
 
     //Update filter depending on new window size

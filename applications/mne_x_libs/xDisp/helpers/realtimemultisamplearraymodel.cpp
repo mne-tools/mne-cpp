@@ -587,8 +587,8 @@ void RealTimeMultiSampleArrayModel::createFilterChannelList(QStringList channelN
 void doFilterPerChannel(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
 {
     for(int i=0; i<channelDataTime.first.size(); i++)
-        channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, false, FilterData::MirrorData);
-        //channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, false, FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
+        //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true, FilterData::MirrorData);
+        channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, true, FilterData::MirrorData); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
 }
 
 
@@ -624,7 +624,7 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
 //            r = 0;
 
         for(int r = 0; r<timeData.size(); r++)
-            m_matDataFiltered.row(timeData.at(r).second.first) = timeData.at(r).second.second.segment(m_iMaxFilterLength, m_matDataRaw.cols());
+            m_matDataFiltered.row(timeData.at(r).second.first) = timeData.at(r).second.second.segment(m_iMaxFilterLength/2, m_matDataRaw.cols());
     }
 
 //    std::cout<<"m_dataCurrent.size(): "<<m_dataCurrent.size()<<std::endl;
@@ -653,12 +653,11 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
 
     for(qint32 i=0; i<data.rows(); ++i) {
         if(m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-            RowVectorXd dataTemp(m_matDataRaw.cols()+2*m_iMaxFilterLength);
-
-            //Only prepend and append the needed amount (filterLength/number of filter taps) to the raw data
-            dataTemp << data.row(i).tail(m_iMaxFilterLength), data.row(i), data.row(i).tail(m_iMaxFilterLength).reverse();
-
-            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,dataTemp)));
+//            //Prepend and append the needed amount (filterLength/number of filter taps) to the raw data
+//            RowVectorXd dataTemp(m_matDataRaw.cols()+2*m_iMaxFilterLength);
+//            dataTemp << data.row(i).tail(m_iMaxFilterLength), data.row(i), data.row(i).tail(m_iMaxFilterLength).reverse();
+//            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,dataTemp)));
+            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,data.row(i))));
         }
     }
 
@@ -675,7 +674,7 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
 
         //TODO: Implement overlap add method
         for(int r = 0; r<timeData.size(); r++)
-            m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex,data.cols()) = timeData.at(r).second.second.segment(m_iMaxFilterLength, data.cols());
+            m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex,data.cols()) = timeData.at(r).second.second.segment(m_iMaxFilterLength/2, data.cols());
     }
 
 //    std::cout<<"m_dataCurrent.size(): "<<m_dataCurrent.size()<<std::endl;

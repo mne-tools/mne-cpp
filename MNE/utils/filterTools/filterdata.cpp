@@ -199,6 +199,8 @@ RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data, bool keepOverhe
 
     //Do zero padding or mirroring depending on user input
     RowVectorXd t_dataZeroPad = RowVectorXd::Zero(2*m_dCoeffA.cols() + data.cols());
+    RowVectorXd t_filteredTime = RowVectorXd::Zero(2*m_dCoeffA.cols() + data.cols());
+
     switch(compensateEdgeEffects) {
         case MirrorData:
             t_dataZeroPad.head(m_dCoeffA.cols()) = data.head(m_dCoeffA.cols()).reverse();   //front
@@ -211,13 +213,11 @@ RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data, bool keepOverhe
             break;
 
         default:
-            t_dataZeroPad.head(data.cols()) = data;
+            t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;
             break;
     }
 
     //Do the convolution
-    RowVectorXd t_filteredTime = RowVectorXd::Zero(2*m_dCoeffA.cols() + data.cols());
-
     for(int i=m_dCoeffA.cols(); i<t_filteredTime.cols(); i++)
         t_filteredTime(i-m_dCoeffA.cols()) = t_dataZeroPad.segment(i-m_dCoeffA.cols(),m_dCoeffA.cols()) * m_dCoeffA.transpose();
 
@@ -225,7 +225,7 @@ RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data, bool keepOverhe
     if(!keepOverhead)
         return t_filteredTime.segment(m_dCoeffA.cols()/2, data.cols());
 
-    return t_filteredTime;
+    return t_filteredTime.head(data.cols()+m_dCoeffA.cols());
 }
 
 
@@ -249,7 +249,7 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
     switch(compensateEdgeEffects) {
         case MirrorData:
             t_dataZeroPad.head(m_dCoeffA.cols()) = data.head(m_dCoeffA.cols()).reverse();   //front
-            t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;                      //middle
+            t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;                    //middle
             t_dataZeroPad.tail(m_dCoeffA.cols()) = data.tail(m_dCoeffA.cols()).reverse();   //back
             break;
 
@@ -258,7 +258,7 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
             break;
 
         default:
-            t_dataZeroPad.head(data.cols()) = data;
+            t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;
             break;
     }
 
@@ -281,7 +281,7 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
     if(!keepOverhead)
         return t_filteredTime.segment(m_dCoeffA.cols()*1.5, data.cols());
 
-    return t_filteredTime;
+    return t_filteredTime.segment(m_dCoeffA.cols(), data.cols()+m_dCoeffA.cols());
 }
 
 
