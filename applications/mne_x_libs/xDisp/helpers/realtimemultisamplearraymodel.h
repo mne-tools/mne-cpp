@@ -380,7 +380,16 @@ private:
 
     //=========================================================================================================
     /**
-    * Calculates the filtered version of the channels in dataTime
+    * Calculates the filtered version of the raw input data
+    *
+    * @param [in] data          data which is to be filtered
+    * @param [in] dataIndex     current position in the global data matrix
+    */
+    void filterChannelsConcurrently(const MatrixXd &data, int dataIndex);
+
+    //=========================================================================================================
+    /**
+    * Calculates the filtered version of the channels in m_matDataRaw
     */
     void filterChannelsConcurrently();
 

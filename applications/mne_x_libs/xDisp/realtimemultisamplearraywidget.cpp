@@ -80,6 +80,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 , m_iT(10)
 , m_fSamplingRate(1024)
 , m_bHideBadChannels(false)
+, m_iMaxFilterTapSize(0)
 {
     Q_UNUSED(pTime)
 
@@ -222,6 +223,8 @@ void RealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
             emit fiffFileUpdated(*m_pFiffInfo.data());
 
             m_fSamplingRate = m_pRTMSA->getSamplingRate();
+
+            m_iMaxFilterTapSize = m_pRTMSA->getMultiSampleArray().at(m_pRTMSA->getMultiSampleArray().size()-1).cols();
 
             init();
         }
@@ -668,6 +671,7 @@ void RealTimeMultiSampleArrayWidget::showFilterWidget()
 
         m_pFilterWindow->setFiffInfo(*m_pFiffInfo.data());
         m_pFilterWindow->setWindowSize(m_pRTMSAModel->getMaxSamples());
+        m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
 
         connect(m_pFilterWindow.data(),static_cast<void (FilterWindow::*)(QString)>(&FilterWindow::applyFilter),
                     m_pRTMSAModel,static_cast<void (RealTimeMultiSampleArrayModel::*)(QString)>(&RealTimeMultiSampleArrayModel::setFilterChannelType));

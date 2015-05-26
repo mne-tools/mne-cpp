@@ -388,6 +388,7 @@ private:
 
     bool            m_bInitialized;                                     /**< Is Initialized */
     bool            m_bHideBadChannels;                                 /**< hide bad channels flag. */
+    qint32          m_iMaxFilterTapSize;                                /**< maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
     float           m_fDefaultSectionSize;                              /**< Default row height */
     float           m_fZoomFactor;                                      /**< Zoom factor */
     float           m_fSamplingRate;                                    /**< Sampling rate */

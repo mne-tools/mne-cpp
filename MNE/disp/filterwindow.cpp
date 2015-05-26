@@ -121,7 +121,19 @@ void FilterWindow::setWindowSize(int iWindowSize)
     if(m_iWindowSize%2!=0)
         m_iWindowSize--;
 
-    ui->m_spinBox_filterTaps->setMaximum(m_iWindowSize);
+    //Update filter depending on new window size
+    filterParametersChanged();
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::setMaxFilterTaps(int iMaxNumberFilterTaps)
+{
+    if(iMaxNumberFilterTaps%2!=0)
+        iMaxNumberFilterTaps--;
+
+    ui->m_spinBox_filterTaps->setMaximum(iMaxNumberFilterTaps);
 
     //Update filter depending on new window size
     filterParametersChanged();
