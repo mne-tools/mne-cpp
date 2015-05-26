@@ -320,6 +320,10 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
             else
                 m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()-residual) = data.at(b).block(0,0,data.at(b).rows(),data.at(b).cols()-residual);
 
+            //Filter if neccessary
+            if(!m_filterData.isEmpty())
+                filterChannelsConcurrently(m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()-residual), m_iCurrentSample);
+
             m_iCurrentSample += data.at(b).cols()-residual;
 
 //            std::cout<<"incoming data exceeds internal data cols by: "<<residual<<std::endl;
@@ -332,6 +336,10 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
                 m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseProj * data.at(b);
             else
                 m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = data.at(b);
+
+            //Filter if neccessary
+            if(!m_filterData.isEmpty())
+                filterChannelsConcurrently(m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()), m_iCurrentSample);
 
             m_iCurrentSample += data.at(b).cols();
         }
@@ -346,10 +354,6 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
             m_vecLastBlockFirstValuesRaw = m_matDataRaw.col(0);
         }
     }
-
-    //Filter current data concurrently
-    if(!m_filterData.isEmpty())
-        filterChannelsConcurrently();
 
     //Update data content
     QModelIndex topLeft = this->index(0,1);
@@ -621,6 +625,57 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
 
         for(int r = 0; r<timeData.size(); r++)
             m_matDataFiltered.row(timeData.at(r).second.first) = timeData.at(r).second.second.segment(m_iMaxFilterLength, m_matDataRaw.cols());
+    }
+
+//    std::cout<<"m_dataCurrent.size(): "<<m_dataCurrent.size()<<std::endl;
+//    std::cout<<"m_dataLast.size(): "<<m_dataLast.size()<<std::endl;
+
+    //std::cout<<"END RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &data, int dataIndex)
+{
+    //std::cout<<"START RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
+
+    if(dataIndex >= m_matDataFiltered.cols() || data.cols()<m_iMaxFilterLength)
+        return;
+
+    if(data.rows() != m_matDataFiltered.rows()) {
+        m_matDataFiltered = m_matDataRaw;
+        return;
+    }
+
+    //Generate QList structure which can be handled by the QConcurrent framework
+    QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;
+
+    for(qint32 i=0; i<data.rows(); ++i) {
+        if(m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name)) {
+            RowVectorXd dataTemp(m_matDataRaw.cols()+2*m_iMaxFilterLength);
+
+            //Only prepend and append the needed amount (filterLength/number of filter taps) to the raw data
+            dataTemp << data.row(i).tail(m_iMaxFilterLength), data.row(i), data.row(i).tail(m_iMaxFilterLength).reverse();
+
+            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,dataTemp)));
+        }
+    }
+
+    //Do the concurrent filtering
+    if(!timeData.isEmpty()) {
+        QFuture<void> future = QtConcurrent::map(timeData,
+                                             doFilterPerChannel);
+
+        future.waitForFinished();
+
+//        int r = m_iMaxFilterLength;
+//        if(matDataLast.rows() == 0)
+//            r = 0;
+
+        //TODO: Implement overlap add method
+        for(int r = 0; r<timeData.size(); r++)
+            m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex,data.cols()) = timeData.at(r).second.second.segment(m_iMaxFilterLength, data.cols());
     }
 
 //    std::cout<<"m_dataCurrent.size(): "<<m_dataCurrent.size()<<std::endl;
