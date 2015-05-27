@@ -327,6 +327,8 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
             //Filter if neccessary
             if(!m_filterData.isEmpty())
                 filterChannelsConcurrently(m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()-residual), m_iCurrentSample);
+            else
+                m_matDataFiltered.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()-residual) = m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()-residual);
 
             m_iCurrentSample += data.at(b).cols()-residual;
 
@@ -344,6 +346,8 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
             //Filter if neccessary
             if(!m_filterData.isEmpty())
                 filterChannelsConcurrently(m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()), m_iCurrentSample);
+            else
+                m_matDataFiltered.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols());
 
             m_iCurrentSample += data.at(b).cols();
         }
@@ -556,6 +560,7 @@ void RealTimeMultiSampleArrayModel::filterChanged(QList<FilterData> filterData)
             m_iMaxFilterLength = filterData.at(i).m_iFilterOrder;
 
     m_matLastOverlap.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxFilterLength);
+    m_matLastOverlap.setZero();
 
     //Filter all visible data channels
     //filterChannelsConcurrently();
@@ -676,9 +681,13 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
                 RowVectorXd tempData = timeData.at(r).second.second;
                 tempData.head(m_iMaxFilterLength) += m_matLastOverlap.row(timeData.at(r).second.first);
                 m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength) = tempData.segment(0,iFilteredNumberCols-m_iMaxFilterLength);
+                m_matLastOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
             } else if(m_iCurrentSample==0) {
                 //Handle first data block
-                m_matDataFiltered.row(timeData.at(r).second.first).head(iFilteredNumberCols-m_iMaxFilterLength) = timeData.at(r).second.second.segment(iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength);
+                RowVectorXd tempData = timeData.at(r).second.second;
+                tempData.head(m_iMaxFilterLength) += m_matLastOverlap.row(timeData.at(r).second.first);
+                m_matDataFiltered.row(timeData.at(r).second.first).head(iFilteredNumberCols-m_iMaxFilterLength) = tempData.segment(iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength);
+                //m_matDataFiltered.row(timeData.at(r).second.first).tail(iFilterDelay) = tempData.segment(0,iFilterDelay);
                 m_matLastOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
             } else {
                 //Handle middle data blocks

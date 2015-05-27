@@ -670,7 +670,7 @@ void RealTimeMultiSampleArrayWidget::showFilterWidget()
         //m_pFilterWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
 
         m_pFilterWindow->setFiffInfo(*m_pFiffInfo.data());
-        m_pFilterWindow->setWindowSize(m_pRTMSAModel->getMaxSamples());
+        m_pFilterWindow->setWindowSize(m_iMaxFilterTapSize);
         m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
 
         connect(m_pFilterWindow.data(),static_cast<void (FilterWindow::*)(QString)>(&FilterWindow::applyFilter),
@@ -679,8 +679,8 @@ void RealTimeMultiSampleArrayWidget::showFilterWidget()
         connect(m_pFilterWindow.data(), &FilterWindow::filterChanged,
                 m_pRTMSAModel, &RealTimeMultiSampleArrayModel::filterChanged);
 
-        connect(m_pRTMSAModel, &RealTimeMultiSampleArrayModel::windowSizeChanged,
-                m_pFilterWindow.data(), &FilterWindow::setWindowSize);
+//        connect(m_pRTMSAModel, &RealTimeMultiSampleArrayModel::windowSizeChanged,
+//                m_pFilterWindow.data(), &FilterWindow::setWindowSize);
 
         connect(this, &RealTimeMultiSampleArrayWidget::samplingRateChanged,
                 m_pFilterWindow.data(), &FilterWindow::setSamplingRate);
