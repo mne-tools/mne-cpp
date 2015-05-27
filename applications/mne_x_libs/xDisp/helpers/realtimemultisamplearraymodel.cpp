@@ -65,6 +65,7 @@ RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 , m_iCurrentSample(0)
 , m_bIsFreezed(false)
 , m_sFilterChannelType("MEG")
+, m_iMaxFilterLength(128)
 {
     init();
 }
@@ -292,6 +293,9 @@ void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T)
     m_matDataFiltered.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
     m_vecLastBlockFirstValuesRaw.conservativeResize(m_pFiffInfo->chs.size());
     m_vecLastBlockFirstValuesFiltered.conservativeResize(m_pFiffInfo->chs.size());
+
+    if(m_iCurrentSample>m_iMaxSamples)
+        m_iCurrentSample = 0;
 
     emit windowSizeChanged(m_iMaxSamples);
 
@@ -546,10 +550,15 @@ void RealTimeMultiSampleArrayModel::filterChanged(QList<FilterData> filterData)
 {
     m_filterData = filterData;
 
-    m_iMaxFilterLength = 0;
+    m_iMaxFilterLength = 1;
     for(int i=0; i<filterData.size(); i++)
         if(m_iMaxFilterLength<filterData.at(i).m_iFilterOrder)
             m_iMaxFilterLength = filterData.at(i).m_iFilterOrder;
+
+    m_matLastOverlap.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxFilterLength);
+
+    //Filter all visible data channels
+    //filterChannelsConcurrently();
 }
 
 
@@ -587,8 +596,8 @@ void RealTimeMultiSampleArrayModel::createFilterChannelList(QStringList channelN
 void doFilterPerChannel(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
 {
     for(int i=0; i<channelDataTime.first.size(); i++)
-        //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true, FilterData::MirrorData);
-        channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, true, FilterData::MirrorData); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
+        //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true, FilterData::ZeroPad);
+        channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, true, FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
 }
 
 
@@ -602,14 +611,8 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
     QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;
 
     for(qint32 i=0; i<m_matDataRaw.rows(); ++i) {
-        if(m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-            RowVectorXd data(m_matDataRaw.cols()+2*m_iMaxFilterLength);
-
-            //Only append needed amount (filterLength) to the data
-            data << m_matDataRaw.row(i).tail(m_iMaxFilterLength), m_matDataRaw.row(i), m_matDataRaw.row(i).tail(m_iMaxFilterLength).reverse();
-
-            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,data)));
-        }
+        if(m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name))
+            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,m_matDataRaw.row(i))));
     }
 
     //Do the concurrent filtering
@@ -652,13 +655,8 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
     QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;
 
     for(qint32 i=0; i<data.rows(); ++i) {
-        if(m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-//            //Prepend and append the needed amount (filterLength/number of filter taps) to the raw data
-//            RowVectorXd dataTemp(m_matDataRaw.cols()+2*m_iMaxFilterLength);
-//            dataTemp << data.row(i).tail(m_iMaxFilterLength), data.row(i), data.row(i).tail(m_iMaxFilterLength).reverse();
-//            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,dataTemp)));
+        if(m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name))
             timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,data.row(i))));
-        }
     }
 
     //Do the concurrent filtering
@@ -668,17 +666,29 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
 
         future.waitForFinished();
 
-//        int r = m_iMaxFilterLength;
-//        if(matDataLast.rows() == 0)
-//            r = 0;
+        //Do the overlap add method and store in m_matDataFiltered
+        int iFilterDelay = m_iMaxFilterLength/2;
+        int iFilteredNumberCols = timeData.at(0).second.second.cols();
 
-        //TODO: Implement overlap add method
-        for(int r = 0; r<timeData.size(); r++)
-            m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex,data.cols()) = timeData.at(r).second.second.segment(m_iMaxFilterLength/2, data.cols());
+        for(int r = 0; r<timeData.size(); r++) {
+            if(m_iCurrentSample+2*data.cols() > m_matDataRaw.cols()) {
+                //Handle last data block
+                RowVectorXd tempData = timeData.at(r).second.second;
+                tempData.head(m_iMaxFilterLength) += m_matLastOverlap.row(timeData.at(r).second.first);
+                m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength) = tempData.segment(0,iFilteredNumberCols-m_iMaxFilterLength);
+            } else if(m_iCurrentSample==0) {
+                //Handle first data block
+                m_matDataFiltered.row(timeData.at(r).second.first).head(iFilteredNumberCols-m_iMaxFilterLength) = timeData.at(r).second.second.segment(iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength);
+                m_matLastOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
+            } else {
+                //Handle middle data blocks
+                RowVectorXd tempData = timeData.at(r).second.second;
+                tempData.head(m_iMaxFilterLength) += m_matLastOverlap.row(timeData.at(r).second.first);
+                m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength) = tempData.segment(0,iFilteredNumberCols-m_iMaxFilterLength);
+                m_matLastOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
+            }
+        }
     }
-
-//    std::cout<<"m_dataCurrent.size(): "<<m_dataCurrent.size()<<std::endl;
-//    std::cout<<"m_dataLast.size(): "<<m_dataLast.size()<<std::endl;
 
     //std::cout<<"END RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
 }
@@ -696,6 +706,7 @@ void RealTimeMultiSampleArrayModel::clearModel()
     m_matDataFilteredFreeze.setZero();
     m_vecLastBlockFirstValuesFiltered.setZero();
     m_vecLastBlockFirstValuesRaw.setZero();
+    m_matLastOverlap.setZero();
 
     endResetModel();
 
