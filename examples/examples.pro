@@ -53,6 +53,7 @@ SUBDIRS += \
     fiffIO \
     makeLayout\
     bmtiExample\
+    readBEM\
 
 contains(MNECPP_CONFIG, withGui) {
 	SUBDIRS +=
