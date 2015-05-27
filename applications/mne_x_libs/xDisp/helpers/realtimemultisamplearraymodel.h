@@ -418,6 +418,7 @@ private:
     MatrixXdR               m_matDataFiltered;
     MatrixXdR               m_matDataRawFreeze;
     MatrixXdR               m_matDataFilteredFreeze;
+    MatrixXd                m_matLastOverlap;                   /**< Last overlap block */
 
     QMap< qint32,float>                 m_qMapChScaling;        /**< Sensor selection widget. */
     QList<FilterData>                   m_filterData;           /**< List of currently active filters. */

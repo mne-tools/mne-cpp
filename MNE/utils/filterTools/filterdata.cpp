@@ -56,7 +56,7 @@ using namespace UTILSLIB;
 FilterData::FilterData()
 : m_Type(UNKNOWN)
 , m_iFilterOrder(80)
-, m_iFFTlength(4096)
+, m_iFFTlength(512)
 , m_sName("Unknown")
 , m_dParksWidth(0.1)
 , m_designMethod(External)
@@ -254,11 +254,11 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
             break;
 
         case ZeroPad:
-            t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;
+            t_dataZeroPad.head(data.cols()) = data;
             break;
 
         default:
-            t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;
+            t_dataZeroPad.head(data.cols()) = data;
             break;
     }
 
@@ -279,9 +279,9 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
 
     //Return filtered data
     if(!keepOverhead)
-        return t_filteredTime.segment(m_dCoeffA.cols()*1.5, data.cols());
+        return t_filteredTime.segment(m_dCoeffA.cols()/2, data.cols());
 
-    return t_filteredTime.segment(m_dCoeffA.cols(), data.cols()+m_dCoeffA.cols());
+    return t_filteredTime.head(data.cols()+m_dCoeffA.cols());
 }
 
 
