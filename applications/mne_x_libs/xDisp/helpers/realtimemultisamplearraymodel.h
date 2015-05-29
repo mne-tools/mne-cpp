@@ -402,6 +402,7 @@ private:
     qint32  m_iCurrentSample;       /**< Current sample which holds the current position in the data matrix */
     qint32  m_iCurrentSampleFreeze; /**< Current sample which holds the current position in the data matrix when freezing tool is active */
     qint32  m_iMaxFilterLength;     /**< Max order of the current filters */
+    qint32  m_iCurrentBlockSize;    /**< Current block size */
 
     QString m_sFilterChannelType;   /**< Kind of channel which is to be filtered */
 
@@ -418,12 +419,13 @@ private:
     MatrixXdR               m_matDataFiltered;
     MatrixXdR               m_matDataRawFreeze;
     MatrixXdR               m_matDataFilteredFreeze;
-    MatrixXd                m_matLastOverlap;                   /**< Last overlap block */
+    MatrixXd                m_matOverlapBack;                   /**< Last overlap block for the back */
 
     QMap< qint32,float>                 m_qMapChScaling;        /**< Sensor selection widget. */
     QList<FilterData>                   m_filterData;           /**< List of currently active filters. */
     QList<RealTimeSampleArrayChInfo>    m_qListChInfo;          /**< Channel info list. ToDo: Obsolete*/
     QStringList                         m_filterChannelList;    /**< List of channels which are to be filtered.*/
+    QStringList                         m_visibleChannelList;   /**< List of currently visible channels in the view.*/
     QMap<qint32,qint32>                 m_qMapIdxRowSelection;  /**< Selection mapping.*/
 };
 

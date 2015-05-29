@@ -66,6 +66,7 @@ RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 , m_bIsFreezed(false)
 , m_sFilterChannelType("MEG")
 , m_iMaxFilterLength(128)
+, m_iCurrentBlockSize(1024)
 {
     init();
 }
@@ -297,8 +298,6 @@ void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T)
     if(m_iCurrentSample>m_iMaxSamples)
         m_iCurrentSample = 0;
 
-    emit windowSizeChanged(m_iMaxSamples);
-
     endResetModel();
 }
 
@@ -325,10 +324,9 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
                 m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()-residual) = data.at(b).block(0,0,data.at(b).rows(),data.at(b).cols()-residual);
 
             //Filter if neccessary
+            m_matDataFiltered.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()-residual) = m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()-residual);
             if(!m_filterData.isEmpty())
                 filterChannelsConcurrently(m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()-residual), m_iCurrentSample);
-            else
-                m_matDataFiltered.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()-residual) = m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()-residual);
 
             m_iCurrentSample += data.at(b).cols()-residual;
 
@@ -344,13 +342,14 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
                 m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = data.at(b);
 
             //Filter if neccessary
+            m_matDataFiltered.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols());
             if(!m_filterData.isEmpty())
                 filterChannelsConcurrently(m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()), m_iCurrentSample);
-            else
-                m_matDataFiltered.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols());
 
             m_iCurrentSample += data.at(b).cols();
         }
+
+        m_iCurrentBlockSize = data.at(b).cols();
     }
 
     //Reset m_iCurrentSample and start filling the data matrix from the beginning again
@@ -559,11 +558,11 @@ void RealTimeMultiSampleArrayModel::filterChanged(QList<FilterData> filterData)
         if(m_iMaxFilterLength<filterData.at(i).m_iFilterOrder)
             m_iMaxFilterLength = filterData.at(i).m_iFilterOrder;
 
-    m_matLastOverlap.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxFilterLength);
-    m_matLastOverlap.setZero();
+    m_matOverlapBack.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxFilterLength);
+    m_matOverlapBack.setZero();
 
-    //Filter all visible data channels
-    //filterChannelsConcurrently();
+    //Filter all visible data channels at once
+    filterChannelsConcurrently();
 }
 
 
@@ -572,8 +571,20 @@ void RealTimeMultiSampleArrayModel::filterChanged(QList<FilterData> filterData)
 void RealTimeMultiSampleArrayModel::setFilterChannelType(QString channelType)
 {
     m_sFilterChannelType = channelType;
+    m_filterChannelList = m_visibleChannelList;
 
-    createFilterChannelList(m_filterChannelList);
+    if(channelType != "All") {
+        QMutableListIterator<QString> i(m_filterChannelList);
+        while(i.hasNext()) {
+            QString val = i.next();
+            if(!val.contains(channelType, Qt::CaseInsensitive)) {
+                i.remove();
+            }
+        }
+    }
+
+    //Filter all visible data channels at once
+    filterChannelsConcurrently();
 }
 
 
@@ -582,6 +593,7 @@ void RealTimeMultiSampleArrayModel::setFilterChannelType(QString channelType)
 void RealTimeMultiSampleArrayModel::createFilterChannelList(QStringList channelNames)
 {
     m_filterChannelList.clear();
+    m_visibleChannelList = channelNames;
 
     for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
         if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
@@ -593,6 +605,9 @@ void RealTimeMultiSampleArrayModel::createFilterChannelList(QStringList channelN
                 m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
         }
     }
+
+    //Filter all visible data channels at once
+    filterChannelsConcurrently();
 }
 
 
@@ -612,12 +627,32 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
 {
     //std::cout<<"START RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
 
+    //Create temporary filters with higher fft length because we are going to filter all available data at once for one time
+    QList<FilterData> tempFilterList;
+
+    int fftLength = m_iMaxSamples;
+    int exp = ceil(MNEMath::log2(fftLength));
+    fftLength = pow(2, exp) <512 ? 512 : pow(2, exp);
+
+    for(int i = 0; i<m_filterData.size(); i++) {
+        FilterData tempFilter(m_filterData.at(i).m_sName,
+                              m_filterData.at(i).m_Type,
+                              m_filterData.at(i).m_iFilterOrder,
+                              m_filterData.at(i).m_dCenterFreq,
+                              m_filterData.at(i).m_dBandwidth,
+                              m_filterData.at(i).m_dParksWidth,
+                              m_filterData.at(i).m_sFreq,
+                              fftLength,
+                              m_filterData.at(i).m_designMethod);
+
+        tempFilterList.append(tempFilter);
+    }
+
     //Generate QList structure which can be handled by the QConcurrent framework
     QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;
-
     for(qint32 i=0; i<m_matDataRaw.rows(); ++i) {
         if(m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name))
-            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,m_matDataRaw.row(i))));
+            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(tempFilterList,QPair<int,RowVectorXd>(i,m_matDataRaw.row(i))));
     }
 
     //Do the concurrent filtering
@@ -627,16 +662,9 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
 
         future.waitForFinished();
 
-//        int r = m_iMaxFilterLength;
-//        if(matDataLast.rows() == 0)
-//            r = 0;
-
         for(int r = 0; r<timeData.size(); r++)
             m_matDataFiltered.row(timeData.at(r).second.first) = timeData.at(r).second.second.segment(m_iMaxFilterLength/2, m_matDataRaw.cols());
     }
-
-//    std::cout<<"m_dataCurrent.size(): "<<m_dataCurrent.size()<<std::endl;
-//    std::cout<<"m_dataLast.size(): "<<m_dataLast.size()<<std::endl;
 
     //std::cout<<"END RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
 }
@@ -679,22 +707,21 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
             if(m_iCurrentSample+2*data.cols() > m_matDataRaw.cols()) {
                 //Handle last data block
                 RowVectorXd tempData = timeData.at(r).second.second;
-                tempData.head(m_iMaxFilterLength) += m_matLastOverlap.row(timeData.at(r).second.first);
+                tempData.head(m_iMaxFilterLength) += m_matOverlapBack.row(timeData.at(r).second.first);
                 m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength) = tempData.segment(0,iFilteredNumberCols-m_iMaxFilterLength);
-                m_matLastOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
-            } else if(m_iCurrentSample==0) {
+                m_matOverlapBack.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
+            } else if(m_iCurrentSample == 0) {
                 //Handle first data block
                 RowVectorXd tempData = timeData.at(r).second.second;
-                tempData.head(m_iMaxFilterLength) += m_matLastOverlap.row(timeData.at(r).second.first);
+                tempData.head(m_iMaxFilterLength) += m_matOverlapBack.row(timeData.at(r).second.first);
                 m_matDataFiltered.row(timeData.at(r).second.first).head(iFilteredNumberCols-m_iMaxFilterLength) = tempData.segment(iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength);
-                //m_matDataFiltered.row(timeData.at(r).second.first).tail(iFilterDelay) = tempData.segment(0,iFilterDelay);
-                m_matLastOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
+                m_matOverlapBack.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
             } else {
                 //Handle middle data blocks
                 RowVectorXd tempData = timeData.at(r).second.second;
-                tempData.head(m_iMaxFilterLength) += m_matLastOverlap.row(timeData.at(r).second.first);
+                tempData.head(m_iMaxFilterLength) += m_matOverlapBack.row(timeData.at(r).second.first);
                 m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength) = tempData.segment(0,iFilteredNumberCols-m_iMaxFilterLength);
-                m_matLastOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
+                m_matOverlapBack.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
             }
         }
     }
@@ -715,7 +742,7 @@ void RealTimeMultiSampleArrayModel::clearModel()
     m_matDataFilteredFreeze.setZero();
     m_vecLastBlockFirstValuesFiltered.setZero();
     m_vecLastBlockFirstValuesRaw.setZero();
-    m_matLastOverlap.setZero();
+    m_matOverlapBack.setZero();
 
     endResetModel();
 
