@@ -75,8 +75,11 @@ FilterPlotScene::FilterPlotScene(QObject *parent) :
 
 //*************************************************************************************************************
 
-void FilterPlotScene::updateFilter(FilterData& operatorFilter, int samplingFreq, int cutOffLow, int cutOffHigh)
+void FilterPlotScene::updateFilter(const FilterData& operatorFilter, int samplingFreq, int cutOffLow, int cutOffHigh)
 {
+    if(operatorFilter.m_dCoeffA.cols() == 0)
+        return;
+
     m_pCurrentFilter = operatorFilter;
 
     //set member variables
@@ -90,13 +93,13 @@ void FilterPlotScene::updateFilter(FilterData& operatorFilter, int samplingFreq,
     plotFilterFrequencyResponse();
 
     //Plot the magnitude diagram
-    plotMagnitudeDiagram(samplingFreq);
+    plotMagnitudeDiagram(samplingFreq, operatorFilter.m_sName);
 }
 
 
 //*************************************************************************************************************
 
-void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq)
+void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq, QString filtername)
 {
     //Get row vector with filter coefficients
     RowVectorXcd coefficientsAFreq = m_pCurrentFilter.m_dFFTCoeffA;
@@ -113,6 +116,10 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq)
             -m_iDiagramMarginsVert,
             numberCoeff+(m_iDiagramMarginsHoriz*2),
             m_dMaxMagnitude+(m_iDiagramMarginsVert*2));
+
+    //Plot filter name on top
+    QGraphicsTextItem * text = addText(filtername, QFont("Times", m_iAxisTextSize));
+    text->setPos((numberCoeff+(m_iDiagramMarginsHoriz*2))/2.4,-70);
 
     //HORIZONTAL
     //Draw horizontal lines
@@ -198,9 +205,10 @@ void FilterPlotScene::plotFilterFrequencyResponse()
 
     int numberCoeff = coefficientsAFreq.cols();
     int dsFactor = 0;
-    if(numberCoeff>2000)
+    if(numberCoeff>2000) {
         dsFactor = numberCoeff/2000;
-
+        dsFactor--;
+    }
     double max = 0;
     for(int i = 0; i<numberCoeff-dsFactor; i++)
         if(abs(coefficientsAFreq(i)) > max)
@@ -217,7 +225,7 @@ void FilterPlotScene::plotFilterFrequencyResponse()
 
     path.moveTo(-m_iDiagramMarginsVert, y); //convert to db
 
-    for(int i = 0; i<numberCoeff; i+=dsFactor) {
+    for(int i = 0; i<numberCoeff; i+=1+dsFactor) {
         y = -20 * log10(abs(coefficientsAFreq(i))) * m_iScalingFactor; //-1 because we want to plot upwards
         if(y > m_dMaxMagnitude)
             y = m_dMaxMagnitude;

@@ -36,10 +36,8 @@
 include(../../mne-cpp.pri)
 
 TEMPLATE = lib
-CONFIG   += ordered
 
 QT  += core widgets svg
-QT  += printsupport
 
 DEFINES += DISP_LIBRARY
 
@@ -96,7 +94,9 @@ SOURCES += \
     graph.cpp \
     rtplot.cpp \
     filterplotscene.cpp \
-    filterwindow.cpp
+    filterwindow.cpp \
+    helpers/filterdatadelegate.cpp \
+    helpers/filterdatamodel.cpp
 
 
 HEADERS += \
@@ -107,7 +107,9 @@ HEADERS += \
     graph.h \
     rtplot.h \
     filterplotscene.h \
-    filterwindow.h
+    filterwindow.h \
+    helpers/filterdatadelegate.h \
+    helpers/filterdatamodel.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

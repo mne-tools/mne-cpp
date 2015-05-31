@@ -43,9 +43,14 @@
 //=============================================================================================================
 
 #include "disp_global.h"
+#include "helpers/filterdatamodel.h"
+#include "helpers/filterdatadelegate.h"
+#include "filterplotscene.h"
+
 #include "utils/mnemath.h"
 #include "utils/filterTools/filterdata.h"
-#include "filterplotscene.h"
+#include "utils/filterTools/filterio.h"
+
 #include <fiff/fiff_info.h>
 
 
@@ -117,7 +122,7 @@ public:
 
     //=========================================================================================================
     /**
-    * On new file loaded.
+    * Sets the new fiff info.
     *
     * @param[in] fiffInfo the new fiffInfo
     */
@@ -125,9 +130,27 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the current filter.
+    * Sets the new window size for the filter.
+    *
+    * @param[in] iWindowSize length of the data which is to be filtered
     */
-    FilterData& getCurrentFilter();
+    void setWindowSize(int iWindowSize);
+
+    //=========================================================================================================
+    /**
+    * Sets the new samplingRate.
+    *
+    * @param[in] dSamplingRate the new sampling rate
+    */
+    void setSamplingRate(double dSamplingRate);
+
+    //=========================================================================================================
+    /**
+    * Returns the current filter.
+    *
+    * @return returns the list with the currently active filters
+    */
+    QList<FilterData> getCurrentFilter();
 
 private:
     //=========================================================================================================
@@ -162,6 +185,18 @@ private:
 
     //=========================================================================================================
     /**
+    * inits the Model View Controller.
+    */
+    void initMVC();
+
+    //=========================================================================================================
+    /**
+    * inits the default and current filter.
+    */
+    void initFilters();
+
+    //=========================================================================================================
+    /**
     * resizeEvent reimplemented virtual function to handle resize events of the filter window
     */
     void resizeEvent(QResizeEvent * event);
@@ -184,27 +219,37 @@ private:
     */
     void updateFilterPlot();
 
-    Ui::FilterWindowWidget *ui;                 /**< Pointer to the qt designer generated ui class.*/
+    Ui::FilterWindowWidget *    ui;                         /**< Pointer to the qt designer generated ui class.*/
 
-    FilterData          m_filterData;           /**< The current filter operator.*/
+    FilterData                  m_filterData;               /**< The current filter operator.*/
+    FilterDataModel::SPtr       m_pFilterDataModel;         /**< The model to hold current filters.*/
+    FilterDataDelegate::SPtr    m_pFilterDataDelegate;      /**< The delegate to plot the activation check boxes in column one.*/
 
-    int                 m_iWindowSize;          /**< The current window size of the loaded fiff data in the DataWindow class.*/
-    int                 m_iFilterTaps;          /**< The current number of filter taps.*/
+    QList<QCheckBox*>           m_lActivationCheckBoxList;  /**< List of all filter check boxes.*/
+    QStringList                 m_lDefaultFilters;          /**< List with the names of all default filters.*/
 
-    FiffInfo            m_fiffInfo;             /**< The current fiffInfo.*/
+    int                         m_iWindowSize;              /**< The current window size of the loaded fiff data in the DataWindow class.*/
+    int                         m_iFilterTaps;              /**< The current number of filter taps.*/
+    double                      m_dSFreq;                   /**< The current sampling frequency.*/
 
-    QSettings           m_qSettings;            /**< QSettings variable used to write or read from independent application sessions.*/
+    FiffInfo                    m_fiffInfo;                 /**< The current fiffInfo.*/
 
-    FilterPlotScene*    m_pFilterPlotScene;     /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
+    QSettings                   m_qSettings;                /**< QSettings variable used to write or read from independent application sessions.*/
+
+    FilterPlotScene*            m_pFilterPlotScene;         /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
 
 signals:
-    void filterChanged(UTILSLIB::FilterData& filterData);
+    void filterChanged(QList<UTILSLIB::FilterData> activeFilter);
 
     void applyFilter(QString channelType);
 
-    void activateFilter(bool active);
-
 protected slots:
+    //=========================================================================================================
+    /**
+    * updates the filter activation layout
+    */
+    void updateDefaultFiltersActivation(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
+
     //=========================================================================================================
     /**
     * This function gets called whenever the combo box is altered by the user via the gui.
@@ -221,13 +266,9 @@ protected slots:
 
     //=========================================================================================================
     /**
-    * This function activates the filter functionality.
-    */
-    void onBtnActivateFilter();
-
-    //=========================================================================================================
-    /**
     * This function applies the user defined filter to all channels.
+    *
+    * @param channelType holds the current text of the connected spin box
     */
     void onSpinBoxFilterChannelType(QString channelType);
 
@@ -242,10 +283,32 @@ protected slots:
     * This function exports the filter coefficients to a txt file.
     */
     void onBtnExportFilterCoefficients();
+
+    //=========================================================================================================
+    /**
+    * This function loads a filter from a txt file.
+    */
+    void onBtnLoadFilter();
+
+    //=========================================================================================================
+    /**
+    * This function connects the activation checkboxes to the filter data model.
+    *
+    * @param [in] state holds the current state of the connected check box
+    */
+    void onChkBoxFilterActivation(bool state);
+
+    //=========================================================================================================
+    /**
+    * This function updates the filter window to the currently selected filter in view.
+    *
+    * @param current holds the current index of the model view
+    * @param previous holds the previous index of the model view
+    */
+    void filterSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
+
 };
 
 } // NAMESPACE DISPLIB
-
-Q_DECLARE_METATYPE(UTILSLIB::FilterData);
 
 #endif // FILTERWINDOW_H

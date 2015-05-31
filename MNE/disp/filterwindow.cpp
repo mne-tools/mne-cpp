@@ -60,6 +60,9 @@ FilterWindow::FilterWindow(QWidget *parent)
 : QWidget(parent,Qt::Window)
 , ui(new Ui::FilterWindowWidget)
 , m_pFilterPlotScene(new FilterPlotScene)
+, m_iWindowSize(4016)
+, m_iFilterTaps(128)
+, m_dSFreq(600)
 {
     ui->setupUi(this);
 
@@ -67,10 +70,9 @@ FilterWindow::FilterWindow(QWidget *parent)
     initSpinBoxes();
     initButtons();
     initComboBoxes();
+    initMVC();
+    initFilters();
     initFilterPlot();
-
-    m_iWindowSize = 4016;
-    m_iFilterTaps = 80;
 }
 
 
@@ -88,22 +90,68 @@ void FilterWindow::setFiffInfo(const FiffInfo &fiffInfo)
 {
     m_fiffInfo = fiffInfo;
 
+    m_dSFreq = m_fiffInfo.sfreq;
+
     filterParametersChanged();
 
-    //Update min max of spin boxes to nyquis
+    //Init m_filterData with designed filter and add to model
+    m_pFilterDataModel->addFilter(m_filterData);
+
+    //Update min max of spin boxes to nyquist
     double samplingFrequency = m_fiffInfo.sfreq;
     double nyquistFrequency = samplingFrequency/2;
 
     ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
     ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
+
+    ui->m_doubleSpinBox_highpass->setValue(nyquistFrequency/3);
+    ui->m_doubleSpinBox_lowpass->setValue(nyquistFrequency/2);
+
+    updateFilterPlot();
 }
 
 
 //*************************************************************************************************************
 
-FilterData& FilterWindow::getCurrentFilter()
+void FilterWindow::setWindowSize(int iWindowSize)
 {
-    return m_filterData;
+    m_iWindowSize = iWindowSize;
+
+    //Only set even numbers -> otherwise cosine design method gives wrong results
+    if(m_iWindowSize%2!=0)
+        m_iWindowSize--;
+
+    ui->m_spinBox_filterTaps->setMaximum(m_iWindowSize);
+
+    //Update filter depending on new window size
+    filterParametersChanged();
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::setSamplingRate(double dSamplingRate)
+{
+    m_dSFreq = dSamplingRate;
+
+    if(ui->m_doubleSpinBox_highpass->value()>m_dSFreq/2)
+        ui->m_doubleSpinBox_highpass->setValue(m_dSFreq/2);
+
+    if(ui->m_doubleSpinBox_lowpass->value()>m_dSFreq/2)
+        ui->m_doubleSpinBox_lowpass->setValue(m_dSFreq/2);
+
+    filterParametersChanged();
+}
+
+
+//*************************************************************************************************************
+
+QList<FilterData> FilterWindow::getCurrentFilter()
+{
+    //Get active filters
+    QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData> >();
+
+    return activeFilters;
 }
 
 
@@ -111,8 +159,6 @@ FilterData& FilterWindow::getCurrentFilter()
 
 void FilterWindow::initCheckBoxes()
 {
-    connect(ui->m_checkBox_activateFilter,static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
-                this,&FilterWindow::onBtnActivateFilter);
 }
 
 
@@ -148,6 +194,9 @@ void FilterWindow::initButtons()
 
     connect(ui->m_pushButton_exportFilter,&QPushButton::released,
                 this,&FilterWindow::onBtnExportFilterCoefficients);
+
+    connect(ui->m_pushButton_loadFilter,&QPushButton::released,
+                this,&FilterWindow::onBtnLoadFilter);
 }
 
 
@@ -164,17 +213,19 @@ void FilterWindow::initComboBoxes()
     //Initial selection is a lowpass and Cosine design method
     ui->m_doubleSpinBox_lowpass->setVisible(true);
     ui->m_label_lowpass->setVisible(true);
-    ui->m_label_lowpass->setText("Cut-Off (Hz):");
+    ui->m_label_lowpass->setText("Highpass (Hz):");
 
     ui->m_doubleSpinBox_highpass->setVisible(false);
     ui->m_label_highpass->setVisible(false);
     ui->m_doubleSpinBox_highpass->setEnabled(false);
 
-    ui->m_spinBox_filterTaps->setVisible(false);
-    ui->m_label_filterTaps->setVisible(false);
+    ui->m_spinBox_filterTaps->setVisible(true);
+    ui->m_label_filterTaps->setVisible(true);
 
     connect(ui->m_comboBox_filterApplyTo, &QComboBox::currentTextChanged,
             this, &FilterWindow::onSpinBoxFilterChannelType);
+
+    ui->m_comboBox_filterApplyTo->setCurrentIndex(1);
 }
 
 
@@ -183,20 +234,64 @@ void FilterWindow::initComboBoxes()
 void FilterWindow::initFilterPlot()
 {
     ui->m_graphicsView_filterPlot->setScene(m_pFilterPlotScene);
+
+    filterSelectionChanged(m_pFilterDataModel->index(m_pFilterDataModel->rowCount()-1,0), QModelIndex());
 }
 
 
 //*************************************************************************************************************
 
-void FilterWindow::updateFilterPlot()
+void FilterWindow::initMVC()
 {
-    //Update the filter of the scene
-    m_pFilterPlotScene->updateFilter(m_filterData,
-                                     m_fiffInfo.sfreq,
-                                     ui->m_doubleSpinBox_lowpass->value(),
-                                     ui->m_doubleSpinBox_highpass->value());
+    m_pFilterDataModel = FilterDataModel::SPtr(new FilterDataModel(this));
+    m_pFilterDataDelegate = FilterDataDelegate::SPtr(new FilterDataDelegate(this));
 
-    ui->m_graphicsView_filterPlot->fitInView(m_pFilterPlotScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+    //Unncomment this if zou want the tableview
+    ui->m_tableView_filterDataView->hide();
+//    ui->m_tableView_filterDataView->setModel(m_pFilterDataModel.data());
+//    ui->m_tableView_filterDataView->setItemDelegate(m_pFilterDataDelegate.data());
+//    ui->m_tableView_filterDataView->resizeColumnToContents(0);
+
+//    //Only show the names of the filter and activity check boxes
+//    ui->m_tableView_filterDataView->verticalHeader()->hide();
+//    ui->m_tableView_filterDataView->hideColumn(2);
+//    ui->m_tableView_filterDataView->hideColumn(3);
+//    ui->m_tableView_filterDataView->hideColumn(4);
+//    //ui->m_tableView_filterDataView->hideColumn(5);
+//    //ui->m_tableView_filterDataView->hideColumn(6);
+//    ui->m_tableView_filterDataView->hideColumn(7);
+//    ui->m_tableView_filterDataView->hideColumn(8);
+//    ui->m_tableView_filterDataView->hideColumn(9);
+
+//    //Connect selection in in filter table view to handle user changing the filter and updating the filter plot scene
+//    connect(ui->m_tableView_filterDataView->selectionModel(),&QItemSelectionModel::currentRowChanged,
+//                this, &FilterWindow::filterSelectionChanged);
+
+    //Connect filter data model to updateFilterActivationWidget
+    connect(m_pFilterDataModel.data(),&FilterDataModel::dataChanged,
+                this, &FilterWindow::updateDefaultFiltersActivation);
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::initFilters()
+{
+    //Init filter data model with all default filters located in the resource directory
+//    m_lDefaultFilters << "NOTCH_60Hz_Fs1kHz"
+//                   << "NOTCH_50Hz_Fs1kHz"
+//                   << "BP_1Hz_70Hz_Fs1kHz"
+//                   << "BP_1Hz_40Hz_Fs1kHz";
+
+    for(int i = 0; i<m_lDefaultFilters.size(); i++) {
+        FilterData tmpFilter;
+        QString fileName = m_lDefaultFilters.at(i);
+        fileName.append(".txt");
+        QString path = QCoreApplication::applicationDirPath() + fileName.prepend("/mne_x_libs/xDisp/default_filters/");
+
+        if(FilterIO::readFilter(path, tmpFilter))
+            m_pFilterDataModel->addFilter(tmpFilter);
+    }
 }
 
 
@@ -241,7 +336,89 @@ bool FilterWindow::eventFilter(QObject *obj, QEvent *event)
         }
     }
 
+    for(int i=0; i<m_lActivationCheckBoxList.size(); i++) {
+        if(obj == m_lActivationCheckBoxList.at(i) ) {
+            if (event->type() == QEvent::HoverEnter) {
+                int filterModelRowIndex = -1;
+                for(int z=0; z<m_pFilterDataModel->rowCount(); z++) {
+                    QString checkBoxText = m_lActivationCheckBoxList.at(i)->text();
+                    if(checkBoxText == "Activate user designed filter")
+                        checkBoxText = "User Design";
+
+                    if(m_pFilterDataModel->data(m_pFilterDataModel->index(z,1), FilterDataModelRoles::GetFilterName).toString() == checkBoxText)
+                        filterModelRowIndex = z;
+                }
+
+                filterSelectionChanged(m_pFilterDataModel->index(filterModelRowIndex,0), QModelIndex());
+
+                return true;
+            } else {
+                // standard event processing
+                return QObject::eventFilter(obj, event);
+            }
+        }
+    }
+
     return true;
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::updateDefaultFiltersActivation(const QModelIndex & topLeft, const QModelIndex & bottomRight, const QVector<int> & roles)
+{
+    Q_UNUSED(topLeft);
+    Q_UNUSED(bottomRight);
+    Q_UNUSED(roles);
+
+    QList<FilterData> allFilters = m_pFilterDataModel->data(m_pFilterDataModel->index(0,9), FilterDataModelRoles::GetAllFilters).value<QList<FilterData> >();
+
+    if(m_lActivationCheckBoxList.size()==allFilters.size())
+        return;
+
+    while(!ui->m_layout_defaultFilterActivation->isEmpty())
+        ui->m_layout_defaultFilterActivation->removeItem(ui->m_layout_defaultFilterActivation->itemAt(0));
+
+    m_lActivationCheckBoxList.clear();
+    for(int i = 0; i<allFilters.size(); i++) {
+        //Check for user designed filter. This needs to be done because there only should be one filter in the model which holds the user designed filter.
+        //Otherwise everytime a filter is designed a new filter would be added to this model -> too much storage consumption.
+        if(allFilters.at(i).m_sName != "User Design") {
+            QCheckBox *checkBox = new QCheckBox(allFilters.at(i).m_sName);
+            connect(checkBox,&QCheckBox::clicked,
+                        this,&FilterWindow::onChkBoxFilterActivation);
+
+            checkBox->installEventFilter(this);
+
+            m_lActivationCheckBoxList.append(checkBox);
+
+            ui->m_layout_defaultFilterActivation->addWidget(checkBox);
+        } else {
+            QCheckBox *checkBox = new QCheckBox("Activate user designed filter");
+            connect(checkBox,&QCheckBox::clicked,
+                        this,&FilterWindow::onChkBoxFilterActivation);
+
+            checkBox->installEventFilter(this);
+
+            m_lActivationCheckBoxList.prepend(checkBox);
+
+            ui->m_layout_designFilter->addWidget(checkBox,6,0,2,2);
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::updateFilterPlot()
+{
+    //Update the filter of the scene
+    m_pFilterPlotScene->updateFilter(m_filterData,
+                                     m_filterData.m_sFreq, //Pass the filters sampling frequency, not the one from the fiff info. Reason: sFreq from a loaded filter could be different
+                                     ui->m_doubleSpinBox_lowpass->value(),
+                                     ui->m_doubleSpinBox_highpass->value());
+
+    ui->m_graphicsView_filterPlot->fitInView(m_pFilterPlotScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 
@@ -254,8 +431,10 @@ void FilterWindow::changeStateSpinBoxes(int currentIndex)
     //Change visibility of filter tap spin boxes depending on filter design method
     switch(ui->m_comboBox_designMethod->currentIndex()) {
         case 0: //Cosine
-            ui->m_spinBox_filterTaps->setVisible(false);
-            ui->m_label_filterTaps->setVisible(false);
+//            ui->m_spinBox_filterTaps->setVisible(false);
+//            ui->m_label_filterTaps->setVisible(false);
+            ui->m_spinBox_filterTaps->setVisible(true);
+            ui->m_label_filterTaps->setVisible(true);
             break;
 
         case 1: //Tschebyscheff
@@ -269,7 +448,7 @@ void FilterWindow::changeStateSpinBoxes(int currentIndex)
         case 0: //Lowpass
             ui->m_doubleSpinBox_lowpass->setVisible(true);
             ui->m_label_lowpass->setVisible(true);
-            ui->m_label_lowpass->setText("Cut-Off (Hz):");
+            ui->m_label_lowpass->setText("Highpass (Hz):");
 
             ui->m_doubleSpinBox_highpass->setVisible(false);
             ui->m_label_highpass->setVisible(false);
@@ -279,7 +458,7 @@ void FilterWindow::changeStateSpinBoxes(int currentIndex)
         case 1: //Highpass
             ui->m_doubleSpinBox_highpass->setVisible(true);
             ui->m_label_highpass->setVisible(true);
-            ui->m_label_highpass->setText("Cut-Off (Hz):");
+            ui->m_label_highpass->setText("Lowpass (Hz):");
 
             ui->m_doubleSpinBox_lowpass->setVisible(false);
             ui->m_label_lowpass->setVisible(false);
@@ -290,12 +469,12 @@ void FilterWindow::changeStateSpinBoxes(int currentIndex)
             ui->m_doubleSpinBox_highpass->setVisible(true);
             ui->m_label_highpass->setVisible(true);
             ui->m_doubleSpinBox_lowpass->setVisible(true);
-            ui->m_label_lowpass->setText("Cut-Off Low (Hz):");
+            ui->m_label_lowpass->setText("Highpass (Hz):");
 
             ui->m_label_lowpass->setVisible(true);
             ui->m_doubleSpinBox_lowpass->setEnabled(true);
             ui->m_doubleSpinBox_highpass->setEnabled(true);
-            ui->m_label_highpass->setText("Cut-Off High (Hz):");
+            ui->m_label_highpass->setText("Lowpass (Hz):");
             break;
     }
 
@@ -316,27 +495,28 @@ void FilterWindow::filterParametersChanged()
     double bw = highpassHz-lowpassHz;
     double center = lowpassHz+bw/2;
 
-    double samplingFrequency = m_fiffInfo.sfreq;
+    double samplingFrequency = m_dSFreq <= 0 ? 600 : m_dSFreq;
     double nyquistFrequency = samplingFrequency/2;
 
     //Calculate the needed fft length
     int filterTaps = ui->m_spinBox_filterTaps->value();
     int fftLength = m_iWindowSize;
     int exp = ceil(MNEMath::log2(fftLength));
-    fftLength = pow(2, exp+1);
+    fftLength = pow(2, exp+1) <4096 ? 4096 : pow(2, exp+1);
 
     //set maximum and minimum for cut off frequency spin boxes
+    ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
+    ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
+    ui->m_doubleSpinBox_highpass->setMinimum(0);
+    ui->m_doubleSpinBox_lowpass->setMinimum(0);
+
     if(ui->m_comboBox_filterType->currentText() == "Bandpass") {
+        if((ui->m_doubleSpinBox_highpass->value() < ui->m_doubleSpinBox_lowpass->value())) {
+            ui->m_doubleSpinBox_highpass->setValue(ui->m_doubleSpinBox_lowpass->value());
+        }
         ui->m_doubleSpinBox_highpass->setMinimum(ui->m_doubleSpinBox_lowpass->value());
         ui->m_doubleSpinBox_lowpass->setMaximum(ui->m_doubleSpinBox_highpass->value());
     }
-    else {
-        ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
-        ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
-    }
-
-    //set current fft length info label
-    ui->m_label_fftLength->setText(QString().number(fftLength));
 
     //set filter design method
     FilterData::DesignMethod dMethod;
@@ -349,9 +529,11 @@ void FilterWindow::filterParametersChanged()
     //Generate filters
     QSharedPointer<FilterData> userDefinedFilterOperator;
 
+    //Note: Always use "User Design" as filter name for user designed filters, which are stored in the model. This needs to be done because there only should be one filter in this model which holds the user designed filter.
+    //Otherwise everytime a filter is designed a new filter would be added to this model -> too much storage consumption.
     if(ui->m_comboBox_filterType->currentText() == "Lowpass") {
         userDefinedFilterOperator = QSharedPointer<FilterData>(
-                                                new FilterData("User defined (See 'Adjust/Filter')",
+                                                new FilterData("User Design",
                                                                FilterData::LPF,
                                                                filterTaps,
                                                                lowpassHz/nyquistFrequency,
@@ -364,20 +546,20 @@ void FilterWindow::filterParametersChanged()
 
     if(ui->m_comboBox_filterType->currentText() == "Highpass") {
         userDefinedFilterOperator = QSharedPointer<FilterData>(
-                                        new FilterData("User defined (See 'Adjust/Filter')",
-                                            FilterData::HPF,
-                                            filterTaps,
-                                            highpassHz/nyquistFrequency,
-                                            0.2,
-                                            (double)trans_width/nyquistFrequency,
-                                            samplingFrequency,
-                                            fftLength,
-                                            dMethod));
+                                        new FilterData("User Design",
+                                                        FilterData::HPF,
+                                                        filterTaps,
+                                                        highpassHz/nyquistFrequency,
+                                                        0.2,
+                                                        (double)trans_width/nyquistFrequency,
+                                                        samplingFrequency,
+                                                        fftLength,
+                                                        dMethod));
     }
 
     if(ui->m_comboBox_filterType->currentText() == "Bandpass") {
         userDefinedFilterOperator = QSharedPointer<FilterData>(
-                   new FilterData("User defined (See 'Adjust/Filter')",
+                   new FilterData("User Design",
                                   FilterData::BPF,
                                   filterTaps,
                                   (double)center/nyquistFrequency,
@@ -391,18 +573,18 @@ void FilterWindow::filterParametersChanged()
     //Replace old with new filter operator
     m_filterData = *userDefinedFilterOperator.data();
 
-    emit filterChanged(m_filterData);
+    //set user designed filter in filter data model
+    QVariant variant;
+    variant.setValue(m_filterData);
+
+    m_pFilterDataModel->setData(m_pFilterDataModel->index(0,7), variant, FilterDataModelRoles::SetUserDesignedFilter);
+
+    QList<FilterData> activeFilters = m_pFilterDataModel->data(m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData> >();
+
+    emit filterChanged(activeFilters);
 
     //update filter plot
     updateFilterPlot();
-}
-
-//*************************************************************************************************************
-
-void FilterWindow::onBtnActivateFilter()
-{
-    //Undo all previous filters
-    emit activateFilter(ui->m_checkBox_activateFilter->isChecked());
 }
 
 
@@ -460,26 +642,105 @@ void FilterWindow::onBtnExportFilterPlot()
 
 void FilterWindow::onBtnExportFilterCoefficients()
 {
-    // Open file dialog
-    QDate date;
+    //Generate appropriate name for the filter to be saved
+    QString filtername;
+    if(m_filterData.m_Type == FilterData::LPF)
+        filtername = QString("%1_%2_Fs%3").arg(FilterData::getStringForFilterType(m_filterData.m_Type)).arg((int)m_filterData.m_dHighpassFreq).arg((int)m_filterData.m_sFreq);
+
+    if(m_filterData.m_Type == FilterData::HPF)
+        filtername = QString("%1_%2_Fs%3").arg(FilterData::getStringForFilterType(m_filterData.m_Type)).arg((int)m_filterData.m_dLowpassFreq).arg((int)m_filterData.m_sFreq);
+
+    if(m_filterData.m_Type == FilterData::BPF)
+         filtername = QString("%1_%2_%3_Fs%4").arg(FilterData::getStringForFilterType(m_filterData.m_Type)).arg((int)m_filterData.m_dHighpassFreq).arg((int)m_filterData.m_dLowpassFreq).arg((int)m_filterData.m_sFreq);
+
+    //Do not pass m_filterData because this is most likely the User Defined filter which name should not change due to the filter model implementation. Hence use temporal copy of m_filterData.
+    FilterData filterWriteTemp = m_filterData;
+    filterWriteTemp.m_sName = filtername;
+
     QString fileName = QFileDialog::getSaveFileName(this,
                                                     "Save filter coefficients",
-                                                    QString("%1/%2_%3_%4_FilterCoeffs").arg(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
+                                                    QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)).arg(filtername),
                                                     tr("Text file(*.txt)"));
 
-    if(!fileName.isEmpty())
-    {
-        QFile file(fileName);
-        if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    FilterIO::writeFilter(fileName, filterWriteTemp);
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::onBtnLoadFilter()
+{
+    QString path = QFileDialog::getOpenFileName(this,
+                                                QString("Load filter"),
+                                                QString("./"),
+                                                tr("txt files (*.txt)"));
+
+    if(!path.isEmpty()) {
+        //Replace old with new filter operator
+        FilterData filterLoadTemp;
+
+        if(!FilterIO::readFilter(path, filterLoadTemp))
             return;
 
-        //Write coefficients to file
-        QTextStream out(&file);
-        for(int i = 0 ; i<m_filterData.m_dCoeffA.cols() ;i++)
-            out << m_filterData.m_dCoeffA(i) << "\n";
+        m_pFilterDataModel->addFilter(filterLoadTemp);
 
-        file.close();
+        QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData> >();
+        emit filterChanged(activeFilters);
+
+        m_lDefaultFilters << filterLoadTemp.m_sName;
+
+        updateFilterPlot();
     }
+    else
+        qDebug()<<"Could not load filter.";
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::onChkBoxFilterActivation(bool state)
+{
+    Q_UNUSED(state);
+
+    //Check default filters
+    for(int i=0; i<m_lActivationCheckBoxList.size(); i++) {
+        QVariant variant;
+        variant.setValue(m_lActivationCheckBoxList.at(i)->isChecked());
+
+        QString checkBoxText = m_lActivationCheckBoxList.at(i)->text();
+        if(checkBoxText == "Activate user designed filter")
+            checkBoxText = "User Design";
+
+        int filterModelRowIndex = -1;
+        for(int z=0; z<m_pFilterDataModel->rowCount(); z++) {
+            if(m_pFilterDataModel->data( m_pFilterDataModel->index(z,1), FilterDataModelRoles::GetFilterName).toString() == checkBoxText)
+                filterModelRowIndex = z;
+        }
+
+        if(filterModelRowIndex != -1)
+            m_pFilterDataModel->setData(m_pFilterDataModel->index(filterModelRowIndex,0), variant, Qt::EditRole);
+    }
+
+    QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData> >();
+    emit filterChanged(activeFilters);
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::filterSelectionChanged(const QModelIndex &current, const QModelIndex &previous)
+{
+    Q_UNUSED(previous);
+
+    //Get filter from model and set as current filter
+    QModelIndex index = m_pFilterDataModel->index(current.row(), 7);
+
+    m_filterData = m_pFilterDataModel->data(index, FilterDataModelRoles::GetFilter).value<FilterData>();
+
+    QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData> >();
+    emit filterChanged(activeFilters);
+
+    updateFilterPlot();
 }
 
 

@@ -90,14 +90,16 @@ SOURCES += \
         rtcov.cpp \
         rtinvop.cpp \
         rtave.cpp \
-    rtnoise.cpp
+    rtnoise.cpp \
+    rthpis.cpp
 
 HEADERS +=  \
         rtinv_global.h \
         rtcov.h \
         rtinvop.h \
         rtave.h \
-    rtnoise.h
+    rtnoise.h \
+    rthpis.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

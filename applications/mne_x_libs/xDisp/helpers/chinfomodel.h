@@ -110,7 +110,7 @@ class ChInfoModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    ChInfoModel(QObject *parent = 0);
+    ChInfoModel(QObject *parent = 0, FiffInfo::SPtr pFiffInfo = FiffInfo::SPtr(0));
 
     //=========================================================================================================
     /**
@@ -132,7 +132,7 @@ public:
     *
     * @param fiffInfo fiff info variabel.
     */
-    void fiffInfoChanged(const FiffInfo &fiffInfo);
+    void fiffInfoChanged(FiffInfo::SPtr pFiffInfo);
 
 //    //=========================================================================================================
 //    /**
@@ -199,7 +199,7 @@ protected:
     */
     void mapLayoutToChannels();
 
-    FiffInfo                m_fiffInfo;             /**< The fiff info of the currently loaded fiff file. */
+    FiffInfo::SPtr          m_pFiffInfo;             /**< The fiff info of the currently loaded fiff file. */
     QMap<QString,QPointF>   m_layoutMap;            /**< The current layout map with a position for all MEG and EEG channels. */
     QStringList             m_aliasNames;           /**< list of given channel aliases. */
     QStringList             m_mappedLayoutChNames;  /**< list of the mapped layout channel names. */

@@ -115,7 +115,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
     if (!do_fit)
         std::cout<<"Using default origin:"<<r0[0]<<r0[1]<<r0[2]<<std::endl;
     else {
-        if(fit_sphere_to_points(rrs,nchan,0.05,r0,rad) == FAIL) {
+        if(fit_sphere_to_points(rrs,nchan,(float)0.05,r0,rad) == FAIL) {
             std::cout<<"Using default origin:"<<r0[0]<<r0[1]<<r0[2]<<std::endl;
         }
         else{
@@ -172,7 +172,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
         if (!outFile.open(QIODevice::WriteOnly)) {
             std::cout<<"could not open output file";
             qDebug()<<"could not open output file";
-            return FAIL;
+            return false;
         }
 
         out.setDevice(&outFile);
@@ -233,6 +233,8 @@ int LayoutMaker::report_func(int loop,
                              int npar,
                              double fval)
 {
+    Q_UNUSED(npar);
+
     /*
     * Report periodically
     */
@@ -250,6 +252,8 @@ float LayoutMaker::fit_eval(const VectorXf &fitpar,
                           int   npar,
                           void  *user_data)
 {
+    Q_UNUSED(npar);
+
     /*
     * Calculate the cost function value
     * Optimize for the radius inside here
@@ -359,7 +363,7 @@ int LayoutMaker::fit_sphere_to_points(MatrixXf &rr,
     * Find the optimal sphere origin
     */
     fitUserRec user;
-    float      ftol            = 1e-3;
+    float      ftol            = (float) 1e-3;
     int        max_eval        = 5000;
     int        report_interval = -1;
     int        neval;
@@ -375,7 +379,7 @@ int LayoutMaker::fit_sphere_to_points(MatrixXf &rr,
     user.rr = rr;
     user.np = np;
 
-    R0 = 0.1;
+    R0 = (float) 0.1;
     calculate_cm_ave_dist(rr,np,cm,R0);
 
     init_simplex = make_initial_simplex(cm,3,simplex_size);

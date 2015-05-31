@@ -95,7 +95,8 @@ PluginGui::PluginGui(PluginManager *pPluginManager, PluginSceneManager *pPluginS
     createToolbars();
 
     m_pPluginScene = new PluginScene(m_pMenuItem, this);
-    m_pPluginScene->setSceneRect(QRectF(0, 0, 200, 500));
+    //m_pPluginScene->setSceneRect(0, 0, 200, 500);
+
     connect(m_pPluginScene, &PluginScene::itemInserted,
             this, &PluginGui::itemInserted);
 
@@ -103,8 +104,8 @@ PluginGui::PluginGui(PluginManager *pPluginManager, PluginSceneManager *pPluginS
             this, &PluginGui::newItemSelected);
 
     m_pGraphicsView = new QGraphicsView(m_pPluginScene);
-
     setCentralWidget(m_pGraphicsView);
+
     setWindowTitle(tr("PluginScene"));
     setUnifiedTitleAndToolBarOnMac(true);
 
@@ -119,6 +120,9 @@ PluginGui::PluginGui(PluginManager *pPluginManager, PluginSceneManager *pPluginS
     }
 
     settings.setValue(QString("MNE-X/loadingState"), true);
+
+    m_pGraphicsView->setMinimumWidth(200);
+    m_pGraphicsView->ensureVisible(m_pPluginScene->itemsBoundingRect());
 }
 
 

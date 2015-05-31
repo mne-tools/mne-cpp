@@ -158,7 +158,7 @@ HEADERS += \
 
 FORMS += \
     realtimesamplearraywidget.ui \
-    helpers/selectionmanagerwindow.ui \
+    helpers/selectionmanagerwindow.ui
 
 qtHaveModule(3d) {
     SOURCES += realtimesourceestimatewidget.cpp

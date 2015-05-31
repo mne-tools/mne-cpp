@@ -56,8 +56,9 @@ using namespace XDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChInfoModel::ChInfoModel(QObject *parent)
+ChInfoModel::ChInfoModel(QObject *parent, FiffInfo::SPtr pFiffInfo)
 : QAbstractTableModel(parent)
+, m_pFiffInfo(pFiffInfo)
 {
 }
 
@@ -67,8 +68,8 @@ ChInfoModel::ChInfoModel(QObject *parent)
 int ChInfoModel::rowCount(const QModelIndex & /*parent*/) const
 {
     //Return number of stored evoked sets
-    if(!m_fiffInfo.chs.size()==0)
-        return m_fiffInfo.chs.size();
+    if(!m_pFiffInfo->chs.size()==0)
+        return m_pFiffInfo->chs.size();
     else
         return 0;
 }
@@ -96,7 +97,7 @@ QVariant ChInfoModel::headerData(int section, Qt::Orientation orientation, int r
         case Qt::DisplayRole: {
             //Return the number and description/comment of the fiff evoked data in the set as vertical header
             if(orientation == Qt::Vertical)
-                if(section<m_fiffInfo.chs.size())
+                if(section<m_pFiffInfo->chs.size())
                     return QString("Ch %1").arg(section);
 
             //Return the horizontal header
@@ -158,7 +159,7 @@ QVariant ChInfoModel::headerData(int section, Qt::Orientation orientation, int r
 
 QVariant ChInfoModel::data(const QModelIndex &index, int role) const
 {
-    if(index.row() >= m_fiffInfo.chs.size())
+    if(index.row() >= m_pFiffInfo->chs.size())
         return QVariant();
 
     if (index.isValid()) {
@@ -186,11 +187,11 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
 
             switch(role) {
                 case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_fiffInfo.chs.at(index.row()).ch_name));
+                    v.setValue(QString("%1").arg(m_pFiffInfo->chs.at(index.row()).ch_name));
                     return v;
 
                 case ChInfoModelRoles::GetOrigChName:
-                    v.setValue(QString("%1").arg(m_fiffInfo.chs.at(index.row()).ch_name));
+                    v.setValue(QString("%1").arg(m_pFiffInfo->chs.at(index.row()).ch_name));
                     return v;
 
                 case Qt::TextAlignmentRole:
@@ -240,11 +241,11 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
 
             switch(role) {
                 case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_fiffInfo.chs.at(index.row()).kind));
+                    v.setValue(QString("%1").arg(m_pFiffInfo->chs.at(index.row()).kind));
                     return v;
 
                 case ChInfoModelRoles::GetChKind:
-                    v.setValue(m_fiffInfo.chs.at(index.row()).kind);
+                    v.setValue(m_pFiffInfo->chs.at(index.row()).kind);
                     return v;
 
                 case Qt::TextAlignmentRole:
@@ -258,8 +259,8 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
 
             v.setValue(QString("%1").arg("non_MEG"));
 
-            if(m_fiffInfo.chs.at(index.row()).kind == FIFFV_MEG_CH) {
-                qint32 unit = m_fiffInfo.chs.at(index.row()).unit;
+            if(m_pFiffInfo->chs.at(index.row()).kind == FIFFV_MEG_CH) {
+                qint32 unit = m_pFiffInfo->chs.at(index.row()).unit;
                 if(unit == FIFF_UNIT_T_M)
                     v.setValue(QString("MEG_grad"));
                 else if(unit == FIFF_UNIT_T)
@@ -284,11 +285,11 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
 
             switch(role) {
                 case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_fiffInfo.chs.at(index.row()).unit));
+                    v.setValue(QString("%1").arg(m_pFiffInfo->chs.at(index.row()).unit));
                     return v;
 
                 case ChInfoModelRoles::GetChUnit:
-                    v.setValue(m_fiffInfo.chs.at(index.row()).unit);
+                    v.setValue(m_pFiffInfo->chs.at(index.row()).unit);
                     return v;
 
                 case Qt::TextAlignmentRole:
@@ -320,9 +321,9 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
         if(index.column()==8) {
             QVariant v;
 
-            QVector3D point3D(m_fiffInfo.chs.at(index.row()).loc(0,0) * 100, //convert to cm
-                            m_fiffInfo.chs.at(index.row()).loc(1,0) * 100,
-                            m_fiffInfo.chs.at(index.row()).loc(2,0) * 100);
+            QVector3D point3D(m_pFiffInfo->chs.at(index.row()).loc(0,0) * 100, //convert to cm
+                            m_pFiffInfo->chs.at(index.row()).loc(1,0) * 100,
+                            m_pFiffInfo->chs.at(index.row()).loc(2,0) * 100);
 
             switch(role) {
                 case Qt::DisplayRole:
@@ -360,17 +361,17 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
 
 //                    switch(filterOperator->m_Type) {
 //                        case FilterOperator::LPF: {
-//                            v.setValue(QString("%1 | %2").arg("LP").arg(filterOperator->m_dCenterFreq*m_fiffInfo.sfreq/2));
+//                            v.setValue(QString("%1 | %2").arg("LP").arg(filterOperator->m_dCenterFreq*m_pFiffInfo->sfreq/2));
 //                            return v;
 //                        }
 
 //                        case FilterOperator::HPF: {
-//                            v.setValue(QString("%1 | %2").arg("HP").arg(filterOperator->m_dCenterFreq*m_fiffInfo.sfreq/2));
+//                            v.setValue(QString("%1 | %2").arg("HP").arg(filterOperator->m_dCenterFreq*m_pFiffInfo->sfreq/2));
 //                            return v;
 //                        }
 
 //                        case FilterOperator::BPF: {
-//                            double fsample = m_fiffInfo.sfreq;
+//                            double fsample = m_pFiffInfo->sfreq;
 //                            double low = (filterOperator->m_dCenterFreq*fsample/2) - (filterOperator->m_dBandwidth*fsample/4); // /4 because we also need to devide by 2 to get the nyquist freq
 //                            double high = (filterOperator->m_dCenterFreq*fsample/2) + (filterOperator->m_dBandwidth*fsample/4);
 //                            v.setValue(QString("%1 | %2 | %3").arg("BP").arg(low).arg(high));
@@ -378,7 +379,7 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
 //                        }
 
 //                        case FilterOperator::NOTCH: {
-//                            double fsample = m_fiffInfo.sfreq;
+//                            double fsample = m_pFiffInfo->sfreq;
 //                            double low = (filterOperator->m_dCenterFreq*fsample/2) - (filterOperator->m_dBandwidth*fsample/4);
 //                            double high = (filterOperator->m_dCenterFreq*fsample/2) + (filterOperator->m_dBandwidth*fsample/4);
 //                            v.setValue(QString("%1 | %2 | %3").arg("NOTCH").arg(low).arg(high));
@@ -410,11 +411,11 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
 
                 switch(role) {
                     case Qt::DisplayRole:
-                        v.setValue(QString("%1").arg(m_fiffInfo.chs.at(index.row()).coil_type));
+                        v.setValue(QString("%1").arg(m_pFiffInfo->chs.at(index.row()).coil_type));
                         return v;
 
                     case ChInfoModelRoles::GetChCoilType:
-                        v.setValue(m_fiffInfo.chs.at(index.row()).coil_type);
+                        v.setValue(m_pFiffInfo->chs.at(index.row()).coil_type);
                         return v;
 
                     case Qt::TextAlignmentRole:
@@ -475,13 +476,13 @@ bool ChInfoModel::setData(const QModelIndex &index, const QVariant &value, int r
 
 //*************************************************************************************************************
 
-void ChInfoModel::fiffInfoChanged(const FiffInfo &fiffInfo)
+void ChInfoModel::fiffInfoChanged(FiffInfo::SPtr pFiffInfo)
 {
     beginResetModel();
 
-    m_fiffInfo = fiffInfo;
-    m_aliasNames = m_fiffInfo.ch_names;
-    m_mappedLayoutChNames = m_fiffInfo.ch_names;
+    m_pFiffInfo = pFiffInfo;
+    m_aliasNames = m_pFiffInfo->ch_names;
+    m_mappedLayoutChNames = m_pFiffInfo->ch_names;
 
     mapLayoutToChannels();
 
@@ -512,8 +513,8 @@ void ChInfoModel::layoutChanged(const QMap<QString,QPointF> &layoutMap)
     beginResetModel();
 
     m_layoutMap = layoutMap;
-    m_aliasNames = m_fiffInfo.ch_names;
-    m_mappedLayoutChNames = m_fiffInfo.ch_names;
+    m_aliasNames = m_pFiffInfo->ch_names;
+    m_mappedLayoutChNames = m_pFiffInfo->ch_names;
 
     mapLayoutToChannels();
 
@@ -536,7 +537,7 @@ const QStringList & ChInfoModel::getMappedChannelsList()
 
 int ChInfoModel::getIndexFromOrigChName(QString chName)
 {
-    return m_fiffInfo.ch_names.indexOf(chName);
+    return m_pFiffInfo->ch_names.indexOf(chName);
 }
 
 
@@ -554,7 +555,7 @@ void ChInfoModel::mapLayoutToChannels()
 {
     //TODO: Move this to layout loader in MNE-CPP Utils?
     //Map channels to layout
-    QList<FiffChInfo> channelList = m_fiffInfo.chs;
+    QList<FiffChInfo> channelList = m_pFiffInfo->chs;
     for(int i = 0; i<channelList.size(); i++) {
         //Get current channel information
         FiffChInfo chInfo = channelList.at(i);
@@ -598,7 +599,7 @@ void ChInfoModel::clearModel()
 {
     beginResetModel();
 
-    m_fiffInfo = FiffInfo();
+    m_pFiffInfo = FiffInfo::SPtr(new FiffInfo());
     m_layoutMap.clear();
     m_aliasNames.clear();
     m_mappedLayoutChNames.clear();
