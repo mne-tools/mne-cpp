@@ -36,8 +36,10 @@
 include(../../mne-cpp.pri)
 
 TEMPLATE = lib
+CONFIG   += ordered
 
 QT  += core widgets svg
+QT  += printsupport
 
 DEFINES += DISP_LIBRARY
 
