@@ -70,6 +70,7 @@
 
 using namespace MNELIB;
 using namespace UTILSLIB;
+using namespace DISPLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -113,13 +114,19 @@ Enhancededitorwindow *_enhanced_editor_window;
 settingwindow *_setting_window;
 TreebasedDictWindow *_treebased_dict_window;
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
 MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);    
+
+    ui->setupUi(this);
+    ui->tw_main->setPalette(*(new QPalette(Qt::green)));
+    ui->tw_main->removeTab(1);
+    ui->tw_main->tabBar()->tabButton(0, QTabBar::LeftSide)->resize(0, 0);
+    connect(ui->tw_main, SIGNAL(tabCloseRequested(int)), this, SLOT(on_close_tab_button(int)));
 
     this->setMinimumSize(1280, 640);
     callGraphWindow = new GraphWindow();
@@ -127,6 +134,7 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     callGraphWindow->setMinimumHeight(140);
     callGraphWindow->setMinimumWidth(500);
     ui->l_Graph->addWidget(callGraphWindow);
+
 
     connect(callGraphWindow, SIGNAL(read_new()), this, SLOT(on_mouse_button_release()));
 
@@ -3250,3 +3258,57 @@ void MainWindow::on_rb_OwnDictionary_clicked()
     else if(_has_file)
         ui->btt_Calc->setEnabled(true);
 }
+
+void MainWindow::on_actionTest_triggered()
+{
+
+    QWidget *plot_widget = new QWidget();
+    if(ui->tw_main->count() >= 2)
+        ui->tw_main->addTab(plot_widget, "TF Channel ??");
+    else
+        ui->tw_main->addTab(plot_widget, "TF-Overview");
+
+    if(ui->tw_main->count() == 2)
+    {
+
+
+        QPushButton *extendedButton = new QPushButton();
+        extendedButton->setMaximumSize(20, 20);
+        extendedButton->setStyleSheet("QPushButton {margin-right: 2px;  border-width: 1px; border-radius: 1px; border-color: grey;} QPushButton:pressed {background-color: grey; border-radius: 10px;}");
+        extendedButton->setIcon(QIcon(":/images/icons/expand_512.png"));
+        extendedButton->setIconSize(QSize(16, 16));
+
+        ui->tw_main->tabBar()->setTabButton(1, QTabBar::LeftSide, extendedButton);
+        connect(extendedButton, SIGNAL (released()), this, SLOT (on_extend_tab_button()));
+    }
+    if(ui->tw_main->count() > 2)
+    {
+
+       // ui->tw_main->setCurrentIndex(ui->tw_main->count() - 1);
+       // CloseButton *closeButton = new CloseButton();
+       // closeButton->setParent(ui->tw_main->currentWidget());
+       // closeButton->setMaximumSize(20, 20);
+       // closeButton->setStyleSheet("QPushButton {margin-right: 2px;  border-width: 1px; border-radius: 1px; border-color: grey;} QPushButton:pressed {background-color: grey; border-radius: 10px;}");
+       // closeButton->setIcon(QIcon(":/images/icons/delete.png"));
+       // closeButton->setIconSize(QSize(16, 16));
+
+
+       // ui->tw_main->tabBar()->tabButton(ui->tw_main->count() - 1, QTabBar::LeftSide);
+        //ui->tw_main->tabBar()->setTabButton(ui->tw_main->count() - 1, QTabBar::LeftSide, closeButton);
+        //connect(closeButton, SIGNAL (released()), closeButton, SLOT (on_close_tab_button()));
+    }
+}
+
+void MainWindow::on_extend_tab_button()
+{
+    QWidget *tf_overview_w = new QWidget();
+    tf_overview_w->setWindowTitle("Time-Frequency-Overview");
+    tf_overview_w->show();
+    ui->tw_main->removeTab(1);
+}
+
+void MainWindow::on_close_tab_button(int index)
+{
+    ui->tw_main->removeTab(index);
+}
+

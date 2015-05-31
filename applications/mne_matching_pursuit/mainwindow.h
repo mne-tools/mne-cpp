@@ -46,6 +46,7 @@
 //=============================================================================================================
 
 #include <mne/mne.h>
+#include <disp/plot.h>
 #include <utils/mp/atom.h>
 #include <utils/mp/adaptivemp.h>
 #include <utils/mp/fixdictmp.h>
@@ -64,6 +65,7 @@
 #include "ui_treebaseddictwindow.h"
 #include "settingwindow.h"
 #include "ui_settingwindow.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -100,6 +102,7 @@ typedef signed int          INT32, *PINT32;
 // USED NAMESPACES
 
 using namespace MNELIB;
+using namespace DISPLIB;
 
 //=============================================================================================================
 
@@ -564,8 +567,10 @@ private slots:
     void on_dsb_energy_valueChanged(double arg1);
     void on_actionBeenden_triggered();
     void on_mouse_button_release();
-
     void on_rb_OwnDictionary_clicked();
+    void on_actionTest_triggered();
+    void on_extend_tab_button();
+    void on_close_tab_button(int index);
 
 signals:
 

@@ -30,5 +30,6 @@
         <file>icons/chirp_fml.png</file>
         <file>icons/gabor_fml.png</file>
         <file>icons/lupe.png</file>
+        <file>icons/expand_512.png</file>
     </qresource>
 </RCC>
