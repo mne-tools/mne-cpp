@@ -49,6 +49,10 @@ RealTimeButterflyPlot::RealTimeButterflyPlot(QWidget *parent)
 
 void RealTimeButterflyPlot::dataUpdate(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
 {
+    Q_UNUSED(topLeft);
+    Q_UNUSED(bottomRight);
+    Q_UNUSED(roles);
+
     if(!m_bIsInit && m_pRealTimeEvokedModel->isInit())
     {
         m_iNumChannels = m_pRealTimeEvokedModel->rowCount();

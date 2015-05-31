@@ -2,13 +2,14 @@
 /**
 * @file     rthpi.h
 * @author   Chiran Doshi <chiran.doshi@childrens.harvard.edu>;
+*           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     June, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Chiran Doshi and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Chiran Doshi, Limin Sun and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -47,7 +48,7 @@
 #include <mne_x/Interfaces/IAlgorithm.h>
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
-
+#include <rtInv/rthpis.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -82,7 +83,7 @@ namespace RtHpiPlugin
 using namespace MNEX;
 using namespace XMEASLIB;
 using namespace IOBuffer;
-
+using namespace RTINVLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -162,13 +163,7 @@ public:
 
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
-    dipError dipfitError (Eigen::MatrixXd, Eigen::MatrixXd, struct sens);
-    Eigen::MatrixXd ft_compute_leadfield(Eigen::MatrixXd, struct sens);
-    Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd, Eigen::MatrixXd, Eigen::MatrixXd);
-    coilParam dipfit(struct coilParam, struct sens, Eigen::MatrixXd);
-    coilParam fminsearch(Eigen::MatrixXd,int, int, int, Eigen::MatrixXd, struct sens);
-    static bool compar (int, int);
-    Eigen::MatrixXd pinv(Eigen::MatrixXd);
+
 
 signals:
     //=========================================================================================================
@@ -197,8 +192,10 @@ private:
 
     bool m_bIsRunning;      /**< If source lab is running */
     bool m_bProcessData;    /**< If data should be received for processing */
+    QMutex m_qMutex;       /**< mutex for hpi */
 
-    static std::vector <double>base_arr;
+    RtHPIS::SPtr m_pRtHPIS;                       /**< Real-time HPI Estimation. */
+
 
 };
 

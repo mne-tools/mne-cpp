@@ -118,8 +118,12 @@ signals:
 private:
     void checkStatusChanged(int state);
 
-    QList<QCheckBox*>   m_qListCheckBox;    /**< List of CheckBox. */
-    FiffInfo::SPtr      m_pFiffInfo;        /**< Connected fiff info. */
+    void enableDisableAll(bool status);
+
+    QList<QCheckBox*>   m_qListCheckBox;            /**< List of CheckBox. */
+    FiffInfo::SPtr      m_pFiffInfo;                /**< Connected fiff info. */
+
+    QCheckBox *         m_enableDisableProjectors;  /**< Holds the enable disable all button. */
 };
 
 } // NAMESPACE

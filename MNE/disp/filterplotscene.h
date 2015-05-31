@@ -98,7 +98,7 @@ public:
     * @param [in] cutOffLow cut off frequqency lowpass or lower cut off when filter is a bandpass
     * @param [in] cutOffHigh cut off frequqency highpass or higher cut off when filter is a bandpass
     */
-    void updateFilter(FilterData& operatorFilter, int samplingFreq, int cutOffLow, int cutOffHigh);
+    void updateFilter(const FilterData &operatorFilter, int samplingFreq, int cutOffLow, int cutOffHigh);
 
 protected:
     //=========================================================================================================
@@ -106,8 +106,9 @@ protected:
     * Draws the diagram to plot the magnitude.
     *
     * @param [in] holds the current sampling frequency
+    * @param [in] holds the current name of the filter
     */
-    void plotMagnitudeDiagram(int samplingFreq);
+    void plotMagnitudeDiagram(int samplingFreq, QString filtername = QString());
 
     //=========================================================================================================
     /**

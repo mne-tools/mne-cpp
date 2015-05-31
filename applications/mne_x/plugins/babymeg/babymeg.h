@@ -47,6 +47,7 @@
 #include "babymegclient.h"
 
 #include "FormFiles/babymegsquidcontroldgl.h"
+#include "FormFiles/babymeghpidgl.h"
 
 
 #include <mne_x/Interfaces/ISensor.h>
@@ -121,6 +122,7 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 class BabyMEGProjectDialog;
+class babymeghpidgl;
 
 
 //=============================================================================================================
@@ -139,6 +141,7 @@ class BABYMEGSHARED_EXPORT BabyMEG : public ISensor
     friend class BabyMEGSetupWidget;
     friend class BabyMEGProjectDialog;
     friend class BabyMEGSQUIDControlDgl;
+    friend class babymeghpidgl;
 
 public:
 
@@ -168,13 +171,22 @@ public:
 
     //=========================================================================================================
     /**
-    * Initialise the BabyMEG.
+    * Returns the babyMEG file path which is to be written to.
     *
     * @param[in] currentTime    insert current time stamp.
     *
     * @return the storage filepath
     */
     QString getFilePath(bool currentTime = false) const;
+
+    //=========================================================================================================
+    /**
+    * Returns the path where the subjects folders are stored.
+    *
+    *
+    * @return the data path
+    */
+    QString getDataPath() const;
 
     //=========================================================================================================
     /**
@@ -218,7 +230,6 @@ public:
     void setCMDData(QByteArray DATA);
     void setFiffGainInfo(QStringList);
 
-
     //=========================================================================================================
     /**
     * Returns information from FLL hardware
@@ -234,6 +245,15 @@ public:
     */
     void UpdateFiffInfo();
 
+    //=========================================================================================================
+    /**
+    * Set HPI fiff information
+    *
+    */
+    void SetFiffInfoForHPI();
+
+
+    void RecvHPIFiffInfo(FiffInfo info);
 
 signals:
     //=========================================================================================================
@@ -293,6 +313,7 @@ private:
     bool DataStartFlag;
 
     QSharedPointer<BabyMEGSQUIDControlDgl> SQUIDCtrlDlg; // added by Dr. Limin Sun for nonmodal dialog
+    QSharedPointer<babymeghpidgl> HPIDlg; // HPI dialog information
 
     FiffInfo::SPtr  m_pFiffInfo;            /**< Fiff measurement info.*/
     qint32          m_iBufferSize;          /**< The raw data buffer size.*/
@@ -321,6 +342,7 @@ private:
     QAction*                        m_pActionRecordFile;        /**< start recording action */
     QAction*                        m_pActionSqdCtrl;           /**< show squid control */
     QAction*                        m_pActionUpdateFiffInfo;    /**< Update Fiff Info action */
+    QAction*                        m_pActionUpdateFiffInfoForHPI;    /**< Update HPI info into Fiff Info action */
 
 public:
     double sfreq;

@@ -100,7 +100,6 @@ class RealTimeMultiSampleArrayModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-
     //=========================================================================================================
     /**
     * Constructs an real-time multi sample array table model for the given parent.
@@ -242,6 +241,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Hides the given list of channel
+    *
+    * @param[in] selection      channel index list to select
+    */
+    void hideRows(const QList<qint32> &selection);
+
+    //=========================================================================================================
+    /**
     * Resets the current selection (selects all channels)
     */
     void resetSelection();
@@ -294,27 +301,27 @@ public:
 
     //=========================================================================================================
     /**
-    * Activate filter functionality
-    *
-    * @param[in] activate    flag used to turn on or off filters
-    */
-    void activateFilter(bool activate);
-
-    //=========================================================================================================
-    /**
-    * Apply filters to channels
-    *
-    * @param[in] activate    flag used to turn on or off filters
-    */
-    void applyFilter(QString channelType);
-
-    //=========================================================================================================
-    /**
     * Filter parameters changed
     *
-    * @param[in] filterData    pointer to the current filter
+    * @param[in] filterData    list of the currently active filter
     */
-    void filterChanged(FilterData &filterData);
+    void filterChanged(QList<FilterData> filterData);
+
+    //=========================================================================================================
+    /**
+    * Create list of channels which are to be filtered based on channel type
+    *
+    * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
+    */
+    void createFilterChannelList(QString channelType);
+
+    //=========================================================================================================
+    /**
+    * Create list of channels which are to be filtered based on channel names
+    *
+    * @param[in] channelNames    the channel names which are to be filtered
+    */
+    void createFilterChannelList(QStringList channelNames);
 
 signals:
     //=========================================================================================================
@@ -324,6 +331,14 @@ signals:
     * @param [in] selection     list of all selected channels
     */
     void newSelection(QList<qint32> selection);
+
+    //=========================================================================================================
+    /**
+    * Emmited when the window size/max number of samples changed
+    *
+    * @param [in] windowSize     number of samples in the window
+    */
+    void windowSizeChanged(int windowSize);
 
 private:
     //=========================================================================================================
@@ -336,15 +351,13 @@ private:
     /**
     * Creates the default filter with the current fiff info
     */
-    void createDefaultFilter();
+    //void createDefaultFilter();
 
     //=========================================================================================================
     /**
-    * Undo filters from channels
-    *
-    * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
+    * Clears the model
     */
-    void createFilterChannelList(QString channelType);
+    void clearModel();
 
     //=========================================================================================================
     /**
@@ -358,7 +371,7 @@ private:
     *
     * @return the current data as a matrix
     */
-    inline const MatrixXd dataCurrentToMatrix() const;
+    inline const MatrixXd dataToMatrix(QVector<VectorXd> &vector) const;
 
     //=========================================================================================================
     /**
@@ -368,42 +381,37 @@ private:
     */
     inline const MatrixXd dataLastToMatrix() const;
 
-    QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list. ToDo: Obsolete*/
-    FiffInfo::SPtr  m_pFiffInfo;                    /**< Fiff info */
-    RowVectorXi     m_vecBadIdcs;                   /**< Idcs of bad channels */
-    MatrixXd        m_matProj;                      /**< SSP projector */
-    SparseMatrix<double> m_matSparseProj;           /**< Sparse SSP projector */
-    bool m_bProjActivated;                          /**< Proj activated */
+    bool    m_bProjActivated;       /**< Proj activated */
+    bool    m_bIsFreezed;           /**< Display is freezed */
+    float   m_fSps;                 /**< Sampling rate */
+    qint32  m_iT;                   /**< Time window */
+    qint32  m_iDownsampling;        /**< Down sampling factor */
+    qint32  m_iMaxSamples;          /**< Max samples per window */
+    qint32  m_iCurrentSample;       /**< Accurate Downsampling */
+    qint32  m_iMaxFilterLength;     /**< Max order of the current filters */
 
-    QMap<qint32,qint32> m_qMapIdxRowSelection;      /**< Selection mapping.*/
+    QString m_sFilterChannelType;   /**< Kind of channel which is to be filtered */
 
-    QStringList         m_filterChannelList;        /**< List of channels which are to be filtered.*/
+    FiffInfo::SPtr          m_pFiffInfo;                        /**< Fiff info */
 
-    //Fiff data structure
-    QVector<VectorXd> m_dataCurrent;                /**< List that holds the current data*/
-    QVector<VectorXd> m_dataFilteredCurrent;        /**< List that holds the current filtered data */
+    RowVectorXi             m_vecBadIdcs;                       /**< Idcs of bad channels */
+    MatrixXd                m_matProj;                          /**< SSP projector */
+    SparseMatrix<double>    m_matSparseProj;                    /**< Sparse SSP projector */
 
-    QVector<VectorXd> m_dataLast;                   /**< List that holds the last data */
-    QVector<VectorXd> m_dataFilteredLast;           /**< List that holds the last filtered data */
+    QVector<VectorXd>       m_dataCurrent;                      /**< List that holds the current data*/
+    QVector<VectorXd>       m_dataFilteredCurrent;              /**< List that holds the current filtered data */
+    QVector<VectorXd>       m_dataLast;                         /**< List that holds the last data */
+    QVector<VectorXd>       m_dataFilteredLast;                 /**< List that holds the last filtered data */
+    QVector<VectorXd>       m_dataCurrentFreeze;                /**< List that holds the current data when freezed*/
+    QVector<VectorXd>       m_dataFilteredCurrentFreeze;        /**< List that holds the current filtered data when freezed*/
+    QVector<VectorXd>       m_dataLastFreeze;                   /**< List that holds the last data when freezed*/
+    QVector<VectorXd>       m_dataFilteredLastFreeze;           /**< List that holds the last filtered data when freezed*/
 
-    QVector<VectorXd> m_dataCurrentFreeze;          /**< List that holds the current data when freezed*/
-    QVector<VectorXd> m_dataFilteredCurrentFreeze;  /**< List that holds the current filtered data when freezed*/
-
-    QVector<VectorXd> m_dataLastFreeze;             /**< List that holds the last data when freezed*/
-    QVector<VectorXd> m_dataFilteredLastFreeze;     /**< List that holds the last filtered data when freezed*/
-
-    FilterData m_filterData;
-
-    float m_fSps;               /**< Sampling rate */
-    qint32 m_iT;                /**< Time window */
-    qint32 m_iDownsampling;     /**< Down sampling factor */
-    qint32 m_iMaxSamples;       /**< Max samples per window */
-    qint32 m_iCurrentSample;    /**< Accurate Downsampling */
-
-    bool m_bIsFreezed;          /**< Display is freezed */
-    bool m_doFiltering;         /**< Do Filtering flag */
-
-    QMap< qint32,float > m_qMapChScaling;   /**< Sensor selection widget. */
+    QMap< qint32,float>                 m_qMapChScaling;        /**< Sensor selection widget. */
+    QList<FilterData>                   m_filterData;           /**< List of currently active filters. */
+    QList<RealTimeSampleArrayChInfo>    m_qListChInfo;          /**< Channel info list. ToDo: Obsolete*/
+    QStringList                         m_filterChannelList;    /**< List of channels which are to be filtered.*/
+    QMap<qint32,qint32>                 m_qMapIdxRowSelection;  /**< Selection mapping.*/
 };
 
 
@@ -452,16 +460,16 @@ inline const QMap< qint32,float >& RealTimeMultiSampleArrayModel::getScaling() c
 
 //*************************************************************************************************************
 
-inline const MatrixXd RealTimeMultiSampleArrayModel::dataCurrentToMatrix() const
+inline const MatrixXd RealTimeMultiSampleArrayModel::dataToMatrix(QVector<VectorXd> &vector) const
 {
-    if(m_dataCurrent.size() == 0)
+    if(vector.size() == 0)
         return MatrixXd();
 
-    MatrixXd matCurrent(m_dataCurrent.first().rows(), m_dataCurrent.size());
+    MatrixXd matCurrent(vector.first().rows(), vector.size());
 
-    for(qint32 r = 0; r < m_dataCurrent.first().rows(); ++r)
-        for(qint32 c = 0; c < m_dataCurrent.size(); ++c)
-            matCurrent(r,c) = m_dataCurrent[c].coeff(r);
+    for(qint32 r = 0; r < vector.first().rows(); ++r)
+        for(qint32 c = 0; c < vector.size(); ++c)
+            matCurrent(r,c) = vector[c].coeff(r);
 
     return matCurrent;
 }

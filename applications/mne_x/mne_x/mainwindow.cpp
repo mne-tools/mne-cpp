@@ -305,19 +305,19 @@ void MainWindow::createActions()
     m_pActionMinLgLv = new QAction(tr("&Minimal"), this);
     m_pActionMinLgLv->setCheckable(true);
     m_pActionMinLgLv->setShortcut(tr("Ctrl+1"));
-    m_pActionMinLgLv->setStatusTip(tr("Open an existing file"));
+    m_pActionMinLgLv->setStatusTip(tr("Set log level to minimal"));
     connect(m_pActionMinLgLv, &QAction::triggered, this, &MainWindow::setMinLogLevel);
 
     m_pActionNormLgLv = new QAction(tr("&Normal"), this);
     m_pActionNormLgLv->setCheckable(true);
     m_pActionNormLgLv->setShortcut(tr("Ctrl+2"));
-    m_pActionNormLgLv->setStatusTip(tr("Save the document to disk"));
+    m_pActionNormLgLv->setStatusTip(tr("Set log level to normal"));
     connect(m_pActionNormLgLv, &QAction::triggered, this, &MainWindow::setNormalLogLevel);
 
     m_pActionMaxLgLv = new QAction(tr("Maximal"), this);
     m_pActionMaxLgLv->setCheckable(true);
     m_pActionMaxLgLv->setShortcut(tr("Ctrl+3"));
-    m_pActionMaxLgLv->setStatusTip(tr("Exit the application"));
+    m_pActionMaxLgLv->setStatusTip(tr("Set log level to maximal"));
     connect(m_pActionMaxLgLv, &QAction::triggered, this, &MainWindow::setMaxLogLevel);
 
     m_pActionGroupLgLv = new QActionGroup(this);
@@ -398,7 +398,6 @@ void MainWindow::createMenus()
     m_pMenuHelp->addAction(m_pActionHelpContents);
     m_pMenuHelp->addSeparator();
     m_pMenuHelp->addAction(m_pActionAbout);
-
 }
 
 
@@ -491,6 +490,8 @@ void MainWindow::createPluginDockWindow()
 
     connect(m_pPluginGui, &PluginGui::selectedConnectionChanged,
             this, &MainWindow::updateConnectionWidget);
+
+    m_pMenuView->addAction(m_pPluginGuiDockWidget->toggleViewAction());
 }
 
 

@@ -80,11 +80,12 @@ SOURCES += \
     mp/adaptivemp.cpp \
     mp/atom.cpp \
     mp/fixdictmp.cpp \
-    selectionloader.cpp \
+    selectionio.cpp \
     minimizersimplex.cpp \
     filterTools/cosinefilter.cpp \
+    filterTools/parksmcclellan.cpp \
     filterTools/filterdata.cpp \
-    filterTools/parksmcclellan.cpp
+    filterTools/filterio.cpp
 
 HEADERS += \
     kmeans.h\
@@ -96,12 +97,13 @@ HEADERS += \
     mp/adaptivemp.h \
     mp/atom.h \
     mp/fixdictmp.h \
-    selectionloader.h \
+    selectionio.h \
     layoutmaker.h \
     minimizersimplex.h \
     filterTools/cosinefilter.h \
+    filterTools/parksmcclellan.h \
     filterTools/filterdata.h \
-    filterTools/parksmcclellan.h
+    filterTools/filterio.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

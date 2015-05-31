@@ -124,6 +124,8 @@ public:
 
     RowVectorXcd    m_dFFTCoeffA;   /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
     RowVectorXd     m_dCoeffA;      /**< the time filter coefficient set*/
+
+    int             m_iFilterOrder;
 };
 
 } // NAMESPACE UTILSLIB

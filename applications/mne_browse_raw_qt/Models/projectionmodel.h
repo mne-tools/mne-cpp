@@ -144,13 +144,13 @@ public:
     */
     void addProjections(const FiffInfo &fiffInfo);
 
-    bool                        m_bFileloaded;          /**< true when a Fiff evoked file is loaded. */
-
     //=========================================================================================================
     /**
     * clearModel clears all model's members
     */
     void clearModel();
+
+    bool                        m_bFileloaded;          /**< true when a Fiff evoked file is loaded. */
 
 protected:
     QList<FiffProj>             m_dataProjs;            /**< current projector data. */

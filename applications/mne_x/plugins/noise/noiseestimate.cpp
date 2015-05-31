@@ -174,6 +174,7 @@ bool NoiseEstimate::start()
 
     // Start threads
     QThread::start();
+    qDebug()<<"NoiseEstimate Thread is started.";
     return true;
 }
 
