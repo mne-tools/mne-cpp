@@ -412,7 +412,7 @@ private:
     qint32  m_iCurrentSampleFreeze; /**< Current sample which holds the current position in the data matrix when freezing tool is active */
     qint32  m_iMaxFilterLength;     /**< Max order of the current filters */
     qint32  m_iCurrentBlockSize;    /**< Current block size */
-    qint32  m_iResidual;
+    qint32  m_iResidual;            /**< Current amount of samples which were to size */
 
     QString m_sFilterChannelType;   /**< Kind of channel which is to be filtered */
 
