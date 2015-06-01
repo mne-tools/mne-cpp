@@ -312,8 +312,6 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
     //SSP
     bool doProj = m_bProjActivated && m_matDataRaw.cols() > 0 && m_matDataRaw.rows() == m_matProj.cols() ? true : false;
 
-    std::cout<<"m_iCurrentSample: "<<m_iCurrentSample<<std::endl;
-
     //Copy new data into the global data matrix
     for(qint32 b = 0; b < data.size(); ++b) {
         if(data.at(b).rows() != m_matDataRaw.rows()) {
@@ -321,32 +319,16 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
             return;
         }
 
-//        if(m_iCurrentSample+data.at(b).cols() > m_matDataRaw.cols()) {
-//            int residual = (m_iCurrentSample+data.at(b).cols()) % m_matDataRaw.cols();
-//            if(doProj)
-//                m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()-residual) = m_matSparseProj * data.at(b).block(0,0,data.at(b).rows(),data.at(b).cols()-residual);
-//            else
-//                m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()-residual) = data.at(b).block(0,0,data.at(b).rows(),data.at(b).cols()-residual);
-
-//            //Filter if neccessary
-//            if(!m_filterData.isEmpty())
-//                filterChannelsConcurrently(m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()-residual), m_iCurrentSample);
-
-//            m_iCurrentSample += data.at(b).cols()-residual;
-
-//            std::cout<<"incoming data exceeds internal data cols by: "<<residual<<std::endl;
-//            std::cout<<"m_iCurrentSample+data.at(b).cols(): "<<m_iCurrentSample+data.at(b).cols()<<std::endl;
-//            std::cout<<"m_matDataRaw.cols(): "<<m_matDataRaw.cols()<<std::endl;
-//            std::cout<<"data.at(b).cols()-residual: "<<data.at(b).cols()-residual<<std::endl<<std::endl;
-//        } else {
-
         //Reset m_iCurrentSample and start filling the data matrix from the beginning again
         if(m_iCurrentSample+data.at(b).cols() > m_matDataRaw.cols()) {
             m_iResidual = data.at(b).cols() - ((m_iCurrentSample+data.at(b).cols()) % m_matDataRaw.cols());
             if(m_iResidual == data.at(b).cols())
                 m_iResidual = 0;
 
-            std::cout<<"m_iResidual: "<<m_iResidual<<std::endl;
+            //            std::cout<<"incoming data exceeds internal data cols by: "<<(m_iCurrentSample+data.at(b).cols()) % m_matDataRaw.cols()<<std::endl;
+            //            std::cout<<"m_iCurrentSample+data.at(b).cols(): "<<m_iCurrentSample+data.at(b).cols()<<std::endl;
+            //            std::cout<<"m_matDataRaw.cols(): "<<m_matDataRaw.cols()<<std::endl;
+            //            std::cout<<"data.at(b).cols()-residual: "<<data.at(b).cols()-residual<<std::endl<<std::endl;
 
             if(doProj)
                 m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseProj * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
@@ -376,16 +358,6 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
 
         m_iCurrentBlockSize = data.at(b).cols();
     }
-
-
-//    if(m_iCurrentSample>=m_iMaxSamples) {
-//        m_iCurrentSample = 0;
-
-//        if(!m_bIsFreezed) {
-//            m_vecLastBlockFirstValuesFiltered = m_matDataFiltered.col(0);
-//            m_vecLastBlockFirstValuesRaw = m_matDataRaw.col(0);
-//        }
-//    }
 
     //Update data content
     QModelIndex topLeft = this->index(0,1);
@@ -760,22 +732,22 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
         for(int r = 0; r<timeData.size(); r++) {
             if(m_iCurrentSample+2*data.cols() > m_matDataRaw.cols()) {
                 //Handle last data block
-                std::cout<<"Handle last data block"<<std::endl;
+                //std::cout<<"Handle last data block"<<std::endl;
 
                 RowVectorXd tempData = timeData.at(r).second.second;
-//                std::cout<<"tempData.cols()-iFilterDelay: "<<tempData.cols()-iFilterDelay<<std::endl;
-//                std::cout<<"m_matDataRaw.cols(): "<<m_matDataRaw.cols()<<std::endl;
 
                 tempData.head(m_iMaxFilterLength) += m_matOverlap.row(timeData.at(r).second.first);
-                m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,iFilteredNumberCols-iFilterDelay) = tempData.head(iFilteredNumberCols-iFilterDelay);
+
+                int start = dataIndex-iFilterDelay < 0 ? 0 : dataIndex-iFilterDelay;
+                m_matDataFiltered.row(timeData.at(r).second.first).segment(start,iFilteredNumberCols-m_iMaxFilterLength) = tempData.head(iFilteredNumberCols-m_iMaxFilterLength);
 
                 m_matOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
             } else if(m_iCurrentSample == 0) {
                 //Handle first data block
-                std::cout<<"Handle first data block"<<std::endl;
+                //std::cout<<"Handle first data block"<<std::endl;
 
                 RowVectorXd tempData = timeData.at(r).second.second;
-                m_matDataFiltered.row(timeData.at(r).second.first).segment(m_matDataFiltered.cols()-iFilterDelay-m_iResidual, m_iMaxFilterLength) += tempData.head(iFilterDelay);
+                m_matDataFiltered.row(timeData.at(r).second.first).segment(m_matDataFiltered.cols()-iFilterDelay-m_iResidual, m_iMaxFilterLength) = tempData.head(iFilterDelay) + m_matOverlap.row(timeData.at(r).second.first).head(iFilterDelay);
 
                 tempData.head(m_iMaxFilterLength) += m_matOverlap.row(timeData.at(r).second.first);
                 m_matDataFiltered.row(timeData.at(r).second.first).head(iFilteredNumberCols-m_iMaxFilterLength-iFilterDelay) = tempData.segment(iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength-iFilterDelay);
@@ -783,7 +755,7 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
                 m_matOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
             } else {
                 //Handle middle data blocks
-                std::cout<<"Handle middle data block"<<std::endl;
+                //std::cout<<"Handle middle data block"<<std::endl;
 
                 RowVectorXd tempData = timeData.at(r).second.second;
                 tempData.head(m_iMaxFilterLength) += m_matOverlap.row(timeData.at(r).second.first);
