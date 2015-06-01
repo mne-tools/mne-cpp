@@ -251,6 +251,8 @@ signals:
 
     void applyFilter(QString channelType);
 
+    void filterActivated(bool state);
+
 protected slots:
     //=========================================================================================================
     /**

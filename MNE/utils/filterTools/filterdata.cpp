@@ -238,7 +238,7 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
         return data;
     }
 
-    if(2*m_dCoeffA.cols() + data.cols()>m_iFFTlength) {
+    if(2*m_dCoeffA.cols() + data.cols()>m_iFFTlength && compensateEdgeEffects == MirrorData) {
         qDebug()<<"Error in FilterData: Number of mirroring size plus data size is bigger then fft length!";
         return data;
     }

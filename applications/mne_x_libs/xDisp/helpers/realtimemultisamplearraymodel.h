@@ -334,6 +334,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Filter avtivated
+    *
+    * @param[in] state    filter on/off flag
+    */
+    void filterActivated(bool state);
+
+    //=========================================================================================================
+    /**
     * Sets the type of channel which are to be filtered
     *
     * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
@@ -394,7 +402,8 @@ private:
     void filterChannelsConcurrently();
 
     bool    m_bProjActivated;       /**< Proj activated */
-    bool    m_bIsFreezed;           /**< Display is freezed */
+    bool    m_bIsFreezed;           /**< Display is freezed */    
+    bool    m_bDrawFilterFront;     /**< Display is freezed */
     float   m_fSps;                 /**< Sampling rate */
     qint32  m_iT;                   /**< Time window */
     qint32  m_iDownsampling;        /**< Down sampling factor */
@@ -403,6 +412,7 @@ private:
     qint32  m_iCurrentSampleFreeze; /**< Current sample which holds the current position in the data matrix when freezing tool is active */
     qint32  m_iMaxFilterLength;     /**< Max order of the current filters */
     qint32  m_iCurrentBlockSize;    /**< Current block size */
+    qint32  m_iResidual;
 
     QString m_sFilterChannelType;   /**< Kind of channel which is to be filtered */
 
@@ -415,11 +425,11 @@ private:
     MatrixXd                m_matProj;                          /**< SSP projector */
     SparseMatrix<double>    m_matSparseProj;                    /**< Sparse SSP projector */
 
-    MatrixXdR               m_matDataRaw;
-    MatrixXdR               m_matDataFiltered;
-    MatrixXdR               m_matDataRawFreeze;
-    MatrixXdR               m_matDataFilteredFreeze;
-    MatrixXd                m_matOverlapBack;                   /**< Last overlap block for the back */
+    MatrixXdR               m_matDataRaw;                       /**< The raw data */
+    MatrixXdR               m_matDataFiltered;                  /**< The filtered data */
+    MatrixXdR               m_matDataRawFreeze;                 /**< The raw data in freeze mode */
+    MatrixXdR               m_matDataFilteredFreeze;            /**< The raw filtered data in freeze mode */
+    MatrixXd                m_matOverlap;                       /**< Last overlap block for the back */
 
     QMap< qint32,float>                 m_qMapChScaling;        /**< Sensor selection widget. */
     QList<FilterData>                   m_filterData;           /**< List of currently active filters. */
@@ -447,6 +457,9 @@ inline qint32 RealTimeMultiSampleArrayModel::getCurrentSampleIndex() const
 {
     if(m_bIsFreezed)
         return m_iCurrentSampleFreeze;
+
+    if(!m_filterData.isEmpty())
+        return m_iCurrentSample-m_iMaxFilterLength/2;
 
     return m_iCurrentSample;
 }
