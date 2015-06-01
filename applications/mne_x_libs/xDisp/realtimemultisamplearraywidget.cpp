@@ -679,6 +679,9 @@ void RealTimeMultiSampleArrayWidget::showFilterWidget()
         connect(m_pFilterWindow.data(), &FilterWindow::filterChanged,
                 m_pRTMSAModel, &RealTimeMultiSampleArrayModel::filterChanged);
 
+        connect(m_pFilterWindow.data(), &FilterWindow::filterActivated,
+                m_pRTMSAModel, &RealTimeMultiSampleArrayModel::filterActivated);
+
 //        connect(m_pRTMSAModel, &RealTimeMultiSampleArrayModel::windowSizeChanged,
 //                m_pFilterWindow.data(), &FilterWindow::setWindowSize);
 

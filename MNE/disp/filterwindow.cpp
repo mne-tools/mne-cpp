@@ -364,7 +364,10 @@ bool FilterWindow::eventFilter(QObject *obj, QEvent *event)
                         filterModelRowIndex = z;
                 }
 
-                filterSelectionChanged(m_pFilterDataModel->index(filterModelRowIndex,0), QModelIndex());
+                //Get filter from model and set as current filter
+                QModelIndex index = m_pFilterDataModel->index(filterModelRowIndex, 7);
+                m_filterData = m_pFilterDataModel->data(index, FilterDataModelRoles::GetFilter).value<FilterData>();
+                updateFilterPlot();
 
                 return true;
             } else {
@@ -715,8 +718,6 @@ void FilterWindow::onBtnLoadFilter()
 
 void FilterWindow::onChkBoxFilterActivation(bool state)
 {
-    Q_UNUSED(state);
-
     //Check default filters
     for(int i=0; i<m_lActivationCheckBoxList.size(); i++) {
         QVariant variant;
@@ -737,7 +738,9 @@ void FilterWindow::onChkBoxFilterActivation(bool state)
     }
 
     QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData> >();
+
     emit filterChanged(activeFilters);
+    emit filterActivated(state);
 }
 
 
