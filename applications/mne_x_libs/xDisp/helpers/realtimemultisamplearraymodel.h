@@ -403,7 +403,7 @@ private:
 
     bool    m_bProjActivated;       /**< Proj activated */
     bool    m_bIsFreezed;           /**< Display is freezed */    
-    bool    m_bDrawFilterFront;     /**< Display is freezed */
+    bool    m_bDrawFilterFront;     /**< Flag whether to plot/write the delayed frontal part of the filtered signal. This flag is necessary to get rid of nasty signal jumps when changing the filter parameters. */
     float   m_fSps;                 /**< Sampling rate */
     qint32  m_iT;                   /**< Time window */
     qint32  m_iDownsampling;        /**< Down sampling factor */
@@ -460,6 +460,9 @@ inline qint32 RealTimeMultiSampleArrayModel::getCurrentSampleIndex() const
 
     if(!m_filterData.isEmpty())
         return m_iCurrentSample-m_iMaxFilterLength/2;
+
+//    if(!m_bDrawFilterFront)
+//        return m_iCurrentSample+m_iMaxFilterLength/2;
 
     return m_iCurrentSample;
 }
