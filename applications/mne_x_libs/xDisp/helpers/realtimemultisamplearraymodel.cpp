@@ -559,7 +559,7 @@ void RealTimeMultiSampleArrayModel::filterChanged(QList<FilterData> filterData)
     m_matOverlap.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxFilterLength);
     m_matOverlap.setZero();
 
-    m_bDrawFilterFront = false;
+    //m_bDrawFilterFront = false;
 
     //Filter all visible data channels at once
     //filterChannelsConcurrently();
@@ -572,7 +572,7 @@ void RealTimeMultiSampleArrayModel::filterActivated(bool state)
 {
     //Filter all visible data channels at once
     if(state) {
-        m_bDrawFilterFront = false;
+        //m_bDrawFilterFront = false;
         //filterChannelsConcurrently();
     }
 }
@@ -595,7 +595,7 @@ void RealTimeMultiSampleArrayModel::setFilterChannelType(QString channelType)
         }
     }
 
-    m_bDrawFilterFront = false;
+    //m_bDrawFilterFront = false;
 
     //Filter all visible data channels at once
     //filterChannelsConcurrently();
@@ -615,12 +615,12 @@ void RealTimeMultiSampleArrayModel::createFilterChannelList(QStringList channelN
             m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH) && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
             if(m_sFilterChannelType == "All" && channelNames.contains(m_pFiffInfo->chs.at(i).ch_name))
                 m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
-            else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType) && channelNames.contains(m_pFiffInfo->chs.at(i).ch_name))
+            else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType)/* && channelNames.contains(m_pFiffInfo->chs.at(i).ch_name)*/)
                 m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
         }
     }
 
-    m_bDrawFilterFront = false;
+    //m_bDrawFilterFront = false;
 
 //    for(int i = 0; i<m_filterChannelList.size(); i++)
 //        std::cout<<m_filterChannelList.at(i).toStdString()<<std::endl;
@@ -635,8 +635,8 @@ void RealTimeMultiSampleArrayModel::createFilterChannelList(QStringList channelN
 void doFilterPerChannel(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
 {
     for(int i=0; i<channelDataTime.first.size(); i++)
-        channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true, FilterData::ZeroPad);
-        //channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, true, FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
+        //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true, FilterData::ZeroPad);
+        channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, true, FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
 }
 
 
@@ -691,13 +691,19 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
 
         future.waitForFinished();
 
-        for(int r = 0; r<timeData.size(); r++)
+        for(int r = 0; r<timeData.size(); r++) {
             m_matDataFiltered.row(timeData.at(r).second.first) = timeData.at(r).second.second.segment(m_iMaxFilterLength+m_iMaxFilterLength/2, m_matDataRaw.cols());
+            m_matOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
+        }
     }
 
     //Fill filtered data with raw data if the channel was not filtered
     for(int i = 0; i<notFilterChannelIndex.size(); i++)
         m_matDataFiltered.row(notFilterChannelIndex.at(i)) = m_matDataRaw.row(notFilterChannelIndex.at(i));
+
+    if(!m_bIsFreezed) {
+        m_vecLastBlockFirstValuesFiltered = m_matDataFiltered.col(0);
+    }
 
     //std::cout<<"END RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
 }
@@ -744,40 +750,51 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
                 //Handle last data block
                 //std::cout<<"Handle last data block"<<std::endl;
 
-                RowVectorXd tempData = timeData.at(r).second.second;
-
-                tempData.head(m_iMaxFilterLength) += m_matOverlap.row(timeData.at(r).second.first);
-
                 if(m_bDrawFilterFront) {
+                    RowVectorXd tempData = timeData.at(r).second.second;
+                    tempData.head(m_iMaxFilterLength) += m_matOverlap.row(timeData.at(r).second.first);
+
                     int start = dataIndex-iFilterDelay < 0 ? 0 : dataIndex-iFilterDelay;
                     m_matDataFiltered.row(timeData.at(r).second.first).segment(start,iFilteredNumberCols-m_iMaxFilterLength) = tempData.head(iFilteredNumberCols-m_iMaxFilterLength);
-                } else
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex+iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength-iFilterDelay) = timeData.at(r).second.second.segment(iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength-iFilterDelay);
+                } else {
+                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength).reverse();
+                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex+iFilterDelay,iFilteredNumberCols-2*m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,iFilteredNumberCols-2*m_iMaxFilterLength);
+                }
 
                 m_matOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
             } else if(m_iCurrentSample == 0) {
                 //Handle first data block
                 //std::cout<<"Handle first data block"<<std::endl;
 
-                RowVectorXd tempData = timeData.at(r).second.second;
-                m_matDataFiltered.row(timeData.at(r).second.first).segment(m_matDataFiltered.cols()-iFilterDelay-m_iResidual, m_iMaxFilterLength) = tempData.head(iFilterDelay) + m_matOverlap.row(timeData.at(r).second.first).head(iFilterDelay);
+                if(m_bDrawFilterFront) {
+                    RowVectorXd tempData = timeData.at(r).second.second;
+                    m_matDataFiltered.row(timeData.at(r).second.first).segment(m_matDataFiltered.cols()-iFilterDelay-m_iResidual, m_iMaxFilterLength) = tempData.head(iFilterDelay) + m_matOverlap.row(timeData.at(r).second.first).head(iFilterDelay);
 
-                tempData.head(m_iMaxFilterLength) += m_matOverlap.row(timeData.at(r).second.first);
-                m_matDataFiltered.row(timeData.at(r).second.first).head(iFilteredNumberCols-m_iMaxFilterLength-iFilterDelay) = tempData.segment(iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength-iFilterDelay);
+                    tempData.head(m_iMaxFilterLength) += m_matOverlap.row(timeData.at(r).second.first);
+                    m_matDataFiltered.row(timeData.at(r).second.first).head(iFilteredNumberCols-m_iMaxFilterLength-iFilterDelay) = tempData.segment(iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength-iFilterDelay);
+                } else {
+                    m_matDataFiltered.row(timeData.at(r).second.first).head(m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength).reverse();
+
+                    m_matDataFiltered.row(timeData.at(r).second.first).segment(iFilterDelay,iFilteredNumberCols-2*m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,iFilteredNumberCols-2*m_iMaxFilterLength);
+                }
 
                 m_matOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
             } else {
                 //Handle middle data blocks
                 //std::cout<<"Handle middle data block"<<std::endl;
 
-                RowVectorXd tempData = timeData.at(r).second.second;
-                tempData.head(m_iMaxFilterLength) += m_matOverlap.row(timeData.at(r).second.first);
+                if(m_bDrawFilterFront) {
+                    RowVectorXd tempData = timeData.at(r).second.second;
+                    tempData.head(m_iMaxFilterLength) += m_matOverlap.row(timeData.at(r).second.first);
 
-                if(m_bDrawFilterFront)
                     m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength) = tempData.head(iFilteredNumberCols-m_iMaxFilterLength);
-                else {
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-m_iMaxFilterLength,iFilterDelay) = m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-m_iMaxFilterLength,iFilterDelay).reverse();
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex+iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength-iFilterDelay) = timeData.at(r).second.second.segment(iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength-iFilterDelay);
+                } else {
+                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength).reverse();
+                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex+iFilterDelay,iFilteredNumberCols-2*m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,iFilteredNumberCols-2*m_iMaxFilterLength);
+
+//                    if(!m_bIsFreezed) {
+//                        m_vecLastBlockFirstValuesFiltered = m_matDataFiltered.col(dataIndex-1);
+//                    }
                 }
 
                 m_matOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
