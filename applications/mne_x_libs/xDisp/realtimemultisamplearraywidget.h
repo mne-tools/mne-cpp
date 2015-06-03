@@ -406,6 +406,7 @@ private:
     QSpinBox*       m_pSpinBoxTimeScale;                                /**< Time scale spin box */
     QSpinBox*       m_pSpinBoxDSFactor;                                 /**< downsampling factor */
     QTableView*     m_pTableView;                                       /**< the QTableView being part of the model/view framework of Qt */
+    QWidget*        m_pQuickControlWidget;
 
     QSharedPointer<ChInfoModel>                     m_pChInfoModel;                 /**< channel info model. */
     QSharedPointer<NewRealTimeMultiSampleArray>     m_pRTMSA;                       /**< The real-time sample array measurement. */

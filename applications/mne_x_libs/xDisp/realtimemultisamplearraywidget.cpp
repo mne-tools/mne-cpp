@@ -152,6 +152,16 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
         delete m_pTableView;
     m_pTableView = new QTableView;
 
+//    QLayout* layout = new QLayout();
+
+//    m_pQuickControlWidget = new QWidget(m_pTableView);
+//    m_pQuickControlWidget->show();
+//    m_pQuickControlWidget->setGeometry(0, 0, 50, 50);
+
+//    layout->addWidget(m_pQuickControlWidget);
+
+//    m_pTableView->setLayout(layout);
+
     //Install event filter for tracking mouse movements
     m_pTableView->viewport()->installEventFilter(this);
     m_pTableView->setMouseTracking(true);
