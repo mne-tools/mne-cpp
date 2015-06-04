@@ -328,21 +328,10 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                         painter->setPen(m_penNormal);
                 }
 
-                //Plot current position marker
-                path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
-                createCurrentPositionMarkerPath(index, option, path);
-
-                painter->save();
-                painter->setPen(m_penMarker);
-                painter->drawPath(path);
-                painter->restore();
-
                 //timer.start();
                 painter->drawPath(path);
                 //timeMS = timer.elapsed();
                 //std::cout<<"Time drawPath Current data"<<timeMS<<std::endl;
-
-                painter->restore();
 
                 //Plot ellipse and amplitude next to marker mouse posistion
 //                if(m_iActiveRow == index.row()) {
@@ -355,6 +344,17 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
 //                    painter->drawEllipse(ellipsePos,2,2);
 //                    painter->restore();
 //                }
+
+                painter->restore();
+
+                //Plot current position marker
+                path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
+                createCurrentPositionMarkerPath(index, option, path);
+
+                painter->save();
+                painter->setPen(m_penMarker);
+                painter->drawPath(path);
+                painter->restore();
             }
             break;
         }
