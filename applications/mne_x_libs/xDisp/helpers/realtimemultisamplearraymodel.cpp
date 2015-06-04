@@ -320,7 +320,7 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
             return;
         }
 
-        //Reset m_iCurrentSample and start filling the data matrix from the beginning again
+        //Reset m_iCurrentSample and start filling the data matrix from the beginning again. Also add residual  amount of data to the end of the matrix.
         if(m_iCurrentSample+data.at(b).cols() > m_matDataRaw.cols()) {
             m_iResidual = data.at(b).cols() - ((m_iCurrentSample+data.at(b).cols()) % m_matDataRaw.cols());
             if(m_iResidual == data.at(b).cols())
@@ -329,7 +329,7 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
             //            std::cout<<"incoming data exceeds internal data cols by: "<<(m_iCurrentSample+data.at(b).cols()) % m_matDataRaw.cols()<<std::endl;
             //            std::cout<<"m_iCurrentSample+data.at(b).cols(): "<<m_iCurrentSample+data.at(b).cols()<<std::endl;
             //            std::cout<<"m_matDataRaw.cols(): "<<m_matDataRaw.cols()<<std::endl;
-            //            std::cout<<"data.at(b).cols()-residual: "<<data.at(b).cols()-residual<<std::endl<<std::endl;
+            //            std::cout<<"data.at(b).cols()-m_iResidual: "<<data.at(b).cols()-m_iResidual<<std::endl<<std::endl;
 
             if(doProj)
                 m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseProj * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
@@ -559,7 +559,7 @@ void RealTimeMultiSampleArrayModel::filterChanged(QList<FilterData> filterData)
     m_matOverlap.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxFilterLength);
     m_matOverlap.setZero();
 
-    //m_bDrawFilterFront = false;
+    m_bDrawFilterFront = false;
 
     //Filter all visible data channels at once
     //filterChannelsConcurrently();
@@ -572,7 +572,7 @@ void RealTimeMultiSampleArrayModel::filterActivated(bool state)
 {
     //Filter all visible data channels at once
     if(state) {
-        //m_bDrawFilterFront = false;
+        m_bDrawFilterFront = false;
         //filterChannelsConcurrently();
     }
 }
@@ -595,7 +595,7 @@ void RealTimeMultiSampleArrayModel::setFilterChannelType(QString channelType)
         }
     }
 
-    //m_bDrawFilterFront = false;
+    m_bDrawFilterFront = false;
 
     //Filter all visible data channels at once
     //filterChannelsConcurrently();
@@ -620,7 +620,7 @@ void RealTimeMultiSampleArrayModel::createFilterChannelList(QStringList channelN
         }
     }
 
-    //m_bDrawFilterFront = false;
+    m_bDrawFilterFront = false;
 
 //    for(int i = 0; i<m_filterChannelList.size(); i++)
 //        std::cout<<m_filterChannelList.at(i).toStdString()<<std::endl;
