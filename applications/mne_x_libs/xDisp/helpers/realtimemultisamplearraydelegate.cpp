@@ -299,15 +299,6 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 painter->drawPath(path);
                 painter->restore();
 
-                //Plot current position marker
-                path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
-                createCurrentPositionMarkerPath(index, option, path);
-
-                painter->save();
-                painter->setPen(m_penMarker);
-                painter->drawPath(path);
-                painter->restore();
-
                 //Plot data path
                 QPointF ellipsePos;
                 QString amplitude;
@@ -336,6 +327,15 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                     else
                         painter->setPen(m_penNormal);
                 }
+
+                //Plot current position marker
+                path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
+                createCurrentPositionMarkerPath(index, option, path);
+
+                painter->save();
+                painter->setPen(m_penMarker);
+                painter->drawPath(path);
+                painter->restore();
 
                 //timer.start();
                 painter->drawPath(path);
