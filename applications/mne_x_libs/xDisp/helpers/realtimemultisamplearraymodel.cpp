@@ -267,6 +267,7 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
 
         //Initialise filter channel names
         int visibleInit = 20;
+        QStringList filterChannels;
 
         if(visibleInit>m_pFiffInfo->chs.size()) {
             while(visibleInit>m_pFiffInfo->chs.size())
@@ -274,7 +275,9 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
         }
 
         for(qint32 b = 0; b < visibleInit; ++b)
-            m_filterChannelList.append(m_pFiffInfo->ch_names.at(b));
+            filterChannels.append(m_pFiffInfo->ch_names.at(b));
+
+        createFilterChannelList(filterChannels);
     }
     else {
         m_vecBadIdcs = RowVectorXi(0,0);
@@ -354,6 +357,8 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
         //Filter if neccessary
         if(!m_filterData.isEmpty())
             filterChannelsConcurrently(m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()), m_iCurrentSample);
+//        else
+//            m_matDataFiltered.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols());
 
         m_iCurrentSample += data.at(b).cols();
 
@@ -559,7 +564,7 @@ void RealTimeMultiSampleArrayModel::filterChanged(QList<FilterData> filterData)
     m_matOverlap.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxFilterLength);
     m_matOverlap.setZero();
 
-    m_bDrawFilterFront = false;
+    //m_bDrawFilterFront = false;
 
     //Filter all visible data channels at once
     //filterChannelsConcurrently();
@@ -572,7 +577,7 @@ void RealTimeMultiSampleArrayModel::filterActivated(bool state)
 {
     //Filter all visible data channels at once
     if(state) {
-        m_bDrawFilterFront = false;
+ //       m_bDrawFilterFront = false;
         //filterChannelsConcurrently();
     }
 }
@@ -595,7 +600,7 @@ void RealTimeMultiSampleArrayModel::setFilterChannelType(QString channelType)
         }
     }
 
-    m_bDrawFilterFront = false;
+//    m_bDrawFilterFront = false;
 
     //Filter all visible data channels at once
     //filterChannelsConcurrently();
@@ -609,18 +614,31 @@ void RealTimeMultiSampleArrayModel::createFilterChannelList(QStringList channelN
     m_filterChannelList.clear();
     m_visibleChannelList = channelNames;
 
+//    //Create channel fiter list based on channelNames
+//    for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
+//        if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
+//            m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
+//            m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH) && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
+//            if(m_sFilterChannelType == "All" && channelNames.contains(m_pFiffInfo->chs.at(i).ch_name))
+//                m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
+//            else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType) && channelNames.contains(m_pFiffInfo->chs.at(i).ch_name))
+//                m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
+//        }
+//    }
+
+    //Create channel filter list independent from channelNames
     for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
         if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
             m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
             m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH) && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-            if(m_sFilterChannelType == "All" && channelNames.contains(m_pFiffInfo->chs.at(i).ch_name))
+            if(m_sFilterChannelType == "All")
                 m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
-            else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType)/* && channelNames.contains(m_pFiffInfo->chs.at(i).ch_name)*/)
+            else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType))
                 m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
         }
     }
 
-    m_bDrawFilterFront = false;
+//    m_bDrawFilterFront = false;
 
 //    for(int i = 0; i<m_filterChannelList.size(); i++)
 //        std::cout<<m_filterChannelList.at(i).toStdString()<<std::endl;
