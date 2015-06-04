@@ -82,7 +82,7 @@ void RealTimeMultiSampleArrayDelegate::initPainterPaths(const QAbstractTableMode
         m_painterPaths.append(QPainterPath());
 
     // Init pens
-    m_penMarker = QPen(Qt::red, 1, Qt::DashLine);
+    m_penMarker = QPen(Qt::red, 2, Qt::DashLine);
 
     m_penGrid = QPen(Qt::black, 0.5, Qt::DotLine);
 
@@ -522,8 +522,6 @@ void RealTimeMultiSampleArrayDelegate::createCurrentPositionMarkerPath(const QMo
     float currentSampleIndex = option.rect.x()+t_pModel->getCurrentSampleIndex();
     float fDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
     currentSampleIndex = currentSampleIndex*fDx;
-
-    std::cout<<"currentSampleIndex "<<currentSampleIndex<<std::endl;
 
     float yStart = option.rect.topLeft().y();
     float yEnd = option.rect.bottomRight().y();
