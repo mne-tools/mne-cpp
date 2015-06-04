@@ -94,8 +94,8 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     m_pDoubleSpinBoxZoom->setStatusTip(tr("Row height"));
     connect(m_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &RealTimeMultiSampleArrayWidget::zoomChanged);
-    connect(m_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &RealTimeMultiSampleArrayWidget::visibleRowsChanged);
+//    connect(m_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+//            this, &RealTimeMultiSampleArrayWidget::visibleRowsChanged);
 
     addDisplayWidget(m_pDoubleSpinBoxZoom);
 
@@ -291,8 +291,8 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 
-        connect(m_pTableView->verticalScrollBar(), &QScrollBar::valueChanged,
-                this, &RealTimeMultiSampleArrayWidget::visibleRowsChanged);
+//        connect(m_pTableView->verticalScrollBar(), &QScrollBar::valueChanged,
+//                this, &RealTimeMultiSampleArrayWidget::visibleRowsChanged);
 
         //set context menu
         m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -529,7 +529,7 @@ void RealTimeMultiSampleArrayWidget::applySelection()
     }
 
     //Update the visible channel list which are to be filtered
-    visibleRowsChanged(0);
+    //visibleRowsChanged(0);
 
     //m_pRTMSAModel->selectRows(m_qListCurrentSelection);
 }
@@ -543,7 +543,7 @@ void RealTimeMultiSampleArrayWidget::hideSelection()
         m_pTableView->hideRow(m_qListCurrentSelection.at(i));
 
     //Update the visible channel list which are to be filtered
-    visibleRowsChanged(0);
+    //visibleRowsChanged(0);
 }
 
 
@@ -564,7 +564,7 @@ void RealTimeMultiSampleArrayWidget::resetSelection()
     }
 
     //Update the visible channel list which are to be filtered
-    visibleRowsChanged(0);
+    //visibleRowsChanged(0);
 }
 
 
@@ -586,7 +586,7 @@ void RealTimeMultiSampleArrayWidget::showSelectedChannelsOnly(QStringList select
     }
 
     //Update the visible channel list which are to be filtered
-    visibleRowsChanged(0);
+    //visibleRowsChanged(0);
 }
 
 
@@ -616,7 +616,7 @@ void RealTimeMultiSampleArrayWidget::hideBadChannels()
     }
 
     //Update the visible channel list which are to be filtered
-    visibleRowsChanged(0);
+    //visibleRowsChanged(0);
 }
 
 
