@@ -153,6 +153,16 @@ private:
 
     //=========================================================================================================
     /**
+    * createCurrentPositionMarkerPath Creates the QPointer path for the current marker position plot.
+    *
+    * @param[in] index      Used to locate data in a data model.
+    * @param[in] option     Describes the parameters used to draw an item in a view widget
+    * @param[in,out] path   The QPointerPath to create for the data plot.
+    */
+    void createCurrentPositionMarkerPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path) const;
+
+    //=========================================================================================================
+    /**
     * createGridPath Creates the QPointer path for the grid plot.
     *
     * @param[in] index      Used to locate data in a data model.
