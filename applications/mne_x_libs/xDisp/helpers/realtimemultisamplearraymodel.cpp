@@ -674,6 +674,7 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
     QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;
     QList<int> notFilterChannelIndex;
 
+    //Also append mirrored data in front and back to get rid of edge effects
     for(qint32 i=0; i<m_matDataRaw.rows(); ++i) {
         if(m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name)) {
             RowVectorXd datTemp(m_matDataRaw.row(i).cols() + 2 * m_iMaxFilterLength);
@@ -757,7 +758,7 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
                     int start = dataIndex-iFilterDelay < 0 ? 0 : dataIndex-iFilterDelay;
                     m_matDataFiltered.row(timeData.at(r).second.first).segment(start,iFilteredNumberCols-m_iMaxFilterLength) = tempData.head(iFilteredNumberCols-m_iMaxFilterLength);
                 } else {
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength).reverse();
+                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength);
                     m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex+iFilterDelay,iFilteredNumberCols-2*m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,iFilteredNumberCols-2*m_iMaxFilterLength);
                 }
 
@@ -768,12 +769,14 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
 
                 if(m_bDrawFilterFront) {
                     RowVectorXd tempData = timeData.at(r).second.second;
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(m_matDataFiltered.cols()-iFilterDelay-m_iResidual, m_iMaxFilterLength) = tempData.head(iFilterDelay) + m_matOverlap.row(timeData.at(r).second.first).head(iFilterDelay);
+                    m_matDataFiltered.row(timeData.at(r).second.first).segment(m_matDataFiltered.cols()-iFilterDelay-m_iResidual, iFilterDelay) = tempData.head(iFilterDelay) + m_matOverlap.row(timeData.at(r).second.first).head(iFilterDelay);
 
                     tempData.head(m_iMaxFilterLength) += m_matOverlap.row(timeData.at(r).second.first);
                     m_matDataFiltered.row(timeData.at(r).second.first).head(iFilteredNumberCols-m_iMaxFilterLength-iFilterDelay) = tempData.segment(iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength-iFilterDelay);
+
+                    m_matDataFiltered.row(timeData.at(r).second.first).tail(m_iResidual) = m_matDataFiltered.row(timeData.at(r).second.first).head(m_iResidual);
                 } else {
-                    m_matDataFiltered.row(timeData.at(r).second.first).head(m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength).reverse();
+                    m_matDataFiltered.row(timeData.at(r).second.first).head(m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength);
 
                     m_matDataFiltered.row(timeData.at(r).second.first).segment(iFilterDelay,iFilteredNumberCols-2*m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,iFilteredNumberCols-2*m_iMaxFilterLength);
                 }
@@ -789,7 +792,7 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
 
                     m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength) = tempData.head(iFilteredNumberCols-m_iMaxFilterLength);
                 } else {
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength).reverse();
+                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength);
                     m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex+iFilterDelay,iFilteredNumberCols-2*m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,iFilteredNumberCols-2*m_iMaxFilterLength);
 
 //                    if(!m_bIsFreezed) {
