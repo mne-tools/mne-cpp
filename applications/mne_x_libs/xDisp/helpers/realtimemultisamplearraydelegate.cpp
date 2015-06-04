@@ -299,6 +299,15 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 painter->drawPath(path);
                 painter->restore();
 
+                //Plot current position marker
+                path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
+                createCurrentPositionMarkerPath(index, option, path);
+
+                painter->save();
+                painter->setPen(m_penMarker);
+                painter->drawPath(path);
+                painter->restore();
+
                 //Plot data path
                 QPointF ellipsePos;
                 QString amplitude;
@@ -501,6 +510,26 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
             amplitude = QString::number(*(data.first+j));
         }
     }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayDelegate::createCurrentPositionMarkerPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path) const
+{
+    const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
+
+    float currentSampleIndex = option.rect.x()+t_pModel->getCurrentSampleIndex();
+    float fDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
+    currentSampleIndex = currentSampleIndex*fDx;
+
+    std::cout<<"currentSampleIndex "<<currentSampleIndex<<std::endl;
+
+    float yStart = option.rect.topLeft().y();
+    float yEnd = option.rect.bottomRight().y();
+
+    path.moveTo(currentSampleIndex,yStart);
+    path.lineTo(currentSampleIndex,yEnd);
 }
 
 
