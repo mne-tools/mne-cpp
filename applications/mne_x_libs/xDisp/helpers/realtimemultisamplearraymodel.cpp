@@ -354,11 +354,11 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
         else
             m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = data.at(b);
 
-        //Filter if neccessary
+        //Filter if neccessary else set to zero
         if(!m_filterData.isEmpty())
             filterChannelsConcurrently(m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()), m_iCurrentSample);
-//        else
-//            m_matDataFiltered.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols());
+        else
+            m_matDataFiltered.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()).setZero();// = m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols());
 
         m_iCurrentSample += data.at(b).cols();
 
@@ -590,15 +590,30 @@ void RealTimeMultiSampleArrayModel::setFilterChannelType(QString channelType)
     m_sFilterChannelType = channelType;
     m_filterChannelList = m_visibleChannelList;
 
-    if(channelType != "All") {
-        QMutableListIterator<QString> i(m_filterChannelList);
-        while(i.hasNext()) {
-            QString val = i.next();
-            if(!val.contains(channelType, Qt::CaseInsensitive)) {
-                i.remove();
-            }
+    //This version is for when all channels of a type are to be filtered (not only the visible ones).
+    //Create channel filter list independent from channelNames
+    m_filterChannelList.clear();
+
+    for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
+        if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
+            m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
+            m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH) && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
+            if(m_sFilterChannelType == "All")
+                m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
+            else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType))
+                m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
         }
     }
+
+//    if(channelType != "All") {
+//        QMutableListIterator<QString> i(m_filterChannelList);
+//        while(i.hasNext()) {
+//            QString val = i.next();
+//            if(!val.contains(channelType, Qt::CaseInsensitive)) {
+//                i.remove();
+//            }
+//        }
+//    }
 
 //    m_bDrawFilterFront = false;
 
