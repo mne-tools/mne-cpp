@@ -752,54 +752,68 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
                 //std::cout<<"Handle last data block"<<std::endl;
 
                 if(m_bDrawFilterFront) {
+                    //Get the currently filtered data. This data has a delay of filterLength/2 in front and back.
                     RowVectorXd tempData = timeData.at(r).second.second;
+
+                    //Perform the actual overlap add by adding the last filterlength data to the newly filtered one
                     tempData.head(m_iMaxFilterLength) += m_matOverlap.row(timeData.at(r).second.first);
 
+                    //Write the newly calulated filtered data to the filter data matrix. Keep in mind that the current block also effect last part of the last block (begin at dataIndex-iFilterDelay).
                     int start = dataIndex-iFilterDelay < 0 ? 0 : dataIndex-iFilterDelay;
                     m_matDataFiltered.row(timeData.at(r).second.first).segment(start,iFilteredNumberCols-m_iMaxFilterLength) = tempData.head(iFilteredNumberCols-m_iMaxFilterLength);
                 } else {
+                    //Perform this else case everytime the filter was changed. Do not begin to plot from dataIndex-iFilterDelay because the impsulse response and m_matOverlap do not match with the new filter anymore.
                     m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength);
                     m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex+iFilterDelay,iFilteredNumberCols-2*m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,iFilteredNumberCols-2*m_iMaxFilterLength);
                 }
 
+                //Refresh the m_matOverlap with the new calculated filtered data.
                 m_matOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
             } else if(m_iCurrentSample == 0) {
                 //Handle first data block
                 //std::cout<<"Handle first data block"<<std::endl;
 
                 if(m_bDrawFilterFront) {
+                    //Get the currently filtered data. This data has a delay of filterLength/2 in front and back.
                     RowVectorXd tempData = timeData.at(r).second.second;
+
+                    //Add newly calculate data to the tail of the current filter data matrix
                     m_matDataFiltered.row(timeData.at(r).second.first).segment(m_matDataFiltered.cols()-iFilterDelay-m_iResidual, iFilterDelay) = tempData.head(iFilterDelay) + m_matOverlap.row(timeData.at(r).second.first).head(iFilterDelay);
 
+                    //Perform the actual overlap add by adding the last filterlength data to the newly filtered one
                     tempData.head(m_iMaxFilterLength) += m_matOverlap.row(timeData.at(r).second.first);
                     m_matDataFiltered.row(timeData.at(r).second.first).head(iFilteredNumberCols-m_iMaxFilterLength-iFilterDelay) = tempData.segment(iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength-iFilterDelay);
 
+                    //Copy residual data from the front to the back. The residual is != 0 if the chosen block size cannot be evenly fit into the matrix size
                     m_matDataFiltered.row(timeData.at(r).second.first).tail(m_iResidual) = m_matDataFiltered.row(timeData.at(r).second.first).head(m_iResidual);
                 } else {
+                    //Perform this else case everytime the filter was changed. Do not begin to plot from dataIndex-iFilterDelay because the impsulse response and m_matOverlap do not match with the new filter anymore.
                     m_matDataFiltered.row(timeData.at(r).second.first).head(m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength);
-
                     m_matDataFiltered.row(timeData.at(r).second.first).segment(iFilterDelay,iFilteredNumberCols-2*m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,iFilteredNumberCols-2*m_iMaxFilterLength);
                 }
 
+                //Refresh the m_matOverlap with the new calculated filtered data.
                 m_matOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
             } else {
                 //Handle middle data blocks
                 //std::cout<<"Handle middle data block"<<std::endl;
 
                 if(m_bDrawFilterFront) {
+                    //Get the currently filtered data. This data has a delay of filterLength/2 in front and back.
                     RowVectorXd tempData = timeData.at(r).second.second;
+
+                    //Perform the actual overlap add by adding the last filterlength data to the newly filtered one
                     tempData.head(m_iMaxFilterLength) += m_matOverlap.row(timeData.at(r).second.first);
 
+                    //Write the newly calulated filtered data to the filter data matrix. Keep in mind that the current block also effect last part of the last block (begin at dataIndex-iFilterDelay).
                     m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength) = tempData.head(iFilteredNumberCols-m_iMaxFilterLength);
                 } else {
+                    //Perform this else case everytime the filter was changed. Do not begin to plot from dataIndex-iFilterDelay because the impsulse response and m_matOverlap do not match with the new filter anymore.
                     m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength);
                     m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex+iFilterDelay,iFilteredNumberCols-2*m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,iFilteredNumberCols-2*m_iMaxFilterLength);
-
-//                    if(!m_bIsFreezed) {
-//                        m_vecLastBlockFirstValuesFiltered = m_matDataFiltered.col(dataIndex-1);
-//                    }
                 }
 
+                //Refresh the m_matOverlap with the new calculated filtered data.
                 m_matOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
             }
         }
