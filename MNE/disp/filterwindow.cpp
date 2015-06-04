@@ -518,7 +518,7 @@ void FilterWindow::filterParametersChanged()
 
     //Calculate the needed fft length
     int filterTaps = ui->m_spinBox_filterTaps->value();
-    int fftLength = m_iWindowSize;
+    int fftLength = m_iWindowSize + ui->m_spinBox_filterTaps->value() * 2;
     int exp = ceil(MNEMath::log2(fftLength));
     fftLength = pow(2, exp) <512 ? 512 : pow(2, exp);
 
