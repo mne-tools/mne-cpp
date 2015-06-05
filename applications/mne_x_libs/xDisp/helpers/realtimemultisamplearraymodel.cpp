@@ -564,7 +564,7 @@ void RealTimeMultiSampleArrayModel::filterChanged(QList<FilterData> filterData)
     m_matOverlap.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxFilterLength);
     m_matOverlap.setZero();
 
-    //m_bDrawFilterFront = false;
+    m_bDrawFilterFront = false;
 
     //Filter all visible data channels at once
     //filterChannelsConcurrently();
@@ -842,7 +842,7 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
                     m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength) = tempData.head(iFilteredNumberCols-m_iMaxFilterLength);
                 } else {
                     //Perform this else case everytime the filter was changed. Do not begin to plot from dataIndex-iFilterDelay because the impsulse response and m_matOverlap do not match with the new filter anymore.
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength);
+                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,m_iMaxFilterLength).setZero();// = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength);
                     m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex+iFilterDelay,iFilteredNumberCols-2*m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,iFilteredNumberCols-2*m_iMaxFilterLength);
                 }
 
