@@ -140,27 +140,25 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     connect(m_pActionProjection, &QAction::triggered,
             this, &RealTimeMultiSampleArrayWidget::showProjectionWidget);
     addDisplayAction(m_pActionProjection);
+    m_pActionProjection->setVisible(true);
 
     m_pActionHideBad = new QAction(QIcon(":/images/hideBad.png"), tr("Toggle all bad channels"),this);
     m_pActionHideBad->setStatusTip(tr("Toggle all bad channels"));
     connect(m_pActionHideBad, &QAction::triggered,
             this, &RealTimeMultiSampleArrayWidget::hideBadChannels);
     addDisplayAction(m_pActionHideBad);
+    m_pActionHideBad->setVisible(true);
 
-    m_pActionProjection->setVisible(true);
+//    m_pActionQuickControl = new QAction(QIcon(), tr("Show quick control widget"),this);
+//    m_pActionQuickControl->setStatusTip(tr("Show quick control widget"));
+//    connect(m_pActionQuickControl, &QAction::triggered,
+//            this, &RealTimeMultiSampleArrayWidget::showQuickControlWidget);
+//    addDisplayAction(m_pActionQuickControl);
+//    m_pActionQuickControl->setVisible(true);
+
     if(m_pTableView)
         delete m_pTableView;
     m_pTableView = new QTableView;
-
-//    QLayout* layout = new QLayout();
-
-//    m_pQuickControlWidget = new QWidget(m_pTableView);
-//    m_pQuickControlWidget->show();
-//    m_pQuickControlWidget->setGeometry(0, 0, 50, 50);
-
-//    layout->addWidget(m_pQuickControlWidget);
-
-//    m_pTableView->setLayout(layout);
 
     //Install event filter for tracking mouse movements
     m_pTableView->viewport()->installEventFilter(this);
@@ -363,6 +361,8 @@ void RealTimeMultiSampleArrayWidget::init()
         for(int i = 0; i<m_pRTMSAModel->rowCount(); i++)
             if(m_pRTMSAModel->data(m_pRTMSAModel->index(i,2)).toBool())
                 m_qListBadChannels << i;
+
+        showQuickControlWidget();
 
         m_bInitialized = true;
     }
@@ -652,7 +652,7 @@ void RealTimeMultiSampleArrayWidget::showProjectionWidget()
     {
         if(!m_pProjectorSelectionWidget)
         {
-            m_pProjectorSelectionWidget = QSharedPointer<ProjectorWidget>(new ProjectorWidget);
+            m_pProjectorSelectionWidget = QSharedPointer<ProjectorWidget>(new ProjectorWidget());
 
             m_pProjectorSelectionWidget->setFiffInfo(m_pFiffInfo);
             //m_pProjectorSelectionWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
@@ -676,7 +676,7 @@ void RealTimeMultiSampleArrayWidget::showProjectionWidget()
 void RealTimeMultiSampleArrayWidget::showFilterWidget()
 {
     if(!m_pFilterWindow) {
-        m_pFilterWindow = QSharedPointer<FilterWindow>(new FilterWindow());
+        m_pFilterWindow = QSharedPointer<FilterWindow>(new FilterWindow(this));
         //m_pFilterWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
 
         m_pFilterWindow->setFiffInfo(*m_pFiffInfo.data());
@@ -718,7 +718,7 @@ void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
     if(!m_pSelectionManagerWindow) {
         m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(this, m_pFiffInfo));
 
-        m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(0, m_pChInfoModel.data()));
+        m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel.data()));
         //m_pSelectionManagerWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
 
         connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::showSelectedChannelsOnly,
@@ -741,6 +741,20 @@ void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
         m_pSelectionManagerWindow->activateWindow();
         m_pSelectionManagerWindow->show();
     }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayWidget::showQuickControlWidget()
+{
+    if(!m_pQuickControlWidget) {
+        m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget());
+        m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
+    }
+
+    m_pQuickControlWidget->activateWindow();
+    m_pQuickControlWidget->show();
 }
 
 

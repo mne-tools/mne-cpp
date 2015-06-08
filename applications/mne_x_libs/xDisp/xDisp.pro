@@ -124,6 +124,7 @@ SOURCES += \
     helpers/selectionscene.cpp \
     helpers/selectionsceneitem.cpp \
     helpers/chinfomodel.cpp \
+    helpers/quickcontrolwidget.cpp
 
 HEADERS += \
     xdisp_global.h \
@@ -155,10 +156,12 @@ HEADERS += \
     helpers/selectionscene.h \
     helpers/selectionsceneitem.h \
     helpers/chinfomodel.h \
+    helpers/quickcontrolwidget.h
 
 FORMS += \
     realtimesamplearraywidget.ui \
-    helpers/selectionmanagerwindow.ui
+    helpers/selectionmanagerwindow.ui \
+    helpers/quickcontrolwidget.ui
 
 qtHaveModule(3d) {
     SOURCES += realtimesourceestimatewidget.cpp
