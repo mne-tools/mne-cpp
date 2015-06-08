@@ -82,7 +82,10 @@ void RealTimeMultiSampleArrayDelegate::initPainterPaths(const QAbstractTableMode
         m_painterPaths.append(QPainterPath());
 
     // Init pens
-    m_penMarker = QPen(Qt::red, 2, Qt::DashLine);
+    QColor colorMarker(233,0,43);
+    colorMarker.setAlpha(160);
+
+    m_penMarker = QPen(colorMarker, 2, Qt::DashLine);
 
     m_penGrid = QPen(Qt::black, 0.5, Qt::DotLine);
 
