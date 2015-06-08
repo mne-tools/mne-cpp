@@ -56,6 +56,7 @@
 #include "helpers/projectorwidget.h"
 #include "helpers/selectionmanagerwindow.h"
 #include "helpers/chinfomodel.h"
+#include "helpers/quickcontrolwidget.h"
 
 #include "disp/filterwindow.h"
 
@@ -94,6 +95,7 @@
 #include <QScroller>
 #include <QScrollBar>
 #include <QDebug>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -379,6 +381,12 @@ private:
 
     //=========================================================================================================
     /**
+    * Shows quick control widget
+    */
+    void showQuickControlWidget();
+
+    //=========================================================================================================
+    /**
     * Gets called when the views in the viewport of the table view change
     */
     void visibleRowsChanged(int value);
@@ -406,8 +414,8 @@ private:
     QSpinBox*       m_pSpinBoxTimeScale;                                /**< Time scale spin box */
     QSpinBox*       m_pSpinBoxDSFactor;                                 /**< downsampling factor */
     QTableView*     m_pTableView;                                       /**< the QTableView being part of the model/view framework of Qt */
-    QWidget*        m_pQuickControlWidget;
 
+    QSharedPointer<QuickControlWidget>              m_pQuickControlWidget;          /**< quick control widget. */
     QSharedPointer<ChInfoModel>                     m_pChInfoModel;                 /**< channel info model. */
     QSharedPointer<NewRealTimeMultiSampleArray>     m_pRTMSA;                       /**< The real-time sample array measurement. */
     QSharedPointer<SelectionManagerWindow>          m_pSelectionManagerWindow;      /**< SelectionManagerWindow. */
@@ -420,7 +428,7 @@ private:
     QAction*        m_pActionChScaling;                                 /**< Show channel scaling Action. */
     QAction*        m_pActionProjection;                                /**< Show projections Action. */
     QAction*        m_pActionHideBad;                                   /**< Hide bad channels. */
-
+    QAction*        m_pActionQuickControl;                              /**< Show quick control widget. */
  };
 
 } // NAMESPACE XDISPLIB
