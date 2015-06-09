@@ -149,12 +149,12 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     addDisplayAction(m_pActionHideBad);
     m_pActionHideBad->setVisible(true);
 
-//    m_pActionQuickControl = new QAction(QIcon(), tr("Show quick control widget"),this);
-//    m_pActionQuickControl->setStatusTip(tr("Show quick control widget"));
-//    connect(m_pActionQuickControl, &QAction::triggered,
-//            this, &RealTimeMultiSampleArrayWidget::showQuickControlWidget);
-//    addDisplayAction(m_pActionQuickControl);
-//    m_pActionQuickControl->setVisible(true);
+    m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget"),this);
+    m_pActionQuickControl->setStatusTip(tr("Show quick control widget"));
+    connect(m_pActionQuickControl, &QAction::triggered,
+            this, &RealTimeMultiSampleArrayWidget::showQuickControlWidget);
+    addDisplayAction(m_pActionQuickControl);
+    m_pActionQuickControl->setVisible(true);
 
     if(m_pTableView)
         delete m_pTableView;
@@ -361,8 +361,6 @@ void RealTimeMultiSampleArrayWidget::init()
         for(int i = 0; i<m_pRTMSAModel->rowCount(); i++)
             if(m_pRTMSAModel->data(m_pRTMSAModel->index(i,2)).toBool())
                 m_qListBadChannels << i;
-
-        showQuickControlWidget();
 
         m_bInitialized = true;
     }
@@ -753,7 +751,6 @@ void RealTimeMultiSampleArrayWidget::showQuickControlWidget()
         m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
     }
 
-    m_pQuickControlWidget->activateWindow();
     m_pQuickControlWidget->show();
 }
 

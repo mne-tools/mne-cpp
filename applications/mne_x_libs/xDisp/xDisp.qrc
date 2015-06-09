@@ -9,5 +9,6 @@
         <file alias="showFilterWindow.png">images/showFilterWindow.png</file>
         <file alias="hideBad.png">images/hideBad.png</file>
         <file alias="showBad.png">images/showBad.png</file>
+        <file alias="quickControl.png">images/quickControl.png</file>
     </qresource>
 </RCC>
