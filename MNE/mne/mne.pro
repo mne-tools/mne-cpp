@@ -96,7 +96,8 @@ SOURCES += \
     mne_cluster_info.cpp \
     mne_surface.cpp \
     mne_corsourceestimate.cpp\
-    mne_bem.cpp
+    mne_bem.cpp\
+    mne_bem_surface.cpp
 
 HEADERS += \
     mne.h \
@@ -111,7 +112,8 @@ HEADERS += \
     mne_cluster_info.h \
     mne_surface.h \
     mne_corsourceestimate.h\
-    mne_bem.h
+    mne_bem.h\
+    mne_bem_surface.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

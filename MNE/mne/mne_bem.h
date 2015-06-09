@@ -1,7 +1,8 @@
 //=============================================================================================================
 /**
-* @file     mne_sourcespace.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     mne_bem.h
+* @author   Jana Kiesel<jana.kiesel@tu-ilmenau.de>
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
@@ -125,6 +126,16 @@ public:
     */
     MNEBem();
 
+
+    //=========================================================================================================
+    /**
+    * Copy constructor.
+    *
+    * @param[in] p_MNEBem   MNE BEM
+    */
+    MNEBem(const MNEBem &p_MNEBem);
+
+
     //=========================================================================================================
     /**
     * Default constructor
@@ -138,11 +149,23 @@ public:
     */
     ~MNEBem();
 
-private:
+    //=========================================================================================================
+    /**
+    * ### MNE toolbox root function ###: Implementation of the mne_read_bem_surface function
+    *
+    * Reads Bem surface from a fif file
+    *
+    * @param [in,out] p_pStream     The opened fif file
+    * @param [in] add_geom          Add geometry information to the source spaces       Note: not used at the moment
+    * @param [in, out] p_Tree       Search for the bem surface here
+    *
+    * @return true if succeeded, false otherwise
+    */
+    static bool readFromStream(FiffStream::SPtr& p_pStream, FiffDirTree& p_Tree);
+
 
 private:
-//    To Do:
-//    QList<MNESurface> m_qListSurface;    /**< List of the Surfaces containing the source space information. */
+//    QList<MNEBemSurface> m_qListBemSurface;    /**< List of the BEM Surfaces. */
 };
 
 //*************************************************************************************************************
