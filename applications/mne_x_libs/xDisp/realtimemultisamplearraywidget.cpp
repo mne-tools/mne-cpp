@@ -747,8 +747,13 @@ void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
 void RealTimeMultiSampleArrayWidget::showQuickControlWidget()
 {
     if(!m_pQuickControlWidget) {
-        m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget());
+        m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(&m_qMapChScaling));
         m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
+
+        //Handle scaling
+        connect(m_pRTMSAScalingWidget.data(), &RealTimeMultiSampleArrayScalingWidget::scalingChanged,
+                this, &RealTimeMultiSampleArrayWidget::broadcastScaling);
+
     }
 
     m_pQuickControlWidget->show();
