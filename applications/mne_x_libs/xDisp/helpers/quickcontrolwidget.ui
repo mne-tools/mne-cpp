@@ -60,72 +60,6 @@
      <property name="bottomMargin">
       <number>0</number>
      </property>
-     <item row="0" column="0">
-      <widget class="QGroupBox" name="m_groupBox_scaling">
-       <property name="minimumSize">
-        <size>
-         <width>220</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="title">
-        <string>Scaling</string>
-       </property>
-       <layout class="QFormLayout" name="formLayout_2">
-        <item row="1" column="0">
-         <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
-        </item>
-        <item row="3" column="0">
-         <widget class="QDoubleSpinBox" name="doubleSpinBox_2"/>
-        </item>
-        <item row="5" column="0">
-         <widget class="QDoubleSpinBox" name="doubleSpinBox_3"/>
-        </item>
-        <item row="3" column="1">
-         <widget class="QSlider" name="horizontalSlider_4">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1">
-         <widget class="QSlider" name="horizontalSlider_5">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QSlider" name="horizontalSlider">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" colspan="2">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>EEG:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>MEG</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0" colspan="2">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>STIM</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
      <item row="1" column="0">
       <widget class="QGroupBox" name="m_groupBox_view">
        <property name="title">
@@ -155,7 +89,7 @@
         <item row="1" column="0" colspan="2">
          <widget class="QLabel" name="label_4">
           <property name="text">
-           <string>Visible channels:</string>
+           <string>Number of visible channels:</string>
           </property>
          </widget>
         </item>
@@ -298,6 +232,19 @@
          </widget>
         </item>
        </layout>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QGroupBox" name="m_groupBox_scaling">
+       <property name="minimumSize">
+        <size>
+         <width>220</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="title">
+        <string>Scaling</string>
+       </property>
       </widget>
      </item>
     </layout>

@@ -41,8 +41,9 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <iostream>
 #include "ui_quickcontrolwidget.h"
-
+#include "fiff/fiff_constants.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -87,8 +88,9 @@ public:
     * Constructs a QuickControlWidget which is a child of parent.
     *
     * @param [in] parent    parent of widget
+    * @param [in] qMapChScaling    pointer to scaling information
     */
-    QuickControlWidget(QWidget *parent = 0);
+    QuickControlWidget(QMap< qint32,float >* qMapChScaling, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -97,6 +99,11 @@ public:
     ~QuickControlWidget();
 
 protected:
+
+    void createScalingGroup();
+
+    void updateScaling(double value);
+
     //=========================================================================================================
     /**
     * Reimplmented mouseMoveEvent.
@@ -134,9 +141,12 @@ protected:
     void toggleHideAll(bool state);
 
 private:
-    QPoint      dragPosition;           /**< the drag position of the window */
+    QPoint                  m_dragPosition;         /**< the drag position of the window */
 
-    Ui::QuickControlWidget *ui;         /**< The generated UI file */
+    QMap< qint32,float >*           m_qMapChScaling;                /**< Channel scaling values. */
+    QMap<qint32, QDoubleSpinBox*>   m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits */
+
+    Ui::QuickControlWidget *ui;                     /**< The generated UI file */
 };
 
 } // NAMESPACE XDISPLIB
