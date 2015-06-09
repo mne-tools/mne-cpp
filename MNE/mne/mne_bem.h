@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include "mne_global.h"
+#include "mne_bem_surface.h"
 
 
 //*************************************************************************************************************
@@ -162,6 +163,22 @@ public:
     * @return true if succeeded, false otherwise
     */
     static bool readFromStream(FiffStream::SPtr& p_pStream, FiffDirTree& p_Tree);
+
+
+protected:
+
+    //=========================================================================================================
+    /**
+    * Implementation of the read_bem_surface function in e.g. mne_read_bem_surface.m
+    * Reads a single bem surface
+    *
+    * @param [in] p_pStream         The opened fif file
+    * @param [in] p_Tree            Search for the source space here
+    * @param [out] p_BemSurface    The read source space (hemisphere)
+    *
+    * @return true if succeeded, false otherwise
+    */
+//    static bool read_bem_surface(FiffStream* p_pStream, const FiffDirTree& p_Tree,  MNEBemSurface& p_BemSurface);
 
 
 private:

@@ -76,17 +76,17 @@ MNEBem::MNEBem(const MNEBem &p_MNEBem)
 //*************************************************************************************************************
 
 MNEBem::MNEBem(QIODevice &p_IODevice)   //const MNESourceSpace &p_MNESourceSpace
-//    :m_qListSurface(p_MNEBem.m_qListSurface)
+//    :m_qListBemSurface(p_MNEBem.m_qListBemSurface)
 {
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
     FiffDirTree t_Tree;
-    QList<FiffDirEntry>fiffDirEntries;
+//    QList<FiffDirEntry>fiffDirEntries;
 
-    if(!t_pStream->open(t_Tree, fiffDirEntries))
-    {
-        qCritical() << "Could not open FIFF stream!";
-//        return false;
-    }
+//    if(!t_pStream->open(t_Tree, fiffDirEntries))
+//    {
+//        qCritical() << "Could not open FIFF stream!";
+////        return false;
+//    }
 
 
     if(!MNEBem::readFromStream(t_pStream, t_Tree))
@@ -111,5 +111,59 @@ MNEBem::~MNEBem()
 
 bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, FiffDirTree& p_Tree)
 {
+
+    //
+    //   Open the file, create directory
+    //
+    bool open_here = false;
+    if (!p_pStream->device()->isOpen())
+    {
+        QList<FiffDirEntry> t_Dir;
+        QString t_sFileName = p_pStream->streamName();
+
+        QFile t_file(t_sFileName);//ToDo TCPSocket;
+        p_pStream = FiffStream::SPtr(new FiffStream(&t_file));
+        if(!p_pStream->open(p_Tree, t_Dir))
+            return false;
+        open_here = true;
+//        if(t_pDir)
+//            delete t_pDir;
+
+
+        //
+        //   Find all BEM surfaces
+        //
+
+        QList<FiffDirTree>bem = p_Tree.dir_tree_find(FIFFB_BEM);
+        if(bem.isEmpty())
+        {
+            qCritical() << "No BEM block found!";
+            return false;
+        }
+
+        QList<FiffDirTree>bemsurf = p_Tree.dir_tree_find(FIFFB_BEM_SURF);
+        if(bemsurf.isEmpty())
+        {
+            qCritical() << "No BEM surfaces found!";
+            return false;
+        }
+
+        for(int k = 0; k < bemsurf.size(); ++k)
+        {
+//            MNEBemSurface  p_BemSurface;
+            printf("\tReading a source space...");
+//            MNEBem::read_bem_surface(p_pStream.data(), bemsurf[k], p_BemSurface);
+            printf("\t[done]\n" );
+
+//            p_SourceSpace.m_qListBemSurface.append(p_BemSurface);
+
+    //           src(k) = this;
+        }
+    }
 return true;
 }
+
+//bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, MNEBemSurface &p_BemSurface)
+//{
+//    return true;
+//}
