@@ -64,23 +64,39 @@ MNEBem::MNEBem()
 {
 }
 
+//*************************************************************************************************************
+
+MNEBem::MNEBem(const MNEBem &p_MNEBem)
+//: m_qListBemSurface(p_MNEBem.m_qListBemSurface)
+{
+
+}
+
 
 //*************************************************************************************************************
 
 MNEBem::MNEBem(QIODevice &p_IODevice)   //const MNESourceSpace &p_MNESourceSpace
 //    :m_qListSurface(p_MNEBem.m_qListSurface)
 {
-    FiffStream::SPtr fiffStream(new FiffStream(&p_IODevice));
-    FiffDirTree fiffDirTree;
+    FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
+    FiffDirTree t_Tree;
     QList<FiffDirEntry>fiffDirEntries;
 
-    if(!fiffStream->open(fiffDirTree, fiffDirEntries))
+    if(!t_pStream->open(t_Tree, fiffDirEntries))
     {
         qCritical() << "Could not open FIFF stream!";
 //        return false;
     }
 
-//MNESurface::read(p_IODevice, bemSurfaces)
+
+    if(!MNEBem::readFromStream(t_pStream, t_Tree))
+    {
+        t_pStream->device()->close();
+        std::cout << "Could not read the source spaces\n"; // ToDo throw error
+        //ToDo error(me,'Could not read the source spaces (%s)',mne_omit_first_line(lasterr));
+//        return false;
+    }
+
 }
 
 
@@ -91,3 +107,9 @@ MNEBem::~MNEBem()
 
 }
 
+//*************************************************************************************************************
+
+bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, FiffDirTree& p_Tree)
+{
+return true;
+}
