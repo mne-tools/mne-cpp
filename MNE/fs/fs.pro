@@ -83,7 +83,10 @@ SOURCES += \
     label.cpp \
     surface.cpp \
     annotationset.cpp \
-    surfaceset.cpp
+    surfaceset.cpp \
+    blendian.cpp \
+    mgh.cpp \
+    mri.cpp
 
 HEADERS += \
     annotation.h\
@@ -92,7 +95,10 @@ HEADERS += \
     label.h \
     surface.h \
     annotationset.h \
-    surfaceset.h
+    surfaceset.h \
+    blendian.h \
+    mgh.h \
+    mri.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
