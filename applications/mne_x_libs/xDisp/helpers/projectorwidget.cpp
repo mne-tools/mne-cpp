@@ -74,6 +74,7 @@ ProjectorWidget::ProjectorWidget(QWidget *parent, Qt::WindowFlags f)
 
 void ProjectorWidget::createUI()
 {
+    this->setWindowTitle("Projections");
     if(m_pFiffInfo)
     {
         m_qListCheckBox.clear();

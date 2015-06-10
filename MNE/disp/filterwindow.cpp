@@ -104,6 +104,9 @@ void FilterWindow::setFiffInfo(const FiffInfo &fiffInfo)
     ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
     ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
 
+    ui->m_doubleSpinBox_highpass->setValue(nyquistFrequency/3);
+    ui->m_doubleSpinBox_lowpass->setValue(nyquistFrequency/2);
+
     updateFilterPlot();
 }
 
@@ -114,7 +117,29 @@ void FilterWindow::setWindowSize(int iWindowSize)
 {
     m_iWindowSize = iWindowSize;
 
-    ui->m_spinBox_filterTaps->setMaximum(iWindowSize);
+    //Only set even numbers -> otherwise cosine design method gives wrong results
+    if(m_iWindowSize%2!=0)
+        m_iWindowSize--;
+
+    //Update filter depending on new window size
+    filterParametersChanged();
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::setMaxFilterTaps(int iMaxNumberFilterTaps)
+{
+    if(iMaxNumberFilterTaps%2!=0)
+        iMaxNumberFilterTaps--;
+
+    if(iMaxNumberFilterTaps>512)
+        iMaxNumberFilterTaps = 512;
+
+    ui->m_spinBox_filterTaps->setMaximum(iMaxNumberFilterTaps);
+
+    //Update filter depending on new window size
+    filterParametersChanged();
 }
 
 
@@ -123,6 +148,12 @@ void FilterWindow::setWindowSize(int iWindowSize)
 void FilterWindow::setSamplingRate(double dSamplingRate)
 {
     m_dSFreq = dSamplingRate;
+
+    if(ui->m_doubleSpinBox_highpass->value()>m_dSFreq/2)
+        ui->m_doubleSpinBox_highpass->setValue(m_dSFreq/2);
+
+    if(ui->m_doubleSpinBox_lowpass->value()>m_dSFreq/2)
+        ui->m_doubleSpinBox_lowpass->setValue(m_dSFreq/2);
 
     filterParametersChanged();
 }
@@ -262,10 +293,10 @@ void FilterWindow::initMVC()
 void FilterWindow::initFilters()
 {
     //Init filter data model with all default filters located in the resource directory
-    m_lDefaultFilters << "NOTCH_60Hz_Fs1kHz"
-                   << "NOTCH_50Hz_Fs1kHz"
-                   << "BP_1Hz_70Hz_Fs1kHz"
-                   << "BP_1Hz_40Hz_Fs1kHz";
+//    m_lDefaultFilters << "NOTCH_60Hz_Fs1kHz"
+//                   << "NOTCH_50Hz_Fs1kHz"
+//                   << "BP_1Hz_70Hz_Fs1kHz"
+//                   << "BP_1Hz_40Hz_Fs1kHz";
 
     for(int i = 0; i<m_lDefaultFilters.size(); i++) {
         FilterData tmpFilter;
@@ -333,7 +364,10 @@ bool FilterWindow::eventFilter(QObject *obj, QEvent *event)
                         filterModelRowIndex = z;
                 }
 
-                filterSelectionChanged(m_pFilterDataModel->index(filterModelRowIndex,0), QModelIndex());
+                //Get filter from model and set as current filter
+                QModelIndex index = m_pFilterDataModel->index(filterModelRowIndex, 7);
+                m_filterData = m_pFilterDataModel->data(index, FilterDataModelRoles::GetFilter).value<FilterData>();
+                updateFilterPlot();
 
                 return true;
             } else {
@@ -484,9 +518,9 @@ void FilterWindow::filterParametersChanged()
 
     //Calculate the needed fft length
     int filterTaps = ui->m_spinBox_filterTaps->value();
-    int fftLength = m_iWindowSize;
+    int fftLength = m_iWindowSize + ui->m_spinBox_filterTaps->value() * 2;
     int exp = ceil(MNEMath::log2(fftLength));
-    fftLength = pow(2, exp+1);
+    fftLength = pow(2, exp) <512 ? 512 : pow(2, exp);
 
     //set maximum and minimum for cut off frequency spin boxes
     ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
@@ -684,8 +718,6 @@ void FilterWindow::onBtnLoadFilter()
 
 void FilterWindow::onChkBoxFilterActivation(bool state)
 {
-    Q_UNUSED(state);
-
     //Check default filters
     for(int i=0; i<m_lActivationCheckBoxList.size(); i++) {
         QVariant variant;
@@ -706,7 +738,9 @@ void FilterWindow::onChkBoxFilterActivation(bool state)
     }
 
     QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData> >();
+
     emit filterChanged(activeFilters);
+    emit filterActivated(state);
 }
 
 
