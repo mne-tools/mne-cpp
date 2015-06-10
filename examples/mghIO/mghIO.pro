@@ -1,14 +1,13 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     MNE.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+# @file     mghIO.pro
+# @author   Carsten Boensel <carsten.boensel@tu-ilmenau.de>
 # @version  1.0
-# @date     July, 2012
+# @date     April, 2015
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2015, Carsten Boensel. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -18,7 +17,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,38 +28,58 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all MNE libraries.
+# @brief    Builds an example for the fs/mgh and /mri library
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../mne-cpp.pri)
+QT       -= gui
 
-TEMPLATE = subdirs
+TARGET = mghIO
+TEMPLATE = lib
 
-SUBDIRS += \
-    generics \
-    utils \
-    fs \
-    fiff \
-    mne \
-    inverse \
-    rtCommand \
-    rtClient \
-    rtInv \
-    bmti \
+DEFINES += MGHIO_LIBRARY
 
-contains(MNECPP_CONFIG, withGui) {
-    SUBDIRS += disp
+SOURCES += \
+    main.cpp
 
-    qtHaveModule(3d) {
-        message(Qt3D available: disp3D library configured!)
-        SUBDIRS += disp3D \
-                   #disp3DNew #Uncomment this if you have Qt3D 2.0 compiled
-    }
+HEADERS +=
+
+unix {
+    target.path = /usr/lib
+    INSTALLS += target
 }
 
-contains(MNECPP_CONFIG, withPython) {
-    SUBDIRS += pyio
+include(../../mne-cpp.pri)
+
+TEMPLATE = app
+
+VERSION = $${MNE_CPP_VERSION}
+
+QT       += widgets
+
+CONFIG   += console
+CONFIG   -= app_bundle
+
+TARGET = mghIO
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
 }
 
-CONFIG += ordered
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Bmtid
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Bmti
+}
+
+DESTDIR =  $${MNE_BINARY_DIR}
+
+SOURCES += \
+        main.cpp \
+
+HEADERS += \
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
