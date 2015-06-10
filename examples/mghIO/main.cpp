@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch. All rights reserved.
+* Copyright (C) 2015, Carsten Boensel. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -42,9 +42,84 @@
 #include <fs/mgh.h>
 #include <fs/blendian.h>
 
+// std includes
+#include <iostream>
+#include <stdint.h>
+#include <stdio.h>
+
+// math includes
+#include <string>
+#include <vector>
+#include <array>
+
+//#include <zlib.h>
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QApplication>
+#include <QCoreApplication>
+#include <QByteArray>
+#include <QBitArray>
+#include <QString>
+#include <QDebug>
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
+#include <QTemporaryFile>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace std;
+
+
+//*************************************************************************************************************
+
+#define VERBOSE true
+
+//=============================================================================================================
+// MAIN
+//=============================================================================================================
+
+// prototypes
+void printVector(vector<int> vec);
+
+//=============================================================================================================
+/**
+* read in mgh sample data and store it to mri data structure
+*/
+int main()
+{
+    // initialize vars to call loadMGH function
+
+    QString fName = "D:/Repos/mne-cpp/bin/MNE-sample-data/subjects/sample/mri/orig/001.mgh";         // where /local/bin is a symlink to /usr/bin
+    QDir fDir(fName);
+    QString fNameNew = fDir.canonicalPath();
+
+    vector<int> slices; // indices of the sclices z to read
+        slices.push_back(0);
+    int frame = 0; // time frame index
+    bool headerOnly = false;
+
+    // call ported freesurfer function to read in file
+    cout << "Reading mgh file..." << endl;
+    cout << fName.toStdString() << endl;
+    Mri mri = Mgh::loadMGH(fName, slices, frame, headerOnly);
+
+    return 0;
+}
+
+//*************************************************************************************************************
+
+// print vector content to console
+void printVector(vector<int> vec)
+{
+  for (unsigned int i=0; i<vec.size(); ++i)
+    cout << vec[i] << ' ';
+  cout << '\n';
+}

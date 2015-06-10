@@ -35,7 +35,7 @@
 QT       -= gui
 
 TARGET = mghIO
-TEMPLATE = lib
+TEMPLATE = app
 
 DEFINES += MGHIO_LIBRARY
 
@@ -68,10 +68,10 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Bmtid
+    LIBS += -lMNE$${MNE_LIB_VERSION}Fsd
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Bmti
+    LIBS += -lMNE$${MNE_LIB_VERSION}Fs
 }
 
 DESTDIR =  $${MNE_BINARY_DIR}
