@@ -37,7 +37,16 @@
 #ifndef BLENDIAN_H
 #define BLENDIAN_H
 
+#include "fs_global.h"
 #include <stdio.h>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE FSLIB
+//=============================================================================================================
+
+namespace FSLIB
+{
 
 class BLEndian
 {
@@ -52,5 +61,7 @@ public:
     static float swapFloat(float source);
     static float freadFloat(FILE *fp);
 };
+
+} // NAMESPACE
 
 #endif // BLENDIAN_H

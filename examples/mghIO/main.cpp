@@ -38,9 +38,10 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <fs/fs_global.h>
+#include <fs/blendian.h>
 #include <fs/mri.h>
 #include <fs/mgh.h>
-#include <fs/blendian.h>
 #include <mne/mne.h>
 
 // std includes
@@ -60,7 +61,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
 #include <QtCore/QCoreApplication>
 #include <QByteArray>
 #include <QBitArray>
@@ -77,7 +77,7 @@
 //=============================================================================================================
 
 using namespace std;
-
+using namespace FSLIB;
 
 //*************************************************************************************************************
 
@@ -94,7 +94,8 @@ void printVector(vector<int> vec);
 /**
 * read in mgh sample data and store it to mri data structure
 */
-int main(int argc, char *argv[])
+//int main(int argc, char *argv[])
+int main()
 {
 //    QCoreApplication a(argc, argv);
     // initialize vars to call loadMGH function
