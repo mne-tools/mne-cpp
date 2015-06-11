@@ -116,19 +116,19 @@ public:
     /**
     * Copy constructor.
     *
-    * @param[in] p_MNEBemSurface    Hemisphere source space which should be copied
+    * @param[in] p_MNEBemSurface    BEM surface which should be copied
     */
     MNEBemSurface(const MNEBemSurface& p_MNEBemSurface);
 
     //=========================================================================================================
     /**
-    * Destroys the hemisphere source space.
+    * Destroys the BEM surface.
     */
     ~MNEBemSurface();
 
     //=========================================================================================================
     /**
-    * Initializes the hemisphere source space.
+    * Initializes the BEM surface.
     */
     void clear();
 
@@ -187,4 +187,4 @@ public:
 
 } // NAMESPACE
 
-#endif // MNE_HEMISPHERE_H
+#endif // MNE_BEMSURFACE_H
