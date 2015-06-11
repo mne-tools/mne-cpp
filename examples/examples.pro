@@ -52,7 +52,6 @@ SUBDIRS += \
     cancelNoise \
     fiffIO \
     makeLayout\
-    bmtiExample\
     readBEM\
 
 contains(MNECPP_CONFIG, withGui) {
