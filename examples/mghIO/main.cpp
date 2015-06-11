@@ -39,10 +39,10 @@
 //=============================================================================================================
 
 #include <fs/fs_global.h>
+
 #include <fs/blendian.h>
 #include <fs/mri.h>
 #include <fs/mgh.h>
-#include <mne/mne.h>
 
 // std includes
 #include <iostream>
