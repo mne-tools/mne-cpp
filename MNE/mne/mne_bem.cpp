@@ -172,7 +172,7 @@ bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, 
     if(!p_Tree.find_tag(p_pStream, FIFF_BEM_SURF_ID, t_pTag))
          p_BemSurface.id = FIFFV_BEM_SURF_ID_UNKNOWN;
     else
-         p_BemSurface.id = *t_pTag->toInt();                          //Achtung
+         p_BemSurface.id = *t_pTag->toInt();
 
 //        qDebug() << "Read SourceSpace ID; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
 
@@ -180,7 +180,7 @@ bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, 
     if(!p_Tree.find_tag(p_pStream, FIFF_BEM_SIGMA, t_pTag))
          p_BemSurface.sigma = 1.0;
     else
-         p_BemSurface.sigma = *t_pTag->toInt();                          //Achtung
+         p_BemSurface.sigma = *t_pTag->toFloat();
 
 //        qDebug() <<
 
@@ -191,7 +191,7 @@ bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, 
         return false;
     }
     else
-         p_BemSurface.np = *t_pTag->toInt();                          //Achtung
+         p_BemSurface.np = *t_pTag->toInt();
 
 //        qDebug() <<
 
@@ -202,7 +202,7 @@ bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, 
         return false;
     }
     else
-         p_BemSurface.ntri = *t_pTag->toInt();                          //Achtung
+         p_BemSurface.ntri = *t_pTag->toInt();
 
 //        qDebug() <<
 
@@ -218,10 +218,10 @@ bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, 
             return false;
         }
         else
-            p_BemSurface.coord_frame = *t_pTag->toInt();                          //Achtung
+            p_BemSurface.coord_frame = *t_pTag->toInt();
     }
     else
-         p_BemSurface.coord_frame = *t_pTag->toInt();                          //Achtung
+         p_BemSurface.coord_frame = *t_pTag->toInt();
 
 //        qDebug() <<
 
