@@ -48,7 +48,7 @@
 namespace FSLIB
 {
 
-class BLEndian
+class FSSHARED_EXPORT BLEndian
 {
 public:
     BLEndian();

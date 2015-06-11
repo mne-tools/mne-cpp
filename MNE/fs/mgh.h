@@ -82,7 +82,7 @@ class BLENdian;
 *
 * @brief mgh file handling.
 */
-class Mgh
+class FSSHARED_EXPORT Mgh
 {
 public:
     //=========================================================================================================

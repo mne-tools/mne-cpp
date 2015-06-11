@@ -81,7 +81,7 @@ namespace FSLIB
 *
 * @brief Mri data structure.
 */
-class Mri
+class FSSHARED_EXPORT Mri
 {
 public:
     //=========================================================================================================
