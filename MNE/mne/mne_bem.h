@@ -178,11 +178,11 @@ protected:
     *
     * @return true if succeeded, false otherwise
     */
-//    static bool read_bem_surface(FiffStream* p_pStream, const FiffDirTree& p_Tree,  MNEBemSurface& p_BemSurface);
+    static bool read_bem_surface(FiffStream* p_pStream, const FiffDirTree& p_Tree,  MNEBemSurface& p_BemSurface);
 
 
 private:
-//    QList<MNEBemSurface> m_qListBemSurface;    /**< List of the BEM Surfaces. */
+    QList<MNEBemSurface> m_qListBemSurface;    /**< List of the BEM Surfaces. */
 };
 
 //*************************************************************************************************************

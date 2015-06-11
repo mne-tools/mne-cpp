@@ -67,7 +67,7 @@ MNEBem::MNEBem()
 //*************************************************************************************************************
 
 MNEBem::MNEBem(const MNEBem &p_MNEBem)
-//: m_qListBemSurface(p_MNEBem.m_qListBemSurface)
+: m_qListBemSurface(p_MNEBem.m_qListBemSurface)
 {
 
 }
@@ -76,7 +76,6 @@ MNEBem::MNEBem(const MNEBem &p_MNEBem)
 //*************************************************************************************************************
 
 MNEBem::MNEBem(QIODevice &p_IODevice)   //const MNESourceSpace &p_MNESourceSpace
-//    :m_qListBemSurface(p_MNEBem.m_qListBemSurface)
 {
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
     FiffDirTree t_Tree;
@@ -150,9 +149,9 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, FiffDirTree& p_Tree)
 
         for(int k = 0; k < bemsurf.size(); ++k)
         {
-//            MNEBemSurface  p_BemSurface;
+            MNEBemSurface  p_BemSurface;
             printf("\tReading a source space...");
-//            MNEBem::read_bem_surface(p_pStream.data(), bemsurf[k], p_BemSurface);
+            MNEBem::read_bem_surface(p_pStream.data(), bemsurf[k], p_BemSurface);
             printf("\t[done]\n" );
 
 //            p_SourceSpace.m_qListBemSurface.append(p_BemSurface);
@@ -163,7 +162,151 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, FiffDirTree& p_Tree)
 return true;
 }
 
-//bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, MNEBemSurface &p_BemSurface)
-//{
-//    return true;
-//}
+bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, MNEBemSurface &p_BemSurface)
+{
+    p_BemSurface.clear();
+
+    FiffTag::SPtr t_pTag;
+
+    //=====================================================================
+    if(!p_Tree.find_tag(p_pStream, FIFF_BEM_SURF_ID, t_pTag))
+         p_BemSurface.id = FIFFV_BEM_SURF_ID_UNKNOWN;
+    else
+         p_BemSurface.id = *t_pTag->toInt();                          //Achtung
+
+//        qDebug() << "Read SourceSpace ID; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
+
+    //=====================================================================
+    if(!p_Tree.find_tag(p_pStream, FIFF_BEM_SIGMA, t_pTag))
+         p_BemSurface.sigma = 1.0;
+    else
+         p_BemSurface.sigma = *t_pTag->toInt();                          //Achtung
+
+//        qDebug() <<
+
+    //=====================================================================
+    if(!p_Tree.find_tag(p_pStream, FIFF_BEM_SURF_NNODE, t_pTag))
+    {
+        qCritical() << "np not found!";
+        return false;
+    }
+    else
+         p_BemSurface.np = *t_pTag->toInt();                          //Achtung
+
+//        qDebug() <<
+
+    //=====================================================================
+    if(!p_Tree.find_tag(p_pStream, FIFF_BEM_SURF_NTRI, t_pTag))
+    {
+        qCritical() << "ntri not found!";
+        return false;
+    }
+    else
+         p_BemSurface.ntri = *t_pTag->toInt();                          //Achtung
+
+//        qDebug() <<
+
+    //=====================================================================
+    if(!p_Tree.find_tag(p_pStream, FIFF_MNE_COORD_FRAME, t_pTag))
+    {
+        qWarning()
+                        << "FIFF_MNE_COORD_FRAME not found, trying FIFF_BEM_COORD_FRAME.";
+        if(!p_Tree.find_tag(p_pStream, FIFF_BEM_COORD_FRAME, t_pTag))
+        {
+            p_pStream->device()->close();
+            std::cout << "Coordinate frame information not found."; //ToDo: throw error.
+            return false;
+        }
+        else
+            p_BemSurface.coord_frame = *t_pTag->toInt();                          //Achtung
+    }
+    else
+         p_BemSurface.coord_frame = *t_pTag->toInt();                          //Achtung
+
+//        qDebug() <<
+
+    //=====================================================================
+    //
+    //   Vertices, normals, and triangles
+    //
+    //=====================================================================
+    if(!p_Tree.find_tag(p_pStream, FIFF_BEM_SURF_NODES, t_pTag))
+    {
+        p_pStream->device()->close();
+        std::cout << "Vertex data not found."; //ToDo: throw error.
+        return false;
+    }
+
+    p_BemSurface.rr = t_pTag->toFloatMatrix().transpose();
+    qint32 rows_rr = p_BemSurface.rr.rows();
+//        qDebug() << "last element rr: " << p_BemSurface.rr(rows_rr-1, 0) << p_BemSurface.rr(rows_rr-1, 1) << p_BemSurface.rr(rows_rr-1, 2);
+
+    if (rows_rr != p_BemSurface.np)
+    {
+        p_pStream->device()->close();
+        std::cout << "Vertex information is incorrect."; //ToDo: throw error.
+        return false;
+    }
+//        qDebug() << "Surf Nodes; type:" << t_pTag->getType();
+
+
+    //=====================================================================
+    if(!p_Tree.find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag))
+    {
+        p_pStream->device()->close();
+        std::cout << "Vertex normals not found."; //ToDo: throw error.
+        return false;
+    }
+
+    p_BemSurface.nn = t_pTag->toFloatMatrix().transpose();
+    qint32 rows_nn =p_BemSurface.nn.rows();
+
+    if (rows_nn != p_BemSurface.np)
+    {
+        p_pStream->device()->close();
+        std::cout << "Vertex normal information is incorrect."; //ToDo: throw error.
+        return false;
+    }
+//        qDebug() << "Source Space Normals; type:" << t_pTag->getType();
+
+
+    //=====================================================================
+    if (p_BemSurface.ntri > 0)
+    {
+        if(!p_Tree.find_tag(p_pStream, FIFF_BEM_SURF_TRIANGLES, t_pTag))
+        {
+            if(!p_Tree.find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_TRIANGLES, t_pTag))
+            {
+                p_pStream->device()->close();
+                std::cout << "Triangulation not found."; //ToDo: throw error.
+                return false;
+            }
+            else
+            {
+                p_BemSurface.tris = t_pTag->toIntMatrix().transpose();
+                p_BemSurface.tris -= MatrixXi::Constant(p_BemSurface.tris.rows(),3,1);//0 based indizes
+            }
+        }
+        else
+        {
+            p_BemSurface.tris = t_pTag->toIntMatrix().transpose();
+            p_BemSurface.tris -= MatrixXi::Constant(p_BemSurface.tris.rows(),3,1);//0 based indizes
+        }
+        if (p_BemSurface.tris.rows() != p_BemSurface.ntri)
+        {
+            p_pStream->device()->close();
+            std::cout << "Triangulation information is incorrect."; //ToDo: throw error.
+            return false;
+        }
+    }
+    else
+    {
+        MatrixXi p_defaultMatrix(0, 0);
+        p_BemSurface.tris = p_defaultMatrix;
+    }
+//        qDebug() << "Triangles; type:" << t_pTag->getType() << "rows:" << p_BemSurface.tris.rows() << "cols:" << p_BemSurface.tris.cols();
+
+
+
+    return true;
+}
