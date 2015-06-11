@@ -32,23 +32,6 @@
 #
 #--------------------------------------------------------------------------------------------------------------
 
-QT       -= gui
-
-TARGET = mghIO
-TEMPLATE = app
-
-DEFINES += MGHIO_LIBRARY
-
-SOURCES += \
-    main.cpp
-
-HEADERS +=
-
-unix {
-    target.path = /usr/lib
-    INSTALLS += target
-}
-
 include(../../mne-cpp.pri)
 
 TEMPLATE = app
@@ -83,3 +66,5 @@ HEADERS += \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
+
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR

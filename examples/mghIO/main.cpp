@@ -41,6 +41,7 @@
 #include <fs/mri.h>
 #include <fs/mgh.h>
 #include <fs/blendian.h>
+#include <mne/mne.h>
 
 // std includes
 #include <iostream>
@@ -60,7 +61,7 @@
 //=============================================================================================================
 
 #include <QApplication>
-#include <QCoreApplication>
+#include <QtCore/QCoreApplication>
 #include <QByteArray>
 #include <QBitArray>
 #include <QString>
@@ -93,8 +94,9 @@ void printVector(vector<int> vec);
 /**
 * read in mgh sample data and store it to mri data structure
 */
-int main()
+int main(int argc, char *argv[])
 {
+//    QCoreApplication a(argc, argv);
     // initialize vars to call loadMGH function
 
     QString fName = "D:/Repos/mne-cpp/bin/MNE-sample-data/subjects/sample/mri/orig/001.mgh";         // where /local/bin is a symlink to /usr/bin
@@ -111,6 +113,7 @@ int main()
     cout << fName.toStdString() << endl;
     Mri mri = Mgh::loadMGH(fName, slices, frame, headerOnly);
 
+//    return a.exec;
     return 0;
 }
 
