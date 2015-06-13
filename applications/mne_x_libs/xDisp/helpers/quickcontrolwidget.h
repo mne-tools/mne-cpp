@@ -98,11 +98,20 @@ public:
     */
     ~QuickControlWidget();
 
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the scaling sliders or spin boxes changed.
+    */
+    void scalingChanged();
+
 protected:
 
     void createScalingGroup();
 
-    void updateScaling(double value);
+    void updateSpinBoxScaling(double value);
+
+    void updateSliderScaling(int value);
 
     //=========================================================================================================
     /**

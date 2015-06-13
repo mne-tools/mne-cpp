@@ -751,7 +751,7 @@ void RealTimeMultiSampleArrayWidget::showQuickControlWidget()
         m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
         //Handle scaling
-        connect(m_pRTMSAScalingWidget.data(), &RealTimeMultiSampleArrayScalingWidget::scalingChanged,
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
                 this, &RealTimeMultiSampleArrayWidget::broadcastScaling);
 
     }
