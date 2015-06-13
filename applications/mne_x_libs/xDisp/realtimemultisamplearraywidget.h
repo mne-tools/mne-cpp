@@ -400,7 +400,7 @@ private:
     QList<qint32>   m_qListCurrentSelection;                            /**< Current selection list -> hack around C++11 lambda  */
     QList<qint32>   m_qListBadChannels;                                 /**< Current list of bad channels  */
     QList<RealTimeSampleArrayChInfo> m_qListChInfo;                     /**< Channel info list. ToDo: check if this is obsolete later on -> ToDo use fiff Info instead*/
-    QMap< qint32,float > m_qMapChScaling;                               /**< Channel scaling values. */
+    QMap<qint32,float> m_qMapChScaling;                                 /**< Channel scaling values. */
 
     FiffInfo::SPtr  m_pFiffInfo;                                        /**< FiffInfo, which is used insteadd of ListChInfo*/
 
