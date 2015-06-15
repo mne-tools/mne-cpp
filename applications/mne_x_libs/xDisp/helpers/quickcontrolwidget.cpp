@@ -54,10 +54,11 @@ using namespace XDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QuickControlWidget::QuickControlWidget(QMap< qint32,float >* qMapChScaling, QWidget *parent)
+QuickControlWidget::QuickControlWidget(QMap< qint32,float >* qMapChScaling, FiffInfo::SPtr pFiffInfo, QWidget *parent)
 : QWidget(parent, Qt::FramelessWindowHint | Qt::WindowSystemMenuHint)
 , ui(new Ui::QuickControlWidget)
 , m_qMapChScaling(qMapChScaling)
+, m_pFiffInfo(pFiffInfo)
 {
     ui->setupUi(this);
 
@@ -69,6 +70,8 @@ QuickControlWidget::QuickControlWidget(QMap< qint32,float >* qMapChScaling, QWid
 
     //Create different quick control groups
     createScalingGroup();
+
+    createProjectorGroup();
 
     //this->setStyleSheet("background-color: rgba(170, 0, 0, 25);");
 }
@@ -98,11 +101,11 @@ void QuickControlWidget::createScalingGroup()
         t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
-        t_pDoubleSpinBoxScale->setMinimum(10e-11);
-        t_pDoubleSpinBoxScale->setMaximum(10e14);
+        t_pDoubleSpinBoxScale->setMinimum(0.1);
+        t_pDoubleSpinBoxScale->setMaximum(100);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
         t_pDoubleSpinBoxScale->setSingleStep(0.1);
-        t_pDoubleSpinBoxScale->setDecimals(4);
+        t_pDoubleSpinBoxScale->setDecimals(1);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
         t_pDoubleSpinBoxScale->setValue(m_qMapChScaling->value(FIFF_UNIT_T)/(1e-12));
         m_qMapScalingDoubleSpinBox.insert(FIFF_UNIT_T,t_pDoubleSpinBoxScale);
@@ -111,6 +114,12 @@ void QuickControlWidget::createScalingGroup()
         t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
+        t_pHorizontalSlider->setMinimum(1);
+        t_pHorizontalSlider->setMaximum(1000);
+        t_pHorizontalSlider->setSingleStep(1);
+        t_pHorizontalSlider->setPageStep(1);
+        t_pHorizontalSlider->setValue(m_qMapChScaling->value(FIFF_UNIT_T)/(1e-12)*10);
+        m_qMapScalingSlider.insert(FIFF_UNIT_T,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                 this,&QuickControlWidget::updateSliderScaling);
         t_pGridLayout->addWidget(t_pHorizontalSlider,i+1,1,1,1);
@@ -126,11 +135,11 @@ void QuickControlWidget::createScalingGroup()
         t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
-        t_pDoubleSpinBoxScale->setMinimum(10e-11);
-        t_pDoubleSpinBoxScale->setMaximum(10e14);
+        t_pDoubleSpinBoxScale->setMinimum(1);
+        t_pDoubleSpinBoxScale->setMaximum(5000);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
-        t_pDoubleSpinBoxScale->setSingleStep(0.1);
-        t_pDoubleSpinBoxScale->setDecimals(4);
+        t_pDoubleSpinBoxScale->setSingleStep(1);
+        t_pDoubleSpinBoxScale->setDecimals(1);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
         t_pDoubleSpinBoxScale->setValue(m_qMapChScaling->value(FIFF_UNIT_T_M)/(1e-15 * 100));
         m_qMapScalingDoubleSpinBox.insert(FIFF_UNIT_T_M,t_pDoubleSpinBoxScale);
@@ -139,6 +148,12 @@ void QuickControlWidget::createScalingGroup()
         t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
+        t_pHorizontalSlider->setMinimum(1);
+        t_pHorizontalSlider->setMaximum(5000);
+        t_pHorizontalSlider->setSingleStep(10);
+        t_pHorizontalSlider->setPageStep(10);
+        t_pHorizontalSlider->setValue(m_qMapChScaling->value(FIFF_UNIT_T_M)/(1e-15*100));
+        m_qMapScalingSlider.insert(FIFF_UNIT_T_M,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                 this,&QuickControlWidget::updateSliderScaling);
         t_pGridLayout->addWidget(t_pHorizontalSlider,i+1,1,1,1);
@@ -154,11 +169,11 @@ void QuickControlWidget::createScalingGroup()
         t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
-        t_pDoubleSpinBoxScale->setMinimum(10e-11);
-        t_pDoubleSpinBoxScale->setMaximum(10e14);
+        t_pDoubleSpinBoxScale->setMinimum(0.1);
+        t_pDoubleSpinBoxScale->setMaximum(2500);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
         t_pDoubleSpinBoxScale->setSingleStep(0.1);
-        t_pDoubleSpinBoxScale->setDecimals(4);
+        t_pDoubleSpinBoxScale->setDecimals(1);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
         t_pDoubleSpinBoxScale->setValue(m_qMapChScaling->value(FIFFV_EEG_CH)/(1e-06));
         m_qMapScalingDoubleSpinBox.insert(FIFFV_EEG_CH,t_pDoubleSpinBoxScale);
@@ -167,6 +182,12 @@ void QuickControlWidget::createScalingGroup()
         t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
+        t_pHorizontalSlider->setMinimum(1);
+        t_pHorizontalSlider->setMaximum(25000);
+        t_pHorizontalSlider->setSingleStep(1);
+        t_pHorizontalSlider->setPageStep(1);
+        t_pHorizontalSlider->setValue(m_qMapChScaling->value(FIFFV_EEG_CH)/(1e-06)*10);
+        m_qMapScalingSlider.insert(FIFFV_EEG_CH,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                 this,&QuickControlWidget::updateSliderScaling);
         t_pGridLayout->addWidget(t_pHorizontalSlider,i+1,1,1,1);
@@ -182,11 +203,11 @@ void QuickControlWidget::createScalingGroup()
         t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
-        t_pDoubleSpinBoxScale->setMinimum(10e-11);
-        t_pDoubleSpinBoxScale->setMaximum(10e14);
+        t_pDoubleSpinBoxScale->setMinimum(0.1);
+        t_pDoubleSpinBoxScale->setMaximum(102500e14);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
         t_pDoubleSpinBoxScale->setSingleStep(0.1);
-        t_pDoubleSpinBoxScale->setDecimals(4);
+        t_pDoubleSpinBoxScale->setDecimals(1);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
         t_pDoubleSpinBoxScale->setValue(m_qMapChScaling->value(FIFFV_EOG_CH)/(1e-06));
         m_qMapScalingDoubleSpinBox.insert(FIFFV_EOG_CH,t_pDoubleSpinBoxScale);
@@ -195,6 +216,12 @@ void QuickControlWidget::createScalingGroup()
         t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
+        t_pHorizontalSlider->setMinimum(1);
+        t_pHorizontalSlider->setMaximum(25000);
+        t_pHorizontalSlider->setSingleStep(1);
+        t_pHorizontalSlider->setPageStep(1);
+        t_pHorizontalSlider->setValue(m_qMapChScaling->value(FIFFV_EOG_CH)/(1e-06)*10);
+        m_qMapScalingSlider.insert(FIFFV_EOG_CH,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                 this,&QuickControlWidget::updateSliderScaling);
         t_pGridLayout->addWidget(t_pHorizontalSlider,i+1,1,1,1);
@@ -210,11 +237,11 @@ void QuickControlWidget::createScalingGroup()
         t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
-        t_pDoubleSpinBoxScale->setMinimum(10e-11);
-        t_pDoubleSpinBoxScale->setMaximum(10e14);
+        t_pDoubleSpinBoxScale->setMinimum(0.1);
+        t_pDoubleSpinBoxScale->setMaximum(100);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
         t_pDoubleSpinBoxScale->setSingleStep(0.1);
-        t_pDoubleSpinBoxScale->setDecimals(4);
+        t_pDoubleSpinBoxScale->setDecimals(1);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
         t_pDoubleSpinBoxScale->setValue(m_qMapChScaling->value(FIFFV_STIM_CH));
         m_qMapScalingDoubleSpinBox.insert(FIFFV_STIM_CH,t_pDoubleSpinBoxScale);
@@ -223,6 +250,12 @@ void QuickControlWidget::createScalingGroup()
         t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
+        t_pHorizontalSlider->setMinimum(1);
+        t_pHorizontalSlider->setMaximum(1000);
+        t_pHorizontalSlider->setSingleStep(1);
+        t_pHorizontalSlider->setPageStep(1);
+        t_pHorizontalSlider->setValue(m_qMapChScaling->value(FIFFV_STIM_CH)/10);
+        m_qMapScalingSlider.insert(FIFFV_STIM_CH,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                 this,&QuickControlWidget::updateSliderScaling);
         t_pGridLayout->addWidget(t_pHorizontalSlider,i+1,1,1,1);
@@ -238,11 +271,11 @@ void QuickControlWidget::createScalingGroup()
         t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
-        t_pDoubleSpinBoxScale->setMinimum(10e-11);
-        t_pDoubleSpinBoxScale->setMaximum(10e14);
+        t_pDoubleSpinBoxScale->setMinimum(0.1);
+        t_pDoubleSpinBoxScale->setMaximum(1000);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
         t_pDoubleSpinBoxScale->setSingleStep(0.1);
-        t_pDoubleSpinBoxScale->setDecimals(4);
+        t_pDoubleSpinBoxScale->setDecimals(1);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
         t_pDoubleSpinBoxScale->setValue(m_qMapChScaling->value(FIFFV_MISC_CH));
         m_qMapScalingDoubleSpinBox.insert(FIFFV_MISC_CH,t_pDoubleSpinBoxScale);
@@ -251,6 +284,12 @@ void QuickControlWidget::createScalingGroup()
         t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
+        t_pHorizontalSlider->setMinimum(1);
+        t_pHorizontalSlider->setMaximum(10000);
+        t_pHorizontalSlider->setSingleStep(1);
+        t_pHorizontalSlider->setPageStep(1);
+        t_pHorizontalSlider->setValue(m_qMapChScaling->value(FIFFV_MISC_CH)/10);
+        m_qMapScalingSlider.insert(FIFFV_MISC_CH,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                 this,&QuickControlWidget::updateSliderScaling);
         t_pGridLayout->addWidget(t_pHorizontalSlider,i+1,1,1,1);
@@ -259,6 +298,91 @@ void QuickControlWidget::createScalingGroup()
     }
 
     ui->m_groupBox_scaling->setLayout(t_pGridLayout);
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::createProjectorGroup()
+{
+    if(m_pFiffInfo)
+    {
+        m_qListCheckBox.clear();
+        // Projection Selection
+        QGridLayout *topLayout = new QGridLayout;
+
+        bool bAllActivated = true;
+
+        int rowCount = 0;
+        qint32 i=0;
+
+        for(i; i < m_pFiffInfo->projs.size(); ++i)
+        {
+            QCheckBox* checkBox = new QCheckBox(m_pFiffInfo->projs[i].desc);
+            checkBox->setChecked(m_pFiffInfo->projs[i].active);
+
+            if(m_pFiffInfo->projs[i].active == false)
+                bAllActivated = false;
+
+            m_qListCheckBox.append(checkBox);
+
+            connect(checkBox, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
+                    this, &QuickControlWidget::checkStatusChanged);
+
+            if(i>m_pFiffInfo->projs.size()/2)
+                topLayout->addWidget(checkBox, i+2-rowCount, 1); //+2 because we already added two widgets before the first projector check box
+            else {
+                topLayout->addWidget(checkBox, i+2, 0); //+2 because we already added two widgets before the first projector check box
+                rowCount++;
+            }
+        }
+
+        QFrame* line = new QFrame();
+        line->setFrameShape(QFrame::HLine);
+        line->setFrameShadow(QFrame::Sunken);
+
+        topLayout->addWidget(line, i+1, 0, 1, 2);
+
+        m_enableDisableProjectors = new QCheckBox("Enable all");
+
+        topLayout->addWidget(m_enableDisableProjectors, i+2, 0, 1, 2);
+        connect(m_enableDisableProjectors, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+                this, &QuickControlWidget::enableDisableAll);
+
+        m_enableDisableProjectors->setChecked(bAllActivated);
+
+        ui->m_groupBox_projectors->setLayout(topLayout);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::checkStatusChanged(int status)
+{
+    Q_UNUSED(status)
+
+    bool bAllActivated = true;
+
+    for(qint32 i = 0; i < m_qListCheckBox.size(); ++i) {
+        if(m_qListCheckBox[i]->isChecked() == false)
+            bAllActivated = false;
+
+        this->m_pFiffInfo->projs[i].active = m_qListCheckBox[i]->isChecked();
+    }
+
+    m_enableDisableProjectors->setChecked(bAllActivated);
+
+    emit projSelectionChanged();
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::enableDisableAll(bool status)
+{
+    for(int i=0; i<m_qListCheckBox.size(); i++)
+        m_qListCheckBox.at(i)->setChecked(status);
 }
 
 
@@ -278,41 +402,48 @@ void QuickControlWidget::updateSpinBoxScaling(double value)
             case FIFF_UNIT_T:
                 //MAG
                 scaleValue = 1e-12;
+                m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*10);
                 break;
             case FIFF_UNIT_T_M:
                 //GRAD
                 scaleValue = 1e-15 * 100; //*100 because data in fiff files is stored as fT/m not fT/cm
+                m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*1);
                 break;
             case FIFFV_EEG_CH:
                 //EEG
                 scaleValue = 1e-06;
+                m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*10);
                 break;
             case FIFFV_EOG_CH:
                 //EOG
                 scaleValue = 1e-06;
+                m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*10);
                 break;
             case FIFFV_EMG_CH:
                 //EMG
                 scaleValue = 1e-03;
+                m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*10);
                 break;
             case FIFFV_ECG_CH:
                 //ECG
                 scaleValue = 1e-03;
+                m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*10);
                 break;
             case FIFFV_MISC_CH:
                 //MISC
                 scaleValue = 1;
+                m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*10);
                 break;
             case FIFFV_STIM_CH:
                 //STIM
                 scaleValue = 1;
+                m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*10);
                 break;
             default:
                 scaleValue = 1.0;
         }
 
         m_qMapChScaling->insert(it.key(), it.value()->value() * scaleValue);
-
 //        qDebug()<<"m_pRTMSAW->m_qMapChScaling[it.key()]" << m_pRTMSAW->m_qMapChScaling[it.key()];
     }
 
@@ -336,45 +467,55 @@ void QuickControlWidget::updateSliderScaling(int value)
             case FIFF_UNIT_T:
                 //MAG
                 scaleValue = 1e-12;
+                it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/10);
                 break;
             case FIFF_UNIT_T_M:
                 //GRAD
                 scaleValue = 1e-15 * 100; //*100 because data in fiff files is stored as fT/m not fT/cm
+                it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/1);
                 break;
             case FIFFV_EEG_CH:
                 //EEG
                 scaleValue = 1e-06;
+                it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/10);
                 break;
             case FIFFV_EOG_CH:
                 //EOG
                 scaleValue = 1e-06;
+                it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/10);
                 break;
             case FIFFV_EMG_CH:
                 //EMG
                 scaleValue = 1e-03;
+                it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/10);
                 break;
             case FIFFV_ECG_CH:
                 //ECG
                 scaleValue = 1e-03;
+                it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/10);
                 break;
             case FIFFV_MISC_CH:
                 //MISC
                 scaleValue = 1;
+                it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/10);
                 break;
             case FIFFV_STIM_CH:
                 //STIM
                 scaleValue = 1;
+                it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/10);
                 break;
             default:
                 scaleValue = 1.0;
         }
 
-        m_qMapChScaling->insert(it.key(), it.value()->value() * scaleValue);
+        std::cout<< m_qMapScalingSlider[it.key()]->value()<<std::endl;
+
+//        m_qMapChScaling->insert(it.key(), it.value()->value() * scaleValue);
 
 //        qDebug()<<"m_pRTMSAW->m_qMapChScaling[it.key()]" << m_pRTMSAW->m_qMapChScaling[it.key()];
     }
 
-    emit scalingChanged();
+//    emit scalingChanged();
 }
 
 
