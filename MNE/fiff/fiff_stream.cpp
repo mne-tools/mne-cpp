@@ -1257,6 +1257,7 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirTree& p_Node)
         }
         t_pFiffDirTreeItem->find_tag(this, FIFF_MNE_PROJ_ITEM_ACTIVE, t_pTag);
         bool active;
+
         if (t_pTag)
             active = *t_pTag->toInt();
         else
@@ -2425,7 +2426,8 @@ void FiffStream::write_proj(const QList<FiffProj>& projs)
 
         this->write_int(FIFF_NCHAN, &projs[k].data->ncol);
         this->write_int(FIFF_PROJ_ITEM_NVEC, &projs[k].data->nrow);
-        qint32 bValue = (qint32)projs[k].active;
+        //qint32 bValue = (qint32)projs[k].active;
+        qint32 bValue = 0;
         this->write_int(FIFF_MNE_PROJ_ITEM_ACTIVE, &bValue);
         this->write_name_list(FIFF_PROJ_ITEM_CH_NAME_LIST, projs[k].data->col_names);
         this->write_float_matrix(FIFF_PROJ_ITEM_VECTORS, projs[k].data->data.cast<float>());//rows == length(names)

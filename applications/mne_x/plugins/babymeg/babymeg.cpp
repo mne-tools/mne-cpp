@@ -403,6 +403,7 @@ void BabyMEG::toggleRecordingFile()
         }
 
         m_pOutfid = Fiff::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals);
+
         fiff_int_t first = 0;
         m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
 
