@@ -73,6 +73,8 @@ QuickControlWidget::QuickControlWidget(QMap< qint32,float >* qMapChScaling, Fiff
 
     createProjectorGroup();
 
+    createViewGroup();
+
     //this->setStyleSheet("background-color: rgba(170, 0, 0, 25);");
 }
 
@@ -95,8 +97,6 @@ void QuickControlWidget::createScalingGroup()
     //MAG
     if(m_qMapChScaling->contains(FIFF_UNIT_T))
     {
-        std::cout<<"FIFF_UNIT_T"<<std::endl;
-
         QLabel* t_pLabelModality = new QLabel("MAG (pT)");
         t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
 
@@ -358,6 +358,66 @@ void QuickControlWidget::createProjectorGroup()
 
 //*************************************************************************************************************
 
+void QuickControlWidget::createViewGroup()
+{
+    QGridLayout* t_pGridLayout = new QGridLayout;
+
+    QLabel* t_pLabelModalityZoom = new QLabel("Row height:");
+    t_pGridLayout->addWidget(t_pLabelModalityZoom,0,0,1,1);
+
+
+    QDoubleSpinBox* t_pDoubleSpinBoxZoom = new QDoubleSpinBox;
+    t_pDoubleSpinBoxZoom = new QDoubleSpinBox();
+    t_pDoubleSpinBoxZoom->setMinimum(0.3);
+    t_pDoubleSpinBoxZoom->setMaximum(6.0);
+    t_pDoubleSpinBoxZoom->setSingleStep(0.1);
+    t_pDoubleSpinBoxZoom->setValue(1.0);
+    t_pDoubleSpinBoxZoom->setSuffix(" x");
+    t_pDoubleSpinBoxZoom->setToolTip(tr("Row height"));
+    t_pDoubleSpinBoxZoom->setStatusTip(tr("Row height"));
+    connect(t_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &QuickControlWidget::zoomChanged);
+    t_pGridLayout->addWidget(t_pDoubleSpinBoxZoom,0,1,1,1);
+
+
+    QLabel* t_pLabelModality = new QLabel("Window size:");
+    t_pGridLayout->addWidget(t_pLabelModality,1,0,1,1);
+
+    QDoubleSpinBox* t_pDoubleSpinBoxWindow = new QDoubleSpinBox;
+    t_pDoubleSpinBoxWindow = new QDoubleSpinBox();
+    t_pDoubleSpinBoxWindow->setMinimum(1);
+    t_pDoubleSpinBoxWindow->setMaximum(10);
+    t_pDoubleSpinBoxWindow->setSingleStep(1);
+    t_pDoubleSpinBoxWindow->setValue(10.0);
+    t_pDoubleSpinBoxWindow->setSuffix(" s");
+    t_pDoubleSpinBoxWindow->setToolTip(tr("Window size"));
+    t_pDoubleSpinBoxWindow->setStatusTip(tr("Window size"));
+    connect(t_pDoubleSpinBoxWindow, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &QuickControlWidget::timeWindowChanged);
+    t_pGridLayout->addWidget(t_pDoubleSpinBoxWindow,1,1,1,1);
+
+    ui->m_groupBox_view->setLayout(t_pGridLayout);
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::onTimeWindowChanged(int value)
+{
+    emit timeWindowChanged(value);
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::onZoomChanged(double value)
+{
+    emit zoomChanged(value);
+}
+
+
+//*************************************************************************************************************
+
 void QuickControlWidget::checkStatusChanged(int status)
 {
     Q_UNUSED(status)
@@ -508,9 +568,6 @@ void QuickControlWidget::updateSliderScaling(int value)
                 scaleValue = 1.0;
         }
 
-        std::cout<< m_qMapScalingSlider[it.key()]->value()<<std::endl;
-
-//        m_qMapChScaling->insert(it.key(), it.value()->value() * scaleValue);
 
 //        qDebug()<<"m_pRTMSAW->m_qMapChScaling[it.key()]" << m_pRTMSAW->m_qMapChScaling[it.key()];
     }
