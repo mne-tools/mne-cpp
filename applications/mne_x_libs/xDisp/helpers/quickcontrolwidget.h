@@ -59,6 +59,7 @@
 
 #include <QWidget>
 #include <QMouseEvent>
+#include <QLabel>
 
 
 //*************************************************************************************************************
@@ -112,11 +113,21 @@ signals:
 
     void projSelectionChanged();
 
+    void timeWindowChanged(int value);
+
+    void zoomChanged(double value);
+
 protected:
 
     void createScalingGroup();
 
     void createProjectorGroup();
+
+    void createViewGroup();
+
+    void onTimeWindowChanged(int value);
+
+    void onZoomChanged(double value);
 
     void checkStatusChanged(int state);
 

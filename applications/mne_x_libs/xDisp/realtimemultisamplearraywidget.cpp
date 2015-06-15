@@ -84,31 +84,30 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 {
     Q_UNUSED(pTime)
 
-    m_pDoubleSpinBoxZoom = new QDoubleSpinBox(this);
-    m_pDoubleSpinBoxZoom->setMinimum(0.3);
-    m_pDoubleSpinBoxZoom->setMaximum(4.0);
-    m_pDoubleSpinBoxZoom->setSingleStep(0.1);
-    m_pDoubleSpinBoxZoom->setValue(1.0);
-    m_pDoubleSpinBoxZoom->setSuffix(" x");
-    m_pDoubleSpinBoxZoom->setToolTip(tr("Row height"));
-    m_pDoubleSpinBoxZoom->setStatusTip(tr("Row height"));
-    connect(m_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &RealTimeMultiSampleArrayWidget::zoomChanged);
+//    m_pDoubleSpinBoxZoom = new QDoubleSpinBox(this);
+//    m_pDoubleSpinBoxZoom->setMinimum(0.3);
+//    m_pDoubleSpinBoxZoom->setMaximum(4.0);
+//    m_pDoubleSpinBoxZoom->setSingleStep(0.1);
+//    m_pDoubleSpinBoxZoom->setValue(1.0);
+//    m_pDoubleSpinBoxZoom->setSuffix(" x");
+//    m_pDoubleSpinBoxZoom->setToolTip(tr("Row height"));
+//    m_pDoubleSpinBoxZoom->setStatusTip(tr("Row height"));
+//    connect(m_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+//            this, &RealTimeMultiSampleArrayWidget::zoomChanged);
 //    connect(m_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
 //            this, &RealTimeMultiSampleArrayWidget::visibleRowsChanged);
+//    addDisplayWidget(m_pDoubleSpinBoxZoom);
 
-    addDisplayWidget(m_pDoubleSpinBoxZoom);
-
-    m_pSpinBoxTimeScale = new QSpinBox(this);
-    m_pSpinBoxTimeScale->setMinimum(1);
-    m_pSpinBoxTimeScale->setMaximum(10);
-    m_pSpinBoxTimeScale->setValue(m_iT);
-    m_pSpinBoxTimeScale->setSuffix(" s");
-    m_pSpinBoxTimeScale->setToolTip(tr("Time window length"));
-    m_pSpinBoxTimeScale->setStatusTip(tr("Time window length"));
-    connect(m_pSpinBoxTimeScale, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &RealTimeMultiSampleArrayWidget::timeWindowChanged);
-    addDisplayWidget(m_pSpinBoxTimeScale);
+//    m_pSpinBoxTimeScale = new QSpinBox(this);
+//    m_pSpinBoxTimeScale->setMinimum(1);
+//    m_pSpinBoxTimeScale->setMaximum(10);
+//    m_pSpinBoxTimeScale->setValue(m_iT);
+//    m_pSpinBoxTimeScale->setSuffix(" s");
+//    m_pSpinBoxTimeScale->setToolTip(tr("Time window length"));
+//    m_pSpinBoxTimeScale->setStatusTip(tr("Time window length"));
+//    connect(m_pSpinBoxTimeScale, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+//            this, &RealTimeMultiSampleArrayWidget::timeWindowChanged);
+//    addDisplayWidget(m_pSpinBoxTimeScale);
 
     m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F9)"),this);
     m_pActionSelectSensors->setShortcut(tr("F9"));
@@ -124,7 +123,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     connect(m_pActionChScaling, &QAction::triggered,
             this, &RealTimeMultiSampleArrayWidget::showChScalingWidget);
     addDisplayAction(m_pActionChScaling);
-    m_pActionChScaling->setVisible(true);
+    m_pActionChScaling->setVisible(false);
 
     m_pActionFiltering = new QAction(QIcon(":/images/showFilterWindow.png"), tr("Shows the filter window (F11)"),this);
     m_pActionFiltering->setShortcut(tr("F11"));
@@ -752,9 +751,15 @@ void RealTimeMultiSampleArrayWidget::showQuickControlWidget()
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
                 this, &RealTimeMultiSampleArrayWidget::broadcastScaling);
 
-//        //Handle projections
-//        connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
-//                this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::updateProjection);
+        //Handle projections
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
+                this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::updateProjection);
+
+        //Handle view changes
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::zoomChanged,
+                this, &RealTimeMultiSampleArrayWidget::zoomChanged);
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::timeWindowChanged,
+                this, &RealTimeMultiSampleArrayWidget::timeWindowChanged);
 
     }
 
