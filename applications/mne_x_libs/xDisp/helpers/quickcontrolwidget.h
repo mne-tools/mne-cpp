@@ -43,7 +43,9 @@
 
 #include <iostream>
 #include "ui_quickcontrolwidget.h"
+#include "fiff/fiff_info.h"
 #include "fiff/fiff_constants.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -72,6 +74,9 @@ namespace XDISPLIB
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace FIFFLIB;
+
+
 //=============================================================================================================
 /**
 * DECLARE CLASS QuickControlWidget
@@ -90,7 +95,7 @@ public:
     * @param [in] parent    parent of widget
     * @param [in] qMapChScaling    pointer to scaling information
     */
-    QuickControlWidget(QMap< qint32,float >* qMapChScaling, QWidget *parent = 0);
+    QuickControlWidget(QMap< qint32,float >* qMapChScaling, FiffInfo::SPtr pFiffInfo, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -105,9 +110,17 @@ signals:
     */
     void scalingChanged();
 
+    void projSelectionChanged();
+
 protected:
 
     void createScalingGroup();
+
+    void createProjectorGroup();
+
+    void checkStatusChanged(int state);
+
+    void enableDisableAll(bool status);
 
     void updateSpinBoxScaling(double value);
 
@@ -154,6 +167,13 @@ private:
 
     QMap< qint32,float >*           m_qMapChScaling;                /**< Channel scaling values. */
     QMap<qint32, QDoubleSpinBox*>   m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits */
+    QMap<qint32, QSlider*>          m_qMapScalingSlider;            /**< Map of types and channel scaling line edits */
+
+
+    QList<QCheckBox*>   m_qListCheckBox;            /**< List of CheckBox. */
+    FiffInfo::SPtr      m_pFiffInfo;                /**< Connected fiff info. */
+
+    QCheckBox *         m_enableDisableProjectors;  /**< Holds the enable disable all button. */
 
     Ui::QuickControlWidget *ui;                     /**< The generated UI file */
 };
