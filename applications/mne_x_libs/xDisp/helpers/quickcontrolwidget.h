@@ -60,6 +60,8 @@
 #include <QWidget>
 #include <QMouseEvent>
 #include <QLabel>
+#include <QDoubleSpinBox>
+#include <QCheckBox>
 
 
 //*************************************************************************************************************
