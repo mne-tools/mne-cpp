@@ -75,7 +75,9 @@ QuickControlWidget::QuickControlWidget(QMap< qint32,float >* qMapChScaling, Fiff
 
     createViewGroup();
 
-    //this->setStyleSheet("background-color: rgba(170, 0, 0, 25);");
+    this->adjustSize();
+
+    //this->setStyleSheet("background-color: rgba(43, 125, 225, 150);");
 }
 
 
