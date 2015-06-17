@@ -94,18 +94,15 @@ void printVector(vector<int> vec);
 /**
 * read in mgh sample data and store it to mri data structure
 */
-//int main(int argc, char *argv[])
 int main()
 {
-//    QCoreApplication a(argc, argv);
     // initialize vars to call loadMGH function
-
     QString fName = "D:/Repos/mne-cpp/bin/MNE-sample-data/subjects/sample/mri/orig/001.mgh";         // where /local/bin is a symlink to /usr/bin
-    QDir fDir(fName);
-    QString fNameNew = fDir.canonicalPath();
+//    QDir fDir(fName);
+//    QString fNameCanonical = fDir.canonicalPath();
 
     vector<int> slices; // indices of the sclices z to read
-        slices.push_back(0);
+    slices.push_back(0);
     int frame = 0; // time frame index
     bool headerOnly = false;
 
@@ -114,7 +111,6 @@ int main()
     cout << fName.toStdString() << endl;
     Mri mri = Mgh::loadMGH(fName, slices, frame, headerOnly);
 
-//    return a.exec;
     return 0;
 }
 
