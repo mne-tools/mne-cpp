@@ -175,6 +175,12 @@ public:
     MatrixX3f rr;               /**< Source locations of available dipoles. */
     MatrixX3f nn;               /**< Source normals of available dipoles. */
     MatrixX3i tris;             /**< Triangles */
+    MatrixX3d tri_cent;         /**< Triangle centers */
+    MatrixX3d tri_nn;           /**< Triangle normals */
+    VectorXd tri_area;          /**< Triangle areas */
+    QList<QPair<int, QVector<int> > > neighbor_tri;           /**< Map of neighboring triangles for each vertex */
+    QList<QPair<int, QVector<int> > > neighbor_vert;          /**< Map of neighboring vertices for each vertex */
+
 
 
 };

@@ -64,6 +64,9 @@ MNEBemSurface::MNEBemSurface()
 , rr(MatrixX3f::Zero(0,3))
 , nn(MatrixX3f::Zero(0,3))
 , tris(MatrixX3i::Zero(0,3))
+, tri_cent(MatrixX3d::Zero(0,3))
+, tri_nn(MatrixX3d::Zero(0,3))
+, tri_area(VectorXd::Zero(0))
 {
 }
 
@@ -79,6 +82,11 @@ MNEBemSurface::MNEBemSurface(const MNEBemSurface& p_MNEBemSurface)
 , rr(p_MNEBemSurface.rr)
 , nn(p_MNEBemSurface.nn)
 , tris(p_MNEBemSurface.tris)
+, tri_cent(p_MNEBemSurface.tri_cent)
+, tri_nn(p_MNEBemSurface.tri_nn)
+, tri_area(p_MNEBemSurface.tri_area)
+, neighbor_tri(p_MNEBemSurface.neighbor_tri)
+, neighbor_vert(p_MNEBemSurface.neighbor_vert)
 {
     //*m_pGeometryData = *p_MNEBemSurface.m_pGeometryData;
 }
@@ -104,6 +112,9 @@ void MNEBemSurface::clear()
     rr = MatrixX3f::Zero(0,3);
     nn = MatrixX3f::Zero(0,3);
     tris = MatrixX3i::Zero(0,3);
+    tri_cent = MatrixX3d::Zero(0,3);
+    tri_nn = MatrixX3d::Zero(0,3);
+    tri_area = VectorXd::Zero(0);
 }
 
 

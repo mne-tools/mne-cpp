@@ -81,13 +81,8 @@ int main(int argc, char *argv[])
 
     QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
 //    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif");
-//    QList<MNESurface::SPtr> bemSurfaces2;
-//    MNESurface bemSurface1 ;
 
-
-//    MNESurface::read(t_fileBem, bemSurfaces);
     MNEBem t_Bem (t_fileBem) ;
-//    MNEBem t_Bem;
 
     qDebug() << "Put your stuff your interest in here";
 
