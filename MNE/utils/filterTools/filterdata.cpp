@@ -56,7 +56,7 @@ using namespace UTILSLIB;
 FilterData::FilterData()
 : m_Type(UNKNOWN)
 , m_iFilterOrder(80)
-, m_iFFTlength(4096)
+, m_iFFTlength(512)
 , m_sName("Unknown")
 , m_dParksWidth(0.1)
 , m_designMethod(External)
@@ -199,6 +199,8 @@ RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data, bool keepOverhe
 
     //Do zero padding or mirroring depending on user input
     RowVectorXd t_dataZeroPad = RowVectorXd::Zero(2*m_dCoeffA.cols() + data.cols());
+    RowVectorXd t_filteredTime = RowVectorXd::Zero(2*m_dCoeffA.cols() + data.cols());
+
     switch(compensateEdgeEffects) {
         case MirrorData:
             t_dataZeroPad.head(m_dCoeffA.cols()) = data.head(m_dCoeffA.cols()).reverse();   //front
@@ -211,13 +213,11 @@ RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data, bool keepOverhe
             break;
 
         default:
-            t_dataZeroPad.head(data.cols()) = data;
+            t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;
             break;
     }
 
     //Do the convolution
-    RowVectorXd t_filteredTime = RowVectorXd::Zero(2*m_dCoeffA.cols() + data.cols());
-
     for(int i=m_dCoeffA.cols(); i<t_filteredTime.cols(); i++)
         t_filteredTime(i-m_dCoeffA.cols()) = t_dataZeroPad.segment(i-m_dCoeffA.cols(),m_dCoeffA.cols()) * m_dCoeffA.transpose();
 
@@ -225,7 +225,7 @@ RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data, bool keepOverhe
     if(!keepOverhead)
         return t_filteredTime.segment(m_dCoeffA.cols()/2, data.cols());
 
-    return t_filteredTime;
+    return t_filteredTime.head(data.cols()+m_dCoeffA.cols());
 }
 
 
@@ -239,7 +239,7 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
     }
 
     if(2*m_dCoeffA.cols() + data.cols()>m_iFFTlength) {
-        qDebug()<<"Error in FilterData: Number of mirroring size plus data size is bigger then fft length!";
+        qDebug()<<"Error in FilterData: Number of mirroring/zeropadding size plus data size is bigger then fft length!";
         return data;
     }
 
@@ -249,12 +249,12 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
     switch(compensateEdgeEffects) {
         case MirrorData:
             t_dataZeroPad.head(m_dCoeffA.cols()) = data.head(m_dCoeffA.cols()).reverse();   //front
-            t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;                      //middle
+            t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;                    //middle
             t_dataZeroPad.tail(m_dCoeffA.cols()) = data.tail(m_dCoeffA.cols()).reverse();   //back
             break;
 
         case ZeroPad:
-            t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;
+            t_dataZeroPad.head(data.cols()) = data;
             break;
 
         default:
@@ -279,9 +279,9 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
 
     //Return filtered data
     if(!keepOverhead)
-        return t_filteredTime.segment(m_dCoeffA.cols()*1.5, data.cols());
+        return t_filteredTime.segment(m_dCoeffA.cols()/2, data.cols());
 
-    return t_filteredTime;
+    return t_filteredTime.head(data.cols()+m_dCoeffA.cols());
 }
 
 
@@ -365,37 +365,3 @@ FilterData::FilterType FilterData::getFilterTypeForString(const QString &filterT
 
     return filterType;
 }
-
-//OLD
-////*************************************************************************************************************
-
-//RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepZeros) const
-//{
-//    //Zero pad in front and back
-//    RowVectorXd t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
-//    t_dataZeroPad.segment(m_iFFTlength/4-m_iFilterOrder/2, data.cols()) = data;
-
-//    //generate fft object
-//    Eigen::FFT<double> fft;
-//    fft.SetFlag(fft.HalfSpectrum);
-
-//    //fft-transform data sequence
-//    RowVectorXcd t_freqData;
-//    fft.fwd(t_freqData,t_dataZeroPad);
-
-//    //perform frequency-domain filtering
-//    RowVectorXcd t_filteredFreq = m_dFFTCoeffA.array()*t_freqData.array();
-
-//    //inverse-FFT
-//    RowVectorXd t_filteredTime;
-//    fft.inv(t_filteredTime,t_filteredFreq);
-
-//    //Return filtered data still with zeros at front and end depending on keepZeros flag
-//    if(!keepZeros)
-//        if(m_designMethod == Tschebyscheff)
-//            return t_filteredTime.segment(m_iFFTlength/4, data.cols());
-//        else
-//            return t_filteredTime.segment(m_iFFTlength/4-m_iFilterOrder/2, data.cols());
-
-//    return t_filteredTime;
-//}
