@@ -131,6 +131,7 @@ protected:
     int             m_iCutOffLow;               /**< cut off frequqency lowpass or lower cut off when filter is a bandpass. */
     int             m_iCutOffHigh;              /**< cut off frequqency highpass or higher cut off when filter is a bandpass. */
     int             m_iCutOffMarkerWidth;       /**< cut off marker width. */
+    int             m_iPlotLength;              /**< Length of current filter impulse response plot. */
 
 };
 

@@ -90,6 +90,14 @@ using namespace Eigen;
 using namespace UTILSLIB;
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE TYPEDEFS
+//=============================================================================================================
+
+typedef QPair<const double*,qint32> RowVectorPair;
+typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
+
 //=============================================================================================================
 /**
 * DECLARE CLASS RealTimeMultiSampleArrayModel
@@ -173,9 +181,8 @@ public:
     *
     * @param[in] sps        Samples per second of incomming data
     * @param[in] T          Time window length to display
-    * @param[in] dest_sps   Desired samples per second -> resulting downsampling is calculated out of this.
     */
-    void setSamplingInfo(float sps, int T, float dest_sps  = 128.0f);
+    void setSamplingInfo(float sps, int T);
 
     //=========================================================================================================
     /**
@@ -222,6 +229,24 @@ public:
     * @return the maximal number of samples
     */
     inline qint32 getMaxSamples() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the current sample index which represents the index which the next incoming data will be stored at in the data
+    *
+    * @return the current sample index
+    */
+    inline qint32 getCurrentSampleIndex() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the first value of the last complete data display block
+    *
+    * @param[in] row    row for which the first value is to be returned
+    *
+    * @return the first value of the last complete data display block
+    */
+    inline double getLastBlockFirstValue(int row) const;
 
     //=========================================================================================================
     /**
@@ -309,11 +334,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Create list of channels which are to be filtered based on channel type
+    * Filter avtivated
+    *
+    * @param[in] state    filter on/off flag
+    */
+    void filterActivated(bool state);
+
+    //=========================================================================================================
+    /**
+    * Sets the type of channel which are to be filtered
     *
     * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
     */
-    void createFilterChannelList(QString channelType);
+    void setFilterChannelType(QString channelType);
 
     //=========================================================================================================
     /**
@@ -349,68 +382,60 @@ private:
 
     //=========================================================================================================
     /**
-    * Creates the default filter with the current fiff info
-    */
-    //void createDefaultFilter();
-
-    //=========================================================================================================
-    /**
     * Clears the model
     */
     void clearModel();
 
     //=========================================================================================================
     /**
-    * Calculates the filtered version of the channels in dataTime
+    * Calculates the filtered version of the raw input data
+    *
+    * @param [in] data          data which is to be filtered
+    * @param [in] dataIndex     current position in the global data matrix
+    */
+    void filterChannelsConcurrently(const MatrixXd &data, int dataIndex);
+
+    //=========================================================================================================
+    /**
+    * Calculates the filtered version of the channels in m_matDataRaw
     */
     void filterChannelsConcurrently();
 
-    //=========================================================================================================
-    /**
-    * Returns the current data in matrix form
-    *
-    * @return the current data as a matrix
-    */
-    inline const MatrixXd dataToMatrix(QVector<VectorXd> &vector) const;
-
-    //=========================================================================================================
-    /**
-    * Returns the last data in matrix form
-    *
-    * @return the last data as a matrix
-    */
-    inline const MatrixXd dataLastToMatrix() const;
-
     bool    m_bProjActivated;       /**< Proj activated */
-    bool    m_bIsFreezed;           /**< Display is freezed */
+    bool    m_bIsFreezed;           /**< Display is freezed */    
+    bool    m_bDrawFilterFront;     /**< Flag whether to plot/write the delayed frontal part of the filtered signal. This flag is necessary to get rid of nasty signal jumps when changing the filter parameters. */
     float   m_fSps;                 /**< Sampling rate */
     qint32  m_iT;                   /**< Time window */
     qint32  m_iDownsampling;        /**< Down sampling factor */
     qint32  m_iMaxSamples;          /**< Max samples per window */
-    qint32  m_iCurrentSample;       /**< Accurate Downsampling */
+    qint32  m_iCurrentSample;       /**< Current sample which holds the current position in the data matrix */
+    qint32  m_iCurrentSampleFreeze; /**< Current sample which holds the current position in the data matrix when freezing tool is active */
     qint32  m_iMaxFilterLength;     /**< Max order of the current filters */
+    qint32  m_iCurrentBlockSize;    /**< Current block size */
+    qint32  m_iResidual;            /**< Current amount of samples which were to size */
 
     QString m_sFilterChannelType;   /**< Kind of channel which is to be filtered */
 
     FiffInfo::SPtr          m_pFiffInfo;                        /**< Fiff info */
 
     RowVectorXi             m_vecBadIdcs;                       /**< Idcs of bad channels */
+    VectorXd                m_vecLastBlockFirstValuesFiltered;  /**< The first value of the last complete filtered data display block */
+    VectorXd                m_vecLastBlockFirstValuesRaw;       /**< The first value of the last complete raw data display block */
+
     MatrixXd                m_matProj;                          /**< SSP projector */
     SparseMatrix<double>    m_matSparseProj;                    /**< Sparse SSP projector */
 
-    QVector<VectorXd>       m_dataCurrent;                      /**< List that holds the current data*/
-    QVector<VectorXd>       m_dataFilteredCurrent;              /**< List that holds the current filtered data */
-    QVector<VectorXd>       m_dataLast;                         /**< List that holds the last data */
-    QVector<VectorXd>       m_dataFilteredLast;                 /**< List that holds the last filtered data */
-    QVector<VectorXd>       m_dataCurrentFreeze;                /**< List that holds the current data when freezed*/
-    QVector<VectorXd>       m_dataFilteredCurrentFreeze;        /**< List that holds the current filtered data when freezed*/
-    QVector<VectorXd>       m_dataLastFreeze;                   /**< List that holds the last data when freezed*/
-    QVector<VectorXd>       m_dataFilteredLastFreeze;           /**< List that holds the last filtered data when freezed*/
+    MatrixXdR               m_matDataRaw;                       /**< The raw data */
+    MatrixXdR               m_matDataFiltered;                  /**< The filtered data */
+    MatrixXdR               m_matDataRawFreeze;                 /**< The raw data in freeze mode */
+    MatrixXdR               m_matDataFilteredFreeze;            /**< The raw filtered data in freeze mode */
+    MatrixXd                m_matOverlap;                       /**< Last overlap block for the back */
 
     QMap< qint32,float>                 m_qMapChScaling;        /**< Sensor selection widget. */
     QList<FilterData>                   m_filterData;           /**< List of currently active filters. */
     QList<RealTimeSampleArrayChInfo>    m_qListChInfo;          /**< Channel info list. ToDo: Obsolete*/
     QStringList                         m_filterChannelList;    /**< List of channels which are to be filtered.*/
+    QStringList                         m_visibleChannelList;   /**< List of currently visible channels in the view.*/
     QMap<qint32,qint32>                 m_qMapIdxRowSelection;  /**< Selection mapping.*/
 };
 
@@ -423,6 +448,39 @@ private:
 inline qint32 RealTimeMultiSampleArrayModel::getMaxSamples() const
 {
     return m_iMaxSamples;
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 RealTimeMultiSampleArrayModel::getCurrentSampleIndex() const
+{
+    if(m_bIsFreezed)
+        return m_iCurrentSampleFreeze;
+
+    if(!m_filterData.isEmpty()/* || !m_bDrawFilterFront*/) {
+//        if(!m_bDrawFilterFront)
+//            return m_iCurrentSample+m_iMaxFilterLength/2;
+//        else
+            return m_iCurrentSample-m_iMaxFilterLength/2;
+    }
+
+
+    return m_iCurrentSample;
+}
+
+
+//*************************************************************************************************************
+
+inline double RealTimeMultiSampleArrayModel::getLastBlockFirstValue(int row) const
+{
+    if(row>m_vecLastBlockFirstValuesFiltered.rows() || row>m_vecLastBlockFirstValuesRaw.rows())
+        return 0;
+
+    if(!m_filterData.isEmpty())
+        return m_vecLastBlockFirstValuesFiltered[row];
+
+    return m_vecLastBlockFirstValuesRaw[row];
 }
 
 
@@ -458,40 +516,11 @@ inline const QMap< qint32,float >& RealTimeMultiSampleArrayModel::getScaling() c
 }
 
 
-//*************************************************************************************************************
-
-inline const MatrixXd RealTimeMultiSampleArrayModel::dataToMatrix(QVector<VectorXd> &vector) const
-{
-    if(vector.size() == 0)
-        return MatrixXd();
-
-    MatrixXd matCurrent(vector.first().rows(), vector.size());
-
-    for(qint32 r = 0; r < vector.first().rows(); ++r)
-        for(qint32 c = 0; c < vector.size(); ++c)
-            matCurrent(r,c) = vector[c].coeff(r);
-
-    return matCurrent;
-}
-
-
-//*************************************************************************************************************
-
-inline const MatrixXd RealTimeMultiSampleArrayModel::dataLastToMatrix() const
-{
-    if(m_dataLast.size() == 0)
-        return MatrixXd();
-
-    MatrixXd matLast(m_dataLast.first().rows(), m_dataLast.size());
-
-    for(qint32 r = 0; r < m_dataLast.first().rows(); ++r)
-        for(qint32 c = 0; c < m_dataLast.size(); ++c)
-            matLast(r,c) = m_dataLast[r].coeff(c);
-
-    return matLast;
-}
-
-
 } // NAMESPACE
+
+#ifndef metatype_rowvectorpair
+#define metatype_rowvectorpair
+Q_DECLARE_METATYPE(XDISPLIB::RowVectorPair);
+#endif
 
 #endif // REALTIMEMULTISAMPLEARRAYMODEL_H
