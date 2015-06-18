@@ -76,6 +76,7 @@ MNEBem::MNEBem(const MNEBem &p_MNEBem)
 //*************************************************************************************************************
 
 MNEBem::MNEBem(QIODevice &p_IODevice)   //const MNESourceSpace &p_MNESourceSpace
+//: m_qListBemSurface()
 {
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
     FiffDirTree t_Tree;
@@ -88,7 +89,7 @@ MNEBem::MNEBem(QIODevice &p_IODevice)   //const MNESourceSpace &p_MNESourceSpace
 //    }
 
 
-    if(!MNEBem::readFromStream(t_pStream, t_Tree))
+    if(!MNEBem::readFromStream(t_pStream, true, t_Tree, *this))
     {
         t_pStream->device()->close();
         std::cout << "Could not read the source spaces\n"; // ToDo throw error
@@ -108,7 +109,7 @@ MNEBem::~MNEBem()
 
 //*************************************************************************************************************
 
-bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, FiffDirTree& p_Tree)
+bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNEBem& p_Bem)
 {
 
     //
@@ -150,11 +151,13 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, FiffDirTree& p_Tree)
         for(int k = 0; k < bemsurf.size(); ++k)
         {
             MNEBemSurface  p_BemSurface;
-            printf("\tReading a source space...");
+            printf("\tReading a BEM surface...");
             MNEBem::read_bem_surface(p_pStream.data(), bemsurf[k], p_BemSurface);
+             if (add_geom)
+                complete_surface_info(p_BemSurface);
             printf("\t[done]\n" );
 
-//            p_SourceSpace.m_qListBemSurface.append(p_BemSurface);
+            p_Bem.m_qListBemSurface.append(p_BemSurface);
 
     //           src(k) = this;
         }
@@ -174,7 +177,7 @@ bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, 
     else
          p_BemSurface.id = *t_pTag->toInt();
 
-//        qDebug() << "Read SourceSpace ID; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
+        qDebug() << "Read SourceSpace ID; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
 
     //=====================================================================
     if(!p_Tree.find_tag(p_pStream, FIFF_BEM_SIGMA, t_pTag))
@@ -239,7 +242,7 @@ bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, 
 
     p_BemSurface.rr = t_pTag->toFloatMatrix().transpose();
     qint32 rows_rr = p_BemSurface.rr.rows();
-//        qDebug() << "last element rr: " << p_BemSurface.rr(rows_rr-1, 0) << p_BemSurface.rr(rows_rr-1, 1) << p_BemSurface.rr(rows_rr-1, 2);
+        qDebug() << "last element rr: " << p_BemSurface.rr(rows_rr-1, 0) << p_BemSurface.rr(rows_rr-1, 1) << p_BemSurface.rr(rows_rr-1, 2);
 
     if (rows_rr != p_BemSurface.np)
     {
@@ -247,27 +250,35 @@ bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, 
         std::cout << "Vertex information is incorrect."; //ToDo: throw error.
         return false;
     }
-//        qDebug() << "Surf Nodes; type:" << t_pTag->getType();
+        qDebug() << "Surf Nodes; type:" << t_pTag->getType();
 
 
     //=====================================================================
-    if(!p_Tree.find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag))
+    if(!p_Tree.find_tag(p_pStream, FIFF_BEM_SURF_NORMALS, t_pTag))
     {
-        p_pStream->device()->close();
-        std::cout << "Vertex normals not found."; //ToDo: throw error.
-        return false;
+        if(!p_Tree.find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag))
+        {
+            p_pStream->device()->close();
+            std::cout << "Vertex normals not found."; //ToDo: throw error.
+            return false;
+        }
+
+        p_BemSurface.nn = t_pTag->toFloatMatrix().transpose();
+    }
+    else
+    {
+        p_BemSurface.nn = t_pTag->toFloatMatrix().transpose();
     }
 
-    p_BemSurface.nn = t_pTag->toFloatMatrix().transpose();
-    qint32 rows_nn =p_BemSurface.nn.rows();
-
-    if (rows_nn != p_BemSurface.np)
+    if (p_BemSurface.nn.rows() != p_BemSurface.np)
     {
         p_pStream->device()->close();
         std::cout << "Vertex normal information is incorrect."; //ToDo: throw error.
         return false;
     }
-//        qDebug() << "Source Space Normals; type:" << t_pTag->getType();
+
+
+        qDebug() << "Source Space Normals; type:" << t_pTag->getType();
 
 
     //=====================================================================
@@ -292,6 +303,7 @@ bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, 
             p_BemSurface.tris = t_pTag->toIntMatrix().transpose();
             p_BemSurface.tris -= MatrixXi::Constant(p_BemSurface.tris.rows(),3,1);//0 based indizes
         }
+
         if (p_BemSurface.tris.rows() != p_BemSurface.ntri)
         {
             p_pStream->device()->close();
@@ -304,9 +316,72 @@ bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, 
         MatrixXi p_defaultMatrix(0, 0);
         p_BemSurface.tris = p_defaultMatrix;
     }
-//        qDebug() << "Triangles; type:" << t_pTag->getType() << "rows:" << p_BemSurface.tris.rows() << "cols:" << p_BemSurface.tris.cols();
-
+        qDebug() << "Triangles; type:" << t_pTag->getType() << "rows:" << p_BemSurface.tris.rows() << "cols:" << p_BemSurface.tris.cols();
+        qDebug() << "First Triangle: " << p_BemSurface.tris(0, 0) << p_BemSurface.tris(0, 1) << p_BemSurface.tris(0, 2);
+        qDebug() << "Last Triangle: " << p_BemSurface.tris(p_BemSurface.tris.rows()-1, 0) << p_BemSurface.tris(p_BemSurface.tris.rows()-1, 1) << p_BemSurface.tris(p_BemSurface.tris.rows()-1, 2);
 
 
     return true;
 }
+
+
+bool MNEBem::complete_surface_info(MNEBemSurface& p_BemSurf)
+{
+    //
+    //   Main triangulation
+    //
+    printf("\tCompleting triangulation info...");
+    p_BemSurf.tri_cent = MatrixX3d::Zero(p_BemSurf.ntri,3);
+    p_BemSurf.tri_nn = MatrixX3d::Zero(p_BemSurf.ntri,3);
+    p_BemSurf.tri_area = VectorXd::Zero(p_BemSurf.ntri);
+
+    Matrix3d r;
+    Vector3d a, b;
+    int k = 0;
+    float size = 0;
+    for (qint32 i = 0; i < p_BemSurf.ntri; ++i)
+    {
+        for ( qint32 j = 0; j < 3; ++j)
+        {
+            k = p_BemSurf.tris(i, j);
+
+            r(j,0) = p_BemSurf.rr(k, 0);
+            r(j,1) = p_BemSurf.rr(k, 1);
+            r(j,2) = p_BemSurf.rr(k, 2);
+
+            p_BemSurf.tri_cent(i, 0) += p_BemSurf.rr(k, 0);
+            p_BemSurf.tri_cent(i, 1) += p_BemSurf.rr(k, 1);
+            p_BemSurf.tri_cent(i, 2) += p_BemSurf.rr(k, 2);
+        }
+        p_BemSurf.tri_cent.row(i) /= 3.0f;
+
+        //cross product {cross((r2-r1),(r3-r1))}
+        a = r.row(1) - r.row(0 );
+        b = r.row(2) - r.row(0);
+        p_BemSurf.tri_nn(i,0) = a(1)*b(2)-a(2)*b(1);
+        p_BemSurf.tri_nn(i,1) = a(2)*b(0)-a(0)*b(2);
+        p_BemSurf.tri_nn(i,2) = a(0)*b(1)-a(1)*b(0);
+
+        //area
+        size = p_BemSurf.tri_nn.row(i)*p_BemSurf.tri_nn.row(i).transpose();
+        size = std::pow(size, 0.5f );
+
+        p_BemSurf.tri_area(i) = size/2.0f;
+        p_BemSurf.tri_nn.row(i) /= size;
+
+
+    }
+    printf("[done]\n");
+
+
+//        qDebug() << "p_BemSurf.tri_cent:" << p_BemSurf.tri_cent(0,0) << p_BemSurf.tri_cent(0,1) << p_BemSurf.tri_cent(0,2);
+//        qDebug() << "p_BemSurf.tri_cent:" << p_BemSurf.tri_cent(2,0) << p_BemSurf.tri_cent(2,1) << p_BemSurf.tri_cent(2,2);
+
+//        qDebug() << "p_BemSurf.tri_nn:" << p_BemSurf.tri_nn(0,0) << p_BemSurf.tri_nn(0,1) << p_BemSurf.tri_nn(0,2);
+//        qDebug() << "p_BemSurf.tri_nn:" << p_BemSurf.tri_nn(2,0) << p_BemSurf.tri_nn(2,1) << p_BemSurf.tri_nn(2,2);
+
+
+    return true;
+}
+
+

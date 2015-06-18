@@ -157,12 +157,27 @@ public:
     * Reads Bem surface from a fif file
     *
     * @param [in,out] p_pStream     The opened fif file
-    * @param [in] add_geom          Add geometry information to the source spaces       Note: not used at the moment
+    * @param [in] add_geom          Add geometry information to the Bem Surface
     * @param [in, out] p_Tree       Search for the bem surface here
     *
     * @return true if succeeded, false otherwise
     */
-    static bool readFromStream(FiffStream::SPtr& p_pStream, FiffDirTree& p_Tree);
+    static bool readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNEBem &p_Bem);
+
+private:
+
+    //=========================================================================================================
+    /**
+    * Implementation of the complete_source_space_info function in e.g. mne_read_source_spaces.m, mne_read_bem_surfaces.m
+    *
+    * Completes triangulation info
+    *
+    * @param [in, out] p_BemSurf   Bem Surface to be completed
+    *
+    * @return true if succeeded, false otherwise
+    */
+    static bool complete_surface_info(MNEBemSurface& p_BemSurf);
+
 
 
 protected:
