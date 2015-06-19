@@ -43,10 +43,13 @@
 #include <math.h>
 #include <fiff/fiff.h>
 #include <mne/mne.h>
+#include "disp/colormap.h"
 
 #include "math.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -113,6 +116,7 @@ EditorWindow *_editor_window;
 Enhancededitorwindow *_enhanced_editor_window;
 settingwindow *_setting_window;
 TreebasedDictWindow *_treebased_dict_window;
+const QSize* psize = new QSize(10, 10);
 
 
 //*************************************************************************************************************
@@ -3261,17 +3265,16 @@ void MainWindow::on_rb_OwnDictionary_clicked()
 
 void MainWindow::on_actionTest_triggered()
 {
+    plot_window = new tfplotwidget();
 
-    QWidget *plot_widget = new QWidget();
+
     if(ui->tw_main->count() >= 2)
-        ui->tw_main->addTab(plot_widget, "TF Channel ??");
+        ui->tw_main->addTab(plot_window, "TF Channel ??");
     else
-        ui->tw_main->addTab(plot_widget, "TF-Overview");
+        ui->tw_main->addTab(plot_window, "TF-Overview");
 
     if(ui->tw_main->count() == 2)
     {
-
-
         QPushButton *extendedButton = new QPushButton();
         extendedButton->setMaximumSize(20, 20);
         extendedButton->setStyleSheet("QPushButton {margin-right: 2px;  border-width: 1px; border-radius: 1px; border-color: grey;} QPushButton:pressed {background-color: grey; border-radius: 10px;}");
@@ -3280,6 +3283,20 @@ void MainWindow::on_actionTest_triggered()
 
         ui->tw_main->tabBar()->setTabButton(1, QTabBar::LeftSide, extendedButton);
         connect(extendedButton, SIGNAL (released()), this, SLOT (on_extend_tab_button()));
+
+        MatrixXd test_matrix = MatrixXd::Random(600, 600);
+        //cout << test_matrix;
+        QImage *test_image = new QImage(test_matrix.rows(), test_matrix.cols(), QImage::Format_RGB32);
+        QColor color;
+        for ( int y = 0; y < test_matrix.rows(); y++ )                    
+            for ( int x = 0; x < test_matrix.cols(); x++ )
+            {
+                color.setRgb(ColorMap::hotR(abs(test_matrix(x,y))), ColorMap::hotG(abs(test_matrix(x,y))), ColorMap::hotB(abs(test_matrix(x,y))));
+                test_image->setPixel(x, y, color.rgb());
+            }
+
+        plot_window->ui->l_pixel->setPixmap(QPixmap::fromImage(*test_image));
+
     }
     if(ui->tw_main->count() > 2)
     {
@@ -3291,7 +3308,6 @@ void MainWindow::on_actionTest_triggered()
        // closeButton->setStyleSheet("QPushButton {margin-right: 2px;  border-width: 1px; border-radius: 1px; border-color: grey;} QPushButton:pressed {background-color: grey; border-radius: 10px;}");
        // closeButton->setIcon(QIcon(":/images/icons/delete.png"));
        // closeButton->setIconSize(QSize(16, 16));
-
 
        // ui->tw_main->tabBar()->tabButton(ui->tw_main->count() - 1, QTabBar::LeftSide);
         //ui->tw_main->tabBar()->setTabButton(ui->tw_main->count() - 1, QTabBar::LeftSide, closeButton);
