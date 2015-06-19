@@ -56,6 +56,7 @@
 #include "helpers/projectorwidget.h"
 #include "helpers/selectionmanagerwindow.h"
 #include "helpers/chinfomodel.h"
+#include "helpers/quickcontrolwidget.h"
 
 #include "disp/filterwindow.h"
 
@@ -95,6 +96,7 @@
 #include <QScrollBar>
 #include <QDebug>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -112,12 +114,6 @@ namespace XMEASLIB{class NewRealTimeMultiSampleArray;}
 
 namespace XDISPLIB
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -315,14 +311,6 @@ private:
 
     //=========================================================================================================
     /**
-    * Sets new zoom factor
-    *
-    * @param [in] dsFactor downsampling factor
-    */
-    void dsFactorChanged(int dsFactor);
-
-    //=========================================================================================================
-    /**
     * Sets new time window size
     *
     * @param [in] T  time window size;
@@ -387,6 +375,12 @@ private:
 
     //=========================================================================================================
     /**
+    * Shows quick control widget
+    */
+    void showQuickControlWidget();
+
+    //=========================================================================================================
+    /**
     * Gets called when the views in the viewport of the table view change
     */
     void visibleRowsChanged(int value);
@@ -396,18 +390,17 @@ private:
 
     bool            m_bInitialized;                                     /**< Is Initialized */
     bool            m_bHideBadChannels;                                 /**< hide bad channels flag. */
+    qint32          m_iMaxFilterTapSize;                                /**< maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
     float           m_fDefaultSectionSize;                              /**< Default row height */
     float           m_fZoomFactor;                                      /**< Zoom factor */
     float           m_fSamplingRate;                                    /**< Sampling rate */
-    float           m_fDesiredSamplingRate;                             /**< Desired display sampling rate */
-    qint32          m_iDSFactor;                                        /**< Downsampling factor */
     qint32          m_iT;                                               /**< Display window size in seconds */
 
     QStringList     m_slSelectedChannels;                               /**< the currently selected channels from the selection manager window. */
     QList<qint32>   m_qListCurrentSelection;                            /**< Current selection list -> hack around C++11 lambda  */
     QList<qint32>   m_qListBadChannels;                                 /**< Current list of bad channels  */
     QList<RealTimeSampleArrayChInfo> m_qListChInfo;                     /**< Channel info list. ToDo: check if this is obsolete later on -> ToDo use fiff Info instead*/
-    QMap< qint32,float > m_qMapChScaling;                               /**< Sensor selection widget. */
+    QMap<qint32,float> m_qMapChScaling;                                 /**< Channel scaling values. */
 
     FiffInfo::SPtr  m_pFiffInfo;                                        /**< FiffInfo, which is used insteadd of ListChInfo*/
 
@@ -416,6 +409,7 @@ private:
     QSpinBox*       m_pSpinBoxDSFactor;                                 /**< downsampling factor */
     QTableView*     m_pTableView;                                       /**< the QTableView being part of the model/view framework of Qt */
 
+    QSharedPointer<QuickControlWidget>              m_pQuickControlWidget;          /**< quick control widget. */
     QSharedPointer<ChInfoModel>                     m_pChInfoModel;                 /**< channel info model. */
     QSharedPointer<NewRealTimeMultiSampleArray>     m_pRTMSA;                       /**< The real-time sample array measurement. */
     QSharedPointer<SelectionManagerWindow>          m_pSelectionManagerWindow;      /**< SelectionManagerWindow. */
@@ -428,7 +422,7 @@ private:
     QAction*        m_pActionChScaling;                                 /**< Show channel scaling Action. */
     QAction*        m_pActionProjection;                                /**< Show projections Action. */
     QAction*        m_pActionHideBad;                                   /**< Hide bad channels. */
-
+    QAction*        m_pActionQuickControl;                              /**< Show quick control widget. */
  };
 
 } // NAMESPACE XDISPLIB

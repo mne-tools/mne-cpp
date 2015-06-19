@@ -79,56 +79,43 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 , m_bInitialized(false)
 , m_iT(10)
 , m_fSamplingRate(1024)
-, m_fDesiredSamplingRate(128)
 , m_bHideBadChannels(false)
+, m_iMaxFilterTapSize(0)
 {
     Q_UNUSED(pTime)
 
-    m_pSpinBoxDSFactor = new QSpinBox(this);
-    m_pSpinBoxDSFactor->setMinimum(1);
-    m_pSpinBoxDSFactor->setMaximum(100.0);
-    m_pSpinBoxDSFactor->setSingleStep(1);
-    m_pSpinBoxDSFactor->setValue(10);
-    m_pSpinBoxDSFactor->setSuffix(" x");
-    m_pSpinBoxDSFactor->setToolTip(tr("Downsample factor"));
-    m_pSpinBoxDSFactor->setStatusTip(tr("Downsample factor"));
-    connect(m_pSpinBoxDSFactor, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &RealTimeMultiSampleArrayWidget::dsFactorChanged);
-    addDisplayWidget(m_pSpinBoxDSFactor);
+//    m_pDoubleSpinBoxZoom = new QDoubleSpinBox(this);
+//    m_pDoubleSpinBoxZoom->setMinimum(0.3);
+//    m_pDoubleSpinBoxZoom->setMaximum(4.0);
+//    m_pDoubleSpinBoxZoom->setSingleStep(0.1);
+//    m_pDoubleSpinBoxZoom->setValue(1.0);
+//    m_pDoubleSpinBoxZoom->setSuffix(" x");
+//    m_pDoubleSpinBoxZoom->setToolTip(tr("Row height"));
+//    m_pDoubleSpinBoxZoom->setStatusTip(tr("Row height"));
+//    connect(m_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+//            this, &RealTimeMultiSampleArrayWidget::zoomChanged);
+//    connect(m_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+//            this, &RealTimeMultiSampleArrayWidget::visibleRowsChanged);
+//    addDisplayWidget(m_pDoubleSpinBoxZoom);
 
-    m_pDoubleSpinBoxZoom = new QDoubleSpinBox(this);
-    m_pDoubleSpinBoxZoom->setMinimum(0.3);
-    m_pDoubleSpinBoxZoom->setMaximum(4.0);
-    m_pDoubleSpinBoxZoom->setSingleStep(0.1);
-    m_pDoubleSpinBoxZoom->setValue(1.0);
-    m_pDoubleSpinBoxZoom->setSuffix(" x");
-    m_pDoubleSpinBoxZoom->setToolTip(tr("Row height"));
-    m_pDoubleSpinBoxZoom->setStatusTip(tr("Row height"));
-    connect(m_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &RealTimeMultiSampleArrayWidget::zoomChanged);
-    connect(m_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &RealTimeMultiSampleArrayWidget::visibleRowsChanged);
-
-    addDisplayWidget(m_pDoubleSpinBoxZoom);
-
-    m_pSpinBoxTimeScale = new QSpinBox(this);
-    m_pSpinBoxTimeScale->setMinimum(1);
-    m_pSpinBoxTimeScale->setMaximum(10);
-    m_pSpinBoxTimeScale->setValue(m_iT);
-    m_pSpinBoxTimeScale->setSuffix(" s");
-    m_pSpinBoxTimeScale->setToolTip(tr("Time window length"));
-    m_pSpinBoxTimeScale->setStatusTip(tr("Time window length"));
-    connect(m_pSpinBoxTimeScale, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &RealTimeMultiSampleArrayWidget::timeWindowChanged);
-    addDisplayWidget(m_pSpinBoxTimeScale);
+//    m_pSpinBoxTimeScale = new QSpinBox(this);
+//    m_pSpinBoxTimeScale->setMinimum(1);
+//    m_pSpinBoxTimeScale->setMaximum(10);
+//    m_pSpinBoxTimeScale->setValue(m_iT);
+//    m_pSpinBoxTimeScale->setSuffix(" s");
+//    m_pSpinBoxTimeScale->setToolTip(tr("Time window length"));
+//    m_pSpinBoxTimeScale->setStatusTip(tr("Time window length"));
+//    connect(m_pSpinBoxTimeScale, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+//            this, &RealTimeMultiSampleArrayWidget::timeWindowChanged);
+//    addDisplayWidget(m_pSpinBoxTimeScale);
 
     m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F9)"),this);
     m_pActionSelectSensors->setShortcut(tr("F9"));
     m_pActionSelectSensors->setToolTip(tr("Shows the region selection widget (F9)"));
-    m_pActionSelectSensors->setVisible(true);
     connect(m_pActionSelectSensors, &QAction::triggered,
             this, &RealTimeMultiSampleArrayWidget::showSensorSelectionWidget);
     addDisplayAction(m_pActionSelectSensors);
+    m_pActionSelectSensors->setVisible(true);
 
     m_pActionChScaling = new QAction(QIcon(":/images/channelScaling.png"), tr("Shows the channel scaling widget (F10)"),this);
     m_pActionChScaling->setShortcut(tr("F10"));
@@ -152,14 +139,22 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     connect(m_pActionProjection, &QAction::triggered,
             this, &RealTimeMultiSampleArrayWidget::showProjectionWidget);
     addDisplayAction(m_pActionProjection);
+    m_pActionProjection->setVisible(false);
 
     m_pActionHideBad = new QAction(QIcon(":/images/hideBad.png"), tr("Toggle all bad channels"),this);
     m_pActionHideBad->setStatusTip(tr("Toggle all bad channels"));
     connect(m_pActionHideBad, &QAction::triggered,
             this, &RealTimeMultiSampleArrayWidget::hideBadChannels);
     addDisplayAction(m_pActionHideBad);
+    m_pActionHideBad->setVisible(true);
 
-    m_pActionProjection->setVisible(true);
+    m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget"),this);
+    m_pActionQuickControl->setStatusTip(tr("Show quick control widget"));
+    connect(m_pActionQuickControl, &QAction::triggered,
+            this, &RealTimeMultiSampleArrayWidget::showQuickControlWidget);
+    addDisplayAction(m_pActionQuickControl);
+    m_pActionQuickControl->setVisible(true);
+
     if(m_pTableView)
         delete m_pTableView;
     m_pTableView = new QTableView;
@@ -236,6 +231,8 @@ void RealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
 
             m_fSamplingRate = m_pRTMSA->getSamplingRate();
 
+            m_iMaxFilterTapSize = m_pRTMSA->getMultiSampleArray().at(m_pRTMSA->getMultiSampleArray().size()-1).cols();
+
             init();
         }
     }
@@ -257,7 +254,7 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pRTMSAModel->setFiffInfo(m_pFiffInfo);
         m_pRTMSAModel->setChannelInfo(m_qListChInfo);//ToDo Obsolete
-        m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, m_iT, m_fDesiredSamplingRate);
+        m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, m_iT);
 
         //Init the delegate
         if(m_pRTMSADelegate)
@@ -291,8 +288,8 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 
-        connect(m_pTableView->verticalScrollBar(), &QScrollBar::valueChanged,
-                this, &RealTimeMultiSampleArrayWidget::visibleRowsChanged);
+//        connect(m_pTableView->verticalScrollBar(), &QScrollBar::valueChanged,
+//                this, &RealTimeMultiSampleArrayWidget::visibleRowsChanged);
 
         //set context menu
         m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -354,8 +351,6 @@ void RealTimeMultiSampleArrayWidget::init()
             }
 
             m_pRTMSAModel->setScaling(m_qMapChScaling);
-
-            m_pActionChScaling->setVisible(true);
         }
 
         //Init bad channel list
@@ -507,24 +502,11 @@ void RealTimeMultiSampleArrayWidget::zoomChanged(double zoomFac)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayWidget::dsFactorChanged(int dsFactor)
-{
-    m_iDSFactor = dsFactor;
-    m_fDesiredSamplingRate = m_fSamplingRate/m_pSpinBoxDSFactor->value();
-
-    emit samplingRateChanged(m_fDesiredSamplingRate);
-
-    m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, m_iT, m_fDesiredSamplingRate);
-}
-
-
-//*************************************************************************************************************
-
 void RealTimeMultiSampleArrayWidget::timeWindowChanged(int T)
 {
     m_iT = T;
 
-    m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, T, m_fDesiredSamplingRate);
+    m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, T);
 }
 
 
@@ -541,6 +523,9 @@ void RealTimeMultiSampleArrayWidget::applySelection()
             m_pTableView->hideRow(i);
     }
 
+    //Update the visible channel list which are to be filtered
+    //visibleRowsChanged(0);
+
     //m_pRTMSAModel->selectRows(m_qListCurrentSelection);
 }
 
@@ -551,6 +536,9 @@ void RealTimeMultiSampleArrayWidget::hideSelection()
 {
     for(int i=0; i<m_qListCurrentSelection.size(); i++)
         m_pTableView->hideRow(m_qListCurrentSelection.at(i));
+
+    //Update the visible channel list which are to be filtered
+    //visibleRowsChanged(0);
 }
 
 
@@ -569,6 +557,9 @@ void RealTimeMultiSampleArrayWidget::resetSelection()
             m_pTableView->showRow(i);
         }
     }
+
+    //Update the visible channel list which are to be filtered
+    //visibleRowsChanged(0);
 }
 
 
@@ -588,6 +579,9 @@ void RealTimeMultiSampleArrayWidget::showSelectedChannelsOnly(QStringList select
         else
             m_pTableView->showRow(i);
     }
+
+    //Update the visible channel list which are to be filtered
+    //visibleRowsChanged(0);
 }
 
 
@@ -617,7 +611,7 @@ void RealTimeMultiSampleArrayWidget::hideBadChannels()
     }
 
     //Update the visible channel list which are to be filtered
-    visibleRowsChanged(0);
+    //visibleRowsChanged(0);
 }
 
 
@@ -653,7 +647,7 @@ void RealTimeMultiSampleArrayWidget::showProjectionWidget()
     {
         if(!m_pProjectorSelectionWidget)
         {
-            m_pProjectorSelectionWidget = QSharedPointer<ProjectorWidget>(new ProjectorWidget);
+            m_pProjectorSelectionWidget = QSharedPointer<ProjectorWidget>(new ProjectorWidget());
 
             m_pProjectorSelectionWidget->setFiffInfo(m_pFiffInfo);
             //m_pProjectorSelectionWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
@@ -677,30 +671,30 @@ void RealTimeMultiSampleArrayWidget::showProjectionWidget()
 void RealTimeMultiSampleArrayWidget::showFilterWidget()
 {
     if(!m_pFilterWindow) {
-        m_pFilterWindow = QSharedPointer<FilterWindow>(new FilterWindow());
+        m_pFilterWindow = QSharedPointer<FilterWindow>(new FilterWindow(this));
         //m_pFilterWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
 
         m_pFilterWindow->setFiffInfo(*m_pFiffInfo.data());
-        m_pFilterWindow->setWindowSize(m_pRTMSAModel->getMaxSamples());
+        m_pFilterWindow->setWindowSize(m_iMaxFilterTapSize);
+        m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
 
         connect(m_pFilterWindow.data(),static_cast<void (FilterWindow::*)(QString)>(&FilterWindow::applyFilter),
-                    m_pRTMSAModel,static_cast<void (RealTimeMultiSampleArrayModel::*)(QString)>(&RealTimeMultiSampleArrayModel::createFilterChannelList));
+                    m_pRTMSAModel,static_cast<void (RealTimeMultiSampleArrayModel::*)(QString)>(&RealTimeMultiSampleArrayModel::setFilterChannelType));
 
         connect(m_pFilterWindow.data(), &FilterWindow::filterChanged,
                 m_pRTMSAModel, &RealTimeMultiSampleArrayModel::filterChanged);
 
-        connect(m_pRTMSAModel, &RealTimeMultiSampleArrayModel::windowSizeChanged,
-                m_pFilterWindow.data(), &FilterWindow::setWindowSize);
+        connect(m_pFilterWindow.data(), &FilterWindow::filterActivated,
+                m_pRTMSAModel, &RealTimeMultiSampleArrayModel::filterActivated);
+
+//        connect(m_pRTMSAModel, &RealTimeMultiSampleArrayModel::windowSizeChanged,
+//                m_pFilterWindow.data(), &FilterWindow::setWindowSize);
 
         connect(this, &RealTimeMultiSampleArrayWidget::samplingRateChanged,
                 m_pFilterWindow.data(), &FilterWindow::setSamplingRate);
 
         //Init downsampled sampling frequency
-        m_fDesiredSamplingRate = m_fSamplingRate/m_pSpinBoxDSFactor->value();
-        emit samplingRateChanged(m_fDesiredSamplingRate);
-
-        //As default only use MEG channels for filtering
-        m_pRTMSAModel->createFilterChannelList("MEG");
+        emit samplingRateChanged(m_fSamplingRate);
     }
 
     if(m_pFilterWindow->isActiveWindow())
@@ -719,7 +713,7 @@ void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
     if(!m_pSelectionManagerWindow) {
         m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(this, m_pFiffInfo));
 
-        m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(0, m_pChInfoModel.data()));
+        m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel.data()));
         //m_pSelectionManagerWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
 
         connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::showSelectedChannelsOnly,
@@ -742,6 +736,34 @@ void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
         m_pSelectionManagerWindow->activateWindow();
         m_pSelectionManagerWindow->show();
     }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayWidget::showQuickControlWidget()
+{
+    if(!m_pQuickControlWidget) {
+        m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(&m_qMapChScaling, m_pFiffInfo));
+        m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
+
+        //Handle scaling
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
+                this, &RealTimeMultiSampleArrayWidget::broadcastScaling);
+
+        //Handle projections
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
+                this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::updateProjection);
+
+        //Handle view changes
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::zoomChanged,
+                this, &RealTimeMultiSampleArrayWidget::zoomChanged);
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::timeWindowChanged,
+                this, &RealTimeMultiSampleArrayWidget::timeWindowChanged);
+
+    }
+
+    m_pQuickControlWidget->show();
 }
 
 
