@@ -47,6 +47,7 @@
 
 #include <mne/mne.h>
 #include <disp/plot.h>
+#include <disp/colormap.h>
 #include <utils/mp/atom.h>
 #include <utils/mp/adaptivemp.h>
 #include <utils/mp/fixdictmp.h>
@@ -65,6 +66,8 @@
 #include "ui_treebaseddictwindow.h"
 #include "settingwindow.h"
 #include "ui_settingwindow.h"
+#include "tfplotwidget.h"
+#include "ui_tfplotwidget.h"
 
 
 //*************************************************************************************************************
@@ -130,8 +133,9 @@ class GraphWindow;
 class ResiduumWindow;
 class AtomSumWindow;
 class XAxisWindow;
+class tfplotwidget;
 
-class MainWindow : public QMainWindow
+class MainWindow : public QMainWindow, ColorMap
 {
     Q_OBJECT
 
@@ -627,6 +631,7 @@ private:
     RowVectorXi picks;
     FiffInfo pick_info;
     QPalette pal;
+    tfplotwidget *plot_window;
 
     QTimer *_counter_timer;
     QThread* mp_Thread;
