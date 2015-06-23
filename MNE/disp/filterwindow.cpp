@@ -517,7 +517,12 @@ void FilterWindow::filterParametersChanged()
     double nyquistFrequency = samplingFrequency/2;
 
     //Calculate the needed fft length
-    int filterTaps = ui->m_spinBox_filterTaps->value();
+    m_iFilterTaps =  ui->m_spinBox_filterTaps->value();
+    if(ui->m_spinBox_filterTaps->value()%2 != 0)
+        m_iFilterTaps--;
+
+    ui->m_spinBox_filterTaps->setValue(m_iFilterTaps);
+
     int fftLength = m_iWindowSize + ui->m_spinBox_filterTaps->value() * 2;
     int exp = ceil(MNEMath::log2(fftLength));
     fftLength = pow(2, exp) <512 ? 512 : pow(2, exp);
@@ -553,7 +558,7 @@ void FilterWindow::filterParametersChanged()
         userDefinedFilterOperator = QSharedPointer<FilterData>(
                                                 new FilterData("User Design",
                                                                FilterData::LPF,
-                                                               filterTaps,
+                                                               m_iFilterTaps,
                                                                lowpassHz/nyquistFrequency,
                                                                0.2,
                                                                (double)trans_width/nyquistFrequency,
@@ -566,7 +571,7 @@ void FilterWindow::filterParametersChanged()
         userDefinedFilterOperator = QSharedPointer<FilterData>(
                                         new FilterData("User Design",
                                                         FilterData::HPF,
-                                                        filterTaps,
+                                                        m_iFilterTaps,
                                                         highpassHz/nyquistFrequency,
                                                         0.2,
                                                         (double)trans_width/nyquistFrequency,
@@ -579,7 +584,7 @@ void FilterWindow::filterParametersChanged()
         userDefinedFilterOperator = QSharedPointer<FilterData>(
                    new FilterData("User Design",
                                   FilterData::BPF,
-                                  filterTaps,
+                                  m_iFilterTaps,
                                   (double)center/nyquistFrequency,
                                   (double)bw/nyquistFrequency,
                                   (double)trans_width/nyquistFrequency,
