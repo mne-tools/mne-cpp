@@ -91,6 +91,44 @@ QuickControlWidget::~QuickControlWidget()
 
 //*************************************************************************************************************
 
+void QuickControlWidget::filterGroupChanged(QList<QCheckBox*> list)
+{
+    m_qFilterListCheckBox.clear();
+
+    for(int u = 0; u<list.size(); u++) {
+        QCheckBox* tempCheckBox = new QCheckBox(list[u]->text());
+        tempCheckBox->setChecked(list[u]->isChecked());
+
+        connect(tempCheckBox, &QCheckBox::toggled,
+                list[u], &QCheckBox::setChecked);
+
+        connect(list[u], &QCheckBox::toggled,
+                tempCheckBox, &QCheckBox::setChecked);
+
+        m_qFilterListCheckBox.append(tempCheckBox);
+    }
+
+    //Delete all widgets in the filter layout
+    QGridLayout* topLayout = static_cast<QGridLayout*>(ui->m_groupBox_filter->layout());
+    if(!topLayout)
+       topLayout = new QGridLayout();
+
+    QLayoutItem *child;
+    while ((child = topLayout->takeAt(0)) != 0) {
+        delete child->widget();
+        delete child;
+    }
+
+    //Add filters
+    for(int u = 0; u<m_qFilterListCheckBox.size(); u++)
+        topLayout->addWidget(m_qFilterListCheckBox[u], u, 0);
+
+    ui->m_groupBox_filter->setLayout(topLayout);
+}
+
+
+//*************************************************************************************************************
+
 void QuickControlWidget::createScalingGroup()
 {
     QGridLayout* t_pGridLayout = new QGridLayout;
@@ -331,29 +369,29 @@ void QuickControlWidget::createProjectorGroup()
             connect(checkBox, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
                     this, &QuickControlWidget::checkStatusChanged);
 
-            if(i>m_pFiffInfo->projs.size()/2)
-                topLayout->addWidget(checkBox, i+2-rowCount, 1); //+2 because we already added two widgets before the first projector check box
-            else {
-                topLayout->addWidget(checkBox, i+2, 0); //+2 because we already added two widgets before the first projector check box
-                rowCount++;
-            }
+            topLayout->addWidget(checkBox, i, 0); //+2 because we already added two widgets before the first projector check box
+
+//            if(i>m_pFiffInfo->projs.size()/2)
+//                topLayout->addWidget(checkBox, i-rowCount, 1); //+2 because we already added two widgets before the first projector check box
+//            else {
+//                topLayout->addWidget(checkBox, i, 0); //+2 because we already added two widgets before the first projector check box
+//                rowCount++;
+//            }
         }
 
         QFrame* line = new QFrame();
         line->setFrameShape(QFrame::HLine);
         line->setFrameShadow(QFrame::Sunken);
 
-        topLayout->addWidget(line, i+1, 0, 1, 2);
+        topLayout->addWidget(line, i+1, 0);
 
         m_enableDisableProjectors = new QCheckBox("Enable all");
-
-        topLayout->addWidget(m_enableDisableProjectors, i+2, 0, 1, 2);
+        m_enableDisableProjectors->setChecked(bAllActivated);
+        topLayout->addWidget(m_enableDisableProjectors, i+2, 0);
         connect(m_enableDisableProjectors, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
                 this, &QuickControlWidget::enableDisableAll);
 
-        m_enableDisableProjectors->setChecked(bAllActivated);
-
-        ui->m_groupBox_projectors->setLayout(topLayout);
+        ui->m_groupBox_projections->setLayout(topLayout);
     }
 }
 
@@ -583,15 +621,15 @@ void QuickControlWidget::updateSliderScaling(int value)
 void QuickControlWidget::toggleHideAll(bool state)
 {
     if(!state) {
+        ui->m_groupBox_projections->hide();
         ui->m_groupBox_filter->hide();
-        ui->m_groupBox_projectors->hide();
         ui->m_groupBox_scaling->hide();
         ui->m_groupBox_view->hide();
         ui->m_pushButton_hideAll->setText("Maximize - Quick Control");
     }
     else {
+        ui->m_groupBox_projections->show();
         ui->m_groupBox_filter->show();
-        ui->m_groupBox_projectors->show();
         ui->m_groupBox_scaling->show();
         ui->m_groupBox_view->show();
         ui->m_pushButton_hideAll->setText("Minimize - Quick Control");
