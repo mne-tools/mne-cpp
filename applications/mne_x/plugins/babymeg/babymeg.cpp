@@ -653,6 +653,10 @@ bool BabyMEG::readProjectors()
 
     QList<FiffProj> q_ListProj = t_pStream->read_proj(t_Tree);
 
+    //Set all projectors to zero
+    for(int i = 0; i<q_ListProj.size(); i++)
+        q_ListProj[i].active = false;
+
     if (q_ListProj.size() == 0)
     {
         printf("Could not find projectors\n");
