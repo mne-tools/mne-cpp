@@ -130,7 +130,7 @@ public:
     float tE;        /* time to echo */
     float tI;        /* time to inversion */
 
-//    char fname[STR_LEN]; // what data type? -> qstring?
+    QString fName;
 
     float x_r, x_a, x_s; /* these are the RAS distances
                             across the whole volume */

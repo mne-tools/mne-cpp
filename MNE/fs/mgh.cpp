@@ -230,48 +230,75 @@ Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerO
         mri.allocSequence(nDimX, nDimY, nDimZ, type, nFrames);
         mri.dof = dof;
 
-//        for (frame=start_frame; frame<=end_frame; frame++)
-//        {
-//            if (fread(buf, sizeof(char), bytes, fp) != bytes)
-//            {
-//                fclose(fp);
-//                free(buf);
+        for (frame=start_frame; frame<=end_frame; frame++)
+        {
+            if (fread(buf, sizeof(char), bytes, fp) != bytes)
+            {
+                fclose(fp);
+                free(buf);
 
-//            }
-//        }
+            }
+        }
 
         // ------ Read in the entire volume -------
-//        switch (type)
-//        {
-//        case MRI_FLOAT:
-//            int dothis;
-//            break;
-//        case MRI_UCHAR:
-//            int dothat;
-//            break;
-//        case MRI_SHORT:
-//            int dothis;
-//            break;
-//        case MRI_INT:
-//            int dothis;
-//            break;
-//        }
-    }
+        switch (type)
+        {
+        case MRI_INT:
+        for (i = y = 0 ; y < height ; y++)
+          {
+            for (x = 0 ; x < width ; x++, i++)
+              {
+                ival = orderIntBytes(((int *)buf)[i]) ;
+                MRIIseq_vox(mri,x,y,z,frame-start_frame) = ival ;
+              }
+          }
+        break ;
+        case MRI_SHORT:
+        for (i = y = 0 ; y < height ; y++)
+          {
+            for (x = 0 ; x < width ; x++, i++)
+              {
+                sval = orderShortBytes(((short *)buf)[i]) ;
+                MRISseq_vox(mri,x,y,z,frame-start_frame) = sval ;
+              }
+          }
+        break ;
+        case MRI_TENSOR:
+        case MRI_FLOAT:
+        for (i = y = 0 ; y < height ; y++)
+          {
+            for (x = 0 ; x < width ; x++, i++)
+              {
+                fval = orderFloatBytes(((float *)buf)[i]) ;
+                MRIFseq_vox(mri,x,y,z,frame-start_frame) = fval ;
+              }
+          }
+        break ;
+        case MRI_UCHAR:
+        local_buffer_to_image(buf, mri, z, frame-start_frame) ;
+        break ;
+        default:
+        errno = 0;
+        ErrorReturn(NULL,
+                    (ERROR_UNSUPPORTED, "mghRead: unsupported type %d",
+                     mri->type)) ;
+        break ;
+        }
 
 
 
-//    if (gZipped)
-//    {
-//        // delete temporary mgh file (ml: line 180 / c: line ┤).
-//    }
-//    else
-//    {
 
-//    }
-//    nFrames = 1;
 
-    //------------------ Read in the entire volume ----------------
+    fclose(fp);
 
+    // xstart, xend, ystart, yend, zstart, zend are not stored
+    mri.xStart = -mri.width/2*mri.xSize;
+    mri.xEnd = mri.xEnd/2*mri.xSize;
+    mri.yStart = -mri.height/2*mri.ySize;
+    mri.yEnd = mri.height/2*mri.ySize;
+    mri.zStart = -mri.depth/2*mri.zSize;
+    mri.zEnd = mri.depth/2*mri.zSize;
+    mri.fName = fName;
 
     return mri;
 }

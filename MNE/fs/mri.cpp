@@ -124,7 +124,6 @@ void Mri::allocSequence(int x, int y, int z, int t, int f)
 
     BUFTYPE *buf;
 
-    qCritical() << "this is critical";
     return;
 
     if (x<=0 || y<=0 || z<=0)
