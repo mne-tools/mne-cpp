@@ -77,6 +77,8 @@ QuickControlWidget::QuickControlWidget(QMap< qint32,float >* qMapChScaling, Fiff
 
     this->adjustSize();
 
+    this->setWindowTitle("Quick Control");
+
     //this->setStyleSheet("background-color: rgba(43, 125, 225, 150);");
 }
 
