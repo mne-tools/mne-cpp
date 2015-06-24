@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 #include <iostream>
-#include "ui_quickcontrolwidget.h"
+#include "../ui_quickcontrolwidget.h"
 #include "fiff/fiff_info.h"
 #include "fiff/fiff_constants.h"
 
