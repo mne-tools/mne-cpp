@@ -45,6 +45,15 @@
 #include <QTableView>
 #include <QMap>
 #include <QDebug>
+#include <QPen>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -54,6 +63,22 @@
 
 namespace XDISPLIB
 {
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE TYPEDEFS
+//=============================================================================================================
+
+typedef QPair<const double*,qint32> RowVectorPair;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace Eigen;
 
 
 //=============================================================================================================
@@ -73,6 +98,14 @@ public:
     * @param[in] parent     Parent of the delegate
     */
     RealTimeMultiSampleArrayDelegate(QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Initializes painter path variables to fit number of channels in the model/view.
+    *
+    * @param[in] model     model
+    */
+    void initPainterPaths(const QAbstractTableModel *model);
 
     //=========================================================================================================
     /**
@@ -112,13 +145,21 @@ private:
     * @param[in] index      Used to locate data in a data model.
     * @param[in] option     Describes the parameters used to draw an item in a view widget
     * @param[in,out] path   The QPointerPath to create for the data plot.
-    * @param[in] lastPath   last path for the last data.
     * @param[in] ellipsePos Position of the ellipse which is plotted at the current channel signal value.
     * @param[in] amplitude  String which is to be plotted.
     * @param[in] data       Current data for the given row.
-    * @param[in] lastData   Last data for the given row.
     */
-    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPainterPath& lastPath, QPointF &ellipsePos, QString &amplitude, QVector<float>& data, QVector<float>& lastData) const;
+    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPointF &ellipsePos, QString &amplitude, XDISPLIB::RowVectorPair &data) const;
+
+    //=========================================================================================================
+    /**
+    * createCurrentPositionMarkerPath Creates the QPointer path for the current marker position plot.
+    *
+    * @param[in] index      Used to locate data in a data model.
+    * @param[in] option     Describes the parameters used to draw an item in a view widget
+    * @param[in,out] path   The QPointerPath to create for the data plot.
+    */
+    void createCurrentPositionMarkerPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path) const;
 
     //=========================================================================================================
     /**
@@ -129,7 +170,7 @@ private:
     * @param[in,out] path   The QPointerPath to create for the data plot.
     * @param[in] data       Data for the given row.
     */
-    void createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<QVector<float> >& data) const;
+    void createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const;
 
     //=========================================================================================================
     /**
@@ -144,12 +185,20 @@ private:
 //    QSettings m_qSettings;
 
     // Scaling
-    float       m_fMaxValue;        /**< Maximum value of the data to plot  */
-    float       m_fScaleY;          /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
-    int         m_iActiveRow;       /**< The current row which the mouse is moved over  */
+    float       m_fMaxValue;        /**< Maximum value of the data to plot. */
+    float       m_fScaleY;          /**< Maximum amplitude of plot (max is m_dPlotHeight/2). */
+    int         m_iActiveRow;       /**< The current row which the mouse is moved over. */
 
-    QPoint      m_markerPosition;  /**< Current mouse position used to draw the marker in the plot  */
+    QPoint              m_markerPosition;   /**< Current mouse position used to draw the marker in the plot. */
+    QList<QPainterPath> m_painterPaths;     /**< List of all current painter paths for each row. */
 
+    QPen        m_penMarker;            /**< Pen for drawing the data marker.  */
+    QPen        m_penGrid;              /**< Pen for drawing the data grid.  */
+
+    QPen        m_penFreeze;            /**< Pen for drawing the data when freeze is on.  */
+    QPen        m_penFreezeSelected;    /**< Pen for drawing the data when freeze is on and channel is selected.  */
+    QPen        m_penNormal;            /**< Pen for drawing the data when data is plotted normally without freeze on.  */
+    QPen        m_penNormalSelected;    /**< Pen for drawing the data when data is plotted normally without freeze on and channel is selected.  */
 };
 
 } // NAMESPACE

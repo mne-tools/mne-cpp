@@ -93,18 +93,7 @@ BabyMEG::BabyMEG()
 //    m_pActionSetupProject->setShortcut(tr("F12"));
     m_pActionSetupProject->setStatusTip(tr("Setup Project"));
     connect(m_pActionSetupProject, &QAction::triggered, this, &BabyMEG::showProjectDialog);
-    addPluginAction(m_pActionSetupProject);
-
-    m_pActionUpdateFiffInfo = new QAction(QIcon(":/images/latestFiffInfo.png"), tr("Update Fiff Info"),this);
-    m_pActionUpdateFiffInfo->setStatusTip(tr("Update Fiff Info"));
-    connect(m_pActionUpdateFiffInfo, &QAction::triggered, this, &BabyMEG::UpdateFiffInfo);
-    addPluginAction(m_pActionUpdateFiffInfo);
-
-    m_pActionUpdateFiffInfoForHPI = new QAction(QIcon(":/images/latestFiffInfoHPI.png"), tr("Update HPI to Fiff Info"),this);
-    m_pActionUpdateFiffInfoForHPI->setStatusTip(tr("Update HPI to Fiff Info"));
-    connect(m_pActionUpdateFiffInfoForHPI, &QAction::triggered, this, &BabyMEG::SetFiffInfoForHPI);
-    addPluginAction(m_pActionUpdateFiffInfoForHPI);
-
+    addPluginAction(m_pActionSetupProject);    
 
     m_pActionRecordFile = new QAction(QIcon(":/images/record.png"), tr("Start Recording"),this);
     m_pActionRecordFile->setStatusTip(tr("Start Recording"));
@@ -119,6 +108,15 @@ BabyMEG::BabyMEG()
     connect(m_pActionSqdCtrl, &QAction::triggered, this, &BabyMEG::showSqdCtrlDialog);
     addPluginAction(m_pActionSqdCtrl);
 
+    m_pActionUpdateFiffInfo = new QAction(QIcon(":/images/latestFiffInfo.png"), tr("Update Fiff Info"),this);
+    m_pActionUpdateFiffInfo->setStatusTip(tr("Update Fiff Info"));
+    connect(m_pActionUpdateFiffInfo, &QAction::triggered, this, &BabyMEG::UpdateFiffInfo);
+    addPluginAction(m_pActionUpdateFiffInfo);
+
+    m_pActionUpdateFiffInfoForHPI = new QAction(QIcon(":/images/latestFiffInfoHPI.png"), tr("Update HPI to Fiff Info"),this);
+    m_pActionUpdateFiffInfoForHPI->setStatusTip(tr("Update HPI to Fiff Info"));
+    connect(m_pActionUpdateFiffInfoForHPI, &QAction::triggered, this, &BabyMEG::SetFiffInfoForHPI);
+    addPluginAction(m_pActionUpdateFiffInfoForHPI);
 }
 
 
@@ -163,6 +161,14 @@ QString BabyMEG::getFilePath(bool currentTime) const
         sFilePath.append("/"+ sTimeStamp + "_" + m_sCurrentSubject + "_" + m_sCurrentParadigm + "_raw.fif");
 
     return sFilePath;
+}
+
+
+//*************************************************************************************************************
+
+QString BabyMEG::getDataPath() const
+{
+    return m_sBabyMEGDataPath;
 }
 
 
@@ -229,7 +235,7 @@ void BabyMEG::initConnector()
         m_pRTMSABabyMEG->data()->setName(this->getName());//Provide name to auto store widget settings
 
         m_pRTMSABabyMEG->data()->initFromFiffInfo(m_pFiffInfo);
-        m_pRTMSABabyMEG->data()->setMultiArraySize(2);
+        m_pRTMSABabyMEG->data()->setMultiArraySize(1);
 
         m_pRTMSABabyMEG->data()->setSamplingRate(m_pFiffInfo->sfreq);
 
@@ -646,6 +652,10 @@ bool BabyMEG::readProjectors()
         return false;
 
     QList<FiffProj> q_ListProj = t_pStream->read_proj(t_Tree);
+
+    //Set all projectors to zero
+    for(int i = 0; i<q_ListProj.size(); i++)
+        q_ListProj[i].active = false;
 
     if (q_ListProj.size() == 0)
     {
