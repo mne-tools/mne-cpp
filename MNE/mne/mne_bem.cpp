@@ -373,13 +373,41 @@ bool MNEBem::complete_surface_info(MNEBemSurface& p_BemSurf)
     }
     printf("[done]\n");
 
-
 //        qDebug() << "p_BemSurf.tri_cent:" << p_BemSurf.tri_cent(0,0) << p_BemSurf.tri_cent(0,1) << p_BemSurf.tri_cent(0,2);
 //        qDebug() << "p_BemSurf.tri_cent:" << p_BemSurf.tri_cent(2,0) << p_BemSurf.tri_cent(2,1) << p_BemSurf.tri_cent(2,2);
 
-//        qDebug() << "p_BemSurf.tri_nn:" << p_BemSurf.tri_nn(0,0) << p_BemSurf.tri_nn(0,1) << p_BemSurf.tri_nn(0,2);
-//        qDebug() << "p_BemSurf.tri_nn:" << p_BemSurf.tri_nn(2,0) << p_BemSurf.tri_nn(2,1) << p_BemSurf.tri_nn(2,2);
+        qDebug() << "p_BemSurf.tri_nn:" << p_BemSurf.tri_nn(0,0) << p_BemSurf.tri_nn(0,1) << p_BemSurf.tri_nn(0,2);
+        qDebug() << "p_BemSurf.tri_nn:" << p_BemSurf.tri_nn(2,0) << p_BemSurf.tri_nn(2,1) << p_BemSurf.tri_nn(2,2);
 
+//        //
+//        //   Accumulate the vertex normals
+//        //
+
+        MatrixX3f nnTest;
+        nnTest = MatrixX3f::Zero(p_BemSurf.np,3);
+
+        for (qint32 p = 0; p < p_BemSurf.ntri; p++)
+        {
+            for (qint32 j=0; j<3 ; j++)
+            {
+                int nodenr;
+                nodenr = p_BemSurf.tris(p,j);
+//                double help;
+//                help= p_BemSurf.tri_nn(p,0);
+//                help = nnTest(nodenr,0);
+//                help= help+p_BemSurf.tri_nn(p,0);
+//                nnTest(nodenr,0)=help;
+                nnTest(nodenr,0) += p_BemSurf.tri_nn(p,0);
+                nnTest(nodenr,1) += p_BemSurf.tri_nn(p,1);
+                nnTest(nodenr,2) += p_BemSurf.tri_nn(p,2);
+            }
+
+            // normalize
+            size = nnTest.row(p)*nnTest.row(p).transpose();
+            size = std::pow(size, 0.5f );
+            nnTest.row(p) /= size;
+        }
+qDebug() << "nnTest first Row:" << nnTest(0,0)<<nnTest(0,1)<<nnTest(0,2);
 
     return true;
 }
