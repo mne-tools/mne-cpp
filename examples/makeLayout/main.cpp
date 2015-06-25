@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     // Get fiff info
-    QFile t_fileRaw("./MNE-sample-data/baby_meg/babymegtest1.fif");
+    QFile t_fileRaw("./MNE-sample-data/baby_meg/150401_121310_TestSubject_raw.fif");
 
     FiffRawData raw(t_fileRaw);
 
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     QList<QVector<double> > inputPoints;
     QList<QVector<double> > outputPoints;
     QStringList names;
-    QFile out("./MNE_Browse_Raw_Resources/Templates/Layouts/babymeg-mag-outer-layer.lout");
+    QFile out("./MNE_Browse_Raw_Resources/Templates/Layouts/babymeg-mag-inner-layer-x-mirrored.lout");
     QFile out_file_3d("./MNE_Browse_Raw_Resources/Templates/Layouts/3D_points_all.lout");
     QTextStream out3D(&out_file_3d);
 
@@ -108,9 +108,9 @@ int main(int argc, char *argv[])
     }
 
     for(int i = 0; i<fiffInfo.ch_names.size(); i++) {
-        int kind = fiffInfo.chs.at(i).coil_type;
+        int type = fiffInfo.chs.at(i).coil_type;
 
-        if(kind == FIFFV_COIL_BABY_REF_MAG) { //FIFFV_MEG_CH FIFFV_EEG_CH FIFFV_REF_MEG_CH
+        if(type == FIFFV_COIL_BABY_MAG) { //FIFFV_MEG_CH FIFFV_EEG_CH FIFFV_REF_MEG_CH FIFFV_COIL_BABY_REF_MAG FIFFV_COIL_BABY_MAG
             QVector<double> temp;
             double x = fiffInfo.chs.at(i).loc(0,0) * 100;
             double y = fiffInfo.chs.at(i).loc(1,0) * 100;
@@ -128,6 +128,7 @@ int main(int argc, char *argv[])
         }
     }
 
+    std::cout<<"could not open out_file_3d file";
     out_file_3d.close();
 
     float prad = 60.0;
@@ -144,6 +145,8 @@ int main(int argc, char *argv[])
                                 prad,
                                 width,
                                 height,
+                                true,
+                                true,
                                 true);
 
     return a.exec();

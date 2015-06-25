@@ -172,6 +172,14 @@ QList<FilterData> FilterWindow::getCurrentFilter()
 
 //*************************************************************************************************************
 
+QList<QCheckBox*> FilterWindow::getActivationCheckBoxList()
+{
+    return m_lActivationCheckBoxList;
+}
+
+
+//*************************************************************************************************************
+
 void FilterWindow::initCheckBoxes()
 {
 }
@@ -398,12 +406,13 @@ void FilterWindow::updateDefaultFiltersActivation(const QModelIndex & topLeft, c
         ui->m_layout_defaultFilterActivation->removeItem(ui->m_layout_defaultFilterActivation->itemAt(0));
 
     m_lActivationCheckBoxList.clear();
+
     for(int i = 0; i<allFilters.size(); i++) {
         //Check for user designed filter. This needs to be done because there only should be one filter in the model which holds the user designed filter.
         //Otherwise everytime a filter is designed a new filter would be added to this model -> too much storage consumption.
         if(allFilters.at(i).m_sName != "User Design") {
             QCheckBox *checkBox = new QCheckBox(allFilters.at(i).m_sName);
-            connect(checkBox,&QCheckBox::clicked,
+            connect(checkBox,&QCheckBox::toggled,
                         this,&FilterWindow::onChkBoxFilterActivation);
 
             checkBox->installEventFilter(this);
@@ -413,7 +422,7 @@ void FilterWindow::updateDefaultFiltersActivation(const QModelIndex & topLeft, c
             ui->m_layout_defaultFilterActivation->addWidget(checkBox);
         } else {
             QCheckBox *checkBox = new QCheckBox("Activate user designed filter");
-            connect(checkBox,&QCheckBox::clicked,
+            connect(checkBox,&QCheckBox::toggled,
                         this,&FilterWindow::onChkBoxFilterActivation);
 
             checkBox->installEventFilter(this);
@@ -423,6 +432,8 @@ void FilterWindow::updateDefaultFiltersActivation(const QModelIndex & topLeft, c
             ui->m_layout_designFilter->addWidget(checkBox,6,0,2,2);
         }
     }
+
+    emit activationCheckBoxListChanged(m_lActivationCheckBoxList);
 }
 
 
@@ -517,7 +528,12 @@ void FilterWindow::filterParametersChanged()
     double nyquistFrequency = samplingFrequency/2;
 
     //Calculate the needed fft length
-    int filterTaps = ui->m_spinBox_filterTaps->value();
+    m_iFilterTaps =  ui->m_spinBox_filterTaps->value();
+    if(ui->m_spinBox_filterTaps->value()%2 != 0)
+        m_iFilterTaps--;
+
+    ui->m_spinBox_filterTaps->setValue(m_iFilterTaps);
+
     int fftLength = m_iWindowSize + ui->m_spinBox_filterTaps->value() * 2;
     int exp = ceil(MNEMath::log2(fftLength));
     fftLength = pow(2, exp) <512 ? 512 : pow(2, exp);
@@ -553,7 +569,7 @@ void FilterWindow::filterParametersChanged()
         userDefinedFilterOperator = QSharedPointer<FilterData>(
                                                 new FilterData("User Design",
                                                                FilterData::LPF,
-                                                               filterTaps,
+                                                               m_iFilterTaps,
                                                                lowpassHz/nyquistFrequency,
                                                                0.2,
                                                                (double)trans_width/nyquistFrequency,
@@ -566,7 +582,7 @@ void FilterWindow::filterParametersChanged()
         userDefinedFilterOperator = QSharedPointer<FilterData>(
                                         new FilterData("User Design",
                                                         FilterData::HPF,
-                                                        filterTaps,
+                                                        m_iFilterTaps,
                                                         highpassHz/nyquistFrequency,
                                                         0.2,
                                                         (double)trans_width/nyquistFrequency,
@@ -579,7 +595,7 @@ void FilterWindow::filterParametersChanged()
         userDefinedFilterOperator = QSharedPointer<FilterData>(
                    new FilterData("User Design",
                                   FilterData::BPF,
-                                  filterTaps,
+                                  m_iFilterTaps,
                                   (double)center/nyquistFrequency,
                                   (double)bw/nyquistFrequency,
                                   (double)trans_width/nyquistFrequency,

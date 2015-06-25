@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>408</width>
-    <height>362</height>
+    <height>286</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -29,19 +29,6 @@
    <string notr="true"/>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QPushButton" name="m_pushButton_hideAll">
-     <property name="text">
-      <string>Minimize - Quick Control</string>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="1">
     <widget class="QPushButton" name="m_pushButton_close">
      <property name="maximumSize">
@@ -60,181 +47,28 @@
      <property name="bottomMargin">
       <number>0</number>
      </property>
-     <item row="1" column="0">
-      <widget class="QGroupBox" name="m_groupBox_view">
+     <item row="0" column="1" rowspan="2">
+      <widget class="QGroupBox" name="m_groupBox_projections">
        <property name="title">
-        <string>View</string>
+        <string>Projections</string>
        </property>
-       <layout class="QFormLayout" name="formLayout">
-        <item row="2" column="1">
-         <widget class="QSlider" name="horizontalSlider_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QSlider" name="horizontalSlider_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QSpinBox" name="spinBox"/>
-        </item>
-        <item row="2" column="0">
-         <widget class="QSpinBox" name="spinBox_2"/>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QLabel" name="label_4">
-          <property name="text">
-           <string>Number of visible channels:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0" colspan="2">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>Time window:</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QGroupBox" name="m_groupBox_projectors">
-       <property name="title">
-        <string>Projectors</string>
-       </property>
-       <layout class="QFormLayout" name="formLayout_3">
-        <item row="0" column="0">
-         <widget class="QCheckBox" name="checkBox_5">
-          <property name="text">
-           <string>1</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QCheckBox" name="checkBox_6">
-          <property name="text">
-           <string>3</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QCheckBox" name="checkBox_9">
-          <property name="text">
-           <string>4</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QCheckBox" name="checkBox_8">
-          <property name="text">
-           <string>2</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QCheckBox" name="checkBox_7">
-          <property name="text">
-           <string>5</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QCheckBox" name="checkBox_10">
-          <property name="text">
-           <string>6</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="0" column="1">
+     <item row="2" column="1">
       <widget class="QGroupBox" name="m_groupBox_filter">
        <property name="title">
         <string>Filter</string>
        </property>
-       <layout class="QGridLayout" name="gridLayout_2">
-        <item row="3" column="0" colspan="2">
-         <widget class="Line" name="line">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="0" colspan="2">
-         <widget class="QComboBox" name="comboBox">
-          <item>
-           <property name="text">
-            <string>Bandpass</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Lowpass</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Highpass</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="8" column="1">
-         <widget class="QDoubleSpinBox" name="doubleSpinBox_5">
-          <property name="suffix">
-           <string>Hz</string>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="0">
-         <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
-          <property name="prefix">
-           <string/>
-          </property>
-          <property name="suffix">
-           <string>Hz</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" colspan="2">
-         <widget class="QCheckBox" name="checkBox">
-          <property name="text">
-           <string>CheckBox</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QCheckBox" name="checkBox_3">
-          <property name="text">
-           <string>CheckBox</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QCheckBox" name="checkBox_2">
-          <property name="text">
-           <string>CheckBox</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0" colspan="2">
-         <widget class="QCheckBox" name="checkBox_4">
-          <property name="text">
-           <string>User design</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
       </widget>
      </item>
-     <item row="0" column="0">
+     <item row="2" column="0">
+      <widget class="QGroupBox" name="m_groupBox_view">
+       <property name="title">
+        <string>View</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0" rowspan="2">
       <widget class="QGroupBox" name="m_groupBox_scaling">
        <property name="minimumSize">
         <size>
@@ -248,6 +82,19 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item row="0" column="0">
+    <widget class="QPushButton" name="m_pushButton_hideAll">
+     <property name="text">
+      <string>Minimize - Quick Control</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
