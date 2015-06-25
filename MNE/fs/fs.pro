@@ -88,6 +88,7 @@ SOURCES += \
     blendian.cpp \
     mri.cpp \
     mgh.cpp \
+    miniz.c
 
 
 HEADERS += \

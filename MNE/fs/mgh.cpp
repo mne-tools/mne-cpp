@@ -42,7 +42,7 @@
 #include "fs_global.h"
 #include "mgh.h"
 #include "blendian.h"
-
+#include "miniz.c"
 
 #include <QCoreApplication>
 #include <QString>
@@ -50,6 +50,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
+#include <QTemporaryFile>
 
 #include <string>
 
@@ -89,7 +90,23 @@ Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerO
     // uncompress if needed (gzip is used)
     if (gZipped)
     {
-        QString uncompFName = QDir::tempPath() + "/001.mgh"; // todo: automatic assignment of file name
+//        QTemporaryFile tempFile(fName);
+//        tempFile.open();
+//        QFileInfo tempFileInfo(tempFile.fileName());
+////        tempFile.open();
+//        QString tempFileName = tempFileInfo.baseName() + ".mgh";
+//        tempFile.close();
+//        QString uncompFName = QDir::tempPath() + tempFileName;
+
+        QFileInfo fileInfo(fName);
+
+
+        QTemporaryFile tempFile(QDir::tempPath() + "/" + fileInfo.completeBaseName()
+                + "." + fileInfo.suffix());
+        tempFile.open();
+        QString uncompFName = tempFile.fileName() + ".mgh";
+        tempFile.close();
+
         unGz(fName, uncompFName);
 
         qDebug() << "Done uncompressing.";
@@ -230,60 +247,62 @@ Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerO
         mri.allocSequence(nDimX, nDimY, nDimZ, type, nFrames);
         mri.dof = dof;
 
-        for (frame=start_frame; frame<=end_frame; frame++)
-        {
-            if (fread(buf, sizeof(char), bytes, fp) != bytes)
-            {
-                fclose(fp);
-                free(buf);
+//        for (frame=start_frame; frame<=end_frame; frame++)
+//        {
+//            if (fread(buf, sizeof(char), bytes, fp) != bytes)
+//            {
+//                fclose(fp);
+//                free(buf);
 
-            }
-        }
+//            }
+//        }
 
-        // ------ Read in the entire volume -------
-        switch (type)
-        {
-        case MRI_INT:
-        for (i = y = 0 ; y < height ; y++)
-          {
-            for (x = 0 ; x < width ; x++, i++)
-              {
-                ival = orderIntBytes(((int *)buf)[i]) ;
-                MRIIseq_vox(mri,x,y,z,frame-start_frame) = ival ;
-              }
-          }
-        break ;
-        case MRI_SHORT:
-        for (i = y = 0 ; y < height ; y++)
-          {
-            for (x = 0 ; x < width ; x++, i++)
-              {
-                sval = orderShortBytes(((short *)buf)[i]) ;
-                MRISseq_vox(mri,x,y,z,frame-start_frame) = sval ;
-              }
-          }
-        break ;
-        case MRI_TENSOR:
-        case MRI_FLOAT:
-        for (i = y = 0 ; y < height ; y++)
-          {
-            for (x = 0 ; x < width ; x++, i++)
-              {
-                fval = orderFloatBytes(((float *)buf)[i]) ;
-                MRIFseq_vox(mri,x,y,z,frame-start_frame) = fval ;
-              }
-          }
-        break ;
-        case MRI_UCHAR:
-        local_buffer_to_image(buf, mri, z, frame-start_frame) ;
-        break ;
-        default:
-        errno = 0;
-        ErrorReturn(NULL,
-                    (ERROR_UNSUPPORTED, "mghRead: unsupported type %d",
-                     mri->type)) ;
-        break ;
-        }
+//        // ------ Read in the entire volume -------
+//        switch (type)
+//        {
+//        case MRI_INT:
+//        for (i = y = 0 ; y < height ; y++)
+//          {
+//            for (x = 0 ; x < width ; x++, i++)
+//              {
+//                ival = orderIntBytes(((int *)buf)[i]) ;
+//                MRIIseq_vox(mri,x,y,z,frame-start_frame) = ival ;
+//              }
+//          }
+//        break ;
+//        case MRI_SHORT:
+//        for (i = y = 0 ; y < height ; y++)
+//          {
+//            for (x = 0 ; x < width ; x++, i++)
+//              {
+//                sval = orderShortBytes(((short *)buf)[i]) ;
+//                MRISseq_vox(mri,x,y,z,frame-start_frame) = sval ;
+//              }
+//          }
+//        break ;
+//        case MRI_TENSOR:
+//        case MRI_FLOAT:
+//        for (i = y = 0 ; y < height ; y++)
+//          {
+//            for (x = 0 ; x < width ; x++, i++)
+//              {
+//                fval = orderFloatBytes(((float *)buf)[i]) ;
+//                MRIFseq_vox(mri,x,y,z,frame-start_frame) = fval ;
+//              }
+//          }
+//        break ;
+//        case MRI_UCHAR:
+//        local_buffer_to_image(buf, mri, z, frame-start_frame) ;
+//        break ;
+//        default:
+//        errno = 0;
+//        ErrorReturn(NULL,
+//                    (ERROR_UNSUPPORTED, "mghRead: unsupported type %d",
+//                     mri->type)) ;
+//        break ;
+    }
+
+
 
 
 
