@@ -42,7 +42,7 @@
 #include "fs_global.h"
 #include "mgh.h"
 #include "blendian.h"
-#include "miniz.c"
+#include "3rdParty/miniz.c"
 
 #include <QCoreApplication>
 #include <QString>

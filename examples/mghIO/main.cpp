@@ -55,7 +55,6 @@
 #include <array>
 
 //#include <zlib.h>
-#include "miniz.c"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -98,7 +97,7 @@ void printVector(vector<int> vec);
 int main()
 {
     // initialize vars to call loadMGH function
-    QString fName = "D:/Repos/mne-cpp/bin/MNE-sample-data/subjects/sample/mri/orig/001.mgh";         // where /local/bin is a symlink to /usr/bin
+    QString fName = "D:/Repos/mne-cpp/bin/MNE-sample-data/subjects/sample/mri/orig/001.mgz";         // where /local/bin is a symlink to /usr/bin
 //    QDir fDir(fName);
 //    QString fNameCanonical = fDir.canonicalPath();
 
