@@ -284,7 +284,7 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
             {
                 QPainterPath path(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor()-1,option.rect.y()));
 
-                painter->setRenderHint(QPainter::Antialiasing, false);
+                painter->setRenderHint(QPainter::Antialiasing, true);
 
                 //Plot marker
 //                createMarkerPath(option, path);
@@ -336,7 +336,7 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 //timeMS = timer.elapsed();
                 //std::cout<<"Time drawPath Current data"<<timeMS<<std::endl;
 
-                //Plot ellipse and amplitude next to marker mouse posistion
+                //Plot ellipse and amplitude next to marker mouse position
 //                if(m_iActiveRow == index.row()) {
 //                    painter->save();
 //                    painter->drawEllipse(ellipsePos,2,2);

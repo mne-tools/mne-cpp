@@ -42,8 +42,10 @@
 //=============================================================================================================
 
 #include <iostream>
-#include "ui_quickcontrolwidget.h"
+#include "../ui_quickcontrolwidget.h"
+#include "fiff/fiff_info.h"
 #include "fiff/fiff_constants.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -57,6 +59,9 @@
 
 #include <QWidget>
 #include <QMouseEvent>
+#include <QLabel>
+#include <QDoubleSpinBox>
+#include <QCheckBox>
 
 
 //*************************************************************************************************************
@@ -71,6 +76,9 @@ namespace XDISPLIB
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
+
+using namespace FIFFLIB;
+
 
 //=============================================================================================================
 /**
@@ -90,7 +98,7 @@ public:
     * @param [in] parent    parent of widget
     * @param [in] qMapChScaling    pointer to scaling information
     */
-    QuickControlWidget(QMap< qint32,float >* qMapChScaling, QWidget *parent = 0);
+    QuickControlWidget(QMap< qint32,float >* qMapChScaling, FiffInfo::SPtr pFiffInfo, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -98,11 +106,91 @@ public:
     */
     ~QuickControlWidget();
 
-protected:
+    //=========================================================================================================
+    /**
+    * Call this whenever the current fitlers have changed.
+    */
+    void filterGroupChanged(QList<QCheckBox*> list);
 
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the scaling sliders or spin boxes changed.
+    */
+    void scalingChanged();
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changes the projections.
+    */
+    void projSelectionChanged();
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changes the window size.
+    */
+    void timeWindowChanged(int value);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changes the row height (zoom) of the channels.
+    */
+    void zoomChanged(double value);
+
+protected:
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the scaling group
+    */
     void createScalingGroup();
 
-    void updateScaling(double value);
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the projector group
+    */
+    void createProjectorGroup();
+
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the view group
+    */
+    void createViewGroup();
+
+    //=========================================================================================================
+    /**
+    * Slot called when time window size changes
+    */
+    void onTimeWindowChanged(int value);
+
+    //=========================================================================================================
+    /**
+    * Slot called when zoome changes
+    */
+    void onZoomChanged(double value);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the projector check state changes
+    */
+    void checkStatusChanged(int state);
+
+    //=========================================================================================================
+    /**
+    * Slot called when user enables/disables all projectors
+    */
+    void enableDisableAll(bool status);
+
+    //=========================================================================================================
+    /**
+    * Slot called when scaling spin boxes change
+    */
+    void updateSpinBoxScaling(double value);
+
+    //=========================================================================================================
+    /**
+    * Slot called when slider scaling change
+    */
+    void updateSliderScaling(int value);
 
     //=========================================================================================================
     /**
@@ -145,6 +233,14 @@ private:
 
     QMap< qint32,float >*           m_qMapChScaling;                /**< Channel scaling values. */
     QMap<qint32, QDoubleSpinBox*>   m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits */
+    QMap<qint32, QSlider*>          m_qMapScalingSlider;            /**< Map of types and channel scaling line edits */
+
+
+    QList<QCheckBox*>   m_qListCheckBox;            /**< List of projection CheckBox. */
+    QList<QCheckBox*>   m_qFilterListCheckBox;      /**< List of filter CheckBox. */
+    FiffInfo::SPtr      m_pFiffInfo;                /**< Connected fiff info. */
+
+    QCheckBox *         m_enableDisableProjectors;  /**< Holds the enable disable all button. */
 
     Ui::QuickControlWidget *ui;                     /**< The generated UI file */
 };
