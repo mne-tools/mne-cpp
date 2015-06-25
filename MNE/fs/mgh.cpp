@@ -90,37 +90,21 @@ Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerO
     // uncompress if needed (gzip is used)
     if (gZipped)
     {
-//        QTemporaryFile tempFile(fName);
-//        tempFile.open();
-//        QFileInfo tempFileInfo(tempFile.fileName());
-////        tempFile.open();
-//        QString tempFileName = tempFileInfo.baseName() + ".mgh";
-//        tempFile.close();
-//        QString uncompFName = QDir::tempPath() + tempFileName;
-
+        // generate unique temporary absolute name destination file
         QFileInfo fileInfo(fName);
-
-
         QTemporaryFile tempFile(QDir::tempPath() + "/" + fileInfo.completeBaseName()
                 + "." + fileInfo.suffix());
         tempFile.open();
         QString uncompFName = tempFile.fileName() + ".mgh";
         tempFile.close();
 
+        // call function
         unGz(fName, uncompFName);
 
-        qDebug() << "Done uncompressing.";
-        qDebug() << uncompFName;
+        // overwrite older fName
         fName = uncompFName;
     }
 
-//    // experiment to read file using QDataStream, still not working
-//    QFile file(fName);
-//    QDataStream in(&file);
-//    file.open(QIODevice::ReadOnly);
-//    QString info = "";
-//    in >> info;
-//    file.close();
 
     // c-style file reading method
     QFile myFile(fName);
@@ -326,23 +310,151 @@ Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerO
 
 // function to unpack compressed data
 //      corrupted data error, try new approach with other lib
-void Mgh::unGz(QString gzFName, QString fName)
+int Mgh::unGz(QString gzFName, QString unGzFName)
 {
-    // http://stackoverflow.com/questions/2690328/qt-quncompress-gzip-data
-    // http://stackoverflow.com/questions/5741657/error-decompressing-gzip-data-using-qt
-    // http://www.zlib.net/zlib_how.html
 
-    QFile inFile(gzFName);
-    QFile outFile(fName);
-    inFile.open(QIODevice::ReadOnly);
-    outFile.open(QIODevice::WriteOnly);
+// qUncompress does not work for gZip files, so we use miniz instead, a small and compact zlib clone
 
-    QByteArray compressedData = inFile.readAll();
-    QByteArray uncompressedData = qUncompress(compressedData); // does not work, because zlib and gzip use different header
-    outFile.write(uncompressedData);
+//    QFile inFile(gzFName);
+//    QFile outFile(fName);
+//    inFile.open(QIODevice::ReadOnly);
+//    outFile.open(QIODevice::WriteOnly);
 
-    inFile.close();
-    outFile.close();
+//    QByteArray compressedData = inFile.readAll();
+//    QByteArray uncompressedData = qUncompress(compressedData); // does not work, because zlib and gzip use different header
+//    outFile.write(uncompressedData);
+
+//    inFile.close();
+//    outFile.close();
+
+// usage of miniz functionality, derived from miniz example 3
+
+printf("miniz.c version: %s\n", MZ_VERSION);
+
+#define my_max(a,b) (((a) > (b)) ? (a) : (b))
+#define my_min(a,b) (((a) < (b)) ? (a) : (b))
+
+#define BUF_SIZE (1024 * 1024)
+
+static quint8 s_inbuf[BUF_SIZE];
+static quint8 s_outbuf[BUF_SIZE];
+
+// initialize vars
+int level = Z_BEST_COMPRESSION;
+z_stream stream;
+int p = 1;
+
+
+// convert qString filenames to const char *
+QByteArray gzByteArray = gzFName.toLatin1();
+const char *pSrc_filename = gzByteArray.data();
+QByteArray unGzByteArray = unGzFName.toLatin1();
+const char *pDst_filename = unGzByteArray.constData();
+printf("Input File: \"%s\"\nOutput File: \"%s\"\n", pSrc_filename, pDst_filename);
+
+// Open input file.
+FILE *pInfile = fopen(pSrc_filename, "rb");
+if (!pInfile)
+{
+  printf("Failed opening input file!\n");
+  return EXIT_FAILURE;
+}
+long file_loc;
+if ((file_loc < 0) || (file_loc > INT_MAX))
+{
+   // This is not a limitation of miniz or tinfl.
+   printf("File is too large to be processed by this example.\n");
+   return EXIT_FAILURE;
+}
+uint infile_size = (uint)file_loc;
+printf("Input file size: %u\n", infile_size);
+
+// Open output file.
+FILE *pOutfile = fopen(pDst_filename, "wb");
+if (!pOutfile)
+{
+  printf("Failed opening output file!\n");
+  return EXIT_FAILURE;
+}
+
+// Init the z_stream
+memset(&stream, 0, sizeof(stream));
+stream.next_in = s_inbuf;
+stream.avail_in = 0;
+stream.next_out = s_outbuf;
+stream.avail_out = BUF_SIZE;
+
+// Decompression.
+uint infile_remaining = infile_size;
+
+if (inflateInit(&stream))
+{
+  printf("inflateInit() failed!\n");
+  return EXIT_FAILURE;
+}
+
+for ( ; ; )
+{
+  int status;
+  if (!stream.avail_in)
+  {
+    // Input buffer is empty, so read more bytes from input file.
+    uint n = my_min(BUF_SIZE, infile_remaining);
+
+    if (fread(s_inbuf, 1, n, pInfile) != n)
+    {
+      printf("Failed reading from input file!\n");
+      return EXIT_FAILURE;
+    }
+
+    stream.next_in = s_inbuf;
+    stream.avail_in = n;
+
+    infile_remaining -= n;
+  }
+
+  status = inflate(&stream, Z_SYNC_FLUSH);
+
+  if ((status == Z_STREAM_END) || (!stream.avail_out))
+  {
+    // Output buffer is full, or decompression is done, so write buffer to output file.
+    uint n = BUF_SIZE - stream.avail_out;
+    if (fwrite(s_outbuf, 1, n, pOutfile) != n)
+    {
+      printf("Failed writing to output file!\n");
+      return EXIT_FAILURE;
+    }
+    stream.next_out = s_outbuf;
+    stream.avail_out = BUF_SIZE;
+  }
+
+  if (status == Z_STREAM_END)
+    break;
+  else if (status != Z_OK)
+  {
+    printf("inflate() failed with status %i!\n", status);
+    return EXIT_FAILURE;
+  }
+}
+
+if (inflateEnd(&stream) != Z_OK)
+{
+  printf("inflateEnd() failed!\n");
+  return EXIT_FAILURE;
+}
+
+fclose(pInfile);
+if (EOF == fclose(pOutfile))
+{
+  printf("Failed writing to output file!\n");
+  return EXIT_FAILURE;
+}
+
+printf("Total input bytes: %u\n", (mz_uint32)stream.total_in);
+printf("Total output bytes: %u\n", (mz_uint32)stream.total_out);
+printf("Success.\n");
+return EXIT_SUCCESS;
+
 }
 
 //*************************************************************************************************************

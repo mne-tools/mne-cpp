@@ -116,9 +116,9 @@ public:
     *
     *
     * @param[in]  gzFName  absolute file name of compressed mgz file
-    * @param[in]  fName  absolute file name of resulting uncompressed mgh file
+    * @param[in]  unGzFName  absolute file name of resulting uncompressed mgh file
     */
-    static void unGz(QString gzFName, QString fName);
+    static int unGz(QString gzFName, QString unGzFName);
 
 };
 
