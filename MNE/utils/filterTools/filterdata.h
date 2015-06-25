@@ -128,7 +128,7 @@ public:
     enum CompensateEdgeEffects {
        ZeroPad,
        MirrorData,
-       NoEdgeEffectCompensation
+       None
     };
 
     /**

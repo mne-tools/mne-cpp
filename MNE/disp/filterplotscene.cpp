@@ -89,7 +89,7 @@ void FilterPlotScene::updateFilter(const FilterData& operatorFilter, int samplin
     //Clear the scene
     this->clear();
 
-    //Plot newly set filter
+    //Plot newly set filter. Needs to be called before plotMagnitudeDiagram() because m_iPlotLength is set in plotFilterFrequencyResponse()
     plotFilterFrequencyResponse();
 
     //Plot the magnitude diagram
@@ -109,6 +109,8 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq, QString filtername)
         int dsFactor = numberCoeff/2000;
         numberCoeff = numberCoeff/dsFactor;
     }
+
+    numberCoeff = m_iPlotLength;
 
     int fMax = samplingFreq/2; //nyquist frequency
 
@@ -203,14 +205,11 @@ void FilterPlotScene::plotFilterFrequencyResponse()
     //Get row vector with filter coefficients and norm to 1
     RowVectorXcd coefficientsAFreq = m_pCurrentFilter.m_dFFTCoeffA;
 
-    int numberCoeff = coefficientsAFreq.cols();
-    int dsFactor = 0;
-    if(numberCoeff>2000) {
-        dsFactor = numberCoeff/2000;
-        dsFactor--;
-    }
+    float numberCoeff = coefficientsAFreq.cols();
+    float dsFactor = numberCoeff/2000;
+
     double max = 0;
-    for(int i = 0; i<numberCoeff-dsFactor; i++)
+    for(int i = 0; i<coefficientsAFreq.cols(); i++)
         if(abs(coefficientsAFreq(i)) > max)
             max = abs(coefficientsAFreq(i));
 
@@ -231,8 +230,13 @@ void FilterPlotScene::plotFilterFrequencyResponse()
             y = m_dMaxMagnitude;
 
         y -= m_iDiagramMarginsVert;
-        path.lineTo(path.currentPosition().x()+1,y);
+        if(dsFactor<1)
+            path.lineTo(path.currentPosition().x()+1/dsFactor,y);
+        else
+            path.lineTo(path.currentPosition().x()+1,y);
     }
+
+    m_iPlotLength = path.currentPosition().x();
 
     QPen pen;
     pen.setColor(Qt::black);

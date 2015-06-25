@@ -138,6 +138,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the max number of allowed filter taps depending on the current block size of the incoming data->
+    *
+    * @param[in] iMaxNumberFilterTaps  number of max allowed filter taps
+    */
+    void setMaxFilterTaps(int iMaxNumberFilterTaps);
+
+    //=========================================================================================================
+    /**
     * Sets the new samplingRate.
     *
     * @param[in] dSamplingRate the new sampling rate
@@ -151,6 +159,14 @@ public:
     * @return returns the list with the currently active filters
     */
     QList<FilterData> getCurrentFilter();
+
+    //=========================================================================================================
+    /**
+    * Returns the current activation checkBox list.
+    *
+    * @return returns the current activation checkBox list.
+    */
+    QList<QCheckBox*> getActivationCheckBoxList();
 
 private:
     //=========================================================================================================
@@ -242,6 +258,10 @@ signals:
     void filterChanged(QList<UTILSLIB::FilterData> activeFilter);
 
     void applyFilter(QString channelType);
+
+    void filterActivated(bool state);
+
+    void activationCheckBoxListChanged(QList<QCheckBox*> list);
 
 protected slots:
     //=========================================================================================================
