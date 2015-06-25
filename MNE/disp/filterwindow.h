@@ -160,6 +160,14 @@ public:
     */
     QList<FilterData> getCurrentFilter();
 
+    //=========================================================================================================
+    /**
+    * Returns the current activation checkBox list.
+    *
+    * @return returns the current activation checkBox list.
+    */
+    QList<QCheckBox*> getActivationCheckBoxList();
+
 private:
     //=========================================================================================================
     /**
@@ -252,6 +260,8 @@ signals:
     void applyFilter(QString channelType);
 
     void filterActivated(bool state);
+
+    void activationCheckBoxListChanged(QList<QCheckBox*> list);
 
 protected slots:
     //=========================================================================================================

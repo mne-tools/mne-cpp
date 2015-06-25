@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>408</width>
-    <height>270</height>
+    <height>286</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -47,94 +47,28 @@
      <property name="bottomMargin">
       <number>0</number>
      </property>
-     <item row="1" column="0">
+     <item row="0" column="1" rowspan="2">
+      <widget class="QGroupBox" name="m_groupBox_projections">
+       <property name="title">
+        <string>Projections</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QGroupBox" name="m_groupBox_filter">
+       <property name="title">
+        <string>Filter</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
       <widget class="QGroupBox" name="m_groupBox_view">
        <property name="title">
         <string>View</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QGroupBox" name="m_groupBox_filter">
-       <property name="title">
-        <string>Filter</string>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_2">
-        <item row="3" column="0" colspan="2">
-         <widget class="Line" name="line">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="0" colspan="2">
-         <widget class="QComboBox" name="comboBox">
-          <item>
-           <property name="text">
-            <string>Bandpass</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Lowpass</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Highpass</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="8" column="1">
-         <widget class="QDoubleSpinBox" name="doubleSpinBox_5">
-          <property name="suffix">
-           <string>Hz</string>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="0">
-         <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
-          <property name="prefix">
-           <string/>
-          </property>
-          <property name="suffix">
-           <string>Hz</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" colspan="2">
-         <widget class="QCheckBox" name="checkBox">
-          <property name="text">
-           <string>CheckBox</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QCheckBox" name="checkBox_3">
-          <property name="text">
-           <string>CheckBox</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QCheckBox" name="checkBox_2">
-          <property name="text">
-           <string>CheckBox</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0" colspan="2">
-         <widget class="QCheckBox" name="checkBox_4">
-          <property name="text">
-           <string>User design</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="0" column="0">
+     <item row="0" column="0" rowspan="2">
       <widget class="QGroupBox" name="m_groupBox_scaling">
        <property name="minimumSize">
         <size>
@@ -144,13 +78,6 @@
        </property>
        <property name="title">
         <string>Scaling</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QGroupBox" name="m_groupBox_projectors">
-       <property name="title">
-        <string>Projectors</string>
        </property>
       </widget>
      </item>
