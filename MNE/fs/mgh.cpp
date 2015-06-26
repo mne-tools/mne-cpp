@@ -359,13 +359,19 @@ if (!pInfile)
   printf("Failed opening input file!\n");
   return EXIT_FAILURE;
 }
-long file_loc;
+
+// Determine input file's size.
+fseek(pInfile, 0, SEEK_END);
+long file_loc = ftell(pInfile);
+fseek(pInfile, 0, SEEK_SET);
+
 if ((file_loc < 0) || (file_loc > INT_MAX))
 {
    // This is not a limitation of miniz or tinfl.
    printf("File is too large to be processed by this example.\n");
    return EXIT_FAILURE;
 }
+
 uint infile_size = (uint)file_loc;
 printf("Input file size: %u\n", infile_size);
 
