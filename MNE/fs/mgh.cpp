@@ -105,7 +105,6 @@ Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerO
         fName = uncompFName;
     }
 
-
     // c-style file reading method
     QFile myFile(fName);
     myFile.open(QIODevice::ReadOnly);
@@ -393,11 +392,23 @@ stream.avail_out = BUF_SIZE;
 // Decompression.
 uint infile_remaining = infile_size;
 
-if (inflateInit(&stream))
+if (inflateInit(&stream)) // this line is from example 3
 {
   printf("inflateInit() failed!\n");
   return EXIT_FAILURE;
 }
+
+//inflateInit2(&stream, 16+MAX_WBITS); // this line has to be executed for gzip
+
+//decompress(gzip_data, 16+MAX_WBITS); -> only gzip format
+//decompress(gzip_data, 32+MAX_WBITS); -> also automatic header detection
+
+
+//zlib.decompress(gzip_data, zlib.MAX_WBITS|32)
+
+//        fh = gzip.open('abc.gz', 'rb')
+//cdata = fh.read()
+//fh.close()
 
 for ( ; ; )
 {
