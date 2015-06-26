@@ -43,6 +43,7 @@
 
 #include <utils/mnemath.h>
 #include <fs/label.h>
+#include <fstream>
 
 
 //*************************************************************************************************************
@@ -392,24 +393,50 @@ bool MNEBem::complete_surface_info(MNEBemSurface& p_BemSurf)
             {
                 int nodenr;
                 nodenr = p_BemSurf.tris(p,j);
-//                double help;
-//                help= p_BemSurf.tri_nn(p,0);
-//                help = nnTest(nodenr,0);
-//                help= help+p_BemSurf.tri_nn(p,0);
-//                nnTest(nodenr,0)=help;
                 nnTest(nodenr,0) += p_BemSurf.tri_nn(p,0);
                 nnTest(nodenr,1) += p_BemSurf.tri_nn(p,1);
                 nnTest(nodenr,2) += p_BemSurf.tri_nn(p,2);
             }
+        }
 
             // normalize
+        for (qint32 p = 0; p < p_BemSurf.np; p++)
+        {
             size = nnTest.row(p)*nnTest.row(p).transpose();
             size = std::pow(size, 0.5f );
             nnTest.row(p) /= size;
         }
-qDebug() << "nnTest first Row:" << nnTest(0,0)<<nnTest(0,1)<<nnTest(0,2);
+
+ qDebug() << "nnTest first Row:" << nnTest(0,0)<<nnTest(0,1)<<nnTest(0,2);
+
+ get_EigentoData(nnTest, "nntest.txt");
 
     return true;
 }
 
+//void MNEBem::matrixtofile()
+//{
+//  std::ofstream file("test.txt");
+//  if (file.is_open())
+//  {
+//    MatrixXf m = MatrixXf::Random(30,3);
+//    file << "Here is the matrix m:\n" << m << '\n';
+//    file << "m" << '\n' <<  colm(m) << '\n';
+//  }
+//}
+
+void MNEBem::get_EigentoData(MatrixX3f& src, char* pathAndName)
+{
+      std::fstream doc(pathAndName, std::ofstream::out | std::ofstream::trunc);
+      if(doc)  // if succesfully opened
+      {
+        // instructions
+        doc << "Here is the matrix src:\n" << src << "\n";
+        doc.close();
+      }
+      else
+      {
+        std::cerr << "Error when opening" << std::endl;
+      }
+ }
 

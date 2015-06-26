@@ -164,6 +164,14 @@ public:
     */
     static bool readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNEBem &p_Bem);
 
+    //=========================================================================================================
+    /**
+    * TO Do: Input
+    *
+    * Write Matrix to a textfile
+    */
+    static void MNEBem::get_EigentoData(MatrixX3f &src, char* pathAndName);
+
 private:
 
     //=========================================================================================================
