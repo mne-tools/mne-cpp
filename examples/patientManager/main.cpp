@@ -80,16 +80,23 @@ int main(int argc, char *argv[])
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
 
-    QString dsn = QString("DRIVER={SQL Server};SERVER=%1;DATABASE=%2;UID=superadmin;PWD=lollo1").arg(serverName).arg(dbName);
+    QString dsn = QString("DRIVER={SQL Server};SERVER=%1;DATABASE=%2;UID=babyMEG;PWD=bayMEG").arg(serverName).arg(dbName);
 
     db.setDatabaseName(dsn);
 
     if(db.open()) {
         qDebug()<<"database opened";
 
-        QSqlQuery qry;
+        QString sQuery = "INSERT INTO [Patients].[dbo].[Patients] ([ID],[Name])VALUES(:ID,:name)";
+        //QString sQuery = "SELECT TOP 1000 [Name],[NumberPatients],[Comments]FROM [Patients].[dbo].[Groups]";
 
-        if(qry.exec("SELECT TOP 1000 [Name],[NumberPatients],[Comments]FROM [Patients].[dbo].[Groups]")) {
+        int ID = 123455;
+        QSqlQuery qry;
+        qry.prepare(sQuery);
+        qry.bindValue(":ID",ID);
+        qry.bindValue(":name","Heather");
+
+        if(qry.exec()) {
             while(qry.next()){
                 qDebug()<<qry.value(0).toString()<<qry.value(1).toString()<<qry.value(2).toString();
             }

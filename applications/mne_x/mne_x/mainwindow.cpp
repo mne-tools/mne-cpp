@@ -229,7 +229,7 @@ void MainWindow::helpContents()
 void MainWindow::about()
 {
     if(!m_pAboutWindow) {
-        m_pAboutWindow = new QWidget();
+        m_pAboutWindow = QSharedPointer<QWidget>(new QWidget());
 
         QGridLayout *gridLayout;
         QLabel *m_label_splashcreen;
@@ -244,9 +244,9 @@ void MainWindow::about()
         m_pAboutWindow->setSizePolicy(sizePolicy);
         m_pAboutWindow->setMinimumSize(QSize(541, 708));
         m_pAboutWindow->setMaximumSize(QSize(541, 708));
-        gridLayout = new QGridLayout(m_pAboutWindow);
+        gridLayout = new QGridLayout(m_pAboutWindow.data());
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
-        m_label_splashcreen = new QLabel(m_pAboutWindow);
+        m_label_splashcreen = new QLabel(m_pAboutWindow.data());
         m_label_splashcreen->setObjectName(QStringLiteral("m_label_splashcreen"));
         QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy1.setHorizontalStretch(0);
@@ -259,7 +259,7 @@ void MainWindow::about()
 
         gridLayout->addWidget(m_label_splashcreen, 0, 0, 1, 1);
 
-        m_textEdit_aboutText = new QTextEdit(m_pAboutWindow);
+        m_textEdit_aboutText = new QTextEdit(m_pAboutWindow.data());
         m_textEdit_aboutText->setObjectName(QStringLiteral("m_textEdit_aboutText"));
         m_textEdit_aboutText->setEnabled(true);
         m_textEdit_aboutText->setReadOnly(true);
@@ -274,7 +274,7 @@ void MainWindow::about()
             "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
             "p, li { white-space: pre-wrap; }\n"
             "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-            "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-weight:600;\">Copyright (C) 2015 Christoph Dinh, Lorenz Esch, Limin Sun, Jens Haueisen, Matti Hamalainen. All rights reserved.</span></p>\n"
+            "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-weight:600;\">Copyright (C) 2015 Christoph Dinh, Limin Sun, Lorenz Esch, Chiran Doshi, Christos Papadelis, Daniel Baumgarten, Yoshio Okada, Jens Haueisen, Matti Hamalainen. All rights reserved.</span></p>\n"
             "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
             "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-s"
                                     "ize:8pt;\">For more information visit the MNE-CPP/MNE-X project on GitHub:</span></p>\n"
