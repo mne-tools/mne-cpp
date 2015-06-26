@@ -54,8 +54,13 @@ DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
         main.cpp \
+    form.cpp
 
 HEADERS += \
+    form.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
+
+FORMS += \
+    form.ui
