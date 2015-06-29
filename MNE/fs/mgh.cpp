@@ -42,7 +42,13 @@
 #include "fs_global.h"
 #include "mgh.h"
 #include "blendian.h"
-#include "3rdParty/miniz.c"
+
+
+//#include "3rdParty/miniz.c"
+#include "3rdParty/tinfl.c"
+#include <stdio.h>
+#include <limits.h>
+
 
 #include <QCoreApplication>
 #include <QString>
@@ -53,6 +59,16 @@
 #include <QTemporaryFile>
 
 #include <string>
+
+//=====================
+// maybe use quint8, ... instead
+typedef unsigned char uint8;
+typedef unsigned short uint16;
+typedef unsigned int uint;
+// later implement these as inline functions
+#define my_max(a,b) (((a) > (b)) ? (a) : (b))
+#define my_min(a,b) (((a) < (b)) ? (a) : (b))
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -327,10 +343,24 @@ int Mgh::unGz(QString gzFName, QString unGzFName)
 //    inFile.close();
 //    outFile.close();
 
-// usage of miniz functionality, derived from miniz example 3
 
-printf("miniz.c version: %s\n", MZ_VERSION);
 
+    // try to derive functionality from example 3
+    printf("miniz.c version: %s\n", MZ_VERSION);
+
+    int status;
+    FILE *pInfile, *pOutfile;
+    uint infile_size, outfile_size;
+    size_t in_buf_size;
+    uint8 *pCmp_data;
+    long file_loc;
+
+    FILE *pInfile = fopen(argv[1], "rb");
+    if (!pInfile)
+    {
+      printf("Failed opening input file!\n");
+      return EXIT_FAILURE;
+    }
 
 
 }

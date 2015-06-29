@@ -120,6 +120,13 @@ public:
     */
     static int unGz(QString gzFName, QString unGzFName);
 
+
+    //
+    inline static int tinfl_put_buf_func(const void* pBuf, int len, void *pUser)
+    {
+      return len == (int)fwrite(pBuf, 1, len, (FILE*)pUser);
+    }
+
 };
 
 } // NAMESPACE
