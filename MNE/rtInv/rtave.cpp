@@ -494,10 +494,21 @@ void RtAve::run()
             {
                 qint32 idx = m_qListStimChannelIdcs[i];
                 RowVectorXi stimSegment = rawSegment.row(idx).cast<int>();
-                int iMax = stimSegment.maxCoeff();
+                RowVectorXi::Index indexMaxCoeff;
+                int iMax = stimSegment.maxCoeff(&indexMaxCoeff);
 
                 if(iMax > 0)
                     t_qListStimuli.append(i);
+
+                //Find trigger using gradient/difference
+                double gradient = 0;
+
+                if(indexMaxCoeff-10<0)
+                    gradient = stimSegment(indexMaxCoeff) - stimSegment(indexMaxCoeff+10);
+                else
+                    gradient = stimSegment(indexMaxCoeff) - stimSegment(indexMaxCoeff-10);
+
+                std::cout<<"gradient: "<<gradient<<std::endl;
             }
 
             //

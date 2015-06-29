@@ -20,9 +20,6 @@
       <string>Content</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="1" column="0">
-       <widget class="QColumnView" name="columnView"/>
-      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label_4">
         <property name="text">
@@ -31,9 +28,6 @@
        </widget>
       </item>
      </layout>
-     <zorder>groupBox</zorder>
-     <zorder>label_4</zorder>
-     <zorder>columnView</zorder>
     </widget>
    </item>
    <item row="0" column="0">
