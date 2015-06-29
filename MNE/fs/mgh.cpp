@@ -47,8 +47,9 @@
 //#define MINIZ_HEADER_FILE_ONLY
 //#include "3rdParty/miniz.c"
 
-#define MINIZ_HEADER_FILE_ONLY
+extern "C" {
 #include "3rdParty/tinfl.c"
+}
 
 #include <stdio.h>
 #include <limits.h>
