@@ -105,6 +105,7 @@ Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerO
         fName = uncompFName;
     }
 
+
     // c-style file reading method
     QFile myFile(fName);
     myFile.open(QIODevice::ReadOnly);
@@ -330,147 +331,7 @@ int Mgh::unGz(QString gzFName, QString unGzFName)
 
 printf("miniz.c version: %s\n", MZ_VERSION);
 
-#define my_max(a,b) (((a) > (b)) ? (a) : (b))
-#define my_min(a,b) (((a) < (b)) ? (a) : (b))
 
-#define BUF_SIZE (1024 * 1024)
-
-static quint8 s_inbuf[BUF_SIZE];
-static quint8 s_outbuf[BUF_SIZE];
-
-// initialize vars
-int level = Z_BEST_COMPRESSION;
-z_stream stream;
-int p = 1;
-
-
-// convert qString filenames to const char *
-QByteArray gzByteArray = gzFName.toLatin1();
-const char *pSrc_filename = gzByteArray.data();
-QByteArray unGzByteArray = unGzFName.toLatin1();
-const char *pDst_filename = unGzByteArray.constData();
-printf("Input File: \"%s\"\nOutput File: \"%s\"\n", pSrc_filename, pDst_filename);
-
-// Open input file.
-FILE *pInfile = fopen(pSrc_filename, "rb");
-if (!pInfile)
-{
-  printf("Failed opening input file!\n");
-  return EXIT_FAILURE;
-}
-
-// Determine input file's size.
-fseek(pInfile, 0, SEEK_END);
-long file_loc = ftell(pInfile);
-fseek(pInfile, 0, SEEK_SET);
-
-if ((file_loc < 0) || (file_loc > INT_MAX))
-{
-   // This is not a limitation of miniz or tinfl.
-   printf("File is too large to be processed by this example.\n");
-   return EXIT_FAILURE;
-}
-
-uint infile_size = (uint)file_loc;
-printf("Input file size: %u\n", infile_size);
-
-// Open output file.
-FILE *pOutfile = fopen(pDst_filename, "wb");
-if (!pOutfile)
-{
-  printf("Failed opening output file!\n");
-  return EXIT_FAILURE;
-}
-
-// Init the z_stream
-memset(&stream, 0, sizeof(stream));
-stream.next_in = s_inbuf;
-stream.avail_in = 0;
-stream.next_out = s_outbuf;
-stream.avail_out = BUF_SIZE;
-
-// Decompression.
-uint infile_remaining = infile_size;
-
-if (inflateInit(&stream)) // this line is from example 3
-{
-  printf("inflateInit() failed!\n");
-  return EXIT_FAILURE;
-}
-
-//inflateInit2(&stream, 16+MAX_WBITS); // this line has to be executed for gzip
-
-//decompress(gzip_data, 16+MAX_WBITS); -> only gzip format
-//decompress(gzip_data, 32+MAX_WBITS); -> also automatic header detection
-
-
-//zlib.decompress(gzip_data, zlib.MAX_WBITS|32)
-
-//        fh = gzip.open('abc.gz', 'rb')
-//cdata = fh.read()
-//fh.close()
-
-for ( ; ; )
-{
-  int status;
-  if (!stream.avail_in)
-  {
-    // Input buffer is empty, so read more bytes from input file.
-    uint n = my_min(BUF_SIZE, infile_remaining);
-
-    if (fread(s_inbuf, 1, n, pInfile) != n)
-    {
-      printf("Failed reading from input file!\n");
-      return EXIT_FAILURE;
-    }
-
-    stream.next_in = s_inbuf;
-    stream.avail_in = n;
-
-    infile_remaining -= n;
-  }
-
-  status = inflate(&stream, Z_SYNC_FLUSH);
-
-  if ((status == Z_STREAM_END) || (!stream.avail_out))
-  {
-    // Output buffer is full, or decompression is done, so write buffer to output file.
-    uint n = BUF_SIZE - stream.avail_out;
-    if (fwrite(s_outbuf, 1, n, pOutfile) != n)
-    {
-      printf("Failed writing to output file!\n");
-      return EXIT_FAILURE;
-    }
-    stream.next_out = s_outbuf;
-    stream.avail_out = BUF_SIZE;
-  }
-
-  if (status == Z_STREAM_END)
-    break;
-  else if (status != Z_OK)
-  {
-    printf("inflate() failed with status %i!\n", status);
-    return EXIT_FAILURE;
-  }
-}
-
-if (inflateEnd(&stream) != Z_OK)
-{
-  printf("inflateEnd() failed!\n");
-  return EXIT_FAILURE;
-}
-
-fclose(pInfile);
-if (EOF == fclose(pOutfile))
-{
-  printf("Failed writing to output file!\n");
-  return EXIT_FAILURE;
-}
-
-printf("Total input bytes: %u\n", (mz_uint32)stream.total_in);
-printf("Total output bytes: %u\n", (mz_uint32)stream.total_out);
-printf("Success.\n");
-return EXIT_SUCCESS;
 
 }
 

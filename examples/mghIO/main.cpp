@@ -99,6 +99,7 @@ int main()
     // initialize vars to call loadMGH function
     QString fName = "D:/Repos/mne-cpp/bin/MNE-sample-data/subjects/sample/mri/orig/001.mgz";         // where /local/bin is a symlink to /usr/bin
 //    QDir fDir(fName);
+//    QFileInfo ...
 //    QString fNameCanonical = fDir.canonicalPath();
 
     vector<int> slices; // indices of the sclices z to read
