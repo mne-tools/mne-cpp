@@ -44,8 +44,12 @@
 #include "blendian.h"
 
 
+//#define MINIZ_HEADER_FILE_ONLY
 //#include "3rdParty/miniz.c"
+
+#define MINIZ_HEADER_FILE_ONLY
 #include "3rdParty/tinfl.c"
+
 #include <stdio.h>
 #include <limits.h>
 
@@ -343,26 +347,88 @@ int Mgh::unGz(QString gzFName, QString unGzFName)
 //    inFile.close();
 //    outFile.close();
 
+    // try to derive functionality from example 4
 
+    // convert qString filename to const char *
+    QByteArray gzByteArray = gzFName.toLatin1();
+    const char *pSrc_filename = gzByteArray.data();
 
-    // try to derive functionality from example 3
-    printf("miniz.c version: %s\n", MZ_VERSION);
-
-    int status;
-    FILE *pInfile, *pOutfile;
-    uint infile_size, outfile_size;
-    size_t in_buf_size;
-    uint8 *pCmp_data;
-    long file_loc;
-
-    FILE *pInfile = fopen(argv[1], "rb");
+    // Open input file.
+    FILE *pInfile = fopen(pSrc_filename, "rb");
     if (!pInfile)
     {
       printf("Failed opening input file!\n");
       return EXIT_FAILURE;
     }
 
+    // Determine input file's size.
+    fseek(pInfile, 0, SEEK_END);
+    long file_loc = ftell(pInfile);
+    fseek(pInfile, 0, SEEK_SET);
 
+    // check file size limitation
+    if ((file_loc < 0) || (file_loc > INT_MAX))
+    {
+       // This is not a limitation of miniz or tinfl, but this example.
+       printf("File is too large to be processed.\n");
+       return EXIT_FAILURE;
+    }
+
+    uint infile_size = (uint)file_loc;
+
+    uint8 *pCmp_data = (uint8 *)malloc(infile_size);
+    if (!pCmp_data)
+    {
+      printf("Out of memory!\n");
+      return EXIT_FAILURE;
+    }
+    if (fread(pCmp_data, 1, infile_size, pInfile) != infile_size)
+    {
+      printf("Failed reading input file!\n");
+      return EXIT_FAILURE;
+    }
+
+    // convert qString filename to const char *
+    QByteArray unGzByteArray = unGzFName.toLatin1();
+    const char *pDst_filename = unGzByteArray.constData();
+
+    // Open output file.
+    FILE *pOutfile = fopen(pDst_filename, "wb");
+    if (!pOutfile)
+    {
+      printf("Failed opening output file!\n");
+      return EXIT_FAILURE;
+    }
+
+    // print filenames and size
+    printf("Input File: \"%s\"\nOutput File: \"%s\"\n", pSrc_filename, pDst_filename);
+    printf("Input file size: %u\n", infile_size);
+
+    size_t in_buf_size = infile_size;
+    int status = tinfl_decompress_mem_to_callback(pCmp_data,
+                                                  &in_buf_size,
+                                                  tinfl_put_buf_func,
+                                                  pOutfile,
+                                                  TINFL_FLAG_PARSE_ZLIB_HEADER);
+    if (!status)
+    {
+      printf("tinfl_decompress_mem_to_callback() failed with status %i!\n", status);
+      return EXIT_FAILURE;
+    }
+
+    uint outfile_size = ftell(pOutfile);
+
+    fclose(pInfile);
+    if (EOF == fclose(pOutfile))
+    {
+      printf("Failed writing to output file!\n");
+      return EXIT_FAILURE;
+    }
+
+    printf("Total input bytes: %u\n", (uint)in_buf_size);
+    printf("Total output bytes: %u\n", outfile_size);
+    printf("Success.\n");
+    return EXIT_SUCCESS;
 }
 
 //*************************************************************************************************************
