@@ -39,7 +39,7 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-QT       += sql
+QT       += sql widgets
 
 CONFIG   += console
 CONFIG   -= app_bundle
@@ -54,10 +54,10 @@ DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
         main.cpp \
-    form.cpp
+    #form.cpp
 
 HEADERS += \
-    form.h
+    #form.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

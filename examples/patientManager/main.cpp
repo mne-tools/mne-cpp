@@ -47,6 +47,7 @@
 #include <QCoreApplication>
 #include <QtSql>
 #include <QDebug>
+#include <QtWidgets>
 
 
 //*************************************************************************************************************
@@ -59,6 +60,77 @@
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
+QSqlDatabase db;
+
+void initializeModel(QSqlRelationalTableModel *model)
+{
+    model->setTable("Patients");
+
+    model->setEditStrategy(QSqlTableModel::OnFieldChange);
+//    model->setRelation(2, QSqlRelation("city", "id", "name"));
+
+//    model->setRelation(3, QSqlRelation("country", "id", "name"));
+
+    model->setHeaderData(0, Qt::Horizontal, QObject::tr("ID"));
+    model->setHeaderData(1, Qt::Horizontal, QObject::tr("Gender"));
+    model->setHeaderData(2, Qt::Horizontal, QObject::tr("Birthdate"));
+    model->setHeaderData(3, Qt::Horizontal, QObject::tr("Name"));
+    model->setHeaderData(3, Qt::Horizontal, QObject::tr("Handedness"));
+    model->setHeaderData(3, Qt::Horizontal, QObject::tr("Comments"));
+
+    model->select();
+}
+
+QTableView *createView(const QString &title, QSqlTableModel *model)
+{
+    QTableView *view = new QTableView;
+    view->setModel(model);
+    view->setItemDelegate(new QSqlRelationalDelegate(view));
+    view->setWindowTitle(title);
+    return view;
+}
+
+void createRelationalTables()
+{
+//    QSqlQuery query;
+//    query.exec("create table employee(id int primary key, name varchar(20), city int, country int)");
+//    query.exec("insert into employee values(1, 'Espen', 5000, 47)");
+//    query.exec("insert into employee values(2, 'Harald', 80000, 49)");
+//    query.exec("insert into employee values(3, 'Sam', 100, 1)");
+
+//    query.exec("create table city(id int, name varchar(20))");
+//    query.exec("insert into city values(100, 'San Jose')");
+//    query.exec("insert into city values(5000, 'Oslo')");
+//    query.exec("insert into city values(80000, 'Munich')");
+
+//    query.exec("create table country(id int, name varchar(20))");
+//    query.exec("insert into country values(1, 'USA')");
+//    query.exec("insert into country values(47, 'Norway')");
+//    query.exec("insert into country values(49, 'Germany')");
+}
+
+bool createConnection()
+{
+    db = QSqlDatabase::addDatabase("QODBC");
+
+    QString serverName = "LORENZ-PC";
+    QString dbName = "Patients";
+    QString dsn = QString("DRIVER={SQL Server};SERVER=%1;DATABASE=%2;UID=superadmin;PWD=lollo1").arg(serverName).arg(dbName);
+
+    db.setDatabaseName(dsn);
+
+    if(db.open()) {
+        qDebug()<<"database opened";
+    } else {
+        qDebug()<< "Error: " <<db.lastError().text();
+        return false;
+    }
+
+    qDebug()<<db.port();
+
+    return true;
+}
+
 
 //=============================================================================================================
 /**
@@ -71,44 +143,60 @@
 */
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    QApplication app(argc, argv);
 
-    qDebug() << "Drivers: "<<QSqlDatabase::drivers();
+    if (!createConnection())
+        return 1;
 
-    QString serverName = "LORENZ-PC";
-    QString dbName = "Patients";
+    createRelationalTables();
 
-    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
+    QSqlRelationalTableModel model;
 
-    QString dsn = QString("DRIVER={SQL Server};SERVER=%1;DATABASE=%2;UID=babyMEG;PWD=bayMEG").arg(serverName).arg(dbName);
+    initializeModel(&model);
 
-    db.setDatabaseName(dsn);
+    QTableView *view = createView(QObject::tr("Relational Table Model"), &model);
+    view->show();
 
-    if(db.open()) {
-        qDebug()<<"database opened";
+    return app.exec();
 
-        QString sQuery = "INSERT INTO [Patients].[dbo].[Patients] ([ID],[Name])VALUES(:ID,:name)";
-        //QString sQuery = "SELECT TOP 1000 [Name],[NumberPatients],[Comments]FROM [Patients].[dbo].[Groups]";
+//    QCoreApplication a(argc, argv);
 
-        int ID = 123455;
-        QSqlQuery qry;
-        qry.prepare(sQuery);
-        qry.bindValue(":ID",ID);
-        qry.bindValue(":name","Heather");
+//    qDebug() << "Drivers: "<<QSqlDatabase::drivers();
 
-        if(qry.exec()) {
-            while(qry.next()){
-                qDebug()<<qry.value(0).toString()<<qry.value(1).toString()<<qry.value(2).toString();
-            }
-        } else {
-            qDebug()<< "Error: " <<db.lastError().text();
-        }
+//    QString serverName = "LORENZ-PC";
+//    QString dbName = "Patients";
 
-        qDebug()<<"Closing database";
+//    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
 
-        db.close();
-    } else
-        qDebug()<< "Error: " <<db.lastError().text();
+//    QString dsn = QString("DRIVER={SQL Server};SERVER=%1;DATABASE=%2;UID=superadmin;PWD=lollo1").arg(serverName).arg(dbName);
 
-    return a.exec();
+//    db.setDatabaseName(dsn);
+
+//    if(db.open()) {
+//        qDebug()<<"database opened";
+
+//        QString sQuery = "INSERT INTO [Patients].[dbo].[Patients] ([ID],[Name])VALUES(:ID,:name)";
+//        //QString sQuery = "SELECT TOP 1000 [Name],[NumberPatients],[Comments]FROM [Patients].[dbo].[Groups]";
+
+//        int ID = 123455;
+//        QSqlQuery qry;
+//        qry.prepare(sQuery);
+//        qry.bindValue(":ID",ID);
+//        qry.bindValue(":name","Heather");
+
+//        if(qry.exec()) {
+//            while(qry.next()){
+//                qDebug()<<qry.value(0).toString()<<qry.value(1).toString()<<qry.value(2).toString();
+//            }
+//        } else {
+//            qDebug()<< "Error: " <<db.lastError().text();
+//        }
+
+//        qDebug()<<"Closing database";
+
+//        db.close();
+//    } else
+//        qDebug()<< "Error: " <<db.lastError().text();
+
+//    return a.exec();
 }
