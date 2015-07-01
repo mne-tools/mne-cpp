@@ -683,28 +683,42 @@ bool BabyMEG::readBadChannels()
     //
     // Bad Channels
     //
-    QFile t_badChannelsFile(m_sBadChannels);
+    //Read bad channels from header/projection fif
+    QFile t_headerFiffFile(m_sFiffHeader);
 
-    if (!t_badChannelsFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    if(!t_headerFiffFile.exists()) {
+        printf("Could not open fif file for copying bad channels to babyMEG fiff_info\n");
         return false;
-
-    printf("Reading bad channels from %s...\n", m_sBadChannels.toUtf8().constData());
-
-    QTextStream in(&t_badChannelsFile);
-    qint32 count = 0;
-    QStringList t_sListbads;
-    while (!in.atEnd()) {
-        QString channel = in.readLine();
-        if(channel.isEmpty())
-            continue;
-        ++count;
-        printf("Channel %i: %s\n",count,channel.toUtf8().constData());
-        t_sListbads << channel;
     }
 
-    m_pFiffInfo->bads = t_sListbads;
+    FiffRawData raw(t_headerFiffFile);
+    m_pFiffInfo->bads = raw.info.bads;
 
     return true;
+
+    //Read bad channels from
+//    QFile t_badChannelsFile(m_sBadChannels);
+
+//    if (!t_badChannelsFile.open(QIODevice::ReadOnly | QIODevice::Text))
+//        return false;
+
+//    printf("Reading bad channels from %s...\n", m_sBadChannels.toUtf8().constData());
+
+//    QTextStream in(&t_badChannelsFile);
+//    qint32 count = 0;
+//    QStringList t_sListbads;
+//    while (!in.atEnd()) {
+//        QString channel = in.readLine();
+//        if(channel.isEmpty())
+//            continue;
+//        ++count;
+//        printf("Channel %i: %s\n",count,channel.toUtf8().constData());
+//        t_sListbads << channel;
+//    }
+
+//    m_pFiffInfo->bads = t_sListbads;
+
+//    return true;
 }
 
 
