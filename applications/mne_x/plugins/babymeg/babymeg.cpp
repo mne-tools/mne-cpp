@@ -402,6 +402,10 @@ void BabyMEG::toggleRecordingFile()
                 return;
         }
 
+        //Set all projectors to zero before writing to file because we always write the raw data
+        for(int i = 0; i<m_pFiffInfo->projs.size(); i++)
+            m_pFiffInfo->projs[i].active = false;
+
         m_pOutfid = Fiff::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals);
         fiff_int_t first = 0;
         m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
