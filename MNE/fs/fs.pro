@@ -85,10 +85,10 @@ SOURCES += \
     surface.cpp \
     annotationset.cpp \
     surfaceset.cpp \
-    blendian.cpp \
     mri.cpp \
     mgh.cpp \
-    3rdParty/miniz.c
+    3rdParty/miniz.c \
+    blendian.cpp
 
 
 HEADERS += \
@@ -99,9 +99,9 @@ HEADERS += \
     surface.h \
     annotationset.h \
     surfaceset.h \
-    blendian.h \
     mri.h \
     mgh.h \
+    blendian.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
@@ -114,3 +114,5 @@ header_files.path = $${MNE_INCLUDE_DIR}/fs
 INSTALLS += header_files
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+
+DISTFILES +=

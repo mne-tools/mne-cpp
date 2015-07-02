@@ -52,6 +52,7 @@ extern "C" {
 }
 
 #include <stdio.h>
+#include <iostream>
 #include <limits.h>
 
 
@@ -252,66 +253,117 @@ Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerO
         mri.allocSequence(nDimX, nDimY, nDimZ, type, nFrames);
         mri.dof = dof;
 
-//        for (frame=start_frame; frame<=end_frame; frame++)
-//        {
-//            if (fread(buf, sizeof(char), bytes, fp) != bytes)
-//            {
-//                fclose(fp);
-//                free(buf);
+        int x, y, z, i, ival;
+        short sval;
+        float fval;
+        for (frame=start_frame; frame<=end_frame; frame++)
+        {
+            for (z=0; z<nDimZ; z++)
+            {
+                if (fread(buf, sizeof(char), nBytesPerSlice, fp) != nBytesPerSlice)
+                {
+                    fclose(fp);
+                    free(buf);
+                    qDebug() << "loadMGH(" << fName << "): could not read "
+                             << nBytesPerSlice << "at slice" << z;
+                }
 
-//            }
-//        }
-
-//        // ------ Read in the entire volume -------
-//        switch (type)
-//        {
-//        case MRI_INT:
-//        for (i = y = 0 ; y < height ; y++)
-//          {
-//            for (x = 0 ; x < width ; x++, i++)
-//              {
-//                ival = orderIntBytes(((int *)buf)[i]) ;
-//                MRIIseq_vox(mri,x,y,z,frame-start_frame) = ival ;
-//              }
-//          }
-//        break ;
-//        case MRI_SHORT:
-//        for (i = y = 0 ; y < height ; y++)
-//          {
-//            for (x = 0 ; x < width ; x++, i++)
-//              {
-//                sval = orderShortBytes(((short *)buf)[i]) ;
-//                MRISseq_vox(mri,x,y,z,frame-start_frame) = sval ;
-//              }
-//          }
-//        break ;
-//        case MRI_TENSOR:
-//        case MRI_FLOAT:
-//        for (i = y = 0 ; y < height ; y++)
-//          {
-//            for (x = 0 ; x < width ; x++, i++)
-//              {
-//                fval = orderFloatBytes(((float *)buf)[i]) ;
-//                MRIFseq_vox(mri,x,y,z,frame-start_frame) = fval ;
-//              }
-//          }
-//        break ;
-//        case MRI_UCHAR:
-//        local_buffer_to_image(buf, mri, z, frame-start_frame) ;
-//        break ;
-//        default:
-//        errno = 0;
-//        ErrorReturn(NULL,
-//                    (ERROR_UNSUPPORTED, "mghRead: unsupported type %d",
-//                     mri->type)) ;
-//        break ;
+                // ------ Read in the entire volume -------
+                switch (type)
+                {
+                case MRI_INT:
+                for (i = y = 0 ; y < nDimY ; y++)
+                  {
+                    for (x = 0 ; x < nDimX ; x++, i++)
+                      {
+                        ival = BLEndian::swapInt(((int *)buf)[i]);
+                        /* voxel access macro */
+                        // ((int *) mri->slices[z+(n)*mri->depth][y])[x]
+//                        MRIIseq_vox(mri,x,y,z,frame-start_frame) = ival;
+                        std::cout << ival;
+                      }
+                  }
+                break ;
+                case MRI_SHORT:
+                for (i = y = 0 ; y < nDimY ; y++)
+                  {
+                    for (x = 0 ; x < nDimX ; x++, i++)
+                      {
+                        sval = BLEndian::swapShort(((short *)buf)[i]);
+                        /* voxel access macro */
+                        //((short*)mri->slices[z+(n)*mri->depth][y])[x]
+//                        MRISseq_vox(mri,x,y,z,frame-start_frame) = sval;
+                        std::cout << sval;
+                      }
+                  }
+                break ;
+                case MRI_TENSOR:
+                case MRI_FLOAT:
+                for (i = y = 0 ; y < nDimY ; y++)
+                  {
+                    for (x = 0 ; x < nDimX ; x++, i++)
+                      {
+                        fval = BLEndian::swapFloat(((float *)buf)[i]);
+                        /* voxel access macro */
+                        // (((float*)(mri->slices[z+((n)*mri->depth)][y]))[x])
+//                        MRIFseq_vox(mri,x,y,z,frame-start_frame) = fval;
+                        std::cout << fval;
+                      }
+                  }
+                break;
+                case MRI_UCHAR:
+                //local_buffer_to_image(buf, mri, z, frame-start_frame); // todo!!
+                break;
+                default:
+                qDebug() << "loadMGH: unsupported type" << mri.type; // return error number!?
+                break;
+                }
+            }
+        }
+        if (buf)
+            free(buf);
     }
 
+    if(ras_good_flag > 0)
+    {
+        // write delta
+        mri.xSize = xSize;
+        mri.ySize = ySize;
+        mri.zSize = zSize;
 
+        // Mdc
+        mri.x_r = x_r;
+        mri.x_a = x_a;
+        mri.x_s = x_s;
 
+        mri.y_r = y_r;
+        mri.y_a = y_a;
+        mri.y_s = y_s;
 
+        mri.z_r = z_r;
+        mri.z_a = z_a;
+        mri.z_s = z_s;
 
+        mri.c_r = c_r;
+        mri.c_a = c_a;
+        mri.c_s = c_s;
 
+        mri.ras_good_flag = 1;
+    }
+    else
+    {
+        qDebug() << "-----------------------------------------------------------------\n"
+                 << "Could not find the direction cosine information.\n"
+                 << "Will use the CORONAL orientation.\n"
+                 << "If not suitable, please provide the information in"
+                 << fName
+                 << ".\n"
+                 << "-----------------------------------------------------------------\n";
+        //todo set direction cosine (mri, MRI_CORONAL);
+    }
+    // read TR, Flip, TE, TI, FOV
+
+    // tag reading
 
     fclose(fp);
 
@@ -348,7 +400,7 @@ int Mgh::unGz(QString gzFName, QString unGzFName)
 //    inFile.close();
 //    outFile.close();
 
-    // try to derive functionality from example 4
+    // try to derive functionality from example 4 - "0" bytes in file, return error "0"
 
     // convert qString filename to const char *
     QByteArray gzByteArray = gzFName.toLatin1();

@@ -70,10 +70,12 @@ namespace FSLIB
 
 #define MRI_UCHAR 0
 #define MRI_INT 1
-#define MRI_LONG 2;
+#define MRI_LONG 2
 #define MRI_FLOAT 3
 #define MRI_SHORT 4
 #define MRI_BITMAP 5
+#define MRI_TENSOR 6
+
 
 //=============================================================================================================
 /**
