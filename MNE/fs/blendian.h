@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BLEndian class declaration.
+* @brief     BLEndian class declaration. Ported from machine.h in FreeSurfer.
 *
 */
 
@@ -60,6 +60,8 @@ public:
     static short freadShort(FILE *fp);
     static float swapFloat(float source);
     static float freadFloat(FILE *fp);
+    static float freadFloatEx(float *pf, FILE *fp);
+
 };
 
 } // NAMESPACE

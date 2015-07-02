@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BLEndian class implementation.
+* @brief     BLEndian class implementation. Ported from machine.c in FreeSurfer.
 *
 */
 
@@ -137,6 +137,16 @@ float BLEndian::freadFloat(FILE *fp)
     size_f = fread(&f, sizeof(float), 1, fp);
     f = swapFloat(f);
     return f;
+}
+
+//*************************************************************************************************************
+
+float BLEndian::freadFloatEx(float *pf, FILE *fp)
+{
+    int size_pf;
+    size_pf = fread(pf, sizeof(float), 1, fp);
+    *pf = swapFloat(*pf);
+    return size_pf;
 }
 
 //*************************************************************************************************************

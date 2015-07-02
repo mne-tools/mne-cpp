@@ -175,7 +175,7 @@ public:
     MriRegion roi;
     int dof;
 //    double        mean ;
-//    double        flip_angle ;  /* in radians */
+    double flip_angle;  /* in radians */
 
     void* tag_data; /* saved tag data */
     int tag_data_size; /* size of saved tag data */
@@ -193,7 +193,6 @@ public:
     * @param[in]  z  depth
     * @param[in]  t  type
     */
-    // width, height, depth, type, nFrames
     void allocHeader(int x, int y, int z, int t);
 
     //=========================================================================================================

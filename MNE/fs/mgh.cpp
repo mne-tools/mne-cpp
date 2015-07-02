@@ -180,7 +180,6 @@ Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerO
         c_r = BLEndian::freadFloat(fp); c_a = BLEndian::freadFloat(fp); c_s = BLEndian::freadFloat(fp);
     }
 
-
     // determine number of bytes per voxel
     int nBytesPerVox;
     switch (type)
@@ -202,6 +201,11 @@ Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerO
             nFrames = 9;
             break;
     }
+
+    // define vars for temporal voxel values in different data types
+    int iVal;
+    short sVal;
+    float fVal;
 
     int nBytesPerSlice = nDimX*nDimY*nBytesPerVox; // number of bytes per slice
     int nVol = nDimX*nDimY*nDimZ*nFrames; // number of volume elements over time
@@ -253,9 +257,7 @@ Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerO
         mri.allocSequence(nDimX, nDimY, nDimZ, type, nFrames);
         mri.dof = dof;
 
-        int x, y, z, i, ival;
-        short sval;
-        float fval;
+        int x, y, z, i;
         for (frame=start_frame; frame<=end_frame; frame++)
         {
             for (z=0; z<nDimZ; z++)
@@ -276,11 +278,11 @@ Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerO
                   {
                     for (x = 0 ; x < nDimX ; x++, i++)
                       {
-                        ival = BLEndian::swapInt(((int *)buf)[i]);
+                        iVal = BLEndian::swapInt(((int *)buf)[i]);
                         /* voxel access macro */
                         // ((int *) mri->slices[z+(n)*mri->depth][y])[x]
 //                        MRIIseq_vox(mri,x,y,z,frame-start_frame) = ival;
-                        std::cout << ival;
+                        std::cout << iVal << " ";
                       }
                   }
                 break ;
@@ -289,11 +291,11 @@ Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerO
                   {
                     for (x = 0 ; x < nDimX ; x++, i++)
                       {
-                        sval = BLEndian::swapShort(((short *)buf)[i]);
+                        sVal = BLEndian::swapShort(((short *)buf)[i]);
                         /* voxel access macro */
                         //((short*)mri->slices[z+(n)*mri->depth][y])[x]
 //                        MRISseq_vox(mri,x,y,z,frame-start_frame) = sval;
-                        std::cout << sval;
+                        std::cout << sVal << " ";
                       }
                   }
                 break ;
@@ -303,11 +305,11 @@ Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerO
                   {
                     for (x = 0 ; x < nDimX ; x++, i++)
                       {
-                        fval = BLEndian::swapFloat(((float *)buf)[i]);
+                        fVal = BLEndian::swapFloat(((float *)buf)[i]);
                         /* voxel access macro */
                         // (((float*)(mri->slices[z+((n)*mri->depth)][y]))[x])
 //                        MRIFseq_vox(mri,x,y,z,frame-start_frame) = fval;
-                        std::cout << fval;
+                        std::cout << fVal << " ";
                       }
                   }
                 break;
@@ -359,11 +361,22 @@ Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerO
                  << fName
                  << ".\n"
                  << "-----------------------------------------------------------------\n";
-        //todo set direction cosine (mri, MRI_CORONAL);
+        //todo: set direction cosine (mri, MRI_CORONAL);
     }
     // read TR, Flip, TE, TI, FOV
+    if (BLEndian::freadFloatEx(&mri.tR, fp)){
+      if (BLEndian::freadFloatEx(&fVal, fp))
+        {
+          mri.flip_angle = fVal;
+          // flip_angle is double. I cannot use the same trick.
+          if (BLEndian::freadFloatEx(&mri.tE, fp))
+            if (BLEndian::freadFloatEx(&mri.tI, fp))
+              BLEndian::freadFloatEx(&mri.fov, fp);
+        }
+    }
 
     // tag reading
+    //  todo!! -> transformations
 
     fclose(fp);
 
@@ -400,7 +413,7 @@ int Mgh::unGz(QString gzFName, QString unGzFName)
 //    inFile.close();
 //    outFile.close();
 
-    // try to derive functionality from example 4 - "0" bytes in file, return error "0"
+    // try to derive functionality from miniz example 4 - "0" bytes in file, return error "0"
 
     // convert qString filename to const char *
     QByteArray gzByteArray = gzFName.toLatin1();
