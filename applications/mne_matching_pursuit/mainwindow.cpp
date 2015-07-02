@@ -43,8 +43,8 @@
 #include <math.h>
 #include <fiff/fiff.h>
 #include <mne/mne.h>
-#include "disp/colormap.h"
 
+#include "disp/colormap.h"
 #include "math.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -3284,19 +3284,33 @@ void MainWindow::on_actionTest_triggered()
         ui->tw_main->tabBar()->setTabButton(1, QTabBar::LeftSide, extendedButton);
         connect(extendedButton, SIGNAL (released()), this, SLOT (on_extend_tab_button()));
 
-        MatrixXd test_matrix = MatrixXd::Random(600, 600);
-        //cout << test_matrix;
-        QImage *test_image = new QImage(test_matrix.rows(), test_matrix.cols(), QImage::Format_RGB32);
-        QColor color;
-        for ( int y = 0; y < test_matrix.rows(); y++ )                    
-            for ( int x = 0; x < test_matrix.cols(); x++ )
-            {
-                color.setRgb(ColorMap::hotR(abs(test_matrix(x,y))), ColorMap::hotG(abs(test_matrix(x,y))), ColorMap::hotB(abs(test_matrix(x,y))));
-                test_image->setPixel(x, y, color.rgb());
-            }
 
-        plot_window->ui->l_pixel->setPixmap(QPixmap::fromImage(*test_image));
+        if(_adaptive_atom_list.count() > 0 && _adaptive_atom_list.first().count() > 0)
+        {
+            GaborAtom atom  = _adaptive_atom_list.first().first();
+            MatrixXd tf_matrix = MatrixXd::Zero(atom.sample_count, atom.sample_count);
+            qreal u = floor(atom.sample_count / 2);
+            for(int t = 0; t < atom.sample_count; t++)
+                for(int f = 0; f < u - 1; f++)
+                {
+                    qreal v = -2 * PI * pow((t - u) / atom.scale, 2) + pow(atom.scale * ((f * PI / atom.sample_count * 2) - (atom.phase * PI / atom.sample_count * 2)) / 2 / PI, 2);
+                    tf_matrix(f, t) = 0.5 * 2 * qExp(v);
+                }
 
+
+            // MatrixXd test_matrix = MatrixXd::Random(600, 600);
+            //cout << test_matrix;
+            QImage *test_image = new QImage(tf_matrix.rows(), tf_matrix.cols(), QImage::Format_RGB32);
+            QColor color;
+            for ( int y = 0; y < tf_matrix.rows(); y++ )
+                for ( int x = 0; x < tf_matrix.cols(); x++ )
+                {
+                    color.setRgb(ColorMap::hotR(abs(tf_matrix(x,y))), ColorMap::hotG(abs(tf_matrix(x,y))), ColorMap::hotB(abs(tf_matrix(x,y))));
+                    test_image->setPixel(x, y, color.rgb());
+                }
+
+            plot_window->ui->l_pixel->setPixmap(QPixmap::fromImage(*test_image));
+        }
     }
     if(ui->tw_main->count() > 2)
     {
