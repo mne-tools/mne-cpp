@@ -117,15 +117,14 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     m_pActionSelectModality->setStatusTip(tr("Shows the covariance modality selection widget (F12)"));
     connect(m_pActionSelectModality, &QAction::triggered, this, &RealTimeEvokedWidget::showModalitySelectionWidget);
     addDisplayAction(m_pActionSelectModality);
-
     m_pActionSelectModality->setVisible(false);
 
     m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F12)"),this);
     m_pActionSelectSensors->setShortcut(tr("F12"));
     m_pActionSelectSensors->setStatusTip(tr("Shows the region selection widget (F12)"));
-    m_pActionSelectSensors->setVisible(false);
     connect(m_pActionSelectSensors, &QAction::triggered, this, &RealTimeEvokedWidget::showSensorSelectionWidget);
     addDisplayAction(m_pActionSelectSensors);
+    m_pActionSelectSensors->setVisible(true);
 
     //set vertical layout
     m_pRteLayout = new QVBoxLayout(this);
@@ -153,7 +152,6 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     FiffInfo::SPtr fiffPointer = FiffInfo::SPtr(&m_fiffInfo);
     m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(this, fiffPointer));
     m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel.data()));
-
 }
 
 
