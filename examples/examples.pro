@@ -53,6 +53,7 @@ SUBDIRS += \
     fiffIO \
     makeLayout\
     readBEM\
+    patientManager
 
 contains(MNECPP_CONFIG, withGui) {
 	SUBDIRS +=
