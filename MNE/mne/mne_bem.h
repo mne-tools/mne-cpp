@@ -172,31 +172,6 @@ public:
     */
     static void MNEBem::get_EigentoData(MatrixX3f &src, char* pathAndName);
 
-private:
-
-    //=========================================================================================================
-    /**
-    * Implementation of the   mne_add_triangle_data function in mne_add_geometry_info.c
-    *
-    * Completes triangulation info
-    *
-    * @param [in, out] p_BemSurf   Bem Surface to be completed
-    *
-    * @return true if succeeded, false otherwise
-    */
-    static bool add_triangle_data(MNEBemSurface& p_BemSurf);
-
-    //=========================================================================================================
-    /**
-    * Implementation of the add_vertex_normals function in mne_add_geometry_info.c
-    *
-    * Completes triangulation info
-    *
-    * @param [in, out] p_BemSurf   Bem Surface to be completed
-    *
-    * @return true if succeeded, false otherwise
-    */
-    static bool add_vertex_normals(MNEBemSurface& p_BemSurf);
 
 protected:
 

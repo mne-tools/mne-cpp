@@ -43,7 +43,7 @@
 
 #include <utils/mnemath.h>
 #include <fs/label.h>
-#include <fstream>
+
 
 
 //*************************************************************************************************************
@@ -154,9 +154,9 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirT
             MNEBemSurface  p_BemSurface;
             printf("\tReading a BEM surface...");
             MNEBem::read_bem_surface(p_pStream.data(), bemsurf[k], p_BemSurface);
-            add_triangle_data(p_BemSurface);
+            p_BemSurface.add_triangle_data();
              if (add_geom)
-                add_vertex_normals(p_BemSurface);
+                p_BemSurface.add_vertex_normals();
             printf("\t[done]\n" );
 
             p_Bem.m_qListBemSurface.append(p_BemSurface);
@@ -192,7 +192,8 @@ bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, 
     //=====================================================================
     if(!p_Tree.find_tag(p_pStream, FIFF_BEM_SURF_NNODE, t_pTag))
     {
-        qCritical() << "np not found!";
+        p_pStream->device()->close();
+        std::cout << "np not found!";
         return false;
     }
     else
@@ -203,7 +204,8 @@ bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, 
     //=====================================================================
     if(!p_Tree.find_tag(p_pStream, FIFF_BEM_SURF_NTRI, t_pTag))
     {
-        qCritical() << "ntri not found!";
+        p_pStream->device()->close();
+        std::cout << "ntri not found!";
         return false;
     }
     else
@@ -214,8 +216,7 @@ bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, 
     //=====================================================================
     if(!p_Tree.find_tag(p_pStream, FIFF_MNE_COORD_FRAME, t_pTag))
     {
-        qWarning()
-                        << "FIFF_MNE_COORD_FRAME not found, trying FIFF_BEM_COORD_FRAME.";
+        qWarning() << "FIFF_MNE_COORD_FRAME not found, trying FIFF_BEM_COORD_FRAME.";
         if(!p_Tree.find_tag(p_pStream, FIFF_BEM_COORD_FRAME, t_pTag))
         {
             p_pStream->device()->close();
@@ -260,7 +261,7 @@ bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, 
     {
         if(!p_Tree.find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag))
         {
-            p_pStream->device()->close();       //ToDo: add geom setzen. Dann werden nn berechnet und müssen nicht ausgelesen werden.
+            p_pStream->device()->close();
             std::cout << "Vertex normals not found."; //ToDo: throw error.
             return false;
         }
@@ -325,104 +326,3 @@ bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, 
 
     return true;
 }
-
-bool MNEBem::add_triangle_data(MNEBemSurface& p_BemSurf)
-{
-    //
-    //   Main triangulation
-    //
-    printf("\tCompleting triangulation info...");
-    p_BemSurf.tri_cent = MatrixX3d::Zero(p_BemSurf.ntri,3);
-    p_BemSurf.tri_nn = MatrixX3d::Zero(p_BemSurf.ntri,3);
-    p_BemSurf.tri_area = VectorXd::Zero(p_BemSurf.ntri);
-
-    Matrix3d r;
-    Vector3d a, b;
-    int k = 0;
-    float size = 0;
-    for (qint32 i = 0; i < p_BemSurf.ntri; ++i)
-    {
-        for ( qint32 j = 0; j < 3; ++j)
-        {
-            k = p_BemSurf.tris(i, j);
-
-            r(j,0) = p_BemSurf.rr(k, 0);
-            r(j,1) = p_BemSurf.rr(k, 1);
-            r(j,2) = p_BemSurf.rr(k, 2);
-
-            p_BemSurf.tri_cent(i, 0) += p_BemSurf.rr(k, 0);
-            p_BemSurf.tri_cent(i, 1) += p_BemSurf.rr(k, 1);
-            p_BemSurf.tri_cent(i, 2) += p_BemSurf.rr(k, 2);
-        }
-        p_BemSurf.tri_cent.row(i) /= 3.0f;
-
-        //cross product {cross((r2-r1),(r3-r1))}
-        a = r.row(1) - r.row(0 );
-        b = r.row(2) - r.row(0);
-        p_BemSurf.tri_nn(i,0) = a(1)*b(2)-a(2)*b(1);
-        p_BemSurf.tri_nn(i,1) = a(2)*b(0)-a(0)*b(2);
-        p_BemSurf.tri_nn(i,2) = a(0)*b(1)-a(1)*b(0);
-
-        //area
-        size = p_BemSurf.tri_nn.row(i)*p_BemSurf.tri_nn.row(i).transpose();
-        size = std::pow(size, 0.5f );
-
-        p_BemSurf.tri_area(i) = size/2.0f;
-        p_BemSurf.tri_nn.row(i) /= size;
-
-
-    }
-
-    std::fstream doc("./Output/tri_area.dat", std::ofstream::out | std::ofstream::trunc);
-    if(doc)  // if succesfully opened
-    {
-      // instructions
-      doc << p_BemSurf.tri_area << "\n";
-      doc.close();
-    }
-
-    printf("[done]\n");
-
-//        qDebug() << "p_BemSurf.tri_cent:" << p_BemSurf.tri_cent(0,0) << p_BemSurf.tri_cent(0,1) << p_BemSurf.tri_cent(0,2);
-//        qDebug() << "p_BemSurf.tri_cent:" << p_BemSurf.tri_cent(2,0) << p_BemSurf.tri_cent(2,1) << p_BemSurf.tri_cent(2,2);
-
-        qDebug() << "p_BemSurf.tri_nn:" << p_BemSurf.tri_nn(0,0) << p_BemSurf.tri_nn(0,1) << p_BemSurf.tri_nn(0,2);
-        qDebug() << "p_BemSurf.tri_nn:" << p_BemSurf.tri_nn(2,0) << p_BemSurf.tri_nn(2,1) << p_BemSurf.tri_nn(2,2);
-
-}
-
-bool MNEBem::add_vertex_normals(MNEBemSurface& p_BemSurf)
-{
-
-      //
-      //   Accumulate the vertex normals
-      //
-
-        for (qint32 p = 0; p < p_BemSurf.ntri; p++)         //check each triangle
-        {
-            for (qint32 j=0; j<3 ; j++)
-            {
-                int nodenr;
-                nodenr = p_BemSurf.tris(p,j);               //find the corners(nodes) of the triangles
-                p_BemSurf.nn(nodenr,0) += p_BemSurf.tri_nn(p,0);  //add the triangle normal to the nodenormal
-                p_BemSurf.nn(nodenr,1) += p_BemSurf.tri_nn(p,1);
-                p_BemSurf.nn(nodenr,2) += p_BemSurf.tri_nn(p,2);
-            }
-        }
-
-            // normalize
-        for (qint32 p = 0; p < p_BemSurf.np; p++)
-        {
-            float size = 0;
-            size = p_BemSurf.nn.row(p)*p_BemSurf.nn.row(p).transpose();
-            size = std::pow(size, 0.5f );
-            p_BemSurf.nn.row(p) /= size;
-        }
-
-
- qDebug() << "nnTest first Row:" << nnTest(0,0)<<nnTest(0,1)<<nnTest(0,2);
-
- return true;
-}
-
-
