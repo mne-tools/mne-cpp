@@ -132,39 +132,30 @@ public:
     */
     void clear();
 
-    //=========================================================================================================
-    /**
-    * Qt 3d geometry information. Data are generated within first call.
-    *
-    * @param[in] p_fScaling  Scale factor of the returned geometry tri model.
-    *
-    * @return the geometry model
-    */
-//    MatrixXf& getTriCoords(float p_fScaling = 1.0f);
-
 
     //=========================================================================================================
     /**
-    * mne_transform_source_space_to
+    * Implementation of the   mne_add_triangle_data function in mne_add_geometry_info.c
     *
-    * ### MNE toolbox root function ###
+    * Completes triangulation info
     *
-    * Implementation of the mne_transform_source_space_to for a single hemisphere function
-    * Transform source space data to the desired coordinate system.
-    *
-    * @param[in] dest       The id of the destination coordinate system (FIFFV_COORD_...)
-    * @param[in] p_Trans    The coordinate transformation structure to use
+    * @param [in, out] p_BemSurf   Bem Surface to be completed
     *
     * @return true if succeeded, false otherwise
     */
-//    bool transform_hemisphere_to(fiff_int_t dest, const FiffCoordTrans &p_Trans);
-
+    bool add_triangle_data();
 
     //=========================================================================================================
     /**
-    * Qt 3d geometry information. Data are generated within first call.
+    * Implementation of the add_vertex_normals function in mne_add_geometry_info.c
+    *
+    * Completes triangulation info
+    *
+    * @param [in, out] p_BemSurf   Bem Surface to be completed
+    *
+    * @return true if succeeded, false otherwise
     */
-    //QGeometryData* getGeometryData(float p_fScaling = 1.0f);
+    bool add_vertex_normals();
 
 public:
     fiff_int_t id;              /**< Id information */
@@ -180,7 +171,6 @@ public:
     VectorXd tri_area;          /**< Triangle areas */
     QList<QPair<int, QVector<int> > > neighbor_tri;           /**< Map of neighboring triangles for each vertex */
     QList<QPair<int, QVector<int> > > neighbor_vert;          /**< Map of neighboring vertices for each vertex */
-
 
 
 };

@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include "mne_bem_surface.h"
+#include <fstream>
 
 
 //*************************************************************************************************************
@@ -118,74 +119,104 @@ void MNEBemSurface::clear()
 }
 
 
-//*************************************************************************************************************
+bool MNEBemSurface::add_triangle_data()
+{
+    //
+    //   Main triangulation
+    //
+    printf("\tCompleting triangulation info...");
+    this->tri_cent = MatrixX3d::Zero(this->ntri,3);
+    this->tri_nn = MatrixX3d::Zero(this->ntri,3);
+    this->tri_area = VectorXd::Zero(this->ntri);
 
-//MatrixXf& MNEBemSurface::getTriCoords(float p_fScaling)
-//{
-//    if(m_TriCoords.size() == 0)
-//    {
-//        m_TriCoords = MatrixXf(3,3*tris.rows());
-//        for(qint32 i = 0; i < tris.rows(); ++i)
-//        {
-//            m_TriCoords.col(i*3) = rr.row( tris(i,0) ).transpose().cast<float>();
-//            m_TriCoords.col(i*3+1) = rr.row( tris(i,1) ).transpose().cast<float>();
-//            m_TriCoords.col(i*3+2) = rr.row( tris(i,2) ).transpose().cast<float>();
-//        }
-//    }
+    Matrix3d r;
+    Vector3d a, b;
+    int k = 0;
+    float size = 0;
+    for (qint32 i = 0; i < this->ntri; ++i)
+    {
+        for ( qint32 j = 0; j < 3; ++j)
+        {
+            k = this->tris(i, j);
 
-//    m_TriCoords *= p_fScaling;
+            r(j,0) = this->rr(k, 0);
+            r(j,1) = this->rr(k, 1);
+            r(j,2) = this->rr(k, 2);
 
-//    return m_TriCoords;
-//}
+            this->tri_cent(i, 0) += this->rr(k, 0);
+            this->tri_cent(i, 1) += this->rr(k, 1);
+            this->tri_cent(i, 2) += this->rr(k, 2);
+        }
+        this->tri_cent.row(i) /= 3.0f;
 
+        //cross product {cross((r2-r1),(r3-r1))}
+        a = r.row(1) - r.row(0 );
+        b = r.row(2) - r.row(0);
+        this->tri_nn(i,0) = a(1)*b(2)-a(2)*b(1);
+        this->tri_nn(i,1) = a(2)*b(0)-a(0)*b(2);
+        this->tri_nn(i,2) = a(0)*b(1)-a(1)*b(0);
 
-//*************************************************************************************************************
+        //area
+        size = this->tri_nn.row(i)*this->tri_nn.row(i).transpose();
+        size = std::pow(size, 0.5f );
 
-//bool MNEBemSurface::transform_hemisphere_to(fiff_int_t dest, const FiffCoordTrans &p_Trans)
-//{
-//    FiffCoordTrans trans(p_Trans);
-
-//    if (this->coord_frame == dest)
-//    {
-//            res = src;
-//        return true;
-//    }
-
-//    if (trans.to == this->coord_frame && trans.from == dest)
-//        trans.invert_transform();
-//    else if(trans.from != this->coord_frame || trans.to != dest)
-//    {
-//        printf("Cannot transform the source space using this coordinate transformation");//Consider throw
-//        return false;
-//    }
-
-//    MatrixXf t = trans.trans.block(0,0,3,4);
-//        res             = src;
-//    this->coord_frame = dest;
-//    MatrixXf t_rr = MatrixXf::Ones(this->np, 4);
-//    t_rr.block(0, 0, this->np, 3) = this->rr;
-//    MatrixXf t_nn = MatrixXf::Zero(this->np, 4);
-//    t_nn.block(0, 0, this->np, 3) = this->nn;
-
-//    this->rr    = (t*t_rr.transpose()).transpose();
-//    this->nn    = (t*t_nn.transpose()).transpose();
-
-//    return true;
-//}
+        this->tri_area(i) = size/2.0f;
+        this->tri_nn.row(i) /= size;
 
 
-//*************************************************************************************************************
+    }
 
-//QGeometryData* MNEBemSurface::getGeometryData(float p_fScaling)
-//{
-//    if(m_pGeometryData == NULL)
-//    {
-//        m_pGeometryData = new QGeometryData();
+    std::fstream doc("./Output/tri_area.dat", std::ofstream::out | std::ofstream::trunc);
+    if(doc)  // if succesfully opened
+    {
+      // instructions
+      doc << this->tri_area << "\n";
+      doc.close();
+    }
 
-//        MatrixXd* triCoords = getTriCoords(p_fScaling);
+    printf("[done]\n");
 
-//        m_pGeometryData->appendVertexArray(QArray<QVector3D>::fromRawData( reinterpret_cast<const QVector3D*>(triCoords->data()), triCoords->cols() ));
-//    }
+//        qDebug() << "this->tri_cent:" << this->tri_cent(0,0) << this->tri_cent(0,1) << this->tri_cent(0,2);
+//        qDebug() << "this->tri_cent:" << this->tri_cent(2,0) << this->tri_cent(2,1) << this->tri_cent(2,2);
 
-//    return m_pGeometryData;
-//}
+        qDebug() << "this->tri_nn:" << this->tri_nn(0,0) << this->tri_nn(0,1) << this->tri_nn(0,2);
+        qDebug() << "this->tri_nn:" << this->tri_nn(2,0) << this->tri_nn(2,1) << this->tri_nn(2,2);
+
+return true;
+}
+
+bool MNEBemSurface::add_vertex_normals()
+{
+
+      //
+      //   Accumulate the vertex normals
+      //
+
+        for (qint32 p = 0; p < this->ntri; p++)         //check each triangle
+        {
+            for (qint32 j=0; j<3 ; j++)
+            {
+                int nodenr;
+                nodenr = this->tris(p,j);               //find the corners(nodes) of the triangles
+                this->nn(nodenr,0) += this->tri_nn(p,0);  //add the triangle normal to the nodenormal
+                this->nn(nodenr,1) += this->tri_nn(p,1);
+                this->nn(nodenr,2) += this->tri_nn(p,2);
+            }
+        }
+
+            // normalize
+        for (qint32 p = 0; p < this->np; p++)
+        {
+            float size = 0;
+            size = this->nn.row(p)*this->nn.row(p).transpose();
+            size = std::pow(size, 0.5f );
+            this->nn.row(p) /= size;
+        }
+
+
+ qDebug() << "nn first Row:" << this->nn(0,0)<<this->nn(0,1)<<this->nn(0,2);
+
+ return true;
+}
+
+
