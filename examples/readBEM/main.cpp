@@ -79,8 +79,12 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-all-src.fif");
+//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-bem-sol.fif");
 //    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif");
+    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+
 
     MNEBem t_Bem (t_fileBem) ;
 
