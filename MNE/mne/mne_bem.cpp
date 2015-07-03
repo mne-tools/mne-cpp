@@ -154,8 +154,9 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirT
             MNEBemSurface  p_BemSurface;
             printf("\tReading a BEM surface...");
             MNEBem::read_bem_surface(p_pStream.data(), bemsurf[k], p_BemSurface);
+            add_triangle_data(p_BemSurface);
              if (add_geom)
-                complete_surface_info(p_BemSurface);
+                add_vertex_normals(p_BemSurface);
             printf("\t[done]\n" );
 
             p_Bem.m_qListBemSurface.append(p_BemSurface);
@@ -259,7 +260,7 @@ bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, 
     {
         if(!p_Tree.find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag))
         {
-            p_pStream->device()->close();
+            p_pStream->device()->close();       //ToDo: add geom setzen. Dann werden nn berechnet und müssen nicht ausgelesen werden.
             std::cout << "Vertex normals not found."; //ToDo: throw error.
             return false;
         }
@@ -325,8 +326,7 @@ bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, 
     return true;
 }
 
-
-bool MNEBem::complete_surface_info(MNEBemSurface& p_BemSurf)
+bool MNEBem::add_triangle_data(MNEBemSurface& p_BemSurf)
 {
     //
     //   Main triangulation
@@ -372,6 +372,15 @@ bool MNEBem::complete_surface_info(MNEBemSurface& p_BemSurf)
 
 
     }
+
+    std::fstream doc("./Output/tri_area.dat", std::ofstream::out | std::ofstream::trunc);
+    if(doc)  // if succesfully opened
+    {
+      // instructions
+      doc << p_BemSurf.tri_area << "\n";
+      doc.close();
+    }
+
     printf("[done]\n");
 
 //        qDebug() << "p_BemSurf.tri_cent:" << p_BemSurf.tri_cent(0,0) << p_BemSurf.tri_cent(0,1) << p_BemSurf.tri_cent(0,2);
@@ -380,63 +389,40 @@ bool MNEBem::complete_surface_info(MNEBemSurface& p_BemSurf)
         qDebug() << "p_BemSurf.tri_nn:" << p_BemSurf.tri_nn(0,0) << p_BemSurf.tri_nn(0,1) << p_BemSurf.tri_nn(0,2);
         qDebug() << "p_BemSurf.tri_nn:" << p_BemSurf.tri_nn(2,0) << p_BemSurf.tri_nn(2,1) << p_BemSurf.tri_nn(2,2);
 
-//        //
-//        //   Accumulate the vertex normals
-//        //
+}
 
-        MatrixX3f nnTest;
-        nnTest = MatrixX3f::Zero(p_BemSurf.np,3);
+bool MNEBem::add_vertex_normals(MNEBemSurface& p_BemSurf)
+{
 
-        for (qint32 p = 0; p < p_BemSurf.ntri; p++)
+      //
+      //   Accumulate the vertex normals
+      //
+
+        for (qint32 p = 0; p < p_BemSurf.ntri; p++)         //check each triangle
         {
             for (qint32 j=0; j<3 ; j++)
             {
                 int nodenr;
-                nodenr = p_BemSurf.tris(p,j);
-                nnTest(nodenr,0) += p_BemSurf.tri_nn(p,0);
-                nnTest(nodenr,1) += p_BemSurf.tri_nn(p,1);
-                nnTest(nodenr,2) += p_BemSurf.tri_nn(p,2);
+                nodenr = p_BemSurf.tris(p,j);               //find the corners(nodes) of the triangles
+                p_BemSurf.nn(nodenr,0) += p_BemSurf.tri_nn(p,0);  //add the triangle normal to the nodenormal
+                p_BemSurf.nn(nodenr,1) += p_BemSurf.tri_nn(p,1);
+                p_BemSurf.nn(nodenr,2) += p_BemSurf.tri_nn(p,2);
             }
         }
 
             // normalize
         for (qint32 p = 0; p < p_BemSurf.np; p++)
         {
-            size = nnTest.row(p)*nnTest.row(p).transpose();
+            float size = 0;
+            size = p_BemSurf.nn.row(p)*p_BemSurf.nn.row(p).transpose();
             size = std::pow(size, 0.5f );
-            nnTest.row(p) /= size;
+            p_BemSurf.nn.row(p) /= size;
         }
+
 
  qDebug() << "nnTest first Row:" << nnTest(0,0)<<nnTest(0,1)<<nnTest(0,2);
 
- get_EigentoData(nnTest, "nntest.txt");
-
-    return true;
+ return true;
 }
 
-//void MNEBem::matrixtofile()
-//{
-//  std::ofstream file("test.txt");
-//  if (file.is_open())
-//  {
-//    MatrixXf m = MatrixXf::Random(30,3);
-//    file << "Here is the matrix m:\n" << m << '\n';
-//    file << "m" << '\n' <<  colm(m) << '\n';
-//  }
-//}
-
-void MNEBem::get_EigentoData(MatrixX3f& src, char* pathAndName)
-{
-      std::fstream doc(pathAndName, std::ofstream::out | std::ofstream::trunc);
-      if(doc)  // if succesfully opened
-      {
-        // instructions
-        doc << "Here is the matrix src:\n" << src << "\n";
-        doc.close();
-      }
-      else
-      {
-        std::cerr << "Error when opening" << std::endl;
-      }
- }
 

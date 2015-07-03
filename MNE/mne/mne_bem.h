@@ -176,7 +176,7 @@ private:
 
     //=========================================================================================================
     /**
-    * Implementation of the complete_source_space_info function in e.g. mne_read_source_spaces.m, mne_read_bem_surfaces.m
+    * Implementation of the   mne_add_triangle_data function in mne_add_geometry_info.c
     *
     * Completes triangulation info
     *
@@ -184,9 +184,19 @@ private:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool complete_surface_info(MNEBemSurface& p_BemSurf);
+    static bool add_triangle_data(MNEBemSurface& p_BemSurf);
 
-
+    //=========================================================================================================
+    /**
+    * Implementation of the add_vertex_normals function in mne_add_geometry_info.c
+    *
+    * Completes triangulation info
+    *
+    * @param [in, out] p_BemSurf   Bem Surface to be completed
+    *
+    * @return true if succeeded, false otherwise
+    */
+    static bool add_vertex_normals(MNEBemSurface& p_BemSurf);
 
 protected:
 
