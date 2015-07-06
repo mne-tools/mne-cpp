@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
 * @file     main.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     Mai, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Jana Kiesel, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,9 +30,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Example of reading forwardsolution data from a fiff file
+* @brief    Example of reading BEM data
 *
 */
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -48,7 +50,6 @@
 //=============================================================================================================
 
 #include <QtCore/QCoreApplication>
-#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -73,19 +74,21 @@ using namespace MNELIB;
 * @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
 * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
 */
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QFile t_fileForwardSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    MNEForwardSolution t_ForwardSolution(t_fileForwardSolution);
+//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-all-src.fif");
+//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-bem-sol.fif");
+//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif");
+    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
 
-    if(t_ForwardSolution.source_ori != -1)
-    {
-        std::cout << "\nfirst 10 rows and columns of the Gain Matrix:\n" << t_ForwardSolution.sol->data.block(0,0,10,10) << std::endl;
-        std::cout << "\nfirst 10 dipole coordinates:\n" << t_ForwardSolution.source_rr.block(0,0,10,3) << std::endl ;
-        std::cout << "\nfirst 10 dipole normales:\n" << t_ForwardSolution.source_nn.block(0,0,10,3) << std::endl ;
-    }
+
+    MNEBem t_Bem (t_fileBem) ;
+
+    qDebug() << "Put your stuff your interest in here";
 
     return a.exec();
 }

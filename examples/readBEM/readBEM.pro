@@ -1,14 +1,15 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+# @file     readBEM.pro
+# @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
+#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
 # @date     July, 2012
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2015, Jana Kiesel, Christoph Dinh and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -29,21 +30,23 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the mne library.
+# @brief    Example project to read in bem data
 #
 #--------------------------------------------------------------------------------------------------------------
 
 include(../../mne-cpp.pri)
 
-TEMPLATE = lib
+TEMPLATE = app
 
-QT += network concurrent
+VERSION = $${MNE_CPP_VERSION}
+
 QT -= gui
 
-DEFINES += MNE_LIBRARY
+CONFIG   += console
+CONFIG   -= app_bundle
 
-TARGET = Mne
-TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
+TARGET = readBEM
+
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -52,79 +55,27 @@ LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Fsd
+            -lMNE$${MNE_LIB_VERSION}Mned
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Fs
+            -lMNE$${MNE_LIB_VERSION}Mne
 }
 
-DESTDIR = $${MNE_LIBRARY_DIR}
-
-contains(MNECPP_CONFIG, build_MNECPP_Static_Lib) {
-    CONFIG += staticlib
-    DEFINES += BUILD_MNECPP_STATIC_LIB
-}
-else {
-    CONFIG += dll
-
-    #
-    # win32: copy dll's to bin dir
-    # unix: add lib folder to LD_LIBRARY_PATH
-    #
-    win32 {
-        FILE = $${DESTDIR}/$${TARGET}.dll
-        BINDIR = $${DESTDIR}/../bin
-        FILE ~= s,/,\\,g
-        BINDIR ~= s,/,\\,g
-        QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
-    }
-}
+DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
-    mne.cpp \
-    mne_sourcespace.cpp \
-    mne_forwardsolution.cpp \
-    mne_sourceestimate.cpp \
-    mne_hemisphere.cpp \
-    mne_inverse_operator.cpp \
-    mne_epoch_data.cpp \
-    mne_epoch_data_list.cpp \
-    mne_cluster_info.cpp \
-    mne_surface.cpp \
-    mne_corsourceestimate.cpp\
-    mne_bem.cpp\
-    mne_bem_surface.cpp
+        main.cpp \
 
 HEADERS += \
-    mne.h \
-    mne_global.h \
-    mne_sourcespace.h \
-    mne_hemisphere.h \
-    mne_forwardsolution.h \
-    mne_sourceestimate.h \
-    mne_inverse_operator.h \
-    mne_epoch_data.h \
-    mne_epoch_data_list.h \
-    mne_cluster_info.h \
-    mne_surface.h \
-    mne_corsourceestimate.h\
-    mne_bem.h\
-    mne_bem_surface.h
+
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-
-# Install headers to include directory
-header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/mne
-
-INSTALLS += header_files
-
-OTHER_FILES += \
-    mne.pro
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
