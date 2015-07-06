@@ -2,12 +2,12 @@
 #
 # @file     mriTestViewer.pro
 # @author   Carsten Boensel <carsten.boensel@tu-ilmenau.de>
-# @version  0.1
-# @date     April, 2015
+# @version  1.0
+# @date     June, 2015
 #
 # @section  LICENSE
 #
-# Copyright (C) 2015, Carsten Bönsel. All rights reserved.
+# Copyright (C) 2015, Carsten Boensel. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -28,21 +28,52 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    What does this project illustrate?
+# @brief    builds a prototype app to visualize mri data
 #
 #--------------------------------------------------------------------------------------------------------------
 
-QT       += core gui
+include(../../mne-cpp.pri)
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
-TARGET = mriTestViewer
 TEMPLATE = app
 
+VERSION = $${MNE_CPP_VERSION}
 
-SOURCES += main.cpp\
-        widget.cpp
+QT       += widgets
 
-HEADERS  += widget.h
+CONFIG   += console
+CONFIG   -= app_bundle
 
-FORMS    += widget.ui
+TARGET = mriTestViewer
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
+}
+
+#LIBS += -L$${MNE_LIBRARY_DIR}
+#CONFIG(debug, debug|release) {
+#    LIBS += -lMNE$${MNE_LIB_VERSION}Fsd
+#            -lMNE$${MNE_LIB_VERSION}Utilsd
+#}
+#else {
+#    LIBS += -lMNE$${MNE_LIB_VERSION}Fs
+#            -lMNE$${MNE_LIB_VERSION}Utils
+#}
+
+DESTDIR =  $${MNE_BINARY_DIR}
+
+SOURCES += \
+        main.cpp \
+        mriviewer.cpp \
+
+HEADERS  += mriviewer.h
+
+FORMS    += mriviewer.ui
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
+
+FORMS += \
+    mriviewer.ui
+
+HEADERS += \
+    mriviewer.h

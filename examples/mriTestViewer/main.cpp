@@ -1,11 +1,13 @@
-#include "widget.h"
+#include "mriviewer.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    Widget w;
-    w.show();
+    QApplication app(argc, argv);
+    QGuiApplication::setApplicationDisplayName(MriViewer::tr("MGH Test Viewer"));
 
-    return a.exec();
+    MriViewer widget;
+    widget.show();
+
+    return app.exec();
 }
