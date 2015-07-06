@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
 * @file     mne_bem_surface.cpp
-* @author   Jana Kiesel<jana.kiesel@tu-ilmenau.de>
+* @author   Jana Kiesel<jana.kiesel@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -9,7 +9,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Jana KIesel, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -118,6 +118,7 @@ void MNEBemSurface::clear()
     tri_area = VectorXd::Zero(0);
 }
 
+//*************************************************************************************************************
 
 bool MNEBemSurface::add_triangle_data()
 {
@@ -182,8 +183,10 @@ bool MNEBemSurface::add_triangle_data()
         qDebug() << "this->tri_nn:" << this->tri_nn(0,0) << this->tri_nn(0,1) << this->tri_nn(0,2);
         qDebug() << "this->tri_nn:" << this->tri_nn(2,0) << this->tri_nn(2,1) << this->tri_nn(2,2);
 
-return true;
+    return true;
 }
+
+//*************************************************************************************************************
 
 bool MNEBemSurface::add_vertex_normals()
 {
@@ -216,7 +219,7 @@ bool MNEBemSurface::add_vertex_normals()
 
  qDebug() << "nn first Row:" << this->nn(0,0)<<this->nn(0,1)<<this->nn(0,2);
 
- return true;
+    return true;
 }
 
 
