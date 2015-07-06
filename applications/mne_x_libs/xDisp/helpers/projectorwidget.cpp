@@ -114,6 +114,9 @@ void ProjectorWidget::createUI()
         m_enableDisableProjectors->setChecked(bAllActivated);
 
         setLayout(topLayout);
+
+        //Set default activation to true
+        enableDisableAll(true);
     }
 }
 
