@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>300</height>
+    <height>400</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>MRI Test Viewer Example</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
