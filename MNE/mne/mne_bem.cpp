@@ -168,7 +168,7 @@ return true;
 }
 
 //*************************************************************************************************************
-s
+
 bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, MNEBemSurface &p_BemSurface)
 {
     p_BemSurface.clear();
