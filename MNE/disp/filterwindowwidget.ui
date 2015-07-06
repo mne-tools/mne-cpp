@@ -191,17 +191,17 @@
                 </property>
                 <item>
                  <property name="text">
+                  <string>Bandpass</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
                   <string>Lowpass</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
                   <string>Highpass</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Bandpass</string>
                  </property>
                 </item>
                </widget>
@@ -222,7 +222,7 @@
                  <double>1.000000000000000</double>
                 </property>
                 <property name="value">
-                 <double>100.000000000000000</double>
+                 <double>5.000000000000000</double>
                 </property>
                </widget>
               </item>
