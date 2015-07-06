@@ -665,6 +665,62 @@ void RealTimeMultiSampleArrayModel::createFilterChannelList(QStringList channelN
 
 //*************************************************************************************************************
 
+void RealTimeMultiSampleArrayModel::markChBad(QModelIndex ch, bool status)
+{
+    QList<FiffChInfo> chInfolist = m_pFiffInfo->chs;
+
+    if(status) {
+        if(!m_pFiffInfo->bads.contains(chInfolist[ch.row()].ch_name))
+            m_pFiffInfo->bads.append(chInfolist[ch.row()].ch_name);
+        qDebug() << "RawModel:" << chInfolist[ch.row()].ch_name << "marked as bad.";
+    }
+    else {
+        if(m_pFiffInfo->bads.contains(chInfolist[ch.row()].ch_name)) {
+            int index = m_pFiffInfo->bads.indexOf(chInfolist[ch.row()].ch_name);
+            m_pFiffInfo->bads.removeAt(index);
+            qDebug() << "RawModel:" << chInfolist[ch.row()].ch_name << "marked as good.";
+        }
+    }
+
+    //Update indeices of bad channels (this vector is needed when creating new ssp operators)
+    QStringList emptyExclude;
+    m_vecBadIdcs = FiffInfoBase::pick_channels(m_pFiffInfo->ch_names, m_pFiffInfo->bads, emptyExclude);
+
+    emit dataChanged(ch,ch);
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::markChBad(QModelIndexList chlist, bool status)
+{
+    QList<FiffChInfo> chInfolist = m_pFiffInfo->chs;
+
+    for(int i=0; i < chlist.size(); ++i) {
+        if(status) {
+            if(!m_pFiffInfo->bads.contains(chInfolist[chlist[i].row()].ch_name))
+                m_pFiffInfo->bads.append(chInfolist[chlist[i].row()].ch_name);
+            qDebug() << "RawModel:" << chInfolist[chlist[i].row()].ch_name << "marked as bad.";
+        }
+        else {
+            if(m_pFiffInfo->bads.contains(chInfolist[chlist[i].row()].ch_name)) {
+                int index = m_pFiffInfo->bads.indexOf(chInfolist[chlist[i].row()].ch_name);
+                m_pFiffInfo->bads.removeAt(index);
+                qDebug() << "RawModel:" << chInfolist[chlist[i].row()].ch_name << "marked as good.";
+            }
+        }
+
+        emit dataChanged(chlist[i],chlist[i]);
+    }
+
+    //Update indeices of bad channels (this vector is needed when creating new ssp operators)
+    QStringList emptyExclude;
+    m_vecBadIdcs = FiffInfoBase::pick_channels(m_pFiffInfo->ch_names, m_pFiffInfo->bads, emptyExclude);
+}
+
+
+//*************************************************************************************************************
+
 void doFilterPerChannel(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
 {
     for(int i=0; i<channelDataTime.first.size(); i++)

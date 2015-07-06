@@ -385,6 +385,12 @@ private:
     */
     void visibleRowsChanged(int value);
 
+    //=========================================================================================================
+    /**
+    * Gets called when the bad channels are about to be marked as bad or good
+    */
+    void markChBad();
+
     RealTimeMultiSampleArrayModel*      m_pRTMSAModel;                  /**< RTMSA data model */
     RealTimeMultiSampleArrayDelegate*   m_pRTMSADelegate;               /**< RTMSA data delegate */
 

@@ -466,20 +466,35 @@ void RealTimeMultiSampleArrayWidget::channelContextMenu(QPoint pos)
     //get selected items
     QModelIndexList selected = m_pTableView->selectionModel()->selectedIndexes();
 
-//    // Lambda C++11 version
-//    QVector<qint32> vecSelection;
-//    for(qint32 i = 0; i < selected.size(); ++i)
-//        if(selected[i].column() == 1)
-//            vecSelection.append(m_pRTMSAModel->getIdxSelMap()[selected[i].row()]);
+    //create custom context menu and actions
+    QMenu *menu = new QMenu(this);
 
-//    //create custom context menu and actions
-//    QMenu *menu = new QMenu(this);
+    //**************** Marking ****************
+    if(!m_qListBadChannels.contains(index.row())) {
+        QAction* doMarkChBad = menu->addAction(tr("Mark as bad"));
+        connect(doMarkChBad, &QAction::triggered,
+                this, &RealTimeMultiSampleArrayWidget::markChBad);
+    } else {
+        QAction* doMarkChGood = menu->addAction(tr("Mark as good"));
+        connect(doMarkChGood, &QAction::triggered,
+                this, &RealTimeMultiSampleArrayWidget::markChBad);
+    }
 
-//    //select channels
-//    QAction* doSelection = menu->addAction(tr("Apply selection"));
-//    connect(doSelection,&QAction::triggered, [=](){
-//        m_pRTMSAModel->selectRows(vecSelection);
-//    });
+    //**************** Select channels ****************
+    //    // Lambda C++11 version
+    //    QVector<qint32> vecSelection;
+    //    for(qint32 i = 0; i < selected.size(); ++i)
+    //        if(selected[i].column() == 1)
+    //            vecSelection.append(m_pRTMSAModel->getIdxSelMap()[selected[i].row()]);
+
+    //    //create custom context menu and actions
+    //    QMenu *menu = new QMenu(this);
+
+    //    //select channels
+    //    QAction* doSelection = menu->addAction(tr("Apply selection"));
+    //    connect(doSelection,&QAction::triggered, [=](){
+    //        m_pRTMSAModel->selectRows(vecSelection);
+    //    });
 
     // non C++11 alternative
     m_qListCurrentSelection.clear();
@@ -487,13 +502,9 @@ void RealTimeMultiSampleArrayWidget::channelContextMenu(QPoint pos)
         if(selected[i].column() == 1)
             m_qListCurrentSelection.append(m_pRTMSAModel->getIdxSelMap()[selected[i].row()]);
 
-    //create custom context menu and actions
-    QMenu *menu = new QMenu(this);
-
-    //select channels
     QAction* doSelection = menu->addAction(tr("Apply selection"));
-    connect(doSelection, &QAction::triggered, this,
-            &RealTimeMultiSampleArrayWidget::applySelection);
+    connect(doSelection, &QAction::triggered,
+            this, &RealTimeMultiSampleArrayWidget::applySelection);
 
     //select channels
     QAction* hideSelection = menu->addAction(tr("Hide selection"));
@@ -502,9 +513,9 @@ void RealTimeMultiSampleArrayWidget::channelContextMenu(QPoint pos)
 
     //undo selection
     QAction* resetAppliedSelection = menu->addAction(tr("Reset selection"));
-    connect(resetAppliedSelection,&QAction::triggered, m_pRTMSAModel,
-            &RealTimeMultiSampleArrayModel::resetSelection);
-    connect(resetAppliedSelection,&QAction::triggered,
+    connect(resetAppliedSelection, &QAction::triggered,
+            m_pRTMSAModel, &RealTimeMultiSampleArrayModel::resetSelection);
+    connect(resetAppliedSelection, &QAction::triggered,
             this, &RealTimeMultiSampleArrayWidget::resetSelection);
 
     //show context menu
@@ -797,5 +808,26 @@ void RealTimeMultiSampleArrayWidget::visibleRowsChanged(int value)
     }
 
     m_pRTMSAModel->createFilterChannelList(channelNames);
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayWidget::markChBad()
+{
+    QModelIndexList selected = m_pTableView->selectionModel()->selectedIndexes();
+
+    for(int i=0; i<selected.size(); i++) {
+        if(m_qListBadChannels.contains(selected[i].row())) { //mark as good
+            m_pRTMSAModel->markChBad(selected[i], false);
+            m_qListBadChannels.removeAll(selected[i].row());
+        }
+        else {
+            m_pRTMSAModel->markChBad(selected[i], true);
+            m_qListBadChannels.append(selected[i].row());
+        }
+    }
+
+    m_pRTMSAModel->updateProjection();
 }
 

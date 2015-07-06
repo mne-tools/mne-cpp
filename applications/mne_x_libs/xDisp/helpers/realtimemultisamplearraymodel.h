@@ -356,6 +356,24 @@ public:
     */
     void createFilterChannelList(QStringList channelNames);
 
+    //=========================================================================================================
+    /**
+    * markChBad marks the selected channels as bad/good in m_chInfolist
+    *
+    * @param chlist index that is selected for marking
+    * @param status, status=1 -> mark as bad, status=0 -> mark as good
+    */
+    void markChBad(QModelIndex ch, bool status);
+
+    //=========================================================================================================
+    /**
+    * markChBad marks the selected channels as bad/good in m_chInfolist
+    *
+    * @param chlist is the list of indices that are selected for marking
+    * @param status, status=1 -> mark as bad, status=0 -> mark as good
+    */
+    void markChBad(QModelIndexList chlist, bool status);
+
 signals:
     //=========================================================================================================
     /**
@@ -431,7 +449,7 @@ private:
     MatrixXdR               m_matDataFilteredFreeze;            /**< The raw filtered data in freeze mode */
     MatrixXd                m_matOverlap;                       /**< Last overlap block for the back */
 
-    QMap< qint32,float>                 m_qMapChScaling;        /**< Sensor selection widget. */
+    QMap< qint32,float>                 m_qMapChScaling;        /**< Channel scaling map. */
     QList<FilterData>                   m_filterData;           /**< List of currently active filters. */
     QList<RealTimeSampleArrayChInfo>    m_qListChInfo;          /**< Channel info list. ToDo: Obsolete*/
     QStringList                         m_filterChannelList;    /**< List of channels which are to be filtered.*/
