@@ -373,11 +373,11 @@ void RealTimeMultiSampleArrayWidget::init()
         {
             m_pProjectorSelectionWidget = QSharedPointer<ProjectorWidget>(new ProjectorWidget());
 
+            connect(m_pProjectorSelectionWidget.data(), &ProjectorWidget::projSelectionChanged,
+                    this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::updateProjection);            
+
             m_pProjectorSelectionWidget->setFiffInfo(m_pFiffInfo);
             //m_pProjectorSelectionWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
-
-            connect(m_pProjectorSelectionWidget.data(), &ProjectorWidget::projSelectionChanged,
-                    this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::updateProjection);
         }
 
         if(!m_pFilterWindow) {

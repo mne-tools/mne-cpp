@@ -127,6 +127,8 @@ void ProjectorWidget::checkStatusChanged(int status)
 {
     Q_UNUSED(status)
 
+    qDebug()<<"checkStatusChanged";
+
     bool bAllActivated = true;
 
     for(qint32 i = 0; i < m_qListCheckBox.size(); ++i) {
