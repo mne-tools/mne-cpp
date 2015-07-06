@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
 * @file     mne_bem.h
-* @author   Jana Kiesel<jana.kiesel@tu-ilmenau.de>
+* @author   Jana Kiesel<jana.kiesel@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -9,7 +9,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Jana Kiesel, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MNEBEM class declaration.
+* @brief    MNEBem class declaration.
 *
 */
 
