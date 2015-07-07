@@ -448,6 +448,10 @@ void RealTimeMultiSampleArrayWidget::init()
             connect(m_pFilterWindow.data(), &FilterWindow::activationCheckBoxListChanged,
                     m_pQuickControlWidget.data(), &QuickControlWidget::filterGroupChanged);
 
+            //Handle trigger detection
+            connect(m_pQuickControlWidget.data(), &QuickControlWidget::triggerInfoChanged,
+                    this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::triggerInfoChanged);
+
             m_pQuickControlWidget->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
         }
 

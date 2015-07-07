@@ -99,8 +99,18 @@ BabyMEG::BabyMEG()
     m_pActionRecordFile->setStatusTip(tr("Start Recording"));
     connect(m_pActionRecordFile, &QAction::triggered, this, &BabyMEG::toggleRecordingFile);
     addPluginAction(m_pActionRecordFile);
-
     //m_pActionRecordFile->setEnabled(false);
+
+    m_pDoubleSpinBoxRecordTime = new QDoubleSpinBox();
+    m_pDoubleSpinBoxRecordTime->setMinimum(1);
+    m_pDoubleSpinBoxRecordTime->setMaximum(100000);
+    m_pDoubleSpinBoxRecordTime->setValue(5);
+    m_pDoubleSpinBoxRecordTime->setSuffix(" min");
+    m_pDoubleSpinBoxRecordTime->setToolTip(tr("Set recording time"));
+    m_pDoubleSpinBoxRecordTime->setStatusTip(tr("Recording time"));
+//    connect(m_pDoubleSpinBoxRecordTime, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+//            this, &RealTimeMultiSampleArrayWidget::timeWindowChanged);
+    //addDisplayWidget(m_pDoubleSpinBoxRecordTime);
 
     m_pActionSqdCtrl = new QAction(QIcon(":/images/sqdctrl.png"), tr("Squid Control"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
@@ -366,6 +376,10 @@ void BabyMEG::splitRecordingFile()
 
 void BabyMEG::toggleRecordingFile()
 {
+    m_pRecordTimer = new QTimer(this);
+    connect(m_pRecordTimer, SIGNAL(timeout()), this, SLOT(toggleRecordingFile()));
+    m_pRecordTimer->start(m_pDoubleSpinBoxRecordTime->value()*60);
+
     //Setup writing to file
     if(m_bWriteToFile)
     {
@@ -386,7 +400,6 @@ void BabyMEG::toggleRecordingFile()
             msgBox.exec();
             return;
         }
-
 
         //Initiate the stream for writing to the fif file
         m_sRecordFile = getFilePath(true);
@@ -683,42 +696,44 @@ bool BabyMEG::readBadChannels()
     //
     // Bad Channels
     //
-//    //Read bad channels from header/projection fif
-//    QFile t_headerFiffFile(m_sFiffHeader);
+    //Read bad channels from header/projection fif
+    QFile t_headerFiffFile(m_sFiffHeader);
 
-//    if(!t_headerFiffFile.exists()) {
-//        printf("Could not open fif file for copying bad channels to babyMEG fiff_info\n");
-//        return false;
-//    }
-
-//    FiffRawData raw(t_headerFiffFile);
-//    m_pFiffInfo->bads = raw.info.bads;
-
-//    return true;
-
-    //Read bad channels from
-    QFile t_badChannelsFile(m_sBadChannels);
-
-    if (!t_badChannelsFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    if(!t_headerFiffFile.exists()) {
+        printf("Could not open fif file for copying bad channels to babyMEG fiff_info\n");
         return false;
-
-    printf("Reading bad channels from %s...\n", m_sBadChannels.toUtf8().constData());
-
-    QTextStream in(&t_badChannelsFile);
-    qint32 count = 0;
-    QStringList t_sListbads;
-    while (!in.atEnd()) {
-        QString channel = in.readLine();
-        if(channel.isEmpty())
-            continue;
-        ++count;
-        printf("Channel %i: %s\n",count,channel.toUtf8().constData());
-        t_sListbads << channel;
     }
 
-    m_pFiffInfo->bads = t_sListbads;
+    FiffRawData raw(t_headerFiffFile);
+    m_pFiffInfo->bads = raw.info.bads;
+
+    t_headerFiffFile.close();
 
     return true;
+
+//    //Read bad channels from
+//    QFile t_badChannelsFile(m_sBadChannels);
+
+//    if (!t_badChannelsFile.open(QIODevice::ReadOnly | QIODevice::Text))
+//        return false;
+
+//    printf("Reading bad channels from %s...\n", m_sBadChannels.toUtf8().constData());
+
+//    QTextStream in(&t_badChannelsFile);
+//    qint32 count = 0;
+//    QStringList t_sListbads;
+//    while (!in.atEnd()) {
+//        QString channel = in.readLine();
+//        if(channel.isEmpty())
+//            continue;
+//        ++count;
+//        printf("Channel %i: %s\n",count,channel.toUtf8().constData());
+//        t_sListbads << channel;
+//    }
+
+//    m_pFiffInfo->bads = t_sListbads;
+
+//    return true;
 }
 
 

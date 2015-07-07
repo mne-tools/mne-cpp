@@ -69,6 +69,8 @@ RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 , m_iCurrentBlockSize(1024)
 , m_iResidual(0)
 , m_bDrawFilterFront(true)
+, m_bTriggerDetectionActive(false)
+, m_dTriggerThreshold(0.05)
 {
     init();
 }
@@ -278,6 +280,13 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
             filterChannels.append(m_pFiffInfo->ch_names.at(b));
 
         createFilterChannelList(filterChannels);
+
+        //Look for trigger channels and initialise detected trigger map
+        QList<int> temp;
+        for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
+            if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH/* && m_pFiffInfo->chs[i].ch_name == "STI 001"*/)
+                m_qMapDetectedTrigger.insert(i, temp);
+        }
     }
     else {
         m_vecBadIdcs = RowVectorXi(0,0);
@@ -341,6 +350,13 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
 
             m_iCurrentSample = 0;
 
+            //Delete all detected triggers
+            QMutableMapIterator<int,QList<int> > i(m_qMapDetectedTrigger);
+            while (i.hasNext()) {
+                i.next();
+                i.value().clear();
+            }
+
             if(!m_bIsFreezed) {
                 m_vecLastBlockFirstValuesFiltered = m_matDataFiltered.col(0);
                 m_vecLastBlockFirstValuesRaw = m_matDataRaw.col(0);
@@ -363,6 +379,10 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
         m_iCurrentSample += data.at(b).cols();
 
         m_iCurrentBlockSize = data.at(b).cols();
+
+        //detect the trigger flanks in the trigger channels
+        if(m_bTriggerDetectionActive)
+            detectTrigger(data.at(b));
     }
 
     //Update data content
@@ -692,6 +712,23 @@ void RealTimeMultiSampleArrayModel::markChBad(QModelIndex ch, bool status)
 
 //*************************************************************************************************************
 
+void RealTimeMultiSampleArrayModel::triggerInfoChanged(const QMap<QString, QColor>& colorMap, bool active, QString triggerCh, double threshold)
+{
+    m_qMapTriggerColor = colorMap;
+    m_bTriggerDetectionActive = active;
+    m_sCurrentTriggerCh = triggerCh;
+    m_dTriggerThreshold = threshold;
+
+    //Find channel index
+    for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
+        if(m_pFiffInfo->chs[i].ch_name == m_sCurrentTriggerCh)
+            m_iCurrentTriggerChIndex = i;
+    }
+}
+
+
+//*************************************************************************************************************
+
 void RealTimeMultiSampleArrayModel::markChBad(QModelIndexList chlist, bool status)
 {
     QList<FiffChInfo> chInfolist = m_pFiffInfo->chs;
@@ -915,6 +952,45 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
         m_matDataFiltered.row(notFilterChannelIndex.at(i)).segment(dataIndex,data.row(notFilterChannelIndex.at(i)).cols()) = data.row(notFilterChannelIndex.at(i));
 
     //std::cout<<"END RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::detectTrigger(const MatrixXd &data)
+{
+    //TODO: This only can detect one trigger per data block. What iff there are more than one trigger in the data block?
+    QMapIterator<int,QList<int> > i(m_qMapDetectedTrigger);
+    while (i.hasNext()) {
+        i.next();
+        //detect the actual triggers in the current data matrix
+        if(i.key() > data.rows()) {
+//            std::cout<<i.key()<<std::endl;
+//            std::cout<<"RealTimeMultiSampleArrayModel::detectTrigger - trigger channel index exceed matrix dimensions. Returning..."<<std::endl;
+            return;
+        }
+
+        RowVectorXd stimSegment = data.row(i.key());
+        RowVectorXd::Index indexMaxCoeff;
+        int dMax = stimSegment.maxCoeff(&indexMaxCoeff);
+
+        //Find trigger using gradient/difference
+        double gradient = 0;
+
+        if(indexMaxCoeff-10<0)
+            gradient = stimSegment(indexMaxCoeff) - stimSegment(indexMaxCoeff+10);
+        else
+            gradient = stimSegment(indexMaxCoeff) - stimSegment(indexMaxCoeff-10);
+
+//        std::cout<<"gradient: "<<gradient<<std::endl;
+//        std::cout<<"dMax: "<<dMax<<std::endl;
+//        std::cout<<"indexMaxCoeff: "<<indexMaxCoeff<<std::endl;
+
+        if(m_iCurrentSample-data.cols()+indexMaxCoeff <= m_iCurrentSample && gradient>m_dTriggerThreshold) {
+            m_qMapDetectedTrigger[i.key()].append((int)m_iCurrentSample-data.cols()+indexMaxCoeff);
+            //std::cout<<"m_iCurrentSample-data.cols()+indexMaxCoeff: "<<m_iCurrentSample-data.cols()+indexMaxCoeff<<std::endl;
+        }
+    }
 }
 
 

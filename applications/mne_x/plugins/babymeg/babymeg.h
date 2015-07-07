@@ -338,11 +338,14 @@ private:
 
     QSharedPointer<RawMatrixBuffer> m_pRawMatrixBuffer;  /**< Holds incoming raw data. */
 
-    QAction*                        m_pActionSetupProject;      /**< shows setup project dialog */
-    QAction*                        m_pActionRecordFile;        /**< start recording action */
-    QAction*                        m_pActionSqdCtrl;           /**< show squid control */
-    QAction*                        m_pActionUpdateFiffInfo;    /**< Update Fiff Info action */
-    QAction*                        m_pActionUpdateFiffInfoForHPI;    /**< Update HPI info into Fiff Info action */
+    QDoubleSpinBox*                 m_pDoubleSpinBoxRecordTime;     /**< Adjust recording time */
+
+    QTimer*                         m_pRecordTimer;                 /**< timer to control recording time */
+    QAction*                        m_pActionSetupProject;          /**< shows setup project dialog */
+    QAction*                        m_pActionRecordFile;            /**< start recording action */
+    QAction*                        m_pActionSqdCtrl;               /**< show squid control */
+    QAction*                        m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
+    QAction*                        m_pActionUpdateFiffInfoForHPI;  /**< Update HPI info into Fiff Info action */
 
 public:
     double sfreq;
