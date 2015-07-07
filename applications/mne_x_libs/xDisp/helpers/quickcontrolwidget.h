@@ -62,6 +62,8 @@
 #include <QLabel>
 #include <QDoubleSpinBox>
 #include <QCheckBox>
+#include <QColorDialog>
+#include <QComboBox>
 
 
 //*************************************************************************************************************
@@ -98,7 +100,7 @@ public:
     * @param [in] parent    parent of widget
     * @param [in] qMapChScaling    pointer to scaling information
     */
-    QuickControlWidget(QMap< qint32,float >* qMapChScaling, FiffInfo::SPtr pFiffInfo, QWidget *parent = 0);
+    QuickControlWidget(QMap<qint32,float>* qMapChScaling, const FiffInfo::SPtr pFiffInfo, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -136,6 +138,12 @@ signals:
     * Emit this signal whenever the user changes the row height (zoom) of the channels.
     */
     void zoomChanged(double value);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the trigger infomration changed.
+    */
+    void triggerInfoChanged(const QMap<QString, QColor>& value, bool active, QString triggerCh, double threshold);
 
 protected:
     //=========================================================================================================
@@ -194,6 +202,30 @@ protected:
 
     //=========================================================================================================
     /**
+    * Slot called when trigger detection check box was toggled
+    */
+    void realTimeTriggerActiveChanged(int state);
+
+    //=========================================================================================================
+    /**
+    * Slot called when trigger detection color button was clicked
+    */
+    void realTimeTriggerColorChanged(bool state);
+
+    //=========================================================================================================
+    /**
+    * Slot called when trigger detection color button was clicked
+    */
+    void realTimeTriggerThresholdChanged(double value);
+
+    //=========================================================================================================
+    /**
+    * Slot called when trigger detection color button was clicked
+    */
+    void realTimeTriggerCurrentChChanged(const QString& value);
+
+    //=========================================================================================================
+    /**
     * Reimplmented mouseMoveEvent.
     */
     void mouseMoveEvent(QMouseEvent *event);
@@ -231,20 +263,26 @@ protected:
 private:
     QPoint                  m_dragPosition;         /**< the drag position of the window */
 
-    QMap< qint32,float >*           m_qMapChScaling;                /**< Channel scaling values. */
+    QMap<qint32,float>*           m_qMapChScaling;                /**< Channel scaling values. */
     QMap<qint32, QDoubleSpinBox*>   m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits */
     QMap<qint32, QSlider*>          m_qMapScalingSlider;            /**< Map of types and channel scaling line edits */
-
+    QMap<QString, QColor>           m_qMapTriggerColor;             /**< Trigger channel colors. */
 
     QList<QCheckBox*>   m_qListCheckBox;            /**< List of projection CheckBox. */
     QList<QCheckBox*>   m_qFilterListCheckBox;      /**< List of filter CheckBox. */
     FiffInfo::SPtr      m_pFiffInfo;                /**< Connected fiff info. */
 
-    QCheckBox *         m_enableDisableProjectors;  /**< Holds the enable disable all button. */
+    QCheckBox*          m_pTriggerDetectionCheckBox;/**< Holds the enable disable trigger detection check box. */
+    QCheckBox *         m_enableDisableProjectors;  /**< Holds the enable disable all check box. */
+    QPushButton*        m_pTriggerColorButton;      /**< Holds the trigger color button. */
+    QComboBox*          m_pComboBoxChannel;         /**< Holds the available trigger channels. */
+    QDoubleSpinBox*     m_pDoubleSpinBoxThreshold;  /**< Holds the trigger channel threshold. */
 
     Ui::QuickControlWidget *ui;                     /**< The generated UI file */
 };
 
 } // NAMESPACE XDISPLIB
+
+//Q_DECLARE_METATYPE(QMap);
 
 #endif // QUICKCONTROLWIDGET_H

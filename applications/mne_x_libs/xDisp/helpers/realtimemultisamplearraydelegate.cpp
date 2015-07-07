@@ -302,6 +302,15 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 painter->drawPath(path);
                 painter->restore();
 
+                //Plot detected triggers
+                path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
+                createTriggerPath(index, option, path, data);
+
+                painter->save();
+                painter->setPen(QPen(t_pModel->getTriggerColor(), 0.75, Qt::SolidLine));
+                painter->drawPath(path);
+                painter->restore();
+
                 //Plot data path
                 QPointF ellipsePos;
                 QString amplitude;
@@ -556,6 +565,29 @@ void RealTimeMultiSampleArrayDelegate::createGridPath(const QModelIndex &index, 
             path.moveTo(x,yStart);
             path.lineTo(x,yEnd);
         }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayDelegate::createTriggerPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const
+{
+    Q_UNUSED(data)
+
+    const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
+
+    QList<int> detectedTriggers = t_pModel->getDetectedTriggers();
+
+    float yStart = option.rect.topLeft().y();
+    float yEnd = option.rect.bottomRight().y();
+    float fDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
+
+    for(int u = 0; u<detectedTriggers.size(); u++) {
+        int triggerPos = detectedTriggers[u];
+
+        path.moveTo(triggerPos*fDx,yStart);
+        path.lineTo(triggerPos*fDx,yEnd);
     }
 }
 

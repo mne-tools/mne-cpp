@@ -54,7 +54,7 @@ using namespace XDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QuickControlWidget::QuickControlWidget(QMap< qint32,float >* qMapChScaling, FiffInfo::SPtr pFiffInfo, QWidget *parent)
+QuickControlWidget::QuickControlWidget(QMap< qint32,float >* qMapChScaling, const FiffInfo::SPtr pFiffInfo, QWidget *parent)
 : QWidget(parent, Qt::FramelessWindowHint | Qt::WindowSystemMenuHint)
 , ui(new Ui::QuickControlWidget)
 , m_qMapChScaling(qMapChScaling)
@@ -67,6 +67,14 @@ QuickControlWidget::QuickControlWidget(QMap< qint32,float >* qMapChScaling, Fiff
 
     connect(ui->m_pushButton_close, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             this, &QuickControlWidget::hide);
+
+    //Create trigger color map
+    m_qMapTriggerColor.clear();
+
+    for(int i = 0; i<pFiffInfo->chs.size(); i++) {
+        if(pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
+            m_qMapTriggerColor.insert(pFiffInfo->chs[i].ch_name, QColor(170,0,0));
+    }
 
     //Create different quick control groups
     createScalingGroup();
@@ -144,8 +152,8 @@ void QuickControlWidget::createScalingGroup()
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
         t_pDoubleSpinBoxScale->setMinimum(0.1);
-        t_pDoubleSpinBoxScale->setMaximum(100);
-        t_pDoubleSpinBoxScale->setMaximumWidth(100);
+        t_pDoubleSpinBoxScale->setMaximum(500);
+        t_pDoubleSpinBoxScale->setMaximumWidth(500);
         t_pDoubleSpinBoxScale->setSingleStep(0.1);
         t_pDoubleSpinBoxScale->setDecimals(1);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
@@ -157,7 +165,7 @@ void QuickControlWidget::createScalingGroup()
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
         t_pHorizontalSlider->setMinimum(1);
-        t_pHorizontalSlider->setMaximum(1000);
+        t_pHorizontalSlider->setMaximum(5000);
         t_pHorizontalSlider->setSingleStep(1);
         t_pHorizontalSlider->setPageStep(1);
         t_pHorizontalSlider->setValue(m_qMapChScaling->value(FIFF_UNIT_T)/(1e-12)*10);
@@ -404,12 +412,11 @@ void QuickControlWidget::createViewGroup()
 {
     QGridLayout* t_pGridLayout = new QGridLayout;
 
+    //Row height
     QLabel* t_pLabelModalityZoom = new QLabel("Row height:");
     t_pGridLayout->addWidget(t_pLabelModalityZoom,0,0,1,1);
 
-
     QDoubleSpinBox* t_pDoubleSpinBoxZoom = new QDoubleSpinBox;
-    t_pDoubleSpinBoxZoom = new QDoubleSpinBox();
     t_pDoubleSpinBoxZoom->setMinimum(0.3);
     t_pDoubleSpinBoxZoom->setMaximum(6.0);
     t_pDoubleSpinBoxZoom->setSingleStep(0.1);
@@ -419,14 +426,13 @@ void QuickControlWidget::createViewGroup()
     t_pDoubleSpinBoxZoom->setStatusTip(tr("Row height"));
     connect(t_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &QuickControlWidget::zoomChanged);
-    t_pGridLayout->addWidget(t_pDoubleSpinBoxZoom,0,1,1,1);
+    t_pGridLayout->addWidget(t_pDoubleSpinBoxZoom,0,1,1,2);
 
-
+    //Window size
     QLabel* t_pLabelModality = new QLabel("Window size:");
     t_pGridLayout->addWidget(t_pLabelModality,1,0,1,1);
 
     QDoubleSpinBox* t_pDoubleSpinBoxWindow = new QDoubleSpinBox;
-    t_pDoubleSpinBoxWindow = new QDoubleSpinBox();
     t_pDoubleSpinBoxWindow->setMinimum(1);
     t_pDoubleSpinBoxWindow->setMaximum(10);
     t_pDoubleSpinBoxWindow->setSingleStep(1);
@@ -436,7 +442,50 @@ void QuickControlWidget::createViewGroup()
     t_pDoubleSpinBoxWindow->setStatusTip(tr("Window size"));
     connect(t_pDoubleSpinBoxWindow, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &QuickControlWidget::timeWindowChanged);
-    t_pGridLayout->addWidget(t_pDoubleSpinBoxWindow,1,1,1,1);
+    t_pGridLayout->addWidget(t_pDoubleSpinBoxWindow,1,1,1,2);
+
+    //Trigger detection
+    m_pTriggerDetectionCheckBox = new QCheckBox("Trigger Detection");
+    m_pTriggerDetectionCheckBox->setToolTip(tr("Real time trigger detection"));
+    m_pTriggerDetectionCheckBox->setStatusTip(tr("Real time trigger detection"));
+    connect(m_pTriggerDetectionCheckBox, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
+            this, &QuickControlWidget::realTimeTriggerActiveChanged);
+    t_pGridLayout->addWidget(m_pTriggerDetectionCheckBox,2,0,2,1);
+
+    m_pComboBoxChannel = new QComboBox;
+    QMapIterator<QString, QColor> i(m_qMapTriggerColor);
+    while(i.hasNext()) {
+        i.next();
+        m_pComboBoxChannel->addItem(i.key());
+    }
+    t_pGridLayout->addWidget(m_pComboBoxChannel,2,1,1,2);
+    connect(m_pComboBoxChannel, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
+            this, &QuickControlWidget::realTimeTriggerCurrentChChanged);
+
+    m_pDoubleSpinBoxThreshold = new QDoubleSpinBox;
+    m_pDoubleSpinBoxThreshold->setMinimum(0.0000001);
+    m_pDoubleSpinBoxThreshold->setMaximum(100000000);
+    m_pDoubleSpinBoxThreshold->setSingleStep(0.01);
+    m_pDoubleSpinBoxThreshold->setValue(0.01);
+    m_pDoubleSpinBoxThreshold->setToolTip(tr("Trigger threshold"));
+    m_pDoubleSpinBoxThreshold->setStatusTip(tr("Trigger threshold"));
+    connect(m_pDoubleSpinBoxThreshold, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &QuickControlWidget::realTimeTriggerThresholdChanged);
+    t_pGridLayout->addWidget(m_pDoubleSpinBoxThreshold,3,1,1,1);
+
+    m_pTriggerColorButton = new QPushButton;
+    m_pTriggerColorButton->setText("Change");
+    m_pTriggerColorButton->setToolTip(tr("Trigger color"));
+    m_pTriggerColorButton->setStatusTip(tr("Toggle trigger color"));
+    connect(m_pTriggerColorButton, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+            this, &QuickControlWidget::realTimeTriggerColorChanged);
+    m_pTriggerColorButton->setAutoFillBackground(true);
+    m_pTriggerColorButton->setFlat(true);
+    QPalette* palette1 = new QPalette();
+    palette1->setColor(QPalette::Button,QColor(255,20,20));
+    m_pTriggerColorButton->setPalette(*palette1);
+    m_pTriggerColorButton->update();
+    t_pGridLayout->addWidget(m_pTriggerColorButton,3,2,1,1);
 
     ui->m_groupBox_view->setLayout(t_pGridLayout);
 }
@@ -610,7 +659,6 @@ void QuickControlWidget::updateSliderScaling(int value)
                 scaleValue = 1.0;
         }
 
-
 //        qDebug()<<"m_pRTMSAW->m_qMapChScaling[it.key()]" << m_pRTMSAW->m_qMapChScaling[it.key()];
     }
 
@@ -620,25 +668,55 @@ void QuickControlWidget::updateSliderScaling(int value)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::toggleHideAll(bool state)
+void QuickControlWidget::realTimeTriggerActiveChanged(int state)
 {
-    if(!state) {
-        ui->m_groupBox_projections->hide();
-        ui->m_groupBox_filter->hide();
-        ui->m_groupBox_scaling->hide();
-        ui->m_groupBox_view->hide();
-        ui->m_pushButton_hideAll->setText("Maximize - Quick Control");
-    }
-    else {
-        ui->m_groupBox_projections->show();
-        ui->m_groupBox_filter->show();
-        ui->m_groupBox_scaling->show();
-        ui->m_groupBox_view->show();
-        ui->m_pushButton_hideAll->setText("Minimize - Quick Control");
-    }
+    Q_UNUSED(state);
 
-    this->adjustSize();
-    this->resize(width(), ui->m_pushButton_hideAll->height()-50);
+    emit triggerInfoChanged(m_qMapTriggerColor, m_pTriggerDetectionCheckBox->isChecked(), m_pComboBoxChannel->currentText(), m_pDoubleSpinBoxThreshold->value());
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::realTimeTriggerColorChanged(bool state)
+{
+    Q_UNUSED(state);
+
+    QColor color = QColorDialog::getColor(m_qMapTriggerColor[m_pComboBoxChannel->currentText()], this, "Set trigger color");
+
+    //Change color of pushbutton
+    QPalette* palette1 = new QPalette();
+    palette1->setColor(QPalette::Button,color);
+    m_pTriggerColorButton->setPalette(*palette1);
+    m_pTriggerColorButton->update();
+
+    m_qMapTriggerColor[m_pComboBoxChannel->currentText()] = color;
+
+    emit triggerInfoChanged(m_qMapTriggerColor, m_pTriggerDetectionCheckBox->isChecked(), m_pComboBoxChannel->currentText(), m_pDoubleSpinBoxThreshold->value());
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::realTimeTriggerThresholdChanged(double value)
+{
+    Q_UNUSED(value);
+
+    emit triggerInfoChanged(m_qMapTriggerColor, m_pTriggerDetectionCheckBox->isChecked(), m_pComboBoxChannel->currentText(), m_pDoubleSpinBoxThreshold->value());
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::realTimeTriggerCurrentChChanged(const QString &value)
+{
+    //Change color of pushbutton
+    QPalette* palette1 = new QPalette();
+    palette1->setColor(QPalette::Button,m_qMapTriggerColor[value]);
+    m_pTriggerColorButton->setPalette(*palette1);
+    m_pTriggerColorButton->update();
+
+    emit triggerInfoChanged(m_qMapTriggerColor, m_pTriggerDetectionCheckBox->isChecked(), m_pComboBoxChannel->currentText(), m_pDoubleSpinBoxThreshold->value());
 }
 
 
@@ -694,3 +772,29 @@ QRegion QuickControlWidget::roundedRect(const QRect& rect, int r)
     region += QRegion(corner, QRegion::Ellipse);
     return region;
 }
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::toggleHideAll(bool state)
+{
+    if(!state) {
+        ui->m_groupBox_projections->hide();
+        ui->m_groupBox_filter->hide();
+        ui->m_groupBox_scaling->hide();
+        ui->m_groupBox_view->hide();
+        ui->m_pushButton_hideAll->setText("Maximize - Quick Control");
+    }
+    else {
+        ui->m_groupBox_projections->show();
+        ui->m_groupBox_filter->show();
+        ui->m_groupBox_scaling->show();
+        ui->m_groupBox_view->show();
+        ui->m_pushButton_hideAll->setText("Minimize - Quick Control");
+    }
+
+    this->adjustSize();
+    this->resize(width(), ui->m_pushButton_hideAll->height()-50);
+}
+
+
