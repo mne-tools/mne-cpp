@@ -24,22 +24,20 @@ public:
 
 private slots:
     void on_openButton_clicked();
-//    void zoomIn();
-//    void zoomOut();
+    void on_zoomInButton_clicked();
+    void on_zoomOutButton_clicked();
 //    void normalSize();
 //    void fitToWindow();
 
-
-    void on_zoomInButton_clicked();
-
-    void on_zoomOutButton_clicked();
+    void on_resizeButton_clicked();
 
 private:
     // basic data objects
     Ui::MriViewer *ui;
     QGraphicsScene *scene;
-    QPixmap mriPixmap;
-    QImage *mriImage;
+    QGraphicsPixmapItem *mriPixmapItem;
+//    QPixmap mriPixmap;
+    QImage mriImage;
 
     // file information
     QString filePath;
@@ -50,6 +48,10 @@ private:
 
     // gui interaction
     QScrollArea *scrollArea;
+
+    double scaleSize;
+    double origXSize;
+    double origZSize;
 
 //    QAction *zoomInAct;
 //    QAction *zoomOutAct;

@@ -2,6 +2,7 @@
 #include "ui_mriviewer.h"
 
 #include <QFileDialog>
+#include <QGraphicsPixmapItem>
 
 MriViewer::MriViewer(QWidget *parent) :
     QWidget(parent),
@@ -14,13 +15,22 @@ MriViewer::MriViewer(QWidget *parent) :
     filePath = "D:/Bilder/Freunde/Lorenz_Esch.jpg";
     loadFile(filePath);
 
-    // set scrollArea
-//    scrollArea = new QScrollArea;
-//    scrollArea->setBackgroundRole(QPalette::Dark);
-//    scene->addWidget(scrollArea);
-
     ui->graphicsView->setScene(scene);
+
     resize(QGuiApplication::primaryScreen()->availableSize()*4/5);
+}
+
+void MriViewer::loadFile(QString filePath)
+{
+
+    mriImage.load(filePath);
+    mriPixmapItem = new QGraphicsPixmapItem(QPixmap::fromImage(mriImage));
+    mriPixmapItem->setFlag(QGraphicsItem::ItemIsMovable);
+    scene->addItem(mriPixmapItem);
+
+    scaleSize = 1;
+
+//    scene->setSceneRect(mriPixmapItem->pixmap().rect());
 }
 
 void MriViewer::on_openButton_clicked()
@@ -35,28 +45,31 @@ void MriViewer::on_openButton_clicked()
     loadFile(filePath);
 }
 
-void MriViewer::loadFile(QString filePath)
-{
-    mriImage = new QImage();
-    mriImage->load(filePath);
-
-    mriPixmap = QPixmap::fromImage(*mriImage);
-
-    scene->addPixmap(mriPixmap);
-//    scene->setSceneRect(mriPixmap.rect());
-}
-
 void MriViewer::on_zoomInButton_clicked()
 {
-    ui->graphicsView->scale(1.5,1.5);
+    double scaleUpFactor = 1.5;
+    ui->graphicsView->scale(scaleUpFactor,scaleUpFactor);
+    scaleSize = scaleUpFactor*scaleSize;
+    qDebug() << "scale up to" << scaleSize;
 }
 
 void MriViewer::on_zoomOutButton_clicked()
 {
-    ui->graphicsView->scale(0.75,0.75);
+    double scaleDownFactor = 0.75;
+    ui->graphicsView->scale(scaleDownFactor,scaleDownFactor);
+    scaleSize = scaleDownFactor*scaleSize;
+    qDebug() << "scale down to" << scaleSize;
+}
+
+void MriViewer::on_resizeButton_clicked()
+{
+//    ui->graphicsView->resize();
+    scaleSize = 1;
+    qDebug() << "resize to normal";
 }
 
 MriViewer::~MriViewer()
 {
     delete ui;
 }
+
