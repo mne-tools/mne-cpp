@@ -85,7 +85,8 @@ SOURCES += \
     filterTools/cosinefilter.cpp \
     filterTools/parksmcclellan.cpp \
     filterTools/filterdata.cpp \
-    filterTools/filterio.cpp
+    filterTools/filterio.cpp \
+    detecttrigger.cpp
 
 HEADERS += \
     kmeans.h\
@@ -103,7 +104,8 @@ HEADERS += \
     filterTools/cosinefilter.h \
     filterTools/parksmcclellan.h \
     filterTools/filterdata.h \
-    filterTools/filterio.h
+    filterTools/filterio.h \
+    detecttrigger.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
