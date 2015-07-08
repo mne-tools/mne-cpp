@@ -26,9 +26,6 @@ private slots:
     void on_openButton_clicked();
     void on_zoomInButton_clicked();
     void on_zoomOutButton_clicked();
-//    void normalSize();
-//    void fitToWindow();
-
     void on_resizeButton_clicked();
 
 private:
@@ -36,7 +33,6 @@ private:
     Ui::MriViewer *ui;
     QGraphicsScene *scene;
     QGraphicsPixmapItem *mriPixmapItem;
-//    QPixmap mriPixmap;
     QImage mriImage;
 
     // file information
@@ -52,11 +48,6 @@ private:
     double scaleSize;
     double origXSize;
     double origZSize;
-
-//    QAction *zoomInAct;
-//    QAction *zoomOutAct;
-//    QAction *zoomInAct;
-//    QAction *zoomOutAct;
 };
 
 #endif // MRIVIEWER_H

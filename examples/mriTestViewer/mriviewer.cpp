@@ -27,10 +27,7 @@ void MriViewer::loadFile(QString filePath)
     mriPixmapItem = new QGraphicsPixmapItem(QPixmap::fromImage(mriImage));
     mriPixmapItem->setFlag(QGraphicsItem::ItemIsMovable);
     scene->addItem(mriPixmapItem);
-
     scaleSize = 1;
-
-//    scene->setSceneRect(mriPixmapItem->pixmap().rect());
 }
 
 void MriViewer::on_openButton_clicked()
@@ -63,9 +60,9 @@ void MriViewer::on_zoomOutButton_clicked()
 
 void MriViewer::on_resizeButton_clicked()
 {
-//    ui->graphicsView->resize();
+    ui->graphicsView->scale(1/scaleSize,1/scaleSize);
     scaleSize = 1;
-    qDebug() << "resize to normal";
+    qDebug() << "resize to original zoom";
 }
 
 MriViewer::~MriViewer()
