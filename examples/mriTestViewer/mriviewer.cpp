@@ -8,12 +8,22 @@ MriViewer::MriViewer(QWidget *parent) :
     ui(new Ui::MriViewer)
 {
     ui->setupUi(this);
+    scene = new QGraphicsScene(this);
 
+    // load File
     filePath = "D:/Bilder/Freunde/Lorenz_Esch.jpg";
     loadFile(filePath);
+
+    // set scrollArea
+//    scrollArea = new QScrollArea;
+//    scrollArea->setBackgroundRole(QPalette::Dark);
+//    scene->addWidget(scrollArea);
+
+    ui->graphicsView->setScene(scene);
+    resize(QGuiApplication::primaryScreen()->availableSize()*4/5);
 }
 
-void MriViewer::on_pushButton_clicked()
+void MriViewer::on_openButton_clicked()
 {
     filePath = QFileDialog::getOpenFileName(
                 this,
@@ -32,11 +42,18 @@ void MriViewer::loadFile(QString filePath)
 
     mriPixmap = QPixmap::fromImage(*mriImage);
 
-    scene = new QGraphicsScene(this);
     scene->addPixmap(mriPixmap);
-    scene->setSceneRect(mriPixmap.rect());
+//    scene->setSceneRect(mriPixmap.rect());
+}
 
-    ui->graphicsView->setScene(scene);
+void MriViewer::on_zoomInButton_clicked()
+{
+    ui->graphicsView->scale(1.5,1.5);
+}
+
+void MriViewer::on_zoomOutButton_clicked()
+{
+    ui->graphicsView->scale(0.75,0.75);
 }
 
 MriViewer::~MriViewer()
