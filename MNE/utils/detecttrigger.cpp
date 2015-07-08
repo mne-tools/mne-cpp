@@ -76,7 +76,7 @@ void DetectTrigger::detectTriggerFlanks(const MatrixXd &data, QMap<int,QList<int
             return;
         }
 
-        RowVectorXd stimSegment = data.row(i.key());
+        RowVectorXd stimSegment = data.row(i.key())*(-1);
         RowVectorXd::Index indexMaxCoeff;
         int dMax = stimSegment.maxCoeff(&indexMaxCoeff);
 
