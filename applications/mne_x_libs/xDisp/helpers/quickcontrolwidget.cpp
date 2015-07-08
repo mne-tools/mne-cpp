@@ -450,7 +450,11 @@ void QuickControlWidget::createViewGroup()
     m_pTriggerDetectionCheckBox->setStatusTip(tr("Real time trigger detection"));
     connect(m_pTriggerDetectionCheckBox, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
             this, &QuickControlWidget::realTimeTriggerActiveChanged);
-    t_pGridLayout->addWidget(m_pTriggerDetectionCheckBox,2,0,2,1);
+    t_pGridLayout->addWidget(m_pTriggerDetectionCheckBox,3,0,1,1);
+
+    QLabel* t_pLabelTriggerActivation = new QLabel;
+    t_pLabelTriggerActivation->setText("Trigger threshold: ");
+    t_pGridLayout->addWidget(t_pLabelTriggerActivation,4,0,1,1);
 
     m_pComboBoxChannel = new QComboBox;
     QMapIterator<QString, QColor> i(m_qMapTriggerColor);
@@ -458,23 +462,13 @@ void QuickControlWidget::createViewGroup()
         i.next();
         m_pComboBoxChannel->addItem(i.key());
     }
-    t_pGridLayout->addWidget(m_pComboBoxChannel,2,1,1,2);
+    t_pGridLayout->addWidget(m_pComboBoxChannel,3,1,1,2);
     connect(m_pComboBoxChannel, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
             this, &QuickControlWidget::realTimeTriggerCurrentChChanged);
 
-    m_pDoubleSpinBoxThreshold = new QDoubleSpinBox;
-    m_pDoubleSpinBoxThreshold->setMinimum(0.0000001);
-    m_pDoubleSpinBoxThreshold->setMaximum(100000000);
-    m_pDoubleSpinBoxThreshold->setSingleStep(0.01);
-    m_pDoubleSpinBoxThreshold->setValue(0.01);
-    m_pDoubleSpinBoxThreshold->setToolTip(tr("Trigger threshold"));
-    m_pDoubleSpinBoxThreshold->setStatusTip(tr("Trigger threshold"));
-    connect(m_pDoubleSpinBoxThreshold, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &QuickControlWidget::realTimeTriggerThresholdChanged);
-    t_pGridLayout->addWidget(m_pDoubleSpinBoxThreshold,3,1,1,1);
-
     m_pTriggerColorButton = new QPushButton;
-    m_pTriggerColorButton->setText("Change");
+    m_pTriggerColorButton->setMaximumWidth(50);
+    m_pTriggerColorButton->setText("Ch Color");
     m_pTriggerColorButton->setToolTip(tr("Trigger color"));
     m_pTriggerColorButton->setStatusTip(tr("Toggle trigger color"));
     connect(m_pTriggerColorButton, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
@@ -485,7 +479,33 @@ void QuickControlWidget::createViewGroup()
     palette1->setColor(QPalette::Button,QColor(255,20,20));
     m_pTriggerColorButton->setPalette(*palette1);
     m_pTriggerColorButton->update();
-    t_pGridLayout->addWidget(m_pTriggerColorButton,3,2,1,1);
+    t_pGridLayout->addWidget(m_pTriggerColorButton,3,3,1,1);
+
+    m_pDoubleSpinBoxThreshold = new QDoubleSpinBox;
+    m_pDoubleSpinBoxThreshold->setMinimum(0.1);
+    m_pDoubleSpinBoxThreshold->setMaximum(100);
+    m_pDoubleSpinBoxThreshold->setSingleStep(0.1);
+    m_pDoubleSpinBoxThreshold->setValue(0.1);
+    m_pDoubleSpinBoxThreshold->setToolTip(tr("Trigger threshold"));
+    m_pDoubleSpinBoxThreshold->setStatusTip(tr("Trigger threshold"));
+    connect(m_pDoubleSpinBoxThreshold, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &QuickControlWidget::realTimeTriggerThresholdChanged);
+    t_pGridLayout->addWidget(m_pDoubleSpinBoxThreshold,4,1,1,1);
+
+    QLabel* t_pLabelPrec = new QLabel;
+    t_pLabelPrec->setText("e^");
+    t_pGridLayout->addWidget(t_pLabelPrec,4,2,1,1);
+
+    m_pSpinBoxThresholdPrec = new QSpinBox;
+    m_pSpinBoxThresholdPrec->setMinimum(-100);
+    m_pSpinBoxThresholdPrec->setMaximum(100);
+    m_pSpinBoxThresholdPrec->setSingleStep(1);
+    m_pSpinBoxThresholdPrec->setValue(0);
+    m_pSpinBoxThresholdPrec->setToolTip(tr("Trigger threshold precision"));
+    m_pSpinBoxThresholdPrec->setStatusTip(tr("Trigger threshold precision"));
+    connect(m_pSpinBoxThresholdPrec, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &QuickControlWidget::realTimeTriggerThresholdChanged);
+    t_pGridLayout->addWidget(m_pSpinBoxThresholdPrec,4,3,1,1);
 
     ui->m_groupBox_view->setLayout(t_pGridLayout);
 }
@@ -672,7 +692,7 @@ void QuickControlWidget::realTimeTriggerActiveChanged(int state)
 {
     Q_UNUSED(state);
 
-    emit triggerInfoChanged(m_qMapTriggerColor, m_pTriggerDetectionCheckBox->isChecked(), m_pComboBoxChannel->currentText(), m_pDoubleSpinBoxThreshold->value());
+    emit triggerInfoChanged(m_qMapTriggerColor, m_pTriggerDetectionCheckBox->isChecked(), m_pComboBoxChannel->currentText(), m_pDoubleSpinBoxThreshold->value()*pow(10,m_pSpinBoxThresholdPrec->value()));
 }
 
 
@@ -692,7 +712,7 @@ void QuickControlWidget::realTimeTriggerColorChanged(bool state)
 
     m_qMapTriggerColor[m_pComboBoxChannel->currentText()] = color;
 
-    emit triggerInfoChanged(m_qMapTriggerColor, m_pTriggerDetectionCheckBox->isChecked(), m_pComboBoxChannel->currentText(), m_pDoubleSpinBoxThreshold->value());
+    emit triggerInfoChanged(m_qMapTriggerColor, m_pTriggerDetectionCheckBox->isChecked(), m_pComboBoxChannel->currentText(), m_pDoubleSpinBoxThreshold->value()*pow(10,m_pSpinBoxThresholdPrec->value()));
 }
 
 
@@ -702,7 +722,7 @@ void QuickControlWidget::realTimeTriggerThresholdChanged(double value)
 {
     Q_UNUSED(value);
 
-    emit triggerInfoChanged(m_qMapTriggerColor, m_pTriggerDetectionCheckBox->isChecked(), m_pComboBoxChannel->currentText(), m_pDoubleSpinBoxThreshold->value());
+    emit triggerInfoChanged(m_qMapTriggerColor, m_pTriggerDetectionCheckBox->isChecked(), m_pComboBoxChannel->currentText(), m_pDoubleSpinBoxThreshold->value()*pow(10,m_pSpinBoxThresholdPrec->value()));
 }
 
 
@@ -716,7 +736,7 @@ void QuickControlWidget::realTimeTriggerCurrentChChanged(const QString &value)
     m_pTriggerColorButton->setPalette(*palette1);
     m_pTriggerColorButton->update();
 
-    emit triggerInfoChanged(m_qMapTriggerColor, m_pTriggerDetectionCheckBox->isChecked(), m_pComboBoxChannel->currentText(), m_pDoubleSpinBoxThreshold->value());
+    emit triggerInfoChanged(m_qMapTriggerColor, m_pTriggerDetectionCheckBox->isChecked(), m_pComboBoxChannel->currentText(), m_pDoubleSpinBoxThreshold->value()*pow(10,m_pSpinBoxThresholdPrec->value()));
 }
 
 

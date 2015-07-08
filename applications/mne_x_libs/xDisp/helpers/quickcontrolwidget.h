@@ -263,7 +263,7 @@ protected:
 private:
     QPoint                  m_dragPosition;         /**< the drag position of the window */
 
-    QMap<qint32,float>*           m_qMapChScaling;                /**< Channel scaling values. */
+    QMap<qint32,float>*             m_qMapChScaling;                /**< Channel scaling values. */
     QMap<qint32, QDoubleSpinBox*>   m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits */
     QMap<qint32, QSlider*>          m_qMapScalingSlider;            /**< Map of types and channel scaling line edits */
     QMap<QString, QColor>           m_qMapTriggerColor;             /**< Trigger channel colors. */
@@ -272,11 +272,12 @@ private:
     QList<QCheckBox*>   m_qFilterListCheckBox;      /**< List of filter CheckBox. */
     FiffInfo::SPtr      m_pFiffInfo;                /**< Connected fiff info. */
 
-    QCheckBox*          m_pTriggerDetectionCheckBox;/**< Holds the enable disable trigger detection check box. */
-    QCheckBox *         m_enableDisableProjectors;  /**< Holds the enable disable all check box. */
-    QPushButton*        m_pTriggerColorButton;      /**< Holds the trigger color button. */
-    QComboBox*          m_pComboBoxChannel;         /**< Holds the available trigger channels. */
-    QDoubleSpinBox*     m_pDoubleSpinBoxThreshold;  /**< Holds the trigger channel threshold. */
+    QCheckBox*          m_pTriggerDetectionCheckBox;    /**< Holds the enable disable trigger detection check box. */
+    QCheckBox *         m_enableDisableProjectors;      /**< Holds the enable disable all check box. */
+    QPushButton*        m_pTriggerColorButton;          /**< Holds the trigger color button. */
+    QComboBox*          m_pComboBoxChannel;             /**< Holds the available trigger channels. */
+    QDoubleSpinBox*     m_pDoubleSpinBoxThreshold;      /**< Holds the trigger channel threshold. */
+    QSpinBox*           m_pSpinBoxThresholdPrec;        /**< Holds the trigger channel threshold precision. */
 
     Ui::QuickControlWidget *ui;                     /**< The generated UI file */
 };
