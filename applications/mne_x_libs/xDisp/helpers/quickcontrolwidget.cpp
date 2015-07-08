@@ -453,7 +453,7 @@ void QuickControlWidget::createViewGroup()
     t_pGridLayout->addWidget(m_pTriggerDetectionCheckBox,3,0,1,1);
 
     QLabel* t_pLabelTriggerActivation = new QLabel;
-    t_pLabelTriggerActivation->setText("Trigger threshold: ");
+    t_pLabelTriggerActivation->setText("Detection threshold: ");
     t_pGridLayout->addWidget(t_pLabelTriggerActivation,4,0,1,1);
 
     m_pComboBoxChannel = new QComboBox;
