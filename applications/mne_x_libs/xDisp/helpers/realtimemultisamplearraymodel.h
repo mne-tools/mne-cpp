@@ -48,6 +48,7 @@
 
 #include <utils/filterTools/filterdata.h>
 #include <utils/mnemath.h>
+#include <utils/detecttrigger.h>
 
 
 //*************************************************************************************************************
@@ -440,14 +441,6 @@ private:
     * @param [in] dataIndex     current position in the global data matrix
     */
     void filterChannelsConcurrently(const MatrixXd &data, int dataIndex);
-
-    //=========================================================================================================
-    /**
-    * detects the trigger flanks and writes them into the trigger name to index map m_qMapDetectedTrigger
-    *
-    * @param [in] data          current data blocked which is to be checked for trigger flanks
-    */
-    void detectTrigger(const MatrixXd &data);
 
     //=========================================================================================================
     /**
