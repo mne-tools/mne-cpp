@@ -27,6 +27,8 @@ private slots:
     void on_zoomInButton_clicked();
     void on_zoomOutButton_clicked();
     void on_resizeButton_clicked();
+    virtual void wheelEvent(QWheelEvent *event);
+    bool eventFilter(QObject *object, QEvent *event);
 
 private:
     // basic data objects
@@ -46,8 +48,7 @@ private:
     QScrollArea *scrollArea;
 
     double scaleSize;
-    double origXSize;
-    double origZSize;
+
 };
 
 #endif // MRIVIEWER_H

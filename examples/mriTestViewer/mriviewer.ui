@@ -14,22 +14,6 @@
    <string>MRI Test Viewer Example</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" colspan="5">
-    <widget class="QGraphicsView" name="graphicsView"/>
-   </item>
-   <item row="1" column="0">
-    <widget class="QPushButton" name="openButton">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string>Open</string>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="4">
     <widget class="QPushButton" name="zoomInButton">
      <property name="sizePolicy">
@@ -80,6 +64,36 @@
      </property>
     </widget>
    </item>
+   <item row="1" column="0">
+    <widget class="QPushButton" name="openButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>Open</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="5">
+    <widget class="QGraphicsView" name="graphicsView">
+     <property name="mouseTracking">
+      <bool>false</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QPushButton" name="resizeButton">
+     <property name="text">
+      <string>Resize</string>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="1">
     <spacer name="horizontalSpacer">
      <property name="orientation">
@@ -92,13 +106,6 @@
       </size>
      </property>
     </spacer>
-   </item>
-   <item row="1" column="2">
-    <widget class="QPushButton" name="resizeButton">
-     <property name="text">
-      <string>Resize</string>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>

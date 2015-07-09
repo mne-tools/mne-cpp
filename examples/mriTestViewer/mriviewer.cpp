@@ -16,6 +16,7 @@ MriViewer::MriViewer(QWidget *parent) :
     loadFile(filePath);
 
     ui->graphicsView->setScene(scene);
+    ui->graphicsView->installEventFilter(this);
 
     resize(QGuiApplication::primaryScreen()->availableSize()*4/5);
 }
@@ -63,6 +64,32 @@ void MriViewer::on_resizeButton_clicked()
     ui->graphicsView->scale(1/scaleSize,1/scaleSize);
     scaleSize = 1;
     qDebug() << "resize to original zoom";
+}
+
+//void MriViewer::in_graphicsView_scrolled(QWheelEvent *event)
+void MriViewer::wheelEvent(QWheelEvent *event)
+{
+    int scrollEvent = event->delta();
+    double scaleFactor;
+
+    if (scrollEvent>0)
+        scaleFactor = 1.2;
+    else if (scrollEvent<0)
+        scaleFactor = 0.8;
+    else
+        scaleFactor = 1.0;
+    scaleSize = scaleFactor*scaleSize;
+    ui->graphicsView->scale(scaleFactor,scaleFactor);
+    qDebug() << "scale to" << scaleSize;
+}
+
+bool MriViewer::eventFilter(QObject *object, QEvent *event)
+{
+    if (object == ui->graphicsView->scene() && event->type() == QEvent::Wheel) {
+        qDebug() << "Scroll";
+        return true;
+    }
+    return false;
 }
 
 MriViewer::~MriViewer()
