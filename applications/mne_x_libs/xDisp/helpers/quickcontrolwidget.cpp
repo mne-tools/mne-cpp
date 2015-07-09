@@ -476,7 +476,7 @@ void QuickControlWidget::createViewGroup()
     m_pTriggerColorButton->setAutoFillBackground(true);
     m_pTriggerColorButton->setFlat(true);
     QPalette* palette1 = new QPalette();
-    palette1->setColor(QPalette::Button,QColor(255,20,20));
+    palette1->setColor(QPalette::Button,QColor(177,0,0));
     m_pTriggerColorButton->setPalette(*palette1);
     m_pTriggerColorButton->update();
     t_pGridLayout->addWidget(m_pTriggerColorButton,3,3,1,1);
