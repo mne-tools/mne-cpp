@@ -95,6 +95,7 @@ class Label;
 namespace MNELIB
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -127,7 +128,6 @@ public:
     */
     MNEBem();
 
-
     //=========================================================================================================
     /**
     * Copy constructor.
@@ -136,13 +136,11 @@ public:
     */
     MNEBem(const MNEBem &p_MNEBem);
 
-
     //=========================================================================================================
     /**
     * Default constructor
     */
     MNEBem(QIODevice &p_IODevice);
-
 
     //=========================================================================================================
     /**
@@ -170,11 +168,9 @@ public:
     *
     * Write Matrix to a textfile
     */
-    static void MNEBem::get_EigentoData(MatrixX3f &src, char* pathAndName);
-
+    static void MNEBem::getEigenToData(MatrixX3f &src, char* pathAndName);
 
 protected:
-
     //=========================================================================================================
     /**
     * Implementation of the read_bem_surface function in e.g. mne_read_bem_surface.m
@@ -182,12 +178,11 @@ protected:
     *
     * @param [in] p_pStream         The opened fif file
     * @param [in] p_Tree            Search for the source space here
-    * @param [out] p_BemSurface    The read source space (hemisphere)
+    * @param [out] p_BemSurface     The read source space (hemisphere)
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read_bem_surface(FiffStream* p_pStream, const FiffDirTree& p_Tree, MNEBemSurface& p_BemSurface);
-
+    static bool readBemSurface(FiffStream* p_pStream, const FiffDirTree& p_Tree, MNEBemSurface& p_BemSurface);
 
 private:
     QList<MNEBemSurface> m_qListBemSurface;    /**< List of the BEM Surfaces. */
@@ -197,8 +192,6 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
-
 
 } // NAMESPACE
 

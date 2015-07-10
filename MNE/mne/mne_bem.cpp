@@ -45,7 +45,6 @@
 #include <fs/label.h>
 
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -64,6 +63,7 @@ using namespace MNELIB;
 MNEBem::MNEBem()
 {
 }
+
 
 //*************************************************************************************************************
 
@@ -89,7 +89,6 @@ MNEBem::MNEBem(QIODevice &p_IODevice)   //const MNESourceSpace &p_MNESourceSpace
 ////        return false;
 //    }
 
-
     if(!MNEBem::readFromStream(t_pStream, true, t_Tree, *this))
     {
         t_pStream->device()->close();
@@ -108,11 +107,11 @@ MNEBem::~MNEBem()
 
 }
 
+
 //*************************************************************************************************************
 
 bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNEBem& p_Bem)
 {
-
     //
     //   Open the file, create directory
     //
@@ -153,10 +152,10 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirT
         {
             MNEBemSurface  p_BemSurface;
             printf("\tReading a BEM surface...");
-            MNEBem::read_bem_surface(p_pStream.data(), bemsurf[k], p_BemSurface);
-            p_BemSurface.add_triangle_data();
+            MNEBem::readBemSurface(p_pStream.data(), bemsurf[k], p_BemSurface);
+            p_BemSurface.addTriangleData();
              if (add_geom)
-                p_BemSurface.add_vertex_normals();
+                p_BemSurface.addVertexNormals();
             printf("\t[done]\n" );
 
             p_Bem.m_qListBemSurface.append(p_BemSurface);
@@ -164,12 +163,14 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirT
     //           src(k) = this;
         }
     }
-return true;
+
+    return true;
 }
+
 
 //*************************************************************************************************************
 
-bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, MNEBemSurface &p_BemSurface)
+bool MNEBem::readBemSurface(FiffStream *p_pStream, const FiffDirTree &p_Tree, MNEBemSurface &p_BemSurface)
 {
     p_BemSurface.clear();
 
@@ -257,7 +258,6 @@ bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, 
     }
         qDebug() << "Surf Nodes; type:" << t_pTag->getType();
 
-
     //=====================================================================
     if(!p_Tree.find_tag(p_pStream, FIFF_BEM_SURF_NORMALS, t_pTag))
     {
@@ -282,9 +282,7 @@ bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, 
         return false;
     }
 
-
-        qDebug() << "Source Space Normals; type:" << t_pTag->getType();
-
+    qDebug() << "Source Space Normals; type:" << t_pTag->getType();
 
     //=====================================================================
     if (p_BemSurface.ntri > 0)
@@ -324,7 +322,6 @@ bool MNEBem::read_bem_surface(FiffStream *p_pStream, const FiffDirTree &p_Tree, 
         qDebug() << "Triangles; type:" << t_pTag->getType() << "rows:" << p_BemSurface.tris.rows() << "cols:" << p_BemSurface.tris.cols();
         qDebug() << "First Triangle: " << p_BemSurface.tris(0, 0) << p_BemSurface.tris(0, 1) << p_BemSurface.tris(0, 2);
         qDebug() << "Last Triangle: " << p_BemSurface.tris(p_BemSurface.tris.rows()-1, 0) << p_BemSurface.tris(p_BemSurface.tris.rows()-1, 1) << p_BemSurface.tris(p_BemSurface.tris.rows()-1, 2);
-
 
     return true;
 }

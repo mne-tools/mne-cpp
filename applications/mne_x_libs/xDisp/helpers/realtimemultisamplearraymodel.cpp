@@ -338,10 +338,10 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
             if(m_iResidual == data.at(b).cols())
                 m_iResidual = 0;
 
-            //            std::cout<<"incoming data exceeds internal data cols by: "<<(m_iCurrentSample+data.at(b).cols()) % m_matDataRaw.cols()<<std::endl;
-            //            std::cout<<"m_iCurrentSample+data.at(b).cols(): "<<m_iCurrentSample+data.at(b).cols()<<std::endl;
-            //            std::cout<<"m_matDataRaw.cols(): "<<m_matDataRaw.cols()<<std::endl;
-            //            std::cout<<"data.at(b).cols()-m_iResidual: "<<data.at(b).cols()-m_iResidual<<std::endl<<std::endl;
+//            std::cout<<"incoming data exceeds internal data cols by: "<<(m_iCurrentSample+data.at(b).cols()) % m_matDataRaw.cols()<<std::endl;
+//            std::cout<<"m_iCurrentSample+data.at(b).cols(): "<<m_iCurrentSample+data.at(b).cols()<<std::endl;
+//            std::cout<<"m_matDataRaw.cols(): "<<m_matDataRaw.cols()<<std::endl;
+//            std::cout<<"data.at(b).cols()-m_iResidual: "<<data.at(b).cols()-m_iResidual<<std::endl<<std::endl;
 
             if(doProj)
                 m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseProj * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
@@ -349,13 +349,6 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
                 m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
 
             m_iCurrentSample = 0;
-
-            //Delete all detected triggers
-            QMutableMapIterator<int,QList<int> > i(m_qMapDetectedTrigger);
-            while (i.hasNext()) {
-                i.next();
-                i.value().clear();
-            }
 
             if(!m_bIsFreezed) {
                 m_vecLastBlockFirstValuesFiltered = m_matDataFiltered.col(0);
@@ -381,8 +374,16 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
         m_iCurrentBlockSize = data.at(b).cols();
 
         //detect the trigger flanks in the trigger channels
-        if(m_bTriggerDetectionActive)
+        if(m_bTriggerDetectionActive) {
+            //Delete all detected triggers
+            QMutableMapIterator<int,QList<int> > i(m_qMapDetectedTrigger);
+            while (i.hasNext()) {
+                i.next();
+                i.value().clear();
+            }
+
             DetectTrigger::detectTriggerFlanks(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-data.at(b).cols(), m_dTriggerThreshold);
+        }
     }
 
     //Update data content
