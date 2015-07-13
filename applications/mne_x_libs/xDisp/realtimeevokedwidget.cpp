@@ -147,11 +147,6 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     this->setLayout(m_pRteLayout);
 
     getData();
-
-    //Create pointers for selection manager
-    FiffInfo::SPtr fiffPointer = FiffInfo::SPtr(&m_fiffInfo);
-    m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(this, fiffPointer));
-    m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel.data()));
 }
 
 
@@ -307,10 +302,13 @@ void RealTimeEvokedWidget::init()
 
         m_pButterflyPlot->setSettings(m_qListModalities);
 
-        m_pActionSelectModality->setVisible(true);        
-        m_pActionSelectSensors->setVisible(true);
-
         //Set up selection manager
+
+        //Create pointers for selection manager
+        FiffInfo::SPtr fiffPointer = FiffInfo::SPtr(&m_fiffInfo);
+        m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(this, fiffPointer));
+        m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel.data()));
+
         connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::showSelectedChannelsOnly,
                 this, &RealTimeEvokedWidget::showSelectedChannelsOnly);
 
@@ -320,9 +318,6 @@ void RealTimeEvokedWidget::init()
 
         connect(m_pChInfoModel.data(), &ChInfoModel::channelsMappedToLayout,
                 m_pSelectionManagerWindow.data(), &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
-
-        FiffInfo::SPtr fiffPointer = FiffInfo::SPtr(&m_fiffInfo);
-        m_pChInfoModel->fiffInfoChanged(fiffPointer);
 
         // Initialized
         m_bInitialized = true;
