@@ -46,10 +46,10 @@
 #include "newmeasurementwidget.h"
 #include "helpers/realtimeevokedmodel.h"
 #include "helpers/realtimebutterflyplot.h"
-
 #include "helpers/evokedmodalitywidget.h"
 #include "helpers/selectionmanagerwindow.h"
 #include "helpers/chinfomodel.h"
+#include "helpers/realtimemultisamplearrayscalingwidget.h"
 
 
 //*************************************************************************************************************
@@ -138,6 +138,8 @@ class XDISPSHARED_EXPORT RealTimeEvokedWidget : public NewMeasurementWidget
     Q_OBJECT
 
     friend class EvokedModalityWidget;
+    friend class RealTimeMultiSampleArrayScalingWidget;
+
 public:
     //=========================================================================================================
     /**
@@ -202,31 +204,47 @@ private:
     */
     void showSelectedChannelsOnly(QStringList selectedChannels);
 
-    QVBoxLayout *m_pRteLayout;  /**< RTE Widget layout */
-    QLabel *m_pLabelInit;       /**< Initialization LAbel */
+    //=========================================================================================================
+    /**
+    * Broadcast channel scaling
+    *
+    * @param [in] scaleMap QMap with scaling values which is to be broadcasted to the model.
+    */
+    void broadcastScaling(QMap<qint32, float> scaleMap);
+
+    //=========================================================================================================
+    /**
+    * Show channel scaling widget
+    */
+    void showChScalingWidget();
 
     RealTimeEvokedModel*        m_pRTEModel;                /**< RTE data model */
     RealTimeButterflyPlot*      m_pButterflyPlot;           /**< Butterfly plot */
 
-    QAction* m_pActionSelectModality;                       /**< Modality selection action */
+    bool            m_bInitialized;             /**< Is Initialized */
+    bool            m_bHideBadChannels;         /**< hide bad channels flag. */
 
-    QSharedPointer<RealTimeEvoked> m_pRTE;                  /**< The real-time evoked measurement. */
+    FiffInfo        m_fiffInfo;                 /**< FiffInfo, which is used insteadd of ListChInfo*/
 
-    bool m_bInitialized;                                    /**< Is Initialized */
+    QAction*        m_pActionSelectSensors;     /**< show roi select widget */
+    QAction*        m_pActionSelectModality;    /**< Modality selection action */
+    QAction*        m_pActionChScaling;         /**< Show channel scaling Action. */
 
-    QList<RealTimeSampleArrayChInfo>    m_qListChInfo;      /**< Channel info list. ToDo: check if this is obsolete later on*/
-    FiffInfo m_fiffInfo;                                    /**< FiffInfo, which is used insteadd of ListChInfo*/
+    QVBoxLayout*    m_pRteLayout;               /**< RTE Widget layout */
+    QLabel*         m_pLabelInit;               /**< Initialization LAbel */
 
-    QAction*    m_pActionSelectSensors;                     /**< show roi select widget */
+    QSharedPointer<SelectionManagerWindow>                  m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */
+    QSharedPointer<RealTimeMultiSampleArrayScalingWidget>   m_pScalingWidget;           /**< Channel scaling widget. */
+    QSharedPointer<ChInfoModel>                             m_pChInfoModel;             /**< channel info model. */
+    QSharedPointer<EvokedModalityWidget>                    m_pEvokedModalityWidget;    /**< Evoked modality widget. */
+    QSharedPointer<RealTimeEvoked>                          m_pRTE;                     /**< The real-time evoked measurement. */
 
-    QSharedPointer<SelectionManagerWindow> m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */
-    QSharedPointer<ChInfoModel> m_pChInfoModel;             /**< channel info model. */
-    bool            m_bHideBadChannels;                     /**< hide bad channels flag. */
+    QList<Modality>                     m_qListModalities;
+    QList<qint32>                       m_qListCurrentSelection;    /**< Current selection list -> hack around C++11 lambda  */
+    QList<RealTimeSampleArrayChInfo>    m_qListChInfo;              /**< Channel info list. ToDo: check if this is obsolete later on*/
 
-    QSharedPointer<EvokedModalityWidget> m_pEvokedModalityWidget;   /**< Evoked modality widget. */
-    QList< Modality > m_qListModalities;
+    QMap<qint32,float>                  m_qMapChScaling;            /**< Channel scaling values. */
 
-    QList<qint32> m_qListCurrentSelection;  /**< Current selection list -> hack around C++11 lambda  */
     void applySelection();                  /**< apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
     void resetSelection();                  /**< reset the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
 };

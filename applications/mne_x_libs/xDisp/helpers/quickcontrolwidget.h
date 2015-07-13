@@ -100,7 +100,7 @@ public:
     * @param [in] parent    parent of widget
     * @param [in] qMapChScaling    pointer to scaling information
     */
-    QuickControlWidget(QMap<qint32,float>* qMapChScaling, const FiffInfo::SPtr pFiffInfo, QWidget *parent = 0);
+    QuickControlWidget(QMap<qint32, float> qMapChScaling, const FiffInfo::SPtr pFiffInfo, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -119,7 +119,7 @@ signals:
     /**
     * Emit this signal whenever the scaling sliders or spin boxes changed.
     */
-    void scalingChanged();
+    void scalingChanged(QMap<qint32, float> scalingMap);
 
     //=========================================================================================================
     /**
@@ -263,7 +263,7 @@ protected:
 private:
     QPoint                  m_dragPosition;         /**< the drag position of the window */
 
-    QMap<qint32,float>*             m_qMapChScaling;                /**< Channel scaling values. */
+    QMap<qint32,float>              m_qMapChScaling;                /**< Channel scaling values. */
     QMap<qint32, QDoubleSpinBox*>   m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits */
     QMap<qint32, QSlider*>          m_qMapScalingSlider;            /**< Map of types and channel scaling line edits */
     QMap<QString, QColor>           m_qMapTriggerColor;             /**< Trigger channel colors. */

@@ -354,6 +354,16 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
                 m_vecLastBlockFirstValuesFiltered = m_matDataFiltered.col(0);
                 m_vecLastBlockFirstValuesRaw = m_matDataRaw.col(0);
             }
+
+            //detect the trigger flanks in the trigger channels
+            if(m_bTriggerDetectionActive) {
+                //Delete all detected triggers
+                QMutableMapIterator<int,QList<int> > i(m_qMapDetectedTrigger);
+                while (i.hasNext()) {
+                    i.next();
+                    i.value().clear();
+                }
+            }
         } else
             m_iResidual = 0;
 
@@ -374,16 +384,8 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
         m_iCurrentBlockSize = data.at(b).cols();
 
         //detect the trigger flanks in the trigger channels
-        if(m_bTriggerDetectionActive) {
-            //Delete all detected triggers
-            QMutableMapIterator<int,QList<int> > i(m_qMapDetectedTrigger);
-            while (i.hasNext()) {
-                i.next();
-                i.value().clear();
-            }
-
+        if(m_bTriggerDetectionActive)
             DetectTrigger::detectTriggerFlanks(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-data.at(b).cols(), m_dTriggerThreshold);
-        }
     }
 
     //Update data content

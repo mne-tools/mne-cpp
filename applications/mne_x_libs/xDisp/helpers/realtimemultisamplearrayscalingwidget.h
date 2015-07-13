@@ -88,19 +88,18 @@ public:
     /**
     * Constructs a EvokedModalityWidget which is a child of connected RTMSAW.
     *
-    * @param [in] toolbox   connected RealTimeMultiSampleArrayWidget
+    * @param [in] scaleMap   scaling maps for all channels
     */
-    RealTimeMultiSampleArrayScalingWidget(RealTimeMultiSampleArrayWidget *toolbox);
+    RealTimeMultiSampleArrayScalingWidget(QMap<qint32,float> &scaleMap);
 
     void updateDoubleSpinBox(const double val);
 
 signals:
-    void scalingChanged();
+    void scalingChanged(QMap<qint32,float> scaleMap);
 
 private:
-    RealTimeMultiSampleArrayWidget * m_pRTMSAW;     /**< Connected real-time evoked widget */
-
-    QMap<qint32, QDoubleSpinBox*>   m_qMapScalingDoubleSpinBox;    /**< Map of types and channel scaling line edits */
+    QMap<qint32,float>                      m_qMapChScaling;                /**< Map of types and channel scaling values */
+    QMap<qint32, QDoubleSpinBox*>           m_qMapScalingDoubleSpinBox;    /**< Map of types and channel scaling line edits */
 };
 
 } // NAMESPACE

@@ -126,6 +126,14 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     addDisplayAction(m_pActionSelectSensors);
     m_pActionSelectSensors->setVisible(false);
 
+    m_pActionChScaling = new QAction(QIcon(":/images/channelScaling.png"), tr("Shows the channel scaling widget (F10)"),this);
+    m_pActionChScaling->setShortcut(tr("F10"));
+    m_pActionChScaling->setStatusTip(tr("Shows the channel scaling widget (F10)"));
+    connect(m_pActionChScaling, &QAction::triggered,
+            this, &RealTimeEvokedWidget::showChScalingWidget);
+    addDisplayAction(m_pActionChScaling);
+    m_pActionChScaling->setVisible(false);
+
     //set vertical layout
     m_pRteLayout = new QVBoxLayout(this);
 
@@ -168,6 +176,24 @@ RealTimeEvokedWidget::~RealTimeEvokedWidget()
             settings.setValue(QString("RTEW/%1/%2/active").arg(t_sRTEWName).arg(m_qListModalities[i].m_sName), m_qListModalities[i].m_bActive);
             settings.setValue(QString("RTEW/%1/%2/norm").arg(t_sRTEWName).arg(m_qListModalities[i].m_sName), m_qListModalities[i].m_fNorm);
         }
+
+        if(m_qMapChScaling.contains(FIFF_UNIT_T))
+            settings.setValue(QString("RTEW/%1/scaleMAG").arg(t_sRTEWName), m_qMapChScaling[FIFF_UNIT_T]);
+
+        if(m_qMapChScaling.contains(FIFF_UNIT_T_M))
+            settings.setValue(QString("RTEW/%1/scaleGRAD").arg(t_sRTEWName), m_qMapChScaling[FIFF_UNIT_T_M]);
+
+        if(m_qMapChScaling.contains(FIFFV_EEG_CH))
+            settings.setValue(QString("RTEW/%1/scaleEEG").arg(t_sRTEWName), m_qMapChScaling[FIFFV_EEG_CH]);
+
+        if(m_qMapChScaling.contains(FIFFV_EOG_CH))
+            settings.setValue(QString("RTEW/%1/scaleEOG").arg(t_sRTEWName), m_qMapChScaling[FIFFV_EOG_CH]);
+
+        if(m_qMapChScaling.contains(FIFFV_STIM_CH))
+            settings.setValue(QString("RTEW/%1/scaleSTIM").arg(t_sRTEWName), m_qMapChScaling[FIFFV_STIM_CH]);
+
+        if(m_qMapChScaling.contains(FIFFV_MISC_CH))
+            settings.setValue(QString("RTEW/%1/scaleMISC").arg(t_sRTEWName), m_qMapChScaling[FIFFV_MISC_CH]);
     }
 }
 
@@ -302,9 +328,77 @@ void RealTimeEvokedWidget::init()
 
         m_pButterflyPlot->setSettings(m_qListModalities);
 
-        //Set up selection manager
+        //Initialize the windows
+        if(!m_pScalingWidget)
+        {
+            m_pScalingWidget = QSharedPointer<RealTimeMultiSampleArrayScalingWidget>(new RealTimeMultiSampleArrayScalingWidget(m_qMapChScaling));
 
-        //Create pointers for selection manager
+            //m_pScalingWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
+
+            connect(m_pScalingWidget.data(), &RealTimeMultiSampleArrayScalingWidget::scalingChanged,
+                    this, &RealTimeEvokedWidget::broadcastScaling);
+        }
+
+        //Scaling
+        //Show only spin boxes and labels which type are present in the current loaded fiffinfo
+        QList<FiffChInfo> channelList = m_fiffInfo.chs;
+        QList<int> availabeChannelTypes;
+
+        for(int i = 0; i<channelList.size(); i++) {
+            int unit = channelList.at(i).unit;
+            int type = channelList.at(i).kind;
+
+            if(!availabeChannelTypes.contains(unit))
+                availabeChannelTypes.append(unit);
+
+            if(!availabeChannelTypes.contains(type))
+                availabeChannelTypes.append(type);
+        }
+
+        QString t_sRTEName = m_pRTE->getName();
+
+        if(!t_sRTEName.isEmpty())
+        {
+            m_qMapChScaling.clear();
+
+            QSettings settings;
+            float val = 0.0f;
+            if(availabeChannelTypes.contains(FIFF_UNIT_T)) {
+                val = settings.value(QString("RTEW/%1/scaleMAG").arg(t_sRTEWName), 1e-11f).toFloat();
+                m_qMapChScaling.insert(FIFF_UNIT_T, val);
+            }
+
+            if(availabeChannelTypes.contains(FIFF_UNIT_T_M)) {
+                val = settings.value(QString("RTEW/%1/scaleGRAD").arg(t_sRTEWName), 1e-10f).toFloat();
+                m_qMapChScaling.insert(FIFF_UNIT_T_M, val);
+            }
+
+            if(availabeChannelTypes.contains(FIFFV_EEG_CH)) {
+                val = settings.value(QString("RTEW/%1/scaleEEG").arg(t_sRTEWName), 1e-4f).toFloat();
+                m_qMapChScaling.insert(FIFFV_EEG_CH, val);
+            }
+
+            if(availabeChannelTypes.contains(FIFFV_EOG_CH)) {
+                val = settings.value(QString("RTEW/%1/scaleEOG").arg(t_sRTEWName), 1e-3f).toFloat();
+                m_qMapChScaling.insert(FIFFV_EOG_CH, val);
+            }
+
+            if(availabeChannelTypes.contains(FIFFV_STIM_CH)) {
+                val = settings.value(QString("RTEW/%1/scaleSTIM").arg(t_sRTEWName), 1e-3f).toFloat();
+                m_qMapChScaling.insert(FIFFV_STIM_CH, val);
+            }
+
+            if(availabeChannelTypes.contains(FIFFV_MISC_CH)) {
+                val = settings.value(QString("RTEW/%1/scaleMISC").arg(t_sRTEWName), 1e-3f).toFloat();
+                m_qMapChScaling.insert(FIFFV_MISC_CH, val);
+            }
+
+            m_pRTEModel->setScaling(m_qMapChScaling);
+        }
+
+        m_pActionChScaling->setVisible(true);
+
+        //Set up selection manager
         FiffInfo::SPtr fiffPointer = FiffInfo::SPtr(&m_fiffInfo);
         m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(this, fiffPointer));
         m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel.data()));
@@ -389,3 +483,26 @@ void RealTimeEvokedWidget::showSelectedChannelsOnly(QStringList selectedChannels
 
     m_pButterflyPlot->setSelectedChannels(selectedChannelsIndexes);
 }
+
+
+//*************************************************************************************************************
+
+void RealTimeEvokedWidget::broadcastScaling(QMap<qint32,float> scaleMap)
+{
+    m_pRTEModel->setScaling(scaleMap);
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeEvokedWidget::showChScalingWidget()
+{
+    if(m_pScalingWidget->isActiveWindow())
+        m_pScalingWidget->hide();
+    else {
+        m_pScalingWidget->activateWindow();
+        m_pScalingWidget->show();
+    }
+}
+
+
