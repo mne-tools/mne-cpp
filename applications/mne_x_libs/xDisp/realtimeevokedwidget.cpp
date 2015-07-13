@@ -394,11 +394,11 @@ void RealTimeEvokedWidget::init()
 
         if(!m_pScalingWidget)
         {
-            m_pScalingWidget = QSharedPointer<RealTimeMultiSampleArrayScalingWidget>(new RealTimeMultiSampleArrayScalingWidget(m_qMapChScaling));
+            m_pScalingWidget = QSharedPointer<ScalingWidget>(new ScalingWidget(m_qMapChScaling));
 
             //m_pScalingWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
-            connect(m_pScalingWidget.data(), &RealTimeMultiSampleArrayScalingWidget::scalingChanged,
+            connect(m_pScalingWidget.data(), &ScalingWidget::scalingChanged,
                     this, &RealTimeEvokedWidget::broadcastScaling);
         }
 

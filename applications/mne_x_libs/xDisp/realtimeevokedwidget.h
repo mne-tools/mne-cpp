@@ -50,7 +50,7 @@
 #include "helpers/selectionmanagerwindow.h"
 #include "helpers/chinfomodel.h"
 #include "helpers/quickcontrolwidget.h"
-#include "helpers/realtimemultisamplearrayscalingwidget.h"
+#include "helpers/scalingwidget.h"
 
 
 //*************************************************************************************************************
@@ -139,7 +139,7 @@ class XDISPSHARED_EXPORT RealTimeEvokedWidget : public NewMeasurementWidget
     Q_OBJECT
 
     friend class EvokedModalityWidget;
-    friend class RealTimeMultiSampleArrayScalingWidget;
+    friend class ScalingWidget;
 
 public:
     //=========================================================================================================
@@ -241,12 +241,12 @@ private:
     QVBoxLayout*    m_pRteLayout;               /**< RTE Widget layout */
     QLabel*         m_pLabelInit;               /**< Initialization LAbel */
 
-    QSharedPointer<QuickControlWidget>                      m_pQuickControlWidget;      /**< Quick control widget. */
-    QSharedPointer<SelectionManagerWindow>                  m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */
-    QSharedPointer<RealTimeMultiSampleArrayScalingWidget>   m_pScalingWidget;           /**< Channel scaling widget. */
-    QSharedPointer<ChInfoModel>                             m_pChInfoModel;             /**< Channel info model. */
-    QSharedPointer<EvokedModalityWidget>                    m_pEvokedModalityWidget;    /**< Evoked modality widget. */
-    QSharedPointer<RealTimeEvoked>                          m_pRTE;                     /**< The real-time evoked measurement. */
+    QSharedPointer<QuickControlWidget>          m_pQuickControlWidget;      /**< Quick control widget. */
+    QSharedPointer<SelectionManagerWindow>      m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */
+    QSharedPointer<ScalingWidget>               m_pScalingWidget;           /**< Channel scaling widget. */
+    QSharedPointer<ChInfoModel>                 m_pChInfoModel;             /**< Channel info model. */
+    QSharedPointer<EvokedModalityWidget>        m_pEvokedModalityWidget;    /**< Evoked modality widget. */
+    QSharedPointer<RealTimeEvoked>              m_pRTE;                     /**< The real-time evoked measurement. */
 
     QList<Modality>                     m_qListModalities;
     QList<qint32>                       m_qListCurrentSelection;    /**< Current selection list -> hack around C++11 lambda  */
