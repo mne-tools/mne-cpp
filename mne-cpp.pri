@@ -89,3 +89,7 @@ defineTest(minQtVersion) {
     }
     return(false)
 }
+
+HEADERS +=
+
+SOURCES +=

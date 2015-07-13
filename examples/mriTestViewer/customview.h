@@ -5,6 +5,9 @@
 #include <QtWidgets>
 #include <QWidget>
 
+#include <viewervars.h>
+using namespace viewerVars;
+
 class CustomView : public QGraphicsView
 {
 public:

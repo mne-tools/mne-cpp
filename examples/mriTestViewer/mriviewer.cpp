@@ -11,7 +11,7 @@ MriViewer::MriViewer(QWidget *parent) :
     ui->setupUi(this);
     scene = new QGraphicsScene(this);
 
-    // load File -> replace with mri file
+    // load File -> todo: replace with mri file
     filePath = "D:/Bilder/Freunde/Lorenz_Esch.jpg";
     loadFile(filePath);
 
@@ -46,17 +46,15 @@ void MriViewer::on_openButton_clicked()
 
 void MriViewer::on_zoomInButton_clicked()
 {
-    double scaleUpFactor = 1.5;
-    ui->graphicsView->scale(scaleUpFactor,scaleUpFactor);
-    scaleSize = scaleUpFactor*scaleSize;
+    ui->graphicsView->scale(scaleFactor,scaleFactor);
+    scaleSize = scaleSize*scaleFactor;
     qDebug() << "scale up to" << scaleSize;
 }
 
 void MriViewer::on_zoomOutButton_clicked()
 {
-    double scaleDownFactor = 0.75;
-    ui->graphicsView->scale(scaleDownFactor,scaleDownFactor);
-    scaleSize = scaleDownFactor*scaleSize;
+    ui->graphicsView->scale(1/scaleFactor,1/scaleFactor);
+    scaleSize = scaleSize/scaleFactor;
     qDebug() << "scale down to" << scaleSize;
 }
 
@@ -65,33 +63,6 @@ void MriViewer::on_resizeButton_clicked()
     ui->graphicsView->scale(1/scaleSize,1/scaleSize);
     scaleSize = 1;
     qDebug() << "resize to original zoom";
-}
-
-////void MriViewer::in_graphicsView_scrolled(QWheelEvent *event)
-//void MriViewer::wheelEvent(QWheelEvent *event)
-//{
-//    int scrollEvent = event->delta();
-//    double scaleFactor;
-
-//    if (scrollEvent>0)
-//        scaleFactor = 1.2;
-//    else if (scrollEvent<0)
-//        scaleFactor = 0.8;
-//    else
-//        scaleFactor = 1.0;
-//    scaleSize = scaleFactor*scaleSize;
-//    ui->graphicsView->scale(scaleFactor,scaleFactor);
-//    qDebug() << "scale to" << scaleSize;
-//}
-
-void MriViewer::getScaleSize()
-{
-
-}
-
-void MriViewer::setScaleSize()
-{
-
 }
 
 MriViewer::~MriViewer()
