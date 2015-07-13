@@ -124,7 +124,7 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     m_pActionSelectSensors->setStatusTip(tr("Shows the region selection widget (F12)"));
     connect(m_pActionSelectSensors, &QAction::triggered, this, &RealTimeEvokedWidget::showSensorSelectionWidget);
     addDisplayAction(m_pActionSelectSensors);
-    m_pActionSelectSensors->setVisible(true);
+    m_pActionSelectSensors->setVisible(false);
 
     //set vertical layout
     m_pRteLayout = new QVBoxLayout(this);
@@ -318,6 +318,8 @@ void RealTimeEvokedWidget::init()
 
         connect(m_pChInfoModel.data(), &ChInfoModel::channelsMappedToLayout,
                 m_pSelectionManagerWindow.data(), &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
+
+        m_pActionSelectSensors->setVisible(true);
 
         // Initialized
         m_bInitialized = true;
