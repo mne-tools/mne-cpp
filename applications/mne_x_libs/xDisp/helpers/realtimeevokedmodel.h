@@ -224,6 +224,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns current scaling
+    *
+    * @return the current scaling
+    */
+    inline const QMap< qint32,float >& getScaling() const;
+
+    //=========================================================================================================
+    /**
     * Returns the number of pre-stimulus samples
     *
     * @return the number of pre-stimulus samples
@@ -275,6 +283,12 @@ public:
     * @param[in] p_qMapChScaling    Map of scaling factors
     */
     void setScaling(const QMap< qint32,float >& p_qMapChScaling);
+
+    //=========================================================================================================
+    /**
+    * Update projections
+    */
+    void updateProjection();
 
 signals:
     //=========================================================================================================
@@ -360,6 +374,14 @@ inline qint32 RealTimeEvokedModel::getNumPreStimSamples() const
 inline bool RealTimeEvokedModel::isFreezed() const
 {
     return m_bIsFreezed;
+}
+
+
+//*************************************************************************************************************
+
+inline const QMap< qint32,float >& RealTimeEvokedModel::getScaling() const
+{
+    return m_qMapChScaling;
 }
 
 } // NAMESPACE

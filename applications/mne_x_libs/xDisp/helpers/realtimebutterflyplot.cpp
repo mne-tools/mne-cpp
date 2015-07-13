@@ -164,27 +164,55 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
 
     switch(kind) {
         case FIFFV_MEG_CH: {
-            qint32 unit = m_pRealTimeEvokedModel->getUnit(row);
-            if(unit == FIFF_UNIT_T_M)
-                fMaxValue = fMaxGRAD;
-            else if(unit == FIFF_UNIT_T)
-                fMaxValue = fMaxMAG;
+            qint32 unit =m_pRealTimeEvokedModel->getUnit(row);
+            if(unit == FIFF_UNIT_T_M) { //gradiometers
+                fMaxValue = 1e-10f;
+                if(m_pRealTimeEvokedModel->getScaling().contains(FIFF_UNIT_T_M))
+                    fMaxValue = m_pRealTimeEvokedModel->getScaling()[FIFF_UNIT_T_M];
+            }
+            else if(unit == FIFF_UNIT_T) //magnitometers
+            {
+                if(m_pRealTimeEvokedModel->getCoil(row) == FIFFV_COIL_BABY_MAG)
+                    fMaxValue = 1e-11f;
+                else
+                    fMaxValue = 1e-11f;
+
+                if(m_pRealTimeEvokedModel->getScaling().contains(FIFF_UNIT_T))
+                    fMaxValue = m_pRealTimeEvokedModel->getScaling()[FIFF_UNIT_T];
+            }
+            break;
+        }
+
+        case FIFFV_REF_MEG_CH: {  /*11/04/14 Added by Limin: MEG reference channel */
+            fMaxValue = 1e-11f;
+            if(m_pRealTimeEvokedModel->getScaling().contains(FIFF_UNIT_T))
+                fMaxValue = m_pRealTimeEvokedModel->getScaling()[FIFF_UNIT_T];
             break;
         }
         case FIFFV_EEG_CH: {
-            fMaxValue = fMaxEEG;
+            fMaxValue = 1e-4f;
+            if(m_pRealTimeEvokedModel->getScaling().contains(FIFFV_EEG_CH))
+                fMaxValue = m_pRealTimeEvokedModel->getScaling()[FIFFV_EEG_CH];
             break;
         }
         case FIFFV_EOG_CH: {
-            fMaxValue = fMaxEOG;
+            fMaxValue = 1e-3f;
+            if(m_pRealTimeEvokedModel->getScaling().contains(FIFFV_EOG_CH))
+                fMaxValue = m_pRealTimeEvokedModel->getScaling()[FIFFV_EOG_CH];
+            break;
+        }
+        case FIFFV_STIM_CH: {
+            fMaxValue = 5;
+            if(m_pRealTimeEvokedModel->getScaling().contains(FIFFV_STIM_CH))
+                fMaxValue = m_pRealTimeEvokedModel->getScaling()[FIFFV_STIM_CH];
             break;
         }
         case FIFFV_MISC_CH: {
-            fMaxValue = fMaxMISC;
+            fMaxValue = 1e-3f;
+            if(m_pRealTimeEvokedModel->getScaling().contains(FIFFV_MISC_CH))
+                fMaxValue = m_pRealTimeEvokedModel->getScaling()[FIFFV_MISC_CH];
             break;
         }
-        default:
-            return;
     }
 
     float fValue;
@@ -199,7 +227,7 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
     float y_base = path.currentPosition().y();
     QPointF qSamplePosition;
 
-    float fDx = (float)(this->width()-2) / ((float)m_pRealTimeEvokedModel->getNumSamples()-1.0f);//((float)option.rect.width()) / t_pModel->getMaxSamples();
+    float fDx = (float)(this->width()-2) / ((float)m_pRealTimeEvokedModel->getNumSamples()-1.0f);//((float)option.rect.width()) / m_pRealTimeEvokedModel->getMaxSamples();
 //    fDx *= iDownSampling;
 
     RowVectorXd rowVec = m_pRealTimeEvokedModel->data(row,1).value<RowVectorXd>();
@@ -242,7 +270,7 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
     }
 
 //    //create lines from one to the next sample for last path
-//    qint32 sample_offset = t_pModel->numVLines() + 1;
+//    qint32 sample_offset = m_pRealTimeEvokedModel->numVLines() + 1;
 //    qSamplePosition.setX(qSamplePosition.x() + fDx*sample_offset);
 //    lastPath.moveTo(qSamplePosition);
 
