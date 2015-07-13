@@ -546,9 +546,9 @@ void RtAve::run()
                 {
                     for(i = 0; i < t_qListRawMatBuf[t_iBuffWithStim].first.size(); ++i)
                     {
-                        //make sure that previous buffer does not conatin this stim - prevent multiple detection
-                        if(!t_qListRawMatBuf[t_iBuffWithStim-1].first.contains(t_qListRawMatBuf[t_iBuffWithStim].first[i]))
-                        {
+//                        //make sure that previous buffer does not conatin this stim - prevent multiple detection
+//                        if(!t_qListRawMatBuf[t_iBuffWithStim-1].first.contains(t_qListRawMatBuf[t_iBuffWithStim].first[i]))
+//                        {
                             qint32 t_iStimIndex = t_qListRawMatBuf[t_iBuffWithStim].first[i];
 
                             //
@@ -636,7 +636,7 @@ void RtAve::run()
                                 emit evokedStim(t_pEvokedStim);
                             }
                             m_qMutex.unlock();
-                        }
+//                        }
                     }
                 }
 

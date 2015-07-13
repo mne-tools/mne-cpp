@@ -210,9 +210,9 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayWidget::broadcastScaling()
+void RealTimeMultiSampleArrayWidget::broadcastScaling(QMap<qint32,float> scaleMap)
 {
-    m_pRTMSAModel->setScaling(m_qMapChScaling);
+    m_pRTMSAModel->setScaling(scaleMap);
 }
 
 
@@ -362,13 +362,14 @@ void RealTimeMultiSampleArrayWidget::init()
         //Initialize the windows
         if(!m_pRTMSAScalingWidget)
         {
-            m_pRTMSAScalingWidget = QSharedPointer<RealTimeMultiSampleArrayScalingWidget>(new RealTimeMultiSampleArrayScalingWidget(this));
+            m_pRTMSAScalingWidget = QSharedPointer<RealTimeMultiSampleArrayScalingWidget>(new RealTimeMultiSampleArrayScalingWidget(m_qMapChScaling));
 
             //m_pRTMSAScalingWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
             connect(m_pRTMSAScalingWidget.data(), &RealTimeMultiSampleArrayScalingWidget::scalingChanged,
                     this, &RealTimeMultiSampleArrayWidget::broadcastScaling);
         }
+
         if(!m_pProjectorSelectionWidget)
         {
             m_pProjectorSelectionWidget = QSharedPointer<ProjectorWidget>(new ProjectorWidget());
@@ -427,7 +428,7 @@ void RealTimeMultiSampleArrayWidget::init()
         }
 
         if(!m_pQuickControlWidget) {
-            m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(&m_qMapChScaling, m_pFiffInfo));
+            m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo));
             m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
             //Handle scaling

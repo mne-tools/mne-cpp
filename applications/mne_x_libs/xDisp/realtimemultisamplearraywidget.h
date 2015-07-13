@@ -298,8 +298,10 @@ private:
     //=========================================================================================================
     /**
     * Broadcast channel scaling
+    *
+    * @param [in] scaleMap QMap with scaling values which is to be broadcasted to the model.
     */
-    void broadcastScaling();
+    void broadcastScaling(QMap<qint32, float> scaleMap);
 
     //=========================================================================================================
     /**

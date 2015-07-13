@@ -268,6 +268,14 @@ public:
     */
     inline bool isFreezed() const;
 
+    //=========================================================================================================
+    /**
+    * Set scaling channel scaling
+    *
+    * @param[in] p_qMapChScaling    Map of scaling factors
+    */
+    void setScaling(const QMap< qint32,float >& p_qMapChScaling);
+
 signals:
     //=========================================================================================================
     /**
@@ -280,7 +288,8 @@ signals:
 private:
     QSharedPointer<RealTimeEvoked> m_pRTE;          /**< The real-time evoked measurement. */
 
-    QMap<qint32,qint32> m_qMapIdxRowSelection;      /**< Selection mapping.*/
+    QMap<qint32,qint32>     m_qMapIdxRowSelection;  /**< Selection mapping.*/
+    QMap<qint32,float>      m_qMapChScaling;        /**< Channel scaling map. */
 
     //Fiff data structure
     MatrixXd m_matData;        /**< List that holds the data*/
