@@ -64,8 +64,10 @@ DESTDIR =  $${MNE_BINARY_DIR}
 SOURCES += \
         main.cpp \
         mriviewer.cpp \
+        customview.cpp
 
-HEADERS  += mriviewer.h
+HEADERS  += mriviewer.h \
+        customview.h
 
 FORMS    += mriviewer.ui
 

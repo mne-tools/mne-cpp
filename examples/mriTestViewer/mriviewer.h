@@ -10,6 +10,8 @@
 #include <QString>
 #include <QScrollArea>
 
+#define scaleFactor 1.2
+
 namespace Ui {
 class MriViewer;
 }
@@ -21,33 +23,26 @@ class MriViewer : public QWidget
 public:
     explicit MriViewer(QWidget *parent = 0);
     ~MriViewer();
+    void getScaleSize();
+    void setScaleSize();
 
 private slots:
     void on_openButton_clicked();
     void on_zoomInButton_clicked();
     void on_zoomOutButton_clicked();
     void on_resizeButton_clicked();
-    virtual void wheelEvent(QWheelEvent *event);
-    bool eventFilter(QObject *object, QEvent *event);
 
 private:
-    // basic data objects
     Ui::MriViewer *ui;
     QGraphicsScene *scene;
     QGraphicsPixmapItem *mriPixmapItem;
     QImage mriImage;
-
-    // file information
+    double scaleSize;
     QString filePath;
     const char *defFileFormat = "JPEG (*.jpg *.jpeg);;"
                             "PNG (*.png)";
 //    QString defFileFormat = "MGH (*.mgh *.mgz)";
     void loadFile(QString filePath);
-
-    // gui interaction
-    QScrollArea *scrollArea;
-
-    double scaleSize;
 
 };
 

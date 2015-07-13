@@ -11,7 +11,7 @@ MriViewer::MriViewer(QWidget *parent) :
     ui->setupUi(this);
     scene = new QGraphicsScene(this);
 
-    // load File
+    // load File -> replace with mri file
     filePath = "D:/Bilder/Freunde/Lorenz_Esch.jpg";
     loadFile(filePath);
 
@@ -27,6 +27,7 @@ void MriViewer::loadFile(QString filePath)
     mriImage.load(filePath);
     mriPixmapItem = new QGraphicsPixmapItem(QPixmap::fromImage(mriImage));
     mriPixmapItem->setFlag(QGraphicsItem::ItemIsMovable);
+    scene->clear();
     scene->addItem(mriPixmapItem);
     scaleSize = 1;
 }
@@ -66,34 +67,34 @@ void MriViewer::on_resizeButton_clicked()
     qDebug() << "resize to original zoom";
 }
 
-//void MriViewer::in_graphicsView_scrolled(QWheelEvent *event)
-void MriViewer::wheelEvent(QWheelEvent *event)
-{
-    int scrollEvent = event->delta();
-    double scaleFactor;
+////void MriViewer::in_graphicsView_scrolled(QWheelEvent *event)
+//void MriViewer::wheelEvent(QWheelEvent *event)
+//{
+//    int scrollEvent = event->delta();
+//    double scaleFactor;
 
-    if (scrollEvent>0)
-        scaleFactor = 1.2;
-    else if (scrollEvent<0)
-        scaleFactor = 0.8;
-    else
-        scaleFactor = 1.0;
-    scaleSize = scaleFactor*scaleSize;
-    ui->graphicsView->scale(scaleFactor,scaleFactor);
-    qDebug() << "scale to" << scaleSize;
+//    if (scrollEvent>0)
+//        scaleFactor = 1.2;
+//    else if (scrollEvent<0)
+//        scaleFactor = 0.8;
+//    else
+//        scaleFactor = 1.0;
+//    scaleSize = scaleFactor*scaleSize;
+//    ui->graphicsView->scale(scaleFactor,scaleFactor);
+//    qDebug() << "scale to" << scaleSize;
+//}
+
+void MriViewer::getScaleSize()
+{
+
 }
 
-bool MriViewer::eventFilter(QObject *object, QEvent *event)
+void MriViewer::setScaleSize()
 {
-    if (object == ui->graphicsView->scene() && event->type() == QEvent::Wheel) {
-        qDebug() << "Scroll";
-        return true;
-    }
-    return false;
+
 }
 
 MriViewer::~MriViewer()
 {
     delete ui;
 }
-

@@ -78,7 +78,7 @@
     </widget>
    </item>
    <item row="0" column="0" colspan="5">
-    <widget class="QGraphicsView" name="graphicsView">
+    <widget class="CustomView" name="graphicsView">
      <property name="mouseTracking">
       <bool>false</bool>
      </property>
@@ -109,6 +109,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CustomView</class>
+   <extends>QGraphicsView</extends>
+   <header>customview.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
