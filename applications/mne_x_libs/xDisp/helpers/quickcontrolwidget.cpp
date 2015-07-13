@@ -121,6 +121,8 @@ QuickControlWidget::~QuickControlWidget()
 void QuickControlWidget::filterGroupChanged(QList<QCheckBox*> list)
 {
     if(m_bFilter) {
+        ui->m_groupBox_filter->show();
+
         m_qFilterListCheckBox.clear();
 
         for(int u = 0; u<list.size(); u++) {
