@@ -362,11 +362,11 @@ void RealTimeMultiSampleArrayWidget::init()
         //Initialize the windows
         if(!m_pRTMSAScalingWidget)
         {
-            m_pRTMSAScalingWidget = QSharedPointer<RealTimeMultiSampleArrayScalingWidget>(new RealTimeMultiSampleArrayScalingWidget(m_qMapChScaling));
+            m_pRTMSAScalingWidget = QSharedPointer<ScalingWidget>(new ScalingWidget(m_qMapChScaling));
 
             //m_pRTMSAScalingWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
-            connect(m_pRTMSAScalingWidget.data(), &RealTimeMultiSampleArrayScalingWidget::scalingChanged,
+            connect(m_pRTMSAScalingWidget.data(), &ScalingWidget::scalingChanged,
                     this, &RealTimeMultiSampleArrayWidget::broadcastScaling);
         }
 

@@ -117,7 +117,7 @@ SOURCES += \
     helpers/frequencyspectrumdelegate.cpp \
     helpers/evokedmodalitywidget.cpp \
     helpers/frequencyspectrumsettingswidget.cpp \
-    helpers/realtimemultisamplearrayscalingwidget.cpp \
+    helpers/scalingwidget.cpp \
     helpers/projectorwidget.cpp \
     helpers/layoutscene.cpp \
     helpers/selectionmanagerwindow.cpp \
@@ -149,7 +149,7 @@ HEADERS += \
     helpers/frequencyspectrummodel.h \
     helpers/evokedmodalitywidget.h \
     helpers/frequencyspectrumsettingswidget.h \
-    helpers/realtimemultisamplearrayscalingwidget.h \
+    helpers/scalingwidget.h \
     helpers/projectorwidget.h \
     helpers/layoutscene.h \
     helpers/selectionmanagerwindow.h \

@@ -52,7 +52,7 @@
 
 #include "helpers/realtimemultisamplearraymodel.h"
 #include "helpers/realtimemultisamplearraydelegate.h"
-#include "helpers/realtimemultisamplearrayscalingwidget.h"
+#include "helpers/scalingwidget.h"
 #include "helpers/projectorwidget.h"
 #include "helpers/selectionmanagerwindow.h"
 #include "helpers/chinfomodel.h"
@@ -151,7 +151,7 @@ class XDISPSHARED_EXPORT RealTimeMultiSampleArrayWidget : public NewMeasurementW
 {
     Q_OBJECT
 
-    friend class RealTimeMultiSampleArrayScalingWidget;
+    friend class ScalingWidget;
 
 public:
     //=========================================================================================================
@@ -423,7 +423,7 @@ private:
     QSharedPointer<SelectionManagerWindow>          m_pSelectionManagerWindow;      /**< SelectionManagerWindow. */
     QSharedPointer<FilterWindow>                    m_pFilterWindow;                /**< SelectionManagerWindow. */
     QSharedPointer<ProjectorWidget>                 m_pProjectorSelectionWidget;    /**< Projector selection widget. */
-    QSharedPointer<RealTimeMultiSampleArrayScalingWidget> m_pRTMSAScalingWidget;    /**< Channel scaling widget. */
+    QSharedPointer<ScalingWidget>                   m_pRTMSAScalingWidget;          /**< Channel scaling widget. */
 
     QAction*        m_pActionSelectSensors;                             /**< show roi select widget */
     QAction*        m_pActionFiltering;                                 /**< show filter window */
