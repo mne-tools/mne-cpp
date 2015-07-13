@@ -54,14 +54,20 @@ using namespace XDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const FiffInfo::SPtr pFiffInfo, QWidget *parent)
+QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const FiffInfo::SPtr pFiffInfo, QString name, QWidget *parent, bool bScaling, bool bProjections, bool bView, bool bFilter)
 : QWidget(parent, Qt::FramelessWindowHint | Qt::WindowSystemMenuHint)
 , ui(new Ui::QuickControlWidget)
 , m_qMapChScaling(qMapChScaling)
 , m_pFiffInfo(pFiffInfo)
+, m_bScaling(bScaling)
+, m_bProjections(bProjections)
+, m_bView(bView)
+, m_bFilter(bFilter)
+, m_sName(name)
 {
     ui->setupUi(this);
 
+    ui->m_pushButton_hideAll->setText(ui->m_pushButton_hideAll->text().append(QString(" - %1").arg(m_sName)));
     connect(ui->m_pushButton_hideAll, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             this, &QuickControlWidget::toggleHideAll);
 
@@ -77,11 +83,22 @@ QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const
     }
 
     //Create different quick control groups
-    createScalingGroup();
+    if(m_bScaling)
+        createScalingGroup();
+    else
+        ui->m_groupBox_scaling->hide();
 
-    createProjectorGroup();
+    if(m_bProjections)
+        createProjectorGroup();
+    else
+        ui->m_groupBox_projections->hide();
 
-    createViewGroup();
+    if(m_bView)
+        createViewGroup();
+    else
+        ui->m_groupBox_view->hide();
+
+    ui->m_groupBox_filter->hide();
 
     this->adjustSize();
 
@@ -103,37 +120,53 @@ QuickControlWidget::~QuickControlWidget()
 
 void QuickControlWidget::filterGroupChanged(QList<QCheckBox*> list)
 {
-    m_qFilterListCheckBox.clear();
+    if(m_bFilter) {
+        m_qFilterListCheckBox.clear();
 
-    for(int u = 0; u<list.size(); u++) {
-        QCheckBox* tempCheckBox = new QCheckBox(list[u]->text());
-        tempCheckBox->setChecked(list[u]->isChecked());
+        for(int u = 0; u<list.size(); u++) {
+            QCheckBox* tempCheckBox = new QCheckBox(list[u]->text());
+            tempCheckBox->setChecked(list[u]->isChecked());
 
-        connect(tempCheckBox, &QCheckBox::toggled,
-                list[u], &QCheckBox::setChecked);
+            connect(tempCheckBox, &QCheckBox::toggled,
+                    list[u], &QCheckBox::setChecked);
 
-        connect(list[u], &QCheckBox::toggled,
-                tempCheckBox, &QCheckBox::setChecked);
+            connect(list[u], &QCheckBox::toggled,
+                    tempCheckBox, &QCheckBox::setChecked);
 
-        m_qFilterListCheckBox.append(tempCheckBox);
-    }
+            m_qFilterListCheckBox.append(tempCheckBox);
+        }
 
-    //Delete all widgets in the filter layout
-    QGridLayout* topLayout = static_cast<QGridLayout*>(ui->m_groupBox_filter->layout());
-    if(!topLayout)
-       topLayout = new QGridLayout();
+        //Delete all widgets in the filter layout
+        QGridLayout* topLayout = static_cast<QGridLayout*>(ui->m_groupBox_filter->layout());
+        if(!topLayout)
+           topLayout = new QGridLayout();
 
-    QLayoutItem *child;
-    while ((child = topLayout->takeAt(0)) != 0) {
-        delete child->widget();
-        delete child;
-    }
+        QLayoutItem *child;
+        while ((child = topLayout->takeAt(0)) != 0) {
+            delete child->widget();
+            delete child;
+        }
 
-    //Add filters
-    for(int u = 0; u<m_qFilterListCheckBox.size(); u++)
-        topLayout->addWidget(m_qFilterListCheckBox[u], u, 0);
+        //Add filters
+        int u = 0;
 
-    ui->m_groupBox_filter->setLayout(topLayout);
+        for(u; u<m_qFilterListCheckBox.size(); u++)
+            topLayout->addWidget(m_qFilterListCheckBox[u], u, 0);
+
+        //Add push button for filter options
+        m_pShowFilterOptions = new QPushButton();
+        m_pShowFilterOptions->setText("Open Filter options");
+        m_pShowFilterOptions->setCheckable(true);
+        connect(m_pShowFilterOptions, &QPushButton::clicked,
+                this, &QuickControlWidget::onShowFilterOptions);
+
+        topLayout->addWidget(m_pShowFilterOptions, u+1, 0);
+
+        ui->m_groupBox_filter->setLayout(topLayout);
+
+        //createViewGroup();
+    } else
+        ui->m_groupBox_filter->hide();
 }
 
 
@@ -803,18 +836,44 @@ void QuickControlWidget::toggleHideAll(bool state)
         ui->m_groupBox_filter->hide();
         ui->m_groupBox_scaling->hide();
         ui->m_groupBox_view->hide();
-        ui->m_pushButton_hideAll->setText("Maximize - Quick Control");
+        ui->m_pushButton_hideAll->setText(QString("Maximize - Quick Control - %1").arg(m_sName));
     }
     else {
-        ui->m_groupBox_projections->show();
-        ui->m_groupBox_filter->show();
-        ui->m_groupBox_scaling->show();
-        ui->m_groupBox_view->show();
-        ui->m_pushButton_hideAll->setText("Minimize - Quick Control");
+        if(m_bProjections)
+            ui->m_groupBox_projections->show();
+
+        if(m_bFilter)
+            ui->m_groupBox_filter->show();
+
+        if(m_bScaling)
+            ui->m_groupBox_scaling->show();
+
+        if(m_bView)
+            ui->m_groupBox_view->show();
+
+        ui->m_pushButton_hideAll->setText(QString("Minimize - Quick Control - %1").arg(m_sName));
     }
 
     this->adjustSize();
     this->resize(width(), ui->m_pushButton_hideAll->height()-50);
 }
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::onShowFilterOptions(bool state)
+{
+    if(state)
+        m_pShowFilterOptions->setText("Close filter options");
+    else
+        m_pShowFilterOptions->setText("Open filter options");
+
+    m_pShowFilterOptions->setChecked(state);
+
+    emit showFilterOptions(state);
+}
+
+
+
 
 

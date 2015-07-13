@@ -131,7 +131,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     connect(m_pActionFiltering, &QAction::triggered,
             this, &RealTimeMultiSampleArrayWidget::showFilterWidget);
     addDisplayAction(m_pActionFiltering);
-    m_pActionFiltering->setVisible(true);
+    m_pActionFiltering->setVisible(false);
 
     m_pActionProjection = new QAction(QIcon(":/images/iconSSP.png"), tr("Shows the SSP widget (F12)"),this);
     m_pActionProjection->setShortcut(tr("F12"));
@@ -428,7 +428,7 @@ void RealTimeMultiSampleArrayWidget::init()
         }
 
         if(!m_pQuickControlWidget) {
-            m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo));
+            m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display"));
             m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
             //Handle scaling
@@ -448,6 +448,9 @@ void RealTimeMultiSampleArrayWidget::init()
             //Handle Filtering
             connect(m_pFilterWindow.data(), &FilterWindow::activationCheckBoxListChanged,
                     m_pQuickControlWidget.data(), &QuickControlWidget::filterGroupChanged);
+
+            connect(m_pQuickControlWidget.data(), &QuickControlWidget::showFilterOptions,
+                    this, &RealTimeMultiSampleArrayWidget::showFilterWidget);
 
             //Handle trigger detection
             connect(m_pQuickControlWidget.data(), &QuickControlWidget::triggerInfoChanged,
@@ -755,13 +758,17 @@ void RealTimeMultiSampleArrayWidget::showProjectionWidget()
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayWidget::showFilterWidget()
+void RealTimeMultiSampleArrayWidget::showFilterWidget(bool state)
 {
-    if(m_pFilterWindow->isActiveWindow())
+    if(state) {
+        if(m_pFilterWindow->isActiveWindow())
+            m_pFilterWindow->hide();
+        else {
+            m_pFilterWindow->activateWindow();
+            m_pFilterWindow->show();
+        }
+    } else {
         m_pFilterWindow->hide();
-    else {
-        m_pFilterWindow->activateWindow();
-        m_pFilterWindow->show();
     }
 }
 

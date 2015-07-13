@@ -367,7 +367,7 @@ private:
     /**
     * Shows the filter widget
     */
-    void showFilterWidget();
+    void showFilterWidget(bool state = true);
 
     //=========================================================================================================
     /**

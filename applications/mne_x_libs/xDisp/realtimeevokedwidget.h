@@ -49,6 +49,7 @@
 #include "helpers/evokedmodalitywidget.h"
 #include "helpers/selectionmanagerwindow.h"
 #include "helpers/chinfomodel.h"
+#include "helpers/quickcontrolwidget.h"
 #include "helpers/realtimemultisamplearrayscalingwidget.h"
 
 
@@ -218,6 +219,12 @@ private:
     */
     void showChScalingWidget();
 
+    //=========================================================================================================
+    /**
+    * Shows quick control widget
+    */
+    void showQuickControlWidget();
+
     RealTimeEvokedModel*        m_pRTEModel;                /**< RTE data model */
     RealTimeButterflyPlot*      m_pButterflyPlot;           /**< Butterfly plot */
 
@@ -229,13 +236,15 @@ private:
     QAction*        m_pActionSelectSensors;     /**< show roi select widget */
     QAction*        m_pActionSelectModality;    /**< Modality selection action */
     QAction*        m_pActionChScaling;         /**< Show channel scaling Action. */
+    QAction*        m_pActionQuickControl;      /**< Show quick control widget. */
 
     QVBoxLayout*    m_pRteLayout;               /**< RTE Widget layout */
     QLabel*         m_pLabelInit;               /**< Initialization LAbel */
 
+    QSharedPointer<QuickControlWidget>                      m_pQuickControlWidget;      /**< Quick control widget. */
     QSharedPointer<SelectionManagerWindow>                  m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */
     QSharedPointer<RealTimeMultiSampleArrayScalingWidget>   m_pScalingWidget;           /**< Channel scaling widget. */
-    QSharedPointer<ChInfoModel>                             m_pChInfoModel;             /**< channel info model. */
+    QSharedPointer<ChInfoModel>                             m_pChInfoModel;             /**< Channel info model. */
     QSharedPointer<EvokedModalityWidget>                    m_pEvokedModalityWidget;    /**< Evoked modality widget. */
     QSharedPointer<RealTimeEvoked>                          m_pRTE;                     /**< The real-time evoked measurement. */
 

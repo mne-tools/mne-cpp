@@ -100,7 +100,7 @@ public:
     * @param [in] parent    parent of widget
     * @param [in] qMapChScaling    pointer to scaling information
     */
-    QuickControlWidget(QMap<qint32, float> qMapChScaling, const FiffInfo::SPtr pFiffInfo, QWidget *parent = 0);
+    QuickControlWidget(QMap<qint32, float> qMapChScaling, const FiffInfo::SPtr pFiffInfo, QString name = "", QWidget *parent = 0, bool bScaling = true, bool bProjections = true, bool bView = true, bool bFilter = true);
 
     //=========================================================================================================
     /**
@@ -144,6 +144,12 @@ signals:
     * Emit this signal whenever the trigger infomration changed.
     */
     void triggerInfoChanged(const QMap<QString, QColor>& value, bool active, QString triggerCh, double threshold);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user is supposed to see the filter option window.
+    */
+    void showFilterOptions(bool state);
 
 protected:
     //=========================================================================================================
@@ -260,26 +266,41 @@ protected:
     */
     void toggleHideAll(bool state);
 
+    //=========================================================================================================
+    /**
+    * Show the filter option screen to the user.
+    *
+    * @param [in] state toggle state.
+    */
+    void onShowFilterOptions(bool state);
+
 private:
-    QPoint                  m_dragPosition;         /**< the drag position of the window */
+    QPoint      m_dragPosition;     /**< the drag position of the window */
+
+    bool        m_bScaling;         /**< Flag for drawing the scaling group box */
+    bool        m_bProjections;     /**< Flag for drawing the projection group box */
+    bool        m_bView;            /**< Flag for drawing the view group box */
+    bool        m_bFilter;          /**< Flag for drawing the filter group box */
 
     QMap<qint32,float>              m_qMapChScaling;                /**< Channel scaling values. */
     QMap<qint32, QDoubleSpinBox*>   m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits */
     QMap<qint32, QSlider*>          m_qMapScalingSlider;            /**< Map of types and channel scaling line edits */
     QMap<QString, QColor>           m_qMapTriggerColor;             /**< Trigger channel colors. */
 
-    QList<QCheckBox*>   m_qListCheckBox;            /**< List of projection CheckBox. */
-    QList<QCheckBox*>   m_qFilterListCheckBox;      /**< List of filter CheckBox. */
-    FiffInfo::SPtr      m_pFiffInfo;                /**< Connected fiff info. */
+    QList<QCheckBox*>   m_qListCheckBox;                /**< List of projection CheckBox. */
+    QList<QCheckBox*>   m_qFilterListCheckBox;          /**< List of filter CheckBox. */
+    FiffInfo::SPtr      m_pFiffInfo;                    /**< Connected fiff info. */
 
+    QString             m_sName;                        /**< Name of the widget which uses this quick control. */
     QCheckBox*          m_pTriggerDetectionCheckBox;    /**< Holds the enable disable trigger detection check box. */
     QCheckBox *         m_enableDisableProjectors;      /**< Holds the enable disable all check box. */
     QPushButton*        m_pTriggerColorButton;          /**< Holds the trigger color button. */
+    QPushButton*        m_pShowFilterOptions;           /**< Holds the show filter options button. */
     QComboBox*          m_pComboBoxChannel;             /**< Holds the available trigger channels. */
     QDoubleSpinBox*     m_pDoubleSpinBoxThreshold;      /**< Holds the trigger channel threshold. */
     QSpinBox*           m_pSpinBoxThresholdPrec;        /**< Holds the trigger channel threshold precision. */
 
-    Ui::QuickControlWidget *ui;                     /**< The generated UI file */
+    Ui::QuickControlWidget *ui;                         /**< The generated UI file */
 };
 
 } // NAMESPACE XDISPLIB

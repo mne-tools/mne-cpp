@@ -134,6 +134,13 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     addDisplayAction(m_pActionChScaling);
     m_pActionChScaling->setVisible(false);
 
+    m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget"),this);
+    m_pActionQuickControl->setStatusTip(tr("Show quick control widget"));
+    connect(m_pActionQuickControl, &QAction::triggered,
+            this, &RealTimeEvokedWidget::showQuickControlWidget);
+    addDisplayAction(m_pActionQuickControl);
+    m_pActionQuickControl->setVisible(false);
+
     //set vertical layout
     m_pRteLayout = new QVBoxLayout(this);
 
@@ -328,17 +335,6 @@ void RealTimeEvokedWidget::init()
 
         m_pButterflyPlot->setSettings(m_qListModalities);
 
-        //Initialize the windows
-        if(!m_pScalingWidget)
-        {
-            m_pScalingWidget = QSharedPointer<RealTimeMultiSampleArrayScalingWidget>(new RealTimeMultiSampleArrayScalingWidget(m_qMapChScaling));
-
-            //m_pScalingWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
-
-            connect(m_pScalingWidget.data(), &RealTimeMultiSampleArrayScalingWidget::scalingChanged,
-                    this, &RealTimeEvokedWidget::broadcastScaling);
-        }
-
         //Scaling
         //Show only spin boxes and labels which type are present in the current loaded fiffinfo
         QList<FiffChInfo> channelList = m_fiffInfo.chs;
@@ -396,7 +392,33 @@ void RealTimeEvokedWidget::init()
             m_pRTEModel->setScaling(m_qMapChScaling);
         }
 
-        m_pActionChScaling->setVisible(true);
+        if(!m_pScalingWidget)
+        {
+            m_pScalingWidget = QSharedPointer<RealTimeMultiSampleArrayScalingWidget>(new RealTimeMultiSampleArrayScalingWidget(m_qMapChScaling));
+
+            //m_pScalingWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
+
+            connect(m_pScalingWidget.data(), &RealTimeMultiSampleArrayScalingWidget::scalingChanged,
+                    this, &RealTimeEvokedWidget::broadcastScaling);
+        }
+
+        m_pActionChScaling->setVisible(false);
+
+        //Quick Control widget
+        if(!m_pQuickControlWidget) {
+            m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, FiffInfo::SPtr(&m_fiffInfo), "RT Averaging", 0, true, true, false, false));
+            m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
+
+            //Handle scaling
+            connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
+                    this, &RealTimeEvokedWidget::broadcastScaling);
+
+            //Handle projections
+            connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
+                    m_pRTEModel, &RealTimeEvokedModel::updateProjection);
+        }
+
+        m_pActionQuickControl->setVisible(true);
 
         //Set up selection manager
         FiffInfo::SPtr fiffPointer = FiffInfo::SPtr(&m_fiffInfo);
@@ -505,4 +527,11 @@ void RealTimeEvokedWidget::showChScalingWidget()
     }
 }
 
+
+//*************************************************************************************************************
+
+void RealTimeEvokedWidget::showQuickControlWidget()
+{
+    m_pQuickControlWidget->show();
+}
 

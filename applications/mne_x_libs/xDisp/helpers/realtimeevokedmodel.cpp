@@ -325,3 +325,53 @@ void RealTimeEvokedModel::setScaling(const QMap< qint32,float >& p_qMapChScaling
     m_qMapChScaling = p_qMapChScaling;
     endResetModel();
 }
+
+
+//*************************************************************************************************************
+
+void RealTimeEvokedModel::updateProjection()
+{
+//    //
+//    //  Update the SSP projector
+//    //
+//    if(m_pFiffInfo)
+//    {
+//        m_bProjActivated = false;
+//        for(qint32 i = 0; i < this->m_pFiffInfo->projs.size(); ++i)
+//            if(this->m_pFiffInfo->projs[i].active)
+//                m_bProjActivated = true;
+
+//        this->m_pFiffInfo->make_projector(m_matProj);
+//        qDebug() << "updateProjection :: New projection calculated.";
+
+//        //set columns of matrix to zero depending on bad channels indexes
+//        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
+//            m_matProj.col(m_vecBadIdcs[j]).setZero();
+
+////        std::cout << "Bads\n" << m_vecBadIdcs << std::endl;
+////        std::cout << "Proj\n";
+////        std::cout << m_matProj.block(0,0,10,10) << std::endl;
+
+//        qint32 nchan = this->m_pFiffInfo->nchan;
+//        qint32 i, k;
+
+//        typedef Eigen::Triplet<double> T;
+//        std::vector<T> tripletList;
+//        tripletList.reserve(nchan);
+
+//        //
+//        // Make proj sparse
+//        //
+//        tripletList.clear();
+//        tripletList.reserve(m_matProj.rows()*m_matProj.cols());
+//        for(i = 0; i < m_matProj.rows(); ++i)
+//            for(k = 0; k < m_matProj.cols(); ++k)
+//                if(m_matProj(i,k) != 0)
+//                    tripletList.push_back(T(i, k, m_matProj(i,k)));
+
+//        m_matSparseProj = SparseMatrix<double>(m_matProj.rows(),m_matProj.cols());
+//        if(tripletList.size() > 0)
+//            m_matSparseProj.setFromTriplets(tripletList.begin(), tripletList.end());
+//    }
+}
+
