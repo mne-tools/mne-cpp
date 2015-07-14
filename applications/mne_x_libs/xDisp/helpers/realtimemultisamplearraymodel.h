@@ -484,6 +484,7 @@ private:
 
     QMap<QString, QColor>               m_qMapTriggerColor;     /**< Current colors for all trigger channels. */
     QMap<int,QList<int> >               m_qMapDetectedTrigger;  /**< Detected trigger for each trigger channel. */
+    QMap<int,QList<int> >               m_qMapDetectedTriggerFreeze;  /**< Detected trigger for each trigger channel while display is freezed. */
     QMap<qint32,float>                  m_qMapChScaling;        /**< Channel scaling map. */
     QList<FilterData>                   m_filterData;           /**< List of currently active filters. */
     QList<RealTimeSampleArrayChInfo>    m_qListChInfo;          /**< Channel info list. ToDo: Obsolete*/
@@ -586,6 +587,9 @@ inline QColor RealTimeMultiSampleArrayModel::getTriggerColor() const
 inline QList<int> RealTimeMultiSampleArrayModel::getDetectedTriggers() const
 {
     QList<int> triggerIndices;
+
+    if(m_bIsFreezed)
+        return m_qMapDetectedTriggerFreeze[m_iCurrentTriggerChIndex];
 
     if(m_bTriggerDetectionActive) {
         return m_qMapDetectedTrigger[m_iCurrentTriggerChIndex];

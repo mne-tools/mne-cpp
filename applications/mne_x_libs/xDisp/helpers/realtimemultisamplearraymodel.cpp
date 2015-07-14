@@ -502,6 +502,7 @@ void RealTimeMultiSampleArrayModel::toggleFreeze(const QModelIndex &)
     if(m_bIsFreezed) {
         m_matDataRawFreeze = m_matDataRaw;
         m_matDataFilteredFreeze = m_matDataFiltered;
+        m_qMapDetectedTriggerFreeze = m_qMapDetectedTrigger;
 
         m_iCurrentSampleFreeze = m_iCurrentSample;
     }
