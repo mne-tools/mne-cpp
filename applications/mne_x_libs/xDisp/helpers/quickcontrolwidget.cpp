@@ -159,7 +159,7 @@ void QuickControlWidget::filterGroupChanged(QList<QCheckBox*> list)
         m_pShowFilterOptions = new QPushButton();
 //        m_pShowFilterOptions->setText("Open Filter options");
         m_pShowFilterOptions->setText("Filter options");
-        m_pShowFilterOptions->setCheckable(true);
+        m_pShowFilterOptions->setCheckable(false);
         connect(m_pShowFilterOptions, &QPushButton::clicked,
                 this, &QuickControlWidget::onShowFilterOptions);
 

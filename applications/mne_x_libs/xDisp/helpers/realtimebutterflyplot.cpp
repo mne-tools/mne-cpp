@@ -151,7 +151,13 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
                 }
 
                 painter.save();
-                painter.setPen(QPen(m_pRealTimeEvokedModel->getColor(r), 1));
+
+                if(m_pRealTimeEvokedModel->isFreezed()) {
+                    QColor freezeColor = m_pRealTimeEvokedModel->getColor(r);
+                    freezeColor.setAlphaF(0.5);
+                    painter.setPen(QPen(freezeColor, 1));
+                } else
+                    painter.setPen(QPen(m_pRealTimeEvokedModel->getColor(r), 1));
 
                 QPainterPath path(QPointF(1,0));
                 createPlotPath(r,path);
