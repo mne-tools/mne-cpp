@@ -91,6 +91,17 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
             painter.restore();
         }
 
+        //Zero line
+        if(m_pRealTimeEvokedModel->getNumSamples() > 0)
+        {
+            painter.save();
+            painter.setPen(QPen(Qt::black, 1, Qt::DashLine));
+
+            painter.drawLine(0, this->height()/2, this->width(), this->height()/2);
+
+            painter.restore();
+        }
+
         painter.translate(0,this->height()/2);
 
         for(qint32 r = 0; r < m_iNumChannels; ++r)
