@@ -535,3 +535,12 @@ void RealTimeEvokedWidget::showQuickControlWidget()
     m_pQuickControlWidget->show();
 }
 
+
+//*************************************************************************************************************
+
+void RealTimeEvokedWidget::mouseDoubleClickEvent(QMouseEvent * event)
+{
+    if(event->button() == Qt::LeftButton)
+        m_pRTEModel->toggleFreeze();
+}
+
