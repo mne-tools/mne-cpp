@@ -5,7 +5,7 @@
 #           Carsten Boensel <carsten.boensel@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.1
-# @date     July, 2012/2015
+# @date     July, 2015
 #
 # @section  LICENSE
 #
@@ -87,8 +87,10 @@ SOURCES += \
     surfaceset.cpp \
     mri.cpp \
     mgh.cpp \
+    blendian.cpp \
+    slicedata.cpp \
     3rdParty/miniz.c \
-    blendian.cpp
+    3rdParty/tinfl.c
 
 
 HEADERS += \
@@ -101,7 +103,8 @@ HEADERS += \
     surfaceset.h \
     mri.h \
     mgh.h \
-    blendian.h
+    blendian.h \
+    slicedata.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
