@@ -157,7 +157,8 @@ void QuickControlWidget::filterGroupChanged(QList<QCheckBox*> list)
 
         //Add push button for filter options
         m_pShowFilterOptions = new QPushButton();
-        m_pShowFilterOptions->setText("Open Filter options");
+//        m_pShowFilterOptions->setText("Open Filter options");
+        m_pShowFilterOptions->setText("Filter options");
         m_pShowFilterOptions->setCheckable(true);
         connect(m_pShowFilterOptions, &QPushButton::clicked,
                 this, &QuickControlWidget::onShowFilterOptions);
@@ -865,14 +866,17 @@ void QuickControlWidget::toggleHideAll(bool state)
 
 void QuickControlWidget::onShowFilterOptions(bool state)
 {
-    if(state)
-        m_pShowFilterOptions->setText("Close filter options");
-    else
-        m_pShowFilterOptions->setText("Open filter options");
+//    if(state)
+//        m_pShowFilterOptions->setText("Close filter options");
+//    else
+//        m_pShowFilterOptions->setText("Open filter options");
 
-    m_pShowFilterOptions->setChecked(state);
+//    m_pShowFilterOptions->setChecked(state);
 
-    emit showFilterOptions(state);
+//    emit showFilterOptions(state);
+
+    Q_UNUSED(state);
+    emit showFilterOptions(true);
 }
 
 

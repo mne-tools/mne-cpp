@@ -322,23 +322,6 @@ void RealTimeEvokedModel::resetSelection()
 
 //*************************************************************************************************************
 
-void RealTimeEvokedModel::toggleFreeze(const QModelIndex &)
-{
-    m_bIsFreezed = !m_bIsFreezed;
-
-    if(m_bIsFreezed)
-        m_matDataFreeze = m_matData;
-
-    //Update data content
-    QModelIndex topLeft = this->index(0,1);
-    QModelIndex bottomRight = this->index(m_pRTE->info().nchan-1,1);
-    QVector<int> roles; roles << Qt::DisplayRole;
-    emit dataChanged(topLeft, bottomRight, roles);
-}
-
-
-//*************************************************************************************************************
-
 void RealTimeEvokedModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
 {
     beginResetModel();
@@ -402,4 +385,23 @@ void RealTimeEvokedModel::updateProjection()
             m_matSparseProj.setFromTriplets(tripletList.begin(), tripletList.end());
     }
 }
+
+
+//*************************************************************************************************************
+
+void RealTimeEvokedModel::toggleFreeze()
+{
+    m_bIsFreezed = !m_bIsFreezed;
+
+    if(m_bIsFreezed) {
+        m_matDataFreeze = m_matData;
+    }
+
+    //Update data content
+    QModelIndex topLeft = this->index(0,1);
+    QModelIndex bottomRight = this->index(this->rowCount(),1);
+    QVector<int> roles; roles << Qt::DisplayRole;
+    emit dataChanged(topLeft, bottomRight, roles);
+}
+
 

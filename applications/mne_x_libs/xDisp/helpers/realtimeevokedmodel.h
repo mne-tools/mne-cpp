@@ -263,14 +263,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Toggle freeze for all channels when a channel is double clicked
-    *
-    * @param [in] index     of the channel which has been double clicked
-    */
-    void toggleFreeze(const QModelIndex &index);
-
-    //=========================================================================================================
-    /**
     * Returns current freezing status
     *
     * @return the current freezing status
@@ -290,6 +282,12 @@ public:
     * Update projections
     */
     void updateProjection();
+
+    //=========================================================================================================
+    /**
+    * Toggle freeze for all channels when a channel is double clicked
+    */
+    void toggleFreeze();
 
 signals:
     //=========================================================================================================

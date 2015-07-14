@@ -225,6 +225,8 @@ private:
     */
     void showQuickControlWidget();
 
+    virtual void mouseDoubleClickEvent(QMouseEvent * event);
+
     RealTimeEvokedModel*        m_pRTEModel;                /**< RTE data model */
     RealTimeButterflyPlot*      m_pButterflyPlot;           /**< Butterfly plot */
 
