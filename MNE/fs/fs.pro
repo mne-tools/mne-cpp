@@ -9,7 +9,7 @@
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh, Carsten Boensel, and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2015, Christoph Dinh, Carsten Boensel, and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -38,7 +38,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       -= gui
+QT       += core
 
 DEFINES += FS_LIBRARY
 

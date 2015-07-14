@@ -283,6 +283,9 @@ Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerO
                         // ((int *) mri->slices[z+(n)*mri->depth][y])[x]
 //                        MRIIseq_vox(mri,x,y,z,frame-start_frame) = ival;
                         std::cout << iVal << " ";
+
+
+
                       }
                   }
                 break ;
@@ -310,6 +313,8 @@ Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerO
                         // (((float*)(mri->slices[z+((n)*mri->depth)][y]))[x])
 //                        MRIFseq_vox(mri,x,y,z,frame-start_frame) = fval;
                         std::cout << fVal << " ";
+
+
                       }
                   }
                 break;
