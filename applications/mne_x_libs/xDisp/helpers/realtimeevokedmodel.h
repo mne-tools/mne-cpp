@@ -61,6 +61,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 
 //*************************************************************************************************************
@@ -305,15 +306,17 @@ private:
     QMap<qint32,qint32>     m_qMapIdxRowSelection;  /**< Selection mapping.*/
     QMap<qint32,float>      m_qMapChScaling;        /**< Channel scaling map. */
 
-    //Fiff data structure
-    MatrixXd m_matData;        /**< List that holds the data*/
-    MatrixXd m_matDataFreeze;  /**< List that holds the data when freezed*/
+    MatrixXd                m_matData;              /**< List that holds the data*/
+    MatrixXd                m_matDataFreeze;        /**< List that holds the data when freezed*/
+    MatrixXd                m_matProj;              /**< SSP projector */
+    SparseMatrix<double>    m_matSparseProj;        /**< Sparse SSP projector */
 
-    bool m_bIsInit;
-
+    bool m_bIsInit;             /**< Init flag */
+    bool m_bIsFreezed;          /**< Display is freezed */
+    bool m_bProjActivated;      /**< Doo projections flag */
     float m_fSps;               /**< Sampling rate */
 
-    bool m_bIsFreezed;          /**< Display is freezed */
+    RowVectorXi             m_vecBadIdcs;           /**< Idcs of bad channels */
 };
 
 
