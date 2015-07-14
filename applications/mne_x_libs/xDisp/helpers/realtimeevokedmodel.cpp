@@ -210,7 +210,7 @@ void RealTimeEvokedModel::updateData()
 {
     bool doProj = m_bProjActivated && m_matData.cols() > 0 && m_matData.rows() == m_matProj.cols() ? true : false;
 
-    if(doProj)
+    if(!doProj)
         m_matData = m_pRTE->getValue()->data;
     else
         m_matData = m_matSparseProj * m_pRTE->getValue()->data;

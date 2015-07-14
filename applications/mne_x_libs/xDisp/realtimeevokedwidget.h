@@ -233,7 +233,7 @@ private:
     bool            m_bInitialized;             /**< Is Initialized */
     bool            m_bHideBadChannels;         /**< hide bad channels flag. */
 
-    FiffInfo        m_fiffInfo;                 /**< FiffInfo, which is used insteadd of ListChInfo*/
+    FiffInfo::SPtr  m_pFiffInfo;                /**< FiffInfo, which is used insteadd of ListChInfo*/
 
     QAction*        m_pActionSelectSensors;     /**< show roi select widget */
     QAction*        m_pActionSelectModality;    /**< Modality selection action */

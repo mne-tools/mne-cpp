@@ -245,7 +245,7 @@ void RealTimeEvokedWidget::getData()
 //            }
 
             m_qListChInfo = m_pRTE->chInfo();
-            m_fiffInfo = m_pRTE->info();
+            m_pFiffInfo = FiffInfo::SPtr(&m_pRTE->info());
 
             init();
 
@@ -337,7 +337,7 @@ void RealTimeEvokedWidget::init()
 
         //Scaling
         //Show only spin boxes and labels which type are present in the current loaded fiffinfo
-        QList<FiffChInfo> channelList = m_fiffInfo.chs;
+        QList<FiffChInfo> channelList = m_pFiffInfo->chs;
         QList<int> availabeChannelTypes;
 
         for(int i = 0; i<channelList.size(); i++) {
@@ -406,7 +406,7 @@ void RealTimeEvokedWidget::init()
 
         //Quick Control widget
         if(!m_pQuickControlWidget) {
-            m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, FiffInfo::SPtr(&m_fiffInfo), "RT Averaging", 0, true, true, false, false));
+            m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Averaging", 0, true, true, false, false));
             m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
             //Handle scaling
@@ -421,8 +421,7 @@ void RealTimeEvokedWidget::init()
         m_pActionQuickControl->setVisible(true);
 
         //Set up selection manager
-        FiffInfo::SPtr fiffPointer = FiffInfo::SPtr(&m_fiffInfo);
-        m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(this, fiffPointer));
+        m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(this, m_pFiffInfo));
         m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel.data()));
 
         connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::showSelectedChannelsOnly,
