@@ -106,10 +106,10 @@ signals:
     void settingsChanged();
 
 private:
-    RealTimeEvokedWidget * m_pRealTimeEvokedWidget; /**< Connected real-time evoked widget */
+    RealTimeEvokedWidget*   m_pRealTimeEvokedWidget;    /**< Connected real-time evoked widget */
 
-    QList<QCheckBox*>   m_qListModalityCheckBox;    /**< List of modality checkboxes */
-    QList<QLineEdit*>   m_qListModalityLineEdit;    /**< List of modality scalings */
+    QList<QCheckBox*>       m_qListModalityCheckBox;    /**< List of modality checkboxes */
+    QList<QLineEdit*>       m_qListModalityLineEdit;    /**< List of modality scalings */
 };
 
 } // NAMESPACE

@@ -72,7 +72,7 @@ EvokedModalityWidget::EvokedModalityWidget(QWidget *parent, RealTimeEvokedWidget
 : QWidget(parent)
 , m_pRealTimeEvokedWidget(toolbox)
 {
-    this->setWindowTitle("Covariance Modality Settings");
+    this->setWindowTitle("Modality Settings");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
 
@@ -105,7 +105,6 @@ EvokedModalityWidget::EvokedModalityWidget(QWidget *parent, RealTimeEvokedWidget
     }
 
     this->setLayout(t_pGridLayout);
-
 }
 
 
