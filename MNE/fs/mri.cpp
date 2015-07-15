@@ -42,7 +42,6 @@
 #include "mri.h"
 #include <QtDebug>
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -78,7 +77,6 @@ void Mri::allocHeader(int x, int y, int z, int t)
     type = t;
     nFrames = 1;
     xI = yI = zI = 0;
-    slices = 0;
     ps = 1;
     xStart = -width/2.0;
     xEnd = width/2.0;
@@ -104,7 +102,7 @@ void Mri::allocHeader(int x, int y, int z, int t)
     brightness = 1;
     subject_name = '\0';
     path_to_t1 = '\0';
-    fname_format = '\0';
+    fName_format = '\0';
     gdf_image_stem = '\0';
     tag_data = 0;
     tag_data_size = 0;
@@ -134,4 +132,3 @@ Mri::~Mri()
 {
 
 }
-
