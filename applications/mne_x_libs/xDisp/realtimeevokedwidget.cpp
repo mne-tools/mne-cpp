@@ -210,15 +210,6 @@ RealTimeEvokedWidget::~RealTimeEvokedWidget()
 
 //*************************************************************************************************************
 
-void RealTimeEvokedWidget::broadcastSettings()
-{
-    m_pButterflyPlot->setSettings(m_qListModalities);
-
-}
-
-
-//*************************************************************************************************************
-
 void RealTimeEvokedWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
     getData();
@@ -409,7 +400,7 @@ void RealTimeEvokedWidget::init()
 
         //Quick control widget
         if(!m_pQuickControlWidget) {
-            m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Averaging", 0, true, true, false, false));
+            m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Averaging", 0, true, true, false, false, true));
             m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
             //Handle scaling
@@ -419,6 +410,9 @@ void RealTimeEvokedWidget::init()
             //Handle projections
             connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
                     m_pRTEModel, &RealTimeEvokedModel::updateProjection);
+
+            connect(m_pQuickControlWidget.data(), &QuickControlWidget::settingsChanged,
+                    this, &RealTimeEvokedWidget::broadcastSettings);
         }
 
         m_pActionQuickControl->setVisible(true);
@@ -446,11 +440,11 @@ void RealTimeEvokedWidget::init()
 
             m_pEvokedModalityWidget->setWindowTitle("Modality Selection");
 
-            connect(m_pEvokedModalityWidget.data(), &EvokedModalityWidget::settingsChanged,
-                    this, &RealTimeEvokedWidget::broadcastSettings);
+//            connect(m_pEvokedModalityWidget.data(), &EvokedModalityWidget::settingsChanged,
+//                    this, &RealTimeEvokedWidget::broadcastSettings);
         }
 
-        m_pActionSelectModality->setVisible(true);
+        m_pActionSelectModality->setVisible(false);
 
         // Initialized
         m_bInitialized = true;
@@ -519,6 +513,14 @@ void RealTimeEvokedWidget::showSelectedChannelsOnly(QStringList selectedChannels
 void RealTimeEvokedWidget::broadcastScaling(QMap<qint32,float> scaleMap)
 {
     m_pRTEModel->setScaling(scaleMap);
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeEvokedWidget::broadcastSettings(QList<Modality> modalityList)
+{
+    m_pButterflyPlot->setSettings(modalityList);
 }
 
 

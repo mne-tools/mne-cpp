@@ -69,7 +69,7 @@ using namespace XDISPLIB;
 //=============================================================================================================
 
 EvokedModalityWidget::EvokedModalityWidget(QWidget *parent, RealTimeEvokedWidget *toolbox)
-: QWidget(parent)
+: QWidget(parent, Qt::Window)
 , m_pRealTimeEvokedWidget(toolbox)
 {
     this->setWindowTitle("Modality Settings");

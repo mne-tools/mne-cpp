@@ -52,6 +52,7 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -74,12 +75,35 @@
 namespace XDISPLIB
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace FIFFLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STRUCTS
+//=============================================================================================================
+
+struct Modality {
+    QString m_sName;
+    bool m_bActive;
+    float m_fNorm;
+
+    Modality(QString name, bool active, double norm)
+    : m_sName(name), m_bActive(active), m_fNorm(norm)
+    {}
+};
 
 
 //=============================================================================================================
@@ -100,7 +124,7 @@ public:
     * @param [in] parent    parent of widget
     * @param [in] qMapChScaling    pointer to scaling information
     */
-    QuickControlWidget(QMap<qint32, float> qMapChScaling, const FiffInfo::SPtr pFiffInfo, QString name = "", QWidget *parent = 0, bool bScaling = true, bool bProjections = true, bool bView = true, bool bFilter = true);
+    QuickControlWidget(QMap<qint32, float> qMapChScaling, const FiffInfo::SPtr pFiffInfo, QString name = "", QWidget *parent = 0, bool bScaling = true, bool bProjections = true, bool bView = true, bool bFilter = true, bool bModalities = false);
 
     //=========================================================================================================
     /**
@@ -151,6 +175,12 @@ signals:
     */
     void showFilterOptions(bool state);
 
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changed the modality.
+    */
+    void settingsChanged(QList<Modality> modalityList);
+
 protected:
     //=========================================================================================================
     /**
@@ -169,6 +199,12 @@ protected:
     * Create the widgets used in the view group
     */
     void createViewGroup();
+
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the modality group
+    */
+    void createModalityGroup();
 
     //=========================================================================================================
     /**
@@ -232,6 +268,12 @@ protected:
 
     //=========================================================================================================
     /**
+    * Slot called when modality check boxes were changed
+    */
+    void updateModalityCheckbox(qint32 state);
+
+    //=========================================================================================================
+    /**
     * Reimplmented mouseMoveEvent.
     */
     void mouseMoveEvent(QMouseEvent *event);
@@ -281,14 +323,17 @@ private:
     bool        m_bProjections;     /**< Flag for drawing the projection group box */
     bool        m_bView;            /**< Flag for drawing the view group box */
     bool        m_bFilter;          /**< Flag for drawing the filter group box */
+    bool        m_bModalitiy;       /**< Flag for drawing the modality group box */
 
     QMap<qint32,float>              m_qMapChScaling;                /**< Channel scaling values. */
     QMap<qint32, QDoubleSpinBox*>   m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits */
     QMap<qint32, QSlider*>          m_qMapScalingSlider;            /**< Map of types and channel scaling line edits */
     QMap<QString, QColor>           m_qMapTriggerColor;             /**< Trigger channel colors. */
 
+    QList<Modality>     m_qListModalities;              /**< List of different modalities. */
     QList<QCheckBox*>   m_qListCheckBox;                /**< List of projection CheckBox. */
     QList<QCheckBox*>   m_qFilterListCheckBox;          /**< List of filter CheckBox. */
+    QList<QCheckBox*>   m_qListModalityCheckBox;        /**< List of modality checkboxes */
     FiffInfo::SPtr      m_pFiffInfo;                    /**< Connected fiff info. */
 
     QString             m_sName;                        /**< Name of the widget which uses this quick control. */
@@ -299,12 +344,13 @@ private:
     QComboBox*          m_pComboBoxChannel;             /**< Holds the available trigger channels. */
     QDoubleSpinBox*     m_pDoubleSpinBoxThreshold;      /**< Holds the trigger channel threshold. */
     QSpinBox*           m_pSpinBoxThresholdPrec;        /**< Holds the trigger channel threshold precision. */
+    QGroupBox*          m_pModalityGroupBox;            /**< Holds the modality group box. */
 
     Ui::QuickControlWidget *ui;                         /**< The generated UI file */
 };
 
 } // NAMESPACE XDISPLIB
 
-//Q_DECLARE_METATYPE(QMap);
+Q_DECLARE_METATYPE(QList<XDISPLIB::Modality>);
 
 #endif // QUICKCONTROLWIDGET_H

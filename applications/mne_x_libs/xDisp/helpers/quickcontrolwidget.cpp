@@ -54,7 +54,7 @@ using namespace XDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const FiffInfo::SPtr pFiffInfo, QString name, QWidget *parent, bool bScaling, bool bProjections, bool bView, bool bFilter)
+QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const FiffInfo::SPtr pFiffInfo, QString name, QWidget *parent, bool bScaling, bool bProjections, bool bView, bool bFilter, bool bModalities)
 : QWidget(parent, Qt::FramelessWindowHint | Qt::WindowSystemMenuHint)
 , ui(new Ui::QuickControlWidget)
 , m_qMapChScaling(qMapChScaling)
@@ -63,6 +63,7 @@ QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const
 , m_bProjections(bProjections)
 , m_bView(bView)
 , m_bFilter(bFilter)
+, m_bModalitiy(bModalities)
 , m_sName(name)
 {
     ui->setupUi(this);
@@ -97,6 +98,9 @@ QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const
         createViewGroup();
     else
         ui->m_groupBox_view->hide();
+
+    if(m_bModalitiy)
+        createModalityGroup();
 
     ui->m_groupBox_filter->hide();
 
@@ -549,6 +553,94 @@ void QuickControlWidget::createViewGroup()
 
 //*************************************************************************************************************
 
+void QuickControlWidget::createModalityGroup()
+{
+    m_pModalityGroupBox = new QGroupBox;
+    m_pModalityGroupBox->setTitle("Modalities");
+
+    m_qListModalities.clear();
+    bool hasMag = false;
+    bool hasGrad = false;
+    bool hasEEG = false;
+    bool hasEOG = false;
+    bool hasMISC = false;
+    for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i)
+    {
+        if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH)
+        {
+            if(!hasMag && m_pFiffInfo->chs[i].unit == FIFF_UNIT_T)
+                hasMag = true;
+            else if(!hasGrad &&  m_pFiffInfo->chs[i].unit == FIFF_UNIT_T_M)
+                hasGrad = true;
+        }
+        else if(!hasEEG && m_pFiffInfo->chs[i].kind == FIFFV_EEG_CH)
+            hasEEG = true;
+        else if(!hasEOG && m_pFiffInfo->chs[i].kind == FIFFV_EOG_CH)
+            hasEOG = true;
+        else if(!hasMISC && m_pFiffInfo->chs[i].kind == FIFFV_MISC_CH)
+            hasMISC = true;
+    }
+
+    bool sel = true;
+    float val = 1e-11f;
+
+    if(hasMag)
+    {
+        m_qListModalities.append(Modality("MAG",sel,val));
+    }
+    if(hasGrad)
+    {
+        m_qListModalities.append(Modality("GRAD",sel,val));
+    }
+    if(hasEEG)
+    {
+        m_qListModalities.append(Modality("EEG",sel,val));
+    }
+    if(hasEOG)
+    {
+        m_qListModalities.append(Modality("EOG",sel,val));
+    }
+    if(hasMISC)
+    {
+        m_qListModalities.append(Modality("MISC",sel,val));
+    }
+
+    QGridLayout* t_pGridLayout = new QGridLayout;
+
+    for(qint32 i = 0; i < m_qListModalities.size(); ++i)
+    {
+        QString mod = m_qListModalities[i].m_sName;
+
+        QLabel* t_pLabelModality = new QLabel;
+        t_pLabelModality->setText(mod);
+        t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
+
+        QCheckBox* t_pCheckBoxModality = new QCheckBox;
+        t_pCheckBoxModality->setChecked(m_qListModalities[i].m_bActive);
+        m_qListModalityCheckBox << t_pCheckBoxModality;
+        connect(t_pCheckBoxModality,&QCheckBox::stateChanged,
+                this,&QuickControlWidget::updateModalityCheckbox);
+        t_pGridLayout->addWidget(t_pCheckBoxModality,i,1,1,1);
+
+    }
+
+    m_pModalityGroupBox->setLayout(t_pGridLayout);
+
+    //Decide where to put the group box depending on already available group boxes
+    if(!m_bView && m_bFilter)
+        ui->m_gridLayout_masterLayout->addWidget(m_pModalityGroupBox, ui->m_gridLayout_masterLayout->rowCount()-1, 0, 1, 1);
+
+    if((m_bView && m_bFilter) || (!m_bView && !m_bFilter))
+        ui->m_gridLayout_masterLayout->addWidget(m_pModalityGroupBox, ui->m_gridLayout_masterLayout->rowCount(), 0, 1, 2);
+
+    if(m_bView && !m_bFilter)
+        ui->m_gridLayout_masterLayout->addWidget(m_pModalityGroupBox, ui->m_gridLayout_masterLayout->rowCount()-1, 1, 1, 1);
+
+}
+
+
+//*************************************************************************************************************
+
 void QuickControlWidget::onTimeWindowChanged(int value)
 {
     emit timeWindowChanged(value);
@@ -880,6 +972,20 @@ void QuickControlWidget::onShowFilterOptions(bool state)
 }
 
 
+//*************************************************************************************************************
 
+void QuickControlWidget::updateModalityCheckbox(qint32 state)
+{
+    Q_UNUSED(state)
 
+    for(qint32 i = 0; i < m_qListModalityCheckBox.size(); ++i)
+    {
+        if(m_qListModalityCheckBox[i]->isChecked())
+            m_qListModalities[i].m_bActive = true;
+        else
+            m_qListModalities[i].m_bActive = false;
+    }
+
+    emit settingsChanged(m_qListModalities);
+}
 

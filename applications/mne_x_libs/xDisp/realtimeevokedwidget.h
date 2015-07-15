@@ -93,6 +93,7 @@ namespace XDISPLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+struct Modality;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -116,16 +117,6 @@ using namespace XMEASLIB;
 //    Freeze     = 0,       /**< Freezing tool. */
 //    Annotation = 1        /**< Annotation tool. */
 //};
-
-struct Modality {
-    QString m_sName;
-    bool m_bActive;
-    float m_fNorm;
-
-    Modality(QString name, bool active, double norm)
-    : m_sName(name), m_bActive(active), m_fNorm(norm)
-    {}
-};
 
 
 //=============================================================================================================
@@ -157,12 +148,6 @@ public:
     * Destroys the RealTimeEvokedWidget.
     */
     ~RealTimeEvokedWidget();
-
-    //=========================================================================================================
-    /**
-    * Broadcast settings to attached widgets
-    */
-    void broadcastSettings();
 
     //=========================================================================================================
     /**
@@ -212,6 +197,12 @@ private:
     * @param [in] scaleMap QMap with scaling values which is to be broadcasted to the model.
     */
     void broadcastScaling(QMap<qint32, float> scaleMap);
+
+    //=========================================================================================================
+    /**
+    * Broadcast settings to attached widgets
+    */
+    void broadcastSettings(QList<Modality> modalityList);
 
     //=========================================================================================================
     /**
