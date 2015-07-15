@@ -77,7 +77,6 @@ namespace FSLIB
 #define MRI_BITMAP 5
 #define MRI_TENSOR 6
 
-
 //=============================================================================================================
 /**
 * Mri class holds and maintains the data structure needed for mri data.
@@ -144,46 +143,33 @@ public:
                             these coordinates are set */
     int ras_good_flag; /* and accurate for the volume */
 
-    /*  for bshorts and bfloats */
-    int STRLEN = 40; // as I use QString, apparently not needed
     int brightness;
     QString subject_name;
-//    MATRIX        *register_mat; // struct MATRIX does not yet exist
     QString path_to_t1;
-    QString fname_format;
+    QString fName_format;
 
-//    /* for gdf volumes */
+    /* for gdf volumes */
     char gdf_image_stem;
 
-//    /*
-//       each slice is an array of rows (mri->height of them) each of which is
-//       mri->width long.
-//    */
-    BUFTYPE ***slices ;
+    /*
+       each slice is a matrix of width*depth
+       appended to a list of height slices.
+    */
+    QList<Eigen::MatrixXd> slices;
     int scale;
-//    char          transform_fname[STR_LEN] ;
-//    General_transform transform ;   /* the next two are from this struct */
-//    Transform         *linear_transform ;
-//    Transform         *inverse_linear_transform ;
-//    int           free_transform ;   /* are we responsible for freeing it? */
-    int nFrames;          /* # of concatenated images */
+    int nFrames; /* # of concatenated images */
 
     /* these are used to handle boundary conditions (arrays of indices) */
     int *xI;
     int *yI;
     int *zI;
-    int yInvert;  /* for converting between MNC and coronal slices */
+    int yInvert; /* for converting between MNC and coronal slices */
     MriRegion roi;
     int dof;
-//    double        mean ;
-    double flip_angle;  /* in radians */
+    double flip_angle; /* in radians */
 
     void* tag_data; /* saved tag data */
     int tag_data_size; /* size of saved tag data */
-//    MATRIX *i_to_r__; /* cache */
-//    MATRIX *r_to_i__;
-//    char   *cmdlines[MAX_CMDS];
-//    int    ncmds;
 
     //=========================================================================================================
     /**

@@ -50,7 +50,6 @@
 
 using namespace FSLIB;
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -103,16 +102,12 @@ void Mri::allocHeader(int x, int y, int z, int t)
     c_r = c_a = c_s = 0.0;
     ras_good_flag = 0;
     brightness = 1;
-//    register_mat = 0; // datatype MATRIX not yet defined
     subject_name = '\0';
     path_to_t1 = '\0';
     fname_format = '\0';
     gdf_image_stem = '\0';
     tag_data = 0;
     tag_data_size = 0;
-
-//    i_to_r__ = extract_i_to_r(mri); // todo
-//    r_to_i__ = extract_r_to_i(mri); // todo
 }
 
 //*************************************************************************************************************
@@ -121,13 +116,8 @@ void Mri::allocSequence(int x, int y, int z, int t, int f)
 {
 
     // todo: what is the mri allocChunk method for? check, use and implement if useful...
-
-    BUFTYPE *buf;
-
-    return;
-
     if (x<=0 || y<=0 || z<=0)
-        qWarning() << "allocSequence("
+        qDebug() << "allocSequence("
                  << x << ", "
                  << y << ", "
                  << z << ", "
@@ -136,69 +126,6 @@ void Mri::allocSequence(int x, int y, int z, int t, int f)
     allocHeader(x, y, z, t);
     //todo: initHeader();
     nFrames = f;
-    //todo: initIndices();
-    //todo: outside_val = 0;
-    slices = (BUFTYPE ***)calloc(z*nFrames, sizeof(BUFTYPE **)) ;
-    if (!slices)
-    {
-        qWarning() << "allocSequence(): out of memory. could not allocate "
-                 << z*sizeof(BUFTYPE *)
-                 << " bytes for "
-                 << depth
-                 << " slices";
-    }
-
-    // allocate each slice
-    int slice;
-    for (slice=0; slice<z*nFrames; slice++)
-    {
-        // allocate pointer to array of rows
-        slices[slice] = (BUFTYPE **)calloc(height, sizeof(BUFTYPE *));
-        if (!slices[slice])
-        {
-//            qWarning() << "allocSequence(): could not allocate"
-//                     << (height*sizeof(BUFTYPE *)
-//                     << "bytes for "
-//                     << slice
-//                     << " slices";
-        }
-
-        // allocate each row
-        int row;
-        for (row=0; row<height; row++)
-        {
-//            switch (type)
-//            {
-//            case MRI_BITMAP:
-//              slices[slice][row] = (BUFTYPE *)calloc(width/8,sizeof(BUFTYPE));
-//              break;
-//            case MRI_UCHAR:
-//              slices[slice][row] = (BUFTYPE *)calloc(width,sizeof(BUFTYPE));
-//              break;
-//            case MRI_FLOAT:
-//              slices[slice][row] = (BUFTYPE *)calloc(width, sizeof(float));
-//              break;
-//            case MRI_INT:
-//              slices[slice][row] = (BUFTYPE *)calloc(width, sizeof(int));
-//              break;
-//            case MRI_SHORT:
-//              slices[slice][row] = (BUFTYPE *)calloc(width, sizeof(short));
-//              break;
-//            case MRI_LONG:
-//              slices[slice][row] = (BUFTYPE *)calloc(width, sizeof(long));
-//            }
-
-            if (!slices[slice][row])
-            {
-                qWarning() << "could not allocate "
-                         << row
-                         << "th row in "
-                         << slice
-                         << "th slice";
-            }
-
-        }
-    }
 }
 
 //*************************************************************************************************************
