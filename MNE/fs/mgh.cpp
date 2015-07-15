@@ -64,12 +64,12 @@
 
 #include <string>
 
-//=====================
-// maybe use quint8, ... instead
+//*************************************************************************************************************
+
 typedef unsigned char uint8;
 typedef unsigned short uint16;
 typedef unsigned int uint;
-// later implement these as inline functions
+
 #define my_max(a,b) (((a) > (b)) ? (a) : (b))
 #define my_min(a,b) (((a) < (b)) ? (a) : (b))
 
@@ -80,7 +80,6 @@ typedef unsigned int uint;
 
 using namespace FSLIB;
 using namespace Eigen;
-
 
 //*************************************************************************************************************
 //=============================================================================================================

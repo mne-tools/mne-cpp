@@ -50,7 +50,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-//#include <QImage>
+#include <QString>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -77,21 +77,22 @@ public:
     MatrixXd getDataAsMatrix();
     void setDataAsMatrix(MatrixXd slice);
     void setSliceIdx(quint32 idx);
-//    QImage getSliceAsImage();
     double getVoxel(int x, int y);
-//    void show();
 
 private:
     MatrixXd m_slice;
     quint32 m_idx; // index of slice
     quint32 m_dimX; // row
     quint32 m_dimY; // column
+    QString m_colorMap = "Bone"; // prefered color map style
+    // valid strings:
+    //    "HotNeg2"
+    //    "Jet"
+    //    "RedBlue"
+    //    "Bone"
+    //    "Jet"
+    //    "Hot"
 
-//    quint8 m_colorMap; // not yet in use
-    //    different possible color maps:
-    //        1 : bone color map
-    //        2 : fuzzy color histogramm
-    //        3 : hot color map
 };
 
 } // NAMESPACE

@@ -40,7 +40,6 @@
 //=============================================================================================================
 
 #include "slicedata.h"
-//#include <disp/imagesc.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -48,8 +47,6 @@
 //=============================================================================================================
 
 using namespace FSLIB;
-//using namespace DISPLIB;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -88,6 +85,11 @@ inline void SliceData::setDataAsMatrix(MatrixXd slice)
     m_slice = slice;
     m_dimX = m_slice.RowsAtCompileTime;
     m_dimY = m_slice.ColsAtCompileTime;
+
+//    m_dimX = m_slice.rows();
+//    m_dimY = m_slice.cols();
+    // todo: check difference between normal and at compiler time
+
 }
 
 //*************************************************************************************************************
@@ -99,48 +101,10 @@ inline void SliceData::setSliceIdx(quint32 idx)
 
 //*************************************************************************************************************
 
-//QImage SliceData::getSliceAsImage()
-//{
-//    qint32 i, j;
-//    QImage t_qImageData(m_dimX, m_dimY, QImage::Format_RGB32);
-
-//    for(i = 0; i < m_dimX; ++i)
-//        for(j = 0; j < m_dimY; ++j)
-////            t_qImageData.setPixel(i, j, ColorMap::valueToJet(m_slice(j,i)));
-//    //todo: check if this colomap function is used right for our kind of data.
-
-//    return t_qImageData;
-//    //todo: eventually port this functionality to imagesc and call it
-//}
-
-//*************************************************************************************************************
-
 inline double SliceData::getVoxel(int x, int y)
 {
     return m_slice(x,y);
 }
-
-//*************************************************************************************************************
-
-//void SliceData::show()
-//{
-//    ImageSc imagesc(m_slice);
-//    QString title = "Visualization of slice no" + m_idx;
-//    imagesc.setTitle(title.toStdString());
-//    imagesc.setXLabel("X Axes");
-//    imagesc.setYLabel("Y Axes");
-
-//    imagesc.setColorMap("HotNeg2");
-//    // Alternate color maps
-//    //  imagesc.setColorMap("Jet");
-//    //  imagesc.setColorMap("RedBlue");
-//    //  imagesc.setColorMap("Bone");
-//    //  imagesc.setColorMap("Jet");
-//    //  imagesc.setColorMap("Hot");
-
-//    imagesc.setWindowTitle("Slice Plot");
-//    imagesc.show();
-//}
 
 //*************************************************************************************************************
 
