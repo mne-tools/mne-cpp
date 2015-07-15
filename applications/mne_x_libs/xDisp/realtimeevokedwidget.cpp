@@ -115,14 +115,16 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     m_pActionSelectModality = new QAction(QIcon(":/images/evokedSettings.png"), tr("Shows the modality selection widget (F12)"),this);
     m_pActionSelectModality->setShortcut(tr("F12"));
     m_pActionSelectModality->setStatusTip(tr("Show the modality selection widget (F12)"));
-    connect(m_pActionSelectModality, &QAction::triggered, this, &RealTimeEvokedWidget::showModalitySelectionWidget);
+    connect(m_pActionSelectModality, &QAction::triggered,
+            this, &RealTimeEvokedWidget::showModalitySelectionWidget);
     addDisplayAction(m_pActionSelectModality);
     m_pActionSelectModality->setVisible(false);
 
     m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Show the region selection widget (F11)"),this);
     m_pActionSelectSensors->setShortcut(tr("F11"));
-    m_pActionSelectSensors->setStatusTip(tr("Show the region selection widget (F12)"));
-    connect(m_pActionSelectSensors, &QAction::triggered, this, &RealTimeEvokedWidget::showSensorSelectionWidget);
+    m_pActionSelectSensors->setStatusTip(tr("Show the region selection widget (F11)"));
+    connect(m_pActionSelectSensors, &QAction::triggered,
+            this, &RealTimeEvokedWidget::showSensorSelectionWidget);
     addDisplayAction(m_pActionSelectSensors);
     m_pActionSelectSensors->setVisible(false);
 
@@ -336,7 +338,7 @@ void RealTimeEvokedWidget::init()
 
         m_pButterflyPlot->setSettings(m_qListModalities);
 
-        //Scaling
+        //Set up scaling
         //Show only spin boxes and labels which type are present in the current loaded fiffinfo
         QList<FiffChInfo> channelList = m_pFiffInfo->chs;
         QList<int> availabeChannelTypes;
@@ -405,7 +407,7 @@ void RealTimeEvokedWidget::init()
 
         m_pActionChScaling->setVisible(false);
 
-        //Quick Control widget
+        //Quick control widget
         if(!m_pQuickControlWidget) {
             m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Averaging", 0, true, true, false, false));
             m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
@@ -437,7 +439,17 @@ void RealTimeEvokedWidget::init()
 
         m_pActionSelectSensors->setVisible(true);
 
-        //Modality widget
+        //Set up modality widget
+        if(!m_pEvokedModalityWidget)
+        {
+            m_pEvokedModalityWidget = QSharedPointer<EvokedModalityWidget>(new EvokedModalityWidget(this, this));
+
+            m_pEvokedModalityWidget->setWindowTitle("Modality Selection");
+
+            connect(m_pEvokedModalityWidget.data(), &EvokedModalityWidget::settingsChanged,
+                    this, &RealTimeEvokedWidget::broadcastSettings);
+        }
+
         m_pActionSelectModality->setVisible(true);
 
         // Initialized
@@ -450,15 +462,6 @@ void RealTimeEvokedWidget::init()
 
 void RealTimeEvokedWidget::showModalitySelectionWidget()
 {
-    if(!m_pEvokedModalityWidget)
-    {
-        m_pEvokedModalityWidget = QSharedPointer<EvokedModalityWidget>(new EvokedModalityWidget(this, this));
-
-        m_pEvokedModalityWidget->setWindowTitle("Modality Selection");
-
-        connect(m_pEvokedModalityWidget.data(), &EvokedModalityWidget::settingsChanged,
-                this, &RealTimeEvokedWidget::broadcastSettings);
-    }
     m_pEvokedModalityWidget->show();
 }
 
