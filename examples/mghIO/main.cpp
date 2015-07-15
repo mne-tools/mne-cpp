@@ -44,14 +44,11 @@
 #include <fs/mri.h>
 #include <fs/mgh.h>
 
-
 #include <disp/imagesc.h>
 #include <disp/plot.h>
 #include <disp/rtplot.h>
 
 #include <math.h>
-
-
 
 // std includes
 #include <iostream>
@@ -60,10 +57,7 @@
 
 // math includes
 #include <string>
-#include <vector>
 #include <array>
-
-//#include <zlib.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -71,14 +65,8 @@
 //=============================================================================================================
 
 #include <QApplication>
-#include <QByteArray>
-#include <QBitArray>
 #include <QString>
 #include <QDebug>
-#include <QDir>
-#include <QFile>
-#include <QFileInfo>
-#include <QTemporaryFile>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -98,12 +86,8 @@ using namespace DISPLIB;
 // MAIN
 //=============================================================================================================
 
-// prototypes
-void printVector(vector<int> vec);
-
-//=============================================================================================================
 /**
-* read in mgh sample data and store it to mri data structure
+* read in mgh sample data, store it to mri data structure, and plot it
 */
 int main(int argc, char *argv[])
 {
@@ -111,59 +95,41 @@ int main(int argc, char *argv[])
 
     // initialize vars to call loadMGH function
     QString fName = "D:/Repos/mne-cpp/bin/MNE-sample-data/subjects/sample/mri/orig/001.mgh";
-//    QDir fDir(fName);
-//    QFileInfo ...
-//    QString fNameCanonical = fDir.canonicalPath();
 
-    vector<int> slices; // indices of the sclices z to read
-    slices.push_back(0);
-    int frame = 0; // time frame index
+    VectorXi slices(3); // indices of the sclices (z dimension) to read
+    slices << 99, 100, 101;
+
+    int frame = 0; // time frame index, negativ values are vectors
     bool headerOnly = false;
 
     // call ported freesurfer function to read in file
-    cout << "Reading mgh file..." << endl;
-    cout << fName.toStdString() << endl;
+    qDebug() << "Reading mgh file...";
+    qDebug() << fName;
+
 //    Mri mri =
     QList<Eigen::MatrixXd> listMatSlices = Mgh::loadMGH(fName, slices, frame, headerOnly);
 
-
-    cout << "Read some slices =" << listMatSlices.size() << endl;
-
-
-
-
-    //ImageSc Test
-
-    MatrixXd mat = listMatSlices[100];
-//    qint32 width = 300;
-//    qint32 height = 400;
-
-
-//    for(int i = 0; i < width; ++i)
-//        for(int j = 0; j < height; ++j)
-//            mat(i,j) = ((double)(i+j))/698.0;//*0.1-1.5;
+    //ImageSc Demo Plot
+    qDebug() << "\nRead" << listMatSlices.size() << "slices.\n";
+    quint16 sliceIdx = 150;
+    MatrixXd mat = listMatSlices[sliceIdx]; // chosen slice index
 
     ImageSc imagesc(mat);
-    imagesc.setTitle("Test Matrix");
+    imagesc.setTitle("Visualization of chosen slice");
     imagesc.setXLabel("X Axes");
     imagesc.setYLabel("Y Axes");
 
-    imagesc.setColorMap("HotNeg2");//imagesc.setColorMap("Jet");//imagesc.setColorMap("RedBlue");//imagesc.setColorMap("Bone");//imagesc.setColorMap("Jet");//imagesc.setColorMap("Hot");
+    QList<QString> colorMaps;
+    colorMaps << "HotNeg2"  // 0
+              << "Jet"      // 1
+              << "RedBlue"  // 2
+              << "Bone"     // 3
+              << "Jet"      // 4
+              << "Hot";     // 5
+    imagesc.setColorMap(colorMaps[3]);
 
-    imagesc.setWindowTitle("Corresponding function to MATLABs imagesc");
+    imagesc.setWindowTitle("Slice Plot");
     imagesc.show();
 
-
-
     return a.exec();
-}
-
-//*************************************************************************************************************
-
-// print vector content to console
-void printVector(vector<int> vec)
-{
-  for (unsigned int i=0; i<vec.size(); ++i)
-    cout << vec[i] << ' ';
-  cout << '\n';
 }

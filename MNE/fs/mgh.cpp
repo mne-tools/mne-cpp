@@ -43,7 +43,6 @@
 #include "mgh.h"
 #include "blendian.h"
 
-
 //#define MINIZ_HEADER_FILE_ONLY
 //#include "3rdParty/miniz.c"
 
@@ -54,7 +53,6 @@
 #include <stdio.h>
 #include <iostream>
 #include <limits.h>
-
 
 #include <QCoreApplication>
 #include <QString>
@@ -75,14 +73,12 @@ typedef unsigned int uint;
 #define my_max(a,b) (((a) > (b)) ? (a) : (b))
 #define my_min(a,b) (((a) < (b)) ? (a) : (b))
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace FSLIB;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -97,7 +93,7 @@ Mgh::Mgh()
 //*************************************************************************************************************
 
 //Mri
-QList<Eigen::MatrixXd> Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerOnly)
+QList<Eigen::MatrixXd> Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int frame, bool headerOnly)
 {
     Mri mri;
 //    mri.nFrames = 2; // for testing purposes
@@ -217,7 +213,6 @@ QList<Eigen::MatrixXd> Mgh::loadMGH(QString fName, std::vector<int> slices, int 
     if (headerOnly)
     {
         // initialize vars and set volume size in mri
-//        mri.STRLEN = 20; // change this to length of fName
         mri.allocHeader(nDimX, nDimY, nDimZ, type);
         mri.dof = dof;
         mri.nFrames = nFrames;
@@ -264,7 +259,7 @@ QList<Eigen::MatrixXd> Mgh::loadMGH(QString fName, std::vector<int> slices, int 
         int x, y, z, i;
 
 
-        Eigen::MatrixXd shortMatData(nDimX, nDimY);
+        Eigen::MatrixXd MatData(nDimX, nDimY);
 
         for (frame=start_frame; frame<=end_frame; frame++)
         {
@@ -293,14 +288,11 @@ QList<Eigen::MatrixXd> Mgh::loadMGH(QString fName, std::vector<int> slices, int 
                         // ((int *) mri->slices[z+(n)*mri->depth][y])[x]
 //                        MRIIseq_vox(mri,x,y,z,frame-start_frame) = ival;
 //                        std::cout << iVal << " ";
-
-
-
+                        MatData(x,y) = sVal;
                       }
                   }
                 break ;
                 case MRI_SHORT:
-
 
                     std::cout << "### Debug watch out Shorts are coming! " << sliceCount << std::endl;
                     for (i = y = 0 ; y < nDimY ; y++)
@@ -313,15 +305,14 @@ QList<Eigen::MatrixXd> Mgh::loadMGH(QString fName, std::vector<int> slices, int 
     //                        MRISseq_vox(mri,x,y,z,frame-start_frame) = sval;
     //                        std::cout << sVal << " ";
 
-
-                            shortMatData(x,y) = sVal;
+                            MatData(x,y) = sVal;
                           }
                       }
 
 
                     ++sliceCount;
 
-                    listSliceMat.append(shortMatData);
+                    listSliceMat.append(MatData);
                 break ;
                 case MRI_TENSOR:
                 case MRI_FLOAT:
@@ -336,7 +327,7 @@ QList<Eigen::MatrixXd> Mgh::loadMGH(QString fName, std::vector<int> slices, int 
 //                      MRIFseq_vox(mri,x,y,z,frame-start_frame) = fval;
 //                      std::cout << fVal << " ";
 
-
+                            MatData(x,y) = sVal;
                        }
                     }
                 break;

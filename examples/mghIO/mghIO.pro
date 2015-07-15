@@ -70,7 +70,6 @@ else {
             -lMNE$${MNE_LIB_VERSION}Disp
 }
 
-
 DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
