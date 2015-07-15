@@ -99,7 +99,7 @@ public:
     //=========================================================================================================
     /**
     * The function loadMGH reads in binary MGH files and stores the content to the data structure
-    * defined in the Mri class.
+    * defined in the Mri class. It is ported from Freesurfers mghRead() method in mriio.c
     *
     * @param[in] fName  filename
     * @param[in] slices   todo
@@ -108,18 +108,16 @@ public:
     *
     * @return calculated result as an integer
     */
-    //static Mri
-    static QList<Eigen::MatrixXd> loadMGH(QString fName, Eigen::VectorXi slices, int frame, bool headerOnly);
+    static Mri loadMGH(QString fName, Eigen::VectorXi slices, int frame, bool headerOnly);
+//    static QList<Eigen::MatrixXd> loadMGH(QString fName, Eigen::VectorXi slices, int frame, bool headerOnly);
 
     //=========================================================================================================
     /**
-    *
     *
     * @param[in]  gzFName  absolute file name of compressed mgz file
     * @param[in]  unGzFName  absolute file name of resulting uncompressed mgh file
     */
     static int unGz(QString gzFName, QString unGzFName);
-
 
     //
     inline static int tinfl_put_buf_func(const void* pBuf, int len, void *pUser)

@@ -102,13 +102,20 @@ int main(int argc, char *argv[])
     qDebug() << "Reading mgh file...";
     qDebug() << fName;
 
-//    Mri mri = Mgh::loadMGH(fName, slices, frame, headerOnly);
-    QList<Eigen::MatrixXd> listMatSlices = Mgh::loadMGH(fName, slices, frame, headerOnly);
+    Mri mri = Mgh::loadMGH(fName, slices, frame, headerOnly);
+//    QList<Eigen::MatrixXd> listMatSlices = Mgh::loadMGH(fName, slices, frame, headerOnly);
+
+    // check dimensions of slices stack
+
+
 
     //ImageSc Demo Plot
-    qDebug() << "\nRead" << listMatSlices.size() << "slices.\n";
+    qDebug() << "\nRead" << mri.slices.size() << "slices.\n";
     quint16 sliceIdx = 150;
-    MatrixXd mat = listMatSlices[sliceIdx]; // chosen slice index
+    MatrixXd mat = mri.slices[sliceIdx]; // chosen slice index
+//    qDebug() << "\nRead" << listMatSlices.size() << "slices.\n";
+//    quint16 sliceIdx = 150;
+//    MatrixXd mat = listMatSlices[sliceIdx]; // chosen slice index
 
     ImageSc imagesc(mat);
     imagesc.setTitle("Visualization of chosen slice");

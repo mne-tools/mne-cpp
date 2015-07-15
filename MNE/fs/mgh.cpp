@@ -93,12 +93,10 @@ Mgh::Mgh()
 
 //*************************************************************************************************************
 
-//Mri
-QList<MatrixXd> Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int frame, bool headerOnly)
+//QList<MatrixXd>
+Mri Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int frame, bool headerOnly)
 {
     Mri mri;
-//    mri.nFrames = 2; // for testing purposes
-
     QList<MatrixXd> sliceDataList;
     int sliceCount = 0;
 
@@ -320,6 +318,8 @@ QList<MatrixXd> Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int frame, b
                            fVal = BLEndian::swapFloat(((float *)buf)[i]);
 //                           qDebug() << fVal << " ";
                            slice(x,y) = sVal;
+                            ((float*)(mri->slices[z+((n)*mri->depth)][y]))[x] = fval;
+//                           MRIFseq_vox(mri,x,y,z,frame-start_frame) = fval;
                        }
                     }
                     ++sliceCount;
@@ -387,8 +387,7 @@ QList<MatrixXd> Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int frame, b
         }
     }
 
-    // tag reading
-    //  todo!! -> transformations
+    //  todo: tag reading and transformations
 
     fclose(fp);
 
@@ -401,8 +400,9 @@ QList<MatrixXd> Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int frame, b
     mri.zEnd = mri.depth/2*mri.zSize;
     mri.fName = fName;
 
-//    return mri;
-    return sliceDataList;
+    mri.slices = sliceDataList;
+    return mri;
+//    return sliceDataList;
 }
 
 //*************************************************************************************************************
