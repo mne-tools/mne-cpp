@@ -67,7 +67,6 @@ void RealTimeButterflyPlot::dataUpdate(const QModelIndex& topLeft, const QModelI
 
 void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
 {
-
     QPainter painter(this);
 
     painter.save();
@@ -80,7 +79,6 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
         //Stimulus bar
         if(m_pRealTimeEvokedModel->getNumSamples() > 0)
         {
-
             painter.save();
             painter.setPen(QPen(Qt::black, 1, Qt::DashLine));
 
