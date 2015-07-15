@@ -45,6 +45,8 @@
 #include "mri.h"
 #include <vector>
 
+#include <Eigen/Core>
+
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
@@ -109,7 +111,8 @@ public:
     *
     * @return calculated result as an integer
     */
-    static Mri loadMGH(QString fName, std::vector<int> slices, int frame, bool headerOnly);
+    //static Mri
+    static QList<Eigen::MatrixXd> loadMGH(QString fName, std::vector<int> slices, int frame, bool headerOnly);
 
     //=========================================================================================================
     /**

@@ -38,7 +38,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       += core
+QT       -= gui
 
 DEFINES += FS_LIBRARY
 

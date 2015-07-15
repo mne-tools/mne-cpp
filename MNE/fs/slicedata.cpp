@@ -40,8 +40,7 @@
 //=============================================================================================================
 
 #include "slicedata.h"
-#include <disp/imagesc.h>
-#include <disp/colormap.h>
+//#include <disp/imagesc.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -49,7 +48,7 @@
 //=============================================================================================================
 
 using namespace FSLIB;
-using namespace DISPLIB;
+//using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -107,7 +106,7 @@ QImage SliceData::getSliceAsImage()
 
     for(i = 0; i < m_dimX; ++i)
         for(j = 0; j < m_dimY; ++j)
-            t_qImageData.setPixel(i, j, ColorMap::valueToJet(m_slice(j,i)));
+//            t_qImageData.setPixel(i, j, ColorMap::valueToJet(m_slice(j,i)));
     //todo: check if this colomap function is used right for our kind of data.
 
     return t_qImageData;
@@ -123,25 +122,25 @@ inline double SliceData::getVoxel(int x, int y)
 
 //*************************************************************************************************************
 
-void SliceData::show()
-{
-    ImageSc imagesc(m_slice);
-    QString title = "Visualization of slice no" + m_idx;
-    imagesc.setTitle(title.toStdString());
-    imagesc.setXLabel("X Axes");
-    imagesc.setYLabel("Y Axes");
+//void SliceData::show()
+//{
+//    ImageSc imagesc(m_slice);
+//    QString title = "Visualization of slice no" + m_idx;
+//    imagesc.setTitle(title.toStdString());
+//    imagesc.setXLabel("X Axes");
+//    imagesc.setYLabel("Y Axes");
 
-    imagesc.setColorMap("HotNeg2");
-    // Alternate color maps
-    //  imagesc.setColorMap("Jet");
-    //  imagesc.setColorMap("RedBlue");
-    //  imagesc.setColorMap("Bone");
-    //  imagesc.setColorMap("Jet");
-    //  imagesc.setColorMap("Hot");
+//    imagesc.setColorMap("HotNeg2");
+//    // Alternate color maps
+//    //  imagesc.setColorMap("Jet");
+//    //  imagesc.setColorMap("RedBlue");
+//    //  imagesc.setColorMap("Bone");
+//    //  imagesc.setColorMap("Jet");
+//    //  imagesc.setColorMap("Hot");
 
-    imagesc.setWindowTitle("Slice Plot");
-    imagesc.show();
-}
+//    imagesc.setWindowTitle("Slice Plot");
+//    imagesc.show();
+//}
 
 //*************************************************************************************************************
 

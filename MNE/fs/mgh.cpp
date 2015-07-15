@@ -96,10 +96,14 @@ Mgh::Mgh()
 
 //*************************************************************************************************************
 
-Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerOnly)
+//Mri
+QList<Eigen::MatrixXd> Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerOnly)
 {
     Mri mri;
 //    mri.nFrames = 2; // for testing purposes
+
+    QList<Eigen::MatrixXd> listSliceMat;
+    int sliceCount = 0;
 
     // get file extension
     QFileInfo fi(fName);
@@ -258,6 +262,10 @@ Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerO
         mri.dof = dof;
 
         int x, y, z, i;
+
+
+        Eigen::MatrixXd shortMatData(nDimX, nDimY);
+
         for (frame=start_frame; frame<=end_frame; frame++)
         {
             for (z=0; z<nDimZ; z++)
@@ -274,6 +282,8 @@ Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerO
                 switch (type)
                 {
                 case MRI_INT:
+
+                    std::cout << "### Debug watch out INTS are coming!\n";
                 for (i = y = 0 ; y < nDimY ; y++)
                   {
                     for (x = 0 ; x < nDimX ; x++, i++)
@@ -282,7 +292,7 @@ Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerO
                         /* voxel access macro */
                         // ((int *) mri->slices[z+(n)*mri->depth][y])[x]
 //                        MRIIseq_vox(mri,x,y,z,frame-start_frame) = ival;
-                        std::cout << iVal << " ";
+//                        std::cout << iVal << " ";
 
 
 
@@ -290,33 +300,45 @@ Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerO
                   }
                 break ;
                 case MRI_SHORT:
-                for (i = y = 0 ; y < nDimY ; y++)
-                  {
-                    for (x = 0 ; x < nDimX ; x++, i++)
+
+
+                    std::cout << "### Debug watch out Shorts are coming! " << sliceCount << std::endl;
+                    for (i = y = 0 ; y < nDimY ; y++)
                       {
-                        sVal = BLEndian::swapShort(((short *)buf)[i]);
-                        /* voxel access macro */
-                        //((short*)mri->slices[z+(n)*mri->depth][y])[x]
-//                        MRISseq_vox(mri,x,y,z,frame-start_frame) = sval;
-                        std::cout << sVal << " ";
+                        for (x = 0 ; x < nDimX ; x++, i++)
+                          {
+                            sVal = BLEndian::swapShort(((short *)buf)[i]);
+                            /* voxel access macro */
+                            //((short*)mri->slices[z+(n)*mri->depth][y])[x]
+    //                        MRISseq_vox(mri,x,y,z,frame-start_frame) = sval;
+    //                        std::cout << sVal << " ";
+
+
+                            shortMatData(x,y) = sVal;
+                          }
                       }
-                  }
+
+
+                    ++sliceCount;
+
+                    listSliceMat.append(shortMatData);
                 break ;
                 case MRI_TENSOR:
                 case MRI_FLOAT:
-                for (i = y = 0 ; y < nDimY ; y++)
-                  {
-                    for (x = 0 ; x < nDimX ; x++, i++)
-                      {
-                        fVal = BLEndian::swapFloat(((float *)buf)[i]);
-                        /* voxel access macro */
-                        // (((float*)(mri->slices[z+((n)*mri->depth)][y]))[x])
-//                        MRIFseq_vox(mri,x,y,z,frame-start_frame) = fval;
-                        std::cout << fVal << " ";
+                    std::cout << "### Debug watch out floats are coming!\n";
+                    for (i = y = 0 ; y < nDimY ; y++)
+                    {
+                       for (x = 0 ; x < nDimX ; x++, i++)
+                       {
+                           fVal = BLEndian::swapFloat(((float *)buf)[i]);
+                           /* voxel access macro */
+                           // (((float*)(mri->slices[z+((n)*mri->depth)][y]))[x])
+//                      MRIFseq_vox(mri,x,y,z,frame-start_frame) = fval;
+//                      std::cout << fVal << " ";
 
 
-                      }
-                  }
+                       }
+                    }
                 break;
                 case MRI_UCHAR:
                 //local_buffer_to_image(buf, mri, z, frame-start_frame); // todo!!
@@ -394,7 +416,8 @@ Mri Mgh::loadMGH(QString fName, std::vector<int> slices, int frame, bool headerO
     mri.zEnd = mri.depth/2*mri.zSize;
     mri.fName = fName;
 
-    return mri;
+//    return mri;
+    return listSliceMat;
 }
 
 //*************************************************************************************************************

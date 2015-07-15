@@ -44,6 +44,15 @@
 #include <fs/mri.h>
 #include <fs/mgh.h>
 
+
+#include <disp/imagesc.h>
+#include <disp/plot.h>
+#include <disp/rtplot.h>
+
+#include <math.h>
+
+
+
 // std includes
 #include <iostream>
 #include <stdint.h>
@@ -61,7 +70,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/QCoreApplication>
+#include <QApplication>
 #include <QByteArray>
 #include <QBitArray>
 #include <QString>
@@ -78,6 +87,8 @@
 
 using namespace std;
 using namespace FSLIB;
+using namespace Eigen;
+using namespace DISPLIB;
 
 //*************************************************************************************************************
 
@@ -94,8 +105,10 @@ void printVector(vector<int> vec);
 /**
 * read in mgh sample data and store it to mri data structure
 */
-int main()
+int main(int argc, char *argv[])
 {
+    QApplication a(argc, argv);
+
     // initialize vars to call loadMGH function
     QString fName = "D:/Repos/mne-cpp/bin/MNE-sample-data/subjects/sample/mri/orig/001.mgh";
 //    QDir fDir(fName);
@@ -110,9 +123,39 @@ int main()
     // call ported freesurfer function to read in file
     cout << "Reading mgh file..." << endl;
     cout << fName.toStdString() << endl;
-    Mri mri = Mgh::loadMGH(fName, slices, frame, headerOnly);
+//    Mri mri =
+    QList<Eigen::MatrixXd> listMatSlices = Mgh::loadMGH(fName, slices, frame, headerOnly);
 
-    return 0;
+
+    cout << "Read some slices =" << listMatSlices.size() << endl;
+
+
+
+
+    //ImageSc Test
+
+    MatrixXd mat = listMatSlices[100];
+//    qint32 width = 300;
+//    qint32 height = 400;
+
+
+//    for(int i = 0; i < width; ++i)
+//        for(int j = 0; j < height; ++j)
+//            mat(i,j) = ((double)(i+j))/698.0;//*0.1-1.5;
+
+    ImageSc imagesc(mat);
+    imagesc.setTitle("Test Matrix");
+    imagesc.setXLabel("X Axes");
+    imagesc.setYLabel("Y Axes");
+
+    imagesc.setColorMap("HotNeg2");//imagesc.setColorMap("Jet");//imagesc.setColorMap("RedBlue");//imagesc.setColorMap("Bone");//imagesc.setColorMap("Jet");//imagesc.setColorMap("Hot");
+
+    imagesc.setWindowTitle("Corresponding function to MATLABs imagesc");
+    imagesc.show();
+
+
+
+    return a.exec();
 }
 
 //*************************************************************************************************************

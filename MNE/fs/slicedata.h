@@ -79,7 +79,7 @@ public:
     void setSliceIdx(quint32 idx);
     QImage getSliceAsImage();
     double getVoxel(int x, int y);
-    void show();
+//    void show();
 
 private:
     MatrixXd m_slice;
