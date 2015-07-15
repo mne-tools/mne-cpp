@@ -99,19 +99,19 @@ inline void SliceData::setSliceIdx(quint32 idx)
 
 //*************************************************************************************************************
 
-QImage SliceData::getSliceAsImage()
-{
-    qint32 i, j;
-    QImage t_qImageData(m_dimX, m_dimY, QImage::Format_RGB32);
+//QImage SliceData::getSliceAsImage()
+//{
+//    qint32 i, j;
+//    QImage t_qImageData(m_dimX, m_dimY, QImage::Format_RGB32);
 
-    for(i = 0; i < m_dimX; ++i)
-        for(j = 0; j < m_dimY; ++j)
-//            t_qImageData.setPixel(i, j, ColorMap::valueToJet(m_slice(j,i)));
-    //todo: check if this colomap function is used right for our kind of data.
+//    for(i = 0; i < m_dimX; ++i)
+//        for(j = 0; j < m_dimY; ++j)
+////            t_qImageData.setPixel(i, j, ColorMap::valueToJet(m_slice(j,i)));
+//    //todo: check if this colomap function is used right for our kind of data.
 
-    return t_qImageData;
-    //todo: eventually port this functionality to imagesc and call it
-}
+//    return t_qImageData;
+//    //todo: eventually port this functionality to imagesc and call it
+//}
 
 //*************************************************************************************************************
 

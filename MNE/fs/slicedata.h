@@ -50,7 +50,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QImage>
+//#include <QImage>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -77,7 +77,7 @@ public:
     MatrixXd getDataAsMatrix();
     void setDataAsMatrix(MatrixXd slice);
     void setSliceIdx(quint32 idx);
-    QImage getSliceAsImage();
+//    QImage getSliceAsImage();
     double getVoxel(int x, int y);
 //    void show();
 

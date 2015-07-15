@@ -55,10 +55,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-// math includes
-#include <string>
-#include <array>
-
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -106,7 +102,7 @@ int main(int argc, char *argv[])
     qDebug() << "Reading mgh file...";
     qDebug() << fName;
 
-//    Mri mri =
+//    Mri mri = Mgh::loadMGH(fName, slices, frame, headerOnly);
     QList<Eigen::MatrixXd> listMatSlices = Mgh::loadMGH(fName, slices, frame, headerOnly);
 
     //ImageSc Demo Plot

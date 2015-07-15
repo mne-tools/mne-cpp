@@ -79,6 +79,8 @@ typedef unsigned int uint;
 //=============================================================================================================
 
 using namespace FSLIB;
+using namespace Eigen;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -93,12 +95,12 @@ Mgh::Mgh()
 //*************************************************************************************************************
 
 //Mri
-QList<Eigen::MatrixXd> Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int frame, bool headerOnly)
+QList<MatrixXd> Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int frame, bool headerOnly)
 {
     Mri mri;
 //    mri.nFrames = 2; // for testing purposes
 
-    QList<Eigen::MatrixXd> listSliceMat;
+    QList<MatrixXd> sliceDataList;
     int sliceCount = 0;
 
     // get file extension
@@ -127,7 +129,6 @@ QList<Eigen::MatrixXd> Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int f
         fName = uncompFName;
     }
 
-
     // c-style file reading method
     QFile myFile(fName);
     myFile.open(QIODevice::ReadOnly);
@@ -135,7 +136,7 @@ QList<Eigen::MatrixXd> Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int f
     std::string stdFName = fName.toStdString(); // convert to std string
     FILE* fp = fopen(stdFName.c_str(), "rb"); // rb because non-text-file is opened, b because faithfully read file as it is and prevend ascii confusion
 
-    int nRead, nDimX, nDimY, nDimZ, nFrames, type, dof;
+    int nRead, nDimX, nDimY, nDimZ, nFrames, type, dof; // define temporal vars
 
     nRead = BLEndian::freadInt(fp);
 
@@ -202,13 +203,13 @@ QList<Eigen::MatrixXd> Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int f
             break;
     }
 
-    // define vars for temporal voxel values in different data types
+    int nBytesPerSlice = nDimX*nDimY*nBytesPerVox; // number of bytes per slice
+    int nVol = nDimX*nDimY*nDimZ*nFrames; // number of volume elements over time
+
+    // define temporal vars to save read data
     int iVal;
     short sVal;
     float fVal;
-
-    int nBytesPerSlice = nDimX*nDimY*nBytesPerVox; // number of bytes per slice
-    int nVol = nDimX*nDimY*nDimZ*nFrames; // number of volume elements over time
 
     if (headerOnly)
     {
@@ -245,7 +246,8 @@ QList<Eigen::MatrixXd> Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int f
         }
         else
         { // frame < 0 means to read in as many frames,
-          // has been defined to prevend using a vector.
+          // has been designed like this in freesurfer
+          // to prevend using a vector.
             nFrames = frame*-1;
             start_frame = 0; end_frame = nFrames-1;
             if (VERBOSE)
@@ -256,10 +258,9 @@ QList<Eigen::MatrixXd> Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int f
         mri.allocSequence(nDimX, nDimY, nDimZ, type, nFrames);
         mri.dof = dof;
 
+        // define further temporal vars to save read data
         int x, y, z, i;
-
-
-        Eigen::MatrixXd MatData(nDimX, nDimY);
+        MatrixXd slice(nDimX, nDimY);
 
         for (frame=start_frame; frame<=end_frame; frame++)
         {
@@ -277,66 +278,60 @@ QList<Eigen::MatrixXd> Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int f
                 switch (type)
                 {
                 case MRI_INT:
-
-                    std::cout << "### Debug watch out INTS are coming!\n";
-                for (i = y = 0 ; y < nDimY ; y++)
-                  {
-                    for (x = 0 ; x < nDimX ; x++, i++)
-                      {
-                        iVal = BLEndian::swapInt(((int *)buf)[i]);
-                        /* voxel access macro */
-                        // ((int *) mri->slices[z+(n)*mri->depth][y])[x]
-//                        MRIIseq_vox(mri,x,y,z,frame-start_frame) = ival;
-//                        std::cout << iVal << " ";
-                        MatData(x,y) = sVal;
-                      }
-                  }
-                break ;
-                case MRI_SHORT:
-
-                    std::cout << "### Debug watch out Shorts are coming! " << sliceCount << std::endl;
+                    qDebug() << "### Debug watch out Ints are coming! "
+                             << sliceCount;
                     for (i = y = 0 ; y < nDimY ; y++)
                       {
                         for (x = 0 ; x < nDimX ; x++, i++)
                           {
-                            sVal = BLEndian::swapShort(((short *)buf)[i]);
-                            /* voxel access macro */
-                            //((short*)mri->slices[z+(n)*mri->depth][y])[x]
-    //                        MRISseq_vox(mri,x,y,z,frame-start_frame) = sval;
-    //                        std::cout << sVal << " ";
-
-                            MatData(x,y) = sVal;
+                            // voxel access
+                            iVal = BLEndian::swapInt(((int *)buf)[i]);
+    //                        qDebug() << iVal << " ";
+                            slice(x,y) = iVal;
                           }
                       }
-
-
                     ++sliceCount;
-
-                    listSliceMat.append(MatData);
-                break ;
+                    sliceDataList.append(slice);
+                    break ;
+                case MRI_SHORT:
+                    qDebug() << "### Debug watch out Shorts are coming! "
+                             << sliceCount;
+                    for (i = y = 0 ; y < nDimY ; y++)
+                      {
+                        for (x = 0 ; x < nDimX ; x++, i++)
+                          {
+                            // voxel access
+                            sVal = BLEndian::swapShort(((short *)buf)[i]);
+//                            qDebug() << sVal << " ";
+                            slice(x,y) = sVal;
+                          }
+                      }
+                    ++sliceCount;
+                    sliceDataList.append(slice);
+                    break ;
                 case MRI_TENSOR:
                 case MRI_FLOAT:
-                    std::cout << "### Debug watch out floats are coming!\n";
+                    qDebug() << "### Debug watch out Floats are coming! "
+                             << sliceCount;
                     for (i = y = 0 ; y < nDimY ; y++)
                     {
                        for (x = 0 ; x < nDimX ; x++, i++)
                        {
+                           // voxel access
                            fVal = BLEndian::swapFloat(((float *)buf)[i]);
-                           /* voxel access macro */
-                           // (((float*)(mri->slices[z+((n)*mri->depth)][y]))[x])
-//                      MRIFseq_vox(mri,x,y,z,frame-start_frame) = fval;
-//                      std::cout << fVal << " ";
-
-                            MatData(x,y) = sVal;
+//                           qDebug() << fVal << " ";
+                           slice(x,y) = sVal;
                        }
                     }
-                break;
+                    ++sliceCount;
+                    sliceDataList.append(slice);
+                    break;
                 case MRI_UCHAR:
-                //local_buffer_to_image(buf, mri, z, frame-start_frame); // todo!!
-                break;
+                    //local_buffer_to_image(buf, mri, z, frame-start_frame); // todo
+                    break;
                 default:
-                qDebug() << "loadMGH: unsupported type" << mri.type; // return error number!?
-                break;
+                    qDebug() << "loadMGH: unsupported type" << mri.type; // return error number!?
+                    break;
                 }
             }
         }
@@ -408,7 +403,7 @@ QList<Eigen::MatrixXd> Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int f
     mri.fName = fName;
 
 //    return mri;
-    return listSliceMat;
+    return sliceDataList;
 }
 
 //*************************************************************************************************************
