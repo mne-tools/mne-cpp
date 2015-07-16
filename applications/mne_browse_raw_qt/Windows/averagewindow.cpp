@@ -137,6 +137,9 @@ void AverageWindow::init()
     initComboBoxes();
 }
 
+
+//*************************************************************************************************************
+
 void AverageWindow::initMVC(QFile &file)
 {
     //Setup average model
@@ -148,6 +151,9 @@ void AverageWindow::initMVC(QFile &file)
     //Setup average delegate
     m_pAverageDelegate = new AverageDelegate(this);
 }
+
+
+//*************************************************************************************************************
 
 void AverageWindow::initMVC()
 {

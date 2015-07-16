@@ -216,6 +216,22 @@ private:
     */
     void showQuickControlWidget();
 
+    //=========================================================================================================
+    /**
+    * Apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda
+    */
+    void applySelection();
+
+    //=========================================================================================================
+    /**
+    * Reset the in m_qListCurrentSelection stored selection -> hack around C++11 lambda
+    */
+    void resetSelection();
+
+    //=========================================================================================================
+    /**
+    * Reimplemented mouseDoubleClickEvent
+    */
     virtual void mouseDoubleClickEvent(QMouseEvent * event);
 
     RealTimeEvokedModel*        m_pRTEModel;                /**< RTE data model */
@@ -232,7 +248,7 @@ private:
     QAction*        m_pActionQuickControl;      /**< Show quick control widget. */
 
     QVBoxLayout*    m_pRteLayout;               /**< RTE Widget layout */
-    QLabel*         m_pLabelInit;               /**< Initialization LAbel */
+    QLabel*         m_pLabelInit;               /**< Initialization Label */
 
     QSharedPointer<QuickControlWidget>          m_pQuickControlWidget;      /**< Quick control widget. */
     QSharedPointer<SelectionManagerWindow>      m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */
@@ -244,13 +260,9 @@ private:
     QList<Modality>                     m_qListModalities;
     QList<qint32>                       m_qListCurrentSelection;    /**< Current selection list -> hack around C++11 lambda  */
     QList<RealTimeSampleArrayChInfo>    m_qListChInfo;              /**< Channel info list. ToDo: check if this is obsolete later on*/
-
     QMap<qint32,float>                  m_qMapChScaling;            /**< Channel scaling values. */
-
-    void applySelection();                  /**< apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
-    void resetSelection();                  /**< reset the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
 };
 
-} // NAMESPACE
+} // NAMESPACE XDISPLIB
 
 #endif // REALTIMEEVOKEDWIDGET_H
