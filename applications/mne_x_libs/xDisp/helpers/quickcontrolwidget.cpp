@@ -192,7 +192,7 @@ void QuickControlWidget::createScalingGroup()
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
         t_pDoubleSpinBoxScale->setMinimum(0.1);
-        t_pDoubleSpinBoxScale->setMaximum(500);
+        t_pDoubleSpinBoxScale->setMaximum(50000);
         t_pDoubleSpinBoxScale->setMaximumWidth(500);
         t_pDoubleSpinBoxScale->setSingleStep(0.1);
         t_pDoubleSpinBoxScale->setDecimals(1);
@@ -226,7 +226,7 @@ void QuickControlWidget::createScalingGroup()
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
         t_pDoubleSpinBoxScale->setMinimum(1);
-        t_pDoubleSpinBoxScale->setMaximum(5000);
+        t_pDoubleSpinBoxScale->setMaximum(500000);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
         t_pDoubleSpinBoxScale->setSingleStep(1);
         t_pDoubleSpinBoxScale->setDecimals(1);
@@ -239,7 +239,7 @@ void QuickControlWidget::createScalingGroup()
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
         t_pHorizontalSlider->setMinimum(1);
-        t_pHorizontalSlider->setMaximum(5000);
+        t_pHorizontalSlider->setMaximum(500);
         t_pHorizontalSlider->setSingleStep(10);
         t_pHorizontalSlider->setPageStep(10);
         t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFF_UNIT_T_M)/(1e-15*100));
@@ -260,7 +260,7 @@ void QuickControlWidget::createScalingGroup()
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
         t_pDoubleSpinBoxScale->setMinimum(0.1);
-        t_pDoubleSpinBoxScale->setMaximum(2500);
+        t_pDoubleSpinBoxScale->setMaximum(25000);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
         t_pDoubleSpinBoxScale->setSingleStep(0.1);
         t_pDoubleSpinBoxScale->setDecimals(1);
@@ -328,7 +328,7 @@ void QuickControlWidget::createScalingGroup()
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
         t_pDoubleSpinBoxScale->setMinimum(0.1);
-        t_pDoubleSpinBoxScale->setMaximum(100);
+        t_pDoubleSpinBoxScale->setMaximum(1000);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
         t_pDoubleSpinBoxScale->setSingleStep(0.1);
         t_pDoubleSpinBoxScale->setDecimals(1);
@@ -362,7 +362,7 @@ void QuickControlWidget::createScalingGroup()
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
         t_pDoubleSpinBoxScale->setMinimum(0.1);
-        t_pDoubleSpinBoxScale->setMaximum(1000);
+        t_pDoubleSpinBoxScale->setMaximum(10000);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
         t_pDoubleSpinBoxScale->setSingleStep(0.1);
         t_pDoubleSpinBoxScale->setDecimals(1);
@@ -742,7 +742,8 @@ void QuickControlWidget::updateSpinBoxScaling(double value)
                 scaleValue = 1.0;
         }
 
-        m_qMapChScaling.insert(it.key(), it.value()->value() * scaleValue);
+        if(m_qMapScalingSlider[it.key()]->maximum()<it.value()->value()*10)
+            m_qMapChScaling.insert(it.key(), it.value()->value() * scaleValue);
 //        qDebug()<<"m_pRTMSAW->m_qMapChScaling[it.key()]" << m_pRTMSAW->m_qMapChScaling[it.key()];
     }
 
