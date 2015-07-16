@@ -122,9 +122,11 @@ private:
     QImage mriImage; /**< qImage holding the mri slice which should be visualized */
     QString filePath; /**< absolute file path of mri file which is loaded */
     const char *defFileFormat = "JPEG (*.jpg *.jpeg);;"
-                            "PNG (*.png)"; /**< suffix definition of loadable file formats */
-//    QString defFileFormat = "MGH (*.mgh *.mgz)";
+                                "PNG (*.png);;"
+                                "MGH (*.mgh)"; /**< suffix definition of loadable file formats */
+//    QString defFileFormat = "MGH (*.mgh *.mgz)"; // mgz not working yet
     void loadImageFile(QString filePath);
+    void loadMriFile(QString filePath);
 
 };
 
