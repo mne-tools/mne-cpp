@@ -32,22 +32,22 @@
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../../mne-cpp.pri)
+#include(../../mne-cpp.pri)
 
-TEMPLATE = app
+#TEMPLATE = app
 
-VERSION = $${MNE_CPP_VERSION}
+#VERSION = $${MNE_CPP_VERSION}
 
-QT       += widgets
+#QT       += widgets
 
-CONFIG   += console
-CONFIG   -= app_bundle
+#CONFIG   += console
+#CONFIG   -= app_bundle
 
-TARGET = mriTestViewer
+#TARGET = mriTestViewer
 
-CONFIG(debug, debug|release) {
-    TARGET = $$join(TARGET,,,d)
-}
+#CONFIG(debug, debug|release) {
+#    TARGET = $$join(TARGET,,,d)
+#}
 
 #LIBS += -L$${MNE_LIBRARY_DIR}
 #CONFIG(debug, debug|release) {
@@ -59,25 +59,85 @@ CONFIG(debug, debug|release) {
 #            -lMNE$${MNE_LIB_VERSION}Utils
 #}
 
+#DESTDIR =  $${MNE_BINARY_DIR}
+
+#SOURCES += \
+#        main.cpp \
+#        mriviewer.cpp \
+#        customview.cpp \
+#    viewervars.cpp
+
+#HEADERS  += mriviewer.h \
+#        customview.h \
+#    viewervars.h
+
+#FORMS    += mriviewer.ui
+
+#INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+#INCLUDEPATH += $${MNE_INCLUDE_DIR}
+
+#FORMS += \
+#    mriviewer.ui
+
+#HEADERS += \
+#    mriviewer.h
+
+###################
+
+include(../../mne-cpp.pri)
+
+TEMPLATE = app
+
+VERSION = $${MNE_CPP_VERSION}
+
+QT += core gui widgets
+
+CONFIG   += console
+#CONFIG   -= app_bundle
+
+TARGET = mriTestViewer
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
+}
+
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}Dispd
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}Disp
+}
+
 DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
         main.cpp \
         mriviewer.cpp \
         customview.cpp \
-    viewervars.cpp
+        viewervars.cpp
 
-HEADERS  += mriviewer.h \
+HEADERS += \
+        mriviewer.h \
         customview.h \
-    viewervars.h
+        viewervars.h
 
-FORMS    += mriviewer.ui
+FORMS += \
+        mriviewer.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-FORMS += \
-    mriviewer.ui
-
-HEADERS += \
-    mriviewer.h
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR

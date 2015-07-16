@@ -41,6 +41,15 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <fs/fs_global.h>
+#include <fs/blendian.h>
+#include <fs/mri.h>
+#include <fs/mgh.h>
+
+#include <disp/imagesc.h>
+#include <disp/plot.h>
+#include <disp/rtplot.h>
+
 #include <viewervars.h>
 
 //*************************************************************************************************************
@@ -104,6 +113,8 @@ private slots:
     void on_zoomOutButton_clicked();
     void on_resizeButton_clicked();
 
+    void on_clearButton_clicked();
+
 private:
     Ui::MriViewer *ui;
     QGraphicsScene *scene;
@@ -113,7 +124,7 @@ private:
     const char *defFileFormat = "JPEG (*.jpg *.jpeg);;"
                             "PNG (*.png)"; /**< suffix definition of loadable file formats */
 //    QString defFileFormat = "MGH (*.mgh *.mgz)";
-    void loadFile(QString filePath);
+    void loadImageFile(QString filePath);
 
 };
 

@@ -41,6 +41,12 @@
 #include "mriviewer.h"
 #include "ui_mriviewer.h"
 
+//*******
+
+using namespace FSLIB;
+using namespace Eigen;
+using namespace DISPLIB;
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -55,7 +61,44 @@ MriViewer::MriViewer(QWidget *parent) :
 
     // load File -> todo: replace with mri file
     filePath = "D:/Bilder/Freunde/Lorenz_Esch.jpg";
-    loadFile(filePath);
+    loadImageFile(filePath);
+
+    //------------
+
+    // initialize vars to call loadMGH function
+    QString fName = "D:/Repos/mne-cpp/bin/MNE-sample-data/subjects/sample/mri/orig/001.mgh";
+
+    VectorXi slices(3); // indices of the sclices (z dimension) to read
+    slices << 99, 100, 101;
+
+    int frame = 0; // time frame index, negativ values are vectors
+    bool headerOnly = false;
+
+    Mri mri = Mgh::loadMGH(fName, slices, frame, headerOnly);
+
+    //ImageSc Demo Plot
+    qDebug() << "\nRead" << mri.slices.size() << "slices.\n";
+    quint16 sliceIdx = 150;
+    MatrixXd mat = mri.slices[sliceIdx]; // chosen slice index
+
+    ImageSc imagesc(mat);
+//    imagesc.setTitle("Visualization of chosen slice");
+//    imagesc.setXLabel("X Axes");
+//    imagesc.setYLabel("Y Axes");
+
+    QString colorMap = "Bone";
+    imagesc.setColorMap(colorMap);
+    QPixmap mriSlice = imagesc.getPixmap();
+//    mriSclice.toimage();
+
+//    imagesc.setWindowTitle("Slice Plot");
+//    imagesc.show();
+
+    mriPixmapItem = new QGraphicsPixmapItem(mriSlice);
+    mriPixmapItem->setFlag(QGraphicsItem::ItemIsMovable);
+    scene->addItem(mriPixmapItem);
+
+    //------------
 
     ui->graphicsView->setScene(scene);
     ui->graphicsView->installEventFilter(this);
@@ -65,13 +108,12 @@ MriViewer::MriViewer(QWidget *parent) :
 
 //*************************************************************************************************************
 
-void MriViewer::loadFile(QString filePath)
+void MriViewer::loadImageFile(QString filePath)
 {
 
     mriImage.load(filePath);
     mriPixmapItem = new QGraphicsPixmapItem(QPixmap::fromImage(mriImage));
     mriPixmapItem->setFlag(QGraphicsItem::ItemIsMovable);
-    scene->clear();
     scene->addItem(mriPixmapItem);
     scaleSize = 1;
 }
@@ -87,7 +129,7 @@ void MriViewer::on_openButton_clicked()
                 tr(defFileFormat)
                 );
 
-    loadFile(filePath);
+    loadImageFile(filePath);
 }
 
 //*************************************************************************************************************
@@ -115,6 +157,14 @@ void MriViewer::on_resizeButton_clicked()
     ui->graphicsView->scale(1/scaleSize,1/scaleSize);
     scaleSize = 1;
     qDebug() << "resize to original zoom";
+}
+
+//*************************************************************************************************************
+
+void MriViewer::on_clearButton_clicked()
+{
+    scene->clear();
+    qDebug() << "clear scene from items";
 }
 
 //*************************************************************************************************************

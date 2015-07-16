@@ -48,7 +48,7 @@
 #include <disp/plot.h>
 #include <disp/rtplot.h>
 
-#include <math.h>
+//#include <math.h>
 
 // std includes
 #include <iostream>
@@ -106,8 +106,9 @@ int main(int argc, char *argv[])
 //    QList<Eigen::MatrixXd> listMatSlices = Mgh::loadMGH(fName, slices, frame, headerOnly);
 
     // check dimensions of slices stack
-
-
+    //    mri.slices.size() == mri.height
+    //    mri.slices[0].rows() == mri.width
+    //    mri.slices[0].columns() ==  mri.depth
 
     //ImageSc Demo Plot
     qDebug() << "\nRead" << mri.slices.size() << "slices.\n";

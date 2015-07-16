@@ -40,7 +40,6 @@ VERSION = $${MNE_CPP_VERSION}
 
 QT += core gui widgets
 
-
 CONFIG   += console
 
 TARGET = mghIO

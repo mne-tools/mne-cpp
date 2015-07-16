@@ -318,7 +318,7 @@ Mri Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int frame, bool headerOn
                            fVal = BLEndian::swapFloat(((float *)buf)[i]);
 //                           qDebug() << fVal << " ";
                            slice(x,y) = sVal;
-                            ((float*)(mri->slices[z+((n)*mri->depth)][y]))[x] = fval;
+//                           ((float*)(mri->slices[z+((n)*mri->depth)][y]))[x] = fval;
 //                           MRIFseq_vox(mri,x,y,z,frame-start_frame) = fval;
                        }
                     }
