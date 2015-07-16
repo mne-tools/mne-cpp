@@ -267,7 +267,7 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
         //  Create the initial SSP projector
         updateProjection();
 
-        //Initialise filter channel names
+        //Initialize filter channel names
         int visibleInit = 20;
         QStringList filterChannels;
 
@@ -355,9 +355,8 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
                 m_vecLastBlockFirstValuesRaw = m_matDataRaw.col(0);
             }
 
-            //detect the trigger flanks in the trigger channels
+            //Delete all detected triggers
             if(m_bTriggerDetectionActive) {
-                //Delete all detected triggers
                 QMutableMapIterator<int,QList<int> > i(m_qMapDetectedTrigger);
                 while (i.hasNext()) {
                     i.next();
@@ -723,10 +722,15 @@ void RealTimeMultiSampleArrayModel::triggerInfoChanged(const QMap<QString, QColo
     m_sCurrentTriggerCh = triggerCh;
     m_dTriggerThreshold = threshold;
 
-    //Find channel index
+    //Find channel index and initialise detected trigger map
+    QList<int> temp;
+    m_qMapDetectedTrigger.clear();
+
     for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
-        if(m_pFiffInfo->chs[i].ch_name == m_sCurrentTriggerCh)
+        if(m_pFiffInfo->chs[i].ch_name == m_sCurrentTriggerCh) {
             m_iCurrentTriggerChIndex = i;
+            m_qMapDetectedTrigger.insert(i, temp);
+        }
     }
 }
 

@@ -291,12 +291,12 @@ void RealTimeMultiSampleArrayWidget::init()
 //        connect(m_pTableView->verticalScrollBar(), &QScrollBar::valueChanged,
 //                this, &RealTimeMultiSampleArrayWidget::visibleRowsChanged);
 
-        //set context menu
+        //Init context menu
         m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
         connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),
                 this,SLOT(channelContextMenu(QPoint)));
 
-        //Scaling
+        //Init scaling
         //Show only spin boxes and labels which type are present in the current loaded fiffinfo
         QList<FiffChInfo> channelList = m_pFiffInfo->chs;
         QList<int> availabeChannelTypes;
