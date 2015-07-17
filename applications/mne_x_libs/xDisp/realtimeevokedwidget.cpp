@@ -147,6 +147,7 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     //set vertical layout
     m_pRteLayout = new QVBoxLayout(this);
 
+    //Acquire label
     m_pLabelInit= new QLabel;
     m_pLabelInit->setText("Acquiring Data");
     m_pLabelInit->setAlignment(Qt::AlignCenter);
@@ -154,12 +155,23 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     m_pLabelInit->setFont(font);
     m_pRteLayout->addWidget(m_pLabelInit);
 
+    //Create toolboxes with butterfly and 2D layout plot
+    m_pToolBox = new QToolBox(this);
+    m_pToolBox->hide();
+
+    //Butterfly
     if(m_pButterflyPlot)
         delete m_pButterflyPlot;
     m_pButterflyPlot = new RealTimeButterflyPlot;
-    m_pButterflyPlot->hide();
 
-    m_pRteLayout->addWidget(m_pButterflyPlot);
+    m_pToolBox->insertItem(0, m_pButterflyPlot, QIcon(), "Butterfly plot");
+
+    //2D layout plot
+    m_pAverageLayoutView = new QGraphicsView;
+
+    m_pToolBox->insertItem(0, m_pAverageLayoutView, QIcon(), "2D Layout plot");
+
+    m_pRteLayout->addWidget(m_pToolBox);
 
     //set layouts
     this->setLayout(m_pRteLayout);
@@ -261,7 +273,8 @@ void RealTimeEvokedWidget::init()
         m_pRteLayout->removeWidget(m_pLabelInit);
         m_pLabelInit->hide();
 
-        m_pButterflyPlot->show();
+        m_pToolBox->show();
+        //m_pButterflyPlot->show();
 
         if(m_pRTEModel)
             delete m_pRTEModel;
@@ -446,9 +459,39 @@ void RealTimeEvokedWidget::init()
 
         m_pActionSelectModality->setVisible(false);
 
+        //Init average scene
+        m_pAverageScene = new AverageScene(m_pAverageLayoutView, this);
+        m_pAverageLayoutView->setScene(m_pAverageScene);
+
+        //Connect selection manager with average manager
+        connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::selectionChanged,
+                this, &RealTimeEvokedWidget::channelSelectionManagerChanged);
+
+        connect(m_pRTEModel, &RealTimeEvokedModel::dataChanged,
+                this, &RealTimeEvokedWidget::onSelectionChanged);
+
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
+                this, &RealTimeEvokedWidget::scaleAveragedData);
+
         // Initialized
         m_bInitialized = true;
     }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeEvokedWidget::channelSelectionManagerChanged(const QList<QGraphicsItem*> &selectedChannelItems)
+{
+    //Repaint the average items in the average scene based on the input parameter
+    m_pAverageScene->repaintItems(selectedChannelItems);
+
+    //call the onSelection function manually to replot the data for the givven average items
+    onSelectionChanged();
+
+    //fit everything in the view and update the scene
+    m_pAverageLayoutView->fitInView(m_pAverageScene->sceneRect(), Qt::KeepAspectRatio);
+    m_pAverageScene->update(m_pAverageScene->sceneRect());
 }
 
 
@@ -520,6 +563,7 @@ void RealTimeEvokedWidget::broadcastScaling(QMap<qint32,float> scaleMap)
 
 void RealTimeEvokedWidget::broadcastSettings(QList<Modality> modalityList)
 {
+    m_qListModalities = modalityList;
     m_pButterflyPlot->setSettings(modalityList);
 }
 
@@ -553,3 +597,45 @@ void RealTimeEvokedWidget::mouseDoubleClickEvent(QMouseEvent * event)
         m_pRTEModel->toggleFreeze();
 }
 
+
+//*************************************************************************************************************
+
+void RealTimeEvokedWidget::onSelectionChanged()
+{
+    //Get current items from the average scene
+    QList<QGraphicsItem *> currentAverageSceneItems = m_pAverageScene->items();
+
+    //Set new data for all averageSceneItems
+    for(int i = 0; i<currentAverageSceneItems.size(); i++) {
+        AverageSceneItem* averageSceneItemTemp = static_cast<AverageSceneItem*>(currentAverageSceneItems.at(i));
+
+        averageSceneItemTemp->m_lAverageData.clear();
+
+        //Get only the necessary data from the average model (use column 2)
+        RowVectorPair averageData = m_pRTEModel->data(0, 2, RealTimeEvokedModelRoles::GetAverageData).value<RowVectorPair>();
+
+        //Get the averageScenItem specific data row
+        QStringList chNames = m_pFiffInfo->ch_names;
+
+        int channelNumber = chNames.indexOf(averageSceneItemTemp->m_sChannelName);
+        if(channelNumber != -1) {
+            averageSceneItemTemp->m_iChannelKind = m_pFiffInfo->chs.at(channelNumber).kind;
+            averageSceneItemTemp->m_iChannelUnit = m_pFiffInfo->chs.at(channelNumber).unit;;
+            averageSceneItemTemp->m_iChannelNumber = channelNumber;
+            averageSceneItemTemp->m_iTotalNumberChannels = chNames.size();
+            averageSceneItemTemp->m_lAverageData.append(averageData);
+        }
+    }
+
+    m_pAverageScene->update();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeEvokedWidget::scaleAveragedData(const QMap<qint32, float> &scaleMap)
+{
+    qDebug()<<"scaleAveragedData";
+    //Set the scale map received from the scale window
+    m_pAverageScene->setScaleMap(scaleMap);
+}
