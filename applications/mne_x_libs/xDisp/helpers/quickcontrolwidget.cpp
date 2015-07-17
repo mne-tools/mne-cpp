@@ -239,7 +239,7 @@ void QuickControlWidget::createScalingGroup()
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
         t_pHorizontalSlider->setMinimum(1);
-        t_pHorizontalSlider->setMaximum(500);
+        t_pHorizontalSlider->setMaximum(5000);
         t_pHorizontalSlider->setSingleStep(10);
         t_pHorizontalSlider->setPageStep(10);
         t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFF_UNIT_T_M)/(1e-15*100));
@@ -635,7 +635,6 @@ void QuickControlWidget::createModalityGroup()
 
     if(m_bView && !m_bFilter)
         ui->m_gridLayout_masterLayout->addWidget(m_pModalityGroupBox, ui->m_gridLayout_masterLayout->rowCount()-1, 1, 1, 1);
-
 }
 
 
@@ -742,7 +741,7 @@ void QuickControlWidget::updateSpinBoxScaling(double value)
                 scaleValue = 1.0;
         }
 
-        if(m_qMapScalingSlider[it.key()]->maximum()<it.value()->value()*10)
+        //if(m_qMapScalingSlider[it.key()]->maximum()<it.value()->value()*10)
             m_qMapChScaling.insert(it.key(), it.value()->value() * scaleValue);
 //        qDebug()<<"m_pRTMSAW->m_qMapChScaling[it.key()]" << m_pRTMSAW->m_qMapChScaling[it.key()];
     }
@@ -932,6 +931,10 @@ void QuickControlWidget::toggleHideAll(bool state)
         ui->m_groupBox_filter->hide();
         ui->m_groupBox_scaling->hide();
         ui->m_groupBox_view->hide();
+
+        if(m_bModalitiy)
+            m_pModalityGroupBox->hide();
+
         ui->m_pushButton_hideAll->setText(QString("Maximize - Quick Control - %1").arg(m_sName));
     }
     else {
@@ -946,6 +949,9 @@ void QuickControlWidget::toggleHideAll(bool state)
 
         if(m_bView)
             ui->m_groupBox_view->show();
+
+        if(m_bModalitiy)
+            m_pModalityGroupBox->show();
 
         ui->m_pushButton_hideAll->setText(QString("Minimize - Quick Control - %1").arg(m_sName));
     }

@@ -37,10 +37,10 @@ RealTimeButterflyPlot::RealTimeButterflyPlot(QWidget *parent)
 , m_bIsInit(false)
 , m_iNumChannels(-1)
 , showMAG(true)
-, showGRAD(false)
-, showEEG(false)
-, showEOG(false)
-, showMISC(false)
+, showGRAD(true)
+, showEEG(true)
+, showEOG(true)
+, showMISC(true)
 {
 }
 

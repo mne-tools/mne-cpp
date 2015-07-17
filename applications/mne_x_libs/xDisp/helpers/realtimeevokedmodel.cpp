@@ -80,7 +80,7 @@ int RealTimeEvokedModel::rowCount(const QModelIndex & /*parent*/) const
 
 int RealTimeEvokedModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 2;
+    return 3;
 }
 
 
@@ -88,7 +88,7 @@ int RealTimeEvokedModel::columnCount(const QModelIndex & /*parent*/) const
 
 QVariant RealTimeEvokedModel::data(const QModelIndex &index, int role) const
 {
-    if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
+    if(role != Qt::DisplayRole && role != Qt::BackgroundRole && role != RealTimeEvokedModelRoles::GetAverageData)
         return QVariant();
 
     if (index.isValid()) {
@@ -107,15 +107,13 @@ QVariant RealTimeEvokedModel::data(const QModelIndex &index, int role) const
                     //pack all adjacent (after reload) RowVectorPairs into a QList
                     RowVectorXd rowVec;
 
-                    if(m_bIsFreezed)
-                    {
+                    if(m_bIsFreezed) {
                         // data freeze
                         rowVec = m_matDataFreeze.row(row);
 
                         v.setValue(rowVec);
                     }
-                    else
-                    {
+                    else {
                         // data
                         rowVec = m_matData.row(row);
 
@@ -139,6 +137,31 @@ QVariant RealTimeEvokedModel::data(const QModelIndex &index, int role) const
                 }
             } // end role switch
         } // end column check
+
+        //******** third column (evoked set data types) ********
+        if(index.column()==2) {
+            QVariant v;
+            RowVectorPair averagedData;
+
+            switch(role) {
+                case RealTimeEvokedModelRoles::GetAverageData: {
+                    if(m_bIsFreezed){
+                        // data freeze
+                        averagedData.first = m_matDataFreeze.data();
+                        averagedData.second = m_matDataFreeze.cols();
+                        v.setValue(averagedData);
+                    }
+                    else {
+                        // data
+                        averagedData.first = m_matData.data();
+                        averagedData.second = m_matData.cols();
+                        v.setValue(averagedData);
+                    }
+                }
+            }
+
+            return v;
+        }//end column check
 
     } // end index.valid() check
 

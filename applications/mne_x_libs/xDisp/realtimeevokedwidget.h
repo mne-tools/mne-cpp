@@ -51,6 +51,8 @@
 #include "helpers/chinfomodel.h"
 #include "helpers/quickcontrolwidget.h"
 #include "helpers/scalingwidget.h"
+#include "helpers/averagescene.h"
+#include "helpers/averagesceneitem.h"
 
 
 //*************************************************************************************************************
@@ -65,6 +67,7 @@
 #include <QDoubleSpinBox>
 #include <QLabel>
 #include <QVBoxLayout>
+#include <QToolBox>
 
 
 //*************************************************************************************************************
@@ -94,6 +97,7 @@ namespace XDISPLIB
 //=============================================================================================================
 
 struct Modality;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -169,6 +173,22 @@ public:
     */
     virtual void init();
 
+    //=========================================================================================================
+    /**
+    * call this whenever the external channel selection manager changes
+    *
+    * * @param [in] selectedChannelItems list of selected graphic items
+    */
+    void channelSelectionManagerChanged(const QList<QGraphicsItem *> &selectedChannelItems);
+
+    //=========================================================================================================
+    /**
+    * Scales the averaged data according to scaleMap
+    *
+    * @param [in] scaleMap map with all channel types and their current scaling value
+    */
+    void scaleAveragedData(const QMap<qint32, float> &scaleMap);
+
 private:
     //=========================================================================================================
     /**
@@ -234,8 +254,15 @@ private:
     */
     virtual void mouseDoubleClickEvent(QMouseEvent * event);
 
+    //=========================================================================================================
+    /**
+    * call this function whenever a selection was made in teh evoked data set list
+    */
+    void onSelectionChanged();
+
     RealTimeEvokedModel*        m_pRTEModel;                /**< RTE data model */
     RealTimeButterflyPlot*      m_pButterflyPlot;           /**< Butterfly plot */
+    AverageScene*               m_pAverageScene;            /**< The pointer to the average scene. */
 
     bool            m_bInitialized;             /**< Is Initialized */
     bool            m_bHideBadChannels;         /**< hide bad channels flag. */
@@ -249,6 +276,8 @@ private:
 
     QVBoxLayout*    m_pRteLayout;               /**< RTE Widget layout */
     QLabel*         m_pLabelInit;               /**< Initialization Label */
+    QToolBox*       m_pToolBox;                 /**< The toolbox which holds the butterfly and 2D layout plot */
+    QGraphicsView*  m_pAverageLayoutView;       /**< View for 2D average layout scene */
 
     QSharedPointer<QuickControlWidget>          m_pQuickControlWidget;      /**< Quick control widget. */
     QSharedPointer<SelectionManagerWindow>      m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */

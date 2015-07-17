@@ -45,6 +45,7 @@
 #include <xMeas/realtimesamplearraychinfo.h>
 #include <xMeas/realtimeevoked.h>
 #include <fiff/fiff_types.h>
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -71,6 +72,13 @@
 
 namespace XDISPLIB
 {
+
+namespace RealTimeEvokedModelRoles
+{
+    enum ItemRole{GetAverageData = Qt::UserRole + 1020};
+}
+
+typedef QPair<const double*,qint32> RowVectorPair;
 
 
 //*************************************************************************************************************
@@ -390,6 +398,11 @@ inline const QMap< qint32,float >& RealTimeEvokedModel::getScaling() const
 #ifndef metatype_rowvectorxd
 #define metatype_rowvectorxd
 Q_DECLARE_METATYPE(Eigen::RowVectorXd);    /**< Provides QT META type declaration of the Eigen::RowVectorXd type. For signal/slot usage.*/
+#endif
+
+#ifndef metatype_rowvectorpair
+#define metatype_rowvectorpair
+Q_DECLARE_METATYPE(XDISPLIB::RowVectorPair);
 #endif
 
 #endif // REALTIMEEVOKEDMODEL_H
