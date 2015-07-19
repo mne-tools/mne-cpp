@@ -228,25 +228,92 @@ void MainWindow::helpContents()
 
 void MainWindow::about()
 {
-    writeToLog(tr("Invoked <b>Help|About</b>"), _LogKndMessage, _LogLvMin);
-    QMessageBox::about(this, CInfo::AppNameShort()+ ", "+tr("Version ")+CInfo::AppVersion(),
-         tr("Copyright (C) 2013 Christoph Dinh, Martin Luessi, Limin Sun, Jens Haueisen, Matti Hamalainen. All rights reserved.\n\n"
-            "Redistribution and use in source and binary forms, with or without modification, are permitted provided that"
-            " the following conditions are met:\n"
-            "\t* Redistributions of source code must retain the above copyright notice, this list of conditions and the"
-            " following disclaimer.\n"
-            "\t* Redistributions in binary form must reproduce the above copyright notice, this list of conditions and"
-            " the following disclaimer in the documentation and/or other materials provided with the distribution.\n"
-            "\t* Neither the name of MNE-CPP authors nor the names of its contributors may be used"
-            " to endorse or promote products derived from this software without specific prior written permission.\n\n"
-            "THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED"
-            " WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A"
-            " PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,"
-            " INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,"
-            " PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)"
-            " HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING"
-            " NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE"
-            " POSSIBILITY OF SUCH DAMAGE."));
+    if(!m_pAboutWindow) {
+        m_pAboutWindow = QSharedPointer<QWidget>(new QWidget());
+
+        QGridLayout *gridLayout;
+        QLabel *m_label_splashcreen;
+        QTextEdit *m_textEdit_aboutText;
+
+        m_pAboutWindow->setObjectName(QStringLiteral("AboutWindow"));
+        m_pAboutWindow->resize(541, 708);
+        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(m_pAboutWindow->sizePolicy().hasHeightForWidth());
+        m_pAboutWindow->setSizePolicy(sizePolicy);
+        m_pAboutWindow->setMinimumSize(QSize(541, 708));
+        m_pAboutWindow->setMaximumSize(QSize(541, 708));
+        gridLayout = new QGridLayout(m_pAboutWindow.data());
+        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        m_label_splashcreen = new QLabel(m_pAboutWindow.data());
+        m_label_splashcreen->setObjectName(QStringLiteral("m_label_splashcreen"));
+        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(m_label_splashcreen->sizePolicy().hasHeightForWidth());
+        m_label_splashcreen->setSizePolicy(sizePolicy1);
+        m_label_splashcreen->setMinimumSize(QSize(0, 0));
+        m_label_splashcreen->setPixmap(QPixmap(QString::fromUtf8(":/images/splashscreen.png")));
+        m_label_splashcreen->setScaledContents(true);
+
+        gridLayout->addWidget(m_label_splashcreen, 0, 0, 1, 1);
+
+        m_textEdit_aboutText = new QTextEdit(m_pAboutWindow.data());
+        m_textEdit_aboutText->setObjectName(QStringLiteral("m_textEdit_aboutText"));
+        m_textEdit_aboutText->setEnabled(true);
+        m_textEdit_aboutText->setReadOnly(true);
+        m_textEdit_aboutText->setOverwriteMode(true);
+        m_textEdit_aboutText->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse);
+
+        gridLayout->addWidget(m_textEdit_aboutText, 1, 0, 1, 1);
+
+        m_pAboutWindow->setWindowTitle(QApplication::translate("AboutWindow", "About", 0));
+        m_label_splashcreen->setText(QString());
+        m_textEdit_aboutText->setHtml(QApplication::translate("AboutWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+            "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+            "p, li { white-space: pre-wrap; }\n"
+            "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+            "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-weight:600;\">Copyright (C) 2015 Christoph Dinh, Limin Sun, Lorenz Esch, Chiran Doshi, Christos Papadelis, Daniel Baumgarten, Yoshio Okada, Jens Haueisen, Matti Hamalainen. All rights reserved.</span></p>\n"
+            "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
+            "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-s"
+                                    "ize:8pt;\">For more information visit the MNE-CPP/MNE-X project on GitHub:</span></p>\n"
+            "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
+            "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><a href=\"https://github.com/mne-tools/mne-cpp\"><span style=\" font-size:8pt; text-decoration: underline; color:#0000ff;\">https://github.com/mne-tools/mne-cpp</span></a></p>\n"
+            "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
+            "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOL"
+                                    "DERS AND CONTRIBUTORS \\&quot;AS IS\\&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span></p>\n"
+            "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
+            "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-righ"
+                                    "t:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Redistribution and use in source and binary forms, with or without modification, are permitted provided tha the following conditions are met:</span></p>\n"
+            "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
+            "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaime. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution. Neither the name of MNE-CPP authors nor the names of its contributors may be used to endorse or pr"
+            "omote products derived from this software without specific prior written permission.</span></p></body></html>", 0));
+
+        m_pAboutWindow->setLayout(gridLayout);
+    }
+
+    m_pAboutWindow->show();
+
+//    writeToLog(tr("Invoked <b>Help|About</b>"), _LogKndMessage, _LogLvMin);
+//    QMessageBox::about(this, CInfo::AppNameShort()+ ", "+tr("Version ")+CInfo::AppVersion(),
+//         tr("Copyright (C) 2015 Christoph Dinh, Lorenz Esch, Martin Luessi, Limin Sun, Jens Haueisen, Matti Hamalainen. All rights reserved.\n\n"
+//            "Redistribution and use in source and binary forms, with or without modification, are permitted provided that"
+//            " the following conditions are met:\n"
+//            "\t* Redistributions of source code must retain the above copyright notice, this list of conditions and the"
+//            " following disclaimer.\n"
+//            "\t* Redistributions in binary form must reproduce the above copyright notice, this list of conditions and"
+//            " the following disclaimer in the documentation and/or other materials provided with the distribution.\n"
+//            "\t* Neither the name of MNE-CPP authors nor the names of its contributors may be used"
+//            " to endorse or promote products derived from this software without specific prior written permission.\n\n"
+//            "THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED"
+//            " WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A"
+//            " PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,"
+//            " INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,"
+//            " PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)"
+//            " HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING"
+//            " NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE"
+//            " POSSIBILITY OF SUCH DAMAGE."));
 }
 
 

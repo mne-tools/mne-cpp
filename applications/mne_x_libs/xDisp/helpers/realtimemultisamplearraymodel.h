@@ -48,6 +48,7 @@
 
 #include <utils/filterTools/filterdata.h>
 #include <utils/mnemath.h>
+#include <utils/detecttrigger.h>
 
 
 //*************************************************************************************************************
@@ -59,6 +60,7 @@
 
 #include <QtConcurrent/QtConcurrent>
 #include <QFuture>
+#include <QColor>
 
 
 //*************************************************************************************************************
@@ -312,6 +314,22 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns current detected trigger flanks
+    *
+    * @return the current detected trigger flanks
+    */
+    inline QList<int> RealTimeMultiSampleArrayModel::getDetectedTriggers() const;
+
+    //=========================================================================================================
+    /**
+    * Returns current trigger color
+    *
+    * @return the current trigger color
+    */
+    inline QColor RealTimeMultiSampleArrayModel::getTriggerColor() const;
+
+    //=========================================================================================================
+    /**
     * Set scaling channel scaling
     *
     * @param[in] p_qMapChScaling    Map of scaling factors
@@ -356,6 +374,35 @@ public:
     */
     void createFilterChannelList(QStringList channelNames);
 
+    //=========================================================================================================
+    /**
+    * markChBad marks the selected channels as bad/good in m_chInfolist
+    *
+    * @param chlist index that is selected for marking
+    * @param status, status=1 -> mark as bad, status=0 -> mark as good
+    */
+    void markChBad(QModelIndex ch, bool status);
+
+    //=========================================================================================================
+    /**
+    * markChBad marks the selected channels as bad/good in m_chInfolist
+    *
+    * @param chlist is the list of indices that are selected for marking
+    * @param status, status=1 -> mark as bad, status=0 -> mark as good
+    */
+    void markChBad(QModelIndexList chlist, bool status);
+
+    //=========================================================================================================
+    /**
+    * markChBad marks the selected channels as bad/good in m_chInfolist
+    *
+    * @param colorMap       color for each trigger channel
+    * @param activ          real time trigger detection active
+    * @param triggerCh      current trigger channel to scan
+    * @param threshold      threshold for the detection process
+    */
+    void triggerInfoChanged(const QMap<QString, QColor>& colorMap, bool active, QString triggerCh, double threshold);
+
 signals:
     //=========================================================================================================
     /**
@@ -382,9 +429,9 @@ private:
 
     //=========================================================================================================
     /**
-    * Clears the model
+    * Calculates the filtered version of the channels in m_matDataRaw
     */
-    void clearModel();
+    void filterChannelsConcurrently();
 
     //=========================================================================================================
     /**
@@ -397,23 +444,27 @@ private:
 
     //=========================================================================================================
     /**
-    * Calculates the filtered version of the channels in m_matDataRaw
+    * Clears the model
     */
-    void filterChannelsConcurrently();
+    void clearModel();
 
-    bool    m_bProjActivated;       /**< Proj activated */
-    bool    m_bIsFreezed;           /**< Display is freezed */    
-    bool    m_bDrawFilterFront;     /**< Flag whether to plot/write the delayed frontal part of the filtered signal. This flag is necessary to get rid of nasty signal jumps when changing the filter parameters. */
-    float   m_fSps;                 /**< Sampling rate */
-    qint32  m_iT;                   /**< Time window */
-    qint32  m_iDownsampling;        /**< Down sampling factor */
-    qint32  m_iMaxSamples;          /**< Max samples per window */
-    qint32  m_iCurrentSample;       /**< Current sample which holds the current position in the data matrix */
-    qint32  m_iCurrentSampleFreeze; /**< Current sample which holds the current position in the data matrix when freezing tool is active */
-    qint32  m_iMaxFilterLength;     /**< Max order of the current filters */
-    qint32  m_iCurrentBlockSize;    /**< Current block size */
-    qint32  m_iResidual;            /**< Current amount of samples which were to size */
+    bool    m_bProjActivated;           /**< Proj activated */
+    bool    m_bIsFreezed;               /**< Display is freezed */
+    bool    m_bDrawFilterFront;         /**< Flag whether to plot/write the delayed frontal part of the filtered signal. This flag is necessary to get rid of nasty signal jumps when changing the filter parameters. */
+    bool    m_bTriggerDetectionActive;  /**< Trigger detection activation state */
+    float   m_fSps;                     /**< Sampling rate */
+    double  m_dTriggerThreshold;        /**< Trigger detection threshold */
+    qint32  m_iT;                       /**< Time window */
+    qint32  m_iDownsampling;            /**< Down sampling factor */
+    qint32  m_iMaxSamples;              /**< Max samples per window */
+    qint32  m_iCurrentSample;           /**< Current sample which holds the current position in the data matrix */
+    qint32  m_iCurrentSampleFreeze;     /**< Current sample which holds the current position in the data matrix when freezing tool is active */
+    qint32  m_iMaxFilterLength;         /**< Max order of the current filters */
+    qint32  m_iCurrentBlockSize;        /**< Current block size */
+    qint32  m_iResidual;                /**< Current amount of samples which were to size */
+    int     m_iCurrentTriggerChIndex;   /**< The index of the current trigger channel */
 
+    QString m_sCurrentTriggerCh;    /**< Current trigger channel which is beeing scanned */
     QString m_sFilterChannelType;   /**< Kind of channel which is to be filtered */
 
     FiffInfo::SPtr          m_pFiffInfo;                        /**< Fiff info */
@@ -431,7 +482,10 @@ private:
     MatrixXdR               m_matDataFilteredFreeze;            /**< The raw filtered data in freeze mode */
     MatrixXd                m_matOverlap;                       /**< Last overlap block for the back */
 
-    QMap< qint32,float>                 m_qMapChScaling;        /**< Sensor selection widget. */
+    QMap<QString, QColor>               m_qMapTriggerColor;     /**< Current colors for all trigger channels. */
+    QMap<int,QList<int> >               m_qMapDetectedTrigger;  /**< Detected trigger for each trigger channel. */
+    QMap<int,QList<int> >               m_qMapDetectedTriggerFreeze;  /**< Detected trigger for each trigger channel while display is freezed. */
+    QMap<qint32,float>                  m_qMapChScaling;        /**< Channel scaling map. */
     QList<FilterData>                   m_filterData;           /**< List of currently active filters. */
     QList<RealTimeSampleArrayChInfo>    m_qListChInfo;          /**< Channel info list. ToDo: Obsolete*/
     QStringList                         m_filterChannelList;    /**< List of channels which are to be filtered.*/
@@ -513,6 +567,35 @@ inline bool RealTimeMultiSampleArrayModel::isFreezed() const
 inline const QMap< qint32,float >& RealTimeMultiSampleArrayModel::getScaling() const
 {
     return m_qMapChScaling;
+}
+
+
+//*************************************************************************************************************
+
+inline QColor RealTimeMultiSampleArrayModel::getTriggerColor() const
+{
+    if(m_bTriggerDetectionActive) {
+        return m_qMapTriggerColor[m_sCurrentTriggerCh];
+    }
+
+    return QColor(170,0,0);
+}
+
+
+//*************************************************************************************************************
+
+inline QList<int> RealTimeMultiSampleArrayModel::getDetectedTriggers() const
+{
+    QList<int> triggerIndices;
+
+    if(m_bIsFreezed)
+        return m_qMapDetectedTriggerFreeze[m_iCurrentTriggerChIndex];
+
+    if(m_bTriggerDetectionActive) {
+        return m_qMapDetectedTrigger[m_iCurrentTriggerChIndex];
+    }
+    else
+        return triggerIndices;
 }
 
 

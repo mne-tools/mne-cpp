@@ -99,8 +99,18 @@ BabyMEG::BabyMEG()
     m_pActionRecordFile->setStatusTip(tr("Start Recording"));
     connect(m_pActionRecordFile, &QAction::triggered, this, &BabyMEG::toggleRecordingFile);
     addPluginAction(m_pActionRecordFile);
-
     //m_pActionRecordFile->setEnabled(false);
+
+    m_pDoubleSpinBoxRecordTime = new QDoubleSpinBox();
+    m_pDoubleSpinBoxRecordTime->setMinimum(1);
+    m_pDoubleSpinBoxRecordTime->setMaximum(100000);
+    m_pDoubleSpinBoxRecordTime->setValue(5);
+    m_pDoubleSpinBoxRecordTime->setSuffix(" min");
+    m_pDoubleSpinBoxRecordTime->setToolTip(tr("Set recording time"));
+    m_pDoubleSpinBoxRecordTime->setStatusTip(tr("Recording time"));
+//    connect(m_pDoubleSpinBoxRecordTime, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+//            this, &RealTimeMultiSampleArrayWidget::timeWindowChanged);
+    //addDisplayWidget(m_pDoubleSpinBoxRecordTime);
 
     m_pActionSqdCtrl = new QAction(QIcon(":/images/sqdctrl.png"), tr("Squid Control"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
@@ -366,6 +376,10 @@ void BabyMEG::splitRecordingFile()
 
 void BabyMEG::toggleRecordingFile()
 {
+    m_pRecordTimer = new QTimer(this);
+    connect(m_pRecordTimer, SIGNAL(timeout()), this, SLOT(toggleRecordingFile()));
+    m_pRecordTimer->start(m_pDoubleSpinBoxRecordTime->value()*60);
+
     //Setup writing to file
     if(m_bWriteToFile)
     {
@@ -387,7 +401,6 @@ void BabyMEG::toggleRecordingFile()
             return;
         }
 
-
         //Initiate the stream for writing to the fif file
         m_sRecordFile = getFilePath(true);
         m_qFileOut.setFileName(m_sRecordFile);
@@ -401,6 +414,10 @@ void BabyMEG::toggleRecordingFile()
             if(ret == QMessageBox::No)
                 return;
         }
+
+        //Set all projectors to zero before writing to file because we always write the raw data
+        for(int i = 0; i<m_pFiffInfo->projs.size(); i++)
+            m_pFiffInfo->projs[i].active = false;
 
         m_pOutfid = Fiff::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals);
         fiff_int_t first = 0;
@@ -653,6 +670,10 @@ bool BabyMEG::readProjectors()
 
     QList<FiffProj> q_ListProj = t_pStream->read_proj(t_Tree);
 
+    //Set all projectors to zero
+    for(int i = 0; i<q_ListProj.size(); i++)
+        q_ListProj[i].active = false;
+
     if (q_ListProj.size() == 0)
     {
         printf("Could not find projectors\n");
@@ -675,6 +696,22 @@ bool BabyMEG::readBadChannels()
     //
     // Bad Channels
     //
+//    //Read bad channels from header/projection fif
+//    QFile t_headerFiffFile(m_sFiffHeader);
+
+//    if(!t_headerFiffFile.exists()) {
+//        printf("Could not open fif file for copying bad channels to babyMEG fiff_info\n");
+//        return false;
+//    }
+
+//    FiffRawData raw(t_headerFiffFile);
+//    m_pFiffInfo->bads = raw.info.bads;
+
+//    t_headerFiffFile.close();
+
+//    return true;
+
+    //Read bad channels from
     QFile t_badChannelsFile(m_sBadChannels);
 
     if (!t_badChannelsFile.open(QIODevice::ReadOnly | QIODevice::Text))

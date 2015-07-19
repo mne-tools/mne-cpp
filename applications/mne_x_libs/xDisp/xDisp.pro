@@ -117,14 +117,16 @@ SOURCES += \
     helpers/frequencyspectrumdelegate.cpp \
     helpers/evokedmodalitywidget.cpp \
     helpers/frequencyspectrumsettingswidget.cpp \
-    helpers/realtimemultisamplearrayscalingwidget.cpp \
+    helpers/scalingwidget.cpp \
     helpers/projectorwidget.cpp \
     helpers/layoutscene.cpp \
     helpers/selectionmanagerwindow.cpp \
     helpers/selectionscene.cpp \
     helpers/selectionsceneitem.cpp \
     helpers/chinfomodel.cpp \
-    helpers/quickcontrolwidget.cpp
+    helpers/quickcontrolwidget.cpp \
+    helpers/averagescene.cpp \
+    helpers/averagesceneitem.cpp
 
 HEADERS += \
     xdisp_global.h \
@@ -149,14 +151,16 @@ HEADERS += \
     helpers/frequencyspectrummodel.h \
     helpers/evokedmodalitywidget.h \
     helpers/frequencyspectrumsettingswidget.h \
-    helpers/realtimemultisamplearrayscalingwidget.h \
+    helpers/scalingwidget.h \
     helpers/projectorwidget.h \
     helpers/layoutscene.h \
     helpers/selectionmanagerwindow.h \
     helpers/selectionscene.h \
     helpers/selectionsceneitem.h \
     helpers/chinfomodel.h \
-    helpers/quickcontrolwidget.h
+    helpers/quickcontrolwidget.h \
+    helpers/averagescene.h \
+    helpers/averagesceneitem.h
 
 FORMS += \
     realtimesamplearraywidget.ui \

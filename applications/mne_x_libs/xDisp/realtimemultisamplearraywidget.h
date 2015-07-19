@@ -52,7 +52,7 @@
 
 #include "helpers/realtimemultisamplearraymodel.h"
 #include "helpers/realtimemultisamplearraydelegate.h"
-#include "helpers/realtimemultisamplearrayscalingwidget.h"
+#include "helpers/scalingwidget.h"
 #include "helpers/projectorwidget.h"
 #include "helpers/selectionmanagerwindow.h"
 #include "helpers/chinfomodel.h"
@@ -151,7 +151,7 @@ class XDISPSHARED_EXPORT RealTimeMultiSampleArrayWidget : public NewMeasurementW
 {
     Q_OBJECT
 
-    friend class RealTimeMultiSampleArrayScalingWidget;
+    friend class ScalingWidget;
 
 public:
     //=========================================================================================================
@@ -298,8 +298,10 @@ private:
     //=========================================================================================================
     /**
     * Broadcast channel scaling
+    *
+    * @param [in] scaleMap QMap with scaling values which is to be broadcasted to the model.
     */
-    void broadcastScaling();
+    void broadcastScaling(QMap<qint32, float> scaleMap);
 
     //=========================================================================================================
     /**
@@ -365,7 +367,7 @@ private:
     /**
     * Shows the filter widget
     */
-    void showFilterWidget();
+    void showFilterWidget(bool state = true);
 
     //=========================================================================================================
     /**
@@ -385,6 +387,12 @@ private:
     */
     void visibleRowsChanged(int value);
 
+    //=========================================================================================================
+    /**
+    * Gets called when the bad channels are about to be marked as bad or good
+    */
+    void markChBad();
+
     RealTimeMultiSampleArrayModel*      m_pRTMSAModel;                  /**< RTMSA data model */
     RealTimeMultiSampleArrayDelegate*   m_pRTMSADelegate;               /**< RTMSA data delegate */
 
@@ -400,7 +408,7 @@ private:
     QList<qint32>   m_qListCurrentSelection;                            /**< Current selection list -> hack around C++11 lambda  */
     QList<qint32>   m_qListBadChannels;                                 /**< Current list of bad channels  */
     QList<RealTimeSampleArrayChInfo> m_qListChInfo;                     /**< Channel info list. ToDo: check if this is obsolete later on -> ToDo use fiff Info instead*/
-    QMap< qint32,float > m_qMapChScaling;                               /**< Channel scaling values. */
+    QMap<qint32,float> m_qMapChScaling;                                 /**< Channel scaling values. */
 
     FiffInfo::SPtr  m_pFiffInfo;                                        /**< FiffInfo, which is used insteadd of ListChInfo*/
 
@@ -415,7 +423,7 @@ private:
     QSharedPointer<SelectionManagerWindow>          m_pSelectionManagerWindow;      /**< SelectionManagerWindow. */
     QSharedPointer<FilterWindow>                    m_pFilterWindow;                /**< SelectionManagerWindow. */
     QSharedPointer<ProjectorWidget>                 m_pProjectorSelectionWidget;    /**< Projector selection widget. */
-    QSharedPointer<RealTimeMultiSampleArrayScalingWidget> m_pRTMSAScalingWidget;    /**< Channel scaling widget. */
+    QSharedPointer<ScalingWidget>                   m_pRTMSAScalingWidget;          /**< Channel scaling widget. */
 
     QAction*        m_pActionSelectSensors;                             /**< show roi select widget */
     QAction*        m_pActionFiltering;                                 /**< show filter window */

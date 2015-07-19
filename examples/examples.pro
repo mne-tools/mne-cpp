@@ -1,3 +1,4 @@
+
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     examples.pro
@@ -54,7 +55,10 @@ SUBDIRS += \
     makeLayout \
     bmtiExample \
     mghIO \
-    mriTestViewer
+    mriTestViewer \
+    patientManager \
+    readBEM \
+
 
 contains(MNECPP_CONFIG, withGui) {
 	SUBDIRS +=

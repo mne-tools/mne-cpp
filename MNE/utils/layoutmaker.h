@@ -143,6 +143,8 @@ public:
     * @param [in] inputPoints the input points in 3D space.
     * @param [in] outputPoints the output layout points in 2D space.
     * @param [in] names the channel names.
+    * @param [in] mirrorXAxis mirror points at x axis.
+    * @param [in] mirrorYAxis mirror points at y axis.
     * @return true if making layout was successful, false otherwise.
     */
     static bool makeLayout(const QList<QVector<double> > &inputPoints,
@@ -153,7 +155,9 @@ public:
                            float prad,
                            float w,
                            float h,
-                           bool writeFile = false);
+                           bool writeFile = false,
+                           bool mirrorXAxis = false,
+                           bool mirrorYAxis = false);
 
 private:
     static void sphere_coord(float x,

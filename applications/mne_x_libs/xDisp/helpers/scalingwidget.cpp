@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     realtimemultisamplearrayscalingwidget.cpp
+* @file     scalingwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the RealTimeMultiSampleArrayScalingWidget Class.
+* @brief    Implementation of the ScalingWidget Class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "realtimemultisamplearrayscalingwidget.h"
+#include "scalingwidget.h"
 #include "../realtimemultisamplearraywidget.h"
 
 
@@ -66,8 +66,8 @@ using namespace XDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(RealTimeMultiSampleArrayWidget *toolbox)
-: m_pRTMSAW(toolbox)
+ScalingWidget::ScalingWidget(QMap<qint32,float> &scaleMap)
+: m_qMapChScaling(scaleMap)
 {
     this->setWindowTitle("Scaling");
     this->setMinimumWidth(220);
@@ -77,7 +77,7 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
 
     qint32 i = 0;
     //MAG
-    if(m_pRTMSAW->m_qMapChScaling.contains(FIFF_UNIT_T))
+    if(m_qMapChScaling.contains(FIFF_UNIT_T))
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("MAG (pT)");
@@ -90,16 +90,16 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
         t_pDoubleSpinBoxScale->setSingleStep(0.1);
         t_pDoubleSpinBoxScale->setDecimals(4);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
-        t_pDoubleSpinBoxScale->setValue(m_pRTMSAW->m_qMapChScaling[FIFF_UNIT_T]/(1e-12));
+        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling[FIFF_UNIT_T]/(1e-12));
         m_qMapScalingDoubleSpinBox.insert(FIFF_UNIT_T,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this,&RealTimeMultiSampleArrayScalingWidget::updateDoubleSpinBox);
+                this,&ScalingWidget::updateDoubleSpinBox);
         t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i,2,1,1);
         ++i;
     }
 
     //GRAD
-    if(m_pRTMSAW->m_qMapChScaling.contains(FIFF_UNIT_T_M))
+    if(m_qMapChScaling.contains(FIFF_UNIT_T_M))
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("GRAD (fT/cm)");
@@ -112,16 +112,16 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
         t_pDoubleSpinBoxScale->setSingleStep(20.0);
         t_pDoubleSpinBoxScale->setDecimals(4);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
-        t_pDoubleSpinBoxScale->setValue(m_pRTMSAW->m_qMapChScaling[FIFF_UNIT_T_M]/(1e-15 * 100));   //*100 because data in fiff files is stored as fT/m not fT/cm
+        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling[FIFF_UNIT_T_M]/(1e-15 * 100));   //*100 because data in fiff files is stored as fT/m not fT/cm
         m_qMapScalingDoubleSpinBox.insert(FIFF_UNIT_T_M,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this,&RealTimeMultiSampleArrayScalingWidget::updateDoubleSpinBox);
+                this,&ScalingWidget::updateDoubleSpinBox);
         t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i,2,1,1);
         ++i;
     }
 
     //EEG
-    if(m_pRTMSAW->m_qMapChScaling.contains(FIFFV_EEG_CH))
+    if(m_qMapChScaling.contains(FIFFV_EEG_CH))
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("EEG (uV)");
@@ -134,16 +134,16 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
         t_pDoubleSpinBoxScale->setSingleStep(1.0);
         t_pDoubleSpinBoxScale->setDecimals(4);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
-        t_pDoubleSpinBoxScale->setValue(m_pRTMSAW->m_qMapChScaling[FIFFV_EEG_CH]/(1e-06));
+        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling[FIFFV_EEG_CH]/(1e-06));
         m_qMapScalingDoubleSpinBox.insert(FIFFV_EEG_CH,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this,&RealTimeMultiSampleArrayScalingWidget::updateDoubleSpinBox);
+                this,&ScalingWidget::updateDoubleSpinBox);
         t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i,2,1,1);
         ++i;
     }
 
     //EOG
-    if(m_pRTMSAW->m_qMapChScaling.contains(FIFFV_EOG_CH))
+    if(m_qMapChScaling.contains(FIFFV_EOG_CH))
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("EOG (uV)");
@@ -156,16 +156,16 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
         t_pDoubleSpinBoxScale->setSingleStep(10.0);
         t_pDoubleSpinBoxScale->setDecimals(4);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
-        t_pDoubleSpinBoxScale->setValue(m_pRTMSAW->m_qMapChScaling[FIFFV_EOG_CH]/(1e-06));
+        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling[FIFFV_EOG_CH]/(1e-06));
         m_qMapScalingDoubleSpinBox.insert(FIFFV_EOG_CH,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this,&RealTimeMultiSampleArrayScalingWidget::updateDoubleSpinBox);
+                this,&ScalingWidget::updateDoubleSpinBox);
         t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i,2,1,1);
         ++i;
     }
 
     //STIM
-    if(m_pRTMSAW->m_qMapChScaling.contains(FIFFV_STIM_CH))
+    if(m_qMapChScaling.contains(FIFFV_STIM_CH))
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("STIM");
@@ -178,16 +178,16 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
         t_pDoubleSpinBoxScale->setSingleStep(1.0);
         t_pDoubleSpinBoxScale->setDecimals(4);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
-        t_pDoubleSpinBoxScale->setValue(m_pRTMSAW->m_qMapChScaling[FIFFV_STIM_CH]);
+        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling[FIFFV_STIM_CH]);
         m_qMapScalingDoubleSpinBox.insert(FIFFV_STIM_CH,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this,&RealTimeMultiSampleArrayScalingWidget::updateDoubleSpinBox);
+                this,&ScalingWidget::updateDoubleSpinBox);
         t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i,2,1,1);
         ++i;
     }
 
     //MISC
-    if(m_pRTMSAW->m_qMapChScaling.contains(FIFFV_MISC_CH))
+    if(m_qMapChScaling.contains(FIFFV_MISC_CH))
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("MISC");
@@ -200,14 +200,13 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
         t_pDoubleSpinBoxScale->setSingleStep(1.0);
         t_pDoubleSpinBoxScale->setDecimals(4);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
-        t_pDoubleSpinBoxScale->setValue(m_pRTMSAW->m_qMapChScaling[FIFFV_MISC_CH]);
+        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling[FIFFV_MISC_CH]);
         m_qMapScalingDoubleSpinBox.insert(FIFFV_MISC_CH,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this,&RealTimeMultiSampleArrayScalingWidget::updateDoubleSpinBox);
+                this,&ScalingWidget::updateDoubleSpinBox);
         t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i,2,1,1);
         ++i;
     }
-
 
     this->setLayout(t_pGridLayout);
 }
@@ -216,7 +215,7 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayScalingWidget::updateDoubleSpinBox(const double val)
+void ScalingWidget::updateDoubleSpinBox(const double val)
 {
     Q_UNUSED(val)
 
@@ -263,10 +262,10 @@ void RealTimeMultiSampleArrayScalingWidget::updateDoubleSpinBox(const double val
                 scaleValue = 1.0;
         }
 
-        m_pRTMSAW->m_qMapChScaling[it.key()] = it.value()->value() * scaleValue;
+        m_qMapChScaling[it.key()] = it.value()->value() * scaleValue;
 
-//        qDebug()<<"m_pRTMSAW->m_qMapChScaling[it.key()]" << m_pRTMSAW->m_qMapChScaling[it.key()];
+//        qDebug()<<"m_qMapChScaling[it.key()]" << m_qMapChScaling[it.key()];
     }
 
-    emit scalingChanged();
+    emit scalingChanged(m_qMapChScaling);
 }

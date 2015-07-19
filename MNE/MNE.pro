@@ -47,7 +47,7 @@ SUBDIRS += \
     rtCommand \
     rtClient \
     rtInv \
-    bmti \
+    bmti
 
 contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += disp

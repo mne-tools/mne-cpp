@@ -317,7 +317,7 @@ Mri Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int frame, bool headerOn
                            // voxel access
                            fVal = BLEndian::swapFloat(((float *)buf)[i]);
 //                           qDebug() << fVal << " ";
-                           slice(x,y) = sVal;
+                           slice(x,y) = fVal;
 //                           ((float*)(mri->slices[z+((n)*mri->depth)][y]))[x] = fval;
 //                           MRIFseq_vox(mri,x,y,z,frame-start_frame) = fval;
                        }

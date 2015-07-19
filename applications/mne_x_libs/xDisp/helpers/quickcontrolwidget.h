@@ -42,13 +42,16 @@
 //=============================================================================================================
 
 #include <iostream>
-#include "ui_quickcontrolwidget.h"
+#include "../ui_quickcontrolwidget.h"
+#include "fiff/fiff_info.h"
 #include "fiff/fiff_constants.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -57,6 +60,11 @@
 
 #include <QWidget>
 #include <QMouseEvent>
+#include <QLabel>
+#include <QDoubleSpinBox>
+#include <QCheckBox>
+#include <QColorDialog>
+#include <QComboBox>
 
 
 //*************************************************************************************************************
@@ -67,10 +75,36 @@
 namespace XDISPLIB
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
+
+using namespace FIFFLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STRUCTS
+//=============================================================================================================
+
+struct Modality {
+    QString m_sName;
+    bool m_bActive;
+    float m_fNorm;
+
+    Modality(QString name, bool active, double norm)
+    : m_sName(name), m_bActive(active), m_fNorm(norm)
+    {}
+};
+
 
 //=============================================================================================================
 /**
@@ -90,7 +124,7 @@ public:
     * @param [in] parent    parent of widget
     * @param [in] qMapChScaling    pointer to scaling information
     */
-    QuickControlWidget(QMap< qint32,float >* qMapChScaling, QWidget *parent = 0);
+    QuickControlWidget(QMap<qint32, float> qMapChScaling, const FiffInfo::SPtr pFiffInfo, QString name = "", QWidget *parent = 0, bool bScaling = true, bool bProjections = true, bool bView = true, bool bFilter = true, bool bModalities = false);
 
     //=========================================================================================================
     /**
@@ -98,11 +132,145 @@ public:
     */
     ~QuickControlWidget();
 
-protected:
+    //=========================================================================================================
+    /**
+    * Call this whenever the current fitlers have changed.
+    */
+    void filterGroupChanged(QList<QCheckBox*> list);
 
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the scaling sliders or spin boxes changed.
+    */
+    void scalingChanged(QMap<qint32, float> scalingMap);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changes the projections.
+    */
+    void projSelectionChanged();
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changes the window size.
+    */
+    void timeWindowChanged(int value);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changes the row height (zoom) of the channels.
+    */
+    void zoomChanged(double value);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the trigger infomration changed.
+    */
+    void triggerInfoChanged(const QMap<QString, QColor>& value, bool active, QString triggerCh, double threshold);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user is supposed to see the filter option window.
+    */
+    void showFilterOptions(bool state);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changed the modality.
+    */
+    void settingsChanged(QList<Modality> modalityList);
+
+protected:
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the scaling group
+    */
     void createScalingGroup();
 
-    void updateScaling(double value);
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the projector group
+    */
+    void createProjectorGroup();
+
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the view group
+    */
+    void createViewGroup();
+
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the modality group
+    */
+    void createModalityGroup();
+
+    //=========================================================================================================
+    /**
+    * Slot called when time window size changes
+    */
+    void onTimeWindowChanged(int value);
+
+    //=========================================================================================================
+    /**
+    * Slot called when zoome changes
+    */
+    void onZoomChanged(double value);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the projector check state changes
+    */
+    void checkStatusChanged(int state);
+
+    //=========================================================================================================
+    /**
+    * Slot called when user enables/disables all projectors
+    */
+    void enableDisableAll(bool status);
+
+    //=========================================================================================================
+    /**
+    * Slot called when scaling spin boxes change
+    */
+    void updateSpinBoxScaling(double value);
+
+    //=========================================================================================================
+    /**
+    * Slot called when slider scaling change
+    */
+    void updateSliderScaling(int value);
+
+    //=========================================================================================================
+    /**
+    * Slot called when trigger detection check box was toggled
+    */
+    void realTimeTriggerActiveChanged(int state);
+
+    //=========================================================================================================
+    /**
+    * Slot called when trigger detection color button was clicked
+    */
+    void realTimeTriggerColorChanged(bool state);
+
+    //=========================================================================================================
+    /**
+    * Slot called when trigger detection color button was clicked
+    */
+    void realTimeTriggerThresholdChanged(double value);
+
+    //=========================================================================================================
+    /**
+    * Slot called when trigger detection color button was clicked
+    */
+    void realTimeTriggerCurrentChChanged(const QString& value);
+
+    //=========================================================================================================
+    /**
+    * Slot called when modality check boxes were changed
+    */
+    void updateModalityCheckbox(qint32 state);
 
     //=========================================================================================================
     /**
@@ -140,15 +308,49 @@ protected:
     */
     void toggleHideAll(bool state);
 
+    //=========================================================================================================
+    /**
+    * Show the filter option screen to the user.
+    *
+    * @param [in] state toggle state.
+    */
+    void onShowFilterOptions(bool state);
+
 private:
-    QPoint                  m_dragPosition;         /**< the drag position of the window */
+    QPoint      m_dragPosition;     /**< the drag position of the window */
 
-    QMap< qint32,float >*           m_qMapChScaling;                /**< Channel scaling values. */
+    bool        m_bScaling;         /**< Flag for drawing the scaling group box */
+    bool        m_bProjections;     /**< Flag for drawing the projection group box */
+    bool        m_bView;            /**< Flag for drawing the view group box */
+    bool        m_bFilter;          /**< Flag for drawing the filter group box */
+    bool        m_bModalitiy;       /**< Flag for drawing the modality group box */
+
+    QMap<qint32,float>              m_qMapChScaling;                /**< Channel scaling values. */
     QMap<qint32, QDoubleSpinBox*>   m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits */
+    QMap<qint32, QSlider*>          m_qMapScalingSlider;            /**< Map of types and channel scaling line edits */
+    QMap<QString, QColor>           m_qMapTriggerColor;             /**< Trigger channel colors. */
 
-    Ui::QuickControlWidget *ui;                     /**< The generated UI file */
+    QList<Modality>     m_qListModalities;              /**< List of different modalities. */
+    QList<QCheckBox*>   m_qListCheckBox;                /**< List of projection CheckBox. */
+    QList<QCheckBox*>   m_qFilterListCheckBox;          /**< List of filter CheckBox. */
+    QList<QCheckBox*>   m_qListModalityCheckBox;        /**< List of modality checkboxes */
+    FiffInfo::SPtr      m_pFiffInfo;                    /**< Connected fiff info. */
+
+    QString             m_sName;                        /**< Name of the widget which uses this quick control. */
+    QCheckBox*          m_pTriggerDetectionCheckBox;    /**< Holds the enable disable trigger detection check box. */
+    QCheckBox *         m_enableDisableProjectors;      /**< Holds the enable disable all check box. */
+    QPushButton*        m_pTriggerColorButton;          /**< Holds the trigger color button. */
+    QPushButton*        m_pShowFilterOptions;           /**< Holds the show filter options button. */
+    QComboBox*          m_pComboBoxChannel;             /**< Holds the available trigger channels. */
+    QDoubleSpinBox*     m_pDoubleSpinBoxThreshold;      /**< Holds the trigger channel threshold. */
+    QSpinBox*           m_pSpinBoxThresholdPrec;        /**< Holds the trigger channel threshold precision. */
+    QGroupBox*          m_pModalityGroupBox;            /**< Holds the modality group box. */
+
+    Ui::QuickControlWidget *ui;                         /**< The generated UI file */
 };
 
 } // NAMESPACE XDISPLIB
+
+Q_DECLARE_METATYPE(QList<XDISPLIB::Modality>);
 
 #endif // QUICKCONTROLWIDGET_H

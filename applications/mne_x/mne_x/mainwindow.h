@@ -260,8 +260,9 @@ private:
     QDockWidget*                        m_pDockWidget_Log;              /**< Holds the dock widget containing the log.*/
     QTextBrowser*                       m_pTextBrowser_Log;             /**< Holds the text browser for the log.*/
 
-    LogLevel                            m_eLogLevelCurrent;            /**< Holds the current log level.*/
+    LogLevel                            m_eLogLevelCurrent;             /**< Holds the current log level.*/
 
+    QSharedPointer<QWidget>             m_pAboutWindow;                 /**< Holds the widget containing the about information.*/
 
     void updatePluginWidget(QSharedPointer<IPlugin> pPlugin);           /**< Sets the plugin widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
 

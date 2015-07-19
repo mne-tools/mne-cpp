@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     realtimemultisamplearrayscalingwidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     averagesceneitem.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     May, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,18 +30,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the RealTimeMultiSampleArrayScalingWidget Class.
+* @brief    Contains the declaration of the AverageSceneItem class.
 *
 */
 
-#ifndef REALTIMEMULTISAMPLEARRAYSCALINGWIDGET_H
-#define REALTIMEMULTISAMPLEARRAYSCALINGWIDGET_H
+#ifndef AVERAGESCENEITEM_H
+#define AVERAGESCENEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
+#include <iostream>
+#include <Eigen/Core>
+#include <fiff/fiff.h>
 
 
 //*************************************************************************************************************
@@ -48,11 +52,20 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QStringList>
-#include <QLineEdit>
-#include <QDoubleSpinBox>
-#include <QMap>
+#include <QGraphicsItem>
+#include <QString>
+#include <QColor>
+#include <QPainter>
+#include <QStaticText>
+#include <QDebug>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -63,46 +76,65 @@
 namespace XDISPLIB
 {
 
+typedef QPair<const double*,qint32> RowVectorPair;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
 //=============================================================================================================
-
-class RealTimeMultiSampleArrayWidget;
-struct Modality;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EvokedModalityWidget
+* AverageSceneItem...
 *
-* @brief The EvokedModalityWidget class provides the sensor selection widget
+* @brief The AverageSceneItem class provides a new data structure for visualizing averages in a 2D layout.
 */
-class RealTimeMultiSampleArrayScalingWidget : public QWidget
+class AverageSceneItem : public QGraphicsItem
 {
-    Q_OBJECT
+
 public:
+    //=========================================================================================================
+    /**
+    * Constructs a AverageSceneItem.
+    */
+    AverageSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor defaultColors = Qt::red);
 
     //=========================================================================================================
     /**
-    * Constructs a EvokedModalityWidget which is a child of connected RTMSAW.
-    *
-    * @param [in] toolbox   connected RealTimeMultiSampleArrayWidget
+    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
     */
-    RealTimeMultiSampleArrayScalingWidget(RealTimeMultiSampleArrayWidget *toolbox);
+    QRectF boundingRect() const;
 
-    void updateDoubleSpinBox(const double val);
+    //=========================================================================================================
+    /**
+    * Reimplemented paint function.
+    */
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-signals:
-    void scalingChanged();
+    QString                 m_sChannelName;             /**< The channel name.*/
+    int                     m_iChannelNumber;           /**< The channel number.*/
+    int                     m_iChannelKind;             /**< The channel kind.*/
+    int                     m_iChannelUnit;             /**< The channel unit.*/
+    int                     m_iTotalNumberChannels;     /**< The total number of channels loaded in the curent evoked data set.*/
 
-private:
-    RealTimeMultiSampleArrayWidget * m_pRTMSAW;     /**< Connected real-time evoked widget */
+    QPointF                 m_qpChannelPosition;        /**< The channels 2D position in the scene.*/
+    QList<QColor>           m_cAverageColors;           /**< The current average color.*/
+    QList<RowVectorPair>    m_lAverageData;             /**< The channels average data which is to be plotted.*/
+    QPair<int,int>          m_firstLastSample;          /**< The first and last sample.*/
+    QMap<qint32,float>      m_scaleMap;                 /**< Map with all channel types and their current scaling value.*/
 
-    QMap<qint32, QDoubleSpinBox*>   m_qMapScalingDoubleSpinBox;    /**< Map of types and channel scaling line edits */
+protected:
+    //=========================================================================================================
+    /**
+    * Create a plot path and paint the average data
+    *
+    * @param [in] painter The painter used to plot in this item.
+    */
+    void paintAveragePath(QPainter *painter);
 };
 
-} // NAMESPACE
+} // NAMESPACE XDISPLIB
 
-#endif // REALTIMEMULTISAMPLEARRAYSCALINGWIDGET_H
+#endif // AVERAGESCENEITEM_H

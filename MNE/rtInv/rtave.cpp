@@ -228,7 +228,6 @@ void RtAve::assemblePreStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_
         qint32 t_iRowIdx = m_qListStimChannelIdcs[p_iStimIdx];
 
         qint32 nSampleCount = m_iPreStimSamples;
-
         MatrixXd t_matPreStim(nrows, m_iPreStimSamples);
         qint32 t_curBufIdx = t_iBuffWithStim;
 
@@ -240,7 +239,6 @@ void RtAve::assemblePreStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_
         //
         // assemble prestimulus
         //
-
         // start from the stimulus itself
         if(pos > 0)
         {
@@ -276,7 +274,6 @@ void RtAve::assemblePreStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_
 
             --t_curBufIdx;
         }
-
         //
         //Store in right pre stimulus buffer vector
         //
@@ -347,6 +344,7 @@ void RtAve::run()
     m_qListStimChannelIdcs.clear();
     MatrixXd t_mat;
     QList<MatrixXd> t_qListMat;
+    QList<int> tempList;
     for(i = 0; i < m_pFiffInfo->nchan; ++i)
     {
         if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH && (m_pFiffInfo->chs[i].ch_name != QString("STI 014")))
@@ -358,9 +356,10 @@ void RtAve::run()
             m_qListPreStimAve.push_back(t_mat);
             m_qListPostStimAve.push_back(t_mat);
             m_qListStimAve.push_back(t_mat);
+
+            m_qMapDetectedTrigger[i] = tempList;
         }
     }
-
 
     float T = 1.0/m_pFiffInfo->sfreq;
 
@@ -459,7 +458,6 @@ void RtAve::run()
                 t_stimEvoked.first = t_stimEvoked.times[0];
                 t_stimEvoked.last = t_stimEvoked.times[t_stimEvoked.times.size()-1];
 
-
                 MatrixXd t_resetMat;
                 t_qListRawMatBuf.clear();
                 m_qListPreStimAve.clear();
@@ -489,15 +487,42 @@ void RtAve::run()
             //
             // Detect Stimuli
             //
+//            QMutableMapIterator<int,QList<int> >itClear(m_qMapDetectedTrigger);
+//            while(itClear.hasNext()) {
+//                itClear.next();
+//                itClear.value().clear();
+//            }
+
+//            DetectTrigger::detectTriggerFlanks(rawSegment, m_qMapDetectedTrigger, 0, 0.1);
+
+//            QList<qint32> t_qListStimuli;
+//            QMapIterator<int,QList<int> >it(m_qMapDetectedTrigger);
+//            while(it.hasNext()) {
+//                it.next();
+//                t_qListStimuli.append(it.value());
+//            }
+
             QList<qint32> t_qListStimuli;
             for(i = 0; i < m_qListStimChannelIdcs.size(); ++i)
             {
                 qint32 idx = m_qListStimChannelIdcs[i];
-                RowVectorXi stimSegment = rawSegment.row(idx).cast<int>();
-                int iMax = stimSegment.maxCoeff();
+                RowVectorXd stimSegment = rawSegment.row(idx);
+                RowVectorXd::Index indexMaxCoeff;
+                int dMax = stimSegment.maxCoeff(&indexMaxCoeff);
 
-                if(iMax > 0)
+                if(dMax > 0)
                     t_qListStimuli.append(i);
+
+                //Find trigger using gradient/difference
+                double gradient = 0;
+
+                if(indexMaxCoeff-10<0)
+                    gradient = stimSegment(indexMaxCoeff) - stimSegment(indexMaxCoeff+10);
+                else
+                    gradient = stimSegment(indexMaxCoeff) - stimSegment(indexMaxCoeff-10);
+
+//                std::cout<<"gradient: "<<gradient<<std::endl;
+//                std::cout<<"dMax: "<<dMax<<std::endl;
             }
 
             //
@@ -521,9 +546,9 @@ void RtAve::run()
                 {
                     for(i = 0; i < t_qListRawMatBuf[t_iBuffWithStim].first.size(); ++i)
                     {
-                        //make sure that previous buffer does not conatin this stim - prevent multiple detection
-                        if(!t_qListRawMatBuf[t_iBuffWithStim-1].first.contains(t_qListRawMatBuf[t_iBuffWithStim].first[i]))
-                        {
+//                        //make sure that previous buffer does not conatin this stim - prevent multiple detection
+//                        if(!t_qListRawMatBuf[t_iBuffWithStim-1].first.contains(t_qListRawMatBuf[t_iBuffWithStim].first[i]))
+//                        {
                             qint32 t_iStimIndex = t_qListRawMatBuf[t_iBuffWithStim].first[i];
 
                             //
@@ -611,10 +636,9 @@ void RtAve::run()
                                 emit evokedStim(t_pEvokedStim);
                             }
                             m_qMutex.unlock();
-                        }
+//                        }
                     }
                 }
-
 
                 //
                 //dump oldest buffer

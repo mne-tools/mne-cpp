@@ -78,7 +78,9 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
                              float prad,
                              float w,
                              float h,
-                             bool writeFile)
+                             bool writeFile,
+                             bool mirrorXAxis,
+                             bool mirrorYAxis)
 {
     /*
     * Automatically make a layout according to the
@@ -180,8 +182,17 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
 
     for(k = 0; k < nchan; k++) {
         point.clear();
-        point.append(xx[k]-0.5*w);
-        point.append(-(yy[k]-0.5*h)); //mirror y axis
+
+        if(mirrorXAxis)
+            point.append(-(xx[k]-0.5*w));
+        else
+            point.append(xx[k]-0.5*w);
+
+        if(mirrorYAxis)
+            point.append(-(yy[k]-0.5*h));
+        else
+            point.append(yy[k]-0.5*h);
+
         outputPoints.append(point);
 
         if(writeFile)

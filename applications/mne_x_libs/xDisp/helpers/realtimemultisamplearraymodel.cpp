@@ -69,6 +69,8 @@ RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 , m_iCurrentBlockSize(1024)
 , m_iResidual(0)
 , m_bDrawFilterFront(true)
+, m_bTriggerDetectionActive(false)
+, m_dTriggerThreshold(0.05)
 {
     init();
 }
@@ -265,7 +267,7 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
         //  Create the initial SSP projector
         updateProjection();
 
-        //Initialise filter channel names
+        //Initialize filter channel names
         int visibleInit = 20;
         QStringList filterChannels;
 
@@ -278,6 +280,13 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
             filterChannels.append(m_pFiffInfo->ch_names.at(b));
 
         createFilterChannelList(filterChannels);
+
+        //Look for trigger channels and initialise detected trigger map
+        QList<int> temp;
+        for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
+            if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH/* && m_pFiffInfo->chs[i].ch_name == "STI 001"*/)
+                m_qMapDetectedTrigger.insert(i, temp);
+        }
     }
     else {
         m_vecBadIdcs = RowVectorXi(0,0);
@@ -329,10 +338,10 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
             if(m_iResidual == data.at(b).cols())
                 m_iResidual = 0;
 
-            //            std::cout<<"incoming data exceeds internal data cols by: "<<(m_iCurrentSample+data.at(b).cols()) % m_matDataRaw.cols()<<std::endl;
-            //            std::cout<<"m_iCurrentSample+data.at(b).cols(): "<<m_iCurrentSample+data.at(b).cols()<<std::endl;
-            //            std::cout<<"m_matDataRaw.cols(): "<<m_matDataRaw.cols()<<std::endl;
-            //            std::cout<<"data.at(b).cols()-m_iResidual: "<<data.at(b).cols()-m_iResidual<<std::endl<<std::endl;
+//            std::cout<<"incoming data exceeds internal data cols by: "<<(m_iCurrentSample+data.at(b).cols()) % m_matDataRaw.cols()<<std::endl;
+//            std::cout<<"m_iCurrentSample+data.at(b).cols(): "<<m_iCurrentSample+data.at(b).cols()<<std::endl;
+//            std::cout<<"m_matDataRaw.cols(): "<<m_matDataRaw.cols()<<std::endl;
+//            std::cout<<"data.at(b).cols()-m_iResidual: "<<data.at(b).cols()-m_iResidual<<std::endl<<std::endl;
 
             if(doProj)
                 m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseProj * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
@@ -344,6 +353,15 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
             if(!m_bIsFreezed) {
                 m_vecLastBlockFirstValuesFiltered = m_matDataFiltered.col(0);
                 m_vecLastBlockFirstValuesRaw = m_matDataRaw.col(0);
+            }
+
+            //Delete all detected triggers
+            if(m_bTriggerDetectionActive) {
+                QMutableMapIterator<int,QList<int> > i(m_qMapDetectedTrigger);
+                while (i.hasNext()) {
+                    i.next();
+                    i.value().clear();
+                }
             }
         } else
             m_iResidual = 0;
@@ -363,6 +381,10 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
         m_iCurrentSample += data.at(b).cols();
 
         m_iCurrentBlockSize = data.at(b).cols();
+
+        //detect the trigger flanks in the trigger channels
+        if(m_bTriggerDetectionActive)
+            DetectTrigger::detectTriggerFlanks(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-data.at(b).cols(), m_dTriggerThreshold);
     }
 
     //Update data content
@@ -479,6 +501,7 @@ void RealTimeMultiSampleArrayModel::toggleFreeze(const QModelIndex &)
     if(m_bIsFreezed) {
         m_matDataRawFreeze = m_matDataRaw;
         m_matDataFilteredFreeze = m_matDataFiltered;
+        m_qMapDetectedTriggerFreeze = m_qMapDetectedTrigger;
 
         m_iCurrentSampleFreeze = m_iCurrentSample;
     }
@@ -660,6 +683,84 @@ void RealTimeMultiSampleArrayModel::createFilterChannelList(QStringList channelN
 
     //Filter all visible data channels at once
     //filterChannelsConcurrently();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::markChBad(QModelIndex ch, bool status)
+{
+    QList<FiffChInfo> chInfolist = m_pFiffInfo->chs;
+
+    if(status) {
+        if(!m_pFiffInfo->bads.contains(chInfolist[ch.row()].ch_name))
+            m_pFiffInfo->bads.append(chInfolist[ch.row()].ch_name);
+        qDebug() << "RawModel:" << chInfolist[ch.row()].ch_name << "marked as bad.";
+    }
+    else {
+        if(m_pFiffInfo->bads.contains(chInfolist[ch.row()].ch_name)) {
+            int index = m_pFiffInfo->bads.indexOf(chInfolist[ch.row()].ch_name);
+            m_pFiffInfo->bads.removeAt(index);
+            qDebug() << "RawModel:" << chInfolist[ch.row()].ch_name << "marked as good.";
+        }
+    }
+
+    //Update indeices of bad channels (this vector is needed when creating new ssp operators)
+    QStringList emptyExclude;
+    m_vecBadIdcs = FiffInfoBase::pick_channels(m_pFiffInfo->ch_names, m_pFiffInfo->bads, emptyExclude);
+
+    emit dataChanged(ch,ch);
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::triggerInfoChanged(const QMap<QString, QColor>& colorMap, bool active, QString triggerCh, double threshold)
+{
+    m_qMapTriggerColor = colorMap;
+    m_bTriggerDetectionActive = active;
+    m_sCurrentTriggerCh = triggerCh;
+    m_dTriggerThreshold = threshold;
+
+    //Find channel index and initialise detected trigger map
+    QList<int> temp;
+    m_qMapDetectedTrigger.clear();
+
+    for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
+        if(m_pFiffInfo->chs[i].ch_name == m_sCurrentTriggerCh) {
+            m_iCurrentTriggerChIndex = i;
+            m_qMapDetectedTrigger.insert(i, temp);
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::markChBad(QModelIndexList chlist, bool status)
+{
+    QList<FiffChInfo> chInfolist = m_pFiffInfo->chs;
+
+    for(int i=0; i < chlist.size(); ++i) {
+        if(status) {
+            if(!m_pFiffInfo->bads.contains(chInfolist[chlist[i].row()].ch_name))
+                m_pFiffInfo->bads.append(chInfolist[chlist[i].row()].ch_name);
+            qDebug() << "RawModel:" << chInfolist[chlist[i].row()].ch_name << "marked as bad.";
+        }
+        else {
+            if(m_pFiffInfo->bads.contains(chInfolist[chlist[i].row()].ch_name)) {
+                int index = m_pFiffInfo->bads.indexOf(chInfolist[chlist[i].row()].ch_name);
+                m_pFiffInfo->bads.removeAt(index);
+                qDebug() << "RawModel:" << chInfolist[chlist[i].row()].ch_name << "marked as good.";
+            }
+        }
+
+        emit dataChanged(chlist[i],chlist[i]);
+    }
+
+    //Update indeices of bad channels (this vector is needed when creating new ssp operators)
+    QStringList emptyExclude;
+    m_vecBadIdcs = FiffInfoBase::pick_channels(m_pFiffInfo->ch_names, m_pFiffInfo->bads, emptyExclude);
 }
 
 

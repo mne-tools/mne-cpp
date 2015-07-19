@@ -45,6 +45,7 @@
 #include <xMeas/realtimesamplearraychinfo.h>
 #include <xMeas/realtimeevoked.h>
 #include <fiff/fiff_types.h>
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -61,6 +62,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 
 //*************************************************************************************************************
@@ -70,6 +72,13 @@
 
 namespace XDISPLIB
 {
+
+namespace RealTimeEvokedModelRoles
+{
+    enum ItemRole{GetAverageData = Qt::UserRole + 1020};
+}
+
+typedef QPair<const double*,qint32> RowVectorPair;
 
 
 //*************************************************************************************************************
@@ -224,6 +233,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns current scaling
+    *
+    * @return the current scaling
+    */
+    inline const QMap< qint32,float >& getScaling() const;
+
+    //=========================================================================================================
+    /**
     * Returns the number of pre-stimulus samples
     *
     * @return the number of pre-stimulus samples
@@ -254,19 +271,31 @@ public:
 
     //=========================================================================================================
     /**
-    * Toggle freeze for all channels when a channel is double clicked
-    *
-    * @param [in] index     of the channel which has been double clicked
-    */
-    void toggleFreeze(const QModelIndex &index);
-
-    //=========================================================================================================
-    /**
     * Returns current freezing status
     *
     * @return the current freezing status
     */
     inline bool isFreezed() const;
+
+    //=========================================================================================================
+    /**
+    * Set scaling channel scaling
+    *
+    * @param[in] p_qMapChScaling    Map of scaling factors
+    */
+    void setScaling(const QMap< qint32,float >& p_qMapChScaling);
+
+    //=========================================================================================================
+    /**
+    * Update projections
+    */
+    void updateProjection();
+
+    //=========================================================================================================
+    /**
+    * Toggle freeze for all channels when a channel is double clicked
+    */
+    void toggleFreeze();
 
 signals:
     //=========================================================================================================
@@ -280,17 +309,20 @@ signals:
 private:
     QSharedPointer<RealTimeEvoked> m_pRTE;          /**< The real-time evoked measurement. */
 
-    QMap<qint32,qint32> m_qMapIdxRowSelection;      /**< Selection mapping.*/
+    QMap<qint32,qint32>     m_qMapIdxRowSelection;  /**< Selection mapping.*/
+    QMap<qint32,float>      m_qMapChScaling;        /**< Channel scaling map. */
 
-    //Fiff data structure
-    MatrixXd m_matData;        /**< List that holds the data*/
-    MatrixXd m_matDataFreeze;  /**< List that holds the data when freezed*/
+    MatrixXd                m_matData;              /**< List that holds the data*/
+    MatrixXd                m_matDataFreeze;        /**< List that holds the data when freezed*/
+    MatrixXd                m_matProj;              /**< SSP projector */
+    SparseMatrix<double>    m_matSparseProj;        /**< Sparse SSP projector */
 
-    bool m_bIsInit;
-
+    bool m_bIsInit;             /**< Init flag */
+    bool m_bIsFreezed;          /**< Display is freezed */
+    bool m_bProjActivated;      /**< Doo projections flag */
     float m_fSps;               /**< Sampling rate */
 
-    bool m_bIsFreezed;          /**< Display is freezed */
+    RowVectorXi             m_vecBadIdcs;           /**< Idcs of bad channels */
 };
 
 
@@ -353,11 +385,24 @@ inline bool RealTimeEvokedModel::isFreezed() const
     return m_bIsFreezed;
 }
 
+
+//*************************************************************************************************************
+
+inline const QMap< qint32,float >& RealTimeEvokedModel::getScaling() const
+{
+    return m_qMapChScaling;
+}
+
 } // NAMESPACE
 
 #ifndef metatype_rowvectorxd
 #define metatype_rowvectorxd
 Q_DECLARE_METATYPE(Eigen::RowVectorXd);    /**< Provides QT META type declaration of the Eigen::RowVectorXd type. For signal/slot usage.*/
+#endif
+
+#ifndef metatype_rowvectorpair
+#define metatype_rowvectorpair
+Q_DECLARE_METATYPE(XDISPLIB::RowVectorPair);
 #endif
 
 #endif // REALTIMEEVOKEDMODEL_H
