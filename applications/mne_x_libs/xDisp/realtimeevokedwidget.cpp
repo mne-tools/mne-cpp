@@ -163,12 +163,14 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     if(m_pButterflyPlot)
         delete m_pButterflyPlot;
     m_pButterflyPlot = new RealTimeButterflyPlot;
+    m_pButterflyPlot->installEventFilter(this);
 
     m_pToolBox->insertItem(0, m_pButterflyPlot, QIcon(), "Butterfly plot");
 
     //2D layout plot
     m_pAverageLayoutView = new QGraphicsView;
 
+    //m_pAverageLayoutView->installEventFilter(this);
     m_pToolBox->insertItem(0, m_pAverageLayoutView, QIcon(), "2D Layout plot");
 
     m_pRteLayout->addWidget(m_pToolBox);
@@ -307,7 +309,7 @@ void RealTimeEvokedWidget::init()
                 hasMISC = true;
         }
         QSettings settings;
-        bool sel = false;
+        bool sel = true;
         float val = 1e-11f;
         if(hasMag)
         {
@@ -591,10 +593,12 @@ void RealTimeEvokedWidget::showQuickControlWidget()
 
 //*************************************************************************************************************
 
-void RealTimeEvokedWidget::mouseDoubleClickEvent(QMouseEvent * event)
+bool RealTimeEvokedWidget::eventFilter(QObject *object, QEvent *event)
 {
-    if(event->button() == Qt::LeftButton)
+    if ((object == m_pButterflyPlot || object == m_pAverageLayoutView) && event->type() == QEvent::MouseButtonDblClick) {
         m_pRTEModel->toggleFreeze();
+    }
+    return false;
 }
 
 

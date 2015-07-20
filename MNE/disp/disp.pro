@@ -96,7 +96,8 @@ SOURCES += \
     filterplotscene.cpp \
     filterwindow.cpp \
     helpers/filterdatadelegate.cpp \
-    helpers/filterdatamodel.cpp
+    helpers/filterdatamodel.cpp \
+    layoutscene.cpp
 
 
 HEADERS += \
@@ -109,7 +110,8 @@ HEADERS += \
     filterplotscene.h \
     filterwindow.h \
     helpers/filterdatadelegate.h \
-    helpers/filterdatamodel.h
+    helpers/filterdatamodel.h \
+    layoutscene.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
