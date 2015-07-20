@@ -635,7 +635,6 @@ void RealTimeEvokedWidget::onSelectionChanged()
 
 void RealTimeEvokedWidget::scaleAveragedData(const QMap<qint32, float> &scaleMap)
 {
-    qDebug()<<"scaleAveragedData";
     //Set the scale map received from the scale window
     m_pAverageScene->setScaleMap(scaleMap);
 }
