@@ -250,9 +250,9 @@ private:
 
     //=========================================================================================================
     /**
-    * Reimplemented mouseDoubleClickEvent
+    * Reimplemented eventFilter
     */
-    virtual void mouseDoubleClickEvent(QMouseEvent * event);
+    bool virtual eventFilter(QObject *object, QEvent *event);
 
     //=========================================================================================================
     /**

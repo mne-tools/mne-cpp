@@ -119,7 +119,6 @@ SOURCES += \
     helpers/frequencyspectrumsettingswidget.cpp \
     helpers/scalingwidget.cpp \
     helpers/projectorwidget.cpp \
-    helpers/layoutscene.cpp \
     helpers/selectionmanagerwindow.cpp \
     helpers/selectionscene.cpp \
     helpers/selectionsceneitem.cpp \
@@ -153,7 +152,6 @@ HEADERS += \
     helpers/frequencyspectrumsettingswidget.h \
     helpers/scalingwidget.h \
     helpers/projectorwidget.h \
-    helpers/layoutscene.h \
     helpers/selectionmanagerwindow.h \
     helpers/selectionscene.h \
     helpers/selectionsceneitem.h \
