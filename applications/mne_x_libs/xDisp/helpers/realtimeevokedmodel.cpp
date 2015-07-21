@@ -96,7 +96,7 @@ QVariant RealTimeEvokedModel::data(const QModelIndex &index, int role) const
 
         //******** first column (chname) ********
         if(index.column() == 0 && role == Qt::DisplayRole)
-            return QVariant(m_pRTE->info().ch_names[row]);
+            return QVariant(m_pRTE->info()->ch_names[row]);
 
         //******** second column (data plot) ********
         if(index.column()==1) {
@@ -213,8 +213,8 @@ void RealTimeEvokedModel::setRTE(QSharedPointer<RealTimeEvoked> &pRTE)
     RowVectorXi sel;// = RowVectorXi(0,0);
     QStringList emptyExclude;
 
-    if(m_pRTE->info().bads.size() > 0)
-        sel = FiffInfoBase::pick_channels(m_pRTE->info().ch_names, m_pRTE->info().bads, emptyExclude);
+    if(m_pRTE->info()->bads.size() > 0)
+        sel = FiffInfoBase::pick_channels(m_pRTE->info()->ch_names, m_pRTE->info()->bads, emptyExclude);
 
     m_vecBadIdcs = sel;
 
@@ -242,7 +242,7 @@ void RealTimeEvokedModel::updateData()
 
     //Update data content
     QModelIndex topLeft = this->index(0,1);
-    QModelIndex bottomRight = this->index(m_pRTE->info().nchan-1,1);
+    QModelIndex bottomRight = this->index(m_pRTE->info()->nchan-1,1);
     QVector<int> roles; roles << Qt::DisplayRole;
     emit dataChanged(topLeft, bottomRight, roles);
 }
@@ -269,7 +269,7 @@ fiff_int_t RealTimeEvokedModel::getKind(qint32 row) const
     if(row < m_qMapIdxRowSelection.size())
     {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_pRTE->info().chs[chRow].kind;
+        return m_pRTE->info()->chs[chRow].kind;
     }
     else
         return 0;
@@ -283,7 +283,7 @@ fiff_int_t RealTimeEvokedModel::getUnit(qint32 row) const
     if(row < m_qMapIdxRowSelection.size())
     {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_pRTE->info().chs[chRow].unit;
+        return m_pRTE->info()->chs[chRow].unit;
     }
     else
         return FIFF_UNIT_NONE;
@@ -297,7 +297,7 @@ fiff_int_t RealTimeEvokedModel::getCoil(qint32 row) const
     if(row < m_qMapIdxRowSelection.size())
     {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_pRTE->info().chs[chRow].coil_type;
+        return m_pRTE->info()->chs[chRow].coil_type;
     }
     else
         return FIFFV_COIL_NONE;
@@ -315,7 +315,7 @@ void RealTimeEvokedModel::selectRows(const QList<qint32> &selection)
     qint32 count = 0;
     for(qint32 i = 0; i < selection.size(); ++i)
     {
-        if(selection[i] < m_pRTE->info().nchan)
+        if(selection[i] < m_pRTE->info()->nchan)
         {
             m_qMapIdxRowSelection.insert(count,selection[i]);
             ++count;
@@ -336,7 +336,7 @@ void RealTimeEvokedModel::resetSelection()
 
     m_qMapIdxRowSelection.clear();
 
-    for(qint32 i = 0; i < m_pRTE->info().nchan; ++i)
+    for(qint32 i = 0; i < m_pRTE->info()->nchan; ++i)
         m_qMapIdxRowSelection.insert(i,i);
 
     endResetModel();
@@ -360,22 +360,22 @@ void RealTimeEvokedModel::updateProjection()
     //
     //  Update the SSP projector
     //
-    if(m_pRTE->info().chs.size()>0)
+    if(m_pRTE->info()->chs.size()>0)
     {
         m_bProjActivated = false;
-        for(qint32 i = 0; i < m_pRTE->info().projs.size(); ++i)
-            if(m_pRTE->info().projs[i].active)
+        for(qint32 i = 0; i < m_pRTE->info()->projs.size(); ++i)
+            if(m_pRTE->info()->projs[i].active)
                 m_bProjActivated = true;
 
-        m_pRTE->info().make_projector(m_matProj);
+        m_pRTE->info()->make_projector(m_matProj);
         qDebug() << "updateProjection :: New projection calculated.";
 
         //set columns of matrix to zero depending on bad channels indexes
         RowVectorXi sel;// = RowVectorXi(0,0);
         QStringList emptyExclude;
 
-        if(m_pRTE->info().bads.size() > 0)
-            sel = FiffInfoBase::pick_channels(m_pRTE->info().ch_names, m_pRTE->info().bads, emptyExclude);
+        if(m_pRTE->info()->bads.size() > 0)
+            sel = FiffInfoBase::pick_channels(m_pRTE->info()->ch_names, m_pRTE->info()->bads, emptyExclude);
 
         m_vecBadIdcs = sel;
 
@@ -386,7 +386,7 @@ void RealTimeEvokedModel::updateProjection()
 //        std::cout << "Proj\n";
 //        std::cout << m_matProj.block(0,0,10,10) << std::endl;
 
-        qint32 nchan = m_pRTE->info().nchan;
+        qint32 nchan = m_pRTE->info()->nchan;
         qint32 i, k;
 
         typedef Eigen::Triplet<double> T;

@@ -137,6 +137,9 @@ class XDISPSHARED_EXPORT RealTimeEvokedWidget : public NewMeasurementWidget
     friend class ScalingWidget;
 
 public:
+    typedef QSharedPointer<RealTimeEvokedWidget> SPtr;              /**< Shared pointer type for RealTimeEvokedWidget. */
+    typedef QSharedPointer<const RealTimeEvokedWidget> ConstSPtr;   /**< Const shared pointer type for RealTimeEvokedWidget. */
+
     //=========================================================================================================
     /**
     * Constructs a RealTimeEvokedWidget which is a child of parent.
@@ -260,9 +263,9 @@ private:
     */
     void onSelectionChanged();
 
-    RealTimeEvokedModel*        m_pRTEModel;                /**< RTE data model */
-    RealTimeButterflyPlot*      m_pButterflyPlot;           /**< Butterfly plot */
-    AverageScene*               m_pAverageScene;            /**< The pointer to the average scene. */
+    RealTimeEvokedModel::SPtr       m_pRTEModel;                /**< RTE data model */
+    RealTimeButterflyPlot::SPtr     m_pButterflyPlot;           /**< Butterfly plot */
+    AverageScene::SPtr              m_pAverageScene;            /**< The pointer to the average scene. */
 
     bool            m_bInitialized;             /**< Is Initialized */
     bool            m_bHideBadChannels;         /**< hide bad channels flag. */

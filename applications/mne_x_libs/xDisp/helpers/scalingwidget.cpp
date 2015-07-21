@@ -66,8 +66,9 @@ using namespace XDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ScalingWidget::ScalingWidget(QMap<qint32,float> &scaleMap)
-: m_qMapChScaling(scaleMap)
+ScalingWidget::ScalingWidget(QMap<qint32,float> &scaleMap, QWidget* parent)
+: QWidget(parent)
+, m_qMapChScaling(scaleMap)
 {
     this->setWindowTitle("Scaling");
     this->setMinimumWidth(220);

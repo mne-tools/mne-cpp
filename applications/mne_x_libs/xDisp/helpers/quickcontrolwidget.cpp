@@ -55,7 +55,7 @@ using namespace XDISPLIB;
 //=============================================================================================================
 
 QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const FiffInfo::SPtr pFiffInfo, QString name, QWidget *parent, bool bScaling, bool bProjections, bool bView, bool bFilter, bool bModalities)
-: QWidget(parent, Qt::FramelessWindowHint | Qt::WindowSystemMenuHint)
+: QWidget(parent, Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint)
 , ui(new Ui::QuickControlWidget)
 , m_qMapChScaling(qMapChScaling)
 , m_pFiffInfo(pFiffInfo)

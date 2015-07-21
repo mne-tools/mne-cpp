@@ -83,6 +83,9 @@ class AverageScene : public LayoutScene
     Q_OBJECT
 
 public:
+    typedef QSharedPointer<AverageScene> SPtr;              /**< Shared pointer type for AverageScene. */
+    typedef QSharedPointer<const AverageScene> ConstSPtr;   /**< Const shared pointer type for AverageScene. */
+
     //=========================================================================================================
     /**
     * Constructs a AverageScene.
