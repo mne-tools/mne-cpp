@@ -81,27 +81,27 @@ RealTimeEvoked::~RealTimeEvoked()
 
 //*************************************************************************************************************
 
-void RealTimeEvoked::init(FiffInfo &p_fiffInfo)
+void RealTimeEvoked::init(FiffInfo::SPtr p_fiffInfo)
 {
     QMutexLocker locker(&m_qMutex);
     m_qListChInfo.clear();
     m_qListChColors.clear();
 
-    m_fiffInfo = p_fiffInfo;
+    m_pFiffInfo = p_fiffInfo;
 
     qsrand(time(NULL));
-    for(qint32 i = 0; i < p_fiffInfo.nchan; ++i)
+    for(qint32 i = 0; i < p_fiffInfo->nchan; ++i)
     {
          m_qListChColors.append(QColor(qrand() % 256, qrand() % 256, qrand() % 256));
 
         RealTimeSampleArrayChInfo initChInfo;
-        initChInfo.setChannelName(p_fiffInfo.chs[i].ch_name);
+        initChInfo.setChannelName(p_fiffInfo->chs[i].ch_name);
 
         // set channel Unit
-        initChInfo.setUnit(p_fiffInfo.chs[i].unit);
+        initChInfo.setUnit(p_fiffInfo->chs[i].unit);
 
         //Treat stimulus channels different
-        if(p_fiffInfo.chs[i].kind == FIFFV_STIM_CH)
+        if(p_fiffInfo->chs[i].kind == FIFFV_STIM_CH)
         {
 //            initChInfo.setUnit("");
             initChInfo.setMinValue(0);
@@ -109,10 +109,10 @@ void RealTimeEvoked::init(FiffInfo &p_fiffInfo)
         }
 
         // set channel Kind
-        initChInfo.setKind(p_fiffInfo.chs[i].kind);
+        initChInfo.setKind(p_fiffInfo->chs[i].kind);
 
         // set channel coil
-        initChInfo.setCoil(p_fiffInfo.chs[i].coil_type);
+        initChInfo.setCoil(p_fiffInfo->chs[i].coil_type);
 
         m_qListChInfo.append(initChInfo);
     }
@@ -130,7 +130,7 @@ FiffEvoked::SPtr& RealTimeEvoked::getValue()
 
 //*************************************************************************************************************
 
-void RealTimeEvoked::setValue(FiffEvoked& v)
+void RealTimeEvoked::setValue(FiffEvoked& v, FiffInfo::SPtr p_fiffinfo)
 {
     if(m_pFiffEvoked->data.cols() != v.data.cols())
         m_bInitialized = false;
@@ -142,7 +142,7 @@ void RealTimeEvoked::setValue(FiffEvoked& v)
 
     if(!m_bInitialized)
     {
-        init(m_pFiffEvoked->info);
+        init(p_fiffinfo);
 
         m_qMutex.lock();
         m_iPreStimSamples = 0;

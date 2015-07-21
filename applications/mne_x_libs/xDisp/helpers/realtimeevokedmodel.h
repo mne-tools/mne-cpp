@@ -100,7 +100,10 @@ using namespace Eigen;
 class RealTimeEvokedModel : public QAbstractTableModel
 {
     Q_OBJECT
+
 public:
+    typedef QSharedPointer<RealTimeEvokedModel> SPtr;              /**< Shared pointer type for RealTimeEvokedModel. */
+    typedef QSharedPointer<const RealTimeEvokedModel> ConstSPtr;   /**< Const shared pointer type for RealTimeEvokedModel. */
 
     //=========================================================================================================
     /**
@@ -317,12 +320,12 @@ private:
     MatrixXd                m_matProj;              /**< SSP projector */
     SparseMatrix<double>    m_matSparseProj;        /**< Sparse SSP projector */
 
-    bool m_bIsInit;             /**< Init flag */
-    bool m_bIsFreezed;          /**< Display is freezed */
-    bool m_bProjActivated;      /**< Doo projections flag */
-    float m_fSps;               /**< Sampling rate */
-
     RowVectorXi             m_vecBadIdcs;           /**< Idcs of bad channels */
+
+    bool    m_bIsInit;              /**< Init flag */
+    bool    m_bIsFreezed;           /**< Display is freezed */
+    bool    m_bProjActivated;       /**< Doo projections flag */
+    float   m_fSps;                 /**< Sampling rate */
 };
 
 

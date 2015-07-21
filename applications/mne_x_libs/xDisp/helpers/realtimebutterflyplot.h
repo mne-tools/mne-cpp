@@ -36,7 +36,11 @@ struct Modality;
 class XDISPSHARED_EXPORT RealTimeButterflyPlot : public QWidget
 {
     Q_OBJECT
+
 public:
+    typedef QSharedPointer<RealTimeButterflyPlot> SPtr;              /**< Shared pointer type for RealTimeButterflyPlot. */
+    typedef QSharedPointer<const RealTimeButterflyPlot> ConstSPtr;   /**< Const shared pointer type for RealTimeButterflyPlot. */
+
     explicit RealTimeButterflyPlot(QWidget *parent = 0);
 
     inline void setModel(RealTimeEvokedModel* model);

@@ -90,7 +90,7 @@ public:
     *
     * @param [in] scaleMap   scaling maps for all channels
     */
-    ScalingWidget(QMap<qint32,float> &scaleMap);
+    ScalingWidget(QMap<qint32,float> &scaleMap, QWidget *parent = 0);
 
     void updateDoubleSpinBox(const double val);
 

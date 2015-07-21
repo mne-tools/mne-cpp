@@ -105,7 +105,7 @@ enum Tool
 
 RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, QSharedPointer<QTime> &pTime, QWidget* parent)
 : NewMeasurementWidget(parent)
-, m_pRTEModel(Q_NULLPTR)
+, m_pRTEModel(0)
 , m_pButterflyPlot(Q_NULLPTR)
 , m_pRTE(pRTE)
 , m_bInitialized(false)
@@ -148,7 +148,7 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     m_pRteLayout = new QVBoxLayout(this);
 
     //Acquire label
-    m_pLabelInit= new QLabel;
+    m_pLabelInit= new QLabel(this);
     m_pLabelInit->setText("Acquiring Data");
     m_pLabelInit->setAlignment(Qt::AlignCenter);
     QFont font;font.setBold(true);font.setPointSize(20);
@@ -160,15 +160,13 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     m_pToolBox->hide();
 
     //Butterfly
-    if(m_pButterflyPlot)
-        delete m_pButterflyPlot;
-    m_pButterflyPlot = new RealTimeButterflyPlot;
+    m_pButterflyPlot = RealTimeButterflyPlot::SPtr(new RealTimeButterflyPlot(this));
     m_pButterflyPlot->installEventFilter(this);
 
-    m_pToolBox->insertItem(0, m_pButterflyPlot, QIcon(), "Butterfly plot");
+    m_pToolBox->insertItem(0, m_pButterflyPlot.data(), QIcon(), "Butterfly plot");
 
     //2D layout plot
-    m_pAverageLayoutView = new QGraphicsView;
+    m_pAverageLayoutView = new QGraphicsView(this);
 
     //m_pAverageLayoutView->installEventFilter(this);
     m_pToolBox->insertItem(0, m_pAverageLayoutView, QIcon(), "2D Layout plot");
@@ -253,7 +251,7 @@ void RealTimeEvokedWidget::getData()
 //            }
 
             m_qListChInfo = m_pRTE->chInfo();
-            m_pFiffInfo = FiffInfo::SPtr(&m_pRTE->info());
+            m_pFiffInfo = m_pRTE->info();
 
             init();
 
@@ -276,15 +274,12 @@ void RealTimeEvokedWidget::init()
         m_pLabelInit->hide();
 
         m_pToolBox->show();
-        //m_pButterflyPlot->show();
 
-        if(m_pRTEModel)
-            delete m_pRTEModel;
-        m_pRTEModel = new RealTimeEvokedModel(this);
+        m_pRTEModel = RealTimeEvokedModel::SPtr(new RealTimeEvokedModel(this));
 
         m_pRTEModel->setRTE(m_pRTE);
 
-        m_pButterflyPlot->setModel(m_pRTEModel);
+        m_pButterflyPlot->setModel(m_pRTEModel.data());
 
         m_qListModalities.clear();
         bool hasMag = false;
@@ -292,20 +287,20 @@ void RealTimeEvokedWidget::init()
         bool hasEEG = false;
         bool hasEOG = false;
         bool hasMISC = false;
-        for(qint32 i = 0; i < m_pRTE->info().nchan; ++i)
+        for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i)
         {
-            if(m_pRTE->info().chs[i].kind == FIFFV_MEG_CH)
+            if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH)
             {
-                if(!hasMag && m_pRTE->info().chs[i].unit == FIFF_UNIT_T)
+                if(!hasMag && m_pFiffInfo->chs[i].unit == FIFF_UNIT_T)
                     hasMag = true;
-                else if(!hasGrad &&  m_pRTE->info().chs[i].unit == FIFF_UNIT_T_M)
+                else if(!hasGrad &&  m_pFiffInfo->chs[i].unit == FIFF_UNIT_T_M)
                     hasGrad = true;
             }
-            else if(!hasEEG && m_pRTE->info().chs[i].kind == FIFFV_EEG_CH)
+            else if(!hasEEG && m_pFiffInfo->chs[i].kind == FIFFV_EEG_CH)
                 hasEEG = true;
-            else if(!hasEOG && m_pRTE->info().chs[i].kind == FIFFV_EOG_CH)
+            else if(!hasEOG && m_pFiffInfo->chs[i].kind == FIFFV_EOG_CH)
                 hasEOG = true;
-            else if(!hasMISC && m_pRTE->info().chs[i].kind == FIFFV_MISC_CH)
+            else if(!hasMISC && m_pFiffInfo->chs[i].kind == FIFFV_MISC_CH)
                 hasMISC = true;
         }
         QSettings settings;
@@ -403,7 +398,7 @@ void RealTimeEvokedWidget::init()
 
         if(!m_pScalingWidget)
         {
-            m_pScalingWidget = QSharedPointer<ScalingWidget>(new ScalingWidget(m_qMapChScaling));
+            m_pScalingWidget = QSharedPointer<ScalingWidget>(new ScalingWidget(m_qMapChScaling, this));
 
             //m_pScalingWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
@@ -424,7 +419,7 @@ void RealTimeEvokedWidget::init()
 
             //Handle projections
             connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
-                    m_pRTEModel, &RealTimeEvokedModel::updateProjection);
+                    m_pRTEModel.data(), &RealTimeEvokedModel::updateProjection);
 
             connect(m_pQuickControlWidget.data(), &QuickControlWidget::settingsChanged,
                     this, &RealTimeEvokedWidget::broadcastSettings);
@@ -462,14 +457,14 @@ void RealTimeEvokedWidget::init()
         m_pActionSelectModality->setVisible(false);
 
         //Init average scene
-        m_pAverageScene = new AverageScene(m_pAverageLayoutView, this);
-        m_pAverageLayoutView->setScene(m_pAverageScene);
+        m_pAverageScene = AverageScene::SPtr(new AverageScene(m_pAverageLayoutView, this));
+        m_pAverageLayoutView->setScene(m_pAverageScene.data());
 
         //Connect selection manager with average manager
         connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::selectionChanged,
                 this, &RealTimeEvokedWidget::channelSelectionManagerChanged);
 
-        connect(m_pRTEModel, &RealTimeEvokedModel::dataChanged,
+        connect(m_pRTEModel.data(), &RealTimeEvokedModel::dataChanged,
                 this, &RealTimeEvokedWidget::onSelectionChanged);
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
@@ -557,7 +552,7 @@ void RealTimeEvokedWidget::showSelectedChannelsOnly(QStringList selectedChannels
 
 void RealTimeEvokedWidget::broadcastScaling(QMap<qint32,float> scaleMap)
 {
-    m_pRTEModel->setScaling(scaleMap);
+    //m_pRTEModel->setScaling(scaleMap);
 }
 
 
@@ -596,7 +591,7 @@ void RealTimeEvokedWidget::showQuickControlWidget()
 bool RealTimeEvokedWidget::eventFilter(QObject *object, QEvent *event)
 {
     if ((object == m_pButterflyPlot || object == m_pAverageLayoutView) && event->type() == QEvent::MouseButtonDblClick) {
-        m_pRTEModel->toggleFreeze();
+        //m_pRTEModel->toggleFreeze();
     }
     return false;
 }
