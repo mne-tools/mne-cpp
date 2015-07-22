@@ -768,7 +768,9 @@ void BabyMEG::run()
                     this->splitRecordingFile();
                 }
 
+                mutex.lock();
                 m_pOutfid->write_raw_buffer(matValue.cast<double>());
+                mutex.unlock();
             }
             else
                 size = 0;
