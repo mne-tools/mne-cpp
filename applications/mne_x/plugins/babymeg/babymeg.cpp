@@ -44,7 +44,6 @@
 #include "FormFiles/babymegsetupwidget.h"
 #include "FormFiles/babymegprojectdialog.h"
 
-
 #include <utils/ioutils.h>
 
 #include <iostream>
@@ -383,7 +382,10 @@ void BabyMEG::toggleRecordingFile()
     //Setup writing to file
     if(m_bWriteToFile)
     {
+        mutex.lock();
         m_pOutfid->finish_writing_raw();
+        mutex.unlock();
+
         m_bWriteToFile = false;
         m_pTimerRecordingChange->stop();
         m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
@@ -419,9 +421,11 @@ void BabyMEG::toggleRecordingFile()
         for(int i = 0; i<m_pFiffInfo->projs.size(); i++)
             m_pFiffInfo->projs[i].active = false;
 
+        mutex.lock();
         m_pOutfid = Fiff::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals);
         fiff_int_t first = 0;
         m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
+        mutex.unlock();
 
         m_bWriteToFile = true;
 

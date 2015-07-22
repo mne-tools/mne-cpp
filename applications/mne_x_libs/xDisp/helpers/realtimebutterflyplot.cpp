@@ -74,6 +74,8 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
     painter.drawRect(QRect(0,0,this->width()-1,this->height()-1));
     painter.restore();
 
+    painter.setRenderHint(QPainter::Antialiasing, true);
+
     if(m_bIsInit)
     {
         //Stimulus bar

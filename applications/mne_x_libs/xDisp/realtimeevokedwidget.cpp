@@ -552,7 +552,7 @@ void RealTimeEvokedWidget::showSelectedChannelsOnly(QStringList selectedChannels
 
 void RealTimeEvokedWidget::broadcastScaling(QMap<qint32,float> scaleMap)
 {
-    //m_pRTEModel->setScaling(scaleMap);
+    m_pRTEModel->setScaling(scaleMap);
 }
 
 
@@ -591,7 +591,7 @@ void RealTimeEvokedWidget::showQuickControlWidget()
 bool RealTimeEvokedWidget::eventFilter(QObject *object, QEvent *event)
 {
     if ((object == m_pButterflyPlot || object == m_pAverageLayoutView) && event->type() == QEvent::MouseButtonDblClick) {
-        //m_pRTEModel->toggleFreeze();
+        m_pRTEModel->toggleFreeze();
     }
     return false;
 }

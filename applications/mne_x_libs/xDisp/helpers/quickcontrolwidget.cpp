@@ -403,7 +403,6 @@ void QuickControlWidget::createProjectorGroup()
 
         bool bAllActivated = true;
 
-        int rowCount = 0;
         qint32 i=0;
 
         for(i; i < m_pFiffInfo->projs.size(); ++i)
