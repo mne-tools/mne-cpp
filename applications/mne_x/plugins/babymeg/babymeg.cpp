@@ -517,6 +517,7 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
     emit fiffInfoAvailable();
 }
 
+
 //*************************************************************************************************************
 
 void BabyMEG::setFiffGainInfo(QStringList GainInfo)
@@ -540,6 +541,7 @@ void BabyMEG::setFiffGainInfo(QStringList GainInfo)
     }
 
 }
+
 //*************************************************************************************************************
 
 void BabyMEG::setCMDData(QByteArray DATA)
