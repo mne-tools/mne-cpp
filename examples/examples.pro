@@ -53,7 +53,6 @@ SUBDIRS += \
     cancelNoise \
     fiffIO \
     makeLayout \
-    bmtiExample \
     mghIO \
     mriTestViewer \
     patientManager \
