@@ -112,8 +112,8 @@ private slots:
     void on_zoomInButton_clicked();
     void on_zoomOutButton_clicked();
     void on_resizeButton_clicked();
-
     void on_clearButton_clicked();
+    void on_sliceDropDown_valueChanged(int sliceNo);
 
 private:
     Ui::MriViewer *ui;
@@ -121,6 +121,7 @@ private:
     QGraphicsPixmapItem *mriPixmapItem;
     QImage mriImage; /**< qImage holding the mri slice which should be visualized */
     QString filePath; /**< absolute file path of mri file which is loaded */
+    FSLIB::Mri mri;
     const char *defFileFormat = "JPEG (*.jpg *.jpeg);;"
                                 "PNG (*.png);;"
                                 "MGH (*.mgh)"; /**< suffix definition of loadable file formats */

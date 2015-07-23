@@ -14,17 +14,7 @@
    <string>MRI Test Viewer Example</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" colspan="6">
-    <widget class="CustomView" name="graphicsView">
-     <property name="mouseTracking">
-      <bool>false</bool>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="5">
+   <item row="1" column="7">
     <widget class="QPushButton" name="zoomInButton">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -49,27 +39,24 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="3">
+   <item row="1" column="5">
     <widget class="QPushButton" name="resizeButton">
      <property name="text">
       <string>Resize</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QPushButton" name="openButton">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+   <item row="0" column="0" colspan="8">
+    <widget class="CustomView" name="graphicsView">
+     <property name="mouseTracking">
+      <bool>false</bool>
      </property>
-     <property name="text">
-      <string>Open</string>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
      </property>
     </widget>
    </item>
-   <item row="1" column="4">
+   <item row="1" column="6">
     <widget class="QPushButton" name="zoomOutButton">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -94,7 +81,27 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="2">
+   <item row="1" column="1">
+    <widget class="QPushButton" name="clearButton">
+     <property name="text">
+      <string>Clear</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QPushButton" name="openButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>Open</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="4">
     <spacer name="horizontalSpacer">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -107,10 +114,29 @@
      </property>
     </spacer>
    </item>
-   <item row="1" column="1">
-    <widget class="QPushButton" name="clearButton">
+   <item row="1" column="3">
+    <widget class="QSpinBox" name="sliceDropDown">
+     <property name="minimumSize">
+      <size>
+       <width>40</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximum">
+      <number>999</number>
+     </property>
+     <property name="value">
+      <number>1</number>
+     </property>
+     <property name="displayIntegerBase">
+      <number>10</number>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QLabel" name="sliceLabel">
      <property name="text">
-      <string>Clear</string>
+      <string>Slice</string>
      </property>
     </widget>
    </item>

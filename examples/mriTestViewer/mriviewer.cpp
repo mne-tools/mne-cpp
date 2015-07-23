@@ -59,40 +59,15 @@ MriViewer::MriViewer(QWidget *parent) :
     ui->setupUi(this);
     scene = new QGraphicsScene(this);
 
-    // load File -> todo: replace with mri file
-    filePath = "D:/Bilder/Freunde/Lorenz_Esch.jpg";
+    // image file example
+    filePath = "D:/Bilder/Lorenz_Esch.jpg";
     loadImageFile(filePath);
 
-    //------------
-
-    // initialize vars to call loadMGH function
-    QString fName = "D:/Repos/mne-cpp/bin/MNE-sample-data/subjects/sample/mri/orig/001.mgh";
-
-    VectorXi slices(3); // indices of the sclices (z dimension) to read
-    slices << 99, 100, 101;
-
-    int frame = 0; // time frame index, negativ values are vectors
-    bool headerOnly = false;
-
-    Mri mri = Mgh::loadMGH(fName, slices, frame, headerOnly);
-
-    qDebug() << "\nRead" << mri.slices.size() << "slices.\n";
-    quint16 sliceIdx = 150;
-    MatrixXd mat = mri.slices[sliceIdx]; // chosen slice index
-
-    ImageSc imagesc(mat);
-    imagesc.setColorMap("Bone");
-    QPixmap mriSlice = imagesc.getPixmap();
-
-    mriPixmapItem = new QGraphicsPixmapItem(mriSlice);
-    mriPixmapItem->setFlag(QGraphicsItem::ItemIsMovable);
-    scene->addItem(mriPixmapItem);
-
-    //------------
+    // mri file example
+    filePath = "D:/Repos/mne-cpp/bin/MNE-sample-data/subjects/sample/mri/orig/001.mgh";
+    loadMriFile(filePath);
 
     ui->graphicsView->setScene(scene);
-    ui->graphicsView->installEventFilter(this);
-
     resize(QGuiApplication::primaryScreen()->availableSize()*4/5);
 }
 
@@ -110,21 +85,22 @@ void MriViewer::loadImageFile(QString filePath)
 
 void MriViewer::loadMriFile(QString filePath)
 {
-    mriImage.load(filePath);
-
-    QString fName = "D:/Repos/mne-cpp/bin/MNE-sample-data/subjects/sample/mri/orig/001.mgh";
-
     VectorXi slices(3); // indices of the sclices (z dimension) to read
-    slices << 99, 100, 101;
+    slices << 99, 100, 101; // some slices, reads everything either way
 
     int frame = 0; // time frame index, negativ values are vectors
     bool headerOnly = false;
 
-    Mri mri = Mgh::loadMGH(fName, slices, frame, headerOnly);
+    mri = Mgh::loadMGH(filePath, slices, frame, headerOnly);
+    quint16 t_size = mri.slices.size();
 
-    qDebug() << "\nRead" << mri.slices.size() << "slices.\n";
+    qDebug() << "Read" << t_size << "slices.";
+
     quint16 sliceIdx = 150;
     MatrixXd mat = mri.slices[sliceIdx]; // chosen slice index
+
+    ui->sliceDropDown->setRange(1,t_size);
+    ui->sliceDropDown->setValue(sliceIdx);
 
     ImageSc imagesc(mat);
     imagesc.setColorMap("Bone");
@@ -145,8 +121,11 @@ void MriViewer::on_openButton_clicked()
                 "",
                 tr(defFileFormat)
                 );
+    // if file suffix not mgh/mgz
+    // loadImageFile(filePath);
+    // else
+    // loadMriFile(filePath);
 
-    loadImageFile(filePath);
 }
 
 //*************************************************************************************************************
@@ -186,7 +165,15 @@ void MriViewer::on_clearButton_clicked()
 
 //*************************************************************************************************************
 
+void MriViewer::on_sliceDropDown_valueChanged(int sliceNo)
+{
+    qDebug() << "show slice no " << sliceNo+1;
+}
+
 MriViewer::~MriViewer()
 {
     delete ui;
 }
+
+//*************************************************************************************************************
+
