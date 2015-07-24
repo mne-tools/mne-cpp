@@ -338,7 +338,7 @@ private:
 
     QTime               m_recordTime;
 
-    QSharedPointer<QTimer> m_pUpdateTimeInfo;
+    QSharedPointer<QTimer>  m_pUpdateTimeInfoTimer;
 
     QString                 m_sFiffHeader;  /**< Fiff header information */
     QString                 m_sBadChannels; /**< Filename which contains a list of bad channels */
