@@ -37,7 +37,6 @@
 #ifndef BABYMEG_H
 #define BABYMEG_H
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
@@ -144,7 +143,6 @@ class BABYMEGSHARED_EXPORT BabyMEG : public ISensor
     friend class babymeghpidgl;
 
 public:
-
     //=========================================================================================================
     /**
     * Constructs a BabyMEG.
@@ -183,7 +181,6 @@ public:
     /**
     * Returns the path where the subjects folders are stored.
     *
-    *
     * @return the data path
     */
     QString getDataPath() const;
@@ -215,7 +212,6 @@ public:
     * Starts or stops a file recording depending on the current recording state.
     */
     void toggleRecordingFile();
-
 
     virtual bool start();
     virtual bool stop();
@@ -254,7 +250,11 @@ public:
 
     void RecvHPIFiffInfo(FiffInfo info);
 
-    void onRecordingElapsedTimeChange();
+    void setRecordingTimerChanged(int time);
+
+    void setRecordingTimerStateChanged(bool state);
+
+    double sfreq;
 
 signals:
     //=========================================================================================================
@@ -282,8 +282,6 @@ signals:
     */
     void SendCMDDataToSQUIDControl(QByteArray DATA);
 
-    double sfreq;
-
 protected:
     virtual void run();
 
@@ -296,14 +294,8 @@ private:
 
     void changeRecordingButton();
 
-    void recordingTimerChanged(const QTime & time);
+    void onRecordingRemainingTimeChange();
 
-    void recordingTimerStateChanged(bool state);
-
-    //=========================================================================================================
-    /**
-    * Initialises the output connector.
-    */
     void initConnector();
 
     PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;   /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
@@ -321,12 +313,13 @@ private:
 
     QSharedPointer<RawMatrixBuffer> m_pRawMatrixBuffer;             /**< Holds incoming raw data. */
 
-    FiffInfo::SPtr  m_pFiffInfo;            /**< Fiff measurement info.*/
-    FiffStream::SPtr    m_pOutfid;          /**< FiffStream to write to.*/
+    FiffInfo::SPtr      m_pFiffInfo;    /**< Fiff measurement info.*/
+    FiffStream::SPtr    m_pOutfid;      /**< FiffStream to write to.*/
 
-    qint16 m_iBlinkStatus;
+    qint16      m_iBlinkStatus;
     qint32      m_iBufferSize;          /**< The raw data buffer size.*/
     qint32      m_iSplitCount;          /**< File split count */
+    int         m_iRecordingSeconds;
     bool        DataStartFlag;
     bool        m_bWriteToFile;         /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool        m_bUseRecordTimer;
@@ -339,9 +332,8 @@ private:
     QString     m_sFiffHeader;          /**< Fiff header information */
     QString     m_sBadChannels;         /**< Filename which contains a list of bad channels */
 
-    QFile               m_qFileOut;         /**< QFile for writing to fif file.*/
-    QMutex              mutex;
-    QTime               m_recordTime;
+    QFile       m_qFileOut;             /**< QFile for writing to fif file.*/
+    QMutex      mutex;
 
     RowVectorXd             m_cals;
     SparseMatrix<double>    m_sparseMatCals;
@@ -350,9 +342,8 @@ private:
     QAction*                m_pActionRecordFile;            /**< start recording action */
     QAction*                m_pActionSqdCtrl;               /**< show squid control */
     QAction*                m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
-    QAction*                m_pActionUpdateFiffInfoForHPI;  /**< Update HPI info into Fiff Info action *
+    QAction*                m_pActionUpdateFiffInfoForHPI;  /**< Update HPI info into Fiff Info action */
 };
-
 
 } // NAMESPACE
 

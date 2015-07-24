@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>264</height>
+    <height>273</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>600</width>
-    <height>205</height>
+    <height>273</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>600</width>
-    <height>500</height>
+    <height>273</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -179,55 +179,34 @@
       <string>Recording settings</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
+      <item row="1" column="3">
+       <widget class="QSpinBox" name="m_spinBox_sec">
+        <property name="suffix">
+         <string> sec</string>
+        </property>
+        <property name="maximum">
+         <number>1000</number>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Recording time (sec):</string>
+         <string>Recording time:</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>Time to go (sec):</string>
+         <string>Remaining time:</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QTimeEdit" name="m_timeEdit_timerInfo">
-        <property name="currentSection">
-         <enum>QDateTimeEdit::HourSection</enum>
-        </property>
-        <property name="displayFormat">
-         <string>HH:mm:ss</string>
-        </property>
-        <property name="time">
-         <time>
-          <hour>0</hour>
-          <minute>5</minute>
-          <second>0</second>
-         </time>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Time passed (sec):</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QLabel" name="m_label_timePassed">
-        <property name="text">
-         <string>00:10 sec</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
+      <item row="2" column="1" colspan="3">
        <widget class="QLabel" name="m_label_timeToGo">
         <property name="text">
-         <string>00:10 sec</string>
+         <string>00:00:00</string>
         </property>
        </widget>
       </item>
@@ -235,6 +214,29 @@
        <widget class="QCheckBox" name="m_checkBox_useRecordingTimer">
         <property name="text">
          <string>Use recording timer</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="m_spinBox_hours">
+        <property name="suffix">
+         <string> h</string>
+        </property>
+        <property name="maximum">
+         <number>1000</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QSpinBox" name="m_spinBox_min">
+        <property name="suffix">
+         <string> min</string>
+        </property>
+        <property name="maximum">
+         <number>1000</number>
+        </property>
+        <property name="value">
+         <number>5</number>
         </property>
        </widget>
       </item>

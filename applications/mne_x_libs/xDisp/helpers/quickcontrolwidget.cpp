@@ -450,6 +450,9 @@ void QuickControlWidget::createProjectorGroup()
                 this, &QuickControlWidget::enableDisableAll);
 
         ui->m_groupBox_projections->setLayout(topLayout);
+
+        //Set default activation to true
+        enableDisableAll(true);
     }
 }
 
