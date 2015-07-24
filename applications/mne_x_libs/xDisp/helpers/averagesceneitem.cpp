@@ -71,7 +71,7 @@ AverageSceneItem::AverageSceneItem(QString channelName, int channelNumber, QPoin
 QRectF AverageSceneItem::boundingRect() const
 {
     int height = 80;
-    int width = 500;
+    int width = 1000;
     return QRectF(-width/2, -height/2, width, height);
 }
 
@@ -86,13 +86,22 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     //set posistion
     this->setPos(60*m_qpChannelPosition.x(), -60*m_qpChannelPosition.y());
 
+    painter->setRenderHint(QPainter::Antialiasing, true);
+
     // Plot channel name
     QStaticText staticElectrodeName = QStaticText(m_sChannelName);
     QSizeF sizeText = staticElectrodeName.size();
-    painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
+    painter->save();
+    painter->drawStaticText(boundingRect().x(), boundingRect().y(), staticElectrodeName);
+    painter->restore();
 
 //    //Plot bounding rect / drawing region of this item
 //    painter->drawRect(this->boundingRect());
+
+    //Plot stim time
+    painter->save();
+    paintStimLine(painter);
+    painter->restore();
 
     //Plot average data
     painter->save();
@@ -194,6 +203,34 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
 
         painter->drawPath(path);
     }
+}
+
+
+//*************************************************************************************************************
+
+void AverageSceneItem::paintStimLine(QPainter *painter)
+{
+    //Plot averaged data
+    QRectF boundingRect = this->boundingRect();
+    QPainterPath path = QPainterPath(QPointF(boundingRect.x(), boundingRect.y() + boundingRect.height()/2));
+
+    int dsFactor;
+    int totalCols =  m_lAverageData.first().second;
+    totalCols / boundingRect.width()<1 ? dsFactor = 1 : dsFactor = totalCols / boundingRect.width();
+
+    QPen pen;
+    pen.setStyle(Qt::DashLine);
+    pen.setColor(Qt::red);
+    pen.setWidthF(1);
+    painter->setPen(pen);
+
+    path.moveTo(boundingRect.x()+abs(m_firstLastSample.first)/dsFactor, boundingRect.y());
+    path.lineTo(boundingRect.x()+abs(m_firstLastSample.first)/dsFactor, boundingRect.y()+boundingRect.height());
+
+    path.moveTo(boundingRect.x(),boundingRect.y()+boundingRect.height()/2);
+    path.lineTo(boundingRect.x()+m_lAverageData.first().second/dsFactor, boundingRect.y()+boundingRect.height()/2);
+
+    painter->drawPath(path);
 }
 
 

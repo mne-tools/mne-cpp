@@ -179,6 +179,18 @@ void QuickControlWidget::filterGroupChanged(QList<QCheckBox*> list)
 
 //*************************************************************************************************************
 
+void QuickControlWidget::setViewParameters(double zoomFactor, int windowSize)
+{
+    ui->m_doubleSpinBox_numberVisibleChannels->setValue(zoomFactor);
+    ui->m_spinBox_windowSize->setValue(windowSize);
+
+    zoomChanged(zoomFactor);
+    timeWindowChanged(windowSize);
+}
+
+
+//*************************************************************************************************************
+
 void QuickControlWidget::createScalingGroup()
 {
     QGridLayout* t_pGridLayout = new QGridLayout;
@@ -449,104 +461,41 @@ void QuickControlWidget::createProjectorGroup()
 
 void QuickControlWidget::createViewGroup()
 {
-    QGridLayout* t_pGridLayout = new QGridLayout;
-
-    //Row height
-    QLabel* t_pLabelModalityZoom = new QLabel("Row height:");
-    t_pGridLayout->addWidget(t_pLabelModalityZoom,0,0,1,1);
-
-    QDoubleSpinBox* t_pDoubleSpinBoxZoom = new QDoubleSpinBox;
-    t_pDoubleSpinBoxZoom->setMinimum(0.3);
-    t_pDoubleSpinBoxZoom->setMaximum(6.0);
-    t_pDoubleSpinBoxZoom->setSingleStep(0.1);
-    t_pDoubleSpinBoxZoom->setValue(1.0);
-    t_pDoubleSpinBoxZoom->setSuffix(" x");
-    t_pDoubleSpinBoxZoom->setToolTip(tr("Row height"));
-    t_pDoubleSpinBoxZoom->setStatusTip(tr("Row height"));
-    connect(t_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+    //Number of visible channels
+    connect(ui->m_doubleSpinBox_numberVisibleChannels, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &QuickControlWidget::zoomChanged);
-    t_pGridLayout->addWidget(t_pDoubleSpinBoxZoom,0,1,1,2);
 
     //Window size
-    QLabel* t_pLabelModality = new QLabel("Window size:");
-    t_pGridLayout->addWidget(t_pLabelModality,1,0,1,1);
-
-    QDoubleSpinBox* t_pDoubleSpinBoxWindow = new QDoubleSpinBox;
-    t_pDoubleSpinBoxWindow->setMinimum(1);
-    t_pDoubleSpinBoxWindow->setMaximum(10);
-    t_pDoubleSpinBoxWindow->setSingleStep(1);
-    t_pDoubleSpinBoxWindow->setValue(10.0);
-    t_pDoubleSpinBoxWindow->setSuffix(" s");
-    t_pDoubleSpinBoxWindow->setToolTip(tr("Window size"));
-    t_pDoubleSpinBoxWindow->setStatusTip(tr("Window size"));
-    connect(t_pDoubleSpinBoxWindow, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+    connect(ui->m_spinBox_windowSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &QuickControlWidget::timeWindowChanged);
-    t_pGridLayout->addWidget(t_pDoubleSpinBoxWindow,1,1,1,2);
 
     //Trigger detection
-    m_pTriggerDetectionCheckBox = new QCheckBox("Trigger Detection");
-    m_pTriggerDetectionCheckBox->setToolTip(tr("Real time trigger detection"));
-    m_pTriggerDetectionCheckBox->setStatusTip(tr("Real time trigger detection"));
-    connect(m_pTriggerDetectionCheckBox, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
+    connect(ui->m_checkBox_activateTriggerDetection, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
             this, &QuickControlWidget::realTimeTriggerActiveChanged);
-    t_pGridLayout->addWidget(m_pTriggerDetectionCheckBox,3,0,1,1);
 
-    QLabel* t_pLabelTriggerActivation = new QLabel;
-    t_pLabelTriggerActivation->setText("Detection threshold: ");
-    t_pGridLayout->addWidget(t_pLabelTriggerActivation,4,0,1,1);
-
-    m_pComboBoxChannel = new QComboBox;
     QMapIterator<QString, QColor> i(m_qMapTriggerColor);
     while(i.hasNext()) {
         i.next();
-        m_pComboBoxChannel->addItem(i.key());
+        ui->m_comboBox_triggerChannels->addItem(i.key());
     }
-    t_pGridLayout->addWidget(m_pComboBoxChannel,3,1,1,2);
-    connect(m_pComboBoxChannel, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
+    connect(ui->m_comboBox_triggerChannels, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
             this, &QuickControlWidget::realTimeTriggerCurrentChChanged);
 
-    m_pTriggerColorButton = new QPushButton;
-    m_pTriggerColorButton->setMaximumWidth(50);
-    m_pTriggerColorButton->setText("Ch Color");
-    m_pTriggerColorButton->setToolTip(tr("Trigger color"));
-    m_pTriggerColorButton->setStatusTip(tr("Toggle trigger color"));
-    connect(m_pTriggerColorButton, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+    connect(ui->m_pushButton_triggerColor, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             this, &QuickControlWidget::realTimeTriggerColorChanged);
-    m_pTriggerColorButton->setAutoFillBackground(true);
-    m_pTriggerColorButton->setFlat(true);
+
+    ui->m_pushButton_triggerColor->setAutoFillBackground(true);
+    ui->m_pushButton_triggerColor->setFlat(true);
     QPalette* palette1 = new QPalette();
     palette1->setColor(QPalette::Button,QColor(177,0,0));
-    m_pTriggerColorButton->setPalette(*palette1);
-    m_pTriggerColorButton->update();
-    t_pGridLayout->addWidget(m_pTriggerColorButton,3,3,1,1);
+    ui->m_pushButton_triggerColor->setPalette(*palette1);
+    ui->m_pushButton_triggerColor->update();
 
-    m_pDoubleSpinBoxThreshold = new QDoubleSpinBox;
-    m_pDoubleSpinBoxThreshold->setMinimum(0.1);
-    m_pDoubleSpinBoxThreshold->setMaximum(100);
-    m_pDoubleSpinBoxThreshold->setSingleStep(0.1);
-    m_pDoubleSpinBoxThreshold->setValue(0.1);
-    m_pDoubleSpinBoxThreshold->setToolTip(tr("Trigger threshold"));
-    m_pDoubleSpinBoxThreshold->setStatusTip(tr("Trigger threshold"));
-    connect(m_pDoubleSpinBoxThreshold, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+    connect(ui->m_doubleSpinBox_detectionThresholdFirst, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &QuickControlWidget::realTimeTriggerThresholdChanged);
-    t_pGridLayout->addWidget(m_pDoubleSpinBoxThreshold,4,1,1,1);
 
-    QLabel* t_pLabelPrec = new QLabel;
-    t_pLabelPrec->setText("e^");
-    t_pGridLayout->addWidget(t_pLabelPrec,4,2,1,1);
-
-    m_pSpinBoxThresholdPrec = new QSpinBox;
-    m_pSpinBoxThresholdPrec->setMinimum(-100);
-    m_pSpinBoxThresholdPrec->setMaximum(100);
-    m_pSpinBoxThresholdPrec->setSingleStep(1);
-    m_pSpinBoxThresholdPrec->setValue(0);
-    m_pSpinBoxThresholdPrec->setToolTip(tr("Trigger threshold precision"));
-    m_pSpinBoxThresholdPrec->setStatusTip(tr("Trigger threshold precision"));
-    connect(m_pSpinBoxThresholdPrec, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(ui->m_spinBox_detectionThresholdSecond, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &QuickControlWidget::realTimeTriggerThresholdChanged);
-    t_pGridLayout->addWidget(m_pSpinBoxThresholdPrec,4,3,1,1);
-
-    ui->m_groupBox_view->setLayout(t_pGridLayout);
 }
 
 
@@ -584,25 +533,15 @@ void QuickControlWidget::createModalityGroup()
     float val = 1e-11f;
 
     if(hasMag)
-    {
         m_qListModalities.append(Modality("MAG",sel,val));
-    }
     if(hasGrad)
-    {
         m_qListModalities.append(Modality("GRAD",sel,val));
-    }
     if(hasEEG)
-    {
-        m_qListModalities.append(Modality("EEG",sel,val));
-    }
+        m_qListModalities.append(Modality("EEG",false,val));
     if(hasEOG)
-    {
-        m_qListModalities.append(Modality("EOG",sel,val));
-    }
+        m_qListModalities.append(Modality("EOG",false,val));
     if(hasMISC)
-    {
-        m_qListModalities.append(Modality("MISC",sel,val));
-    }
+        m_qListModalities.append(Modality("MISC",false,val));
 
     QGridLayout* t_pGridLayout = new QGridLayout;
 
@@ -819,7 +758,7 @@ void QuickControlWidget::realTimeTriggerActiveChanged(int state)
 {
     Q_UNUSED(state);
 
-    emit triggerInfoChanged(m_qMapTriggerColor, m_pTriggerDetectionCheckBox->isChecked(), m_pComboBoxChannel->currentText(), m_pDoubleSpinBoxThreshold->value()*pow(10,m_pSpinBoxThresholdPrec->value()));
+    emit triggerInfoChanged(m_qMapTriggerColor, ui->m_checkBox_activateTriggerDetection->isChecked(), ui->m_comboBox_triggerChannels->currentText(), ui->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, ui->m_spinBox_detectionThresholdSecond->value()));
 }
 
 
@@ -829,17 +768,17 @@ void QuickControlWidget::realTimeTriggerColorChanged(bool state)
 {
     Q_UNUSED(state);
 
-    QColor color = QColorDialog::getColor(m_qMapTriggerColor[m_pComboBoxChannel->currentText()], this, "Set trigger color");
+    QColor color = QColorDialog::getColor(m_qMapTriggerColor[ui->m_comboBox_triggerChannels->currentText()], this, "Set trigger color");
 
     //Change color of pushbutton
     QPalette* palette1 = new QPalette();
     palette1->setColor(QPalette::Button,color);
-    m_pTriggerColorButton->setPalette(*palette1);
-    m_pTriggerColorButton->update();
+    ui->m_pushButton_triggerColor->setPalette(*palette1);
+    ui->m_pushButton_triggerColor->update();
 
-    m_qMapTriggerColor[m_pComboBoxChannel->currentText()] = color;
+    m_qMapTriggerColor[ui->m_comboBox_triggerChannels->currentText()] = color;
 
-    emit triggerInfoChanged(m_qMapTriggerColor, m_pTriggerDetectionCheckBox->isChecked(), m_pComboBoxChannel->currentText(), m_pDoubleSpinBoxThreshold->value()*pow(10,m_pSpinBoxThresholdPrec->value()));
+    emit triggerInfoChanged(m_qMapTriggerColor, ui->m_checkBox_activateTriggerDetection->isChecked(), ui->m_comboBox_triggerChannels->currentText(), ui->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, ui->m_spinBox_detectionThresholdSecond->value()));
 }
 
 
@@ -849,7 +788,7 @@ void QuickControlWidget::realTimeTriggerThresholdChanged(double value)
 {
     Q_UNUSED(value);
 
-    emit triggerInfoChanged(m_qMapTriggerColor, m_pTriggerDetectionCheckBox->isChecked(), m_pComboBoxChannel->currentText(), m_pDoubleSpinBoxThreshold->value()*pow(10,m_pSpinBoxThresholdPrec->value()));
+    emit triggerInfoChanged(m_qMapTriggerColor, ui->m_checkBox_activateTriggerDetection->isChecked(), ui->m_comboBox_triggerChannels->currentText(), ui->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, ui->m_spinBox_detectionThresholdSecond->value()));
 }
 
 
@@ -863,7 +802,7 @@ void QuickControlWidget::realTimeTriggerCurrentChChanged(const QString &value)
     m_pTriggerColorButton->setPalette(*palette1);
     m_pTriggerColorButton->update();
 
-    emit triggerInfoChanged(m_qMapTriggerColor, m_pTriggerDetectionCheckBox->isChecked(), m_pComboBoxChannel->currentText(), m_pDoubleSpinBoxThreshold->value()*pow(10,m_pSpinBoxThresholdPrec->value()));
+    emit triggerInfoChanged(m_qMapTriggerColor, ui->m_checkBox_activateTriggerDetection->isChecked(), ui->m_comboBox_triggerChannels->currentText(), ui->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, ui->m_spinBox_detectionThresholdSecond->value()));
 }
 
 

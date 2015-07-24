@@ -162,11 +162,35 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the currently loaded filters.
+    *
+    * @return returns the list with the currently loaded filters
+    */
+    FilterData getUserDesignedFilter();
+
+    //=========================================================================================================
+    /**
     * Returns the current activation checkBox list.
     *
     * @return returns the current activation checkBox list.
     */
     QList<QCheckBox*> getActivationCheckBoxList();
+
+    //=========================================================================================================
+    /**
+    * Sets the new samplingRate.
+    *
+    * @param[in] dSamplingRate the new sampling rate
+    */
+    void setFilterParameters(double hp, double lp, int order, int type, int designMethod, double transition, bool activateFilter);
+
+    //=========================================================================================================
+    /**
+    * Sets the new samplingRate.
+    *
+    * @return return true if user designed filter is active
+    */
+    bool userDesignedFiltersIsActive();
 
 private:
     //=========================================================================================================

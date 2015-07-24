@@ -95,6 +95,7 @@
 #include <QScroller>
 #include <QScrollBar>
 #include <QDebug>
+#include <QMetaType>
 
 
 //*************************************************************************************************************

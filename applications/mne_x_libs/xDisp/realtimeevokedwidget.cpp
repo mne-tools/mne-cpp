@@ -193,12 +193,14 @@ RealTimeEvokedWidget::~RealTimeEvokedWidget()
 
         QSettings settings;
 
+        //Store Modalities
         for(qint32 i = 0; i < m_qListModalities.size(); ++i)
         {
             settings.setValue(QString("RTEW/%1/%2/active").arg(t_sRTEWName).arg(m_qListModalities[i].m_sName), m_qListModalities[i].m_bActive);
             settings.setValue(QString("RTEW/%1/%2/norm").arg(t_sRTEWName).arg(m_qListModalities[i].m_sName), m_qListModalities[i].m_fNorm);
         }
 
+        //Store scaling
         if(m_qMapChScaling.contains(FIFF_UNIT_T))
             settings.setValue(QString("RTEW/%1/scaleMAG").arg(t_sRTEWName), m_qMapChScaling[FIFF_UNIT_T]);
 
@@ -619,7 +621,9 @@ void RealTimeEvokedWidget::onSelectionChanged()
         int channelNumber = chNames.indexOf(averageSceneItemTemp->m_sChannelName);
         if(channelNumber != -1) {
             averageSceneItemTemp->m_iChannelKind = m_pFiffInfo->chs.at(channelNumber).kind;
-            averageSceneItemTemp->m_iChannelUnit = m_pFiffInfo->chs.at(channelNumber).unit;;
+            averageSceneItemTemp->m_iChannelUnit = m_pFiffInfo->chs.at(channelNumber).unit;
+            averageSceneItemTemp->m_firstLastSample.first = (-1)*m_pRTE->getNumPreStimSamples();
+            averageSceneItemTemp->m_firstLastSample.second = averageData.second-m_pRTE->getNumPreStimSamples();
             averageSceneItemTemp->m_iChannelNumber = channelNumber;
             averageSceneItemTemp->m_iTotalNumberChannels = chNames.size();
             averageSceneItemTemp->m_lAverageData.append(averageData);
@@ -636,4 +640,12 @@ void RealTimeEvokedWidget::scaleAveragedData(const QMap<qint32, float> &scaleMap
 {
     //Set the scale map received from the scale window
     m_pAverageScene->setScaleMap(scaleMap);
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeEvokedWidget::wheelEvent(QWheelEvent * event)
+{
+    std::cout<<"mouseWheelEvent"<<std::endl;
 }
