@@ -457,7 +457,7 @@ void BabyMEG::toggleRecordingFile()
             }
             m_pBlinkingRecordButtonTimer->start(500);
 
-            if(m_pUpdateTimeInfoTimerTimer == 0) {
+            if(m_pUpdateTimeInfoTimer == 0) {
                 m_pUpdateTimeInfoTimer = QSharedPointer<QTimer>(new QTimer(this));
                 connect(m_pUpdateTimeInfoTimer.data(), &QTimer::timeout,
                         this, &BabyMEG::onRecordingElapsedTimeChange);
