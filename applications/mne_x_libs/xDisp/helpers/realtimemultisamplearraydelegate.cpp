@@ -307,7 +307,7 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 createTriggerPath(index, option, path, data);
 
                 painter->save();
-                painter->setPen(QPen(t_pModel->getTriggerColor(), 0.75, Qt::SolidLine));
+                painter->setPen(QPen(t_pModel->getTriggerColor(), 1.5, Qt::SolidLine));
                 painter->drawPath(path);
                 painter->restore();
 

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     covmodalitywidget.cpp
+* @file     sensorwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,94 +29,103 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the CovModalityWidget Class.
+* @brief    Declaration of the SensorWidget Class.
 *
 */
+
+#ifndef SENSORWIDGET_H
+#define SENSORWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "covmodalitywidget.h"
-#include "../realtimecovwidget.h"
+#include "sensormodel.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QLabel>
-#include <QGridLayout>
-#include <QStringList>
-
-#include <QDebug>
+#include <QWidget>
+#include <QGraphicsView>
+#include <QGraphicsScene>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE XDISPLIB
 //=============================================================================================================
 
-using namespace XDISPLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-CovModalityWidget::CovModalityWidget(RealTimeCovWidget *parent)
-: m_pRealTimeCovWidget(parent)
+namespace XDISPLIB
 {
-    this->setWindowTitle("Covariance Modality Settings");
-    this->setMinimumWidth(330);
-    this->setMaximumWidth(330);
-
-    QGridLayout* t_pGridLayout = new QGridLayout;
-
-    QStringList t_qListModalities;
-    t_qListModalities << "MEG" << "EEG";
 
 
-    qint32 count = 0;
-    foreach (const QString &mod, t_qListModalities) {
-
-        QLabel* t_pLabelModality = new QLabel;
-        t_pLabelModality->setText(mod);
-        t_pGridLayout->addWidget(t_pLabelModality, count,0,1,1);
-        m_qListModalities << mod;
-
-        QCheckBox* t_pCheckBoxModality = new QCheckBox;
-        if(m_pRealTimeCovWidget->m_qListPickTypes.contains(mod))
-            t_pCheckBoxModality->setChecked(true);
-
-        m_qListModalityCheckBox << t_pCheckBoxModality;
-
-        connect(t_pCheckBoxModality,&QCheckBox::stateChanged,this,&CovModalityWidget::updateSelection);
-
-        t_pGridLayout->addWidget(t_pCheckBoxModality,count,1,1,1);
-
-        ++count;
-    }
-
-    this->setLayout(t_pGridLayout);
-
-}
-
-
-//*************************************************************************************************************
-
-void CovModalityWidget::updateSelection(qint32 state)
+//=============================================================================================================
+/**
+* DECLARE CLASS SensorWidget
+*
+* @brief The SensorWidget class provides the sensor selection widget
+*/
+class SensorWidget : public QWidget
 {
-    Q_UNUSED(state)
+    Q_OBJECT
+public:
 
-    m_pRealTimeCovWidget->m_qListPickTypes.clear();
+    //=========================================================================================================
+    /**
+    * Constructs a SensorWidget which is a child of parent.
+    *
+    * @param [in] parent    parent of widget
+    * @param [in] f         widget flags
+    */
+    SensorWidget(QWidget *parent = 0, Qt::WindowFlags f = 0);
 
-    for(qint32 i = 0; i < m_qListModalityCheckBox.size(); ++i)
-        if(m_qListModalityCheckBox[i]->isChecked())
-            m_pRealTimeCovWidget->m_qListPickTypes << m_qListModalities[i];
+    //=========================================================================================================
+    /**
+    * Create the user interface
+    */
+    void createUI();
 
-    m_pRealTimeCovWidget->m_bInitialized = false;
-}
+    //=========================================================================================================
+    /**
+    * draw the channels
+    */
+    void drawChannels();
+
+    //=========================================================================================================
+    /**
+    * Sets the SensorModel to display
+    *
+    * @param [in] model     Model to set
+    */
+    void setModel(SensorModel *model);
+
+    //=========================================================================================================
+    /**
+    * Repaint the sensor widget with given parameters
+    *
+    * @param [in] topLeft       Index of upper left corner which has to be updated
+    * @param [in] bottomRight   Index of bottom right corner which has to be updated
+    * @param [in] roles         Role which has been updated
+    */
+    void contextUpdate(const QModelIndex & topLeft, const QModelIndex & bottomRight, const QVector<int> & roles = QVector<int> ());
+
+    //=========================================================================================================
+    /**
+    * Repaint the sensor widget
+    */
+    void contextUpdate();
+
+private:
+    SensorModel*    m_pSensorModel;     /**< Connected sensor model */
+    QGraphicsView*  m_pGraphicsView;    /**< View where channel items are displayed */
+    QGraphicsScene* m_pGraphicsScene;   /**< Scene holding the channel items */
+
+};
+
+} // NAMESPACE
+
+#endif // SENSORWIDGET_H

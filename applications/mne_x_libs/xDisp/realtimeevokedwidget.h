@@ -46,11 +46,9 @@
 #include "newmeasurementwidget.h"
 #include "helpers/realtimeevokedmodel.h"
 #include "helpers/realtimebutterflyplot.h"
-#include "helpers/evokedmodalitywidget.h"
 #include "helpers/selectionmanagerwindow.h"
 #include "helpers/chinfomodel.h"
 #include "helpers/quickcontrolwidget.h"
-#include "helpers/scalingwidget.h"
 #include "helpers/averagescene.h"
 #include "helpers/averagesceneitem.h"
 
@@ -133,9 +131,6 @@ class XDISPSHARED_EXPORT RealTimeEvokedWidget : public NewMeasurementWidget
 {
     Q_OBJECT
 
-    friend class EvokedModalityWidget;
-    friend class ScalingWidget;
-
 public:
     typedef QSharedPointer<RealTimeEvokedWidget> SPtr;              /**< Shared pointer type for RealTimeEvokedWidget. */
     typedef QSharedPointer<const RealTimeEvokedWidget> ConstSPtr;   /**< Const shared pointer type for RealTimeEvokedWidget. */
@@ -201,12 +196,6 @@ private:
 
     //=========================================================================================================
     /**
-    * Show the modality selection widget
-    */
-    void showModalitySelectionWidget();
-
-    //=========================================================================================================
-    /**
     * Only shows the channels defined in the QStringList selectedChannels
     *
     * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
@@ -226,12 +215,6 @@ private:
     * Broadcast settings to attached widgets
     */
     void broadcastSettings(QList<Modality> modalityList);
-
-    //=========================================================================================================
-    /**
-    * Show channel scaling widget
-    */
-    void showChScalingWidget();
 
     //=========================================================================================================
     /**
@@ -279,8 +262,6 @@ private:
     FiffInfo::SPtr  m_pFiffInfo;                /**< FiffInfo, which is used insteadd of ListChInfo*/
 
     QAction*        m_pActionSelectSensors;     /**< show roi select widget */
-    QAction*        m_pActionSelectModality;    /**< Modality selection action */
-    QAction*        m_pActionChScaling;         /**< Show channel scaling Action. */
     QAction*        m_pActionQuickControl;      /**< Show quick control widget. */
 
     QVBoxLayout*    m_pRteLayout;               /**< RTE Widget layout */
@@ -290,9 +271,7 @@ private:
 
     QSharedPointer<QuickControlWidget>          m_pQuickControlWidget;      /**< Quick control widget. */
     QSharedPointer<SelectionManagerWindow>      m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */
-    QSharedPointer<ScalingWidget>               m_pScalingWidget;           /**< Channel scaling widget. */
     QSharedPointer<ChInfoModel>                 m_pChInfoModel;             /**< Channel info model. */
-    QSharedPointer<EvokedModalityWidget>        m_pEvokedModalityWidget;    /**< Evoked modality widget. */
     QSharedPointer<RealTimeEvoked>              m_pRTE;                     /**< The real-time evoked measurement. */
 
     QList<Modality>                     m_qListModalities;
