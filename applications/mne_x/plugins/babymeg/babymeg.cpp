@@ -88,7 +88,7 @@ BabyMEG::BabyMEG()
 , m_pRawMatrixBuffer(0)
 , m_sFiffHeader(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/header.fif")
 , m_sBadChannels(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/both.bad")
-, m_recordTime(QTime(0,5,0,0))
+, m_iRecordingSeconds(5*60*1000)
 {
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup Project"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
@@ -122,6 +122,26 @@ BabyMEG::BabyMEG()
     connect(m_pActionUpdateFiffInfoForHPI, &QAction::triggered,
             this, &BabyMEG::SetFiffInfoForHPI);
     addPluginAction(m_pActionUpdateFiffInfoForHPI);
+
+    //Init timers
+    if(m_pRecordTimer == 0) {
+        m_pRecordTimer = QSharedPointer<QTimer>(new QTimer(this));
+        m_pRecordTimer->setSingleShot(true);
+        connect(m_pRecordTimer.data(), &QTimer::timeout,
+                this, &BabyMEG::toggleRecordingFile);
+    }
+
+    if(m_pBlinkingRecordButtonTimer == 0) {
+        m_pBlinkingRecordButtonTimer = QSharedPointer<QTimer>(new QTimer);
+        connect(m_pBlinkingRecordButtonTimer.data(), &QTimer::timeout,
+                this, &BabyMEG::changeRecordingButton);
+    }
+
+    if(m_pUpdateTimeInfoTimer == 0) {
+        m_pUpdateTimeInfoTimer = QSharedPointer<QTimer>(new QTimer(this));
+        connect(m_pUpdateTimeInfoTimer.data(), &QTimer::timeout,
+                this, &BabyMEG::onRecordingRemainingTimeChange);
+    }
 }
 
 
@@ -268,10 +288,10 @@ void BabyMEG::showProjectDialog()
         m_pBabyMEGProjectDialog = QSharedPointer<BabyMEGProjectDialog>(new BabyMEGProjectDialog(this));
 
     connect(m_pBabyMEGProjectDialog.data(), &BabyMEGProjectDialog::timerChanged,
-            this, &BabyMEG::recordingTimerChanged);
+            this, &BabyMEG::setRecordingTimerChanged);
 
     connect(m_pBabyMEGProjectDialog.data(), &BabyMEGProjectDialog::recordingTimerStateChanged,
-            this, &BabyMEG::recordingTimerStateChanged);
+            this, &BabyMEG::setRecordingTimerStateChanged);
 
     m_pBabyMEGProjectDialog->show();
 }
@@ -300,7 +320,6 @@ void BabyMEG::showSqdCtrlDialog()
 
 void BabyMEG::UpdateFiffInfo()
 {
-
     // read gain info and save them to the m_pFiffInfo.range
     myClientComm->SendCommandToBabyMEGShortConnection("INFG");
 
@@ -333,7 +352,6 @@ void BabyMEG::SetFiffInfoForHPI()
             HPIDlg->show();
             HPIDlg->raise();
         }
-
     }
 }
 
@@ -441,27 +459,11 @@ void BabyMEG::toggleRecordingFile()
         m_bWriteToFile = true;
 
         //Start timers for record button blinking, recording timer and updating the elapsed time in the proj widget
+        m_pBlinkingRecordButtonTimer->start(500);
+
         if(m_bUseRecordTimer) {
-            if(m_pRecordTimer == 0) {
-                m_pRecordTimer = QSharedPointer<QTimer>(new QTimer(this));
-                m_pRecordTimer->setSingleShot(true);
-                connect(m_pRecordTimer.data(), SIGNAL(timeout()),
-                        this, SLOT(toggleRecordingFile()));
-            }
-            m_pRecordTimer->start(QTime().msecsTo(m_recordTime));
-
-            if(m_pBlinkingRecordButtonTimer == 0) {
-                m_pBlinkingRecordButtonTimer = QSharedPointer<QTimer>(new QTimer);
-                connect(m_pBlinkingRecordButtonTimer.data(), &QTimer::timeout,
-                        this, &BabyMEG::changeRecordingButton);
-            }
-            m_pBlinkingRecordButtonTimer->start(500);
-
-            if(m_pUpdateTimeInfoTimer == 0) {
-                m_pUpdateTimeInfoTimer = QSharedPointer<QTimer>(new QTimer(this));
-                connect(m_pUpdateTimeInfoTimer.data(), &QTimer::timeout,
-                        this, &BabyMEG::onRecordingElapsedTimeChange);
-            }
+            std::cout<<"secs: "<<m_iRecordingSeconds<<std::endl;
+            m_pRecordTimer->start(m_iRecordingSeconds);
             m_pUpdateTimeInfoTimer->start(1000);
         }
     }
@@ -839,15 +841,15 @@ void BabyMEG::changeRecordingButton()
 
 //*************************************************************************************************************
 
-void BabyMEG::recordingTimerChanged(const QTime & time)
+void BabyMEG::setRecordingTimerChanged(int time)
 {
-    m_recordTime = time;
+    m_iRecordingSeconds = time;
 }
 
 
 //*************************************************************************************************************
 
-void BabyMEG::recordingTimerStateChanged(bool state)
+void BabyMEG::setRecordingTimerStateChanged(bool state)
 {
     m_bUseRecordTimer = state;
 }
@@ -855,8 +857,8 @@ void BabyMEG::recordingTimerStateChanged(bool state)
 
 //*************************************************************************************************************
 
-void BabyMEG::onRecordingElapsedTimeChange()
+void BabyMEG::onRecordingRemainingTimeChange()
 {
-    m_pBabyMEGProjectDialog->setRecordingElapsedTime(m_recordTime.elapsed());
+    m_pBabyMEGProjectDialog->setRecordingRemainingTime(m_pRecordTimer->remainingTime());
 }
 

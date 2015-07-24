@@ -179,6 +179,9 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
         //Store view
         settings.setValue(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), m_fZoomFactor);
         settings.setValue(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), m_iT);
+
+        //Store show/hide bad channel flag
+        settings.setValue(QString("RTMSAW/%1/showHideBad").arg(t_sRTMSAWName), m_bHideBadChannels);
     }
 }
 
@@ -187,6 +190,7 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
 
 void RealTimeMultiSampleArrayWidget::broadcastScaling(QMap<qint32,float> scaleMap)
 {
+    m_qMapChScaling = scaleMap;
     m_pRTMSAModel->setScaling(scaleMap);
 }
 
@@ -223,6 +227,7 @@ void RealTimeMultiSampleArrayWidget::init()
     if(m_qListChInfo.size() > 0)
     {
         QSettings settings;
+        QString t_sRTMSAWName = m_pRTMSA->getName();
 
         //Init the model
         if(m_pRTMSAModel)
@@ -269,6 +274,9 @@ void RealTimeMultiSampleArrayWidget::init()
 //        connect(m_pTableView->verticalScrollBar(), &QScrollBar::valueChanged,
 //                this, &RealTimeMultiSampleArrayWidget::visibleRowsChanged);
 
+        if(settings.value(QString("RTMSAW/%1/showHideBad").arg(t_sRTMSAWName), false).toBool())
+            hideBadChannels();
+
         //Init context menu
         m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -290,8 +298,6 @@ void RealTimeMultiSampleArrayWidget::init()
             if(!availabeChannelTypes.contains(type))
                 availabeChannelTypes.append(type);
         }
-
-        QString t_sRTMSAWName = m_pRTMSA->getName();
 
         if(!t_sRTMSAWName.isEmpty())
         {

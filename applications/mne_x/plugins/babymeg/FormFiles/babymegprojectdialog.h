@@ -33,10 +33,10 @@ public:
     explicit BabyMEGProjectDialog(BabyMEG* p_pBabyMEG, QWidget *parent = 0);
     ~BabyMEGProjectDialog();
 
-    void setRecordingElapsedTime(int secs);
+    void setRecordingRemainingTime(int msecs);
 
 signals:
-    void timerChanged(const QTime & time);
+    void timerChanged(int secs);
     void recordingTimerStateChanged(bool state);
 
 private:
@@ -56,7 +56,7 @@ private:
 
     void updateFileName();
 
-    void onTimeChanged(const QTime & time);
+    void onTimeChanged();
     void onRecordingTimerStateChanged(bool state);
 
     BabyMEG* m_pBabyMEG;

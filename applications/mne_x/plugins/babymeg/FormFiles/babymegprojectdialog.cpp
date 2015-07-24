@@ -102,7 +102,13 @@ BabyMEGProjectDialog::BabyMEGProjectDialog(BabyMEG* p_pBabyMEG, QWidget *parent)
     connect(ui->m_qPushButtonDeleteSubject,&QPushButton::clicked,
                 this,&BabyMEGProjectDialog::deleteSubject);
 
-    connect(ui->m_timeEdit_timerInfo,&QTimeEdit::timeChanged,
+    connect(ui->m_spinBox_hours, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+                this,&BabyMEGProjectDialog::onTimeChanged);
+
+    connect(ui->m_spinBox_min, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+                this,&BabyMEGProjectDialog::onTimeChanged);
+
+    connect(ui->m_spinBox_sec, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                 this,&BabyMEGProjectDialog::onTimeChanged);
 
     connect(ui->m_checkBox_useRecordingTimer,&QCheckBox::toggled,
@@ -128,12 +134,14 @@ BabyMEGProjectDialog::~BabyMEGProjectDialog()
 
 //*************************************************************************************************************
 
-void BabyMEGProjectDialog::setRecordingElapsedTime(int secs)
+void BabyMEGProjectDialog::setRecordingRemainingTime(int msecs)
 {
-    ui->m_label_timePassed->setText(QTime(0,0,secs,0).toString());
+    std::cout<<"BabyMEGProjectDialog msecs: "<<msecs<<std::endl;
+    QTime remainingTime(0,0,0,0);
 
-    int toGo = QTime().secsTo(ui->m_timeEdit_timerInfo->time()) - secs;
-    ui->m_label_timePassed->setText(QTime(0,0,toGo,0).toString());
+    QTime finalTime = remainingTime.addMSecs(msecs);
+
+    ui->m_label_timeToGo->setText(finalTime.toString());
 }
 
 
@@ -354,9 +362,11 @@ void BabyMEGProjectDialog::updateFileName()
 
 //*************************************************************************************************************
 
-void BabyMEGProjectDialog::onTimeChanged(const QTime & time)
+void BabyMEGProjectDialog::onTimeChanged()
 {
-    emit timerChanged(time);
+    int seconds = (ui->m_spinBox_hours->value()*60*60)+(ui->m_spinBox_min->value()*60)+(ui->m_spinBox_sec->value());
+
+    emit timerChanged(seconds*1000);
 }
 
 
