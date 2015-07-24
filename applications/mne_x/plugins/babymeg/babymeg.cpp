@@ -462,7 +462,6 @@ void BabyMEG::toggleRecordingFile()
         m_pBlinkingRecordButtonTimer->start(500);
 
         if(m_bUseRecordTimer) {
-            std::cout<<"secs: "<<m_iRecordingSeconds<<std::endl;
             m_pRecordTimer->start(m_iRecordingSeconds);
             m_pUpdateTimeInfoTimer->start(1000);
         }
