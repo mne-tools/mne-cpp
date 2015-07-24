@@ -799,8 +799,8 @@ void QuickControlWidget::realTimeTriggerCurrentChChanged(const QString &value)
     //Change color of pushbutton
     QPalette* palette1 = new QPalette();
     palette1->setColor(QPalette::Button,m_qMapTriggerColor[value]);
-    m_pTriggerColorButton->setPalette(*palette1);
-    m_pTriggerColorButton->update();
+    ui->m_pushButton_triggerColor->setPalette(*palette1);
+    ui->m_pushButton_triggerColor->update();
 
     emit triggerInfoChanged(m_qMapTriggerColor, ui->m_checkBox_activateTriggerDetection->isChecked(), ui->m_comboBox_triggerChannels->currentText(), ui->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, ui->m_spinBox_detectionThresholdSecond->value()));
 }

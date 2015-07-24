@@ -112,14 +112,6 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
 {
     Q_UNUSED(pTime)
 
-    m_pActionSelectModality = new QAction(QIcon(":/images/evokedSettings.png"), tr("Shows the modality selection widget (F12)"),this);
-    m_pActionSelectModality->setShortcut(tr("F12"));
-    m_pActionSelectModality->setStatusTip(tr("Show the modality selection widget (F12)"));
-    connect(m_pActionSelectModality, &QAction::triggered,
-            this, &RealTimeEvokedWidget::showModalitySelectionWidget);
-    addDisplayAction(m_pActionSelectModality);
-    m_pActionSelectModality->setVisible(false);
-
     m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Show the region selection widget (F11)"),this);
     m_pActionSelectSensors->setShortcut(tr("F11"));
     m_pActionSelectSensors->setStatusTip(tr("Show the region selection widget (F11)"));
@@ -127,14 +119,6 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
             this, &RealTimeEvokedWidget::showSensorSelectionWidget);
     addDisplayAction(m_pActionSelectSensors);
     m_pActionSelectSensors->setVisible(false);
-
-    m_pActionChScaling = new QAction(QIcon(":/images/channelScaling.png"), tr("Show the channel scaling widget (F10)"),this);
-    m_pActionChScaling->setShortcut(tr("F10"));
-    m_pActionChScaling->setStatusTip(tr("Show the channel scaling widget (F10)"));
-    connect(m_pActionChScaling, &QAction::triggered,
-            this, &RealTimeEvokedWidget::showChScalingWidget);
-    addDisplayAction(m_pActionChScaling);
-    m_pActionChScaling->setVisible(false);
 
     m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget (F9)"),this);
     m_pActionQuickControl->setShortcut(tr("F9"));
@@ -398,18 +382,6 @@ void RealTimeEvokedWidget::init()
             m_pRTEModel->setScaling(m_qMapChScaling);
         }
 
-        if(!m_pScalingWidget)
-        {
-            m_pScalingWidget = QSharedPointer<ScalingWidget>(new ScalingWidget(m_qMapChScaling, this));
-
-            //m_pScalingWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
-
-            connect(m_pScalingWidget.data(), &ScalingWidget::scalingChanged,
-                    this, &RealTimeEvokedWidget::broadcastScaling);
-        }
-
-        m_pActionChScaling->setVisible(false);
-
         //Quick control widget
         if(!m_pQuickControlWidget) {
             m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Averaging", 0, true, true, false, false, true));
@@ -445,19 +417,6 @@ void RealTimeEvokedWidget::init()
 
         m_pActionSelectSensors->setVisible(true);
 
-        //Set up modality widget
-        if(!m_pEvokedModalityWidget)
-        {
-            m_pEvokedModalityWidget = QSharedPointer<EvokedModalityWidget>(new EvokedModalityWidget(this, this));
-
-            m_pEvokedModalityWidget->setWindowTitle("Modality Selection");
-
-//            connect(m_pEvokedModalityWidget.data(), &EvokedModalityWidget::settingsChanged,
-//                    this, &RealTimeEvokedWidget::broadcastSettings);
-        }
-
-        m_pActionSelectModality->setVisible(false);
-
         //Init average scene
         m_pAverageScene = AverageScene::SPtr(new AverageScene(m_pAverageLayoutView, this));
         m_pAverageLayoutView->setScene(m_pAverageScene.data());
@@ -491,14 +450,6 @@ void RealTimeEvokedWidget::channelSelectionManagerChanged(const QList<QGraphicsI
     //fit everything in the view and update the scene
     m_pAverageLayoutView->fitInView(m_pAverageScene->sceneRect(), Qt::KeepAspectRatio);
     m_pAverageScene->update(m_pAverageScene->sceneRect());
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedWidget::showModalitySelectionWidget()
-{
-    m_pEvokedModalityWidget->show();
 }
 
 
@@ -564,19 +515,6 @@ void RealTimeEvokedWidget::broadcastSettings(QList<Modality> modalityList)
 {
     m_qListModalities = modalityList;
     m_pButterflyPlot->setSettings(modalityList);
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedWidget::showChScalingWidget()
-{
-    if(m_pScalingWidget->isActiveWindow())
-        m_pScalingWidget->hide();
-    else {
-        m_pScalingWidget->activateWindow();
-        m_pScalingWidget->show();
-    }
 }
 
 

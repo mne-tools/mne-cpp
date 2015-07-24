@@ -102,11 +102,6 @@ SOURCES += \
     realtimesamplearraywidget.cpp \
     helpers/realtimemultisamplearraymodel.cpp \
     helpers/realtimemultisamplearraydelegate.cpp \
-#    helpers/sensorgroup.cpp \
-#    helpers/sensoritem.cpp \
-#    helpers/sensorlayout.cpp \
-#    helpers/sensormodel.cpp \
-#    helpers/sensorwidget.cpp \
     helpers/realtimeevokedmodel.cpp \
     realtimeevokedwidget.cpp \
     helpers/realtimebutterflyplot.cpp \
@@ -115,10 +110,7 @@ SOURCES += \
     frequencyspectrumwidget.cpp \
     helpers/frequencyspectrummodel.cpp \
     helpers/frequencyspectrumdelegate.cpp \
-    helpers/evokedmodalitywidget.cpp \
     helpers/frequencyspectrumsettingswidget.cpp \
-    helpers/scalingwidget.cpp \
-    helpers/projectorwidget.cpp \
     helpers/selectionmanagerwindow.cpp \
     helpers/selectionscene.cpp \
     helpers/selectionsceneitem.cpp \
@@ -135,11 +127,6 @@ HEADERS += \
     realtimesamplearraywidget.h \
     helpers/realtimemultisamplearraymodel.h \
     helpers/realtimemultisamplearraydelegate.h \
-#    helpers/sensorgroup.h \
-#    helpers/sensoritem.h \
-#    helpers/sensorlayout.h \
-#    helpers/sensormodel.h \
-#    helpers/sensorwidget.h \
     helpers/realtimeevokedmodel.h \
     realtimeevokedwidget.h \
     helpers/realtimebutterflyplot.h \
@@ -148,10 +135,7 @@ HEADERS += \
     frequencyspectrumwidget.h \
     helpers/frequencyspectrumdelegate.h \
     helpers/frequencyspectrummodel.h \
-    helpers/evokedmodalitywidget.h \
     helpers/frequencyspectrumsettingswidget.h \
-    helpers/scalingwidget.h \
-    helpers/projectorwidget.h \
     helpers/selectionmanagerwindow.h \
     helpers/selectionscene.h \
     helpers/selectionsceneitem.h \

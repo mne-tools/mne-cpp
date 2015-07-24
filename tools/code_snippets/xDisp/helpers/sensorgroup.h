@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     covmodalitywidget.cpp
+* @file     sensorgroup.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,94 +29,96 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the CovModalityWidget Class.
+* @brief    Declaration of the SensorGroup Class.
 *
 */
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "covmodalitywidget.h"
-#include "../realtimecovwidget.h"
-
+#ifndef SENSORGROUP_H
+#define SENSORGROUP_H
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QLabel>
-#include <QGridLayout>
+#include <QtXml/QDomElement>
 #include <QStringList>
 
-#include <QDebug>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE XDISPLIB
 //=============================================================================================================
 
-using namespace XDISPLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-CovModalityWidget::CovModalityWidget(RealTimeCovWidget *parent)
-: m_pRealTimeCovWidget(parent)
+namespace XDISPLIB
 {
-    this->setWindowTitle("Covariance Modality Settings");
-    this->setMinimumWidth(330);
-    this->setMaximumWidth(330);
-
-    QGridLayout* t_pGridLayout = new QGridLayout;
-
-    QStringList t_qListModalities;
-    t_qListModalities << "MEG" << "EEG";
 
 
-    qint32 count = 0;
-    foreach (const QString &mod, t_qListModalities) {
+//=============================================================================================================
+/**
+* DECLARE CLASS SensorGroup
+*
+* @brief The SensorGroup class represents a sensor selection group
+*/
+class SensorGroup
+{
+public:
+    //=========================================================================================================
+    /**
+    * Default constructor
+    */
+    SensorGroup();
 
-        QLabel* t_pLabelModality = new QLabel;
-        t_pLabelModality->setText(mod);
-        t_pGridLayout->addWidget(t_pLabelModality, count,0,1,1);
-        m_qListModalities << mod;
+    //=========================================================================================================
+    /**
+    * Returns the parsed sensor group
+    *
+    * @param [in] sensorGroupElement    the xml element which contains the sensor group
+    *
+    * @return the parsed sensor group
+    */
+    static SensorGroup parseSensorGroup(const QDomElement &sensorGroupElement);
 
-        QCheckBox* t_pCheckBoxModality = new QCheckBox;
-        if(m_pRealTimeCovWidget->m_qListPickTypes.contains(mod))
-            t_pCheckBoxModality->setChecked(true);
+    //=========================================================================================================
+    /**
+    * Returns the group name
+    *
+    * @return the group name
+    */
+    inline const QString& getGroupName() const;
 
-        m_qListModalityCheckBox << t_pCheckBoxModality;
+    //=========================================================================================================
+    /**
+    * Returns the channels of the group
+    *
+    * @return the channels belonging to the current group
+    */
+    inline const QStringList& getChannelNames() const;
 
-        connect(t_pCheckBoxModality,&QCheckBox::stateChanged,this,&CovModalityWidget::updateSelection);
+private:
+    QString m_sGroupName;           /**< group name */
+    QStringList m_qListChannels;    /**< group channel name list */
+};
 
-        t_pGridLayout->addWidget(t_pCheckBoxModality,count,1,1,1);
 
-        ++count;
-    }
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
 
-    this->setLayout(t_pGridLayout);
-
+inline const QString& SensorGroup::getGroupName() const
+{
+    return m_sGroupName;
 }
 
 
 //*************************************************************************************************************
 
-void CovModalityWidget::updateSelection(qint32 state)
+inline const QStringList& SensorGroup::getChannelNames() const
 {
-    Q_UNUSED(state)
-
-    m_pRealTimeCovWidget->m_qListPickTypes.clear();
-
-    for(qint32 i = 0; i < m_qListModalityCheckBox.size(); ++i)
-        if(m_qListModalityCheckBox[i]->isChecked())
-            m_pRealTimeCovWidget->m_qListPickTypes << m_qListModalities[i];
-
-    m_pRealTimeCovWidget->m_bInitialized = false;
+    return m_qListChannels;
 }
+
+} // NAMESPACE
+
+#endif // SENSORGROUP_H

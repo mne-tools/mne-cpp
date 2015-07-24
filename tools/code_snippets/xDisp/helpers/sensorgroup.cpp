@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     covmodalitywidget.cpp
+* @file     sensorgroup.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the CovModalityWidget Class.
+* @brief    Implementation of the SensorGroup Class.
 *
 */
 
@@ -38,18 +38,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "covmodalitywidget.h"
-#include "../realtimecovwidget.h"
+#include "sensorgroup.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
-
-#include <QLabel>
-#include <QGridLayout>
-#include <QStringList>
 
 #include <QDebug>
 
@@ -67,56 +62,23 @@ using namespace XDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CovModalityWidget::CovModalityWidget(RealTimeCovWidget *parent)
-: m_pRealTimeCovWidget(parent)
+SensorGroup::SensorGroup()
 {
-    this->setWindowTitle("Covariance Modality Settings");
-    this->setMinimumWidth(330);
-    this->setMaximumWidth(330);
-
-    QGridLayout* t_pGridLayout = new QGridLayout;
-
-    QStringList t_qListModalities;
-    t_qListModalities << "MEG" << "EEG";
-
-
-    qint32 count = 0;
-    foreach (const QString &mod, t_qListModalities) {
-
-        QLabel* t_pLabelModality = new QLabel;
-        t_pLabelModality->setText(mod);
-        t_pGridLayout->addWidget(t_pLabelModality, count,0,1,1);
-        m_qListModalities << mod;
-
-        QCheckBox* t_pCheckBoxModality = new QCheckBox;
-        if(m_pRealTimeCovWidget->m_qListPickTypes.contains(mod))
-            t_pCheckBoxModality->setChecked(true);
-
-        m_qListModalityCheckBox << t_pCheckBoxModality;
-
-        connect(t_pCheckBoxModality,&QCheckBox::stateChanged,this,&CovModalityWidget::updateSelection);
-
-        t_pGridLayout->addWidget(t_pCheckBoxModality,count,1,1,1);
-
-        ++count;
-    }
-
-    this->setLayout(t_pGridLayout);
-
 }
 
 
 //*************************************************************************************************************
 
-void CovModalityWidget::updateSelection(qint32 state)
+SensorGroup SensorGroup::parseSensorGroup(const QDomElement &sensorGroupElement)
 {
-    Q_UNUSED(state)
+    SensorGroup group;
 
-    m_pRealTimeCovWidget->m_qListPickTypes.clear();
+    group.m_sGroupName = sensorGroupElement.attribute("GroupName", "");
+    qint32 t_iNumChannels = sensorGroupElement.attribute("NumChannels", "").toInt();
+    group.m_qListChannels = sensorGroupElement.text().split(":");
 
-    for(qint32 i = 0; i < m_qListModalityCheckBox.size(); ++i)
-        if(m_qListModalityCheckBox[i]->isChecked())
-            m_pRealTimeCovWidget->m_qListPickTypes << m_qListModalities[i];
+    if(t_iNumChannels != group.m_qListChannels.size())
+        qWarning() << "Warning: Number of group channels do not match!";
 
-    m_pRealTimeCovWidget->m_bInitialized = false;
+    return group;
 }

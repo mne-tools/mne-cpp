@@ -349,7 +349,6 @@ private:
 
     QString             m_sName;                        /**< Name of the widget which uses this quick control. */
     QCheckBox *         m_enableDisableProjectors;      /**< Holds the enable disable all check box. */
-    QPushButton*        m_pTriggerColorButton;          /**< Holds the trigger color button. */
     QPushButton*        m_pShowFilterOptions;           /**< Holds the show filter options button. */
     QGroupBox*          m_pModalityGroupBox;            /**< Holds the modality group box. */
 
