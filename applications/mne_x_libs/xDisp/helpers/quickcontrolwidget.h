@@ -134,9 +134,20 @@ public:
 
     //=========================================================================================================
     /**
-    * Call this whenever the current fitlers have changed.
+    * Call this whenever the current filters have changed.
+    *
+    * @param [in] list    list of QCheckBoxes which are to be added to the filter group
     */
     void filterGroupChanged(QList<QCheckBox*> list);
+
+    //=========================================================================================================
+    /**
+    * Sets the values of the zoomFactor and windowSize spin boxes
+    *
+    * @param [in] zoomFactor    new zoomFactor value
+    * @param [in] windowSize    new window size value
+    */
+    void setViewParameters(double zoomFactor, int windowSize);
 
 signals:
     //=========================================================================================================
@@ -337,13 +348,9 @@ private:
     FiffInfo::SPtr      m_pFiffInfo;                    /**< Connected fiff info. */
 
     QString             m_sName;                        /**< Name of the widget which uses this quick control. */
-    QCheckBox*          m_pTriggerDetectionCheckBox;    /**< Holds the enable disable trigger detection check box. */
     QCheckBox *         m_enableDisableProjectors;      /**< Holds the enable disable all check box. */
     QPushButton*        m_pTriggerColorButton;          /**< Holds the trigger color button. */
     QPushButton*        m_pShowFilterOptions;           /**< Holds the show filter options button. */
-    QComboBox*          m_pComboBoxChannel;             /**< Holds the available trigger channels. */
-    QDoubleSpinBox*     m_pDoubleSpinBoxThreshold;      /**< Holds the trigger channel threshold. */
-    QSpinBox*           m_pSpinBoxThresholdPrec;        /**< Holds the trigger channel threshold precision. */
     QGroupBox*          m_pModalityGroupBox;            /**< Holds the modality group box. */
 
     Ui::QuickControlWidget *ui;                         /**< The generated UI file */

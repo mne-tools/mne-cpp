@@ -263,6 +263,12 @@ private:
     */
     void onSelectionChanged();
 
+    //=========================================================================================================
+    /**
+    * Reimplemented mouseWheelEvent
+    */
+    virtual void wheelEvent(QWheelEvent * event);
+
     RealTimeEvokedModel::SPtr       m_pRTEModel;                /**< RTE data model */
     RealTimeButterflyPlot::SPtr     m_pButterflyPlot;           /**< Butterfly plot */
     AverageScene::SPtr              m_pAverageScene;            /**< The pointer to the average scene. */

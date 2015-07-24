@@ -187,6 +187,7 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
 
         QSettings settings;
 
+        //Store scaling
         if(m_qMapChScaling.contains(FIFF_UNIT_T))
             settings.setValue(QString("RTMSAW/%1/scaleMAG").arg(t_sRTMSAWName), m_qMapChScaling[FIFF_UNIT_T]);
 
@@ -204,6 +205,21 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
 
         if(m_qMapChScaling.contains(FIFFV_MISC_CH))
             settings.setValue(QString("RTMSAW/%1/scaleMISC").arg(t_sRTMSAWName), m_qMapChScaling[FIFFV_MISC_CH]);
+
+        //Store filter
+        FilterData filter = m_pFilterWindow->getUserDesignedFilter();
+
+        settings.setValue(QString("RTMSAW/%1/filterHP").arg(t_sRTMSAWName), filter.m_dHighpassFreq);
+        settings.setValue(QString("RTMSAW/%1/filterLP").arg(t_sRTMSAWName), filter.m_dLowpassFreq);
+        settings.setValue(QString("RTMSAW/%1/filterOrder").arg(t_sRTMSAWName), filter.m_iFilterOrder);
+        settings.setValue(QString("RTMSAW/%1/filterType").arg(t_sRTMSAWName), (int)filter.m_Type);
+        settings.setValue(QString("RTMSAW/%1/filterDesignMethod").arg(t_sRTMSAWName), (int)filter.m_designMethod);
+        settings.setValue(QString("RTMSAW/%1/filterTransition").arg(t_sRTMSAWName), filter.m_dParksWidth*(filter.m_sFreq/2));        
+        settings.setValue(QString("RTMSAW/%1/filterUserDesignActive").arg(t_sRTMSAWName), m_pFilterWindow->userDesignedFiltersIsActive());
+
+        //Store view
+        settings.setValue(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), m_fZoomFactor);
+        settings.setValue(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), m_iT);
     }
 }
 
@@ -247,6 +263,8 @@ void RealTimeMultiSampleArrayWidget::init()
 {
     if(m_qListChInfo.size() > 0)
     {
+        QSettings settings;
+
         //Init the model
         if(m_pRTMSAModel)
             delete m_pRTMSAModel;
@@ -318,7 +336,6 @@ void RealTimeMultiSampleArrayWidget::init()
         {
             m_qMapChScaling.clear();
 
-            QSettings settings;
             float val = 0.0f;
             if(availabeChannelTypes.contains(FIFF_UNIT_T)) {
                 val = settings.value(QString("RTMSAW/%1/scaleMAG").arg(t_sRTMSAWName), 1e-11f).toFloat();
@@ -406,6 +423,16 @@ void RealTimeMultiSampleArrayWidget::init()
 
             //Init downsampled sampling frequency
             emit samplingRateChanged(m_fSamplingRate);
+
+            //Set stored filter settings from last session
+            QSettings settings;
+            m_pFilterWindow->setFilterParameters(settings.value(QString("RTMSAW/%1/filterHP").arg(t_sRTMSAWName), 5.0).toDouble(),
+                                                    settings.value(QString("RTMSAW/%1/filterLP").arg(t_sRTMSAWName), 40.0).toDouble(),
+                                                    settings.value(QString("RTMSAW/%1/filterOrder").arg(t_sRTMSAWName), 128).toInt(),
+                                                    settings.value(QString("RTMSAW/%1/filterType").arg(t_sRTMSAWName), 2).toInt(),
+                                                    settings.value(QString("RTMSAW/%1/filterDesignMethod").arg(t_sRTMSAWName), 0).toInt(),
+                                                    settings.value(QString("RTMSAW/%1/filterTransition").arg(t_sRTMSAWName), 5.0).toDouble(),
+                                                    settings.value(QString("RTMSAW/%1/filterUserDesignActive").arg(t_sRTMSAWName), false).toBool());
         }
 
         if(!m_pSelectionManagerWindow) {
@@ -457,6 +484,9 @@ void RealTimeMultiSampleArrayWidget::init()
                     this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::triggerInfoChanged);
 
             m_pQuickControlWidget->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
+
+            m_pQuickControlWidget->setViewParameters(settings.value(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), 1.0).toFloat(),
+                                                     settings.value(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), 10).toInt());
         }
 
         m_bInitialized = true;
