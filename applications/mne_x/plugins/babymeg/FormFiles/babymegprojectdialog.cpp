@@ -136,7 +136,6 @@ BabyMEGProjectDialog::~BabyMEGProjectDialog()
 
 void BabyMEGProjectDialog::setRecordingRemainingTime(int msecs)
 {
-    std::cout<<"BabyMEGProjectDialog msecs: "<<msecs<<std::endl;
     QTime remainingTime(0,0,0,0);
 
     QTime finalTime = remainingTime.addMSecs(msecs);

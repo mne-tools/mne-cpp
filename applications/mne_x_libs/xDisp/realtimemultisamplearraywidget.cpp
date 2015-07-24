@@ -435,6 +435,9 @@ void RealTimeMultiSampleArrayWidget::init()
 
             m_pQuickControlWidget->setViewParameters(settings.value(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), 1.0).toFloat(),
                                                      settings.value(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), 10).toInt());
+
+            //Activate projections as default
+            m_pRTMSAModel->updateProjection();
         }
 
         m_bInitialized = true;
