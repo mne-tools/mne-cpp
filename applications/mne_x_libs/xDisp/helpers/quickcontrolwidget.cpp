@@ -68,6 +68,7 @@ QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const
 {
     ui->setupUi(this);
 
+    //Init and connect hide all group (minimize) button
     ui->m_pushButton_hideAll->setText(ui->m_pushButton_hideAll->text().append(QString(" - %1").arg(m_sName)));
     connect(ui->m_pushButton_hideAll, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             this, &QuickControlWidget::toggleHideAll);
@@ -105,10 +106,6 @@ QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const
     ui->m_groupBox_filter->hide();
 
     this->adjustSize();
-
-    this->setWindowTitle("Quick Control");
-
-    //this->setStyleSheet("background-color: rgba(43, 125, 225, 150);");
 }
 
 
