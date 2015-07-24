@@ -132,7 +132,7 @@ BabyMEG::BabyMEG()
     }
 
     if(m_pBlinkingRecordButtonTimer == 0) {
-        m_pBlinkingRecordButtonTimer = QSharedPointer<QTimer>(new QTimer);
+        m_pBlinkingRecordButtonTimer = QSharedPointer<QTimer>(new QTimer(this));
         connect(m_pBlinkingRecordButtonTimer.data(), &QTimer::timeout,
                 this, &BabyMEG::changeRecordingButton);
     }
