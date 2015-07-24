@@ -282,6 +282,7 @@ signals:
     */
     void SendCMDDataToSQUIDControl(QByteArray DATA);
 
+    double sfreq;
 
 protected:
     virtual void run();
@@ -299,9 +300,6 @@ private:
 
     void recordingTimerStateChanged(bool state);
 
-    QSharedPointer<QTimer> m_pBlinkingRecordButtonTimer;
-    qint16 m_iBlinkStatus;
-
     //=========================================================================================================
     /**
     * Initialises the output connector.
@@ -310,55 +308,49 @@ private:
 
     PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;   /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
 
-    QMutex mutex;
-
     QSharedPointer<BabyMEGClient>           myClient;
     QSharedPointer<BabyMEGClient>           myClientComm;
     QSharedPointer<BabyMEGInfo>             pInfo;
     QSharedPointer<BabyMEGProjectDialog>    m_pBabyMEGProjectDialog;
-    bool DataStartFlag;
+    QSharedPointer<BabyMEGSQUIDControlDgl>  SQUIDCtrlDlg; // added by Dr. Limin Sun for nonmodal dialog
+    QSharedPointer<babymeghpidgl>           HPIDlg; // HPI dialog information
 
-    QSharedPointer<BabyMEGSQUIDControlDgl> SQUIDCtrlDlg; // added by Dr. Limin Sun for nonmodal dialog
-    QSharedPointer<babymeghpidgl> HPIDlg; // HPI dialog information
+    QSharedPointer<QTimer>          m_pUpdateTimeInfoTimer;
+    QSharedPointer<QTimer>          m_pBlinkingRecordButtonTimer;
+    QSharedPointer<QTimer>          m_pRecordTimer;                 /**< timer to control recording time */
+
+    QSharedPointer<RawMatrixBuffer> m_pRawMatrixBuffer;             /**< Holds incoming raw data. */
 
     FiffInfo::SPtr  m_pFiffInfo;            /**< Fiff measurement info.*/
-    qint32          m_iBufferSize;          /**< The raw data buffer size.*/
-
-    bool            m_bWriteToFile;         /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
-    bool            m_bUseRecordTimer;
-
-    QString             m_sBabyMEGDataPath; /**< The data storage path.*/
-    QString             m_sCurrentProject;  /**< The current project which is part of the filename to be recorded.*/
-    QString             m_sCurrentSubject;  /**< The current subject which is part of the filename to be recorded.*/
-    QString             m_sCurrentParadigm; /**< The current paradigm which is part of the filename to be recorded.*/
-    QString             m_sRecordFile;      /**< Current record file. */
-    qint32              m_iSplitCount;      /**< File split count */
-    QFile               m_qFileOut;         /**< QFile for writing to fif file.*/
     FiffStream::SPtr    m_pOutfid;          /**< FiffStream to write to.*/
 
+    qint16 m_iBlinkStatus;
+    qint32      m_iBufferSize;          /**< The raw data buffer size.*/
+    qint32      m_iSplitCount;          /**< File split count */
+    bool        DataStartFlag;
+    bool        m_bWriteToFile;         /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
+    bool        m_bUseRecordTimer;
+    bool        m_bIsRunning;
+    QString     m_sBabyMEGDataPath;     /**< The data storage path.*/
+    QString     m_sCurrentProject;      /**< The current project which is part of the filename to be recorded.*/
+    QString     m_sCurrentSubject;      /**< The current subject which is part of the filename to be recorded.*/
+    QString     m_sCurrentParadigm;     /**< The current paradigm which is part of the filename to be recorded.*/
+    QString     m_sRecordFile;          /**< Current record file. */
+    QString     m_sFiffHeader;          /**< Fiff header information */
+    QString     m_sBadChannels;         /**< Filename which contains a list of bad channels */
+
+    QFile               m_qFileOut;         /**< QFile for writing to fif file.*/
+    QMutex              mutex;
     QTime               m_recordTime;
 
-    QSharedPointer<QTimer>  m_pUpdateTimeInfoTimer;
-
-    QString                 m_sFiffHeader;  /**< Fiff header information */
-    QString                 m_sBadChannels; /**< Filename which contains a list of bad channels */
     RowVectorXd             m_cals;
     SparseMatrix<double>    m_sparseMatCals;
 
-    bool    m_bIsRunning;
-
-    QSharedPointer<RawMatrixBuffer> m_pRawMatrixBuffer;  /**< Holds incoming raw data. */
-
-    QSharedPointer<QTimer>          m_pRecordTimer;                 /**< timer to control recording time */
-    QAction*                        m_pActionSetupProject;          /**< shows setup project dialog */
-    QAction*                        m_pActionRecordFile;            /**< start recording action */
-    QAction*                        m_pActionSqdCtrl;               /**< show squid control */
-    QAction*                        m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
-    QAction*                        m_pActionUpdateFiffInfoForHPI;  /**< Update HPI info into Fiff Info action */
-
-public:
-    double sfreq;
-
+    QAction*                m_pActionSetupProject;          /**< shows setup project dialog */
+    QAction*                m_pActionRecordFile;            /**< start recording action */
+    QAction*                m_pActionSqdCtrl;               /**< show squid control */
+    QAction*                m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
+    QAction*                m_pActionUpdateFiffInfoForHPI;  /**< Update HPI info into Fiff Info action *
 };
 
 
