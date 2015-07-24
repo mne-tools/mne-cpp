@@ -84,47 +84,43 @@ BabyMEG::BabyMEG()
 , m_bWriteToFile(false)
 , m_sCurrentParadigm("")
 , m_bIsRunning(false)
+, m_bUseRecordTimer(false)
 , m_pRawMatrixBuffer(0)
 , m_sFiffHeader(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/header.fif")
 , m_sBadChannels(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/both.bad")
+, m_recordTime(QTime(0,5,0,0))
 {
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup Project"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
     m_pActionSetupProject->setStatusTip(tr("Setup Project"));
-    connect(m_pActionSetupProject, &QAction::triggered, this, &BabyMEG::showProjectDialog);
+    connect(m_pActionSetupProject, &QAction::triggered,
+            this, &BabyMEG::showProjectDialog);
     addPluginAction(m_pActionSetupProject);    
 
     m_pActionRecordFile = new QAction(QIcon(":/images/record.png"), tr("Start Recording"),this);
     m_pActionRecordFile->setStatusTip(tr("Start Recording"));
-    connect(m_pActionRecordFile, &QAction::triggered, this, &BabyMEG::toggleRecordingFile);
+    connect(m_pActionRecordFile, &QAction::triggered,
+            this, &BabyMEG::toggleRecordingFile);
     addPluginAction(m_pActionRecordFile);
     //m_pActionRecordFile->setEnabled(false);
-
-    m_pDoubleSpinBoxRecordTime = new QDoubleSpinBox();
-    m_pDoubleSpinBoxRecordTime->setMinimum(1);
-    m_pDoubleSpinBoxRecordTime->setMaximum(100000);
-    m_pDoubleSpinBoxRecordTime->setValue(5);
-    m_pDoubleSpinBoxRecordTime->setSuffix(" min");
-    m_pDoubleSpinBoxRecordTime->setToolTip(tr("Set recording time"));
-    m_pDoubleSpinBoxRecordTime->setStatusTip(tr("Recording time"));
-//    connect(m_pDoubleSpinBoxRecordTime, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-//            this, &RealTimeMultiSampleArrayWidget::timeWindowChanged);
-    //addDisplayWidget(m_pDoubleSpinBoxRecordTime);
 
     m_pActionSqdCtrl = new QAction(QIcon(":/images/sqdctrl.png"), tr("Squid Control"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
     m_pActionSqdCtrl->setStatusTip(tr("Squid Control"));
-    connect(m_pActionSqdCtrl, &QAction::triggered, this, &BabyMEG::showSqdCtrlDialog);
+    connect(m_pActionSqdCtrl, &QAction::triggered,
+            this, &BabyMEG::showSqdCtrlDialog);
     addPluginAction(m_pActionSqdCtrl);
 
     m_pActionUpdateFiffInfo = new QAction(QIcon(":/images/latestFiffInfo.png"), tr("Update Fiff Info"),this);
     m_pActionUpdateFiffInfo->setStatusTip(tr("Update Fiff Info"));
-    connect(m_pActionUpdateFiffInfo, &QAction::triggered, this, &BabyMEG::UpdateFiffInfo);
+    connect(m_pActionUpdateFiffInfo, &QAction::triggered,
+            this, &BabyMEG::UpdateFiffInfo);
     addPluginAction(m_pActionUpdateFiffInfo);
 
     m_pActionUpdateFiffInfoForHPI = new QAction(QIcon(":/images/latestFiffInfoHPI.png"), tr("Update HPI to Fiff Info"),this);
     m_pActionUpdateFiffInfoForHPI->setStatusTip(tr("Update HPI to Fiff Info"));
-    connect(m_pActionUpdateFiffInfoForHPI, &QAction::triggered, this, &BabyMEG::SetFiffInfoForHPI);
+    connect(m_pActionUpdateFiffInfoForHPI, &QAction::triggered,
+            this, &BabyMEG::SetFiffInfoForHPI);
     addPluginAction(m_pActionUpdateFiffInfoForHPI);
 }
 
@@ -268,8 +264,16 @@ void BabyMEG::clear()
 
 void BabyMEG::showProjectDialog()
 {
-    BabyMEGProjectDialog projectDialog(this);
-    projectDialog.exec();
+    if(m_pBabyMEGProjectDialog == 0)
+        m_pBabyMEGProjectDialog = QSharedPointer<BabyMEGProjectDialog>(new BabyMEGProjectDialog(this));
+
+    connect(m_pBabyMEGProjectDialog.data(), &BabyMEGProjectDialog::timerChanged,
+            this, &BabyMEG::recordingTimerChanged);
+
+    connect(m_pBabyMEGProjectDialog.data(), &BabyMEGProjectDialog::recordingTimerStateChanged,
+            this, &BabyMEG::recordingTimerStateChanged);
+
+    m_pBabyMEGProjectDialog->show();
 }
 
 
@@ -291,6 +295,7 @@ void BabyMEG::showSqdCtrlDialog()
     }
 }
 
+
 //*************************************************************************************************************
 
 void BabyMEG::UpdateFiffInfo()
@@ -304,6 +309,7 @@ void BabyMEG::UpdateFiffInfo()
     //m_pActionRecordFile->setEnabled(true);
 
 }
+
 
 //*************************************************************************************************************
 
@@ -331,12 +337,16 @@ void BabyMEG::SetFiffInfoForHPI()
     }
 }
 
+
+//*************************************************************************************************************
+
 void BabyMEG::RecvHPIFiffInfo(FiffInfo info)
 {
     // show the HPI info
     qDebug()<<"saved HPI" << m_pFiffInfo->dig.at(0).r[0];
     qDebug()<<"HPI"<< info.dig.at(0).kind << info.dig.at(0).r[0];
 }
+
 
 //*************************************************************************************************************
 
@@ -375,10 +385,6 @@ void BabyMEG::splitRecordingFile()
 
 void BabyMEG::toggleRecordingFile()
 {
-    m_pRecordTimer = new QTimer(this);
-    connect(m_pRecordTimer, SIGNAL(timeout()), this, SLOT(toggleRecordingFile()));
-    m_pRecordTimer->start(m_pDoubleSpinBoxRecordTime->value()*60);
-
     //Setup writing to file
     if(m_bWriteToFile)
     {
@@ -387,9 +393,14 @@ void BabyMEG::toggleRecordingFile()
         mutex.unlock();
 
         m_bWriteToFile = false;
-        m_pTimerRecordingChange->stop();
-        m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
         m_iSplitCount = 0;
+
+        //Stop record timer
+        m_pRecordTimer->stop();
+        m_pUpdateTimeInfoTimer->stop();
+        m_pBlinkingRecordButtonTimer->stop();
+
+        m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
     }
     else
     {
@@ -429,9 +440,30 @@ void BabyMEG::toggleRecordingFile()
 
         m_bWriteToFile = true;
 
-        m_pTimerRecordingChange = QSharedPointer<QTimer>(new QTimer);
-        connect(m_pTimerRecordingChange.data(), &QTimer::timeout, this, &BabyMEG::changeRecordingButton);
-        m_pTimerRecordingChange->start(500);
+        //Start timers for record button blinking, recording timer and updating the elapsed time in the proj widget
+        if(m_bUseRecordTimer) {
+            if(m_pRecordTimer == 0) {
+                m_pRecordTimer = QSharedPointer<QTimer>(new QTimer(this));
+                m_pRecordTimer->setSingleShot(true);
+                connect(m_pRecordTimer.data(), SIGNAL(timeout()),
+                        this, SLOT(toggleRecordingFile()));
+            }
+            m_pRecordTimer->start(QTime().msecsTo(m_recordTime));
+
+            if(m_pBlinkingRecordButtonTimer == 0) {
+                m_pBlinkingRecordButtonTimer = QSharedPointer<QTimer>(new QTimer);
+                connect(m_pBlinkingRecordButtonTimer.data(), &QTimer::timeout,
+                        this, &BabyMEG::changeRecordingButton);
+            }
+            m_pBlinkingRecordButtonTimer->start(500);
+
+            if(m_pUpdateTimeInfoTimerTimer == 0) {
+                m_pUpdateTimeInfoTimer = QSharedPointer<QTimer>(new QTimer(this));
+                connect(m_pUpdateTimeInfoTimer.data(), &QTimer::timeout,
+                        this, &BabyMEG::onRecordingElapsedTimeChange);
+            }
+            m_pUpdateTimeInfoTimer->start(1000);
+        }
     }
 }
 
@@ -803,3 +835,28 @@ void BabyMEG::changeRecordingButton()
         m_iBlinkStatus = 0;
     }
 }
+
+
+//*************************************************************************************************************
+
+void BabyMEG::recordingTimerChanged(const QTime & time)
+{
+    m_recordTime = time;
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::recordingTimerStateChanged(bool state)
+{
+    m_bUseRecordTimer = state;
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::onRecordingElapsedTimeChange()
+{
+    m_pBabyMEGProjectDialog->setRecordingElapsedTime(m_recordTime.elapsed());
+}
+

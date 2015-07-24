@@ -252,8 +252,9 @@ public:
     */
     void SetFiffInfoForHPI();
 
-
     void RecvHPIFiffInfo(FiffInfo info);
+
+    void onRecordingElapsedTimeChange();
 
 signals:
     //=========================================================================================================
@@ -294,7 +295,11 @@ private:
 
     void changeRecordingButton();
 
-    QSharedPointer<QTimer> m_pTimerRecordingChange;
+    void recordingTimerChanged(const QTime & time);
+
+    void recordingTimerStateChanged(bool state);
+
+    QSharedPointer<QTimer> m_pBlinkingRecordButtonTimer;
     qint16 m_iBlinkStatus;
 
     //=========================================================================================================
@@ -307,9 +312,10 @@ private:
 
     QMutex mutex;
 
-    QSharedPointer<BabyMEGClient> myClient;
-    QSharedPointer<BabyMEGClient> myClientComm;
-    QSharedPointer<BabyMEGInfo>   pInfo;
+    QSharedPointer<BabyMEGClient>           myClient;
+    QSharedPointer<BabyMEGClient>           myClientComm;
+    QSharedPointer<BabyMEGInfo>             pInfo;
+    QSharedPointer<BabyMEGProjectDialog>    m_pBabyMEGProjectDialog;
     bool DataStartFlag;
 
     QSharedPointer<BabyMEGSQUIDControlDgl> SQUIDCtrlDlg; // added by Dr. Limin Sun for nonmodal dialog
@@ -319,6 +325,7 @@ private:
     qint32          m_iBufferSize;          /**< The raw data buffer size.*/
 
     bool            m_bWriteToFile;         /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
+    bool            m_bUseRecordTimer;
 
     QString             m_sBabyMEGDataPath; /**< The data storage path.*/
     QString             m_sCurrentProject;  /**< The current project which is part of the filename to be recorded.*/
@@ -329,6 +336,10 @@ private:
     QFile               m_qFileOut;         /**< QFile for writing to fif file.*/
     FiffStream::SPtr    m_pOutfid;          /**< FiffStream to write to.*/
 
+    QTime               m_recordTime;
+
+    QSharedPointer<QTimer> m_pUpdateTimeInfo;
+
     QString                 m_sFiffHeader;  /**< Fiff header information */
     QString                 m_sBadChannels; /**< Filename which contains a list of bad channels */
     RowVectorXd             m_cals;
@@ -338,9 +349,7 @@ private:
 
     QSharedPointer<RawMatrixBuffer> m_pRawMatrixBuffer;  /**< Holds incoming raw data. */
 
-    QDoubleSpinBox*                 m_pDoubleSpinBoxRecordTime;     /**< Adjust recording time */
-
-    QTimer*                         m_pRecordTimer;                 /**< timer to control recording time */
+    QSharedPointer<QTimer>          m_pRecordTimer;                 /**< timer to control recording time */
     QAction*                        m_pActionSetupProject;          /**< shows setup project dialog */
     QAction*                        m_pActionRecordFile;            /**< start recording action */
     QAction*                        m_pActionSqdCtrl;               /**< show squid control */
@@ -349,7 +358,9 @@ private:
 
 public:
     double sfreq;
+
 };
+
 
 } // NAMESPACE
 

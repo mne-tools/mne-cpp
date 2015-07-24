@@ -102,6 +102,12 @@ BabyMEGProjectDialog::BabyMEGProjectDialog(BabyMEG* p_pBabyMEG, QWidget *parent)
     connect(ui->m_qPushButtonDeleteSubject,&QPushButton::clicked,
                 this,&BabyMEGProjectDialog::deleteSubject);
 
+    connect(ui->m_timeEdit_timerInfo,&QTimeEdit::timeChanged,
+                this,&BabyMEGProjectDialog::onTimeChanged);
+
+    connect(ui->m_checkBox_useRecordingTimer,&QCheckBox::toggled,
+                this,&BabyMEGProjectDialog::onRecordingTimerStateChanged);
+
     ui->m_qLineEditFileName->setReadOnly(true);
 
     updateFileName();
@@ -117,6 +123,17 @@ BabyMEGProjectDialog::BabyMEGProjectDialog(BabyMEG* p_pBabyMEG, QWidget *parent)
 BabyMEGProjectDialog::~BabyMEGProjectDialog()
 {
     delete ui;
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEGProjectDialog::setRecordingElapsedTime(int secs)
+{
+    ui->m_label_timePassed->setText(QTime(0,0,secs,0).toString());
+
+    int toGo = QTime().secsTo(ui->m_timeEdit_timerInfo->time()) - secs;
+    ui->m_label_timePassed->setText(QTime(0,0,toGo,0).toString());
 }
 
 
@@ -331,5 +348,22 @@ void BabyMEGProjectDialog::selectNewSubject(const QString &newSubject)
 
 void BabyMEGProjectDialog::updateFileName()
 {
-        ui->m_qLineEditFileName->setText(m_pBabyMEG->getFilePath());
+    ui->m_qLineEditFileName->setText(m_pBabyMEG->getFilePath());
 }
+
+
+//*************************************************************************************************************
+
+void BabyMEGProjectDialog::onTimeChanged(const QTime & time)
+{
+    emit timerChanged(time);
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEGProjectDialog::onRecordingTimerStateChanged(bool state)
+{
+    emit recordingTimerStateChanged(state);
+}
+

@@ -87,7 +87,7 @@ SOURCES += \
     FormFiles/globalobj.cpp \
     FormFiles/babymegprojectdialog.cpp \
     FormFiles/plotter.cpp \
-    FormFiles/babymeghpidgl.cpp
+    FormFiles/babymeghpidgl.cpp \
 
 HEADERS += \
     babymeg.h \
@@ -100,14 +100,14 @@ HEADERS += \
     FormFiles/globalobj.h \
     FormFiles/babymegprojectdialog.h \
     FormFiles/plotter.h \
-    FormFiles/babymeghpidgl.h
+    FormFiles/babymeghpidgl.h \
 
 FORMS += \
     FormFiles/babymegsetup.ui \
     FormFiles/babymegabout.ui \
     FormFiles/babymegsquidcontroldgl.ui \
     FormFiles/babymegprojectdialog.ui \
-    FormFiles/babymeghpidgl.ui
+    FormFiles/babymeghpidgl.ui \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
