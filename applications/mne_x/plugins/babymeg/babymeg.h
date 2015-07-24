@@ -48,7 +48,6 @@
 #include "FormFiles/babymegsquidcontroldgl.h"
 #include "FormFiles/babymeghpidgl.h"
 
-
 #include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularbuffer_old.h>
 #include <generics/circularmatrixbuffer.h>
