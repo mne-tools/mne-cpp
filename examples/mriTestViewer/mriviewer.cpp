@@ -59,9 +59,9 @@ MriViewer::MriViewer(QWidget *parent) :
     ui->setupUi(this);
     scene = new QGraphicsScene(this);
 
-    // image file example
-    filePath = "D:/Bilder/Lorenz_Esch.jpg";
-    loadImageFile(filePath);
+//    // image file example
+//    filePath = "D:/Bilder/Lorenz_Esch.jpg";
+//    loadImageFile(filePath);
 
     // mri file example
     filePath = "D:/Repos/mne-cpp/bin/MNE-sample-data/subjects/sample/mri/orig/001.mgh";
@@ -75,8 +75,9 @@ MriViewer::MriViewer(QWidget *parent) :
 
 void MriViewer::loadImageFile(QString filePath)
 {
-    mriImage.load(filePath);
-    mriPixmapItem = new QGraphicsPixmapItem(QPixmap::fromImage(mriImage));
+    ui->sliceDropDown->setDisabled(true);
+    image.load(filePath);
+    mriPixmapItem = new QGraphicsPixmapItem(QPixmap::fromImage(image));
     mriPixmapItem->setFlag(QGraphicsItem::ItemIsMovable);
     scene->addItem(mriPixmapItem);
 }
@@ -96,17 +97,36 @@ void MriViewer::loadMriFile(QString filePath)
 
     qDebug() << "Read" << t_size << "slices.";
 
-    quint16 sliceIdx = 150;
-    MatrixXd mat = mri.slices[sliceIdx]; // chosen slice index
+    // change slice index
+    ui->sliceDropDown->setDisabled(false);
+    ui->sliceDropDown->setRange(sliceIdx,t_size);
+    changeActiveSlice(1);
 
-    ui->sliceDropDown->setRange(1,t_size);
-    ui->sliceDropDown->setValue(sliceIdx);
+    // add pixmap to scene
+    mriPixmapItem = new QGraphicsPixmapItem(mriPixmap);
+    mriPixmapItem->setFlag(QGraphicsItem::ItemIsMovable);
+    scene->addItem(mriPixmapItem);
+}
 
-    ImageSc imagesc(mat);
+//*************************************************************************************************************
+
+void MriViewer::getPixmapFromSlice()
+{
+    MatrixXd t_mat = mri.slices[sliceIdx-1]; // chosen slice index
+    ImageSc imagesc(t_mat);
     imagesc.setColorMap("Bone");
-    QPixmap mriSlice = imagesc.getPixmap();
+    mriPixmap = imagesc.getPixmap();
+}
 
-    mriPixmapItem = new QGraphicsPixmapItem(mriSlice);
+//*************************************************************************************************************
+
+void MriViewer::changeActiveSlice(quint16 newsliceIdx)
+{
+    sliceIdx = newsliceIdx;
+    ui->sliceDropDown->setValue(sliceIdx);
+    scene->clear();
+    getPixmapFromSlice();
+    mriPixmapItem = new QGraphicsPixmapItem(mriPixmap);
     mriPixmapItem->setFlag(QGraphicsItem::ItemIsMovable);
     scene->addItem(mriPixmapItem);
 }
@@ -121,11 +141,18 @@ void MriViewer::on_openButton_clicked()
                 "",
                 tr(defFileFormat)
                 );
-    // if file suffix not mgh/mgz
-    // loadImageFile(filePath);
-    // else
-    // loadMriFile(filePath);
 
+    // if file type is not mgh, load image file
+    scene->clear();
+    QFileInfo fi(filePath);
+    QString ext = fi.completeSuffix(); // extension
+    bool isMgh = (QString::compare(ext,"mgz", Qt::CaseInsensitive)==0
+        || QString::compare(ext,"mgh", Qt::CaseInsensitive)==0);
+
+    if (isMgh)
+       loadMriFile(filePath);
+    else
+       loadImageFile(filePath);
 }
 
 //*************************************************************************************************************
@@ -167,8 +194,11 @@ void MriViewer::on_clearButton_clicked()
 
 void MriViewer::on_sliceDropDown_valueChanged(int sliceNo)
 {
-    qDebug() << "show slice no " << sliceNo+1;
+    changeActiveSlice(sliceNo);
+    qDebug() << "show slice no " << sliceNo;
 }
+
+//*************************************************************************************************************
 
 MriViewer::~MriViewer()
 {

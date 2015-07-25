@@ -119,15 +119,19 @@ private:
     Ui::MriViewer *ui;
     QGraphicsScene *scene;
     QGraphicsPixmapItem *mriPixmapItem;
-    QImage mriImage; /**< qImage holding the mri slice which should be visualized */
+    QImage image; /**< qImage holding jpg oder png data*/
+    QPixmap mriPixmap; /**< qPixmap holding the mri slice which should be visualized */
     QString filePath; /**< absolute file path of mri file which is loaded */
     FSLIB::Mri mri;
-    const char *defFileFormat = "JPEG (*.jpg *.jpeg);;"
+    quint16 sliceIdx = 1;
+    const char *defFileFormat = "MGH (*.mgh);;"
                                 "PNG (*.png);;"
-                                "MGH (*.mgh)"; /**< suffix definition of loadable file formats */
+                                "JPG (*.jpg *.jpeg)"; /**< suffix definition of loadable file formats */
 //    QString defFileFormat = "MGH (*.mgh *.mgz)"; // mgz not working yet
     void loadImageFile(QString filePath);
     void loadMriFile(QString filePath);
+    void getPixmapFromSlice(); // create pixmap from mri mat data
+    void changeActiveSlice(quint16 newsliceIdx);
 
 };
 
