@@ -30,12 +30,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BLEndian class declaration. Ported from machine.h in FreeSurfer.
+* @brief     BLEndian class declaration.
 *
 */
 
 #ifndef BLENDIAN_H
 #define BLENDIAN_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
 
 #include "fs_global.h"
 #include <stdio.h>
@@ -48,18 +53,97 @@
 namespace FSLIB
 {
 
+//=============================================================================================================
+/**
+* Functions to swap between big and little endian format. Ported from machine.h in FreeSurfer.
+*
+* @brief conversion beetween big and little endian.
+*/
+
 class FSSHARED_EXPORT BLEndian
 {
 public:
+    //=========================================================================================================
+    /**
+    * Constructs a BLEndian object.
+    */
     BLEndian();
+
+    //=========================================================================================================
+    /**
+    * Destroys the BLEndian object.
+    */
     ~BLEndian();
 
+    //=========================================================================================================
+    /**
+    * The function swapInt takes integer values and returns the swaped ones.
+    *
+    * @param[in]  source  An integer value which should be swaped
+    *
+    * @return calculated result as an integer
+    */
     static int swapInt(int source);
+
+    //=========================================================================================================
+    /**
+    * The function freadInt reads file and swaps data.
+    *
+    * @param[in]  fp  file to read
+    *
+    * @return calculated result as an integer
+    */
     static int freadInt(FILE *fp);
+
+    //=========================================================================================================
+    /**
+    * The function swapShort takes short values and returns the swaped ones.
+    *
+    * @param[in]  source  A short value which should be swaped
+    *
+    * @return calculated result as a short
+    */
     static short swapShort(short source);
+
+    //=========================================================================================================
+    /**
+    * The function freadShort reads file and swaps data.
+    *
+    * @param[in]  fp  file to read
+    *
+    * @return calculated result as a short
+    */
     static short freadShort(FILE *fp);
+
+    //=========================================================================================================
+    /**
+    * The function swapFloat takes float values and returns the swaped ones.
+    *
+    * @param[in]  source  a float value which should be swaped
+    *
+    * @return calculated result as a float
+    */
     static float swapFloat(float source);
+
+    //=========================================================================================================
+    /**
+    * The function freadFloat reads file and swaps data.
+    *
+    * @param[in]  fp  file to read
+    *
+    * @return calculated result as a float
+    */
     static float freadFloat(FILE *fp);
+
+    //=========================================================================================================
+    /**
+    * The function freadFloatEx reads file, swaps data, and returns size of it.
+    *
+    * @param[in]  pf  TemplateClass which should be copied
+    * @param[in]  fp  file to read
+    *
+    * @return calculated result as a float
+    */
     static float freadFloatEx(float *pf, FILE *fp);
 
 };
