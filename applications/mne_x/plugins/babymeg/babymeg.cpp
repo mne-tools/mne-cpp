@@ -3,13 +3,14 @@
 * @file     babymeg.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh, Limin Sun, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -152,8 +153,8 @@ BabyMEG::~BabyMEG()
     if(this->isRunning())
         stop();
 
-    if(myClient && myClient->isConnected())
-            myClient->DisConnectBabyMEG();
+    if(m_pMyClient && m_pMyClient->isConnected())
+            m_pMyClient->DisConnectBabyMEG();
 
 }
 
@@ -222,20 +223,19 @@ void BabyMEG::init()
     connect(pInfo.data(), &BabyMEGInfo::SendCMDPackage, this, &BabyMEG::setCMDData);
     connect(pInfo.data(), &BabyMEGInfo::GainInfoUpdate, this, &BabyMEG::setFiffGainInfo);
 
-    myClient = QSharedPointer<BabyMEGClient>(new BabyMEGClient(6340,this));
-    myClient->SetInfo(pInfo);
-    myClient->start();
-    myClientComm = QSharedPointer<BabyMEGClient>(new BabyMEGClient(6341,this));
-    myClientComm->SetInfo(pInfo);
-    myClientComm->start();
+    m_pMyClient = QSharedPointer<BabyMEGClient>(new BabyMEGClient(6340,this));
+    m_pMyClient->SetInfo(pInfo);
+    m_pMyClient->start();
+    m_pMyClientComm = QSharedPointer<BabyMEGClient>(new BabyMEGClient(6341,this));
+    m_pMyClientComm->SetInfo(pInfo);
+    m_pMyClientComm->start();
 
-    myClientComm->SendCommandToBabyMEGShortConnection("INFO");
+    m_pMyClientComm->SendCommandToBabyMEGShortConnection("INFO");
 
-    myClient->ConnectToBabyMEG();
+    m_pMyClient->ConnectToBabyMEG();
 
     //init channels when fiff info is available
     connect(this, &BabyMEG::fiffInfoAvailable, this, &BabyMEG::initConnector);
-
 }
 
 
@@ -248,9 +248,6 @@ void BabyMEG::unload()
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// Create measurement instances and config them
-//=============================================================================================================
 
 void BabyMEG::initConnector()
 {
@@ -321,7 +318,7 @@ void BabyMEG::showSqdCtrlDialog()
 void BabyMEG::UpdateFiffInfo()
 {
     // read gain info and save them to the m_pFiffInfo.range
-    myClientComm->SendCommandToBabyMEGShortConnection("INFG");
+    m_pMyClientComm->SendCommandToBabyMEGShortConnection("INFG");
 
     //sleep(0.5);
 
@@ -525,7 +522,7 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
     }
 
     m_iBufferSize = pInfo->dataLength;
-    sfreq = pInfo->sfreq;
+    m_dSfreq = pInfo->sfreq;
 
     //
     //   Add the calibration factors
@@ -575,6 +572,7 @@ void BabyMEG::setFiffGainInfo(QStringList GainInfo)
 
 }
 
+
 //*************************************************************************************************************
 
 void BabyMEG::setCMDData(QByteArray DATA)
@@ -593,10 +591,10 @@ void BabyMEG::comFLL(QString t_sFLLControlCommand)
 
     qDebug() << "BabyMeg Received" << t_sFLLControlCommand;
     int strlen = t_sFLLControlCommand.size();
-    QByteArray Scmd = myClientComm->MGH_LM_Int2Byte(strlen);
+    QByteArray Scmd = m_pMyClientComm->MGH_LM_Int2Byte(strlen);
     QByteArray SC = QByteArray("COMS")+Scmd;
     SC.append(t_sFLLControlCommand);
-    myClientComm->SendCommandToBabyMEGShortConnection(SC);
+    m_pMyClientComm->SendCommandToBabyMEGShortConnection(SC);
 }
 
 
@@ -614,8 +612,8 @@ bool BabyMEG::start()
     // Start threads
     m_bIsRunning = true;
 
-    if(!myClient->isConnected())
-        myClient->ConnectToBabyMEG();
+    if(!m_pMyClient->isConnected())
+        m_pMyClient->ConnectToBabyMEG();
     // Start threads
     QThread::start();
 
@@ -627,8 +625,8 @@ bool BabyMEG::start()
 
 bool BabyMEG::stop()
 {
-    if(myClient->isConnected())
-        myClient->DisConnectBabyMEG();
+    if(m_pMyClient->isConnected())
+        m_pMyClient->DisConnectBabyMEG();
 
     m_bIsRunning = false;
 
@@ -662,8 +660,8 @@ QString BabyMEG::getName() const
 
 QWidget* BabyMEG::setupWidget()
 {
-    if(!myClient->isConnected())
-        myClient->ConnectToBabyMEG();
+    if(!m_pMyClient->isConnected())
+        m_pMyClient->ConnectToBabyMEG();
 
     BabyMEGSetupWidget* widget = new BabyMEGSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
 
