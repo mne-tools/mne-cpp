@@ -281,6 +281,22 @@ void SelectionManagerWindow::newFiffFileLoaded()
 
 //*************************************************************************************************************
 
+QString SelectionManagerWindow::getCurrentLayoutFile()
+{
+    return ui->m_comboBox_layoutFile->currentText();
+}
+
+
+//*************************************************************************************************************
+
+void SelectionManagerWindow::setCurrentLayoutFile(QString currentLayoutFile)
+{
+    ui->m_comboBox_layoutFile->setCurrentText(currentLayoutFile);
+}
+
+
+//*************************************************************************************************************
+
 bool SelectionManagerWindow::loadLayout(QString path)
 {
     bool state = LayoutLoader::readMNELoutFile(path, m_layoutMap);
