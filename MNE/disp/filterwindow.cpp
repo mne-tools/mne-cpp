@@ -59,7 +59,6 @@ using namespace DISPLIB;
 FilterWindow::FilterWindow(QWidget *parent)
 : QWidget(parent,Qt::Window)
 , ui(new Ui::FilterWindowWidget)
-, m_pFilterPlotScene(new FilterPlotScene)
 , m_iWindowSize(4016)
 , m_iFilterTaps(512)
 , m_dSFreq(600)
@@ -317,6 +316,8 @@ void FilterWindow::initComboBoxes()
 
 void FilterWindow::initFilterPlot()
 {
+    m_pFilterPlotScene = new FilterPlotScene(ui->m_graphicsView_filterPlot, this);
+
     ui->m_graphicsView_filterPlot->setScene(m_pFilterPlotScene);
 
     filterSelectionChanged(m_pFilterDataModel->index(m_pFilterDataModel->rowCount()-1,0), QModelIndex());
@@ -812,7 +813,7 @@ void FilterWindow::onChkBoxFilterActivation(bool state)
             m_pFilterDataModel->setData(m_pFilterDataModel->index(filterModelRowIndex,0), variant, Qt::EditRole);
     }
 
-    QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData> >();
+    QList<FilterData> activeFilters = m_pFilterDataModel->data(m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData> >();
 
     emit filterChanged(activeFilters);
     emit filterActivated(state);

@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include "disp_global.h"
+#include "layoutscene.h"
 #include "utils/filterTools/filterdata.h"
 
 
@@ -77,9 +78,10 @@ using namespace UTILSLIB;
 *
 * @brief The FilterPlotScene class provides the scene where a filter response can be plotted.
 */
-class DISPSHARED_EXPORT FilterPlotScene : public QGraphicsScene
+class DISPSHARED_EXPORT FilterPlotScene : public LayoutScene
 {
     Q_OBJECT
+
 public:
     //=========================================================================================================
     /**
@@ -87,7 +89,7 @@ public:
     *
     * @param [in] parent pointer to parent widget; If parent is 0, the new FilterPlotScene becomes a window. If parent is another widget, FilterPlotScene becomes a child window inside parent. FilterPlotScene is deleted when its parent is deleted.
     */
-    FilterPlotScene(QObject *parent = 0);
+    FilterPlotScene(QGraphicsView* view, QObject *parent = 0);
 
     //=========================================================================================================
     /**
