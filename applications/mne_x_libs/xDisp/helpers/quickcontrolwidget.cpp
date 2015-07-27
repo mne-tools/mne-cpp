@@ -54,7 +54,7 @@ using namespace XDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const FiffInfo::SPtr pFiffInfo, QString name, QWidget *parent, bool bScaling, bool bProjections, bool bView, bool bFilter, bool bModalities)
+QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const FiffInfo::SPtr pFiffInfo, QString name, QWidget *parent, bool bScaling, bool bProjections, bool bView, bool bFilter, bool bModalities, bool bTriggerDetection)
 : QWidget(parent, Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint)
 , ui(new Ui::QuickControlWidget)
 , m_qMapChScaling(qMapChScaling)
@@ -64,6 +64,7 @@ QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const
 , m_bView(bView)
 , m_bFilter(bFilter)
 , m_bModalitiy(bModalities)
+, m_bTriggerDetection(bTriggerDetection)
 , m_sName(name)
 {
     ui->setupUi(this);
@@ -470,6 +471,7 @@ void QuickControlWidget::createViewGroup()
             this, &QuickControlWidget::timeWindowChanged);
 
     //Trigger detection
+
     connect(ui->m_checkBox_activateTriggerDetection, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
             this, &QuickControlWidget::realTimeTriggerActiveChanged);
 
@@ -495,7 +497,10 @@ void QuickControlWidget::createViewGroup()
             this, &QuickControlWidget::realTimeTriggerThresholdChanged);
 
     connect(ui->m_spinBox_detectionThresholdSecond, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &QuickControlWidget::realTimeTriggerThresholdChanged);
+                this, &QuickControlWidget::realTimeTriggerThresholdChanged);
+
+    if(!m_bTriggerDetection)
+        ui->m_tabWidget_viewOptions->removeTab(1);
 
     //opacity
     connect(ui->m_horizontalSlider_opacity, &QSlider::valueChanged,

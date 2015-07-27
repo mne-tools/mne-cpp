@@ -124,7 +124,7 @@ public:
     * @param [in] parent    parent of widget
     * @param [in] qMapChScaling    pointer to scaling information
     */
-    QuickControlWidget(QMap<qint32, float> qMapChScaling, const FiffInfo::SPtr pFiffInfo, QString name = "", QWidget *parent = 0, bool bScaling = true, bool bProjections = true, bool bView = true, bool bFilter = true, bool bModalities = false);
+    QuickControlWidget(QMap<qint32, float> qMapChScaling, const FiffInfo::SPtr pFiffInfo, QString name = "", QWidget *parent = 0, bool bScaling = true, bool bProjections = true, bool bView = true, bool bFilter = true, bool bModalities = false, bool bTriggerDetection = true);
 
     //=========================================================================================================
     /**
@@ -344,6 +344,7 @@ private:
     bool        m_bView;            /**< Flag for drawing the view group box */
     bool        m_bFilter;          /**< Flag for drawing the filter group box */
     bool        m_bModalitiy;       /**< Flag for drawing the modality group box */
+    bool        m_bTriggerDetection;/**< Flag for drawing the trigger detection tab in the view group box */
 
     QMap<qint32,float>              m_qMapChScaling;                /**< Channel scaling values. */
     QMap<qint32, QDoubleSpinBox*>   m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits */
