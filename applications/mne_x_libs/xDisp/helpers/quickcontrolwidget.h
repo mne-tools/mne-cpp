@@ -279,12 +279,6 @@ protected:
 
     //=========================================================================================================
     /**
-    * Slot called when modality check boxes were changed
-    */
-    void updateModalityCheckbox(qint32 state);
-
-    //=========================================================================================================
-    /**
     * Reimplmented mouseMoveEvent.
     */
     void mouseMoveEvent(QMouseEvent *event);
@@ -326,6 +320,21 @@ protected:
     * @param [in] state toggle state.
     */
     void onShowFilterOptions(bool state);
+
+    //=========================================================================================================
+    /**
+    * Slot called when modality check boxes were changed
+    */
+    void updateModalityCheckbox(qint32 state);
+
+    //=========================================================================================================
+    /**
+    * Slot called when opacity slider was changed
+    *
+    * @param [in] value opacity value.
+    */
+    void onOpacityChange(qint32 value);
+
 
 private:
     QPoint      m_dragPosition;     /**< the drag position of the window */

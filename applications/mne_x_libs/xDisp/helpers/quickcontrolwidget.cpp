@@ -496,6 +496,10 @@ void QuickControlWidget::createViewGroup()
 
     connect(ui->m_spinBox_detectionThresholdSecond, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &QuickControlWidget::realTimeTriggerThresholdChanged);
+
+    //opacity
+    connect(ui->m_horizontalSlider_opacity, &QSlider::valueChanged,
+            this, &QuickControlWidget::onOpacityChange);
 }
 
 
@@ -933,4 +937,14 @@ void QuickControlWidget::updateModalityCheckbox(qint32 state)
 
     emit settingsChanged(m_qListModalities);
 }
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::onOpacityChange(qint32 value)
+{
+    this->setWindowOpacity(1/(100.0/value));
+}
+
+
 
