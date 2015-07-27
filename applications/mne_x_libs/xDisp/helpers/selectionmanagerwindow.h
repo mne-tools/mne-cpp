@@ -165,6 +165,22 @@ public:
     */
     void newFiffFileLoaded();
 
+    //=========================================================================================================
+    /**
+    * returns the currently selected layout file.
+    *
+    * @return the currently selected layout file
+    */
+    QString getCurrentLayoutFile();
+
+    //=========================================================================================================
+    /**
+    * Sets the current layout file.
+    *
+    * @param [in] currentLayoutFile the current layout file
+    */
+    void setCurrentLayoutFile(QString currentLayoutFile);
+
 signals:
     //=========================================================================================================
     /**

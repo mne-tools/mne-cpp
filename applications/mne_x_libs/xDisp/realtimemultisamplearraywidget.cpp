@@ -182,6 +182,9 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
 
         //Store show/hide bad channel flag
         settings.setValue(QString("RTMSAW/%1/showHideBad").arg(t_sRTMSAWName), m_bHideBadChannels);
+
+        //Store selected layout file
+        settings.setValue(QString("RTMSAW/%1/selectedLayoutFile").arg(t_sRTMSAWName), m_pSelectionManagerWindow->getCurrentLayoutFile());
     }
 }
 
@@ -399,6 +402,8 @@ void RealTimeMultiSampleArrayWidget::init()
                     m_pSelectionManagerWindow.data(), &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
 
             m_pChInfoModel->fiffInfoChanged(m_pFiffInfo);
+
+            m_pSelectionManagerWindow->setCurrentLayoutFile(settings.value(QString("RTMSAW/%1/selectedLayoutFile").arg(t_sRTMSAWName), "babymeg-mag-inner-layer.lout").toString());
         }
 
         //Init quick control widget
