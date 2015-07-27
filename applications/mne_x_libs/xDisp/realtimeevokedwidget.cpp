@@ -202,6 +202,9 @@ RealTimeEvokedWidget::~RealTimeEvokedWidget()
 
         if(m_qMapChScaling.contains(FIFFV_MISC_CH))
             settings.setValue(QString("RTEW/%1/scaleMISC").arg(t_sRTEWName), m_qMapChScaling[FIFFV_MISC_CH]);
+
+        //Store selected layout file
+        settings.setValue(QString("RTEW/%1/selectedLayoutFile").arg(t_sRTEWName), m_pSelectionManagerWindow->getCurrentLayoutFile());
     }
 }
 
@@ -414,6 +417,8 @@ void RealTimeEvokedWidget::init()
 
         connect(m_pChInfoModel.data(), &ChInfoModel::channelsMappedToLayout,
                 m_pSelectionManagerWindow.data(), &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
+
+        m_pSelectionManagerWindow->setCurrentLayoutFile(settings.value(QString("RTEW/%1/selectedLayoutFile").arg(t_sRTEWName), "babymeg-mag-inner-layer.lout").toString());
 
         m_pActionSelectSensors->setVisible(true);
 

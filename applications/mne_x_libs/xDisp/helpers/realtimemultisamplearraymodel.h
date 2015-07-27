@@ -519,7 +519,6 @@ inline qint32 RealTimeMultiSampleArrayModel::getCurrentSampleIndex() const
             return m_iCurrentSample-m_iMaxFilterLength/2;
     }
 
-
     return m_iCurrentSample;
 }
 
