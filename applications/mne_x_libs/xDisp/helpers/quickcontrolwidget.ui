@@ -65,7 +65,7 @@
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QTabWidget" name="tabWidget">
+         <widget class="QTabWidget" name="m_tabWidget_viewOptions">
           <property name="currentIndex">
            <number>0</number>
           </property>
