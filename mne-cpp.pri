@@ -33,7 +33,7 @@ isEmpty( MNE_BINARY_DIR ) {
 ### MNE cpp config ###
 MNECPP_CONFIG += withGui
 #MNECPP_CONFIG += withPython
-MNECPP_CONFIG += BuildBasicMNEXVersion
+#MNECPP_CONFIG += BuildBasicMNEXVersion
 
 #Build MNE-CPP libraries as static libs
 #MNECPP_CONFIG += build_MNECPP_Static_Lib
