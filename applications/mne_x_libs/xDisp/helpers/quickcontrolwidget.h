@@ -146,8 +146,17 @@ public:
     *
     * @param [in] zoomFactor    new zoomFactor value
     * @param [in] windowSize    new window size value
+    * @param [in] opactiy       the new opacity value
     */
-    void setViewParameters(double zoomFactor, int windowSize);
+    void setViewParameters(double zoomFactor, int windowSize, int opactiy);
+
+    //=========================================================================================================
+    /**
+    * Get current opacity value.
+    *
+    * @return thecurrent set opacity value of this window.
+    */
+    int getOpacityValue();
 
 signals:
     //=========================================================================================================
