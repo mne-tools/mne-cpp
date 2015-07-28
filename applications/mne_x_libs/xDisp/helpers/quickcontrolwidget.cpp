@@ -177,13 +177,23 @@ void QuickControlWidget::filterGroupChanged(QList<QCheckBox*> list)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::setViewParameters(double zoomFactor, int windowSize)
+void QuickControlWidget::setViewParameters(double zoomFactor, int windowSize, int opactiy)
 {
     ui->m_doubleSpinBox_numberVisibleChannels->setValue(zoomFactor);
     ui->m_spinBox_windowSize->setValue(windowSize);
+    ui->m_horizontalSlider_opacity->setValue(opactiy);
 
     zoomChanged(zoomFactor);
     timeWindowChanged(windowSize);
+    onOpacityChange(opactiy);
+}
+
+
+//*************************************************************************************************************
+
+int QuickControlWidget::getOpacityValue()
+{
+    return ui->m_horizontalSlider_opacity->value();
 }
 
 
