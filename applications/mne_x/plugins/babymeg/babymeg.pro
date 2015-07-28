@@ -126,3 +126,6 @@ unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 # suppress visibility warnings
 unix: QMAKE_CXXFLAGS += -Wno-attributes
 
+contains(MNECPP_CONFIG, BuildBasicMNEXVersion) {
+    DEFINES += BUILD_BASIC_MNEX_VERSION
+}
