@@ -143,6 +143,12 @@ BabyMEG::BabyMEG()
         connect(m_pUpdateTimeInfoTimer.data(), &QTimer::timeout,
                 this, &BabyMEG::onRecordingRemainingTimeChange);
     }
+
+    //If the basic MNE-X version is to be build hide the HPI and squid control actions in the toolbar
+    #ifdef BUILD_BASIC_MNEX_VERSION
+    m_pActionSqdCtrl->setVisible(false);
+    m_pActionUpdateFiffInfoForHPI->setVisible(false);
+    #endif
 }
 
 

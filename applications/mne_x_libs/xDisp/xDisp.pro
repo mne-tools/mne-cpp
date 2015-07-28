@@ -173,3 +173,7 @@ header_files.path = $${MNE_X_INCLUDE_DIR}/xDisp
 INSTALLS += header_files
 
 OTHER_FILES +=
+
+contains(MNECPP_CONFIG, BuildBasicMNEXVersion) {
+    DEFINES += BUILD_BASIC_MNEX_VERSION
+}

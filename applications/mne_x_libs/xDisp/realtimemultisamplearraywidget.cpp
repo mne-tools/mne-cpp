@@ -408,7 +408,14 @@ void RealTimeMultiSampleArrayWidget::init()
 
         //Init quick control widget
         if(!m_pQuickControlWidget) {
-            m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display"));
+            #ifdef BUILD_BASIC_MNEX_VERSION
+                std::cout<<"BUILD_BASIC_MNEX_VERSION Defined"<<std::endl;
+                m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display", 0, true, false, true, false, false, false));
+            #else
+                std::cout<<"BUILD_BASIC_MNEX_VERSION Undefined"<<std::endl;
+                m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display"));
+            #endif
+
             m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
             //Handle scaling
