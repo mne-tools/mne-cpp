@@ -109,15 +109,17 @@ QVariant RealTimeEvokedModel::data(const QModelIndex &index, int role) const
 
                     if(m_bIsFreezed) {
                         // data freeze
-                        rowVec = m_matDataFreeze.row(row);
-
-                        v.setValue(rowVec);
+                        if(m_filterData.isEmpty())
+                            rowVec = m_matDataFreeze.row(row);
+                        else
+                            rowVec = m_matDataFilteredFreeze.row(row);
                     }
                     else {
-                        // data
-                        rowVec = m_matData.row(row);
-
-                        v.setValue(rowVec);
+                        // data stream
+                        if(m_filterData.isEmpty())
+                            rowVec = m_matData.row(row);
+                        else
+                            rowVec = m_matDataFiltered.row(row);
                     }
                     return v;
                     break;
@@ -221,6 +223,8 @@ void RealTimeEvokedModel::setRTE(QSharedPointer<RealTimeEvoked> &pRTE)
     //Create the initial SSP projector
     updateProjection();
 
+    createFilterChannelList(m_pRTE->info()->ch_names);
+
     endResetModel();
 
     resetSelection();
@@ -237,6 +241,9 @@ void RealTimeEvokedModel::updateData()
         m_matData = m_pRTE->getValue()->data;
     else
         m_matData = m_matSparseProj * m_pRTE->getValue()->data;
+
+    if(!m_filterData.isEmpty())
+        filterChannelsConcurrently();
 
     m_bIsInit = true;
 
@@ -417,6 +424,7 @@ void RealTimeEvokedModel::toggleFreeze()
     m_bIsFreezed = !m_bIsFreezed;
 
     if(m_bIsFreezed) {
+        m_matDataFilteredFreeze = m_matDataFiltered;
         m_matDataFreeze = m_matData;
     }
 
@@ -427,4 +435,173 @@ void RealTimeEvokedModel::toggleFreeze()
     emit dataChanged(topLeft, bottomRight, roles);
 }
 
+
+//*************************************************************************************************************
+
+void RealTimeEvokedModel::filterChanged(QList<FilterData> filterData)
+{
+    m_filterData = filterData;
+
+    m_iMaxFilterLength = 1;
+    for(int i=0; i<filterData.size(); i++)
+        if(m_iMaxFilterLength<filterData.at(i).m_iFilterOrder)
+            m_iMaxFilterLength = filterData.at(i).m_iFilterOrder;
+
+    //Filter all visible data channels at once
+    //filterChannelsConcurrently();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeEvokedModel::setFilterChannelType(QString channelType)
+{
+    m_sFilterChannelType = channelType;
+    m_filterChannelList = m_visibleChannelList;
+
+    //This version is for when all channels of a type are to be filtered (not only the visible ones).
+    //Create channel filter list independent from channelNames
+    m_filterChannelList.clear();
+
+    for(int i = 0; i<m_pRTE->info()->chs.size(); i++) {
+        if((m_pRTE->info()->chs.at(i).kind == FIFFV_MEG_CH || m_pRTE->info()->chs.at(i).kind == FIFFV_EEG_CH ||
+            m_pRTE->info()->chs.at(i).kind == FIFFV_EOG_CH || m_pRTE->info()->chs.at(i).kind == FIFFV_ECG_CH ||
+            m_pRTE->info()->chs.at(i).kind == FIFFV_EMG_CH) && !m_pRTE->info()->bads.contains(m_pRTE->info()->chs.at(i).ch_name)) {
+            if(m_sFilterChannelType == "All")
+                m_filterChannelList << m_pRTE->info()->chs.at(i).ch_name;
+            else if(m_pRTE->info()->chs.at(i).ch_name.contains(m_sFilterChannelType))
+                m_filterChannelList << m_pRTE->info()->chs.at(i).ch_name;
+        }
+    }
+
+//    if(channelType != "All") {
+//        QMutableListIterator<QString> i(m_filterChannelList);
+//        while(i.hasNext()) {
+//            QString val = i.next();
+//            if(!val.contains(channelType, Qt::CaseInsensitive)) {
+//                i.remove();
+//            }
+//        }
+//    }
+
+//    m_bDrawFilterFront = false;
+
+    //Filter all visible data channels at once
+    //filterChannelsConcurrently();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeEvokedModel::createFilterChannelList(QStringList channelNames)
+{
+    m_filterChannelList.clear();
+    m_visibleChannelList = channelNames;
+
+    //    //Create channel fiter list based on channelNames
+    //    for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
+    //        if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
+    //            m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
+    //            m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH) && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
+    //            if(m_sFilterChannelType == "All" && channelNames.contains(m_pFiffInfo->chs.at(i).ch_name))
+    //                m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
+    //            else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType) && channelNames.contains(m_pFiffInfo->chs.at(i).ch_name))
+    //                m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
+    //        }
+    //    }
+
+    //Create channel filter list independent from channelNames
+    for(int i = 0; i<m_pRTE->info()->chs.size(); i++) {
+        if((m_pRTE->info()->chs.at(i).kind == FIFFV_MEG_CH || m_pRTE->info()->chs.at(i).kind == FIFFV_EEG_CH ||
+            m_pRTE->info()->chs.at(i).kind == FIFFV_EOG_CH || m_pRTE->info()->chs.at(i).kind == FIFFV_ECG_CH ||
+            m_pRTE->info()->chs.at(i).kind == FIFFV_EMG_CH) && !m_pRTE->info()->bads.contains(m_pRTE->info()->chs.at(i).ch_name)) {
+            if(m_sFilterChannelType == "All")
+                m_filterChannelList << m_pRTE->info()->chs.at(i).ch_name;
+            else if(m_pRTE->info()->chs.at(i).ch_name.contains(m_sFilterChannelType))
+                m_filterChannelList << m_pRTE->info()->chs.at(i).ch_name;
+        }
+    }
+
+//    m_bDrawFilterFront = false;
+
+//    for(int i = 0; i<m_filterChannelList.size(); i++)
+//        std::cout<<m_filterChannelList.at(i).toStdString()<<std::endl;
+
+    //Filter all visible data channels at once
+    //filterChannelsConcurrently();
+}
+
+
+//*************************************************************************************************************
+
+void doFilterPerChannelRTE(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
+{
+    for(int i=0; i<channelDataTime.first.size(); i++)
+        //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true, FilterData::ZeroPad);
+        channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, true, FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeEvokedModel::filterChannelsConcurrently()
+{
+    std::cout<<"START RealTimeEvokedModel::filterChannelsConcurrently()"<<std::endl;
+
+    if(m_filterData.isEmpty())
+        return;
+
+    //Create temporary filters with higher fft length because we are going to filter all available data at once for one time
+    QList<FilterData> tempFilterList;
+
+    int fftLength = m_matData.row(0).cols() + 2 * m_iMaxFilterLength;
+    int exp = ceil(MNEMath::log2(fftLength));
+    fftLength = pow(2, exp) <512 ? 512 : pow(2, exp);
+
+    for(int i = 0; i<m_filterData.size(); i++) {
+        FilterData tempFilter(m_filterData.at(i).m_sName,
+                              m_filterData.at(i).m_Type,
+                              m_filterData.at(i).m_iFilterOrder,
+                              m_filterData.at(i).m_dCenterFreq,
+                              m_filterData.at(i).m_dBandwidth,
+                              m_filterData.at(i).m_dParksWidth,
+                              m_filterData.at(i).m_sFreq,
+                              fftLength,
+                              m_filterData.at(i).m_designMethod);
+
+        tempFilterList.append(tempFilter);
+    }
+
+    //Generate QList structure which can be handled by the QConcurrent framework
+    QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;
+    QList<int> notFilterChannelIndex;
+
+    //Also append mirrored data in front and back to get rid of edge effects
+    for(qint32 i=0; i<m_matData.rows(); ++i) {
+        if(m_filterChannelList.contains(m_pRTE->info()->chs.at(i).ch_name)) {
+            RowVectorXd datTemp(m_matData.row(i).cols() + 2 * m_iMaxFilterLength);
+            datTemp << m_matData.row(i).head(m_iMaxFilterLength).reverse(), m_matData.row(i), m_matData.row(i).tail(m_iMaxFilterLength).reverse();
+            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(tempFilterList,QPair<int,RowVectorXd>(i,datTemp)));
+        }
+        else
+            notFilterChannelIndex.append(i);
+    }
+
+    //Do the concurrent filtering
+    if(!timeData.isEmpty()) {
+        QFuture<void> future = QtConcurrent::map(timeData,
+                                             doFilterPerChannelRTE);
+
+        future.waitForFinished();
+
+        for(int r = 0; r<timeData.size(); r++)
+            m_matDataFiltered.row(timeData.at(r).second.first) = timeData.at(r).second.second.segment(m_iMaxFilterLength+m_iMaxFilterLength/2, m_matData.cols());
+    }
+
+    //Fill filtered data with raw data if the channel was not filtered
+    for(int i = 0; i<notFilterChannelIndex.size(); i++)
+        m_matDataFiltered.row(notFilterChannelIndex.at(i)) = m_matData.row(notFilterChannelIndex.at(i));
+
+    std::cout<<"END RealTimeEvokedModel::filterChannelsConcurrently()"<<std::endl;
+}
 

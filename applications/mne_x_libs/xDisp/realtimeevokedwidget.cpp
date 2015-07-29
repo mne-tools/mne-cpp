@@ -184,6 +184,17 @@ RealTimeEvokedWidget::~RealTimeEvokedWidget()
             settings.setValue(QString("RTEW/%1/%2/norm").arg(t_sRTEWName).arg(m_qListModalities[i].m_sName), m_qListModalities[i].m_fNorm);
         }
 
+        //Store filter
+        FilterData filter = m_pFilterWindow->getUserDesignedFilter();
+
+        settings.setValue(QString("RTEW/%1/filterHP").arg(t_sRTEWName), filter.m_dHighpassFreq);
+        settings.setValue(QString("RTEW/%1/filterLP").arg(t_sRTEWName), filter.m_dLowpassFreq);
+        settings.setValue(QString("RTEW/%1/filterOrder").arg(t_sRTEWName), filter.m_iFilterOrder);
+        settings.setValue(QString("RTEW/%1/filterType").arg(t_sRTEWName), (int)filter.m_Type);
+        settings.setValue(QString("RTEW/%1/filterDesignMethod").arg(t_sRTEWName), (int)filter.m_designMethod);
+        settings.setValue(QString("RTEW/%1/filterTransition").arg(t_sRTEWName), filter.m_dParksWidth*(filter.m_sFreq/2));
+        settings.setValue(QString("RTEW/%1/filterUserDesignActive").arg(t_sRTEWName), m_pFilterWindow->userDesignedFiltersIsActive());
+
         //Store scaling
         if(m_qMapChScaling.contains(FIFF_UNIT_T))
             settings.setValue(QString("RTEW/%1/scaleMAG").arg(t_sRTEWName), m_qMapChScaling[FIFF_UNIT_T]);
@@ -221,34 +232,20 @@ void RealTimeEvokedWidget::update(XMEASLIB::NewMeasurement::SPtr)
 
 void RealTimeEvokedWidget::getData()
 {
-    if(!m_bInitialized)
-    {
-        if(m_pRTE->isInitialized())
-        {
-//            QFile file(m_pRTE->getXMLLayoutFile());
-//            if (!file.open(QFile::ReadOnly | QFile::Text))
-//            {
-//                qDebug() << QString("Cannot read file %1:\n%2.").arg(m_pRTE->getXMLLayoutFile()).arg(file.errorString());
-//                m_pSensorModel = new SensorModel(this);
-//                m_pSensorModel->mapChannelInfo(m_qListChInfo);
-//            }
-//            else
-//            {
-//                m_pSensorModel = new SensorModel(&file, this);
-//                m_pSensorModel->mapChannelInfo(m_qListChInfo);
-//                m_pActionSelectSensors->setVisible(true);
-//            }
-
+    if(!m_bInitialized) {
+        if(m_pRTE->isInitialized()) {
             m_qListChInfo = m_pRTE->chInfo();
             m_pFiffInfo = m_pRTE->info();
 
+            m_iMaxFilterTapSize = m_pRTE->getValue()->data.cols();
             init();
 
             m_pRTEModel->updateData();
         }
     }
-    else
+    else {
         m_pRTEModel->updateData();
+    }
 }
 
 
@@ -295,32 +292,27 @@ void RealTimeEvokedWidget::init()
         QSettings settings;
         bool sel = true;
         float val = 1e-11f;
-        if(hasMag)
-        {
+        if(hasMag) {
             sel = settings.value(QString("RTEW/%1/MAG/active").arg(t_sRTEWName), true).toBool();
             val = settings.value(QString("RTEW/%1/MAG/norm").arg(t_sRTEWName), 1e-11f).toFloat();
             m_qListModalities.append(Modality("MAG",sel,val));
         }
-        if(hasGrad)
-        {
+        if(hasGrad) {
             sel = settings.value(QString("RTEW/%1/GRAD/active").arg(t_sRTEWName), true).toBool();
             val = settings.value(QString("RTEW/%1/GRAD/norm").arg(t_sRTEWName), 1e-10f).toFloat();
             m_qListModalities.append(Modality("GRAD",sel,val));
         }
-        if(hasEEG)
-        {
+        if(hasEEG) {
             sel = settings.value(QString("RTEW/%1/EEG/active").arg(t_sRTEWName), true).toBool();
             val = settings.value(QString("RTEW/%1/EEG/norm").arg(t_sRTEWName), 1e-4f).toFloat();
             m_qListModalities.append(Modality("EEG",sel,val));
         }
-        if(hasEOG)
-        {
+        if(hasEOG) {
             sel = settings.value(QString("RTEW/%1/EOG/active").arg(t_sRTEWName), true).toBool();
             val = settings.value(QString("RTEW/%1/EOG/norm").arg(t_sRTEWName), 1e-3f).toFloat();
             m_qListModalities.append(Modality("EOG",sel,val));
         }
-        if(hasMISC)
-        {
+        if(hasMISC) {
             sel = settings.value(QString("RTEW/%1/MISC/active").arg(t_sRTEWName), true).toBool();
             val = settings.value(QString("RTEW/%1/MISC/norm").arg(t_sRTEWName), 1e-3f).toFloat();
             m_qListModalities.append(Modality("MISC",sel,val));
@@ -385,9 +377,35 @@ void RealTimeEvokedWidget::init()
             m_pRTEModel->setScaling(m_qMapChScaling);
         }
 
+        //Init filter window
+        if(!m_pFilterWindow) {
+            m_pFilterWindow = QSharedPointer<FilterWindow>(new FilterWindow(this));
+            //m_pFilterWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
+
+            m_pFilterWindow->setFiffInfo(m_pFiffInfo);
+            m_pFilterWindow->setWindowSize(m_iMaxFilterTapSize);
+            m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
+
+            connect(m_pFilterWindow.data(),static_cast<void (FilterWindow::*)(QString)>(&FilterWindow::applyFilter),
+                    m_pRTEModel.data(),static_cast<void (RealTimeEvokedModel::*)(QString)>(&RealTimeEvokedModel::setFilterChannelType));
+
+            connect(m_pFilterWindow.data(), &FilterWindow::filterChanged,
+                    m_pRTEModel.data(), &RealTimeEvokedModel::filterChanged);
+
+            //Set stored filter settings from last session
+            QSettings settings;
+            m_pFilterWindow->setFilterParameters(settings.value(QString("RTEW/%1/filterHP").arg(t_sRTEWName), 5.0).toDouble(),
+                                                    settings.value(QString("RTEW/%1/filterLP").arg(t_sRTEWName), 40.0).toDouble(),
+                                                    settings.value(QString("RTEW/%1/filterOrder").arg(t_sRTEWName), 128).toInt(),
+                                                    settings.value(QString("RTEW/%1/filterType").arg(t_sRTEWName), 2).toInt(),
+                                                    settings.value(QString("RTEW/%1/filterDesignMethod").arg(t_sRTEWName), 0).toInt(),
+                                                    settings.value(QString("RTEW/%1/filterTransition").arg(t_sRTEWName), 5.0).toDouble(),
+                                                    settings.value(QString("RTEW/%1/filterUserDesignActive").arg(t_sRTEWName), false).toBool());
+        }
+
         //Quick control widget
         if(!m_pQuickControlWidget) {
-            m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Averaging", 0, true, true, false, false, true));
+            m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Averaging", 0, true, true, false, true, true, false));
             m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
             //Handle scaling
@@ -400,27 +418,38 @@ void RealTimeEvokedWidget::init()
 
             connect(m_pQuickControlWidget.data(), &QuickControlWidget::settingsChanged,
                     this, &RealTimeEvokedWidget::broadcastSettings);
+
+            connect(m_pQuickControlWidget.data(), &QuickControlWidget::showFilterOptions,
+                    this, &RealTimeEvokedWidget::showFilterWidget);
+
+            m_pQuickControlWidget->setViewParameters(settings.value(QString("RTEW/%1/viewZoomFactor").arg(t_sRTEWName), 1.0).toFloat(),
+                                                     settings.value(QString("RTEW/%1/viewWindowSize").arg(t_sRTEWName), 10).toInt(),
+                                                     settings.value(QString("RTEW/%1/viewOpacity").arg(t_sRTEWName), 95).toInt());
+
+            m_pQuickControlWidget->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
+
+            m_pActionQuickControl->setVisible(true);
         }
 
-        m_pActionQuickControl->setVisible(true);
-
         //Set up selection manager
-        m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(this, m_pFiffInfo));
-        m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel.data()));
+        if(!m_pSelectionManagerWindow) {
+            m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(this, m_pFiffInfo));
+            m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel.data()));
 
-        connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::showSelectedChannelsOnly,
-                this, &RealTimeEvokedWidget::showSelectedChannelsOnly);
+            connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::showSelectedChannelsOnly,
+                    this, &RealTimeEvokedWidget::showSelectedChannelsOnly);
 
-        //Connect channel info model
-        connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::loadedLayoutMap,
-                m_pChInfoModel.data(), &ChInfoModel::layoutChanged);
+            //Connect channel info model
+            connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::loadedLayoutMap,
+                    m_pChInfoModel.data(), &ChInfoModel::layoutChanged);
 
-        connect(m_pChInfoModel.data(), &ChInfoModel::channelsMappedToLayout,
-                m_pSelectionManagerWindow.data(), &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
+            connect(m_pChInfoModel.data(), &ChInfoModel::channelsMappedToLayout,
+                    m_pSelectionManagerWindow.data(), &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
 
-        m_pSelectionManagerWindow->setCurrentLayoutFile(settings.value(QString("RTEW/%1/selectedLayoutFile").arg(t_sRTEWName), "babymeg-mag-inner-layer.lout").toString());
+            m_pSelectionManagerWindow->setCurrentLayoutFile(settings.value(QString("RTEW/%1/selectedLayoutFile").arg(t_sRTEWName), "babymeg-mag-inner-layer.lout").toString());
 
-        m_pActionSelectSensors->setVisible(true);
+            m_pActionSelectSensors->setVisible(true);
+        }
 
         //Init average scene
         m_pAverageScene = AverageScene::SPtr(new AverageScene(m_pAverageLayoutView, this));
@@ -460,6 +489,15 @@ void RealTimeEvokedWidget::channelSelectionManagerChanged(const QList<QGraphicsI
 
 //*************************************************************************************************************
 
+void RealTimeEvokedWidget::scaleAveragedData(const QMap<qint32, float> &scaleMap)
+{
+    //Set the scale map received from the scale window
+    m_pAverageScene->setScaleMap(scaleMap);
+}
+
+
+//*************************************************************************************************************
+
 void RealTimeEvokedWidget::showSensorSelectionWidget()
 {
     if(!m_pSelectionManagerWindow) {
@@ -467,29 +505,6 @@ void RealTimeEvokedWidget::showSensorSelectionWidget()
     }
 
     m_pSelectionManagerWindow->show();
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedWidget::applySelection()
-{
-//    m_pRTMSAModel->selectRows(m_qListCurrentSelection);
-
-//    m_pSensorModel->silentUpdateSelection(m_qListCurrentSelection);
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedWidget::resetSelection()
-{
-//    // non C++11 alternative
-//    m_qListCurrentSelection.clear();
-//    for(qint32 i = 0; i < m_qListChInfo.size(); ++i)
-//        m_qListCurrentSelection.append(i);
-
-//    applySelection();
 }
 
 
@@ -579,10 +594,18 @@ void RealTimeEvokedWidget::onSelectionChanged()
 
 //*************************************************************************************************************
 
-void RealTimeEvokedWidget::scaleAveragedData(const QMap<qint32, float> &scaleMap)
+void RealTimeEvokedWidget::showFilterWidget(bool state)
 {
-    //Set the scale map received from the scale window
-    m_pAverageScene->setScaleMap(scaleMap);
+    if(state) {
+        if(m_pFilterWindow->isActiveWindow())
+            m_pFilterWindow->hide();
+        else {
+            m_pFilterWindow->activateWindow();
+            m_pFilterWindow->show();
+        }
+    } else {
+        m_pFilterWindow->hide();
+    }
 }
 
 

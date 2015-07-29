@@ -126,7 +126,7 @@ public:
     *
     * @param[in] fiffInfo the new fiffInfo
     */
-    void setFiffInfo(const FiffInfo &fiffInfo);
+    void setFiffInfo(const FiffInfo::SPtr &pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -272,7 +272,7 @@ private:
     int                         m_iFilterTaps;              /**< The current number of filter taps.*/
     double                      m_dSFreq;                   /**< The current sampling frequency.*/
 
-    FiffInfo                    m_fiffInfo;                 /**< The current fiffInfo.*/
+    FiffInfo::SPtr              m_pFiffInfo;                /**< The current fiffInfo.*/
 
     QSettings                   m_qSettings;                /**< QSettings variable used to write or read from independent application sessions.*/
 
