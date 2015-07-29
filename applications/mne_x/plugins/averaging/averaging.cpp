@@ -296,7 +296,9 @@ QWidget* Averaging::setupWidget()
 void Averaging::showAveragingWidget()
 {
     QMutexLocker locker(&m_qMutex);
-    m_pAveragingWidget = AveragingSettingsWidget::SPtr(new AveragingSettingsWidget(this));
+    if(!m_pAveragingWidget)
+        m_pAveragingWidget = AveragingSettingsWidget::SPtr(new AveragingSettingsWidget(this));
+
     m_pAveragingWidget->show();
 }
 

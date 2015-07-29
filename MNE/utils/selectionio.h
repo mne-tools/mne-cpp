@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include "utils_global.h"
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -54,6 +55,7 @@
 #include <QFile>
 #include <QDebug>
 #include <QTextStream>
+#include <QFileInfo>
 
 
 //*************************************************************************************************************
@@ -108,11 +110,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Qrites the specified MNE sel file.
+    * Writes the specified selection groups to a single MNE .sel file.
     * @param [in] path holds the file path of the elc file which is to be read.
     * @param [in] selectionMap holds the map to which the read selection groups are stored.
     */
     static bool writeMNESelFile(QString path, const QMap<QString,QStringList> &selectionMap);
+
+    //=========================================================================================================
+    /**
+    * Writes the specified selection groups to different Brainstorm .mon files. The amount of written files depend on the number of selection groups in selectionMap
+    * @param [in] path holds the file path of the elc file which is to be read.
+    * @param [in] selectionMap holds the map to which the read selection groups are stored.
+    */
+    static bool writeBrainstormMonFiles(QString path, const QMap<QString,QStringList> &selectionMap);
 
 };
 

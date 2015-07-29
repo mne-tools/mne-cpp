@@ -117,7 +117,7 @@ bool SelectionIO::writeMNESelFile(QString path, const QMap<QString,QStringList> 
 
     QFile file(path);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)){
-        qDebug()<<"Error opening filter sel file for writing";
+        qDebug()<<"Error opening sel file for writing";
         return false;
     }
 
@@ -137,6 +137,45 @@ bool SelectionIO::writeMNESelFile(QString path, const QMap<QString,QStringList> 
     }
 
     file.close();
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool SelectionIO::writeBrainstormMonFiles(QString path, const QMap<QString,QStringList> &selectionMap)
+{
+    //Open .sel file
+    if(!path.contains(".mon"))
+        return false;
+
+    QMapIterator<QString,QStringList> i(selectionMap);
+    while (i.hasNext()) {
+        i.next();
+
+        QFileInfo fileInfo(path);
+
+        QString newPath = QString("%1/%2.mon").arg(fileInfo.absolutePath()).arg(i.key());
+
+        std::cout<<newPath.toStdString()<<std::endl;
+
+        QFile file(newPath);
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)){
+            qDebug()<<"Error opening mon file for writing";
+            return false;
+        }
+
+        //Write selections to file
+        QTextStream out(&file);
+
+        out<<i.key()<<"\n";
+
+        for(int u=0; u<i.value().size() ; u++)
+            out << i.value().at(u) << " : " << i.value().at(u) << "\n";
+
+        file.close();
+    }
 
     return true;
 }
