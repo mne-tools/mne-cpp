@@ -238,16 +238,6 @@ void RealTimeEvokedModel::setRTE(QSharedPointer<RealTimeEvoked> &pRTE)
 
     m_vecBadIdcs = sel;
 
-    //init data matrix
-    m_matData.conservativeResize(m_pRTE->info()->chs.size(), m_pRTE->getValue()->data.cols());
-    m_matData.setZero();
-    m_matDataFreeze.conservativeResize(m_pRTE->info()->chs.size(), m_pRTE->getValue()->data.cols());
-    m_matDataFreeze.setZero();
-    m_matDataFiltered.conservativeResize(m_pRTE->info()->chs.size(), m_pRTE->getValue()->data.cols());
-    m_matDataFiltered.setZero();
-    m_matDataFilteredFreeze.conservativeResize(m_pRTE->info()->chs.size(), m_pRTE->getValue()->data.cols());
-    m_matDataFilteredFreeze.setZero();
-
     //Create the initial SSP projector
     updateProjection();
 
@@ -264,6 +254,18 @@ void RealTimeEvokedModel::setRTE(QSharedPointer<RealTimeEvoked> &pRTE)
 
 void RealTimeEvokedModel::updateData()
 {
+    if(m_matData.cols() != m_pRTE->getValue()->data.cols()) {
+        //init data matrix
+        m_matData.conservativeResize(m_pRTE->info()->chs.size(), m_pRTE->getValue()->data.cols());
+        m_matData.setZero();
+        m_matDataFreeze.conservativeResize(m_pRTE->info()->chs.size(), m_pRTE->getValue()->data.cols());
+        m_matDataFreeze.setZero();
+        m_matDataFiltered.conservativeResize(m_pRTE->info()->chs.size(), m_pRTE->getValue()->data.cols());
+        m_matDataFiltered.setZero();
+        m_matDataFilteredFreeze.conservativeResize(m_pRTE->info()->chs.size(), m_pRTE->getValue()->data.cols());
+        m_matDataFilteredFreeze.setZero();
+    }
+
     bool doProj = m_bProjActivated && m_matData.cols() > 0 && m_matData.rows() == m_matProj.cols() ? true : false;
 
     if(!doProj)
@@ -572,11 +574,11 @@ void doFilterPerChannelRTE(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &cha
 //*************************************************************************************************************
 
 void RealTimeEvokedModel::filterChannelsConcurrently()
-{
+{    
+    //std::cout<<"START RealTimeEvokedModel::filterChannelsConcurrently()"<<std::endl;
+
     if(m_filterData.isEmpty())
         return;
-
-    std::cout<<"START RealTimeEvokedModel::filterChannelsConcurrently()"<<std::endl;
 
     //Generate QList structure which can be handled by the QConcurrent framework
     QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;
@@ -610,6 +612,6 @@ void RealTimeEvokedModel::filterChannelsConcurrently()
     for(int i = 0; i<notFilterChannelIndex.size(); i++)
         m_matDataFiltered.row(notFilterChannelIndex.at(i)) = m_matData.row(notFilterChannelIndex.at(i));
 
-    std::cout<<"END RealTimeEvokedModel::filterChannelsConcurrently()"<<std::endl;
+    //std::cout<<"END RealTimeEvokedModel::filterChannelsConcurrently()"<<std::endl;
 }
 

@@ -580,14 +580,18 @@ void SelectionManagerWindow::onBtnSaveUserSelection()
     QString path = QFileDialog::getSaveFileName(this,
                                                 "Save user channel selection",
                                                 QString("./MNE_Browse_Raw_Resources/Templates/ChannelSelection/%1_%2_%3_UserSelection").arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
-                                                tr("Selection file(*.sel)"));
+                                                tr("Selection file(*.sel);; Montage file(*.mon)"));
 
     QMap<QString, QStringList> tempMap = m_selectionGroupsMap;
     tempMap.remove("All");
     tempMap.remove("All EEG");
 
-    if(!path.isEmpty())
-        SelectionIO::writeMNESelFile(path, tempMap);
+    if(!path.isEmpty()) {
+        if(path.contains(".sel"))
+            SelectionIO::writeMNESelFile(path, tempMap);
+        if(path.contains(".mon"))
+            SelectionIO::writeBrainstormMonFiles(path, tempMap);
+    }
 }
 
 
@@ -645,10 +649,17 @@ bool SelectionManagerWindow::eventFilter(QObject *obj, QEvent *event)
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
 
         if(keyEvent->key() == Qt::Key_Delete) {
-            for(int i = 0; i<ui->m_listWidget_selectionGroups->selectedItems().size(); i++)
-                m_selectionGroupsMap.remove(ui->m_listWidget_selectionGroups->selectedItems().at(i)->text());
+            QList<QListWidgetItem *> tempSelectedList;
 
-            qDeleteAll(ui->m_listWidget_selectionGroups->selectedItems());
+            for(int i = 0; i<ui->m_listWidget_selectionGroups->selectedItems().size(); i++) {
+                if(ui->m_listWidget_selectionGroups->selectedItems().at(i)->text() != "All" &&
+                        ui->m_listWidget_selectionGroups->selectedItems().at(i)->text() != "All EEG") {
+                    tempSelectedList.append(ui->m_listWidget_selectionGroups->selectedItems().at(i));
+                    m_selectionGroupsMap.remove(ui->m_listWidget_selectionGroups->selectedItems().at(i)->text());
+                }
+            }
+
+            qDeleteAll(tempSelectedList);
             updateDataView();
 
             return true;
