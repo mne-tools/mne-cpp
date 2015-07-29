@@ -786,7 +786,7 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
     //Create temporary filters with higher fft length because we are going to filter all available data at once for one time
     QList<FilterData> tempFilterList;
 
-    int fftLength = m_matDataRaw.row(0).cols() + 2 * m_iMaxFilterLength;
+    int fftLength = m_matDataRaw.row(0).cols() + 4 * m_iMaxFilterLength;
     int exp = ceil(MNEMath::log2(fftLength));
     fftLength = pow(2, exp) <512 ? 512 : pow(2, exp);
 

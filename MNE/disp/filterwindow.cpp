@@ -594,9 +594,13 @@ void FilterWindow::filterParametersChanged()
     if(ui->m_spinBox_filterTaps->value()%2 != 0)
         m_iFilterTaps--;
 
-    int fftLength = m_iWindowSize + ui->m_spinBox_filterTaps->value() * 2;
+    int fftLength = m_iWindowSize + ui->m_spinBox_filterTaps->value() * 4;
     int exp = ceil(MNEMath::log2(fftLength));
-    fftLength = pow(2, exp) <512 ? 512 : pow(2, exp+2);
+    fftLength = pow(2, exp) <512 ? 512 : pow(2, exp);
+
+//    std::cout<<"fftLength: "<<fftLength<<std::endl;
+//    std::cout<<"m_iWindowSize: "<<m_iWindowSize<<std::endl;
+//    std::cout<<"m_iWindowSize + ui->m_spinBox_filterTaps->value() * 4: "<<m_iWindowSize + ui->m_spinBox_filterTaps->value() * 4<<std::endl;
 
     //set maximum and minimum for cut off frequency spin boxes
     ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);

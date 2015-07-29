@@ -98,7 +98,8 @@ QVariant RealTimeEvokedModel::data(const QModelIndex &index, int role) const
         if(index.column() == 0 && role == Qt::DisplayRole)
             return QVariant(m_pRTE->info()->ch_names[row]);
 
-        //******** second column (data plot) ********
+        //******** second column (butterfly data plot) ********
+        //TODO: Bring this into a better structure see colum three
         if(index.column()==1) {
             QVariant v;
 
@@ -121,6 +122,9 @@ QVariant RealTimeEvokedModel::data(const QModelIndex &index, int role) const
                         else
                             rowVec = m_matDataFiltered.row(row);
                     }
+
+                    v.setValue(rowVec);
+
                     return v;
                     break;
                 }
@@ -140,7 +144,7 @@ QVariant RealTimeEvokedModel::data(const QModelIndex &index, int role) const
             } // end role switch
         } // end column check
 
-        //******** third column (evoked set data types) ********
+        //******** third column (2D layout data plot, this third column is needed because the te data needs to be in another strucutre for the 2D layout to work) ********
         if(index.column()==2) {
             QVariant v;
             RowVectorPair averagedData;
@@ -149,14 +153,28 @@ QVariant RealTimeEvokedModel::data(const QModelIndex &index, int role) const
                 case RealTimeEvokedModelRoles::GetAverageData: {
                     if(m_bIsFreezed){
                         // data freeze
-                        averagedData.first = m_matDataFreeze.data();
-                        averagedData.second = m_matDataFreeze.cols();
+                        if(m_filterData.isEmpty()) {
+                            averagedData.first = m_matDataFreeze.data();
+                            averagedData.second = m_matDataFreeze.cols();
+                        }
+                        else {
+                            averagedData.first = m_matDataFilteredFreeze.data();
+                            averagedData.second = m_matDataFilteredFreeze.cols();
+                        }
+
                         v.setValue(averagedData);
                     }
                     else {
                         // data
-                        averagedData.first = m_matData.data();
-                        averagedData.second = m_matData.cols();
+                        if(m_filterData.isEmpty()) {
+                            averagedData.first = m_matData.data();
+                            averagedData.second = m_matData.cols();
+                        }
+                        else {
+                            averagedData.first = m_matDataFiltered.data();
+                            averagedData.second = m_matDataFiltered.cols();
+                        }
+
                         v.setValue(averagedData);
                     }
                 }
@@ -220,9 +238,20 @@ void RealTimeEvokedModel::setRTE(QSharedPointer<RealTimeEvoked> &pRTE)
 
     m_vecBadIdcs = sel;
 
+    //init data matrix
+    m_matData.conservativeResize(m_pRTE->info()->chs.size(), m_pRTE->getValue()->data.cols());
+    m_matData.setZero();
+    m_matDataFreeze.conservativeResize(m_pRTE->info()->chs.size(), m_pRTE->getValue()->data.cols());
+    m_matDataFreeze.setZero();
+    m_matDataFiltered.conservativeResize(m_pRTE->info()->chs.size(), m_pRTE->getValue()->data.cols());
+    m_matDataFiltered.setZero();
+    m_matDataFilteredFreeze.conservativeResize(m_pRTE->info()->chs.size(), m_pRTE->getValue()->data.cols());
+    m_matDataFilteredFreeze.setZero();
+
     //Create the initial SSP projector
     updateProjection();
 
+    //Init list of channels which are to filtered
     createFilterChannelList(m_pRTE->info()->ch_names);
 
     endResetModel();
@@ -522,8 +551,6 @@ void RealTimeEvokedModel::createFilterChannelList(QStringList channelNames)
         }
     }
 
-//    m_bDrawFilterFront = false;
-
 //    for(int i = 0; i<m_filterChannelList.size(); i++)
 //        std::cout<<m_filterChannelList.at(i).toStdString()<<std::endl;
 
@@ -546,31 +573,10 @@ void doFilterPerChannelRTE(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &cha
 
 void RealTimeEvokedModel::filterChannelsConcurrently()
 {
-    std::cout<<"START RealTimeEvokedModel::filterChannelsConcurrently()"<<std::endl;
-
     if(m_filterData.isEmpty())
         return;
 
-    //Create temporary filters with higher fft length because we are going to filter all available data at once for one time
-    QList<FilterData> tempFilterList;
-
-    int fftLength = m_matData.row(0).cols() + 2 * m_iMaxFilterLength;
-    int exp = ceil(MNEMath::log2(fftLength));
-    fftLength = pow(2, exp) <512 ? 512 : pow(2, exp);
-
-    for(int i = 0; i<m_filterData.size(); i++) {
-        FilterData tempFilter(m_filterData.at(i).m_sName,
-                              m_filterData.at(i).m_Type,
-                              m_filterData.at(i).m_iFilterOrder,
-                              m_filterData.at(i).m_dCenterFreq,
-                              m_filterData.at(i).m_dBandwidth,
-                              m_filterData.at(i).m_dParksWidth,
-                              m_filterData.at(i).m_sFreq,
-                              fftLength,
-                              m_filterData.at(i).m_designMethod);
-
-        tempFilterList.append(tempFilter);
-    }
+    std::cout<<"START RealTimeEvokedModel::filterChannelsConcurrently()"<<std::endl;
 
     //Generate QList structure which can be handled by the QConcurrent framework
     QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;
@@ -581,7 +587,7 @@ void RealTimeEvokedModel::filterChannelsConcurrently()
         if(m_filterChannelList.contains(m_pRTE->info()->chs.at(i).ch_name)) {
             RowVectorXd datTemp(m_matData.row(i).cols() + 2 * m_iMaxFilterLength);
             datTemp << m_matData.row(i).head(m_iMaxFilterLength).reverse(), m_matData.row(i), m_matData.row(i).tail(m_iMaxFilterLength).reverse();
-            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(tempFilterList,QPair<int,RowVectorXd>(i,datTemp)));
+            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,datTemp)));
         }
         else
             notFilterChannelIndex.append(i);
@@ -589,6 +595,8 @@ void RealTimeEvokedModel::filterChannelsConcurrently()
 
     //Do the concurrent filtering
     if(!timeData.isEmpty()) {
+        std::cout<<"timeData.size(): "<<timeData.size()<<std::endl;
+
         QFuture<void> future = QtConcurrent::map(timeData,
                                              doFilterPerChannelRTE);
 
