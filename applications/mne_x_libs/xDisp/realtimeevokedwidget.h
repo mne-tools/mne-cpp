@@ -51,6 +51,7 @@
 #include "helpers/quickcontrolwidget.h"
 #include "helpers/averagescene.h"
 #include "helpers/averagesceneitem.h"
+#include "disp/filterwindow.h"
 
 
 //*************************************************************************************************************
@@ -224,18 +225,6 @@ private:
 
     //=========================================================================================================
     /**
-    * Apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda
-    */
-    void applySelection();
-
-    //=========================================================================================================
-    /**
-    * Reset the in m_qListCurrentSelection stored selection -> hack around C++11 lambda
-    */
-    void resetSelection();
-
-    //=========================================================================================================
-    /**
     * Reimplemented eventFilter
     */
     bool virtual eventFilter(QObject *object, QEvent *event);
@@ -245,6 +234,12 @@ private:
     * call this function whenever a selection was made in teh evoked data set list
     */
     void onSelectionChanged();
+
+    //=========================================================================================================
+    /**
+    * Shows the filter widget
+    */
+    void showFilterWidget(bool state = true);
 
     //=========================================================================================================
     /**
@@ -258,6 +253,7 @@ private:
 
     bool            m_bInitialized;             /**< Is Initialized */
     bool            m_bHideBadChannels;         /**< hide bad channels flag. */
+    qint32          m_iMaxFilterTapSize;        /**< maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
 
     FiffInfo::SPtr  m_pFiffInfo;                /**< FiffInfo, which is used insteadd of ListChInfo*/
 
@@ -273,6 +269,7 @@ private:
     QSharedPointer<SelectionManagerWindow>      m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */
     QSharedPointer<ChInfoModel>                 m_pChInfoModel;             /**< Channel info model. */
     QSharedPointer<RealTimeEvoked>              m_pRTE;                     /**< The real-time evoked measurement. */
+    QSharedPointer<FilterWindow>                m_pFilterWindow;            /**< Filter window. */
 
     QList<Modality>                     m_qListModalities;
     QList<qint32>                       m_qListCurrentSelection;    /**< Current selection list -> hack around C++11 lambda  */

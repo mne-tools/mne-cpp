@@ -47,6 +47,8 @@
 #include <fiff/fiff_types.h>
 #include <iostream>
 
+#include <utils/filterTools/filterdata.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -54,6 +56,8 @@
 //=============================================================================================================
 
 #include <QAbstractTableModel>
+#include <QtConcurrent/QtConcurrent>
+#include <QFuture>
 
 
 //*************************************************************************************************************
@@ -89,6 +93,7 @@ typedef QPair<const double*,qint32> RowVectorPair;
 using namespace XMEASLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
+using namespace UTILSLIB;
 
 
 //=============================================================================================================
@@ -300,6 +305,30 @@ public:
     */
     void toggleFreeze();
 
+    //=========================================================================================================
+    /**
+    * Filter parameters changed
+    *
+    * @param[in] filterData    list of the currently active filter
+    */
+    void filterChanged(QList<FilterData> filterData);
+
+    //=========================================================================================================
+    /**
+    * Sets the type of channel which are to be filtered
+    *
+    * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
+    */
+    void setFilterChannelType(QString channelType);
+
+    //=========================================================================================================
+    /**
+    * Create list of channels which are to be filtered based on channel names
+    *
+    * @param[in] channelNames    the channel names which are to be filtered
+    */
+    void createFilterChannelList(QStringList channelNames);
+
 signals:
     //=========================================================================================================
     /**
@@ -310,6 +339,12 @@ signals:
     void newSelection(QList<qint32> selection);
 
 private:
+    //=========================================================================================================
+    /**
+    * Calculates the filtered version of the channels in m_matData
+    */
+    void filterChannelsConcurrently();
+
     QSharedPointer<RealTimeEvoked> m_pRTE;          /**< The real-time evoked measurement. */
 
     QMap<qint32,qint32>     m_qMapIdxRowSelection;  /**< Selection mapping.*/
@@ -318,6 +353,8 @@ private:
     MatrixXd                m_matData;              /**< List that holds the data*/
     MatrixXd                m_matDataFreeze;        /**< List that holds the data when freezed*/
     MatrixXd                m_matProj;              /**< SSP projector */
+    MatrixXd                m_matDataFiltered;      /**< The filtered data */
+    MatrixXd                m_matDataFilteredFreeze;/**< The raw filtered data in freeze mode */
     SparseMatrix<double>    m_matSparseProj;        /**< Sparse SSP projector */
 
     RowVectorXi             m_vecBadIdcs;           /**< Idcs of bad channels */
@@ -326,6 +363,12 @@ private:
     bool    m_bIsFreezed;           /**< Display is freezed */
     bool    m_bProjActivated;       /**< Doo projections flag */
     float   m_fSps;                 /**< Sampling rate */
+    qint32  m_iMaxFilterLength;     /**< Max order of the current filters */
+    QString m_sFilterChannelType;   /**< Kind of channel which is to be filtered */
+
+    QList<FilterData>                   m_filterData;           /**< List of currently active filters. */
+    QStringList                         m_filterChannelList;    /**< List of channels which are to be filtered.*/
+    QStringList                         m_visibleChannelList;   /**< List of currently visible channels in the view.*/
 };
 
 

@@ -766,7 +766,7 @@ void RealTimeMultiSampleArrayModel::markChBad(QModelIndexList chlist, bool statu
 
 //*************************************************************************************************************
 
-void doFilterPerChannel(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
+void doFilterPerChannelRTMSA(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
 {
     for(int i=0; i<channelDataTime.first.size(); i++)
         //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true, FilterData::ZeroPad);
@@ -822,7 +822,7 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
     //Do the concurrent filtering
     if(!timeData.isEmpty()) {
         QFuture<void> future = QtConcurrent::map(timeData,
-                                             doFilterPerChannel);
+                                             doFilterPerChannelRTMSA);
 
         future.waitForFinished();
 
@@ -872,7 +872,7 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
     //Do the concurrent filtering
     if(!timeData.isEmpty()) {
         QFuture<void> future = QtConcurrent::map(timeData,
-                                             doFilterPerChannel);
+                                             doFilterPerChannelRTMSA);
 
         future.waitForFinished();
 

@@ -405,7 +405,7 @@ private:
     QSharedPointer<ChInfoModel>                     m_pChInfoModel;                 /**< channel info model. */
     QSharedPointer<NewRealTimeMultiSampleArray>     m_pRTMSA;                       /**< The real-time sample array measurement. */
     QSharedPointer<SelectionManagerWindow>          m_pSelectionManagerWindow;      /**< SelectionManagerWindow. */
-    QSharedPointer<FilterWindow>                    m_pFilterWindow;                /**< SelectionManagerWindow. */
+    QSharedPointer<FilterWindow>                    m_pFilterWindow;                /**< Filter window. */
 
     QAction*        m_pActionSelectSensors;                             /**< show roi select widget */
     QAction*        m_pActionFiltering;                                 /**< show filter window */

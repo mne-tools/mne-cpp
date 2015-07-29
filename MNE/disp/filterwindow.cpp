@@ -85,11 +85,11 @@ FilterWindow::~FilterWindow()
 
 //*************************************************************************************************************
 
-void FilterWindow::setFiffInfo(const FiffInfo &fiffInfo)
+void FilterWindow::setFiffInfo(const FiffInfo::SPtr &pFiffInfo)
 {
-    m_fiffInfo = fiffInfo;
+    m_pFiffInfo = pFiffInfo;
 
-    m_dSFreq = m_fiffInfo.sfreq;
+    m_dSFreq = m_pFiffInfo->sfreq;
 
     filterParametersChanged();
 
@@ -97,7 +97,7 @@ void FilterWindow::setFiffInfo(const FiffInfo &fiffInfo)
     m_pFilterDataModel->addFilter(m_filterData);
 
     //Update min max of spin boxes to nyquist
-    double samplingFrequency = m_fiffInfo.sfreq;
+    double samplingFrequency = m_pFiffInfo->sfreq;
     double nyquistFrequency = samplingFrequency/2;
 
     ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
@@ -596,7 +596,7 @@ void FilterWindow::filterParametersChanged()
 
     int fftLength = m_iWindowSize + ui->m_spinBox_filterTaps->value() * 2;
     int exp = ceil(MNEMath::log2(fftLength));
-    fftLength = pow(2, exp) <512 ? 512 : pow(2, exp);
+    fftLength = pow(2, exp) <512 ? 512 : pow(2, exp+2);
 
     //set maximum and minimum for cut off frequency spin boxes
     ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);

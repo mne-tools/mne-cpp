@@ -352,12 +352,12 @@ void RealTimeMultiSampleArrayWidget::init()
             m_pFilterWindow = QSharedPointer<FilterWindow>(new FilterWindow(this));
             //m_pFilterWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
 
-            m_pFilterWindow->setFiffInfo(*m_pFiffInfo.data());
+            m_pFilterWindow->setFiffInfo(m_pFiffInfo);
             m_pFilterWindow->setWindowSize(m_iMaxFilterTapSize);
             m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
 
             connect(m_pFilterWindow.data(),static_cast<void (FilterWindow::*)(QString)>(&FilterWindow::applyFilter),
-                        m_pRTMSAModel,static_cast<void (RealTimeMultiSampleArrayModel::*)(QString)>(&RealTimeMultiSampleArrayModel::setFilterChannelType));
+                    m_pRTMSAModel,static_cast<void (RealTimeMultiSampleArrayModel::*)(QString)>(&RealTimeMultiSampleArrayModel::setFilterChannelType));
 
             connect(m_pFilterWindow.data(), &FilterWindow::filterChanged,
                     m_pRTMSAModel, &RealTimeMultiSampleArrayModel::filterChanged);
@@ -449,6 +449,7 @@ void RealTimeMultiSampleArrayWidget::init()
             m_pQuickControlWidget->setViewParameters(settings.value(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), 1.0).toFloat(),
                                                      settings.value(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), 10).toInt(),
                                                      settings.value(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), 95).toInt());
+
             //Activate projections as default
             m_pRTMSAModel->updateProjection();
         }
