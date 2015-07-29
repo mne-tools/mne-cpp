@@ -244,6 +244,14 @@ void RealTimeEvokedWidget::getData()
         }
     }
     else {
+        //Check if block size has changed, if yes update the filter
+        if(m_iMaxFilterTapSize != m_pRTE->getValue()->data.cols()) {
+            m_iMaxFilterTapSize = m_pRTE->getValue()->data.cols();
+
+            m_pFilterWindow->setWindowSize(m_iMaxFilterTapSize);
+            m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
+        }
+
         m_pRTEModel->updateData();
     }
 }
