@@ -401,6 +401,8 @@ Mri Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int frame, bool headerOn
     mri.fName = fName;
 
     mri.slices = sliceDataList;
+    //mri.slices.getNewCube(sliceDataList);
+
     return mri;
 //    return sliceDataList;
 }

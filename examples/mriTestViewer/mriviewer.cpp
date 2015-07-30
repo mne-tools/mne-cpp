@@ -60,11 +60,11 @@ MriViewer::MriViewer(QWidget *parent) :
     scene = new QGraphicsScene(this);
 
 //    // image file example
-//    filePath = "D:/Bilder/Lorenz_Esch.jpg";
+//    filePath = "/Lorenz_Esch.jpg";
 //    loadImageFile(filePath);
 
     // mri file example
-    filePath = "D:/Repos/mne-cpp/bin/MNE-sample-data/subjects/sample/mri/orig/001.mgh";
+    filePath = "C:/Repos/mne-cpp/examples/mriTestViewer/data/001.mgh";
     loadMriFile(filePath);
 
     ui->graphicsView->setScene(scene);

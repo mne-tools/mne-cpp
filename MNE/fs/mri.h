@@ -44,6 +44,7 @@
 
 #include "fs_global.h"
 #include <Eigen/Core>
+#include "cubedata.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -156,7 +157,10 @@ public:
        each slice is a matrix of width*depth
        appended to a list of height slices.
     */
-    QList<Eigen::MatrixXd> slices;
+    //QList<Eigen::MatrixXd> slices;
+    //FSLIB::SliceData slices;
+    FSLIB::CubeData slices;
+
     int scale;
     int nFrames; /* # of concatenated images */
 
