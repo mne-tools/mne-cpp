@@ -61,26 +61,22 @@ namespace FSLIB
 {
 
 //*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
 
-using namespace Eigen;
 
 class SliceData
 {
 public:
     SliceData();
-    SliceData(MatrixXd slice);
-    SliceData(MatrixXd slice, quint32 idx);
+    SliceData(Eigen::MatrixXd slice);
+    SliceData(Eigen::MatrixXd slice, quint32 idx);
     ~SliceData();
-    MatrixXd getDataAsMatrix();
-    void setDataAsMatrix(MatrixXd slice);
+    Eigen::MatrixXd getDataAsMatrix();
+    void setDataAsMatrix(Eigen::MatrixXd slice);
     void setSliceIdx(quint32 idx);
     double getVoxel(int x, int y);
 
 private:
-    MatrixXd m_slice;
+    Eigen::MatrixXd m_slice;
     quint32 m_idx; // index of slice
     quint32 m_dimX; // row
     quint32 m_dimY; // column
