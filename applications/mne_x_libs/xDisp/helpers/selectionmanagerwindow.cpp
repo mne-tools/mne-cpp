@@ -580,7 +580,7 @@ void SelectionManagerWindow::onBtnSaveUserSelection()
     QString path = QFileDialog::getSaveFileName(this,
                                                 "Save user channel selection",
                                                 QString("./MNE_Browse_Raw_Resources/Templates/ChannelSelection/%1_%2_%3_UserSelection").arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
-                                                tr("Selection file(*.sel);; Montage file(*.mon)"));
+                                                tr("MNE selection file(*.sel);; Brainstorm montage file(*.mon)"));
 
     QMap<QString, QStringList> tempMap = m_selectionGroupsMap;
     tempMap.remove("All");
