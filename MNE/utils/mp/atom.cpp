@@ -78,6 +78,46 @@ using namespace UTILSLIB;
 
 //*************************************************************************************************************
 
+MatrixXd Atom::make_tf(qint32 sample_count, qreal scale, quint32 translation, qreal modulation)
+{
+    std::cout << "\n";
+
+    if(sample_count== scale) translation = floor(sample_count/2);
+
+    MatrixXd tf_matrix = MatrixXd::Zero(floor(sample_count/2), sample_count);
+    for(qint32 w = 0; w < floor(sample_count/2); w++)
+    {
+        for(qint32 t = 0; t < sample_count; t++)
+        {
+            tf_matrix(w, t)= exp( - 2 * PI
+                             * (pow(((qreal(t) - qreal(translation)) / scale), 2)
+                             + pow((scale * ((2* w * PI / qreal(sample_count))
+                             - (2* modulation * PI / qreal(sample_count))) / 2 / PI), 2)));
+            /*//debugout
+            qreal a = pow(((qreal(t) - qreal(translation)) / scale), qreal(2));
+            qreal b = ((scale * ((qreal(2)* w * PI / qreal(sample_count)))
+                        - (qreal(2)* modulation * PI / qreal(sample_count))) / qreal(2) / PI);
+            std::cout << "\na=" << a << "\n";
+            std::cout << "b=" << b << "\n";
+            b = pow(b, qreal(2));
+            std::cout << "b^2=" << b << "\n";
+            qreal c = a + b;
+            std::cout << "c=" << c << "\n";
+            c = exp(- qreal(2) * PI * c);
+            std::cout << "exp(c)=" << c << "\n";
+
+            if(w%8 == 0) std::cout << tf_matrix(w, t) << ";";
+*/
+
+         }
+//         std::cout << "\n";
+    }
+
+    return tf_matrix;
+}
+
+//*************************************************************************************************************
+
 FixDictAtom::FixDictAtom(qint32 _id, qint32 _sample_count, QString _dict_source)
 {
     id = _id;
