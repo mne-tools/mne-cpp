@@ -64,7 +64,9 @@
 #include <QtConcurrent>
 #include <qtconcurrentrun.h>
 
-#include "QtGui"
+#include <QtGui>
+#include <QGraphicsTextItem>
+#include <QGraphicsLineItem>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -3287,29 +3289,141 @@ void MainWindow::on_actionTest_triggered()
 
         if(_adaptive_atom_list.count() > 0 && _adaptive_atom_list.first().count() > 0)
         {
-            GaborAtom atom  = _adaptive_atom_list.first().first();
-            MatrixXd tf_matrix = MatrixXd::Zero(atom.sample_count, atom.sample_count);
-            qreal u = floor(atom.sample_count / 2);
+            QList<MatrixXd> tf_atoms();
+            MatrixXd tf_sum = MatrixXd::Zero(floor(_adaptive_atom_list.first().first().sample_count/2), _adaptive_atom_list.first().first().sample_count);
+            for(qint32 i = 0; i < _adaptive_atom_list.first().length(); i++)//foreach channel
+            {
+                for(qint32 j = 0; j < _adaptive_atom_list.length(); j++) //foreach atom
+                {
+                    GaborAtom atom  = _adaptive_atom_list.at(j).at(i);
+                    MatrixXd tf_matrix = atom.make_tf(atom.sample_count, atom.scale, atom.translation,atom.modulation);
+                    //tf_atoms.append(*tf_matrix);
+                    tf_matrix *= atom.max_scalar_list.at(i)*atom.max_scalar_list.at(i);
+                    tf_sum += tf_matrix;
+                }
+
+
+
+
+            /*qreal u = floor(atom.sample_count / 2);
             for(int t = 0; t < atom.sample_count; t++)
                 for(int f = 0; f < u - 1; f++)
                 {
                     qreal v = -2 * PI * pow((t - u) / atom.scale, 2) + pow(atom.scale * ((f * PI / atom.sample_count * 2) - (atom.phase * PI / atom.sample_count * 2)) / 2 / PI, 2);
                     tf_matrix(f, t) = 0.5 * 2 * qExp(v);
                 }
+              */
 
-
+            }
             // MatrixXd test_matrix = MatrixXd::Random(600, 600);
             //cout << test_matrix;
-            QImage *test_image = new QImage(tf_matrix.rows(), tf_matrix.cols(), QImage::Format_RGB32);
-            QColor color;
-            for ( int y = 0; y < tf_matrix.rows(); y++ )
-                for ( int x = 0; x < tf_matrix.cols(); x++ )
-                {
-                    color.setRgb(ColorMap::hotR(abs(tf_matrix(x,y))), ColorMap::hotG(abs(tf_matrix(x,y))), ColorMap::hotB(abs(tf_matrix(x,y))));
-                    test_image->setPixel(x, y, color.rgb());
-                }
+            QImage *test_image = new QImage(tf_sum.cols(), tf_sum.rows(), QImage::Format_RGB32);
+            QImage *y_axis = new QImage(25, tf_sum.rows(), QImage::Format_RGB32);
 
-            plot_window->ui->l_pixel->setPixmap(QPixmap::fromImage(*test_image));
+            QColor color;
+
+            //normalisation of the tf-matrix
+            qreal norm = tf_sum.maxCoeff();
+            qreal mnorm = tf_sum.minCoeff();
+            if(abs(mnorm) > norm) norm = mnorm;
+            tf_sum /= norm;
+
+            // y axis colors just for fun whatever
+            norm = tf_sum.maxCoeff();
+            for(qint32 it = 0; it < tf_sum.rows(); it++)
+            {
+                for ( qint32 x = 0; x < 25; x++ )
+                {
+                    color.setRgb(ColorMap::hotR(it*norm/tf_sum.rows()), ColorMap::hotG(it*norm/tf_sum.rows()), ColorMap::hotB(it*norm/tf_sum.rows()));
+                    y_axis->setPixel(x, tf_sum.rows() - 1 -  it,  color.rgb());
+                }
+                std::cout << ColorMap::jetR(it*norm/tf_sum.rows()) << " ; " <<
+                             ColorMap::jetG(it*norm/tf_sum.rows()) << " ; " <<
+                             ColorMap::jetB(it*norm/tf_sum.rows()) << "\n";
+            }
+
+            //x-axis
+            //QGraphicsTextItem *x_axis_values = new QGraphicsTextItem("0.0");
+            QGraphicsTextItem *x_axis_name = new QGraphicsTextItem("time");
+
+            //y-axis
+            QGraphicsTextItem *y_axis_values = new QGraphicsTextItem("0.0");
+            QGraphicsTextItem *y_axis_name = new QGraphicsTextItem("frequency");
+
+            //image
+            for ( qint32 y = 0; y < tf_sum.rows(); y++ )
+            {
+                for ( qint32 x = 0; x < tf_sum.cols(); x++ )
+                {
+                    color.setRgb(ColorMap::hotR(abs(tf_sum(y, x))), ColorMap::hotG(abs(tf_sum(y, x))), ColorMap::hotB(abs(tf_sum(y, x))));
+                    test_image->setPixel(x, tf_sum.rows() - 1 -  y,  color.rgb());
+                }
+            }
+
+
+            QGraphicsPixmapItem *tf_pixmap = new QGraphicsPixmapItem(QPixmap::fromImage(*test_image));
+
+                    //QGraphicsScene
+
+            plot_window->tf_scene.addItem(tf_pixmap);
+
+            //QGraphicsPixmapItem * y_axis_item = plot_window->tf_scene.addPixmap(QPixmap::fromImage(*y_axis));//addItem();
+
+            QList<QGraphicsItem *> x_axis_values;
+            QList<QGraphicsItem *> x_axis_lines;
+
+            const qint32 maxStrLenght = 55;
+            qint32 borderMarginWidth = 15;
+            qreal scaleXText = (_adaptive_atom_list.first().first().sample_count - 1) /  _sample_rate / 21.0;                       // divide signallength
+            //qreal scaleXAchse = (windowSize.width() - maxStrLenght - borderMarginWidth) / 20.0;
+
+            for(qint32 j = 0; j < 22; j++)
+            {
+                QGraphicsTextItem *text_item = new QGraphicsTextItem(QString::number(j * scaleXText + _from / _sample_rate  + _offset_time, 'f', 2), tf_pixmap);
+                text_item->setFont(QFont("arial", 3));
+                x_axis_values.append(text_item);    // scalevalue as string
+                QGraphicsLineItem *line_item = new QGraphicsLineItem(tf_pixmap);
+                line_item->setLine(0,-1,0,1);
+                line_item->setPen(QPen(Qt::darkGray, 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+                x_axis_lines.append(line_item);                    // scalelines
+                plot_window->tf_scene.addItem(x_axis_values.at(j));
+                plot_window->tf_scene.addItem(line_item);
+            }
+            //painter.drawText(5 , 20, "[sec]");  // unit
+            //painter.drawLine(5, 5, windowSize.width()-5, 5);  // paint y-line
+
+            //plot_window->tf_scene.addItem(x_axis_name);
+            //plot_window->tf_scene.addItem(x_axis_values);
+
+            //plot_window->tf_scene.addItem(y_axis_name);
+            //plot_window->tf_scene.addItem(y_axis_values);
+
+            plot_window->ui->tf_view->setScene(&plot_window->tf_scene);
+
+            tf_pixmap->setPos(0/*-test_image->width()/2*/,
+                              0/*-test_image->height()/2*/);
+
+            x_axis_name->setPos(plot_window->tf_scene.width()/2 - x_axis_name->boundingRect().width()/2,
+                                plot_window->tf_scene.height()/2 + test_image->height()/2 + x_axis_name->boundingRect().height()/2 + 10);
+
+            /*y_axis_item->setPos(plot_window->tf_scene.width()/2 - test_image->width()/2 - y_axis_item->boundingRect().width()/2 - 10,
+                                plot_window->tf_scene.height()/2 - y_axis_item->boundingRect().height()/2);
+
+*/
+            qreal scale = test_image->width()/21;
+
+            for(qint32 i = 0; i < x_axis_values.length(); i++)
+            {
+               x_axis_values.at(i)->setPos(qreal(i)*scale - x_axis_values.at(0)->boundingRect().width()/2,
+                                           tf_pixmap->boundingRect().height());
+               x_axis_lines.at(i)->setPos(qreal(i)*scale,
+                                          tf_pixmap->boundingRect().height());
+
+            }
+
+            //plot_window->ui->tf_view->sceneRect().size().toSize();//stretch paint area to image size
+            plot_window->ui->tf_view->scale(3,3);//scale graphic scene
+            plot_window->ui->tf_view->show();
         }
     }
     if(ui->tw_main->count() > 2)
@@ -3331,10 +3445,17 @@ void MainWindow::on_actionTest_triggered()
 
 void MainWindow::on_extend_tab_button()
 {
-    QWidget *tf_overview_w = new QWidget();
-    tf_overview_w->setWindowTitle("Time-Frequency-Overview");
-    tf_overview_w->show();
+    //plot_window->show();
+    //plot_window->setWindowTitle("Time-Frequency-Overview");
+  //  QWidget *tf_overview_w = new QWidget();
+  //  tf_overview_w->setWindowTitle("Time-Frequency-Overview");
+  //  tf_overview_w->show();
     ui->tw_main->removeTab(1);
+    /*QLayout layout;// = new QLayout;
+    layout->addWidget(plot_window);
+    tf_overview_w->setLayout(layout);
+
+*/
 }
 
 void MainWindow::on_close_tab_button(int index)
