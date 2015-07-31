@@ -178,22 +178,23 @@ RealTimeEvokedWidget::~RealTimeEvokedWidget()
         QSettings settings;
 
         //Store Modalities
-        for(qint32 i = 0; i < m_qListModalities.size(); ++i)
-        {
+        for(qint32 i = 0; i < m_qListModalities.size(); ++i) {
             settings.setValue(QString("RTEW/%1/%2/active").arg(t_sRTEWName).arg(m_qListModalities[i].m_sName), m_qListModalities[i].m_bActive);
             settings.setValue(QString("RTEW/%1/%2/norm").arg(t_sRTEWName).arg(m_qListModalities[i].m_sName), m_qListModalities[i].m_fNorm);
         }
 
         //Store filter
-        FilterData filter = m_pFilterWindow->getUserDesignedFilter();
+        if(m_pFilterWindow != 0) {
+            FilterData filter = m_pFilterWindow->getUserDesignedFilter();
 
-        settings.setValue(QString("RTEW/%1/filterHP").arg(t_sRTEWName), filter.m_dHighpassFreq);
-        settings.setValue(QString("RTEW/%1/filterLP").arg(t_sRTEWName), filter.m_dLowpassFreq);
-        settings.setValue(QString("RTEW/%1/filterOrder").arg(t_sRTEWName), filter.m_iFilterOrder);
-        settings.setValue(QString("RTEW/%1/filterType").arg(t_sRTEWName), (int)filter.m_Type);
-        settings.setValue(QString("RTEW/%1/filterDesignMethod").arg(t_sRTEWName), (int)filter.m_designMethod);
-        settings.setValue(QString("RTEW/%1/filterTransition").arg(t_sRTEWName), filter.m_dParksWidth*(filter.m_sFreq/2));
-        settings.setValue(QString("RTEW/%1/filterUserDesignActive").arg(t_sRTEWName), m_pFilterWindow->userDesignedFiltersIsActive());
+            settings.setValue(QString("RTEW/%1/filterHP").arg(t_sRTEWName), filter.m_dHighpassFreq);
+            settings.setValue(QString("RTEW/%1/filterLP").arg(t_sRTEWName), filter.m_dLowpassFreq);
+            settings.setValue(QString("RTEW/%1/filterOrder").arg(t_sRTEWName), filter.m_iFilterOrder);
+            settings.setValue(QString("RTEW/%1/filterType").arg(t_sRTEWName), (int)filter.m_Type);
+            settings.setValue(QString("RTEW/%1/filterDesignMethod").arg(t_sRTEWName), (int)filter.m_designMethod);
+            settings.setValue(QString("RTEW/%1/filterTransition").arg(t_sRTEWName), filter.m_dParksWidth*(filter.m_sFreq/2));
+            settings.setValue(QString("RTEW/%1/filterUserDesignActive").arg(t_sRTEWName), m_pFilterWindow->userDesignedFiltersIsActive());
+        }
 
         //Store scaling
         if(m_qMapChScaling.contains(FIFF_UNIT_T))
@@ -215,7 +216,8 @@ RealTimeEvokedWidget::~RealTimeEvokedWidget()
             settings.setValue(QString("RTEW/%1/scaleMISC").arg(t_sRTEWName), m_qMapChScaling[FIFFV_MISC_CH]);
 
         //Store selected layout file
-        settings.setValue(QString("RTEW/%1/selectedLayoutFile").arg(t_sRTEWName), m_pSelectionManagerWindow->getCurrentLayoutFile());
+        if(!m_pSelectionManagerWindow == 0)
+            settings.setValue(QString("RTEW/%1/selectedLayoutFile").arg(t_sRTEWName), m_pSelectionManagerWindow->getCurrentLayoutFile());
     }
 }
 
