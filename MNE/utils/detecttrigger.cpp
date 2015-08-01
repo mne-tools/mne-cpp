@@ -76,17 +76,18 @@ void DetectTrigger::detectTriggerFlanks(const MatrixXd &data, QMap<int,QList<int
             return;
         }
 
-        RowVectorXd stimSegment = data.row(i.key());
         RowVectorXd::Index indexMaxCoeff;
-        int dMax = stimSegment.maxCoeff(&indexMaxCoeff);
+        int dMax = data.row(i.key()).maxCoeff(&indexMaxCoeff);
 
         //Find trigger using gradient/difference
-        double gradient = 0;
+        double gradient = data.row(i.key())(indexMaxCoeff);
 
-        if(indexMaxCoeff-10<0)
-            gradient = stimSegment(indexMaxCoeff) - stimSegment(indexMaxCoeff+10);
-        else
-            gradient = stimSegment(indexMaxCoeff) - stimSegment(indexMaxCoeff-10);
+//        double gradient = 0;
+
+//        if(indexMaxCoeff-10<0)
+//            gradient = data.row(i.key())(indexMaxCoeff) - data.row(i.key())(indexMaxCoeff+10);
+//        else
+//            gradient = data.row(i.key())(indexMaxCoeff) - data.row(i.key())(indexMaxCoeff-10);
 
 //        std::cout<<"gradient: "<<gradient<<std::endl;
 //        std::cout<<"indexMaxCoeff: "<<indexMaxCoeff<<std::endl;
