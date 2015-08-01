@@ -109,6 +109,47 @@ bool SelectionIO::readMNESelFile(QString path, QMap<QString,QStringList> &select
 
 //*************************************************************************************************************
 
+bool SelectionIO::readBrainstormMonFile(QString path, QMap<QString,QStringList> &selectionMap)
+{
+    //Open .sel file
+    if(!path.contains(".mon"))
+        return false;
+
+    //clear the map first
+    selectionMap.clear();
+
+    QFile file(path);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug()<<"Error opening montage file";
+        return false;
+    }
+
+    //Start reading from file
+    QTextStream in(&file);
+    QString groupName = in.readLine();
+    QStringList channels;
+
+    while(!in.atEnd()) {
+        QString line = in.readLine();
+
+        if(line.contains(":") == true) {
+            QStringList secondSplit = line.split(":");
+            QString key = secondSplit.at(0);
+            channels.append(key);
+        }
+    }
+
+    //Add to map
+    selectionMap.insertMulti(groupName, channels);
+
+    file.close();
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
 bool SelectionIO::writeMNESelFile(QString path, const QMap<QString,QStringList> &selectionMap)
 {
     //Open .sel file
@@ -158,7 +199,7 @@ bool SelectionIO::writeBrainstormMonFiles(QString path, const QMap<QString,QStri
 
         QString newPath = QString("%1/%2.mon").arg(fileInfo.absolutePath()).arg(i.key());
 
-        std::cout<<newPath.toStdString()<<std::endl;
+        //std::cout<<newPath.toStdString()<<std::endl;
 
         QFile file(newPath);
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text)){

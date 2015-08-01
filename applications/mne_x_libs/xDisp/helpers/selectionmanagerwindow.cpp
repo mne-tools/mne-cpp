@@ -382,7 +382,14 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
     QString newPath = path; //QCoreApplication::applicationDirPath() + path.prepend("/MNE_Browse_Raw_Resources/Templates/ChannelSelection/");
 
     m_selectionGroupsMap.clear();
-    bool state = SelectionIO::readMNESelFile(newPath, m_selectionGroupsMap);
+
+    bool state;
+    if(!path.isEmpty()) {
+        if(path.contains(".sel"))
+            state = SelectionIO::readMNESelFile(newPath, m_selectionGroupsMap);
+        if(path.contains(".mon"))
+            state = SelectionIO::readBrainstormMonFile(newPath, m_selectionGroupsMap);
+    }
 
     //Create group 'All' and 'All EEG' manually (bcause this group depends on the loaded channels from the fiff data file, not on the loaded selection file)
     m_selectionGroupsMap["All"] = m_currentlyLoadedFiffChannels;
@@ -563,7 +570,7 @@ void SelectionManagerWindow::onBtnLoadUserSelection()
     QString path = QFileDialog::getOpenFileName(this,
                                                 QString("Open selection file"),
                                                 QString("./MNE_Browse_Raw_Resources/Templates/ChannelSelection/"),
-                                                tr("Selection files (*.sel)"));
+                                                tr("Selection files (*.sel *.mon)"));
 
     if(path.isEmpty())
         return;
