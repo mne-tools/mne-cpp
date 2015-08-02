@@ -89,7 +89,7 @@ BabyMEG::BabyMEG()
 , m_pRawMatrixBuffer(0)
 , m_sFiffHeader(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/header.fif")
 , m_sBadChannels(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/both.bad")
-, m_iRecordingSeconds(5*60*1000)
+, m_iRecordingMSeconds(5*60*1000)
 {
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup Project"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
@@ -465,7 +465,7 @@ void BabyMEG::toggleRecordingFile()
         m_pBlinkingRecordButtonTimer->start(500);
 
         if(m_bUseRecordTimer) {
-            m_pRecordTimer->start(m_iRecordingSeconds);
+            m_pRecordTimer->start(m_iRecordingMSeconds);
             m_pUpdateTimeInfoTimer->start(1000);
         }
     }
@@ -846,7 +846,7 @@ void BabyMEG::changeRecordingButton()
 
 void BabyMEG::setRecordingTimerChanged(int time)
 {
-    m_iRecordingSeconds = time;
+    m_iRecordingMSeconds = time;
 }
 
 
@@ -862,6 +862,7 @@ void BabyMEG::setRecordingTimerStateChanged(bool state)
 
 void BabyMEG::onRecordingRemainingTimeChange()
 {
-    m_pBabyMEGProjectDialog->setRecordingRemainingTime(m_pRecordTimer->remainingTime());
+    int remainingMSeconds = m_pRecordTimer->remainingTime();
+    m_pBabyMEGProjectDialog->setRecordingRemainingTime(remainingMSeconds);
 }
 
