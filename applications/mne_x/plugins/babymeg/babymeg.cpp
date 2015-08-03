@@ -125,20 +125,19 @@ BabyMEG::BabyMEG()
     addPluginAction(m_pActionUpdateFiffInfoForHPI);
 
     //Init timers
-    if(m_pRecordTimer == 0) {
+    if(!m_pRecordTimer) {
         m_pRecordTimer = QSharedPointer<QTimer>(new QTimer(this));
-        m_pRecordTimer->setSingleShot(true);
         connect(m_pRecordTimer.data(), &QTimer::timeout,
                 this, &BabyMEG::toggleRecordingFile);
     }
 
-    if(m_pBlinkingRecordButtonTimer == 0) {
+    if(!m_pBlinkingRecordButtonTimer) {
         m_pBlinkingRecordButtonTimer = QSharedPointer<QTimer>(new QTimer(this));
         connect(m_pBlinkingRecordButtonTimer.data(), &QTimer::timeout,
                 this, &BabyMEG::changeRecordingButton);
     }
 
-    if(m_pUpdateTimeInfoTimer == 0) {
+    if(!m_pUpdateTimeInfoTimer) {
         m_pUpdateTimeInfoTimer = QSharedPointer<QTimer>(new QTimer(this));
         connect(m_pUpdateTimeInfoTimer.data(), &QTimer::timeout,
                 this, &BabyMEG::onRecordingRemainingTimeChange);
