@@ -290,6 +290,8 @@ void BabyMEG::showProjectDialog()
     if(m_pBabyMEGProjectDialog == 0)
         m_pBabyMEGProjectDialog = QSharedPointer<BabyMEGProjectDialog>(new BabyMEGProjectDialog(this));
 
+    m_pBabyMEGProjectDialog->setWindowFlags(Qt::WindowStaysOnTopHint);
+
     connect(m_pBabyMEGProjectDialog.data(), &BabyMEGProjectDialog::timerChanged,
             this, &BabyMEG::setRecordingTimerChanged);
 
