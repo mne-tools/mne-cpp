@@ -65,6 +65,8 @@ private:
 
     QStringList m_sListProjects;
     QStringList m_sListSubjects;
+
+    int m_iRecordingTime;       /**< recording time in ms.*/
 };
 
 } // NAMESPACE

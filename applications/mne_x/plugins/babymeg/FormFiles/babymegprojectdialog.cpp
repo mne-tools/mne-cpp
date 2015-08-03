@@ -75,6 +75,7 @@ BabyMEGProjectDialog::BabyMEGProjectDialog(BabyMEG* p_pBabyMEG, QWidget *parent)
 : m_pBabyMEG(p_pBabyMEG)
 , QDialog(parent)
 , ui(new Ui::BabyMEGProjectDialog)
+, m_iRecordingTime(5*60*1000)
 {
     ui->setupUi(this);
 
@@ -138,9 +139,15 @@ void BabyMEGProjectDialog::setRecordingRemainingTime(int msecs)
 {
     QTime remainingTime(0,0,0,0);
 
-    QTime finalTime = remainingTime.addMSecs(msecs);
+    QTime remainingTimeFinal = remainingTime.addMSecs(msecs);
 
-    ui->m_label_timeToGo->setText(finalTime.toString());
+    ui->m_label_timeToGo->setText(remainingTimeFinal.toString());
+
+    QTime passedTime(0,0,0,0);
+
+    QTime passedTimeFinal = passedTime.addMSecs(m_iRecordingTime-msecs);
+
+    ui->m_label_timePassed->setText(passedTimeFinal.toString());
 }
 
 
@@ -363,9 +370,12 @@ void BabyMEGProjectDialog::updateFileName()
 
 void BabyMEGProjectDialog::onTimeChanged()
 {
-    int seconds = (ui->m_spinBox_hours->value()*60*60)+(ui->m_spinBox_min->value()*60)+(ui->m_spinBox_sec->value());
 
-    emit timerChanged(seconds*1000);
+    m_iRecordingTime = (ui->m_spinBox_hours->value()*60*60)+(ui->m_spinBox_min->value()*60)+(ui->m_spinBox_sec->value());
+
+    m_iRecordingTime*=1000;
+
+    emit timerChanged(m_iRecordingTime);
 }
 
 
