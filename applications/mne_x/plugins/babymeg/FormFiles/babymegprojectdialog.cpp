@@ -145,7 +145,8 @@ void BabyMEGProjectDialog::setRecordingRemainingTime(int msecs)
 
     QTime passedTime(0,0,0,0);
 
-    QTime passedTimeFinal = passedTime.addMSecs(m_iRecordingTime-msecs);
+    m_iRecordingTime-=msecs;
+    QTime passedTimeFinal = passedTime.addMSecs(m_iRecordingTime);
 
     ui->m_label_timePassed->setText(passedTimeFinal.toString());
 }
