@@ -87,7 +87,7 @@ void RealTimeMultiSampleArrayDelegate::initPainterPaths(const QAbstractTableMode
 
     m_penMarker = QPen(colorMarker, 2, Qt::DashLine);
 
-    m_penGrid = QPen(Qt::black, 0.75, Qt::DotLine);
+    m_penGrid = QPen(Qt::black, 0.9, Qt::DotLine);
     m_penTimeSpacers = QPen(Qt::black, 0.4, Qt::DotLine);
 
     m_penFreeze = QPen(Qt::darkGray, 1, Qt::SolidLine);
