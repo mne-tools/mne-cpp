@@ -127,6 +127,7 @@ BabyMEG::BabyMEG()
     //Init timers
     if(!m_pRecordTimer) {
         m_pRecordTimer = QSharedPointer<QTimer>(new QTimer(this));
+        m_pRecordTimer->setSingleShot(true);
         connect(m_pRecordTimer.data(), &QTimer::timeout,
                 this, &BabyMEG::toggleRecordingFile);
     }

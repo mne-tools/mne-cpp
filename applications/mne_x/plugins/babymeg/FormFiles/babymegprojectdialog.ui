@@ -196,7 +196,7 @@
       <item row="2" column="1" colspan="3">
        <widget class="QLabel" name="m_label_timeToGo">
         <property name="text">
-         <string>00:00:00</string>
+         <string>00:05:00</string>
         </property>
        </widget>
       </item>

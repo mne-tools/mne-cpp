@@ -371,10 +371,15 @@ void BabyMEGProjectDialog::updateFileName()
 
 void BabyMEGProjectDialog::onTimeChanged()
 {
-
     m_iRecordingTime = (ui->m_spinBox_hours->value()*60*60)+(ui->m_spinBox_min->value()*60)+(ui->m_spinBox_sec->value());
 
     m_iRecordingTime*=1000;
+
+    QTime remainingTime(0,0,0,0);
+
+    QTime remainingTimeFinal = remainingTime.addMSecs(m_iRecordingTime);
+
+    ui->m_label_timeToGo->setText(remainingTimeFinal.toString());
 
     emit timerChanged(m_iRecordingTime);
 }
