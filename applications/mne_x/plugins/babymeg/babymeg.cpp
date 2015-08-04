@@ -570,11 +570,21 @@ void BabyMEG::setFiffGainInfo(QStringList GainInfo)
     {
         //set up the gain info
         qDebug()<<"Set Gain Info";
-        for(qint32 i = 0; i < m_pFiffInfo->nchan; i++)
-        {
+        for(qint32 i = 0; i < m_pFiffInfo->nchan; i++) {
             m_pFiffInfo->chs[i].range = 1.0f/GainInfo.at(i).toFloat();//1; // set gain
+            m_cals[i] = m_pFiffInfo->chs[i].range*m_pFiffInfo->chs[i].cal;
             //qDebug()<<i<<"="<<m_pFiffInfo->chs[i].ch_name<<","<<m_pFiffInfo->chs[i].range;
         }
+
+        // Initialize the data and calibration vector
+        typedef Eigen::Triplet<double> T;
+        std::vector<T> tripletList;
+        tripletList.reserve(m_pFiffInfo->nchan);
+        for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i)
+            tripletList.push_back(T(i, i, this->m_cals[i]));
+
+        m_sparseMatCals = SparseMatrix<double>(m_pFiffInfo->nchan, m_pFiffInfo->nchan);
+        m_sparseMatCals.setFromTriplets(tripletList.begin(), tripletList.end());
     }
 
 }
