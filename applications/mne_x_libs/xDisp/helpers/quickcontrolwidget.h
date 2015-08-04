@@ -201,6 +201,12 @@ signals:
     */
     void settingsChanged(QList<Modality> modalityList);
 
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changed the time spacer distance.
+    */
+    void distanceTimeSpacerChanged(int value);
+
 protected:
     //=========================================================================================================
     /**
@@ -343,6 +349,14 @@ protected:
     * @param [in] value opacity value.
     */
     void onOpacityChange(qint32 value);
+
+    //=========================================================================================================
+    /**
+    * Slot called when time spacer distance changes
+    *
+    * @param [in] value for time spacer distance.
+    */
+    void onDistanceTimeSpacerChanged(qint32 value);
 
 
 private:

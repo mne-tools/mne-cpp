@@ -448,6 +448,10 @@ void RealTimeMultiSampleArrayWidget::init()
             connect(m_pQuickControlWidget.data(), &QuickControlWidget::triggerInfoChanged,
                     this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::triggerInfoChanged);
 
+            //Handle time spacer distance
+            connect(m_pQuickControlWidget.data(), &QuickControlWidget::distanceTimeSpacerChanged,
+                    this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::distanceTimeSpacerChanged);
+
             m_pQuickControlWidget->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
 
             m_pQuickControlWidget->setViewParameters(settings.value(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), 1.0).toFloat(),
