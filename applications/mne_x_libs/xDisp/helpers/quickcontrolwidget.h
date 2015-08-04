@@ -158,6 +158,22 @@ public:
     */
     int getOpacityValue();
 
+    //=========================================================================================================
+    /**
+    * Get current distance time spacer combo box index.
+    *
+    * @return the current index of the distance time spacer combo box.
+    */
+    int getDistanceTimeSpacerIndex();
+
+    //=========================================================================================================
+    /**
+    * Set current distance time spacer combo box index.
+    *
+    * @param [in] index     the new index value of the combo box
+    */
+    void setDistanceTimeSpacerIndex(int index);
+
 signals:
     //=========================================================================================================
     /**

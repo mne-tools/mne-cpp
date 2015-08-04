@@ -199,6 +199,22 @@ int QuickControlWidget::getOpacityValue()
 
 //*************************************************************************************************************
 
+int QuickControlWidget::getDistanceTimeSpacerIndex()
+{
+    return ui->m_comboBox_distaceTimeSpacer->currentIndex();
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::setDistanceTimeSpacerIndex(int index)
+{
+    ui->m_comboBox_distaceTimeSpacer->setCurrentIndex(index);
+}
+
+
+//*************************************************************************************************************
+
 void QuickControlWidget::createScalingGroup()
 {
     QGridLayout* t_pGridLayout = new QGridLayout;

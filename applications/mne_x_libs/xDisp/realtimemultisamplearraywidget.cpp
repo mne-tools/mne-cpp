@@ -190,6 +190,11 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
         //Store selected layout file
         if(m_pSelectionManagerWindow != 0)
             settings.setValue(QString("RTMSAW/%1/selectedLayoutFile").arg(t_sRTMSAWName), m_pSelectionManagerWindow->getCurrentLayoutFile());
+
+        //Store show/hide bad channel flag
+        if(m_pQuickControlWidget != 0)
+            settings.setValue(QString("RTMSAW/%1/distanceTimeSpacerIndex").arg(t_sRTMSAWName), m_pQuickControlWidget->getDistanceTimeSpacerIndex());
+
     }
 }
 
@@ -457,6 +462,8 @@ void RealTimeMultiSampleArrayWidget::init()
             m_pQuickControlWidget->setViewParameters(settings.value(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), 1.0).toFloat(),
                                                      settings.value(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), 10).toInt(),
                                                      settings.value(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), 95).toInt());
+
+            m_pQuickControlWidget->setDistanceTimeSpacerIndex(settings.value(QString("RTMSAW/%1/distanceTimeSpacerIndex").arg(t_sRTMSAWName), 3).toInt());
 
             //Activate projections as default
             m_pRTMSAModel->updateProjection();
