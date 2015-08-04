@@ -135,18 +135,17 @@ BabyMEGProjectDialog::~BabyMEGProjectDialog()
 
 //*************************************************************************************************************
 
-void BabyMEGProjectDialog::setRecordingRemainingTime(int msecs)
+void BabyMEGProjectDialog::setRecordingElapsedTime(int mSecsElapsed)
 {
     QTime remainingTime(0,0,0,0);
 
-    QTime remainingTimeFinal = remainingTime.addMSecs(msecs);
+    QTime remainingTimeFinal = remainingTime.addMSecs(m_iRecordingTime-mSecsElapsed);
 
     ui->m_label_timeToGo->setText(remainingTimeFinal.toString());
 
     QTime passedTime(0,0,0,0);
 
-    m_iRecordingTime-=msecs;
-    QTime passedTimeFinal = passedTime.addMSecs(m_iRecordingTime);
+    QTime passedTimeFinal = passedTime.addMSecs(mSecsElapsed);
 
     ui->m_label_timePassed->setText(passedTimeFinal.toString());
 }
