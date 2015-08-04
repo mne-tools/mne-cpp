@@ -93,8 +93,14 @@ void RealTimeMultiSampleArrayDelegate::initPainterPaths(const QAbstractTableMode
     m_penFreeze = QPen(Qt::darkGray, 1, Qt::SolidLine);
     m_penFreezeSelected = QPen(Qt::darkRed, 1, Qt::SolidLine);
 
+    m_penFreezeBad = QPen(Qt::darkGray, 0.1, Qt::SolidLine);
+    m_penFreezeSelectedBad = QPen(Qt::darkRed, 0.1, Qt::SolidLine);
+
     m_penNormal = QPen(Qt::darkBlue, 1, Qt::SolidLine);
     m_penNormalSelected = QPen(Qt::red, 1, Qt::SolidLine);
+
+    m_penNormalBad = QPen(Qt::darkBlue, 0.1, Qt::SolidLine);
+    m_penNormalSelectedBad = QPen(Qt::red, 0.1, Qt::SolidLine);
 }
 
 
@@ -259,12 +265,15 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
         case 1: { //data plot
             //draw special background when channel is marked as bad
             QVariant v = index.model()->data(index,Qt::BackgroundRole);
+            bool bIsBadChannel = false;
+
             if((v.canConvert<QBrush>() && !(option.state & QStyle::State_Selected)) ||
                (v.canConvert<QBrush>() && (option.state & QStyle::State_Selected))) {
                 QPointF oldBO = painter->brushOrigin();
                 painter->setBrushOrigin(option.rect.topLeft());
                 painter->fillRect(option.rect, qvariant_cast<QBrush>(v));
                 painter->setBrushOrigin(oldBO);
+                bIsBadChannel = true;
             }
 
 //            //Highlight selected channels
@@ -337,16 +346,30 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 painter->save();
                 painter->translate(0, t_fPlotHeight/2);
 
-                if(t_pModel->isFreezed()) {
-                    if(option.state & QStyle::State_Selected)
-                        painter->setPen(m_penFreezeSelected);
-                    else
-                        painter->setPen(m_penFreeze);
+                if(bIsBadChannel) {
+                    if(t_pModel->isFreezed()) {
+                        if(option.state & QStyle::State_Selected)
+                            painter->setPen(m_penFreezeSelectedBad);
+                        else
+                            painter->setPen(m_penFreezeBad);
+                    } else {
+                        if(option.state & QStyle::State_Selected)
+                            painter->setPen(m_penNormalSelectedBad);
+                        else
+                            painter->setPen(m_penNormalBad);
+                    }
                 } else {
-                    if(option.state & QStyle::State_Selected)
-                        painter->setPen(m_penNormalSelected);
-                    else
-                        painter->setPen(m_penNormal);
+                    if(t_pModel->isFreezed()) {
+                        if(option.state & QStyle::State_Selected)
+                            painter->setPen(m_penFreezeSelected);
+                        else
+                            painter->setPen(m_penFreeze);
+                    } else {
+                        if(option.state & QStyle::State_Selected)
+                            painter->setPen(m_penNormalSelected);
+                        else
+                            painter->setPen(m_penNormal);
+                    }
                 }
 
                 //timer.start();
