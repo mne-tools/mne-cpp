@@ -71,6 +71,7 @@ RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 , m_bDrawFilterFront(true)
 , m_bTriggerDetectionActive(false)
 , m_dTriggerThreshold(0.05)
+, m_iDistanceTimerSpacer(1000)
 {
     init();
 }
@@ -732,6 +733,14 @@ void RealTimeMultiSampleArrayModel::triggerInfoChanged(const QMap<QString, QColo
             m_qMapDetectedTrigger.insert(i, temp);
         }
     }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::distanceTimeSpacerChanged(int value)
+{
+    m_iDistanceTimerSpacer = value;
 }
 
 

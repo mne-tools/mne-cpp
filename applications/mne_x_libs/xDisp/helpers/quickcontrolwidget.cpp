@@ -481,7 +481,6 @@ void QuickControlWidget::createViewGroup()
             this, &QuickControlWidget::timeWindowChanged);
 
     //Trigger detection
-
     connect(ui->m_checkBox_activateTriggerDetection, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
             this, &QuickControlWidget::realTimeTriggerActiveChanged);
 
@@ -515,6 +514,10 @@ void QuickControlWidget::createViewGroup()
     //opacity
     connect(ui->m_horizontalSlider_opacity, &QSlider::valueChanged,
             this, &QuickControlWidget::onOpacityChange);
+
+    //Distance for timer spacer
+    connect(ui->m_comboBox_distaceTimeSpacer, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this, &QuickControlWidget::onDistanceTimeSpacerChanged);
 }
 
 
@@ -960,6 +963,32 @@ void QuickControlWidget::onOpacityChange(qint32 value)
 {
     this->setWindowOpacity(1/(100.0/value));
 }
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::onDistanceTimeSpacerChanged(qint32 value)
+{
+    switch(value) {
+        case 0:
+            emit distanceTimeSpacerChanged(100);
+        break;
+
+        case 1:
+            emit distanceTimeSpacerChanged(200);
+        break;
+
+        case 2:
+            emit distanceTimeSpacerChanged(500);
+        break;
+
+        case 3:
+            emit distanceTimeSpacerChanged(1000);
+        break;
+    }
+}
+
+
 
 
 

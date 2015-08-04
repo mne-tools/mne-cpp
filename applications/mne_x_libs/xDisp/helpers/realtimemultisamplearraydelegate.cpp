@@ -87,7 +87,8 @@ void RealTimeMultiSampleArrayDelegate::initPainterPaths(const QAbstractTableMode
 
     m_penMarker = QPen(colorMarker, 2, Qt::DashLine);
 
-    m_penGrid = QPen(Qt::black, 0.5, Qt::DotLine);
+    m_penGrid = QPen(Qt::black, 0.75, Qt::DotLine);
+    m_penTimeSpacers = QPen(Qt::black, 0.4, Qt::DotLine);
 
     m_penFreeze = QPen(Qt::darkGray, 1, Qt::SolidLine);
     m_penFreezeSelected = QPen(Qt::darkRed, 1, Qt::SolidLine);
@@ -299,6 +300,14 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
 
                 painter->save();
                 painter->setPen(m_penGrid);
+                painter->drawPath(path);
+                painter->restore();
+
+                //Plot time spacers
+                createTimeSpacersPath(index, option, path, data);
+
+                painter->save();
+                painter->setPen(m_penTimeSpacers);
                 painter->drawPath(path);
                 painter->restore();
 
@@ -553,7 +562,7 @@ void RealTimeMultiSampleArrayDelegate::createGridPath(const QModelIndex &index, 
 
     if(t_pModel->numVLines() > 0)
     {
-        //horizontal lines
+        //vertical lines
         float distance = option.rect.width()/(t_pModel->numVLines()+1);
 
         float yStart = option.rect.topLeft().y();
@@ -564,6 +573,35 @@ void RealTimeMultiSampleArrayDelegate::createGridPath(const QModelIndex &index, 
             float x = distance*(i+1);
             path.moveTo(x,yStart);
             path.lineTo(x,yEnd);
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayDelegate::createTimeSpacersPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const
+{
+    Q_UNUSED(data)
+
+    const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
+
+    if(t_pModel->getNumberOfTimeSpacers() > 0)
+    {
+        //vertical lines
+        float distanceSec = option.rect.width()/(t_pModel->numVLines()+1);
+        float distanceSpacers = distanceSec/(t_pModel->getNumberOfTimeSpacers()+1);
+
+        float yStart = option.rect.topLeft().y();
+
+        float yEnd = option.rect.bottomRight().y();
+
+        for(qint8 t = 0; t < t_pModel->numVLines()+1; ++t) {
+            for(qint8 i = 0; i < t_pModel->getNumberOfTimeSpacers(); ++i) {
+                float x = (distanceSec*t)+(distanceSpacers*(i+1));
+                path.moveTo(x,yStart);
+                path.lineTo(x,yEnd);
+            }
         }
     }
 }

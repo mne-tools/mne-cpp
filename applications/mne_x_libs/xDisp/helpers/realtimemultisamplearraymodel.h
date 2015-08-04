@@ -330,6 +330,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the current number for the time spacers
+    *
+    * @return the current number for the time spacers
+    */
+    inline int getNumberOfTimeSpacers() const;
+
+    //=========================================================================================================
+    /**
     * Set scaling channel scaling
     *
     * @param[in] p_qMapChScaling    Map of scaling factors
@@ -403,6 +411,14 @@ public:
     */
     void triggerInfoChanged(const QMap<QString, QColor>& colorMap, bool active, QString triggerCh, double threshold);
 
+    //=========================================================================================================
+    /**
+    * distanceTimeSpacerChanged changes the distance of the time spacers
+    *
+    * @param value the new distance for the time spacers
+    */
+    void distanceTimeSpacerChanged(int value);
+
 signals:
     //=========================================================================================================
     /**
@@ -463,6 +479,7 @@ private:
     qint32  m_iCurrentBlockSize;        /**< Current block size */
     qint32  m_iResidual;                /**< Current amount of samples which were to size */
     int     m_iCurrentTriggerChIndex;   /**< The index of the current trigger channel */
+    int     m_iDistanceTimerSpacer;     /**< The distance for the horizontal time spacers in the view in ms */
 
     QString m_sCurrentTriggerCh;    /**< Current trigger channel which is beeing scanned */
     QString m_sFilterChannelType;   /**< Kind of channel which is to be filtered */
@@ -595,6 +612,15 @@ inline QList<int> RealTimeMultiSampleArrayModel::getDetectedTriggers() const
     }
     else
         return triggerIndices;
+}
+
+
+//*************************************************************************************************************
+
+inline int RealTimeMultiSampleArrayModel::getNumberOfTimeSpacers() const
+{
+    //std::cout<<((m_iT*1000)/m_iDistanceTimerSpacer)-1<<std::endl;
+    return ((1000)/m_iDistanceTimerSpacer)-1;
 }
 
 

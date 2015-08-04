@@ -123,7 +123,14 @@
               </property>
              </widget>
             </item>
-            <item row="4" column="1">
+            <item row="5" column="0">
+             <widget class="QLabel" name="label_8">
+              <property name="text">
+               <string>Time spacer every</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="1">
              <widget class="QSlider" name="m_horizontalSlider_opacity">
               <property name="minimum">
                <number>25</number>
@@ -142,11 +149,38 @@
               </property>
              </widget>
             </item>
-            <item row="4" column="0">
+            <item row="6" column="0">
              <widget class="QLabel" name="label_7">
               <property name="text">
                <string>Opcaity:</string>
               </property>
+             </widget>
+            </item>
+            <item row="5" column="1">
+             <widget class="QComboBox" name="m_comboBox_distaceTimeSpacer">
+              <property name="currentIndex">
+               <number>3</number>
+              </property>
+              <item>
+               <property name="text">
+                <string>100ms</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>200ms</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>500ms</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>1000ms</string>
+               </property>
+              </item>
              </widget>
             </item>
            </layout>
