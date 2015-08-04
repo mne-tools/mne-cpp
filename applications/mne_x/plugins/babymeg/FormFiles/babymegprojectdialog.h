@@ -33,7 +33,7 @@ public:
     explicit BabyMEGProjectDialog(BabyMEG* p_pBabyMEG, QWidget *parent = 0);
     ~BabyMEGProjectDialog();
 
-    void setRecordingRemainingTime(int msecs);
+    void setRecordingElapsedTime(int mSecsElapsed);
 
 signals:
     void timerChanged(int secs);

@@ -323,7 +323,7 @@ public:
     *
     * @param[in] time   the new recording time.
     */
-    void setRecordingTimerChanged(int time);
+    void setRecordingTimerChanged(int timeMSecs);
 
     //=========================================================================================================
     /**
@@ -448,6 +448,7 @@ private:
 
     QFile       m_qFileOut;             /**< QFile for writing to fif file.*/
     QMutex      mutex;                  /**< Mutex to guarantee thread safety.*/
+    QTime       m_recordingStartedTime; /**< The time when the recording started.*/
 
     RowVectorXd             m_cals;             /**< Calibration vector.*/
     SparseMatrix<double>    m_sparseMatCals;    /**< Sparse calibration matrix.*/

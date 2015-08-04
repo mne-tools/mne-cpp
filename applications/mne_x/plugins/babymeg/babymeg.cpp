@@ -467,6 +467,8 @@ void BabyMEG::toggleRecordingFile()
         m_pBlinkingRecordButtonTimer->start(500);
 
         if(m_bUseRecordTimer) {
+            m_recordingStartedTime.restart();
+
             m_pRecordTimer->start(m_iRecordingMSeconds);
             m_pUpdateTimeInfoTimer->start(1000);
         }
@@ -856,9 +858,13 @@ void BabyMEG::changeRecordingButton()
 
 //*************************************************************************************************************
 
-void BabyMEG::setRecordingTimerChanged(int time)
+void BabyMEG::setRecordingTimerChanged(int timeMSecs)
 {
-    m_iRecordingMSeconds = time;
+    //If the recording time is changed during the recording, change the timer
+    if(m_bWriteToFile)
+        m_pRecordTimer->setInterval(timeMSecs-m_recordingStartedTime.elapsed());
+
+    m_iRecordingMSeconds = timeMSecs;
 }
 
 
@@ -874,7 +880,6 @@ void BabyMEG::setRecordingTimerStateChanged(bool state)
 
 void BabyMEG::onRecordingRemainingTimeChange()
 {
-    int remainingMSeconds = m_pRecordTimer->remainingTime();
-    m_pBabyMEGProjectDialog->setRecordingRemainingTime(remainingMSeconds);
+    m_pBabyMEGProjectDialog->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
 }
 
