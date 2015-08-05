@@ -329,6 +329,20 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 painter->drawPath(path);
                 painter->restore();
 
+                //Plot trigger threshold
+                if(index.row() == t_pModel->getCurrentTriggerIndex() &&
+                        t_pModel->triggerDetectionActive()) {
+                    path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
+                    QPointF textPosition;
+                    createTriggerThresholdPath(index, option, path, data, textPosition);
+
+                    painter->save();
+                    painter->setPen(QPen(Qt::red, 1, Qt::DashLine));
+                    painter->drawPath(path);
+                    painter->drawText(textPosition, "Trigger Threshold");
+                    painter->restore();
+                }
+
                 //Plot data path
                 QPointF ellipsePos;
                 QString amplitude;
@@ -650,6 +664,37 @@ void RealTimeMultiSampleArrayDelegate::createTriggerPath(const QModelIndex &inde
         path.moveTo(triggerPos*fDx,yStart);
         path.lineTo(triggerPos*fDx,yEnd);
     }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayDelegate::createTriggerThresholdPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data, QPointF &textPosition) const
+{
+    Q_UNUSED(data)
+
+    const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
+
+    //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
+    qint32 kind = t_pModel->getKind(index.row());
+    double fMaxValue = 1e-9f;
+
+    switch(kind) {
+        case FIFFV_STIM_CH: {
+            fMaxValue = 5.0;
+            if(t_pModel->getScaling().contains(FIFFV_STIM_CH))
+                fMaxValue = t_pModel->getScaling()[FIFFV_STIM_CH];
+            break;
+        }
+    }
+
+    double fScaleY = option.rect.height()/(2*fMaxValue);
+    double triggerThreshold = -1*(t_pModel->getTriggerThreshold());
+
+    path.moveTo(option.rect.topLeft().x(), option.rect.topLeft().y()+option.rect.height()/2+fScaleY*triggerThreshold);
+    path.lineTo(option.rect.topRight().x(), option.rect.topLeft().y()+option.rect.height()/2+fScaleY*triggerThreshold);
+
+    textPosition = QPointF(option.rect.topLeft().x()+5, option.rect.topLeft().y()+option.rect.height()/2+fScaleY*triggerThreshold-5);
 }
 
 

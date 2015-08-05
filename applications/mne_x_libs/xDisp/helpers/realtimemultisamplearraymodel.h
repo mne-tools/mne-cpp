@@ -338,6 +338,30 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the current trigger threshold
+    *
+    * @return the current trigger threshold
+    */
+    inline double getTriggerThreshold() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the current trigger channel index
+    *
+    * @return the current trigger channel index
+    */
+    inline int getCurrentTriggerIndex() const;
+
+    //=========================================================================================================
+    /**
+    * Returns whether trigger detection is active or not
+    *
+    * @return whether trigger detection is active or not
+    */
+    inline bool triggerDetectionActive() const;
+
+    //=========================================================================================================
+    /**
     * Set scaling channel scaling
     *
     * @param[in] p_qMapChScaling    Map of scaling factors
@@ -621,6 +645,30 @@ inline int RealTimeMultiSampleArrayModel::getNumberOfTimeSpacers() const
 {
     //std::cout<<((m_iT*1000)/m_iDistanceTimerSpacer)-1<<std::endl;
     return ((1000)/m_iDistanceTimerSpacer)-1;
+}
+
+
+//*************************************************************************************************************
+
+inline double RealTimeMultiSampleArrayModel::getTriggerThreshold() const
+{
+    return m_dTriggerThreshold;
+}
+
+
+//*************************************************************************************************************
+
+inline int RealTimeMultiSampleArrayModel::getCurrentTriggerIndex() const
+{
+    return m_iCurrentTriggerChIndex;
+}
+
+
+//*************************************************************************************************************
+
+inline bool RealTimeMultiSampleArrayModel::triggerDetectionActive() const
+{
+    return m_bTriggerDetectionActive;
 }
 
 

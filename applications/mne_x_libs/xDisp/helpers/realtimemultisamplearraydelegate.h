@@ -196,12 +196,26 @@ private:
 
     //=========================================================================================================
     /**
+    * createTriggerThresholdPath Creates the QPointer path for the trigger threshold line plot.
+    *
+    * @param[in] index      Used to locate data in a data model.
+    * @param[in] option     Describes the parameters used to draw an item in a view widget
+    * @param[in,out] path   The QPointerPath to create for the data plot.
+    * @param[in] data       Data for the given row.
+    * @param[in] textPosition Position of the text.
+    */
+    void createTriggerThresholdPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data, QPointF &textPosition) const;
+
+    //=========================================================================================================
+    /**
     * createMarkerPath Creates the QPointer path for the marker plot.
     *
     * @param[in] option     Describes the parameters used to draw an item in a view widget.
     * @param[in,out] path   The QPointerPath to create for the data plot.
     */
     void createMarkerPath(const QStyleOptionViewItem &option, QPainterPath& path) const;
+
+
 
     //Settings
 //    QSettings m_qSettings;
