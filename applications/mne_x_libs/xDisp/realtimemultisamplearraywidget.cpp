@@ -396,7 +396,7 @@ void RealTimeMultiSampleArrayWidget::init()
 
         //Init channel selection manager
         if(!m_pSelectionManagerWindow) {
-            m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(this, m_pFiffInfo));
+            m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(m_pFiffInfo, this));
 
             m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel.data()));
             //m_pSelectionManagerWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
@@ -414,6 +414,8 @@ void RealTimeMultiSampleArrayWidget::init()
             m_pChInfoModel->fiffInfoChanged(m_pFiffInfo);
 
             m_pSelectionManagerWindow->setCurrentLayoutFile(settings.value(QString("RTMSAW/%1/selectedLayoutFile").arg(t_sRTMSAWName), "babymeg-mag-inner-layer.lout").toString());
+
+            m_pSelectionManagerWindow->updateBadChannels();
         }
 
         //Init quick control widget
@@ -736,7 +738,9 @@ void RealTimeMultiSampleArrayWidget::markChBad()
         }
     }
 
-    m_pRTMSAModel->updateProjection();
+    m_pRTMSAModel->updateProjection();    
+
+    m_pSelectionManagerWindow->updateBadChannels();
 }
 
 

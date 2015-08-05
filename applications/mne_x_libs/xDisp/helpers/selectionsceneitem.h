@@ -87,7 +87,7 @@ public:
     /**
     * Constructs a SelectionSceneItem.
     */
-    SelectionSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor averageColor = Qt::blue);
+    SelectionSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor channelColor = Qt::blue, bool bIsBadChannel = false);
 
     //=========================================================================================================
     /**
@@ -108,6 +108,7 @@ public:
     QPointF     m_qpChannelPosition;        /**< The channel's 2D position in the scene.*/
     QColor      m_cChannelColor;            /**< The current channel color.*/
     bool        m_bHighlightItem;           /**< Whether this item is to be highlighted.*/
+    bool        m_bIsBadChannel;            /**< Whether this item is a bad channel.*/
 };
 
 } // NAMESPACE XDISPLIB

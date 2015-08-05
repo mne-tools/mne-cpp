@@ -136,7 +136,6 @@ void SelectionManagerWindow::initComboBoxes()
     //Load selection groups again because they need to be reinitialised every time a new layout hase been loaded
     selectionName = QString("mne_browse_raw_babyMEG.sel");
     loadSelectionGroups(QCoreApplication::applicationDirPath() + selectionName.prepend("/MNE_Browse_Raw_Resources/Templates/ChannelSelection/"));
-
 }
 
 
@@ -297,6 +296,30 @@ void SelectionManagerWindow::setCurrentLayoutFile(QString currentLayoutFile)
 
 //*************************************************************************************************************
 
+void SelectionManagerWindow::updateBadChannels()
+{
+    QStringList badChannelsMappedNames;
+
+    for(int i = 0; i<m_pChInfoModel->rowCount(); i++)  {
+        QModelIndex digIndex = m_pChInfoModel->index(i,3);
+        QString mappedChName = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetMappedLayoutChName).toString();
+
+        digIndex = m_pChInfoModel->index(i,1);
+        QString origChName = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetOrigChName).toString();
+
+        if(m_pChInfoModel->getBadChannelList().contains(origChName))
+            badChannelsMappedNames << mappedChName;
+    }
+
+    m_pSelectionScene->repaintItems(m_layoutMap, badChannelsMappedNames);
+    m_pSelectionScene->update();
+
+    updateSceneItems();
+}
+
+
+//*************************************************************************************************************
+
 bool SelectionManagerWindow::loadLayout(QString path)
 {
     bool state = LayoutLoader::readMNELoutFile(path, m_layoutMap);
@@ -353,8 +376,8 @@ bool SelectionManagerWindow::loadLayout(QString path)
     for(int i = 0; i<outputPoints.size(); i++)
         m_layoutMap[names.at(i)] = QPointF(outputPoints.at(i)[0],outputPoints.at(i)[1]);
 
-    //Update scene
-    m_pSelectionScene->repaintItems(m_layoutMap);
+    QStringList bad;
+    m_pSelectionScene->repaintItems(m_layoutMap, bad);
     m_pSelectionScene->update();
     updateSceneItems();
 
@@ -391,7 +414,7 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
             state = SelectionIO::readBrainstormMonFile(newPath, m_selectionGroupsMap);
     }
 
-    //Create group 'All' and 'All EEG' manually (bcause this group depends on the loaded channels from the fiff data file, not on the loaded selection file)
+    //Create group 'All' and 'All EEG' manually (bcause this group depends on the loaded channels from the Info data file, not on the loaded selection file)
     m_selectionGroupsMap["All"] = m_currentlyLoadedFiffChannels;
 
     QStringList names;

@@ -56,7 +56,7 @@ using namespace XDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChInfoModel::ChInfoModel(QObject *parent, FiffInfo::SPtr pFiffInfo)
+ChInfoModel::ChInfoModel(FiffInfo::SPtr pFiffInfo, QObject *parent)
 : QAbstractTableModel(parent)
 , m_pFiffInfo(pFiffInfo)
 {
@@ -79,7 +79,7 @@ int ChInfoModel::rowCount(const QModelIndex & /*parent*/) const
 
 int ChInfoModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 11;
+    return 12;
 }
 
 
@@ -145,6 +145,10 @@ QVariant ChInfoModel::headerData(int section, Qt::Orientation orientation, int r
 
                     case 10:
                         return QString("%1").arg("Coil Type");
+                        break;
+
+                    case 11:
+                        return QString("%1").arg("Bad channel");
                         break;
                 }
             }
@@ -422,6 +426,28 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
                         return Qt::AlignHCenter + Qt::AlignVCenter;
                 }
             }//end column check
+
+            //******** twelve column (channel bad) ********
+            if(index.column()==11) {
+                QVariant v;
+                bool isBad = false;
+                QString chName = m_pFiffInfo->chs.at(index.row()).ch_name;
+
+                switch(role) {
+                    case Qt::DisplayRole:
+                        isBad = m_pFiffInfo->bads.contains(chName);
+                        v.setValue(isBad);
+                        return v;
+
+                    case ChInfoModelRoles::GetIsBad:
+                        isBad = m_pFiffInfo->bads.contains(chName);
+                        v.setValue(isBad);
+                        return v;
+
+                    case Qt::TextAlignmentRole:
+                        return Qt::AlignHCenter + Qt::AlignVCenter;
+                }
+            }//end column check
         }//end column check
     } // end index.valid() check
 
@@ -546,6 +572,14 @@ int ChInfoModel::getIndexFromOrigChName(QString chName)
 int ChInfoModel::getIndexFromMappedChName(QString chName)
 {
     return m_mappedLayoutChNames.indexOf(chName);
+}
+
+
+//*************************************************************************************************************
+
+QStringList ChInfoModel::getBadChannelList()
+{
+    return m_pFiffInfo->bads;
 }
 
 

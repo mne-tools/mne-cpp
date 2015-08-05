@@ -94,13 +94,13 @@ void RealTimeMultiSampleArrayDelegate::initPainterPaths(const QAbstractTableMode
     m_penFreezeSelected = QPen(Qt::darkRed, 1, Qt::SolidLine);
 
     m_penFreezeBad = QPen(Qt::darkGray, 0.1, Qt::SolidLine);
-    m_penFreezeSelectedBad = QPen(Qt::darkRed, 0.1, Qt::SolidLine);
+    m_penFreezeSelectedBad = QPen(Qt::darkRed, 1, Qt::SolidLine);
 
     m_penNormal = QPen(Qt::darkBlue, 1, Qt::SolidLine);
     m_penNormalSelected = QPen(Qt::red, 1, Qt::SolidLine);
 
     m_penNormalBad = QPen(Qt::darkBlue, 0.1, Qt::SolidLine);
-    m_penNormalSelectedBad = QPen(Qt::red, 0.1, Qt::SolidLine);
+    m_penNormalSelectedBad = QPen(Qt::red, 1, Qt::SolidLine);
 }
 
 
