@@ -181,6 +181,12 @@ public:
     */
     void setCurrentLayoutFile(QString currentLayoutFile);
 
+    //=========================================================================================================
+    /**
+    * Update the scene items according to the bad channel list in the fiff info file.
+    */
+    void updateBadChannels();
+
 signals:
     //=========================================================================================================
     /**

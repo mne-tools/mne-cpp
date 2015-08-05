@@ -65,7 +65,7 @@ SelectionScene::SelectionScene(QGraphicsView* view, QObject* parent)
 
 //*************************************************************************************************************
 
-void SelectionScene::repaintItems(const QMap<QString,QPointF> &layoutMap)
+void SelectionScene::repaintItems(const QMap<QString,QPointF> &layoutMap, QStringList badChannels)
 {
     this->clear();
 
@@ -79,13 +79,17 @@ void SelectionScene::repaintItems(const QMap<QString,QPointF> &layoutMap)
                                                               0,
                                                               i.value(),
                                                               FIFFV_EEG_CH,
-                                                              FIFF_UNIT_T_M);
+                                                              FIFF_UNIT_T_M,
+                                                              Qt::blue,
+                                                              badChannels.contains(i.key()));
         else
             SelectionSceneItemTemp = new SelectionSceneItem(i.key(),
                                                               0,
                                                               i.value(),
                                                               FIFFV_MEG_CH,
-                                                              FIFF_UNIT_T_M);
+                                                              FIFF_UNIT_T_M,
+                                                              Qt::blue,
+                                                              badChannels.contains(i.key()));
 
         this->addItem(SelectionSceneItemTemp);
     }

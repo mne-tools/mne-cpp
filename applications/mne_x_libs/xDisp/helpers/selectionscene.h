@@ -96,8 +96,9 @@ public:
     * Updates layout data.
     *
     * @param [in] layoutMap layout data map.
+    * @param [in] bad channel list.
     */
-    void repaintItems(const QMap<QString, QPointF> &layoutMap);
+    void repaintItems(const QMap<QString, QPointF> &layoutMap, QStringList badChannels);
 
     //=========================================================================================================
     /**
