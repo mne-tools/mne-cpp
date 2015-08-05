@@ -243,6 +243,13 @@ private:
 
     //=========================================================================================================
     /**
+    * Initialises all check boxes in the selection window.
+    *
+    */
+    void initCheckBoxes();
+
+    //=========================================================================================================
+    /**
     * Loads a new layout from given file path.
     *
     * @param [in] path holds file pathloll

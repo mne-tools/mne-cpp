@@ -67,6 +67,7 @@ SelectionManagerWindow::SelectionManagerWindow(QWidget *parent, ChInfoModel* pCh
     initSelectionSceneView();
     initComboBoxes();
     initButtons();
+    initCheckBoxes();
 }
 
 
@@ -151,6 +152,15 @@ void SelectionManagerWindow::initButtons()
 
     connect(ui->m_pushButton_addToSelectionGroups, &QPushButton::clicked,
                 this, &SelectionManagerWindow::onBtnAddToSelectionGroups);
+}
+
+
+//*************************************************************************************************************
+
+void SelectionManagerWindow::initCheckBoxes()
+{
+    connect(ui->m_checkBox_showBadChannelsAsRed, &QCheckBox::clicked,
+                this, &SelectionManagerWindow::updateBadChannels);
 }
 
 
@@ -300,15 +310,17 @@ void SelectionManagerWindow::updateBadChannels()
 {
     QStringList badChannelsMappedNames;
 
-    for(int i = 0; i<m_pChInfoModel->rowCount(); i++)  {
-        QModelIndex digIndex = m_pChInfoModel->index(i,3);
-        QString mappedChName = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetMappedLayoutChName).toString();
+    if(ui->m_checkBox_showBadChannelsAsRed->isChecked()) {
+        for(int i = 0; i<m_pChInfoModel->rowCount(); i++)  {
+            QModelIndex digIndex = m_pChInfoModel->index(i,3);
+            QString mappedChName = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetMappedLayoutChName).toString();
 
-        digIndex = m_pChInfoModel->index(i,1);
-        QString origChName = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetOrigChName).toString();
+            digIndex = m_pChInfoModel->index(i,1);
+            QString origChName = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetOrigChName).toString();
 
-        if(m_pChInfoModel->getBadChannelList().contains(origChName))
-            badChannelsMappedNames << mappedChName;
+            if(m_pChInfoModel->getBadChannelList().contains(origChName))
+                badChannelsMappedNames << mappedChName;
+        }
     }
 
     m_pSelectionScene->repaintItems(m_layoutMap, badChannelsMappedNames);
