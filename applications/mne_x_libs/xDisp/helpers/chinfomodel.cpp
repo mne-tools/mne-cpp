@@ -209,11 +209,13 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
 
             switch(role) {
                 case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_aliasNames.at(index.row())));
+                    if(index.row()<m_aliasNames.size())
+                        v.setValue(QString("%1").arg(m_aliasNames.at(index.row())));
                     return v;
 
                 case ChInfoModelRoles::GetChAlias:
-                    v.setValue(m_aliasNames.at(index.row()));
+                    if(index.row()<m_aliasNames.size())
+                        v.setValue(QString("%1").arg(m_aliasNames.at(index.row())));
                     return v;
 
                 case Qt::TextAlignmentRole:
@@ -227,11 +229,13 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
 
             switch(role) {
                 case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_mappedLayoutChNames.at(index.row())));
+                    if(index.row()<m_mappedLayoutChNames.size())
+                        v.setValue(QString("%1").arg(m_mappedLayoutChNames.at(index.row())));
                     return v;
 
                 case ChInfoModelRoles::GetMappedLayoutChName:
-                    v.setValue(QString("%1").arg(m_mappedLayoutChNames.at(index.row())));
+                    if(index.row()<m_mappedLayoutChNames.size())
+                        v.setValue(QString("%1").arg(m_mappedLayoutChNames.at(index.row())));
                     return v;
 
                 case Qt::TextAlignmentRole:
