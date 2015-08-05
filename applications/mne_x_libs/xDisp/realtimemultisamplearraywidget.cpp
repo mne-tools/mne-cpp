@@ -408,14 +408,15 @@ void RealTimeMultiSampleArrayWidget::init()
             connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::loadedLayoutMap,
                     m_pChInfoModel.data(), &ChInfoModel::layoutChanged);
 
+            connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::loadedLayoutMap,
+                    m_pSelectionManagerWindow.data(), &SelectionManagerWindow::updateBadChannels);
+
             connect(m_pChInfoModel.data(), &ChInfoModel::channelsMappedToLayout,
                     m_pSelectionManagerWindow.data(), &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
 
             m_pChInfoModel->fiffInfoChanged(m_pFiffInfo);
 
             m_pSelectionManagerWindow->setCurrentLayoutFile(settings.value(QString("RTMSAW/%1/selectedLayoutFile").arg(t_sRTMSAWName), "babymeg-mag-inner-layer.lout").toString());
-
-            m_pSelectionManagerWindow->updateBadChannels();
         }
 
         //Init quick control widget

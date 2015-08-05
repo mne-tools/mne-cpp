@@ -301,6 +301,8 @@ QString SelectionManagerWindow::getCurrentLayoutFile()
 void SelectionManagerWindow::setCurrentLayoutFile(QString currentLayoutFile)
 {
     ui->m_comboBox_layoutFile->setCurrentText(currentLayoutFile);
+
+    updateBadChannels();
 }
 
 
@@ -308,22 +310,23 @@ void SelectionManagerWindow::setCurrentLayoutFile(QString currentLayoutFile)
 
 void SelectionManagerWindow::updateBadChannels()
 {
-    QStringList badChannelsMappedNames;
+    QStringList badChannelMappedNames;
+    QStringList badChannelList = m_pChInfoModel->getBadChannelList();
 
     if(ui->m_checkBox_showBadChannelsAsRed->isChecked()) {
-        for(int i = 0; i<m_pChInfoModel->rowCount(); i++)  {
+        for(int i = 0; i<m_pChInfoModel->rowCount(); i++) {
             QModelIndex digIndex = m_pChInfoModel->index(i,3);
             QString mappedChName = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetMappedLayoutChName).toString();
 
             digIndex = m_pChInfoModel->index(i,1);
             QString origChName = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetOrigChName).toString();
 
-            if(m_pChInfoModel->getBadChannelList().contains(origChName))
-                badChannelsMappedNames << mappedChName;
+            if(badChannelList.contains(origChName))
+                badChannelMappedNames << mappedChName;
         }
     }
 
-    m_pSelectionScene->repaintItems(m_layoutMap, badChannelsMappedNames);
+    m_pSelectionScene->repaintItems(m_layoutMap, badChannelMappedNames);
     m_pSelectionScene->update();
 
     updateSceneItems();
