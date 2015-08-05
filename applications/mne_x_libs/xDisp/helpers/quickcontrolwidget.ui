@@ -67,7 +67,7 @@
         <item>
          <widget class="QTabWidget" name="m_tabWidget_viewOptions">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tab">
            <attribute name="title">
@@ -190,24 +190,13 @@
             <string>Trigger detection</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_2">
-            <item row="2" column="0">
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string>Trigger color:</string>
-              </property>
-             </widget>
+            <item row="1" column="1" colspan="3">
+             <widget class="QComboBox" name="m_comboBox_triggerChannels"/>
             </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="label_5">
+            <item row="2" column="1" colspan="3">
+             <widget class="QPushButton" name="m_pushButton_triggerColor">
               <property name="text">
-               <string>Threshold:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_4">
-              <property name="text">
-               <string>Trigger channel:</string>
+               <string>Click to change</string>
               </property>
              </widget>
             </item>
@@ -224,7 +213,7 @@
             <item row="3" column="1">
              <widget class="QDoubleSpinBox" name="m_doubleSpinBox_detectionThresholdFirst">
               <property name="minimum">
-               <double>0.100000000000000</double>
+               <double>-1000.000000000000000</double>
               </property>
               <property name="maximum">
                <double>1000.000000000000000</double>
@@ -247,20 +236,31 @@
               </property>
              </widget>
             </item>
-            <item row="2" column="1" colspan="3">
-             <widget class="QPushButton" name="m_pushButton_triggerColor">
-              <property name="text">
-               <string>Click to change</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1" colspan="3">
-             <widget class="QComboBox" name="m_comboBox_triggerChannels"/>
-            </item>
             <item row="0" column="0" colspan="4">
              <widget class="QCheckBox" name="m_checkBox_activateTriggerDetection">
               <property name="text">
                <string>Activate trigger detection</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>Trigger channel:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Trigger color:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>Threshold:</string>
               </property>
              </widget>
             </item>
