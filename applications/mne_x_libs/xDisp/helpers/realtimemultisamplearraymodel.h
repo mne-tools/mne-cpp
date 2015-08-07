@@ -505,8 +505,8 @@ private:
     int     m_iCurrentTriggerChIndex;   /**< The index of the current trigger channel */
     int     m_iDistanceTimerSpacer;     /**< The distance for the horizontal time spacers in the view in ms */
 
-    QString m_sCurrentTriggerCh;    /**< Current trigger channel which is beeing scanned */
-    QString m_sFilterChannelType;   /**< Kind of channel which is to be filtered */
+    QString m_sCurrentTriggerCh;        /**< Current trigger channel which is beeing scanned */
+    QString m_sFilterChannelType;       /**< Kind of channel which is to be filtered */
 
     FiffInfo::SPtr          m_pFiffInfo;                        /**< Fiff info */
 

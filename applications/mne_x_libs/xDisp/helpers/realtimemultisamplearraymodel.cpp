@@ -70,7 +70,7 @@ RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 , m_iResidual(0)
 , m_bDrawFilterFront(true)
 , m_bTriggerDetectionActive(false)
-, m_dTriggerThreshold(0.05)
+, m_dTriggerThreshold(0.01)
 , m_iDistanceTimerSpacer(1000)
 {
     init();
@@ -731,6 +731,7 @@ void RealTimeMultiSampleArrayModel::triggerInfoChanged(const QMap<QString, QColo
         if(m_pFiffInfo->chs[i].ch_name == m_sCurrentTriggerCh) {
             m_iCurrentTriggerChIndex = i;
             m_qMapDetectedTrigger.insert(i, temp);
+            break;
         }
     }
 }

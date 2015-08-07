@@ -79,21 +79,61 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
     if(m_bIsInit)
     {
         //Stimulus bar
-        if(m_pRealTimeEvokedModel->getNumSamples() > 0)
-        {
+        if(m_pRealTimeEvokedModel->getNumSamples() > 0) {
             painter.save();
-            painter.setPen(QPen(Qt::black, 1, Qt::DashLine));
+            painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
 
             float fDx = (float)(this->width()-2) / ((float)m_pRealTimeEvokedModel->getNumSamples()-1.0f);
-            float posX = fDx * ((float)m_pRealTimeEvokedModel->getNumPreStimSamples()-1.0f);
+            float posX = fDx * ((float)m_pRealTimeEvokedModel->getNumPreStimSamples());
             painter.drawLine(posX, 1, posX, this->height()-2);
+
+            painter.drawText(QPointF(posX+5,this->rect().bottomRight().y()-5), QString("0ms / Stimulus"));
+
+            painter.restore();
+        }
+
+        //Vertical time spacers
+        if(m_pRealTimeEvokedModel->getNumberOfTimeSpacers() > 0)
+        {
+            painter.save();
+            QColor colorTimeSpacer = Qt::black;
+            colorTimeSpacer.setAlphaF(0.5);
+            painter.setPen(QPen(colorTimeSpacer, 1, Qt::DashLine));
+
+            float yStart = this->rect().topLeft().y();
+            float yEnd = this->rect().bottomRight().y();
+            float fDx = (float)(this->width()-2) / ((float)m_pRealTimeEvokedModel->getNumSamples()-1.0f);
+
+            float sampleCounter = m_pRealTimeEvokedModel->getNumPreStimSamples();
+            int counter = 1;
+            float timeDistanceMSec = 50.0;
+            float timeDistanceSamples = (timeDistanceMSec/1000.0)*m_pRealTimeEvokedModel->getSamplingFrequency(); //time distance corresponding to sampling frequency
+
+            //spacers before stim
+            while(sampleCounter-timeDistanceSamples>0) {
+                sampleCounter-=timeDistanceSamples;
+                float x = fDx*sampleCounter;
+                painter.drawLine(x, yStart, x, yEnd);
+                painter.drawText(QPointF(x+5,yEnd-5), QString("-%1ms").arg(timeDistanceMSec*counter));
+                counter++;
+            }
+
+            //spacers after stim
+            counter = 1;
+            sampleCounter = m_pRealTimeEvokedModel->getNumPreStimSamples();
+            while(sampleCounter+timeDistanceSamples<m_pRealTimeEvokedModel->getNumSamples()) {
+                sampleCounter+=timeDistanceSamples;
+                float x = fDx*sampleCounter;
+                painter.drawLine(x, yStart, x, yEnd);
+                painter.drawText(QPointF(x+5,yEnd-5), QString("%1ms").arg(timeDistanceMSec*counter));
+                counter++;
+            }
 
             painter.restore();
         }
 
         //Zero line
-        if(m_pRealTimeEvokedModel->getNumSamples() > 0)
-        {
+        if(m_pRealTimeEvokedModel->getNumSamples() > 0) {
             painter.save();
             painter.setPen(QPen(Qt::black, 1, Qt::DashLine));
 
@@ -104,8 +144,7 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
 
         painter.translate(0,this->height()/2);
 
-        for(qint32 r = 0; r < m_iNumChannels; ++r)
-        {
+        for(qint32 r = 0; r < m_iNumChannels; ++r) {
             if(m_lSelectedChannels.contains(r)) {
                 qint32 kind = m_pRealTimeEvokedModel->getKind(r);
 
