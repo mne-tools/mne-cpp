@@ -258,11 +258,27 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the current number for the time spacers
+    *
+    * @return the current number for the time spacers
+    */
+    inline int getNumberOfTimeSpacers() const;
+
+    //=========================================================================================================
+    /**
     * Returns the number of pre-stimulus samples
     *
     * @return the number of pre-stimulus samples
     */
     inline qint32 getNumPreStimSamples() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the current sampling frequency
+    *
+    * @return the current sampling frequency
+    */
+    inline float getSamplingFrequency() const;
 
     //=========================================================================================================
     /**
@@ -435,6 +451,14 @@ inline qint32 RealTimeEvokedModel::getNumPreStimSamples() const
 
 //*************************************************************************************************************
 
+inline float RealTimeEvokedModel::getSamplingFrequency() const
+{
+    return m_fSps;
+}
+
+
+//*************************************************************************************************************
+
 inline bool RealTimeEvokedModel::isFreezed() const
 {
     return m_bIsFreezed;
@@ -447,6 +471,16 @@ inline const QMap< qint32,float >& RealTimeEvokedModel::getScaling() const
 {
     return m_qMapChScaling;
 }
+
+
+//*************************************************************************************************************
+
+inline int RealTimeEvokedModel::getNumberOfTimeSpacers() const
+{
+    //std::cout<<floor((m_matData.cols()/m_fSps)*10)<<std::endl;
+    return floor((m_matData.cols()/m_fSps)*10);
+}
+
 
 } // NAMESPACE
 

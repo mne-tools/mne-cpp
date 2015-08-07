@@ -80,7 +80,7 @@ void DetectTrigger::detectTriggerFlanks(const MatrixXd &data, QMap<int,QList<int
         int dMax = data.row(i.key()).maxCoeff(&indexMaxCoeff);
 
         //Find trigger using gradient/difference
-        double gradient = data.row(i.key())(indexMaxCoeff);
+        double maxValue = data.row(i.key())(indexMaxCoeff);
 
 //        double gradient = 0;
 
@@ -92,10 +92,8 @@ void DetectTrigger::detectTriggerFlanks(const MatrixXd &data, QMap<int,QList<int
 //        std::cout<<"gradient: "<<gradient<<std::endl;
 //        std::cout<<"indexMaxCoeff: "<<indexMaxCoeff<<std::endl;
 
-        if(gradient>dThreshold) {
+        if(maxValue>dThreshold)
             qMapDetectedTrigger[i.key()].append((int)iOffsetIndex+indexMaxCoeff);
-//            std::cout<<"m_iCurrentSample-data.cols()+indexMaxCoeff: "<<iOffsetIndex+indexMaxCoeff<<std::endl;
-        }
     }
 }
 

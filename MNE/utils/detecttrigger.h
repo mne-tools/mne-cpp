@@ -105,7 +105,7 @@ public:
 
     //=========================================================================================================
     /**
-    * detectTriggerFlanks detects flanks from a given data matrix in row wise order
+    * detectTriggerFlanks detects flanks from a given data matrix in row wise order. This function uses a simple maxCoeff function implemented by eigen to locate the triggers.
     *
     * @param[in] data  the data used to find the trigger flanks
     * @param[out] qMapDetectedTrigger  This map holds the indices of the channels which are to be read from data. For each index/channel the found triggers are written to the value of the map.

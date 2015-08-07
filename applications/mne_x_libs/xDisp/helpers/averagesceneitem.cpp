@@ -84,7 +84,7 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     Q_UNUSED(widget);
 
     //set posistion
-    this->setPos(60*m_qpChannelPosition.x(), -60*m_qpChannelPosition.y());
+    this->setPos(75*m_qpChannelPosition.x(), -75*m_qpChannelPosition.y());
 
     painter->setRenderHint(QPainter::Antialiasing, true);
 
@@ -180,8 +180,10 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
         //Calculate downsampling factor of averaged data in respect to the items width
         int dsFactor;
         totalCols / boundingRect.width()<1 ? dsFactor = 1 : dsFactor = totalCols / boundingRect.width();
+        dsFactor = 1;
 
         //Create path
+        float offset = (*(averageData+(abs(m_firstLastSample.first)*m_iTotalNumberChannels)+m_iChannelNumber));
         QPainterPath path = QPainterPath(QPointF(boundingRect.x(), boundingRect.y() + boundingRect.height()/2));
         QPen pen;
         pen.setStyle(Qt::SolidLine);
@@ -193,7 +195,7 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
 
         for(int i = 0; i < totalCols && path.elementCount() <= boundingRect.width(); i += dsFactor) {
             //evoked matrix is stored in column major
-            double val = (*(averageData+(i*m_iTotalNumberChannels)+m_iChannelNumber) * dScaleY);
+            double val = ((*(averageData+(i*m_iTotalNumberChannels)+m_iChannelNumber))-offset) * dScaleY;
 
             qSamplePosition.setY(-val);
             qSamplePosition.setX(path.currentPosition().x()+1);
