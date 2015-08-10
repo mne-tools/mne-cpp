@@ -665,7 +665,7 @@ void RealTimeMultiSampleArrayDelegate::createTriggerPath(const QModelIndex &inde
     for(int u = 0; u<detectedTriggers.size(); u++) {
         int triggerPos = detectedTriggers[u];
 
-        if(triggerPos<=currentSampleIndex) {
+        if(triggerPos<=currentSampleIndex+t_pModel->getCurrentOverlapAddDelay()) {
             path.moveTo(triggerPos*fDx,yStart);
             path.lineTo(triggerPos*fDx,yEnd);
         }
