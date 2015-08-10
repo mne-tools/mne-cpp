@@ -378,6 +378,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the current overlap add delay
+    *
+    * @return the current overlap add delay
+    */
+    inline int getCurrentOverlapAddDelay() const;
+
+    //=========================================================================================================
+    /**
     * Set scaling channel scaling
     *
     * @param[in] p_qMapChScaling    Map of scaling factors
@@ -725,6 +733,17 @@ inline int RealTimeMultiSampleArrayModel::getCurrentTriggerIndex() const
 inline bool RealTimeMultiSampleArrayModel::triggerDetectionActive() const
 {
     return m_bTriggerDetectionActive;
+}
+
+
+//*************************************************************************************************************
+
+inline int RealTimeMultiSampleArrayModel::getCurrentOverlapAddDelay() const
+{
+    if(!m_filterData.isEmpty())
+        return m_iMaxFilterLength/2;
+    else
+        return 0;
 }
 
 
