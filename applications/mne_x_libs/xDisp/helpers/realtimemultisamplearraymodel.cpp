@@ -397,14 +397,10 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
             //Compute newly counted triggers
             int newTriggers = m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].size() - iOldDetectedTriggers;
 
-            std::cout<<"iOldDetectedTriggers: "<<iOldDetectedTriggers<<std::endl;
-            std::cout<<"newTriggers: "<<newTriggers<<std::endl;
-
             if(newTriggers!=0) {
                 m_iDetectedTriggers += newTriggers;
                 emit triggerDetected(m_iDetectedTriggers);
             }
-            std::cout<<"m_iDetectedTriggers: "<<m_iDetectedTriggers<<std::endl;
         }
     }
 
