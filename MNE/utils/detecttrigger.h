@@ -112,8 +112,9 @@ public:
     * @param[out]   qMapDetectedTrigger  This map holds the indices of the channels which are to be read from data. For each index/channel the found triggers are written to the value of the map.
     * @param[in]    iOffsetIndex  the offset index gets added to the found trigger flank index
     * @param[in]    iThreshold  the signal threshold value used to find the trigger flank
+    * @param[in]    bRemoveOffset  remove the first sample as offset
     */
-    static void detectTriggerFlanksMax(const MatrixXd &data, QMap<int,QList<int> >& qMapDetectedTrigger, int iOffsetIndex, double dThreshold);
+    static void detectTriggerFlanksMax(const MatrixXd &data, QMap<int,QList<int> >& qMapDetectedTrigger, int iOffsetIndex, double dThreshold, bool bRemoveOffset);
 
     //=========================================================================================================
     /**
