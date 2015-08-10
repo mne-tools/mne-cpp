@@ -653,16 +653,32 @@ void RealTimeMultiSampleArrayDelegate::createTriggerPath(const QModelIndex &inde
     const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
 
     QList<int> detectedTriggers = t_pModel->getDetectedTriggers();
+    QList<int> detectedTriggersOld = t_pModel->getDetectedTriggersOld();
 
     float yStart = option.rect.topLeft().y();
     float yEnd = option.rect.bottomRight().y();
     float fDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
 
+    int currentSampleIndex = t_pModel->getCurrentSampleIndex();
+
+    //Newly detected triggers
     for(int u = 0; u<detectedTriggers.size(); u++) {
         int triggerPos = detectedTriggers[u];
 
-        path.moveTo(triggerPos*fDx,yStart);
-        path.lineTo(triggerPos*fDx,yEnd);
+        if(triggerPos<=currentSampleIndex) {
+            path.moveTo(triggerPos*fDx,yStart);
+            path.lineTo(triggerPos*fDx,yEnd);
+        }
+    }
+
+    //Old detected triggers
+    for(int u = 0; u<detectedTriggersOld.size(); u++) {
+        int triggerPos = detectedTriggersOld[u];
+
+        if(triggerPos>currentSampleIndex) {
+            path.moveTo(triggerPos*fDx,yStart);
+            path.lineTo(triggerPos*fDx,yEnd);
+        }
     }
 }
 

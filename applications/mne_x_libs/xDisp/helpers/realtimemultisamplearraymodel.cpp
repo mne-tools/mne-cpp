@@ -356,7 +356,10 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
                 m_vecLastBlockFirstValuesRaw = m_matDataRaw.col(0);
             }
 
-            //Delete all detected triggers
+            //Store old detected triggers
+            m_qMapDetectedTriggerOld = m_qMapDetectedTrigger;
+
+            //Clear detected triggers
             if(m_bTriggerDetectionActive) {
                 QMutableMapIterator<int,QList<int> > i(m_qMapDetectedTrigger);
                 while (i.hasNext()) {
@@ -504,6 +507,7 @@ void RealTimeMultiSampleArrayModel::toggleFreeze(const QModelIndex &)
         m_matDataRawFreeze = m_matDataRaw;
         m_matDataFilteredFreeze = m_matDataFiltered;
         m_qMapDetectedTriggerFreeze = m_qMapDetectedTrigger;
+        m_qMapDetectedTriggerOldFreeze = m_qMapDetectedTriggerOld;
 
         m_iCurrentSampleFreeze = m_iCurrentSample;
     }
