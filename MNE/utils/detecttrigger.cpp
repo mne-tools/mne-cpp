@@ -63,7 +63,7 @@ DetectTrigger::DetectTrigger()
 
 //*************************************************************************************************************
 
-void DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data, QMap<int,QList<int> >& qMapDetectedTrigger, int iOffsetIndex, double dThreshold)
+void DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data, QMap<int,QList<int> >& qMapDetectedTrigger, int iOffsetIndex, double dThreshold, bool bRemoveOffset)
 {
     //TODO: This only can detect one trigger per data block. What iff there are more than one trigger in the data block?
     QMapIterator<int,QList<int> > i(qMapDetectedTrigger);
@@ -76,9 +76,12 @@ void DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data, QMap<int,QList<
 
         RowVectorXd::Index indexMaxCoeff;
         int dMax = data.row(i.key()).maxCoeff(&indexMaxCoeff);
+        Q_UNUSED(dMax);
 
-        //Find trigger using gradient/difference
+        //Find trigger using gradient/difference. Also subtract first value as offset, like in the display
         double maxValue = data.row(i.key())(indexMaxCoeff);
+        if(bRemoveOffset)
+            maxValue -= data.row(i.key())(0);
 
         if(maxValue>dThreshold)
             qMapDetectedTrigger[i.key()].append((int)iOffsetIndex+indexMaxCoeff);
@@ -127,6 +130,9 @@ void DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &data, QMap<int,QList
         //Compare to calculated threshold
         if(tGradient(indexMaxGrad)>2*tThreshold)
             qMapDetectedTrigger[i.key()].append((int)iOffsetIndex+indexMaxGrad);
+
+        std::cout<<"tGradient(indexMaxGrad): "<<tGradient(indexMaxGrad)<<std::endl;
+        std::cout<<"tThreshold: "<<tThreshold<<std::endl;
 
         int timeElapsed = time.elapsed();
         std::cout<<"timeElapsed: "<<timeElapsed<<std::endl;

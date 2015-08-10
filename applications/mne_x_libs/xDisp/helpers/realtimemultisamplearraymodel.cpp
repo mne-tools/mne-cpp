@@ -385,8 +385,8 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
 
         //detect the trigger flanks in the trigger channels
         if(m_bTriggerDetectionActive)
-            //DetectTrigger::detectTriggerFlanksMax(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-data.at(b).cols(), m_dTriggerThreshold);
-            DetectTrigger::detectTriggerFlanksGrad(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-data.at(b).cols());
+            DetectTrigger::detectTriggerFlanksMax(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-data.at(b).cols(), m_dTriggerThreshold, true);
+            //DetectTrigger::detectTriggerFlanksGrad(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-data.at(b).cols());
     }
 
     //Update data content
