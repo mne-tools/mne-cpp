@@ -487,43 +487,43 @@ void RtAve::run()
             //
             // Detect Stimuli
             //
-//            QMutableMapIterator<int,QList<int> >itClear(m_qMapDetectedTrigger);
-//            while(itClear.hasNext()) {
-//                itClear.next();
-//                itClear.value().clear();
-//            }
+            QMutableMapIterator<int,QList<int> >itClear(m_qMapDetectedTrigger);
+            while(itClear.hasNext()) {
+                itClear.next();
+                itClear.value().clear();
+            }
 
-//            DetectTrigger::detectTriggerFlanks(rawSegment, m_qMapDetectedTrigger, 0, 0.1);
-
-//            QList<qint32> t_qListStimuli;
-//            QMapIterator<int,QList<int> >it(m_qMapDetectedTrigger);
-//            while(it.hasNext()) {
-//                it.next();
-//                t_qListStimuli.append(it.value());
-//            }
+            DetectTrigger::detectTriggerFlanksMax(rawSegment, m_qMapDetectedTrigger, 0, 0.1, true);
 
             QList<qint32> t_qListStimuli;
-            for(i = 0; i < m_qListStimChannelIdcs.size(); ++i)
-            {
-                qint32 idx = m_qListStimChannelIdcs[i];
-                RowVectorXd stimSegment = rawSegment.row(idx);
-                RowVectorXd::Index indexMaxCoeff;
-                int dMax = stimSegment.maxCoeff(&indexMaxCoeff);
-
-                if(dMax > 0)
-                    t_qListStimuli.append(i);
-
-                //Find trigger using gradient/difference
-                double gradient = 0;
-
-                if(indexMaxCoeff-10<0)
-                    gradient = stimSegment(indexMaxCoeff) - stimSegment(indexMaxCoeff+10);
-                else
-                    gradient = stimSegment(indexMaxCoeff) - stimSegment(indexMaxCoeff-10);
-
-//                std::cout<<"gradient: "<<gradient<<std::endl;
-//                std::cout<<"dMax: "<<dMax<<std::endl;
+            QMapIterator<int,QList<int> >it(m_qMapDetectedTrigger);
+            while(it.hasNext()) {
+                it.next();
+                t_qListStimuli.append(it.value());
             }
+
+//            QList<qint32> t_qListStimuli;
+//            for(i = 0; i < m_qListStimChannelIdcs.size(); ++i)
+//            {
+//                qint32 idx = m_qListStimChannelIdcs[i];
+//                RowVectorXd stimSegment = rawSegment.row(idx);
+//                RowVectorXd::Index indexMaxCoeff;
+//                int dMax = stimSegment.maxCoeff(&indexMaxCoeff);
+
+//                if(dMax > 0)
+//                    t_qListStimuli.append(i);
+
+//                //Find trigger using gradient/difference
+//                double gradient = 0;
+
+//                if(indexMaxCoeff-10<0)
+//                    gradient = stimSegment(indexMaxCoeff) - stimSegment(indexMaxCoeff+10);
+//                else
+//                    gradient = stimSegment(indexMaxCoeff) - stimSegment(indexMaxCoeff-10);
+
+////                std::cout<<"gradient: "<<gradient<<std::endl;
+////                std::cout<<"dMax: "<<dMax<<std::endl;
+//            }
 
             //
             // Store
