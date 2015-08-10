@@ -455,6 +455,10 @@ void RealTimeMultiSampleArrayWidget::init()
             //Handle trigger detection
             connect(m_pQuickControlWidget.data(), &QuickControlWidget::triggerInfoChanged,
                     this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::triggerInfoChanged);
+            connect(m_pQuickControlWidget.data(), &QuickControlWidget::resetTriggerCounter,
+                    this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::resetTriggerCounter);
+            connect(this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::triggerDetected,
+                    m_pQuickControlWidget.data(), &QuickControlWidget::setNumberDetectedTriggers);
 
             //Handle time spacer distance
             connect(m_pQuickControlWidget.data(), &QuickControlWidget::distanceTimeSpacerChanged,
@@ -772,6 +776,14 @@ void RealTimeMultiSampleArrayWidget::hideBadChannels()
 
     //Update the visible channel list which are to be filtered
     //visibleRowsChanged(0);
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayWidget::onTriggerDetected(int numberDetectedTriggers)
+{
+    m_pQuickControlWidget->setNumberDetectedTriggers(numberDetectedTriggers);
 }
 
 

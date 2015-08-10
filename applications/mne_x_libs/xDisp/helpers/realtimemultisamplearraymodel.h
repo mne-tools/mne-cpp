@@ -459,6 +459,12 @@ public:
     */
     void distanceTimeSpacerChanged(int value);
 
+    //=========================================================================================================
+    /**
+    * resetTriggerCounter resets the trigger counter
+    */
+    void resetTriggerCounter();
+
 signals:
     //=========================================================================================================
     /**
@@ -475,6 +481,12 @@ signals:
     * @param [in] windowSize     number of samples in the window
     */
     void windowSizeChanged(int windowSize);
+
+    //=========================================================================================================
+    /**
+    * Emmited when trigger detection was performed
+    */
+    void triggerDetected(int numberDetectedTriggers);
 
 private:
     //=========================================================================================================
@@ -520,6 +532,7 @@ private:
     qint32  m_iResidual;                /**< Current amount of samples which were to size */
     int     m_iCurrentTriggerChIndex;   /**< The index of the current trigger channel */
     int     m_iDistanceTimerSpacer;     /**< The distance for the horizontal time spacers in the view in ms */
+    int     m_iDetectedTriggers;        /**< Detected triggers since the last reset */
 
     QString m_sCurrentTriggerCh;        /**< Current trigger channel which is beeing scanned */
     QString m_sFilterChannelType;       /**< Kind of channel which is to be filtered */

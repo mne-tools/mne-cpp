@@ -97,7 +97,7 @@ QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const
         ui->m_groupBox_projections->hide();
 
     if(m_bView)
-        createViewGroup();
+        createOtherGroup();
     else
         ui->m_groupBox_view->hide();
 
@@ -210,6 +210,15 @@ int QuickControlWidget::getDistanceTimeSpacerIndex()
 void QuickControlWidget::setDistanceTimeSpacerIndex(int index)
 {
     ui->m_comboBox_distaceTimeSpacer->setCurrentIndex(index);
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::setNumberDetectedTriggers(int numberDetections)
+{
+    if(m_bTriggerDetection)
+        ui->m_label_numberDetectedTriggers->setText(QString("%1").arg(numberDetections));
 }
 
 
@@ -486,7 +495,7 @@ void QuickControlWidget::createProjectorGroup()
 
 //*************************************************************************************************************
 
-void QuickControlWidget::createViewGroup()
+void QuickControlWidget::createOtherGroup()
 {
     //Number of visible channels
     connect(ui->m_doubleSpinBox_numberVisibleChannels, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
@@ -523,6 +532,9 @@ void QuickControlWidget::createViewGroup()
 
     connect(ui->m_spinBox_detectionThresholdSecond, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                 this, &QuickControlWidget::realTimeTriggerThresholdChanged);
+
+    connect(ui->m_pushButton_resetNumberTriggers, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+            this, &QuickControlWidget::onResetTriggerNumbers);
 
     if(!m_bTriggerDetection)
         ui->m_tabWidget_viewOptions->removeTab(1);
@@ -1002,6 +1014,16 @@ void QuickControlWidget::onDistanceTimeSpacerChanged(qint32 value)
             emit distanceTimeSpacerChanged(1000);
         break;
     }
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::onResetTriggerNumbers()
+{
+    ui->m_label_numberDetectedTriggers->setText(QString("0"));
+
+    emit resetTriggerCounter();
 }
 
 

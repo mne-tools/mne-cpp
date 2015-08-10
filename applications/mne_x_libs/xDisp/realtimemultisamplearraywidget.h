@@ -344,6 +344,8 @@ private:
     //=========================================================================================================
     /**
     * Gets called when the views in the viewport of the table view change
+    *
+    * @param [in] value unused int.
     */
     void visibleRowsChanged(int value);
 
@@ -358,6 +360,14 @@ private:
     * Hides/shows all bad channels in the view
     */
     void hideBadChannels();
+
+    //=========================================================================================================
+    /**
+    * Updates the number of detected trigger in quick control widget
+    *
+    * @param [in] numberDetectedTriggers number of detected triggers.
+    */
+    void onTriggerDetected(int numberDetectedTriggers);
 
     //=========================================================================================================
     /**
