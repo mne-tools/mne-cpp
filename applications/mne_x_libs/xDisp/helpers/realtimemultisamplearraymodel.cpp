@@ -72,6 +72,7 @@ RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 , m_bTriggerDetectionActive(false)
 , m_dTriggerThreshold(0.01)
 , m_iDistanceTimerSpacer(1000)
+, m_iDetectedTriggers(0)
 {
     init();
 }
@@ -387,9 +388,24 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
         m_iCurrentBlockSize = data.at(b).cols();
 
         //detect the trigger flanks in the trigger channels
-        if(m_bTriggerDetectionActive)
+        if(m_bTriggerDetectionActive) {
+            int iOldDetectedTriggers = m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].size();
+
             DetectTrigger::detectTriggerFlanksMax(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-data.at(b).cols(), m_dTriggerThreshold, true);
             //DetectTrigger::detectTriggerFlanksGrad(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-data.at(b).cols());
+
+            //Compute newly counted triggers
+            int newTriggers = m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].size() - iOldDetectedTriggers;
+
+            std::cout<<"iOldDetectedTriggers: "<<iOldDetectedTriggers<<std::endl;
+            std::cout<<"newTriggers: "<<newTriggers<<std::endl;
+
+            if(newTriggers!=0) {
+                m_iDetectedTriggers += newTriggers;
+                emit triggerDetected(m_iDetectedTriggers);
+            }
+            std::cout<<"m_iDetectedTriggers: "<<m_iDetectedTriggers<<std::endl;
+        }
     }
 
     //Update data content
@@ -748,6 +764,15 @@ void RealTimeMultiSampleArrayModel::distanceTimeSpacerChanged(int value)
 {
     m_iDistanceTimerSpacer = value;
 }
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::resetTriggerCounter()
+{
+    m_iDetectedTriggers = 0;
+}
+
 
 
 //*************************************************************************************************************

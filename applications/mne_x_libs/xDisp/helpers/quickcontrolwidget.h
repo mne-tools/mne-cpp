@@ -174,6 +174,14 @@ public:
     */
     void setDistanceTimeSpacerIndex(int index);
 
+    //=========================================================================================================
+    /**
+    * Set number of detected triggers.
+    *
+    * @param [in] numberDetections     the numger of detected triggers
+    */
+    void setNumberDetectedTriggers(int numberDetections);
+
 signals:
     //=========================================================================================================
     /**
@@ -223,6 +231,12 @@ signals:
     */
     void distanceTimeSpacerChanged(int value);
 
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user pressed the trigger counter.
+    */
+    void resetTriggerCounter();
+
 protected:
     //=========================================================================================================
     /**
@@ -238,9 +252,9 @@ protected:
 
     //=========================================================================================================
     /**
-    * Create the widgets used in the view group
+    * Create the widgets used in the other group
     */
-    void createViewGroup();
+    void createOtherGroup();
 
     //=========================================================================================================
     /**
@@ -374,6 +388,11 @@ protected:
     */
     void onDistanceTimeSpacerChanged(qint32 value);
 
+    //=========================================================================================================
+    /**
+    * Slot called when reset number of detected triggers was pressed
+    */
+    void onResetTriggerNumbers();
 
 private:
     QPoint      m_dragPosition;     /**< the drag position of the window */
