@@ -339,7 +339,7 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                     painter->save();
                     painter->setPen(QPen(Qt::red, 1, Qt::DashLine));
                     painter->drawPath(path);
-                    painter->drawText(textPosition, "Trigger Threshold");
+                    painter->drawText(textPosition, QString("%1 Threshold").arg(t_pModel->getTriggerName()));
                     painter->restore();
                 }
 

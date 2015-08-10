@@ -346,6 +346,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the current trigger name
+    *
+    * @return the current trigger name
+    */
+    inline QString getTriggerName() const;
+
+    //=========================================================================================================
+    /**
     * Returns the current trigger channel index
     *
     * @return the current trigger channel index
@@ -653,6 +661,14 @@ inline int RealTimeMultiSampleArrayModel::getNumberOfTimeSpacers() const
 inline double RealTimeMultiSampleArrayModel::getTriggerThreshold() const
 {
     return m_dTriggerThreshold;
+}
+
+
+//*************************************************************************************************************
+
+inline QString RealTimeMultiSampleArrayModel::getTriggerName() const
+{
+    return m_sCurrentTriggerCh;
 }
 
 
