@@ -68,6 +68,7 @@ void DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data, QMap<int,QList<
     //TODO: This only can detect one trigger per data block. What iff there are more than one trigger in the data block?
     QMapIterator<int,QList<int> > i(qMapDetectedTrigger);
     while (i.hasNext()) {
+        QTime time;
         i.next();
         //detect the actual triggers in the current data matrix
         if(i.key() > data.rows()) {
@@ -85,21 +86,24 @@ void DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data, QMap<int,QList<
 
         if(maxValue>dThreshold)
             qMapDetectedTrigger[i.key()].append((int)iOffsetIndex+indexMaxCoeff);
+
+        int timeElapsed = time.elapsed();
+        std::cout<<"timeElapsed: "<<timeElapsed<<std::endl;
     }
 }
 
 
 //*************************************************************************************************************
 
-void DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &data, QMap<int,QList<int> >& qMapDetectedTrigger, int iOffsetIndex)
+void DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &data, QMap<int,QList<int> >& qMapDetectedTrigger, int iOffsetIndex, double dThreshold)
 {
     //TODO: This only can detect one trigger per data block. What iff there are more than one trigger in the data block?
     RowVectorXd tGradient = RowVectorXd::Zero(data.cols());
 
     QMapIterator<int,QList<int> > i(qMapDetectedTrigger);
     while (i.hasNext()) {
-        QTime time;
-        time.start();
+//        QTime time;
+//        time.start();
 
         i.next();
         //detect the actual triggers in the current data matrix
@@ -116,26 +120,26 @@ void DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &data, QMap<int,QList
         int dMax = tGradient.maxCoeff(&indexMaxGrad);
         Q_UNUSED(dMax);
 
-        //Calculate dynamic threshold
-        RowVectorXd::Index indexMinGrad;
-        int dMin = data.row(i.key()).minCoeff(&indexMinGrad);
-        Q_UNUSED(dMin);
+//        //Calculate dynamic threshold
+//        RowVectorXd::Index indexMinGrad;
+//        int dMin = data.row(i.key()).minCoeff(&indexMinGrad);
+//        Q_UNUSED(dMin);
 
-        double tThreshold = 0;
-        if(indexMinGrad-1<0)
-            tThreshold = data.row(i.key())(indexMinGrad+1) - data.row(i.key())(indexMinGrad);
-        else
-            tThreshold = data.row(i.key())(indexMinGrad) - data.row(i.key())(indexMinGrad-1);
+//        double tThreshold = 0;
+//        if(indexMinGrad-1<0)
+//            tThreshold = data.row(i.key())(indexMinGrad+1) - data.row(i.key())(indexMinGrad);
+//        else
+//            tThreshold = data.row(i.key())(indexMinGrad) - data.row(i.key())(indexMinGrad-1);
 
         //Compare to calculated threshold
-        if(tGradient(indexMaxGrad)>2*tThreshold)
+        if(tGradient(indexMaxGrad)>dThreshold)
             qMapDetectedTrigger[i.key()].append((int)iOffsetIndex+indexMaxGrad);
 
-        std::cout<<"tGradient(indexMaxGrad): "<<tGradient(indexMaxGrad)<<std::endl;
-        std::cout<<"tThreshold: "<<tThreshold<<std::endl;
+//        std::cout<<"tGradient(indexMaxGrad): "<<tGradient(indexMaxGrad)<<std::endl;
+//        std::cout<<"tThreshold: "<<tThreshold<<std::endl;
 
-        int timeElapsed = time.elapsed();
-        std::cout<<"timeElapsed: "<<timeElapsed<<std::endl;
+//        int timeElapsed = time.elapsed();
+//        std::cout<<"timeElapsed: "<<timeElapsed<<std::endl;
     }
 }
 
