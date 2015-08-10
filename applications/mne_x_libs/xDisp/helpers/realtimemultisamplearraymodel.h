@@ -322,6 +322,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns old detected trigger flanks
+    *
+    * @return the old detected trigger flanks
+    */
+    inline QList<int> RealTimeMultiSampleArrayModel::getDetectedTriggersOld() const;
+
+    //=========================================================================================================
+    /**
     * Returns current trigger color
     *
     * @return the current trigger color
@@ -531,15 +539,17 @@ private:
     MatrixXdR               m_matDataFilteredFreeze;            /**< The raw filtered data in freeze mode */
     MatrixXd                m_matOverlap;                       /**< Last overlap block for the back */
 
-    QMap<QString, QColor>               m_qMapTriggerColor;     /**< Current colors for all trigger channels. */
-    QMap<int,QList<int> >               m_qMapDetectedTrigger;  /**< Detected trigger for each trigger channel. */
-    QMap<int,QList<int> >               m_qMapDetectedTriggerFreeze;  /**< Detected trigger for each trigger channel while display is freezed. */
-    QMap<qint32,float>                  m_qMapChScaling;        /**< Channel scaling map. */
-    QList<FilterData>                   m_filterData;           /**< List of currently active filters. */
-    QList<RealTimeSampleArrayChInfo>    m_qListChInfo;          /**< Channel info list. ToDo: Obsolete*/
-    QStringList                         m_filterChannelList;    /**< List of channels which are to be filtered.*/
-    QStringList                         m_visibleChannelList;   /**< List of currently visible channels in the view.*/
-    QMap<qint32,qint32>                 m_qMapIdxRowSelection;  /**< Selection mapping.*/
+    QMap<QString, QColor>               m_qMapTriggerColor;             /**< Current colors for all trigger channels. */
+    QMap<int,QList<int> >               m_qMapDetectedTrigger;          /**< Detected trigger for each trigger channel. */
+    QMap<int,QList<int> >               m_qMapDetectedTriggerFreeze;    /**< Detected trigger for each trigger channel while display is freezed. */
+    QMap<int,QList<int> >               m_qMapDetectedTriggerOld;       /**< Old detected trigger for each trigger channel. */
+    QMap<int,QList<int> >               m_qMapDetectedTriggerOldFreeze; /**< Old detected trigger for each trigger channel while display is freezed. */
+    QMap<qint32,float>                  m_qMapChScaling;                /**< Channel scaling map. */
+    QList<FilterData>                   m_filterData;                   /**< List of currently active filters. */
+    QList<RealTimeSampleArrayChInfo>    m_qListChInfo;                  /**< Channel info list. ToDo: Obsolete*/
+    QStringList                         m_filterChannelList;            /**< List of channels which are to be filtered.*/
+    QStringList                         m_visibleChannelList;           /**< List of currently visible channels in the view.*/
+    QMap<qint32,qint32>                 m_qMapIdxRowSelection;          /**< Selection mapping.*/
 };
 
 
@@ -641,6 +651,23 @@ inline QList<int> RealTimeMultiSampleArrayModel::getDetectedTriggers() const
 
     if(m_bTriggerDetectionActive) {
         return m_qMapDetectedTrigger[m_iCurrentTriggerChIndex];
+    }
+    else
+        return triggerIndices;
+}
+
+
+//*************************************************************************************************************
+
+inline QList<int> RealTimeMultiSampleArrayModel::getDetectedTriggersOld() const
+{
+    QList<int> triggerIndices;
+
+    if(m_bIsFreezed)
+        return m_qMapDetectedTriggerOldFreeze[m_iCurrentTriggerChIndex];
+
+    if(m_bTriggerDetectionActive) {
+        return m_qMapDetectedTriggerOld[m_iCurrentTriggerChIndex];
     }
     else
         return triggerIndices;
