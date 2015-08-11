@@ -159,8 +159,10 @@ void RtAve::assemblePostStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p
 
         qint32 t_iSize = 0;
 
+        //Detect actual stimulus flank in signal
         qint32 pos = 0;
-        p_qListRawMatBuf[t_iBuffWithStim].second.row(t_iRowIdx).maxCoeff(&pos);
+        DetectTrigger::detectTriggerFlanksMax(p_qListRawMatBuf[t_iBuffWithStim].second, t_iRowIdx, pos, 0, 0.01, true);
+        //p_qListRawMatBuf[t_iBuffWithStim].second.row(t_iRowIdx).maxCoeff(&pos);
 
         //
         // assemble poststimulus
@@ -233,8 +235,10 @@ void RtAve::assemblePreStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_
 
         qint32 t_iStart = 0;
 
+        //Detect actual stimulus flank in signal
         qint32 pos = 0;
-        p_qListRawMatBuf[t_iBuffWithStim].second.row(t_iRowIdx).maxCoeff(&pos);
+        DetectTrigger::detectTriggerFlanksMax(p_qListRawMatBuf[t_iBuffWithStim].second, t_iRowIdx, pos, 0, 0.01, true);
+        //p_qListRawMatBuf[t_iBuffWithStim].second.row(t_iRowIdx).maxCoeff(&pos);
 
         //
         // assemble prestimulus
@@ -485,45 +489,19 @@ void RtAve::run()
             ++count;
 
             //
-            // Detect Stimuli
+            // Find which trigger channel has a trigger flank in it
             //
-            QMutableMapIterator<int,QList<int> >itClear(m_qMapDetectedTrigger);
-            while(itClear.hasNext()) {
-                itClear.next();
-                itClear.value().clear();
-            }
-
-            DetectTrigger::detectTriggerFlanksMax(rawSegment, m_qMapDetectedTrigger, 0, 0.1, true);
-
             QList<qint32> t_qListStimuli;
-            QMapIterator<int,QList<int> >it(m_qMapDetectedTrigger);
-            while(it.hasNext()) {
-                it.next();
-                t_qListStimuli.append(it.value());
+            for(i = 0; i < m_qListStimChannelIdcs.size(); ++i)
+            {
+                qint32 idx = m_qListStimChannelIdcs[i];
+                int pos = -1;
+
+                DetectTrigger::detectTriggerFlanksMax(rawSegment, idx, pos, 0, 0.02, true);
+
+                if(pos!=-1)
+                    t_qListStimuli.append(i);
             }
-
-//            QList<qint32> t_qListStimuli;
-//            for(i = 0; i < m_qListStimChannelIdcs.size(); ++i)
-//            {
-//                qint32 idx = m_qListStimChannelIdcs[i];
-//                RowVectorXd stimSegment = rawSegment.row(idx);
-//                RowVectorXd::Index indexMaxCoeff;
-//                int dMax = stimSegment.maxCoeff(&indexMaxCoeff);
-
-//                if(dMax > 0)
-//                    t_qListStimuli.append(i);
-
-//                //Find trigger using gradient/difference
-//                double gradient = 0;
-
-//                if(indexMaxCoeff-10<0)
-//                    gradient = stimSegment(indexMaxCoeff) - stimSegment(indexMaxCoeff+10);
-//                else
-//                    gradient = stimSegment(indexMaxCoeff) - stimSegment(indexMaxCoeff-10);
-
-////                std::cout<<"gradient: "<<gradient<<std::endl;
-////                std::cout<<"dMax: "<<dMax<<std::endl;
-//            }
 
             //
             // Store

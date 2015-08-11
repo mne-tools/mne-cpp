@@ -597,8 +597,6 @@ void RealTimeEvokedModel::filterChannelsConcurrently()
 
     //Do the concurrent filtering
     if(!timeData.isEmpty()) {
-        std::cout<<"timeData.size(): "<<timeData.size()<<std::endl;
-
         QFuture<void> future = QtConcurrent::map(timeData,
                                              doFilterPerChannelRTE);
 
