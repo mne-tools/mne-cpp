@@ -374,15 +374,6 @@ void RealTimeMultiSampleArrayWidget::init()
             connect(m_pFilterWindow.data(), &FilterWindow::filterActivated,
                     m_pRTMSAModel, &RealTimeMultiSampleArrayModel::filterActivated);
 
-    //        connect(m_pRTMSAModel, &RealTimeMultiSampleArrayModel::windowSizeChanged,
-    //                m_pFilterWindow.data(), &FilterWindow::setWindowSize);
-
-            connect(this, &RealTimeMultiSampleArrayWidget::samplingRateChanged,
-                    m_pFilterWindow.data(), &FilterWindow::setSamplingRate);
-
-            //Init downsampled sampling frequency
-            emit samplingRateChanged(m_fSamplingRate);
-
             //Set stored filter settings from last session
             QSettings settings;
             m_pFilterWindow->setFilterParameters(settings.value(QString("RTMSAW/%1/filterHP").arg(t_sRTMSAWName), 5.0).toDouble(),
