@@ -413,6 +413,26 @@ void RealTimeEvokedWidget::init()
                                                     settings.value(QString("RTEW/%1/filterUserDesignActive").arg(t_sRTEWName), false).toBool());
         }
 
+        //Set up selection manager
+        if(!m_pSelectionManagerWindow) {
+            m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(m_pFiffInfo, this));
+            m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel.data()));
+
+            connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::showSelectedChannelsOnly,
+                    this, &RealTimeEvokedWidget::showSelectedChannelsOnly);
+
+            //Connect channel info model
+            connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::loadedLayoutMap,
+                    m_pChInfoModel.data(), &ChInfoModel::layoutChanged);
+
+            connect(m_pChInfoModel.data(), &ChInfoModel::channelsMappedToLayout,
+                    m_pSelectionManagerWindow.data(), &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
+
+            m_pSelectionManagerWindow->setCurrentLayoutFile(settings.value(QString("RTEW/%1/selectedLayoutFile").arg(t_sRTEWName), "babymeg-mag-inner-layer.lout").toString());
+
+            m_pActionSelectSensors->setVisible(true);
+        }
+
         //Quick control widget
         if(!m_pQuickControlWidget) {
             m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Averaging", 0, true, true, false, true, true, false));
@@ -433,32 +453,12 @@ void RealTimeEvokedWidget::init()
                     this, &RealTimeEvokedWidget::showFilterWidget);
 
             m_pQuickControlWidget->setViewParameters(settings.value(QString("RTEW/%1/viewZoomFactor").arg(t_sRTEWName), 1.0).toFloat(),
-                                                     settings.value(QString("RTEW/%1/viewWindowSize").arg(t_sRTEWName), 10).toInt(),
-                                                     settings.value(QString("RTEW/%1/viewOpacity").arg(t_sRTEWName), 95).toInt());
+                                                         settings.value(QString("RTEW/%1/viewWindowSize").arg(t_sRTEWName), 10).toInt(),
+                                                         settings.value(QString("RTEW/%1/viewOpacity").arg(t_sRTEWName), 95).toInt());
 
             m_pQuickControlWidget->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
 
             m_pActionQuickControl->setVisible(true);
-        }
-
-        //Set up selection manager
-        if(!m_pSelectionManagerWindow) {
-            m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(m_pFiffInfo, this));
-            m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel.data()));
-
-            connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::showSelectedChannelsOnly,
-                    this, &RealTimeEvokedWidget::showSelectedChannelsOnly);
-
-            //Connect channel info model
-            connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::loadedLayoutMap,
-                    m_pChInfoModel.data(), &ChInfoModel::layoutChanged);
-
-            connect(m_pChInfoModel.data(), &ChInfoModel::channelsMappedToLayout,
-                    m_pSelectionManagerWindow.data(), &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
-
-            m_pSelectionManagerWindow->setCurrentLayoutFile(settings.value(QString("RTEW/%1/selectedLayoutFile").arg(t_sRTEWName), "babymeg-mag-inner-layer.lout").toString());
-
-            m_pActionSelectSensors->setVisible(true);
         }
 
         //Init average scene

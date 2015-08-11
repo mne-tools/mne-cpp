@@ -259,6 +259,7 @@ void Averaging::changeStimChannel(qint32 index)
 //    qDebug() << "Averaging::changeStimChannel(qint32 index)" << m_pAveragingWidget->m_pComboBoxChSelection->currentData().toInt();
 }
 
+
 //*************************************************************************************************************
 
 void Averaging::changePreStim(qint32 samples)

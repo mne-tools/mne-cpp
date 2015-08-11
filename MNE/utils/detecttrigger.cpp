@@ -73,9 +73,8 @@ void DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data, QMap<int,QList<
 
         i.next();
         //detect the actual triggers in the current data matrix
-        if(i.key() > data.rows()) {
+        if(i.key() > data.rows())
             return;
-        }
 
         RowVectorXd::Index indexMaxCoeff;
         int dMax = data.row(i.key()).maxCoeff(&indexMaxCoeff);
@@ -97,6 +96,35 @@ void DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data, QMap<int,QList<
 
 //*************************************************************************************************************
 
+void DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data, int iTriggerChannelIdx, int &iDetectedTrigger, int iOffsetIndex, double dThreshold, bool bRemoveOffset)
+{
+    //TODO: This only can detect one trigger per data block. What iff there are more than one trigger in the data block?
+//        QTime time;
+//        time.start();
+
+    //detect the actual triggers in the current data matrix
+    if(iTriggerChannelIdx > data.rows())
+        return;
+
+    RowVectorXd::Index indexMaxCoeff;
+    int dMax = data.row(iTriggerChannelIdx).maxCoeff(&indexMaxCoeff);
+    Q_UNUSED(dMax);
+
+    //Find trigger using gradient/difference. Also subtract first value as offset, like in the display
+    double maxValue = data.row(iTriggerChannelIdx)(indexMaxCoeff);
+    if(bRemoveOffset)
+        maxValue -= data.row(iTriggerChannelIdx)(0);
+
+    if(maxValue>dThreshold)
+        iDetectedTrigger = (int)iOffsetIndex+indexMaxCoeff;
+
+//        int timeElapsed = time.elapsed();
+//        std::cout<<"timeElapsed: "<<timeElapsed<<std::endl;
+}
+
+
+//*************************************************************************************************************
+
 void DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &data, QMap<int,QList<int> >& qMapDetectedTrigger, int iOffsetIndex, double dThreshold)
 {
     //TODO: This only can detect one trigger per data block. What if there are more than one trigger in the data block?
@@ -109,9 +137,8 @@ void DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &data, QMap<int,QList
 
         i.next();
         //detect the actual triggers in the current data matrix
-        if(i.key() > data.rows()) {
+        if(i.key() > data.rows())
             return;
-        }
 
         //Compute gradient
         for(int t = 1; t<tGradient.cols(); t++)
