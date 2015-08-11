@@ -736,21 +736,26 @@ void RealTimeMultiSampleArrayModel::markChBad(QModelIndex ch, bool status)
 void RealTimeMultiSampleArrayModel::triggerInfoChanged(const QMap<QString, QColor>& colorMap, bool active, QString triggerCh, double threshold)
 {
     m_qMapTriggerColor = colorMap;
-    m_bTriggerDetectionActive = active;
-    m_sCurrentTriggerCh = triggerCh;
+    m_bTriggerDetectionActive = active;    
     m_dTriggerThreshold = threshold;
 
-    //Find channel index and initialise detected trigger map
-    QList<int> temp;
-    m_qMapDetectedTrigger.clear();
+    //Find channel index and initialise detected trigger map if channel name changed
+    if(m_sCurrentTriggerCh!=triggerCh) {
+        m_sCurrentTriggerCh=triggerCh;
 
-    for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
-        if(m_pFiffInfo->chs[i].ch_name == m_sCurrentTriggerCh) {
-            m_iCurrentTriggerChIndex = i;
-            m_qMapDetectedTrigger.insert(i, temp);
-            break;
+        QList<int> temp;
+        m_qMapDetectedTrigger.clear();
+
+        for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
+            if(m_pFiffInfo->chs[i].ch_name == m_sCurrentTriggerCh) {
+                m_iCurrentTriggerChIndex = i;
+                m_qMapDetectedTrigger.insert(i, temp);
+                break;
+            }
         }
     }
+
+    m_sCurrentTriggerCh=triggerCh;
 }
 
 

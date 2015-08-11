@@ -402,6 +402,9 @@ void RealTimeEvokedWidget::init()
             connect(m_pFilterWindow.data(), &FilterWindow::filterChanged,
                     m_pRTEModel.data(), &RealTimeEvokedModel::filterChanged);
 
+            //Init downsampled sampling frequency
+            m_pFilterWindow->setSamplingRate(m_pFiffInfo->sfreq);
+
             //Set stored filter settings from last session
             QSettings settings;
             m_pFilterWindow->setFilterParameters(settings.value(QString("RTEW/%1/filterHP").arg(t_sRTEWName), 5.0).toDouble(),
@@ -413,7 +416,7 @@ void RealTimeEvokedWidget::init()
                                                     settings.value(QString("RTEW/%1/filterUserDesignActive").arg(t_sRTEWName), false).toBool());
         }
 
-        //Set up selection manager
+        //Init channel selection manager
         if(!m_pSelectionManagerWindow) {
             m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(m_pFiffInfo, this));
             m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel.data()));
@@ -428,12 +431,14 @@ void RealTimeEvokedWidget::init()
             connect(m_pChInfoModel.data(), &ChInfoModel::channelsMappedToLayout,
                     m_pSelectionManagerWindow.data(), &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
 
+            m_pChInfoModel->fiffInfoChanged(m_pFiffInfo);
+
             m_pSelectionManagerWindow->setCurrentLayoutFile(settings.value(QString("RTEW/%1/selectedLayoutFile").arg(t_sRTEWName), "babymeg-mag-inner-layer.lout").toString());
 
             m_pActionSelectSensors->setVisible(true);
         }
 
-        //Quick control widget
+        //Init quick control widget
         if(!m_pQuickControlWidget) {
             m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Averaging", 0, true, true, false, true, true, false));
             m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
@@ -446,8 +451,14 @@ void RealTimeEvokedWidget::init()
             connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
                     m_pRTEModel.data(), &RealTimeEvokedModel::updateProjection);
 
+            //Handle modalities
             connect(m_pQuickControlWidget.data(), &QuickControlWidget::settingsChanged,
                     this, &RealTimeEvokedWidget::broadcastSettings);
+
+            //Handle filtering
+
+            connect(m_pFilterWindow.data(), &FilterWindow::activationCheckBoxListChanged,
+                    m_pQuickControlWidget.data(), &QuickControlWidget::filterGroupChanged);
 
             connect(m_pQuickControlWidget.data(), &QuickControlWidget::showFilterOptions,
                     this, &RealTimeEvokedWidget::showFilterWidget);
@@ -459,6 +470,9 @@ void RealTimeEvokedWidget::init()
             m_pQuickControlWidget->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
 
             m_pActionQuickControl->setVisible(true);
+
+            //Activate projections as default
+            m_pRTEModel->updateProjection();
         }
 
         //Init average scene
