@@ -105,6 +105,9 @@ class DISPSHARED_EXPORT FilterWindow : public QWidget
     Q_OBJECT
 
 public:
+    typedef QSharedPointer<FilterWindow> SPtr;              /**< Shared pointer type for FilterWindow. */
+    typedef QSharedPointer<const FilterWindow> ConstSPtr;   /**< Const shared pointer type for FilterWindow. */
+
     //=========================================================================================================
     /**
     * Constructs a FilterWindow dialog which is a child of parent.

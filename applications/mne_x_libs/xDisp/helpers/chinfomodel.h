@@ -111,6 +111,9 @@ class ChInfoModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
+    typedef QSharedPointer<ChInfoModel> SPtr;              /**< Shared pointer type for ChInfoModel. */
+    typedef QSharedPointer<const ChInfoModel> ConstSPtr;   /**< Const shared pointer type for ChInfoModel. */
+
     ChInfoModel(FiffInfo::SPtr pFiffInfo, QObject *parent = 0);
 
     //=========================================================================================================

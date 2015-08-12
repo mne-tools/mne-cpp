@@ -249,7 +249,8 @@ private:
 
     RealTimeEvokedModel::SPtr       m_pRTEModel;                /**< RTE data model */
     RealTimeButterflyPlot::SPtr     m_pButterflyPlot;           /**< Butterfly plot */
-    AverageScene::SPtr              m_pAverageScene;            /**< The pointer to the average scene. */
+    AverageScene::SPtr              m_pAverageScene;            /**< The pointer to the average scene. */    
+    RealTimeEvoked::SPtr            m_pRTE;                     /**< The real-time evoked measurement. */
 
     bool            m_bInitialized;             /**< Is Initialized */
     bool            m_bHideBadChannels;         /**< hide bad channels flag. */
@@ -265,11 +266,10 @@ private:
     QToolBox*       m_pToolBox;                 /**< The toolbox which holds the butterfly and 2D layout plot */
     QGraphicsView*  m_pAverageLayoutView;       /**< View for 2D average layout scene */
 
-    QSharedPointer<QuickControlWidget>          m_pQuickControlWidget;      /**< Quick control widget. */
-    QSharedPointer<SelectionManagerWindow>      m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */
-    QSharedPointer<ChInfoModel>                 m_pChInfoModel;             /**< Channel info model. */
-    QSharedPointer<RealTimeEvoked>              m_pRTE;                     /**< The real-time evoked measurement. */
-    QSharedPointer<FilterWindow>                m_pFilterWindow;            /**< Filter window. */
+    QuickControlWidget::SPtr            m_pQuickControlWidget;      /**< Quick control widget. */
+    SelectionManagerWindow::SPtr        m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */
+    ChInfoModel::SPtr                   m_pChInfoModel;             /**< Channel info model. */
+    FilterWindow::SPtr                  m_pFilterWindow;            /**< Filter window. */
 
     QList<Modality>                     m_qListModalities;
     QList<qint32>                       m_qListCurrentSelection;    /**< Current selection list -> hack around C++11 lambda  */

@@ -126,6 +126,7 @@ public:
     * @param[in] parent     parent of the table model
     */
     RealTimeEvokedModel(QObject *parent = 0);
+    ~RealTimeEvokedModel();
 
     inline bool isInit() const;
 

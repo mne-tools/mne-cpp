@@ -55,7 +55,7 @@ using namespace XDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SelectionManagerWindow::SelectionManagerWindow(QWidget *parent, ChInfoModel* pChInfoModel)
+SelectionManagerWindow::SelectionManagerWindow(QWidget *parent, ChInfoModel::SPtr pChInfoModel)
 : QWidget(parent,Qt::Window)
 , ui(new Ui::SelectionManagerWindow)
 , m_pChInfoModel(pChInfoModel)
