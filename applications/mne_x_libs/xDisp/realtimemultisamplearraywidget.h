@@ -387,8 +387,13 @@ private:
     */
     void showQuickControlWidget();
 
-    RealTimeMultiSampleArrayModel*      m_pRTMSAModel;                  /**< RTMSA data model */
-    RealTimeMultiSampleArrayDelegate*   m_pRTMSADelegate;               /**< RTMSA data delegate */
+    RealTimeMultiSampleArrayModel::SPtr         m_pRTMSAModel;                  /**< RTMSA data model */
+    RealTimeMultiSampleArrayDelegate::SPtr      m_pRTMSADelegate;               /**< RTMSA data delegate */
+    QuickControlWidget::SPtr                    m_pQuickControlWidget;          /**< quick control widget. */
+    ChInfoModel::SPtr                           m_pChInfoModel;                 /**< channel info model. */
+    NewRealTimeMultiSampleArray::SPtr           m_pRTMSA;                       /**< The real-time sample array measurement. */
+    SelectionManagerWindow::SPtr                m_pSelectionManagerWindow;      /**< SelectionManagerWindow. */
+    FilterWindow::SPtr                          m_pFilterWindow;                /**< Filter window. */
 
     bool            m_bInitialized;                                     /**< Is Initialized */
     bool            m_bHideBadChannels;                                 /**< hide bad channels flag. */
@@ -410,12 +415,6 @@ private:
     QSpinBox*       m_pSpinBoxTimeScale;                                /**< Time scale spin box */
     QSpinBox*       m_pSpinBoxDSFactor;                                 /**< downsampling factor */
     QTableView*     m_pTableView;                                       /**< the QTableView being part of the model/view framework of Qt */
-
-    QSharedPointer<QuickControlWidget>              m_pQuickControlWidget;          /**< quick control widget. */
-    QSharedPointer<ChInfoModel>                     m_pChInfoModel;                 /**< channel info model. */
-    QSharedPointer<NewRealTimeMultiSampleArray>     m_pRTMSA;                       /**< The real-time sample array measurement. */
-    QSharedPointer<SelectionManagerWindow>          m_pSelectionManagerWindow;      /**< SelectionManagerWindow. */
-    QSharedPointer<FilterWindow>                    m_pFilterWindow;                /**< Filter window. */
 
     QAction*        m_pActionSelectSensors;                             /**< show roi select widget */
     QAction*        m_pActionFiltering;                                 /**< show filter window */

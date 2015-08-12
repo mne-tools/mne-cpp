@@ -91,6 +91,9 @@ class RealTimeMultiSampleArrayDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
 public:
+    typedef QSharedPointer<RealTimeMultiSampleArrayDelegate> SPtr;              /**< Shared pointer type for RealTimeMultiSampleArrayDelegate. */
+    typedef QSharedPointer<const RealTimeMultiSampleArrayDelegate> ConstSPtr;   /**< Const shared pointer type for RealTimeMultiSampleArrayDelegate. */
+
     //=========================================================================================================
     /**
     * Creates a new abstract item delegate with the given parent.

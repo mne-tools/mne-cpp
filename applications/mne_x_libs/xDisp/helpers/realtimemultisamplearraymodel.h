@@ -110,6 +110,9 @@ class RealTimeMultiSampleArrayModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
+    typedef QSharedPointer<RealTimeMultiSampleArrayModel> SPtr;              /**< Shared pointer type for RealTimeMultiSampleArrayModel. */
+    typedef QSharedPointer<const RealTimeMultiSampleArrayModel> ConstSPtr;   /**< Const shared pointer type for RealTimeMultiSampleArrayModel. */
+
     //=========================================================================================================
     /**
     * Constructs an real-time multi sample array table model for the given parent.
