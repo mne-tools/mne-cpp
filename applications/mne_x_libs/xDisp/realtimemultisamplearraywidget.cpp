@@ -247,29 +247,25 @@ void RealTimeMultiSampleArrayWidget::init()
         QString t_sRTMSAWName = m_pRTMSA->getName();
 
         //Init the model
-        if(m_pRTMSAModel)
-            delete m_pRTMSAModel;
-        m_pRTMSAModel = new RealTimeMultiSampleArrayModel(this);
+        m_pRTMSAModel = RealTimeMultiSampleArrayModel::SPtr(new RealTimeMultiSampleArrayModel(this));
 
         m_pRTMSAModel->setFiffInfo(m_pFiffInfo);
         m_pRTMSAModel->setChannelInfo(m_qListChInfo);//ToDo Obsolete
         m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, m_iT);
 
         //Init the delegate
-        if(m_pRTMSADelegate)
-            delete m_pRTMSADelegate;
-        m_pRTMSADelegate = new RealTimeMultiSampleArrayDelegate(this);
-        m_pRTMSADelegate->initPainterPaths(m_pRTMSAModel);
+        m_pRTMSADelegate = RealTimeMultiSampleArrayDelegate::SPtr(new RealTimeMultiSampleArrayDelegate(this));
+        m_pRTMSADelegate->initPainterPaths(m_pRTMSAModel.data());
 
         connect(this, &RealTimeMultiSampleArrayWidget::markerMoved,
-                m_pRTMSADelegate, &RealTimeMultiSampleArrayDelegate::markerMoved);
+                m_pRTMSADelegate.data(), &RealTimeMultiSampleArrayDelegate::markerMoved);
 
         //Init the view
-        m_pTableView->setModel(m_pRTMSAModel);
-        m_pTableView->setItemDelegate(m_pRTMSADelegate);
+        m_pTableView->setModel(m_pRTMSAModel.data());
+        m_pTableView->setItemDelegate(m_pRTMSADelegate.data());
 
         connect(m_pTableView, &QTableView::doubleClicked,
-                m_pRTMSAModel, &RealTimeMultiSampleArrayModel::toggleFreeze);
+                m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::toggleFreeze);
 
         //set some size settings for m_pTableView
         m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -370,13 +366,13 @@ void RealTimeMultiSampleArrayWidget::init()
             m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
 
             connect(m_pFilterWindow.data(),static_cast<void (FilterWindow::*)(QString)>(&FilterWindow::applyFilter),
-                    m_pRTMSAModel,static_cast<void (RealTimeMultiSampleArrayModel::*)(QString)>(&RealTimeMultiSampleArrayModel::setFilterChannelType));
+                    m_pRTMSAModel.data(),static_cast<void (RealTimeMultiSampleArrayModel::*)(QString)>(&RealTimeMultiSampleArrayModel::setFilterChannelType));
 
             connect(m_pFilterWindow.data(), &FilterWindow::filterChanged,
-                    m_pRTMSAModel, &RealTimeMultiSampleArrayModel::filterChanged);
+                    m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::filterChanged);
 
             connect(m_pFilterWindow.data(), &FilterWindow::filterActivated,
-                    m_pRTMSAModel, &RealTimeMultiSampleArrayModel::filterActivated);
+                    m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::filterActivated);
 
             //Set stored filter settings from last session
             QSettings settings;
@@ -432,11 +428,12 @@ void RealTimeMultiSampleArrayWidget::init()
 
             //Handle projections
             connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
-                    this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::updateProjection);
+                    this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::updateProjection);
 
             //Handle view changes
             connect(m_pQuickControlWidget.data(), &QuickControlWidget::zoomChanged,
                     this, &RealTimeMultiSampleArrayWidget::zoomChanged);
+
             connect(m_pQuickControlWidget.data(), &QuickControlWidget::timeWindowChanged,
                     this, &RealTimeMultiSampleArrayWidget::timeWindowChanged);
 
@@ -449,15 +446,17 @@ void RealTimeMultiSampleArrayWidget::init()
 
             //Handle trigger detection
             connect(m_pQuickControlWidget.data(), &QuickControlWidget::triggerInfoChanged,
-                    this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::triggerInfoChanged);
+                    this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::triggerInfoChanged);
+
             connect(m_pQuickControlWidget.data(), &QuickControlWidget::resetTriggerCounter,
-                    this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::resetTriggerCounter);
-            connect(this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::triggerDetected,
+                    this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::resetTriggerCounter);
+
+            connect(this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::triggerDetected,
                     m_pQuickControlWidget.data(), &QuickControlWidget::setNumberDetectedTriggers);
 
             //Handle time spacer distance
             connect(m_pQuickControlWidget.data(), &QuickControlWidget::distanceTimeSpacerChanged,
-                    this->m_pRTMSAModel, &RealTimeMultiSampleArrayModel::distanceTimeSpacerChanged);
+                    this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::distanceTimeSpacerChanged);
 
             m_pQuickControlWidget->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
 
@@ -518,7 +517,7 @@ void RealTimeMultiSampleArrayWidget::channelContextMenu(QPoint pos)
     //undo selection
     QAction* resetAppliedSelection = menu->addAction(tr("Reset selection"));
     connect(resetAppliedSelection, &QAction::triggered,
-            m_pRTMSAModel, &RealTimeMultiSampleArrayModel::resetSelection);
+            m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::resetSelection);
     connect(resetAppliedSelection, &QAction::triggered,
             this, &RealTimeMultiSampleArrayWidget::resetSelection);
 
