@@ -278,8 +278,6 @@ void RealTimeEvokedWidget::init()
         m_pToolBox->show();
 
         m_pRTEModel = RealTimeEvokedModel::SPtr(new RealTimeEvokedModel(this));
-        //m_pRTEModel = new RealTimeEvokedModel(this);
-
         m_pRTEModel->setRTE(m_pRTE);
 
         m_pButterflyPlot->setModel(m_pRTEModel.data());
@@ -397,7 +395,6 @@ void RealTimeEvokedWidget::init()
 
         //-------- Init filter window --------
         m_pFilterWindow = FilterWindow::SPtr(new FilterWindow(this));
-        //m_pFilterWindow = new FilterWindow(this);
         //m_pFilterWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
 
         m_pFilterWindow->setFiffInfo(m_pFiffInfo);
@@ -414,7 +411,6 @@ void RealTimeEvokedWidget::init()
         m_pFilterWindow->setSamplingRate(m_pFiffInfo->sfreq);
 
         //Set stored filter settings from last session
-        //QSettings settings;
         m_pFilterWindow->setFilterParameters(settings.value(QString("RTEW/%1/filterHP").arg(t_sRTEWName), 5.0).toDouble(),
                                                 settings.value(QString("RTEW/%1/filterLP").arg(t_sRTEWName), 40.0).toDouble(),
                                                 settings.value(QString("RTEW/%1/filterOrder").arg(t_sRTEWName), 128).toInt(),
@@ -426,8 +422,6 @@ void RealTimeEvokedWidget::init()
         //-------- Init channel selection manager --------
         m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(m_pFiffInfo, this));
         m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel));
-        //m_pChInfoModel = new ChInfoModel(m_pFiffInfo, this);
-        //m_pSelectionManagerWindow = new SelectionManagerWindow(this, m_pChInfoModel);
 
         connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::showSelectedChannelsOnly,
                 this, &RealTimeEvokedWidget::showSelectedChannelsOnly);
@@ -447,7 +441,6 @@ void RealTimeEvokedWidget::init()
 
         //-------- Init quick control widget --------
         m_pQuickControlWidget = QuickControlWidget::SPtr(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Averaging", 0, true, true, false, true, true, false));
-        //m_pQuickControlWidget = new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Averaging", 0, true, true, false, true, true, false);
         m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
         //Handle scaling
@@ -482,7 +475,6 @@ void RealTimeEvokedWidget::init()
 
         //-------- Init average scene --------
         m_pAverageScene = AverageScene::SPtr(new AverageScene(m_pAverageLayoutView, this));
-        //m_pAverageScene = new AverageScene(m_pAverageLayoutView, this);
         m_pAverageLayoutView->setScene(m_pAverageScene.data());
 
         //Connect selection manager with average manager
@@ -495,7 +487,7 @@ void RealTimeEvokedWidget::init()
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
                 this, &RealTimeEvokedWidget::scaleAveragedData);
 
-        // Initialized
+        //Initialized
         m_bInitialized = true;
     }
 }

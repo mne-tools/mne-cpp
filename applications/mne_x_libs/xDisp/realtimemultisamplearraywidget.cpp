@@ -253,14 +253,14 @@ void RealTimeMultiSampleArrayWidget::init()
         m_pRTMSAModel->setChannelInfo(m_qListChInfo);//ToDo Obsolete
         m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, m_iT);
 
-        //Init the delegate
+        //-------- Init the delegate --------
         m_pRTMSADelegate = RealTimeMultiSampleArrayDelegate::SPtr(new RealTimeMultiSampleArrayDelegate(this));
         m_pRTMSADelegate->initPainterPaths(m_pRTMSAModel.data());
 
         connect(this, &RealTimeMultiSampleArrayWidget::markerMoved,
                 m_pRTMSADelegate.data(), &RealTimeMultiSampleArrayDelegate::markerMoved);
 
-        //Init the view
+        //-------- Init the view --------
         m_pTableView->setModel(m_pRTMSAModel.data());
         m_pTableView->setItemDelegate(m_pRTMSADelegate.data());
 
@@ -296,7 +296,7 @@ void RealTimeMultiSampleArrayWidget::init()
         connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),
                 this,SLOT(channelContextMenu(QPoint)));
 
-        //Init scaling
+        //-------- Init scaling --------
         //Show only spin boxes and labels which type are present in the current loaded fiffinfo
         QList<FiffChInfo> channelList = m_pFiffInfo->chs;
         QList<int> availabeChannelTypes;
@@ -350,43 +350,39 @@ void RealTimeMultiSampleArrayWidget::init()
             m_pRTMSAModel->setScaling(m_qMapChScaling);
         }
 
-        //Init bad channel list
+        //-------- Init bad channel list --------
         m_qListBadChannels.clear();
         for(int i = 0; i<m_pRTMSAModel->rowCount(); i++)
             if(m_pRTMSAModel->data(m_pRTMSAModel->index(i,2)).toBool())
                 m_qListBadChannels << i;
 
-        //Init filter window
-        if(!m_pFilterWindow) {
-            m_pFilterWindow = QSharedPointer<FilterWindow>(new FilterWindow(this));
-            //m_pFilterWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
+        //-------- Init filter window --------
+        m_pFilterWindow = QSharedPointer<FilterWindow>(new FilterWindow(this));
+        //m_pFilterWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
 
-            m_pFilterWindow->setFiffInfo(m_pFiffInfo);
-            m_pFilterWindow->setWindowSize(m_iMaxFilterTapSize);
-            m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
+        m_pFilterWindow->setFiffInfo(m_pFiffInfo);
+        m_pFilterWindow->setWindowSize(m_iMaxFilterTapSize);
+        m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
 
-            connect(m_pFilterWindow.data(),static_cast<void (FilterWindow::*)(QString)>(&FilterWindow::applyFilter),
-                    m_pRTMSAModel.data(),static_cast<void (RealTimeMultiSampleArrayModel::*)(QString)>(&RealTimeMultiSampleArrayModel::setFilterChannelType));
+        connect(m_pFilterWindow.data(),static_cast<void (FilterWindow::*)(QString)>(&FilterWindow::applyFilter),
+                m_pRTMSAModel.data(),static_cast<void (RealTimeMultiSampleArrayModel::*)(QString)>(&RealTimeMultiSampleArrayModel::setFilterChannelType));
 
-            connect(m_pFilterWindow.data(), &FilterWindow::filterChanged,
-                    m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::filterChanged);
+        connect(m_pFilterWindow.data(), &FilterWindow::filterChanged,
+                m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::filterChanged);
 
-            connect(m_pFilterWindow.data(), &FilterWindow::filterActivated,
-                    m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::filterActivated);
+        connect(m_pFilterWindow.data(), &FilterWindow::filterActivated,
+                m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::filterActivated);
 
-            //Set stored filter settings from last session
-            QSettings settings;
-            m_pFilterWindow->setFilterParameters(settings.value(QString("RTMSAW/%1/filterHP").arg(t_sRTMSAWName), 5.0).toDouble(),
-                                                    settings.value(QString("RTMSAW/%1/filterLP").arg(t_sRTMSAWName), 40.0).toDouble(),
-                                                    settings.value(QString("RTMSAW/%1/filterOrder").arg(t_sRTMSAWName), 128).toInt(),
-                                                    settings.value(QString("RTMSAW/%1/filterType").arg(t_sRTMSAWName), 2).toInt(),
-                                                    settings.value(QString("RTMSAW/%1/filterDesignMethod").arg(t_sRTMSAWName), 0).toInt(),
-                                                    settings.value(QString("RTMSAW/%1/filterTransition").arg(t_sRTMSAWName), 5.0).toDouble(),
-                                                    settings.value(QString("RTMSAW/%1/filterUserDesignActive").arg(t_sRTMSAWName), false).toBool());
-        }
+        //Set stored filter settings from last session
+        m_pFilterWindow->setFilterParameters(settings.value(QString("RTMSAW/%1/filterHP").arg(t_sRTMSAWName), 5.0).toDouble(),
+                                                settings.value(QString("RTMSAW/%1/filterLP").arg(t_sRTMSAWName), 40.0).toDouble(),
+                                                settings.value(QString("RTMSAW/%1/filterOrder").arg(t_sRTMSAWName), 128).toInt(),
+                                                settings.value(QString("RTMSAW/%1/filterType").arg(t_sRTMSAWName), 2).toInt(),
+                                                settings.value(QString("RTMSAW/%1/filterDesignMethod").arg(t_sRTMSAWName), 0).toInt(),
+                                                settings.value(QString("RTMSAW/%1/filterTransition").arg(t_sRTMSAWName), 5.0).toDouble(),
+                                                settings.value(QString("RTMSAW/%1/filterUserDesignActive").arg(t_sRTMSAWName), false).toBool());
 
-        //Init channel selection manager
-        if(!m_pSelectionManagerWindow) {
+        //-------- Init channel selection manager --------
             m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(m_pFiffInfo, this));
 
             m_pSelectionManagerWindow = SelectionManagerWindow::SPtr(new SelectionManagerWindow(this, m_pChInfoModel));
@@ -408,68 +404,66 @@ void RealTimeMultiSampleArrayWidget::init()
             m_pChInfoModel->fiffInfoChanged(m_pFiffInfo);
 
             m_pSelectionManagerWindow->setCurrentLayoutFile(settings.value(QString("RTMSAW/%1/selectedLayoutFile").arg(t_sRTMSAWName), "babymeg-mag-inner-layer.lout").toString());
-        }
 
-        //Init quick control widget
-        if(!m_pQuickControlWidget) {
-            #ifdef BUILD_BASIC_MNEX_VERSION
-                std::cout<<"BUILD_BASIC_MNEX_VERSION Defined"<<std::endl;
-                m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display", 0, true, false, true, false, false, false));
-            #else
-                std::cout<<"BUILD_BASIC_MNEX_VERSION Undefined"<<std::endl;
-                m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display"));
-            #endif
+        //-------- Init quick control widget --------
+        #ifdef BUILD_BASIC_MNEX_VERSION
+            std::cout<<"BUILD_BASIC_MNEX_VERSION Defined"<<std::endl;
+            m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display", 0, true, false, true, false, false, false));
+        #else
+            std::cout<<"BUILD_BASIC_MNEX_VERSION Undefined"<<std::endl;
+            m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display"));
+        #endif
 
-            m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
+        m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
-            //Handle scaling
-            connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
-                    this, &RealTimeMultiSampleArrayWidget::broadcastScaling);
+        //Handle scaling
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
+                this, &RealTimeMultiSampleArrayWidget::broadcastScaling);
 
-            //Handle projections
-            connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
-                    this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::updateProjection);
+        //Handle projections
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
+                this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::updateProjection);
 
-            //Handle view changes
-            connect(m_pQuickControlWidget.data(), &QuickControlWidget::zoomChanged,
-                    this, &RealTimeMultiSampleArrayWidget::zoomChanged);
+        //Handle view changes
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::zoomChanged,
+                this, &RealTimeMultiSampleArrayWidget::zoomChanged);
 
-            connect(m_pQuickControlWidget.data(), &QuickControlWidget::timeWindowChanged,
-                    this, &RealTimeMultiSampleArrayWidget::timeWindowChanged);
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::timeWindowChanged,
+                this, &RealTimeMultiSampleArrayWidget::timeWindowChanged);
 
-            //Handle Filtering
-            connect(m_pFilterWindow.data(), &FilterWindow::activationCheckBoxListChanged,
-                    m_pQuickControlWidget.data(), &QuickControlWidget::filterGroupChanged);
+        //Handle Filtering
+        connect(m_pFilterWindow.data(), &FilterWindow::activationCheckBoxListChanged,
+                m_pQuickControlWidget.data(), &QuickControlWidget::filterGroupChanged);
 
-            connect(m_pQuickControlWidget.data(), &QuickControlWidget::showFilterOptions,
-                    this, &RealTimeMultiSampleArrayWidget::showFilterWidget);
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::showFilterOptions,
+                this, &RealTimeMultiSampleArrayWidget::showFilterWidget);
 
-            //Handle trigger detection
-            connect(m_pQuickControlWidget.data(), &QuickControlWidget::triggerInfoChanged,
-                    this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::triggerInfoChanged);
+        //Handle trigger detection
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::triggerInfoChanged,
+                this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::triggerInfoChanged);
 
-            connect(m_pQuickControlWidget.data(), &QuickControlWidget::resetTriggerCounter,
-                    this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::resetTriggerCounter);
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::resetTriggerCounter,
+                this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::resetTriggerCounter);
 
-            connect(this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::triggerDetected,
-                    m_pQuickControlWidget.data(), &QuickControlWidget::setNumberDetectedTriggers);
+        connect(this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::triggerDetected,
+                m_pQuickControlWidget.data(), &QuickControlWidget::setNumberDetectedTriggers);
 
-            //Handle time spacer distance
-            connect(m_pQuickControlWidget.data(), &QuickControlWidget::distanceTimeSpacerChanged,
-                    this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::distanceTimeSpacerChanged);
+        //Handle time spacer distance
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::distanceTimeSpacerChanged,
+                this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::distanceTimeSpacerChanged);
 
-            m_pQuickControlWidget->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
+        m_pQuickControlWidget->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
 
-            m_pQuickControlWidget->setViewParameters(settings.value(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), 1.0).toFloat(),
-                                                     settings.value(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), 10).toInt(),
-                                                     settings.value(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), 95).toInt());
+        m_pQuickControlWidget->setViewParameters(settings.value(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), 1.0).toFloat(),
+                                                 settings.value(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), 10).toInt(),
+                                                 settings.value(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), 95).toInt());
 
-            m_pQuickControlWidget->setDistanceTimeSpacerIndex(settings.value(QString("RTMSAW/%1/distanceTimeSpacerIndex").arg(t_sRTMSAWName), 3).toInt());
+        m_pQuickControlWidget->setDistanceTimeSpacerIndex(settings.value(QString("RTMSAW/%1/distanceTimeSpacerIndex").arg(t_sRTMSAWName), 3).toInt());
 
-            //Activate projections as default
-            m_pRTMSAModel->updateProjection();
-        }
+        //Activate projections as default
+        m_pRTMSAModel->updateProjection();
 
+        //Initialized
         m_bInitialized = true;
     }
 }
