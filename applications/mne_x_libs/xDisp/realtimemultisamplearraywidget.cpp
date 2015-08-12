@@ -81,6 +81,10 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 , m_fSamplingRate(1024)
 , m_bHideBadChannels(false)
 , m_iMaxFilterTapSize(0)
+, m_pQuickControlWidget(Q_NULLPTR)
+, m_pChInfoModel(Q_NULLPTR)
+, m_pSelectionManagerWindow(Q_NULLPTR)
+, m_pFilterWindow(Q_NULLPTR)
 {
     Q_UNUSED(pTime)
 
