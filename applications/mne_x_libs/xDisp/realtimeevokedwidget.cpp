@@ -105,9 +105,15 @@ enum Tool
 
 RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, QSharedPointer<QTime> &pTime, QWidget* parent)
 : NewMeasurementWidget(parent)
-, m_pRTEModel(0)
+, m_pRTEModel(Q_NULLPTR)
 , m_pButterflyPlot(Q_NULLPTR)
+, m_pAverageScene(Q_NULLPTR)
 , m_pRTE(pRTE)
+, m_pQuickControlWidget(Q_NULLPTR)
+, m_pSelectionManagerWindow(Q_NULLPTR)
+, m_pChInfoModel(Q_NULLPTR)
+, m_pFilterWindow(Q_NULLPTR)
+, m_pFiffInfo(Q_NULLPTR)
 , m_bInitialized(false)
 {
     Q_UNUSED(pTime)
@@ -145,7 +151,6 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
 
     //Butterfly
     m_pButterflyPlot = RealTimeButterflyPlot::SPtr(new RealTimeButterflyPlot(this));
-    //m_pButterflyPlot = new RealTimeButterflyPlot(this);
     m_pButterflyPlot->installEventFilter(this);
 
     m_pToolBox->insertItem(0, m_pButterflyPlot.data(), QIcon(), "Butterfly plot");
