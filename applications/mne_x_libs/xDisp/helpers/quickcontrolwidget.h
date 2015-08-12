@@ -117,6 +117,9 @@ class QuickControlWidget : public QWidget
     Q_OBJECT
 
 public:
+    typedef QSharedPointer<QuickControlWidget> SPtr;              /**< Shared pointer type for QuickControlWidget. */
+    typedef QSharedPointer<const QuickControlWidget> ConstSPtr;   /**< Const shared pointer type for QuickControlWidget. */
+
     //=========================================================================================================
     /**
     * Constructs a QuickControlWidget which is a child of parent.

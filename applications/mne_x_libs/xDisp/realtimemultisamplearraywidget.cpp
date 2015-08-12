@@ -166,7 +166,7 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
             settings.setValue(QString("RTMSAW/%1/scaleMISC").arg(t_sRTMSAWName), m_qMapChScaling[FIFFV_MISC_CH]);
 
         //Store filter
-        if(m_pFilterWindow != 0) {
+        if(!m_pFilterWindow) {
             FilterData filter = m_pFilterWindow->getUserDesignedFilter();
 
             settings.setValue(QString("RTMSAW/%1/filterHP").arg(t_sRTMSAWName), filter.m_dHighpassFreq);
@@ -389,7 +389,7 @@ void RealTimeMultiSampleArrayWidget::init()
         if(!m_pSelectionManagerWindow) {
             m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(m_pFiffInfo, this));
 
-            m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel.data()));
+            m_pSelectionManagerWindow = SelectionManagerWindow::SPtr(new SelectionManagerWindow(this, m_pChInfoModel));
             //m_pSelectionManagerWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
 
             connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::showSelectedChannelsOnly,

@@ -706,11 +706,9 @@ void FilterWindow::onBtnExportFilterPlot()
                                                     QString("%1/%2_%3_%4_FilterPlot").arg(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
                                                     tr("Vector graphic(*.svg);;Images (*.png)"));
 
-    if(!fileName.isEmpty())
-    {
+    if(!fileName.isEmpty()) {
         // Generate screenshot
-        if(fileName.contains(".svg"))
-        {
+        if(fileName.contains(".svg")) {
             QSvgGenerator svgGen;
 
             svgGen.setFileName(fileName);
@@ -722,8 +720,7 @@ void FilterWindow::onBtnExportFilterPlot()
             m_pFilterPlotScene->render(&painter);
         }
 
-        if(fileName.contains(".png"))
-        {
+        if(fileName.contains(".png")) {
             m_pFilterPlotScene->setSceneRect(m_pFilterPlotScene->itemsBoundingRect());                  // Re-shrink the scene to it's bounding contents
             QImage image(m_pFilterPlotScene->sceneRect().size().toSize(), QImage::Format_ARGB32);       // Create the image with the exact size of the shrunk scene
             image.fill(Qt::transparent);                                                                // Start all pixels transparent
@@ -818,6 +815,8 @@ void FilterWindow::onChkBoxFilterActivation(bool state)
     }
 
     QList<FilterData> activeFilters = m_pFilterDataModel->data(m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData> >();
+
+    std::cout<<"activeFilters.size(): "<<activeFilters.size()<<std::endl;
 
     emit filterChanged(activeFilters);
     emit filterActivated(state);

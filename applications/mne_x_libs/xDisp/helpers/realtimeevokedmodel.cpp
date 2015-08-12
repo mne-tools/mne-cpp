@@ -66,6 +66,14 @@ RealTimeEvokedModel::RealTimeEvokedModel(QObject *parent)
 
 
 //*************************************************************************************************************
+
+RealTimeEvokedModel::~RealTimeEvokedModel()
+{
+    std::cout<<"RealTimeEvokedModel::~RealTimeEvokedModel"<<std::endl;
+}
+
+
+//*************************************************************************************************************
 //virtual functions
 int RealTimeEvokedModel::rowCount(const QModelIndex & /*parent*/) const
 {
@@ -406,7 +414,7 @@ void RealTimeEvokedModel::updateProjection()
                 m_bProjActivated = true;
 
         m_pRTE->info()->make_projector(m_matProj);
-        qDebug() << "updateProjection :: New projection calculated.";
+        qDebug() << "updateProjection :: New projection calculated :: m_bProjActivated is "<<m_bProjActivated;
 
         //set columns of matrix to zero depending on bad channels indexes
         RowVectorXi sel;// = RowVectorXi(0,0);

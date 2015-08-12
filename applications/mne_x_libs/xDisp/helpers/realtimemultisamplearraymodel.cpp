@@ -741,7 +741,7 @@ void RealTimeMultiSampleArrayModel::triggerInfoChanged(const QMap<QString, QColo
 
     //Find channel index and initialise detected trigger map if channel name changed
     if(m_sCurrentTriggerCh!=triggerCh) {
-        m_sCurrentTriggerCh=triggerCh;
+        m_sCurrentTriggerCh = triggerCh;
 
         QList<int> temp;
         m_qMapDetectedTrigger.clear();
@@ -755,7 +755,7 @@ void RealTimeMultiSampleArrayModel::triggerInfoChanged(const QMap<QString, QColo
         }
     }
 
-    m_sCurrentTriggerCh=triggerCh;
+    m_sCurrentTriggerCh = triggerCh;
 }
 
 
