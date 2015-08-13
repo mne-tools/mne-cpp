@@ -173,17 +173,18 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
 
     //do for all currently stored evoked set data
     for(int dataIndex = 0; dataIndex<m_lAverageData.size(); dataIndex++) {
-        //plot data from averaged data m_lAverageData with the calulacted downsample factor
+        //plot data from averaged data m_lAverageData with the calculated downsample factor
         const double* averageData = m_lAverageData.at(dataIndex).first;
         int totalCols =  m_lAverageData.at(dataIndex).second;
 
         //Calculate downsampling factor of averaged data in respect to the items width
         int dsFactor;
         totalCols / boundingRect.width()<1 ? dsFactor = 1 : dsFactor = totalCols / boundingRect.width();
-        dsFactor = 1;
+        //if(dsFactor == 0)
+            dsFactor = 1;
 
         //Create path
-        float offset = (*(averageData+(abs(m_firstLastSample.first)*m_iTotalNumberChannels)+m_iChannelNumber));
+        float offset = (*(averageData+(abs(m_firstLastSample.first)*m_iTotalNumberChannels)+m_iChannelNumber)); //choose offset to be the signal value at time instance 0
         QPainterPath path = QPainterPath(QPointF(boundingRect.x(), boundingRect.y() + boundingRect.height()/2));
         QPen pen;
         pen.setStyle(Qt::SolidLine);
@@ -212,13 +213,19 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
 
 void AverageSceneItem::paintStimLine(QPainter *painter)
 {
+    if(m_lAverageData.size() == 0)
+        return;
+
     //Plot averaged data
     QRectF boundingRect = this->boundingRect();
     QPainterPath path = QPainterPath(QPointF(boundingRect.x(), boundingRect.y() + boundingRect.height()/2));
 
-    int dsFactor;
+    int dsFactor = 1;
     int totalCols =  m_lAverageData.first().second;
     totalCols / boundingRect.width()<1 ? dsFactor = 1 : dsFactor = totalCols / boundingRect.width();
+
+    if(dsFactor == 0)
+        dsFactor = 1;
 
     QPen pen;
     pen.setStyle(Qt::DashLine);
@@ -234,13 +241,4 @@ void AverageSceneItem::paintStimLine(QPainter *painter)
 
     painter->drawPath(path);
 }
-
-
-
-
-
-
-
-
-
 
