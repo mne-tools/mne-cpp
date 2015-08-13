@@ -183,7 +183,7 @@ RealTimeEvokedWidget::~RealTimeEvokedWidget()
 
         QSettings settings;
 
-        //Store Modalities
+        //Store modalities
         for(qint32 i = 0; i < m_qListModalities.size(); ++i) {
             settings.setValue(QString("RTEW/%1/%2/active").arg(t_sRTEWName).arg(m_qListModalities[i].m_sName), m_qListModalities[i].m_bActive);
             settings.setValue(QString("RTEW/%1/%2/norm").arg(t_sRTEWName).arg(m_qListModalities[i].m_sName), m_qListModalities[i].m_fNorm);
@@ -497,7 +497,7 @@ void RealTimeEvokedWidget::init()
 
 void RealTimeEvokedWidget::channelSelectionManagerChanged(const QList<QGraphicsItem*> &selectedChannelItems)
 {
-    //Repaint the average items in the average scene based on the input parameter
+    //Repaint the average items in the average scene based on the input parameter selectedChannelItems
     m_pAverageScene->repaintItems(selectedChannelItems);
 
     //call the onSelection function manually to replot the data for the givven average items
@@ -522,10 +522,8 @@ void RealTimeEvokedWidget::scaleAveragedData(const QMap<qint32, float> &scaleMap
 
 void RealTimeEvokedWidget::showSensorSelectionWidget()
 {
-    if(!m_pSelectionManagerWindow) {
+    if(!m_pSelectionManagerWindow)
         m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow);
-        //ym_pSelectionManagerWindow = new SelectionManagerWindow();
-    }
 
     m_pSelectionManagerWindow->show();
 }
@@ -597,16 +595,15 @@ void RealTimeEvokedWidget::onSelectionChanged()
         RowVectorPair averageData = m_pRTEModel->data(0, 2, RealTimeEvokedModelRoles::GetAverageData).value<RowVectorPair>();
 
         //Get the averageScenItem specific data row
-        QStringList chNames = m_pFiffInfo->ch_names;
+        int channelNumber = m_pChInfoModel->getIndexFromMappedChName(averageSceneItemTemp->m_sChannelName);
 
-        int channelNumber = chNames.indexOf(averageSceneItemTemp->m_sChannelName);
         if(channelNumber != -1) {
             averageSceneItemTemp->m_iChannelKind = m_pFiffInfo->chs.at(channelNumber).kind;
             averageSceneItemTemp->m_iChannelUnit = m_pFiffInfo->chs.at(channelNumber).unit;
             averageSceneItemTemp->m_firstLastSample.first = (-1)*m_pRTE->getNumPreStimSamples();
             averageSceneItemTemp->m_firstLastSample.second = averageData.second-m_pRTE->getNumPreStimSamples();
             averageSceneItemTemp->m_iChannelNumber = channelNumber;
-            averageSceneItemTemp->m_iTotalNumberChannels = chNames.size();
+            averageSceneItemTemp->m_iTotalNumberChannels = m_pFiffInfo->ch_names.size();
             averageSceneItemTemp->m_lAverageData.append(averageData);
         }
     }
@@ -637,5 +634,4 @@ void RealTimeEvokedWidget::showFilterWidget(bool state)
 void RealTimeEvokedWidget::wheelEvent(QWheelEvent * event)
 {
     Q_UNUSED(event)
-    std::cout<<"mouseWheelEvent"<<std::endl;
 }

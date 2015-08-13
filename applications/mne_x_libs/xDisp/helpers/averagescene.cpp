@@ -86,13 +86,13 @@ void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelIte
 
     QListIterator<QGraphicsItem*> i(selectedChannelItems);
     while (i.hasNext()) {
-        SelectionSceneItem* SelectionSceneItemTemp = static_cast<SelectionSceneItem*>(i.next());
-        AverageSceneItem* AverageSceneItemTemp = new AverageSceneItem(SelectionSceneItemTemp->m_sChannelName,
-                                                                      SelectionSceneItemTemp->m_iChannelNumber,
-                                                                      SelectionSceneItemTemp->m_qpChannelPosition,
-                                                                      SelectionSceneItemTemp->m_iChannelKind,
-                                                                      SelectionSceneItemTemp->m_iChannelUnit);
+        SelectionSceneItem* selectionSceneItemTemp = static_cast<SelectionSceneItem*>(i.next());
+        AverageSceneItem* averageSceneItemTemp = new AverageSceneItem(selectionSceneItemTemp->m_sChannelName,
+                                                                      selectionSceneItemTemp->m_iChannelNumber,
+                                                                      selectionSceneItemTemp->m_qpChannelPosition,
+                                                                      selectionSceneItemTemp->m_iChannelKind,
+                                                                      selectionSceneItemTemp->m_iChannelUnit);
 
-        this->addItem(AverageSceneItemTemp);
+        this->addItem(averageSceneItemTemp);
     }
 }
