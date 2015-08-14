@@ -551,17 +551,23 @@ void RealTimeMultiSampleArrayModel::updateProjection()
     //
     if(m_pFiffInfo)
     {
+        //If a minimum of one projector is active set m_bProjActivated to true so that this model applies the ssp to the incoming data
         m_bProjActivated = false;
-        for(qint32 i = 0; i < this->m_pFiffInfo->projs.size(); ++i)
-            if(this->m_pFiffInfo->projs[i].active)
+        for(qint32 i = 0; i < this->m_pFiffInfo->projs.size(); ++i) {
+            std::cout<<this->m_pFiffInfo->projs[i].desc.toStdString()<<" is active: "<<this->m_pFiffInfo->projs[i].active<<std::endl;
+
+            if(this->m_pFiffInfo->projs[i].active) {
                 m_bProjActivated = true;
+                break;
+            }
+        }
 
         this->m_pFiffInfo->make_projector(m_matProj);
         qDebug() << "updateProjection :: New projection calculated.";
 
         //set columns of matrix to zero depending on bad channels indexes
-        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
-            m_matProj.col(m_vecBadIdcs[j]).setZero();
+//        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
+//            m_matProj.col(m_vecBadIdcs[j]).setZero();
 
 //        std::cout << "Bads\n" << m_vecBadIdcs << std::endl;
 //        std::cout << "Proj\n";
@@ -715,13 +721,15 @@ void RealTimeMultiSampleArrayModel::markChBad(QModelIndex ch, bool status)
             m_pFiffInfo->bads.append(chInfolist[ch.row()].ch_name);
         qDebug() << "RawModel:" << chInfolist[ch.row()].ch_name << "marked as bad.";
     }
-    else {
-        if(m_pFiffInfo->bads.contains(chInfolist[ch.row()].ch_name)) {
-            int index = m_pFiffInfo->bads.indexOf(chInfolist[ch.row()].ch_name);
-            m_pFiffInfo->bads.removeAt(index);
-            qDebug() << "RawModel:" << chInfolist[ch.row()].ch_name << "marked as good.";
-        }
+    else if(m_pFiffInfo->bads.contains(chInfolist[ch.row()].ch_name)) {
+        int index = m_pFiffInfo->bads.indexOf(chInfolist[ch.row()].ch_name);
+        m_pFiffInfo->bads.removeAt(index);
+        qDebug() << "RawModel:" << chInfolist[ch.row()].ch_name << "marked as good.";
     }
+
+    //Redefine channels which are to be filtered
+    QStringList channelNames;
+    createFilterChannelList(channelNames);
 
     //Update indeices of bad channels (this vector is needed when creating new ssp operators)
     QStringList emptyExclude;
