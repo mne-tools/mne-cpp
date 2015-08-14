@@ -460,7 +460,7 @@ void QuickControlWidget::createProjectorGroup()
 
             m_qListCheckBox.append(checkBox);
 
-            connect(checkBox, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
+            connect(checkBox, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
                     this, &QuickControlWidget::checkStatusChanged);
 
             topLayout->addWidget(checkBox, i, 0); //+2 because we already added two widgets before the first projector check box
@@ -483,7 +483,7 @@ void QuickControlWidget::createProjectorGroup()
         m_enableDisableProjectors->setChecked(bAllActivated);
         topLayout->addWidget(m_enableDisableProjectors, i+2, 0);
         connect(m_enableDisableProjectors, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-                this, &QuickControlWidget::enableDisableAll);
+            this, &QuickControlWidget::enableDisableAll);
 
         ui->m_groupBox_projections->setLayout(topLayout);
 
@@ -644,7 +644,7 @@ void QuickControlWidget::onZoomChanged(double value)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::checkStatusChanged(int status)
+void QuickControlWidget::checkStatusChanged(bool status)
 {
     Q_UNUSED(status)
 
@@ -655,6 +655,8 @@ void QuickControlWidget::checkStatusChanged(int status)
             bAllActivated = false;
 
         this->m_pFiffInfo->projs[i].active = m_qListCheckBox[i]->isChecked();
+
+        std::cout<<m_qListCheckBox[i]->text().toStdString()<<"check state: "<<m_qListCheckBox[i]->isChecked()<<std::endl;
     }
 
     m_enableDisableProjectors->setChecked(bAllActivated);
@@ -667,8 +669,17 @@ void QuickControlWidget::checkStatusChanged(int status)
 
 void QuickControlWidget::enableDisableAll(bool status)
 {
+    //Set all checkboxes to status
     for(int i=0; i<m_qListCheckBox.size(); i++)
         m_qListCheckBox.at(i)->setChecked(status);
+
+    //Set all projection activation states to status
+    for(int i=0; i < m_pFiffInfo->projs.size(); ++i)
+        m_pFiffInfo->projs[i].active = status;
+
+    m_enableDisableProjectors->setChecked(status);
+
+    emit projSelectionChanged();
 }
 
 

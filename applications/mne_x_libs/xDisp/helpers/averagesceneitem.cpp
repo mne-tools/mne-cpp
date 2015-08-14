@@ -114,6 +114,9 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
 void AverageSceneItem::paintAveragePath(QPainter *painter)
 {
+    if(m_lAverageData.size() == 0)
+        return;
+
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     float dMaxValue = 1e-9f;
 

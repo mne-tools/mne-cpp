@@ -281,7 +281,7 @@ protected:
     /**
     * Slot called when the projector check state changes
     */
-    void checkStatusChanged(int state);
+    void checkStatusChanged(bool state);
 
     //=========================================================================================================
     /**
