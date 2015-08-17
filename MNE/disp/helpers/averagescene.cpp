@@ -47,7 +47,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace XDISPLIB;
+using namespace DISPLIB;
 using namespace std;
 
 

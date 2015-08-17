@@ -42,13 +42,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_selectionmanagerwindow.h"
+#include "disp_global.h"
+#include "ui_selectionmanagerwindow.h"
 #include "utils/layoutloader.h"             //MNE-CPP utils
 #include "utils/selectionio.h"              //MNE-CPP utils
 #include "utils/layoutmaker.h"              //MNE-CPP utils
-#include "selectionscene.h"
+#include "helpers/selectionscene.h"
 #include "fiff/fiff.h"
-#include "chinfomodel.h"
+#include "helpers/chinfomodel.h"
 
 
 //*************************************************************************************************************
@@ -72,10 +73,10 @@ using namespace UTILSLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE XDISPLIB
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace XDISPLIB
+namespace DISPLIB
 {
 
 
@@ -90,7 +91,7 @@ namespace XDISPLIB
 *
 * @brief The SelectionManagerWindow class provides a channel selection window.
 */
-class SelectionManagerWindow : public QWidget
+class DISPSHARED_EXPORT SelectionManagerWindow : public QWidget
 {
     Q_OBJECT
 
@@ -358,6 +359,6 @@ private:
     QStringList                     m_currentlyLoadedFiffChannels;      /**< List of currently loaded fiff data channels.*/
 };
 
-} // NAMESPACE XDISPLIB
+} // NAMESPACE DISPLIB
 
 #endif // SELECTIONMANAGERWINDOW_H

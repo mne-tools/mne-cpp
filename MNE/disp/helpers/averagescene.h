@@ -42,7 +42,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "disp/layoutscene.h"
+#include "../disp_global.h"
+#include "layoutscene.h"
 #include "averagesceneitem.h"
 #include "selectionsceneitem.h"
 
@@ -57,10 +58,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE XDISPLIB
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace XDISPLIB
+namespace DISPLIB
 {
 
 
@@ -69,7 +70,6 @@ namespace XDISPLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
 
 
 //=============================================================================================================
@@ -78,7 +78,7 @@ using namespace DISPLIB;
 *
 * @brief The AverageScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
 */
-class AverageScene : public LayoutScene
+class DISPSHARED_EXPORT AverageScene : public LayoutScene
 {
     Q_OBJECT
 
@@ -112,6 +112,6 @@ private:
     QList<SelectionSceneItem*> m_lSelectedChannelItems ;        /**< Holds the selected channels from the selection manager.*/
 };
 
-} // NAMESPACE XDISPLIB
+} // NAMESPACE DISPLIB
 
 #endif // AverageScene_H

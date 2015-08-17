@@ -42,6 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "../disp_global.h"
 #include <iostream>
 
 
@@ -60,10 +61,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE XDISPLIB
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace XDISPLIB
+namespace DISPLIB
 {
 
 
@@ -79,7 +80,7 @@ namespace XDISPLIB
 *
 * @brief The SelectionSceneItem class provides a new data structure for visualizing channels in a 2D layout.
 */
-class SelectionSceneItem : public QGraphicsItem
+class DISPSHARED_EXPORT SelectionSceneItem : public QGraphicsItem
 {
 
 public:
@@ -111,6 +112,6 @@ public:
     bool        m_bIsBadChannel;            /**< Whether this item is a bad channel.*/
 };
 
-} // NAMESPACE XDISPLIB
+} // NAMESPACE DISPLIB
 
 #endif // SELECTIONSCENEITEM_H

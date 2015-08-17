@@ -52,8 +52,8 @@
 
 #include "helpers/realtimemultisamplearraymodel.h"
 #include "helpers/realtimemultisamplearraydelegate.h"
-#include "helpers/selectionmanagerwindow.h"
-#include "helpers/chinfomodel.h"
+#include "disp/selectionmanagerwindow.h"
+#include "disp/helpers/chinfomodel.h"
 #include "helpers/quickcontrolwidget.h"
 
 #include "disp/filterwindow.h"

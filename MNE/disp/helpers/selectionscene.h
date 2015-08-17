@@ -42,7 +42,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "disp/layoutscene.h"
+#include "../disp_global.h"
+#include "layoutscene.h"
 #include "selectionsceneitem.h"
 #include <fiff/fiff.h>
 
@@ -59,10 +60,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE XDISPLIB
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace XDISPLIB
+namespace DISPLIB
 {
 
 
@@ -71,8 +72,6 @@ namespace XDISPLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
-
 
 //=============================================================================================================
 /**
@@ -80,7 +79,7 @@ using namespace DISPLIB;
 *
 * @brief The SelectionScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
 */
-class SelectionScene : public LayoutScene
+class DISPSHARED_EXPORT SelectionScene : public LayoutScene
 {
     Q_OBJECT
 
@@ -111,6 +110,6 @@ public:
     int         m_iChannelTypeMode;
 };
 
-} // NAMESPACE XDISPLIB
+} // NAMESPACE DISPLIB
 
 #endif // SelectionScene_H

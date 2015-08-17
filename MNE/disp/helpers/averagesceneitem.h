@@ -42,6 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "../disp_global.h"
 #include <iostream>
 #include <Eigen/Core>
 #include <fiff/fiff.h>
@@ -91,7 +92,7 @@ typedef QPair<const double*,qint32> RowVectorPair;
 *
 * @brief The AverageSceneItem class provides a new data structure for visualizing averages in a 2D layout.
 */
-class AverageSceneItem : public QGraphicsItem
+class DISPSHARED_EXPORT AverageSceneItem : public QGraphicsItem
 {
 
 public:
@@ -143,6 +144,6 @@ protected:
     void paintStimLine(QPainter *painter);
 };
 
-} // NAMESPACE XDISPLIB
+} // NAMESPACE DISPLIB
 
 #endif // AVERAGESCENEITEM_H

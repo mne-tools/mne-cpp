@@ -45,7 +45,7 @@
 #include "disp_global.h"
 #include "helpers/filterdatamodel.h"
 #include "helpers/filterdatadelegate.h"
-#include "filterplotscene.h"
+#include "helpers/filterplotscene.h"
 
 #include "utils/mnemath.h"
 #include "utils/filterTools/filterdata.h"
