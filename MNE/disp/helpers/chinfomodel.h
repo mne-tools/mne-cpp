@@ -43,6 +43,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "../disp_global.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -80,10 +82,10 @@ using namespace FIFFLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE XDISPLIB
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace XDISPLIB
+namespace DISPLIB
 {
 
 //Declare type roles
@@ -107,7 +109,7 @@ namespace ChInfoModelRoles
 /**
 * DECLARE CLASS ChInfoModel
 */
-class ChInfoModel : public QAbstractTableModel
+class DISPSHARED_EXPORT ChInfoModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
@@ -213,6 +215,6 @@ protected:
 
 };
 
-} // NAMESPACE XDISPLIB
+} // NAMESPACE DISPLIB
 
 #endif // CHINFOCLASS_H

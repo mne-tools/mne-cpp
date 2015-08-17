@@ -134,7 +134,6 @@ HEADERS += \
 
 FORMS += \
     realtimesamplearraywidget.ui \
-    helpers/selectionmanagerwindow.ui \
     helpers/quickcontrolwidget.ui
 
 qtHaveModule(3d) {

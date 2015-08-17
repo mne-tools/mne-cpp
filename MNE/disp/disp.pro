@@ -93,11 +93,10 @@ SOURCES += \
     plot.cpp \
     graph.cpp \
     rtplot.cpp \
-    filterplotscene.cpp \
     filterwindow.cpp \
-    layoutscene.cpp \
-    averagescene.cpp \
-    averagesceneitem.cpp \
+    helpers\layoutscene.cpp \
+    helpers\averagescene.cpp \
+    helpers\averagesceneitem.cpp \
     helpers/filterdatadelegate.cpp \
     helpers/filterdatamodel.cpp \
     helpers/averagescene.cpp \
@@ -116,11 +115,10 @@ HEADERS += \
     plot.h \
     graph.h \
     rtplot.h \
-    filterplotscene.h \
     filterwindow.h \
-    layoutscene.h \
-    averagescene.h \
-    averagesceneitem.h \
+    helpers\layoutscene.h \
+    helpers\averagescene.h \
+    helpers\averagesceneitem.h \
     helpers/filterdatadelegate.h \
     helpers/filterdatamodel.h \
     helpers/averagescene.h \
