@@ -124,14 +124,14 @@ void AverageWindow::scaleAveragedData(const QMap<QString,double> &scaleMap)
     //Set the scale map received from the scale window
     QMap<qint32,float> newScaleMapIdx;
 
-    FiffInfo info = m_pAverageModel->getFiffInfo();
-
-    QMapIterator<QString,double> i(scaleMap);
-    while (i.hasNext()) {
-        i.next();
-        qint32 idx = info.ch_names.indexOf(i.key());
-        newScaleMapIdx.insert(idx, (float)i.value());
-    }
+    newScaleMapIdx[FIFF_UNIT_T_M] = scaleMap["MEG_grad"];
+    newScaleMapIdx[FIFF_UNIT_T] = scaleMap["MEG_mag"];
+    newScaleMapIdx[FIFFV_REF_MEG_CH] = scaleMap["MEG_mag"];
+    newScaleMapIdx[FIFFV_EEG_CH] = scaleMap["MEG_EEG"];
+    newScaleMapIdx[FIFFV_EOG_CH] = scaleMap["MEG_EOG"];
+    newScaleMapIdx[FIFFV_EMG_CH] = scaleMap["MEG_EMG"];
+    newScaleMapIdx[FIFFV_STIM_CH] = scaleMap["MEG_STIM"];
+    newScaleMapIdx[FIFFV_MISC_CH] = scaleMap["MEG_MISC"];
 
     m_pAverageScene->setScaleMap(newScaleMapIdx);
     m_pButterflyScene->setScaleMap(scaleMap);

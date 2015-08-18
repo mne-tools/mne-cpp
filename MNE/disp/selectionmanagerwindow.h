@@ -108,7 +108,7 @@ public:
     * @param [in] parent pointer to parent widget; If parent is 0, the new SelectionManagerWindow becomes a window. If parent is another widget, SelectionManagerWindow becomes a child window inside parent. SelectionManagerWindow is deleted when its parent is deleted.
     * @param [in] pChInfoModel pointer to the channel info model.
     */
-    SelectionManagerWindow(QWidget *parent = 0, ChInfoModel::SPtr pChInfoModel = ChInfoModel::SPtr(0));
+    SelectionManagerWindow(QWidget *parent = 0, ChInfoModel::SPtr pChInfoModel = ChInfoModel::SPtr(0), Qt::WindowType type = Qt::Window);
 
     //=========================================================================================================
     /**
