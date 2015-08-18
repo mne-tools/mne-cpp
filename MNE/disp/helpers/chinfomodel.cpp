@@ -64,6 +64,15 @@ ChInfoModel::ChInfoModel(FiffInfo::SPtr pFiffInfo, QObject *parent)
 
 
 //*************************************************************************************************************
+
+ChInfoModel::ChInfoModel(QObject *parent)
+: QAbstractTableModel(parent)
+, m_pFiffInfo(FiffInfo::SPtr(new FiffInfo))
+{
+}
+
+
+//*************************************************************************************************************
 //virtual functions
 int ChInfoModel::rowCount(const QModelIndex & /*parent*/) const
 {
@@ -524,16 +533,16 @@ void ChInfoModel::fiffInfoChanged(FiffInfo::SPtr pFiffInfo)
 
 //*************************************************************************************************************
 
-//void ChInfoModel::assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOperator> > &assignedOperators)
-//{
-//    beginResetModel();
+void ChInfoModel::assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOperator> > &assignedOperators)
+{
+    beginResetModel();
 
-//    m_assignedOperators = assignedOperators;
+    m_assignedOperators = assignedOperators;
 
-//    endResetModel();
+    endResetModel();
 
-//    emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
-//}
+    emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
+}
 
 
 //*************************************************************************************************************

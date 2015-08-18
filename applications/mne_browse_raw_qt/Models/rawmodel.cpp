@@ -63,7 +63,7 @@ RawModel::RawModel(QObject *parent)
 , m_bEndReached(false)
 , m_bReloading(false)
 , m_bProcessing(false)
-, m_fiffInfo(FiffInfo())
+, m_pFiffInfo(FiffInfo::SPtr(new FiffInfo()))
 , m_pfiffIO(QSharedPointer<FiffIO>(new FiffIO()))
 , m_filterChType("All")
 {
@@ -73,7 +73,7 @@ RawModel::RawModel(QObject *parent)
     m_iFilterTaps = MODEL_NUM_FILTER_TAPS;
 
     //Set default sampling freq to 1024
-    m_fiffInfo.sfreq = 1024;
+    m_pFiffInfo->sfreq = 1024;
 
     // Generate default filter operator - This needs to be done here so that the filter design tool works without loading a file
     genStdFilterOps();
@@ -110,7 +110,7 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
 , m_bEndReached(false)
 , m_bReloading(false)
 , m_bProcessing(false)
-, m_fiffInfo(FiffInfo())
+, m_pFiffInfo(Q_NULLPTR)
 , m_pfiffIO(QSharedPointer<FiffIO>(new FiffIO()))
 , m_filterChType("All")
 {
@@ -209,7 +209,7 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
             }
 
             case Qt::BackgroundRole: { //plot channel red if marked as red
-                if(m_fiffInfo.bads.contains(m_chInfolist[index.row()].ch_name)) {
+                if(m_pFiffInfo->bads.contains(m_chInfolist[index.row()].ch_name)) {
                     QBrush brush;
                     brush.setStyle(Qt::SolidPattern);
 //                    qDebug() << m_chInfolist[index.row()].ch_name << "is marked as bad, index:" << index.row();
@@ -299,7 +299,7 @@ void RawModel::genStdFilterOps()
     //m_Operators.clear();
 
     //regenerate them with the correct sampling frequency (only required for naming of filter)
-    double sfreq = (m_fiffInfo.sfreq>=0) ? m_fiffInfo.sfreq : 600.0;
+    double sfreq = (m_pFiffInfo->sfreq>=0) ? m_pFiffInfo->sfreq : 600.0;
     double nyquist_freq = sfreq/2;
 
     int fftLength = m_iWindowSize;
@@ -399,7 +399,7 @@ bool RawModel::loadFiffData(QFile* qFile)
 
     qFile->close();
 
-    emit fileLoaded(m_fiffInfo);
+    emit fileLoaded(m_pFiffInfo);
     emit assignedOperatorsChanged(m_assignedOperators);
 
     return true;
@@ -415,13 +415,13 @@ bool RawModel::writeFiffData(QIODevice *p_IODevice)
     RowVectorXi sel;
 
 //    std::cout << "Writing file " << QFile(&p_IODevice).fileName().toLatin1() << std::endl;
-    FiffStream::SPtr outfid = Fiff::start_writing_raw(*p_IODevice,m_fiffInfo,cals);
+    FiffStream::SPtr outfid = Fiff::start_writing_raw(*p_IODevice,*m_pFiffInfo.data(),cals);
 
     //Setup reading parameters
     fiff_int_t from = firstSample();
     fiff_int_t to = lastSample();
     float quantum_sec = 10.0f;//read and write in 10 sec junks
-    fiff_int_t quantum = ceil(quantum_sec*m_fiffInfo.sfreq);
+    fiff_int_t quantum = ceil(quantum_sec*m_pFiffInfo->sfreq);
 
     // Uncomment to read the whole file at once. Warning MAtrix may be none-initialisable because its huge
     //quantum = to - from + 1;
@@ -473,7 +473,7 @@ void RawModel::loadFiffInfos()
         m_chInfolist.append(m_pfiffIO->m_qlistRaw[0]->info.chs[i]);
 
     //loads fiffInfo
-    m_fiffInfo = m_pfiffIO->m_qlistRaw[0]->info;
+    m_pFiffInfo = FiffInfo::SPtr(&m_pfiffIO->m_qlistRaw[0]->info);
 }
 
 
@@ -483,7 +483,7 @@ void RawModel::clearModel()
 {
     //FiffIO object
     m_pfiffIO.clear();
-    m_fiffInfo.clear();
+    m_pFiffInfo->clear();
     m_chInfolist.clear();
 
     //data model structure
@@ -658,14 +658,14 @@ void RawModel::markChBad(QModelIndexList chlist, bool status)
     for(int i=0; i < chlist.size(); ++i) {
         if(chlist[i].column() == 1) {//only process indexes corresponding to column 1 (data)
             if(status) {
-                if(!m_fiffInfo.bads.contains(m_chInfolist[chlist[i].row()].ch_name))
-                    m_fiffInfo.bads.append(m_chInfolist[chlist[i].row()].ch_name);
+                if(!m_pFiffInfo->bads.contains(m_chInfolist[chlist[i].row()].ch_name))
+                    m_pFiffInfo->bads.append(m_chInfolist[chlist[i].row()].ch_name);
                 qDebug() << "RawModel:" << m_chInfolist[chlist[i].row()].ch_name << "marked as bad.";
             }
             else {
-                if(m_fiffInfo.bads.contains(m_chInfolist[chlist[i].row()].ch_name)) {
-                    int index = m_fiffInfo.bads.indexOf(m_chInfolist[chlist[i].row()].ch_name);
-                    m_fiffInfo.bads.removeAt(index);
+                if(m_pFiffInfo->bads.contains(m_chInfolist[chlist[i].row()].ch_name)) {
+                    int index = m_pFiffInfo->bads.indexOf(m_chInfolist[chlist[i].row()].ch_name);
+                    m_pFiffInfo->bads.removeAt(index);
                     qDebug() << "RawModel:" << m_chInfolist[chlist[i].row()].ch_name << "marked as good.";
                 }
             }

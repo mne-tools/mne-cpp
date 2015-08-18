@@ -43,7 +43,6 @@
 //=============================================================================================================
 
 #include "disp_global.h"
-#include "ui_selectionmanagerwindow.h"
 #include "utils/layoutloader.h"             //MNE-CPP utils
 #include "utils/selectionio.h"              //MNE-CPP utils
 #include "utils/layoutmaker.h"              //MNE-CPP utils
@@ -60,6 +59,7 @@
 #include <QMutableStringListIterator>
 #include <QFileDialog>
 #include <QStandardPaths>
+#include <QListWidget>
 
 
 //*************************************************************************************************************
@@ -75,6 +75,8 @@ using namespace UTILSLIB;
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
+
+namespace Ui {class SelectionManagerWindow;} //This must be defined outside of the DISPLIB namespace
 
 namespace DISPLIB
 {

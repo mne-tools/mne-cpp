@@ -122,7 +122,18 @@ void AverageWindow::channelSelectionManagerChanged(const QList<QGraphicsItem*> &
 void AverageWindow::scaleAveragedData(const QMap<QString,double> &scaleMap)
 {
     //Set the scale map received from the scale window
-    m_pAverageScene->setScaleMap(scaleMap);
+    QMap<qint32,float> newScaleMapIdx;
+
+    FiffInfo info = m_pAverageModel->getFiffInfo();
+
+    QMapIterator<QString,double> i(scaleMap);
+    while (i.hasNext()) {
+        i.next();
+        qint32 idx = info.ch_names.indexOf(i.key());
+        newScaleMapIdx.insert(idx, (float)i.value());
+    }
+
+    m_pAverageScene->setScaleMap(newScaleMapIdx);
     m_pButterflyScene->setScaleMap(scaleMap);
 }
 

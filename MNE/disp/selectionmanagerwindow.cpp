@@ -39,6 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "ui_selectionmanagerwindow.h"
 #include "selectionmanagerwindow.h"
 
 

@@ -44,8 +44,8 @@
 
 #include "ui_averagewindow.h"
 #include "utils/layoutloader.h"             //MNE-CPP utils
-#include "../Utils/averagescene.h"          //MNE Browse Raw QT utils
-#include "../Utils/selectionsceneitem.h"
+#include "disp/helpers/averagescene.h"
+#include "disp/helpers/selectionsceneitem.h"
 #include "../Utils/butterflyscene.h"
 #include "../Utils/types.h"
 #include "../Models/averagemodel.h"
@@ -61,6 +61,13 @@
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QSvgGenerator>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************

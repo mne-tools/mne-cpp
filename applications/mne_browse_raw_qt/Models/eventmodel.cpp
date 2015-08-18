@@ -183,7 +183,7 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
         if(index.column()==1){
             switch(role) {
                 case Qt::DisplayRole: {
-                    int time = ((m_dataSamples_Filtered.at(index.row()) - m_iFirstSample) / m_fiffInfo.sfreq) * 100;
+                    int time = ((m_dataSamples_Filtered.at(index.row()) - m_iFirstSample) / m_pFiffInfo->sfreq) * 100;
 
                     return QVariant((double)time / 100);
                 }
@@ -330,7 +330,7 @@ bool EventModel::setData(const QModelIndex & index, const QVariant & value, int 
                 break;
 
             case 1: //time values
-                m_dataSamples[index.row()] = value.toDouble() * m_fiffInfo.sfreq + m_iFirstSample;
+                m_dataSamples[index.row()] = value.toDouble() * m_pFiffInfo->sfreq + m_iFirstSample;
                 break;
 
             case 2: //type
@@ -412,9 +412,9 @@ bool EventModel::saveEventData(QFile& qFile)
 
 //*************************************************************************************************************
 
-void EventModel::setFiffInfo(FiffInfo& fiffInfo)
+void EventModel::setFiffInfo(FiffInfo::SPtr pFiffInfo)
 {
-    m_fiffInfo = fiffInfo;
+    m_pFiffInfo = pFiffInfo;
 }
 
 
@@ -438,9 +438,9 @@ void EventModel::setCurrentMarkerPos(int markerPos)
 
 //*************************************************************************************************************
 
-FiffInfo EventModel::getFiffInfo() const
+FiffInfo::SPtr EventModel::getFiffInfo() const
 {
-    return m_fiffInfo;
+    return m_pFiffInfo;
 }
 
 

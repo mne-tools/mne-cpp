@@ -541,9 +541,9 @@ void DataWindow::setRangeSampleLabels()
 
     //Set values as string
     QString stringTemp;
-    int minSampleRangeSec = (minSampleRange/m_pRawModel->m_fiffInfo.sfreq)*1000;
+    int minSampleRangeSec = (minSampleRange/m_pRawModel->m_pFiffInfo->sfreq)*1000;
     ui->m_label_sampleMin->setText(QString("%1 / %2 sec").arg(stringTemp.number(minSampleRange)).arg(stringTemp.number((double)minSampleRangeSec/1000,'g')));
-    int maxSampleRangeSec = (maxSampleRange/m_pRawModel->m_fiffInfo.sfreq)*1000;
+    int maxSampleRangeSec = (maxSampleRange/m_pRawModel->m_pFiffInfo->sfreq)*1000;
     ui->m_label_sampleMax->setText(QString("%1 / %2 sec").arg(stringTemp.number(maxSampleRange)).arg(stringTemp.number((double)maxSampleRangeSec/1000,'g')));
 }
 
@@ -558,7 +558,7 @@ void DataWindow::setMarkerSampleLabel()
     m_iCurrentMarkerSample = ui->m_tableView_rawTableView->horizontalScrollBar()->value() +
             (m_pDataMarker->geometry().x() - ui->m_tableView_rawTableView->geometry().x() - ui->m_tableView_rawTableView->verticalHeader()->width());
 
-    int currentSeconds = (m_iCurrentMarkerSample/m_pRawModel->m_fiffInfo.sfreq)*1000;
+    int currentSeconds = (m_iCurrentMarkerSample/m_pRawModel->m_pFiffInfo->sfreq)*1000;
 
     QString numberString = QString("%1 / %2 sec").arg(QString().number(m_iCurrentMarkerSample)).arg(QString().number((double)currentSeconds/1000,'g'));
     m_pCurrentDataMarkerLabel->setText(numberString);

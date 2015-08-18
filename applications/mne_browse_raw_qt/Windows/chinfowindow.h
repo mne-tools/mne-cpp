@@ -45,7 +45,7 @@
 #include "ui_chinfowindow.h"
 #include "fiff/fiff.h"
 
-#include "../Models/chinfomodel.h"
+#include "disp/helpers/chinfomodel.h"
 
 
 //*************************************************************************************************************
@@ -62,6 +62,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -72,10 +73,12 @@ using namespace FIFFLIB;
 namespace MNEBrowseRawQt
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE FORWARD DECLARATIONS
 //=============================================================================================================
+
 
 /**
 * DECLARE CLASS ChInfoWindow
@@ -106,7 +109,7 @@ public:
     /**
     * Returns the ChInfoModel of this window
     */
-    ChInfoModel* getDataModel();
+    ChInfoModel::SPtr getDataModel();
 
 private:
     //=========================================================================================================
@@ -125,7 +128,7 @@ private:
 
     Ui::ChInfoWindow*   ui;                 /**< Pointer to the qt designer generated ui class.*/
 
-    ChInfoModel*        m_pChInfoModel;     /**< The channel info model.*/
+    ChInfoModel::SPtr   m_pChInfoModel;     /**< The channel info model.*/
 };
 
 } // NAMESPACE MNEBrowseRawQt
