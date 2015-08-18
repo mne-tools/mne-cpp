@@ -56,8 +56,8 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SelectionManagerWindow::SelectionManagerWindow(QWidget *parent, ChInfoModel::SPtr pChInfoModel)
-: QWidget(parent,Qt::Window)
+SelectionManagerWindow::SelectionManagerWindow(QWidget *parent, ChInfoModel::SPtr pChInfoModel, Qt::WindowType type)
+: QWidget(parent, type)
 , ui(new Ui::SelectionManagerWindow)
 , m_pChInfoModel(pChInfoModel)
 {

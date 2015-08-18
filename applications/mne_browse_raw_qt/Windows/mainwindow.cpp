@@ -59,7 +59,7 @@ using namespace MNEBrowseRawQt;
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
 //, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
-//, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
+, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
 , m_qEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
 , m_qSettings()
 , m_rawSettings()
@@ -115,16 +115,11 @@ void MainWindow::setupWindowWidgets()
     m_pChInfoWindow->hide();
 
     //Create selection manager window - QTDesigner used - see / FormFiles
-    m_pSelectionManagerWindow = new SelectionManagerWindow(this, m_pChInfoWindow->getDataModel());
-
-    //Get SelectionManagerWindow Widget in a QDockWidget
     m_pSelectionManagerWindowDock = new QDockWidget(this);
-    QGridLayout* t_pGridLayout = new QGridLayout;
-    t_pGridLayout->addWidget(m_pSelectionManagerWindow);
-    m_pSelectionManagerWindowDock->setLayout(t_pGridLayout);
-
     addDockWidget(Qt::BottomDockWidgetArea, m_pSelectionManagerWindowDock);
-    m_pSelectionManagerWindow->hide();
+    m_pSelectionManagerWindow = new SelectionManagerWindow(m_pSelectionManagerWindowDock, m_pChInfoWindow->getDataModel(), Qt::Widget);
+    m_pSelectionManagerWindowDock->setWidget(m_pSelectionManagerWindow);
+    m_pSelectionManagerWindowDock->hide();
 
     //Create average manager window - QTDesigner used - see / FormFiles
     m_pAverageWindow = new AverageWindow(this, m_qEvokedFile);
@@ -285,7 +280,7 @@ void MainWindow::createToolBar()
     QAction* showSelectionManager = new QAction(QIcon(":/Resources/Images/showSelectionManager.png"),tr("Toggle selection manager"), this);
     showSelectionManager->setStatusTip(tr("Toggle the selection manager"));
     connect(showSelectionManager, &QAction::triggered, this, [=](){
-        showWindow(m_pSelectionManagerWindow);
+        showWindow(m_pSelectionManagerWindowDock);
     });
     toolBar->addAction(showSelectionManager);
 
@@ -360,7 +355,7 @@ void MainWindow::connectMenus()
         showWindow(m_pInformationWindow);
     });
     connect(ui->m_channelSelectionManagerAction, &QAction::triggered, this, [=](){
-        showWindow(m_pSelectionManagerWindow);
+        showWindow(m_pSelectionManagerWindowDock);
     });
     connect(ui->m_averageWindowAction, &QAction::triggered, this, [=](){
         showWindow(m_pAverageWindow);
