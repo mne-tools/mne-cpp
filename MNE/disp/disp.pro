@@ -106,7 +106,8 @@ SOURCES += \
     helpers/selectionscene.cpp \
     helpers/selectionsceneitem.cpp \
     selectionmanagerwindow.cpp \
-    helpers/chinfomodel.cpp
+    helpers/chinfomodel.cpp \
+    helpers/mneoperator.cpp
 
 HEADERS += \
     disp_global.h \
@@ -128,7 +129,8 @@ HEADERS += \
     helpers/selectionscene.h \
     helpers/selectionsceneitem.h \
     selectionmanagerwindow.h \
-    helpers/chinfomodel.h
+    helpers/chinfomodel.h \
+    helpers/mneoperator.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

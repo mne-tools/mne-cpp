@@ -142,7 +142,7 @@ public:
     *
     * @param fiffInfo fiff info with already loaded projectors.
     */
-    void addProjections(const FiffInfo &fiffInfo);
+    void addProjections(FiffInfo::ConstSPtr pFiffInfo);
 
     //=========================================================================================================
     /**

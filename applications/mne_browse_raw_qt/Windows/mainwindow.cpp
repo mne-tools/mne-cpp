@@ -60,7 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
 //, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
 //, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
-//, m_qEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
+, m_qEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
 , m_qSettings()
 , m_rawSettings()
 , ui(new Ui::MainWindowWidget)
@@ -116,7 +116,14 @@ void MainWindow::setupWindowWidgets()
 
     //Create selection manager window - QTDesigner used - see / FormFiles
     m_pSelectionManagerWindow = new SelectionManagerWindow(this, m_pChInfoWindow->getDataModel());
-    addDockWidget(Qt::BottomDockWidgetArea, m_pSelectionManagerWindow);
+
+    //Get SelectionManagerWindow Widget in a QDockWidget
+    m_pSelectionManagerWindowDock = new QDockWidget(this);
+    QGridLayout* t_pGridLayout = new QGridLayout;
+    t_pGridLayout->addWidget(m_pSelectionManagerWindow);
+    m_pSelectionManagerWindowDock->setLayout(t_pGridLayout);
+
+    addDockWidget(Qt::BottomDockWidgetArea, m_pSelectionManagerWindowDock);
     m_pSelectionManagerWindow->hide();
 
     //Create average manager window - QTDesigner used - see / FormFiles
@@ -171,15 +178,15 @@ void MainWindow::setupWindowWidgets()
 
     //Connect channel info window with raw data model, layout manager and the data window
     connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
-            m_pChInfoWindow->getDataModel(), &ChInfoModel::fiffInfoChanged);
+            m_pChInfoWindow->getDataModel().data(), &ChInfoModel::fiffInfoChanged);
 
     connect(m_pDataWindow->getDataModel(), &RawModel::assignedOperatorsChanged,
-            m_pChInfoWindow->getDataModel(), &ChInfoModel::assignedOperatorsChanged);
+            m_pChInfoWindow->getDataModel().data(), &ChInfoModel::assignedOperatorsChanged);
 
     connect(m_pSelectionManagerWindow, &SelectionManagerWindow::loadedLayoutMap,
-            m_pChInfoWindow->getDataModel(), &ChInfoModel::layoutChanged);
+            m_pChInfoWindow->getDataModel().data(), &ChInfoModel::layoutChanged);
 
-    connect(m_pChInfoWindow->getDataModel(), &ChInfoModel::channelsMappedToLayout,
+    connect(m_pChInfoWindow->getDataModel().data(), &ChInfoModel::channelsMappedToLayout,
             m_pSelectionManagerWindow, &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
 
     //Connect selection manager with a new file loaded signal
@@ -192,17 +199,17 @@ void MainWindow::setupWindowWidgets()
 
     //Connect projection manager with fif file loading
     connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
-            m_pProjectionWindow->getDataModel(), static_cast<void (ProjectionModel::*)(const FiffInfo&)>(&ProjectionModel::addProjections));
+            m_pProjectionWindow->getDataModel(), static_cast<void (ProjectionModel::*)(FiffInfo::ConstSPtr)>(&ProjectionModel::addProjections));
 
     //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels - TODO: dirty move get rid of this here
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
-        m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_fiffInfo);
-        m_pChInfoWindow->getDataModel()->fiffInfoChanged(m_pDataWindow->getDataModel()->m_fiffInfo);
+        m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_pFiffInfo);
+        m_pChInfoWindow->getDataModel()->fiffInfoChanged(m_pDataWindow->getDataModel()->m_pFiffInfo);
         m_pChInfoWindow->getDataModel()->layoutChanged(m_pSelectionManagerWindow->getLayoutMap());
         m_pSelectionManagerWindow->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
         m_pSelectionManagerWindow->newFiffFileLoaded();
         m_pFilterWindow->newFileLoaded();
-        m_pProjectionWindow->getDataModel()->addProjections(m_pDataWindow->getDataModel()->m_fiffInfo);
+        m_pProjectionWindow->getDataModel()->addProjections(m_pDataWindow->getDataModel()->m_pFiffInfo);
     }
 }
 
@@ -403,7 +410,7 @@ void MainWindow::setWindowStatus()
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
         int idx = m_qFileRaw.fileName().lastIndexOf("/");
         QString filename = m_qFileRaw.fileName().remove(0,idx+1);
-        title = QString("Data file: %1  /  First sample: %2  /  Sample frequency: %3Hz").arg(filename).arg(m_pDataWindow->getDataModel()->firstSample()).arg(m_pDataWindow->getDataModel()->m_fiffInfo.sfreq);
+        title = QString("Data file: %1  /  First sample: %2  /  Sample frequency: %3Hz").arg(filename).arg(m_pDataWindow->getDataModel()->firstSample()).arg(m_pDataWindow->getDataModel()->m_pFiffInfo->sfreq);
     }
     else
         title = QString("No data file");
@@ -523,7 +530,7 @@ void MainWindow::openFile()
     m_pDataWindow->initMVCSettings();
 
     //Set fiffInfo in event model
-    m_pEventWindow->getEventModel()->setFiffInfo(m_pDataWindow->getDataModel()->m_fiffInfo);
+    m_pEventWindow->getEventModel()->setFiffInfo(m_pDataWindow->getDataModel()->m_pFiffInfo);
     m_pEventWindow->getEventModel()->setFirstLastSample(m_pDataWindow->getDataModel()->firstSample(),
                                                         m_pDataWindow->getDataModel()->lastSample());
 
@@ -535,7 +542,7 @@ void MainWindow::openFile()
     setWindowStatus();
 
     //Hide not presented channel types and their spin boxes in the scale window
-    m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_fiffInfo);
+    m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_pFiffInfo);
 
     m_qFileRaw.close();
 }

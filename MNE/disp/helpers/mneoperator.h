@@ -1,15 +1,16 @@
 //=============================================================================================================
 /**
-* @file     selectionsceneitem.cpp
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* @file     mneoperator.h
+* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     September, 2014
+* @date     February, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,100 +31,71 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the SelectionSceneItem class.
+* @brief    Contains all MNEOperators.
 *
 */
+#ifndef MNEOPERATOR_H
+#define MNEOPERATOR_H
+
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "selectionsceneitem.h"
+#include "../disp_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// Qt INCLUDES
 //=============================================================================================================
 
-using namespace MNEBrowseRawQt;
-using namespace std;
+#include <QObject>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// MNE INCLUDES
 //=============================================================================================================
 
-SelectionSceneItem::SelectionSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor channelColor)
-: m_sChannelName(channelName)
-, m_iChannelNumber(channelNumber)
-, m_qpChannelPosition(channelPosition)
-, m_cChannelColor(channelColor)
-, m_bHighlightItem(false)
-, m_iChannelKind(channelKind)
-, m_iChannelUnit(channelUnit)
+#include <fiff/fiff.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISPLIB
+//=============================================================================================================
+
+namespace DISPLIB
 {
-    this->setAcceptHoverEvents(true);
-    this->setFlag(QGraphicsItem::ItemIsSelectable, true);
-}
 
-
-//*************************************************************************************************************
-
-QRectF SelectionSceneItem::boundingRect() const
+//=============================================================================================================
+/**
+* DECLARE CLASS MNEOperator
+*/
+class DISPSHARED_EXPORT MNEOperator
 {
-    return QRectF(-25, -30, 50, 50);
-}
+public:
+    enum OperatorType {
+        FILTER,
+        PCA,
+        AVERAGE,
+        UNKNOWN
+    } m_OperatorType;
 
+    MNEOperator();
 
-//*************************************************************************************************************
+    MNEOperator(const MNEOperator& obj);
 
-void SelectionSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
+    MNEOperator(OperatorType type);
 
-    this->setPos(10*m_qpChannelPosition.x(), -10*m_qpChannelPosition.y());
+    ~MNEOperator();
 
-    // Plot shadow
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(Qt::darkGray);
-    painter->drawEllipse(-12, -12, 30, 30);
+    QString m_sName;
+};
 
-    //Plot selected item
-    if(this->isSelected())
-        painter->setBrush(QBrush(QColor(93,177,47)));
-    else
-        painter->setBrush(QBrush(m_cChannelColor));
+} // NAMESPACE DISPLIB
 
-    //Plot highlighted selected item
-    if(m_bHighlightItem) {
-        painter->setPen(QPen(Qt::red, 4));
-        painter->drawEllipse(-15, -15, 30, 30);
-    }
-    else {
-        painter->setPen(QPen(Qt::black, 1));
-        painter->drawEllipse(-15, -15, 30, 30);
-    }
-
-    // Plot electrode name
-    painter->setPen(QPen(Qt::black, 1));
-    QStaticText staticElectrodeName = QStaticText(m_sChannelName);
-    QSizeF sizeText = staticElectrodeName.size();
-    painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
+#endif // MNEOPERATOR_H

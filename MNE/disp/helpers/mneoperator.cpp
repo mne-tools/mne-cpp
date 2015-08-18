@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mneoperator.h
+* @file     mneoperator.cpp
 * @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -31,61 +31,59 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains all MNEOperators.
+* @brief    MNEOperator class represents the base class of an arbitrary MNEOperator, e.g. FILTER,PCA,AVERAGE.
+*           All specific Operators must be derived from MNEOperator, see the FilterOperator class.
 *
 */
-#ifndef MNEOPERATOR_H
-#define MNEOPERATOR_H
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// INCLUDES
 //=============================================================================================================
 
-#include <QObject>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
-#include <fiff/fiff.h>
+#include "mneoperator.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEBrowseRawQt
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace MNEBrowseRawQt
+using namespace DISPLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+MNEOperator::MNEOperator()
+: m_OperatorType(UNKNOWN)
+, m_sName("unknown")
 {
+}
 
-//=============================================================================================================
-/**
-* DECLARE CLASS MNEOperator
-*/
-class MNEOperator
+
+//*************************************************************************************************************
+
+MNEOperator::MNEOperator(const MNEOperator& obj)
 {
-public:
-    enum OperatorType {
-        FILTER,
-        PCA,
-        AVERAGE,
-        UNKNOWN
-    } m_OperatorType;
+    m_OperatorType = obj.m_OperatorType;
+    m_sName = obj.m_sName;
+}
 
-    MNEOperator();
 
-    MNEOperator(const MNEOperator& obj);
+//*************************************************************************************************************
 
-    MNEOperator(OperatorType type);
+MNEOperator::MNEOperator(OperatorType type)
+: m_OperatorType(type)
+, m_sName("unknown")
+{
+}
 
-    ~MNEOperator();
 
-    QString m_sName;
-};
+//*************************************************************************************************************
 
-} // NAMESPACE
-
-#endif // MNEOPERATOR_H
+MNEOperator::~MNEOperator()
+{
+}

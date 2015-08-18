@@ -44,6 +44,7 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include "mneoperator.h"
 
 
 //*************************************************************************************************************
@@ -88,6 +89,12 @@ using namespace FIFFLIB;
 namespace DISPLIB
 {
 
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
 //Declare type roles
 namespace ChInfoModelRoles
 {
@@ -117,6 +124,7 @@ public:
     typedef QSharedPointer<const ChInfoModel> ConstSPtr;   /**< Const shared pointer type for ChInfoModel. */
 
     ChInfoModel(FiffInfo::SPtr pFiffInfo, QObject *parent = 0);
+    ChInfoModel(QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -140,13 +148,13 @@ public:
     */
     void fiffInfoChanged(FiffInfo::SPtr pFiffInfo);
 
-//    //=========================================================================================================
-//    /**
-//    * Updates the fiff info
-//    *
-//    * @param assignedOperators the filter operators which are currently active.
-//    */
-//    void assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOperator> > &assignedOperators);
+    //=========================================================================================================
+    /**
+    * Updates the fiff info
+    *
+    * @param assignedOperators the filter operators which are currently active.
+    */
+    void assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOperator> > &assignedOperators);
 
     //=========================================================================================================
     /**
@@ -211,7 +219,7 @@ protected:
     QMap<QString,QPointF>   m_layoutMap;            /**< The current layout map with a position for all MEG and EEG channels. */
     QStringList             m_aliasNames;           /**< list of given channel aliases. */
     QStringList             m_mappedLayoutChNames;  /**< list of the mapped layout channel names. */
-//    QMap<int,QSharedPointer<MNEOperator> >      m_assignedOperators;    /**< Map of MNEOperator types to channels.*/
+    QMap<int,QSharedPointer<MNEOperator> >      m_assignedOperators;    /**< Map of MNEOperator types to channels.*/
 
 };
 
