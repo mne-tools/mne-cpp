@@ -377,7 +377,7 @@ void AverageModel::clearModel()
 {
     beginResetModel();
     //clear average data model structure
-    //m_pEvokedDataSet->clear();
+    m_pEvokedDataSet->clear();
 
     m_bFileloaded = false;
 
