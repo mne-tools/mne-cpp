@@ -119,6 +119,10 @@ BabyMEGProjectDialog::BabyMEGProjectDialog(BabyMEG* p_pBabyMEG, QWidget *parent)
 
     updateFileName();
 
+    //Hide remaining time
+    ui->m_label_RemainingTime->hide();
+    ui->m_label_timeToGo->hide();
+
 //    QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
 //                                              tr("User name:"), QLineEdit::Normal,
 //                                              QDir::home().dirName(), &ok);

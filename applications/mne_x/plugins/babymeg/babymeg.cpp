@@ -465,13 +465,11 @@ void BabyMEG::toggleRecordingFile()
 
         //Start timers for record button blinking, recording timer and updating the elapsed time in the proj widget
         m_pBlinkingRecordButtonTimer->start(500);
+        m_recordingStartedTime.restart();
+        m_pUpdateTimeInfoTimer->start(1000);
 
-        if(m_bUseRecordTimer) {
-            m_recordingStartedTime.restart();
-
+        if(m_bUseRecordTimer)
             m_pRecordTimer->start(m_iRecordingMSeconds);
-            m_pUpdateTimeInfoTimer->start(1000);
-        }
     }
 }
 
