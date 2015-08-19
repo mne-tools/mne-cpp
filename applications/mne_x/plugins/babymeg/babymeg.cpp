@@ -124,9 +124,6 @@ BabyMEG::BabyMEG()
             this, &BabyMEG::SetFiffInfoForHPI);
     addPluginAction(m_pActionUpdateFiffInfoForHPI);
 
-    //Init projection dialog
-    m_pBabyMEGProjectDialog = QSharedPointer<BabyMEGProjectDialog>(new BabyMEGProjectDialog(this));
-
     //Init timers
     if(!m_pRecordTimer) {
         m_pRecordTimer = QSharedPointer<QTimer>(new QTimer(this));
@@ -245,6 +242,10 @@ void BabyMEG::init()
 
     //init channels when fiff info is available
     connect(this, &BabyMEG::fiffInfoAvailable, this, &BabyMEG::initConnector);
+
+    //Init projection dialog
+    m_pBabyMEGProjectDialog = QSharedPointer<BabyMEGProjectDialog>(new BabyMEGProjectDialog(this));
+
 }
 
 
