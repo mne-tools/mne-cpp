@@ -140,6 +140,14 @@ void AverageWindow::scaleAveragedData(const QMap<QString,double> &scaleMap)
 
 //*************************************************************************************************************
 
+void AverageWindow::setMappedChannelNames(QStringList mappedChannelNames)
+{
+    m_mappedChannelNames = mappedChannelNames;
+}
+
+
+//*************************************************************************************************************
+
 void AverageWindow::init()
 {
     initTableViewWidgets();
@@ -266,16 +274,15 @@ void AverageWindow::onSelectionChanged(const QItemSelection &selected, const QIt
             int last = m_pAverageModel->data(m_pAverageModel->index(index.row(), 3), AverageModelRoles::GetLastSample).toInt();
 
             //Get the averageScenItem specific data row
-            QStringList chNames = fiffInfo->ch_names;
+            int channelNumber = m_mappedChannelNames.indexOf(averageSceneItemTemp->m_sChannelName);
 
-            int channelNumber = chNames.indexOf(averageSceneItemTemp->m_sChannelName);
             if(channelNumber != -1) {
                 averageSceneItemTemp->m_firstLastSample.first = first;
                 averageSceneItemTemp->m_firstLastSample.second = last;
                 averageSceneItemTemp->m_iChannelKind = fiffInfo->chs.at(channelNumber).kind;
                 averageSceneItemTemp->m_iChannelUnit = fiffInfo->chs.at(channelNumber).unit;;
                 averageSceneItemTemp->m_iChannelNumber = channelNumber;
-                averageSceneItemTemp->m_iTotalNumberChannels = chNames.size();
+                averageSceneItemTemp->m_iTotalNumberChannels = fiffInfo->ch_names.size();
                 averageSceneItemTemp->m_lAverageData.append(averageData);
             }
         }

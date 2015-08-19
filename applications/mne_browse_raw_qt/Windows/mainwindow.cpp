@@ -58,7 +58,7 @@ using namespace MNEBrowseRawQt;
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
-//, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
 , m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
 , m_qEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
 , m_qSettings()
@@ -171,7 +171,7 @@ void MainWindow::setupWindowWidgets()
     connect(m_pSelectionManagerWindow, &SelectionManagerWindow::selectionChanged,
             m_pAverageWindow, &AverageWindow::channelSelectionManagerChanged);
 
-    //Connect channel info window with raw data model, layout manager and the data window
+    //Connect channel info window with raw data model, layout manager, average manager and the data window
     connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
             m_pChInfoWindow->getDataModel().data(), &ChInfoModel::fiffInfoChanged);
 
@@ -183,6 +183,9 @@ void MainWindow::setupWindowWidgets()
 
     connect(m_pChInfoWindow->getDataModel().data(), &ChInfoModel::channelsMappedToLayout,
             m_pSelectionManagerWindow, &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
+
+    connect(m_pChInfoWindow->getDataModel().data(), &ChInfoModel::channelsMappedToLayout,
+            m_pAverageWindow, &AverageWindow::setMappedChannelNames);
 
     //Connect selection manager with a new file loaded signal
     connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
