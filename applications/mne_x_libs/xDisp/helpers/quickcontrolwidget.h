@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     projectorwidget.h
+* @file     quickcontrolwidget.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -45,6 +45,7 @@
 #include "../ui_quickcontrolwidget.h"
 #include "fiff/fiff_info.h"
 #include "fiff/fiff_constants.h"
+#include "disp/helpers/roundededgeswidget.h"
 
 
 //*************************************************************************************************************
@@ -82,6 +83,7 @@ namespace XDISPLIB
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -112,7 +114,7 @@ struct Modality {
 *
 * @brief The ProjectorWidget class provides a quick control widget for scaling, filtering, projector and view options
 */
-class QuickControlWidget : public QWidget
+class QuickControlWidget : public RoundedEdgesWidget
 {
     Q_OBJECT
 
@@ -327,34 +329,6 @@ protected:
 
     //=========================================================================================================
     /**
-    * Reimplmented mouseMoveEvent.
-    */
-    void mouseMoveEvent(QMouseEvent *event);
-
-    //=========================================================================================================
-    /**
-    * Reimplmented mouseMoveEvent.
-    */
-    void mousePressEvent(QMouseEvent *event);
-
-    //=========================================================================================================
-    /**
-    * Reimplmented mouseMoveEvent.
-    */
-    void resizeEvent(QResizeEvent *event);
-
-    //=========================================================================================================
-    /**
-    * Calculates a rect with rounded edged.
-    *
-    * @param [in] rect the rect which is supposed to be rounded.
-    * @param [in] r the radius of round edges.
-    * @return the rounded rect in form of a QRegion
-    */
-    QRegion roundedRect(const QRect& rect, int r);
-
-    //=========================================================================================================
-    /**
     * Is called when the minimize or maximize button was pressed.
     *
     * @param [in] state toggle state.
@@ -398,8 +372,6 @@ protected:
     void onResetTriggerNumbers();
 
 private:
-    QPoint      m_dragPosition;     /**< the drag position of the window */
-
     bool        m_bScaling;         /**< Flag for drawing the scaling group box */
     bool        m_bProjections;     /**< Flag for drawing the projection group box */
     bool        m_bView;            /**< Flag for drawing the view group box */
