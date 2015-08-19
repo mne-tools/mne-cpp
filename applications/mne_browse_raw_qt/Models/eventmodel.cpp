@@ -61,6 +61,7 @@ EventModel::EventModel(QObject *parent)
 , m_iFirstSample(0)
 , m_bFileloaded(false)
 , m_sFilterEventType("All")
+, m_pFiffInfo(FiffInfo::SPtr(new FiffInfo))
 {
     //Create default event type color map
     m_eventTypeColor[1] = QColor(Qt::black);
@@ -83,6 +84,7 @@ EventModel::EventModel(QFile &qFile, QObject *parent)
 , m_iFirstSample(0)
 , m_bFileloaded(false)
 , m_sFilterEventType("All")
+, m_pFiffInfo(FiffInfo::SPtr(new FiffInfo))
 {
     //Create default event type color map
     m_eventTypeColor[1] = QColor(Qt::black);

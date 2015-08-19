@@ -518,7 +518,7 @@ void MainWindow::openFile()
 //    else
 //        qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
 
-    if(!m_pDataWindow->getDataModel()->loadFiffData(&m_qFileRaw))
+    if(m_pDataWindow->getDataModel()->loadFiffData(&m_qFileRaw))
         qDebug() << "Fiff data file" << filename << "loaded.";
     else
         qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
