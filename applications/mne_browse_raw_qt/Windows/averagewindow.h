@@ -149,6 +149,14 @@ public:
     */
     void scaleAveragedData(const QMap<QString,double> &scaleMap);
 
+    //=========================================================================================================
+    /**
+    * Scales the averaged data according to scaleMap
+    *
+    * @param [in] mappedChannelNames all mapped channel names
+    */
+    void setMappedChannelNames(QStringList mappedChannelNames);
+
 private:
 
     //=========================================================================================================
@@ -222,6 +230,8 @@ private:
     Ui::AverageWindow*      ui;                     /**< Pointer to the qt designer generated ui class.*/
 
     QList<QColor>           m_lButterflyColors;     /**< List which holds 500 randomly generated colors.*/
+
+    QStringList             m_mappedChannelNames;   /**< List which holds the mapped channel names.*/
 
     AverageModel*           m_pAverageModel;        /**< The QAbstractTable average model being part of the model/view framework of Qt. */
     AverageDelegate*        m_pAverageDelegate;     /**< The QItemDelegateaverage delegate being part of the model/view framework of Qt. */

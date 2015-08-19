@@ -110,7 +110,7 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
 , m_bEndReached(false)
 , m_bReloading(false)
 , m_bProcessing(false)
-, m_pFiffInfo(Q_NULLPTR)
+, m_pFiffInfo(FiffInfo::SPtr(new FiffInfo()))
 , m_pfiffIO(QSharedPointer<FiffIO>(new FiffIO()))
 , m_filterChType("All")
 {
@@ -482,8 +482,8 @@ void RawModel::loadFiffInfos()
 void RawModel::clearModel()
 {
     //FiffIO object
-    m_pfiffIO.clear();
-    m_pFiffInfo->clear();
+    //m_pfiffIO.clear();
+    //m_pFiffInfo->clear();
     m_chInfolist.clear();
 
     //data model structure
