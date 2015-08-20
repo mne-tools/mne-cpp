@@ -482,7 +482,7 @@ void RawModel::loadFiffInfos()
 void RawModel::clearModel()
 {
     //FiffIO object
-    m_pfiffIO.clear();
+    //m_pfiffIO.clear();
     //m_pFiffInfo->clear();
     m_chInfolist.clear();
 

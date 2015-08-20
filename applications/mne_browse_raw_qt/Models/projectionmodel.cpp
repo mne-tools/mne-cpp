@@ -354,7 +354,7 @@ void ProjectionModel::addProjections(const QList<FiffProj>& dataProjs)
 
 //*************************************************************************************************************
 
-void ProjectionModel::addProjections(FiffInfo::ConstSPtr pFiffInfo)
+void ProjectionModel::addProjections(FiffInfo::SPtr pFiffInfo)
 {
     m_dataProjs.append(pFiffInfo->projs);
 

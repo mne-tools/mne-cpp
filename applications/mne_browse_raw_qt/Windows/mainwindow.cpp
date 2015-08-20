@@ -197,7 +197,7 @@ void MainWindow::setupWindowWidgets()
 
     //Connect projection manager with fif file loading
     connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
-            m_pProjectionWindow->getDataModel(), static_cast<void (ProjectionModel::*)(FiffInfo::ConstSPtr)>(&ProjectionModel::addProjections));
+            m_pProjectionWindow->getDataModel(), static_cast<void (ProjectionModel::*)(FiffInfo::SPtr)>(&ProjectionModel::addProjections));
 
     //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels - TODO: dirty move get rid of this here
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
@@ -205,8 +205,8 @@ void MainWindow::setupWindowWidgets()
         m_pChInfoWindow->getDataModel()->fiffInfoChanged(m_pDataWindow->getDataModel()->m_pFiffInfo);
         m_pChInfoWindow->getDataModel()->layoutChanged(m_pSelectionManagerWindow->getLayoutMap());
         m_pSelectionManagerWindow->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
-        m_pSelectionManagerWindow->newFiffFileLoaded();
-        m_pFilterWindow->newFileLoaded();
+        m_pSelectionManagerWindow->newFiffFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);
+        m_pFilterWindow->newFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);
         m_pProjectionWindow->getDataModel()->addProjections(m_pDataWindow->getDataModel()->m_pFiffInfo);
     }
 }
@@ -528,7 +528,7 @@ void MainWindow::openFile()
     m_pDataWindow->initMVCSettings();
 
     //Set fiffInfo in event model
-    m_pEventWindow->getEventModel()->setFiffInfo(m_pDataWindow->getDataModel()->m_pFiffInfo);
+    //m_pEventWindow->getEventModel()->setFiffInfo(m_pDataWindow->getDataModel()->m_pFiffInfo);
     m_pEventWindow->getEventModel()->setFirstLastSample(m_pDataWindow->getDataModel()->firstSample(),
                                                         m_pDataWindow->getDataModel()->lastSample());
 
@@ -690,8 +690,8 @@ void MainWindow::loadEvoked()
     setWindowStatus();
 
     //Show average window
-    if(!m_pAverageWindow->isVisible())
-        m_pAverageWindow->show();
+//    if(!m_pAverageWindow->isVisible())
+//        m_pAverageWindow->show();
 }
 
 
