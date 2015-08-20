@@ -283,8 +283,10 @@ const QMap<QString,QPointF>& SelectionManagerWindow::getLayoutMap()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::newFiffFileLoaded()
+void SelectionManagerWindow::newFiffFileLoaded(FiffInfo::SPtr pFiffInfo)
 {
+    Q_UNUSED(pFiffInfo);
+
     loadLayout(ui->m_comboBox_layoutFile->currentText());
 }
 

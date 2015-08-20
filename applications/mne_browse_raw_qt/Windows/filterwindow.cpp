@@ -84,8 +84,9 @@ FilterWindow::~FilterWindow()
 
 //*************************************************************************************************************
 
-void FilterWindow::newFileLoaded()
+void FilterWindow::newFileLoaded(FiffInfo::SPtr pFiffInfo)
 {
+    Q_UNUSED(pFiffInfo);
     filterParametersChanged();
 
     //Update min max of spin boxes to nyquist
