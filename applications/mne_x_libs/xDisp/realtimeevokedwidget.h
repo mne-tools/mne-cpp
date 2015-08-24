@@ -46,10 +46,12 @@
 #include "newmeasurementwidget.h"
 #include "helpers/realtimeevokedmodel.h"
 #include "helpers/realtimebutterflyplot.h"
-
-#include "helpers/evokedmodalitywidget.h"
 #include "helpers/selectionmanagerwindow.h"
 #include "helpers/chinfomodel.h"
+#include "helpers/quickcontrolwidget.h"
+#include "helpers/averagescene.h"
+#include "helpers/averagesceneitem.h"
+#include "disp/filterwindow.h"
 
 
 //*************************************************************************************************************
@@ -64,6 +66,7 @@
 #include <QDoubleSpinBox>
 #include <QLabel>
 #include <QVBoxLayout>
+#include <QToolBox>
 
 
 //*************************************************************************************************************
@@ -92,6 +95,8 @@ namespace XDISPLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+struct Modality;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -116,16 +121,6 @@ using namespace XMEASLIB;
 //    Annotation = 1        /**< Annotation tool. */
 //};
 
-struct Modality {
-    QString m_sName;
-    bool m_bActive;
-    float m_fNorm;
-
-    Modality(QString name, bool active, double norm)
-    : m_sName(name), m_bActive(active), m_fNorm(norm)
-    {}
-};
-
 
 //=============================================================================================================
 /**
@@ -137,8 +132,10 @@ class XDISPSHARED_EXPORT RealTimeEvokedWidget : public NewMeasurementWidget
 {
     Q_OBJECT
 
-    friend class EvokedModalityWidget;
 public:
+    typedef QSharedPointer<RealTimeEvokedWidget> SPtr;              /**< Shared pointer type for RealTimeEvokedWidget. */
+    typedef QSharedPointer<const RealTimeEvokedWidget> ConstSPtr;   /**< Const shared pointer type for RealTimeEvokedWidget. */
+
     //=========================================================================================================
     /**
     * Constructs a RealTimeEvokedWidget which is a child of parent.
@@ -154,12 +151,6 @@ public:
     * Destroys the RealTimeEvokedWidget.
     */
     ~RealTimeEvokedWidget();
-
-    //=========================================================================================================
-    /**
-    * Broadcast settings to attached widgets
-    */
-    void broadcastSettings();
 
     //=========================================================================================================
     /**
@@ -181,6 +172,22 @@ public:
     */
     virtual void init();
 
+    //=========================================================================================================
+    /**
+    * call this whenever the external channel selection manager changes
+    *
+    * * @param [in] selectedChannelItems list of selected graphic items
+    */
+    void channelSelectionManagerChanged(const QList<QGraphicsItem *> &selectedChannelItems);
+
+    //=========================================================================================================
+    /**
+    * Scales the averaged data according to scaleMap
+    *
+    * @param [in] scaleMap map with all channel types and their current scaling value
+    */
+    void scaleAveragedData(const QMap<qint32, float> &scaleMap);
+
 private:
     //=========================================================================================================
     /**
@@ -190,47 +197,85 @@ private:
 
     //=========================================================================================================
     /**
-    * Show the modality selection widget
-    */
-    void showModalitySelectionWidget();
-
-    //=========================================================================================================
-    /**
     * Only shows the channels defined in the QStringList selectedChannels
     *
     * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
     */
     void showSelectedChannelsOnly(QStringList selectedChannels);
 
-    QVBoxLayout *m_pRteLayout;  /**< RTE Widget layout */
-    QLabel *m_pLabelInit;       /**< Initialization LAbel */
+    //=========================================================================================================
+    /**
+    * Broadcast channel scaling
+    *
+    * @param [in] scaleMap QMap with scaling values which is to be broadcasted to the model.
+    */
+    void broadcastScaling(QMap<qint32, float> scaleMap);
 
-    RealTimeEvokedModel*        m_pRTEModel;                /**< RTE data model */
-    RealTimeButterflyPlot*      m_pButterflyPlot;           /**< Butterfly plot */
+    //=========================================================================================================
+    /**
+    * Broadcast settings to attached widgets
+    */
+    void broadcastSettings(QList<Modality> modalityList);
 
-    QAction* m_pActionSelectModality;                       /**< Modality selection action */
+    //=========================================================================================================
+    /**
+    * Shows quick control widget
+    */
+    void showQuickControlWidget();
 
-    QSharedPointer<RealTimeEvoked> m_pRTE;                  /**< The real-time evoked measurement. */
+    //=========================================================================================================
+    /**
+    * Reimplemented eventFilter
+    */
+    bool virtual eventFilter(QObject *object, QEvent *event);
 
-    bool m_bInitialized;                                    /**< Is Initialized */
+    //=========================================================================================================
+    /**
+    * call this function whenever a selection was made in teh evoked data set list
+    */
+    void onSelectionChanged();
 
-    QList<RealTimeSampleArrayChInfo>    m_qListChInfo;      /**< Channel info list. ToDo: check if this is obsolete later on*/
-    FiffInfo m_fiffInfo;                                    /**< FiffInfo, which is used insteadd of ListChInfo*/
+    //=========================================================================================================
+    /**
+    * Shows the filter widget
+    */
+    void showFilterWidget(bool state = true);
 
-    QAction*    m_pActionSelectSensors;                     /**< show roi select widget */
+    //=========================================================================================================
+    /**
+    * Reimplemented mouseWheelEvent
+    */
+    virtual void wheelEvent(QWheelEvent * event);
 
-    QSharedPointer<SelectionManagerWindow> m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */
-    QSharedPointer<ChInfoModel> m_pChInfoModel;             /**< channel info model. */
-    bool            m_bHideBadChannels;                     /**< hide bad channels flag. */
+    RealTimeEvokedModel::SPtr       m_pRTEModel;                /**< RTE data model */
+    RealTimeButterflyPlot::SPtr     m_pButterflyPlot;           /**< Butterfly plot */
+    AverageScene::SPtr              m_pAverageScene;            /**< The pointer to the average scene. */    
+    RealTimeEvoked::SPtr            m_pRTE;                     /**< The real-time evoked measurement. */
+    QuickControlWidget::SPtr            m_pQuickControlWidget;      /**< Quick control widget. */
+    SelectionManagerWindow::SPtr        m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */
+    ChInfoModel::SPtr                   m_pChInfoModel;             /**< Channel info model. */
+    FilterWindow::SPtr                  m_pFilterWindow;            /**< Filter window. */
 
-    QSharedPointer<EvokedModalityWidget> m_pEvokedModalityWidget;   /**< Evoked modality widget. */
-    QList< Modality > m_qListModalities;
+    bool            m_bInitialized;             /**< Is Initialized */
+    bool            m_bHideBadChannels;         /**< hide bad channels flag. */
+    qint32          m_iMaxFilterTapSize;        /**< maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
 
-    QList<qint32> m_qListCurrentSelection;  /**< Current selection list -> hack around C++11 lambda  */
-    void applySelection();                  /**< apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
-    void resetSelection();                  /**< reset the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
+    FiffInfo::SPtr  m_pFiffInfo;                /**< FiffInfo, which is used insteadd of ListChInfo*/
+
+    QAction*        m_pActionSelectSensors;     /**< show roi select widget */
+    QAction*        m_pActionQuickControl;      /**< Show quick control widget. */
+
+    QVBoxLayout*    m_pRteLayout;               /**< RTE Widget layout */
+    QLabel*         m_pLabelInit;               /**< Initialization Label */
+    QToolBox*       m_pToolBox;                 /**< The toolbox which holds the butterfly and 2D layout plot */
+    QGraphicsView*  m_pAverageLayoutView;       /**< View for 2D average layout scene */
+
+    QList<Modality>                     m_qListModalities;
+    QList<qint32>                       m_qListCurrentSelection;    /**< Current selection list -> hack around C++11 lambda  */
+    QList<RealTimeSampleArrayChInfo>    m_qListChInfo;              /**< Channel info list. ToDo: check if this is obsolete later on*/
+    QMap<qint32,float>                  m_qMapChScaling;            /**< Channel scaling values. */
 };
 
-} // NAMESPACE
+} // NAMESPACE XDISPLIB
 
 #endif // REALTIMEEVOKEDWIDGET_H

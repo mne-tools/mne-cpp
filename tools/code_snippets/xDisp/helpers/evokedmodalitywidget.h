@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     sensorwidget.h
+* @file     evokedmodalitywidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,19 +29,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the SensorWidget Class.
+* @brief    Declaration of the EvokedModalityWidget Class.
 *
 */
 
-#ifndef SENSORWIDGET_H
-#define SENSORWIDGET_H
+#ifndef EVOKEDMODALITYWIDGET_H
+#define EVOKEDMODALITYWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "sensormodel.h"
 
 
 //*************************************************************************************************************
@@ -50,8 +49,9 @@
 //=============================================================================================================
 
 #include <QWidget>
-#include <QGraphicsView>
-#include <QGraphicsScene>
+#include <QCheckBox>
+#include <QStringList>
+#include <QLineEdit>
 
 
 //*************************************************************************************************************
@@ -63,69 +63,55 @@ namespace XDISPLIB
 {
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class RealTimeEvokedWidget;
+struct Modality;
+
+
 //=============================================================================================================
 /**
-* DECLARE CLASS SensorWidget
+* DECLARE CLASS EvokedModalityWidget
 *
-* @brief The SensorWidget class provides the sensor selection widget
+* @brief The EvokedModalityWidget class provides the sensor selection widget
 */
-class SensorWidget : public QWidget
+class EvokedModalityWidget : public QWidget
 {
     Q_OBJECT
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a SensorWidget which is a child of parent.
+    * Constructs a EvokedModalityWidget which is a child of parent evoked widget.
     *
-    * @param [in] parent    parent of widget
-    * @param [in] f         widget flags
+    * @param [in] toolbox   connected real-time evoked widget
     */
-    SensorWidget(QWidget *parent = 0, Qt::WindowFlags f = 0);
+    EvokedModalityWidget(QWidget *parent, RealTimeEvokedWidget *toolbox);
 
     //=========================================================================================================
     /**
-    * Create the user interface
+    * Destroys the EvokedModalityWidget.
+    * All EvokedModalityWidget's children are deleted first. The application exits if EvokedModalityWidget is the main widget.
     */
-    void createUI();
+    ~EvokedModalityWidget();
 
-    //=========================================================================================================
-    /**
-    * draw the channels
-    */
-    void drawChannels();
+    void updateCheckbox(qint32 state);
 
-    //=========================================================================================================
-    /**
-    * Sets the SensorModel to display
-    *
-    * @param [in] model     Model to set
-    */
-    void setModel(SensorModel *model);
+    void updateLineEdit(const QString & text);
 
-    //=========================================================================================================
-    /**
-    * Repaint the sensor widget with given parameters
-    *
-    * @param [in] topLeft       Index of upper left corner which has to be updated
-    * @param [in] bottomRight   Index of bottom right corner which has to be updated
-    * @param [in] roles         Role which has been updated
-    */
-    void contextUpdate(const QModelIndex & topLeft, const QModelIndex & bottomRight, const QVector<int> & roles = QVector<int> ());
-
-    //=========================================================================================================
-    /**
-    * Repaint the sensor widget
-    */
-    void contextUpdate();
+signals:
+    void settingsChanged();
 
 private:
-    SensorModel*    m_pSensorModel;     /**< Connected sensor model */
-    QGraphicsView*  m_pGraphicsView;    /**< View where channel items are displayed */
-    QGraphicsScene* m_pGraphicsScene;   /**< Scene holding the channel items */
+    RealTimeEvokedWidget*   m_pRealTimeEvokedWidget;    /**< Connected real-time evoked widget */
 
+    QList<QCheckBox*>       m_qListModalityCheckBox;    /**< List of modality checkboxes */
+    QList<QLineEdit*>       m_qListModalityLineEdit;    /**< List of modality scalings */
 };
 
 } // NAMESPACE
 
-#endif // SENSORWIDGET_H
+#endif // EVOKEDMODALITYWIDGET_H

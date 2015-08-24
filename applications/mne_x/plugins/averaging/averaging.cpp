@@ -259,6 +259,7 @@ void Averaging::changeStimChannel(qint32 index)
 //    qDebug() << "Averaging::changeStimChannel(qint32 index)" << m_pAveragingWidget->m_pComboBoxChSelection->currentData().toInt();
 }
 
+
 //*************************************************************************************************************
 
 void Averaging::changePreStim(qint32 samples)
@@ -296,7 +297,9 @@ QWidget* Averaging::setupWidget()
 void Averaging::showAveragingWidget()
 {
     QMutexLocker locker(&m_qMutex);
-    m_pAveragingWidget = AveragingSettingsWidget::SPtr(new AveragingSettingsWidget(this));
+    if(!m_pAveragingWidget)
+        m_pAveragingWidget = AveragingSettingsWidget::SPtr(new AveragingSettingsWidget(this));
+
     m_pAveragingWidget->show();
 }
 
@@ -447,7 +450,7 @@ void Averaging::run()
 #ifdef DEBUG_AVERAGING
                 std::cout << "EVK:" << t_fiffEvoked.data.row(0) << std::endl;
 #endif
-                m_pAveragingOutput->data()->setValue(t_fiffEvoked);
+                m_pAveragingOutput->data()->setValue(t_fiffEvoked, m_pFiffInfo);
 
                 m_qVecEvokedData.pop_front();
 

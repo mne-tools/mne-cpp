@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     realtimemultisamplearrayscalingwidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     main.cpp
+* @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     May, 2014
+* @date     Mai, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Jana Kiesel, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,18 +30,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the RealTimeMultiSampleArrayScalingWidget Class.
+* @brief    Example of reading BEM data
 *
 */
 
-#ifndef REALTIMEMULTISAMPLEARRAYSCALINGWIDGET_H
-#define REALTIMEMULTISAMPLEARRAYSCALINGWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
+#include <iostream>
+#include <mne/mne.h>
 
 
 //*************************************************************************************************************
@@ -48,61 +49,46 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QStringList>
-#include <QLineEdit>
-#include <QDoubleSpinBox>
-#include <QMap>
+#include <QtCore/QCoreApplication>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE XDISPLIB
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace XDISPLIB
-{
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// MAIN
 //=============================================================================================================
-
-class RealTimeMultiSampleArrayWidget;
-struct Modality;
-
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EvokedModalityWidget
+* The function main marks the entry point of the program.
+* By default, main has the storage class extern.
 *
-* @brief The EvokedModalityWidget class provides the sensor selection widget
+* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
 */
-class RealTimeMultiSampleArrayScalingWidget : public QWidget
+
+int main(int argc, char *argv[])
 {
-    Q_OBJECT
-public:
+    QCoreApplication a(argc, argv);
 
-    //=========================================================================================================
-    /**
-    * Constructs a EvokedModalityWidget which is a child of connected RTMSAW.
-    *
-    * @param [in] toolbox   connected RealTimeMultiSampleArrayWidget
-    */
-    RealTimeMultiSampleArrayScalingWidget(RealTimeMultiSampleArrayWidget *toolbox);
+//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-all-src.fif");
+//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-bem-sol.fif");
+//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif");
+    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
 
-    void updateDoubleSpinBox(const double val);
 
-signals:
-    void scalingChanged();
+    MNEBem t_Bem (t_fileBem) ;
 
-private:
-    RealTimeMultiSampleArrayWidget * m_pRTMSAW;     /**< Connected real-time evoked widget */
+    qDebug() << "Put your stuff your interest in here";
 
-    QMap<qint32, QDoubleSpinBox*>   m_qMapScalingDoubleSpinBox;    /**< Map of types and channel scaling line edits */
-};
-
-} // NAMESPACE
-
-#endif // REALTIMEMULTISAMPLEARRAYSCALINGWIDGET_H
+    return a.exec();
+}

@@ -46,7 +46,8 @@ SUBDIRS += \
     inverse \
     rtCommand \
     rtClient \
-    rtInv
+    rtInv\
+
 
 contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += disp

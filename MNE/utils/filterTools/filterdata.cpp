@@ -238,6 +238,9 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
         return data;
     }
 
+//    std::cout<<"m_iFFTlength: "<<m_iFFTlength<<std::endl;
+//    std::cout<<"2*m_dCoeffA.cols() + data.cols(): "<<2*m_dCoeffA.cols() + data.cols()<<std::endl;
+
     if(2*m_dCoeffA.cols() + data.cols()>m_iFFTlength) {
         qDebug()<<"Error in FilterData: Number of mirroring/zeropadding size plus data size is bigger then fft length!";
         return data;

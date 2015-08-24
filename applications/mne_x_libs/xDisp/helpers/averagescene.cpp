@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     sensorLlayout.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     averagescene.cpp
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     May, 2014
+* @date     September, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the SensorLayout Class.
+* @brief    Contains the implementation of the AverageScene class.
 *
 */
 
@@ -38,15 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "sensorlayout.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
+#include "averagescene.h"
 
 
 //*************************************************************************************************************
@@ -55,6 +48,7 @@
 //=============================================================================================================
 
 using namespace XDISPLIB;
+using namespace std;
 
 
 //*************************************************************************************************************
@@ -62,42 +56,43 @@ using namespace XDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SensorLayout::SensorLayout()
+AverageScene::AverageScene(QGraphicsView* view, QObject* parent)
+: LayoutScene(view, parent)
 {
 }
 
 
 //*************************************************************************************************************
 
-SensorLayout SensorLayout::parseSensorLayout(const QDomElement &sensorLayoutElement)
+void AverageScene::setScaleMap(const QMap<qint32,float> &scaleMap)
 {
-    SensorLayout layout;
+    QList<QGraphicsItem*> itemList = this->items();
 
-    qint32 t_iNumChannels = sensorLayoutElement.attribute("NumChannels", 0).toInt();
-
-    Q_UNUSED(t_iNumChannels)
-
-    layout.m_sName = sensorLayoutElement.attribute("Type", "");
-
-    QDomElement childSensor = sensorLayoutElement.firstChildElement("Sensor");
-    while (!childSensor.isNull()) {
-        QString chName = layout.m_sName.isEmpty() ? childSensor.attribute("ChannelNumber") : QString("%1%2").arg(layout.m_sName).arg(childSensor.attribute("ChannelNumber"));
-        layout.m_qListFullChannelNames.append(chName);
-        layout.m_qListShortChannelNames.append(childSensor.attribute("ChannelNumber"));
-        float plot_x = childSensor.attribute("plot_x").toFloat()*5; //mm to pixel
-        float plot_y = childSensor.attribute("plot_y").toFloat()*5; //mm to pixel
-        layout.m_qListLocations.append(QPointF(plot_x,plot_y));
-        childSensor = childSensor.nextSiblingElement("Sensor");
+    QListIterator<QGraphicsItem*> i(itemList);
+    while (i.hasNext()) {
+        AverageSceneItem* AverageSceneItemTemp = static_cast<AverageSceneItem*>(i.next());
+        AverageSceneItemTemp->m_scaleMap = scaleMap;
     }
 
-//    qDebug() << "layout.m_qListChannels" << layout.m_qListChannels;
-//    qDebug() << "layout.m_qListLocations" << layout.m_qListLocations;
+    this->update();
+}
 
-//    if(t_iNumChannels == layout.m_qListChannels.size())
-        return layout;
-//    else
-//    {
-//        qWarning() << "Number of channel inconsistency!";
-//        return SensorLayout();
-//    }
+
+//*************************************************************************************************************
+
+void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelItems)
+{
+    this->clear();
+
+    QListIterator<QGraphicsItem*> i(selectedChannelItems);
+    while (i.hasNext()) {
+        SelectionSceneItem* selectionSceneItemTemp = static_cast<SelectionSceneItem*>(i.next());
+        AverageSceneItem* averageSceneItemTemp = new AverageSceneItem(selectionSceneItemTemp->m_sChannelName,
+                                                                      selectionSceneItemTemp->m_iChannelNumber,
+                                                                      selectionSceneItemTemp->m_qpChannelPosition,
+                                                                      selectionSceneItemTemp->m_iChannelKind,
+                                                                      selectionSceneItemTemp->m_iChannelUnit);
+
+        this->addItem(averageSceneItemTemp);
+    }
 }

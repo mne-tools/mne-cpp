@@ -87,13 +87,20 @@ void RealTimeMultiSampleArrayDelegate::initPainterPaths(const QAbstractTableMode
 
     m_penMarker = QPen(colorMarker, 2, Qt::DashLine);
 
-    m_penGrid = QPen(Qt::black, 0.5, Qt::DotLine);
+    m_penGrid = QPen(Qt::black, 0.7, Qt::DotLine);
+    m_penTimeSpacers = QPen(Qt::black, 0.2, Qt::DotLine);
 
     m_penFreeze = QPen(Qt::darkGray, 1, Qt::SolidLine);
     m_penFreezeSelected = QPen(Qt::darkRed, 1, Qt::SolidLine);
 
+    m_penFreezeBad = QPen(Qt::darkGray, 0.1, Qt::SolidLine);
+    m_penFreezeSelectedBad = QPen(Qt::darkRed, 1, Qt::SolidLine);
+
     m_penNormal = QPen(Qt::darkBlue, 1, Qt::SolidLine);
     m_penNormalSelected = QPen(Qt::red, 1, Qt::SolidLine);
+
+    m_penNormalBad = QPen(Qt::darkBlue, 0.1, Qt::SolidLine);
+    m_penNormalSelectedBad = QPen(Qt::red, 1, Qt::SolidLine);
 }
 
 
@@ -258,12 +265,15 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
         case 1: { //data plot
             //draw special background when channel is marked as bad
             QVariant v = index.model()->data(index,Qt::BackgroundRole);
+            bool bIsBadChannel = false;
+
             if((v.canConvert<QBrush>() && !(option.state & QStyle::State_Selected)) ||
                (v.canConvert<QBrush>() && (option.state & QStyle::State_Selected))) {
                 QPointF oldBO = painter->brushOrigin();
                 painter->setBrushOrigin(option.rect.topLeft());
                 painter->fillRect(option.rect, qvariant_cast<QBrush>(v));
                 painter->setBrushOrigin(oldBO);
+                bIsBadChannel = true;
             }
 
 //            //Highlight selected channels
@@ -302,6 +312,37 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 painter->drawPath(path);
                 painter->restore();
 
+                //Plot time spacers
+                createTimeSpacersPath(index, option, path, data);
+
+                painter->save();
+                painter->setPen(m_penTimeSpacers);
+                painter->drawPath(path);
+                painter->restore();
+
+                //Plot detected triggers
+                path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
+                createTriggerPath(index, option, path, data);
+
+                painter->save();
+                painter->setPen(QPen(t_pModel->getTriggerColor(), 1.5, Qt::SolidLine));
+                painter->drawPath(path);
+                painter->restore();
+
+                //Plot trigger threshold
+                if(index.row() == t_pModel->getCurrentTriggerIndex() &&
+                        t_pModel->triggerDetectionActive()) {
+                    path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
+                    QPointF textPosition;
+                    createTriggerThresholdPath(index, option, path, data, textPosition);
+
+                    painter->save();
+                    painter->setPen(QPen(Qt::red, 1, Qt::DashLine));
+                    painter->drawPath(path);
+                    painter->drawText(textPosition, QString("%1 Threshold").arg(t_pModel->getTriggerName()));
+                    painter->restore();
+                }
+
                 //Plot data path
                 QPointF ellipsePos;
                 QString amplitude;
@@ -319,16 +360,30 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 painter->save();
                 painter->translate(0, t_fPlotHeight/2);
 
-                if(t_pModel->isFreezed()) {
-                    if(option.state & QStyle::State_Selected)
-                        painter->setPen(m_penFreezeSelected);
-                    else
-                        painter->setPen(m_penFreeze);
+                if(bIsBadChannel) {
+                    if(t_pModel->isFreezed()) {
+                        if(option.state & QStyle::State_Selected)
+                            painter->setPen(m_penFreezeSelectedBad);
+                        else
+                            painter->setPen(m_penFreezeBad);
+                    } else {
+                        if(option.state & QStyle::State_Selected)
+                            painter->setPen(m_penNormalSelectedBad);
+                        else
+                            painter->setPen(m_penNormalBad);
+                    }
                 } else {
-                    if(option.state & QStyle::State_Selected)
-                        painter->setPen(m_penNormalSelected);
-                    else
-                        painter->setPen(m_penNormal);
+                    if(t_pModel->isFreezed()) {
+                        if(option.state & QStyle::State_Selected)
+                            painter->setPen(m_penFreezeSelected);
+                        else
+                            painter->setPen(m_penFreeze);
+                    } else {
+                        if(option.state & QStyle::State_Selected)
+                            painter->setPen(m_penNormalSelected);
+                        else
+                            painter->setPen(m_penNormal);
+                    }
                 }
 
                 //timer.start();
@@ -544,7 +599,7 @@ void RealTimeMultiSampleArrayDelegate::createGridPath(const QModelIndex &index, 
 
     if(t_pModel->numVLines() > 0)
     {
-        //horizontal lines
+        //vertical lines
         float distance = option.rect.width()/(t_pModel->numVLines()+1);
 
         float yStart = option.rect.topLeft().y();
@@ -557,6 +612,105 @@ void RealTimeMultiSampleArrayDelegate::createGridPath(const QModelIndex &index, 
             path.lineTo(x,yEnd);
         }
     }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayDelegate::createTimeSpacersPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const
+{
+    Q_UNUSED(data)
+
+    const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
+
+    if(t_pModel->getNumberOfTimeSpacers() > 0)
+    {
+        //vertical lines
+        float distanceSec = option.rect.width()/(t_pModel->numVLines()+1);
+        float distanceSpacers = distanceSec/(t_pModel->getNumberOfTimeSpacers()+1);
+
+        float yStart = option.rect.topLeft().y();
+
+        float yEnd = option.rect.bottomRight().y();
+
+        for(qint8 t = 0; t < t_pModel->numVLines()+1; ++t) {
+            for(qint8 i = 0; i < t_pModel->getNumberOfTimeSpacers(); ++i) {
+                float x = (distanceSec*t)+(distanceSpacers*(i+1));
+                path.moveTo(x,yStart);
+                path.lineTo(x,yEnd);
+            }
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayDelegate::createTriggerPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const
+{
+    Q_UNUSED(data)
+
+    const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
+
+    QList<int> detectedTriggers = t_pModel->getDetectedTriggers();
+    QList<int> detectedTriggersOld = t_pModel->getDetectedTriggersOld();
+
+    float yStart = option.rect.topLeft().y();
+    float yEnd = option.rect.bottomRight().y();
+    float fDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
+
+    int currentSampleIndex = t_pModel->getCurrentSampleIndex();
+
+    //Newly detected triggers
+    for(int u = 0; u<detectedTriggers.size(); u++) {
+        int triggerPos = detectedTriggers[u];
+
+        if(triggerPos<=currentSampleIndex+t_pModel->getCurrentOverlapAddDelay()) {
+            path.moveTo(triggerPos*fDx,yStart);
+            path.lineTo(triggerPos*fDx,yEnd);
+        }
+    }
+
+    //Old detected triggers
+    for(int u = 0; u<detectedTriggersOld.size(); u++) {
+        int triggerPos = detectedTriggersOld[u];
+
+        if(triggerPos>currentSampleIndex+t_pModel->getCurrentOverlapAddDelay()) {
+            path.moveTo(triggerPos*fDx,yStart);
+            path.lineTo(triggerPos*fDx,yEnd);
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayDelegate::createTriggerThresholdPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data, QPointF &textPosition) const
+{
+    Q_UNUSED(data)
+
+    const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
+
+    //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
+    qint32 kind = t_pModel->getKind(index.row());
+    double fMaxValue = 1e-9f;
+
+    switch(kind) {
+        case FIFFV_STIM_CH: {
+            fMaxValue = 5.0;
+            if(t_pModel->getScaling().contains(FIFFV_STIM_CH))
+                fMaxValue = t_pModel->getScaling()[FIFFV_STIM_CH];
+            break;
+        }
+    }
+
+    double fScaleY = option.rect.height()/(2*fMaxValue);
+    double triggerThreshold = -1*(t_pModel->getTriggerThreshold());
+
+    path.moveTo(option.rect.topLeft().x(), option.rect.topLeft().y()+option.rect.height()/2+fScaleY*triggerThreshold);
+    path.lineTo(option.rect.topRight().x(), option.rect.topLeft().y()+option.rect.height()/2+fScaleY*triggerThreshold);
+
+    textPosition = QPointF(option.rect.topLeft().x()+5, option.rect.topLeft().y()+option.rect.height()/2+fScaleY*triggerThreshold-5);
 }
 
 

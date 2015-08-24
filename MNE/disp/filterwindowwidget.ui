@@ -191,17 +191,17 @@
                 </property>
                 <item>
                  <property name="text">
+                  <string>Bandpass</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
                   <string>Lowpass</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
                   <string>Highpass</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Bandpass</string>
                  </property>
                 </item>
                </widget>
@@ -222,7 +222,7 @@
                  <double>1.000000000000000</double>
                 </property>
                 <property name="value">
-                 <double>100.000000000000000</double>
+                 <double>5.000000000000000</double>
                 </property>
                </widget>
               </item>
@@ -409,6 +409,21 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>m_comboBox_filterApplyTo</tabstop>
+  <tabstop>m_tabWidget_mode</tabstop>
+  <tabstop>m_comboBox_designMethod</tabstop>
+  <tabstop>m_comboBox_filterType</tabstop>
+  <tabstop>m_doubleSpinBox_lowpass</tabstop>
+  <tabstop>m_doubleSpinBox_highpass</tabstop>
+  <tabstop>m_doubleSpinBox_transitionband</tabstop>
+  <tabstop>m_spinBox_filterTaps</tabstop>
+  <tabstop>m_pushButton_exportFilter</tabstop>
+  <tabstop>m_pushButton_loadFilter</tabstop>
+  <tabstop>m_pushButton_exportPlot</tabstop>
+  <tabstop>m_graphicsView_filterPlot</tabstop>
+  <tabstop>m_tableView_filterDataView</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

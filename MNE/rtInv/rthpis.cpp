@@ -145,7 +145,7 @@ void RtHPIS::run()
     int numCoils = 4;
     int numCh = m_pFiffInfo->nchan;
     int samF = m_pFiffInfo->sfreq;
-    int numLoc = 3, numBlock, samLoc; // numLoc : Number of times to localize in a second
+    int numLoc = 1, numBlock, samLoc; // numLoc : Number of times to localize in a second
     samLoc = samF/numLoc; // minimum samples required to localize numLoc times in a second
     Eigen::VectorXd coilfreq(numCoils);
     coilfreq[0] = 154;coilfreq[1] = 158;coilfreq[2] = 162;coilfreq[3] = 166;

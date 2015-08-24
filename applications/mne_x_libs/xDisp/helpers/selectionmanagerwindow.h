@@ -95,6 +95,9 @@ class SelectionManagerWindow : public QWidget
     Q_OBJECT
 
 public:
+    typedef QSharedPointer<SelectionManagerWindow> SPtr;              /**< Shared pointer type for SelectionManagerWindow. */
+    typedef QSharedPointer<const SelectionManagerWindow> ConstSPtr;   /**< Const shared pointer type for SelectionManagerWindow. */
+
     //=========================================================================================================
     /**
     * Constructs a SelectionManagerWindow which is a child of parent.
@@ -102,7 +105,7 @@ public:
     * @param [in] parent pointer to parent widget; If parent is 0, the new SelectionManagerWindow becomes a window. If parent is another widget, SelectionManagerWindow becomes a child window inside parent. SelectionManagerWindow is deleted when its parent is deleted.
     * @param [in] pChInfoModel pointer to the channel info model.
     */
-    SelectionManagerWindow(QWidget *parent = 0, ChInfoModel *pChInfoModel = 0);
+    SelectionManagerWindow(QWidget *parent = 0, ChInfoModel::SPtr pChInfoModel = ChInfoModel::SPtr(0));
 
     //=========================================================================================================
     /**
@@ -165,6 +168,28 @@ public:
     */
     void newFiffFileLoaded();
 
+    //=========================================================================================================
+    /**
+    * returns the currently selected layout file.
+    *
+    * @return the currently selected layout file
+    */
+    QString getCurrentLayoutFile();
+
+    //=========================================================================================================
+    /**
+    * Sets the current layout file.
+    *
+    * @param [in] currentLayoutFile the current layout file
+    */
+    void setCurrentLayoutFile(QString currentLayoutFile);
+
+    //=========================================================================================================
+    /**
+    * Update the scene items according to the bad channel list in the fiff info file.
+    */
+    void updateBadChannels();
+
 signals:
     //=========================================================================================================
     /**
@@ -218,6 +243,13 @@ private:
     *
     */
     void initButtons();
+
+    //=========================================================================================================
+    /**
+    * Initialises all check boxes in the selection window.
+    *
+    */
+    void initCheckBoxes();
 
     //=========================================================================================================
     /**
@@ -316,7 +348,7 @@ private:
 
     Ui::SelectionManagerWindow*     ui;                                 /**< Pointer to the qt designer generated ui class. */
 
-    ChInfoModel*                    m_pChInfoModel;                     /**< Pointer to the channel info model. */
+    ChInfoModel::SPtr               m_pChInfoModel;                     /**< Pointer to the channel info model. */
 
     QMap<QString,QPointF>           m_layoutMap;                        /**< QMap with the loaded layout. each channel name correspond to a QPointF variable. */
     QMap<QString,QStringList>       m_selectionGroupsMap;               /**< QMap with the loaded selection groups. Each group name holds a string list with the corresponding channels of the group.*/

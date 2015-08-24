@@ -45,6 +45,9 @@
 #include <xMeas/realtimesamplearraychinfo.h>
 #include <xMeas/realtimeevoked.h>
 #include <fiff/fiff_types.h>
+#include <iostream>
+
+#include <utils/filterTools/filterdata.h>
 
 
 //*************************************************************************************************************
@@ -53,6 +56,8 @@
 //=============================================================================================================
 
 #include <QAbstractTableModel>
+#include <QtConcurrent/QtConcurrent>
+#include <QFuture>
 
 
 //*************************************************************************************************************
@@ -61,6 +66,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 
 //*************************************************************************************************************
@@ -71,6 +77,13 @@
 namespace XDISPLIB
 {
 
+namespace RealTimeEvokedModelRoles
+{
+    enum ItemRole{GetAverageData = Qt::UserRole + 1020};
+}
+
+typedef QPair<const double*,qint32> RowVectorPair;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -80,6 +93,16 @@ namespace XDISPLIB
 using namespace XMEASLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
+using namespace UTILSLIB;
+using namespace XDISPLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE TYPEDEFS
+//=============================================================================================================
+
+typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
 
 
 //=============================================================================================================
@@ -91,7 +114,10 @@ using namespace Eigen;
 class RealTimeEvokedModel : public QAbstractTableModel
 {
     Q_OBJECT
+
 public:
+    typedef QSharedPointer<RealTimeEvokedModel> SPtr;              /**< Shared pointer type for RealTimeEvokedModel. */
+    typedef QSharedPointer<const RealTimeEvokedModel> ConstSPtr;   /**< Const shared pointer type for RealTimeEvokedModel. */
 
     //=========================================================================================================
     /**
@@ -100,6 +126,7 @@ public:
     * @param[in] parent     parent of the table model
     */
     RealTimeEvokedModel(QObject *parent = 0);
+    ~RealTimeEvokedModel();
 
     inline bool isInit() const;
 
@@ -224,11 +251,35 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns current scaling
+    *
+    * @return the current scaling
+    */
+    inline const QMap< qint32,float >& getScaling() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the current number for the time spacers
+    *
+    * @return the current number for the time spacers
+    */
+    inline int getNumberOfTimeSpacers() const;
+
+    //=========================================================================================================
+    /**
     * Returns the number of pre-stimulus samples
     *
     * @return the number of pre-stimulus samples
     */
     inline qint32 getNumPreStimSamples() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the current sampling frequency
+    *
+    * @return the current sampling frequency
+    */
+    inline float getSamplingFrequency() const;
 
     //=========================================================================================================
     /**
@@ -254,19 +305,55 @@ public:
 
     //=========================================================================================================
     /**
-    * Toggle freeze for all channels when a channel is double clicked
-    *
-    * @param [in] index     of the channel which has been double clicked
-    */
-    void toggleFreeze(const QModelIndex &index);
-
-    //=========================================================================================================
-    /**
     * Returns current freezing status
     *
     * @return the current freezing status
     */
     inline bool isFreezed() const;
+
+    //=========================================================================================================
+    /**
+    * Set scaling channel scaling
+    *
+    * @param[in] p_qMapChScaling    Map of scaling factors
+    */
+    void setScaling(const QMap< qint32,float >& p_qMapChScaling);
+
+    //=========================================================================================================
+    /**
+    * Update projections
+    */
+    void updateProjection();
+
+    //=========================================================================================================
+    /**
+    * Toggle freeze for all channels when a channel is double clicked
+    */
+    void toggleFreeze();
+
+    //=========================================================================================================
+    /**
+    * Filter parameters changed
+    *
+    * @param[in] filterData    list of the currently active filter
+    */
+    void filterChanged(QList<FilterData> filterData);
+
+    //=========================================================================================================
+    /**
+    * Sets the type of channel which are to be filtered
+    *
+    * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
+    */
+    void setFilterChannelType(QString channelType);
+
+    //=========================================================================================================
+    /**
+    * Create list of channels which are to be filtered based on channel names
+    *
+    * @param[in] channelNames    the channel names which are to be filtered
+    */
+    void createFilterChannelList(QStringList channelNames);
 
 signals:
     //=========================================================================================================
@@ -278,19 +365,36 @@ signals:
     void newSelection(QList<qint32> selection);
 
 private:
+    //=========================================================================================================
+    /**
+    * Calculates the filtered version of the channels in m_matData
+    */
+    void filterChannelsConcurrently();
+
     QSharedPointer<RealTimeEvoked> m_pRTE;          /**< The real-time evoked measurement. */
 
-    QMap<qint32,qint32> m_qMapIdxRowSelection;      /**< Selection mapping.*/
+    QMap<qint32,qint32>     m_qMapIdxRowSelection;  /**< Selection mapping.*/
+    QMap<qint32,float>      m_qMapChScaling;        /**< Channel scaling map. */
 
-    //Fiff data structure
-    MatrixXd m_matData;        /**< List that holds the data*/
-    MatrixXd m_matDataFreeze;  /**< List that holds the data when freezed*/
+    MatrixXd                m_matData;              /**< List that holds the data*/
+    MatrixXd                m_matDataFreeze;        /**< List that holds the data when freezed*/
+    MatrixXd                m_matProj;              /**< SSP projector */
+    MatrixXd                m_matDataFiltered;      /**< The filtered data */
+    MatrixXd                m_matDataFilteredFreeze;/**< The raw filtered data in freeze mode */
+    SparseMatrix<double>    m_matSparseProj;        /**< Sparse SSP projector */
 
-    bool m_bIsInit;
+    RowVectorXi             m_vecBadIdcs;           /**< Idcs of bad channels */
 
-    float m_fSps;               /**< Sampling rate */
+    bool    m_bIsInit;              /**< Init flag */
+    bool    m_bIsFreezed;           /**< Display is freezed */
+    bool    m_bProjActivated;       /**< Doo projections flag */
+    float   m_fSps;                 /**< Sampling rate */
+    qint32  m_iMaxFilterLength;     /**< Max order of the current filters */
+    QString m_sFilterChannelType;   /**< Kind of channel which is to be filtered */
 
-    bool m_bIsFreezed;          /**< Display is freezed */
+    QList<FilterData>                   m_filterData;           /**< List of currently active filters. */
+    QStringList                         m_filterChannelList;    /**< List of channels which are to be filtered.*/
+    QStringList                         m_visibleChannelList;   /**< List of currently visible channels in the view.*/
 };
 
 
@@ -348,16 +452,47 @@ inline qint32 RealTimeEvokedModel::getNumPreStimSamples() const
 
 //*************************************************************************************************************
 
+inline float RealTimeEvokedModel::getSamplingFrequency() const
+{
+    return m_fSps;
+}
+
+
+//*************************************************************************************************************
+
 inline bool RealTimeEvokedModel::isFreezed() const
 {
     return m_bIsFreezed;
 }
+
+
+//*************************************************************************************************************
+
+inline const QMap< qint32,float >& RealTimeEvokedModel::getScaling() const
+{
+    return m_qMapChScaling;
+}
+
+
+//*************************************************************************************************************
+
+inline int RealTimeEvokedModel::getNumberOfTimeSpacers() const
+{
+    //std::cout<<floor((m_matData.cols()/m_fSps)*10)<<std::endl;
+    return floor((m_matData.cols()/m_fSps)*10);
+}
+
 
 } // NAMESPACE
 
 #ifndef metatype_rowvectorxd
 #define metatype_rowvectorxd
 Q_DECLARE_METATYPE(Eigen::RowVectorXd);    /**< Provides QT META type declaration of the Eigen::RowVectorXd type. For signal/slot usage.*/
+#endif
+
+#ifndef metatype_rowvectorpair
+#define metatype_rowvectorpair
+Q_DECLARE_METATYPE(XDISPLIB::RowVectorPair);
 #endif
 
 #endif // REALTIMEEVOKEDMODEL_H

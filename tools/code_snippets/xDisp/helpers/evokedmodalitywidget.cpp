@@ -69,10 +69,10 @@ using namespace XDISPLIB;
 //=============================================================================================================
 
 EvokedModalityWidget::EvokedModalityWidget(QWidget *parent, RealTimeEvokedWidget *toolbox)
-: QWidget(parent)
+: QWidget(parent, Qt::Window)
 , m_pRealTimeEvokedWidget(toolbox)
 {
-    this->setWindowTitle("Covariance Modality Settings");
+    this->setWindowTitle("Modality Settings");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
 
@@ -105,7 +105,6 @@ EvokedModalityWidget::EvokedModalityWidget(QWidget *parent, RealTimeEvokedWidget
     }
 
     this->setLayout(t_pGridLayout);
-
 }
 
 
