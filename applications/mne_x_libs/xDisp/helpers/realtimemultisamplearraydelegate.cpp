@@ -563,7 +563,7 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
         //Create ellipse position
         if(j == (qint32)(m_markerPosition.x()/fDx)) {
             ellipsePos.setX(path.currentPosition().x()+fDx);
-            ellipsePos.setY(newY+(option.rect.height()/2));
+            ellipsePos.setY(newY/*+(option.rect.height()/2)*/);
 
             amplitude = QString::number(*(data.first+j));
         }
