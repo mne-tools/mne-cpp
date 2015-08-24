@@ -225,6 +225,15 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+#ifndef metatype_filtertype
+#define metatype_filtertype
+Q_DECLARE_METATYPE(FilterData::FilterType)
+#endif
+
+#ifndef metatype_filterdesign
+#define metatype_filterdesign
+Q_DECLARE_METATYPE(FilterData::DesignMethod)
+#endif
 
 } // NAMESPACE UTILSLIB
 

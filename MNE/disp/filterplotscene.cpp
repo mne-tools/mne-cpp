@@ -56,19 +56,19 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FilterPlotScene::FilterPlotScene(QObject *parent) :
-    QGraphicsScene(parent),
-    m_pGraphicsItemPath(new QGraphicsPathItem()),
-    m_iScalingFactor(5),
-    m_dMaxMagnitude(100*m_iScalingFactor),
-    m_iNumberHorizontalLines(4),
-    m_iNumberVerticalLines(3),
-    m_iAxisTextSize(24),
-    m_iDiagramMarginsHoriz(5),
-    m_iDiagramMarginsVert(5),
-    m_iCutOffLow(5),
-    m_iCutOffHigh(40),
-    m_iCutOffMarkerWidth(3)
+FilterPlotScene::FilterPlotScene(QGraphicsView *view, QObject *parent)
+: LayoutScene(view, parent)
+, m_pGraphicsItemPath(new QGraphicsPathItem())
+, m_iScalingFactor(5)
+, m_dMaxMagnitude(100*m_iScalingFactor)
+, m_iNumberHorizontalLines(4)
+, m_iNumberVerticalLines(3)
+, m_iAxisTextSize(24)
+, m_iDiagramMarginsHoriz(5)
+, m_iDiagramMarginsVert(5)
+, m_iCutOffLow(5)
+, m_iCutOffHigh(40)
+, m_iCutOffMarkerWidth(3)
 {
 }
 

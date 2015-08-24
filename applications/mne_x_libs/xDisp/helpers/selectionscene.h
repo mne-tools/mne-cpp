@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "layoutscene.h"
+#include "disp/layoutscene.h"
 #include "selectionsceneitem.h"
 #include <fiff/fiff.h>
 
@@ -64,6 +64,14 @@
 
 namespace XDISPLIB
 {
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace DISPLIB;
 
 
 //=============================================================================================================
@@ -88,8 +96,9 @@ public:
     * Updates layout data.
     *
     * @param [in] layoutMap layout data map.
+    * @param [in] bad channel list.
     */
-    void repaintItems(const QMap<QString, QPointF> &layoutMap);
+    void repaintItems(const QMap<QString, QPointF> &layoutMap, QStringList badChannels);
 
     //=========================================================================================================
     /**

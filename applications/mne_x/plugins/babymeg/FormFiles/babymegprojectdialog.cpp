@@ -75,6 +75,7 @@ BabyMEGProjectDialog::BabyMEGProjectDialog(BabyMEG* p_pBabyMEG, QWidget *parent)
 : m_pBabyMEG(p_pBabyMEG)
 , QDialog(parent)
 , ui(new Ui::BabyMEGProjectDialog)
+, m_iRecordingTime(5*60*1000)
 {
     ui->setupUi(this);
 
@@ -102,9 +103,25 @@ BabyMEGProjectDialog::BabyMEGProjectDialog(BabyMEG* p_pBabyMEG, QWidget *parent)
     connect(ui->m_qPushButtonDeleteSubject,&QPushButton::clicked,
                 this,&BabyMEGProjectDialog::deleteSubject);
 
+    connect(ui->m_spinBox_hours, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+                this,&BabyMEGProjectDialog::onTimeChanged);
+
+    connect(ui->m_spinBox_min, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+                this,&BabyMEGProjectDialog::onTimeChanged);
+
+    connect(ui->m_spinBox_sec, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+                this,&BabyMEGProjectDialog::onTimeChanged);
+
+    connect(ui->m_checkBox_useRecordingTimer,&QCheckBox::toggled,
+                this,&BabyMEGProjectDialog::onRecordingTimerStateChanged);
+
     ui->m_qLineEditFileName->setReadOnly(true);
 
     updateFileName();
+
+    //Hide remaining time
+    ui->m_label_RemainingTime->hide();
+    ui->m_label_timeToGo->hide();
 
 //    QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
 //                                              tr("User name:"), QLineEdit::Normal,
@@ -117,6 +134,24 @@ BabyMEGProjectDialog::BabyMEGProjectDialog(BabyMEG* p_pBabyMEG, QWidget *parent)
 BabyMEGProjectDialog::~BabyMEGProjectDialog()
 {
     delete ui;
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEGProjectDialog::setRecordingElapsedTime(int mSecsElapsed)
+{
+    QTime remainingTime(0,0,0,0);
+
+    QTime remainingTimeFinal = remainingTime.addMSecs(m_iRecordingTime-mSecsElapsed);
+
+    ui->m_label_timeToGo->setText(remainingTimeFinal.toString());
+
+    QTime passedTime(0,0,0,0);
+
+    QTime passedTimeFinal = passedTime.addMSecs(mSecsElapsed);
+
+    ui->m_label_timePassed->setText(passedTimeFinal.toString());
 }
 
 
@@ -331,5 +366,32 @@ void BabyMEGProjectDialog::selectNewSubject(const QString &newSubject)
 
 void BabyMEGProjectDialog::updateFileName()
 {
-        ui->m_qLineEditFileName->setText(m_pBabyMEG->getFilePath());
+    ui->m_qLineEditFileName->setText(m_pBabyMEG->getFilePath());
 }
+
+
+//*************************************************************************************************************
+
+void BabyMEGProjectDialog::onTimeChanged()
+{
+    m_iRecordingTime = (ui->m_spinBox_hours->value()*60*60)+(ui->m_spinBox_min->value()*60)+(ui->m_spinBox_sec->value());
+
+    m_iRecordingTime*=1000;
+
+    QTime remainingTime(0,0,0,0);
+
+    QTime remainingTimeFinal = remainingTime.addMSecs(m_iRecordingTime);
+
+    ui->m_label_timeToGo->setText(remainingTimeFinal.toString());
+
+    emit timerChanged(m_iRecordingTime);
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEGProjectDialog::onRecordingTimerStateChanged(bool state)
+{
+    emit recordingTimerStateChanged(state);
+}
+

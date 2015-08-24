@@ -89,7 +89,10 @@ using namespace Eigen;
 class FrequencySpectrumModel : public QAbstractTableModel
 {
     Q_OBJECT
+
 public:
+    typedef QSharedPointer<FrequencySpectrumModel> SPtr;              /**< Shared pointer type for FrequencySpectrumModel. */
+    typedef QSharedPointer<const FrequencySpectrumModel> ConstSPtr;   /**< Const shared pointer type for FrequencySpectrumModel. */
 
     //=========================================================================================================
     /**

@@ -61,14 +61,16 @@ CONFIG += static console #DEBUG console
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Disp \
+            -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
@@ -85,7 +87,6 @@ SOURCES += \
     Utils/filteroperator.cpp \
     Utils/filterplotscene.cpp \
     Utils/butterflyscene.cpp \
-    Utils/layoutscene.cpp \
     Utils/averagescene.cpp \
     Utils/selectionscene.cpp \
     Utils/selectionsceneitem.cpp \
@@ -121,7 +122,6 @@ HEADERS += \
     Utils/info.h \
     Utils/filterplotscene.h \
     Utils/butterflyscene.h \
-    Utils/layoutscene.h \
     Utils/averagescene.h \
     Utils/selectionscene.h \
     Utils/selectionsceneitem.h \

@@ -3,13 +3,14 @@
 * @file     babymeg.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh, Limin Sun, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -37,7 +38,6 @@
 #ifndef BABYMEG_H
 #define BABYMEG_H
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
@@ -48,7 +48,6 @@
 
 #include "FormFiles/babymegsquidcontroldgl.h"
 #include "FormFiles/babymeghpidgl.h"
-
 
 #include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularbuffer_old.h>
@@ -129,12 +128,12 @@ class babymeghpidgl;
 /**
 * DECLARE CLASS BabyMEG
 *
-* @brief The BabyMEG class provides a RT server connection.
+* @brief The BabyMEG class provides a connection to the babyMEG system.
 */
 class BABYMEGSHARED_EXPORT BabyMEG : public ISensor
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "babymeg.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "babymeg.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::ISensor)
 
@@ -144,7 +143,6 @@ class BABYMEGSHARED_EXPORT BabyMEG : public ISensor
     friend class babymeghpidgl;
 
 public:
-
     //=========================================================================================================
     /**
     * Constructs a BabyMEG.
@@ -183,7 +181,6 @@ public:
     /**
     * Returns the path where the subjects folders are stored.
     *
-    *
     * @return the data path
     */
     QString getDataPath() const;
@@ -200,8 +197,16 @@ public:
     */
     virtual void unload();
 
+    //=========================================================================================================
+    /**
+    * Shows the project dialog/window.
+    */
     void showProjectDialog();
 
+    //=========================================================================================================
+    /**
+    * Shows the project squid control dialog.
+    */
     void showSqdCtrlDialog();
 
     //=========================================================================================================
@@ -216,23 +221,77 @@ public:
     */
     void toggleRecordingFile();
 
-
+    //=========================================================================================================
+    /**
+    * Start the thread.
+    */
     virtual bool start();
-    virtual bool stop();
-
-    virtual IPlugin::PluginType getType() const;
-    virtual QString getName() const;
-
-    virtual QWidget* setupWidget();
-
-    void setFiffInfo(FIFFLIB::FiffInfo);
-    void setFiffData(QByteArray DATA);
-    void setCMDData(QByteArray DATA);
-    void setFiffGainInfo(QStringList);
 
     //=========================================================================================================
     /**
-    * Returns information from FLL hardware
+    * Stop the thread.
+    */
+    virtual bool stop();
+
+    //=========================================================================================================
+    /**
+    * Get plugin type.
+    *
+    * @return the plugin type in form of a IPlugin::PluginType
+    */
+    virtual IPlugin::PluginType getType() const;
+
+    //=========================================================================================================
+    /**
+    * Get plugin name.
+    *
+    * @return the plugin name as a QString
+    */
+    virtual QString getName() const;
+
+    //=========================================================================================================
+    /**
+    * Setups this widgets and returns a pointer to it.
+    *
+    * @return a QWidget pointer to the set up QWidget
+    */
+    virtual QWidget* setupWidget();
+
+    //=========================================================================================================
+    /**
+    * Sets the Fiff Info.
+    *
+    * @param[in] p_FiffInfo    the Fiff Info.
+    */
+    void setFiffInfo(FIFFLIB::FiffInfo p_FiffInfo);
+
+    //=========================================================================================================
+    /**
+    * Sets the Fiff Info data.
+    *
+    * @param[in] DATA    the Fiff Info data.
+    */
+    void setFiffData(QByteArray DATA);
+
+    //=========================================================================================================
+    /**
+    * Sets the CMD data.
+    *
+    * @param[in] DATA    the CMD data.
+    */
+    void setCMDData(QByteArray DATA);
+
+    //=========================================================================================================
+    /**
+    * Sets the gain info.
+    *
+    * @param[in] GainInfo    a QStringList with all the gain information.
+    */
+    void setFiffGainInfo(QStringList GainInfo);
+
+    //=========================================================================================================
+    /**
+    * Returns information from FLL hardware.
     *
     * @param[in] t_sFLLControlCommand  FLL command.
     */
@@ -240,25 +299,46 @@ public:
 
     //=========================================================================================================
     /**
-    * Update fiff information
-    *
+    * Update fiff information.
     */
     void UpdateFiffInfo();
 
     //=========================================================================================================
     /**
-    * Set HPI fiff information
-    *
+    * Set HPI fiff information.
     */
     void SetFiffInfoForHPI();
 
-
+    //=========================================================================================================
+    /**
+    * Receive HPI FiffInfo.
+    *
+    * @param[in] info   the new fiff info.
+    */
     void RecvHPIFiffInfo(FiffInfo info);
+
+    //=========================================================================================================
+    /**
+    * Set the recording time in seconds.
+    *
+    * @param[in] time   the new recording time.
+    */
+    void setRecordingTimerChanged(int timeMSecs);
+
+    //=========================================================================================================
+    /**
+    * Set the recording time active flag.
+    *
+    * @param[in] state   whether the recording should be used or not.
+    */
+    void setRecordingTimerStateChanged(bool state);
+
+    double m_dSfreq;        /**< The current sampling frequency. */
 
 signals:
     //=========================================================================================================
     /**
-    * Emitted when command clients connection status changed
+    * Emitted when command clients connection status changed.
     *
     * @param[in] p_bStatus  connection status
     */
@@ -266,86 +346,118 @@ signals:
 
     //=========================================================================================================
     /**
-    * Emitted when fiffInfo is available
+    * Emitted when fiffInfo is available.
     */
     void fiffInfoAvailable();
 
     //=========================================================================================================
     /**
-    * Emitted when data is ready
+    * Emitted when data is ready.
+    *
+    * @param[in] tmp    data to squid control
     */
     void DataToSquidCtrlGUI(MatrixXf tmp);
+
     //=========================================================================================================
     /**
-    * Emitted when data received from tcp/ip socket
+    * Emitted when data received from tcp/ip socket.
+    *
+    * @param[in] DATA    data to squid control
     */
     void SendCMDDataToSQUIDControl(QByteArray DATA);
-
 
 protected:
     virtual void run();
 
 private:
+    //=========================================================================================================
+    /**
+    * Calibrate matrix.
+    *
+    * @param[out] data  connection status
+    */
     MatrixXd calibrate(const MatrixXf& data);
-
-    bool readProjectors();
-
-    bool readBadChannels();
-
-    void changeRecordingButton();
-
-    QSharedPointer<QTimer> m_pTimerRecordingChange;
-    qint16 m_iBlinkStatus;
 
     //=========================================================================================================
     /**
-    * Initialises the output connector.
+    * Read projections from fiff file.
+    *
+    * @return true if successful, false otherwise
+    */
+    bool readProjectors();
+
+    //=========================================================================================================
+    /**
+    * Read bad channels from fiff file.
+    *
+    * @return true if successful, false otherwise
+    */
+    bool readBadChannels();
+
+    //=========================================================================================================
+    /**
+    * change recording button.
+    */
+    void changeRecordingButton();
+
+    //=========================================================================================================
+    /**
+    * This function sends the current remaining recording time to the project window.
+    */
+    void onRecordingRemainingTimeChange();
+
+    //=========================================================================================================
+    /**
+    * Initialize the connector.
     */
     void initConnector();
 
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;   /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
+    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;    /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
 
-    QMutex mutex;
+    QSharedPointer<BabyMEGClient>           m_pMyClient;                    /**< TCP/IP communication between Qt and Labview. */
+    QSharedPointer<BabyMEGClient>           m_pMyClientComm;                /**< TCP/IP communication between Qt and Labview - communication. */
+    QSharedPointer<BabyMEGInfo>             pInfo;                          /**< Set up the babyMEG info. */
+    QSharedPointer<BabyMEGProjectDialog>    m_pBabyMEGProjectDialog;        /**< Window to setup the recording tiem and fiel name. */
+    QSharedPointer<BabyMEGSQUIDControlDgl>  SQUIDCtrlDlg;                   /**< Nonmodal dialog for squid control. */
+    QSharedPointer<babymeghpidgl>           HPIDlg;                         /**< HPI dialog information. */
 
-    QSharedPointer<BabyMEGClient> myClient;
-    QSharedPointer<BabyMEGClient> myClientComm;
-    QSharedPointer<BabyMEGInfo>   pInfo;
-    bool DataStartFlag;
+    QSharedPointer<QTimer>                  m_pUpdateTimeInfoTimer;         /**< timer to control remaining time. */
+    QSharedPointer<QTimer>                  m_pBlinkingRecordButtonTimer;   /**< timer to control blinking recording button. */
+    QSharedPointer<QTimer>                  m_pRecordTimer;                 /**< timer to control recording time. */
 
-    QSharedPointer<BabyMEGSQUIDControlDgl> SQUIDCtrlDlg; // added by Dr. Limin Sun for nonmodal dialog
-    QSharedPointer<babymeghpidgl> HPIDlg; // HPI dialog information
+    QSharedPointer<RawMatrixBuffer>         m_pRawMatrixBuffer;             /**< Holds incoming raw data. */
 
-    FiffInfo::SPtr  m_pFiffInfo;            /**< Fiff measurement info.*/
-    qint32          m_iBufferSize;          /**< The raw data buffer size.*/
+    FiffInfo::SPtr      m_pFiffInfo;    /**< Fiff measurement info.*/
+    FiffStream::SPtr    m_pOutfid;      /**< FiffStream to write to.*/
 
-    bool            m_bWriteToFile;         /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
+    qint16      m_iBlinkStatus;         /**< The blink status of the recording button.*/
+    qint32      m_iBufferSize;          /**< The raw data buffer size.*/
+    qint32      m_iSplitCount;          /**< File split count */
+    int         m_iRecordingMSeconds;   /**< Recording length in mseconds.*/
+    bool        DataStartFlag;          /**< Flag for data start.*/
+    bool        m_bWriteToFile;         /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
+    bool        m_bUseRecordTimer;      /**< Flag whether to use data recording timer.*/
+    bool        m_bIsRunning;           /**< If thread is running flag.*/
+    QString     m_sBabyMEGDataPath;     /**< The data storage path.*/
+    QString     m_sCurrentProject;      /**< The current project which is part of the filename to be recorded.*/
+    QString     m_sCurrentSubject;      /**< The current subject which is part of the filename to be recorded.*/
+    QString     m_sCurrentParadigm;     /**< The current paradigm which is part of the filename to be recorded.*/
+    QString     m_sRecordFile;          /**< Current record file. */
+    QString     m_sFiffHeader;          /**< Fiff header information */
+    QString     m_sBadChannels;         /**< Filename which contains a list of bad channels */
 
-    QString             m_sBabyMEGDataPath; /**< The data storage path.*/
-    QString             m_sCurrentProject;  /**< The current project which is part of the filename to be recorded.*/
-    QString             m_sCurrentSubject;  /**< The current subject which is part of the filename to be recorded.*/
-    QString             m_sCurrentParadigm; /**< The current paradigm which is part of the filename to be recorded.*/
-    QString             m_sRecordFile;      /**< Current record file. */
-    qint32              m_iSplitCount;      /**< File split count */
-    QFile               m_qFileOut;         /**< QFile for writing to fif file.*/
-    FiffStream::SPtr    m_pOutfid;          /**< FiffStream to write to.*/
+    QFile       m_qFileOut;             /**< QFile for writing to fif file.*/
+    QMutex      mutex;                  /**< Mutex to guarantee thread safety.*/
+    QTime       m_recordingStartedTime; /**< The time when the recording started.*/
 
-    QString                 m_sFiffHeader;  /**< Fiff header information */
-    QString                 m_sBadChannels; /**< Filename which contains a list of bad channels */
-    RowVectorXd             m_cals;
-    SparseMatrix<double>    m_sparseMatCals;
+    RowVectorXd             m_cals;             /**< Calibration vector.*/
+    SparseMatrix<double>    m_sparseMatCals;    /**< Sparse calibration matrix.*/
 
-    bool    m_bIsRunning;
-
-    QSharedPointer<RawMatrixBuffer> m_pRawMatrixBuffer;  /**< Holds incoming raw data. */
-
-    QAction*                        m_pActionSetupProject;      /**< shows setup project dialog */
-    QAction*                        m_pActionRecordFile;        /**< start recording action */
-    QAction*                        m_pActionSqdCtrl;           /**< show squid control */
-    QAction*                        m_pActionUpdateFiffInfo;    /**< Update Fiff Info action */
-    QAction*                        m_pActionUpdateFiffInfoForHPI;    /**< Update HPI info into Fiff Info action */
-
-public:
-    double sfreq;
+    QAction*                m_pActionSetupProject;          /**< shows setup project dialog */
+    QAction*                m_pActionRecordFile;            /**< start recording action */
+    QAction*                m_pActionSqdCtrl;               /**< show squid control */
+    QAction*                m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
+    QAction*                m_pActionUpdateFiffInfoForHPI;  /**< Update HPI info into Fiff Info action */
 };
 
 } // NAMESPACE

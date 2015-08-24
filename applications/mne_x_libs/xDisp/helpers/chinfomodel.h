@@ -99,7 +99,8 @@ namespace ChInfoModelRoles
                   GetChPosition = Qt::UserRole + 1016,
                   GetChDigitizer = Qt::UserRole + 1017,
                   GetChActiveFilter = Qt::UserRole + 1018,
-                  GetChCoilType = Qt::UserRole + 1019};
+                  GetChCoilType = Qt::UserRole + 1019,
+                  GetIsBad = Qt::UserRole + 1020};
 }
 
 //=============================================================================================================
@@ -110,7 +111,10 @@ class ChInfoModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    ChInfoModel(QObject *parent = 0, FiffInfo::SPtr pFiffInfo = FiffInfo::SPtr(0));
+    typedef QSharedPointer<ChInfoModel> SPtr;              /**< Shared pointer type for ChInfoModel. */
+    typedef QSharedPointer<const ChInfoModel> ConstSPtr;   /**< Const shared pointer type for ChInfoModel. */
+
+    ChInfoModel(FiffInfo::SPtr pFiffInfo, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -175,6 +179,8 @@ public:
     * @return the index number. if channel was not found in the data this functions returns -1
     */
     int getIndexFromMappedChName(QString chName);
+
+    QStringList getBadChannelList();
 
 signals:
     //=========================================================================================================

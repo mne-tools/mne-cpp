@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     sensorgroup.h
+* @file     scalingwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,20 +29,30 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the SensorGroup Class.
+* @brief    Declaration of the ScalingWidget Class.
 *
 */
 
-#ifndef SENSORGROUP_H
-#define SENSORGROUP_H
+#ifndef SCALINGWIDGET_H
+#define SCALINGWIDGET_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtXml/QDomElement>
+#include <QWidget>
 #include <QStringList>
+#include <QLineEdit>
+#include <QDoubleSpinBox>
+#include <QMap>
 
 
 //*************************************************************************************************************
@@ -54,71 +64,44 @@ namespace XDISPLIB
 {
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class RealTimeMultiSampleArrayWidget;
+struct Modality;
+
+
 //=============================================================================================================
 /**
-* DECLARE CLASS SensorGroup
+* DECLARE CLASS ScalingWidget
 *
-* @brief The SensorGroup class represents a sensor selection group
+* @brief The ScalingWidget class provides the sensor selection widget
 */
-class SensorGroup
+class ScalingWidget : public QWidget
 {
+    Q_OBJECT
 public:
-    //=========================================================================================================
-    /**
-    * Default constructor
-    */
-    SensorGroup();
 
     //=========================================================================================================
     /**
-    * Returns the parsed sensor group
+    * Constructs a ScalingWidget.
     *
-    * @param [in] sensorGroupElement    the xml element which contains the sensor group
-    *
-    * @return the parsed sensor group
+    * @param [in] scaleMap   scaling maps for all channels
     */
-    static SensorGroup parseSensorGroup(const QDomElement &sensorGroupElement);
+    ScalingWidget(QMap<qint32,float> &scaleMap, QWidget *parent = 0);
 
-    //=========================================================================================================
-    /**
-    * Returns the group name
-    *
-    * @return the group name
-    */
-    inline const QString& getGroupName() const;
+    void updateDoubleSpinBox(const double val);
 
-    //=========================================================================================================
-    /**
-    * Returns the channels of the group
-    *
-    * @return the channels belonging to the current group
-    */
-    inline const QStringList& getChannelNames() const;
+signals:
+    void scalingChanged(QMap<qint32,float> scaleMap);
 
 private:
-    QString m_sGroupName;           /**< group name */
-    QStringList m_qListChannels;    /**< group channel name list */
+    QMap<qint32,float>                      m_qMapChScaling;                /**< Map of types and channel scaling values */
+    QMap<qint32, QDoubleSpinBox*>           m_qMapScalingDoubleSpinBox;    /**< Map of types and channel scaling line edits */
 };
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-inline const QString& SensorGroup::getGroupName() const
-{
-    return m_sGroupName;
-}
-
-
-//*************************************************************************************************************
-
-inline const QStringList& SensorGroup::getChannelNames() const
-{
-    return m_qListChannels;
-}
 
 } // NAMESPACE
 
-#endif // SENSORGROUP_H
+#endif // SCALINGWIDGET_H

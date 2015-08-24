@@ -137,6 +137,9 @@ void AverageWindow::init()
     initComboBoxes();
 }
 
+
+//*************************************************************************************************************
+
 void AverageWindow::initMVC(QFile &file)
 {
     //Setup average model
@@ -148,6 +151,9 @@ void AverageWindow::initMVC(QFile &file)
     //Setup average delegate
     m_pAverageDelegate = new AverageDelegate(this);
 }
+
+
+//*************************************************************************************************************
 
 void AverageWindow::initMVC()
 {
@@ -227,7 +233,6 @@ void AverageWindow::initComboBoxes()
 void AverageWindow::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
     Q_UNUSED(deselected);
-    Q_UNUSED(selected);
 
     qDebug()<<"AverageWindow::onSelectionChanged";
     //Get current items from the average scene

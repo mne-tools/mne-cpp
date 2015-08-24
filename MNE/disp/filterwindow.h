@@ -105,6 +105,9 @@ class DISPSHARED_EXPORT FilterWindow : public QWidget
     Q_OBJECT
 
 public:
+    typedef QSharedPointer<FilterWindow> SPtr;              /**< Shared pointer type for FilterWindow. */
+    typedef QSharedPointer<const FilterWindow> ConstSPtr;   /**< Const shared pointer type for FilterWindow. */
+
     //=========================================================================================================
     /**
     * Constructs a FilterWindow dialog which is a child of parent.
@@ -126,7 +129,7 @@ public:
     *
     * @param[in] fiffInfo the new fiffInfo
     */
-    void setFiffInfo(const FiffInfo &fiffInfo);
+    void setFiffInfo(const FiffInfo::SPtr &pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -162,11 +165,35 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the currently loaded filters.
+    *
+    * @return returns the list with the currently loaded filters
+    */
+    FilterData getUserDesignedFilter();
+
+    //=========================================================================================================
+    /**
     * Returns the current activation checkBox list.
     *
     * @return returns the current activation checkBox list.
     */
     QList<QCheckBox*> getActivationCheckBoxList();
+
+    //=========================================================================================================
+    /**
+    * Sets the new samplingRate.
+    *
+    * @param[in] dSamplingRate the new sampling rate
+    */
+    void setFilterParameters(double hp, double lp, int order, int type, int designMethod, double transition, bool activateFilter);
+
+    //=========================================================================================================
+    /**
+    * Sets the new samplingRate.
+    *
+    * @return return true if user designed filter is active
+    */
+    bool userDesignedFiltersIsActive();
 
 private:
     //=========================================================================================================
@@ -248,7 +275,7 @@ private:
     int                         m_iFilterTaps;              /**< The current number of filter taps.*/
     double                      m_dSFreq;                   /**< The current sampling frequency.*/
 
-    FiffInfo                    m_fiffInfo;                 /**< The current fiffInfo.*/
+    FiffInfo::SPtr              m_pFiffInfo;                /**< The current fiffInfo.*/
 
     QSettings                   m_qSettings;                /**< QSettings variable used to write or read from independent application sessions.*/
 

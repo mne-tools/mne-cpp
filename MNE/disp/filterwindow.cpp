@@ -59,9 +59,8 @@ using namespace DISPLIB;
 FilterWindow::FilterWindow(QWidget *parent)
 : QWidget(parent,Qt::Window)
 , ui(new Ui::FilterWindowWidget)
-, m_pFilterPlotScene(new FilterPlotScene)
 , m_iWindowSize(4016)
-, m_iFilterTaps(128)
+, m_iFilterTaps(512)
 , m_dSFreq(600)
 {
     ui->setupUi(this);
@@ -86,11 +85,11 @@ FilterWindow::~FilterWindow()
 
 //*************************************************************************************************************
 
-void FilterWindow::setFiffInfo(const FiffInfo &fiffInfo)
+void FilterWindow::setFiffInfo(const FiffInfo::SPtr &pFiffInfo)
 {
-    m_fiffInfo = fiffInfo;
+    m_pFiffInfo = pFiffInfo;
 
-    m_dSFreq = m_fiffInfo.sfreq;
+    m_dSFreq = m_pFiffInfo->sfreq;
 
     filterParametersChanged();
 
@@ -98,14 +97,17 @@ void FilterWindow::setFiffInfo(const FiffInfo &fiffInfo)
     m_pFilterDataModel->addFilter(m_filterData);
 
     //Update min max of spin boxes to nyquist
-    double samplingFrequency = m_fiffInfo.sfreq;
+    double samplingFrequency = m_pFiffInfo->sfreq;
     double nyquistFrequency = samplingFrequency/2;
 
     ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
     ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
 
-    ui->m_doubleSpinBox_highpass->setValue(nyquistFrequency/3);
-    ui->m_doubleSpinBox_lowpass->setValue(nyquistFrequency/2);
+    if(ui->m_doubleSpinBox_highpass->value()>m_dSFreq/2)
+        ui->m_doubleSpinBox_highpass->setValue(m_dSFreq/2);
+
+    if(ui->m_doubleSpinBox_lowpass->value()>m_dSFreq/2)
+        ui->m_doubleSpinBox_lowpass->setValue(m_dSFreq/2);
 
     updateFilterPlot();
 }
@@ -172,9 +174,65 @@ QList<FilterData> FilterWindow::getCurrentFilter()
 
 //*************************************************************************************************************
 
+FilterData FilterWindow::getUserDesignedFilter()
+{
+    return m_filterData;
+}
+
+
+//*************************************************************************************************************
+
 QList<QCheckBox*> FilterWindow::getActivationCheckBoxList()
 {
     return m_lActivationCheckBoxList;
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::setFilterParameters(double hp, double lp, int order, int type, int designMethod, double transition, bool activateFilter)
+{
+    ui->m_doubleSpinBox_highpass->setValue(lp);
+    ui->m_doubleSpinBox_lowpass->setValue(hp);
+    ui->m_spinBox_filterTaps->setValue(order);
+
+    if(type == 0)
+        ui->m_comboBox_filterType->setCurrentText("Lowpass");
+    if(type == 1)
+        ui->m_comboBox_filterType->setCurrentText("Highpass");
+    if(type == 2)
+        ui->m_comboBox_filterType->setCurrentText("Bandpass");
+    if(type == 3)
+        ui->m_comboBox_filterType->setCurrentText("Notch");
+
+    if(designMethod == 0)
+        ui->m_comboBox_designMethod->setCurrentText("Tschebyscheff");
+    if(designMethod == 1)
+        ui->m_comboBox_designMethod->setCurrentText("Cosine");
+
+    ui->m_doubleSpinBox_transitionband->setValue(transition);
+
+    for(int i=0; i<m_lActivationCheckBoxList.size(); i++) {
+        if(m_lActivationCheckBoxList.at(i)->text() == "Activate user designed filter")
+            m_lActivationCheckBoxList.at(i)->setChecked(activateFilter);
+    }
+
+    filterActivated(activateFilter);
+
+    filterParametersChanged();
+}
+
+
+//*************************************************************************************************************
+
+bool FilterWindow::userDesignedFiltersIsActive()
+{
+    for(int i=0; i<m_lActivationCheckBoxList.size(); i++) {
+        if(m_lActivationCheckBoxList.at(i)->text() == "Activate user designed filter")
+            return m_lActivationCheckBoxList.at(i)->isChecked();
+    }
+
+    return false;
 }
 
 
@@ -189,6 +247,10 @@ void FilterWindow::initCheckBoxes()
 
 void FilterWindow::initSpinBoxes()
 {
+    ui->m_doubleSpinBox_lowpass->setValue(5.0);
+    ui->m_doubleSpinBox_highpass->setValue(50.0);
+    ui->m_doubleSpinBox_transitionband->setValue(4.0);
+
     connect(ui->m_doubleSpinBox_lowpass,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                 this,&FilterWindow::filterParametersChanged);
 
@@ -233,14 +295,12 @@ void FilterWindow::initComboBoxes()
     connect(ui->m_comboBox_filterType,static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
                 this,&FilterWindow::changeStateSpinBoxes);
 
-    //Initial selection is a lowpass and Cosine design method
+    //Initial selection is a bandpass and Cosine design method
     ui->m_doubleSpinBox_lowpass->setVisible(true);
     ui->m_label_lowpass->setVisible(true);
-    ui->m_label_lowpass->setText("Highpass (Hz):");
 
-    ui->m_doubleSpinBox_highpass->setVisible(false);
-    ui->m_label_highpass->setVisible(false);
-    ui->m_doubleSpinBox_highpass->setEnabled(false);
+    ui->m_doubleSpinBox_highpass->setVisible(true);
+    ui->m_label_highpass->setVisible(true);
 
     ui->m_spinBox_filterTaps->setVisible(true);
     ui->m_label_filterTaps->setVisible(true);
@@ -256,6 +316,8 @@ void FilterWindow::initComboBoxes()
 
 void FilterWindow::initFilterPlot()
 {
+    m_pFilterPlotScene = new FilterPlotScene(ui->m_graphicsView_filterPlot, this);
+
     ui->m_graphicsView_filterPlot->setScene(m_pFilterPlotScene);
 
     filterSelectionChanged(m_pFilterDataModel->index(m_pFilterDataModel->rowCount()-1,0), QModelIndex());
@@ -474,27 +536,7 @@ void FilterWindow::changeStateSpinBoxes(int currentIndex)
 
     //Change visibility of spin boxes depending on filter type
     switch(ui->m_comboBox_filterType->currentIndex()) {
-        case 0: //Lowpass
-            ui->m_doubleSpinBox_lowpass->setVisible(true);
-            ui->m_label_lowpass->setVisible(true);
-            ui->m_label_lowpass->setText("Highpass (Hz):");
-
-            ui->m_doubleSpinBox_highpass->setVisible(false);
-            ui->m_label_highpass->setVisible(false);
-            ui->m_doubleSpinBox_highpass->setEnabled(false);
-            break;
-
-        case 1: //Highpass
-            ui->m_doubleSpinBox_highpass->setVisible(true);
-            ui->m_label_highpass->setVisible(true);
-            ui->m_label_highpass->setText("Lowpass (Hz):");
-
-            ui->m_doubleSpinBox_lowpass->setVisible(false);
-            ui->m_label_lowpass->setVisible(false);
-            ui->m_doubleSpinBox_highpass->setEnabled(true);
-            break;
-
-        case 2: //Bandpass
+        case 0: //Bandpass
             ui->m_doubleSpinBox_highpass->setVisible(true);
             ui->m_label_highpass->setVisible(true);
             ui->m_doubleSpinBox_lowpass->setVisible(true);
@@ -504,6 +546,26 @@ void FilterWindow::changeStateSpinBoxes(int currentIndex)
             ui->m_doubleSpinBox_lowpass->setEnabled(true);
             ui->m_doubleSpinBox_highpass->setEnabled(true);
             ui->m_label_highpass->setText("Lowpass (Hz):");
+            break;
+
+        case 1: //Lowpass
+            ui->m_doubleSpinBox_lowpass->setVisible(true);
+            ui->m_label_lowpass->setVisible(true);
+            ui->m_label_lowpass->setText("Highpass (Hz):");
+
+            ui->m_doubleSpinBox_highpass->setVisible(false);
+            ui->m_label_highpass->setVisible(false);
+            ui->m_doubleSpinBox_highpass->setEnabled(false);
+            break;
+
+        case 2: //Highpass
+            ui->m_doubleSpinBox_highpass->setVisible(true);
+            ui->m_label_highpass->setVisible(true);
+            ui->m_label_highpass->setText("Lowpass (Hz):");
+
+            ui->m_doubleSpinBox_lowpass->setVisible(false);
+            ui->m_label_lowpass->setVisible(false);
+            ui->m_doubleSpinBox_highpass->setEnabled(true);
             break;
     }
 
@@ -528,13 +590,17 @@ void FilterWindow::filterParametersChanged()
     double nyquistFrequency = samplingFrequency/2;
 
     //Calculate the needed fft length
-    m_iFilterTaps =  ui->m_spinBox_filterTaps->value();
+    m_iFilterTaps = ui->m_spinBox_filterTaps->value();
     if(ui->m_spinBox_filterTaps->value()%2 != 0)
         m_iFilterTaps--;
 
-    int fftLength = m_iWindowSize + ui->m_spinBox_filterTaps->value() * 2;
+    int fftLength = m_iWindowSize + ui->m_spinBox_filterTaps->value() * 4; // *2 to take into account the overlap in front and back after the convolution. Another *2 to take into account the appended and prepended data.
     int exp = ceil(MNEMath::log2(fftLength));
     fftLength = pow(2, exp) <512 ? 512 : pow(2, exp);
+
+//    std::cout<<"fftLength: "<<fftLength<<std::endl;
+//    std::cout<<"m_iWindowSize: "<<m_iWindowSize<<std::endl;
+//    std::cout<<"m_iWindowSize + ui->m_spinBox_filterTaps->value() * 4: "<<m_iWindowSize + ui->m_spinBox_filterTaps->value() * 4<<std::endl;
 
     //set maximum and minimum for cut off frequency spin boxes
     ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
@@ -640,11 +706,9 @@ void FilterWindow::onBtnExportFilterPlot()
                                                     QString("%1/%2_%3_%4_FilterPlot").arg(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
                                                     tr("Vector graphic(*.svg);;Images (*.png)"));
 
-    if(!fileName.isEmpty())
-    {
+    if(!fileName.isEmpty()) {
         // Generate screenshot
-        if(fileName.contains(".svg"))
-        {
+        if(fileName.contains(".svg")) {
             QSvgGenerator svgGen;
 
             svgGen.setFileName(fileName);
@@ -656,8 +720,7 @@ void FilterWindow::onBtnExportFilterPlot()
             m_pFilterPlotScene->render(&painter);
         }
 
-        if(fileName.contains(".png"))
-        {
+        if(fileName.contains(".png")) {
             m_pFilterPlotScene->setSceneRect(m_pFilterPlotScene->itemsBoundingRect());                  // Re-shrink the scene to it's bounding contents
             QImage image(m_pFilterPlotScene->sceneRect().size().toSize(), QImage::Format_ARGB32);       // Create the image with the exact size of the shrunk scene
             image.fill(Qt::transparent);                                                                // Start all pixels transparent
@@ -751,7 +814,9 @@ void FilterWindow::onChkBoxFilterActivation(bool state)
             m_pFilterDataModel->setData(m_pFilterDataModel->index(filterModelRowIndex,0), variant, Qt::EditRole);
     }
 
-    QList<FilterData> activeFilters = m_pFilterDataModel->data( m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData> >();
+    QList<FilterData> activeFilters = m_pFilterDataModel->data(m_pFilterDataModel->index(0,8), FilterDataModelRoles::GetActiveFilters).value<QList<FilterData> >();
+
+    std::cout<<"activeFilters.size(): "<<activeFilters.size()<<std::endl;
 
     emit filterChanged(activeFilters);
     emit filterActivated(state);

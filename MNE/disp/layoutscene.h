@@ -42,6 +42,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "disp_global.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -68,7 +70,7 @@
 // DEFINE NAMESPACE XDISPLIB
 //=============================================================================================================
 
-namespace XDISPLIB
+namespace DISPLIB
 {
 
 
@@ -78,7 +80,7 @@ namespace XDISPLIB
 *
 * @brief The LayoutScene class provides a reimplemented QGraphicsScene for 2D layout plotting. This class handles all the user interaction features (subclass in order to use).
 */
-class LayoutScene : public QGraphicsScene
+class DISPSHARED_EXPORT LayoutScene : public QGraphicsScene
 {
     Q_OBJECT
 
@@ -178,6 +180,6 @@ protected:
     bool eventFilter(QObject *object, QEvent *event);
 };
 
-} // NAMESPACE XDISPLIB
+} // NAMESPACE DISPLIB
 
 #endif // LAYOUTSCENE_H

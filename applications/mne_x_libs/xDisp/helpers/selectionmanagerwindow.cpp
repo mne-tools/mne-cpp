@@ -55,7 +55,7 @@ using namespace XDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SelectionManagerWindow::SelectionManagerWindow(QWidget *parent, ChInfoModel* pChInfoModel)
+SelectionManagerWindow::SelectionManagerWindow(QWidget *parent, ChInfoModel::SPtr pChInfoModel)
 : QWidget(parent,Qt::Window)
 , ui(new Ui::SelectionManagerWindow)
 , m_pChInfoModel(pChInfoModel)
@@ -67,6 +67,7 @@ SelectionManagerWindow::SelectionManagerWindow(QWidget *parent, ChInfoModel* pCh
     initSelectionSceneView();
     initComboBoxes();
     initButtons();
+    initCheckBoxes();
 }
 
 
@@ -136,7 +137,6 @@ void SelectionManagerWindow::initComboBoxes()
     //Load selection groups again because they need to be reinitialised every time a new layout hase been loaded
     selectionName = QString("mne_browse_raw_babyMEG.sel");
     loadSelectionGroups(QCoreApplication::applicationDirPath() + selectionName.prepend("/MNE_Browse_Raw_Resources/Templates/ChannelSelection/"));
-
 }
 
 
@@ -152,6 +152,15 @@ void SelectionManagerWindow::initButtons()
 
     connect(ui->m_pushButton_addToSelectionGroups, &QPushButton::clicked,
                 this, &SelectionManagerWindow::onBtnAddToSelectionGroups);
+}
+
+
+//*************************************************************************************************************
+
+void SelectionManagerWindow::initCheckBoxes()
+{
+    connect(ui->m_checkBox_showBadChannelsAsRed, &QCheckBox::clicked,
+                this, &SelectionManagerWindow::updateBadChannels);
 }
 
 
@@ -281,6 +290,51 @@ void SelectionManagerWindow::newFiffFileLoaded()
 
 //*************************************************************************************************************
 
+QString SelectionManagerWindow::getCurrentLayoutFile()
+{
+    return ui->m_comboBox_layoutFile->currentText();
+}
+
+
+//*************************************************************************************************************
+
+void SelectionManagerWindow::setCurrentLayoutFile(QString currentLayoutFile)
+{
+    ui->m_comboBox_layoutFile->setCurrentText(currentLayoutFile);
+
+    updateBadChannels();
+}
+
+
+//*************************************************************************************************************
+
+void SelectionManagerWindow::updateBadChannels()
+{
+    QStringList badChannelMappedNames;
+    QStringList badChannelList = m_pChInfoModel->getBadChannelList();
+
+    if(ui->m_checkBox_showBadChannelsAsRed->isChecked()) {
+        for(int i = 0; i<m_pChInfoModel->rowCount(); i++) {
+            QModelIndex digIndex = m_pChInfoModel->index(i,3);
+            QString mappedChName = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetMappedLayoutChName).toString();
+
+            digIndex = m_pChInfoModel->index(i,1);
+            QString origChName = m_pChInfoModel->data(digIndex,ChInfoModelRoles::GetOrigChName).toString();
+
+            if(badChannelList.contains(origChName))
+                badChannelMappedNames << mappedChName;
+        }
+    }
+
+    m_pSelectionScene->repaintItems(m_layoutMap, badChannelMappedNames);
+    m_pSelectionScene->update();
+
+    updateSceneItems();
+}
+
+
+//*************************************************************************************************************
+
 bool SelectionManagerWindow::loadLayout(QString path)
 {
     bool state = LayoutLoader::readMNELoutFile(path, m_layoutMap);
@@ -337,8 +391,8 @@ bool SelectionManagerWindow::loadLayout(QString path)
     for(int i = 0; i<outputPoints.size(); i++)
         m_layoutMap[names.at(i)] = QPointF(outputPoints.at(i)[0],outputPoints.at(i)[1]);
 
-    //Update scene
-    m_pSelectionScene->repaintItems(m_layoutMap);
+    QStringList bad;
+    m_pSelectionScene->repaintItems(m_layoutMap, bad);
     m_pSelectionScene->update();
     updateSceneItems();
 
@@ -366,9 +420,16 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
     QString newPath = path; //QCoreApplication::applicationDirPath() + path.prepend("/MNE_Browse_Raw_Resources/Templates/ChannelSelection/");
 
     m_selectionGroupsMap.clear();
-    bool state = SelectionIO::readMNESelFile(newPath, m_selectionGroupsMap);
 
-    //Create group 'All' and 'All EEG' manually (bcause this group depends on the loaded channels from the fiff data file, not on the loaded selection file)
+    bool state;
+    if(!path.isEmpty()) {
+        if(path.contains(".sel"))
+            state = SelectionIO::readMNESelFile(newPath, m_selectionGroupsMap);
+        if(path.contains(".mon"))
+            state = SelectionIO::readBrainstormMonFile(newPath, m_selectionGroupsMap);
+    }
+
+    //Create group 'All' and 'All EEG' manually (bcause this group depends on the loaded channels from the Info data file, not on the loaded selection file)
     m_selectionGroupsMap["All"] = m_currentlyLoadedFiffChannels;
 
     QStringList names;
@@ -547,7 +608,7 @@ void SelectionManagerWindow::onBtnLoadUserSelection()
     QString path = QFileDialog::getOpenFileName(this,
                                                 QString("Open selection file"),
                                                 QString("./MNE_Browse_Raw_Resources/Templates/ChannelSelection/"),
-                                                tr("Selection files (*.sel)"));
+                                                tr("Selection files (*.sel *.mon)"));
 
     if(path.isEmpty())
         return;
@@ -564,14 +625,18 @@ void SelectionManagerWindow::onBtnSaveUserSelection()
     QString path = QFileDialog::getSaveFileName(this,
                                                 "Save user channel selection",
                                                 QString("./MNE_Browse_Raw_Resources/Templates/ChannelSelection/%1_%2_%3_UserSelection").arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
-                                                tr("Selection file(*.sel)"));
+                                                tr("MNE selection file(*.sel);; Brainstorm montage file(*.mon)"));
 
     QMap<QString, QStringList> tempMap = m_selectionGroupsMap;
     tempMap.remove("All");
     tempMap.remove("All EEG");
 
-    if(!path.isEmpty())
-        SelectionIO::writeMNESelFile(path, tempMap);
+    if(!path.isEmpty()) {
+        if(path.contains(".sel"))
+            SelectionIO::writeMNESelFile(path, tempMap);
+        if(path.contains(".mon"))
+            SelectionIO::writeBrainstormMonFiles(path, tempMap);
+    }
 }
 
 
@@ -629,10 +694,17 @@ bool SelectionManagerWindow::eventFilter(QObject *obj, QEvent *event)
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
 
         if(keyEvent->key() == Qt::Key_Delete) {
-            for(int i = 0; i<ui->m_listWidget_selectionGroups->selectedItems().size(); i++)
-                m_selectionGroupsMap.remove(ui->m_listWidget_selectionGroups->selectedItems().at(i)->text());
+            QList<QListWidgetItem *> tempSelectedList;
 
-            qDeleteAll(ui->m_listWidget_selectionGroups->selectedItems());
+            for(int i = 0; i<ui->m_listWidget_selectionGroups->selectedItems().size(); i++) {
+                if(ui->m_listWidget_selectionGroups->selectedItems().at(i)->text() != "All" &&
+                        ui->m_listWidget_selectionGroups->selectedItems().at(i)->text() != "All EEG") {
+                    tempSelectedList.append(ui->m_listWidget_selectionGroups->selectedItems().at(i));
+                    m_selectionGroupsMap.remove(ui->m_listWidget_selectionGroups->selectedItems().at(i)->text());
+                }
+            }
+
+            qDeleteAll(tempSelectedList);
             updateDataView();
 
             return true;

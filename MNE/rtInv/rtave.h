@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include "rtinv_global.h"
+#include "Utils/detecttrigger.h"
 
 
 //*************************************************************************************************************
@@ -244,36 +245,29 @@ private:
     */
     void assemblePreStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_qListRawMatBuf, qint32 p_iStimIdx);
 
-    QMutex m_qMutex;                    /**< Provides access serialization between threads*/
+    QMutex  m_qMutex;               /**< Provides access serialization between threads*/
 
-    qint32 m_iNumAverages;              /**< Number of averages */
+    qint32  m_iNumAverages;         /**< Number of averages */
+    qint32  m_iPreStimSamples;      /**< Amount of samples averaged before the stimulus. */
+    qint32  m_iPostStimSamples;     /**< Amount of samples averaged after the stimulus, including the stimulus sample.*/
+    qint32  m_iNewPreStimSamples;   /**< New amount of samples averaged before the stimulus. */
+    qint32  m_iNewPostStimSamples;  /**< New amount of samples averaged after the stimulus, including the stimulus sample.*/
 
-    qint32     m_iPreStimSamples;       /**< Amount of samples averaged before the stimulus. */
-    qint32     m_iPostStimSamples;      /**< Amount of samples averaged after the stimulus, including the stimulus sample.*/
+    bool    m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
+    bool    m_bAutoAspect;          /**< Auto aspect detection on or off. */
 
-    qint32     m_iNewPreStimSamples;    /**< New amount of samples averaged before the stimulus. */
-    qint32     m_iNewPostStimSamples;   /**< New amount of samples averaged after the stimulus, including the stimulus sample.*/
-
-
-    FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
-
-    bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
+    FiffInfo::SPtr  m_pFiffInfo;    /**< Holds the fiff measurement information. */
 
     CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
 
-    bool m_bAutoAspect; /**< Auto aspect detection on or off. */
-
-
-    QList<qint32> m_qListStimChannelIdcs;   /**< Stimulus channel indeces. */
-
-//    QList<fiff_int_t>  m_qSetAspectKinds;   /**< List of aspects to average. Each aspect is averaged separetely and released stored in evoked data.*/
-
+    QMap<int,QList<int> >   m_qMapDetectedTrigger;      /**< Detected trigger for each trigger channel. */
+    QList<qint32>           m_qListStimChannelIdcs;     /**< Stimulus channel indeces. */
     QList<QList<MatrixXd> > m_qListQListPreStimBuf;     /**< assembles the pre stimulus data */
     QList<QList<MatrixXd> > m_qListQListPostStimBuf;    /**< assembles the post stimulus data */
-
-    QList<MatrixXd> m_qListPreStimAve;     /**< the current pre stimulus average */
-    QList<MatrixXd> m_qListPostStimAve;    /**< the current post stimulus average */
-    QList<MatrixXd> m_qListStimAve;     /**< the current stimulus average */
+    QList<MatrixXd>         m_qListPreStimAve;          /**< the current pre stimulus average */
+    QList<MatrixXd>         m_qListPostStimAve;         /**< the current post stimulus average */
+    QList<MatrixXd>         m_qListStimAve;             /**< the current stimulus average */
+//    QList<fiff_int_t>       m_qSetAspectKinds;          /**< List of aspects to average. Each aspect is averaged separetely and released stored in evoked data.*/
 };
 
 //*************************************************************************************************************

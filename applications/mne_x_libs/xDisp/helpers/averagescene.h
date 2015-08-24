@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     evokedmodalitywidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     averagescene.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     May, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,18 +30,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the EvokedModalityWidget Class.
+* @brief    Contains the declaration of the AverageScene class.
 *
 */
 
-#ifndef EVOKEDMODALITYWIDGET_H
-#define EVOKEDMODALITYWIDGET_H
+#ifndef AVERAGESCENE_H
+#define AVERAGESCENE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
+#include "disp/layoutscene.h"
+#include "averagesceneitem.h"
+#include "selectionsceneitem.h"
 
 
 //*************************************************************************************************************
@@ -48,10 +52,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QCheckBox>
-#include <QStringList>
-#include <QLineEdit>
+#include <QGraphicsScene>
 
 
 //*************************************************************************************************************
@@ -65,53 +66,52 @@ namespace XDISPLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
 //=============================================================================================================
 
-class RealTimeEvokedWidget;
-struct Modality;
+using namespace DISPLIB;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EvokedModalityWidget
+* AverageScene...
 *
-* @brief The EvokedModalityWidget class provides the sensor selection widget
+* @brief The AverageScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
 */
-class EvokedModalityWidget : public QWidget
+class AverageScene : public LayoutScene
 {
     Q_OBJECT
+
 public:
+    typedef QSharedPointer<AverageScene> SPtr;              /**< Shared pointer type for AverageScene. */
+    typedef QSharedPointer<const AverageScene> ConstSPtr;   /**< Const shared pointer type for AverageScene. */
 
     //=========================================================================================================
     /**
-    * Constructs a EvokedModalityWidget which is a child of parent evoked widget.
+    * Constructs a AverageScene.
+    */
+    explicit AverageScene(QGraphicsView* view, QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Sets the scale map to scaleMap.
     *
-    * @param [in] toolbox   connected real-time evoked widget
+    * @param [in] scaleMap map with all channel types and their current scaling value.
     */
-    EvokedModalityWidget(QWidget *parent, RealTimeEvokedWidget *toolbox);
+    void setScaleMap(const QMap<qint32, float> &scaleMap);
 
     //=========================================================================================================
     /**
-    * Destroys the EvokedModalityWidget.
-    * All EvokedModalityWidget's children are deleted first. The application exits if EvokedModalityWidget is the main widget.
+    * Repaints all items from the layout data in the scene.
+    *
+    *  @param [in] selectedChannelItems items which are to painted to the average scene
     */
-    ~EvokedModalityWidget();
-
-    void updateCheckbox(qint32 state);
-
-    void updateLineEdit(const QString & text);
-
-signals:
-    void settingsChanged();
+    void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
 
 private:
-    RealTimeEvokedWidget * m_pRealTimeEvokedWidget; /**< Connected real-time evoked widget */
-
-    QList<QCheckBox*>   m_qListModalityCheckBox;    /**< List of modality checkboxes */
-    QList<QLineEdit*>   m_qListModalityLineEdit;    /**< List of modality scalings */
+    QList<SelectionSceneItem*> m_lSelectedChannelItems ;        /**< Holds the selected channels from the selection manager.*/
 };
 
-} // NAMESPACE
+} // NAMESPACE XDISPLIB
 
-#endif // EVOKEDMODALITYWIDGET_H
+#endif // AverageScene_H
