@@ -80,7 +80,6 @@ using namespace UTILSLIB;
 
 MatrixXd Atom::make_tf(qint32 sample_count, qreal scale, quint32 translation, qreal modulation)
 {
-    std::cout << "\n";
 
     if(sample_count== scale) translation = floor(sample_count/2);
 
@@ -97,6 +96,7 @@ MatrixXd Atom::make_tf(qint32 sample_count, qreal scale, quint32 translation, qr
             qreal a = pow(((qreal(t) - qreal(translation)) / scale), qreal(2));
             qreal b = ((scale * ((qreal(2)* w * PI / qreal(sample_count)))
                         - (qreal(2)* modulation * PI / qreal(sample_count))) / qreal(2) / PI);
+            std::cout << "\n";
             std::cout << "\na=" << a << "\n";
             std::cout << "b=" << b << "\n";
             b = pow(b, qreal(2));
