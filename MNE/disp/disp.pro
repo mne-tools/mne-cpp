@@ -88,7 +88,7 @@ else {
 }
 
 SOURCES += \
-    colormap.cpp \
+    helpers\colormap.cpp \
     imagesc.cpp \
     plot.cpp \
     graph.cpp \
@@ -112,7 +112,7 @@ SOURCES += \
 
 HEADERS += \
     disp_global.h \
-    colormap.h \
+    helpers\colormap.h \
     imagesc.h \
     plot.h \
     graph.h \

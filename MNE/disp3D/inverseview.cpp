@@ -43,7 +43,7 @@
 #include "inverseviewproducer.h"
 
 #include <fs/label.h>
-#include <disp/colormap.h>
+#include <disp/helpers/colormap.h>
 
 
 //*************************************************************************************************************

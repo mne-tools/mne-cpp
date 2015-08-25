@@ -45,7 +45,7 @@
 #include <utils/layoutloader.h>
 #include "../tmsielectrodeitem.h"
 #include "../tmsiimpedancescene.h"
-#include "disp/colormap.h"
+#include "disp/helpers/colormap.h"
 
 #include <xMeas/newrealtimemultisamplearray.h>
 
