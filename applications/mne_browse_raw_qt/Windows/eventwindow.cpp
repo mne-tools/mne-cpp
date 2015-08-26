@@ -125,7 +125,7 @@ EventDelegate* EventWindow::getEventDelegate()
 void EventWindow::initMVCSettings()
 {
     //Set fiffInfo and first/last sample in the event model
-    m_pEventModel->setFiffInfo(m_pMainWindow->m_pDataWindow->getDataModel()->m_fiffInfo);
+    m_pEventModel->setFiffInfo(m_pMainWindow->m_pDataWindow->getDataModel()->m_pFiffInfo);
     m_pEventModel->setFirstLastSample(m_pMainWindow->m_pDataWindow->getDataModel()->firstSample(),
                                       m_pMainWindow->m_pDataWindow->getDataModel()->lastSample());
 

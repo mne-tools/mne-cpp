@@ -80,7 +80,7 @@
 #include "datawindow.h"
 #include "aboutwindow.h"
 #include "informationwindow.h"
-#include "selectionmanagerwindow.h"
+#include "disp/selectionmanagerwindow.h"
 #include "averagewindow.h"
 #include "scalewindow.h"
 #include "chinfowindow.h"
@@ -269,6 +269,8 @@ private:
     ScaleWindow*            m_pScaleWindow;             /**< Scale widget can be used to set the scaling of the different channels types. */
     ChInfoWindow*           m_pChInfoWindow;            /**< Dock window which shows the information about the curretly loaded data channels. */
     ProjectionWindow*       m_pProjectionWindow;        /**< Dock widget to hold he projection manager. */
+
+    QDockWidget*            m_pSelectionManagerWindowDock;
 
     //application settings
     QSettings               m_qSettings;                /**< QSettings variable used to write or read from independent application sessions. */

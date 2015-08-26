@@ -1,16 +1,15 @@
 //=============================================================================================================
 /**
-* @file     mneoperator.h
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+* @file     averagescene.cpp
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     February, 2014
+* @date     September, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,61 +30,69 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains all MNEOperators.
+* @brief    Contains the implementation of the AverageScene class.
 *
 */
-#ifndef MNEOPERATOR_H
-#define MNEOPERATOR_H
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// INCLUDES
 //=============================================================================================================
 
-#include <QObject>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
-#include <fiff/fiff.h>
+#include "averagescene.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEBrowseRawQt
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace MNEBrowseRawQt
+using namespace DISPLIB;
+using namespace std;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+AverageScene::AverageScene(QGraphicsView* view, QObject* parent)
+: LayoutScene(view, parent)
 {
+}
 
-//=============================================================================================================
-/**
-* DECLARE CLASS MNEOperator
-*/
-class MNEOperator
+
+//*************************************************************************************************************
+
+void AverageScene::setScaleMap(const QMap<qint32,float> &scaleMap)
 {
-public:
-    enum OperatorType {
-        FILTER,
-        PCA,
-        AVERAGE,
-        UNKNOWN
-    } m_OperatorType;
+    QList<QGraphicsItem*> itemList = this->items();
 
-    MNEOperator();
+    QListIterator<QGraphicsItem*> i(itemList);
+    while (i.hasNext()) {
+        AverageSceneItem* AverageSceneItemTemp = static_cast<AverageSceneItem*>(i.next());
+        AverageSceneItemTemp->m_scaleMap = scaleMap;
+    }
 
-    MNEOperator(const MNEOperator& obj);
+    this->update();
+}
 
-    MNEOperator(OperatorType type);
 
-    ~MNEOperator();
+//*************************************************************************************************************
 
-    QString m_sName;
-};
+void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelItems)
+{
+    this->clear();
 
-} // NAMESPACE
+    QListIterator<QGraphicsItem*> i(selectedChannelItems);
+    while (i.hasNext()) {
+        SelectionSceneItem* selectionSceneItemTemp = static_cast<SelectionSceneItem*>(i.next());
+        AverageSceneItem* averageSceneItemTemp = new AverageSceneItem(selectionSceneItemTemp->m_sChannelName,
+                                                                      selectionSceneItemTemp->m_iChannelNumber,
+                                                                      selectionSceneItemTemp->m_qpChannelPosition,
+                                                                      selectionSceneItemTemp->m_iChannelKind,
+                                                                      selectionSceneItemTemp->m_iChannelUnit);
 
-#endif // MNEOPERATOR_H
+        this->addItem(averageSceneItemTemp);
+    }
+}

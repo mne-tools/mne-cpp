@@ -1,16 +1,14 @@
 //=============================================================================================================
 /**
-* @file     projectionmodel.h
+* @file     projectorwidget.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     October, 2014
+* @date     June, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,27 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    This class represents the projection model of the model/view framework of mne_browse_raw_qt application.
+* @brief    Declaration of the RoundedEdgesWidget Class.
 *
 */
 
-#ifndef PROJECTIONMODEL_H
-#define PROJECTIONMODEL_H
+#ifndef ROUNDEDEDGESWIDGET_H
+#define ROUNDEDEDGESWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../Utils/types.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QAbstractTableModel>
+#include "../disp_global.h"
 
 
 //*************************************************************************************************************
@@ -59,15 +49,23 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QWidget>
+#include <QMouseEvent>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MNE INCLUDES
+// DEFINE NAMESPACE XDISPLIB
 //=============================================================================================================
 
-#include <fiff/fiff.h>
+namespace DISPLIB
+{
 
 
 //*************************************************************************************************************
@@ -75,96 +73,82 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
-using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEBrowseRawQt
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNEBrowseRawQt
-{
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STRUCTS
+//=============================================================================================================
+
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ProjectionModel
+* DECLARE CLASS RoundedEdgesWidget
+*
+* @brief The ProjectorWidget class provides a quick control widget for scaling, filtering, projector and view options
 */
-class ProjectionModel : public QAbstractTableModel
+class DISPSHARED_EXPORT RoundedEdgesWidget : public QWidget
 {
     Q_OBJECT
+
 public:
-    ProjectionModel(QObject *parent = 0);
-    ProjectionModel(QObject *parent, QFile& qFile);
-    ProjectionModel(QObject *parent, QList<FiffProj>& dataProjs);
+    typedef QSharedPointer<RoundedEdgesWidget> SPtr;              /**< Shared pointer type for RoundedEdgesWidget. */
+    typedef QSharedPointer<const RoundedEdgesWidget> ConstSPtr;   /**< Const shared pointer type for RoundedEdgesWidget. */
 
     //=========================================================================================================
     /**
-    * Reimplemented virtual functions
-    */
-    virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
-    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
-    virtual Qt::ItemFlags flags(const QModelIndex & index) const;
-    virtual bool insertRows(int position, int span, const QModelIndex & parent = QModelIndex());
-    virtual bool removeRows(int position, int span, const QModelIndex & parent = QModelIndex());
-
-    //=========================================================================================================
-    /**
-    * loadProjections loads projections from a fif file
+    * Constructs a RoundedEdgesWidget which is a child of parent.
     *
-    * @param qFile fiff data file containing the projections
+    * @param [in] parent    parent of widget
     */
-    bool loadProjections(QFile& qFile);
+    RoundedEdgesWidget(QWidget *parent = 0, Qt::WindowFlags f = 0);
 
     //=========================================================================================================
     /**
-    * saveProjections saves projections to a fif file
-    *
-    * @param qFile fiff data file containing the projections
+    * Destructs a RoundedEdgesWidget
     */
-    bool saveProjections(QFile& qFile);
-
-    //=========================================================================================================
-    /**
-    * addProjections adds projections to the data
-    *
-    * @param dataProjs fiff list with already loaded projectors.
-    */
-    void addProjections(const QList<FiffProj>& dataProjs);
-
-    //=========================================================================================================
-    /**
-    * addProjections adds projections to the data
-    *
-    * @param fiffInfo fiff info with already loaded projectors.
-    */
-    void addProjections(FiffInfo::SPtr pFiffInfo);
-
-    //=========================================================================================================
-    /**
-    * clearModel clears all model's members
-    */
-    void clearModel();
-
-    bool                        m_bFileloaded;          /**< true when a Fiff evoked file is loaded. */
+    ~RoundedEdgesWidget();
 
 protected:
-    QList<FiffProj>             m_dataProjs;            /**< current projector data. */
-
-signals:
     //=========================================================================================================
     /**
-    * fileLoaded is emitted whenever a file was (tried) to be loaded
+    * Reimplmented mouseMoveEvent.
     */
-    void fileLoaded(bool);
+    void mouseMoveEvent(QMouseEvent *event);
+
+    //=========================================================================================================
+    /**
+    * Reimplmented mouseMoveEvent.
+    */
+    void mousePressEvent(QMouseEvent *event);
+
+    //=========================================================================================================
+    /**
+    * Reimplmented mouseMoveEvent.
+    */
+    void resizeEvent(QResizeEvent *event);
+
+    //=========================================================================================================
+    /**
+    * Calculates a rect with rounded edged.
+    *
+    * @param [in] rect the rect which is supposed to be rounded.
+    * @param [in] r the radius of round edges.
+    * @return the rounded rect in form of a QRegion
+    */
+    QRegion roundedRect(const QRect& rect, int r);
+
+private:
+    QPoint      m_dragPosition;     /**< the drag position of the window */
 };
 
-} // NAMESPACE
+} // NAMESPACE DISPLIB
 
 
-
-#endif // PROJECTIONMODEL_H
+#endif // ROUNDEDEDGESWIDGET_H

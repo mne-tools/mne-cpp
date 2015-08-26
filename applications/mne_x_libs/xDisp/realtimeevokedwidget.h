@@ -46,11 +46,11 @@
 #include "newmeasurementwidget.h"
 #include "helpers/realtimeevokedmodel.h"
 #include "helpers/realtimebutterflyplot.h"
-#include "helpers/selectionmanagerwindow.h"
-#include "helpers/chinfomodel.h"
+#include "disp/selectionmanagerwindow.h"
+#include "disp/helpers/chinfomodel.h"
 #include "helpers/quickcontrolwidget.h"
-#include "helpers/averagescene.h"
-#include "helpers/averagesceneitem.h"
+#include "disp/helpers/averagescene.h"
+#include "disp/helpers/averagesceneitem.h"
 #include "disp/filterwindow.h"
 
 
@@ -104,6 +104,7 @@ struct Modality;
 //=============================================================================================================
 
 using namespace XMEASLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
