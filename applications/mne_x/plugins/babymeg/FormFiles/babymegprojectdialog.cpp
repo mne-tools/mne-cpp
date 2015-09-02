@@ -126,6 +126,10 @@ BabyMEGProjectDialog::BabyMEGProjectDialog(BabyMEG* p_pBabyMEG, QWidget *parent)
 //    QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
 //                                              tr("User name:"), QLineEdit::Normal,
 //                                              QDir::home().dirName(), &ok);
+
+    //Hide delete buttons
+    ui.m_qPushButtonDeleteProject->hide();
+    ui.m_qPushButtonDeleteSubject->hide();
 }
 
 
