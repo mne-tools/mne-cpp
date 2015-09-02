@@ -88,15 +88,15 @@ else {
 }
 
 SOURCES += \
-    helpers\colormap.cpp \
+    helpers/colormap.cpp \
     imagesc.cpp \
     plot.cpp \
     graph.cpp \
     rtplot.cpp \
     filterwindow.cpp \
-    helpers\layoutscene.cpp \
-    helpers\averagescene.cpp \
-    helpers\averagesceneitem.cpp \
+    helpers/layoutscene.cpp \
+    helpers/averagescene.cpp \
+    helpers/averagesceneitem.cpp \
     helpers/filterdatadelegate.cpp \
     helpers/filterdatamodel.cpp \
     helpers/averagescene.cpp \
@@ -112,15 +112,15 @@ SOURCES += \
 
 HEADERS += \
     disp_global.h \
-    helpers\colormap.h \
+    helpers/colormap.h \
     imagesc.h \
     plot.h \
     graph.h \
     rtplot.h \
     filterwindow.h \
-    helpers\layoutscene.h \
-    helpers\averagescene.h \
-    helpers\averagesceneitem.h \
+    helpers/layoutscene.h \
+    helpers/averagescene.h \
+    helpers/averagesceneitem.h \
     helpers/filterdatadelegate.h \
     helpers/filterdatamodel.h \
     helpers/averagescene.h \
