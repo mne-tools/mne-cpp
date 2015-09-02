@@ -128,8 +128,8 @@ BabyMEGProjectDialog::BabyMEGProjectDialog(BabyMEG* p_pBabyMEG, QWidget *parent)
 //                                              QDir::home().dirName(), &ok);
 
     //Hide delete buttons
-    ui.m_qPushButtonDeleteProject->hide();
-    ui.m_qPushButtonDeleteSubject->hide();
+    ui->m_qPushButtonDeleteProject->hide();
+    ui->m_qPushButtonDeleteSubject->hide();
 }
 
 
