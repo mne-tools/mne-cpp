@@ -116,8 +116,8 @@ int main(int argc, char* argv[])
     // Camera
     Qt3D::QCamera *cameraEntity = new Qt3D::QCamera(rootEntity);
 
-    cameraEntity->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.1f, 1000.0f);
-    cameraEntity->setPosition(QVector3D(0, 0, -40.0f));
+    cameraEntity->lens()->setPerspectiveProjection(40.0f, 16.0f/9.0f, 0.1f, 1000.0f);
+    cameraEntity->setPosition(QVector3D( 0, 0, -1.0f));
     cameraEntity->setUpVector(QVector3D(0, 1, 0));
     cameraEntity->setViewCenter(QVector3D(0, 0, 0));
     input->setCamera(cameraEntity);
@@ -178,7 +178,7 @@ int main(int argc, char* argv[])
         // Vector Normal
         QVector3D n(t_ForwardSolution.src[0].nn(i,0), t_ForwardSolution.src[0].nn(i,1), t_ForwardSolution.src[0].nn(i,2));
 
-        if(color_debug_count % 4 == 0)
+        if(color_debug_count % 2 == 0)
         {
             vertices << v << n << white;
         }
