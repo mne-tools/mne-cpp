@@ -163,9 +163,9 @@ public:
 
     void changeStimChannel(qint32 index);
 
-    void changePreStim(qint32 samples);
+    void changePreStim(qint32 mseconds);
 
-    void changePostStim(qint32 samples);
+    void changePostStim(qint32 mseconds);
 
     void appendEvoked(FiffEvoked::SPtr p_pEvoked);
 
