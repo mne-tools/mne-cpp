@@ -66,7 +66,7 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
     }
 
     QLabel* t_pLabelPreStim = new QLabel;
-    t_pLabelPreStim->setText("Pre-Stimulus Samples");
+    t_pLabelPreStim->setText("Pre-Stimulus in ms");
     t_pGridLayout->addWidget(t_pLabelPreStim,2,0,1,2);
 
     m_pSpinBoxPreStimSamples = new QSpinBox;
@@ -78,7 +78,7 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
     t_pGridLayout->addWidget(m_pSpinBoxPreStimSamples,2,2,1,1);
 
     QLabel* t_pLabelPostStim = new QLabel;
-    t_pLabelPostStim->setText("Post-Stimulus Samples");
+    t_pLabelPostStim->setText("Post-Stimulus in ms");
     t_pGridLayout->addWidget(t_pLabelPostStim,3,0,1,2);
 
     m_pSpinBoxPostStimSamples = new QSpinBox;

@@ -262,10 +262,11 @@ void Averaging::changeStimChannel(qint32 index)
 
 //*************************************************************************************************************
 
-void Averaging::changePreStim(qint32 samples)
+void Averaging::changePreStim(qint32 mseconds)
 {
     QMutexLocker locker(&m_qMutex);
-    m_iPreStimSamples = samples;
+    m_iPreStimSamples = ((float)mseconds/1000)*m_pFiffInfo->sfreq;
+    qDebug()<<m_iPreStimSamples;
     if(m_pRtAve)
         m_pRtAve->setPreStim(m_iPreStimSamples);
 
@@ -274,10 +275,11 @@ void Averaging::changePreStim(qint32 samples)
 
 //*************************************************************************************************************
 
-void Averaging::changePostStim(qint32 samples)
+void Averaging::changePostStim(qint32 mseconds)
 {
     QMutexLocker locker(&m_qMutex);
-    m_iPostStimSamples = samples;
+    m_iPostStimSamples = ((float)mseconds/1000)*m_pFiffInfo->sfreq;
+    qDebug()<<m_iPostStimSamples;
     if(m_pRtAve)
         m_pRtAve->setPostStim(m_iPostStimSamples);
 }
