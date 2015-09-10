@@ -209,6 +209,8 @@ private:
 
     qint32 m_iPreStimSamples;
     qint32 m_iPostStimSamples;
+    qint32 m_iPreStimSeconds;
+    qint32 m_iPostStimSeconds;
 
     qint32 m_iNumAverages;
 
