@@ -80,6 +80,9 @@ RtAve::RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStim
 , m_bIsRunning(false)
 , m_bAutoAspect(true)
 , m_fTriggerThreshold(0.02)
+, m_bFillingBackBuffer(false)
+, m_iTriggerIndex(306)
+, m_iTriggerPos(-1)
 {
     qRegisterMetaType<FiffEvoked::SPtr>("FiffEvoked::SPtr");
 }
@@ -138,6 +141,16 @@ void RtAve::setPostStim(qint32 samples)
 
 //*************************************************************************************************************
 
+void RtAve::setTriggerChIndx(qint32 idx)
+{
+    m_iNewTriggerIndex = idx;
+
+    qDebug()<<"m_iTriggerIndex"<<m_iTriggerIndex;
+}
+
+
+//*************************************************************************************************************
+
 bool RtAve::start()
 {
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
@@ -174,12 +187,10 @@ bool RtAve::stop()
 
 void RtAve::run()
 {
-    // Inits & Clears
+    //Inits & Clears
     m_qMutex.lock();
-
     m_qListStimAve.clear();
 
-    // Init
     MatrixXd t_mat;
     QList<int> tempList;
 
@@ -192,16 +203,16 @@ void RtAve::run()
 
     float T = 1.0/m_pFiffInfo->sfreq;
 
-    FiffEvoked t_stimEvoked;
-    t_stimEvoked.setInfo(*m_pFiffInfo.data());
-    t_stimEvoked.nave = m_iNumAverages;
-    t_stimEvoked.aspect_kind = FIFFV_ASPECT_AVERAGE;
-    t_stimEvoked.times.resize(m_iPreStimSamples+m_iPostStimSamples);
-    t_stimEvoked.times[0] = -T*m_iPreStimSamples;
-    for(int i = 1; i < t_stimEvoked.times.size(); ++i)
-        t_stimEvoked.times[i] = t_stimEvoked.times[i-1] + T;
-    t_stimEvoked.first = t_stimEvoked.times[0];
-    t_stimEvoked.last = t_stimEvoked.times[t_stimEvoked.times.size()-1];
+    m_pStimEvoked = FiffEvoked::SPtr(new FiffEvoked);
+    m_pStimEvoked->setInfo(*m_pFiffInfo.data());
+    m_pStimEvoked->nave = m_iNumAverages;
+    m_pStimEvoked->aspect_kind = FIFFV_ASPECT_AVERAGE;
+    m_pStimEvoked->times.resize(m_iPreStimSamples+m_iPostStimSamples);
+    m_pStimEvoked->times[0] = -T*m_iPreStimSamples;
+    for(int i = 1; i < m_pStimEvoked->times.size(); ++i)
+        m_pStimEvoked->times[i] = m_pStimEvoked->times[i-1] + T;
+    m_pStimEvoked->first = m_pStimEvoked->times[0];
+    m_pStimEvoked->last = m_pStimEvoked->times[m_pStimEvoked->times.size()-1];
 
     m_iNewPreStimSamples = m_iPreStimSamples;
     m_iNewPostStimSamples = m_iPostStimSamples;
@@ -211,66 +222,76 @@ void RtAve::run()
     //Enter the main loop
     while(m_bIsRunning)
     {
-        qDebug()<<"Running";
-
         bool doProcessing = false;
 
         if(m_pRawMatrixBuffer)
             doProcessing = true;
 
         if(doProcessing) {
-            // Reset when stim size changed
+            //Reset when stim size changed
             m_qMutex.lock();
-            if(m_iNewPreStimSamples != m_iPreStimSamples || m_iNewPostStimSamples != m_iPostStimSamples)
+            if(m_iNewPreStimSamples != m_iPreStimSamples
+                    || m_iNewPostStimSamples != m_iPostStimSamples
+                    || m_iNewTriggerIndex != m_iTriggerIndex)
             {
                 m_iPreStimSamples = m_iNewPreStimSamples;
                 m_iPostStimSamples = m_iNewPostStimSamples;
+                m_iTriggerIndex = m_iNewTriggerIndex;
 
-                // Full real-time evoked response
-                t_stimEvoked.times.resize(m_iPreStimSamples+m_iPostStimSamples);
-                t_stimEvoked.times[0] = -T*m_iPreStimSamples;
-                for(int i = 1; i < t_stimEvoked.times.size(); ++i)
-                    t_stimEvoked.times[i] = t_stimEvoked.times[i-1] + T;
-                t_stimEvoked.first = t_stimEvoked.times[0];
-                t_stimEvoked.last = t_stimEvoked.times[t_stimEvoked.times.size()-1];
+                //Full real-time evoked response
+                m_pStimEvoked->times.resize(m_iPreStimSamples+m_iPostStimSamples);
+                m_pStimEvoked->times[0] = -T*m_iPreStimSamples;
+                for(int i = 1; i < m_pStimEvoked->times.size(); ++i)
+                    m_pStimEvoked->times[i] = m_pStimEvoked->times[i-1] + T;
+                m_pStimEvoked->first = m_pStimEvoked->times[0];
+                m_pStimEvoked->last = m_pStimEvoked->times[m_pStimEvoked->times.size()-1];
 
                 m_qListStimAve.clear();
                 m_matBufferFront.clear();
+                m_matBufferBack.clear();
+
+                m_bFillingBackBuffer = false;
             }
             m_qMutex.unlock();
 
-            // Acquire Data
+            //Acquire Data
             MatrixXd rawSegment = m_pRawMatrixBuffer->pop();
             m_iCurrentBlockSize = rawSegment.cols();
 
-            // Clear old detected triggers
-            clearDetectedTriggers();
+            //Fill back buffer and decide when to do the data packing of the different buffers
+            if(m_bFillingBackBuffer) {
+                if(fillBackBuffer(rawSegment) == m_iPostStimSamples) {
+                    //Calculate the average
+                    mergeData();
 
-            // Detect trigger for all stim channels
-            if(DetectTrigger::detectTriggerFlanksMax(rawSegment, m_qMapDetectedTrigger, 0, m_fTriggerThreshold, true)) {
-                // If triggers were detected
+                    //Clear data
+                    m_matBufferBack.clear();
+                    m_matBufferFront.clear();
+
+                    //Calculate the actual average data
+                    generateEvoked();
+
+                    //If number of averages was reached emit new average
+                    if(m_qListStimAve.size() == m_iNumAverages)
+                        emit evokedStim(m_pStimEvoked);
+
+                    m_bFillingBackBuffer = false;
+                }
 
             } else {
-                // If no triggers were detected
+                clearDetectedTriggers();
+
+                //Detect trigger for all stim channels. If detected turn on filling of the back / post stim buffer
+                if(DetectTrigger::detectTriggerFlanksMax(rawSegment, m_iTriggerIndex, m_iTriggerPos, 0, m_fTriggerThreshold, true)) {
+                    m_matStimData = rawSegment;
+                    m_bFillingBackBuffer = true;
+                }
+
+                qDebug()<<"Trigger channel "<<m_iTriggerIndex<<"found at "<<m_iTriggerPos;
+
+                //Fill front / pre stim buffer
+                fillFrontBuffer(rawSegment);
             }
-
-            // DEBUG - Detect trigger for all stim channels
-            QMutableMapIterator<int,QList<int> > iteratorDetectedTrigger(m_qMapDetectedTrigger);
-            while (iteratorDetectedTrigger.hasNext()) {
-                iteratorDetectedTrigger.next();
-                qDebug()<<"Channel "<<iteratorDetectedTrigger.key()<<" has "<<iteratorDetectedTrigger.value().size()<<" triggers";
-                iteratorDetectedTrigger.value().clear();
-            }
-
-            // Fill front/pre stim buffer
-            fillFrontBuffer(rawSegment);
-
-//            // Emit final evoked
-//            FiffEvoked::SPtr t_pEvokedStim(new FiffEvoked(t_stimEvoked));
-//            t_pEvokedStim->nave = m_iNumAverages;
-//            t_pEvokedStim->comment = t_sStimChName;
-//            t_pEvokedStim->data = m_qListStimAve[t_iStimIndex];
-//            emit evokedStim(t_pEvokedStim);
         }
     }
 }
@@ -285,6 +306,30 @@ void RtAve::clearDetectedTriggers()
         i.next();
         i.value().clear();
     }
+}
+
+
+//*************************************************************************************************************
+
+int RtAve::fillBackBuffer(MatrixXd &data)
+{
+    int iTotalBufSize = 0;
+    int iResidualCols = data.cols();
+    for(int i = 0; i < m_matBufferBack.size(); i++)
+        iTotalBufSize += m_matBufferBack.at(i).cols();
+
+    if(iTotalBufSize < m_iPostStimSamples) {
+        if(iTotalBufSize+data.cols() > m_iPostStimSamples) {
+            iResidualCols = m_iPostStimSamples-iTotalBufSize;
+            m_matBufferBack.append(data.block(0,0,data.cols(),iResidualCols));
+        } else
+            m_matBufferBack.append(data);
+    }
+
+    //DEBUG
+    qDebug()<<"m_matBufferBack: "<<iTotalBufSize+iResidualCols;
+
+    return iTotalBufSize+iResidualCols;
 }
 
 
@@ -309,9 +354,51 @@ void RtAve::fillFrontBuffer(MatrixXd &data)
         }
     }
 
+    // DEBUG - Check total data length of front buffer
     int size = 0;
     for(int i = 0; i<m_matBufferFront.size(); i++)
-        size+=m_matBufferFront.at(i).cols();
+        size += m_matBufferFront.at(i).cols();
+    qDebug()<<"m_matBufferFront: "<<size;
+}
 
-    qDebug()<<size;
+
+//*************************************************************************************************************
+
+void RtAve::mergeData()
+{
+    int rows = m_matStimData.rows();
+    MatrixXd cutData(rows, m_iPreStimSamples+m_iPostStimSamples);
+    MatrixXd mergedData(rows, (m_iPreStimSamples+m_iPostStimSamples)*2);
+
+    for(int i = 0; i < m_matBufferFront.size(); i++)
+        mergedData.block(0,i*m_iCurrentBlockSize,rows,m_matBufferFront.at(i).cols()) =  m_matBufferFront.at(i);
+
+    mergedData.block(0,m_iPreStimSamples,rows,m_matStimData.cols()) =  m_matStimData;
+
+    for(int i = 0; i < m_matBufferBack.size(); i++)
+        mergedData.block(0,m_iPreStimSamples+m_matStimData.cols()+i*m_iCurrentBlockSize,rows,m_matBufferBack.at(i).cols()) =  m_matBufferBack.at(i);
+
+    cutData = mergedData.block(0,m_iPreStimSamples+m_iTriggerPos-m_iPreStimSamples,rows,m_iPreStimSamples+m_iPostStimSamples);
+
+    //Add cut data to average buffer
+    m_qListStimAve.append(cutData);
+    if(m_qListStimAve.size()>m_iNumAverages)
+        m_qListStimAve.pop_front();
+}
+
+
+//*************************************************************************************************************
+
+void RtAve::generateEvoked()
+{
+    // Emit final evoked
+    MatrixXd finalAverage = MatrixXd::Zero(m_matStimData.rows(), m_iPreStimSamples+m_iPostStimSamples);
+
+    for(int i = 0; i<m_qListStimAve.size(); i++) {
+        finalAverage += m_qListStimAve.at(i);
+    }
+    finalAverage = finalAverage/m_qListStimAve.size();
+
+    m_pStimEvoked->nave = m_iNumAverages;
+    m_pStimEvoked->data = finalAverage;
 }

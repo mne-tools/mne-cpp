@@ -67,7 +67,7 @@ bool DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data, QMap<int,QList<
 {
     bool bFoundTrigger = false;
 
-    //TODO: This only can detect one trigger per data block. What iff there are more than one trigger in the data block?
+    //TODO: This only can detect one trigger per data block. What if there are more than one trigger in the data block?
     QMapIterator<int,QList<int> > i(qMapDetectedTrigger);
     while (i.hasNext()) {
 //        QTime time;
@@ -106,7 +106,7 @@ bool DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data, int iTriggerCha
 {
     bool bFoundTrigger = false;
 
-    //TODO: This only can detect one trigger per data block. What iff there are more than one trigger in the data block?
+    //TODO: This only can detect one trigger per data block. What if there are more than one trigger in the data block?
 //        QTime time;
 //        time.start();
 

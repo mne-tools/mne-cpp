@@ -256,6 +256,9 @@ void Averaging::changeStimChannel(qint32 index)
     Q_UNUSED(index)
     QMutexLocker locker(&m_qMutex);
     m_iStimChan = m_pAveragingWidget->m_pComboBoxChSelection->currentData().toInt();
+
+    m_pRtAve->setTriggerChIndx(m_qListStimChs.at(index));
+
 //    qDebug() << "Averaging::changeStimChannel(qint32 index)" << m_pAveragingWidget->m_pComboBoxChSelection->currentData().toInt();
 }
 
@@ -380,14 +383,14 @@ void Averaging::appendEvoked(FiffEvoked::SPtr p_pEvoked)
 //    qDebug() << p_pEvoked->comment;
     QString t_sStimulusChannel = m_pFiffInfo->chs[m_qListStimChs[m_iStimChan]].ch_name;
 
-    if(p_pEvoked->comment == t_sStimulusChannel)
-    {
+//    if(p_pEvoked->comment == t_sStimulusChannel)
+//    {
 //        qDebug()<< "append" << p_pEvoked->comment << "=" << t_sStimulusChannel;
         m_qMutex.lock();
         m_qVecEvokedData.push_back(p_pEvoked);
         m_qMutex.unlock();
 //        qDebug() << "append after" << m_qVecEvokedData.size();
-    }
+//    }
 }
 
 

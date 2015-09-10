@@ -166,6 +166,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the index of the trigger channel which is to be scanned fo triggers
+    *
+    * @param[in] idx    trigger channel index
+    */
+    void setTriggerChIndx(qint32 idx);
+
+    //=========================================================================================================
+    /**
     * Starts the RtAve by starting the producer's thread.
     */
     virtual bool start();
@@ -187,22 +195,6 @@ public:
     inline bool isRunning();
 
 signals:
-    //=========================================================================================================
-    /**
-    * Signal which is emitted when new evoked pre stimulus data are available.
-    *
-    * @param[out] p_pEvokedPreStim     The evoked pre stimulus data
-    */
-    void evokedPreStim(FIFFLIB::FiffEvoked::SPtr p_pEvokedPreStim);
-
-    //=========================================================================================================
-    /**
-    * Signal which is emitted when new evoked post stimulus data are available.
-    *
-    * @param[out] p_pEvokedPostStim     The evoked post stimulus data
-    */
-    void evokedPostStim(FIFFLIB::FiffEvoked::SPtr p_pEvokedPostStim);
-
     //=========================================================================================================
     /**
     * Signal which is emitted when new evoked stimulus data are available.
@@ -229,7 +221,10 @@ protected:
 private:
     void clearDetectedTriggers();       /**< Clears already detected trigger*/
 
-    void fillFrontBuffer(MatrixXd &data);             /**< Prepends incoming data to front/pre stim buffer*/
+    void fillFrontBuffer(MatrixXd &data);           /**< Prepends incoming data to front/pre stim buffer*/
+    int fillBackBuffer(MatrixXd &data);             /**< Prepends incoming data to back/post stim buffer*/
+    void mergeData();                               /**< Packs the buffers togehter as one and calcualtes the current running average and emits the result if number of averages has been reached*/
+    void generateEvoked();                          /**< Generates the final evoke variable*/
 
     QMutex  m_qMutex;                   /**< Provides access serialization between threads*/
 
@@ -240,19 +235,27 @@ private:
     qint32  m_iNewPreStimSamples;       /**< New amount of samples averaged before the stimulus. */
     qint32  m_iNewPostStimSamples;      /**< New amount of samples averaged after the stimulus, including the stimulus sample.*/
     qint32  m_iCurrentMatBufferIndex;   /**< Current index inside of the matrix buffer m_matBuffer */
+    qint32  m_iTriggerIndex;
+    qint32  m_iNewTriggerIndex;
+    qint32  m_iTriggerPos;
 
     float   m_fTriggerThreshold;        /**< Threshold to detect trigger */
 
     bool    m_bIsRunning;               /**< Holds if real-time Covariance estimation is running.*/
     bool    m_bAutoAspect;              /**< Auto aspect detection on or off. */
+    bool    m_bFillingBackBuffer;
 
-    FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
+    FiffInfo::SPtr      m_pFiffInfo;        /**< Holds the fiff measurement information. */
+    FiffEvoked::SPtr    m_pStimEvoked;
 
     CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
 
     QMap<int,QList<int> >   m_qMapDetectedTrigger;      /**< Detected trigger for each trigger channel. */
-    QList<MatrixXd>         m_matBufferFront;           /**< the data buffer for each trigger channel. This buffer and its including matrices should always sum up to m_iPreStimSamples columns */
-    QList<MatrixXd>         m_qListStimAve;             /**< the current stimulus average */
+
+    MatrixXd                m_matStimData;              /**< The matrix data correspdoning to the latest detected stim event. */
+    QList<MatrixXd>         m_matBufferFront;           /**< the front/pre stim data buffer for each trigger channel. This buffer and its including matrices should always sum up to m_iPreStimSamples columns */
+    QList<MatrixXd>         m_matBufferBack;            /**< the back/post stim data buffer for each trigger channel. This buffer and its including matrices should always sum up to m_iPostStimSamples columns */
+    QList<MatrixXd>         m_qListStimAve;             /**< the current stimulus average buffer. Holds m_iNumAverages vectors */
 };
 
 //*************************************************************************************************************
