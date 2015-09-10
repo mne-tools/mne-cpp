@@ -79,8 +79,8 @@ Averaging::Averaging()
 , m_pAveragingBuffer(CircularMatrixBuffer<double>::SPtr())
 , m_bIsRunning(false)
 , m_bProcessData(false)
-, m_iPreStimSamples(400)
-, m_iPostStimSamples(750)
+, m_iPreStimSeconds(100)
+, m_iPostStimSeconds(400)
 , m_iNumAverages(10)
 , m_iStimChan(0)
 , m_pAveragingWidget(AveragingSettingsWidget::SPtr())
@@ -129,8 +129,8 @@ void Averaging::init()
     // Load Settings
     //
     QSettings settings;
-    m_iPreStimSamples = settings.value(QString("Plugin/%1/preStimSamples").arg(this->getName()), 400).toInt();
-    m_iPostStimSamples = settings.value(QString("Plugin/%1/postStimSamples").arg(this->getName()), 750).toInt();
+    m_iPreStimSeconds = settings.value(QString("Plugin/%1/preStimSeconds").arg(this->getName()), 100).toInt();
+    m_iPostStimSeconds = settings.value(QString("Plugin/%1/postStimSeconds").arg(this->getName()), 400).toInt();
     m_iNumAverages = settings.value(QString("Plugin/%1/numAverages").arg(this->getName()), 10).toInt();
     m_iStimChan = settings.value(QString("Plugin/%1/stimChannel").arg(this->getName()), 0).toInt();
 
@@ -161,8 +161,8 @@ void Averaging::unload()
     // Store Settings
     //
     QSettings settings;
-    settings.setValue(QString("Plugin/%1/preStimSamples").arg(this->getName()), m_iPreStimSamples);
-    settings.setValue(QString("Plugin/%1/postStimSamples").arg(this->getName()), m_iPostStimSamples);
+    settings.setValue(QString("Plugin/%1/preStimSeconds").arg(this->getName()), m_iPreStimSeconds);
+    settings.setValue(QString("Plugin/%1/postStimSeconds").arg(this->getName()), m_iPostStimSeconds);
     settings.setValue(QString("Plugin/%1/numAverages").arg(this->getName()), m_iNumAverages);
     settings.setValue(QString("Plugin/%1/stimChannel").arg(this->getName()), m_iStimChan);
 }
@@ -265,6 +265,7 @@ void Averaging::changeStimChannel(qint32 index)
 void Averaging::changePreStim(qint32 mseconds)
 {
     QMutexLocker locker(&m_qMutex);
+    m_iPreStimSeconds = mseconds;
     m_iPreStimSamples = ((float)mseconds/1000)*m_pFiffInfo->sfreq;
     qDebug()<<m_iPreStimSamples;
     if(m_pRtAve)
@@ -278,6 +279,7 @@ void Averaging::changePreStim(qint32 mseconds)
 void Averaging::changePostStim(qint32 mseconds)
 {
     QMutexLocker locker(&m_qMutex);
+    m_iPostStimSeconds = mseconds;
     m_iPostStimSamples = ((float)mseconds/1000)*m_pFiffInfo->sfreq;
     qDebug()<<m_iPostStimSamples;
     if(m_pRtAve)
@@ -399,6 +401,9 @@ void Averaging::run()
     //
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
+
+    m_iPreStimSamples = ((float)m_iPreStimSeconds/1000)*m_pFiffInfo->sfreq;
+    m_iPostStimSamples = ((float)m_iPostStimSeconds/1000)*m_pFiffInfo->sfreq;
 
     m_pActionShowAdjustment->setVisible(true);
 
