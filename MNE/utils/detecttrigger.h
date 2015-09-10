@@ -121,7 +121,7 @@ public:
     * detectTriggerFlanks detects flanks from a given data matrix in row wise order. This function uses a simple maxCoeff function implemented by eigen to locate the triggers.
     *
     * @param[in]    data  the data used to find the trigger flanks
-    * @param[out]   iTriggerChannelIdx  This map holds the indices of the channels which are to be read from data. For each index/channel the found triggers are written to the value of the map.
+    * @param[in]    iTriggerChannelIdx  the index of the trigger channel in the matrix.
     * @param[out]   iDetectedTrigger The detected trigger
     * @param[in]    iOffsetIndex  the offset index gets added to the found trigger flank index
     * @param[in]    iThreshold  the signal threshold value used to find the trigger flank
