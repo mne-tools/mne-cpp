@@ -243,7 +243,8 @@ private:
 
     bool    m_bIsRunning;               /**< Holds if real-time Covariance estimation is running.*/
     bool    m_bAutoAspect;              /**< Auto aspect detection on or off. */
-    bool    m_bFillingBackBuffer;
+    bool    m_bFillingBackBuffer;       /**< Whether the back buffer is currently getting filled. */
+    bool    m_bRunningAverage;          /**< Whether the running average is to be calculated. */
 
     FiffInfo::SPtr      m_pFiffInfo;        /**< Holds the fiff measurement information. */
     FiffEvoked::SPtr    m_pStimEvoked;

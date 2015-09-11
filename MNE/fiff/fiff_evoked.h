@@ -206,6 +206,14 @@ public:
     */
     void setInfo(FiffInfo &p_info, bool proj = true);
 
+    //=========================================================================================================
+    /**
+    * Inputs a new data set and recalculates the average. This function also iterates the nave parameter
+    *
+    * @param[in] newData     the new data set which is to be added to the current average
+    */
+    FiffEvoked & operator+=(const MatrixXd &newData);
+
 public:
     FiffInfo    info;           /**< Measurement info. */
     fiff_int_t  nave;           /**< Number of averaged epochs. */

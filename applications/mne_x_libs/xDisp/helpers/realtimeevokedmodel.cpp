@@ -246,6 +246,8 @@ void RealTimeEvokedModel::setRTE(QSharedPointer<RealTimeEvoked> &pRTE)
 
     m_vecBadIdcs = sel;
 
+    m_fSps = m_pRTE->info()->sfreq;
+
     //Create the initial SSP projector
     updateProjection();
 
