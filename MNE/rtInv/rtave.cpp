@@ -83,6 +83,7 @@ RtAve::RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStim
 , m_bFillingBackBuffer(false)
 , m_iTriggerIndex(306)
 , m_iTriggerPos(-1)
+, m_bRunningAverage(false)
 {
     qRegisterMetaType<FiffEvoked::SPtr>("FiffEvoked::SPtr");
 }
@@ -205,7 +206,7 @@ void RtAve::run()
 
     m_pStimEvoked = FiffEvoked::SPtr(new FiffEvoked);
     m_pStimEvoked->setInfo(*m_pFiffInfo.data());
-    m_pStimEvoked->nave = m_iNumAverages;
+    m_pStimEvoked->nave = 0;
     m_pStimEvoked->aspect_kind = FIFFV_ASPECT_AVERAGE;
     m_pStimEvoked->times.resize(m_iPreStimSamples+m_iPostStimSamples);
     m_pStimEvoked->times[0] = -T*m_iPreStimSamples;
@@ -261,25 +262,31 @@ void RtAve::run()
             //Fill back buffer and decide when to do the data packing of the different buffers
             if(m_bFillingBackBuffer) {
                 if(fillBackBuffer(rawSegment) == m_iPostStimSamples) {
-                    //Calculate the average
+                    //Merge the different buffers
                     mergeData();
 
                     //Clear data
                     m_matBufferBack.clear();
                     m_matBufferFront.clear();
 
-                    //Calculate the actual average data
+                    //Calculate the actual average
                     generateEvoked();
 
                     //If number of averages was reached emit new average
-                    if(m_qListStimAve.size() == m_iNumAverages)
+                    if(m_qListStimAve.size() == m_iNumAverages && m_bRunningAverage) {
+                        m_pStimEvoked->nave = m_iNumAverages;
+                        emit evokedStim(m_pStimEvoked);
+                    }
+                    else if(m_qListStimAve.size()>0)
                         emit evokedStim(m_pStimEvoked);
 
                     m_bFillingBackBuffer = false;
                 }
-
             } else {
                 clearDetectedTriggers();
+
+                //Fill front / pre stim buffer
+                fillFrontBuffer(rawSegment);
 
                 //Detect trigger for all stim channels. If detected turn on filling of the back / post stim buffer
                 if(DetectTrigger::detectTriggerFlanksMax(rawSegment, m_iTriggerIndex, m_iTriggerPos, 0, m_fTriggerThreshold, true)) {
@@ -287,10 +294,8 @@ void RtAve::run()
                     m_bFillingBackBuffer = true;
                 }
 
-                qDebug()<<"Trigger channel "<<m_iTriggerIndex<<"found at "<<m_iTriggerPos;
+                qDebug()<<"Trigger channel "<<m_iTriggerIndex<<" found at "<<m_iTriggerPos;
 
-                //Fill front / pre stim buffer
-                fillFrontBuffer(rawSegment);
             }
         }
     }
@@ -368,7 +373,7 @@ void RtAve::mergeData()
 {
     int rows = m_matStimData.rows();
     MatrixXd cutData(rows, m_iPreStimSamples+m_iPostStimSamples);
-    MatrixXd mergedData(rows, (m_iPreStimSamples+m_iPostStimSamples)*2);
+    MatrixXd mergedData(rows, m_iPreStimSamples+m_iPostStimSamples+m_matStimData.cols());
 
     for(int i = 0; i < m_matBufferFront.size(); i++)
         mergedData.block(0,i*m_iCurrentBlockSize,rows,m_matBufferFront.at(i).cols()) =  m_matBufferFront.at(i);
@@ -382,7 +387,7 @@ void RtAve::mergeData()
 
     //Add cut data to average buffer
     m_qListStimAve.append(cutData);
-    if(m_qListStimAve.size()>m_iNumAverages)
+    if(m_qListStimAve.size()>m_iNumAverages && m_bRunningAverage)
         m_qListStimAve.pop_front();
 }
 
@@ -394,11 +399,18 @@ void RtAve::generateEvoked()
     // Emit final evoked
     MatrixXd finalAverage = MatrixXd::Zero(m_matStimData.rows(), m_iPreStimSamples+m_iPostStimSamples);
 
-    for(int i = 0; i<m_qListStimAve.size(); i++) {
-        finalAverage += m_qListStimAve.at(i);
-    }
-    finalAverage = finalAverage/m_qListStimAve.size();
+    if(m_bRunningAverage) {
+        for(int i = 0; i<m_qListStimAve.size(); i++) {
+            finalAverage += m_qListStimAve.at(i);
+        }
+        finalAverage = finalAverage/m_qListStimAve.size();
 
-    m_pStimEvoked->nave = m_iNumAverages;
-    m_pStimEvoked->data = finalAverage;
+        m_pStimEvoked->data = finalAverage;
+    } else {
+        *m_pStimEvoked.data() += m_qListStimAve.last();
+    }
+
+    qDebug()<<m_pStimEvoked->nave;
 }
+
+
