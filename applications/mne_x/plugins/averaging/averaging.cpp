@@ -267,6 +267,9 @@ void Averaging::changeStimChannel(qint32 index)
 
 void Averaging::changePreStim(qint32 mseconds)
 {
+    if(mseconds<10)
+        mseconds=10;
+
     QMutexLocker locker(&m_qMutex);
     m_iPreStimSeconds = mseconds;
     m_iPreStimSamples = ((float)mseconds/1000)*m_pFiffInfo->sfreq;
@@ -281,6 +284,9 @@ void Averaging::changePreStim(qint32 mseconds)
 
 void Averaging::changePostStim(qint32 mseconds)
 {
+    if(mseconds<10)
+        mseconds=10;
+
     QMutexLocker locker(&m_qMutex);
     m_iPostStimSeconds = mseconds;
     m_iPostStimSamples = ((float)mseconds/1000)*m_pFiffInfo->sfreq;
