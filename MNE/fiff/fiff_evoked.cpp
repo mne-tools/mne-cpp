@@ -5,11 +5,11 @@
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Septemeber, 2015
+* @date     September, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Christoph Dinh, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -529,16 +529,17 @@ void FiffEvoked::setInfo(FiffInfo &p_info, bool proj)
 
 FiffEvoked & FiffEvoked::operator+=(const MatrixXd &newData)
 {
+    //Init matrix if necessary
     if(nave == -1 || nave == 0)
         data = MatrixXd::Zero(newData.rows(),newData.cols());
 
     if(data.cols() == newData.cols() && data.rows() ==  newData.rows()) {
+        //Revert old averaging
         data = data*nave;
 
+        //Do new averaging
         data += newData;
-
         nave++;
-
         data /= nave;
     }
 

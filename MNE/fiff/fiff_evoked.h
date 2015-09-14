@@ -209,22 +209,25 @@ public:
 
     //=========================================================================================================
     /**
-    * Inputs a new data set and recalculates the average. This function also iterates the nave parameter
+    * Inputs a new data set and recalculates the average. This function also iterates the nave parameter by one.
     *
     * @param[in] newData     the new data set which is to be added to the current average
+    *
+    * @return the updated FiffEvoked
     */
     FiffEvoked & operator+=(const MatrixXd &newData);
 
 public:
-    FiffInfo    info;           /**< Measurement info. */
-    fiff_int_t  nave;           /**< Number of averaged epochs. */
-    fiff_int_t  aspect_kind;    /**< Aspect identifier, either FIFFV_ASPECT_AVERAGE or FIFFV_ASPECT_STD_ERR.  */
-    fiff_int_t  first;          /**< First time sample. */
-    fiff_int_t  last;           /**< Last time sample. */
-    QString     comment;        /**< Comment on dataset. Can be the condition. */
-    RowVectorXf times;          /**< Vector of time instants in seconds. */
-    MatrixXd    data;           /**< 2D array of shape [n_channels x n_times]; Evoked response. */
-    MatrixXd    proj;           /**< SSP projection */
+    FiffInfo    info;               /**< Measurement info. */
+    fiff_int_t  nave;               /**< Number of averaged epochs. */
+    fiff_int_t  aspect_kind;        /**< Aspect identifier, either FIFFV_ASPECT_AVERAGE or FIFFV_ASPECT_STD_ERR.  */
+    fiff_int_t  first;              /**< First time sample. */
+    fiff_int_t  last;               /**< Last time sample. */
+    QString     comment;            /**< Comment on dataset. Can be the condition. */
+    RowVectorXf times;              /**< Vector of time instants in seconds. */
+    MatrixXd    data;               /**< 2D array of shape [n_channels x n_times]; Evoked response. */
+    MatrixXd    proj;               /**< SSP projection */
+    QPair<QVariant,QVariant>    baseline;    /**< Baseline information */
 };
 
 //*************************************************************************************************************
