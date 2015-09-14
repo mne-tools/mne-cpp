@@ -44,6 +44,7 @@
 
 #include "rtinv_global.h"
 #include "Utils/detecttrigger.h"
+#include "Utils/mnemath.h"
 
 
 //*************************************************************************************************************
@@ -175,6 +176,30 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the baseline correction on or off
+    *
+    * @param[in] activate    activate baseline correction
+    */
+    void setBaselineActive(bool activate);
+
+    //=========================================================================================================
+    /**
+    * Sets the min of the baseline area
+    *
+    * @param[in] min    min of baseline area
+    */
+    void setBaselineMin(int min);
+
+    //=========================================================================================================
+    /**
+    * Sets the max of the baseline area
+    *
+    * @param[in] max    max of baseline area
+    */
+    void setBaselineMax(int max);
+
+    //=========================================================================================================
+    /**
     * Starts the RtAve by starting the producer's thread.
     */
     virtual bool start();
@@ -246,6 +271,9 @@ private:
     bool    m_bAutoAspect;              /**< Auto aspect detection on or off. */
     bool    m_bFillingBackBuffer;       /**< Whether the back buffer is currently getting filled. */
     bool    m_bRunningAverage;          /**< Whether the running average is to be calculated. */
+    bool    m_bDoBaselineCorrection;    /**< Whether to perform baseline correction. */
+
+    QPair<float,float> m_baseline;
 
     FiffInfo::SPtr      m_pFiffInfo;        /**< Holds the fiff measurement information. */
     FiffEvoked::SPtr    m_pStimEvoked;

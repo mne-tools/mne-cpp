@@ -186,6 +186,22 @@ public:
     */
     inline bool isInitialized() const;
 
+    //=========================================================================================================
+    /**
+    * Set baseline information
+    *
+    * @param [in] info             the min max information of the baseline
+    */
+    inline void setBaselineInfo(QPair<qint32,qint32> info);
+
+    //=========================================================================================================
+    /**
+    * Get baseline information
+    *
+    * @return the min max information of the baseline as a QPair
+    */
+    inline QPair<qint32,qint32> getBaselineInfo();
+
 private:
     //=========================================================================================================
     /**
@@ -210,6 +226,8 @@ private:
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
 
     bool                        m_bInitialized;     /**< If values are stored.*/
+
+    QPair<qint32,qint32>        m_pairBaseline;     /**< Baseline information min max.*/
 };
 
 
@@ -285,6 +303,22 @@ inline bool RealTimeEvoked::isInitialized() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_bInitialized;
+}
+
+
+//*************************************************************************************************************
+
+inline void RealTimeEvoked::setBaselineInfo(QPair<qint32,qint32> info)
+{
+    m_pairBaseline = info;
+}
+
+
+//*************************************************************************************************************
+
+inline QPair<qint32,qint32> RealTimeEvoked::getBaselineInfo()
+{
+    return m_pairBaseline;
 }
 
 } // NAMESPACE

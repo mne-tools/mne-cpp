@@ -53,11 +53,19 @@ signals:
 public slots:
 
 private:
+    void changePreStim(qint32 mSeconds);
+    void changePostStim(qint32 mSeconds);
+    void changeBaselineFrom(qint32 mSeconds);
+    void changeBaselineTo(qint32 mSeconds);
+
+
     QComboBox* m_pComboBoxChSelection;
     Averaging* m_pAveragingToolbox;
     QSpinBox* m_pSpinBoxNumAverages;
     QSpinBox* m_pSpinBoxPreStimSamples;
     QSpinBox* m_pSpinBoxPostStimSamples;
+    QSpinBox* m_pSpinBoxBaselineFrom;
+    QSpinBox* m_pSpinBoxBaselineTo;
 };
 
 } // NAMESPACE

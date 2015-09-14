@@ -84,6 +84,8 @@ RtAve::RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStim
 , m_iTriggerIndex(306)
 , m_iTriggerPos(-1)
 , m_bRunningAverage(false)
+, m_bDoBaselineCorrection(true)
+, m_baseline(qMakePair(0,m_iPreStimSamples))
 {
     qRegisterMetaType<FiffEvoked::SPtr>("FiffEvoked::SPtr");
 }
@@ -145,8 +147,49 @@ void RtAve::setPostStim(qint32 samples)
 void RtAve::setTriggerChIndx(qint32 idx)
 {
     m_iNewTriggerIndex = idx;
+}
 
-    qDebug()<<"m_iTriggerIndex"<<m_iTriggerIndex;
+
+//*************************************************************************************************************
+
+void RtAve::setBaselineActive(bool activate)
+{
+    m_bDoBaselineCorrection = activate;
+
+    if(!m_bDoBaselineCorrection)
+        m_pStimEvoked->baseline = qMakePair(QVariant("None"), QVariant("None"));
+}
+
+
+//*************************************************************************************************************
+
+void RtAve::setBaselineMin(int min)
+{
+    if(min<0)
+        m_baseline.first = 0;
+    else if(min>m_iPostStimSamples+m_iPreStimSamples)
+        m_baseline.first = m_iPostStimSamples+m_iPreStimSamples;
+    else
+        m_baseline.first = min;
+
+    if(m_bDoBaselineCorrection)
+        m_pStimEvoked->baseline = m_baseline;
+}
+
+
+//*************************************************************************************************************
+
+void RtAve::setBaselineMax(int max)
+{
+    if(max<0)
+        m_baseline.second = 0;
+    else if(max>m_iPostStimSamples+m_iPreStimSamples)
+        m_baseline.second = m_iPostStimSamples+m_iPreStimSamples;
+    else
+        m_baseline.second = max;
+
+    if(m_bDoBaselineCorrection)
+        m_pStimEvoked->baseline = m_baseline;
 }
 
 
@@ -217,6 +260,8 @@ void RtAve::run()
 
     m_iNewPreStimSamples = m_iPreStimSamples;
     m_iNewPostStimSamples = m_iPostStimSamples;
+
+    m_baseline = qMakePair(0,m_iNewPreStimSamples);
 
     m_qMutex.unlock();
 
@@ -294,8 +339,7 @@ void RtAve::run()
                     m_bFillingBackBuffer = true;
                 }
 
-                qDebug()<<"Trigger channel "<<m_iTriggerIndex<<" found at "<<m_iTriggerPos;
-
+                //qDebug()<<"Trigger channel "<<m_iTriggerIndex<<" found at "<<m_iTriggerPos;
             }
         }
     }
@@ -332,7 +376,7 @@ int RtAve::fillBackBuffer(MatrixXd &data)
     }
 
     //DEBUG
-    qDebug()<<"m_matBufferBack: "<<iTotalBufSize+iResidualCols;
+    //qDebug()<<"m_matBufferBack: "<<iTotalBufSize+iResidualCols;
 
     return iTotalBufSize+iResidualCols;
 }
@@ -363,7 +407,7 @@ void RtAve::fillFrontBuffer(MatrixXd &data)
     int size = 0;
     for(int i = 0; i<m_matBufferFront.size(); i++)
         size += m_matBufferFront.at(i).cols();
-    qDebug()<<"m_matBufferFront: "<<size;
+    //qDebug()<<"m_matBufferFront: "<<size;
 }
 
 
@@ -405,12 +449,20 @@ void RtAve::generateEvoked()
         }
         finalAverage = finalAverage/m_qListStimAve.size();
 
+        if(m_bDoBaselineCorrection)
+            finalAverage = MNEMath::rescale(finalAverage, m_pStimEvoked->times, m_baseline, QString("mean"));
+
         m_pStimEvoked->data = finalAverage;
     } else {
-        *m_pStimEvoked.data() += m_qListStimAve.last();
+        MatrixXd tempMatrix = m_qListStimAve.last();
+
+        if(m_bDoBaselineCorrection)
+            tempMatrix = MNEMath::rescale(tempMatrix, m_pStimEvoked->times, m_baseline, QString("mean"));
+
+        *m_pStimEvoked.data() += tempMatrix;
     }
 
-    qDebug()<<m_pStimEvoked->nave;
+    //qDebug()<<"nave "<<m_pStimEvoked->nave;
 }
 
 

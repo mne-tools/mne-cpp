@@ -65,6 +65,7 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
         t_pGridLayout->addWidget(m_pSpinBoxNumAverages,1,2,1,1);
     }
 
+    //Pre Post stimulus
     QLabel* t_pLabelPreStim = new QLabel;
     t_pLabelPreStim->setText("Pre-Stimulus in ms");
     t_pGridLayout->addWidget(t_pLabelPreStim,2,0,1,2);
@@ -73,8 +74,9 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
     m_pSpinBoxPreStimSamples->setMinimum(10);
     m_pSpinBoxPreStimSamples->setMaximum(10000);
     m_pSpinBoxPreStimSamples->setSingleStep(10);
+    m_pSpinBoxPreStimSamples->setPrefix("-");
     m_pSpinBoxPreStimSamples->setValue(m_pAveragingToolbox->m_iPreStimSeconds);
-    connect(m_pSpinBoxPreStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_pAveragingToolbox, &Averaging::changePreStim);
+    connect(m_pSpinBoxPreStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &AveragingSettingsWidget::changePreStim);
     t_pGridLayout->addWidget(m_pSpinBoxPreStimSamples,2,2,1,1);
 
     QLabel* t_pLabelPostStim = new QLabel;
@@ -86,8 +88,75 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
     m_pSpinBoxPostStimSamples->setMaximum(10000);
     m_pSpinBoxPostStimSamples->setSingleStep(10);
     m_pSpinBoxPostStimSamples->setValue(m_pAveragingToolbox->m_iPostStimSeconds);
-    connect(m_pSpinBoxPostStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_pAveragingToolbox, &Averaging::changePostStim);
+    connect(m_pSpinBoxPostStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &AveragingSettingsWidget::changePostStim);
     t_pGridLayout->addWidget(m_pSpinBoxPostStimSamples,3,2,1,1);
+
+    //Baseline Correction
+    QLabel* t_pLabelBaselineMin = new QLabel;
+    t_pLabelBaselineMin->setText("Baseline min in ms");
+    t_pGridLayout->addWidget(t_pLabelBaselineMin,4,0,1,2);
+
+    m_pSpinBoxBaselineFrom = new QSpinBox;
+    m_pSpinBoxBaselineFrom->setMinimum(m_pSpinBoxPreStimSamples->value()*-1);
+    m_pSpinBoxBaselineFrom->setMaximum(m_pSpinBoxPostStimSamples->value());
+    m_pSpinBoxBaselineFrom->setSingleStep(10);
+    m_pSpinBoxBaselineFrom->setValue(m_pAveragingToolbox->m_iBaselineFromSeconds);
+    connect(m_pSpinBoxBaselineFrom, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &AveragingSettingsWidget::changeBaselineFrom);
+    t_pGridLayout->addWidget(m_pSpinBoxBaselineFrom,4,2,1,1);
+
+    QLabel* t_pLabelBaselineMax = new QLabel;
+    t_pLabelBaselineMax->setText("Baseline max in ms");
+    t_pGridLayout->addWidget(t_pLabelBaselineMax,5,0,1,2);
+
+    m_pSpinBoxBaselineTo = new QSpinBox;
+    m_pSpinBoxBaselineTo->setMinimum(m_pSpinBoxPreStimSamples->value()*-1);
+    m_pSpinBoxBaselineTo->setMaximum(m_pSpinBoxPostStimSamples->value());
+    m_pSpinBoxBaselineTo->setSingleStep(10);
+    m_pSpinBoxBaselineTo->setValue(m_pAveragingToolbox->m_iBaselineToSeconds);
+    connect(m_pSpinBoxBaselineTo, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &AveragingSettingsWidget::changeBaselineTo);
+    t_pGridLayout->addWidget(m_pSpinBoxBaselineTo,5,2,1,1);
 
     this->setLayout(t_pGridLayout);
 }
+
+
+//*************************************************************************************************************
+
+void AveragingSettingsWidget::changePreStim(qint32 mSeconds)
+{
+    m_pSpinBoxBaselineTo->setMinimum(m_pSpinBoxPreStimSamples->value()*-1);
+    m_pSpinBoxBaselineFrom->setMinimum(m_pSpinBoxPreStimSamples->value()*-1);
+
+    m_pAveragingToolbox->changePreStim(mSeconds);
+}
+
+
+//*************************************************************************************************************
+
+void AveragingSettingsWidget::changePostStim(qint32 mSeconds)
+{
+    m_pSpinBoxBaselineTo->setMaximum(m_pSpinBoxPostStimSamples->value());
+    m_pSpinBoxBaselineFrom->setMaximum(m_pSpinBoxPostStimSamples->value());
+
+    m_pAveragingToolbox->changePostStim(mSeconds);
+}
+
+//*************************************************************************************************************
+
+void AveragingSettingsWidget::changeBaselineFrom(qint32 mSeconds)
+{
+    m_pSpinBoxBaselineTo->setMinimum(mSeconds);
+
+    m_pAveragingToolbox->changeBaselineFrom(mSeconds);
+}
+
+
+//*************************************************************************************************************
+
+void AveragingSettingsWidget::changeBaselineTo(qint32 mSeconds)
+{
+    m_pSpinBoxBaselineFrom->setMaximum(mSeconds);
+
+    m_pAveragingToolbox->changeBaselineTo(mSeconds);
+}
+
