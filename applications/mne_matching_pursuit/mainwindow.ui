@@ -26,7 +26,7 @@
    <string>Matching-Pursuit-Toolbox</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="Ressourcen.qrc">
+   <iconset>
     <normaloff>:/images/icons/spanner.png</normaloff>:/images/icons/spanner.png</iconset>
   </property>
   <property name="layoutDirection">
@@ -130,7 +130,7 @@ QTabBar::tab:only-one {
 }</string>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -1068,7 +1068,7 @@ QProgressBar::background{
   </widget>
   <action name="actionNeu">
    <property name="icon">
-    <iconset resource="Ressourcen.qrc">
+    <iconset>
      <normaloff>:/images/icons/paper.png</normaloff>:/images/icons/paper.png</iconset>
    </property>
    <property name="text">
@@ -1080,7 +1080,7 @@ QProgressBar::background{
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="Ressourcen.qrc">
+    <iconset>
      <normaloff>:/images/icons/floppyDisk.png</normaloff>:/images/icons/floppyDisk.png</iconset>
    </property>
    <property name="text">
@@ -1092,7 +1092,7 @@ QProgressBar::background{
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="Ressourcen.qrc">
+    <iconset>
      <normaloff>:/images/icons/floppyDisk.png</normaloff>:/images/icons/floppyDisk.png</iconset>
    </property>
    <property name="text">
@@ -1101,7 +1101,7 @@ QProgressBar::background{
   </action>
   <action name="actionBeenden">
    <property name="icon">
-    <iconset resource="Ressourcen.qrc">
+    <iconset>
      <normaloff>:/images/icons/logOut.png</normaloff>:/images/icons/logOut.png</iconset>
    </property>
    <property name="text">
@@ -1110,7 +1110,7 @@ QProgressBar::background{
   </action>
   <action name="actionVersionsinformation">
    <property name="icon">
-    <iconset resource="Ressourcen.qrc">
+    <iconset>
      <normaloff>:/images/icons/exclamation.png</normaloff>:/images/icons/exclamation.png</iconset>
    </property>
    <property name="text">
@@ -1119,7 +1119,7 @@ QProgressBar::background{
   </action>
   <action name="actionHilfe">
    <property name="icon">
-    <iconset resource="Ressourcen.qrc">
+    <iconset>
      <normaloff>:/images/icons/questions.png</normaloff>:/images/icons/questions.png</iconset>
    </property>
    <property name="text">
@@ -1128,7 +1128,7 @@ QProgressBar::background{
   </action>
   <action name="actionW_rterbucheditor">
    <property name="icon">
-    <iconset resource="Ressourcen.qrc">
+    <iconset>
      <normaloff>:/images/icons/pen.png</normaloff>:/images/icons/pen.png</iconset>
    </property>
    <property name="text">
@@ -1137,7 +1137,7 @@ QProgressBar::background{
   </action>
   <action name="actionErweiterter_W_rterbucheditor">
    <property name="icon">
-    <iconset resource="Ressourcen.qrc">
+    <iconset>
      <normaloff>:/images/icons/design.png</normaloff>:/images/icons/design.png</iconset>
    </property>
    <property name="text">
@@ -1146,7 +1146,7 @@ QProgressBar::background{
   </action>
   <action name="actionAtomformeleditor">
    <property name="icon">
-    <iconset resource="Ressourcen.qrc">
+    <iconset>
      <normaloff>:/images/icons/ruler.png</normaloff>:/images/icons/ruler.png</iconset>
    </property>
    <property name="text">
@@ -1155,7 +1155,7 @@ QProgressBar::background{
   </action>
   <action name="actionCreate_treebased_dictionary">
    <property name="icon">
-    <iconset resource="Ressourcen.qrc">
+    <iconset>
      <normaloff>:/images/icons/tree.png</normaloff>:/images/icons/tree.png</iconset>
    </property>
    <property name="text">
@@ -1167,7 +1167,7 @@ QProgressBar::background{
   </action>
   <action name="actionSettings">
    <property name="icon">
-    <iconset resource="Ressourcen.qrc">
+    <iconset>
      <normaloff>:/images/icons/settings.png</normaloff>:/images/icons/settings.png</iconset>
    </property>
    <property name="text">
@@ -1179,7 +1179,7 @@ QProgressBar::background{
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="Ressourcen.qrc">
+    <iconset>
      <normaloff>:/images/icons/boxUpload.png</normaloff>:/images/icons/boxUpload.png</iconset>
    </property>
    <property name="text">
@@ -1193,8 +1193,6 @@ QProgressBar::background{
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="Ressourcen.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
