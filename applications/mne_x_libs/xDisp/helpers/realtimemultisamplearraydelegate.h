@@ -91,6 +91,9 @@ class RealTimeMultiSampleArrayDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
 public:
+    typedef QSharedPointer<RealTimeMultiSampleArrayDelegate> SPtr;              /**< Shared pointer type for RealTimeMultiSampleArrayDelegate. */
+    typedef QSharedPointer<const RealTimeMultiSampleArrayDelegate> ConstSPtr;   /**< Const shared pointer type for RealTimeMultiSampleArrayDelegate. */
+
     //=========================================================================================================
     /**
     * Creates a new abstract item delegate with the given parent.
@@ -174,12 +177,48 @@ private:
 
     //=========================================================================================================
     /**
+    * createTimeSpacersPath Creates the QPointer path for the vertical time spacers.
+    *
+    * @param[in] index      Used to locate data in a data model.
+    * @param[in] option     Describes the parameters used to draw an item in a view widget
+    * @param[in,out] path   The QPointerPath to create for the data plot.
+    * @param[in] data       Data for the given row.
+    */
+    void createTimeSpacersPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const;
+
+    //=========================================================================================================
+    /**
+    * createTriggerPath Creates the QPointer path for the trigger line plot.
+    *
+    * @param[in] index      Used to locate data in a data model.
+    * @param[in] option     Describes the parameters used to draw an item in a view widget
+    * @param[in,out] path   The QPointerPath to create for the data plot.
+    * @param[in] data       Data for the given row.
+    */
+    void createTriggerPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const;
+
+    //=========================================================================================================
+    /**
+    * createTriggerThresholdPath Creates the QPointer path for the trigger threshold line plot.
+    *
+    * @param[in] index      Used to locate data in a data model.
+    * @param[in] option     Describes the parameters used to draw an item in a view widget
+    * @param[in,out] path   The QPointerPath to create for the data plot.
+    * @param[in] data       Data for the given row.
+    * @param[in] textPosition Position of the text.
+    */
+    void createTriggerThresholdPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data, QPointF &textPosition) const;
+
+    //=========================================================================================================
+    /**
     * createMarkerPath Creates the QPointer path for the marker plot.
     *
     * @param[in] option     Describes the parameters used to draw an item in a view widget.
     * @param[in,out] path   The QPointerPath to create for the data plot.
     */
     void createMarkerPath(const QStyleOptionViewItem &option, QPainterPath& path) const;
+
+
 
     //Settings
 //    QSettings m_qSettings;
@@ -192,13 +231,17 @@ private:
     QPoint              m_markerPosition;   /**< Current mouse position used to draw the marker in the plot. */
     QList<QPainterPath> m_painterPaths;     /**< List of all current painter paths for each row. */
 
-    QPen        m_penMarker;            /**< Pen for drawing the data marker.  */
-    QPen        m_penGrid;              /**< Pen for drawing the data grid.  */
-
+    QPen        m_penMarker;            /**< Pen for drawing the data marker. */
+    QPen        m_penGrid;              /**< Pen for drawing the data grid. */
+    QPen        m_penTimeSpacers;       /**< Pen for drawing the time spacer. */
     QPen        m_penFreeze;            /**< Pen for drawing the data when freeze is on.  */
     QPen        m_penFreezeSelected;    /**< Pen for drawing the data when freeze is on and channel is selected.  */
+    QPen        m_penFreezeBad;         /**< Pen for drawing the bad data when freeze is on.  */
+    QPen        m_penFreezeSelectedBad; /**< Pen for drawing the bad data when freeze is on and channel is selected.  */
     QPen        m_penNormal;            /**< Pen for drawing the data when data is plotted normally without freeze on.  */
     QPen        m_penNormalSelected;    /**< Pen for drawing the data when data is plotted normally without freeze on and channel is selected.  */
+    QPen        m_penNormalBad;         /**< Pen for drawing the data when bad data is plotted normally without freeze on.  */
+    QPen        m_penNormalSelectedBad; /**< Pen for drawing the data when bad data is plotted normally without freeze on and channel is selected.  */
 };
 
 } // NAMESPACE

@@ -2,13 +2,14 @@
 /**
 * @file     fiff_evoked.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     Septemeber, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -521,4 +522,25 @@ void FiffEvoked::setInfo(FiffInfo &p_info, bool proj)
         //   The projection items have been activated
         FiffProj::activate_projs(info.projs);
     }
+}
+
+
+//*************************************************************************************************************
+
+FiffEvoked & FiffEvoked::operator+=(const MatrixXd &newData)
+{
+    if(nave == -1 || nave == 0)
+        data = MatrixXd::Zero(newData.rows(),newData.cols());
+
+    if(data.cols() == newData.cols() && data.rows() ==  newData.rows()) {
+        data = data*nave;
+
+        data += newData;
+
+        nave++;
+
+        data /= nave;
+    }
+
+    return *this;
 }

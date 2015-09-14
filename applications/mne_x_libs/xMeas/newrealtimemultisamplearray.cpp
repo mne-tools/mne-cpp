@@ -227,7 +227,6 @@ void NewRealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
     //Sampling rate
     m_dSamplingRate = p_pFiffInfo->sfreq;
 
-
     m_pFiffInfo_orig = p_pFiffInfo;
 
     m_bChInfoIsInit = true;

@@ -2,6 +2,7 @@
 #define TFPLOTWIDGET_H
 
 #include <QWidget>
+#include <QGraphicsScene>
 
 namespace Ui {
 class tfplotwidget;
@@ -16,6 +17,7 @@ public:
     ~tfplotwidget();
 
     Ui::tfplotwidget *ui;
+    QGraphicsScene tf_scene;
 };
 
 #endif // TFPLOTWIDGET_H

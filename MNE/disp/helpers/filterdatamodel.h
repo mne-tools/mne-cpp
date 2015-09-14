@@ -43,6 +43,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "../disp_global.h"
 #include "utils/filterTools/filterdata.h"
 #include "utils/filterTools/filterio.h"
 
@@ -110,7 +111,7 @@ namespace FilterDataModelRoles
 /**
 * DECLARE CLASS FilterDataModel
 */
-class FilterDataModel : public QAbstractTableModel
+class DISPSHARED_EXPORT FilterDataModel : public QAbstractTableModel
 {
     Q_OBJECT
 
@@ -174,7 +175,7 @@ protected:
     int                     m_iDesignFilterIndex;   /**< index of the user designed filter. */
 };
 
-} // NAMESPACE DISP
+} // NAMESPACE DISPLIB
 
 Q_DECLARE_METATYPE(FilterData);
 Q_DECLARE_METATYPE(QList<FilterData>);

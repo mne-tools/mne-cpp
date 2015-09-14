@@ -100,31 +100,18 @@ SOURCES += \
     newmeasurementwidget.cpp \
     realtimemultisamplearraywidget.cpp \
     realtimesamplearraywidget.cpp \
+    realtimeevokedwidget.cpp \
+    realtimecovwidget.cpp \
+    frequencyspectrumwidget.cpp \
+    helpers/realtimebutterflyplot.cpp \
     helpers/realtimemultisamplearraymodel.cpp \
     helpers/realtimemultisamplearraydelegate.cpp \
-#    helpers/sensorgroup.cpp \
-#    helpers/sensoritem.cpp \
-#    helpers/sensorlayout.cpp \
-#    helpers/sensormodel.cpp \
-#    helpers/sensorwidget.cpp \
     helpers/realtimeevokedmodel.cpp \
-    realtimeevokedwidget.cpp \
-    helpers/realtimebutterflyplot.cpp \
-    realtimecovwidget.cpp \
     helpers/covmodalitywidget.cpp \
-    frequencyspectrumwidget.cpp \
     helpers/frequencyspectrummodel.cpp \
     helpers/frequencyspectrumdelegate.cpp \
-    helpers/evokedmodalitywidget.cpp \
     helpers/frequencyspectrumsettingswidget.cpp \
-    helpers/realtimemultisamplearrayscalingwidget.cpp \
-    helpers/projectorwidget.cpp \
-    helpers/layoutscene.cpp \
-    helpers/selectionmanagerwindow.cpp \
-    helpers/selectionscene.cpp \
-    helpers/selectionsceneitem.cpp \
-    helpers/chinfomodel.cpp \
-    helpers/quickcontrolwidget.cpp
+    helpers/quickcontrolwidget.cpp \
 
 HEADERS += \
     xdisp_global.h \
@@ -132,35 +119,21 @@ HEADERS += \
     newmeasurementwidget.h \
     realtimemultisamplearraywidget.h \
     realtimesamplearraywidget.h \
+    realtimeevokedwidget.h \
+    realtimecovwidget.h \
+    frequencyspectrumwidget.h \
     helpers/realtimemultisamplearraymodel.h \
     helpers/realtimemultisamplearraydelegate.h \
-#    helpers/sensorgroup.h \
-#    helpers/sensoritem.h \
-#    helpers/sensorlayout.h \
-#    helpers/sensormodel.h \
-#    helpers/sensorwidget.h \
     helpers/realtimeevokedmodel.h \
-    realtimeevokedwidget.h \
     helpers/realtimebutterflyplot.h \
-    realtimecovwidget.h \
     helpers/covmodalitywidget.h \
-    frequencyspectrumwidget.h \
     helpers/frequencyspectrumdelegate.h \
     helpers/frequencyspectrummodel.h \
-    helpers/evokedmodalitywidget.h \
     helpers/frequencyspectrumsettingswidget.h \
-    helpers/realtimemultisamplearrayscalingwidget.h \
-    helpers/projectorwidget.h \
-    helpers/layoutscene.h \
-    helpers/selectionmanagerwindow.h \
-    helpers/selectionscene.h \
-    helpers/selectionsceneitem.h \
-    helpers/chinfomodel.h \
-    helpers/quickcontrolwidget.h
+    helpers/quickcontrolwidget.h \
 
 FORMS += \
     realtimesamplearraywidget.ui \
-    helpers/selectionmanagerwindow.ui \
     helpers/quickcontrolwidget.ui
 
 qtHaveModule(3d) {
@@ -187,3 +160,7 @@ header_files.path = $${MNE_X_INCLUDE_DIR}/xDisp
 INSTALLS += header_files
 
 OTHER_FILES +=
+
+contains(MNECPP_CONFIG, BuildBasicMNEXVersion) {
+    DEFINES += BUILD_BASIC_MNEX_VERSION
+}

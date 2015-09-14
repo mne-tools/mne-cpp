@@ -84,12 +84,13 @@ FilterWindow::~FilterWindow()
 
 //*************************************************************************************************************
 
-void FilterWindow::newFileLoaded()
+void FilterWindow::newFileLoaded(FiffInfo::SPtr pFiffInfo)
 {
+    Q_UNUSED(pFiffInfo);
     filterParametersChanged();
 
     //Update min max of spin boxes to nyquist
-    double samplingFrequency = m_pMainWindow->m_pDataWindow->getDataModel()->m_fiffInfo.sfreq;
+    double samplingFrequency = m_pMainWindow->m_pDataWindow->getDataModel()->m_pFiffInfo->sfreq;
     double nyquistFrequency = samplingFrequency/2;
 
     ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
@@ -178,7 +179,7 @@ void FilterWindow::initFilterPlot()
 
 void FilterWindow::initTableViews()
 {
-    ui->m_tableView_activeFilters->setModel(m_pMainWindow->m_pChInfoWindow->getDataModel());
+    ui->m_tableView_activeFilters->setModel(m_pMainWindow->m_pChInfoWindow->getDataModel().data());
 
     //Hide columns
     ui->m_tableView_activeFilters->hideColumn(0);
@@ -208,7 +209,7 @@ void FilterWindow::updateFilterPlot()
         it.next();
         if(it.key() == "User defined (See 'Adjust/Filter')") {
             m_pFilterPlotScene->updateFilter(it.value(),
-                                             m_pMainWindow->m_pDataWindow->getDataModel()->m_fiffInfo.sfreq,
+                                             m_pMainWindow->m_pDataWindow->getDataModel()->m_pFiffInfo->sfreq,
                                              ui->m_doubleSpinBox_lowpass->value(),
                                              ui->m_doubleSpinBox_highpass->value());
         }
@@ -334,7 +335,7 @@ void FilterWindow::filterParametersChanged()
     double bw = highpassHz-lowpassHz;
     double center = lowpassHz+bw/2;
 
-    double samplingFrequency = m_pMainWindow->m_pDataWindow->getDataModel()->m_fiffInfo.sfreq;
+    double samplingFrequency = m_pMainWindow->m_pDataWindow->getDataModel()->m_pFiffInfo->sfreq;
     double nyquistFrequency = samplingFrequency/2;
 
     //Calculate the needed fft length

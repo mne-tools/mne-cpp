@@ -60,6 +60,7 @@ AverageModel::AverageModel(QObject *parent)
 : QAbstractTableModel(parent)
 , m_bFileloaded(false)
 , m_pfiffIO(QSharedPointer<FiffIO>(new FiffIO()))
+, m_pEvokedDataSet(FiffEvokedSet::SPtr(new FiffEvokedSet))
 {
 }
 
@@ -70,6 +71,7 @@ AverageModel::AverageModel(QFile& qFile, QObject *parent)
 : QAbstractTableModel(parent)
 , m_bFileloaded(false)
 , m_pfiffIO(QSharedPointer<FiffIO>(new FiffIO()))
+, m_pEvokedDataSet(FiffEvokedSet::SPtr(new FiffEvokedSet))
 {
     //read evoked fiff data
     loadEvokedData(qFile);
@@ -81,8 +83,8 @@ AverageModel::AverageModel(QFile& qFile, QObject *parent)
 int AverageModel::rowCount(const QModelIndex & /*parent*/) const
 {
     //Return number of stored evoked sets
-    if(!m_pEvokedDataSet.evoked.size()==0)
-        return m_pEvokedDataSet.evoked.size();
+    if(!m_pEvokedDataSet->evoked.size()==0)
+        return m_pEvokedDataSet->evoked.size();
     else
         return 0;
 }
@@ -105,7 +107,7 @@ QVariant AverageModel::headerData(int section, Qt::Orientation orientation, int 
 
     //Return the number and description/comment of the fiff evoked data in the set as vertical header
     if(orientation == Qt::Vertical) {
-        if(section<m_pEvokedDataSet.evoked.size())
+        if(section<m_pEvokedDataSet->evoked.size())
             return QString("Set %1").arg(section);
     }
 
@@ -142,7 +144,7 @@ QVariant AverageModel::headerData(int section, Qt::Orientation orientation, int 
 
 QVariant AverageModel::data(const QModelIndex &index, int role) const
 {
-    if(index.row() >= m_pEvokedDataSet.evoked.size())
+    if(index.row() >= m_pEvokedDataSet->evoked.size())
         return QVariant();
 
     if (index.isValid()) {
@@ -152,12 +154,12 @@ QVariant AverageModel::data(const QModelIndex &index, int role) const
 
             switch(role) {
                 case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_pEvokedDataSet.evoked.at(index.row()).comment));
+                    v.setValue(QString("%1").arg(m_pEvokedDataSet->evoked.at(index.row()).comment));
                     return v;
                     break;
 
                 case AverageModelRoles::GetComment:
-                    v.setValue(m_pEvokedDataSet.evoked.at(index.row()).comment);
+                    v.setValue(m_pEvokedDataSet->evoked.at(index.row()).comment);
                     return v;
                     break;
 
@@ -172,12 +174,12 @@ QVariant AverageModel::data(const QModelIndex &index, int role) const
 
             switch(role) {
                 case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_pEvokedDataSet.evoked.at(index.row()).aspect_kind));
+                    v.setValue(QString("%1").arg(m_pEvokedDataSet->evoked.at(index.row()).aspect_kind));
                     return v;
                     break;
 
                 case AverageModelRoles::GetAspectKind:
-                    v.setValue(m_pEvokedDataSet.evoked.at(index.row()).aspect_kind);
+                    v.setValue(m_pEvokedDataSet->evoked.at(index.row()).aspect_kind);
                     return v;
                     break;
 
@@ -192,12 +194,12 @@ QVariant AverageModel::data(const QModelIndex &index, int role) const
 
             switch(role) {
                 case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_pEvokedDataSet.evoked.at(index.row()).first));
+                    v.setValue(QString("%1").arg(m_pEvokedDataSet->evoked.at(index.row()).first));
                     return v;
                     break;
 
             case AverageModelRoles::GetFirstSample:
-                v.setValue(m_pEvokedDataSet.evoked.at(index.row()).first);
+                v.setValue(m_pEvokedDataSet->evoked.at(index.row()).first);
                 return v;
                 break;
 
@@ -212,12 +214,12 @@ QVariant AverageModel::data(const QModelIndex &index, int role) const
 
             switch(role) {
                 case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_pEvokedDataSet.evoked.at(index.row()).last));
+                    v.setValue(QString("%1").arg(m_pEvokedDataSet->evoked.at(index.row()).last));
                     return v;
                     break;
 
             case AverageModelRoles::GetLastSample:
-                v.setValue(m_pEvokedDataSet.evoked.at(index.row()).last);
+                v.setValue(m_pEvokedDataSet->evoked.at(index.row()).last);
                 return v;
                 break;
 
@@ -236,25 +238,25 @@ QVariant AverageModel::data(const QModelIndex &index, int role) const
 
             switch(role) {
                 case AverageModelRoles::GetAverageData:
-                    averagedData.first = m_pEvokedDataSet.evoked.at(index.row()).data.data();
-                    averagedData.second = m_pEvokedDataSet.evoked.at(index.row()).data.cols();
+                    averagedData.first = m_pEvokedDataSet->evoked.at(index.row()).data.data();
+                    averagedData.second = m_pEvokedDataSet->evoked.at(index.row()).data.cols();
                     v.setValue(averagedData);
                     break;
 
                 case AverageModelRoles::GetFiffInfo:
-                    fiffInfo = &m_pEvokedDataSet.evoked.at(index.row()).info;
+                    fiffInfo = &m_pEvokedDataSet->evoked.at(index.row()).info;
                     v.setValue(fiffInfo);
                     break;
 
                 case AverageModelRoles::GetTimeData:
-                    timeData.first = m_pEvokedDataSet.evoked.at(index.row()).times.data();
-                    timeData.second = m_pEvokedDataSet.evoked.at(index.row()).times.cols();
+                    timeData.first = m_pEvokedDataSet->evoked.at(index.row()).times.data();
+                    timeData.second = m_pEvokedDataSet->evoked.at(index.row()).times.cols();
                     v.setValue(timeData);
                     break;
 
                 case AverageModelRoles::GetProjections:
-                    projections.first = m_pEvokedDataSet.evoked.at(index.row()).proj.data();
-                    projections.second = m_pEvokedDataSet.evoked.at(index.row()).proj.cols();
+                    projections.first = m_pEvokedDataSet->evoked.at(index.row()).proj.data();
+                    projections.second = m_pEvokedDataSet->evoked.at(index.row()).proj.cols();
                     v.setValue(projections);
                     break;
 
@@ -322,11 +324,11 @@ bool AverageModel::loadEvokedData(QFile& qFile)
     beginResetModel();
     clearModel();
 
-    FiffEvokedSet::read(qFile, m_pEvokedDataSet);
+    FiffEvokedSet::read(qFile, *m_pEvokedDataSet.data());
 
-    qDebug()<<"m_pEvokedDataSet.evoked.size()"<<m_pEvokedDataSet.evoked.size();
+    qDebug()<<"m_pEvokedDataSet->evoked.size()"<<m_pEvokedDataSet->evoked.size();
 
-    if(!m_pEvokedDataSet.evoked.empty())
+    if(!m_pEvokedDataSet->evoked.empty())
         m_bFileloaded = true;
     else {
         qDebug("AverageModel: ERROR! Data set does not contain any evoked data!");
@@ -363,11 +365,19 @@ bool AverageModel::saveEvokedData(QFile& qFile)
 
 //*************************************************************************************************************
 
+const FiffInfo AverageModel::getFiffInfo()
+{
+    return m_pEvokedDataSet->info;
+}
+
+
+//*************************************************************************************************************
+
 void AverageModel::clearModel()
 {
     beginResetModel();
     //clear average data model structure
-    m_pEvokedDataSet.clear();
+    m_pEvokedDataSet->clear();
 
     m_bFileloaded = false;
 

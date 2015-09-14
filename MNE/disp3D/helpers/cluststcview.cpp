@@ -42,7 +42,7 @@
 #include "cluststcview.h"
 #include "cluststcmodel.h"
 
-#include <disp/colormap.h>
+#include <disp/helpers/colormap.h>
 
 
 //*************************************************************************************************************

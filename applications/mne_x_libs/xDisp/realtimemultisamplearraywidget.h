@@ -52,10 +52,8 @@
 
 #include "helpers/realtimemultisamplearraymodel.h"
 #include "helpers/realtimemultisamplearraydelegate.h"
-#include "helpers/realtimemultisamplearrayscalingwidget.h"
-#include "helpers/projectorwidget.h"
-#include "helpers/selectionmanagerwindow.h"
-#include "helpers/chinfomodel.h"
+#include "disp/selectionmanagerwindow.h"
+#include "disp/helpers/chinfomodel.h"
 #include "helpers/quickcontrolwidget.h"
 
 #include "disp/filterwindow.h"
@@ -150,8 +148,6 @@ using namespace DISPLIB;
 class XDISPSHARED_EXPORT RealTimeMultiSampleArrayWidget : public NewMeasurementWidget
 {
     Q_OBJECT
-
-    friend class RealTimeMultiSampleArrayScalingWidget;
 
 public:
     //=========================================================================================================
@@ -298,8 +294,10 @@ private:
     //=========================================================================================================
     /**
     * Broadcast channel scaling
+    *
+    * @param [in] scaleMap QMap with scaling values which is to be broadcasted to the model.
     */
-    void broadcastScaling();
+    void broadcastScaling(QMap<qint32, float> scaleMap);
 
     //=========================================================================================================
     /**
@@ -345,27 +343,37 @@ private:
 
     //=========================================================================================================
     /**
-    * hides/show all bad channels in the view
+    * Gets called when the views in the viewport of the table view change
+    *
+    * @param [in] value unused int.
+    */
+    void visibleRowsChanged(int value);
+
+    //=========================================================================================================
+    /**
+    * Gets called when the bad channels are about to be marked as bad or good
+    */
+    void markChBad();
+
+    //=========================================================================================================
+    /**
+    * Hides/shows all bad channels in the view
     */
     void hideBadChannels();
 
     //=========================================================================================================
     /**
-    * Show channel scaling widget
+    * Updates the number of detected trigger in quick control widget
+    *
+    * @param [in] numberDetectedTriggers number of detected triggers.
     */
-    void showChScalingWidget();
-
-    //=========================================================================================================
-    /**
-    * Shows the projection widget
-    */
-    void showProjectionWidget();
+    void onTriggerDetected(int numberDetectedTriggers);
 
     //=========================================================================================================
     /**
     * Shows the filter widget
     */
-    void showFilterWidget();
+    void showFilterWidget(bool state = true);
 
     //=========================================================================================================
     /**
@@ -379,14 +387,13 @@ private:
     */
     void showQuickControlWidget();
 
-    //=========================================================================================================
-    /**
-    * Gets called when the views in the viewport of the table view change
-    */
-    void visibleRowsChanged(int value);
-
-    RealTimeMultiSampleArrayModel*      m_pRTMSAModel;                  /**< RTMSA data model */
-    RealTimeMultiSampleArrayDelegate*   m_pRTMSADelegate;               /**< RTMSA data delegate */
+    RealTimeMultiSampleArrayModel::SPtr         m_pRTMSAModel;                  /**< RTMSA data model */
+    RealTimeMultiSampleArrayDelegate::SPtr      m_pRTMSADelegate;               /**< RTMSA data delegate */
+    QuickControlWidget::SPtr                    m_pQuickControlWidget;          /**< quick control widget. */
+    ChInfoModel::SPtr                           m_pChInfoModel;                 /**< channel info model. */
+    NewRealTimeMultiSampleArray::SPtr           m_pRTMSA;                       /**< The real-time sample array measurement. */
+    SelectionManagerWindow::SPtr                m_pSelectionManagerWindow;      /**< SelectionManagerWindow. */
+    FilterWindow::SPtr                          m_pFilterWindow;                /**< Filter window. */
 
     bool            m_bInitialized;                                     /**< Is Initialized */
     bool            m_bHideBadChannels;                                 /**< hide bad channels flag. */
@@ -409,18 +416,8 @@ private:
     QSpinBox*       m_pSpinBoxDSFactor;                                 /**< downsampling factor */
     QTableView*     m_pTableView;                                       /**< the QTableView being part of the model/view framework of Qt */
 
-    QSharedPointer<QuickControlWidget>              m_pQuickControlWidget;          /**< quick control widget. */
-    QSharedPointer<ChInfoModel>                     m_pChInfoModel;                 /**< channel info model. */
-    QSharedPointer<NewRealTimeMultiSampleArray>     m_pRTMSA;                       /**< The real-time sample array measurement. */
-    QSharedPointer<SelectionManagerWindow>          m_pSelectionManagerWindow;      /**< SelectionManagerWindow. */
-    QSharedPointer<FilterWindow>                    m_pFilterWindow;                /**< SelectionManagerWindow. */
-    QSharedPointer<ProjectorWidget>                 m_pProjectorSelectionWidget;    /**< Projector selection widget. */
-    QSharedPointer<RealTimeMultiSampleArrayScalingWidget> m_pRTMSAScalingWidget;    /**< Channel scaling widget. */
-
     QAction*        m_pActionSelectSensors;                             /**< show roi select widget */
     QAction*        m_pActionFiltering;                                 /**< show filter window */
-    QAction*        m_pActionChScaling;                                 /**< Show channel scaling Action. */
-    QAction*        m_pActionProjection;                                /**< Show projections Action. */
     QAction*        m_pActionHideBad;                                   /**< Hide bad channels. */
     QAction*        m_pActionQuickControl;                              /**< Show quick control widget. */
  };

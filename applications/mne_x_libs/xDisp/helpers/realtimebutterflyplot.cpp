@@ -37,10 +37,10 @@ RealTimeButterflyPlot::RealTimeButterflyPlot(QWidget *parent)
 , m_bIsInit(false)
 , m_iNumChannels(-1)
 , showMAG(true)
-, showGRAD(false)
-, showEEG(false)
-, showEOG(false)
-, showMISC(false)
+, showGRAD(true)
+, showEEG(true)
+, showEOG(true)
+, showMISC(true)
 {
 }
 
@@ -67,7 +67,6 @@ void RealTimeButterflyPlot::dataUpdate(const QModelIndex& topLeft, const QModelI
 
 void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
 {
-
     QPainter painter(this);
 
     painter.save();
@@ -75,26 +74,77 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
     painter.drawRect(QRect(0,0,this->width()-1,this->height()-1));
     painter.restore();
 
+    painter.setRenderHint(QPainter::Antialiasing, true);
+
     if(m_bIsInit)
     {
         //Stimulus bar
-        if(m_pRealTimeEvokedModel->getNumSamples() > 0)
-        {
+        if(m_pRealTimeEvokedModel->getNumSamples() > 0) {
+            painter.save();
+            painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
 
+            float fDx = (float)(this->width()-2) / ((float)m_pRealTimeEvokedModel->getNumSamples()-1.0f);
+            float posX = fDx * ((float)m_pRealTimeEvokedModel->getNumPreStimSamples());
+            painter.drawLine(posX, 1, posX, this->height()-2);
+
+            painter.drawText(QPointF(posX+5,this->rect().bottomRight().y()-5), QString("0ms / Stimulus"));
+
+            painter.restore();
+        }
+
+        //Vertical time spacers
+        if(m_pRealTimeEvokedModel->getNumberOfTimeSpacers() > 0)
+        {
+            painter.save();
+            QColor colorTimeSpacer = Qt::black;
+            colorTimeSpacer.setAlphaF(0.5);
+            painter.setPen(QPen(colorTimeSpacer, 1, Qt::DashLine));
+
+            float yStart = this->rect().topLeft().y();
+            float yEnd = this->rect().bottomRight().y();
+            float fDx = (float)(this->width()-2) / ((float)m_pRealTimeEvokedModel->getNumSamples()-1.0f);
+
+            float sampleCounter = m_pRealTimeEvokedModel->getNumPreStimSamples();
+            int counter = 1;
+            float timeDistanceMSec = 50.0;
+            float timeDistanceSamples = (timeDistanceMSec/1000.0)*m_pRealTimeEvokedModel->getSamplingFrequency(); //time distance corresponding to sampling frequency
+
+            //spacers before stim
+            while(sampleCounter-timeDistanceSamples>0) {
+                sampleCounter-=timeDistanceSamples;
+                float x = fDx*sampleCounter;
+                painter.drawLine(x, yStart, x, yEnd);
+                painter.drawText(QPointF(x+5,yEnd-5), QString("-%1ms").arg(timeDistanceMSec*counter));
+                counter++;
+            }
+
+            //spacers after stim
+            counter = 1;
+            sampleCounter = m_pRealTimeEvokedModel->getNumPreStimSamples();
+            while(sampleCounter+timeDistanceSamples<m_pRealTimeEvokedModel->getNumSamples()) {
+                sampleCounter+=timeDistanceSamples;
+                float x = fDx*sampleCounter;
+                painter.drawLine(x, yStart, x, yEnd);
+                painter.drawText(QPointF(x+5,yEnd-5), QString("%1ms").arg(timeDistanceMSec*counter));
+                counter++;
+            }
+
+            painter.restore();
+        }
+
+        //Zero line
+        if(m_pRealTimeEvokedModel->getNumSamples() > 0) {
             painter.save();
             painter.setPen(QPen(Qt::black, 1, Qt::DashLine));
 
-            float fDx = (float)(this->width()-2) / ((float)m_pRealTimeEvokedModel->getNumSamples()-1.0f);
-            float posX = fDx * ((float)m_pRealTimeEvokedModel->getNumPreStimSamples()-1.0f);
-            painter.drawLine(posX, 1, posX, this->height()-2);
+            painter.drawLine(0, this->height()/2, this->width(), this->height()/2);
 
             painter.restore();
         }
 
         painter.translate(0,this->height()/2);
 
-        for(qint32 r = 0; r < m_iNumChannels; ++r)
-        {
+        for(qint32 r = 0; r < m_iNumChannels; ++r) {
             if(m_lSelectedChannels.contains(r)) {
                 qint32 kind = m_pRealTimeEvokedModel->getKind(r);
 
@@ -140,7 +190,13 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
                 }
 
                 painter.save();
-                painter.setPen(QPen(m_pRealTimeEvokedModel->getColor(r), 1));
+
+                if(m_pRealTimeEvokedModel->isFreezed()) {
+                    QColor freezeColor = m_pRealTimeEvokedModel->getColor(r);
+                    freezeColor.setAlphaF(0.5);
+                    painter.setPen(QPen(freezeColor, 1));
+                } else
+                    painter.setPen(QPen(m_pRealTimeEvokedModel->getColor(r), 1));
 
                 QPainterPath path(QPointF(1,0));
                 createPlotPath(r,path);
@@ -164,27 +220,55 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
 
     switch(kind) {
         case FIFFV_MEG_CH: {
-            qint32 unit = m_pRealTimeEvokedModel->getUnit(row);
-            if(unit == FIFF_UNIT_T_M)
-                fMaxValue = fMaxGRAD;
-            else if(unit == FIFF_UNIT_T)
-                fMaxValue = fMaxMAG;
+            qint32 unit =m_pRealTimeEvokedModel->getUnit(row);
+            if(unit == FIFF_UNIT_T_M) { //gradiometers
+                fMaxValue = 1e-10f;
+                if(m_pRealTimeEvokedModel->getScaling().contains(FIFF_UNIT_T_M))
+                    fMaxValue = m_pRealTimeEvokedModel->getScaling()[FIFF_UNIT_T_M];
+            }
+            else if(unit == FIFF_UNIT_T) //magnitometers
+            {
+                if(m_pRealTimeEvokedModel->getCoil(row) == FIFFV_COIL_BABY_MAG)
+                    fMaxValue = 1e-11f;
+                else
+                    fMaxValue = 1e-11f;
+
+                if(m_pRealTimeEvokedModel->getScaling().contains(FIFF_UNIT_T))
+                    fMaxValue = m_pRealTimeEvokedModel->getScaling()[FIFF_UNIT_T];
+            }
+            break;
+        }
+
+        case FIFFV_REF_MEG_CH: {  /*11/04/14 Added by Limin: MEG reference channel */
+            fMaxValue = 1e-11f;
+            if(m_pRealTimeEvokedModel->getScaling().contains(FIFF_UNIT_T))
+                fMaxValue = m_pRealTimeEvokedModel->getScaling()[FIFF_UNIT_T];
             break;
         }
         case FIFFV_EEG_CH: {
-            fMaxValue = fMaxEEG;
+            fMaxValue = 1e-4f;
+            if(m_pRealTimeEvokedModel->getScaling().contains(FIFFV_EEG_CH))
+                fMaxValue = m_pRealTimeEvokedModel->getScaling()[FIFFV_EEG_CH];
             break;
         }
         case FIFFV_EOG_CH: {
-            fMaxValue = fMaxEOG;
+            fMaxValue = 1e-3f;
+            if(m_pRealTimeEvokedModel->getScaling().contains(FIFFV_EOG_CH))
+                fMaxValue = m_pRealTimeEvokedModel->getScaling()[FIFFV_EOG_CH];
+            break;
+        }
+        case FIFFV_STIM_CH: {
+            fMaxValue = 5;
+            if(m_pRealTimeEvokedModel->getScaling().contains(FIFFV_STIM_CH))
+                fMaxValue = m_pRealTimeEvokedModel->getScaling()[FIFFV_STIM_CH];
             break;
         }
         case FIFFV_MISC_CH: {
-            fMaxValue = fMaxMISC;
+            fMaxValue = 1e-3f;
+            if(m_pRealTimeEvokedModel->getScaling().contains(FIFFV_MISC_CH))
+                fMaxValue = m_pRealTimeEvokedModel->getScaling()[FIFFV_MISC_CH];
             break;
         }
-        default:
-            return;
     }
 
     float fValue;
@@ -199,7 +283,7 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
     float y_base = path.currentPosition().y();
     QPointF qSamplePosition;
 
-    float fDx = (float)(this->width()-2) / ((float)m_pRealTimeEvokedModel->getNumSamples()-1.0f);//((float)option.rect.width()) / t_pModel->getMaxSamples();
+    float fDx = (float)(this->width()-2) / ((float)m_pRealTimeEvokedModel->getNumSamples()-1.0f);//((float)option.rect.width()) / m_pRealTimeEvokedModel->getMaxSamples();
 //    fDx *= iDownSampling;
 
     RowVectorXd rowVec = m_pRealTimeEvokedModel->data(row,1).value<RowVectorXd>();
@@ -207,7 +291,7 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
     if(rowVec.size() > 0)
     {
         float val = rowVec[0];
-        fValue = (val-rowVec[m_pRealTimeEvokedModel->getNumPreStimSamples()-1])*fScaleY;//ToDo -> -2 PreStim is one too short
+        fValue = (val/*-rowVec[m_pRealTimeEvokedModel->getNumPreStimSamples()-1]*/)*fScaleY;//ToDo -> -2 PreStim is one too short
 
         float newY = y_base+fValue;
 
@@ -221,9 +305,9 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
     qint32 i;
     for(i = 1; i < rowVec.size(); ++i) {
 
-        if(i != m_pRealTimeEvokedModel->getNumPreStimSamples() - 2)
-        {
-            float val = rowVec[m_pRealTimeEvokedModel->getNumPreStimSamples()-1] - rowVec[i]; //remove first sample data[0] as offset
+//        if(i != m_pRealTimeEvokedModel->getNumPreStimSamples() - 2)
+//        {
+            float val = /*rowVec[m_pRealTimeEvokedModel->getNumPreStimSamples()-1] - */rowVec[i]; //remove first sample data[0] as offset
             fValue = val*fScaleY;
 
             fValue = fValue > fWinMaxVal ? fWinMaxVal : fValue < -fWinMaxVal ? -fWinMaxVal : fValue;
@@ -231,9 +315,9 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
             float newY = y_base+fValue;
 
             qSamplePosition.setY(newY);
-        }
-        else
-            qSamplePosition.setY(y_base);
+//        }
+//        else
+//            qSamplePosition.setY(y_base);
 
 
         qSamplePosition.setX(path.currentPosition().x()+fDx);
@@ -242,7 +326,7 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
     }
 
 //    //create lines from one to the next sample for last path
-//    qint32 sample_offset = t_pModel->numVLines() + 1;
+//    qint32 sample_offset = m_pRealTimeEvokedModel->numVLines() + 1;
 //    qSamplePosition.setX(qSamplePosition.x() + fDx*sample_offset);
 //    lastPath.moveTo(qSamplePosition);
 
