@@ -40,7 +40,6 @@
 
 #include "covmodalitywidget.h"
 #include "../realtimecovwidget.h"
-#include "sensoritem.h"
 
 
 //*************************************************************************************************************

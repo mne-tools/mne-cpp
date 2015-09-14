@@ -3,13 +3,14 @@
 * @file     babymeg.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh, Limin Sun, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -43,7 +44,6 @@
 
 #include "FormFiles/babymegsetupwidget.h"
 #include "FormFiles/babymegprojectdialog.h"
-
 
 #include <utils/ioutils.h>
 
@@ -85,38 +85,70 @@ BabyMEG::BabyMEG()
 , m_bWriteToFile(false)
 , m_sCurrentParadigm("")
 , m_bIsRunning(false)
+, m_bUseRecordTimer(false)
 , m_pRawMatrixBuffer(0)
 , m_sFiffHeader(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/header.fif")
 , m_sBadChannels(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/both.bad")
+, m_iRecordingMSeconds(5*60*1000)
 {
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup Project"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
     m_pActionSetupProject->setStatusTip(tr("Setup Project"));
-    connect(m_pActionSetupProject, &QAction::triggered, this, &BabyMEG::showProjectDialog);
+    connect(m_pActionSetupProject, &QAction::triggered,
+            this, &BabyMEG::showProjectDialog);
     addPluginAction(m_pActionSetupProject);    
 
     m_pActionRecordFile = new QAction(QIcon(":/images/record.png"), tr("Start Recording"),this);
     m_pActionRecordFile->setStatusTip(tr("Start Recording"));
-    connect(m_pActionRecordFile, &QAction::triggered, this, &BabyMEG::toggleRecordingFile);
+    connect(m_pActionRecordFile, &QAction::triggered,
+            this, &BabyMEG::toggleRecordingFile);
     addPluginAction(m_pActionRecordFile);
-
     //m_pActionRecordFile->setEnabled(false);
 
     m_pActionSqdCtrl = new QAction(QIcon(":/images/sqdctrl.png"), tr("Squid Control"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
     m_pActionSqdCtrl->setStatusTip(tr("Squid Control"));
-    connect(m_pActionSqdCtrl, &QAction::triggered, this, &BabyMEG::showSqdCtrlDialog);
+    connect(m_pActionSqdCtrl, &QAction::triggered,
+            this, &BabyMEG::showSqdCtrlDialog);
     addPluginAction(m_pActionSqdCtrl);
 
     m_pActionUpdateFiffInfo = new QAction(QIcon(":/images/latestFiffInfo.png"), tr("Update Fiff Info"),this);
     m_pActionUpdateFiffInfo->setStatusTip(tr("Update Fiff Info"));
-    connect(m_pActionUpdateFiffInfo, &QAction::triggered, this, &BabyMEG::UpdateFiffInfo);
+    connect(m_pActionUpdateFiffInfo, &QAction::triggered,
+            this, &BabyMEG::UpdateFiffInfo);
     addPluginAction(m_pActionUpdateFiffInfo);
 
     m_pActionUpdateFiffInfoForHPI = new QAction(QIcon(":/images/latestFiffInfoHPI.png"), tr("Update HPI to Fiff Info"),this);
     m_pActionUpdateFiffInfoForHPI->setStatusTip(tr("Update HPI to Fiff Info"));
-    connect(m_pActionUpdateFiffInfoForHPI, &QAction::triggered, this, &BabyMEG::SetFiffInfoForHPI);
+    connect(m_pActionUpdateFiffInfoForHPI, &QAction::triggered,
+            this, &BabyMEG::SetFiffInfoForHPI);
     addPluginAction(m_pActionUpdateFiffInfoForHPI);
+
+    //Init timers
+    if(!m_pRecordTimer) {
+        m_pRecordTimer = QSharedPointer<QTimer>(new QTimer(this));
+        m_pRecordTimer->setSingleShot(true);
+        connect(m_pRecordTimer.data(), &QTimer::timeout,
+                this, &BabyMEG::toggleRecordingFile);
+    }
+
+    if(!m_pBlinkingRecordButtonTimer) {
+        m_pBlinkingRecordButtonTimer = QSharedPointer<QTimer>(new QTimer(this));
+        connect(m_pBlinkingRecordButtonTimer.data(), &QTimer::timeout,
+                this, &BabyMEG::changeRecordingButton);
+    }
+
+    if(!m_pUpdateTimeInfoTimer) {
+        m_pUpdateTimeInfoTimer = QSharedPointer<QTimer>(new QTimer(this));
+        connect(m_pUpdateTimeInfoTimer.data(), &QTimer::timeout,
+                this, &BabyMEG::onRecordingRemainingTimeChange);
+    }
+
+    //If the basic MNE-X version is to be build hide the HPI and squid control actions in the toolbar
+    #ifdef BUILD_BASIC_MNEX_VERSION
+    m_pActionSqdCtrl->setVisible(false);
+    m_pActionUpdateFiffInfoForHPI->setVisible(false);
+    #endif
 }
 
 
@@ -127,8 +159,8 @@ BabyMEG::~BabyMEG()
     if(this->isRunning())
         stop();
 
-    if(myClient && myClient->isConnected())
-            myClient->DisConnectBabyMEG();
+    if(m_pMyClient && m_pMyClient->isConnected())
+            m_pMyClient->DisConnectBabyMEG();
 
 }
 
@@ -197,19 +229,22 @@ void BabyMEG::init()
     connect(pInfo.data(), &BabyMEGInfo::SendCMDPackage, this, &BabyMEG::setCMDData);
     connect(pInfo.data(), &BabyMEGInfo::GainInfoUpdate, this, &BabyMEG::setFiffGainInfo);
 
-    myClient = QSharedPointer<BabyMEGClient>(new BabyMEGClient(6340,this));
-    myClient->SetInfo(pInfo);
-    myClient->start();
-    myClientComm = QSharedPointer<BabyMEGClient>(new BabyMEGClient(6341,this));
-    myClientComm->SetInfo(pInfo);
-    myClientComm->start();
+    m_pMyClient = QSharedPointer<BabyMEGClient>(new BabyMEGClient(6340,this));
+    m_pMyClient->SetInfo(pInfo);
+    m_pMyClient->start();
+    m_pMyClientComm = QSharedPointer<BabyMEGClient>(new BabyMEGClient(6341,this));
+    m_pMyClientComm->SetInfo(pInfo);
+    m_pMyClientComm->start();
 
-    myClientComm->SendCommandToBabyMEGShortConnection("INFO");
+    m_pMyClientComm->SendCommandToBabyMEGShortConnection("INFO");
 
-    myClient->ConnectToBabyMEG();
+    m_pMyClient->ConnectToBabyMEG();
 
     //init channels when fiff info is available
     connect(this, &BabyMEG::fiffInfoAvailable, this, &BabyMEG::initConnector);
+
+    //Init projection dialog
+    m_pBabyMEGProjectDialog = QSharedPointer<BabyMEGProjectDialog>(new BabyMEGProjectDialog(this));
 
 }
 
@@ -223,9 +258,6 @@ void BabyMEG::unload()
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// Create measurement instances and config them
-//=============================================================================================================
 
 void BabyMEG::initConnector()
 {
@@ -259,8 +291,15 @@ void BabyMEG::clear()
 
 void BabyMEG::showProjectDialog()
 {
-    BabyMEGProjectDialog projectDialog(this);
-    projectDialog.exec();
+    m_pBabyMEGProjectDialog->setWindowFlags(Qt::WindowStaysOnTopHint);
+
+    connect(m_pBabyMEGProjectDialog.data(), &BabyMEGProjectDialog::timerChanged,
+            this, &BabyMEG::setRecordingTimerChanged);
+
+    connect(m_pBabyMEGProjectDialog.data(), &BabyMEGProjectDialog::recordingTimerStateChanged,
+            this, &BabyMEG::setRecordingTimerStateChanged);
+
+    m_pBabyMEGProjectDialog->show();
 }
 
 
@@ -282,19 +321,20 @@ void BabyMEG::showSqdCtrlDialog()
     }
 }
 
+
 //*************************************************************************************************************
 
 void BabyMEG::UpdateFiffInfo()
 {
-
     // read gain info and save them to the m_pFiffInfo.range
-    myClientComm->SendCommandToBabyMEGShortConnection("INFG");
+    m_pMyClientComm->SendCommandToBabyMEGShortConnection("INFG");
 
     //sleep(0.5);
 
     //m_pActionRecordFile->setEnabled(true);
 
 }
+
 
 //*************************************************************************************************************
 
@@ -318,9 +358,11 @@ void BabyMEG::SetFiffInfoForHPI()
             HPIDlg->show();
             HPIDlg->raise();
         }
-
     }
 }
+
+
+//*************************************************************************************************************
 
 void BabyMEG::RecvHPIFiffInfo(FiffInfo info)
 {
@@ -328,6 +370,7 @@ void BabyMEG::RecvHPIFiffInfo(FiffInfo info)
     qDebug()<<"saved HPI" << m_pFiffInfo->dig.at(0).r[0];
     qDebug()<<"HPI"<< info.dig.at(0).kind << info.dig.at(0).r[0];
 }
+
 
 //*************************************************************************************************************
 
@@ -369,11 +412,19 @@ void BabyMEG::toggleRecordingFile()
     //Setup writing to file
     if(m_bWriteToFile)
     {
+        mutex.lock();
         m_pOutfid->finish_writing_raw();
+        mutex.unlock();
+
         m_bWriteToFile = false;
-        m_pTimerRecordingChange->stop();
-        m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
         m_iSplitCount = 0;
+
+        //Stop record timer
+        m_pRecordTimer->stop();
+        m_pUpdateTimeInfoTimer->stop();
+        m_pBlinkingRecordButtonTimer->stop();
+
+        m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
     }
     else
     {
@@ -386,7 +437,6 @@ void BabyMEG::toggleRecordingFile()
             msgBox.exec();
             return;
         }
-
 
         //Initiate the stream for writing to the fif file
         m_sRecordFile = getFilePath(true);
@@ -402,15 +452,25 @@ void BabyMEG::toggleRecordingFile()
                 return;
         }
 
+        //Set all projectors to zero before writing to file because we always write the raw data
+        for(int i = 0; i<m_pFiffInfo->projs.size(); i++)
+            m_pFiffInfo->projs[i].active = false;
+
+        mutex.lock();
         m_pOutfid = Fiff::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals);
         fiff_int_t first = 0;
         m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
+        mutex.unlock();
 
         m_bWriteToFile = true;
 
-        m_pTimerRecordingChange = QSharedPointer<QTimer>(new QTimer);
-        connect(m_pTimerRecordingChange.data(), &QTimer::timeout, this, &BabyMEG::changeRecordingButton);
-        m_pTimerRecordingChange->start(500);
+        //Start timers for record button blinking, recording timer and updating the elapsed time in the proj widget
+        m_pBlinkingRecordButtonTimer->start(500);
+        m_recordingStartedTime.restart();
+        m_pUpdateTimeInfoTimer->start(1000);
+
+        if(m_bUseRecordTimer)
+            m_pRecordTimer->start(m_iRecordingMSeconds);
     }
 }
 
@@ -471,7 +531,7 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
     }
 
     m_iBufferSize = pInfo->dataLength;
-    sfreq = pInfo->sfreq;
+    m_dSfreq = pInfo->sfreq;
 
     //
     //   Add the calibration factors
@@ -496,6 +556,7 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
     emit fiffInfoAvailable();
 }
 
+
 //*************************************************************************************************************
 
 void BabyMEG::setFiffGainInfo(QStringList GainInfo)
@@ -511,14 +572,26 @@ void BabyMEG::setFiffGainInfo(QStringList GainInfo)
     {
         //set up the gain info
         qDebug()<<"Set Gain Info";
-        for(qint32 i = 0; i < m_pFiffInfo->nchan; i++)
-        {
+        for(qint32 i = 0; i < m_pFiffInfo->nchan; i++) {
             m_pFiffInfo->chs[i].range = 1.0f/GainInfo.at(i).toFloat();//1; // set gain
+            m_cals[i] = m_pFiffInfo->chs[i].range*m_pFiffInfo->chs[i].cal;
             //qDebug()<<i<<"="<<m_pFiffInfo->chs[i].ch_name<<","<<m_pFiffInfo->chs[i].range;
         }
+
+        // Initialize the data and calibration vector
+        typedef Eigen::Triplet<double> T;
+        std::vector<T> tripletList;
+        tripletList.reserve(m_pFiffInfo->nchan);
+        for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i)
+            tripletList.push_back(T(i, i, this->m_cals[i]));
+
+        m_sparseMatCals = SparseMatrix<double>(m_pFiffInfo->nchan, m_pFiffInfo->nchan);
+        m_sparseMatCals.setFromTriplets(tripletList.begin(), tripletList.end());
     }
 
 }
+
+
 //*************************************************************************************************************
 
 void BabyMEG::setCMDData(QByteArray DATA)
@@ -537,10 +610,10 @@ void BabyMEG::comFLL(QString t_sFLLControlCommand)
 
     qDebug() << "BabyMeg Received" << t_sFLLControlCommand;
     int strlen = t_sFLLControlCommand.size();
-    QByteArray Scmd = myClientComm->MGH_LM_Int2Byte(strlen);
+    QByteArray Scmd = m_pMyClientComm->MGH_LM_Int2Byte(strlen);
     QByteArray SC = QByteArray("COMS")+Scmd;
     SC.append(t_sFLLControlCommand);
-    myClientComm->SendCommandToBabyMEGShortConnection(SC);
+    m_pMyClientComm->SendCommandToBabyMEGShortConnection(SC);
 }
 
 
@@ -558,8 +631,8 @@ bool BabyMEG::start()
     // Start threads
     m_bIsRunning = true;
 
-    if(!myClient->isConnected())
-        myClient->ConnectToBabyMEG();
+    if(!m_pMyClient->isConnected())
+        m_pMyClient->ConnectToBabyMEG();
     // Start threads
     QThread::start();
 
@@ -571,8 +644,8 @@ bool BabyMEG::start()
 
 bool BabyMEG::stop()
 {
-    if(myClient->isConnected())
-        myClient->DisConnectBabyMEG();
+    if(m_pMyClient->isConnected())
+        m_pMyClient->DisConnectBabyMEG();
 
     m_bIsRunning = false;
 
@@ -606,8 +679,8 @@ QString BabyMEG::getName() const
 
 QWidget* BabyMEG::setupWidget()
 {
-    if(!myClient->isConnected())
-        myClient->ConnectToBabyMEG();
+    if(!m_pMyClient->isConnected())
+        m_pMyClient->ConnectToBabyMEG();
 
     BabyMEGSetupWidget* widget = new BabyMEGSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
 
@@ -679,6 +752,22 @@ bool BabyMEG::readBadChannels()
     //
     // Bad Channels
     //
+//    //Read bad channels from header/projection fif
+//    QFile t_headerFiffFile(m_sFiffHeader);
+
+//    if(!t_headerFiffFile.exists()) {
+//        printf("Could not open fif file for copying bad channels to babyMEG fiff_info\n");
+//        return false;
+//    }
+
+//    FiffRawData raw(t_headerFiffFile);
+//    m_pFiffInfo->bads = raw.info.bads;
+
+//    t_headerFiffFile.close();
+
+//    return true;
+
+    //Read bad channels from
     QFile t_badChannelsFile(m_sBadChannels);
 
     if (!t_badChannelsFile.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -731,7 +820,9 @@ void BabyMEG::run()
                     this->splitRecordingFile();
                 }
 
+                mutex.lock();
                 m_pOutfid->write_raw_buffer(matValue.cast<double>());
+                mutex.unlock();
             }
             else
                 size = 0;
@@ -762,3 +853,32 @@ void BabyMEG::changeRecordingButton()
         m_iBlinkStatus = 0;
     }
 }
+
+
+//*************************************************************************************************************
+
+void BabyMEG::setRecordingTimerChanged(int timeMSecs)
+{
+    //If the recording time is changed during the recording, change the timer
+    if(m_bWriteToFile)
+        m_pRecordTimer->setInterval(timeMSecs-m_recordingStartedTime.elapsed());
+
+    m_iRecordingMSeconds = timeMSecs;
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::setRecordingTimerStateChanged(bool state)
+{
+    m_bUseRecordTimer = state;
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::onRecordingRemainingTimeChange()
+{
+    m_pBabyMEGProjectDialog->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
+}
+

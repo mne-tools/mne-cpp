@@ -262,7 +262,7 @@ private:
 
     LogLevel                            m_eLogLevelCurrent;             /**< Holds the current log level.*/
 
-    QWidget*                            m_pAboutWindow;                 /**< Holds the widget containing the about information.*/
+    QSharedPointer<QWidget>             m_pAboutWindow;                 /**< Holds the widget containing the about information.*/
 
     void updatePluginWidget(QSharedPointer<IPlugin> pPlugin);           /**< Sets the plugin widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
 

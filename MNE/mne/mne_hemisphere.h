@@ -128,6 +128,16 @@ public:
 
     //=========================================================================================================
     /**
+    * Add vertex normals and neighbourhood information
+    *
+    * @param [in, out] p_pHemisphere   Hemisphere to be completed
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool add_geometry_info();
+
+    //=========================================================================================================
+    /**
     * Initializes the hemisphere source space.
     */
     void clear();

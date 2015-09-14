@@ -49,6 +49,8 @@
 #include "mne_hemisphere.h"
 #include "mne_sourcespace.h"
 #include "mne_surface.h"
+#include "mne_bem.h"
+#include "mne_bem_surface.h"
 
 
 //*************************************************************************************************************

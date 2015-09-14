@@ -354,9 +354,9 @@ void ProjectionModel::addProjections(const QList<FiffProj>& dataProjs)
 
 //*************************************************************************************************************
 
-void ProjectionModel::addProjections(const FiffInfo &fiffInfo)
+void ProjectionModel::addProjections(FiffInfo::SPtr pFiffInfo)
 {
-    m_dataProjs.append(fiffInfo.projs);
+    m_dataProjs.append(pFiffInfo->projs);
 
     emit dataChanged(createIndex(0,0), createIndex(rowCount(),columnCount()));
     emit headerDataChanged(Qt::Vertical, 0, rowCount());

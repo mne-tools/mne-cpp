@@ -88,29 +88,51 @@ else {
 }
 
 SOURCES += \
-    colormap.cpp \
+    helpers/colormap.cpp \
     imagesc.cpp \
     plot.cpp \
     graph.cpp \
     rtplot.cpp \
-    filterplotscene.cpp \
     filterwindow.cpp \
+    helpers/layoutscene.cpp \
+    helpers/averagescene.cpp \
+    helpers/averagesceneitem.cpp \
     helpers/filterdatadelegate.cpp \
-    helpers/filterdatamodel.cpp
-
+    helpers/filterdatamodel.cpp \
+    helpers/averagescene.cpp \
+    helpers/averagesceneitem.cpp \
+    helpers/filterplotscene.cpp \
+    helpers/layoutscene.cpp \
+    helpers/selectionscene.cpp \
+    helpers/selectionsceneitem.cpp \
+    selectionmanagerwindow.cpp \
+    helpers/chinfomodel.cpp \
+    helpers/mneoperator.cpp \
+    helpers/roundededgeswidget.cpp
 
 HEADERS += \
     disp_global.h \
-    colormap.h \
+    helpers/colormap.h \
     imagesc.h \
     plot.h \
     graph.h \
     rtplot.h \
-    filterplotscene.h \
     filterwindow.h \
+    helpers/layoutscene.h \
+    helpers/averagescene.h \
+    helpers/averagesceneitem.h \
     helpers/filterdatadelegate.h \
-    helpers/filterdatamodel.h
-
+    helpers/filterdatamodel.h \
+    helpers/averagescene.h \
+    helpers/averagesceneitem.h \
+    helpers/filterplotscene.h \
+    helpers/layoutscene.h \
+    helpers/selectionscene.h \
+    helpers/selectionsceneitem.h \
+    selectionmanagerwindow.h \
+    helpers/chinfomodel.h \
+    helpers/mneoperator.h \
+    helpers/roundededgeswidget.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -122,6 +144,7 @@ header_files.path = $${MNE_INCLUDE_DIR}/disp
 INSTALLS += header_files
 
 FORMS += \
-    filterwindowwidget.ui
+    filterwindowwidget.ui \
+    selectionmanagerwindow.ui
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR

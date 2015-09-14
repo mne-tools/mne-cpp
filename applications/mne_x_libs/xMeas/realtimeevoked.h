@@ -158,15 +158,16 @@ public:
     *
     * @return the reference to the current info.
     */
-    inline FiffInfo& info();
+    inline FiffInfo::SPtr info();
 
     //=========================================================================================================
     /**
     * New devoked to distribute
     *
-    * @param [in] v     the evoked which should be distributed.
+    * @param [in] v             the evoked which should be distributed.
+    * @param [in] p_fiffinfo    the evoked fiff info as shared pointer.
     */
-    virtual void setValue(FiffEvoked& v);
+    virtual void setValue(FiffEvoked& v, FiffInfo::SPtr p_fiffinfo);
 
     //=========================================================================================================
     /**
@@ -192,13 +193,13 @@ private:
     *
     * @param[in] p_fiffInfo     Info to init from
     */
-    void init(FiffInfo &p_fiffInfo);
+    void init(FiffInfo::SPtr p_fiffInfo);
 
     mutable QMutex              m_qMutex;           /**< Mutex to ensure thread safety */
 
     FiffEvoked::SPtr            m_pFiffEvoked;      /**< Evoked data set */
 
-    FiffInfo                    m_fiffInfo;        /**< Fiff info */
+    FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff info */
 
     QString                     m_sXMLLayoutFile;   /**< Layout file name. */
 
@@ -271,10 +272,10 @@ inline QList<RealTimeSampleArrayChInfo>& RealTimeEvoked::chInfo()
 
 //*************************************************************************************************************
 
-inline FiffInfo& RealTimeEvoked::info()
+inline FiffInfo::SPtr RealTimeEvoked::info()
 {
     QMutexLocker locker(&m_qMutex);
-    return m_fiffInfo;
+    return m_pFiffInfo;
 }
 
 

@@ -51,7 +51,9 @@ SUBDIRS += \
     evokedGradAmp \
     cancelNoise \
     fiffIO \
-    makeLayout
+    makeLayout\
+    readBEM\
+    patientManager
 
 contains(MNECPP_CONFIG, withGui) {
 	SUBDIRS +=

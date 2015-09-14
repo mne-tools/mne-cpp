@@ -63,3 +63,4 @@ contains(MNECPP_CONFIG, withGui) {
 }
 
 CONFIG += ordered
+

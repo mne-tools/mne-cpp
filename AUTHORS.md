@@ -16,3 +16,6 @@ Authors
   * Martin Henfling <martin.henfling@tu-ilmenau.de> 2014
   * Seok Lew <slew@nmr.mgh.harvard.edu> 2014
   * Chiran Doshi <chiran.doshi@childrens.harvard.edu> 2014
+  * Franco-Joel Polo <franco-joel.polo@tu-ilmenau.de> 2014
+  * Carsten Boensel <carsten.boensel@tu-ilmenau.de> 2015
+  * Jana Kiesel <jana.kiesel@tu-ilmenau.de> 2015

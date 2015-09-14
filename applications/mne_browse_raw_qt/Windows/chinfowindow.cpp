@@ -76,7 +76,7 @@ ChInfoWindow::~ChInfoWindow()
 
 //*************************************************************************************************************
 
-ChInfoModel* ChInfoWindow::getDataModel()
+ChInfoModel::SPtr ChInfoWindow::getDataModel()
 {
     return m_pChInfoModel;
 }
@@ -86,7 +86,7 @@ ChInfoModel* ChInfoWindow::getDataModel()
 
 void ChInfoWindow::initMVC()
 {
-    m_pChInfoModel = new ChInfoModel(this);
+    m_pChInfoModel = ChInfoModel::SPtr(new ChInfoModel(this));
 }
 
 
@@ -94,10 +94,10 @@ void ChInfoWindow::initMVC()
 
 void ChInfoWindow::initTableViews()
 {
-    ui->m_tableView_chInfos->setModel(m_pChInfoModel);
+    ui->m_tableView_chInfos->setModel(m_pChInfoModel.data());
     ui->m_tableView_chInfos->verticalHeader()->setVisible(false);
 
-    connect(m_pChInfoModel, &ChInfoModel::dataChanged,
+    connect(m_pChInfoModel.data(), &ChInfoModel::dataChanged,
             ui->m_tableView_chInfos, &QTableView::resizeColumnsToContents);
 }
 

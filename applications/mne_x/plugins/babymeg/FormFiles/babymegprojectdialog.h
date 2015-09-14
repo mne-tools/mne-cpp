@@ -33,6 +33,12 @@ public:
     explicit BabyMEGProjectDialog(BabyMEG* p_pBabyMEG, QWidget *parent = 0);
     ~BabyMEGProjectDialog();
 
+    void setRecordingElapsedTime(int mSecsElapsed);
+
+signals:
+    void timerChanged(int secs);
+    void recordingTimerStateChanged(bool state);
+
 private:
     void addProject();
     void addSubject();
@@ -50,12 +56,17 @@ private:
 
     void updateFileName();
 
+    void onTimeChanged();
+    void onRecordingTimerStateChanged(bool state);
+
     BabyMEG* m_pBabyMEG;
 
     Ui::BabyMEGProjectDialog *ui;
 
     QStringList m_sListProjects;
     QStringList m_sListSubjects;
+
+    int m_iRecordingTime;       /**< recording time in ms.*/
 };
 
 } // NAMESPACE
