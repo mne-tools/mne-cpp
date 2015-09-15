@@ -45,7 +45,8 @@
 #include "disp_global.h"
 #include "helpers/filterdatamodel.h"
 #include "helpers/filterdatadelegate.h"
-#include "filterplotscene.h"
+#include "helpers/filterplotscene.h"
+#include "helpers/roundededgeswidget.h"
 
 #include "utils/mnemath.h"
 #include "utils/filterTools/filterdata.h"
@@ -100,7 +101,7 @@ using namespace UTILSLIB;
 *
 * @brief The FilterWindow class provides the filter window.
 */
-class DISPSHARED_EXPORT FilterWindow : public QWidget
+class DISPSHARED_EXPORT FilterWindow : public RoundedEdgesWidget
 {
     Q_OBJECT
 
@@ -114,7 +115,7 @@ public:
     *
     * @param [in] parent pointer to parent widget; If parent is 0, the new FilterWindow becomes a window. If parent is another widget, FilterWindow becomes a child window inside parent. FilterWindow is deleted when its parent is deleted.
     */
-    FilterWindow(QWidget *parent = 0);
+    FilterWindow(QWidget *parent = 0, Qt::WindowFlags type = 0);
 
     //=========================================================================================================
     /**

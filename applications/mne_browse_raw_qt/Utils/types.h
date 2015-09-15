@@ -127,6 +127,6 @@ Q_DECLARE_METATYPE(const FIFFLIB::FiffInfo*);
 Q_DECLARE_METATYPE(MNEBrowseRawQt::MatrixXdR);
 Q_DECLARE_METATYPE(MNEBrowseRawQt::RowVectorPair);
 Q_DECLARE_METATYPE(QList<MNEBrowseRawQt::RowVectorPair>);
-Q_DECLARE_METATYPE(QSharedPointer<MNEBrowseRawQt::MNEOperator>);
+Q_DECLARE_METATYPE(QSharedPointer<DISPLIB::MNEOperator>);
 
 #endif // TYPES_H

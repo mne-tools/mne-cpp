@@ -83,19 +83,13 @@ SOURCES += \
     main.cpp \
     Utils/datamarker.cpp \
     Utils/rawsettings.cpp \
-    Utils/mneoperator.cpp \
     Utils/filteroperator.cpp \
     Utils/filterplotscene.cpp \
     Utils/butterflyscene.cpp \
-    Utils/averagescene.cpp \
-    Utils/selectionscene.cpp \
-    Utils/selectionsceneitem.cpp \
-    Utils/averagesceneitem.cpp \
     Utils/butterflysceneitem.cpp \
     Models/averagemodel.cpp \
     Models/rawmodel.cpp \
     Models/eventmodel.cpp \
-    Models/chinfomodel.cpp \
     Models/projectionmodel.cpp \
     Delegates/averagedelegate.cpp \
     Delegates/rawdelegate.cpp \
@@ -106,7 +100,6 @@ SOURCES += \
     Windows/datawindow.cpp \
     Windows/aboutwindow.cpp \
     Windows/informationwindow.cpp \
-    Windows/selectionmanagerwindow.cpp \
     Windows/averagewindow.cpp \
     Windows/scalewindow.cpp \
     Windows/chinfowindow.cpp \
@@ -116,21 +109,15 @@ SOURCES += \
 HEADERS += \
     Utils/datamarker.h \
     Utils/rawsettings.h \
-    Utils/mneoperator.h \
     Utils/filteroperator.h \
     Utils/types.h \
     Utils/info.h \
     Utils/filterplotscene.h \
     Utils/butterflyscene.h \
-    Utils/averagescene.h \
-    Utils/selectionscene.h \
-    Utils/selectionsceneitem.h \
-    Utils/averagesceneitem.h \
     Utils/butterflysceneitem.h \
     Models/averagemodel.h \
     Models/rawmodel.h \
     Models/eventmodel.h \
-    Models/chinfomodel.h \
     Models/projectionmodel.h \
     Delegates/averagedelegate.h \
     Delegates/rawdelegate.h \
@@ -141,7 +128,6 @@ HEADERS += \
     Windows/datawindow.h \
     Windows/aboutwindow.h \
     Windows/informationwindow.h \
-    Windows/selectionmanagerwindow.h \
     Windows/averagewindow.h \
     Windows/scalewindow.h \
     Windows/chinfowindow.h \
@@ -154,7 +140,6 @@ FORMS += \
     Windows/mainwindow.ui \
     Windows/aboutwindow.ui \
     Windows/informationwindow.ui \
-    Windows/selectionmanagerwindow.ui \
     Windows/averagewindow.ui \
     Windows/scalewindow.ui \
     Windows/chinfowindow.ui \

@@ -1,15 +1,16 @@
 //=============================================================================================================
 /**
-* @file     averagescene.cpp
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* @file     mneoperator.cpp
+* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     September, 2014
+* @date     February, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +31,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the AverageScene class.
+* @brief    MNEOperator class represents the base class of an arbitrary MNEOperator, e.g. FILTER,PCA,AVERAGE.
+*           All specific Operators must be derived from MNEOperator, see the FilterOperator class.
 *
 */
 
@@ -39,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "averagescene.h"
+#include "mneoperator.h"
 
 
 //*************************************************************************************************************
@@ -47,8 +49,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace XDISPLIB;
-using namespace std;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -56,43 +57,33 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AverageScene::AverageScene(QGraphicsView* view, QObject* parent)
-: LayoutScene(view, parent)
+MNEOperator::MNEOperator()
+: m_OperatorType(UNKNOWN)
+, m_sName("unknown")
 {
 }
 
 
 //*************************************************************************************************************
 
-void AverageScene::setScaleMap(const QMap<qint32,float> &scaleMap)
+MNEOperator::MNEOperator(const MNEOperator& obj)
 {
-    QList<QGraphicsItem*> itemList = this->items();
-
-    QListIterator<QGraphicsItem*> i(itemList);
-    while (i.hasNext()) {
-        AverageSceneItem* AverageSceneItemTemp = static_cast<AverageSceneItem*>(i.next());
-        AverageSceneItemTemp->m_scaleMap = scaleMap;
-    }
-
-    this->update();
+    m_OperatorType = obj.m_OperatorType;
+    m_sName = obj.m_sName;
 }
 
 
 //*************************************************************************************************************
 
-void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelItems)
+MNEOperator::MNEOperator(OperatorType type)
+: m_OperatorType(type)
+, m_sName("unknown")
 {
-    this->clear();
+}
 
-    QListIterator<QGraphicsItem*> i(selectedChannelItems);
-    while (i.hasNext()) {
-        SelectionSceneItem* selectionSceneItemTemp = static_cast<SelectionSceneItem*>(i.next());
-        AverageSceneItem* averageSceneItemTemp = new AverageSceneItem(selectionSceneItemTemp->m_sChannelName,
-                                                                      selectionSceneItemTemp->m_iChannelNumber,
-                                                                      selectionSceneItemTemp->m_qpChannelPosition,
-                                                                      selectionSceneItemTemp->m_iChannelKind,
-                                                                      selectionSceneItemTemp->m_iChannelUnit);
 
-        this->addItem(averageSceneItemTemp);
-    }
+//*************************************************************************************************************
+
+MNEOperator::~MNEOperator()
+{
 }

@@ -394,7 +394,7 @@ void RealTimeEvokedWidget::init()
         }
 
         //-------- Init filter window --------
-        m_pFilterWindow = FilterWindow::SPtr(new FilterWindow(this));
+        m_pFilterWindow = FilterWindow::SPtr(new FilterWindow(this, Qt::Window));
         //m_pFilterWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
 
         m_pFilterWindow->setFiffInfo(m_pFiffInfo);

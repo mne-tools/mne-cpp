@@ -56,8 +56,8 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FilterWindow::FilterWindow(QWidget *parent)
-: QWidget(parent,Qt::Window)
+FilterWindow::FilterWindow(QWidget *parent, Qt::WindowFlags type)
+: RoundedEdgesWidget(parent, type)
 , ui(new Ui::FilterWindowWidget)
 , m_iWindowSize(4016)
 , m_iFilterTaps(512)
@@ -386,6 +386,8 @@ void FilterWindow::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
     ui->m_graphicsView_filterPlot->fitInView(m_pFilterPlotScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+
+    //RoundedEdgesWidget::resizeEvent(event);
 }
 
 

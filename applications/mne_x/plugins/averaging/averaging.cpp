@@ -79,8 +79,8 @@ Averaging::Averaging()
 , m_pAveragingBuffer(CircularMatrixBuffer<double>::SPtr())
 , m_bIsRunning(false)
 , m_bProcessData(false)
-, m_iPreStimSamples(400)
-, m_iPostStimSamples(750)
+, m_iPreStimSeconds(100)
+, m_iPostStimSeconds(400)
 , m_iNumAverages(10)
 , m_iStimChan(0)
 , m_pAveragingWidget(AveragingSettingsWidget::SPtr())
@@ -129,8 +129,8 @@ void Averaging::init()
     // Load Settings
     //
     QSettings settings;
-    m_iPreStimSamples = settings.value(QString("Plugin/%1/preStimSamples").arg(this->getName()), 400).toInt();
-    m_iPostStimSamples = settings.value(QString("Plugin/%1/postStimSamples").arg(this->getName()), 750).toInt();
+    m_iPreStimSeconds = settings.value(QString("Plugin/%1/preStimSeconds").arg(this->getName()), 100).toInt();
+    m_iPostStimSeconds = settings.value(QString("Plugin/%1/postStimSeconds").arg(this->getName()), 400).toInt();
     m_iNumAverages = settings.value(QString("Plugin/%1/numAverages").arg(this->getName()), 10).toInt();
     m_iStimChan = settings.value(QString("Plugin/%1/stimChannel").arg(this->getName()), 0).toInt();
 
@@ -161,8 +161,8 @@ void Averaging::unload()
     // Store Settings
     //
     QSettings settings;
-    settings.setValue(QString("Plugin/%1/preStimSamples").arg(this->getName()), m_iPreStimSamples);
-    settings.setValue(QString("Plugin/%1/postStimSamples").arg(this->getName()), m_iPostStimSamples);
+    settings.setValue(QString("Plugin/%1/preStimSeconds").arg(this->getName()), m_iPreStimSeconds);
+    settings.setValue(QString("Plugin/%1/postStimSeconds").arg(this->getName()), m_iPostStimSeconds);
     settings.setValue(QString("Plugin/%1/numAverages").arg(this->getName()), m_iNumAverages);
     settings.setValue(QString("Plugin/%1/stimChannel").arg(this->getName()), m_iStimChan);
 }
@@ -256,16 +256,24 @@ void Averaging::changeStimChannel(qint32 index)
     Q_UNUSED(index)
     QMutexLocker locker(&m_qMutex);
     m_iStimChan = m_pAveragingWidget->m_pComboBoxChSelection->currentData().toInt();
+
+    m_pRtAve->setTriggerChIndx(m_qListStimChs.at(index));
+
 //    qDebug() << "Averaging::changeStimChannel(qint32 index)" << m_pAveragingWidget->m_pComboBoxChSelection->currentData().toInt();
 }
 
 
 //*************************************************************************************************************
 
-void Averaging::changePreStim(qint32 samples)
+void Averaging::changePreStim(qint32 mseconds)
 {
+    if(mseconds<10)
+        mseconds=10;
+
     QMutexLocker locker(&m_qMutex);
-    m_iPreStimSamples = samples;
+    m_iPreStimSeconds = mseconds;
+    m_iPreStimSamples = ((float)mseconds/1000)*m_pFiffInfo->sfreq;
+    qDebug()<<m_iPreStimSamples;
     if(m_pRtAve)
         m_pRtAve->setPreStim(m_iPreStimSamples);
 
@@ -274,10 +282,15 @@ void Averaging::changePreStim(qint32 samples)
 
 //*************************************************************************************************************
 
-void Averaging::changePostStim(qint32 samples)
+void Averaging::changePostStim(qint32 mseconds)
 {
+    if(mseconds<10)
+        mseconds=10;
+
     QMutexLocker locker(&m_qMutex);
-    m_iPostStimSamples = samples;
+    m_iPostStimSeconds = mseconds;
+    m_iPostStimSamples = ((float)mseconds/1000)*m_pFiffInfo->sfreq;
+    qDebug()<<m_iPostStimSamples;
     if(m_pRtAve)
         m_pRtAve->setPostStim(m_iPostStimSamples);
 }
@@ -376,14 +389,14 @@ void Averaging::appendEvoked(FiffEvoked::SPtr p_pEvoked)
 //    qDebug() << p_pEvoked->comment;
     QString t_sStimulusChannel = m_pFiffInfo->chs[m_qListStimChs[m_iStimChan]].ch_name;
 
-    if(p_pEvoked->comment == t_sStimulusChannel)
-    {
+//    if(p_pEvoked->comment == t_sStimulusChannel)
+//    {
 //        qDebug()<< "append" << p_pEvoked->comment << "=" << t_sStimulusChannel;
         m_qMutex.lock();
         m_qVecEvokedData.push_back(p_pEvoked);
         m_qMutex.unlock();
 //        qDebug() << "append after" << m_qVecEvokedData.size();
-    }
+//    }
 }
 
 
@@ -397,6 +410,9 @@ void Averaging::run()
     //
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
+
+    m_iPreStimSamples = ((float)m_iPreStimSeconds/1000)*m_pFiffInfo->sfreq;
+    m_iPostStimSamples = ((float)m_iPostStimSeconds/1000)*m_pFiffInfo->sfreq;
 
     m_pActionShowAdjustment->setVisible(true);
 

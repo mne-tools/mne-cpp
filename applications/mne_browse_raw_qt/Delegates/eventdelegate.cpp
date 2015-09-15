@@ -81,7 +81,7 @@ QWidget *EventDelegate::createEditor(QWidget *parent,
         case 1: {
             QDoubleSpinBox *editor = new QDoubleSpinBox(parent);
             editor->setMinimum(0.0);
-            editor->setMaximum(pEventModel->getFirstLastSample().second / pEventModel->getFiffInfo().sfreq);
+            editor->setMaximum(pEventModel->getFirstLastSample().second / pEventModel->getFiffInfo()->sfreq);
             editor->setSingleStep(0.01);
             return editor;
         }

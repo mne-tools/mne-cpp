@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     averagesceneitem.h
+* @file     selectionsceneitem.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     October, 2014
+* @date     September, 2014
 *
 * @section  LICENSE
 *
@@ -30,22 +30,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the AverageSceneItem class.
+* @brief    Contains the declaration of the SelectionSceneItem class.
 *
 */
 
-#ifndef AVERAGESCENEITEM_H
-#define AVERAGESCENEITEM_H
+#ifndef SELECTIONSCENEITEM_H
+#define SELECTIONSCENEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
+#include "../disp_global.h"
 #include <iostream>
-#include <Eigen/Core>
-#include <fiff/fiff.h>
-#include "types.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -62,18 +61,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-using namespace Eigen;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNEBrowseRawQt
-//=============================================================================================================
-
-namespace MNEBrowseRawQt
+namespace DISPLIB
 {
 
 
@@ -85,19 +76,19 @@ namespace MNEBrowseRawQt
 
 //=============================================================================================================
 /**
-* AverageSceneItem...
+* SelectionSceneItem...
 *
-* @brief The AverageSceneItem class provides a new data structure for visualizing averages in a 2D layout.
+* @brief The SelectionSceneItem class provides a new data structure for visualizing channels in a 2D layout.
 */
-class AverageSceneItem : public QGraphicsItem
+class DISPSHARED_EXPORT SelectionSceneItem : public QGraphicsItem
 {
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a AverageSceneItem.
+    * Constructs a SelectionSceneItem.
     */
-    AverageSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor defaultColors = Qt::red);
+    SelectionSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor channelColor = Qt::blue, bool bIsBadChannel = false);
 
     //=========================================================================================================
     /**
@@ -109,29 +100,18 @@ public:
     /**
     * Reimplemented paint function.
     */
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    QString                 m_sChannelName;             /**< The channel name.*/
-    int                     m_iChannelNumber;           /**< The channel number.*/
-    int                     m_iChannelKind;             /**< The channel kind.*/
-    int                     m_iChannelUnit;             /**< The channel unit.*/
-    int                     m_iTotalNumberChannels;     /**< The total number of channels loaded in the curent evoked data set.*/
-    QPointF                 m_qpChannelPosition;        /**< The channels 2D position in the scene.*/
-    QList<QColor>           m_cAverageColors;           /**< The current average color.*/
-    QList<RowVectorPair>    m_lAverageData;             /**< The channels average data which is to be plotted.*/
-    QPair<int,int>          m_firstLastSample;          /**< The first and last sample.*/
-    QMap<QString,double>    m_scaleMap;                 /**< Map with all channel types and their current scaling value.*/
-
-protected:
-    //=========================================================================================================
-    /**
-    * Create a plot path and paint the average data
-    *
-    * @param [in] painter The painter used to plot in this item.
-    */
-    void paintAveragePath(QPainter *painter);
+    QString     m_sChannelName;             /**< The channel's name.*/
+    int         m_iChannelNumber;           /**< The channel number.*/
+    int         m_iChannelKind;             /**< The channel kind.*/
+    int         m_iChannelUnit;             /**< The channel unit.*/
+    QPointF     m_qpChannelPosition;        /**< The channel's 2D position in the scene.*/
+    QColor      m_cChannelColor;            /**< The current channel color.*/
+    bool        m_bHighlightItem;           /**< Whether this item is to be highlighted.*/
+    bool        m_bIsBadChannel;            /**< Whether this item is a bad channel.*/
 };
 
-} // NAMESPACE MNEBrowseRawQt
+} // NAMESPACE DISPLIB
 
-#endif // AVERAGESCENEITEM_H
+#endif // SELECTIONSCENEITEM_H
