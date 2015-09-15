@@ -86,7 +86,7 @@ RtAve::RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStim
 , m_iTriggerPos(-1)
 , m_bRunningAverage(true)
 , m_bDoBaselineCorrection(false)
-, m_pairBaseline(qMakePair(QVariant(QString::number(p_iBaselineFromSamples)),QVariant(QString::number(p_iBaselineToSamples))))
+, m_pairBaselineSec(qMakePair(QVariant(QString::number(p_iBaselineFromSamples)),QVariant(QString::number(p_iBaselineToSamples))))
 {
     qRegisterMetaType<FiffEvoked::SPtr>("FiffEvoked::SPtr");
 }
@@ -162,29 +162,33 @@ void RtAve::setBaselineActive(bool activate)
     if(!m_bDoBaselineCorrection)
         m_pStimEvoked->baseline = qMakePair(QVariant("None"), QVariant("None"));
 
-    m_pStimEvoked->baseline = m_pairBaseline;
+    m_pStimEvoked->baseline = m_pairBaselineSec;
 }
 
 
 //*************************************************************************************************************
 
-void RtAve::setBaselineFrom(int from)
+void RtAve::setBaselineFrom(int fromSamp, int fromMSec)
 {
     QMutexLocker locker(&m_qMutex);
-    m_pairBaseline.first = QVariant(QString::number(from));
+    m_pairBaselineSec.first = QVariant(QString::number(fromMSec));
+    m_pairBaselineSamp.first = QVariant(QString::number(fromSamp));
 
-    m_pStimEvoked->baseline.first = QVariant(QString::number(from));
+    m_pStimEvoked->baseline.first = QVariant(QString::number(fromMSec));
 }
 
 
 //*************************************************************************************************************
 
-void RtAve::setBaselineTo(int to)
+void RtAve::setBaselineTo(int toSamp, int toMSec)
 {
-    QMutexLocker locker(&m_qMutex);
-    m_pairBaseline.second = QVariant(QString::number(to));
+    Q_UNUSED(toSamp);
 
-    m_pStimEvoked->baseline.second = QVariant(QString::number(to));
+    QMutexLocker locker(&m_qMutex);
+    m_pairBaselineSec.second = QVariant(QString::number(toMSec));
+    m_pairBaselineSamp.second = QVariant(QString::number(toSamp));
+
+    m_pStimEvoked->baseline.second = QVariant(QString::number(toMSec));
 }
 
 
@@ -257,7 +261,7 @@ void RtAve::run()
     m_iNewPreStimSamples = m_iPreStimSamples;
     m_iNewPostStimSamples = m_iPostStimSamples;
 
-    m_pStimEvoked->baseline = m_pairBaseline;
+    m_pStimEvoked->baseline = m_pairBaselineSec;
 
     m_qMutex.unlock();
 
@@ -445,7 +449,7 @@ void RtAve::generateEvoked()
         finalAverage = finalAverage/m_qListStimAve.size();
 
         if(m_bDoBaselineCorrection)
-            finalAverage = MNEMath::rescale(finalAverage, m_pStimEvoked->times, m_pairBaseline, QString("mean"));
+            finalAverage = MNEMath::rescale(finalAverage, m_pStimEvoked->times, m_pairBaselineSamp, QString("mean"));
 
         m_pStimEvoked->data = finalAverage;
         m_pStimEvoked->nave = m_iNumAverages;
@@ -453,7 +457,7 @@ void RtAve::generateEvoked()
         MatrixXd tempMatrix = m_qListStimAve.last();
 
         if(m_bDoBaselineCorrection)
-            tempMatrix = MNEMath::rescale(tempMatrix, m_pStimEvoked->times, m_pairBaseline, QString("mean"));
+            tempMatrix = MNEMath::rescale(tempMatrix, m_pStimEvoked->times, m_pairBaselineSamp, QString("mean"));
 
         *m_pStimEvoked.data() += tempMatrix;
     }

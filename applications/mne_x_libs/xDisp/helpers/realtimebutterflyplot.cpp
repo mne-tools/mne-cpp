@@ -79,17 +79,38 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
     if(m_bIsInit)
     {
         //Draw baseline correction area
-        qDebug()<<"Baseline from: "<<m_pRealTimeEvokedModel->getBaselineInfo().first.toInt();
-        qDebug()<<"Baseline to: "<<m_pRealTimeEvokedModel->getBaselineInfo().second.toInt();
+        if(m_pRealTimeEvokedModel->getBaselineInfo().first.toString() != "None" &&
+                m_pRealTimeEvokedModel->getBaselineInfo().second.toString() != "None") {
+            int from = m_pRealTimeEvokedModel->getBaselineInfo().first.toInt();
+            int to = m_pRealTimeEvokedModel->getBaselineInfo().second.toInt();
+
+            painter.save();
+            painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
+            painter.setBrush(Qt::red);
+            painter.setOpacity(0.15);
+
+            float fDx = (float)(this->width()) / ((float)m_pRealTimeEvokedModel->getNumSamples());
+
+            float fromSamp = ((from/1000.0)*m_pRealTimeEvokedModel->getSamplingFrequency())+m_pRealTimeEvokedModel->getNumPreStimSamples();
+            float posX = fDx*(fromSamp);
+            float toSamp = ((to/1000.0)*m_pRealTimeEvokedModel->getSamplingFrequency())+m_pRealTimeEvokedModel->getNumPreStimSamples();
+            float width = fDx*(toSamp-fromSamp);
+
+            QRect rect(posX,0,width,this->height());
+
+            painter.drawRect(rect);
+
+            painter.restore();
+        }
 
         //Stimulus bar
         if(m_pRealTimeEvokedModel->getNumSamples() > 0) {
             painter.save();
             painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
 
-            float fDx = (float)(this->width()-2) / ((float)m_pRealTimeEvokedModel->getNumSamples()-1.0f);
+            float fDx = (float)(this->width()) / ((float)m_pRealTimeEvokedModel->getNumSamples());
             float posX = fDx * ((float)m_pRealTimeEvokedModel->getNumPreStimSamples());
-            painter.drawLine(posX, 1, posX, this->height()-2);
+            painter.drawLine(posX, 1, posX, this->height());
 
             painter.drawText(QPointF(posX+5,this->rect().bottomRight().y()-5), QString("0ms / Stimulus"));
 
@@ -106,7 +127,7 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
 
             float yStart = this->rect().topLeft().y();
             float yEnd = this->rect().bottomRight().y();
-            float fDx = (float)(this->width()-2) / ((float)m_pRealTimeEvokedModel->getNumSamples()-1.0f);
+            float fDx = (float)(this->width()) / ((float)m_pRealTimeEvokedModel->getNumSamples());
 
             float sampleCounter = m_pRealTimeEvokedModel->getNumPreStimSamples();
             int counter = 1;
