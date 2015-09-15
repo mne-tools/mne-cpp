@@ -139,7 +139,7 @@ public:
     *
     * @param fiffInfo fiff info variabel
     */
-    void setFiffInfo(FiffInfo& fiffInfo);
+    void setFiffInfo(FiffInfo::SPtr pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -163,7 +163,7 @@ public:
     * getFiffInfo returns the fiffinfo
     *
     */
-    FiffInfo getFiffInfo() const;
+    FiffInfo::SPtr getFiffInfo() const;
 
     //=========================================================================================================
     /**
@@ -223,7 +223,7 @@ private:
     QVector<int>        m_dataTypes_Filtered;       /**< Filtered Vector that holds the type alues for each loaded event. */
     QVector<int>        m_dataIsUserEvent_Filtered; /**< Filtered Vector that holds the flag whether the event is user defined or loaded from file. */
 
-    FiffInfo            m_fiffInfo;                 /**< Fiff info of whole fiff file. */
+    FiffInfo::SPtr      m_pFiffInfo;                /**< Fiff info of whole fiff file. */
 
     int                 m_iFirstSample;             /**< The first/starting sample of the fiff data file. */
     int                 m_iLastSample;              /**< The last/ending sample of the fiff data file. */

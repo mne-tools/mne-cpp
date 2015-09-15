@@ -42,13 +42,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_selectionmanagerwindow.h"
+#include "disp_global.h"
 #include "utils/layoutloader.h"             //MNE-CPP utils
 #include "utils/selectionio.h"              //MNE-CPP utils
 #include "utils/layoutmaker.h"              //MNE-CPP utils
-#include "selectionscene.h"
+#include "helpers/selectionscene.h"
 #include "fiff/fiff.h"
-#include "chinfomodel.h"
+#include "helpers/chinfomodel.h"
 
 
 //*************************************************************************************************************
@@ -59,6 +59,7 @@
 #include <QMutableStringListIterator>
 #include <QFileDialog>
 #include <QStandardPaths>
+#include <QListWidget>
 
 
 //*************************************************************************************************************
@@ -72,10 +73,12 @@ using namespace UTILSLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE XDISPLIB
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace XDISPLIB
+namespace Ui {class SelectionManagerWindow;} //This must be defined outside of the DISPLIB namespace
+
+namespace DISPLIB
 {
 
 
@@ -90,7 +93,7 @@ namespace XDISPLIB
 *
 * @brief The SelectionManagerWindow class provides a channel selection window.
 */
-class SelectionManagerWindow : public QWidget
+class DISPSHARED_EXPORT SelectionManagerWindow : public QWidget
 {
     Q_OBJECT
 
@@ -105,7 +108,7 @@ public:
     * @param [in] parent pointer to parent widget; If parent is 0, the new SelectionManagerWindow becomes a window. If parent is another widget, SelectionManagerWindow becomes a child window inside parent. SelectionManagerWindow is deleted when its parent is deleted.
     * @param [in] pChInfoModel pointer to the channel info model.
     */
-    SelectionManagerWindow(QWidget *parent = 0, ChInfoModel::SPtr pChInfoModel = ChInfoModel::SPtr(0));
+    SelectionManagerWindow(QWidget *parent = 0, ChInfoModel::SPtr pChInfoModel = ChInfoModel::SPtr(0), Qt::WindowType type = Qt::Window);
 
     //=========================================================================================================
     /**
@@ -166,7 +169,7 @@ public:
     /**
     * call this whenever a new file was loaded.
     */
-    void newFiffFileLoaded();
+    void newFiffFileLoaded(FiffInfo::SPtr pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -358,6 +361,6 @@ private:
     QStringList                     m_currentlyLoadedFiffChannels;      /**< List of currently loaded fiff data channels.*/
 };
 
-} // NAMESPACE XDISPLIB
+} // NAMESPACE DISPLIB
 
 #endif // SELECTIONMANAGERWINDOW_H

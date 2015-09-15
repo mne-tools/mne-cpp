@@ -122,8 +122,27 @@ void AverageWindow::channelSelectionManagerChanged(const QList<QGraphicsItem*> &
 void AverageWindow::scaleAveragedData(const QMap<QString,double> &scaleMap)
 {
     //Set the scale map received from the scale window
-    m_pAverageScene->setScaleMap(scaleMap);
+    QMap<qint32,float> newScaleMapIdx;
+
+    newScaleMapIdx[FIFF_UNIT_T_M] = scaleMap["MEG_grad"];
+    newScaleMapIdx[FIFF_UNIT_T] = scaleMap["MEG_mag"];
+    newScaleMapIdx[FIFFV_REF_MEG_CH] = scaleMap["MEG_mag"];
+    newScaleMapIdx[FIFFV_EEG_CH] = scaleMap["MEG_EEG"];
+    newScaleMapIdx[FIFFV_EOG_CH] = scaleMap["MEG_EOG"];
+    newScaleMapIdx[FIFFV_EMG_CH] = scaleMap["MEG_EMG"];
+    newScaleMapIdx[FIFFV_STIM_CH] = scaleMap["MEG_STIM"];
+    newScaleMapIdx[FIFFV_MISC_CH] = scaleMap["MEG_MISC"];
+
+    m_pAverageScene->setScaleMap(newScaleMapIdx);
     m_pButterflyScene->setScaleMap(scaleMap);
+}
+
+
+//*************************************************************************************************************
+
+void AverageWindow::setMappedChannelNames(QStringList mappedChannelNames)
+{
+    m_mappedChannelNames = mappedChannelNames;
 }
 
 
@@ -255,16 +274,15 @@ void AverageWindow::onSelectionChanged(const QItemSelection &selected, const QIt
             int last = m_pAverageModel->data(m_pAverageModel->index(index.row(), 3), AverageModelRoles::GetLastSample).toInt();
 
             //Get the averageScenItem specific data row
-            QStringList chNames = fiffInfo->ch_names;
+            int channelNumber = m_mappedChannelNames.indexOf(averageSceneItemTemp->m_sChannelName);
 
-            int channelNumber = chNames.indexOf(averageSceneItemTemp->m_sChannelName);
             if(channelNumber != -1) {
                 averageSceneItemTemp->m_firstLastSample.first = first;
                 averageSceneItemTemp->m_firstLastSample.second = last;
                 averageSceneItemTemp->m_iChannelKind = fiffInfo->chs.at(channelNumber).kind;
                 averageSceneItemTemp->m_iChannelUnit = fiffInfo->chs.at(channelNumber).unit;;
                 averageSceneItemTemp->m_iChannelNumber = channelNumber;
-                averageSceneItemTemp->m_iTotalNumberChannels = chNames.size();
+                averageSceneItemTemp->m_iTotalNumberChannels = fiffInfo->ch_names.size();
                 averageSceneItemTemp->m_lAverageData.append(averageData);
             }
         }

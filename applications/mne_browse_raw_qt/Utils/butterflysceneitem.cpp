@@ -94,6 +94,8 @@ void ButterflySceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     //Plot bounding rect / drawing region of this item
     //painter->drawRect(this->boundingRect());
 
+    painter->setRenderHint(QPainter::Antialiasing, true);
+
     //Plot average data
     painter->save();
     paintAveragePaths(painter);

@@ -48,7 +48,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace XDISPLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -59,6 +59,15 @@ using namespace XDISPLIB;
 ChInfoModel::ChInfoModel(FiffInfo::SPtr pFiffInfo, QObject *parent)
 : QAbstractTableModel(parent)
 , m_pFiffInfo(pFiffInfo)
+{
+}
+
+
+//*************************************************************************************************************
+
+ChInfoModel::ChInfoModel(QObject *parent)
+: QAbstractTableModel(parent)
+, m_pFiffInfo(FiffInfo::SPtr(new FiffInfo))
 {
 }
 
@@ -524,16 +533,16 @@ void ChInfoModel::fiffInfoChanged(FiffInfo::SPtr pFiffInfo)
 
 //*************************************************************************************************************
 
-//void ChInfoModel::assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOperator> > &assignedOperators)
-//{
-//    beginResetModel();
+void ChInfoModel::assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOperator> > &assignedOperators)
+{
+    beginResetModel();
 
-//    m_assignedOperators = assignedOperators;
+    m_assignedOperators = assignedOperators;
 
-//    endResetModel();
+    endResetModel();
 
-//    emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
-//}
+    emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
+}
 
 
 //*************************************************************************************************************

@@ -39,6 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "ui_selectionmanagerwindow.h"
 #include "selectionmanagerwindow.h"
 
 
@@ -47,7 +48,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace XDISPLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -55,8 +56,8 @@ using namespace XDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SelectionManagerWindow::SelectionManagerWindow(QWidget *parent, ChInfoModel::SPtr pChInfoModel)
-: QWidget(parent,Qt::Window)
+SelectionManagerWindow::SelectionManagerWindow(QWidget *parent, ChInfoModel::SPtr pChInfoModel, Qt::WindowType type)
+: QWidget(parent, type)
 , ui(new Ui::SelectionManagerWindow)
 , m_pChInfoModel(pChInfoModel)
 {
@@ -282,8 +283,10 @@ const QMap<QString,QPointF>& SelectionManagerWindow::getLayoutMap()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::newFiffFileLoaded()
+void SelectionManagerWindow::newFiffFileLoaded(FiffInfo::SPtr pFiffInfo)
 {
+    Q_UNUSED(pFiffInfo);
+
     loadLayout(ui->m_comboBox_layoutFile->currentText());
 }
 

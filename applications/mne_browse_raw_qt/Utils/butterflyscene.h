@@ -42,9 +42,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "disp/layoutscene.h"
+#include "disp/helpers/layoutscene.h"
 #include "butterflysceneitem.h"
-#include "selectionsceneitem.h"
+#include "disp/helpers/selectionsceneitem.h"
 
 
 //*************************************************************************************************************

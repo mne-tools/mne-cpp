@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     selectionsceneitem.cpp
+* @file     averagescene.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     September, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
@@ -30,16 +30,40 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the SelectionSceneItem class.
+* @brief    Contains the declaration of the AverageScene class.
 *
 */
+
+#ifndef AVERAGESCENE_H
+#define AVERAGESCENE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
+#include "../disp_global.h"
+#include "layoutscene.h"
+#include "averagesceneitem.h"
 #include "selectionsceneitem.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QGraphicsScene>
+#include <QList>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISPLIB
+//=============================================================================================================
+
+namespace DISPLIB
+{
 
 
 //*************************************************************************************************************
@@ -47,83 +71,55 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEBrowseRawQt;
-using namespace std;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-SelectionSceneItem::SelectionSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor channelColor)
-: m_sChannelName(channelName)
-, m_iChannelNumber(channelNumber)
-, m_qpChannelPosition(channelPosition)
-, m_cChannelColor(channelColor)
-, m_bHighlightItem(false)
-, m_iChannelKind(channelKind)
-, m_iChannelUnit(channelUnit)
+class SelectionSceneItem;
+
+
+//=============================================================================================================
+/**
+* AverageScene...
+*
+* @brief The AverageScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
+*/
+class DISPSHARED_EXPORT AverageScene : public LayoutScene
 {
-    this->setAcceptHoverEvents(true);
-    this->setFlag(QGraphicsItem::ItemIsSelectable, true);
-}
+    Q_OBJECT
 
+public:
+    typedef QSharedPointer<AverageScene> SPtr;              /**< Shared pointer type for AverageScene. */
+    typedef QSharedPointer<const AverageScene> ConstSPtr;   /**< Const shared pointer type for AverageScene. */
 
-//*************************************************************************************************************
+    //=========================================================================================================
+    /**
+    * Constructs a AverageScene.
+    */
+    explicit AverageScene(QGraphicsView* view, QObject *parent = 0);
 
-QRectF SelectionSceneItem::boundingRect() const
-{
-    return QRectF(-25, -30, 50, 50);
-}
+    //=========================================================================================================
+    /**
+    * Sets the scale map to scaleMap.
+    *
+    * @param [in] scaleMap map with all channel types and their current scaling value.
+    */
+    void setScaleMap(const QMap<qint32, float> &scaleMap);
 
+    //=========================================================================================================
+    /**
+    * Repaints all items from the layout data in the scene.
+    *
+    *  @param [in] selectedChannelItems items which are to painted to the average scene
+    */
+    void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
 
-//*************************************************************************************************************
+private:
+    QList<SelectionSceneItem*>      m_lSelectedChannelItems;        /**< Holds the selected channels from the selection manager.*/
+};
 
-void SelectionSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
+} // NAMESPACE DISPLIB
 
-    this->setPos(10*m_qpChannelPosition.x(), -10*m_qpChannelPosition.y());
-
-    // Plot shadow
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(Qt::darkGray);
-    painter->drawEllipse(-12, -12, 30, 30);
-
-    //Plot selected item
-    if(this->isSelected())
-        painter->setBrush(QBrush(QColor(93,177,47)));
-    else
-        painter->setBrush(QBrush(m_cChannelColor));
-
-    //Plot highlighted selected item
-    if(m_bHighlightItem) {
-        painter->setPen(QPen(Qt::red, 4));
-        painter->drawEllipse(-15, -15, 30, 30);
-    }
-    else {
-        painter->setPen(QPen(Qt::black, 1));
-        painter->drawEllipse(-15, -15, 30, 30);
-    }
-
-    // Plot electrode name
-    painter->setPen(QPen(Qt::black, 1));
-    QStaticText staticElectrodeName = QStaticText(m_sChannelName);
-    QSizeF sizeText = staticElectrodeName.size();
-    painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
+#endif // AverageScene_H

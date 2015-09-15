@@ -129,10 +129,18 @@ public:
     */
     bool saveEvokedData(QFile& qFile);
 
+    //=========================================================================================================
+    /**
+    * getFiffInfo returns the fiff info
+    *
+    * @param FiffInfo of the evoked file
+    */
+    const FiffInfo getFiffInfo();
+
     bool                        m_bFileloaded;          /**< true when a Fiff evoked file is loaded. */
 
 protected:
-    FiffEvokedSet               m_pEvokedDataSet;       /**< QList<FiffEvoked> that holds the evoked data sets which are to be organised and handled by this model. */
+    FiffEvokedSet::SPtr         m_pEvokedDataSet;       /**< QList<FiffEvoked> that holds the evoked data sets which are to be organised and handled by this model. */
     QSharedPointer<FiffIO>      m_pfiffIO;              /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!). */
 
     //=========================================================================================================

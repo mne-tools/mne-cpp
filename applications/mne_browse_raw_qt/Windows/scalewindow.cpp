@@ -120,7 +120,7 @@ QMap<QString,double> ScaleWindow::genereateScalingMap()
 
 //*************************************************************************************************************
 
-void ScaleWindow::hideSpinBoxes(FiffInfo currentFiffInfo)
+void ScaleWindow::hideSpinBoxes(FiffInfo::SPtr pCurrentFiffInfo)
 {
     //Hide all spin boxes and labels
     ui->m_doubleSpinBox_MEG_grad->hide();
@@ -142,7 +142,7 @@ void ScaleWindow::hideSpinBoxes(FiffInfo currentFiffInfo)
     ui->m_label_STIM->hide();
 
     //Show only spin boxes and labels which type are present in the current loaded fiffinfo
-    QList<FiffChInfo> channelList = currentFiffInfo.chs;
+    QList<FiffChInfo> channelList = pCurrentFiffInfo->chs;
     for(int i = 0; i<channelList.size(); i++) {
         switch(channelList.at(i).kind) {
         case FIFFV_MEG_CH: {

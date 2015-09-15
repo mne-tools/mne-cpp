@@ -100,24 +100,18 @@ SOURCES += \
     newmeasurementwidget.cpp \
     realtimemultisamplearraywidget.cpp \
     realtimesamplearraywidget.cpp \
+    realtimeevokedwidget.cpp \
+    realtimecovwidget.cpp \
+    frequencyspectrumwidget.cpp \
+    helpers/realtimebutterflyplot.cpp \
     helpers/realtimemultisamplearraymodel.cpp \
     helpers/realtimemultisamplearraydelegate.cpp \
     helpers/realtimeevokedmodel.cpp \
-    realtimeevokedwidget.cpp \
-    helpers/realtimebutterflyplot.cpp \
-    realtimecovwidget.cpp \
     helpers/covmodalitywidget.cpp \
-    frequencyspectrumwidget.cpp \
     helpers/frequencyspectrummodel.cpp \
     helpers/frequencyspectrumdelegate.cpp \
     helpers/frequencyspectrumsettingswidget.cpp \
-    helpers/selectionmanagerwindow.cpp \
-    helpers/selectionscene.cpp \
-    helpers/selectionsceneitem.cpp \
-    helpers/chinfomodel.cpp \
     helpers/quickcontrolwidget.cpp \
-    helpers/averagescene.cpp \
-    helpers/averagesceneitem.cpp
 
 HEADERS += \
     xdisp_global.h \
@@ -125,28 +119,21 @@ HEADERS += \
     newmeasurementwidget.h \
     realtimemultisamplearraywidget.h \
     realtimesamplearraywidget.h \
+    realtimeevokedwidget.h \
+    realtimecovwidget.h \
+    frequencyspectrumwidget.h \
     helpers/realtimemultisamplearraymodel.h \
     helpers/realtimemultisamplearraydelegate.h \
     helpers/realtimeevokedmodel.h \
-    realtimeevokedwidget.h \
     helpers/realtimebutterflyplot.h \
-    realtimecovwidget.h \
     helpers/covmodalitywidget.h \
-    frequencyspectrumwidget.h \
     helpers/frequencyspectrumdelegate.h \
     helpers/frequencyspectrummodel.h \
     helpers/frequencyspectrumsettingswidget.h \
-    helpers/selectionmanagerwindow.h \
-    helpers/selectionscene.h \
-    helpers/selectionsceneitem.h \
-    helpers/chinfomodel.h \
     helpers/quickcontrolwidget.h \
-    helpers/averagescene.h \
-    helpers/averagesceneitem.h
 
 FORMS += \
     realtimesamplearraywidget.ui \
-    helpers/selectionmanagerwindow.ui \
     helpers/quickcontrolwidget.ui
 
 qtHaveModule(3d) {

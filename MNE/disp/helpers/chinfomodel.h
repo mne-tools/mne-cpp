@@ -43,9 +43,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../Utils/rawsettings.h"
-#include "../Utils/types.h"
-#include "../Utils/filteroperator.h"
+#include "../disp_global.h"
+#include "mneoperator.h"
 
 
 //*************************************************************************************************************
@@ -84,20 +83,47 @@ using namespace FIFFLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEBrowseRawQt
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace MNEBrowseRawQt
+namespace DISPLIB
 {
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//Declare type roles
+namespace ChInfoModelRoles
+{
+    enum ItemRole{GetOrigChName = Qt::UserRole + 1009,
+                  GetMappedLayoutChName = Qt::UserRole + 1010,
+                  GetChNumber = Qt::UserRole + 1011,
+                  GetChKind = Qt::UserRole + 1012,
+                  GetMEGType = Qt::UserRole + 1013,
+                  GetChUnit = Qt::UserRole + 1014,
+                  GetChAlias = Qt::UserRole + 1015,
+                  GetChPosition = Qt::UserRole + 1016,
+                  GetChDigitizer = Qt::UserRole + 1017,
+                  GetChActiveFilter = Qt::UserRole + 1018,
+                  GetChCoilType = Qt::UserRole + 1019,
+                  GetIsBad = Qt::UserRole + 1020};
+}
 
 //=============================================================================================================
 /**
 * DECLARE CLASS ChInfoModel
 */
-class ChInfoModel : public QAbstractTableModel
+class DISPSHARED_EXPORT ChInfoModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
+    typedef QSharedPointer<ChInfoModel> SPtr;              /**< Shared pointer type for ChInfoModel. */
+    typedef QSharedPointer<const ChInfoModel> ConstSPtr;   /**< Const shared pointer type for ChInfoModel. */
+
+    ChInfoModel(FiffInfo::SPtr pFiffInfo, QObject *parent = 0);
     ChInfoModel(QObject *parent = 0);
 
     //=========================================================================================================
@@ -120,7 +146,7 @@ public:
     *
     * @param fiffInfo fiff info variabel.
     */
-    void fiffInfoChanged(const FiffInfo &fiffInfo);
+    void fiffInfoChanged(FiffInfo::SPtr pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -164,6 +190,8 @@ public:
     */
     int getIndexFromMappedChName(QString chName);
 
+    QStringList getBadChannelList();
+
 signals:
     //=========================================================================================================
     /**
@@ -187,7 +215,7 @@ protected:
     */
     void mapLayoutToChannels();
 
-    FiffInfo                m_fiffInfo;             /**< The fiff info of the currently loaded fiff file. */
+    FiffInfo::SPtr          m_pFiffInfo;             /**< The fiff info of the currently loaded fiff file. */
     QMap<QString,QPointF>   m_layoutMap;            /**< The current layout map with a position for all MEG and EEG channels. */
     QStringList             m_aliasNames;           /**< list of given channel aliases. */
     QStringList             m_mappedLayoutChNames;  /**< list of the mapped layout channel names. */
@@ -195,6 +223,6 @@ protected:
 
 };
 
-} // NAMESPACE
+} // NAMESPACE DISPLIB
 
 #endif // CHINFOCLASS_H

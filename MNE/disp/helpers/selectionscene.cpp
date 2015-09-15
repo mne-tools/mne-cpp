@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     averagescene.cpp
+* @file     selectionscene.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the AverageScene class.
+* @brief    Contains the implementation of the SelectionScene class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "averagescene.h"
+#include "selectionscene.h"
 
 
 //*************************************************************************************************************
@@ -47,7 +47,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEBrowseRawQt;
+using namespace DISPLIB;
 using namespace std;
 
 
@@ -56,43 +56,71 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AverageScene::AverageScene(QGraphicsView* view, QObject* parent)
+SelectionScene::SelectionScene(QGraphicsView* view, QObject* parent)
 : LayoutScene(view, parent)
+, m_iChannelTypeMode(FIFFV_MEG_CH)
 {
 }
 
 
 //*************************************************************************************************************
 
-void AverageScene::setScaleMap(const QMap<QString,double> &scaleMap)
-{
-    QList<QGraphicsItem*> itemList = this->items();
-
-    QListIterator<QGraphicsItem*> i(itemList);
-    while (i.hasNext()) {
-        AverageSceneItem* AverageSceneItemTemp = static_cast<AverageSceneItem*>(i.next());
-        AverageSceneItemTemp->m_scaleMap = scaleMap;
-    }
-
-    this->update();
-}
-
-
-//*************************************************************************************************************
-
-void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelItems)
+void SelectionScene::repaintItems(const QMap<QString,QPointF> &layoutMap, QStringList badChannels)
 {
     this->clear();
 
-    QListIterator<QGraphicsItem*> i(selectedChannelItems);
+    QMapIterator<QString,QPointF > i(layoutMap);
     while (i.hasNext()) {
-        SelectionSceneItem* SelectionSceneItemTemp = static_cast<SelectionSceneItem*>(i.next());
-        AverageSceneItem* AverageSceneItemTemp = new AverageSceneItem(SelectionSceneItemTemp->m_sChannelName,
-                                                                      SelectionSceneItemTemp->m_iChannelNumber,
-                                                                      SelectionSceneItemTemp->m_qpChannelPosition,
-                                                                      SelectionSceneItemTemp->m_iChannelKind,
-                                                                      SelectionSceneItemTemp->m_iChannelUnit);
+        i.next();
+        SelectionSceneItem* SelectionSceneItemTemp;
 
-        this->addItem(AverageSceneItemTemp);
+        if(i.key().contains("EEG"))
+            SelectionSceneItemTemp = new SelectionSceneItem(i.key(),
+                                                              0,
+                                                              i.value(),
+                                                              FIFFV_EEG_CH,
+                                                              FIFF_UNIT_T_M,
+                                                              Qt::blue,
+                                                              badChannels.contains(i.key()));
+        else
+            SelectionSceneItemTemp = new SelectionSceneItem(i.key(),
+                                                              0,
+                                                              i.value(),
+                                                              FIFFV_MEG_CH,
+                                                              FIFF_UNIT_T_M,
+                                                              Qt::blue,
+                                                              badChannels.contains(i.key()));
+
+        this->addItem(SelectionSceneItemTemp);
     }
 }
+
+
+//*************************************************************************************************************
+
+void SelectionScene::hideItems(QStringList visibleItems)
+{
+    //Hide all items which names are in the the string list visibleItems. All other items' opacity is set to 0.25 an dthey are no longer selectable.
+    QList<QGraphicsItem *> itemList = this->items();
+
+    for(int i = 0; i<itemList.size(); i++) {
+        SelectionSceneItem* item = static_cast<SelectionSceneItem*>(itemList.at(i));
+
+        if(item->m_iChannelKind == m_iChannelTypeMode) {
+            item->show();
+
+            if(!visibleItems.contains(item->m_sChannelName)) {
+                item->setFlag(QGraphicsItem::ItemIsSelectable, false);
+                item->setOpacity(0.25);
+            }
+            else {
+                item->setFlag(QGraphicsItem::ItemIsSelectable, true);
+                item->setOpacity(1);
+            }
+        }
+        else
+            item->hide();
+    }
+}
+
+

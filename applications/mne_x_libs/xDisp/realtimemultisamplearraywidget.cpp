@@ -357,7 +357,7 @@ void RealTimeMultiSampleArrayWidget::init()
                 m_qListBadChannels << i;
 
         //-------- Init filter window --------
-        m_pFilterWindow = QSharedPointer<FilterWindow>(new FilterWindow(this));
+        m_pFilterWindow = QSharedPointer<FilterWindow>(new FilterWindow(this, Qt::Window/* | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint*/));
         //m_pFilterWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
 
         m_pFilterWindow->setFiffInfo(m_pFiffInfo);

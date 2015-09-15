@@ -1,15 +1,16 @@
 //=============================================================================================================
 /**
-* @file     selectionsceneitem.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* @file     mneoperator.h
+* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     September, 2014
+* @date     February, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,87 +31,71 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the SelectionSceneItem class.
+* @brief    Contains all MNEOperators.
 *
 */
+#ifndef MNEOPERATOR_H
+#define MNEOPERATOR_H
 
-#ifndef SELECTIONSCENEITEM_H
-#define SELECTIONSCENEITEM_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
+#include "../disp_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QGraphicsItem>
-#include <QString>
-#include <QColor>
-#include <QPainter>
-#include <QStaticText>
-#include <QDebug>
+#include <QObject>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE XDISPLIB
+// MNE INCLUDES
 //=============================================================================================================
 
-namespace XDISPLIB
+#include <fiff/fiff.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISPLIB
+//=============================================================================================================
+
+namespace DISPLIB
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
 
 //=============================================================================================================
 /**
-* SelectionSceneItem...
-*
-* @brief The SelectionSceneItem class provides a new data structure for visualizing channels in a 2D layout.
+* DECLARE CLASS MNEOperator
 */
-class SelectionSceneItem : public QGraphicsItem
+class DISPSHARED_EXPORT MNEOperator
 {
-
 public:
-    //=========================================================================================================
-    /**
-    * Constructs a SelectionSceneItem.
-    */
-    SelectionSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor channelColor = Qt::blue, bool bIsBadChannel = false);
+    enum OperatorType {
+        FILTER,
+        PCA,
+        AVERAGE,
+        UNKNOWN
+    } m_OperatorType;
 
-    //=========================================================================================================
-    /**
-    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
-    */
-    QRectF boundingRect() const;
+    MNEOperator();
 
-    //=========================================================================================================
-    /**
-    * Reimplemented paint function.
-    */
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    MNEOperator(const MNEOperator& obj);
 
-    QString     m_sChannelName;             /**< The channel's name.*/
-    int         m_iChannelNumber;           /**< The channel number.*/
-    int         m_iChannelKind;             /**< The channel kind.*/
-    int         m_iChannelUnit;             /**< The channel unit.*/
-    QPointF     m_qpChannelPosition;        /**< The channel's 2D position in the scene.*/
-    QColor      m_cChannelColor;            /**< The current channel color.*/
-    bool        m_bHighlightItem;           /**< Whether this item is to be highlighted.*/
-    bool        m_bIsBadChannel;            /**< Whether this item is a bad channel.*/
+    MNEOperator(OperatorType type);
+
+    ~MNEOperator();
+
+    QString m_sName;
 };
 
-} // NAMESPACE XDISPLIB
+} // NAMESPACE DISPLIB
 
-#endif // SELECTIONSCENEITEM_H
+#endif // MNEOPERATOR_H
