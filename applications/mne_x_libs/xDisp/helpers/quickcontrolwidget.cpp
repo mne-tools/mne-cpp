@@ -134,6 +134,10 @@ void QuickControlWidget::filterGroupChanged(QList<QCheckBox*> list)
             connect(tempCheckBox, &QCheckBox::toggled,
                     list[u], &QCheckBox::setChecked);
 
+            if(tempCheckBox->text() == "Activate user designed filter")
+                connect(tempCheckBox, &QCheckBox::toggled,
+                        this, &QuickControlWidget::userFilterToggled);
+
             connect(list[u], &QCheckBox::toggled,
                     tempCheckBox, &QCheckBox::setChecked);
 
@@ -662,6 +666,8 @@ void QuickControlWidget::checkStatusChanged(bool status)
     m_enableDisableProjectors->setChecked(bAllActivated);
 
     emit projSelectionChanged();
+
+    emit updateConnectedView();
 }
 
 
@@ -680,6 +686,8 @@ void QuickControlWidget::enableDisableAll(bool status)
     m_enableDisableProjectors->setChecked(status);
 
     emit projSelectionChanged();
+
+    emit updateConnectedView();
 }
 
 
@@ -746,6 +754,8 @@ void QuickControlWidget::updateSpinBoxScaling(double value)
     }
 
     emit scalingChanged(m_qMapChScaling);
+
+    emit updateConnectedView();
 }
 
 
@@ -810,6 +820,8 @@ void QuickControlWidget::updateSliderScaling(int value)
     }
 
 //    emit scalingChanged();
+
+    emit updateConnectedView();
 }
 
 
@@ -939,6 +951,8 @@ void QuickControlWidget::updateModalityCheckbox(qint32 state)
     }
 
     emit settingsChanged(m_qListModalities);
+
+    emit updateConnectedView();
 }
 
 
@@ -971,6 +985,8 @@ void QuickControlWidget::onDistanceTimeSpacerChanged(qint32 value)
             emit distanceTimeSpacerChanged(1000);
         break;
     }
+
+    emit updateConnectedView();
 }
 
 
@@ -981,7 +997,20 @@ void QuickControlWidget::onResetTriggerNumbers()
     ui->m_label_numberDetectedTriggers->setText(QString("0"));
 
     emit resetTriggerCounter();
+
+    emit updateConnectedView();
 }
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::userFilterToggled(bool state)
+{
+    Q_UNUSED(state);
+    qDebug()<<"userFilterToggled";
+    emit updateConnectedView();
+}
+
 
 
 

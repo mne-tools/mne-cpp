@@ -221,6 +221,7 @@ private:
     qint32 m_iBaselineFromSamples;
     qint32 m_iBaselineToSeconds;
     qint32 m_iBaselineToSamples;
+    qint32 m_iStimChanIdx;
 
     qint32 m_iNumAverages;
 

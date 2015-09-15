@@ -66,6 +66,7 @@ private:
     QSpinBox* m_pSpinBoxPostStimSamples;
     QSpinBox* m_pSpinBoxBaselineFrom;
     QSpinBox* m_pSpinBoxBaselineTo;
+    QCheckBox* m_pcheckBoxBaselineCorrection;
 };
 
 } // NAMESPACE

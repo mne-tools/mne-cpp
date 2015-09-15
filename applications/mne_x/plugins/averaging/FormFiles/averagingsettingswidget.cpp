@@ -92,9 +92,14 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
     t_pGridLayout->addWidget(m_pSpinBoxPostStimSamples,3,2,1,1);
 
     //Baseline Correction
+    m_pcheckBoxBaselineCorrection = new QCheckBox;
+    m_pcheckBoxBaselineCorrection->setText("Use Baseline Correction");
+    t_pGridLayout->addWidget(m_pcheckBoxBaselineCorrection,4,0,1,2);
+    connect(m_pcheckBoxBaselineCorrection, &QCheckBox::clicked, m_pAveragingToolbox, &Averaging::changeBaselineActive);
+
     QLabel* t_pLabelBaselineMin = new QLabel;
     t_pLabelBaselineMin->setText("Baseline min in ms");
-    t_pGridLayout->addWidget(t_pLabelBaselineMin,4,0,1,2);
+    t_pGridLayout->addWidget(t_pLabelBaselineMin,5,0,1,2);
 
     m_pSpinBoxBaselineFrom = new QSpinBox;
     m_pSpinBoxBaselineFrom->setMinimum(m_pSpinBoxPreStimSamples->value()*-1);
@@ -102,11 +107,11 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
     m_pSpinBoxBaselineFrom->setSingleStep(10);
     m_pSpinBoxBaselineFrom->setValue(m_pAveragingToolbox->m_iBaselineFromSeconds);
     connect(m_pSpinBoxBaselineFrom, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &AveragingSettingsWidget::changeBaselineFrom);
-    t_pGridLayout->addWidget(m_pSpinBoxBaselineFrom,4,2,1,1);
+    t_pGridLayout->addWidget(m_pSpinBoxBaselineFrom,5,2,1,1);
 
     QLabel* t_pLabelBaselineMax = new QLabel;
     t_pLabelBaselineMax->setText("Baseline max in ms");
-    t_pGridLayout->addWidget(t_pLabelBaselineMax,5,0,1,2);
+    t_pGridLayout->addWidget(t_pLabelBaselineMax,6,0,1,2);
 
     m_pSpinBoxBaselineTo = new QSpinBox;
     m_pSpinBoxBaselineTo->setMinimum(m_pSpinBoxPreStimSamples->value()*-1);
@@ -114,7 +119,7 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
     m_pSpinBoxBaselineTo->setSingleStep(10);
     m_pSpinBoxBaselineTo->setValue(m_pAveragingToolbox->m_iBaselineToSeconds);
     connect(m_pSpinBoxBaselineTo, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &AveragingSettingsWidget::changeBaselineTo);
-    t_pGridLayout->addWidget(m_pSpinBoxBaselineTo,5,2,1,1);
+    t_pGridLayout->addWidget(m_pSpinBoxBaselineTo,6,2,1,1);
 
     this->setLayout(t_pGridLayout);
 }

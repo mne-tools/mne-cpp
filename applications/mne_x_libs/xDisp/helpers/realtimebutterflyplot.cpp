@@ -78,6 +78,10 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
 
     if(m_bIsInit)
     {
+        //Draw baseline correction area
+        qDebug()<<"Baseline from: "<<m_pRealTimeEvokedModel->getBaselineInfo().first.toInt();
+        qDebug()<<"Baseline to: "<<m_pRealTimeEvokedModel->getBaselineInfo().second.toInt();
+
         //Stimulus bar
         if(m_pRealTimeEvokedModel->getNumSamples() > 0) {
             painter.save();
@@ -390,5 +394,13 @@ void RealTimeButterflyPlot::setSelectedChannels(const QList<int> &selectedChanne
 {
     m_lSelectedChannels = selectedChannels;
 
+    update();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeButterflyPlot::updateView()
+{
     update();
 }

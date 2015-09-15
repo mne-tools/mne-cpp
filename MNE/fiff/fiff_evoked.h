@@ -107,14 +107,14 @@ public:
     *
     * @param[in] p_IODevice     IO device to read from the evoked data set.
     * @param[in] setno          The set to pick. Dataset ID number (int) or comment/name (str). Optional if there isonly one data set in file.
-    * @param[in] baseline       The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b)
+    * @param[in] t_baseline     The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b)
     *                           the interval is between "a (s)" and "b (s)". If a is None the beginning of the data is used and if b is
     *                           None then b is set to the end of the interval. If baseline is equal ot (None, None) all the time interval is used.
     *                           If None, no correction is applied.
     * @param[in] proj           Apply SSP projection vectors (optional, default = true)
     * @param[in] p_aspect_kind  Either "FIFFV_ASPECT_AVERAGE" or "FIFFV_ASPECT_STD_ERR". The type of data to read. Only used if "setno" is a str.
     */
-    FiffEvoked(QIODevice& p_IODevice, QVariant setno = 0, QPair<QVariant,QVariant> baseline = defaultVariantPair, bool proj = true, fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE);
+    FiffEvoked(QIODevice& p_IODevice, QVariant setno = 0, QPair<QVariant,QVariant> t_baseline = defaultVariantPair, bool proj = true, fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE);
 
     //=========================================================================================================
     /**
@@ -187,7 +187,7 @@ public:
     * @param[in] p_IODevice     An fiff IO device like a fiff QFile or QTCPSocket
     * @param[out] p_FiffEvoked  The read evoked data
     * @param[in] setno          the set to pick. Dataset ID number (int) or comment/name (str). Optional if there isonly one data set in file.
-    * @param[in] baseline       The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b)
+    * @param[in] t_baseline       The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b)
     *                           the interval is between "a (s)" and "b (s)". If a is None the beginning of the data is used and if b is
     *                           None then b is set to the end of the interval. If baseline is equal ot (None, None) all the time interval is used.
     *                           If None, no correction is applied.
@@ -196,7 +196,7 @@ public:
     *
     * @return true if successful, false otherwise
     */
-    static bool read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant setno = 0, QPair<QVariant,QVariant> baseline = defaultVariantPair, bool proj = true, fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE);
+    static bool read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant setno = 0, QPair<QVariant,QVariant> t_baseline = defaultVariantPair, bool proj = true, fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE);
 
     //=========================================================================================================
     /**
@@ -227,7 +227,7 @@ public:
     RowVectorXf times;              /**< Vector of time instants in seconds. */
     MatrixXd    data;               /**< 2D array of shape [n_channels x n_times]; Evoked response. */
     MatrixXd    proj;               /**< SSP projection */
-    QPair<QVariant,QVariant>    baseline;    /**< Baseline information */
+    QPair<QVariant,QVariant>    baseline;    /**< Baseline information in sample form [from to]*/
 };
 
 //*************************************************************************************************************
