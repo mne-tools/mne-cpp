@@ -190,17 +190,19 @@ public:
     /**
     * Sets the from mSeconds of the baseline area
     *
-    * @param[in] from    from of baseline area
+    * @param[in] fromSamp    from of baseline area in samples
+    * @param[in] fromMSec    from of baseline area in mSeconds
     */
-    void setBaselineFrom(int from);
+    void setBaselineFrom(int fromSamp, int fromMSec);
 
     //=========================================================================================================
     /**
     * Sets the to mSeconds of the baseline area
     *
-    * @param[in] to    to of baseline area
+    * @param[in] toSamp    to of baseline area in samples
+    * @param[in] toMSec    to of baseline area in mSeconds
     */
-    void setBaselineTo(int to);
+    void setBaselineTo(int toSamp, int toMSec);
 
     //=========================================================================================================
     /**
@@ -277,10 +279,11 @@ private:
     bool    m_bRunningAverage;          /**< Whether the running average is to be calculated. */
     bool    m_bDoBaselineCorrection;    /**< Whether to perform baseline correction. */
 
-    QPair<QVariant,QVariant>    m_pairBaseline; /**< Baseline information [from,to]. */
+    QPair<QVariant,QVariant>    m_pairBaselineSec;     /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
+    QPair<QVariant,QVariant>    m_pairBaselineSamp; /**< Baseline information in samples form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
 
-    FiffInfo::SPtr      m_pFiffInfo;            /**< Holds the fiff measurement information. */
-    FiffEvoked::SPtr    m_pStimEvoked;          /**< Holds the evoked information. */
+    FiffInfo::SPtr          m_pFiffInfo;            /**< Holds the fiff measurement information. */
+    FiffEvoked::SPtr        m_pStimEvoked;          /**< Holds the evoked information. */
 
     CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;      /**< The Circular Raw Matrix Buffer. */
 

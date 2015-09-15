@@ -138,6 +138,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Set the number of pre-stimulus samples
+    *
+    * @param[in] samples the number of pre-stimulus samples
+    */
+    inline void setNumPreStimSamples(qint32 samples);
+
+    //=========================================================================================================
+    /**
     * Returns the number of channels.
     *
     * @return the number of values which are gathered before a notify() is called.
@@ -267,6 +275,15 @@ inline qint32 RealTimeEvoked::getNumPreStimSamples() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_iPreStimSamples;
+}
+
+
+//*************************************************************************************************************
+
+inline void RealTimeEvoked::setNumPreStimSamples(qint32 samples)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_iPreStimSamples = samples;
 }
 
 
