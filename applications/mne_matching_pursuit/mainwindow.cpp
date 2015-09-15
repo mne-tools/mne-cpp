@@ -44,7 +44,6 @@
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 
-#include "disp/colormap.h"
 #include "math.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -129,10 +128,10 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
 {
 
     ui->setupUi(this);
-    ui->tw_main->setPalette(*(new QPalette(Qt::green)));
-    ui->tw_main->removeTab(1);
-    ui->tw_main->tabBar()->tabButton(0, QTabBar::LeftSide)->resize(0, 0);
-    connect(ui->tw_main, SIGNAL(tabCloseRequested(int)), this, SLOT(on_close_tab_button(int)));
+    ui->tabWidget->setPalette(*(new QPalette(Qt::green)));
+    ui->tabWidget->removeTab(1);
+    ui->tabWidget->tabBar()->tabButton(0, QTabBar::LeftSide)->resize(0, 0);
+    connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(on_close_tab_button(int)));
 
     this->setMinimumSize(1280, 640);
     callGraphWindow = new GraphWindow();
@@ -3270,12 +3269,12 @@ void MainWindow::on_actionTest_triggered()
     plot_window = new tfplotwidget();
 
 
-    if(ui->tw_main->count() >= 2)
-        ui->tw_main->addTab(plot_window, "TF Channel ??");
+    if(ui->tabWidget->count() >= 2)
+        ui->tabWidget->addTab(plot_window, "TF Channel ??");
     else
-        ui->tw_main->addTab(plot_window, "TF-Overview");
+        ui->tabWidget->addTab(plot_window, "TF-Overview");
 
-    if(ui->tw_main->count() == 2)
+    if(ui->tabWidget->count() == 2)
     {
         QPushButton *extendedButton = new QPushButton();
         extendedButton->setMaximumSize(20, 20);
@@ -3283,9 +3282,13 @@ void MainWindow::on_actionTest_triggered()
         extendedButton->setIcon(QIcon(":/images/icons/expand_512.png"));
         extendedButton->setIconSize(QSize(16, 16));
 
-        ui->tw_main->tabBar()->setTabButton(1, QTabBar::LeftSide, extendedButton);
+        ui->tabWidget->tabBar()->setTabButton(1, QTabBar::LeftSide, extendedButton);
         connect(extendedButton, SIGNAL (released()), this, SLOT (on_extend_tab_button()));
         qreal max_frequency = 0;
+        QGridLayout* layout = new QGridLayout();
+        layout->setMargin(0);
+        layout->setSpacing(4);
+        ui->tabWidget->setLayout(layout);
 
 
         if(_adaptive_atom_list.count() > 0 && _adaptive_atom_list.first().count() > 0)
@@ -3303,6 +3306,7 @@ void MainWindow::on_actionTest_triggered()
                     tf_matrix *= atom.max_scalar_list.at(i)*atom.max_scalar_list.at(i);
                     tf_sum += tf_matrix;
 
+                    //brauchst du nicht
                     //find maximum frequency in signal to set y axis with right values
                     /*if(atom.modulation == 0 && atom.scale != 0)
                     {
@@ -3492,7 +3496,7 @@ void MainWindow::on_actionTest_triggered()
             plot_window->ui->tf_view->show();
         }
     }
-    if(ui->tw_main->count() > 2)
+    if(ui->tabWidget->count() > 2)
     {
 
        // ui->tw_main->setCurrentIndex(ui->tw_main->count() - 1);
@@ -3516,7 +3520,7 @@ void MainWindow::on_extend_tab_button()
   //  QWidget *tf_overview_w = new QWidget();
   //  tf_overview_w->setWindowTitle("Time-Frequency-Overview");
   //  tf_overview_w->show();
-    ui->tw_main->removeTab(1);
+    ui->tabWidget->removeTab(1);
     /*QLayout layout;// = new QLayout;
     layout->addWidget(plot_window);
     tf_overview_w->setLayout(layout);
@@ -3526,6 +3530,6 @@ void MainWindow::on_extend_tab_button()
 
 void MainWindow::on_close_tab_button(int index)
 {
-    ui->tw_main->removeTab(index);
+    ui->tabWidget->removeTab(index);
 }
 
