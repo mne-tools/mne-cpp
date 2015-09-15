@@ -65,6 +65,7 @@ FiffEvoked::FiffEvoked()
 , aspect_kind(-1)
 , first(-1)
 , last(-1)
+, baseline(qMakePair(QVariant("None"), QVariant("None")))
 {
 
 }
@@ -72,10 +73,12 @@ FiffEvoked::FiffEvoked()
 
 //*************************************************************************************************************
 
-FiffEvoked::FiffEvoked(QIODevice& p_IODevice, QVariant setno, QPair<QVariant,QVariant> baseline, bool proj, fiff_int_t p_aspect_kind)
+FiffEvoked::FiffEvoked(QIODevice& p_IODevice, QVariant setno, QPair<QVariant,QVariant> t_baseline, bool proj, fiff_int_t p_aspect_kind)
 {
-    if(!FiffEvoked::read(p_IODevice, *this, setno, baseline, proj, p_aspect_kind))
+    if(!FiffEvoked::read(p_IODevice, *this, setno, t_baseline, proj, p_aspect_kind))
     {
+        baseline = t_baseline;
+
         printf("\tFiff evoked data not found.\n");//ToDo Throw here
         return;
     }
@@ -94,6 +97,7 @@ FiffEvoked::FiffEvoked(const FiffEvoked& p_FiffEvoked)
 , times(p_FiffEvoked.times)
 , data(p_FiffEvoked.data)
 , proj(p_FiffEvoked.proj)
+, baseline(p_FiffEvoked.baseline)
 {
 
 }
@@ -162,7 +166,7 @@ FiffEvoked FiffEvoked::pick_channels(const QStringList& include, const QStringLi
 
 //*************************************************************************************************************
 
-bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant setno, QPair<QVariant,QVariant> baseline, bool proj, fiff_int_t p_aspect_kind)
+bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant setno, QPair<QVariant,QVariant> t_baseline, bool proj, fiff_int_t p_aspect_kind)
 {
     p_FiffEvoked.clear();
 
@@ -473,7 +477,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     }
 
     // Run baseline correction
-    all_data = MNEMath::rescale(all_data, times, baseline, QString("mean"));
+    all_data = MNEMath::rescale(all_data, times, t_baseline, QString("mean"));
     printf("Applying baseline correction ... (mode: mean)");
 
     // Put it all together

@@ -51,6 +51,8 @@ public:
 
     void setSelectedChannels(const QList<int> &selectedChannels);
 
+    void updateView();
+
 protected:
     //=========================================================================================================
     /**
