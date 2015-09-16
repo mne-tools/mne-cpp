@@ -96,3 +96,11 @@ void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelIte
         this->addItem(averageSceneItemTemp);
     }
 }
+
+
+//*************************************************************************************************************
+
+void AverageScene::updateScene()
+{
+    this->update();
+}

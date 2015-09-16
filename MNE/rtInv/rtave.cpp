@@ -84,7 +84,7 @@ RtAve::RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStim
 , m_iTriggerIndex(-1)
 , m_iNewTriggerIndex(p_iTriggerIndex)
 , m_iTriggerPos(-1)
-, m_bRunningAverage(true)
+, m_bRunningAverage(false)
 , m_bDoBaselineCorrection(false)
 , m_pairBaselineSamp(qMakePair(QVariant(QString::number(p_iBaselineFromSamples)),QVariant(QString::number(p_iBaselineToSamples))))
 , m_iPreStimSeconds(0)
@@ -306,6 +306,11 @@ void RtAve::run()
                     m_pStimEvoked->times[i] = m_pStimEvoked->times[i-1] + T;
                 m_pStimEvoked->first = m_pStimEvoked->times[0];
                 m_pStimEvoked->last = m_pStimEvoked->times[m_pStimEvoked->times.size()-1];
+                m_pStimEvoked->data.setZero();
+                if(m_bRunningAverage)
+                    m_pStimEvoked->nave = m_iNumAverages;
+                else
+                    m_pStimEvoked->nave = 0;
 
                 m_qListStimAve.clear();
                 m_matBufferFront.clear();

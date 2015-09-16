@@ -116,6 +116,12 @@ public:
     */
     void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
 
+    //=========================================================================================================
+    /**
+    * Updates and repaints the scene
+    */
+    void updateScene();
+
 private:
     QList<SelectionSceneItem*>      m_lSelectedChannelItems;        /**< Holds the selected channels from the selection manager.*/
 };
