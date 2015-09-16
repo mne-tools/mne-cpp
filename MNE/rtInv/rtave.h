@@ -159,16 +159,18 @@ public:
     * Sets the number of pre stimulus samples
     *
     * @param[in] samples    new number of pre stimulus samples
+    * @param[in] secs    new number of pre stimulus seconds
     */
-    void setPreStim(qint32 samples);
+    void setPreStim(qint32 samples, qint32 secs);
 
     //=========================================================================================================
     /**
     * Sets the number of post stimulus samples
     *
     * @param[in] samples    new number of post stimulus samples
+    * @param[in] secs    new number of pre stimulus seconds
     */
-    void setPostStim(qint32 samples);
+    void setPostStim(qint32 samples, qint32 secs);
 
     //=========================================================================================================
     /**
@@ -266,6 +268,8 @@ private:
     qint32  m_iPostStimSamples;         /**< Amount of samples averaged after the stimulus, including the stimulus sample.*/
     qint32  m_iNewPreStimSamples;       /**< New amount of samples averaged before the stimulus. */
     qint32  m_iNewPostStimSamples;      /**< New amount of samples averaged after the stimulus, including the stimulus sample.*/
+    qint32  m_iPreStimSeconds;          /**< Amount of seconds averaged before the stimulus. */
+    qint32  m_iPostStimSeconds;         /**< Amount of seconds averaged after the stimulus, including the stimulus sample.*/
     qint32  m_iCurrentMatBufferIndex;   /**< Current index inside of the matrix buffer m_matBuffer */
     qint32  m_iTriggerIndex;            /**< Current row index of the data matrix which is to be scanned for triggers */
     qint32  m_iNewTriggerIndex;         /**< Old row index of the data matrix which is to be scanned for triggers */
