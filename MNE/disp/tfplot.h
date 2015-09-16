@@ -40,6 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "disp_global.h"
 #include <disp/helpers/colormap.h>
 #include <utils/wignertransform.h>
 
@@ -71,7 +72,7 @@ namespace DISPLIB
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace DISPLIB;
+using namespace UTILSLIB;
 
 
 enum ColorMaps
@@ -82,14 +83,14 @@ enum ColorMaps
     Jet,
     Bone,
     RedBlue
-
 };
 
-class TFplot
+class DISPSHARED_EXPORT TFplot : public ColorMap, QWidget
 {
+
 public:
-    tfplot();
-    tfplot(VectorXd signal_vector, int sample_rate, ColorMaps cmap, QWidget *plot_widget);
+    TFplot();
+    QWidget *plotTf(MatrixXd signal_vector, int sample_rate, ColorMaps cmap, QWidget *plot_widget);
 };
 
 }

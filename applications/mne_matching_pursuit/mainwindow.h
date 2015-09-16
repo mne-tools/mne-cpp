@@ -51,6 +51,7 @@
 #include <utils/mp/atom.h>
 #include <utils/mp/adaptivemp.h>
 #include <utils/mp/fixdictmp.h>
+#include <disp/tfplot.h>
 
 #include "editorwindow.h"
 #include "ui_editorwindow.h"
