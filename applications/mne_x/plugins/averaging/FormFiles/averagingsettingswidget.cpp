@@ -105,7 +105,7 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
     m_pSpinBoxBaselineFrom->setMinimum(m_pSpinBoxPreStimSamples->value()*-1);
     m_pSpinBoxBaselineFrom->setMaximum(m_pSpinBoxPostStimSamples->value());
     m_pSpinBoxBaselineFrom->setSingleStep(10);
-    m_pSpinBoxBaselineFrom->setValue(m_pAveragingToolbox->m_iBaselineFromSeconds-m_pSpinBoxPreStimSamples->value());
+    m_pSpinBoxBaselineFrom->setValue(m_pSpinBoxPreStimSamples->value());
     connect(m_pSpinBoxBaselineFrom, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &AveragingSettingsWidget::changeBaselineFrom);
     t_pGridLayout->addWidget(m_pSpinBoxBaselineFrom,5,2,1,1);
 
@@ -117,7 +117,7 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
     m_pSpinBoxBaselineTo->setMinimum(m_pSpinBoxPreStimSamples->value()*-1);
     m_pSpinBoxBaselineTo->setMaximum(m_pSpinBoxPostStimSamples->value());
     m_pSpinBoxBaselineTo->setSingleStep(10);
-    m_pSpinBoxBaselineTo->setValue(m_pAveragingToolbox->m_iBaselineToSeconds-m_pSpinBoxPreStimSamples->value());
+    m_pSpinBoxBaselineTo->setValue(m_pSpinBoxPreStimSamples->value());
     connect(m_pSpinBoxBaselineTo, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &AveragingSettingsWidget::changeBaselineTo);
     t_pGridLayout->addWidget(m_pSpinBoxBaselineTo,6,2,1,1);
 
