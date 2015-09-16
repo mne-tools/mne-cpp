@@ -282,8 +282,7 @@ void RtAve::run()
     m_qMutex.unlock();
 
     //Enter the main loop
-    while(m_bIsRunning)
-    {
+    while(m_bIsRunning) {
         bool doProcessing = false;
 
         if(m_pRawMatrixBuffer)
@@ -311,6 +310,7 @@ void RtAve::run()
                 m_qListStimAve.clear();
                 m_matBufferFront.clear();
                 m_matBufferBack.clear();
+                clearDetectedTriggers();
 
                 m_bFillingBackBuffer = false;
             }
@@ -318,10 +318,8 @@ void RtAve::run()
             m_qMutex.unlock();
 
             //Acquire Data
-//            m_qMutex.lock();
             MatrixXd rawSegment = m_pRawMatrixBuffer->pop();
             m_iCurrentBlockSize = rawSegment.cols();
-//            m_qMutex.unlock();
 
             //Fill back buffer and decide when to do the data packing of the different buffers
             if(m_bFillingBackBuffer) {
@@ -330,23 +328,19 @@ void RtAve::run()
                     mergeData();
 
                     //Clear data
-                    m_qMutex.lock();
                     m_matBufferBack.clear();
                     m_matBufferFront.clear();
-                    m_qMutex.unlock();
 
                     //Calculate the actual average
                     generateEvoked();
 
                     //If number of averages was reached emit new average
-                    m_qMutex.lock();
                     if(m_qListStimAve.size() == m_iNumAverages && m_bRunningAverage)
                         emit evokedStim(m_pStimEvoked);
                     else if(m_qListStimAve.size() > 0 && !m_bRunningAverage)
                         emit evokedStim(m_pStimEvoked);
 
                     m_bFillingBackBuffer = false;
-                    m_qMutex.unlock();
                 }
             } else {
                 clearDetectedTriggers();
@@ -355,12 +349,10 @@ void RtAve::run()
                 fillFrontBuffer(rawSegment);
 
                 //Detect trigger for all stim channels. If detected turn on filling of the back / post stim buffer
-                m_qMutex.lock();
                 if(DetectTrigger::detectTriggerFlanksMax(rawSegment, m_iTriggerIndex, m_iTriggerPos, 0, m_fTriggerThreshold, true)) {
                     m_matStimData = rawSegment;
                     m_bFillingBackBuffer = true;
                 }
-                m_qMutex.unlock();
 
                 qDebug()<<"Trigger channel "<<m_iTriggerIndex<<" found at "<<m_iTriggerPos;
             }
@@ -373,15 +365,11 @@ void RtAve::run()
 
 void RtAve::clearDetectedTriggers()
 {
-    m_qMutex.lock();
-
     QMutableMapIterator<int,QList<int> > i(m_qMapDetectedTrigger);
     while (i.hasNext()) {
         i.next();
         i.value().clear();
     }
-
-    m_qMutex.unlock();
 }
 
 
@@ -437,9 +425,9 @@ void RtAve::fillFrontBuffer(MatrixXd &data)
     }
 
     // DEBUG - Check total data length of front buffer
-    int size = 0;
-    for(int i = 0; i<m_matBufferFront.size(); i++)
-        size += m_matBufferFront.at(i).cols();
+//    int size = 0;
+//    for(int i = 0; i<m_matBufferFront.size(); i++)
+//        size += m_matBufferFront.at(i).cols();
     //qDebug()<<"m_matBufferFront: "<<size;
 
     m_qMutex.unlock();
@@ -481,7 +469,7 @@ void RtAve::generateEvoked()
 {
     m_qMutex.lock();
 
-    // Emit final evoked
+    // Generate final evoked
     MatrixXd finalAverage = MatrixXd::Zero(m_matStimData.rows(), m_iPreStimSamples+m_iPostStimSamples);
 
     if(m_bRunningAverage) {
