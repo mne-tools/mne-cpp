@@ -160,7 +160,6 @@ public:
     virtual IPlugin::PluginType getType() const;
     virtual QString getName() const;
 
-
     void changeStimChannel(qint32 index);
 
     void changePreStim(qint32 mseconds);

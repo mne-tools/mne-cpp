@@ -124,7 +124,7 @@ void RtAve::append(const MatrixXd &p_DataSegment)
 void RtAve::setAverages(qint32 numAve)
 {
     m_qMutex.lock();
-    m_iNumAverages = numAve;
+    m_iNewNumAverages = numAve;
     m_qMutex.unlock();
     emit numAveragesChanged();
 }
@@ -274,7 +274,8 @@ void RtAve::run()
             if(m_iNewPreStimSamples != m_iPreStimSamples
                     || m_iNewPostStimSamples != m_iPostStimSamples
                     || m_iNewTriggerIndex != m_iTriggerIndex
-                    || m_bNewRunningAverage != m_bRunningAverage)
+                    || m_bNewRunningAverage != m_bRunningAverage
+                    || m_iNewNumAverages != m_iNumAverages)
                 reset();
 
             //Acquire Data
@@ -437,7 +438,7 @@ void RtAve::generateEvoked()
         *m_pStimEvoked.data() += tempMatrix;
     }
 
-    qDebug()<<"nave "<<m_pStimEvoked->nave;
+    qDebug()<<"nave "<<m_qListStimAve.size();
 }
 
 
@@ -454,6 +455,7 @@ void RtAve::reset()
     m_iPostStimSamples = m_iNewPostStimSamples;
     m_iTriggerIndex = m_iNewTriggerIndex;
     m_bRunningAverage = m_bNewRunningAverage;
+    m_iNumAverages = m_iNewNumAverages;
 
     //Full real-time evoked response
     m_pStimEvoked->baseline = m_pairBaselineSec;
@@ -495,6 +497,7 @@ void RtAve::init()
 
     m_iNewPreStimSamples = m_iPreStimSamples;
     m_iNewPostStimSamples = m_iPostStimSamples;
+    m_iNewNumAverages = m_iNumAverages;
 
     m_pStimEvoked = FiffEvoked::SPtr(new FiffEvoked);
 

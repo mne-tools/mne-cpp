@@ -201,7 +201,7 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
             //evoked matrix is stored in column major
             double val = ((*(averageData+(i*m_iTotalNumberChannels)+m_iChannelNumber))-offset) * dScaleY;
 
-            qSamplePosition.setY(-val);
+            qSamplePosition.setY(val);
             qSamplePosition.setX(path.currentPosition().x()+1);
 
             path.lineTo(qSamplePosition);

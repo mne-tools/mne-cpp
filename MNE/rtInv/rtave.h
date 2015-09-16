@@ -273,6 +273,7 @@ private:
     QMutex  m_qMutex;                   /**< Provides access serialization between threads*/
 
     qint32  m_iNumAverages;             /**< Number of averages */
+    qint32  m_iNewNumAverages;          /**< Number of averages */
     qint32  m_iCurrentBlockSize;        /**< Current block size of the incoming data */
     qint32  m_iPreStimSamples;          /**< Amount of samples averaged before the stimulus. */
     qint32  m_iPostStimSamples;         /**< Amount of samples averaged after the stimulus, including the stimulus sample.*/
