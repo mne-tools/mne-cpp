@@ -275,7 +275,7 @@ void Averaging::changeStimChannel(qint32 index)
 {
     Q_UNUSED(index)
     QMutexLocker locker(&m_qMutex);
-    m_iStimChan = m_pAveragingWidget->m_pComboBoxChSelection->currentData().toInt();
+    m_iStimChan = m_pAveragingWidget->getStimChannelIdx();
     m_iStimChanIdx = m_qListStimChs.at(index);
 
     if(m_pRtAve)

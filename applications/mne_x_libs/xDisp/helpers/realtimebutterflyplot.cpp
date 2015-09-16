@@ -320,7 +320,7 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
 
         float newY = y_base+fValue;
 
-        qSamplePosition.setY(newY);
+        qSamplePosition.setY(-newY);
         qSamplePosition.setX(path.currentPosition().x());
 
         path.moveTo(qSamplePosition);
