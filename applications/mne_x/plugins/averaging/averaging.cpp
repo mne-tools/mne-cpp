@@ -302,7 +302,7 @@ void Averaging::changePreStim(qint32 mseconds)
         m_pAveragingOutput->data()->setNumPreStimSamples(m_iPreStimSamples);
 
     if(m_pRtAve)
-        m_pRtAve->setPreStim(m_iPreStimSamples);
+        m_pRtAve->setPreStim(m_iPreStimSamples, m_iPostStimSeconds);
 }
 
 
@@ -320,7 +320,7 @@ void Averaging::changePostStim(qint32 mseconds)
     //qDebug()<<"m_iPostStimSamples "<<m_iPostStimSamples;
 
     if(m_pRtAve)
-        m_pRtAve->setPostStim(m_iPostStimSamples);
+        m_pRtAve->setPostStim(m_iPostStimSamples, m_iPostStimSeconds);
 }
 
 
@@ -330,7 +330,7 @@ void Averaging::changeBaselineFrom(qint32 fromMSeconds)
 {
     QMutexLocker locker(&m_qMutex);
     m_iBaselineFromSeconds = fromMSeconds;
-    m_iBaselineFromSamples = ((float)(fromMSeconds+m_iPreStimSeconds)/1000)*m_pFiffInfo->sfreq;
+    m_iBaselineFromSamples = ((float)(fromMSeconds)/1000)*m_pFiffInfo->sfreq;
 
     //qDebug()<<"m_iBaselineFromSamples "<<m_iBaselineFromSamples;
 
@@ -345,7 +345,7 @@ void Averaging::changeBaselineTo(qint32 toMSeconds)
 {
     QMutexLocker locker(&m_qMutex);
     m_iBaselineToSeconds = toMSeconds;
-    m_iBaselineToSamples = ((float)(toMSeconds+m_iPreStimSeconds)/1000)*m_pFiffInfo->sfreq;
+    m_iBaselineToSamples = ((float)(toMSeconds)/1000)*m_pFiffInfo->sfreq;
 
     //qDebug()<<"m_iBaselineToSamples "<<m_iBaselineToSamples;
 

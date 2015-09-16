@@ -87,7 +87,7 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
             painter.save();
             painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
             painter.setBrush(Qt::red);
-            painter.setOpacity(0.15);
+            painter.setOpacity(0.1);
 
             float fDx = (float)(this->width()) / ((float)m_pRealTimeEvokedModel->getNumSamples());
 
