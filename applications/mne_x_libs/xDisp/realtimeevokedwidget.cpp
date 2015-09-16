@@ -462,9 +462,11 @@ void RealTimeEvokedWidget::init()
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::showFilterOptions,
                 this, &RealTimeEvokedWidget::showFilterWidget);
 
-        //Handle updating the butterfly plot
+        //Handle updating the butterfly and layout plot
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
                 m_pButterflyPlot.data(), &RealTimeButterflyPlot::updateView);
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
+                this, &RealTimeEvokedWidget::onSelectionChanged);
 
         m_pQuickControlWidget->setViewParameters(settings.value(QString("RTEW/%1/viewZoomFactor").arg(t_sRTEWName), 1.0).toFloat(),
                                                      settings.value(QString("RTEW/%1/viewWindowSize").arg(t_sRTEWName), 10).toInt(),
