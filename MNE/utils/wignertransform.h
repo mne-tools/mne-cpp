@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mainwindow.cpp
+* @file     wignertransform.h
 * @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
 *           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
 * @version  1.0
@@ -40,7 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "wignertransform.h"
+#include <utils/utils_global.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -51,7 +51,7 @@
 #include <Eigen/SparseCore>
 #include <unsupported/Eigen/FFT>
 
-namespace DISPLIB
+namespace UTILSLIB
 {
 
 //*************************************************************************************************************
@@ -63,10 +63,13 @@ using namespace Eigen;
 using namespace std;
 
 
-class Wignertransform
+class UTILSSHARED_EXPORT Wignertransform
 {
-public:    
+
+public:
+    Wignertransform();
     MatrixXd wigner_transform(VectorXd signal_vector);
 };
+}
 
 #endif // WIGNERTRANSFORM_H

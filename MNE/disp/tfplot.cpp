@@ -38,6 +38,7 @@
 //=============================================================================================================
 
 #include "tfplot.h"
+#include "math.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -46,16 +47,18 @@
 
 using namespace DISPLIB;
 
-TFplot::tfplot()
+
+
+TFplot::TFplot()
 {
 }
 
-TFplot::tfplot(VectorXd signal_vector, int sample_rate, ColorMaps cmap = ColorMaps::Jet, QWidget *plot_widget = NULL)
+QWidget* TFplot::plotTf(MatrixXd signal_vector, int sample_rate, ColorMaps cmap = ColorMaps::Jet, QWidget *plot_widget = NULL)
 {
-    MatrixXd tf_sum = MatrixXd::Zero(floor(signal_vector.rows() / 2, signal_vector.rows());
-    Wignertransform wtransform;
-    MatrixXd tf_matrix = wtransform.wigner_transform(signal_vector);
-
+    //MatrixXd tf_sum = MatrixXd::Zero(floor(signal_vector.rows() / 2), signal_vector.rows());
+    //Wignertransform wtransform;
+    //MatrixXd tf_matrix = wtransform.wigner_transform(signal_vector);
+    MatrixXd tf_matrix = signal_vector;
 
 
     //setup image
@@ -66,38 +69,38 @@ TFplot::tfplot(VectorXd signal_vector, int sample_rate, ColorMaps cmap = ColorMa
     for ( qint32 y = 0; y < tf_matrix.rows(); y++ )
         for ( qint32 x = 0; x < tf_matrix.cols(); x++ )
         {
-            switch  (cmap) {
-            case Jet:
-                color.setRgb(ColorMap::jetR(abs(tf_matrix(y, x))),
-                             ColorMap::jetG(abs(tf_matrix(y, x))),
-                             ColorMap::jetB(abs(tf_matrix(y, x))));
-                break;
-            case Hot:
-                color.setRgb(ColorMap::hotR(abs(tf_matrix(y, x))),
-                             ColorMap::hotG(abs(tf_matrix(y, x))),
-                             ColorMap::hotB(abs(tf_matrix(y, x))));
-                break;
-            case HotNeg1:
-                color.setRgb(ColorMap::hotNeg1R(abs(tf_matrix(y, x))),
-                             ColorMap::hotNeg1G(abs(tf_matrix(y, x))),
-                             ColorMap::hotNeg1B(abs(tf_matrix(y, x))));
-                break;
-            case HotNeg2:
-                color.setRgb(ColorMap::hotNeg2R(abs(tf_matrix(y, x))),
-                             ColorMap::hotNeg2G(abs(tf_matrix(y, x))),
-                             ColorMap::hotNeg2B(abs(tf_matrix(y, x))));
-                break;
-            case Bone:
-                color.setRgb(ColorMap::boneR(abs(tf_matrix(y, x))),
-                             ColorMap::boneG(abs(tf_matrix(y, x))),
-                             ColorMap::boneB(abs(tf_matrix(y, x))));
-                break;
-            case RedBlue:
-                color.setRgb(ColorMap::rbR(abs(tf_matrix(y, x))),
-                             ColorMap::rbG(abs(tf_matrix(y, x))),
-                             ColorMap::rbB(abs(tf_matrix(y, x))));
-                break;
-
+            switch  (cmap)
+            {
+                case Jet:
+                    color.setRgb(ColorMap::jetR(abs(tf_matrix(y, x))),
+                                 ColorMap::jetG(abs(tf_matrix(y, x))),
+                                 ColorMap::jetB(abs(tf_matrix(y, x))));
+                    break;
+                case Hot:
+                    color.setRgb(ColorMap::hotR(abs(tf_matrix(y, x))),
+                                 ColorMap::hotG(abs(tf_matrix(y, x))),
+                                 ColorMap::hotB(abs(tf_matrix(y, x))));
+                    break;
+                case HotNeg1:
+                    color.setRgb(ColorMap::hotRNeg1(abs(tf_matrix(y, x))),
+                                 ColorMap::hotGNeg1(abs(tf_matrix(y, x))),
+                                 ColorMap::hotBNeg1(abs(tf_matrix(y, x))));
+                    break;
+                case HotNeg2:
+                    color.setRgb(ColorMap::hotRNeg2(abs(tf_matrix(y, x))),
+                                 ColorMap::hotGNeg2(abs(tf_matrix(y, x))),
+                                 ColorMap::hotBNeg2(abs(tf_matrix(y, x))));
+                    break;
+                case Bone:
+                    color.setRgb(ColorMap::boneR(abs(tf_matrix(y, x))),
+                                 ColorMap::boneG(abs(tf_matrix(y, x))),
+                                 ColorMap::boneB(abs(tf_matrix(y, x))));
+                    break;
+                case RedBlue:
+                    color.setRgb(ColorMap::rbR(abs(tf_matrix(y, x))),
+                                 ColorMap::rbG(abs(tf_matrix(y, x))),
+                                 ColorMap::rbB(abs(tf_matrix(y, x))));
+                    break;
             }
             image_to_tf_plot->setPixel(x, tf_matrix.rows() - 1 -  y,  color.rgb());
         }
@@ -106,9 +109,10 @@ TFplot::tfplot(VectorXd signal_vector, int sample_rate, ColorMaps cmap = ColorMa
     QGraphicsPixmapItem *tf_pixmap = new QGraphicsPixmapItem(QPixmap::fromImage(*image_to_tf_plot));
 
     if(plot_widget == NULL)
-        plot_widget = new QWidget();)
+        plot_widget = new QWidget();
 
-    plot_widget->tf_scene.addItem(tf_pixmap);
+    QGraphicsScene *tf_scene = new QGraphicsScene();
+    tf_scene->addItem(tf_pixmap);
 
     //setup x-axis
     QGraphicsTextItem *x_axis_name = new QGraphicsTextItem("time [sec]", tf_pixmap);
@@ -139,9 +143,11 @@ TFplot::tfplot(VectorXd signal_vector, int sample_rate, ColorMaps cmap = ColorMa
     qreal scale_x = qreal(tf_pixmap->boundingRect().width()) / qreal(x_axis_values.length()-1);
 
     //dbgout
+    /*
     std::cout << "\nimage width=    " << image_to_tf_plot->width() << "\n";
     std::cout << "\npixmap width=    " << tf_pixmap->boundingRect().width() << "\n";
     std::cout << "\nscale x=    " << scale_x << "\n";
+    */
 
     for(qint32 i = 0; i < x_axis_values.length(); i++)
     {
@@ -184,9 +190,11 @@ TFplot::tfplot(VectorXd signal_vector, int sample_rate, ColorMaps cmap = ColorMa
     qreal scale_y = qreal(tf_pixmap->boundingRect().height()) / qreal(y_axis_values.length()-1);
 
     //dbgout
+    /*
     std::cout << "\nimage heigth=    " << image_to_tf_plot->height() << "\n";
     std::cout << "\npixmap heigth=    " << tf_pixmap->boundingRect().height() << "\n";
     std::cout << "\nscale=    " << scale_y << "\n";
+    */
 
     for(qint32 i = 0; i < y_axis_values.length(); i++)
     {
@@ -201,47 +209,47 @@ TFplot::tfplot(VectorXd signal_vector, int sample_rate, ColorMaps cmap = ColorMa
     //end y axis
 
     // coefficient colors just for fun whatever
-    QImage *coeffs_image = new QImage(10, tf_sum.rows(), QImage::Format_RGB32);
+    QImage *coeffs_image = new QImage(10, tf_matrix.rows(), QImage::Format_RGB32);
     qreal norm = tf_matrix.maxCoeff();
-    for(qint32 it = 0; it < tf_sum.rows(); it++)
+    for(qint32 it = 0; it < tf_matrix.rows(); it++)
     {
         for ( qint32 x = 0; x < 10; x++ )
         {
-            switch  (cmap) {
-            case Jet:
-                color.setRgb(ColorMap::jetR(it*norm/tf_matrix.rows()),
-                             ColorMap::jetG(it*norm/tf_matrix.rows()),
-                             ColorMap::jetB(it*norm/tf_matrix.rows());
-                break;
-            case Hot:
-                color.setRgb(ColorMap::hotR(it*norm/tf_matrix.rows()),
-                             ColorMap::hotG(it*norm/tf_matrix.rows()),
-                             ColorMap::hotB(it*norm/tf_matrix.rows());
-                break;
-            case HotNeg1:
-                color.setRgb(ColorMap::hotNeg1R(it*norm/tf_matrix.rows()),
-                             ColorMap::hotNeg1G(it*norm/tf_matrix.rows()),
-                             ColorMap::hotNeg1B(it*norm/tf_matrix.rows());
-                break;
-            case HotNeg2:
-                color.setRgb(ColorMap::hotNeg2R(it*norm/tf_matrix.rows()),
-                             ColorMap::hotNeg2G(it*norm/tf_matrix.rows()),
-                             ColorMap::hotNeg2B(it*norm/tf_matrix.rows());
-                break;
-            case Bone:
-                color.setRgb(ColorMap::boneR(it*norm/tf_matrix.rows()),
-                             ColorMap::boneG(it*norm/tf_matrix.rows()),
-                             ColorMap::boneB(it*norm/tf_matrix.rows());
-                break;
-            case RedBlue:
-                color.setRgb(ColorMap::rbR(it*norm/tf_matrix.rows()),
-                             ColorMap::rbG(it*norm/tf_matrix.rows()),
-                             ColorMap::rbB(it*norm/tf_matrix.rows());
-                break;
-
-
-            //color.setRgb(ColorMap::hotR(it*norm/tf_matrix.rows()), ColorMap::hotG(it*norm/tf_sum.rows()), ColorMap::hotB(it*norm/tf_sum.rows()));
-            coeffs_image->setPixel(x, tf_matrix.rows() - 1 -  it,  color.rgb());
+            switch  (cmap)
+            {
+                case Jet:
+                    color.setRgb(ColorMap::jetR(it*norm/tf_matrix.rows()),
+                                 ColorMap::jetG(it*norm/tf_matrix.rows()),
+                                 ColorMap::jetB(it*norm/tf_matrix.rows()));
+                    break;
+                case Hot:
+                    color.setRgb(ColorMap::hotR(it*norm/tf_matrix.rows()),
+                                 ColorMap::hotG(it*norm/tf_matrix.rows()),
+                                 ColorMap::hotB(it*norm/tf_matrix.rows()));
+                    break;
+                case HotNeg1:
+                    color.setRgb(ColorMap::hotRNeg1(it*norm/tf_matrix.rows()),
+                                 ColorMap::hotGNeg1(it*norm/tf_matrix.rows()),
+                                 ColorMap::hotBNeg1(it*norm/tf_matrix.rows()));
+                    break;
+                case HotNeg2:
+                    color.setRgb(ColorMap::hotRNeg2(it*norm/tf_matrix.rows()),
+                                 ColorMap::hotGNeg2(it*norm/tf_matrix.rows()),
+                                 ColorMap::hotBNeg2(it*norm/tf_matrix.rows()));
+                    break;
+                case Bone:
+                    color.setRgb(ColorMap::boneR(it*norm/tf_matrix.rows()),
+                                 ColorMap::boneG(it*norm/tf_matrix.rows()),
+                                 ColorMap::boneB(it*norm/tf_matrix.rows()));
+                    break;
+                case RedBlue:
+                    color.setRgb(ColorMap::rbR(it*norm/tf_matrix.rows()),
+                                 ColorMap::rbG(it*norm/tf_matrix.rows()),
+                                 ColorMap::rbB(it*norm/tf_matrix.rows()));
+                    break;
+              }
+              //color.setRgb(ColorMap::hotR(it*norm/tf_matrix.rows()), ColorMap::hotG(it*norm/tf_sum.rows()), ColorMap::hotB(it*norm/tf_sum.rows()));
+              coeffs_image->setPixel(x, tf_matrix.rows() - 1 -  it,  color.rgb());
         }
         /*std::cout << ColorMap::jetR(it*norm/tf_sum.rows()) << " ; " <<
                      ColorMap::jetG(it*norm/tf_sum.rows()) << " ; " <<
@@ -249,7 +257,7 @@ TFplot::tfplot(VectorXd signal_vector, int sample_rate, ColorMaps cmap = ColorMa
         do we have a bug in jet here?
         */
     }
-    QGraphicsPixmapItem * coeffs_item = plot_window->tf_scene.addPixmap(QPixmap::fromImage(*coeffs_image));//addItem();
+    QGraphicsPixmapItem * coeffs_item = tf_scene->addPixmap(QPixmap::fromImage(*coeffs_image));//addItem();
     coeffs_item->setParentItem(tf_pixmap);
     coeffs_item->setPos(tf_pixmap->boundingRect().width() +5, 0);
 
@@ -269,23 +277,28 @@ TFplot::tfplot(VectorXd signal_vector, int sample_rate, ColorMaps cmap = ColorMa
                            0);
     //end coeffs picture
 
-    QGraphicsScene tf_scene;
-
     QLayout * layout = new QGridLayout();
     QGraphicsView * view = new QGraphicsView();
+    view->setObjectName("tf_view");
+    view->setScene(tf_scene);
+    tf_scene->setBackgroundBrush(Qt::lightGray);
+    view->scale(plot_widget->size().height() / tf_scene->sceneRect().height()
+                                        ,plot_widget->size().height() / tf_scene->sceneRect().height());//scale graphic scene
     layout->addWidget(view);
     plot_widget->setLayout(layout);
 
 
     //set Scene to GraphicsView and show
-    plot_widget->tf_view->setScene(tf_scene);
+   // plot_widget->
     //plot_window->tf_scene.setSceneRect(plot_window->tf_scene.itemsBoundingRect());                  // Re-shrink the scene to it's bounding contents
-    plot_widget->tf_scene.setBackgroundBrush(Qt::lightGray);
-    plot_widget->tf_view->scale(plot_window->size().height() / plot_window->tf_scene.sceneRect().height()
-                                    ,plot_window->size().height() / plot_window->tf_scene.sceneRect().height());//scale graphic scene
+   // plot_widget->
+    //plot_widget->tf_view->scale(plot_window->size().height() / plot_window->tf_scene.sceneRect().height()
+    //                                ,plot_window->size().height() / plot_window->tf_scene.sceneRect().height());//scale graphic scene
     //in the line above you see the problem of scaleing the whole scene after adding all items
     //depending on the signals size the text on the axis is not nice to read or even written over each other
     //otherwise it could happen tohave too small letters to read then.
     //SO SOLVE THIS AS WELL MAN!
-    plot_window->tf_view->show();
+    plot_widget->show();
+
+    return plot_widget;
 }

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mainwindow.cpp
+* @file     wignertransform.cpp
 * @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
 *           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
 * @version  1.0
@@ -48,16 +48,16 @@
 #include <Eigen/SparseCore>
 #include <unsupported/Eigen/FFT>
 
-namespace DISPLIB
-{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace UTILSLIB;
 using namespace Eigen;
 using namespace std;
+
 
 MatrixXd Wignertransform::wigner_transform(VectorXd signal_vector)
 {
@@ -83,5 +83,8 @@ MatrixXd Wignertransform::wigner_transform(VectorXd signal_vector)
     }
 
     return tf_sum;
+
     */
+    MatrixXd m;
+    return m;
 }
