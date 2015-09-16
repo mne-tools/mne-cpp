@@ -372,8 +372,7 @@ MatrixXd MNEMath::rescale(const MatrixXd &data, const RowVectorXf &times, QPair<
     }
     printf("\tApplying baseline correction ... (mode: %s)\n", mode.toLatin1().constData());
 
-    qint32 imin = 0;
-    qint32 imax = data.cols()-1;
+    qint32 imin, imax;
     float bmin, bmax;
 
     if(!baseline.first.isValid())
@@ -404,9 +403,6 @@ MatrixXd MNEMath::rescale(const MatrixXd &data, const RowVectorXf &times, QPair<
             }
         }
     }
-
-    qDebug()<<"imin "<<imin;
-    qDebug()<<"imax "<<imax;
 
     VectorXd mean = data_out.block(0, imin,data_out.rows(),imax-imin).rowwise().mean();
     if(mode.compare("mean") == 0)
