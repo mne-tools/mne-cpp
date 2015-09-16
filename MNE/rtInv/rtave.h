@@ -124,13 +124,13 @@ public:
     * @param[in] numAverages            Number of evkos to average
     * @param[in] p_iPreStimSamples      Number of samples averaged before the stimulus
     * @param[in] p_iPostStimSamples     Number of samples averaged after the stimulus (including the stimulus)
-    * @param[in] p_iBaselineFromSamples Start of baseline area which was/is used for correction
-    * @param[in] p_iBaselineToSamples   End of baseline area which was/is used for correction
+    * @param[in] p_iBaselineFromSecs    Start of baseline area which was/is used for correction in msecs
+    * @param[in] p_iBaselineToSSecs     End of baseline area which was/is used for correction in msecs
     * @param[in] p_iTriggerIndex        Row in dex of channel which is to be scanned for triggers
     * @param[in] p_pFiffInfo            Associated Fiff Information
     * @param[in] parent     Parent QObject (optional)
     */
-    explicit RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStimSamples, quint32 p_iBaselineFromSamples, quint32 p_iBaselineToSamples, quint32 p_iTriggerIndex, FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
+    explicit RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStimSamples, quint32 p_iBaselineFromSecs, quint32 p_iBaselineToSecs, quint32 p_iTriggerIndex, FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -208,6 +208,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the running average active
+    *
+    * @param[in] activate    activate running average
+    */
+    void setRunningAverageActive(bool activate);
+
+    //=========================================================================================================
+    /**
     * Starts the RtAve by starting the producer's thread.
     */
     virtual bool start();
@@ -282,9 +290,10 @@ private:
     bool    m_bFillingBackBuffer;       /**< Whether the back buffer is currently getting filled. */
     bool    m_bRunningAverage;          /**< Whether the running average is to be calculated. */
     bool    m_bDoBaselineCorrection;    /**< Whether to perform baseline correction. */
+    bool    m_bNewRunningAverage;       /**< Whether to perform running or cumulative averaging. */
 
     QPair<QVariant,QVariant>    m_pairBaselineSec;     /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
-    QPair<QVariant,QVariant>    m_pairBaselineSamp; /**< Baseline information in samples form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
+    QPair<QVariant,QVariant>    m_pairBaselineSamp;     /**< Baseline information in samples form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
 
     FiffInfo::SPtr          m_pFiffInfo;            /**< Holds the fiff measurement information. */
     FiffEvoked::SPtr        m_pStimEvoked;          /**< Holds the evoked information. */
