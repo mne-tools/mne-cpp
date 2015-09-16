@@ -302,7 +302,7 @@ void Averaging::changePreStim(qint32 mseconds)
         m_pAveragingOutput->data()->setNumPreStimSamples(m_iPreStimSamples);
 
     if(m_pRtAve)
-        m_pRtAve->setPreStim(m_iPreStimSamples, m_iPostStimSeconds);
+        m_pRtAve->setPreStim(m_iPreStimSamples, m_iPreStimSeconds);
 }
 
 
@@ -497,7 +497,7 @@ void Averaging::run()
     //
     // Init Real-Time average
     //
-    m_pRtAve = RtAve::SPtr(new RtAve(m_iNumAverages, m_iPreStimSamples, m_iPostStimSamples, m_iBaselineFromSamples, m_iBaselineToSamples, m_qListStimChs.at(m_iStimChan), m_pFiffInfo));
+    m_pRtAve = RtAve::SPtr(new RtAve(m_iNumAverages, m_iPreStimSamples, m_iPostStimSamples, m_iBaselineFromSeconds, m_iBaselineToSeconds, m_qListStimChs.at(m_iStimChan), m_pFiffInfo));
     connect(m_pRtAve.data(), &RtAve::evokedStim, this, &Averaging::appendEvoked);
 
     m_pRtAve->start();
