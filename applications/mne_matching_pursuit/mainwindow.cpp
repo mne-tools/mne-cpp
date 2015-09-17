@@ -44,7 +44,7 @@
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 
-#include "disp/colormap.h"
+//#include "disp/helpers/colormap.h"
 #include "math.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
