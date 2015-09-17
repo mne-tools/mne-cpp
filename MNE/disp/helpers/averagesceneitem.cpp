@@ -95,8 +95,8 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->drawStaticText(boundingRect().x(), boundingRect().y(), staticElectrodeName);
     painter->restore();
 
-    //Plot bounding rect / drawing region of this item
-    painter->drawRect(this->boundingRect());
+//    //Plot bounding rect / drawing region of this item
+//    painter->drawRect(this->boundingRect());
 
     //Plot stim time
     painter->save();
