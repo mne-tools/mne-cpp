@@ -242,6 +242,12 @@ signals:
     */
     void resetTriggerCounter();
 
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever you want to cople this control widget to updating a view for which it is providing control.
+    */
+    void updateConnectedView();
+
 protected:
     //=========================================================================================================
     /**
@@ -370,6 +376,12 @@ protected:
     * Slot called when reset number of detected triggers was pressed
     */
     void onResetTriggerNumbers();
+
+    //=========================================================================================================
+    /**
+    * Slot called when the user designed filter was toggled
+    */
+    void userFilterToggled(bool state);
 
 private:
     bool        m_bScaling;         /**< Flag for drawing the scaling group box */

@@ -246,6 +246,8 @@ void RealTimeEvokedModel::setRTE(QSharedPointer<RealTimeEvoked> &pRTE)
 
     m_vecBadIdcs = sel;
 
+    m_fSps = m_pRTE->info()->sfreq;
+
     //Create the initial SSP projector
     updateProjection();
 
@@ -280,6 +282,8 @@ void RealTimeEvokedModel::updateData()
         m_matData = m_pRTE->getValue()->data;
     else
         m_matData = m_matSparseProj * m_pRTE->getValue()->data;
+
+    m_pairBaseline = m_pRTE->getValue()->baseline;
 
     if(!m_filterData.isEmpty())
         filterChannelsConcurrently();

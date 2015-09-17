@@ -248,10 +248,10 @@ private:
     */
     virtual void wheelEvent(QWheelEvent * event);
 
-    RealTimeEvokedModel::SPtr       m_pRTEModel;                /**< RTE data model */
-    RealTimeButterflyPlot::SPtr     m_pButterflyPlot;           /**< Butterfly plot */
-    AverageScene::SPtr              m_pAverageScene;            /**< The pointer to the average scene. */    
-    RealTimeEvoked::SPtr            m_pRTE;                     /**< The real-time evoked measurement. */
+    RealTimeEvokedModel::SPtr           m_pRTEModel;                /**< RTE data model */
+    RealTimeButterflyPlot::SPtr         m_pButterflyPlot;           /**< Butterfly plot */
+    AverageScene::SPtr                  m_pAverageScene;            /**< The pointer to the average scene. */
+    RealTimeEvoked::SPtr                m_pRTE;                     /**< The real-time evoked measurement. */
     QuickControlWidget::SPtr            m_pQuickControlWidget;      /**< Quick control widget. */
     SelectionManagerWindow::SPtr        m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */
     ChInfoModel::SPtr                   m_pChInfoModel;             /**< Channel info model. */

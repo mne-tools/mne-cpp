@@ -2,14 +2,14 @@
 /**
 * @file     rtave.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     September, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Christoph Dinh, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -71,14 +71,25 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtAve::RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStimSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent)
+RtAve::RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStimSamples, quint32 p_iBaselineFromSecs, quint32 p_iBaselineToSecs, quint32 p_iTriggerIndex, FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 : QThread(parent)
 , m_iNumAverages(numAverages)
 , m_iPreStimSamples(p_iPreStimSamples)
 , m_iPostStimSamples(p_iPostStimSamples)
+, m_iPreStimSeconds(p_iPreStimSamples/p_pFiffInfo->sfreq)
+, m_iPostStimSeconds(p_iPostStimSamples/p_pFiffInfo->sfreq)
 , m_pFiffInfo(p_pFiffInfo)
 , m_bIsRunning(false)
 , m_bAutoAspect(true)
+, m_fTriggerThreshold(0.02)
+, m_bFillingBackBuffer(false)
+, m_iTriggerIndex(-1)
+, m_iNewTriggerIndex(p_iTriggerIndex)
+, m_iTriggerPos(-1)
+, m_iAverageMode(0)
+, m_iNewAverageMode(0)
+, m_bDoBaselineCorrection(false)
+, m_pairBaselineSec(qMakePair(QVariant(QString::number(p_iBaselineFromSecs)),QVariant(QString::number(p_iBaselineToSecs))))
 {
     qRegisterMetaType<FiffEvoked::SPtr>("FiffEvoked::SPtr");
 }
@@ -97,12 +108,14 @@ RtAve::~RtAve()
 
 void RtAve::append(const MatrixXd &p_DataSegment)
 {
-    QMutexLocker locker(&m_qMutex);
+    m_qMutex.lock();
     // ToDo handle change buffersize
     if(!m_pRawMatrixBuffer)
         m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(128, p_DataSegment.rows(), p_DataSegment.cols()));
 
     m_pRawMatrixBuffer->push(&p_DataSegment);
+
+    m_qMutex.unlock();
 }
 
 
@@ -111,7 +124,7 @@ void RtAve::append(const MatrixXd &p_DataSegment)
 void RtAve::setAverages(qint32 numAve)
 {
     m_qMutex.lock();
-    m_iNumAverages = numAve;
+    m_iNewNumAverages = numAve;
     m_qMutex.unlock();
     emit numAveragesChanged();
 }
@@ -119,170 +132,90 @@ void RtAve::setAverages(qint32 numAve)
 
 //*************************************************************************************************************
 
-void RtAve::setPreStim(qint32 samples)
+void RtAve::setAverageMode(qint32 mode)
 {
-    QMutexLocker locker(&m_qMutex);
+    m_qMutex.lock();
+    m_iNewAverageMode = mode;
+    m_qMutex.unlock();
+}
+
+
+//*************************************************************************************************************
+
+void RtAve::setPreStim(qint32 samples, qint32 secs)
+{
+    m_qMutex.lock();
     m_iNewPreStimSamples = samples;
+    m_iPreStimSeconds = secs;
+    m_qMutex.unlock();
 }
 
 
 //*************************************************************************************************************
 
-void RtAve::setPostStim(qint32 samples)
+void RtAve::setPostStim(qint32 samples, qint32 secs)
 {
-    QMutexLocker locker(&m_qMutex);
+    m_qMutex.lock();
     m_iNewPostStimSamples = samples;
+    m_iPostStimSeconds = secs;
+    m_qMutex.unlock();
 }
 
 
 //*************************************************************************************************************
 
-void RtAve::assemblePostStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_qListRawMatBuf, qint32 p_iStimIdx)
+void RtAve::setTriggerChIndx(qint32 idx)
 {
-    QMutexLocker locker(&m_qMutex);
-    if(m_iPostStimSamples > 0)
-    {
-        // middle of the assembled buffers
-        float ratio = (float)m_iPreStimSamples/((float)(m_iPreStimSamples+m_iPostStimSamples));
-        qint32 t_iBuffWithStim = floor((p_qListRawMatBuf.size()-1)*ratio) + 1;
-
-        qint32 nrows = p_qListRawMatBuf[t_iBuffWithStim].second.rows();
-        qint32 ncols = p_qListRawMatBuf[t_iBuffWithStim].second.cols();
-
-        //Stimulus channel row
-        qint32 t_iRowIdx = m_qListStimChannelIdcs[p_iStimIdx];
-
-        qint32 nSampleCount = 0;
-
-        MatrixXd t_matPostStim(nrows, m_iPostStimSamples);
-        qint32 t_curBufIdx = t_iBuffWithStim;
-
-        qint32 t_iSize = 0;
-
-        //Detect actual stimulus flank in signal
-        qint32 pos = 0;
-        DetectTrigger::detectTriggerFlanksMax(p_qListRawMatBuf[t_iBuffWithStim].second, t_iRowIdx, pos, 0, 0.01, true);
-        //p_qListRawMatBuf[t_iBuffWithStim].second.row(t_iRowIdx).maxCoeff(&pos);
-
-        //
-        // assemble poststimulus
-        //
-
-        // start from the stimulus itself
-        if(pos >= 0)
-        {
-            t_iSize = ncols - pos;
-            if(t_iSize <= m_iPostStimSamples)
-            {
-                t_matPostStim.block(0, 0, nrows, t_iSize) = p_qListRawMatBuf[t_iBuffWithStim].second.block(0, pos, nrows, t_iSize);
-                nSampleCount += t_iSize;
-            }
-            else
-            {
-                t_matPostStim.block(0, 0, nrows, m_iPostStimSamples) = p_qListRawMatBuf[t_iBuffWithStim].second.block(0, pos, nrows, m_iPostStimSamples);
-                nSampleCount = m_iPostStimSamples;
-            }
-        }
-
-        ++t_curBufIdx;
-
-        // remaining samples
-        while(nSampleCount < m_iPostStimSamples)
-        {
-            t_iSize = m_iPostStimSamples-nSampleCount;
-
-            if(ncols <= t_iSize)
-            {
-                t_matPostStim.block(0, nSampleCount, nrows, ncols) = p_qListRawMatBuf[t_curBufIdx].second.block(0, 0, nrows, ncols);
-                nSampleCount += ncols;
-            }
-            else
-            {
-                t_matPostStim.block(0, nSampleCount, nrows, t_iSize) = p_qListRawMatBuf[t_curBufIdx].second.block(0, 0, nrows, t_iSize);
-                nSampleCount = m_iPostStimSamples;
-            }
-
-            ++t_curBufIdx;
-        }
-
-        //
-        //Store in right post stimulus buffer vector
-        //
-        m_qListQListPostStimBuf[p_iStimIdx].append(t_matPostStim);
-    }
+    m_qMutex.lock();
+    m_iNewTriggerIndex = idx;
+    m_qMutex.unlock();
 }
 
 
 //*************************************************************************************************************
 
-void RtAve::assemblePreStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_qListRawMatBuf, qint32 p_iStimIdx)
+void RtAve::setBaselineActive(bool activate)
 {
-    QMutexLocker locker(&m_qMutex);
-    if(m_iPreStimSamples > 0)
-    {
-        // stimulus containing buffer of the assembled buffers
-        float ratio = (float)m_iPreStimSamples/((float)(m_iPreStimSamples+m_iPostStimSamples));
-        qint32 t_iBuffWithStim = floor((p_qListRawMatBuf.size()-1)*ratio) + 1;
-        qint32 nrows = p_qListRawMatBuf[t_iBuffWithStim].second.rows();
-        qint32 ncols = p_qListRawMatBuf[t_iBuffWithStim].second.cols();
+    m_qMutex.lock();
 
-        //Stimulus channel row
-        qint32 t_iRowIdx = m_qListStimChannelIdcs[p_iStimIdx];
+    m_bDoBaselineCorrection = activate;
 
-        qint32 nSampleCount = m_iPreStimSamples;
-        MatrixXd t_matPreStim(nrows, m_iPreStimSamples);
-        qint32 t_curBufIdx = t_iBuffWithStim;
+    if(!m_bDoBaselineCorrection)
+        m_pStimEvoked->baseline = qMakePair(QVariant("None"), QVariant("None"));
 
-        qint32 t_iStart = 0;
+    m_pStimEvoked->baseline = m_pairBaselineSec;
 
-        //Detect actual stimulus flank in signal
-        qint32 pos = 0;
-        DetectTrigger::detectTriggerFlanksMax(p_qListRawMatBuf[t_iBuffWithStim].second, t_iRowIdx, pos, 0, 0.01, true);
-        //p_qListRawMatBuf[t_iBuffWithStim].second.row(t_iRowIdx).maxCoeff(&pos);
+    m_qMutex.unlock();
+}
 
-        //
-        // assemble prestimulus
-        //
-        // start from the stimulus itself
-        if(pos > 0)
-        {
-            t_iStart = m_iPreStimSamples - pos;
-            if(t_iStart >= 0)
-            {
-                t_matPreStim.block(0, t_iStart, nrows, pos) = p_qListRawMatBuf[t_iBuffWithStim].second.block(0, 0, nrows, pos);
-                nSampleCount -= pos;
-            }
-            else
-            {
-                t_matPreStim.block(0, 0, nrows, m_iPreStimSamples) = p_qListRawMatBuf[t_iBuffWithStim].second.block(0, -t_iStart, nrows, m_iPreStimSamples);
-                nSampleCount = 0;
-            }
-        }
-        --t_curBufIdx;
 
-        // remaining samples
-        while(nSampleCount > 0)
-        {
-            t_iStart = nSampleCount - ncols;
+//*************************************************************************************************************
 
-            if(t_iStart >= 0)
-            {
-                t_matPreStim.block(0, t_iStart, nrows, ncols) = p_qListRawMatBuf[t_curBufIdx].second.block(0, 0, nrows, ncols);
-                nSampleCount -= ncols;
-            }
-            else
-            {
-                t_matPreStim.block(0, 0, nrows, nSampleCount) = p_qListRawMatBuf[t_curBufIdx].second.block(0, -t_iStart, nrows, nSampleCount);
-                nSampleCount = 0;
-            }
+void RtAve::setBaselineFrom(int fromSamp, int fromMSec)
+{
+    m_qMutex.lock();
 
-            --t_curBufIdx;
-        }
-        //
-        //Store in right pre stimulus buffer vector
-        //
-        m_qListQListPreStimBuf[p_iStimIdx].append(t_matPreStim);
-    }
+    m_pairBaselineSec.first = QVariant(QString::number(float(fromMSec)/1000));
+    m_pairBaselineSamp.first = QVariant(QString::number(fromSamp));
+
+    m_pStimEvoked->baseline.first = QVariant(QString::number(float(fromMSec)/1000));
+
+    m_qMutex.unlock();
+}
+
+
+//*************************************************************************************************************
+
+void RtAve::setBaselineTo(int toSamp, int toMSec)
+{
+    m_qMutex.lock();
+
+    m_pairBaselineSec.second = QVariant(QString::number(float(toMSec)/1000));
+    m_pairBaselineSamp.second = QVariant(QString::number(toSamp));
+
+    m_pStimEvoked->baseline.second = QVariant(QString::number(float(toMSec)/1000));
+
+    m_qMutex.unlock();
 }
 
 
@@ -324,305 +257,250 @@ bool RtAve::stop()
 
 void RtAve::run()
 {
-    //
-    // Inits & Clears
-    //
-    m_qMutex.lock();
-    quint32 t_nSamplesPerBuf = 0;
-    QList<QPair<QList<qint32>, MatrixXd> > t_qListRawMatBuf;
-
-    FiffEvoked::SPtr evoked(new FiffEvoked());
-    VectorXd mu;
-    qint32 i = 0;
-    qint32 j = 0;
-
-    m_qListQListPreStimBuf.clear();
-    m_qListQListPostStimBuf.clear();
-    m_qListPreStimAve.clear();
-    m_qListPostStimAve.clear();
-    m_qListStimAve.clear();
-
-    //
-    // get num stim channels
-    //
-    m_qListStimChannelIdcs.clear();
-    MatrixXd t_mat;
-    QList<MatrixXd> t_qListMat;
-    QList<int> tempList;
-    for(i = 0; i < m_pFiffInfo->nchan; ++i)
-    {
-        if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH && (m_pFiffInfo->chs[i].ch_name != QString("STI 014")))
-        {
-            m_qListStimChannelIdcs.append(i);
-
-            m_qListQListPreStimBuf.push_back(t_qListMat);
-            m_qListQListPostStimBuf.push_back(t_qListMat);
-            m_qListPreStimAve.push_back(t_mat);
-            m_qListPostStimAve.push_back(t_mat);
-            m_qListStimAve.push_back(t_mat);
-
-            m_qMapDetectedTrigger[i] = tempList;
-        }
-    }
-
-    float T = 1.0/m_pFiffInfo->sfreq;
-
-    // pre real-time evoked response
-    FiffEvoked t_preStimEvoked;
-    t_preStimEvoked.setInfo(*m_pFiffInfo.data());
-    t_preStimEvoked.nave = m_iNumAverages;
-    t_preStimEvoked.aspect_kind = FIFFV_ASPECT_AVERAGE;
-    t_preStimEvoked.times.resize(m_iPreStimSamples);
-    t_preStimEvoked.times[0] = -T*m_iPreStimSamples;
-    for(i = 1; i < t_preStimEvoked.times.size(); ++i)
-        t_preStimEvoked.times[i] = t_preStimEvoked.times[i-1] + T;
-    t_preStimEvoked.first = t_preStimEvoked.times[0];
-    t_preStimEvoked.last = t_preStimEvoked.times[t_preStimEvoked.times.size()-1];
-
-    // post real-time evoked full response
-    FiffEvoked t_postStimEvoked;
-    t_postStimEvoked.setInfo(*m_pFiffInfo.data());
-    t_postStimEvoked.nave = m_iNumAverages;
-    t_postStimEvoked.aspect_kind = FIFFV_ASPECT_AVERAGE;
-    t_postStimEvoked.times.resize(m_iPostStimSamples);
-    t_postStimEvoked.times[0] = 0;
-    for(i = 1; i < t_postStimEvoked.times.size(); ++i)
-        t_postStimEvoked.times[i] = t_postStimEvoked.times[i-1] + T;
-    t_postStimEvoked.first = t_postStimEvoked.times[0];
-    t_postStimEvoked.last = t_postStimEvoked.times[t_postStimEvoked.times.size()-1];
-
-    // Full real-time evoked response
-    FiffEvoked t_stimEvoked;
-    t_stimEvoked.setInfo(*m_pFiffInfo.data());
-    t_stimEvoked.nave = m_iNumAverages;
-    t_stimEvoked.aspect_kind = FIFFV_ASPECT_AVERAGE;
-    t_stimEvoked.times.resize(m_iPreStimSamples+m_iPostStimSamples);
-    t_stimEvoked.times[0] = -T*m_iPreStimSamples;
-    for(i = 1; i < t_stimEvoked.times.size(); ++i)
-        t_stimEvoked.times[i] = t_stimEvoked.times[i-1] + T;
-    t_stimEvoked.first = t_stimEvoked.times[0];
-    t_stimEvoked.last = t_stimEvoked.times[t_stimEvoked.times.size()-1];
-
-
-    qint32 count = 0;
-
-    m_iNewPreStimSamples = m_iPreStimSamples;
-    m_iNewPostStimSamples = m_iPostStimSamples;
-
-    m_qMutex.unlock();
+    //Init
+    init();
+    reset();
 
     //Enter the main loop
-    while(true)
-    {
-        {
-            QMutexLocker locker(&m_qMutex);
-            if(!m_bIsRunning)
-                break;
-        }
-
+    while(m_bIsRunning) {
         bool doProcessing = false;
-        {
-            QMutexLocker locker(&m_qMutex);
-            if(m_pRawMatrixBuffer)
-                doProcessing = true;
-        }
 
-        if(doProcessing)
-        {
-            //
-            // Reset when stim size changed
-            //
-            m_qMutex.lock();
-            if(m_iNewPreStimSamples != m_iPreStimSamples || m_iNewPostStimSamples != m_iPostStimSamples)
-            {
-                m_iPreStimSamples = m_iNewPreStimSamples;
-                m_iPostStimSamples = m_iNewPostStimSamples;
+        if(m_pRawMatrixBuffer)
+            doProcessing = true;
 
-                // pre real-time evoked response
-                t_preStimEvoked.times.resize(m_iPreStimSamples);
-                t_preStimEvoked.times[0] = -T*m_iPreStimSamples;
-                for(i = 1; i < t_preStimEvoked.times.size(); ++i)
-                    t_preStimEvoked.times[i] = t_preStimEvoked.times[i-1] + T;
-                t_preStimEvoked.first = t_preStimEvoked.times[0];
-                t_preStimEvoked.last = t_preStimEvoked.times[t_preStimEvoked.times.size()-1];
+        if(doProcessing) {
+            if(m_iNewPreStimSamples != m_iPreStimSamples
+                    || m_iNewPostStimSamples != m_iPostStimSamples
+                    || m_iNewTriggerIndex != m_iTriggerIndex
+                    || m_iNewAverageMode != m_iAverageMode
+                    || m_iNewNumAverages != m_iNumAverages)
+                reset();
 
-                // post real-time evoked full response
-                t_postStimEvoked.times.resize(m_iPostStimSamples);
-                t_postStimEvoked.times[0] = 0;
-                for(i = 1; i < t_postStimEvoked.times.size(); ++i)
-                    t_postStimEvoked.times[i] = t_postStimEvoked.times[i-1] + T;
-                t_postStimEvoked.first = t_postStimEvoked.times[0];
-                t_postStimEvoked.last = t_postStimEvoked.times[t_postStimEvoked.times.size()-1];
-
-                // Full real-time evoked response
-                t_stimEvoked.times.resize(m_iPreStimSamples+m_iPostStimSamples);
-                t_stimEvoked.times[0] = -T*m_iPreStimSamples;
-                for(i = 1; i < t_stimEvoked.times.size(); ++i)
-                    t_stimEvoked.times[i] = t_stimEvoked.times[i-1] + T;
-                t_stimEvoked.first = t_stimEvoked.times[0];
-                t_stimEvoked.last = t_stimEvoked.times[t_stimEvoked.times.size()-1];
-
-                MatrixXd t_resetMat;
-                t_qListRawMatBuf.clear();
-                m_qListPreStimAve.clear();
-                m_qListPostStimAve.clear();
-                m_qListStimAve.clear();
-
-                for(qint32 i = 0; i < m_qListQListPreStimBuf.size(); ++i)
-                {
-                    m_qListQListPreStimBuf[i].clear();
-                    m_qListQListPostStimBuf[i].clear();
-                    m_qListPreStimAve.push_back(t_resetMat);
-                    m_qListPostStimAve.push_back(t_resetMat);
-                    m_qListStimAve.push_back(t_resetMat);
-                }
-            }
-            m_qMutex.unlock();
-
-            //
-            // Acquire Data
-            //
+            //Acquire Data
             MatrixXd rawSegment = m_pRawMatrixBuffer->pop();
-            if(t_nSamplesPerBuf == 0)
-                t_nSamplesPerBuf = rawSegment.cols();
+            m_iCurrentBlockSize = rawSegment.cols();
 
-            ++count;
+            //Fill back buffer and decide when to do the data packing of the different buffers
+            if(m_bFillingBackBuffer) {
+                if(fillBackBuffer(rawSegment) == m_iPostStimSamples) {
+                    //Merge the different buffers
+                    mergeData();
 
-            //
-            // Find which trigger channel has a trigger flank in it
-            //
-            QList<qint32> t_qListStimuli;
-            for(i = 0; i < m_qListStimChannelIdcs.size(); ++i)
-            {
-                qint32 idx = m_qListStimChannelIdcs[i];
-                int pos = -1;
+                    //Clear data
+                    m_matBufferBack.clear();
+                    m_matBufferFront.clear();
 
-                DetectTrigger::detectTriggerFlanksMax(rawSegment, idx, pos, 0, 0.02, true);
+                    //Calculate the actual average
+                    generateEvoked();
 
-                if(pos!=-1)
-                    t_qListStimuli.append(i);
-            }
+                    //If number of averages was reached emit new average
+                    if(m_qListStimAve.size() == m_iNumAverages && m_iAverageMode==0)
+                        emit evokedStim(m_pStimEvoked);
+                    else if(m_qListStimAve.size() > 0)
+                        emit evokedStim(m_pStimEvoked);
 
-            //
-            // Store
-            //
-            t_qListRawMatBuf.push_back(qMakePair(t_qListStimuli, rawSegment));
+                    m_bFillingBackBuffer = false;
+                }
+            } else {
+                clearDetectedTriggers();
 
-            m_qMutex.lock();
-            qint32 minSize = (m_iPreStimSamples+m_iPostStimSamples) + (2 * t_nSamplesPerBuf);
-            m_qMutex.unlock();
+                //Fill front / pre stim buffer
+                fillFrontBuffer(rawSegment);
 
-            if(t_nSamplesPerBuf*t_qListRawMatBuf.size() > (quint32)minSize)
-            {
-                //
-                // Average
-                //
-                float ratio = (float)m_iPreStimSamples/((float)(m_iPreStimSamples+m_iPostStimSamples));
-                qint32 t_iBuffWithStim = floor((t_qListRawMatBuf.size()-1)*ratio) + 1;
-
-                if(t_iBuffWithStim > 0 && t_qListRawMatBuf[t_iBuffWithStim].first.size() != 0)
-                {
-                    for(i = 0; i < t_qListRawMatBuf[t_iBuffWithStim].first.size(); ++i)
-                    {
-//                        //make sure that previous buffer does not conatin this stim - prevent multiple detection
-//                        if(!t_qListRawMatBuf[t_iBuffWithStim-1].first.contains(t_qListRawMatBuf[t_iBuffWithStim].first[i]))
-//                        {
-                            qint32 t_iStimIndex = t_qListRawMatBuf[t_iBuffWithStim].first[i];
-
-                            //
-                            // assemble prestimulus
-                            //
-                            this->assemblePreStimulus(t_qListRawMatBuf, t_iStimIndex);
-
-                            //
-                            // assemble poststimulus
-                            //
-                            this->assemblePostStimulus(t_qListRawMatBuf, t_iStimIndex);
-
-                            qDebug() << m_pFiffInfo->ch_names[m_qListStimChannelIdcs[t_iStimIndex]] << ": Buffer Size" << m_qListQListPreStimBuf[t_iStimIndex].size();
-                            //
-                            // Prestimulus average
-                            //
-                            m_qMutex.lock();
-                            if(m_qListQListPreStimBuf[t_iStimIndex].size() >= m_iNumAverages)
-                            {
-                                while(m_qListQListPreStimBuf[t_iStimIndex].size() >= (m_iNumAverages+1))//if meanwhile number of averages was reduced
-                                    m_qListQListPreStimBuf[t_iStimIndex].pop_front();
-
-                                m_qListPreStimAve[t_iStimIndex] = m_qListQListPreStimBuf[t_iStimIndex][0];
-                                for(j = 1; j < m_qListQListPreStimBuf[t_iStimIndex].size(); ++j)
-                                    m_qListPreStimAve[t_iStimIndex] += m_qListQListPreStimBuf[t_iStimIndex][j];
-
-                                m_qListPreStimAve[t_iStimIndex].array() /= (double)m_iNumAverages;
-
-                                m_qListQListPreStimBuf[t_iStimIndex].pop_front();
-                            }
-                            m_qMutex.unlock();
-
-                            //
-                            // Poststimulus average
-                            //
-                            m_qMutex.lock();
-                            if(m_qListQListPostStimBuf[t_iStimIndex].size() >= m_iNumAverages)
-                            {
-                                while(m_qListQListPostStimBuf[t_iStimIndex].size() >= (m_iNumAverages+1))//if meanwhile number of averages was reduced
-                                    m_qListQListPostStimBuf[t_iStimIndex].pop_front();
-
-                                m_qListPostStimAve[t_iStimIndex] = m_qListQListPostStimBuf[t_iStimIndex][0];
-                                for(j = 1; j < m_qListQListPostStimBuf[t_iStimIndex].size(); ++j)
-                                    m_qListPostStimAve[t_iStimIndex] += m_qListQListPostStimBuf[t_iStimIndex][j];
-
-                                m_qListPostStimAve[t_iStimIndex].array() /= (double)m_iNumAverages;
-
-                                m_qListQListPostStimBuf[t_iStimIndex].pop_front();
-                            }
-                            m_qMutex.unlock();
-
-                            //if averages are available -> buffers are filled and first average is stored
-                            m_qMutex.lock();
-                            if(m_qListPreStimAve[t_iStimIndex].size() > 0)
-                            {
-                                //
-                                // concatenate pre + post stimulus to full stimulus
-                                //
-                                m_qListStimAve[t_iStimIndex].resize(m_qListPreStimAve[t_iStimIndex].rows(), m_qListPreStimAve[t_iStimIndex].cols() + m_qListPostStimAve[t_iStimIndex].cols());
-                                // Pre
-                                m_qListStimAve[t_iStimIndex].block(0,0,m_qListPreStimAve[t_iStimIndex].rows(),m_qListPreStimAve[t_iStimIndex].cols()) = m_qListPreStimAve[t_iStimIndex];
-                                // Post
-                                m_qListStimAve[t_iStimIndex].block(0,m_qListPreStimAve[t_iStimIndex].cols(),m_qListPostStimAve[t_iStimIndex].rows(),m_qListPostStimAve[t_iStimIndex].cols()) = m_qListPostStimAve[t_iStimIndex];
-
-                                //
-                                // Emit evoked
-                                //
-                                QString t_sStimChName = m_pFiffInfo->ch_names[m_qListStimChannelIdcs[t_iStimIndex]];
-                                FiffEvoked::SPtr t_pEvokedPreStim(new FiffEvoked(t_preStimEvoked));
-                                t_pEvokedPreStim->nave = m_iNumAverages;
-                                t_pEvokedPreStim->comment = t_sStimChName;
-                                t_pEvokedPreStim->data = m_qListPreStimAve[t_iStimIndex];
-                                emit evokedPreStim(t_pEvokedPreStim);
-
-                                FiffEvoked::SPtr t_pEvokedPostStim(new FiffEvoked(t_postStimEvoked));
-                                t_pEvokedPostStim->nave = m_iNumAverages;
-                                t_pEvokedPostStim->comment = t_sStimChName;
-                                t_pEvokedPostStim->data = m_qListPostStimAve[t_iStimIndex];
-                                emit evokedPostStim(t_pEvokedPostStim);
-
-                                FiffEvoked::SPtr t_pEvokedStim(new FiffEvoked(t_stimEvoked));
-                                t_pEvokedStim->nave = m_iNumAverages;
-                                t_pEvokedStim->comment = t_sStimChName;
-                                t_pEvokedStim->data = m_qListStimAve[t_iStimIndex];
-                                emit evokedStim(t_pEvokedStim);
-                            }
-                            m_qMutex.unlock();
-//                        }
-                    }
+                //Detect trigger for all stim channels. If detected turn on filling of the back / post stim buffer
+                if(DetectTrigger::detectTriggerFlanksMax(rawSegment, m_iTriggerIndex, m_iTriggerPos, 0, m_fTriggerThreshold, true)) {
+                    m_matStimData = rawSegment;
+                    m_bFillingBackBuffer = true;
                 }
 
-                //
-                //dump oldest buffer
-                //
-                t_qListRawMatBuf.pop_front();
+                qDebug()<<"Trigger channel "<<m_iTriggerIndex<<" found at "<<m_iTriggerPos;
             }
         }
     }
 }
+
+
+//*************************************************************************************************************
+
+void RtAve::clearDetectedTriggers()
+{
+    QMutableMapIterator<int,QList<int> > i(m_qMapDetectedTrigger);
+    while (i.hasNext()) {
+        i.next();
+        i.value().clear();
+    }
+}
+
+
+//*************************************************************************************************************
+
+int RtAve::fillBackBuffer(MatrixXd &data)
+{
+    int iTotalBufSize = 0;
+    int iResidualCols = data.cols();
+    for(int i = 0; i < m_matBufferBack.size(); i++)
+        iTotalBufSize += m_matBufferBack.at(i).cols();
+
+    if(iTotalBufSize < m_iPostStimSamples) {
+        if(iTotalBufSize+data.cols() > m_iPostStimSamples) {
+            iResidualCols = m_iPostStimSamples-iTotalBufSize;
+            m_matBufferBack.append(data.block(0,0,data.cols(),iResidualCols));
+        } else
+            m_matBufferBack.append(data);
+    }
+
+    //DEBUG
+    //qDebug()<<"m_matBufferBack: "<<iTotalBufSize+iResidualCols;
+    return iTotalBufSize+iResidualCols;
+}
+
+
+//*************************************************************************************************************
+
+void RtAve::fillFrontBuffer(MatrixXd &data)
+{
+    if(m_iCurrentMatBufferIndex == 0)
+        m_matBufferFront.clear();
+
+    if(m_iPreStimSamples <= m_iCurrentBlockSize) {
+        m_matBufferFront.prepend(data.block(0,m_iCurrentBlockSize-m_iPreStimSamples,data.rows(),m_iPreStimSamples));
+        m_iCurrentMatBufferIndex = 0;
+    } else {
+        if(m_iCurrentMatBufferIndex+m_iCurrentBlockSize > m_iPreStimSamples) {
+            int numberCols = m_iPreStimSamples % m_iCurrentBlockSize;
+            m_matBufferFront.prepend(data.block(0,m_iCurrentBlockSize-numberCols,data.rows(),numberCols));
+            m_iCurrentMatBufferIndex = 0;
+        } else {
+            m_matBufferFront.prepend(data);
+            m_iCurrentMatBufferIndex += m_iCurrentBlockSize;
+        }
+    }
+
+    // DEBUG - Check total data length of front buffer
+//    int size = 0;
+//    for(int i = 0; i<m_matBufferFront.size(); i++)
+//        size += m_matBufferFront.at(i).cols();
+    //qDebug()<<"m_matBufferFront: "<<size;
+}
+
+
+//*************************************************************************************************************
+
+void RtAve::mergeData()
+{
+    int rows = m_matStimData.rows();
+    MatrixXd cutData(rows, m_iPreStimSamples+m_iPostStimSamples);
+    MatrixXd mergedData(rows, m_iPreStimSamples+m_iPostStimSamples+m_matStimData.cols());
+
+    for(int i = 0; i < m_matBufferFront.size(); i++)
+        mergedData.block(0,i*m_iCurrentBlockSize,rows,m_matBufferFront.at(i).cols()) =  m_matBufferFront.at(i);
+
+    mergedData.block(0,m_iPreStimSamples,rows,m_matStimData.cols()) =  m_matStimData;
+
+    for(int i = 0; i < m_matBufferBack.size(); i++)
+        mergedData.block(0,m_iPreStimSamples+m_matStimData.cols()+i*m_iCurrentBlockSize,rows,m_matBufferBack.at(i).cols()) =  m_matBufferBack.at(i);
+
+    cutData = mergedData.block(0,m_iPreStimSamples+m_iTriggerPos-m_iPreStimSamples,rows,m_iPreStimSamples+m_iPostStimSamples);
+
+    //Add cut data to average buffer
+    m_qListStimAve.append(cutData);
+    if(m_qListStimAve.size()>m_iNumAverages && m_iAverageMode == 0)
+        m_qListStimAve.pop_front();
+}
+
+
+//*************************************************************************************************************
+
+void RtAve::generateEvoked()
+{
+    // Generate final evoked
+    MatrixXd finalAverage = MatrixXd::Zero(m_matStimData.rows(), m_iPreStimSamples+m_iPostStimSamples);
+
+    if(m_iAverageMode == 0) {
+        qDebug()<<"Do running average";
+        for(int i = 0; i<m_qListStimAve.size(); i++) {
+            finalAverage += m_qListStimAve.at(i);
+        }
+        finalAverage = finalAverage/m_qListStimAve.size();
+
+        if(m_bDoBaselineCorrection)
+            finalAverage = MNEMath::rescale(finalAverage, m_pStimEvoked->times, m_pairBaselineSec, QString("mean"));
+
+        m_pStimEvoked->data = finalAverage;
+        m_pStimEvoked->nave = m_iNumAverages;
+    } else if(m_iAverageMode == 1){
+        qDebug()<<"Do cumulative average";
+        MatrixXd tempMatrix = m_qListStimAve.last();
+
+        if(m_bDoBaselineCorrection)
+            tempMatrix = MNEMath::rescale(tempMatrix, m_pStimEvoked->times, m_pairBaselineSec, QString("mean"));
+
+        *m_pStimEvoked.data() += tempMatrix;
+    }
+
+    qDebug()<<"nave "<<m_qListStimAve.size();
+}
+
+
+//*************************************************************************************************************
+
+void RtAve::reset()
+{
+    //Reset
+    m_qMutex.lock();
+
+    float T = 1.0/m_pFiffInfo->sfreq;
+
+    m_iPreStimSamples = m_iNewPreStimSamples;
+    m_iPostStimSamples = m_iNewPostStimSamples;
+    m_iTriggerIndex = m_iNewTriggerIndex;
+    m_iAverageMode = m_iNewAverageMode;
+    m_iNumAverages = m_iNewNumAverages;
+
+    //Full real-time evoked response
+    m_pStimEvoked->baseline = m_pairBaselineSec;
+    m_pStimEvoked->times.resize(m_iPreStimSamples+m_iPostStimSamples);
+    m_pStimEvoked->times[0] = -T*m_iPreStimSamples;
+    for(int i = 1; i < m_pStimEvoked->times.size(); ++i)
+        m_pStimEvoked->times[i] = m_pStimEvoked->times[i-1] + T;
+    m_pStimEvoked->first = m_pStimEvoked->times[0];
+    m_pStimEvoked->last = m_pStimEvoked->times[m_pStimEvoked->times.size()-1];
+    m_pStimEvoked->data.setZero();
+
+    if(m_iAverageMode == 0)
+        m_pStimEvoked->nave = m_iNumAverages;
+    else
+        m_pStimEvoked->nave = 0;
+
+    m_qListStimAve.clear();
+    m_matBufferFront.clear();
+    m_matBufferBack.clear();
+    clearDetectedTriggers();
+
+    m_bFillingBackBuffer = false;
+
+    m_qMutex.unlock();
+}
+
+
+//*************************************************************************************************************
+
+void RtAve::init()
+{
+    m_qMutex.lock();
+
+    QList<int> tempList;
+    for(int i = 0; i < m_pFiffInfo->nchan; ++i) {
+        if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH && (m_pFiffInfo->chs[i].ch_name != QString("STI 014")))
+            m_qMapDetectedTrigger.insert(i,tempList);
+    }
+
+    m_iNewPreStimSamples = m_iPreStimSamples;
+    m_iNewPostStimSamples = m_iPostStimSamples;
+    m_iNewNumAverages = m_iNumAverages;
+
+    m_pStimEvoked = FiffEvoked::SPtr(new FiffEvoked);
+
+    m_qMutex.unlock();
+}
+
