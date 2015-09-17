@@ -161,3 +161,5 @@ void RealTimeEvoked::setValue(FiffEvoked& v, FiffInfo::SPtr p_fiffinfo)
     emit notify();
 }
 
+
+//*************************************************************************************************************

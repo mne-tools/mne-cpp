@@ -167,6 +167,12 @@ public:
 
     void changePostStim(qint32 mseconds);
 
+    void changeBaselineFrom(qint32 fromMSeconds);
+
+    void changeBaselineTo(qint32 toMSeconds);
+
+    void changeBaselineActive(bool state);
+
     void appendEvoked(FiffEvoked::SPtr p_pEvoked);
 
     virtual QWidget* setupWidget();
@@ -211,6 +217,11 @@ private:
     qint32 m_iPostStimSamples;
     qint32 m_iPreStimSeconds;
     qint32 m_iPostStimSeconds;
+    qint32 m_iBaselineFromSeconds;
+    qint32 m_iBaselineFromSamples;
+    qint32 m_iBaselineToSeconds;
+    qint32 m_iBaselineToSamples;
+    qint32 m_iStimChanIdx;
 
     qint32 m_iNumAverages;
 
