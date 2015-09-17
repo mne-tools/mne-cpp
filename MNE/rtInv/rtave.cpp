@@ -86,8 +86,8 @@ RtAve::RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStim
 , m_iTriggerIndex(-1)
 , m_iNewTriggerIndex(p_iTriggerIndex)
 , m_iTriggerPos(-1)
-, m_bRunningAverage(true)
-, m_bNewRunningAverage(m_bRunningAverage)
+, m_iAverageMode(0)
+, m_iNewAverageMode(0)
 , m_bDoBaselineCorrection(false)
 , m_pairBaselineSec(qMakePair(QVariant(QString::number(p_iBaselineFromSecs)),QVariant(QString::number(p_iBaselineToSecs))))
 {
@@ -127,6 +127,16 @@ void RtAve::setAverages(qint32 numAve)
     m_iNewNumAverages = numAve;
     m_qMutex.unlock();
     emit numAveragesChanged();
+}
+
+
+//*************************************************************************************************************
+
+void RtAve::setAverageMode(qint32 mode)
+{
+    m_qMutex.lock();
+    m_iNewAverageMode = mode;
+    m_qMutex.unlock();
 }
 
 
@@ -211,18 +221,6 @@ void RtAve::setBaselineTo(int toSamp, int toMSec)
 
 //*************************************************************************************************************
 
-void RtAve::setRunningAverageActive(bool activate)
-{
-    m_qMutex.lock();
-
-    m_bNewRunningAverage = activate;
-
-    m_qMutex.unlock();
-}
-
-
-//*************************************************************************************************************
-
 bool RtAve::start()
 {
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
@@ -274,7 +272,7 @@ void RtAve::run()
             if(m_iNewPreStimSamples != m_iPreStimSamples
                     || m_iNewPostStimSamples != m_iPostStimSamples
                     || m_iNewTriggerIndex != m_iTriggerIndex
-                    || m_bNewRunningAverage != m_bRunningAverage
+                    || m_iNewAverageMode != m_iAverageMode
                     || m_iNewNumAverages != m_iNumAverages)
                 reset();
 
@@ -296,9 +294,9 @@ void RtAve::run()
                     generateEvoked();
 
                     //If number of averages was reached emit new average
-                    if(m_qListStimAve.size() == m_iNumAverages && m_bRunningAverage)
+                    if(m_qListStimAve.size() == m_iNumAverages && m_iAverageMode==0)
                         emit evokedStim(m_pStimEvoked);
-                    else if(m_qListStimAve.size() > 0 && !m_bRunningAverage)
+                    else if(m_qListStimAve.size() > 0)
                         emit evokedStim(m_pStimEvoked);
 
                     m_bFillingBackBuffer = false;
@@ -406,7 +404,7 @@ void RtAve::mergeData()
 
     //Add cut data to average buffer
     m_qListStimAve.append(cutData);
-    if(m_qListStimAve.size()>m_iNumAverages && m_bRunningAverage)
+    if(m_qListStimAve.size()>m_iNumAverages && m_iAverageMode == 0)
         m_qListStimAve.pop_front();
 }
 
@@ -418,7 +416,8 @@ void RtAve::generateEvoked()
     // Generate final evoked
     MatrixXd finalAverage = MatrixXd::Zero(m_matStimData.rows(), m_iPreStimSamples+m_iPostStimSamples);
 
-    if(m_bRunningAverage) {
+    if(m_iAverageMode == 0) {
+        qDebug()<<"Do running average";
         for(int i = 0; i<m_qListStimAve.size(); i++) {
             finalAverage += m_qListStimAve.at(i);
         }
@@ -429,7 +428,8 @@ void RtAve::generateEvoked()
 
         m_pStimEvoked->data = finalAverage;
         m_pStimEvoked->nave = m_iNumAverages;
-    } else {
+    } else if(m_iAverageMode == 1){
+        qDebug()<<"Do cumulative average";
         MatrixXd tempMatrix = m_qListStimAve.last();
 
         if(m_bDoBaselineCorrection)
@@ -454,7 +454,7 @@ void RtAve::reset()
     m_iPreStimSamples = m_iNewPreStimSamples;
     m_iPostStimSamples = m_iNewPostStimSamples;
     m_iTriggerIndex = m_iNewTriggerIndex;
-    m_bRunningAverage = m_bNewRunningAverage;
+    m_iAverageMode = m_iNewAverageMode;
     m_iNumAverages = m_iNewNumAverages;
 
     //Full real-time evoked response
@@ -467,7 +467,7 @@ void RtAve::reset()
     m_pStimEvoked->last = m_pStimEvoked->times[m_pStimEvoked->times.size()-1];
     m_pStimEvoked->data.setZero();
 
-    if(m_bRunningAverage)
+    if(m_iAverageMode == 0)
         m_pStimEvoked->nave = m_iNumAverages;
     else
         m_pStimEvoked->nave = 0;

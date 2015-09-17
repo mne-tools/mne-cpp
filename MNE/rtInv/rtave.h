@@ -156,6 +156,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the average mode
+    *
+    * @param[in] mode     average mode (0-running or 1-cumulative)
+    */
+    void setAverageMode(qint32 mode);
+
+    //=========================================================================================================
+    /**
     * Sets the number of pre stimulus samples
     *
     * @param[in] samples    new number of pre stimulus samples
@@ -205,14 +213,6 @@ public:
     * @param[in] toMSec    to of baseline area in mSeconds
     */
     void setBaselineTo(int toSamp, int toMSec);
-
-    //=========================================================================================================
-    /**
-    * Sets the running average active
-    *
-    * @param[in] activate    activate running average
-    */
-    void setRunningAverageActive(bool activate);
 
     //=========================================================================================================
     /**
@@ -285,15 +285,15 @@ private:
     qint32  m_iTriggerIndex;            /**< Current row index of the data matrix which is to be scanned for triggers */
     qint32  m_iNewTriggerIndex;         /**< Old row index of the data matrix which is to be scanned for triggers */
     qint32  m_iTriggerPos;              /**< Last found trigger postion */
+    qint32  m_iNewAverageMode;          /**< The new averaging mode 0-running 1-cumulative. */
+    qint32  m_iAverageMode;             /**< The averaging mode 0-running 1-cumulative. */
 
     float   m_fTriggerThreshold;        /**< Threshold to detect trigger */
 
     bool    m_bIsRunning;               /**< Holds if real-time Covariance estimation is running.*/
     bool    m_bAutoAspect;              /**< Auto aspect detection on or off. */
     bool    m_bFillingBackBuffer;       /**< Whether the back buffer is currently getting filled. */
-    bool    m_bRunningAverage;          /**< Whether the running average is to be calculated. */
     bool    m_bDoBaselineCorrection;    /**< Whether to perform baseline correction. */
-    bool    m_bNewRunningAverage;       /**< Whether to perform running or cumulative averaging. */
 
     QPair<QVariant,QVariant>    m_pairBaselineSec;     /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
     QPair<QVariant,QVariant>    m_pairBaselineSamp;     /**< Baseline information in samples form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
