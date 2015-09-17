@@ -1,10 +1,45 @@
+//=============================================================================================================
+/**
+* @file     averagingsettingswidget.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @version  1.0
+* @date     September, 2015
+*
+* @section  LICENSE
+*
+* Copyright (C) 2015, Christoph Dinh, Lorenz Esch and Matti Hamalainen. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Contains the implementation of the AveragingSettingsWidget class.
+*
+*/
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include "averagingsettingswidget.h"
-
-#include "../averaging.h"
-
-#include <QGridLayout>
-#include <QSpinBox>
-#include <QLabel>
 
 
 //*************************************************************************************************************
@@ -19,75 +54,109 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
 : QWidget(parent)
 , m_pAveragingToolbox(toolbox)
 {
+    ui.setupUi(this);
+
     this->setWindowTitle("Averaging Settings");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
 
-    QGridLayout* t_pGridLayout = new QGridLayout;
-
-    if(m_pAveragingToolbox->m_pFiffInfo && m_pAveragingToolbox->m_qListStimChs.size() > 0)
-    {
-        QLabel* t_pLabelStimChannel = new QLabel;
-        t_pLabelStimChannel->setText("Stimulus Channel");
-        t_pGridLayout->addWidget(t_pLabelStimChannel,0,0,1,2);
-
-        m_pComboBoxChSelection = new QComboBox;
-
-        for(qint32 i = 0; i < m_pAveragingToolbox->m_qListStimChs.size(); ++i)
-        {
-            if(m_pAveragingToolbox->m_pFiffInfo->ch_names[ m_pAveragingToolbox->m_qListStimChs[i] ] != QString("STI 014"))
-            {
-                qDebug() << "Insert" << i << m_pAveragingToolbox->m_pFiffInfo->ch_names[ m_pAveragingToolbox->m_qListStimChs[i] ];
-                m_pComboBoxChSelection->insertItem(i,m_pAveragingToolbox->m_pFiffInfo->ch_names[ m_pAveragingToolbox->m_qListStimChs[i] ],QVariant(i));
+    if(m_pAveragingToolbox->m_pFiffInfo && m_pAveragingToolbox->m_qListStimChs.size() > 0) {
+        for(qint32 i = 0; i < m_pAveragingToolbox->m_qListStimChs.size(); ++i) {
+            if(m_pAveragingToolbox->m_pFiffInfo->ch_names[ m_pAveragingToolbox->m_qListStimChs[i] ] != QString("STI 014")) {
+                //qDebug() << "Insert" << i << m_pAveragingToolbox->m_pFiffInfo->ch_names[ m_pAveragingToolbox->m_qListStimChs[i] ];
+                ui.m_pComboBoxChSelection->insertItem(i,m_pAveragingToolbox->m_pFiffInfo->ch_names[ m_pAveragingToolbox->m_qListStimChs[i] ],QVariant(i));
             }
         }
 
-        m_pComboBoxChSelection->setCurrentIndex(m_pAveragingToolbox->m_iStimChan);
+        ui.m_pComboBoxChSelection->setCurrentIndex(m_pAveragingToolbox->m_iStimChan);
 
-        connect(m_pComboBoxChSelection, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), m_pAveragingToolbox, &Averaging::changeStimChannel);
-
-        t_pGridLayout->addWidget(m_pComboBoxChSelection,0,2,1,1);
+        connect(ui.m_pComboBoxChSelection, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+                m_pAveragingToolbox, &Averaging::changeStimChannel);
     }
 
+    if(m_pAveragingToolbox->m_pRtAve) {
+        ui.m_pSpinBoxNumAverages->setValue(m_pAveragingToolbox->m_iNumAverages);
+        connect(ui.m_pSpinBoxNumAverages, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+                m_pAveragingToolbox, &Averaging::changeNumAverages);
 
-    if(m_pAveragingToolbox->m_pRtAve)
-    {
-        QLabel* t_pLabelNumAve = new QLabel;
-        t_pLabelNumAve->setText("Number of Averages");
-        t_pGridLayout->addWidget(t_pLabelNumAve,1,0,1,2);
+        ui.m_comboBox_runningAvr->setCurrentIndex(m_pAveragingToolbox->m_iAverageMode);
+        connect(ui.m_comboBox_runningAvr, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+                m_pAveragingToolbox, &Averaging::changeAverageMode);
 
-        m_pSpinBoxNumAverages = new QSpinBox;
-        m_pSpinBoxNumAverages->setMinimum(1);
-        m_pSpinBoxNumAverages->setMaximum(1000);
-        m_pSpinBoxNumAverages->setSingleStep(1);
-        m_pSpinBoxNumAverages->setValue(m_pAveragingToolbox->m_iNumAverages);
-        connect(m_pSpinBoxNumAverages, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_pAveragingToolbox, &Averaging::changeNumAverages);
-        t_pGridLayout->addWidget(m_pSpinBoxNumAverages,1,2,1,1);
     }
 
-    QLabel* t_pLabelPreStim = new QLabel;
-    t_pLabelPreStim->setText("Pre-Stimulus Samples");
-    t_pGridLayout->addWidget(t_pLabelPreStim,2,0,1,2);
+    //Pre Post stimulus
+    ui.m_pSpinBoxPreStimSamples->setValue(m_pAveragingToolbox->m_iPreStimSeconds);
+    connect(ui.m_pSpinBoxPreStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &AveragingSettingsWidget::changePreStim);
 
-    m_pSpinBoxPreStimSamples = new QSpinBox;
-    m_pSpinBoxPreStimSamples->setMinimum(10);
-    m_pSpinBoxPreStimSamples->setMaximum(10000);
-    m_pSpinBoxPreStimSamples->setSingleStep(10);
-    m_pSpinBoxPreStimSamples->setValue(m_pAveragingToolbox->m_iPreStimSamples);
-    connect(m_pSpinBoxPreStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_pAveragingToolbox, &Averaging::changePreStim);
-    t_pGridLayout->addWidget(m_pSpinBoxPreStimSamples,2,2,1,1);
+    ui.m_pSpinBoxPostStimSamples->setValue(m_pAveragingToolbox->m_iPostStimSeconds);
+    connect(ui.m_pSpinBoxPostStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &AveragingSettingsWidget::changePostStim);
 
-    QLabel* t_pLabelPostStim = new QLabel;
-    t_pLabelPostStim->setText("Post-Stimulus Samples");
-    t_pGridLayout->addWidget(t_pLabelPostStim,3,0,1,2);
+    //Baseline Correction
+    connect(ui.m_pcheckBoxBaselineCorrection, &QCheckBox::clicked,
+            m_pAveragingToolbox, &Averaging::changeBaselineActive);
 
-    m_pSpinBoxPostStimSamples = new QSpinBox;
-    m_pSpinBoxPostStimSamples->setMinimum(10);
-    m_pSpinBoxPostStimSamples->setMaximum(10000);
-    m_pSpinBoxPostStimSamples->setSingleStep(10);
-    m_pSpinBoxPostStimSamples->setValue(m_pAveragingToolbox->m_iPostStimSamples);
-    connect(m_pSpinBoxPostStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_pAveragingToolbox, &Averaging::changePostStim);
-    t_pGridLayout->addWidget(m_pSpinBoxPostStimSamples,3,2,1,1);
+    ui.m_pSpinBoxBaselineFrom->setMinimum(ui.m_pSpinBoxPreStimSamples->value()*-1);
+    ui.m_pSpinBoxBaselineFrom->setMaximum(ui.m_pSpinBoxPostStimSamples->value());
+    ui.m_pSpinBoxBaselineFrom->setValue(ui.m_pSpinBoxPreStimSamples->value());
+    connect(ui.m_pSpinBoxBaselineFrom, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &AveragingSettingsWidget::changeBaselineFrom);
 
-    this->setLayout(t_pGridLayout);
+    ui.m_pSpinBoxBaselineTo->setMinimum(ui.m_pSpinBoxPreStimSamples->value()*-1);
+    ui.m_pSpinBoxBaselineTo->setMaximum(ui.m_pSpinBoxPostStimSamples->value());
+    ui.m_pSpinBoxBaselineTo->setValue(ui.m_pSpinBoxPreStimSamples->value());
+    connect(ui.m_pSpinBoxBaselineTo, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &AveragingSettingsWidget::changeBaselineTo);
 }
+
+
+//*************************************************************************************************************
+
+int AveragingSettingsWidget::getStimChannelIdx()
+{
+    return ui.m_pComboBoxChSelection->currentData().toInt();
+}
+
+
+//*************************************************************************************************************
+
+void AveragingSettingsWidget::changePreStim(qint32 mSeconds)
+{
+    ui.m_pSpinBoxBaselineTo->setMinimum(ui.m_pSpinBoxPreStimSamples->value()*-1);
+    ui.m_pSpinBoxBaselineFrom->setMinimum(ui.m_pSpinBoxPreStimSamples->value()*-1);
+
+    m_pAveragingToolbox->changePreStim(mSeconds);
+}
+
+
+//*************************************************************************************************************
+
+void AveragingSettingsWidget::changePostStim(qint32 mSeconds)
+{
+    ui.m_pSpinBoxBaselineTo->setMaximum(ui.m_pSpinBoxPostStimSamples->value());
+    ui.m_pSpinBoxBaselineFrom->setMaximum(ui.m_pSpinBoxPostStimSamples->value());
+
+    m_pAveragingToolbox->changePostStim(mSeconds);
+}
+
+//*************************************************************************************************************
+
+void AveragingSettingsWidget::changeBaselineFrom(qint32 mSeconds)
+{
+    ui.m_pSpinBoxBaselineTo->setMinimum(mSeconds);
+
+    m_pAveragingToolbox->changeBaselineFrom(mSeconds/*+m_pSpinBoxPreStimSamples->value()*/);
+}
+
+
+//*************************************************************************************************************
+
+void AveragingSettingsWidget::changeBaselineTo(qint32 mSeconds)
+{
+    ui.m_pSpinBoxBaselineFrom->setMaximum(mSeconds);
+
+    m_pAveragingToolbox->changeBaselineTo(mSeconds/*+m_pSpinBoxPreStimSamples->value()*/);
+}
+

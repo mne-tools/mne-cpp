@@ -150,6 +150,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Change the average mode
+    *
+    * @param[in] mode     average mode (0-running or 1-cumulative)
+    */
+    void changeAverageMode(qint32 mode);
+
+    //=========================================================================================================
+    /**
     * Clone the plugin
     */
     virtual QSharedPointer<IPlugin> clone() const;
@@ -160,12 +168,17 @@ public:
     virtual IPlugin::PluginType getType() const;
     virtual QString getName() const;
 
-
     void changeStimChannel(qint32 index);
 
-    void changePreStim(qint32 samples);
+    void changePreStim(qint32 mseconds);
 
-    void changePostStim(qint32 samples);
+    void changePostStim(qint32 mseconds);
+
+    void changeBaselineFrom(qint32 fromMSeconds);
+
+    void changeBaselineTo(qint32 toMSeconds);
+
+    void changeBaselineActive(bool state);
 
     void appendEvoked(FiffEvoked::SPtr p_pEvoked);
 
@@ -209,6 +222,14 @@ private:
 
     qint32 m_iPreStimSamples;
     qint32 m_iPostStimSamples;
+    qint32 m_iPreStimSeconds;
+    qint32 m_iPostStimSeconds;
+    qint32 m_iBaselineFromSeconds;
+    qint32 m_iBaselineFromSamples;
+    qint32 m_iBaselineToSeconds;
+    qint32 m_iBaselineToSamples;
+    qint32 m_iStimChanIdx;
+    qint32 m_iAverageMode;
 
     qint32 m_iNumAverages;
 

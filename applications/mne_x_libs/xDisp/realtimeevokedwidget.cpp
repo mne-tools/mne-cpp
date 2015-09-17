@@ -203,8 +203,10 @@ RealTimeEvokedWidget::~RealTimeEvokedWidget()
         }
 
         //Store scaling
-        if(m_qMapChScaling.contains(FIFF_UNIT_T))
+        if(m_qMapChScaling.contains(FIFF_UNIT_T)) {
             settings.setValue(QString("RTEW/%1/scaleMAG").arg(t_sRTEWName), m_qMapChScaling[FIFF_UNIT_T]);
+            qDebug()<<"m_qMapChScaling[FIFF_UNIT_T]: "<<m_qMapChScaling[FIFF_UNIT_T];
+        }
 
         if(m_qMapChScaling.contains(FIFF_UNIT_T_M))
             settings.setValue(QString("RTEW/%1/scaleGRAD").arg(t_sRTEWName), m_qMapChScaling[FIFF_UNIT_T_M]);
@@ -269,8 +271,9 @@ void RealTimeEvokedWidget::getData()
 
 void RealTimeEvokedWidget::init()
 {
-    if(m_pRTE->isInitialized())
+    if(m_qListChInfo.size() > 0)
     {
+        qDebug()<<"RealTimeEvokedWidget::init() - "<<m_pRTE->getName();
         QString t_sRTEWName = m_pRTE->getName();
         m_pRteLayout->removeWidget(m_pLabelInit);
         m_pLabelInit->hide();
@@ -356,6 +359,7 @@ void RealTimeEvokedWidget::init()
 
         if(!t_sRTEName.isEmpty())
         {
+            qDebug()<<"Init scaling";
             m_qMapChScaling.clear();
 
             QSettings settings;
@@ -461,6 +465,12 @@ void RealTimeEvokedWidget::init()
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::showFilterOptions,
                 this, &RealTimeEvokedWidget::showFilterWidget);
+
+        //Handle updating the butterfly and layout plot
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
+                m_pButterflyPlot.data(), &RealTimeButterflyPlot::updateView);
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::updateConnectedView,
+                this, &RealTimeEvokedWidget::onSelectionChanged);
 
         m_pQuickControlWidget->setViewParameters(settings.value(QString("RTEW/%1/viewZoomFactor").arg(t_sRTEWName), 1.0).toFloat(),
                                                      settings.value(QString("RTEW/%1/viewWindowSize").arg(t_sRTEWName), 10).toInt(),

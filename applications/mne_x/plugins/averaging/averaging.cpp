@@ -79,10 +79,13 @@ Averaging::Averaging()
 , m_pAveragingBuffer(CircularMatrixBuffer<double>::SPtr())
 , m_bIsRunning(false)
 , m_bProcessData(false)
-, m_iPreStimSamples(400)
-, m_iPostStimSamples(750)
+, m_iPreStimSeconds(100)
+, m_iPostStimSeconds(400)
+, m_iBaselineFromSeconds(-100)
+, m_iBaselineToSeconds(0)
 , m_iNumAverages(10)
 , m_iStimChan(0)
+, m_iAverageMode(0)
 , m_pAveragingWidget(AveragingSettingsWidget::SPtr())
 , m_pActionShowAdjustment(Q_NULLPTR)
 #ifdef DEBUG_AVERAGING
@@ -129,10 +132,20 @@ void Averaging::init()
     // Load Settings
     //
     QSettings settings;
-    m_iPreStimSamples = settings.value(QString("Plugin/%1/preStimSamples").arg(this->getName()), 400).toInt();
-    m_iPostStimSamples = settings.value(QString("Plugin/%1/postStimSamples").arg(this->getName()), 750).toInt();
+    m_iPreStimSeconds = settings.value(QString("Plugin/%1/preStimSeconds").arg(this->getName()), 100).toInt();
+    m_iPostStimSeconds = settings.value(QString("Plugin/%1/postStimSeconds").arg(this->getName()), 400).toInt();
+    m_iPreStimSamples = settings.value(QString("Plugin/%1/preStimSeconds").arg(this->getName()), 100).toInt();
+    m_iPostStimSamples = settings.value(QString("Plugin/%1/postStimSeconds").arg(this->getName()), 400).toInt();
+
+    m_iBaselineFromSeconds = settings.value(QString("Plugin/%1/baselineFromSeconds").arg(this->getName()), -100).toInt();
+    m_iBaselineToSeconds = settings.value(QString("Plugin/%1/baselineToSeconds").arg(this->getName()), 0).toInt();
+    m_iBaselineFromSamples = settings.value(QString("Plugin/%1/baselineFromSamples").arg(this->getName()), 0).toInt();
+    m_iBaselineToSamples = settings.value(QString("Plugin/%1/baselineToSamples").arg(this->getName()), 10).toInt();
+
     m_iNumAverages = settings.value(QString("Plugin/%1/numAverages").arg(this->getName()), 10).toInt();
     m_iStimChan = settings.value(QString("Plugin/%1/stimChannel").arg(this->getName()), 0).toInt();
+    m_iStimChanIdx = settings.value(QString("Plugin/%1/stimChannelIdX").arg(this->getName()), 0).toInt();
+    m_iAverageMode = settings.value(QString("Plugin/%1/averageMode").arg(this->getName()), 0).toInt();
 
     // Input
     m_pAveragingInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "AveragingIn", "Averaging input data");
@@ -147,7 +160,7 @@ void Averaging::init()
     //init channels when fiff info is available
     connect(this, &Averaging::fiffInfoAvailable, this, &Averaging::initConnector);
 
-    //Delete Buffer - will be initailzed with first incoming data
+    //Delete Buffer - will be initialized with first incoming data
     if(!m_pAveragingBuffer.isNull())
         m_pAveragingBuffer = CircularMatrixBuffer<double>::SPtr();
 }
@@ -161,10 +174,19 @@ void Averaging::unload()
     // Store Settings
     //
     QSettings settings;
-    settings.setValue(QString("Plugin/%1/preStimSamples").arg(this->getName()), m_iPreStimSamples);
-    settings.setValue(QString("Plugin/%1/postStimSamples").arg(this->getName()), m_iPostStimSamples);
+    settings.setValue(QString("Plugin/%1/preStimSeconds").arg(this->getName()), m_iPreStimSeconds);
+    settings.setValue(QString("Plugin/%1/postStimSeconds").arg(this->getName()), m_iPostStimSeconds);
+    settings.setValue(QString("Plugin/%1/baselineFromSamples").arg(this->getName()), m_iBaselineFromSamples);
+    settings.setValue(QString("Plugin/%1/baselineToSamples").arg(this->getName()), m_iBaselineToSamples);
+
     settings.setValue(QString("Plugin/%1/numAverages").arg(this->getName()), m_iNumAverages);
     settings.setValue(QString("Plugin/%1/stimChannel").arg(this->getName()), m_iStimChan);
+    settings.setValue(QString("Plugin/%1/stimChannelIdx").arg(this->getName()), m_iStimChanIdx);
+    settings.setValue(QString("Plugin/%1/averageMode").arg(this->getName()), m_iAverageMode);
+
+    settings.setValue(QString("Plugin/%1/baselineFromSeconds").arg(this->getName()), m_iBaselineFromSeconds);
+    settings.setValue(QString("Plugin/%1/baselineToSeconds").arg(this->getName()), m_iBaselineToSeconds);
+    settings.setValue(QString("Plugin/%1/baselineFromSamples").arg(this->getName()), m_iBaselineFromSamples);
 }
 
 
@@ -176,6 +198,17 @@ void Averaging::changeNumAverages(qint32 numAve)
     m_iNumAverages = numAve;
     if(m_pRtAve)
         m_pRtAve->setAverages(numAve);
+}
+
+
+//*************************************************************************************************************
+
+void Averaging::changeAverageMode(qint32 mode)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_iAverageMode = mode;
+    if(m_pRtAve)
+        m_pRtAve->setAverageMode(mode);
 }
 
 
@@ -255,31 +288,92 @@ void Averaging::changeStimChannel(qint32 index)
 {
     Q_UNUSED(index)
     QMutexLocker locker(&m_qMutex);
-    m_iStimChan = m_pAveragingWidget->m_pComboBoxChSelection->currentData().toInt();
+    m_iStimChan = m_pAveragingWidget->getStimChannelIdx();
+    m_iStimChanIdx = m_qListStimChs.at(index);
+
+    if(m_pRtAve)
+        m_pRtAve->setTriggerChIndx(m_iStimChanIdx);
+
 //    qDebug() << "Averaging::changeStimChannel(qint32 index)" << m_pAveragingWidget->m_pComboBoxChSelection->currentData().toInt();
 }
 
 
 //*************************************************************************************************************
 
-void Averaging::changePreStim(qint32 samples)
+void Averaging::changePreStim(qint32 mseconds)
 {
     QMutexLocker locker(&m_qMutex);
-    m_iPreStimSamples = samples;
-    if(m_pRtAve)
-        m_pRtAve->setPreStim(m_iPreStimSamples);
+    if(mseconds<10)
+        mseconds=10;
 
+    m_iPreStimSeconds = mseconds;
+    m_iPreStimSamples = ((float)(mseconds)/1000)*m_pFiffInfo->sfreq;
+
+    //qDebug()<<"m_iPreStimSamples "<<m_iPreStimSamples;
+
+    if(m_pAveragingOutput)
+        m_pAveragingOutput->data()->setNumPreStimSamples(m_iPreStimSamples);
+
+    if(m_pRtAve)
+        m_pRtAve->setPreStim(m_iPreStimSamples, m_iPreStimSeconds);
 }
 
 
 //*************************************************************************************************************
 
-void Averaging::changePostStim(qint32 samples)
+void Averaging::changePostStim(qint32 mseconds)
 {
     QMutexLocker locker(&m_qMutex);
-    m_iPostStimSamples = samples;
+    if(mseconds<10)
+        mseconds=10;
+
+    m_iPostStimSeconds = mseconds;
+    m_iPostStimSamples = ((float)(mseconds)/1000)*m_pFiffInfo->sfreq;
+
+    //qDebug()<<"m_iPostStimSamples "<<m_iPostStimSamples;
+
     if(m_pRtAve)
-        m_pRtAve->setPostStim(m_iPostStimSamples);
+        m_pRtAve->setPostStim(m_iPostStimSamples, m_iPostStimSeconds);
+}
+
+
+//*************************************************************************************************************
+
+void Averaging::changeBaselineFrom(qint32 fromMSeconds)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_iBaselineFromSeconds = fromMSeconds;
+    m_iBaselineFromSamples = ((float)(fromMSeconds)/1000)*m_pFiffInfo->sfreq;
+
+    //qDebug()<<"m_iBaselineFromSamples "<<m_iBaselineFromSamples;
+
+    if(m_pRtAve)
+        m_pRtAve->setBaselineFrom(m_iBaselineFromSamples, m_iBaselineFromSeconds);
+}
+
+
+//*************************************************************************************************************
+
+void Averaging::changeBaselineTo(qint32 toMSeconds)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_iBaselineToSeconds = toMSeconds;
+    m_iBaselineToSamples = ((float)(toMSeconds)/1000)*m_pFiffInfo->sfreq;
+
+    //qDebug()<<"m_iBaselineToSamples "<<m_iBaselineToSamples;
+
+    if(m_pRtAve)
+        m_pRtAve->setBaselineTo(m_iBaselineToSamples, m_iBaselineToSeconds);
+}
+
+
+//*************************************************************************************************************
+
+void Averaging::changeBaselineActive(bool state)
+{
+    QMutexLocker locker(&m_qMutex);
+    if(m_pRtAve)
+        m_pRtAve->setBaselineActive(state);
 }
 
 
@@ -310,8 +404,7 @@ void Averaging::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
     QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
 
-    if(pRTMSA)
-    {
+    if(pRTMSA) {
         //Check if buffer initialized
         if(!m_pAveragingBuffer)
             m_pAveragingBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
@@ -374,16 +467,16 @@ void Averaging::appendEvoked(FiffEvoked::SPtr p_pEvoked)
 {
 //    qDebug() << "void Averaging::appendEvoked";// << p_pEvoked->comment;
 //    qDebug() << p_pEvoked->comment;
-    QString t_sStimulusChannel = m_pFiffInfo->chs[m_qListStimChs[m_iStimChan]].ch_name;
+//    QString t_sStimulusChannel = m_pFiffInfo->chs[m_qListStimChs[m_iStimChan]].ch_name;
 
-    if(p_pEvoked->comment == t_sStimulusChannel)
-    {
+//    if(p_pEvoked->comment == t_sStimulusChannel)
+//    {
 //        qDebug()<< "append" << p_pEvoked->comment << "=" << t_sStimulusChannel;
         m_qMutex.lock();
         m_qVecEvokedData.push_back(p_pEvoked);
         m_qMutex.unlock();
 //        qDebug() << "append after" << m_qVecEvokedData.size();
-    }
+//    }
 }
 
 
@@ -398,6 +491,9 @@ void Averaging::run()
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
+    m_iPreStimSamples = ((float)m_iPreStimSeconds/1000)*m_pFiffInfo->sfreq;
+    m_iPostStimSamples = ((float)m_iPostStimSeconds/1000)*m_pFiffInfo->sfreq;
+
     m_pActionShowAdjustment->setVisible(true);
 
     for(qint32 i = 0; i < m_pFiffInfo->chs.size(); ++i)
@@ -409,14 +505,12 @@ void Averaging::run()
         }
     }
 
-    m_qMutex.lock();
     m_bProcessData = true;
-    m_qMutex.unlock();
 
     //
     // Init Real-Time average
     //
-    m_pRtAve = RtAve::SPtr(new RtAve(m_iNumAverages, m_iPreStimSamples, m_iPostStimSamples, m_pFiffInfo));
+    m_pRtAve = RtAve::SPtr(new RtAve(m_iNumAverages, m_iPreStimSamples, m_iPostStimSamples, m_iBaselineFromSeconds, m_iBaselineToSeconds, m_qListStimChs.at(m_iStimChan), m_pFiffInfo));
     connect(m_pRtAve.data(), &RtAve::evokedStim, this, &Averaging::appendEvoked);
 
     m_pRtAve->start();
