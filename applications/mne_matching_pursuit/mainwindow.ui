@@ -26,7 +26,7 @@
    <string>Matching-Pursuit-Toolbox</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="Ressourcen.qrc">
     <normaloff>:/images/icons/spanner.png</normaloff>:/images/icons/spanner.png</iconset>
   </property>
   <property name="layoutDirection">
@@ -59,12 +59,552 @@
      <number>4</number>
     </property>
     <item>
-     <widget class="QTabWidget" name="tw_main">
-      <property name="layoutDirection">
-       <enum>Qt::LeftToRight</enum>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QTabWidget::pane { /* The tab widget frame */
+     <widget class="QWidget" name="widget" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>2</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QSplitter" name="splitter">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="opaqueResize">
+          <bool>true</bool>
+         </property>
+         <property name="childrenCollapsible">
+          <bool>false</bool>
+         </property>
+         <widget class="QWidget" name="layoutWidget_2">
+          <layout class="QVBoxLayout" name="l_left_side">
+           <property name="spacing">
+            <number>6</number>
+           </property>
+           <item>
+            <widget class="QGroupBox" name="gb_trunc">
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;truncation criterion&lt;/span&gt;&lt;/p&gt;&lt;p&gt;criterion at which the matching pursuit algorithm stops&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">    QGroupBox  {
+        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                          stop: 0 #E0E0E0, stop: 1 #FFFFFF);
+        border: 1px solid gray;
+        border-radius: 5px;
+        margin-top: 3ex; /* leave space at the top for the title */
+    }
+     
+    QGroupBox::title  {
+        subcontrol-origin: margin;
+		left: 12px;
+        subcontrol-position: top left; /* position at the top center */
+        padding: 1px;       
+    }
+
+</string>
+             </property>
+             <property name="title">
+              <string>truncation criterion</string>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout">
+              <property name="leftMargin">
+               <number>6</number>
+              </property>
+              <property name="topMargin">
+               <number>6</number>
+              </property>
+              <property name="rightMargin">
+               <number>6</number>
+              </property>
+              <property name="bottomMargin">
+               <number>6</number>
+              </property>
+              <item>
+               <layout class="QGridLayout" name="l_options" columnstretch="0,0,0,0">
+                <property name="spacing">
+                 <number>5</number>
+                </property>
+                <item row="4" column="0" colspan="2">
+                 <widget class="QCheckBox" name="chb_Iterations">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;maximum iterations&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...algorithm will expire if the selected number of iterations (found atoms) is reached&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>max. iterations:</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="9" column="0" colspan="2">
+                 <widget class="QRadioButton" name="rb_OwnDictionary">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;own dictionary&lt;/span&gt;&lt;/p&gt;&lt;p&gt;…uses fix dictionaries which have been built by the user&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>own dictionary:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="10" column="0" colspan="2">
+                 <widget class="QLabel" name="label">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;sample rate&lt;/span&gt;&lt;/p&gt;&lt;p&gt;the sample rate which was used for data aquisition has to be entered here. In case of fif-files it is set automatically&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>sample rate:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="0" colspan="2">
+                 <widget class="QCheckBox" name="chb_ResEnergy">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;residual energy&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...algorithm will expire if residue reaches selected percentage of the input signal&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>residual energy:</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="8" column="0" colspan="2">
+                 <widget class="QRadioButton" name="rb_adativMp">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;adaptive MP&lt;/span&gt;&lt;br/&gt;&lt;br/&gt;...use matching pursuit algorithm of Stephan Mallat and Zhifeng Zhang&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>adaptive MP</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="9" column="2" colspan="2">
+                 <widget class="QComboBox" name="cb_Dicts">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>70</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;...chose dictionary here&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="3">
+                 <widget class="QDoubleSpinBox" name="dsb_energy">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0,1% ... 99,9%&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                  <property name="suffix">
+                   <string> %</string>
+                  </property>
+                  <property name="decimals">
+                   <number>1</number>
+                  </property>
+                  <property name="minimum">
+                   <double>0.100000000000000</double>
+                  </property>
+                  <property name="maximum">
+                   <double>1000.000000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>1.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="3">
+                 <widget class="QSpinBox" name="sb_Iterations">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0 ... 5000&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
+                  <property name="maximum">
+                   <number>5000</number>
+                  </property>
+                  <property name="value">
+                   <number>80</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="10" column="3">
+                 <widget class="QDoubleSpinBox" name="dsb_sample_rate">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;...enter sample rate here, in case of fif-files this value will be set automatically&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                  <property name="suffix">
+                   <string> Hz</string>
+                  </property>
+                  <property name="decimals">
+                   <number>3</number>
+                  </property>
+                  <property name="minimum">
+                   <double>0.010000000000000</double>
+                  </property>
+                  <property name="maximum">
+                   <double>999999.000000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>1.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="lo_buttons" stretch="0,0,0">
+             <property name="leftMargin">
+              <number>5</number>
+             </property>
+             <property name="rightMargin">
+              <number>5</number>
+             </property>
+             <item>
+              <widget class="QPushButton" name="btt_OpenSignal">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;read signal&lt;/span&gt;&lt;/p&gt;&lt;p&gt;…opens file dialog to read in a new signal.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="layoutDirection">
+                <enum>Qt::RightToLeft</enum>
+               </property>
+               <property name="text">
+                <string>read signal</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="cb_channels">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>130</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;channel select&lt;/span&gt;&lt;/p&gt;&lt;p&gt;drops down channel selection before decomposing. Bad channels are initially deselected and marked by red color.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="maxVisibleItems">
+                <number>51</number>
+               </property>
+               <property name="frame">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btt_Calc">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;calculate&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...starts the chosen MP Algorithm. When Algorithm is started, the button´s text is changed to &amp;quot;cancel&amp;quot;. Now you can interrupt the calculation-thread and it will stop after finding the next atom. During the interrupt-request the button´s text is set to &amp;quot;wait...&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="layoutDirection">
+                <enum>Qt::RightToLeft</enum>
+               </property>
+               <property name="text">
+                <string>calculate</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="l_readtime">
+             <property name="leftMargin">
+              <number>5</number>
+             </property>
+             <property name="rightMargin">
+              <number>5</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="lb_from">
+               <property name="text">
+                <string>from:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="dsb_from">
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="suffix">
+                <string> sec</string>
+               </property>
+               <property name="decimals">
+                <number>4</number>
+               </property>
+               <property name="minimum">
+                <double>-999999.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>9999.989999999999782</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="lb_to">
+               <property name="text">
+                <string>to</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="dsb_to">
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="suffix">
+                <string> sec</string>
+               </property>
+               <property name="decimals">
+                <number>4</number>
+               </property>
+               <property name="maximum">
+                <double>9999.989999999999782</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="lb_samples">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="text">
+                <string>samples:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="sb_sample_count">
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="minimum">
+                <number>64</number>
+               </property>
+               <property name="maximum">
+                <number>4096</number>
+               </property>
+               <property name="value">
+                <number>311</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QTableWidget" name="tbv_Results"/>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="l_selectall_and_timer">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QCheckBox" name="cb_all_select">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;select / deselect all atoms&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...select all, none or user chosen atoms in result list&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>select / deselect all atoms</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+               <property name="tristate">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="lb_timer">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;timer&lt;/span&gt;&lt;/p&gt;&lt;p&gt;expired time since algorithm started&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QProgressBar" name="progressBarCalc">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="font">
+              <font>
+               <kerning>true</kerning>
+              </font>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QProgressBar {	
+	color: white;
+	
+	
+	
+}
+QProgressBar::chunk { 
+	background-image: url(:/images/icons/progressbar_brush.png);
+	
+}
+
+QProgressBar::background{
+
+ color: black;
+}</string>
+             </property>
+             <property name="value">
+              <number>50</number>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="format">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QProgressBar" name="progress_bar_save">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QProgressBar {	
+	color: white;
+	
+	
+	
+}
+QProgressBar::chunk { 
+	background-image: url(:/images/icons/progressbar_brush.png);
+	
+}
+
+QProgressBar::background{
+
+ color: black;
+}</string>
+             </property>
+             <property name="value">
+              <number>50</number>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="format">
+              <string>save file: %p%</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QTabWidget" name="tabWidget">
+          <property name="styleSheet">
+           <string notr="true">QTabWidget::pane { /* The tab widget frame */
     border-top: 0.5px solid #C2C7CB;
 }
 
@@ -128,564 +668,30 @@ QTabBar::tab:only-one {
     margin: 0px; /* if there is only one tab, we don't want overlapping margins */
 	padding-left: 0px
 }</string>
-      </property>
-      <property name="currentIndex">
-       <number>0</number>
-      </property>
-      <property name="elideMode">
-       <enum>Qt::ElideNone</enum>
-      </property>
-      <property name="tabsClosable">
-       <bool>true</bool>
-      </property>
-      <widget class="QWidget" name="tab">
-       <attribute name="title">
-        <string>decomposition</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <property name="spacing">
-         <number>0</number>
-        </property>
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>2</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item>
-         <widget class="QSplitter" name="splitter">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
           </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="opaqueResize">
+          <property name="tabsClosable">
            <bool>true</bool>
           </property>
-          <property name="childrenCollapsible">
-           <bool>false</bool>
-          </property>
-          <widget class="QWidget" name="layoutWidget">
-           <layout class="QVBoxLayout" name="l_left_side">
-            <property name="spacing">
-             <number>6</number>
-            </property>
-            <item>
-             <widget class="QGroupBox" name="gb_trunc">
-              <property name="font">
-               <font>
-                <pointsize>9</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;truncation criterion&lt;/span&gt;&lt;/p&gt;&lt;p&gt;criterion at which the matching pursuit algorithm stops&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">    QGroupBox  {
-        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                          stop: 0 #E0E0E0, stop: 1 #FFFFFF);
-        border: 1px solid gray;
-        border-radius: 5px;
-        margin-top: 3ex; /* leave space at the top for the title */
-    }
-     
-    QGroupBox::title  {
-        subcontrol-origin: margin;
-		left: 12px;
-        subcontrol-position: top left; /* position at the top center */
-        padding: 1px;       
-    }
-
-</string>
-              </property>
-              <property name="title">
-               <string>truncation criterion</string>
-              </property>
-              <layout class="QHBoxLayout" name="horizontalLayout">
-               <property name="leftMargin">
-                <number>6</number>
-               </property>
-               <property name="topMargin">
-                <number>6</number>
-               </property>
-               <property name="rightMargin">
-                <number>6</number>
-               </property>
-               <property name="bottomMargin">
-                <number>6</number>
-               </property>
-               <item>
-                <layout class="QGridLayout" name="l_options" columnstretch="0,0,0,0">
-                 <property name="spacing">
-                  <number>5</number>
-                 </property>
-                 <item row="4" column="0" colspan="2">
-                  <widget class="QCheckBox" name="chb_Iterations">
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;maximum iterations&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...algorithm will expire if the selected number of iterations (found atoms) is reached&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="text">
-                    <string>max. iterations:</string>
-                   </property>
-                   <property name="checked">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="9" column="0" colspan="2">
-                  <widget class="QRadioButton" name="rb_OwnDictionary">
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;own dictionary&lt;/span&gt;&lt;/p&gt;&lt;p&gt;…uses fix dictionaries which have been built by the user&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="text">
-                    <string>own dictionary:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="10" column="0" colspan="2">
-                  <widget class="QLabel" name="label">
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;sample rate&lt;/span&gt;&lt;/p&gt;&lt;p&gt;the sample rate which was used for data aquisition has to be entered here. In case of fif-files it is set automatically&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="text">
-                    <string>sample rate:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="6" column="0" colspan="2">
-                  <widget class="QCheckBox" name="chb_ResEnergy">
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;residual energy&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...algorithm will expire if residue reaches selected percentage of the input signal&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="text">
-                    <string>residual energy:</string>
-                   </property>
-                   <property name="checked">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="8" column="0" colspan="2">
-                  <widget class="QRadioButton" name="rb_adativMp">
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;adaptive MP&lt;/span&gt;&lt;br/&gt;&lt;br/&gt;...use matching pursuit algorithm of Stephan Mallat and Zhifeng Zhang&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="text">
-                    <string>adaptive MP</string>
-                   </property>
-                   <property name="checked">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="9" column="2" colspan="2">
-                  <widget class="QComboBox" name="cb_Dicts">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>70</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;...chose dictionary here&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="6" column="3">
-                  <widget class="QDoubleSpinBox" name="dsb_energy">
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0,1% ... 99,9%&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                   <property name="suffix">
-                    <string> %</string>
-                   </property>
-                   <property name="decimals">
-                    <number>1</number>
-                   </property>
-                   <property name="minimum">
-                    <double>0.100000000000000</double>
-                   </property>
-                   <property name="maximum">
-                    <double>1000.000000000000000</double>
-                   </property>
-                   <property name="value">
-                    <double>1.000000000000000</double>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="3">
-                  <widget class="QSpinBox" name="sb_Iterations">
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0 ... 5000&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                   <property name="minimum">
-                    <number>1</number>
-                   </property>
-                   <property name="maximum">
-                    <number>5000</number>
-                   </property>
-                   <property name="value">
-                    <number>80</number>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="10" column="3">
-                  <widget class="QDoubleSpinBox" name="dsb_sample_rate">
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;...enter sample rate here, in case of fif-files this value will be set automatically&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                   <property name="suffix">
-                    <string> Hz</string>
-                   </property>
-                   <property name="decimals">
-                    <number>3</number>
-                   </property>
-                   <property name="minimum">
-                    <double>0.010000000000000</double>
-                   </property>
-                   <property name="maximum">
-                    <double>999999.000000000000000</double>
-                   </property>
-                   <property name="value">
-                    <double>1.000000000000000</double>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="lo_buttons" stretch="0,0,0">
-              <property name="leftMargin">
-               <number>5</number>
-              </property>
-              <property name="rightMargin">
-               <number>5</number>
-              </property>
-              <item>
-               <widget class="QPushButton" name="btt_OpenSignal">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;read signal&lt;/span&gt;&lt;/p&gt;&lt;p&gt;…opens file dialog to read in a new signal.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="layoutDirection">
-                 <enum>Qt::RightToLeft</enum>
-                </property>
-                <property name="text">
-                 <string>read signal</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QComboBox" name="cb_channels">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>130</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;channel select&lt;/span&gt;&lt;/p&gt;&lt;p&gt;drops down channel selection before decomposing. Bad channels are initially deselected and marked by red color.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="maxVisibleItems">
-                 <number>51</number>
-                </property>
-                <property name="frame">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="btt_Calc">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;calculate&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...starts the chosen MP Algorithm. When Algorithm is started, the button´s text is changed to &amp;quot;cancel&amp;quot;. Now you can interrupt the calculation-thread and it will stop after finding the next atom. During the interrupt-request the button´s text is set to &amp;quot;wait...&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="layoutDirection">
-                 <enum>Qt::RightToLeft</enum>
-                </property>
-                <property name="text">
-                 <string>calculate</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="l_readtime">
-              <property name="leftMargin">
-               <number>5</number>
-              </property>
-              <property name="rightMargin">
-               <number>5</number>
-              </property>
-              <item>
-               <widget class="QLabel" name="lb_from">
-                <property name="text">
-                 <string>from:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QDoubleSpinBox" name="dsb_from">
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-                <property name="suffix">
-                 <string> sec</string>
-                </property>
-                <property name="decimals">
-                 <number>4</number>
-                </property>
-                <property name="minimum">
-                 <double>-999999.000000000000000</double>
-                </property>
-                <property name="maximum">
-                 <double>9999.989999999999782</double>
-                </property>
-                <property name="singleStep">
-                 <double>0.100000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="lb_to">
-                <property name="text">
-                 <string>to</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QDoubleSpinBox" name="dsb_to">
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-                <property name="suffix">
-                 <string> sec</string>
-                </property>
-                <property name="decimals">
-                 <number>4</number>
-                </property>
-                <property name="maximum">
-                 <double>9999.989999999999782</double>
-                </property>
-                <property name="singleStep">
-                 <double>0.100000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_3">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>0</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QLabel" name="lb_samples">
-                <property name="toolTip">
-                 <string/>
-                </property>
-                <property name="text">
-                 <string>samples:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QSpinBox" name="sb_sample_count">
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-                <property name="minimum">
-                 <number>64</number>
-                </property>
-                <property name="maximum">
-                 <number>4096</number>
-                </property>
-                <property name="value">
-                 <number>311</number>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <widget class="QTableWidget" name="tbv_Results"/>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="l_selectall_and_timer">
-              <property name="spacing">
-               <number>0</number>
-              </property>
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-              <item>
-               <widget class="QCheckBox" name="cb_all_select">
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;select / deselect all atoms&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...select all, none or user chosen atoms in result list&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="text">
-                 <string>select / deselect all atoms</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-                <property name="tristate">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="lb_timer">
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;timer&lt;/span&gt;&lt;/p&gt;&lt;p&gt;expired time since algorithm started&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <widget class="QProgressBar" name="progressBarCalc">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="font">
-               <font>
-                <kerning>true</kerning>
-               </font>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">QProgressBar {	
-	color: white;
-	
-	
-	
-}
-QProgressBar::chunk { 
-	background-image: url(:/images/icons/progressbar_brush.png);
-	
-}
-
-QProgressBar::background{
-
- color: black;
-}</string>
-              </property>
-              <property name="value">
-               <number>50</number>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-              <property name="format">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QProgressBar" name="progress_bar_save">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">QProgressBar {	
-	color: white;
-	
-	
-	
-}
-QProgressBar::chunk { 
-	background-image: url(:/images/icons/progressbar_brush.png);
-	
-}
-
-QProgressBar::background{
-
- color: black;
-}</string>
-              </property>
-              <property name="value">
-               <number>50</number>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-              <property name="format">
-               <string>save file: %p%</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="layoutWidget">
+          <widget class="QWidget" name="tw_Tab1">
+           <attribute name="title">
+            <string>Decomposition</string>
+           </attribute>
            <layout class="QGridLayout" name="gridLayout">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <property name="spacing">
+             <number>4</number>
+            </property>
             <item row="0" column="0">
              <widget class="QLabel" name="lb_InputSignal">
               <property name="sizePolicy">
@@ -911,9 +917,6 @@ QProgressBar::background{
               </property>
              </widget>
             </item>
-            <item row="1" column="0" colspan="3">
-             <layout class="QVBoxLayout" name="l_Graph"/>
-            </item>
             <item row="4" column="1">
              <widget class="QLabel" name="lb_residual_energy_text">
               <property name="minimumSize">
@@ -936,90 +939,85 @@ QProgressBar::background{
               </property>
              </widget>
             </item>
+            <item row="1" column="0" colspan="3">
+             <layout class="QVBoxLayout" name="l_Graph"/>
+            </item>
            </layout>
           </widget>
          </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="l_line">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>4</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="Line" name="line">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="l_info">
-          <item>
-           <widget class="QLabel" name="lb_info">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>information:</string>
-            </property>
-            <property name="margin">
-             <number>3</number>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="lb_info_content">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_4">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>0</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QLabel" name="lb_figure_of_merit">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;FOM&lt;/span&gt;&lt;/p&gt;&lt;p&gt;shows the correlation between original signal and approximation after finishing calculation to validate the algorithms figure of merit (FOM)&lt;br/&gt;&lt;br/&gt;range: 0...1 (0 means no correlation, 1 means maximal correlation)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-       <zorder>splitter</zorder>
-       <zorder></zorder>
-       <zorder></zorder>
-      </widget>
-      <widget class="QWidget" name="tab_2">
-       <attribute name="title">
-        <string>Tab 2</string>
-       </attribute>
-      </widget>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="l_line">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>4</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="Line" name="line">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="l_info">
+         <item>
+          <widget class="QLabel" name="lb_info">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>information:</string>
+           </property>
+           <property name="margin">
+            <number>3</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lb_info_content">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>0</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="lb_figure_of_merit">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;FOM&lt;/span&gt;&lt;/p&gt;&lt;p&gt;shows the correlation between original signal and approximation after finishing calculation to validate the algorithms figure of merit (FOM)&lt;br/&gt;&lt;br/&gt;range: 0...1 (0 means no correlation, 1 means maximal correlation)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
      </widget>
     </item>
    </layout>
@@ -1068,7 +1066,7 @@ QProgressBar::background{
   </widget>
   <action name="actionNeu">
    <property name="icon">
-    <iconset>
+    <iconset resource="Ressourcen.qrc">
      <normaloff>:/images/icons/paper.png</normaloff>:/images/icons/paper.png</iconset>
    </property>
    <property name="text">
@@ -1080,7 +1078,7 @@ QProgressBar::background{
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="Ressourcen.qrc">
      <normaloff>:/images/icons/floppyDisk.png</normaloff>:/images/icons/floppyDisk.png</iconset>
    </property>
    <property name="text">
@@ -1092,7 +1090,7 @@ QProgressBar::background{
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="Ressourcen.qrc">
      <normaloff>:/images/icons/floppyDisk.png</normaloff>:/images/icons/floppyDisk.png</iconset>
    </property>
    <property name="text">
@@ -1101,7 +1099,7 @@ QProgressBar::background{
   </action>
   <action name="actionBeenden">
    <property name="icon">
-    <iconset>
+    <iconset resource="Ressourcen.qrc">
      <normaloff>:/images/icons/logOut.png</normaloff>:/images/icons/logOut.png</iconset>
    </property>
    <property name="text">
@@ -1110,7 +1108,7 @@ QProgressBar::background{
   </action>
   <action name="actionVersionsinformation">
    <property name="icon">
-    <iconset>
+    <iconset resource="Ressourcen.qrc">
      <normaloff>:/images/icons/exclamation.png</normaloff>:/images/icons/exclamation.png</iconset>
    </property>
    <property name="text">
@@ -1119,7 +1117,7 @@ QProgressBar::background{
   </action>
   <action name="actionHilfe">
    <property name="icon">
-    <iconset>
+    <iconset resource="Ressourcen.qrc">
      <normaloff>:/images/icons/questions.png</normaloff>:/images/icons/questions.png</iconset>
    </property>
    <property name="text">
@@ -1128,7 +1126,7 @@ QProgressBar::background{
   </action>
   <action name="actionW_rterbucheditor">
    <property name="icon">
-    <iconset>
+    <iconset resource="Ressourcen.qrc">
      <normaloff>:/images/icons/pen.png</normaloff>:/images/icons/pen.png</iconset>
    </property>
    <property name="text">
@@ -1137,7 +1135,7 @@ QProgressBar::background{
   </action>
   <action name="actionErweiterter_W_rterbucheditor">
    <property name="icon">
-    <iconset>
+    <iconset resource="Ressourcen.qrc">
      <normaloff>:/images/icons/design.png</normaloff>:/images/icons/design.png</iconset>
    </property>
    <property name="text">
@@ -1146,7 +1144,7 @@ QProgressBar::background{
   </action>
   <action name="actionAtomformeleditor">
    <property name="icon">
-    <iconset>
+    <iconset resource="Ressourcen.qrc">
      <normaloff>:/images/icons/ruler.png</normaloff>:/images/icons/ruler.png</iconset>
    </property>
    <property name="text">
@@ -1155,7 +1153,7 @@ QProgressBar::background{
   </action>
   <action name="actionCreate_treebased_dictionary">
    <property name="icon">
-    <iconset>
+    <iconset resource="Ressourcen.qrc">
      <normaloff>:/images/icons/tree.png</normaloff>:/images/icons/tree.png</iconset>
    </property>
    <property name="text">
@@ -1167,7 +1165,7 @@ QProgressBar::background{
   </action>
   <action name="actionSettings">
    <property name="icon">
-    <iconset>
+    <iconset resource="Ressourcen.qrc">
      <normaloff>:/images/icons/settings.png</normaloff>:/images/icons/settings.png</iconset>
    </property>
    <property name="text">
@@ -1179,7 +1177,7 @@ QProgressBar::background{
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="Ressourcen.qrc">
      <normaloff>:/images/icons/boxUpload.png</normaloff>:/images/icons/boxUpload.png</iconset>
    </property>
    <property name="text">
@@ -1192,7 +1190,26 @@ QProgressBar::background{
    </property>
   </action>
  </widget>
- <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <layoutdefault spacing="4" margin="5"/>
+ <resources>
+  <include location="Ressourcen.qrc"/>
+ </resources>
  <connections/>
+ <designerdata>
+  <property name="gridDeltaX">
+   <number>10</number>
+  </property>
+  <property name="gridDeltaY">
+   <number>10</number>
+  </property>
+  <property name="gridSnapX">
+   <bool>true</bool>
+  </property>
+  <property name="gridSnapY">
+   <bool>true</bool>
+  </property>
+  <property name="gridVisible">
+   <bool>true</bool>
+  </property>
+ </designerdata>
 </ui>

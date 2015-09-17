@@ -44,7 +44,6 @@
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 
-//#include "disp/helpers/colormap.h"
 #include "math.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -129,10 +128,10 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
 {
 
     ui->setupUi(this);
-    ui->tw_main->setPalette(*(new QPalette(Qt::green)));
-    ui->tw_main->removeTab(1);
-    ui->tw_main->tabBar()->tabButton(0, QTabBar::LeftSide)->resize(0, 0);
-    connect(ui->tw_main, SIGNAL(tabCloseRequested(int)), this, SLOT(on_close_tab_button(int)));
+    ui->tabWidget->setPalette(*(new QPalette(Qt::green)));
+    ui->tabWidget->removeTab(1);
+    ui->tabWidget->tabBar()->tabButton(0, QTabBar::LeftSide)->resize(0, 0);
+    connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(on_close_tab_button(int)));
 
     this->setMinimumSize(1280, 640);
     callGraphWindow = new GraphWindow();
@@ -3270,12 +3269,12 @@ void MainWindow::on_actionTest_triggered()
     plot_window = new tfplotwidget();
 
 
-    if(ui->tw_main->count() >= 2)
-        ui->tw_main->addTab(plot_window, "TF Channel ??");
+    if(ui->tabWidget->count() >= 2)
+        ui->tabWidget->addTab(plot_window, "TF Channel ??");
     else
-        ui->tw_main->addTab(plot_window, "TF-Overview");
+        ui->tabWidget->addTab(plot_window, "TF-Overview");
 
-    if(ui->tw_main->count() == 2)
+    if(ui->tabWidget->count() == 2)
     {
         QPushButton *extendedButton = new QPushButton();
         extendedButton->setMaximumSize(20, 20);
@@ -3283,11 +3282,44 @@ void MainWindow::on_actionTest_triggered()
         extendedButton->setIcon(QIcon(":/images/icons/expand_512.png"));
         extendedButton->setIconSize(QSize(16, 16));
 
-        ui->tw_main->tabBar()->setTabButton(1, QTabBar::LeftSide, extendedButton);
+        ui->tabWidget->tabBar()->setTabButton(1, QTabBar::LeftSide, extendedButton);
         connect(extendedButton, SIGNAL (released()), this, SLOT (on_extend_tab_button()));
         qreal max_frequency = 0;
+        QGridLayout* layout = new QGridLayout();
+        layout->setMargin(0);
+        layout->setSpacing(4);
+        ui->tabWidget->setLayout(layout);
+
+        MatrixXd tf_sum = MatrixXd::Zero(floor(_adaptive_atom_list.first().first().sample_count/2), _adaptive_atom_list.first().first().sample_count);
+        for(qint32 i = 0; i < _adaptive_atom_list.first().length(); i++)//foreach channel
+        {
+            for(qint32 j = 0; j < _adaptive_atom_list.length(); j++) //foreach atom
+            {
+                GaborAtom atom  = _adaptive_atom_list.at(j).at(i);
+                MatrixXd tf_matrix = atom.make_tf(atom.sample_count, atom.scale, atom.translation, atom.modulation);
+                //tf_atoms.append(*tf_matrix);
+                tf_matrix *= atom.max_scalar_list.at(i)*atom.max_scalar_list.at(i);
+                tf_sum += tf_matrix;
+
+                if(atom.modulation * _sample_rate / atom.sample_count > max_frequency)
+                    max_frequency = atom.modulation * _sample_rate / atom.sample_count;
+
+                std::cout << "\nmax frequency:  " << max_frequency;
+
+            }
+        }
+
+        //normalisation of the tf-matrix
+        qreal norm = tf_sum.maxCoeff();
+        qreal mnorm = tf_sum.minCoeff();
+        if(abs(mnorm) > norm) norm = mnorm;
+        tf_sum /= norm;
 
 
+        TFplot tfplot;
+        tfplot.plotTf(tf_sum, _sample_rate, ColorMaps::Bone, NULL);
+
+        /*
         if(_adaptive_atom_list.count() > 0 && _adaptive_atom_list.first().count() > 0)
         {
             //prepare data to paint tf plot
@@ -3303,28 +3335,21 @@ void MainWindow::on_actionTest_triggered()
                     tf_matrix *= atom.max_scalar_list.at(i)*atom.max_scalar_list.at(i);
                     tf_sum += tf_matrix;
 
-                    //find maximum frequency in signal to set y axis with right values
-                    /*if(atom.modulation == 0 && atom.scale != 0)
-                    {
-                        qreal temp = atom.scale / _sample_rate;
-                        if(1 / temp > max_frequency)
-                            max_frequency = 1 / temp;
-                    }*/
-                    /*else*/ if(atom.modulation * _sample_rate / atom.sample_count > max_frequency)
+                    if(atom.modulation * _sample_rate / atom.sample_count > max_frequency)
                         max_frequency = atom.modulation * _sample_rate / atom.sample_count;
 
                     std::cout << "\nmax frequency:  " << max_frequency;
 
                 }
 
-            /*qreal u = floor(atom.sample_count / 2);
-            for(int t = 0; t < atom.sample_count; t++)
-                for(int f = 0; f < u - 1; f++)
-                {
-                    qreal v = -2 * PI * pow((t - u) / atom.scale, 2) + pow(atom.scale * ((f * PI / atom.sample_count * 2) - (atom.phase * PI / atom.sample_count * 2)) / 2 / PI, 2);
-                    tf_matrix(f, t) = 0.5 * 2 * qExp(v);
-                }
-              */
+            //qreal u = floor(atom.sample_count / 2);
+            //for(int t = 0; t < atom.sample_count; t++)
+            //    for(int f = 0; f < u - 1; f++)
+            //    {
+            //        qreal v = -2 * PI * pow((t - u) / atom.scale, 2) + pow(atom.scale * ((f * PI / atom.sample_count * 2) - (atom.phase * PI / atom.sample_count * 2)) / 2 / PI, 2);
+            //        tf_matrix(f, t) = 0.5 * 2 * qExp(v);
+            //    }
+
 
             }
 
@@ -3406,7 +3431,7 @@ void MainWindow::on_actionTest_triggered()
 
             for(qint32 j = 0; j < 11; j++)
             {
-                QGraphicsTextItem *text_item = new QGraphicsTextItem(QString::number(j*scale_y_text,//pow(10, j)/pow(10, 11) /*(j+1)/log(12)*/ * max_frequency,//scale_y_text,
+                QGraphicsTextItem *text_item = new QGraphicsTextItem(QString::number(j*scale_y_text,//pow(10, j)/pow(10, 11) (j+1)/log(12) * max_frequency,//scale_y_text,
                                                                                      'f', 0), tf_pixmap);
                 text_item->setFont(QFont("arial", 3));
                 y_axis_values.append(text_item);    // scalevalue as string
@@ -3420,10 +3445,10 @@ void MainWindow::on_actionTest_triggered()
                                 tf_pixmap->boundingRect().height()/2 + y_axis_name->boundingRect().height()/2);
             y_axis_name->setRotation(-90);
 
-            /*y_axis_item->setPos(plot_window->tf_scene.width()/2 - test_image->width()/2 - y_axis_item->boundingRect().width()/2 - 10,
-                                plot_window->tf_scene.height()/2 - y_axis_item->boundingRect().height()/2);
+            //y_axis_item->setPos(plot_window->tf_scene.width()/2 - test_image->width()/2 - y_axis_item->boundingRect().width()/2 - 10,
+              //                  plot_window->tf_scene.height()/2 - y_axis_item->boundingRect().height()/2);
 
-            */
+
             qreal scale_y = qreal(tf_pixmap->boundingRect().height()) / qreal(y_axis_values.length()-1);
 
             //dbgout
@@ -3453,11 +3478,7 @@ void MainWindow::on_actionTest_triggered()
                     color.setRgb(ColorMap::hotR(it*norm/tf_sum.rows()), ColorMap::hotG(it*norm/tf_sum.rows()), ColorMap::hotB(it*norm/tf_sum.rows()));
                     coeffs_image->setPixel(x, tf_sum.rows() - 1 -  it,  color.rgb());
                 }
-                /*std::cout << ColorMap::jetR(it*norm/tf_sum.rows()) << " ; " <<
-                             ColorMap::jetG(it*norm/tf_sum.rows()) << " ; " <<
-                             ColorMap::jetB(it*norm/tf_sum.rows()) << "\n";
-                do we have a bug in jet here?
-                */
+
             }
             QGraphicsPixmapItem * coeffs_item = plot_window->tf_scene.addPixmap(QPixmap::fromImage(*coeffs_image));//addItem();
             coeffs_item->setParentItem(tf_pixmap);
@@ -3491,8 +3512,9 @@ void MainWindow::on_actionTest_triggered()
             //SO SOLVE THIS AS WELL MAN!
             plot_window->ui->tf_view->show();
         }
+            */
     }
-    if(ui->tw_main->count() > 2)
+    if(ui->tabWidget->count() > 2)
     {
 
        // ui->tw_main->setCurrentIndex(ui->tw_main->count() - 1);
@@ -3516,7 +3538,7 @@ void MainWindow::on_extend_tab_button()
   //  QWidget *tf_overview_w = new QWidget();
   //  tf_overview_w->setWindowTitle("Time-Frequency-Overview");
   //  tf_overview_w->show();
-    ui->tw_main->removeTab(1);
+    ui->tabWidget->removeTab(1);
     /*QLayout layout;// = new QLayout;
     layout->addWidget(plot_window);
     tf_overview_w->setLayout(layout);
@@ -3526,6 +3548,6 @@ void MainWindow::on_extend_tab_button()
 
 void MainWindow::on_close_tab_button(int index)
 {
-    ui->tw_main->removeTab(index);
+    ui->tabWidget->removeTab(index);
 }
 
