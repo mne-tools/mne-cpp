@@ -85,6 +85,7 @@ Averaging::Averaging()
 , m_iBaselineToSeconds(0)
 , m_iNumAverages(10)
 , m_iStimChan(0)
+, m_iAverageMode(0)
 , m_pAveragingWidget(AveragingSettingsWidget::SPtr())
 , m_pActionShowAdjustment(Q_NULLPTR)
 #ifdef DEBUG_AVERAGING
@@ -144,6 +145,7 @@ void Averaging::init()
     m_iNumAverages = settings.value(QString("Plugin/%1/numAverages").arg(this->getName()), 10).toInt();
     m_iStimChan = settings.value(QString("Plugin/%1/stimChannel").arg(this->getName()), 0).toInt();
     m_iStimChanIdx = settings.value(QString("Plugin/%1/stimChannelIdX").arg(this->getName()), 0).toInt();
+    m_iAverageMode = settings.value(QString("Plugin/%1/averageMode").arg(this->getName()), 0).toInt();
 
     // Input
     m_pAveragingInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "AveragingIn", "Averaging input data");
@@ -180,11 +182,11 @@ void Averaging::unload()
     settings.setValue(QString("Plugin/%1/numAverages").arg(this->getName()), m_iNumAverages);
     settings.setValue(QString("Plugin/%1/stimChannel").arg(this->getName()), m_iStimChan);
     settings.setValue(QString("Plugin/%1/stimChannelIdx").arg(this->getName()), m_iStimChanIdx);
+    settings.setValue(QString("Plugin/%1/averageMode").arg(this->getName()), m_iAverageMode);
 
     settings.setValue(QString("Plugin/%1/baselineFromSeconds").arg(this->getName()), m_iBaselineFromSeconds);
     settings.setValue(QString("Plugin/%1/baselineToSeconds").arg(this->getName()), m_iBaselineToSeconds);
     settings.setValue(QString("Plugin/%1/baselineFromSamples").arg(this->getName()), m_iBaselineFromSamples);
-    settings.setValue(QString("Plugin/%1/baselineToSamples").arg(this->getName()), m_iBaselineToSamples);
 }
 
 
@@ -196,6 +198,17 @@ void Averaging::changeNumAverages(qint32 numAve)
     m_iNumAverages = numAve;
     if(m_pRtAve)
         m_pRtAve->setAverages(numAve);
+}
+
+
+//*************************************************************************************************************
+
+void Averaging::changeAverageMode(qint32 mode)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_iAverageMode = mode;
+    if(m_pRtAve)
+        m_pRtAve->setAverageMode(mode);
 }
 
 
