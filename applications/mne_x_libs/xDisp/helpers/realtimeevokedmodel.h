@@ -267,6 +267,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the current baseline information
+    *
+    * @return the current baseline information as a from to QPair
+    */
+    inline QPair<QVariant,QVariant> getBaselineInfo() const;
+
+    //=========================================================================================================
+    /**
     * Returns the number of pre-stimulus samples
     *
     * @return the number of pre-stimulus samples
@@ -385,13 +393,15 @@ private:
 
     RowVectorXi             m_vecBadIdcs;           /**< Idcs of bad channels */
 
+    QPair<QVariant,QVariant>    m_pairBaseline;     /**< Baseline information */
+
     bool    m_bIsInit;              /**< Init flag */
     bool    m_bIsFreezed;           /**< Display is freezed */
     bool    m_bProjActivated;       /**< Doo projections flag */
     float   m_fSps;                 /**< Sampling rate */
     qint32  m_iMaxFilterLength;     /**< Max order of the current filters */
-    QString m_sFilterChannelType;   /**< Kind of channel which is to be filtered */
 
+    QString                             m_sFilterChannelType;   /**< Kind of channel which is to be filtered */
     QList<FilterData>                   m_filterData;           /**< List of currently active filters. */
     QStringList                         m_filterChannelList;    /**< List of channels which are to be filtered.*/
     QStringList                         m_visibleChannelList;   /**< List of currently visible channels in the view.*/
@@ -482,6 +492,14 @@ inline int RealTimeEvokedModel::getNumberOfTimeSpacers() const
     return floor((m_matData.cols()/m_fSps)*10);
 }
 
+
+//*************************************************************************************************************
+
+inline QPair<QVariant,QVariant> RealTimeEvokedModel::getBaselineInfo() const
+{
+    //std::cout<<floor((m_matData.cols()/m_fSps)*10)<<std::endl;
+    return m_pairBaseline;
+}
 
 } // NAMESPACE
 

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_evoked_data.h
+* @file     fiff_evoked.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    FiffEvokedData class declaration.
+* @brief    FiffEvoked class declaration.
 *
 */
 
@@ -107,14 +107,14 @@ public:
     *
     * @param[in] p_IODevice     IO device to read from the evoked data set.
     * @param[in] setno          The set to pick. Dataset ID number (int) or comment/name (str). Optional if there isonly one data set in file.
-    * @param[in] baseline       The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b)
+    * @param[in] t_baseline     The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b)
     *                           the interval is between "a (s)" and "b (s)". If a is None the beginning of the data is used and if b is
     *                           None then b is set to the end of the interval. If baseline is equal ot (None, None) all the time interval is used.
     *                           If None, no correction is applied.
     * @param[in] proj           Apply SSP projection vectors (optional, default = true)
     * @param[in] p_aspect_kind  Either "FIFFV_ASPECT_AVERAGE" or "FIFFV_ASPECT_STD_ERR". The type of data to read. Only used if "setno" is a str.
     */
-    FiffEvoked(QIODevice& p_IODevice, QVariant setno = 0, QPair<QVariant,QVariant> baseline = defaultVariantPair, bool proj = true, fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE);
+    FiffEvoked(QIODevice& p_IODevice, QVariant setno = 0, QPair<QVariant,QVariant> t_baseline = defaultVariantPair, bool proj = true, fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE);
 
     //=========================================================================================================
     /**
@@ -187,7 +187,7 @@ public:
     * @param[in] p_IODevice     An fiff IO device like a fiff QFile or QTCPSocket
     * @param[out] p_FiffEvoked  The read evoked data
     * @param[in] setno          the set to pick. Dataset ID number (int) or comment/name (str). Optional if there isonly one data set in file.
-    * @param[in] baseline       The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b)
+    * @param[in] t_baseline       The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b)
     *                           the interval is between "a (s)" and "b (s)". If a is None the beginning of the data is used and if b is
     *                           None then b is set to the end of the interval. If baseline is equal ot (None, None) all the time interval is used.
     *                           If None, no correction is applied.
@@ -196,7 +196,7 @@ public:
     *
     * @return true if successful, false otherwise
     */
-    static bool read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant setno = 0, QPair<QVariant,QVariant> baseline = defaultVariantPair, bool proj = true, fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE);
+    static bool read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant setno = 0, QPair<QVariant,QVariant> t_baseline = defaultVariantPair, bool proj = true, fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE);
 
     //=========================================================================================================
     /**
@@ -209,22 +209,25 @@ public:
 
     //=========================================================================================================
     /**
-    * Inputs a new data set and recalculates the average. This function also iterates the nave parameter
+    * Inputs a new data set and recalculates the average. This function also iterates the nave parameter by one.
     *
     * @param[in] newData     the new data set which is to be added to the current average
+    *
+    * @return the updated FiffEvoked
     */
     FiffEvoked & operator+=(const MatrixXd &newData);
 
 public:
-    FiffInfo    info;           /**< Measurement info. */
-    fiff_int_t  nave;           /**< Number of averaged epochs. */
-    fiff_int_t  aspect_kind;    /**< Aspect identifier, either FIFFV_ASPECT_AVERAGE or FIFFV_ASPECT_STD_ERR.  */
-    fiff_int_t  first;          /**< First time sample. */
-    fiff_int_t  last;           /**< Last time sample. */
-    QString     comment;        /**< Comment on dataset. Can be the condition. */
-    RowVectorXf times;          /**< Vector of time instants in seconds. */
-    MatrixXd    data;           /**< 2D array of shape [n_channels x n_times]; Evoked response. */
-    MatrixXd    proj;           /**< SSP projection */
+    FiffInfo    info;               /**< Measurement info. */
+    fiff_int_t  nave;               /**< Number of averaged epochs. */
+    fiff_int_t  aspect_kind;        /**< Aspect identifier, either FIFFV_ASPECT_AVERAGE or FIFFV_ASPECT_STD_ERR.  */
+    fiff_int_t  first;              /**< First time sample. */
+    fiff_int_t  last;               /**< Last time sample. */
+    QString     comment;            /**< Comment on dataset. Can be the condition. */
+    RowVectorXf times;              /**< Vector of time instants in seconds. */
+    MatrixXd    data;               /**< 2D array of shape [n_channels x n_times]; Evoked response. */
+    MatrixXd    proj;               /**< SSP projection */
+    QPair<QVariant,QVariant>    baseline;    /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
 };
 
 //*************************************************************************************************************

@@ -44,6 +44,7 @@
 
 #include "rtinv_global.h"
 #include "Utils/detecttrigger.h"
+#include "Utils/mnemath.h"
 
 
 //*************************************************************************************************************
@@ -73,6 +74,7 @@
 #include <QSharedPointer>
 #include <QSet>
 #include <QList>
+#include <QVariant>
 
 
 //*************************************************************************************************************
@@ -119,13 +121,16 @@ public:
     /**
     * Creates the real-time covariance estimation object.
     *
-    * @param[in] numAverages        Number of evkos to average
-    * @param[in] p_iPreStimSamples  Number of samples averaged before the stimulus
-    * @param[in] p_iPostStimSamples Number of samples averaged after the stimulus (including the stimulus)
-    * @param[in] p_pFiffInfo        Associated Fiff Information
+    * @param[in] numAverages            Number of evkos to average
+    * @param[in] p_iPreStimSamples      Number of samples averaged before the stimulus
+    * @param[in] p_iPostStimSamples     Number of samples averaged after the stimulus (including the stimulus)
+    * @param[in] p_iBaselineFromSamples Start of baseline area which was/is used for correction
+    * @param[in] p_iBaselineToSamples   End of baseline area which was/is used for correction
+    * @param[in] p_iTriggerIndex        Row in dex of channel which is to be scanned for triggers
+    * @param[in] p_pFiffInfo            Associated Fiff Information
     * @param[in] parent     Parent QObject (optional)
     */
-    explicit RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStimSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
+    explicit RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStimSamples, quint32 p_iBaselineFromSamples, quint32 p_iBaselineToSamples, quint32 p_iTriggerIndex, FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -154,16 +159,18 @@ public:
     * Sets the number of pre stimulus samples
     *
     * @param[in] samples    new number of pre stimulus samples
+    * @param[in] secs    new number of pre stimulus seconds
     */
-    void setPreStim(qint32 samples);
+    void setPreStim(qint32 samples, qint32 secs);
 
     //=========================================================================================================
     /**
     * Sets the number of post stimulus samples
     *
     * @param[in] samples    new number of post stimulus samples
+    * @param[in] secs    new number of pre stimulus seconds
     */
-    void setPostStim(qint32 samples);
+    void setPostStim(qint32 samples, qint32 secs);
 
     //=========================================================================================================
     /**
@@ -172,6 +179,32 @@ public:
     * @param[in] idx    trigger channel index
     */
     void setTriggerChIndx(qint32 idx);
+
+    //=========================================================================================================
+    /**
+    * Sets the baseline correction on or off
+    *
+    * @param[in] activate    activate baseline correction
+    */
+    void setBaselineActive(bool activate);
+
+    //=========================================================================================================
+    /**
+    * Sets the from mSeconds of the baseline area
+    *
+    * @param[in] fromSamp    from of baseline area in samples
+    * @param[in] fromMSec    from of baseline area in mSeconds
+    */
+    void setBaselineFrom(int fromSamp, int fromMSec);
+
+    //=========================================================================================================
+    /**
+    * Sets the to mSeconds of the baseline area
+    *
+    * @param[in] toSamp    to of baseline area in samples
+    * @param[in] toMSec    to of baseline area in mSeconds
+    */
+    void setBaselineTo(int toSamp, int toMSec);
 
     //=========================================================================================================
     /**
@@ -220,12 +253,12 @@ protected:
     virtual void run();
 
 private:
-    void clearDetectedTriggers();       /**< Clears already detected trigger*/
+    void clearDetectedTriggers();               /**< Clears already detected trigger*/
 
-    void fillFrontBuffer(MatrixXd &data);           /**< Prepends incoming data to front/pre stim buffer*/
-    int fillBackBuffer(MatrixXd &data);             /**< Prepends incoming data to back/post stim buffer*/
-    void mergeData();                               /**< Packs the buffers togehter as one and calcualtes the current running average and emits the result if number of averages has been reached*/
-    void generateEvoked();                          /**< Generates the final evoke variable*/
+    void fillFrontBuffer(MatrixXd &data);       /**< Prepends incoming data to front/pre stim buffer*/
+    int fillBackBuffer(MatrixXd &data);         /**< Prepends incoming data to back/post stim buffer*/
+    void mergeData();                           /**< Packs the buffers togehter as one and calcualtes the current running average and emits the result if number of averages has been reached*/
+    void generateEvoked();                      /**< Generates the final evoke variable*/
 
     QMutex  m_qMutex;                   /**< Provides access serialization between threads*/
 
@@ -235,10 +268,12 @@ private:
     qint32  m_iPostStimSamples;         /**< Amount of samples averaged after the stimulus, including the stimulus sample.*/
     qint32  m_iNewPreStimSamples;       /**< New amount of samples averaged before the stimulus. */
     qint32  m_iNewPostStimSamples;      /**< New amount of samples averaged after the stimulus, including the stimulus sample.*/
+    qint32  m_iPreStimSeconds;          /**< Amount of seconds averaged before the stimulus. */
+    qint32  m_iPostStimSeconds;         /**< Amount of seconds averaged after the stimulus, including the stimulus sample.*/
     qint32  m_iCurrentMatBufferIndex;   /**< Current index inside of the matrix buffer m_matBuffer */
-    qint32  m_iTriggerIndex;
-    qint32  m_iNewTriggerIndex;
-    qint32  m_iTriggerPos;
+    qint32  m_iTriggerIndex;            /**< Current row index of the data matrix which is to be scanned for triggers */
+    qint32  m_iNewTriggerIndex;         /**< Old row index of the data matrix which is to be scanned for triggers */
+    qint32  m_iTriggerPos;              /**< Last found trigger postion */
 
     float   m_fTriggerThreshold;        /**< Threshold to detect trigger */
 
@@ -246,18 +281,22 @@ private:
     bool    m_bAutoAspect;              /**< Auto aspect detection on or off. */
     bool    m_bFillingBackBuffer;       /**< Whether the back buffer is currently getting filled. */
     bool    m_bRunningAverage;          /**< Whether the running average is to be calculated. */
+    bool    m_bDoBaselineCorrection;    /**< Whether to perform baseline correction. */
 
-    FiffInfo::SPtr      m_pFiffInfo;        /**< Holds the fiff measurement information. */
-    FiffEvoked::SPtr    m_pStimEvoked;
+    QPair<QVariant,QVariant>    m_pairBaselineSec;     /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
+    QPair<QVariant,QVariant>    m_pairBaselineSamp; /**< Baseline information in samples form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
 
-    CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
+    FiffInfo::SPtr          m_pFiffInfo;            /**< Holds the fiff measurement information. */
+    FiffEvoked::SPtr        m_pStimEvoked;          /**< Holds the evoked information. */
 
-    QMap<int,QList<int> >   m_qMapDetectedTrigger;      /**< Detected trigger for each trigger channel. */
+    CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;      /**< The Circular Raw Matrix Buffer. */
 
-    MatrixXd                m_matStimData;              /**< The matrix data correspdoning to the latest detected stim event. */
-    QList<MatrixXd>         m_matBufferFront;           /**< the front/pre stim data buffer for each trigger channel. This buffer and its including matrices should always sum up to m_iPreStimSamples columns */
-    QList<MatrixXd>         m_matBufferBack;            /**< the back/post stim data buffer for each trigger channel. This buffer and its including matrices should always sum up to m_iPostStimSamples columns */
-    QList<MatrixXd>         m_qListStimAve;             /**< the current stimulus average buffer. Holds m_iNumAverages vectors */
+    QMap<int,QList<int> >   m_qMapDetectedTrigger;              /**< Detected trigger for each trigger channel. */
+
+    MatrixXd                m_matStimData;                      /**< The matrix data correspdoning to the latest detected stim event. */
+    QList<MatrixXd>         m_matBufferFront;                   /**< the front/pre stim data buffer for each trigger channel. This buffer and its including matrices should always sum up to m_iPreStimSamples columns */
+    QList<MatrixXd>         m_matBufferBack;                    /**< the back/post stim data buffer for each trigger channel. This buffer and its including matrices should always sum up to m_iPostStimSamples columns */
+    QList<MatrixXd>         m_qListStimAve;                     /**< the current stimulus average buffer. Holds m_iNumAverages vectors */
 };
 
 //*************************************************************************************************************

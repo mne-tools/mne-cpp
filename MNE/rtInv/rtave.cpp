@@ -71,7 +71,7 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtAve::RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStimSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent)
+RtAve::RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStimSamples, quint32 p_iBaselineFromSamples, quint32 p_iBaselineToSamples, quint32 p_iTriggerIndex, FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 : QThread(parent)
 , m_iNumAverages(numAverages)
 , m_iPreStimSamples(p_iPreStimSamples)
@@ -81,9 +81,14 @@ RtAve::RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStim
 , m_bAutoAspect(true)
 , m_fTriggerThreshold(0.02)
 , m_bFillingBackBuffer(false)
-, m_iTriggerIndex(306)
+, m_iTriggerIndex(-1)
+, m_iNewTriggerIndex(p_iTriggerIndex)
 , m_iTriggerPos(-1)
-, m_bRunningAverage(false)
+, m_bRunningAverage(true)
+, m_bDoBaselineCorrection(false)
+, m_pairBaselineSamp(qMakePair(QVariant(QString::number(p_iBaselineFromSamples)),QVariant(QString::number(p_iBaselineToSamples))))
+, m_iPreStimSeconds(0)
+, m_iPostStimSeconds(100)
 {
     qRegisterMetaType<FiffEvoked::SPtr>("FiffEvoked::SPtr");
 }
@@ -102,12 +107,14 @@ RtAve::~RtAve()
 
 void RtAve::append(const MatrixXd &p_DataSegment)
 {
-    QMutexLocker locker(&m_qMutex);
+    m_qMutex.lock();
     // ToDo handle change buffersize
     if(!m_pRawMatrixBuffer)
         m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(128, p_DataSegment.rows(), p_DataSegment.cols()));
 
     m_pRawMatrixBuffer->push(&p_DataSegment);
+
+    m_qMutex.unlock();
 }
 
 
@@ -124,19 +131,23 @@ void RtAve::setAverages(qint32 numAve)
 
 //*************************************************************************************************************
 
-void RtAve::setPreStim(qint32 samples)
+void RtAve::setPreStim(qint32 samples, qint32 secs)
 {
-    QMutexLocker locker(&m_qMutex);
+    m_qMutex.lock();
     m_iNewPreStimSamples = samples;
+    m_iPreStimSeconds = secs;
+    m_qMutex.unlock();
 }
 
 
 //*************************************************************************************************************
 
-void RtAve::setPostStim(qint32 samples)
+void RtAve::setPostStim(qint32 samples, qint32 secs)
 {
-    QMutexLocker locker(&m_qMutex);
+    m_qMutex.lock();
     m_iNewPostStimSamples = samples;
+    m_iPostStimSeconds = secs;
+    m_qMutex.unlock();
 }
 
 
@@ -144,9 +155,56 @@ void RtAve::setPostStim(qint32 samples)
 
 void RtAve::setTriggerChIndx(qint32 idx)
 {
+    m_qMutex.lock();
     m_iNewTriggerIndex = idx;
+    m_qMutex.unlock();
+}
 
-    qDebug()<<"m_iTriggerIndex"<<m_iTriggerIndex;
+
+//*************************************************************************************************************
+
+void RtAve::setBaselineActive(bool activate)
+{
+    m_qMutex.lock();
+
+    m_bDoBaselineCorrection = activate;
+
+    if(!m_bDoBaselineCorrection)
+        m_pStimEvoked->baseline = qMakePair(QVariant("None"), QVariant("None"));
+
+    m_pStimEvoked->baseline = m_pairBaselineSec;
+
+    m_qMutex.unlock();
+}
+
+
+//*************************************************************************************************************
+
+void RtAve::setBaselineFrom(int fromSamp, int fromMSec)
+{
+    m_qMutex.lock();
+
+    m_pairBaselineSec.first = QVariant(QString::number(fromMSec));
+    m_pairBaselineSamp.first = QVariant(QString::number(fromSamp));
+
+    m_pStimEvoked->baseline.first = QVariant(QString::number(fromMSec));
+
+    m_qMutex.unlock();
+}
+
+
+//*************************************************************************************************************
+
+void RtAve::setBaselineTo(int toSamp, int toMSec)
+{
+    m_qMutex.lock();
+
+    m_pairBaselineSec.second = QVariant(QString::number(toMSec));
+    m_pairBaselineSamp.second = QVariant(QString::number(toSamp));
+
+    m_pStimEvoked->baseline.second = QVariant(QString::number(toMSec));
+
+    m_qMutex.unlock();
 }
 
 
@@ -190,6 +248,7 @@ void RtAve::run()
 {
     //Inits & Clears
     m_qMutex.lock();
+
     m_qListStimAve.clear();
 
     MatrixXd t_mat;
@@ -218,11 +277,12 @@ void RtAve::run()
     m_iNewPreStimSamples = m_iPreStimSamples;
     m_iNewPostStimSamples = m_iPostStimSamples;
 
+    m_pStimEvoked->baseline = m_pairBaselineSec;
+
     m_qMutex.unlock();
 
     //Enter the main loop
-    while(m_bIsRunning)
-    {
+    while(m_bIsRunning) {
         bool doProcessing = false;
 
         if(m_pRawMatrixBuffer)
@@ -231,10 +291,10 @@ void RtAve::run()
         if(doProcessing) {
             //Reset when stim size changed
             m_qMutex.lock();
+
             if(m_iNewPreStimSamples != m_iPreStimSamples
                     || m_iNewPostStimSamples != m_iPostStimSamples
-                    || m_iNewTriggerIndex != m_iTriggerIndex)
-            {
+                    || m_iNewTriggerIndex != m_iTriggerIndex) {
                 m_iPreStimSamples = m_iNewPreStimSamples;
                 m_iPostStimSamples = m_iNewPostStimSamples;
                 m_iTriggerIndex = m_iNewTriggerIndex;
@@ -250,9 +310,11 @@ void RtAve::run()
                 m_qListStimAve.clear();
                 m_matBufferFront.clear();
                 m_matBufferBack.clear();
+                clearDetectedTriggers();
 
                 m_bFillingBackBuffer = false;
             }
+
             m_qMutex.unlock();
 
             //Acquire Data
@@ -273,11 +335,9 @@ void RtAve::run()
                     generateEvoked();
 
                     //If number of averages was reached emit new average
-                    if(m_qListStimAve.size() == m_iNumAverages && m_bRunningAverage) {
-                        m_pStimEvoked->nave = m_iNumAverages;
+                    if(m_qListStimAve.size() == m_iNumAverages && m_bRunningAverage)
                         emit evokedStim(m_pStimEvoked);
-                    }
-                    else if(m_qListStimAve.size()>0)
+                    else if(m_qListStimAve.size() > 0 && !m_bRunningAverage)
                         emit evokedStim(m_pStimEvoked);
 
                     m_bFillingBackBuffer = false;
@@ -295,7 +355,6 @@ void RtAve::run()
                 }
 
                 qDebug()<<"Trigger channel "<<m_iTriggerIndex<<" found at "<<m_iTriggerPos;
-
             }
         }
     }
@@ -318,6 +377,8 @@ void RtAve::clearDetectedTriggers()
 
 int RtAve::fillBackBuffer(MatrixXd &data)
 {
+    m_qMutex.lock();
+
     int iTotalBufSize = 0;
     int iResidualCols = data.cols();
     for(int i = 0; i < m_matBufferBack.size(); i++)
@@ -332,7 +393,9 @@ int RtAve::fillBackBuffer(MatrixXd &data)
     }
 
     //DEBUG
-    qDebug()<<"m_matBufferBack: "<<iTotalBufSize+iResidualCols;
+    //qDebug()<<"m_matBufferBack: "<<iTotalBufSize+iResidualCols;
+
+    m_qMutex.unlock();
 
     return iTotalBufSize+iResidualCols;
 }
@@ -342,6 +405,8 @@ int RtAve::fillBackBuffer(MatrixXd &data)
 
 void RtAve::fillFrontBuffer(MatrixXd &data)
 {
+    m_qMutex.lock();
+
     if(m_iCurrentMatBufferIndex == 0)
         m_matBufferFront.clear();
 
@@ -360,10 +425,12 @@ void RtAve::fillFrontBuffer(MatrixXd &data)
     }
 
     // DEBUG - Check total data length of front buffer
-    int size = 0;
-    for(int i = 0; i<m_matBufferFront.size(); i++)
-        size += m_matBufferFront.at(i).cols();
-    qDebug()<<"m_matBufferFront: "<<size;
+//    int size = 0;
+//    for(int i = 0; i<m_matBufferFront.size(); i++)
+//        size += m_matBufferFront.at(i).cols();
+    //qDebug()<<"m_matBufferFront: "<<size;
+
+    m_qMutex.unlock();
 }
 
 
@@ -371,6 +438,8 @@ void RtAve::fillFrontBuffer(MatrixXd &data)
 
 void RtAve::mergeData()
 {
+    m_qMutex.lock();
+
     int rows = m_matStimData.rows();
     MatrixXd cutData(rows, m_iPreStimSamples+m_iPostStimSamples);
     MatrixXd mergedData(rows, m_iPreStimSamples+m_iPostStimSamples+m_matStimData.cols());
@@ -389,6 +458,8 @@ void RtAve::mergeData()
     m_qListStimAve.append(cutData);
     if(m_qListStimAve.size()>m_iNumAverages && m_bRunningAverage)
         m_qListStimAve.pop_front();
+
+    m_qMutex.unlock();
 }
 
 
@@ -396,7 +467,9 @@ void RtAve::mergeData()
 
 void RtAve::generateEvoked()
 {
-    // Emit final evoked
+    m_qMutex.lock();
+
+    // Generate final evoked
     MatrixXd finalAverage = MatrixXd::Zero(m_matStimData.rows(), m_iPreStimSamples+m_iPostStimSamples);
 
     if(m_bRunningAverage) {
@@ -405,12 +478,29 @@ void RtAve::generateEvoked()
         }
         finalAverage = finalAverage/m_qListStimAve.size();
 
+        if(m_bDoBaselineCorrection) {
+            qDebug()<<m_pairBaselineSec.first.toInt()<<m_pairBaselineSec.second.toInt();
+            finalAverage = MNEMath::rescale(finalAverage, m_pStimEvoked->times, m_pairBaselineSec, QString("mean"));
+            qDebug()<<"Baseline correction was a sucess";
+        }
+
         m_pStimEvoked->data = finalAverage;
+        m_pStimEvoked->nave = m_iNumAverages;
     } else {
-        *m_pStimEvoked.data() += m_qListStimAve.last();
+        MatrixXd tempMatrix = m_qListStimAve.last();
+
+        if(m_bDoBaselineCorrection) {
+            qDebug()<<m_pairBaselineSec.first.toInt()<<m_pairBaselineSec.second.toInt();
+            tempMatrix = MNEMath::rescale(tempMatrix, m_pStimEvoked->times, m_pairBaselineSec, QString("mean"));
+            qDebug()<<"Baseline correction was a sucess";
+        }
+
+        *m_pStimEvoked.data() += tempMatrix;
     }
 
-    qDebug()<<m_pStimEvoked->nave;
+    qDebug()<<"nave "<<m_pStimEvoked->nave;
+
+    m_qMutex.unlock();
 }
 
 
