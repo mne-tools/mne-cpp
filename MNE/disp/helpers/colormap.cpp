@@ -106,7 +106,7 @@ int ColorMap::jetG(double x)
     else if(x >= 0.375 && x < 0.625)
         return (int)floor(1.0*255);
     else if(x >= 0.625 && x < 0.875)
-        return (int)floor(linearSlope(x, -4, 2.5)*255);
+        return (int)floor(linearSlope(x, -4, 3.5)*255);
     else
         return 0;
 }
