@@ -281,7 +281,7 @@ private:
     qint32  m_iNewPostStimSamples;      /**< New amount of samples averaged after the stimulus, including the stimulus sample.*/
     qint32  m_iPreStimSeconds;          /**< Amount of seconds averaged before the stimulus. */
     qint32  m_iPostStimSeconds;         /**< Amount of seconds averaged after the stimulus, including the stimulus sample.*/
-    qint32  m_iCurrentMatBufferIndex;   /**< Current index inside of the matrix buffer m_matBuffer */
+    qint32  m_iCurrentMatBufferSize;    /**< Current index inside of the matrix buffer m_matBuffer */
     qint32  m_iTriggerIndex;            /**< Current row index of the data matrix which is to be scanned for triggers */
     qint32  m_iNewTriggerIndex;         /**< Old row index of the data matrix which is to be scanned for triggers */
     qint32  m_iTriggerPos;              /**< Last found trigger postion */
