@@ -95,6 +95,7 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
             this, &AveragingSettingsWidget::changePostStim);
 
     //Baseline Correction
+    ui.m_pcheckBoxBaselineCorrection->setChecked(m_pAveragingToolbox->m_bDoBaselineCorrection);
     connect(ui.m_pcheckBoxBaselineCorrection, &QCheckBox::clicked,
             m_pAveragingToolbox, &Averaging::changeBaselineActive);
 
