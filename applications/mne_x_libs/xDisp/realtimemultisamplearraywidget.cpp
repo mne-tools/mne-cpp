@@ -170,7 +170,8 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
             settings.setValue(QString("RTMSAW/%1/scaleMISC").arg(t_sRTMSAWName), m_qMapChScaling[FIFFV_MISC_CH]);
 
         //Store filter
-        if(!m_pFilterWindow) {
+        if(m_pFilterWindow != 0) {
+            qDebug()<<"Store filter";
             FilterData filter = m_pFilterWindow->getUserDesignedFilter();
 
             settings.setValue(QString("RTMSAW/%1/filterHP").arg(t_sRTMSAWName), filter.m_dHighpassFreq);
