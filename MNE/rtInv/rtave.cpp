@@ -308,7 +308,7 @@ void RtAve::run()
                 fillFrontBuffer(rawSegment);
 
                 //Detect trigger for all stim channels. If detected turn on filling of the back / post stim buffer
-                if(DetectTrigger::detectTriggerFlanksMax(rawSegment, m_iTriggerIndex, m_iTriggerPos, 0, m_fTriggerThreshold, true)) {
+                if(DetectTrigger::detectTriggerFlanksGrad(rawSegment, m_iTriggerIndex, m_iTriggerPos, 0, m_fTriggerThreshold, true, "Rising")) {
                     m_matStimData = rawSegment;
                     m_bFillingBackBuffer = true;
                 }
