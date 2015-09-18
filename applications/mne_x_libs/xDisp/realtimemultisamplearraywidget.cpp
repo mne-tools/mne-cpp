@@ -171,7 +171,6 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
 
         //Store filter
         if(m_pFilterWindow != 0) {
-            qDebug()<<"Store filter";
             FilterData filter = m_pFilterWindow->getUserDesignedFilter();
 
             settings.setValue(QString("RTMSAW/%1/filterHP").arg(t_sRTMSAWName), filter.m_dHighpassFreq);
