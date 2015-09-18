@@ -230,10 +230,10 @@ private:
     qint32 m_iBaselineToSamples;
     qint32 m_iStimChanIdx;
     qint32 m_iAverageMode;
-
     qint32 m_iNumAverages;
-
     qint32 m_iStimChan;
+
+    bool m_bDoBaselineCorrection;
 
     QVector<FiffEvoked::SPtr>   m_qVecEvokedData;   /**< Evoked data set */
 
