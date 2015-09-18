@@ -90,6 +90,7 @@ RtAve::RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStim
 , m_iNewAverageMode(0)
 , m_bDoBaselineCorrection(false)
 , m_pairBaselineSec(qMakePair(QVariant(QString::number(p_iBaselineFromSecs)),QVariant(QString::number(p_iBaselineToSecs))))
+, m_pStimEvoked(FiffEvoked::SPtr(new FiffEvoked))
 {
     qRegisterMetaType<FiffEvoked::SPtr>("FiffEvoked::SPtr");
 }
@@ -282,23 +283,25 @@ void RtAve::run()
 
             //Fill back buffer and decide when to do the data packing of the different buffers
             if(m_bFillingBackBuffer) {
+                qDebug()<<"0";
                 if(fillBackBuffer(rawSegment) == m_iPostStimSamples) {
+                    qDebug()<<"1";
                     //Merge the different buffers
                     mergeData();
-
+                    qDebug()<<"2";
                     //Clear data
                     m_matBufferBack.clear();
                     m_matBufferFront.clear();
-
+                    qDebug()<<"3";
                     //Calculate the actual average
                     generateEvoked();
-
+                    qDebug()<<"4";
                     //If number of averages was reached emit new average
                     if(m_qListStimAve.size() == m_iNumAverages && m_iAverageMode==0)
                         emit evokedStim(m_pStimEvoked);
                     else if(m_qListStimAve.size() > 0)
                         emit evokedStim(m_pStimEvoked);
-
+                    qDebug()<<"5";
                     m_bFillingBackBuffer = false;
                 }
             } else {
@@ -417,7 +420,6 @@ void RtAve::generateEvoked()
     MatrixXd finalAverage = MatrixXd::Zero(m_matStimData.rows(), m_iPreStimSamples+m_iPostStimSamples);
 
     if(m_iAverageMode == 0) {
-        qDebug()<<"Do running average";
         for(int i = 0; i<m_qListStimAve.size(); i++) {
             finalAverage += m_qListStimAve.at(i);
         }
@@ -429,7 +431,6 @@ void RtAve::generateEvoked()
         m_pStimEvoked->data = finalAverage;
         m_pStimEvoked->nave = m_iNumAverages;
     } else if(m_iAverageMode == 1){
-        qDebug()<<"Do cumulative average";
         MatrixXd tempMatrix = m_qListStimAve.last();
 
         if(m_bDoBaselineCorrection)
@@ -498,8 +499,6 @@ void RtAve::init()
     m_iNewPreStimSamples = m_iPreStimSamples;
     m_iNewPostStimSamples = m_iPostStimSamples;
     m_iNewNumAverages = m_iNumAverages;
-
-    m_pStimEvoked = FiffEvoked::SPtr(new FiffEvoked);
 
     m_qMutex.unlock();
 }
