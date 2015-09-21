@@ -110,6 +110,8 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
     ui.m_pSpinBoxBaselineTo->setValue(m_pAveragingToolbox->m_iBaselineToSeconds);
     connect(ui.m_pSpinBoxBaselineTo, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &AveragingSettingsWidget::changeBaselineTo);
+
+    setWindowFlags(Qt::WindowStaysOnTopHint);
 }
 
 
