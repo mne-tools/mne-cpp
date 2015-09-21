@@ -486,6 +486,8 @@ void RealTimeEvokedWidget::init()
         //-------- Init average scene --------
         m_pAverageScene = AverageScene::SPtr(new AverageScene(m_pAverageLayoutView, this));
         m_pAverageLayoutView->setScene(m_pAverageScene.data());
+        QBrush brush(Qt::black);
+        m_pAverageScene->setBackgroundBrush(brush);
 
         //Connect selection manager with average manager
         connect(m_pSelectionManagerWindow.data(), &SelectionManagerWindow::selectionChanged,
