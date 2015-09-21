@@ -283,6 +283,8 @@ void RealTimeEvokedModel::updateData()
     else
         m_matData = m_matSparseProj * m_pRTE->getValue()->data;
 
+    m_pairBaseline = m_pRTE->getValue()->baseline;
+
     if(!m_filterData.isEmpty())
         filterChannelsConcurrently();
 

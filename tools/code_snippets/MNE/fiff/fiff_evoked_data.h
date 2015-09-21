@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     averagingsettingswidget.h
+* @file     fiff_evoked_data.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2015
+* @date     July, 2012
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Christoph Dinh, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,21 +29,29 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the AveragingSettingsWidget class.
+* @brief    OLD FiffEvokedData class declaration.
 *
 */
 
-#ifndef AVERAGINGSETTINGSWIDGET_H
-#define AVERAGINGSETTINGSWIDGET_H
+#ifndef FIFF_EVOKED_DATA_H
+#define FIFF_EVOKED_DATA_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INCLUDES
+// FIFF INCLUDES
 //=============================================================================================================
 
-#include "../averaging.h"
+#include "fiff_global.h"
+#include "fiff_types.h"
 
-#include "../ui_averagingsettingswidget.h"
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -52,22 +59,18 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QSpinBox>
-#include <QPair>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QGridLayout>
-#include <QSpinBox>
-#include <QLabel>
+#include <QSharedData>
+#include <QSharedDataPointer>
+#include <QSharedPointer>
+#include <QString>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE AveragingPlugin
+// DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
-namespace AveragingPlugin
+namespace FIFFLIB
 {
 
 //*************************************************************************************************************
@@ -75,44 +78,54 @@ namespace AveragingPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace FIFFLIB;
+using namespace Eigen;
 
-//*************************************************************************************************************
+
 //=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class Averaging;
-
-
-class AveragingSettingsWidget : public QWidget
+/**
+* Fiff evoked data
+*
+* @brief evoked data
+*/
+class FIFFSHARED_EXPORT FiffEvokedData : public QSharedData
 {
-    Q_OBJECT
+public:
+    typedef QSharedPointer<FiffEvokedData> SPtr;            /**< Shared pointer type for FiffEvokedData. */
+    typedef QSharedPointer<const FiffEvokedData> ConstSPtr; /**< Const shared pointer type for FiffEvokedData. */
+    typedef QSharedDataPointer<FiffEvokedData> SDPtr;       /**< Shared data pointer type for FiffEvokedDataSet. */
 
-    friend class Averaging;
+    //=========================================================================================================
+    /**
+    * Constructs fiff evoked data.
+    */
+    FiffEvokedData();
+
+    //=========================================================================================================
+    /**
+    * Copy constructor.
+    *
+    * @param[in] p_FiffEvokedData  Fiff evoked data which should be copied
+    */
+    FiffEvokedData(const FiffEvokedData &p_FiffEvokedData);
+
+    //=========================================================================================================
+    /**
+    * Destroys the MNEEvokedData.
+    */
+    ~FiffEvokedData();
 
 public:
-    typedef QSharedPointer<AveragingSettingsWidget> SPtr;         /**< Shared pointer type for AveragingAdjustmentWidget. */
-    typedef QSharedPointer<AveragingSettingsWidget> ConstSPtr;    /**< Const shared pointer type for AveragingAdjustmentWidget. */
-
-    explicit AveragingSettingsWidget(Averaging *toolbox, QWidget *parent = 0);
-
-    int getStimChannelIdx();
-
-signals:
-
-public slots:
-
-private:
-    void changePreStim(qint32 mSeconds);
-    void changePostStim(qint32 mSeconds);
-    void changeBaselineFrom(qint32 mSeconds);
-    void changeBaselineTo(qint32 mSeconds);
-
-    Ui::AverageSettingsWidgetClass ui;		/**< Holds the user interface for the AverageSettingsWidgetClass.*/
-
-    Averaging* m_pAveragingToolbox;
+    fiff_int_t  aspect_kind;    /**< Aspect identifier */
+    fiff_int_t  is_smsh;        /**< ToDo... */
+    fiff_int_t  nave;           /**< Number of averaged epochs. */
+    fiff_int_t  first;          /**< First time sample. */
+    fiff_int_t  last;           /**< Last time sample. */
+    QString     comment;        /**< Comment on dataset. Can be the condition. */
+    MatrixXd    times;          /**< Array of time instants in seconds. */
+    MatrixXd    epochs;         /**< 2D array of shape [nChannels x nTimes]; Evoked response. */
 };
 
 } // NAMESPACE
 
-#endif // AVERAGINGSETTINGSWIDGET_H
+#endif // FIFF_EVOKED_DATA_H

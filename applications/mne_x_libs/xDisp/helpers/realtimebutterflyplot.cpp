@@ -78,14 +78,39 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
 
     if(m_bIsInit)
     {
+        //Draw baseline correction area
+        if(m_pRealTimeEvokedModel->getBaselineInfo().first.toString() != "None" &&
+                m_pRealTimeEvokedModel->getBaselineInfo().second.toString() != "None") {
+            float from = m_pRealTimeEvokedModel->getBaselineInfo().first.toFloat();
+            float to = m_pRealTimeEvokedModel->getBaselineInfo().second.toFloat();
+
+            painter.save();
+            painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
+            painter.setBrush(Qt::red);
+            painter.setOpacity(0.1);
+
+            float fDx = (float)(this->width()) / ((float)m_pRealTimeEvokedModel->getNumSamples());
+
+            float fromSamp = ((from)*m_pRealTimeEvokedModel->getSamplingFrequency())+m_pRealTimeEvokedModel->getNumPreStimSamples();
+            float posX = fDx*(fromSamp);
+            float toSamp = ((to)*m_pRealTimeEvokedModel->getSamplingFrequency())+m_pRealTimeEvokedModel->getNumPreStimSamples();
+            float width = fDx*(toSamp-fromSamp);
+
+            QRect rect(posX,0,width,this->height());
+
+            painter.drawRect(rect);
+
+            painter.restore();
+        }
+
         //Stimulus bar
         if(m_pRealTimeEvokedModel->getNumSamples() > 0) {
             painter.save();
             painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
 
-            float fDx = (float)(this->width()-2) / ((float)m_pRealTimeEvokedModel->getNumSamples()-1.0f);
+            float fDx = (float)(this->width()) / ((float)m_pRealTimeEvokedModel->getNumSamples());
             float posX = fDx * ((float)m_pRealTimeEvokedModel->getNumPreStimSamples());
-            painter.drawLine(posX, 1, posX, this->height()-2);
+            painter.drawLine(posX, 1, posX, this->height());
 
             painter.drawText(QPointF(posX+5,this->rect().bottomRight().y()-5), QString("0ms / Stimulus"));
 
@@ -102,7 +127,7 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
 
             float yStart = this->rect().topLeft().y();
             float yEnd = this->rect().bottomRight().y();
-            float fDx = (float)(this->width()-2) / ((float)m_pRealTimeEvokedModel->getNumSamples()-1.0f);
+            float fDx = (float)(this->width()) / ((float)m_pRealTimeEvokedModel->getNumSamples());
 
             float sampleCounter = m_pRealTimeEvokedModel->getNumPreStimSamples();
             int counter = 1;
@@ -295,7 +320,7 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
 
         float newY = y_base+fValue;
 
-        qSamplePosition.setY(newY);
+        qSamplePosition.setY(-newY);
         qSamplePosition.setX(path.currentPosition().x());
 
         path.moveTo(qSamplePosition);
@@ -314,7 +339,7 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
 
             float newY = y_base+fValue;
 
-            qSamplePosition.setY(newY);
+            qSamplePosition.setY(-newY);
 //        }
 //        else
 //            qSamplePosition.setY(y_base);
@@ -390,5 +415,13 @@ void RealTimeButterflyPlot::setSelectedChannels(const QList<int> &selectedChanne
 {
     m_lSelectedChannels = selectedChannels;
 
+    update();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeButterflyPlot::updateView()
+{
     update();
 }

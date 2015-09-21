@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     averagingsettingswidget.h
+* @file     fiff_evoked_data.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2015
+* @date     July, 2012
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Christoph Dinh, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,89 +29,63 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the AveragingSettingsWidget class.
+* @brief    OLD Implementation of the FIFFEvokedData Class.
 *
 */
-
-#ifndef AVERAGINGSETTINGSWIDGET_H
-#define AVERAGINGSETTINGSWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../averaging.h"
+#include "fiff_evoked_data.h"
 
-#include "../ui_averagingsettingswidget.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QWidget>
-#include <QSpinBox>
-#include <QPair>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QGridLayout>
-#include <QSpinBox>
-#include <QLabel>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE AveragingPlugin
-//=============================================================================================================
-
-namespace AveragingPlugin
-{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace FIFFLIB;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-class Averaging;
-
-
-class AveragingSettingsWidget : public QWidget
+FiffEvokedData::FiffEvokedData()
+: aspect_kind(-1)
+, is_smsh(-1)
+, nave(-1)
+, first(-1)
+, last(-1)
+, comment("")
 {
-    Q_OBJECT
 
-    friend class Averaging;
+}
 
-public:
-    typedef QSharedPointer<AveragingSettingsWidget> SPtr;         /**< Shared pointer type for AveragingAdjustmentWidget. */
-    typedef QSharedPointer<AveragingSettingsWidget> ConstSPtr;    /**< Const shared pointer type for AveragingAdjustmentWidget. */
 
-    explicit AveragingSettingsWidget(Averaging *toolbox, QWidget *parent = 0);
+//*************************************************************************************************************
 
-    int getStimChannelIdx();
+FiffEvokedData::FiffEvokedData(const FiffEvokedData& p_FiffEvokedData)
+: QSharedData(p_FiffEvokedData)
+, aspect_kind(p_FiffEvokedData.aspect_kind)
+, is_smsh(p_FiffEvokedData.is_smsh)
+, nave(p_FiffEvokedData.nave)
+, first(p_FiffEvokedData.first)
+, last(p_FiffEvokedData.last)
+, comment(p_FiffEvokedData.comment)
+, times(p_FiffEvokedData.times)
+, epochs(p_FiffEvokedData.epochs)
+{
 
-signals:
+}
 
-public slots:
 
-private:
-    void changePreStim(qint32 mSeconds);
-    void changePostStim(qint32 mSeconds);
-    void changeBaselineFrom(qint32 mSeconds);
-    void changeBaselineTo(qint32 mSeconds);
+//*************************************************************************************************************
 
-    Ui::AverageSettingsWidgetClass ui;		/**< Holds the user interface for the AverageSettingsWidgetClass.*/
+FiffEvokedData::~FiffEvokedData()
+{
 
-    Averaging* m_pAveragingToolbox;
-};
-
-} // NAMESPACE
-
-#endif // AVERAGINGSETTINGSWIDGET_H
+}

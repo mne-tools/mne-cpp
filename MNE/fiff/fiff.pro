@@ -96,7 +96,6 @@ SOURCES += fiff.cpp \
     fiff_raw_dir.cpp \
     fiff_dig_point.cpp \
     fiff_ch_pos.cpp \
-    fiff_evoked_data.cpp \
     fiff_cov.cpp \
     fiff_stream.cpp \
     fiff_dir_entry.cpp \
@@ -123,9 +122,6 @@ HEADERS += fiff.h \
     fiff_raw_dir.h \
     fiff_dig_point.h \
     fiff_ch_pos.h \
-    fiff_evoked_data.h \
-    fiff_evoked_data.h \
-    fiff_evoked_data.h \
     fiff_cov.h \
     fiff_stream.h \
     fiff_info_base.h \
