@@ -305,11 +305,9 @@ private:
 
     QMap<int,QList<int> >   m_qMapDetectedTrigger;              /**< Detected trigger for each trigger channel. */
 
-    MatrixXd                m_matStimData;                      /**< The matrix data correspdoning to the latest detected stim event. */
     MatrixXd                m_matDataPre;                       /**< The matrix holding the pre stim data. */
     MatrixXd                m_matDataPost;                      /**< The matrix holding the post stim data. */
 
-    QList<MatrixXd>         m_matBufferBack;                    /**< the back/post stim data buffer for each trigger channel. This buffer and its including matrices should always sum up to m_iPostStimSamples columns */
     QList<MatrixXd>         m_qListStimAve;                     /**< the current stimulus average buffer. Holds m_iNumAverages vectors */
 };
 
