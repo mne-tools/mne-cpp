@@ -113,7 +113,7 @@ void RtAve::append(const MatrixXd &p_DataSegment)
     m_qMutex.lock();
     // ToDo handle change buffersize
     if(!m_pRawMatrixBuffer)
-        m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(128, p_DataSegment.rows(), p_DataSegment.cols()));
+        m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(32, p_DataSegment.rows(), p_DataSegment.cols()));
 
     m_pRawMatrixBuffer->push(&p_DataSegment);
 
@@ -267,8 +267,10 @@ void RtAve::run()
     while(m_bIsRunning) {
         bool doProcessing = false;
 
+        m_qMutex.lock();
         if(m_pRawMatrixBuffer)
             doProcessing = true;
+        m_qMutex.unlock();
 
         if(doProcessing) {
             if(m_iNewPreStimSamples != m_iPreStimSamples
