@@ -88,17 +88,6 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     painter->setRenderHint(QPainter::Antialiasing, true);
 
-    // Plot channel name
-    QStaticText staticElectrodeName = QStaticText(m_sChannelName);
-    QSizeF sizeText = staticElectrodeName.size();
-    painter->save();
-    QPen pen;
-    pen.setColor(Qt::yellow);
-    pen.setWidthF(5);
-    painter->setPen(pen);
-    painter->drawStaticText(boundingRect().x(), boundingRect().y(), staticElectrodeName);
-    painter->restore();
-
 //    //Plot bounding rect / drawing region of this item
 //    painter->drawRect(this->boundingRect());
 
@@ -110,6 +99,17 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     //Plot average data
     painter->save();
     paintAveragePath(painter);
+    painter->restore();
+
+    // Plot channel name
+    QStaticText staticElectrodeName = QStaticText(m_sChannelName);
+    QSizeF sizeText = staticElectrodeName.size();
+    painter->save();
+    QPen pen;
+    pen.setColor(Qt::yellow);
+    pen.setWidthF(5);
+    painter->setPen(pen);
+    painter->drawStaticText(boundingRect().x(), boundingRect().y(), staticElectrodeName);
     painter->restore();
 }
 
