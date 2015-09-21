@@ -91,7 +91,7 @@ RtAve::RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStim
 , m_bDoBaselineCorrection(false)
 , m_pairBaselineSec(qMakePair(QVariant(QString::number(p_iBaselineFromSecs)),QVariant(QString::number(p_iBaselineToSecs))))
 , m_pStimEvoked(FiffEvoked::SPtr(new FiffEvoked))
-, m_iCurrentMatBufferSize(0)
+, m_iMatDataPreIdx(0)
 {
     qRegisterMetaType<FiffEvoked::SPtr>("FiffEvoked::SPtr");
 }
@@ -338,7 +338,7 @@ void RtAve::clearDetectedTriggers()
 //*************************************************************************************************************
 
 int RtAve::fillBackBuffer(MatrixXd &data)
-{
+{   
     qDebug()<<"fillBackBuffer";
     int iBackBufferSize = 0;
     int iResidualCols = data.cols();
@@ -363,40 +363,50 @@ int RtAve::fillBackBuffer(MatrixXd &data)
 
 void RtAve::fillFrontBuffer(MatrixXd &data)
 {
-    qDebug()<<"fillFrontBuffer";
-    if(m_iCurrentMatBufferSize == m_iPreStimSamples) {
-        m_iCurrentMatBufferSize = 0;
-        m_matBufferFront.clear();
-    }
-
-    qDebug()<<"m_iPreStimSamples"<<m_iPreStimSamples;
-    qDebug()<<"m_iCurrentMatBufferSize"<<m_iCurrentMatBufferSize;
-    qDebug()<<"m_iCurrentBlockSize"<<m_iCurrentBlockSize;
-    qDebug()<<"data.cols()"<<data.cols();
-
     if(m_iPreStimSamples <= m_iCurrentBlockSize) {
-        m_matBufferFront.append(data.block(0,m_iCurrentBlockSize-m_iPreStimSamples,data.rows(),m_iPreStimSamples));
-        m_iCurrentMatBufferSize = m_iPreStimSamples;
-        qDebug()<<0;
+        m_matDataPre = data.block(0,m_iCurrentBlockSize-m_iPreStimSamples,data.rows(),m_iPreStimSamples);
     } else {
-        if(m_iCurrentMatBufferSize+m_iCurrentBlockSize > m_iPreStimSamples) {
-            int residual = m_iPreStimSamples-m_iCurrentMatBufferSize;
-            qDebug()<<"residual"<<residual;
-            m_matBufferFront.append(data.block(0,m_iCurrentBlockSize-residual,data.rows(),residual));
-            m_iCurrentMatBufferSize += residual;
-            qDebug()<<1;
-        } else {
-            m_matBufferFront.append(data);
-            m_iCurrentMatBufferSize += m_iCurrentBlockSize;
-            qDebug()<<2;
-        }
+        //Shift data
+        m_matDataPre.block(0,0,data.rows(),m_iPreStimSamples-data.cols()) = m_matDataPre.block(0,data.cols(),data.rows(),m_iPreStimSamples-data.cols());
+
+        //Copy new data in
+        m_matDataPre.block(0,m_iPreStimSamples-data.cols(),data.rows(),data.cols()) = data;
     }
 
-    // DEBUG - Check total data length of front buffer
-    int size = 0;
-    for(int i = 0; i<m_matBufferFront.size(); i++)
-        size += m_matBufferFront.at(i).cols();
-    qDebug()<<"m_matBufferFront size: "<<size;
+//    qDebug()<<"fillFrontBuffer";
+//    if(m_iMatDataPreIdx == m_iPreStimSamples) {
+//        m_iMatDataPreIdx = 0;
+//        m_matBufferFront.clear();
+//    }
+
+//    qDebug()<<"m_iPreStimSamples"<<m_iPreStimSamples;
+//    qDebug()<<"m_iMatDataPreIdx"<<m_iMatDataPreIdx;
+//    qDebug()<<"m_iCurrentBlockSize"<<m_iCurrentBlockSize;
+//    qDebug()<<"data.cols()"<<data.cols();
+
+//    if(m_iPreStimSamples <= m_iCurrentBlockSize) {
+//        m_matBufferFront.append(data.block(0,m_iCurrentBlockSize-m_iPreStimSamples,data.rows(),m_iPreStimSamples));
+//        m_iMatDataPreIdx = m_iPreStimSamples;
+//        qDebug()<<0;
+//    } else {
+//        if(m_iMatDataPreIdx+m_iCurrentBlockSize > m_iPreStimSamples) {
+//            int residual = m_iPreStimSamples-m_iMatDataPreIdx;
+//            qDebug()<<"residual"<<residual;
+//            m_matBufferFront.append(data.block(0,m_iCurrentBlockSize-residual,data.rows(),residual));
+//            m_iMatDataPreIdx += residual;
+//            qDebug()<<1;
+//        } else {
+//            m_matBufferFront.append(data);
+//            m_iMatDataPreIdx += m_iCurrentBlockSize;
+//            qDebug()<<2;
+//        }
+//    }
+
+//    // DEBUG - Check total data length of front buffer
+//    int size = 0;
+//    for(int i = 0; i<m_matBufferFront.size(); i++)
+//        size += m_matBufferFront.at(i).cols();
+//    qDebug()<<"m_matBufferFront size: "<<size;
 }
 
 
@@ -409,8 +419,10 @@ void RtAve::mergeData()
     MatrixXd cutData(rows, m_iPreStimSamples+m_iPostStimSamples);
     MatrixXd mergedData(rows, m_iPreStimSamples+m_iPostStimSamples+m_matStimData.cols());
 
-    for(int i = 0; i < m_matBufferFront.size(); i++)
-        mergedData.block(0,i*m_iCurrentBlockSize,rows,m_matBufferFront.at(i).cols()) =  m_matBufferFront.at(i);
+//    for(int i = 0; i < m_matBufferFront.size(); i++)
+//        mergedData.block(0,i*m_iCurrentBlockSize,rows,m_matBufferFront.at(i).cols()) =  m_matBufferFront.at(i);
+
+    mergedData.block(0,0,rows,m_matDataPre.cols()) =  m_matDataPre;
 
     mergedData.block(0,m_iPreStimSamples,rows,m_matStimData.cols()) =  m_matStimData;
 
@@ -473,6 +485,12 @@ void RtAve::reset()
     m_iAverageMode = m_iNewAverageMode;
     m_iNumAverages = m_iNewNumAverages;
 
+    //Resize data matrices
+    m_matDataPre.resize(m_pFiffInfo->chs.size(), m_iPreStimSamples);
+    m_matDataPre.setZero();
+    m_matDataPost.resize(m_pFiffInfo->chs.size(), m_iPostStimSamples);
+    m_matDataPost.setZero();
+
     //Full real-time evoked response
     m_pStimEvoked->baseline = m_pairBaselineSec;
     m_pStimEvoked->times.resize(m_iPreStimSamples+m_iPostStimSamples);
@@ -514,6 +532,12 @@ void RtAve::init()
     m_iNewPreStimSamples = m_iPreStimSamples;
     m_iNewPostStimSamples = m_iPostStimSamples;
     m_iNewNumAverages = m_iNumAverages;
+
+    //Resize data matrices
+    m_matDataPre.resize(m_pFiffInfo->chs.size(), m_iPreStimSamples);
+    m_matDataPre.setZero();
+    m_matDataPost.resize(m_pFiffInfo->chs.size(), m_iPostStimSamples);
+    m_matDataPost.setZero();
 
     m_qMutex.unlock();
 }
