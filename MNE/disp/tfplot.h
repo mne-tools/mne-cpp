@@ -85,12 +85,12 @@ enum ColorMaps
     RedBlue
 };
 
-class DISPSHARED_EXPORT TFplot : public ColorMap, QWidget
+class DISPSHARED_EXPORT TFplot : public QWidget
 {
 
 public:
-    TFplot();
-    QWidget *plotTf(MatrixXd signal_vector, int sample_rate, ColorMaps cmap, QWidget *plot_widget);
+    TFplot(MatrixXd signal_vector, int sample_rate, ColorMaps cmap);
+    void plotTf(MatrixXd signal_vector, int sample_rate, ColorMaps cmap);
 };
 
 }
