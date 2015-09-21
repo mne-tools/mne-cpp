@@ -89,7 +89,8 @@ HEADERS += \
 
 FORMS += \
     FormFiles/averagingsetup.ui \
-    FormFiles/averagingabout.ui
+    FormFiles/averagingabout.ui \
+    FormFiles/averagingsettingswidget.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
