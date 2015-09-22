@@ -287,6 +287,7 @@ private:
     qint32  m_iTriggerPos;              /**< Last found trigger postion */
     qint32  m_iNewAverageMode;          /**< The new averaging mode 0-running 1-cumulative. */
     qint32  m_iAverageMode;             /**< The averaging mode 0-running 1-cumulative. */
+    qint32  m_iNumberCalcAverages;      /**< The number of currently calculated averages. */
 
     float   m_fTriggerThreshold;        /**< Threshold to detect trigger */
 
