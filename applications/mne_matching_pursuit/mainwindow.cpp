@@ -3266,30 +3266,18 @@ void MainWindow::on_rb_OwnDictionary_clicked()
 
 void MainWindow::on_actionTest_triggered()
 {
-    plot_window = new tfplotwidget();
+    //plot_window = new tfplotwidget();
 
-
+    /*
     if(ui->tabWidget->count() >= 2)
         ui->tabWidget->addTab(plot_window, "TF Channel ??");
     else
         ui->tabWidget->addTab(plot_window, "TF-Overview");
+        */
 
-    if(ui->tabWidget->count() == 2)
-    {
-        QPushButton *extendedButton = new QPushButton();
-        extendedButton->setMaximumSize(20, 20);
-        extendedButton->setStyleSheet("QPushButton {margin-right: 2px;  border-width: 1px; border-radius: 1px; border-color: grey;} QPushButton:pressed {background-color: grey; border-radius: 10px;}");
-        extendedButton->setIcon(QIcon(":/images/icons/expand_512.png"));
-        extendedButton->setIconSize(QSize(16, 16));
-
-        ui->tabWidget->tabBar()->setTabButton(1, QTabBar::LeftSide, extendedButton);
-        connect(extendedButton, SIGNAL (released()), this, SLOT (on_extend_tab_button()));
+    if(ui->tabWidget->count() == 1)
+    {       
         qreal max_frequency = 0;
-        QGridLayout* layout = new QGridLayout();
-        layout->setMargin(0);
-        layout->setSpacing(4);
-        ui->tabWidget->setLayout(layout);
-
         MatrixXd tf_sum = MatrixXd::Zero(floor(_adaptive_atom_list.first().first().sample_count/2), _adaptive_atom_list.first().first().sample_count);
         for(qint32 i = 0; i < _adaptive_atom_list.first().length(); i++)//foreach channel
         {
@@ -3316,202 +3304,17 @@ void MainWindow::on_actionTest_triggered()
         tf_sum /= norm;
 
 
-        TFplot tfplot;
-        tfplot.plotTf(tf_sum, _sample_rate, ColorMaps::Bone, 0);
-        /*
-        if(_adaptive_atom_list.count() > 0 && _adaptive_atom_list.first().count() > 0)
-        {
-            //prepare data to paint tf plot
-            //QList<MatrixXd> tf_atoms();
-            MatrixXd tf_sum = MatrixXd::Zero(floor(_adaptive_atom_list.first().first().sample_count/2), _adaptive_atom_list.first().first().sample_count);
-            for(qint32 i = 0; i < _adaptive_atom_list.first().length(); i++)//foreach channel
-            {
-                for(qint32 j = 0; j < _adaptive_atom_list.length(); j++) //foreach atom
-                {
-                    GaborAtom atom  = _adaptive_atom_list.at(j).at(i);
-                    MatrixXd tf_matrix = atom.make_tf(atom.sample_count, atom.scale, atom.translation, atom.modulation);
-                    //tf_atoms.append(*tf_matrix);
-                    tf_matrix *= atom.max_scalar_list.at(i)*atom.max_scalar_list.at(i);
-                    tf_sum += tf_matrix;
+        TFplot *tfplot = new TFplot(tf_sum, _sample_rate, ColorMaps::Jet);
+        ui->tabWidget->addTab(tfplot, "TF-Overview");
 
-                    if(atom.modulation * _sample_rate / atom.sample_count > max_frequency)
-                        max_frequency = atom.modulation * _sample_rate / atom.sample_count;
+        QPushButton *extendedButton = new QPushButton();
+        extendedButton->setMaximumSize(20, 20);
+        extendedButton->setStyleSheet("QPushButton {margin-right: 2px;  border-width: 1px; border-radius: 1px; border-color: grey;} QPushButton:pressed {background-color: grey; border-radius: 10px;}");
+        extendedButton->setIcon(QIcon(":/images/icons/expand_512.png"));
+        extendedButton->setIconSize(QSize(16, 16));
 
-                    std::cout << "\nmax frequency:  " << max_frequency;
-
-                }
-
-            //qreal u = floor(atom.sample_count / 2);
-            //for(int t = 0; t < atom.sample_count; t++)
-            //    for(int f = 0; f < u - 1; f++)
-            //    {
-            //        qreal v = -2 * PI * pow((t - u) / atom.scale, 2) + pow(atom.scale * ((f * PI / atom.sample_count * 2) - (atom.phase * PI / atom.sample_count * 2)) / 2 / PI, 2);
-            //        tf_matrix(f, t) = 0.5 * 2 * qExp(v);
-            //    }
-
-
-            }
-
-            //normalisation of the tf-matrix
-            qreal norm = tf_sum.maxCoeff();
-            qreal mnorm = tf_sum.minCoeff();
-            if(abs(mnorm) > norm) norm = mnorm;
-            tf_sum /= norm;
-
-            //setup image
-            QImage *image_to_tf_plot = new QImage(tf_sum.cols(), tf_sum.rows(), QImage::Format_RGB32);
-
-            //setup pixelcolors in image
-            QColor color;
-            for ( qint32 y = 0; y < tf_sum.rows(); y++ )
-                for ( qint32 x = 0; x < tf_sum.cols(); x++ )
-                {
-                    color.setRgb(ColorMap::hotR(abs(tf_sum(y, x))),
-                                 ColorMap::hotG(abs(tf_sum(y, x))),
-                                 ColorMap::hotB(abs(tf_sum(y, x))));
-                    image_to_tf_plot->setPixel(x, tf_sum.rows() - 1 -  y,  color.rgb());
-                }
-
-            //image to pixmap
-            QGraphicsPixmapItem *tf_pixmap = new QGraphicsPixmapItem(QPixmap::fromImage(*image_to_tf_plot));
-
-            plot_window->tf_scene.addItem(tf_pixmap);
-
-            //setup x-axis
-            QGraphicsTextItem *x_axis_name = new QGraphicsTextItem("time [sec]", tf_pixmap);
-            x_axis_name->setFont(QFont("arial", 3));
-
-            QList<QGraphicsItem *> x_axis_values;
-            QList<QGraphicsItem *> x_axis_lines;
-
-            qreal scaleXText = (_adaptive_atom_list.first().first().sample_count - 1) /  _sample_rate / 20.0;                       // divide signallength
-
-            for(qint32 j = 0; j < 21; j++)
-            {
-                QGraphicsTextItem *text_item = new QGraphicsTextItem(QString::number(j * scaleXText + _from
-                                                                                     / _sample_rate
-                                                                                     + _offset_time,
-                                                                                     'f', 2), tf_pixmap);
-                text_item->setFont(QFont("arial", 3));
-                x_axis_values.append(text_item);    // scalevalue as string
-                QGraphicsLineItem *x_line_item = new QGraphicsLineItem(tf_pixmap);
-                x_line_item->setLine(0,-1,0,1);
-                x_line_item->setPen(QPen(Qt::darkGray, 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
-                x_axis_lines.append(x_line_item);                    // scalelines
-            }
-
-            x_axis_name->setPos(tf_pixmap->boundingRect().width()/2 - x_axis_name->boundingRect().width()/2,
-                                tf_pixmap->boundingRect().height() + 0.5*x_axis_values.at(0)->boundingRect().height());
-
-            qreal scale_x = qreal(tf_pixmap->boundingRect().width()) / qreal(x_axis_values.length()-1);
-
-            //dbgout
-            std::cout << "\nimage width=    " << image_to_tf_plot->width() << "\n";
-            std::cout << "\npixmap width=    " << tf_pixmap->boundingRect().width() << "\n";
-            std::cout << "\nscale x=    " << scale_x << "\n";
-
-            for(qint32 i = 0; i < x_axis_values.length(); i++)
-            {
-               x_axis_values.at(i)->setPos(qreal(i)*scale_x - x_axis_values.at(0)->boundingRect().width()/2,
-                                           tf_pixmap->boundingRect().height());
-               x_axis_lines.at(i)->setPos(qreal(i)*scale_x,
-                                          tf_pixmap->boundingRect().height());
-
-            }//end x axis
-
-            //y-axis
-            QGraphicsTextItem *y_axis_name = new QGraphicsTextItem("frequency [Hz]", tf_pixmap);
-            y_axis_name->setFont(QFont("arial", 3));
-
-            QList<QGraphicsItem *> y_axis_values;
-            QList<QGraphicsItem *> y_axis_lines;
-
-            qreal scale_y_text = 0.5*_sample_rate / 10.0;                       // divide signallength
-
-            for(qint32 j = 0; j < 11; j++)
-            {
-                QGraphicsTextItem *text_item = new QGraphicsTextItem(QString::number(j*scale_y_text,//pow(10, j)/pow(10, 11) (j+1)/log(12) * max_frequency,//scale_y_text,
-                                                                                     'f', 0), tf_pixmap);
-                text_item->setFont(QFont("arial", 3));
-                y_axis_values.append(text_item);    // scalevalue as string
-                QGraphicsLineItem *y_line_item = new QGraphicsLineItem(tf_pixmap);
-                y_line_item->setLine(-1,0,1,0);
-                y_line_item->setPen(QPen(Qt::darkGray, 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
-                y_axis_lines.append(y_line_item);                    // scalelines
-            }
-
-            y_axis_name->setPos(- x_axis_values.at(0)->boundingRect().width() - y_axis_name->boundingRect().height(),
-                                tf_pixmap->boundingRect().height()/2 + y_axis_name->boundingRect().height()/2);
-            y_axis_name->setRotation(-90);
-
-            //y_axis_item->setPos(plot_window->tf_scene.width()/2 - test_image->width()/2 - y_axis_item->boundingRect().width()/2 - 10,
-              //                  plot_window->tf_scene.height()/2 - y_axis_item->boundingRect().height()/2);
-
-
-            qreal scale_y = qreal(tf_pixmap->boundingRect().height()) / qreal(y_axis_values.length()-1);
-
-            //dbgout
-            std::cout << "\nimage heigth=    " << image_to_tf_plot->height() << "\n";
-            std::cout << "\npixmap heigth=    " << tf_pixmap->boundingRect().height() << "\n";
-            std::cout << "\nscale=    " << scale_y << "\n";
-
-            for(qint32 i = 0; i < y_axis_values.length(); i++)
-            {
-               y_axis_values.at(i)->setPos( -y_axis_values.last()->boundingRect().width()
-                                            -0.5*y_axis_lines.last()->boundingRect().width()
-                                            -1
-                                           ,tf_pixmap->boundingRect().height()
-                                            - y_axis_values.last()->boundingRect().height()/2
-                                            - qreal(i)*scale_y);
-               y_axis_lines.at(i)->setPos(0, qreal(i)*scale_y);
-            }
-            //end y axis
-
-            // coefficient colors just for fun whatever
-            QImage *coeffs_image = new QImage(10, tf_sum.rows(), QImage::Format_RGB32);
-            norm = tf_sum.maxCoeff();
-            for(qint32 it = 0; it < tf_sum.rows(); it++)
-            {
-                for ( qint32 x = 0; x < 10; x++ )
-                {
-                    color.setRgb(ColorMap::hotR(it*norm/tf_sum.rows()), ColorMap::hotG(it*norm/tf_sum.rows()), ColorMap::hotB(it*norm/tf_sum.rows()));
-                    coeffs_image->setPixel(x, tf_sum.rows() - 1 -  it,  color.rgb());
-                }
-
-            }
-            QGraphicsPixmapItem * coeffs_item = plot_window->tf_scene.addPixmap(QPixmap::fromImage(*coeffs_image));//addItem();
-            coeffs_item->setParentItem(tf_pixmap);
-            coeffs_item->setPos(tf_pixmap->boundingRect().width() +5, 0);
-
-            QGraphicsSimpleTextItem *axis_name_item = new QGraphicsSimpleTextItem("coefficients", coeffs_item);
-            QGraphicsSimpleTextItem *axis_zero_item = new QGraphicsSimpleTextItem("0", coeffs_item);
-            QGraphicsSimpleTextItem *axis_one_item = new QGraphicsSimpleTextItem("1", coeffs_item);
-            axis_name_item->setFont(QFont("arial", 3));
-            axis_zero_item->setFont(QFont("arial", 3));
-            axis_one_item->setFont(QFont("arial", 3));
-
-            axis_name_item->setPos(coeffs_item->boundingRect().width() + 1,
-                                coeffs_item->boundingRect().height()/2 + axis_name_item->boundingRect().height()/2);
-            axis_name_item->setRotation(-90);
-            axis_zero_item->setPos( 1 + coeffs_item->boundingRect().width(),
-                                   coeffs_item->boundingRect().height()- axis_zero_item->boundingRect().height());
-            axis_one_item->setPos( 1 + coeffs_item->boundingRect().width(),
-                                   0);
-            //end coeffs picture
-
-            //set Scene to GraphicsView and show
-            plot_window->ui->tf_view->setScene(&plot_window->tf_scene);
-            //plot_window->tf_scene.setSceneRect(plot_window->tf_scene.itemsBoundingRect());                  // Re-shrink the scene to it's bounding contents
-            plot_window->tf_scene.setBackgroundBrush(Qt::lightGray);
-            plot_window->ui->tf_view->scale(plot_window->size().height() / plot_window->tf_scene.sceneRect().height()
-                                            ,plot_window->size().height() / plot_window->tf_scene.sceneRect().height());//scale graphic scene
-            //in the line above you see the problem of scaleing the whole scene after adding all items
-            //depending on the signals size the text on the axis is not nice to read or even written over each other
-            //otherwise it could happen tohave too small letters to read then.
-            //SO SOLVE THIS AS WELL MAN!
-            plot_window->ui->tf_view->show();
-        }
-            */
+        ui->tabWidget->tabBar()->setTabButton(1, QTabBar::LeftSide, extendedButton);
+        connect(extendedButton, SIGNAL (released()), this, SLOT (on_extend_tab_button()));
     }
     if(ui->tabWidget->count() > 2)
     {
