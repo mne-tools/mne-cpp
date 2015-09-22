@@ -92,8 +92,11 @@ RtAve::RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStim
 , m_pairBaselineSec(qMakePair(QVariant(QString::number(p_iBaselineFromSecs)),QVariant(QString::number(p_iBaselineToSecs))))
 , m_pStimEvoked(FiffEvoked::SPtr(new FiffEvoked))
 , m_iMatDataPostIdx(0)
+, m_iNumberCalcAverages(0)
 {
     qRegisterMetaType<FiffEvoked::SPtr>("FiffEvoked::SPtr");
+
+    init();
 }
 
 
@@ -259,8 +262,7 @@ bool RtAve::stop()
 
 void RtAve::run()
 {
-    //Init
-    init();
+    //Do initial reset
     reset();
 
     //Enter the main loop
@@ -299,6 +301,8 @@ void RtAve::run()
                         emit evokedStim(m_pStimEvoked);
 
                     m_bFillingBackBuffer = false;
+
+                    qDebug()<<"Number of calculated averages:"<<m_iNumberCalcAverages;
                 } else
                     fillBackBuffer(rawSegment);
             } else {
@@ -420,16 +424,19 @@ void RtAve::generateEvoked()
 
         m_pStimEvoked->data = finalAverage;
         m_pStimEvoked->nave = m_iNumAverages;
-    } else if(m_iAverageMode == 1){
+
+        if(m_iNumberCalcAverages<m_iNumAverages)
+            m_iNumberCalcAverages++;
+    } else if(m_iAverageMode == 1) {
         MatrixXd tempMatrix = m_qListStimAve.last();
 
         if(m_bDoBaselineCorrection)
             tempMatrix = MNEMath::rescale(tempMatrix, m_pStimEvoked->times, m_pairBaselineSec, QString("mean"));
 
         *m_pStimEvoked.data() += tempMatrix;
-    }
 
-    qDebug()<<"nave "<<m_qListStimAve.size();
+        m_iNumberCalcAverages++;
+    }
 }
 
 
@@ -447,6 +454,8 @@ void RtAve::reset()
     m_iTriggerIndex = m_iNewTriggerIndex;
     m_iAverageMode = m_iNewAverageMode;
     m_iNumAverages = m_iNewNumAverages;
+
+    m_iNumberCalcAverages = 0;
 
     //Resize data matrices
     m_matDataPre.resize(m_pFiffInfo->chs.size(), m_iPreStimSamples);
