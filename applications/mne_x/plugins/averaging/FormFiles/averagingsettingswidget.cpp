@@ -144,13 +144,14 @@ void AveragingSettingsWidget::changePostStim(qint32 mSeconds)
     m_pAveragingToolbox->changePostStim(mSeconds);
 }
 
+
 //*************************************************************************************************************
 
 void AveragingSettingsWidget::changeBaselineFrom(qint32 mSeconds)
 {
     ui.m_pSpinBoxBaselineTo->setMinimum(mSeconds);
 
-    m_pAveragingToolbox->changeBaselineFrom(mSeconds/*+m_pSpinBoxPreStimSamples->value()*/);
+    m_pAveragingToolbox->changeBaselineFrom(mSeconds);
 }
 
 
@@ -160,6 +161,6 @@ void AveragingSettingsWidget::changeBaselineTo(qint32 mSeconds)
 {
     ui.m_pSpinBoxBaselineFrom->setMaximum(mSeconds);
 
-    m_pAveragingToolbox->changeBaselineTo(mSeconds/*+m_pSpinBoxPreStimSamples->value()*/);
+    m_pAveragingToolbox->changeBaselineTo(mSeconds);
 }
 
