@@ -3317,8 +3317,7 @@ void MainWindow::on_actionTest_triggered()
 
 
         TFplot tfplot;
-        tfplot.plotTf(tf_sum, _sample_rate, ColorMaps::Bone, NULL);
-
+        tfplot.plotTf(tf_sum, _sample_rate, ColorMaps::Bone, 0);
         /*
         if(_adaptive_atom_list.count() > 0 && _adaptive_atom_list.first().count() > 0)
         {
