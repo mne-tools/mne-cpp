@@ -394,7 +394,7 @@ void RtAve::mergeData()
 
     //Add cut data to average buffer
     m_qListStimAve.append(mergedData);
-    if(m_qListStimAve.size()>m_iNumAverages && m_iAverageMode == 0)
+    if(m_qListStimAve.size()>m_iNumAverages)
         m_qListStimAve.pop_front();
 }
 
