@@ -126,6 +126,8 @@ void TMSI::init()
     m_iNumberOfChannels = 138;
     m_iSamplesPerBlock = 16;
     m_iTriggerInterval = 5000;
+    m_iSplitFileSizeMs = 10;
+    m_iSplitCount = 0;
 
     m_bUseChExponent = true;
     m_bUseUnitGain = true;
@@ -139,6 +141,7 @@ void TMSI::init()
     m_bUseCommonAverage = true;
     m_bUseKeyboardTrigger = false;
     m_bCheckImpedances = false;
+    m_bSplitFile = false;
 
     m_iTriggerType = 0;
 
@@ -605,8 +608,43 @@ void TMSI::setKeyboardTriggerType(int type)
 
 //*************************************************************************************************************
 
+void TMSI::splitRecordingFile()
+{
+    qDebug() << "Split recording file";
+    ++m_iSplitCount;
+    QString nextFileName = m_sOutputFilePath.remove("_raw.fif");
+    nextFileName += QString("-%1_raw.fif").arg(m_iSplitCount);
+
+    /*
+    * Write the link to the next file
+    */
+    qint32 data;
+    m_pOutfid->start_block(FIFFB_REF);
+    data = FIFFV_ROLE_NEXT_FILE;
+    m_pOutfid->write_int(FIFF_REF_ROLE,&data);
+    m_pOutfid->write_string(FIFF_REF_FILE_NAME, nextFileName);
+    m_pOutfid->write_id(FIFF_REF_FILE_ID);//ToDo meas_id
+    data = m_iSplitCount - 1;
+    m_pOutfid->write_int(FIFF_REF_FILE_NUM, &data);
+    m_pOutfid->end_block(FIFFB_REF);
+
+    //finish file
+    m_pOutfid->finish_writing_raw();
+
+    //start next file
+    m_fileOut.setFileName(nextFileName);
+    m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
+    fiff_int_t first = 0;
+    m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
+}
+
+
+//*************************************************************************************************************
+
 void TMSI::run()
 {
+    qint32 size = 0;
+
     while(m_bIsRunning)
     {
         //std::cout<<"TMSI::run(s)"<<std::endl;
@@ -639,8 +677,18 @@ void TMSI::run()
                 matValue(136, m_iSamplesPerBlock-1) = m_iTriggerType;
 
             //Write raw data to fif file
-            if(m_bWriteToFile)
+            if(m_bWriteToFile) {
                 m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
+                size += matValue.cols();
+
+//                qDebug()<<"size"<<size;
+//                qDebug()<<"(m_iSplitFileSizeMs/1000)*m_pFiffInfo->sfreq"<<(double(m_iSplitFileSizeMs)/1000.0)*m_pFiffInfo->sfreq;
+                if(size > (double(m_iSplitFileSizeMs)/1000.0)*m_pFiffInfo->sfreq && m_bSplitFile) {
+                    size = 0;
+                    splitRecordingFile();
+                }
+            } else
+                size = 0;
 
             // TODO: Use preprocessing if wanted by the user
             if(m_bUseFiltering)
@@ -778,6 +826,8 @@ void TMSI::showSetupProjectDialog()
 
 void TMSI::showStartRecording()
 {
+    m_iSplitCount = 0;
+
     //Setup writing to file
     if(m_bWriteToFile)
     {
