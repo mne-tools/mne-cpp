@@ -11,4 +11,6 @@ call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" amd6
 
 qmake ../mne-cpp.pro -r
 
+nmake clean
+
 nmake
