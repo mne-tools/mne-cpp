@@ -187,6 +187,8 @@ public:
 
     void setKeyboardTriggerType(int type);
 
+    void splitRecordingFile();
+
 protected:
     //=========================================================================================================
     /**
@@ -237,6 +239,7 @@ private:
     int                                 m_iSamplingFreq;                    /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
     int                                 m_iNumberOfChannels;                /**< The samples per block defined by the user via the GUI.*/
     int                                 m_iSamplesPerBlock;                 /**< The number of channels defined by the user via the GUI.*/
+    qint32                              m_iSplitCount;                      /**< File split count */
 
     int                                 m_iTriggerInterval;                 /**< The gap between the trigger signals which request the subject to do something (in ms).*/
     QTime                               m_qTimerTrigger;                    /**< Time stemp of the last trigger event (in ms).*/
@@ -253,7 +256,9 @@ private:
     bool                                m_bUseCommonAverage;                /**< Flag for using common average.*/
     bool                                m_bUseKeyboardTrigger;              /**< Flag for using the keyboard as a trigger input.*/
     bool                                m_bCheckImpedances;                 /**< Flag for checking the impedances of the EEG amplifier.*/
+    bool                                m_bSplitFile;                       /**< Flag for splitting the recorded file.*/
 
+    int                                 m_iSplitFileSizeMs;                 /**< Holds the size of the splitted files in ms.*/
     int                                 m_iTriggerType;                     /**< Holds the trigger type | 0 - no trigger activated, 254 - left, 253 - right, 252 - beep.*/
 
     ofstream                            m_outputFileStream;                 /**< fstream for writing the samples values to txt file.*/
