@@ -3276,25 +3276,21 @@ void MainWindow::on_actionTest_triggered()
 
     if(ui->tabWidget->count() == 1)
     {       
-        qreal max_frequency = 0;
-        MatrixXd tf_sum = MatrixXd::Zero(floor(_adaptive_atom_list.first().first().sample_count/2), _adaptive_atom_list.first().first().sample_count);
-        for(qint32 i = 0; i < _adaptive_atom_list.first().length(); i++)//foreach channel
+        MatrixXd tf_sum;// = MatrixXd::Zero(floor(_adaptive_atom_list.first().first().sample_count/2), _adaptive_atom_list.first().first().sample_count);
+        /*for(qint32 i = 0; i < _adaptive_atom_list.first().length(); i++)//foreach channel
         {
             for(qint32 j = 0; j < _adaptive_atom_list.length(); j++) //foreach atom
             {
                 GaborAtom atom  = _adaptive_atom_list.at(j).at(i);
                 MatrixXd tf_matrix = atom.make_tf(atom.sample_count, atom.scale, atom.translation, atom.modulation);
-                //tf_atoms.append(*tf_matrix);
+
                 tf_matrix *= atom.max_scalar_list.at(i)*atom.max_scalar_list.at(i);
                 tf_sum += tf_matrix;
-
-                if(atom.modulation * _sample_rate / atom.sample_count > max_frequency)
-                    max_frequency = atom.modulation * _sample_rate / atom.sample_count;
-
-                std::cout << "\nmax frequency:  " << max_frequency;
-
             }
-        }
+        }*/
+
+        MatrixXd stft_matrix = TFplot::make_STFT(_signal_matrix.col(0));
+        tf_sum = stft_matrix;
 
         //normalisation of the tf-matrix
         qreal norm = tf_sum.maxCoeff();
@@ -3302,8 +3298,7 @@ void MainWindow::on_actionTest_triggered()
         if(abs(mnorm) > norm) norm = mnorm;
         tf_sum /= norm;
 
-
-        TFplot *tfplot = new TFplot(tf_sum, _sample_rate, ColorMaps::Jet);
+        TFplot *tfplot = new TFplot(tf_sum, _sample_rate, 0.9 * ui->tabWidget->width(), ColorMaps::Jet);
         ui->tabWidget->addTab(tfplot, "TF-Overview");
 
         QPushButton *extendedButton = new QPushButton();

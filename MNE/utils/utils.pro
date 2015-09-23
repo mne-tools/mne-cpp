@@ -86,8 +86,7 @@ SOURCES += \
     filterTools/parksmcclellan.cpp \
     filterTools/filterdata.cpp \
     filterTools/filterio.cpp \
-    detecttrigger.cpp \
-    wignertransform.cpp
+    detecttrigger.cpp
 
 HEADERS += \
     kmeans.h\
@@ -106,8 +105,7 @@ HEADERS += \
     filterTools/parksmcclellan.h \
     filterTools/filterdata.h \
     filterTools/filterio.h \
-    detecttrigger.h \
-    wignertransform.h
+    detecttrigger.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
