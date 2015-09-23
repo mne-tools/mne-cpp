@@ -245,3 +245,32 @@ TFplot::TFplot(MatrixXd signal_vector, int sample_rate, ColorMaps cmap = ColorMa
     //SO SOLVE THIS AS WELL MAN!
     //plot_widget->show();
 }
+
+//-----------------------------------------------------------------------------------------------------------------
+
+VectorXd TFplot::gauss_window (qint32 sample_count, qreal scale, quint32 translation)
+{
+    VectorXd gauss = VectorXd::Zero(sample_count);
+
+    for(qint32 n = 0; n < sample_count; n++)
+    {
+        qreal t = (qreal(n) - translation) / scale;
+        gauss[n] = exp(-PI * pow(t, 2))*pow(sqrt(scale),(-1))*pow(qreal(2),(0.25));
+    }
+
+    return gauss;
+}
+
+//-----------------------------------------------------------------------------------------------------------------
+
+MatrixXd make_STFT(MatrixXd signal_vector)
+{
+    for(qint32 translate = 0; translate < signal_vector.cols(); translate++)
+    {
+        VectorXd envelope = gauss_window(signal_vector.cols(), signal_vector.rows()/4, translate);
+        for(qint32 sample = 0; sample < signal_vector.cols(); sample++)
+        {
+            VectorXd windowed_sig = signal_vector.cols();
+        }
+    }
+}
