@@ -112,6 +112,12 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
     //Connect about button
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &TMSISetupWidget::showAboutDialog);
 
+    //Connect split file options
+    connect(ui.m_checkBox_splitFiles, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &TMSISetupWidget::setSplitFile);
+    connect(ui.m_spinBox_splitFileSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &TMSISetupWidget::setSplitFileSize);
+
     //Fill info box
     QFile file(m_pTMSI->m_qStringResourcePath+"readme.txt");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -203,6 +209,23 @@ void TMSISetupWidget::setWriteToFile()
 {
     m_pTMSI->m_bWriteDriverDebugToFile = ui.m_checkBox_WriteDriverDebugToFile->isChecked();
 }
+
+
+//*************************************************************************************************************
+
+void TMSISetupWidget::setSplitFile(bool state)
+{
+    m_pTMSI->m_bSplitFile = state;
+}
+
+
+//*************************************************************************************************************
+
+void TMSISetupWidget::setSplitFileSize(qint32 value)
+{
+    m_pTMSI->m_iSplitFileSizeMs = value;
+}
+
 
 //*************************************************************************************************************
 
