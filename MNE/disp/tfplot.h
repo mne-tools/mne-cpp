@@ -91,6 +91,8 @@ class DISPSHARED_EXPORT TFplot : public QWidget
 public:
     TFplot(MatrixXd signal_vector, int sample_rate, ColorMaps cmap);
     void plotTf(MatrixXd signal_vector, int sample_rate, ColorMaps cmap);
+    VectorXd gauss_window (qint32 sample_count, qreal scale, quint32 translation);
+    MatrixXd make_STFT(MatrixXd signal_vector);
 };
 
 }
