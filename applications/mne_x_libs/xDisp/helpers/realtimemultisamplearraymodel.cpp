@@ -391,8 +391,8 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
         if(m_bTriggerDetectionActive) {
             int iOldDetectedTriggers = m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].size();
 
-            DetectTrigger::detectTriggerFlanksMax(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-data.at(b).cols(), m_dTriggerThreshold, true);
-            //DetectTrigger::detectTriggerFlanksGrad(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-data.at(b).cols());
+            //DetectTrigger::detectTriggerFlanksMax(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-data.at(b).cols(), m_dTriggerThreshold, true);
+            DetectTrigger::detectTriggerFlanksGrad(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-data.at(b).cols(), m_dTriggerThreshold, "Falling");
 
             //Compute newly counted triggers
             int newTriggers = m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].size() - iOldDetectedTriggers;
@@ -419,7 +419,7 @@ fiff_int_t RealTimeMultiSampleArrayModel::getKind(qint32 row) const
     if(row < m_qMapIdxRowSelection.size())
     {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_qListChInfo[chRow].getKind();;
+        return m_qListChInfo[chRow].getKind();
     }
     else
         return 0;

@@ -137,8 +137,24 @@ public:
     * @param[out]   qMapDetectedTrigger  This map holds the indices of the channels which are to be read from data. For each index/channel the found triggers are written to the value of the map.
     * @param[in]    iOffsetIndex  the offset index gets added to the found trigger flank index
     * @param[in]    iThreshold  the gradient threshold value used to find the trigger flank
+    * @param[in]    bRemoveOffset  remove the first sample as offset
+    * @param[in]    type  detect rising or falling flank. Use "Rising" or "Falling" as input
     */
-    static bool detectTriggerFlanksGrad(const MatrixXd &data, QMap<int,QList<int> >& qMapDetectedTrigger, int iOffsetIndex, double dThreshold);
+    static bool detectTriggerFlanksGrad(const MatrixXd &data, QMap<int,QList<int> >& qMapDetectedTrigger, int iOffsetIndex, double dThreshold, bool bRemoveOffset, QString type = "Rising");
+
+    //=========================================================================================================
+    /**
+    * detectTriggerFlanksGrad detects flanks from a given data matrix in row wise order. This function uses a simple gradient to locate the triggers.
+    *
+    * @param[in]    data  the data used to find the trigger flanks
+    * @param[in]    iTriggerChannelIdx  the index of the trigger channel in the matrix.
+    * @param[out]   iDetectedTrigger The detected trigger
+    * @param[in]    iOffsetIndex  the offset index gets added to the found trigger flank index
+    * @param[in]    iThreshold  the gradient threshold value used to find the trigger flank
+    * @param[in]    bRemoveOffset  remove the first sample as offset
+    * @param[in]    type  detect rising or falling flank. Use "Rising" or "Falling" as input
+    */
+    static bool detectTriggerFlanksGrad(const MatrixXd &data, int iTriggerChannelIdx, int &iDetectedTrigger, int iOffsetIndex, double dThreshold, bool bRemoveOffset, QString type = "Rising");
 };
 
 //*************************************************************************************************************
