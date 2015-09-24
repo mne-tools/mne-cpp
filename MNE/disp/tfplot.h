@@ -42,7 +42,6 @@
 
 #include "disp_global.h"
 #include <disp/helpers/colormap.h>
-#include <utils/wignertransform.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -72,7 +71,7 @@ namespace DISPLIB
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace UTILSLIB;
+//using namespace UTILSLIB;
 
 
 enum ColorMaps
@@ -92,7 +91,7 @@ public:
     TFplot(MatrixXd tf_matrix, qreal sample_rate, qint32 width, ColorMaps cmap);
     void plotTf(MatrixXd signal_vector, int sample_rate, ColorMaps cmap);
     static inline VectorXd gauss_window (qint32 sample_count, qreal scale, quint32 translation);
-    static inline MatrixXd make_STFT(VectorXd signal);
+    static inline MatrixXd make_spectrogram(VectorXd signal, qint32 window_size);
 };
 
 }
