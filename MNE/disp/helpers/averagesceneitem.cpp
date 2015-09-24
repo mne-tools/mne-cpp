@@ -88,13 +88,6 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     painter->setRenderHint(QPainter::Antialiasing, true);
 
-    // Plot channel name
-    QStaticText staticElectrodeName = QStaticText(m_sChannelName);
-    QSizeF sizeText = staticElectrodeName.size();
-    painter->save();
-    painter->drawStaticText(boundingRect().x(), boundingRect().y(), staticElectrodeName);
-    painter->restore();
-
 //    //Plot bounding rect / drawing region of this item
 //    painter->drawRect(this->boundingRect());
 
@@ -106,6 +99,17 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     //Plot average data
     painter->save();
     paintAveragePath(painter);
+    painter->restore();
+
+    // Plot channel name
+    QStaticText staticElectrodeName = QStaticText(m_sChannelName);
+    QSizeF sizeText = staticElectrodeName.size();
+    painter->save();
+    QPen pen;
+    pen.setColor(Qt::yellow);
+    pen.setWidthF(5);
+    painter->setPen(pen);
+    painter->drawStaticText(boundingRect().x(), boundingRect().y(), staticElectrodeName);
     painter->restore();
 }
 
@@ -183,23 +187,23 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
         //Calculate downsampling factor of averaged data in respect to the items width
         int dsFactor;
         totalCols / boundingRect.width()<1 ? dsFactor = 1 : dsFactor = totalCols / boundingRect.width();
-        //if(dsFactor == 0)
+        if(dsFactor == 0)
             dsFactor = 1;
 
         //Create path
-        float offset = (*(averageData+(abs(m_firstLastSample.first)*m_iTotalNumberChannels)+m_iChannelNumber)); //choose offset to be the signal value at time instance 0
+        //float offset = (*(averageData+(abs(m_firstLastSample.first)*m_iTotalNumberChannels)+m_iChannelNumber)); //choose offset to be the signal value at time instance 0
         QPainterPath path = QPainterPath(QPointF(boundingRect.x(), boundingRect.y() + boundingRect.height()/2));
         QPen pen;
         pen.setStyle(Qt::SolidLine);
-        pen.setColor(Qt::black);
+        pen.setColor(Qt::yellow);
         if(!m_cAverageColors.isEmpty() && !(dataIndex<m_cAverageColors.size()))
             pen.setColor(m_cAverageColors.at(dataIndex));
-        pen.setWidthF(2);
+        pen.setWidthF(5);
         painter->setPen(pen);
 
         for(int i = 0; i < totalCols && path.elementCount() <= boundingRect.width(); i += dsFactor) {
             //evoked matrix is stored in column major
-            double val = ((*(averageData+(i*m_iTotalNumberChannels)+m_iChannelNumber))-offset) * dScaleY;
+            double val = ((*(averageData+(i*m_iTotalNumberChannels)+m_iChannelNumber))/*-offset*/) * dScaleY;
 
             qSamplePosition.setY(-val);
             qSamplePosition.setX(path.currentPosition().x()+1);
@@ -231,9 +235,9 @@ void AverageSceneItem::paintStimLine(QPainter *painter)
         dsFactor = 1;
 
     QPen pen;
-    pen.setStyle(Qt::DashLine);
+    pen.setStyle(Qt::SolidLine);
     pen.setColor(Qt::red);
-    pen.setWidthF(1);
+    pen.setWidthF(3);
     painter->setPen(pen);
 
     path.moveTo(boundingRect.x()+abs(m_firstLastSample.first)/dsFactor, boundingRect.y());

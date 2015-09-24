@@ -81,8 +81,8 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
         //Draw baseline correction area
         if(m_pRealTimeEvokedModel->getBaselineInfo().first.toString() != "None" &&
                 m_pRealTimeEvokedModel->getBaselineInfo().second.toString() != "None") {
-            int from = m_pRealTimeEvokedModel->getBaselineInfo().first.toInt();
-            int to = m_pRealTimeEvokedModel->getBaselineInfo().second.toInt();
+            float from = m_pRealTimeEvokedModel->getBaselineInfo().first.toFloat();
+            float to = m_pRealTimeEvokedModel->getBaselineInfo().second.toFloat();
 
             painter.save();
             painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
@@ -91,9 +91,9 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
 
             float fDx = (float)(this->width()) / ((float)m_pRealTimeEvokedModel->getNumSamples());
 
-            float fromSamp = ((from/1000.0)*m_pRealTimeEvokedModel->getSamplingFrequency())+m_pRealTimeEvokedModel->getNumPreStimSamples();
+            float fromSamp = ((from)*m_pRealTimeEvokedModel->getSamplingFrequency())+m_pRealTimeEvokedModel->getNumPreStimSamples();
             float posX = fDx*(fromSamp);
-            float toSamp = ((to/1000.0)*m_pRealTimeEvokedModel->getSamplingFrequency())+m_pRealTimeEvokedModel->getNumPreStimSamples();
+            float toSamp = ((to)*m_pRealTimeEvokedModel->getSamplingFrequency())+m_pRealTimeEvokedModel->getNumPreStimSamples();
             float width = fDx*(toSamp-fromSamp);
 
             QRect rect(posX,0,width,this->height());
@@ -320,7 +320,7 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
 
         float newY = y_base+fValue;
 
-        qSamplePosition.setY(newY);
+        qSamplePosition.setY(-newY);
         qSamplePosition.setX(path.currentPosition().x());
 
         path.moveTo(qSamplePosition);
@@ -339,7 +339,7 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
 
             float newY = y_base+fValue;
 
-            qSamplePosition.setY(newY);
+            qSamplePosition.setY(-newY);
 //        }
 //        else
 //            qSamplePosition.setY(y_base);

@@ -1007,7 +1007,7 @@ void QuickControlWidget::onResetTriggerNumbers()
 void QuickControlWidget::userFilterToggled(bool state)
 {
     Q_UNUSED(state);
-    qDebug()<<"userFilterToggled";
+    //qDebug()<<"userFilterToggled";
     emit updateConnectedView();
 }
 
