@@ -415,6 +415,7 @@ void MainWindow::open_file()
     ui->lb_figure_of_merit->setHidden(true);
     callXAxisWindow->setMinimumHeight(22);
     callXAxisWindow->setMaximumHeight(22);
+    ui->actionTFplot->setEnabled(false);
 
 
     _atom_sum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
@@ -1367,6 +1368,7 @@ void MainWindow::on_btt_Calc_clicked()
         ui->actionExport->setEnabled(false);
         ui->lb_figure_of_merit->setHidden(true);
         ui->lb_info_content->clear();
+        ui->actionTFplot->setEnabled(false);
 
         _adaptive_atom_list.clear();
         _fix_dict_atom_list.clear();
@@ -1844,6 +1846,7 @@ void MainWindow::calc_thread_finished()
     ui->dsb_from->setEnabled(true);
     ui->dsb_to->setEnabled(true);    
     ui->sb_sample_count ->setEnabled(true);
+    ui->actionTFplot->setEnabled(true);
 
     QList<qint32> sizes = ui->splitter->sizes();
     sizes.insert(0, max_tbv_header_width + 100);
@@ -3263,21 +3266,14 @@ void MainWindow::on_rb_OwnDictionary_clicked()
         ui->btt_Calc->setEnabled(true);
 }
 
-void MainWindow::on_actionTest_triggered()
-{
-    //plot_window = new tfplotwidget();
-
-    /*
-    if(ui->tabWidget->count() >= 2)
-        ui->tabWidget->addTab(plot_window, "TF Channel ??");
-    else
-        ui->tabWidget->addTab(plot_window, "TF-Overview");
-        */
-
+void MainWindow::on_actionTFplot_triggered()
+{    
     if(ui->tabWidget->count() == 1)
     {       
-        MatrixXd tf_sum;// = MatrixXd::Zero(floor(_adaptive_atom_list.first().first().sample_count/2), _adaptive_atom_list.first().first().sample_count);
-        /*for(qint32 i = 0; i < _adaptive_atom_list.first().length(); i++)//foreach channel
+        MatrixXd tf_sum;
+        tf_sum = MatrixXd::Zero(floor(_adaptive_atom_list.first().first().sample_count/2), _adaptive_atom_list.first().first().sample_count);
+
+        for(qint32 i = 0; i < _adaptive_atom_list.first().length(); i++)//foreach channel
         {
             for(qint32 j = 0; j < _adaptive_atom_list.length(); j++) //foreach atom
             {
@@ -3287,10 +3283,9 @@ void MainWindow::on_actionTest_triggered()
                 tf_matrix *= atom.max_scalar_list.at(i)*atom.max_scalar_list.at(i);
                 tf_sum += tf_matrix;
             }
-        }*/
+        }
 
-        MatrixXd stft_matrix = TFplot::make_STFT(_signal_matrix.col(0));
-        tf_sum = stft_matrix;
+        //tf_sum = TFplot::make_spectrogram(_signal_matrix.col(0), 0);
 
         //normalisation of the tf-matrix
         qreal norm = tf_sum.maxCoeff();
@@ -3309,22 +3304,7 @@ void MainWindow::on_actionTest_triggered()
 
         ui->tabWidget->tabBar()->setTabButton(1, QTabBar::LeftSide, extendedButton);
         connect(extendedButton, SIGNAL (released()), this, SLOT (on_extend_tab_button()));
-    }
-    if(ui->tabWidget->count() > 2)
-    {
-
-       // ui->tw_main->setCurrentIndex(ui->tw_main->count() - 1);
-       // CloseButton *closeButton = new CloseButton();
-       // closeButton->setParent(ui->tw_main->currentWidget());
-       // closeButton->setMaximumSize(20, 20);
-       // closeButton->setStyleSheet("QPushButton {margin-right: 2px;  border-width: 1px; border-radius: 1px; border-color: grey;} QPushButton:pressed {background-color: grey; border-radius: 10px;}");
-       // closeButton->setIcon(QIcon(":/images/icons/delete.png"));
-       // closeButton->setIconSize(QSize(16, 16));
-
-       // ui->tw_main->tabBar()->tabButton(ui->tw_main->count() - 1, QTabBar::LeftSide);
-        //ui->tw_main->tabBar()->setTabButton(ui->tw_main->count() - 1, QTabBar::LeftSide, closeButton);
-        //connect(closeButton, SIGNAL (released()), closeButton, SLOT (on_close_tab_button()));
-    }
+    }    
 }
 
 void MainWindow::on_extend_tab_button()
@@ -3346,4 +3326,3 @@ void MainWindow::on_close_tab_button(int index)
 {
     ui->tabWidget->removeTab(index);
 }
-

@@ -31,5 +31,6 @@
         <file>icons/gabor_fml.png</file>
         <file>icons/lupe.png</file>
         <file>icons/expand_512.png</file>
+        <file>icons/tf_symbol.png</file>
     </qresource>
 </RCC>
