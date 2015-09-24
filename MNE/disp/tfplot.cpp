@@ -47,16 +47,8 @@
 
 using namespace DISPLIB;
 
-
-
-TFplot::TFplot(MatrixXd signal_vector, int sample_rate, ColorMaps cmap = ColorMaps::Jet)
+TFplot::TFplot(MatrixXd tf_matrix, qreal sample_rate, qint32 width, ColorMaps cmap = ColorMaps::Jet)
 {
-    //MatrixXd tf_sum = MatrixXd::Zero(floor(signal_vector.rows() / 2), signal_vector.rows());
-    //Wignertransform wtransform;
-    //MatrixXd tf_matrix = wtransform.wigner_transform(signal_vector);
-    MatrixXd tf_matrix = signal_vector;
-
-
     //setup image
     QImage *image_to_tf_plot = new QImage(tf_matrix.cols(), tf_matrix.rows(), QImage::Format_RGB32);
 
@@ -89,13 +81,13 @@ TFplot::TFplot(MatrixXd signal_vector, int sample_rate, ColorMaps cmap = ColorMa
             image_to_tf_plot->setPixel(x, tf_matrix.rows() - 1 -  y,  color.rgb());
         }
 
+    *image_to_tf_plot = image_to_tf_plot->scaledToWidth(0.9 * width, Qt::SmoothTransformation);
     //image to pixmap
     QGraphicsPixmapItem *tf_pixmap = new QGraphicsPixmapItem(QPixmap::fromImage(*image_to_tf_plot));
-
+    //tf_pixmap->setScale(6);
     QGraphicsScene *tf_scene = new QGraphicsScene();
     tf_scene->addItem(tf_pixmap);
 
-    // coefficient colors just for fun whatever
     QImage *coeffs_image = new QImage(10, tf_matrix.rows(), QImage::Format_RGB32);
     qreal norm = tf_matrix.maxCoeff();
     for(qint32 it = 0; it < tf_matrix.rows(); it++)
@@ -127,35 +119,40 @@ TFplot::TFplot(MatrixXd signal_vector, int sample_rate, ColorMaps cmap = ColorMa
         }      
     }
 
+    *coeffs_image = coeffs_image->scaledToHeight(image_to_tf_plot->height(), Qt::SmoothTransformation);
+
     QLayout * layout = new QGridLayout();
     QGraphicsView * view = new QGraphicsView();
     view->setObjectName("tf_view");
     view->setScene(tf_scene);
-    tf_scene->setBackgroundBrush(Qt::lightGray);
-    view->scale(this->size().height() / tf_scene->sceneRect().height(), this->size().height() / tf_scene->sceneRect().height());//scale graphic scene
+    QLinearGradient lgrad(tf_scene->sceneRect().topLeft(), tf_scene->sceneRect().bottomRight());
+              lgrad.setColorAt(0.0, Qt::white);
+              lgrad.setColorAt(1.0, Qt::lightGray);
+
+    tf_scene->setBackgroundBrush(lgrad);//Qt::white);
 
     //setup x-axis
     QGraphicsTextItem *x_axis_name = new QGraphicsTextItem("time [sec]", tf_pixmap);
-    x_axis_name->setFont(QFont("arial", 3));
+    x_axis_name->setFont(QFont("arial", 14));
 
     QList<QGraphicsItem *> x_axis_values;
     QList<QGraphicsItem *> x_axis_lines;
 
-    qreal scaleXText = (signal_vector.rows() - 1) /  sample_rate / 20.0;                       // divide signallength
+    qreal scaleXText = (tf_matrix.rows() - 1) /  sample_rate / 20.0;                       // divide signallength
 
     for(qint32 j = 0; j < 21; j++)
     {
-        QGraphicsTextItem *text_item = new QGraphicsTextItem(QString::number(j * scaleXText, 'f', 3), tf_pixmap);
-        text_item->setFont(QFont("arial", 3));
+        QGraphicsTextItem *text_item = new QGraphicsTextItem(QString::number(j * scaleXText, 'f', 2), tf_pixmap);
+        text_item->setFont(QFont("arial", 10));
         x_axis_values.append(text_item);    // scalevalue as string
         QGraphicsLineItem *x_line_item = new QGraphicsLineItem(tf_pixmap);
-        x_line_item->setLine(0,-1,0,1);
-        x_line_item->setPen(QPen(Qt::darkGray, 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+        x_line_item->setLine(0,-3,0,3);
+        x_line_item->setPen(QPen(Qt::darkGray, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
         x_axis_lines.append(x_line_item);                    // scalelines
     }
 
     x_axis_name->setPos(tf_pixmap->boundingRect().width()/2 - x_axis_name->boundingRect().width()/2,
-                        tf_pixmap->boundingRect().height() + 0.5*x_axis_values.at(0)->boundingRect().height());
+                        tf_pixmap->boundingRect().height() + 0.8 * x_axis_values.at(0)->boundingRect().height());
 
     qreal scale_x = qreal(tf_pixmap->boundingRect().width()) / qreal(x_axis_values.length()-1);
 
@@ -170,7 +167,7 @@ TFplot::TFplot(MatrixXd signal_vector, int sample_rate, ColorMaps cmap = ColorMa
 
     //y-axis
     QGraphicsTextItem *y_axis_name = new QGraphicsTextItem("frequency [Hz]", tf_pixmap);
-    y_axis_name->setFont(QFont("arial", 3));
+    y_axis_name->setFont(QFont("arial", 14));
 
     QList<QGraphicsItem *> y_axis_values;
     QList<QGraphicsItem *> y_axis_lines;
@@ -181,11 +178,11 @@ TFplot::TFplot(MatrixXd signal_vector, int sample_rate, ColorMaps cmap = ColorMa
     {
         QGraphicsTextItem *text_item = new QGraphicsTextItem(QString::number(j*scale_y_text,//pow(10, j)/pow(10, 11) /*(j+1)/log(12)*/ * max_frequency,//scale_y_text,
                                                                              'f', 0), tf_pixmap);
-        text_item->setFont(QFont("arial", 3));
+        text_item->setFont(QFont("arial", 10));
         y_axis_values.append(text_item);    // scalevalue as string
         QGraphicsLineItem *y_line_item = new QGraphicsLineItem(tf_pixmap);
-        y_line_item->setLine(-1,0,1,0);
-        y_line_item->setPen(QPen(Qt::darkGray, 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+        y_line_item->setLine(-3,0,3,0);
+        y_line_item->setPen(QPen(Qt::darkGray, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
         y_axis_lines.append(y_line_item);                    // scalelines
     }
 
@@ -215,9 +212,9 @@ TFplot::TFplot(MatrixXd signal_vector, int sample_rate, ColorMaps cmap = ColorMa
     QGraphicsSimpleTextItem *axis_name_item = new QGraphicsSimpleTextItem("coefficients", coeffs_item);
     QGraphicsSimpleTextItem *axis_zero_item = new QGraphicsSimpleTextItem("0", coeffs_item);
     QGraphicsSimpleTextItem *axis_one_item = new QGraphicsSimpleTextItem("1", coeffs_item);
-    axis_name_item->setFont(QFont("arial", 3));
-    axis_zero_item->setFont(QFont("arial", 3));
-    axis_one_item->setFont(QFont("arial", 3));
+    axis_name_item->setFont(QFont("arial", 14));
+    axis_zero_item->setFont(QFont("arial", 10));
+    axis_one_item->setFont(QFont("arial", 10));
 
     axis_name_item->setPos(coeffs_item->boundingRect().width() + 1,
                         coeffs_item->boundingRect().height()/2 + axis_name_item->boundingRect().height()/2);
@@ -231,31 +228,18 @@ TFplot::TFplot(MatrixXd signal_vector, int sample_rate, ColorMaps cmap = ColorMa
 
     layout->addWidget(view);
     this->setLayout(layout);
-
-
-    //set Scene to GraphicsView and show
-   // plot_widget->
-    //plot_window->tf_scene.setSceneRect(plot_window->tf_scene.itemsBoundingRect());                  // Re-shrink the scene to it's bounding contents
-   // plot_widget->
-    //plot_widget->tf_view->scale(plot_window->size().height() / plot_window->tf_scene.sceneRect().height()
-    //                                ,plot_window->size().height() / plot_window->tf_scene.sceneRect().height());//scale graphic scene
-    //in the line above you see the problem of scaleing the whole scene after adding all items
-    //depending on the signals size the text on the axis is not nice to read or even written over each other
-    //otherwise it could happen tohave too small letters to read then.
-    //SO SOLVE THIS AS WELL MAN!
-    //plot_widget->show();
 }
 
 //-----------------------------------------------------------------------------------------------------------------
 
-VectorXd TFplot::gauss_window (qint32 sample_count, qreal scale, quint32 translation)
+inline VectorXd TFplot::gauss_window (qint32 sample_count, qreal scale, quint32 translation)
 {
     VectorXd gauss = VectorXd::Zero(sample_count);
 
     for(qint32 n = 0; n < sample_count; n++)
     {
         qreal t = (qreal(n) - translation) / scale;
-        gauss[n] = exp(-PI * pow(t, 2))*pow(sqrt(scale),(-1))*pow(qreal(2),(0.25));
+        gauss[n] = exp(-3.14 * pow(t, 2))*pow(sqrt(scale),(-1))*pow(qreal(2),(0.25));
     }
 
     return gauss;
@@ -263,14 +247,31 @@ VectorXd TFplot::gauss_window (qint32 sample_count, qreal scale, quint32 transla
 
 //-----------------------------------------------------------------------------------------------------------------
 
-MatrixXd make_STFT(MatrixXd signal_vector)
+inline MatrixXd TFplot::make_STFT(VectorXd signal)
 {
-    for(qint32 translate = 0; translate < signal_vector.cols(); translate++)
+    Eigen::FFT<double> fft;
+    MatrixXd tf_matrix = MatrixXd::Zero(signal.rows(), signal.rows());
+
+    for(qint32 translate = 0; translate < signal.rows(); translate++)
     {
-        VectorXd envelope = gauss_window(signal_vector.cols(), signal_vector.rows()/4, translate);
-        for(qint32 sample = 0; sample < signal_vector.cols(); sample++)
-        {
-            VectorXd windowed_sig = signal_vector.cols();
-        }
+        //VectorXd windowed_sig = VectorXd::Zero(signal.rows());
+        VectorXcd fft_sig = VectorXcd::Zero(signal.rows());
+        VectorXcd fft_env = VectorXcd::Zero(signal.rows());
+        VectorXcd fft_e_sig = VectorXcd::Zero(signal.rows());
+        VectorXd envelope = gauss_window(signal.rows(), signal.rows(), translate);
+        VectorXd coeffs = VectorXd::Zero(signal.rows());
+
+        //for(qint32 sample = 0; sample < signal_vector.rows(); sample++)
+        //{
+        //    windowed_sig = signal_vector[sample] * envelope[sample];
+        //}
+        fft.fwd(fft_sig, signal);
+        fft.fwd(fft_env, envelope);
+        for( qint32 m = 0; m < signal.rows(); m++)
+            fft_e_sig[m] = fft_sig[m] * conj(fft_env[m]);
+
+        fft.inv(coeffs, fft_e_sig);
+        tf_matrix.row(translate) = coeffs;
     }
+    return tf_matrix;
 }
