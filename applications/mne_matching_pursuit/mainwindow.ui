@@ -1051,7 +1051,7 @@ QTabBar::tab:only-one {
     <addaction name="actionCreate_treebased_dictionary"/>
     <addaction name="separator"/>
     <addaction name="actionSettings"/>
-    <addaction name="actionTest"/>
+    <addaction name="actionTFplot"/>
    </widget>
    <widget class="QMenu" name="menuInfo">
     <property name="title">
@@ -1184,9 +1184,16 @@ QTabBar::tab:only-one {
     <string>export results to dict...</string>
    </property>
   </action>
-  <action name="actionTest">
+  <action name="actionTFplot">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="Ressourcen.qrc">
+     <normaloff>:/images/icons/tf_symbol.png</normaloff>:/images/icons/tf_symbol.png</iconset>
+   </property>
    <property name="text">
-    <string>test</string>
+    <string>tf-plot</string>
    </property>
   </action>
  </widget>

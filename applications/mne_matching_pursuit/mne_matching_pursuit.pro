@@ -84,8 +84,7 @@ SOURCES += \
     mainwindow.cpp \
     processdurationmessagebox.cpp \
     treebaseddictwindow.cpp \
-    settingwindow.cpp \
-    tfplotwidget.cpp
+    settingwindow.cpp
 
 HEADERS += \
     editorwindow.h \
@@ -95,8 +94,7 @@ HEADERS += \
     mainwindow.h \
     processdurationmessagebox.h \
     treebaseddictwindow.h \
-    settingwindow.h \
-    tfplotwidget.h
+    settingwindow.h
 
 FORMS += \
     editorwindow.ui \
@@ -106,8 +104,7 @@ FORMS += \
     mainwindow.ui \
     processdurationmessagebox.ui \
     treebaseddictwindow.ui \
-    settingwindow.ui \
-    tfplotwidget.ui
+    settingwindow.ui
 
 RESOURCES += \
     Ressourcen.qrc
