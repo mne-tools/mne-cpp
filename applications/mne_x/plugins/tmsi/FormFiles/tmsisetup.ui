@@ -193,6 +193,9 @@
         <string>Other options</string>
        </property>
        <layout class="QFormLayout" name="formLayout_3">
+        <property name="fieldGrowthPolicy">
+         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+        </property>
         <item row="0" column="0">
          <widget class="QCheckBox" name="m_checkBox_EnableBeep">
           <property name="text">
@@ -216,13 +219,10 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
-         <widget class="QCheckBox" name="m_checkBox_UseFFT">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
+        <item row="1" column="0">
+         <widget class="QCheckBox" name="m_checkBox_EnableKeyboardTrigger">
           <property name="text">
-           <string>Use FFT</string>
+           <string>Enable keyboard trigger</string>
           </property>
          </widget>
         </item>
@@ -233,10 +233,13 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QCheckBox" name="m_checkBox_EnableKeyboardTrigger">
+        <item row="4" column="0">
+         <widget class="QCheckBox" name="m_checkBox_UseFFT">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
-           <string>Enable keyboard trigger</string>
+           <string>Use FFT</string>
           </property>
          </widget>
         </item>
@@ -250,6 +253,43 @@
           </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0" colspan="2">
+         <widget class="Line" name="line_3">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0" colspan="2">
+         <widget class="QCheckBox" name="m_checkBox_splitFiles">
+          <property name="text">
+           <string>Split files</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0">
+         <widget class="QLabel" name="m_label_splitFileSize">
+          <property name="text">
+           <string>File size in ms:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1">
+         <widget class="QSpinBox" name="m_spinBox_splitFileSize">
+          <property name="minimum">
+           <number>10</number>
+          </property>
+          <property name="maximum">
+           <number>50000000</number>
           </property>
          </widget>
         </item>
