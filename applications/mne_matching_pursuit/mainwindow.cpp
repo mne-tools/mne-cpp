@@ -3285,7 +3285,7 @@ void MainWindow::on_actionTFplot_triggered()
             }
         }
 
-        //tf_sum = TFplot::make_spectrogram(_signal_matrix.col(0), 0);
+        MatrixXd tf_sum = TFplot::make_spectrogram(_signal_matrix.col(0), 0);
 
         //normalisation of the tf-matrix
         qreal norm = tf_sum.maxCoeff();
