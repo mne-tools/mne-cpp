@@ -247,31 +247,35 @@ inline VectorXd TFplot::gauss_window (qint32 sample_count, qreal scale, quint32 
 
 //-----------------------------------------------------------------------------------------------------------------
 
-inline MatrixXd TFplot::make_STFT(VectorXd signal)
+inline MatrixXd TFplot::make_spectrogram(VectorXd signal, qint32 window_size = 0)
 {
+    if(window_size == 0)
+        window_size = signal.rows()/4;
+
     Eigen::FFT<double> fft;
-    MatrixXd tf_matrix = MatrixXd::Zero(signal.rows(), signal.rows());
+    MatrixXd tf_matrix = MatrixXd::Zero(signal.rows()/2, signal.rows());
 
     for(qint32 translate = 0; translate < signal.rows(); translate++)
     {
-        //VectorXd windowed_sig = VectorXd::Zero(signal.rows());
-        VectorXcd fft_sig = VectorXcd::Zero(signal.rows());
-        VectorXcd fft_env = VectorXcd::Zero(signal.rows());
-        VectorXcd fft_e_sig = VectorXcd::Zero(signal.rows());
-        VectorXd envelope = gauss_window(signal.rows(), signal.rows(), translate);
-        VectorXd coeffs = VectorXd::Zero(signal.rows());
+        VectorXd envelope = gauss_window(signal.rows(), window_size, translate);
 
-        //for(qint32 sample = 0; sample < signal_vector.rows(); sample++)
-        //{
-        //    windowed_sig = signal_vector[sample] * envelope[sample];
-        //}
-        fft.fwd(fft_sig, signal);
-        fft.fwd(fft_env, envelope);
-        for( qint32 m = 0; m < signal.rows(); m++)
-            fft_e_sig[m] = fft_sig[m] * conj(fft_env[m]);
+        VectorXd windowed_sig = VectorXd::Zero(signal.rows());
+        VectorXcd fft_win_sig = VectorXcd::Zero(signal.rows());
 
-        fft.inv(coeffs, fft_e_sig);
-        tf_matrix.row(translate) = coeffs;
+        VectorXd real_coeffs = VectorXd::Zero(signal.rows()/2);
+
+        for(qint32 sample = 0; sample < signal.rows(); sample++)
+            windowed_sig[sample] = signal[sample] * envelope[sample];
+
+        fft.fwd(fft_win_sig, windowed_sig);
+
+        for(qint32 i= 0; i<signal.rows()/2; i++)
+        {
+            qreal value = pow(abs(fft_win_sig[i]), 2.0);
+            real_coeffs[i] = value;
+        }
+
+        tf_matrix.col(translate) = real_coeffs;
     }
     return tf_matrix;
 }

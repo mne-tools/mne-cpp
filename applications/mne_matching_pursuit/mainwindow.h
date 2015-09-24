@@ -67,9 +67,6 @@
 #include "ui_treebaseddictwindow.h"
 #include "settingwindow.h"
 #include "ui_settingwindow.h"
-#include "tfplotwidget.h"
-#include "ui_tfplotwidget.h"
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -573,9 +570,9 @@ private slots:
     void on_actionBeenden_triggered();
     void on_mouse_button_release();
     void on_rb_OwnDictionary_clicked();
-    void on_actionTest_triggered();
     void on_extend_tab_button();
     void on_close_tab_button(int index);
+    void on_actionTFplot_triggered();
 
 signals:
 
@@ -632,7 +629,6 @@ private:
     RowVectorXi picks;
     FiffInfo pick_info;
     QPalette pal;
-    tfplotwidget *plot_window;
 
     QTimer *_counter_timer;
     QThread* mp_Thread;
