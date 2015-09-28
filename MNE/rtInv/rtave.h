@@ -236,6 +236,12 @@ public:
     */
     inline bool isRunning();
 
+    //=========================================================================================================
+    /**
+    * Resets the averaged data stored.
+    */
+    void reset();
+
 signals:
     //=========================================================================================================
     /**
@@ -267,7 +273,7 @@ private:
     void fillBackBuffer(MatrixXd &data);        /**< Prepends incoming data to back/post stim buffer*/
     void mergeData();                           /**< Packs the buffers togehter as one and calcualtes the current running average and emits the result if number of averages has been reached*/
     void generateEvoked();                      /**< Generates the final evoke variable*/
-    void reset();
+
     void init();
 
     QMutex  m_qMutex;                   /**< Provides access serialization between threads*/
