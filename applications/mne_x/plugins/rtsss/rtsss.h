@@ -177,6 +177,8 @@ private:
 
     int LinRR, LoutRR, Lin, Lout;
 
+    QMutex m_qMutex;
+
     //    dBuffer::SPtr   m_pRtSssBuffer;      /**< Holds incoming data.*/
 };
 

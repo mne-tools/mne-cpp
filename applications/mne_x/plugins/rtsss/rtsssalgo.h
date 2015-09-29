@@ -109,7 +109,7 @@ public:
 
     QList<MatrixXd> getLinEqn();
 
-    void setMEGInfo(FiffInfo::SPtr fiffinfo);
+    void setMEGInfo(FiffInfo::SPtr fiffinfo, RowVectorXi);
     void setSSSParameter(QList<int>);
     qint32 getNumMEGChan();
     qint32 getNumMEGChanUsed();
