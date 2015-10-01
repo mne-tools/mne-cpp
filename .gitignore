@@ -356,3 +356,4 @@ lib
 /bin/imageformats/*.dll
 /bin/platforms/*.dll
 /bin/translations/*.qm
+/bin/*.qm
