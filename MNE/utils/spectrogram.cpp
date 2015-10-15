@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     tfplot.cpp
+* @file     spectrogram.cpp
 * @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
 *           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
 * @version  1.0
@@ -29,71 +29,72 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of time-frequency plot class.
+* @brief    Implementation of spectrogram class.
 */
-
-#ifndef TFPLOT_H
-#define TFPLOT_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "disp_global.h"
-#include <disp/helpers/colormap.h>
+#include "spectrogram.h"
+#include "math.h"
 
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QImage>
-#include <QGridLayout>
-#include <QGraphicsView>
-#include <QGraphicsPixmapItem>
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
-#include <Eigen/SparseCore>
-#include <unsupported/Eigen/FFT>
-
-namespace DISPLIB
-{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
-//using namespace UTILSLIB;
+using namespace UTILSLIB;
+
+#include "spectrogram.h"
 
 
-enum ColorMaps
+inline VectorXd Spectrogram::gauss_window (qint32 sample_count, qreal scale, quint32 translation)
 {
-    Hot,
-    HotNeg1,
-    HotNeg2,
-    Jet,
-    Bone,
-    RedBlue
-};
+    VectorXd gauss = VectorXd::Zero(sample_count);
 
-class DISPSHARED_EXPORT TFplot : public QWidget
-{
+    for(qint32 n = 0; n < sample_count; n++)
+    {
+        qreal t = (qreal(n) - translation) / scale;
+        gauss[n] = exp(-3.14 * pow(t, 2))*pow(sqrt(scale),(-1))*pow(qreal(2),(0.25));
+    }
 
-public:
-    TFplot(MatrixXd tf1_matrix, qreal sample_rate, qint32 width, qreal lower_frq, qreal upper_frq, ColorMaps cmap);
-    TFplot(MatrixXd tf_matrix, qreal sample_rate, qint32 width, ColorMaps cmap);
-    void plotTf(MatrixXd signal_vector, int sample_rate, ColorMaps cmap);  
-    void calc_plot(MatrixXd tf_matrix, qint32 width, qreal sample_rate, ColorMaps cmap, qreal lower_frq, qreal upper_frq);
-};
-
+    return gauss;
 }
 
-#endif // TFPLOT_H
+//-----------------------------------------------------------------------------------------------------------------
+
+inline MatrixXd Spectrogram::make_spectrogram(VectorXd signal, qint32 window_size = 0)
+{
+    if(window_size == 0)
+        window_size = signal.rows()/4;
+
+    Eigen::FFT<double> fft;
+    MatrixXd tf_matrix = MatrixXd::Zero(signal.rows()/2, signal.rows());
+
+    for(qint32 translate = 0; translate < signal.rows(); translate++)
+    {
+        VectorXd envelope = gauss_window(signal.rows(), window_size, translate);
+
+        VectorXd windowed_sig = VectorXd::Zero(signal.rows());
+        VectorXcd fft_win_sig = VectorXcd::Zero(signal.rows());
+
+        VectorXd real_coeffs = VectorXd::Zero(signal.rows()/2);
+
+        for(qint32 sample = 0; sample < signal.rows(); sample++)
+            windowed_sig[sample] = signal[sample] * envelope[sample];
+
+        fft.fwd(fft_win_sig, windowed_sig);
+
+        for(qint32 i= 0; i<signal.rows()/2; i++)
+        {
+            qreal value = pow(abs(fft_win_sig[i]), 2.0);
+            real_coeffs[i] = value;
+        }
+
+        tf_matrix.col(translate) = real_coeffs;
+    }
+    return tf_matrix;
+}

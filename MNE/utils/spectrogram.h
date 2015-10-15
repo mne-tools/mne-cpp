@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     tfplot.cpp
+* @file     spectrogram.cpp
 * @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
 *           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
 * @version  1.0
@@ -29,29 +29,23 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of time-frequency plot class.
+* @brief    Declaration of spectrogram class.
 */
 
-#ifndef TFPLOT_H
-#define TFPLOT_H
+#ifndef SPECTROGRAM_H
+#define SPECTROGRAM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "disp_global.h"
-#include <disp/helpers/colormap.h>
+#include "utils_global.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
-
-#include <QImage>
-#include <QGridLayout>
-#include <QGraphicsView>
-#include <QGraphicsPixmapItem>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -62,7 +56,7 @@
 #include <Eigen/SparseCore>
 #include <unsupported/Eigen/FFT>
 
-namespace DISPLIB
+namespace UTILSLIB
 {
 
 //*************************************************************************************************************
@@ -71,29 +65,17 @@ namespace DISPLIB
 //=============================================================================================================
 
 using namespace Eigen;
-//using namespace UTILSLIB;
 
-
-enum ColorMaps
-{
-    Hot,
-    HotNeg1,
-    HotNeg2,
-    Jet,
-    Bone,
-    RedBlue
-};
-
-class DISPSHARED_EXPORT TFplot : public QWidget
+class UTILSSHARED_EXPORT Spectrogram
 {
 
 public:
-    TFplot(MatrixXd tf1_matrix, qreal sample_rate, qint32 width, qreal lower_frq, qreal upper_frq, ColorMaps cmap);
-    TFplot(MatrixXd tf_matrix, qreal sample_rate, qint32 width, ColorMaps cmap);
-    void plotTf(MatrixXd signal_vector, int sample_rate, ColorMaps cmap);  
-    void calc_plot(MatrixXd tf_matrix, qint32 width, qreal sample_rate, ColorMaps cmap, qreal lower_frq, qreal upper_frq);
+
+    static inline VectorXd gauss_window (qint32 sample_count, qreal scale, quint32 translation);
+    static inline MatrixXd make_spectrogram(VectorXd signal, qint32 window_size);
 };
 
-}
+}//namespace
 
-#endif // TFPLOT_H
+#endif // SPECTROGRAM_H
+
