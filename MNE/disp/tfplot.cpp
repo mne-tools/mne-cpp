@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mainwindow.cpp
+* @file     tfplot.cpp
 * @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
 *           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
 * @version  1.0
@@ -47,8 +47,57 @@
 
 using namespace DISPLIB;
 
+TFplot::TFplot(MatrixXd tf_matrix, qreal sample_rate, qint32 width, qreal lower_frq, qreal upper_frq, ColorMaps cmap = ColorMaps::Jet)
+{
+    qreal max_frq = sample_rate/2.0;
+    qreal frq_per_px = max_frq/tf_matrix.rows();
+
+    if(upper_frq > max_frq || upper_frq <= 0) upper_frq = max_frq;
+    if(lower_frq < 0 || lower_frq > max_frq) lower_frq = 0;
+    if(upper_frq < lower_frq)
+    {
+        qreal temp = upper_frq;
+        upper_frq = lower_frq;
+        lower_frq = temp;
+    }
+
+    qint32 lower_px = floor(lower_frq / frq_per_px);
+    qint32 upper_px = floor(upper_frq / frq_per_px);
+
+    MatrixXd zoomed_tf_matrix = MatrixXd::Zero(upper_px-lower_px, tf_matrix.cols());
+    //How to print to console here
+    //printf(("fff   "+QString::number(zoomed_tf_matrix(12,12))).toLatin1().data());// << ";  " << zoomed_tf_matrix.rows(2) << ";   ";
+
+    qint32 pxls = 0;
+    for(qint32 it = lower_px; it < upper_px; it++)
+    {
+        zoomed_tf_matrix.row(pxls) = tf_matrix.row(it);
+        pxls++;
+    }
+
+    //zoomed_tf_matrix = tf_matrix.block(tf_matrix.rows() - upper_px, 0, upper_px-lower_px, tf_matrix.cols());
+
+    calc_plot(zoomed_tf_matrix, width, sample_rate, cmap, lower_frq, upper_frq);
+
+}
+
+//-----------------------------------------------------------------------------------------------------------------
+
 TFplot::TFplot(MatrixXd tf_matrix, qreal sample_rate, qint32 width, ColorMaps cmap = ColorMaps::Jet)
 {
+    calc_plot(tf_matrix, width, sample_rate, cmap, 0, 0);
+}
+
+//-----------------------------------------------------------------------------------------------------------------
+
+void TFplot::calc_plot(MatrixXd tf_matrix, qint32 width, qreal sample_rate, ColorMaps cmap, qreal lower_frq = 0, qreal upper_frq = 0)
+{
+    //normalisation of the tf-matrix
+    qreal norm1 = tf_matrix.maxCoeff();
+    qreal mnorm = tf_matrix.minCoeff();
+    if(abs(mnorm) > norm1) norm1 = mnorm;
+    tf_matrix /= norm1;
+
     //setup image
     QImage *image_to_tf_plot = new QImage(tf_matrix.cols(), tf_matrix.rows(), QImage::Format_RGB32);
 
@@ -81,6 +130,7 @@ TFplot::TFplot(MatrixXd tf_matrix, qreal sample_rate, qint32 width, ColorMaps cm
             image_to_tf_plot->setPixel(x, tf_matrix.rows() - 1 -  y,  color.rgb());
         }
 
+    *image_to_tf_plot = image_to_tf_plot->scaled(tf_matrix.cols(), tf_matrix.cols()/2, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     *image_to_tf_plot = image_to_tf_plot->scaledToWidth(0.9 * width, Qt::SmoothTransformation);
     //image to pixmap
     QGraphicsPixmapItem *tf_pixmap = new QGraphicsPixmapItem(QPixmap::fromImage(*image_to_tf_plot));
@@ -116,9 +166,10 @@ TFplot::TFplot(MatrixXd tf_matrix, qreal sample_rate, qint32 width, ColorMaps cm
                     break;
               }
               coeffs_image->setPixel(x, tf_matrix.rows() - 1 -  it,  color.rgb());
-        }      
+        }
     }
 
+    *coeffs_image = coeffs_image->scaled(10, tf_matrix.cols()/2, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     *coeffs_image = coeffs_image->scaledToHeight(image_to_tf_plot->height(), Qt::SmoothTransformation);
 
     QLayout * layout = new QGridLayout();
@@ -172,11 +223,15 @@ TFplot::TFplot(MatrixXd tf_matrix, qreal sample_rate, qint32 width, ColorMaps cm
     QList<QGraphicsItem *> y_axis_values;
     QList<QGraphicsItem *> y_axis_lines;
 
-    qreal scale_y_text = 0.5* sample_rate / 10.0;                       // divide signallength
+    qreal scale_y_text = 0;
+
+    if(lower_frq == 0  && upper_frq == 0)  scale_y_text = 0.5* sample_rate / 10.0;                       // divide signallength
+    else scale_y_text = (upper_frq - lower_frq) / 10.0;
+
 
     for(qint32 j = 0; j < 11; j++)
     {
-        QGraphicsTextItem *text_item = new QGraphicsTextItem(QString::number(j*scale_y_text,//pow(10, j)/pow(10, 11) /*(j+1)/log(12)*/ * max_frequency,//scale_y_text,
+        QGraphicsTextItem *text_item = new QGraphicsTextItem(QString::number(lower_frq + j*scale_y_text,//pow(10, j)/pow(10, 11) /*(j+1)/log(12)*/ * max_frequency,//scale_y_text,
                                                                              'f', 0), tf_pixmap);
         text_item->setFont(QFont("arial", 10));
         y_axis_values.append(text_item);    // scalevalue as string
@@ -230,52 +285,3 @@ TFplot::TFplot(MatrixXd tf_matrix, qreal sample_rate, qint32 width, ColorMaps cm
     this->setLayout(layout);
 }
 
-//-----------------------------------------------------------------------------------------------------------------
-
-inline VectorXd TFplot::gauss_window (qint32 sample_count, qreal scale, quint32 translation)
-{
-    VectorXd gauss = VectorXd::Zero(sample_count);
-
-    for(qint32 n = 0; n < sample_count; n++)
-    {
-        qreal t = (qreal(n) - translation) / scale;
-        gauss[n] = exp(-3.14 * pow(t, 2))*pow(sqrt(scale),(-1))*pow(qreal(2),(0.25));
-    }
-
-    return gauss;
-}
-
-//-----------------------------------------------------------------------------------------------------------------
-
-inline MatrixXd TFplot::make_spectrogram(VectorXd signal, qint32 window_size = 0)
-{
-    if(window_size == 0)
-        window_size = signal.rows()/4;
-
-    Eigen::FFT<double> fft;
-    MatrixXd tf_matrix = MatrixXd::Zero(signal.rows()/2, signal.rows());
-
-    for(qint32 translate = 0; translate < signal.rows(); translate++)
-    {
-        VectorXd envelope = gauss_window(signal.rows(), window_size, translate);
-
-        VectorXd windowed_sig = VectorXd::Zero(signal.rows());
-        VectorXcd fft_win_sig = VectorXcd::Zero(signal.rows());
-
-        VectorXd real_coeffs = VectorXd::Zero(signal.rows()/2);
-
-        for(qint32 sample = 0; sample < signal.rows(); sample++)
-            windowed_sig[sample] = signal[sample] * envelope[sample];
-
-        fft.fwd(fft_win_sig, windowed_sig);
-
-        for(qint32 i= 0; i<signal.rows()/2; i++)
-        {
-            qreal value = pow(abs(fft_win_sig[i]), 2.0);
-            real_coeffs[i] = value;
-        }
-
-        tf_matrix.col(translate) = real_coeffs;
-    }
-    return tf_matrix;
-}
