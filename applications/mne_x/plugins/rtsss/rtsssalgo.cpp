@@ -54,6 +54,8 @@ RtSssAlgo::~RtSssAlgo()
 //QList<MatrixXd> RtSssAlgo::buildLinearEqn()
 MatrixXd RtSssAlgo::buildLinearEqn()
 {
+    //qDebug() << "buildLinearEqn START";
+
     QList<MatrixXd> Eqn, EqnRR;
     QList<MatrixXd> LinEqn;
     qint32 LIn, LOut;
@@ -161,6 +163,8 @@ MatrixXd RtSssAlgo::buildLinearEqn()
 
 //    std::cout << "building SSS linear equation .....finished !" << endl;
 
+    //qDebug() << "buildLinearEqn END";
+
 //    return LinEqn;
     return CoilScale.asDiagonal();
 }
@@ -178,8 +182,9 @@ void RtSssAlgo::setSSSParameter(QList<int> expansionOrder)
     LOutOLS = expansionOrder[3];
 }
 
-void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
+void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo, RowVectorXi pickedChannels)
 {
+    //qDebug() << "setMEGInfo START";
 
     // Set origin of head(?) coordinate
     Origin.resize(3);
@@ -191,28 +196,30 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
 //        if(fiffInfo->chs[i].kind == FIFFV_MEG_CH)
 //            nmegchan ++;
 
-    // Find the number of MEG channels
-    NumMEGChan = 0,
-    NumBadCoil = 0;
-    BadChan.setZero(fiffInfo->nchan);
-    for (qint32 i=0; i<fiffInfo->nchan; ++i)
-        if(fiffInfo->chs[i].kind == FIFFV_MEG_CH)
-        {
-            for(qint32 j = 0; j < fiffInfo->bads.size(); j++)
-                if(fiffInfo->chs[i].ch_name == fiffInfo->bads[j])
-                {
-                    BadChan(i) = 1;
-                    qDebug() << "bad ch: " << i << "(" << fiffInfo->chs[i].ch_name << ")";
-                    NumBadCoil ++;
-//                    nmegbadchan ++;
-                }
-            NumMEGChan ++;
-        }
+//    // Find the number of MEG channels
+//    NumMEGChan = 0,
+//    NumBadCoil = 0;
+//    BadChan.setZero(fiffInfo->nchan);
+//    for (qint32 i=0; i<fiffInfo->nchan; ++i)
+//        if(fiffInfo->chs[i].kind == FIFFV_MEG_CH)
+//        {
+//            for(qint32 j = 0; j < fiffInfo->bads.size(); j++)
+//                if(fiffInfo->chs[i].ch_name == fiffInfo->bads[j])
+//                {
+//                    BadChan(i) = 1;
+//                    qDebug() << "bad ch: " << i << "(" << fiffInfo->chs[i].ch_name << ")";
+//                    NumBadCoil ++;
+////                    nmegbadchan ++;
+//                }
+//            NumMEGChan ++;
+//        }
 
-    NumCoil =  NumMEGChan - NumBadCoil;
+//    NumCoil =  NumMEGChan - NumBadCoil;
+//    NumCoil = 249;
+    NumCoil = pickedChannels.cols();
 
-    qDebug() << "number of meg channels: " << NumMEGChan;
-    qDebug() << "number of bad meg channels : " << NumBadCoil;
+//    qDebug() << "number of meg channels: " << NumMEGChan;
+//    qDebug() << "number of bad meg channels : " << NumBadCoil;
     qDebug() << "number of meg channels used for rtSSS: " << NumCoil;
 
 //    CoilTk.append("VV_PLANAR_T1");
@@ -247,56 +254,70 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
     qint32 cid = 0;
     CoilGrad.setZero(NumCoil);
 
-    for (qint32 i=0; i<fiffInfo->nchan; ++i)
+//    for (qint32 i=0; i<fiffInfo->nchan; ++i)
+//    {
+//        if(fiffInfo->chs[i].kind == FIFFV_MEG_CH && BadChan(i) == 0)
+//        {
+
+//            CoilT.append(fiffInfo->chs[i].coil_trans);
+//            CoilName.append(fiffInfo->chs[i].ch_name);
+
+////            qDebug() << "coil type= " << fiffInfo->chs[i].coil_type;
+
+//            switch (fiffInfo->chs[i].coil_type)
+//            {
+//                case 3012:
+//                    CoilGrad(cid) = 1;
+//                    CoilNk(cid) = 8;
+//                    CoilRk.append(C3012intpts8);
+//                    CoilWk.append(C3012Wintpts8);
+//                    break;
+
+//                case 3024:
+//                    CoilGrad(cid) = 0;
+//                    CoilNk(cid) = 9;
+//                    CoilRk.append(C3024intpts9);
+//                    CoilWk.append(C3024Wintpts9);
+//                    break;
+
+//                case 7002:
+//                    CoilGrad(cid) = 0;
+//                    CoilNk(cid) = 7;
+//                    CoilRk.append(C7002intpts7);
+//                    CoilWk.append(C7002Wintpts7);
+//                    break;
+
+//                case 7003:
+//                    CoilGrad(cid) = 0;
+//                    CoilNk(cid) = 4;
+//                    CoilRk.append(C7003intpts4);
+//                    CoilWk.append(C7003Wintpts4);
+////                    CoilRk.append(C7003intpts16);
+////                    CoilWk.append(C7003Wintpts16);
+//                    break;
+
+//                default:
+//                    qDebug() << " This coil type is NOT supported";
+//                    break;
+//            }
+////        qDebug() << fiffInfo->chs[i].coil_type << ", CoilNk(" << cid << "): " << CoilNk(cid);
+//            cid++;
+//        }
+//    }
+
+    for (qint32 i=0; i<NumCoil; ++i)
     {
-        if(fiffInfo->chs[i].kind == FIFFV_MEG_CH && BadChan(i) == 0)
-        {
+        CoilT.append(fiffInfo->chs[pickedChannels(i)].coil_trans);
+        CoilName.append(fiffInfo->chs[pickedChannels(i)].ch_name);
 
-            CoilT.append(fiffInfo->chs[i].coil_trans);
-            CoilName.append(fiffInfo->chs[i].ch_name);
-
-//            qDebug() << "coil type= " << fiffInfo->chs[i].coil_type;
-
-            switch (fiffInfo->chs[i].coil_type)
-            {
-                case 3012:
-                    CoilGrad(cid) = 1;
-                    CoilNk(cid) = 8;
-                    CoilRk.append(C3012intpts8);
-                    CoilWk.append(C3012Wintpts8);
-                    break;
-
-                case 3024:
-                    CoilGrad(cid) = 0;
-                    CoilNk(cid) = 9;
-                    CoilRk.append(C3024intpts9);
-                    CoilWk.append(C3024Wintpts9);
-                    break;
-
-                case 7002:
-                    CoilGrad(cid) = 0;
-                    CoilNk(cid) = 7;
-                    CoilRk.append(C7002intpts7);
-                    CoilWk.append(C7002Wintpts7);
-                    break;
-
-                case 7003:
-                    CoilGrad(cid) = 0;
-                    CoilNk(cid) = 4;
-                    CoilRk.append(C7003intpts4);
-                    CoilWk.append(C7003Wintpts4);
-//                    CoilRk.append(C7003intpts16);
-//                    CoilWk.append(C7003Wintpts16);
-                    break;
-
-                default:
-                    qDebug() << " This coil type is NOT supported";
-                    break;
-            }
-//        qDebug() << fiffInfo->chs[i].coil_type << ", CoilNk(" << cid << "): " << CoilNk(cid);
-            cid++;
-        }
+        CoilGrad(i) = 0;
+        CoilNk(i) = 7;
+        CoilRk.append(C7002intpts7);
+        CoilWk.append(C7002Wintpts7);
     }
+
+
+    //qDebug() << "setMEGInfo END";
 
 //    std::cout << "loading MEGData ....";
 //    ifstream inMEGData("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_test_sim/VectorView/MEGData.txt",ios::in);
@@ -333,6 +354,8 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
 QList<MatrixXd> RtSssAlgo::getSSSEqn(qint32 LIn, qint32 LOut)
 //QList<MatrixXd> RtSssAlgo::getSSSEqn(VectorXi Lexp)
 {
+    //qDebug() << "getSSSEqn START";
+
     int NumBIn, NumBOut;
 //    int coil_index=1;
     double RScale;
@@ -417,6 +440,8 @@ QList<MatrixXd> RtSssAlgo::getSSSEqn(qint32 LIn, qint32 LOut)
 //    std::cout << "EqnOut: Coil 1 " << endl << Eqn[1].row(0) << endl;
 //    std::cout << "EqnOut: Coil 306 " << endl << Eqn[1].row(305) << endl;
 
+    //qDebug() << "getSSSEqn END";
+
     return Eqn;
 }
 
@@ -438,6 +463,8 @@ QList<MatrixXd> RtSssAlgo::getSSSEqn(qint32 LIn, qint32 LOut)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 void RtSssAlgo::getSSSBasis(VectorXd X, VectorXd Y, VectorXd Z, qint32 LIn, qint32 LOut)
 {
+    //qDebug() << "getSSSBasis START";
+
     int NumSample, NumBIn, NumBOut;
     int LMax;
 
@@ -458,9 +485,11 @@ void RtSssAlgo::getSSSBasis(VectorXd X, VectorXd Y, VectorXd Z, qint32 LIn, qint
     for(int i=0; i<X.rows(); i++)
         if ( (abs(X(i)) < 1e-30) && (abs(Y(i)) < 1e-30) )
         {
-            std::cout << "Zero THETA detected!****  ";
-            std::cout << "X, Y: " << X(i) << ",  " << Y(i) << endl;
-            exit(1);
+            //std::cout << "Zero THETA detected!****  ";
+            //std::cout << "X, Y: " << X(i) << ",  " << Y(i) << endl;
+            break;
+            //return;
+            //exit(1);
         }
 
 //  % initialization
@@ -616,6 +645,8 @@ void RtSssAlgo::getSSSBasis(VectorXd X, VectorXd Y, VectorXd Z, qint32 LIn, qint
     BOutY = BOutR.array() * (R_Y.replicate(1,NumBOut)).array() + BOutPHI.array() * (PHI_Y.replicate(1,NumBOut)).array() + BOutTHETA.array() * (THETA_Y.replicate(1,NumBOut)).array();
     BOutZ = BOutR.array() * (R_Z.replicate(1,NumBOut)).array() + BOutPHI.array() * (PHI_Z.replicate(1,NumBOut)).array() + BOutTHETA.array() * (THETA_Z.replicate(1,NumBOut)).array();
 
+    //qDebug() << "getSSSBasis END";
+
 //        std::cout << "BInX" << endl << BInX << endl;
 //        std::cout << "BInY" << endl << BInY << endl;
 //        std::cout << "BInZ" << endl << BInZ << endl;
@@ -647,6 +678,8 @@ void RtSssAlgo::getSSSBasis(VectorXd X, VectorXd Y, VectorXd Z, qint32 LIn, qint
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 void RtSssAlgo::getCartesianToSpherCoordinate(VectorXd X, VectorXd Y, VectorXd Z)
 {
+    //qDebug() << "getCartesianToSpherCoordinate START";
+
     VectorXd hypotxy;
 //    std::cout << "X: " << X.rows() << " x " << X.cols() << endl;
 //    std::cout << "Y: " << Y.rows() << " x " << Y.cols() << endl;
@@ -655,6 +688,9 @@ void RtSssAlgo::getCartesianToSpherCoordinate(VectorXd X, VectorXd Y, VectorXd Z
     R = hypot(hypotxy,Z);
     PHI = atan2vec(Y,X);
     THETA = atan2vec(hypotxy,Z);
+
+    //qDebug() << "getCartesianToSpherCoordinate END";
+
 }
 
 
@@ -737,6 +773,8 @@ void RtSssAlgo::getSphereToCartesianVector()
 //QList<MatrixXd> RtSssAlgo::getSSSRR(MatrixXd EqnB)
 MatrixXd RtSssAlgo::getSSSRR(MatrixXd EqnB)
 {
+    //qDebug() << "getSSSRR START";
+
     int NumBIn, NumBOut, NumCoil, NumExp;
     MatrixXd EqnRRInv, EqnInv, SSSIn, SSSOut, Weight; //, ErrRel;
     VectorXd ErrRel;
@@ -872,6 +910,8 @@ MatrixXd RtSssAlgo::getSSSRR(MatrixXd EqnB)
     RRsss.append(Weight);
     RRsss.append(ErrRel);
 
+    //qDebug() << "getSSSRR END";
+
 //    return RRsss;
     return SSSIn;
 }
@@ -902,6 +942,8 @@ MatrixXd RtSssAlgo::getSSSRR(MatrixXd EqnB)
 //QList<MatrixXd> RtSssAlgo::getSSSOLS(MatrixXd EqnB)
 MatrixXd RtSssAlgo::getSSSOLS(MatrixXd EqnB)
 {
+    //qDebug() << "getSSSOLS START";
+
     int NumBIn, NumBOut, NumCoil, NumExp;
     MatrixXd EqnRRInv, EqnInv, SSSIn, SSSOut;
     MatrixXd sol_X, sol_in, sol_out;
@@ -938,6 +980,8 @@ MatrixXd RtSssAlgo::getSSSOLS(MatrixXd EqnB)
     OLSsss.append(SSSIn);
     OLSsss.append(SSSOut);
     OLSsss.append(ErrRel);
+
+    //qDebug() << "getSSSOLS END";
 
 //    return OLSsss;
     return SSSIn;

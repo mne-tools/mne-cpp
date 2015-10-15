@@ -188,6 +188,8 @@ public:
 
     void showAveragingWidget();
 
+    void resetAverage(bool state);
+
 signals:
     //=========================================================================================================
     /**
