@@ -312,8 +312,8 @@ void RealTimeMultiSampleArrayWidget::init()
                 availabeChannelTypes.append(type);
         }
 
-        if(!t_sRTMSAWName.isEmpty())
-        {
+//        if(!t_sRTMSAWName.isEmpty())
+//        {
             m_qMapChScaling.clear();
 
             float val = 0.0f;
@@ -348,7 +348,7 @@ void RealTimeMultiSampleArrayWidget::init()
             }
 
             m_pRTMSAModel->setScaling(m_qMapChScaling);
-        }
+//        }
 
         //-------- Init bad channel list --------
         m_qListBadChannels.clear();

@@ -19,4 +19,3 @@ Authors
   * Franco-Joel Polo <franco-joel.polo@tu-ilmenau.de> 2014
   * Carsten Boensel <carsten.boensel@tu-ilmenau.de> 2015
   * Jana Kiesel <jana.kiesel@tu-ilmenau.de> 2015
-  * Alexander Hunold <alexander.hunold@tu-ilmenau.de> 2015

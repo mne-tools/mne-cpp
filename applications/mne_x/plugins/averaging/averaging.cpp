@@ -407,6 +407,17 @@ void Averaging::showAveragingWidget()
 
 //*************************************************************************************************************
 
+void Averaging::resetAverage(bool state)
+{
+    QMutexLocker locker(&m_qMutex);
+    if(m_pRtAve)
+        m_pRtAve->reset();
+}
+
+
+
+//*************************************************************************************************************
+
 void Averaging::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
     QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();

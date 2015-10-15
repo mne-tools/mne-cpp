@@ -352,3 +352,8 @@ bin/mne_browse_raw_qt.app/Contents/PkgInfo
 /bin/mne_x_plugins/resources/babymeg/ERio_P8.fif.gz
 lib
 /examples/readBEM/*.user
+/bin/iconengines/*.dll
+/bin/imageformats/*.dll
+/bin/platforms/*.dll
+/bin/translations/*.qm
+/bin/*.qm
