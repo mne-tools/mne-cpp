@@ -88,21 +88,11 @@ enum ColorMaps
 class DISPSHARED_EXPORT TFplot : public QWidget
 {
 
-private:
-    MatrixXd _tf_matrix;
-    qreal _sample_rate;
-    qreal _lower_frq;
-    qreal _upper_frq;
-    ColorMaps _cmap;
-    QImage *coeffs_image;
-    QImage *image_to_tf_plot;
-    bool uiui=false;
-
 public:
-    TFplot(MatrixXd tf1_matrix, qreal sample_rate, qint32 width, qreal lower_frq, qreal upper_frq, ColorMaps cmap);
-    TFplot(MatrixXd tf_matrix, qreal sample_rate, qint32 width, ColorMaps cmap);
+    TFplot(MatrixXd tf1_matrix, qreal sample_rate, qreal lower_frq, qreal upper_frq, ColorMaps cmap);
+    TFplot(MatrixXd tf_matrix, qreal sample_rate, ColorMaps cmap);
     void plotTf(MatrixXd signal_vector, int sample_rate, ColorMaps cmap);  
-    void calc_plot(MatrixXd tf_matrix, qint32 width, qreal sample_rate, ColorMaps cmap, qreal lower_frq, qreal upper_frq);
+    void calc_plot(MatrixXd tf_matrix, qreal sample_rate, ColorMaps cmap, qreal lower_frq, qreal upper_frq);
 
 protected:
      virtual void resizeEvent(QResizeEvent *event);
