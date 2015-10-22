@@ -32,7 +32,5 @@ var searchData=
   ['eventdelegate_2eh',['eventdelegate.h',['../eventdelegate_8h.html',1,'']]],
   ['eventmodel_2ecpp',['eventmodel.cpp',['../eventmodel_8cpp.html',1,'']]],
   ['eventmodel_2eh',['eventmodel.h',['../eventmodel_8h.html',1,'']]],
-  ['eventwindow_2eh',['eventwindow.h',['../eventwindow_8h.html',1,'']]],
-  ['evokedmodalitywidget_2ecpp',['evokedmodalitywidget.cpp',['../evokedmodalitywidget_8cpp.html',1,'']]],
-  ['evokedmodalitywidget_2eh',['evokedmodalitywidget.h',['../evokedmodalitywidget_8h.html',1,'']]]
+  ['eventwindow_2eh',['eventwindow.h',['../eventwindow_8h.html',1,'']]]
 ];

@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['timewindowchanged',['timeWindowChanged',['../class_x_d_i_s_p_l_i_b_1_1_quick_control_widget.html#a9a542dda765a0f103606504749cef590',1,'XDISPLIB::QuickControlWidget']]],
   ['tmsi',['TMSI',['../class_t_m_s_i_plugin_1_1_t_m_s_i.html#af05f662f0cf7db2650b4322049e8d640',1,'TMSIPlugin::TMSI']]],
   ['tmsiaboutwidget',['TMSIAboutWidget',['../class_t_m_s_i_plugin_1_1_t_m_s_i_about_widget.html#a0bf21f6a2701c88ae39fa2651bda1eb2',1,'TMSIPlugin::TMSIAboutWidget']]],
   ['tmsidriver',['TMSIDriver',['../class_t_m_s_i_plugin_1_1_t_m_s_i_driver.html#ae78ab176b5f82ce29690e5c5dfde710d',1,'TMSIPlugin::TMSIDriver']]],
@@ -23,7 +24,8 @@ var searchData=
   ['tofiffid',['toFiffID',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a227960340883c81cbc0614dca1a17dd6',1,'FIFFLIB::FiffTag']]],
   ['tofloat',['toFloat',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#aa36b1845c6f83d65fb73f60205c02849',1,'FIFFLIB::FiffTag']]],
   ['tofloatmatrix',['toFloatMatrix',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a0737ad664a5a324795492a5b388e4a90',1,'FIFFLIB::FiffTag']]],
-  ['togglefreeze',['toggleFreeze',['../class_x_d_i_s_p_l_i_b_1_1_frequency_spectrum_model.html#a678ac927d6af388d5b613491fa389a92',1,'XDISPLIB::FrequencySpectrumModel::toggleFreeze()'],['../class_x_d_i_s_p_l_i_b_1_1_real_time_evoked_model.html#a1caf6a1e8a6ddffe59572b12bd360ea9',1,'XDISPLIB::RealTimeEvokedModel::toggleFreeze()'],['../class_x_d_i_s_p_l_i_b_1_1_real_time_multi_sample_array_model.html#acb1bd2085c09022df817270659ca341a',1,'XDISPLIB::RealTimeMultiSampleArrayModel::toggleFreeze()']]],
+  ['togglefreeze',['toggleFreeze',['../class_x_d_i_s_p_l_i_b_1_1_frequency_spectrum_model.html#a678ac927d6af388d5b613491fa389a92',1,'XDISPLIB::FrequencySpectrumModel::toggleFreeze()'],['../class_x_d_i_s_p_l_i_b_1_1_real_time_evoked_model.html#a795ffe3a566f9505e48699d34884b145',1,'XDISPLIB::RealTimeEvokedModel::toggleFreeze()'],['../class_x_d_i_s_p_l_i_b_1_1_real_time_multi_sample_array_model.html#acb1bd2085c09022df817270659ca341a',1,'XDISPLIB::RealTimeMultiSampleArrayModel::toggleFreeze()']]],
+  ['togglehideall',['toggleHideAll',['../class_x_d_i_s_p_l_i_b_1_1_quick_control_widget.html#aa3676f6c67ea469993c8e5bf25c805ab',1,'XDISPLIB::QuickControlWidget']]],
   ['togglerecordingfile',['toggleRecordingFile',['../class_baby_m_e_g_plugin_1_1_baby_m_e_g.html#a577fbaa287e78c90caa6a8123f9dddf0',1,'BabyMEGPlugin::BabyMEG']]],
   ['toint',['toInt',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a88f8094d1f3b876708bd3d5779a30a49',1,'FIFFLIB::FiffTag']]],
   ['tointmatrix',['toIntMatrix',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ae6e352d3ff566884190c7ce52896f94d',1,'FIFFLIB::FiffTag']]],
@@ -42,7 +44,10 @@ var searchData=
   ['triggercontrol',['TriggerControl',['../class_trigger_control_plugin_1_1_trigger_control.html#ab4e05209de8fad9ae655eb9546f4c95c',1,'TriggerControlPlugin::TriggerControl']]],
   ['triggercontrolaboutwidget',['TriggerControlAboutWidget',['../class_trigger_control_plugin_1_1_trigger_control_about_widget.html#a6841c7268f757482ed68741243ecf7d4',1,'TriggerControlPlugin::TriggerControlAboutWidget']]],
   ['triggercontrolsetupwidget',['TriggerControlSetupWidget',['../class_trigger_control_plugin_1_1_trigger_control_setup_widget.html#a806196255f6f53112ce5cdb02dd8c39f',1,'TriggerControlPlugin::TriggerControlSetupWidget']]],
+  ['triggerdetected',['triggerDetected',['../class_x_d_i_s_p_l_i_b_1_1_real_time_multi_sample_array_model.html#a0574d563f2c3e8cb1ee356362ffaf020',1,'XDISPLIB::RealTimeMultiSampleArrayModel']]],
+  ['triggerdetectionactive',['triggerDetectionActive',['../class_x_d_i_s_p_l_i_b_1_1_real_time_multi_sample_array_model.html#a88a46db1b717658962e2ebd8a3792ef7',1,'XDISPLIB::RealTimeMultiSampleArrayModel']]],
   ['triggered',['triggered',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_manager.html#aacc0233908903bf8d02356fb7a971f21',1,'RTCOMMANDLIB::CommandManager']]],
+  ['triggerinfochanged',['triggerInfoChanged',['../class_x_d_i_s_p_l_i_b_1_1_quick_control_widget.html#aa9dbfc6d36073e78e312990ebefafde9',1,'XDISPLIB::QuickControlWidget::triggerInfoChanged()'],['../class_x_d_i_s_p_l_i_b_1_1_real_time_multi_sample_array_model.html#a023b881834091e3d45ab8ca60818cb7d',1,'XDISPLIB::RealTimeMultiSampleArrayModel::triggerInfoChanged()']]],
   ['tripletselection',['tripletSelection',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a0f2f18b5ea97b20e227927e9f938d394',1,'MNELIB::MNEForwardSolution']]],
   ['tris',['tris',['../class_f_s_l_i_b_1_1_surface.html#a878222645281e470be3b1cb507926886',1,'FSLIB::Surface']]],
   ['type',['type',['../class_x_m_e_a_s_l_i_b_1_1_new_measurement.html#a29e173fdd5dab68f945035d335d513f7',1,'XMEASLIB::NewMeasurement']]]

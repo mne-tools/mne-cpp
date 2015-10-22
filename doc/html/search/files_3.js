@@ -8,6 +8,8 @@ var searchData=
   ['datawindow_2eh',['datawindow.h',['../datawindow_8h.html',1,'']]],
   ['deletemessagebox_2ecpp',['deletemessagebox.cpp',['../deletemessagebox_8cpp.html',1,'']]],
   ['deletemessagebox_2eh',['deletemessagebox.h',['../deletemessagebox_8h.html',1,'']]],
+  ['detecttrigger_2ecpp',['detecttrigger.cpp',['../detecttrigger_8cpp.html',1,'']]],
+  ['detecttrigger_2eh',['detecttrigger.h',['../detecttrigger_8h.html',1,'']]],
   ['dipole_2ecpp',['dipole.cpp',['../dipole_8cpp.html',1,'']]],
   ['dipole_2eh',['dipole.h',['../dipole_8h.html',1,'']]],
   ['directrecord_2eh',['directrecord.h',['../directrecord_8h.html',1,'']]],
