@@ -3271,7 +3271,7 @@ void MainWindow::on_actionTFplot_triggered()
     if(ui->tabWidget->count() == 1)
     {       
         MatrixXd tf_sum;
-        /*tf_sum = MatrixXd::Zero(floor(_adaptive_atom_list.first().first().sample_count/2), _adaptive_atom_list.first().first().sample_count);
+        tf_sum = MatrixXd::Zero(floor(_adaptive_atom_list.first().first().sample_count/2), _adaptive_atom_list.first().first().sample_count);
 
         for(qint32 i = 0; i < _adaptive_atom_list.first().length(); i++)//foreach channel
         {
@@ -3284,15 +3284,16 @@ void MainWindow::on_actionTFplot_triggered()
                 tf_sum += tf_matrix;
             }
         }
-        */
-        tf_sum = Spectrogram::make_spectrogram(_signal_matrix.col(0), 0);
+
+        //tf_sum = Spectrogram::make_spectrogram(_signal_matrix.col(0), 0);
 
 
 
-        TFplot *tfplot = new TFplot(tf_sum, _sample_rate, 0.88 *  ui->tabWidget->geometry().width(), 10, 125, ColorMaps::Jet);
+        TFplot *tfplot = new TFplot(tf_sum, _sample_rate, 0, 600, ColorMaps::Jet);
+        //tfplot->show();
         ui->tabWidget->addTab(tfplot, "TF-Overview");
-
-        tfplot->update();
+        ui->tabWidget->setCurrentIndex(1);
+        tfplot->resize(ui->tabWidget->size());
 
         QPushButton *extendedButton = new QPushButton();
         extendedButton->setMaximumSize(20, 20);

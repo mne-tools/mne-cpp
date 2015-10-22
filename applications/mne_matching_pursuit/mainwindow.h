@@ -149,32 +149,7 @@ public:
     typedef QList<FixDictAtom> fix_dict_atom_list;
     typedef QMap<qint32, bool> select_map;
     typedef Eigen::VectorXd VectorXd;
-    typedef Eigen::RowVectorXi RowVectorXi;
-    //==========================================================================================================
-    /**
-    * MainWindow_fill_dict_combobox
-    *
-    * ### MP toolbox main window function ###
-    *
-    * fills combobox with available dictionaries
-    *
-    * @return void
-    */
-    void fill_dict_combobox();
-
-    //==========================================================================================================
-
-    //==========================================================================================================
-    /**
-    * MainWindow_fill_dict_combobox
-    *
-    * ### MP toolbox main window function ###
-    *
-    * save files
-    *
-    * @return void
-    */
-    void save_fif_file();
+    typedef Eigen::RowVectorXi RowVectorXi;    
 
 
 private slots:
@@ -635,6 +610,30 @@ private:
     QThread* mp_Thread;
     AdaptiveMp *adaptive_Mp;
     FixDictMp *fixDict_Mp ;
+
+    //==========================================================================================================
+    /**
+    * MainWindow_fill_dict_combobox
+    *
+    * ### MP toolbox main window function ###
+    *
+    * fills combobox with available dictionaries
+    *
+    * @return void
+    */
+    void fill_dict_combobox();
+
+    //==========================================================================================================
+    /**
+    * MainWindow_fill_dict_combobox
+    *
+    * ### MP toolbox main window function ###
+    *
+    * save files
+    *
+    * @return void
+    */
+    void save_fif_file();
 
     //==========================================================================================================
     /**
