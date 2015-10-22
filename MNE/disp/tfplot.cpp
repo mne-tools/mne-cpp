@@ -49,6 +49,12 @@ using namespace DISPLIB;
 
 TFplot::TFplot(MatrixXd tf_matrix, qreal sample_rate, qint32 width, qreal lower_frq, qreal upper_frq, ColorMaps cmap = ColorMaps::Jet)
 {
+    _tf_matrix = tf_matrix;
+    _sample_rate = sample_rate;
+    _lower_frq = lower_frq;
+    _upper_frq = upper_frq;
+    _cmap = cmap;
+
     qreal max_frq = sample_rate/2.0;
     qreal frq_per_px = max_frq/tf_matrix.rows();
 
@@ -85,6 +91,11 @@ TFplot::TFplot(MatrixXd tf_matrix, qreal sample_rate, qint32 width, qreal lower_
 
 TFplot::TFplot(MatrixXd tf_matrix, qreal sample_rate, qint32 width, ColorMaps cmap = ColorMaps::Jet)
 {
+    _tf_matrix = tf_matrix;
+    _sample_rate = sample_rate;
+    _lower_frq = 0;
+    _upper_frq = 0;
+    _cmap = cmap;
     calc_plot(tf_matrix, width, sample_rate, cmap, 0, 0);
 }
 
@@ -99,7 +110,7 @@ void TFplot::calc_plot(MatrixXd tf_matrix, qint32 width, qreal sample_rate, Colo
     tf_matrix /= norm1;
 
     //setup image
-    QImage *image_to_tf_plot = new QImage(tf_matrix.cols(), tf_matrix.rows(), QImage::Format_RGB32);
+    image_to_tf_plot = new QImage(tf_matrix.cols(), tf_matrix.rows(), QImage::Format_RGB32);
 
     //setup pixelcolors in image
     QColor color;
@@ -131,14 +142,14 @@ void TFplot::calc_plot(MatrixXd tf_matrix, qint32 width, qreal sample_rate, Colo
         }
 
     *image_to_tf_plot = image_to_tf_plot->scaled(tf_matrix.cols(), tf_matrix.cols()/2, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-    *image_to_tf_plot = image_to_tf_plot->scaledToWidth(0.9 * width, Qt::SmoothTransformation);
+    *image_to_tf_plot = image_to_tf_plot->scaledToWidth(/*0.9 **/ width, Qt::SmoothTransformation);
     //image to pixmap
     QGraphicsPixmapItem *tf_pixmap = new QGraphicsPixmapItem(QPixmap::fromImage(*image_to_tf_plot));
-    //tf_pixmap->setScale(6);
+    //tf_pixmap->setScale(100);
     QGraphicsScene *tf_scene = new QGraphicsScene();
     tf_scene->addItem(tf_pixmap);
 
-    QImage *coeffs_image = new QImage(10, tf_matrix.rows(), QImage::Format_RGB32);
+    coeffs_image = new QImage(10, tf_matrix.rows(), QImage::Format_RGB32);
     qreal norm = tf_matrix.maxCoeff();
     for(qint32 it = 0; it < tf_matrix.rows(); it++)
     {
@@ -276,12 +287,51 @@ void TFplot::calc_plot(MatrixXd tf_matrix, qint32 width, qreal sample_rate, Colo
     axis_name_item->setRotation(-90);
     axis_zero_item->setPos( 1 + coeffs_item->boundingRect().width(),
                            coeffs_item->boundingRect().height()- axis_zero_item->boundingRect().height());
-    axis_one_item->setPos( 1 + coeffs_item->boundingRect().width(),
-                           0);
+    axis_one_item->setPos( 1 + coeffs_item->boundingRect().width(), 0);
     //end coeffs picture
 
 
+    view->fitInView(layout->contentsRect(),Qt::KeepAspectRatio);
     layout->addWidget(view);
     this->setLayout(layout);
+
+}
+
+void TFplot::resizeEvent(QResizeEvent *event)
+{
+    Q_UNUSED(event);
+    //qint32 width = this->size().width();
+    //qint32 width = QResizeEvent::size()->width;
+    //qint32 width = event->size()->width;
+
+
+            for (qint32 i = 0; i < this->layout()->count(); i++)
+            {
+              QWidget *widget = this->layout()->itemAt(i)-> widget();
+              if (widget != NULL )
+              {
+                  //DIRTY WORKAROUND ToDo
+                  QGraphicsView* view = (QGraphicsView*)widget;
+                  if(this->uiui == false)
+                  {
+                      //if(this->layout()->count() == i-1)
+                        this->uiui = true;
+                  }
+                  else if(this->uiui == true)
+                      view->fitInView(view->sceneRect(),Qt::KeepAspectRatio);
+                  //view->fitInView(QRect(0,0,this->size().width(), this->size().height()));
+                  /*QGraphicsScene *scene = view->scene();
+                  for (int j = 0; j < scene->children().count(); j++)
+                  {
+                       QGraphicsItem *item = scene-> itemAt(j);
+
+                  }*/
+              }
+            }
+/*
+    *image_to_tf_plot = image_to_tf_plot->scaledToWidth(0.9 * width, Qt::SmoothTransformation);
+    *coeffs_image = coeffs_image->scaledToHeight(image_to_tf_plot->height(), Qt::SmoothTransformation);
+    delete this->layout();
+    calc_plot(_tf_matrix, width, _sample_rate, _cmap, _lower_frq, _upper_frq);*/
 }
 

@@ -3289,8 +3289,10 @@ void MainWindow::on_actionTFplot_triggered()
 
 
 
-        TFplot *tfplot = new TFplot(tf_sum, _sample_rate, 0.9 * ui->tabWidget->width(), 10, 125, ColorMaps::Jet);
+        TFplot *tfplot = new TFplot(tf_sum, _sample_rate, 0.88 *  ui->tabWidget->geometry().width(), 10, 125, ColorMaps::Jet);
         ui->tabWidget->addTab(tfplot, "TF-Overview");
+
+        tfplot->update();
 
         QPushButton *extendedButton = new QPushButton();
         extendedButton->setMaximumSize(20, 20);
