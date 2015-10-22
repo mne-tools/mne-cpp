@@ -104,7 +104,7 @@ QSharedPointer<IPlugin> RtSss::clone() const
 
 void RtSss::init()
 {
-    qDebug() << "*********** Initialization ************";
+    //qDebug() << "*********** Initialization ************";
 
     //Delete Buffer - will be initailzed with first incoming data
     if(!m_pRtSssBuffer.isNull())
@@ -145,9 +145,14 @@ void RtSss::unload()
 
 bool RtSss::start()
 {
-    qDebug() << "*********** Start ************";
+    //qDebug() << "*********** Start ************";
+
+    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning())
+        QThread::wait();
 
     QThread::start();
+
     return true;
 }
 
@@ -156,18 +161,24 @@ bool RtSss::start()
 
 bool RtSss::stop()
 {
-    qDebug() << "*********** Stop *************";
+    //qDebug() << "*********** Stop *************";
 
+    //Wait until this thread is stopped
+    m_qMutex.lock();
     m_bIsRunning = false;
 
-    // Stop threads
-    QThread::terminate();
-    QThread::wait();
+    if(m_bProcessData)
+    {
+        //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
+        m_pRtSssBuffer->releaseFromPop();
+        m_pRtSssBuffer->releaseFromPush();
 
-    if(m_pRtSssBuffer)
         m_pRtSssBuffer->clear();
+    }
 
     m_bReceiveData = false;
+
+    m_qMutex.unlock();
 
     return true;
 }
@@ -193,7 +204,7 @@ QString RtSss::getName() const
 
 QWidget* RtSss::setupWidget()
 {
-    qDebug()  << "*********** SetUpWidget ************";
+    //qDebug()  << "*********** SetUpWidget ************";
 
     RtSssSetupWidget* widget = new RtSssSetupWidget(this);  //widget is later distroyed by CentralWidget - so it has to be created everytime new
 
@@ -211,11 +222,16 @@ QWidget* RtSss::setupWidget()
 }
 
 
+//*************************************************************************************************************
+
 void RtSss::setLinRR(int val)
 {
 //   qDebug() <<" new LinRR: " << val;
     LinRR = val;
 }
+
+
+//*************************************************************************************************************
 
 void RtSss::setLoutRR(int val)
 {
@@ -223,17 +239,24 @@ void RtSss::setLoutRR(int val)
     LoutRR = val;
 }
 
+
+//*************************************************************************************************************
+
 void RtSss::setLin(int val)
 {
 //    qDebug()  <<" new Lin: " << val;
     Lin = val;
 }
 
+
+//*************************************************************************************************************
+
 void RtSss::setLout(int val)
 {
 //    qDebug()  <<" new Lout: " << val;
     Lout = val;
 }
+
 
 //*************************************************************************************************************
 
@@ -247,7 +270,7 @@ void RtSss::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
     {
         //Check if buffer initialized
         if(!m_pRtSssBuffer)
-            m_pRtSssBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
+            m_pRtSssBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(32, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
 
         //Fiff information
         if(!m_pFiffInfo)
@@ -295,23 +318,48 @@ void RtSss::run()
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
+    //Find index vector for wanted meg channels
+    QStringList exclude;
+    for(int i = 0; i < m_pFiffInfo->chs.size(); i++) {
+        if(m_pFiffInfo->chs.at(i).coil_type != FIFFV_COIL_BABY_MAG)
+            exclude<<m_pFiffInfo->chs.at(i).ch_name;
+    }
+
+    exclude<<m_pFiffInfo->bads;
+
+    qDebug()<< exclude ;
+
+    RowVectorXi pickedChannels = m_pFiffInfo->pick_types("mag",false, false, QStringList(),exclude);
+
+    for(int i = 0; i < 100; i++)
+        qDebug()<< " pickedID= " << pickedChannels(i);
+
+     qDebug()<< "finished pickedChannels";
+
+    qint32 nmegchanused = pickedChannels.cols();
+
+    qDebug()<< "number of picked channels for rtSSS= " << nmegchanused;
+
     // Initialize output
     m_pRTMSAOutput->data()->initFromFiffInfo(m_pFiffInfo);
-    m_pRTMSAOutput->data()->setMultiArraySize(100);
+    m_pRTMSAOutput->data()->setMultiArraySize(1);
     // m_pRTMSAOutput->data()->setSamplingRate(m_pFiffInfo->sfreq);
     m_pRTMSAOutput->data()->setVisibility(true);
 
     // Set MEG channel infomation to rtSSS
-    rsss.setMEGInfo(m_pFiffInfo);
+//    rsss.setMEGInfo(m_pFiffInfo);
+    rsss.setMEGInfo(m_pFiffInfo, pickedChannels);
+
+    qDebug() << " setMEGInfo finished";
 
     // Get channel information
     qint32 nmegchan = rsss.getNumMEGChan();
-    qint32 nmegchanused = rsss.getNumMEGChanUsed();
-    qDebug() << "number of meg channels(run): " << nmegchan;
+    //qint32 nmegchanused = rsss.getNumMEGChanUsed();
+    //qDebug() << "number of meg channels(run): " << nmegchan;
     VectorXi badch = rsss.getBadChan();
 
     // Load and set the number of spherical harmonics expansion
-    qDebug() << "LinRR (run): " << LinRR << ", LoutRR (run): " << LoutRR <<", Lin (run): " << Lin <<", Lout (run): " << Lout;
+    //qDebug() << "LinRR (run): " << LinRR << ", LoutRR (run): " << LoutRR <<", Lin (run): " << Lin <<", Lout (run): " << Lout;
     QList<int> expOrder;
     expOrder << LinRR << LoutRR << Lin << Lout;
     rsss.setSSSParameter(expOrder);
@@ -336,26 +384,26 @@ void RtSss::run()
     // When the MEG recording of the first channel is saved starting not from the first row and being followed by others like EEG,
     //   the startID_MEGch will be the first encounter of MEG channel other than zero.
     //
-    qint32 startID_MEGch = 0;
-    for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i)
-        if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH)
-        {
-            startID_MEGch = i;
-            break;
-        }
-//    qDebug() << "strat id: " << startID_MEGch;
+//    qint32 startID_MEGch = 0;
+//    for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i)
+//        if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH)
+//        {
+//            startID_MEGch = i;
+//            break;
+//        }
+    //qDebug() << "strat id: " << startID_MEGch;
 
     //  Build linear equation
-    qDebug() << "building SSS linear equation .....";
+    //qDebug() << "building SSS linear equation .....";
     lineqn = rsss.buildLinearEqn();
 
-    qDebug() << "..finished !!";
+    //qDebug() << "..finished !!";
 
     // start processing data
     m_bProcessData = true;
     qint32 HEADMOV_COR_cnt = 15 ;
     qint32 cnt=0;
-    qDebug() << "rtSSS started.....";
+    //qDebug() << "rtSSS started.....";
 
     bool m_bIsHeadMov = true;
 
@@ -364,7 +412,7 @@ void RtSss::run()
 //        if (m_bIsHeadMov)
 //        {
             lineqn = rsss.buildLinearEqn();
-            qDebug() << "rebuilt SSS linear equation .....";
+            //qDebug() << "rebuilt SSS linear equation .....";
 //            m_bIsHeadMov = false;
 //        }
 //        else
@@ -380,53 +428,75 @@ void RtSss::run()
             MatrixXd in_mat = m_pRtSssBuffer->pop();
 //            qDebug() << "size of in_mat (run): " << in_mat.rows() << " x " << in_mat.cols();
 
-            //  Remove bad channel signals
-            MatrixXd in_mat_used(nmegchanused, in_mat.cols());
-//            qDebug() << "size of in_mat_used (run): " << in_mat_used.rows() << " x " << in_mat_used.cols();
-            for(qint32 i = 0, k = 0; i < nmegchan; ++i)
-                if (badch(i) == 0)
-                {
-                    in_mat_used.row(k) = in_mat.row(i);
-                    k++;
-                }
+            //Generate new matrix from picked channels
+            MatrixXd in_mat_used(pickedChannels.cols(), in_mat.cols());
+
+            for(qint32 i = 0; i < in_mat_used.rows(); ++i)
+                in_mat_used.row(i) = in_mat.row(pickedChannels(i));
+
+//            //  Remove bad channel signals
+//            MatrixXd in_mat_used(nmegchanused, in_mat.cols());
+////            qDebug() << "size of in_mat_used (run): " << in_mat_used.rows() << " x " << in_mat_used.cols();
+//            for(qint32 i = 0, k = 0; i < nmegchan; ++i)
+//                if (badch(i) == 0)
+//                {
+//                    in_mat_used.row(k) = in_mat.row(i);
+//                    k++;
+//                }
 //            in_mat_used = in_mat.block(0,0,nmegchanused,in_mat.cols());
+
+           in_mat_used = rt_sss(in_mat_used);
 
             // Implement Concurrent mapreduced for parallel processing
             // divide the in_mat_used into 2 or 4 matrices, which renders 50ms or 25ms data
-            QList<MatrixXd> list_in_mat;
-            qint32 nSubSample = 20;
-            qint32 nThread = in_mat.cols() / nSubSample;
+//            QList<MatrixXd> list_in_mat;
+//            qint32 nSubSample = 20;
+//            qint32 nThread = in_mat_used.cols() / nSubSample;
 
-            for(qint32 ith = 0; ith < nThread; ++ ith)
-                list_in_mat.append(in_mat_used.block(0,ith*nSubSample,nmegchanused,nSubSample));
+//            for(qint32 ith = 0; ith < nThread; ++ ith) {
+//                if(ith*nSubSample+nSubSample < in_mat_used.cols())
+//                    list_in_mat.append(in_mat_used.block(0,ith*nSubSample,nmegchanused,in_mat_used.cols()-(ith*nSubSample)));
+//                else
+//                    list_in_mat.append(in_mat_used.block(0,ith*nSubSample,nmegchanused,nSubSample));
+//            }
+//            qDebug() << "rtSSS split up done!";
 
-            QFuture<MatrixXd> res = QtConcurrent::mapped(list_in_mat, rt_sss);
-            res.waitForFinished();
+//            QFuture<MatrixXd> res = QtConcurrent::mapped(list_in_mat, rt_sss);
+//            res.waitForFinished();
 
-            for(qint32 ith = 0; ith < nThread; ++ ith)
-                in_mat_used.block(0,ith*nSubSample,nmegchanused,nSubSample)= res.resultAt(ith);
+//            qDebug() << "rtSSS mapped done!";
+
+//            for(qint32 ith = 0; ith < nThread; ++ ith)
+//                in_mat_used.block(0,ith*nSubSample,nmegchanused,nSubSample)= res.resultAt(ith);
 
             // Replace raw signal by SSS signal
-            for(qint32 i = 0, k = 0; i < nmegchan; ++i)
-                if (badch(i) == 0)
-                {
-                    in_mat.row(i) = in_mat_used.row(k);
-                    k++;
-                }
+            for(qint32 i = 0; i < in_mat_used.rows(); ++i) {
+                in_mat.row(pickedChannels(i)) = in_mat_used.row(i);
+//             qDebug() <<    in_mat.row(pickedChannels(i));
+            }
+
+//            for(qint32 i = 0, k = 0; i < nmegchan; ++i)
+//                if (badch(i) == 0)
+//                {
+//                    in_mat.row(i) = in_mat_used.row(k);
+//                    k++;
+//                }
 
             // Output to display
-            for(qint32 i = 0; i <in_mat.cols(); ++i)
-                m_pRTMSAOutput->data()->setValue(1e7 * in_mat.col(i));
-//                m_pRTMSAOutput->data()->setValue(1e-16 * in_mat.col(i));
+            m_pRTMSAOutput->data()->setValue(in_mat);
+
+//            for(qint32 i = 0; i <in_mat.cols(); ++i)
+//                m_pRTMSAOutput->data()->setValue(1e7 * in_mat.col(i));
+////                m_pRTMSAOutput->data()->setValue(1e-16 * in_mat.col(i));
 
             cnt++;
-            qDebug() << cnt;
+            qDebug() << cnt << "   " ;
         }
     }
 
     m_bProcessData = false;
     m_bReceiveData = false;
-    qDebug() << "rtSSS stopped.";
+    //qDebug() << "rtSSS stopped.";
 }
 
 
