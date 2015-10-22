@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['aboutwindow',['AboutWindow',['../class_m_n_e_browse_raw_qt_1_1_about_window.html',1,'MNEBrowseRawQt']]],
   ['aboutwindow',['AboutWindow',['../class_about_window.html',1,'']]],
+  ['aboutwindow',['AboutWindow',['../class_m_n_e_browse_raw_qt_1_1_about_window.html',1,'MNEBrowseRawQt']]],
   ['adaptivemp',['AdaptiveMp',['../class_u_t_i_l_s_l_i_b_1_1_adaptive_mp.html',1,'UTILSLIB']]],
   ['annotation',['Annotation',['../class_f_s_l_i_b_1_1_annotation.html',1,'FSLIB']]],
   ['annotationset',['AnnotationSet',['../class_f_s_l_i_b_1_1_annotation_set.html',1,'FSLIB']]],
@@ -12,8 +12,8 @@ var searchData=
   ['atomwindow',['AtomWindow',['../class_atom_window.html',1,'']]],
   ['averagedelegate',['AverageDelegate',['../class_m_n_e_browse_raw_qt_1_1_average_delegate.html',1,'MNEBrowseRawQt']]],
   ['averagemodel',['AverageModel',['../class_m_n_e_browse_raw_qt_1_1_average_model.html',1,'MNEBrowseRawQt']]],
-  ['averagescene',['AverageScene',['../class_m_n_e_browse_raw_qt_1_1_average_scene.html',1,'MNEBrowseRawQt']]],
-  ['averagesceneitem',['AverageSceneItem',['../class_m_n_e_browse_raw_qt_1_1_average_scene_item.html',1,'MNEBrowseRawQt']]],
+  ['averagescene',['AverageScene',['../class_d_i_s_p_l_i_b_1_1_average_scene.html',1,'DISPLIB']]],
+  ['averagesceneitem',['AverageSceneItem',['../class_d_i_s_p_l_i_b_1_1_average_scene_item.html',1,'DISPLIB']]],
   ['averagewindow',['AverageWindow',['../class_m_n_e_browse_raw_qt_1_1_average_window.html',1,'MNEBrowseRawQt']]],
   ['averaging',['Averaging',['../class_averaging_plugin_1_1_averaging.html',1,'AveragingPlugin']]],
   ['averagingaboutwidget',['AveragingAboutWidget',['../class_averaging_plugin_1_1_averaging_about_widget.html',1,'AveragingPlugin']]],

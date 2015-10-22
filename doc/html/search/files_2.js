@@ -1,5 +1,7 @@
 var searchData=
 [
+  ['chinfomodel_2ecpp',['chinfomodel.cpp',['../chinfomodel_8cpp.html',1,'']]],
+  ['chinfomodel_2eh',['chinfomodel.h',['../chinfomodel_8h.html',1,'']]],
   ['chinfowindow_2ecpp',['chinfowindow.cpp',['../chinfowindow_8cpp.html',1,'']]],
   ['chinfowindow_2eh',['chinfowindow.h',['../chinfowindow_8h.html',1,'']]],
   ['circularbuffer_2ecpp',['circularbuffer.cpp',['../circularbuffer_8cpp.html',1,'']]],

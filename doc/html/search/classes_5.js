@@ -3,7 +3,6 @@ var searchData=
   ['ecgaboutwidget',['ECGAboutWidget',['../class_e_c_g_simulator_plugin_1_1_e_c_g_about_widget.html',1,'ECGSimulatorPlugin']]],
   ['ecgaboutwidgetclass',['ECGAboutWidgetClass',['../class_ui_1_1_e_c_g_about_widget_class.html',1,'Ui']]],
   ['ecgproducer',['ECGProducer',['../class_e_c_g_simulator_plugin_1_1_e_c_g_producer.html',1,'ECGSimulatorPlugin']]],
-  ['ecgrunclass',['ECGRunClass',['../class_ui_1_1_e_c_g_run_class.html',1,'Ui']]],
   ['ecgsetupclass',['ECGSetupClass',['../class_ui_1_1_e_c_g_setup_class.html',1,'Ui']]],
   ['ecgsetupwidget',['ECGSetupWidget',['../class_e_c_g_simulator_plugin_1_1_e_c_g_setup_widget.html',1,'ECGSimulatorPlugin']]],
   ['ecgsimchannel',['ECGSimChannel',['../class_e_c_g_simulator_plugin_1_1_e_c_g_sim_channel.html',1,'ECGSimulatorPlugin']]],
@@ -21,6 +20,5 @@ var searchData=
   ['enhancededitorwindow',['Enhancededitorwindow',['../class_enhancededitorwindow.html',1,'']]],
   ['eventdelegate',['EventDelegate',['../class_m_n_e_browse_raw_qt_1_1_event_delegate.html',1,'MNEBrowseRawQt']]],
   ['eventmodel',['EventModel',['../class_m_n_e_browse_raw_qt_1_1_event_model.html',1,'MNEBrowseRawQt']]],
-  ['eventwindow',['EventWindow',['../class_m_n_e_browse_raw_qt_1_1_event_window.html',1,'MNEBrowseRawQt']]],
-  ['evokedmodalitywidget',['EvokedModalityWidget',['../class_x_d_i_s_p_l_i_b_1_1_evoked_modality_widget.html',1,'XDISPLIB']]]
+  ['eventwindow',['EventWindow',['../class_m_n_e_browse_raw_qt_1_1_event_window.html',1,'MNEBrowseRawQt']]]
 ];

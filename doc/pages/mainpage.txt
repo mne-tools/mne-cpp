@@ -100,8 +100,12 @@
  * \li Luise Lang luise.lang@tu-ilmenau.de 2014
  * \li Felix Arndt felix.arndt@tu-ilmenau.de 2014
  * \li Daniel Knobl daniel.knobl@tu-ilmenau.de 2014
+ * \li Martin Henfling martin.henfling@tu-ilmenau.de 2014
  * \li Seok Lew slew@nmr.mgh.harvard.edu 2014
  * \li Chiran Doshi chiran.doshi@childrens.harvard.edu 2014
+ * \li Franco-Joel Polo franco-joel.polo@tu-ilmenau.de 2014
+ * \li Carsten Boensel carsten.boensel@tu-ilmenau.de 2015
+ * \li Jana Kiesel jana.kiesel@tu-ilmenau.de 2015
  *
  */
 

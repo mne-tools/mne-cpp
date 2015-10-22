@@ -27,6 +27,8 @@ var searchData=
   ['averaging_5fglobal_2eh',['averaging_global.h',['../averaging__global_8h.html',1,'']]],
   ['averagingaboutwidget_2ecpp',['averagingaboutwidget.cpp',['../averagingaboutwidget_8cpp.html',1,'']]],
   ['averagingaboutwidget_2eh',['averagingaboutwidget.h',['../averagingaboutwidget_8h.html',1,'']]],
+  ['averagingsettingswidget_2ecpp',['averagingsettingswidget.cpp',['../averagingsettingswidget_8cpp.html',1,'']]],
+  ['averagingsettingswidget_2eh',['averagingsettingswidget.h',['../averagingsettingswidget_8h.html',1,'']]],
   ['averagingsetupwidget_2ecpp',['averagingsetupwidget.cpp',['../averagingsetupwidget_8cpp.html',1,'']]],
   ['averagingsetupwidget_2eh',['averagingsetupwidget.h',['../averagingsetupwidget_8h.html',1,'']]]
 ];

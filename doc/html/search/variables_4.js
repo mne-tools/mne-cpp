@@ -9,7 +9,6 @@ var searchData=
   ['endian',['endian',['../struct_f_i_f_f_l_i_b_1_1__fiff__data__ref.html#adf1ace9f1a93518db18b26e97b11929a',1,'FIFFLIB::_fiff_data_ref']]],
   ['ent',['ent',['../class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a4eb9431e5cc5f8a5d8ae452a51661f5e',1,'FIFFLIB::FiffRawDir']]],
   ['epoch',['epoch',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html#ae4a5960195809fd713fc6ecef9b53731',1,'MNELIB::MNEEpochData']]],
-  ['epochs',['epochs',['../class_f_i_f_f_l_i_b_1_1_fiff_evoked_data.html#a3299c9d7a7c3fc8d874eec57aa141343',1,'FIFFLIB::FiffEvokedData']]],
   ['event',['event',['../class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html#a17777212048bda9f08419a4056a96fa6',1,'MNELIB::MNEEpochData']]],
   ['evoked',['evoked',['../class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#aec48fff116de710b554d21f7f89f8fe6',1,'FIFFLIB::FiffEvokedSet']]],
   ['ex',['ex',['../class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html#a3384bdc6bec84189fc61ad275127dc2f',1,'FIFFLIB::FiffChPos']]],

@@ -111,6 +111,10 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
     connect(ui.m_pSpinBoxBaselineTo, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &AveragingSettingsWidget::changeBaselineTo);
 
+    connect(ui.m_pushButton_reset, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+            m_pAveragingToolbox, &Averaging::resetAverage);
+
+
     setWindowFlags(Qt::WindowStaysOnTopHint);
 }
 
