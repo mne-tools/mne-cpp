@@ -399,6 +399,7 @@ void QuickControlWidget::createScalingGroup()
                 this,&QuickControlWidget::updateSliderScaling);
         t_pGridLayout->addWidget(t_pHorizontalSlider,i+1,1,1,1);
 
+
         i+=2;
     }
 

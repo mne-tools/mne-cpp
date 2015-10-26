@@ -344,6 +344,32 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
 
             break;
         }
+
+
+        /*  Add the coiltrans for each sensor */
+        /* x-axis normal vector */
+        t_ch.coil_trans(0,0) = t_ch.loc(3,0);
+        t_ch.coil_trans(1,0) = t_ch.loc(4,0);
+        t_ch.coil_trans(2,0) = t_ch.loc(5,0);
+        /* y-axis normal vector */
+        t_ch.coil_trans(0,1) = t_ch.loc(6,0);
+        t_ch.coil_trans(1,1) = t_ch.loc(7,0);
+        t_ch.coil_trans(2,1) = t_ch.loc(8,0);
+        /* z-axis normal vector */
+        t_ch.coil_trans(0,2) = t_ch.loc(9,0);
+        t_ch.coil_trans(1,2) = t_ch.loc(10,0);
+        t_ch.coil_trans(2,2) = t_ch.loc(11,0);
+        /* x,y,z coordinates */
+        t_ch.coil_trans(0,3) = t_ch.loc(0,0);
+        t_ch.coil_trans(1,3) = t_ch.loc(1,0);
+        t_ch.coil_trans(2,3) = t_ch.loc(2,0);
+
+        /* 0 0 0 1 */
+        t_ch.coil_trans(3,0) = 0.0;
+        t_ch.coil_trans(3,1) = 0.0;
+        t_ch.coil_trans(3,2) = 0.0;
+        t_ch.coil_trans(3,3) = 1.0;
+
         m_FiffInfo.chs.append(t_ch);
         m_FiffInfo.ch_names.append(t_ch.ch_name);
 
