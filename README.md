@@ -53,7 +53,7 @@ To build MNE-CPP follow the wiki-guide:
 Contact information
 ===================
 
-Homepage: http://www.tu-ilmenau.de/mne-cpp
+Homepage: http://www.mne-cpp.com
 
 Mailing List: http://mail.nmr.mgh.harvard.edu/mailman/listinfo/mne_analysis
 
