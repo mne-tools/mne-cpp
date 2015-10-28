@@ -10,7 +10,7 @@ cd mne-cpp_shadow_build
 call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" amd64
 
 qmake ../mne-cpp/mne-cpp.pro -r
-:: nmake clean
+nmake clean
 nmake
 
 cd ..
