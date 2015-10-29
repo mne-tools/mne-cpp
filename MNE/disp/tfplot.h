@@ -127,7 +127,7 @@ public:
     TFplot(MatrixXd tf_matrix, qreal sample_rate, ColorMaps cmap);
 
 
-    //void plotTf(MatrixXd signal_vector, int sample_rate, ColorMaps cmap);
+private:
 
     //=========================================================================================================
     /**
