@@ -70,6 +70,22 @@ class UTILSSHARED_EXPORT Spectrogram
 {
 
 public:
+    //=========================================================================================================
+    /**
+    * Spectrogram_make_spectrogram
+    *
+     * ### TF plot root function ###
+    *
+    * calculates the spectrogram (tf-representation) of a given signal
+    *
+    * @param[in] signal         input-signal to calculate spectrogram of
+    * @param[in] window_size    size of the window which is used (resolution in time an frequency is depending on it)
+    *
+    * @return spectrogram-matrix (tf-representation of the input signal)
+    */
+    static inline MatrixXd make_spectrogram(VectorXd signal, qint32 window_size);
+
+private:
 
     //=========================================================================================================
     /**
@@ -87,20 +103,6 @@ public:
     */
     static inline VectorXd gauss_window (qint32 sample_count, qreal scale, quint32 translation);
 
-    //=========================================================================================================
-    /**
-    * Spectrogram_make_spectrogram
-    *
-     * ### TF plot root function ###
-    *
-    * calculates the spectrogram (tf-representation) of a given signal
-    *
-    * @param[in] signal         input-signal to calculate spectrogram of
-    * @param[in] window_size    size of the window which is used (resolution in time an frequency is depending on it)
-    *
-    * @return spectrogram-matrix (tf-representation of the input signal)
-    */
-    static inline MatrixXd make_spectrogram(VectorXd signal, qint32 window_size);
 };
 
 }//namespace
