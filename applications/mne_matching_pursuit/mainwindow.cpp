@@ -3257,6 +3257,8 @@ void MainWindow::on_mouse_button_release()
         read_matlab_file_new();
 }
 
+//*****************************************************************************************************************
+
 void MainWindow::on_rb_OwnDictionary_clicked()
 {
     ui->cb_Dicts->setEnabled(true);
@@ -3265,6 +3267,8 @@ void MainWindow::on_rb_OwnDictionary_clicked()
     else if(_has_file)
         ui->btt_Calc->setEnabled(true);
 }
+
+//*****************************************************************************************************************
 
 void MainWindow::on_actionTFplot_triggered()
 {    
@@ -3306,6 +3310,8 @@ void MainWindow::on_actionTFplot_triggered()
     }    
 }
 
+//*****************************************************************************************************************
+
 void MainWindow::on_extend_tab_button()
 {
     //plot_window->show();
@@ -3320,6 +3326,8 @@ void MainWindow::on_extend_tab_button()
 
 */
 }
+
+//*****************************************************************************************************************
 
 void MainWindow::on_close_tab_button(int index)
 {
