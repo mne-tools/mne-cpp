@@ -89,9 +89,61 @@ class DISPSHARED_EXPORT TFplot : public QWidget
 {
 
 public:
-    TFplot(MatrixXd tf1_matrix, qreal sample_rate, qreal lower_frq, qreal upper_frq, ColorMaps cmap);
+
+    //=========================================================================================================
+    /**
+    * TFplot_TFplot
+    *
+    * ### display tf-plot function ###
+    *
+    * Constructor
+    *
+    * constructs TFplot class
+    *
+    *  @param[in] tf_matrix         given spectrogram
+    *  @param[in] sample_rate       given sample rate of signal related to th spectrogram
+    *  @param[in] lower_frq         lower bound frequency, that should be plotted
+    *  @param[in] upper_frq         upper bound frequency, that should be plotted
+    *  @param[in] cmap              colormap used to plot the spectrogram
+    *
+    */
+    TFplot(MatrixXd tf_matrix, qreal sample_rate, qreal lower_frq, qreal upper_frq, ColorMaps cmap);
+
+    //=========================================================================================================
+    /**
+    * TFplot_TFplot
+    *
+    * ### display tf-plot function ###
+    *
+    * Constructor
+    *
+    * constructs TFplot class
+    *
+    *  @param[in] tf_matrix         given spectrogram
+    *  @param[in] sample_rate       given sample rate of signal related to th spectrogram
+    *  @param[in] cmap              colormap used to plot the spectrogram
+    *
+    */
     TFplot(MatrixXd tf_matrix, qreal sample_rate, ColorMaps cmap);
-    void plotTf(MatrixXd signal_vector, int sample_rate, ColorMaps cmap);  
+
+
+    //void plotTf(MatrixXd signal_vector, int sample_rate, ColorMaps cmap);
+
+    //=========================================================================================================
+    /**
+    * TFplot_calc_plot
+    *
+    * ### display tf-plot function ###
+    *
+    * calculates a image to plot the tf_matrix
+    *
+    *  @param[in] tf_matrix         given spectrogram
+    *  @param[in] sample_rate       given sample rate of signal related to th spectrogram
+    *  @param[in] cmap              colormap used to plot the spectrogram
+    *  @param[in] lower_frq         lower bound frequency, that should be plotted
+    *  @param[in] upper_frq         upper bound frequency, that should be plotted
+    *
+    */
     void calc_plot(MatrixXd tf_matrix, qreal sample_rate, ColorMaps cmap, qreal lower_frq, qreal upper_frq);
 
 protected:
