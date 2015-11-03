@@ -168,7 +168,7 @@ public:
     *
     * Write Matrix to a textfile
     */
-    static void MNEBem::getEigenToData(MatrixX3f &src, char* pathAndName);
+    static void getEigenToData(MatrixX3f &src, char* pathAndName);
 
 protected:
     //=========================================================================================================
