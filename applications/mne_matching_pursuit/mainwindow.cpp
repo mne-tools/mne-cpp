@@ -48,6 +48,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -61,7 +62,9 @@
 #include <QtConcurrent>
 #include <qtconcurrentrun.h>
 
-#include "QtGui"
+#include <QtGui>
+#include <QGraphicsTextItem>
+#include <QGraphicsLineItem>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -70,6 +73,7 @@
 
 using namespace MNELIB;
 using namespace UTILSLIB;
+using namespace DISPLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -112,6 +116,8 @@ EditorWindow *_editor_window;
 Enhancededitorwindow *_enhanced_editor_window;
 settingwindow *_setting_window;
 TreebasedDictWindow *_treebased_dict_window;
+const QSize* psize = new QSize(10, 10);
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -119,7 +125,12 @@ TreebasedDictWindow *_treebased_dict_window;
 //=============================================================================================================
 MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);    
+
+    ui->setupUi(this);
+    ui->tabWidget->setPalette(*(new QPalette(Qt::green)));
+    ui->tabWidget->removeTab(1);
+    ui->tabWidget->tabBar()->tabButton(0, QTabBar::LeftSide)->resize(0, 0);
+    connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(on_close_tab_button(int)));
 
     this->setMinimumSize(1280, 640);
     callGraphWindow = new GraphWindow();
@@ -127,6 +138,7 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     callGraphWindow->setMinimumHeight(140);
     callGraphWindow->setMinimumWidth(500);
     ui->l_Graph->addWidget(callGraphWindow);
+
 
     connect(callGraphWindow, SIGNAL(read_new()), this, SLOT(on_mouse_button_release()));
 
@@ -403,6 +415,7 @@ void MainWindow::open_file()
     ui->lb_figure_of_merit->setHidden(true);
     callXAxisWindow->setMinimumHeight(22);
     callXAxisWindow->setMaximumHeight(22);
+    ui->actionTFplot->setEnabled(false);
 
 
     _atom_sum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
@@ -1355,6 +1368,7 @@ void MainWindow::on_btt_Calc_clicked()
         ui->actionExport->setEnabled(false);
         ui->lb_figure_of_merit->setHidden(true);
         ui->lb_info_content->clear();
+        ui->actionTFplot->setEnabled(false);
 
         _adaptive_atom_list.clear();
         _fix_dict_atom_list.clear();
@@ -1832,6 +1846,7 @@ void MainWindow::calc_thread_finished()
     ui->dsb_from->setEnabled(true);
     ui->dsb_to->setEnabled(true);    
     ui->sb_sample_count ->setEnabled(true);
+    ui->actionTFplot->setEnabled(true);
 
     QList<qint32> sizes = ui->splitter->sizes();
     sizes.insert(0, max_tbv_header_width + 100);
@@ -3242,6 +3257,8 @@ void MainWindow::on_mouse_button_release()
         read_matlab_file_new();
 }
 
+//*****************************************************************************************************************
+
 void MainWindow::on_rb_OwnDictionary_clicked()
 {
     ui->cb_Dicts->setEnabled(true);
@@ -3249,4 +3266,70 @@ void MainWindow::on_rb_OwnDictionary_clicked()
         ui->btt_Calc->setEnabled(false);
     else if(_has_file)
         ui->btt_Calc->setEnabled(true);
+}
+
+//*****************************************************************************************************************
+
+void MainWindow::on_actionTFplot_triggered()
+{    
+    if(ui->tabWidget->count() == 1)
+    {       
+        MatrixXd tf_sum;
+        tf_sum = MatrixXd::Zero(floor(_adaptive_atom_list.first().first().sample_count/2), _adaptive_atom_list.first().first().sample_count);
+
+        for(qint32 i = 0; i < _adaptive_atom_list.first().length(); i++)//foreach channel
+        {
+            for(qint32 j = 0; j < _adaptive_atom_list.length(); j++) //foreach atom
+            {
+                GaborAtom atom  = _adaptive_atom_list.at(j).at(i);
+                MatrixXd tf_matrix = atom.make_tf(atom.sample_count, atom.scale, atom.translation, atom.modulation);
+
+                tf_matrix *= atom.max_scalar_list.at(i)*atom.max_scalar_list.at(i);
+                tf_sum += tf_matrix;
+            }
+        }
+
+        //tf_sum = Spectrogram::make_spectrogram(_signal_matrix.col(0), 0);
+
+
+
+        TFplot *tfplot = new TFplot(tf_sum, _sample_rate, 0, 600, ColorMaps::Jet);
+        //tfplot->show();
+        ui->tabWidget->addTab(tfplot, "TF-Overview");
+        ui->tabWidget->setCurrentIndex(1);
+        tfplot->resize(ui->tabWidget->size());
+
+        QPushButton *extendedButton = new QPushButton();
+        extendedButton->setMaximumSize(20, 20);
+        extendedButton->setStyleSheet("QPushButton {margin-right: 2px;  border-width: 1px; border-radius: 1px; border-color: grey;} QPushButton:pressed {background-color: grey; border-radius: 10px;}");
+        extendedButton->setIcon(QIcon(":/images/icons/expand_512.png"));
+        extendedButton->setIconSize(QSize(16, 16));
+
+        ui->tabWidget->tabBar()->setTabButton(1, QTabBar::LeftSide, extendedButton);
+        connect(extendedButton, SIGNAL (released()), this, SLOT (on_extend_tab_button()));
+    }    
+}
+
+//*****************************************************************************************************************
+
+void MainWindow::on_extend_tab_button()
+{
+    //plot_window->show();
+    //plot_window->setWindowTitle("Time-Frequency-Overview");
+  //  QWidget *tf_overview_w = new QWidget();
+  //  tf_overview_w->setWindowTitle("Time-Frequency-Overview");
+  //  tf_overview_w->show();
+    ui->tabWidget->removeTab(1);
+    /*QLayout layout;// = new QLayout;
+    layout->addWidget(plot_window);
+    tf_overview_w->setLayout(layout);
+
+*/
+}
+
+//*****************************************************************************************************************
+
+void MainWindow::on_close_tab_button(int index)
+{
+    ui->tabWidget->removeTab(index);
 }
