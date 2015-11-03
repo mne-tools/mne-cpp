@@ -64,7 +64,6 @@
 
 #include <Eigen/Core>
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE DISP3DLIB
@@ -176,6 +175,17 @@ public:
     * @param[in] p_sColorMap    The colormap to use
     */
     void setColorMap(const QString &p_sColorMap);
+
+    //=========================================================================================================
+    /**
+    * Get pixmap data from ImageSc class for further processing
+    *
+    * @param[out] p_sColorMap    The colormap to use
+    */
+    inline QPixmap getPixmap()
+    {
+        return *m_pPixmapData;
+    }
 
 protected:
     //=========================================================================================================

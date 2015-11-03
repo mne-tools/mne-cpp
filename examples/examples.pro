@@ -1,3 +1,4 @@
+
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     examples.pro
@@ -51,9 +52,12 @@ SUBDIRS += \
     evokedGradAmp \
     cancelNoise \
     fiffIO \
-    makeLayout\
-    readBEM\
-    patientManager
+    makeLayout \
+    mghIO \
+    mriTestViewer \
+    patientManager \
+    readBEM \
+
 
 contains(MNECPP_CONFIG, withGui) {
 	SUBDIRS +=

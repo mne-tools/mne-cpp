@@ -2,13 +2,14 @@
 #
 # @file     fs.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+#           Carsten Boensel <carsten.boensel@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-# @version  1.0
-# @date     July, 2012
+# @version  1.1
+# @date     July, 2015
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2015, Christoph Dinh, Carsten Boensel, and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -83,7 +84,15 @@ SOURCES += \
     label.cpp \
     surface.cpp \
     annotationset.cpp \
-    surfaceset.cpp
+    surfaceset.cpp \
+    mri.cpp \
+    mgh.cpp \
+    blendian.cpp \
+    slicedata.cpp \
+    3rdParty/miniz.c \
+    3rdParty/tinfl.c \
+    cubedata.cpp
+
 
 HEADERS += \
     annotation.h\
@@ -92,7 +101,13 @@ HEADERS += \
     label.h \
     surface.h \
     annotationset.h \
-    surfaceset.h
+    surfaceset.h \
+    mri.h \
+    mgh.h \
+    blendian.h \
+    slicedata.h \
+    cubedata.h
+
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -104,3 +119,5 @@ header_files.path = $${MNE_INCLUDE_DIR}/fs
 INSTALLS += header_files
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+
+DISTFILES +=
