@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       += widgets 3dcore 3drenderer 3dinput concurrent
+QT       += widgets 3dcore 3drender 3dinput concurrent
 
 DEFINES += DISP3DNEW_LIBRARY
 
@@ -88,9 +88,19 @@ else {
 }
 
 SOURCES += \
+    view3d.cpp \
+    3DObjects/brain.cpp \
+    3DObjects/brainobject.cpp \
+    helpers/renderable3Dentity.cpp \
+    helpers/custommesh.cpp
 
 HEADERS += \
     disp3dnew_global.h \
+    view3d.h \
+    3DObjects/brain.h \
+    3DObjects/brainobject.h \
+    helpers/renderable3Dentity.h \
+    helpers/custommesh.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
