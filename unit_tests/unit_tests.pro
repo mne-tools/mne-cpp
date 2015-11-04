@@ -72,7 +72,7 @@ contains(MNECPP_CONFIG, withGui) {
             isEqual(QT_MINOR_VERSION, 6){
                 message(Qt3D available && QTVersion >= Qt 5.6: new mne 3D tests configured!)
                 SUBDIRS += \
-                    test_new_3d
+                    #test_new_3d
             }
         }
     }
