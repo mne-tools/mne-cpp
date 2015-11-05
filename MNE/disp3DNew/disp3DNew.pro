@@ -92,7 +92,8 @@ SOURCES += \
     3DObjects/brain.cpp \
     3DObjects/brainobject.cpp \
     helpers/renderable3Dentity.cpp \
-    helpers/custommesh.cpp
+    helpers/custommesh.cpp \
+    helpers/window.cpp \
 
 HEADERS += \
     disp3dnew_global.h \
@@ -100,7 +101,8 @@ HEADERS += \
     3DObjects/brain.h \
     3DObjects/brainobject.h \
     helpers/renderable3Dentity.h \
-    helpers/custommesh.h
+    helpers/custommesh.h \
+    helpers/window.h \
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

@@ -45,6 +45,8 @@
 
 #include "3DObjects/brain.h"
 
+#include "helpers/window.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -57,6 +59,10 @@
 
 #include <Qt3DCore/QAspectEngine>
 #include <Qt3DCore/QCamera>
+
+#include <Qt3DCore/QTransform>
+#include <Qt3DCore/QScaleTransform>
+#include <Qt3DRender/QPerVertexColorMaterial>
 
 #include <Qt3DRender/QRenderAspect>
 #include <Qt3DRender/QFrameGraph>
@@ -97,7 +103,7 @@ namespace DISP3DNEWLIB
 *
 * @brief Visualizes 3D data
 */
-class DISP3DNEWSHARED_EXPORT View3D : public QWindow
+class DISP3DNEWSHARED_EXPORT View3D : public Window
 {
     Q_OBJECT
 
@@ -130,7 +136,7 @@ public:
     bool addFsBrainData(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
 
 protected:
-    Qt3DCore::QAspectEngine*        m_aspectEngine;
+    Qt3DCore::QAspectEngine         m_aspectEngine;
     Qt3DCore::QEntity*              m_pRootEntity;
     Qt3DInput::QInputAspect*        m_pInputAspect;
     Qt3DCore::QCamera*              m_pCameraEntity;

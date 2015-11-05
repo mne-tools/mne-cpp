@@ -50,8 +50,12 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QVector3D>
 
 #include <Qt3DRender/QGeometryRenderer>
+#include <Qt3DRender/QGeometry>
+#include <Qt3DRender/QAttribute>
+#include <Qt3DRender/QBuffer>
 
 
 //*************************************************************************************************************
@@ -121,6 +125,8 @@ protected:
     MatrixX3f   m_matVert;      /**< alias verts. Vertex coordinates in meters */
     MatrixX3i   m_matTris;      /**< alias faces. The triangle descriptions */
     MatrixX3f   m_matNorm;      /**< Normalized surface normals for each vertex. -> not needed since qglbuilder is doing that for us */
+
+    void init();
 };
 
 } // NAMESPACE
