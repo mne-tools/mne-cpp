@@ -43,6 +43,8 @@
 
 #include "disp3dnew_global.h"
 
+#include "3DObjects/brain.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -98,6 +100,7 @@ namespace DISP3DNEWLIB
 class DISP3DNEWSHARED_EXPORT View3D : public QWindow
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<View3D> SPtr;             /**< Shared pointer type for View3D class. */
     typedef QSharedPointer<const View3D> ConstSPtr;  /**< Const shared pointer type for View3D class. */
@@ -115,6 +118,17 @@ public:
     */
     ~View3D();
 
+    //=========================================================================================================
+    /**
+    * Adds FreeSurfer brain data.
+    *
+    * @param[in] subject_id         Name of subject
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
+    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+    * @param[in] subjects_dir       Subjects directory
+    */
+    bool addFsBrainData(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
+
 protected:
     Qt3DCore::QAspectEngine*        m_aspectEngine;
     Qt3DCore::QEntity*              m_pRootEntity;
@@ -122,6 +136,8 @@ protected:
     Qt3DCore::QCamera*              m_pCameraEntity;
     Qt3DRender::QFrameGraph*        m_pFrameGraph;
     Qt3DRender::QForwardRenderer*   m_pForwardRenderer;
+
+    Brain::SPtr          m_pBrain;
 
     //=========================================================================================================
     /**

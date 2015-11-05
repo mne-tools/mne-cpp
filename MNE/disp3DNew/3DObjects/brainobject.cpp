@@ -54,7 +54,14 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainObject::BrainObject()
+BrainObject::BrainObject(const Surface &tSurface, Qt3DCore::QEntity *parent)
+: Renderable3DEntity(tSurface.rr(), tSurface.nn(), tSurface.tris(), parent)
+, m_sFilePath(tSurface.filePath())
+, m_sFileName(tSurface.fileName())
+, m_iHemi(tSurface.hemi())
+, m_sSurf(tSurface.surf())
+, m_vecCurv(tSurface.curv())
+, m_vecOffset(tSurface.offset())
 {
 }
 

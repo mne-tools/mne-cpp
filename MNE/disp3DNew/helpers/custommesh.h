@@ -56,6 +56,14 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -73,6 +81,8 @@ namespace DISP3DNEWLIB
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace Eigen;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -89,6 +99,7 @@ namespace DISP3DNEWLIB
 class DISP3DNEWSHARED_EXPORT CustomMesh : public Qt3DRender::QGeometryRenderer
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<CustomMesh> SPtr;             /**< Shared pointer type for CustomMesh class. */
     typedef QSharedPointer<const CustomMesh> ConstSPtr;  /**< Const shared pointer type for CustomMesh class. */
@@ -98,7 +109,7 @@ public:
     * Default constructor
     *
     */
-    CustomMesh();
+    CustomMesh(const MatrixX3f tMatVert, const MatrixX3f tMatNorm, const MatrixX3i tMatTris);
 
     //=========================================================================================================
     /**
@@ -107,7 +118,9 @@ public:
     ~CustomMesh();
 
 protected:
-
+    MatrixX3f   m_matVert;      /**< alias verts. Vertex coordinates in meters */
+    MatrixX3i   m_matTris;      /**< alias faces. The triangle descriptions */
+    MatrixX3f   m_matNorm;      /**< Normalized surface normals for each vertex. -> not needed since qglbuilder is doing that for us */
 };
 
 } // NAMESPACE
