@@ -45,6 +45,9 @@
 
 #include "brainobject.h"
 
+#include <fs/surfaceset.h>
+#include <fs/annotationset.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -75,6 +78,7 @@ namespace DISP3DNEWLIB
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace FSLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -91,6 +95,7 @@ namespace DISP3DNEWLIB
 class DISP3DNEWSHARED_EXPORT Brain : public Qt3DCore::QEntity
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<Brain> SPtr;             /**< Shared pointer type for Brain class. */
     typedef QSharedPointer<const Brain> ConstSPtr;  /**< Const shared pointer type for Brain class. */
@@ -100,7 +105,7 @@ public:
     * Default constructor
     *
     */
-    Brain();
+    Brain(QEntity *parent = 0);
 
     //=========================================================================================================
     /**
@@ -120,7 +125,7 @@ public:
     bool addFsBrainData(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
 
 protected:
-    QList<BrainObject*>     m_lBrainData;
+    QList<BrainObject::SPtr>     m_lBrainData;
 
 };
 

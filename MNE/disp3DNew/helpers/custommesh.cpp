@@ -54,7 +54,11 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CustomMesh::CustomMesh()
+CustomMesh::CustomMesh(const MatrixX3f tMatVert, const MatrixX3f tMatNorm, const MatrixX3i tMatTris)
+: Qt3DRender::QGeometryRenderer()
+, m_matVert(tMatVert)
+, m_matTris(tMatTris)
+, m_matNorm(tMatNorm)
 {
 }
 

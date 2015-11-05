@@ -56,6 +56,13 @@ using namespace DISP3DNEWLIB;
 
 View3D::View3D()
 : QWindow()
+, m_aspectEngine(Q_NULLPTR)
+, m_pRootEntity(Q_NULLPTR)
+, m_pInputAspect(Q_NULLPTR)
+, m_pCameraEntity(Q_NULLPTR)
+, m_pFrameGraph(Q_NULLPTR)
+, m_pForwardRenderer(Q_NULLPTR)
+, m_pBrain(Q_NULLPTR)
 {
     init();
 }
@@ -104,3 +111,15 @@ void View3D::init()
     m_pForwardRenderer->setCamera(m_pCameraEntity);
     m_pFrameGraph->setActiveFrameGraph(m_pForwardRenderer);
 }
+
+
+//*************************************************************************************************************
+
+bool View3D::addFsBrainData(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir)
+{
+    if(!m_pBrain)
+        m_pBrain = Brain::SPtr(new Brain(m_pRootEntity));
+
+    return m_pBrain->addFsBrainData(subject_id, hemi, surf, subjects_dir);
+}
+

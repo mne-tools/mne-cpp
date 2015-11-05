@@ -283,6 +283,22 @@ public:
     */
     inline Vector3f& offset();
 
+    //=========================================================================================================
+    /**
+    * path to surf directuryt
+    *
+    * @return the path to surf directory
+    */
+    inline QString filePath() const;
+
+    //=========================================================================================================
+    /**
+    * surf file name
+    *
+    * @return the surf file name
+    */
+    inline QString fileName() const;
+
 private:
     QString m_sFilePath;    /**< Path to surf directory. */
     QString m_sFileName;    /**< Surface file name. */
@@ -368,6 +384,22 @@ inline const Vector3f& Surface::offset() const
 inline Vector3f& Surface::offset()
 {
     return m_vecOffset;
+}
+
+
+//*************************************************************************************************************
+
+inline QString Surface::filePath() const
+{
+    return m_sFilePath;
+}
+
+
+//*************************************************************************************************************
+
+inline QString Surface::fileName() const
+{
+    return m_sFileName;
 }
 
 } // NAMESPACE

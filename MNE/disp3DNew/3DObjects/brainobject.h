@@ -45,6 +45,9 @@
 
 #include "../helpers/renderable3Dentity.h"
 
+#include <fs/surfaceset.h>
+#include <fs/annotationset.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -75,6 +78,8 @@ namespace DISP3DNEWLIB
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace FSLIB;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -91,16 +96,17 @@ namespace DISP3DNEWLIB
 class DISP3DNEWSHARED_EXPORT BrainObject : public Renderable3DEntity
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<BrainObject> SPtr;             /**< Shared pointer type for BrainObject class. */
     typedef QSharedPointer<const BrainObject> ConstSPtr;  /**< Const shared pointer type for BrainObject class. */
 
     //=========================================================================================================
     /**
-    * Default constructor
+    * Default constructor using freesurfer data as input
     *
     */
-    BrainObject();
+    BrainObject(const Surface &tSurface, Qt3DCore::QEntity *parent = 0);
 
     //=========================================================================================================
     /**
@@ -109,7 +115,12 @@ public:
     ~BrainObject();
 
 protected:
-
+    QString     m_sFilePath;        /**< Path to surf directory. */
+    QString     m_sFileName;        /**< Surface file name. */
+    qint32      m_iHemi;            /**< Hemisphere (lh = 0; rh = 1) */
+    QString     m_sSurf;            /**< Loaded surface (eg. inflated, orig ...) */
+    VectorXf    m_vecCurv;          /**< FreeSurfer curvature data */
+    Vector3f    m_vecOffset;        /**< Surface offset */
 };
 
 } // NAMESPACE

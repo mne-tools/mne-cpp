@@ -54,7 +54,8 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Brain::Brain()
+Brain::Brain(Qt3DCore::QEntity *parent)
+: Qt3DCore::QEntity(parent)
 {
 }
 
@@ -70,6 +71,15 @@ Brain::~Brain()
 
 bool Brain::addFsBrainData(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir)
 {
+    //Create fresurfer surface set and annotation set
+    SurfaceSet tSurfaceSet(subject_id, hemi, surf, subjects_dir);
+
+    //Create new brain objects (based on the number of loaded hemispheres) and add to the global list
+    for(qint32 i = 0; i<tSurfaceSet.data().size(); i++) {
+        BrainObject::SPtr pBrainObject= BrainObject::SPtr(new BrainObject(tSurfaceSet[i], this));
+        m_lBrainData.append(pBrainObject);
+    }
+
     return true;
 }
 
