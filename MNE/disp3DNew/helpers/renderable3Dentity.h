@@ -56,6 +56,10 @@
 #include <QSharedPointer>
 
 #include <Qt3DCore/QEntity>
+#include <Qt3DCore/QTransform>
+
+#include <Qt3DRender/QMaterial>
+#include <Qt3DRender/QPerVertexColorMaterial>
 
 
 //*************************************************************************************************************
@@ -119,8 +123,9 @@ public:
     ~Renderable3DEntity();
 
 protected:
-    CustomMesh::SPtr    m_pCustomMesh;
-
+    CustomMesh::SPtr                            m_pCustomMesh;
+    QSharedPointer<Qt3DCore::QTransform>        m_pTransform;
+    QSharedPointer<Qt3DRender::QMaterial>       m_pMaterial;
 };
 
 } // NAMESPACE

@@ -55,7 +55,7 @@ using namespace DISP3DNEWLIB;
 //=============================================================================================================
 
 View3D::View3D()
-: QWindow()
+: Window()
 , m_aspectEngine(Q_NULLPTR)
 , m_pRootEntity(Q_NULLPTR)
 , m_pInputAspect(Q_NULLPTR)
@@ -80,18 +80,17 @@ View3D::~View3D()
 void View3D::init()
 {
     //Aspect engine
-    m_aspectEngine = new Qt3DCore::QAspectEngine();
-    m_aspectEngine->registerAspect(new Qt3DRender::QRenderAspect());
+    m_aspectEngine.registerAspect(new Qt3DRender::QRenderAspect());
 
     m_pInputAspect = new Qt3DInput::QInputAspect();
-    m_aspectEngine->registerAspect(m_pInputAspect);
-    m_aspectEngine->initialize();
+    m_aspectEngine.registerAspect(m_pInputAspect);
+    m_aspectEngine.initialize();
 
     //Data
     QVariantMap data;
     data.insert(QStringLiteral("surface"), QVariant::fromValue(static_cast<QSurface *>(this)));
     data.insert(QStringLiteral("eventSource"), QVariant::fromValue(this));
-    m_aspectEngine->setData(data);
+    m_aspectEngine.setData(data);
 
     // Root entity
     m_pRootEntity = new Qt3DCore::QEntity();
@@ -110,6 +109,12 @@ void View3D::init()
     m_pForwardRenderer->setClearColor(QColor::fromRgbF(0.0, 0.5, 1.0, 1.0));
     m_pForwardRenderer->setCamera(m_pCameraEntity);
     m_pFrameGraph->setActiveFrameGraph(m_pForwardRenderer);
+
+    // Setting the FrameGraph
+    m_pRootEntity->addComponent(m_pFrameGraph);
+
+    // Set root object of the scene
+    m_aspectEngine.setRootEntity(m_pRootEntity);
 }
 
 
@@ -120,6 +125,8 @@ bool View3D::addFsBrainData(const QString &subject_id, qint32 hemi, const QStrin
     if(!m_pBrain)
         m_pBrain = Brain::SPtr(new Brain(m_pRootEntity));
 
-    return m_pBrain->addFsBrainData(subject_id, hemi, surf, subjects_dir);
+    bool state =  m_pBrain->addFsBrainData(subject_id, hemi, surf, subjects_dir);
+
+    return state;
 }
 
