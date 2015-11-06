@@ -55,7 +55,7 @@ using namespace DISP3DNEWLIB;
 //=============================================================================================================
 
 BrainObject::BrainObject(const Surface &tSurface, Qt3DCore::QEntity *parent)
-: Renderable3DEntity(tSurface.rr(), tSurface.nn(), tSurface.tris(), parent)
+: Renderable3DEntity(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset(), parent)
 , m_sFilePath(tSurface.filePath())
 , m_sFileName(tSurface.fileName())
 , m_iHemi(tSurface.hemi())
@@ -63,6 +63,7 @@ BrainObject::BrainObject(const Surface &tSurface, Qt3DCore::QEntity *parent)
 , m_vecCurv(tSurface.curv())
 , m_vecOffset(tSurface.offset())
 {
+    qDebug()<<m_vecOffset(0)<<m_vecOffset(1)<<m_vecOffset(2);
 }
 
 

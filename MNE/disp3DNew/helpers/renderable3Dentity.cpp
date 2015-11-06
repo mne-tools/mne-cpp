@@ -62,9 +62,9 @@ Renderable3DEntity::Renderable3DEntity()
 //*************************************************************************************************************
 
 
-Renderable3DEntity::Renderable3DEntity(const MatrixX3f &tMatVert, const MatrixX3f &tMatNorm, const MatrixX3i &tMatTris, Qt3DCore::QEntity *parent)
+Renderable3DEntity::Renderable3DEntity(const MatrixX3f &tMatVert, const MatrixX3f &tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset, Qt3DCore::QEntity *parent)
 : Qt3DCore::QEntity(parent)
-, m_pCustomMesh(new CustomMesh(tMatVert, tMatNorm, tMatTris))
+, m_pCustomMesh(new CustomMesh(tMatVert, tMatNorm, tMatTris, tVecOffset))
 , m_pTransform(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
 , m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPerVertexColorMaterial(this)))
 {
