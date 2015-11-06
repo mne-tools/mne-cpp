@@ -114,7 +114,7 @@ public:
     /**
     * Default constructor for freesurfer mesh
     */
-    Renderable3DEntity(const MatrixX3f &tMatVert, const MatrixX3f &tMatNorm, const MatrixX3i &tMatTris, Qt3DCore::QEntity *parent = 0);
+    Renderable3DEntity(const MatrixX3f &tMatVert, const MatrixX3f &tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset, Qt3DCore::QEntity *parent = 0);
 
     //=========================================================================================================
     /**

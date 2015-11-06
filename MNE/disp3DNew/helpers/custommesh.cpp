@@ -54,11 +54,12 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CustomMesh::CustomMesh(const MatrixX3f tMatVert, const MatrixX3f tMatNorm, const MatrixX3i tMatTris)
+CustomMesh::CustomMesh(const MatrixX3f tMatVert, const MatrixX3f tMatNorm, const MatrixX3i tMatTris, const Vector3f &tVecOffset)
 : Qt3DRender::QGeometryRenderer()
 , m_matVert(tMatVert)
 , m_matTris(tMatTris)
 , m_matNorm(tMatNorm)
+, m_vecOffset(tVecOffset)
 {
     init();
 }
@@ -80,70 +81,41 @@ void CustomMesh::init()
     Qt3DRender::QBuffer *vertexDataBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer, customGeometry);
     Qt3DRender::QBuffer *indexDataBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::IndexBuffer, customGeometry);
 
-    // 4 distinct vertices
+    //Fill vertexBuffer with data which hold the vertices, normals and colors
     QByteArray vertexBufferData;
-    vertexBufferData.resize(4 * (3 + 3 + 3) * sizeof(float));
-
-    // Vertices
-    QVector3D v0(-1.0f, 0.0f, -1.0f);
-    QVector3D v1(1.0f, 0.0f, -1.0f);
-    QVector3D v2(0.0f, 1.0f, 0.0f);
-    QVector3D v3(0.0f, 0.0f, 1.0f);
-
-    // Faces Normals
-    QVector3D n023 = QVector3D::normal(v0, v2, v3);
-    QVector3D n012 = QVector3D::normal(v0, v1, v2);
-    QVector3D n310 = QVector3D::normal(v3, v1, v0);
-    QVector3D n132 = QVector3D::normal(v1, v3, v2);
-
-    // Vector Normals
-    QVector3D n0 = QVector3D(n023 + n012 + n310).normalized();
-    QVector3D n1 = QVector3D(n132 + n012 + n310).normalized();
-    QVector3D n2 = QVector3D(n132 + n012 + n023).normalized();
-    QVector3D n3 = QVector3D(n132 + n310 + n023).normalized();
-
-    // Colors
-    QVector3D red(1.0f, 0.0f, 0.0f);
-    QVector3D green(0.0f, 1.0f, 0.0f);
-    QVector3D blue(0.0f, 0.0f, 1.0f);
-    QVector3D white(1.0f, 1.0f, 1.0f);
-
-    QVector<QVector3D> vertices = QVector<QVector3D>()
-            << v0 << n0 << red
-            << v1 << n1 << blue
-            << v2 << n2 << green
-            << v3 << n3 << white;
-
+    vertexBufferData.resize(m_matVert.rows() * (3 + 3 + 3) * sizeof(float));
     float *rawVertexArray = reinterpret_cast<float *>(vertexBufferData.data());
     int idx = 0;
 
-    Q_FOREACH (const QVector3D &v, vertices) {
-        rawVertexArray[idx++] = v.x();
-        rawVertexArray[idx++] = v.y();
-        rawVertexArray[idx++] = v.z();
+    for(int i = 0; i<m_matVert.rows(); i++) {
+        //Vertex
+        rawVertexArray[idx++] = m_matVert(i,0) + m_vecOffset(0);
+        rawVertexArray[idx++] = m_matVert(i,1) + m_vecOffset(1);
+        rawVertexArray[idx++] = m_matVert(i,2) + m_vecOffset(2);
+
+        //Normal
+        rawVertexArray[idx++] = m_matNorm(i,0);
+        rawVertexArray[idx++] = m_matNorm(i,1);
+        rawVertexArray[idx++] = m_matNorm(i,2);
+
+        //Color
+        rawVertexArray[idx++] = 1.0f;//m_matColor(i,0);
+        rawVertexArray[idx++] = 0.0f;//m_matColor(i,1);
+        rawVertexArray[idx++] = 0.0f;//m_matColor(i,2);
     }
 
-    // Indices (12)
+    //Fill indexBufferData with data which holds the triangulation information (faces/tris)
     QByteArray indexBufferData;
-    indexBufferData.resize(4 * 3 * sizeof(ushort));
-    ushort *rawIndexArray = reinterpret_cast<ushort *>(indexBufferData.data());
+    indexBufferData.resize(m_matTris.rows() * 3 * sizeof(uint));
+    uint *rawIndexArray = reinterpret_cast<uint *>(indexBufferData.data());
+    idx = 0;
 
-    // Front
-    rawIndexArray[0] = 0;
-    rawIndexArray[1] = 1;
-    rawIndexArray[2] = 2;
-    // Bottom
-    rawIndexArray[3] = 3;
-    rawIndexArray[4] = 1;
-    rawIndexArray[5] = 0;
-    // Left
-    rawIndexArray[6] = 0;
-    rawIndexArray[7] = 2;
-    rawIndexArray[8] = 3;
-    // Right
-    rawIndexArray[9] = 1;
-    rawIndexArray[10] = 3;
-    rawIndexArray[11] = 2;
+    for(int i = 0; i<m_matTris.rows(); i++) {
+        //Faces/Tris
+        rawIndexArray[idx++] = m_matTris(i,0);
+        rawIndexArray[idx++] = m_matTris(i,1);
+        rawIndexArray[idx++] = m_matTris(i,2);
+    }
 
     vertexDataBuffer->setData(vertexBufferData);
     indexDataBuffer->setData(indexBufferData);
@@ -156,7 +128,7 @@ void CustomMesh::init()
     positionAttribute->setDataSize(3);
     positionAttribute->setByteOffset(0);
     positionAttribute->setByteStride(9 * sizeof(float));
-    positionAttribute->setCount(4);
+    positionAttribute->setCount(m_matVert.rows());
     positionAttribute->setName(Qt3DRender::QAttribute::defaultPositionAttributeName());
 
     Qt3DRender::QAttribute *normalAttribute = new Qt3DRender::QAttribute();
@@ -166,7 +138,7 @@ void CustomMesh::init()
     normalAttribute->setDataSize(3);
     normalAttribute->setByteOffset(3 * sizeof(float));
     normalAttribute->setByteStride(9 * sizeof(float));
-    normalAttribute->setCount(4);
+    normalAttribute->setCount(m_matVert.rows());
     normalAttribute->setName(Qt3DRender::QAttribute::defaultNormalAttributeName());
 
     Qt3DRender::QAttribute *colorAttribute = new Qt3DRender::QAttribute();
@@ -176,17 +148,17 @@ void CustomMesh::init()
     colorAttribute->setDataSize(3);
     colorAttribute->setByteOffset(6 * sizeof(float));
     colorAttribute->setByteStride(9 * sizeof(float));
-    colorAttribute->setCount(4);
+    colorAttribute->setCount(m_matVert.rows());
     colorAttribute->setName(Qt3DRender::QAttribute::defaultColorAttributeName());
 
     Qt3DRender::QAttribute *indexAttribute = new Qt3DRender::QAttribute();
     indexAttribute->setAttributeType(Qt3DRender::QAttribute::IndexAttribute);
     indexAttribute->setBuffer(indexDataBuffer);
-    indexAttribute->setDataType(Qt3DRender::QAttribute::UnsignedShort);
+    indexAttribute->setDataType(Qt3DRender::QAttribute::UnsignedInt);
     indexAttribute->setDataSize(1);
     indexAttribute->setByteOffset(0);
     indexAttribute->setByteStride(0);
-    indexAttribute->setCount(12);
+    indexAttribute->setCount(m_matTris.rows());
 
     customGeometry->addAttribute(positionAttribute);
     customGeometry->addAttribute(normalAttribute);
@@ -198,8 +170,8 @@ void CustomMesh::init()
     this->setBaseInstance(0);
     this->setPrimitiveType(Qt3DRender::QGeometryRenderer::Triangles);
     this->setGeometry(customGeometry);
-    // 4 faces of 3 points
-    this->setPrimitiveCount(12);
+
+    this->setPrimitiveCount(m_matTris.rows()*3);
 }
 
 

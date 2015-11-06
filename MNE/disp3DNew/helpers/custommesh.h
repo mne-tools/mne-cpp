@@ -113,7 +113,7 @@ public:
     * Default constructor
     *
     */
-    CustomMesh(const MatrixX3f tMatVert, const MatrixX3f tMatNorm, const MatrixX3i tMatTris);
+    CustomMesh(const MatrixX3f tMatVert, const MatrixX3f tMatNorm, const MatrixX3i tMatTris, const Vector3f &tVecOffset);
 
     //=========================================================================================================
     /**
@@ -125,6 +125,8 @@ protected:
     MatrixX3f   m_matVert;      /**< alias verts. Vertex coordinates in meters */
     MatrixX3i   m_matTris;      /**< alias faces. The triangle descriptions */
     MatrixX3f   m_matNorm;      /**< Normalized surface normals for each vertex. -> not needed since qglbuilder is doing that for us */
+    MatrixX3f   m_matColor;
+    Vector3f    m_vecOffset;
 
     void init();
 };
