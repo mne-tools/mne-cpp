@@ -106,7 +106,7 @@ public:
     * Default constructor using freesurfer data as input
     *
     */
-    BrainObject(const Surface &tSurface, Qt3DCore::QEntity *parent = 0);
+    BrainObject(const Surface &tSurface, float initScale, Qt3DCore::QEntity *parent = 0);
 
     //=========================================================================================================
     /**
@@ -117,10 +117,18 @@ public:
 protected:
     QString     m_sFilePath;        /**< Path to surf directory. */
     QString     m_sFileName;        /**< Surface file name. */
-    qint32      m_iHemi;            /**< Hemisphere (lh = 0; rh = 1) */
     QString     m_sSurf;            /**< Loaded surface (eg. inflated, orig ...) */
+    qint32      m_iHemi;            /**< Hemisphere (lh = 0; rh = 1) */
+    QColor      m_ColorSulci;
+    QColor      m_ColorGyri;
+
     VectorXf    m_vecCurv;          /**< FreeSurfer curvature data */
     Vector3f    m_vecOffset;        /**< Surface offset */
+    MatrixX3f   m_matVert;          /**< alias verts. Vertex coordinates in meters */
+    MatrixX3i   m_matTris;          /**< alias faces. The triangle descriptions */
+    MatrixX3f   m_matNorm;          /**< Normalized surface normals for each vertex. -> not needed since qglbuilder is doing that for us */
+    MatrixX3f   m_matColorsOrig;    /**< original color values based on curvature values */
+
 };
 
 } // NAMESPACE

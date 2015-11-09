@@ -57,16 +57,20 @@
 
 #include <QWindow>
 
+#include <QDebug>
+
 #include <Qt3DCore/QAspectEngine>
 #include <Qt3DCore/QCamera>
-
 #include <Qt3DCore/QTransform>
 #include <Qt3DCore/QScaleTransform>
-#include <Qt3DRender/QPerVertexColorMaterial>
 
+#include <Qt3DRender/QPhongMaterial>
+#include <Qt3DRender/QPerVertexColorMaterial>
 #include <Qt3DRender/QRenderAspect>
 #include <Qt3DRender/QFrameGraph>
 #include <Qt3DRender/QForwardRenderer>
+#include <Qt3DRender/QPointLight>
+#include <Qt3DRender/QCylinderMesh>
 
 #include <Qt3DInput/QInputAspect>
 
@@ -142,14 +146,47 @@ protected:
     Qt3DCore::QCamera*              m_pCameraEntity;
     Qt3DRender::QFrameGraph*        m_pFrameGraph;
     Qt3DRender::QForwardRenderer*   m_pForwardRenderer;
+    Qt3DCore::QTransform*           m_pTransform;
+    Qt3DCore::QScaleTransform*      m_pScaleTransform;
+    Qt3DCore::QTranslateTransform*  m_pTranslateTransform;
+    Qt3DCore::QRotateTransform*     m_pRotateTransformX;
+    Qt3DCore::QRotateTransform*     m_pRotateTransformY;
+
+    QSharedPointer<Qt3DCore::QEntity> m_XAxisEntity;
+    QSharedPointer<Qt3DCore::QEntity> m_YAxisEntity;
+    QSharedPointer<Qt3DCore::QEntity> m_ZAxisEntity;
 
     Brain::SPtr          m_pBrain;
+
+    bool    m_bDragMode;                /**< Flag which defines drag mode by pressing the middle mouse button.*/
+    bool    m_bZoomMode;                /**< Flag which defines zoom mode by pressing the right mouse button.*/
+    bool    m_bRotationMode;            /**< Flag which defines rotation mode by pressing the left mouse button.*/
+
+    QPoint  m_mousePressPositon;
+    float m_rotationXOld;				/**< Saves data from the mouse x rotation.*/
+    float m_rotationYOld;				/**< Saves data from the mouse y rotation.*/
+    float m_dragXOld;					/**< Saves data from the mouse x movement.*/
+    float m_dragYOld;					/**< Saves data from the mouse y movement.*/
+    float m_zoomOld;					/**< Saves data from the mouse zoom position.*/
+    float m_rotationX;					/**< Holds data from the mouse x rotation.*/
+    float m_rotationY;					/**< Holds data from the mouse y rotation.*/
+    float m_scalefactor;				/**< Holds the scaling factor used when rendering the 3D model.*/
+    float m_X;
+    float m_Y;
+    float m_Z;
 
     //=========================================================================================================
     /**
     * Init the 3D view
     */
     void init();
+
+    void keyPressEvent(QKeyEvent *e);
+    void mousePressEvent(QMouseEvent *e);
+    void mouseReleaseEvent(QMouseEvent *e);
+    void mouseMoveEvent(QMouseEvent *e);
+
+    void createCoordSystem(Qt3DCore::QEntity *rootEntity);
 
 private:
 

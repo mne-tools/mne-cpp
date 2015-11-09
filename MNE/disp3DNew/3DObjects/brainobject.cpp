@@ -54,16 +54,36 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainObject::BrainObject(const Surface &tSurface, Qt3DCore::QEntity *parent)
-: Renderable3DEntity(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset(), parent)
+BrainObject::BrainObject(const Surface &tSurface, float initScale, Qt3DCore::QEntity *parent)
+: Renderable3DEntity(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset(), initScale, parent)
 , m_sFilePath(tSurface.filePath())
 , m_sFileName(tSurface.fileName())
 , m_iHemi(tSurface.hemi())
 , m_sSurf(tSurface.surf())
 , m_vecCurv(tSurface.curv())
 , m_vecOffset(tSurface.offset())
+, m_ColorSulci(QColor(255,0,0))
+, m_ColorGyri(QColor(0,255,0))
+, m_matVert(tSurface.rr())
+, m_matTris(tSurface.tris())
+, m_matNorm(tSurface.nn())
 {
-    qDebug()<<m_vecOffset(0)<<m_vecOffset(1)<<m_vecOffset(2);
+    //Create color from curvature information and refresh renderable 3D entity
+    m_matColorsOrig.resize(m_matVert.rows(), m_matVert.cols());
+
+    for(int i = 0; i<m_matVert.rows() ; i++) {
+        if(m_vecCurv[i] >= 0) {
+            m_matColorsOrig(i, 0) = m_ColorSulci.red();
+            m_matColorsOrig(i, 1) = m_ColorSulci.green();
+            m_matColorsOrig(i, 2) = m_ColorSulci.blue();
+        } else {
+            m_matColorsOrig(i, 0) = m_ColorGyri.red();
+            m_matColorsOrig(i, 1) = m_ColorGyri.green();
+            m_matColorsOrig(i, 2) = m_ColorGyri.blue();
+        }
+    }
+
+    //this->updateVertColors(m_matColorsOrig);
 }
 
 
