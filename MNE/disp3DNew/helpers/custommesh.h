@@ -113,7 +113,7 @@ public:
     * Default constructor
     *
     */
-    CustomMesh(const MatrixX3f tMatVert, const MatrixX3f tMatNorm, const MatrixX3i tMatTris, const Vector3f &tVecOffset);
+    CustomMesh(const MatrixX3f &tMatVert, const MatrixX3f tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset);
 
     //=========================================================================================================
     /**
@@ -121,14 +121,20 @@ public:
     */
     ~CustomMesh();
 
-protected:
-    MatrixX3f   m_matVert;      /**< alias verts. Vertex coordinates in meters */
-    MatrixX3i   m_matTris;      /**< alias faces. The triangle descriptions */
-    MatrixX3f   m_matNorm;      /**< Normalized surface normals for each vertex. -> not needed since qglbuilder is doing that for us */
-    MatrixX3f   m_matColor;
-    Vector3f    m_vecOffset;
+    //=========================================================================================================
+    /**
+    * Refresh the vertices colors of the mesh
+    *
+    */
+    bool updateVertColors(const MatrixX3f &tMatColors);
 
-    void init();
+protected:
+    QSharedPointer<Qt3DRender::QBuffer> m_pVertexDataBuffer;
+    QSharedPointer<Qt3DRender::QBuffer> m_pIndexDataBuffer;
+
+    Qt3DRender::QGeometry *customGeometry ;
+
+    int     m_iNumVert;
 };
 
 } // NAMESPACE

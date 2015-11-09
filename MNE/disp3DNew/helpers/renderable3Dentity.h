@@ -57,9 +57,13 @@
 
 #include <Qt3DCore/QEntity>
 #include <Qt3DCore/QTransform>
+#include <Qt3DCore/QScaleTransform>
+#include <Qt3DCore/QRotateTransform>
+#include <Qt3DCore/QTranslateTransform>
 
 #include <Qt3DRender/QMaterial>
 #include <Qt3DRender/QPerVertexColorMaterial>
+#include <Qt3DRender/QPhongMaterial>
 
 
 //*************************************************************************************************************
@@ -114,13 +118,20 @@ public:
     /**
     * Default constructor for freesurfer mesh
     */
-    Renderable3DEntity(const MatrixX3f &tMatVert, const MatrixX3f &tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset, Qt3DCore::QEntity *parent = 0);
+    Renderable3DEntity(const MatrixX3f &tMatVert, const MatrixX3f &tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset, float tInitScale, Qt3DCore::QEntity *parent = 0);
 
     //=========================================================================================================
     /**
     * Default destructor
     */
     ~Renderable3DEntity();
+
+    //=========================================================================================================
+    /**
+    * Refresh the vertices colors of the mesh
+    *
+    */
+    bool updateVertColors(const MatrixX3f &tMatColors);
 
 protected:
     CustomMesh::SPtr                            m_pCustomMesh;

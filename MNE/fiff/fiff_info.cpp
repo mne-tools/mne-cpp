@@ -226,7 +226,7 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
 
 bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXd& this_comp) const//private method
 {
-    qDebug() << "make_compensator not debugged jet";
+    qDebug() << "make_compensator not debugged yet";
     FiffNamedMatrix::SDPtr this_data;
     MatrixXd presel, postsel;
     qint32 k, col, c, ch, row, row_ch=0, channelAvailable;

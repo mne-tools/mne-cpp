@@ -54,51 +54,33 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CustomMesh::CustomMesh(const MatrixX3f tMatVert, const MatrixX3f tMatNorm, const MatrixX3i tMatTris, const Vector3f &tVecOffset)
+CustomMesh::CustomMesh(const MatrixX3f &tMatVert, const MatrixX3f tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset)
 : Qt3DRender::QGeometryRenderer()
-, m_matVert(tMatVert)
-, m_matTris(tMatTris)
-, m_matNorm(tMatNorm)
-, m_vecOffset(tVecOffset)
+, m_iNumVert(tMatVert.rows())
 {
-    init();
-}
+    customGeometry = new Qt3DRender::QGeometry(this);
 
-
-//*************************************************************************************************************
-
-CustomMesh::~CustomMesh()
-{
-}
-
-
-//*************************************************************************************************************
-
-void CustomMesh::init()
-{
-    Qt3DRender::QGeometry *customGeometry = new Qt3DRender::QGeometry(this);
-
-    Qt3DRender::QBuffer *vertexDataBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer, customGeometry);
-    Qt3DRender::QBuffer *indexDataBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::IndexBuffer, customGeometry);
+    m_pVertexDataBuffer = QSharedPointer<Qt3DRender::QBuffer>(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer, customGeometry));
+    m_pIndexDataBuffer = QSharedPointer<Qt3DRender::QBuffer>(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::IndexBuffer, customGeometry));
 
     //Fill vertexBuffer with data which hold the vertices, normals and colors
     QByteArray vertexBufferData;
-    vertexBufferData.resize(m_matVert.rows() * (3 + 3 + 3) * sizeof(float));
+    vertexBufferData.resize(tMatVert.rows() * (3 + 3 + 3) * sizeof(float));
     float *rawVertexArray = reinterpret_cast<float *>(vertexBufferData.data());
     int idx = 0;
 
-    for(int i = 0; i<m_matVert.rows(); i++) {
+    for(int i = 0; i<tMatVert.rows(); i++) {
         //Vertex
-        rawVertexArray[idx++] = m_matVert(i,0) + m_vecOffset(0);
-        rawVertexArray[idx++] = m_matVert(i,1) + m_vecOffset(1);
-        rawVertexArray[idx++] = m_matVert(i,2) + m_vecOffset(2);
+        rawVertexArray[idx++] = tMatVert(i,0) + tVecOffset(0);
+        rawVertexArray[idx++] = tMatVert(i,1) + tVecOffset(1);
+        rawVertexArray[idx++] = tMatVert(i,2) + tVecOffset(2);
 
         //Normal
-        rawVertexArray[idx++] = m_matNorm(i,0);
-        rawVertexArray[idx++] = m_matNorm(i,1);
-        rawVertexArray[idx++] = m_matNorm(i,2);
+        rawVertexArray[idx++] = tMatNorm(i,0);
+        rawVertexArray[idx++] = tMatNorm(i,1);
+        rawVertexArray[idx++] = tMatNorm(i,2);
 
-        //Color
+        //Color (this is the default color and will be used until the updateVertColor function was called)
         rawVertexArray[idx++] = 1.0f;//m_matColor(i,0);
         rawVertexArray[idx++] = 0.0f;//m_matColor(i,1);
         rawVertexArray[idx++] = 0.0f;//m_matColor(i,2);
@@ -106,59 +88,59 @@ void CustomMesh::init()
 
     //Fill indexBufferData with data which holds the triangulation information (faces/tris)
     QByteArray indexBufferData;
-    indexBufferData.resize(m_matTris.rows() * 3 * sizeof(uint));
+    indexBufferData.resize(tMatTris.rows() * 3 * sizeof(uint));
     uint *rawIndexArray = reinterpret_cast<uint *>(indexBufferData.data());
     idx = 0;
 
-    for(int i = 0; i<m_matTris.rows(); i++) {
+    for(int i = 0; i<tMatTris.rows(); i++) {
         //Faces/Tris
-        rawIndexArray[idx++] = m_matTris(i,0);
-        rawIndexArray[idx++] = m_matTris(i,1);
-        rawIndexArray[idx++] = m_matTris(i,2);
+        rawIndexArray[idx++] = tMatTris(i,0);
+        rawIndexArray[idx++] = tMatTris(i,1);
+        rawIndexArray[idx++] = tMatTris(i,2);
     }
 
-    vertexDataBuffer->setData(vertexBufferData);
-    indexDataBuffer->setData(indexBufferData);
+    m_pVertexDataBuffer->setData(vertexBufferData);
+    m_pIndexDataBuffer->setData(indexBufferData);
 
     // Attributes
     Qt3DRender::QAttribute *positionAttribute = new Qt3DRender::QAttribute();
     positionAttribute->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
-    positionAttribute->setBuffer(vertexDataBuffer);
+    positionAttribute->setBuffer(m_pVertexDataBuffer.data());
     positionAttribute->setDataType(Qt3DRender::QAttribute::Float);
     positionAttribute->setDataSize(3);
     positionAttribute->setByteOffset(0);
     positionAttribute->setByteStride(9 * sizeof(float));
-    positionAttribute->setCount(m_matVert.rows());
+    positionAttribute->setCount(tMatVert.rows());
     positionAttribute->setName(Qt3DRender::QAttribute::defaultPositionAttributeName());
 
     Qt3DRender::QAttribute *normalAttribute = new Qt3DRender::QAttribute();
     normalAttribute->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
-    normalAttribute->setBuffer(vertexDataBuffer);
+    normalAttribute->setBuffer(m_pVertexDataBuffer.data());
     normalAttribute->setDataType(Qt3DRender::QAttribute::Float);
     normalAttribute->setDataSize(3);
     normalAttribute->setByteOffset(3 * sizeof(float));
     normalAttribute->setByteStride(9 * sizeof(float));
-    normalAttribute->setCount(m_matVert.rows());
+    normalAttribute->setCount(tMatVert.rows());
     normalAttribute->setName(Qt3DRender::QAttribute::defaultNormalAttributeName());
 
     Qt3DRender::QAttribute *colorAttribute = new Qt3DRender::QAttribute();
     colorAttribute->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
-    colorAttribute->setBuffer(vertexDataBuffer);
+    colorAttribute->setBuffer(m_pVertexDataBuffer.data());
     colorAttribute->setDataType(Qt3DRender::QAttribute::Float);
     colorAttribute->setDataSize(3);
     colorAttribute->setByteOffset(6 * sizeof(float));
     colorAttribute->setByteStride(9 * sizeof(float));
-    colorAttribute->setCount(m_matVert.rows());
+    colorAttribute->setCount(tMatVert.rows());
     colorAttribute->setName(Qt3DRender::QAttribute::defaultColorAttributeName());
 
     Qt3DRender::QAttribute *indexAttribute = new Qt3DRender::QAttribute();
     indexAttribute->setAttributeType(Qt3DRender::QAttribute::IndexAttribute);
-    indexAttribute->setBuffer(indexDataBuffer);
+    indexAttribute->setBuffer(m_pIndexDataBuffer.data());
     indexAttribute->setDataType(Qt3DRender::QAttribute::UnsignedInt);
     indexAttribute->setDataSize(1);
     indexAttribute->setByteOffset(0);
     indexAttribute->setByteStride(0);
-    indexAttribute->setCount(m_matTris.rows());
+    indexAttribute->setCount(tMatTris.rows());
 
     customGeometry->addAttribute(positionAttribute);
     customGeometry->addAttribute(normalAttribute);
@@ -171,7 +153,48 @@ void CustomMesh::init()
     this->setPrimitiveType(Qt3DRender::QGeometryRenderer::Triangles);
     this->setGeometry(customGeometry);
 
-    this->setPrimitiveCount(m_matTris.rows()*3);
+    this->setPrimitiveCount(tMatTris.rows()*3);
+}
+
+//*************************************************************************************************************
+
+bool CustomMesh::updateVertColors(const MatrixX3f &tMatColors)
+{
+    //Check dimensions
+    if(tMatColors.rows() != m_iNumVert) {
+        qDebug()<<"CustomMesh::updateVertColors - new color and vertices dimensions do not match!";
+        return false;
+    }
+
+        qDebug()<<"Start - Updated color";
+
+    //Fill vertexBuffer with data which hold the vertices, normals and colors
+//    Qt3DRender::QGeometry::QAttributeList attributeList = this->geometry()->attributes();
+
+//    for(int i = 0; attributeList.size(); i++)
+//        if(atributteList.at(i).name == "ColorAttribute")
+
+    float *rawVertexArray = reinterpret_cast<float *>(m_pVertexDataBuffer->data().data());
+    int idx = 5;
+
+    qDebug()<<"Size of buffer"<<m_pVertexDataBuffer->data().size();
+    qDebug()<<"buffer at [0]"<<m_pVertexDataBuffer->data().data()[0];
+    for(int i = 0; i<tMatColors.rows(); i++) {
+        qDebug()<<rawVertexArray[idx++];
+        rawVertexArray[idx++] = tMatColors(i,0);
+        rawVertexArray[idx++] = tMatColors(i,1);
+        rawVertexArray[idx++] = tMatColors(i,2);
+        idx += 6;
+    }
+
+    qDebug()<<"Done - Updated color";
+
+    return true;
 }
 
 
+//*************************************************************************************************************
+
+CustomMesh::~CustomMesh()
+{
+}
