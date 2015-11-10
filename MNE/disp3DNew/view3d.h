@@ -146,11 +146,16 @@ protected:
     Qt3DCore::QCamera*              m_pCameraEntity;
     Qt3DRender::QFrameGraph*        m_pFrameGraph;
     Qt3DRender::QForwardRenderer*   m_pForwardRenderer;
-    Qt3DCore::QTransform*           m_pTransform;
-    Qt3DCore::QScaleTransform*      m_pScaleTransform;
-    Qt3DCore::QTranslateTransform*  m_pTranslateTransform;
-    Qt3DCore::QRotateTransform*     m_pRotateTransformX;
-    Qt3DCore::QRotateTransform*     m_pRotateTransformY;
+
+    Qt3DCore::QTransform*           m_pCameraTransform;
+    Qt3DCore::QScaleTransform*      m_pCameraScaleTransform;
+    Qt3DCore::QTranslateTransform*  m_pCameraTranslateTransform;
+    Qt3DCore::QRotateTransform*     m_pCameraRotateTransformX;
+    Qt3DCore::QRotateTransform*     m_pCameraRotateTransformY;
+
+    Qt3DCore::QTransform*           m_pRootEntityTransform;
+    Qt3DCore::QRotateTransform*     m_pRootEntityRotateTransformX;
+    Qt3DCore::QRotateTransform*     m_pRootEntityRotateTransformY;
 
     QSharedPointer<Qt3DCore::QEntity> m_XAxisEntity;
     QSharedPointer<Qt3DCore::QEntity> m_YAxisEntity;
@@ -158,22 +163,34 @@ protected:
 
     Brain::SPtr          m_pBrain;
 
-    bool    m_bDragMode;                /**< Flag which defines drag mode by pressing the middle mouse button.*/
-    bool    m_bZoomMode;                /**< Flag which defines zoom mode by pressing the right mouse button.*/
-    bool    m_bRotationMode;            /**< Flag which defines rotation mode by pressing the left mouse button.*/
+    bool    m_bTransMode;                           /**< Flag which defines Trans mode by pressing the middle mouse button.*/
+    bool    m_bZoomMode;                            /**< Flag which defines zoom mode by pressing the right mouse button.*/
+    bool    m_bRotationMode;                        /**< Flag which defines rotation mode by pressing the left mouse button.*/
 
     QPoint  m_mousePressPositon;
-    float m_rotationXOld;				/**< Saves data from the mouse x rotation.*/
-    float m_rotationYOld;				/**< Saves data from the mouse y rotation.*/
-    float m_dragXOld;					/**< Saves data from the mouse x movement.*/
-    float m_dragYOld;					/**< Saves data from the mouse y movement.*/
-    float m_zoomOld;					/**< Saves data from the mouse zoom position.*/
-    float m_rotationX;					/**< Holds data from the mouse x rotation.*/
-    float m_rotationY;					/**< Holds data from the mouse y rotation.*/
-    float m_scalefactor;				/**< Holds the scaling factor used when rendering the 3D model.*/
-    float m_X;
-    float m_Y;
-    float m_Z;
+
+    float m_fRootEntityRotationXOld;				/**< Saves data from the mouse x rotation.*/
+    float m_fRootEntityRotationYOld;                /**< Saves data from the mouse y rotation.*/
+    float m_fRootEntityRotationX;					/**< Holds data from the mouse x rotation.*/
+    float m_fRootEntityRotationY;					/**< Holds data from the mouse y rotation.*/
+
+    float m_fCameraTransX;
+    float m_fCameraTransXOld;                       /**< Saves data from the mouse x movement.*/
+    float m_fCameraTransY;
+    float m_fCameraTransYOld;                       /**< Saves data from the mouse y movement.*/
+
+    float m_fCameraZoom;
+    float m_fCameraZoomOld;                         /**< Saves data from the mouse zoom position.*/
+
+    float m_fCameraRotationXOld;                    /**< Saves data from the mouse x rotation.*/
+    float m_fCameraRotationYOld;                    /**< Saves data from the mouse y rotation.*/
+    float m_fCameraRotationX;                       /**< Holds data from the mouse x rotation.*/
+    float m_fCameraRotationY;                       /**< Holds data from the mouse y rotation.*/
+
+
+
+
+
 
     //=========================================================================================================
     /**
