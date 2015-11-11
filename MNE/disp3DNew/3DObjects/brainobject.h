@@ -120,6 +120,7 @@ protected:
     QString     m_sFilePath;        /**< Path to surf directory. */
     QString     m_sFileName;        /**< Surface file name. */
     QString     m_sSurf;            /**< Loaded surface (eg. inflated, orig, pial ...). */
+    QString     m_sAnnotation;      /**< Type of annotation set, if loaded. */
     qint32      m_iHemi;            /**< Hemisphere (lh = 0; rh = 1). */
     QColor      m_ColorSulci;       /**< Color for the vertices which belong to the sulci. */
     QColor      m_ColorGyri;        /**< Color for the vertices which belong to the gyri.). */
