@@ -70,6 +70,8 @@ View3D::View3D()
 , m_vecCameraTransOld(QVector3D(0.0,-0.5,-2.0))
 , m_vecCameraRotation(QVector3D(0.0,0.0,0.0))
 , m_vecCameraRotationOld(QVector3D(0.0,0.0,0.0))
+, m_vecModelRotation(QVector3D(-90.0,110.0,0.0))
+, m_vecModelRotationOld(QVector3D(-90.0,110.0,0.0))
 {
     init();
 }
@@ -119,8 +121,8 @@ void View3D::init()
     m_pCameraEntity->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
     m_pCameraEntity->setPosition(m_vecCameraTrans);
     m_pCameraEntity->setUpVector(QVector3D(0, 1, 0));
-    m_pCameraEntity->setViewCenter(QVector3D(1, 0, 0));
-    //m_pInputAspect->setCamera(m_pCameraEntity);
+    m_pCameraEntity->setViewCenter(QVector3D(0, 0, 0));
+    m_pInputAspect->setCamera(m_pCameraEntity);
 
     // FrameGraph
     m_pForwardRenderer = new Qt3DRender::QForwardRenderer();
@@ -137,7 +139,7 @@ void View3D::init()
     // Set root object of the scene
     m_aspectEngine.setRootEntity(m_pRootEntity);
 
-    createCoordSystem(m_pRootEntity);
+    //createCoordSystem(m_pRootEntity);
 }
 
 
@@ -174,7 +176,7 @@ void View3D::initTransformations()
     m_pCameraRotateTransformZ->setAxis(QVector3D(0,0,1));
     m_pCameraTransform->addTransform(m_pCameraRotateTransformZ);
 
-    //m_pCameraEntity->addComponent(m_pCameraTransform);
+    m_pCameraEntity->addComponent(m_pCameraTransform);
 }
 
 //*************************************************************************************************************
@@ -182,6 +184,14 @@ void View3D::initTransformations()
 bool View3D::addFsBrainData(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir)
 {
     bool state = m_pBrain->addFsBrainData(subject_id, hemi, surf, subjects_dir);
+
+    //Init rotation
+    QList<BrainObject::SPtr> list = m_pBrain->brainObjectList();
+
+    for(int i = 0; i<list.size(); i++) {
+        list.at(i)->setRotationX(m_vecModelRotation.x());
+        list.at(i)->setRotationY(m_vecModelRotation.y());
+    }
 
     return state;
 }
@@ -215,7 +225,8 @@ void View3D::mousePressEvent(QMouseEvent* e)
             //TODO: SelectionMode
             break;
         case Qt::MidButton:
-            m_bCameraRotationMode = true;
+            m_bModelRotationMode = true;
+            //m_bCameraRotationMode = true;
             break;
         case Qt::RightButton:
             m_bCameraTransMode = true;
@@ -252,6 +263,7 @@ void View3D::mouseReleaseEvent(QMouseEvent *e)
     m_bCameraTransMode = false;
     m_vecCameraTransOld = m_vecCameraTrans;
     m_vecCameraRotationOld = m_vecCameraRotation;
+    m_vecModelRotationOld = m_vecModelRotation;
 
     Window::mouseReleaseEvent(e);
 }
@@ -261,59 +273,43 @@ void View3D::mouseReleaseEvent(QMouseEvent *e)
 
 void View3D::mouseMoveEvent(QMouseEvent* e)
 {
-//    if(m_bModelRotationMode) {
-//        m_fModelRotationX = ((e->pos().y() - m_mousePressPositon.y()) * -0.1f ) + m_fModelRotationXOld;
-//        m_fModelRotationY = ((e->pos().x() - m_mousePressPositon.x()) * 0.1f ) + m_fModelRotationYOld;
+    if(m_bModelRotationMode) {
+        m_vecModelRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * -0.1f) + m_vecModelRotationOld.x());
+        m_vecModelRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.1f) + m_vecModelRotationOld.y());
 
-//        // Transform
-//        m_pModelRotateTransformX->setAngleDeg(m_fModelRotationX);
-//        m_pModelRotateTransformY->setAngleDeg(m_fModelRotationY);
-//    }
+        // Rotate brain surfaces
+        QList<BrainObject::SPtr> list = m_pBrain->brainObjectList();
+
+        for(int i = 0; i<list.size(); i++) {
+            list.at(i)->setRotationX(m_vecModelRotation.x());
+            list.at(i)->setRotationY(m_vecModelRotation.y());
+        }
+    }
 
     if(m_bCameraRotationMode) {
-        if(e->pos().y() - m_mousePressPositon.y()>0)
-            m_pCameraEntity->tilt(5);
-        else
-            m_pCameraEntity->tilt(-5);
+        m_vecCameraRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * 0.1f) + m_vecCameraRotationOld.x());
+        m_vecCameraRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.1f) + m_vecCameraRotationOld.y());
 
-//        m_vecCameraRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * -0.01f));// + m_vecCameraRotationOld.x());
-//        m_vecCameraRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.01f));// + m_vecCameraRotationOld.y());
+        m_pCameraRotateTransformX->setAngleDeg(m_vecCameraRotation.x());
+        m_pCameraRotateTransformY->setAngleDeg(m_vecCameraRotation.y());
+        m_pCameraRotateTransformZ->setAngleDeg(m_vecCameraRotation.z());
 
-//        qDebug()<<"m_vecCameraRotation"<<m_vecCameraRotation;
+//        qDebug()<<"m_vecCameraRotation.x()"<<m_vecCameraRotation.x();
+//        qDebug()<<"m_vecCameraRotation.y()"<<m_vecCameraRotation.y();
 
+//        // Camera rotation transform
 //        m_pCameraEntity->tilt(m_vecCameraRotation.x());
 //        m_pCameraEntity->pan(m_vecCameraRotation.y());
-
-//        // Transform
-//        m_pCameraRotateTransformX->setAngleDeg(m_vecCameraRotation.x());
-//        QVector4D tempAxis(m_pCameraRotateTransformX->axis().x(), m_pCameraRotateTransformX->axis().y(), m_pCameraRotateTransformX->axis().z(), 1);
-//        QVector4D newAxis = m_pCameraRotateTransformX->transformMatrix()*tempAxis;
-//        qDebug()<<"tempAxis"<<tempAxis;
-//        qDebug()<<"newAxis"<<newAxis;
-
-//        m_pCameraRotateTransformX->setAxis(QVector3D(newAxis.x(), newAxis.y(), newAxis.z()));
-//        m_pCameraRotateTransformY->setAngleDeg(m_vecCameraRotation.y());
-//        m_pCameraRotateTransformZ->setAngleDeg(m_vecCameraRotation.z());
-
-
-//        qDebug()<<"m_pCameraRotateTransformX axis"<<m_pCameraRotateTransformX->axis();
-//        qDebug()<<"m_pCameraRotateTransformY axis"<<m_pCameraRotateTransformY->axis();
-//        qDebug()<<"m_pCameraRotateTransformZ axis"<<m_pCameraRotateTransformZ->axis();
     }
 
     if(m_bCameraTransMode) {
-        m_vecCameraTrans.setX(((e->pos().x() - m_mousePressPositon.x()) * 0.006f) + m_vecCameraTransOld.x());
-        m_vecCameraTrans.setZ(((e->pos().y() - m_mousePressPositon.y()) * 0.006f) + m_vecCameraTransOld.z());
+        m_vecCameraTrans.setX(((e->pos().x() - m_mousePressPositon.x()) * 0.001f) + m_vecCameraTransOld.x());
+        m_vecCameraTrans.setY(((e->pos().y() - m_mousePressPositon.y()) * -0.001f) + m_vecCameraTransOld.y());
 
-        // Transform
-        m_pCameraEntity->translateWorld(m_vecCameraTrans);
-//        m_pCameraTranslateTransform->setDx(m_vecCameraTrans.x());
-//        m_pCameraTranslateTransform->setDy(m_vecCameraTrans.y());
-//        m_pCameraTranslateTransform->setDz(m_vecCameraTrans.z());
-
-//        m_pCameraEntity->setViewCenter(m_vecCameraTrans);
-        qDebug()<<"m_vecCameraTrans"<<m_vecCameraTrans;
-        qDebug()<<"m_pCameraEntity->viewCenter()"<<m_pCameraEntity->viewCenter();
+        // Camera translation transform
+        m_pCameraTranslateTransform->setDx(m_vecCameraTrans.x());
+        m_pCameraTranslateTransform->setDy(m_vecCameraTrans.y());
+        m_pCameraTranslateTransform->setDz(m_vecCameraTrans.z());
     }
 
     //qDebug()<< m_pCameraTransform->matrix();

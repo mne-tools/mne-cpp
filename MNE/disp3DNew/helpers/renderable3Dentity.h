@@ -143,6 +143,27 @@ public:
 
     //=========================================================================================================
     /**
+    * Set the X-axis rotation of the entity
+    *
+    */
+    void setRotationX(float degree);
+
+    //=========================================================================================================
+    /**
+    * Set the Y-axis rotation of the entity
+    *
+    */
+    void setRotationY(float degree);
+
+    //=========================================================================================================
+    /**
+    * Set the Z-axis rotation of the entity
+    *
+    */
+    void setRotationZ(float degree);
+
+    //=========================================================================================================
+    /**
     * Set the rotation of the entity
     *
     */
@@ -168,6 +189,9 @@ protected:
     QSharedPointer<Qt3DCore::QScaleTransform>       m_pScaleTransform;
     QSharedPointer<Qt3DCore::QTranslateTransform>   m_pTranslateTransform;
     QSharedPointer<Qt3DCore::QRotateTransform>      m_pRotateTransform;
+    QSharedPointer<Qt3DCore::QRotateTransform>      m_pRotateTransformX;
+    QSharedPointer<Qt3DCore::QRotateTransform>      m_pRotateTransformY;
+    QSharedPointer<Qt3DCore::QRotateTransform>      m_pRotateTransformZ;
 
     QSharedPointer<Qt3DRender::QMaterial>           m_pMaterial;
 };

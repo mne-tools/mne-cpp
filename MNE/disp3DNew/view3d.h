@@ -170,6 +170,8 @@ protected:
     QVector3D   m_vecCameraTransOld;
     QVector3D   m_vecCameraRotation;
     QVector3D   m_vecCameraRotationOld;
+    QVector3D   m_vecModelRotation;
+    QVector3D   m_vecModelRotationOld;
 
     float       m_fCameraScale;
 
