@@ -69,11 +69,21 @@ Renderable3DEntity::Renderable3DEntity(const MatrixX3f &tMatVert, const MatrixX3
 , m_pScaleTransform(QSharedPointer<Qt3DCore::QScaleTransform>(new Qt3DCore::QScaleTransform()))
 , m_pTranslateTransform(QSharedPointer<Qt3DCore::QTranslateTransform>(new Qt3DCore::QTranslateTransform()))
 , m_pRotateTransform(QSharedPointer<Qt3DCore::QRotateTransform>(new Qt3DCore::QRotateTransform()))
+, m_pRotateTransformX(QSharedPointer<Qt3DCore::QRotateTransform>(new Qt3DCore::QRotateTransform()))
+, m_pRotateTransformY(QSharedPointer<Qt3DCore::QRotateTransform>(new Qt3DCore::QRotateTransform()))
+, m_pRotateTransformZ(QSharedPointer<Qt3DCore::QRotateTransform>(new Qt3DCore::QRotateTransform()))
 , m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPhongMaterial(this)))
 {
+    m_pRotateTransformX->setAxis(QVector3D(1,0,0));
+    m_pRotateTransformY->setAxis(QVector3D(0,1,0));
+    m_pRotateTransformZ->setAxis(QVector3D(0,0,1));
+
     m_pTransform->addTransform(m_pScaleTransform.data());
     m_pTransform->addTransform(m_pTranslateTransform.data());
     m_pTransform->addTransform(m_pRotateTransform.data());
+    m_pTransform->addTransform(m_pRotateTransformX.data());
+    m_pTransform->addTransform(m_pRotateTransformY.data());
+    m_pTransform->addTransform(m_pRotateTransformZ.data());
 
     this->addComponent(m_pCustomMesh.data());
     this->addComponent(m_pTransform.data());
@@ -101,6 +111,30 @@ bool Renderable3DEntity::updateVertColors(const MatrixX3f &tMatColors)
 void Renderable3DEntity::setScale(float scaleFactor)
 {
     m_pScaleTransform->setScale(scaleFactor);
+}
+
+
+//*************************************************************************************************************
+
+void Renderable3DEntity::setRotationX(float degree)
+{
+    m_pRotateTransformX->setAngleDeg(degree);
+}
+
+
+//*************************************************************************************************************
+
+void Renderable3DEntity::setRotationY(float degree)
+{
+    m_pRotateTransformY->setAngleDeg(degree);
+}
+
+
+//*************************************************************************************************************
+
+void Renderable3DEntity::setRotationZ(float degree)
+{
+    m_pRotateTransformZ->setAngleDeg(degree);
 }
 
 
