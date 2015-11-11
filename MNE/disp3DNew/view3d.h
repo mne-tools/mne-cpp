@@ -152,10 +152,7 @@ protected:
     Qt3DCore::QTranslateTransform*  m_pCameraTranslateTransform;
     Qt3DCore::QRotateTransform*     m_pCameraRotateTransformX;
     Qt3DCore::QRotateTransform*     m_pCameraRotateTransformY;
-
-    Qt3DCore::QTransform*           m_pRootEntityTransform;
-    Qt3DCore::QRotateTransform*     m_pRootEntityRotateTransformX;
-    Qt3DCore::QRotateTransform*     m_pRootEntityRotateTransformY;
+    Qt3DCore::QRotateTransform*     m_pCameraRotateTransformZ;
 
     QSharedPointer<Qt3DCore::QEntity> m_XAxisEntity;
     QSharedPointer<Qt3DCore::QEntity> m_YAxisEntity;
@@ -163,34 +160,18 @@ protected:
 
     Brain::SPtr          m_pBrain;
 
-    bool    m_bTransMode;                           /**< Flag which defines Trans mode by pressing the middle mouse button.*/
-    bool    m_bZoomMode;                            /**< Flag which defines zoom mode by pressing the right mouse button.*/
-    bool    m_bRotationMode;                        /**< Flag which defines rotation mode by pressing the left mouse button.*/
+    bool    m_bCameraTransMode;
+    bool    m_bModelRotationMode;
+    bool    m_bCameraRotationMode;
 
     QPoint  m_mousePressPositon;
 
-    float m_fRootEntityRotationXOld;				/**< Saves data from the mouse x rotation.*/
-    float m_fRootEntityRotationYOld;                /**< Saves data from the mouse y rotation.*/
-    float m_fRootEntityRotationX;					/**< Holds data from the mouse x rotation.*/
-    float m_fRootEntityRotationY;					/**< Holds data from the mouse y rotation.*/
+    QVector3D   m_vecCameraTrans;
+    QVector3D   m_vecCameraTransOld;
+    QVector3D   m_vecCameraRotation;
+    QVector3D   m_vecCameraRotationOld;
 
-    float m_fCameraTransX;
-    float m_fCameraTransXOld;                       /**< Saves data from the mouse x movement.*/
-    float m_fCameraTransY;
-    float m_fCameraTransYOld;                       /**< Saves data from the mouse y movement.*/
-
-    float m_fCameraZoom;
-    float m_fCameraZoomOld;                         /**< Saves data from the mouse zoom position.*/
-
-    float m_fCameraRotationXOld;                    /**< Saves data from the mouse x rotation.*/
-    float m_fCameraRotationYOld;                    /**< Saves data from the mouse y rotation.*/
-    float m_fCameraRotationX;                       /**< Holds data from the mouse x rotation.*/
-    float m_fCameraRotationY;                       /**< Holds data from the mouse y rotation.*/
-
-
-
-
-
+    float       m_fCameraScale;
 
     //=========================================================================================================
     /**
@@ -198,8 +179,15 @@ protected:
     */
     void init();
 
+    //=========================================================================================================
+    /**
+    * Init the 3D views transformation matrices
+    */
+    void initTransformations();
+
     void keyPressEvent(QKeyEvent *e);
     void mousePressEvent(QMouseEvent *e);
+    void wheelEvent(QWheelEvent *e);
     void mouseReleaseEvent(QMouseEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
 

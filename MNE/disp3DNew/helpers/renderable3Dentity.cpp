@@ -62,15 +62,18 @@ Renderable3DEntity::Renderable3DEntity()
 
 //*************************************************************************************************************
 
-Renderable3DEntity::Renderable3DEntity(const MatrixX3f &tMatVert, const MatrixX3f &tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset, float tInitScale, Qt3DCore::QEntity *parent)
+Renderable3DEntity::Renderable3DEntity(const MatrixX3f &tMatVert, const MatrixX3f &tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset, Qt3DCore::QEntity *parent)
 : Qt3DCore::QEntity(parent)
 , m_pCustomMesh(new CustomMesh(tMatVert, tMatNorm, tMatTris, tVecOffset))
 , m_pTransform(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
+, m_pScaleTransform(QSharedPointer<Qt3DCore::QScaleTransform>(new Qt3DCore::QScaleTransform()))
+, m_pTranslateTransform(QSharedPointer<Qt3DCore::QTranslateTransform>(new Qt3DCore::QTranslateTransform()))
+, m_pRotateTransform(QSharedPointer<Qt3DCore::QRotateTransform>(new Qt3DCore::QRotateTransform()))
 , m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPhongMaterial(this)))
 {
-    Qt3DCore::QScaleTransform *scaleTransform = new Qt3DCore::QScaleTransform;
-    scaleTransform->setScale(tInitScale);
-    m_pTransform->addTransform(scaleTransform);
+    m_pTransform->addTransform(m_pScaleTransform.data());
+    m_pTransform->addTransform(m_pTranslateTransform.data());
+    m_pTransform->addTransform(m_pRotateTransform.data());
 
     this->addComponent(m_pCustomMesh.data());
     this->addComponent(m_pTransform.data());
@@ -92,6 +95,45 @@ bool Renderable3DEntity::updateVertColors(const MatrixX3f &tMatColors)
     return m_pCustomMesh->updateVertColors(tMatColors);
 }
 
+
+//*************************************************************************************************************
+
+void Renderable3DEntity::setScale(float scaleFactor)
+{
+    m_pScaleTransform->setScale(scaleFactor);
+}
+
+
+//*************************************************************************************************************
+
+void Renderable3DEntity::setRotation(float degree, const QVector3D &rotAxis)
+{
+    m_pRotateTransform->setAxis(rotAxis);
+    m_pRotateTransform->setAngleDeg(degree);
+}
+
+
+//*************************************************************************************************************
+
+void Renderable3DEntity::addRotation(float degree, const QVector3D &rotAxis)
+{
+    Qt3DCore::QRotateTransform* rotateTransform = new Qt3DCore::QRotateTransform();
+    rotateTransform->setAxis(rotAxis);
+    rotateTransform->setAngleDeg(degree);
+
+    m_pTransform->addTransform(rotateTransform);
+
+    //qDebug()<<"Adding rotation transform. Total:"<<m_pTransform->transforms().size();
+}
+
+
+
+//*************************************************************************************************************
+
+void Renderable3DEntity::setTranslation(const QVector3D &trans)
+{
+    m_pTranslateTransform->setTranslation(trans);
+}
 
 
 
