@@ -67,6 +67,7 @@ BrainObject::BrainObject(const Surface &tSurface, Qt3DCore::QEntity *parent)
 , m_matVert(tSurface.rr())
 , m_matTris(tSurface.tris())
 , m_matNorm(tSurface.nn())
+, m_sAnnotation("none")
 {
     //Create color from curvature information and refresh renderable 3D entity
     m_matColorsOrig.resize(m_matVert.rows(), m_matVert.cols());
