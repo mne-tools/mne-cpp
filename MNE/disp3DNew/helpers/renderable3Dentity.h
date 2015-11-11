@@ -54,6 +54,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QVector3D>
 
 #include <Qt3DCore/QEntity>
 #include <Qt3DCore/QTransform>
@@ -118,7 +119,7 @@ public:
     /**
     * Default constructor for freesurfer mesh
     */
-    Renderable3DEntity(const MatrixX3f &tMatVert, const MatrixX3f &tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset, float tInitScale, Qt3DCore::QEntity *parent = 0);
+    Renderable3DEntity(const MatrixX3f &tMatVert, const MatrixX3f &tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset, Qt3DCore::QEntity *parent = 0);
 
     //=========================================================================================================
     /**
@@ -133,10 +134,42 @@ public:
     */
     bool updateVertColors(const MatrixX3f &tMatColors);
 
+    //=========================================================================================================
+    /**
+    * Scale the entity
+    *
+    */
+    void setScale(float scaleFactor);
+
+    //=========================================================================================================
+    /**
+    * Set the rotation of the entity
+    *
+    */
+    void setRotation(float degree, const QVector3D &rotAxis);
+
+    //=========================================================================================================
+    /**
+    * Add a rotation to the exiting rotation of the entity
+    *
+    */
+    void addRotation(float degree, const QVector3D &rotAxis);
+
+    //=========================================================================================================
+    /**
+    * Translate the entity
+    *
+    */
+    void setTranslation(const QVector3D &trans);
+
 protected:
-    CustomMesh::SPtr                            m_pCustomMesh;
-    QSharedPointer<Qt3DCore::QTransform>        m_pTransform;
-    QSharedPointer<Qt3DRender::QMaterial>       m_pMaterial;
+    CustomMesh::SPtr                                m_pCustomMesh;
+    QSharedPointer<Qt3DCore::QTransform>            m_pTransform;
+    QSharedPointer<Qt3DCore::QScaleTransform>       m_pScaleTransform;
+    QSharedPointer<Qt3DCore::QTranslateTransform>   m_pTranslateTransform;
+    QSharedPointer<Qt3DCore::QRotateTransform>      m_pRotateTransform;
+
+    QSharedPointer<Qt3DRender::QMaterial>           m_pMaterial;
 };
 
 } // NAMESPACE

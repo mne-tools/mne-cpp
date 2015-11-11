@@ -106,7 +106,7 @@ public:
     * Default constructor using freesurfer data as input
     *
     */
-    BrainObject(const Surface &tSurface, float initScale, Qt3DCore::QEntity *parent = 0);
+    BrainObject(const Surface &tSurface, Qt3DCore::QEntity *parent = 0);
 
     //=========================================================================================================
     /**
@@ -128,7 +128,6 @@ protected:
     MatrixX3i   m_matTris;          /**< alias faces. The triangle descriptions */
     MatrixX3f   m_matNorm;          /**< Normalized surface normals for each vertex. -> not needed since qglbuilder is doing that for us */
     MatrixX3f   m_matColorsOrig;    /**< original color values based on curvature values */
-
 };
 
 } // NAMESPACE

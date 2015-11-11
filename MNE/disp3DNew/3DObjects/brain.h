@@ -124,6 +124,14 @@ public:
     */
     bool addFsBrainData(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
 
+    //=========================================================================================================
+    /**
+    * Return the stored BrainObjects
+    *
+    * @return returns a const adress to the list with the sotred brain objects
+    */
+    const QList<BrainObject::SPtr> & brainObjectList();
+
 protected:
     QList<BrainObject::SPtr>     m_lBrainData;
 
