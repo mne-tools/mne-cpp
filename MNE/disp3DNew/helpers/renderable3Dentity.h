@@ -111,89 +111,106 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor for freesurfer mesh
+    * Default constructor for freesurfer mesh.
     */
     Renderable3DEntity();
 
     //=========================================================================================================
     /**
-    * Default constructor for freesurfer mesh
+    * Default constructor for freesurfer mesh.
+    *
+    * @param[in] tMatVert       Vertices in form of a matrix.
+    * @param[in] tMatNorm       Normals in form of a matrix.
+    * @param[in] tMatTris       Tris/Faces in form of a matrix.
+    * @param[in] tVecOffset     The offset which is to be used on all the vertices.
+    * @param[in] parent         The parent of this class.
     */
     Renderable3DEntity(const MatrixX3f &tMatVert, const MatrixX3f &tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset, Qt3DCore::QEntity *parent = 0);
 
     //=========================================================================================================
     /**
-    * Default destructor
+    * Default destructor.
     */
     ~Renderable3DEntity();
 
     //=========================================================================================================
     /**
-    * Refresh the vertices colors of the mesh
+    * Refresh the vertices colors of the mesh.
     *
+    * @param[in] tMatColors     New color information for the vertices.
     */
     bool updateVertColors(const MatrixX3f &tMatColors);
 
     //=========================================================================================================
     /**
-    * Scale the entity
+    * Scale the entity.
     *
+    * @param[in] scaleFactor    The factor which is to be used for scaling.
     */
     void setScale(float scaleFactor);
 
     //=========================================================================================================
     /**
-    * Set the X-axis rotation of the entity
+    * Set the X-axis rotation of the entity.
     *
+    * @param[in] degree         The degrees which are to be used to rotate the entity.
     */
     void setRotationX(float degree);
 
     //=========================================================================================================
     /**
-    * Set the Y-axis rotation of the entity
+    * Set the Y-axis rotation of the entity.
     *
+    * @param[in] degree         The degrees which are to be used to rotate the entity.
     */
     void setRotationY(float degree);
 
     //=========================================================================================================
     /**
-    * Set the Z-axis rotation of the entity
+    * Set the Z-axis rotation of the entity.
     *
+    * @param[in] degree         The degrees which are to be used to rotate the entity.
     */
     void setRotationZ(float degree);
 
     //=========================================================================================================
     /**
-    * Set the rotation of the entity
+    * Set the rotation of the entity. Please note that this function will overrwrite all other rotation transformations.
     *
+    * @param[in] degree         The degrees which are to be used to rotate the entity.
+    * @param[in] rotAxis        The rotation axis.
     */
     void setRotation(float degree, const QVector3D &rotAxis);
 
     //=========================================================================================================
     /**
-    * Add a rotation to the exiting rotation of the entity
+    * Add a rotation to the exiting rotation of the entity. Please note that this funtion will add a rotation transformation,
+    * not overwriting already presented transformations. However, this will increase the number of stored transformations very quickly if not used carefully
     *
+    * @param[in] degree         The degrees which are to be used to rotate the entity.
+    * @param[in] rotAxis        The rotation axis.
     */
     void addRotation(float degree, const QVector3D &rotAxis);
 
     //=========================================================================================================
     /**
-    * Translate the entity
+    * Translate the entity.
     *
+    * @param[in] trans          The vector for the translation.
     */
     void setTranslation(const QVector3D &trans);
 
 protected:
-    CustomMesh::SPtr                                m_pCustomMesh;
-    QSharedPointer<Qt3DCore::QTransform>            m_pTransform;
-    QSharedPointer<Qt3DCore::QScaleTransform>       m_pScaleTransform;
-    QSharedPointer<Qt3DCore::QTranslateTransform>   m_pTranslateTransform;
-    QSharedPointer<Qt3DCore::QRotateTransform>      m_pRotateTransform;
-    QSharedPointer<Qt3DCore::QRotateTransform>      m_pRotateTransformX;
-    QSharedPointer<Qt3DCore::QRotateTransform>      m_pRotateTransformY;
-    QSharedPointer<Qt3DCore::QRotateTransform>      m_pRotateTransformZ;
+    CustomMesh::SPtr                                m_pCustomMesh;          /**< The actual mesh information (vertices, normals, colors). */
+    QSharedPointer<Qt3DCore::QTransform>            m_pTransform;           /**< The main transformation. */
+    QSharedPointer<Qt3DCore::QScaleTransform>       m_pScaleTransform;      /**< The scaling transformation. */
+    QSharedPointer<Qt3DCore::QTranslateTransform>   m_pTranslateTransform;  /**< The translation transformation. */
+    QSharedPointer<Qt3DCore::QRotateTransform>      m_pRotateTransform;     /**< The rotation transformation which is used when setting a rotation. */
+    QSharedPointer<Qt3DCore::QRotateTransform>      m_pRotateTransformX;    /**< The X-Axis transformation. */
+    QSharedPointer<Qt3DCore::QRotateTransform>      m_pRotateTransformY;    /**< The Y-Axis transformation. */
+    QSharedPointer<Qt3DCore::QRotateTransform>      m_pRotateTransformZ;    /**< The Z-Axis transformation. */
 
-    QSharedPointer<Qt3DRender::QMaterial>           m_pMaterial;
+    QSharedPointer<Qt3DRender::QMaterial>           m_pMaterial;            /**< The material to be used for this entity. */
 };
 
 } // NAMESPACE

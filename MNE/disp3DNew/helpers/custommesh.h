@@ -110,8 +110,12 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor
+    * Default constructor.
     *
+    * @param[in] tMatVert       Vertices in form of a matrix.
+    * @param[in] tMatNorm       Normals in form of a matrix.
+    * @param[in] tMatTris       Tris/Faces in form of a matrix.
+    * @param[in] tVecOffset     The offset which is to be used on all the vertices.
     */
     CustomMesh(const MatrixX3f &tMatVert, const MatrixX3f tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset);
 
@@ -123,18 +127,20 @@ public:
 
     //=========================================================================================================
     /**
-    * Refresh the vertices colors of the mesh
+    * Update the vertices colors of the mesh.
     *
+    * @param[in] tMatColors     New color information for the vertices.
     */
     bool updateVertColors(const MatrixX3f &tMatColors);
 
 protected:
-    QSharedPointer<Qt3DRender::QBuffer> m_pVertexDataBuffer;
-    QSharedPointer<Qt3DRender::QBuffer> m_pIndexDataBuffer;
 
-    Qt3DRender::QGeometry *customGeometry ;
+    QSharedPointer<Qt3DRender::QBuffer> m_pVertexDataBuffer;    /**< The vertex buffer. */
+    QSharedPointer<Qt3DRender::QBuffer> m_pNormalDataBuffer;    /**< The normal buffer. */
+    QSharedPointer<Qt3DRender::QBuffer> m_pColorDataBuffer;     /**< The color buffer. */
+    QSharedPointer<Qt3DRender::QBuffer> m_pIndexDataBuffer;     /**< The index buffer. */
 
-    int     m_iNumVert;
+    int     m_iNumVert;     /**< The total number of set vertices. */
 };
 
 } // NAMESPACE

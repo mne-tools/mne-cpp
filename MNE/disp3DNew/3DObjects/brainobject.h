@@ -103,31 +103,33 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor using freesurfer data as input
+    * Default constructor using FreeSurfer data as input.
     *
+    * @param[in] tSurface       FreeSurfer surface.
+    * @param[in] parent         The parent of this clas.
     */
     BrainObject(const Surface &tSurface, Qt3DCore::QEntity *parent = 0);
 
     //=========================================================================================================
     /**
-    * Default destructor
+    * Default destructor.
     */
     ~BrainObject();
 
 protected:
     QString     m_sFilePath;        /**< Path to surf directory. */
     QString     m_sFileName;        /**< Surface file name. */
-    QString     m_sSurf;            /**< Loaded surface (eg. inflated, orig ...) */
-    qint32      m_iHemi;            /**< Hemisphere (lh = 0; rh = 1) */
-    QColor      m_ColorSulci;
-    QColor      m_ColorGyri;
+    QString     m_sSurf;            /**< Loaded surface (eg. inflated, orig, pial ...). */
+    qint32      m_iHemi;            /**< Hemisphere (lh = 0; rh = 1). */
+    QColor      m_ColorSulci;       /**< Color for the vertices which belong to the sulci. */
+    QColor      m_ColorGyri;        /**< Color for the vertices which belong to the gyri.). */
 
-    VectorXf    m_vecCurv;          /**< FreeSurfer curvature data */
-    Vector3f    m_vecOffset;        /**< Surface offset */
-    MatrixX3f   m_matVert;          /**< alias verts. Vertex coordinates in meters */
-    MatrixX3i   m_matTris;          /**< alias faces. The triangle descriptions */
-    MatrixX3f   m_matNorm;          /**< Normalized surface normals for each vertex. -> not needed since qglbuilder is doing that for us */
-    MatrixX3f   m_matColorsOrig;    /**< original color values based on curvature values */
+    VectorXf    m_vecCurv;          /**< FreeSurfer curvature data. */
+    Vector3f    m_vecOffset;        /**< Surface offset. */
+    MatrixX3f   m_matVert;          /**< Alias verts. Vertex coordinates in meters. */
+    MatrixX3i   m_matTris;          /**< Alias faces. The triangle descriptions. */
+    MatrixX3f   m_matNorm;          /**< Normalized surface normals for each vertex. */
+    MatrixX3f   m_matColorsOrig;    /**< Original color values based on curvature values. */
 };
 
 } // NAMESPACE

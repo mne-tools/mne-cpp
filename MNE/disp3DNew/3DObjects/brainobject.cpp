@@ -62,8 +62,8 @@ BrainObject::BrainObject(const Surface &tSurface, Qt3DCore::QEntity *parent)
 , m_sSurf(tSurface.surf())
 , m_vecCurv(tSurface.curv())
 , m_vecOffset(tSurface.offset())
-, m_ColorSulci(QColor(255,0,0))
-, m_ColorGyri(QColor(0,255,0))
+, m_ColorSulci(QColor(125,0,0))
+, m_ColorGyri(QColor(0,0,125))
 , m_matVert(tSurface.rr())
 , m_matTris(tSurface.tris())
 , m_matNorm(tSurface.nn())
@@ -73,17 +73,17 @@ BrainObject::BrainObject(const Surface &tSurface, Qt3DCore::QEntity *parent)
 
     for(int i = 0; i<m_matVert.rows() ; i++) {
         if(m_vecCurv[i] >= 0) {
-            m_matColorsOrig(i, 0) = m_ColorSulci.red();
-            m_matColorsOrig(i, 1) = m_ColorSulci.green();
-            m_matColorsOrig(i, 2) = m_ColorSulci.blue();
+            m_matColorsOrig(i, 0) = m_ColorSulci.redF();
+            m_matColorsOrig(i, 1) = m_ColorSulci.greenF();
+            m_matColorsOrig(i, 2) = m_ColorSulci.blueF();
         } else {
-            m_matColorsOrig(i, 0) = m_ColorGyri.red();
-            m_matColorsOrig(i, 1) = m_ColorGyri.green();
-            m_matColorsOrig(i, 2) = m_ColorGyri.blue();
+            m_matColorsOrig(i, 0) = m_ColorGyri.redF();
+            m_matColorsOrig(i, 1) = m_ColorGyri.greenF();
+            m_matColorsOrig(i, 2) = m_ColorGyri.blueF();
         }
     }
 
-    //this->updateVertColors(m_matColorsOrig);
+    this->updateVertColors(m_matColorsOrig);
 }
 
 

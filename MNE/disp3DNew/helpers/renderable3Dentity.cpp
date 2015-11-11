@@ -72,7 +72,8 @@ Renderable3DEntity::Renderable3DEntity(const MatrixX3f &tMatVert, const MatrixX3
 , m_pRotateTransformX(QSharedPointer<Qt3DCore::QRotateTransform>(new Qt3DCore::QRotateTransform()))
 , m_pRotateTransformY(QSharedPointer<Qt3DCore::QRotateTransform>(new Qt3DCore::QRotateTransform()))
 , m_pRotateTransformZ(QSharedPointer<Qt3DCore::QRotateTransform>(new Qt3DCore::QRotateTransform()))
-, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPhongMaterial(this)))
+, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPerVertexColorMaterial(this)))
+//, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QNormalDiffuseMapMaterial(this)))
 {
     m_pRotateTransformX->setAxis(QVector3D(1,0,0));
     m_pRotateTransformY->setAxis(QVector3D(0,1,0));

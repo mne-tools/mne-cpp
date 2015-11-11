@@ -81,7 +81,6 @@ View3D::View3D()
 
 View3D::~View3D()
 {
-    delete m_pRootEntity;
     delete m_pInputAspect;
     delete m_pCameraEntity;
     delete m_pFrameGraph;
@@ -92,6 +91,8 @@ View3D::~View3D()
     delete m_pCameraTranslateTransform;
     delete m_pCameraRotateTransformX;
     delete m_pCameraRotateTransformY;
+
+    delete m_pRootEntity;
 }
 
 
@@ -126,7 +127,7 @@ void View3D::init()
 
     // FrameGraph
     m_pForwardRenderer = new Qt3DRender::QForwardRenderer();
-    m_pForwardRenderer->setClearColor(QColor::fromRgbF(0.0, 0.5, 1.0, 1.0));
+    m_pForwardRenderer->setClearColor(QColor::fromRgbF(0.0, 0.0, 0.0, 1.0));
     m_pForwardRenderer->setCamera(m_pCameraEntity);
     m_pFrameGraph->setActiveFrameGraph(m_pForwardRenderer);
 
@@ -320,7 +321,7 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
 
 //*************************************************************************************************************
 
-void View3D::createCoordSystem(Qt3DCore::QEntity *rootEntity)
+void View3D::createCoordSystem(Qt3DCore::QEntity *parent)
 {
     // Y - red
     Qt3DRender::QCylinderMesh *YAxis = new Qt3DRender::QCylinderMesh();
@@ -329,7 +330,7 @@ void View3D::createCoordSystem(Qt3DCore::QEntity *rootEntity)
     YAxis->setRings(100);
     YAxis->setSlices(20);
 
-    m_YAxisEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(rootEntity));
+    m_YAxisEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(parent));
     m_YAxisEntity->addComponent(YAxis);
 
     Qt3DRender::QPhongMaterial *phongMaterialY = new Qt3DRender::QPhongMaterial();
@@ -353,7 +354,7 @@ void View3D::createCoordSystem(Qt3DCore::QEntity *rootEntity)
     rotationZ->setAxis(QVector3D(1, 0, 0));
     transformZ->addTransform(rotationZ);
 
-    m_ZAxisEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(rootEntity));
+    m_ZAxisEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(parent));
     m_ZAxisEntity->addComponent(ZAxis);
     m_ZAxisEntity->addComponent(transformZ);
 
@@ -378,7 +379,7 @@ void View3D::createCoordSystem(Qt3DCore::QEntity *rootEntity)
     rotationX->setAxis(QVector3D(0, 0, 1));
     transformX->addTransform(rotationX);
 
-    m_XAxisEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(rootEntity));
+    m_XAxisEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(parent));
     m_XAxisEntity->addComponent(XAxis);
     m_XAxisEntity->addComponent(transformX);
 
