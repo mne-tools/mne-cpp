@@ -140,63 +140,73 @@ public:
     bool addFsBrainData(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
 
 protected:
-    Qt3DCore::QAspectEngine         m_aspectEngine;
-    Qt3DCore::QEntity*              m_pRootEntity;
-    Qt3DInput::QInputAspect*        m_pInputAspect;
-    Qt3DCore::QCamera*              m_pCameraEntity;
-    Qt3DRender::QFrameGraph*        m_pFrameGraph;
-    Qt3DRender::QForwardRenderer*   m_pForwardRenderer;
+    Qt3DCore::QAspectEngine             m_aspectEngine;                 /**< The aspect engine. */
+    Qt3DCore::QEntity*                  m_pRootEntity;                  /**< The root/most top level entity buffer. */
+    Qt3DInput::QInputAspect*            m_pInputAspect;                 /**< The input aspect. */
+    Qt3DCore::QCamera*                  m_pCameraEntity;                /**< The camera entity. */
+    Qt3DRender::QFrameGraph*            m_pFrameGraph;                  /**< The frame graph holding the render information. */
+    Qt3DRender::QForwardRenderer*       m_pForwardRenderer;             /**< The renderer (here forward renderer). */
 
-    Qt3DCore::QTransform*           m_pCameraTransform;
-    Qt3DCore::QScaleTransform*      m_pCameraScaleTransform;
-    Qt3DCore::QTranslateTransform*  m_pCameraTranslateTransform;
-    Qt3DCore::QRotateTransform*     m_pCameraRotateTransformX;
-    Qt3DCore::QRotateTransform*     m_pCameraRotateTransformY;
-    Qt3DCore::QRotateTransform*     m_pCameraRotateTransformZ;
+    QSharedPointer<Qt3DCore::QEntity>   m_XAxisEntity;                  /**< The entity representing a torus in x direction. */
+    QSharedPointer<Qt3DCore::QEntity>   m_YAxisEntity;                  /**< The entity representing a torus in y direction. */
+    QSharedPointer<Qt3DCore::QEntity>   m_ZAxisEntity;                  /**< The entity representing a torus in z direction. */
 
-    QSharedPointer<Qt3DCore::QEntity> m_XAxisEntity;
-    QSharedPointer<Qt3DCore::QEntity> m_YAxisEntity;
-    QSharedPointer<Qt3DCore::QEntity> m_ZAxisEntity;
+    Qt3DCore::QTransform*               m_pCameraTransform;             /**< The main camera transform. */
+    Qt3DCore::QScaleTransform*          m_pCameraScaleTransform;        /**< The camera scale transformation (added to m_pCameraTransform). */
+    Qt3DCore::QTranslateTransform*      m_pCameraTranslateTransform;    /**< The camera translation transformation (added to m_pCameraTransform). */
+    Qt3DCore::QRotateTransform*         m_pCameraRotateTransformX;      /**< The camera x-axis rotation transformation (added to m_pCameraTransform). */
+    Qt3DCore::QRotateTransform*         m_pCameraRotateTransformY;      /**< The camera y-axis rotation transformation (added to m_pCameraTransform). */
+    Qt3DCore::QRotateTransform*         m_pCameraRotateTransformZ;      /**< The camera z-axis rotation transformation (added to m_pCameraTransform). */
 
-    Brain::SPtr          m_pBrain;
+    Brain::SPtr     m_pBrain;                   /**< Pointer to the Brain class, which holds all BrainObjects. */
 
-    bool    m_bCameraTransMode;
-    bool    m_bModelRotationMode;
-    bool    m_bCameraRotationMode;
+    bool            m_bCameraTransMode;         /**< Flag for activating/deactivating the translation camera mode. */
+    bool            m_bModelRotationMode;       /**< Flag for activating/deactivating the rotation model mode. */
+    bool            m_bCameraRotationMode;      /**< Flag for activating/deactivating the rotation camera mode. */
 
-    QPoint  m_mousePressPositon;
+    QPoint          m_mousePressPositon;        /**< Position when the mouse was pressed. */
 
-    QVector3D   m_vecCameraTrans;
-    QVector3D   m_vecCameraTransOld;
-    QVector3D   m_vecCameraRotation;
-    QVector3D   m_vecCameraRotationOld;
-    QVector3D   m_vecModelRotation;
-    QVector3D   m_vecModelRotationOld;
+    float           m_fCameraScale;             /**< The current camera scaling factor. */
 
-    float       m_fCameraScale;
+    QVector3D       m_vecCameraTrans;           /**< The camera translation vector. */
+    QVector3D       m_vecCameraTransOld;        /**< The camera old translation vector. */
+    QVector3D       m_vecCameraRotation;        /**< The camera rotation vector. */
+    QVector3D       m_vecCameraRotationOld;     /**< The camera old rotation vector. */
+    QVector3D       m_vecModelRotation;         /**< The model rotation vector. */
+    QVector3D       m_vecModelRotationOld;      /**< The model old rotation vector. */
 
     //=========================================================================================================
     /**
     * Init the 3D view
+    *
     */
     void init();
 
     //=========================================================================================================
     /**
     * Init the 3D views transformation matrices
+    *
     */
     void initTransformations();
 
+    //=========================================================================================================
+    /**
+    * Virtual functions for mouse and keyboard control
+    *
+    */
     void keyPressEvent(QKeyEvent *e);
     void mousePressEvent(QMouseEvent *e);
     void wheelEvent(QWheelEvent *e);
     void mouseReleaseEvent(QMouseEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
 
-    void createCoordSystem(Qt3DCore::QEntity *rootEntity);
-
-private:
-
+    //=========================================================================================================
+    /**
+    * Creates a coordiante system (x/Green, y/Red, z/Blue).
+    *
+    * @param[in] parent         The parent identity which will "hold" the coordinate system.
+    */
+    void createCoordSystem(Qt3DCore::QEntity *parent);
 };
 
 } // NAMESPACE

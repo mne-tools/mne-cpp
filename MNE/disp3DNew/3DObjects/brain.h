@@ -102,14 +102,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor
+    * Default constructor.
     *
+    * @param[in] parent         The parent of this class.
     */
     Brain(QEntity *parent = 0);
 
     //=========================================================================================================
     /**
-    * Default destructor
+    * Default destructor.
     */
     ~Brain();
 
@@ -133,7 +134,7 @@ public:
     const QList<BrainObject::SPtr> & brainObjectList();
 
 protected:
-    QList<BrainObject::SPtr>     m_lBrainData;
+    QList<BrainObject::SPtr>     m_lBrainData;      /**< List of currently loaded BrainObjects. */
 
 };
 
