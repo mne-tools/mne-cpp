@@ -243,6 +243,14 @@ public:
     */
     bool toLabels(const Surface &p_surf, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListLabelRGBAs) const;
 
+    //=========================================================================================================
+    /**
+    * annotation file name
+    *
+    * @return the surf file name
+    */
+    inline QString fileName() const;
+
 private:
     QString m_sFileName;        /**< Annotation file */
 
@@ -315,6 +323,14 @@ inline Colortable& Annotation::getColortable()
 inline const Colortable Annotation::getColortable() const
 {
     return m_Colortable;
+}
+
+
+//*************************************************************************************************************
+
+inline QString Annotation::fileName() const
+{
+    return m_sFileName;
 }
 
 } // NAMESPACE

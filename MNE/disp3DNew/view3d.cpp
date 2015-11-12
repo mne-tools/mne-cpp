@@ -66,6 +66,7 @@ View3D::View3D()
 , m_bCameraRotationMode(false)
 , m_bCameraTransMode(false)
 , m_fCameraScale(1.0f)
+, m_fModelScale(10.0f)
 , m_vecCameraTrans(QVector3D(0.0,-0.5,-2.0))
 , m_vecCameraTransOld(QVector3D(0.0,-0.5,-2.0))
 , m_vecCameraRotation(QVector3D(0.0,0.0,0.0))
@@ -81,18 +82,6 @@ View3D::View3D()
 
 View3D::~View3D()
 {
-    delete m_pInputAspect;
-    delete m_pCameraEntity;
-    delete m_pFrameGraph;
-    delete m_pForwardRenderer;
-
-    delete m_pCameraTransform;
-    delete m_pCameraScaleTransform;
-    delete m_pCameraTranslateTransform;
-    delete m_pCameraRotateTransformX;
-    delete m_pCameraRotateTransformY;
-
-    delete m_pRootEntity;
 }
 
 
@@ -180,18 +169,20 @@ void View3D::initTransformations()
     m_pCameraEntity->addComponent(m_pCameraTransform);
 }
 
+
 //*************************************************************************************************************
 
-bool View3D::addFsBrainData(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir)
+bool View3D::addFsBrainData(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, const QString &atlas)
 {
-    bool state = m_pBrain->addFsBrainData(subject_id, hemi, surf, subjects_dir);
+    bool state = m_pBrain->addFsBrainData(subject_id, hemi, surf, subjects_dir, atlas);
 
     //Init rotation
-    QList<BrainObject::SPtr> list = m_pBrain->brainObjectList();
+    QList<BrainObject::SPtr> lBrainObjectList = m_pBrain->getBrainObjectList();
 
-    for(int i = 0; i<list.size(); i++) {
-        list.at(i)->setRotationX(m_vecModelRotation.x());
-        list.at(i)->setRotationY(m_vecModelRotation.y());
+    for(int i = 0; i<lBrainObjectList.size(); i++) {
+        lBrainObjectList.at(i)->setRotationX(m_vecModelRotation.x());
+        lBrainObjectList.at(i)->setRotationY(m_vecModelRotation.y());
+        lBrainObjectList.at(i)->setScale(m_fModelScale);
     }
 
     return state;
@@ -279,11 +270,11 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
         m_vecModelRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.1f) + m_vecModelRotationOld.y());
 
         // Rotate brain surfaces
-        QList<BrainObject::SPtr> list = m_pBrain->brainObjectList();
+        QList<BrainObject::SPtr> lBrainObjectList = m_pBrain->getBrainObjectList();
 
-        for(int i = 0; i<list.size(); i++) {
-            list.at(i)->setRotationX(m_vecModelRotation.x());
-            list.at(i)->setRotationY(m_vecModelRotation.y());
+        for(int i = 0; i<lBrainObjectList.size(); i++) {
+            lBrainObjectList.at(i)->setRotationX(m_vecModelRotation.x());
+            lBrainObjectList.at(i)->setRotationY(m_vecModelRotation.y());
         }
     }
 
