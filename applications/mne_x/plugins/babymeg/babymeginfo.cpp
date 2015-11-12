@@ -310,7 +310,7 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
 
             break;
         case 2: // outer layer meg sensors
-            t_ch.kind = FIFFV_MEG_CH;
+            t_ch.kind = FIFFV_REF_MEG_CH;
             t_ch.unit = FIFF_UNIT_T;
             t_ch.unit_mul = FIFF_UNITM_NONE;
             t_ch.coil_type = FIFFV_COIL_BABY_REF_MAG;
