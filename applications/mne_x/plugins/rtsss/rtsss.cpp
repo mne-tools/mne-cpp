@@ -327,18 +327,16 @@ void RtSss::run()
 
     exclude<<m_pFiffInfo->bads;
 
-    qDebug()<< exclude ;
+//    qDebug()<< exclude ;
 
     RowVectorXi pickedChannels = m_pFiffInfo->pick_types("mag",false, false, QStringList(),exclude);
-
-    for(int i = 0; i < 100; i++)
-        qDebug()<< " pickedID= " << pickedChannels(i);
-
-     qDebug()<< "finished pickedChannels";
-
+    qDebug()<< "finished pickedChannels";
     qint32 nmegchanused = pickedChannels.cols();
 
-    qDebug()<< "number of picked channels for rtSSS= " << nmegchanused;
+//    for(int i = 0; i < nmegchanused; i++)
+//        std::cout << " pickedID= " << pickedChannels(i) <<", ";
+
+//    qDebug()<< "number of picked channels for rtSSS= " << nmegchanused;
 
     // Initialize output
     m_pRTMSAOutput->data()->initFromFiffInfo(m_pFiffInfo);
@@ -348,9 +346,11 @@ void RtSss::run()
 
     // Set MEG channel infomation to rtSSS
 //    rsss.setMEGInfo(m_pFiffInfo);
+//    std::cout << "****** coil trans ****** " << std::endl;
+//    std::cout <<  m_pFiffInfo->chs[pickedChannels(1)].coil_trans << std::endl;
+//    return;
     rsss.setMEGInfo(m_pFiffInfo, pickedChannels);
-
-    qDebug() << " setMEGInfo finished";
+//    qDebug() << " setMEGInfo finished";
 
     // Get channel information
     qint32 nmegchan = rsss.getNumMEGChan();
@@ -394,7 +394,7 @@ void RtSss::run()
     //qDebug() << "strat id: " << startID_MEGch;
 
     //  Build linear equation
-    //qDebug() << "building SSS linear equation .....";
+    qDebug() << "building an initial SSS linear equation .....";
     lineqn = rsss.buildLinearEqn();
 
     //qDebug() << "..finished !!";
@@ -411,7 +411,7 @@ void RtSss::run()
     {
 //        if (m_bIsHeadMov)
 //        {
-            lineqn = rsss.buildLinearEqn();
+//            lineqn = rsss.buildLinearEqn();
             //qDebug() << "rebuilt SSS linear equation .....";
 //            m_bIsHeadMov = false;
 //        }
@@ -472,25 +472,14 @@ void RtSss::run()
             // Replace raw signal by SSS signal
             for(qint32 i = 0; i < in_mat_used.rows(); ++i) {
                 in_mat.row(pickedChannels(i)) = in_mat_used.row(i);
-//             qDebug() <<    in_mat.row(pickedChannels(i));
+//                qDebug() <<    in_mat.row(pickedChannels(i));
             }
 
-//            for(qint32 i = 0, k = 0; i < nmegchan; ++i)
-//                if (badch(i) == 0)
-//                {
-//                    in_mat.row(i) = in_mat_used.row(k);
-//                    k++;
-//                }
-
             // Output to display
-            m_pRTMSAOutput->data()->setValue(in_mat);
+            m_pRTMSAOutput->data()->setValue(0.01* in_mat);
 
-//            for(qint32 i = 0; i <in_mat.cols(); ++i)
-//                m_pRTMSAOutput->data()->setValue(1e7 * in_mat.col(i));
-////                m_pRTMSAOutput->data()->setValue(1e-16 * in_mat.col(i));
-
-            cnt++;
-            qDebug() << cnt << "   " ;
+//            cnt++;
+//            qDebug() << cnt << "   " ;
         }
     }
 
