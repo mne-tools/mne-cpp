@@ -53,7 +53,7 @@ TFplot::TFplot(MatrixXd tf_matrix, qreal sample_rate, qreal lower_frq, qreal upp
     qreal frq_per_px = max_frq/tf_matrix.rows();
 
     if(upper_frq > max_frq || upper_frq <= 0) upper_frq = max_frq;
-    if(lower_frq < 0 || lower_frq > max_frq) lower_frq = 0;
+    if(lower_frq < 0 || lower_frq >= max_frq) lower_frq = 0;
     if(upper_frq < lower_frq)
     {
         qreal temp = upper_frq;
