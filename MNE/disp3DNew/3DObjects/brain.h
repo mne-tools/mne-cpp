@@ -122,8 +122,10 @@ public:
     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
     * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
     * @param[in] subjects_dir       Subjects directory
+    * @param[in] annotation         Load annotation data if wanted.
+    * @return    Const list of added brain object
     */
-    bool addFsBrainData(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
+    bool addFsBrainData(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, const QString &atlas="");
 
     //=========================================================================================================
     /**
@@ -131,11 +133,10 @@ public:
     *
     * @return returns a const adress to the list with the sotred brain objects
     */
-    const QList<BrainObject::SPtr> & brainObjectList();
+    const QList<BrainObject::SPtr>  getBrainObjectList() const;
 
 protected:
     QList<BrainObject::SPtr>     m_lBrainData;      /**< List of currently loaded BrainObjects. */
-
 };
 
 } // NAMESPACE

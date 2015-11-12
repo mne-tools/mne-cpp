@@ -132,12 +132,13 @@ public:
     /**
     * Adds FreeSurfer brain data.
     *
-    * @param[in] subject_id         Name of subject
-    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
-    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
-    * @param[in] subjects_dir       Subjects directory
+    * @param[in] subject_id         Name of subject.
+    * @param[in] hemi               Which hemisphere to load (0 -> lh, 1 -> rh, 2 -> both).
+    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...).
+    * @param[in] subjects_dir       Subjects directory.
+    * @param[in] atlas              Load annotation data (atlas) if wanted.
     */
-    bool addFsBrainData(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
+    bool addFsBrainData(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, const QString &atlas = "");
 
 protected:
     Qt3DCore::QAspectEngine             m_aspectEngine;                 /**< The aspect engine. */
@@ -158,6 +159,8 @@ protected:
     Qt3DCore::QRotateTransform*         m_pCameraRotateTransformY;      /**< The camera y-axis rotation transformation (added to m_pCameraTransform). */
     Qt3DCore::QRotateTransform*         m_pCameraRotateTransformZ;      /**< The camera z-axis rotation transformation (added to m_pCameraTransform). */
 
+    QList<BrainObject::SPtr>            m_lBrainObjectList;
+
     Brain::SPtr     m_pBrain;                   /**< Pointer to the Brain class, which holds all BrainObjects. */
 
     bool            m_bCameraTransMode;         /**< Flag for activating/deactivating the translation camera mode. */
@@ -166,6 +169,7 @@ protected:
 
     QPoint          m_mousePressPositon;        /**< Position when the mouse was pressed. */
 
+    float           m_fModelScale;              /**< The current camera scaling factor. */
     float           m_fCameraScale;             /**< The current camera scaling factor. */
 
     QVector3D       m_vecCameraTrans;           /**< The camera translation vector. */

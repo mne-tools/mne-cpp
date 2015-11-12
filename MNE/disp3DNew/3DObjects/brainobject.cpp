@@ -54,10 +54,10 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainObject::BrainObject(const Surface &tSurface, Qt3DCore::QEntity *parent)
+BrainObject::BrainObject(const Surface &tSurface, const Annotation &tAnnotation, Qt3DCore::QEntity *parent)
 : Renderable3DEntity(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset(), parent)
 , m_sFilePath(tSurface.filePath())
-, m_sFileName(tSurface.fileName())
+, m_sSurfFileName(tSurface.fileName())
 , m_iHemi(tSurface.hemi())
 , m_sSurf(tSurface.surf())
 , m_vecCurv(tSurface.curv())
@@ -67,7 +67,10 @@ BrainObject::BrainObject(const Surface &tSurface, Qt3DCore::QEntity *parent)
 , m_matVert(tSurface.rr())
 , m_matTris(tSurface.tris())
 , m_matNorm(tSurface.nn())
-, m_sAnnotation("none")
+, m_sAnnotFilePath(tAnnotation.fileName())
+, m_vecAnnotVertices(tAnnotation.getVertices())
+, m_vecAnnotLabelIds(tAnnotation.getLabelIds())
+, m_Colortable(tAnnotation.getColortable())
 {
     //Create color from curvature information and refresh renderable 3D entity
     m_matColorsOrig.resize(m_matVert.rows(), m_matVert.cols());
