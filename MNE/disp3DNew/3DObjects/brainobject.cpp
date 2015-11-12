@@ -72,7 +72,7 @@ BrainObject::BrainObject(const Surface &tSurface, const Annotation &tAnnotation,
 , m_vecAnnotLabelIds(tAnnotation.getLabelIds())
 , m_Colortable(tAnnotation.getColortable())
 {
-    //Create color from curvature information and refresh renderable 3D entity
+    //Create color from curvature information
     m_matColorsOrig.resize(m_matVert.rows(), m_matVert.cols());
 
     for(int i = 0; i<m_matVert.rows() ; i++) {
@@ -87,7 +87,23 @@ BrainObject::BrainObject(const Surface &tSurface, const Annotation &tAnnotation,
         }
     }
 
-    this->updateVertColors(m_matColorsOrig);
+    //Create color from annotation data if annotation is not empty
+    if(tAnnotation.getVertices().rows() != 0) {
+        QList<FSLIB::Label> p_qListLabels;
+        QList<RowVector4i> p_qListLabelRGBAs;
+        tAnnotation.toLabels(tSurface, p_qListLabels, p_qListLabelRGBAs);
+
+        m_matColorsAnnot.resize(m_matVert.rows(), m_matVert.cols());
+
+        for(int i = 0; i<p_qListLabels.size(); i++) {
+            FSLIB::Label label = p_qListLabels.at(i);
+            for(int j = 0; j<label.vertices.rows(); j++) {
+                m_matColorsAnnot(label.vertices(j), 0) = p_qListLabelRGBAs.at(i)(0)/255.0;
+                m_matColorsAnnot(label.vertices(j), 1) = p_qListLabelRGBAs.at(i)(1)/255.0;
+                m_matColorsAnnot(label.vertices(j), 2) = p_qListLabelRGBAs.at(i)(2)/255.0;
+            }
+        }
+    }
 }
 
 
@@ -100,6 +116,13 @@ BrainObject::~BrainObject()
 
 //*************************************************************************************************************
 
+void BrainObject::showAnnotation(bool flag)
+{
+    if(flag && m_matColorsAnnot.rows()!=0)
+        this->updateVertColors(m_matColorsAnnot);
+    else
+        this->updateVertColors(m_matColorsOrig);
+}
 
 
 
