@@ -251,7 +251,7 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo, RowVectorXi pickedChannels)
     C3012Wintpts8 << 14.9790,  -14.9790,   14.9790,  -14.9790,   14.9790,  -14.9790,   14.9790,  -14.9790;
     C3024Wintpts9 << 0.1975,    0.0772,    0.0772,    0.0772,    0.0772,    0.1235,    0.1235,    0.1235,    0.1235;
 
-    qint32 cid = 0;
+//    qint32 cid = 0;
     CoilGrad.setZero(NumCoil);
 
 //    for (qint32 i=0; i<fiffInfo->nchan; ++i)
@@ -308,12 +308,49 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo, RowVectorXi pickedChannels)
     for (qint32 i=0; i<NumCoil; ++i)
     {
         CoilT.append(fiffInfo->chs[pickedChannels(i)].coil_trans);
+
+//                std::cout << "PickedChID: " << pickedChannels(i) << ", ";
+//                std::cout <<  fiffInfo->chs[pickedChannels(i)].coil_trans << std::endl;
+//                std::cout <<  fiffInfo->chs[pickedChannels(i)].ch_name << std::endl;
+//                std::cout <<  CoilT[i] << std::endl;
+
         CoilName.append(fiffInfo->chs[pickedChannels(i)].ch_name);
 
-        CoilGrad(i) = 0;
-        CoilNk(i) = 7;
-        CoilRk.append(C7002intpts7);
-        CoilWk.append(C7002Wintpts7);
+        switch (fiffInfo->chs[pickedChannels(i)].coil_type)
+        {
+            case 3012:
+                qDebug() << " WARNING !!! Gradiometer is not supported for SSS !!!";
+                CoilGrad(i) = 1;
+                CoilNk(i) = 8;
+                CoilRk.append(C3012intpts8);
+                CoilWk.append(C3012Wintpts8);
+                break;
+
+            case 3024:
+                CoilGrad(i) = 0;
+                CoilNk(i) = 9;
+                CoilRk.append(C3024intpts9);
+                CoilWk.append(C3024Wintpts9);
+                break;
+
+            case 7002:
+                CoilGrad(i) = 0;
+                CoilNk(i) = 7;
+                CoilRk.append(C7002intpts7);
+                CoilWk.append(C7002Wintpts7);
+                break;
+
+            case 7003:
+                CoilGrad(i) = 0;
+                CoilNk(i) = 4;
+                CoilRk.append(C7003intpts4);
+                CoilWk.append(C7003Wintpts4);
+                break;
+
+            default:
+                qDebug() << " This coil type is NOT supported";
+                break;
+        }
     }
 
 
@@ -485,7 +522,7 @@ void RtSssAlgo::getSSSBasis(VectorXd X, VectorXd Y, VectorXd Z, qint32 LIn, qint
     for(int i=0; i<X.rows(); i++)
         if ( (abs(X(i)) < 1e-30) && (abs(Y(i)) < 1e-30) )
         {
-            //std::cout << "Zero THETA detected!****  ";
+//            std::cout << "Zero THETA detected!****  ";
             //std::cout << "X, Y: " << X(i) << ",  " << Y(i) << endl;
             break;
             //return;

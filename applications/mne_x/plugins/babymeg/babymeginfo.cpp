@@ -310,7 +310,7 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
 
             break;
         case 2: // outer layer meg sensors
-            t_ch.kind = FIFFV_MEG_CH;
+            t_ch.kind = FIFFV_REF_MEG_CH;
             t_ch.unit = FIFF_UNIT_T;
             t_ch.unit_mul = FIFF_UNITM_NONE;
             t_ch.coil_type = FIFFV_COIL_BABY_REF_MAG;
@@ -344,6 +344,32 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
 
             break;
         }
+
+
+        /*  Add the coiltrans for each sensor */
+        /* x-axis normal vector */
+        t_ch.coil_trans(0,0) = t_ch.loc(3,0);
+        t_ch.coil_trans(1,0) = t_ch.loc(4,0);
+        t_ch.coil_trans(2,0) = t_ch.loc(5,0);
+        /* y-axis normal vector */
+        t_ch.coil_trans(0,1) = t_ch.loc(6,0);
+        t_ch.coil_trans(1,1) = t_ch.loc(7,0);
+        t_ch.coil_trans(2,1) = t_ch.loc(8,0);
+        /* z-axis normal vector */
+        t_ch.coil_trans(0,2) = t_ch.loc(9,0);
+        t_ch.coil_trans(1,2) = t_ch.loc(10,0);
+        t_ch.coil_trans(2,2) = t_ch.loc(11,0);
+        /* x,y,z coordinates */
+        t_ch.coil_trans(0,3) = t_ch.loc(0,0);
+        t_ch.coil_trans(1,3) = t_ch.loc(1,0);
+        t_ch.coil_trans(2,3) = t_ch.loc(2,0);
+
+        /* 0 0 0 1 */
+        t_ch.coil_trans(3,0) = 0.0;
+        t_ch.coil_trans(3,1) = 0.0;
+        t_ch.coil_trans(3,2) = 0.0;
+        t_ch.coil_trans(3,3) = 1.0;
+
         m_FiffInfo.chs.append(t_ch);
         m_FiffInfo.ch_names.append(t_ch.ch_name);
 
