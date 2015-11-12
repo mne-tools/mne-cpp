@@ -93,6 +93,7 @@ SOURCES += \
     plot.cpp \
     graph.cpp \
     rtplot.cpp \
+    tfplot.cpp \
     filterwindow.cpp \
     helpers/layoutscene.cpp \
     helpers/averagescene.cpp \
@@ -114,6 +115,7 @@ HEADERS += \
     plot.h \
     graph.h \
     rtplot.h \
+    tfplot.h \
     filterwindow.h \
     selectionmanagerwindow.h \
     helpers/layoutscene.h \
