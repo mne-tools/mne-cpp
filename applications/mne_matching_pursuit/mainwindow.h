@@ -46,9 +46,13 @@
 //=============================================================================================================
 
 #include <mne/mne.h>
+#include <disp/plot.h>
+#include <disp/helpers/colormap.h>
+#include <utils/spectrogram.h>
 #include <utils/mp/atom.h>
 #include <utils/mp/adaptivemp.h>
 #include <utils/mp/fixdictmp.h>
+#include <disp/tfplot.h>
 
 #include "editorwindow.h"
 #include "ui_editorwindow.h"
@@ -100,6 +104,7 @@ typedef signed int          INT32, *PINT32;
 // USED NAMESPACES
 
 using namespace MNELIB;
+using namespace DISPLIB;
 
 //=============================================================================================================
 
@@ -127,8 +132,9 @@ class GraphWindow;
 class ResiduumWindow;
 class AtomSumWindow;
 class XAxisWindow;
+class tfplotwidget;
 
-class MainWindow : public QMainWindow
+class MainWindow : public QMainWindow, ColorMap
 {
     Q_OBJECT
 
@@ -143,32 +149,7 @@ public:
     typedef QList<FixDictAtom> fix_dict_atom_list;
     typedef QMap<qint32, bool> select_map;
     typedef Eigen::VectorXd VectorXd;
-    typedef Eigen::RowVectorXi RowVectorXi;
-    //==========================================================================================================
-    /**
-    * MainWindow_fill_dict_combobox
-    *
-    * ### MP toolbox main window function ###
-    *
-    * fills combobox with available dictionaries
-    *
-    * @return void
-    */
-    void fill_dict_combobox();
-
-    //==========================================================================================================
-
-    //==========================================================================================================
-    /**
-    * MainWindow_fill_dict_combobox
-    *
-    * ### MP toolbox main window function ###
-    *
-    * save files
-    *
-    * @return void
-    */
-    void save_fif_file();
+    typedef Eigen::RowVectorXi RowVectorXi;    
 
 
 private slots:
@@ -564,8 +545,10 @@ private slots:
     void on_dsb_energy_valueChanged(double arg1);
     void on_actionBeenden_triggered();
     void on_mouse_button_release();
-
     void on_rb_OwnDictionary_clicked();
+    void on_extend_tab_button();
+    void on_close_tab_button(int index);
+    void on_actionTFplot_triggered();
 
 signals:
 
@@ -627,6 +610,30 @@ private:
     QThread* mp_Thread;
     AdaptiveMp *adaptive_Mp;
     FixDictMp *fixDict_Mp ;
+
+    //==========================================================================================================
+    /**
+    * MainWindow_fill_dict_combobox
+    *
+    * ### MP toolbox main window function ###
+    *
+    * fills combobox with available dictionaries
+    *
+    * @return void
+    */
+    void fill_dict_combobox();
+
+    //==========================================================================================================
+    /**
+    * MainWindow_fill_dict_combobox
+    *
+    * ### MP toolbox main window function ###
+    *
+    * save files
+    *
+    * @return void
+    */
+    void save_fif_file();
 
     //==========================================================================================================
     /**
