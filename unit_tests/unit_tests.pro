@@ -67,14 +67,10 @@ contains(MNECPP_CONFIG, withGui) {
         }
     }
 	
-    qtHaveModule(3d) {
-        isEqual(QT_MAJOR_VERSION, 5){
-            isEqual(QT_MINOR_VERSION, 6){
-                message(Qt3D available && QTVersion >= Qt 5.6: new mne 3D tests configured!)
-                SUBDIRS += \
-                    test_new_3d
-            }
-        }
+    qtHaveModule(3dcore) {
+        message(Qt3D 3DCore available - new mne 3D tests configured!)
+        SUBDIRS += \
+            #test_new_3d
     }
 
 }
