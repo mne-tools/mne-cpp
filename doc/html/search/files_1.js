@@ -2,6 +2,7 @@ var searchData=
 [
   ['babymegaboutwidget_2ecpp',['babymegaboutwidget.cpp',['../babymegaboutwidget_8cpp.html',1,'']]],
   ['babymegaboutwidget_2eh',['babymegaboutwidget.h',['../babymegaboutwidget_8h.html',1,'']]],
+  ['babymeghpidgl_2ecpp',['babymeghpidgl.cpp',['../babymeghpidgl_8cpp.html',1,'']]],
   ['babymegprojectdialog_2ecpp',['babymegprojectdialog.cpp',['../babymegprojectdialog_8cpp.html',1,'']]],
   ['babymegsetupwidget_2ecpp',['babymegsetupwidget.cpp',['../babymegsetupwidget_8cpp.html',1,'']]],
   ['babymegsetupwidget_2eh',['babymegsetupwidget.h',['../babymegsetupwidget_8h.html',1,'']]],

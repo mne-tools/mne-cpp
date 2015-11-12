@@ -56,24 +56,29 @@ SUBDIRS += \
     patientManager
 
 contains(MNECPP_CONFIG, withGui) {
-	SUBDIRS +=
+    SUBDIRS += \
+
+    qtHaveModule(3dcore) {
+    message(Examples.pro - Qt3D 3DCore available!)
+    SUBDIRS += \
+        disp3DNewTutorial \
+    }
 
     qtHaveModule(3d) {
-        message(Qt3D available: readFwdDisp3D configured!)
-        SUBDIRS += \
-            clusteredInverse \
-            rawClusteredInverse \
-            rawClusteredInverseEEG \
-            readFwdDisp3D \
-            plotSurfaces \
-            lnt \
-            computeInverseRapMusic \
-            rawClusteredInverseRapMusic \
-            computeInversePwlRapMusic \
-            rawClusteredInversePwlRapMusic \
-            stClusteredInversePwlRapMusic  \
-            roiClusteredInversePwlRapMusic \
-            fsSurface \
-            #disp3DNewTutorial #Uncomment this if you have Qt3D 2.0 compiled
+    message(Examples.pro - Qt3D available!)
+    SUBDIRS += \
+        clusteredInverse \
+        rawClusteredInverse \
+        rawClusteredInverseEEG \
+        readFwdDisp3D \
+        plotSurfaces \
+        lnt \
+        computeInverseRapMusic \
+        rawClusteredInverseRapMusic \
+        computeInversePwlRapMusic \
+        rawClusteredInversePwlRapMusic \
+        stClusteredInversePwlRapMusic  \
+        roiClusteredInversePwlRapMusic \
+        fsSurface \
     }
 }

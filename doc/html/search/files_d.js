@@ -32,8 +32,6 @@ var searchData=
   ['projectionmodel_2eh',['projectionmodel.h',['../projectionmodel_8h.html',1,'']]],
   ['projectionwindow_2ecpp',['projectionwindow.cpp',['../projectionwindow_8cpp.html',1,'']]],
   ['projectionwindow_2eh',['projectionwindow.h',['../projectionwindow_8h.html',1,'']]],
-  ['projectorwidget_2ecpp',['projectorwidget.cpp',['../projectorwidget_8cpp.html',1,'']]],
-  ['projectorwidget_2eh',['projectorwidget.h',['../projectorwidget_8h.html',1,'']]],
   ['pwlrapmusic_2ecpp',['pwlrapmusic.cpp',['../pwlrapmusic_8cpp.html',1,'']]],
   ['pwlrapmusic_2eh',['pwlrapmusic.h',['../pwlrapmusic_8h.html',1,'']]],
   ['pyio_2ecpp',['pyio.cpp',['../pyio_8cpp.html',1,'']]],

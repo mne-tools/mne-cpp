@@ -356,3 +356,6 @@ lib
 /bin/imageformats/*.dll
 /bin/platforms/*.dll
 /bin/translations/*.qm
+/bin/*.qm
+/bin/bearer/qgenericbearer.dll
+/bin/bearer/qnativewifibearer.dll

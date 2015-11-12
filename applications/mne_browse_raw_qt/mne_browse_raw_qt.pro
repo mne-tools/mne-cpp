@@ -169,6 +169,9 @@ RC_FILE = Resources/Images/ApplicationIcons/browse_raw.rc
 
 # Deploy Qt Dependencies
 unix:!macx {
+    #ToDo Unix
+}
+else {
     isEmpty(TARGET_EXT) {
         win32 {
             TARGET_CUSTOM_EXT = .exe
@@ -193,4 +196,3 @@ unix:!macx {
     #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
     QMAKE_POST_LINK = $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
 }
-#ToDo Unix

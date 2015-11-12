@@ -31,10 +31,8 @@ var searchData=
   ['pluginscenemanager',['PluginSceneManager',['../class_m_n_e_x_1_1_plugin_scene_manager.html',1,'MNEX']]],
   ['proavg',['PROAvg',['../struct_p_r_o_avg.html',1,'']]],
   ['processdurationmessagebox',['processdurationmessagebox',['../classprocessdurationmessagebox.html',1,'']]],
-  ['progressbarwidgetclass',['ProgressBarWidgetClass',['../class_ui_1_1_progress_bar_widget_class.html',1,'Ui']]],
   ['projectionmodel',['ProjectionModel',['../class_m_n_e_browse_raw_qt_1_1_projection_model.html',1,'MNEBrowseRawQt']]],
   ['projectionwindow',['ProjectionWindow',['../class_m_n_e_browse_raw_qt_1_1_projection_window.html',1,'MNEBrowseRawQt']]],
-  ['projectorwidget',['ProjectorWidget',['../class_x_d_i_s_p_l_i_b_1_1_projector_widget.html',1,'XDISPLIB']]],
   ['pwlrapmusic',['PwlRapMusic',['../class_i_n_v_e_r_s_e_l_i_b_1_1_pwl_rap_music.html',1,'INVERSELIB']]],
   ['pyio',['PyIO',['../class_p_y_i_o_l_i_b_1_1_py_i_o.html',1,'PYIOLIB']]]
 ];

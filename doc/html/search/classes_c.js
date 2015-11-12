@@ -12,11 +12,8 @@ var searchData=
   ['newmeasurementwidget',['NewMeasurementWidget',['../class_x_d_i_s_p_l_i_b_1_1_new_measurement_widget.html',1,'XDISPLIB']]],
   ['newnumeric',['NewNumeric',['../class_x_m_e_a_s_l_i_b_1_1_new_numeric.html',1,'XMEASLIB']]],
   ['newrealtimemultisamplearray',['NewRealTimeMultiSampleArray',['../class_x_m_e_a_s_l_i_b_1_1_new_real_time_multi_sample_array.html',1,'XMEASLIB']]],
-  ['newrealtimemultisamplearrayclass',['NewRealTimeMultiSampleArrayClass',['../class_ui_1_1_new_real_time_multi_sample_array_class.html',1,'Ui']]],
   ['newrealtimesamplearray',['NewRealTimeSampleArray',['../class_x_m_e_a_s_l_i_b_1_1_new_real_time_sample_array.html',1,'XMEASLIB']]],
-  ['newrealtimesamplearrayclass',['NewRealTimeSampleArrayClass',['../class_ui_1_1_new_real_time_sample_array_class.html',1,'Ui']]],
   ['noiseestimate',['NoiseEstimate',['../class_noise_estimate_plugin_1_1_noise_estimate.html',1,'NoiseEstimatePlugin']]],
   ['noiseestimatesetupwidget',['NoiseEstimateSetupWidget',['../class_noise_estimate_plugin_1_1_noise_estimate_setup_widget.html',1,'NoiseEstimatePlugin']]],
-  ['noiseestimatesetupwidgetclass',['NoiseEstimateSetupWidgetClass',['../class_ui_1_1_noise_estimate_setup_widget_class.html',1,'Ui']]],
-  ['numericwidgetclass',['NumericWidgetClass',['../class_ui_1_1_numeric_widget_class.html',1,'Ui']]]
+  ['noiseestimatesetupwidgetclass',['NoiseEstimateSetupWidgetClass',['../class_ui_1_1_noise_estimate_setup_widget_class.html',1,'Ui']]]
 ];
