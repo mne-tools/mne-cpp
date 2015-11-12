@@ -4,7 +4,7 @@
 # @author   Lorenz Esch <Lorenz.Esch@tu-ilmenauu.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     February, 2015
+# @date     November, 2015
 #
 # @section  LICENSE
 #
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the new display 3D library which depends on the qt3d 2.0 library.
+# @brief    This project file builds the new display 3D library which depends on the qt3d module.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       += widgets 3dcore 3drenderer 3dinput concurrent
+QT       += widgets 3dcore 3drender 3dinput concurrent
 
 DEFINES += DISP3DNEW_LIBRARY
 
@@ -88,23 +88,21 @@ else {
 }
 
 SOURCES += \
-    brainview.cpp \
-    brainSurface\brainsurface.cpp \
-    brainSurface\brainsurfacemesh.cpp \
-    brainSurface\brainhemisphere.cpp \
-    helpers\renderableentity.cpp \
-    models\stcdatamodel.cpp \
-    models\stcdataworker.cpp
+    view3d.cpp \
+    3DObjects/brain.cpp \
+    3DObjects/brainobject.cpp \
+    helpers/renderable3Dentity.cpp \
+    helpers/custommesh.cpp \
+    helpers/window.cpp \
 
 HEADERS += \
     disp3dnew_global.h \
-    brainview.h \
-    brainSurface\brainsurface.h \
-    brainSurface\brainsurfacemesh.h \
-    brainSurface\brainhemisphere.h \
-    helpers\renderableentity.h \
-    models\stcdatamodel.h \
-    models\stcdataworker.h
+    view3d.h \
+    3DObjects/brain.h \
+    3DObjects/brainobject.h \
+    helpers/renderable3Dentity.h \
+    helpers/custommesh.h \
+    helpers/window.h \
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

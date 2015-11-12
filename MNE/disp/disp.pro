@@ -99,10 +99,7 @@ SOURCES += \
     helpers/averagesceneitem.cpp \
     helpers/filterdatadelegate.cpp \
     helpers/filterdatamodel.cpp \
-    helpers/averagescene.cpp \
-    helpers/averagesceneitem.cpp \
     helpers/filterplotscene.cpp \
-    helpers/layoutscene.cpp \
     helpers/selectionscene.cpp \
     helpers/selectionsceneitem.cpp \
     selectionmanagerwindow.cpp \
@@ -118,18 +115,15 @@ HEADERS += \
     graph.h \
     rtplot.h \
     filterwindow.h \
+    selectionmanagerwindow.h \
     helpers/layoutscene.h \
     helpers/averagescene.h \
     helpers/averagesceneitem.h \
     helpers/filterdatadelegate.h \
     helpers/filterdatamodel.h \
-    helpers/averagescene.h \
-    helpers/averagesceneitem.h \
     helpers/filterplotscene.h \
-    helpers/layoutscene.h \
     helpers/selectionscene.h \
     helpers/selectionsceneitem.h \
-    selectionmanagerwindow.h \
     helpers/chinfomodel.h \
     helpers/mneoperator.h \
     helpers/roundededgeswidget.h

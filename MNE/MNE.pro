@@ -52,10 +52,16 @@ SUBDIRS += \
 contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += disp
 
+    qtHaveModule(3dcore) {
+    message(Examples.pro - Qt3D 3DCore available!)
+    SUBDIRS += \
+        disp3DNew \
+    }
+
     qtHaveModule(3d) {
         message(Qt3D available: disp3D library configured!)
-        SUBDIRS += disp3D \
-                   #disp3DNew #Uncomment this if you have Qt3D 2.0 compiled
+        SUBDIRS +=  \
+            disp3D \
     }
 }
 

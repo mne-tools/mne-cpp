@@ -321,7 +321,7 @@ public:
     *
     * @return the current detected trigger flanks
     */
-    inline QList<int> RealTimeMultiSampleArrayModel::getDetectedTriggers() const;
+    inline QList<int> getDetectedTriggers() const;
 
     //=========================================================================================================
     /**
@@ -329,7 +329,7 @@ public:
     *
     * @return the old detected trigger flanks
     */
-    inline QList<int> RealTimeMultiSampleArrayModel::getDetectedTriggersOld() const;
+    inline QList<int> getDetectedTriggersOld() const;
 
     //=========================================================================================================
     /**
@@ -337,7 +337,7 @@ public:
     *
     * @return the current trigger color
     */
-    inline QColor RealTimeMultiSampleArrayModel::getTriggerColor() const;
+    inline QColor getTriggerColor() const;
 
     //=========================================================================================================
     /**
