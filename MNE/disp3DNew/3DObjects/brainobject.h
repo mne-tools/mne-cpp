@@ -47,6 +47,7 @@
 
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
+#include <fs/label.h>
 
 
 //*************************************************************************************************************
@@ -117,6 +118,14 @@ public:
     */
     ~BrainObject();
 
+    //=========================================================================================================
+    /**
+    * Controls whether curvature (original) or annotation data is to be displayed.
+    *
+    * @param[in] flag           Whether to show loaded annotation data.
+    */
+    void showAnnotation(bool flag);
+
 protected:
     QString     m_sFilePath;        /**< Path to surf directory. */
     QString     m_sSurfFileName;    /**< Surface file name. */
@@ -139,6 +148,7 @@ protected:
     MatrixX3i   m_matTris;          /**< Alias faces. The triangle descriptions. */
     MatrixX3f   m_matNorm;          /**< Normalized surface normals for each vertex. */
     MatrixX3f   m_matColorsOrig;    /**< Original color values based on curvature values. */
+    MatrixX3f   m_matColorsAnnot;   /**< Annotation color values based on atlas data. */
 };
 
 } // NAMESPACE

@@ -78,6 +78,7 @@ bool Brain::addFsBrainData(const QString &subject_id, qint32 hemi, const QString
     //Create new brain objects (based on the number of loaded hemispheres) and add to the global list
     for(qint32 i = 0; i<tSurfaceSet.data().size(); i++) {
         BrainObject::SPtr pBrainObject = BrainObject::SPtr(new BrainObject(tSurfaceSet[i], tAnnotationSet[i], this));
+        pBrainObject->showAnnotation(true);
         m_lBrainData.append(pBrainObject);
     }
 
