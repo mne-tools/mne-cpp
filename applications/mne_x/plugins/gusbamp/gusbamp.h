@@ -42,20 +42,11 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-#include <iostream>
-#include <fstream>
-#include <direct.h>
-
 #include "gusbamp_global.h"
 
 #include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
-
-#include <utils/layoutloader.h>
-
-#include <unsupported/Eigen/FFT>
-#include <Eigen/Geometry>
 
 
 //*************************************************************************************************************
@@ -64,12 +55,8 @@
 //=============================================================================================================
 
 #include <QtWidgets>
-#include <QVector>
-#include <QTime>
-#include <QtConcurrent/QtConcurrent>
 
 #include "FormFiles/gusbampsetupwidget.h"
-#include "FormFiles/gusbampsetupprojectwidget.h"
 
 
 //*************************************************************************************************************
@@ -99,7 +86,6 @@ using namespace XMEASLIB;
 using namespace IOBuffer;
 using namespace FIFFLIB;
 using namespace std;
-using namespace UTILSLIB;
 using namespace Eigen;
 
 
@@ -126,7 +112,6 @@ class GUSBAMPSHARED_EXPORT GUSBAmp : public ISensor
 
     friend class GUSBAmpProducer;
     friend class GUSBAmpSetupWidget;
-    friend class GUSBAmpSetupProjectWidget;
 
 public:
     //=========================================================================================================
@@ -161,12 +146,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets up the fiff info with the current data chosen by the user. Note: Only works for ANT Neuro Waveguard Duke caps.
-    */
-    void setUpFiffInfo();
-
-    //=========================================================================================================
-    /**
     * Starts the GUSBAmp by starting the GUSBAmp's thread.
     */
     virtual bool start();
@@ -182,8 +161,6 @@ public:
 
     virtual QWidget* setupWidget();
 
-    void splitRecordingFile();
-
 protected:
     //=========================================================================================================
     /**
@@ -193,76 +170,16 @@ protected:
     */
     virtual void run();
 
-    //=========================================================================================================
-    /**
-    * Opens a dialog to setup the project to check the impedance values
-    */
-    void showSetupProjectDialog();
-
-    //=========================================================================================================
-    /**
-    * Starts data recording
-    */
-    void showStartRecording();
-
-    //=========================================================================================================
-    /**
-    * Implements blinking recording button
-    */
-    void changeRecordingButton();
-
-    //=========================================================================================================
-    /**
-    * Checks if a dir exists
-    */
-    bool dirExists(const std::string& dirName_in);
-
 private:
     PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRMTSA_GUSBAmp;   /**< The RealTimeSampleArray to provide the EEG data.*/
-    QSharedPointer<GUSBAmpSetupProjectWidget> m_pGUSBAmpSetupProjectWidget; /**< Widget for setting up the session*/
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
-    int                                 m_iSamplingFreq;                    /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
-    int                                 m_iNumberOfChannels;                /**< The samples per block defined by the user via the GUI.*/
-    int                                 m_iSamplesPerBlock;                 /**< The number of channels defined by the user via the GUI.*/
-    qint32                              m_iSplitCount;                      /**< File split count */
-
-    int                                 m_iTriggerInterval;                 /**< The gap between the trigger signals which request the subject to do something (in ms).*/
-    QTime                               m_qTimerTrigger;                    /**< Time stemp of the last trigger event (in ms).*/
-
-    bool                                m_bUseChExponent;                   /**< Flag for using the channels exponent. Defined by the user via the GUI.*/
-    bool                                m_bUseUnitGain;                     /**< Flag for using the channels unit gain. Defined by the user via the GUI.*/
-    bool                                m_bUseUnitOffset;                   /**< Flag for using the channels unit offset. Defined by the user via the GUI.*/
-    bool                                m_bWriteToFile;                     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
-    bool                                m_bWriteDriverDebugToFile;          /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
     bool                                m_bIsRunning;                       /**< Whether GUSBAmp is running.*/
-    bool                                m_bBeepTrigger;                     /**< Flag for using a trigger input.*/
-    bool                                m_bSplitFile;                       /**< Flag for splitting the recorded file.*/
-
-    int                                 m_iSplitFileSizeMs;                 /**< Holds the size of the splitted files in ms.*/
-    int                                 m_iTriggerType;                     /**< Holds the trigger type | 0 - no trigger activated, 254 - left, 253 - right, 252 - beep.*/
-
-    ofstream                            m_outputFileStream;                 /**< fstream for writing the samples values to txt file.*/
-    QString                             m_sOutputFilePath;                  /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
-    QString                             m_sElcFilePath;                     /**< Holds the path for the .elc file (electrode positions). Defined by the user via the GUI.*/
-    QFile                               m_fileOut;                          /**< QFile for writing to fif file.*/
-    FiffStream::SPtr                    m_pOutfid;                          /**< QFile for writing to fif file.*/
-    QSharedPointer<FiffInfo>            m_pFiffInfo;                        /**< Fiff measurement info.*/
-    RowVectorXd                         m_cals;
 
     QSharedPointer<RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/
 
     QSharedPointer<GUSBAmpProducer>     m_pGUSBAmpProducer;                 /**< the GUSBAmpProducer.*/
-
-    QMutex                              m_qMutex;                           /**< Holds the threads mutex.*/
-
-    QAction*                            m_pActionSetupProject;              /**< shows setup project dialog */
-    QAction*                            m_pActionStartRecording;            /**< starts to record data */
-
-    QSharedPointer<QTimer>              m_pTimerRecordingChange;            /**< timer to control blinking of the recording icon */
-    qint16                              m_iBlinkStatus;                     /**< flag for recording icon blinking */
-
 };
 
 } // NAMESPACE
