@@ -131,7 +131,7 @@ public:
     *
     * @param[in] tMatColors     New color information for the vertices.
     */
-    bool updateVertColors(const MatrixX3f &tMatColors);
+    bool updateVertColors(const Matrix<float, Dynamic, 3, RowMajor> &tMatColors);
 
 protected:
     Qt3DRender::QBuffer* m_pVertexDataBuffer;    /**< The vertex buffer. */
