@@ -412,7 +412,7 @@ int main(int argc, char *argv[])
 
     View3D testWindow;
 
-    testWindow.addFsBrainData("sample", 2, "pial", "./MNE-sample-data/subjects", "aparc.a2009s");
+    testWindow.addFsBrainData("sample", 2, "pial", "./MNE-sample-data/subjects"/*, "aparc.a2009s"*/);
 
     testWindow.show();
 
