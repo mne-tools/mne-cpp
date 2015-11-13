@@ -55,7 +55,7 @@ contains(MNECPP_CONFIG, BuildBasicMNEXVersion) {
         neuromag \
         babymeg \
         triggercontrol \
-        #gusbamp
+        gusbamp
 
     #Algorithms
     SUBDIRS += \
