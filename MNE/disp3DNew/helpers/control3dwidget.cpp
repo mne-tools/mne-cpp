@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     brain.h
+* @file     control3dwidget.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015
+* @date     June, 2015
 *
 * @section  LICENSE
 *
@@ -29,116 +29,94 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Brain class declaration
+* @brief    Definition of the Control3DWidget Class.
 *
 */
-
-#ifndef BRAIN_H
-#define BRAIN_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "disp3dnew_global.h"
+#include "control3dwidget.h"
+#include "ui_control3dwidget.h"
 
-#include "brainobject.h"
-
-#include <fs/surfaceset.h>
-#include <fs/annotationset.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QSharedPointer>
-
-#include <Qt3DCore/QEntity>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DISP3DNEWLIB
-//=============================================================================================================
-
-namespace DISP3DNEWLIB
-{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FSLIB;
+using namespace DISP3DNEWLIB;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* Visualizes a brain in 3D.
-*
-* @brief Visualizes a brain in 3D.
-*/
-class DISP3DNEWSHARED_EXPORT Brain : public Qt3DCore::QEntity
+Control3DWidget::Control3DWidget(QWidget *parent)
+: RoundedEdgesWidget(parent)
+, ui(new Ui::Control3DWidget)
 {
-    Q_OBJECT
+    ui->setupUi(this);
 
-public:
-    typedef QSharedPointer<Brain> SPtr;             /**< Shared pointer type for Brain class. */
-    typedef QSharedPointer<const Brain> ConstSPtr;  /**< Const shared pointer type for Brain class. */
+    //Do connect for internal widget use (non dependent on a view3D)
+    connect(ui->m_pushButton_minimize, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+            this, &Control3DWidget::onMinimizeWidget);
 
-    //=========================================================================================================
-    /**
-    * Default constructor.
-    *
-    * @param[in] parent         The parent of this class.
-    */
-    Brain(QEntity *parent = 0);
+    connect(ui->m_horizontalSlider_opacity, &QSlider::valueChanged,
+            this, &Control3DWidget::onOpacityChange);
 
-    //=========================================================================================================
-    /**
-    * Default destructor.
-    */
-    ~Brain();
+    this->setWindowFlags(Qt::WindowStaysOnTopHint);
+    this->adjustSize();
+    this->setWindowOpacity(1/(100.0/90.0));
 
-    //=========================================================================================================
-    /**
-    * Adds FreeSurfer brain data.
-    *
-    * @param[in] subject_id         Name of subject
-    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
-    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
-    * @param[in] subjects_dir       Subjects directory
-    * @param[in] annotation         Load annotation data if wanted.
-    * @return    Const list of added brain object
-    */
-    bool addFsBrainData(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, const QString &atlas="");
+    //Rename minimize button
+    ui->m_pushButton_minimize->setText(QString("Minimize - %1").arg(this->windowTitle()));
+}
 
-    //=========================================================================================================
-    /**
-    * Return the stored BrainObjects
-    *
-    * @return returns a const adress to the list with the sotred brain objects
-    */
-    const QList<BrainObject::SPtr>  getBrainObjectList() const;
 
-protected:
-    QList<BrainObject::SPtr>     m_lBrainData;      /**< List of currently loaded BrainObjects. */
-};
+//*************************************************************************************************************
 
-} // NAMESPACE
+Control3DWidget::~Control3DWidget()
+{
+    delete ui;
+}
 
-#endif // BRAIN_H
+
+//*************************************************************************************************************
+
+void Control3DWidget::setView3D(View3D::SPtr view3D)
+{
+    //Do the connects from this control widget to the View3D
+
+    //Add the view3D to the list of connected view3D's
+    m_lView3D.append(view3D);
+}
+
+
+//*************************************************************************************************************
+
+void Control3DWidget::onMinimizeWidget(bool state)
+{
+    if(!state) {
+        ui->m_toolBox->hide();
+        ui->m_pushButton_minimize->setText(QString("Maximize - %1").arg(this->windowTitle()));
+    }
+    else {
+        ui->m_toolBox->show();
+        ui->m_pushButton_minimize->setText(QString("Minimize - %1").arg(this->windowTitle()));
+    }
+
+    this->adjustSize();
+    this->resize(width(), ui->m_pushButton_minimize->height());
+}
+
+
+//*************************************************************************************************************
+
+void Control3DWidget::onOpacityChange(qint32 value)
+{
+    this->setWindowOpacity(1/(100.0/value));
+}

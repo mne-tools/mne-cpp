@@ -58,7 +58,7 @@ CustomMesh::CustomMesh(const MatrixX3f &tMatVert, const MatrixX3f tMatNorm, cons
 : Qt3DRender::QGeometryRenderer()
 , m_iNumVert(tMatVert.rows())
 {
-    customGeometry = new Qt3DRender::QGeometry(this);
+    Qt3DRender::QGeometry* customGeometry = new Qt3DRender::QGeometry(this);
 
     m_pVertexDataBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer, customGeometry);//QSharedPointer<Qt3DRender::QBuffer>(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer, customGeometry));
     m_pNormalDataBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer, customGeometry);//QSharedPointer<Qt3DRender::QBuffer>(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer, customGeometry));
