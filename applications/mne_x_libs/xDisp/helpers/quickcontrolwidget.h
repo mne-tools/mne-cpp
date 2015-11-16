@@ -129,7 +129,7 @@ public:
     * @param [in] parent    parent of widget
     * @param [in] qMapChScaling    pointer to scaling information
     */
-    QuickControlWidget(QMap<qint32, float> qMapChScaling, const FiffInfo::SPtr pFiffInfo, QString name = "", QWidget *parent = 0, bool bScaling = true, bool bProjections = true, bool bView = true, bool bFilter = true, bool bModalities = false, bool bTriggerDetection = true);
+    QuickControlWidget(QMap<qint32, float> qMapChScaling, const FiffInfo::SPtr pFiffInfo, QString name = "", QWidget *parent = 0, bool bScaling = true, bool bProjections = true, bool bView = true, bool bFilter = true, bool bModalities = false, bool bCompensator = true, bool bTriggerDetection = true);
 
     //=========================================================================================================
     /**
@@ -199,6 +199,12 @@ signals:
     * Emit this signal whenever the user changes the projections.
     */
     void projSelectionChanged();
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changes the compensator.
+    */
+    void compSelectionChanged(int to);
 
     //=========================================================================================================
     /**
@@ -275,6 +281,12 @@ protected:
 
     //=========================================================================================================
     /**
+    * Create the widgets used in the compensator group
+    */
+    void createCompensatorGroup();
+
+    //=========================================================================================================
+    /**
     * Slot called when time window size changes
     */
     void onTimeWindowChanged(int value);
@@ -289,13 +301,19 @@ protected:
     /**
     * Slot called when the projector check state changes
     */
-    void checkStatusChanged(bool state);
+    void checkProjStatusChanged(bool state);
 
     //=========================================================================================================
     /**
     * Slot called when user enables/disables all projectors
     */
-    void enableDisableAll(bool status);
+    void enableDisableAllProj(bool status);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the compensator check state changes
+    */
+    void checkCompStatusChanged(bool state);
 
     //=========================================================================================================
     /**
@@ -389,6 +407,7 @@ private:
     bool        m_bView;            /**< Flag for drawing the view group box */
     bool        m_bFilter;          /**< Flag for drawing the filter group box */
     bool        m_bModalitiy;       /**< Flag for drawing the modality group box */
+    bool        m_bCompensator;     /**< Flag for drawing the compensator group box */
     bool        m_bTriggerDetection;/**< Flag for drawing the trigger detection tab in the view group box */
 
     QMap<qint32,float>              m_qMapChScaling;                /**< Channel scaling values. */
@@ -397,7 +416,8 @@ private:
     QMap<QString, QColor>           m_qMapTriggerColor;             /**< Trigger channel colors. */
 
     QList<Modality>     m_qListModalities;              /**< List of different modalities. */
-    QList<QCheckBox*>   m_qListCheckBox;                /**< List of projection CheckBox. */
+    QList<QCheckBox*>   m_qListProjCheckBox;            /**< List of projection CheckBox. */
+    QList<QCheckBox*>   m_qListCompCheckBox;            /**< List of compensator CheckBox. */
     QList<QCheckBox*>   m_qFilterListCheckBox;          /**< List of filter CheckBox. */
     QList<QCheckBox*>   m_qListModalityCheckBox;        /**< List of modality checkboxes */
     FiffInfo::SPtr      m_pFiffInfo;                    /**< Connected fiff info. */

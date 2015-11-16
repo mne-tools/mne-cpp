@@ -256,6 +256,17 @@ FiffInfo::SPtr RtDataClient::readInfo()
                             comp = FiffCtfComp();
                             p_pFiffInfo->comps.append(comp);
                             p_pFiffInfo->comps[countComp].ctfkind = *(t_pTag->toInt());
+
+                            if (p_pFiffInfo->comps[countComp].ctfkind == 1194410578) //hex2dec('47314252')
+                                p_pFiffInfo->comps[countComp].kind = 1;
+                            else if (p_pFiffInfo->comps[countComp].ctfkind == 1194476114) //hex2dec('47324252')
+                                p_pFiffInfo->comps[countComp].kind = 2;
+                            else if (p_pFiffInfo->comps[countComp].ctfkind == 1194541650) //hex2dec('47334252')
+                                p_pFiffInfo->comps[countComp].kind = 3;
+                            else
+                                p_pFiffInfo->comps[countComp].kind = p_pFiffInfo->comps[countComp].ctfkind;
+
+                            qDebug()<<"p_pFiffInfo->comps[countComp].kind"<<p_pFiffInfo->comps[countComp].kind;
                             break;
                         case FIFF_MNE_CTF_COMP_CALIBRATED:
                             p_pFiffInfo->comps[countComp].save_calibrated = *(t_pTag->toInt());
