@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brain.h
+* @file     cntrol3dwidget.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,24 +29,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Brain class declaration
+* @brief    Control3DWidget class declaration
 *
 */
 
-#ifndef BRAIN_H
-#define BRAIN_H
+#ifndef CONTROL3DWIDGET_H
+#define CONTROL3DWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "disp3dnew_global.h"
+#include "../disp3dnew_global.h"
 
-#include "brainobject.h"
-
-#include <fs/surfaceset.h>
-#include <fs/annotationset.h>
+#include "disp/helpers/roundededgeswidget.h"
+#include "../view3d.h"
 
 
 //*************************************************************************************************************
@@ -54,16 +52,16 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-
-#include <Qt3DCore/QEntity>
+#include <QWidget>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
+namespace Ui {
+class Control3DWidget;
+}
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -73,12 +71,14 @@
 namespace DISP3DNEWLIB
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FSLIB;
+using namespace DISPLIB;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -86,59 +86,66 @@ using namespace FSLIB;
 //=============================================================================================================
 
 
+
 //=============================================================================================================
 /**
-* Visualizes a brain in 3D.
+* User GUI control for View3D.
 *
-* @brief Visualizes a brain in 3D.
+* @brief User GUI control for View3D.
 */
-class DISP3DNEWSHARED_EXPORT Brain : public Qt3DCore::QEntity
+class DISP3DNEWSHARED_EXPORT Control3DWidget : public RoundedEdgesWidget
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<Brain> SPtr;             /**< Shared pointer type for Brain class. */
-    typedef QSharedPointer<const Brain> ConstSPtr;  /**< Const shared pointer type for Brain class. */
+    typedef QSharedPointer<Control3DWidget> SPtr;              /**< Shared pointer type for Control3DWidget. */
+    typedef QSharedPointer<const Control3DWidget> ConstSPtr;   /**< Const shared pointer type for Control3DWidget. */
 
     //=========================================================================================================
     /**
     * Default constructor.
     *
-    * @param[in] parent         The parent of this class.
     */
-    Brain(QEntity *parent = 0);
+    explicit Control3DWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
     * Default destructor.
+    *
     */
-    ~Brain();
+    ~Control3DWidget();
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer brain data.
+    * Set/Add a View3D to be controlled by the this GUI widget.
     *
-    * @param[in] subject_id         Name of subject
-    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
-    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
-    * @param[in] subjects_dir       Subjects directory
-    * @param[in] annotation         Load annotation data if wanted.
-    * @return    Const list of added brain object
+    * @param[in] view3D         The view3D to bec connected to this widget.
     */
-    bool addFsBrainData(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, const QString &atlas="");
+    void setView3D(View3D::SPtr view3D);
+
+protected slots:
+    //=========================================================================================================
+    /**
+    * Minimizes th ewidget and all its contents.
+    *
+    * @param[in] state         Whether the widget is to be maximized or minimized
+    */
+    void onMinimizeWidget(bool state);
 
     //=========================================================================================================
     /**
-    * Return the stored BrainObjects
+    * Slot called when opacity slider was changed
     *
-    * @return returns a const adress to the list with the sotred brain objects
+    * @param [in] value         opacity value.
     */
-    const QList<BrainObject::SPtr>  getBrainObjectList() const;
+    void onOpacityChange(qint32 value);
 
 protected:
-    QList<BrainObject::SPtr>     m_lBrainData;      /**< List of currently loaded BrainObjects. */
+    Ui::Control3DWidget*    ui;         /**< The pointer to the QtDesigner ui class. */
+
+    QList<View3D::SPtr>     m_lView3D;  /**< List of all connected view3D's. */
 };
 
-} // NAMESPACE
+} // NAMESPACE DISP3DNEWLIB
 
-#endif // BRAIN_H
+#endif // CONTROL3DWIDGET_H

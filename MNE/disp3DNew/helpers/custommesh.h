@@ -74,7 +74,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
+// DEFINE NAMESPACE DISP3DNEWLIB
 //=============================================================================================================
 
 namespace DISP3DNEWLIB
@@ -138,8 +138,6 @@ protected:
     Qt3DRender::QBuffer* m_pNormalDataBuffer;    /**< The normal buffer. */
     Qt3DRender::QBuffer* m_pColorDataBuffer;     /**< The color buffer. */
     Qt3DRender::QBuffer* m_pIndexDataBuffer;     /**< The index buffer. */
-
-    Qt3DRender::QGeometry* customGeometry;
 
     int     m_iNumVert;     /**< The total number of set vertices. */
 };
