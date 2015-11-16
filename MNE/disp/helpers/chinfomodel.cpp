@@ -88,7 +88,7 @@ int ChInfoModel::rowCount(const QModelIndex & /*parent*/) const
 
 int ChInfoModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 12;
+    return 13;
 }
 
 
@@ -158,6 +158,10 @@ QVariant ChInfoModel::headerData(int section, Qt::Orientation orientation, int r
 
                     case 11:
                         return QString("%1").arg("Bad channel");
+                        break;
+
+                    case 12:
+                        return QString("%1").arg("# of Compensators");
                         break;
                 }
             }
@@ -421,46 +425,60 @@ QVariant ChInfoModel::data(const QModelIndex &index, int role) const
                 case Qt::TextAlignmentRole:
                     return Qt::AlignHCenter + Qt::AlignVCenter;
             }
+        }
 
-            //******** eleventh column (coil type) ********
-            if(index.column()==10) {
-                QVariant v;
+        //******** eleventh column (coil type) ********
+        if(index.column()==10) {
+            QVariant v;
 
-                switch(role) {
-                    case Qt::DisplayRole:
-                        v.setValue(QString("%1").arg(m_pFiffInfo->chs.at(index.row()).coil_type));
-                        return v;
+            switch(role) {
+                case Qt::DisplayRole:
+                    v.setValue(QString("%1").arg(m_pFiffInfo->chs.at(index.row()).coil_type));
+                    return v;
 
-                    case ChInfoModelRoles::GetChCoilType:
-                        v.setValue(m_pFiffInfo->chs.at(index.row()).coil_type);
-                        return v;
+                case ChInfoModelRoles::GetChCoilType:
+                    v.setValue(m_pFiffInfo->chs.at(index.row()).coil_type);
+                    return v;
 
-                    case Qt::TextAlignmentRole:
-                        return Qt::AlignHCenter + Qt::AlignVCenter;
-                }
-            }//end column check
+                case Qt::TextAlignmentRole:
+                    return Qt::AlignHCenter + Qt::AlignVCenter;
+            }
+        }//end column check
 
-            //******** twelve column (channel bad) ********
-            if(index.column()==11) {
-                QVariant v;
-                bool isBad = false;
-                QString chName = m_pFiffInfo->chs.at(index.row()).ch_name;
+        //******** twelve column (channel bad) ********
+        if(index.column()==11) {
+            QVariant v;
+            bool isBad = false;
+            QString chName = m_pFiffInfo->chs.at(index.row()).ch_name;
 
-                switch(role) {
-                    case Qt::DisplayRole:
-                        isBad = m_pFiffInfo->bads.contains(chName);
-                        v.setValue(isBad);
-                        return v;
+            switch(role) {
+                case Qt::DisplayRole:
+                    isBad = m_pFiffInfo->bads.contains(chName);
+                    v.setValue(isBad);
+                    return v;
 
-                    case ChInfoModelRoles::GetIsBad:
-                        isBad = m_pFiffInfo->bads.contains(chName);
-                        v.setValue(isBad);
-                        return v;
+                case ChInfoModelRoles::GetIsBad:
+                    isBad = m_pFiffInfo->bads.contains(chName);
+                    v.setValue(isBad);
+                    return v;
 
-                    case Qt::TextAlignmentRole:
-                        return Qt::AlignHCenter + Qt::AlignVCenter;
-                }
-            }//end column check
+                case Qt::TextAlignmentRole:
+                    return Qt::AlignHCenter + Qt::AlignVCenter;
+            }
+        }//end column check
+
+        //******** twelve column (compensators bad) ********
+        if(index.column()==12) {
+            QVariant v;
+
+            switch(role) {
+                case Qt::DisplayRole:
+                    v.setValue(m_pFiffInfo->comps.size());
+                    return v;
+
+                case Qt::TextAlignmentRole:
+                    return Qt::AlignHCenter + Qt::AlignVCenter;
+            }
         }//end column check
     } // end index.valid() check
 
