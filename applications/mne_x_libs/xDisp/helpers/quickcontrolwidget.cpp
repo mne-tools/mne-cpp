@@ -54,7 +54,7 @@ using namespace XDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const FiffInfo::SPtr pFiffInfo, QString name, QWidget *parent, bool bScaling, bool bProjections, bool bView, bool bFilter, bool bModalities, bool bTriggerDetection)
+QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const FiffInfo::SPtr pFiffInfo, QString name, QWidget *parent, bool bScaling, bool bProjections, bool bView, bool bFilter, bool bModalities, bool bCompensator, bool bTriggerDetection)
 : RoundedEdgesWidget(parent, Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint)
 , ui(new Ui::QuickControlWidget)
 , m_qMapChScaling(qMapChScaling)
@@ -64,6 +64,7 @@ QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const
 , m_bView(bView)
 , m_bFilter(bFilter)
 , m_bModalitiy(bModalities)
+, m_bCompensator(bCompensator)
 , m_bTriggerDetection(bTriggerDetection)
 , m_sName(name)
 {
@@ -103,6 +104,11 @@ QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const
 
     if(m_bModalitiy)
         createModalityGroup();
+
+    if(m_bCompensator)
+        createCompensatorGroup();
+    else
+        ui->m_groupBox_compensators->hide();
 
     ui->m_groupBox_filter->hide();
 
@@ -447,7 +453,7 @@ void QuickControlWidget::createProjectorGroup()
 {
     if(m_pFiffInfo)
     {
-        m_qListCheckBox.clear();
+        m_qListProjCheckBox.clear();
         // Projection Selection
         QGridLayout *topLayout = new QGridLayout;
 
@@ -463,10 +469,10 @@ void QuickControlWidget::createProjectorGroup()
             if(m_pFiffInfo->projs[i].active == false)
                 bAllActivated = false;
 
-            m_qListCheckBox.append(checkBox);
+            m_qListProjCheckBox.append(checkBox);
 
             connect(checkBox, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-                    this, &QuickControlWidget::checkStatusChanged);
+                    this, &QuickControlWidget::checkProjStatusChanged);
 
             topLayout->addWidget(checkBox, i, 0); //+2 because we already added two widgets before the first projector check box
 
@@ -488,12 +494,12 @@ void QuickControlWidget::createProjectorGroup()
         m_enableDisableProjectors->setChecked(bAllActivated);
         topLayout->addWidget(m_enableDisableProjectors, i+2, 0);
         connect(m_enableDisableProjectors, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &QuickControlWidget::enableDisableAll);
+            this, &QuickControlWidget::enableDisableAllProj);
 
         ui->m_groupBox_projections->setLayout(topLayout);
 
         //Set default activation to true
-        enableDisableAll(true);
+        enableDisableAllProj(true);
     }
 }
 
@@ -633,6 +639,41 @@ void QuickControlWidget::createModalityGroup()
 
 //*************************************************************************************************************
 
+void QuickControlWidget::createCompensatorGroup()
+{
+    if(m_pFiffInfo)
+    {
+        m_qListCompCheckBox.clear();
+        // Projection Selection
+        QGridLayout *topLayout = new QGridLayout;
+
+        qint32 i=0;
+
+        QCheckBox* checkBox = new QCheckBox("None");
+        m_qListCompCheckBox.append(checkBox);
+        topLayout->addWidget(checkBox, i, 0);
+
+        for(i; i < m_pFiffInfo->comps.size(); ++i)
+        {
+            QString numStr;
+            qDebug()<<m_pFiffInfo->comps[i].kind;
+            checkBox = new QCheckBox(numStr.setNum(m_pFiffInfo->comps[i].kind));
+
+            m_qListCompCheckBox.append(checkBox);
+
+            connect(checkBox, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+                    this, &QuickControlWidget::checkCompStatusChanged);
+
+            topLayout->addWidget(checkBox, i+1, 0);
+        }
+
+        ui->m_groupBox_compensators->setLayout(topLayout);
+    }
+}
+
+
+//*************************************************************************************************************
+
 void QuickControlWidget::onTimeWindowChanged(int value)
 {
     emit timeWindowChanged(value);
@@ -649,19 +690,19 @@ void QuickControlWidget::onZoomChanged(double value)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::checkStatusChanged(bool status)
+void QuickControlWidget::checkProjStatusChanged(bool status)
 {
     Q_UNUSED(status)
 
     bool bAllActivated = true;
 
-    for(qint32 i = 0; i < m_qListCheckBox.size(); ++i) {
-        if(m_qListCheckBox[i]->isChecked() == false)
+    for(qint32 i = 0; i < m_qListProjCheckBox.size(); ++i) {
+        if(m_qListProjCheckBox[i]->isChecked() == false)
             bAllActivated = false;
 
-        this->m_pFiffInfo->projs[i].active = m_qListCheckBox[i]->isChecked();
+        this->m_pFiffInfo->projs[i].active = m_qListProjCheckBox[i]->isChecked();
 
-        std::cout<<m_qListCheckBox[i]->text().toStdString()<<"check state: "<<m_qListCheckBox[i]->isChecked()<<std::endl;
+        std::cout<<m_qListProjCheckBox[i]->text().toStdString()<<"check state: "<<m_qListProjCheckBox[i]->isChecked()<<std::endl;
     }
 
     m_enableDisableProjectors->setChecked(bAllActivated);
@@ -674,11 +715,11 @@ void QuickControlWidget::checkStatusChanged(bool status)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::enableDisableAll(bool status)
+void QuickControlWidget::enableDisableAllProj(bool status)
 {
     //Set all checkboxes to status
-    for(int i=0; i<m_qListCheckBox.size(); i++)
-        m_qListCheckBox.at(i)->setChecked(status);
+    for(int i=0; i<m_qListProjCheckBox.size(); i++)
+        m_qListProjCheckBox.at(i)->setChecked(status);
 
     //Set all projection activation states to status
     for(int i=0; i < m_pFiffInfo->projs.size(); ++i)
@@ -687,6 +728,24 @@ void QuickControlWidget::enableDisableAll(bool status)
     m_enableDisableProjectors->setChecked(status);
 
     emit projSelectionChanged();
+
+    emit updateConnectedView();
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::checkCompStatusChanged(bool status)
+{
+    Q_UNUSED(status)
+
+    int to = 1;
+
+    for(to; to < m_qListCompCheckBox.size(); ++to)
+        if(m_qListCompCheckBox[to]->isChecked() == true)
+            break;
+
+    emit compSelectionChanged(to);
 
     emit updateConnectedView();
 }
@@ -889,6 +948,7 @@ void QuickControlWidget::toggleHideAll(bool state)
         ui->m_groupBox_filter->hide();
         ui->m_groupBox_scaling->hide();
         ui->m_groupBox_view->hide();
+        ui->m_groupBox_compensators->hide();
 
         if(m_bModalitiy)
             m_pModalityGroupBox->hide();
@@ -910,6 +970,9 @@ void QuickControlWidget::toggleHideAll(bool state)
 
         if(m_bModalitiy)
             m_pModalityGroupBox->show();
+
+        if(m_bCompensator)
+            ui->m_groupBox_compensators->show();
 
         ui->m_pushButton_hideAll->setText(QString("Minimize - Quick Control - %1").arg(m_sName));
     }
