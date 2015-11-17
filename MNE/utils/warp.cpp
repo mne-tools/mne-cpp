@@ -51,3 +51,35 @@ using namespace UTILSLIB;
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
+
+MatrixXd Warp::calculate(const MatrixXd &srcLm, const MatrixXd &dstLm, const MatrixXd &srcVert)
+{
+     MatrixXd dstVert = MatrixXd::Zero(3,srcVert.rows());
+     return dstVert;
+}
+
+
+//*************************************************************************************************************
+
+MatrixXd Warp::calculate(const MatrixXd &srcVert)
+{
+    MatrixXd dstVert = MatrixXd::Zero(3,srcVert.rows());
+    return dstVert;
+}
+
+
+//*************************************************************************************************************
+
+bool Warp::calcWeighting(const MatrixXd &srcLm, const MatrixXd &dstLm, MatrixXd &warpWeight, MatrixXd &polWeight)
+{
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+MatrixXd Warp::warpVertices(const MatrixXd srcVert)
+{
+    MatrixXd dstVert = MatrixXd::Zero(3,srcVert.rows());
+    return dstVert;
+}
