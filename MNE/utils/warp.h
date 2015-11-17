@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mnemath.h
+* @file     warp.h
 * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -94,35 +94,35 @@ public:
     /**
     * Calculates the TPS Warp of given setup
     *
-    * @param[in] srcLm      3D Landmarks of the source geometry
-    * @param[in] dstLm      3D Landmarks of the destination geometry
-    * @param[in] srcVert    Vertices of the source geometry
+    * @param[in]  sLm      3D Landmarks of the source geometry
+    * @param[in]  dLm      3D Landmarks of the destination geometry
+    * @param[in]  sVert    Vertices of the source geometry
     *
-    * @return dstVert   Vertices of the warped destination geometry
+    * @return wVert   Vertices of the warped destination geometry
     */
-    MatrixXd calculate(const MatrixXd& srcLm, const MatrixXd& dstLm, const MatrixXd& srcVert);
+    MatrixXd calculate(const MatrixXd & sLm, const MatrixXd &dLm, const MatrixXd & sVert);
 
     //=========================================================================================================
     /**
     * Warps the source vertices with previously calculated weightningparameters
     *
-    * @param[in] srcVert    Vertices of the source geometry
+    * @param[in]  sVert    Vertices of the source geometry
     *
-    * @return dstVert   Vertices of the warped destination geometry
+    * @return wVert   Vertices of the warped destination geometry
     */
-     MatrixXd calculate(const MatrixXd& srcVert);
+     MatrixXd calculate(const MatrixXd & sVert);
 
 private:
     //=========================================================================================================
     /**
     * Calculate the weighting parameters.
     *
-    * @param[in] srcLm      3D Landmarks of the source geometry
-    * @param[in] dstLm      3D Landmarks of the destination geometry
+    * @param[in]  sLm      3D Landmarks of the source geometry
+    * @param[in]  dLm      3D Landmarks of the destination geometry
     * @param[out] warpWeight Weighting parameters of the tps warp
     * @param[out] polWeight  Weighting papameters of the polynomial warp
     */
-    bool calcWeighting(const MatrixXd& srcLm, const MatrixXd& dstLm, MatrixXd& warpWeight, MatrixXd& polWeight);
+    bool calcWeighting(const MatrixXd & sLm, const MatrixXd &dLm, MatrixXd &warpWeight, MatrixXd &polWeight);
 
     //=========================================================================================================
     /**
@@ -130,7 +130,7 @@ private:
     *
     * @return Warped Vertices
     */
-    MatrixXd warpVertices(const MatrixXd srcVert);
+    MatrixXd warpVertices(const MatrixXd & sVert);
 
     //=========================================================================================================
 
