@@ -403,6 +403,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Update the compensator
+    *
+    * @param[in] to    Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind)
+    */
+    void updateCompensator(int to);
+
+    //=========================================================================================================
+    /**
     * Filter parameters changed
     *
     * @param[in] filterData    list of the currently active filter
@@ -527,7 +535,8 @@ private:
     */
     void clearModel();
 
-    bool    m_bProjActivated;           /**< Proj activated */
+    bool    m_bProjActivated;           /**< Projections activated */
+    bool    m_bCompActivated;           /**< Compensator activated */
     bool    m_bIsFreezed;               /**< Display is freezed */
     bool    m_bDrawFilterFront;         /**< Flag whether to plot/write the delayed frontal part of the filtered signal. This flag is necessary to get rid of nasty signal jumps when changing the filter parameters. */
     bool    m_bTriggerDetectionActive;  /**< Trigger detection activation state */
@@ -556,6 +565,8 @@ private:
 
     MatrixXd                m_matProj;                          /**< SSP projector */
     SparseMatrix<double>    m_matSparseProj;                    /**< Sparse SSP projector */
+
+    MatrixXd                m_matComp;                          /**< Compensator */
 
     MatrixXdR               m_matDataRaw;                       /**< The raw data */
     MatrixXdR               m_matDataFiltered;                  /**< The filtered data */

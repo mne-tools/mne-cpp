@@ -424,6 +424,10 @@ void RealTimeMultiSampleArrayWidget::init()
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
                 this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::updateProjection);
 
+        //Handle compensators
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::compSelectionChanged,
+                this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::updateCompensator);
+
         //Handle view changes
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::zoomChanged,
                 this, &RealTimeMultiSampleArrayWidget::zoomChanged);

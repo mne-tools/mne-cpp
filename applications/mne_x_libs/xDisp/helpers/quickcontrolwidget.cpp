@@ -643,29 +643,36 @@ void QuickControlWidget::createCompensatorGroup()
 {
     if(m_pFiffInfo)
     {
+        m_pCompSignalMapper = new QSignalMapper(this);
+
         m_qListCompCheckBox.clear();
-        // Projection Selection
+
+        // Compensation Selection
         QGridLayout *topLayout = new QGridLayout;
 
         qint32 i=0;
 
-        QCheckBox* checkBox = new QCheckBox("None");
-        m_qListCompCheckBox.append(checkBox);
-        topLayout->addWidget(checkBox, i, 0);
-
         for(i; i < m_pFiffInfo->comps.size(); ++i)
         {
             QString numStr;
-            qDebug()<<m_pFiffInfo->comps[i].kind;
-            checkBox = new QCheckBox(numStr.setNum(m_pFiffInfo->comps[i].kind));
+            QCheckBox* checkBox = new QCheckBox(numStr.setNum(m_pFiffInfo->comps[i].kind));
 
             m_qListCompCheckBox.append(checkBox);
 
-            connect(checkBox, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-                    this, &QuickControlWidget::checkCompStatusChanged);
+            connect(checkBox, SIGNAL(clicked()),
+                        m_pCompSignalMapper, SLOT(map()));
 
-            topLayout->addWidget(checkBox, i+1, 0);
+            m_pCompSignalMapper->setMapping(checkBox, numStr);
+
+            topLayout->addWidget(checkBox, i, 0);
+
         }
+
+        connect(m_pCompSignalMapper, SIGNAL(mapped(const QString &)),
+                    this, SIGNAL(compClicked(const QString &)));
+
+        connect(this, &QuickControlWidget::compClicked,
+                this, &QuickControlWidget::checkCompStatusChanged);
 
         ui->m_groupBox_compensators->setLayout(topLayout);
     }
@@ -735,17 +742,22 @@ void QuickControlWidget::enableDisableAllProj(bool status)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::checkCompStatusChanged(bool status)
+void QuickControlWidget::checkCompStatusChanged(const QString & compName)
 {
-    Q_UNUSED(status)
+    qDebug()<<compName;
 
-    int to = 1;
+    bool currentState;
 
-    for(to; to < m_qListCompCheckBox.size(); ++to)
-        if(m_qListCompCheckBox[to]->isChecked() == true)
-            break;
+    for(int i = 0; i < m_qListCompCheckBox.size(); ++i)
+        if(m_qListCompCheckBox[i]->text() != compName)
+            m_qListCompCheckBox[i]->setChecked(false);
+        else
+            currentState = m_qListCompCheckBox[i]->isChecked();
 
-    emit compSelectionChanged(to);
+    if(currentState)
+        emit compSelectionChanged(compName.toInt());
+    else //If none selected
+        emit compSelectionChanged(0);
 
     emit updateConnectedView();
 }
