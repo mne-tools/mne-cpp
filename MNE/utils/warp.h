@@ -36,8 +36,6 @@
 #ifndef WARP_H
 #define WARP_H
 
-#endif // WARP_H
-
 //*************************************************************************************************************
 //=============================================================================================================
 // MNE INCLUDES
@@ -102,7 +100,7 @@ public:
     *
     * @return dstVert   Vertices of the warped destination geometry
     */
-    MatrixXd calculate(const MatrixXd & srcLm, const MatrixXd & dstLm, const MatrixXd & srcVert);
+    MatrixXd calculate(const MatrixXd& srcLm, const MatrixXd& dstLm, const MatrixXd& srcVert);
 
     //=========================================================================================================
     /**
@@ -112,17 +110,19 @@ public:
     *
     * @return dstVert   Vertices of the warped destination geometry
     */
-     MatrixXd calculate(const MatrixXd & srcVert);
+     MatrixXd calculate(const MatrixXd& srcVert);
 
 private:
     //=========================================================================================================
     /**
     * Calculate the weighting parameters.
     *
-    * @param[out] warpWeighting Weighting parameters of the tps warp
-    * @param[out] polWeighting  Weighting papameters of the polynomial warp
+    * @param[in] srcLm      3D Landmarks of the source geometry
+    * @param[in] dstLm      3D Landmarks of the destination geometry
+    * @param[out] warpWeight Weighting parameters of the tps warp
+    * @param[out] polWeight  Weighting papameters of the polynomial warp
     */
-    bool calcWeighting(const MatrixXd & srcLm, const MatrixXd & dstLm);
+    bool calcWeighting(const MatrixXd& srcLm, const MatrixXd& dstLm, MatrixXd& warpWeight, MatrixXd& polWeight);
 
     //=========================================================================================================
     /**
@@ -134,8 +134,8 @@ private:
 
     //=========================================================================================================
 
-    MatrixXd warpWeighting; /** Weighting parameters of the tps Warp */
-    MatrixXd polWeighting;  /** Weighting papameters of the polynomial warp */
+    MatrixXd warpWeight; /** Weighting parameters of the tps Warp */
+    MatrixXd polWeight;  /** Weighting papameters of the polynomial warp */
 
 };
 
