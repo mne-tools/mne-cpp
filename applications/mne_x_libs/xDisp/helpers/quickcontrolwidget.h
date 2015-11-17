@@ -66,6 +66,7 @@
 #include <QCheckBox>
 #include <QColorDialog>
 #include <QComboBox>
+#include <QSignalMapper>
 
 
 //*************************************************************************************************************
@@ -254,6 +255,12 @@ signals:
     */
     void updateConnectedView();
 
+    //=========================================================================================================
+    /**
+    * Signal mapper signal for compensator changes.
+    */
+    void compClicked(const QString &text);
+
 protected:
     //=========================================================================================================
     /**
@@ -313,7 +320,7 @@ protected:
     /**
     * Slot called when the compensator check state changes
     */
-    void checkCompStatusChanged(bool state);
+    void checkCompStatusChanged(const QString & compName);
 
     //=========================================================================================================
     /**
@@ -426,6 +433,8 @@ private:
     QCheckBox *         m_enableDisableProjectors;      /**< Holds the enable disable all check box. */
     QPushButton*        m_pShowFilterOptions;           /**< Holds the show filter options button. */
     QGroupBox*          m_pModalityGroupBox;            /**< Holds the modality group box. */
+
+    QSignalMapper*      m_pCompSignalMapper;
 
     Ui::QuickControlWidget *ui;                         /**< The generated UI file */
 };

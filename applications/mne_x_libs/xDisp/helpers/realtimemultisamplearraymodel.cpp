@@ -58,6 +58,7 @@ using namespace XDISPLIB;
 RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 : QAbstractTableModel(parent)
 , m_bProjActivated(false)
+, m_bCompActivated(false)
 , m_fSps(1024.0f)
 , m_iT(10)
 , m_iDownsampling(10)
@@ -293,6 +294,7 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
     else {
         m_vecBadIdcs = RowVectorXi(0,0);
         m_matProj = MatrixXd(0,0);
+        m_matComp = MatrixXd(0,0);
     }
 }
 
@@ -326,6 +328,10 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
 {
     //SSP
     bool doProj = m_bProjActivated && m_matDataRaw.cols() > 0 && m_matDataRaw.rows() == m_matProj.cols() ? true : false;
+
+    //Compensator
+    bool doComp = m_bCompActivated && m_matDataRaw.cols() > 0 && m_matDataRaw.rows() == m_matComp.cols() ? true : false;
+
 
     //Copy new data into the global data matrix
     for(qint32 b = 0; b < data.size(); ++b) {
@@ -593,6 +599,40 @@ void RealTimeMultiSampleArrayModel::updateProjection()
         m_matSparseProj = SparseMatrix<double>(m_matProj.rows(),m_matProj.cols());
         if(tripletList.size() > 0)
             m_matSparseProj.setFromTriplets(tripletList.begin(), tripletList.end());
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::updateCompensator(int to)
+{
+    //
+    //  Update the compensator
+    //
+    if(m_pFiffInfo)
+    {
+        if(to == 0)
+            m_bCompActivated = false;
+        else
+            m_bCompActivated = true;
+
+        int from = this->m_pFiffInfo->get_current_comp();
+
+        qDebug()<<"to"<<to;
+        qDebug()<<"from"<<from;
+        qDebug()<<"m_bCompActivated"<<m_bCompActivated;
+
+        FiffCtfComp newComp;
+        this->m_pFiffInfo->make_compensator(from, to, newComp);
+        //this->m_pFiffInfo->set_current_comp(to);
+
+        //m_matComp = newComp.data->data;
+
+        qDebug() << "updateCompensator :: New compensators calculated.";
+
+
+        qDebug()<<"m_matComp size"<<m_matComp.rows()<<"x"<<m_matComp.cols();
     }
 }
 
