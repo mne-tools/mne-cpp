@@ -5,7 +5,7 @@
 #           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     May, 2015
+# @date     November, 2015
 #
 # @section  LICENSE
 #
@@ -19,7 +19,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -30,22 +30,21 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    Example project to read in bem data
-#
+# @brief    Example project to test the warp class
 #--------------------------------------------------------------------------------------------------------------
-
 include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
+#QT += core
 QT -= gui
 
-CONFIG   += console
-CONFIG   -= app_bundle
-
-TARGET = readBEM
+#CONFIG += c++11
+CONFIG += console
+CONFIG -= app_bundle
+TARGET = testWarp
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -67,13 +66,8 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne
 }
 
-DESTDIR =  $${MNE_BINARY_DIR}
-
-SOURCES += \
-        main.cpp \
-
+SOURCES += main.cpp
 HEADERS += \
-
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
