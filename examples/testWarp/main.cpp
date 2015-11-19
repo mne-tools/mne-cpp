@@ -78,5 +78,35 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
+    Matrix<double,6,3> sLm;
+    sLm <<  1,1,1,
+            2,1,1,
+            3,1,1,
+            1,2,1,
+            2,2,1,
+            3,2,1;
+    std::cout << "Here is the matrix sLm:" << std::endl << sLm << std::endl;
+
+    Matrix<double,6,3> dLm;
+    dLm <<  1,1,2,
+            2,1,3,
+            3,1,2,
+            1,2,2,
+            2,2,3,
+            3,2,2;
+
+    Matrix<double,6,3> sVert;
+    sVert <<1.0,0.5,1,
+            1.5,0.5,1,
+            2.0,0.5,1,
+            2.3,0.5,1,
+            2.7,0.5,1,
+            3.0,0.5,1;
+
+    MatrixXd wVert = MatrixXd::Zero(sVert.rows(),3);
+
+    Warp test;
+    wVert = test.calculate(sLm, dLm, sVert);
+
     return a.exec();
 }

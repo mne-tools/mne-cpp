@@ -37,6 +37,7 @@
 //=============================================================================================================
 
 #include "warp.h"
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -52,34 +53,72 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MatrixXd Warp::calculate(const MatrixXd &srcLm, const MatrixXd &dstLm, const MatrixXd &srcVert)
+MatrixXd Warp::calculate(const MatrixXd &sLm, const MatrixXd &dLm, const MatrixXd &sVert)
 {
-     MatrixXd dstVert = MatrixXd::Zero(3,srcVert.rows());
-     return dstVert;
+     MatrixXd wVert = MatrixXd::Zero(3,sVert.rows());
+
+     MatrixXd warpWeight = MatrixXd::Zero(sLm.rows(),3);
+     MatrixXd polWeight = MatrixXd::Zero(4,3);
+
+     std::cout << "Here is the matrix sLm:" << std::endl << sLm << std::endl;
+
+     calcWeighting(sLm, dLm, warpWeight, polWeight);
+
+     return wVert;
 }
 
 
 //*************************************************************************************************************
 
-MatrixXd Warp::calculate(const MatrixXd &srcVert)
+MatrixXd Warp::calculate(const MatrixXd &sVert)
 {
-    MatrixXd dstVert = MatrixXd::Zero(3,srcVert.rows());
-    return dstVert;
+    MatrixXd wVert = MatrixXd::Zero(3,sVert.rows());
+    return wVert;
 }
 
 
 //*************************************************************************************************************
 
-bool Warp::calcWeighting(const MatrixXd &srcLm, const MatrixXd &dstLm, MatrixXd &warpWeight, MatrixXd &polWeight)
+bool Warp::calcWeighting(const MatrixXd &sLm, const MatrixXd &dLm, MatrixXd &warpWeight, MatrixXd &polWeight)
 {
+    MatrixXd K = MatrixXd::Zero(sLm.rows(),sLm.rows());             //K(i,j)=||sLm(i)-sLm(j)||
+    for (int i=0; i<sLm.rows(); i++)
+        K.col(i)=((sLm.rowwise()-sLm.row(i)).rowwise().norm());
+
+    std::cout << "Here is the matrix K:" << std::endl << K << std::endl;
+
+    MatrixXd P (sLm.rows(),4);                                      //P=[ones,sLm]
+    P << MatrixXd::Ones(sLm.rows(),1),sLm;
+    std::cout << "Here is the matrix P:" << std::endl << P << std::endl;
+
+    MatrixXd L ((sLm.rows()+4),(sLm.rows()+4));
+    L <<    K,P,
+            P.transpose(),MatrixXd::Zero(4,4);
+    std::cout << "Here is the matrix L:" << std::endl << L << std::endl;
+
+    MatrixXd Y ((dLm.rows()+4),3);                                  //Y=[dLm,Zero]
+    Y <<    dLm,
+            MatrixXd::Zero(4,3);
+    std::cout << "Here is the matrix Y:" << std::endl << Y << std::endl;
+
+    // calculate the weighting matrix
+    MatrixXd W ((dLm.rows()+4),3);                                  //W=[warpWeight,polWeight]
+    Eigen::FullPivLU <MatrixXd> Linv(L);
+    std::cout << "Here is the inverse of L:" << std::endl << Linv.matrixLU() << std::endl;
+    W=Linv.matrixLU()*Y;
+    std::cout << "Here is the matrix W:" << std::endl << W << std::endl;
+
+    warpWeight = W.topRows(sLm.rows());
+    polWeight = W.bottomRows(4);
+
     return true;
 }
 
 
 //*************************************************************************************************************
 
-MatrixXd Warp::warpVertices(const MatrixXd srcVert)
+MatrixXd Warp::warpVertices(const MatrixXd &sVert)
 {
-    MatrixXd dstVert = MatrixXd::Zero(3,srcVert.rows());
-    return dstVert;
+    MatrixXd wVert = MatrixXd::Zero(3,sVert.rows());
+    return wVert;
 }
