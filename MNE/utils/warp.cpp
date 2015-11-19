@@ -55,8 +55,6 @@ using namespace UTILSLIB;
 
 MatrixXd Warp::calculate(const MatrixXd &sLm, const MatrixXd &dLm, const MatrixXd &sVert)
 {
-     MatrixXd wVert = MatrixXd::Zero(3,sVert.rows());
-
      MatrixXd warpWeight = MatrixXd::Zero(sLm.rows(),3);
      MatrixXd polWeight = MatrixXd::Zero(4,3);
 
@@ -64,6 +62,7 @@ MatrixXd Warp::calculate(const MatrixXd &sLm, const MatrixXd &dLm, const MatrixX
 
      calcWeighting(sLm, dLm, warpWeight, polWeight);
 
+     MatrixXd wVert = warpVertices(sVert);
      return wVert;
 }
 
@@ -103,13 +102,15 @@ bool Warp::calcWeighting(const MatrixXd &sLm, const MatrixXd &dLm, MatrixXd &war
 
     // calculate the weighting matrix
     MatrixXd W ((dLm.rows()+4),3);                                  //W=[warpWeight,polWeight]
-    Eigen::FullPivLU <MatrixXd> Linv(L);
-    std::cout << "Here is the inverse of L:" << std::endl << Linv.matrixLU() << std::endl;
-    W=Linv.matrixLU()*Y;
+    Eigen::FullPivLU <MatrixXd> Lu(L);
+    W=Lu.solve(Y);
     std::cout << "Here is the matrix W:" << std::endl << W << std::endl;
 
     warpWeight = W.topRows(sLm.rows());
     polWeight = W.bottomRows(4);
+    this->warpWeight = W.topRows(sLm.rows());
+    this->polWeight = W.bottomRows(4);
+    this->sLm=sLm;
 
     return true;
 }
@@ -119,6 +120,18 @@ bool Warp::calcWeighting(const MatrixXd &sLm, const MatrixXd &dLm, MatrixXd &war
 
 MatrixXd Warp::warpVertices(const MatrixXd &sVert)
 {
-    MatrixXd wVert = MatrixXd::Zero(3,sVert.rows());
+    MatrixXd wVert = sVert * this->polWeight.bottomRows(3);
+    std::cout << "Here is the matrix wVert 1.Step:" << std::endl << wVert << std::endl;
+
+    wVert.rowwise() += this->polWeight.row(0);
+    std::cout << "Here is the matrix wVert 2.Step:" << std::endl << wVert << std::endl;
+
+    MatrixXd K = MatrixXd::Zero(sVert.rows(),this->sLm.rows());             //K(i,j)=||sLm(i)-sLm(j)||
+    for (int i=0; i<sVert.rows(); i++)
+        K.row(i)=((this->sLm.rowwise()-sVert.row(i)).rowwise().norm().transpose());
+    std::cout << "Here is the matrix K:" << std::endl << K << std::endl;
+
+    wVert += K*this->warpWeight;
+    std::cout << "Here is the matrix wVert 3.Step:" << std::endl << wVert << std::endl;
     return wVert;
 }
