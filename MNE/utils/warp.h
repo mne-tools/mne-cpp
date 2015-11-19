@@ -138,6 +138,7 @@ private:
 
     MatrixXd warpWeight; /** Weighting parameters of the tps Warp */
     MatrixXd polWeight;  /** Weighting papameters of the polynomial warp */
+    MatrixXd sLm;        /** 3D Landmarks of the source geometry */
 
 };
 

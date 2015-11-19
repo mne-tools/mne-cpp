@@ -85,6 +85,12 @@ int main(int argc, char *argv[])
             1,2,1,
             2,2,1,
             3,2,1;
+//    sLm<<   1, 2, 3,
+//            4, 5, 6,
+//            7, 8, 10,
+//            1, 2, 3,
+//            4, 5, 6,
+//            7, 8, 10;
     std::cout << "Here is the matrix sLm:" << std::endl << sLm << std::endl;
 
     Matrix<double,6,3> dLm;
@@ -94,19 +100,39 @@ int main(int argc, char *argv[])
             1,2,2,
             2,2,3,
             3,2,2;
+//    dLm = sLm + MatrixXd::Ones(6,3);
 
-    Matrix<double,6,3> sVert;
+    Matrix<double,16,3> sVert;
     sVert <<1.0,0.5,1,
             1.5,0.5,1,
             2.0,0.5,1,
             2.3,0.5,1,
             2.7,0.5,1,
-            3.0,0.5,1;
+            3.0,0.5,1,
+            3.5,0.5,1,
+            4.0,0.5,1,
+            1.0,1,1,
+            1.5,1,1,
+            2.0,1,1,
+            2.3,1,1,
+            2.7,1,1,
+            3.0,1,1,
+            3.5,1,1,
+            4.0,1,1;;
+//    Matrix<double,6,3> sVert;
+//    sVert<< 1, 2, 3,
+//            4, 5, 6,
+//            7, 8, 10,
+//            1, 2, 3,
+//            4, 5, 6,
+//            7, 8, 10;
 
     MatrixXd wVert = MatrixXd::Zero(sVert.rows(),3);
 
     Warp test;
     wVert = test.calculate(sLm, dLm, sVert);
+    std::cout << "Here is the final matrix wVert:" << std::endl << wVert << std::endl;
+
 
     return a.exec();
 }
