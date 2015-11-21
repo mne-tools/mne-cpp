@@ -2,7 +2,7 @@
 # win32: copy dll's to mne_browse_raw package data dir
 #
 
-LIBDIR = $${PWD}/../data/MNE/libs
+LIBDIR = $${PWD}/../data
 LIBDIR ~= s,/,\\,g
 
 FILE = $${MNE_BINARY_DIR}/MNE1Generics.dll
