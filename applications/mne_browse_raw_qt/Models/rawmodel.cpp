@@ -395,15 +395,6 @@ bool RawModel::loadFiffData(QFile* qFile)
     loadFiffInfos();
     genStdFilterOps();
 
-    FiffCtfComp comp;
-    int from = m_pFiffInfo->get_current_comp();
-    int to = 1;
-    m_pFiffInfo->make_compensator(from, to, comp);
-
-    IOUtils::write_eigen_matrix(comp.data->data, QString("browse_raw_comp_mat_%1_%2.txt").arg(from).arg(to));
-    for(int i = 0; i<m_pFiffInfo->comps.size();i++)
-        IOUtils::write_eigen_matrix(m_pFiffInfo->comps.at(i).data->data, QString("browse_raw_comp_mat_%1.txt").arg(m_pFiffInfo->comps.at(i).kind));
-
     endResetModel();
 
     qFile->close();

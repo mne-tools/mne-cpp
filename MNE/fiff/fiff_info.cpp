@@ -150,8 +150,6 @@ qint32 FiffInfo::get_current_comp()
 
 bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf_comp, bool exclude_comp_chs) const
 {
-    qDebug() << "make_compensator not debugged jet";
-
     MatrixXd C1, C2, comp_tmp;
 
     qDebug() << "Todo add all need ctf variables.";
@@ -193,12 +191,7 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
     //   s_to   = s_orig - C2*s_orig = (I - C2)*s_orig
     //   s_to   = (I - C2)*(I + C1)*s_from = (I + C1 - C2 - C2*C1)*s_from
     //
-
-    ctf_comp.data->data = MatrixXd::Identity(this->nchan,this->nchan) + C1 - C2 - C2*C1;
-
-    UTILSLIB::IOUtils::write_eigen_matrix(C1, "C1.txt");
-    UTILSLIB::IOUtils::write_eigen_matrix(C2, "C2.txt");
-    UTILSLIB::IOUtils::write_eigen_matrix(ctf_comp.data->data, "data.txt");
+    comp_tmp = MatrixXd::Identity(this->nchan,this->nchan) + C1 - C2 - C2*C1;
 
     qint32 k;
     if (exclude_comp_chs)
@@ -222,7 +215,9 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
         ctf_comp.data->data.resize(npick,this->nchan);
         for (k = 0; k < npick; ++k)
             ctf_comp.data->data.row(k) = comp_tmp.block(pick(k), 0, 1, this->nchan);
-    }
+    } else
+        ctf_comp.data->data = comp_tmp;
+
     return true;
 }
 
@@ -231,27 +226,20 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
 
 bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXd& this_comp) const//private method
 {
-    qDebug() << "FiffInfo::make_compensator - make_compensator not debugged yet";
     FiffNamedMatrix::SDPtr this_data;
     MatrixXd presel, postsel;
     qint32 k, col, c, ch, row, row_ch=0, channelAvailable;
-
-    qDebug() << "FiffInfo::make_compensator - init variables done";
 
     for (k = 0; k < this->comps.size(); ++k)
     {
         if (this->comps[k].kind == kind)
         {
-                        this_data = this->comps[k].data;
-            qDebug()<<"this_data->ncol x this->nchan"<<this_data->ncol<<"x"<<this->nchan;
-            qDebug()<<"FiffInfo::make_compensator - this->comps[k].kind"<<this->comps[k].kind;
-
+            this_data = this->comps[k].data;
 
             //
             //   Create the preselector
             //
             presel = MatrixXd::Zero(this_data->ncol,this->nchan);
-            qDebug()<<"FiffInfo::make_compensator - presel size"<<presel.rows()<<"x"<<presel.cols();
 
             for(col = 0; col < this_data->ncol; ++col)
             {

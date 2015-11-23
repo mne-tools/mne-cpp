@@ -49,7 +49,6 @@
 #include <utils/filterTools/filterdata.h>
 #include <utils/mnemath.h>
 #include <utils/detecttrigger.h>
-#include <utils/ioutils.h>
 
 
 //*************************************************************************************************************

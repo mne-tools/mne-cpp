@@ -641,17 +641,7 @@ void RealTimeMultiSampleArrayModel::updateCompensator(int to)
         FiffCtfComp newComp;
         this->m_pFiffInfo->make_compensator(from, to, newComp);
         this->m_pFiffInfo->set_current_comp(to);
-        //newComp.data->data.transposeInPlace();
         m_matComp = newComp.data->data;
-
-
-        IOUtils::write_eigen_matrix(m_matComp, QString("display_comp_mat_%1_%2.txt").arg(from).arg(to));
-
-        for(int i = 0; i<this->m_pFiffInfo->comps.size();i++)
-            IOUtils::write_eigen_matrix(this->m_pFiffInfo->comps.at(i).data->data, QString("display_comp_mat_%1.txt").arg(this->m_pFiffInfo->comps.at(i).kind));
-
-        qDebug()<<"updateCompensator :: New compensators calculated.";
-        qDebug()<<"m_matComp size"<<m_matComp.rows()<<"x"<<m_matComp.cols();
     }
 }
 
