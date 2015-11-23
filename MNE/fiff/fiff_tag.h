@@ -576,7 +576,7 @@ public:
     fiff_int_t  kind;       /**< Tag number.
                              *   This defines the meaning of the item */
     fiff_int_t  type;       /**< Data type.
-                             *   This defines the reperentation of the data. */
+                             *   This defines the representation of the data. */
 //    fiff_int_t  size;       /**< Size of the data.
 //                             *   The size is given in bytes and defines the
 //                             *   total size of the data. */

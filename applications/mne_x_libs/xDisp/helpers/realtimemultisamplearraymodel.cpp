@@ -332,7 +332,6 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
     //Compensator
     bool doComp = m_bCompActivated && m_matDataRaw.cols() > 0 && m_matDataRaw.rows() == m_matComp.cols() ? true : false;
 
-
     //Copy new data into the global data matrix
     for(qint32 b = 0; b < data.size(); ++b) {
         if(data.at(b).rows() != m_matDataRaw.rows()) {
@@ -356,6 +355,17 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
             else
                 m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
 
+            if(doComp)
+                if(doProj)
+                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseProj * m_matComp * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
+                else
+                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matComp * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
+            else if(doProj)
+                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseProj * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
+                else
+                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
+
+
             m_iCurrentSample = 0;
 
             if(!m_bIsFreezed) {
@@ -378,10 +388,15 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
             m_iResidual = 0;
 
         //std::cout<<"incoming data is ok"<<std::endl;
-        if(doProj)
-            m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseProj * data.at(b);
-        else
-            m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = data.at(b);
+        if(doComp)
+            if(doProj)
+                m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseProj * m_matComp * data.at(b);
+            else
+                m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matComp * data.at(b);
+        else if(doProj)
+                m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseProj * data.at(b);
+            else
+                m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = data.at(b);
 
         //Filter if neccessary else set to zero
         if(!m_filterData.isEmpty())
@@ -625,13 +640,17 @@ void RealTimeMultiSampleArrayModel::updateCompensator(int to)
 
         FiffCtfComp newComp;
         this->m_pFiffInfo->make_compensator(from, to, newComp);
-        //this->m_pFiffInfo->set_current_comp(to);
-
-        //m_matComp = newComp.data->data;
-
-        qDebug() << "updateCompensator :: New compensators calculated.";
+        this->m_pFiffInfo->set_current_comp(to);
+        //newComp.data->data.transposeInPlace();
+        m_matComp = newComp.data->data;
 
 
+        IOUtils::write_eigen_matrix(m_matComp, QString("display_comp_mat_%1_%2.txt").arg(from).arg(to));
+
+        for(int i = 0; i<this->m_pFiffInfo->comps.size();i++)
+            IOUtils::write_eigen_matrix(this->m_pFiffInfo->comps.at(i).data->data, QString("display_comp_mat_%1.txt").arg(this->m_pFiffInfo->comps.at(i).kind));
+
+        qDebug()<<"updateCompensator :: New compensators calculated.";
         qDebug()<<"m_matComp size"<<m_matComp.rows()<<"x"<<m_matComp.cols();
     }
 }

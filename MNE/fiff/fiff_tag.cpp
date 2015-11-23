@@ -94,7 +94,6 @@ FiffTag::FiffTag(const FiffTag* p_pFiffTag)
 
 //*************************************************************************************************************
 
-
 FiffTag::~FiffTag()
 {
     if(this->m_pComplexFloatData)
