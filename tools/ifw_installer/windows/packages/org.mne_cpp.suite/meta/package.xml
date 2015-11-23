@@ -2,8 +2,9 @@
 <Package>
     <DisplayName>MNE-CPP</DisplayName>
     <Description>MNE-CPP is a cross-platform application and algorithm framework for MEG and EEG data analysis.</Description>
+    <Default>true</Default>
     <Version>1.0.0-1</Version>
-    <ReleaseDate>2014-11-19</ReleaseDate>
+    <ReleaseDate>2015-11-21</ReleaseDate>
     <Script>installscript.js</Script>
     <UserInterfaces>
         <UserInterface>targetwidget.ui</UserInterface>
