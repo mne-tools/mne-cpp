@@ -2,12 +2,14 @@
 <Package>
     <DisplayName>MNE Browse Raw Qt</DisplayName>
     <Description>A fif data browser.</Description>
+    <Default>true</Default>
     <Version>1.0.0-1</Version>
-    <ReleaseDate>2014-10-19</ReleaseDate>
+    <ReleaseDate>2015-11-21</ReleaseDate>
     <Name>org.mne_cpp.suite.mne_browse_raw_qt</Name>
     <Licenses>
         <License name="MNE Browse Raw Qt License (BSD 3-Clause)" file="license_mne_browse_raw_qt.txt" />
     </Licenses>
     <Default>script</Default>
     <Script>installscript.qs</Script>
+    <SortingPriority>70</SortingPriority>
 </Package>
