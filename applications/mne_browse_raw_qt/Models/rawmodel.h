@@ -75,7 +75,6 @@
 #include "../Utils/filteroperator.h"
 #include "../Utils/rawsettings.h"
 #include "../Utils/datapackage.h"
-#include "utils/ioutils.h"
 
 
 //*************************************************************************************************************

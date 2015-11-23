@@ -1926,25 +1926,11 @@ void FiffStream::write_ctf_comp(const QList<FiffCtfComp>& comps)
         qint32 save_calibrated = comp.save_calibrated;
         this->write_int(FIFF_MNE_CTF_COMP_CALIBRATED, &save_calibrated);
         //
-        //    Write an uncalibrated or calibrated matrix
-        //
-
-        qDebug()<<"FiffStream::write_ctf_comp before - "<<comp.data->data.rows()<<"x"<<comp.data->data.cols();
-        qDebug()<<"FiffStream::write_ctf_comp before rowcal - "<<comp.rowcals.rows()<<"x"<<comp.rowcals.cols();
-        qDebug()<<"FiffStream::write_ctf_comp before colcals - "<<comp.colcals.rows()<<"x"<<comp.colcals.cols();
-        qDebug()<<"FiffStream::write_ctf_comp before rowcal diag - "<<comp.rowcals.asDiagonal().rows()<<"x"<<comp.rowcals.asDiagonal().cols();
-        qDebug()<<"FiffStream::write_ctf_comp before colcals diag - "<<comp.colcals.asDiagonal().rows()<<"x"<<comp.colcals.asDiagonal().cols();
-        qDebug()<<"FiffStream::write_ctf_comp before rowcal diag inverse - "<<comp.rowcals.asDiagonal().inverse().rows()<<"x"<<comp.rowcals.asDiagonal().inverse().cols();
-        qDebug()<<"FiffStream::write_ctf_comp before colcals diag inverse - "<<comp.colcals.asDiagonal().inverse().rows()<<"x"<<comp.colcals.asDiagonal().inverse().cols();
-
-        //
+        //  Write an uncalibrated or calibrated matrix
         //  If compensators where calibrated undo this here
         //
         if(comps[k].save_calibrated)
             comp.data->data = (comp.rowcals.asDiagonal()).inverse()* comp.data->data * (comp.colcals.asDiagonal()).inverse();
-
-        qDebug()<<"FiffStream::write_ctf_comp after - "<<comp.data->data.rows()<<"x"<<comp.data->data.cols();
-        //comp.data->data.transposeInPlace();
 
         this->write_named_matrix(FIFF_MNE_CTF_COMP_DATA,*comp.data.data());
         this->end_block(FIFFB_MNE_CTF_COMP_DATA);
@@ -2040,11 +2026,8 @@ void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXf& mat)
         *this << mat.data()[i];
 
     qint32 dims[3];
-    //dims[0] = mat.cols();
-    //dims[1] = mat.rows();
-    dims[0] = mat.rows();
-    dims[1] = mat.cols();
-
+    dims[0] = mat.cols();
+    dims[1] = mat.rows();
     dims[2] = 2;
 
     for(i = 0; i < 3; ++i)
@@ -2418,12 +2401,6 @@ void FiffStream::write_named_matrix(fiff_int_t kind, const FiffNamedMatrix& mat)
        this->write_name_list(FIFF_MNE_ROW_NAMES, mat.row_names);
     if (mat.col_names.size() > 0)
        this->write_name_list(FIFF_MNE_COL_NAMES, mat.col_names);
-    qDebug()<<"FiffStream::write_named_matrix data dim - "<<mat.data.rows()<<"x"<<mat.data.cols();
-    qDebug()<<"FiffStream::write_named_matrix mat.nrow - "<<mat.nrow;
-    qDebug()<<"FiffStream::write_named_matrix mat.ncols - "<<mat.ncol;
-
-    //Matrix<float, Dynamic, Dynamic, RowMajor> dataColwise = mat.data.cast<float>();
-
     this->write_float_matrix(kind,mat.data.cast<float>());
     this->end_block(FIFFB_MNE_NAMED_MATRIX);
 }

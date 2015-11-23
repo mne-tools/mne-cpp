@@ -211,11 +211,11 @@ FiffInfo::SPtr RtDataClient::readInfo()
                         case FIFF_NCHAN: // First data -> FiffNamedMatrix is created
 //                                p_pFiffInfo->projs[countProj].data = FiffNamedMatrix();//obsolete
                             p_pFiffInfo->projs[countProj].data->ncol = *(t_pTag->toInt());
-                            qDebug()<<"p_pFiffInfo->projs[countProj].data->ncol"<<p_pFiffInfo->projs[countProj].data->ncol;
+                            //qDebug()<<"p_pFiffInfo->projs[countProj].data->ncol"<<p_pFiffInfo->projs[countProj].data->ncol;
                             break;
                         case FIFF_PROJ_ITEM_NVEC:
                             p_pFiffInfo->projs[countProj].data->nrow = *(t_pTag->toInt());
-                            qDebug()<<"p_pFiffInfo->projs[countProj].data->nrow"<<p_pFiffInfo->projs[countProj].data->nrow;
+                            //qDebug()<<"p_pFiffInfo->projs[countProj].data->nrow"<<p_pFiffInfo->projs[countProj].data->nrow;
                             break;
                         case FIFF_MNE_PROJ_ITEM_ACTIVE:
                             p_pFiffInfo->projs[countProj].active = *(t_pTag->toInt());
@@ -225,7 +225,7 @@ FiffInfo::SPtr RtDataClient::readInfo()
                             break;
                         case FIFF_PROJ_ITEM_VECTORS:
                             p_pFiffInfo->projs[countProj].data->data = t_pTag->toFloatMatrix().cast<double>();
-                            qDebug()<<"p_pFiffInfo->projs[countProj].data->data"<<p_pFiffInfo->projs[countProj].data->data.rows()<<"x"<<p_pFiffInfo->projs[countProj].data->data.cols();
+                            //qDebug()<<"p_pFiffInfo->projs[countProj].data->data"<<p_pFiffInfo->projs[countProj].data->data.rows()<<"x"<<p_pFiffInfo->projs[countProj].data->data.cols();
                             break;
                         }
                     }
@@ -274,20 +274,15 @@ FiffInfo::SPtr RtDataClient::readInfo()
                             break;
                         case FIFF_MNE_CTF_COMP_CALIBRATED:
                             p_pFiffInfo->comps[countComp].save_calibrated = *(t_pTag->toInt());
-                            qDebug()<<"p_pFiffInfo->comps[countComp].save_calibrated"<<p_pFiffInfo->comps[countComp].save_calibrated;
-                            break;
-                        case FIFF_MNE_CTF_COMP_DATA:
-                            //p_pFiffInfo->comps[countComp].data = t_pTag->toNamedMatrix();
-                            p_pFiffInfo->comps[countComp].data->data = t_pTag->toFloatMatrix().cast<double>();
-                            UTILSLIB::IOUtils::write_eigen_matrix(p_pFiffInfo->comps[countComp].data->data, QString("rtdataclient_comp_mat_%1.txt").arg(p_pFiffInfo->comps[countComp].kind));
+                            //qDebug()<<"p_pFiffInfo->comps[countComp].save_calibrated"<<p_pFiffInfo->comps[countComp].save_calibrated;
                             break;
                         case FIFF_MNE_NROW:
                             p_pFiffInfo->comps[countComp].data->nrow = *(t_pTag->toInt());
-                            qDebug()<<"p_pFiffInfo->comps[countComp].data->nrow"<<p_pFiffInfo->comps[countComp].data->nrow;
+                            //qDebug()<<"p_pFiffInfo->comps[countComp].data->nrow"<<p_pFiffInfo->comps[countComp].data->nrow;
                             break;
                         case FIFF_MNE_NCOL:
                             p_pFiffInfo->comps[countComp].data->ncol = *(t_pTag->toInt());
-                            qDebug()<<"p_pFiffInfo->comps[countComp].data->ncol"<<p_pFiffInfo->comps[countComp].data->ncol;
+                            //qDebug()<<"p_pFiffInfo->comps[countComp].data->ncol"<<p_pFiffInfo->comps[countComp].data->ncol;
                             break;
                         case FIFF_MNE_ROW_NAMES:
                             row_names = t_pTag->toString();
@@ -298,6 +293,9 @@ FiffInfo::SPtr RtDataClient::readInfo()
                             col_names = t_pTag->toString();
                             if (!col_names.isEmpty())
                                 p_pFiffInfo->comps[countComp].data->col_names = FiffStream::split_name_list(col_names);
+                            break;
+                        case FIFF_MNE_CTF_COMP_DATA:
+                                p_pFiffInfo->comps[countComp].data->data = t_pTag->toNamedMatrix().cast<double>();
                             break;
                         }
                     }
