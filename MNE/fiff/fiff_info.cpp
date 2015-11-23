@@ -159,7 +159,7 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
 
     if (from == to)
     {
-        ctf_comp.data->data = MatrixXd::Zero(this->nchan, this->nchan);
+        ctf_comp.data->data = MatrixXd::Identity(this->nchan, this->nchan);
         return false;
     }
 
