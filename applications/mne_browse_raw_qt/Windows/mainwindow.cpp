@@ -58,9 +58,9 @@ using namespace MNEBrowseRawQt;
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
-, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
-, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
-, m_qEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
+, m_qFileRaw("./MNE-sample-data/CTF/spont_raw.fif")
+//, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
+//, m_qEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
 , m_qSettings()
 , m_rawSettings()
 , ui(new Ui::MainWindowWidget)

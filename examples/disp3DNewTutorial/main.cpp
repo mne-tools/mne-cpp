@@ -416,7 +416,7 @@ int main(int argc, char *argv[])
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
 
-    testWindow->addFsBrainData("sample", 2, "orig", "./MNE-sample-data/subjects"/*, "aparc.a2009s"*/);
+    testWindow->addFsBrainData("sample", 2, "pial", "./MNE-sample-data/subjects"/*, "aparc.a2009s"*/);
 
     testWindow->show();    
 
