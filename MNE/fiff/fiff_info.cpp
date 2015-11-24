@@ -150,8 +150,6 @@ qint32 FiffInfo::get_current_comp()
 
 bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf_comp, bool exclude_comp_chs) const
 {
-    qDebug() << "make_compensator not debugged jet";
-
     MatrixXd C1, C2, comp_tmp;
 
     qDebug() << "Todo add all need ctf variables.";
@@ -217,7 +215,10 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
         ctf_comp.data->data.resize(npick,this->nchan);
         for (k = 0; k < npick; ++k)
             ctf_comp.data->data.row(k) = comp_tmp.block(pick(k), 0, 1, this->nchan);
+    } else {
+        ctf_comp.data->data = comp_tmp;
     }
+
     return true;
 }
 
@@ -226,18 +227,21 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
 
 bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXd& this_comp) const//private method
 {
-    qDebug() << "make_compensator not debugged yet";
     FiffNamedMatrix::SDPtr this_data;
     MatrixXd presel, postsel;
     qint32 k, col, c, ch, row, row_ch=0, channelAvailable;
+
     for (k = 0; k < this->comps.size(); ++k)
     {
         if (this->comps[k].kind == kind)
-        {                this_data = this->comps[k].data;
+        {
+            this_data = this->comps[k].data;
+
             //
             //   Create the preselector
             //
-            presel  = MatrixXd::Zero(this_data->ncol,this->nchan);
+            presel = MatrixXd::Zero(this_data->ncol,this->nchan);
+
             for(col = 0; col < this_data->ncol; ++col)
             {
                 channelAvailable = 0;
@@ -265,12 +269,13 @@ bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXd& this_comp) const//pri
             //   Create the postselector
             //
             postsel = MatrixXd::Zero(this->nchan,this_data->nrow);
+
             for (c = 0; c  < this->nchan; ++c)
             {
                 channelAvailable = 0;
                 for (row = 0; row < this_data->row_names.size(); ++row)
                 {
-                    if (QString::compare(this_data->col_names.at(c),this->ch_names.at(row)) == 0)
+                    if (QString::compare(this->ch_names.at(c),this_data->row_names.at(row)) == 0)
                     {
                         ++channelAvailable;
                         row_ch = row;
