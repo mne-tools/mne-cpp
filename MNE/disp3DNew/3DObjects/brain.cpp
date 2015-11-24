@@ -69,15 +69,11 @@ Brain::~Brain()
 
 //*************************************************************************************************************
 
-bool Brain::addFsBrainData(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, const QString &atlas)
+bool Brain::addFsBrainData(const SurfaceSet::SPtr pSurfaceSet, const AnnotationSet::SPtr pAnnotationSet)
 {
-    //Create fresurfer surface set and annotation set
-    SurfaceSet tSurfaceSet(subject_id, hemi, surf, subjects_dir);
-    AnnotationSet tAnnotationSet(subject_id, hemi, atlas, subjects_dir);
-
     //Create new brain objects (based on the number of loaded hemispheres) and add to the global list
-    for(qint32 i = 0; i<tSurfaceSet.data().size(); i++) {
-        BrainObject::SPtr pBrainObject = BrainObject::SPtr(new BrainObject(tSurfaceSet[i], tAnnotationSet[i], this));
+    for(qint32 i = 0; i<pSurfaceSet->data().size(); i++) {
+        BrainObject::SPtr pBrainObject = BrainObject::SPtr(new BrainObject(pSurfaceSet[i], pAnnotationSet[i], this));
         pBrainObject->showAnnotation(true);
         m_lBrainData.append(pBrainObject);
     }
