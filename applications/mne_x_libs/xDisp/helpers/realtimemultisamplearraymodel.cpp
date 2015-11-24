@@ -355,16 +355,19 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
             else
                 m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
 
-            if(doComp)
-                if(doProj)
+            if(doComp) {
+                if(doProj) {
                     m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseProj * m_matComp * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-                else
+                } else {
                     m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matComp * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-            else if(doProj)
+                }
+            } else {
+                if(doProj) {
                     m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseProj * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-                else
+                } else {
                     m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-
+                }
+            }
 
             m_iCurrentSample = 0;
 
@@ -388,15 +391,19 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
             m_iResidual = 0;
 
         //std::cout<<"incoming data is ok"<<std::endl;
-        if(doComp)
-            if(doProj)
+        if(doComp) {
+            if(doProj) {
                 m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseProj * m_matComp * data.at(b);
-            else
+            } else {
                 m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matComp * data.at(b);
-        else if(doProj)
+            }
+        } else {
+            if(doProj) {
                 m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseProj * data.at(b);
-            else
+            } else {
                 m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = data.at(b);
+            }
+        }
 
         //Filter if neccessary else set to zero
         if(!m_filterData.isEmpty())

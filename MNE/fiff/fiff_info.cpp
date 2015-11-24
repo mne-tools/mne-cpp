@@ -215,8 +215,9 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
         ctf_comp.data->data.resize(npick,this->nchan);
         for (k = 0; k < npick; ++k)
             ctf_comp.data->data.row(k) = comp_tmp.block(pick(k), 0, 1, this->nchan);
-    } else
+    } else {
         ctf_comp.data->data = comp_tmp;
+    }
 
     return true;
 }
