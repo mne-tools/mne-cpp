@@ -1926,9 +1926,13 @@ void FiffStream::write_ctf_comp(const QList<FiffCtfComp>& comps)
         qint32 save_calibrated = comp.save_calibrated;
         this->write_int(FIFF_MNE_CTF_COMP_CALIBRATED, &save_calibrated);
         //
-        //    Write an uncalibrated or calibrated matrix
+        //  Write an uncalibrated or calibrated matrix
+        //  If compensators where calibrated undo this here
         //
-        comp.data->data = (comp.rowcals.diagonal()).inverse()* comp.data->data * (comp.colcals.diagonal()).inverse();
+        if(comps[k].save_calibrated) {
+            comp.data->data = (comp.rowcals.asDiagonal()).inverse()* comp.data->data * (comp.colcals.asDiagonal()).inverse();
+        }
+
         this->write_named_matrix(FIFF_MNE_CTF_COMP_DATA,*comp.data.data());
         this->end_block(FIFFB_MNE_CTF_COMP_DATA);
     }
