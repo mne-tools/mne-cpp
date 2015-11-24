@@ -11,4 +11,9 @@
     <TargetDir>C:/Program Files/MNE-CPP</TargetDir><!-- @homeDir@/MNE-CPP -->
     <AdminTargetDir>C:/Program Files/MNE-CPP</AdminTargetDir><!-- @rootDir@/MNE-CPP -->
     <CreateLocalRepository>true</CreateLocalRepository>
+    <Watermark>background.png</Watermark>
+    <InstallerWindowIcon>mne-cpp_icon_32x32.png</InstallerWindowIcon>
+    <WizardStyle>Modern</WizardStyle>
+    <WizardDefaultWidth>600</WizardDefaultWidth>
+    <WizardDefaultHeight>400</WizardDefaultHeight>
 </Installer>
