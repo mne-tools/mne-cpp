@@ -108,7 +108,7 @@ public:
     *
     * @param[in] tSurface       FreeSurfer surface.
     * @param[in] tAnnotation    FreeSurfer annotation.
-    * @param[in] parent         The parent of this clas.
+    * @param[in] parent         The parent of this class.
     */
     BrainObject(const Surface &tSurface, const Annotation &tAnnotation, Qt3DCore::QEntity *parent = 0);
 

@@ -172,20 +172,28 @@ void View3D::initTransformations()
 
 //*************************************************************************************************************
 
-bool View3D::addFsBrainData(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, const QString &atlas)
+bool View3D::addFsBrainData(const SurfaceSet::SPtr pSurfaceSet, const AnnotationSet::SPtr pAnnotationSet)
 {
-    bool state = m_pBrain->addFsBrainData(subject_id, hemi, surf, subjects_dir, atlas);
+    bool state = m_pBrain->addFsBrainData(pSurfaceSet, pAnnotationSet);
 
-    //Init rotation
-    QList<BrainObject::SPtr> lBrainObjectList = m_pBrain->getBrainObjectList();
-
-    for(int i = 0; i<lBrainObjectList.size(); i++) {
-        lBrainObjectList.at(i)->setRotationX(m_vecModelRotation.x());
-        lBrainObjectList.at(i)->setRotationY(m_vecModelRotation.y());
-        lBrainObjectList.at(i)->setScale(m_fModelScale);
-    }
-
+    qDebug()<<"View3D::addFsBrainData";
     return state;
+
+//    //Init rotation
+//    QList<BrainObject::SPtr> lBrainObjectList = m_pBrain->getBrainObjectList();
+
+//    for(int i = 0; i<lBrainObjectList.size(); i++) {
+//        lBrainObjectList.at(i)->setRotationX(m_vecModelRotation.x());
+//        lBrainObjectList.at(i)->setRotationY(m_vecModelRotation.y());
+//        lBrainObjectList.at(i)->setScale(m_fModelScale);
+//    }
+
+//    return state;
+}
+
+BrainTreeModel* View3D::getBrainTreeModel()
+{
+    return m_pBrain->getBrainTreeModel();
 }
 
 

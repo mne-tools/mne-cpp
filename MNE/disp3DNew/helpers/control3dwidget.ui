@@ -32,15 +32,15 @@
      <item>
       <widget class="QToolBox" name="m_toolBox">
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="page">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>98</width>
-          <height>89</height>
+          <width>380</width>
+          <height>414</height>
          </rect>
         </property>
         <attribute name="label">
@@ -48,7 +48,14 @@
         </attribute>
         <layout class="QGridLayout" name="gridLayout">
          <item row="0" column="0">
-          <widget class="QTreeView" name="m_treeView_loadedData"/>
+          <widget class="QTreeView" name="m_treeView_loadedData">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>300</height>
+            </size>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>

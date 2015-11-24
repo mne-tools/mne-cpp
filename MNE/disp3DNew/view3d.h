@@ -138,7 +138,9 @@ public:
     * @param[in] subjects_dir       Subjects directory.
     * @param[in] atlas              Load annotation data (atlas) if wanted.
     */
-    bool addFsBrainData(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, const QString &atlas = "");
+    bool addFsBrainData(const SurfaceSet::SPtr pSurfaceSet, const AnnotationSet::SPtr pAnnotationSet);
+
+    BrainTreeModel* getBrainTreeModel();
 
 protected:
     Qt3DCore::QAspectEngine             m_aspectEngine;                 /**< The aspect engine. */
