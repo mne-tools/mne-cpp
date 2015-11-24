@@ -236,3 +236,24 @@ void IOUtils::swap_doublep(double *source)
 
     return;
 }
+
+
+//*************************************************************************************************************
+
+void IOUtils::write_eigen_matrix(const MatrixXd &in, const QString& path)
+
+{
+    QFile file(path);
+    if(file.open(QIODevice::WriteOnly|QIODevice::Truncate))
+    {
+        QTextStream stream(&file);
+        stream<<"Dimensions (rows x cols): "<<in.rows()<<" x "<<in.cols()<<"\n";
+        for(int row = 0; row<in.rows(); row++) {
+            for(int col = 0; col<in.cols(); col++)
+                stream << in(row, col)<<" ";
+            stream<<"\n";
+        }
+    } else {
+        qWarning()<<"Could not write Eigen element to file! Path does not exist!";
+    }
+}
