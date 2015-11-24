@@ -45,6 +45,8 @@
 
 #include "brainobject.h"
 
+#include "../Models/braintreemodel.h"
+
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 
@@ -116,16 +118,23 @@ public:
 
     //=========================================================================================================
     /**
+    * Adds FreeSurfer brain data SETS.
+    *
+    * @param[in] pSurfaceSet        FreeSurfer surface set.
+    * @param[in] pAnnotationSet     FreeSurfer annotation set.
+    * @return                       Returns true if successful.
+    */
+    bool addFsBrainData(const SurfaceSet::SPtr pSurfaceSet, const AnnotationSet::SPtr pAnnotationSet);
+
+    //=========================================================================================================
+    /**
     * Adds FreeSurfer brain data.
     *
-    * @param[in] subject_id         Name of subject
-    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
-    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
-    * @param[in] subjects_dir       Subjects directory
-    * @param[in] annotation         Load annotation data if wanted.
-    * @return    Const list of added brain object
+    * @param[in] pSurface           FreeSurfer surface.
+    * @param[in] pAnnotation        FreeSurfer annotation.
+    * @return                       Returns true if successful.
     */
-    bool addFsBrainData(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, const QString &atlas="");
+    bool addFsBrainData(const Surface::SPtr pSurface, const Annotation::SPtr pAnnotation);
 
     //=========================================================================================================
     /**
@@ -135,8 +144,12 @@ public:
     */
     const QList<BrainObject::SPtr>  getBrainObjectList() const;
 
+    BrainTreeModel* getBrainTreeModel();
+
 protected:
-    QList<BrainObject::SPtr>     m_lBrainData;      /**< List of currently loaded BrainObjects. */
+    QList<BrainObject::SPtr>        m_lBrainData;      /**< List of currently loaded BrainObjects. */
+
+    BrainTreeModel*                 m_pBrainTreeModel;
 };
 
 } // NAMESPACE

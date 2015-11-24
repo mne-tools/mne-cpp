@@ -95,6 +95,8 @@ SOURCES += \
     helpers/custommesh.cpp \
     helpers/window.cpp \
     helpers/control3dwidget.cpp \
+    models/braintreemodel.cpp \
+    models/braintreeitem.cpp
 
 HEADERS += \
     disp3dnew_global.h \
@@ -105,6 +107,8 @@ HEADERS += \
     helpers/custommesh.h \
     helpers/window.h \
     helpers/control3dwidget.h \
+    models/braintreemodel.h \
+    models/braintreeitem.h
 
 FORMS += \
     helpers/control3dwidget.ui \

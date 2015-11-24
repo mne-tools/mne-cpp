@@ -90,6 +90,7 @@ Control3DWidget::~Control3DWidget()
 void Control3DWidget::setView3D(View3D::SPtr view3D)
 {
     //Do the connects from this control widget to the View3D
+    ui->m_treeView_loadedData->setModel(view3D->getBrainTreeModel());
 
     //Add the view3D to the list of connected view3D's
     m_lView3D.append(view3D);
