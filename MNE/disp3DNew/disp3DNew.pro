@@ -94,7 +94,7 @@ SOURCES += \
     helpers/renderable3Dentity.cpp \
     helpers/custommesh.cpp \
     helpers/window.cpp \
-    helpers/control3dwidget.cpp \
+    control/control3dwidget.cpp \
     models/braintreemodel.cpp \
     models/braintreeitem.cpp
 
@@ -106,12 +106,12 @@ HEADERS += \
     helpers/renderable3Dentity.h \
     helpers/custommesh.h \
     helpers/window.h \
-    helpers/control3dwidget.h \
+    control/control3dwidget.h \
     models/braintreemodel.h \
     models/braintreeitem.h
 
 FORMS += \
-    helpers/control3dwidget.ui \
+    control/control3dwidget.ui \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

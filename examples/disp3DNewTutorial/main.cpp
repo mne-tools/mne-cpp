@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include <disp3DNew/view3D.h>
-#include <disp3DNew/helpers/control3dwidget.h>
+#include <disp3DNew/control/control3dwidget.h>
 
 #include "disp/helpers/roundededgeswidget.h"
 
