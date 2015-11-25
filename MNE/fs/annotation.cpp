@@ -113,6 +113,7 @@ bool Annotation::read(const QString &subject_id, qint32 hemi, const QString &atl
         return false;
 
     QString p_sFile = QString("%1/%2/label/%3.%4.annot").arg(subjects_dir).arg(subject_id).arg(hemi == 0 ? "lh" : "rh").arg(atlas);
+    p_Annotation.fileName() = atlas;
 
     return read(p_sFile, p_Annotation);
 }
