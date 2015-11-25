@@ -88,9 +88,6 @@ using namespace UTILSLIB;
 // MAIN
 //=============================================================================================================
 
-SurfaceSet::SPtr pSurfSet;
-AnnotationSet::SPtr pAnnotSet;
-
 
 //=============================================================================================================
 /**
@@ -417,11 +414,12 @@ int main(int argc, char *argv[])
 //        return 1;
 //     // Create the test view
 //    std::cout<<"Creating BrainView"<<std::endl;
-    pSurfSet = SurfaceSet::SPtr(new SurfaceSet("sample", 2, "orig", "./MNE-sample-data/subjects"));
-    pAnnotSet = AnnotationSet::SPtr(new AnnotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects"));
+
+    SurfaceSet tSurfSet ("sample", 2, "orig", "./MNE-sample-data/subjects");
+    AnnotationSet tAnnotSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addFsBrainData(pSurfSet, pAnnotSet);
+    testWindow->addFsBrainData(tSurfSet, tAnnotSet);
     testWindow->show();    
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());

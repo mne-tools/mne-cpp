@@ -70,13 +70,13 @@ Brain::~Brain()
 
 //*************************************************************************************************************
 
-bool Brain::addFsBrainData(const SurfaceSet::SPtr pSurfaceSet, const AnnotationSet::SPtr pAnnotationSet)
+bool Brain::addFsBrainData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
 {
 //    //Create fresurfer surface set and annotation set
 //    SurfaceSet tSurfaceSet(subject_id, hemi, surf, subjects_dir);
 //    AnnotationSet tAnnotationSet(subject_id, hemi, atlas, subjects_dir);
 
-    return m_pBrainTreeModel->addFsData(pSurfaceSet, pAnnotationSet);
+    return m_pBrainTreeModel->addFsData(tSurfaceSet, tAnnotationSet);
 
 //    //Create new brain objects (based on the number of loaded hemispheres) and add to the global list
 //    for(qint32 i = 0; i<tSurfaceSet.data().size(); i++) {
@@ -92,10 +92,10 @@ bool Brain::addFsBrainData(const SurfaceSet::SPtr pSurfaceSet, const AnnotationS
 
 //*************************************************************************************************************
 
-bool Brain::addFsBrainData(const Surface::SPtr pSurface, const Annotation::SPtr pAnnotation)
+bool Brain::addFsBrainData(const Surface &tSurface, const Annotation &tAnnotation)
 {
-    bool state = m_pBrainTreeModel->addFsData(pSurface, pAnnotation);
-    qDebug()<<"Brain::addFsBrainData";
+    bool state = m_pBrainTreeModel->addFsData(tSurface, tAnnotation);
+
     return state;
 }
 

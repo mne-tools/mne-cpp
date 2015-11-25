@@ -130,15 +130,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer brain data.
+    * Adds FreeSurfer brain data SET.
     *
-    * @param[in] subject_id         Name of subject.
-    * @param[in] hemi               Which hemisphere to load (0 -> lh, 1 -> rh, 2 -> both).
-    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...).
-    * @param[in] subjects_dir       Subjects directory.
-    * @param[in] atlas              Load annotation data (atlas) if wanted.
+    * @param[in] tSurfaceSet        FreeSurfer surface set.
+    * @param[in] tAnnotationSet     FreeSurfer annotation set.
+    * @return                       Returns true if successful.
     */
-    bool addFsBrainData(const SurfaceSet::SPtr pSurfaceSet, const AnnotationSet::SPtr pAnnotationSet);
+    bool addFsBrainData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet);
 
     BrainTreeModel* getBrainTreeModel();
 

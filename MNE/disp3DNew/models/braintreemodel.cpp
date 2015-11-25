@@ -58,8 +58,8 @@ BrainTreeModel::BrainTreeModel(QObject *parent)
 : QAbstractItemModel(parent)
 {
     QList<QVariant> rootData;
-    rootData << "Loaded Data";
-    m_pRootItem = new BrainTreeItem(rootData);
+    rootData << "Loaded 3D Data";
+    m_pRootItem = new BrainTreeItem(rootData, BrainTreeItem::RootItem);
 }
 
 
@@ -180,48 +180,19 @@ QModelIndex BrainTreeModel::parent(const QModelIndex &index) const
 
 //*************************************************************************************************************
 
-bool BrainTreeModel::addFsData(const SurfaceSet::SPtr pSurfaceSet, const AnnotationSet::SPtr pAnnotationSet, Qt3DCore::QEntity *p3DEntityParent)
+bool BrainTreeModel::addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity *p3DEntityParent)
 {
-    qDebug()<<"BrainTreeModel::addFsData START";
-
-    SurfaceSet tSurfaceSet = *pSurfaceSet.data();
-
-    for(int i = 0; i< pSurfaceSet->size(); i++)
-        if(i < pAnnotationSet->size())
-            if((*pSurfaceSet.data())[i].hemi() == (*pAnnotationSet.data())[i].hemi())
-                addFsData(Surface::SPtr((pSurfaceSet.data())[i]), Annotation::SPtr(&(*pAnnotationSet.data())[i]), p3DEntityParent);
-//            else
-//                addFsData(surfSPtrList.at(i), Annotation::SPtr(new Annotation()), p3DEntityParent);
-//        else
-//            addFsData(surfSPtrList.at(i), Annotation::SPtr(new Annotation()), p3DEntityParent);
-
-//    QMap<qint32, Surface>::iterator i_surf;
-//    QList<Surface::SPtr> surfSPtrList;
-//    for (i_surf = pSurfaceSet->data().begin(); i_surf != pSurfaceSet->data().end(); ++i_surf) {
-//        Surface::SPtr tmpSurfSPtr = Surface::SPtr(&i_surf.value());
-//        surfSPtrList.append(tmpSurfSPtr);
-//    }
-
-//    QMap<qint32, Annotation>::iterator i_annot;
-//    QList<Annotation::SPtr> annotSPtrList;
-//    for (i_annot = pAnnotationSet->data().begin(); i_annot != pAnnotationSet->data().end(); ++i_annot) {
-//        Annotation::SPtr tmpAnnotSPtr = Annotation::SPtr(&i_annot.value());
-//        annotSPtrList<<tmpAnnotSPtr;
-//    }
-
-    qDebug()<<"BrainTreeModel::addFsData calling overloaded function";
-
-//    for(int i = 0; i < surfSPtrList.size(); i++) {
-//        if(i < annotSPtrList.size())
-//            if(surfSPtrList.at(i)->hemi() == annotSPtrList.at(i)->hemi())
-//                addFsData(surfSPtrList.at(i), annotSPtrList.at(i), p3DEntityParent);
-//            else
-//                addFsData(surfSPtrList.at(i), Annotation::SPtr(new Annotation()), p3DEntityParent);
-//        else
-//            addFsData(surfSPtrList.at(i), Annotation::SPtr(new Annotation()), p3DEntityParent);
-//    }
-
-    qDebug()<<"BrainTreeModel::addFsData END";
+    for(int i = 0; i < tSurfaceSet.size(); i++) {
+        if(i < tAnnotationSet.size()) {
+            if(tAnnotationSet[i].hemi() == tSurfaceSet[i].hemi()) {
+                addFsData(tSurfaceSet[i], tAnnotationSet[i], p3DEntityParent);
+            } else {
+                addFsData(tSurfaceSet[i], Annotation(), p3DEntityParent);
+            }
+        } else {
+            addFsData(tSurfaceSet[i], Annotation(), p3DEntityParent);
+        }
+    }
 
     return true;
 }
@@ -229,15 +200,59 @@ bool BrainTreeModel::addFsData(const SurfaceSet::SPtr pSurfaceSet, const Annotat
 
 //*************************************************************************************************************
 
-bool BrainTreeModel::addFsData(const Surface::SPtr pSurface, const Annotation::SPtr pAnnotation, Qt3DCore::QEntity* p3DEntityParent)
+bool BrainTreeModel::addFsData(const Surface &tSurface, const Annotation &tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
 {
-    qDebug()<<"BrainTreeModel::addFsData overloaded function START";
+    QList<QVariant> lDataVariant;
 
-    QList<QVariant> columnData;
-    columnData<<"test";
-    m_pRootItem->appendChild(new BrainTreeItem(columnData, m_pRootItem));
+    //Top level brain tree item
+    lDataVariant<<tSurface.fileName();
+    BrainTreeItem* pBrainTreeItemTop = new BrainTreeItem(lDataVariant, BrainTreeItem::SurfName, m_pRootItem);
+    m_pRootItem->appendChild(pBrainTreeItemTop);
+    lDataVariant.clear();
 
-    qDebug()<<"BrainTreeModel::addFsData overloaded function END";
+    //Actual data of the top level brain item
+    //FilePath
+    lDataVariant<<tSurface.filePath();
+    BrainTreeItem* pBrainTreeItemPath = new BrainTreeItem(lDataVariant, BrainTreeItem::FilePath, pBrainTreeItemTop);
+    pBrainTreeItemTop->appendChild(pBrainTreeItemPath);
+    lDataVariant.clear();
+
+    //AnnotName
+    lDataVariant<<(tAnnotation.fileName().isEmpty() ? "unspecified" : tAnnotation.fileName());
+    BrainTreeItem* pBrainTreeItemAnnotName = new BrainTreeItem(lDataVariant, BrainTreeItem::AnnotName, pBrainTreeItemTop);
+    pBrainTreeItemTop->appendChild(pBrainTreeItemAnnotName);
+    lDataVariant.clear();
+
+    //SurfType
+    lDataVariant<<tSurface.surf();
+    BrainTreeItem* pBrainTreeItemSurfType = new BrainTreeItem(lDataVariant, BrainTreeItem::SurfType, pBrainTreeItemTop);
+    pBrainTreeItemTop->appendChild(pBrainTreeItemSurfType);
+    lDataVariant.clear();
+
+    //Hemi
+    lDataVariant<<tSurface.hemi();
+    BrainTreeItem* pBrainTreeItemHemi = new BrainTreeItem(lDataVariant, BrainTreeItem::Hemi, pBrainTreeItemTop);
+    pBrainTreeItemTop->appendChild(pBrainTreeItemHemi);
+    lDataVariant.clear();
+
+    //ColorSulci
+    lDataVariant<<QColor(50,50,50);
+    BrainTreeItem* pBrainTreeItemColorSulci = new BrainTreeItem(lDataVariant, BrainTreeItem::ColorSulci, pBrainTreeItemTop);
+    pBrainTreeItemTop->appendChild(pBrainTreeItemColorSulci);
+    lDataVariant.clear();
+
+    //ColorGyri
+    lDataVariant<<QColor(125,125,125);
+    BrainTreeItem* pBrainTreeItemColorGyri = new BrainTreeItem(lDataVariant, BrainTreeItem::ColorGyri, pBrainTreeItemTop);
+    pBrainTreeItemTop->appendChild(pBrainTreeItemColorGyri);
+    lDataVariant.clear();
+
+    //Renderable3DEntity
+//    Renderable3DEntity* pRenderable3DEntity = new Renderable3DEntity(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset(), p3DEntityParent);
+//    lDataVariant<<pRenderable3DEntity;
+//    BrainTreeItem* pBrainTreeItemPath = new BrainTreeItem(lDataVariant, BrainTreeItem::Renderable3DEntity, pBrainTreeItemTop);
+//    pBrainTreeItemTop->appendChild(pRenderable3DEntity);
+//    lDataVariant.clear();
 
     return true;
 }

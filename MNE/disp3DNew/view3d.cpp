@@ -172,9 +172,9 @@ void View3D::initTransformations()
 
 //*************************************************************************************************************
 
-bool View3D::addFsBrainData(const SurfaceSet::SPtr pSurfaceSet, const AnnotationSet::SPtr pAnnotationSet)
+bool View3D::addFsBrainData(const SurfaceSet &tSurfaceSet, const AnnotationSet &tAnnotationSet)
 {
-    bool state = m_pBrain->addFsBrainData(pSurfaceSet, pAnnotationSet);
+    bool state = m_pBrain->addFsBrainData(tSurfaceSet, tAnnotationSet);
 
     qDebug()<<"View3D::addFsBrainData";
     return state;
@@ -190,6 +190,9 @@ bool View3D::addFsBrainData(const SurfaceSet::SPtr pSurfaceSet, const Annotation
 
 //    return state;
 }
+
+
+//*************************************************************************************************************
 
 BrainTreeModel* View3D::getBrainTreeModel()
 {

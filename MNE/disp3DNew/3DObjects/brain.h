@@ -120,11 +120,11 @@ public:
     /**
     * Adds FreeSurfer brain data SETS.
     *
-    * @param[in] pSurfaceSet        FreeSurfer surface set.
-    * @param[in] pAnnotationSet     FreeSurfer annotation set.
+    * @param[in] tSurfaceSet        FreeSurfer surface set.
+    * @param[in] tAnnotationSet     FreeSurfer annotation set.
     * @return                       Returns true if successful.
     */
-    bool addFsBrainData(const SurfaceSet::SPtr pSurfaceSet, const AnnotationSet::SPtr pAnnotationSet);
+    bool addFsBrainData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet);
 
     //=========================================================================================================
     /**
@@ -134,7 +134,7 @@ public:
     * @param[in] pAnnotation        FreeSurfer annotation.
     * @return                       Returns true if successful.
     */
-    bool addFsBrainData(const Surface::SPtr pSurface, const Annotation::SPtr pAnnotation);
+    bool addFsBrainData(const Surface& tSurface, const Annotation& tAnnotation);
 
     //=========================================================================================================
     /**
