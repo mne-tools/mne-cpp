@@ -9,7 +9,6 @@
     <Licenses>
         <License name="MNE Library License (BSD 3-Clause)" file="license_mne.txt" />
     </Licenses>
-    <Default>script</Default>
     <Script>installscript.qs</Script>
     <SortingPriority>80</SortingPriority>
 </Package>
