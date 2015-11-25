@@ -103,7 +103,8 @@ void Control3DWidget::onMinimizeWidget(bool state)
 {
     if(!state) {
         ui->m_toolBox->hide();
-        ui->m_pushButton_minimize->setText(QString("Maximize - %1").arg(this->windowTitle()));
+        ui->m_pushButton_minimize->setText(QString("Maximize - %1").arg(this->windowTitle()));        
+        this->resize(width(), ui->m_pushButton_minimize->height());
     }
     else {
         ui->m_toolBox->show();
@@ -111,7 +112,6 @@ void Control3DWidget::onMinimizeWidget(bool state)
     }
 
     this->adjustSize();
-    this->resize(width(), ui->m_pushButton_minimize->height());
 }
 
 

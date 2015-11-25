@@ -47,6 +47,7 @@
 #include "fs/surfaceset.h"
 
 #include "braintreeitem.h"
+#include "../helpers/renderable3Dentity.h"
 
 
 //*************************************************************************************************************
@@ -131,26 +132,26 @@ public:
     /**
     * Adds FreeSurfer data based on surfaces and annotation SETS to this model.
     *
-    * @param[in] pSurfaceSet        FreeSurfer surface set.
-    * @param[in] pAnnotationSet     FreeSurfer annotation set.
+    * @param[in] tSurfaceSet        FreeSurfer surface set.
+    * @param[in] tAnnotationSet     FreeSurfer annotation set.
     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
     * @return                       Returns true if successful.
     */
-    bool addFsData(const SurfaceSet::SPtr pSurfaceSet, const AnnotationSet::SPtr pAnnotationSet, Qt3DCore::QEntity *p3DEntityParent = 0);
+    bool addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity *p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
     * Adds FreeSurfer data based on surfaces and annotation data to this model.
     *
-    * @param[in] pSurface           FreeSurfer surface.
-    * @param[in] pAnnotation        FreeSurfer annotation.
+    * @param[in] tSurface           FreeSurfer surface.
+    * @param[in] tAnnotation        FreeSurfer annotation.
     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
     * @return                       Returns true if successful.
     */
-    bool addFsData(const Surface::SPtr pSurface, const Annotation::SPtr pAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
+    bool addFsData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
 
 private:
-    BrainTreeItem*     m_pRootItem;
+    BrainTreeItem*     m_pRootItem;     /**< The root item of the tree model. */
 };
 
 } //NAMESPACE DISP3DNEWLIB
