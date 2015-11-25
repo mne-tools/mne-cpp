@@ -4,6 +4,10 @@
 
 LIBDIR = $${PWD}/../data
 LIBDIR ~= s,/,\\,g
+
+exists($$quote($${LIBDIR})) {
+    QMAKE_PRE_LINK += $${QMAKE_CLEAN} $$quote($${LIBDIR}) $$escape_expand(\\n\\t)
+}
 QMAKE_PRE_LINK += $${QMAKE_MKDIR} $$quote($${LIBDIR}) $$escape_expand(\\n\\t)
 
 FILE = $${MNE_BINARY_DIR}/*.dll
@@ -27,7 +31,11 @@ for(DIR, DIRS) {
     DESTPATH = $${LIBDIR}/$${DIR}
     DESTPATH ~= s,/,\\,g
 
+    exists($$quote($${DESTPATH})) {
+        QMAKE_PRE_LINK += $${QMAKE_CLEAN} $$quote($${DESTPATH}) $$escape_expand(\\n\\t)
+    }
     QMAKE_PRE_LINK += $${QMAKE_MKDIR} $$quote($${DESTPATH}) $$escape_expand(\\n\\t)
+
     QMAKE_PRE_LINK += $${QMAKE_COPY} $$quote($${SRCPATH}) $$quote($${DESTPATH}) $$escape_expand(\\n\\t)
 }
 
