@@ -103,7 +103,7 @@ FiffSimulator::FiffSimulator()
 : m_pFiffProducer(new FiffProducer(this))
 //, m_sResourceDataPath(QString("%1/MNE-sample-data/baby_meg/150831_101231_SimulateTest_50nAm_raw.fif").arg(QCoreApplication::applicationDirPath()))
 //, m_sResourceDataPath(QString("%1/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(QCoreApplication::applicationDirPath()))
-, m_sResourceDataPath(QString("%1/MNE-sample-data/CTF/spont_raw.fif").arg(QCoreApplication::applicationDirPath()))
+, m_sResourceDataPath(QString("%1/MNE-sample-data/baby_meg/151015_151137_4884471_Spontaneous-1_raw.fif").arg(QCoreApplication::applicationDirPath()))
 , m_uiBufferSampleSize(100)//(4)
 , m_AccelerationFactor(1.0)
 , m_TrueSamplingRate(0.0)
@@ -501,6 +501,27 @@ bool FiffSimulator::readRawInfo()
         if(m_pRawMatrixBuffer)
             delete m_pRawMatrixBuffer;
         m_pRawMatrixBuffer = new RawMatrixBuffer(10, m_RawInfo.info.nchan, m_uiBufferSampleSize);
+
+        //Put new compensators into babymeg file
+        QFile t_compFiffFile("C:/Git/mne-cpp/bin/MNE-sample-data/baby_meg/WSGM_write_ctf_comp.fif");
+
+        FiffStream::SPtr t_pStream(new FiffStream(&t_compFiffFile));
+
+        FiffDirTree t_Tree;
+        QList<FiffDirEntry> t_Dir;
+
+        if(!t_pStream->open(t_Tree, t_Dir))
+            printf("Could not open compensator file\n");
+
+        QList<FiffCtfComp> q_ListComp = t_pStream->read_ctf_comp(t_Tree, m_RawInfo.info.chs);
+
+        if (q_ListComp.size() == 0)
+        {
+            printf("Could not find compensators\n");
+        } else {
+             m_RawInfo.info.comps = q_ListComp;
+             printf("compensators loaded to babymeg file!\n");
+        }
 
         mutex.unlock();
     }
