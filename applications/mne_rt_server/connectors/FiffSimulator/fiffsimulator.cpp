@@ -502,27 +502,6 @@ bool FiffSimulator::readRawInfo()
             delete m_pRawMatrixBuffer;
         m_pRawMatrixBuffer = new RawMatrixBuffer(10, m_RawInfo.info.nchan, m_uiBufferSampleSize);
 
-        //Put new compensators into babymeg file
-        QFile t_compFiffFile("C:/Git/mne-cpp/bin/MNE-sample-data/baby_meg/WSGM_write_ctf_comp.fif");
-
-        FiffStream::SPtr t_pStream(new FiffStream(&t_compFiffFile));
-
-        FiffDirTree t_Tree;
-        QList<FiffDirEntry> t_Dir;
-
-        if(!t_pStream->open(t_Tree, t_Dir))
-            printf("Could not open compensator file\n");
-
-        QList<FiffCtfComp> q_ListComp = t_pStream->read_ctf_comp(t_Tree, m_RawInfo.info.chs);
-
-        if (q_ListComp.size() == 0)
-        {
-            printf("Could not find compensators\n");
-        } else {
-             m_RawInfo.info.comps = q_ListComp;
-             printf("compensators loaded to babymeg file!\n");
-        }
-
         mutex.unlock();
     }
 
