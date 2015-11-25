@@ -6,23 +6,19 @@ function Component()
 
 //*************************************************************************************************************
 
-Component.prototype.isDefault = function()
-{
-    // select the component by default
-    return true;
-}
-
-
-//*************************************************************************************************************
-
 Component.prototype.createOperations = function()
 {
-    // create mne library shortcut
-    component.createOperations();
 
-//    if (installer.value("os") === "win") {
-//        component.addOperation("CreateShortcut", "@TargetDir@/mne_browse_raw_qt/readme.txt", "@StartMenuDir@/MNE Browse Raw Qt/README.lnk",
-//            "workingDirectory=@TargetDir@", "iconPath=%SystemRoot%/system32/SHELL32.dll",
-//            "iconId=2");
-//    }
+    try {
+        component.createOperations();
+
+        // create mne library shortcuts
+        if (installer.value("os") === "win") {
+            component.addOperation("CreateShortcut", "@TargetDir@/MNECppMaintenanceTool.exe", "@StartMenuDir@/MNE-CPP/MNECppMaintenanceTool.exe.lnk");
+        }
+    } catch (e) {
+        print(e);
+    }
+
+
 }
