@@ -3,6 +3,7 @@
 #
 DATADIR = $${PWD}/../data
 DATADIR ~= s,/,\\,g
+QMAKE_PRE_LINK += $${QMAKE_MKDIR} $$quote($${DATADIR}) $$escape_expand(\\n\\t)
 
 FILE = $${MNE_BINARY_DIR}/mne_browse_raw_qt.exe
 FILE ~= s,/,\\,g
