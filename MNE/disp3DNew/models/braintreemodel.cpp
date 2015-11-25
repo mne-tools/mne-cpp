@@ -180,7 +180,7 @@ QModelIndex BrainTreeModel::parent(const QModelIndex &index) const
 
 //*************************************************************************************************************
 
-bool BrainTreeModel::addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity *p3DEntityParent)
+bool BrainTreeModel::addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
 {
     for(int i = 0; i < tSurfaceSet.size(); i++) {
         if(i < tAnnotationSet.size()) {
@@ -248,11 +248,13 @@ bool BrainTreeModel::addFsData(const Surface &tSurface, const Annotation &tAnnot
     lDataVariant.clear();
 
     //Renderable3DEntity
-//    Renderable3DEntity* pRenderable3DEntity = new Renderable3DEntity(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset(), p3DEntityParent);
-//    lDataVariant<<pRenderable3DEntity;
-//    BrainTreeItem* pBrainTreeItemPath = new BrainTreeItem(lDataVariant, BrainTreeItem::Renderable3DEntity, pBrainTreeItemTop);
-//    pBrainTreeItemTop->appendChild(pRenderable3DEntity);
-//    lDataVariant.clear();
+    Renderable3DEntity* pRenderable3DEntity = new Renderable3DEntity(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset(), p3DEntityParent);
+    QVariant var;
+    var.setValue(pRenderable3DEntity);
+    lDataVariant<<var;
+    BrainTreeItem* pBrainTreeItem3DEntity = new BrainTreeItem(lDataVariant, BrainTreeItem::Renderable3DEntity, pBrainTreeItemTop);
+    pBrainTreeItemTop->appendChild(pBrainTreeItem3DEntity);
+    lDataVariant.clear();
 
     return true;
 }

@@ -76,7 +76,7 @@ bool Brain::addFsBrainData(const SurfaceSet& tSurfaceSet, const AnnotationSet& t
 //    SurfaceSet tSurfaceSet(subject_id, hemi, surf, subjects_dir);
 //    AnnotationSet tAnnotationSet(subject_id, hemi, atlas, subjects_dir);
 
-    return m_pBrainTreeModel->addFsData(tSurfaceSet, tAnnotationSet);
+    return m_pBrainTreeModel->addFsData(tSurfaceSet, tAnnotationSet, this);
 
 //    //Create new brain objects (based on the number of loaded hemispheres) and add to the global list
 //    for(qint32 i = 0; i<tSurfaceSet.data().size(); i++) {
