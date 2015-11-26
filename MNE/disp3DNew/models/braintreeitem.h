@@ -131,7 +131,7 @@ public:
     BrainTreeItem *child(int row);
     int childCount() const;
     int columnCount() const;
-    QVariant data(int column) const;
+    QVariant data(int column, int role) const;
     int row() const;
     BrainTreeItem *parentItem();
 

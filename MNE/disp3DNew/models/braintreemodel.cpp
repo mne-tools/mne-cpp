@@ -111,7 +111,7 @@ QVariant BrainTreeModel::data(const QModelIndex &index, int role) const
 
     BrainTreeItem *item = static_cast<BrainTreeItem*>(index.internalPointer());
 
-    return item->data(index.column());
+    return item->data(index.column(), role);
 }
 
 
@@ -132,7 +132,7 @@ QVariant BrainTreeModel::headerData(int section, Qt::Orientation orientation,
                                int role) const
 {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
-        return m_pRootItem->data(section);
+        return m_pRootItem->data(section, role);
 
     return QVariant();
 }
