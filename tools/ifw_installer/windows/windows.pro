@@ -25,8 +25,6 @@ FORMS += \
 
 #Offline installer configuration
 
-
-
 mne-cpp_installer.target = build_mne_cpp_installer
 mne-cpp_installer.commands = binarycreator --offline-only -c $$PWD/config/config.xml -p $$PWD/packages -r $$PWD/resources/additional.qrc mne-cpp-windows-x86_64_1.0.0
 QMAKE_EXTRA_TARGETS += mne-cpp_installer
