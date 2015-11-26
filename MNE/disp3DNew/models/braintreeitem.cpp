@@ -104,8 +104,9 @@ int BrainTreeItem::columnCount() const
 
 //*************************************************************************************************************
 
-QVariant BrainTreeItem::data(int column) const
+QVariant BrainTreeItem::data(int column, int role) const
 {
+    Q_UNUSED(role);
 
     return m_lItemData.value(column);
 }
