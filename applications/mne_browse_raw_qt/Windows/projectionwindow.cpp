@@ -94,16 +94,26 @@ ProjectionWindow::ProjectionWindow(QWidget *parent, QList<FiffProj>& dataProjs)
 
 //*************************************************************************************************************
 
-void ProjectionWindow::initTableViewWidgets()
+ProjectionWindow::ProjectionWindow(QWidget *parent, FiffInfo::SPtr pFiffInfo)
+: QDockWidget(parent)
+, ui(new Ui::ProjectionWindow)
+, m_pFiffInfo(pFiffInfo)
 {
-    //Set model
-    ui->m_tableView_availableProjections->setModel(m_pProjectionModel);
+    ui->setupUi(this);
 
-    connect(m_pProjectionModel, &ProjectionModel::dataChanged,
-            ui->m_tableView_availableProjections, &QTableView::resizeColumnsToContents);
+    createProjectorGroup();
+    createCompensatorGroup();
+}
 
-    //Hide data column in view
-    ui->m_tableView_availableProjections->setColumnHidden(3, true);
+
+//*************************************************************************************************************
+
+void ProjectionWindow::setFiffInfo(FiffInfo::SPtr pFiffInfo)
+{
+    m_pFiffInfo = pFiffInfo;
+
+    createProjectorGroup();
+    createCompensatorGroup();
 }
 
 
@@ -112,4 +122,214 @@ void ProjectionWindow::initTableViewWidgets()
 ProjectionModel* ProjectionWindow::getDataModel()
 {
     return m_pProjectionModel;
+}
+
+
+//*************************************************************************************************************
+
+void ProjectionWindow::initTableViewWidgets()
+{
+//    //Set model
+//    ui->m_tableView_availableProjections->setModel(m_pProjectionModel);
+
+//    connect(m_pProjectionModel, &ProjectionModel::dataChanged,
+//            ui->m_tableView_availableProjections, &QTableView::resizeColumnsToContents);
+
+//    //Hide data column in view
+//    ui->m_tableView_availableProjections->setColumnHidden(3, true);
+
+//    ui->m_tableView_availableProjections->hide();
+}
+
+
+//*************************************************************************************************************
+
+void ProjectionWindow::createProjectorGroup()
+{
+    if(m_pFiffInfo)
+    {
+        if(ui->m_groupBox_projections->layout() != 0)
+            this->remove(ui->m_groupBox_projections->layout());
+
+        // Projection Selection
+        QGridLayout *topLayout = new QGridLayout;
+
+        if(!m_pFiffInfo->projs.isEmpty())
+        {
+            bool bAllActivated = true;
+
+            qint32 i=0;
+
+            for(i; i < m_pFiffInfo->projs.size(); ++i)
+            {
+                QCheckBox* checkBox = new QCheckBox(m_pFiffInfo->projs[i].desc);
+                checkBox->setChecked(m_pFiffInfo->projs[i].active);
+
+                if(m_pFiffInfo->projs[i].active == false)
+                    bAllActivated = false;
+
+                m_qListProjCheckBox.append(checkBox);
+
+                connect(checkBox, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+                        this, &ProjectionWindow::checkProjStatusChanged);
+
+                topLayout->addWidget(checkBox, i, 0); //+2 because we already added two widgets before the first projector check box
+
+    //            if(i>m_pFiffInfo->projs.size()/2)
+    //                topLayout->addWidget(checkBox, i-rowCount, 1); //+2 because we already added two widgets before the first projector check box
+    //            else {
+    //                topLayout->addWidget(checkBox, i, 0); //+2 because we already added two widgets before the first projector check box
+    //                rowCount++;
+    //            }
+            }
+
+            QFrame* line = new QFrame();
+            line->setFrameShape(QFrame::HLine);
+            line->setFrameShadow(QFrame::Sunken);
+
+            topLayout->addWidget(line, i+1, 0);
+
+            m_enableDisableProjectors = new QCheckBox("Enable all");
+            m_enableDisableProjectors->setChecked(bAllActivated);
+            topLayout->addWidget(m_enableDisableProjectors, i+2, 0);
+            connect(m_enableDisableProjectors, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+                this, &ProjectionWindow::enableDisableAllProj);
+
+            emit projSelectionChanged();
+        }
+
+        delete ui->m_groupBox_projections->layout();
+        ui->m_groupBox_projections->setLayout(topLayout);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void ProjectionWindow::createCompensatorGroup()
+{
+    if(m_pFiffInfo)
+    {
+        m_pCompSignalMapper = new QSignalMapper(this);
+
+        if(ui->m_groupBox_compensators->layout() != 0)
+            this->remove(ui->m_groupBox_compensators->layout());
+
+        // Compensation Selection
+        QGridLayout *topLayout = new QGridLayout;
+
+        if(!m_pFiffInfo->comps.isEmpty())
+        {
+            qint32 i=0;
+
+            for(i; i < m_pFiffInfo->comps.size(); ++i)
+            {
+                QString numStr;
+                QCheckBox* checkBox = new QCheckBox(numStr.setNum(m_pFiffInfo->comps[i].kind));
+
+                m_qListCompCheckBox.append(checkBox);
+
+                connect(checkBox, SIGNAL(clicked()),
+                            m_pCompSignalMapper, SLOT(map()));
+
+                m_pCompSignalMapper->setMapping(checkBox, numStr);
+
+                topLayout->addWidget(checkBox, i, 0);
+
+            }
+
+            connect(m_pCompSignalMapper, SIGNAL(mapped(const QString &)),
+                        this, SIGNAL(compClicked(const QString &)));
+
+            connect(this, &ProjectionWindow::compClicked,
+                    this, &ProjectionWindow::checkCompStatusChanged);
+        }
+
+        delete ui->m_groupBox_compensators->layout();
+        ui->m_groupBox_compensators->setLayout(topLayout);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void ProjectionWindow::enableDisableAllProj(bool status)
+{
+    //Set all checkboxes to status
+    for(int i=0; i<m_qListProjCheckBox.size(); i++)
+        m_qListProjCheckBox.at(i)->setChecked(status);
+
+    //Set all projection activation states to status
+    for(int i=0; i < m_pFiffInfo->projs.size(); ++i)
+        m_pFiffInfo->projs[i].active = status;
+
+    m_enableDisableProjectors->setChecked(status);
+
+    emit projSelectionChanged();
+}
+
+
+//*************************************************************************************************************
+
+void ProjectionWindow::checkProjStatusChanged(bool status)
+{
+    Q_UNUSED(status)
+
+    bool bAllActivated = true;
+
+    for(qint32 i = 0; i < m_qListProjCheckBox.size(); ++i) {
+        if(m_qListProjCheckBox[i]->isChecked() == false)
+            bAllActivated = false;
+
+        this->m_pFiffInfo->projs[i].active = m_qListProjCheckBox[i]->isChecked();
+
+        std::cout<<m_qListProjCheckBox[i]->text().toStdString()<<"check state: "<<m_qListProjCheckBox[i]->isChecked()<<std::endl;
+    }
+
+    m_enableDisableProjectors->setChecked(bAllActivated);
+
+    emit projSelectionChanged();
+}
+
+
+//*************************************************************************************************************
+
+void ProjectionWindow::checkCompStatusChanged(const QString & compName)
+{
+    qDebug()<<compName;
+
+    bool currentState;
+
+    for(int i = 0; i < m_qListCompCheckBox.size(); ++i)
+        if(m_qListCompCheckBox[i]->text() != compName)
+            m_qListCompCheckBox[i]->setChecked(false);
+        else
+            currentState = m_qListCompCheckBox[i]->isChecked();
+
+    if(currentState)
+        emit compSelectionChanged(compName.toInt());
+    else //If none selected
+        emit compSelectionChanged(0);
+}
+
+
+//*************************************************************************************************************
+
+void ProjectionWindow::remove(QLayout* layout)
+{
+    QLayoutItem* child;
+    while(layout->count()!=0)
+    {
+        child = layout->takeAt(0);
+        if(child->layout() != 0)
+        {
+            remove(child->layout());
+        }
+        else if(child->widget() != 0)
+        {
+            delete child->widget();
+        }
+
+        delete child;
+    }
 }
