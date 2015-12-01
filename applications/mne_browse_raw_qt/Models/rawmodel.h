@@ -233,6 +233,7 @@ private:
     bool                                    m_bStartReached;            /**< signals, whether the start of the fiff data file is reached. */
     bool                                    m_bEndReached;              /**< signals, whether the end of the fiff data file is reached. */
     bool                                    m_bReloadBefore;            /**< bool value indicating if data was reloaded before (1) or after (0) the existing data. */
+    bool                                    m_bProjActivated;
 
     //Concurrent reloading
     QFutureWatcher<QPair<MatrixXd,MatrixXd> > m_reloadFutureWatcher;    /**< QFutureWatcher for watching process of reloading fiff data. */
@@ -251,7 +252,7 @@ private:
     QList<QSharedPointer<DataPackage> >     m_data;                     /**< List that holds the fiff matrix data <n_channels x n_samples>. */
 
     //Filter operators
-    QMap<int,QSharedPointer<MNEOperator> >      m_assignedOperators;    /**< Map of MNEOperator types to channels.*/
+    QMap<int,QSharedPointer<MNEOperator> >  m_assignedOperators;        /**< Map of MNEOperator types to channels.*/
 
     qint32                                  m_iAbsFiffCursor;           /**< Cursor that points to the current position in the fiff data file [in samples]. */
     qint32                                  m_iCurAbsScrollPos;         /**< the current (absolute) ScrollPosition in the fiff data file. */
@@ -261,6 +262,9 @@ private:
     qint8                                   m_maxWindows;               /**< number of windows that are at maximum remained in m_data. */
     qint16                                  m_iFilterTaps;              /**< Number of Filter taps */
     int                                     m_iCurrentFFTLength;        /**< Currently used fft length */
+
+    SparseMatrix<double>                    m_matSparseProj;
+    MatrixXd                                m_matProj;
 
 signals:
     //=========================================================================================================
@@ -385,6 +389,12 @@ public slots:
     * undoFilter undoes the filtering operation for all filter operations for all channels
     */
     void undoFilter();
+
+    //=========================================================================================================
+    /**
+    * updateProjections updates the projection matrix
+    */
+    void updateProjections();
 
 private slots:
     //=========================================================================================================

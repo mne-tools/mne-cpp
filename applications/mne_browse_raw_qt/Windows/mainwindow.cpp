@@ -58,7 +58,7 @@ using namespace MNEBrowseRawQt;
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
-, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+, m_qFileRaw("./MNE-sample-data/baby_meg/151015_151137_4884471_Spontaneous-1_raw.fif")
 , m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
 , m_qEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
 , m_qSettings()
@@ -197,7 +197,13 @@ void MainWindow::setupWindowWidgets()
 
     //Connect projection manager with fif file loading
     connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
-            m_pProjectionWindow->getDataModel(), static_cast<void (ProjectionModel::*)(FiffInfo::SPtr)>(&ProjectionModel::addProjections));
+            m_pProjectionWindow, &ProjectionWindow::setFiffInfo);
+
+    connect(m_pProjectionWindow, &ProjectionWindow::projSelectionChanged,
+            m_pDataWindow->getDataModel(), &RawModel::updateProjections);
+
+//    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
+//            m_pProjectionWindow->getDataModel(), static_cast<void (ProjectionModel::*)(FiffInfo::SPtr)>(&ProjectionModel::addProjections));
 
     //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels - TODO: dirty move get rid of this here
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
@@ -207,7 +213,8 @@ void MainWindow::setupWindowWidgets()
         m_pSelectionManagerWindow->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
         m_pSelectionManagerWindow->newFiffFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);
         m_pFilterWindow->newFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);
-        m_pProjectionWindow->getDataModel()->addProjections(m_pDataWindow->getDataModel()->m_pFiffInfo);
+        //m_pProjectionWindow->getDataModel()->addProjections(m_pDataWindow->getDataModel()->m_pFiffInfo);
+        m_pProjectionWindow->setFiffInfo(m_pDataWindow->getDataModel()->m_pFiffInfo);
     }
 }
 

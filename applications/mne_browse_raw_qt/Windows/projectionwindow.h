@@ -51,6 +51,8 @@
 //=============================================================================================================
 
 #include <QDockWidget>
+#include <QCheckBox>
+#include <QSignalMapper>
 
 
 //*************************************************************************************************************
@@ -103,12 +105,34 @@ public:
     */
     ProjectionWindow(QWidget *parent, QList<FiffProj>& dataProjs);
 
+    ProjectionWindow(QWidget *parent, FiffInfo::SPtr pFiffInfo);
+
+    void setFiffInfo(FiffInfo::SPtr pFiffInfo);
+
     //=========================================================================================================
     /**
     * Returns the ProjectionModel of this window
     */
     ProjectionModel* getDataModel();
 
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changes the projections.
+    */
+    void projSelectionChanged();
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changes the compensator.
+    */
+    void compSelectionChanged(int to);
+
+    //=========================================================================================================
+    /**
+    * Signal mapper signal for compensator changes.
+    */
+    void compClicked(const QString &text);
 
 private:
     //=========================================================================================================
@@ -117,8 +141,51 @@ private:
     */
     void initTableViewWidgets();
 
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the projector group
+    */
+    void createProjectorGroup();
+
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the compensator group
+    */
+    void createCompensatorGroup();
+
+    //=========================================================================================================
+    /**
+    * Slot called when user enables/disables all projectors
+    */
+    void enableDisableAllProj(bool status);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the projector check state changes
+    */
+    void checkProjStatusChanged(bool state);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the compensator check state changes
+    */
+    void checkCompStatusChanged(const QString & compName);
+
+    //=========================================================================================================
+    /**
+    * Function to remove all children from a layout
+    */
+    void remove(QLayout* layout);
+
     Ui::ProjectionWindow *ui;                       /**< Pointer to the qt designer generated ui class.*/
 
+    QList<QCheckBox*>   m_qListProjCheckBox;            /**< List of projection CheckBox. */
+    QList<QCheckBox*>   m_qListCompCheckBox;            /**< List of compensator CheckBox. */
+    QCheckBox *         m_enableDisableProjectors;      /**< Holds the enable disable all check box. */
+
+    QSignalMapper*      m_pCompSignalMapper;
+
+    FiffInfo::SPtr      m_pFiffInfo;
     ProjectionModel*    m_pProjectionModel;         /**< Pointer to the projection data model.*/
 };
 

@@ -908,6 +908,63 @@ void RawModel::undoFilter()
 
 
 //*************************************************************************************************************
+
+void RawModel::updateProjections()
+{
+    //  Update the SSP projector
+    if(m_pFiffInfo)
+    {
+        //If a minimum of one projector is active set m_bProjActivated to true so that this model applies the ssp to the incoming data
+        m_bProjActivated = false;
+        for(qint32 i = 0; i < this->m_pFiffInfo->projs.size(); ++i) {
+            std::cout<<this->m_pFiffInfo->projs[i].desc.toStdString()<<" is active: "<<this->m_pFiffInfo->projs[i].active<<std::endl;
+
+            if(this->m_pFiffInfo->projs[i].active) {
+                m_bProjActivated = true;
+                break;
+            }
+        }
+
+        qint32 nproj = this->m_pFiffInfo->make_projector(m_matProj);
+        qDebug() << "updateProjection :: New projection calculated."<<nproj;
+
+        //set columns of matrix to zero depending on bad channels indexes
+//        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
+//            m_matProj.col(m_vecBadIdcs[j]).setZero();
+
+        std::cout << "Proj\n";
+        std::cout << m_matProj.block(0,0,10,10) << std::endl;
+
+        qint32 nchan = this->m_pFiffInfo->nchan;
+        qint32 i, k;
+
+        typedef Eigen::Triplet<double> T;
+        std::vector<T> tripletList;
+        tripletList.reserve(nchan);
+
+        // Make proj sparse
+        tripletList.clear();
+        tripletList.reserve(m_matProj.rows()*m_matProj.cols());
+        for(i = 0; i < m_matProj.rows(); ++i)
+            for(k = 0; k < m_matProj.cols(); ++k)
+                if(m_matProj(i,k) != 0)
+                    tripletList.push_back(T(i, k, m_matProj(i,k)));
+
+        m_matSparseProj = SparseMatrix<double>(m_matProj.rows(),m_matProj.cols());
+        if(tripletList.size() > 0)
+            m_matSparseProj.setFromTriplets(tripletList.begin(), tripletList.end());
+
+        //set projection matrix for upcoming read raw segement calls
+        m_pfiffIO->m_qlistRaw[0]->proj = m_matProj;
+
+        qDebug()<<"m_pfiffIO->m_qlistRaw[0]->proj.size():"<<m_pfiffIO->m_qlistRaw[0]->proj.size();
+
+        resetPosition(m_iAbsFiffCursor);
+    }
+}
+
+
+//*************************************************************************************************************
 //private SLOTS
 void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair)
 {
