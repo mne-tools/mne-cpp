@@ -582,8 +582,6 @@ void RealTimeMultiSampleArrayModel::updateProjection()
         //If a minimum of one projector is active set m_bProjActivated to true so that this model applies the ssp to the incoming data
         m_bProjActivated = false;
         for(qint32 i = 0; i < this->m_pFiffInfo->projs.size(); ++i) {
-            std::cout<<this->m_pFiffInfo->projs[i].desc.toStdString()<<" is active: "<<this->m_pFiffInfo->projs[i].active<<std::endl;
-
             if(this->m_pFiffInfo->projs[i].active) {
                 m_bProjActivated = true;
                 break;

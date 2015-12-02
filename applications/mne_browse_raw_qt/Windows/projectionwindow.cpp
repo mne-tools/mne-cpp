@@ -282,8 +282,6 @@ void ProjectionWindow::checkProjStatusChanged(bool status)
             bAllActivated = false;
 
         this->m_pFiffInfo->projs[i].active = m_qListProjCheckBox[i]->isChecked();
-
-        std::cout<<m_qListProjCheckBox[i]->text().toStdString()<<"check state: "<<m_qListProjCheckBox[i]->isChecked()<<std::endl;
     }
 
     m_enableDisableProjectors->setChecked(bAllActivated);
