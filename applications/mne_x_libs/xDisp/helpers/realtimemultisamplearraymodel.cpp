@@ -637,14 +637,13 @@ void RealTimeMultiSampleArrayModel::updateCompensator(int to)
         else
             m_bCompActivated = true;
 
-        int from = this->m_pFiffInfo->get_current_comp();
-
-        qDebug()<<"to"<<to;
-        qDebug()<<"from"<<from;
-        qDebug()<<"m_bCompActivated"<<m_bCompActivated;
+//        qDebug()<<"to"<<to;
+//        qDebug()<<"from"<<from;
+//        qDebug()<<"m_bCompActivated"<<m_bCompActivated;
 
         FiffCtfComp newComp;
-        this->m_pFiffInfo->make_compensator(from, to, newComp);
+        this->m_pFiffInfo->make_compensator(0, to, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
+
         this->m_pFiffInfo->set_current_comp(to);
         m_matComp = newComp.data->data;
     }
@@ -835,7 +834,6 @@ void RealTimeMultiSampleArrayModel::resetTriggerCounter()
 {
     m_iDetectedTriggers = 0;
 }
-
 
 
 //*************************************************************************************************************
