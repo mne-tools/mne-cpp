@@ -233,7 +233,6 @@ private:
     bool                                    m_bStartReached;            /**< signals, whether the start of the fiff data file is reached. */
     bool                                    m_bEndReached;              /**< signals, whether the end of the fiff data file is reached. */
     bool                                    m_bReloadBefore;            /**< bool value indicating if data was reloaded before (1) or after (0) the existing data. */
-    bool                                    m_bProjActivated;
 
     //Concurrent reloading
     QFutureWatcher<QPair<MatrixXd,MatrixXd> > m_reloadFutureWatcher;    /**< QFutureWatcher for watching process of reloading fiff data. */
@@ -262,9 +261,6 @@ private:
     qint8                                   m_maxWindows;               /**< number of windows that are at maximum remained in m_data. */
     qint16                                  m_iFilterTaps;              /**< Number of Filter taps */
     int                                     m_iCurrentFFTLength;        /**< Currently used fft length */
-
-    SparseMatrix<double>                    m_matSparseProj;
-    MatrixXd                                m_matProj;
 
 signals:
     //=========================================================================================================

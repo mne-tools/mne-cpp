@@ -122,7 +122,7 @@ void FiffProj::activate_projs(QList<FiffProj> &p_qListFiffProj)
 
 //*************************************************************************************************************
 
-fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringList& ch_names, MatrixXd& proj, const QStringList& bads, MatrixXd& U, bool include_active)
+fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringList& ch_names, MatrixXd& proj, const QStringList& bads, MatrixXd& U)
 {
     fiff_int_t nchan = ch_names.size();
     if (nchan == 0)
@@ -147,7 +147,7 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
     fiff_int_t k, l;
     for (k = 0; k < projs.size(); ++k)
     {
-        if (!projs[k].active || include_active)
+        if (projs[k].active)
         {
             ++nproj;
             nvec += projs[k].data->nrow;
@@ -172,7 +172,7 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
     vecSel.setConstant(-1);
     for (k = 0; k < projs.size(); ++k)
     {
-        if (!projs[k].active || include_active)
+        if (projs[k].active)
         {
             FiffProj one = projs[k];
 

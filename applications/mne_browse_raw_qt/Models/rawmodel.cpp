@@ -370,6 +370,7 @@ bool RawModel::loadFiffData(QFile* qFile)
     m_pfiffIO = QSharedPointer<FiffIO>(new FiffIO(*qFile));
     if(!m_pfiffIO->m_qlistRaw.empty()) {
         m_iAbsFiffCursor = m_pfiffIO->m_qlistRaw[0]->first_samp; //Set cursor somewhere into fiff file [in samples]
+        m_iCurAbsScrollPos = 0;
         m_bStartReached = true;
 
         int start = m_iAbsFiffCursor;
@@ -915,51 +916,56 @@ void RawModel::updateProjections()
     if(m_pFiffInfo)
     {
         //If a minimum of one projector is active set m_bProjActivated to true so that this model applies the ssp to the incoming data
-        m_bProjActivated = false;
+        bool bProjActivated = false;
         for(qint32 i = 0; i < this->m_pFiffInfo->projs.size(); ++i) {
-            std::cout<<this->m_pFiffInfo->projs[i].desc.toStdString()<<" is active: "<<this->m_pFiffInfo->projs[i].active<<std::endl;
-
             if(this->m_pFiffInfo->projs[i].active) {
-                m_bProjActivated = true;
+                bProjActivated = true;
                 break;
             }
         }
 
-        qint32 nproj = this->m_pFiffInfo->make_projector(m_matProj);
-        qDebug() << "updateProjection :: New projection calculated."<<nproj;
+        if(bProjActivated)
+        {
+            MatrixXd matProj;
+            qint32 nproj = this->m_pFiffInfo->make_projector(matProj);
+            qDebug() << "updateProjection :: New projection calculated."<<nproj;
 
-        //set columns of matrix to zero depending on bad channels indexes
-//        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
-//            m_matProj.col(m_vecBadIdcs[j]).setZero();
+            //set columns of matrix to zero depending on bad channels indexes
+    //        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
+    //            m_matProj.col(m_vecBadIdcs[j]).setZero();
 
-        std::cout << "Proj\n";
-        std::cout << m_matProj.block(0,0,10,10) << std::endl;
+    //        std::cout << "Proj\n";
+    //        std::cout << m_matProj.block(0,0,10,10) << std::endl;
 
-        qint32 nchan = this->m_pFiffInfo->nchan;
-        qint32 i, k;
+//            qint32 nchan = this->m_pFiffInfo->nchan;
+//            qint32 i, k;
 
-        typedef Eigen::Triplet<double> T;
-        std::vector<T> tripletList;
-        tripletList.reserve(nchan);
+//            typedef Eigen::Triplet<double> T;
+//            std::vector<T> tripletList;
+//            tripletList.reserve(nchan);
 
-        // Make proj sparse
-        tripletList.clear();
-        tripletList.reserve(m_matProj.rows()*m_matProj.cols());
-        for(i = 0; i < m_matProj.rows(); ++i)
-            for(k = 0; k < m_matProj.cols(); ++k)
-                if(m_matProj(i,k) != 0)
-                    tripletList.push_back(T(i, k, m_matProj(i,k)));
+//            // Make proj sparse
+//            tripletList.clear();
+//            tripletList.reserve(matProj.rows()*matProj.cols());
+//            for(i = 0; i < matProj.rows(); ++i)
+//                for(k = 0; k < matProj.cols(); ++k)
+//                    if(matProj(i,k) != 0)
+//                        tripletList.push_back(T(i, k, matProj(i,k)));
 
-        m_matSparseProj = SparseMatrix<double>(m_matProj.rows(),m_matProj.cols());
-        if(tripletList.size() > 0)
-            m_matSparseProj.setFromTriplets(tripletList.begin(), tripletList.end());
+//            SparseMatrix<double> matSparseProj (matProj.rows(),matProj.cols());
+//            if(tripletList.size() > 0)
+//                matSparseProj.setFromTriplets(tripletList.begin(), tripletList.end());
 
-        //set projection matrix for upcoming read raw segement calls
-        m_pfiffIO->m_qlistRaw[0]->proj = m_matProj;
+            //set projection matrix for upcoming read raw segement calls
+            m_pfiffIO->m_qlistRaw[0]->proj = matProj;
+        } else {
+            m_pfiffIO->m_qlistRaw[0]->proj.resize(0,0);
+        }
 
-        qDebug()<<"m_pfiffIO->m_qlistRaw[0]->proj.size():"<<m_pfiffIO->m_qlistRaw[0]->proj.size();
-
-        resetPosition(m_iAbsFiffCursor);
+        if(m_iCurAbsScrollPos==0)
+            resetPosition(m_iCurAbsScrollPos + firstSample());
+        else
+            resetPosition(m_iCurAbsScrollPos);
     }
 }
 
