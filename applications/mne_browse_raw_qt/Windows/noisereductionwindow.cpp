@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     projectionwindow.cpp
+* @file     noisereductionwindow.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ProjectionWindow class.
+* @brief    Contains the implementation of the NoiseReductionWindow class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "projectionwindow.h"
+#include "NoiseReductionWindow.h"
 
 
 //*************************************************************************************************************
@@ -55,48 +55,19 @@ using namespace MNEBrowseRawQt;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ProjectionWindow::ProjectionWindow(QWidget *parent)
+NoiseReductionWindow::NoiseReductionWindow(QWidget *parent)
 : QDockWidget(parent)
-, ui(new Ui::ProjectionWindow)
-, m_pProjectionModel(new ProjectionModel(this))
+, ui(new Ui::NoiseReductionWindow)
 {
     ui->setupUi(this);
-
-    initTableViewWidgets();
 }
 
 
 //*************************************************************************************************************
 
-ProjectionWindow::ProjectionWindow(QWidget *parent, QFile& qFile)
+NoiseReductionWindow::NoiseReductionWindow(QWidget *parent, FiffInfo::SPtr pFiffInfo)
 : QDockWidget(parent)
-, ui(new Ui::ProjectionWindow)
-, m_pProjectionModel(new ProjectionModel(this, qFile))
-{
-    ui->setupUi(this);
-
-    initTableViewWidgets();
-}
-
-
-//*************************************************************************************************************
-
-ProjectionWindow::ProjectionWindow(QWidget *parent, QList<FiffProj>& dataProjs)
-: QDockWidget(parent)
-, ui(new Ui::ProjectionWindow)
-, m_pProjectionModel(new ProjectionModel(this, dataProjs))
-{
-    ui->setupUi(this);
-
-    initTableViewWidgets();
-}
-
-
-//*************************************************************************************************************
-
-ProjectionWindow::ProjectionWindow(QWidget *parent, FiffInfo::SPtr pFiffInfo)
-: QDockWidget(parent)
-, ui(new Ui::ProjectionWindow)
+, ui(new Ui::NoiseReductionWindow)
 , m_pFiffInfo(pFiffInfo)
 {
     ui->setupUi(this);
@@ -108,7 +79,7 @@ ProjectionWindow::ProjectionWindow(QWidget *parent, FiffInfo::SPtr pFiffInfo)
 
 //*************************************************************************************************************
 
-void ProjectionWindow::setFiffInfo(FiffInfo::SPtr pFiffInfo)
+void NoiseReductionWindow::setFiffInfo(FiffInfo::SPtr pFiffInfo)
 {
     m_pFiffInfo = pFiffInfo;
 
@@ -119,7 +90,7 @@ void ProjectionWindow::setFiffInfo(FiffInfo::SPtr pFiffInfo)
 
 //*************************************************************************************************************
 
-ProjectionModel* ProjectionWindow::getDataModel()
+ProjectionModel* NoiseReductionWindow::getDataModel()
 {
     return m_pProjectionModel;
 }
@@ -127,24 +98,7 @@ ProjectionModel* ProjectionWindow::getDataModel()
 
 //*************************************************************************************************************
 
-void ProjectionWindow::initTableViewWidgets()
-{
-//    //Set model
-//    ui->m_tableView_availableProjections->setModel(m_pProjectionModel);
-
-//    connect(m_pProjectionModel, &ProjectionModel::dataChanged,
-//            ui->m_tableView_availableProjections, &QTableView::resizeColumnsToContents);
-
-//    //Hide data column in view
-//    ui->m_tableView_availableProjections->setColumnHidden(3, true);
-
-//    ui->m_tableView_availableProjections->hide();
-}
-
-
-//*************************************************************************************************************
-
-void ProjectionWindow::createProjectorGroup()
+void NoiseReductionWindow::createProjectorGroup()
 {
     if(m_pFiffInfo)
     {
@@ -171,7 +125,7 @@ void ProjectionWindow::createProjectorGroup()
                 m_qListProjCheckBox.append(checkBox);
 
                 connect(checkBox, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-                        this, &ProjectionWindow::checkProjStatusChanged);
+                        this, &NoiseReductionWindow::checkProjStatusChanged);
 
                 topLayout->addWidget(checkBox, i, 0); //+2 because we already added two widgets before the first projector check box
 
@@ -193,7 +147,7 @@ void ProjectionWindow::createProjectorGroup()
             m_enableDisableProjectors->setChecked(bAllActivated);
             topLayout->addWidget(m_enableDisableProjectors, i+2, 0);
             connect(m_enableDisableProjectors, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-                this, &ProjectionWindow::enableDisableAllProj);
+                this, &NoiseReductionWindow::enableDisableAllProj);
 
             emit projSelectionChanged();
         }
@@ -206,7 +160,7 @@ void ProjectionWindow::createProjectorGroup()
 
 //*************************************************************************************************************
 
-void ProjectionWindow::createCompensatorGroup()
+void NoiseReductionWindow::createCompensatorGroup()
 {
     if(m_pFiffInfo)
     {
@@ -241,8 +195,8 @@ void ProjectionWindow::createCompensatorGroup()
             connect(m_pCompSignalMapper, SIGNAL(mapped(const QString &)),
                         this, SIGNAL(compClicked(const QString &)));
 
-            connect(this, &ProjectionWindow::compClicked,
-                    this, &ProjectionWindow::checkCompStatusChanged);
+            connect(this, &NoiseReductionWindow::compClicked,
+                    this, &NoiseReductionWindow::checkCompStatusChanged);
         }
 
         delete ui->m_groupBox_compensators->layout();
@@ -253,7 +207,7 @@ void ProjectionWindow::createCompensatorGroup()
 
 //*************************************************************************************************************
 
-void ProjectionWindow::enableDisableAllProj(bool status)
+void NoiseReductionWindow::enableDisableAllProj(bool status)
 {
     //Set all checkboxes to status
     for(int i=0; i<m_qListProjCheckBox.size(); i++)
@@ -271,7 +225,7 @@ void ProjectionWindow::enableDisableAllProj(bool status)
 
 //*************************************************************************************************************
 
-void ProjectionWindow::checkProjStatusChanged(bool status)
+void NoiseReductionWindow::checkProjStatusChanged(bool status)
 {
     Q_UNUSED(status)
 
@@ -292,7 +246,7 @@ void ProjectionWindow::checkProjStatusChanged(bool status)
 
 //*************************************************************************************************************
 
-void ProjectionWindow::checkCompStatusChanged(const QString & compName)
+void NoiseReductionWindow::checkCompStatusChanged(const QString & compName)
 {
     qDebug()<<compName;
 
@@ -313,7 +267,7 @@ void ProjectionWindow::checkCompStatusChanged(const QString & compName)
 
 //*************************************************************************************************************
 
-void ProjectionWindow::remove(QLayout* layout)
+void NoiseReductionWindow::remove(QLayout* layout)
 {
     QLayoutItem* child;
     while(layout->count()!=0)
