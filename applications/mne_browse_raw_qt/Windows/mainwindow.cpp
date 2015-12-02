@@ -202,9 +202,6 @@ void MainWindow::setupWindowWidgets()
     connect(m_pNoiseReductionWindow, &NoiseReductionWindow::projSelectionChanged,
             m_pDataWindow->getDataModel(), &RawModel::updateProjections);
 
-//    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
-//            m_pNoiseReductionWindow->getDataModel(), static_cast<void (ProjectionModel::*)(FiffInfo::SPtr)>(&ProjectionModel::addProjections));
-
     //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels - TODO: dirty move get rid of this here
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
         m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_pFiffInfo);
@@ -213,7 +210,6 @@ void MainWindow::setupWindowWidgets()
         m_pSelectionManagerWindow->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
         m_pSelectionManagerWindow->newFiffFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);
         m_pFilterWindow->newFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);
-        //m_pNoiseReductionWindow->getDataModel()->addProjections(m_pDataWindow->getDataModel()->m_pFiffInfo);
         m_pNoiseReductionWindow->setFiffInfo(m_pDataWindow->getDataModel()->m_pFiffInfo);
     }
 }
@@ -486,9 +482,6 @@ void MainWindow::openFile()
         m_qFileRaw.close();
 
     m_qFileRaw.setFileName(filename);
-
-    //Clear projection manager model
-    m_pNoiseReductionWindow->getDataModel()->clearModel();
 
     //Clear event model
     m_pEventWindow->getEventModel()->clearModel();
