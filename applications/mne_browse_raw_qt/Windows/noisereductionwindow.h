@@ -111,12 +111,6 @@ public:
     */
     void setFiffInfo(FiffInfo::SPtr pFiffInfo);
 
-    //=========================================================================================================
-    /**
-    * Returns the ProjectionModel of this window
-    */
-    ProjectionModel* getDataModel();
-
 signals:
     //=========================================================================================================
     /**

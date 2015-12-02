@@ -142,7 +142,7 @@ FORMS += \
     Windows/scalewindow.ui \
     Windows/chinfowindow.ui \
     Windows/filterwindowdock.ui \
-    Windows/NoiseReductionWindow.ui
+    Windows/noisereductionwindow.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

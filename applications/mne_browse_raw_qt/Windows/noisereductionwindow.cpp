@@ -90,14 +90,6 @@ void NoiseReductionWindow::setFiffInfo(FiffInfo::SPtr pFiffInfo)
 
 //*************************************************************************************************************
 
-ProjectionModel* NoiseReductionWindow::getDataModel()
-{
-    return m_pProjectionModel;
-}
-
-
-//*************************************************************************************************************
-
 void NoiseReductionWindow::createProjectorGroup()
 {
     if(m_pFiffInfo)
