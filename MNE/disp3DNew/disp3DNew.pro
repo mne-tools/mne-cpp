@@ -96,7 +96,8 @@ SOURCES += \
     helpers/window.cpp \
     control/control3dwidget.cpp \
     models/braintreemodel.cpp \
-    models/braintreeitem.cpp
+    models/braintreeitem.cpp \
+    models/abstracttreeitem.cpp
 
 HEADERS += \
     disp3dnew_global.h \
@@ -108,7 +109,9 @@ HEADERS += \
     helpers/window.h \
     control/control3dwidget.h \
     models/braintreemodel.h \
-    models/braintreeitem.h
+    models/braintreeitem.h \
+    models/abstracttreeitem.h \
+    helpers/types.h
 
 FORMS += \
     control/control3dwidget.ui \
