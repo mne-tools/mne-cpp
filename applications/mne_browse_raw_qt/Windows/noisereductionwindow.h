@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     projectionwindow.h
+* @file     noisereductionwindow.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,20 +30,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ProjectionWindow class.
+* @brief    Contains the declaration of the NoiseReductionWindow class.
 *
 */
 
-#ifndef PROJECTIONWINDOW_H
-#define PROJECTIONWINDOW_H
+#ifndef NOISEREDUCTIONWINDOW_H
+#define NOISEREDUCTIONWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "ui_projectionwindow.h"
-#include "../Models/projectionmodel.h"
+#include "ui_NoiseReductionWindow.h"
+
+#include "fiff/fiff_info.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -63,6 +65,13 @@
 namespace MNEBrowseRawQt
 {
 
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace FIFFLIB;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -70,43 +79,36 @@ namespace MNEBrowseRawQt
 //=============================================================================================================
 
 /**
-* DECLARE CLASS ProjectionWindow
+* DECLARE CLASS NoiseReductionWindow
 *
-* @brief The ProjectionWindow class provides a dock window for managing SSP operator projcetions.
+* @brief The NoiseReductionWindow class provides a dock window for managing SSP operator projcetions and compensators. Both for purposes of noise reduction.
 */
-class ProjectionWindow : public QDockWidget
+class NoiseReductionWindow : public QDockWidget
 {
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a ProjectionWindow which is a child of parent.
+    * Constructs a NoiseReductionWindow which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new ProjectionWindow becomes a window. If parent is another widget, ProjectionWindow becomes a child window inside parent. ProjectionWindow is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new NoiseReductionWindow becomes a window. If parent is another widget, NoiseReductionWindow becomes a child window inside parent. NoiseReductionWindow is deleted when its parent is deleted.
     */
-    ProjectionWindow(QWidget *parent = 0);
+    NoiseReductionWindow(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Constructs a ProjectionWindow which is a child of parent.
+    * Constructs a NoiseReductionWindow which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new ProjectionWindow becomes a window. If parent is another widget, ProjectionWindow becomes a child window inside parent. ProjectionWindow is deleted when its parent is deleted.
-    * @param [in] qFile file to read the projectors from.
+    * @param [in] parent        pointer to parent widget; If parent is 0, the new NoiseReductionWindow becomes a window. If parent is another widget, NoiseReductionWindow becomes a child window inside parent. NoiseReductionWindow is deleted when its parent is deleted.
+    * @param [in] pFiffInfo     fiff info with the projectors and compensators.
     */
-    ProjectionWindow(QWidget *parent, QFile& qFile);
+    NoiseReductionWindow(QWidget *parent, FiffInfo::SPtr pFiffInfo);
 
     //=========================================================================================================
     /**
-    * Constructs a ProjectionWindow which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new ProjectionWindow becomes a window. If parent is another widget, ProjectionWindow becomes a child window inside parent. ProjectionWindow is deleted when its parent is deleted.
-    * @param [in] dataProjs list with already loaded projectors.
+    * Set new fiff info
     */
-    ProjectionWindow(QWidget *parent, QList<FiffProj>& dataProjs);
-
-    ProjectionWindow(QWidget *parent, FiffInfo::SPtr pFiffInfo);
-
     void setFiffInfo(FiffInfo::SPtr pFiffInfo);
 
     //=========================================================================================================
@@ -135,12 +137,6 @@ signals:
     void compClicked(const QString &text);
 
 private:
-    //=========================================================================================================
-    /**
-    * inits the table widgets of this window
-    */
-    void initTableViewWidgets();
-
     //=========================================================================================================
     /**
     * Create the widgets used in the projector group
@@ -177,7 +173,7 @@ private:
     */
     void remove(QLayout* layout);
 
-    Ui::ProjectionWindow *ui;                       /**< Pointer to the qt designer generated ui class.*/
+    Ui::NoiseReductionWindow *ui;                       /**< Pointer to the qt designer generated ui class.*/
 
     QList<QCheckBox*>   m_qListProjCheckBox;            /**< List of projection CheckBox. */
     QList<QCheckBox*>   m_qListCompCheckBox;            /**< List of compensator CheckBox. */
@@ -186,9 +182,8 @@ private:
     QSignalMapper*      m_pCompSignalMapper;
 
     FiffInfo::SPtr      m_pFiffInfo;
-    ProjectionModel*    m_pProjectionModel;         /**< Pointer to the projection data model.*/
 };
 
 } // NAMESPACE MNEBrowseRawQt
 
-#endif // PROJECTIONWINDOW_H
+#endif // NOISEREDUCTIONWINDOW_H

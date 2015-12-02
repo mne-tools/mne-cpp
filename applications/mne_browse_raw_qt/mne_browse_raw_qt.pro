@@ -90,7 +90,6 @@ SOURCES += \
     Models/averagemodel.cpp \
     Models/rawmodel.cpp \
     Models/eventmodel.cpp \
-    Models/projectionmodel.cpp \
     Delegates/averagedelegate.cpp \
     Delegates/rawdelegate.cpp \
     Delegates/eventdelegate.cpp \
@@ -103,8 +102,8 @@ SOURCES += \
     Windows/averagewindow.cpp \
     Windows/scalewindow.cpp \
     Windows/chinfowindow.cpp \
-    Windows/projectionwindow.cpp \
     Utils/datapackage.cpp \    
+    Windows/noisereductionwindow.cpp
 
 HEADERS += \
     Utils/datamarker.h \
@@ -118,7 +117,6 @@ HEADERS += \
     Models/averagemodel.h \
     Models/rawmodel.h \
     Models/eventmodel.h \
-    Models/projectionmodel.h \
     Delegates/averagedelegate.h \
     Delegates/rawdelegate.h \
     Delegates/eventdelegate.h \
@@ -131,7 +129,7 @@ HEADERS += \
     Windows/averagewindow.h \
     Windows/scalewindow.h \
     Windows/chinfowindow.h \
-    Windows/projectionwindow.h \
+    Windows/NoiseReductionWindow.h \
     Utils/datapackage.h \
 
 FORMS += \
@@ -144,7 +142,7 @@ FORMS += \
     Windows/scalewindow.ui \
     Windows/chinfowindow.ui \
     Windows/filterwindowdock.ui \
-    Windows/projectionwindow.ui
+    Windows/NoiseReductionWindow.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

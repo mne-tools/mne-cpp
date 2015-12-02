@@ -84,7 +84,7 @@
 #include "averagewindow.h"
 #include "scalewindow.h"
 #include "chinfowindow.h"
-#include "projectionwindow.h"
+#include "NoiseReductionWindow.h"
 
 
 //*************************************************************************************************************
@@ -268,7 +268,7 @@ private:
     AverageWindow*          m_pAverageWindow;           /**< Average window can be used to plot calculated averages in a 2D layout scene.*/
     ScaleWindow*            m_pScaleWindow;             /**< Scale widget can be used to set the scaling of the different channels types. */
     ChInfoWindow*           m_pChInfoWindow;            /**< Dock window which shows the information about the curretly loaded data channels. */
-    ProjectionWindow*       m_pProjectionWindow;        /**< Dock widget to hold he projection manager. */
+    NoiseReductionWindow*       m_pNoiseReductionWindow;        /**< Dock widget to hold he projection manager. */
 
     QDockWidget*            m_pSelectionManagerWindowDock;
 

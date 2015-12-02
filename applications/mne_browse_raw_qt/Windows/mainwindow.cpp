@@ -137,9 +137,9 @@ void MainWindow::setupWindowWidgets()
     m_pFilterWindow->hide();
 
     //Create filter window - QTDesigner used - see / FormFiles
-    m_pProjectionWindow = new ProjectionWindow(this);
-    addDockWidget(Qt::LeftDockWidgetArea, m_pProjectionWindow);
-    m_pProjectionWindow->hide();
+    m_pNoiseReductionWindow = new NoiseReductionWindow(this);
+    addDockWidget(Qt::LeftDockWidgetArea, m_pNoiseReductionWindow);
+    m_pNoiseReductionWindow->hide();
 
     //Init windows - TODO: get rid of this here, do this inside the window classes
     m_pDataWindow->init();
@@ -197,13 +197,13 @@ void MainWindow::setupWindowWidgets()
 
     //Connect projection manager with fif file loading
     connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
-            m_pProjectionWindow, &ProjectionWindow::setFiffInfo);
+            m_pNoiseReductionWindow, &NoiseReductionWindow::setFiffInfo);
 
-    connect(m_pProjectionWindow, &ProjectionWindow::projSelectionChanged,
+    connect(m_pNoiseReductionWindow, &NoiseReductionWindow::projSelectionChanged,
             m_pDataWindow->getDataModel(), &RawModel::updateProjections);
 
 //    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
-//            m_pProjectionWindow->getDataModel(), static_cast<void (ProjectionModel::*)(FiffInfo::SPtr)>(&ProjectionModel::addProjections));
+//            m_pNoiseReductionWindow->getDataModel(), static_cast<void (ProjectionModel::*)(FiffInfo::SPtr)>(&ProjectionModel::addProjections));
 
     //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels - TODO: dirty move get rid of this here
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
@@ -213,8 +213,8 @@ void MainWindow::setupWindowWidgets()
         m_pSelectionManagerWindow->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
         m_pSelectionManagerWindow->newFiffFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);
         m_pFilterWindow->newFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);
-        //m_pProjectionWindow->getDataModel()->addProjections(m_pDataWindow->getDataModel()->m_pFiffInfo);
-        m_pProjectionWindow->setFiffInfo(m_pDataWindow->getDataModel()->m_pFiffInfo);
+        //m_pNoiseReductionWindow->getDataModel()->addProjections(m_pDataWindow->getDataModel()->m_pFiffInfo);
+        m_pNoiseReductionWindow->setFiffInfo(m_pDataWindow->getDataModel()->m_pFiffInfo);
     }
 }
 
@@ -311,10 +311,10 @@ void MainWindow::createToolBar()
     toolBar->addAction(showAverageManager);
 
     //Toggle visibility of the projection manager
-    QAction* showProjectionManager = new QAction(QIcon(":/Resources/Images/showProjectionWindow.png"),tr("Toggle projection manager"), this);
+    QAction* showProjectionManager = new QAction(QIcon(":/Resources/Images/showNoiseReductionWindow.png"),tr("Toggle projection manager"), this);
     showProjectionManager->setStatusTip(tr("Toggle the projection manager"));
     connect(showProjectionManager, &QAction::triggered, this, [=](){
-        showWindow(m_pProjectionWindow);
+        showWindow(m_pNoiseReductionWindow);
     });
     toolBar->addAction(showProjectionManager);
 
@@ -377,7 +377,7 @@ void MainWindow::connectMenus()
         showWindow(m_pChInfoWindow);
     });
     connect(ui->m_projectionManagerAction, &QAction::triggered, this, [=](){
-        showWindow(m_pProjectionWindow);
+        showWindow(m_pNoiseReductionWindow);
     });
 
     //Help
@@ -488,7 +488,7 @@ void MainWindow::openFile()
     m_qFileRaw.setFileName(filename);
 
     //Clear projection manager model
-    m_pProjectionWindow->getDataModel()->clearModel();
+    m_pNoiseReductionWindow->getDataModel()->clearModel();
 
     //Clear event model
     m_pEventWindow->getEventModel()->clearModel();
