@@ -566,6 +566,10 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(const FiffDirTree& p_Node, const QL
             one.kind = 2;
         else if (one.ctfkind == 1194541650) //hex2dec('47334252')
             one.kind = 3;
+        else if (one.ctfkind == 1194479433)
+            one.kind = 4;
+        else if (one.ctfkind == 1194544969)
+            one.kind = 5;
         else
             one.kind = one.ctfkind;
 

@@ -392,6 +392,14 @@ public slots:
     */
     void updateProjections();
 
+    //=========================================================================================================
+    /**
+    * Update the compensator
+    *
+    * @param[in] to    Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind)
+    */
+    void updateCompensator(int to);
+
 private slots:
     //=========================================================================================================
     /**

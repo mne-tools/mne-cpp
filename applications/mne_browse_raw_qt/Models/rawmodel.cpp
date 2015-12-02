@@ -962,7 +962,40 @@ void RawModel::updateProjections()
             m_pfiffIO->m_qlistRaw[0]->proj.resize(0,0);
         }
 
-        if(m_iCurAbsScrollPos==0)
+        if(m_iCurAbsScrollPos == 0)
+            resetPosition(m_iCurAbsScrollPos + firstSample());
+        else
+            resetPosition(m_iCurAbsScrollPos);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RawModel::updateCompensator(int to)
+{
+    //
+    //  Update the compensator
+    //
+    if(m_pFiffInfo)
+    {
+        FiffCtfComp newComp;
+
+        if(to != 0) {
+//            qDebug()<<"to"<<to;
+//            qDebug()<<"from"<<from;
+
+            this->m_pFiffInfo->make_compensator(0, to, newComp); //Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
+
+            newComp.kind = to;
+        }
+
+        this->m_pFiffInfo->set_current_comp(to);
+
+        //set compensator for upcoming read raw segement calls
+        m_pfiffIO->m_qlistRaw[0]->comp = newComp;
+
+        if(m_iCurAbsScrollPos == 0)
             resetPosition(m_iCurAbsScrollPos + firstSample());
         else
             resetPosition(m_iCurAbsScrollPos);

@@ -263,6 +263,10 @@ FiffInfo::SPtr RtDataClient::readInfo()
                                 p_pFiffInfo->comps[countComp].kind = 2;
                             else if (p_pFiffInfo->comps[countComp].ctfkind == 1194541650) //hex2dec('47334252')
                                 p_pFiffInfo->comps[countComp].kind = 3;
+                            else if (p_pFiffInfo->comps[countComp].ctfkind == 1194479433)
+                                p_pFiffInfo->comps[countComp].kind = 4;
+                            else if (p_pFiffInfo->comps[countComp].ctfkind == 1194544969)
+                                p_pFiffInfo->comps[countComp].kind = 5;
                             else
                                 p_pFiffInfo->comps[countComp].kind = p_pFiffInfo->comps[countComp].ctfkind;
                             break;

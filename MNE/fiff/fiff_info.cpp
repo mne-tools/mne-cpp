@@ -152,7 +152,6 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
 {
     MatrixXd C1, C2, comp_tmp;
 
-    qDebug() << "Todo add all need ctf variables.";
 //    if(ctf_comp.data)
 //        delete ctf_comp.data;
     ctf_comp.data->clear();

@@ -58,7 +58,7 @@ using namespace MNEBrowseRawQt;
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
-, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+, m_qFileRaw("./MNE-sample-data/CTF/spont_raw.fif")
 , m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
 , m_qEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
 , m_qSettings()
@@ -202,6 +202,9 @@ void MainWindow::setupWindowWidgets()
     connect(m_pNoiseReductionWindow, &NoiseReductionWindow::projSelectionChanged,
             m_pDataWindow->getDataModel(), &RawModel::updateProjections);
 
+    connect(m_pNoiseReductionWindow, &NoiseReductionWindow::compSelectionChanged,
+            m_pDataWindow->getDataModel(), &RawModel::updateCompensator);
+
     //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels - TODO: dirty move get rid of this here
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
         m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_pFiffInfo);
@@ -306,13 +309,13 @@ void MainWindow::createToolBar()
     });
     toolBar->addAction(showAverageManager);
 
-    //Toggle visibility of the projection manager
-    QAction* showProjectionManager = new QAction(QIcon(":/Resources/Images/showNoiseReductionWindow.png"),tr("Toggle projection manager"), this);
-    showProjectionManager->setStatusTip(tr("Toggle the projection manager"));
-    connect(showProjectionManager, &QAction::triggered, this, [=](){
+    //Toggle visibility of the noise reduction manager
+    QAction* showNoiseReductionManager = new QAction(QIcon(":/Resources/Images/showNoiseReductionWindow.png"),tr("Toggle noise reduction manager"), this);
+    showNoiseReductionManager->setStatusTip(tr("Toggle the noise reduction manager"));
+    connect(showNoiseReductionManager, &QAction::triggered, this, [=](){
         showWindow(m_pNoiseReductionWindow);
     });
-    toolBar->addAction(showProjectionManager);
+    toolBar->addAction(showNoiseReductionManager);
 
     toolBar->addSeparator();
 
@@ -372,7 +375,7 @@ void MainWindow::connectMenus()
     connect(ui->m_ChInformationAction, &QAction::triggered, this, [=](){
         showWindow(m_pChInfoWindow);
     });
-    connect(ui->m_projectionManagerAction, &QAction::triggered, this, [=](){
+    connect(ui->m_noiseReductionManagerAction, &QAction::triggered, this, [=](){
         showWindow(m_pNoiseReductionWindow);
     });
 
