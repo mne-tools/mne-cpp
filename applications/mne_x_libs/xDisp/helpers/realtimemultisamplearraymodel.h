@@ -567,6 +567,9 @@ private:
     SparseMatrix<double>    m_matSparseProj;                    /**< Sparse SSP projector */
 
     MatrixXd                m_matComp;                          /**< Compensator */
+    SparseMatrix<double>    m_matSparseComp;                    /**< Sparse compensator matrix */
+
+    SparseMatrix<double>    m_matSparseFull;                    /**< Full multiplication matrix  */
 
     MatrixXdR               m_matDataRaw;                       /**< The raw data */
     MatrixXdR               m_matDataFiltered;                  /**< The filtered data */
