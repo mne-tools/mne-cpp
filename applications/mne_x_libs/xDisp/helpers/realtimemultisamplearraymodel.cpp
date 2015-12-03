@@ -350,16 +350,11 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
 //            std::cout<<"m_matDataRaw.cols(): "<<m_matDataRaw.cols()<<std::endl;
 //            std::cout<<"data.at(b).cols()-m_iResidual: "<<data.at(b).cols()-m_iResidual<<std::endl<<std::endl;
 
-            if(doProj)
-                m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseProj * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-            else
-                m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-
             if(doComp) {
                 if(doProj) {
-                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseProj * m_matComp * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
+                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseFull * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
                 } else {
-                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matComp * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
+                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseComp * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
                 }
             } else {
                 if(doProj) {
@@ -393,9 +388,9 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
         //std::cout<<"incoming data is ok"<<std::endl;
         if(doComp) {
             if(doProj) {
-                m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseProj * m_matComp * data.at(b);
+                m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseFull * data.at(b);
             } else {
-                m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matComp * data.at(b);
+                m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseComp * data.at(b);
             }
         } else {
             if(doProj) {
@@ -599,6 +594,9 @@ void RealTimeMultiSampleArrayModel::updateProjection()
 //        std::cout << "Proj\n";
 //        std::cout << m_matProj.block(0,0,10,10) << std::endl;
 
+        //
+        // Make proj sparse
+        //
         qint32 nchan = this->m_pFiffInfo->nchan;
         qint32 i, k;
 
@@ -606,9 +604,6 @@ void RealTimeMultiSampleArrayModel::updateProjection()
         std::vector<T> tripletList;
         tripletList.reserve(nchan);
 
-        //
-        // Make proj sparse
-        //
         tripletList.clear();
         tripletList.reserve(m_matProj.rows()*m_matProj.cols());
         for(i = 0; i < m_matProj.rows(); ++i)
@@ -619,6 +614,9 @@ void RealTimeMultiSampleArrayModel::updateProjection()
         m_matSparseProj = SparseMatrix<double>(m_matProj.rows(),m_matProj.cols());
         if(tripletList.size() > 0)
             m_matSparseProj.setFromTriplets(tripletList.begin(), tripletList.end());
+
+        //Create full multiplication matrix
+        m_matSparseFull = m_matSparseProj * m_matSparseComp;
     }
 }
 
@@ -646,6 +644,30 @@ void RealTimeMultiSampleArrayModel::updateCompensator(int to)
 
         this->m_pFiffInfo->set_current_comp(to);
         m_matComp = newComp.data->data;
+
+        //
+        // Make proj sparse
+        //
+        qint32 nchan = this->m_pFiffInfo->nchan;
+        qint32 i, k;
+
+        typedef Eigen::Triplet<double> T;
+        std::vector<T> tripletList;
+        tripletList.reserve(nchan);
+
+        tripletList.clear();
+        tripletList.reserve(m_matComp.rows()*m_matComp.cols());
+        for(i = 0; i < m_matComp.rows(); ++i)
+            for(k = 0; k < m_matComp.cols(); ++k)
+                if(m_matComp(i,k) != 0)
+                    tripletList.push_back(T(i, k, m_matComp(i,k)));
+
+        m_matSparseComp = SparseMatrix<double>(m_matComp.rows(),m_matComp.cols());
+        if(tripletList.size() > 0)
+            m_matSparseComp.setFromTriplets(tripletList.begin(), tripletList.end());
+
+        //Create full multiplication matrix
+        m_matSparseFull = m_matSparseProj * m_matSparseComp;
     }
 }
 
