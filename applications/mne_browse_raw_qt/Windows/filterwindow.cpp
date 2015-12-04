@@ -84,7 +84,7 @@ FilterWindow::~FilterWindow()
 
 //*************************************************************************************************************
 
-void FilterWindow::newFileLoaded(FiffInfo::SPtr pFiffInfo)
+void FilterWindow::newFileLoaded(FiffInfo* pFiffInfo)
 {
     Q_UNUSED(pFiffInfo);
     filterParametersChanged();

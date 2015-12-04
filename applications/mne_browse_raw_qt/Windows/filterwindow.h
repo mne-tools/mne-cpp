@@ -103,7 +103,7 @@ public:
     /**
     * On new file loaded.
     */
-    void newFileLoaded(FiffInfo::SPtr pFiffInfo);
+    void newFileLoaded(FiffInfo* pFiffInfo);
 
 private:
     //=========================================================================================================

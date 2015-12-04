@@ -103,13 +103,13 @@ public:
     * @param [in] parent        pointer to parent widget; If parent is 0, the new NoiseReductionWindow becomes a window. If parent is another widget, NoiseReductionWindow becomes a child window inside parent. NoiseReductionWindow is deleted when its parent is deleted.
     * @param [in] pFiffInfo     fiff info with the projectors and compensators.
     */
-    NoiseReductionWindow(QWidget *parent, FiffInfo::SPtr pFiffInfo);
+    NoiseReductionWindow(QWidget *parent, FiffInfo* pFiffInfo);
 
     //=========================================================================================================
     /**
     * Set new fiff info
     */
-    void setFiffInfo(FiffInfo::SPtr pFiffInfo);
+    void setFiffInfo(FiffInfo* pFiffInfo);
 
 signals:
     //=========================================================================================================
@@ -175,7 +175,7 @@ private:
 
     QSignalMapper*      m_pCompSignalMapper;
 
-    FiffInfo::SPtr      m_pFiffInfo;
+    FiffInfo*      m_pFiffInfo;
 };
 
 } // NAMESPACE MNEBrowseRawQt

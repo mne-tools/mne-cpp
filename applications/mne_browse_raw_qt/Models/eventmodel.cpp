@@ -61,7 +61,7 @@ EventModel::EventModel(QObject *parent)
 , m_iFirstSample(0)
 , m_bFileloaded(false)
 , m_sFilterEventType("All")
-, m_pFiffInfo(FiffInfo::SPtr(new FiffInfo))
+, m_pFiffInfo(new FiffInfo)
 {
     //Create default event type color map
     m_eventTypeColor[1] = QColor(Qt::black);
@@ -84,7 +84,7 @@ EventModel::EventModel(QFile &qFile, QObject *parent)
 , m_iFirstSample(0)
 , m_bFileloaded(false)
 , m_sFilterEventType("All")
-, m_pFiffInfo(FiffInfo::SPtr(new FiffInfo))
+, m_pFiffInfo(new FiffInfo)
 {
     //Create default event type color map
     m_eventTypeColor[1] = QColor(Qt::black);
@@ -414,7 +414,7 @@ bool EventModel::saveEventData(QFile& qFile)
 
 //*************************************************************************************************************
 
-void EventModel::setFiffInfo(FiffInfo::SPtr pFiffInfo)
+void EventModel::setFiffInfo(FiffInfo* pFiffInfo)
 {
     m_pFiffInfo = pFiffInfo;
 }
@@ -440,7 +440,7 @@ void EventModel::setCurrentMarkerPos(int markerPos)
 
 //*************************************************************************************************************
 
-FiffInfo::SPtr EventModel::getFiffInfo() const
+FiffInfo* EventModel::getFiffInfo() const
 {
     return m_pFiffInfo;
 }

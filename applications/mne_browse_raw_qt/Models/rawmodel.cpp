@@ -63,7 +63,7 @@ RawModel::RawModel(QObject *parent)
 , m_bEndReached(false)
 , m_bReloading(false)
 , m_bProcessing(false)
-, m_pFiffInfo(FiffInfo::SPtr(new FiffInfo()))
+, m_pFiffInfo(new FiffInfo())
 , m_pfiffIO(QSharedPointer<FiffIO>(new FiffIO()))
 , m_filterChType("All")
 {
@@ -110,7 +110,7 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
 , m_bEndReached(false)
 , m_bReloading(false)
 , m_bProcessing(false)
-, m_pFiffInfo(FiffInfo::SPtr(new FiffInfo()))
+, m_pFiffInfo(new FiffInfo())
 , m_pfiffIO(QSharedPointer<FiffIO>(new FiffIO()))
 , m_filterChType("All")
 {
@@ -362,7 +362,7 @@ void RawModel::genStdFilterOps()
 bool RawModel::loadFiffData(QFile* qFile)
 {
     beginResetModel();
-    clearModel();
+//    clearModel();
 
     MatrixXd t_data,t_times; //type is later on (when append to m_data) casted into MatrixXdR (Row-Major)
     QSharedPointer<DataPackage> newDataPackage;
@@ -416,7 +416,7 @@ bool RawModel::writeFiffData(QIODevice *p_IODevice)
     RowVectorXi sel;
 
 //    std::cout << "Writing file " << QFile(&p_IODevice).fileName().toLatin1() << std::endl;
-    FiffStream::SPtr outfid = Fiff::start_writing_raw(*p_IODevice,*m_pFiffInfo.data(),cals);
+    FiffStream::SPtr outfid = Fiff::start_writing_raw(*p_IODevice,*m_pFiffInfo,cals);
 
     //Setup reading parameters
     fiff_int_t from = firstSample();
@@ -474,7 +474,7 @@ void RawModel::loadFiffInfos()
         m_chInfolist.append(m_pfiffIO->m_qlistRaw[0]->info.chs[i]);
 
     //loads fiffInfo
-    m_pFiffInfo = FiffInfo::SPtr(&m_pfiffIO->m_qlistRaw[0]->info);
+    m_pFiffInfo = &m_pfiffIO->m_qlistRaw[0]->info;
 }
 
 
@@ -483,8 +483,7 @@ void RawModel::loadFiffInfos()
 void RawModel::clearModel()
 {
     //FiffIO object
-    //m_pfiffIO.clear();
-    //m_pFiffInfo->clear();
+    m_pfiffIO.clear();
     m_chInfolist.clear();
 
     //data model structure
