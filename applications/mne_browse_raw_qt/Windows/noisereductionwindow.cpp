@@ -65,7 +65,7 @@ NoiseReductionWindow::NoiseReductionWindow(QWidget *parent)
 
 //*************************************************************************************************************
 
-NoiseReductionWindow::NoiseReductionWindow(QWidget *parent, FiffInfo::SPtr pFiffInfo)
+NoiseReductionWindow::NoiseReductionWindow(QWidget *parent, FiffInfo* pFiffInfo)
 : QDockWidget(parent)
 , ui(new Ui::NoiseReductionWindow)
 , m_pFiffInfo(pFiffInfo)
@@ -79,7 +79,7 @@ NoiseReductionWindow::NoiseReductionWindow(QWidget *parent, FiffInfo::SPtr pFiff
 
 //*************************************************************************************************************
 
-void NoiseReductionWindow::setFiffInfo(FiffInfo::SPtr pFiffInfo)
+void NoiseReductionWindow::setFiffInfo(FiffInfo* pFiffInfo)
 {
     m_pFiffInfo = pFiffInfo;
 
