@@ -58,6 +58,8 @@
 
 #include <QSharedPointer>
 #include <QDebug>
+#include <QFile>
+//#include <QString>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -114,6 +116,16 @@ public:
     */
      MatrixXd calculate(const MatrixXd & sVert);
 
+     //=========================================================================================================
+     /**
+     * Warps the source vertices with previously calculated weightningparameters
+     *
+     * @param[in]  electrodeFileName    .txt file of electrodes
+     *
+     * @return electrodes   Matrix with electrode positions
+     */
+     MatrixXd readsLm(const QString &electrodeFileName);
+
 private:
     //=========================================================================================================
     /**
@@ -124,7 +136,7 @@ private:
     * @param[out] warpWeight Weighting parameters of the tps warp
     * @param[out] polWeight  Weighting papameters of the polynomial warp
     */
-    bool calcWeighting(const MatrixXd & sLm, const MatrixXd &dLm, MatrixXd &warpWeight, MatrixXd &polWeight);
+    bool calcWeighting(const MatrixXd & sLm, const MatrixXd &dLm);
 
     //=========================================================================================================
     /**

@@ -55,13 +55,7 @@ using namespace UTILSLIB;
 
 MatrixXd Warp::calculate(const MatrixXd &sLm, const MatrixXd &dLm, const MatrixXd &sVert)
 {
-     MatrixXd warpWeight = MatrixXd::Zero(sLm.rows(),3);
-     MatrixXd polWeight = MatrixXd::Zero(4,3);
-
-     std::cout << "Here is the matrix sLm:" << std::endl << sLm << std::endl;
-
-     calcWeighting(sLm, dLm, warpWeight, polWeight);
-
+     calcWeighting(sLm, dLm);
      MatrixXd wVert = warpVertices(sVert);
      return wVert;
 }
@@ -71,43 +65,43 @@ MatrixXd Warp::calculate(const MatrixXd &sLm, const MatrixXd &dLm, const MatrixX
 
 MatrixXd Warp::calculate(const MatrixXd &sVert)
 {
-    MatrixXd wVert = MatrixXd::Zero(3,sVert.rows());
+    MatrixXd wVert = warpVertices(sVert);
     return wVert;
 }
 
 
 //*************************************************************************************************************
 
-bool Warp::calcWeighting(const MatrixXd &sLm, const MatrixXd &dLm, MatrixXd &warpWeight, MatrixXd &polWeight)
+bool Warp::calcWeighting(const MatrixXd &sLm, const MatrixXd &dLm)
 {
-    MatrixXd K = MatrixXd::Zero(sLm.rows(),sLm.rows());             //K(i,j)=||sLm(i)-sLm(j)||
+    MatrixXd K = MatrixXd::Zero(sLm.rows(),sLm.rows());     //K(i,j)=||sLm(i)-sLm(j)||
     for (int i=0; i<sLm.rows(); i++)
         K.col(i)=((sLm.rowwise()-sLm.row(i)).rowwise().norm());
 
-    std::cout << "Here is the matrix K:" << std::endl << K << std::endl;
+//    std::cout << "Here is the matrix K:" << std::endl << K << std::endl;
 
-    MatrixXd P (sLm.rows(),4);                                      //P=[ones,sLm]
+    MatrixXd P (sLm.rows(),4);                              //P=[ones,sLm]
     P << MatrixXd::Ones(sLm.rows(),1),sLm;
-    std::cout << "Here is the matrix P:" << std::endl << P << std::endl;
+//    std::cout << "Here is the matrix P:" << std::endl << P << std::endl;
 
-    MatrixXd L ((sLm.rows()+4),(sLm.rows()+4));
+    MatrixXd L ((sLm.rows()+4),(sLm.rows()+4));             //L=Full Matrix of the linear eq.
     L <<    K,P,
             P.transpose(),MatrixXd::Zero(4,4);
-    std::cout << "Here is the matrix L:" << std::endl << L << std::endl;
+//    std::cout << "Here is the matrix L:" << std::endl << L << std::endl;
 
-    MatrixXd Y ((dLm.rows()+4),3);                                  //Y=[dLm,Zero]
+    MatrixXd Y ((dLm.rows()+4),3);                          //Y=[dLm,Zero]
     Y <<    dLm,
             MatrixXd::Zero(4,3);
-    std::cout << "Here is the matrix Y:" << std::endl << Y << std::endl;
+//    std::cout << "Here is the matrix Y:" << std::endl << Y << std::endl;
 
-    // calculate the weighting matrix
-    MatrixXd W ((dLm.rows()+4),3);                                  //W=[warpWeight,polWeight]
-    Eigen::FullPivLU <MatrixXd> Lu(L);
+    //
+    // calculate the weighting matrix (Y=L*W)
+    //
+    MatrixXd W ((dLm.rows()+4),3);                          //W=[warpWeight,polWeight]
+    Eigen::FullPivLU <MatrixXd> Lu(L);                      //LU decomposition is one method to solve lin. eq.
     W=Lu.solve(Y);
     std::cout << "Here is the matrix W:" << std::endl << W << std::endl;
 
-    warpWeight = W.topRows(sLm.rows());
-    polWeight = W.bottomRows(4);
     this->warpWeight = W.topRows(sLm.rows());
     this->polWeight = W.bottomRows(4);
     this->sLm=sLm;
@@ -120,18 +114,61 @@ bool Warp::calcWeighting(const MatrixXd &sLm, const MatrixXd &dLm, MatrixXd &war
 
 MatrixXd Warp::warpVertices(const MatrixXd &sVert)
 {
-    MatrixXd wVert = sVert * this->polWeight.bottomRows(3);
-    std::cout << "Here is the matrix wVert 1.Step:" << std::endl << wVert << std::endl;
+    MatrixXd wVert = sVert * this->polWeight.bottomRows(3);         //Pol. Warp
+    wVert.rowwise() += this->polWeight.row(0);                      //Translation
 
-    wVert.rowwise() += this->polWeight.row(0);
-    std::cout << "Here is the matrix wVert 2.Step:" << std::endl << wVert << std::endl;
-
-    MatrixXd K = MatrixXd::Zero(sVert.rows(),this->sLm.rows());             //K(i,j)=||sLm(i)-sLm(j)||
+    //
+    // TPS Warp
+    //
+    MatrixXd K = MatrixXd::Zero(sVert.rows(),this->sLm.rows());     //K(i,j)=||sLm(i)-sLm(j)||
     for (int i=0; i<sVert.rows(); i++)
         K.row(i)=((this->sLm.rowwise()-sVert.row(i)).rowwise().norm().transpose());
-    std::cout << "Here is the matrix K:" << std::endl << K << std::endl;
+//    std::cout << "Here is the matrix K:" << std::endl << K << std::endl;
 
     wVert += K*this->warpWeight;
-    std::cout << "Here is the matrix wVert 3.Step:" << std::endl << wVert << std::endl;
+//    std::cout << "Here is the matrix wVert:" << std::endl << wVert << std::endl;
     return wVert;
+}
+
+//*************************************************************************************************************
+
+MatrixXd Warp::readsLm(const QString &electrodeFileName)
+{
+    MatrixXd electrodes;
+    QFile file(electrodeFileName);
+
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug()<<"Error opening file";
+//        return false;
+    }
+
+    //Start reading from file
+    double numberElectrodes;
+    QTextStream in(&file);
+    int i=0;
+
+    while(!in.atEnd())
+    {
+        QString line = in.readLine();
+        QStringList fields = line.split(QRegExp("\\s+"));
+
+        //Delete last element if it is a blank character
+        if(fields.at(fields.size()-1) == "")
+            fields.removeLast();
+
+        //Read number of electrodes
+        if(i == 0){
+            numberElectrodes = fields.at(fields.size()-1).toDouble();
+            electrodes = MatrixXd::Zero(numberElectrodes, 3);
+        }
+        //Read actual electrode positions
+        else{
+            Vector3d x;
+            x << fields.at(fields.size()-3).toDouble(),fields.at(fields.size()-2).toDouble(),fields.at(fields.size()-1).toDouble();
+            electrodes.row(i-1)=x.transpose();
+        }
+        i++;
+    }
+    return electrodes;
+
 }
