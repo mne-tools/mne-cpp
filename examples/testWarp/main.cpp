@@ -39,8 +39,17 @@
 // INCLUDES
 //=============================================================================================================
 
+//#include <fstream>
 #include <iostream>
+
 #include <utils/warp.h>
+#include <fiff/fiff.h>
+#include <mne/mne_bem.h>
+
+
+#include <QFile>
+
+
 
 
 //*************************************************************************************************************
@@ -56,6 +65,9 @@
 //=============================================================================================================
 
 using namespace UTILSLIB;
+using namespace FIFFLIB;
+
+using namespace std;
 
 
 //*************************************************************************************************************
@@ -73,65 +85,106 @@ using namespace UTILSLIB;
 * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
 */
 
+#define MAXBUFSIZE  ((int) 1e6)
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    Matrix<double,6,3> sLm;
-    sLm <<  1,1,1,
-            2,1,1,
-            3,1,1,
-            1,2,1,
-            2,2,1,
-            3,2,1;
-//    sLm<<   1, 2, 3,
-//            4, 5, 6,
-//            7, 8, 10,
-//            1, 2, 3,
-//            4, 5, 6,
-//            7, 8, 10;
-    std::cout << "Here is the matrix sLm:" << std::endl << sLm << std::endl;
+//    Matrix<double,6,3> sLm;
+//    sLm <<  1,1,1,
+//            2,1,1,
+//            3,1,1,
+//            1,2,1,
+//            2,2,1,
+//            3,2,1;
+//    std::cout << "Here is the matrix sLm:" << std::endl << sLm << std::endl;
 
-    Matrix<double,6,3> dLm;
-    dLm <<  1,1,2,
-            2,1,3,
-            3,1,2,
-            1,2,2,
-            2,2,3,
-            3,2,2;
-//    dLm = sLm + MatrixXd::Ones(6,3);
+//    Matrix<double,6,3> dLm;
+//    dLm <<  1,1,2,
+//            2,1,3,
+//            3,1,2,
+//            1,2,2,
+//            2,2,3,
+//            3,2,2;
 
-    Matrix<double,16,3> sVert;
-    sVert <<1.0,0.5,1,
-            1.5,0.5,1,
-            2.0,0.5,1,
-            2.3,0.5,1,
-            2.7,0.5,1,
-            3.0,0.5,1,
-            3.5,0.5,1,
-            4.0,0.5,1,
-            1.0,1,1,
-            1.5,1,1,
-            2.0,1,1,
-            2.3,1,1,
-            2.7,1,1,
-            3.0,1,1,
-            3.5,1,1,
-            4.0,1,1;;
-//    Matrix<double,6,3> sVert;
-//    sVert<< 1, 2, 3,
-//            4, 5, 6,
-//            7, 8, 10,
-//            1, 2, 3,
-//            4, 5, 6,
-//            7, 8, 10;
+//    Matrix<double,16,3> sVert;
+//    sVert <<1.0,0.5,1,
+//            1.5,0.5,1,
+//            2.0,0.5,1,
+//            2.3,0.5,1,
+//            2.7,0.5,1,
+//            3.0,0.5,1,
+//            3.5,0.5,1,
+//            4.0,0.5,1,
+//            1.0,1,1,
+//            1.5,1,1,
+//            2.0,1,1,
+//            2.3,1,1,
+//            2.7,1,1,
+//            3.0,1,1,
+//            3.5,1,1,
+//            4.0,1,1;;
 
-    MatrixXd wVert = MatrixXd::Zero(sVert.rows(),3);
+    //
+    // Read Electrode Positions from fiff
+    //
+    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    FiffRawData raw(t_fileRaw);
+    QList<FiffChInfo> ChannelInfo= raw.info.chs;
+    QList<QVector<double>> tempElecInfo;
+    QList<QString> ElecChanName;
+    for (int i=0; i<ChannelInfo.length();i++)
+    {
+        if (ChannelInfo[i].kind==2)
+        {
+            QVector<double> temp;
+            ElecChanName.append(ChannelInfo[i].ch_name);
+            temp.append(ChannelInfo[i].loc(0,0));
+            temp.append(ChannelInfo[i].loc(1,0));
+            temp.append(ChannelInfo[i].loc(2,0));
+            tempElecInfo.append(temp);
+        }
+    }
+    MatrixXd ElecPos(tempElecInfo.length(),3);
+    for (int i=0; i<tempElecInfo.length();i++)
+    {
+        ElecPos(i,0)=tempElecInfo[i][0];
+        ElecPos(i,1)=tempElecInfo[i][1];
+        ElecPos(i,2)=tempElecInfo[i][2];
+    }
 
+    std::cout << "Here is the matrix ElecPos:" << std::endl << ElecPos << std::endl;
+
+    //
+    // read electrode positions from Database
+    //
+//    QString electrodeFileName= "./MNE-sample-data/MriDatabase/FirstYear/Sources/Electrodes/AVG3-0Months_10-5_Electrodes.txt";
+//    Matrix<double, Dynamic ,3> ElecPos = test.readsLm(electrodeFileName);
+//    std::cout << "Here is the matrix ElecPos:" << std::endl << ElecPos << std::endl;
+
+    //
+    //Read BEM from fiff
+    //
+    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    MNELIB::MNEBem t_Bem (t_fileBem) ;
+
+    //
+    // prepare warp
+    //
+    MatrixXd sLm(ElecPos.rows(),3);
+    sLm=ElecPos;
+    MatrixXd dLm=sLm.array()+0.5;
+    MNELIB::MNEBemSurface skin=t_Bem[0];
+    MatrixXd sVert=skin.rr.cast<double>();
+
+    //
+    // calculate Warp
+    //
     Warp test;
+    MatrixXd wVert(sVert.rows(),3);
     wVert = test.calculate(sLm, dLm, sVert);
-    std::cout << "Here is the final matrix wVert:" << std::endl << wVert << std::endl;
+//    std::cout << "Here is the final matrix wVert:" << std::endl << wVert << std::endl;
 
 
     return a.exec();
