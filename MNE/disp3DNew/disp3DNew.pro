@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       += widgets 3dcore 3drender 3dinput concurrent
+QT       += widgets 3dcore 3drender 3dinput
 
 DEFINES += DISP3DNEW_LIBRARY
 
@@ -94,6 +94,7 @@ SOURCES += \
     helpers/renderable3Dentity.cpp \
     helpers/custommesh.cpp \
     helpers/window.cpp \
+    helpers/control3dwidget.cpp \
 
 HEADERS += \
     disp3dnew_global.h \
@@ -103,7 +104,10 @@ HEADERS += \
     helpers/renderable3Dentity.h \
     helpers/custommesh.h \
     helpers/window.h \
+    helpers/control3dwidget.h \
 
+FORMS += \
+    helpers/control3dwidget.ui \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -115,3 +119,4 @@ header_files.path = $${MNE_INCLUDE_DIR}/disp3DNew
 INSTALLS += header_files
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+

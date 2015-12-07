@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>MNE Library</DisplayName>
+    <Description>MNE libraryies for, e.g., FreeSurfer (fs), Fiff structures (fiff), MNE structures (MNE) and displaying (disp, disp3d).</Description>
+    <ForcedInstallation>true</ForcedInstallation>
+    <Version>1.0.0-1</Version>
+    <ReleaseDate>2014-10-19</ReleaseDate>
+    <Name>org.mne_cpp.suite.mne</Name>
+    <Licenses>
+        <License name="MNE Library License (BSD 3-Clause)" file="license_mne.txt" />
+    </Licenses>
+    <Script>installscript.qs</Script>
+    <SortingPriority>80</SortingPriority>
+</Package>

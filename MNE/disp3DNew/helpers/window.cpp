@@ -61,7 +61,6 @@ Window::Window(QScreen *screen)
     setSurfaceType(QSurface::OpenGLSurface);
 
     resize(1024, 768);
-
 //    QSurfaceFormat format;
 //    if (QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGL) {
 //        format.setVersion(4, 3);

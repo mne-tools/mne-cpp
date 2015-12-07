@@ -283,7 +283,7 @@ const QMap<QString,QPointF>& SelectionManagerWindow::getLayoutMap()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::newFiffFileLoaded(FiffInfo::SPtr pFiffInfo)
+void SelectionManagerWindow::newFiffFileLoaded(FiffInfo* pFiffInfo)
 {
     Q_UNUSED(pFiffInfo);
 

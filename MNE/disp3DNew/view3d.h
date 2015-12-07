@@ -41,6 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <iostream>
 #include "disp3dnew_global.h"
 
 #include "3DObjects/brain.h"
@@ -54,9 +55,8 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-
+#include <QWidget>
 #include <QWindow>
-
 #include <QDebug>
 
 #include <Qt3DCore/QAspectEngine>
@@ -83,7 +83,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
+// DEFINE NAMESPACE DISP3DNEWLIB
 //=============================================================================================================
 
 namespace DISP3DNEWLIB
@@ -120,7 +120,7 @@ public:
     * Default constructor
     *
     */
-    explicit View3D();
+    explicit View3D(/*QWidget *parent = 0*/);
 
     //=========================================================================================================
     /**
@@ -161,7 +161,7 @@ protected:
 
     QList<BrainObject::SPtr>            m_lBrainObjectList;
 
-    Brain::SPtr     m_pBrain;                   /**< Pointer to the Brain class, which holds all BrainObjects. */
+    Brain::SPtr                         m_pBrain;                       /**< Pointer to the Brain class, which holds all BrainObjects. */
 
     bool            m_bCameraTransMode;         /**< Flag for activating/deactivating the translation camera mode. */
     bool            m_bModelRotationMode;       /**< Flag for activating/deactivating the rotation model mode. */

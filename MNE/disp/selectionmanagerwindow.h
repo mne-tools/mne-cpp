@@ -169,7 +169,7 @@ public:
     /**
     * call this whenever a new file was loaded.
     */
-    void newFiffFileLoaded(FiffInfo::SPtr pFiffInfo);
+    void newFiffFileLoaded(FiffInfo* pFiffInfo);
 
     //=========================================================================================================
     /**

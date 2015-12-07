@@ -47,7 +47,7 @@
 
 using namespace DISPLIB;
 
-TFplot::TFplot(MatrixXd tf_matrix, qreal sample_rate, qreal lower_frq, qreal upper_frq, ColorMaps cmap = ColorMaps::Jet)
+TFplot::TFplot(MatrixXd tf_matrix, qreal sample_rate, qreal lower_frq, qreal upper_frq, ColorMaps cmap = Jet)
 {
     qreal max_frq = sample_rate/2.0;
     qreal frq_per_px = max_frq/tf_matrix.rows();
@@ -83,7 +83,7 @@ TFplot::TFplot(MatrixXd tf_matrix, qreal sample_rate, qreal lower_frq, qreal upp
 
 //-----------------------------------------------------------------------------------------------------------------
 
-TFplot::TFplot(MatrixXd tf_matrix, qreal sample_rate, ColorMaps cmap = ColorMaps::Jet)
+TFplot::TFplot(MatrixXd tf_matrix, qreal sample_rate, ColorMaps cmap = Jet)
 {   
     calc_plot(tf_matrix, sample_rate, cmap, 0, 0);
 }

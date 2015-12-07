@@ -71,30 +71,16 @@ GUSBAmpProducer::GUSBAmpProducer(GUSBAmp* pGUSBAmp)
 
 GUSBAmpProducer::~GUSBAmpProducer()
 {
-    //cout << "GUSBAmpProducer::~GUSBAmpProducer()" << endl;
+    //qDebug() << "GUSBAmpProducer::~GUSBAmpProducer()" << endl;
 }
 
 
 //*************************************************************************************************************
 
-void GUSBAmpProducer::start(int iNumberOfChannels,
-                     int iSamplingFrequency,
-                     int iSamplesPerBlock,
-                     bool bUseChExponent,
-                     bool bUseUnitGain,
-                     bool bUseUnitOffset,
-                     bool bWriteDriverDebugToFile,
-                     QString sOutputFilePath)
+void GUSBAmpProducer::start()
 {
     //Initialise device
-    if(m_pGUSBAmpDriver->initDevice(iNumberOfChannels,
-                              iSamplingFrequency,
-                              iSamplesPerBlock,
-                              bUseChExponent,
-                              bUseUnitGain,
-                              bUseUnitOffset,
-                              bWriteDriverDebugToFile,
-                              sOutputFilePath))
+    if(m_pGUSBAmpDriver->initDevice())
     {
         m_bIsRunning = true;
         QThread::start();
@@ -126,17 +112,16 @@ void GUSBAmpProducer::stop()
 
 void GUSBAmpProducer::run()
 {
-    MatrixXf matRawBuffer(m_pGUSBAmp->m_iNumberOfChannels, m_pGUSBAmp->m_iSamplesPerBlock);
+    MatrixXf matRawBuffer(128,100);
 
-    while(m_bIsRunning)
-    {
-        //std::cout<<"GUSBAmpProducer::run()"<<std::endl;
+    while(m_bIsRunning) {
+        //std::qDebug()<<"GUSBAmpProducer::run()"<<std::endl;
         //Get the GUSBAmp EEG data out of the device buffer and write received data to circular buffer
         if(m_pGUSBAmpDriver->getSampleMatrixValue(matRawBuffer))
             m_pGUSBAmp->m_pRawMatrixBuffer_In->push(&matRawBuffer);
     }
 
-    //std::cout<<"EXITING - GUSBAmpProducer::run()"<<std::endl;
+    //std::qDebug()<<"EXITING - GUSBAmpProducer::run()"<<std::endl;
 }
 
 

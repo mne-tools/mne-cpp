@@ -95,8 +95,7 @@ SOURCES += \
         gusbampproducer.cpp \
         gusbampdriver.cpp \
         FormFiles/gusbampsetupwidget.cpp \
-        FormFiles/gusbampaboutwidget.cpp \
-        FormFiles/gusbampsetupprojectwidget.cpp
+        FormFiles/gusbampaboutwidget.cpp
 
 HEADERS += \
         gusbamp.h\
@@ -104,13 +103,11 @@ HEADERS += \
         gusbampproducer.h \
         gusbampdriver.h \
         FormFiles/gusbampsetupwidget.h \
-        FormFiles/gusbampaboutwidget.h \
-        FormFiles/gusbampsetupprojectwidget.h
+        FormFiles/gusbampaboutwidget.h
 
 FORMS += \
         FormFiles/gusbampsetupwidget.ui \
-        FormFiles/gusbampabout.ui \
-        FormFiles/gusbampsetupprojectwidget.ui
+        FormFiles/gusbampabout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

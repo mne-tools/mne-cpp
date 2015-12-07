@@ -81,12 +81,9 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-//    QFile t_fileIn("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-//    QFile t_fileIn("./MNE-sample-data/MEG/test_output.fif");
-    QFile t_fileIn("./MNE-sample-data/MEG/sample/sample_write/test_output.fif");
+    QFile t_fileIn("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
 
-    QFile t_fileOut("./MNE-sample-data/MEG/sample/sample_write/test_output2.fif");
-//    QFile t_fileOut("./MNE-sample-data/MEG/test_output2.fif");
+    QFile t_fileOut("./MNE-sample-data/MEG/sample/test_output.fif");
 
     //
     //   Setup for reading the raw data

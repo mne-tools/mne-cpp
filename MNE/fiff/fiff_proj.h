@@ -147,7 +147,7 @@ public:
     *
     * @return nproj - How many items in the projector
     */
-    static fiff_int_t make_projector(const QList<FiffProj>& projs, const QStringList& ch_names, MatrixXd& proj, const QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd, bool include_active = true);
+    static fiff_int_t make_projector(const QList<FiffProj>& projs, const QStringList& ch_names, MatrixXd& proj, const QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd);
 
     //=========================================================================================================
     /**
