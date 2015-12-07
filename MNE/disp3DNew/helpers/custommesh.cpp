@@ -58,7 +58,7 @@ CustomMesh::CustomMesh(const MatrixX3f &tMatVert, const MatrixX3f tMatNorm, cons
 : Qt3DRender::QGeometryRenderer()
 , m_iNumVert(tMatVert.rows())
 {
-    customGeometry = new Qt3DRender::QGeometry(this);
+    Qt3DRender::QGeometry* customGeometry = new Qt3DRender::QGeometry(this);
 
     m_pVertexDataBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer, customGeometry);//QSharedPointer<Qt3DRender::QBuffer>(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer, customGeometry));
     m_pNormalDataBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer, customGeometry);//QSharedPointer<Qt3DRender::QBuffer>(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer, customGeometry));
@@ -182,7 +182,7 @@ CustomMesh::~CustomMesh()
 
 //*************************************************************************************************************
 
-bool CustomMesh::updateVertColors(const MatrixX3f &tMatColors)
+bool CustomMesh::updateVertColors(const Matrix<float, Dynamic, 3, RowMajor> &tMatColors)
 {
     //Check dimensions
     if(tMatColors.rows() != m_iNumVert) {
@@ -200,15 +200,7 @@ bool CustomMesh::updateVertColors(const MatrixX3f &tMatColors)
     //Update color
     QByteArray newColorData;
     newColorData.resize(tMatColors.rows() * 3 * (int)sizeof(float));
-    float *rawColorArray = reinterpret_cast<float *>(newColorData.data());
-
-    int idx = 0;
-
-    for(int i = 0; i<tMatColors.rows(); i++) {
-        rawColorArray[idx++] = tMatColors(i,0);
-        rawColorArray[idx++] = tMatColors(i,1);
-        rawColorArray[idx++] = tMatColors(i,2);
-    }
+    Map<Matrix<float, Dynamic, 3, RowMajor>> (reinterpret_cast<float *>(newColorData.data()), tMatColors.rows(), tMatColors.cols()) = tMatColors;
 
     colorAttribute->buffer()->setData(newColorData);
 

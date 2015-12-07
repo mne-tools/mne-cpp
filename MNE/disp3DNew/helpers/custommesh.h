@@ -74,7 +74,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
+// DEFINE NAMESPACE DISP3DNEWLIB
 //=============================================================================================================
 
 namespace DISP3DNEWLIB
@@ -131,15 +131,13 @@ public:
     *
     * @param[in] tMatColors     New color information for the vertices.
     */
-    bool updateVertColors(const MatrixX3f &tMatColors);
+    bool updateVertColors(const Matrix<float, Dynamic, 3, RowMajor> &tMatColors);
 
 protected:
     Qt3DRender::QBuffer* m_pVertexDataBuffer;    /**< The vertex buffer. */
     Qt3DRender::QBuffer* m_pNormalDataBuffer;    /**< The normal buffer. */
     Qt3DRender::QBuffer* m_pColorDataBuffer;     /**< The color buffer. */
     Qt3DRender::QBuffer* m_pIndexDataBuffer;     /**< The index buffer. */
-
-    Qt3DRender::QGeometry* customGeometry;
 
     int     m_iNumVert;     /**< The total number of set vertices. */
 };

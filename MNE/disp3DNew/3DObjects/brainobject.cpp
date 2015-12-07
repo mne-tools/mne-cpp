@@ -62,15 +62,12 @@ BrainObject::BrainObject(const Surface &tSurface, const Annotation &tAnnotation,
 , m_sSurf(tSurface.surf())
 , m_vecCurv(tSurface.curv())
 , m_vecOffset(tSurface.offset())
-, m_ColorSulci(QColor(125,0,0))
-, m_ColorGyri(QColor(0,0,125))
+, m_ColorGyri(QColor(125,125,125))
+, m_ColorSulci(QColor(50,50,50))
 , m_matVert(tSurface.rr())
 , m_matTris(tSurface.tris())
 , m_matNorm(tSurface.nn())
 , m_sAnnotFilePath(tAnnotation.fileName())
-, m_vecAnnotVertices(tAnnotation.getVertices())
-, m_vecAnnotLabelIds(tAnnotation.getLabelIds())
-, m_Colortable(tAnnotation.getColortable())
 {
     //Create color from curvature information
     m_matColorsOrig.resize(m_matVert.rows(), m_matVert.cols());
@@ -89,18 +86,16 @@ BrainObject::BrainObject(const Surface &tSurface, const Annotation &tAnnotation,
 
     //Create color from annotation data if annotation is not empty
     if(tAnnotation.getVertices().rows() != 0) {
-        QList<FSLIB::Label> p_qListLabels;
-        QList<RowVector4i> p_qListLabelRGBAs;
-        tAnnotation.toLabels(tSurface, p_qListLabels, p_qListLabelRGBAs);
+        tAnnotation.toLabels(tSurface, m_qListLabels, m_qListLabelRGBAs);
 
         m_matColorsAnnot.resize(m_matVert.rows(), m_matVert.cols());
 
-        for(int i = 0; i<p_qListLabels.size(); i++) {
-            FSLIB::Label label = p_qListLabels.at(i);
+        for(int i = 0; i<m_qListLabels.size(); i++) {
+            FSLIB::Label label = m_qListLabels.at(i);
             for(int j = 0; j<label.vertices.rows(); j++) {
-                m_matColorsAnnot(label.vertices(j), 0) = p_qListLabelRGBAs.at(i)(0)/255.0;
-                m_matColorsAnnot(label.vertices(j), 1) = p_qListLabelRGBAs.at(i)(1)/255.0;
-                m_matColorsAnnot(label.vertices(j), 2) = p_qListLabelRGBAs.at(i)(2)/255.0;
+                m_matColorsAnnot(label.vertices(j), 0) = m_qListLabelRGBAs.at(i)(0)/255.0;
+                m_matColorsAnnot(label.vertices(j), 1) = m_qListLabelRGBAs.at(i)(1)/255.0;
+                m_matColorsAnnot(label.vertices(j), 2) = m_qListLabelRGBAs.at(i)(2)/255.0;
             }
         }
     }

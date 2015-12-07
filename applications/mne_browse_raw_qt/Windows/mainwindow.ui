@@ -52,7 +52,7 @@
     <addaction name="m_scalingAction"/>
     <addaction name="m_averageWindowAction"/>
     <addaction name="m_ChInformationAction"/>
-    <addaction name="m_projectionManagerAction"/>
+    <addaction name="m_noiseReductionManagerAction"/>
     <addaction name="m_informationAction"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -146,7 +146,7 @@
     <string>Channel informations...</string>
    </property>
   </action>
-  <action name="m_projectionManagerAction">
+  <action name="m_noiseReductionManagerAction">
    <property name="text">
     <string>Projection manager...</string>
    </property>

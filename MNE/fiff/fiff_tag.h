@@ -487,6 +487,16 @@ public:
 
     //=========================================================================================================
     /**
+    * to fiff FIFFT FLOAT NAMED MATRIX. Same as toFLoatMAtrix with the slight difference of dimension use to map data to matrix.
+    *
+    * parses a fiff float named matrix
+    *
+    * @return the parsed float named matrix
+    */
+    inline MatrixXf toNamedMatrix() const;
+
+    //=========================================================================================================
+    /**
     * to sparse fiff FIFFT FLOAT MATRIX
     *
     * parses a sparse fiff float matrix and returns a double sparse matrix to make sure only double is used
@@ -576,7 +586,7 @@ public:
     fiff_int_t  kind;       /**< Tag number.
                              *   This defines the meaning of the item */
     fiff_int_t  type;       /**< Data type.
-                             *   This defines the reperentation of the data. */
+                             *   This defines the representation of the data. */
 //    fiff_int_t  size;       /**< Size of the data.
 //                             *   The size is given in bytes and defines the
 //                             *   total size of the data. */
@@ -996,6 +1006,36 @@ inline MatrixXf FiffTag::toFloatMatrix() const
 
     // --> Use copy constructor instead --> slower performance but higher memory management reliability
     MatrixXf p_Matrix((Map<MatrixXf>( (float*)this->data(),dims[0], dims[1])));
+
+    return p_Matrix;
+}
+
+
+//*************************************************************************************************************
+
+inline MatrixXf FiffTag::toNamedMatrix() const
+{
+    if(!this->isMatrix() || this->getType() != FIFFT_FLOAT || this->data() == NULL)
+        return MatrixXf();//NULL;
+
+    if (fiff_type_matrix_coding(this->type) != FIFFTS_MC_DENSE)
+    {
+        printf("Error in FiffTag::toNamedMatrix(): Matrix is not dense!\n");
+        return MatrixXf();//NULL;
+    }
+
+    qint32 ndim;
+    QVector<qint32> dims;
+    this->getMatrixDimensions(ndim, dims);
+
+    if (ndim != 2)
+    {
+        printf("Only two-dimensional matrices are supported at this time");
+        return MatrixXf();//NULL;
+    }
+
+    // --> Use copy constructor instead --> slower performance but higher memory management reliability
+    MatrixXf p_Matrix((Map<MatrixXf>( (float*)this->data(),dims[1], dims[0])));
 
     return p_Matrix;
 }

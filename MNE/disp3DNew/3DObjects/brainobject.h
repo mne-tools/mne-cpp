@@ -68,7 +68,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
+// DEFINE NAMESPACE DISP3DNEWLIB
 //=============================================================================================================
 
 namespace DISP3DNEWLIB
@@ -137,18 +137,17 @@ protected:
     QColor      m_ColorSulci;       /**< Color for the vertices which belong to the sulci. */
     QColor      m_ColorGyri;        /**< Color for the vertices which belong to the gyri.). */
 
-    Colortable  m_Colortable;       /**< Lookup table label annotation colors & ids */
-
     VectorXf    m_vecCurv;          /**< FreeSurfer curvature data. */
     Vector3f    m_vecOffset;        /**< Surface offset. */
-    VectorXi    m_vecAnnotVertices; /**< Annotation vertices indeces */
-    VectorXi    m_vecAnnotLabelIds; /**< Annotation vertices label ids */
 
     MatrixX3f   m_matVert;          /**< Alias verts. Vertex coordinates in meters. */
     MatrixX3i   m_matTris;          /**< Alias faces. The triangle descriptions. */
     MatrixX3f   m_matNorm;          /**< Normalized surface normals for each vertex. */
-    MatrixX3f   m_matColorsOrig;    /**< Original color values based on curvature values. */
-    MatrixX3f   m_matColorsAnnot;   /**< Annotation color values based on atlas data. */
+    Matrix<float, Dynamic, 3, RowMajor>   m_matColorsOrig;    /**< Original color values based on curvature values. */
+    Matrix<float, Dynamic, 3, RowMajor>   m_matColorsAnnot;   /**< Annotation color values based on atlas data. */
+
+    QList<FSLIB::Label>     m_qListLabels;
+    QList<RowVector4i>      m_qListLabelRGBAs;
 };
 
 } // NAMESPACE

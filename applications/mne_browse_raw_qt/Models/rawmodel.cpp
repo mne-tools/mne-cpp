@@ -63,7 +63,7 @@ RawModel::RawModel(QObject *parent)
 , m_bEndReached(false)
 , m_bReloading(false)
 , m_bProcessing(false)
-, m_pFiffInfo(FiffInfo::SPtr(new FiffInfo()))
+, m_pFiffInfo(new FiffInfo())
 , m_pfiffIO(QSharedPointer<FiffIO>(new FiffIO()))
 , m_filterChType("All")
 {
@@ -110,7 +110,7 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
 , m_bEndReached(false)
 , m_bReloading(false)
 , m_bProcessing(false)
-, m_pFiffInfo(FiffInfo::SPtr(new FiffInfo()))
+, m_pFiffInfo(new FiffInfo())
 , m_pfiffIO(QSharedPointer<FiffIO>(new FiffIO()))
 , m_filterChType("All")
 {
@@ -370,6 +370,7 @@ bool RawModel::loadFiffData(QFile* qFile)
     m_pfiffIO = QSharedPointer<FiffIO>(new FiffIO(*qFile));
     if(!m_pfiffIO->m_qlistRaw.empty()) {
         m_iAbsFiffCursor = m_pfiffIO->m_qlistRaw[0]->first_samp; //Set cursor somewhere into fiff file [in samples]
+        m_iCurAbsScrollPos = 0;
         m_bStartReached = true;
 
         int start = m_iAbsFiffCursor;
@@ -415,7 +416,7 @@ bool RawModel::writeFiffData(QIODevice *p_IODevice)
     RowVectorXi sel;
 
 //    std::cout << "Writing file " << QFile(&p_IODevice).fileName().toLatin1() << std::endl;
-    FiffStream::SPtr outfid = Fiff::start_writing_raw(*p_IODevice,*m_pFiffInfo.data(),cals);
+    FiffStream::SPtr outfid = Fiff::start_writing_raw(*p_IODevice,*m_pFiffInfo,cals);
 
     //Setup reading parameters
     fiff_int_t from = firstSample();
@@ -473,7 +474,7 @@ void RawModel::loadFiffInfos()
         m_chInfolist.append(m_pfiffIO->m_qlistRaw[0]->info.chs[i]);
 
     //loads fiffInfo
-    m_pFiffInfo = FiffInfo::SPtr(&m_pfiffIO->m_qlistRaw[0]->info);
+    m_pFiffInfo = &m_pfiffIO->m_qlistRaw[0]->info;
 }
 
 
@@ -482,8 +483,7 @@ void RawModel::loadFiffInfos()
 void RawModel::clearModel()
 {
     //FiffIO object
-    //m_pfiffIO.clear();
-    //m_pFiffInfo->clear();
+    m_pfiffIO.clear();
     m_chInfolist.clear();
 
     //data model structure
@@ -904,6 +904,101 @@ void RawModel::undoFilter()
     m_assignedOperators.clear();
 
     emit assignedOperatorsChanged(m_assignedOperators);
+}
+
+
+//*************************************************************************************************************
+
+void RawModel::updateProjections()
+{
+    //  Update the SSP projector
+    if(m_pFiffInfo)
+    {
+        //If a minimum of one projector is active set m_bProjActivated to true so that this model applies the ssp to the incoming data
+        bool bProjActivated = false;
+        for(qint32 i = 0; i < this->m_pFiffInfo->projs.size(); ++i) {
+            if(this->m_pFiffInfo->projs[i].active) {
+                bProjActivated = true;
+                break;
+            }
+        }
+
+        if(bProjActivated)
+        {
+            MatrixXd matProj;
+            qint32 nproj = this->m_pFiffInfo->make_projector(matProj);
+            qDebug() << "updateProjection :: New projection calculated."<<nproj;
+
+            //set columns of matrix to zero depending on bad channels indexes
+    //        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
+    //            m_matProj.col(m_vecBadIdcs[j]).setZero();
+
+    //        std::cout << "Proj\n";
+    //        std::cout << m_matProj.block(0,0,10,10) << std::endl;
+
+//            qint32 nchan = this->m_pFiffInfo->nchan;
+//            qint32 i, k;
+
+//            typedef Eigen::Triplet<double> T;
+//            std::vector<T> tripletList;
+//            tripletList.reserve(nchan);
+
+//            // Make proj sparse
+//            tripletList.clear();
+//            tripletList.reserve(matProj.rows()*matProj.cols());
+//            for(i = 0; i < matProj.rows(); ++i)
+//                for(k = 0; k < matProj.cols(); ++k)
+//                    if(matProj(i,k) != 0)
+//                        tripletList.push_back(T(i, k, matProj(i,k)));
+
+//            SparseMatrix<double> matSparseProj (matProj.rows(),matProj.cols());
+//            if(tripletList.size() > 0)
+//                matSparseProj.setFromTriplets(tripletList.begin(), tripletList.end());
+
+            //set projection matrix for upcoming read raw segement calls
+            m_pfiffIO->m_qlistRaw[0]->proj = matProj;
+        } else {
+            m_pfiffIO->m_qlistRaw[0]->proj.resize(0,0);
+        }
+
+        if(m_iCurAbsScrollPos == 0)
+            resetPosition(m_iCurAbsScrollPos + firstSample());
+        else
+            resetPosition(m_iCurAbsScrollPos);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RawModel::updateCompensator(int to)
+{
+    //
+    //  Update the compensator
+    //
+    if(m_pFiffInfo)
+    {
+        FiffCtfComp newComp;
+
+        if(to != 0) {
+//            qDebug()<<"to"<<to;
+//            qDebug()<<"from"<<from;
+
+            this->m_pFiffInfo->make_compensator(0, to, newComp); //Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
+
+            newComp.kind = to;
+        }
+
+        this->m_pFiffInfo->set_current_comp(to);
+
+        //set compensator for upcoming read raw segement calls
+        m_pfiffIO->m_qlistRaw[0]->comp = newComp;
+
+        if(m_iCurAbsScrollPos == 0)
+            resetPosition(m_iCurAbsScrollPos + firstSample());
+        else
+            resetPosition(m_iCurAbsScrollPos);
+    }
 }
 
 

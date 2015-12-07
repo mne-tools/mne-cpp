@@ -178,7 +178,7 @@ public:
     //VARIABLES
     bool                                        m_bFileloaded;  /**< true when a Fiff file is loaded */
     QList<FiffChInfo>                           m_chInfolist;   /**< List of FiffChInfo objects that holds the corresponding channels information */
-    FiffInfo::SPtr                              m_pFiffInfo;     /**< fiff info of whole fiff file */
+    FiffInfo*                              m_pFiffInfo;     /**< fiff info of whole fiff file */
     QSharedPointer<FiffIO>                      m_pfiffIO;      /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!) */
     QMap<QString,QSharedPointer<MNEOperator> >  m_Operators;    /**< generated MNEOperator types (FilterOperator,PCA etc.) */
 
@@ -251,7 +251,7 @@ private:
     QList<QSharedPointer<DataPackage> >     m_data;                     /**< List that holds the fiff matrix data <n_channels x n_samples>. */
 
     //Filter operators
-    QMap<int,QSharedPointer<MNEOperator> >      m_assignedOperators;    /**< Map of MNEOperator types to channels.*/
+    QMap<int,QSharedPointer<MNEOperator> >  m_assignedOperators;        /**< Map of MNEOperator types to channels.*/
 
     qint32                                  m_iAbsFiffCursor;           /**< Cursor that points to the current position in the fiff data file [in samples]. */
     qint32                                  m_iCurAbsScrollPos;         /**< the current (absolute) ScrollPosition in the fiff data file. */
@@ -275,7 +275,7 @@ signals:
     *
     * @param FiffInfo the current loaded fiffinfo
     */
-    void fileLoaded(FiffInfo::SPtr);
+    void fileLoaded(FiffInfo*);
 
     //=========================================================================================================
     /**
@@ -385,6 +385,20 @@ public slots:
     * undoFilter undoes the filtering operation for all filter operations for all channels
     */
     void undoFilter();
+
+    //=========================================================================================================
+    /**
+    * updateProjections updates the projection matrix
+    */
+    void updateProjections();
+
+    //=========================================================================================================
+    /**
+    * Update the compensator
+    *
+    * @param[in] to    Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind)
+    */
+    void updateCompensator(int to);
 
 private slots:
     //=========================================================================================================

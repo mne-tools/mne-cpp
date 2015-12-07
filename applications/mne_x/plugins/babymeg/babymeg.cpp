@@ -87,7 +87,8 @@ BabyMEG::BabyMEG()
 , m_bIsRunning(false)
 , m_bUseRecordTimer(false)
 , m_pRawMatrixBuffer(0)
-, m_sFiffHeader(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/header.fif")
+, m_sFiffProjectors(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/header.fif")
+, m_sFiffCompensators(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/compensator.fif")
 , m_sBadChannels(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/both.bad")
 , m_iRecordingMSeconds(5*60*1000)
 {
@@ -457,7 +458,7 @@ void BabyMEG::toggleRecordingFile()
             m_pFiffInfo->projs[i].active = false;
 
         mutex.lock();
-        m_pOutfid = Fiff::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals);
+        m_pOutfid = FiffStream::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals, defaultMatrixXi, false);
         fiff_int_t first = 0;
         m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
         mutex.unlock();
@@ -521,6 +522,12 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
     if(!readProjectors())
     {
         qDebug() << "Not able to read projectors";
+        return;
+    }
+
+    if(!readCompensators())
+    {
+        qDebug() << "Not able to read compensators";
         return;
     }
 
@@ -708,12 +715,12 @@ MatrixXd BabyMEG::calibrate(const MatrixXf& data)
 
 bool BabyMEG::readProjectors()
 {
-    QFile t_headerFiffFile(m_sFiffHeader);
+    QFile t_projFiffFile(m_sFiffProjectors);
 
     //
     //   Open the file
     //
-    FiffStream::SPtr t_pStream(new FiffStream(&t_headerFiffFile));
+    FiffStream::SPtr t_pStream(new FiffStream(&t_projFiffFile));
     QString t_sFileName = t_pStream->streamName();
 
     printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
@@ -747,13 +754,50 @@ bool BabyMEG::readProjectors()
 
 //*************************************************************************************************************
 
+bool BabyMEG::readCompensators()
+{
+    QFile t_compFiffFile(m_sFiffCompensators);
+
+    //
+    //   Open the file
+    //
+    FiffStream::SPtr t_pStream(new FiffStream(&t_compFiffFile));
+    QString t_sFileName = t_pStream->streamName();
+
+    printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
+
+    FiffDirTree t_Tree;
+    QList<FiffDirEntry> t_Dir;
+
+    if(!t_pStream->open(t_Tree, t_Dir))
+        return false;
+
+    QList<FiffCtfComp> q_ListComp = t_pStream->read_ctf_comp(t_Tree, m_pFiffInfo->chs);
+
+    if (q_ListComp.size() == 0)
+    {
+        printf("Could not find compensators\n");
+        return false;
+    }
+
+    m_pFiffInfo->comps = q_ListComp;
+
+    //garbage collecting
+    t_pStream->device()->close();
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
 bool BabyMEG::readBadChannels()
 {
     //
     // Bad Channels
     //
 //    //Read bad channels from header/projection fif
-//    QFile t_headerFiffFile(m_sFiffHeader);
+//    QFile t_headerFiffFile(m_sFiffProjectors);
 
 //    if(!t_headerFiffFile.exists()) {
 //        printf("Could not open fif file for copying bad channels to babyMEG fiff_info\n");

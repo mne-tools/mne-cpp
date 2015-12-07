@@ -123,7 +123,7 @@ public:
     typedef QSharedPointer<ChInfoModel> SPtr;              /**< Shared pointer type for ChInfoModel. */
     typedef QSharedPointer<const ChInfoModel> ConstSPtr;   /**< Const shared pointer type for ChInfoModel. */
 
-    ChInfoModel(FiffInfo::SPtr pFiffInfo, QObject *parent = 0);
+    ChInfoModel(FiffInfo* pFiffInfo, QObject *parent = 0);
     ChInfoModel(QObject *parent = 0);
 
     //=========================================================================================================
@@ -146,7 +146,7 @@ public:
     *
     * @param fiffInfo fiff info variabel.
     */
-    void fiffInfoChanged(FiffInfo::SPtr pFiffInfo);
+    void fiffInfoChanged(FiffInfo* pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -215,7 +215,7 @@ protected:
     */
     void mapLayoutToChannels();
 
-    FiffInfo::SPtr          m_pFiffInfo;             /**< The fiff info of the currently loaded fiff file. */
+    FiffInfo*               m_pFiffInfo;            /**< The fiff info of the currently loaded fiff file. */
     QMap<QString,QPointF>   m_layoutMap;            /**< The current layout map with a position for all MEG and EEG channels. */
     QStringList             m_aliasNames;           /**< list of given channel aliases. */
     QStringList             m_mappedLayoutChNames;  /**< list of the mapped layout channel names. */

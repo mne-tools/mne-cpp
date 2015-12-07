@@ -40,6 +40,9 @@
 //=============================================================================================================
 
 #include <disp3DNew/view3D.h>
+#include <disp3DNew/helpers/control3dwidget.h>
+
+#include "disp/helpers/roundededgeswidget.h"
 
 #include <fs/label.h>
 #include <fs/surface.h>
@@ -63,7 +66,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGuiApplication>
+#include <QApplication>
+#include <QMainWindow>
 
 
 //*************************************************************************************************************
@@ -95,7 +99,7 @@ using namespace UTILSLIB;
 */
 int main(int argc, char *argv[])
 {
-    QGuiApplication a(argc, argv);
+    QApplication a(argc, argv);
 
 //    //*************************** Create source estimate *****************************************//
 //    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
@@ -410,11 +414,15 @@ int main(int argc, char *argv[])
 //     // Create the test view
 //    std::cout<<"Creating BrainView"<<std::endl;
 
-    View3D testWindow;
+    View3D::SPtr testWindow = View3D::SPtr(new View3D());
 
-    testWindow.addFsBrainData("sample", 2, "pial", "./MNE-sample-data/subjects"/*, "aparc.a2009s"*/);
+    testWindow->addFsBrainData("sample", 2, "pial", "./MNE-sample-data/subjects"/*, "aparc.a2009s"*/);
 
-    testWindow.show();
+    testWindow->show();    
+
+    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
+
+    control3DWidget->show();
 
     return a.exec();
 }

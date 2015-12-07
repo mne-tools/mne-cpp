@@ -114,3 +114,32 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
+# Deploy Qt Dependencies
+unix:!macx {
+    #ToDo Unix
+}
+else {
+    isEmpty(TARGET_EXT) {
+        win32 {
+            TARGET_CUSTOM_EXT = .exe
+        }
+        macx {
+            TARGET_CUSTOM_EXT = .app
+        }
+    } else {
+        TARGET_CUSTOM_EXT = $${TARGET_EXT}
+    }
+
+    win32 {
+        DEPLOY_COMMAND = windeployqt
+    }
+    macx {
+        DEPLOY_COMMAND = macdeployqt
+    }
+
+    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
+
+    #  # Uncomment the following line to help debug the deploy command when running qmake
+    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
+    QMAKE_POST_LINK = $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+}

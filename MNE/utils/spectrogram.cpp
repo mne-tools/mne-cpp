@@ -51,7 +51,7 @@ using namespace UTILSLIB;
 #include "spectrogram.h"
 
 
-inline VectorXd Spectrogram::gauss_window (qint32 sample_count, qreal scale, quint32 translation)
+VectorXd Spectrogram::gauss_window (qint32 sample_count, qreal scale, quint32 translation)
 {
     VectorXd gauss = VectorXd::Zero(sample_count);
 
@@ -66,7 +66,7 @@ inline VectorXd Spectrogram::gauss_window (qint32 sample_count, qreal scale, qui
 
 //-----------------------------------------------------------------------------------------------------------------
 
-inline MatrixXd Spectrogram::make_spectrogram(VectorXd signal, qint32 window_size = 0)
+MatrixXd Spectrogram::make_spectrogram(VectorXd signal, qint32 window_size = 0)
 {
     if(window_size == 0)
         window_size = signal.rows()/4;
