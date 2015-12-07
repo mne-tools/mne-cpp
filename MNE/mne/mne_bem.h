@@ -164,11 +164,23 @@ public:
 
     //=========================================================================================================
     /**
-    * TO Do: Input
+    * Subscript operator [] to access bem_surface by index
     *
-    * Write Matrix to a textfile
+    * @param[in] idx    the surface index (0,1 or 2).
+    *
+    * @return MNEBemSurface related to the parameter index.
     */
-    static void getEigenToData(MatrixX3f &src, char* pathAndName);
+    const MNEBemSurface& operator[] (qint32 idx) const;
+
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access bem_surface by index
+    *
+    * @param[in] idx    the surface index (0,1 or 2).
+    *
+    * @return MNEBemSurface related to the parameter index.
+    */
+    MNEBemSurface& operator[] (qint32 idx);
 
 protected:
     //=========================================================================================================
