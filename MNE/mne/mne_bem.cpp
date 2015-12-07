@@ -325,3 +325,40 @@ bool MNEBem::readBemSurface(FiffStream *p_pStream, const FiffDirTree &p_Tree, MN
 
     return true;
 }
+
+//*************************************************************************************************************
+
+const MNEBemSurface& MNEBem::operator[] (qint32 idx) const
+{
+    if (idx>=m_qListBemSurface.length())
+    {
+        qWarning("Warning: Required surface doesn't exist! Returning surface '0'.");
+        idx=0;
+    }
+    return m_qListBemSurface[idx];
+}
+
+
+//*************************************************************************************************************
+
+MNEBemSurface& MNEBem::operator[] (qint32 idx)
+{
+    if (idx>=m_qListBemSurface.length())
+    {
+        qWarning("Warning: Required surface doesn't exist! Returning surface '0'.");
+        idx=0;
+    }
+    return m_qListBemSurface[idx];
+
+//    if(idx == 0)
+//        return m_qListBemSurface[0];
+//    else if(idx == 1)
+//        return m_qListBemSurface[1];
+//    else if(idx == 2)
+//        return m_qListBemSurface[2];
+//    else
+//    {
+//        qWarning("Warning: Index is not '0', '1' or '2'! Returning '0'.");
+//        return m_qListBemSurface[0];
+//    }
+}
