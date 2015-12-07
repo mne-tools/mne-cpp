@@ -362,7 +362,7 @@ void RawModel::genStdFilterOps()
 bool RawModel::loadFiffData(QFile* qFile)
 {
     beginResetModel();
-//    clearModel();
+    clearModel();
 
     MatrixXd t_data,t_times; //type is later on (when append to m_data) casted into MatrixXdR (Row-Major)
     QSharedPointer<DataPackage> newDataPackage;
