@@ -97,6 +97,8 @@ void NoiseReductionWindow::createProjectorGroup()
         if(ui->m_groupBox_projections->layout() != 0)
             this->remove(ui->m_groupBox_projections->layout());
 
+        m_qListProjCheckBox.clear();
+
         // Projection Selection
         QGridLayout *topLayout = new QGridLayout;
 
@@ -160,6 +162,8 @@ void NoiseReductionWindow::createCompensatorGroup()
 
         if(ui->m_groupBox_compensators->layout() != 0)
             this->remove(ui->m_groupBox_compensators->layout());
+
+        m_qListCompCheckBox.clear();
 
         // Compensation Selection
         QGridLayout *topLayout = new QGridLayout;

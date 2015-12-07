@@ -175,7 +175,7 @@ private:
 
     QSignalMapper*      m_pCompSignalMapper;
 
-    FiffInfo*      m_pFiffInfo;
+    FiffInfo*           m_pFiffInfo;
 };
 
 } // NAMESPACE MNEBrowseRawQt

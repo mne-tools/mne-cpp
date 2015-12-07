@@ -458,7 +458,7 @@ void BabyMEG::toggleRecordingFile()
             m_pFiffInfo->projs[i].active = false;
 
         mutex.lock();
-        m_pOutfid = Fiff::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals);
+        m_pOutfid = FiffStream::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals, defaultMatrixXi, false);
         fiff_int_t first = 0;
         m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
         mutex.unlock();

@@ -105,116 +105,116 @@ void MainWindow::setupWindowWidgets()
     addDockWidget(Qt::BottomDockWidgetArea, m_pInformationWindow);
     m_pInformationWindow->hide();
 
-//    //Create about window - QTDesigner used - see / FormFiles
-//    m_pAboutWindow = new AboutWindow(this);
-//    m_pAboutWindow->hide();
+    //Create about window - QTDesigner used - see / FormFiles
+    m_pAboutWindow = new AboutWindow(this);
+    m_pAboutWindow->hide();
 
-//    //Create channel info window - QTDesigner used - see / FormFiles
-//    m_pChInfoWindow = new ChInfoWindow(this);
-//    addDockWidget(Qt::BottomDockWidgetArea, m_pChInfoWindow);
-//    m_pChInfoWindow->hide();
+    //Create channel info window - QTDesigner used - see / FormFiles
+    m_pChInfoWindow = new ChInfoWindow(this);
+    addDockWidget(Qt::BottomDockWidgetArea, m_pChInfoWindow);
+    m_pChInfoWindow->hide();
 
-//    //Create selection manager window - QTDesigner used - see / FormFiles
-//    m_pSelectionManagerWindowDock = new QDockWidget(this);
-//    addDockWidget(Qt::BottomDockWidgetArea, m_pSelectionManagerWindowDock);
-//    m_pSelectionManagerWindow = new SelectionManagerWindow(m_pSelectionManagerWindowDock, m_pChInfoWindow->getDataModel(), Qt::Widget);
-//    m_pSelectionManagerWindowDock->setWidget(m_pSelectionManagerWindow);
-//    m_pSelectionManagerWindowDock->hide();
+    //Create selection manager window - QTDesigner used - see / FormFiles
+    m_pSelectionManagerWindowDock = new QDockWidget(this);
+    addDockWidget(Qt::BottomDockWidgetArea, m_pSelectionManagerWindowDock);
+    m_pSelectionManagerWindow = new SelectionManagerWindow(m_pSelectionManagerWindowDock, m_pChInfoWindow->getDataModel(), Qt::Widget);
+    m_pSelectionManagerWindowDock->setWidget(m_pSelectionManagerWindow);
+    m_pSelectionManagerWindowDock->hide();
 
     //Create average manager window - QTDesigner used - see / FormFiles
     m_pAverageWindow = new AverageWindow(this, m_qEvokedFile);
     addDockWidget(Qt::BottomDockWidgetArea, m_pAverageWindow);
     m_pAverageWindow->hide();
 
-//    //Create scale window - QTDesigner used - see / FormFiles
-//    m_pScaleWindow = new ScaleWindow(this);
-//    addDockWidget(Qt::LeftDockWidgetArea, m_pScaleWindow);
-//    m_pScaleWindow->hide();
+    //Create scale window - QTDesigner used - see / FormFiles
+    m_pScaleWindow = new ScaleWindow(this);
+    addDockWidget(Qt::LeftDockWidgetArea, m_pScaleWindow);
+    m_pScaleWindow->hide();
 
-//    //Create filter window - QTDesigner used - see / FormFiles
-//    m_pFilterWindow = new FilterWindow(this, this);
-//    addDockWidget(Qt::BottomDockWidgetArea, m_pFilterWindow);
-//    m_pFilterWindow->hide();
+    //Create filter window - QTDesigner used - see / FormFiles
+    m_pFilterWindow = new FilterWindow(this, this);
+    addDockWidget(Qt::BottomDockWidgetArea, m_pFilterWindow);
+    m_pFilterWindow->hide();
 
-//    //Create noise reduction window - QTDesigner used - see / FormFiles
-//    m_pNoiseReductionWindow = new NoiseReductionWindow(this);
-//    addDockWidget(Qt::LeftDockWidgetArea, m_pNoiseReductionWindow);
-//    m_pNoiseReductionWindow->hide();
+    //Create noise reduction window - QTDesigner used - see / FormFiles
+    m_pNoiseReductionWindow = new NoiseReductionWindow(this);
+    addDockWidget(Qt::LeftDockWidgetArea, m_pNoiseReductionWindow);
+    m_pNoiseReductionWindow->hide();
 
-//    //Init windows - TODO: get rid of this here, do this inside the window classes
+    //Init windows - TODO: get rid of this here, do this inside the window classes
     m_pDataWindow->init();
     m_pEventWindow->init();
-//    m_pScaleWindow->init();
+    m_pScaleWindow->init();
 
-//    //Create the toolbar after all indows have been initiliased
-//    createToolBar();
+    //Create the toolbar after all indows have been initiliased
+    createToolBar();
 
-//    //Connect window signals
-//    //Change scaling of the data and averaged data whenever a spinbox value changed or the user performs a pinch gesture on the view
-//    connect(m_pScaleWindow, &ScaleWindow::scalingChannelValueChanged,
-//            m_pDataWindow, &DataWindow::scaleData);
+    //Connect window signals
+    //Change scaling of the data and averaged data whenever a spinbox value changed or the user performs a pinch gesture on the view
+    connect(m_pScaleWindow, &ScaleWindow::scalingChannelValueChanged,
+            m_pDataWindow, &DataWindow::scaleData);
 
-//    connect(m_pScaleWindow, &ScaleWindow::scalingViewValueChanged,
-//            m_pDataWindow, &DataWindow::changeRowHeight);
+    connect(m_pScaleWindow, &ScaleWindow::scalingViewValueChanged,
+            m_pDataWindow, &DataWindow::changeRowHeight);
 
-//    connect(m_pDataWindow, &DataWindow::scaleChannels,
-//            m_pScaleWindow, &ScaleWindow::scaleAllChannels);
+    connect(m_pDataWindow, &DataWindow::scaleChannels,
+            m_pScaleWindow, &ScaleWindow::scaleAllChannels);
 
-//    connect(m_pScaleWindow, &ScaleWindow::scalingChannelValueChanged,
-//            m_pAverageWindow, &AverageWindow::scaleAveragedData);
+    connect(m_pScaleWindow, &ScaleWindow::scalingChannelValueChanged,
+            m_pAverageWindow, &AverageWindow::scaleAveragedData);
 
-//    //Hide non selected channels in the data view
-//    connect(m_pSelectionManagerWindow, &SelectionManagerWindow::showSelectedChannelsOnly,
-//            m_pDataWindow, &DataWindow::showSelectedChannelsOnly);
+    //Hide non selected channels in the data view
+    connect(m_pSelectionManagerWindow, &SelectionManagerWindow::showSelectedChannelsOnly,
+            m_pDataWindow, &DataWindow::showSelectedChannelsOnly);
 
-//    //Connect selection manager with average manager
-//    connect(m_pSelectionManagerWindow, &SelectionManagerWindow::selectionChanged,
-//            m_pAverageWindow, &AverageWindow::channelSelectionManagerChanged);
+    //Connect selection manager with average manager
+    connect(m_pSelectionManagerWindow, &SelectionManagerWindow::selectionChanged,
+            m_pAverageWindow, &AverageWindow::channelSelectionManagerChanged);
 
-//    //Connect channel info window with raw data model, layout manager, average manager and the data window
-//    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
-//            m_pChInfoWindow->getDataModel().data(), &ChInfoModel::fiffInfoChanged);
+    //Connect channel info window with raw data model, layout manager, average manager and the data window
+    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
+            m_pChInfoWindow->getDataModel().data(), &ChInfoModel::fiffInfoChanged);
 
-//    connect(m_pDataWindow->getDataModel(), &RawModel::assignedOperatorsChanged,
-//            m_pChInfoWindow->getDataModel().data(), &ChInfoModel::assignedOperatorsChanged);
+    connect(m_pDataWindow->getDataModel(), &RawModel::assignedOperatorsChanged,
+            m_pChInfoWindow->getDataModel().data(), &ChInfoModel::assignedOperatorsChanged);
 
-//    connect(m_pSelectionManagerWindow, &SelectionManagerWindow::loadedLayoutMap,
-//            m_pChInfoWindow->getDataModel().data(), &ChInfoModel::layoutChanged);
+    connect(m_pSelectionManagerWindow, &SelectionManagerWindow::loadedLayoutMap,
+            m_pChInfoWindow->getDataModel().data(), &ChInfoModel::layoutChanged);
 
-//    connect(m_pChInfoWindow->getDataModel().data(), &ChInfoModel::channelsMappedToLayout,
-//            m_pSelectionManagerWindow, &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
+    connect(m_pChInfoWindow->getDataModel().data(), &ChInfoModel::channelsMappedToLayout,
+            m_pSelectionManagerWindow, &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
 
-//    connect(m_pChInfoWindow->getDataModel().data(), &ChInfoModel::channelsMappedToLayout,
-//            m_pAverageWindow, &AverageWindow::setMappedChannelNames);
+    connect(m_pChInfoWindow->getDataModel().data(), &ChInfoModel::channelsMappedToLayout,
+            m_pAverageWindow, &AverageWindow::setMappedChannelNames);
 
-//    //Connect selection manager with a new file loaded signal
-//    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
-//            m_pSelectionManagerWindow, &SelectionManagerWindow::newFiffFileLoaded);
+    //Connect selection manager with a new file loaded signal
+    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
+            m_pSelectionManagerWindow, &SelectionManagerWindow::newFiffFileLoaded);
 
-//    //Connect filter window with new file loaded signal
-//    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
-//            m_pFilterWindow, &FilterWindow::newFileLoaded);
+    //Connect filter window with new file loaded signal
+    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
+            m_pFilterWindow, &FilterWindow::newFileLoaded);
 
-//    //Connect noise reduction manager with fif file loading
-//    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
-//            m_pNoiseReductionWindow, &NoiseReductionWindow::setFiffInfo);
+    //Connect noise reduction manager with fif file loading
+    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
+            m_pNoiseReductionWindow, &NoiseReductionWindow::setFiffInfo);
 
-//    connect(m_pNoiseReductionWindow, &NoiseReductionWindow::projSelectionChanged,
-//            m_pDataWindow->getDataModel(), &RawModel::updateProjections);
+    connect(m_pNoiseReductionWindow, &NoiseReductionWindow::projSelectionChanged,
+            m_pDataWindow->getDataModel(), &RawModel::updateProjections);
 
-//    connect(m_pNoiseReductionWindow, &NoiseReductionWindow::compSelectionChanged,
-//            m_pDataWindow->getDataModel(), &RawModel::updateCompensator);
+    connect(m_pNoiseReductionWindow, &NoiseReductionWindow::compSelectionChanged,
+            m_pDataWindow->getDataModel(), &RawModel::updateCompensator);
 
-//    //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels - TODO: dirty move get rid of this here
-//    if(m_pDataWindow->getDataModel()->m_bFileloaded) {
-//        m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_pFiffInfo);
-//        m_pChInfoWindow->getDataModel()->fiffInfoChanged(m_pDataWindow->getDataModel()->m_pFiffInfo);
-//        m_pChInfoWindow->getDataModel()->layoutChanged(m_pSelectionManagerWindow->getLayoutMap());
-//        m_pSelectionManagerWindow->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
-//        m_pSelectionManagerWindow->newFiffFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);
-//        m_pFilterWindow->newFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);
-//        m_pNoiseReductionWindow->setFiffInfo(m_pDataWindow->getDataModel()->m_pFiffInfo);
-//    }
+    //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels - TODO: dirty move get rid of this here
+    if(m_pDataWindow->getDataModel()->m_bFileloaded) {
+        m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_pFiffInfo);
+        m_pChInfoWindow->getDataModel()->fiffInfoChanged(m_pDataWindow->getDataModel()->m_pFiffInfo);
+        m_pChInfoWindow->getDataModel()->layoutChanged(m_pSelectionManagerWindow->getLayoutMap());
+        m_pSelectionManagerWindow->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
+        m_pSelectionManagerWindow->newFiffFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);
+        m_pFilterWindow->newFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);
+        m_pNoiseReductionWindow->setFiffInfo(m_pDataWindow->getDataModel()->m_pFiffInfo);
+    }
 }
 
 
@@ -345,16 +345,16 @@ void MainWindow::connectMenus()
 {
     //File
     connect(ui->m_openAction, SIGNAL(triggered()), this, SLOT(openFile()));
-//    connect(ui->m_writeAction, SIGNAL(triggered()), this, SLOT(writeFile()));
-//    connect(ui->m_loadEvents, SIGNAL(triggered()), this, SLOT(loadEvents()));
-//    connect(ui->m_saveEvents, SIGNAL(triggered()), this, SLOT(saveEvents()));
-//    connect(ui->m_loadEvokedAction, SIGNAL(triggered()), this, SLOT(loadEvoked()));
-//    connect(ui->m_quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+    connect(ui->m_writeAction, SIGNAL(triggered()), this, SLOT(writeFile()));
+    connect(ui->m_loadEvents, SIGNAL(triggered()), this, SLOT(loadEvents()));
+    connect(ui->m_saveEvents, SIGNAL(triggered()), this, SLOT(saveEvents()));
+    connect(ui->m_loadEvokedAction, SIGNAL(triggered()), this, SLOT(loadEvoked()));
+    connect(ui->m_quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
-//    //Adjust
-//    connect(ui->m_filterAction, &QAction::triggered, this, [=](){
-//        showWindow(m_pFilterWindow);
-//    });
+    //Adjust
+    connect(ui->m_filterAction, &QAction::triggered, this, [=](){
+        showWindow(m_pFilterWindow);
+    });
 
     //Windows
     connect(ui->m_eventAction, &QAction::triggered, this, [=](){
@@ -363,26 +363,26 @@ void MainWindow::connectMenus()
     connect(ui->m_informationAction, &QAction::triggered, this, [=](){
         showWindow(m_pInformationWindow);
     });
-//    connect(ui->m_channelSelectionManagerAction, &QAction::triggered, this, [=](){
-//        showWindow(m_pSelectionManagerWindowDock);
-//    });
-//    connect(ui->m_averageWindowAction, &QAction::triggered, this, [=](){
-//        showWindow(m_pAverageWindow);
-//    });
-//    connect(ui->m_scalingAction, &QAction::triggered, this, [=](){
-//        showWindow(m_pScaleWindow);
-//    });
-//    connect(ui->m_ChInformationAction, &QAction::triggered, this, [=](){
-//        showWindow(m_pChInfoWindow);
-//    });
-//    connect(ui->m_noiseReductionManagerAction, &QAction::triggered, this, [=](){
-//        showWindow(m_pNoiseReductionWindow);
-//    });
+    connect(ui->m_channelSelectionManagerAction, &QAction::triggered, this, [=](){
+        showWindow(m_pSelectionManagerWindowDock);
+    });
+    connect(ui->m_averageWindowAction, &QAction::triggered, this, [=](){
+        showWindow(m_pAverageWindow);
+    });
+    connect(ui->m_scalingAction, &QAction::triggered, this, [=](){
+        showWindow(m_pScaleWindow);
+    });
+    connect(ui->m_ChInformationAction, &QAction::triggered, this, [=](){
+        showWindow(m_pChInfoWindow);
+    });
+    connect(ui->m_noiseReductionManagerAction, &QAction::triggered, this, [=](){
+        showWindow(m_pNoiseReductionWindow);
+    });
 
-//    //Help
-//    connect(ui->m_aboutAction, &QAction::triggered, this, [=](){
-//        showWindow(m_pAboutWindow);
-//    });
+    //Help
+    connect(ui->m_aboutAction, &QAction::triggered, this, [=](){
+        showWindow(m_pAboutWindow);
+    });
 }
 
 
@@ -543,7 +543,7 @@ void MainWindow::openFile()
     setWindowStatus();
 
     //Hide not presented channel types and their spin boxes in the scale window
-//    m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_pFiffInfo);
+    m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_pFiffInfo);
 
     m_qFileRaw.close();
 }
