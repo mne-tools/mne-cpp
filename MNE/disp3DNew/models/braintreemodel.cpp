@@ -95,10 +95,13 @@ bool BrainTreeModel::addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSe
 bool BrainTreeModel::addFsData(const Surface &tSurface, const Annotation &tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
 {
     QString hemi;
-    hemi = tSurface.hemi() == 0 ? "Left Hemi" : "Right Hemi";
-    BrainSurfaceTreeItem* surfaceItem = new BrainSurfaceTreeItem(tSurface, tAnnotation, BrainTreeItemTypes::SurfaceItem, hemi, p3DEntityParent);
+    hemi = tSurface.hemi() == 0 ? "Left" : "Right";
+    QList<QStandardItem*> itemList;
 
-    m_pRootItem->appendRow(surfaceItem);
+    BrainSurfaceTreeItem* surfaceItem = new BrainSurfaceTreeItem(tSurface, tAnnotation, BrainTreeItemTypes::SurfaceItem, hemi, p3DEntityParent);
+    itemList<<surfaceItem<<new QStandardItem("Hemisphere");
+
+    m_pRootItem->appendRow(itemList);
 
     return true;
 }
