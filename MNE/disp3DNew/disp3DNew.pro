@@ -98,6 +98,7 @@ SOURCES += \
     models/braintreemodel.cpp \
     models/braintreeitem.cpp \
     models/brainsurfacetreeitem.cpp \
+    models/brainsurfacesettreeitem.cpp \
     models/abstracttreeitem.cpp
 
 HEADERS += \
@@ -113,6 +114,7 @@ HEADERS += \
     models/braintreeitem.h \
     models/abstracttreeitem.h \
     models/brainsurfacetreeitem.h \
+    models/brainsurfacesettreeitem.h \
     helpers/types.h
 
 FORMS += \

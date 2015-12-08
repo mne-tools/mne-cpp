@@ -54,7 +54,7 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainTreeItem::BrainTreeItem(int iType, const QString & text)
+BrainTreeItem::BrainTreeItem( const int &iType, const QString & text)
 : QStandardItem(text)
 , m_iType(iType)
 {

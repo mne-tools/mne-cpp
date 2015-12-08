@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     braintreeitem.h
+* @file     brainsurfacesettreeitem.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,53 +29,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BrainTreeItem class declaration.
+* @brief    BrainSurfaceSetTreeItem class definition.
 *
 */
-
-#ifndef BRAINTREEITEM_H
-#define BRAINTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3DNew_global.h"
-#include "abstracttreeitem.h"
-#include "../helpers/types.h"
-
-#include "fs/label.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QList>
-#include <QVariant>
-#include <QStringList>
-#include <QColor>
-#include <QStandardItem>
-#include <QStandardItemModel>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DISP3DNEWLIB
-//=============================================================================================================
-
-namespace DISP3DNEWLIB
-{
+#include "brainsurfacesettreeitem.h"
 
 
 //*************************************************************************************************************
@@ -83,52 +46,53 @@ namespace DISP3DNEWLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
+using namespace DISP3DNEWLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* BrainTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
-*
-* @brief Provides a generic brain tree item.
-*/
-class DISP3DNEWSHARED_EXPORT BrainTreeItem : public QStandardItem
+BrainSurfaceSetTreeItem::BrainSurfaceSetTreeItem(const int &iType, const QString & text)
+: QStandardItem(text)
+, m_iType(iType)
 {
 
-public:
-    typedef QSharedPointer<BrainTreeItem> SPtr;             /**< Shared pointer type for BrainTreeItem class. */
-    typedef QSharedPointer<const BrainTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainTreeItem class. */
+}
 
-    //=========================================================================================================
-    /**
-    * Default constructor.
-    */
-    explicit BrainTreeItem(const int &iType, const QString & text = "");
 
-    //=========================================================================================================
-    /**
-    * Default destructor
-    */
-    ~BrainTreeItem();
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * AbstractTreeItem functions
-    */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void  setData(const QVariant& value, int role = Qt::UserRole + 1);
-    int  type() const;
+BrainSurfaceSetTreeItem::~BrainSurfaceSetTreeItem()
+{
+}
 
-private:
-    int m_iType;
-};
 
-} //NAMESPACE DISP3DNEWLIB
+//*************************************************************************************************************
 
-#endif // BRAINTREEITEM_H
+QVariant BrainSurfaceSetTreeItem::data(int role) const
+{
+    switch(role) {
+        case BrainTreeModelRoles::GetSurfSetName:
+            return QVariant();
+    }
+
+    return QStandardItem::data(role);
+}
+
+
+//*************************************************************************************************************
+
+void  BrainSurfaceSetTreeItem::setData(const QVariant& value, int role)
+{
+    QStandardItem::setData(value, role);
+}
+
+
+//*************************************************************************************************************
+
+int  BrainSurfaceSetTreeItem::type() const
+{
+    return m_iType;
+}
