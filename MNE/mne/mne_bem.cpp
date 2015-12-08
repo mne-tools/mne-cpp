@@ -329,6 +329,20 @@ bool MNEBem::readBemSurface(FiffStream *p_pStream, const FiffDirTree &p_Tree, MN
 
 //*************************************************************************************************************
 
+void MNEBem::write(QIODevice &p_IODevice)
+{
+    //
+    //   Open the file, create directory
+    //
+
+    // Create the file and save the essentials
+    FiffStream::SPtr t_pStream = FiffStream::start_file(p_IODevice);
+    printf("Write BEM surface in %s...", t_pStream->streamName().toUtf8().constData());
+    this->writeToStream(t_pStream.data());
+}
+
+//*************************************************************************************************************
+
 void MNEBem::writeToStream(FiffStream* p_pStream)
 {
     for(qint32 h = 0; h < m_qListBemSurface.size(); ++h)
