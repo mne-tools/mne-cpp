@@ -164,6 +164,8 @@ public:
 
     //=========================================================================================================
     /**
+    * MNE Toolbox function mne_write_bem_surfaces_block
+    *
     * Write the Bem to a FIF stream
     *
     * @param[in] p_pStream  The stream to write to.
