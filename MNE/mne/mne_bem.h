@@ -164,6 +164,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Write the Bem to a FIF stream
+    *
+    * @param[in] p_pStream  The stream to write to.
+    */
+    void writeToStream(FiffStream *p_pStream);
+
+    //=========================================================================================================
+    /**
     * Subscript operator [] to access bem_surface by index
     *
     * @param[in] idx    the surface index (0,1 or 2).

@@ -221,7 +221,15 @@ bool MNEBemSurface::addVertexNormals()
 
  qDebug() << "nn first Row:" << this->nn(0,0)<<this->nn(0,1)<<this->nn(0,2);
 
-    return true;
+ return true;
+}
+
+
+//*************************************************************************************************************
+
+void MNEBemSurface::writeToStream(FiffStream *p_pStream)
+{
+
 }
 
 
