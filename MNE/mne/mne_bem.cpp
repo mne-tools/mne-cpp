@@ -326,6 +326,23 @@ bool MNEBem::readBemSurface(FiffStream *p_pStream, const FiffDirTree &p_Tree, MN
     return true;
 }
 
+
+//*************************************************************************************************************
+
+void MNEBem::writeToStream(FiffStream* p_pStream)
+{
+    for(qint32 h = 0; h < m_qListBemSurface.size(); ++h)
+    {
+        printf("\tWrite a bem surface... ");
+        p_pStream->start_block(FIFFB_BEM_SURF);
+        m_qListBemSurface[h].writeToStream(p_pStream);
+        p_pStream->end_block(FIFFB_BEM_SURF);
+        printf("[done]\n");
+    }
+    printf("\t%d bem surfaces written\n", m_qListBemSurface.size());
+}
+
+
 //*************************************************************************************************************
 
 const MNEBemSurface& MNEBem::operator[] (qint32 idx) const
