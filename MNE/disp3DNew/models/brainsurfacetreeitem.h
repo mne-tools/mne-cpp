@@ -113,7 +113,7 @@ public:
     /**
     * Default constructor.
     */
-    explicit BrainSurfaceTreeItem(const Surface &tSurface, const Annotation &tAnnotation, Qt3DCore::QEntity *entityParent = 0);
+    explicit BrainSurfaceTreeItem(const Surface &tSurface, const Annotation &tAnnotation, int iType, QString text = "", Qt3DCore::QEntity *entityParent = 0);
 
     //=========================================================================================================
     /**
@@ -125,12 +125,14 @@ public:
     /**
     * AbstractTreeItem functions
     */
-    QVariant data(int column, int role) const;
-    bool setData(int role, const QVariant &value);
+    QVariant data(int role = Qt::UserRole + 1) const;
+    void  setData(const QVariant & value, int role = Qt::UserRole + 1);
+    int type() const;
 
 private:
     bool createBrainSurfaceTreeItem(const Surface &tSurface, const Annotation &tAnnotation);
 
+    int m_iType;
 };
 
 } //NAMESPACE DISP3DNEWLIB

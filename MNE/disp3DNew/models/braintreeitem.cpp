@@ -54,8 +54,9 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainTreeItem::BrainTreeItem()
-: QStandardItem()
+BrainTreeItem::BrainTreeItem(int iType, const QString & text)
+: QStandardItem(text)
+, m_iType(iType)
 {
 }
 
@@ -73,22 +74,22 @@ QHash<int, QByteArray> BrainTreeItem::roleNames() const
 {
     QHash<int, QByteArray> roles;
 
-    roles[BrainTreeItemModelRoles::SurfName] = "SurfName";
-    roles[BrainTreeItemModelRoles::SurfType] = "SurfType";
-    roles[BrainTreeItemModelRoles::SurfHemi] = "SurfHemi";
-    roles[BrainTreeItemModelRoles::SurfColorSulci] = "SurfColorSulci";
-    roles[BrainTreeItemModelRoles::SurfColorGyri] = "SurfColorGyri";
-    roles[BrainTreeItemModelRoles::SurfColorVert] = "SurfColorVert";
-    roles[BrainTreeItemModelRoles::SurfVert] = "SurfVert";
-    roles[BrainTreeItemModelRoles::SurfTris] = "SurfTris";
-    roles[BrainTreeItemModelRoles::SurfNorm] = "SurfNorm";
-    roles[BrainTreeItemModelRoles::SurfCurv] = "SurfCurv";
-    roles[BrainTreeItemModelRoles::SurfOffset] = "SurfOffset";
-    roles[BrainTreeItemModelRoles::SurfFilePath] = "SurfFilePath";
-    roles[BrainTreeItemModelRoles::SurfAnnotName] = "SurfAnnotName";
-    roles[BrainTreeItemModelRoles::SurfAnnotFilePath] = "SurfAnnotFilePath";
-    roles[BrainTreeItemModelRoles::SurfColorAnnot] = "SurfColorAnnot";
-    roles[BrainTreeItemModelRoles::RootItem] = "RootItem";
+//    roles[BrainTreeModelRoles::SurfName] = "SurfName";
+//    roles[BrainTreeModelRoles::SurfType] = "SurfType";
+//    roles[BrainTreeModelRoles::SurfHemi] = "SurfHemi";
+//    roles[BrainTreeModelRoles::SurfColorSulci] = "SurfColorSulci";
+//    roles[BrainTreeModelRoles::SurfColorGyri] = "SurfColorGyri";
+//    roles[BrainTreeModelRoles::SurfColorVert] = "SurfColorVert";
+//    roles[BrainTreeModelRoles::SurfVert] = "SurfVert";
+//    roles[BrainTreeModelRoles::SurfTris] = "SurfTris";
+//    roles[BrainTreeModelRoles::SurfNorm] = "SurfNorm";
+//    roles[BrainTreeModelRoles::SurfCurv] = "SurfCurv";
+//    roles[BrainTreeModelRoles::SurfOffset] = "SurfOffset";
+//    roles[BrainTreeModelRoles::SurfFilePath] = "SurfFilePath";
+//    roles[BrainTreeModelRoles::SurfAnnotName] = "SurfAnnotName";
+//    roles[BrainTreeModelRoles::SurfAnnotFilePath] = "SurfAnnotFilePath";
+//    roles[BrainTreeModelRoles::SurfColorAnnot] = "SurfColorAnnot";
+//    roles[BrainTreeModelRoles::RootItem] = "RootItem";
 
     return roles;
 }
@@ -96,9 +97,14 @@ QHash<int, QByteArray> BrainTreeItem::roleNames() const
 
 //*************************************************************************************************************
 
-QVariant BrainTreeItem::data(int column, int role) const
+QVariant BrainTreeItem::data(int role) const
 {
-    Q_UNUSED(role);
+    switch(role) {
+        case Qt::DisplayRole:
+            return QStandardItem::data(role);
+            break;
+
+    }
 
     return QVariant();
 }
@@ -106,9 +112,15 @@ QVariant BrainTreeItem::data(int column, int role) const
 
 //*************************************************************************************************************
 
-bool BrainTreeItem::setData(const QVariant& value, int role)
+void  BrainTreeItem::setData(const QVariant& value, int role)
 {
     Q_UNUSED(role);
+}
 
-    return true;
+
+//*************************************************************************************************************
+
+int  BrainTreeItem::type() const
+{
+    return m_iType;
 }

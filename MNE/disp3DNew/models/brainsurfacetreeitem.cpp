@@ -54,9 +54,10 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainSurfaceTreeItem::BrainSurfaceTreeItem(const Surface &tSurface, const Annotation &tAnnotation, Qt3DCore::QEntity *entityParent)
-: QStandardItem(QString("%1/%2").arg(tSurface.fileName()).arg(tAnnotation.fileName()))
+BrainSurfaceTreeItem::BrainSurfaceTreeItem(const Surface &tSurface, const Annotation &tAnnotation, int iType, QString text, Qt3DCore::QEntity *entityParent)
+: QStandardItem(text)
 , Renderable3DEntity(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset(), entityParent)
+, m_iType(iType)
 {
     createBrainSurfaceTreeItem(tSurface, tAnnotation);
 }
@@ -71,10 +72,14 @@ BrainSurfaceTreeItem::~BrainSurfaceTreeItem()
 
 //*************************************************************************************************************
 
-QVariant BrainSurfaceTreeItem::data(int column, int role) const
+QVariant BrainSurfaceTreeItem::data(int role) const
 {
-    Q_UNUSED(role);
-    Q_UNUSED(column);
+    switch(role) {
+        case Qt::DisplayRole:
+            return QStandardItem::data(role);
+            break;
+
+    }
 
     return QVariant();
 }
@@ -82,11 +87,17 @@ QVariant BrainSurfaceTreeItem::data(int column, int role) const
 
 //*************************************************************************************************************
 
-bool BrainSurfaceTreeItem::setData(const QVariant& value, int role)
+void  BrainSurfaceTreeItem::setData(const QVariant& value, int role)
 {
     Q_UNUSED(role);
+}
 
-    return true;
+
+//*************************************************************************************************************
+
+int  BrainSurfaceTreeItem::type() const
+{
+    return m_iType;
 }
 
 
@@ -94,17 +105,25 @@ bool BrainSurfaceTreeItem::setData(const QVariant& value, int role)
 
 bool BrainSurfaceTreeItem::createBrainSurfaceTreeItem(const Surface &tSurface, const Annotation &tAnnotation)
 {
-    BrainTreeItem *item = new BrainTreeItem();
-    item->setText(tSurface.fileName());
-    this->appendRow(item);
+    BrainTreeItem *itemSurfFileName = new BrainTreeItem(BrainTreeItemTypes::SurfaceFileName, tSurface.fileName());
+    this->appendRow(itemSurfFileName);
+
+    BrainTreeItem *itemSurfPath = new BrainTreeItem(BrainTreeItemTypes::SurfaceFilePath, tSurface.filePath());
+    this->appendRow(itemSurfPath);
+
+    BrainTreeItem *itemAnnotFileName = new BrainTreeItem(BrainTreeItemTypes::AnnotFileName, tAnnotation.fileName());
+    this->appendRow(itemAnnotFileName);
+
+    BrainTreeItem *itemAnnotPath = new BrainTreeItem(BrainTreeItemTypes::AnnotFilePath, tAnnotation.filePath());
+    this->appendRow(itemAnnotPath);
+
+    QList<QStandardItem*> itemDescriptionList;
+    itemDescriptionList<<new QStandardItem("Surface file path");
+    itemDescriptionList<<new QStandardItem("Annot file path");
+
+    this->appendColumn(itemDescriptionList);
 
     //    QList<QVariant> lDataVariant;
-
-    //    //Top level brain tree item
-    //    lDataVariant<<tSurface.fileName();
-    //    BrainTreeItem* pBrainTreeItemTop = new BrainTreeItem(lDataVariant, BrainTreeItem::SurfName, m_pRootItem);
-    //    m_pRootItem->appendChild(pBrainTreeItemTop);
-    //    lDataVariant.clear();
 
     //    //Actual data of the top level brain item
     //    //FilePath

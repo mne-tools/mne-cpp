@@ -53,6 +53,7 @@
 
 #include <QString>
 #include <QSharedPointer>
+#include <QFileInfo>
 
 
 //*************************************************************************************************************
@@ -245,6 +246,14 @@ public:
 
     //=========================================================================================================
     /**
+    * annotation file path
+    *
+    * @return the surf file path
+    */
+    inline QString filePath() const;
+
+    //=========================================================================================================
+    /**
     * annotation file name
     *
     * @return the surf file name
@@ -252,7 +261,8 @@ public:
     inline QString fileName() const;
 
 private:
-    QString m_sFileName;        /**< Annotation file */
+    QString m_sFileName;        /**< Annotation file name */
+    QString m_sFilePath;        /**< Annotation file path */
 
     qint32 m_iHemi;             /**< Hemisphere (lh = 0; rh = 1) */
     VectorXi m_Vertices;        /**< Vertice indeces */
@@ -323,6 +333,14 @@ inline Colortable& Annotation::getColortable()
 inline const Colortable Annotation::getColortable() const
 {
     return m_Colortable;
+}
+
+
+//*************************************************************************************************************
+
+inline QString Annotation::filePath() const
+{
+    return m_sFilePath;
 }
 
 

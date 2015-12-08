@@ -113,7 +113,6 @@ bool Annotation::read(const QString &subject_id, qint32 hemi, const QString &atl
         return false;
 
     QString p_sFile = QString("%1/%2/label/%3.%4.annot").arg(subjects_dir).arg(subject_id).arg(hemi == 0 ? "lh" : "rh").arg(atlas);
-    p_Annotation.fileName() = atlas;
 
     return read(p_sFile, p_Annotation);
 }
@@ -140,6 +139,10 @@ bool Annotation::read(const QString& p_sFileName, Annotation &p_Annotation)
 
     printf("Reading annotation...\n");
     QFile t_File(p_sFileName);
+    QFileInfo fileInfo(t_File.fileName());
+
+    p_Annotation.m_sFileName = fileInfo.fileName();
+    p_Annotation.m_sFilePath = fileInfo.filePath();
 
     if (!t_File.open(QIODevice::ReadOnly))
     {

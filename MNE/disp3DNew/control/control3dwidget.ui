@@ -51,8 +51,8 @@
           <widget class="QTreeView" name="m_treeView_loadedData">
            <property name="minimumSize">
             <size>
-             <width>100</width>
-             <height>300</height>
+             <width>0</width>
+             <height>0</height>
             </size>
            </property>
           </widget>
@@ -64,8 +64,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>380</width>
-          <height>414</height>
+          <width>151</width>
+          <height>40</height>
          </rect>
         </property>
         <attribute name="label">
