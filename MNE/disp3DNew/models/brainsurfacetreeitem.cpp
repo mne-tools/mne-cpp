@@ -105,23 +105,27 @@ int  BrainSurfaceTreeItem::type() const
 
 bool BrainSurfaceTreeItem::createBrainSurfaceTreeItem(const Surface &tSurface, const Annotation &tAnnotation)
 {
+    QList<QStandardItem*> itemList;
+
     BrainTreeItem *itemSurfFileName = new BrainTreeItem(BrainTreeItemTypes::SurfaceFileName, tSurface.fileName());
-    this->appendRow(itemSurfFileName);
+    itemList<<itemSurfFileName<<new QStandardItem("Surface file name");
+    this->appendRow(itemList);
+    itemList.clear();
 
     BrainTreeItem *itemSurfPath = new BrainTreeItem(BrainTreeItemTypes::SurfaceFilePath, tSurface.filePath());
-    this->appendRow(itemSurfPath);
+    itemList<<itemSurfPath<<new QStandardItem("Surface file path");
+    this->appendRow(itemList);
+    itemList.clear();
 
     BrainTreeItem *itemAnnotFileName = new BrainTreeItem(BrainTreeItemTypes::AnnotFileName, tAnnotation.fileName());
-    this->appendRow(itemAnnotFileName);
+    itemList<<itemAnnotFileName<<new QStandardItem("Annot file name");
+    this->appendRow(itemList);
+    itemList.clear();
 
     BrainTreeItem *itemAnnotPath = new BrainTreeItem(BrainTreeItemTypes::AnnotFilePath, tAnnotation.filePath());
-    this->appendRow(itemAnnotPath);
-
-    QList<QStandardItem*> itemDescriptionList;
-    itemDescriptionList<<new QStandardItem("Surface file path");
-    itemDescriptionList<<new QStandardItem("Annot file path");
-
-    this->appendColumn(itemDescriptionList);
+    itemList<<itemAnnotPath<<new QStandardItem("Annot file path");
+    this->appendRow(itemList);
+    itemList.clear();
 
     //    QList<QVariant> lDataVariant;
 
