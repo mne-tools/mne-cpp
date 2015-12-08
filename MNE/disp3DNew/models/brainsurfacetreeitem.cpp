@@ -54,10 +54,11 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainSurfaceTreeItem::BrainSurfaceTreeItem(const Surface &tSurface, const Annotation &tAnnotation, QString sDesc, Qt3DCore::QEntity *entityParent, AbstractTreeItem *treeItemParent)
-: AbstractTreeItem(0, sDesc, treeItemParent)
+BrainSurfaceTreeItem::BrainSurfaceTreeItem(const Surface &tSurface, const Annotation &tAnnotation, Qt3DCore::QEntity *entityParent)
+: QStandardItem(QString("%1/%2").arg(tSurface.fileName()).arg(tAnnotation.fileName()))
 , Renderable3DEntity(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset(), entityParent)
 {
+    createBrainSurfaceTreeItem(tSurface, tAnnotation);
 }
 
 
@@ -70,35 +71,18 @@ BrainSurfaceTreeItem::~BrainSurfaceTreeItem()
 
 //*************************************************************************************************************
 
-QHash<int, QByteArray> BrainSurfaceTreeItem::roleNames() const
-{
-    QHash<int, QByteArray> roles;
-
-    return roles;
-}
-
-
-//*************************************************************************************************************
-
-int BrainSurfaceTreeItem::columnCount() const
-{
-    return m_lItemData.count();
-}
-
-
-//*************************************************************************************************************
-
 QVariant BrainSurfaceTreeItem::data(int column, int role) const
 {
     Q_UNUSED(role);
+    Q_UNUSED(column);
 
-    return m_lItemData.value(column);
+    return QVariant();
 }
 
 
 //*************************************************************************************************************
 
-bool BrainSurfaceTreeItem::setData(int role, const QVariant &value)
+bool BrainSurfaceTreeItem::setData(const QVariant& value, int role)
 {
     Q_UNUSED(role);
 
@@ -108,7 +92,65 @@ bool BrainSurfaceTreeItem::setData(int role, const QVariant &value)
 
 //*************************************************************************************************************
 
-int BrainSurfaceTreeItem::childCount() const
+bool BrainSurfaceTreeItem::createBrainSurfaceTreeItem(const Surface &tSurface, const Annotation &tAnnotation)
 {
-    return 5;
+    BrainTreeItem *item = new BrainTreeItem();
+    item->setText(tSurface.fileName());
+    this->appendRow(item);
+
+    //    QList<QVariant> lDataVariant;
+
+    //    //Top level brain tree item
+    //    lDataVariant<<tSurface.fileName();
+    //    BrainTreeItem* pBrainTreeItemTop = new BrainTreeItem(lDataVariant, BrainTreeItem::SurfName, m_pRootItem);
+    //    m_pRootItem->appendChild(pBrainTreeItemTop);
+    //    lDataVariant.clear();
+
+    //    //Actual data of the top level brain item
+    //    //FilePath
+    //    lDataVariant<<tSurface.filePath();
+    //    BrainTreeItem* pBrainTreeItemPath = new BrainTreeItem(lDataVariant, BrainTreeItem::FilePath, pBrainTreeItemTop);
+    //    pBrainTreeItemTop->appendChild(pBrainTreeItemPath);
+    //    lDataVariant.clear();
+
+    //    //AnnotName
+    //    lDataVariant<<(tAnnotation.fileName().isEmpty() ? "unspecified" : tAnnotation.fileName());
+    //    BrainTreeItem* pBrainTreeItemAnnotName = new BrainTreeItem(lDataVariant, BrainTreeItem::AnnotName, pBrainTreeItemTop);
+    //    pBrainTreeItemTop->appendChild(pBrainTreeItemAnnotName);
+    //    lDataVariant.clear();
+
+    //    //SurfType
+    //    lDataVariant<<tSurface.surf();
+    //    BrainTreeItem* pBrainTreeItemSurfType = new BrainTreeItem(lDataVariant, BrainTreeItem::SurfType, pBrainTreeItemTop);
+    //    pBrainTreeItemTop->appendChild(pBrainTreeItemSurfType);
+    //    lDataVariant.clear();
+
+    //    //Hemi
+    //    lDataVariant<<tSurface.hemi();
+    //    BrainTreeItem* pBrainTreeItemHemi = new BrainTreeItem(lDataVariant, BrainTreeItem::Hemi, pBrainTreeItemTop);
+    //    pBrainTreeItemTop->appendChild(pBrainTreeItemHemi);
+    //    lDataVariant.clear();
+
+    //    //ColorSulci
+    //    lDataVariant<<QColor(50,50,50);
+    //    BrainTreeItem* pBrainTreeItemColorSulci = new BrainTreeItem(lDataVariant, BrainTreeItem::ColorSulci, pBrainTreeItemTop);
+    //    pBrainTreeItemTop->appendChild(pBrainTreeItemColorSulci);
+    //    lDataVariant.clear();
+
+    //    //ColorGyri
+    //    lDataVariant<<QColor(125,125,125);
+    //    BrainTreeItem* pBrainTreeItemColorGyri = new BrainTreeItem(lDataVariant, BrainTreeItem::ColorGyri, pBrainTreeItemTop);
+    //    pBrainTreeItemTop->appendChild(pBrainTreeItemColorGyri);
+    //    lDataVariant.clear();
+
+    //    //Renderable3DEntity
+    //    Renderable3DEntity* pRenderable3DEntity = new Renderable3DEntity(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset(), p3DEntityParent);
+    //    QVariant var;
+    //    var.setValue(pRenderable3DEntity);
+    //    lDataVariant<<var;
+    //    BrainTreeItem* pBrainTreeItem3DEntity = new BrainTreeItem(lDataVariant, BrainTreeItem::Renderable3DEntity, pBrainTreeItemTop);
+    //    pBrainTreeItemTop->appendChild(pBrainTreeItem3DEntity);
+    //    lDataVariant.clear();
+
+    return true;
 }

@@ -46,7 +46,8 @@
 #include "fs/annotationset.h"
 #include "fs/surfaceset.h"
 
-#include "braintreeitem.h"
+#include "brainsurfacetreeitem.h"
+
 #include "../helpers/renderable3Dentity.h"
 
 
@@ -59,6 +60,7 @@
 #include <QModelIndex>
 #include <QVariant>
 #include <QStringList>
+#include <QStandardItemModel>
 
 #include <Qt3DCore/QEntity>
 
@@ -94,7 +96,7 @@ class BrainTreeItem;
 *
 * @brief Provides a tree based data model.
 */
-class DISP3DNEWSHARED_EXPORT BrainTreeModel : public QAbstractItemModel
+class DISP3DNEWSHARED_EXPORT BrainTreeModel : public QStandardItemModel
 {
     Q_OBJECT
 
@@ -118,15 +120,6 @@ public:
     /**
     * Overloaded functions
     */
-    int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
-    QVariant data(const QModelIndex &index, int role) const Q_DECL_OVERRIDE;
-    Qt::ItemFlags flags(const QModelIndex &index) const Q_DECL_OVERRIDE;
-    QVariant headerData(int section, Qt::Orientation orientation,
-                        int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
-    QModelIndex index(int row, int column,
-                      const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
-    QModelIndex parent(const QModelIndex &index) const Q_DECL_OVERRIDE;
 
     //=========================================================================================================
     /**
@@ -151,7 +144,7 @@ public:
     bool addFsData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
 
 private:
-    BrainTreeItem*     m_pRootItem;     /**< The root item of the tree model. */
+    QStandardItem*     m_pRootItem;     /**< The root item of the tree model. */
 };
 
 } //NAMESPACE DISP3DNEWLIB

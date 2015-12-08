@@ -61,6 +61,8 @@
 #include <QVariant>
 #include <QStringList>
 #include <QColor>
+#include <QStandardItem>
+#include <QStandardItemModel>
 
 
 //*************************************************************************************************************
@@ -100,7 +102,7 @@ using namespace Eigen;
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT BrainSurfaceTreeItem : public AbstractTreeItem, public Renderable3DEntity
+class DISP3DNEWSHARED_EXPORT BrainSurfaceTreeItem : public QStandardItem, public Renderable3DEntity
 {
 
 public:
@@ -111,7 +113,7 @@ public:
     /**
     * Default constructor.
     */
-    explicit BrainSurfaceTreeItem(const Surface &tSurface, const Annotation &tAnnotation, QString sDesc = "", Qt3DCore::QEntity *entityParent = 0, AbstractTreeItem *treeItemParent = 0);
+    explicit BrainSurfaceTreeItem(const Surface &tSurface, const Annotation &tAnnotation, Qt3DCore::QEntity *entityParent = 0);
 
     //=========================================================================================================
     /**
@@ -123,14 +125,11 @@ public:
     /**
     * AbstractTreeItem functions
     */
-    QHash<int, QByteArray> roleNames() const;
-    int columnCount() const;
     QVariant data(int column, int role) const;
     bool setData(int role, const QVariant &value);
-    int childCount() const;
 
 private:
-    QList<QVariant>         m_lItemData;
+    bool createBrainSurfaceTreeItem(const Surface &tSurface, const Annotation &tAnnotation);
 
 };
 
