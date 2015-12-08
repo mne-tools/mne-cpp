@@ -109,7 +109,7 @@ public:
     /**
     * Default constructor.
     */
-    explicit BrainTreeItem();
+    explicit BrainTreeItem(int iType, const QString & text = "");
 
     //=========================================================================================================
     /**
@@ -122,11 +122,12 @@ public:
     * AbstractTreeItem functions
     */
     QHash<int, QByteArray> roleNames() const;
-    QVariant data(int column, int role) const;
-    bool setData(const QVariant& value, int role = Qt::UserRole + 1);
+    QVariant data(int role = Qt::UserRole + 1) const;
+    void  setData(const QVariant& value, int role = Qt::UserRole + 1);
+    int  type() const;
 
 private:
-
+    int m_iType;
 };
 
 } //NAMESPACE DISP3DNEWLIB

@@ -57,9 +57,8 @@ using namespace DISP3DNEWLIB;
 BrainTreeModel::BrainTreeModel(QObject *parent)
 : QStandardItemModel(parent)
 {
-    QList<QVariant> rootData;
-    rootData << "Loaded 3D Data";
     m_pRootItem = this->invisibleRootItem();
+    m_pRootItem->setText("Loaded 3D Data");
 }
 
 
@@ -95,7 +94,9 @@ bool BrainTreeModel::addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSe
 
 bool BrainTreeModel::addFsData(const Surface &tSurface, const Annotation &tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
 {
-    BrainSurfaceTreeItem* surfaceItem = new BrainSurfaceTreeItem(tSurface, tAnnotation, p3DEntityParent);
+    QString hemi;
+    hemi = tSurface.hemi() == 0 ? "Left Hemi" : "Right Hemi";
+    BrainSurfaceTreeItem* surfaceItem = new BrainSurfaceTreeItem(tSurface, tAnnotation, BrainTreeItemTypes::SurfaceItem, hemi, p3DEntityParent);
 
     m_pRootItem->appendRow(surfaceItem);
 
