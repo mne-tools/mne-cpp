@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     braintreeitem.h
+* @file     brainsurfacetreeitem.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,51 +29,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BrainTreeItem class declaration.
+* @brief    BrainSurfaceTreeItem class definition.
 *
 */
-
-#ifndef BRAINTREEITEM_H
-#define BRAINTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3DNew_global.h"
-#include "abstracttreeitem.h"
-#include "../helpers/types.h"
-
-#include "fs/label.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QList>
-#include <QVariant>
-#include <QStringList>
-#include <QColor>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DISP3DNEWLIB
-//=============================================================================================================
-
-namespace DISP3DNEWLIB
-{
+#include "brainsurfacetreeitem.h"
 
 
 //*************************************************************************************************************
@@ -81,54 +46,69 @@ namespace DISP3DNEWLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
+using namespace DISP3DNEWLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* BrainTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
-*
-* @brief Provides a generic brain tree item.
-*/
-class DISP3DNEWSHARED_EXPORT BrainTreeItem : public AbstractTreeItem
+BrainSurfaceTreeItem::BrainSurfaceTreeItem(const Surface &tSurface, const Annotation &tAnnotation, QString sDesc, Qt3DCore::QEntity *entityParent, AbstractTreeItem *treeItemParent)
+: AbstractTreeItem(0, sDesc, treeItemParent)
+, Renderable3DEntity(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset(), entityParent)
 {
+}
 
-public:
-    typedef QSharedPointer<BrainTreeItem> SPtr;             /**< Shared pointer type for BrainTreeItem class. */
-    typedef QSharedPointer<const BrainTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainTreeItem class. */
 
-    //=========================================================================================================
-    /**
-    * Default constructor.
-    */
-    explicit BrainTreeItem(QList<QVariant> lItemData, int iDataRole, QString sDesc = "", AbstractTreeItem *parentItem = 0);
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Default destructor
-    */
-    ~BrainTreeItem();
+BrainSurfaceTreeItem::~BrainSurfaceTreeItem()
+{
+}
 
-    //=========================================================================================================
-    /**
-    * AbstractTreeItem functions
-    */
-    QHash<int, QByteArray> roleNames() const;
-    int columnCount() const;
-    QVariant data(int column, int role) const;
-    bool setData(int role, const QVariant &value);
 
-private:
-    QList<QVariant>         m_lItemData;
+//*************************************************************************************************************
 
-};
+QHash<int, QByteArray> BrainSurfaceTreeItem::roleNames() const
+{
+    QHash<int, QByteArray> roles;
 
-} //NAMESPACE DISP3DNEWLIB
+    return roles;
+}
 
-#endif // BRAINTREEITEM_H
+
+//*************************************************************************************************************
+
+int BrainSurfaceTreeItem::columnCount() const
+{
+    return m_lItemData.count();
+}
+
+
+//*************************************************************************************************************
+
+QVariant BrainSurfaceTreeItem::data(int column, int role) const
+{
+    Q_UNUSED(role);
+
+    return m_lItemData.value(column);
+}
+
+
+//*************************************************************************************************************
+
+bool BrainSurfaceTreeItem::setData(int role, const QVariant &value)
+{
+    Q_UNUSED(role);
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+int BrainSurfaceTreeItem::childCount() const
+{
+    return 5;
+}

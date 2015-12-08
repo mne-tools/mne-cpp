@@ -63,22 +63,32 @@ namespace DISP3DNEWLIB
 
 namespace BrainTreeItemModelRoles
 {
-    enum ItemRole{SurfFilePath = Qt::UserRole + 1000,
-                 SurfAnnotName = Qt::UserRole + 1000,
-                 SurfFilePath = Qt::UserRole + 1000,
-                 SurfFilePath = Qt::UserRole + 1000,
-                 SurfFilePath = Qt::UserRole + 1000,
-                 SurfFilePath = Qt::UserRole + 1000};
+    enum ItemRole{SurfName = Qt::UserRole + 1000,
+                  SurfType = Qt::UserRole + 1001,
+                  SurfHemi = Qt::UserRole + 1002,
+                  SurfColorSulci = Qt::UserRole + 1003,
+                  SurfColorGyri = Qt::UserRole + 1004,
+                  SurfColorVert = Qt::UserRole + 1005,
+                  SurfVert = Qt::UserRole + 1006,
+                  SurfTris = Qt::UserRole + 1007,
+                  SurfNorm = Qt::UserRole + 1008,
+                  SurfCurv = Qt::UserRole + 1009,
+                  SurfOffset = Qt::UserRole + 1010,
+                  SurfFilePath = Qt::UserRole + 1011,
+                  SurfAnnotName = Qt::UserRole + 1012,
+                  SurfAnnotFilePath = Qt::UserRole + 1013,
+                  SurfColorAnnot = Qt::UserRole + 1014,
+                  RootItem = Qt::UserRole + 1015};
 }
 
-namespace BrainTreeSurfaceModelRoles
+namespace BrainSurfaceTreeItemModelRoles
 {
-    enum ItemRole{};
+    enum ItemRole{SurfName = Qt::UserRole + 1100};
 }
 
 namespace BrainTreeSurfaceSetModelRoles
 {
-    enum ItemRole{};
+    enum ItemRole{SurfSetName = Qt::UserRole + 1200};
 }
 
 

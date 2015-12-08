@@ -2,9 +2,11 @@
 
 using namespace DISP3DNEWLIB;
 
-AbstractTreeItem::AbstractTreeItem(QObject *parent)
+AbstractTreeItem::AbstractTreeItem(int iDataRole, QString sDesc, AbstractTreeItem *parent)
 : QObject(parent)
-, m_parentItem(parent)
+, m_iDataRole(iDataRole)
+, m_sDesc(sDesc)
+, m_pParentItem(parent)
 {
 }
 
@@ -33,9 +35,9 @@ QHash<QByteArray, int> AbstractTreeItem::roleTypesFromName()
 
 //*************************************************************************************************************
 
-AbstractTreeItem *AbstractTreeItem::parentItem()
+AbstractTreeItem* AbstractTreeItem::parentItem()
 {
-    return m_parentItem;
+    return m_pParentItem;
 }
 
 
@@ -67,9 +69,19 @@ int AbstractTreeItem::childCount() const
 
 int AbstractTreeItem::row() const
 {
-    if (m_parentItem)
-        return m_parentItem->m_childItems.indexOf(const_cast<AbstractTreeItem*>(this));
+    if (m_pParentItem)
+        return m_pParentItem->m_childItems.indexOf(const_cast<AbstractTreeItem*>(this));
 
     return 0;
+}
+
+
+//*************************************************************************************************************
+
+bool AbstractTreeItem::setData(int role, const QVariant &value)
+{
+    Q_UNUSED(role);
+    Q_UNUSED(value);
+    return false;
 }
 

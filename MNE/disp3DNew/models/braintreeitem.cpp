@@ -54,10 +54,9 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainTreeItem::BrainTreeItem(QList<QVariant> lItemData, BrainTreeItemType type, BrainTreeItem* parent)
-: m_parentItem(parent)
+BrainTreeItem::BrainTreeItem(QList<QVariant> lItemData, int iDataRole, QString sDesc, AbstractTreeItem* parent)
+: AbstractTreeItem(iDataRole, sDesc, parent)
 , m_lItemData(lItemData)
-, m_type(type)
 {
 }
 
@@ -66,31 +65,33 @@ BrainTreeItem::BrainTreeItem(QList<QVariant> lItemData, BrainTreeItemType type, 
 
 BrainTreeItem::~BrainTreeItem()
 {
-    qDeleteAll(m_childItems);
 }
 
 
 //*************************************************************************************************************
 
-void BrainTreeItem::appendChild(BrainTreeItem *item)
+QHash<int, QByteArray> BrainTreeItem::roleNames() const
 {
-    m_childItems.append(item);
-}
+    QHash<int, QByteArray> roles;
 
+    roles[BrainTreeItemModelRoles::SurfName] = "SurfName";
+    roles[BrainTreeItemModelRoles::SurfType] = "SurfType";
+    roles[BrainTreeItemModelRoles::SurfHemi] = "SurfHemi";
+    roles[BrainTreeItemModelRoles::SurfColorSulci] = "SurfColorSulci";
+    roles[BrainTreeItemModelRoles::SurfColorGyri] = "SurfColorGyri";
+    roles[BrainTreeItemModelRoles::SurfColorVert] = "SurfColorVert";
+    roles[BrainTreeItemModelRoles::SurfVert] = "SurfVert";
+    roles[BrainTreeItemModelRoles::SurfTris] = "SurfTris";
+    roles[BrainTreeItemModelRoles::SurfNorm] = "SurfNorm";
+    roles[BrainTreeItemModelRoles::SurfCurv] = "SurfCurv";
+    roles[BrainTreeItemModelRoles::SurfOffset] = "SurfOffset";
+    roles[BrainTreeItemModelRoles::SurfFilePath] = "SurfFilePath";
+    roles[BrainTreeItemModelRoles::SurfAnnotName] = "SurfAnnotName";
+    roles[BrainTreeItemModelRoles::SurfAnnotFilePath] = "SurfAnnotFilePath";
+    roles[BrainTreeItemModelRoles::SurfColorAnnot] = "SurfColorAnnot";
+    roles[BrainTreeItemModelRoles::RootItem] = "RootItem";
 
-//*************************************************************************************************************
-
-BrainTreeItem *BrainTreeItem::child(int row)
-{
-    return m_childItems.value(row);
-}
-
-
-//*************************************************************************************************************
-
-int BrainTreeItem::childCount() const
-{
-    return m_childItems.count();
+    return roles;
 }
 
 
@@ -114,21 +115,9 @@ QVariant BrainTreeItem::data(int column, int role) const
 
 //*************************************************************************************************************
 
-int BrainTreeItem::row() const
+bool BrainTreeItem::setData(int role, const QVariant &value)
 {
-    if (m_parentItem)
-        return m_parentItem->m_childItems.indexOf(const_cast<BrainTreeItem*>(this));
+    Q_UNUSED(role);
 
-    return 0;
+    return true;
 }
-
-
-//*************************************************************************************************************
-
-BrainTreeItem *BrainTreeItem::parentItem()
-{
-    return m_parentItem;
-}
-
-
-

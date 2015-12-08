@@ -97,6 +97,7 @@ SOURCES += \
     control/control3dwidget.cpp \
     models/braintreemodel.cpp \
     models/braintreeitem.cpp \
+    models/brainsurfacetreeitem.cpp \
     models/abstracttreeitem.cpp
 
 HEADERS += \
@@ -111,6 +112,7 @@ HEADERS += \
     models/braintreemodel.h \
     models/braintreeitem.h \
     models/abstracttreeitem.h \
+    models/brainsurfacetreeitem.h \
     helpers/types.h
 
 FORMS += \
