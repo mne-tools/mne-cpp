@@ -87,7 +87,7 @@ BabyMEG::BabyMEG()
 , m_bIsRunning(false)
 , m_bUseRecordTimer(false)
 , m_pRawMatrixBuffer(0)
-, m_sFiffProjectors(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/header.fif")
+, m_sFiffProjections(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/header.fif")
 , m_sFiffCompensators(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/compensator.fif")
 , m_sBadChannels(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/babymeg/both.bad")
 , m_iRecordingMSeconds(5*60*1000)
@@ -522,19 +522,16 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
     if(!readProjectors())
     {
         qDebug() << "Not able to read projectors";
-        return;
     }
 
     if(!readCompensators())
     {
         qDebug() << "Not able to read compensators";
-        return;
     }
 
     if(!readBadChannels())
     {
         qDebug() << "Not able to read bad channels";
-        return;
     }
 
     m_iBufferSize = pInfo->dataLength;
@@ -715,7 +712,7 @@ MatrixXd BabyMEG::calibrate(const MatrixXf& data)
 
 bool BabyMEG::readProjectors()
 {
-    QFile t_projFiffFile(m_sFiffProjectors);
+    QFile t_projFiffFile(m_sFiffProjections);
 
     //
     //   Open the file
@@ -797,7 +794,7 @@ bool BabyMEG::readBadChannels()
     // Bad Channels
     //
 //    //Read bad channels from header/projection fif
-//    QFile t_headerFiffFile(m_sFiffProjectors);
+//    QFile t_headerFiffFile(m_sFiffProjections);
 
 //    if(!t_headerFiffFile.exists()) {
 //        printf("Could not open fif file for copying bad channels to babyMEG fiff_info\n");
