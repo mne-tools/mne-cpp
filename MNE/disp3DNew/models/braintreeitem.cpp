@@ -58,6 +58,7 @@ BrainTreeItem::BrainTreeItem(int iType, const QString & text)
 : QStandardItem(text)
 , m_iType(iType)
 {
+    this->setToolTip("test");
 }
 
 
@@ -70,43 +71,17 @@ BrainTreeItem::~BrainTreeItem()
 
 //*************************************************************************************************************
 
-QHash<int, QByteArray> BrainTreeItem::roleNames() const
-{
-    QHash<int, QByteArray> roles;
-
-//    roles[BrainTreeModelRoles::SurfName] = "SurfName";
-//    roles[BrainTreeModelRoles::SurfType] = "SurfType";
-//    roles[BrainTreeModelRoles::SurfHemi] = "SurfHemi";
-//    roles[BrainTreeModelRoles::SurfColorSulci] = "SurfColorSulci";
-//    roles[BrainTreeModelRoles::SurfColorGyri] = "SurfColorGyri";
-//    roles[BrainTreeModelRoles::SurfColorVert] = "SurfColorVert";
-//    roles[BrainTreeModelRoles::SurfVert] = "SurfVert";
-//    roles[BrainTreeModelRoles::SurfTris] = "SurfTris";
-//    roles[BrainTreeModelRoles::SurfNorm] = "SurfNorm";
-//    roles[BrainTreeModelRoles::SurfCurv] = "SurfCurv";
-//    roles[BrainTreeModelRoles::SurfOffset] = "SurfOffset";
-//    roles[BrainTreeModelRoles::SurfFilePath] = "SurfFilePath";
-//    roles[BrainTreeModelRoles::SurfAnnotName] = "SurfAnnotName";
-//    roles[BrainTreeModelRoles::SurfAnnotFilePath] = "SurfAnnotFilePath";
-//    roles[BrainTreeModelRoles::SurfColorAnnot] = "SurfColorAnnot";
-//    roles[BrainTreeModelRoles::RootItem] = "RootItem";
-
-    return roles;
-}
-
-
-//*************************************************************************************************************
-
 QVariant BrainTreeItem::data(int role) const
 {
     switch(role) {
-        case Qt::DisplayRole:
-            return QStandardItem::data(role);
-            break;
+        case BrainTreeModelRoles::GetSurfType:
+            return QVariant();
 
+        case BrainTreeModelRoles::GetSurfHemi:
+            return QVariant();
     }
 
-    return QVariant();
+    return QStandardItem::data(role);
 }
 
 
@@ -115,6 +90,8 @@ QVariant BrainTreeItem::data(int role) const
 void  BrainTreeItem::setData(const QVariant& value, int role)
 {
     Q_UNUSED(role);
+
+    QStandardItem::setData(value, role);
 }
 
 
