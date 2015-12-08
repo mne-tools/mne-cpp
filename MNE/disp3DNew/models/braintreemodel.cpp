@@ -59,7 +59,7 @@ BrainTreeModel::BrainTreeModel(QObject *parent)
 {
     QList<QVariant> rootData;
     rootData << "Loaded 3D Data";
-    m_pRootItem = new BrainTreeItem(rootData, BrainTreeItem::RootItem);
+    m_pRootItem = new BrainTreeItem(rootData, BrainTreeItemModelRoles::RootItem, "RootItem");
 }
 
 
@@ -153,7 +153,7 @@ QModelIndex BrainTreeModel::index(int row, int column, const QModelIndex &parent
     else
         parentItem = static_cast<BrainTreeItem*>(parent.internalPointer());
 
-    BrainTreeItem* childItem = parentItem->child(row);
+    AbstractTreeItem* childItem = parentItem->child(row);
     if (childItem)
         return createIndex(row, column, childItem);
     else
@@ -169,7 +169,7 @@ QModelIndex BrainTreeModel::parent(const QModelIndex &index) const
         return QModelIndex();
 
     BrainTreeItem* childItem = static_cast<BrainTreeItem*>(index.internalPointer());
-    BrainTreeItem* parentItem = childItem->parentItem();
+    AbstractTreeItem* parentItem = childItem->parentItem();
 
     if (parentItem == m_pRootItem)
         return QModelIndex();
@@ -202,59 +202,59 @@ bool BrainTreeModel::addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSe
 
 bool BrainTreeModel::addFsData(const Surface &tSurface, const Annotation &tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
 {
-    QList<QVariant> lDataVariant;
+//    QList<QVariant> lDataVariant;
 
-    //Top level brain tree item
-    lDataVariant<<tSurface.fileName();
-    BrainTreeItem* pBrainTreeItemTop = new BrainTreeItem(lDataVariant, BrainTreeItem::SurfName, m_pRootItem);
-    m_pRootItem->appendChild(pBrainTreeItemTop);
-    lDataVariant.clear();
+//    //Top level brain tree item
+//    lDataVariant<<tSurface.fileName();
+//    BrainTreeItem* pBrainTreeItemTop = new BrainTreeItem(lDataVariant, BrainTreeItem::SurfName, m_pRootItem);
+//    m_pRootItem->appendChild(pBrainTreeItemTop);
+//    lDataVariant.clear();
 
-    //Actual data of the top level brain item
-    //FilePath
-    lDataVariant<<tSurface.filePath();
-    BrainTreeItem* pBrainTreeItemPath = new BrainTreeItem(lDataVariant, BrainTreeItem::FilePath, pBrainTreeItemTop);
-    pBrainTreeItemTop->appendChild(pBrainTreeItemPath);
-    lDataVariant.clear();
+//    //Actual data of the top level brain item
+//    //FilePath
+//    lDataVariant<<tSurface.filePath();
+//    BrainTreeItem* pBrainTreeItemPath = new BrainTreeItem(lDataVariant, BrainTreeItem::FilePath, pBrainTreeItemTop);
+//    pBrainTreeItemTop->appendChild(pBrainTreeItemPath);
+//    lDataVariant.clear();
 
-    //AnnotName
-    lDataVariant<<(tAnnotation.fileName().isEmpty() ? "unspecified" : tAnnotation.fileName());
-    BrainTreeItem* pBrainTreeItemAnnotName = new BrainTreeItem(lDataVariant, BrainTreeItem::AnnotName, pBrainTreeItemTop);
-    pBrainTreeItemTop->appendChild(pBrainTreeItemAnnotName);
-    lDataVariant.clear();
+//    //AnnotName
+//    lDataVariant<<(tAnnotation.fileName().isEmpty() ? "unspecified" : tAnnotation.fileName());
+//    BrainTreeItem* pBrainTreeItemAnnotName = new BrainTreeItem(lDataVariant, BrainTreeItem::AnnotName, pBrainTreeItemTop);
+//    pBrainTreeItemTop->appendChild(pBrainTreeItemAnnotName);
+//    lDataVariant.clear();
 
-    //SurfType
-    lDataVariant<<tSurface.surf();
-    BrainTreeItem* pBrainTreeItemSurfType = new BrainTreeItem(lDataVariant, BrainTreeItem::SurfType, pBrainTreeItemTop);
-    pBrainTreeItemTop->appendChild(pBrainTreeItemSurfType);
-    lDataVariant.clear();
+//    //SurfType
+//    lDataVariant<<tSurface.surf();
+//    BrainTreeItem* pBrainTreeItemSurfType = new BrainTreeItem(lDataVariant, BrainTreeItem::SurfType, pBrainTreeItemTop);
+//    pBrainTreeItemTop->appendChild(pBrainTreeItemSurfType);
+//    lDataVariant.clear();
 
-    //Hemi
-    lDataVariant<<tSurface.hemi();
-    BrainTreeItem* pBrainTreeItemHemi = new BrainTreeItem(lDataVariant, BrainTreeItem::Hemi, pBrainTreeItemTop);
-    pBrainTreeItemTop->appendChild(pBrainTreeItemHemi);
-    lDataVariant.clear();
+//    //Hemi
+//    lDataVariant<<tSurface.hemi();
+//    BrainTreeItem* pBrainTreeItemHemi = new BrainTreeItem(lDataVariant, BrainTreeItem::Hemi, pBrainTreeItemTop);
+//    pBrainTreeItemTop->appendChild(pBrainTreeItemHemi);
+//    lDataVariant.clear();
 
-    //ColorSulci
-    lDataVariant<<QColor(50,50,50);
-    BrainTreeItem* pBrainTreeItemColorSulci = new BrainTreeItem(lDataVariant, BrainTreeItem::ColorSulci, pBrainTreeItemTop);
-    pBrainTreeItemTop->appendChild(pBrainTreeItemColorSulci);
-    lDataVariant.clear();
+//    //ColorSulci
+//    lDataVariant<<QColor(50,50,50);
+//    BrainTreeItem* pBrainTreeItemColorSulci = new BrainTreeItem(lDataVariant, BrainTreeItem::ColorSulci, pBrainTreeItemTop);
+//    pBrainTreeItemTop->appendChild(pBrainTreeItemColorSulci);
+//    lDataVariant.clear();
 
-    //ColorGyri
-    lDataVariant<<QColor(125,125,125);
-    BrainTreeItem* pBrainTreeItemColorGyri = new BrainTreeItem(lDataVariant, BrainTreeItem::ColorGyri, pBrainTreeItemTop);
-    pBrainTreeItemTop->appendChild(pBrainTreeItemColorGyri);
-    lDataVariant.clear();
+//    //ColorGyri
+//    lDataVariant<<QColor(125,125,125);
+//    BrainTreeItem* pBrainTreeItemColorGyri = new BrainTreeItem(lDataVariant, BrainTreeItem::ColorGyri, pBrainTreeItemTop);
+//    pBrainTreeItemTop->appendChild(pBrainTreeItemColorGyri);
+//    lDataVariant.clear();
 
-    //Renderable3DEntity
-    Renderable3DEntity* pRenderable3DEntity = new Renderable3DEntity(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset(), p3DEntityParent);
-    QVariant var;
-    var.setValue(pRenderable3DEntity);
-    lDataVariant<<var;
-    BrainTreeItem* pBrainTreeItem3DEntity = new BrainTreeItem(lDataVariant, BrainTreeItem::Renderable3DEntity, pBrainTreeItemTop);
-    pBrainTreeItemTop->appendChild(pBrainTreeItem3DEntity);
-    lDataVariant.clear();
+//    //Renderable3DEntity
+//    Renderable3DEntity* pRenderable3DEntity = new Renderable3DEntity(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset(), p3DEntityParent);
+//    QVariant var;
+//    var.setValue(pRenderable3DEntity);
+//    lDataVariant<<var;
+//    BrainTreeItem* pBrainTreeItem3DEntity = new BrainTreeItem(lDataVariant, BrainTreeItem::Renderable3DEntity, pBrainTreeItemTop);
+//    pBrainTreeItemTop->appendChild(pBrainTreeItem3DEntity);
+//    lDataVariant.clear();
 
     return true;
 }
