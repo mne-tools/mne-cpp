@@ -88,7 +88,8 @@ namespace BrainTreeModelRoles
                   GetAnnotName = Qt::UserRole + 12,
                   GetAnnotFilePath = Qt::UserRole + 13,
                   GetAnnotColor = Qt::UserRole + 14,
-                  GetRootItem = Qt::UserRole + 15};
+                  GetRenderable3DEntity = Qt::UserRole + 15,
+                  GetRootItem = Qt::UserRole + 16};
 }
 
 

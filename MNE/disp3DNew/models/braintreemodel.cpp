@@ -72,6 +72,14 @@ BrainTreeModel::~BrainTreeModel()
 
 //*************************************************************************************************************
 
+QVariant BrainTreeModel::data(const QModelIndex & index, int role) const
+{
+    return QStandardItemModel::data(index, role);
+}
+
+
+//*************************************************************************************************************
+
 bool BrainTreeModel::addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
 {
     for(int i = 0; i < tSurfaceSet.size(); i++) {
@@ -94,14 +102,11 @@ bool BrainTreeModel::addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSe
 
 bool BrainTreeModel::addFsData(const Surface &tSurface, const Annotation &tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
 {
-    QString hemi;
-    hemi = tSurface.hemi() == 0 ? "Left" : "Right";
-    QList<QStandardItem*> itemList;
+    QString hemi = tSurface.hemi() == 0 ? "Left" : "Right";
 
     BrainSurfaceTreeItem* surfaceItem = new BrainSurfaceTreeItem(tSurface, tAnnotation, BrainTreeItemTypes::SurfaceItem, hemi, p3DEntityParent);
-    itemList<<surfaceItem<<new QStandardItem("Hemisphere");
-
-    m_pRootItem->appendRow(itemList);
+    surfaceItem->setToolTip("Brain hemisphere");
+    m_pRootItem->appendRow(surfaceItem);
 
     return true;
 }

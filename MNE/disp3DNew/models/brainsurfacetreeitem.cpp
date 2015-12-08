@@ -75,13 +75,15 @@ BrainSurfaceTreeItem::~BrainSurfaceTreeItem()
 QVariant BrainSurfaceTreeItem::data(int role) const
 {
     switch(role) {
-        case Qt::DisplayRole:
-            return QStandardItem::data(role);
-            break;
+        case BrainTreeModelRoles::GetSurfName:
+            return QVariant();
+
+        case BrainTreeModelRoles::GetRenderable3DEntity:
+            return QVariant();
 
     }
 
-    return QVariant();
+    return QStandardItem::data(role);
 }
 
 
@@ -89,7 +91,7 @@ QVariant BrainSurfaceTreeItem::data(int role) const
 
 void  BrainSurfaceTreeItem::setData(const QVariant& value, int role)
 {
-    Q_UNUSED(role);
+    QStandardItem::setData(value, role);
 }
 
 
@@ -105,27 +107,21 @@ int  BrainSurfaceTreeItem::type() const
 
 bool BrainSurfaceTreeItem::createBrainSurfaceTreeItem(const Surface &tSurface, const Annotation &tAnnotation)
 {
-    QList<QStandardItem*> itemList;
-
     BrainTreeItem *itemSurfFileName = new BrainTreeItem(BrainTreeItemTypes::SurfaceFileName, tSurface.fileName());
-    itemList<<itemSurfFileName<<new QStandardItem("Surface file name");
-    this->appendRow(itemList);
-    itemList.clear();
+    itemSurfFileName->setToolTip("Surface file name");
+    this->appendRow(itemSurfFileName);
 
     BrainTreeItem *itemSurfPath = new BrainTreeItem(BrainTreeItemTypes::SurfaceFilePath, tSurface.filePath());
-    itemList<<itemSurfPath<<new QStandardItem("Surface file path");
-    this->appendRow(itemList);
-    itemList.clear();
+    itemSurfPath->setToolTip("Surface file path");
+    this->appendRow(itemSurfPath);
 
     BrainTreeItem *itemAnnotFileName = new BrainTreeItem(BrainTreeItemTypes::AnnotFileName, tAnnotation.fileName());
-    itemList<<itemAnnotFileName<<new QStandardItem("Annot file name");
-    this->appendRow(itemList);
-    itemList.clear();
+    itemAnnotFileName->setToolTip("Annot file name");
+    this->appendRow(itemAnnotFileName);
 
     BrainTreeItem *itemAnnotPath = new BrainTreeItem(BrainTreeItemTypes::AnnotFilePath, tAnnotation.filePath());
-    itemList<<itemAnnotPath<<new QStandardItem("Annot file path");
-    this->appendRow(itemList);
-    itemList.clear();
+    itemAnnotPath->setToolTip("Annot file path");
+    this->appendRow(itemAnnotPath);
 
     //    QList<QVariant> lDataVariant;
 
