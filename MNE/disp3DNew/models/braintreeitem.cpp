@@ -54,9 +54,8 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainTreeItem::BrainTreeItem(QList<QVariant> lItemData, int iDataRole, QString sDesc, AbstractTreeItem* parent)
-: AbstractTreeItem(iDataRole, sDesc, parent)
-, m_lItemData(lItemData)
+BrainTreeItem::BrainTreeItem()
+: QStandardItem()
 {
 }
 
@@ -97,25 +96,17 @@ QHash<int, QByteArray> BrainTreeItem::roleNames() const
 
 //*************************************************************************************************************
 
-int BrainTreeItem::columnCount() const
-{
-    return m_lItemData.count();
-}
-
-
-//*************************************************************************************************************
-
 QVariant BrainTreeItem::data(int column, int role) const
 {
     Q_UNUSED(role);
 
-    return m_lItemData.value(column);
+    return QVariant();
 }
 
 
 //*************************************************************************************************************
 
-bool BrainTreeItem::setData(int role, const QVariant &value)
+bool BrainTreeItem::setData(const QVariant& value, int role)
 {
     Q_UNUSED(role);
 

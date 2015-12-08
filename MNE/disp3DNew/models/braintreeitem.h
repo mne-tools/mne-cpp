@@ -57,6 +57,8 @@
 #include <QVariant>
 #include <QStringList>
 #include <QColor>
+#include <QStandardItem>
+#include <QStandardItemModel>
 
 
 //*************************************************************************************************************
@@ -96,7 +98,7 @@ using namespace Eigen;
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT BrainTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT BrainTreeItem : public QStandardItem
 {
 
 public:
@@ -107,7 +109,7 @@ public:
     /**
     * Default constructor.
     */
-    explicit BrainTreeItem(QList<QVariant> lItemData, int iDataRole, QString sDesc = "", AbstractTreeItem *parentItem = 0);
+    explicit BrainTreeItem();
 
     //=========================================================================================================
     /**
@@ -120,12 +122,10 @@ public:
     * AbstractTreeItem functions
     */
     QHash<int, QByteArray> roleNames() const;
-    int columnCount() const;
     QVariant data(int column, int role) const;
-    bool setData(int role, const QVariant &value);
+    bool setData(const QVariant& value, int role = Qt::UserRole + 1);
 
 private:
-    QList<QVariant>         m_lItemData;
 
 };
 
