@@ -166,6 +166,16 @@ public:
     /**
     * MNE Toolbox function mne_write_bem_surfaces_block
     *
+    * Write the Bem to a FIF file
+    *
+    * @param [in] p_IODevice   IO device to write the bem to.
+    */
+    void write(QIODevice &p_IODevice);
+
+    //=========================================================================================================
+    /**
+    * MNE Toolbox function mne_write_bem_surfaces_block
+    *
     * Write the Bem to a FIF stream
     *
     * @param[in] p_pStream  The stream to write to.
