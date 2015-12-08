@@ -82,15 +82,19 @@ QVariant BrainTreeModel::data(const QModelIndex & index, int role) const
 
 bool BrainTreeModel::addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
 {
+    BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeItemTypes::SurfaceSetItem, "Subject 1");
+    pSurfaceSetItem->setToolTip("Brain surface set");
+    m_pRootItem->appendRow(pSurfaceSetItem);
+
     for(int i = 0; i < tSurfaceSet.size(); i++) {
         if(i < tAnnotationSet.size()) {
             if(tAnnotationSet[i].hemi() == tSurfaceSet[i].hemi()) {
-                addFsData(tSurfaceSet[i], tAnnotationSet[i], p3DEntityParent);
+                addFsDataAsItem(tSurfaceSet[i], tAnnotationSet[i], pSurfaceSetItem, p3DEntityParent);
             } else {
-                addFsData(tSurfaceSet[i], Annotation(), p3DEntityParent);
+                addFsDataAsItem(tSurfaceSet[i], Annotation(), pSurfaceSetItem, p3DEntityParent);
             }
         } else {
-            addFsData(tSurfaceSet[i], Annotation(), p3DEntityParent);
+            addFsDataAsItem(tSurfaceSet[i], Annotation(), pSurfaceSetItem, p3DEntityParent);
         }
     }
 
@@ -102,11 +106,23 @@ bool BrainTreeModel::addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSe
 
 bool BrainTreeModel::addFsData(const Surface &tSurface, const Annotation &tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
 {
-    QString hemi = tSurface.hemi() == 0 ? "Left" : "Right";
+    BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeItemTypes::SurfaceSetItem, "Subject 1");
+    pSurfaceSetItem->setToolTip("Brain surface set");
+    m_pRootItem->appendRow(pSurfaceSetItem);
+
+    return addFsDataAsItem(tSurface, tAnnotation, pSurfaceSetItem, p3DEntityParent);
+}
+
+
+//*************************************************************************************************************
+
+bool BrainTreeModel::addFsDataAsItem(const Surface &tSurface, const Annotation &tAnnotation, QStandardItem* pItemParent, Qt3DCore::QEntity* p3DEntityParent)
+{
+    QString hemi = tSurface.hemi() == 0 ? "Left hemisphere" : "Right hemisphere";
 
     BrainSurfaceTreeItem* surfaceItem = new BrainSurfaceTreeItem(tSurface, tAnnotation, BrainTreeItemTypes::SurfaceItem, hemi, p3DEntityParent);
     surfaceItem->setToolTip("Brain hemisphere");
-    m_pRootItem->appendRow(surfaceItem);
+    pItemParent->appendRow(surfaceItem);
 
     return true;
 }

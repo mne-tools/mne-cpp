@@ -47,6 +47,7 @@
 #include "fs/surfaceset.h"
 
 #include "brainsurfacetreeitem.h"
+#include "brainsurfacesettreeitem.h"
 
 #include "../helpers/renderable3Dentity.h"
 
@@ -145,7 +146,21 @@ public:
     bool addFsData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
 
 private:
+    //=========================================================================================================
+    /**
+    * Adds FreeSurfer data based on surfaces and annotation data to a an item in this model.
+    *
+    * @param[in] tSurface           FreeSurfer surface.
+    * @param[in] tAnnotation        FreeSurfer annotation.
+    * @param[in] pItemParent        item parent.
+    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+    * @return                       Returns true if successful.
+    */
+    bool addFsDataAsItem(const Surface& tSurface, const Annotation& tAnnotation, QStandardItem* pItemParent, Qt3DCore::QEntity* p3DEntityParent = 0);
+
     QStandardItem*     m_pRootItem;     /**< The root item of the tree model. */
+
+
 };
 
 } //NAMESPACE DISP3DNEWLIB

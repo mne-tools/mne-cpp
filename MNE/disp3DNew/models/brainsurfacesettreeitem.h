@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     braintreeitem.h
+* @file     brainsurfacesettreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BrainTreeItem class declaration.
+* @brief     BrainSurfaceSetTreeItem class declaration.
 *
 */
 
-#ifndef BRAINTREEITEM_H
-#define BRAINTREEITEM_H
+#ifndef BrainSurfaceSetTreeItem_H
+#define BrainSurfaceSetTreeItem_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -42,7 +42,10 @@
 //=============================================================================================================
 
 #include "../disp3DNew_global.h"
+
 #include "abstracttreeitem.h"
+#include "braintreeitem.h"
+
 #include "../helpers/types.h"
 
 #include "fs/label.h"
@@ -94,36 +97,36 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* BrainTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
+* BrainSurfaceSetTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT BrainTreeItem : public QStandardItem
+class DISP3DNEWSHARED_EXPORT BrainSurfaceSetTreeItem : public QStandardItem
 {
 
 public:
-    typedef QSharedPointer<BrainTreeItem> SPtr;             /**< Shared pointer type for BrainTreeItem class. */
-    typedef QSharedPointer<const BrainTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainTreeItem class. */
+    typedef QSharedPointer<BrainSurfaceSetTreeItem> SPtr;             /**< Shared pointer type for BrainSurfaceSetTreeItem class. */
+    typedef QSharedPointer<const BrainSurfaceSetTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainSurfaceSetTreeItem class. */
 
     //=========================================================================================================
     /**
     * Default constructor.
     */
-    explicit BrainTreeItem(const int &iType, const QString & text = "");
+    explicit BrainSurfaceSetTreeItem(const int &iType, const QString &text = "");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~BrainTreeItem();
+    ~BrainSurfaceSetTreeItem();
 
     //=========================================================================================================
     /**
     * AbstractTreeItem functions
     */
     QVariant data(int role = Qt::UserRole + 1) const;
-    void  setData(const QVariant& value, int role = Qt::UserRole + 1);
-    int  type() const;
+    void setData(const QVariant & value, int role = Qt::UserRole + 1);
+    int type() const;
 
 private:
     int m_iType;
@@ -131,4 +134,4 @@ private:
 
 } //NAMESPACE DISP3DNEWLIB
 
-#endif // BRAINTREEITEM_H
+#endif // BrainSurfaceSetTreeItem_H

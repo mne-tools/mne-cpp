@@ -65,10 +65,11 @@ namespace DISP3DNEWLIB
 
 enum BrainTreeItemTypes {
     SurfaceItem = QStandardItem::UserType,
-    SurfaceFileName = QStandardItem::UserType + 1,
-    SurfaceFilePath = QStandardItem::UserType + 2,
-    AnnotFileName = QStandardItem::UserType + 3,
-    AnnotFilePath = QStandardItem::UserType + 4,
+    SurfaceSetItem = QStandardItem::UserType + 1,
+    SurfaceFileName = QStandardItem::UserType + 2,
+    SurfaceFilePath = QStandardItem::UserType + 3,
+    AnnotFileName = QStandardItem::UserType + 4,
+    AnnotFilePath = QStandardItem::UserType + 5
 };
 
 namespace BrainTreeModelRoles
@@ -89,7 +90,8 @@ namespace BrainTreeModelRoles
                   GetAnnotFilePath = Qt::UserRole + 13,
                   GetAnnotColor = Qt::UserRole + 14,
                   GetRenderable3DEntity = Qt::UserRole + 15,
-                  GetRootItem = Qt::UserRole + 16};
+                  GetRootItem = Qt::UserRole + 16,
+                  GetSurfSetName = Qt::UserRole + 17};
 }
 
 
