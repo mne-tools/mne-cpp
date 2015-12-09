@@ -55,10 +55,8 @@ using namespace DISP3DNEWLIB;
 //=============================================================================================================
 
 BrainTreeItem::BrainTreeItem( const int &iType, const QString & text)
-: QStandardItem(text)
-, m_iType(iType)
+: AbstractTreeItem(iType, text)
 {
-    this->setToolTip("test");
 }
 
 
@@ -94,10 +92,3 @@ void  BrainTreeItem::setData(const QVariant& value, int role)
     QStandardItem::setData(value, role);
 }
 
-
-//*************************************************************************************************************
-
-int  BrainTreeItem::type() const
-{
-    return m_iType;
-}

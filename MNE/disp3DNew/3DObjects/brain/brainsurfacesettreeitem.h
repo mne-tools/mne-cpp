@@ -101,7 +101,7 @@ using namespace Eigen;
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT BrainSurfaceSetTreeItem : public QStandardItem
+class DISP3DNEWSHARED_EXPORT BrainSurfaceSetTreeItem : public AbstractTreeItem
 {
 
 public:
@@ -126,10 +126,9 @@ public:
     */
     QVariant data(int role = Qt::UserRole + 1) const;
     void setData(const QVariant & value, int role = Qt::UserRole + 1);
-    int type() const;
 
 private:
-    int m_iType;
+
 };
 
 } //NAMESPACE DISP3DNEWLIB

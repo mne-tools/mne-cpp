@@ -55,9 +55,8 @@ using namespace DISP3DNEWLIB;
 //=============================================================================================================
 
 BrainSurfaceTreeItem::BrainSurfaceTreeItem(const Surface &tSurface, const Annotation &tAnnotation,  const int & iType, const QString & text, Qt3DCore::QEntity *entityParent)
-: QStandardItem(text)
+: AbstractTreeItem(iType, text)
 , Renderable3DEntity(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset(), entityParent)
-, m_iType(iType)
 {
     createBrainSurfaceTreeItem(tSurface, tAnnotation);
 }
@@ -92,14 +91,6 @@ QVariant BrainSurfaceTreeItem::data(int role) const
 void  BrainSurfaceTreeItem::setData(const QVariant& value, int role)
 {
     QStandardItem::setData(value, role);
-}
-
-
-//*************************************************************************************************************
-
-int  BrainSurfaceTreeItem::type() const
-{
-    return m_iType;
 }
 
 
