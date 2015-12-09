@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3DNew_global.h"
+#include "../../disp3DNew_global.h"
 
 #include "fs/annotationset.h"
 #include "fs/surfaceset.h"
@@ -49,7 +49,7 @@
 #include "brainsurfacetreeitem.h"
 #include "brainsurfacesettreeitem.h"
 
-#include "../helpers/renderable3Dentity.h"
+#include "../../helpers/renderable3Dentity.h"
 
 
 //*************************************************************************************************************

@@ -41,12 +41,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3DNew_global.h"
+#include "../../disp3DNew_global.h"
 
-#include "abstracttreeitem.h"
+#include "../../helpers/abstracttreeitem.h"
 #include "braintreeitem.h"
 
-#include "../helpers/types.h"
+#include "../../helpers/types.h"
 
 #include "fs/label.h"
 

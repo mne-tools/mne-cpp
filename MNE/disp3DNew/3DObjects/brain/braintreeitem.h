@@ -41,9 +41,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3DNew_global.h"
-#include "abstracttreeitem.h"
-#include "../helpers/types.h"
+#include "../../disp3DNew_global.h"
+#include "../../helpers/abstracttreeitem.h"
+#include "../../helpers/types.h"
 
 #include "fs/label.h"
 

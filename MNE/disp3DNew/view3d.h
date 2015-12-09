@@ -44,7 +44,7 @@
 #include <iostream>
 #include "disp3dnew_global.h"
 
-#include "3DObjects/brain.h"
+#include "3DObjects/brain/brain.h"
 
 #include "helpers/window.h"
 
