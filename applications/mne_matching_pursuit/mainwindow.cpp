@@ -3292,19 +3292,19 @@ void MainWindow::on_actionTFplot_triggered()
         */
         tf_sum = Spectrogram::make_spectrogram(_signal_matrix.col(0), 0);
 
-        TFplot *tfplot = new TFplot(tf_sum, _sample_rate, 0, 600, ColorMaps::Jet);
+        TFplot *tfplot = new TFplot(tf_sum, _sample_rate, 0, 600, Jet);
         ui->tabWidget->addTab(tfplot, "TF-Overview 0-500Hz");
         ui->tabWidget->setCurrentIndex(1);
         tfplot->resize(ui->tabWidget->size());
 
-        TFplot *tfplot2 = new TFplot(tf_sum, _sample_rate, 0, 100, ColorMaps::Jet);
+        TFplot *tfplot2 = new TFplot(tf_sum, _sample_rate, 0, 100, Jet);
         ui->tabWidget->addTab(tfplot2, "TF-Overview 0-100Hz");
 
         ui->tabWidget->setCurrentIndex(2);
         tfplot2->resize(ui->tabWidget->size());
 
 
-        TFplot *tfplot3 = new TFplot(tf_sum, _sample_rate, 301, 480, ColorMaps::Jet);
+        TFplot *tfplot3 = new TFplot(tf_sum, _sample_rate, 301, 480, Jet);
         ui->tabWidget->addTab(tfplot3, "TF-Overview 300-480Hz");
 
         ui->tabWidget->setCurrentIndex(3);

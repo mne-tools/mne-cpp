@@ -85,6 +85,7 @@ namespace MNELIB
 //=============================================================================================================
 /**
  * BEM Surface
+ * TODO: Get rid of this? Not used anymore. Maybe by the Leipzig proct code?
  *
  * @brief BEM Surface
  */

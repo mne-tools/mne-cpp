@@ -83,7 +83,7 @@ public:
     *
     * @return spectrogram-matrix (tf-representation of the input signal)
     */
-    static inline MatrixXd make_spectrogram(VectorXd signal, qint32 window_size);
+    static MatrixXd make_spectrogram(VectorXd signal, qint32 window_size);
 
 private:
 
@@ -101,7 +101,7 @@ private:
     *
     * @return samples of window-vector
     */
-    static inline VectorXd gauss_window (qint32 sample_count, qreal scale, quint32 translation);
+    static VectorXd gauss_window (qint32 sample_count, qreal scale, quint32 translation);
 
 };
 

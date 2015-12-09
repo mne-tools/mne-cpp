@@ -116,53 +116,57 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirT
     //   Open the file, create directory
     //
     bool open_here = false;
+    QFile t_file;//ToDo TCPSocket;
+
     if (!p_pStream->device()->isOpen())
     {
         QList<FiffDirEntry> t_Dir;
         QString t_sFileName = p_pStream->streamName();
 
-        QFile t_file(t_sFileName);//ToDo TCPSocket;
+        t_file.setFileName(t_sFileName);
         p_pStream = FiffStream::SPtr(new FiffStream(&t_file));
         if(!p_pStream->open(p_Tree, t_Dir))
             return false;
         open_here = true;
 //        if(t_pDir)
 //            delete t_pDir;
-
-
-        //
-        //   Find all BEM surfaces
-        //
-
-        QList<FiffDirTree>bem = p_Tree.dir_tree_find(FIFFB_BEM);
-        if(bem.isEmpty())
-        {
-            qCritical() << "No BEM block found!";
-            return false;
-        }
-
-        QList<FiffDirTree>bemsurf = p_Tree.dir_tree_find(FIFFB_BEM_SURF);
-        if(bemsurf.isEmpty())
-        {
-            qCritical() << "No BEM surfaces found!";
-            return false;
-        }
-
-        for(int k = 0; k < bemsurf.size(); ++k)
-        {
-            MNEBemSurface  p_BemSurface;
-            printf("\tReading a BEM surface...");
-            MNEBem::readBemSurface(p_pStream.data(), bemsurf[k], p_BemSurface);
-            p_BemSurface.addTriangleData();
-             if (add_geom)
-                p_BemSurface.addVertexNormals();
-            printf("\t[done]\n" );
-
-            p_Bem.m_qListBemSurface.append(p_BemSurface);
-
-    //           src(k) = this;
-        }
     }
+
+    //
+    //   Find all BEM surfaces
+    //
+
+    QList<FiffDirTree>bem = p_Tree.dir_tree_find(FIFFB_BEM);
+    if(bem.isEmpty())
+    {
+        qCritical() << "No BEM block found!";
+        return false;
+    }
+
+    QList<FiffDirTree>bemsurf = p_Tree.dir_tree_find(FIFFB_BEM_SURF);
+    if(bemsurf.isEmpty())
+    {
+        qCritical() << "No BEM surfaces found!";
+        return false;
+    }
+
+    for(int k = 0; k < bemsurf.size(); ++k)
+    {
+        MNEBemSurface  p_BemSurface;
+        printf("\tReading a BEM surface...");
+        MNEBem::readBemSurface(p_pStream.data(), bemsurf[k], p_BemSurface);
+        p_BemSurface.addTriangleData();
+         if (add_geom)
+            p_BemSurface.addVertexNormals();
+        printf("\t[done]\n" );
+
+        p_Bem.m_qListBemSurface.append(p_BemSurface);
+
+//           src(k) = this;
+    }
+
+    if(open_here)
+        p_pStream->device()->close();
 
     return true;
 }
