@@ -43,7 +43,7 @@
 
 #include "disp3dnew_global.h"
 
-#include "../helpers/renderable3Dentity.h"
+#include "../../helpers/renderable3Dentity.h"
 
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>

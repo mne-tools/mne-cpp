@@ -45,7 +45,7 @@
 
 #include "brainobject.h"
 
-#include "../Models/braintreemodel.h"
+#include "braintreemodel.h"
 
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
