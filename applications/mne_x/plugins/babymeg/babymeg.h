@@ -62,6 +62,7 @@
 
 #include <fiff/fiff_info.h>
 #include <fiff/fiff.h>
+#include <fiff/fiff_types.h>
 
 
 //*************************************************************************************************************
@@ -451,7 +452,7 @@ private:
     QString     m_sCurrentSubject;      /**< The current subject which is part of the filename to be recorded.*/
     QString     m_sCurrentParadigm;     /**< The current paradigm which is part of the filename to be recorded.*/
     QString     m_sRecordFile;          /**< Current record file. */
-    QString     m_sFiffProjectors;      /**< Fiff projection information */
+    QString     m_sFiffProjections;     /**< Fiff projection information */
     QString     m_sFiffCompensators;    /**< Fiff compensator information */
     QString     m_sBadChannels;         /**< Filename which contains a list of bad channels */
 

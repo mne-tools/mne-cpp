@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     templateclass.h
+* @file     templateclass.cpp
 * @author   Your name <yourname@yourdomain>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0

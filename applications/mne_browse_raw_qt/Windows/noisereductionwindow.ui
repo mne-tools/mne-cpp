@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ProjectionWindow</class>
- <widget class="QDockWidget" name="ProjectionWindow">
+ <class>NoiseReductionWindow</class>
+ <widget class="QDockWidget" name="NoiseReductionWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -20,16 +20,18 @@
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
      <layout class="QGridLayout" name="gridLayout_2">
+      <item row="1" column="0">
+       <widget class="QGroupBox" name="m_groupBox_compensators">
+        <property name="title">
+         <string>Available Compensators</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0">
-       <widget class="QGroupBox" name="groupBox">
+       <widget class="QGroupBox" name="m_groupBox_projections">
         <property name="title">
          <string>Available projections</string>
         </property>
-        <layout class="QGridLayout" name="gridLayout_3">
-         <item row="0" column="0">
-          <widget class="QTableView" name="m_tableView_availableProjections"/>
-         </item>
-        </layout>
        </widget>
       </item>
      </layout>
