@@ -40,6 +40,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "renderable3Dentity.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -47,6 +49,12 @@
 //=============================================================================================================
 
 #include <QStandardItem>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -64,12 +72,13 @@ namespace DISP3DNEWLIB
 {
 
 enum BrainTreeItemTypes {
-    SurfaceItem = QStandardItem::UserType,
-    SurfaceSetItem = QStandardItem::UserType + 1,
-    SurfaceFileName = QStandardItem::UserType + 2,
-    SurfaceFilePath = QStandardItem::UserType + 3,
-    AnnotFileName = QStandardItem::UserType + 4,
-    AnnotFilePath = QStandardItem::UserType + 5
+    UnknownItem = QStandardItem::UserType,
+    SurfaceItem = QStandardItem::UserType + 1,
+    SurfaceSetItem = QStandardItem::UserType + 2,
+    SurfaceFileName = QStandardItem::UserType + 3,
+    SurfaceFilePath = QStandardItem::UserType + 4,
+    AnnotFileName = QStandardItem::UserType + 5,
+    AnnotFilePath = QStandardItem::UserType + 6
 };
 
 namespace BrainTreeModelRoles
@@ -94,9 +103,12 @@ namespace BrainTreeModelRoles
                   GetSurfSetName = Qt::UserRole + 17};
 }
 
+} //NAMESPACE DISP3DNEWLIB
 
-
-} //NAMESPACE
+#ifndef metatype_renderable3Dentity
+#define metatype_renderable3Dentity
+Q_DECLARE_METATYPE(DISP3DNEWLIB::Renderable3DEntity*)
+#endif
 
 //Q_DECLARE_METATYPE(FIFFLIB::fiff_int_t);
 //Q_DECLARE_METATYPE(MNEBrowseRawQt::RowVectorPairF);

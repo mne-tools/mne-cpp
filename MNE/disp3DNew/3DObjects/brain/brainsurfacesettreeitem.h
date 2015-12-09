@@ -49,7 +49,8 @@
 #include "../../helpers/types.h"
 
 #include "fs/label.h"
-
+#include "fs/annotationset.h"
+#include "fs/surfaceset.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -87,6 +88,7 @@ namespace DISP3DNEWLIB
 //=============================================================================================================
 
 using namespace Eigen;
+using namespace FSLIB;
 
 
 //*************************************************************************************************************
@@ -112,7 +114,13 @@ public:
     /**
     * Default constructor.
     */
-    explicit BrainSurfaceSetTreeItem(const int &iType, const QString &text = "");
+    explicit BrainSurfaceSetTreeItem();
+
+    //=========================================================================================================
+    /**
+    * FreeSurfer constructor from single surface.
+    */
+    explicit BrainSurfaceSetTreeItem(const int& iType, const QString& text = "");
 
     //=========================================================================================================
     /**
@@ -125,7 +133,10 @@ public:
     * AbstractTreeItem functions
     */
     QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant & value, int role = Qt::UserRole + 1);
+    void setData(const QVariant& value, int role = Qt::UserRole + 1);
+
+    BrainSurfaceSetTreeItem& operator<<(const SurfaceSet& tSurfaceSet);
+    BrainSurfaceSetTreeItem& operator<<(const AnnotationSet& tAnnotationSet);
 
 private:
 
