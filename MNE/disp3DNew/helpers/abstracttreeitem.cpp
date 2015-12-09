@@ -22,3 +22,13 @@ int  AbstractTreeItem::type() const
 {
     return m_iType;
 }
+
+
+//*************************************************************************************************************
+
+AbstractTreeItem& AbstractTreeItem::operator<<(AbstractTreeItem &newItem)
+{
+    this->appendRow(&newItem);
+
+    return *this;
+}

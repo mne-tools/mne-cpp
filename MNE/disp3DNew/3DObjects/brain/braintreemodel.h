@@ -165,9 +165,4 @@ private:
 
 } //NAMESPACE DISP3DNEWLIB
 
-#ifndef metatype_renderable3Dentity
-#define metatype_renderable3Dentity
-Q_DECLARE_METATYPE(DISP3DNEWLIB::Renderable3DEntity*)
-#endif
-
 #endif // BRAINTREEMODEL_H

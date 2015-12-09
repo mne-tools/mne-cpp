@@ -92,6 +92,8 @@ public :
 
     int type() const;
 
+    AbstractTreeItem &operator<<(AbstractTreeItem &newItem);
+
 protected :
     int     m_iType;
 };

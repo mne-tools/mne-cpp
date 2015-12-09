@@ -54,7 +54,7 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainSurfaceSetTreeItem::BrainSurfaceSetTreeItem(const int &iType, const QString & text)
+BrainSurfaceSetTreeItem::BrainSurfaceSetTreeItem(const int& iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
 
@@ -86,4 +86,20 @@ QVariant BrainSurfaceSetTreeItem::data(int role) const
 void  BrainSurfaceSetTreeItem::setData(const QVariant& value, int role)
 {
     QStandardItem::setData(value, role);
+}
+
+
+//*************************************************************************************************************
+
+BrainSurfaceSetTreeItem& BrainSurfaceSetTreeItem::operator<<(const SurfaceSet& tSurfaceSet)
+{
+    return *this;
+}
+
+
+//*************************************************************************************************************
+
+BrainSurfaceSetTreeItem& BrainSurfaceSetTreeItem::operator<<(const AnnotationSet& tAnnotationSet)
+{
+    return *this;
 }

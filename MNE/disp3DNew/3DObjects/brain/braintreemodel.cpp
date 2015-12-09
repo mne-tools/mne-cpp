@@ -84,19 +84,20 @@ bool BrainTreeModel::addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSe
 {
     BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeItemTypes::SurfaceSetItem, "Subject 1");
     pSurfaceSetItem->setToolTip("Brain surface set");
+    *pSurfaceSetItem<<tSurfaceSet<<tAnnotationSet;
     m_pRootItem->appendRow(pSurfaceSetItem);
 
-    for(int i = 0; i < tSurfaceSet.size(); i++) {
-        if(i < tAnnotationSet.size()) {
-            if(tAnnotationSet[i].hemi() == tSurfaceSet[i].hemi()) {
-                addFsDataAsItem(tSurfaceSet[i], tAnnotationSet[i], pSurfaceSetItem, p3DEntityParent);
-            } else {
-                addFsDataAsItem(tSurfaceSet[i], Annotation(), pSurfaceSetItem, p3DEntityParent);
-            }
-        } else {
-            addFsDataAsItem(tSurfaceSet[i], Annotation(), pSurfaceSetItem, p3DEntityParent);
-        }
-    }
+//    for(int i = 0; i < tSurfaceSet.size(); i++) {
+//        if(i < tAnnotationSet.size()) {
+//            if(tAnnotationSet[i].hemi() == tSurfaceSet[i].hemi()) {
+//                addFsDataAsItem(tSurfaceSet[i], tAnnotationSet[i], pSurfaceSetItem, p3DEntityParent);
+//            } else {
+//                addFsDataAsItem(tSurfaceSet[i], Annotation(), pSurfaceSetItem, p3DEntityParent);
+//            }
+//        } else {
+//            addFsDataAsItem(tSurfaceSet[i], Annotation(), pSurfaceSetItem, p3DEntityParent);
+//        }
+//    }
 
     return true;
 }
