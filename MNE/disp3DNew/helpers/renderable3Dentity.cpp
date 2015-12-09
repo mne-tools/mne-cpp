@@ -66,25 +66,25 @@ Renderable3DEntity::Renderable3DEntity(const MatrixX3f &tMatVert, const MatrixX3
 : Qt3DCore::QEntity(parent)
 , m_pCustomMesh(new CustomMesh(tMatVert, tMatNorm, tMatTris, tVecOffset))
 , m_pTransform(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
-, m_pScaleTransform(QSharedPointer<Qt3DCore::QScaleTransform>(new Qt3DCore::QScaleTransform()))
-, m_pTranslateTransform(QSharedPointer<Qt3DCore::QTranslateTransform>(new Qt3DCore::QTranslateTransform()))
-, m_pRotateTransform(QSharedPointer<Qt3DCore::QRotateTransform>(new Qt3DCore::QRotateTransform()))
-, m_pRotateTransformX(QSharedPointer<Qt3DCore::QRotateTransform>(new Qt3DCore::QRotateTransform()))
-, m_pRotateTransformY(QSharedPointer<Qt3DCore::QRotateTransform>(new Qt3DCore::QRotateTransform()))
-, m_pRotateTransformZ(QSharedPointer<Qt3DCore::QRotateTransform>(new Qt3DCore::QRotateTransform()))
+, m_pScaleTransform(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
+, m_pTranslateTransform(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
+, m_pRotateTransform(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
+, m_pRotateTransformX(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
+, m_pRotateTransformY(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
+, m_pRotateTransformZ(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
 , m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPerVertexColorMaterial(this)))
 //, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QNormalDiffuseMapMaterial(this)))
 {
-    m_pRotateTransformX->setAxis(QVector3D(1,0,0));
-    m_pRotateTransformY->setAxis(QVector3D(0,1,0));
-    m_pRotateTransformZ->setAxis(QVector3D(0,0,1));
+//    m_pRotateTransformX->setAxis(QVector3D(1,0,0));
+//    m_pRotateTransformY->setAxis(QVector3D(0,1,0));
+//    m_pRotateTransformZ->setAxis(QVector3D(0,0,1));
 
-    m_pTransform->addTransform(m_pScaleTransform.data());
-    m_pTransform->addTransform(m_pTranslateTransform.data());
-    m_pTransform->addTransform(m_pRotateTransform.data());
-    m_pTransform->addTransform(m_pRotateTransformX.data());
-    m_pTransform->addTransform(m_pRotateTransformY.data());
-    m_pTransform->addTransform(m_pRotateTransformZ.data());
+//    m_pTransform->addTransform(m_pScaleTransform.data());
+//    m_pTransform->addTransform(m_pTranslateTransform.data());
+//    m_pTransform->addTransform(m_pRotateTransform.data());
+//    m_pTransform->addTransform(m_pRotateTransformX.data());
+//    m_pTransform->addTransform(m_pRotateTransformY.data());
+//    m_pTransform->addTransform(m_pRotateTransformZ.data());
 
     this->addComponent(m_pCustomMesh.data());
     this->addComponent(m_pTransform.data());
@@ -119,7 +119,7 @@ void Renderable3DEntity::setScale(float scaleFactor)
 
 void Renderable3DEntity::setRotationX(float degree)
 {
-    m_pRotateTransformX->setAngleDeg(degree);
+    //m_pRotateTransformX->setAngleDeg(degree);
 }
 
 
@@ -127,7 +127,7 @@ void Renderable3DEntity::setRotationX(float degree)
 
 void Renderable3DEntity::setRotationY(float degree)
 {
-    m_pRotateTransformY->setAngleDeg(degree);
+    //m_pRotateTransformY->setAngleDeg(degree);
 }
 
 
@@ -135,7 +135,7 @@ void Renderable3DEntity::setRotationY(float degree)
 
 void Renderable3DEntity::setRotationZ(float degree)
 {
-    m_pRotateTransformZ->setAngleDeg(degree);
+    //m_pRotateTransformZ->setAngleDeg(degree);
 }
 
 
@@ -143,8 +143,8 @@ void Renderable3DEntity::setRotationZ(float degree)
 
 void Renderable3DEntity::setRotation(float degree, const QVector3D &rotAxis)
 {
-    m_pRotateTransform->setAxis(rotAxis);
-    m_pRotateTransform->setAngleDeg(degree);
+    //m_pRotateTransform->setAxis(rotAxis);
+    //m_pRotateTransform->setAngleDeg(degree);
 }
 
 
@@ -152,11 +152,11 @@ void Renderable3DEntity::setRotation(float degree, const QVector3D &rotAxis)
 
 void Renderable3DEntity::addRotation(float degree, const QVector3D &rotAxis)
 {
-    Qt3DCore::QRotateTransform* rotateTransform = new Qt3DCore::QRotateTransform();
-    rotateTransform->setAxis(rotAxis);
-    rotateTransform->setAngleDeg(degree);
+    Qt3DCore::QTransform* rotateTransform = new Qt3DCore::QTransform();
+//    rotateTransform->setAxis(rotAxis);
+//    rotateTransform->setAngleDeg(degree);
 
-    m_pTransform->addTransform(rotateTransform);
+//    m_pTransform->addTransform(rotateTransform);
 
     //qDebug()<<"Adding rotation transform. Total:"<<m_pTransform->transforms().size();
 }

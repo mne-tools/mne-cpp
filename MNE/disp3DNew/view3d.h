@@ -62,7 +62,6 @@
 #include <Qt3DCore/QAspectEngine>
 #include <Qt3DCore/QCamera>
 #include <Qt3DCore/QTransform>
-#include <Qt3DCore/QScaleTransform>
 
 #include <Qt3DRender/QPhongMaterial>
 #include <Qt3DRender/QPerVertexColorMaterial>
@@ -153,11 +152,11 @@ protected:
     QSharedPointer<Qt3DCore::QEntity>   m_ZAxisEntity;                  /**< The entity representing a torus in z direction. */
 
     Qt3DCore::QTransform*               m_pCameraTransform;             /**< The main camera transform. */
-    Qt3DCore::QScaleTransform*          m_pCameraScaleTransform;        /**< The camera scale transformation (added to m_pCameraTransform). */
-    Qt3DCore::QTranslateTransform*      m_pCameraTranslateTransform;    /**< The camera translation transformation (added to m_pCameraTransform). */
-    Qt3DCore::QRotateTransform*         m_pCameraRotateTransformX;      /**< The camera x-axis rotation transformation (added to m_pCameraTransform). */
-    Qt3DCore::QRotateTransform*         m_pCameraRotateTransformY;      /**< The camera y-axis rotation transformation (added to m_pCameraTransform). */
-    Qt3DCore::QRotateTransform*         m_pCameraRotateTransformZ;      /**< The camera z-axis rotation transformation (added to m_pCameraTransform). */
+    Qt3DCore::QTransform*               m_pCameraScaleTransform;        /**< The camera scale transformation (added to m_pCameraTransform). */
+    Qt3DCore::QTransform*               m_pCameraTranslateTransform;    /**< The camera translation transformation (added to m_pCameraTransform). */
+    Qt3DCore::QTransform*               m_pCameraRotateTransformX;      /**< The camera x-axis rotation transformation (added to m_pCameraTransform). */
+    Qt3DCore::QTransform*               m_pCameraRotateTransformY;      /**< The camera y-axis rotation transformation (added to m_pCameraTransform). */
+    Qt3DCore::QTransform*               m_pCameraRotateTransformZ;      /**< The camera z-axis rotation transformation (added to m_pCameraTransform). */
 
     QList<BrainObject::SPtr>            m_lBrainObjectList;
 

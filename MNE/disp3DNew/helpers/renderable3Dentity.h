@@ -58,9 +58,6 @@
 
 #include <Qt3DCore/QEntity>
 #include <Qt3DCore/QTransform>
-#include <Qt3DCore/QScaleTransform>
-#include <Qt3DCore/QRotateTransform>
-#include <Qt3DCore/QTranslateTransform>
 
 #include <Qt3DRender/QMaterial>
 #include <Qt3DRender/QPerVertexColorMaterial>
@@ -203,12 +200,12 @@ public:
 protected:
     CustomMesh::SPtr                                m_pCustomMesh;          /**< The actual mesh information (vertices, normals, colors). */
     QSharedPointer<Qt3DCore::QTransform>            m_pTransform;           /**< The main transformation. */
-    QSharedPointer<Qt3DCore::QScaleTransform>       m_pScaleTransform;      /**< The scaling transformation. */
-    QSharedPointer<Qt3DCore::QTranslateTransform>   m_pTranslateTransform;  /**< The translation transformation. */
-    QSharedPointer<Qt3DCore::QRotateTransform>      m_pRotateTransform;     /**< The rotation transformation which is used when setting a rotation. */
-    QSharedPointer<Qt3DCore::QRotateTransform>      m_pRotateTransformX;    /**< The X-Axis transformation. */
-    QSharedPointer<Qt3DCore::QRotateTransform>      m_pRotateTransformY;    /**< The Y-Axis transformation. */
-    QSharedPointer<Qt3DCore::QRotateTransform>      m_pRotateTransformZ;    /**< The Z-Axis transformation. */
+    QSharedPointer<Qt3DCore::QTransform>            m_pScaleTransform;      /**< The scaling transformation. */
+    QSharedPointer<Qt3DCore::QTransform>            m_pTranslateTransform;  /**< The translation transformation. */
+    QSharedPointer<Qt3DCore::QTransform>            m_pRotateTransform;     /**< The rotation transformation which is used when setting a rotation. */
+    QSharedPointer<Qt3DCore::QTransform>            m_pRotateTransformX;    /**< The X-Axis transformation. */
+    QSharedPointer<Qt3DCore::QTransform>            m_pRotateTransformY;    /**< The Y-Axis transformation. */
+    QSharedPointer<Qt3DCore::QTransform>            m_pRotateTransformZ;    /**< The Z-Axis transformation. */
 
     QSharedPointer<Qt3DRender::QMaterial>           m_pMaterial;            /**< The material to be used for this entity. */
 };
