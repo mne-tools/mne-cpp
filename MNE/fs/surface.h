@@ -132,7 +132,6 @@ public:
     */
     explicit Surface(const QString &path, qint32 hemi, const QString &surf);
 
-
     //=========================================================================================================
     /**
     * Destroys the Surface class.

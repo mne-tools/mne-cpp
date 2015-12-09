@@ -92,7 +92,7 @@ void View3D::init()
     //Aspect engine
     m_aspectEngine.registerAspect(new Qt3DRender::QRenderAspect());
 
-//    m_aspectEngine.registerAspect(m_pInputAspect);
+    m_aspectEngine.registerAspect(m_pInputAspect);
     m_aspectEngine.initialize();
 
     //Data
@@ -141,32 +141,27 @@ void View3D::initTransformations()
     m_pCameraTransform = new Qt3DCore::QTransform;
 
     //Camera scaling
-    m_pCameraScaleTransform = new Qt3DCore::QScaleTransform;
+    m_pCameraScaleTransform = new Qt3DCore::QTransform;
     m_pCameraScaleTransform->setScale(m_fCameraScale);
-    m_pCameraTransform->addTransform(m_pCameraScaleTransform);
 
     //Camera translation
-    m_pCameraTranslateTransform = new Qt3DCore::QTranslateTransform;
+    m_pCameraTranslateTransform = new Qt3DCore::QTransform;
     m_pCameraTranslateTransform->setTranslation(m_vecCameraTrans);
-    m_pCameraTransform->addTransform(m_pCameraTranslateTransform);
 
     //Camera rotation
-    m_pCameraRotateTransformX = new Qt3DCore::QRotateTransform;
-    m_pCameraRotateTransformX->setAngleDeg(m_vecCameraRotation.x());
-    m_pCameraRotateTransformX->setAxis(QVector3D(1,0,0));
-    m_pCameraTransform->addTransform(m_pCameraRotateTransformX);
+    m_pCameraRotateTransformX = new Qt3DCore::QTransform;
+    m_pCameraRotateTransformX->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1,0,0), m_vecCameraRotation.x()));
 
-    m_pCameraRotateTransformY = new Qt3DCore::QRotateTransform;
-    m_pCameraRotateTransformY->setAngleDeg(m_vecCameraRotation.y());
-    m_pCameraRotateTransformY->setAxis(QVector3D(0,1,0));
-    m_pCameraTransform->addTransform(m_pCameraRotateTransformY);
+    m_pCameraRotateTransformY = new Qt3DCore::QTransform;
+    m_pCameraRotateTransformY->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(0,1,0), m_vecCameraRotation.y()));
 
-    m_pCameraRotateTransformZ = new Qt3DCore::QRotateTransform;
-    m_pCameraRotateTransformZ->setAngleDeg(m_vecCameraRotation.z());
-    m_pCameraRotateTransformZ->setAxis(QVector3D(0,0,1));
-    m_pCameraTransform->addTransform(m_pCameraRotateTransformZ);
+    m_pCameraRotateTransformZ = new Qt3DCore::QTransform;
+    m_pCameraRotateTransformZ->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(0,0,1), m_vecCameraRotation.z()));
 
-    m_pCameraEntity->addComponent(m_pCameraTransform);
+//    m_pCameraEntity->addComponent(m_pCameraScaleTransform);
+//    m_pCameraEntity->addComponent(m_pCameraTranslateTransform);
+//    m_pCameraEntity->addComponent(m_pCameraTransform);
+//    m_pCameraEntity->addComponent(m_pCameraTransform);
 }
 
 
@@ -253,6 +248,8 @@ void View3D::wheelEvent(QWheelEvent* e)
     if(m_fCameraScale > 0)
         m_pCameraScaleTransform->setScale(m_fCameraScale);
 
+    qDebug()<<"wheelEvent scale:"<<m_fCameraScale;
+
     Window::wheelEvent(e);
 }
 
@@ -281,28 +278,28 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
         m_vecModelRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.1f) + m_vecModelRotationOld.y());
 
         // Rotate brain surfaces
-        QList<BrainObject::SPtr> lBrainObjectList = m_pBrain->getBrainObjectList();
+//        QList<BrainObject::SPtr> lBrainObjectList = m_pBrain->getBrainObjectList();
 
-        for(int i = 0; i<lBrainObjectList.size(); i++) {
-            lBrainObjectList.at(i)->setRotationX(m_vecModelRotation.x());
-            lBrainObjectList.at(i)->setRotationY(m_vecModelRotation.y());
-        }
+//        for(int i = 0; i<lBrainObjectList.size(); i++) {
+//            lBrainObjectList.at(i)->setRotationX(m_vecModelRotation.x());
+//            lBrainObjectList.at(i)->setRotationY(m_vecModelRotation.y());
+//        }
     }
 
     if(m_bCameraRotationMode) {
         m_vecCameraRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * 0.1f) + m_vecCameraRotationOld.x());
         m_vecCameraRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.1f) + m_vecCameraRotationOld.y());
 
-        m_pCameraRotateTransformX->setAngleDeg(m_vecCameraRotation.x());
-        m_pCameraRotateTransformY->setAngleDeg(m_vecCameraRotation.y());
-        m_pCameraRotateTransformZ->setAngleDeg(m_vecCameraRotation.z());
+        m_pCameraRotateTransformX->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1,0,0), m_vecCameraRotation.x()));
+        m_pCameraRotateTransformY->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(0,1,0), m_vecCameraRotation.y()));
+        m_pCameraRotateTransformZ->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(0,0,1), m_vecCameraRotation.z()));
 
-//        qDebug()<<"m_vecCameraRotation.x()"<<m_vecCameraRotation.x();
-//        qDebug()<<"m_vecCameraRotation.y()"<<m_vecCameraRotation.y();
+        qDebug()<<"m_vecCameraRotation.x()"<<m_vecCameraRotation.x();
+        qDebug()<<"m_vecCameraRotation.y()"<<m_vecCameraRotation.y();
 
-//        // Camera rotation transform
-//        m_pCameraEntity->tilt(m_vecCameraRotation.x());
-//        m_pCameraEntity->pan(m_vecCameraRotation.y());
+        // Camera rotation transform
+        m_pCameraEntity->tilt(m_vecCameraRotation.x());
+        m_pCameraEntity->pan(m_vecCameraRotation.y());
     }
 
     if(m_bCameraTransMode) {
@@ -310,9 +307,7 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
         m_vecCameraTrans.setY(((e->pos().y() - m_mousePressPositon.y()) * -0.001f) + m_vecCameraTransOld.y());
 
         // Camera translation transform
-        m_pCameraTranslateTransform->setDx(m_vecCameraTrans.x());
-        m_pCameraTranslateTransform->setDy(m_vecCameraTrans.y());
-        m_pCameraTranslateTransform->setDz(m_vecCameraTrans.z());
+        m_pCameraTranslateTransform->setTranslation(m_vecCameraTrans);
     }
 
     //qDebug()<< m_pCameraTransform->matrix();
@@ -349,12 +344,8 @@ void View3D::createCoordSystem(Qt3DCore::QEntity *parent)
     ZAxis->setRings(100);
     ZAxis->setSlices(20);
 
-    Qt3DCore::QRotateTransform *rotationZ = new Qt3DCore::QRotateTransform();
     Qt3DCore::QTransform *transformZ = new Qt3DCore::QTransform();
-
-    rotationZ->setAngleDeg(90.0f);
-    rotationZ->setAxis(QVector3D(1, 0, 0));
-    transformZ->addTransform(rotationZ);
+    transformZ->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1,0,0), 90));
 
     m_ZAxisEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(parent));
     m_ZAxisEntity->addComponent(ZAxis);
@@ -374,12 +365,8 @@ void View3D::createCoordSystem(Qt3DCore::QEntity *parent)
     XAxis->setRings(100);
     XAxis->setSlices(20);
 
-    Qt3DCore::QRotateTransform *rotationX = new Qt3DCore::QRotateTransform();
     Qt3DCore::QTransform *transformX = new Qt3DCore::QTransform();
-
-    rotationX->setAngleDeg(90.0f);
-    rotationX->setAxis(QVector3D(0, 0, 1));
-    transformX->addTransform(rotationX);
+    transformX->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(0,0,1), 90));
 
     m_XAxisEntity = QSharedPointer<Qt3DCore::QEntity>(new Qt3DCore::QEntity(parent));
     m_XAxisEntity->addComponent(XAxis);
