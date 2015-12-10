@@ -170,8 +170,6 @@ protected:
     Qt3DCore::QTransform*               m_pCameraRotateTransformY;      /**< The camera y-axis rotation transformation (added to m_pCameraTransform). */
     Qt3DCore::QTransform*               m_pCameraRotateTransformZ;      /**< The camera z-axis rotation transformation (added to m_pCameraTransform). */
 
-    QList<BrainObject::SPtr>            m_lBrainObjectList;
-
     Brain::SPtr                         m_pBrain;                       /**< Pointer to the Brain class, which holds all BrainObjects. */
 
     bool            m_bCameraTransMode;         /**< Flag for activating/deactivating the translation camera mode. */

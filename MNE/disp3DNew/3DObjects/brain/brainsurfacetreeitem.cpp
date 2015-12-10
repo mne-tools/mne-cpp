@@ -118,7 +118,7 @@ bool BrainSurfaceTreeItem::addFsData(const Surface& tSurface, const Annotation& 
     //Set renderable 3D entity and mesh data
     this->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset());
 
-    //Add meta information of this item
+    //Add surface meta information
     BrainTreeItem *itemSurfFileName = new BrainTreeItem(BrainTreeItemTypes::SurfaceFileName, tSurface.fileName());
     this->appendRow(itemSurfFileName);
 
@@ -128,11 +128,14 @@ bool BrainSurfaceTreeItem::addFsData(const Surface& tSurface, const Annotation& 
     BrainTreeItem *itemSurfPath = new BrainTreeItem(BrainTreeItemTypes::SurfaceFilePath, tSurface.filePath());
     this->appendRow(itemSurfPath);
 
-    BrainTreeItem *itemAnnotFileName = new BrainTreeItem(BrainTreeItemTypes::AnnotFileName, tAnnotation.fileName());
-    this->appendRow(itemAnnotFileName);
+    //Add annotation meta information
+    if(!tAnnotation.isEmpty()) {
+        BrainTreeItem *itemAnnotFileName = new BrainTreeItem(BrainTreeItemTypes::AnnotFileName, tAnnotation.fileName());
+        this->appendRow(itemAnnotFileName);
 
-    BrainTreeItem *itemAnnotPath = new BrainTreeItem(BrainTreeItemTypes::AnnotFilePath, tAnnotation.filePath());
-    this->appendRow(itemAnnotPath);
+        BrainTreeItem *itemAnnotPath = new BrainTreeItem(BrainTreeItemTypes::AnnotFilePath, tAnnotation.filePath());
+        this->appendRow(itemAnnotPath);
+    }
 
     //    //ColorSulci
     //    lDataVariant<<QColor(50,50,50);
