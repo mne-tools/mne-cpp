@@ -90,27 +90,27 @@ else {
 SOURCES += \
     view3d.cpp \
     3DObjects/brain/brain.cpp \
-    3DObjects/brain/brainobject.cpp \
     3DObjects/brain/braintreemodel.cpp \
     3DObjects/brain/braintreeitem.cpp \
     3DObjects/brain/brainsurfacetreeitem.cpp \
     3DObjects/brain/brainsurfacesettreeitem.cpp \
+    3DObjects/brain/brainannotationtreeitem.cpp \
+    3DObjects/brain/brainhemispheretreeitem.cpp \
     helpers/abstracttreeitem.cpp \
     helpers/renderable3Dentity.cpp \
     helpers/custommesh.cpp \
     helpers/window.cpp \
     control/control3dwidget.cpp \
-    3DObjects/brain/brainannotationtreeitem.cpp \
-    3DObjects/brain/brainhemispheretreeitem.cpp
 
 HEADERS += \
     view3d.h \
     3DObjects/brain/brain.h \
-    3DObjects/brain/brainobject.h \
     3DObjects/brain/braintreemodel.h \
     3DObjects/brain/braintreeitem.h \
     3DObjects/brain/brainsurfacetreeitem.h \
     3DObjects/brain/brainsurfacesettreeitem.h \
+    3DObjects/brain/brainannotationtreeitem.h \
+    3DObjects/brain/brainhemispheretreeitem.h \
     helpers/abstracttreeitem.h \
     helpers/renderable3Dentity.h \
     helpers/custommesh.h \
@@ -118,8 +118,6 @@ HEADERS += \
     helpers/types.h \
     control/control3dwidget.h \
     disp3dnew_global.h \
-    3DObjects/brain/brainannotationtreeitem.h \
-    3DObjects/brain/brainhemispheretreeitem.h
 
 FORMS += \
     control/control3dwidget.ui \

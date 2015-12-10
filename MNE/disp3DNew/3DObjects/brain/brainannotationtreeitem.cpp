@@ -54,7 +54,7 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainAnnotationTreeItem::BrainAnnotationTreeItem(const int & iType, const QString & text)
+BrainAnnotationTreeItem::BrainAnnotationTreeItem(const int& iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
 }
@@ -102,6 +102,22 @@ bool BrainAnnotationTreeItem::addFsAnnotData(const Annotation& tAnnotation)
 
     BrainTreeItem *itemAnnotPath = new BrainTreeItem(BrainTreeItemTypes::AnnotFilePath, tAnnotation.filePath());
     *this<<itemAnnotPath;
+
+//    //Create color from annotation data if annotation is not empty
+//    if(tAnnotation.getVertices().rows() != 0) {
+//        tAnnotation.toLabels(tSurface, m_qListLabels, m_qListLabelRGBAs);
+
+//        m_matColorsAnnot.resize(m_matVert.rows(), m_matVert.cols());
+
+//        for(int i = 0; i<m_qListLabels.size(); i++) {
+//            FSLIB::Label label = m_qListLabels.at(i);
+//            for(int j = 0; j<label.vertices.rows(); j++) {
+//                m_matColorsAnnot(label.vertices(j), 0) = m_qListLabelRGBAs.at(i)(0)/255.0;
+//                m_matColorsAnnot(label.vertices(j), 1) = m_qListLabelRGBAs.at(i)(1)/255.0;
+//                m_matColorsAnnot(label.vertices(j), 2) = m_qListLabelRGBAs.at(i)(2)/255.0;
+//            }
+//        }
+//    }
 
     return true;
 }
