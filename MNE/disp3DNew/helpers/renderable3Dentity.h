@@ -110,7 +110,7 @@ public:
     /**
     * Default constructor for freesurfer mesh.
     */
-    Renderable3DEntity();
+    Renderable3DEntity(Qt3DCore::QEntity *parent = 0);
 
     //=========================================================================================================
     /**
@@ -136,77 +136,24 @@ public:
     *
     * @param[in] tMatColors     New color information for the vertices.
     */
-    bool updateVertColors(const MatrixX3f &tMatColors);
+    bool setVertColor(const MatrixX3f &tMatColors);
 
     //=========================================================================================================
     /**
-    * Scale the entity.
+    * Set the information needed to create the mesh.
     *
-    * @param[in] scaleFactor    The factor which is to be used for scaling.
-    */
-    void setScale(float scaleFactor);
-
-    //=========================================================================================================
-    /**
-    * Set the X-axis rotation of the entity.
+    * @param[in] tMatVert       Vertices in form of a matrix.
+    * @param[in] tMatNorm       Normals in form of a matrix.
+    * @param[in] tMatTris       Tris/Faces in form of a matrix.
+    * @param[in] tVecOffset     The offset which is to be used on all the vertices.
     *
-    * @param[in] degree         The degrees which are to be used to rotate the entity.
+    * @return If successful returns true, false otherwise.
     */
-    void setRotationX(float degree);
-
-    //=========================================================================================================
-    /**
-    * Set the Y-axis rotation of the entity.
-    *
-    * @param[in] degree         The degrees which are to be used to rotate the entity.
-    */
-    void setRotationY(float degree);
-
-    //=========================================================================================================
-    /**
-    * Set the Z-axis rotation of the entity.
-    *
-    * @param[in] degree         The degrees which are to be used to rotate the entity.
-    */
-    void setRotationZ(float degree);
-
-    //=========================================================================================================
-    /**
-    * Set the rotation of the entity. Please note that this function will overrwrite all other rotation transformations.
-    *
-    * @param[in] degree         The degrees which are to be used to rotate the entity.
-    * @param[in] rotAxis        The rotation axis.
-    */
-    void setRotation(float degree, const QVector3D &rotAxis);
-
-    //=========================================================================================================
-    /**
-    * Add a rotation to the exiting rotation of the entity. Please note that this funtion will add a rotation transformation,
-    * not overwriting already presented transformations. However, this will increase the number of stored transformations very quickly if not used carefully
-    *
-    * @param[in] degree         The degrees which are to be used to rotate the entity.
-    * @param[in] rotAxis        The rotation axis.
-    */
-    void addRotation(float degree, const QVector3D &rotAxis);
-
-    //=========================================================================================================
-    /**
-    * Translate the entity.
-    *
-    * @param[in] trans          The vector for the translation.
-    */
-    void setTranslation(const QVector3D &trans);
+    bool setMeshData(const MatrixX3f &tMatVert, const MatrixX3f tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset);
 
 protected:
     CustomMesh::SPtr                                m_pCustomMesh;          /**< The actual mesh information (vertices, normals, colors). */
     QSharedPointer<Qt3DCore::QTransform>            m_pTransform;           /**< The main transformation. */
-    QSharedPointer<Qt3DCore::QTransform>            m_pScaleTransform;      /**< The scaling transformation. */
-    QSharedPointer<Qt3DCore::QTransform>            m_pTranslateTransform;  /**< The translation transformation. */
-    QSharedPointer<Qt3DCore::QTransform>            m_pRotateTransform;     /**< The rotation transformation which is used when setting a rotation. */
-    QSharedPointer<Qt3DCore::QTransform>            m_pRotateTransformX;    /**< The X-Axis transformation. */
-    QSharedPointer<Qt3DCore::QTransform>            m_pRotateTransformY;    /**< The Y-Axis transformation. */
-    QSharedPointer<Qt3DCore::QTransform>            m_pRotateTransformZ;    /**< The Z-Axis transformation. */
-
     QSharedPointer<Qt3DRender::QMaterial>           m_pMaterial;            /**< The material to be used for this entity. */
 };
 

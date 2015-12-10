@@ -54,11 +54,11 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainSurfaceTreeItem::BrainSurfaceTreeItem(const Surface &tSurface, const Annotation &tAnnotation,  const int & iType, const QString & text, Qt3DCore::QEntity *entityParent)
+BrainSurfaceTreeItem::BrainSurfaceTreeItem(const int & iType, const QString & text, Qt3DCore::QEntity *parent)
 : AbstractTreeItem(iType, text)
-, Renderable3DEntity(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset(), entityParent)
+, Renderable3DEntity(parent)
 {
-    createBrainSurfaceTreeItem(tSurface, tAnnotation);
+    this->setToolTip("Brain hemisphere");
 }
 
 
@@ -96,8 +96,29 @@ void  BrainSurfaceTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool BrainSurfaceTreeItem::createBrainSurfaceTreeItem(const Surface &tSurface, const Annotation &tAnnotation)
+bool BrainSurfaceTreeItem::addFsData(const Surface& tSurface, const Annotation& tAnnotation)
 {
+    //Set name of this item based on the hemispehre information
+    QString itemText;
+
+    switch (tSurface.hemi()) {
+    case 0:
+        itemText = "Left hemisphere";
+        break;
+    case 1:
+        itemText = "Right hemisphere";
+        break;
+    default:
+        itemText = "Unknown hemisphere";
+        break;
+    }
+
+    this->setText(itemText);
+
+    //Set renderable 3D entity and mesh data
+    this->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset());
+
+    //Add meta information of this item
     BrainTreeItem *itemSurfFileName = new BrainTreeItem(BrainTreeItemTypes::SurfaceFileName, tSurface.fileName());
     itemSurfFileName->setToolTip("Surface file name");
     this->appendRow(itemSurfFileName);
@@ -164,3 +185,4 @@ bool BrainSurfaceTreeItem::createBrainSurfaceTreeItem(const Surface &tSurface, c
 
     return true;
 }
+

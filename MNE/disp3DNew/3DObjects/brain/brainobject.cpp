@@ -113,10 +113,10 @@ BrainObject::~BrainObject()
 
 void BrainObject::showAnnotation(bool flag)
 {
-    if(flag && m_matColorsAnnot.rows()!=0)
-        this->updateVertColors(m_matColorsAnnot);
-    else
-        this->updateVertColors(m_matColorsOrig);
+//    if(flag && m_matColorsAnnot.rows()!=0)
+//        this->updateVertColors(m_matColorsAnnot);
+//    else
+//        this->updateVertColors(m_matColorsOrig);
 }
 
 

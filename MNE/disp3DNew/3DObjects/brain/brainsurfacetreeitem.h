@@ -113,7 +113,7 @@ public:
     /**
     * Default constructor.
     */
-    explicit BrainSurfaceTreeItem(const Surface &tSurface, const Annotation &tAnnotation, const int &iType, const QString &text = "", Qt3DCore::QEntity *entityParent = 0);
+    explicit BrainSurfaceTreeItem(const int &iType, const QString &text = "", Qt3DCore::QEntity *parent = 0);
 
     //=========================================================================================================
     /**
@@ -128,8 +128,18 @@ public:
     QVariant data(int role = Qt::UserRole + 1) const;
     void  setData(const QVariant & value, int role = Qt::UserRole + 1);
 
+    //=========================================================================================================
+    /**
+    * Adds FreeSurfer data based on surfaces and annotation SETS to this model.
+    *
+    * @param[in] tSurfaceSet        FreeSurfer surface set.
+    * @param[in] tAnnotationSet     FreeSurfer annotation set.
+    * @return                       Returns true if successful.
+    */
+    bool addFsData(const Surface& tSurfaceSet, const Annotation& tAnnotation);
+
 private:
-    bool createBrainSurfaceTreeItem(const Surface &tSurface, const Annotation &tAnnotation);
+
 };
 
 } //NAMESPACE DISP3DNEWLIB

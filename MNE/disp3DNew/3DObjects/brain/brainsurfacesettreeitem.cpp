@@ -57,7 +57,7 @@ using namespace DISP3DNEWLIB;
 BrainSurfaceSetTreeItem::BrainSurfaceSetTreeItem(const int& iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
-
+    this->setToolTip("Brain surface set");
 }
 
 
@@ -91,15 +91,29 @@ void  BrainSurfaceSetTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-BrainSurfaceSetTreeItem& BrainSurfaceSetTreeItem::operator<<(const SurfaceSet& tSurfaceSet)
+bool BrainSurfaceSetTreeItem::addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
 {
-    return *this;
-}
+    //Set name for this item based on surface data
+    this->setText("Set");
 
+    //Generate child items based on surface set input parameters
+    bool state = false;
 
-//*************************************************************************************************************
+    for(int i = 0; i < tSurfaceSet.size(); i++) {
+        BrainSurfaceTreeItem* pSurfaceItem = new BrainSurfaceTreeItem(BrainTreeItemTypes::SurfaceItem, "", p3DEntityParent);
 
-BrainSurfaceSetTreeItem& BrainSurfaceSetTreeItem::operator<<(const AnnotationSet& tAnnotationSet)
-{
-    return *this;
+        if(i < tAnnotationSet.size()) {
+            if(tAnnotationSet[i].hemi() == tSurfaceSet[i].hemi()) {
+                state = pSurfaceItem->addFsData(tSurfaceSet[i], tAnnotationSet[i]);
+            } else {
+                state = pSurfaceItem->addFsData(tSurfaceSet[i], Annotation());
+            }
+        } else {
+            state = pSurfaceItem->addFsData(tSurfaceSet[i], Annotation());
+        }
+
+        *this<<pSurfaceItem; //same as this->appendRow(pSurfaceItem)
+    }
+
+    return state;
 }

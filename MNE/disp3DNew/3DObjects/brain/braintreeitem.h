@@ -122,10 +122,10 @@ public:
     * AbstractTreeItem functions
     */
     QVariant data(int role = Qt::UserRole + 1) const;
-    void  setData(const QVariant& value, int role = Qt::UserRole + 1);
+    void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
 private:
-    int m_iType;
+
 };
 
 } //NAMESPACE DISP3DNEWLIB

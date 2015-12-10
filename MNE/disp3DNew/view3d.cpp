@@ -169,21 +169,7 @@ void View3D::initTransformations()
 
 bool View3D::addFsBrainData(const SurfaceSet &tSurfaceSet, const AnnotationSet &tAnnotationSet)
 {
-    bool state = m_pBrain->addFsBrainData(tSurfaceSet, tAnnotationSet);
-
-    qDebug()<<"View3D::addFsBrainData";
-    return state;
-
-//    //Init rotation
-//    QList<BrainObject::SPtr> lBrainObjectList = m_pBrain->getBrainObjectList();
-
-//    for(int i = 0; i<lBrainObjectList.size(); i++) {
-//        lBrainObjectList.at(i)->setRotationX(m_vecModelRotation.x());
-//        lBrainObjectList.at(i)->setRotationY(m_vecModelRotation.y());
-//        lBrainObjectList.at(i)->setScale(m_fModelScale);
-//    }
-
-//    return state;
+    return m_pBrain->addFsBrainData(tSurfaceSet, tAnnotationSet);
 }
 
 

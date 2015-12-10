@@ -87,12 +87,13 @@ class AbstractTreeItem : public QStandardItem
 {
 
 public :
-    AbstractTreeItem(const int &iType, const QString &text = "");
+    AbstractTreeItem(const int& iType, const QString& text = "");
     virtual ~AbstractTreeItem();
 
     int type() const;
 
-    AbstractTreeItem &operator<<(AbstractTreeItem &newItem);
+    AbstractTreeItem &operator<<(AbstractTreeItem* newItem);
+    AbstractTreeItem &operator<<(AbstractTreeItem& newItem);
 
 protected :
     int     m_iType;
