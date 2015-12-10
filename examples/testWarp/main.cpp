@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
         ElecPos(i,2)=tempElecInfo[i][2];
     }
 
-    std::cout << "Here is the matrix ElecPos:" << std::endl << ElecPos << std::endl;
+//    std::cout << "Here is the matrix ElecPos:" << std::endl << ElecPos << std::endl;
 
     //
     // read electrode positions from Database
@@ -186,6 +186,15 @@ int main(int argc, char *argv[])
     wVert = test.calculate(sLm, dLm, sVert);
 //    std::cout << "Here is the final matrix wVert:" << std::endl << wVert << std::endl;
 
+    //
+    // WRITE NEW VERTICES BACK TO BEM
+    //
+    skin.rr=wVert.cast<float>();
+    skin.addVertexNormals();
+    QFile t_fileBemWarped("./MNE-sample-data/subjects/sample/bem/sample-head-warped.fif");
+    t_Bem.write(t_fileBemWarped);
 
+    MNELIB::MNEBem t_BemWarped (t_fileBemWarped) ;
+    MNELIB::MNEBemSurface skinWarped=t_BemWarped[0];
     return a.exec();
 }
