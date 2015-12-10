@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef BrainSurfaceSetTreeItem_H
-#define BrainSurfaceSetTreeItem_H
+#ifndef BRAINSURFACESETTREEITEM_H
+#define BRAINSURFACESETTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -44,9 +44,7 @@
 #include "../../disp3DNew_global.h"
 
 #include "../../helpers/abstracttreeitem.h"
-#include "brainsurfacetreeitem.h"
-
-//#include "../../helpers/types.h"
+#include "brainhemispheretreeitem.h"
 
 #include "fs/label.h"
 #include "fs/annotationset.h"
@@ -101,7 +99,7 @@ using namespace FSLIB;
 /**
 * BrainSurfaceSetTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
 *
-* @brief Provides a generic brain tree item.
+* @brief Provides a generic BrainSurfaceSetTreeItem.
 */
 class DISP3DNEWSHARED_EXPORT BrainSurfaceSetTreeItem : public AbstractTreeItem
 {
@@ -155,4 +153,4 @@ private:
 
 } //NAMESPACE DISP3DNEWLIB
 
-#endif // BrainSurfaceSetTreeItem_H
+#endif // BRAINSURFACESETTREEITEM_H

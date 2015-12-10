@@ -100,6 +100,8 @@ SOURCES += \
     helpers/custommesh.cpp \
     helpers/window.cpp \
     control/control3dwidget.cpp \
+    3DObjects/brain/brainannotationtreeitem.cpp \
+    3DObjects/brain/brainhemispheretreeitem.cpp
 
 HEADERS += \
     view3d.h \
@@ -116,6 +118,8 @@ HEADERS += \
     helpers/types.h \
     control/control3dwidget.h \
     disp3dnew_global.h \
+    3DObjects/brain/brainannotationtreeitem.h \
+    3DObjects/brain/brainhemispheretreeitem.h
 
 FORMS += \
     control/control3dwidget.ui \

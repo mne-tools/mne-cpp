@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brainsurfacetreeitem.h
+* @file     brainhemispheretreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BrainSurfaceTreeItem class declaration.
+* @brief     BrainHemisphereTreeItem class declaration.
 *
 */
 
-#ifndef BRAINSURFACETREEITEM_H
-#define BRAINSURFACETREEITEM_H
+#ifndef BRAINHEMISPHERETREEITEM_H
+#define BRAINHEMISPHERETREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -44,13 +44,12 @@
 #include "../../disp3DNew_global.h"
 
 #include "../../helpers/abstracttreeitem.h"
-#include "braintreeitem.h"
-
-#include "../../helpers/types.h"
-#include "../../helpers/renderable3Dentity.h"
+#include "brainsurfacetreeitem.h"
+#include "brainannotationtreeitem.h"
 
 #include "fs/label.h"
-
+#include "fs/annotationset.h"
+#include "fs/surfaceset.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -88,6 +87,7 @@ namespace DISP3DNEWLIB
 //=============================================================================================================
 
 using namespace Eigen;
+using namespace FSLIB;
 
 
 //*************************************************************************************************************
@@ -98,45 +98,53 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* BrainSurfaceTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
+* BrainHemisphereTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT BrainSurfaceTreeItem : public AbstractTreeItem, public Renderable3DEntity
+class DISP3DNEWSHARED_EXPORT BrainHemisphereTreeItem : public AbstractTreeItem
 {
 
 public:
-    typedef QSharedPointer<BrainSurfaceTreeItem> SPtr;             /**< Shared pointer type for BrainSurfaceTreeItem class. */
-    typedef QSharedPointer<const BrainSurfaceTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainSurfaceTreeItem class. */
+    typedef QSharedPointer<BrainHemisphereTreeItem> SPtr;             /**< Shared pointer type for BrainHemisphereTreeItem class. */
+    typedef QSharedPointer<const BrainHemisphereTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainHemisphereTreeItem class. */
 
     //=========================================================================================================
     /**
     * Default constructor.
     */
-    explicit BrainSurfaceTreeItem(const int &iType, const QString &text = "Brain surface", Qt3DCore::QEntity *parent = 0);
+    explicit BrainHemisphereTreeItem();
+
+    //=========================================================================================================
+    /**
+    * FreeSurfer constructor from single surface.
+    */
+    explicit BrainHemisphereTreeItem(const int& iType, const QString& text = "Unknown");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~BrainSurfaceTreeItem();
+    ~BrainHemisphereTreeItem();
 
     //=========================================================================================================
     /**
     * AbstractTreeItem functions
     */
     QVariant data(int role = Qt::UserRole + 1) const;
-    void  setData(const QVariant & value, int role = Qt::UserRole + 1);
+    void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on surfaces and annotation SETS to this model.
+    * Adds FreeSurfer data based on surfaces and annotation data to this model.
     *
     * @param[in] tSurface           FreeSurfer surface.
+    * @param[in] tAnnotation        FreeSurfer annotation.
+    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
     *
     * @return                       Returns true if successful.
     */
-    bool addFsSurfData(const Surface& tSurface);
+    bool addFsData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity *p3DEntityParent = 0);
 
 private:
 
@@ -144,4 +152,4 @@ private:
 
 } //NAMESPACE DISP3DNEWLIB
 
-#endif // BRAINSURFACETREEITEM_H
+#endif // BRAINHEMISPHERETREEITEM_H
