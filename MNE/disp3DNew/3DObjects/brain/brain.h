@@ -43,8 +43,6 @@
 
 #include "disp3dnew_global.h"
 
-#include "brainobject.h"
-
 #include "braintreemodel.h"
 
 #include <fs/surfaceset.h>
@@ -145,8 +143,6 @@ public:
     BrainTreeModel* getBrainTreeModel();
 
 protected:
-    QList<BrainObject::SPtr>        m_lBrainData;      /**< List of currently loaded BrainObjects. */
-
     BrainTreeModel*                 m_pBrainTreeModel;
 };
 

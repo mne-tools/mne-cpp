@@ -54,7 +54,7 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainSurfaceTreeItem::BrainSurfaceTreeItem(const int & iType, const QString & text, Qt3DCore::QEntity *parent)
+BrainSurfaceTreeItem::BrainSurfaceTreeItem(const int& iType, const QString& text, Qt3DCore::QEntity* parent)
 : AbstractTreeItem(iType, text)
 , Renderable3DEntity(parent)
 {
@@ -109,6 +109,21 @@ bool BrainSurfaceTreeItem::addFsSurfData(const Surface& tSurface)
 
     BrainTreeItem *itemSurfPath = new BrainTreeItem(BrainTreeItemTypes::SurfaceFilePath, tSurface.filePath());
     this->appendRow(itemSurfPath);
+
+//    //Create color from curvature information
+//    m_matColorsOrig.resize(m_matVert.rows(), m_matVert.cols());
+
+//    for(int i = 0; i<m_matVert.rows() ; i++) {
+//        if(m_vecCurv[i] >= 0) {
+//            m_matColorsOrig(i, 0) = m_ColorSulci.redF();
+//            m_matColorsOrig(i, 1) = m_ColorSulci.greenF();
+//            m_matColorsOrig(i, 2) = m_ColorSulci.blueF();
+//        } else {
+//            m_matColorsOrig(i, 0) = m_ColorGyri.redF();
+//            m_matColorsOrig(i, 1) = m_ColorGyri.greenF();
+//            m_matColorsOrig(i, 2) = m_ColorGyri.blueF();
+//        }
+//    }
 
     //    //ColorSulci
     //    lDataVariant<<QColor(50,50,50);
