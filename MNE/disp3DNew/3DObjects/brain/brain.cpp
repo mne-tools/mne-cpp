@@ -86,14 +86,6 @@ bool Brain::addFsBrainData(const Surface &tSurface, const Annotation &tAnnotatio
 
 //*************************************************************************************************************
 
-const QList<BrainObject::SPtr> Brain::getBrainObjectList() const
-{
-    return m_lBrainData;
-}
-
-
-//*************************************************************************************************************
-
 BrainTreeModel* Brain::getBrainTreeModel()
 {
     return m_pBrainTreeModel;

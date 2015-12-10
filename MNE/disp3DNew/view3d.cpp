@@ -175,6 +175,14 @@ bool View3D::addFsBrainData(const SurfaceSet &tSurfaceSet, const AnnotationSet &
 
 //*************************************************************************************************************
 
+bool View3D::addFsBrainData(const Surface &tSurface, const Annotation &tAnnotation)
+{
+    return m_pBrain->addFsBrainData(tSurface, tAnnotation);
+}
+
+
+//*************************************************************************************************************
+
 BrainTreeModel* View3D::getBrainTreeModel()
 {
     return m_pBrain->getBrainTreeModel();
