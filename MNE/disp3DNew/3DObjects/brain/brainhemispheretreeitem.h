@@ -111,15 +111,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    */
-    explicit BrainHemisphereTreeItem();
-
-    //=========================================================================================================
-    /**
     * FreeSurfer constructor from single surface.
     */
-    explicit BrainHemisphereTreeItem(const int& iType, const QString& text = "Unknown");
+    explicit BrainHemisphereTreeItem(const int& iType = BrainTreeItemTypes::UnknownItem, const QString& text = "Unknown");
 
     //=========================================================================================================
     /**

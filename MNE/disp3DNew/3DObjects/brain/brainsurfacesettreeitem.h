@@ -110,15 +110,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    */
-    explicit BrainSurfaceSetTreeItem();
-
-    //=========================================================================================================
-    /**
     * FreeSurfer constructor from single surface.
     */
-    explicit BrainSurfaceSetTreeItem(const int& iType, const QString& text = "");
+    explicit BrainSurfaceSetTreeItem(const int& iType = BrainTreeItemTypes::UnknownItem, const QString& text = "");
 
     //=========================================================================================================
     /**
@@ -144,8 +138,6 @@ public:
     * @return                       Returns true if successful.
     */
     bool addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity *p3DEntityParent = 0);
-
-    enum ItemType {Type, UnknownItem, SurfaceSetItem};
 
 private:
 
