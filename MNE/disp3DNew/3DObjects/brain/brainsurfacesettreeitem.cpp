@@ -99,19 +99,19 @@ bool BrainSurfaceSetTreeItem::addFsData(const SurfaceSet& tSurfaceSet, const Ann
     bool state = false;
 
     for(int i = 0; i < tSurfaceSet.size(); i++) {
-        BrainSurfaceTreeItem* pSurfaceItem = new BrainSurfaceTreeItem(BrainTreeItemTypes::SurfaceItem, "", p3DEntityParent);
+        BrainHemisphereTreeItem* pHemisphereItem = new BrainHemisphereTreeItem(BrainTreeItemTypes::HemisphereItem);
 
         if(i < tAnnotationSet.size()) {
             if(tAnnotationSet[i].hemi() == tSurfaceSet[i].hemi()) {
-                state = pSurfaceItem->addFsData(tSurfaceSet[i], tAnnotationSet[i]);
+                state = pHemisphereItem->addFsData(tSurfaceSet[i], tAnnotationSet[i], p3DEntityParent);
             } else {
-                state = pSurfaceItem->addFsData(tSurfaceSet[i], Annotation());
+                state = pHemisphereItem->addFsData(tSurfaceSet[i], Annotation(), p3DEntityParent);
             }
         } else {
-            state = pSurfaceItem->addFsData(tSurfaceSet[i], Annotation());
+            state = pHemisphereItem->addFsData(tSurfaceSet[i], Annotation(), p3DEntityParent);
         }
 
-        *this<<pSurfaceItem; //same as this->appendRow(pSurfaceItem)
+        *this<<pHemisphereItem; //same as this->appendRow(pSurfaceItem)
     }
 
     return state;

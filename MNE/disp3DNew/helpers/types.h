@@ -75,12 +75,14 @@ namespace BrainTreeItemTypes
 {
     enum ItemType{UnknownItem = QStandardItem::UserType,
                     SurfaceSetItem = QStandardItem::UserType + 1,
-                    SurfaceItem = QStandardItem::UserType + 2,
-                    SurfaceFileName = QStandardItem::UserType + 3,
-                    SurfaceFilePath = QStandardItem::UserType + 4,
-                    AnnotFileName = QStandardItem::UserType + 5,
-                    AnnotFilePath = QStandardItem::UserType + 6,
-                    SurfaceFileType = QStandardItem::UserType + 7};
+                    HemisphereItem = QStandardItem::UserType + 2,
+                    SurfaceItem = QStandardItem::UserType + 3,
+                    AnnotationItem = QStandardItem::UserType + 4,
+                    SurfaceFileName = QStandardItem::UserType + 5,
+                    SurfaceFilePath = QStandardItem::UserType + 6,
+                    AnnotFileName = QStandardItem::UserType + 7,
+                    AnnotFilePath = QStandardItem::UserType + 8,
+                    SurfaceFileType = QStandardItem::UserType + 9};
 }
 
 namespace BrainTreeModelRoles

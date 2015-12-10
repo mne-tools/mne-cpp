@@ -58,8 +58,14 @@ void AbstractTreeItem::createToolTip()
     case BrainTreeItemTypes::SurfaceSetItem:
         sToolTip = "Brain surface set";
         break;
+    case BrainTreeItemTypes::HemisphereItem:
+        sToolTip = "Brain hemisphere";
+        break;
     case BrainTreeItemTypes::SurfaceItem:
         sToolTip = "Brain surface";
+        break;
+    case BrainTreeItemTypes::AnnotationItem:
+        sToolTip = "Brain annotation";
         break;
     case BrainTreeItemTypes::SurfaceFileName:
         sToolTip = "Surface file name";

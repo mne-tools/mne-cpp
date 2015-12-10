@@ -58,7 +58,6 @@ BrainSurfaceTreeItem::BrainSurfaceTreeItem(const int & iType, const QString & te
 : AbstractTreeItem(iType, text)
 , Renderable3DEntity(parent)
 {
-    this->setToolTip("Brain hemisphere");
 }
 
 
@@ -96,25 +95,8 @@ void  BrainSurfaceTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool BrainSurfaceTreeItem::addFsData(const Surface& tSurface, const Annotation& tAnnotation)
+bool BrainSurfaceTreeItem::addFsSurfData(const Surface& tSurface)
 {
-    //Set name of this item based on the hemispehre information
-    QString itemText;
-
-    switch (tSurface.hemi()) {
-    case 0:
-        itemText = "Left hemisphere";
-        break;
-    case 1:
-        itemText = "Right hemisphere";
-        break;
-    default:
-        itemText = "Unknown hemisphere";
-        break;
-    }
-
-    this->setText(itemText);
-
     //Set renderable 3D entity and mesh data
     this->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset());
 
@@ -127,15 +109,6 @@ bool BrainSurfaceTreeItem::addFsData(const Surface& tSurface, const Annotation& 
 
     BrainTreeItem *itemSurfPath = new BrainTreeItem(BrainTreeItemTypes::SurfaceFilePath, tSurface.filePath());
     this->appendRow(itemSurfPath);
-
-    //Add annotation meta information
-    if(!tAnnotation.isEmpty()) {
-        BrainTreeItem *itemAnnotFileName = new BrainTreeItem(BrainTreeItemTypes::AnnotFileName, tAnnotation.fileName());
-        this->appendRow(itemAnnotFileName);
-
-        BrainTreeItem *itemAnnotPath = new BrainTreeItem(BrainTreeItemTypes::AnnotFilePath, tAnnotation.filePath());
-        this->appendRow(itemAnnotPath);
-    }
 
     //    //ColorSulci
     //    lDataVariant<<QColor(50,50,50);

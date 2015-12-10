@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     braintreemodel.cpp
+* @file     brainhemispheretreeitem.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BrainTreeModel class definition.
+* @brief    BrainHemisphereTreeItem class definition.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "braintreemodel.h"
+#include "brainhemispheretreeitem.h"
 
 
 //*************************************************************************************************************
@@ -54,52 +54,75 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainTreeModel::BrainTreeModel(QObject *parent)
-: QStandardItemModel(parent)
+BrainHemisphereTreeItem::BrainHemisphereTreeItem(const int& iType, const QString& text)
+: AbstractTreeItem(iType, text)
 {
-    m_pRootItem = this->invisibleRootItem();
-    m_pRootItem->setText("Loaded 3D Data");
 }
 
 
 //*************************************************************************************************************
 
-BrainTreeModel::~BrainTreeModel()
+BrainHemisphereTreeItem::~BrainHemisphereTreeItem()
 {
-    delete m_pRootItem;
 }
 
 
 //*************************************************************************************************************
 
-QVariant BrainTreeModel::data(const QModelIndex & index, int role) const
+QVariant BrainHemisphereTreeItem::data(int role) const
 {
-    return QStandardItemModel::data(index, role);
+    switch(role) {
+        case BrainTreeModelRoles::GetSurfSetName:
+            return QVariant();
+    }
+
+    return QStandardItem::data(role);
 }
 
 
 //*************************************************************************************************************
 
-bool BrainTreeModel::addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
+void  BrainHemisphereTreeItem::setData(const QVariant& value, int role)
 {
-    BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeItemTypes::SurfaceSetItem);
-    m_pRootItem->appendRow(pSurfaceSetItem);
-
-    return pSurfaceSetItem->addFsData(tSurfaceSet, tAnnotationSet, p3DEntityParent);;
+    QStandardItem::setData(value, role);
 }
 
 
 //*************************************************************************************************************
 
-bool BrainTreeModel::addFsData(const Surface &tSurface, const Annotation &tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
+bool BrainHemisphereTreeItem::addFsData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity *p3DEntityParent)
 {
-    BrainHemisphereTreeItem* pHemisphereItem = new BrainHemisphereTreeItem(BrainTreeItemTypes::HemisphereItem);
-    m_pRootItem->appendRow(pHemisphereItem);
+    //Set name of this item based on the hemispehre information
+    QString itemText;
 
-    return pHemisphereItem->addFsData(tSurface, tAnnotation, p3DEntityParent);
+    switch (tSurface.hemi()) {
+    case 0:
+        itemText = "Left";
+        break;
+    case 1:
+        itemText = "Right";
+        break;
+    default:
+        itemText = "Unknown";
+        break;
+    }
+
+    this->setText(itemText);
+
+    //Add childs
+    bool state = false;
+
+    //Add surface child
+    BrainSurfaceTreeItem* pSurfaceItem = new BrainSurfaceTreeItem(BrainTreeItemTypes::SurfaceItem, "Surface", p3DEntityParent);
+    state = pSurfaceItem->addFsSurfData(tSurface);
+    *this<<pSurfaceItem;
+
+    //Add annotation child
+    if(!tAnnotation.isEmpty()) {
+        BrainAnnotationTreeItem* pAnnotItem = new BrainAnnotationTreeItem(BrainTreeItemTypes::AnnotationItem);
+        state = pAnnotItem->addFsAnnotData(tAnnotation);
+        *this<<pAnnotItem;
+    }
+
+    return state;
 }
-
-
-
-
-

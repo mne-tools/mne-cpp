@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brainsurfacetreeitem.h
+* @file     brainannotationtreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BrainSurfaceTreeItem class declaration.
+* @brief     BrainAnnotationTreeItem class declaration.
 *
 */
 
-#ifndef BRAINSURFACETREEITEM_H
-#define BRAINSURFACETREEITEM_H
+#ifndef BRAINANNOTATIONTREEITEM_H
+#define BRAINANNOTATIONTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -47,7 +47,6 @@
 #include "braintreeitem.h"
 
 #include "../../helpers/types.h"
-#include "../../helpers/renderable3Dentity.h"
 
 #include "fs/label.h"
 
@@ -98,28 +97,28 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* BrainSurfaceTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
+* BrainAnnotationTreeItem provides a generic item to hold information about brain annotation information.
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT BrainSurfaceTreeItem : public AbstractTreeItem, public Renderable3DEntity
+class DISP3DNEWSHARED_EXPORT BrainAnnotationTreeItem : public AbstractTreeItem
 {
 
 public:
-    typedef QSharedPointer<BrainSurfaceTreeItem> SPtr;             /**< Shared pointer type for BrainSurfaceTreeItem class. */
-    typedef QSharedPointer<const BrainSurfaceTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainSurfaceTreeItem class. */
+    typedef QSharedPointer<BrainAnnotationTreeItem> SPtr;             /**< Shared pointer type for BrainAnnotationTreeItem class. */
+    typedef QSharedPointer<const BrainAnnotationTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainAnnotationTreeItem class. */
 
     //=========================================================================================================
     /**
     * Default constructor.
     */
-    explicit BrainSurfaceTreeItem(const int &iType, const QString &text = "Brain surface", Qt3DCore::QEntity *parent = 0);
+    explicit BrainAnnotationTreeItem(const int &iType, const QString &text = "Annotation");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~BrainSurfaceTreeItem();
+    ~BrainAnnotationTreeItem();
 
     //=========================================================================================================
     /**
@@ -130,13 +129,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on surfaces and annotation SETS to this model.
+    * Adds FreeSurfer data based on annotation information to this model.
     *
-    * @param[in] tSurface           FreeSurfer surface.
+    * @param[in] tAnnotation        FreeSurfer annotation.
     *
     * @return                       Returns true if successful.
     */
-    bool addFsSurfData(const Surface& tSurface);
+    bool addFsAnnotData(const Annotation& tAnnotation);
 
 private:
 
@@ -144,4 +143,4 @@ private:
 
 } //NAMESPACE DISP3DNEWLIB
 
-#endif // BRAINSURFACETREEITEM_H
+#endif // BRAINANNOTATIONTREEITEM_H
