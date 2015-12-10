@@ -130,6 +130,7 @@ public:
     * @param[in] tSurfaceSet        FreeSurfer surface set.
     * @param[in] tAnnotationSet     FreeSurfer annotation set.
     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+    *
     * @return                       Returns true if successful.
     */
     bool addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity *p3DEntityParent = 0);
@@ -141,13 +142,13 @@ public:
     * @param[in] tSurface           FreeSurfer surface.
     * @param[in] tAnnotation        FreeSurfer annotation.
     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+    *
     * @return                       Returns true if successful.
     */
     bool addFsData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
 
 private:
     QStandardItem*     m_pRootItem;     /**< The root item of the tree model. */
-
 
 };
 
