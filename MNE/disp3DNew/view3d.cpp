@@ -270,14 +270,6 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
     if(m_bModelRotationMode) {
         m_vecModelRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * -0.1f) + m_vecModelRotationOld.x());
         m_vecModelRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.1f) + m_vecModelRotationOld.y());
-
-        // Rotate brain surfaces
-//        QList<BrainObject::SPtr> lBrainObjectList = m_pBrain->getBrainObjectList();
-
-//        for(int i = 0; i<lBrainObjectList.size(); i++) {
-//            lBrainObjectList.at(i)->setRotationX(m_vecModelRotation.x());
-//            lBrainObjectList.at(i)->setRotationY(m_vecModelRotation.y());
-//        }
     }
 
     if(m_bCameraRotationMode) {

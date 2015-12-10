@@ -94,7 +94,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* BrainTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
+* BrainTreeItem provides a generic brain tree item to hold meta information about the surface and annoation item.
 *
 * @brief Provides a generic brain tree item.
 */
