@@ -74,6 +74,9 @@ Control3DWidget::Control3DWidget(QWidget *parent)
 
     //Rename minimize button
     ui->m_pushButton_minimize->setText(QString("Minimize - %1").arg(this->windowTitle()));
+
+    //Init tree view properties
+    ui->m_treeView_loadedData->setHeaderHidden(true);
 }
 
 

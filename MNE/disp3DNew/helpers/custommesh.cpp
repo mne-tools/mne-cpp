@@ -56,6 +56,10 @@ using namespace DISP3DNEWLIB;
 
 CustomMesh::CustomMesh()
 : Qt3DRender::QGeometryRenderer()
+, m_pVertexDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
+, m_pNormalDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
+, m_pColorDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
+, m_pIndexDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::IndexBuffer))
 , m_iNumVert(0)
 {
 
