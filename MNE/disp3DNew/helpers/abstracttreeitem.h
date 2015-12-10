@@ -41,6 +41,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "types.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -95,7 +97,11 @@ public :
     AbstractTreeItem &operator<<(AbstractTreeItem* newItem);
     AbstractTreeItem &operator<<(AbstractTreeItem& newItem);
 
+    enum ItemType {UserType, UnknownItem};
+
 protected :
+    void createToolTip();
+
     int     m_iType;
 };
 

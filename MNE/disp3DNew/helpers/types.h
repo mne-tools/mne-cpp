@@ -71,36 +71,38 @@
 namespace DISP3DNEWLIB
 {
 
-enum BrainTreeItemTypes {
-    UnknownItem = QStandardItem::UserType,
-    SurfaceItem = QStandardItem::UserType + 1,
-    SurfaceSetItem = QStandardItem::UserType + 2,
-    SurfaceFileName = QStandardItem::UserType + 3,
-    SurfaceFilePath = QStandardItem::UserType + 4,
-    AnnotFileName = QStandardItem::UserType + 5,
-    AnnotFilePath = QStandardItem::UserType + 6
-};
+namespace BrainTreeItemTypes
+{
+    enum ItemType{UnknownItem = QStandardItem::UserType,
+                    SurfaceSetItem = QStandardItem::UserType + 1,
+                    SurfaceItem = QStandardItem::UserType + 2,
+                    SurfaceFileName = QStandardItem::UserType + 3,
+                    SurfaceFilePath = QStandardItem::UserType + 4,
+                    AnnotFileName = QStandardItem::UserType + 5,
+                    AnnotFilePath = QStandardItem::UserType + 6,
+                    SurfaceFileType = QStandardItem::UserType + 7};
+}
 
 namespace BrainTreeModelRoles
 {
     enum ItemRole{GetSurfName = Qt::UserRole,
-                  GetSurfType = Qt::UserRole + 1,
-                  GetSurfHemi = Qt::UserRole + 2,
-                  GetSurfColorSulci = Qt::UserRole + 3,
-                  GetSurfColorGyri = Qt::UserRole + 4,
-                  GetSurfColorVert = Qt::UserRole + 5,
-                  GetSurfVert = Qt::UserRole + 6,
-                  GetSurfTris = Qt::UserRole + 7,
-                  GetSurfNorm = Qt::UserRole + 8,
-                  GetSurfCurv = Qt::UserRole + 9,
-                  GetSurfOffset = Qt::UserRole + 10,
-                  GetSurfFilePath = Qt::UserRole + 11,
-                  GetAnnotName = Qt::UserRole + 12,
-                  GetAnnotFilePath = Qt::UserRole + 13,
-                  GetAnnotColor = Qt::UserRole + 14,
-                  GetRenderable3DEntity = Qt::UserRole + 15,
-                  GetRootItem = Qt::UserRole + 16,
-                  GetSurfSetName = Qt::UserRole + 17};
+                      GetSurfType = Qt::UserRole + 1,
+                      GetSurfHemi = Qt::UserRole + 2,
+                      GetSurfColorSulci = Qt::UserRole + 3,
+                      GetSurfColorGyri = Qt::UserRole + 4,
+                      GetSurfColorVert = Qt::UserRole + 5,
+                      GetSurfVert = Qt::UserRole + 6,
+                      GetSurfTris = Qt::UserRole + 7,
+                      GetSurfNorm = Qt::UserRole + 8,
+                      GetSurfCurv = Qt::UserRole + 9,
+                      GetSurfOffset = Qt::UserRole + 10,
+                      GetSurfFilePath = Qt::UserRole + 11,
+                      GetAnnotName = Qt::UserRole + 12,
+                      GetAnnotFilePath = Qt::UserRole + 13,
+                      GetAnnotColor = Qt::UserRole + 14,
+                      GetRenderable3DEntity = Qt::UserRole + 15,
+                      GetRootItem = Qt::UserRole + 16,
+                      GetSurfSetName = Qt::UserRole + 17};
 }
 
 } //NAMESPACE DISP3DNEWLIB
