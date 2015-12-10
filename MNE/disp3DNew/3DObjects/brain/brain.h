@@ -138,12 +138,10 @@ public:
 
     //=========================================================================================================
     /**
-    * Return the stored BrainObjects
+    * Return the brain tree model.
     *
-    * @return returns a const adress to the list with the sotred brain objects
+    * @return returns a pointer to the brain tree model BrainTreeModel.
     */
-    const QList<BrainObject::SPtr>  getBrainObjectList() const;
-
     BrainTreeModel* getBrainTreeModel();
 
 protected:

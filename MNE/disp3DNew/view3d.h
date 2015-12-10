@@ -133,9 +133,21 @@ public:
     *
     * @param[in] tSurfaceSet        FreeSurfer surface set.
     * @param[in] tAnnotationSet     FreeSurfer annotation set.
+    *
     * @return                       Returns true if successful.
     */
-    bool addFsBrainData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet);
+    bool addFsBrainData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet = AnnotationSet());
+
+    //=========================================================================================================
+    /**
+    * Adds FreeSurfer single brain data.
+    *
+    * @param[in] tSurface           FreeSurfer surface.
+    * @param[in] tAnnotation        FreeSurfer annotation.
+    *
+    * @return                       Returns true if successful.
+    */
+    bool addFsBrainData(const Surface& tSurface, const Annotation& tAnnotation = Annotation());
 
     BrainTreeModel* getBrainTreeModel();
 
