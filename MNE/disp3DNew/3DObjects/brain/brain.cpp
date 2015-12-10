@@ -72,21 +72,7 @@ Brain::~Brain()
 
 bool Brain::addFsBrainData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
 {
-//    //Create fresurfer surface set and annotation set
-//    SurfaceSet tSurfaceSet(subject_id, hemi, surf, subjects_dir);
-//    AnnotationSet tAnnotationSet(subject_id, hemi, atlas, subjects_dir);
-
     return m_pBrainTreeModel->addFsData(tSurfaceSet, tAnnotationSet, this);
-
-//    //Create new brain objects (based on the number of loaded hemispheres) and add to the global list
-//    for(qint32 i = 0; i<tSurfaceSet.data().size(); i++) {
-//        BrainObject::SPtr pBrainObject = BrainObject::SPtr(new BrainObject(tSurfaceSet[i], tAnnotationSet[i], this));
-//        pBrainObject->showAnnotation(true);
-//        m_lBrainData.append(pBrainObject);
-//        m_pBrainTreeModel->addFsData();
-//    }
-
-//    return true;
 }
 
 
@@ -94,9 +80,7 @@ bool Brain::addFsBrainData(const SurfaceSet& tSurfaceSet, const AnnotationSet& t
 
 bool Brain::addFsBrainData(const Surface &tSurface, const Annotation &tAnnotation)
 {
-    bool state = m_pBrainTreeModel->addFsData(tSurface, tAnnotation);
-
-    return state;
+    return m_pBrainTreeModel->addFsData(tSurface, tAnnotation, this);
 }
 
 
@@ -106,6 +90,9 @@ const QList<BrainObject::SPtr> Brain::getBrainObjectList() const
 {
     return m_lBrainData;
 }
+
+
+//*************************************************************************************************************
 
 BrainTreeModel* Brain::getBrainTreeModel()
 {

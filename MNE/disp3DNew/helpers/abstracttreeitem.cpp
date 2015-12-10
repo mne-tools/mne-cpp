@@ -2,7 +2,7 @@
 
 using namespace DISP3DNEWLIB;
 
-AbstractTreeItem::AbstractTreeItem(const int &iType, const QString & text)
+AbstractTreeItem::AbstractTreeItem(const int& iType, const QString& text)
 : QStandardItem(text)
 , m_iType(iType)
 {
@@ -26,9 +26,20 @@ int  AbstractTreeItem::type() const
 
 //*************************************************************************************************************
 
-AbstractTreeItem& AbstractTreeItem::operator<<(AbstractTreeItem &newItem)
+AbstractTreeItem& AbstractTreeItem::operator<<(AbstractTreeItem* newItem)
+{
+    this->appendRow(newItem);
+
+    return *this;
+}
+
+
+//*************************************************************************************************************
+
+AbstractTreeItem& AbstractTreeItem::operator<<(AbstractTreeItem& newItem)
 {
     this->appendRow(&newItem);
 
     return *this;
 }
+

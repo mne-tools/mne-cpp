@@ -44,7 +44,7 @@
 #include "../../disp3DNew_global.h"
 
 #include "../../helpers/abstracttreeitem.h"
-#include "braintreeitem.h"
+#include "brainsurfacetreeitem.h"
 
 #include "../../helpers/types.h"
 
@@ -135,8 +135,16 @@ public:
     QVariant data(int role = Qt::UserRole + 1) const;
     void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
-    BrainSurfaceSetTreeItem& operator<<(const SurfaceSet& tSurfaceSet);
-    BrainSurfaceSetTreeItem& operator<<(const AnnotationSet& tAnnotationSet);
+    //=========================================================================================================
+    /**
+    * Adds FreeSurfer data based on surfaces and annotation SETS to this model.
+    *
+    * @param[in] tSurfaceSet        FreeSurfer surface set.
+    * @param[in] tAnnotationSet     FreeSurfer annotation set.
+    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+    * @return                       Returns true if successful.
+    */
+    bool addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity *p3DEntityParent = 0);
 
 private:
 
