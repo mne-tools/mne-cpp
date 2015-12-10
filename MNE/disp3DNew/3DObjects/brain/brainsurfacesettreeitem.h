@@ -46,7 +46,7 @@
 #include "../../helpers/abstracttreeitem.h"
 #include "brainsurfacetreeitem.h"
 
-#include "../../helpers/types.h"
+//#include "../../helpers/types.h"
 
 #include "fs/label.h"
 #include "fs/annotationset.h"
@@ -142,9 +142,12 @@ public:
     * @param[in] tSurfaceSet        FreeSurfer surface set.
     * @param[in] tAnnotationSet     FreeSurfer annotation set.
     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+    *
     * @return                       Returns true if successful.
     */
     bool addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity *p3DEntityParent = 0);
+
+    enum ItemType {Type, UnknownItem, SurfaceSetItem};
 
 private:
 

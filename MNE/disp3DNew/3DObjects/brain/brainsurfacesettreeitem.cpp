@@ -57,7 +57,6 @@ using namespace DISP3DNEWLIB;
 BrainSurfaceSetTreeItem::BrainSurfaceSetTreeItem(const int& iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
-    this->setToolTip("Brain surface set");
 }
 
 

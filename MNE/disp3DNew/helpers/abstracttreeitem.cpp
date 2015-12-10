@@ -6,6 +6,7 @@ AbstractTreeItem::AbstractTreeItem(const int& iType, const QString& text)
 : QStandardItem(text)
 , m_iType(iType)
 {
+    createToolTip();
 }
 
 
@@ -43,3 +44,42 @@ AbstractTreeItem& AbstractTreeItem::operator<<(AbstractTreeItem& newItem)
     return *this;
 }
 
+
+//*************************************************************************************************************
+
+void AbstractTreeItem::createToolTip()
+{
+    QString sToolTip;
+
+    switch(m_iType) {
+    case BrainTreeItemTypes::UnknownItem:
+        sToolTip = "Unknown";
+        break;
+    case BrainTreeItemTypes::SurfaceSetItem:
+        sToolTip = "Brain surface set";
+        break;
+    case BrainTreeItemTypes::SurfaceItem:
+        sToolTip = "Brain surface";
+        break;
+    case BrainTreeItemTypes::SurfaceFileName:
+        sToolTip = "Surface file name";
+        break;
+    case BrainTreeItemTypes::SurfaceFilePath:
+        sToolTip = "Surface file path";
+        break;
+    case BrainTreeItemTypes::AnnotFileName:
+        sToolTip = "Annotation file name";
+        break;
+    case BrainTreeItemTypes::AnnotFilePath:
+        sToolTip = "Annotation file path";
+        break;
+    case BrainTreeItemTypes::SurfaceFileType:
+        sToolTip = "Surface type";
+        break;
+    default:
+        sToolTip = "Unknown";
+        break;
+    }
+
+    this->setToolTip(sToolTip);
+}
