@@ -184,17 +184,24 @@ int main(int argc, char *argv[])
     Warp test;
     MatrixXd wVert(sVert.rows(),3);
     wVert = test.calculate(sLm, dLm, sVert);
-//    std::cout << "Here is the final matrix wVert:" << std::endl << wVert << std::endl;
 
     //
     // WRITE NEW VERTICES BACK TO BEM
     //
     skin.rr=wVert.cast<float>();
     skin.addVertexNormals();
+
+    std::cout << "Here is the last row of the final matrix skin.rr:" << std::endl << skin.rr.bottomRows(1) << std::endl;
+    std::cout << "Here is the first row of the final matrix skin.tris:" << std::endl << skin.tris.topRows(9) << std::endl;
+    std::cout << "Here is the last row of the final matrix skin.tris:" << std::endl << skin.tris.bottomRows(1) << std::endl;
+
+    MNELIB::MNEBem t_BemWarpedA;
+    t_BemWarpedA<<skin;
     QFile t_fileBemWarped("./MNE-sample-data/subjects/sample/bem/sample-head-warped.fif");
     t_Bem.write(t_fileBemWarped);
+    t_fileBemWarped.close();
 
-    MNELIB::MNEBem t_BemWarped (t_fileBemWarped) ;
-    MNELIB::MNEBemSurface skinWarped=t_BemWarped[0];
+    MNELIB::MNEBem t_BemWarpedB (t_fileBemWarped) ;
+    MNELIB::MNEBemSurface skinWarped=t_BemWarpedB[0];
     return a.exec();
 }

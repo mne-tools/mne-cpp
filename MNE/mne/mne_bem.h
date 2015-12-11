@@ -202,6 +202,26 @@ public:
     */
     MNEBemSurface& operator[] (qint32 idx);
 
+    //=========================================================================================================
+    /**
+    * Subscript operator << to add a new bem_surface
+    *
+    * @param[in] surf   BemSurface to be added
+    *
+    * @return MNEBem
+    */
+    MNEBem& operator<< (const MNEBemSurface& surf);
+
+    //=========================================================================================================
+    /**
+    * Subscript operator << to add a new bem_surface
+    *
+    * @param[in] surf   BemSurface to be added
+    *
+    * @return MNEBem
+    */
+    MNEBem& operator<< (const MNEBemSurface* surf);
+
 protected:
     //=========================================================================================================
     /**

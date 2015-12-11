@@ -587,8 +587,8 @@ void RealTimeMultiSampleArrayModel::updateProjection()
         qDebug() << "updateProjection :: New projection calculated.";
 
         //set columns of matrix to zero depending on bad channels indexes
-//        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
-//            m_matProj.col(m_vecBadIdcs[j]).setZero();
+        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
+            m_matProj.col(m_vecBadIdcs[j]).setZero();
 
 //        std::cout << "Bads\n" << m_vecBadIdcs << std::endl;
 //        std::cout << "Proj\n";

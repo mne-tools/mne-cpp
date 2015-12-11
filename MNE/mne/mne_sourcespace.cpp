@@ -264,12 +264,14 @@ bool MNESourceSpace::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, 
     //   Open the file, create directory
     //
     bool open_here = false;
+    QFile t_file;//ToDo TCPSocket;
+
     if (!p_pStream->device()->isOpen())
     {
         QList<FiffDirEntry> t_Dir;
         QString t_sFileName = p_pStream->streamName();
 
-        QFile t_file(t_sFileName);//ToDo TCPSocket;
+        t_file.setFileName(t_sFileName);
         p_pStream = FiffStream::SPtr(new FiffStream(&t_file));
         if(!p_pStream->open(p_Tree, t_Dir))
             return false;
