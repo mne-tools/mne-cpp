@@ -2424,21 +2424,19 @@ void FiffStream::write_int_matrix(fiff_int_t kind, const MatrixXi& mat)
     *this << (qint32)datasize;
     *this << (qint32)FIFFV_NEXT_SEQ;
 
-//    qint32 i;
+    qint32 i,j;
 //    for(i = 0; i < numel; ++i)
 //        *this << mat.data()[i];
 
-    qint32 i,j;
-
-//    //Option 1: Rowmajor
-//    for(i = 0; i < mat.rows(); ++i)
-//        for(j = 0; j < mat.cols(); ++j)
-//            *this << mat(i,j);
-
-        //Option 2: Colmajor
+    //Option 1: Rowmajor
+    for(i = 0; i < mat.rows(); ++i)
         for(j = 0; j < mat.cols(); ++j)
-            for(i = 0; i < mat.rows(); ++i)
-                *this << mat(i,j);
+            *this << mat(i,j);
+
+//        //Option 2: Colmajor
+//        for(j = 0; j < mat.cols(); ++j)
+//            for(i = 0; i < mat.rows(); ++i)
+//                *this << mat(i,j);
 
 
     qint32 dims[3];
