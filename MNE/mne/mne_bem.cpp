@@ -252,6 +252,7 @@ bool MNEBem::readBemSurface(FiffStream *p_pStream, const FiffDirTree &p_Tree, MN
 
     p_BemSurface.rr = t_pTag->toFloatMatrix().transpose();
     qint32 rows_rr = p_BemSurface.rr.rows();
+    std::cout << "Here are the first Rows rr:" << std::endl << p_BemSurface.rr.topRows(9) << std::endl;
         qDebug() << "last element rr: " << p_BemSurface.rr(rows_rr-1, 0) << p_BemSurface.rr(rows_rr-1, 1) << p_BemSurface.rr(rows_rr-1, 2);
 
     if (rows_rr != p_BemSurface.np)
@@ -323,10 +324,11 @@ bool MNEBem::readBemSurface(FiffStream *p_pStream, const FiffDirTree &p_Tree, MN
         MatrixXi p_defaultMatrix(0, 0);
         p_BemSurface.tris = p_defaultMatrix;
     }
+
         qDebug() << "Triangles; type:" << t_pTag->getType() << "rows:" << p_BemSurface.tris.rows() << "cols:" << p_BemSurface.tris.cols();
 //        qDebug() << "First Triangle: " << p_BemSurface.tris(0, 0) << p_BemSurface.tris(0, 1) << p_BemSurface.tris(0, 2);
         std::cout << "Here is the first row of the final matrix skin.tris:" << std::endl << p_BemSurface.tris.topRows(9) << std::endl;
-        qDebug() << "Last Triangle: " << p_BemSurface.tris(p_BemSurface.tris.rows()-1, 0) << p_BemSurface.tris(p_BemSurface.tris.rows()-1, 1) << p_BemSurface.tris(p_BemSurface.tris.rows()-1, 2);
+//        qDebug() << "Last Triangle: " << p_BemSurface.tris(p_BemSurface.tris.rows()-1, 0) << p_BemSurface.tris(p_BemSurface.tris.rows()-1, 1) << p_BemSurface.tris(p_BemSurface.tris.rows()-1, 2);
 
     return true;
 }
