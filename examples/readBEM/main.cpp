@@ -88,6 +88,13 @@ int main(int argc, char *argv[])
 
     MNEBem t_Bem (t_fileBem) ;
 
+    QFile t_fileBemTest("./MNE-sample-data/subjects/sample/bem/sample-head-test.fif");
+    t_Bem.write(t_fileBemTest);
+    t_fileBemTest.close();
+
+
+    MNELIB::MNEBem t_BemTest (t_fileBemTest) ;
+
     qDebug() << "Put your stuff your interest in here";
 
     return a.exec();
