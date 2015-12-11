@@ -353,7 +353,7 @@ void MNEHemisphere::writeToStream(FiffStream* p_pStream)
 
     if(this->type == 2) //2 = Vol
     {
-        qDebug() << "ToDo: Write Volume not implemented jet!!!!!!!!";
+        qDebug() << "ToDo: Write Volume not implemented yet!!!!!!!!";
 //        p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS, this->shape)
 //        p_pStream->write_coord_trans(this->src_mri_t);
 
