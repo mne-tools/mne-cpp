@@ -82,29 +82,32 @@ namespace BrainTreeItemTypes
                     SurfaceFilePath = QStandardItem::UserType + 6,
                     AnnotFileName = QStandardItem::UserType + 7,
                     AnnotFilePath = QStandardItem::UserType + 8,
-                    SurfaceFileType = QStandardItem::UserType + 9};
+                    SurfaceFileType = QStandardItem::UserType + 9,
+                    SurfaceColorGyri = QStandardItem::UserType + 10,
+                    SurfaceColorSulci = QStandardItem::UserType + 11,
+                    SurfaceColorVert = QStandardItem::UserType + 12};
 }
 
 namespace BrainTreeModelRoles
 {
-    enum ItemRole{GetSurfName = Qt::UserRole,
-                      GetSurfType = Qt::UserRole + 1,
-                      GetSurfHemi = Qt::UserRole + 2,
-                      GetSurfColorSulci = Qt::UserRole + 3,
-                      GetSurfColorGyri = Qt::UserRole + 4,
-                      GetSurfColorVert = Qt::UserRole + 5,
-                      GetSurfVert = Qt::UserRole + 6,
-                      GetSurfTris = Qt::UserRole + 7,
-                      GetSurfNorm = Qt::UserRole + 8,
-                      GetSurfCurv = Qt::UserRole + 9,
-                      GetSurfOffset = Qt::UserRole + 10,
-                      GetSurfFilePath = Qt::UserRole + 11,
-                      GetAnnotName = Qt::UserRole + 12,
-                      GetAnnotFilePath = Qt::UserRole + 13,
-                      GetAnnotColor = Qt::UserRole + 14,
-                      GetRenderable3DEntity = Qt::UserRole + 15,
-                      GetRootItem = Qt::UserRole + 16,
-                      GetSurfSetName = Qt::UserRole + 17};
+    enum ItemRole{SurfaceName = Qt::UserRole,
+                      SurfaceType = Qt::UserRole + 1,
+                      SurfaceHemi = Qt::UserRole + 2,
+                      SurfaceColorSulci = Qt::UserRole + 3,
+                      SurfaceColorGyri = Qt::UserRole + 4,
+                      SurfaceColorVert = Qt::UserRole + 5,
+                      SurfaceVert = Qt::UserRole + 6,
+                      SurfaceTris = Qt::UserRole + 7,
+                      SurfaceNorm = Qt::UserRole + 8,
+                      SurfaceCurv = Qt::UserRole + 9,
+                      SurfaceOffset = Qt::UserRole + 10,
+                      SurfaceFilePath = Qt::UserRole + 11,
+                      AnnotName = Qt::UserRole + 12,
+                      AnnotFilePath = Qt::UserRole + 13,
+                      AnnotColor = Qt::UserRole + 14,
+                      Renderable3DEntity = Qt::UserRole + 15,
+                      RootItem = Qt::UserRole + 16,
+                      SurfaceSetName = Qt::UserRole + 17};
 }
 
 } //NAMESPACE DISP3DNEWLIB

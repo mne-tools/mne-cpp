@@ -94,7 +94,7 @@ using namespace FSLIB;
 
 //=============================================================================================================
 /**
-* Base class for renederable 3D and 2D QEntities.
+* Base class for renederable 3D QEntities.
 *
 * @brief Base class for renederable 3D QEntities.
 */
@@ -150,6 +150,10 @@ public:
     * @return If successful returns true, false otherwise.
     */
     bool setMeshData(const MatrixX3f &tMatVert, const MatrixX3f tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset);
+
+    bool setTransform(QSharedPointer<Qt3DCore::QTransform> pTransform);
+
+    bool setMaterial(QSharedPointer<Qt3DRender::QMaterial> pMaterial);
 
 protected:
     CustomMesh::SPtr                                m_pCustomMesh;          /**< The actual mesh information (vertices, normals, colors). */

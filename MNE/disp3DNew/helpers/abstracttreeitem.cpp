@@ -82,6 +82,12 @@ void AbstractTreeItem::createToolTip()
     case BrainTreeItemTypes::SurfaceFileType:
         sToolTip = "Surface type";
         break;
+    case BrainTreeItemTypes::SurfaceColorGyri:
+        sToolTip = "Color Gyri";
+        break;
+    case BrainTreeItemTypes::SurfaceColorSulci:
+        sToolTip = "Color Sulci";
+        break;
     default:
         sToolTip = "Unknown";
         break;

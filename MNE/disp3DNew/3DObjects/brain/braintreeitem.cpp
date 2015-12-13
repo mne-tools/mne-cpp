@@ -72,10 +72,10 @@ BrainTreeItem::~BrainTreeItem()
 QVariant BrainTreeItem::data(int role) const
 {
     switch(role) {
-        case BrainTreeModelRoles::GetSurfType:
+        case BrainTreeModelRoles::SurfaceType:
             return QVariant();
 
-        case BrainTreeModelRoles::GetSurfHemi:
+        case BrainTreeModelRoles::SurfaceHemi:
             return QVariant();
     }
 

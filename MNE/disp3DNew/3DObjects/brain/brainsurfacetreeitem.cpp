@@ -73,10 +73,10 @@ BrainSurfaceTreeItem::~BrainSurfaceTreeItem()
 QVariant BrainSurfaceTreeItem::data(int role) const
 {
     switch(role) {
-        case BrainTreeModelRoles::GetSurfName:
+        case BrainTreeModelRoles::SurfaceName:
             return QVariant();
 
-        case BrainTreeModelRoles::GetRenderable3DEntity:
+        case BrainTreeModelRoles::Renderable3DEntity:
             return QVariant();
 
     }
@@ -97,45 +97,43 @@ void  BrainSurfaceTreeItem::setData(const QVariant& value, int role)
 
 bool BrainSurfaceTreeItem::addFsSurfData(const Surface& tSurface)
 {
+    //Create color from curvature information
+    Matrix<float, Dynamic, 3, RowMajor> matColorsOrig(tSurface.rr().rows(), tSurface.rr().cols());
+    QColor colSulci(50,50,50);
+    QColor colGyri(125,125,125);
+
+    for(int i = 0; i<matColorsOrig.rows() ; i++) {
+        if(tSurface.curv()[i] >= 0) {
+            matColorsOrig(i, 0) = colSulci.redF();
+            matColorsOrig(i, 1) = colSulci.greenF();
+            matColorsOrig(i, 2) = colSulci.blueF();
+        } else {
+            matColorsOrig(i, 0) = colGyri.redF();
+            matColorsOrig(i, 1) = colGyri.greenF();
+            matColorsOrig(i, 2) = colGyri.blueF();
+        }
+    }
+
+    this->setVertColor(matColorsOrig);
+
     //Set renderable 3D entity and mesh data
     this->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset());
 
     //Add surface meta information
+    BrainTreeItem *itemSurfColSulci = new BrainTreeItem(BrainTreeItemTypes::SurfaceColorSulci, "Color sulci");
+    *this<<itemSurfColSulci;
+
+    BrainTreeItem *itemSurfColGyri = new BrainTreeItem(BrainTreeItemTypes::SurfaceColorGyri, "Color gyri");
+    *this<<itemSurfColGyri;
+
     BrainTreeItem *itemSurfFileName = new BrainTreeItem(BrainTreeItemTypes::SurfaceFileName, tSurface.fileName());
-    this->appendRow(itemSurfFileName);
+    *this<<itemSurfFileName;
 
     BrainTreeItem *itemSurfType = new BrainTreeItem(BrainTreeItemTypes::SurfaceFileType, tSurface.surf());
-    this->appendRow(itemSurfType);
+    *this<<itemSurfType;
 
     BrainTreeItem *itemSurfPath = new BrainTreeItem(BrainTreeItemTypes::SurfaceFilePath, tSurface.filePath());
-    this->appendRow(itemSurfPath);
-
-//    //Create color from curvature information
-//    m_matColorsOrig.resize(m_matVert.rows(), m_matVert.cols());
-
-//    for(int i = 0; i<m_matVert.rows() ; i++) {
-//        if(m_vecCurv[i] >= 0) {
-//            m_matColorsOrig(i, 0) = m_ColorSulci.redF();
-//            m_matColorsOrig(i, 1) = m_ColorSulci.greenF();
-//            m_matColorsOrig(i, 2) = m_ColorSulci.blueF();
-//        } else {
-//            m_matColorsOrig(i, 0) = m_ColorGyri.redF();
-//            m_matColorsOrig(i, 1) = m_ColorGyri.greenF();
-//            m_matColorsOrig(i, 2) = m_ColorGyri.blueF();
-//        }
-//    }
-
-    //    //ColorSulci
-    //    lDataVariant<<QColor(50,50,50);
-    //    BrainTreeItem* pBrainTreeItemColorSulci = new BrainTreeItem(lDataVariant, BrainTreeItem::ColorSulci, pBrainTreeItemTop);
-    //    pBrainTreeItemTop->appendChild(pBrainTreeItemColorSulci);
-    //    lDataVariant.clear();
-
-    //    //ColorGyri
-    //    lDataVariant<<QColor(125,125,125);
-    //    BrainTreeItem* pBrainTreeItemColorGyri = new BrainTreeItem(lDataVariant, BrainTreeItem::ColorGyri, pBrainTreeItemTop);
-    //    pBrainTreeItemTop->appendChild(pBrainTreeItemColorGyri);
-    //    lDataVariant.clear();
+    *this<<itemSurfPath;
 
     return true;
 }
