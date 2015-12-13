@@ -122,8 +122,9 @@ public:
     * @param[in] tMatNorm       Normals in form of a matrix.
     * @param[in] tMatTris       Tris/Faces in form of a matrix.
     * @param[in] tVecOffset     The offset which is to be used on all the vertices.
+    * @param[in] tMatColors     The vertex colors. If empty a default value will be used.
     */
-    CustomMesh(const MatrixX3f &tMatVert, const MatrixX3f tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset);
+    CustomMesh(const MatrixX3f &tMatVert, const MatrixX3f tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset, const Matrix<float, Dynamic, 3, RowMajor> &tMatColors = Matrix<float, Dynamic, 3, RowMajor>(0,0));
 
     //=========================================================================================================
     /**
@@ -166,10 +167,11 @@ protected:
     Qt3DRender::QBuffer*    m_pColorDataBuffer;     /**< The color buffer. */
     Qt3DRender::QBuffer*    m_pIndexDataBuffer;     /**< The index buffer. */
 
-    MatrixX3f               m_matVert;              /**< The vertex buffer. */
-    MatrixX3f               m_matNorm;              /**< The normal buffer. */
-    MatrixX3i               m_matTris;              /**< The tris buffer. */
-    Vector3f                m_vecOffset;            /**< The offset buffer. */
+    MatrixX3f               m_matVert;              /**< The vertex matrix. */
+    MatrixX3f               m_matNorm;              /**< The normal matrix. */
+    MatrixX3i               m_matTris;              /**< The tris matrix. */
+    Vector3f                m_vecOffset;            /**< The offset matrix. */
+    Matrix<float, Dynamic, 3, RowMajor> m_matColor; /**< The color matrix. */
 
     int     m_iNumVert;     /**< The total number of set vertices. */
 };

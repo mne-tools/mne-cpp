@@ -68,12 +68,13 @@ CustomMesh::CustomMesh()
 
 //*************************************************************************************************************
 
-CustomMesh::CustomMesh(const MatrixX3f &tMatVert, const MatrixX3f tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset)
+CustomMesh::CustomMesh(const MatrixX3f &tMatVert, const MatrixX3f tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset, const Matrix<float, Dynamic, 3, RowMajor> &tMatColors)
 : Qt3DRender::QGeometryRenderer()
 , m_matVert(tMatVert)
 , m_matNorm(tMatNorm)
 , m_matTris(tMatTris)
 , m_vecOffset(tVecOffset)
+, m_matColor(tMatColors)
 , m_iNumVert(tMatVert.rows())
 {
     this->createCustomMesh();
@@ -91,9 +92,11 @@ CustomMesh::~CustomMesh()
 
 bool CustomMesh::setVertColor(const Matrix<float, Dynamic, 3, RowMajor> &tMatColors)
 {
+    m_matColor = tMatColors;
+
     //Check dimensions
     if(tMatColors.rows() != m_iNumVert) {
-        qDebug()<<"CustomMesh::updateVertColors - new color and vertices dimensions do not match!";
+        qDebug()<<"CustomMesh::updateVertColors - new color and vertices dimensions do not match or mesh data was not set yet!";
         return false;
     }
 
@@ -168,9 +171,15 @@ bool CustomMesh::createCustomMesh()
         rawNormalArray[idxNorm++] = m_matNorm(i,2);
 
         //Color (this is the default color and will be used until the updateVertColor function was called)
-        rawColorArray[idxColor++] = 0.5f;
-        rawColorArray[idxColor++] = 0.2f;
-        rawColorArray[idxColor++] = 0.2f;
+        if(m_matColor.size() == 0 || m_matColor.rows() != m_matVert.rows()) {
+            rawColorArray[idxColor++] = 0.5f;
+            rawColorArray[idxColor++] = 0.2f;
+            rawColorArray[idxColor++] = 0.2f;
+        } else {
+            rawColorArray[idxColor++] = m_matColor(i,0);
+            rawColorArray[idxColor++] = m_matColor(i,1);
+            rawColorArray[idxColor++] = m_matColor(i,2);
+        }
     }
 
     //Fill indexBufferData with data which holds the triangulation information (faces/tris)

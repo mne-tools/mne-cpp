@@ -54,7 +54,7 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainAnnotationTreeItem::BrainAnnotationTreeItem(const int& iType, const QString& text)
+BrainAnnotationTreeItem::BrainAnnotationTreeItem(const int &iType, const QString &text)
 : AbstractTreeItem(iType, text)
 {
 }
@@ -72,10 +72,10 @@ BrainAnnotationTreeItem::~BrainAnnotationTreeItem()
 QVariant BrainAnnotationTreeItem::data(int role) const
 {
     switch(role) {
-        case BrainTreeModelRoles::GetSurfName:
+        case BrainTreeModelRoles::AnnotName:
             return QVariant();
 
-        case BrainTreeModelRoles::GetRenderable3DEntity:
+        case BrainTreeModelRoles::Renderable3DEntity:
             return QVariant();
 
     }
@@ -86,7 +86,7 @@ QVariant BrainAnnotationTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void  BrainAnnotationTreeItem::setData(const QVariant& value, int role)
+void  BrainAnnotationTreeItem::setData(const QVariant &value, int role)
 {
     QStandardItem::setData(value, role);
 }
@@ -94,30 +94,32 @@ void  BrainAnnotationTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool BrainAnnotationTreeItem::addFsAnnotData(const Annotation& tAnnotation)
+bool BrainAnnotationTreeItem::addFsAnnotData(const Surface &tSurface, const Annotation &tAnnotation)
 {
+    //Create color from annotation data if annotation is not empty
+    if(tAnnotation.getVertices().rows() != 0) {
+        Matrix<float, Dynamic, 3, RowMajor> matColorsAnnot(tAnnotation.getVertices().rows(), 3);
+        QList<FSLIB::Label> qListLabels;
+        QList<RowVector4i> qListLabelRGBAs;
+
+        tAnnotation.toLabels(tSurface, qListLabels, qListLabelRGBAs);
+
+        for(int i = 0; i<qListLabels.size(); i++) {
+            FSLIB::Label label = qListLabels.at(i);
+            for(int j = 0; j<label.vertices.rows(); j++) {
+                matColorsAnnot(label.vertices(j), 0) = qListLabelRGBAs.at(i)(0)/255.0;
+                matColorsAnnot(label.vertices(j), 1) = qListLabelRGBAs.at(i)(1)/255.0;
+                matColorsAnnot(label.vertices(j), 2) = qListLabelRGBAs.at(i)(2)/255.0;
+            }
+        }
+    }
+
     //Add annotation meta information
     BrainTreeItem *itemAnnotFileName = new BrainTreeItem(BrainTreeItemTypes::AnnotFileName, tAnnotation.fileName());
     *this<<itemAnnotFileName;
 
     BrainTreeItem *itemAnnotPath = new BrainTreeItem(BrainTreeItemTypes::AnnotFilePath, tAnnotation.filePath());
     *this<<itemAnnotPath;
-
-//    //Create color from annotation data if annotation is not empty
-//    if(tAnnotation.getVertices().rows() != 0) {
-//        tAnnotation.toLabels(tSurface, m_qListLabels, m_qListLabelRGBAs);
-
-//        m_matColorsAnnot.resize(m_matVert.rows(), m_matVert.cols());
-
-//        for(int i = 0; i<m_qListLabels.size(); i++) {
-//            FSLIB::Label label = m_qListLabels.at(i);
-//            for(int j = 0; j<label.vertices.rows(); j++) {
-//                m_matColorsAnnot(label.vertices(j), 0) = m_qListLabelRGBAs.at(i)(0)/255.0;
-//                m_matColorsAnnot(label.vertices(j), 1) = m_qListLabelRGBAs.at(i)(1)/255.0;
-//                m_matColorsAnnot(label.vertices(j), 2) = m_qListLabelRGBAs.at(i)(2)/255.0;
-//            }
-//        }
-//    }
 
     return true;
 }

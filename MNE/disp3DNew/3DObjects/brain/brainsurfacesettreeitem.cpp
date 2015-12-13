@@ -72,7 +72,7 @@ BrainSurfaceSetTreeItem::~BrainSurfaceSetTreeItem()
 QVariant BrainSurfaceSetTreeItem::data(int role) const
 {
     switch(role) {
-        case BrainTreeModelRoles::GetSurfSetName:
+        case BrainTreeModelRoles::SurfaceSetName:
             return QVariant();
     }
 

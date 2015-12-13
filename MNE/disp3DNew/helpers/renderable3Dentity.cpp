@@ -85,6 +85,7 @@ Renderable3DEntity::Renderable3DEntity(const MatrixX3f &tMatVert, const MatrixX3
 
 Renderable3DEntity::~Renderable3DEntity()
 {
+    this->removeAllComponents();
 }
 
 
@@ -102,5 +103,26 @@ bool Renderable3DEntity::setMeshData(const MatrixX3f &tMatVert, const MatrixX3f 
 {
     return m_pCustomMesh->setMeshData(tMatVert, tMatNorm, tMatTris, tVecOffset);
 }
+
+
+//*************************************************************************************************************
+
+bool Renderable3DEntity::setTransform(QSharedPointer<Qt3DCore::QTransform> pTransform)
+{
+    m_pTransform = pTransform;
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool Renderable3DEntity::setMaterial(QSharedPointer<Qt3DRender::QMaterial> pMaterial)
+{
+    m_pMaterial = pMaterial;
+
+    return true;
+}
+
 
 

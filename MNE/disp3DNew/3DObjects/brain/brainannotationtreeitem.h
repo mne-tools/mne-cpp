@@ -112,7 +112,7 @@ public:
     /**
     * Default constructor.
     */
-    explicit BrainAnnotationTreeItem(const int& iType = BrainTreeItemTypes::UnknownItem, const QString& text = "Annotation");
+    explicit BrainAnnotationTreeItem(const int &iType = BrainTreeItemTypes::UnknownItem, const QString &text = "Annotation");
 
     //=========================================================================================================
     /**
@@ -125,17 +125,18 @@ public:
     * AbstractTreeItem functions
     */
     QVariant data(int role = Qt::UserRole + 1) const;
-    void  setData(const QVariant & value, int role = Qt::UserRole + 1);
+    void setData(const QVariant &value, int role = Qt::UserRole + 1);
 
     //=========================================================================================================
     /**
     * Adds FreeSurfer data based on annotation information to this model.
     *
+    * @param[in] tSurface           FreeSurfer surface.
     * @param[in] tAnnotation        FreeSurfer annotation.
     *
     * @return                       Returns true if successful.
     */
-    bool addFsAnnotData(const Annotation& tAnnotation);
+    bool addFsAnnotData(const Surface &tSurface, const Annotation &tAnnotation);
 
 private:
 
