@@ -2039,9 +2039,11 @@ void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXf& mat)
     *this << (qint32)datasize;
     *this << (qint32)FIFFV_NEXT_SEQ;
 
-    qint32 i;
-    for(i = 0; i < numel; ++i)
-        *this << mat.data()[i];
+    qint32 i, j;
+    // Storage order: row-major
+    for(i = 0; i < mat.rows(); ++i)
+        for(j = 0; j < mat.cols(); ++j)
+            *this << mat(i,j);
 
     qint32 dims[3];
     dims[0] = mat.cols();
@@ -2385,9 +2387,11 @@ void FiffStream::write_int_matrix(fiff_int_t kind, const MatrixXi& mat)
     *this << (qint32)datasize;
     *this << (qint32)FIFFV_NEXT_SEQ;
 
-    qint32 i;
-    for(i = 0; i < numel; ++i)
-        *this << mat.data()[i];
+    qint32 i, j;
+    // Storage order: row-major
+    for(i = 0; i < mat.rows(); ++i)
+        for(j = 0; j < mat.cols(); ++j)
+            *this << mat(i,j);
 
     qint32 dims[3];
     dims[0] = mat.cols();
