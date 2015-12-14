@@ -113,7 +113,7 @@ public:
     /**
     * Default constructor.
     */
-    explicit BrainSurfaceTreeItem(const int & iType = BrainTreeModelItemTypes::UnknownItem, const QString & text = "Brain surface");
+    explicit BrainSurfaceTreeItem(const int & iType = BrainTreeModelItemTypes::UnknownItem, const QString & text = "Surface");
 
     //=========================================================================================================
     /**
@@ -137,6 +137,8 @@ public:
     * @return                       Returns true if successful.
     */
     bool addData(const Surface & tSurface, Qt3DCore::QEntity * parent);
+
+    void updateVertColor();
 
 private:
     MatrixX3f createCurvatureVertColor(const VectorXf & curvature, const QColor & colSulci = QColor(50,50,50), const QColor & colGyri = QColor(125,125,125));

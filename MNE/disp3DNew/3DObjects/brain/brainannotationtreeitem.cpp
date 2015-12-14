@@ -111,10 +111,6 @@ bool BrainAnnotationTreeItem::addData(const Surface &tSurface, const Annotation 
     }
 
     //Add annotation meta information
-    BrainTreeItem *itemShowAnnot = new BrainTreeItem(BrainTreeModelItemTypes::AnnotToggleVisibility, "Show");
-    itemShowAnnot->setCheckable(true);
-    *this<<itemShowAnnot;
-
     BrainTreeItem *itemAnnotFileName = new BrainTreeItem(BrainTreeModelItemTypes::AnnotFileName, tAnnotation.fileName());
     *this<<itemAnnotFileName;
 

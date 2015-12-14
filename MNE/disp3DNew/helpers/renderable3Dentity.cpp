@@ -91,7 +91,7 @@ Renderable3DEntity::~Renderable3DEntity()
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::setVertColor(const MatrixX3f & tMatColors)
+bool Renderable3DEntity::setVertColor(const Matrix<float, Dynamic, 3, RowMajor> & tMatColors)
 {
     return m_pCustomMesh->setVertColor(tMatColors);
 }

@@ -109,7 +109,7 @@ bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation&
     bool state = false;
 
     //Add surface child
-    BrainSurfaceTreeItem* pSurfaceItem = new BrainSurfaceTreeItem(BrainTreeModelItemTypes::SurfaceItem, "Surface");
+    BrainSurfaceTreeItem* pSurfaceItem = new BrainSurfaceTreeItem(BrainTreeModelItemTypes::SurfaceItem);
     state = pSurfaceItem->addData(tSurface, p3DEntityParent);
 
     //qDebug()<<pTransform->matrix();

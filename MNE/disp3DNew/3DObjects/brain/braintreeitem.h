@@ -43,6 +43,7 @@
 
 #include "../../disp3DNew_global.h"
 #include "../../helpers/abstracttreeitem.h"
+#include "brainsurfacetreeitem.h"
 
 
 //*************************************************************************************************************
@@ -120,8 +121,6 @@ public:
     */
     QVariant data(int role = Qt::UserRole + 1) const;
     void setData(const QVariant& value, int role = Qt::UserRole + 1);
-
-signals:
 
 private:
 
