@@ -91,12 +91,11 @@ bool BrainSurfaceTreeItem::addFsSurfData(const Surface & tSurface, Qt3DCore::QEn
     //Create renderable 3D entity
     m_pRenderable3DEntity = new Renderable3DEntity(parent);
 
-    //Set renderable 3D entity and mesh data
-    m_pRenderable3DEntity->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset());
-
     //Create color from curvature information with default gyri and sulcus colors
     MatrixX3f matCurvatureColor = createCurvatureVertColor(tSurface.curv());
-    m_pRenderable3DEntity->setVertColor(matCurvatureColor);
+
+    //Set renderable 3D entity mesh and color data
+    m_pRenderable3DEntity->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset(), matCurvatureColor);
 
     //Add data which is held by this BrainSurfaceTreeItem
     QVariant data;
@@ -145,14 +144,6 @@ bool BrainSurfaceTreeItem::addFsSurfData(const Surface & tSurface, Qt3DCore::QEn
     *this<<itemSurfPath;
 
     return true;
-}
-
-
-//*************************************************************************************************************
-
-void BrainSurfaceTreeItem::vertColorChanged()
-{
-
 }
 
 

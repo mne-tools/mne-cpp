@@ -149,7 +149,7 @@ public:
     *
     * @return If successful returns true, false otherwise.
     */
-    bool setMeshData(const MatrixX3f &tMatVert, const MatrixX3f tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset);
+    bool setMeshData(const MatrixX3f & tMatVert, const MatrixX3f & tMatNorm, const MatrixX3i & tMatTris, const Vector3f & tVecOffset, const Matrix<float, Dynamic, 3, RowMajor> & tMatColors = Matrix<float, Dynamic, 3, RowMajor>(0,3));
 
     bool setTransform(QSharedPointer<Qt3DCore::QTransform> pTransform);
 
