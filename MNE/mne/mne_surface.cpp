@@ -208,6 +208,7 @@ bool MNESurface::read(FIFFLIB::FiffStream* fiffStream,
 
     if(dir.find_tag(fiffStream, FIFF_BEM_SURF_NODES, tag) && surf->np > 0)
     {
+        //ToDo: rows, cols are exchanged - usually 3 cols -> ToDo: transpose
         surf->rr.resize(3, surf->np);
         surf->rr = tag->toFloatMatrix();
     }else
@@ -219,6 +220,7 @@ bool MNESurface::read(FIFFLIB::FiffStream* fiffStream,
     if(dir.find_tag(fiffStream, FIFF_MNE_SOURCE_SPACE_NORMALS, tag)
             && surf->np > 0)
     {
+        //ToDo: rows, cols are exchanged - usually 3 cols -> ToDo: transpose
         surf->nn.resize(3, surf->np);
         surf->nn = tag->toFloatMatrix();
     }else
@@ -228,6 +230,7 @@ bool MNESurface::read(FIFFLIB::FiffStream* fiffStream,
 
     if(dir.find_tag(fiffStream, FIFF_BEM_SURF_TRIANGLES, tag) && surf->ntri > 0)
     {
+        //ToDo: rows, cols are exchanged - usually 3 cols -> ToDo: transpose
         surf->tris.resize(3, surf->ntri);
         surf->tris = tag->toIntMatrix();
     }else

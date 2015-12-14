@@ -221,7 +221,8 @@ FiffInfo::SPtr RtDataClient::readInfo()
                             p_pFiffInfo->projs[countProj].data->col_names = FiffStream::split_name_list(t_pTag->toString());
                             break;
                         case FIFF_PROJ_ITEM_VECTORS:
-                            p_pFiffInfo->projs[countProj].data->data = t_pTag->toFloatMatrix().cast<double>();
+                            //ToDo: Test; Float Matrix
+                            p_pFiffInfo->projs[countProj].data->data = t_pTag->toFloatMatrix().transpose().cast<double>();
                             break;
                         }
                     }
@@ -290,7 +291,8 @@ FiffInfo::SPtr RtDataClient::readInfo()
                                 p_pFiffInfo->comps[countComp].data->col_names = FiffStream::split_name_list(col_names);
                             break;
                         case FIFF_MNE_CTF_COMP_DATA:
-                                p_pFiffInfo->comps[countComp].data->data = t_pTag->toNamedMatrix().cast<double>();
+                            //ToDo: Test; Float Matrix
+                            p_pFiffInfo->comps[countComp].data->data = t_pTag->toNamedMatrix().cast<double>();
                             break;
                         }
                     }
