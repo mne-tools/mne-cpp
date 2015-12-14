@@ -102,7 +102,7 @@ using namespace Eigen;
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT BrainSurfaceTreeItem : public AbstractTreeItem, public Renderable3DEntity
+class DISP3DNEWSHARED_EXPORT BrainSurfaceTreeItem : public AbstractTreeItem
 {
 
 public:
@@ -113,7 +113,7 @@ public:
     /**
     * Default constructor.
     */
-    explicit BrainSurfaceTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "Brain surface", Qt3DCore::QEntity* parent = 0);
+    explicit BrainSurfaceTreeItem(const int & iType = BrainTreeModelItemTypes::UnknownItem, const QString & text = "Brain surface");
 
     //=========================================================================================================
     /**
@@ -136,9 +136,14 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addFsSurfData(const Surface& tSurface);
+    bool addFsSurfData(const Surface & tSurface, Qt3DCore::QEntity * parent);
 
 private:
+    void vertColorChanged();
+
+    MatrixX3f createCurvatureVertColor(const VectorXf & curvature, const QColor & colSulci = QColor(50,50,50), const QColor & colGyri = QColor(125,125,125));
+
+    Renderable3DEntity*     m_pRenderable3DEntity;
 
 };
 

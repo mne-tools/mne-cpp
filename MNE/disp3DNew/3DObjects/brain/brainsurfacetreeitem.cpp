@@ -54,9 +54,9 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainSurfaceTreeItem::BrainSurfaceTreeItem(const int& iType, const QString& text, Qt3DCore::QEntity* parent)
+BrainSurfaceTreeItem::BrainSurfaceTreeItem(const int & iType, const QString & text)
 : AbstractTreeItem(iType, text)
-, Renderable3DEntity(parent)
+, m_pRenderable3DEntity(new Renderable3DEntity())
 {
 }
 
@@ -72,33 +72,13 @@ BrainSurfaceTreeItem::~BrainSurfaceTreeItem()
 
 QVariant BrainSurfaceTreeItem::data(int role) const
 {
-    switch(role) {
-    case BrainSurfaceTreeItemRoles::SurfaceColorVert:
-        return QVariant();
-
-    case BrainSurfaceTreeItemRoles::SurfaceVert:
-        return QVariant();
-
-    case BrainSurfaceTreeItemRoles::SurfaceTris:
-        return QVariant();
-
-    case BrainSurfaceTreeItemRoles::SurfaceNorm:
-        return QVariant();
-
-    case BrainSurfaceTreeItemRoles::SurfaceOffset:
-        return QVariant();
-
-    case BrainSurfaceTreeItemRoles::Renderable3DEntity:
-        return QVariant();
-    }
-
     return QStandardItem::data(role);
 }
 
 
 //*************************************************************************************************************
 
-void  BrainSurfaceTreeItem::setData(const QVariant& value, int role)
+void  BrainSurfaceTreeItem::setData(const QVariant & value, int role)
 {
     QStandardItem::setData(value, role);
 }
@@ -106,41 +86,51 @@ void  BrainSurfaceTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool BrainSurfaceTreeItem::addFsSurfData(const Surface& tSurface)
+bool BrainSurfaceTreeItem::addFsSurfData(const Surface & tSurface, Qt3DCore::QEntity * parent)
 {
-    //Create color from curvature information with default gyri and sulcus colors
-    Matrix<float, Dynamic, 3, RowMajor> matColorsOrig(tSurface.rr().rows(), tSurface.rr().cols());
-    QColor colSulci(50,50,50);
-    QColor colGyri(125,125,125);
-
-    for(int i = 0; i<matColorsOrig.rows() ; i++) {
-        if(tSurface.curv()[i] >= 0) {
-            matColorsOrig(i, 0) = colSulci.redF();
-            matColorsOrig(i, 1) = colSulci.greenF();
-            matColorsOrig(i, 2) = colSulci.blueF();
-        } else {
-            matColorsOrig(i, 0) = colGyri.redF();
-            matColorsOrig(i, 1) = colGyri.greenF();
-            matColorsOrig(i, 2) = colGyri.blueF();
-        }
-    }
-
-    this->setVertColor(matColorsOrig);
+    //Create renderable 3D entity
+    m_pRenderable3DEntity = new Renderable3DEntity(parent);
 
     //Set renderable 3D entity and mesh data
-    this->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset());
+    m_pRenderable3DEntity->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset());
 
-    //Add surface meta information
+    //Create color from curvature information with default gyri and sulcus colors
+    MatrixX3f matCurvatureColor = createCurvatureVertColor(tSurface.curv());
+    m_pRenderable3DEntity->setVertColor(matCurvatureColor);
+
+    //Add data which is held by this BrainSurfaceTreeItem
     QVariant data;
+    data.setValue(matCurvatureColor);
+    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert);
+    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurvatureColorVert);
 
+    data.setValue(tSurface.rr());
+    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceVert);
+
+    data.setValue(tSurface.tris());
+    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceTris);
+
+    data.setValue(tSurface.nn());
+    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceNorm);
+
+    data.setValue(tSurface.curv());
+    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurv);
+
+    data.setValue(tSurface.offset());
+    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceOffset);
+
+    data.setValue(m_pRenderable3DEntity);
+    this->setData(data, BrainSurfaceTreeItemRoles::Renderable3DEntity);
+
+    //Add surface meta information as item children
     BrainTreeItem *itemSurfColSulci = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceColorSulci, "Color sulci");
-    data.setValue(colSulci);
+    data.setValue(QColor(50,50,50));
     itemSurfColSulci->setData(data, BrainTreeItemRoles::SurfaceColorSulci);
     itemSurfColSulci->setData(data, Qt::DecorationRole);
     *this<<itemSurfColSulci;
 
     BrainTreeItem *itemSurfColGyri = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceColorGyri, "Color gyri");
-    data.setValue(colGyri);
+    data.setValue(QColor(125,125,125));
     itemSurfColGyri->setData(data, BrainTreeItemRoles::SurfaceColorGyri);
     itemSurfColGyri->setData(data, Qt::DecorationRole);
     *this<<itemSurfColGyri;
@@ -157,3 +147,32 @@ bool BrainSurfaceTreeItem::addFsSurfData(const Surface& tSurface)
     return true;
 }
 
+
+//*************************************************************************************************************
+
+void BrainSurfaceTreeItem::vertColorChanged()
+{
+
+}
+
+
+//*************************************************************************************************************
+
+MatrixX3f BrainSurfaceTreeItem::createCurvatureVertColor(const VectorXf & curvature, const QColor & colSulci, const QColor & colGyri)
+{
+    MatrixX3f matCurvatureColor(curvature.rows(), 3);
+
+    for(int i = 0; i<curvature.rows() ; i++) {
+        if(curvature[i] >= 0) {
+            matCurvatureColor(i, 0) = colSulci.redF();
+            matCurvatureColor(i, 1) = colSulci.greenF();
+            matCurvatureColor(i, 2) = colSulci.blueF();
+        } else {
+            matCurvatureColor(i, 0) = colGyri.redF();
+            matCurvatureColor(i, 1) = colGyri.greenF();
+            matCurvatureColor(i, 2) = colGyri.blueF();
+        }
+    }
+
+    return matCurvatureColor;
+}

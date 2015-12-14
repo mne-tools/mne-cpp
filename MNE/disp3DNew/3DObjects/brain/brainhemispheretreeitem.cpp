@@ -109,12 +109,8 @@ bool BrainHemisphereTreeItem::addFsData(const Surface& tSurface, const Annotatio
     bool state = false;
 
     //Add surface child
-    BrainSurfaceTreeItem* pSurfaceItem = new BrainSurfaceTreeItem(BrainTreeModelItemTypes::SurfaceItem, "Surface", p3DEntityParent);
-    state = pSurfaceItem->addFsSurfData(tSurface);
-
-    QSharedPointer<Qt3DCore::QTransform> pTransform = QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform());
-    pTransform->setScale(50.0f);
-    pSurfaceItem->setTransform(pTransform);
+    BrainSurfaceTreeItem* pSurfaceItem = new BrainSurfaceTreeItem(BrainTreeModelItemTypes::SurfaceItem, "Surface");
+    state = pSurfaceItem->addFsSurfData(tSurface, p3DEntityParent);
 
     //qDebug()<<pTransform->matrix();
 
