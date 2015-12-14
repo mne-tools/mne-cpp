@@ -112,7 +112,7 @@ public:
     /**
     * Default constructor.
     */
-    explicit BrainAnnotationTreeItem(const int &iType = BrainTreeItemTypes::UnknownItem, const QString &text = "Annotation");
+    explicit BrainAnnotationTreeItem(const int &iType = BrainTreeModelItemTypes::UnknownItem, const QString &text = "Annotation");
 
     //=========================================================================================================
     /**

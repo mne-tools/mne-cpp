@@ -73,12 +73,23 @@ BrainSurfaceTreeItem::~BrainSurfaceTreeItem()
 QVariant BrainSurfaceTreeItem::data(int role) const
 {
     switch(role) {
-        case BrainTreeModelRoles::SurfaceName:
-            return QVariant();
+    case BrainSurfaceTreeItemRoles::SurfaceColorVert:
+        return QVariant();
 
-        case BrainTreeModelRoles::Renderable3DEntity:
-            return QVariant();
+    case BrainSurfaceTreeItemRoles::SurfaceVert:
+        return QVariant();
 
+    case BrainSurfaceTreeItemRoles::SurfaceTris:
+        return QVariant();
+
+    case BrainSurfaceTreeItemRoles::SurfaceNorm:
+        return QVariant();
+
+    case BrainSurfaceTreeItemRoles::SurfaceOffset:
+        return QVariant();
+
+    case BrainSurfaceTreeItemRoles::Renderable3DEntity:
+        return QVariant();
     }
 
     return QStandardItem::data(role);
@@ -97,7 +108,7 @@ void  BrainSurfaceTreeItem::setData(const QVariant& value, int role)
 
 bool BrainSurfaceTreeItem::addFsSurfData(const Surface& tSurface)
 {
-    //Create color from curvature information
+    //Create color from curvature information with default gyri and sulcus colors
     Matrix<float, Dynamic, 3, RowMajor> matColorsOrig(tSurface.rr().rows(), tSurface.rr().cols());
     QColor colSulci(50,50,50);
     QColor colGyri(125,125,125);
@@ -120,19 +131,27 @@ bool BrainSurfaceTreeItem::addFsSurfData(const Surface& tSurface)
     this->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset());
 
     //Add surface meta information
-    BrainTreeItem *itemSurfColSulci = new BrainTreeItem(BrainTreeItemTypes::SurfaceColorSulci, "Color sulci");
+    QVariant data;
+
+    BrainTreeItem *itemSurfColSulci = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceColorSulci, "Color sulci");
+    data.setValue(colSulci);
+    itemSurfColSulci->setData(data, BrainTreeItemRoles::SurfaceColorSulci);
+    itemSurfColSulci->setData(data, Qt::DecorationRole);
     *this<<itemSurfColSulci;
 
-    BrainTreeItem *itemSurfColGyri = new BrainTreeItem(BrainTreeItemTypes::SurfaceColorGyri, "Color gyri");
+    BrainTreeItem *itemSurfColGyri = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceColorGyri, "Color gyri");
+    data.setValue(colGyri);
+    itemSurfColGyri->setData(data, BrainTreeItemRoles::SurfaceColorGyri);
+    itemSurfColGyri->setData(data, Qt::DecorationRole);
     *this<<itemSurfColGyri;
 
-    BrainTreeItem *itemSurfFileName = new BrainTreeItem(BrainTreeItemTypes::SurfaceFileName, tSurface.fileName());
+    BrainTreeItem *itemSurfFileName = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceFileName, tSurface.fileName());
     *this<<itemSurfFileName;
 
-    BrainTreeItem *itemSurfType = new BrainTreeItem(BrainTreeItemTypes::SurfaceFileType, tSurface.surf());
+    BrainTreeItem *itemSurfType = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceType, tSurface.surf());
     *this<<itemSurfType;
 
-    BrainTreeItem *itemSurfPath = new BrainTreeItem(BrainTreeItemTypes::SurfaceFilePath, tSurface.filePath());
+    BrainTreeItem *itemSurfPath = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceFilePath, tSurface.filePath());
     *this<<itemSurfPath;
 
     return true;

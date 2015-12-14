@@ -1,14 +1,16 @@
 //=============================================================================================================
 /**
-* @file     brainhemispheretreeitem.cpp
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     braintreedelegate.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     November, 2015
+* @date     December, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,103 +31,71 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BrainHemisphereTreeItem class definition.
+* @brief BrainTreeDelegate class declaration.
 *
 */
+
+#ifndef BRAINTREEDELEGATE_H
+#define BRAINTREEDELEGATE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "brainhemispheretreeitem.h"
+#include "../../disp3DNew_global.h"
+
+#include "braintreemodel.h"
+#include "../../helpers/abstracttreeitem.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// QT INCLUDES
 //=============================================================================================================
 
-using namespace DISP3DNEWLIB;
+#include <QItemDelegate>
+#include <QSpinBox>
+#include <QDoubleSpinBox>
+#include <QComboBox>
+#include <QDebug>
+#include <QColorDialog>
+#include <QPushButton>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE DISP3DNEWLIB
 //=============================================================================================================
 
-BrainHemisphereTreeItem::BrainHemisphereTreeItem(const int& iType, const QString& text)
-: AbstractTreeItem(iType, text)
+namespace DISP3DNEWLIB
 {
-}
 
 
-//*************************************************************************************************************
-
-BrainHemisphereTreeItem::~BrainHemisphereTreeItem()
+//=============================================================================================================
+/**
+* DECLARE CLASS BrainTreeDelegate
+*/
+class DISP3DNEWSHARED_EXPORT BrainTreeDelegate : public QItemDelegate
 {
-}
+    Q_OBJECT
 
+public:
+    BrainTreeDelegate(QObject *parent = 0);
 
-//*************************************************************************************************************
+    //=========================================================================================================
+    /**
+    * Reimplemented virtual functions
+    *
+    */
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
+    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-QVariant BrainHemisphereTreeItem::data(int role) const
-{
-    switch(role) {
-        case BrainHemisphereTreeItemRoles::SurfaceHemi:
-            return QVariant();
-    }
+private:
+};
 
-    return QStandardItem::data(role);
-}
+} //NAMESPACE DISP3DNEWLIB
 
-
-//*************************************************************************************************************
-
-void  BrainHemisphereTreeItem::setData(const QVariant& value, int role)
-{
-    QStandardItem::setData(value, role);
-}
-
-
-//*************************************************************************************************************
-
-bool BrainHemisphereTreeItem::addFsData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity *p3DEntityParent)
-{
-    //Set name of this item based on the hemispehre information
-    switch (tSurface.hemi()) {
-    case 0:
-        this->setText("Left");
-        break;
-    case 1:
-        this->setText("Right");
-        break;
-    default:
-        this->setText("Unknown");
-        break;
-    }
-
-    //Add childs
-    bool state = false;
-
-    //Add surface child
-    BrainSurfaceTreeItem* pSurfaceItem = new BrainSurfaceTreeItem(BrainTreeModelItemTypes::SurfaceItem, "Surface", p3DEntityParent);
-    state = pSurfaceItem->addFsSurfData(tSurface);
-
-    QSharedPointer<Qt3DCore::QTransform> pTransform = QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform());
-    pTransform->setScale(50.0f);
-    pSurfaceItem->setTransform(pTransform);
-
-    //qDebug()<<pTransform->matrix();
-
-    *this<<pSurfaceItem;
-
-    //Add annotation child
-    if(!tAnnotation.isEmpty()) {
-        BrainAnnotationTreeItem* pAnnotItem = new BrainAnnotationTreeItem(BrainTreeModelItemTypes::AnnotationItem);
-        state = pAnnotItem->addFsAnnotData(tSurface, tAnnotation);
-        *this<<pAnnotItem;
-    }
-
-    return state;
-}
+#endif // BRAINTREEDELEGATE_H

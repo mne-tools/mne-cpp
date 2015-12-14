@@ -72,12 +72,8 @@ BrainAnnotationTreeItem::~BrainAnnotationTreeItem()
 QVariant BrainAnnotationTreeItem::data(int role) const
 {
     switch(role) {
-        case BrainTreeModelRoles::AnnotName:
+        case BrainAnnotationTreeItemRoles::AnnotColors:
             return QVariant();
-
-        case BrainTreeModelRoles::Renderable3DEntity:
-            return QVariant();
-
     }
 
     return QStandardItem::data(role);
@@ -115,10 +111,14 @@ bool BrainAnnotationTreeItem::addFsAnnotData(const Surface &tSurface, const Anno
     }
 
     //Add annotation meta information
-    BrainTreeItem *itemAnnotFileName = new BrainTreeItem(BrainTreeItemTypes::AnnotFileName, tAnnotation.fileName());
+    BrainTreeItem *itemShowAnnot = new BrainTreeItem(BrainTreeModelItemTypes::AnnotToggleVisibility, "Show");
+    itemShowAnnot->setCheckable(true);
+    *this<<itemShowAnnot;
+
+    BrainTreeItem *itemAnnotFileName = new BrainTreeItem(BrainTreeModelItemTypes::AnnotFileName, tAnnotation.fileName());
     *this<<itemAnnotFileName;
 
-    BrainTreeItem *itemAnnotPath = new BrainTreeItem(BrainTreeItemTypes::AnnotFilePath, tAnnotation.filePath());
+    BrainTreeItem *itemAnnotPath = new BrainTreeItem(BrainTreeModelItemTypes::AnnotFilePath, tAnnotation.filePath());
     *this<<itemAnnotPath;
 
     return true;

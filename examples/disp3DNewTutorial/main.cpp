@@ -416,10 +416,10 @@ int main(int argc, char *argv[])
 //     // Create the test view
 //    std::cout<<"Creating BrainView"<<std::endl;
 
-    SurfaceSet tSurfSet ("sample", 2, "orig", "./MNE-sample-data/subjects");
-    AnnotationSet tAnnotSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
-    Surface tSurfRight ("sample", 1, "orig", "./MNE-sample-data/subjects");
-    Annotation tAnnotRight ("sample", 1, "aparc.a2009s", "./MNE-sample-data/subjects");
+//    SurfaceSet tSurfSet ("sample", 2, "orig", "./MNE-sample-data/subjects");
+//    AnnotationSet tAnnotSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
+//    Surface tSurfRight ("sample", 1, "orig", "./MNE-sample-data/subjects");
+//    Annotation tAnnotRight ("sample", 1, "aparc.a2009s", "./MNE-sample-data/subjects");
     Surface tSurfLeft ("sample", 0, "orig", "./MNE-sample-data/subjects");
     Annotation tAnnotLeft ("sample", 0, "aparc.a2009s", "./MNE-sample-data/subjects");
 
