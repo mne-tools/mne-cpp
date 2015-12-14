@@ -138,7 +138,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addFsData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity *p3DEntityParent = 0);
+    bool addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity *p3DEntityParent = 0);
 
 private:
 

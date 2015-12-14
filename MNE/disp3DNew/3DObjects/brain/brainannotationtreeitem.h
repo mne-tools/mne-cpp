@@ -136,7 +136,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addFsAnnotData(const Surface &tSurface, const Annotation &tAnnotation);
+    bool addData(const Surface &tSurface, const Annotation &tAnnotation);
 
 private:
 

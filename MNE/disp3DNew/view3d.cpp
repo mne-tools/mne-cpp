@@ -167,17 +167,17 @@ void View3D::initTransformations()
 
 //*************************************************************************************************************
 
-bool View3D::addFsBrainData(const SurfaceSet &tSurfaceSet, const AnnotationSet &tAnnotationSet)
+bool View3D::addBrainData(const SurfaceSet &tSurfaceSet, const AnnotationSet &tAnnotationSet)
 {
-    return m_pBrain->addFsBrainData(tSurfaceSet, tAnnotationSet);
+    return m_pBrain->addData(tSurfaceSet, tAnnotationSet);
 }
 
 
 //*************************************************************************************************************
 
-bool View3D::addFsBrainData(const Surface &tSurface, const Annotation &tAnnotation)
+bool View3D::addBrainData(const Surface &tSurface, const Annotation &tAnnotation)
 {
-    return m_pBrain->addFsBrainData(tSurface, tAnnotation);
+    return m_pBrain->addData(tSurface, tAnnotation);
 }
 
 

@@ -136,7 +136,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addFsBrainData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet = AnnotationSet());
+    bool addBrainData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet = AnnotationSet());
 
     //=========================================================================================================
     /**
@@ -147,7 +147,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addFsBrainData(const Surface& tSurface, const Annotation& tAnnotation = Annotation());
+    bool addBrainData(const Surface& tSurface, const Annotation& tAnnotation = Annotation());
 
     BrainTreeModel* getBrainTreeModel();
 

@@ -90,7 +90,7 @@ void  BrainHemisphereTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool BrainHemisphereTreeItem::addFsData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity *p3DEntityParent)
+bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity *p3DEntityParent)
 {
     //Set name of this item based on the hemispehre information
     switch (tSurface.hemi()) {
@@ -110,7 +110,7 @@ bool BrainHemisphereTreeItem::addFsData(const Surface& tSurface, const Annotatio
 
     //Add surface child
     BrainSurfaceTreeItem* pSurfaceItem = new BrainSurfaceTreeItem(BrainTreeModelItemTypes::SurfaceItem, "Surface");
-    state = pSurfaceItem->addFsSurfData(tSurface, p3DEntityParent);
+    state = pSurfaceItem->addData(tSurface, p3DEntityParent);
 
     //qDebug()<<pTransform->matrix();
 
@@ -119,7 +119,7 @@ bool BrainHemisphereTreeItem::addFsData(const Surface& tSurface, const Annotatio
     //Add annotation child
     if(!tAnnotation.isEmpty()) {
         BrainAnnotationTreeItem* pAnnotItem = new BrainAnnotationTreeItem(BrainTreeModelItemTypes::AnnotationItem);
-        state = pAnnotItem->addFsAnnotData(tSurface, tAnnotation);
+        state = pAnnotItem->addData(tSurface, tAnnotation);
         *this<<pAnnotItem;
     }
 

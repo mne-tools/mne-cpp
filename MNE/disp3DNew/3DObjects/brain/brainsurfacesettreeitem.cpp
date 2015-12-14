@@ -90,7 +90,7 @@ void  BrainSurfaceSetTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool BrainSurfaceSetTreeItem::addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
+bool BrainSurfaceSetTreeItem::addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Set name for this item based on surface data
     this->setText("Set");
@@ -103,12 +103,12 @@ bool BrainSurfaceSetTreeItem::addFsData(const SurfaceSet& tSurfaceSet, const Ann
 
         if(i < tAnnotationSet.size()) {
             if(tAnnotationSet[i].hemi() == tSurfaceSet[i].hemi()) {
-                state = pHemisphereItem->addFsData(tSurfaceSet[i], tAnnotationSet[i], p3DEntityParent);
+                state = pHemisphereItem->addData(tSurfaceSet[i], tAnnotationSet[i], p3DEntityParent);
             } else {
-                state = pHemisphereItem->addFsData(tSurfaceSet[i], Annotation(), p3DEntityParent);
+                state = pHemisphereItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent);
             }
         } else {
-            state = pHemisphereItem->addFsData(tSurfaceSet[i], Annotation(), p3DEntityParent);
+            state = pHemisphereItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent);
         }
 
         *this<<pHemisphereItem; //same as this->appendRow(pSurfaceItem)

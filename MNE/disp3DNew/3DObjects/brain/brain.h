@@ -122,7 +122,7 @@ public:
     * @param[in] tAnnotationSet     FreeSurfer annotation set.
     * @return                       Returns true if successful.
     */
-    bool addFsBrainData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet);
+    bool addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet);
 
     //=========================================================================================================
     /**
@@ -132,7 +132,7 @@ public:
     * @param[in] pAnnotation        FreeSurfer annotation.
     * @return                       Returns true if successful.
     */
-    bool addFsBrainData(const Surface& tSurface, const Annotation& tAnnotation);
+    bool addData(const Surface& tSurface, const Annotation& tAnnotation);
 
     //=========================================================================================================
     /**
