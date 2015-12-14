@@ -56,11 +56,15 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Core>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
+
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -70,6 +74,7 @@
 
 namespace DISP3DNEWLIB
 {
+// Typedefs
 
 // Model item types
 namespace BrainTreeModelItemTypes
@@ -104,13 +109,14 @@ namespace BrainTreeItemRoles
 
 namespace BrainSurfaceTreeItemRoles
 {
-    enum ItemRole{SurfaceColorVert = Qt::UserRole + 100,
-                      SurfaceVert = Qt::UserRole + 101,
-                      SurfaceTris = Qt::UserRole + 102,
-                      SurfaceNorm = Qt::UserRole + 103,
-                      SurfaceCurv = Qt::UserRole + 104,
-                      SurfaceOffset = Qt::UserRole + 105,
-                      Renderable3DEntity = Qt::UserRole + 106};
+    enum ItemRole{SurfaceCurrentColorVert = Qt::UserRole + 100,
+                    SurfaceVert = Qt::UserRole + 101,
+                    SurfaceTris = Qt::UserRole + 102,
+                    SurfaceNorm = Qt::UserRole + 103,
+                    SurfaceCurv = Qt::UserRole + 104,
+                    SurfaceOffset = Qt::UserRole + 105,
+                    Renderable3DEntity = Qt::UserRole + 106,
+                    SurfaceCurvatureColorVert = Qt::UserRole + 107};
 }
 
 namespace BrainSurfaceSetTreeItemRoles
@@ -136,17 +142,24 @@ namespace BrainAnnotationTreeItemRoles
 Q_DECLARE_METATYPE(DISP3DNEWLIB::Renderable3DEntity*)
 #endif
 
-#ifndef metatype_qcolor
-#define metatype_qcolor
-Q_DECLARE_METATYPE(QColor)
+#ifndef metatype_matrixx3i
+#define metatype_matrixx3i
+Q_DECLARE_METATYPE(Eigen::MatrixX3i)
 #endif
 
-//Q_DECLARE_METATYPE(FIFFLIB::fiff_int_t);
-//Q_DECLARE_METATYPE(MNEBrowseRawQt::RowVectorPairF);
-//Q_DECLARE_METATYPE(const FIFFLIB::FiffInfo*);
-//Q_DECLARE_METATYPE(MNEBrowseRawQt::MatrixXdR);
-//Q_DECLARE_METATYPE(MNEBrowseRawQt::RowVectorPair);
-//Q_DECLARE_METATYPE(QList<MNEBrowseRawQt::RowVectorPair>);
-//Q_DECLARE_METATYPE(QSharedPointer<DISPLIB::MNEOperator>);
+#ifndef metatype_matrixx3f
+#define metatype_matrixx3f
+Q_DECLARE_METATYPE(Eigen::MatrixX3f)
+#endif
+
+#ifndef metatype_vectorxf
+#define metatype_vectorxf
+Q_DECLARE_METATYPE(Eigen::VectorXf)
+#endif
+
+#ifndef metatype_vector3f
+#define metatype_vector3f
+Q_DECLARE_METATYPE(Eigen::Vector3f)
+#endif
 
 #endif // TYPES_H

@@ -89,6 +89,7 @@ class AbstractTreeItem : public QStandardItem
 {
 
 public :
+
     AbstractTreeItem(const int& iType, const QString& text = "");
     virtual ~AbstractTreeItem();
 

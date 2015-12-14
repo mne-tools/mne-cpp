@@ -79,6 +79,11 @@ QVariant BrainTreeItem::data(int role) const
 
 void  BrainTreeItem::setData(const QVariant& value, int role)
 {
+//    switch(role) {
+//        case BrainTreeItemRoles::SurfaceColorSulci:
+//           // emit surfaceColorSulciChanged();
+//    }
+
     QStandardItem::setData(value, role);
 }
 
