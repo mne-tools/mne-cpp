@@ -106,7 +106,7 @@ public:
     /**
     * Default constructor.
     */
-    explicit BrainTreeItem(const int& iType = BrainTreeItemTypes::UnknownItem, const QString& text = "");
+    explicit BrainTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "");
 
     //=========================================================================================================
     /**

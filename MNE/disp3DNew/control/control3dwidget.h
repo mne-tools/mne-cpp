@@ -45,6 +45,7 @@
 
 #include "disp/helpers/roundededgeswidget.h"
 #include "../view3d.h"
+#include "../3DObjects/brain/braintreedelegate.h"
 
 
 //*************************************************************************************************************

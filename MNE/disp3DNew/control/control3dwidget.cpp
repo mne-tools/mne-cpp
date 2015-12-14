@@ -76,6 +76,8 @@ Control3DWidget::Control3DWidget(QWidget *parent)
     ui->m_pushButton_minimize->setText(QString("Minimize - %1").arg(this->windowTitle()));
 
     //Init tree view properties
+    BrainTreeDelegate* pBrainTreeDelegate = new BrainTreeDelegate(this);
+    ui->m_treeView_loadedData->setItemDelegate(pBrainTreeDelegate);
     ui->m_treeView_loadedData->setHeaderHidden(true);
 }
 

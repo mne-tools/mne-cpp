@@ -71,7 +71,8 @@
 namespace DISP3DNEWLIB
 {
 
-namespace BrainTreeItemTypes
+// Model item types
+namespace BrainTreeModelItemTypes
 {
     enum ItemType{UnknownItem = QStandardItem::UserType,
                     SurfaceSetItem = QStandardItem::UserType + 1,
@@ -82,39 +83,62 @@ namespace BrainTreeItemTypes
                     SurfaceFilePath = QStandardItem::UserType + 6,
                     AnnotFileName = QStandardItem::UserType + 7,
                     AnnotFilePath = QStandardItem::UserType + 8,
-                    SurfaceFileType = QStandardItem::UserType + 9,
+                    SurfaceType = QStandardItem::UserType + 9,
                     SurfaceColorGyri = QStandardItem::UserType + 10,
                     SurfaceColorSulci = QStandardItem::UserType + 11,
-                    SurfaceColorVert = QStandardItem::UserType + 12};
+                    SurfaceColorVert = QStandardItem::UserType + 12,
+                    AnnotToggleVisibility = QStandardItem::UserType + 13};
 }
 
-namespace BrainTreeModelRoles
+// Model item roles
+namespace BrainTreeItemRoles
 {
     enum ItemRole{SurfaceName = Qt::UserRole,
-                      SurfaceType = Qt::UserRole + 1,
-                      SurfaceHemi = Qt::UserRole + 2,
-                      SurfaceColorSulci = Qt::UserRole + 3,
-                      SurfaceColorGyri = Qt::UserRole + 4,
-                      SurfaceColorVert = Qt::UserRole + 5,
-                      SurfaceVert = Qt::UserRole + 6,
-                      SurfaceTris = Qt::UserRole + 7,
-                      SurfaceNorm = Qt::UserRole + 8,
-                      SurfaceCurv = Qt::UserRole + 9,
-                      SurfaceOffset = Qt::UserRole + 10,
-                      SurfaceFilePath = Qt::UserRole + 11,
-                      AnnotName = Qt::UserRole + 12,
-                      AnnotFilePath = Qt::UserRole + 13,
-                      AnnotColor = Qt::UserRole + 14,
-                      Renderable3DEntity = Qt::UserRole + 15,
-                      RootItem = Qt::UserRole + 16,
-                      SurfaceSetName = Qt::UserRole + 17};
+                    SurfaceType = Qt::UserRole + 1,
+                    SurfaceColorSulci = Qt::UserRole + 3,
+                    SurfaceColorGyri = Qt::UserRole + 4,
+                    SurfaceFilePath = Qt::UserRole + 5,
+                    AnnotName = Qt::UserRole + 6,
+                    AnnotFilePath = Qt::UserRole + 7};
+}
+
+namespace BrainSurfaceTreeItemRoles
+{
+    enum ItemRole{SurfaceColorVert = Qt::UserRole + 100,
+                      SurfaceVert = Qt::UserRole + 101,
+                      SurfaceTris = Qt::UserRole + 102,
+                      SurfaceNorm = Qt::UserRole + 103,
+                      SurfaceCurv = Qt::UserRole + 104,
+                      SurfaceOffset = Qt::UserRole + 105,
+                      Renderable3DEntity = Qt::UserRole + 106};
+}
+
+namespace BrainSurfaceSetTreeItemRoles
+{
+    enum ItemRole{SurfaceSetName = Qt::UserRole + 200};
+}
+
+namespace BrainHemisphereTreeItemRoles
+{
+    enum ItemRole{SurfaceHemi = Qt::UserRole + 300};
+}
+
+namespace BrainAnnotationTreeItemRoles
+{
+    enum ItemRole{AnnotColors = Qt::UserRole + 400};
 }
 
 } //NAMESPACE DISP3DNEWLIB
 
+// Metatype declaration for correct QVariant usage
 #ifndef metatype_renderable3Dentity
 #define metatype_renderable3Dentity
 Q_DECLARE_METATYPE(DISP3DNEWLIB::Renderable3DEntity*)
+#endif
+
+#ifndef metatype_qcolor
+#define metatype_qcolor
+Q_DECLARE_METATYPE(QColor)
 #endif
 
 //Q_DECLARE_METATYPE(FIFFLIB::fiff_int_t);

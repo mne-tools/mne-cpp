@@ -52,40 +52,40 @@ void AbstractTreeItem::createToolTip()
     QString sToolTip;
 
     switch(m_iType) {
-    case BrainTreeItemTypes::UnknownItem:
+    case BrainTreeModelItemTypes::UnknownItem:
         sToolTip = "Unknown";
         break;
-    case BrainTreeItemTypes::SurfaceSetItem:
+    case BrainTreeModelItemTypes::SurfaceSetItem:
         sToolTip = "Brain surface set";
         break;
-    case BrainTreeItemTypes::HemisphereItem:
+    case BrainTreeModelItemTypes::HemisphereItem:
         sToolTip = "Brain hemisphere";
         break;
-    case BrainTreeItemTypes::SurfaceItem:
+    case BrainTreeModelItemTypes::SurfaceItem:
         sToolTip = "Brain surface";
         break;
-    case BrainTreeItemTypes::AnnotationItem:
+    case BrainTreeModelItemTypes::AnnotationItem:
         sToolTip = "Brain annotation";
         break;
-    case BrainTreeItemTypes::SurfaceFileName:
+    case BrainTreeModelItemTypes::SurfaceFileName:
         sToolTip = "Surface file name";
         break;
-    case BrainTreeItemTypes::SurfaceFilePath:
+    case BrainTreeModelItemTypes::SurfaceFilePath:
         sToolTip = "Surface file path";
         break;
-    case BrainTreeItemTypes::AnnotFileName:
+    case BrainTreeModelItemTypes::AnnotFileName:
         sToolTip = "Annotation file name";
         break;
-    case BrainTreeItemTypes::AnnotFilePath:
+    case BrainTreeModelItemTypes::AnnotFilePath:
         sToolTip = "Annotation file path";
         break;
-    case BrainTreeItemTypes::SurfaceFileType:
+    case BrainTreeModelItemTypes::SurfaceType:
         sToolTip = "Surface type";
         break;
-    case BrainTreeItemTypes::SurfaceColorGyri:
+    case BrainTreeModelItemTypes::SurfaceColorGyri:
         sToolTip = "Color Gyri";
         break;
-    case BrainTreeItemTypes::SurfaceColorSulci:
+    case BrainTreeModelItemTypes::SurfaceColorSulci:
         sToolTip = "Color Sulci";
         break;
     default:

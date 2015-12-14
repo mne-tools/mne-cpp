@@ -112,7 +112,7 @@ public:
     /**
     * FreeSurfer constructor from single surface.
     */
-    explicit BrainSurfaceSetTreeItem(const int& iType = BrainTreeItemTypes::UnknownItem, const QString& text = "");
+    explicit BrainSurfaceSetTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "");
 
     //=========================================================================================================
     /**

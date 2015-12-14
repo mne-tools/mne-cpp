@@ -82,7 +82,7 @@ QVariant BrainTreeModel::data(const QModelIndex & index, int role) const
 
 bool BrainTreeModel::addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
 {
-    BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeItemTypes::SurfaceSetItem);
+    BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem);
     m_pRootItem->appendRow(pSurfaceSetItem);
 
     return pSurfaceSetItem->addFsData(tSurfaceSet, tAnnotationSet, p3DEntityParent);;
@@ -93,7 +93,7 @@ bool BrainTreeModel::addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSe
 
 bool BrainTreeModel::addFsData(const Surface &tSurface, const Annotation &tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
 {
-    BrainHemisphereTreeItem* pHemisphereItem = new BrainHemisphereTreeItem(BrainTreeItemTypes::HemisphereItem);
+    BrainHemisphereTreeItem* pHemisphereItem = new BrainHemisphereTreeItem(BrainTreeModelItemTypes::HemisphereItem);
     m_pRootItem->appendRow(pHemisphereItem);
 
     return pHemisphereItem->addFsData(tSurface, tAnnotation, p3DEntityParent);

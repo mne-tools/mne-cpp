@@ -113,7 +113,7 @@ public:
     /**
     * Default constructor.
     */
-    explicit BrainSurfaceTreeItem(const int& iType = BrainTreeItemTypes::UnknownItem, const QString& text = "Brain surface", Qt3DCore::QEntity* parent = 0);
+    explicit BrainSurfaceTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "Brain surface", Qt3DCore::QEntity* parent = 0);
 
     //=========================================================================================================
     /**

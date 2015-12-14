@@ -71,14 +71,6 @@ BrainTreeItem::~BrainTreeItem()
 
 QVariant BrainTreeItem::data(int role) const
 {
-    switch(role) {
-        case BrainTreeModelRoles::SurfaceType:
-            return QVariant();
-
-        case BrainTreeModelRoles::SurfaceHemi:
-            return QVariant();
-    }
-
     return QStandardItem::data(role);
 }
 
@@ -87,8 +79,6 @@ QVariant BrainTreeItem::data(int role) const
 
 void  BrainTreeItem::setData(const QVariant& value, int role)
 {
-    Q_UNUSED(role);
-
     QStandardItem::setData(value, role);
 }
 

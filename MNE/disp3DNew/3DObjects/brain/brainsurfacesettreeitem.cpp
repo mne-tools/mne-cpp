@@ -72,7 +72,7 @@ BrainSurfaceSetTreeItem::~BrainSurfaceSetTreeItem()
 QVariant BrainSurfaceSetTreeItem::data(int role) const
 {
     switch(role) {
-        case BrainTreeModelRoles::SurfaceSetName:
+        case BrainSurfaceSetTreeItemRoles::SurfaceSetName:
             return QVariant();
     }
 
@@ -99,7 +99,7 @@ bool BrainSurfaceSetTreeItem::addFsData(const SurfaceSet& tSurfaceSet, const Ann
     bool state = false;
 
     for(int i = 0; i < tSurfaceSet.size(); i++) {
-        BrainHemisphereTreeItem* pHemisphereItem = new BrainHemisphereTreeItem(BrainTreeItemTypes::HemisphereItem);
+        BrainHemisphereTreeItem* pHemisphereItem = new BrainHemisphereTreeItem(BrainTreeModelItemTypes::HemisphereItem);
 
         if(i < tAnnotationSet.size()) {
             if(tAnnotationSet[i].hemi() == tSurfaceSet[i].hemi()) {
