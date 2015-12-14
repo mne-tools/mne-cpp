@@ -133,7 +133,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity *p3DEntityParent = 0);
+    bool addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity *p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -145,7 +145,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addFsData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
+    bool addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
 
 private:
     QStandardItem*     m_pRootItem;     /**< The root item of the tree model. */

@@ -136,7 +136,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addFsSurfData(const Surface & tSurface, Qt3DCore::QEntity * parent);
+    bool addData(const Surface & tSurface, Qt3DCore::QEntity * parent);
 
 private:
     MatrixX3f createCurvatureVertColor(const VectorXf & curvature, const QColor & colSulci = QColor(50,50,50), const QColor & colGyri = QColor(125,125,125));

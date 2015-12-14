@@ -86,7 +86,7 @@ void  BrainSurfaceTreeItem::setData(const QVariant & value, int role)
 
 //*************************************************************************************************************
 
-bool BrainSurfaceTreeItem::addFsSurfData(const Surface & tSurface, Qt3DCore::QEntity * parent)
+bool BrainSurfaceTreeItem::addData(const Surface & tSurface, Qt3DCore::QEntity * parent)
 {
     //Create renderable 3D entity
     m_pRenderable3DEntity = new Renderable3DEntity(parent);

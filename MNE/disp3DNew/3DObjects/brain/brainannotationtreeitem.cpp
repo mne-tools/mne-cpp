@@ -90,7 +90,7 @@ void  BrainAnnotationTreeItem::setData(const QVariant &value, int role)
 
 //*************************************************************************************************************
 
-bool BrainAnnotationTreeItem::addFsAnnotData(const Surface &tSurface, const Annotation &tAnnotation)
+bool BrainAnnotationTreeItem::addData(const Surface &tSurface, const Annotation &tAnnotation)
 {
     //Create color from annotation data if annotation is not empty
     if(tAnnotation.getVertices().rows() != 0) {

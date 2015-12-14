@@ -70,17 +70,17 @@ Brain::~Brain()
 
 //*************************************************************************************************************
 
-bool Brain::addFsBrainData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
+bool Brain::addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
 {
-    return m_pBrainTreeModel->addFsData(tSurfaceSet, tAnnotationSet, this);
+    return m_pBrainTreeModel->addData(tSurfaceSet, tAnnotationSet, this);
 }
 
 
 //*************************************************************************************************************
 
-bool Brain::addFsBrainData(const Surface &tSurface, const Annotation &tAnnotation)
+bool Brain::addData(const Surface &tSurface, const Annotation &tAnnotation)
 {
-    return m_pBrainTreeModel->addFsData(tSurface, tAnnotation, this);
+    return m_pBrainTreeModel->addData(tSurface, tAnnotation, this);
 }
 
 

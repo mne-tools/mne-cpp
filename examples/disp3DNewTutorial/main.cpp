@@ -425,9 +425,9 @@ int main(int argc, char *argv[])
 
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addFsBrainData(tSurfLeft, tAnnotLeft);
-//    testWindow->addFsBrainData(tSurfRight, tAnnotRight);
-//    testWindow->addFsBrainData(tSurfSet, tAnnotSet);
+    testWindow->addBrainData(tSurfLeft, tAnnotLeft);
+//    testWindow->addBrainData(tSurfRight, tAnnotRight);
+//    testWindow->addBrainData(tSurfSet, tAnnotSet);
     testWindow->show();    
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
