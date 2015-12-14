@@ -139,8 +139,6 @@ public:
     bool addFsSurfData(const Surface & tSurface, Qt3DCore::QEntity * parent);
 
 private:
-    void vertColorChanged();
-
     MatrixX3f createCurvatureVertColor(const VectorXf & curvature, const QColor & colSulci = QColor(50,50,50), const QColor & colGyri = QColor(125,125,125));
 
     Renderable3DEntity*     m_pRenderable3DEntity;
