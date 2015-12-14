@@ -88,7 +88,7 @@ void  BrainAnnotationTreeItem::setData(const QVariant &value, int role)
 bool BrainAnnotationTreeItem::addData(const Surface &tSurface, const Annotation &tAnnotation)
 {
     //Create color from annotation data if annotation is not empty
-    if(tAnnotation.getVertices().rows() != 0) {
+    if(!tAnnotation.isEmpty()) {
         MatrixX3f matColorsAnnot(tAnnotation.getVertices().rows(), 3);
         QList<FSLIB::Label> qListLabels;
         QList<RowVector4i> qListLabelRGBAs;
