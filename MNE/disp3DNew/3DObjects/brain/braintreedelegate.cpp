@@ -81,6 +81,14 @@ QWidget *BrainTreeDelegate::createEditor(QWidget *parent, const QStyleOptionView
         pColorDialog->show();
         return pColorDialog;
     }
+
+    case BrainTreeModelItemTypes::SurfaceColorInfoOrigin: {
+        QComboBox* pComboBox = new QComboBox(parent);
+        pComboBox->addItem("Color from curvature");
+        pComboBox->addItem("Color from annotation");
+        pComboBox->addItem("Color from RT source loc");
+        return pComboBox;
+    }
     }
 
     return QItemDelegate::createEditor(parent, option, index);
@@ -106,6 +114,13 @@ void BrainTreeDelegate::setEditorData(QWidget *editor, const QModelIndex &index)
         QColor color = index.model()->data(index, BrainTreeItemRoles::SurfaceColorSulci).value<QColor>();
         QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
         pColorDialog->setCurrentColor(color);
+        break;
+    }
+
+    case BrainTreeModelItemTypes::SurfaceColorInfoOrigin: {
+        QString colorOrigin = index.model()->data(index, BrainTreeItemRoles::SurfaceColorInfoOrigin).toString();
+        QComboBox* pComboBox = static_cast<QComboBox*>(editor);
+        pComboBox->setCurrentText(colorOrigin);
         break;
     }
     }
@@ -141,6 +156,16 @@ void BrainTreeDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 
         model->setData(index, data, BrainTreeItemRoles::SurfaceColorSulci);
         model->setData(index, data, Qt::DecorationRole);
+        return;
+    }
+
+    case BrainTreeModelItemTypes::SurfaceColorInfoOrigin: {
+        QComboBox* pColorDialog = static_cast<QComboBox*>(editor);
+        QVariant data;
+        data.setValue(pColorDialog->currentText());
+
+        model->setData(index, data, BrainTreeItemRoles::SurfaceColorInfoOrigin);
+        model->setData(index, data, Qt::DisplayRole);
         return;
     }
 

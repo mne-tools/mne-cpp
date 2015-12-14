@@ -88,6 +88,9 @@ void AbstractTreeItem::createToolTip()
     case BrainTreeModelItemTypes::SurfaceColorSulci:
         sToolTip = "Color Sulci";
         break;
+    case BrainTreeModelItemTypes::SurfaceColorInfoOrigin:
+        sToolTip = "Information used to color the surface";
+        break;
     default:
         sToolTip = "Unknown";
         break;

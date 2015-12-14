@@ -92,7 +92,7 @@ namespace BrainTreeModelItemTypes
                     SurfaceColorGyri = QStandardItem::UserType + 10,
                     SurfaceColorSulci = QStandardItem::UserType + 11,
                     SurfaceColorVert = QStandardItem::UserType + 12,
-                    AnnotToggleVisibility = QStandardItem::UserType + 13};
+                    SurfaceColorInfoOrigin = QStandardItem::UserType + 13};
 }
 
 // Model item roles
@@ -104,7 +104,8 @@ namespace BrainTreeItemRoles
                     SurfaceColorGyri = Qt::UserRole + 4,
                     SurfaceFilePath = Qt::UserRole + 5,
                     AnnotName = Qt::UserRole + 6,
-                    AnnotFilePath = Qt::UserRole + 7};
+                    AnnotFilePath = Qt::UserRole + 7,
+                    SurfaceColorInfoOrigin = Qt::UserRole + 8};
 }
 
 namespace BrainSurfaceTreeItemRoles
