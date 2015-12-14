@@ -71,11 +71,6 @@ BrainAnnotationTreeItem::~BrainAnnotationTreeItem()
 
 QVariant BrainAnnotationTreeItem::data(int role) const
 {
-    switch(role) {
-        case BrainAnnotationTreeItemRoles::AnnotColors:
-            return QVariant();
-    }
-
     return QStandardItem::data(role);
 }
 
@@ -94,7 +89,7 @@ bool BrainAnnotationTreeItem::addData(const Surface &tSurface, const Annotation 
 {
     //Create color from annotation data if annotation is not empty
     if(tAnnotation.getVertices().rows() != 0) {
-        Matrix<float, Dynamic, 3, RowMajor> matColorsAnnot(tAnnotation.getVertices().rows(), 3);
+        MatrixX3f matColorsAnnot(tAnnotation.getVertices().rows(), 3);
         QList<FSLIB::Label> qListLabels;
         QList<RowVector4i> qListLabelRGBAs;
 
@@ -108,14 +103,23 @@ bool BrainAnnotationTreeItem::addData(const Surface &tSurface, const Annotation 
                 matColorsAnnot(label.vertices(j), 2) = qListLabelRGBAs.at(i)(2)/255.0;
             }
         }
+
+        //Add data which is held by this BrainAnnotationTreeItem
+        QVariant data;
+        data.setValue(matColorsAnnot);
+        this->setData(data, BrainAnnotationTreeItemRoles::AnnotColors);
+
+        //Add annotation meta information as item children
+        BrainTreeItem *itemAnnotFileName = new BrainTreeItem(BrainTreeModelItemTypes::AnnotFileName, tAnnotation.fileName());
+        *this<<itemAnnotFileName;
+        data.setValue(tAnnotation.fileName());
+        itemAnnotFileName->setData(data, BrainAnnotationTreeItemRoles::AnnotFileName);
+
+        BrainTreeItem *itemAnnotPath = new BrainTreeItem(BrainTreeModelItemTypes::AnnotFilePath, tAnnotation.filePath());
+        *this<<itemAnnotPath;
+        data.setValue(tAnnotation.filePath());
+        itemAnnotFileName->setData(data, BrainAnnotationTreeItemRoles::AnnotFilePath);
     }
-
-    //Add annotation meta information
-    BrainTreeItem *itemAnnotFileName = new BrainTreeItem(BrainTreeModelItemTypes::AnnotFileName, tAnnotation.fileName());
-    *this<<itemAnnotFileName;
-
-    BrainTreeItem *itemAnnotPath = new BrainTreeItem(BrainTreeModelItemTypes::AnnotFilePath, tAnnotation.filePath());
-    *this<<itemAnnotPath;
 
     return true;
 }

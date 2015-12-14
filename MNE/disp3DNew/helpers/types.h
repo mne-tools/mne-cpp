@@ -132,7 +132,9 @@ namespace BrainHemisphereTreeItemRoles
 
 namespace BrainAnnotationTreeItemRoles
 {
-    enum ItemRole{AnnotColors = Qt::UserRole + 400};
+    enum ItemRole{AnnotColors = Qt::UserRole + 400,
+                    AnnotFileName = Qt::UserRole + 401,
+                    AnnotFilePath = Qt::UserRole + 402};
 }
 
 } //NAMESPACE DISP3DNEWLIB
