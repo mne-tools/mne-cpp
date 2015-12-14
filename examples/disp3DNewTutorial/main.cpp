@@ -425,7 +425,7 @@ int main(int argc, char *argv[])
 
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addBrainData(tSurfLeft, tAnnotLeft);
+    testWindow->addBrainData(tSurfLeft/*, tAnnotLeft*/);
 //    testWindow->addBrainData(tSurfRight, tAnnotRight);
 //    testWindow->addBrainData(tSurfSet, tAnnotSet);
     testWindow->show();    
