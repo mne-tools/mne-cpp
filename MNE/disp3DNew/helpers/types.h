@@ -98,7 +98,7 @@ namespace BrainTreeModelItemTypes
 // Model item roles
 namespace BrainTreeItemRoles
 {
-    enum ItemRole{SurfaceName = Qt::UserRole,
+    enum ItemRole{SurfaceFileName = Qt::UserRole,
                     SurfaceType = Qt::UserRole + 1,
                     SurfaceColorSulci = Qt::UserRole + 3,
                     SurfaceColorGyri = Qt::UserRole + 4,

@@ -99,6 +99,7 @@ bool BrainSurfaceTreeItem::addData(const Surface & tSurface, Qt3DCore::QEntity *
 
     //Add data which is held by this BrainSurfaceTreeItem
     QVariant data;
+
     data.setValue(matCurvatureColor);
     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert);
     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurvatureColorVert);
@@ -122,25 +123,31 @@ bool BrainSurfaceTreeItem::addData(const Surface & tSurface, Qt3DCore::QEntity *
     this->setData(data, BrainSurfaceTreeItemRoles::Renderable3DEntity);
 
     //Add surface meta information as item children
-    BrainTreeItem *itemSurfColSulci = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceColorSulci, "Color sulci");
+    BrainTreeItem *itemSurfColSulci = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceColorSulci, "Sulci color");
     data.setValue(QColor(50,50,50));
     itemSurfColSulci->setData(data, BrainTreeItemRoles::SurfaceColorSulci);
     itemSurfColSulci->setData(data, Qt::DecorationRole);
     *this<<itemSurfColSulci;
 
-    BrainTreeItem *itemSurfColGyri = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceColorGyri, "Color gyri");
+    BrainTreeItem *itemSurfColGyri = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceColorGyri, "Gyri color");
     data.setValue(QColor(125,125,125));
     itemSurfColGyri->setData(data, BrainTreeItemRoles::SurfaceColorGyri);
     itemSurfColGyri->setData(data, Qt::DecorationRole);
     *this<<itemSurfColGyri;
 
     BrainTreeItem *itemSurfFileName = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceFileName, tSurface.fileName());
+    data.setValue(tSurface.fileName());
+    itemSurfFileName->setData(data, BrainTreeItemRoles::SurfaceFileName);
     *this<<itemSurfFileName;
 
     BrainTreeItem *itemSurfType = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceType, tSurface.surf());
+    data.setValue(tSurface.surf());
+    itemSurfType->setData(data, BrainTreeItemRoles::SurfaceType);
     *this<<itemSurfType;
 
     BrainTreeItem *itemSurfPath = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceFilePath, tSurface.filePath());
+    data.setValue(tSurface.filePath());
+    itemSurfPath->setData(data, BrainTreeItemRoles::SurfaceFilePath);
     *this<<itemSurfPath;
 
     return true;
