@@ -193,11 +193,14 @@ void BrainSurfaceTreeItem::updateVertColor()
         }
 
         if(sColorInfoOrigin == "Color from annotation") {
-            //Create color from curvature information with default gyri and sulcus colors
-            matNewVertColor = createCurvatureVertColor(this->data(BrainSurfaceTreeItemRoles::SurfaceCurv).value<VectorXf>(), colorSulci, colorGyri);
-
-            data.setValue(matNewVertColor);
-            this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurvatureColorVert);
+            BrainHemisphereTreeItem* pParent = static_cast<BrainHemisphereTreeItem*>(this->parent());
+            for(int i = 0; i<pParent->rowCount(); i++) {
+                if(pParent->child(i,0)->type() == BrainTreeModelItemTypes::AnnotationItem) {
+                    BrainAnnotationTreeItem* pAnnotItem = static_cast<BrainAnnotationTreeItem*>(pParent->child(i,0));
+                    matNewVertColor = pAnnotItem->data(BrainAnnotationTreeItemRoles::AnnotColors).value<MatrixX3f>();
+                    data.setValue(matNewVertColor);
+                }
+            }
         }
 
         //Set renderable 3D entity mesh and color data

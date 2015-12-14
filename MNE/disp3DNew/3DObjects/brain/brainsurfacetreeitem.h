@@ -45,6 +45,7 @@
 
 #include "../../helpers/abstracttreeitem.h"
 #include "braintreeitem.h"
+#include "brainhemispheretreeitem.h"
 
 #include "../../helpers/types.h"
 #include "../../helpers/renderable3Dentity.h"
