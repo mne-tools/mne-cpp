@@ -82,7 +82,7 @@ void  BrainTreeItem::setData(const QVariant& value, int role)
     QStandardItem::setData(value, role);
 
     //After data was set inform the surface tree item to change the vertex colors
-    BrainSurfaceTreeItem* pParent = static_cast<BrainSurfaceTreeItem*>(this->parent());
+    BrainSurfaceTreeItem* pParent = dynamic_cast<BrainSurfaceTreeItem*>(this->QStandardItem::parent());
 
     //TODO: Exchange this with signal slot system (Problem with Q_Object and inherited QStandardItem)
     switch(role) {

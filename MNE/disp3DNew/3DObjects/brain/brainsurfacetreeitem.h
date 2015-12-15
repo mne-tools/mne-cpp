@@ -44,7 +44,6 @@
 #include "../../disp3DNew_global.h"
 
 #include "../../helpers/abstracttreeitem.h"
-#include "braintreeitem.h"
 #include "brainhemispheretreeitem.h"
 
 #include "../../helpers/types.h"
@@ -96,6 +95,8 @@ using namespace Eigen;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class BrainTreeItem;
+
 
 //=============================================================================================================
 /**
@@ -146,6 +147,9 @@ private:
 
     Renderable3DEntity*     m_pRenderable3DEntity;
 
+    BrainTreeItem*          m_pItemSurfColorInfoOrigin; //These are stored as member variables because we do not wat to look for them everytime we call updateVertColor(), especially not whe nwe perform rt source loc
+    BrainTreeItem*          m_pItemSurfColSulci;
+    BrainTreeItem*          m_pItemSurfColGyri;
 };
 
 } //NAMESPACE DISP3DNEWLIB
