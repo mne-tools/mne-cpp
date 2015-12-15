@@ -116,8 +116,8 @@ bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation&
     //Add annotation child
     if(!tAnnotation.isEmpty()) {
         BrainAnnotationTreeItem* pAnnotItem = new BrainAnnotationTreeItem(BrainTreeModelItemTypes::AnnotationItem);
-        state = pAnnotItem->addData(tSurface, tAnnotation);
         *this<<pAnnotItem;
+        state = pAnnotItem->addData(tSurface, tAnnotation);
     }
 
     return state;
