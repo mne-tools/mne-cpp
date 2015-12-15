@@ -151,6 +151,8 @@ public:
 
     BrainTreeModel* getBrainTreeModel();
 
+    void changeSceneColor(const QColor & colSceneColor);
+
 protected:
     Qt3DCore::QAspectEngine             m_aspectEngine;                 /**< The aspect engine. */
     Qt3DCore::QEntity*                  m_pRootEntity;                  /**< The root/most top level entity buffer. */
