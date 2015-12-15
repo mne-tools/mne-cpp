@@ -97,6 +97,10 @@ void Control3DWidget::setView3D(View3D::SPtr view3D)
     //Do the connects from this control widget to the View3D
     ui->m_treeView_loadedData->setModel(view3D->getBrainTreeModel());
 
+    //Do the connects
+    connect(ui->m_pushButton_sceneColorPicker, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+            this, &Control3DWidget::onSceneColorPicker);
+
     //Add the view3D to the list of connected view3D's
     m_lView3D.append(view3D);
 }
@@ -125,4 +129,21 @@ void Control3DWidget::onMinimizeWidget(bool state)
 void Control3DWidget::onOpacityChange(qint32 value)
 {
     this->setWindowOpacity(1/(100.0/value));
+}
+
+
+//*************************************************************************************************************
+
+void Control3DWidget::onSceneColorPicker()
+{
+    QColorDialog* pDialog = new QColorDialog(this);
+    pDialog->exec();
+    QColor pickedColor = pDialog->currentColor();
+
+    ui->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(pickedColor.red()).arg(pickedColor.green()).arg(pickedColor.blue()));
+
+    //Update all connected View3D's scene colors
+    for(int i = 0; i<m_lView3D.size(); i++) {
+        m_lView3D.at(i)->changeSceneColor(pickedColor);
+    }
 }

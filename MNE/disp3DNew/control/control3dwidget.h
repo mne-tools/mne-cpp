@@ -141,6 +141,8 @@ protected slots:
     */
     void onOpacityChange(qint32 value);
 
+    void onSceneColorPicker();
+
 protected:
     Ui::Control3DWidget*    ui;         /**< The pointer to the QtDesigner ui class. */
 
