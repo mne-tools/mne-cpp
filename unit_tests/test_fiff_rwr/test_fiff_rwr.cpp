@@ -292,18 +292,20 @@ void TestFiffRWR::compareTimes()
 
 void TestFiffRWR::compareInfo()
 {
-//    FiffRawData first_in_raw;
+    //Sampling frequency
+    std::cout << "[1] Sampling Frequency Check\n";
+    QVERIFY( first_in_raw.info.sfreq == second_in_raw.info.sfreq );
 
-//    MatrixXd first_in_data;
-//    MatrixXd first_in_times;
+    //Projection
+    std::cout << "[2] Projection Check\n";
+    QVERIFY( first_in_raw.info.projs.size() == second_in_raw.info.projs.size() );
 
-
-//    FiffRawData second_in_raw;
-
-//    MatrixXd second_in_data;
-//    MatrixXd second_in_times;
-
-//    QVERIFY( 1 + 1 == 2 );
+    for( qint32 i = 0; i < first_in_raw.info.projs.size(); ++i )
+    {
+        std::cout << "Projector " << i << std::endl;
+        MatrixXd tmp = first_in_raw.info.projs[i].data->data - second_in_raw.info.projs[i].data->data;
+        QVERIFY( tmp.sum() < epsilon );
+    }
 }
 
 //*************************************************************************************************************
@@ -318,5 +320,5 @@ void TestFiffRWR::cleanupTestCase()
 // MAIN
 //=============================================================================================================
 
-QTEST_MAIN(TestFiffRWR)
+QTEST_APPLESS_MAIN(TestFiffRWR)
 #include "test_fiff_rwr.moc"

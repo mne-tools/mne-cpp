@@ -177,7 +177,7 @@ public:
     */
     void writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl);
 
-private slots:
+private:
     //=========================================================================================================
     /**
     * openFile opens a file dialog that picks the fiff data file to analyze and invokes the setup methods.
