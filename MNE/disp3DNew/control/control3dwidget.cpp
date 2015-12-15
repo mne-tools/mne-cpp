@@ -68,6 +68,12 @@ Control3DWidget::Control3DWidget(QWidget *parent)
     connect(ui->m_horizontalSlider_opacity, &QSlider::valueChanged,
             this, &Control3DWidget::onOpacityChange);
 
+    connect(ui->m_pushButton_sceneColorPicker, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+            this, &Control3DWidget::onSceneColorPicker);
+
+    //Init's
+    ui->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(0, 0, 0);"));
+
     this->setWindowFlags(Qt::WindowStaysOnTopHint);
     this->adjustSize();
     this->setWindowOpacity(1/(100.0/90.0));
@@ -96,10 +102,6 @@ void Control3DWidget::setView3D(View3D::SPtr view3D)
 {
     //Do the connects from this control widget to the View3D
     ui->m_treeView_loadedData->setModel(view3D->getBrainTreeModel());
-
-    //Do the connects
-    connect(ui->m_pushButton_sceneColorPicker, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &Control3DWidget::onSceneColorPicker);
 
     //Add the view3D to the list of connected view3D's
     m_lView3D.append(view3D);

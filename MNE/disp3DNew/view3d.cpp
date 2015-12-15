@@ -62,6 +62,7 @@ View3D::View3D()
 , m_pFrameGraph(new Qt3DRender::QFrameGraph())
 , m_pForwardRenderer(new Qt3DRender::QForwardRenderer())
 , m_pBrain(Brain::SPtr(new Brain(m_pRootEntity)))
+, m_pStcDataModel(StcDataModel::SPtr(new StcDataModel(this)))
 , m_bModelRotationMode(false)
 , m_bCameraRotationMode(false)
 , m_bCameraTransMode(false)
@@ -178,6 +179,15 @@ bool View3D::addBrainData(const SurfaceSet &tSurfaceSet, const AnnotationSet &tA
 bool View3D::addBrainData(const Surface &tSurface, const Annotation &tAnnotation)
 {
     return m_pBrain->addData(tSurface, tAnnotation);
+}
+
+
+//*************************************************************************************************************
+
+bool View3D::addSourceEstimate(const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & forwardSolution)
+{
+    m_pStcDataModel->init(forwardSolution);
+    return m_pStcDataModel->addData(tSourceEstimate);
 }
 
 

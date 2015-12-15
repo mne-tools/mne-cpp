@@ -101,7 +101,9 @@ SOURCES += \
     helpers/custommesh.cpp \
     helpers/window.cpp \
     control/control3dwidget.cpp \
-    3DObjects/brain/braintreedelegate.cpp
+    3DObjects/brain/braintreedelegate.cpp \
+    rt/sourcelevel/stcdatamodel.cpp \
+    rt/sourcelevel/stcdataworker.cpp
 
 HEADERS += \
     view3d.h \
@@ -119,7 +121,9 @@ HEADERS += \
     helpers/types.h \
     control/control3dwidget.h \
     disp3dnew_global.h \
-    3DObjects/brain/braintreedelegate.h
+    3DObjects/brain/braintreedelegate.h \
+    rt/sourcelevel/stcdatamodel.h \
+    rt/sourcelevel/stcdataworker.h
 
 FORMS += \
     control/control3dwidget.ui \
