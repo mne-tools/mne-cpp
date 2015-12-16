@@ -93,7 +93,10 @@ namespace BrainTreeModelItemTypes
                     SurfaceColorSulci = QStandardItem::UserType + 11,
                     SurfaceColorVert = QStandardItem::UserType + 12,
                     SurfaceColorInfoOrigin = QStandardItem::UserType + 13,
-                    RTDataItem = QStandardItem::UserType + 14};
+                    RTDataItem = QStandardItem::UserType + 14,
+                    RTDataStreamStatus = QStandardItem::UserType + 15, //RT data streaming on or off
+                    RTDataSourceSpaceType = QStandardItem::UserType + 16, //Clustered or full sourcespace
+                    RTDataColormapType = QStandardItem::UserType + 17}; //Type of the colormap used
 }
 
 // Model item roles
@@ -107,7 +110,9 @@ namespace BrainTreeItemRoles
                     AnnotName = Qt::UserRole + 6,
                     AnnotFilePath = Qt::UserRole + 7,
                     SurfaceColorInfoOrigin = Qt::UserRole + 8,
-                    };
+                    RTDataStreamStatus = Qt::UserRole + 9,
+                    RTDataSourceSpaceType = Qt::UserRole + 10,
+                    RTDataColormapType = Qt::UserRole + 11};
 }
 
 namespace BrainSurfaceTreeItemRoles

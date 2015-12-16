@@ -46,6 +46,8 @@
 #include "../../helpers/abstracttreeitem.h"
 #include "../../helpers/types.h"
 
+#include "braintreeitem.h"
+
 #include "mne/mne_sourceestimate.h"
 #include "mne/mne_forwardsolution.h"
 
