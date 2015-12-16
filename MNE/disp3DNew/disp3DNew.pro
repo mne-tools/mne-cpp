@@ -96,15 +96,14 @@ SOURCES += \
     3DObjects/brain/brainsurfacesettreeitem.cpp \
     3DObjects/brain/brainannotationtreeitem.cpp \
     3DObjects/brain/brainhemispheretreeitem.cpp \
+    3DObjects/brain/braintreedelegate.cpp \
+    3DObjects/brain/brainrtdatatreeitem.cpp
     helpers/abstracttreeitem.cpp \
     helpers/renderable3Dentity.cpp \
     helpers/custommesh.cpp \
     helpers/window.cpp \
     control/control3dwidget.cpp \
-    3DObjects/brain/braintreedelegate.cpp \
-    rt/sourcelevel/stcdatamodel.cpp \
     rt/sourcelevel/stcdataworker.cpp \
-    3DObjects/brain/brainrtdatatreeitem.cpp
 
 HEADERS += \
     view3d.h \
@@ -115,6 +114,8 @@ HEADERS += \
     3DObjects/brain/brainsurfacesettreeitem.h \
     3DObjects/brain/brainannotationtreeitem.h \
     3DObjects/brain/brainhemispheretreeitem.h \
+    3DObjects/brain/braintreedelegate.h \
+    3DObjects/brain/brainrtdatatreeitem.h
     helpers/abstracttreeitem.h \
     helpers/renderable3Dentity.h \
     helpers/custommesh.h \
@@ -122,10 +123,7 @@ HEADERS += \
     helpers/types.h \
     control/control3dwidget.h \
     disp3dnew_global.h \
-    3DObjects/brain/braintreedelegate.h \
-    rt/sourcelevel/stcdatamodel.h \
     rt/sourcelevel/stcdataworker.h \
-    3DObjects/brain/brainrtdatatreeitem.h
 
 FORMS += \
     control/control3dwidget.ui \

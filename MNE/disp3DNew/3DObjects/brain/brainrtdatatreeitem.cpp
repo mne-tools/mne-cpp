@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brainhemispheretreeitem.cpp
+* @file     brainrtdata.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BrainHemisphereTreeItem class definition.
+* @brief    BrainRTDataTreeItem class definition.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "brainhemispheretreeitem.h"
+#include "BrainRTDataTreeItem.h"
 
 
 //*************************************************************************************************************
@@ -54,35 +54,32 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainHemisphereTreeItem::BrainHemisphereTreeItem(const int & iType, const QString & text)
+BrainRTDataTreeItem::BrainRTDataTreeItem(const int &iType, const QString &text)
 : AbstractTreeItem(iType, text)
+, m_bInit(false)
+, m_sHemi("Unknown")
 {
 }
 
 
 //*************************************************************************************************************
 
-BrainHemisphereTreeItem::~BrainHemisphereTreeItem()
+BrainRTDataTreeItem::~BrainRTDataTreeItem()
 {
 }
 
 
 //*************************************************************************************************************
 
-QVariant BrainHemisphereTreeItem::data(int role) const
+QVariant BrainRTDataTreeItem::data(int role) const
 {
-    switch(role) {
-        case BrainHemisphereTreeItemRoles::SurfaceHemi:
-            return QVariant();
-    }
-
     return QStandardItem::data(role);
 }
 
 
 //*************************************************************************************************************
 
-void  BrainHemisphereTreeItem::setData(const QVariant & value, int role)
+void  BrainRTDataTreeItem::setData(const QVariant & value, int role)
 {
     QStandardItem::setData(value, role);
 }
@@ -90,52 +87,42 @@ void  BrainHemisphereTreeItem::setData(const QVariant & value, int role)
 
 //*************************************************************************************************************
 
-bool BrainHemisphereTreeItem::addData(const Surface & tSurface, const Annotation & tAnnotation, Qt3DCore::QEntity * p3DEntityParent)
-{
-    //Set name of this item based on the hemispehre information
-    switch (tSurface.hemi()) {
-    case 0:
-        this->setText("Left");
-        break;
-    case 1:
-        this->setText("Right");
-        break;
-    default:
-        this->setText("Unknown");
-        break;
-    }
+bool BrainRTDataTreeItem::addData(const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution, const QString & hemi)
+{   
+    m_sHemi = hemi;
 
-    //Add childs
-    bool state = false;
+    // Add data which is held by this BrainRTDataTreeItem
+    QVariant data;
 
-    //Add surface child
-    BrainSurfaceTreeItem* pSurfaceItem = new BrainSurfaceTreeItem(BrainTreeModelItemTypes::SurfaceItem);
-    *this<<pSurfaceItem;
-    state = pSurfaceItem->addData(tSurface, p3DEntityParent);
+    data.setValue(tSourceEstimate.data);
+    this->setData(data, BrainRTDataTreeItemRoles::RTData);
 
-    //Add annotation child
-    if(!tAnnotation.isEmpty()) {
-        BrainAnnotationTreeItem* pAnnotItem = new BrainAnnotationTreeItem(BrainTreeModelItemTypes::AnnotationItem);
-        *this<<pAnnotItem;
-        state = pAnnotItem->addData(tSurface, tAnnotation);
-    }
+    data.setValue(tSourceEstimate.vertices);
+    this->setData(data, BrainRTDataTreeItemRoles::RTVertices);
 
-    return state;
+    data.setValue(tSourceEstimate.times);
+    this->setData(data, BrainRTDataTreeItemRoles::RTTimes);
+
+    //Add surface meta information as item children
+
+    m_bInit = true;
+
+    return this;
 }
 
 
 //*************************************************************************************************************
 
-BrainRTDataTreeItem* BrainHemisphereTreeItem::addData(const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution)
+bool BrainRTDataTreeItem::updateData(const MNESourceEstimate & tSourceEstimate)
 {
-    if(!tSourceEstimate.isEmpty()) {
-        //Add source estimation data as child
-        BrainRTDataTreeItem* pBrainRtDataTreeItem = new BrainRTDataTreeItem(BrainTreeModelItemTypes::RTDataItem);
-        *this<<pBrainRtDataTreeItem;
-        pBrainRtDataTreeItem->addData(tSourceEstimate, tForwardSolution, this->text());
-        return pBrainRtDataTreeItem;
+    if(!m_bInit) {
+        qDebug()<<"BrainRTDataTreeItem::updateData - Item was not initialized/filled with data yet!";
+        return false;
     }
 
-    return new BrainRTDataTreeItem();
-}
+    QVariant data;
+    data.setValue(tSourceEstimate.data);
+    this->setData(data, BrainRTDataTreeItemRoles::RTData);
 
+    return true;
+}
