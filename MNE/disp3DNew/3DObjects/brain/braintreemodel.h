@@ -149,7 +149,7 @@ public:
     */
     bool addData(const QString & text, const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
 
-    bool addData(const QString & text, const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution);
+    QList<BrainRTDataTreeItem*> addData(const QString & text, const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution);
 
 private:
     QStandardItem*     m_pRootItem;     /**< The root item of the tree model. */

@@ -151,7 +151,7 @@ public:
     */
     bool addBrainData(const QString & text, const Surface& tSurface, const Annotation& tAnnotation = Annotation());
 
-    bool addSourceEstimate(const QString & text, const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution);
+    QList<BrainRTDataTreeItem*> addSourceEstimate(const QString & text, const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution);
 
     BrainTreeModel* getBrainTreeModel();
 

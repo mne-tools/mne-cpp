@@ -142,7 +142,7 @@ public:
     */
     bool addData(const Surface & tSurface, const Annotation & tAnnotation, Qt3DCore::QEntity * p3DEntityParent = 0);
 
-    bool addData(const MNESourceEstimate & tEstimate);
+    BrainRTDataTreeItem* addData(const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution);
 
 private:
 

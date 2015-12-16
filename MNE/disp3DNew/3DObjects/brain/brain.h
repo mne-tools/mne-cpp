@@ -138,7 +138,7 @@ public:
     */
     bool addData(const QString & text, const Surface & tSurface, const Annotation & tAnnotation);
 
-    bool addData(const QString & text, const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution);
+    QList<BrainRTDataTreeItem*> addData(const QString & text, const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution);
 
     //=========================================================================================================
     /**

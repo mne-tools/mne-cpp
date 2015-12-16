@@ -126,16 +126,17 @@ bool BrainHemisphereTreeItem::addData(const Surface & tSurface, const Annotation
 
 //*************************************************************************************************************
 
-bool BrainHemisphereTreeItem::addData(const MNESourceEstimate & tEstimate)
+BrainRTDataTreeItem* BrainHemisphereTreeItem::addData(const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution)
 {
-    bool state = false;
-
-    //Add source estimation data as child
-    if(!tEstimate.isEmpty()) {
-        BrainRTDataTreeItem* pRTDataItem = new BrainRTDataTreeItem(BrainTreeModelItemTypes::RTDataItem);
-        *this<<pRTDataItem;
-        state = pRTDataItem->addData(tEstimate);
+    qDebug()<<"tSourceEstimate.isEmpty(): "<<tSourceEstimate.isEmpty();
+    if(!tSourceEstimate.isEmpty()) {
+        //Add source estimation data as child
+        BrainRTDataTreeItem* pBrainRtDataTreeItem = new BrainRTDataTreeItem(BrainTreeModelItemTypes::RTDataItem);
+        *this<<pBrainRtDataTreeItem;
+        pBrainRtDataTreeItem->addData(tSourceEstimate, tForwardSolution, this->text());
+        return pBrainRtDataTreeItem;
     }
 
-    return state;
+    return new BrainRTDataTreeItem();
 }
+
