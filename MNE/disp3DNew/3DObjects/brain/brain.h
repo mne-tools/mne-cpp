@@ -48,6 +48,10 @@
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 
+#include <disp/helpers/colormap.h>
+
+#include "../../rt/sourcelevel/stcdatamodel.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -106,7 +110,7 @@ public:
     *
     * @param[in] parent         The parent of this class.
     */
-    Brain(QEntity *parent = 0);
+    Brain(QEntity * parent = 0);
 
     //=========================================================================================================
     /**
@@ -122,7 +126,7 @@ public:
     * @param[in] tAnnotationSet     FreeSurfer annotation set.
     * @return                       Returns true if successful.
     */
-    bool addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet);
+    bool addData(const QString & text, const SurfaceSet & tSurfaceSet, const AnnotationSet & tAnnotationSet);
 
     //=========================================================================================================
     /**
@@ -132,7 +136,9 @@ public:
     * @param[in] pAnnotation        FreeSurfer annotation.
     * @return                       Returns true if successful.
     */
-    bool addData(const Surface& tSurface, const Annotation& tAnnotation);
+    bool addData(const QString & text, const Surface & tSurface, const Annotation & tAnnotation);
+
+    bool addData(const QString & text, const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution);
 
     //=========================================================================================================
     /**
@@ -140,7 +146,9 @@ public:
     *
     * @return returns a pointer to the brain tree model BrainTreeModel.
     */
-    BrainTreeModel* getBrainTreeModel();
+    BrainTreeModel* getBrainTreeModel();    
+
+    void dataChanged(const QModelIndex & topLeft, const QModelIndex & bottomRight, const QVector<int> & roles = QVector<int>());
 
 protected:
     BrainTreeModel*                 m_pBrainTreeModel;

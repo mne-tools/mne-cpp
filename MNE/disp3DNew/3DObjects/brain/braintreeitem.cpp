@@ -54,7 +54,7 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainTreeItem::BrainTreeItem( const int& iType, const QString& text)
+BrainTreeItem::BrainTreeItem( const int & iType, const QString & text)
 : AbstractTreeItem(iType, text)
 {
 }
@@ -77,26 +77,29 @@ QVariant BrainTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void  BrainTreeItem::setData(const QVariant& value, int role)
+void  BrainTreeItem::setData(const QVariant & value, int role)
 {
     QStandardItem::setData(value, role);
 
-    //After data was set inform the surface tree item to change the vertex colors
-    BrainSurfaceTreeItem* pParent = dynamic_cast<BrainSurfaceTreeItem*>(this->QStandardItem::parent());
-
     //TODO: Exchange this with signal slot system (Problem with Q_Object and inherited QStandardItem)
     switch(role) {
-    case BrainTreeItemRoles::SurfaceColorSulci:
+    case BrainTreeItemRoles::SurfaceColorSulci: {
+        BrainSurfaceTreeItem* pParent = dynamic_cast<BrainSurfaceTreeItem*>(this->QStandardItem::parent());
         pParent->updateVertColor();
         break;
+    }
 
-    case BrainTreeItemRoles::SurfaceColorGyri:
+    case BrainTreeItemRoles::SurfaceColorGyri: {
+        BrainSurfaceTreeItem* pParent = dynamic_cast<BrainSurfaceTreeItem*>(this->QStandardItem::parent());
         pParent->updateVertColor();
         break;
+    }
 
-    case BrainTreeItemRoles::SurfaceColorInfoOrigin:
+    case BrainTreeItemRoles::SurfaceColorInfoOrigin: {
+        BrainSurfaceTreeItem* pParent = dynamic_cast<BrainSurfaceTreeItem*>(this->QStandardItem::parent());
         pParent->updateVertColor();
         break;
+    }
     }
 }
 

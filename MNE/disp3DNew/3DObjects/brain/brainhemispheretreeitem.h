@@ -46,6 +46,7 @@
 #include "../../helpers/abstracttreeitem.h"
 #include "brainsurfacetreeitem.h"
 #include "brainannotationtreeitem.h"
+#include "brainrtdatatreeitem.h"
 
 #include "fs/label.h"
 #include "fs/annotationset.h"
@@ -88,6 +89,7 @@ namespace DISP3DNEWLIB
 
 using namespace Eigen;
 using namespace FSLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -113,7 +115,7 @@ public:
     /**
     * FreeSurfer constructor from single surface.
     */
-    explicit BrainHemisphereTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "Unknown");
+    explicit BrainHemisphereTreeItem(const int & iType = BrainTreeModelItemTypes::UnknownItem, const QString & text = "Unknown");
 
     //=========================================================================================================
     /**
@@ -138,7 +140,9 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity *p3DEntityParent = 0);
+    bool addData(const Surface & tSurface, const Annotation & tAnnotation, Qt3DCore::QEntity * p3DEntityParent = 0);
+
+    bool addData(const MNESourceEstimate & tEstimate);
 
 private:
 

@@ -138,7 +138,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addBrainData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet = AnnotationSet());
+    bool addBrainData(const QString & text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet = AnnotationSet());
 
     //=========================================================================================================
     /**
@@ -149,9 +149,9 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addBrainData(const Surface& tSurface, const Annotation& tAnnotation = Annotation());
+    bool addBrainData(const QString & text, const Surface& tSurface, const Annotation& tAnnotation = Annotation());
 
-    bool addSourceEstimate(const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & forwardSolution);
+    bool addSourceEstimate(const QString & text, const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution);
 
     BrainTreeModel* getBrainTreeModel();
 

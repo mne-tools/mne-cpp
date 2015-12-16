@@ -51,6 +51,8 @@
 
 #include "../../helpers/renderable3Dentity.h"
 
+#include "mne/mne_forwardsolution.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -133,7 +135,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity *p3DEntityParent = 0);
+    bool addData(const QString & text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity *p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -145,7 +147,9 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
+    bool addData(const QString & text, const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
+
+    bool addData(const QString & text, const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution);
 
 private:
     QStandardItem*     m_pRootItem;     /**< The root item of the tree model. */
