@@ -54,7 +54,7 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainAnnotationTreeItem::BrainAnnotationTreeItem(const int &iType, const QString &text)
+BrainAnnotationTreeItem::BrainAnnotationTreeItem(const int & iType, const QString & text)
 : AbstractTreeItem(iType, text)
 {
 }
@@ -77,7 +77,7 @@ QVariant BrainAnnotationTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void  BrainAnnotationTreeItem::setData(const QVariant &value, int role)
+void  BrainAnnotationTreeItem::setData(const QVariant & value, int role)
 {
     QStandardItem::setData(value, role);
 }
@@ -85,7 +85,7 @@ void  BrainAnnotationTreeItem::setData(const QVariant &value, int role)
 
 //*************************************************************************************************************
 
-bool BrainAnnotationTreeItem::addData(const Surface &tSurface, const Annotation &tAnnotation)
+bool BrainAnnotationTreeItem::addData(const Surface & tSurface, const Annotation & tAnnotation)
 {
     //Create color from annotation data if annotation is not empty
     if(!tAnnotation.isEmpty()) {

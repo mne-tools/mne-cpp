@@ -92,9 +92,6 @@ void  BrainSurfaceSetTreeItem::setData(const QVariant& value, int role)
 
 bool BrainSurfaceSetTreeItem::addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
 {
-    //Set name for this item based on surface data
-    this->setText("Set");
-
     //Generate child items based on surface set input parameters
     bool state = false;
 
@@ -113,6 +110,27 @@ bool BrainSurfaceSetTreeItem::addData(const SurfaceSet& tSurfaceSet, const Annot
 
         *this<<pHemisphereItem; //same as this->appendRow(pSurfaceItem)
     }
+
+    return state;
+}
+
+
+//*************************************************************************************************************
+
+bool BrainSurfaceSetTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
+{
+    //Generate child items based on surface set input parameters
+    bool state = false;
+
+    BrainHemisphereTreeItem* pHemisphereItem = new BrainHemisphereTreeItem(BrainTreeModelItemTypes::HemisphereItem);
+
+    if(tAnnotation.hemi() == tSurface.hemi()) {
+        state = pHemisphereItem->addData(tSurface, tAnnotation, p3DEntityParent);
+    } else {
+        state = pHemisphereItem->addData(tSurface, Annotation(), p3DEntityParent);
+    }
+
+    *this<<pHemisphereItem; //same as this->appendRow(pSurfaceItem)
 
     return state;
 }

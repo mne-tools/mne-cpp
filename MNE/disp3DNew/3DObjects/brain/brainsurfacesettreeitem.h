@@ -112,7 +112,7 @@ public:
     /**
     * FreeSurfer constructor from single surface.
     */
-    explicit BrainSurfaceSetTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "");
+    explicit BrainSurfaceSetTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString & text = "");
 
     //=========================================================================================================
     /**
@@ -138,6 +138,8 @@ public:
     * @return                       Returns true if successful.
     */
     bool addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity *p3DEntityParent = 0);
+
+    bool addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
 
 private:
 

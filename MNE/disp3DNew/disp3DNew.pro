@@ -103,7 +103,8 @@ SOURCES += \
     control/control3dwidget.cpp \
     3DObjects/brain/braintreedelegate.cpp \
     rt/sourcelevel/stcdatamodel.cpp \
-    rt/sourcelevel/stcdataworker.cpp
+    rt/sourcelevel/stcdataworker.cpp \
+    3DObjects/brain/brainrtdatatreeitem.cpp
 
 HEADERS += \
     view3d.h \
@@ -123,7 +124,8 @@ HEADERS += \
     disp3dnew_global.h \
     3DObjects/brain/braintreedelegate.h \
     rt/sourcelevel/stcdatamodel.h \
-    rt/sourcelevel/stcdataworker.h
+    rt/sourcelevel/stcdataworker.h \
+    3DObjects/brain/brainrtdatatreeitem.h
 
 FORMS += \
     control/control3dwidget.ui \

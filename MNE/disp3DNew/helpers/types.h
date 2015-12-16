@@ -92,7 +92,8 @@ namespace BrainTreeModelItemTypes
                     SurfaceColorGyri = QStandardItem::UserType + 10,
                     SurfaceColorSulci = QStandardItem::UserType + 11,
                     SurfaceColorVert = QStandardItem::UserType + 12,
-                    SurfaceColorInfoOrigin = QStandardItem::UserType + 13};
+                    SurfaceColorInfoOrigin = QStandardItem::UserType + 13,
+                    RTDataItem = QStandardItem::UserType + 14};
 }
 
 // Model item roles
@@ -138,6 +139,13 @@ namespace BrainAnnotationTreeItemRoles
                     AnnotFilePath = Qt::UserRole + 402};
 }
 
+namespace BrainRTDataTreeItemRoles
+{
+    enum ItemRole{RTData = Qt::UserRole + 500,
+                    RTVertices = Qt::UserRole + 501,
+                    RTTimes = Qt::UserRole + 502};
+}
+
 } //NAMESPACE DISP3DNEWLIB
 
 // Metatype declaration for correct QVariant usage
@@ -151,6 +159,11 @@ Q_DECLARE_METATYPE(DISP3DNEWLIB::Renderable3DEntity*)
 Q_DECLARE_METATYPE(Eigen::MatrixX3i)
 #endif
 
+#ifndef metatype_matrixXd
+#define metatype_matrixXd
+Q_DECLARE_METATYPE(Eigen::MatrixXd)
+#endif
+
 #ifndef metatype_matrixx3f
 #define metatype_matrixx3f
 Q_DECLARE_METATYPE(Eigen::MatrixX3f)
@@ -159,6 +172,16 @@ Q_DECLARE_METATYPE(Eigen::MatrixX3f)
 #ifndef metatype_vectorxf
 #define metatype_vectorxf
 Q_DECLARE_METATYPE(Eigen::VectorXf)
+#endif
+
+#ifndef metatype_vectorxi
+#define metatype_vectorxi
+Q_DECLARE_METATYPE(Eigen::VectorXi)
+#endif
+
+#ifndef metatype_rowvectorxf
+#define metatype_rowvectorxf
+Q_DECLARE_METATYPE(Eigen::RowVectorXf)
 #endif
 
 #ifndef metatype_vector3f

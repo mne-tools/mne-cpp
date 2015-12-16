@@ -80,26 +80,35 @@ QVariant BrainTreeModel::data(const QModelIndex & index, int role) const
 
 //*************************************************************************************************************
 
-bool BrainTreeModel::addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
+bool BrainTreeModel::addData(const QString & text, const SurfaceSet & tSurfaceSet, const AnnotationSet & tAnnotationSet, Qt3DCore::QEntity * p3DEntityParent)
 {
-    BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem);
+    BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, text);
     m_pRootItem->appendRow(pSurfaceSetItem);
 
-    return pSurfaceSetItem->addData(tSurfaceSet, tAnnotationSet, p3DEntityParent);;
+    return pSurfaceSetItem->addData(tSurfaceSet, tAnnotationSet, p3DEntityParent);
 }
 
 
 //*************************************************************************************************************
 
-bool BrainTreeModel::addData(const Surface &tSurface, const Annotation &tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
+bool BrainTreeModel::addData(const QString & text, const Surface & tSurface, const Annotation & tAnnotation, Qt3DCore::QEntity * p3DEntityParent)
 {
-    BrainHemisphereTreeItem* pHemisphereItem = new BrainHemisphereTreeItem(BrainTreeModelItemTypes::HemisphereItem);
-    m_pRootItem->appendRow(pHemisphereItem);
+    BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, text);
+    m_pRootItem->appendRow(pSurfaceSetItem);
 
-    return pHemisphereItem->addData(tSurface, tAnnotation, p3DEntityParent);
+    return pSurfaceSetItem->addData(tSurface, tAnnotation, p3DEntityParent);
 }
 
 
+//*************************************************************************************************************
 
+bool BrainTreeModel::addData(const QString & text, const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution)
+{
+//    BrainHemisphereTreeItem* pHemisphereItem = new BrainHemisphereTreeItem(BrainTreeModelItemTypes::HemisphereItem);
+//    m_pRootItem->appendRow(pHemisphereItem);
+
+//    return pHemisphereItem->addData(tSurface, tAnnotation, p3DEntityParent);
+    return true;
+}
 
 

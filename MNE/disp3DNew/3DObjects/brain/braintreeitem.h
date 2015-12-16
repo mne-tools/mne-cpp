@@ -107,7 +107,7 @@ public:
     /**
     * Default constructor.
     */
-    explicit BrainTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "");
+    explicit BrainTreeItem(const int & iType = BrainTreeModelItemTypes::UnknownItem, const QString & text = "");
 
     //=========================================================================================================
     /**
@@ -120,7 +120,7 @@ public:
     * AbstractTreeItem functions
     */
     QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
+    void setData(const QVariant & value, int role = Qt::UserRole + 1);
 
 private:
 

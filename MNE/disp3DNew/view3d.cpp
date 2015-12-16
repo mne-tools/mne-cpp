@@ -168,26 +168,25 @@ void View3D::initTransformations()
 
 //*************************************************************************************************************
 
-bool View3D::addBrainData(const SurfaceSet &tSurfaceSet, const AnnotationSet &tAnnotationSet)
+bool View3D::addBrainData(const QString & text, const SurfaceSet & tSurfaceSet, const AnnotationSet & tAnnotationSet)
 {
-    return m_pBrain->addData(tSurfaceSet, tAnnotationSet);
+    return m_pBrain->addData(text, tSurfaceSet, tAnnotationSet);
 }
 
 
 //*************************************************************************************************************
 
-bool View3D::addBrainData(const Surface &tSurface, const Annotation &tAnnotation)
+bool View3D::addBrainData(const QString & text, const Surface & tSurface, const Annotation & tAnnotation)
 {
-    return m_pBrain->addData(tSurface, tAnnotation);
+    return m_pBrain->addData(text, tSurface, tAnnotation);
 }
 
 
 //*************************************************************************************************************
 
-bool View3D::addSourceEstimate(const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & forwardSolution)
+bool View3D::addSourceEstimate(const QString & text, const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution)
 {
-    m_pStcDataModel->init(forwardSolution);
-    return m_pStcDataModel->addData(tSourceEstimate);
+    return m_pBrain->addData(text, tSourceEstimate, tForwardSolution);
 }
 
 
