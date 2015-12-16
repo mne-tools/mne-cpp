@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     brainhemispheretreeitem.cpp
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     stcdataworker.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015
+* @date     March, 2015
 *
 * @section  LICENSE
 *
@@ -29,113 +29,107 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BrainHemisphereTreeItem class definition.
+* @brief    StcDataWorker class declaration
 *
 */
+
+#ifndef STCDATAWORKER_H
+#define STCDATAWORKER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "brainhemispheretreeitem.h"
+#include <iostream>
 
+#include "../../disp3dnew_global.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QObject>
+#include <QList>
+#include <QThread>
+#include <QSharedPointer>
+#include <QMutex>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISP3DLIB
+//=============================================================================================================
+
+namespace DISP3DNEWLIB
+{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISP3DNEWLIB;
+using namespace Eigen;
 
-
-//*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-BrainHemisphereTreeItem::BrainHemisphereTreeItem(const int & iType, const QString & text)
-: AbstractTreeItem(iType, text)
+/**
+* Worker which schedules data with the right timing
+*
+* @brief Data scheduler
+*/
+class DISP3DNEWSHARED_EXPORT StcDataWorker : public QThread
 {
-}
+    Q_OBJECT
+public:
+    typedef QSharedPointer<StcDataWorker> SPtr;            /**< Shared pointer type for StcDataWorker class. */
+    typedef QSharedPointer<const StcDataWorker> ConstSPtr; /**< Const shared pointer type for StcDataWorker class. */
 
+    StcDataWorker(QObject *parent = 0);
 
-//*************************************************************************************************************
+    ~StcDataWorker();
 
-BrainHemisphereTreeItem::~BrainHemisphereTreeItem()
-{
-}
+//    void setIntervall(int intervall);
 
+    void addData(QList<VectorXd> &data);
 
-//*************************************************************************************************************
+    void clear();
 
-QVariant BrainHemisphereTreeItem::data(int role) const
-{
-    switch(role) {
-        case BrainHemisphereTreeItemRoles::SurfaceHemi:
-            return QVariant();
-    }
+    void setAverage(qint32 samples);
 
-    return QStandardItem::data(role);
-}
+    void setInterval(int usec);
 
+    void setLoop(bool looping);
 
-//*************************************************************************************************************
+    void stop();
 
-void  BrainHemisphereTreeItem::setData(const QVariant & value, int role)
-{
-    QStandardItem::setData(value, role);
-}
+signals:
+    void stcSample(Eigen::VectorXd sample);
 
+protected:
+    virtual void run();
 
-//*************************************************************************************************************
+private:
+    QMutex m_qMutex;
+    QList<VectorXd> m_data;   /**< List that holds the fiff matrix data <n_channels x n_samples> */
 
-bool BrainHemisphereTreeItem::addData(const Surface & tSurface, const Annotation & tAnnotation, Qt3DCore::QEntity * p3DEntityParent)
-{
-    //Set name of this item based on the hemispehre information
-    switch (tSurface.hemi()) {
-    case 0:
-        this->setText("Left");
-        break;
-    case 1:
-        this->setText("Right");
-        break;
-    default:
-        this->setText("Unknown");
-        break;
-    }
+    bool m_bIsRunning;
+    bool m_bIsLooping;
 
-    //Add childs
-    bool state = false;
+    qint32 m_iAverageSamples;
+    qint32 m_iCurrentSample;
+    qint32 m_iUSecIntervall;
+};
 
-    //Add surface child
-    BrainSurfaceTreeItem* pSurfaceItem = new BrainSurfaceTreeItem(BrainTreeModelItemTypes::SurfaceItem);
-    *this<<pSurfaceItem;
-    state = pSurfaceItem->addData(tSurface, p3DEntityParent);
+} // NAMESPACE
 
-    //Add annotation child
-    if(!tAnnotation.isEmpty()) {
-        BrainAnnotationTreeItem* pAnnotItem = new BrainAnnotationTreeItem(BrainTreeModelItemTypes::AnnotationItem);
-        *this<<pAnnotItem;
-        state = pAnnotItem->addData(tSurface, tAnnotation);
-    }
-
-    return state;
-}
-
-
-//*************************************************************************************************************
-
-BrainRTDataTreeItem* BrainHemisphereTreeItem::addData(const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution)
-{
-    if(!tSourceEstimate.isEmpty()) {
-        //Add source estimation data as child
-        BrainRTDataTreeItem* pBrainRtDataTreeItem = new BrainRTDataTreeItem(BrainTreeModelItemTypes::RTDataItem);
-        *this<<pBrainRtDataTreeItem;
-        pBrainRtDataTreeItem->addData(tSourceEstimate, tForwardSolution, this->text());
-        return pBrainRtDataTreeItem;
-    }
-
-    return new BrainRTDataTreeItem();
-}
-
+#endif // STCDATAWORKER_H

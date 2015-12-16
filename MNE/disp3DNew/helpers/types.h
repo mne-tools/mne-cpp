@@ -106,7 +106,8 @@ namespace BrainTreeItemRoles
                     SurfaceFilePath = Qt::UserRole + 5,
                     AnnotName = Qt::UserRole + 6,
                     AnnotFilePath = Qt::UserRole + 7,
-                    SurfaceColorInfoOrigin = Qt::UserRole + 8};
+                    SurfaceColorInfoOrigin = Qt::UserRole + 8,
+                    };
 }
 
 namespace BrainSurfaceTreeItemRoles

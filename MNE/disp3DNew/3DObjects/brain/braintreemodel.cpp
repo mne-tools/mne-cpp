@@ -125,8 +125,7 @@ QList<BrainRTDataTreeItem*> BrainTreeModel::addData(const QString & text, const 
     QList<BrainRTDataTreeItem*> returnList;
     QList<QStandardItem*> itemList = this->findItems(text);
 
-    qDebug()<<"itemList.size(): "<<itemList.size();
-
+    //Find the all the hemispheres of the set "text" and add the source estimates as items
     if(!itemList.isEmpty()) {
         for(int i = 0; i<itemList.size(); i++) {
             for(int j = 0; j<itemList.at(i)->rowCount(); j++) {

@@ -46,7 +46,6 @@
 #include "disp3dnew_global.h"
 #include "3DObjects/brain/brain.h"
 #include "helpers/window.h"
-#include "rt/sourcelevel/stcdatamodel.h"
 
 #include <mne/mne_sourceestimate.h>
 
@@ -177,7 +176,6 @@ protected:
     Qt3DCore::QTransform*               m_pCameraRotateTransformZ;      /**< The camera z-axis rotation transformation (added to m_pCameraTransform). */
 
     Brain::SPtr                         m_pBrain;                       /**< Pointer to the Brain class, which holds all BrainObjects. */
-    StcDataModel::SPtr                  m_pStcDataModel;
 
     bool            m_bCameraTransMode;         /**< Flag for activating/deactivating the translation camera mode. */
     bool            m_bModelRotationMode;       /**< Flag for activating/deactivating the rotation model mode. */
