@@ -91,6 +91,18 @@ void AbstractTreeItem::createToolTip()
     case BrainTreeModelItemTypes::SurfaceColorInfoOrigin:
         sToolTip = "Information used to color the surface";
         break;
+    case BrainTreeModelItemTypes::RTDataItem:
+        sToolTip = "Real time data item";
+        break;
+    case BrainTreeModelItemTypes::RTDataStreamStatus:
+        sToolTip = "Turn real time data streaming on/off";
+        break;
+    case BrainTreeModelItemTypes::RTDataSourceSpaceType:
+        sToolTip = "Used source space type";
+        break;
+    case BrainTreeModelItemTypes::RTDataColormapType:
+        sToolTip = "Used color mapping";
+        break;
     default:
         sToolTip = "Unknown";
         break;

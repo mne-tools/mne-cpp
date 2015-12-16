@@ -44,6 +44,7 @@
 #include "../../disp3DNew_global.h"
 
 #include "../../helpers/abstracttreeitem.h"
+
 #include "brainsurfacetreeitem.h"
 #include "brainannotationtreeitem.h"
 #include "brainrtdatatreeitem.h"
@@ -51,6 +52,10 @@
 #include "fs/label.h"
 #include "fs/annotationset.h"
 #include "fs/surfaceset.h"
+
+#include "mne/mne_forwardsolution.h"
+#include "mne/mne_sourceestimate.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
