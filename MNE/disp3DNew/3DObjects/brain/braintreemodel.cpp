@@ -54,7 +54,7 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainTreeModel::BrainTreeModel(QObject *parent)
+BrainTreeModel::BrainTreeModel(QObject * parent)
 : QStandardItemModel(parent)
 {
     m_pRootItem = this->invisibleRootItem();
@@ -82,10 +82,19 @@ QVariant BrainTreeModel::data(const QModelIndex & index, int role) const
 
 bool BrainTreeModel::addData(const QString & text, const SurfaceSet & tSurfaceSet, const AnnotationSet & tAnnotationSet, Qt3DCore::QEntity * p3DEntityParent)
 {
-    BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, text);
-    m_pRootItem->appendRow(pSurfaceSetItem);
+    QList<QStandardItem*> itemList = this->findItems(text);
+    bool state = false;
 
-    return pSurfaceSetItem->addData(tSurfaceSet, tAnnotationSet, p3DEntityParent);
+    if(!itemList.isEmpty() && (itemList.at(0)->type() == BrainTreeModelItemTypes::SurfaceSetItem)) {
+        BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
+        state = pSurfaceSetItem->addData(tSurfaceSet, tAnnotationSet, p3DEntityParent);
+    } else {
+        BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, text);
+        m_pRootItem->appendRow(pSurfaceSetItem);
+        state = pSurfaceSetItem->addData(tSurfaceSet, tAnnotationSet, p3DEntityParent);
+    }
+
+    return state;
 }
 
 
@@ -93,22 +102,43 @@ bool BrainTreeModel::addData(const QString & text, const SurfaceSet & tSurfaceSe
 
 bool BrainTreeModel::addData(const QString & text, const Surface & tSurface, const Annotation & tAnnotation, Qt3DCore::QEntity * p3DEntityParent)
 {
-    BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, text);
-    m_pRootItem->appendRow(pSurfaceSetItem);
+    QList<QStandardItem*> itemList = this->findItems(text);
+    bool state = false;
 
-    return pSurfaceSetItem->addData(tSurface, tAnnotation, p3DEntityParent);
+    if(!itemList.isEmpty() && (itemList.at(0)->type() == BrainTreeModelItemTypes::SurfaceSetItem)) {
+        BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
+        state = pSurfaceSetItem->addData(tSurface, tAnnotation, p3DEntityParent);
+    } else {
+        BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, text);
+        m_pRootItem->appendRow(pSurfaceSetItem);
+        state = pSurfaceSetItem->addData(tSurface, tAnnotation, p3DEntityParent);
+    }
+
+    return state;
 }
 
 
 //*************************************************************************************************************
 
-bool BrainTreeModel::addData(const QString & text, const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution)
+QList<BrainRTDataTreeItem*> BrainTreeModel::addData(const QString & text, const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution)
 {
-//    BrainHemisphereTreeItem* pHemisphereItem = new BrainHemisphereTreeItem(BrainTreeModelItemTypes::HemisphereItem);
-//    m_pRootItem->appendRow(pHemisphereItem);
+    QList<BrainRTDataTreeItem*> returnList;
+    QList<QStandardItem*> itemList = this->findItems(text);
 
-//    return pHemisphereItem->addData(tSurface, tAnnotation, p3DEntityParent);
-    return true;
+    qDebug()<<"itemList.size(): "<<itemList.size();
+
+    if(!itemList.isEmpty()) {
+        for(int i = 0; i<itemList.size(); i++) {
+            for(int j = 0; j<itemList.at(i)->rowCount(); j++) {
+                if(itemList.at(i)->child(j,0)->type() == BrainTreeModelItemTypes::HemisphereItem) {
+                    BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(i)->child(j,0));
+                    returnList.append(pHemiItem->addData(tSourceEstimate, tForwardSolution));
+                }
+            }
+        }
+    }
+
+    return returnList;
 }
 
 
