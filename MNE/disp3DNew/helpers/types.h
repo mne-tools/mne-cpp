@@ -94,9 +94,12 @@ namespace BrainTreeModelItemTypes
                     SurfaceColorVert = QStandardItem::UserType + 12,
                     SurfaceColorInfoOrigin = QStandardItem::UserType + 13,
                     RTDataItem = QStandardItem::UserType + 14,
-                    RTDataStreamStatus = QStandardItem::UserType + 15, //RT data streaming on or off
-                    RTDataSourceSpaceType = QStandardItem::UserType + 16, //Clustered or full sourcespace
-                    RTDataColormapType = QStandardItem::UserType + 17}; //Type of the colormap used
+                    RTDataStreamStatus = QStandardItem::UserType + 15,
+                    RTDataSourceSpaceType = QStandardItem::UserType + 16,
+                    RTDataColormapType = QStandardItem::UserType + 17,
+                    RTDataStreamingSpeed = QStandardItem::UserType + 18,
+                    RTDataLoopedStreaming = QStandardItem::UserType + 19,
+                    RTDataNumberAverages = QStandardItem::UserType + 20};
 }
 
 // Model item roles
@@ -112,7 +115,10 @@ namespace BrainTreeItemRoles
                     SurfaceColorInfoOrigin = Qt::UserRole + 8,
                     RTDataStreamStatus = Qt::UserRole + 9,
                     RTDataSourceSpaceType = Qt::UserRole + 10,
-                    RTDataColormapType = Qt::UserRole + 11};
+                    RTDataColormapType = Qt::UserRole + 11,
+                    RTDataStreamingSpeed = Qt::UserRole + 12,
+                    RTDataLoopedStreaming = Qt::UserRole + 13,
+                    RTDataNumberAverages = Qt::UserRole + 14};
 }
 
 namespace BrainSurfaceTreeItemRoles
@@ -148,7 +154,7 @@ namespace BrainAnnotationTreeItemRoles
 namespace BrainRTDataTreeItemRoles
 {
     enum ItemRole{RTData = Qt::UserRole + 500,
-                    RTVertices = Qt::UserRole + 501,
+                    RTVerticesIdx = Qt::UserRole + 501,
                     RTTimes = Qt::UserRole + 502,
                     RTHemi = Qt::UserRole + 503,
                     RTStartIdx = Qt::UserRole + 504,

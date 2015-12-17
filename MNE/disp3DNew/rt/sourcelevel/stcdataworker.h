@@ -44,7 +44,6 @@
 #include <iostream>
 
 #include "../../disp3dnew_global.h"
-#include "../../helpers/types.h"
 
 
 //*************************************************************************************************************
@@ -82,7 +81,6 @@ namespace DISP3DNEWLIB
 
 using namespace Eigen;
 
-
 //=============================================================================================================
 /**
 * Worker which schedules data with the right timing
@@ -115,7 +113,7 @@ public:
     void stop();
 
 signals:
-    void stcSample(VectorXd sample);
+    void stcSample(Eigen::VectorXd sample);
 
 protected:
     virtual void run();

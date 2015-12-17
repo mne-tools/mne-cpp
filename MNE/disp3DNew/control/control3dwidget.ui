@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>517</height>
+    <height>625</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,7 +40,7 @@
           <x>0</x>
           <y>0</y>
           <width>380</width>
-          <height>414</height>
+          <height>522</height>
          </rect>
         </property>
         <attribute name="label">
@@ -58,7 +58,7 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>150</height>
+             <height>250</height>
             </size>
            </property>
            <property name="mouseTracking">
@@ -77,7 +77,7 @@
           <x>0</x>
           <y>0</y>
           <width>380</width>
-          <height>414</height>
+          <height>522</height>
          </rect>
         </property>
         <attribute name="label">
