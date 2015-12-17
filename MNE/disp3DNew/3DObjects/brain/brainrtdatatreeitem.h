@@ -154,10 +154,8 @@ private:
     void onStcSample(const VectorXd& sample);
 
     bool        m_bInit;
-    QString     m_sHemi;
 
     BrainTreeItem*  m_pItemRTDataStreamStatus;
-
     StcDataWorker*  m_pStcDataWorker;
 };
 
