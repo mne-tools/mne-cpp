@@ -487,7 +487,7 @@ public:
 
     //=========================================================================================================
     /**
-    * to fiff FIFFT FLOAT NAMED MATRIX. Same as toFLoatMAtrix with the slight difference of dimension use to map data to matrix.
+    * to fiff FIFFT FLOAT NAMED MATRIX. Same as toFloatMAtrix with the slight difference of dimension use to map data to matrix.
     *
     * parses a fiff float named matrix
     *
