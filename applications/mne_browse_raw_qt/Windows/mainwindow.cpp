@@ -344,11 +344,11 @@ void MainWindow::createToolBar()
 void MainWindow::connectMenus()
 {
     //File
-    connect(ui->m_openAction, SIGNAL(triggered()), this, SLOT(openFile()));
-    connect(ui->m_writeAction, SIGNAL(triggered()), this, SLOT(writeFile()));
-    connect(ui->m_loadEvents, SIGNAL(triggered()), this, SLOT(loadEvents()));
-    connect(ui->m_saveEvents, SIGNAL(triggered()), this, SLOT(saveEvents()));
-    connect(ui->m_loadEvokedAction, SIGNAL(triggered()), this, SLOT(loadEvoked()));
+    connect(ui->m_openAction, &QAction::triggered, this, &MainWindow::openFile);
+    connect(ui->m_writeAction, &QAction::triggered, this, &MainWindow::writeFile);
+    connect(ui->m_loadEvents, &QAction::triggered, this, &MainWindow::loadEvents);
+    connect(ui->m_saveEvents, &QAction::triggered, this, &MainWindow::saveEvents);
+    connect(ui->m_loadEvokedAction, &QAction::triggered, this, &MainWindow::loadEvoked);
     connect(ui->m_quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
     //Adjust
