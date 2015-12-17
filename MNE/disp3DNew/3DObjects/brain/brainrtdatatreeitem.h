@@ -105,6 +105,7 @@ using namespace MNELIB;
 */
 class DISP3DNEWSHARED_EXPORT BrainRTDataTreeItem : public AbstractTreeItem
 {
+    Q_OBJECT;
 
 public:
     typedef QSharedPointer<BrainRTDataTreeItem> SPtr;             /**< Shared pointer type for BrainRTDataTreeItem class. */

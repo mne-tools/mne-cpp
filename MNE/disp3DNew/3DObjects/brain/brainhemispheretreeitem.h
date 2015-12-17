@@ -111,6 +111,7 @@ using namespace MNELIB;
 */
 class DISP3DNEWSHARED_EXPORT BrainHemisphereTreeItem : public AbstractTreeItem
 {
+    Q_OBJECT;
 
 public:
     typedef QSharedPointer<BrainHemisphereTreeItem> SPtr;             /**< Shared pointer type for BrainHemisphereTreeItem class. */
