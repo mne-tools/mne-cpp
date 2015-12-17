@@ -93,24 +93,37 @@ void  BrainRTDataTreeItem::setData(const QVariant& value, int role)
 bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QString& hemi)
 {   
     // Add data which is held by this BrainRTDataTreeItem
-
-    int iHemi = -1;
-    int iStartIdx = 0;
-    int iEndIdx = 0;
-
-    if(hemi == "Left") {
-        iHemi = 0;
-        iStartIdx = 0;
-        iEndIdx = tForwardSolution.src[iHemi].rr.rows()-1;
-    } else if(hemi == "Right") {
-        iHemi = 1;
-        iStartIdx = tForwardSolution.src[0].rr.rows();
-        iEndIdx = tForwardSolution.src[0].rr.rows()+tForwardSolution.src[1].rr.rows()-1;
-    }
+    int iHemi = hemi == "Left" ? 0 : hemi == "Right" ? 1 : -1;
 
     this->setData(iHemi, BrainRTDataTreeItemRoles::RTHemi);
-    this->setData(iStartIdx, BrainRTDataTreeItemRoles::RTStartIdx);
-    this->setData(iEndIdx, BrainRTDataTreeItemRoles::RTEndIdx);
+
+    if(tForwardSolution.src[iHemi].isClustered()) {
+        // Source Space IS clustered
+        switch(iHemi) {
+            case 0:
+                this->setData(0, BrainRTDataTreeItemRoles::RTStartIdx);
+                this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() - 1, BrainRTDataTreeItemRoles::RTEndIdx);
+                break;
+
+            case 1:
+                this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size(), BrainRTDataTreeItemRoles::RTStartIdx);
+                this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() + tForwardSolution.src[1].cluster_info.centroidSource_rr.size() - 1, BrainRTDataTreeItemRoles::RTEndIdx);
+                break;
+        }
+    } else {
+        // Source Space is NOT clustered
+        switch(iHemi) {
+            case 0:
+                this->setData(0, BrainRTDataTreeItemRoles::RTStartIdx);
+                this->setData(tForwardSolution.src[0].nuse - 1, BrainRTDataTreeItemRoles::RTEndIdx);
+                break;
+
+            case 1:
+                this->setData(tForwardSolution.src[0].nuse, BrainRTDataTreeItemRoles::RTStartIdx);
+                this->setData(tForwardSolution.src[0].nuse + tForwardSolution.src[1].nuse - 1, BrainRTDataTreeItemRoles::RTEndIdx);
+                break;
+        }
+    }
 
     QVariant data;
 
@@ -118,7 +131,7 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     this->setData(data, BrainRTDataTreeItemRoles::RTData);
 
     data.setValue(tSourceEstimate.vertices);
-    this->setData(data, BrainRTDataTreeItemRoles::RTVertices);
+    this->setData(data, BrainRTDataTreeItemRoles::RTVerticesIdx);
 
     data.setValue(tSourceEstimate.times);
     this->setData(data, BrainRTDataTreeItemRoles::RTTimes);
@@ -133,7 +146,7 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     data.setValue(false);
     m_pItemRTDataStreamStatus->setData(data, BrainTreeItemRoles::RTDataStreamStatus);
 
-    QString sIsClustered = tForwardSolution.src[iHemi].isClustered() ? "Clustered source space" : "Full source space";
+    QString sIsClustered = tForwardSolution.src[iHemi].isClustered() ? "Clustered" : "Full";
     BrainTreeItem *itemSourceSpaceType = new BrainTreeItem(BrainTreeModelItemTypes::RTDataSourceSpaceType, sIsClustered);
     *this<<itemSourceSpaceType;
     data.setValue(sIsClustered);
@@ -143,6 +156,17 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     *this<<itemColormapType;
     data.setValue(QString("Hot Negative 2"));
     itemColormapType->setData(data, BrainTreeItemRoles::RTDataColormapType);
+
+    BrainTreeItem *itemStreamingSpeed = new BrainTreeItem(BrainTreeModelItemTypes::RTDataStreamingSpeed, "Streaming speed");
+    *this<<itemStreamingSpeed;
+
+    BrainTreeItem *itemLoopedStreaming = new BrainTreeItem(BrainTreeModelItemTypes::RTDataLoopedStreaming, "Looping on/off");
+    itemLoopedStreaming->setCheckable(true);
+    itemLoopedStreaming->setCheckState(Qt::Unchecked);
+    *this<<itemLoopedStreaming;
+
+    BrainTreeItem *itemAveragedStreaming = new BrainTreeItem(BrainTreeModelItemTypes::RTDataNumberAverages, "Number of Averages");
+    *this<<itemAveragedStreaming;
 
     m_pStcDataWorker->addData(tSourceEstimate.data);
 
@@ -196,6 +220,6 @@ void BrainRTDataTreeItem::onStcSample(const VectorXd& sample)
     qDebug()<<"BrainRTDataTreeItem::onStcSample - iStartIdx"<<iStartIdx;
     qDebug()<<"BrainRTDataTreeItem::onStcSample - iEndIdx"<<iEndIdx;
 
-    emit rtDataChanged(sample.segment(iStartIdx, iEndIdx), this->data(BrainRTDataTreeItemRoles::RTVertices).value<VectorXi>().segment(iStartIdx, iEndIdx));
+    emit rtDataChanged(sample.segment(iStartIdx, iEndIdx), this->data(BrainRTDataTreeItemRoles::RTVerticesIdx).value<VectorXi>().segment(iStartIdx, iEndIdx));
 }
 
