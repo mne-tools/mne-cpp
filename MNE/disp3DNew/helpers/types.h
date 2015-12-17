@@ -158,6 +158,7 @@ namespace BrainRTDataTreeItemRoles
 } //NAMESPACE DISP3DNEWLIB
 
 // Metatype declaration for correct QVariant usage
+// DO NOT FORGET TO REGISTER THESE TYPES IF YOU WANT TO USE THEM IN SIGNAL SLOT/SLOT SYSTEM (SEE VIEW3D initMetatypes())
 #ifndef metatype_renderable3Dentity
 #define metatype_renderable3Dentity
 Q_DECLARE_METATYPE(DISP3DNEWLIB::Renderable3DEntity*)
