@@ -256,4 +256,6 @@ void IOUtils::write_eigen_matrix(const MatrixXd &in, const QString& path)
     } else {
         qWarning()<<"Could not write Eigen element to file! Path does not exist!";
     }
+
+    file.close();
 }

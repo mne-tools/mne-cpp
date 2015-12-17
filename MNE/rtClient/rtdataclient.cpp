@@ -292,7 +292,7 @@ FiffInfo::SPtr RtDataClient::readInfo()
                             break;
                         case FIFF_MNE_CTF_COMP_DATA:
                             //ToDo: Test; Float Matrix
-                            p_pFiffInfo->comps[countComp].data->data = t_pTag->toNamedMatrix().cast<double>();
+                            p_pFiffInfo->comps[countComp].data->data = t_pTag->toFloatMatrix().transpose().cast<double>();
                             break;
                         }
                     }
