@@ -54,7 +54,7 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainTreeModel::BrainTreeModel(QObject * parent)
+BrainTreeModel::BrainTreeModel(QObject* parent)
 : QStandardItemModel(parent)
 {
     m_pRootItem = this->invisibleRootItem();
@@ -72,7 +72,7 @@ BrainTreeModel::~BrainTreeModel()
 
 //*************************************************************************************************************
 
-QVariant BrainTreeModel::data(const QModelIndex & index, int role) const
+QVariant BrainTreeModel::data(const QModelIndex& index, int role) const
 {
     return QStandardItemModel::data(index, role);
 }
@@ -80,7 +80,7 @@ QVariant BrainTreeModel::data(const QModelIndex & index, int role) const
 
 //*************************************************************************************************************
 
-bool BrainTreeModel::addData(const QString & text, const SurfaceSet & tSurfaceSet, const AnnotationSet & tAnnotationSet, Qt3DCore::QEntity * p3DEntityParent)
+bool BrainTreeModel::addData(const QString& text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
 {
     QList<QStandardItem*> itemList = this->findItems(text);
     bool state = false;
@@ -100,7 +100,7 @@ bool BrainTreeModel::addData(const QString & text, const SurfaceSet & tSurfaceSe
 
 //*************************************************************************************************************
 
-bool BrainTreeModel::addData(const QString & text, const Surface & tSurface, const Annotation & tAnnotation, Qt3DCore::QEntity * p3DEntityParent)
+bool BrainTreeModel::addData(const QString& text, const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
 {
     QList<QStandardItem*> itemList = this->findItems(text);
     bool state = false;
@@ -120,7 +120,7 @@ bool BrainTreeModel::addData(const QString & text, const Surface & tSurface, con
 
 //*************************************************************************************************************
 
-QList<BrainRTDataTreeItem*> BrainTreeModel::addData(const QString & text, const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution)
+QList<BrainRTDataTreeItem*> BrainTreeModel::addData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
     QList<BrainRTDataTreeItem*> returnList;
     QList<QStandardItem*> itemList = this->findItems(text);

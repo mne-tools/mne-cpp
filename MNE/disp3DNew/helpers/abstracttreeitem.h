@@ -96,10 +96,11 @@ public :
 
     int type() const;
 
+    QList<QStandardItem*> findChildren(const int& type);
+    QList<QStandardItem*> findChildren(const QString& text);
+
     AbstractTreeItem &operator<<(AbstractTreeItem* newItem);
     AbstractTreeItem &operator<<(AbstractTreeItem& newItem);
-
-    enum ItemType {UserType, UnknownItem};
 
 protected :
     void createToolTip();

@@ -54,7 +54,7 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainTreeItem::BrainTreeItem( const int & iType, const QString & text)
+BrainTreeItem::BrainTreeItem(const int& iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
 }
@@ -77,26 +77,26 @@ QVariant BrainTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void  BrainTreeItem::setData(const QVariant & value, int role)
+void  BrainTreeItem::setData(const QVariant& value, int role)
 {
     QStandardItem::setData(value, role);
 
     //TODO: Exchange this with signal slot system (Problem with Q_Object and inherited QStandardItem)
     switch(role) {
-    case BrainTreeItemRoles::SurfaceColorSulci: {
-        emit updateSurfaceVertColors();
-        break;
-    }
+        case BrainTreeItemRoles::SurfaceColorSulci: {
+            emit updateSurfaceVertColors();
+            break;
+        }
 
-    case BrainTreeItemRoles::SurfaceColorGyri: {
-        emit updateSurfaceVertColors();
-        break;
-    }
+        case BrainTreeItemRoles::SurfaceColorGyri: {
+            emit updateSurfaceVertColors();
+            break;
+        }
 
-    case BrainTreeItemRoles::SurfaceColorInfoOrigin: {
-        emit updateSurfaceVertColors();
-        break;
-    }
+        case BrainTreeItemRoles::SurfaceColorInfoOrigin: {
+            emit updateSurfaceVertColors();
+            break;
+        }
     }
 }
 

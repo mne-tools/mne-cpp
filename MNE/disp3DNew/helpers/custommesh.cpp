@@ -68,7 +68,7 @@ CustomMesh::CustomMesh()
 
 //*************************************************************************************************************
 
-CustomMesh::CustomMesh(const MatrixX3f &tMatVert, const MatrixX3f tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset, const Matrix<float, Dynamic, 3, RowMajor> &tMatColors)
+CustomMesh::CustomMesh(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset, const Matrix<float, Dynamic, 3, RowMajor>& tMatColors)
 : Qt3DRender::QGeometryRenderer()
 , m_iNumVert(tMatVert.rows())
 {
@@ -85,7 +85,7 @@ CustomMesh::~CustomMesh()
 
 //*************************************************************************************************************
 
-bool CustomMesh::setVertColor(const Matrix<float, Dynamic, 3, RowMajor> &tMatColors)
+bool CustomMesh::setVertColor(const Matrix<float, Dynamic, 3, RowMajor>& tMatColors)
 {
     //Check dimensions
     if(tMatColors.rows() != m_iNumVert) {
@@ -113,7 +113,7 @@ bool CustomMesh::setVertColor(const Matrix<float, Dynamic, 3, RowMajor> &tMatCol
 
 //*************************************************************************************************************
 
-bool CustomMesh::setMeshData(const MatrixX3f & tMatVert, const MatrixX3f & tMatNorm, const MatrixX3i & tMatTris, const Vector3f & tVecOffset, const Matrix<float, Dynamic, 3, RowMajor> &tMatColors)
+bool CustomMesh::setMeshData(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset, const Matrix<float, Dynamic, 3, RowMajor>& tMatColors)
 {
     m_iNumVert = tMatVert.rows();
 
@@ -122,7 +122,7 @@ bool CustomMesh::setMeshData(const MatrixX3f & tMatVert, const MatrixX3f & tMatN
 
 //*************************************************************************************************************
 
-bool CustomMesh::createCustomMesh(const MatrixX3f &tMatVert, const MatrixX3f & tMatNorm, const MatrixX3i & tMatTris, const Vector3f & tVecOffset, const Matrix<float, Dynamic, 3, RowMajor> &tMatColors)
+bool CustomMesh::createCustomMesh(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset, const Matrix<float, Dynamic, 3, RowMajor>& tMatColors)
 {
     Qt3DRender::QGeometry* customGeometry = new Qt3DRender::QGeometry(this);
 

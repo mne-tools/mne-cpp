@@ -79,17 +79,25 @@ QVariant BrainRTDataTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void  BrainRTDataTreeItem::setData(const QVariant & value, int role)
+void  BrainRTDataTreeItem::setData(const QVariant& value, int role)
 {
     QStandardItem::setData(value, role);
+
+    switch(role) {
+    case BrainRTDataTreeItemRoles::RTData:
+        if(m_pItemRTDataStreamStatus->checkState() == Qt::Checked) {
+            emit rtDataChanged();
+        }
+    }
 }
 
 
 //*************************************************************************************************************
 
-bool BrainRTDataTreeItem::addData(const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution, const QString & hemi)
+bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QString & hemi)
 {   
     m_sHemi = hemi;
+    int iHemi = m_sHemi == "lh" ? 0 : 1;
 
     // Add data which is held by this BrainRTDataTreeItem
     QVariant data;
@@ -104,14 +112,14 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate & tSourceEstimate, con
     this->setData(data, BrainRTDataTreeItemRoles::RTTimes);
 
     //Add surface meta information as item children
-    BrainTreeItem *itemRTDataStream = new BrainTreeItem(BrainTreeModelItemTypes::RTDataStreamStatus, "Stream data on/off");
-    *this<<itemRTDataStream;
-    itemRTDataStream->setCheckable(true);
-    itemRTDataStream->setCheckState(Qt::Unchecked);
+    m_pItemRTDataStreamStatus = new BrainTreeItem(BrainTreeModelItemTypes::RTDataStreamStatus, "Stream data on/off");
+    *this<<m_pItemRTDataStreamStatus;
+    m_pItemRTDataStreamStatus->setCheckable(true);
+    m_pItemRTDataStreamStatus->setCheckState(Qt::Unchecked);
     data.setValue(false);
-    itemRTDataStream->setData(data, BrainTreeItemRoles::RTDataStreamStatus);
+    m_pItemRTDataStreamStatus->setData(data, BrainTreeItemRoles::RTDataStreamStatus);
 
-    QString sIsClustered = tForwardSolution.src[0].isClustered() ? "Clustered source space" : "Full source space";
+    QString sIsClustered = tForwardSolution.src[iHemi].isClustered() ? "Clustered source space" : "Full source space";
     BrainTreeItem *itemSourceSpaceType = new BrainTreeItem(BrainTreeModelItemTypes::RTDataSourceSpaceType, sIsClustered);
     *this<<itemSourceSpaceType;
     data.setValue(sIsClustered);
@@ -130,7 +138,7 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate & tSourceEstimate, con
 
 //*************************************************************************************************************
 
-bool BrainRTDataTreeItem::updateData(const MNESourceEstimate & tSourceEstimate)
+bool BrainRTDataTreeItem::updateData(const MNESourceEstimate& tSourceEstimate)
 {
     if(!m_bInit) {
         qDebug()<<"BrainRTDataTreeItem::updateData - Item was not initialized/filled with data yet!";

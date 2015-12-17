@@ -167,7 +167,7 @@ void View3D::initTransformations()
 
 //*************************************************************************************************************
 
-bool View3D::addBrainData(const QString & text, const SurfaceSet & tSurfaceSet, const AnnotationSet & tAnnotationSet)
+bool View3D::addBrainData(const QString& text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
 {
     return m_pBrain->addData(text, tSurfaceSet, tAnnotationSet);
 }
@@ -175,7 +175,7 @@ bool View3D::addBrainData(const QString & text, const SurfaceSet & tSurfaceSet, 
 
 //*************************************************************************************************************
 
-bool View3D::addBrainData(const QString & text, const Surface & tSurface, const Annotation & tAnnotation)
+bool View3D::addBrainData(const QString& text, const Surface& tSurface, const Annotation& tAnnotation)
 {
     return m_pBrain->addData(text, tSurface, tAnnotation);
 }
@@ -183,7 +183,7 @@ bool View3D::addBrainData(const QString & text, const Surface & tSurface, const 
 
 //*************************************************************************************************************
 
-QList<BrainRTDataTreeItem*> View3D::addSourceEstimate(const QString & text, const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution)
+QList<BrainRTDataTreeItem*> View3D::addSourceEstimate(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
     return m_pBrain->addData(text, tSourceEstimate, tForwardSolution);
 }
@@ -199,7 +199,7 @@ BrainTreeModel* View3D::getBrainTreeModel()
 
 //*************************************************************************************************************
 
-void View3D::changeSceneColor(const QColor & colSceneColor)
+void View3D::changeSceneColor(const QColor& colSceneColor)
 {
     m_pForwardRenderer->setClearColor(colSceneColor);
 }
@@ -266,7 +266,7 @@ void View3D::wheelEvent(QWheelEvent* e)
 
 //*************************************************************************************************************
 
-void View3D::mouseReleaseEvent(QMouseEvent *e)
+void View3D::mouseReleaseEvent(QMouseEvent* e)
 {
     m_bModelRotationMode = false;
     m_bCameraRotationMode = false;
@@ -320,7 +320,7 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
 
 //*************************************************************************************************************
 
-void View3D::createCoordSystem(Qt3DCore::QEntity *parent)
+void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
 {
     // Y - red
     Qt3DRender::QCylinderMesh *YAxis = new Qt3DRender::QCylinderMesh();

@@ -55,7 +55,7 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Control3DWidget::Control3DWidget(QWidget *parent)
+Control3DWidget::Control3DWidget(QWidget* parent)
 : RoundedEdgesWidget(parent)
 , ui(new Ui::Control3DWidget)
 {

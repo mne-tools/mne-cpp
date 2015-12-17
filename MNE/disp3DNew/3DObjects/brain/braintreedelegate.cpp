@@ -56,7 +56,7 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainTreeDelegate::BrainTreeDelegate(QObject *parent)
+BrainTreeDelegate::BrainTreeDelegate(QObject* parent)
 : QItemDelegate(parent)
 {
 }
@@ -64,7 +64,7 @@ BrainTreeDelegate::BrainTreeDelegate(QObject *parent)
 
 //*************************************************************************************************************
 
-QWidget *BrainTreeDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option , const QModelIndex &index) const
+QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option , const QModelIndex& index) const
 {
     const BrainTreeModel* pBrainTreeModel = static_cast<const BrainTreeModel*>(index.model());
     const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pBrainTreeModel->itemFromIndex(index));
@@ -97,7 +97,7 @@ QWidget *BrainTreeDelegate::createEditor(QWidget *parent, const QStyleOptionView
 
 //*************************************************************************************************************
 
-void BrainTreeDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+void BrainTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
 {
     const BrainTreeModel* pBrainTreeModel = static_cast<const BrainTreeModel*>(index.model());
     const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pBrainTreeModel->itemFromIndex(index));
@@ -131,7 +131,7 @@ void BrainTreeDelegate::setEditorData(QWidget *editor, const QModelIndex &index)
 
 //*************************************************************************************************************
 
-void BrainTreeDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+void BrainTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
 {
     const BrainTreeModel* pBrainTreeModel = static_cast<const BrainTreeModel*>(index.model());
     const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pBrainTreeModel->itemFromIndex(index));
@@ -177,7 +177,7 @@ void BrainTreeDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 
 //*************************************************************************************************************
 
-void BrainTreeDelegate::updateEditorGeometry(QWidget *editor,
+void BrainTreeDelegate::updateEditorGeometry(QWidget* editor,
     const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
 {
     editor->setGeometry(option.rect);

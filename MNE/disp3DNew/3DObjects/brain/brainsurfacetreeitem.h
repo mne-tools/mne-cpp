@@ -95,8 +95,6 @@ using namespace Eigen;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class BrainTreeItem;
-
 
 //=============================================================================================================
 /**
@@ -116,7 +114,7 @@ public:
     /**
     * Default constructor.
     */
-    explicit BrainSurfaceTreeItem(const int & iType = BrainTreeModelItemTypes::UnknownItem, const QString & text = "Surface");
+    explicit BrainSurfaceTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "Surface");
 
     //=========================================================================================================
     /**
@@ -129,7 +127,7 @@ public:
     * AbstractTreeItem functions
     */
     QVariant data(int role = Qt::UserRole + 1) const;
-    void  setData(const QVariant & value, int role = Qt::UserRole + 1);
+    void  setData(const QVariant& value, int role = Qt::UserRole + 1);
 
     //=========================================================================================================
     /**
@@ -139,12 +137,12 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const Surface & tSurface, Qt3DCore::QEntity * parent);
+    bool addData(const Surface& tSurface, Qt3DCore::QEntity* parent);
 
     void updateVertColor();
 
 private:
-    MatrixX3f createCurvatureVertColor(const VectorXf & curvature, const QColor & colSulci = QColor(50,50,50), const QColor & colGyri = QColor(125,125,125));
+    MatrixX3f createCurvatureVertColor(const VectorXf& curvature, const QColor& colSulci = QColor(50,50,50), const QColor& colGyri = QColor(125,125,125));
 
     Renderable3DEntity*     m_pRenderable3DEntity;
 
