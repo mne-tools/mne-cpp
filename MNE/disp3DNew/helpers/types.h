@@ -149,7 +149,10 @@ namespace BrainRTDataTreeItemRoles
 {
     enum ItemRole{RTData = Qt::UserRole + 500,
                     RTVertices = Qt::UserRole + 501,
-                    RTTimes = Qt::UserRole + 502};
+                    RTTimes = Qt::UserRole + 502,
+                    RTHemi = Qt::UserRole + 503,
+                    RTStartIdx = Qt::UserRole + 504,
+                    RTEndIdx = Qt::UserRole + 505};
 }
 
 } //NAMESPACE DISP3DNEWLIB

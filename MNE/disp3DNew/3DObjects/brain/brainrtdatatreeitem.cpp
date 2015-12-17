@@ -57,7 +57,6 @@ using namespace DISP3DNEWLIB;
 BrainRTDataTreeItem::BrainRTDataTreeItem(const int &iType, const QString &text)
 : AbstractTreeItem(iType, text)
 , m_bInit(false)
-, m_sHemi("Unknown")
 , m_pItemRTDataStreamStatus(new BrainTreeItem())
 , m_pStcDataWorker(new StcDataWorker(this))
 {
@@ -93,8 +92,23 @@ void  BrainRTDataTreeItem::setData(const QVariant& value, int role)
 
 bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QString& hemi)
 {   
-    m_sHemi = hemi;
-    int iHemi = m_sHemi == "lh" ? 0 : 1;
+    int iHemi = -1;
+    int iStartIdx = 0;
+    int iEndIdx = 0;
+
+    if(hemi == "Left") {
+        iHemi = 0;
+        iStartIdx = 0;
+        iEndIdx = tForwardSolution.src[iHemi].rr.rows()-1;
+    } else if(hemi == "Right") {
+        iHemi = 1;
+        iStartIdx = tForwardSolution.src[0].rr.rows();
+        iEndIdx = tForwardSolution.src[0].rr.rows()+tForwardSolution.src[1].rr.rows()-1;
+    }
+
+    this->setData(iHemi, BrainRTDataTreeItemRoles::RTHemi);
+    this->setData(iStartIdx, BrainRTDataTreeItemRoles::RTStartIdx);
+    this->setData(iEndIdx, BrainRTDataTreeItemRoles::RTEndIdx);
 
     // Add data which is held by this BrainRTDataTreeItem
     QVariant data;
@@ -176,7 +190,13 @@ void BrainRTDataTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 
 void BrainRTDataTreeItem::onStcSample(const VectorXd& sample)
 {
-    qDebug()<<"data received: "<<sample.rows();
-    emit rtDataChanged(sample, this->data(BrainRTDataTreeItemRoles::RTVertices).value<VectorXi>());
+    int iStartIdx = this->data(BrainRTDataTreeItemRoles::RTStartIdx).toInt();
+    int iEndIdx = this->data(BrainRTDataTreeItemRoles::RTEndIdx).toInt();
+
+    qDebug()<<"BrainRTDataTreeItem::onStcSample - sample.rows(): "<<sample.rows();
+    qDebug()<<"BrainRTDataTreeItem::onStcSample - iStartIdx"<<iStartIdx;
+    qDebug()<<"BrainRTDataTreeItem::onStcSample - iEndIdx"<<iEndIdx;
+
+    emit rtDataChanged(sample.segment(iStartIdx, iEndIdx), this->data(BrainRTDataTreeItemRoles::RTVertices).value<VectorXi>().segment(iStartIdx, iEndIdx));
 }
 
