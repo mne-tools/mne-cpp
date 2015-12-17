@@ -57,7 +57,6 @@ using namespace DISP3DNEWLIB;
 BrainSurfaceSetTreeItem::BrainSurfaceSetTreeItem(const int& iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
-
 }
 
 
@@ -73,11 +72,11 @@ BrainSurfaceSetTreeItem::~BrainSurfaceSetTreeItem()
 QVariant BrainSurfaceSetTreeItem::data(int role) const
 {
     switch(role) {
-        case BrainTreeModelRoles::GetSurfSetName:
+        case BrainSurfaceSetTreeItemRoles::SurfaceSetName:
             return QVariant();
     }
 
-    return QStandardItem::data(role);
+    return AbstractTreeItem::data(role);
 }
 
 
@@ -85,21 +84,53 @@ QVariant BrainSurfaceSetTreeItem::data(int role) const
 
 void  BrainSurfaceSetTreeItem::setData(const QVariant& value, int role)
 {
-    QStandardItem::setData(value, role);
+    AbstractTreeItem::setData(value, role);
 }
 
 
 //*************************************************************************************************************
 
-BrainSurfaceSetTreeItem& BrainSurfaceSetTreeItem::operator<<(const SurfaceSet& tSurfaceSet)
+bool BrainSurfaceSetTreeItem::addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
 {
-    return *this;
+    //Generate child items based on surface set input parameters
+    bool state = false;
+
+    for(int i = 0; i < tSurfaceSet.size(); i++) {
+        BrainHemisphereTreeItem* pHemisphereItem = new BrainHemisphereTreeItem(BrainTreeModelItemTypes::HemisphereItem);
+
+        if(i < tAnnotationSet.size()) {
+            if(tAnnotationSet[i].hemi() == tSurfaceSet[i].hemi()) {
+                state = pHemisphereItem->addData(tSurfaceSet[i], tAnnotationSet[i], p3DEntityParent);
+            } else {
+                state = pHemisphereItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent);
+            }
+        } else {
+            state = pHemisphereItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent);
+        }
+
+        *this<<pHemisphereItem; //same as this->appendRow(pSurfaceItem)
+    }
+
+    return state;
 }
 
 
 //*************************************************************************************************************
 
-BrainSurfaceSetTreeItem& BrainSurfaceSetTreeItem::operator<<(const AnnotationSet& tAnnotationSet)
+bool BrainSurfaceSetTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
 {
-    return *this;
+    //Generate child items based on surface set input parameters
+    bool state = false;
+
+    BrainHemisphereTreeItem* pHemisphereItem = new BrainHemisphereTreeItem(BrainTreeModelItemTypes::HemisphereItem);
+
+    if(tAnnotation.hemi() == tSurface.hemi()) {
+        state = pHemisphereItem->addData(tSurface, tAnnotation, p3DEntityParent);
+    } else {
+        state = pHemisphereItem->addData(tSurface, Annotation(), p3DEntityParent);
+    }
+
+    *this<<pHemisphereItem; //same as this->appendRow(pSurfaceItem)
+
+    return state;
 }

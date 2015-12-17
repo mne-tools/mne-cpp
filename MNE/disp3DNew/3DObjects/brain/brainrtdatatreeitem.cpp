@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brain.cpp
+* @file     brainrtdata.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Brain class definition.
+* @brief    BrainRTDataTreeItem class definition.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "brain.h"
+#include "BrainRTDataTreeItem.h"
 
 
 //*************************************************************************************************************
@@ -54,48 +54,118 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Brain::Brain(Qt3DCore::QEntity* parent)
-: Qt3DCore::QEntity(parent)
-, m_pBrainTreeModel(new BrainTreeModel(this))
+BrainRTDataTreeItem::BrainRTDataTreeItem(const int &iType, const QString &text)
+: AbstractTreeItem(iType, text)
+, m_bInit(false)
+, m_sHemi("Unknown")
+, m_pItemRTDataStreamStatus(new BrainTreeItem())
 {
 }
 
 
 //*************************************************************************************************************
 
-Brain::~Brain()
+BrainRTDataTreeItem::~BrainRTDataTreeItem()
 {
 }
 
 
 //*************************************************************************************************************
 
-bool Brain::addData(const QString& text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
+QVariant BrainRTDataTreeItem::data(int role) const
 {
-    return m_pBrainTreeModel->addData(text, tSurfaceSet, tAnnotationSet, this);
+    return AbstractTreeItem::data(role);
 }
 
 
 //*************************************************************************************************************
 
-bool Brain::addData(const QString& text, const Surface& tSurface, const Annotation &tAnnotation)
+void  BrainRTDataTreeItem::setData(const QVariant& value, int role)
 {
-    return m_pBrainTreeModel->addData(text, tSurface, tAnnotation, this);
+    AbstractTreeItem::setData(value, role);
+
+    switch(role) {
+    case BrainRTDataTreeItemRoles::RTData:
+        if(m_pItemRTDataStreamStatus->checkState() == Qt::Checked) {
+            emit rtDataChanged();
+        }
+    }
 }
 
 
 //*************************************************************************************************************
 
-QList<BrainRTDataTreeItem*> Brain::addData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
-{
-    return m_pBrainTreeModel->addData(text, tSourceEstimate, tForwardSolution);
+bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QString& hemi)
+{   
+    m_sHemi = hemi;
+    int iHemi = m_sHemi == "lh" ? 0 : 1;
+
+    // Add data which is held by this BrainRTDataTreeItem
+    QVariant data;
+
+    data.setValue(tSourceEstimate.data);
+    this->setData(data, BrainRTDataTreeItemRoles::RTData);
+
+    data.setValue(tSourceEstimate.vertices);
+    this->setData(data, BrainRTDataTreeItemRoles::RTVertices);
+
+    data.setValue(tSourceEstimate.times);
+    this->setData(data, BrainRTDataTreeItemRoles::RTTimes);
+
+    //Add surface meta information as item children
+    m_pItemRTDataStreamStatus = new BrainTreeItem(BrainTreeModelItemTypes::RTDataStreamStatus, "Stream data on/off");
+    connect(m_pItemRTDataStreamStatus, &BrainTreeItem::checkStateChanged,
+            this, &BrainRTDataTreeItem::onCheckStateChanged);
+    *this<<m_pItemRTDataStreamStatus;
+    m_pItemRTDataStreamStatus->setCheckable(true);
+    m_pItemRTDataStreamStatus->setCheckState(Qt::Unchecked);
+    data.setValue(false);
+    m_pItemRTDataStreamStatus->setData(data, BrainTreeItemRoles::RTDataStreamStatus);
+
+    QString sIsClustered = tForwardSolution.src[iHemi].isClustered() ? "Clustered source space" : "Full source space";
+    BrainTreeItem *itemSourceSpaceType = new BrainTreeItem(BrainTreeModelItemTypes::RTDataSourceSpaceType, sIsClustered);
+    *this<<itemSourceSpaceType;
+    data.setValue(sIsClustered);
+    itemSourceSpaceType->setData(data, BrainTreeItemRoles::RTDataSourceSpaceType);
+
+    BrainTreeItem *itemColormapType = new BrainTreeItem(BrainTreeModelItemTypes::RTDataColormapType, "Hot Negative 2");
+    *this<<itemColormapType;
+    data.setValue(QString("Hot Negative 2"));
+    itemColormapType->setData(data, BrainTreeItemRoles::RTDataColormapType);
+
+    m_bInit = true;
+
+    return true;
 }
 
 
 //*************************************************************************************************************
 
-BrainTreeModel* Brain::getBrainTreeModel()
+bool BrainRTDataTreeItem::updateData(const MNESourceEstimate& tSourceEstimate)
 {
-    return m_pBrainTreeModel;
+    if(!m_bInit) {
+        qDebug()<<"BrainRTDataTreeItem::updateData - Item was not initialized/filled with data yet!";
+        return false;
+    }
+
+    QVariant data;
+    data.setValue(tSourceEstimate.data);
+    this->setData(data, BrainRTDataTreeItemRoles::RTData);
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+void BrainRTDataTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+{
+    if(checkState == Qt::Checked) {
+        //TODO: Start stc worker
+        qDebug()<<"Start stc worker";
+    } else if(checkState == Qt::Unchecked) {
+        //TODO: Stop stc worker
+        qDebug()<<"Stop stc worker";
+    }
 }
 

@@ -167,23 +167,25 @@ void View3D::initTransformations()
 
 //*************************************************************************************************************
 
-bool View3D::addFsBrainData(const SurfaceSet &tSurfaceSet, const AnnotationSet &tAnnotationSet)
+bool View3D::addBrainData(const QString& text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
 {
-    bool state = m_pBrain->addFsBrainData(tSurfaceSet, tAnnotationSet);
+    return m_pBrain->addData(text, tSurfaceSet, tAnnotationSet);
+}
 
-    qDebug()<<"View3D::addFsBrainData";
-    return state;
 
-//    //Init rotation
-//    QList<BrainObject::SPtr> lBrainObjectList = m_pBrain->getBrainObjectList();
+//*************************************************************************************************************
 
-//    for(int i = 0; i<lBrainObjectList.size(); i++) {
-//        lBrainObjectList.at(i)->setRotationX(m_vecModelRotation.x());
-//        lBrainObjectList.at(i)->setRotationY(m_vecModelRotation.y());
-//        lBrainObjectList.at(i)->setScale(m_fModelScale);
-//    }
+bool View3D::addBrainData(const QString& text, const Surface& tSurface, const Annotation& tAnnotation)
+{
+    return m_pBrain->addData(text, tSurface, tAnnotation);
+}
 
-//    return state;
+
+//*************************************************************************************************************
+
+QList<BrainRTDataTreeItem*> View3D::addSourceEstimate(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
+{
+    return m_pBrain->addData(text, tSourceEstimate, tForwardSolution);
 }
 
 
@@ -192,6 +194,14 @@ bool View3D::addFsBrainData(const SurfaceSet &tSurfaceSet, const AnnotationSet &
 BrainTreeModel* View3D::getBrainTreeModel()
 {
     return m_pBrain->getBrainTreeModel();
+}
+
+
+//*************************************************************************************************************
+
+void View3D::changeSceneColor(const QColor& colSceneColor)
+{
+    m_pForwardRenderer->setClearColor(colSceneColor);
 }
 
 
@@ -256,7 +266,7 @@ void View3D::wheelEvent(QWheelEvent* e)
 
 //*************************************************************************************************************
 
-void View3D::mouseReleaseEvent(QMouseEvent *e)
+void View3D::mouseReleaseEvent(QMouseEvent* e)
 {
     m_bModelRotationMode = false;
     m_bCameraRotationMode = false;
@@ -276,14 +286,6 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
     if(m_bModelRotationMode) {
         m_vecModelRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * -0.1f) + m_vecModelRotationOld.x());
         m_vecModelRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.1f) + m_vecModelRotationOld.y());
-
-        // Rotate brain surfaces
-//        QList<BrainObject::SPtr> lBrainObjectList = m_pBrain->getBrainObjectList();
-
-//        for(int i = 0; i<lBrainObjectList.size(); i++) {
-//            lBrainObjectList.at(i)->setRotationX(m_vecModelRotation.x());
-//            lBrainObjectList.at(i)->setRotationY(m_vecModelRotation.y());
-//        }
     }
 
     if(m_bCameraRotationMode) {
@@ -318,7 +320,7 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
 
 //*************************************************************************************************************
 
-void View3D::createCoordSystem(Qt3DCore::QEntity *parent)
+void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
 {
     // Y - red
     Qt3DRender::QCylinderMesh *YAxis = new Qt3DRender::QCylinderMesh();

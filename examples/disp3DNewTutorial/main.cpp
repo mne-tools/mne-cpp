@@ -103,329 +103,117 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-//    //*************************** Create source estimate *****************************************//
-//    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-//    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-//    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-//    QString t_sEventName = "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
+    //########################################################################################
+    //
+    // Source Estimate START
+    //
+    //########################################################################################
 
-//    qint32 event = 1;
+    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
 
-//    float tmin = -0.2f;
-//    float tmax = 0.4f;
+    QString t_sFileClusteredInverse("");//QFile t_fileClusteredInverse("./clusteredInverse-inv.fif");
 
-//    bool keep_comp = false;
-//    fiff_int_t dest_comp = 0;
-//    bool pick_all  = true;
+    double snr = 1.0;
+    double lambda2 = 1.0 / pow(snr, 2);
+    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
-//    qint32 k, p;
+    // Load data
+    fiff_int_t setno = 1;
+    QPair<QVariant, QVariant> baseline(QVariant(), 0);
+    FiffEvoked evoked(t_fileEvoked, setno, baseline);
+    if(evoked.isEmpty())
+        return 1;
 
-//    //
-//    //   Setup for reading the raw data
-//    //
-//    FiffRawData raw(t_fileRaw);
+    std::cout << "Evoked description: " << evoked.comment.toLatin1().constData() << std::endl;
 
-//    RowVectorXi picks;
-//    if (pick_all)
-//    {
-//        //
-//        // Pick all
-//        //
-//        picks.resize(raw.info.nchan);
+    MNEForwardSolution t_Fwd(t_fileFwd);
+    if(t_Fwd.isEmpty())
+        return 1;
 
-//        for(k = 0; k < raw.info.nchan; ++k)
-//            picks(k) = k;
-//        //
-//    }
-//    else
-//    {
-//        QStringList include;
-//        include << "STI 014";
-//        bool want_meg   = true;
-//        bool want_eeg   = false;
-//        bool want_stim  = false;
+    FiffCov noise_cov(t_fileCov);
 
-////        picks = Fiff::pick_types(raw.info, want_meg, want_eeg, want_stim, include, raw.info.bads);
-//        picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);//prefer member function
-//    }
+    // regularize noise covariance
+    noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
 
-//    QStringList ch_names;
-//    for(k = 0; k < picks.cols(); ++k)
-//        ch_names << raw.info.ch_names[picks(0,k)];
+    //
+    // Cluster forward solution;
+    //
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 40);
 
-//    //
-//    //   Set up projection
-//    //
-//    if (raw.info.projs.size() == 0)
-//        printf("No projector specified for these data\n");
-//    else
-//    {
-//        //
-//        //   Activate the projection items
-//        //
-//        for (k = 0; k < raw.info.projs.size(); ++k)
-//            raw.info.projs[k].active = true;
+    //
+    // make an inverse operators
+    //
+    FiffInfo info = evoked.info;
 
-//        printf("%d projection items activated\n",raw.info.projs.size());
-//        //
-//        //   Create the projector
-//        //
-////        fiff_int_t nproj = MNE::make_projector_info(raw.info, raw.proj); Using the member function instead
-//        fiff_int_t nproj = raw.info.make_projector(raw.proj);
+    MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
 
-//        if (nproj == 0)
-//        {
-//            printf("The projection vectors do not apply to these channels\n");
-//        }
-//        else
-//        {
-//            printf("Created an SSP operator (subspace dimension = %d)\n",nproj);
-//        }
-//    }
+    if(!t_sFileClusteredInverse.isEmpty())
+    {
+        QFile t_fileClusteredInverse(t_sFileClusteredInverse);
+        inverse_operator.write(t_fileClusteredInverse);
+    }
 
-//    //
-//    //   Set up the CTF compensator
-//    //
-////    qint32 current_comp = MNE::get_current_comp(raw.info);
-//    qint32 current_comp = raw.info.get_current_comp();
-//    if (current_comp > 0)
-//        printf("Current compensation grade : %d\n",current_comp);
+    //
+    // Compute inverse solution
+    //
+    MinimumNorm minimumNorm(inverse_operator, lambda2, method);
+    MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
 
-//    if (keep_comp)
-//        dest_comp = current_comp;
+    if(sourceEstimate.isEmpty())
+        return 1;
 
-//    if (current_comp != dest_comp)
-//    {
-//        qDebug() << "This part needs to be debugged";
-//        if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp))
-//        {
-////            raw.info.chs = MNE::set_current_comp(raw.info.chs,dest_comp);
-//            raw.info.set_current_comp(dest_comp);
-//            printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
-//        }
-//        else
-//        {
-//            printf("Could not make the compensator\n");
-//            return 0;
-//        }
-//    }
+//    // View activation time-series
+//    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
+//    std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
+//    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
+//    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
+//    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
 
-//    //
-//    //  Read the events
-//    //
-//    QFile t_EventFile;
-//    MatrixXi events;
-//    if (t_sEventName.size() == 0)
-//    {
-//        p = t_fileRaw.fileName().indexOf(".fif");
-//        if (p > 0)
-//        {
-//            t_sEventName = t_fileRaw.fileName().replace(p, 4, "-eve.fif");
-//        }
-//        else
-//        {
-//            printf("Raw file name does not end properly\n");
-//            return 0;
-//        }
-////        events = mne_read_events(t_sEventName);
+    //########################################################################################
+    //
+    //Source Estimate END
+    //
+    //########################################################################################
 
-//        t_EventFile.setFileName(t_sEventName);
-//        MNE::read_events(t_EventFile, events);
-//        printf("Events read from %s\n",t_sEventName.toUtf8().constData());
-//    }
-//    else
-//    {
-//        //
-//        //   Binary file
-//        //
-//        p = t_fileRaw.fileName().indexOf(".fif");
-//        if (p > 0)
-//        {
-//            t_EventFile.setFileName(t_sEventName);
-//            if(!MNE::read_events(t_EventFile, events))
-//            {
-//                printf("Error while read events.\n");
-//                return 0;
-//            }
-//            printf("Binary event file %s read\n",t_sEventName.toUtf8().constData());
-//        }
-//        else
-//        {
-//            //
-//            //   Text file
-//            //
-//            printf("Text file %s is not supported jet.\n",t_sEventName.toUtf8().constData());
-//        }
-//    }
+    //########################################################################################
+    //
+    // Create the test view START
+    //
+    //########################################################################################
 
-//    //
-//    //    Select the desired events
-//    //
-//    qint32 count = 0;
-//    MatrixXi selected = MatrixXi::Zero(1, events.rows());
-//    for (p = 0; p < events.rows(); ++p)
-//    {
-//        if (events(p,1) == 0 && events(p,2) == event)
-//        {
-//            selected(0,count) = p;
-//            ++count;
-//        }
-//    }
-//    selected.conservativeResize(1, count);
-//    if (count > 0)
-//        printf("%d matching events found\n",count);
-//    else
-//    {
-//        printf("No desired events found.\n");
-//        return 0;
-//    }
-
-
-//    fiff_int_t event_samp, from, to;
-//    MatrixXd timesDummy;
-
-//    MNEEpochDataList data;
-
-//    MNEEpochData* epoch = NULL;
-
-//    MatrixXd times;
-
-//    for (p = 0; p < count; ++p)
-//    {
-//        //
-//        //       Read a data segment
-//        //
-//        event_samp = events(selected(p),0);
-//        from = event_samp + tmin*raw.info.sfreq;
-//        to   = event_samp + floor(tmax*raw.info.sfreq + 0.5);
-
-//        epoch = new MNEEpochData();
-
-//        if(raw.read_raw_segment(epoch->epoch, timesDummy, from, to, picks))
-//        {
-//            if (p == 0)
-//            {
-//                times.resize(1, to-from+1);
-//                for (qint32 i = 0; i < times.cols(); ++i)
-//                    times(0, i) = ((float)(from-event_samp+i)) / raw.info.sfreq;
-//            }
-
-//            epoch->event = event;
-//            epoch->tmin = ((float)(from)-(float)(raw.first_samp))/raw.info.sfreq;
-//            epoch->tmax = ((float)(to)-(float)(raw.first_samp))/raw.info.sfreq;
-
-//            data.append(MNEEpochData::SPtr(epoch));//List takes ownwership of the pointer - no delete need
-//        }
-//        else
-//        {
-//            printf("Can't read the event data segments");
-//            return 0;
-//        }
-//    }
-
-//    if(data.size() > 0)
-//    {
-//        printf("Read %d epochs, %d samples each.\n",data.size(),(qint32)data[0]->epoch.cols());
-
-//        //DEBUG
-//        std::cout << data[0]->epoch.block(0,0,10,10) << std::endl;
-//        qDebug() << data[0]->epoch.rows() << " x " << data[0]->epoch.cols();
-
-//        std::cout << times.block(0,0,1,10) << std::endl;
-//        qDebug() << times.rows() << " x " << times.cols();
-//    }
-
-//    //
-//    // calculate the average
-
-//    //Option 1
-//    qint32 numAverages = 99;
-//    VectorXi vecSel(numAverages);
-//    srand (time(NULL)); // initialize random seed
-
-//    for(qint32 i = 0; i < vecSel.size(); ++i)
-//    {
-//        qint32 val = rand() % data.size();
-//        vecSel(i) = val;
-//    }
-
-//    std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
-
-//    FiffEvoked evoked = data.average(raw.info, tmin*raw.info.sfreq, floor(tmax*raw.info.sfreq + 0.5), vecSel);
-
-//    //Source estimation
-//    double snr = 1.0f;//0.1f;//1.0f;//3.0f;//0.1f;//3.0f;
-//    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
-
-//    QString t_sFileNameClusteredInv("");
-//    QString t_sFileNameStc("test_mind006_051209_auditory01.stc");
-
-//    // Parse command line parameters
-//    for(qint32 i = 0; i < argc; ++i)
-//    {
-//        if(strcmp(argv[i], "-snr") == 0 || strcmp(argv[i], "--snr") == 0)
-//        {
-//            if(i + 1 < argc)
-//                snr = atof(argv[i+1]);
-//        }
-//        else if(strcmp(argv[i], "-method") == 0 || strcmp(argv[i], "--method") == 0)
-//        {
-//            if(i + 1 < argc)
-//                method = QString::fromUtf8(argv[i+1]);
-//        }
-//        else if(strcmp(argv[i], "-inv") == 0 || strcmp(argv[i], "--inv") == 0)
-//        {
-//            if(i + 1 < argc)
-//                t_sFileNameClusteredInv = QString::fromUtf8(argv[i+1]);
-//        }
-//        else if(strcmp(argv[i], "-stc") == 0 || strcmp(argv[i], "--stc") == 0)
-//        {
-//            if(i + 1 < argc)
-//                t_sFileNameStc = QString::fromUtf8(argv[i+1]);
-//        }
-//    }
-
-//    double lambda2 = 1.0 / pow(snr, 2);
-//    qDebug() << "Start calculation with: SNR" << snr << "; Lambda" << lambda2 << "; Method" << method << "; stc:" << t_sFileNameStc;
-
-//    MNEForwardSolution t_Fwd(t_fileFwd);
-//    if(t_Fwd.isEmpty())
-//        return 1;
-
-//    FiffCov noise_cov(t_fileCov);
-
-//    // regularize noise covariance
-//    noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
-
-//    //
-//    // make an inverse operators
-//    //
-//    FiffInfo info = evoked.info;
-
-//    MNEInverseOperator inverse_operator(info, t_Fwd, noise_cov, 0.2f, 0.8f);
-
-//    //
-//    // Compute inverse solution
-//    //
-//    MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-
-//    MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
-
-//    if(sourceEstimate.isEmpty())
-//        return 1;
-//     // Create the test view
-//    std::cout<<"Creating BrainView"<<std::endl;
+    std::cout<<"Creating BrainView"<<std::endl;
 
     SurfaceSet tSurfSet ("sample", 2, "orig", "./MNE-sample-data/subjects");
     AnnotationSet tAnnotSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
+//    Surface tSurfRight ("sample", 1, "orig", "./MNE-sample-data/subjects");
+//    Annotation tAnnotRight ("sample", 1, "aparc.a2009s", "./MNE-sample-data/subjects");
+//    Surface tSurfLeft ("sample", 0, "orig", "./MNE-sample-data/subjects");
+//    Annotation tAnnotLeft ("sample", 0, "aparc.a2009s", "./MNE-sample-data/subjects");
+//    MNESourceEstimate sourceEstimate;
+//    MNEForwardSolution t_clusteredFwd;
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addFsBrainData(tSurfSet, tAnnotSet);
+//    testWindow->addBrainData("HemiLR", tSurfLeft, tAnnotLeft);
+//    testWindow->addBrainData("HemiLR", tSurfRight, tAnnotRight);
+    testWindow->addBrainData("HemiLRSet", tSurfSet, tAnnotSet);
+
+    QList<BrainRTDataTreeItem*> rtItemList = testWindow->addSourceEstimate("HemiLRSet", sourceEstimate, t_clusteredFwd);
+    //rtItemList.at(0)->updateData();
+
     testWindow->show();    
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
     control3DWidget->setView3D(testWindow);
     control3DWidget->show();
+
+    //########################################################################################
+    //
+    // Create the test view END
+    //
+    //########################################################################################
 
     return a.exec();
 }

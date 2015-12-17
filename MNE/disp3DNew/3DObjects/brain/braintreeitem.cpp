@@ -54,7 +54,7 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainTreeItem::BrainTreeItem( const int &iType, const QString & text)
+BrainTreeItem::BrainTreeItem(const int& iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
 }
@@ -71,15 +71,7 @@ BrainTreeItem::~BrainTreeItem()
 
 QVariant BrainTreeItem::data(int role) const
 {
-    switch(role) {
-        case BrainTreeModelRoles::GetSurfType:
-            return QVariant();
-
-        case BrainTreeModelRoles::GetSurfHemi:
-            return QVariant();
-    }
-
-    return QStandardItem::data(role);
+    return AbstractTreeItem::data(role);
 }
 
 
@@ -87,8 +79,23 @@ QVariant BrainTreeItem::data(int role) const
 
 void  BrainTreeItem::setData(const QVariant& value, int role)
 {
-    Q_UNUSED(role);
+    AbstractTreeItem::setData(value, role);
 
-    QStandardItem::setData(value, role);
+    switch(role) {
+        case BrainTreeItemRoles::SurfaceColorSulci: {
+            emit updateSurfaceVertColors();
+            break;
+        }
+
+        case BrainTreeItemRoles::SurfaceColorGyri: {
+            emit updateSurfaceVertColors();
+            break;
+        }
+
+        case BrainTreeItemRoles::SurfaceColorInfoOrigin: {
+            emit updateSurfaceVertColors();
+            break;
+        }
+    }
 }
 

@@ -102,8 +102,9 @@ using namespace Eigen;
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT BrainSurfaceTreeItem : public AbstractTreeItem, public Renderable3DEntity
+class DISP3DNEWSHARED_EXPORT BrainSurfaceTreeItem : public AbstractTreeItem
 {
+    Q_OBJECT;
 
 public:
     typedef QSharedPointer<BrainSurfaceTreeItem> SPtr;             /**< Shared pointer type for BrainSurfaceTreeItem class. */
@@ -113,7 +114,7 @@ public:
     /**
     * Default constructor.
     */
-    explicit BrainSurfaceTreeItem(const Surface &tSurface, const Annotation &tAnnotation, const int &iType, const QString &text = "", Qt3DCore::QEntity *entityParent = 0);
+    explicit BrainSurfaceTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "Surface");
 
     //=========================================================================================================
     /**
@@ -126,10 +127,28 @@ public:
     * AbstractTreeItem functions
     */
     QVariant data(int role = Qt::UserRole + 1) const;
-    void  setData(const QVariant & value, int role = Qt::UserRole + 1);
+    void  setData(const QVariant& value, int role = Qt::UserRole + 1);
+
+    //=========================================================================================================
+    /**
+    * Adds FreeSurfer data based on surfaces and annotation SETS to this model.
+    *
+    * @param[in] tSurface           FreeSurfer surface.
+    *
+    * @return                       Returns true if successful.
+    */
+    bool addData(const Surface& tSurface, Qt3DCore::QEntity* parent);
+
+    void updateVertColor();
 
 private:
-    bool createBrainSurfaceTreeItem(const Surface &tSurface, const Annotation &tAnnotation);
+    MatrixX3f createCurvatureVertColor(const VectorXf& curvature, const QColor& colSulci = QColor(50,50,50), const QColor& colGyri = QColor(125,125,125));
+
+    Renderable3DEntity*     m_pRenderable3DEntity;
+
+    BrainTreeItem*          m_pItemSurfColorInfoOrigin; //These are stored as member variables because we do not wat to look for them everytime we call updateVertColor(), especially not whe nwe perform rt source loc
+    BrainTreeItem*          m_pItemSurfColSulci;
+    BrainTreeItem*          m_pItemSurfColGyri;
 };
 
 } //NAMESPACE DISP3DNEWLIB

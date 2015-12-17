@@ -43,12 +43,12 @@
 
 #include "disp3dnew_global.h"
 
-#include "brainobject.h"
-
 #include "braintreemodel.h"
 
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
+
+#include <disp/helpers/colormap.h>
 
 
 //*************************************************************************************************************
@@ -108,7 +108,7 @@ public:
     *
     * @param[in] parent         The parent of this class.
     */
-    Brain(QEntity *parent = 0);
+    Brain(QEntity * parent = 0);
 
     //=========================================================================================================
     /**
@@ -124,7 +124,7 @@ public:
     * @param[in] tAnnotationSet     FreeSurfer annotation set.
     * @return                       Returns true if successful.
     */
-    bool addFsBrainData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet);
+    bool addData(const QString& text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet);
 
     //=========================================================================================================
     /**
@@ -134,21 +134,19 @@ public:
     * @param[in] pAnnotation        FreeSurfer annotation.
     * @return                       Returns true if successful.
     */
-    bool addFsBrainData(const Surface& tSurface, const Annotation& tAnnotation);
+    bool addData(const QString& text, const Surface& tSurface, const Annotation& tAnnotation);
+
+    QList<BrainRTDataTreeItem*> addData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution);
 
     //=========================================================================================================
     /**
-    * Return the stored BrainObjects
+    * Return the brain tree model.
     *
-    * @return returns a const adress to the list with the sotred brain objects
+    * @return returns a pointer to the brain tree model BrainTreeModel.
     */
-    const QList<BrainObject::SPtr>  getBrainObjectList() const;
-
-    BrainTreeModel* getBrainTreeModel();
+    BrainTreeModel* getBrainTreeModel();    
 
 protected:
-    QList<BrainObject::SPtr>        m_lBrainData;      /**< List of currently loaded BrainObjects. */
-
     BrainTreeModel*                 m_pBrainTreeModel;
 };
 

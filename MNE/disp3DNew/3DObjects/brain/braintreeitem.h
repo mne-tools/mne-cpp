@@ -43,9 +43,6 @@
 
 #include "../../disp3DNew_global.h"
 #include "../../helpers/abstracttreeitem.h"
-#include "../../helpers/types.h"
-
-#include "fs/label.h"
 
 
 //*************************************************************************************************************
@@ -94,12 +91,13 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* BrainTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
+* BrainTreeItem provides a generic brain tree item to hold meta information about the surface and annoation item.
 *
 * @brief Provides a generic brain tree item.
 */
 class DISP3DNEWSHARED_EXPORT BrainTreeItem : public AbstractTreeItem
 {
+    Q_OBJECT;
 
 public:
     typedef QSharedPointer<BrainTreeItem> SPtr;             /**< Shared pointer type for BrainTreeItem class. */
@@ -109,7 +107,7 @@ public:
     /**
     * Default constructor.
     */
-    explicit BrainTreeItem(const int &iType, const QString & text = "");
+    explicit BrainTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "");
 
     //=========================================================================================================
     /**
@@ -122,10 +120,13 @@ public:
     * AbstractTreeItem functions
     */
     QVariant data(int role = Qt::UserRole + 1) const;
-    void  setData(const QVariant& value, int role = Qt::UserRole + 1);
+    void setData(const QVariant& value, int role = Qt::UserRole + 1);
+
+signals:
+    void updateSurfaceVertColors();
 
 private:
-    int m_iType;
+
 };
 
 } //NAMESPACE DISP3DNEWLIB

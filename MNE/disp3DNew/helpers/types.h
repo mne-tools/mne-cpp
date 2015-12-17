@@ -56,11 +56,15 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Core>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
+
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -70,52 +74,125 @@
 
 namespace DISP3DNEWLIB
 {
+// Typedefs
 
-enum BrainTreeItemTypes {
-    UnknownItem = QStandardItem::UserType,
-    SurfaceItem = QStandardItem::UserType + 1,
-    SurfaceSetItem = QStandardItem::UserType + 2,
-    SurfaceFileName = QStandardItem::UserType + 3,
-    SurfaceFilePath = QStandardItem::UserType + 4,
-    AnnotFileName = QStandardItem::UserType + 5,
-    AnnotFilePath = QStandardItem::UserType + 6
-};
-
-namespace BrainTreeModelRoles
+// Model item types
+namespace BrainTreeModelItemTypes
 {
-    enum ItemRole{GetSurfName = Qt::UserRole,
-                  GetSurfType = Qt::UserRole + 1,
-                  GetSurfHemi = Qt::UserRole + 2,
-                  GetSurfColorSulci = Qt::UserRole + 3,
-                  GetSurfColorGyri = Qt::UserRole + 4,
-                  GetSurfColorVert = Qt::UserRole + 5,
-                  GetSurfVert = Qt::UserRole + 6,
-                  GetSurfTris = Qt::UserRole + 7,
-                  GetSurfNorm = Qt::UserRole + 8,
-                  GetSurfCurv = Qt::UserRole + 9,
-                  GetSurfOffset = Qt::UserRole + 10,
-                  GetSurfFilePath = Qt::UserRole + 11,
-                  GetAnnotName = Qt::UserRole + 12,
-                  GetAnnotFilePath = Qt::UserRole + 13,
-                  GetAnnotColor = Qt::UserRole + 14,
-                  GetRenderable3DEntity = Qt::UserRole + 15,
-                  GetRootItem = Qt::UserRole + 16,
-                  GetSurfSetName = Qt::UserRole + 17};
+    enum ItemType{UnknownItem = QStandardItem::UserType,
+                    SurfaceSetItem = QStandardItem::UserType + 1,
+                    HemisphereItem = QStandardItem::UserType + 2,
+                    SurfaceItem = QStandardItem::UserType + 3,
+                    AnnotationItem = QStandardItem::UserType + 4,
+                    SurfaceFileName = QStandardItem::UserType + 5,
+                    SurfaceFilePath = QStandardItem::UserType + 6,
+                    AnnotFileName = QStandardItem::UserType + 7,
+                    AnnotFilePath = QStandardItem::UserType + 8,
+                    SurfaceType = QStandardItem::UserType + 9,
+                    SurfaceColorGyri = QStandardItem::UserType + 10,
+                    SurfaceColorSulci = QStandardItem::UserType + 11,
+                    SurfaceColorVert = QStandardItem::UserType + 12,
+                    SurfaceColorInfoOrigin = QStandardItem::UserType + 13,
+                    RTDataItem = QStandardItem::UserType + 14,
+                    RTDataStreamStatus = QStandardItem::UserType + 15, //RT data streaming on or off
+                    RTDataSourceSpaceType = QStandardItem::UserType + 16, //Clustered or full sourcespace
+                    RTDataColormapType = QStandardItem::UserType + 17}; //Type of the colormap used
+}
+
+// Model item roles
+namespace BrainTreeItemRoles
+{
+    enum ItemRole{SurfaceFileName = Qt::UserRole,
+                    SurfaceType = Qt::UserRole + 1,
+                    SurfaceColorSulci = Qt::UserRole + 3,
+                    SurfaceColorGyri = Qt::UserRole + 4,
+                    SurfaceFilePath = Qt::UserRole + 5,
+                    AnnotName = Qt::UserRole + 6,
+                    AnnotFilePath = Qt::UserRole + 7,
+                    SurfaceColorInfoOrigin = Qt::UserRole + 8,
+                    RTDataStreamStatus = Qt::UserRole + 9,
+                    RTDataSourceSpaceType = Qt::UserRole + 10,
+                    RTDataColormapType = Qt::UserRole + 11};
+}
+
+namespace BrainSurfaceTreeItemRoles
+{
+    enum ItemRole{SurfaceCurrentColorVert = Qt::UserRole + 100,
+                    SurfaceVert = Qt::UserRole + 101,
+                    SurfaceTris = Qt::UserRole + 102,
+                    SurfaceNorm = Qt::UserRole + 103,
+                    SurfaceCurv = Qt::UserRole + 104,
+                    SurfaceOffset = Qt::UserRole + 105,
+                    SurfaceRenderable3DEntity = Qt::UserRole + 106,
+                    SurfaceCurvatureColorVert = Qt::UserRole + 107,
+                    SurfaceRTSourceLocColor = Qt::UserRole + 108};
+}
+
+namespace BrainSurfaceSetTreeItemRoles
+{
+    enum ItemRole{SurfaceSetName = Qt::UserRole + 200};
+}
+
+namespace BrainHemisphereTreeItemRoles
+{
+    enum ItemRole{SurfaceHemi = Qt::UserRole + 300};
+}
+
+namespace BrainAnnotationTreeItemRoles
+{
+    enum ItemRole{AnnotColors = Qt::UserRole + 400,
+                    AnnotFileName = Qt::UserRole + 401,
+                    AnnotFilePath = Qt::UserRole + 402};
+}
+
+namespace BrainRTDataTreeItemRoles
+{
+    enum ItemRole{RTData = Qt::UserRole + 500,
+                    RTVertices = Qt::UserRole + 501,
+                    RTTimes = Qt::UserRole + 502};
 }
 
 } //NAMESPACE DISP3DNEWLIB
 
+// Metatype declaration for correct QVariant usage
 #ifndef metatype_renderable3Dentity
 #define metatype_renderable3Dentity
 Q_DECLARE_METATYPE(DISP3DNEWLIB::Renderable3DEntity*)
 #endif
 
-//Q_DECLARE_METATYPE(FIFFLIB::fiff_int_t);
-//Q_DECLARE_METATYPE(MNEBrowseRawQt::RowVectorPairF);
-//Q_DECLARE_METATYPE(const FIFFLIB::FiffInfo*);
-//Q_DECLARE_METATYPE(MNEBrowseRawQt::MatrixXdR);
-//Q_DECLARE_METATYPE(MNEBrowseRawQt::RowVectorPair);
-//Q_DECLARE_METATYPE(QList<MNEBrowseRawQt::RowVectorPair>);
-//Q_DECLARE_METATYPE(QSharedPointer<DISPLIB::MNEOperator>);
+#ifndef metatype_matrixx3i
+#define metatype_matrixx3i
+Q_DECLARE_METATYPE(Eigen::MatrixX3i)
+#endif
+
+#ifndef metatype_matrixXd
+#define metatype_matrixXd
+Q_DECLARE_METATYPE(Eigen::MatrixXd)
+#endif
+
+#ifndef metatype_matrixx3f
+#define metatype_matrixx3f
+Q_DECLARE_METATYPE(Eigen::MatrixX3f)
+#endif
+
+#ifndef metatype_vectorxf
+#define metatype_vectorxf
+Q_DECLARE_METATYPE(Eigen::VectorXf)
+#endif
+
+#ifndef metatype_vectorxi
+#define metatype_vectorxi
+Q_DECLARE_METATYPE(Eigen::VectorXi)
+#endif
+
+#ifndef metatype_rowvectorxf
+#define metatype_rowvectorxf
+Q_DECLARE_METATYPE(Eigen::RowVectorXf)
+#endif
+
+#ifndef metatype_vector3f
+#define metatype_vector3f
+Q_DECLARE_METATYPE(Eigen::Vector3f)
+#endif
 
 #endif // TYPES_H

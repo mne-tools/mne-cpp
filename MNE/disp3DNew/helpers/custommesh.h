@@ -111,13 +111,20 @@ public:
     //=========================================================================================================
     /**
     * Default constructor.
+    */
+    CustomMesh();
+
+    //=========================================================================================================
+    /**
+    * Default constructor.
     *
     * @param[in] tMatVert       Vertices in form of a matrix.
     * @param[in] tMatNorm       Normals in form of a matrix.
     * @param[in] tMatTris       Tris/Faces in form of a matrix.
     * @param[in] tVecOffset     The offset which is to be used on all the vertices.
+    * @param[in] tMatColors     The vertex colors. If empty a default value will be used.
     */
-    CustomMesh(const MatrixX3f &tMatVert, const MatrixX3f tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset);
+    CustomMesh(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset, const Matrix<float, Dynamic, 3, RowMajor>& tMatColors = Matrix<float, Dynamic, 3, RowMajor>(0,3));
 
     //=========================================================================================================
     /**
@@ -131,13 +138,34 @@ public:
     *
     * @param[in] tMatColors     New color information for the vertices.
     */
-    bool updateVertColors(const Matrix<float, Dynamic, 3, RowMajor> &tMatColors);
+    bool setVertColor(const Matrix<float, Dynamic, 3, RowMajor>& tMatColors);
+
+    //=========================================================================================================
+    /**
+    * Set the needed information to create the mesh and then creates a new mesh.
+    *
+    * @param[in] tMatVert       Vertices in form of a matrix.
+    * @param[in] tMatNorm       Normals in form of a matrix.
+    * @param[in] tMatTris       Tris/Faces in form of a matrix.
+    * @param[in] tVecOffset     The offset which is to be used on all the vertices.
+    *
+    * @return If successful returns true, false otherwise.
+    */
+    bool setMeshData(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset, const Matrix<float, Dynamic, 3, RowMajor>& tMatColors = Matrix<float, Dynamic, 3, RowMajor>(0,3));
 
 protected:
-    Qt3DRender::QBuffer* m_pVertexDataBuffer;    /**< The vertex buffer. */
-    Qt3DRender::QBuffer* m_pNormalDataBuffer;    /**< The normal buffer. */
-    Qt3DRender::QBuffer* m_pColorDataBuffer;     /**< The color buffer. */
-    Qt3DRender::QBuffer* m_pIndexDataBuffer;     /**< The index buffer. */
+    //=========================================================================================================
+    /**
+    * Creates the actual mesh from the set vertex, normals, tris and offset members.
+    *
+    * @return If successful returns true, false otherwise.
+    */
+    bool createCustomMesh(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset, const Matrix<float, Dynamic, 3, RowMajor>& tMatColors = Matrix<float, Dynamic, 3, RowMajor>(0,3));
+
+    Qt3DRender::QBuffer*    m_pVertexDataBuffer;    /**< The vertex buffer. */
+    Qt3DRender::QBuffer*    m_pNormalDataBuffer;    /**< The normal buffer. */
+    Qt3DRender::QBuffer*    m_pColorDataBuffer;     /**< The color buffer. */
+    Qt3DRender::QBuffer*    m_pIndexDataBuffer;     /**< The index buffer. */
 
     int     m_iNumVert;     /**< The total number of set vertices. */
 };
