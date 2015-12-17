@@ -70,7 +70,6 @@ StcDataWorker::StcDataWorker(QObject* parent)
 , m_iCurrentSample(0)
 , m_iUSecIntervall(1000)
 {
-    m_data.clear();
 }
 
 
@@ -85,7 +84,7 @@ StcDataWorker::~StcDataWorker()
 
 //*************************************************************************************************************
 
-void StcDataWorker::addData(QList<VectorXd>& data)
+void StcDataWorker::addData(const MatrixXd& data)
 {
     //std::cout<<"START::StcDataWorker::addData"<<std::endl;
 
@@ -93,7 +92,7 @@ void StcDataWorker::addData(QList<VectorXd>& data)
     if(data.size() == 0)
         return;
 
-    m_data.append(data);
+    m_data = data;
 
     //std::cout<<"END::StcDataWorker::addData"<<std::endl;
 }
@@ -104,7 +103,6 @@ void StcDataWorker::addData(QList<VectorXd>& data)
 void StcDataWorker::clear()
 {
     QMutexLocker locker(&m_qMutex);
-    m_data.clear();
 }
 
 
@@ -128,7 +126,7 @@ void StcDataWorker::run()
         bool doProcessing = false;
         {
             QMutexLocker locker(&m_qMutex);
-            if(!m_data.isEmpty() && m_data.size() > 0)
+            if(m_data.cols() > 0)
                 doProcessing = true;
         }
 
@@ -141,22 +139,22 @@ void StcDataWorker::run()
 //                std::cout<<"StcDataWorker::run() - m_data.size(): "<<m_data.size()<<std::endl;
 //                std::cout<<"StcDataWorker::run() - m_iCurrentSample: "<<m_iCurrentSample<<std::endl;
 
-                if(t_vecAverage.rows() != m_data[0].rows())
-                    t_vecAverage = m_data[m_iCurrentSample%m_data.size()];
+                if(t_vecAverage.rows() != m_data.rows())
+                    t_vecAverage = m_data.col(m_iCurrentSample%m_data.cols());
                 else
-                    t_vecAverage += m_data[m_iCurrentSample%m_data.size()];
+                    t_vecAverage += m_data.col(m_iCurrentSample%m_data.cols());
                 m_qMutex.unlock();
             }
             else
             {
                 m_qMutex.lock();
                 //Down sampling in stream mode
-                if(t_vecAverage.rows() != m_data[0].rows())
-                    t_vecAverage = m_data.front();
+                if(t_vecAverage.rows() != m_data.rows())
+                    t_vecAverage = m_data.col(0);
                 else
-                    t_vecAverage += m_data.front();
+                    t_vecAverage += m_data.col(0);
 
-                m_data.pop_front();
+                m_data = m_data.block(0,1,m_data.rows(),m_data.cols()-1);
                 m_qMutex.unlock();
             }
 

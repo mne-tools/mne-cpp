@@ -29,7 +29,6 @@ QVariant AbstractTreeItem::data(int role) const
 
 void  AbstractTreeItem::setData(const QVariant& value, int role)
 {
-    qDebug()<<role;
     QStandardItem::setData(value, role);
 
     switch(role) {
