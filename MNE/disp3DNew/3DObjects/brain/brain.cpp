@@ -54,7 +54,7 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Brain::Brain(Qt3DCore::QEntity *parent)
+Brain::Brain(Qt3DCore::QEntity* parent)
 : Qt3DCore::QEntity(parent)
 , m_pBrainTreeModel(new BrainTreeModel(this))
 {
@@ -70,7 +70,7 @@ Brain::~Brain()
 
 //*************************************************************************************************************
 
-bool Brain::addData(const QString & text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
+bool Brain::addData(const QString& text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
 {
     return m_pBrainTreeModel->addData(text, tSurfaceSet, tAnnotationSet, this);
 }
@@ -78,7 +78,7 @@ bool Brain::addData(const QString & text, const SurfaceSet& tSurfaceSet, const A
 
 //*************************************************************************************************************
 
-bool Brain::addData(const QString & text, const Surface &tSurface, const Annotation &tAnnotation)
+bool Brain::addData(const QString& text, const Surface& tSurface, const Annotation &tAnnotation)
 {
     return m_pBrainTreeModel->addData(text, tSurface, tAnnotation, this);
 }
@@ -86,7 +86,7 @@ bool Brain::addData(const QString & text, const Surface &tSurface, const Annotat
 
 //*************************************************************************************************************
 
-QList<BrainRTDataTreeItem*> Brain::addData(const QString & text, const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution)
+QList<BrainRTDataTreeItem*> Brain::addData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
     return m_pBrainTreeModel->addData(text, tSourceEstimate, tForwardSolution);
 }

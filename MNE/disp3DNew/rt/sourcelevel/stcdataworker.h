@@ -94,13 +94,13 @@ public:
     typedef QSharedPointer<StcDataWorker> SPtr;            /**< Shared pointer type for StcDataWorker class. */
     typedef QSharedPointer<const StcDataWorker> ConstSPtr; /**< Const shared pointer type for StcDataWorker class. */
 
-    StcDataWorker(QObject *parent = 0);
+    StcDataWorker(QObject* parent = 0);
 
     ~StcDataWorker();
 
 //    void setIntervall(int intervall);
 
-    void addData(QList<VectorXd> &data);
+    void addData(QList<VectorXd>& data);
 
     void clear();
 

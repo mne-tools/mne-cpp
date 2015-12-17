@@ -113,7 +113,7 @@ public:
     /**
     * Default constructor.
     */
-    explicit BrainAnnotationTreeItem(const int & iType = BrainTreeModelItemTypes::UnknownItem, const QString & text = "Annotation");
+    explicit BrainAnnotationTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "Annotation");
 
     //=========================================================================================================
     /**
@@ -126,7 +126,7 @@ public:
     * AbstractTreeItem functions
     */
     QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant & value, int role = Qt::UserRole + 1);
+    void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
     //=========================================================================================================
     /**
@@ -137,7 +137,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const Surface & tSurface, const Annotation & tAnnotation);
+    bool addData(const Surface& tSurface, const Annotation& tAnnotation);
 
 private:
 

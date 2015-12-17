@@ -62,7 +62,7 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-StcDataWorker::StcDataWorker(QObject *parent)
+StcDataWorker::StcDataWorker(QObject* parent)
 : QThread(parent)
 , m_bIsRunning(false)
 , m_bIsLooping(true)
@@ -85,7 +85,7 @@ StcDataWorker::~StcDataWorker()
 
 //*************************************************************************************************************
 
-void StcDataWorker::addData(QList<VectorXd> &data)
+void StcDataWorker::addData(QList<VectorXd>& data)
 {
     //std::cout<<"START::StcDataWorker::addData"<<std::endl;
 

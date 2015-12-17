@@ -107,7 +107,7 @@ public:
     *
     * @param[in] parent         The parent of this class.
     */
-    explicit Window(QScreen *screen = 0);
+    explicit Window(QScreen* screen = 0);
 
     //=========================================================================================================
     /**
@@ -122,10 +122,10 @@ protected:
     * Virtual functions for mouse and keyboard control
     *
     */
-    virtual void keyPressEvent(QKeyEvent *e);
-    virtual void mousePressEvent(QMouseEvent *e);
-    virtual void wheelEvent(QWheelEvent *e);
-    virtual void mouseMoveEvent(QMouseEvent *e);
+    virtual void keyPressEvent(QKeyEvent* e);
+    virtual void mousePressEvent(QMouseEvent* e);
+    virtual void wheelEvent(QWheelEvent* e);
+    virtual void mouseMoveEvent(QMouseEvent* e);
 };
 
 }

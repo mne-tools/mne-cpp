@@ -115,7 +115,7 @@ public:
     /**
     * Default constructor.
     */
-    explicit BrainRTDataTreeItem(const int &iType = BrainTreeModelItemTypes::UnknownItem, const QString &text = "RT Data");
+    explicit BrainRTDataTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "RT Data");
 
     //=========================================================================================================
     /**
@@ -128,7 +128,7 @@ public:
     * AbstractTreeItem functions
     */
     QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant &value, int role = Qt::UserRole + 1);
+    void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
     //=========================================================================================================
     /**
@@ -139,16 +139,20 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution, const QString & hemi = "Unknown");
+    bool addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QString& hemi = "Unknown");
 
-    bool updateData(const MNESourceEstimate & tSourceEstimate);
+    bool updateData(const MNESourceEstimate& tSourceEstimate);
 
     inline bool isInit() const;
+
+signals:
+    void rtDataChanged();
 
 private:
     bool        m_bInit;
     QString     m_sHemi;
 
+    BrainTreeItem*  m_pItemRTDataStreamStatus;
 };
 
 //*************************************************************************************************************

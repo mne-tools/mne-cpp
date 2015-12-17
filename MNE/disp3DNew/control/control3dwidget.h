@@ -107,7 +107,7 @@ public:
     * Default constructor.
     *
     */
-    explicit Control3DWidget(QWidget *parent = 0);
+    explicit Control3DWidget(QWidget* parent = 0);
 
     //=========================================================================================================
     /**

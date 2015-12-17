@@ -54,7 +54,7 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainHemisphereTreeItem::BrainHemisphereTreeItem(const int & iType, const QString & text)
+BrainHemisphereTreeItem::BrainHemisphereTreeItem(const int& iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
 }
@@ -82,7 +82,7 @@ QVariant BrainHemisphereTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void  BrainHemisphereTreeItem::setData(const QVariant & value, int role)
+void  BrainHemisphereTreeItem::setData(const QVariant& value, int role)
 {
     QStandardItem::setData(value, role);
 }
@@ -90,7 +90,7 @@ void  BrainHemisphereTreeItem::setData(const QVariant & value, int role)
 
 //*************************************************************************************************************
 
-bool BrainHemisphereTreeItem::addData(const Surface & tSurface, const Annotation & tAnnotation, Qt3DCore::QEntity * p3DEntityParent)
+bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Set name of this item based on the hemispehre information
     switch (tSurface.hemi()) {
@@ -126,7 +126,7 @@ bool BrainHemisphereTreeItem::addData(const Surface & tSurface, const Annotation
 
 //*************************************************************************************************************
 
-BrainRTDataTreeItem* BrainHemisphereTreeItem::addData(const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution)
+BrainRTDataTreeItem* BrainHemisphereTreeItem::addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
     if(!tSourceEstimate.isEmpty()) {
         //Add source estimation data as child

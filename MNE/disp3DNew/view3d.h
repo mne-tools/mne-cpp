@@ -137,7 +137,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addBrainData(const QString & text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet = AnnotationSet());
+    bool addBrainData(const QString& text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet = AnnotationSet());
 
     //=========================================================================================================
     /**
@@ -148,13 +148,13 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addBrainData(const QString & text, const Surface& tSurface, const Annotation& tAnnotation = Annotation());
+    bool addBrainData(const QString& text, const Surface& tSurface, const Annotation& tAnnotation = Annotation());
 
-    QList<BrainRTDataTreeItem*> addSourceEstimate(const QString & text, const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution);
+    QList<BrainRTDataTreeItem*> addSourceEstimate(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution);
 
     BrainTreeModel* getBrainTreeModel();
 
-    void changeSceneColor(const QColor & colSceneColor);
+    void changeSceneColor(const QColor& colSceneColor);
 
 protected:
     Qt3DCore::QAspectEngine             m_aspectEngine;                 /**< The aspect engine. */
@@ -212,11 +212,11 @@ protected:
     * Virtual functions for mouse and keyboard control
     *
     */
-    void keyPressEvent(QKeyEvent *e);
-    void mousePressEvent(QMouseEvent *e);
-    void wheelEvent(QWheelEvent *e);
-    void mouseReleaseEvent(QMouseEvent *e);
-    void mouseMoveEvent(QMouseEvent *e);
+    void keyPressEvent(QKeyEvent* e);
+    void mousePressEvent(QMouseEvent* e);
+    void wheelEvent(QWheelEvent* e);
+    void mouseReleaseEvent(QMouseEvent* e);
+    void mouseMoveEvent(QMouseEvent* e);
 
     //=========================================================================================================
     /**

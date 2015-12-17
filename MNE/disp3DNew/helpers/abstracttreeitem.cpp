@@ -27,6 +27,46 @@ int  AbstractTreeItem::type() const
 
 //*************************************************************************************************************
 
+QList<QStandardItem*> AbstractTreeItem::findChildren(const int& type)
+{
+    QList<QStandardItem*> itemList;
+
+    if(this->hasChildren()) {
+        for(int row = 0; row<this->rowCount(); row++) {
+            for(int col = 0; col<this->columnCount(); col++) {
+                if(this->child(row, col)->type() == type) {
+                    itemList.append(this->child(row, col));
+                }
+            }
+        }
+    }
+
+    return itemList;
+}
+
+
+//*************************************************************************************************************
+
+QList<QStandardItem*> AbstractTreeItem::findChildren(const QString& text)
+{
+    QList<QStandardItem*> itemList;
+
+    if(this->hasChildren()) {
+        for(int row = 0; row<this->rowCount(); row++) {
+            for(int col = 0; col<this->columnCount(); col++) {
+                if(this->child(row, col)->text() == text) {
+                    itemList.append(this->child(row, col));
+                }
+            }
+        }
+    }
+
+    return itemList;
+}
+
+
+//*************************************************************************************************************
+
 AbstractTreeItem& AbstractTreeItem::operator<<(AbstractTreeItem* newItem)
 {
     this->appendRow(newItem);

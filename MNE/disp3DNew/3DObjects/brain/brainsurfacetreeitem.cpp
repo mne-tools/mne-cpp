@@ -54,7 +54,7 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainSurfaceTreeItem::BrainSurfaceTreeItem(const int & iType, const QString & text)
+BrainSurfaceTreeItem::BrainSurfaceTreeItem(const int& iType, const QString& text)
 : AbstractTreeItem(iType, text)
 , m_pRenderable3DEntity(new Renderable3DEntity())
 , m_pItemSurfColorInfoOrigin(new BrainTreeItem())
@@ -81,7 +81,7 @@ QVariant BrainSurfaceTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void  BrainSurfaceTreeItem::setData(const QVariant & value, int role)
+void  BrainSurfaceTreeItem::setData(const QVariant& value, int role)
 {
     QStandardItem::setData(value, role);
 
@@ -99,7 +99,7 @@ void  BrainSurfaceTreeItem::setData(const QVariant & value, int role)
 
 //*************************************************************************************************************
 
-bool BrainSurfaceTreeItem::addData(const Surface & tSurface, Qt3DCore::QEntity * parent)
+bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
     m_pRenderable3DEntity = new Renderable3DEntity(parent);
@@ -230,7 +230,7 @@ void BrainSurfaceTreeItem::updateVertColor()
 
 //*************************************************************************************************************
 
-MatrixX3f BrainSurfaceTreeItem::createCurvatureVertColor(const VectorXf & curvature, const QColor & colSulci, const QColor & colGyri)
+MatrixX3f BrainSurfaceTreeItem::createCurvatureVertColor(const VectorXf& curvature, const QColor& colSulci, const QColor& colGyri)
 {
     MatrixX3f matCurvatureColor(curvature.rows(), 3);
 

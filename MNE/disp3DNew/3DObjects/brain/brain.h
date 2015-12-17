@@ -124,7 +124,7 @@ public:
     * @param[in] tAnnotationSet     FreeSurfer annotation set.
     * @return                       Returns true if successful.
     */
-    bool addData(const QString & text, const SurfaceSet & tSurfaceSet, const AnnotationSet & tAnnotationSet);
+    bool addData(const QString& text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet);
 
     //=========================================================================================================
     /**
@@ -134,9 +134,9 @@ public:
     * @param[in] pAnnotation        FreeSurfer annotation.
     * @return                       Returns true if successful.
     */
-    bool addData(const QString & text, const Surface & tSurface, const Annotation & tAnnotation);
+    bool addData(const QString& text, const Surface& tSurface, const Annotation& tAnnotation);
 
-    QList<BrainRTDataTreeItem*> addData(const QString & text, const MNESourceEstimate & tSourceEstimate, const MNEForwardSolution & tForwardSolution);
+    QList<BrainRTDataTreeItem*> addData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution);
 
     //=========================================================================================================
     /**
