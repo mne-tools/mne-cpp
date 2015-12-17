@@ -92,6 +92,8 @@ void  BrainRTDataTreeItem::setData(const QVariant& value, int role)
 
 bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QString& hemi)
 {   
+    // Add data which is held by this BrainRTDataTreeItem
+
     int iHemi = -1;
     int iStartIdx = 0;
     int iEndIdx = 0;
@@ -110,7 +112,6 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     this->setData(iStartIdx, BrainRTDataTreeItemRoles::RTStartIdx);
     this->setData(iEndIdx, BrainRTDataTreeItemRoles::RTEndIdx);
 
-    // Add data which is held by this BrainRTDataTreeItem
     QVariant data;
 
     data.setValue(tSourceEstimate.data);
@@ -175,11 +176,9 @@ bool BrainRTDataTreeItem::updateData(const MNESourceEstimate& tSourceEstimate)
 void BrainRTDataTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     if(checkState == Qt::Checked) {
-        //TODO: Start stc worker
         qDebug()<<"Start stc worker";
         m_pStcDataWorker->start();
     } else if(checkState == Qt::Unchecked) {
-        //TODO: Stop stc worker
         qDebug()<<"Stop stc worker";
         m_pStcDataWorker->stop();
     }
