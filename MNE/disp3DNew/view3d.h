@@ -42,11 +42,12 @@
 //=============================================================================================================
 
 #include <iostream>
+
 #include "disp3dnew_global.h"
-
 #include "3DObjects/brain/brain.h"
-
 #include "helpers/window.h"
+
+#include <mne/mne_sourceestimate.h>
 
 
 //*************************************************************************************************************
@@ -133,11 +134,27 @@ public:
     *
     * @param[in] tSurfaceSet        FreeSurfer surface set.
     * @param[in] tAnnotationSet     FreeSurfer annotation set.
+    *
     * @return                       Returns true if successful.
     */
-    bool addFsBrainData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet);
+    bool addBrainData(const QString& text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet = AnnotationSet());
+
+    //=========================================================================================================
+    /**
+    * Adds FreeSurfer single brain data.
+    *
+    * @param[in] tSurface           FreeSurfer surface.
+    * @param[in] tAnnotation        FreeSurfer annotation.
+    *
+    * @return                       Returns true if successful.
+    */
+    bool addBrainData(const QString& text, const Surface& tSurface, const Annotation& tAnnotation = Annotation());
+
+    QList<BrainRTDataTreeItem*> addSourceEstimate(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution);
 
     BrainTreeModel* getBrainTreeModel();
+
+    void changeSceneColor(const QColor& colSceneColor);
 
 protected:
     Qt3DCore::QAspectEngine             m_aspectEngine;                 /**< The aspect engine. */
@@ -157,8 +174,6 @@ protected:
     Qt3DCore::QTransform*               m_pCameraRotateTransformX;      /**< The camera x-axis rotation transformation (added to m_pCameraTransform). */
     Qt3DCore::QTransform*               m_pCameraRotateTransformY;      /**< The camera y-axis rotation transformation (added to m_pCameraTransform). */
     Qt3DCore::QTransform*               m_pCameraRotateTransformZ;      /**< The camera z-axis rotation transformation (added to m_pCameraTransform). */
-
-    QList<BrainObject::SPtr>            m_lBrainObjectList;
 
     Brain::SPtr                         m_pBrain;                       /**< Pointer to the Brain class, which holds all BrainObjects. */
 
@@ -197,11 +212,11 @@ protected:
     * Virtual functions for mouse and keyboard control
     *
     */
-    void keyPressEvent(QKeyEvent *e);
-    void mousePressEvent(QMouseEvent *e);
-    void wheelEvent(QWheelEvent *e);
-    void mouseReleaseEvent(QMouseEvent *e);
-    void mouseMoveEvent(QMouseEvent *e);
+    void keyPressEvent(QKeyEvent* e);
+    void mousePressEvent(QMouseEvent* e);
+    void wheelEvent(QWheelEvent* e);
+    void mouseReleaseEvent(QMouseEvent* e);
+    void mouseMoveEvent(QMouseEvent* e);
 
     //=========================================================================================================
     /**

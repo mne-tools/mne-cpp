@@ -41,6 +41,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "types.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -83,18 +85,32 @@ namespace DISP3DNEWLIB
 *
 * @brief Provides the basic tree item.
 */
-class AbstractTreeItem : public QStandardItem
+class AbstractTreeItem : public QObject, public QStandardItem
 {
+    Q_OBJECT;
 
 public :
-    AbstractTreeItem(const int &iType, const QString &text = "");
+
+    AbstractTreeItem(const int& iType, const QString& text = "");
     virtual ~AbstractTreeItem();
+
+    QVariant data(int role = Qt::UserRole + 1) const;
+    void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
     int type() const;
 
-    AbstractTreeItem &operator<<(AbstractTreeItem &newItem);
+    QList<QStandardItem*> findChildren(const int& type);
+    QList<QStandardItem*> findChildren(const QString& text);
+
+    AbstractTreeItem &operator<<(AbstractTreeItem* newItem);
+    AbstractTreeItem &operator<<(AbstractTreeItem& newItem);
+
+signals:
+    void checkStateChanged(const Qt::CheckState& checkState);
 
 protected :
+    void createToolTip();
+
     int     m_iType;
 };
 

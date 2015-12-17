@@ -55,7 +55,7 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Window::Window(QScreen *screen)
+Window::Window(QScreen* screen)
 : QWindow(screen)
 {
     setSurfaceType(QSurface::OpenGLSurface);

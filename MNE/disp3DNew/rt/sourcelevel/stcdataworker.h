@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     window.h
-* @author   Qt Project (qt3D examples)
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     stcdataworker.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015
+* @date     March, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, QtProject, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,19 +29,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Window class declaration
+* @brief    StcDataWorker class declaration
+*
 */
 
-#ifndef WINDOW_H
-#define WINDOW_H
-
+#ifndef STCDATAWORKER_H
+#define STCDATAWORKER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3DNew_global.h"
+#include <iostream>
+
+#include "../../disp3dnew_global.h"
 
 
 //*************************************************************************************************************
@@ -50,13 +51,11 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWindow>
-
-#include <QKeyEvent>
-#include <QGuiApplication>
-#include <QOpenGLContext>
-
-#include <QDebug>
+#include <QObject>
+#include <QList>
+#include <QThread>
+#include <QSharedPointer>
+#include <QMutex>
 
 
 //*************************************************************************************************************
@@ -64,16 +63,12 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DISP3DNEWLIB
+// DEFINE NAMESPACE DISP3DLIB
 //=============================================================================================================
 
 namespace DISP3DNEWLIB
@@ -84,50 +79,57 @@ namespace DISP3DNEWLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
+using namespace Eigen;
 
 //=============================================================================================================
 /**
-* Window is a subclass of the QWindow with OpenGL support.
+* Worker which schedules data with the right timing
 *
-* @brief Window is a subclass of the QWindow with OpenGL support.
+* @brief Data scheduler
 */
-class DISP3DNEWSHARED_EXPORT Window : public QWindow
+class DISP3DNEWSHARED_EXPORT StcDataWorker : public QThread
 {
     Q_OBJECT
 public:
-    //=========================================================================================================
-    /**
-    * Default constructor.
-    *
-    * @param[in] parent         The parent of this class.
-    */
-    explicit Window(QScreen* screen = 0);
+    typedef QSharedPointer<StcDataWorker> SPtr;            /**< Shared pointer type for StcDataWorker class. */
+    typedef QSharedPointer<const StcDataWorker> ConstSPtr; /**< Const shared pointer type for StcDataWorker class. */
 
-    //=========================================================================================================
-    /**
-    * Default destructor.
-    *
-    */
-    ~Window();
+    StcDataWorker(QObject* parent = 0);
+
+    ~StcDataWorker();
+
+//    void setIntervall(int intervall);
+
+    void addData(QList<VectorXd>& data);
+
+    void clear();
+
+    void setAverage(qint32 samples);
+
+    void setInterval(int usec);
+
+    void setLoop(bool looping);
+
+    void stop();
+
+signals:
+    void stcSample(Eigen::VectorXd sample);
 
 protected:
-    //=========================================================================================================
-    /**
-    * Virtual functions for mouse and keyboard control
-    *
-    */
-    virtual void keyPressEvent(QKeyEvent* e);
-    virtual void mousePressEvent(QMouseEvent* e);
-    virtual void wheelEvent(QWheelEvent* e);
-    virtual void mouseMoveEvent(QMouseEvent* e);
+    virtual void run();
+
+private:
+    QMutex m_qMutex;
+    QList<VectorXd> m_data;   /**< List that holds the fiff matrix data <n_channels x n_samples> */
+
+    bool m_bIsRunning;
+    bool m_bIsLooping;
+
+    qint32 m_iAverageSamples;
+    qint32 m_iCurrentSample;
+    qint32 m_iUSecIntervall;
 };
 
-}
+} // NAMESPACE
 
-#endif // QT3D_WINDOW_H
+#endif // STCDATAWORKER_H

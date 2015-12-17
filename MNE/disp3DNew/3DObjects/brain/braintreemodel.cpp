@@ -54,7 +54,7 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainTreeModel::BrainTreeModel(QObject *parent)
+BrainTreeModel::BrainTreeModel(QObject* parent)
 : QStandardItemModel(parent)
 {
     m_pRootItem = this->invisibleRootItem();
@@ -72,7 +72,7 @@ BrainTreeModel::~BrainTreeModel()
 
 //*************************************************************************************************************
 
-QVariant BrainTreeModel::data(const QModelIndex & index, int role) const
+QVariant BrainTreeModel::data(const QModelIndex& index, int role) const
 {
     return QStandardItemModel::data(index, role);
 }
@@ -80,56 +80,64 @@ QVariant BrainTreeModel::data(const QModelIndex & index, int role) const
 
 //*************************************************************************************************************
 
-bool BrainTreeModel::addFsData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
+bool BrainTreeModel::addData(const QString& text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
 {
-    BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeItemTypes::SurfaceSetItem, "Subject 1");
-    pSurfaceSetItem->setToolTip("Brain surface set");
-    *pSurfaceSetItem<<tSurfaceSet<<tAnnotationSet;
-    m_pRootItem->appendRow(pSurfaceSetItem);
+    QList<QStandardItem*> itemList = this->findItems(text);
+    bool state = false;
 
-//    for(int i = 0; i < tSurfaceSet.size(); i++) {
-//        if(i < tAnnotationSet.size()) {
-//            if(tAnnotationSet[i].hemi() == tSurfaceSet[i].hemi()) {
-//                addFsDataAsItem(tSurfaceSet[i], tAnnotationSet[i], pSurfaceSetItem, p3DEntityParent);
-//            } else {
-//                addFsDataAsItem(tSurfaceSet[i], Annotation(), pSurfaceSetItem, p3DEntityParent);
-//            }
-//        } else {
-//            addFsDataAsItem(tSurfaceSet[i], Annotation(), pSurfaceSetItem, p3DEntityParent);
-//        }
-//    }
+    if(!itemList.isEmpty() && (itemList.at(0)->type() == BrainTreeModelItemTypes::SurfaceSetItem)) {
+        BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
+        state = pSurfaceSetItem->addData(tSurfaceSet, tAnnotationSet, p3DEntityParent);
+    } else {
+        BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, text);
+        m_pRootItem->appendRow(pSurfaceSetItem);
+        state = pSurfaceSetItem->addData(tSurfaceSet, tAnnotationSet, p3DEntityParent);
+    }
 
-    return true;
+    return state;
 }
 
 
 //*************************************************************************************************************
 
-bool BrainTreeModel::addFsData(const Surface &tSurface, const Annotation &tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
+bool BrainTreeModel::addData(const QString& text, const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
 {
-    BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeItemTypes::SurfaceSetItem, "Subject 1");
-    pSurfaceSetItem->setToolTip("Brain surface set");
-    m_pRootItem->appendRow(pSurfaceSetItem);
+    QList<QStandardItem*> itemList = this->findItems(text);
+    bool state = false;
 
-    return addFsDataAsItem(tSurface, tAnnotation, pSurfaceSetItem, p3DEntityParent);
+    if(!itemList.isEmpty() && (itemList.at(0)->type() == BrainTreeModelItemTypes::SurfaceSetItem)) {
+        BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
+        state = pSurfaceSetItem->addData(tSurface, tAnnotation, p3DEntityParent);
+    } else {
+        BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, text);
+        m_pRootItem->appendRow(pSurfaceSetItem);
+        state = pSurfaceSetItem->addData(tSurface, tAnnotation, p3DEntityParent);
+    }
+
+    return state;
 }
 
 
 //*************************************************************************************************************
 
-bool BrainTreeModel::addFsDataAsItem(const Surface &tSurface, const Annotation &tAnnotation, QStandardItem* pItemParent, Qt3DCore::QEntity* p3DEntityParent)
+QList<BrainRTDataTreeItem*> BrainTreeModel::addData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
-    QString hemi = tSurface.hemi() == 0 ? "Left hemisphere" : "Right hemisphere";
+    QList<BrainRTDataTreeItem*> returnList;
+    QList<QStandardItem*> itemList = this->findItems(text);
 
-    BrainSurfaceTreeItem* surfaceItem = new BrainSurfaceTreeItem(tSurface, tAnnotation, BrainTreeItemTypes::SurfaceItem, hemi, p3DEntityParent);
-    surfaceItem->setToolTip("Brain hemisphere");
-    pItemParent->appendRow(surfaceItem);
+    //Find the all the hemispheres of the set "text" and add the source estimates as items
+    if(!itemList.isEmpty()) {
+        for(int i = 0; i<itemList.size(); i++) {
+            for(int j = 0; j<itemList.at(i)->rowCount(); j++) {
+                if(itemList.at(i)->child(j,0)->type() == BrainTreeModelItemTypes::HemisphereItem) {
+                    BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(i)->child(j,0));
+                    returnList.append(pHemiItem->addData(tSourceEstimate, tForwardSolution));
+                }
+            }
+        }
+    }
 
-    return true;
+    return returnList;
 }
-
-
-
-
 
 

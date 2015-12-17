@@ -118,6 +118,29 @@ public:
 
     //=========================================================================================================
     /**
+    * Construts the annotation by reading it of the given file.
+    *
+    * @param[in] subject_id         Name of subject
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
+    * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...)
+    * @param[in] subjects_dir       Subjects directory
+    */
+    explicit Annotation(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
+
+    //=========================================================================================================
+    /**
+    * Construts the annotation by reading it of the given file.
+    *
+    * @param[in] path               path to surface directory
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
+    * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...)
+    *
+    * @return true if read sucessful, false otherwise
+    */
+    explicit Annotation(const QString &path, qint32 hemi, const QString &surf);
+
+    //=========================================================================================================
+    /**
     * Destroys the annotation.
     */
     ~Annotation();

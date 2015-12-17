@@ -54,38 +54,27 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Renderable3DEntity::Renderable3DEntity()
+Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
+: Qt3DCore::QEntity(parent)
+, m_pCustomMesh(CustomMesh::SPtr(new CustomMesh()))
+, m_pTransform(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
+, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPerVertexColorMaterial))
 {
-
+    this->addComponent(m_pCustomMesh.data());
+    this->addComponent(m_pTransform.data());
+    this->addComponent(m_pMaterial.data());
 }
 
 
 //*************************************************************************************************************
 
-Renderable3DEntity::Renderable3DEntity(const MatrixX3f &tMatVert, const MatrixX3f &tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset, Qt3DCore::QEntity *parent)
+Renderable3DEntity::Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset, Qt3DCore::QEntity* parent)
 : Qt3DCore::QEntity(parent)
 , m_pCustomMesh(new CustomMesh(tMatVert, tMatNorm, tMatTris, tVecOffset))
 , m_pTransform(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
-, m_pScaleTransform(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
-, m_pTranslateTransform(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
-, m_pRotateTransform(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
-, m_pRotateTransformX(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
-, m_pRotateTransformY(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
-, m_pRotateTransformZ(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
 , m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPerVertexColorMaterial(this)))
 //, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QNormalDiffuseMapMaterial(this)))
 {
-//    m_pRotateTransformX->setAxis(QVector3D(1,0,0));
-//    m_pRotateTransformY->setAxis(QVector3D(0,1,0));
-//    m_pRotateTransformZ->setAxis(QVector3D(0,0,1));
-
-//    m_pTransform->addTransform(m_pScaleTransform.data());
-//    m_pTransform->addTransform(m_pTranslateTransform.data());
-//    m_pTransform->addTransform(m_pRotateTransform.data());
-//    m_pTransform->addTransform(m_pRotateTransformX.data());
-//    m_pTransform->addTransform(m_pRotateTransformY.data());
-//    m_pTransform->addTransform(m_pRotateTransformZ.data());
-
     this->addComponent(m_pCustomMesh.data());
     this->addComponent(m_pTransform.data());
     this->addComponent(m_pMaterial.data());
@@ -96,78 +85,43 @@ Renderable3DEntity::Renderable3DEntity(const MatrixX3f &tMatVert, const MatrixX3
 
 Renderable3DEntity::~Renderable3DEntity()
 {
+    this->removeAllComponents();
 }
 
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::updateVertColors(const MatrixX3f &tMatColors)
+bool Renderable3DEntity::setVertColor(const Matrix<float, Dynamic, 3, RowMajor>& tMatColors)
 {
-    return m_pCustomMesh->updateVertColors(tMatColors);
+    return m_pCustomMesh->setVertColor(tMatColors);
 }
 
 
 //*************************************************************************************************************
 
-void Renderable3DEntity::setScale(float scaleFactor)
+bool Renderable3DEntity::setMeshData(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset,  const Matrix<float, Dynamic, 3, RowMajor>& tMatColors)
 {
-    m_pScaleTransform->setScale(scaleFactor);
+    return m_pCustomMesh->setMeshData(tMatVert, tMatNorm, tMatTris, tVecOffset, tMatColors);
 }
 
 
 //*************************************************************************************************************
 
-void Renderable3DEntity::setRotationX(float degree)
+bool Renderable3DEntity::setTransform(QSharedPointer<Qt3DCore::QTransform> pTransform)
 {
-    //m_pRotateTransformX->setAngleDeg(degree);
+    m_pTransform = pTransform;
+
+    return true;
 }
 
 
 //*************************************************************************************************************
 
-void Renderable3DEntity::setRotationY(float degree)
+bool Renderable3DEntity::setMaterial(QSharedPointer<Qt3DRender::QMaterial> pMaterial)
 {
-    //m_pRotateTransformY->setAngleDeg(degree);
-}
+    m_pMaterial = pMaterial;
 
-
-//*************************************************************************************************************
-
-void Renderable3DEntity::setRotationZ(float degree)
-{
-    //m_pRotateTransformZ->setAngleDeg(degree);
-}
-
-
-//*************************************************************************************************************
-
-void Renderable3DEntity::setRotation(float degree, const QVector3D &rotAxis)
-{
-    //m_pRotateTransform->setAxis(rotAxis);
-    //m_pRotateTransform->setAngleDeg(degree);
-}
-
-
-//*************************************************************************************************************
-
-void Renderable3DEntity::addRotation(float degree, const QVector3D &rotAxis)
-{
-    Qt3DCore::QTransform* rotateTransform = new Qt3DCore::QTransform();
-//    rotateTransform->setAxis(rotAxis);
-//    rotateTransform->setAngleDeg(degree);
-
-//    m_pTransform->addTransform(rotateTransform);
-
-    //qDebug()<<"Adding rotation transform. Total:"<<m_pTransform->transforms().size();
-}
-
-
-
-//*************************************************************************************************************
-
-void Renderable3DEntity::setTranslation(const QVector3D &trans)
-{
-    m_pTranslateTransform->setTranslation(trans);
+    return true;
 }
 
 

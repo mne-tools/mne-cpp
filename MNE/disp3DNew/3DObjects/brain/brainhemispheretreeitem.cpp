@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     window.h
-* @author   Qt Project (qt3D examples)
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     brainhemispheretreeitem.cpp
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     November, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, QtProject, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,104 +29,108 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Window class declaration
+* @brief    BrainHemisphereTreeItem class definition.
+*
 */
-
-#ifndef WINDOW_H
-#define WINDOW_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3DNew_global.h"
+#include "brainhemispheretreeitem.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QWindow>
-
-#include <QKeyEvent>
-#include <QGuiApplication>
-#include <QOpenGLContext>
-
-#include <QDebug>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DISP3DNEWLIB
-//=============================================================================================================
-
-namespace DISP3DNEWLIB
-{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace DISP3DNEWLIB;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* Window is a subclass of the QWindow with OpenGL support.
-*
-* @brief Window is a subclass of the QWindow with OpenGL support.
-*/
-class DISP3DNEWSHARED_EXPORT Window : public QWindow
+BrainHemisphereTreeItem::BrainHemisphereTreeItem(const int& iType, const QString& text)
+: AbstractTreeItem(iType, text)
 {
-    Q_OBJECT
-public:
-    //=========================================================================================================
-    /**
-    * Default constructor.
-    *
-    * @param[in] parent         The parent of this class.
-    */
-    explicit Window(QScreen* screen = 0);
-
-    //=========================================================================================================
-    /**
-    * Default destructor.
-    *
-    */
-    ~Window();
-
-protected:
-    //=========================================================================================================
-    /**
-    * Virtual functions for mouse and keyboard control
-    *
-    */
-    virtual void keyPressEvent(QKeyEvent* e);
-    virtual void mousePressEvent(QMouseEvent* e);
-    virtual void wheelEvent(QWheelEvent* e);
-    virtual void mouseMoveEvent(QMouseEvent* e);
-};
-
 }
 
-#endif // QT3D_WINDOW_H
+
+//*************************************************************************************************************
+
+BrainHemisphereTreeItem::~BrainHemisphereTreeItem()
+{
+}
+
+
+//*************************************************************************************************************
+
+QVariant BrainHemisphereTreeItem::data(int role) const
+{
+    return AbstractTreeItem::data(role);
+}
+
+
+//*************************************************************************************************************
+
+void  BrainHemisphereTreeItem::setData(const QVariant& value, int role)
+{
+    AbstractTreeItem::setData(value, role);
+}
+
+
+//*************************************************************************************************************
+
+bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
+{
+    //Set name of this item based on the hemispehre information
+    switch (tSurface.hemi()) {
+    case 0:
+        this->setText("Left");
+        break;
+    case 1:
+        this->setText("Right");
+        break;
+    default:
+        this->setText("Unknown");
+        break;
+    }
+
+    //Add childs
+    bool state = false;
+
+    //Add surface child
+    BrainSurfaceTreeItem* pSurfaceItem = new BrainSurfaceTreeItem(BrainTreeModelItemTypes::SurfaceItem);
+    *this<<pSurfaceItem;
+    state = pSurfaceItem->addData(tSurface, p3DEntityParent);
+
+    //Add annotation child
+    if(!tAnnotation.isEmpty()) {
+        BrainAnnotationTreeItem* pAnnotItem = new BrainAnnotationTreeItem(BrainTreeModelItemTypes::AnnotationItem);
+        *this<<pAnnotItem;
+        state = pAnnotItem->addData(tSurface, tAnnotation);
+    }
+
+    return state;
+}
+
+
+//*************************************************************************************************************
+
+BrainRTDataTreeItem* BrainHemisphereTreeItem::addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
+{
+    if(!tSourceEstimate.isEmpty()) {
+        //Add source estimation data as child
+        BrainRTDataTreeItem* pBrainRtDataTreeItem = new BrainRTDataTreeItem(BrainTreeModelItemTypes::RTDataItem);
+        *this<<pBrainRtDataTreeItem;
+        pBrainRtDataTreeItem->addData(tSourceEstimate, tForwardSolution, this->text());
+        return pBrainRtDataTreeItem;
+    }
+
+    return new BrainRTDataTreeItem();
+}
+

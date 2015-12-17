@@ -70,6 +70,9 @@ using namespace FSLIB;
 //=============================================================================================================
 
 Annotation::Annotation()
+: m_sFilePath("")
+, m_sFileName("")
+, m_iHemi(-1)
 {
 
 }
@@ -83,6 +86,28 @@ Annotation::Annotation(const QString& p_sFileName)
     Annotation t_Annotation;
     Annotation::read(m_sFileName, t_Annotation);
     *this = t_Annotation;
+}
+
+
+//*************************************************************************************************************
+
+Annotation::Annotation(const QString &subject_id, qint32 hemi, const QString &atlas, const QString &subjects_dir)
+: m_sFilePath("")
+, m_sFileName("")
+, m_iHemi(-1)
+{
+    Annotation::read(subject_id, hemi, atlas, subjects_dir, *this);
+}
+
+
+//*************************************************************************************************************
+
+Annotation::Annotation(const QString &path, qint32 hemi, const QString &atlas)
+: m_sFilePath("")
+, m_sFileName("")
+, m_iHemi(-1)
+{
+    Annotation::read(path, hemi, atlas, *this);
 }
 
 
