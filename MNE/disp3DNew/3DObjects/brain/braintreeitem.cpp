@@ -71,7 +71,7 @@ BrainTreeItem::~BrainTreeItem()
 
 QVariant BrainTreeItem::data(int role) const
 {
-    return QStandardItem::data(role);
+    return AbstractTreeItem::data(role);
 }
 
 
@@ -79,7 +79,7 @@ QVariant BrainTreeItem::data(int role) const
 
 void  BrainTreeItem::setData(const QVariant& value, int role)
 {
-    QStandardItem::setData(value, role);
+    AbstractTreeItem::setData(value, role);
 
     //TODO: Exchange this with signal slot system (Problem with Q_Object and inherited QStandardItem)
     switch(role) {

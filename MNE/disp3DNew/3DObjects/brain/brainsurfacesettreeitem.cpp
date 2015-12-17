@@ -76,7 +76,7 @@ QVariant BrainSurfaceSetTreeItem::data(int role) const
             return QVariant();
     }
 
-    return QStandardItem::data(role);
+    return AbstractTreeItem::data(role);
 }
 
 
@@ -84,7 +84,7 @@ QVariant BrainSurfaceSetTreeItem::data(int role) const
 
 void  BrainSurfaceSetTreeItem::setData(const QVariant& value, int role)
 {
-    QStandardItem::setData(value, role);
+    AbstractTreeItem::setData(value, role);
 }
 
 

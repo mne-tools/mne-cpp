@@ -71,7 +71,7 @@ BrainAnnotationTreeItem::~BrainAnnotationTreeItem()
 
 QVariant BrainAnnotationTreeItem::data(int role) const
 {
-    return QStandardItem::data(role);
+    return AbstractTreeItem::data(role);
 }
 
 
@@ -79,7 +79,7 @@ QVariant BrainAnnotationTreeItem::data(int role) const
 
 void  BrainAnnotationTreeItem::setData(const QVariant& value, int role)
 {
-    QStandardItem::setData(value, role);
+    AbstractTreeItem::setData(value, role);
 }
 
 

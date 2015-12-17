@@ -58,6 +58,7 @@ BrainRTDataTreeItem::BrainRTDataTreeItem(const int &iType, const QString &text)
 : AbstractTreeItem(iType, text)
 , m_bInit(false)
 , m_sHemi("Unknown")
+, m_pItemRTDataStreamStatus(new BrainTreeItem())
 {
 }
 
@@ -73,7 +74,7 @@ BrainRTDataTreeItem::~BrainRTDataTreeItem()
 
 QVariant BrainRTDataTreeItem::data(int role) const
 {
-    return QStandardItem::data(role);
+    return AbstractTreeItem::data(role);
 }
 
 
@@ -81,7 +82,7 @@ QVariant BrainRTDataTreeItem::data(int role) const
 
 void  BrainRTDataTreeItem::setData(const QVariant& value, int role)
 {
-    QStandardItem::setData(value, role);
+    AbstractTreeItem::setData(value, role);
 
     switch(role) {
     case BrainRTDataTreeItemRoles::RTData:
@@ -94,7 +95,7 @@ void  BrainRTDataTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QString & hemi)
+bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QString& hemi)
 {   
     m_sHemi = hemi;
     int iHemi = m_sHemi == "lh" ? 0 : 1;
@@ -113,6 +114,8 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
 
     //Add surface meta information as item children
     m_pItemRTDataStreamStatus = new BrainTreeItem(BrainTreeModelItemTypes::RTDataStreamStatus, "Stream data on/off");
+    connect(m_pItemRTDataStreamStatus, &BrainTreeItem::checkStateChanged,
+            this, &BrainRTDataTreeItem::onCheckStateChanged);
     *this<<m_pItemRTDataStreamStatus;
     m_pItemRTDataStreamStatus->setCheckable(true);
     m_pItemRTDataStreamStatus->setCheckState(Qt::Unchecked);
@@ -151,3 +154,18 @@ bool BrainRTDataTreeItem::updateData(const MNESourceEstimate& tSourceEstimate)
 
     return true;
 }
+
+
+//*************************************************************************************************************
+
+void BrainRTDataTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+{
+    if(checkState == Qt::Checked) {
+        //TODO: Start stc worker
+        qDebug()<<"Start stc worker";
+    } else if(checkState == Qt::Unchecked) {
+        //TODO: Stop stc worker
+        qDebug()<<"Stop stc worker";
+    }
+}
+
