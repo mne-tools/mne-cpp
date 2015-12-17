@@ -85,8 +85,9 @@ namespace DISP3DNEWLIB
 *
 * @brief Provides the basic tree item.
 */
-class AbstractTreeItem : public QStandardItem
+class AbstractTreeItem : public QObject, public QStandardItem
 {
+    Q_OBJECT;
 
 public :
 

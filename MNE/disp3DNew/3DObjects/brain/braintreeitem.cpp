@@ -84,20 +84,17 @@ void  BrainTreeItem::setData(const QVariant & value, int role)
     //TODO: Exchange this with signal slot system (Problem with Q_Object and inherited QStandardItem)
     switch(role) {
     case BrainTreeItemRoles::SurfaceColorSulci: {
-        BrainSurfaceTreeItem* pParent = dynamic_cast<BrainSurfaceTreeItem*>(this->QStandardItem::parent());
-        pParent->updateVertColor();
+        emit updateSurfaceVertColors();
         break;
     }
 
     case BrainTreeItemRoles::SurfaceColorGyri: {
-        BrainSurfaceTreeItem* pParent = dynamic_cast<BrainSurfaceTreeItem*>(this->QStandardItem::parent());
-        pParent->updateVertColor();
+        emit updateSurfaceVertColors();
         break;
     }
 
     case BrainTreeItemRoles::SurfaceColorInfoOrigin: {
-        BrainSurfaceTreeItem* pParent = dynamic_cast<BrainSurfaceTreeItem*>(this->QStandardItem::parent());
-        pParent->updateVertColor();
+        emit updateSurfaceVertColors();
         break;
     }
     }

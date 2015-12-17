@@ -104,10 +104,12 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate & tSourceEstimate, con
     this->setData(data, BrainRTDataTreeItemRoles::RTTimes);
 
     //Add surface meta information as item children
-    BrainTreeItem *itemRTDataStream = new BrainTreeItem(BrainTreeModelItemTypes::RTDataStreamStatus, "Stream data on/off";
+    BrainTreeItem *itemRTDataStream = new BrainTreeItem(BrainTreeModelItemTypes::RTDataStreamStatus, "Stream data on/off");
     *this<<itemRTDataStream;
     itemRTDataStream->setCheckable(true);
-    itemRTDataStream->setData(false, BrainTreeItemRoles::RTDataStreamStatus);
+    itemRTDataStream->setCheckState(Qt::Unchecked);
+    data.setValue(false);
+    itemRTDataStream->setData(data, BrainTreeItemRoles::RTDataStreamStatus);
 
     QString sIsClustered = tForwardSolution.src[0].isClustered() ? "Clustered source space" : "Full source space";
     BrainTreeItem *itemSourceSpaceType = new BrainTreeItem(BrainTreeModelItemTypes::RTDataSourceSpaceType, sIsClustered);
@@ -117,7 +119,7 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate & tSourceEstimate, con
 
     BrainTreeItem *itemColormapType = new BrainTreeItem(BrainTreeModelItemTypes::RTDataColormapType, "Hot Negative 2");
     *this<<itemColormapType;
-    data.setValue("Hot Negative 2");
+    data.setValue(QString("Hot Negative 2"));
     itemColormapType->setData(data, BrainTreeItemRoles::RTDataColormapType);
 
     m_bInit = true;

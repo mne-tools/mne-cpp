@@ -103,6 +103,7 @@ using namespace Eigen;
 */
 class DISP3DNEWSHARED_EXPORT BrainAnnotationTreeItem : public AbstractTreeItem
 {
+    Q_OBJECT;
 
 public:
     typedef QSharedPointer<BrainAnnotationTreeItem> SPtr;             /**< Shared pointer type for BrainAnnotationTreeItem class. */

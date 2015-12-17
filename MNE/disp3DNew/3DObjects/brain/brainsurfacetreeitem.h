@@ -44,7 +44,7 @@
 #include "../../disp3DNew_global.h"
 
 #include "../../helpers/abstracttreeitem.h"
-#include "brainhemispheretreeitem.h"
+#include "braintreeitem.h"
 
 #include "../../helpers/types.h"
 #include "../../helpers/renderable3Dentity.h"
@@ -106,6 +106,7 @@ class BrainTreeItem;
 */
 class DISP3DNEWSHARED_EXPORT BrainSurfaceTreeItem : public AbstractTreeItem
 {
+    Q_OBJECT;
 
 public:
     typedef QSharedPointer<BrainSurfaceTreeItem> SPtr;             /**< Shared pointer type for BrainSurfaceTreeItem class. */

@@ -44,8 +44,6 @@
 #include "../../disp3DNew_global.h"
 #include "../../helpers/abstracttreeitem.h"
 
-#include "brainsurfacetreeitem.h"
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -99,6 +97,7 @@ using namespace Eigen;
 */
 class DISP3DNEWSHARED_EXPORT BrainTreeItem : public AbstractTreeItem
 {
+    Q_OBJECT;
 
 public:
     typedef QSharedPointer<BrainTreeItem> SPtr;             /**< Shared pointer type for BrainTreeItem class. */
@@ -122,6 +121,9 @@ public:
     */
     QVariant data(int role = Qt::UserRole + 1) const;
     void setData(const QVariant & value, int role = Qt::UserRole + 1);
+
+signals:
+    void updateSurfaceVertColors();
 
 private:
 
