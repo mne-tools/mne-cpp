@@ -143,12 +143,15 @@ public:
 
     bool updateData(const MNESourceEstimate& tSourceEstimate);
 
+    void onCheckStateChanged(const Qt::CheckState& checkState);
+
     inline bool isInit() const;
 
 signals:
     void rtDataChanged();
 
 private:
+
     bool        m_bInit;
     QString     m_sHemi;
 

@@ -75,7 +75,7 @@ BrainSurfaceTreeItem::~BrainSurfaceTreeItem()
 
 QVariant BrainSurfaceTreeItem::data(int role) const
 {
-    return QStandardItem::data(role);
+    return AbstractTreeItem::data(role);
 }
 
 
@@ -83,7 +83,7 @@ QVariant BrainSurfaceTreeItem::data(int role) const
 
 void  BrainSurfaceTreeItem::setData(const QVariant& value, int role)
 {
-    QStandardItem::setData(value, role);
+    AbstractTreeItem::setData(value, role);
 
     switch(role) {
     case BrainSurfaceTreeItemRoles::SurfaceRTSourceLocColor:

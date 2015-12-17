@@ -71,12 +71,7 @@ BrainHemisphereTreeItem::~BrainHemisphereTreeItem()
 
 QVariant BrainHemisphereTreeItem::data(int role) const
 {
-    switch(role) {
-        case BrainHemisphereTreeItemRoles::SurfaceHemi:
-            return QVariant();
-    }
-
-    return QStandardItem::data(role);
+    return AbstractTreeItem::data(role);
 }
 
 
@@ -84,7 +79,7 @@ QVariant BrainHemisphereTreeItem::data(int role) const
 
 void  BrainHemisphereTreeItem::setData(const QVariant& value, int role)
 {
-    QStandardItem::setData(value, role);
+    AbstractTreeItem::setData(value, role);
 }
 
 

@@ -19,6 +19,30 @@ AbstractTreeItem::~AbstractTreeItem()
 
 //*************************************************************************************************************
 
+QVariant AbstractTreeItem::data(int role) const
+{
+    return QStandardItem::data(role);
+}
+
+
+//*************************************************************************************************************
+
+void  AbstractTreeItem::setData(const QVariant& value, int role)
+{
+    qDebug()<<role;
+    QStandardItem::setData(value, role);
+
+    switch(role) {
+        case Qt::CheckStateRole:{
+            emit checkStateChanged(this->checkState());
+            break;
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
 int  AbstractTreeItem::type() const
 {
     return m_iType;

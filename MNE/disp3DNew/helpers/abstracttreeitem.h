@@ -94,6 +94,9 @@ public :
     AbstractTreeItem(const int& iType, const QString& text = "");
     virtual ~AbstractTreeItem();
 
+    QVariant data(int role = Qt::UserRole + 1) const;
+    void setData(const QVariant& value, int role = Qt::UserRole + 1);
+
     int type() const;
 
     QList<QStandardItem*> findChildren(const int& type);
@@ -101,6 +104,9 @@ public :
 
     AbstractTreeItem &operator<<(AbstractTreeItem* newItem);
     AbstractTreeItem &operator<<(AbstractTreeItem& newItem);
+
+signals:
+    void checkStateChanged(const Qt::CheckState& checkState);
 
 protected :
     void createToolTip();
