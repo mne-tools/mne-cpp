@@ -162,37 +162,43 @@ Q_DECLARE_METATYPE(DISP3DNEWLIB::Renderable3DEntity*)
 
 #ifndef metatype_matrixx3i
 #define metatype_matrixx3i
-Q_DECLARE_METATYPE(Eigen::MatrixX3i)
+Q_DECLARE_METATYPE(Eigen::MatrixX3i);
 #endif
 
 #ifndef metatype_matrixXd
 #define metatype_matrixXd
-Q_DECLARE_METATYPE(Eigen::MatrixXd)
+Q_DECLARE_METATYPE(Eigen::MatrixXd);
 #endif
 
 #ifndef metatype_matrixx3f
 #define metatype_matrixx3f
-Q_DECLARE_METATYPE(Eigen::MatrixX3f)
+Q_DECLARE_METATYPE(Eigen::MatrixX3f);
 #endif
 
 #ifndef metatype_vectorxf
 #define metatype_vectorxf
-Q_DECLARE_METATYPE(Eigen::VectorXf)
+Q_DECLARE_METATYPE(Eigen::VectorXf);
 #endif
 
 #ifndef metatype_vectorxi
 #define metatype_vectorxi
-Q_DECLARE_METATYPE(Eigen::VectorXi)
+Q_DECLARE_METATYPE(Eigen::VectorXi);
+#endif
+
+#ifndef metatype_vectorxd
+#define metatype_vectorxd
+Q_DECLARE_METATYPE(Eigen::VectorXd);
 #endif
 
 #ifndef metatype_rowvectorxf
 #define metatype_rowvectorxf
-Q_DECLARE_METATYPE(Eigen::RowVectorXf)
+Q_DECLARE_METATYPE(Eigen::RowVectorXf);
 #endif
 
 #ifndef metatype_vector3f
 #define metatype_vector3f
-Q_DECLARE_METATYPE(Eigen::Vector3f)
+Q_DECLARE_METATYPE(Eigen::Vector3f);
 #endif
+
 
 #endif // TYPES_H

@@ -44,6 +44,7 @@
 #include <iostream>
 
 #include "../../disp3dnew_global.h"
+#include "../../helpers/types.h"
 
 
 //*************************************************************************************************************
@@ -81,6 +82,7 @@ namespace DISP3DNEWLIB
 
 using namespace Eigen;
 
+
 //=============================================================================================================
 /**
 * Worker which schedules data with the right timing
@@ -100,7 +102,7 @@ public:
 
 //    void setIntervall(int intervall);
 
-    void addData(QList<VectorXd>& data);
+    void addData(const MatrixXd& data);
 
     void clear();
 
@@ -113,14 +115,14 @@ public:
     void stop();
 
 signals:
-    void stcSample(Eigen::VectorXd sample);
+    void stcSample(VectorXd sample);
 
 protected:
     virtual void run();
 
 private:
     QMutex m_qMutex;
-    QList<VectorXd> m_data;   /**< List that holds the fiff matrix data <n_channels x n_samples> */
+    MatrixXd m_data;   /**< List that holds the fiff matrix data <n_channels x n_samples> */
 
     bool m_bIsRunning;
     bool m_bIsLooping;

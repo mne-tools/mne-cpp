@@ -59,7 +59,10 @@ BrainRTDataTreeItem::BrainRTDataTreeItem(const int &iType, const QString &text)
 , m_bInit(false)
 , m_sHemi("Unknown")
 , m_pItemRTDataStreamStatus(new BrainTreeItem())
+, m_pStcDataWorker(new StcDataWorker(this))
 {
+    connect(m_pStcDataWorker, &StcDataWorker::stcSample,
+            this, &BrainRTDataTreeItem::onStcSample);
 }
 
 
@@ -83,13 +86,6 @@ QVariant BrainRTDataTreeItem::data(int role) const
 void  BrainRTDataTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
-
-    switch(role) {
-    case BrainRTDataTreeItemRoles::RTData:
-        if(m_pItemRTDataStreamStatus->checkState() == Qt::Checked) {
-            emit rtDataChanged();
-        }
-    }
 }
 
 
@@ -133,6 +129,8 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     data.setValue(QString("Hot Negative 2"));
     itemColormapType->setData(data, BrainTreeItemRoles::RTDataColormapType);
 
+    m_pStcDataWorker->addData(tSourceEstimate.data);
+
     m_bInit = true;
 
     return true;
@@ -147,6 +145,8 @@ bool BrainRTDataTreeItem::updateData(const MNESourceEstimate& tSourceEstimate)
         qDebug()<<"BrainRTDataTreeItem::updateData - Item was not initialized/filled with data yet!";
         return false;
     }
+
+    m_pStcDataWorker->addData(tSourceEstimate.data);
 
     QVariant data;
     data.setValue(tSourceEstimate.data);
@@ -163,9 +163,20 @@ void BrainRTDataTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
     if(checkState == Qt::Checked) {
         //TODO: Start stc worker
         qDebug()<<"Start stc worker";
+        m_pStcDataWorker->start();
     } else if(checkState == Qt::Unchecked) {
         //TODO: Stop stc worker
         qDebug()<<"Stop stc worker";
+        m_pStcDataWorker->stop();
     }
+}
+
+
+//*************************************************************************************************************
+
+void BrainRTDataTreeItem::onStcSample(const VectorXd& sample)
+{
+    qDebug()<<"data received: "<<sample.rows();
+    emit rtDataChanged(sample, this->data(BrainRTDataTreeItemRoles::RTVertices).value<VectorXi>());
 }
 
