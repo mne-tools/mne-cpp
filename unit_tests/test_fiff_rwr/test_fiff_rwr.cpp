@@ -306,6 +306,17 @@ void TestFiffRWR::compareInfo()
         MatrixXd tmp = first_in_raw.info.projs[i].data->data - second_in_raw.info.projs[i].data->data;
         QVERIFY( tmp.sum() < epsilon );
     }
+
+    //Compensators
+    std::cout << "[3] Compensator Check\n";
+    QVERIFY( first_in_raw.info.comps.size() == second_in_raw.info.comps.size() );
+
+    for( qint32 i = 0; i < first_in_raw.info.comps.size(); ++i )
+    {
+        std::cout << "Compensator " << i << std::endl;
+        MatrixXd tmp = first_in_raw.info.comps[i].data->data - second_in_raw.info.comps[i].data->data;
+        QVERIFY( tmp.sum() < epsilon );
+    }
 }
 
 //*************************************************************************************************************
