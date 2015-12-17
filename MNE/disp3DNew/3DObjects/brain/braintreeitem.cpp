@@ -81,7 +81,6 @@ void  BrainTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 
-    //TODO: Exchange this with signal slot system (Problem with Q_Object and inherited QStandardItem)
     switch(role) {
         case BrainTreeItemRoles::SurfaceColorSulci: {
             emit updateSurfaceVertColors();
