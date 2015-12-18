@@ -1,15 +1,16 @@
 //=============================================================================================================
 /**
-* @file     window.h
-* @author   Qt Project (qt3D examples)
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     braintreedelegate.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     November, 2015
+* @date     December, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, QtProject, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,19 +31,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Window class declaration
+* @brief BrainTreeDelegate class declaration.
+*
 */
 
-#ifndef WINDOW_H
-#define WINDOW_H
-
+#ifndef BRAINTREEDELEGATE_H
+#define BRAINTREEDELEGATE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3DNew_global.h"
+#include "../../disp3DNew_global.h"
+
+#include "braintreemodel.h"
+#include "../../helpers/abstracttreeitem.h"
 
 
 //*************************************************************************************************************
@@ -50,25 +54,13 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWindow>
-
-#include <QKeyEvent>
-#include <QGuiApplication>
-#include <QOpenGLContext>
-
+#include <QItemDelegate>
+#include <QSpinBox>
+#include <QDoubleSpinBox>
+#include <QComboBox>
 #include <QDebug>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
+#include <QColorDialog>
+#include <QPushButton>
 
 
 //*************************************************************************************************************
@@ -79,55 +71,31 @@
 namespace DISP3DNEWLIB
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
 
 //=============================================================================================================
 /**
-* Window is a subclass of the QWindow with OpenGL support.
-*
-* @brief Window is a subclass of the QWindow with OpenGL support.
+* DECLARE CLASS BrainTreeDelegate
 */
-class DISP3DNEWSHARED_EXPORT Window : public QWindow
+class DISP3DNEWSHARED_EXPORT BrainTreeDelegate : public QItemDelegate
 {
     Q_OBJECT
+
 public:
-    //=========================================================================================================
-    /**
-    * Default constructor.
-    *
-    * @param[in] parent         The parent of this class.
-    */
-    explicit Window(QScreen* screen = 0);
+    BrainTreeDelegate(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Default destructor.
+    * Reimplemented virtual functions
     *
     */
-    ~Window();
+    QWidget *createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+    void setEditorData(QWidget* editor, const QModelIndex& index) const;
+    void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const;
+    void updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 
-protected:
-    //=========================================================================================================
-    /**
-    * Virtual functions for mouse and keyboard control
-    *
-    */
-    virtual void keyPressEvent(QKeyEvent* e);
-    virtual void mousePressEvent(QMouseEvent* e);
-    virtual void wheelEvent(QWheelEvent* e);
-    virtual void mouseMoveEvent(QMouseEvent* e);
+private:
 };
 
-}
+} //NAMESPACE DISP3DNEWLIB
 
-#endif // QT3D_WINDOW_H
+#endif // BRAINTREEDELEGATE_H

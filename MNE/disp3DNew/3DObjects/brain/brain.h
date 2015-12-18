@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     window.h
-* @author   Qt Project (qt3D examples)
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     brain.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     November, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, QtProject, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,19 +29,26 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Window class declaration
+* @brief    Brain class declaration
+*
 */
 
-#ifndef WINDOW_H
-#define WINDOW_H
-
+#ifndef BRAIN_H
+#define BRAIN_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3DNew_global.h"
+#include "disp3dnew_global.h"
+
+#include "braintreemodel.h"
+
+#include <fs/surfaceset.h>
+#include <fs/annotationset.h>
+
+#include <disp/helpers/colormap.h>
 
 
 //*************************************************************************************************************
@@ -50,19 +56,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWindow>
+#include <QSharedPointer>
 
-#include <QKeyEvent>
-#include <QGuiApplication>
-#include <QOpenGLContext>
-
-#include <QDebug>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
+#include <Qt3DCore/QEntity>
 
 
 //*************************************************************************************************************
@@ -84,6 +80,7 @@ namespace DISP3DNEWLIB
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace FSLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -93,41 +90,66 @@ namespace DISP3DNEWLIB
 
 //=============================================================================================================
 /**
-* Window is a subclass of the QWindow with OpenGL support.
+* Visualizes a brain in 3D.
 *
-* @brief Window is a subclass of the QWindow with OpenGL support.
+* @brief Visualizes a brain in 3D.
 */
-class DISP3DNEWSHARED_EXPORT Window : public QWindow
+class DISP3DNEWSHARED_EXPORT Brain : public Qt3DCore::QEntity
 {
     Q_OBJECT
+
 public:
+    typedef QSharedPointer<Brain> SPtr;             /**< Shared pointer type for Brain class. */
+    typedef QSharedPointer<const Brain> ConstSPtr;  /**< Const shared pointer type for Brain class. */
+
     //=========================================================================================================
     /**
     * Default constructor.
     *
     * @param[in] parent         The parent of this class.
     */
-    explicit Window(QScreen* screen = 0);
+    Brain(QEntity * parent = 0);
 
     //=========================================================================================================
     /**
     * Default destructor.
-    *
     */
-    ~Window();
+    ~Brain();
 
-protected:
     //=========================================================================================================
     /**
-    * Virtual functions for mouse and keyboard control
+    * Adds FreeSurfer brain data SETS.
     *
+    * @param[in] tSurfaceSet        FreeSurfer surface set.
+    * @param[in] tAnnotationSet     FreeSurfer annotation set.
+    * @return                       Returns true if successful.
     */
-    virtual void keyPressEvent(QKeyEvent* e);
-    virtual void mousePressEvent(QMouseEvent* e);
-    virtual void wheelEvent(QWheelEvent* e);
-    virtual void mouseMoveEvent(QMouseEvent* e);
+    bool addData(const QString& text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet);
+
+    //=========================================================================================================
+    /**
+    * Adds FreeSurfer brain data.
+    *
+    * @param[in] pSurface           FreeSurfer surface.
+    * @param[in] pAnnotation        FreeSurfer annotation.
+    * @return                       Returns true if successful.
+    */
+    bool addData(const QString& text, const Surface& tSurface, const Annotation& tAnnotation);
+
+    QList<BrainRTDataTreeItem*> addData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution);
+
+    //=========================================================================================================
+    /**
+    * Return the brain tree model.
+    *
+    * @return returns a pointer to the brain tree model BrainTreeModel.
+    */
+    BrainTreeModel* getBrainTreeModel();    
+
+protected:
+    BrainTreeModel*                 m_pBrainTreeModel;
 };
 
-}
+} // NAMESPACE
 
-#endif // QT3D_WINDOW_H
+#endif // BRAIN_H

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     renderable3Dentity.cpp
+* @file     braintreemodel.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Renderable3DEntity class definition.
+* @brief    BrainTreeModel class definition.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "renderable3Dentity.h"
+#include "braintreemodel.h"
 
 
 //*************************************************************************************************************
@@ -54,75 +54,90 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
-: Qt3DCore::QEntity(parent)
-, m_pCustomMesh(CustomMesh::SPtr(new CustomMesh()))
-, m_pTransform(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
-, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPerVertexColorMaterial))
+BrainTreeModel::BrainTreeModel(QObject* parent)
+: QStandardItemModel(parent)
 {
-    this->addComponent(m_pCustomMesh.data());
-    this->addComponent(m_pTransform.data());
-    this->addComponent(m_pMaterial.data());
+    m_pRootItem = this->invisibleRootItem();
+    m_pRootItem->setText("Loaded 3D Data");
 }
 
 
 //*************************************************************************************************************
 
-Renderable3DEntity::Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset, Qt3DCore::QEntity* parent)
-: Qt3DCore::QEntity(parent)
-, m_pCustomMesh(new CustomMesh(tMatVert, tMatNorm, tMatTris, tVecOffset))
-, m_pTransform(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
-, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPerVertexColorMaterial(this)))
-//, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QNormalDiffuseMapMaterial(this)))
+BrainTreeModel::~BrainTreeModel()
 {
-    this->addComponent(m_pCustomMesh.data());
-    this->addComponent(m_pTransform.data());
-    this->addComponent(m_pMaterial.data());
+    delete m_pRootItem;
 }
 
 
 //*************************************************************************************************************
 
-Renderable3DEntity::~Renderable3DEntity()
+QVariant BrainTreeModel::data(const QModelIndex& index, int role) const
 {
-    this->removeAllComponents();
+    return QStandardItemModel::data(index, role);
 }
 
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::setVertColor(const Matrix<float, Dynamic, 3, RowMajor>& tMatColors)
+bool BrainTreeModel::addData(const QString& text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
 {
-    return m_pCustomMesh->setVertColor(tMatColors);
+    QList<QStandardItem*> itemList = this->findItems(text);
+    bool state = false;
+
+    if(!itemList.isEmpty() && (itemList.at(0)->type() == BrainTreeModelItemTypes::SurfaceSetItem)) {
+        BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
+        state = pSurfaceSetItem->addData(tSurfaceSet, tAnnotationSet, p3DEntityParent);
+    } else {
+        BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, text);
+        m_pRootItem->appendRow(pSurfaceSetItem);
+        state = pSurfaceSetItem->addData(tSurfaceSet, tAnnotationSet, p3DEntityParent);
+    }
+
+    return state;
 }
 
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::setMeshData(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset,  const Matrix<float, Dynamic, 3, RowMajor>& tMatColors)
+bool BrainTreeModel::addData(const QString& text, const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
 {
-    return m_pCustomMesh->setMeshData(tMatVert, tMatNorm, tMatTris, tVecOffset, tMatColors);
+    QList<QStandardItem*> itemList = this->findItems(text);
+    bool state = false;
+
+    if(!itemList.isEmpty() && (itemList.at(0)->type() == BrainTreeModelItemTypes::SurfaceSetItem)) {
+        BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
+        state = pSurfaceSetItem->addData(tSurface, tAnnotation, p3DEntityParent);
+    } else {
+        BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, text);
+        m_pRootItem->appendRow(pSurfaceSetItem);
+        state = pSurfaceSetItem->addData(tSurface, tAnnotation, p3DEntityParent);
+    }
+
+    return state;
 }
 
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::setTransform(QSharedPointer<Qt3DCore::QTransform> pTransform)
+QList<BrainRTDataTreeItem*> BrainTreeModel::addData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
-    m_pTransform = pTransform;
+    QList<BrainRTDataTreeItem*> returnList;
+    QList<QStandardItem*> itemList = this->findItems(text);
 
-    return true;
+    //Find the all the hemispheres of the set "text" and add the source estimates as items
+    if(!itemList.isEmpty()) {
+        for(int i = 0; i<itemList.size(); i++) {
+            for(int j = 0; j<itemList.at(i)->rowCount(); j++) {
+                if(itemList.at(i)->child(j,0)->type() == BrainTreeModelItemTypes::HemisphereItem) {
+                    BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(i)->child(j,0));
+                    returnList.append(pHemiItem->addData(tSourceEstimate, tForwardSolution));
+                }
+            }
+        }
+    }
+
+    return returnList;
 }
-
-
-//*************************************************************************************************************
-
-bool Renderable3DEntity::setMaterial(QSharedPointer<Qt3DRender::QMaterial> pMaterial)
-{
-    m_pMaterial = pMaterial;
-
-    return true;
-}
-
 
 

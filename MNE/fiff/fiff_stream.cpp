@@ -2025,33 +2025,6 @@ void FiffStream::write_float(fiff_int_t kind, const float* data, fiff_int_t nel)
 
 //*************************************************************************************************************
 
-//void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXf& mat)
-//{
-//    qint32 FIFFT_MATRIX = 1 << 30;
-//    qint32 FIFFT_MATRIX_FLOAT = FIFFT_FLOAT | FIFFT_MATRIX;
-
-//    qint32 numel = mat.rows() * mat.cols();
-
-//    fiff_int_t datasize = 4*numel + 4*3;
-
-//    *this << (qint32)kind;
-//    *this << (qint32)FIFFT_MATRIX_FLOAT;
-//    *this << (qint32)datasize;
-//    *this << (qint32)FIFFV_NEXT_SEQ;
-
-//    qint32 i;
-//    for(i = 0; i < numel; ++i)
-//        *this << mat.data()[i];
-
-//    qint32 dims[3];
-//    dims[0] = mat.cols();
-//    dims[1] = mat.rows();
-//    dims[2] = 2;
-
-//    for(i = 0; i < 3; ++i)
-//        *this << dims[i];
-//}
-
 void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXf& mat)
 {
     qint32 FIFFT_MATRIX = 1 << 30;
@@ -2067,20 +2040,10 @@ void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXf& mat)
     *this << (qint32)FIFFV_NEXT_SEQ;
 
     qint32 i, j;
-//    for(i = 0; i < numel; ++i)
-//        *this << mat.data()[i];
-
-    //Option 1: Rowmajor
+    // Storage order: row-major
     for(i = 0; i < mat.rows(); ++i)
         for(j = 0; j < mat.cols(); ++j)
             *this << mat(i,j);
-
-//    //Option 2: Colmajor
-//    for(j = 0; j < mat.cols(); ++j)
-//        for(i = 0; i < mat.rows(); ++i)
-//            *this << mat(i,j);
-
-
 
     qint32 dims[3];
     dims[0] = mat.cols();
@@ -2424,20 +2387,11 @@ void FiffStream::write_int_matrix(fiff_int_t kind, const MatrixXi& mat)
     *this << (qint32)datasize;
     *this << (qint32)FIFFV_NEXT_SEQ;
 
-    qint32 i,j;
-//    for(i = 0; i < numel; ++i)
-//        *this << mat.data()[i];
-
-    //Option 1: Rowmajor
+    qint32 i, j;
+    // Storage order: row-major
     for(i = 0; i < mat.rows(); ++i)
         for(j = 0; j < mat.cols(); ++j)
             *this << mat(i,j);
-
-//        //Option 2: Colmajor
-//        for(j = 0; j < mat.cols(); ++j)
-//            for(i = 0; i < mat.rows(); ++i)
-//                *this << mat(i,j);
-
 
     qint32 dims[3];
     dims[0] = mat.cols();
