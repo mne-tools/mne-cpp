@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     window.h
-* @author   Qt Project (qt3D examples)
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     brainrtdata.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     November, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, QtProject, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,33 +29,40 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Window class declaration
+* @brief     BrainRTDataTreeItem class declaration.
+*
 */
 
-#ifndef WINDOW_H
-#define WINDOW_H
-
+#ifndef BRAINRTDATATREEITEM_H
+#define BRAINRTDATATREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3DNew_global.h"
+#include "../../disp3DNew_global.h"
+
+#include "../../helpers/abstracttreeitem.h"
+#include "../../helpers/types.h"
+
+#include "braintreeitem.h"
+
+#include "mne/mne_sourceestimate.h"
+#include "mne/mne_forwardsolution.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QWindow>
-
-#include <QKeyEvent>
-#include <QGuiApplication>
-#include <QOpenGLContext>
-
-#include <QDebug>
+#include <QList>
+#include <QVariant>
+#include <QStringList>
+#include <QColor>
+#include <QStandardItem>
+#include <QStandardItemModel>
 
 
 //*************************************************************************************************************
@@ -64,11 +70,7 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -79,10 +81,14 @@
 namespace DISP3DNEWLIB
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
+
+using namespace Eigen;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -93,41 +99,75 @@ namespace DISP3DNEWLIB
 
 //=============================================================================================================
 /**
-* Window is a subclass of the QWindow with OpenGL support.
+* BrainRTDataTreeItem provides a generic item to hold information about real time data to plot onto the brain surface.
 *
-* @brief Window is a subclass of the QWindow with OpenGL support.
+* @brief Provides a generic brain tree item to hold real time data.
 */
-class DISP3DNEWSHARED_EXPORT Window : public QWindow
+class DISP3DNEWSHARED_EXPORT BrainRTDataTreeItem : public AbstractTreeItem
 {
-    Q_OBJECT
+    Q_OBJECT;
+
 public:
+    typedef QSharedPointer<BrainRTDataTreeItem> SPtr;             /**< Shared pointer type for BrainRTDataTreeItem class. */
+    typedef QSharedPointer<const BrainRTDataTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainRTDataTreeItem class. */
+
     //=========================================================================================================
     /**
     * Default constructor.
-    *
-    * @param[in] parent         The parent of this class.
     */
-    explicit Window(QScreen* screen = 0);
+    explicit BrainRTDataTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "RT Data");
 
     //=========================================================================================================
     /**
-    * Default destructor.
-    *
+    * Default destructor
     */
-    ~Window();
+    ~BrainRTDataTreeItem();
 
-protected:
     //=========================================================================================================
     /**
-    * Virtual functions for mouse and keyboard control
-    *
+    * AbstractTreeItem functions
     */
-    virtual void keyPressEvent(QKeyEvent* e);
-    virtual void mousePressEvent(QMouseEvent* e);
-    virtual void wheelEvent(QWheelEvent* e);
-    virtual void mouseMoveEvent(QMouseEvent* e);
+    QVariant data(int role = Qt::UserRole + 1) const;
+    void setData(const QVariant& value, int role = Qt::UserRole + 1);
+
+    //=========================================================================================================
+    /**
+    * Adds FreeSurfer data based on annotation information to this model.
+    *
+    * @param[in] tSurface           FreeSurfer surface.
+    * @param[in] tAnnotation        FreeSurfer annotation.
+    *
+    * @return                       Returns true if successful.
+    */
+    bool addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QString& hemi = "Unknown");
+
+    bool updateData(const MNESourceEstimate& tSourceEstimate);
+
+    void onCheckStateChanged(const Qt::CheckState& checkState);
+
+    inline bool isInit() const;
+
+signals:
+    void rtDataChanged();
+
+private:
+
+    bool        m_bInit;
+    QString     m_sHemi;
+
+    BrainTreeItem*  m_pItemRTDataStreamStatus;
 };
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool BrainRTDataTreeItem::isInit() const
+{
+    return m_bInit;
 }
 
-#endif // QT3D_WINDOW_H
+} //NAMESPACE DISP3DNEWLIB
+
+#endif // BRAINRTDATATREEITEM_H

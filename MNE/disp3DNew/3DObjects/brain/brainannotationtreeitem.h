@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brainobject.h
+* @file     brainannotationtreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,41 +29,47 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BrainObject class declaration
+* @brief     BrainAnnotationTreeItem class declaration.
 *
 */
 
-#ifndef BRAINOBJECT_H
-#define BRAINOBJECT_H
+#ifndef BRAINANNOTATIONTREEITEM_H
+#define BRAINANNOTATIONTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "disp3dnew_global.h"
+#include "../../disp3DNew_global.h"
 
-#include "../helpers/renderable3Dentity.h"
+#include "../../helpers/abstracttreeitem.h"
+#include "braintreeitem.h"
 
-#include <fs/surfaceset.h>
-#include <fs/annotationset.h>
-#include <fs/label.h>
+#include "../../helpers/types.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QSharedPointer>
-
-#include <Qt3DCore/QEntity>
+#include "fs/label.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// Qt INCLUDES
 //=============================================================================================================
+
+#include <QList>
+#include <QVariant>
+#include <QStringList>
+#include <QColor>
+#include <QStandardItem>
+#include <QStandardItemModel>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -74,12 +80,13 @@
 namespace DISP3DNEWLIB
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FSLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -90,66 +97,52 @@ using namespace FSLIB;
 
 //=============================================================================================================
 /**
-* Holds the data for brain visualization.
+* BrainAnnotationTreeItem provides a generic item to hold information about brain annotation information.
 *
-* @brief Holds the data for brain visualization.
+* @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT BrainObject : public Renderable3DEntity
+class DISP3DNEWSHARED_EXPORT BrainAnnotationTreeItem : public AbstractTreeItem
 {
-    Q_OBJECT
+    Q_OBJECT;
 
 public:
-    typedef QSharedPointer<BrainObject> SPtr;             /**< Shared pointer type for BrainObject class. */
-    typedef QSharedPointer<const BrainObject> ConstSPtr;  /**< Const shared pointer type for BrainObject class. */
+    typedef QSharedPointer<BrainAnnotationTreeItem> SPtr;             /**< Shared pointer type for BrainAnnotationTreeItem class. */
+    typedef QSharedPointer<const BrainAnnotationTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainAnnotationTreeItem class. */
 
     //=========================================================================================================
     /**
-    * Default constructor using FreeSurfer data as input.
+    * Default constructor.
+    */
+    explicit BrainAnnotationTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "Annotation");
+
+    //=========================================================================================================
+    /**
+    * Default destructor
+    */
+    ~BrainAnnotationTreeItem();
+
+    //=========================================================================================================
+    /**
+    * AbstractTreeItem functions
+    */
+    QVariant data(int role = Qt::UserRole + 1) const;
+    void setData(const QVariant& value, int role = Qt::UserRole + 1);
+
+    //=========================================================================================================
+    /**
+    * Adds FreeSurfer data based on annotation information to this model.
     *
-    * @param[in] tSurface       FreeSurfer surface.
-    * @param[in] tAnnotation    FreeSurfer annotation.
-    * @param[in] parent         The parent of this clas.
-    */
-    BrainObject(const Surface &tSurface, const Annotation &tAnnotation, Qt3DCore::QEntity *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Default destructor.
-    */
-    ~BrainObject();
-
-    //=========================================================================================================
-    /**
-    * Controls whether curvature (original) or annotation data is to be displayed.
+    * @param[in] tSurface           FreeSurfer surface.
+    * @param[in] tAnnotation        FreeSurfer annotation.
     *
-    * @param[in] flag           Whether to show loaded annotation data.
+    * @return                       Returns true if successful.
     */
-    void showAnnotation(bool flag);
+    bool addData(const Surface& tSurface, const Annotation& tAnnotation);
 
-protected:
-    QString     m_sFilePath;        /**< Path to surf directory. */
-    QString     m_sSurfFileName;    /**< Surface file name. */
-    QString     m_sAnnotFilePath;   /**< Annotation file name. */
-    QString     m_sSurf;            /**< Loaded surface (eg. inflated, orig, pial ...). */
+private:
 
-    qint32      m_iHemi;            /**< Hemisphere (lh = 0; rh = 1). */
-
-    QColor      m_ColorSulci;       /**< Color for the vertices which belong to the sulci. */
-    QColor      m_ColorGyri;        /**< Color for the vertices which belong to the gyri.). */
-
-    VectorXf    m_vecCurv;          /**< FreeSurfer curvature data. */
-    Vector3f    m_vecOffset;        /**< Surface offset. */
-
-    MatrixX3f   m_matVert;          /**< Alias verts. Vertex coordinates in meters. */
-    MatrixX3i   m_matTris;          /**< Alias faces. The triangle descriptions. */
-    MatrixX3f   m_matNorm;          /**< Normalized surface normals for each vertex. */
-    Matrix<float, Dynamic, 3, RowMajor>   m_matColorsOrig;    /**< Original color values based on curvature values. */
-    Matrix<float, Dynamic, 3, RowMajor>   m_matColorsAnnot;   /**< Annotation color values based on atlas data. */
-
-    QList<FSLIB::Label>     m_qListLabels;
-    QList<RowVector4i>      m_qListLabelRGBAs;
 };
 
-} // NAMESPACE
+} //NAMESPACE DISP3DNEWLIB
 
-#endif // BRAINOBJECT_H
+#endif // BRAINANNOTATIONTREEITEM_H

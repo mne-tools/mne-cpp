@@ -55,7 +55,7 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Control3DWidget::Control3DWidget(QWidget *parent)
+Control3DWidget::Control3DWidget(QWidget* parent)
 : RoundedEdgesWidget(parent)
 , ui(new Ui::Control3DWidget)
 {
@@ -68,12 +68,23 @@ Control3DWidget::Control3DWidget(QWidget *parent)
     connect(ui->m_horizontalSlider_opacity, &QSlider::valueChanged,
             this, &Control3DWidget::onOpacityChange);
 
+    connect(ui->m_pushButton_sceneColorPicker, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+            this, &Control3DWidget::onSceneColorPicker);
+
+    //Init's
+    ui->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(0, 0, 0);"));
+
     this->setWindowFlags(Qt::WindowStaysOnTopHint);
     this->adjustSize();
     this->setWindowOpacity(1/(100.0/90.0));
 
     //Rename minimize button
     ui->m_pushButton_minimize->setText(QString("Minimize - %1").arg(this->windowTitle()));
+
+    //Init tree view properties
+    BrainTreeDelegate* pBrainTreeDelegate = new BrainTreeDelegate(this);
+    ui->m_treeView_loadedData->setItemDelegate(pBrainTreeDelegate);
+    ui->m_treeView_loadedData->setHeaderHidden(true);
 }
 
 
@@ -90,6 +101,7 @@ Control3DWidget::~Control3DWidget()
 void Control3DWidget::setView3D(View3D::SPtr view3D)
 {
     //Do the connects from this control widget to the View3D
+    ui->m_treeView_loadedData->setModel(view3D->getBrainTreeModel());
 
     //Add the view3D to the list of connected view3D's
     m_lView3D.append(view3D);
@@ -102,7 +114,8 @@ void Control3DWidget::onMinimizeWidget(bool state)
 {
     if(!state) {
         ui->m_toolBox->hide();
-        ui->m_pushButton_minimize->setText(QString("Maximize - %1").arg(this->windowTitle()));
+        ui->m_pushButton_minimize->setText(QString("Maximize - %1").arg(this->windowTitle()));        
+        this->resize(width(), ui->m_pushButton_minimize->height());
     }
     else {
         ui->m_toolBox->show();
@@ -110,7 +123,6 @@ void Control3DWidget::onMinimizeWidget(bool state)
     }
 
     this->adjustSize();
-    this->resize(width(), ui->m_pushButton_minimize->height());
 }
 
 
@@ -119,4 +131,21 @@ void Control3DWidget::onMinimizeWidget(bool state)
 void Control3DWidget::onOpacityChange(qint32 value)
 {
     this->setWindowOpacity(1/(100.0/value));
+}
+
+
+//*************************************************************************************************************
+
+void Control3DWidget::onSceneColorPicker()
+{
+    QColorDialog* pDialog = new QColorDialog(this);
+    pDialog->exec();
+    QColor pickedColor = pDialog->currentColor();
+
+    ui->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(pickedColor.red()).arg(pickedColor.green()).arg(pickedColor.blue()));
+
+    //Update all connected View3D's scene colors
+    for(int i = 0; i<m_lView3D.size(); i++) {
+        m_lView3D.at(i)->changeSceneColor(pickedColor);
+    }
 }

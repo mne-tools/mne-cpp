@@ -70,6 +70,9 @@ using namespace FSLIB;
 //=============================================================================================================
 
 Annotation::Annotation()
+: m_sFilePath("")
+, m_sFileName("")
+, m_iHemi(-1)
 {
 
 }
@@ -83,6 +86,28 @@ Annotation::Annotation(const QString& p_sFileName)
     Annotation t_Annotation;
     Annotation::read(m_sFileName, t_Annotation);
     *this = t_Annotation;
+}
+
+
+//*************************************************************************************************************
+
+Annotation::Annotation(const QString &subject_id, qint32 hemi, const QString &atlas, const QString &subjects_dir)
+: m_sFilePath("")
+, m_sFileName("")
+, m_iHemi(-1)
+{
+    Annotation::read(subject_id, hemi, atlas, subjects_dir, *this);
+}
+
+
+//*************************************************************************************************************
+
+Annotation::Annotation(const QString &path, qint32 hemi, const QString &atlas)
+: m_sFilePath("")
+, m_sFileName("")
+, m_iHemi(-1)
+{
+    Annotation::read(path, hemi, atlas, *this);
 }
 
 
@@ -139,6 +164,10 @@ bool Annotation::read(const QString& p_sFileName, Annotation &p_Annotation)
 
     printf("Reading annotation...\n");
     QFile t_File(p_sFileName);
+    QFileInfo fileInfo(t_File.fileName());
+
+    p_Annotation.m_sFileName = fileInfo.fileName();
+    p_Annotation.m_sFilePath = fileInfo.filePath();
 
     if (!t_File.open(QIODevice::ReadOnly))
     {

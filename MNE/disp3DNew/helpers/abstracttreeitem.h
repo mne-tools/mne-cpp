@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     window.h
-* @author   Qt Project (qt3D examples)
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     abstracttreeitem.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     November, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, QtProject, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,33 +29,27 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Window class declaration
+* @brief     AbstractTreeItem class declaration.
+*
 */
 
-#ifndef WINDOW_H
-#define WINDOW_H
-
+#ifndef ABSTRACTTREEITEM_H
+#define ABSTRACTTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3DNew_global.h"
+#include "types.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QWindow>
-
-#include <QKeyEvent>
-#include <QGuiApplication>
-#include <QOpenGLContext>
-
-#include <QDebug>
+#include <QStandardItem>
 
 
 //*************************************************************************************************************
@@ -67,17 +60,12 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // DEFINE NAMESPACE DISP3DNEWLIB
 //=============================================================================================================
 
 namespace DISP3DNEWLIB
 {
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -93,41 +81,39 @@ namespace DISP3DNEWLIB
 
 //=============================================================================================================
 /**
-* Window is a subclass of the QWindow with OpenGL support.
+* AbstractTreeItem provides AbstractTreeItem provides the basic tree item. This item should be used as a base class for all tree items throughout the disp3DNew library.
 *
-* @brief Window is a subclass of the QWindow with OpenGL support.
+* @brief Provides the basic tree item.
 */
-class DISP3DNEWSHARED_EXPORT Window : public QWindow
+class AbstractTreeItem : public QObject, public QStandardItem
 {
-    Q_OBJECT
-public:
-    //=========================================================================================================
-    /**
-    * Default constructor.
-    *
-    * @param[in] parent         The parent of this class.
-    */
-    explicit Window(QScreen* screen = 0);
+    Q_OBJECT;
 
-    //=========================================================================================================
-    /**
-    * Default destructor.
-    *
-    */
-    ~Window();
+public :
 
-protected:
-    //=========================================================================================================
-    /**
-    * Virtual functions for mouse and keyboard control
-    *
-    */
-    virtual void keyPressEvent(QKeyEvent* e);
-    virtual void mousePressEvent(QMouseEvent* e);
-    virtual void wheelEvent(QWheelEvent* e);
-    virtual void mouseMoveEvent(QMouseEvent* e);
+    AbstractTreeItem(const int& iType, const QString& text = "");
+    virtual ~AbstractTreeItem();
+
+    QVariant data(int role = Qt::UserRole + 1) const;
+    void setData(const QVariant& value, int role = Qt::UserRole + 1);
+
+    int type() const;
+
+    QList<QStandardItem*> findChildren(const int& type);
+    QList<QStandardItem*> findChildren(const QString& text);
+
+    AbstractTreeItem &operator<<(AbstractTreeItem* newItem);
+    AbstractTreeItem &operator<<(AbstractTreeItem& newItem);
+
+signals:
+    void checkStateChanged(const Qt::CheckState& checkState);
+
+protected :
+    void createToolTip();
+
+    int     m_iType;
 };
 
-}
+} //NAMESPACE DISP3DNEWLIB
 
-#endif // QT3D_WINDOW_H
+#endif // ABSTRACTTREEITEM_H

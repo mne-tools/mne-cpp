@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     window.h
-* @author   Qt Project (qt3D examples)
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     brainsurfacesettreeitem.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     November, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, QtProject, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,33 +29,38 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Window class declaration
+* @brief     BrainSurfaceSetTreeItem class declaration.
+*
 */
 
-#ifndef WINDOW_H
-#define WINDOW_H
-
+#ifndef BRAINSURFACESETTREEITEM_H
+#define BRAINSURFACESETTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3DNew_global.h"
+#include "../../disp3DNew_global.h"
 
+#include "../../helpers/abstracttreeitem.h"
+#include "brainhemispheretreeitem.h"
+
+#include "fs/label.h"
+#include "fs/annotationset.h"
+#include "fs/surfaceset.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QWindow>
-
-#include <QKeyEvent>
-#include <QGuiApplication>
-#include <QOpenGLContext>
-
-#include <QDebug>
+#include <QList>
+#include <QVariant>
+#include <QStringList>
+#include <QColor>
+#include <QStandardItem>
+#include <QStandardItemModel>
 
 
 //*************************************************************************************************************
@@ -64,11 +68,7 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -79,10 +79,14 @@
 namespace DISP3DNEWLIB
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
+
+using namespace Eigen;
+using namespace FSLIB;
 
 
 //*************************************************************************************************************
@@ -93,41 +97,55 @@ namespace DISP3DNEWLIB
 
 //=============================================================================================================
 /**
-* Window is a subclass of the QWindow with OpenGL support.
+* BrainSurfaceSetTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
 *
-* @brief Window is a subclass of the QWindow with OpenGL support.
+* @brief Provides a generic BrainSurfaceSetTreeItem.
 */
-class DISP3DNEWSHARED_EXPORT Window : public QWindow
+class DISP3DNEWSHARED_EXPORT BrainSurfaceSetTreeItem : public AbstractTreeItem
 {
-    Q_OBJECT
+    Q_OBJECT;
+
 public:
-    //=========================================================================================================
-    /**
-    * Default constructor.
-    *
-    * @param[in] parent         The parent of this class.
-    */
-    explicit Window(QScreen* screen = 0);
+    typedef QSharedPointer<BrainSurfaceSetTreeItem> SPtr;             /**< Shared pointer type for BrainSurfaceSetTreeItem class. */
+    typedef QSharedPointer<const BrainSurfaceSetTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainSurfaceSetTreeItem class. */
 
     //=========================================================================================================
     /**
-    * Default destructor.
-    *
+    * FreeSurfer constructor from single surface.
     */
-    ~Window();
+    explicit BrainSurfaceSetTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "");
 
-protected:
     //=========================================================================================================
     /**
-    * Virtual functions for mouse and keyboard control
-    *
+    * Default destructor
     */
-    virtual void keyPressEvent(QKeyEvent* e);
-    virtual void mousePressEvent(QMouseEvent* e);
-    virtual void wheelEvent(QWheelEvent* e);
-    virtual void mouseMoveEvent(QMouseEvent* e);
+    ~BrainSurfaceSetTreeItem();
+
+    //=========================================================================================================
+    /**
+    * AbstractTreeItem functions
+    */
+    QVariant data(int role = Qt::UserRole + 1) const;
+    void setData(const QVariant& value, int role = Qt::UserRole + 1);
+
+    //=========================================================================================================
+    /**
+    * Adds FreeSurfer data based on surfaces and annotation SETS to this model.
+    *
+    * @param[in] tSurfaceSet        FreeSurfer surface set.
+    * @param[in] tAnnotationSet     FreeSurfer annotation set.
+    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+    *
+    * @return                       Returns true if successful.
+    */
+    bool addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent = 0);
+
+    bool addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
+
+private:
+
 };
 
-}
+} //NAMESPACE DISP3DNEWLIB
 
-#endif // QT3D_WINDOW_H
+#endif // BRAINSURFACESETTREEITEM_H

@@ -54,9 +54,75 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CustomMesh::CustomMesh(const MatrixX3f &tMatVert, const MatrixX3f tMatNorm, const MatrixX3i &tMatTris, const Vector3f &tVecOffset)
+CustomMesh::CustomMesh()
+: Qt3DRender::QGeometryRenderer()
+, m_pVertexDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
+, m_pNormalDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
+, m_pColorDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
+, m_pIndexDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::IndexBuffer))
+, m_iNumVert(0)
+{
+
+}
+
+
+//*************************************************************************************************************
+
+CustomMesh::CustomMesh(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset, const Matrix<float, Dynamic, 3, RowMajor>& tMatColors)
 : Qt3DRender::QGeometryRenderer()
 , m_iNumVert(tMatVert.rows())
+{
+    this->createCustomMesh(tMatVert, tMatNorm, tMatTris, tVecOffset, tMatColors);
+}
+
+
+//*************************************************************************************************************
+
+CustomMesh::~CustomMesh()
+{
+}
+
+
+//*************************************************************************************************************
+
+bool CustomMesh::setVertColor(const Matrix<float, Dynamic, 3, RowMajor>& tMatColors)
+{
+    //Check dimensions
+    if(tMatColors.rows() != m_iNumVert) {
+        qDebug()<<"CustomMesh::updateVertColors - new color and vertices dimensions do not match or mesh data was not set yet!";
+        return false;
+    }
+
+    Qt3DRender::QAttributeList list = this->geometry()->attributes();
+
+    Qt3DRender::QAttribute* colorAttribute;
+    for(int i = 0; i<list.size(); i++)
+        if(list.at(i)->name() == Qt3DRender::QAttribute::defaultColorAttributeName())
+            colorAttribute = dynamic_cast<Qt3DRender::QAttribute*>(list.at(i));
+
+    //Update color
+    QByteArray newColorData;
+    newColorData.resize(tMatColors.rows() * 3 * (int)sizeof(float));
+    Map<Matrix<float, Dynamic, 3, RowMajor>> (reinterpret_cast<float *>(newColorData.data()), tMatColors.rows(), tMatColors.cols()) = tMatColors;
+
+    colorAttribute->buffer()->setData(newColorData);
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool CustomMesh::setMeshData(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset, const Matrix<float, Dynamic, 3, RowMajor>& tMatColors)
+{
+    m_iNumVert = tMatVert.rows();
+
+    return createCustomMesh(tMatVert, tMatNorm, tMatTris, tVecOffset, tMatColors);
+}
+
+//*************************************************************************************************************
+
+bool CustomMesh::createCustomMesh(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset, const Matrix<float, Dynamic, 3, RowMajor>& tMatColors)
 {
     Qt3DRender::QGeometry* customGeometry = new Qt3DRender::QGeometry(this);
 
@@ -84,9 +150,9 @@ CustomMesh::CustomMesh(const MatrixX3f &tMatVert, const MatrixX3f tMatNorm, cons
 
     for(int i = 0; i<tMatVert.rows(); i++) {
         //Vertex
-        rawVertexArray[idxVert++] = tMatVert(i,0) + tVecOffset(0);
-        rawVertexArray[idxVert++] = tMatVert(i,1) + tVecOffset(1);
-        rawVertexArray[idxVert++] = tMatVert(i,2) + tVecOffset(2);
+        rawVertexArray[idxVert++] = (tMatVert(i,0) + tVecOffset(0))*10;
+        rawVertexArray[idxVert++] = (tMatVert(i,1) + tVecOffset(1))*10;
+        rawVertexArray[idxVert++] = (tMatVert(i,2) + tVecOffset(2))*10;
 
         //Normal
         rawNormalArray[idxNorm++] = tMatNorm(i,0);
@@ -94,9 +160,15 @@ CustomMesh::CustomMesh(const MatrixX3f &tMatVert, const MatrixX3f tMatNorm, cons
         rawNormalArray[idxNorm++] = tMatNorm(i,2);
 
         //Color (this is the default color and will be used until the updateVertColor function was called)
-        rawColorArray[idxColor++] = 0.5f;
-        rawColorArray[idxColor++] = 0.2f;
-        rawColorArray[idxColor++] = 0.2f;
+        if(tMatColors.size() == 0 || tMatColors.rows() != tMatVert.rows()) {
+            rawColorArray[idxColor++] = 0.5f;
+            rawColorArray[idxColor++] = 0.2f;
+            rawColorArray[idxColor++] = 0.2f;
+        } else {
+            rawColorArray[idxColor++] = tMatColors(i,0);
+            rawColorArray[idxColor++] = tMatColors(i,1);
+            rawColorArray[idxColor++] = tMatColors(i,2);
+        }
     }
 
     //Fill indexBufferData with data which holds the triangulation information (faces/tris)
@@ -170,40 +242,5 @@ CustomMesh::CustomMesh(const MatrixX3f &tMatVert, const MatrixX3f tMatNorm, cons
     this->setGeometry(customGeometry);
 
     this->setPrimitiveCount(tMatTris.rows()*3);
-}
-
-
-//*************************************************************************************************************
-
-CustomMesh::~CustomMesh()
-{
-}
-
-
-//*************************************************************************************************************
-
-bool CustomMesh::updateVertColors(const Matrix<float, Dynamic, 3, RowMajor> &tMatColors)
-{
-    //Check dimensions
-    if(tMatColors.rows() != m_iNumVert) {
-        qDebug()<<"CustomMesh::updateVertColors - new color and vertices dimensions do not match!";
-        return false;
-    }
-
-    Qt3DRender::QAttributeList list = this->geometry()->attributes();
-
-    Qt3DRender::QAttribute* colorAttribute;
-    for(int i = 0; i<list.size(); i++)
-        if(list.at(i)->name() == Qt3DRender::QAttribute::defaultColorAttributeName())
-            colorAttribute = dynamic_cast<Qt3DRender::QAttribute*>(list.at(i));
-
-    //Update color
-    QByteArray newColorData;
-    newColorData.resize(tMatColors.rows() * 3 * (int)sizeof(float));
-    Map<Matrix<float, Dynamic, 3, RowMajor>> (reinterpret_cast<float *>(newColorData.data()), tMatColors.rows(), tMatColors.cols()) = tMatColors;
-
-    colorAttribute->buffer()->setData(newColorData);
-
     return true;
 }
-

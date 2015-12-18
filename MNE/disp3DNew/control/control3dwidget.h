@@ -45,6 +45,7 @@
 
 #include "disp/helpers/roundededgeswidget.h"
 #include "../view3d.h"
+#include "../3DObjects/brain/braintreedelegate.h"
 
 
 //*************************************************************************************************************
@@ -106,7 +107,7 @@ public:
     * Default constructor.
     *
     */
-    explicit Control3DWidget(QWidget *parent = 0);
+    explicit Control3DWidget(QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -139,6 +140,8 @@ protected slots:
     * @param [in] value         opacity value.
     */
     void onOpacityChange(qint32 value);
+
+    void onSceneColorPicker();
 
 protected:
     Ui::Control3DWidget*    ui;         /**< The pointer to the QtDesigner ui class. */

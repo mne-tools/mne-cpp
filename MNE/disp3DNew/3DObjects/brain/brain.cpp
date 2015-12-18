@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brain.h
+* @file     brain.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,116 +29,73 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Brain class declaration
+* @brief    Brain class definition.
 *
 */
-
-#ifndef BRAIN_H
-#define BRAIN_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "disp3dnew_global.h"
+#include "brain.h"
 
-#include "brainobject.h"
-
-#include <fs/surfaceset.h>
-#include <fs/annotationset.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QSharedPointer>
-
-#include <Qt3DCore/QEntity>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DISP3DNEWLIB
-//=============================================================================================================
-
-namespace DISP3DNEWLIB
-{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FSLIB;
+using namespace DISP3DNEWLIB;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* Visualizes a brain in 3D.
-*
-* @brief Visualizes a brain in 3D.
-*/
-class DISP3DNEWSHARED_EXPORT Brain : public Qt3DCore::QEntity
+Brain::Brain(Qt3DCore::QEntity* parent)
+: Qt3DCore::QEntity(parent)
+, m_pBrainTreeModel(new BrainTreeModel(this))
 {
-    Q_OBJECT
+}
 
-public:
-    typedef QSharedPointer<Brain> SPtr;             /**< Shared pointer type for Brain class. */
-    typedef QSharedPointer<const Brain> ConstSPtr;  /**< Const shared pointer type for Brain class. */
 
-    //=========================================================================================================
-    /**
-    * Default constructor.
-    *
-    * @param[in] parent         The parent of this class.
-    */
-    Brain(QEntity *parent = 0);
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Default destructor.
-    */
-    ~Brain();
+Brain::~Brain()
+{
+}
 
-    //=========================================================================================================
-    /**
-    * Adds FreeSurfer brain data.
-    *
-    * @param[in] subject_id         Name of subject
-    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
-    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
-    * @param[in] subjects_dir       Subjects directory
-    * @param[in] annotation         Load annotation data if wanted.
-    * @return    Const list of added brain object
-    */
-    bool addFsBrainData(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, const QString &atlas="");
 
-    //=========================================================================================================
-    /**
-    * Return the stored BrainObjects
-    *
-    * @return returns a const adress to the list with the sotred brain objects
-    */
-    const QList<BrainObject::SPtr>  getBrainObjectList() const;
+//*************************************************************************************************************
 
-protected:
-    QList<BrainObject::SPtr>     m_lBrainData;      /**< List of currently loaded BrainObjects. */
-};
+bool Brain::addData(const QString& text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
+{
+    return m_pBrainTreeModel->addData(text, tSurfaceSet, tAnnotationSet, this);
+}
 
-} // NAMESPACE
 
-#endif // BRAIN_H
+//*************************************************************************************************************
+
+bool Brain::addData(const QString& text, const Surface& tSurface, const Annotation &tAnnotation)
+{
+    return m_pBrainTreeModel->addData(text, tSurface, tAnnotation, this);
+}
+
+
+//*************************************************************************************************************
+
+QList<BrainRTDataTreeItem*> Brain::addData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
+{
+    return m_pBrainTreeModel->addData(text, tSourceEstimate, tForwardSolution);
+}
+
+
+//*************************************************************************************************************
+
+BrainTreeModel* Brain::getBrainTreeModel()
+{
+    return m_pBrainTreeModel;
+}
+

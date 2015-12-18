@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     window.h
-* @author   Qt Project (qt3D examples)
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     brainannotationtreeitem.cpp
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     November, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, QtProject, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,104 +29,98 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Window class declaration
+* @brief    BrainAnnotationTreeItem class definition.
+*
 */
-
-#ifndef WINDOW_H
-#define WINDOW_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3DNew_global.h"
+#include "brainannotationtreeitem.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QWindow>
-
-#include <QKeyEvent>
-#include <QGuiApplication>
-#include <QOpenGLContext>
-
-#include <QDebug>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DISP3DNEWLIB
-//=============================================================================================================
-
-namespace DISP3DNEWLIB
-{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace DISP3DNEWLIB;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* Window is a subclass of the QWindow with OpenGL support.
-*
-* @brief Window is a subclass of the QWindow with OpenGL support.
-*/
-class DISP3DNEWSHARED_EXPORT Window : public QWindow
+BrainAnnotationTreeItem::BrainAnnotationTreeItem(const int & iType, const QString & text)
+: AbstractTreeItem(iType, text)
 {
-    Q_OBJECT
-public:
-    //=========================================================================================================
-    /**
-    * Default constructor.
-    *
-    * @param[in] parent         The parent of this class.
-    */
-    explicit Window(QScreen* screen = 0);
-
-    //=========================================================================================================
-    /**
-    * Default destructor.
-    *
-    */
-    ~Window();
-
-protected:
-    //=========================================================================================================
-    /**
-    * Virtual functions for mouse and keyboard control
-    *
-    */
-    virtual void keyPressEvent(QKeyEvent* e);
-    virtual void mousePressEvent(QMouseEvent* e);
-    virtual void wheelEvent(QWheelEvent* e);
-    virtual void mouseMoveEvent(QMouseEvent* e);
-};
-
 }
 
-#endif // QT3D_WINDOW_H
+
+//*************************************************************************************************************
+
+BrainAnnotationTreeItem::~BrainAnnotationTreeItem()
+{
+}
+
+
+//*************************************************************************************************************
+
+QVariant BrainAnnotationTreeItem::data(int role) const
+{
+    return AbstractTreeItem::data(role);
+}
+
+
+//*************************************************************************************************************
+
+void  BrainAnnotationTreeItem::setData(const QVariant& value, int role)
+{
+    AbstractTreeItem::setData(value, role);
+}
+
+
+//*************************************************************************************************************
+
+bool BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation)
+{
+    //Create color from annotation data if annotation is not empty
+    if(!tAnnotation.isEmpty()) {
+        MatrixX3f matColorsAnnot(tAnnotation.getVertices().rows(), 3);
+        QList<FSLIB::Label> qListLabels;
+        QList<RowVector4i> qListLabelRGBAs;
+
+        tAnnotation.toLabels(tSurface, qListLabels, qListLabelRGBAs);
+
+        for(int i = 0; i<qListLabels.size(); i++) {
+            FSLIB::Label label = qListLabels.at(i);
+            for(int j = 0; j<label.vertices.rows(); j++) {
+                matColorsAnnot(label.vertices(j), 0) = qListLabelRGBAs.at(i)(0)/255.0;
+                matColorsAnnot(label.vertices(j), 1) = qListLabelRGBAs.at(i)(1)/255.0;
+                matColorsAnnot(label.vertices(j), 2) = qListLabelRGBAs.at(i)(2)/255.0;
+            }
+        }
+
+        //Add data which is held by this BrainAnnotationTreeItem
+        QVariant data;
+        data.setValue(matColorsAnnot);
+        this->setData(data, BrainAnnotationTreeItemRoles::AnnotColors);
+
+        //Add annotation meta information as item children
+        BrainTreeItem *itemAnnotFileName = new BrainTreeItem(BrainTreeModelItemTypes::AnnotFileName, tAnnotation.fileName());
+        *this<<itemAnnotFileName;
+        data.setValue(tAnnotation.fileName());
+        itemAnnotFileName->setData(data, BrainAnnotationTreeItemRoles::AnnotFileName);
+
+        BrainTreeItem *itemAnnotPath = new BrainTreeItem(BrainTreeModelItemTypes::AnnotFilePath, tAnnotation.filePath());
+        *this<<itemAnnotPath;
+        data.setValue(tAnnotation.filePath());
+        itemAnnotFileName->setData(data, BrainAnnotationTreeItemRoles::AnnotFilePath);
+    }
+
+    return true;
+}
+

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     renderable3Dentity.cpp
+* @file     brainrtdata.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Renderable3DEntity class definition.
+* @brief    BrainRTDataTreeItem class definition.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "renderable3Dentity.h"
+#include "BrainRTDataTreeItem.h"
 
 
 //*************************************************************************************************************
@@ -54,62 +54,86 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
-: Qt3DCore::QEntity(parent)
-, m_pCustomMesh(CustomMesh::SPtr(new CustomMesh()))
-, m_pTransform(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
-, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPerVertexColorMaterial))
+BrainRTDataTreeItem::BrainRTDataTreeItem(const int &iType, const QString &text)
+: AbstractTreeItem(iType, text)
+, m_bInit(false)
+, m_sHemi("Unknown")
+, m_pItemRTDataStreamStatus(new BrainTreeItem())
 {
-    this->addComponent(m_pCustomMesh.data());
-    this->addComponent(m_pTransform.data());
-    this->addComponent(m_pMaterial.data());
 }
 
 
 //*************************************************************************************************************
 
-Renderable3DEntity::Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset, Qt3DCore::QEntity* parent)
-: Qt3DCore::QEntity(parent)
-, m_pCustomMesh(new CustomMesh(tMatVert, tMatNorm, tMatTris, tVecOffset))
-, m_pTransform(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
-, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPerVertexColorMaterial(this)))
-//, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QNormalDiffuseMapMaterial(this)))
+BrainRTDataTreeItem::~BrainRTDataTreeItem()
 {
-    this->addComponent(m_pCustomMesh.data());
-    this->addComponent(m_pTransform.data());
-    this->addComponent(m_pMaterial.data());
 }
 
 
 //*************************************************************************************************************
 
-Renderable3DEntity::~Renderable3DEntity()
+QVariant BrainRTDataTreeItem::data(int role) const
 {
-    this->removeAllComponents();
+    return AbstractTreeItem::data(role);
 }
 
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::setVertColor(const Matrix<float, Dynamic, 3, RowMajor>& tMatColors)
+void  BrainRTDataTreeItem::setData(const QVariant& value, int role)
 {
-    return m_pCustomMesh->setVertColor(tMatColors);
+    AbstractTreeItem::setData(value, role);
+
+    switch(role) {
+    case BrainRTDataTreeItemRoles::RTData:
+        if(m_pItemRTDataStreamStatus->checkState() == Qt::Checked) {
+            emit rtDataChanged();
+        }
+    }
 }
 
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::setMeshData(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset,  const Matrix<float, Dynamic, 3, RowMajor>& tMatColors)
-{
-    return m_pCustomMesh->setMeshData(tMatVert, tMatNorm, tMatTris, tVecOffset, tMatColors);
-}
+bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QString& hemi)
+{   
+    m_sHemi = hemi;
+    int iHemi = m_sHemi == "lh" ? 0 : 1;
 
+    // Add data which is held by this BrainRTDataTreeItem
+    QVariant data;
 
-//*************************************************************************************************************
+    data.setValue(tSourceEstimate.data);
+    this->setData(data, BrainRTDataTreeItemRoles::RTData);
 
-bool Renderable3DEntity::setTransform(QSharedPointer<Qt3DCore::QTransform> pTransform)
-{
-    m_pTransform = pTransform;
+    data.setValue(tSourceEstimate.vertices);
+    this->setData(data, BrainRTDataTreeItemRoles::RTVertices);
+
+    data.setValue(tSourceEstimate.times);
+    this->setData(data, BrainRTDataTreeItemRoles::RTTimes);
+
+    //Add surface meta information as item children
+    m_pItemRTDataStreamStatus = new BrainTreeItem(BrainTreeModelItemTypes::RTDataStreamStatus, "Stream data on/off");
+    connect(m_pItemRTDataStreamStatus, &BrainTreeItem::checkStateChanged,
+            this, &BrainRTDataTreeItem::onCheckStateChanged);
+    *this<<m_pItemRTDataStreamStatus;
+    m_pItemRTDataStreamStatus->setCheckable(true);
+    m_pItemRTDataStreamStatus->setCheckState(Qt::Unchecked);
+    data.setValue(false);
+    m_pItemRTDataStreamStatus->setData(data, BrainTreeItemRoles::RTDataStreamStatus);
+
+    QString sIsClustered = tForwardSolution.src[iHemi].isClustered() ? "Clustered source space" : "Full source space";
+    BrainTreeItem *itemSourceSpaceType = new BrainTreeItem(BrainTreeModelItemTypes::RTDataSourceSpaceType, sIsClustered);
+    *this<<itemSourceSpaceType;
+    data.setValue(sIsClustered);
+    itemSourceSpaceType->setData(data, BrainTreeItemRoles::RTDataSourceSpaceType);
+
+    BrainTreeItem *itemColormapType = new BrainTreeItem(BrainTreeModelItemTypes::RTDataColormapType, "Hot Negative 2");
+    *this<<itemColormapType;
+    data.setValue(QString("Hot Negative 2"));
+    itemColormapType->setData(data, BrainTreeItemRoles::RTDataColormapType);
+
+    m_bInit = true;
 
     return true;
 }
@@ -117,12 +141,31 @@ bool Renderable3DEntity::setTransform(QSharedPointer<Qt3DCore::QTransform> pTran
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::setMaterial(QSharedPointer<Qt3DRender::QMaterial> pMaterial)
+bool BrainRTDataTreeItem::updateData(const MNESourceEstimate& tSourceEstimate)
 {
-    m_pMaterial = pMaterial;
+    if(!m_bInit) {
+        qDebug()<<"BrainRTDataTreeItem::updateData - Item was not initialized/filled with data yet!";
+        return false;
+    }
+
+    QVariant data;
+    data.setValue(tSourceEstimate.data);
+    this->setData(data, BrainRTDataTreeItemRoles::RTData);
 
     return true;
 }
 
 
+//*************************************************************************************************************
+
+void BrainRTDataTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+{
+    if(checkState == Qt::Checked) {
+        //TODO: Start stc worker
+        qDebug()<<"Start stc worker";
+    } else if(checkState == Qt::Unchecked) {
+        //TODO: Stop stc worker
+        qDebug()<<"Stop stc worker";
+    }
+}
 
