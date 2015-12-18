@@ -118,7 +118,6 @@ void View3D::init()
     m_aspectEngine.registerAspect(new Qt3DRender::QRenderAspect());
 
     m_aspectEngine.registerAspect(m_pInputAspect);
-    m_aspectEngine.initialize();
 
     //Data
     QVariantMap data;
