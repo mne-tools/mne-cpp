@@ -76,7 +76,7 @@ MNEBem::MNEBem(const MNEBem &p_MNEBem)
 
 //*************************************************************************************************************
 
-MNEBem::MNEBem(QIODevice &p_IODevice)   //const MNESourceSpace &p_MNESourceSpace
+MNEBem::MNEBem(QIODevice &p_IODevice)   //const MNEBem &p_MNEBem
 //: m_qListBemSurface()
 {
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
@@ -90,7 +90,7 @@ MNEBem::MNEBem(QIODevice &p_IODevice)   //const MNESourceSpace &p_MNESourceSpace
 //        return false;
     }
 
-    bool testStream =t_pStream->device()->isOpen();
+//    bool testStream =t_pStream->device()->isOpen();
 }
 
 
@@ -166,7 +166,7 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirT
 
     if(open_here)
         p_pStream->device()->close();
-    bool testStream =p_pStream->device()->isOpen();
+//    bool testStream =p_pStream->device()->isOpen();
     return true;
 }
 
@@ -186,7 +186,7 @@ bool MNEBem::readBemSurface(FiffStream *p_pStream, const FiffDirTree &p_Tree, MN
     else
          p_BemSurface.id = *t_pTag->toInt();
 
-        qDebug() << "Read SourceSpace ID; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
+        qDebug() << "Read BemSurface ID; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
 
     //=====================================================================
     if(!p_Tree.find_tag(p_pStream, FIFF_BEM_SIGMA, t_pTag))
@@ -253,7 +253,7 @@ bool MNEBem::readBemSurface(FiffStream *p_pStream, const FiffDirTree &p_Tree, MN
     p_BemSurface.rr = t_pTag->toFloatMatrix().transpose();
     qint32 rows_rr = p_BemSurface.rr.rows();
     std::cout << "Here are the first Rows rr:" << std::endl << p_BemSurface.rr.topRows(9) << std::endl;
-        qDebug() << "last element rr: " << p_BemSurface.rr(rows_rr-1, 0) << p_BemSurface.rr(rows_rr-1, 1) << p_BemSurface.rr(rows_rr-1, 2);
+//        qDebug() << "last element rr: " << p_BemSurface.rr(rows_rr-1, 0) << p_BemSurface.rr(rows_rr-1, 1) << p_BemSurface.rr(rows_rr-1, 2);
 
     if (rows_rr != p_BemSurface.np)
     {
@@ -287,7 +287,7 @@ bool MNEBem::readBemSurface(FiffStream *p_pStream, const FiffDirTree &p_Tree, MN
         return false;
     }
 
-    qDebug() << "Source Space Normals; type:" << t_pTag->getType();
+    qDebug() << "Bem Vertex Normals; type:" << t_pTag->getType();
 
     //=====================================================================
     if (p_BemSurface.ntri > 0)
@@ -327,8 +327,7 @@ bool MNEBem::readBemSurface(FiffStream *p_pStream, const FiffDirTree &p_Tree, MN
 
         qDebug() << "Triangles; type:" << t_pTag->getType() << "rows:" << p_BemSurface.tris.rows() << "cols:" << p_BemSurface.tris.cols();
 //        qDebug() << "First Triangle: " << p_BemSurface.tris(0, 0) << p_BemSurface.tris(0, 1) << p_BemSurface.tris(0, 2);
-        std::cout << "Here is the first row of the final matrix skin.tris:" << std::endl << p_BemSurface.tris.topRows(9) << std::endl;
-//        qDebug() << "Last Triangle: " << p_BemSurface.tris(p_BemSurface.tris.rows()-1, 0) << p_BemSurface.tris(p_BemSurface.tris.rows()-1, 1) << p_BemSurface.tris(p_BemSurface.tris.rows()-1, 2);
+//        std::cout << "Here is the first row of the final matrix skin.tris:" << std::endl << p_BemSurface.tris.topRows(9) << std::endl;
 
     return true;
 }
@@ -344,9 +343,9 @@ void MNEBem::write(QIODevice &p_IODevice)
 
     // Create the file and save the essentials
     FiffStream::SPtr t_pStream = FiffStream::start_file(p_IODevice);
-    printf("Write BEM surface in %s...", t_pStream->streamName().toUtf8().constData());
+    printf("Write BEM surface in %s...", t_pStream->streamName().toUtf8().constData(), "\n");
     this->writeToStream(t_pStream.data());
-    bool test= t_pStream->device()->isOpen();
+//    bool test= t_pStream->device()->isOpen();
 }
 
 //*************************************************************************************************************
@@ -356,6 +355,8 @@ void MNEBem::writeToStream(FiffStream* p_pStream)
     p_pStream->start_block(FIFFB_BEM);
     for(qint32 h = 0; h < m_qListBemSurface.size(); ++h)
     {
+        std::cout << "Here are the first Rows rr bevor writing:" << std::endl << m_qListBemSurface[h].rr.topRows(9) << std::endl;
+
         printf("\tWrite a bem surface... ");
         p_pStream->start_block(FIFFB_BEM_SURF);
         m_qListBemSurface[h].writeToStream(p_pStream);
