@@ -41,6 +41,8 @@
 
 //#include <fstream>
 #include <iostream>
+#include <cstdlib>
+#include <time.h>
 
 #include <utils/warp.h>
 #include <fiff/fiff.h>
@@ -166,17 +168,34 @@ int main(int argc, char *argv[])
     //
     //Read BEM from fiff
     //
-    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
     MNELIB::MNEBem t_Bem (t_fileBem) ;
 
     //
     // prepare warp
     //
-    MatrixXd sLm(ElecPos.rows(),3);
-    sLm=ElecPos;
-    MatrixXd dLm=sLm.array()+0.5;
+    MatrixXd sLm=ElecPos;
+    MatrixXd random(ElecPos.rows(),3);
+    srand(time(NULL));
+    for (int i=0;i<ElecPos.rows();i++)
+    {
+
+        for (int j=0; j<3;j++)
+        {
+            random(i,j)=rand();
+            random(i,j)/=RAND_MAX;
+            random(i,j)*=0.06;
+            random(i,j)-=0.03;
+            //            random(i,j)=0.005*(rand()/RAND_MAX);
+        }
+    }
+//    std::cout << "Here are the first row of the matrix random:" << std::endl << random.topRows(9) << std::endl;
+    MatrixXd dLm=sLm+random;
     MNELIB::MNEBemSurface skin=t_Bem[0];
     MatrixXd sVert=skin.rr.cast<double>();
+
+    std::cout << "Here are the first row of the matrix skin.rr bevor warp:" << std::endl << skin.rr.topRows(9) << std::endl;
+
 
     //
     // calculate Warp
@@ -191,14 +210,14 @@ int main(int argc, char *argv[])
     skin.rr=wVert.cast<float>();
     skin.addVertexNormals();
 
-    std::cout << "Here is the last row of the final matrix skin.rr:" << std::endl << skin.rr.bottomRows(1) << std::endl;
-    std::cout << "Here is the first row of the final matrix skin.tris:" << std::endl << skin.tris.topRows(9) << std::endl;
-    std::cout << "Here is the last row of the final matrix skin.tris:" << std::endl << skin.tris.bottomRows(1) << std::endl;
+    std::cout << "Here are the first row of the matrix skin.rr after warp:" << std::endl << skin.rr.topRows(9) << std::endl;
+//    std::cout << "Here is the first row of the final matrix skin.tris:" << std::endl << skin.tris.topRows(9) << std::endl;
+//    std::cout << "Here is the last row of the final matrix skin.tris:" << std::endl << skin.tris.bottomRows(1) << std::endl;
 
     MNELIB::MNEBem t_BemWarpedA;
     t_BemWarpedA<<skin;
-    QFile t_fileBemWarped("./MNE-sample-data/subjects/sample/bem/sample-head-warped.fif");
-    t_Bem.write(t_fileBemWarped);
+    QFile t_fileBemWarped("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem-warped.fif");
+    t_BemWarpedA.write(t_fileBemWarped);
     t_fileBemWarped.close();
 
     MNELIB::MNEBem t_BemWarpedB (t_fileBemWarped) ;
