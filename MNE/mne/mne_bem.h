@@ -229,8 +229,8 @@ protected:
     * Reads a single bem surface
     *
     * @param [in] p_pStream         The opened fif file
-    * @param [in] p_Tree            Search for the source space here
-    * @param [out] p_BemSurface     The read source space (hemisphere)
+    * @param [in] p_Tree            Search for the bem surface here
+    * @param [out] p_BemSurface     The read BemSurface
     *
     * @return true if succeeded, false otherwise
     */
