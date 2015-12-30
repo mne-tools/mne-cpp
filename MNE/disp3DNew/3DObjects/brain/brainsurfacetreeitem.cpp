@@ -86,10 +86,6 @@ void  BrainSurfaceTreeItem::setData(const QVariant& value, int role)
     AbstractTreeItem::setData(value, role);
 
     switch(role) {
-    case BrainSurfaceTreeItemRoles::SurfaceRTSourceLocColor:
-        updateVertColor();
-        break;
-
     case BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert:
         m_pRenderable3DEntity->setVertColor(value.value<MatrixX3f>());
         break;
@@ -197,7 +193,7 @@ void BrainSurfaceTreeItem::updateVertColor()
             this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurvatureColorVert);
             this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert);
 
-            //Return here because the new colors will be set in the setData() function
+            //Return here because the new colors will be set to the renderable entity in the setData() function with the role BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert
             return;
         }
 
@@ -209,24 +205,66 @@ void BrainSurfaceTreeItem::updateVertColor()
 
                     //Set renderable 3D entity mesh and color data
                     data.setValue(matNewVertColor);
+                    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceAnnotationColorVert);
                     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert);
 
-                    //Return here because the new colors will be set in the setData() function
+                    //Return here because the new colors will be set to the renderable entity in the setData() function with the role BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert
                     return;
                 }
             }
         }
-
-        if(sColorInfoOrigin == "Color from RT source loc") {
-            data.setValue(this->data(BrainSurfaceTreeItemRoles::SurfaceRTSourceLocColor).value<MatrixX3f>());
-            this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert);
-
-            //Return here because the new colors will be set in the setData() function
-            return;
-        }
     }
 }
 
+
+//*************************************************************************************************************
+
+void BrainSurfaceTreeItem::updateRtVertColor(const VectorXd& sample, const VectorXi& vertexIndex)
+{
+    qDebug()<<"sample.rows()"<<sample.rows();
+    qDebug()<<"vertexIndex.rows()"<<vertexIndex.rows();
+
+    if(sample.rows() != vertexIndex.rows()) {
+        qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor - number of rows in sample do not not match with idx/no number of rows in vertex. Returning...";
+        return;
+    }
+
+    //This function is called for every new sample point and therfore must be kept highly efficient!
+    QString sColorInfoOrigin = m_pItemSurfColorInfoOrigin->data(BrainTreeItemRoles::SurfaceColorInfoOrigin).toString();
+    MatrixX3f matCurrentVertColor;
+
+    if(sColorInfoOrigin == "Color from curvature") {
+        matCurrentVertColor = this->data(BrainSurfaceTreeItemRoles::SurfaceCurvatureColorVert).value<MatrixX3f>();
+    }
+
+    if(sColorInfoOrigin == "Color from annotation") {
+        matCurrentVertColor = this->data(BrainSurfaceTreeItemRoles::SurfaceAnnotationColorVert).value<MatrixX3f>();
+    }
+
+    for(int i = 0; i<sample.rows(); i++) {
+        qint32 iVal = sample(i) * 20;
+
+        iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
+
+        QRgb qRgb;
+        //qRgb = ColorMap::valueToHotNegative1((float)iVal/255.0);
+        qRgb = ColorMap::valueToHotNegative2((float)iVal/255.0);
+        //qRgb = ColorMap::valueToHot((float)iVal/255.0);
+
+        QColor colSample(qRgb);
+        matCurrentVertColor(vertexIndex(i), 0) = colSample.redF();
+        matCurrentVertColor(vertexIndex(i), 1) = colSample.greenF();
+        matCurrentVertColor(vertexIndex(i), 2) = colSample.blueF();
+    }
+
+    QVariant data;
+    data.setValue(matCurrentVertColor);
+    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceRTSourceLocColor);
+    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert);
+
+    //Return here because the new colors will be set to the renderable entity in the setData() function with the role BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert
+    return;
+}
 
 //*************************************************************************************************************
 

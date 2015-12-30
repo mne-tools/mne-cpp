@@ -131,7 +131,8 @@ namespace BrainSurfaceTreeItemRoles
                     SurfaceOffset = Qt::UserRole + 105,
                     SurfaceRenderable3DEntity = Qt::UserRole + 106,
                     SurfaceCurvatureColorVert = Qt::UserRole + 107,
-                    SurfaceRTSourceLocColor = Qt::UserRole + 108};
+                    SurfaceRTSourceLocColor = Qt::UserRole + 108,
+                    SurfaceAnnotationColorVert = Qt::UserRole + 109};
 }
 
 namespace BrainSurfaceSetTreeItemRoles

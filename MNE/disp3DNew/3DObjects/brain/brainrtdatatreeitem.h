@@ -147,7 +147,7 @@ public:
     inline bool isInit() const;
 
 signals:
-    void rtDataChanged(VectorXd sample, VectorXi vertexIndex);
+    void rtDataUpdated(VectorXd sample, VectorXi vertexIndex);
 
 private:
     void onCheckStateChanged(const Qt::CheckState& checkState);
@@ -155,7 +155,6 @@ private:
 
     bool        m_bInit;
 
-    BrainTreeItem*  m_pItemRTDataStreamStatus;
     StcDataWorker*  m_pStcDataWorker;
 };
 
