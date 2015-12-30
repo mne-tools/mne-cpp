@@ -130,7 +130,7 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     this->setData(data, BrainRTDataTreeItemRoles::RTData);
 
     if(iHemi != -1 && iHemi < tForwardSolution.src.size()) {
-        data.setValue(tForwardSolution.src[iHemi].vertno);
+        data.setValue(tForwardSolution.src[iHemi].vertno); // TODO: When clustered source space, these idx no's are the annotation labels
         this->setData(data, BrainRTDataTreeItemRoles::RTVerticesIdx);
     }
 
@@ -145,15 +145,15 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     pItemRTDataStreamStatus->setData(data, BrainTreeItemRoles::RTDataStreamStatus);
 
     QString sIsClustered = tForwardSolution.src[iHemi].isClustered() ? "Clustered" : "Full";
-    BrainTreeItem *pItemSourceSpaceType = new BrainTreeItem(BrainTreeModelItemTypes::RTDataSourceSpaceType, sIsClustered);
+    BrainTreeItem* pItemSourceSpaceType = new BrainTreeItem(BrainTreeModelItemTypes::RTDataSourceSpaceType, sIsClustered);
     *this<<pItemSourceSpaceType;
     data.setValue(sIsClustered);
     pItemSourceSpaceType->setData(data, BrainTreeItemRoles::RTDataSourceSpaceType);
 
-//    BrainTreeItem *itemColormapType = new BrainTreeItem(BrainTreeModelItemTypes::RTDataColormapType, "Hot Negative 2");
-//    *this<<itemColormapType;
-//    data.setValue(QString("Hot Negative 2"));
-//    itemColormapType->setData(data, BrainTreeItemRoles::RTDataColormapType);
+    m_pItemColormapType = new BrainTreeItem(BrainTreeModelItemTypes::RTDataColormapType, "Hot Negative 2");
+    *this<<m_pItemColormapType;
+    data.setValue(QString("Hot Negative 2"));
+    m_pItemColormapType->setData(data, BrainTreeItemRoles::RTDataColormapType);
 
 //    BrainTreeItem *itemStreamingSpeed = new BrainTreeItem(BrainTreeModelItemTypes::RTDataStreamingSpeed, "Streaming speed");
 //    *this<<itemStreamingSpeed;
@@ -218,6 +218,53 @@ void BrainRTDataTreeItem::onStcSample(const VectorXd& sample)
     qDebug()<<"BrainRTDataTreeItem::onStcSample - iStartIdx"<<iStartIdx;
     qDebug()<<"BrainRTDataTreeItem::onStcSample - iEndIdx"<<iEndIdx;
 
-    emit rtDataUpdated(sample.segment(iStartIdx, iEndIdx-iStartIdx+1), this->data(BrainRTDataTreeItemRoles::RTVerticesIdx).value<VectorXi>());
+    //Calculate/Transform acutal colors from rtSorceLoc samples
+    VectorXd subSamples = sample.segment(iStartIdx, iEndIdx-iStartIdx+1);
+    MatrixX3f matVertColors(subSamples.rows(), 3);
+    QString sColorMapType = m_pItemColormapType->data(BrainTreeItemRoles::RTDataColormapType).toString();
+
+    if(sColorMapType == "Hot Negative 1") {
+        for(int i = 0; i<subSamples.rows(); i++) {
+            qint32 iVal = subSamples(i) > 255 ? 255 : subSamples(i) < 0 ? 0 : subSamples(i);
+
+            QRgb qRgb;
+            qRgb = ColorMap::valueToHotNegative1((float)iVal/255.0);
+
+            QColor colSample(qRgb);
+            matVertColors(i, 0) = colSample.redF();
+            matVertColors(i, 1) = colSample.greenF();
+            matVertColors(i, 2) = colSample.blueF();
+        }
+    }
+
+    if(sColorMapType == "Hot Negative 2") {
+        for(int i = 0; i<subSamples.rows(); i++) {
+            qint32 iVal = subSamples(i) > 255 ? 255 : subSamples(i) < 0 ? 0 : subSamples(i);
+
+            QRgb qRgb;
+            qRgb = ColorMap::valueToHotNegative2((float)iVal/255.0);
+
+            QColor colSample(qRgb);
+            matVertColors(i, 0) = colSample.redF();
+            matVertColors(i, 1) = colSample.greenF();
+            matVertColors(i, 2) = colSample.blueF();
+        }
+    }
+
+    if(sColorMapType == "Hot") {
+        for(int i = 0; i<subSamples.rows(); i++) {
+            qint32 iVal = subSamples(i) > 255 ? 255 : subSamples(i) < 0 ? 0 : subSamples(i);
+
+            QRgb qRgb;
+            qRgb = ColorMap::valueToHot((float)iVal/255.0);
+
+            QColor colSample(qRgb);
+            matVertColors(i, 0) = colSample.redF();
+            matVertColors(i, 1) = colSample.greenF();
+            matVertColors(i, 2) = colSample.blueF();
+        }
+    }
+
+    emit rtDataUpdated(matVertColors, this->data(BrainRTDataTreeItemRoles::RTVerticesIdx).value<VectorXi>());
 }
 

@@ -219,12 +219,9 @@ void BrainSurfaceTreeItem::updateVertColor()
 
 //*************************************************************************************************************
 
-void BrainSurfaceTreeItem::updateRtVertColor(const VectorXd& sample, const VectorXi& vertexIndex)
+void BrainSurfaceTreeItem::updateRtVertColor(const MatrixX3f& matVertColors, const VectorXi& vertexIndex)
 {
-    qDebug()<<"sample.rows()"<<sample.rows();
-    qDebug()<<"vertexIndex.rows()"<<vertexIndex.rows();
-
-    if(sample.rows() != vertexIndex.rows()) {
+    if(matVertColors.rows() != vertexIndex.rows()) {
         qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor - number of rows in sample do not not match with idx/no number of rows in vertex. Returning...";
         return;
     }
@@ -241,20 +238,12 @@ void BrainSurfaceTreeItem::updateRtVertColor(const VectorXd& sample, const Vecto
         matCurrentVertColor = this->data(BrainSurfaceTreeItemRoles::SurfaceAnnotationColorVert).value<MatrixX3f>();
     }
 
-    for(int i = 0; i<sample.rows(); i++) {
-        qint32 iVal = sample(i) * 20;
-
-        iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
-
-        QRgb qRgb;
-        //qRgb = ColorMap::valueToHotNegative1((float)iVal/255.0);
-        qRgb = ColorMap::valueToHotNegative2((float)iVal/255.0);
-        //qRgb = ColorMap::valueToHot((float)iVal/255.0);
-
-        QColor colSample(qRgb);
-        matCurrentVertColor(vertexIndex(i), 0) = colSample.redF();
-        matCurrentVertColor(vertexIndex(i), 1) = colSample.greenF();
-        matCurrentVertColor(vertexIndex(i), 2) = colSample.blueF();
+    for(int i = 0; i<matVertColors.rows(); i++) {
+        if(vertexIndex(i) > 0 && vertexIndex(i) < matCurrentVertColor.rows()) {
+            matCurrentVertColor.row(vertexIndex(i)) = matVertColors.row(i);
+        } else {
+            qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor - Vertex index exceeds matrix dimensions!";
+        }
     }
 
     QVariant data;
