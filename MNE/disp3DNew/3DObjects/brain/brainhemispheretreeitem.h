@@ -151,6 +151,9 @@ public:
     BrainRTDataTreeItem* addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution);
 
 private:
+    BrainSurfaceTreeItem*       m_pSurfaceItem;
+    BrainAnnotationTreeItem*    m_pAnnotItem;
+    BrainRTDataTreeItem*        m_pBrainRtDataTreeItem;
 
 };
 

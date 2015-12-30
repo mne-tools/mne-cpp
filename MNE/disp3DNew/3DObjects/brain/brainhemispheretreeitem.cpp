@@ -104,15 +104,15 @@ bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation&
     bool state = false;
 
     //Add surface child
-    BrainSurfaceTreeItem* pSurfaceItem = new BrainSurfaceTreeItem(BrainTreeModelItemTypes::SurfaceItem);
-    *this<<pSurfaceItem;
-    state = pSurfaceItem->addData(tSurface, p3DEntityParent);
+    m_pSurfaceItem = new BrainSurfaceTreeItem(BrainTreeModelItemTypes::SurfaceItem);
+    *this<<m_pSurfaceItem;
+    state = m_pSurfaceItem->addData(tSurface, p3DEntityParent);
 
     //Add annotation child
     if(!tAnnotation.isEmpty()) {
-        BrainAnnotationTreeItem* pAnnotItem = new BrainAnnotationTreeItem(BrainTreeModelItemTypes::AnnotationItem);
-        *this<<pAnnotItem;
-        state = pAnnotItem->addData(tSurface, tAnnotation);
+        m_pAnnotItem = new BrainAnnotationTreeItem(BrainTreeModelItemTypes::AnnotationItem);
+        *this<<m_pAnnotItem;
+        state = m_pAnnotItem->addData(tSurface, tAnnotation);
     }
 
     return state;
@@ -125,10 +125,12 @@ BrainRTDataTreeItem* BrainHemisphereTreeItem::addData(const MNESourceEstimate& t
 {
     if(!tSourceEstimate.isEmpty()) {
         //Add source estimation data as child
-        BrainRTDataTreeItem* pBrainRtDataTreeItem = new BrainRTDataTreeItem(BrainTreeModelItemTypes::RTDataItem);
-        *this<<pBrainRtDataTreeItem;
-        pBrainRtDataTreeItem->addData(tSourceEstimate, tForwardSolution, this->text());
-        return pBrainRtDataTreeItem;
+        m_pBrainRtDataTreeItem = new BrainRTDataTreeItem(BrainTreeModelItemTypes::RTDataItem);
+        connect(m_pBrainRtDataTreeItem, &BrainRTDataTreeItem::rtDataUpdated,
+                m_pSurfaceItem, &BrainSurfaceTreeItem::updateRtVertColor);
+        *this<<m_pBrainRtDataTreeItem;
+        m_pBrainRtDataTreeItem->addData(tSourceEstimate, tForwardSolution, this->text());
+        return m_pBrainRtDataTreeItem;
     }
 
     return new BrainRTDataTreeItem();

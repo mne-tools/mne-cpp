@@ -161,10 +161,10 @@ void AbstractTreeItem::createToolTip()
         sToolTip = "Turn real time data streaming on/off";
         break;
     case BrainTreeModelItemTypes::RTDataSourceSpaceType:
-        sToolTip = "Used source space type";
+        sToolTip = "The source space type";
         break;
     case BrainTreeModelItemTypes::RTDataColormapType:
-        sToolTip = "Used color mapping";
+        sToolTip = "The color map type";
         break;
     case BrainTreeModelItemTypes::RTDataStreamingSpeed:
         sToolTip = "The real time streaming speed";

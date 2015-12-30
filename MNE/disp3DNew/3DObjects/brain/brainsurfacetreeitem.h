@@ -51,6 +51,8 @@
 
 #include "fs/label.h"
 
+#include <disp/helpers/colormap.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -88,6 +90,7 @@ namespace DISP3DNEWLIB
 //=============================================================================================================
 
 using namespace Eigen;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -140,6 +143,8 @@ public:
     bool addData(const Surface& tSurface, Qt3DCore::QEntity* parent);
 
     void updateVertColor();
+
+    void updateRtVertColor(const VectorXd &sample, const VectorXi &vertexIndex);
 
 private:
     MatrixX3f createCurvatureVertColor(const VectorXf& curvature, const QColor& colSulci = QColor(50,50,50), const QColor& colGyri = QColor(125,125,125));
