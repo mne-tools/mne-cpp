@@ -175,6 +175,9 @@ void AbstractTreeItem::createToolTip()
     case BrainTreeModelItemTypes::RTDataNumberAverages:
         sToolTip = "The number of samples waited to average the activity estimation";
         break;
+    case BrainTreeModelItemTypes::RTDataNormalizationValue:
+        sToolTip = "The value to normalize the source localization result";
+        break;
     default:
         sToolTip = "Unknown";
         break;

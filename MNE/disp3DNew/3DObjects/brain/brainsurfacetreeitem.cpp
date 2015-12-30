@@ -241,6 +241,7 @@ void BrainSurfaceTreeItem::updateRtVertColor(const MatrixX3f& matVertColors, con
     for(int i = 0; i<matVertColors.rows(); i++) {
         if(vertexIndex(i) > 0 && vertexIndex(i) < matCurrentVertColor.rows()) {
             matCurrentVertColor.row(vertexIndex(i)) = matVertColors.row(i);
+            //qDebug()<<matVertColors(0,0)<<matVertColors(0,1)<<matVertColors(0,2);
         } else {
             qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor - Vertex index exceeds matrix dimensions!";
         }

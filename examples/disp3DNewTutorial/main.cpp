@@ -186,21 +186,21 @@ int main(int argc, char *argv[])
 
     std::cout<<"Creating BrainView"<<std::endl;
 
-    SurfaceSet tSurfSet ("sample", 2, "inflated", "./MNE-sample-data/subjects");
-    AnnotationSet tAnnotSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
-//    Surface tSurfRight ("sample", 1, "inflated", "./MNE-sample-data/subjects");
-//    Annotation tAnnotRight ("sample", 1, "aparc.a2009s", "./MNE-sample-data/subjects");
-//    Surface tSurfLeft ("sample", 0, "inflated", "./MNE-sample-data/subjects");
-//    Annotation tAnnotLeft ("sample", 0, "aparc.a2009s", "./MNE-sample-data/subjects");
+//    SurfaceSet tSurfSet ("sample", 2, "inflated", "./MNE-sample-data/subjects");
+//    AnnotationSet tAnnotSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
+    Surface tSurfRight ("sample", 1, "pial", "./MNE-sample-data/subjects");
+    Annotation tAnnotRight ("sample", 1, "aparc.a2009s", "./MNE-sample-data/subjects");
+    Surface tSurfLeft ("sample", 0, "orig", "./MNE-sample-data/subjects");
+    Annotation tAnnotLeft ("sample", 0, "aparc.a2009s", "./MNE-sample-data/subjects");
 //    MNESourceEstimate sourceEstimate;
 //    MNEForwardSolution t_clusteredFwd;
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-//    testWindow->addBrainData("HemiLR", tSurfLeft, tAnnotLeft);
-//    testWindow->addBrainData("HemiLR", tSurfRight, tAnnotRight);
-    testWindow->addBrainData("HemiLRSet", tSurfSet, tAnnotSet);
+    testWindow->addBrainData("HemiLR", tSurfLeft, tAnnotLeft);
+    testWindow->addBrainData("HemiLR", tSurfRight, tAnnotRight);
+//    testWindow->addBrainData("HemiLRSet", tSurfSet, tAnnotSet);
 
-    QList<BrainRTDataTreeItem*> rtItemList = testWindow->addSourceEstimate("HemiLRSet", sourceEstimate, t_clusteredFwd);
+    QList<BrainRTDataTreeItem*> rtItemList = testWindow->addSourceEstimate("HemiLR", sourceEstimate, t_clusteredFwd);
     //rtItemList.at(0)->updateData();
 
     testWindow->show();    

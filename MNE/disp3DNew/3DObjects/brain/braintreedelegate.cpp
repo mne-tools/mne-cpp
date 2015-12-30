@@ -70,32 +70,39 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
     const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pBrainTreeModel->itemFromIndex(index));
 
     switch(pAbstractItem->type()) {
-    case BrainTreeModelItemTypes::SurfaceColorGyri: {
-        QColorDialog *pColorDialog = new QColorDialog(parent);
-        pColorDialog->show();
-        return pColorDialog;
-    }
+        case BrainTreeModelItemTypes::SurfaceColorGyri: {
+            QColorDialog *pColorDialog = new QColorDialog(parent);
+            pColorDialog->show();
+            return pColorDialog;
+        }
 
-    case BrainTreeModelItemTypes::SurfaceColorSulci: {
-        QColorDialog *pColorDialog = new QColorDialog(parent);
-        pColorDialog->show();
-        return pColorDialog;
-    }
+        case BrainTreeModelItemTypes::SurfaceColorSulci: {
+            QColorDialog *pColorDialog = new QColorDialog(parent);
+            pColorDialog->show();
+            return pColorDialog;
+        }
 
-    case BrainTreeModelItemTypes::SurfaceColorInfoOrigin: {
-        QComboBox* pComboBox = new QComboBox(parent);
-        pComboBox->addItem("Color from curvature");
-        pComboBox->addItem("Color from annotation");
-        return pComboBox;
-    }
+        case BrainTreeModelItemTypes::SurfaceColorInfoOrigin: {
+            QComboBox* pComboBox = new QComboBox(parent);
+            pComboBox->addItem("Color from curvature");
+            pComboBox->addItem("Color from annotation");
+            return pComboBox;
+        }
 
-    case BrainTreeModelItemTypes::RTDataColormapType: {
-        QComboBox* pComboBox = new QComboBox(parent);
-        pComboBox->addItem("Hot Negative 1");
-        pComboBox->addItem("Hot Negative 2");
-        pComboBox->addItem("Hot");
-        return pComboBox;
-    }
+        case BrainTreeModelItemTypes::RTDataColormapType: {
+            QComboBox* pComboBox = new QComboBox(parent);
+            pComboBox->addItem("Hot Negative 1");
+            pComboBox->addItem("Hot Negative 2");
+            pComboBox->addItem("Hot");
+            return pComboBox;
+        }
+
+        case BrainTreeModelItemTypes::RTDataNormalizationValue: {
+            QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
+            pDoubleSpinBox->setValue(index.model()->data(index, BrainTreeItemRoles::RTDataNormalizationValue).toDouble());
+            return pDoubleSpinBox;
+            break;
+        }
     }
 
     return QItemDelegate::createEditor(parent, option, index);
@@ -110,33 +117,40 @@ void BrainTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index)
     const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pBrainTreeModel->itemFromIndex(index));
 
     switch(pAbstractItem->type()) {
-    case BrainTreeModelItemTypes::SurfaceColorGyri: {
-        QColor color = index.model()->data(index, BrainTreeItemRoles::SurfaceColorGyri).value<QColor>();
-        QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
-        pColorDialog->setCurrentColor(color);
-        break;
-    }
+        case BrainTreeModelItemTypes::SurfaceColorGyri: {
+            QColor color = index.model()->data(index, BrainTreeItemRoles::SurfaceColorGyri).value<QColor>();
+            QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
+            pColorDialog->setCurrentColor(color);
+            break;
+        }
 
-    case BrainTreeModelItemTypes::SurfaceColorSulci: {
-        QColor color = index.model()->data(index, BrainTreeItemRoles::SurfaceColorSulci).value<QColor>();
-        QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
-        pColorDialog->setCurrentColor(color);
-        break;
-    }
+        case BrainTreeModelItemTypes::SurfaceColorSulci: {
+            QColor color = index.model()->data(index, BrainTreeItemRoles::SurfaceColorSulci).value<QColor>();
+            QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
+            pColorDialog->setCurrentColor(color);
+            break;
+        }
 
-    case BrainTreeModelItemTypes::SurfaceColorInfoOrigin: {
-        QString colorOrigin = index.model()->data(index, BrainTreeItemRoles::SurfaceColorInfoOrigin).toString();
-        QComboBox* pComboBox = static_cast<QComboBox*>(editor);
-        pComboBox->setCurrentText(colorOrigin);
-        break;
-    }
+        case BrainTreeModelItemTypes::SurfaceColorInfoOrigin: {
+            QString colorOrigin = index.model()->data(index, BrainTreeItemRoles::SurfaceColorInfoOrigin).toString();
+            QComboBox* pComboBox = static_cast<QComboBox*>(editor);
+            pComboBox->setCurrentText(colorOrigin);
+            break;
+        }
 
-    case BrainTreeModelItemTypes::RTDataColormapType: {
-        QString colormap = index.model()->data(index, BrainTreeItemRoles::RTDataColormapType).toString();
-        QComboBox* pComboBox = static_cast<QComboBox*>(editor);
-        pComboBox->setCurrentText(colormap);
-        break;
-    }
+        case BrainTreeModelItemTypes::RTDataColormapType: {
+            QString colormap = index.model()->data(index, BrainTreeItemRoles::RTDataColormapType).toString();
+            QComboBox* pComboBox = static_cast<QComboBox*>(editor);
+            pComboBox->setCurrentText(colormap);
+            break;
+        }
+
+        case BrainTreeModelItemTypes::RTDataNormalizationValue: {
+            double normValue = index.model()->data(index, BrainTreeItemRoles::RTDataNormalizationValue).toDouble();
+            QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
+            pDoubleSpinBox->setValue(normValue);
+            break;
+        }
     }
 
     QItemDelegate::setEditorData(editor, index);
@@ -151,48 +165,58 @@ void BrainTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
     const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pBrainTreeModel->itemFromIndex(index));
 
     switch(pAbstractItem->type()) {
-    case BrainTreeModelItemTypes::SurfaceColorGyri: {
-        QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
-        QColor color = pColorDialog->currentColor();
-        QVariant data;
-        data.setValue(color);
+        case BrainTreeModelItemTypes::SurfaceColorGyri: {
+            QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
+            QColor color = pColorDialog->currentColor();
+            QVariant data;
+            data.setValue(color);
 
-        model->setData(index, data, BrainTreeItemRoles::SurfaceColorGyri);
-        model->setData(index, data, Qt::DecorationRole);
-        return;
-    }
+            model->setData(index, data, BrainTreeItemRoles::SurfaceColorGyri);
+            model->setData(index, data, Qt::DecorationRole);
+            return;
+        }
 
-    case BrainTreeModelItemTypes::SurfaceColorSulci: {
-        QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
-        QColor color = pColorDialog->currentColor();
-        QVariant data;
-        data.setValue(color);
+        case BrainTreeModelItemTypes::SurfaceColorSulci: {
+            QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
+            QColor color = pColorDialog->currentColor();
+            QVariant data;
+            data.setValue(color);
 
-        model->setData(index, data, BrainTreeItemRoles::SurfaceColorSulci);
-        model->setData(index, data, Qt::DecorationRole);
-        return;
-    }
+            model->setData(index, data, BrainTreeItemRoles::SurfaceColorSulci);
+            model->setData(index, data, Qt::DecorationRole);
+            return;
+        }
 
-    case BrainTreeModelItemTypes::SurfaceColorInfoOrigin: {
-        QComboBox* pColorDialog = static_cast<QComboBox*>(editor);
-        QVariant data;
-        data.setValue(pColorDialog->currentText());
+        case BrainTreeModelItemTypes::SurfaceColorInfoOrigin: {
+            QComboBox* pColorDialog = static_cast<QComboBox*>(editor);
+            QVariant data;
+            data.setValue(pColorDialog->currentText());
 
-        model->setData(index, data, BrainTreeItemRoles::SurfaceColorInfoOrigin);
-        model->setData(index, data, Qt::DisplayRole);
-        return;
-    }
+            model->setData(index, data, BrainTreeItemRoles::SurfaceColorInfoOrigin);
+            model->setData(index, data, Qt::DisplayRole);
+            return;
+        }
 
-    case BrainTreeModelItemTypes::RTDataColormapType: {
-        QComboBox* pColorDialog = static_cast<QComboBox*>(editor);
-        QVariant data;
-        data.setValue(pColorDialog->currentText());
+        case BrainTreeModelItemTypes::RTDataColormapType: {
+            QComboBox* pColorDialog = static_cast<QComboBox*>(editor);
+            QVariant data;
+            data.setValue(pColorDialog->currentText());
 
-        model->setData(index, data, BrainTreeItemRoles::RTDataColormapType);
-        model->setData(index, data, Qt::DisplayRole);
-        return;
-    }
+            model->setData(index, data, BrainTreeItemRoles::RTDataColormapType);
+            model->setData(index, data, Qt::DisplayRole);
+            return;
+        }
 
+        case BrainTreeModelItemTypes::RTDataNormalizationValue: {
+            QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
+
+            QVariant data;
+            data.setValue(pDoubleSpinBox->value());
+
+            model->setData(index, data, BrainTreeItemRoles::RTDataNormalizationValue);
+            model->setData(index, data, Qt::DisplayRole);
+            break;
+        }
     }
 
     QItemDelegate::setModelData(editor, model, index);
@@ -201,8 +225,7 @@ void BrainTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
 
 //*************************************************************************************************************
 
-void BrainTreeDelegate::updateEditorGeometry(QWidget* editor,
-    const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
+void BrainTreeDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
 {
     editor->setGeometry(option.rect);
 }

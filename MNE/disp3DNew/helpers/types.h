@@ -99,7 +99,8 @@ namespace BrainTreeModelItemTypes
                     RTDataColormapType = QStandardItem::UserType + 17,
                     RTDataStreamingSpeed = QStandardItem::UserType + 18,
                     RTDataLoopedStreaming = QStandardItem::UserType + 19,
-                    RTDataNumberAverages = QStandardItem::UserType + 20};
+                    RTDataNumberAverages = QStandardItem::UserType + 20,
+                    RTDataNormalizationValue = QStandardItem::UserType + 21};
 }
 
 // Model item roles
@@ -118,7 +119,8 @@ namespace BrainTreeItemRoles
                     RTDataColormapType = Qt::UserRole + 11,
                     RTDataStreamingSpeed = Qt::UserRole + 12,
                     RTDataLoopedStreaming = Qt::UserRole + 13,
-                    RTDataNumberAverages = Qt::UserRole + 14};
+                    RTDataNumberAverages = Qt::UserRole + 14,
+                    RTDataNormalizationValue = Qt::UserRole + 15};
 }
 
 namespace BrainSurfaceTreeItemRoles
