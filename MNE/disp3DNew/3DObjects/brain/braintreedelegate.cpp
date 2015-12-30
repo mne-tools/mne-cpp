@@ -86,7 +86,14 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
         QComboBox* pComboBox = new QComboBox(parent);
         pComboBox->addItem("Color from curvature");
         pComboBox->addItem("Color from annotation");
-        pComboBox->addItem("Color from RT source loc");
+        return pComboBox;
+    }
+
+    case BrainTreeModelItemTypes::RTDataColormapType: {
+        QComboBox* pComboBox = new QComboBox(parent);
+        pComboBox->addItem("Hot Negative 1");
+        pComboBox->addItem("Hot Negative 2");
+        pComboBox->addItem("Hot");
         return pComboBox;
     }
     }
@@ -121,6 +128,13 @@ void BrainTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index)
         QString colorOrigin = index.model()->data(index, BrainTreeItemRoles::SurfaceColorInfoOrigin).toString();
         QComboBox* pComboBox = static_cast<QComboBox*>(editor);
         pComboBox->setCurrentText(colorOrigin);
+        break;
+    }
+
+    case BrainTreeModelItemTypes::RTDataColormapType: {
+        QString colormap = index.model()->data(index, BrainTreeItemRoles::RTDataColormapType).toString();
+        QComboBox* pComboBox = static_cast<QComboBox*>(editor);
+        pComboBox->setCurrentText(colormap);
         break;
     }
     }
@@ -165,6 +179,16 @@ void BrainTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
         data.setValue(pColorDialog->currentText());
 
         model->setData(index, data, BrainTreeItemRoles::SurfaceColorInfoOrigin);
+        model->setData(index, data, Qt::DisplayRole);
+        return;
+    }
+
+    case BrainTreeModelItemTypes::RTDataColormapType: {
+        QComboBox* pColorDialog = static_cast<QComboBox*>(editor);
+        QVariant data;
+        data.setValue(pColorDialog->currentText());
+
+        model->setData(index, data, BrainTreeItemRoles::RTDataColormapType);
         model->setData(index, data, Qt::DisplayRole);
         return;
     }
