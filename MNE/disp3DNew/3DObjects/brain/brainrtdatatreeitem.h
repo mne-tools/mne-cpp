@@ -155,8 +155,11 @@ signals:
 private:
     void onCheckStateChanged(const Qt::CheckState& checkState);
     void onStcSample(const VectorXd& sample);
+    void onNormalizationValueChanged(const double& value);
 
     bool        m_bInit;
+
+    double      m_dStcNorm;
 
     StcDataWorker*      m_pStcDataWorker;
     BrainTreeItem*      m_pItemColormapType;

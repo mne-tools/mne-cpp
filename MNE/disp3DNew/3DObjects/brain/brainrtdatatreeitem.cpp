@@ -58,6 +58,7 @@ BrainRTDataTreeItem::BrainRTDataTreeItem(const int &iType, const QString &text)
 : AbstractTreeItem(iType, text)
 , m_bInit(false)
 , m_pStcDataWorker(new StcDataWorker(this))
+, m_dStcNorm(1.0)
 {
     connect(m_pStcDataWorker, &StcDataWorker::stcSample,
             this, &BrainRTDataTreeItem::onStcSample);
@@ -155,6 +156,13 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     data.setValue(QString("Hot Negative 2"));
     m_pItemColormapType->setData(data, BrainTreeItemRoles::RTDataColormapType);
 
+    BrainTreeItem* pItemSourceLocNormValue = new BrainTreeItem(BrainTreeModelItemTypes::RTDataNormalizationValue, "Normalization value");
+    connect(pItemSourceLocNormValue, &BrainTreeItem::RTDataNormalizationValueChanged,
+            this, &BrainRTDataTreeItem::onNormalizationValueChanged);
+    *this<<pItemSourceLocNormValue;
+    data.setValue(1.0);
+    pItemSourceLocNormValue->setData(data, BrainTreeItemRoles::RTDataNormalizationValue);
+
 //    BrainTreeItem *itemStreamingSpeed = new BrainTreeItem(BrainTreeModelItemTypes::RTDataStreamingSpeed, "Streaming speed");
 //    *this<<itemStreamingSpeed;
 
@@ -214,26 +222,27 @@ void BrainRTDataTreeItem::onStcSample(const VectorXd& sample)
     int iStartIdx = this->data(BrainRTDataTreeItemRoles::RTStartIdx).toInt();
     int iEndIdx = this->data(BrainRTDataTreeItemRoles::RTEndIdx).toInt();
 
-    qDebug()<<"BrainRTDataTreeItem::onStcSample - sample.rows(): "<<sample.rows();
-    qDebug()<<"BrainRTDataTreeItem::onStcSample - iStartIdx"<<iStartIdx;
-    qDebug()<<"BrainRTDataTreeItem::onStcSample - iEndIdx"<<iEndIdx;
-
     //Calculate/Transform acutal colors from rtSorceLoc samples
     VectorXd subSamples = sample.segment(iStartIdx, iEndIdx-iStartIdx+1);
+    subSamples /= m_dStcNorm;
+
     MatrixX3f matVertColors(subSamples.rows(), 3);
     QString sColorMapType = m_pItemColormapType->data(BrainTreeItemRoles::RTDataColormapType).toString();
 
     if(sColorMapType == "Hot Negative 1") {
         for(int i = 0; i<subSamples.rows(); i++) {
             qint32 iVal = subSamples(i) > 255 ? 255 : subSamples(i) < 0 ? 0 : subSamples(i);
-
+            qDebug()<<"ival"<<iVal;
             QRgb qRgb;
             qRgb = ColorMap::valueToHotNegative1((float)iVal/255.0);
 
+            qDebug()<<"qRgb"<<qRgb;
             QColor colSample(qRgb);
             matVertColors(i, 0) = colSample.redF();
             matVertColors(i, 1) = colSample.greenF();
             matVertColors(i, 2) = colSample.blueF();
+            qDebug()<<"QColor"<<colSample;
+
         }
     }
 
@@ -268,3 +277,12 @@ void BrainRTDataTreeItem::onStcSample(const VectorXd& sample)
     emit rtDataUpdated(matVertColors, this->data(BrainRTDataTreeItemRoles::RTVerticesIdx).value<VectorXi>());
 }
 
+
+//*************************************************************************************************************
+
+void BrainRTDataTreeItem::onNormalizationValueChanged(const double& value)
+{
+    double dStcNormMax = 10.0;
+
+    m_dStcNorm = (dStcNormMax/100.0) * (double)value;
+}

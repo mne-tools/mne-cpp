@@ -124,6 +124,7 @@ public:
 
 signals:
     void updateSurfaceVertColors();
+    void RTDataNormalizationValueChanged(const double& value);
 
 private:
 
