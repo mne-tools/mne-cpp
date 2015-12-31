@@ -68,7 +68,7 @@ StcDataWorker::StcDataWorker(QObject* parent)
 , m_bIsLooping(true)
 , m_iAverageSamples(1)
 , m_iCurrentSample(0)
-, m_iUSecIntervall(1000)
+, m_iMSecIntervall(1000)
 {
 }
 
@@ -116,6 +116,9 @@ void StcDataWorker::run()
 
     while(true)
     {
+        QTime timer;
+        timer.start();
+
         //std::cout<<"StcDataWorker Running ... "<<std::endl;
         {
             QMutexLocker locker(&m_qMutex);
@@ -171,7 +174,8 @@ void StcDataWorker::run()
             m_qMutex.unlock();
         }
 
-        QThread::msleep(m_iUSecIntervall);
+        //qDebug()<<"StcDataWorker::run()"<<timer.elapsed()<<"msecs";
+        QThread::msleep(m_iMSecIntervall);
     }
 }
 
@@ -190,7 +194,7 @@ void StcDataWorker::setAverage(qint32 samples)
 void StcDataWorker::setInterval(int usec)
 {
     QMutexLocker locker(&m_qMutex);
-    m_iUSecIntervall = usec;
+    m_iMSecIntervall = usec;
 }
 
 
@@ -212,4 +216,16 @@ void StcDataWorker::stop()
     m_qMutex.unlock();
 
     QThread::wait();
+}
+
+
+//*************************************************************************************************************
+
+void StcDataWorker::start()
+{
+    m_qMutex.lock();
+    m_iCurrentSample = 0;
+    m_qMutex.unlock();
+
+    QThread::start();
 }

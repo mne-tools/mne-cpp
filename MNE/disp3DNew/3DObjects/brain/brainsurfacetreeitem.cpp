@@ -219,14 +219,17 @@ void BrainSurfaceTreeItem::updateVertColor()
 
 //*************************************************************************************************************
 
-void BrainSurfaceTreeItem::updateRtVertColor(const MatrixX3f& matVertColors, const VectorXi& vertexIndex)
+void BrainSurfaceTreeItem::updateRtVertColor(const VectorXd& sourceSamples, const VectorXi& vertexIndex, const QString& sColorMapType)
 {
-    if(matVertColors.rows() != vertexIndex.rows()) {
+    QTime time;
+    time.start();
+
+    if(sourceSamples.rows() != vertexIndex.rows()) {
         qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor - number of rows in sample do not not match with idx/no number of rows in vertex. Returning...";
         return;
     }
 
-    //This function is called for every new sample point and therfore must be kept highly efficient!
+    //This function is called for every new sample point and therfore it must be kept highly efficient!
     QString sColorInfoOrigin = m_pItemSurfColorInfoOrigin->data(BrainTreeItemRoles::SurfaceColorInfoOrigin).toString();
     MatrixX3f matCurrentVertColor;
 
@@ -238,12 +241,63 @@ void BrainSurfaceTreeItem::updateRtVertColor(const MatrixX3f& matVertColors, con
         matCurrentVertColor = this->data(BrainSurfaceTreeItemRoles::SurfaceAnnotationColorVert).value<MatrixX3f>();
     }
 
-    for(int i = 0; i<matVertColors.rows(); i++) {
-        if(vertexIndex(i) > 0 && vertexIndex(i) < matCurrentVertColor.rows()) {
-            matCurrentVertColor.row(vertexIndex(i)) = matVertColors.row(i);
-            //qDebug()<<matVertColors(0,0)<<matVertColors(0,1)<<matVertColors(0,2);
-        } else {
-            qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor - Vertex index exceeds matrix dimensions!";
+    if(sColorMapType == "Hot Negative 1") {
+        for(int i = 0; i<sourceSamples.rows(); i++) {
+            if(vertexIndex(i) > 0 && vertexIndex(i) < matCurrentVertColor.rows()) {
+                qint32 iVal = sourceSamples(i) > 255 ? 255 : sourceSamples(i) < 0 ? 0 : sourceSamples(i);
+
+                QRgb qRgb;
+                qRgb = ColorMap::valueToHotNegative1((float)iVal/255.0);
+
+                QColor colSample(qRgb);
+                if(colSample != Qt::black) {
+                    matCurrentVertColor(vertexIndex(i), 0) = colSample.redF();
+                    matCurrentVertColor(vertexIndex(i), 1) = colSample.greenF();
+                    matCurrentVertColor(vertexIndex(i), 2) = colSample.blueF();
+                }
+            } else {
+                qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor - Vertex index exceeds matrix dimensions!";
+            }
+        }
+    }
+
+    if(sColorMapType == "Hot Negative 2") {
+        for(int i = 0; i<sourceSamples.rows(); i++) {
+            if(vertexIndex(i) > 0 && vertexIndex(i) < matCurrentVertColor.rows()) {
+                qint32 iVal = sourceSamples(i) > 255 ? 255 : sourceSamples(i) < 0 ? 0 : sourceSamples(i);
+
+                QRgb qRgb;
+                qRgb = ColorMap::valueToHotNegative2((float)iVal/255.0);
+
+                QColor colSample(qRgb);
+                if(colSample != Qt::black) {
+                    matCurrentVertColor(vertexIndex(i), 0) = colSample.redF();
+                    matCurrentVertColor(vertexIndex(i), 1) = colSample.greenF();
+                    matCurrentVertColor(vertexIndex(i), 2) = colSample.blueF();
+                }
+            } else {
+                qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor - Vertex index exceeds matrix dimensions!";
+            }
+        }
+    }
+
+    if(sColorMapType == "Hot") {
+        for(int i = 0; i<sourceSamples.rows(); i++) {
+            if(vertexIndex(i) > 0 && vertexIndex(i) < matCurrentVertColor.rows()) {
+                qint32 iVal = sourceSamples(i) > 255 ? 255 : sourceSamples(i) < 0 ? 0 : sourceSamples(i);
+
+                QRgb qRgb;
+                qRgb = ColorMap::valueToHot((float)iVal/255.0);
+
+                QColor colSample(qRgb);
+                if(colSample != Qt::black) {
+                    matCurrentVertColor(vertexIndex(i), 0) = colSample.redF();
+                    matCurrentVertColor(vertexIndex(i), 1) = colSample.greenF();
+                    matCurrentVertColor(vertexIndex(i), 2) = colSample.blueF();
+                }
+            } else {
+                qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor - Vertex index exceeds matrix dimensions!";
+            }
         }
     }
 
@@ -252,9 +306,11 @@ void BrainSurfaceTreeItem::updateRtVertColor(const MatrixX3f& matVertColors, con
     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceRTSourceLocColor);
     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert);
 
+    //qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor"<<time.elapsed()<<"msecs";
     //Return here because the new colors will be set to the renderable entity in the setData() function with the role BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert
     return;
 }
+
 
 //*************************************************************************************************************
 

@@ -52,8 +52,6 @@
 #include "mne/mne_sourceestimate.h"
 #include "mne/mne_forwardsolution.h"
 
-#include <disp/helpers/colormap.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -66,6 +64,7 @@
 #include <QColor>
 #include <QStandardItem>
 #include <QStandardItemModel>
+#include <QTime>
 
 
 //*************************************************************************************************************
@@ -92,7 +91,6 @@ namespace DISP3DNEWLIB
 
 using namespace Eigen;
 using namespace MNELIB;
-using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -150,18 +148,19 @@ public:
     inline bool isInit() const;
 
 signals:
-    void rtDataUpdated(MatrixX3f vertColors, VectorXi vertexIndex);
+    void rtDataUpdated(VectorXd sourceSamples, VectorXi vertexIndex, QString sColorMapType);
 
 private:
     void onCheckStateChanged(const Qt::CheckState& checkState);
-    void onStcSample(const VectorXd& sample);
-    void onNormalizationValueChanged(const double& value);
+    void onStcSample(VectorXd sourceSamples);
+    void onStreamingIntervalChanged(const int& usec);
 
     bool        m_bInit;
 
-    double      m_dStcNorm;
+    double      m_dStcNormMax;
 
     StcDataWorker*      m_pStcDataWorker;
+    BrainTreeItem*      m_pItemSourceLocNormValue;
     BrainTreeItem*      m_pItemColormapType;
 };
 

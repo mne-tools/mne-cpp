@@ -97,8 +97,8 @@ void  BrainTreeItem::setData(const QVariant& value, int role)
             break;
         }
 
-        case BrainTreeItemRoles::RTDataNormalizationValue: {
-            emit RTDataNormalizationValueChanged(value.toDouble());
+        case BrainTreeItemRoles::RTDataTimeInterval: {
+            emit rtDataTimeIntervalUpdated(value.toInt());
             break;
         }
     }
