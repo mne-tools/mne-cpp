@@ -97,7 +97,7 @@ namespace BrainTreeModelItemTypes
                     RTDataStreamStatus = QStandardItem::UserType + 15,
                     RTDataSourceSpaceType = QStandardItem::UserType + 16,
                     RTDataColormapType = QStandardItem::UserType + 17,
-                    RTDataStreamingSpeed = QStandardItem::UserType + 18,
+                    RTDataTimeInterval = QStandardItem::UserType + 18,
                     RTDataLoopedStreaming = QStandardItem::UserType + 19,
                     RTDataNumberAverages = QStandardItem::UserType + 20,
                     RTDataNormalizationValue = QStandardItem::UserType + 21};
@@ -117,7 +117,7 @@ namespace BrainTreeItemRoles
                     RTDataStreamStatus = Qt::UserRole + 9,
                     RTDataSourceSpaceType = Qt::UserRole + 10,
                     RTDataColormapType = Qt::UserRole + 11,
-                    RTDataStreamingSpeed = Qt::UserRole + 12,
+                    RTDataTimeInterval = Qt::UserRole + 12,
                     RTDataLoopedStreaming = Qt::UserRole + 13,
                     RTDataNumberAverages = Qt::UserRole + 14,
                     RTDataNormalizationValue = Qt::UserRole + 15};

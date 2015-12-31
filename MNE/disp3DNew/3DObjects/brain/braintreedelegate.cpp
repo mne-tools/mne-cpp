@@ -99,8 +99,21 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
 
         case BrainTreeModelItemTypes::RTDataNormalizationValue: {
             QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
+            pDoubleSpinBox->setMinimum(0.01);
+            pDoubleSpinBox->setMaximum(10.0);
+            pDoubleSpinBox->setSingleStep(0.01);
             pDoubleSpinBox->setValue(index.model()->data(index, BrainTreeItemRoles::RTDataNormalizationValue).toDouble());
             return pDoubleSpinBox;
+            break;
+        }
+
+        case BrainTreeModelItemTypes::RTDataTimeInterval: {
+            QSpinBox* pSpinBox = new QSpinBox(parent);
+            pSpinBox->setSuffix(" mSec");
+            pSpinBox->setMinimum(1);
+            pSpinBox->setMaximum(1000000);
+            pSpinBox->setValue(index.model()->data(index, BrainTreeItemRoles::RTDataTimeInterval).toInt());
+            return pSpinBox;
             break;
         }
     }
@@ -146,9 +159,16 @@ void BrainTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index)
         }
 
         case BrainTreeModelItemTypes::RTDataNormalizationValue: {
-            double normValue = index.model()->data(index, BrainTreeItemRoles::RTDataNormalizationValue).toDouble();
+            double value = index.model()->data(index, BrainTreeItemRoles::RTDataNormalizationValue).toDouble();
             QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
-            pDoubleSpinBox->setValue(normValue);
+            pDoubleSpinBox->setValue(value);
+            break;
+        }
+
+        case BrainTreeModelItemTypes::RTDataTimeInterval: {
+            int value = index.model()->data(index, BrainTreeItemRoles::RTDataTimeInterval).toInt();
+            QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
+            pSpinBox->setValue(value);
             break;
         }
     }
@@ -214,6 +234,17 @@ void BrainTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
             data.setValue(pDoubleSpinBox->value());
 
             model->setData(index, data, BrainTreeItemRoles::RTDataNormalizationValue);
+            model->setData(index, data, Qt::DisplayRole);
+            break;
+        }
+
+        case BrainTreeModelItemTypes::RTDataTimeInterval: {
+            QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
+
+            QVariant data;
+            data.setValue(pSpinBox->value());
+
+            model->setData(index, data, BrainTreeItemRoles::RTDataTimeInterval);
             model->setData(index, data, Qt::DisplayRole);
             break;
         }

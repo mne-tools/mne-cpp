@@ -166,8 +166,8 @@ void AbstractTreeItem::createToolTip()
     case BrainTreeModelItemTypes::RTDataColormapType:
         sToolTip = "The color map type";
         break;
-    case BrainTreeModelItemTypes::RTDataStreamingSpeed:
-        sToolTip = "The real time streaming speed";
+    case BrainTreeModelItemTypes::RTDataTimeInterval:
+        sToolTip = "The u seconds waited in between each rt source loc result sample";
         break;
     case BrainTreeModelItemTypes::RTDataLoopedStreaming:
         sToolTip = "Turn looped streaming on/off";
