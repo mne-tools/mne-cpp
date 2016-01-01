@@ -52,6 +52,7 @@
 //=============================================================================================================
 
 #include <QString>
+#include <QList>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -68,8 +69,8 @@ class CubeData
 public:
     CubeData();
     ~CubeData();
-    QList<SliceData> geData();
-    void seData(QList<SliceData> slices);
+    QList<FSLIB::SliceData> geData();
+    void seData(QList<FSLIB::SliceData> slices);
     //Eigen::MatrixXd getXSlice(quint16 idx);
     //Eigen::MatrixXd getYSlice(quint16 idx);
     FSLIB::SliceData getZSlice(quint16 idx);
@@ -80,7 +81,7 @@ public:
     double getVoxel(int x, int y);
 
 private:
-    QList<SliceData> m_cube;
+    QList<FSLIB::SliceData> m_cube;
 
 };
 
