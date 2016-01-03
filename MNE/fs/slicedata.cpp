@@ -89,6 +89,7 @@ inline void SliceData::setDataAsMatrix(MatrixXd slice)
 
 //    m_dimX = m_slice.rows();
 //    m_dimY = m_slice.cols();
+
     // todo: check difference between normal and at compiler time
 
 }

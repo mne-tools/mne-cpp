@@ -102,11 +102,11 @@ public:
     * defined in the Mri class. It is ported from Freesurfers mghRead() method in mriio.c
     *
     * @param[in] fName  filename
-    * @param[in] slices   todo
+    * @param[in] slices   todo / slices to load from file
     * @param[in] frame  int number, indicating the index of the time frame, negativ numbers indicate a sequence
     * @param[in] headerOnly   bool flag indicating if only header or also volume of file should be read
     *
-    * @return calculated result as an integer
+    * @return todo / calculated result as an integer / mri data object
     */
     static Mri loadMGH(QString fName, Eigen::VectorXi slices, int frame, bool headerOnly);
 //    static QList<Eigen::MatrixXd> loadMGH(QString fName, Eigen::VectorXi slices, int frame, bool headerOnly);

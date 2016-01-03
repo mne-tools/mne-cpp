@@ -299,7 +299,7 @@ Mri Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int frame, bool headerOn
                           {
                             // voxel access
                             sVal = BLEndian::swapShort(((short *)buf)[i]);
-//                            qDebug() << sVal << " ";
+                            qDebug() << sVal << " at pos " << x << "|" << y <<  ". ";
                             slice(x,y) = sVal;
                           }
                       }
@@ -401,6 +401,7 @@ Mri Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int frame, bool headerOn
     mri.fName = fName;
 
     mri.slices = sliceDataList;
+    //mri.slices.
     //mri.slices.getNewCube(sliceDataList);
 
     return mri;

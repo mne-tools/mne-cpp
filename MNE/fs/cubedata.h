@@ -69,12 +69,14 @@ class CubeData
 public:
     CubeData();
     ~CubeData();
-    QList<FSLIB::SliceData> geData();
-    void seData(QList<FSLIB::SliceData> slices);
-    //Eigen::MatrixXd getXSlice(quint16 idx);
-    //Eigen::MatrixXd getYSlice(quint16 idx);
+    QList<FSLIB::SliceData> getData();
+    void setData(QList<FSLIB::SliceData> slices);
+
     FSLIB::SliceData getZSlice(quint16 idx);
     void setZSlice(FSLIB::SliceData slice, quint16 idx);
+
+    //Eigen::MatrixXd getXSlice(quint16 idx);
+    //Eigen::MatrixXd getYSlice(quint16 idx);
 
     void setDataAsMatrix(Eigen::MatrixXd slice);
     void setSliceIdx(quint32 idx);
