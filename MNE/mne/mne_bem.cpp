@@ -76,27 +76,21 @@ MNEBem::MNEBem(const MNEBem &p_MNEBem)
 
 //*************************************************************************************************************
 
-MNEBem::MNEBem(QIODevice &p_IODevice)   //const MNESourceSpace &p_MNESourceSpace
+MNEBem::MNEBem(QIODevice &p_IODevice)   //const MNEBem &p_MNEBem
 //: m_qListBemSurface()
 {
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
     FiffDirTree t_Tree;
-//    QList<FiffDirEntry>fiffDirEntries;
-
-//    if(!t_pStream->open(t_Tree, fiffDirEntries))
-//    {
-//        qCritical() << "Could not open FIFF stream!";
-////        return false;
-//    }
 
     if(!MNEBem::readFromStream(t_pStream, true, t_Tree, *this))
     {
         t_pStream->device()->close();
-        std::cout << "Could not read the source spaces\n"; // ToDo throw error
-        //ToDo error(me,'Could not read the source spaces (%s)',mne_omit_first_line(lasterr));
+        std::cout << "Could not read the bem surfaces\n"; // ToDo throw error
+        //ToDo error(me,'Could not read the bem surfaces (%s)',mne_omit_first_line(lasterr));
 //        return false;
     }
 
+//    bool testStream =t_pStream->device()->isOpen();
 }
 
 
@@ -105,6 +99,13 @@ MNEBem::MNEBem(QIODevice &p_IODevice)   //const MNESourceSpace &p_MNESourceSpace
 MNEBem::~MNEBem()
 {
 
+}
+
+//*************************************************************************************************************
+
+void MNEBem::clear()
+{
+    m_qListBemSurface.clear();
 }
 
 
@@ -136,10 +137,13 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirT
     //   Find all BEM surfaces
     //
 
+
     QList<FiffDirTree>bem = p_Tree.dir_tree_find(FIFFB_BEM);
     if(bem.isEmpty())
     {
         qCritical() << "No BEM block found!";
+        if(open_here)
+            p_pStream->device()->close();
         return false;
     }
 
@@ -147,6 +151,8 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirT
     if(bemsurf.isEmpty())
     {
         qCritical() << "No BEM surfaces found!";
+        if(open_here)
+            p_pStream->device()->close();
         return false;
     }
 
@@ -161,13 +167,13 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirT
         printf("\t[done]\n" );
 
         p_Bem.m_qListBemSurface.append(p_BemSurface);
-
 //           src(k) = this;
     }
 
+    printf("\t%d bem surfaces read\n", bemsurf.size());
+
     if(open_here)
         p_pStream->device()->close();
-
     return true;
 }
 
@@ -186,7 +192,7 @@ bool MNEBem::readBemSurface(FiffStream *p_pStream, const FiffDirTree &p_Tree, MN
     else
          p_BemSurface.id = *t_pTag->toInt();
 
-        qDebug() << "Read SourceSpace ID; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
+        qDebug() << "Read BemSurface ID; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
 
     //=====================================================================
     if(!p_Tree.find_tag(p_pStream, FIFF_BEM_SIGMA, t_pTag))
@@ -252,7 +258,6 @@ bool MNEBem::readBemSurface(FiffStream *p_pStream, const FiffDirTree &p_Tree, MN
 
     p_BemSurface.rr = t_pTag->toFloatMatrix().transpose();
     qint32 rows_rr = p_BemSurface.rr.rows();
-        qDebug() << "last element rr: " << p_BemSurface.rr(rows_rr-1, 0) << p_BemSurface.rr(rows_rr-1, 1) << p_BemSurface.rr(rows_rr-1, 2);
 
     if (rows_rr != p_BemSurface.np)
     {
@@ -286,7 +291,7 @@ bool MNEBem::readBemSurface(FiffStream *p_pStream, const FiffDirTree &p_Tree, MN
         return false;
     }
 
-    qDebug() << "Source Space Normals; type:" << t_pTag->getType();
+    qDebug() << "Bem Vertex Normals; type:" << t_pTag->getType();
 
     //=====================================================================
     if (p_BemSurface.ntri > 0)
@@ -323,9 +328,84 @@ bool MNEBem::readBemSurface(FiffStream *p_pStream, const FiffDirTree &p_Tree, MN
         MatrixXi p_defaultMatrix(0, 0);
         p_BemSurface.tris = p_defaultMatrix;
     }
-        qDebug() << "Triangles; type:" << t_pTag->getType() << "rows:" << p_BemSurface.tris.rows() << "cols:" << p_BemSurface.tris.cols();
-        qDebug() << "First Triangle: " << p_BemSurface.tris(0, 0) << p_BemSurface.tris(0, 1) << p_BemSurface.tris(0, 2);
-        qDebug() << "Last Triangle: " << p_BemSurface.tris(p_BemSurface.tris.rows()-1, 0) << p_BemSurface.tris(p_BemSurface.tris.rows()-1, 1) << p_BemSurface.tris(p_BemSurface.tris.rows()-1, 2);
 
     return true;
+}
+
+
+//*************************************************************************************************************
+
+void MNEBem::write(QIODevice &p_IODevice)
+{
+    //
+    //   Open the file, create directory
+    //
+
+    // Create the file and save the essentials
+    FiffStream::SPtr t_pStream = FiffStream::start_file(p_IODevice);
+    printf("Write BEM surface in %s...", t_pStream->streamName().toUtf8().constData(), "\n");
+    this->writeToStream(t_pStream.data());
+}
+
+
+//*************************************************************************************************************
+
+void MNEBem::writeToStream(FiffStream* p_pStream)
+{
+    p_pStream->start_block(FIFFB_BEM);
+    for(qint32 h = 0; h < m_qListBemSurface.size(); ++h)
+    {
+        printf("\tWrite a bem surface... ");
+        p_pStream->start_block(FIFFB_BEM_SURF);
+        m_qListBemSurface[h].writeToStream(p_pStream);
+        p_pStream->end_block(FIFFB_BEM_SURF);
+        printf("[done]\n");
+    }
+    printf("\t%d bem surfaces written\n", m_qListBemSurface.size());
+    p_pStream->end_block(FIFFB_BEM);
+    p_pStream->end_file();
+}
+
+
+//*************************************************************************************************************
+
+const MNEBemSurface& MNEBem::operator[] (qint32 idx) const
+{
+    if (idx>=m_qListBemSurface.length())
+    {
+        qWarning("Warning: Required surface doesn't exist! Returning surface '0'.");
+        idx=0;
+    }
+    return m_qListBemSurface[idx];
+}
+
+
+//*************************************************************************************************************
+
+MNEBemSurface& MNEBem::operator[] (qint32 idx)
+{
+    if (idx>=m_qListBemSurface.length())
+    {
+        qWarning("Warning: Required surface doesn't exist! Returning surface '0'.");
+        idx=0;
+    }
+    return m_qListBemSurface[idx];
+}
+
+
+//*************************************************************************************************************
+
+MNEBem &MNEBem::operator<<(const MNEBemSurface &surf)
+{
+    this->m_qListBemSurface.append(surf);
+    return *this;
+}
+
+
+//*************************************************************************************************************
+
+MNEBem &MNEBem::operator<<(const MNEBemSurface *surf)
+{
+    this->m_qListBemSurface.append(*surf);
+    return *this;
 }
