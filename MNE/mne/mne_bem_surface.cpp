@@ -218,10 +218,7 @@ bool MNEBemSurface::addVertexNormals()
             this->nn.row(p) /= size;
         }
 
-
- qDebug() << "nn first Row:" << this->nn(0,0)<<this->nn(0,1)<<this->nn(0,2);
-
- return true;
+return true;
 }
 
 

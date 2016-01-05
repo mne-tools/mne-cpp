@@ -5,7 +5,7 @@
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015*
+* @date     November, 2015
 * @section  LICENSE
 *
 * Copyright (C) 2015, Jana Kiesel, Christoph Dinh and Matti Hamalainen. All rights reserved.
@@ -48,10 +48,7 @@
 #include <fiff/fiff.h>
 #include <mne/mne_bem.h>
 
-
 #include <QFile>
-
-
 
 
 //*************************************************************************************************************
@@ -60,6 +57,7 @@
 //=============================================================================================================
 
 #include <QtCore/QCoreApplication>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
