@@ -28,7 +28,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of a thin plate spline warping class.
+* @brief   Warp class definition.
 */
 
 //*************************************************************************************************************
@@ -55,24 +55,15 @@ using namespace UTILSLIB;
 
 MatrixXd Warp::calculate(const MatrixXd &sLm, const MatrixXd &dLm, const MatrixXd &sVert)
 {
-     calcWeighting(sLm, dLm);
-     MatrixXd wVert = warpVertices(sVert);
-     return wVert;
-}
-
-
-//*************************************************************************************************************
-
-MatrixXd Warp::calculate(const MatrixXd &sVert)
-{
-    MatrixXd wVert = warpVertices(sVert);
+    MatrixXd warpWeight, polWeight;
+    calcWeighting(sLm, dLm, warpWeight, polWeight);
+    MatrixXd wVert = warpVertices(sVert, sLm, warpWeight, polWeight);
     return wVert;
 }
 
-
 //*************************************************************************************************************
 
-bool Warp::calcWeighting(const MatrixXd &sLm, const MatrixXd &dLm)
+bool Warp::calcWeighting(const MatrixXd &sLm, const MatrixXd &dLm, MatrixXd& warpWeight, MatrixXd& polWeight)
 {
     MatrixXd K = MatrixXd::Zero(sLm.rows(),sLm.rows());     //K(i,j)=||sLm(i)-sLm(j)||
     for (int i=0; i<sLm.rows(); i++)
@@ -100,11 +91,10 @@ bool Warp::calcWeighting(const MatrixXd &sLm, const MatrixXd &dLm)
     MatrixXd W ((dLm.rows()+4),3);                          //W=[warpWeight,polWeight]
     Eigen::FullPivLU <MatrixXd> Lu(L);                      //LU decomposition is one method to solve lin. eq.
     W=Lu.solve(Y);
-    std::cout << "Here is the matrix W:" << std::endl << W << std::endl;
+//    std::cout << "Here is the matrix W:" << std::endl << W << std::endl;
 
-    this->warpWeight = W.topRows(sLm.rows());
-    this->polWeight = W.bottomRows(4);
-    this->sLm=sLm;
+    warpWeight = W.topRows(sLm.rows());
+    polWeight = W.bottomRows(4);
 
     return true;
 }
@@ -112,20 +102,20 @@ bool Warp::calcWeighting(const MatrixXd &sLm, const MatrixXd &dLm)
 
 //*************************************************************************************************************
 
-MatrixXd Warp::warpVertices(const MatrixXd &sVert)
+MatrixXd Warp::warpVertices(const MatrixXd &sVert, const MatrixXd & sLm, const MatrixXd& warpWeight, const MatrixXd& polWeight)
 {
-    MatrixXd wVert = sVert * this->polWeight.bottomRows(3);         //Pol. Warp
-    wVert.rowwise() += this->polWeight.row(0);                      //Translation
+    MatrixXd wVert = sVert * polWeight.bottomRows(3);         //Pol. Warp
+    wVert.rowwise() += polWeight.row(0);                      //Translation
 
     //
     // TPS Warp
     //
-    MatrixXd K = MatrixXd::Zero(sVert.rows(),this->sLm.rows());     //K(i,j)=||sLm(i)-sLm(j)||
+    MatrixXd K = MatrixXd::Zero(sVert.rows(),sLm.rows());     //K(i,j)=||sLm(i)-sLm(j)||
     for (int i=0; i<sVert.rows(); i++)
-        K.row(i)=((this->sLm.rowwise()-sVert.row(i)).rowwise().norm().transpose());
+        K.row(i)=((sLm.rowwise()-sVert.row(i)).rowwise().norm().transpose());
 //    std::cout << "Here is the matrix K:" << std::endl << K << std::endl;
 
-    wVert += K*this->warpWeight;
+    wVert += K*warpWeight;
 //    std::cout << "Here is the matrix wVert:" << std::endl << wVert << std::endl;
     return wVert;
 }

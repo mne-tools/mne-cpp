@@ -144,9 +144,23 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the MNE forward solution
+    * Destroys the MNE Bem
     */
     ~MNEBem();
+
+    //=========================================================================================================
+    /**
+    * Initializes MNE Bem
+    */
+    void clear();
+
+    //=========================================================================================================
+    /**
+    * True if MNE Bem is empty.
+    *
+    * @return true if MNE Bem is empty
+    */
+    inline bool isEmpty() const;
 
     //=========================================================================================================
     /**
@@ -161,6 +175,14 @@ public:
     * @return true if succeeded, false otherwise
     */
     static bool readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNEBem &p_Bem);
+
+    //=========================================================================================================
+    /**
+    * Returns the number of stored bem surfaces
+    *
+    * @return number of stored bem surfaces
+    */
+    inline qint32 size() const;
 
     //=========================================================================================================
     /**
@@ -245,6 +267,18 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+inline bool MNEBem::isEmpty() const
+{
+    return m_qListBemSurface.size() == 0;
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 MNEBem::size() const
+{
+    return m_qListBemSurface.size();
+}
 } // NAMESPACE
 
 

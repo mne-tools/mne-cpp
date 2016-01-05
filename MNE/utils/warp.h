@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    warp class declaration.
+* @brief    Warp class declaration.
 *
 */
 
@@ -51,6 +51,7 @@
 #include <Eigen/Core>
 #include <Eigen/LU>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -61,6 +62,7 @@
 #include <QFile>
 //#include <QString>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE UTILSLIB
@@ -68,6 +70,7 @@
 
 namespace UTILSLIB
 {
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -108,25 +111,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Warps the source vertices with previously calculated weightningparameters
+    * Read electrode positions from MRI Database
     *
-    * @param[in]  sVert    Vertices of the source geometry
+    * @param[in]  electrodeFileName    .txt file of electrodes
     *
-    * @return wVert   Vertices of the warped destination geometry
+    * @return electrodes   Matrix with electrode positions
     */
-     MatrixXd calculate(const MatrixXd & sVert);
+    MatrixXd readsLm(const QString &electrodeFileName);
 
-     //=========================================================================================================
-     /**
-     * Warps the source vertices with previously calculated weightningparameters
-     *
-     * @param[in]  electrodeFileName    .txt file of electrodes
-     *
-     * @return electrodes   Matrix with electrode positions
-     */
-     MatrixXd readsLm(const QString &electrodeFileName);
-
-private:
     //=========================================================================================================
     /**
     * Calculate the weighting parameters.
@@ -136,21 +128,22 @@ private:
     * @param[out] warpWeight Weighting parameters of the tps warp
     * @param[out] polWeight  Weighting papameters of the polynomial warp
     */
-    bool calcWeighting(const MatrixXd & sLm, const MatrixXd &dLm);
+    bool calcWeighting(const MatrixXd& sLm, const MatrixXd &dLm, MatrixXd& warpWeight, MatrixXd& polWeight);
 
     //=========================================================================================================
     /**
     * Warp the Vertices of the source geometry
     *
+    * @param[in]  sVert    Vertices of the source geometry
+    * @param[in]  sLm      3D Landmarks of the source geometry
+    * @param[in]  warpWeight Weighting parameters of the tps warp
+    * @param[in]  polWeight  Weighting papameters of the polynomial warp
+    *
     * @return Warped Vertices
     */
-    MatrixXd warpVertices(const MatrixXd & sVert);
+    MatrixXd warpVertices(const MatrixXd & sVert, const MatrixXd & sLm, const MatrixXd& warpWeight, const MatrixXd& polWeight);
 
-    //=========================================================================================================
-
-    MatrixXd warpWeight; /** Weighting parameters of the tps Warp */
-    MatrixXd polWeight;  /** Weighting papameters of the polynomial warp */
-    MatrixXd sLm;        /** 3D Landmarks of the source geometry */
+private:
 
 };
 
