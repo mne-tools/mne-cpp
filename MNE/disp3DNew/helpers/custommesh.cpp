@@ -150,9 +150,9 @@ bool CustomMesh::createCustomMesh(const MatrixX3f& tMatVert, const MatrixX3f& tM
 
     for(int i = 0; i<tMatVert.rows(); i++) {
         //Vertex
-        rawVertexArray[idxVert++] = (tMatVert(i,0) + tVecOffset(0))*40;
-        rawVertexArray[idxVert++] = (tMatVert(i,1) + tVecOffset(1))*40;
-        rawVertexArray[idxVert++] = (tMatVert(i,2) + tVecOffset(2))*40;
+        rawVertexArray[idxVert++] = (tMatVert(i,0) + tVecOffset(0));
+        rawVertexArray[idxVert++] = (tMatVert(i,1) + tVecOffset(1));
+        rawVertexArray[idxVert++] = (tMatVert(i,2) + tVecOffset(2));
 
         //Normal
         rawNormalArray[idxNorm++] = tMatNorm(i,0);
