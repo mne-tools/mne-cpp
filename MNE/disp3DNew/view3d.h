@@ -46,6 +46,7 @@
 #include "disp3dnew_global.h"
 #include "3DObjects/brain/brain.h"
 #include "helpers/window.h"
+#include "helpers/types.h"
 
 #include <mne/mne_sourceestimate.h>
 
@@ -192,6 +193,8 @@ protected:
     QVector3D       m_vecCameraRotationOld;     /**< The camera old rotation vector. */
     QVector3D       m_vecModelRotation;         /**< The model rotation vector. */
     QVector3D       m_vecModelRotationOld;      /**< The model old rotation vector. */
+
+    void initMetatypes();
 
     //=========================================================================================================
     /**

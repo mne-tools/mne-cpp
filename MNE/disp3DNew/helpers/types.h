@@ -94,9 +94,12 @@ namespace BrainTreeModelItemTypes
                     SurfaceColorVert = QStandardItem::UserType + 12,
                     SurfaceColorInfoOrigin = QStandardItem::UserType + 13,
                     RTDataItem = QStandardItem::UserType + 14,
-                    RTDataStreamStatus = QStandardItem::UserType + 15, //RT data streaming on or off
-                    RTDataSourceSpaceType = QStandardItem::UserType + 16, //Clustered or full sourcespace
-                    RTDataColormapType = QStandardItem::UserType + 17}; //Type of the colormap used
+                    RTDataStreamStatus = QStandardItem::UserType + 15,
+                    RTDataSourceSpaceType = QStandardItem::UserType + 16,
+                    RTDataColormapType = QStandardItem::UserType + 17,
+                    RTDataStreamingSpeed = QStandardItem::UserType + 18,
+                    RTDataLoopedStreaming = QStandardItem::UserType + 19,
+                    RTDataNumberAverages = QStandardItem::UserType + 20};
 }
 
 // Model item roles
@@ -112,7 +115,10 @@ namespace BrainTreeItemRoles
                     SurfaceColorInfoOrigin = Qt::UserRole + 8,
                     RTDataStreamStatus = Qt::UserRole + 9,
                     RTDataSourceSpaceType = Qt::UserRole + 10,
-                    RTDataColormapType = Qt::UserRole + 11};
+                    RTDataColormapType = Qt::UserRole + 11,
+                    RTDataStreamingSpeed = Qt::UserRole + 12,
+                    RTDataLoopedStreaming = Qt::UserRole + 13,
+                    RTDataNumberAverages = Qt::UserRole + 14};
 }
 
 namespace BrainSurfaceTreeItemRoles
@@ -148,13 +154,17 @@ namespace BrainAnnotationTreeItemRoles
 namespace BrainRTDataTreeItemRoles
 {
     enum ItemRole{RTData = Qt::UserRole + 500,
-                    RTVertices = Qt::UserRole + 501,
-                    RTTimes = Qt::UserRole + 502};
+                    RTVerticesIdx = Qt::UserRole + 501,
+                    RTTimes = Qt::UserRole + 502,
+                    RTHemi = Qt::UserRole + 503,
+                    RTStartIdx = Qt::UserRole + 504,
+                    RTEndIdx = Qt::UserRole + 505};
 }
 
 } //NAMESPACE DISP3DNEWLIB
 
 // Metatype declaration for correct QVariant usage
+// DO NOT FORGET TO REGISTER THESE TYPES IF YOU WANT TO USE THEM IN SIGNAL SLOT/SLOT SYSTEM (SEE VIEW3D initMetatypes())
 #ifndef metatype_renderable3Dentity
 #define metatype_renderable3Dentity
 Q_DECLARE_METATYPE(DISP3DNEWLIB::Renderable3DEntity*)
@@ -162,37 +172,43 @@ Q_DECLARE_METATYPE(DISP3DNEWLIB::Renderable3DEntity*)
 
 #ifndef metatype_matrixx3i
 #define metatype_matrixx3i
-Q_DECLARE_METATYPE(Eigen::MatrixX3i)
+Q_DECLARE_METATYPE(Eigen::MatrixX3i);
 #endif
 
 #ifndef metatype_matrixXd
 #define metatype_matrixXd
-Q_DECLARE_METATYPE(Eigen::MatrixXd)
+Q_DECLARE_METATYPE(Eigen::MatrixXd);
 #endif
 
 #ifndef metatype_matrixx3f
 #define metatype_matrixx3f
-Q_DECLARE_METATYPE(Eigen::MatrixX3f)
+Q_DECLARE_METATYPE(Eigen::MatrixX3f);
 #endif
 
 #ifndef metatype_vectorxf
 #define metatype_vectorxf
-Q_DECLARE_METATYPE(Eigen::VectorXf)
+Q_DECLARE_METATYPE(Eigen::VectorXf);
 #endif
 
 #ifndef metatype_vectorxi
 #define metatype_vectorxi
-Q_DECLARE_METATYPE(Eigen::VectorXi)
+Q_DECLARE_METATYPE(Eigen::VectorXi);
+#endif
+
+#ifndef metatype_vectorxd
+#define metatype_vectorxd
+Q_DECLARE_METATYPE(Eigen::VectorXd);
 #endif
 
 #ifndef metatype_rowvectorxf
 #define metatype_rowvectorxf
-Q_DECLARE_METATYPE(Eigen::RowVectorXf)
+Q_DECLARE_METATYPE(Eigen::RowVectorXf);
 #endif
 
 #ifndef metatype_vector3f
 #define metatype_vector3f
-Q_DECLARE_METATYPE(Eigen::Vector3f)
+Q_DECLARE_METATYPE(Eigen::Vector3f);
 #endif
+
 
 #endif // TYPES_H

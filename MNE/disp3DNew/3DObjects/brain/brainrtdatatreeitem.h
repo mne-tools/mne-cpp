@@ -45,6 +45,7 @@
 
 #include "../../helpers/abstracttreeitem.h"
 #include "../../helpers/types.h"
+#include "../../rt/sourcelevel/stcdataworker.h"
 
 #include "braintreeitem.h"
 
@@ -143,19 +144,19 @@ public:
 
     bool updateData(const MNESourceEstimate& tSourceEstimate);
 
-    void onCheckStateChanged(const Qt::CheckState& checkState);
-
     inline bool isInit() const;
 
 signals:
-    void rtDataChanged();
+    void rtDataChanged(VectorXd sample, VectorXi vertexIndex);
 
 private:
+    void onCheckStateChanged(const Qt::CheckState& checkState);
+    void onStcSample(const VectorXd& sample);
 
     bool        m_bInit;
-    QString     m_sHemi;
 
     BrainTreeItem*  m_pItemRTDataStreamStatus;
+    StcDataWorker*  m_pStcDataWorker;
 };
 
 //*************************************************************************************************************

@@ -57,9 +57,11 @@ using namespace DISP3DNEWLIB;
 BrainRTDataTreeItem::BrainRTDataTreeItem(const int &iType, const QString &text)
 : AbstractTreeItem(iType, text)
 , m_bInit(false)
-, m_sHemi("Unknown")
 , m_pItemRTDataStreamStatus(new BrainTreeItem())
+, m_pStcDataWorker(new StcDataWorker(this))
 {
+    connect(m_pStcDataWorker, &StcDataWorker::stcSample,
+            this, &BrainRTDataTreeItem::onStcSample);
 }
 
 
@@ -83,13 +85,6 @@ QVariant BrainRTDataTreeItem::data(int role) const
 void  BrainRTDataTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
-
-    switch(role) {
-    case BrainRTDataTreeItemRoles::RTData:
-        if(m_pItemRTDataStreamStatus->checkState() == Qt::Checked) {
-            emit rtDataChanged();
-        }
-    }
 }
 
 
@@ -97,17 +92,46 @@ void  BrainRTDataTreeItem::setData(const QVariant& value, int role)
 
 bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QString& hemi)
 {   
-    m_sHemi = hemi;
-    int iHemi = m_sHemi == "lh" ? 0 : 1;
-
     // Add data which is held by this BrainRTDataTreeItem
+    int iHemi = hemi == "Left" ? 0 : hemi == "Right" ? 1 : -1;
+
+    this->setData(iHemi, BrainRTDataTreeItemRoles::RTHemi);
+
+    if(tForwardSolution.src[iHemi].isClustered()) {
+        // Source Space IS clustered
+        switch(iHemi) {
+            case 0:
+                this->setData(0, BrainRTDataTreeItemRoles::RTStartIdx);
+                this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() - 1, BrainRTDataTreeItemRoles::RTEndIdx);
+                break;
+
+            case 1:
+                this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size(), BrainRTDataTreeItemRoles::RTStartIdx);
+                this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() + tForwardSolution.src[1].cluster_info.centroidSource_rr.size() - 1, BrainRTDataTreeItemRoles::RTEndIdx);
+                break;
+        }
+    } else {
+        // Source Space is NOT clustered
+        switch(iHemi) {
+            case 0:
+                this->setData(0, BrainRTDataTreeItemRoles::RTStartIdx);
+                this->setData(tForwardSolution.src[0].nuse - 1, BrainRTDataTreeItemRoles::RTEndIdx);
+                break;
+
+            case 1:
+                this->setData(tForwardSolution.src[0].nuse, BrainRTDataTreeItemRoles::RTStartIdx);
+                this->setData(tForwardSolution.src[0].nuse + tForwardSolution.src[1].nuse - 1, BrainRTDataTreeItemRoles::RTEndIdx);
+                break;
+        }
+    }
+
     QVariant data;
 
     data.setValue(tSourceEstimate.data);
     this->setData(data, BrainRTDataTreeItemRoles::RTData);
 
     data.setValue(tSourceEstimate.vertices);
-    this->setData(data, BrainRTDataTreeItemRoles::RTVertices);
+    this->setData(data, BrainRTDataTreeItemRoles::RTVerticesIdx);
 
     data.setValue(tSourceEstimate.times);
     this->setData(data, BrainRTDataTreeItemRoles::RTTimes);
@@ -122,7 +146,7 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     data.setValue(false);
     m_pItemRTDataStreamStatus->setData(data, BrainTreeItemRoles::RTDataStreamStatus);
 
-    QString sIsClustered = tForwardSolution.src[iHemi].isClustered() ? "Clustered source space" : "Full source space";
+    QString sIsClustered = tForwardSolution.src[iHemi].isClustered() ? "Clustered" : "Full";
     BrainTreeItem *itemSourceSpaceType = new BrainTreeItem(BrainTreeModelItemTypes::RTDataSourceSpaceType, sIsClustered);
     *this<<itemSourceSpaceType;
     data.setValue(sIsClustered);
@@ -132,6 +156,19 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     *this<<itemColormapType;
     data.setValue(QString("Hot Negative 2"));
     itemColormapType->setData(data, BrainTreeItemRoles::RTDataColormapType);
+
+    BrainTreeItem *itemStreamingSpeed = new BrainTreeItem(BrainTreeModelItemTypes::RTDataStreamingSpeed, "Streaming speed");
+    *this<<itemStreamingSpeed;
+
+    BrainTreeItem *itemLoopedStreaming = new BrainTreeItem(BrainTreeModelItemTypes::RTDataLoopedStreaming, "Looping on/off");
+    itemLoopedStreaming->setCheckable(true);
+    itemLoopedStreaming->setCheckState(Qt::Unchecked);
+    *this<<itemLoopedStreaming;
+
+    BrainTreeItem *itemAveragedStreaming = new BrainTreeItem(BrainTreeModelItemTypes::RTDataNumberAverages, "Number of Averages");
+    *this<<itemAveragedStreaming;
+
+    m_pStcDataWorker->addData(tSourceEstimate.data);
 
     m_bInit = true;
 
@@ -148,6 +185,8 @@ bool BrainRTDataTreeItem::updateData(const MNESourceEstimate& tSourceEstimate)
         return false;
     }
 
+    m_pStcDataWorker->addData(tSourceEstimate.data);
+
     QVariant data;
     data.setValue(tSourceEstimate.data);
     this->setData(data, BrainRTDataTreeItemRoles::RTData);
@@ -161,11 +200,26 @@ bool BrainRTDataTreeItem::updateData(const MNESourceEstimate& tSourceEstimate)
 void BrainRTDataTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     if(checkState == Qt::Checked) {
-        //TODO: Start stc worker
         qDebug()<<"Start stc worker";
+        m_pStcDataWorker->start();
     } else if(checkState == Qt::Unchecked) {
-        //TODO: Stop stc worker
         qDebug()<<"Stop stc worker";
+        m_pStcDataWorker->stop();
     }
+}
+
+
+//*************************************************************************************************************
+
+void BrainRTDataTreeItem::onStcSample(const VectorXd& sample)
+{
+    int iStartIdx = this->data(BrainRTDataTreeItemRoles::RTStartIdx).toInt();
+    int iEndIdx = this->data(BrainRTDataTreeItemRoles::RTEndIdx).toInt();
+
+    qDebug()<<"BrainRTDataTreeItem::onStcSample - sample.rows(): "<<sample.rows();
+    qDebug()<<"BrainRTDataTreeItem::onStcSample - iStartIdx"<<iStartIdx;
+    qDebug()<<"BrainRTDataTreeItem::onStcSample - iEndIdx"<<iEndIdx;
+
+    emit rtDataChanged(sample.segment(iStartIdx, iEndIdx), this->data(BrainRTDataTreeItemRoles::RTVerticesIdx).value<VectorXi>().segment(iStartIdx, iEndIdx));
 }
 
