@@ -147,6 +147,7 @@ protected:
     Ui::Control3DWidget*    ui;         /**< The pointer to the QtDesigner ui class. */
 
     QList<View3D::SPtr>     m_lView3D;  /**< List of all connected view3D's. */
+    QColor                  m_colCurrentSceneColor;
 };
 
 } // NAMESPACE DISP3DNEWLIB

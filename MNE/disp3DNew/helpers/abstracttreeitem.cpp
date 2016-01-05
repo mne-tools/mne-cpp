@@ -161,19 +161,22 @@ void AbstractTreeItem::createToolTip()
         sToolTip = "Turn real time data streaming on/off";
         break;
     case BrainTreeModelItemTypes::RTDataSourceSpaceType:
-        sToolTip = "Used source space type";
+        sToolTip = "The source space type";
         break;
     case BrainTreeModelItemTypes::RTDataColormapType:
-        sToolTip = "Used color mapping";
+        sToolTip = "The color map type";
         break;
-    case BrainTreeModelItemTypes::RTDataStreamingSpeed:
-        sToolTip = "The real time streaming speed";
+    case BrainTreeModelItemTypes::RTDataTimeInterval:
+        sToolTip = "The u seconds waited in between each rt source loc result sample";
         break;
     case BrainTreeModelItemTypes::RTDataLoopedStreaming:
         sToolTip = "Turn looped streaming on/off";
         break;
     case BrainTreeModelItemTypes::RTDataNumberAverages:
         sToolTip = "The number of samples waited to average the activity estimation";
+        break;
+    case BrainTreeModelItemTypes::RTDataNormalizationValue:
+        sToolTip = "The value to normalize the source localization result";
         break;
     default:
         sToolTip = "Unknown";

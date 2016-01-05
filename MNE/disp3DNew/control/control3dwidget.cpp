@@ -58,6 +58,7 @@ using namespace DISP3DNEWLIB;
 Control3DWidget::Control3DWidget(QWidget* parent)
 : RoundedEdgesWidget(parent)
 , ui(new Ui::Control3DWidget)
+, m_colCurrentSceneColor(QColor(0,0,0))
 {
     ui->setupUi(this);
 
@@ -139,13 +140,14 @@ void Control3DWidget::onOpacityChange(qint32 value)
 void Control3DWidget::onSceneColorPicker()
 {
     QColorDialog* pDialog = new QColorDialog(this);
+    pDialog->setCurrentColor(m_colCurrentSceneColor);
     pDialog->exec();
-    QColor pickedColor = pDialog->currentColor();
+    m_colCurrentSceneColor = pDialog->currentColor();
 
-    ui->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(pickedColor.red()).arg(pickedColor.green()).arg(pickedColor.blue()));
+    ui->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(m_colCurrentSceneColor.red()).arg(m_colCurrentSceneColor.green()).arg(m_colCurrentSceneColor.blue()));
 
     //Update all connected View3D's scene colors
     for(int i = 0; i<m_lView3D.size(); i++) {
-        m_lView3D.at(i)->changeSceneColor(pickedColor);
+        m_lView3D.at(i)->changeSceneColor(m_colCurrentSceneColor);
     }
 }

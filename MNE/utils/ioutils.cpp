@@ -240,8 +240,8 @@ void IOUtils::swap_doublep(double *source)
 
 //*************************************************************************************************************
 
-void IOUtils::write_eigen_matrix(const MatrixXd &in, const QString& path)
-
+template<typename T>
+void IOUtils::write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QString& path)
 {
     QFile file(path);
     if(file.open(QIODevice::WriteOnly|QIODevice::Truncate))
