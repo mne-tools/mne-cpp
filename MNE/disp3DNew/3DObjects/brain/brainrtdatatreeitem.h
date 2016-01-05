@@ -64,6 +64,7 @@
 #include <QColor>
 #include <QStandardItem>
 #include <QStandardItemModel>
+#include <QTime>
 
 
 //*************************************************************************************************************
@@ -147,16 +148,20 @@ public:
     inline bool isInit() const;
 
 signals:
-    void rtDataChanged(VectorXd sample, VectorXi vertexIndex);
+    void rtDataUpdated(VectorXd sourceSamples, VectorXi vertexIndex, QString sColorMapType);
 
 private:
     void onCheckStateChanged(const Qt::CheckState& checkState);
-    void onStcSample(const VectorXd& sample);
+    void onStcSample(VectorXd sourceSamples);
+    void onStreamingIntervalChanged(const int& usec);
 
     bool        m_bInit;
 
-    BrainTreeItem*  m_pItemRTDataStreamStatus;
-    StcDataWorker*  m_pStcDataWorker;
+    double      m_dStcNormMax;
+
+    StcDataWorker*      m_pStcDataWorker;
+    BrainTreeItem*      m_pItemSourceLocNormValue;
+    BrainTreeItem*      m_pItemColormapType;
 };
 
 //*************************************************************************************************************

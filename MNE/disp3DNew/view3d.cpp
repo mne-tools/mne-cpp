@@ -62,17 +62,13 @@ View3D::View3D()
 , m_pFrameGraph(new Qt3DRender::QFrameGraph())
 , m_pForwardRenderer(new Qt3DRender::QForwardRenderer())
 , m_pBrain(Brain::SPtr(new Brain(m_pRootEntity)))
-, m_bModelRotationMode(false)
 , m_bCameraRotationMode(false)
 , m_bCameraTransMode(false)
-, m_fCameraScale(1.0f)
-, m_fModelScale(10.0f)
-, m_vecCameraTrans(QVector3D(0.0,-0.5,-2.0))
-, m_vecCameraTransOld(QVector3D(0.0,-0.5,-2.0))
+, m_fCameraScale(0.0f)
+, m_vecCameraTrans(QVector3D(0.0,0.0,0.0))
+, m_vecCameraTransOld(QVector3D(0.0,0.0,0.0))
 , m_vecCameraRotation(QVector3D(0.0,0.0,0.0))
 , m_vecCameraRotationOld(QVector3D(0.0,0.0,0.0))
-, m_vecModelRotation(QVector3D(-90.0,110.0,0.0))
-, m_vecModelRotationOld(QVector3D(-90.0,110.0,0.0))
 {
     initMetatypes();
     init();
@@ -117,7 +113,7 @@ void View3D::init()
     //Aspect engine
     m_aspectEngine.registerAspect(new Qt3DRender::QRenderAspect());
 
-    m_aspectEngine.registerAspect(m_pInputAspect);
+    //m_aspectEngine.registerAspect(m_pInputAspect);
 
     //Data
     QVariantMap data;
@@ -126,17 +122,17 @@ void View3D::init()
     m_aspectEngine.setData(data);
 
     // Light source
-    Qt3DRender::QPointLight *light1 = new Qt3DRender::QPointLight();
-    light1->setColor(Qt::white);
-    light1->setIntensity(0.1f);
-    m_pRootEntity->addComponent(light1);
+//    Qt3DRender::QPointLight *light1 = new Qt3DRender::QPointLight();
+//    light1->setColor(Qt::white);
+//    light1->setIntensity(0.1f);
+//    m_pRootEntity->addComponent(light1);
 
     // Camera
     m_pCameraEntity->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
     m_pCameraEntity->setPosition(m_vecCameraTrans);
     m_pCameraEntity->setUpVector(QVector3D(0, 1, 0));
     m_pCameraEntity->setViewCenter(QVector3D(0, 0, 0));
-    m_pInputAspect->setCamera(m_pCameraEntity);
+    //m_pInputAspect->setCamera(m_pCameraEntity);
 
     // FrameGraph
     m_pForwardRenderer = new Qt3DRender::QForwardRenderer();
@@ -163,29 +159,7 @@ void View3D::initTransformations()
 {
     // Initialize camera transforms
     m_pCameraTransform = new Qt3DCore::QTransform;
-
-    //Camera scaling
-    m_pCameraScaleTransform = new Qt3DCore::QTransform;
-    m_pCameraScaleTransform->setScale(m_fCameraScale);
-
-    //Camera translation
-    m_pCameraTranslateTransform = new Qt3DCore::QTransform;
-    m_pCameraTranslateTransform->setTranslation(m_vecCameraTrans);
-
-    //Camera rotation
-    m_pCameraRotateTransformX = new Qt3DCore::QTransform;
-    m_pCameraRotateTransformX->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1,0,0), m_vecCameraRotation.x()));
-
-    m_pCameraRotateTransformY = new Qt3DCore::QTransform;
-    m_pCameraRotateTransformY->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(0,1,0), m_vecCameraRotation.y()));
-
-    m_pCameraRotateTransformZ = new Qt3DCore::QTransform;
-    m_pCameraRotateTransformZ->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(0,0,1), m_vecCameraRotation.z()));
-
-//    m_pCameraEntity->addComponent(m_pCameraScaleTransform);
-//    m_pCameraEntity->addComponent(m_pCameraTranslateTransform);
-//    m_pCameraEntity->addComponent(m_pCameraTransform);
-//    m_pCameraEntity->addComponent(m_pCameraTransform);
+    m_pCameraEntity->addComponent(m_pCameraTransform);
 }
 
 
@@ -257,8 +231,7 @@ void View3D::mousePressEvent(QMouseEvent* e)
             //TODO: SelectionMode
             break;
         case Qt::MidButton:
-            m_bModelRotationMode = true;
-            //m_bCameraRotationMode = true;
+            m_bCameraRotationMode = true;
             break;
         case Qt::RightButton:
             m_bCameraTransMode = true;
@@ -274,15 +247,13 @@ void View3D::mousePressEvent(QMouseEvent* e)
 void View3D::wheelEvent(QWheelEvent* e)
 {
     if(e->angleDelta().y() > 0)
-        m_fCameraScale += 0.05f;
+        m_fCameraScale += 0.1f;
     else
-        m_fCameraScale -= 0.05f;
+        m_fCameraScale -= 0.1f;
 
     // Transform
-    if(m_fCameraScale > 0)
-        m_pCameraScaleTransform->setScale(m_fCameraScale);
-
-    qDebug()<<"wheelEvent scale:"<<m_fCameraScale;
+    m_vecCameraTrans.setZ(m_fCameraScale);
+    m_pCameraTransform->setTranslation(m_vecCameraTrans);
 
     Window::wheelEvent(e);
 }
@@ -292,12 +263,10 @@ void View3D::wheelEvent(QWheelEvent* e)
 
 void View3D::mouseReleaseEvent(QMouseEvent* e)
 {
-    m_bModelRotationMode = false;
     m_bCameraRotationMode = false;
     m_bCameraTransMode = false;
     m_vecCameraTransOld = m_vecCameraTrans;
     m_vecCameraRotationOld = m_vecCameraRotation;
-    m_vecModelRotationOld = m_vecModelRotation;
 
     Window::mouseReleaseEvent(e);
 }
@@ -307,25 +276,12 @@ void View3D::mouseReleaseEvent(QMouseEvent* e)
 
 void View3D::mouseMoveEvent(QMouseEvent* e)
 {
-    if(m_bModelRotationMode) {
-        m_vecModelRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * -0.1f) + m_vecModelRotationOld.x());
-        m_vecModelRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.1f) + m_vecModelRotationOld.y());
-    }
-
     if(m_bCameraRotationMode) {
         m_vecCameraRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * 0.1f) + m_vecCameraRotationOld.x());
         m_vecCameraRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.1f) + m_vecCameraRotationOld.y());
 
-        m_pCameraRotateTransformX->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1,0,0), m_vecCameraRotation.x()));
-        m_pCameraRotateTransformY->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(0,1,0), m_vecCameraRotation.y()));
-        m_pCameraRotateTransformZ->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(0,0,1), m_vecCameraRotation.z()));
-
-        qDebug()<<"m_vecCameraRotation.x()"<<m_vecCameraRotation.x();
-        qDebug()<<"m_vecCameraRotation.y()"<<m_vecCameraRotation.y();
-
-        // Camera rotation transform
-        m_pCameraEntity->tilt(m_vecCameraRotation.x());
-        m_pCameraEntity->pan(m_vecCameraRotation.y());
+        m_pCameraTransform->setRotationX(m_vecCameraRotation.x());
+        m_pCameraTransform->setRotationY(m_vecCameraRotation.y());
     }
 
     if(m_bCameraTransMode) {
@@ -333,10 +289,8 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
         m_vecCameraTrans.setY(((e->pos().y() - m_mousePressPositon.y()) * -0.001f) + m_vecCameraTransOld.y());
 
         // Camera translation transform
-        m_pCameraTranslateTransform->setTranslation(m_vecCameraTrans);
+        m_pCameraTransform->setTranslation(m_vecCameraTrans);
     }
-
-    //qDebug()<< m_pCameraTransform->matrix();
 
     Window::mouseMoveEvent(e);
 }

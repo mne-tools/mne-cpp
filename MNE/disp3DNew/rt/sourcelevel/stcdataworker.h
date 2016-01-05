@@ -56,6 +56,7 @@
 #include <QThread>
 #include <QSharedPointer>
 #include <QMutex>
+#include <QTime>
 
 
 //*************************************************************************************************************
@@ -112,6 +113,8 @@ public:
 
     void stop();
 
+    void start();
+
 signals:
     void stcSample(Eigen::VectorXd sample);
 
@@ -127,7 +130,7 @@ private:
 
     qint32 m_iAverageSamples;
     qint32 m_iCurrentSample;
-    qint32 m_iUSecIntervall;
+    qint32 m_iMSecIntervall;
 };
 
 } // NAMESPACE

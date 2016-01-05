@@ -96,6 +96,11 @@ void  BrainTreeItem::setData(const QVariant& value, int role)
             emit updateSurfaceVertColors();
             break;
         }
+
+        case BrainTreeItemRoles::RTDataTimeInterval: {
+            emit rtDataTimeIntervalUpdated(value.toInt());
+            break;
+        }
     }
 }
 
