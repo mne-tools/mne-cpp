@@ -285,8 +285,8 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
     }
 
     if(m_bCameraTransMode) {
-        m_vecCameraTrans.setX(((e->pos().x() - m_mousePressPositon.x()) * 0.001f) + m_vecCameraTransOld.x());
-        m_vecCameraTrans.setY(((e->pos().y() - m_mousePressPositon.y()) * -0.001f) + m_vecCameraTransOld.y());
+        m_vecCameraTrans.setX(((e->pos().x() - m_mousePressPositon.x()) * 0.0001f) + m_vecCameraTransOld.x());
+        m_vecCameraTrans.setY(((e->pos().y() - m_mousePressPositon.y()) * -0.0001f) + m_vecCameraTransOld.y());
 
         // Camera translation transform
         m_pCameraTransform->setTranslation(m_vecCameraTrans);
