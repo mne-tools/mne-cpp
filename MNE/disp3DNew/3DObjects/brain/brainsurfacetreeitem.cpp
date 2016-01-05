@@ -100,6 +100,12 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     //Create renderable 3D entity
     m_pRenderable3DEntity = new Renderable3DEntity(parent);
 
+    QMatrix4x4 m;
+    Qt3DCore::QTransform* transform =  new Qt3DCore::QTransform();
+    m.rotate(270, QVector3D(1.0f, 0.0f, 0.0f));
+    transform->setMatrix(m);
+    m_pRenderable3DEntity->addComponent(transform);
+
     //Create color from curvature information with default gyri and sulcus colors
     MatrixX3f matCurvatureColor = createCurvatureVertColor(tSurface.curv());
 
@@ -241,16 +247,18 @@ void BrainSurfaceTreeItem::updateRtVertColor(const VectorXd& sourceSamples, cons
         matCurrentVertColor = this->data(BrainSurfaceTreeItemRoles::SurfaceAnnotationColorVert).value<MatrixX3f>();
     }
 
+    qint32 iThreshold = 0;
+
     if(sColorMapType == "Hot Negative 1") {
         for(int i = 0; i<sourceSamples.rows(); i++) {
             if(vertexIndex(i) > 0 && vertexIndex(i) < matCurrentVertColor.rows()) {
                 qint32 iVal = sourceSamples(i) > 255 ? 255 : sourceSamples(i) < 0 ? 0 : sourceSamples(i);
 
-                QRgb qRgb;
-                qRgb = ColorMap::valueToHotNegative1((float)iVal/255.0);
+                if(iVal > iThreshold) {
+                    QRgb qRgb;
+                    qRgb = ColorMap::valueToHotNegative1((float)iVal/255.0);
 
-                QColor colSample(qRgb);
-                if(colSample != Qt::black) {
+                    QColor colSample(qRgb);
                     matCurrentVertColor(vertexIndex(i), 0) = colSample.redF();
                     matCurrentVertColor(vertexIndex(i), 1) = colSample.greenF();
                     matCurrentVertColor(vertexIndex(i), 2) = colSample.blueF();
@@ -266,11 +274,11 @@ void BrainSurfaceTreeItem::updateRtVertColor(const VectorXd& sourceSamples, cons
             if(vertexIndex(i) > 0 && vertexIndex(i) < matCurrentVertColor.rows()) {
                 qint32 iVal = sourceSamples(i) > 255 ? 255 : sourceSamples(i) < 0 ? 0 : sourceSamples(i);
 
-                QRgb qRgb;
-                qRgb = ColorMap::valueToHotNegative2((float)iVal/255.0);
+                if(iVal > iThreshold) {
+                    QRgb qRgb;
+                    qRgb = ColorMap::valueToHotNegative2((float)iVal/255.0);
 
-                QColor colSample(qRgb);
-                if(colSample != Qt::black) {
+                    QColor colSample(qRgb);
                     matCurrentVertColor(vertexIndex(i), 0) = colSample.redF();
                     matCurrentVertColor(vertexIndex(i), 1) = colSample.greenF();
                     matCurrentVertColor(vertexIndex(i), 2) = colSample.blueF();
@@ -286,11 +294,11 @@ void BrainSurfaceTreeItem::updateRtVertColor(const VectorXd& sourceSamples, cons
             if(vertexIndex(i) > 0 && vertexIndex(i) < matCurrentVertColor.rows()) {
                 qint32 iVal = sourceSamples(i) > 255 ? 255 : sourceSamples(i) < 0 ? 0 : sourceSamples(i);
 
-                QRgb qRgb;
-                qRgb = ColorMap::valueToHot((float)iVal/255.0);
+                if(iVal > iThreshold) {
+                    QRgb qRgb;
+                    qRgb = ColorMap::valueToHot((float)iVal/255.0);
 
-                QColor colSample(qRgb);
-                if(colSample != Qt::black) {
+                    QColor colSample(qRgb);
                     matCurrentVertColor(vertexIndex(i), 0) = colSample.redF();
                     matCurrentVertColor(vertexIndex(i), 1) = colSample.greenF();
                     matCurrentVertColor(vertexIndex(i), 2) = colSample.blueF();

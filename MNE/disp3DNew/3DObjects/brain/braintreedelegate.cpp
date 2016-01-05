@@ -110,8 +110,8 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
         case BrainTreeModelItemTypes::RTDataTimeInterval: {
             QSpinBox* pSpinBox = new QSpinBox(parent);
             pSpinBox->setSuffix(" mSec");
-            pSpinBox->setMinimum(1);
-            pSpinBox->setMaximum(1000000);
+            pSpinBox->setMinimum(17);
+            pSpinBox->setMaximum(5000);
             pSpinBox->setValue(index.model()->data(index, BrainTreeItemRoles::RTDataTimeInterval).toInt());
             return pSpinBox;
             break;
