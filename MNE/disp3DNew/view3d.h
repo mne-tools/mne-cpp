@@ -178,8 +178,6 @@ protected:
 
     QPoint          m_mousePressPositon;        /**< Position when the mouse was pressed. */
 
-    float           m_fCameraScale;             /**< The current camera scaling factor. */
-
     QVector3D       m_vecCameraTrans;           /**< The camera translation vector. */
     QVector3D       m_vecCameraTransOld;        /**< The camera old translation vector. */
     QVector3D       m_vecCameraRotation;        /**< The camera rotation vector. */
