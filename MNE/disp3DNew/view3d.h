@@ -170,29 +170,20 @@ protected:
     QSharedPointer<Qt3DCore::QEntity>   m_ZAxisEntity;                  /**< The entity representing a torus in z direction. */
 
     Qt3DCore::QTransform*               m_pCameraTransform;             /**< The main camera transform. */
-    Qt3DCore::QTransform*               m_pCameraScaleTransform;        /**< The camera scale transformation (added to m_pCameraTransform). */
-    Qt3DCore::QTransform*               m_pCameraTranslateTransform;    /**< The camera translation transformation (added to m_pCameraTransform). */
-    Qt3DCore::QTransform*               m_pCameraRotateTransformX;      /**< The camera x-axis rotation transformation (added to m_pCameraTransform). */
-    Qt3DCore::QTransform*               m_pCameraRotateTransformY;      /**< The camera y-axis rotation transformation (added to m_pCameraTransform). */
-    Qt3DCore::QTransform*               m_pCameraRotateTransformZ;      /**< The camera z-axis rotation transformation (added to m_pCameraTransform). */
 
     Brain::SPtr                         m_pBrain;                       /**< Pointer to the Brain class, which holds all BrainObjects. */
 
     bool            m_bCameraTransMode;         /**< Flag for activating/deactivating the translation camera mode. */
-    bool            m_bModelRotationMode;       /**< Flag for activating/deactivating the rotation model mode. */
     bool            m_bCameraRotationMode;      /**< Flag for activating/deactivating the rotation camera mode. */
 
     QPoint          m_mousePressPositon;        /**< Position when the mouse was pressed. */
 
-    float           m_fModelScale;              /**< The current camera scaling factor. */
     float           m_fCameraScale;             /**< The current camera scaling factor. */
 
     QVector3D       m_vecCameraTrans;           /**< The camera translation vector. */
     QVector3D       m_vecCameraTransOld;        /**< The camera old translation vector. */
     QVector3D       m_vecCameraRotation;        /**< The camera rotation vector. */
     QVector3D       m_vecCameraRotationOld;     /**< The camera old rotation vector. */
-    QVector3D       m_vecModelRotation;         /**< The model rotation vector. */
-    QVector3D       m_vecModelRotationOld;      /**< The model old rotation vector. */
 
     void initMetatypes();
 
