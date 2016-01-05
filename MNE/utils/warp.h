@@ -119,6 +119,8 @@ public:
     */
     MatrixXd readsLm(const QString &electrodeFileName);
 
+private:
+
     //=========================================================================================================
     /**
     * Calculate the weighting parameters.
@@ -142,8 +144,6 @@ public:
     * @return Warped Vertices
     */
     MatrixXd warpVertices(const MatrixXd & sVert, const MatrixXd & sLm, const MatrixXd& warpWeight, const MatrixXd& polWeight);
-
-private:
 
 };
 
