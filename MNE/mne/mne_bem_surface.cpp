@@ -218,10 +218,26 @@ bool MNEBemSurface::addVertexNormals()
             this->nn.row(p) /= size;
         }
 
+return true;
+}
 
- qDebug() << "nn first Row:" << this->nn(0,0)<<this->nn(0,1)<<this->nn(0,2);
 
-    return true;
+//*************************************************************************************************************
+
+void MNEBemSurface::writeToStream(FiffStream *p_pStream)
+{
+    if(this->id <=0)
+        this->id=FIFFV_MNE_SURF_UNKNOWN;
+    if(this->sigma>0.0)
+        p_pStream->write_float(FIFF_BEM_SIGMA, &this->sigma);
+    p_pStream->write_int(FIFF_BEM_SURF_ID, &this->id);
+    p_pStream->write_int(FIFF_MNE_COORD_FRAME, &this->coord_frame);
+    p_pStream->write_int(FIFF_BEM_SURF_NNODE, &this->np);
+    p_pStream->write_int(FIFF_BEM_SURF_NTRI, &this->ntri);
+    p_pStream->write_float_matrix(FIFF_BEM_SURF_NODES, this->rr);
+    if (this->ntri > 0)
+        p_pStream->write_int_matrix(FIFF_BEM_SURF_TRIANGLES, this->tris.array() + 1);
+    p_pStream->write_float_matrix(FIFF_BEM_SURF_NORMALS, this->nn);
 }
 
 

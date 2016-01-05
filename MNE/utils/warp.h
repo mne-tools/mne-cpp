@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     mne_bem_surface.h
-* @author   Jana Kiesel<jana.kiesel@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     warp.h
+* @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     June, 2015
+* @date     November, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Jana Kiesel, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Jana Kiesel and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -19,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -30,29 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     MNEBemSurface class declaration.
+* @brief    Warp class declaration.
 *
 */
 
-#ifndef MNE_BEM_SURFACE_H
-#define MNE_BEM_SURFACE_H
+#ifndef WARP_H
+#define WARP_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // MNE INCLUDES
 //=============================================================================================================
 
-#include "mne_global.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
-
-#include <fiff/fiff_types.h>
-#include <fiff/fiff.h>
-
+#include "utils_global.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -60,7 +49,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
-#include <Eigen/SparseCore>
+#include <Eigen/LU>
 
 
 //*************************************************************************************************************
@@ -68,16 +57,20 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QList>
+#include <QSharedPointer>
+#include <QDebug>
+#include <QFile>
+//#include <QString>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
-namespace MNELIB
+namespace UTILSLIB
 {
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -85,7 +78,6 @@ namespace MNELIB
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -96,92 +88,65 @@ using namespace FIFFLIB;
 
 //=============================================================================================================
 /**
-* BEM surface geometry information
-*
-* @brief BEM surface provides geometry information
+* @brief Thin Plate Spline Warp
 */
-class MNESHARED_EXPORT MNEBemSurface
+class UTILSSHARED_EXPORT Warp
 {
 public:
-    typedef QSharedPointer<MNEBemSurface> SPtr;             /**< Shared pointer type for MNEBemSurface. */
-    typedef QSharedPointer<const MNEBemSurface> ConstSPtr;  /**< Const shared pointer type for MNEBemSurface. */
+
+    typedef QSharedPointer<Warp> SPtr;            /**< Shared pointer type for Warp. */
+    typedef QSharedPointer<const Warp> ConstSPtr; /**< Const shared pointer type for Warp. */
 
     //=========================================================================================================
     /**
-    * Constructors the bem surface.
-    */
-    MNEBemSurface();
-
-    //=========================================================================================================
-    /**
-    * Copy constructor.
+    * Calculates the TPS Warp of given setup
     *
-    * @param[in] p_MNEBemSurface    BEM surface which should be copied
+    * @param[in]  sLm      3D Landmarks of the source geometry
+    * @param[in]  dLm      3D Landmarks of the destination geometry
+    * @param[in]  sVert    Vertices of the source geometry
+    *
+    * @return wVert   Vertices of the warped destination geometry
     */
-    MNEBemSurface(const MNEBemSurface& p_MNEBemSurface);
+    MatrixXd calculate(const MatrixXd & sLm, const MatrixXd &dLm, const MatrixXd & sVert);
 
     //=========================================================================================================
     /**
-    * Destroys the BEM surface.
+    * Read electrode positions from MRI Database
+    *
+    * @param[in]  electrodeFileName    .txt file of electrodes
+    *
+    * @return electrodes   Matrix with electrode positions
     */
-    ~MNEBemSurface();
+    MatrixXd readsLm(const QString &electrodeFileName);
+
+private:
 
     //=========================================================================================================
     /**
-    * Initializes the BEM surface.
+    * Calculate the weighting parameters.
+    *
+    * @param[in]  sLm      3D Landmarks of the source geometry
+    * @param[in]  dLm      3D Landmarks of the destination geometry
+    * @param[out] warpWeight Weighting parameters of the tps warp
+    * @param[out] polWeight  Weighting papameters of the polynomial warp
     */
-    void clear();
+    bool calcWeighting(const MatrixXd& sLm, const MatrixXd &dLm, MatrixXd& warpWeight, MatrixXd& polWeight);
 
     //=========================================================================================================
     /**
-    * Implementation of the   mne_add_triangle_data function in mne_add_geometry_info.c
+    * Warp the Vertices of the source geometry
     *
-    * Completes triangulation info
+    * @param[in]  sVert    Vertices of the source geometry
+    * @param[in]  sLm      3D Landmarks of the source geometry
+    * @param[in]  warpWeight Weighting parameters of the tps warp
+    * @param[in]  polWeight  Weighting papameters of the polynomial warp
     *
-    * @return true if succeeded, false otherwise
+    * @return Warped Vertices
     */
-    bool addTriangleData();
+    MatrixXd warpVertices(const MatrixXd & sVert, const MatrixXd & sLm, const MatrixXd& warpWeight, const MatrixXd& polWeight);
 
-    //=========================================================================================================
-    /**
-    * Implementation of the addVertexNormals function in mne_add_geometry_info.c
-    *
-    * Completes triangulation info
-    *
-    * @return true if succeeded, false otherwise
-    */
-    bool addVertexNormals();
-
-    //=========================================================================================================
-    /**
-    * Writes the bem surface to a FIFF stream
-    *
-    * @param[in] p_pStream  The stream to write to.
-    */
-    void writeToStream(FiffStream* p_pStream);
-
-public:
-    fiff_int_t id;              /**< Id information */
-    fiff_int_t np;              /**< Number of vertices of the whole/original surface used to create the source locations. */
-    fiff_int_t ntri;            /**< Number of available triangles */
-    fiff_int_t coord_frame;     /**< Coil coordinate system definition */
-    fiff_float_t sigma;         /**< Conductivity of a compartment */
-    MatrixX3f rr;               /**< Source locations of available dipoles. */
-    MatrixX3f nn;               /**< Source normals of available dipoles. */
-    MatrixX3i tris;             /**< Triangles */
-    MatrixX3d tri_cent;         /**< Triangle centers */
-    MatrixX3d tri_nn;           /**< Triangle normals */
-    VectorXd tri_area;          /**< Triangle areas */
-    QList<QPair<int, QVector<int> > > neighbor_tri;           /**< Map of neighboring triangles for each vertex */
-    QList<QPair<int, QVector<int> > > neighbor_vert;          /**< Map of neighboring vertices for each vertex */
 };
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
 
 } // NAMESPACE
 
-#endif // MNE_BEMSURFACE_H
+#endif // WARP_H

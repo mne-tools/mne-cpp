@@ -144,9 +144,23 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the MNE forward solution
+    * Destroys the MNE Bem
     */
     ~MNEBem();
+
+    //=========================================================================================================
+    /**
+    * Initializes MNE Bem
+    */
+    void clear();
+
+    //=========================================================================================================
+    /**
+    * True if MNE Bem is empty.
+    *
+    * @return true if MNE Bem is empty
+    */
+    inline bool isEmpty() const;
 
     //=========================================================================================================
     /**
@@ -164,11 +178,71 @@ public:
 
     //=========================================================================================================
     /**
-    * TO Do: Input
+    * Returns the number of stored bem surfaces
     *
-    * Write Matrix to a textfile
+    * @return number of stored bem surfaces
     */
-    static void getEigenToData(MatrixX3f &src, char* pathAndName);
+    inline qint32 size() const;
+
+    //=========================================================================================================
+    /**
+    * MNE Toolbox function mne_write_bem_surfaces_block
+    *
+    * Write the Bem to a FIF file
+    *
+    * @param [in] p_IODevice   IO device to write the bem to.
+    */
+    void write(QIODevice &p_IODevice);
+
+    //=========================================================================================================
+    /**
+    * MNE Toolbox function mne_write_bem_surfaces_block
+    *
+    * Write the Bem to a FIF stream
+    *
+    * @param[in] p_pStream  The stream to write to.
+    */
+    void writeToStream(FiffStream *p_pStream);
+
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access bem_surface by index
+    *
+    * @param[in] idx    the surface index (0,1 or 2).
+    *
+    * @return MNEBemSurface related to the parameter index.
+    */
+    const MNEBemSurface& operator[] (qint32 idx) const;
+
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access bem_surface by index
+    *
+    * @param[in] idx    the surface index (0,1 or 2).
+    *
+    * @return MNEBemSurface related to the parameter index.
+    */
+    MNEBemSurface& operator[] (qint32 idx);
+
+    //=========================================================================================================
+    /**
+    * Subscript operator << to add a new bem_surface
+    *
+    * @param[in] surf   BemSurface to be added
+    *
+    * @return MNEBem
+    */
+    MNEBem& operator<< (const MNEBemSurface& surf);
+
+    //=========================================================================================================
+    /**
+    * Subscript operator << to add a new bem_surface
+    *
+    * @param[in] surf   BemSurface to be added
+    *
+    * @return MNEBem
+    */
+    MNEBem& operator<< (const MNEBemSurface* surf);
 
 protected:
     //=========================================================================================================
@@ -177,8 +251,8 @@ protected:
     * Reads a single bem surface
     *
     * @param [in] p_pStream         The opened fif file
-    * @param [in] p_Tree            Search for the source space here
-    * @param [out] p_BemSurface     The read source space (hemisphere)
+    * @param [in] p_Tree            Search for the bem surface here
+    * @param [out] p_BemSurface     The read BemSurface
     *
     * @return true if succeeded, false otherwise
     */
@@ -193,6 +267,18 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+inline bool MNEBem::isEmpty() const
+{
+    return m_qListBemSurface.size() == 0;
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 MNEBem::size() const
+{
+    return m_qListBemSurface.size();
+}
 } // NAMESPACE
 
 
