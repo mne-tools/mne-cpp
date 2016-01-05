@@ -29,7 +29,6 @@ QVariant AbstractTreeItem::data(int role) const
 
 void  AbstractTreeItem::setData(const QVariant& value, int role)
 {
-    qDebug()<<role;
     QStandardItem::setData(value, role);
 
     switch(role) {
@@ -166,6 +165,15 @@ void AbstractTreeItem::createToolTip()
         break;
     case BrainTreeModelItemTypes::RTDataColormapType:
         sToolTip = "Used color mapping";
+        break;
+    case BrainTreeModelItemTypes::RTDataStreamingSpeed:
+        sToolTip = "The real time streaming speed";
+        break;
+    case BrainTreeModelItemTypes::RTDataLoopedStreaming:
+        sToolTip = "Turn looped streaming on/off";
+        break;
+    case BrainTreeModelItemTypes::RTDataNumberAverages:
+        sToolTip = "The number of samples waited to average the activity estimation";
         break;
     default:
         sToolTip = "Unknown";

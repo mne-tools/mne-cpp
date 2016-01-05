@@ -100,7 +100,7 @@ public:
 
 //    void setIntervall(int intervall);
 
-    void addData(QList<VectorXd>& data);
+    void addData(const MatrixXd& data);
 
     void clear();
 
@@ -120,7 +120,7 @@ protected:
 
 private:
     QMutex m_qMutex;
-    QList<VectorXd> m_data;   /**< List that holds the fiff matrix data <n_channels x n_samples> */
+    MatrixXd m_data;   /**< List that holds the fiff matrix data <n_channels x n_samples> */
 
     bool m_bIsRunning;
     bool m_bIsLooping;

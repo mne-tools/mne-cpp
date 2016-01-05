@@ -74,6 +74,7 @@ View3D::View3D()
 , m_vecModelRotation(QVector3D(-90.0,110.0,0.0))
 , m_vecModelRotationOld(QVector3D(-90.0,110.0,0.0))
 {
+    initMetatypes();
     init();
 }
 
@@ -87,13 +88,36 @@ View3D::~View3D()
 
 //*************************************************************************************************************
 
+void View3D::initMetatypes()
+{
+    qRegisterMetaType<Eigen::MatrixX3i>();
+    qRegisterMetaType<Eigen::MatrixXd>();
+    qRegisterMetaType<Eigen::MatrixX3f>();
+    qRegisterMetaType<Eigen::VectorXf>();
+    qRegisterMetaType<Eigen::VectorXi>();
+    qRegisterMetaType<Eigen::VectorXd>();
+    qRegisterMetaType<Eigen::RowVectorXf>();
+    qRegisterMetaType<Eigen::Vector3f>();
+
+    qRegisterMetaType<MatrixX3i>();
+    qRegisterMetaType<MatrixXd>();
+    qRegisterMetaType<MatrixX3f>();
+    qRegisterMetaType<VectorXf>();
+    qRegisterMetaType<VectorXi>();
+    qRegisterMetaType<VectorXd>();
+    qRegisterMetaType<RowVectorXf>();
+    qRegisterMetaType<Vector3f>();
+}
+
+
+//*************************************************************************************************************
+
 void View3D::init()
 {
     //Aspect engine
     m_aspectEngine.registerAspect(new Qt3DRender::QRenderAspect());
 
     m_aspectEngine.registerAspect(m_pInputAspect);
-    m_aspectEngine.initialize();
 
     //Data
     QVariantMap data;
