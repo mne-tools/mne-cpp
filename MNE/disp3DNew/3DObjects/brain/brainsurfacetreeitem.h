@@ -150,6 +150,7 @@ private:
     MatrixX3f createCurvatureVertColor(const VectorXf& curvature, const QColor& colSulci = QColor(50,50,50), const QColor& colGyri = QColor(125,125,125));
 
     Renderable3DEntity*     m_pRenderable3DEntity;
+    Renderable3DEntity*     m_pRenderable3DEntityActivationOverlay;
 
     BrainTreeItem*          m_pItemSurfColorInfoOrigin; //These are stored as member variables because we do not wat to look for them everytime we call updateVertColor(), especially not whe nwe perform rt source loc
     BrainTreeItem*          m_pItemSurfColSulci;
