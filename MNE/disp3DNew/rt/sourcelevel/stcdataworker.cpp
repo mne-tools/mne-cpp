@@ -69,7 +69,7 @@ StcDataWorker::StcDataWorker(QObject* parent)
 , m_iAverageSamples(1)
 , m_iCurrentSample(0)
 , m_iMSecIntervall(1000)
-, m_sColormap("Hot")
+, m_sColormap("Hot Negative 2")
 {
 }
 
@@ -94,8 +94,8 @@ void StcDataWorker::addData(const MatrixXd& data, const QString& sColormap)
     m_matData = data;
     m_sColormap = sColormap;
 
-    //TODO: Transform to colors here!
-    m_lDataColor = transformDataToColor(data, m_sColormap);
+    //Transform to colors here!
+    m_lDataColor = transformDataToColor(m_matData, m_sColormap);
 }
 
 
@@ -111,7 +111,7 @@ void StcDataWorker::clear()
 
 void StcDataWorker::run()
 {
-    VectorXd t_vecAverage(0,0);
+    MatrixX3f t_matAverage;
 
     m_bIsRunning = true;
 
@@ -143,22 +143,27 @@ void StcDataWorker::run()
 //                std::cout<<"StcDataWorker::run() - m_matData.size(): "<<m_matData.size()<<std::endl;
 //                std::cout<<"StcDataWorker::run() - m_iCurrentSample: "<<m_iCurrentSample<<std::endl;
 
-                if(t_vecAverage.rows() != m_matData.rows())
-                    t_vecAverage = m_matData.col(m_iCurrentSample%m_matData.cols());
-                else
-                    t_vecAverage += m_matData.col(m_iCurrentSample%m_matData.cols());
+                if(t_matAverage.rows() != m_lDataColor.at(m_iCurrentSample%m_lDataColor.size()).rows()) {
+                    t_matAverage = m_lDataColor.at(m_iCurrentSample%m_lDataColor.size());
+                } else {
+                    t_matAverage += m_lDataColor.at(m_iCurrentSample%m_lDataColor.size());
+                }
+
                 m_qMutex.unlock();
             }
             else
             {
                 m_qMutex.lock();
                 //Down sampling in stream mode
-                if(t_vecAverage.rows() != m_matData.rows())
-                    t_vecAverage = m_matData.col(0);
-                else
-                    t_vecAverage += m_matData.col(0);
+                if(t_matAverage.rows() != m_lDataColor.at(m_iCurrentSample%m_lDataColor.size()).rows()) {
+                    t_matAverage = m_lDataColor.at(0);
+                } else {
+                    t_matAverage += m_lDataColor.at(0);
+                }
 
                 m_matData = m_matData.block(0,1,m_matData.rows(),m_matData.cols()-1);
+                m_lDataColor.pop_front();
+
                 m_qMutex.unlock();
             }
 
@@ -167,10 +172,10 @@ void StcDataWorker::run()
 
             if((m_iCurrentSample/1)%m_iAverageSamples == 0)
             {
-                t_vecAverage /= (double)m_iAverageSamples;
+                t_matAverage /= (double)m_iAverageSamples;
 
-                emit stcSample(t_vecAverage);
-                t_vecAverage = VectorXd::Zero(t_vecAverage.rows());
+                emit stcSample(t_matAverage);
+                t_matAverage = MatrixX3f::Zero(t_matAverage.rows(), 3);
             }
             m_qMutex.unlock();
         }
@@ -183,9 +188,72 @@ void StcDataWorker::run()
 
 //*************************************************************************************************************
 
-QList<MatrixX3f> StcDataWorker::transformDataToColor(const MatrixXd& data, const QString& sColormap)
+QList<MatrixX3f> StcDataWorker::transformDataToColor(const MatrixXd& data, const QString& sColorMapType)
 {
     QList<MatrixX3f> matList;
+
+    if(sColorMapType == "Hot Negative 1") {
+        for(int c = 0; c<data.cols(); c++) {
+            MatrixX3f colors(data.rows(), 3);
+
+            for(int r = 0; r<data.rows(); r++) {
+                double dSample = data(r,c)/((10.0/100.0) * 1.0);
+                qint32 iVal = dSample > 255 ? 255 : dSample < 0 ? 0 : dSample;
+
+                QRgb qRgb;
+                qRgb = ColorMap::valueToHotNegative1((float)iVal/255.0);
+
+                QColor colSample(qRgb);
+                colors(r, 0) = colSample.redF();
+                colors(r, 1) = colSample.greenF();
+                colors(r, 2) = colSample.blueF();
+            }
+
+            matList.append(colors);
+        }
+    }
+
+    if(sColorMapType == "Hot Negative 2") {
+        for(int c = 0; c<data.cols(); c++) {
+            MatrixX3f colors(data.rows(), 3);
+
+            for(int r = 0; r<data.rows(); r++) {
+                double dSample = data(r,c)/((10.0/100.0) * 1.0);
+                qint32 iVal = dSample > 255 ? 255 : dSample < 0 ? 0 : dSample;
+
+                QRgb qRgb;
+                qRgb = ColorMap::valueToHotNegative2((float)iVal/255.0);
+
+                QColor colSample(qRgb);
+                colors(r, 0) = colSample.redF();
+                colors(r, 1) = colSample.greenF();
+                colors(r, 2) = colSample.blueF();
+            }
+
+            matList.append(colors);
+        }
+    }
+
+    if(sColorMapType == "Hot") {
+        for(int c = 0; c<data.cols(); c++) {
+            MatrixX3f colors(data.rows(), 3);
+
+            for(int r = 0; r<data.rows(); r++) {
+                double dSample = data(r,c)/((10.0/100.0) * 1.0);
+                qint32 iVal = dSample > 255 ? 255 : dSample < 0 ? 0 : dSample;
+
+                QRgb qRgb;
+                qRgb = ColorMap::valueToHot((float)iVal/255.0);
+
+                QColor colSample(qRgb);
+                colors(r, 0) = colSample.redF();
+                colors(r, 1) = colSample.greenF();
+                colors(r, 2) = colSample.blueF();
+            }
+
+            matList.append(colors);
+        }
+    }
 
     return matList;
 }

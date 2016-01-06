@@ -45,6 +45,8 @@
 
 #include "../../disp3dnew_global.h"
 
+#include <disp/helpers/colormap.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -81,6 +83,8 @@ namespace DISP3DNEWLIB
 //=============================================================================================================
 
 using namespace Eigen;
+using namespace DISPLIB;
+
 
 //=============================================================================================================
 /**
@@ -101,7 +105,7 @@ public:
 
 //    void setIntervall(int intervall);
 
-    void addData(const MatrixXd& data, const QString& sColormap = "Hot");
+    void addData(const MatrixXd& data, const QString& sColorMapType = "Hot Negative 2");
 
     void clear();
 
@@ -116,7 +120,7 @@ public:
     void start();
 
 signals:
-    void stcSample(Eigen::VectorXd sample);
+    void stcSample(Eigen::MatrixX3f colorSample);
 
 protected:
     virtual void run();
