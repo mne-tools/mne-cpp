@@ -69,6 +69,7 @@ StcDataWorker::StcDataWorker(QObject* parent)
 , m_iAverageSamples(1)
 , m_iCurrentSample(0)
 , m_iMSecIntervall(1000)
+, m_sColormap("Hot")
 {
 }
 
@@ -84,17 +85,17 @@ StcDataWorker::~StcDataWorker()
 
 //*************************************************************************************************************
 
-void StcDataWorker::addData(const MatrixXd& data)
+void StcDataWorker::addData(const MatrixXd& data, const QString& sColormap)
 {
-    //std::cout<<"START::StcDataWorker::addData"<<std::endl;
-
     QMutexLocker locker(&m_qMutex);
     if(data.size() == 0)
         return;
 
-    m_data = data;
+    m_matData = data;
+    m_sColormap = sColormap;
 
-    //std::cout<<"END::StcDataWorker::addData"<<std::endl;
+    //TODO: Transform to colors here!
+    m_lDataColor = transformDataToColor(data, m_sColormap);
 }
 
 
@@ -129,7 +130,7 @@ void StcDataWorker::run()
         bool doProcessing = false;
         {
             QMutexLocker locker(&m_qMutex);
-            if(m_data.cols() > 0)
+            if(m_matData.cols() > 0)
                 doProcessing = true;
         }
 
@@ -139,25 +140,25 @@ void StcDataWorker::run()
             {
                 m_qMutex.lock();
                 //Down sampling in loop mode
-//                std::cout<<"StcDataWorker::run() - m_data.size(): "<<m_data.size()<<std::endl;
+//                std::cout<<"StcDataWorker::run() - m_matData.size(): "<<m_matData.size()<<std::endl;
 //                std::cout<<"StcDataWorker::run() - m_iCurrentSample: "<<m_iCurrentSample<<std::endl;
 
-                if(t_vecAverage.rows() != m_data.rows())
-                    t_vecAverage = m_data.col(m_iCurrentSample%m_data.cols());
+                if(t_vecAverage.rows() != m_matData.rows())
+                    t_vecAverage = m_matData.col(m_iCurrentSample%m_matData.cols());
                 else
-                    t_vecAverage += m_data.col(m_iCurrentSample%m_data.cols());
+                    t_vecAverage += m_matData.col(m_iCurrentSample%m_matData.cols());
                 m_qMutex.unlock();
             }
             else
             {
                 m_qMutex.lock();
                 //Down sampling in stream mode
-                if(t_vecAverage.rows() != m_data.rows())
-                    t_vecAverage = m_data.col(0);
+                if(t_vecAverage.rows() != m_matData.rows())
+                    t_vecAverage = m_matData.col(0);
                 else
-                    t_vecAverage += m_data.col(0);
+                    t_vecAverage += m_matData.col(0);
 
-                m_data = m_data.block(0,1,m_data.rows(),m_data.cols()-1);
+                m_matData = m_matData.block(0,1,m_matData.rows(),m_matData.cols()-1);
                 m_qMutex.unlock();
             }
 
@@ -177,6 +178,16 @@ void StcDataWorker::run()
         //qDebug()<<"StcDataWorker::run()"<<timer.elapsed()<<"msecs";
         QThread::msleep(m_iMSecIntervall);
     }
+}
+
+
+//*************************************************************************************************************
+
+QList<MatrixX3f> StcDataWorker::transformDataToColor(const MatrixXd& data, const QString& sColormap)
+{
+    QList<MatrixX3f> matList;
+
+    return matList;
 }
 
 

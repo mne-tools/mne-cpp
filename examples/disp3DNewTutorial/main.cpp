@@ -188,12 +188,10 @@ int main(int argc, char *argv[])
 
     SurfaceSet tSurfSet ("sample", 2, "inflated", "./MNE-sample-data/subjects");
     AnnotationSet tAnnotSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
-//    Surface tSurfRight ("sample", 1, "orig", "./MNE-sample-data/subjects");
-//    Annotation tAnnotRight ("sample", 1, "aparc.a2009s", "./MNE-sample-data/subjects");
-//    Surface tSurfLeft ("sample", 0, "pial", "./MNE-sample-data/subjects");
-//    Annotation tAnnotLeft ("sample", 0, "aparc.a2009s", "./MNE-sample-data/subjects");
-//    MNESourceEstimate sourceEstimate;
-//    MNEForwardSolution t_clusteredFwd;
+    //Surface tSurfRight ("sample", 1, "inflated", "./MNE-sample-data/subjects");
+    //Annotation tAnnotRight ("sample", 1, "aparc.a2009s", "./MNE-sample-data/subjects");
+    //Surface tSurfLeft ("sample", 0, "inflated", "./MNE-sample-data/subjects");
+    //Annotation tAnnotLeft ("sample", 0, "aparc.a2009s", "./MNE-sample-data/subjects");
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
     //testWindow->addBrainData("HemiLR", tSurfLeft, tAnnotLeft);
