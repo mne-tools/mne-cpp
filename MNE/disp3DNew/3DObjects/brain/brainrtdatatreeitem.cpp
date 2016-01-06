@@ -193,7 +193,7 @@ bool BrainRTDataTreeItem::updateData(const MNESourceEstimate& tSourceEstimate)
         return false;
     }
 
-    m_pStcDataWorker->addData(tSourceEstimate.data);
+    m_pStcDataWorker->addData(tSourceEstimate.data, m_pItemColormapType->data(BrainTreeItemRoles::RTDataColormapType).toString());
 
     QVariant data;
     data.setValue(tSourceEstimate.data);
@@ -219,7 +219,7 @@ void BrainRTDataTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 
 //*************************************************************************************************************
 
-void BrainRTDataTreeItem::onStcSample(VectorXd sourceSamples)
+void BrainRTDataTreeItem::onStcSample(MatrixX3f sourceColorSamples)
 {
     QTime time;
     time.start();
@@ -227,14 +227,14 @@ void BrainRTDataTreeItem::onStcSample(VectorXd sourceSamples)
     int iStartIdx = this->data(BrainRTDataTreeItemRoles::RTStartIdx).toInt();
     int iEndIdx = this->data(BrainRTDataTreeItemRoles::RTEndIdx).toInt();
 
-    //Normalize source loc result and cut out the hemisphere part
-    VectorXd subSamples = sourceSamples.segment(iStartIdx, iEndIdx-iStartIdx+1);
-    subSamples /= (m_dStcNormMax/100.0) * m_pItemSourceLocNormValue->data(BrainTreeItemRoles::RTDataNormalizationValue).toDouble();
+//    //Normalize source loc result and cut out the hemisphere part
+//    Matrix3Xf subColorSamples = sourceSamples.block(iStartIdx, 0, iEndIdx-iStartIdx+1, 3);
+//    subColorSamples /= (m_dStcNormMax/100.0) * m_pItemSourceLocNormValue->data(BrainTreeItemRoles::RTDataNormalizationValue).toDouble();
 
-    QString sColorMapType = m_pItemColormapType->data(BrainTreeItemRoles::RTDataColormapType).toString();
-//    qDebug()<<"BrainRTDataTreeItem::onStcSample"<<time.elapsed()<<"msecs";
+//    QString sColorMapType = m_pItemColormapType->data(BrainTreeItemRoles::RTDataColormapType).toString();
+////    qDebug()<<"BrainRTDataTreeItem::onStcSample"<<time.elapsed()<<"msecs";
 
-    emit rtDataUpdated(subSamples, this->data(BrainRTDataTreeItemRoles::RTVerticesIdx).value<VectorXi>(), sColorMapType);
+    emit rtDataUpdated(sourceColorSamples.block(iStartIdx, 0, iEndIdx-iStartIdx+1, 3), this->data(BrainRTDataTreeItemRoles::RTVerticesIdx).value<VectorXi>());
 
     }
 

@@ -249,12 +249,12 @@ void BrainSurfaceTreeItem::updateVertColor()
 
 //*************************************************************************************************************
 
-void BrainSurfaceTreeItem::updateRtVertColor(const VectorXd& sourceSamples, const VectorXi& vertexIndex, const QString& sColorMapType)
+void BrainSurfaceTreeItem::updateRtVertColor(const MatrixX3f& sourceColorSamples, const VectorXi& vertexIndex)
 {
     QTime time;
     time.start();
 
-    if(sourceSamples.rows() != vertexIndex.rows()) {
+    if(sourceColorSamples.rows() != vertexIndex.rows()) {
         qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor - number of rows in sample do not not match with idx/no number of rows in vertex. Returning...";
         return;
     }
@@ -271,65 +271,11 @@ void BrainSurfaceTreeItem::updateRtVertColor(const VectorXd& sourceSamples, cons
         matCurrentVertColor = this->data(BrainSurfaceTreeItemRoles::SurfaceAnnotationColorVert).value<MatrixX3f>();
     }
 
-    qint32 iThreshold = 0;
-
-    if(sColorMapType == "Hot Negative 1") {
-        for(int i = 0; i<sourceSamples.rows(); i++) {
-            if(vertexIndex(i) > 0 && vertexIndex(i) < matCurrentVertColor.rows()) {
-                qint32 iVal = sourceSamples(i) > 255 ? 255 : sourceSamples(i) < 0 ? 0 : sourceSamples(i);
-
-                if(iVal > iThreshold) {
-                    QRgb qRgb;
-                    qRgb = ColorMap::valueToHotNegative1((float)iVal/255.0);
-
-                    QColor colSample(qRgb);
-                    matCurrentVertColor(vertexIndex(i), 0) = colSample.redF();
-                    matCurrentVertColor(vertexIndex(i), 1) = colSample.greenF();
-                    matCurrentVertColor(vertexIndex(i), 2) = colSample.blueF();
-                }
-            } else {
-                qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor - Vertex index exceeds matrix dimensions!";
-            }
-        }
-    }
-
-    if(sColorMapType == "Hot Negative 2") {
-        for(int i = 0; i<sourceSamples.rows(); i++) {
-            if(vertexIndex(i) > 0 && vertexIndex(i) < matCurrentVertColor.rows()) {
-                qint32 iVal = sourceSamples(i) > 255 ? 255 : sourceSamples(i) < 0 ? 0 : sourceSamples(i);
-
-                if(iVal > iThreshold) {
-                    QRgb qRgb;
-                    qRgb = ColorMap::valueToHotNegative2((float)iVal/255.0);
-
-                    QColor colSample(qRgb);
-                    matCurrentVertColor(vertexIndex(i), 0) = colSample.redF();
-                    matCurrentVertColor(vertexIndex(i), 1) = colSample.greenF();
-                    matCurrentVertColor(vertexIndex(i), 2) = colSample.blueF();
-                }
-            } else {
-                qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor - Vertex index exceeds matrix dimensions!";
-            }
-        }
-    }
-
-    if(sColorMapType == "Hot") {
-        for(int i = 0; i<sourceSamples.rows(); i++) {
-            if(vertexIndex(i) > 0 && vertexIndex(i) < matCurrentVertColor.rows()) {
-                qint32 iVal = sourceSamples(i) > 255 ? 255 : sourceSamples(i) < 0 ? 0 : sourceSamples(i);
-
-                if(iVal > iThreshold) {
-                    QRgb qRgb;
-                    qRgb = ColorMap::valueToHot((float)iVal/255.0);
-
-                    QColor colSample(qRgb);
-                    matCurrentVertColor(vertexIndex(i), 0) = colSample.redF();
-                    matCurrentVertColor(vertexIndex(i), 1) = colSample.greenF();
-                    matCurrentVertColor(vertexIndex(i), 2) = colSample.blueF();
-                }
-            } else {
-                qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor - Vertex index exceeds matrix dimensions!";
-            }
+    for(int i = 0; i<sourceColorSamples.rows(); i++) {
+        if(vertexIndex(i) > 0 && vertexIndex(i) < matCurrentVertColor.rows()) {
+            matCurrentVertColor.row(vertexIndex(i)) = sourceColorSamples.row(i);
+        } else {
+            qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor - Source loc vertex index exceeds matrix dimensions!";
         }
     }
 

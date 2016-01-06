@@ -148,11 +148,11 @@ public:
     inline bool isInit() const;
 
 signals:
-    void rtDataUpdated(VectorXd sourceSamples, VectorXi vertexIndex, QString sColorMapType);
+    void rtDataUpdated(MatrixX3f sourceColorSamples, VectorXi vertexIndex);
 
 private:
     void onCheckStateChanged(const Qt::CheckState& checkState);
-    void onStcSample(VectorXd sourceSamples);
+    void onStcSample(MatrixX3f sourceColorSamples);
     void onStreamingIntervalChanged(const int& usec);
 
     bool        m_bInit;
