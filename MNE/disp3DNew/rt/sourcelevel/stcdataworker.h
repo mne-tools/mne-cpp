@@ -101,7 +101,7 @@ public:
 
 //    void setIntervall(int intervall);
 
-    void addData(const MatrixXd& data);
+    void addData(const MatrixXd& data, const QString& sColormap = "Hot");
 
     void clear();
 
@@ -122,15 +122,21 @@ protected:
     virtual void run();
 
 private:
-    QMutex m_qMutex;
-    MatrixXd m_data;   /**< List that holds the fiff matrix data <n_channels x n_samples> */
+    QList<MatrixX3f> transformDataToColor(const MatrixXd& data, const QString &sColormap);
 
-    bool m_bIsRunning;
-    bool m_bIsLooping;
+    QMutex              m_qMutex;
 
-    qint32 m_iAverageSamples;
-    qint32 m_iCurrentSample;
-    qint32 m_iMSecIntervall;
+    MatrixXd            m_matData;        /**< List that holds the fiff matrix data <n_channels x n_samples> */
+    QList<MatrixX3f>    m_lDataColor;       /**< List that holds the fiff matrix data <n_channels x n_samples> in rgb color values */
+
+    bool        m_bIsRunning;
+    bool        m_bIsLooping;
+
+    qint32      m_iAverageSamples;
+    qint32      m_iCurrentSample;
+    qint32      m_iMSecIntervall;
+
+    QString     m_sColormap;
 };
 
 } // NAMESPACE

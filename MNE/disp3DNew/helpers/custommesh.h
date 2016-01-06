@@ -167,6 +167,8 @@ protected:
     Qt3DRender::QBuffer*    m_pColorDataBuffer;     /**< The color buffer. */
     Qt3DRender::QBuffer*    m_pIndexDataBuffer;     /**< The index buffer. */
 
+    Qt3DRender::QAttribute* m_pCcolorAttribute;
+
     int     m_iNumVert;     /**< The total number of set vertices. */
 };
 
