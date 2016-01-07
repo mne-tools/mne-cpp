@@ -85,6 +85,8 @@ View3D::~View3D()
 
 void View3D::initMetatypes()
 {
+    qRegisterMetaType<QByteArray>();
+
     qRegisterMetaType<Eigen::MatrixX3i>();
     qRegisterMetaType<Eigen::MatrixXd>();
     qRegisterMetaType<Eigen::MatrixX3f>();

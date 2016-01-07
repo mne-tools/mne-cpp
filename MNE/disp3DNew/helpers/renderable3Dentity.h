@@ -134,9 +134,9 @@ public:
     /**
     * Refresh the vertices colors of the mesh.
     *
-    * @param[in] tMatColors     New color information for the vertices.
+    * @param[in] tArrayColors     New color information for the vertices.
     */
-    bool setVertColor(const Matrix<float, Dynamic, 3, RowMajor>& tMatColors);
+    bool setVertColor(const QByteArray &tArrayColors);
 
     //=========================================================================================================
     /**
@@ -149,7 +149,7 @@ public:
     *
     * @return If successful returns true, false otherwise.
     */
-    bool setMeshData(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset, const Matrix<float, Dynamic, 3, RowMajor>& tMatColors = Matrix<float, Dynamic, 3, RowMajor>(0,3));
+    bool setMeshData(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset, const QByteArray &tArrayColors = QByteArray());
 
     bool setTransform(QSharedPointer<Qt3DCore::QTransform> pTransform);
 

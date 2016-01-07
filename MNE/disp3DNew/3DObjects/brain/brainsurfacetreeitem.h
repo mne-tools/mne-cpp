@@ -142,10 +142,10 @@ public:
 
     void updateVertColor();
 
-    void updateRtVertColor(const MatrixX3f& sourceColorSamples, const VectorXi& vertexIndex);
+    void updateRtVertColor(const QByteArray& sourceColorSamples, const VectorXi& vertexIndex);
 
 private:
-    MatrixX3f createCurvatureVertColor(const VectorXf& curvature, const QColor& colSulci = QColor(50,50,50), const QColor& colGyri = QColor(125,125,125));
+    QByteArray createCurvatureVertColor(const VectorXf& curvature, const QColor& colSulci = QColor(50,50,50), const QColor& colGyri = QColor(125,125,125));
 
     Renderable3DEntity*     m_pRenderable3DEntity;
     Renderable3DEntity*     m_pRenderable3DEntityActivationOverlay;
