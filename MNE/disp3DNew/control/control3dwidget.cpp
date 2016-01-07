@@ -86,6 +86,7 @@ Control3DWidget::Control3DWidget(QWidget* parent)
     BrainTreeDelegate* pBrainTreeDelegate = new BrainTreeDelegate(this);
     ui->m_treeView_loadedData->setItemDelegate(pBrainTreeDelegate);
     ui->m_treeView_loadedData->setHeaderHidden(true);
+    ui->m_treeView_loadedData->setEditTriggers(QAbstractItemView::CurrentChanged);
 }
 
 

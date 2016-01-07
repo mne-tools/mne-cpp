@@ -185,16 +185,19 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     m_pItemSurfColGyri->setData(data, Qt::DecorationRole);
 
     BrainTreeMetaItem *itemSurfFileName = new BrainTreeMetaItem(BrainTreeModelItemTypes::SurfaceFileName, tSurface.fileName());
+    itemSurfFileName->setEditable(false);
     *this<<itemSurfFileName;
     data.setValue(tSurface.fileName());
     itemSurfFileName->setData(data, BrainTreeMetaItemRoles::SurfaceFileName);
 
     BrainTreeMetaItem *itemSurfType = new BrainTreeMetaItem(BrainTreeModelItemTypes::SurfaceType, tSurface.surf());
+    itemSurfType->setEditable(false);
     *this<<itemSurfType;
     data.setValue(tSurface.surf());
     itemSurfType->setData(data, BrainTreeMetaItemRoles::SurfaceType);
 
     BrainTreeMetaItem *itemSurfPath = new BrainTreeMetaItem(BrainTreeModelItemTypes::SurfaceFilePath, tSurface.filePath());
+    itemSurfPath->setEditable(false);
     *this<<itemSurfPath;
     data.setValue(tSurface.filePath());
     itemSurfPath->setData(data, BrainTreeMetaItemRoles::SurfaceFilePath);
