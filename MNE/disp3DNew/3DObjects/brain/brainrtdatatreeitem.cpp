@@ -97,7 +97,8 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     this->setData(iHemi, BrainRTDataTreeItemRoles::RTHemi);
 
     //Set data based on clusterd or full source space
-    if(tForwardSolution.src[iHemi].isClustered()) {
+    bool isClustered = tForwardSolution.src[iHemi].isClustered();
+    if(isClustered) {
         //Source Space IS clustered
         switch(iHemi) {
             case 0:
@@ -151,28 +152,32 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     data.setValue(false);
     pItemRTDataStreamStatus->setData(data, BrainTreeItemRoles::RTDataStreamStatus);
 
-    QString sIsClustered = tForwardSolution.src[iHemi].isClustered() ? "Clustered" : "Full";
+    QString sIsClustered = isClustered ? "Clustered" : "Full";
     BrainTreeItem* pItemSourceSpaceType = new BrainTreeItem(BrainTreeModelItemTypes::RTDataSourceSpaceType, sIsClustered);
     *this<<pItemSourceSpaceType;
     data.setValue(sIsClustered);
     pItemSourceSpaceType->setData(data, BrainTreeItemRoles::RTDataSourceSpaceType);
 
-    m_pItemColormapType = new BrainTreeItem(BrainTreeModelItemTypes::RTDataColormapType, "Hot Negative 2");
-    *this<<m_pItemColormapType;
+    BrainTreeItem* pItemColormapType = new BrainTreeItem(BrainTreeModelItemTypes::RTDataColormapType, "Hot Negative 2");
+    connect(pItemColormapType, &BrainTreeItem::rtDataColormapTypeUpdated,
+            this, &BrainRTDataTreeItem::onColormapTypeChanged);
+    *this<<pItemColormapType;
     data.setValue(QString("Hot Negative 2"));
-    m_pItemColormapType->setData(data, BrainTreeItemRoles::RTDataColormapType);
+    pItemColormapType->setData(data, BrainTreeItemRoles::RTDataColormapType);
 
-    m_pItemSourceLocNormValue = new BrainTreeItem(BrainTreeModelItemTypes::RTDataNormalizationValue, "0.1");
-    *this<<m_pItemSourceLocNormValue;
+    BrainTreeItem* pItemSourceLocNormValue = new BrainTreeItem(BrainTreeModelItemTypes::RTDataNormalizationValue, "0.1");
+    connect(pItemSourceLocNormValue, &BrainTreeItem::rtDataNormalizationValueUpdated,
+            this, &BrainRTDataTreeItem::onDataNormalizationValueChanged);
+    *this<<pItemSourceLocNormValue;
     data.setValue(0.1);
-    m_pItemSourceLocNormValue->setData(data, BrainTreeItemRoles::RTDataNormalizationValue);
+    pItemSourceLocNormValue->setData(data, BrainTreeItemRoles::RTDataNormalizationValue);
 
-    BrainTreeItem *itemStreamingInterval = new BrainTreeItem(BrainTreeModelItemTypes::RTDataTimeInterval, "1000");
-    connect(itemStreamingInterval, &BrainTreeItem::rtDataTimeIntervalUpdated,
-            this, &BrainRTDataTreeItem::onStreamingIntervalChanged);
-    *this<<itemStreamingInterval;
+    BrainTreeItem *pItemStreamingInterval = new BrainTreeItem(BrainTreeModelItemTypes::RTDataTimeInterval, "1000");
+    connect(pItemStreamingInterval, &BrainTreeItem::rtDataTimeIntervalUpdated,
+            this, &BrainRTDataTreeItem::onTimeIntervalChanged);
+    *this<<pItemStreamingInterval;
     data.setValue(1000);
-    itemStreamingInterval->setData(data, BrainTreeItemRoles::RTDataTimeInterval);
+    pItemStreamingInterval->setData(data, BrainTreeItemRoles::RTDataTimeInterval);
 
 //    BrainTreeItem *itemLoopedStreaming = new BrainTreeItem(BrainTreeModelItemTypes::RTDataLoopedStreaming, "Looping on/off");
 //    itemLoopedStreaming->setCheckable(true);
@@ -202,7 +207,7 @@ bool BrainRTDataTreeItem::updateData(const MNESourceEstimate& tSourceEstimate)
 
     int iStartIdx = this->data(BrainRTDataTreeItemRoles::RTStartIdx).toInt();
     int iEndIdx = this->data(BrainRTDataTreeItemRoles::RTEndIdx).toInt();
-    m_pStcDataWorker->addData(tSourceEstimate.data.block(iStartIdx, 0, iEndIdx-iStartIdx+1, 3), m_pItemColormapType->data(BrainTreeItemRoles::RTDataColormapType).toString());
+    m_pStcDataWorker->addData(tSourceEstimate.data.block(iStartIdx, 0, iEndIdx-iStartIdx+1, 3));
 
     QVariant data;
     MatrixXd subData = tSourceEstimate.data.block(iStartIdx, 0, iEndIdx-iStartIdx+1, 3);
@@ -237,7 +242,23 @@ void BrainRTDataTreeItem::onStcSample(QByteArray sourceColorSamples)
 
 //*************************************************************************************************************
 
-void BrainRTDataTreeItem::onStreamingIntervalChanged(const int& usec)
+void BrainRTDataTreeItem::onColormapTypeChanged(const QString& sColormapType)
 {
-    m_pStcDataWorker->setInterval(usec);
+    m_pStcDataWorker->setColormapType(sColormapType);
+}
+
+
+//*************************************************************************************************************
+
+void BrainRTDataTreeItem::onTimeIntervalChanged(const int& iMSec)
+{
+    m_pStcDataWorker->setInterval(iMSec);
+}
+
+
+//*************************************************************************************************************
+
+void BrainRTDataTreeItem::onDataNormalizationValueChanged(const double& dValue)
+{
+    m_pStcDataWorker->setNormalization(dValue);
 }

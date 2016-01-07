@@ -103,15 +103,17 @@ public:
 
     ~StcDataWorker();
 
-//    void setIntervall(int intervall);
-
-    void addData(const MatrixXd& data, const QString& sColorMapType = "Hot Negative 2");
+    void addData(const MatrixXd& data);
 
     void clear();
 
     void setAverage(qint32 samples);
 
-    void setInterval(int usec);
+    void setInterval(const int& iMSec);
+
+    void setColormapType(const QString& sColormapType);
+
+    void setNormalization(const double& dValue);
 
     void setLoop(bool looping);
 
@@ -126,7 +128,7 @@ protected:
     virtual void run();
 
 private:
-    QByteArray transformDataToColor(const VectorXd& data, const QString &sColormap);
+    QByteArray transformDataToColor(const VectorXd& data);
 
     QMutex              m_qMutex;
 
@@ -138,6 +140,9 @@ private:
     qint32      m_iAverageSamples;
     qint32      m_iCurrentSample;
     qint32      m_iMSecIntervall;
+
+    double      m_dNormalization;
+    double      m_dNormalizationMax;
 
     QString     m_sColormap;
 };
