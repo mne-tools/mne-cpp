@@ -87,8 +87,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Reimplemented virtual functions
-    *
+    * QItemDelegate functions
     */
     QWidget *createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const;
     void setEditorData(QWidget* editor, const QModelIndex& index) const;

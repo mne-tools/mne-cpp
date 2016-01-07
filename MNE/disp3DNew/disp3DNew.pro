@@ -91,7 +91,7 @@ SOURCES += \
     view3d.cpp \
     3DObjects/brain/brain.cpp \
     3DObjects/brain/braintreemodel.cpp \
-    3DObjects/brain/braintreeitem.cpp \
+    3DObjects/brain/braintreemetaitem.cpp \
     3DObjects/brain/brainsurfacetreeitem.cpp \
     3DObjects/brain/brainsurfacesettreeitem.cpp \
     3DObjects/brain/brainannotationtreeitem.cpp \
@@ -109,7 +109,7 @@ HEADERS += \
     view3d.h \
     3DObjects/brain/brain.h \
     3DObjects/brain/braintreemodel.h \
-    3DObjects/brain/braintreeitem.h \
+    3DObjects/brain/braintreemetaitem.h \
     3DObjects/brain/brainsurfacetreeitem.h \
     3DObjects/brain/brainsurfacesettreeitem.h \
     3DObjects/brain/brainannotationtreeitem.h \

@@ -142,48 +142,48 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     }
 
     //Add surface meta information as item children
-    BrainTreeItem* pItemRTDataStreamStatus = new BrainTreeItem(BrainTreeModelItemTypes::RTDataStreamStatus, "Stream data on/off");
-    connect(pItemRTDataStreamStatus, &BrainTreeItem::checkStateChanged,
+    BrainTreeMetaItem* pItemRTDataStreamStatus = new BrainTreeMetaItem(BrainTreeModelItemTypes::RTDataStreamStatus, "Stream data on/off");
+    connect(pItemRTDataStreamStatus, &BrainTreeMetaItem::checkStateChanged,
             this, &BrainRTDataTreeItem::onCheckStateWorkerChanged);
     *this<<pItemRTDataStreamStatus;
     pItemRTDataStreamStatus->setCheckable(true);
     pItemRTDataStreamStatus->setCheckState(Qt::Unchecked);
     data.setValue(false);
-    pItemRTDataStreamStatus->setData(data, BrainTreeItemRoles::RTDataStreamStatus);
+    pItemRTDataStreamStatus->setData(data, BrainTreeMetaItemRoles::RTDataStreamStatus);
 
     QString sIsClustered = isClustered ? "Clustered" : "Full";
-    BrainTreeItem* pItemSourceSpaceType = new BrainTreeItem(BrainTreeModelItemTypes::RTDataSourceSpaceType, sIsClustered);
+    BrainTreeMetaItem* pItemSourceSpaceType = new BrainTreeMetaItem(BrainTreeModelItemTypes::RTDataSourceSpaceType, sIsClustered);
     *this<<pItemSourceSpaceType;
     data.setValue(sIsClustered);
-    pItemSourceSpaceType->setData(data, BrainTreeItemRoles::RTDataSourceSpaceType);
+    pItemSourceSpaceType->setData(data, BrainTreeMetaItemRoles::RTDataSourceSpaceType);
 
-    BrainTreeItem* pItemColormapType = new BrainTreeItem(BrainTreeModelItemTypes::RTDataColormapType, "Hot Negative 2");
-    connect(pItemColormapType, &BrainTreeItem::rtDataColormapTypeUpdated,
+    BrainTreeMetaItem* pItemColormapType = new BrainTreeMetaItem(BrainTreeModelItemTypes::RTDataColormapType, "Hot Negative 2");
+    connect(pItemColormapType, &BrainTreeMetaItem::rtDataColormapTypeUpdated,
             this, &BrainRTDataTreeItem::onColormapTypeChanged);
     *this<<pItemColormapType;
     data.setValue(QString("Hot Negative 2"));
-    pItemColormapType->setData(data, BrainTreeItemRoles::RTDataColormapType);
+    pItemColormapType->setData(data, BrainTreeMetaItemRoles::RTDataColormapType);
 
-    BrainTreeItem* pItemSourceLocNormValue = new BrainTreeItem(BrainTreeModelItemTypes::RTDataNormalizationValue, "0.1");
-    connect(pItemSourceLocNormValue, &BrainTreeItem::rtDataNormalizationValueUpdated,
+    BrainTreeMetaItem* pItemSourceLocNormValue = new BrainTreeMetaItem(BrainTreeModelItemTypes::RTDataNormalizationValue, "0.1");
+    connect(pItemSourceLocNormValue, &BrainTreeMetaItem::rtDataNormalizationValueUpdated,
             this, &BrainRTDataTreeItem::onDataNormalizationValueChanged);
     *this<<pItemSourceLocNormValue;
     data.setValue(0.1);
-    pItemSourceLocNormValue->setData(data, BrainTreeItemRoles::RTDataNormalizationValue);
+    pItemSourceLocNormValue->setData(data, BrainTreeMetaItemRoles::RTDataNormalizationValue);
 
-    BrainTreeItem *pItemStreamingInterval = new BrainTreeItem(BrainTreeModelItemTypes::RTDataTimeInterval, "1000");
-    connect(pItemStreamingInterval, &BrainTreeItem::rtDataTimeIntervalUpdated,
+    BrainTreeMetaItem *pItemStreamingInterval = new BrainTreeMetaItem(BrainTreeModelItemTypes::RTDataTimeInterval, "1000");
+    connect(pItemStreamingInterval, &BrainTreeMetaItem::rtDataTimeIntervalUpdated,
             this, &BrainRTDataTreeItem::onTimeIntervalChanged);
     *this<<pItemStreamingInterval;
     data.setValue(1000);
-    pItemStreamingInterval->setData(data, BrainTreeItemRoles::RTDataTimeInterval);
+    pItemStreamingInterval->setData(data, BrainTreeMetaItemRoles::RTDataTimeInterval);
 
-//    BrainTreeItem *itemLoopedStreaming = new BrainTreeItem(BrainTreeModelItemTypes::RTDataLoopedStreaming, "Looping on/off");
+//    BrainTreeMetaItem *itemLoopedStreaming = new BrainTreeMetaItem(BrainTreeModelItemTypes::RTDataLoopedStreaming, "Looping on/off");
 //    itemLoopedStreaming->setCheckable(true);
 //    itemLoopedStreaming->setCheckState(Qt::Unchecked);
 //    *this<<itemLoopedStreaming;
 
-//    BrainTreeItem *itemAveragedStreaming = new BrainTreeItem(BrainTreeModelItemTypes::RTDataNumberAverages, "Number of Averages");
+//    BrainTreeMetaItem *itemAveragedStreaming = new BrainTreeMetaItem(BrainTreeModelItemTypes::RTDataNumberAverages, "Number of Averages");
 //    *this<<itemAveragedStreaming;
 
     //set rt data corresponding to the hemisphere

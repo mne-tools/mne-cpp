@@ -157,7 +157,6 @@ public:
     bool addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
 
 private:
-
 };
 
 } //NAMESPACE DISP3DNEWLIB

@@ -47,7 +47,7 @@
 #include "../../helpers/types.h"
 #include "../../rt/sourcelevel/rtdataworker.h"
 
-#include "braintreeitem.h"
+#include "braintreemetaitem.h"
 
 #include "mne/mne_sourceestimate.h"
 #include "mne/mne_forwardsolution.h"
