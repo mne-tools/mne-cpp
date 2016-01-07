@@ -125,13 +125,19 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
         }
     }
 
+    int iStartIdx = this->data(BrainRTDataTreeItemRoles::RTStartIdx).toInt();
+    int iEndIdx = this->data(BrainRTDataTreeItemRoles::RTEndIdx).toInt();
     QVariant data;
 
-    data.setValue(tSourceEstimate.data);
+    MatrixXd matHemisphereData = tSourceEstimate.data.block(iStartIdx, 0, iEndIdx-iStartIdx+1, tSourceEstimate.data.cols());
+    data.setValue(matHemisphereData);
+    qDebug()<<matHemisphereData.rows()<<"x"<<matHemisphereData.cols();
     this->setData(data, BrainRTDataTreeItemRoles::RTData);
 
     if(iHemi != -1 && iHemi < tForwardSolution.src.size()) {
-        data.setValue(tForwardSolution.src[iHemi].vertno); // TODO: When clustered source space, these idx no's are the annotation labels
+        //Only take the vertno's corresponding to the hemisphere
+        //VectorXi vecHemispehreVertNo = tForwardSolution.src[iHemi].vertno.segment(iStartIdx, iEndIdx-iStartIdx+1);
+        data.setValue(tForwardSolution.src[iHemi].vertno); //TODO: When clustered source space, these idx no's are the annotation labels
         this->setData(data, BrainRTDataTreeItemRoles::RTVerticesIdx);
     }
 
@@ -176,7 +182,8 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
 //    BrainTreeItem *itemAveragedStreaming = new BrainTreeItem(BrainTreeModelItemTypes::RTDataNumberAverages, "Number of Averages");
 //    *this<<itemAveragedStreaming;
 
-    m_pStcDataWorker->addData(tSourceEstimate.data);
+    //set rt data corresponding to the hemisphere
+    m_pStcDataWorker->addData(matHemisphereData);
 
     m_bInit = true;
 
@@ -193,10 +200,13 @@ bool BrainRTDataTreeItem::updateData(const MNESourceEstimate& tSourceEstimate)
         return false;
     }
 
-    m_pStcDataWorker->addData(tSourceEstimate.data, m_pItemColormapType->data(BrainTreeItemRoles::RTDataColormapType).toString());
+    int iStartIdx = this->data(BrainRTDataTreeItemRoles::RTStartIdx).toInt();
+    int iEndIdx = this->data(BrainRTDataTreeItemRoles::RTEndIdx).toInt();
+    m_pStcDataWorker->addData(tSourceEstimate.data.block(iStartIdx, 0, iEndIdx-iStartIdx+1, 3), m_pItemColormapType->data(BrainTreeItemRoles::RTDataColormapType).toString());
 
     QVariant data;
-    data.setValue(tSourceEstimate.data);
+    MatrixXd subData = tSourceEstimate.data.block(iStartIdx, 0, iEndIdx-iStartIdx+1, 3);
+    data.setValue(subData);
     this->setData(data, BrainRTDataTreeItemRoles::RTData);
 
     return true;
@@ -219,24 +229,10 @@ void BrainRTDataTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 
 //*************************************************************************************************************
 
-void BrainRTDataTreeItem::onStcSample(MatrixX3f sourceColorSamples)
+void BrainRTDataTreeItem::onStcSample(QByteArray sourceColorSamples)
 {
-    QTime time;
-    time.start();
-
-    int iStartIdx = this->data(BrainRTDataTreeItemRoles::RTStartIdx).toInt();
-    int iEndIdx = this->data(BrainRTDataTreeItemRoles::RTEndIdx).toInt();
-
-//    //Normalize source loc result and cut out the hemisphere part
-//    Matrix3Xf subColorSamples = sourceSamples.block(iStartIdx, 0, iEndIdx-iStartIdx+1, 3);
-//    subColorSamples /= (m_dStcNormMax/100.0) * m_pItemSourceLocNormValue->data(BrainTreeItemRoles::RTDataNormalizationValue).toDouble();
-
-//    QString sColorMapType = m_pItemColormapType->data(BrainTreeItemRoles::RTDataColormapType).toString();
-////    qDebug()<<"BrainRTDataTreeItem::onStcSample"<<time.elapsed()<<"msecs";
-
-    emit rtDataUpdated(sourceColorSamples.block(iStartIdx, 0, iEndIdx-iStartIdx+1, 3), this->data(BrainRTDataTreeItemRoles::RTVerticesIdx).value<VectorXi>());
-
-    }
+    emit rtDataUpdated(sourceColorSamples, this->data(BrainRTDataTreeItemRoles::RTVerticesIdx).value<VectorXi>());
+}
 
 
 //*************************************************************************************************************

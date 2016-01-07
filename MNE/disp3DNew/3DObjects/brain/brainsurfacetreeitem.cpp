@@ -88,7 +88,12 @@ void  BrainSurfaceTreeItem::setData(const QVariant& value, int role)
 
     switch(role) {
     case BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert:
-        m_pRenderable3DEntity->setVertColor(value.value<MatrixX3f>());
+        QTime time;
+        time.start();
+        m_pRenderable3DEntity->setVertColor(value.value<QByteArray>());
+        int timepassed = time.elapsed();
+        qDebug()<<"BrainSurfaceTreeItem::setData:setVertColor:"<<timepassed<<"msecs";
+
         break;
 
 //    case BrainSurfaceTreeItemRoles::SurfaceRTSourceLocColor:
@@ -115,10 +120,10 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     m_pRenderable3DEntityActivationOverlay->addComponent(transform);
 
     //Create color from curvature information with default gyri and sulcus colors
-    MatrixX3f matCurvatureColor = createCurvatureVertColor(tSurface.curv());
+    QByteArray arrayCurvatureColor = createCurvatureVertColor(tSurface.curv());
 
     //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset(), matCurvatureColor);
+    m_pRenderable3DEntity->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset(), arrayCurvatureColor);
 
     //Generate activation overlay surface
 //    MatrixX3f overlayAdds = tSurface.rr();
@@ -134,7 +139,7 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     //Add data which is held by this BrainSurfaceTreeItem
     QVariant data;
 
-    data.setValue(matCurvatureColor);
+    data.setValue(arrayCurvatureColor);
     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert);
     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurvatureColorVert);
 
@@ -158,7 +163,6 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
 
     data.setValue(m_pRenderable3DEntityActivationOverlay);
     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceRenderable3DEntityAcivationOverlay);
-
 
     //Add surface meta information as item children
     m_pItemSurfColorInfoOrigin = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceColorInfoOrigin, "Color from curvature");
@@ -210,16 +214,16 @@ void BrainSurfaceTreeItem::updateVertColor()
     if(this->hasChildren()) {
         QString sColorInfoOrigin = m_pItemSurfColorInfoOrigin->data(BrainTreeItemRoles::SurfaceColorInfoOrigin).toString();
         QVariant data;
-        MatrixX3f matNewVertColor;
+        QByteArray arrayNewVertColor;
 
         if(sColorInfoOrigin == "Color from curvature") {
             //Create color from curvature information with default gyri and sulcus colors
             QColor colorSulci = m_pItemSurfColSulci->data(BrainTreeItemRoles::SurfaceColorSulci).value<QColor>();
             QColor colorGyri = m_pItemSurfColGyri->data(BrainTreeItemRoles::SurfaceColorGyri).value<QColor>();
 
-            matNewVertColor = createCurvatureVertColor(this->data(BrainSurfaceTreeItemRoles::SurfaceCurv).value<VectorXf>(), colorSulci, colorGyri);
+            arrayNewVertColor = createCurvatureVertColor(this->data(BrainSurfaceTreeItemRoles::SurfaceCurv).value<VectorXf>(), colorSulci, colorGyri);
 
-            data.setValue(matNewVertColor);
+            data.setValue(arrayNewVertColor);
             this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurvatureColorVert);
             this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert);
 
@@ -231,10 +235,10 @@ void BrainSurfaceTreeItem::updateVertColor()
             //Find the BrainAnnotationTreeItem
             for(int i = 0; i<this->QStandardItem::parent()->rowCount(); i++) {
                 if(this->QStandardItem::parent()->child(i,0)->type() == BrainTreeModelItemTypes::AnnotationItem) {
-                    matNewVertColor = this->QStandardItem::parent()->child(i,0)->data(BrainAnnotationTreeItemRoles::AnnotColors).value<MatrixX3f>();
+                    arrayNewVertColor = this->QStandardItem::parent()->child(i,0)->data(BrainAnnotationTreeItemRoles::AnnotColors).value<QByteArray>();
 
                     //Set renderable 3D entity mesh and color data
-                    data.setValue(matNewVertColor);
+                    data.setValue(arrayNewVertColor);
                     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceAnnotationColorVert);
                     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert);
 
@@ -249,64 +253,75 @@ void BrainSurfaceTreeItem::updateVertColor()
 
 //*************************************************************************************************************
 
-void BrainSurfaceTreeItem::updateRtVertColor(const MatrixX3f& sourceColorSamples, const VectorXi& vertexIndex)
+void BrainSurfaceTreeItem::updateRtVertColor(const QByteArray& sourceColorSamples, const VectorXi& vertexIndex)
 {
     QTime time;
     time.start();
 
-    if(sourceColorSamples.rows() != vertexIndex.rows()) {
-        qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor - number of rows in sample do not not match with idx/no number of rows in vertex. Returning...";
+    if((sourceColorSamples.size()/((int)sizeof(float)*3)) != vertexIndex.rows()) {
+        qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor - number of rows in sample ("<<sourceColorSamples.size()/((int)sizeof(float)*3)<<") do not not match with idx/no number of rows in vertex ("<<vertexIndex.rows()<<"). Returning...";
         return;
     }
 
     //This function is called for every new sample point and therfore it must be kept highly efficient!
     QString sColorInfoOrigin = m_pItemSurfColorInfoOrigin->data(BrainTreeItemRoles::SurfaceColorInfoOrigin).toString();
-    MatrixX3f matCurrentVertColor;
+    QByteArray arrayCurrentVertColor;
 
     if(sColorInfoOrigin == "Color from curvature") {
-        matCurrentVertColor = this->data(BrainSurfaceTreeItemRoles::SurfaceCurvatureColorVert).value<MatrixX3f>();
+        arrayCurrentVertColor = this->data(BrainSurfaceTreeItemRoles::SurfaceCurvatureColorVert).value<QByteArray>();
     }
 
     if(sColorInfoOrigin == "Color from annotation") {
-        matCurrentVertColor = this->data(BrainSurfaceTreeItemRoles::SurfaceAnnotationColorVert).value<MatrixX3f>();
+        arrayCurrentVertColor = this->data(BrainSurfaceTreeItemRoles::SurfaceAnnotationColorVert).value<QByteArray>();
     }
 
-    for(int i = 0; i<sourceColorSamples.rows(); i++) {
-        if(vertexIndex(i) > 0 && vertexIndex(i) < matCurrentVertColor.rows()) {
-            matCurrentVertColor.row(vertexIndex(i)) = sourceColorSamples.row(i);
-        } else {
-            qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor - Source loc vertex index exceeds matrix dimensions!";
-        }
+    //Create final QByteArray with colors based on the current anatomical information
+    const float *rawSourceColorSamples = reinterpret_cast<const float *>(sourceColorSamples.data());
+    int idxSourceColorSamples = 0;
+    float *rawArrayCurrentVertColor = reinterpret_cast<float *>(arrayCurrentVertColor.data());
+
+    for(int i = 0; i<vertexIndex.rows(); i++) {
+        rawArrayCurrentVertColor[vertexIndex(i)*3+0] = rawSourceColorSamples[idxSourceColorSamples++];
+        rawArrayCurrentVertColor[vertexIndex(i)*3+1] = rawSourceColorSamples[idxSourceColorSamples++];
+        rawArrayCurrentVertColor[vertexIndex(i)*3+2] = rawSourceColorSamples[idxSourceColorSamples++];
     }
 
+    //Set new data. Here we also pass the new color values to the renderer (see setData function)
     QVariant data;
-    data.setValue(matCurrentVertColor);
+    data.setValue(arrayCurrentVertColor);
     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceRTSourceLocColor);
+
+    int timepassed = time.elapsed();
+    qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor"<<timepassed<<"msecs";
+
     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert);
 
-    //qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor"<<time.elapsed()<<"msecs";
-    //Return here because the new colors will be set to the renderable entity in the setData() function with the role BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert
     return;
 }
 
 
 //*************************************************************************************************************
 
-MatrixX3f BrainSurfaceTreeItem::createCurvatureVertColor(const VectorXf& curvature, const QColor& colSulci, const QColor& colGyri)
+QByteArray BrainSurfaceTreeItem::createCurvatureVertColor(const VectorXf& curvature, const QColor& colSulci, const QColor& colGyri)
 {
-    MatrixX3f matCurvatureColor(curvature.rows(), 3);
+    QByteArray arrayCurvatureColor;
+    arrayCurvatureColor.resize(curvature.rows() * 3 * (int)sizeof(float));
+    float *rawColorArray = reinterpret_cast<float *>(arrayCurvatureColor.data());
 
-    for(int i = 0; i<curvature.rows() ; i++) {
+    int idxColor = 0;
+
+    for(int i = 0; i<curvature.rows(); i++) {
+        //Color (this is the default color and will be used until the updateVertColor function was called)
         if(curvature[i] >= 0) {
-            matCurvatureColor(i, 0) = colSulci.redF();
-            matCurvatureColor(i, 1) = colSulci.greenF();
-            matCurvatureColor(i, 2) = colSulci.blueF();
+            rawColorArray[idxColor++] = colSulci.redF();
+            rawColorArray[idxColor++] = colSulci.greenF();
+            rawColorArray[idxColor++] = colSulci.blueF();
         } else {
-            matCurvatureColor(i, 0) = colGyri.redF();
-            matCurvatureColor(i, 1) = colGyri.greenF();
-            matCurvatureColor(i, 2) = colGyri.blueF();
+            rawColorArray[idxColor++] = colGyri.redF();
+            rawColorArray[idxColor++] = colGyri.greenF();
+            rawColorArray[idxColor++] = colGyri.blueF();
         }
     }
 
-    return matCurvatureColor;
+    return arrayCurvatureColor;
 }

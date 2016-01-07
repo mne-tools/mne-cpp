@@ -120,18 +120,17 @@ public:
     void start();
 
 signals:
-    void stcSample(Eigen::MatrixX3f colorSample);
+    void stcSample(QByteArray colorSample);
 
 protected:
     virtual void run();
 
 private:
-    QList<MatrixX3f> transformDataToColor(const MatrixXd& data, const QString &sColormap);
+    QByteArray transformDataToColor(const VectorXd& data, const QString &sColormap);
 
     QMutex              m_qMutex;
 
     MatrixXd            m_matData;        /**< List that holds the fiff matrix data <n_channels x n_samples> */
-    QList<MatrixX3f>    m_lDataColor;       /**< List that holds the fiff matrix data <n_channels x n_samples> in rgb color values */
 
     bool        m_bIsRunning;
     bool        m_bIsLooping;
