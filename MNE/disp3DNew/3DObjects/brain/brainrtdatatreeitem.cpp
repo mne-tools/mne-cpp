@@ -57,10 +57,9 @@ using namespace DISP3DNEWLIB;
 BrainRTDataTreeItem::BrainRTDataTreeItem(const int &iType, const QString &text)
 : AbstractTreeItem(iType, text)
 , m_bInit(false)
-, m_pStcDataWorker(new StcDataWorker(this))
-, m_dStcNormMax(10.0)
+, m_pRtDataWorker(new StcDataWorker(this))
 {
-    connect(m_pStcDataWorker, &StcDataWorker::stcSample,
+    connect(m_pRtDataWorker, &StcDataWorker::stcSample,
             this, &BrainRTDataTreeItem::onStcSample);
 }
 
@@ -188,7 +187,7 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
 //    *this<<itemAveragedStreaming;
 
     //set rt data corresponding to the hemisphere
-    m_pStcDataWorker->addData(matHemisphereData);
+    m_pRtDataWorker->addData(matHemisphereData);
 
     m_bInit = true;
 
@@ -207,7 +206,7 @@ bool BrainRTDataTreeItem::updateData(const MNESourceEstimate& tSourceEstimate)
 
     int iStartIdx = this->data(BrainRTDataTreeItemRoles::RTStartIdx).toInt();
     int iEndIdx = this->data(BrainRTDataTreeItemRoles::RTEndIdx).toInt();
-    m_pStcDataWorker->addData(tSourceEstimate.data.block(iStartIdx, 0, iEndIdx-iStartIdx+1, 3));
+    m_pRtDataWorker->addData(tSourceEstimate.data.block(iStartIdx, 0, iEndIdx-iStartIdx+1, 3));
 
     QVariant data;
     MatrixXd subData = tSourceEstimate.data.block(iStartIdx, 0, iEndIdx-iStartIdx+1, 3);
@@ -220,14 +219,14 @@ bool BrainRTDataTreeItem::updateData(const MNESourceEstimate& tSourceEstimate)
 
 //*************************************************************************************************************
 
-void BrainRTDataTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+void BrainRTDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState)
 {
     if(checkState == Qt::Checked) {
         qDebug()<<"Start stc worker";
-        m_pStcDataWorker->start();
+        m_pRtDataWorker->start();
     } else if(checkState == Qt::Unchecked) {
         qDebug()<<"Stop stc worker";
-        m_pStcDataWorker->stop();
+        m_pRtDataWorker->stop();
     }
 }
 
@@ -244,7 +243,7 @@ void BrainRTDataTreeItem::onStcSample(QByteArray sourceColorSamples)
 
 void BrainRTDataTreeItem::onColormapTypeChanged(const QString& sColormapType)
 {
-    m_pStcDataWorker->setColormapType(sColormapType);
+    m_pRtDataWorker->setColormapType(sColormapType);
 }
 
 
@@ -252,7 +251,7 @@ void BrainRTDataTreeItem::onColormapTypeChanged(const QString& sColormapType)
 
 void BrainRTDataTreeItem::onTimeIntervalChanged(const int& iMSec)
 {
-    m_pStcDataWorker->setInterval(iMSec);
+    m_pRtDataWorker->setInterval(iMSec);
 }
 
 
@@ -260,5 +259,5 @@ void BrainRTDataTreeItem::onTimeIntervalChanged(const int& iMSec)
 
 void BrainRTDataTreeItem::onDataNormalizationValueChanged(const double& dValue)
 {
-    m_pStcDataWorker->setNormalization(dValue);
+    m_pRtDataWorker->setNormalization(dValue);
 }
