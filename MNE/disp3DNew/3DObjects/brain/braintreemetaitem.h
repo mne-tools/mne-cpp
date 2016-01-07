@@ -91,7 +91,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* BrainTreeMetaItem provides a generic brain tree item to hold meta information about other items.
+* BrainTreeMetaItem provides a generic brain tree item to hold meta information about other brain tree items.
 *
 * @brief Provides a generic brain tree item.
 */
@@ -106,6 +106,9 @@ public:
     //=========================================================================================================
     /**
     * Default constructor.
+    *
+    * @param[in] iType      The type of the item. See types.h for declaration and definition.
+    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
     explicit BrainTreeMetaItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "");
 
@@ -123,16 +126,45 @@ public:
     void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
 signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the color of the curvature data changed.
+    */
     void curvColorsUpdated();
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the color origin (curvature or annotation) changed.
+    */
     void colorInfoOriginUpdated();
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the time interval of the data streaming changed.
+    *
+    * @param[in] iMSec     The time interval in mSecs.
+    */
     void rtDataTimeIntervalUpdated(const int& iMSec);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the normalization value of the data streaming changed.
+    *
+    * @param[in] dValue     The new normalization value.
+    */
     void rtDataNormalizationValueUpdated(const double& dValue);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the colormap type of the data streaming changed.
+    *
+    * @param[in] sColormapType     The new colormap type.
+    */
     void rtDataColormapTypeUpdated(const QString& sColormapType);
 
 private:
-
 };
 
 } //NAMESPACE DISP3DNEWLIB
 
-#endif // BrainTreeMetaItem_H
+#endif // BRAINTREEMETAITEM_H

@@ -60,6 +60,7 @@ CustomMesh::CustomMesh()
 , m_pNormalDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
 , m_pColorDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
 , m_pIndexDataBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::IndexBuffer))
+, m_pColorAttribute(new Qt3DRender::QAttribute())
 , m_iNumVert(0)
 {
 
@@ -94,7 +95,7 @@ bool CustomMesh::setVertColor(const QByteArray& tArrayColors)
     }
 
     //Update color
-    m_pCcolorAttribute->buffer()->setData(tArrayColors);
+    m_pColorAttribute->buffer()->setData(tArrayColors);
 
     return true;
 }
@@ -200,15 +201,15 @@ bool CustomMesh::createCustomMesh(const MatrixX3f& tMatVert, const MatrixX3f& tM
     normalAttribute->setCount(tMatVert.rows());
     normalAttribute->setName(Qt3DRender::QAttribute::defaultNormalAttributeName());
 
-    m_pCcolorAttribute = new Qt3DRender::QAttribute();
-    m_pCcolorAttribute->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
-    m_pCcolorAttribute->setBuffer(m_pColorDataBuffer);
-    m_pCcolorAttribute->setDataType(Qt3DRender::QAttribute::Float);
-    m_pCcolorAttribute->setDataSize(3);
-    m_pCcolorAttribute->setByteOffset(0);
-    m_pCcolorAttribute->setByteStride(3 * sizeof(float));
-    m_pCcolorAttribute->setCount(tMatVert.rows());
-    m_pCcolorAttribute->setName(Qt3DRender::QAttribute::defaultColorAttributeName());
+    m_pColorAttribute = new Qt3DRender::QAttribute();
+    m_pColorAttribute->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
+    m_pColorAttribute->setBuffer(m_pColorDataBuffer);
+    m_pColorAttribute->setDataType(Qt3DRender::QAttribute::Float);
+    m_pColorAttribute->setDataSize(3);
+    m_pColorAttribute->setByteOffset(0);
+    m_pColorAttribute->setByteStride(3 * sizeof(float));
+    m_pColorAttribute->setCount(tMatVert.rows());
+    m_pColorAttribute->setName(Qt3DRender::QAttribute::defaultColorAttributeName());
 
     Qt3DRender::QAttribute *indexAttribute = new Qt3DRender::QAttribute();
     indexAttribute->setAttributeType(Qt3DRender::QAttribute::IndexAttribute);
@@ -221,7 +222,7 @@ bool CustomMesh::createCustomMesh(const MatrixX3f& tMatVert, const MatrixX3f& tM
 
     customGeometry->addAttribute(positionAttribute);
     customGeometry->addAttribute(normalAttribute);
-    customGeometry->addAttribute(m_pCcolorAttribute);
+    customGeometry->addAttribute(m_pColorAttribute);
     customGeometry->addAttribute(indexAttribute);
 
     this->setInstanceCount(1);

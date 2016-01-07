@@ -110,6 +110,8 @@ public:
     //=========================================================================================================
     /**
     * Default constructor.
+    *
+    * @param[in] parent      The parent of the QObject.
     */
     explicit BrainTreeModel(QObject *parent = 0);
 
@@ -121,7 +123,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Overloaded functions
+    * QStandardItemModel functions
     */
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 

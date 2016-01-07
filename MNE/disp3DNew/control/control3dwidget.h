@@ -64,6 +64,7 @@ namespace Ui {
 class Control3DWidget;
 }
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE DISP3DNEWLIB
@@ -92,7 +93,7 @@ using namespace DISPLIB;
 /**
 * User GUI control for View3D.
 *
-* @brief User GUI control for View3D.
+* @brief User GUI control for the View3D.
 */
 class DISP3DNEWSHARED_EXPORT Control3DWidget : public RoundedEdgesWidget
 {
@@ -106,13 +107,13 @@ public:
     /**
     * Default constructor.
     *
+    * @param[in] parent      The parent of the QObject.
     */
     explicit Control3DWidget(QWidget* parent = 0);
 
     //=========================================================================================================
     /**
     * Default destructor.
-    *
     */
     ~Control3DWidget();
 
@@ -135,19 +136,23 @@ protected slots:
 
     //=========================================================================================================
     /**
-    * Slot called when opacity slider was changed
+    * Slot called when opacity slider was changed.
     *
     * @param [in] value         opacity value.
     */
     void onOpacityChange(qint32 value);
 
+    //=========================================================================================================
+    /**
+    * Slot called when the scene color changed.
+    */
     void onSceneColorPicker();
 
 protected:
-    Ui::Control3DWidget*    ui;         /**< The pointer to the QtDesigner ui class. */
+    Ui::Control3DWidget*    ui;                         /**< The pointer to the QtDesigner ui class. */
 
-    QList<View3D::SPtr>     m_lView3D;  /**< List of all connected view3D's. */
-    QColor                  m_colCurrentSceneColor;
+    QList<View3D::SPtr>     m_lView3D;                  /**< List of all connected view3D's. */
+    QColor                  m_colCurrentSceneColor;     /**< Current color of the scene in all View3D's. */
 };
 
 } // NAMESPACE DISP3DNEWLIB
