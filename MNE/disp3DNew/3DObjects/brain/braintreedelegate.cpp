@@ -72,13 +72,17 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
     switch(pAbstractItem->type()) {
         case BrainTreeModelItemTypes::SurfaceColorGyri: {
             QColorDialog *pColorDialog = new QColorDialog(parent);
+            connect(pColorDialog, &QColorDialog::currentColorChanged,
+                    this, &BrainTreeDelegate::onEditorEdited);
             pColorDialog->setWindowTitle("Select Gyri Color");
             pColorDialog->show();
             return pColorDialog;
         }
 
         case BrainTreeModelItemTypes::SurfaceColorSulci: {
-            QColorDialog *pColorDialog = new QColorDialog(parent);
+            QColorDialog *pColorDialog = new QColorDialog();
+            connect(pColorDialog, &QColorDialog::currentColorChanged,
+                    this, &BrainTreeDelegate::onEditorEdited);
             pColorDialog->setWindowTitle("Select Sulci Color");
             pColorDialog->show();
             return pColorDialog;
@@ -101,8 +105,10 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
 
         case BrainTreeModelItemTypes::RTDataNormalizationValue: {
             QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
-            pDoubleSpinBox->setMinimum(0.01);
-            pDoubleSpinBox->setMaximum(10.0);
+            connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                    this, &BrainTreeDelegate::onEditorEdited);
+            pDoubleSpinBox->setMinimum(0.0001);
+            pDoubleSpinBox->setMaximum(10000.0);
             pDoubleSpinBox->setSingleStep(0.01);
             pDoubleSpinBox->setValue(index.model()->data(index, BrainTreeMetaItemRoles::RTDataNormalizationValue).toDouble());
             return pDoubleSpinBox;
@@ -111,6 +117,8 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
 
         case BrainTreeModelItemTypes::RTDataTimeInterval: {
             QSpinBox* pSpinBox = new QSpinBox(parent);
+            connect(pSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+                    this, &BrainTreeDelegate::onEditorEdited);
             pSpinBox->setSuffix(" mSec");
             pSpinBox->setMinimum(1);
             pSpinBox->setMaximum(5000);
@@ -231,7 +239,6 @@ void BrainTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
 
         case BrainTreeModelItemTypes::RTDataNormalizationValue: {
             QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
-
             QVariant data;
             data.setValue(pDoubleSpinBox->value());
 
@@ -262,3 +269,15 @@ void BrainTreeDelegate::updateEditorGeometry(QWidget* editor, const QStyleOption
 {
     editor->setGeometry(option.rect);
 }
+
+
+//*************************************************************************************************************
+
+void BrainTreeDelegate::onEditorEdited()
+{
+    QWidget* editor = qobject_cast<QWidget*>(QObject::sender());
+    emit commitData(editor);
+}
+
+
+
