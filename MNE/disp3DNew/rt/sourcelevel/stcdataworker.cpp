@@ -70,6 +70,8 @@ StcDataWorker::StcDataWorker(QObject* parent)
 , m_iCurrentSample(0)
 , m_iMSecIntervall(1000)
 , m_sColormap("Hot Negative 2")
+, m_dNormalization(1.0)
+, m_dNormalizationMax(10.0)
 {
 }
 
@@ -85,14 +87,13 @@ StcDataWorker::~StcDataWorker()
 
 //*************************************************************************************************************
 
-void StcDataWorker::addData(const MatrixXd& data, const QString& sColormap)
+void StcDataWorker::addData(const MatrixXd& data)
 {
     QMutexLocker locker(&m_qMutex);
     if(data.size() == 0)
         return;
 
     m_matData = data;
-    m_sColormap = sColormap;
 }
 
 
@@ -114,8 +115,8 @@ void StcDataWorker::run()
 
     while(true)
     {
-        QTime timer;
-        timer.start();
+//        QTime timer;
+//        timer.start();
 
         {
             QMutexLocker locker(&m_qMutex);
@@ -162,7 +163,7 @@ void StcDataWorker::run()
             {
                 t_vecAverage /= (double)m_iAverageSamples;
 
-                emit stcSample(transformDataToColor(t_vecAverage, m_sColormap));
+                emit stcSample(transformDataToColor(t_vecAverage));
                 t_vecAverage = VectorXd::Zero(t_vecAverage.rows());
             }
             m_qMutex.unlock();
@@ -176,18 +177,18 @@ void StcDataWorker::run()
 
 //*************************************************************************************************************
 
-QByteArray StcDataWorker::transformDataToColor(const VectorXd& data, const QString& sColorMapType)
+QByteArray StcDataWorker::transformDataToColor(const VectorXd& data)
 {
     //Note: This function needs to be implemented extremley efficient
     QByteArray arrayColor;
     int idxColor = 0;
 
-    if(sColorMapType == "Hot Negative 1") {
+    if(m_sColormap == "Hot Negative 1") {
         arrayColor.resize(data.rows() * 3 * (int)sizeof(float));
         float *rawArrayColors = reinterpret_cast<float *>(arrayColor.data());
 
         for(int r = 0; r<data.rows(); r++) {
-            double dSample = data(r)/((10.0/100.0) * 1.0);
+            double dSample = data(r)/m_dNormalization;
             qint32 iVal = dSample > 255 ? 255 : dSample < 0 ? 0 : dSample;
 
             QRgb qRgb;
@@ -202,12 +203,12 @@ QByteArray StcDataWorker::transformDataToColor(const VectorXd& data, const QStri
         return arrayColor;
     }
 
-    if(sColorMapType == "Hot Negative 2") {
+    if(m_sColormap == "Hot Negative 2") {
         arrayColor.resize(data.rows() * 3 * (int)sizeof(float));
         float *rawArrayColors = reinterpret_cast<float *>(arrayColor.data());
 
         for(int r = 0; r<data.rows(); r++) {
-            double dSample = data(r)/((10.0/100.0) * 1.0);
+            double dSample = data(r)/m_dNormalization;
             qint32 iVal = dSample > 255 ? 255 : dSample < 0 ? 0 : dSample;
 
             QRgb qRgb;
@@ -222,12 +223,12 @@ QByteArray StcDataWorker::transformDataToColor(const VectorXd& data, const QStri
         return arrayColor;
     }
 
-    if(sColorMapType == "Hot") {
+    if(m_sColormap == "Hot") {
         arrayColor.resize(data.rows() * 3 * (int)sizeof(float));
         float *rawArrayColors = reinterpret_cast<float *>(arrayColor.data());
 
         for(int r = 0; r<data.rows(); r++) {
-            double dSample = data(r)/((10.0/100.0) * 1.0);
+            double dSample = data(r)/m_dNormalization;
             qint32 iVal = dSample > 255 ? 255 : dSample < 0 ? 0 : dSample;
 
             QRgb qRgb;
@@ -257,10 +258,28 @@ void StcDataWorker::setAverage(qint32 samples)
 
 //*************************************************************************************************************
 
-void StcDataWorker::setInterval(int usec)
+void StcDataWorker::setInterval(const int& iMSec)
 {
     QMutexLocker locker(&m_qMutex);
-    m_iMSecIntervall = usec;
+    m_iMSecIntervall = iMSec;
+}
+
+
+//*************************************************************************************************************
+
+void StcDataWorker::setColormapType(const QString& sColormapType)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_sColormap = sColormapType;
+}
+
+
+//*************************************************************************************************************
+
+void StcDataWorker::setNormalization(const double& dValue)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_dNormalization = (m_dNormalizationMax/100.0) * dValue;
 }
 
 

@@ -124,7 +124,9 @@ public:
 
 signals:
     void updateSurfaceVertColors();
-    void rtDataTimeIntervalUpdated(const int& usec);
+    void rtDataTimeIntervalUpdated(const int& iMSec);
+    void rtDataNormalizationValueUpdated(const double& dValue);
+    void rtDataColormapTypeUpdated(const QString& sColormapType);
 
 private:
 

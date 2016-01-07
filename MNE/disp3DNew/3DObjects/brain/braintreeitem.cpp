@@ -101,6 +101,16 @@ void  BrainTreeItem::setData(const QVariant& value, int role)
             emit rtDataTimeIntervalUpdated(value.toInt());
             break;
         }
+
+        case BrainTreeItemRoles::RTDataNormalizationValue: {
+            emit rtDataNormalizationValueUpdated(value.toDouble());
+            break;
+        }
+
+        case BrainTreeItemRoles::RTDataColormapType: {
+            emit rtDataColormapTypeUpdated(value.toString());
+            break;
+        }
     }
 }
 

@@ -153,15 +153,15 @@ signals:
 private:
     void onCheckStateChanged(const Qt::CheckState& checkState);
     void onStcSample(QByteArray sourceColorSamples);
-    void onStreamingIntervalChanged(const int& usec);
+    void onColormapTypeChanged(const QString& sColormapType);
+    void onTimeIntervalChanged(const int& iMSec);
+    void onDataNormalizationValueChanged(const double& dValue);
 
     bool        m_bInit;
 
     double      m_dStcNormMax;
 
     StcDataWorker*      m_pStcDataWorker;
-    BrainTreeItem*      m_pItemSourceLocNormValue;
-    BrainTreeItem*      m_pItemColormapType;
 };
 
 //*************************************************************************************************************

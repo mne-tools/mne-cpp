@@ -88,12 +88,7 @@ void  BrainSurfaceTreeItem::setData(const QVariant& value, int role)
 
     switch(role) {
     case BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert:
-        QTime time;
-        time.start();
         m_pRenderable3DEntity->setVertColor(value.value<QByteArray>());
-        int timepassed = time.elapsed();
-        qDebug()<<"BrainSurfaceTreeItem::setData:setVertColor:"<<timepassed<<"msecs";
-
         break;
 
 //    case BrainSurfaceTreeItemRoles::SurfaceRTSourceLocColor:
@@ -255,9 +250,6 @@ void BrainSurfaceTreeItem::updateVertColor()
 
 void BrainSurfaceTreeItem::updateRtVertColor(const QByteArray& sourceColorSamples, const VectorXi& vertexIndex)
 {
-    QTime time;
-    time.start();
-
     if((sourceColorSamples.size()/((int)sizeof(float)*3)) != vertexIndex.rows()) {
         qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor - number of rows in sample ("<<sourceColorSamples.size()/((int)sizeof(float)*3)<<") do not not match with idx/no number of rows in vertex ("<<vertexIndex.rows()<<"). Returning...";
         return;
@@ -276,6 +268,7 @@ void BrainSurfaceTreeItem::updateRtVertColor(const QByteArray& sourceColorSample
     }
 
     //Create final QByteArray with colors based on the current anatomical information
+    //TODO: Smooth here!
     const float *rawSourceColorSamples = reinterpret_cast<const float *>(sourceColorSamples.data());
     int idxSourceColorSamples = 0;
     float *rawArrayCurrentVertColor = reinterpret_cast<float *>(arrayCurrentVertColor.data());
@@ -290,10 +283,6 @@ void BrainSurfaceTreeItem::updateRtVertColor(const QByteArray& sourceColorSample
     QVariant data;
     data.setValue(arrayCurrentVertColor);
     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceRTSourceLocColor);
-
-    int timepassed = time.elapsed();
-    qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor"<<timepassed<<"msecs";
-
     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert);
 
     return;
