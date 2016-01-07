@@ -64,7 +64,6 @@
 #include <QColor>
 #include <QStandardItem>
 #include <QStandardItemModel>
-#include <QTime>
 
 
 //*************************************************************************************************************
@@ -137,7 +136,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on annotation information to this model.
+    * Adds FreeSurfer data based on annotation information to this item.
     *
     * @param[in] tSourceEstimate    The MNESourceEstimate.
     * @param[in] tForwardSolution   The MNEForwardSolution.
@@ -168,14 +167,14 @@ public:
 signals:
     //=========================================================================================================
     /**
-    * Call this signal whenver you want to provide newly generated colors from the stream rt data.
+    * Call this signal whenever you want to provide newly generated colors from the stream rt data.
     *
     * @param[in] sourceColorSamples     The color values for each estimated source.
     * @param[in] vertexIndex            The vertex idnex of each estiamted source.
     */
-    void rtDataUpdated(QByteArray sourceColorSamples, VectorXi vertexIndex);
+    void rtVertColorUpdated(QByteArray sourceColorSamples, VectorXi vertexIndex);
 
-private:
+private slots:
     //=========================================================================================================
     /**
     * This slot gets called whenever the check/actiation state of the rt data worker changed.
@@ -216,6 +215,7 @@ private:
     */
     void onDataNormalizationValueChanged(const double& dValue);
 
+private:
     bool                m_bInit;            /**< The init flag. */
     RtDataWorker*       m_pRtDataWorker;    /**< The source data worker. This worker streams the rt data to this item.*/
 };

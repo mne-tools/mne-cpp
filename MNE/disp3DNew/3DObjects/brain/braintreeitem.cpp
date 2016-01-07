@@ -83,17 +83,17 @@ void  BrainTreeItem::setData(const QVariant& value, int role)
 
     switch(role) {
         case BrainTreeItemRoles::SurfaceColorSulci: {
-            emit updateSurfaceVertColors();
+            emit curvColorsUpdated();
             break;
         }
 
         case BrainTreeItemRoles::SurfaceColorGyri: {
-            emit updateSurfaceVertColors();
+            emit curvColorsUpdated();
             break;
         }
 
         case BrainTreeItemRoles::SurfaceColorInfoOrigin: {
-            emit updateSurfaceVertColors();
+            emit colorInfoOriginUpdated();
             break;
         }
 

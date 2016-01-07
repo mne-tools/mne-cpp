@@ -235,7 +235,7 @@ void BrainRTDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkS
 
 void BrainRTDataTreeItem::onStcSample(QByteArray sourceColorSamples)
 {
-    emit rtDataUpdated(sourceColorSamples, this->data(BrainRTDataTreeItemRoles::RTVerticesIdx).value<VectorXi>());
+    emit rtVertColorUpdated(sourceColorSamples, this->data(BrainRTDataTreeItemRoles::RTVerticesIdx).value<VectorXi>());
 }
 
 
