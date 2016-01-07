@@ -115,11 +115,13 @@ bool BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation&
 
         //Add annotation meta information as item children
         BrainTreeMetaItem *itemAnnotFileName = new BrainTreeMetaItem(BrainTreeModelItemTypes::AnnotFileName, tAnnotation.fileName());
+        itemAnnotFileName->setEditable(false);
         *this<<itemAnnotFileName;
         data.setValue(tAnnotation.fileName());
         itemAnnotFileName->setData(data, BrainAnnotationTreeItemRoles::AnnotFileName);
 
         BrainTreeMetaItem *itemAnnotPath = new BrainTreeMetaItem(BrainTreeModelItemTypes::AnnotFilePath, tAnnotation.filePath());
+        itemAnnotPath->setEditable(false);
         *this<<itemAnnotPath;
         data.setValue(tAnnotation.filePath());
         itemAnnotFileName->setData(data, BrainAnnotationTreeItemRoles::AnnotFilePath);

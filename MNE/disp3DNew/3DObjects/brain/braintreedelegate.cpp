@@ -122,6 +122,7 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
             pSpinBox->setSuffix(" mSec");
             pSpinBox->setMinimum(1);
             pSpinBox->setMaximum(5000);
+            pSpinBox->setSingleStep(10);
             pSpinBox->setValue(index.model()->data(index, BrainTreeMetaItemRoles::RTDataTimeInterval).toInt());
             return pSpinBox;
             break;
