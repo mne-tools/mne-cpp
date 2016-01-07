@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     stcdataworker.h
+* @file     rtdataworker.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    StcDataWorker class declaration
+* @brief    RtDataWorker class declaration
 *
 */
 
-#ifndef STCDATAWORKER_H
-#define STCDATAWORKER_H
+#ifndef RTDATAWORKER_H
+#define RTDATAWORKER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -92,16 +92,16 @@ using namespace DISPLIB;
 *
 * @brief Data scheduler
 */
-class DISP3DNEWSHARED_EXPORT StcDataWorker : public QThread
+class DISP3DNEWSHARED_EXPORT RtDataWorker : public QThread
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<StcDataWorker> SPtr;            /**< Shared pointer type for StcDataWorker class. */
-    typedef QSharedPointer<const StcDataWorker> ConstSPtr; /**< Const shared pointer type for StcDataWorker class. */
+    typedef QSharedPointer<RtDataWorker> SPtr;            /**< Shared pointer type for RtDataWorker class. */
+    typedef QSharedPointer<const RtDataWorker> ConstSPtr; /**< Const shared pointer type for RtDataWorker class. */
 
-    StcDataWorker(QObject* parent = 0);
+    RtDataWorker(QObject* parent = 0);
 
-    ~StcDataWorker();
+    ~RtDataWorker();
 
     void addData(const MatrixXd& data);
 
@@ -149,4 +149,4 @@ private:
 
 } // NAMESPACE
 
-#endif // STCDATAWORKER_H
+#endif // RtDataWorker_H
