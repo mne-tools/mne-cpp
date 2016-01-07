@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brainrtdata.h
+* @file     brainrtdatatreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -167,7 +167,7 @@ public:
 signals:
     //=========================================================================================================
     /**
-    * Call this signal whenever you want to provide newly generated colors from the stream rt data.
+    * Emit this signal whenever you want to provide newly generated colors from the stream rt data.
     *
     * @param[in] sourceColorSamples     The color values for each estimated source.
     * @param[in] vertexIndex            The vertex idnex of each estiamted source.
