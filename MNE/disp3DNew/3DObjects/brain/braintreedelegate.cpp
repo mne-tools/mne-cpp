@@ -72,12 +72,14 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
     switch(pAbstractItem->type()) {
         case BrainTreeModelItemTypes::SurfaceColorGyri: {
             QColorDialog *pColorDialog = new QColorDialog(parent);
+            pColorDialog->setWindowTitle("Select Gyri Color");
             pColorDialog->show();
             return pColorDialog;
         }
 
         case BrainTreeModelItemTypes::SurfaceColorSulci: {
             QColorDialog *pColorDialog = new QColorDialog(parent);
+            pColorDialog->setWindowTitle("Select Sulci Color");
             pColorDialog->show();
             return pColorDialog;
         }
