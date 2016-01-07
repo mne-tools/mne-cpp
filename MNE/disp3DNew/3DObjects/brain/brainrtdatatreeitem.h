@@ -45,7 +45,7 @@
 
 #include "../../helpers/abstracttreeitem.h"
 #include "../../helpers/types.h"
-#include "../../rt/sourcelevel/stcdataworker.h"
+#include "../../rt/sourcelevel/rtdataworker.h"
 
 #include "braintreeitem.h"
 
@@ -217,7 +217,7 @@ private:
     void onDataNormalizationValueChanged(const double& dValue);
 
     bool                m_bInit;            /**< The init flag. */
-    StcDataWorker*      m_pRtDataWorker;    /**< The source data worker. This worker streams the rt data to this item.*/
+    RtDataWorker*       m_pRtDataWorker;    /**< The source data worker. This worker streams the rt data to this item.*/
 };
 
 //*************************************************************************************************************

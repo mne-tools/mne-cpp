@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     stcdataworker.cpp
+* @file     rtdataworker.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the StcDataWorker class.
+* @brief    Implementation of the RtDataWorker class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "stcdataworker.h"
+#include "rtdataworker.h"
 
 
 //*************************************************************************************************************
@@ -62,7 +62,7 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-StcDataWorker::StcDataWorker(QObject* parent)
+RtDataWorker::RtDataWorker(QObject* parent)
 : QThread(parent)
 , m_bIsRunning(false)
 , m_bIsLooping(true)
@@ -78,7 +78,7 @@ StcDataWorker::StcDataWorker(QObject* parent)
 
 //*************************************************************************************************************
 
-StcDataWorker::~StcDataWorker()
+RtDataWorker::~RtDataWorker()
 {
     if(this->isRunning())
         stop();
@@ -87,7 +87,7 @@ StcDataWorker::~StcDataWorker()
 
 //*************************************************************************************************************
 
-void StcDataWorker::addData(const MatrixXd& data)
+void RtDataWorker::addData(const MatrixXd& data)
 {
     QMutexLocker locker(&m_qMutex);
     if(data.size() == 0)
@@ -99,7 +99,7 @@ void StcDataWorker::addData(const MatrixXd& data)
 
 //*************************************************************************************************************
 
-void StcDataWorker::clear()
+void RtDataWorker::clear()
 {
     QMutexLocker locker(&m_qMutex);
 }
@@ -107,7 +107,7 @@ void StcDataWorker::clear()
 
 //*************************************************************************************************************
 
-void StcDataWorker::run()
+void RtDataWorker::run()
 {
     VectorXd t_vecAverage(0,0);
 
@@ -169,7 +169,7 @@ void StcDataWorker::run()
             m_qMutex.unlock();
         }
 
-        //qDebug()<<"StcDataWorker::run()"<<timer.elapsed()<<"msecs";
+        //qDebug()<<"RtDataWorker::run()"<<timer.elapsed()<<"msecs";
         QThread::msleep(m_iMSecIntervall);
     }
 }
@@ -177,7 +177,7 @@ void StcDataWorker::run()
 
 //*************************************************************************************************************
 
-QByteArray StcDataWorker::transformDataToColor(const VectorXd& data)
+QByteArray RtDataWorker::transformDataToColor(const VectorXd& data)
 {
     //Note: This function needs to be implemented extremley efficient
     QByteArray arrayColor;
@@ -249,7 +249,7 @@ QByteArray StcDataWorker::transformDataToColor(const VectorXd& data)
 
 //*************************************************************************************************************
 
-void StcDataWorker::setAverage(qint32 samples)
+void RtDataWorker::setAverage(qint32 samples)
 {
     QMutexLocker locker(&m_qMutex);
     m_iAverageSamples = samples;
@@ -258,7 +258,7 @@ void StcDataWorker::setAverage(qint32 samples)
 
 //*************************************************************************************************************
 
-void StcDataWorker::setInterval(const int& iMSec)
+void RtDataWorker::setInterval(const int& iMSec)
 {
     QMutexLocker locker(&m_qMutex);
     m_iMSecIntervall = iMSec;
@@ -267,7 +267,7 @@ void StcDataWorker::setInterval(const int& iMSec)
 
 //*************************************************************************************************************
 
-void StcDataWorker::setColormapType(const QString& sColormapType)
+void RtDataWorker::setColormapType(const QString& sColormapType)
 {
     QMutexLocker locker(&m_qMutex);
     m_sColormap = sColormapType;
@@ -276,7 +276,7 @@ void StcDataWorker::setColormapType(const QString& sColormapType)
 
 //*************************************************************************************************************
 
-void StcDataWorker::setNormalization(const double& dValue)
+void RtDataWorker::setNormalization(const double& dValue)
 {
     QMutexLocker locker(&m_qMutex);
     m_dNormalization = (m_dNormalizationMax/100.0) * dValue;
@@ -285,7 +285,7 @@ void StcDataWorker::setNormalization(const double& dValue)
 
 //*************************************************************************************************************
 
-void StcDataWorker::setLoop(bool looping)
+void RtDataWorker::setLoop(bool looping)
 {
     QMutexLocker locker(&m_qMutex);
     m_bIsLooping = looping;
@@ -294,7 +294,7 @@ void StcDataWorker::setLoop(bool looping)
 
 //*************************************************************************************************************
 
-void StcDataWorker::stop()
+void RtDataWorker::stop()
 {
     m_qMutex.lock();
     m_bIsRunning = false;
@@ -306,7 +306,7 @@ void StcDataWorker::stop()
 
 //*************************************************************************************************************
 
-void StcDataWorker::start()
+void RtDataWorker::start()
 {
     m_qMutex.lock();
     m_iCurrentSample = 0;

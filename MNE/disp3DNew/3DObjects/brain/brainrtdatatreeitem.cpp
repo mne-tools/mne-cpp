@@ -57,9 +57,9 @@ using namespace DISP3DNEWLIB;
 BrainRTDataTreeItem::BrainRTDataTreeItem(const int &iType, const QString &text)
 : AbstractTreeItem(iType, text)
 , m_bInit(false)
-, m_pRtDataWorker(new StcDataWorker(this))
+, m_pRtDataWorker(new RtDataWorker(this))
 {
-    connect(m_pRtDataWorker, &StcDataWorker::stcSample,
+    connect(m_pRtDataWorker, &RtDataWorker::stcSample,
             this, &BrainRTDataTreeItem::onStcSample);
 }
 
@@ -144,7 +144,7 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     //Add surface meta information as item children
     BrainTreeItem* pItemRTDataStreamStatus = new BrainTreeItem(BrainTreeModelItemTypes::RTDataStreamStatus, "Stream data on/off");
     connect(pItemRTDataStreamStatus, &BrainTreeItem::checkStateChanged,
-            this, &BrainRTDataTreeItem::onCheckStateChanged);
+            this, &BrainRTDataTreeItem::onCheckStateWorkerChanged);
     *this<<pItemRTDataStreamStatus;
     pItemRTDataStreamStatus->setCheckable(true);
     pItemRTDataStreamStatus->setCheckState(Qt::Unchecked);
