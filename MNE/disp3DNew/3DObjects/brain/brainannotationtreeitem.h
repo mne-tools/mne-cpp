@@ -44,7 +44,7 @@
 #include "../../disp3DNew_global.h"
 
 #include "../../helpers/abstracttreeitem.h"
-#include "braintreeitem.h"
+#include "braintreemetaitem.h"
 
 #include "../../helpers/types.h"
 
@@ -143,7 +143,6 @@ public:
     bool addData(const Surface& tSurface, const Annotation& tAnnotation);
 
 private:
-
 };
 
 } //NAMESPACE DISP3DNEWLIB

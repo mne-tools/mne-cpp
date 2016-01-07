@@ -58,9 +58,9 @@ BrainSurfaceTreeItem::BrainSurfaceTreeItem(const int& iType, const QString& text
 : AbstractTreeItem(iType, text)
 , m_pRenderable3DEntity(new Renderable3DEntity())
 , m_pRenderable3DEntityActivationOverlay(new Renderable3DEntity())
-, m_pItemSurfColorInfoOrigin(new BrainTreeItem())
-, m_pItemSurfColGyri(new BrainTreeItem())
-, m_pItemSurfColSulci(new BrainTreeItem())
+, m_pItemSurfColorInfoOrigin(new BrainTreeMetaItem())
+, m_pItemSurfColGyri(new BrainTreeMetaItem())
+, m_pItemSurfColSulci(new BrainTreeMetaItem())
 {
 }
 
@@ -160,43 +160,43 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceRenderable3DEntityAcivationOverlay);
 
     //Add surface meta information as item children
-    m_pItemSurfColorInfoOrigin = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceColorInfoOrigin, "Color from curvature");
-    connect(m_pItemSurfColorInfoOrigin, &BrainTreeItem::colorInfoOriginUpdated,
+    m_pItemSurfColorInfoOrigin = new BrainTreeMetaItem(BrainTreeModelItemTypes::SurfaceColorInfoOrigin, "Color from curvature");
+    connect(m_pItemSurfColorInfoOrigin, &BrainTreeMetaItem::colorInfoOriginUpdated,
             this, &BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorUpdated);
     *this<<m_pItemSurfColorInfoOrigin;
     data.setValue(QString("Color from curvature"));
-    m_pItemSurfColorInfoOrigin->setData(data, BrainTreeItemRoles::SurfaceColorInfoOrigin);
+    m_pItemSurfColorInfoOrigin->setData(data, BrainTreeMetaItemRoles::SurfaceColorInfoOrigin);
 
-    m_pItemSurfColSulci = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceColorSulci, "Sulci color");
-    connect(m_pItemSurfColSulci, &BrainTreeItem::curvColorsUpdated,
+    m_pItemSurfColSulci = new BrainTreeMetaItem(BrainTreeModelItemTypes::SurfaceColorSulci, "Sulci color");
+    connect(m_pItemSurfColSulci, &BrainTreeMetaItem::curvColorsUpdated,
             this, &BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorUpdated);
     *this<<m_pItemSurfColSulci;
     data.setValue(QColor(50,50,50));
-    m_pItemSurfColSulci->setData(data, BrainTreeItemRoles::SurfaceColorSulci);
+    m_pItemSurfColSulci->setData(data, BrainTreeMetaItemRoles::SurfaceColorSulci);
     m_pItemSurfColSulci->setData(data, Qt::DecorationRole);
 
-    m_pItemSurfColGyri = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceColorGyri, "Gyri color");
-    connect(m_pItemSurfColGyri, &BrainTreeItem::curvColorsUpdated,
+    m_pItemSurfColGyri = new BrainTreeMetaItem(BrainTreeModelItemTypes::SurfaceColorGyri, "Gyri color");
+    connect(m_pItemSurfColGyri, &BrainTreeMetaItem::curvColorsUpdated,
             this, &BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorUpdated);
     *this<<m_pItemSurfColGyri;
     data.setValue(QColor(125,125,125));
-    m_pItemSurfColGyri->setData(data, BrainTreeItemRoles::SurfaceColorGyri);
+    m_pItemSurfColGyri->setData(data, BrainTreeMetaItemRoles::SurfaceColorGyri);
     m_pItemSurfColGyri->setData(data, Qt::DecorationRole);
 
-    BrainTreeItem *itemSurfFileName = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceFileName, tSurface.fileName());
+    BrainTreeMetaItem *itemSurfFileName = new BrainTreeMetaItem(BrainTreeModelItemTypes::SurfaceFileName, tSurface.fileName());
     *this<<itemSurfFileName;
     data.setValue(tSurface.fileName());
-    itemSurfFileName->setData(data, BrainTreeItemRoles::SurfaceFileName);
+    itemSurfFileName->setData(data, BrainTreeMetaItemRoles::SurfaceFileName);
 
-    BrainTreeItem *itemSurfType = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceType, tSurface.surf());
+    BrainTreeMetaItem *itemSurfType = new BrainTreeMetaItem(BrainTreeModelItemTypes::SurfaceType, tSurface.surf());
     *this<<itemSurfType;
     data.setValue(tSurface.surf());
-    itemSurfType->setData(data, BrainTreeItemRoles::SurfaceType);
+    itemSurfType->setData(data, BrainTreeMetaItemRoles::SurfaceType);
 
-    BrainTreeItem *itemSurfPath = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceFilePath, tSurface.filePath());
+    BrainTreeMetaItem *itemSurfPath = new BrainTreeMetaItem(BrainTreeModelItemTypes::SurfaceFilePath, tSurface.filePath());
     *this<<itemSurfPath;
     data.setValue(tSurface.filePath());
-    itemSurfPath->setData(data, BrainTreeItemRoles::SurfaceFilePath);
+    itemSurfPath->setData(data, BrainTreeMetaItemRoles::SurfaceFilePath);
 
     return true;
 }
@@ -207,14 +207,14 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
 void BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorUpdated()
 {
     if(this->hasChildren()) {
-        QString sColorInfoOrigin = m_pItemSurfColorInfoOrigin->data(BrainTreeItemRoles::SurfaceColorInfoOrigin).toString();
+        QString sColorInfoOrigin = m_pItemSurfColorInfoOrigin->data(BrainTreeMetaItemRoles::SurfaceColorInfoOrigin).toString();
         QVariant data;
         QByteArray arrayNewVertColor;
 
         if(sColorInfoOrigin == "Color from curvature") {
             //Create color from curvature information with default gyri and sulcus colors
-            QColor colorSulci = m_pItemSurfColSulci->data(BrainTreeItemRoles::SurfaceColorSulci).value<QColor>();
-            QColor colorGyri = m_pItemSurfColGyri->data(BrainTreeItemRoles::SurfaceColorGyri).value<QColor>();
+            QColor colorSulci = m_pItemSurfColSulci->data(BrainTreeMetaItemRoles::SurfaceColorSulci).value<QColor>();
+            QColor colorGyri = m_pItemSurfColGyri->data(BrainTreeMetaItemRoles::SurfaceColorGyri).value<QColor>();
 
             arrayNewVertColor = createCurvatureVertColor(this->data(BrainSurfaceTreeItemRoles::SurfaceCurv).value<VectorXf>(), colorSulci, colorGyri);
 
@@ -256,7 +256,7 @@ void BrainSurfaceTreeItem::onRtVertColorUpdated(const QByteArray& sourceColorSam
     }
 
     //This function is called for every new sample point and therfore it must be kept highly efficient!
-    QString sColorInfoOrigin = m_pItemSurfColorInfoOrigin->data(BrainTreeItemRoles::SurfaceColorInfoOrigin).toString();
+    QString sColorInfoOrigin = m_pItemSurfColorInfoOrigin->data(BrainTreeMetaItemRoles::SurfaceColorInfoOrigin).toString();
     QByteArray arrayCurrentVertColor;
 
     if(sColorInfoOrigin == "Color from curvature") {

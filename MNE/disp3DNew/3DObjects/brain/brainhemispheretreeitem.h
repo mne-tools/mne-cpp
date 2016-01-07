@@ -166,7 +166,6 @@ private:
     BrainSurfaceTreeItem*       m_pSurfaceItem;             /**< The surface item of this hemisphere item. Only one surface item may exists under a hemisphere item. */
     BrainAnnotationTreeItem*    m_pAnnotItem;               /**< The annotation item of this hemisphere item. Only one annotation item may exists under a hemisphere item. */
     BrainRTDataTreeItem*        m_pBrainRtDataTreeItem;     /**< The rt data item of this hemisphere item. Multiple rt data item's can be added to this hemipshere item. */
-
 };
 
 } //NAMESPACE DISP3DNEWLIB

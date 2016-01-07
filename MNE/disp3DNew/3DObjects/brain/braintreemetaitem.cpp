@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     braintreeitem.h
+* @file     braintreemetaitem.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,50 +29,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BrainTreeItem class declaration.
+* @brief    BrainTreeMetaItem class definition.
 *
 */
-
-#ifndef BRAINTREEITEM_H
-#define BRAINTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../disp3DNew_global.h"
-#include "../../helpers/abstracttreeitem.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QList>
-#include <QVariant>
-#include <QStringList>
-#include <QColor>
-#include <QStandardItem>
-#include <QStandardItemModel>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE DISP3DNEWLIB
-//=============================================================================================================
-
-namespace DISP3DNEWLIB
-{
+#include "BrainTreeMetaItem.h"
 
 
 //*************************************************************************************************************
@@ -80,59 +46,71 @@ namespace DISP3DNEWLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
+using namespace DISP3DNEWLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* BrainTreeItem provides a generic brain tree item to hold meta information about the surface and annoation item.
-*
-* @brief Provides a generic brain tree item.
-*/
-class DISP3DNEWSHARED_EXPORT BrainTreeItem : public AbstractTreeItem
+BrainTreeMetaItem::BrainTreeMetaItem(const int& iType, const QString& text)
+: AbstractTreeItem(iType, text)
 {
-    Q_OBJECT;
+}
 
-public:
-    typedef QSharedPointer<BrainTreeItem> SPtr;             /**< Shared pointer type for BrainTreeItem class. */
-    typedef QSharedPointer<const BrainTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainTreeItem class. */
 
-    //=========================================================================================================
-    /**
-    * Default constructor.
-    */
-    explicit BrainTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "");
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Default destructor
-    */
-    ~BrainTreeItem();
+BrainTreeMetaItem::~BrainTreeMetaItem()
+{
+}
 
-    //=========================================================================================================
-    /**
-    * AbstractTreeItem functions
-    */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
-signals:
-    void curvColorsUpdated();
-    void colorInfoOriginUpdated();
-    void rtDataTimeIntervalUpdated(const int& iMSec);
-    void rtDataNormalizationValueUpdated(const double& dValue);
-    void rtDataColormapTypeUpdated(const QString& sColormapType);
+//*************************************************************************************************************
 
-private:
+QVariant BrainTreeMetaItem::data(int role) const
+{
+    return AbstractTreeItem::data(role);
+}
 
-};
 
-} //NAMESPACE DISP3DNEWLIB
+//*************************************************************************************************************
 
-#endif // BRAINTREEITEM_H
+void  BrainTreeMetaItem::setData(const QVariant& value, int role)
+{
+    AbstractTreeItem::setData(value, role);
+
+    switch(role) {
+        case BrainTreeMetaItemRoles::SurfaceColorSulci: {
+            emit curvColorsUpdated();
+            break;
+        }
+
+        case BrainTreeMetaItemRoles::SurfaceColorGyri: {
+            emit curvColorsUpdated();
+            break;
+        }
+
+        case BrainTreeMetaItemRoles::SurfaceColorInfoOrigin: {
+            emit colorInfoOriginUpdated();
+            break;
+        }
+
+        case BrainTreeMetaItemRoles::RTDataTimeInterval: {
+            emit rtDataTimeIntervalUpdated(value.toInt());
+            break;
+        }
+
+        case BrainTreeMetaItemRoles::RTDataNormalizationValue: {
+            emit rtDataNormalizationValueUpdated(value.toDouble());
+            break;
+        }
+
+        case BrainTreeMetaItemRoles::RTDataColormapType: {
+            emit rtDataColormapTypeUpdated(value.toString());
+            break;
+        }
+    }
+}
+

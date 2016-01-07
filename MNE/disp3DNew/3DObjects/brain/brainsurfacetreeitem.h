@@ -44,7 +44,7 @@
 #include "../../disp3DNew_global.h"
 
 #include "../../helpers/abstracttreeitem.h"
-#include "braintreeitem.h"
+#include "braintreemetaitem.h"
 
 #include "../../helpers/types.h"
 #include "../../helpers/renderable3Dentity.h"
@@ -175,9 +175,9 @@ private:
     Renderable3DEntity*     m_pRenderable3DEntityActivationOverlay;     /**< The renderable 3D entity used as an overlay for activity plotting. */
 
     //These are stored as member variables because we do not wat to look for them everytime we call functions, especially not when we perform rt source loc
-    BrainTreeItem*          m_pItemSurfColorInfoOrigin;                 /**< The item which holds the information of the color origin (curvature or annotation). */
-    BrainTreeItem*          m_pItemSurfColSulci;                        /**< The item which holds the sulci color information. */
-    BrainTreeItem*          m_pItemSurfColGyri;                         /**< The item which holds the gyri color information. */
+    BrainTreeMetaItem*      m_pItemSurfColorInfoOrigin;                 /**< The item which holds the information of the color origin (curvature or annotation). */
+    BrainTreeMetaItem*      m_pItemSurfColSulci;                        /**< The item which holds the sulci color information. */
+    BrainTreeMetaItem*      m_pItemSurfColGyri;                         /**< The item which holds the gyri color information. */
 };
 
 } //NAMESPACE DISP3DNEWLIB
