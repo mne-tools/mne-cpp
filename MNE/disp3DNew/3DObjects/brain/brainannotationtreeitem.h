@@ -133,7 +133,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on annotation information to this model.
+    * Adds FreeSurfer data based on annotation information to this item.
     *
     * @param[in] tSurface           FreeSurfer surface.
     * @param[in] tAnnotation        FreeSurfer annotation.

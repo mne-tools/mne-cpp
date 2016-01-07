@@ -161,23 +161,23 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
 
     //Add surface meta information as item children
     m_pItemSurfColorInfoOrigin = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceColorInfoOrigin, "Color from curvature");
-    connect(m_pItemSurfColorInfoOrigin, &BrainTreeItem::updateSurfaceVertColors,
-            this, &BrainSurfaceTreeItem::updateVertColor);
+    connect(m_pItemSurfColorInfoOrigin, &BrainTreeItem::colorInfoOriginUpdated,
+            this, &BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorUpdated);
     *this<<m_pItemSurfColorInfoOrigin;
     data.setValue(QString("Color from curvature"));
     m_pItemSurfColorInfoOrigin->setData(data, BrainTreeItemRoles::SurfaceColorInfoOrigin);
 
     m_pItemSurfColSulci = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceColorSulci, "Sulci color");
-    connect(m_pItemSurfColSulci, &BrainTreeItem::updateSurfaceVertColors,
-            this, &BrainSurfaceTreeItem::updateVertColor);
+    connect(m_pItemSurfColSulci, &BrainTreeItem::curvColorsUpdated,
+            this, &BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorUpdated);
     *this<<m_pItemSurfColSulci;
     data.setValue(QColor(50,50,50));
     m_pItemSurfColSulci->setData(data, BrainTreeItemRoles::SurfaceColorSulci);
     m_pItemSurfColSulci->setData(data, Qt::DecorationRole);
 
     m_pItemSurfColGyri = new BrainTreeItem(BrainTreeModelItemTypes::SurfaceColorGyri, "Gyri color");
-    connect(m_pItemSurfColGyri, &BrainTreeItem::updateSurfaceVertColors,
-            this, &BrainSurfaceTreeItem::updateVertColor);
+    connect(m_pItemSurfColGyri, &BrainTreeItem::curvColorsUpdated,
+            this, &BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorUpdated);
     *this<<m_pItemSurfColGyri;
     data.setValue(QColor(125,125,125));
     m_pItemSurfColGyri->setData(data, BrainTreeItemRoles::SurfaceColorGyri);
@@ -204,7 +204,7 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
 
 //*************************************************************************************************************
 
-void BrainSurfaceTreeItem::updateVertColor()
+void BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorUpdated()
 {
     if(this->hasChildren()) {
         QString sColorInfoOrigin = m_pItemSurfColorInfoOrigin->data(BrainTreeItemRoles::SurfaceColorInfoOrigin).toString();
@@ -248,7 +248,7 @@ void BrainSurfaceTreeItem::updateVertColor()
 
 //*************************************************************************************************************
 
-void BrainSurfaceTreeItem::updateRtVertColor(const QByteArray& sourceColorSamples, const VectorXi& vertexIndex)
+void BrainSurfaceTreeItem::onRtVertColorUpdated(const QByteArray& sourceColorSamples, const VectorXi& vertexIndex)
 {
     if((sourceColorSamples.size()/((int)sizeof(float)*3)) != vertexIndex.rows()) {
         qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor - number of rows in sample ("<<sourceColorSamples.size()/((int)sizeof(float)*3)<<") do not not match with idx/no number of rows in vertex ("<<vertexIndex.rows()<<"). Returning...";

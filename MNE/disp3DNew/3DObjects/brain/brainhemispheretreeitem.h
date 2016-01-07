@@ -119,7 +119,7 @@ public:
 
     //=========================================================================================================
     /**
-    * FreeSurfer constructor from single surface.
+    * Default constructor from single surface.
     *
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
@@ -141,7 +141,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on surfaces and annotation data to this model.
+    * Adds FreeSurfer data based on surfaces and annotation data to this item.
     *
     * @param[in] tSurface           FreeSurfer surface.
     * @param[in] tAnnotation        FreeSurfer annotation.

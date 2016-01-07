@@ -123,7 +123,8 @@ public:
     void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
 signals:
-    void updateSurfaceVertColors();
+    void curvColorsUpdated();
+    void colorInfoOriginUpdated();
     void rtDataTimeIntervalUpdated(const int& iMSec);
     void rtDataNormalizationValueUpdated(const double& dValue);
     void rtDataColormapTypeUpdated(const QString& sColormapType);

@@ -50,6 +50,7 @@
 #include "fs/annotationset.h"
 #include "fs/surfaceset.h"
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
@@ -111,7 +112,10 @@ public:
 
     //=========================================================================================================
     /**
-    * FreeSurfer constructor from single surface.
+    * Default constructor.
+    *
+    * @param[in] iType      The type of the item. See types.h for declaration and definition.
+    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
     explicit BrainSurfaceSetTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "");
 
@@ -130,7 +134,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on surfaces and annotation SETS to this model.
+    * Adds FreeSurfer data based on surfaces and annotation SETS to this item.
     *
     * @param[in] tSurfaceSet        FreeSurfer surface set.
     * @param[in] tAnnotationSet     FreeSurfer annotation set.
@@ -140,6 +144,16 @@ public:
     */
     bool addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent = 0);
 
+    //=========================================================================================================
+    /**
+    * Adds FreeSurfer data based on surfaces and annotation data to this item.
+    *
+    * @param[in] tSurface           FreeSurfer surface.
+    * @param[in] tAnnotation        FreeSurfer annotation.
+    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+    *
+    * @return                       Returns true if successful.
+    */
     bool addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
 
 private:

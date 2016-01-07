@@ -75,6 +75,8 @@ namespace DISP3DNEWLIB
 //=============================================================================================================
 /**
 * DECLARE CLASS BrainTreeDelegate
+*
+* @brief Provides a delegate to render user specific input methods in the tree model.
 */
 class DISP3DNEWSHARED_EXPORT BrainTreeDelegate : public QItemDelegate
 {
