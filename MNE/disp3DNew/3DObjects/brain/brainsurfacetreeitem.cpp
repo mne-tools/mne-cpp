@@ -62,6 +62,7 @@ BrainSurfaceTreeItem::BrainSurfaceTreeItem(const int& iType, const QString& text
 , m_pItemSurfColGyri(new BrainTreeMetaItem())
 , m_pItemSurfColSulci(new BrainTreeMetaItem())
 {
+    this->setEditable(false);
 }
 
 

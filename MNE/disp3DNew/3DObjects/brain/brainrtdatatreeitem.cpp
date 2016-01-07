@@ -61,6 +61,8 @@ BrainRTDataTreeItem::BrainRTDataTreeItem(const int &iType, const QString &text)
 {
     connect(m_pRtDataWorker, &RtDataWorker::stcSample,
             this, &BrainRTDataTreeItem::onStcSample);
+
+    this->setEditable(false);
 }
 
 
@@ -131,12 +133,9 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
 
     MatrixXd matHemisphereData = tSourceEstimate.data.block(iStartIdx, 0, iEndIdx-iStartIdx+1, tSourceEstimate.data.cols());
     data.setValue(matHemisphereData);
-    qDebug()<<matHemisphereData.rows()<<"x"<<matHemisphereData.cols();
     this->setData(data, BrainRTDataTreeItemRoles::RTData);
 
     if(iHemi != -1 && iHemi < tForwardSolution.src.size()) {
-        //Only take the vertno's corresponding to the hemisphere
-        //VectorXi vecHemispehreVertNo = tForwardSolution.src[iHemi].vertno.segment(iStartIdx, iEndIdx-iStartIdx+1);
         data.setValue(tForwardSolution.src[iHemi].vertno); //TODO: When clustered source space, these idx no's are the annotation labels
         this->setData(data, BrainRTDataTreeItemRoles::RTVerticesIdx);
     }
