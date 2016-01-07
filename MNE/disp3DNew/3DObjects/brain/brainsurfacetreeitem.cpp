@@ -296,7 +296,6 @@ QByteArray BrainSurfaceTreeItem::createCurvatureVertColor(const VectorXf& curvat
     QByteArray arrayCurvatureColor;
     arrayCurvatureColor.resize(curvature.rows() * 3 * (int)sizeof(float));
     float *rawColorArray = reinterpret_cast<float *>(arrayCurvatureColor.data());
-
     int idxColor = 0;
 
     for(int i = 0; i<curvature.rows(); i++) {
