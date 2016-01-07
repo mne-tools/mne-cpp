@@ -116,6 +116,9 @@ public:
     //=========================================================================================================
     /**
     * Default constructor.
+    *
+    * @param[in] iType      The type of the item. See types.h for declaration and definition.
+    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
     explicit BrainRTDataTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "RT Data");
 
@@ -136,32 +139,85 @@ public:
     /**
     * Adds FreeSurfer data based on annotation information to this model.
     *
-    * @param[in] tSurface           FreeSurfer surface.
-    * @param[in] tAnnotation        FreeSurfer annotation.
+    * @param[in] tSourceEstimate    The MNESourceEstimate.
+    * @param[in] tForwardSolution   The MNEForwardSolution.
+    * @param[in] hemi               The hemispehre of this brain rt data item. This information is important in order to cut out the wanted source estimations from the MNESourceEstimate
     *
     * @return                       Returns true if successful.
     */
     bool addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QString& hemi = "Unknown");
 
+    //=========================================================================================================
+    /**
+    * Updates the rt data which is streamed by this item's worker thread item.
+    *
+    * @param[in] tSourceEstimate    The MNESourceEstimate.
+    *
+    * @return                       Returns true if successful.
+    */
     bool updateData(const MNESourceEstimate& tSourceEstimate);
 
+    //=========================================================================================================
+    /**
+    * Updates the rt data which is streamed by this item's worker thread item.
+    *
+    * @return                       Returns true if this item is initialized.
+    */
     inline bool isInit() const;
 
 signals:
+    //=========================================================================================================
+    /**
+    * Call this signal whenver you want to provide newly generated colors from the stream rt data.
+    *
+    * @param[in] sourceColorSamples     The color values for each estimated source.
+    * @param[in] vertexIndex            The vertex idnex of each estiamted source.
+    */
     void rtDataUpdated(QByteArray sourceColorSamples, VectorXi vertexIndex);
 
 private:
-    void onCheckStateChanged(const Qt::CheckState& checkState);
+    //=========================================================================================================
+    /**
+    * This slot gets called whenever the check/actiation state of the rt data worker changed.
+    *
+    * @param[in] checkState     The check state of the worker.
+    */
+    void onCheckStateWorkerChanged(const Qt::CheckState& checkState);
+
+    //=========================================================================================================
+    /**
+    * This slot gets called whenever this item receives new color values for each estimated source.
+    *
+    * @param[in] sourceColorSamples     The color values for each estimated source.
+    */
     void onStcSample(QByteArray sourceColorSamples);
+
+    //=========================================================================================================
+    /**
+    * This slot gets called whenever the used colormap type changed.
+    *
+    * @param[in] sColormapType     The name of the new colormap type.
+    */
     void onColormapTypeChanged(const QString& sColormapType);
+
+    //=========================================================================================================
+    /**
+    * This slot gets called whenever the time interval in between the streamed samples changed.
+    *
+    * @param[in] iMSec     The new time in milliseconds waited in between each streamed sample.
+    */
     void onTimeIntervalChanged(const int& iMSec);
+
+    //=========================================================================================================
+    /**
+    * This slot gets called whenever the normaization value changed. The normalization value is used to normalize the estimated source activation.
+    *
+    * @param[in] iMSec     The new time normalization value.
+    */
     void onDataNormalizationValueChanged(const double& dValue);
 
-    bool        m_bInit;
-
-    double      m_dStcNormMax;
-
-    StcDataWorker*      m_pStcDataWorker;
+    bool                m_bInit;            /**< The init flag. */
+    StcDataWorker*      m_pRtDataWorker;    /**< The source data worker. This worker streams the rt data to this item.*/
 };
 
 //*************************************************************************************************************

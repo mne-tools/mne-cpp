@@ -48,8 +48,6 @@
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 
-#include <disp/helpers/colormap.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -81,6 +79,7 @@ namespace DISP3DNEWLIB
 //=============================================================================================================
 
 using namespace FSLIB;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -120,8 +119,10 @@ public:
     /**
     * Adds FreeSurfer brain data SETS.
     *
+    * @param[in] text               The name of the surface set to which the data is to be added.
     * @param[in] tSurfaceSet        FreeSurfer surface set.
     * @param[in] tAnnotationSet     FreeSurfer annotation set.
+    *
     * @return                       Returns true if successful.
     */
     bool addData(const QString& text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet);
@@ -130,12 +131,24 @@ public:
     /**
     * Adds FreeSurfer brain data.
     *
+    * @param[in] text               The name of the surface set to which the data is to be added.
     * @param[in] pSurface           FreeSurfer surface.
     * @param[in] pAnnotation        FreeSurfer annotation.
+    *
     * @return                       Returns true if successful.
     */
     bool addData(const QString& text, const Surface& tSurface, const Annotation& tAnnotation);
 
+    //=========================================================================================================
+    /**
+    * Adds source estimated activation data.
+    *
+    * @param[in] text               The name of the surface set to which the actiavtion data is to be added.
+    * @param[in] tSourceEstimate    The MNESourceEstimate.
+    * @param[in] tForwardSolution   The MNEForwardSolution.
+    *
+    * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
+    */
     QList<BrainRTDataTreeItem*> addData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution);
 
     //=========================================================================================================
@@ -147,7 +160,7 @@ public:
     BrainTreeModel* getBrainTreeModel();    
 
 protected:
-    BrainTreeModel*                 m_pBrainTreeModel;
+    BrainTreeModel*     m_pBrainTreeModel;  /**< The model which holds all of the loaded brain data. */
 };
 
 } // NAMESPACE

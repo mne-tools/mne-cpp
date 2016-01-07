@@ -120,6 +120,9 @@ public:
     //=========================================================================================================
     /**
     * FreeSurfer constructor from single surface.
+    *
+    * @param[in] iType      The type of the item. See types.h for declaration and definition.
+    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
     explicit BrainHemisphereTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "Unknown");
 
@@ -148,12 +151,21 @@ public:
     */
     bool addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
 
+    //=========================================================================================================
+    /**
+    * Adds source estimated activation data.
+    *
+    * @param[in] tSourceEstimate    The MNESourceEstimate.
+    * @param[in] tForwardSolution   The MNEForwardSolution.
+    *
+    * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
+    */
     BrainRTDataTreeItem* addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution);
 
 private:
-    BrainSurfaceTreeItem*       m_pSurfaceItem;
-    BrainAnnotationTreeItem*    m_pAnnotItem;
-    BrainRTDataTreeItem*        m_pBrainRtDataTreeItem;
+    BrainSurfaceTreeItem*       m_pSurfaceItem;             /**< The surface item of this hemisphere item. Only one surface item may exists under a hemisphere item. */
+    BrainAnnotationTreeItem*    m_pAnnotItem;               /**< The annotation item of this hemisphere item. Only one annotation item may exists under a hemisphere item. */
+    BrainRTDataTreeItem*        m_pBrainRtDataTreeItem;     /**< The rt data item of this hemisphere item. Multiple rt data item's can be added to this hemipshere item. */
 
 };
 
