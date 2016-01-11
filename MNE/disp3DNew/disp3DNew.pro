@@ -103,7 +103,7 @@ SOURCES += \
     helpers/custommesh.cpp \
     helpers/window.cpp \
     control/control3dwidget.cpp \
-    rt/sourcelevel/rtdataworker.cpp \
+    rt/rtdataworker.cpp \
 
 HEADERS += \
     view3d.h \
@@ -123,7 +123,7 @@ HEADERS += \
     helpers/types.h \
     control/control3dwidget.h \
     disp3dnew_global.h \
-    rt/sourcelevel/rtdataworker.h \
+    rt/rtdataworker.h \
 
 FORMS += \
     control/control3dwidget.ui \

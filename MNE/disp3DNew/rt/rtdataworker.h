@@ -43,7 +43,7 @@
 
 #include <iostream>
 
-#include "../../disp3dnew_global.h"
+#include "../disp3dnew_global.h"
 
 #include <disp/helpers/colormap.h>
 
