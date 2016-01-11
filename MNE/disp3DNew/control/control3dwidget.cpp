@@ -142,13 +142,17 @@ void Control3DWidget::onSceneColorPicker()
 {
     QColorDialog* pDialog = new QColorDialog(this);
     pDialog->setCurrentColor(m_colCurrentSceneColor);
+
+    //Update all connected View3D's scene colors
+    for(int i = 0; i<m_lView3D.size(); i++) {
+        connect(pDialog, &QColorDialog::currentColorChanged,
+                m_lView3D.at(i).data(), &View3D::changeSceneColor);
+    }
+
     pDialog->exec();
     m_colCurrentSceneColor = pDialog->currentColor();
 
     ui->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(m_colCurrentSceneColor.red()).arg(m_colCurrentSceneColor.green()).arg(m_colCurrentSceneColor.blue()));
 
-    //Update all connected View3D's scene colors
-    for(int i = 0; i<m_lView3D.size(); i++) {
-        m_lView3D.at(i)->changeSceneColor(m_colCurrentSceneColor);
-    }
+
 }
