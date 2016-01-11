@@ -153,9 +153,6 @@ public:
 	public slots:
     ///Put your public slots
 
-signals: //If you want to use signal/slot system you need to specify the Q_Object flag above
-    //Put your signals which you want to emit from this class here
-
 protected slots:
 	//Put your protected slots
 	
@@ -171,6 +168,9 @@ private:
     //Put your private member functions here
 
     //Put your private members here
+	
+signals: //If you want to use signal/slot system you need to specify the Q_Object flag above
+    //Put your signals which you want to emit from this class here
 };
 
 

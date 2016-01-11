@@ -144,15 +144,6 @@ public :
     */
     AbstractTreeItem &operator<<(AbstractTreeItem& newItem);
 
-signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever this item's check state changed.
-    *
-    * @param[in] checkState     The current check state.
-    */
-    void checkStateChanged(const Qt::CheckState& checkState);
-
 protected:
     //=========================================================================================================
     /**
@@ -161,6 +152,15 @@ protected:
     void createToolTip();
 
     int     m_iType;        /**< This item's type. */
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever this item's check state changed.
+    *
+    * @param[in] checkState     The current check state.
+    */
+    void checkStateChanged(const Qt::CheckState& checkState);
 };
 
 } //NAMESPACE DISP3DNEWLIB

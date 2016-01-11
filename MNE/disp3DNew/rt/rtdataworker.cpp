@@ -253,7 +253,7 @@ void RtDataWorker::run()
             {
                 t_vecAverage /= (double)m_iAverageSamples;
 
-                emit stcSample(performVisualizationTypeCalculation(transformDataToColor(t_vecAverage)));
+                emit newRtData(performVisualizationTypeCalculation(transformDataToColor(t_vecAverage)));
                 t_vecAverage = VectorXd::Zero(t_vecAverage.rows());
             }
             m_qMutex.unlock();

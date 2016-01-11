@@ -154,9 +154,6 @@ public slots:
     */
     void onRtVertColorUpdated(const QByteArray& sourceColorSamples);
 
-signals:
-    void colorInfoOriginUpdated(const QByteArray& arrayVertColor);
-
 private slots:
     //=========================================================================================================
     /**
@@ -182,6 +179,15 @@ private:
     BrainTreeMetaItem*      m_pItemSurfColorInfoOrigin;                 /**< The item which holds the information of the color origin (curvature or annotation). */
     BrainTreeMetaItem*      m_pItemSurfColSulci;                        /**< The item which holds the sulci color information. */
     BrainTreeMetaItem*      m_pItemSurfColGyri;                         /**< The item which holds the gyri color information. */
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the origin of the vertex color (from curvature, from annotation) changed.
+    *
+    * @param[in] arrayVertColor      The new vertex colors.
+    */
+    void colorInfoOriginUpdated(const QByteArray& arrayVertColor);
 };
 
 } //NAMESPACE DISP3DNEWLIB

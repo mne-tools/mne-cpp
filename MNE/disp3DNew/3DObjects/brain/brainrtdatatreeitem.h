@@ -168,16 +168,6 @@ public:
 public slots:
     void onColorInfoOriginUpdated(const QByteArray& arrayVertColor);
 
-signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever you want to provide newly generated colors from the stream rt data.
-    *
-    * @param[in] sourceColorSamples     The color values for each estimated source.
-    * @param[in] vertexIndex            The vertex idnex of each estiamted source.
-    */
-    void rtVertColorUpdated(QByteArray sourceColorSamples, VectorXi vertexIndex);
-
 private slots:
     //=========================================================================================================
     /**
@@ -193,7 +183,7 @@ private slots:
     *
     * @param[in] sourceColorSamples     The color values for each estimated source.
     */
-    void onStcSample(QByteArray sourceColorSamples);
+    void onNewRtData(QByteArray sourceColorSamples);
 
     //=========================================================================================================
     /**
@@ -231,6 +221,16 @@ private:
     bool                m_bInit;                /**< The init flag. */
 
     RtDataWorker*       m_pRtDataWorker;        /**< The source data worker. This worker streams the rt data to this item.*/
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever you want to provide newly generated colors from the stream rt data.
+    *
+    * @param[in] sourceColorSamples     The color values for each estimated source.
+    * @param[in] vertexIndex            The vertex idnex of each estiamted source.
+    */
+    void rtVertColorUpdated(QByteArray sourceColorSamples, VectorXi vertexIndex);
 };
 
 //*************************************************************************************************************

@@ -59,8 +59,8 @@ BrainRTDataTreeItem::BrainRTDataTreeItem(const int &iType, const QString &text)
 , m_bInit(false)
 , m_pRtDataWorker(new RtDataWorker(this))
 {
-    connect(m_pRtDataWorker, &RtDataWorker::stcSample,
-            this, &BrainRTDataTreeItem::onStcSample);
+    connect(m_pRtDataWorker, &RtDataWorker::newRtData,
+            this, &BrainRTDataTreeItem::onNewRtData);
 
     this->setEditable(false);
 }
@@ -249,7 +249,7 @@ void BrainRTDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkS
 
 //*************************************************************************************************************
 
-void BrainRTDataTreeItem::onStcSample(QByteArray sourceColorSamples)
+void BrainRTDataTreeItem::onNewRtData(QByteArray sourceColorSamples)
 {
     emit rtVertColorUpdated(sourceColorSamples, this->data(BrainRTDataTreeItemRoles::RTVertNo).value<VectorXi>());
 }

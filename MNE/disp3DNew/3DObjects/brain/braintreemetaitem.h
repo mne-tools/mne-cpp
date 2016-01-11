@@ -125,6 +125,8 @@ public:
     QVariant data(int role = Qt::UserRole + 1) const;
     void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
+private:
+
 signals:
     //=========================================================================================================
     /**
@@ -169,8 +171,6 @@ signals:
     * @param[in] sVisualizationType     The new visualization type.
     */
     void rtDataVisualizationTypeUpdated(const QString& sVisualizationType);
-
-private:
 };
 
 } //NAMESPACE DISP3DNEWLIB
