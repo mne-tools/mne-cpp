@@ -68,6 +68,7 @@ RtDataWorker::RtDataWorker(QObject* parent)
 , m_bIsLooping(true)
 , m_iAverageSamples(1)
 , m_iCurrentSample(0)
+, m_iVisualizationType(BrainRTDataVisualizationTypes::VertexBased)
 , m_iMSecIntervall(1000)
 , m_sColormap("Hot Negative 2")
 , m_dNormalization(1.0)
@@ -82,6 +83,17 @@ RtDataWorker::~RtDataWorker()
 {
     if(this->isRunning())
         stop();
+}
+
+
+//*************************************************************************************************************
+
+void RtDataWorker::setSurfaceData(const QByteArray& arraySurfaceVertColor, const VectorXi& vecVertNo)
+{
+    QMutexLocker locker(&m_qMutex);
+
+    m_arraySurfaceVertColor = arraySurfaceVertColor;
+    m_vecVertNo = vecVertNo;
 }
 
 
@@ -120,6 +132,15 @@ void RtDataWorker::setInterval(const int& iMSec)
 {
     QMutexLocker locker(&m_qMutex);
     m_iMSecIntervall = iMSec;
+}
+
+
+//*************************************************************************************************************
+
+void RtDataWorker::setVisualizationType(const int& iVisType)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_iVisualizationType = iVisType;
 }
 
 
@@ -232,7 +253,7 @@ void RtDataWorker::run()
             {
                 t_vecAverage /= (double)m_iAverageSamples;
 
-                emit stcSample(transformDataToColor(t_vecAverage));
+                emit stcSample(performVisualizationTypeCalculation(transformDataToColor(t_vecAverage)));
                 t_vecAverage = VectorXd::Zero(t_vecAverage.rows());
             }
             m_qMutex.unlock();
@@ -241,6 +262,48 @@ void RtDataWorker::run()
         //qDebug()<<"RtDataWorker::run()"<<timer.elapsed()<<"msecs";
         QThread::msleep(m_iMSecIntervall);
     }
+}
+
+
+//*************************************************************************************************************
+
+QByteArray RtDataWorker::performVisualizationTypeCalculation(const QByteArray& sourceColorSamples)
+{
+    //NOTE: This function is called for every new sample point and therfore it must be kept highly efficient!
+    if((sourceColorSamples.size()/((int)sizeof(float)*3)) != m_vecVertNo.rows()) {
+        qDebug()<<"RtDataWorker::performVisualizationTypeCalculation - number of rows in sample ("<<sourceColorSamples.size()/((int)sizeof(float)*3)<<") do not not match with idx/no number of rows in vertex ("<<m_vecVertNo.rows()<<"). Returning...";
+        return QByteArray();
+    }
+
+    QByteArray arrayCurrentVertColor = m_arraySurfaceVertColor;
+
+    //Generate color data for vertices
+    switch(m_iVisualizationType) {
+        case BrainRTDataVisualizationTypes::VertexBased: {
+             //Create final QByteArray with colors based on the current anatomical information
+            const float *rawSourceColorSamples = reinterpret_cast<const float *>(sourceColorSamples.data());
+            int idxSourceColorSamples = 0;
+            float *rawArrayCurrentVertColor = reinterpret_cast<float *>(arrayCurrentVertColor.data());
+
+            for(int i = 0; i<m_vecVertNo.rows(); i++) {
+                rawArrayCurrentVertColor[m_vecVertNo(i)*3+0] = rawSourceColorSamples[idxSourceColorSamples++];
+                rawArrayCurrentVertColor[m_vecVertNo(i)*3+1] = rawSourceColorSamples[idxSourceColorSamples++];
+                rawArrayCurrentVertColor[m_vecVertNo(i)*3+2] = rawSourceColorSamples[idxSourceColorSamples++];
+            }
+            break;
+        }
+
+        case BrainRTDataVisualizationTypes::SmoothingBased: {
+            //TODO: Smooth here!
+            break;
+        }
+
+        case BrainRTDataVisualizationTypes::AnnotationBased: {
+            break;
+        }
+    }
+
+    return arrayCurrentVertColor;
 }
 
 

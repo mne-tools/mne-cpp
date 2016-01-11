@@ -101,7 +101,8 @@ namespace BrainTreeModelItemTypes
                     RTDataTimeInterval = QStandardItem::UserType + 18,
                     RTDataLoopedStreaming = QStandardItem::UserType + 19,
                     RTDataNumberAverages = QStandardItem::UserType + 20,
-                    RTDataNormalizationValue = QStandardItem::UserType + 21};
+                    RTDataNormalizationValue = QStandardItem::UserType + 21,
+                    RTDataVisualizationType = QStandardItem::UserType + 22};
 }
 
 // Model item roles
@@ -121,7 +122,8 @@ namespace BrainTreeMetaItemRoles
                     RTDataTimeInterval = Qt::UserRole + 12,
                     RTDataLoopedStreaming = Qt::UserRole + 13,
                     RTDataNumberAverages = Qt::UserRole + 14,
-                    RTDataNormalizationValue = Qt::UserRole + 15};
+                    RTDataNormalizationValue = Qt::UserRole + 15,
+                    RTDataVisualizationType = Qt::UserRole + 16};
 }
 
 namespace BrainSurfaceTreeItemRoles
@@ -159,11 +161,18 @@ namespace BrainAnnotationTreeItemRoles
 namespace BrainRTDataTreeItemRoles
 {
     enum ItemRole{RTData = Qt::UserRole + 500,
-                    RTVerticesIdx = Qt::UserRole + 501,
+                    RTVertNo = Qt::UserRole + 501,
                     RTTimes = Qt::UserRole + 502,
                     RTHemi = Qt::UserRole + 503,
                     RTStartIdx = Qt::UserRole + 504,
                     RTEndIdx = Qt::UserRole + 505};
+}
+
+namespace BrainRTDataVisualizationTypes
+{
+    enum ItemRole{VertexBased = Qt::UserRole + 600,
+                    SmoothingBased = Qt::UserRole + 601,
+                    AnnotationBased = Qt::UserRole + 602};
 }
 
 } //NAMESPACE DISP3DNEWLIB

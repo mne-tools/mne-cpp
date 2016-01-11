@@ -129,8 +129,12 @@ BrainRTDataTreeItem* BrainHemisphereTreeItem::addData(const MNESourceEstimate& t
         m_pBrainRtDataTreeItem = new BrainRTDataTreeItem(BrainTreeModelItemTypes::RTDataItem);
         connect(m_pBrainRtDataTreeItem, &BrainRTDataTreeItem::rtVertColorUpdated,
                 m_pSurfaceItem, &BrainSurfaceTreeItem::onRtVertColorUpdated);
+        connect(m_pSurfaceItem, &BrainSurfaceTreeItem::colorInfoOriginUpdated,
+                m_pBrainRtDataTreeItem, &BrainRTDataTreeItem::onColorInfoOriginUpdated);
+
         *this<<m_pBrainRtDataTreeItem;
-        m_pBrainRtDataTreeItem->addData(tSourceEstimate, tForwardSolution, this->text());
+
+        m_pBrainRtDataTreeItem->addData(tSourceEstimate, tForwardSolution, m_pSurfaceItem->data(BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert).value<QByteArray>(), this->text());
         return m_pBrainRtDataTreeItem;
     }
 

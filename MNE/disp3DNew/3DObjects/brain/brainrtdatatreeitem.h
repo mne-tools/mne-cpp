@@ -138,13 +138,14 @@ public:
     /**
     * Adds FreeSurfer data based on annotation information to this item.
     *
-    * @param[in] tSourceEstimate    The MNESourceEstimate.
-    * @param[in] tForwardSolution   The MNEForwardSolution.
-    * @param[in] hemi               The hemispehre of this brain rt data item. This information is important in order to cut out the wanted source estimations from the MNESourceEstimate
+    * @param[in] tSourceEstimate        The MNESourceEstimate.
+    * @param[in] tForwardSolution       The MNEForwardSolution.
+    * @param[in] hemi                   The hemispehre of this brain rt data item. This information is important in order to cut out the wanted source estimations from the MNESourceEstimate
+    * @param[in] arraySurfaceVertColor  The vertex colors for the surface where the data is to be plotted on.
     *
-    * @return                       Returns true if successful.
+    * @return                           Returns true if successful.
     */
-    bool addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QString& hemi = "Unknown");
+    bool addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QByteArray &arraySurfaceVertColor, const QString& hemi = "Unknown");
 
     //=========================================================================================================
     /**
@@ -163,6 +164,9 @@ public:
     * @return                       Returns true if this item is initialized.
     */
     inline bool isInit() const;
+
+public slots:
+    void onColorInfoOriginUpdated(const QByteArray& arrayVertColor);
 
 signals:
     //=========================================================================================================
@@ -215,9 +219,18 @@ private slots:
     */
     void onDataNormalizationValueChanged(const double& dValue);
 
+    //=========================================================================================================
+    /**
+    * This slot gets called whenever the preferred visualization type changes (single vertex, smoothing, annotation based). This functions translates from QString to m_iVisualizationType.
+    *
+    * @param[in] sVisType     The new visualization type.
+    */
+    void onVisualizationTypeChanged(const QString& sVisType);
+
 private:
-    bool                m_bInit;            /**< The init flag. */
-    RtDataWorker*       m_pRtDataWorker;    /**< The source data worker. This worker streams the rt data to this item.*/
+    bool                m_bInit;                /**< The init flag. */
+
+    RtDataWorker*       m_pRtDataWorker;        /**< The source data worker. This worker streams the rt data to this item.*/
 };
 
 //*************************************************************************************************************

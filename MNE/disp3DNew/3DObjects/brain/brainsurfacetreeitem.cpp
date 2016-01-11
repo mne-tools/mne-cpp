@@ -226,6 +226,8 @@ void BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorUpdated()
             this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurvatureColorVert);
             this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert);
 
+            emit colorInfoOriginUpdated(arrayNewVertColor);
+
             //Return here because the new colors will be set to the renderable entity in the setData() function with the role BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert
             return;
         }
@@ -241,6 +243,8 @@ void BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorUpdated()
                     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceAnnotationColorVert);
                     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert);
 
+                    emit colorInfoOriginUpdated(arrayNewVertColor);
+
                     //Return here because the new colors will be set to the renderable entity in the setData() function with the role BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert
                     return;
                 }
@@ -252,44 +256,14 @@ void BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorUpdated()
 
 //*************************************************************************************************************
 
-void BrainSurfaceTreeItem::onRtVertColorUpdated(const QByteArray& sourceColorSamples, const VectorXi& vertexIndex)
+void BrainSurfaceTreeItem::onRtVertColorUpdated(const QByteArray& sourceColorSamples)
 {
-    if((sourceColorSamples.size()/((int)sizeof(float)*3)) != vertexIndex.rows()) {
-        qDebug()<<"BrainSurfaceTreeItem::updateRtVertColor - number of rows in sample ("<<sourceColorSamples.size()/((int)sizeof(float)*3)<<") do not not match with idx/no number of rows in vertex ("<<vertexIndex.rows()<<"). Returning...";
-        return;
-    }
-
-    //This function is called for every new sample point and therfore it must be kept highly efficient!
-    QString sColorInfoOrigin = m_pItemSurfColorInfoOrigin->data(BrainTreeMetaItemRoles::SurfaceColorInfoOrigin).toString();
-    QByteArray arrayCurrentVertColor;
-
-    if(sColorInfoOrigin == "Color from curvature") {
-        arrayCurrentVertColor = this->data(BrainSurfaceTreeItemRoles::SurfaceCurvatureColorVert).value<QByteArray>();
-    }
-
-    if(sColorInfoOrigin == "Color from annotation") {
-        arrayCurrentVertColor = this->data(BrainSurfaceTreeItemRoles::SurfaceAnnotationColorVert).value<QByteArray>();
-    }
-
-    //Create final QByteArray with colors based on the current anatomical information
-    //TODO: Smooth here!
-    const float *rawSourceColorSamples = reinterpret_cast<const float *>(sourceColorSamples.data());
-    int idxSourceColorSamples = 0;
-    float *rawArrayCurrentVertColor = reinterpret_cast<float *>(arrayCurrentVertColor.data());
-
-    for(int i = 0; i<vertexIndex.rows(); i++) {
-        rawArrayCurrentVertColor[vertexIndex(i)*3+0] = rawSourceColorSamples[idxSourceColorSamples++];
-        rawArrayCurrentVertColor[vertexIndex(i)*3+1] = rawSourceColorSamples[idxSourceColorSamples++];
-        rawArrayCurrentVertColor[vertexIndex(i)*3+2] = rawSourceColorSamples[idxSourceColorSamples++];
-    }
-
-    //Set new data. Here we also pass the new color values to the renderer (see setData function)
+    //Set new data.
+    //In setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert) we pass the new color values to the renderer (see setData function).
     QVariant data;
-    data.setValue(arrayCurrentVertColor);
+    data.setValue(sourceColorSamples);
     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceRTSourceLocColor);
     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert);
-
-    return;
 }
 
 

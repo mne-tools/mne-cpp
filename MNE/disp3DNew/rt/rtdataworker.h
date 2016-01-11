@@ -44,6 +44,7 @@
 #include <iostream>
 
 #include "../disp3dnew_global.h"
+#include "../helpers/types.h"
 
 #include <disp/helpers/colormap.h>
 
@@ -115,6 +116,15 @@ public:
 
     //=========================================================================================================
     /**
+    * Add surface data which the streamed data is plotted on.
+    *
+    * @param[in] arraySurfaceVertColor  The vertex colors for the surface where the data is to be plotted on.
+    * @param[in] vecVertNo              The vertex indexes.
+    */
+    void setSurfaceData(const QByteArray& arraySurfaceVertColor, const VectorXi& vecVertNo);
+
+    //=========================================================================================================
+    /**
     * Add data which is to be streamed.
     *
     * @param[in] data         The new data.
@@ -142,6 +152,14 @@ public:
     * @param[in] iMSec              The new length in milli Seconds to wait inbetween data samples.
     */
     void setInterval(const int& iMSec);
+
+    //=========================================================================================================
+    /**
+    * Set the visualization type.
+    *
+    * @param[in] iVisType           The new visualization type.
+    */
+    void setVisualizationType(const int& iVisType);
 
     //=========================================================================================================
     /**
@@ -191,6 +209,8 @@ protected:
     virtual void run();
 
 private:
+    QByteArray performVisualizationTypeCalculation(const QByteArray& sourceColorSamples);
+
     //=========================================================================================================
     /**
     * Transform the data sample values to color values.
@@ -202,7 +222,9 @@ private:
 
     QMutex      m_qMutex;               /**< The thread's mutex. */
 
-    MatrixXd    m_matData;              /**< List that holds the fiff matrix data <n_channels x n_samples> */
+    QByteArray  m_arraySurfaceVertColor;/**< The vertex colors for the surface where the data is to be plotted on. */
+    MatrixXd    m_matData;              /**< List that holds the fiff matrix data <n_channels x n_samples>. */
+    VectorXi    m_vecVertNo;            /**< Vector with the source vertx indexes. */
 
     bool        m_bIsRunning;           /**< Flag if this thread is running. */
     bool        m_bIsLooping;           /**< Flag if this thread should repeat sending the same data over and over again. */
@@ -210,6 +232,7 @@ private:
     qint32      m_iAverageSamples;      /**< Number of average to compute. */
     qint32      m_iCurrentSample;       /**< Number of the current sample which is/was streamed. */
     qint32      m_iMSecIntervall;       /**< Length in milli Seconds to wait inbetween data samples. */
+    int         m_iVisualizationType;   /**< The visualization type (single vertex, smoothing, annotation based). */
 
     double      m_dNormalization;       /**< Normalization value. */
     double      m_dNormalizationMax;    /**< Value to normalize to. */
