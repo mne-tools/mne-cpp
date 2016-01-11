@@ -97,6 +97,8 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
 
         case BrainTreeModelItemTypes::RTDataColormapType: {
             QComboBox* pComboBox = new QComboBox(parent);
+            connect(pComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+                    this, &BrainTreeDelegate::onEditorEdited);
             pComboBox->addItem("Hot Negative 1");
             pComboBox->addItem("Hot Negative 2");
             pComboBox->addItem("Hot");
