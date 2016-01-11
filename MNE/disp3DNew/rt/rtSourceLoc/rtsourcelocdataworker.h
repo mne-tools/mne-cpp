@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtdataworker.h
+* @file     rtsourcelocdataworker.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    RtDataWorker class declaration
+* @brief    RtSourceLocDataWorker class declaration
 *
 */
 
-#ifndef RTDATAWORKER_H
-#define RTDATAWORKER_H
+#ifndef RTSOURCELOCDATAWORKER_H
+#define RTSOURCELOCDATAWORKER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -43,8 +43,8 @@
 
 #include <iostream>
 
-#include "../disp3dnew_global.h"
-#include "../helpers/types.h"
+#include "../../disp3dnew_global.h"
+#include "../../helpers/types.h"
 
 #include <disp/helpers/colormap.h>
 
@@ -93,12 +93,12 @@ using namespace DISPLIB;
 *
 * @brief Data scheduler
 */
-class DISP3DNEWSHARED_EXPORT RtDataWorker : public QThread
+class DISP3DNEWSHARED_EXPORT RtSourceLocDataWorker : public QThread
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<RtDataWorker> SPtr;            /**< Shared pointer type for RtDataWorker class. */
-    typedef QSharedPointer<const RtDataWorker> ConstSPtr; /**< Const shared pointer type for RtDataWorker class. */
+    typedef QSharedPointer<RtSourceLocDataWorker> SPtr;            /**< Shared pointer type for RtSourceLocDataWorker class. */
+    typedef QSharedPointer<const RtSourceLocDataWorker> ConstSPtr; /**< Const shared pointer type for RtSourceLocDataWorker class. */
 
     //=========================================================================================================
     /**
@@ -106,13 +106,13 @@ public:
     *
     * @param[in] parent      The parent of the QObject.
     */
-    RtDataWorker(QObject* parent = 0);
+    RtSourceLocDataWorker(QObject* parent = 0);
 
     //=========================================================================================================
     /**
     * Default destructor.
     */
-    ~RtDataWorker();
+    ~RtSourceLocDataWorker();
 
     //=========================================================================================================
     /**
@@ -200,6 +200,14 @@ protected:
     virtual void run();
 
 private:
+    //=========================================================================================================
+    /**
+    * Perfrom the needed visualization type computations, such as smoothing, annoation coliring, etc..
+    *
+    * @param[in] sourceColorSamples         The color data for the sources.
+    *
+    * @return                               Returns the final colors in form of a QByteArray.
+    */
     QByteArray performVisualizationTypeCalculation(const QByteArray& sourceColorSamples);
 
     //=========================================================================================================
@@ -243,4 +251,4 @@ signals:
 
 } // NAMESPACE
 
-#endif // RTDATAWORKER_H
+#endif // RTSOURCELOCDATAWORKER_H
