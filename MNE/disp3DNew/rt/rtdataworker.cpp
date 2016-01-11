@@ -107,6 +107,75 @@ void RtDataWorker::clear()
 
 //*************************************************************************************************************
 
+void RtDataWorker::setAverage(qint32 samples)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_iAverageSamples = samples;
+}
+
+
+//*************************************************************************************************************
+
+void RtDataWorker::setInterval(const int& iMSec)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_iMSecIntervall = iMSec;
+}
+
+
+//*************************************************************************************************************
+
+void RtDataWorker::setColormapType(const QString& sColormapType)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_sColormap = sColormapType;
+}
+
+
+//*************************************************************************************************************
+
+void RtDataWorker::setNormalization(const double& dValue)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_dNormalization = (m_dNormalizationMax/100.0) * dValue;
+}
+
+
+//*************************************************************************************************************
+
+void RtDataWorker::setLoop(bool looping)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_bIsLooping = looping;
+}
+
+
+//*************************************************************************************************************
+
+void RtDataWorker::start()
+{
+    m_qMutex.lock();
+    m_iCurrentSample = 0;
+    m_qMutex.unlock();
+
+    QThread::start();
+}
+
+
+//*************************************************************************************************************
+
+void RtDataWorker::stop()
+{
+    m_qMutex.lock();
+    m_bIsRunning = false;
+    m_qMutex.unlock();
+
+    QThread::wait();
+}
+
+
+//*************************************************************************************************************
+
 void RtDataWorker::run()
 {
     VectorXd t_vecAverage(0,0);
@@ -244,73 +313,4 @@ QByteArray RtDataWorker::transformDataToColor(const VectorXd& data)
     }
 
     return arrayColor;
-}
-
-
-//*************************************************************************************************************
-
-void RtDataWorker::setAverage(qint32 samples)
-{
-    QMutexLocker locker(&m_qMutex);
-    m_iAverageSamples = samples;
-}
-
-
-//*************************************************************************************************************
-
-void RtDataWorker::setInterval(const int& iMSec)
-{
-    QMutexLocker locker(&m_qMutex);
-    m_iMSecIntervall = iMSec;
-}
-
-
-//*************************************************************************************************************
-
-void RtDataWorker::setColormapType(const QString& sColormapType)
-{
-    QMutexLocker locker(&m_qMutex);
-    m_sColormap = sColormapType;
-}
-
-
-//*************************************************************************************************************
-
-void RtDataWorker::setNormalization(const double& dValue)
-{
-    QMutexLocker locker(&m_qMutex);
-    m_dNormalization = (m_dNormalizationMax/100.0) * dValue;
-}
-
-
-//*************************************************************************************************************
-
-void RtDataWorker::setLoop(bool looping)
-{
-    QMutexLocker locker(&m_qMutex);
-    m_bIsLooping = looping;
-}
-
-
-//*************************************************************************************************************
-
-void RtDataWorker::stop()
-{
-    m_qMutex.lock();
-    m_bIsRunning = false;
-    m_qMutex.unlock();
-
-    QThread::wait();
-}
-
-
-//*************************************************************************************************************
-
-void RtDataWorker::start()
-{
-    m_qMutex.lock();
-    m_iCurrentSample = 0;
-    m_qMutex.unlock();
-
-    QThread::start();
 }
