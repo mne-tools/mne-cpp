@@ -45,7 +45,7 @@
 
 #include "../../helpers/abstracttreeitem.h"
 #include "../../helpers/types.h"
-#include "../../rt/rtdataworker.h"
+#include "../../rt/rtSourceLoc/rtsourcelocdataworker.h"
 
 #include "braintreemetaitem.h"
 
@@ -218,9 +218,9 @@ private slots:
     void onVisualizationTypeChanged(const QString& sVisType);
 
 private:
-    bool                m_bInit;                /**< The init flag. */
+    bool                        m_bInit;                /**< The init flag. */
 
-    RtDataWorker*       m_pRtDataWorker;        /**< The source data worker. This worker streams the rt data to this item.*/
+    RtSourceLocDataWorker*      m_pSourceLocRtDataWorker;        /**< The source data worker. This worker streams the rt data to this item.*/
 
 signals:
     //=========================================================================================================

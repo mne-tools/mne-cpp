@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     rtdataworker.cpp
+* @file     rtsourcelocdataworker.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     March, 2015
+* @date     December, 2015
 *
 * @section  LICENSE
 *
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the RtDataWorker class.
+* @brief    Implementation of the RtSourceLocDataWorker class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rtdataworker.h"
+#include "rtsourcelocdataworker.h"
 
 
 //*************************************************************************************************************
@@ -62,7 +62,7 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtDataWorker::RtDataWorker(QObject* parent)
+RtSourceLocDataWorker::RtSourceLocDataWorker(QObject* parent)
 : QThread(parent)
 , m_bIsRunning(false)
 , m_bIsLooping(true)
@@ -79,7 +79,7 @@ RtDataWorker::RtDataWorker(QObject* parent)
 
 //*************************************************************************************************************
 
-RtDataWorker::~RtDataWorker()
+RtSourceLocDataWorker::~RtSourceLocDataWorker()
 {
     if(this->isRunning())
         stop();
@@ -88,7 +88,7 @@ RtDataWorker::~RtDataWorker()
 
 //*************************************************************************************************************
 
-void RtDataWorker::setSurfaceData(const QByteArray& arraySurfaceVertColor, const VectorXi& vecVertNo)
+void RtSourceLocDataWorker::setSurfaceData(const QByteArray& arraySurfaceVertColor, const VectorXi& vecVertNo)
 {
     QMutexLocker locker(&m_qMutex);
 
@@ -99,7 +99,7 @@ void RtDataWorker::setSurfaceData(const QByteArray& arraySurfaceVertColor, const
 
 //*************************************************************************************************************
 
-void RtDataWorker::addData(const MatrixXd& data)
+void RtSourceLocDataWorker::addData(const MatrixXd& data)
 {
     QMutexLocker locker(&m_qMutex);
     if(data.size() == 0)
@@ -111,7 +111,7 @@ void RtDataWorker::addData(const MatrixXd& data)
 
 //*************************************************************************************************************
 
-void RtDataWorker::clear()
+void RtSourceLocDataWorker::clear()
 {
     QMutexLocker locker(&m_qMutex);
 }
@@ -119,7 +119,7 @@ void RtDataWorker::clear()
 
 //*************************************************************************************************************
 
-void RtDataWorker::setAverage(qint32 samples)
+void RtSourceLocDataWorker::setAverage(qint32 samples)
 {
     QMutexLocker locker(&m_qMutex);
     m_iAverageSamples = samples;
@@ -128,7 +128,7 @@ void RtDataWorker::setAverage(qint32 samples)
 
 //*************************************************************************************************************
 
-void RtDataWorker::setInterval(const int& iMSec)
+void RtSourceLocDataWorker::setInterval(const int& iMSec)
 {
     QMutexLocker locker(&m_qMutex);
     m_iMSecIntervall = iMSec;
@@ -137,7 +137,7 @@ void RtDataWorker::setInterval(const int& iMSec)
 
 //*************************************************************************************************************
 
-void RtDataWorker::setVisualizationType(const int& iVisType)
+void RtSourceLocDataWorker::setVisualizationType(const int& iVisType)
 {
     QMutexLocker locker(&m_qMutex);
     m_iVisualizationType = iVisType;
@@ -146,7 +146,7 @@ void RtDataWorker::setVisualizationType(const int& iVisType)
 
 //*************************************************************************************************************
 
-void RtDataWorker::setColormapType(const QString& sColormapType)
+void RtSourceLocDataWorker::setColormapType(const QString& sColormapType)
 {
     QMutexLocker locker(&m_qMutex);
     m_sColormap = sColormapType;
@@ -155,7 +155,7 @@ void RtDataWorker::setColormapType(const QString& sColormapType)
 
 //*************************************************************************************************************
 
-void RtDataWorker::setNormalization(const double& dValue)
+void RtSourceLocDataWorker::setNormalization(const double& dValue)
 {
     QMutexLocker locker(&m_qMutex);
     m_dNormalization = (m_dNormalizationMax/100.0) * dValue;
@@ -164,7 +164,7 @@ void RtDataWorker::setNormalization(const double& dValue)
 
 //*************************************************************************************************************
 
-void RtDataWorker::setLoop(bool looping)
+void RtSourceLocDataWorker::setLoop(bool looping)
 {
     QMutexLocker locker(&m_qMutex);
     m_bIsLooping = looping;
@@ -173,7 +173,7 @@ void RtDataWorker::setLoop(bool looping)
 
 //*************************************************************************************************************
 
-void RtDataWorker::start()
+void RtSourceLocDataWorker::start()
 {
     m_qMutex.lock();
     m_iCurrentSample = 0;
@@ -185,7 +185,7 @@ void RtDataWorker::start()
 
 //*************************************************************************************************************
 
-void RtDataWorker::stop()
+void RtSourceLocDataWorker::stop()
 {
     m_qMutex.lock();
     m_bIsRunning = false;
@@ -197,7 +197,7 @@ void RtDataWorker::stop()
 
 //*************************************************************************************************************
 
-void RtDataWorker::run()
+void RtSourceLocDataWorker::run()
 {
     VectorXd t_vecAverage(0,0);
 
@@ -259,7 +259,7 @@ void RtDataWorker::run()
             m_qMutex.unlock();
         }
 
-        //qDebug()<<"RtDataWorker::run()"<<timer.elapsed()<<"msecs";
+        //qDebug()<<"RtSourceLocDataWorker::run()"<<timer.elapsed()<<"msecs";
         QThread::msleep(m_iMSecIntervall);
     }
 }
@@ -267,11 +267,11 @@ void RtDataWorker::run()
 
 //*************************************************************************************************************
 
-QByteArray RtDataWorker::performVisualizationTypeCalculation(const QByteArray& sourceColorSamples)
+QByteArray RtSourceLocDataWorker::performVisualizationTypeCalculation(const QByteArray& sourceColorSamples)
 {
     //NOTE: This function is called for every new sample point and therfore it must be kept highly efficient!
     if((sourceColorSamples.size()/((int)sizeof(float)*3)) != m_vecVertNo.rows()) {
-        qDebug()<<"RtDataWorker::performVisualizationTypeCalculation - number of rows in sample ("<<sourceColorSamples.size()/((int)sizeof(float)*3)<<") do not not match with idx/no number of rows in vertex ("<<m_vecVertNo.rows()<<"). Returning...";
+        qDebug()<<"RtSourceLocDataWorker::performVisualizationTypeCalculation - number of rows in sample ("<<sourceColorSamples.size()/((int)sizeof(float)*3)<<") do not not match with idx/no number of rows in vertex ("<<m_vecVertNo.rows()<<"). Returning...";
         return QByteArray();
     }
 
@@ -309,7 +309,7 @@ QByteArray RtDataWorker::performVisualizationTypeCalculation(const QByteArray& s
 
 //*************************************************************************************************************
 
-QByteArray RtDataWorker::transformDataToColor(const VectorXd& data)
+QByteArray RtSourceLocDataWorker::transformDataToColor(const VectorXd& data)
 {
     //Note: This function needs to be implemented extremley efficient
     QByteArray arrayColor;
