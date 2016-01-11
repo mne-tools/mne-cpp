@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
 * @file     rtdataworker.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2015
+* @date     December, 2015
 *
 * @section  LICENSE
 *
@@ -99,54 +99,124 @@ public:
     typedef QSharedPointer<RtDataWorker> SPtr;            /**< Shared pointer type for RtDataWorker class. */
     typedef QSharedPointer<const RtDataWorker> ConstSPtr; /**< Const shared pointer type for RtDataWorker class. */
 
+    //=========================================================================================================
+    /**
+    * Default constructor.
+    *
+    * @param[in] parent      The parent of the QObject.
+    */
     RtDataWorker(QObject* parent = 0);
 
+    //=========================================================================================================
+    /**
+    * Default destructor.
+    */
     ~RtDataWorker();
 
+    //=========================================================================================================
+    /**
+    * Add data which is to be streamed.
+    *
+    * @param[in] data         The new data.
+    */
     void addData(const MatrixXd& data);
 
+    //=========================================================================================================
+    /**
+    * Clear this worker.
+    */
     void clear();
 
+    //=========================================================================================================
+    /**
+    * Set the number of average to take after emitting the data to the listening threads.
+    *
+    * @param[in] samples            The new number of averages.
+    */
     void setAverage(qint32 samples);
 
+    //=========================================================================================================
+    /**
+    * Set the length in milli Seconds to wait inbetween data samples.
+    *
+    * @param[in] iMSec              The new length in milli Seconds to wait inbetween data samples.
+    */
     void setInterval(const int& iMSec);
 
+    //=========================================================================================================
+    /**
+    * Set the type of the colormap.
+    *
+    * @param[in] sColormapType      The new colormap type.
+    */
     void setColormapType(const QString& sColormapType);
 
+    //=========================================================================================================
+    /**
+    * Set the normalization value.
+    *
+    * @param[in] dValue             The new normalization value.
+    */
     void setNormalization(const double& dValue);
 
+    //=========================================================================================================
+    /**
+    * Set the loop functionality on or off.
+    *
+    * @param[in] looping            The new looping state.
+    */
     void setLoop(bool looping);
 
+    //=========================================================================================================
+    /**
+    * QThread functions
+    */
     void stop();
-
     void start();
 
 signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever this item should send a new sample to its listening threads.
+    *
+    * @param[in] colorSample     The samples data in form of rgb colors as QByteArray.
+    */
     void stcSample(QByteArray colorSample);
 
 protected:
+    //=========================================================================================================
+    /**
+    * QThread functions
+    */
     virtual void run();
 
 private:
+    //=========================================================================================================
+    /**
+    * Transform the data sample values to color values.
+    *
+    * @param[in] data               The data which is to be transformed.
+    * @return                       Returns the colors in form of a QByteArray.
+    */
     QByteArray transformDataToColor(const VectorXd& data);
 
-    QMutex              m_qMutex;
+    QMutex      m_qMutex;               /**< The thread's mutex. */
 
-    MatrixXd            m_matData;        /**< List that holds the fiff matrix data <n_channels x n_samples> */
+    MatrixXd    m_matData;              /**< List that holds the fiff matrix data <n_channels x n_samples> */
 
-    bool        m_bIsRunning;
-    bool        m_bIsLooping;
+    bool        m_bIsRunning;           /**< Flag if this thread is running. */
+    bool        m_bIsLooping;           /**< Flag if this thread should repeat sending the same data over and over again. */
 
-    qint32      m_iAverageSamples;
-    qint32      m_iCurrentSample;
-    qint32      m_iMSecIntervall;
+    qint32      m_iAverageSamples;      /**< Number of average to compute. */
+    qint32      m_iCurrentSample;       /**< Number of the current sample which is/was streamed. */
+    qint32      m_iMSecIntervall;       /**< Length in milli Seconds to wait inbetween data samples. */
 
-    double      m_dNormalization;
-    double      m_dNormalizationMax;
+    double      m_dNormalization;       /**< Normalization value. */
+    double      m_dNormalizationMax;    /**< Value to normalize to. */
 
-    QString     m_sColormap;
+    QString     m_sColormap;            /**< The type of colormap ("Hot", "Hot Negative 1", etc.). */
 };
 
 } // NAMESPACE
 
-#endif // RtDataWorker_H
+#endif // RTDATAWORKER_H
