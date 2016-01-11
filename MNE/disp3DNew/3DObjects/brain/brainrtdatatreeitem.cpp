@@ -152,7 +152,7 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
 
     QString sIsClustered = isClustered ? "Clustered" : "Full";
     BrainTreeMetaItem* pItemSourceSpaceType = new BrainTreeMetaItem(BrainTreeModelItemTypes::RTDataSourceSpaceType, sIsClustered);
-    pItemRTDataStreamStatus->setEditable(false);
+    pItemSourceSpaceType->setEditable(false);
     *this<<pItemSourceSpaceType;
     data.setValue(sIsClustered);
     pItemSourceSpaceType->setData(data, BrainTreeMetaItemRoles::RTDataSourceSpaceType);
