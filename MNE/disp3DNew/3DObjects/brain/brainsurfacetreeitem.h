@@ -132,7 +132,7 @@ public:
     * AbstractTreeItem functions
     */
     QVariant data(int role = Qt::UserRole + 1) const;
-    void  setData(const QVariant& value, int role = Qt::UserRole + 1);
+    void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
     //=========================================================================================================
     /**
@@ -151,9 +151,11 @@ public slots:
     * Call this slot whenever new colors for the activation data plotting are available.
     *
     * @param[in] sourceColorSamples     The color values for each estimated source.
-    * @param[in] vertexIndex            The vertex idnex of each estiamted source.
     */
-    void onRtVertColorUpdated(const QByteArray& sourceColorSamples, const VectorXi& vertexIndex);
+    void onRtVertColorUpdated(const QByteArray& sourceColorSamples);
+
+signals:
+    void colorInfoOriginUpdated(const QByteArray& arrayVertColor);
 
 private slots:
     //=========================================================================================================

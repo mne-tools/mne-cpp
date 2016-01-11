@@ -129,6 +129,14 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
             return pSpinBox;
             break;
         }
+
+        case BrainTreeModelItemTypes::RTDataVisualizationType: {
+            QComboBox* pComboBox = new QComboBox(parent);
+            pComboBox->addItem("Vertex based");
+            pComboBox->addItem("Smoothing based");
+            pComboBox->addItem("Annotation based");
+            return pComboBox;
+        }
     }
 
     return QItemDelegate::createEditor(parent, option, index);
@@ -184,6 +192,13 @@ void BrainTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index)
             pSpinBox->setValue(value);
             break;
         }
+
+        case BrainTreeModelItemTypes::RTDataVisualizationType: {
+            QString visType = index.model()->data(index, BrainTreeMetaItemRoles::RTDataVisualizationType).toString();
+            QComboBox* pComboBox = static_cast<QComboBox*>(editor);
+            pComboBox->setCurrentText(visType);
+            break;
+        }
     }
 
     QItemDelegate::setEditorData(editor, index);
@@ -231,9 +246,9 @@ void BrainTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
         }
 
         case BrainTreeModelItemTypes::RTDataColormapType: {
-            QComboBox* pColorDialog = static_cast<QComboBox*>(editor);
+            QComboBox* pColorMapType = static_cast<QComboBox*>(editor);
             QVariant data;
-            data.setValue(pColorDialog->currentText());
+            data.setValue(pColorMapType->currentText());
 
             model->setData(index, data, BrainTreeMetaItemRoles::RTDataColormapType);
             model->setData(index, data, Qt::DisplayRole);
@@ -259,6 +274,16 @@ void BrainTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
             model->setData(index, data, BrainTreeMetaItemRoles::RTDataTimeInterval);
             model->setData(index, data, Qt::DisplayRole);
             break;
+        }
+
+        case BrainTreeModelItemTypes::RTDataVisualizationType: {
+            QComboBox* pVisType = static_cast<QComboBox*>(editor);
+            QVariant data;
+            data.setValue(pVisType->currentText());
+
+            model->setData(index, data, BrainTreeMetaItemRoles::RTDataVisualizationType);
+            model->setData(index, data, Qt::DisplayRole);
+            return;
         }
     }
 

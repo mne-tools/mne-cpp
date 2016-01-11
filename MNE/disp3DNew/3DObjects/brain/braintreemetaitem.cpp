@@ -111,6 +111,12 @@ void  BrainTreeMetaItem::setData(const QVariant& value, int role)
             emit rtDataColormapTypeUpdated(value.toString());
             break;
         }
+
+        case BrainTreeMetaItemRoles::RTDataVisualizationType: {
+            emit rtDataVisualizationTypeUpdated(value.toString());
+            break;
+        }
+
     }
 }
 

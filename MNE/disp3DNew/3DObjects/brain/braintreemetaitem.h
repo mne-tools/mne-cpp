@@ -162,6 +162,14 @@ signals:
     */
     void rtDataColormapTypeUpdated(const QString& sColormapType);
 
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the visualization type of the data streaming changed (single vertex, smoothing, annotation based).
+    *
+    * @param[in] sVisualizationType     The new visualization type.
+    */
+    void rtDataVisualizationTypeUpdated(const QString& sVisualizationType);
+
 private:
 };
 

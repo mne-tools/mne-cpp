@@ -91,7 +91,7 @@ void  BrainRTDataTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QString& hemi)
+bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QByteArray& arraySurfaceVertColor, const QString& hemi)
 {   
     //Find out which hemisphere we are working with and set as item's data
     int iHemi = hemi == "Left" ? 0 : hemi == "Right" ? 1 : -1;
@@ -137,7 +137,7 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
 
     if(iHemi != -1 && iHemi < tForwardSolution.src.size()) {
         data.setValue(tForwardSolution.src[iHemi].vertno); //TODO: When clustered source space, these idx no's are the annotation labels
-        this->setData(data, BrainRTDataTreeItemRoles::RTVerticesIdx);
+        this->setData(data, BrainRTDataTreeItemRoles::RTVertNo);
     }
 
     //Add surface meta information as item children
@@ -149,6 +149,13 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     pItemRTDataStreamStatus->setCheckState(Qt::Unchecked);
     data.setValue(false);
     pItemRTDataStreamStatus->setData(data, BrainTreeMetaItemRoles::RTDataStreamStatus);
+
+    BrainTreeMetaItem* pItemVisuaizationType = new BrainTreeMetaItem(BrainTreeModelItemTypes::RTDataVisualizationType, "Single Vertex");
+    connect(pItemVisuaizationType, &BrainTreeMetaItem::rtDataVisualizationTypeUpdated,
+            this, &BrainRTDataTreeItem::onVisualizationTypeChanged);
+    *this<<pItemVisuaizationType;
+    data.setValue(QString("Single Vertex"));
+    pItemVisuaizationType->setData(data, BrainTreeMetaItemRoles::RTDataVisualizationType);
 
     QString sIsClustered = isClustered ? "Clustered" : "Full";
     BrainTreeMetaItem* pItemSourceSpaceType = new BrainTreeMetaItem(BrainTreeModelItemTypes::RTDataSourceSpaceType, sIsClustered);
@@ -187,6 +194,7 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
 //    *this<<itemAveragedStreaming;
 
     //set rt data corresponding to the hemisphere
+    m_pRtDataWorker->setSurfaceData(arraySurfaceVertColor, tForwardSolution.src[iHemi].vertno);
     m_pRtDataWorker->addData(matHemisphereData);
 
     m_bInit = true;
@@ -219,6 +227,14 @@ bool BrainRTDataTreeItem::updateData(const MNESourceEstimate& tSourceEstimate)
 
 //*************************************************************************************************************
 
+void BrainRTDataTreeItem::onColorInfoOriginUpdated(const QByteArray& arrayVertColor)
+{
+    m_pRtDataWorker->setSurfaceData(arrayVertColor, this->data(BrainRTDataTreeItemRoles::RTVertNo).value<VectorXi>());
+}
+
+
+//*************************************************************************************************************
+
 void BrainRTDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState)
 {
     if(checkState == Qt::Checked) {
@@ -235,7 +251,7 @@ void BrainRTDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkS
 
 void BrainRTDataTreeItem::onStcSample(QByteArray sourceColorSamples)
 {
-    emit rtVertColorUpdated(sourceColorSamples, this->data(BrainRTDataTreeItemRoles::RTVerticesIdx).value<VectorXi>());
+    emit rtVertColorUpdated(sourceColorSamples, this->data(BrainRTDataTreeItemRoles::RTVertNo).value<VectorXi>());
 }
 
 
@@ -260,4 +276,22 @@ void BrainRTDataTreeItem::onTimeIntervalChanged(const int& iMSec)
 void BrainRTDataTreeItem::onDataNormalizationValueChanged(const double& dValue)
 {
     m_pRtDataWorker->setNormalization(dValue);
+}
+
+
+//*************************************************************************************************************
+
+void BrainRTDataTreeItem::onVisualizationTypeChanged(const QString& sVisType)
+{
+    int iVisType = BrainRTDataVisualizationTypes::VertexBased;
+
+    if(sVisType == "Annotation based") {
+        iVisType = BrainRTDataVisualizationTypes::SmoothingBased;
+    }
+
+    if(sVisType == "Smoothing based") {
+        iVisType = BrainRTDataVisualizationTypes::AnnotationBased;
+    }
+
+    m_pRtDataWorker->setVisualizationType(iVisType);
 }
