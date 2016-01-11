@@ -199,7 +199,7 @@ BrainTreeModel* View3D::getBrainTreeModel()
 
 //*************************************************************************************************************
 
-void View3D::changeSceneColor(const QColor& colSceneColor)
+void View3D::setSceneColor(const QColor& colSceneColor)
 {
     m_pForwardRenderer->setClearColor(colSceneColor);
 }

@@ -146,7 +146,7 @@ void Control3DWidget::onSceneColorPicker()
     //Update all connected View3D's scene colors
     for(int i = 0; i<m_lView3D.size(); i++) {
         connect(pDialog, &QColorDialog::currentColorChanged,
-                m_lView3D.at(i).data(), &View3D::changeSceneColor);
+                m_lView3D.at(i).data(), &View3D::setSceneColor);
     }
 
     pDialog->exec();

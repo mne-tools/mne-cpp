@@ -192,15 +192,6 @@ public:
     void stop();
     void start();
 
-signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever this item should send a new sample to its listening threads.
-    *
-    * @param[in] colorSample     The samples data in form of rgb colors as QByteArray.
-    */
-    void stcSample(QByteArray colorSample);
-
 protected:
     //=========================================================================================================
     /**
@@ -216,6 +207,7 @@ private:
     * Transform the data sample values to color values.
     *
     * @param[in] data               The data which is to be transformed.
+    *
     * @return                       Returns the colors in form of a QByteArray.
     */
     QByteArray transformDataToColor(const VectorXd& data);
@@ -238,6 +230,15 @@ private:
     double      m_dNormalizationMax;    /**< Value to normalize to. */
 
     QString     m_sColormap;            /**< The type of colormap ("Hot", "Hot Negative 1", etc.). */
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever this item should send a new sample to its listening threads.
+    *
+    * @param[in] colorSample     The samples data in form of rgb colors as QByteArray.
+    */
+    void newRtData(QByteArray colorSample);
 };
 
 } // NAMESPACE
