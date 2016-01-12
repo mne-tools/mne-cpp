@@ -42,6 +42,8 @@
 
 #include "renderable3Dentity.h"
 
+#include "fs/label.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -155,7 +157,9 @@ namespace BrainAnnotationTreeItemRoles
 {
     enum ItemRole{AnnotColors = Qt::UserRole + 400,
                     AnnotFileName = Qt::UserRole + 401,
-                    AnnotFilePath = Qt::UserRole + 402};
+                    AnnotFilePath = Qt::UserRole + 402,
+                    LabeList = Qt::UserRole + 403,
+                    LabeIds = Qt::UserRole + 404};
 }
 
 namespace BrainRTDataTreeItemRoles
@@ -227,6 +231,11 @@ Q_DECLARE_METATYPE(Eigen::Vector3f);
 #ifndef metatype_qbytearray
 #define metatype_qbytearray
 Q_DECLARE_METATYPE(QByteArray);
+#endif
+
+#ifndef metatype_labellist
+#define metatype_labellist
+Q_DECLARE_METATYPE(QList<FSLIB::Label>);
 #endif
 
 #endif // TYPES_H

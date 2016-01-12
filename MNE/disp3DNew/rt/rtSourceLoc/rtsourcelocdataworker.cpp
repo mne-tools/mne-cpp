@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "rtsourcelocdataworker.h"
+#include "fs/label.h"
 
 
 //*************************************************************************************************************
@@ -73,6 +74,8 @@ RtSourceLocDataWorker::RtSourceLocDataWorker(QObject* parent)
 , m_sColormap("Hot Negative 2")
 , m_dNormalization(1.0)
 , m_dNormalizationMax(10.0)
+, m_bSurfaceDataIsInit(false)
+, m_bAnnotationDataIsInit(false)
 {
 }
 
@@ -83,17 +86,6 @@ RtSourceLocDataWorker::~RtSourceLocDataWorker()
 {
     if(this->isRunning())
         stop();
-}
-
-
-//*************************************************************************************************************
-
-void RtSourceLocDataWorker::setSurfaceData(const QByteArray& arraySurfaceVertColor, const VectorXi& vecVertNo)
-{
-    QMutexLocker locker(&m_qMutex);
-
-    m_arraySurfaceVertColor = arraySurfaceVertColor;
-    m_vecVertNo = vecVertNo;
 }
 
 
@@ -114,6 +106,53 @@ void RtSourceLocDataWorker::addData(const MatrixXd& data)
 void RtSourceLocDataWorker::clear()
 {
     QMutexLocker locker(&m_qMutex);
+}
+
+
+//*************************************************************************************************************
+
+void RtSourceLocDataWorker::setSurfaceData(const QByteArray& arraySurfaceVertColor, const VectorXi& vecVertNo)
+{
+    QMutexLocker locker(&m_qMutex);
+
+    if(arraySurfaceVertColor.size() == 0 || vecVertNo.rows() == 0) {
+        qDebug()<<"RtSourceLocDataWorker::setSurfaceData - Surface data is empty. Returning ...";
+        return;
+    }
+
+    m_arraySurfaceVertColor = arraySurfaceVertColor;
+    m_vecVertNo = vecVertNo;
+
+    m_bSurfaceDataIsInit = true;
+}
+
+
+//*************************************************************************************************************
+
+void RtSourceLocDataWorker::setAnnotationData(const VectorXi& vecLabelIds, const QList<FSLIB::Label>& lLabels)
+{
+    QMutexLocker locker(&m_qMutex);
+
+    if(vecLabelIds.rows() == 0 || lLabels.isEmpty()) {
+        qDebug()<<"RtSourceLocDataWorker::setAnnotationData - Annotation data is empty. Returning ...";
+        return;
+    }
+
+    m_lLabels = lLabels;
+
+    qDebug()<<"vecLabelIds.rows()"<<vecLabelIds.rows();
+    qDebug()<<"vecLabelIds(0)"<<vecLabelIds(0);
+    qDebug()<<"vecLabelIds(1)"<<vecLabelIds(1);
+    qDebug()<<"vecLabelIds(2)"<<vecLabelIds(2);
+    qDebug()<<"vecLabelIds(3)"<<vecLabelIds(3);
+    qDebug()<<"vecLabelIds(4)"<<vecLabelIds(4);
+    qDebug()<<"vecLabelIds(5)"<<vecLabelIds(5);
+
+    //Generate fast lookup map for each source and corresponding label
+    for(qint32 i = 0; i < m_vecVertNo.rows(); ++i)
+        m_mapLabelIdSources.insert(m_vecVertNo(i), vecLabelIds(m_vecVertNo(i)));
+
+    m_bAnnotationDataIsInit = true;
 }
 
 
@@ -253,7 +292,7 @@ void RtSourceLocDataWorker::run()
             {
                 t_vecAverage /= (double)m_iAverageSamples;
 
-                emit newRtData(performVisualizationTypeCalculation(transformDataToColor(t_vecAverage)));
+                emit newRtData(performVisualizationTypeCalculation(t_vecAverage));
                 t_vecAverage = VectorXd::Zero(t_vecAverage.rows());
             }
             m_qMutex.unlock();
@@ -267,43 +306,84 @@ void RtSourceLocDataWorker::run()
 
 //*************************************************************************************************************
 
-QByteArray RtSourceLocDataWorker::performVisualizationTypeCalculation(const QByteArray& sourceColorSamples)
+QByteArray RtSourceLocDataWorker::performVisualizationTypeCalculation(const VectorXd& sourceColorSamples)
 {
-    //NOTE: This function is called for every new sample point and therfore it must be kept highly efficient!
-    if((sourceColorSamples.size()/((int)sizeof(float)*3)) != m_vecVertNo.rows()) {
-        qDebug()<<"RtSourceLocDataWorker::performVisualizationTypeCalculation - number of rows in sample ("<<sourceColorSamples.size()/((int)sizeof(float)*3)<<") do not not match with idx/no number of rows in vertex ("<<m_vecVertNo.rows()<<"). Returning...";
+    //NOTE: This function is called for every new sample point and therefore must be kept highly efficient!
+    if(sourceColorSamples.rows() != m_vecVertNo.rows()) {
+        qDebug()<<"RtSourceLocDataWorker::performVisualizationTypeCalculation - number of rows in sample ("<<sourceColorSamples.rows()<<") do not not match with idx/no number of rows in vertex ("<<m_vecVertNo.rows()<<"). Returning...";
         return QByteArray();
     }
-
-    QByteArray arrayCurrentVertColor = m_arraySurfaceVertColor;
 
     //Generate color data for vertices
     switch(m_iVisualizationType) {
         case BrainRTDataVisualizationTypes::VertexBased: {
-             //Create final QByteArray with colors based on the current anatomical information
-            const float *rawSourceColorSamples = reinterpret_cast<const float *>(sourceColorSamples.data());
+            if(!m_bSurfaceDataIsInit) {
+                qDebug()<<"RtSourceLocDataWorker::performVisualizationTypeCalculation - Surface data was not initialized. Returning ...";
+                return m_arraySurfaceVertColor;
+            }
+
+            QByteArray arrayCurrentVertColor = m_arraySurfaceVertColor;
+
+            //Create final QByteArray with colors based on the current anatomical information
+            QByteArray sourceColorSamplesColor = transformDataToColor(sourceColorSamples);
+            const float *rawSourceColorSamplesColor = reinterpret_cast<const float *>(sourceColorSamplesColor.data());
             int idxSourceColorSamples = 0;
             float *rawArrayCurrentVertColor = reinterpret_cast<float *>(arrayCurrentVertColor.data());
 
             for(int i = 0; i<m_vecVertNo.rows(); i++) {
-                rawArrayCurrentVertColor[m_vecVertNo(i)*3+0] = rawSourceColorSamples[idxSourceColorSamples++];
-                rawArrayCurrentVertColor[m_vecVertNo(i)*3+1] = rawSourceColorSamples[idxSourceColorSamples++];
-                rawArrayCurrentVertColor[m_vecVertNo(i)*3+2] = rawSourceColorSamples[idxSourceColorSamples++];
+                rawArrayCurrentVertColor[m_vecVertNo(i)*3+0] = rawSourceColorSamplesColor[idxSourceColorSamples++];
+                rawArrayCurrentVertColor[m_vecVertNo(i)*3+1] = rawSourceColorSamplesColor[idxSourceColorSamples++];
+                rawArrayCurrentVertColor[m_vecVertNo(i)*3+2] = rawSourceColorSamplesColor[idxSourceColorSamples++];
             }
+
             break;
         }
+
+        case BrainRTDataVisualizationTypes::AnnotationBased: {
+            if(!m_bAnnotationDataIsInit) {
+                qDebug()<<"RtSourceLocDataWorker::performVisualizationTypeCalculation - Annotation data was not initialized. Returning ...";
+                return m_arraySurfaceVertColor;
+            }
+
+            qDebug()<<"AnnotationBasedVis";
+            qDebug()<<"m_lLabels.size()"<<m_lLabels.size();
+            qDebug()<<"m_mapLabelIdSources.size()"<<m_mapLabelIdSources.size();
+
+            VectorXd vecLabelActivation(m_lLabels.size());
+
+            for(int i = 0; i<m_vecVertNo.rows(); i++) {
+                //Find out label for source
+                qint32 labelIdx = m_mapLabelIdSources[m_vecVertNo(i)];
+
+                if(abs(sourceColorSamples(i)) > abs(vecLabelActivation(labelIdx)))
+                    vecLabelActivation(labelIdx) = sourceColorSamples(i);
+            }
+
+            //Transform label activations to rgb colors
+            QByteArray arrayLabelColors = transformDataToColor(vecLabelActivation);
+
+            //Color all labels respectivley to their activation colors
+            float *rawArrayCurrentVertColor = reinterpret_cast<float *>(arrayCurrentVertColor.data());
+
+            for(int i = 0; i<m_lLabels.size(); i++) {
+                FSLIB::Label label = m_lLabels.at(i);
+                for(int j = 0; j<label.vertices.rows(); j++) {
+                    rawArrayCurrentVertColor[label.vertices(j)*3+0] = arrayLabelColors[i*3+0];
+                    rawArrayCurrentVertColor[label.vertices(j)*3+1] = arrayLabelColors[i*3+1];
+                    rawArrayCurrentVertColor[label.vertices(j)*3+2] = arrayLabelColors[i*3+2];
+                }
+            }
+
+            break;
+        }        
 
         case BrainRTDataVisualizationTypes::SmoothingBased: {
             //TODO: Smooth here!
             break;
         }
-
-        case BrainRTDataVisualizationTypes::AnnotationBased: {
-            break;
-        }
     }
 
-    return arrayCurrentVertColor;
+    return m_arraySurfaceVertColor;
 }
 
 

@@ -48,6 +48,8 @@
 
 #include <disp/helpers/colormap.h>
 
+#include "fs/annotation.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -85,6 +87,7 @@ namespace DISP3DNEWLIB
 
 using namespace Eigen;
 using namespace DISPLIB;
+using namespace FSLIB;
 
 
 //=============================================================================================================
@@ -116,15 +119,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Add surface data which the streamed data is plotted on.
-    *
-    * @param[in] arraySurfaceVertColor  The vertex colors for the surface where the data is to be plotted on.
-    * @param[in] vecVertNo              The vertex indexes.
-    */
-    void setSurfaceData(const QByteArray& arraySurfaceVertColor, const VectorXi& vecVertNo);
-
-    //=========================================================================================================
-    /**
     * Add data which is to be streamed.
     *
     * @param[in] data         The new data.
@@ -139,9 +133,27 @@ public:
 
     //=========================================================================================================
     /**
+    * Set surface data which the streamed data is plotted on.
+    *
+    * @param[in] arraySurfaceVertColor  The vertex colors for the surface where the data is to be plotted on.
+    * @param[in] vecVertNo              The vertex indexes.
+    */
+    void setSurfaceData(const QByteArray& arraySurfaceVertColor, const VectorXi& vecVertNo);
+
+    //=========================================================================================================
+    /**
+    * Set annotation data.
+    *
+    * @param[in] vecLabelIds            The labels ids for each of the surface vertex idx.
+    * @param[in] lLabels                The label information.
+    */
+    void setAnnotationData(const VectorXi& vecLabelIds, const QList<FSLIB::Label>& lLabels);
+
+    //=========================================================================================================
+    /**
     * Set the number of average to take after emitting the data to the listening threads.
     *
-    * @param[in] samples            The new number of averages.
+    * @param[in] samples                The new number of averages.
     */
     void setAverage(qint32 samples);
 
@@ -149,7 +161,7 @@ public:
     /**
     * Set the length in milli Seconds to wait inbetween data samples.
     *
-    * @param[in] iMSec              The new length in milli Seconds to wait inbetween data samples.
+    * @param[in] iMSec                  The new length in milli Seconds to wait inbetween data samples.
     */
     void setInterval(const int& iMSec);
 
@@ -157,7 +169,7 @@ public:
     /**
     * Set the visualization type.
     *
-    * @param[in] iVisType           The new visualization type.
+    * @param[in] iVisType               The new visualization type.
     */
     void setVisualizationType(const int& iVisType);
 
@@ -165,7 +177,7 @@ public:
     /**
     * Set the type of the colormap.
     *
-    * @param[in] sColormapType      The new colormap type.
+    * @param[in] sColormapType          The new colormap type.
     */
     void setColormapType(const QString& sColormapType);
 
@@ -173,7 +185,7 @@ public:
     /**
     * Set the normalization value.
     *
-    * @param[in] dValue             The new normalization value.
+    * @param[in] dValue                 The new normalization value.
     */
     void setNormalization(const double& dValue);
 
@@ -181,7 +193,7 @@ public:
     /**
     * Set the loop functionality on or off.
     *
-    * @param[in] looping            The new looping state.
+    * @param[in] looping                The new looping state.
     */
     void setLoop(bool looping);
 
@@ -208,7 +220,7 @@ private:
     *
     * @return                               Returns the final colors in form of a QByteArray.
     */
-    QByteArray performVisualizationTypeCalculation(const QByteArray& sourceColorSamples);
+    QByteArray performVisualizationTypeCalculation(const VectorXd& sourceColorSamples);
 
     //=========================================================================================================
     /**
@@ -228,6 +240,8 @@ private:
 
     bool        m_bIsRunning;           /**< Flag if this thread is running. */
     bool        m_bIsLooping;           /**< Flag if this thread should repeat sending the same data over and over again. */
+    bool        m_bSurfaceDataIsInit;   /**< Flag if this thread's surface data was initialized. This flag is used to decide whether specific visualization types can be computed. */
+    bool        m_bAnnotationDataIsInit;/**< Flag if this thread's annotation data was initialized. This flag is used to decide whether specific visualization types can be computed. */
 
     qint32      m_iAverageSamples;      /**< Number of average to compute. */
     qint32      m_iCurrentSample;       /**< Number of the current sample which is/was streamed. */
@@ -238,6 +252,9 @@ private:
     double      m_dNormalizationMax;    /**< Value to normalize to. */
 
     QString     m_sColormap;            /**< The type of colormap ("Hot", "Hot Negative 1", etc.). */
+
+    QList<FSLIB::Label>         m_lLabels;
+    QMap<qint32, qint32>        m_mapLabelIdSources;
 
 signals:
     //=========================================================================================================

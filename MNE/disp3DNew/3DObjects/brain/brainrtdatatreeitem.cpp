@@ -91,7 +91,7 @@ void  BrainRTDataTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QByteArray& arraySurfaceVertColor, const QString& hemi)
+bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QByteArray& arraySurfaceVertColor, const QString& hemi, const VectorXi& vecLabelIds, const QList<FSLIB::Label>& lLabels)
 {   
     //Find out which hemisphere we are working with and set as item's data
     int iHemi = hemi == "Left" ? 0 : hemi == "Right" ? 1 : -1;
@@ -195,6 +195,7 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
 
     //set rt data corresponding to the hemisphere
     m_pSourceLocRtDataWorker->setSurfaceData(arraySurfaceVertColor, tForwardSolution.src[iHemi].vertno);
+    m_pSourceLocRtDataWorker->setAnnotationData(vecLabelIds, lLabels);
     m_pSourceLocRtDataWorker->addData(matHemisphereData);
 
     m_bInit = true;
@@ -286,11 +287,11 @@ void BrainRTDataTreeItem::onVisualizationTypeChanged(const QString& sVisType)
     int iVisType = BrainRTDataVisualizationTypes::VertexBased;
 
     if(sVisType == "Annotation based") {
-        iVisType = BrainRTDataVisualizationTypes::SmoothingBased;
+        iVisType = BrainRTDataVisualizationTypes::AnnotationBased;
     }
 
     if(sVisType == "Smoothing based") {
-        iVisType = BrainRTDataVisualizationTypes::AnnotationBased;
+        iVisType = BrainRTDataVisualizationTypes::SmoothingBased;
     }
 
     m_pSourceLocRtDataWorker->setVisualizationType(iVisType);
