@@ -134,7 +134,20 @@ BrainRTDataTreeItem* BrainHemisphereTreeItem::addData(const MNESourceEstimate& t
 
         *this<<m_pBrainRtDataTreeItem;
 
-        m_pBrainRtDataTreeItem->addData(tSourceEstimate, tForwardSolution, m_pSurfaceItem->data(BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert).value<QByteArray>(), this->text());
+        if(this->findChildren(BrainTreeModelItemTypes::RTDataItem).size() == 0) {
+            m_pBrainRtDataTreeItem->addData(tSourceEstimate,
+                                            tForwardSolution,
+                                            m_pSurfaceItem->data(BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
+                                            this->text());
+        } else {
+            m_pBrainRtDataTreeItem->addData(tSourceEstimate,
+                                            tForwardSolution,
+                                            m_pSurfaceItem->data(BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
+                                            this->text(),
+                                            m_pAnnotItem->data(BrainAnnotationTreeItemRoles::LabeIds).value<VectorXi>(),
+                                            m_pAnnotItem->data(BrainAnnotationTreeItemRoles::LabeList).value<QList<FSLIB::Label>>());
+        }
+
         return m_pBrainRtDataTreeItem;
     }
 

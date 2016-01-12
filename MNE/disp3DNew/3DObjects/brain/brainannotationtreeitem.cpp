@@ -113,6 +113,12 @@ bool BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation&
         data.setValue(arrayColorsAnnot);
         this->setData(data, BrainAnnotationTreeItemRoles::AnnotColors);
 
+        data.setValue(qListLabels);
+        this->setData(data, BrainAnnotationTreeItemRoles::LabeList);
+
+        data.setValue(tAnnotation.getLabelIds());
+        this->setData(data, BrainAnnotationTreeItemRoles::LabeIds);
+
         //Add annotation meta information as item children
         BrainTreeMetaItem *itemAnnotFileName = new BrainTreeMetaItem(BrainTreeModelItemTypes::AnnotFileName, tAnnotation.fileName());
         itemAnnotFileName->setEditable(false);

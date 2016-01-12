@@ -142,10 +142,12 @@ public:
     * @param[in] tForwardSolution       The MNEForwardSolution.
     * @param[in] hemi                   The hemispehre of this brain rt data item. This information is important in order to cut out the wanted source estimations from the MNESourceEstimate
     * @param[in] arraySurfaceVertColor  The vertex colors for the surface where the data is to be plotted on.
+    * @param[in] vecLabelIds            The label ids for each surface vertex index.
+    * @param[in] lLabels                The label list.
     *
     * @return                           Returns true if successful.
     */
-    bool addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QByteArray &arraySurfaceVertColor, const QString& hemi = "Unknown");
+    bool addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QByteArray &arraySurfaceVertColor, const QString& hemi = "Unknown", const VectorXi& vecLabelIds = VectorXi(0), const QList<FSLIB::Label>& lLabels = QList<FSLIB::Label>());
 
     //=========================================================================================================
     /**
