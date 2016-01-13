@@ -140,14 +140,6 @@ void RtSourceLocDataWorker::setAnnotationData(const VectorXi& vecLabelIds, const
 
     m_lLabels = lLabels;
 
-    qDebug()<<"vecLabelIds.rows()"<<vecLabelIds.rows();
-    qDebug()<<"vecLabelIds(0)"<<vecLabelIds(0);
-    qDebug()<<"vecLabelIds(1)"<<vecLabelIds(1);
-    qDebug()<<"vecLabelIds(2)"<<vecLabelIds(2);
-    qDebug()<<"vecLabelIds(3)"<<vecLabelIds(3);
-    qDebug()<<"vecLabelIds(4)"<<vecLabelIds(4);
-    qDebug()<<"vecLabelIds(5)"<<vecLabelIds(5);
-
     //Generate fast lookup map for each source and corresponding label
     for(qint32 i = 0; i < m_vecVertNo.rows(); ++i)
         m_mapLabelIdSources.insert(m_vecVertNo(i), vecLabelIds(m_vecVertNo(i)));
