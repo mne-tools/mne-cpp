@@ -150,7 +150,7 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     data.setValue(false);
     pItemRTDataStreamStatus->setData(data, BrainTreeMetaItemRoles::RTDataStreamStatus);
 
-    BrainTreeMetaItem* pItemVisuaizationType = new BrainTreeMetaItem(BrainTreeModelItemTypes::RTDataVisualizationType, "Single Vertex");
+    BrainTreeMetaItem* pItemVisuaizationType = new BrainTreeMetaItem(BrainTreeModelItemTypes::RTDataVisualizationType, "Vertex based");
     connect(pItemVisuaizationType, &BrainTreeMetaItem::rtDataVisualizationTypeUpdated,
             this, &BrainRTDataTreeItem::onVisualizationTypeChanged);
     *this<<pItemVisuaizationType;
