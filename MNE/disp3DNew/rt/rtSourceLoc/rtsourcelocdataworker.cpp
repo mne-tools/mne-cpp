@@ -244,8 +244,8 @@ void RtSourceLocDataWorker::run()
 
     while(true)
     {
-//        QTime timer;
-//        timer.start();
+        QTime timer;
+        timer.start();
 
         {
             QMutexLocker locker(&m_qMutex);
@@ -298,7 +298,7 @@ void RtSourceLocDataWorker::run()
             m_qMutex.unlock();
         }
 
-        //qDebug()<<"RtSourceLocDataWorker::run()"<<timer.elapsed()<<"msecs";
+        qDebug()<<"RtSourceLocDataWorker::run()"<<timer.elapsed()<<"msecs";
         QThread::msleep(m_iMSecIntervall);
     }
 }
@@ -336,7 +336,7 @@ QByteArray RtSourceLocDataWorker::performVisualizationTypeCalculation(const Vect
                 rawArrayCurrentVertColor[m_vecVertNo(i)*3+2] = rawSourceColorSamplesColor[idxSourceColorSamples++];
             }
 
-            break;
+            return arrayCurrentVertColor;
         }
 
         case BrainRTDataVisualizationTypes::AnnotationBased: {
@@ -345,36 +345,41 @@ QByteArray RtSourceLocDataWorker::performVisualizationTypeCalculation(const Vect
                 return m_arraySurfaceVertColor;
             }
 
-            qDebug()<<"AnnotationBasedVis";
-            qDebug()<<"m_lLabels.size()"<<m_lLabels.size();
-            qDebug()<<"m_mapLabelIdSources.size()"<<m_mapLabelIdSources.size();
-
-            VectorXd vecLabelActivation(m_lLabels.size());
+            //Find maximum actiavtion for each label
+            QMap<qint32, double> vecLabelActivation;
 
             for(int i = 0; i<m_vecVertNo.rows(); i++) {
                 //Find out label for source
                 qint32 labelIdx = m_mapLabelIdSources[m_vecVertNo(i)];
 
-                if(abs(sourceColorSamples(i)) > abs(vecLabelActivation(labelIdx)))
-                    vecLabelActivation(labelIdx) = sourceColorSamples(i);
-            }
+                if(abs(sourceColorSamples(i)) > abs(vecLabelActivation[labelIdx]))
+                    vecLabelActivation.insert(labelIdx, sourceColorSamples(i));
+            }      
 
-            //Transform label activations to rgb colors
-            QByteArray arrayLabelColors = transformDataToColor(vecLabelActivation);
+            //Color all labels respectivley to their activation
+            QByteArray arrayCurrentVertColor;
+            arrayCurrentVertColor.resize(m_arraySurfaceVertColor.size());
 
-            //Color all labels respectivley to their activation colors
             float *rawArrayCurrentVertColor = reinterpret_cast<float *>(arrayCurrentVertColor.data());
 
             for(int i = 0; i<m_lLabels.size(); i++) {
                 FSLIB::Label label = m_lLabels.at(i);
+
+                //Transform label activations to rgb colors
+                VectorXd vecActivation(1);
+                vecActivation(0) = vecLabelActivation[label.label_id];
+
+                QByteArray arrayLabelColors = transformDataToColor(vecActivation);
+                float *rawArrayLabelColors = reinterpret_cast<float *>(arrayLabelColors.data());
+
                 for(int j = 0; j<label.vertices.rows(); j++) {
-                    rawArrayCurrentVertColor[label.vertices(j)*3+0] = arrayLabelColors[i*3+0];
-                    rawArrayCurrentVertColor[label.vertices(j)*3+1] = arrayLabelColors[i*3+1];
-                    rawArrayCurrentVertColor[label.vertices(j)*3+2] = arrayLabelColors[i*3+2];
+                    rawArrayCurrentVertColor[label.vertices(j)*3+0] = rawArrayLabelColors[0];
+                    rawArrayCurrentVertColor[label.vertices(j)*3+1] = rawArrayLabelColors[1];
+                    rawArrayCurrentVertColor[label.vertices(j)*3+2] = rawArrayLabelColors[2];
                 }
             }
 
-            break;
+            return arrayCurrentVertColor;
         }        
 
         case BrainRTDataVisualizationTypes::SmoothingBased: {
