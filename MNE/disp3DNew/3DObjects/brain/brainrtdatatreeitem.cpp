@@ -99,6 +99,7 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
 
     //Set data based on clusterd or full source space
     bool isClustered = tForwardSolution.src[iHemi].isClustered();
+
     if(isClustered) {
         //Source Space IS clustered
         switch(iHemi) {
@@ -136,7 +137,16 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     this->setData(data, BrainRTDataTreeItemRoles::RTData);
 
     if(iHemi != -1 && iHemi < tForwardSolution.src.size()) {
-        data.setValue(tForwardSolution.src[iHemi].vertno); //TODO: When clustered source space, these idx no's are the annotation labels
+        if(isClustered) {
+            VectorXi clustVertNo(tForwardSolution.src[iHemi].cluster_info.centroidVertno.size());
+            for(int i = 0; i <clustVertNo.rows(); i++) {
+                clustVertNo(i) = tForwardSolution.src[iHemi].cluster_info.centroidVertno.at(i);
+            }
+            data.setValue(clustVertNo);
+        } else {
+            data.setValue(tForwardSolution.src[iHemi].vertno);
+        }
+
         this->setData(data, BrainRTDataTreeItemRoles::RTVertNo);
     }
 
@@ -194,7 +204,7 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
 //    *this<<itemAveragedStreaming;
 
     //set rt data corresponding to the hemisphere
-    m_pSourceLocRtDataWorker->setSurfaceData(arraySurfaceVertColor, tForwardSolution.src[iHemi].vertno);
+    m_pSourceLocRtDataWorker->setSurfaceData(arraySurfaceVertColor, this->data(BrainRTDataTreeItemRoles::RTVertNo).value<VectorXi>());
     m_pSourceLocRtDataWorker->setAnnotationData(vecLabelIds, lLabels);
     m_pSourceLocRtDataWorker->addData(matHemisphereData);
 
