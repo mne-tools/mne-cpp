@@ -92,7 +92,6 @@ else {
 SOURCES += \
     inverseview.cpp \
     inverseviewproducer.cpp \
-    brainview.cpp \
     newbrainview.cpp \
     helpers/cluststcmodel.cpp \
     helpers/cluststcview.cpp \
@@ -103,7 +102,6 @@ HEADERS += \
     disp3D_global.h \
     inverseview.h \
     inverseviewproducer.h \
-    brainview.h \
     newbrainview.h \
     helpers/cluststcmodel.h \
     helpers/cluststctabledelegate.h \
