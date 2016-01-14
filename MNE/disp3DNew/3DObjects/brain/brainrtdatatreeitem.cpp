@@ -138,6 +138,7 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
 
     if(iHemi != -1 && iHemi < tForwardSolution.src.size()) {
         if(isClustered) {
+            //When clustered source space, the idx no's are the annotation labels. Take the .cluster_info.centroidVertno instead.
             VectorXi clustVertNo(tForwardSolution.src[iHemi].cluster_info.centroidVertno.size());
             for(int i = 0; i <clustVertNo.rows(); i++) {
                 clustVertNo(i) = tForwardSolution.src[iHemi].cluster_info.centroidVertno.at(i);
