@@ -58,6 +58,7 @@ BrainAnnotationTreeItem::BrainAnnotationTreeItem(const int & iType, const QStrin
 : AbstractTreeItem(iType, text)
 {
     this->setEditable(false);
+    this->setToolTip("Brain annotation");
 }
 
 
@@ -120,13 +121,13 @@ bool BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation&
         this->setData(data, BrainAnnotationTreeItemRoles::LabeIds);
 
         //Add annotation meta information as item children
-        BrainTreeMetaItem *itemAnnotFileName = new BrainTreeMetaItem(BrainTreeModelItemTypes::AnnotFileName, tAnnotation.fileName());
+        BrainTreeMetaItem *itemAnnotFileName = new BrainTreeMetaItem(BrainTreeMetaItemTypes::AnnotFileName, tAnnotation.fileName());
         itemAnnotFileName->setEditable(false);
         *this<<itemAnnotFileName;
         data.setValue(tAnnotation.fileName());
         itemAnnotFileName->setData(data, BrainAnnotationTreeItemRoles::AnnotFileName);
 
-        BrainTreeMetaItem *itemAnnotPath = new BrainTreeMetaItem(BrainTreeModelItemTypes::AnnotFilePath, tAnnotation.filePath());
+        BrainTreeMetaItem *itemAnnotPath = new BrainTreeMetaItem(BrainTreeMetaItemTypes::AnnotFilePath, tAnnotation.filePath());
         itemAnnotPath->setEditable(false);
         *this<<itemAnnotPath;
         data.setValue(tAnnotation.filePath());

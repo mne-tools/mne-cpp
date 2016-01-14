@@ -63,6 +63,7 @@ BrainRTDataTreeItem::BrainRTDataTreeItem(const int &iType, const QString &text)
             this, &BrainRTDataTreeItem::onNewRtData);
 
     this->setEditable(false);
+    this->setToolTip("Real time data item");
 }
 
 
@@ -152,7 +153,7 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     }
 
     //Add surface meta information as item children
-    BrainTreeMetaItem* pItemRTDataStreamStatus = new BrainTreeMetaItem(BrainTreeModelItemTypes::RTDataStreamStatus, "Stream data on/off");
+    BrainTreeMetaItem* pItemRTDataStreamStatus = new BrainTreeMetaItem(BrainTreeMetaItemTypes::RTDataStreamStatus, "Stream data on/off");
     connect(pItemRTDataStreamStatus, &BrainTreeMetaItem::checkStateChanged,
             this, &BrainRTDataTreeItem::onCheckStateWorkerChanged);
     *this<<pItemRTDataStreamStatus;
@@ -161,7 +162,7 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     data.setValue(false);
     pItemRTDataStreamStatus->setData(data, BrainTreeMetaItemRoles::RTDataStreamStatus);
 
-    BrainTreeMetaItem* pItemVisuaizationType = new BrainTreeMetaItem(BrainTreeModelItemTypes::RTDataVisualizationType, "Vertex based");
+    BrainTreeMetaItem* pItemVisuaizationType = new BrainTreeMetaItem(BrainTreeMetaItemTypes::RTDataVisualizationType, "Vertex based");
     connect(pItemVisuaizationType, &BrainTreeMetaItem::rtDataVisualizationTypeUpdated,
             this, &BrainRTDataTreeItem::onVisualizationTypeChanged);
     *this<<pItemVisuaizationType;
@@ -169,27 +170,27 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     pItemVisuaizationType->setData(data, BrainTreeMetaItemRoles::RTDataVisualizationType);
 
     QString sIsClustered = isClustered ? "Clustered" : "Full";
-    BrainTreeMetaItem* pItemSourceSpaceType = new BrainTreeMetaItem(BrainTreeModelItemTypes::RTDataSourceSpaceType, sIsClustered);
+    BrainTreeMetaItem* pItemSourceSpaceType = new BrainTreeMetaItem(BrainTreeMetaItemTypes::RTDataSourceSpaceType, sIsClustered);
     pItemSourceSpaceType->setEditable(false);
     *this<<pItemSourceSpaceType;
     data.setValue(sIsClustered);
     pItemSourceSpaceType->setData(data, BrainTreeMetaItemRoles::RTDataSourceSpaceType);
 
-    BrainTreeMetaItem* pItemColormapType = new BrainTreeMetaItem(BrainTreeModelItemTypes::RTDataColormapType, "Hot Negative 2");
+    BrainTreeMetaItem* pItemColormapType = new BrainTreeMetaItem(BrainTreeMetaItemTypes::RTDataColormapType, "Hot Negative 2");
     connect(pItemColormapType, &BrainTreeMetaItem::rtDataColormapTypeUpdated,
             this, &BrainRTDataTreeItem::onColormapTypeChanged);
     *this<<pItemColormapType;
     data.setValue(QString("Hot Negative 2"));
     pItemColormapType->setData(data, BrainTreeMetaItemRoles::RTDataColormapType);
 
-    BrainTreeMetaItem* pItemSourceLocNormValue = new BrainTreeMetaItem(BrainTreeModelItemTypes::RTDataNormalizationValue, "0.1");
+    BrainTreeMetaItem* pItemSourceLocNormValue = new BrainTreeMetaItem(BrainTreeMetaItemTypes::RTDataNormalizationValue, "0.1");
     connect(pItemSourceLocNormValue, &BrainTreeMetaItem::rtDataNormalizationValueUpdated,
             this, &BrainRTDataTreeItem::onDataNormalizationValueChanged);
     *this<<pItemSourceLocNormValue;
     data.setValue(0.1);
     pItemSourceLocNormValue->setData(data, BrainTreeMetaItemRoles::RTDataNormalizationValue);
 
-    BrainTreeMetaItem *pItemStreamingInterval = new BrainTreeMetaItem(BrainTreeModelItemTypes::RTDataTimeInterval, "1000");
+    BrainTreeMetaItem *pItemStreamingInterval = new BrainTreeMetaItem(BrainTreeMetaItemTypes::RTDataTimeInterval, "1000");
     connect(pItemStreamingInterval, &BrainTreeMetaItem::rtDataTimeIntervalUpdated,
             this, &BrainRTDataTreeItem::onTimeIntervalChanged);
     *this<<pItemStreamingInterval;

@@ -87,26 +87,31 @@ namespace BrainTreeModelItemTypes
                     HemisphereItem = QStandardItem::UserType + 2,
                     SurfaceItem = QStandardItem::UserType + 3,
                     AnnotationItem = QStandardItem::UserType + 4,
-                    SurfaceFileName = QStandardItem::UserType + 5,
-                    SurfaceFilePath = QStandardItem::UserType + 6,
-                    AnnotFileName = QStandardItem::UserType + 7,
-                    AnnotFilePath = QStandardItem::UserType + 8,
-                    SurfaceType = QStandardItem::UserType + 9,
-                    SurfaceColorGyri = QStandardItem::UserType + 10,
-                    SurfaceColorSulci = QStandardItem::UserType + 11,
-                    SurfaceColorVert = QStandardItem::UserType + 12,
-                    SurfaceColorInfoOrigin = QStandardItem::UserType + 13,
-                    RTDataItem = QStandardItem::UserType + 14,
-                    RTDataStreamStatus = QStandardItem::UserType + 15,
-                    RTDataSourceSpaceType = QStandardItem::UserType + 16,
-                    RTDataColormapType = QStandardItem::UserType + 17,
-                    RTDataTimeInterval = QStandardItem::UserType + 18,
-                    RTDataLoopedStreaming = QStandardItem::UserType + 19,
-                    RTDataNumberAverages = QStandardItem::UserType + 20,
-                    RTDataNormalizationValue = QStandardItem::UserType + 21,
-                    RTDataVisualizationType = QStandardItem::UserType + 22,
-                    SourceSpaceItem = QStandardItem::UserType + 23,
-                    SurfaceColorItem = QStandardItem::UserType + 24};
+                    RTDataItem = QStandardItem::UserType + 5,
+                    SourceSpaceItem = QStandardItem::UserType + 6};
+}
+
+namespace BrainTreeMetaItemTypes
+{
+  enum ItemType{SurfaceFileName = QStandardItem::UserType + 100,
+                    SurfaceFilePath = QStandardItem::UserType + 101,
+                    AnnotFileName = QStandardItem::UserType + 102,
+                    AnnotFilePath = QStandardItem::UserType + 103,
+                    SurfaceType = QStandardItem::UserType + 104,
+                    SurfaceColorGyri = QStandardItem::UserType + 105,
+                    SurfaceColorSulci = QStandardItem::UserType + 106,
+                    SurfaceColorVert = QStandardItem::UserType + 107,
+                    SurfaceColorInfoOrigin = QStandardItem::UserType + 108,
+                    RTDataStreamStatus = QStandardItem::UserType + 109,
+                    RTDataSourceSpaceType = QStandardItem::UserType + 110,
+                    RTDataColormapType = QStandardItem::UserType + 111,
+                    RTDataTimeInterval = QStandardItem::UserType + 112,
+                    RTDataLoopedStreaming = QStandardItem::UserType + 113,
+                    RTDataNumberAverages = QStandardItem::UserType + 114,
+                    RTDataNormalizationValue = QStandardItem::UserType + 115,
+                    RTDataVisualizationType = QStandardItem::UserType + 116,
+                    SurfaceColorItem = QStandardItem::UserType + 117,
+                    UnknownItem = QStandardItem::UserType + 118};
 }
 
 // Model item roles
