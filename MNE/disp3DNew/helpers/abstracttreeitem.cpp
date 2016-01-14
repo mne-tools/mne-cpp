@@ -181,6 +181,15 @@ void AbstractTreeItem::createToolTip()
         case BrainTreeModelItemTypes::RTDataVisualizationType:
             sToolTip = "The visualization type";
             break;
+        case BrainTreeMetaItemRoles::SurfaceColor:
+            sToolTip = "The surface color";
+            break;
+        case BrainTreeModelItemTypes::SurfaceColorItem:
+            sToolTip = "Surface color item";
+            break;
+        case BrainTreeModelItemTypes::SourceSpaceItem:
+            sToolTip = "Source space item";
+            break;
         default:
             sToolTip = "Unknown";
             break;
