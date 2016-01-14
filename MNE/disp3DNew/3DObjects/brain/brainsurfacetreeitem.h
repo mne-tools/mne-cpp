@@ -164,7 +164,7 @@ private slots:
 private:
     //=========================================================================================================
     /**
-    * Cretes a QByteArray of colors for given curvature and color data.
+    * Creates a QByteArray of colors for given curvature and color data.
     *
     * @param[in] curvature      The curvature information.
     * @param[in] colSulci       The sulci color information.

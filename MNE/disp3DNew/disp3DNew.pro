@@ -104,6 +104,7 @@ SOURCES += \
     helpers/window.cpp \
     control/control3dwidget.cpp \
     rt/rtSourceLoc/rtsourcelocdataworker.cpp \
+    3DObjects/brain/brainsourcespacetreeitem.cpp
 
 HEADERS += \
     view3d.h \
@@ -124,6 +125,7 @@ HEADERS += \
     control/control3dwidget.h \
     disp3dnew_global.h \
     rt/rtSourceLoc/rtsourcelocdataworker.h \
+    3DObjects/brain/brainsourcespacetreeitem.h
 
 FORMS += \
     control/control3dwidget.ui \

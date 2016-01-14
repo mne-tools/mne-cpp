@@ -156,6 +156,17 @@ public:
     */
     bool addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
 
+    //=========================================================================================================
+    /**
+    * Adds source space data to this item.
+    *
+    * @param[in] tSourceSpace       The source space data.
+    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+    *
+    * @return                       Returns true if successful.
+    */
+    bool addData(const MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent = 0);
+
 private:
 };
 

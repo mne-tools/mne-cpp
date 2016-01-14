@@ -117,6 +117,10 @@ void  BrainTreeMetaItem::setData(const QVariant& value, int role)
             break;
         }
 
+        case BrainTreeMetaItemRoles::SurfaceColor: {
+            emit surfaceColorUpdated(value.value<QColor>());
+            break;
+        }
     }
 }
 

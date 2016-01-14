@@ -133,6 +133,7 @@ public:
     /**
     * Adds FreeSurfer brain data SET.
     *
+    * @param[in] text               The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
     * @param[in] tSurfaceSet        FreeSurfer surface set.
     * @param[in] tAnnotationSet     FreeSurfer annotation set.
     *
@@ -144,12 +145,35 @@ public:
     /**
     * Adds FreeSurfer single brain data.
     *
+    * @param[in] text               The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
     * @param[in] tSurface           FreeSurfer surface.
     * @param[in] tAnnotation        FreeSurfer annotation.
     *
     * @return                       Returns true if successful.
     */
     bool addBrainData(const QString& text, const Surface& tSurface, const Annotation& tAnnotation = Annotation());
+
+    //=========================================================================================================
+    /**
+    * Adds source space data to the brain tree model.
+    *
+    * @param[in] text               The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
+    * @param[in] tSourceSpace       The source space information.
+    *
+    * @return                       Returns true if successful.
+    */
+    bool addBrainData(const QString& text, const MNESourceSpace& tSourceSpace);
+
+    //=========================================================================================================
+    /**
+    * Adds a forward solution data to the brain tree model. Convenient function to addBrainData(const QString& text, const MNESourceSpace& tSourceSpace).
+    *
+    * @param[in] text               The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
+    * @param[in] tForwardSolution   The forward solution information.
+    *
+    * @return                       Returns true if successful.
+    */
+    bool addBrainData(const QString& text, const MNEForwardSolution& tForwardSolution);
 
     //=========================================================================================================
     /**

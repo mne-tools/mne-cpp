@@ -137,6 +137,15 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
             pComboBox->addItem("Annotation based");
             return pComboBox;
         }
+
+        case BrainTreeModelItemTypes::SurfaceColorItem: {
+            QColorDialog *pColorDialog = new QColorDialog();
+            connect(pColorDialog, &QColorDialog::currentColorChanged,
+                    this, &BrainTreeDelegate::onEditorEdited);
+            pColorDialog->setWindowTitle("Select Surface Color");
+            pColorDialog->show();
+            return pColorDialog;
+        }
     }
 
     return QItemDelegate::createEditor(parent, option, index);
@@ -197,6 +206,13 @@ void BrainTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index)
             QString visType = index.model()->data(index, BrainTreeMetaItemRoles::RTDataVisualizationType).toString();
             QComboBox* pComboBox = static_cast<QComboBox*>(editor);
             pComboBox->setCurrentText(visType);
+            break;
+        }
+
+        case BrainTreeModelItemTypes::SurfaceColorItem: {
+            QColor color = index.model()->data(index, BrainTreeMetaItemRoles::SurfaceColor).value<QColor>();
+            QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
+            pColorDialog->setCurrentColor(color);
             break;
         }
     }
@@ -283,6 +299,17 @@ void BrainTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
 
             model->setData(index, data, BrainTreeMetaItemRoles::RTDataVisualizationType);
             model->setData(index, data, Qt::DisplayRole);
+            return;
+        }
+
+        case BrainTreeModelItemTypes::SurfaceColorItem: {
+            QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
+            QColor color = pColorDialog->currentColor();
+            QVariant data;
+            data.setValue(color);
+
+            model->setData(index, data, BrainTreeMetaItemRoles::SurfaceColor);
+            model->setData(index, data, Qt::DecorationRole);
             return;
         }
     }
