@@ -57,6 +57,63 @@ using namespace DISP3DNEWLIB;
 BrainTreeMetaItem::BrainTreeMetaItem(const int& iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
+    QString sToolTip;
+
+    switch(m_iType) {
+        case BrainTreeMetaItemTypes::SurfaceFileName:
+            sToolTip = "Surface file name";
+            break;
+        case BrainTreeMetaItemTypes::SurfaceFilePath:
+            sToolTip = "Surface file path";
+            break;
+        case BrainTreeMetaItemTypes::AnnotFileName:
+            sToolTip = "Annotation file name";
+            break;
+        case BrainTreeMetaItemTypes::AnnotFilePath:
+            sToolTip = "Annotation file path";
+            break;
+        case BrainTreeMetaItemTypes::SurfaceType:
+            sToolTip = "Surface type";
+            break;
+        case BrainTreeMetaItemTypes::SurfaceColorGyri:
+            sToolTip = "Color Gyri";
+            break;
+        case BrainTreeMetaItemTypes::SurfaceColorSulci:
+            sToolTip = "Color Sulci";
+            break;
+        case BrainTreeMetaItemTypes::SurfaceColorInfoOrigin:
+            sToolTip = "Information used to color the surface";
+            break;
+        case BrainTreeMetaItemTypes::RTDataStreamStatus:
+            sToolTip = "Turn real time data streaming on/off";
+            break;
+        case BrainTreeMetaItemTypes::RTDataSourceSpaceType:
+            sToolTip = "The source space type";
+            break;
+        case BrainTreeMetaItemTypes::RTDataColormapType:
+            sToolTip = "The color map type";
+            break;
+        case BrainTreeMetaItemTypes::RTDataTimeInterval:
+            sToolTip = "The m seconds waited in between each sample";
+            break;
+        case BrainTreeMetaItemTypes::RTDataLoopedStreaming:
+            sToolTip = "Turn looped streaming on/off";
+            break;
+        case BrainTreeMetaItemTypes::RTDataNumberAverages:
+            sToolTip = "The number of samples waited to average the activity estimation";
+            break;
+        case BrainTreeMetaItemTypes::RTDataNormalizationValue:
+            sToolTip = "The value to normalize the source localization result";
+            break;
+        case BrainTreeMetaItemTypes::RTDataVisualizationType:
+            sToolTip = "The visualization type";
+            break;
+        case BrainTreeMetaItemTypes::SurfaceColorItem:
+            sToolTip = "Surface color item";
+            break;
+    }
+
+    this->setToolTip(sToolTip);
 }
 
 

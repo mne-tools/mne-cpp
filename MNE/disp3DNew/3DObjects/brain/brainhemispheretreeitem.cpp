@@ -58,6 +58,7 @@ BrainHemisphereTreeItem::BrainHemisphereTreeItem(const int& iType, const QString
 : AbstractTreeItem(iType, text)
 {
     this->setEditable(false);
+    this->setToolTip("Brain hemisphere");
 }
 
 

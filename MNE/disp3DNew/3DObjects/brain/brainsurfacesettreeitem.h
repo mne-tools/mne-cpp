@@ -117,7 +117,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainSurfaceSetTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "");
+    explicit BrainSurfaceSetTreeItem(const int& iType = BrainTreeModelItemTypes::SurfaceSetItem, const QString& text = "");
 
     //=========================================================================================================
     /**
