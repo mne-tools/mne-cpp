@@ -39,7 +39,6 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-#QT       += 3d
 QT += widgets 3dcore 3drender 3dinput
 
 CONFIG   += console
@@ -60,7 +59,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Dispd \
-            #-lMNE$${MNE_LIB_VERSION}Disp3Dd \
             -lMNE$${MNE_LIB_VERSION}Disp3DNewd
 }
 else {
@@ -71,7 +69,6 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Disp \
-            #-lMNE$${MNE_LIB_VERSION}Disp3D \
             -lMNE$${MNE_LIB_VERSION}Disp3DNew
 }
 
