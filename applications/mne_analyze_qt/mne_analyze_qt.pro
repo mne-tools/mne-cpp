@@ -40,7 +40,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += gui widgets 3d
+QT += gui widgets 3dcore 3drender 3dinput
 
 TARGET = mne_analyze_qt
 
@@ -68,7 +68,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lMNE$${MNE_LIB_VERSION}Disp3Dd
+            -lMNE$${MNE_LIB_VERSION}Disp3DNewd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -78,7 +78,7 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Disp \
-            -lMNE$${MNE_LIB_VERSION}Disp3D
+            -lMNE$${MNE_LIB_VERSION}Disp3DNew
 }
 
 DESTDIR = $${MNE_BINARY_DIR}
@@ -89,7 +89,7 @@ SOURCES += \
     Windows/aboutwindow.cpp \
     Windows/viewerwidget.cpp \
     Views/baseview.cpp \
-    Views/view3d.cpp
+    Views/view3danalyze.cpp
 
 HEADERS += \
     info.h \
@@ -97,7 +97,7 @@ HEADERS += \
     Windows/aboutwindow.h \
     Windows/viewerwidget.h \
     Views/baseview.h \
-    Views/view3d.h
+    Views/view3danalyze.h
 
 FORMS += \
     Windows/mainwindow.ui \

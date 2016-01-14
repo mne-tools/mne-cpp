@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     view3d.cpp
+* @file     view3danalyze.h
 * @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
 *			Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
@@ -34,76 +34,70 @@
 *
 * @brief
 *
-*@file
-*       view3d.h
+* @file
+*       view3danalyze.cpp
 */
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE
+//=============================================================================================================
+
+#ifndef VIEW3DANALYZE_H
+#define VIEW3DANALYZE_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QWidget>
+#include <QtWidgets/QHBoxLayout>
+#include <QPushButton>
+
+#include "disp3DNew/view3d.h"
+
+#include <fs/surfaceset.h>
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "view3d.h"
+#include "baseview.h"
+
+//*************************************************************************************************************
+//=============================================================================================================
+// NAMESPACES
+//=============================================================================================================
+
+using namespace FSLIB;
+using namespace DISP3DNEWLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
-// View3D constructor
 //=============================================================================================================
 
-View3D::View3D(int surface_type)
+class View3DAnalyze : public BaseView
 {
-    //Resizing the created QMdiSubwindow to fit the minimun size of the container used later
-    this->resize(256,256);
-    //QGridLayout is used so the container constantly resizes to the size of the QMdiSubwindow
-    m_view3d_gridlayout = new QGridLayout(this);
-
-    //*************************************************************************************************************
-    //=============================================================================================================
-    // Loading a FreeSurfer example from BrainView class
-    //=============================================================================================================
-
-    switch(surface_type){
-    case 1:
-    //
-    // pial
-    //
-        m_BrainView = new BrainView("sample", 2, "pial", "./MNE-sample-data/subjects");
-        break;
-    case 2:
-    //
-    // inflated
-    //
-        m_BrainView = new BrainView("sample", 2, "inflated", "./MNE-sample-data/subjects");
-        break;
-    case 3:
-    //
-    // orig
-    //
-        m_BrainView = new BrainView("sample", 2, "orig", "./MNE-sample-data/subjects");
-        break;
-    case 4:
-    //
-    // white
-    //
-        m_BrainView = new BrainView("sample", 2, "white", "./MNE-sample-data/subjects");
-        break;
-    }
-    //A container is created to contain the QWindow that comes from BrainView, then a minimum size is set
-    m_view3d_container = QWidget::createWindowContainer(m_BrainView);
-    m_view3d_container->setMinimumSize(256,256);
-    //m_view3d_container->setMaximumSize(256,256);
-    m_view3d_container->setFocusPolicy(Qt::TabFocus);
-    //The loaded surfaces, as a QWindow is added to the created container
-    m_view3d_gridlayout->addWidget(m_view3d_container);
-}
-//*************************************************************************************************************
 //=============================================================================================================
-// View3D destructor
+public:
+    //int surface_type is only for testing purposes, to show every surface
+    View3DAnalyze(int surface_type);
+    ~View3DAnalyze();
+
 //=============================================================================================================
 
-View3D::~View3D()
-{
+private:
+    //Layout
+    QWidget *m_view3d_container;
+    QGridLayout *m_view3d_gridlayout;
+    //Surface
+    View3D *m_BrainView;
 
-}
+};
 
+#endif // VIEW3DANALYZE_H
