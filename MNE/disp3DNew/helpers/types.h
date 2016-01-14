@@ -104,7 +104,9 @@ namespace BrainTreeModelItemTypes
                     RTDataLoopedStreaming = QStandardItem::UserType + 19,
                     RTDataNumberAverages = QStandardItem::UserType + 20,
                     RTDataNormalizationValue = QStandardItem::UserType + 21,
-                    RTDataVisualizationType = QStandardItem::UserType + 22};
+                    RTDataVisualizationType = QStandardItem::UserType + 22,
+                    SourceSpaceItem = QStandardItem::UserType + 23,
+                    SurfaceColorItem = QStandardItem::UserType + 24};
 }
 
 // Model item roles
@@ -125,7 +127,8 @@ namespace BrainTreeMetaItemRoles
                     RTDataLoopedStreaming = Qt::UserRole + 13,
                     RTDataNumberAverages = Qt::UserRole + 14,
                     RTDataNormalizationValue = Qt::UserRole + 15,
-                    RTDataVisualizationType = Qt::UserRole + 16};
+                    RTDataVisualizationType = Qt::UserRole + 16,
+                    SurfaceColor = Qt::UserRole + 17};
 }
 
 namespace BrainSurfaceTreeItemRoles
@@ -141,6 +144,16 @@ namespace BrainSurfaceTreeItemRoles
                     SurfaceRTSourceLocColor = Qt::UserRole + 108,
                     SurfaceAnnotationColorVert = Qt::UserRole + 109,
                     SurfaceRenderable3DEntityAcivationOverlay = Qt::UserRole + 110};
+}
+
+namespace BrainSourceSpaceTreeItemRoles
+{
+    enum ItemRole{SurfaceCurrentColorVert = Qt::UserRole + 100,
+                    SurfaceVert = Qt::UserRole + 101,
+                    SurfaceTris = Qt::UserRole + 102,
+                    SurfaceNorm = Qt::UserRole + 103,
+                    SurfaceOffset = Qt::UserRole + 104,
+                    SurfaceRenderable3DEntity = Qt::UserRole + 105};
 }
 
 namespace BrainSurfaceSetTreeItemRoles

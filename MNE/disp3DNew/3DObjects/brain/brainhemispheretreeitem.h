@@ -48,6 +48,7 @@
 #include "brainsurfacetreeitem.h"
 #include "brainannotationtreeitem.h"
 #include "brainrtdatatreeitem.h"
+#include "brainsourcespacetreeitem.h"
 
 #include "fs/label.h"
 #include "fs/annotationset.h"
@@ -150,6 +151,17 @@ public:
     * @return                       Returns true if successful.
     */
     bool addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
+
+    //=========================================================================================================
+    /**
+    * Adds source space information.
+    *
+    * @param[in] tHemisphere        The MNEHemisphere.
+    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+    *
+    * @return                       Returns true if successful.
+    */
+    bool addData(const MNEHemisphere& tHemisphere, Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**

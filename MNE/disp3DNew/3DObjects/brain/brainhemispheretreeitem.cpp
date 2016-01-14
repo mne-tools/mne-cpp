@@ -88,7 +88,7 @@ void  BrainHemisphereTreeItem::setData(const QVariant& value, int role)
 
 bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
 {
-    //Set name of this item based on the hemispehre information
+    //Set name of BrainHemisphereTreeItem based on the hemisphere information
     switch (tSurface.hemi()) {
     case 0:
         this->setText("Left");
@@ -100,6 +100,11 @@ bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation&
         this->setText("Unknown");
         break;
     }
+
+    QVariant data;
+    data.setValue(tSurface.hemi());
+
+    this->setData(data, BrainHemisphereTreeItemRoles::SurfaceHemi);
 
     //Add childs
     bool state = false;
@@ -115,6 +120,41 @@ bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation&
         *this<<m_pAnnotItem;
         state = m_pAnnotItem->addData(tSurface, tAnnotation);
     }
+
+    return state;
+}
+
+
+//*************************************************************************************************************
+
+bool BrainHemisphereTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QEntity* p3DEntityParent)
+{
+    //Set name of BrainHemisphereTreeItem based on the hemisphere information
+    qDebug()<<"tHemisphere.id"<<tHemisphere.id;
+    switch (tHemisphere.id) {
+    case 101:
+        this->setText("Left");
+        break;
+    case 102:
+        this->setText("Right");
+        break;
+    default:
+        this->setText("Unknown");
+        break;
+    }
+
+    QVariant data;
+    data.setValue(tHemisphere.id);
+
+    this->setData(data, BrainHemisphereTreeItemRoles::SurfaceHemi);
+
+    //Add childs
+    bool state = false;
+
+    //Add surface child
+    BrainSourceSpaceTreeItem* pSourceSpaceItem = new BrainSourceSpaceTreeItem(BrainTreeModelItemTypes::SourceSpaceItem);
+    *this<<pSourceSpaceItem;
+    state = pSourceSpaceItem->addData(tHemisphere, p3DEntityParent);
 
     return state;
 }

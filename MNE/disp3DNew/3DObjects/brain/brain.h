@@ -141,6 +141,17 @@ public:
 
     //=========================================================================================================
     /**
+    * Adds source space brain data.
+    *
+    * @param[in] text               The name of the surface set to which the data is to be added.
+    * @param[in] tSourceSpace       The source space information.
+    *
+    * @return                       Returns true if successful.
+    */
+    bool addData(const QString& text, const MNESourceSpace& tSourceSpace);
+
+    //=========================================================================================================
+    /**
     * Adds source estimated activation data.
     *
     * @param[in] text               The name of the surface set to which the actiavtion data is to be added.

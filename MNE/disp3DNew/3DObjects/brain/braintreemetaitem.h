@@ -171,6 +171,14 @@ signals:
     * @param[in] sVisualizationType     The new visualization type.
     */
     void rtDataVisualizationTypeUpdated(const QString& sVisualizationType);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the surface color changed.
+    *
+    * @param[in] color     The new surface color.
+    */
+    void surfaceColorUpdated(const QColor& color);
 };
 
 } //NAMESPACE DISP3DNEWLIB

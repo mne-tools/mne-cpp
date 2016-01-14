@@ -183,6 +183,22 @@ bool View3D::addBrainData(const QString& text, const Surface& tSurface, const An
 
 //*************************************************************************************************************
 
+bool View3D::addBrainData(const QString& text, const MNESourceSpace& tSourceSpace)
+{
+    return m_pBrain->addData(text, tSourceSpace);
+}
+
+
+//*************************************************************************************************************
+
+bool View3D::addBrainData(const QString& text, const MNEForwardSolution& tForwardSolution)
+{
+    return m_pBrain->addData(text, tForwardSolution.src);
+}
+
+
+//*************************************************************************************************************
+
 QList<BrainRTDataTreeItem*> View3D::addSourceEstimate(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
     return m_pBrain->addData(text, tSourceEstimate, tForwardSolution);

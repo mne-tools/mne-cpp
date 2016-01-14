@@ -90,7 +90,6 @@ else {
 }
 
 SOURCES += \
-    geometryview.cpp \
     labelview.cpp \
     inverseview.cpp \
     inverseviewproducer.cpp \
@@ -103,7 +102,6 @@ SOURCES += \
 
 HEADERS += \
     disp3D_global.h \
-    geometryview.h \
     labelview.h \
     inverseview.h \
     inverseviewproducer.h \

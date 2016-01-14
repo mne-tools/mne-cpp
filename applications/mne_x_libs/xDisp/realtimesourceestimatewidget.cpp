@@ -45,7 +45,6 @@
 
 #include <xMeas/realtimesourceestimate.h>
 
-#include <disp3D/geometryview.h>
 #include <mne/mne_forwardsolution.h>
 
 
