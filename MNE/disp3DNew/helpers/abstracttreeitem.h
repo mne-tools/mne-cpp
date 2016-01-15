@@ -145,12 +145,6 @@ public :
     AbstractTreeItem &operator<<(AbstractTreeItem& newItem);
 
 protected:
-    //=========================================================================================================
-    /**
-    * Create tool tip for all possible items.
-    */
-    void createToolTip();
-
     int     m_iType;        /**< This item's type. */
 
 signals:
