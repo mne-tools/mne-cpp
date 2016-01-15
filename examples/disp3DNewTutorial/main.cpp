@@ -197,6 +197,10 @@ int main(int argc, char *argv[])
     //testWindow->addBrainData("HemiLR", tSurfRight, tAnnotRight);
     testWindow->addBrainData("HemiLRSet", tSurfSet, tAnnotSet);
 
+//    QFile t_File("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+//    MNEForwardSolution t_forwardSolution(t_File);
+    //testWindow->addBrainData("HemiLRSet", t_forwardSolution);
+
     QList<BrainRTDataTreeItem*> rtItemList = testWindow->addSourceEstimate("HemiLRSet", sourceEstimate, t_clusteredFwd);
     //rtItemList.at(0)->updateData();
 

@@ -63,7 +63,7 @@ BrainRTDataTreeItem::BrainRTDataTreeItem(const int &iType, const QString &text)
             this, &BrainRTDataTreeItem::onNewRtData);
 
     this->setEditable(false);
-    this->setToolTip("Real time data item");
+    this->setToolTip("Real time data");
 }
 
 
