@@ -6,7 +6,7 @@ AbstractTreeItem::AbstractTreeItem(const int& iType, const QString& text)
 : QStandardItem(text)
 , m_iType(iType)
 {
-    createToolTip();
+    this->setToolTip("Unknown");
 }
 
 
@@ -105,23 +105,4 @@ AbstractTreeItem& AbstractTreeItem::operator<<(AbstractTreeItem& newItem)
     this->appendRow(&newItem);
 
     return *this;
-}
-
-
-//*************************************************************************************************************
-
-void AbstractTreeItem::createToolTip()
-{
-    QString sToolTip;
-
-    switch(m_iType) {
-        case BrainTreeModelItemTypes::UnknownItem:
-            sToolTip = "Unknown";
-            break;
-        default:
-            sToolTip = "Unknown";
-            break;
-    }
-
-    this->setToolTip(sToolTip);
 }
