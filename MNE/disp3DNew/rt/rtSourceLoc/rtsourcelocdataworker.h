@@ -155,7 +155,7 @@ public:
     *
     * @param[in] samples                The new number of averages.
     */
-    void setAverage(qint32 samples);
+    void setNumberAverages(const int& iNumAvr);
 
     //=========================================================================================================
     /**
@@ -232,26 +232,26 @@ private:
     */
     QByteArray transformDataToColor(const VectorXd& data);
 
-    QMutex      m_qMutex;               /**< The thread's mutex. */
+    QMutex          m_qMutex;               /**< The thread's mutex. */
 
-    QByteArray  m_arraySurfaceVertColor;/**< The vertex colors for the surface where the data is to be plotted on. */
-    MatrixXd    m_matData;              /**< List that holds the fiff matrix data <n_channels x n_samples>. */
-    VectorXi    m_vecVertNo;            /**< Vector with the source vertx indexes. */
+    QByteArray      m_arraySurfaceVertColor;/**< The vertex colors for the surface where the data is to be plotted on. */
+    QList<VectorXd> m_lData;                /**< List that holds the fiff matrix data <n_channels x n_samples>. */
+    VectorXi        m_vecVertNo;            /**< Vector with the source vertx indexes. */
 
-    bool        m_bIsRunning;           /**< Flag if this thread is running. */
-    bool        m_bIsLooping;           /**< Flag if this thread should repeat sending the same data over and over again. */
-    bool        m_bSurfaceDataIsInit;   /**< Flag if this thread's surface data was initialized. This flag is used to decide whether specific visualization types can be computed. */
-    bool        m_bAnnotationDataIsInit;/**< Flag if this thread's annotation data was initialized. This flag is used to decide whether specific visualization types can be computed. */
+    bool            m_bIsRunning;           /**< Flag if this thread is running. */
+    bool            m_bIsLooping;           /**< Flag if this thread should repeat sending the same data over and over again. */
+    bool            m_bSurfaceDataIsInit;   /**< Flag if this thread's surface data was initialized. This flag is used to decide whether specific visualization types can be computed. */
+    bool            m_bAnnotationDataIsInit;/**< Flag if this thread's annotation data was initialized. This flag is used to decide whether specific visualization types can be computed. */
 
-    qint32      m_iAverageSamples;      /**< Number of average to compute. */
-    qint32      m_iCurrentSample;       /**< Number of the current sample which is/was streamed. */
-    qint32      m_iMSecIntervall;       /**< Length in milli Seconds to wait inbetween data samples. */
-    int         m_iVisualizationType;   /**< The visualization type (single vertex, smoothing, annotation based). */
+    int             m_iAverageSamples;      /**< Number of average to compute. */
+    int             m_iCurrentSample;       /**< Number of the current sample which is/was streamed. */
+    int             m_iMSecIntervall;       /**< Length in milli Seconds to wait inbetween data samples. */
+    int             m_iVisualizationType;   /**< The visualization type (single vertex, smoothing, annotation based). */
 
-    double      m_dNormalization;       /**< Normalization value. */
-    double      m_dNormalizationMax;    /**< Value to normalize to. */
+    double          m_dNormalization;       /**< Normalization value. */
+    double          m_dNormalizationMax;    /**< Value to normalize to. */
 
-    QString     m_sColormap;            /**< The type of colormap ("Hot", "Hot Negative 1", etc.). */
+    QString         m_sColormap;            /**< The type of colormap ("Hot", "Hot Negative 1", etc.). */
 
     QList<FSLIB::Label>         m_lLabels;
     QMap<qint32, qint32>        m_mapLabelIdSources;

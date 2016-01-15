@@ -132,13 +132,13 @@ signals:
     /**
     * Emit this signal whenever the color of the curvature data changed.
     */
-    void curvColorsUpdated();
+    void curvColorsChanged();
 
     //=========================================================================================================
     /**
     * Emit this signal whenever the color origin (curvature or annotation) changed.
     */
-    void colorInfoOriginUpdated();
+    void colorInfoOriginChanged();
 
     //=========================================================================================================
     /**
@@ -146,7 +146,7 @@ signals:
     *
     * @param[in] iMSec     The time interval in mSecs.
     */
-    void rtDataTimeIntervalUpdated(const int& iMSec);
+    void rtDataTimeIntervalChanged(const int& iMSec);
 
     //=========================================================================================================
     /**
@@ -154,7 +154,7 @@ signals:
     *
     * @param[in] dValue     The new normalization value.
     */
-    void rtDataNormalizationValueUpdated(const double& dValue);
+    void rtDataNormalizationValueChanged(const double& dValue);
 
     //=========================================================================================================
     /**
@@ -162,7 +162,7 @@ signals:
     *
     * @param[in] sColormapType     The new colormap type.
     */
-    void rtDataColormapTypeUpdated(const QString& sColormapType);
+    void rtDataColormapTypeChanged(const QString& sColormapType);
 
     //=========================================================================================================
     /**
@@ -170,7 +170,7 @@ signals:
     *
     * @param[in] sVisualizationType     The new visualization type.
     */
-    void rtDataVisualizationTypeUpdated(const QString& sVisualizationType);
+    void rtDataVisualizationTypeChanged(const QString& sVisualizationType);
 
     //=========================================================================================================
     /**
@@ -178,7 +178,15 @@ signals:
     *
     * @param[in] color     The new surface color.
     */
-    void surfaceColorUpdated(const QColor& color);
+    void surfaceColorChanged(const QColor& color);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the number of averages of the data streaming changed.
+    *
+    * @param[in] iMSec     The new number of averages.
+    */
+    void rtDataNumberAveragesChanged(const int& iNumAvr);
 };
 
 } //NAMESPACE DISP3DNEWLIB

@@ -163,7 +163,7 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     pItemRTDataStreamStatus->setData(data, BrainTreeMetaItemRoles::RTDataStreamStatus);
 
     BrainTreeMetaItem* pItemVisuaizationType = new BrainTreeMetaItem(BrainTreeMetaItemTypes::RTDataVisualizationType, "Vertex based");
-    connect(pItemVisuaizationType, &BrainTreeMetaItem::rtDataVisualizationTypeUpdated,
+    connect(pItemVisuaizationType, &BrainTreeMetaItem::rtDataVisualizationTypeChanged,
             this, &BrainRTDataTreeItem::onVisualizationTypeChanged);
     *this<<pItemVisuaizationType;
     data.setValue(QString("Single Vertex"));
@@ -177,33 +177,39 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     pItemSourceSpaceType->setData(data, BrainTreeMetaItemRoles::RTDataSourceSpaceType);
 
     BrainTreeMetaItem* pItemColormapType = new BrainTreeMetaItem(BrainTreeMetaItemTypes::RTDataColormapType, "Hot Negative 2");
-    connect(pItemColormapType, &BrainTreeMetaItem::rtDataColormapTypeUpdated,
+    connect(pItemColormapType, &BrainTreeMetaItem::rtDataColormapTypeChanged,
             this, &BrainRTDataTreeItem::onColormapTypeChanged);
     *this<<pItemColormapType;
     data.setValue(QString("Hot Negative 2"));
     pItemColormapType->setData(data, BrainTreeMetaItemRoles::RTDataColormapType);
 
     BrainTreeMetaItem* pItemSourceLocNormValue = new BrainTreeMetaItem(BrainTreeMetaItemTypes::RTDataNormalizationValue, "0.1");
-    connect(pItemSourceLocNormValue, &BrainTreeMetaItem::rtDataNormalizationValueUpdated,
+    connect(pItemSourceLocNormValue, &BrainTreeMetaItem::rtDataNormalizationValueChanged,
             this, &BrainRTDataTreeItem::onDataNormalizationValueChanged);
     *this<<pItemSourceLocNormValue;
     data.setValue(0.1);
     pItemSourceLocNormValue->setData(data, BrainTreeMetaItemRoles::RTDataNormalizationValue);
 
     BrainTreeMetaItem *pItemStreamingInterval = new BrainTreeMetaItem(BrainTreeMetaItemTypes::RTDataTimeInterval, "1000");
-    connect(pItemStreamingInterval, &BrainTreeMetaItem::rtDataTimeIntervalUpdated,
+    connect(pItemStreamingInterval, &BrainTreeMetaItem::rtDataTimeIntervalChanged,
             this, &BrainRTDataTreeItem::onTimeIntervalChanged);
     *this<<pItemStreamingInterval;
     data.setValue(1000);
     pItemStreamingInterval->setData(data, BrainTreeMetaItemRoles::RTDataTimeInterval);
 
-//    BrainTreeMetaItem *itemLoopedStreaming = new BrainTreeMetaItem(BrainTreeModelItemTypes::RTDataLoopedStreaming, "Looping on/off");
-//    itemLoopedStreaming->setCheckable(true);
-//    itemLoopedStreaming->setCheckState(Qt::Unchecked);
-//    *this<<itemLoopedStreaming;
+    BrainTreeMetaItem *pItemLoopedStreaming = new BrainTreeMetaItem(BrainTreeMetaItemTypes::RTDataLoopedStreaming, "Looping on/off");
+    connect(pItemLoopedStreaming, &BrainTreeMetaItem::checkStateChanged,
+            this, &BrainRTDataTreeItem::onCheckStateLoopedStateChanged);
+    pItemLoopedStreaming->setCheckable(true);
+    pItemLoopedStreaming->setCheckState(Qt::Checked);
+    *this<<pItemLoopedStreaming;
 
-//    BrainTreeMetaItem *itemAveragedStreaming = new BrainTreeMetaItem(BrainTreeModelItemTypes::RTDataNumberAverages, "Number of Averages");
-//    *this<<itemAveragedStreaming;
+    BrainTreeMetaItem *pItemAveragedStreaming = new BrainTreeMetaItem(BrainTreeMetaItemTypes::RTDataNumberAverages, "1");
+    connect(pItemAveragedStreaming, &BrainTreeMetaItem::rtDataNumberAveragesChanged,
+            this, &BrainRTDataTreeItem::onNumberAveragesChanged);
+    *this<<pItemAveragedStreaming;
+    data.setValue(1);
+    pItemAveragedStreaming->setData(data, BrainTreeMetaItemRoles::RTDataNumberAverages);
 
     //set rt data corresponding to the hemisphere
     m_pSourceLocRtDataWorker->setSurfaceData(arraySurfaceVertColor, this->data(BrainRTDataTreeItemRoles::RTVertNo).value<VectorXi>());
@@ -240,7 +246,7 @@ bool BrainRTDataTreeItem::updateData(const MNESourceEstimate& tSourceEstimate)
 
 //*************************************************************************************************************
 
-void BrainRTDataTreeItem::onColorInfoOriginUpdated(const QByteArray& arrayVertColor)
+void BrainRTDataTreeItem::onColorInfoOriginChanged(const QByteArray& arrayVertColor)
 {
     m_pSourceLocRtDataWorker->setSurfaceData(arrayVertColor, this->data(BrainRTDataTreeItemRoles::RTVertNo).value<VectorXi>());
 }
@@ -264,7 +270,7 @@ void BrainRTDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkS
 
 void BrainRTDataTreeItem::onNewRtData(QByteArray sourceColorSamples)
 {
-    emit rtVertColorUpdated(sourceColorSamples, this->data(BrainRTDataTreeItemRoles::RTVertNo).value<VectorXi>());
+    emit rtVertColorChanged(sourceColorSamples, this->data(BrainRTDataTreeItemRoles::RTVertNo).value<VectorXi>());
 }
 
 
@@ -308,3 +314,27 @@ void BrainRTDataTreeItem::onVisualizationTypeChanged(const QString& sVisType)
 
     m_pSourceLocRtDataWorker->setVisualizationType(iVisType);
 }
+
+
+//*************************************************************************************************************
+
+void BrainRTDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& checkState)
+{
+    if(checkState == Qt::Checked) {
+        qDebug()<<"Looped streaming active";
+        m_pSourceLocRtDataWorker->setLoop(true);
+    } else if(checkState == Qt::Unchecked) {
+        qDebug()<<"Looped streaming inactive";
+        m_pSourceLocRtDataWorker->setLoop(false);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void BrainRTDataTreeItem::onNumberAveragesChanged(const int& iNumAvr)
+{
+    qDebug()<<"iNumAvr"<<iNumAvr;
+    m_pSourceLocRtDataWorker->setNumberAverages(iNumAvr);
+}
+
