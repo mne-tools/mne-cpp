@@ -146,6 +146,18 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
             pColorDialog->show();
             return pColorDialog;
         }
+
+        case BrainTreeMetaItemTypes::RTDataNumberAverages: {
+            QSpinBox* pSpinBox = new QSpinBox(parent);
+            connect(pSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+                    this, &BrainTreeDelegate::onEditorEdited);
+            pSpinBox->setMinimum(1);
+            pSpinBox->setMaximum(100);
+            pSpinBox->setSingleStep(1);
+            pSpinBox->setValue(index.model()->data(index, BrainTreeMetaItemRoles::RTDataNumberAverages).toInt());
+            return pSpinBox;
+            break;
+        }
     }
 
     return QItemDelegate::createEditor(parent, option, index);
@@ -213,6 +225,13 @@ void BrainTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index)
             QColor color = index.model()->data(index, BrainTreeMetaItemRoles::SurfaceColor).value<QColor>();
             QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
             pColorDialog->setCurrentColor(color);
+            break;
+        }
+
+        case BrainTreeMetaItemTypes::RTDataNumberAverages: {
+            int value = index.model()->data(index, BrainTreeMetaItemRoles::RTDataNumberAverages).toInt();
+            QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
+            pSpinBox->setValue(value);
             break;
         }
     }
@@ -311,6 +330,17 @@ void BrainTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
             model->setData(index, data, BrainTreeMetaItemRoles::SurfaceColor);
             model->setData(index, data, Qt::DecorationRole);
             return;
+        }
+
+        case BrainTreeMetaItemTypes::RTDataNumberAverages: {
+            QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
+
+            QVariant data;
+            data.setValue(pSpinBox->value());
+
+            model->setData(index, data, BrainTreeMetaItemRoles::RTDataNumberAverages);
+            model->setData(index, data, Qt::DisplayRole);
+            break;
         }
     }
 

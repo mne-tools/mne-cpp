@@ -152,14 +152,14 @@ public slots:
     *
     * @param[in] sourceColorSamples     The color values for each estimated source.
     */
-    void onRtVertColorUpdated(const QByteArray& sourceColorSamples);
+    void onRtVertColorChanged(const QByteArray& sourceColorSamples);
 
 private slots:
     //=========================================================================================================
     /**
     * Call this slot whenever the curvature color or origin of color information (curvature or annotation) changed.
     */
-    void onColorInfoOriginOrCurvColorUpdated();
+    void onColorInfoOriginOrCurvColorChanged();
 
 private:
     //=========================================================================================================
@@ -187,7 +187,7 @@ signals:
     *
     * @param[in] arrayVertColor      The new vertex colors.
     */
-    void colorInfoOriginUpdated(const QByteArray& arrayVertColor);
+    void colorInfoOriginChanged(const QByteArray& arrayVertColor);
 };
 
 } //NAMESPACE DISP3DNEWLIB

@@ -168,10 +168,10 @@ BrainRTDataTreeItem* BrainHemisphereTreeItem::addData(const MNESourceEstimate& t
     if(!tSourceEstimate.isEmpty()) {
         //Add source estimation data as child
         m_pBrainRtDataTreeItem = new BrainRTDataTreeItem(BrainTreeModelItemTypes::RTDataItem);
-        connect(m_pBrainRtDataTreeItem, &BrainRTDataTreeItem::rtVertColorUpdated,
-                m_pSurfaceItem, &BrainSurfaceTreeItem::onRtVertColorUpdated);
-        connect(m_pSurfaceItem, &BrainSurfaceTreeItem::colorInfoOriginUpdated,
-                m_pBrainRtDataTreeItem, &BrainRTDataTreeItem::onColorInfoOriginUpdated);
+        connect(m_pBrainRtDataTreeItem, &BrainRTDataTreeItem::rtVertColorChanged,
+                m_pSurfaceItem, &BrainSurfaceTreeItem::onRtVertColorChanged);
+        connect(m_pSurfaceItem, &BrainSurfaceTreeItem::colorInfoOriginChanged,
+                m_pBrainRtDataTreeItem, &BrainRTDataTreeItem::onColorInfoOriginChanged);
 
         *this<<m_pBrainRtDataTreeItem;
 

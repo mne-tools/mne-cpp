@@ -100,7 +100,7 @@ BrainTreeMetaItem::BrainTreeMetaItem(const int& iType, const QString& text)
             sToolTip = "Turn looped streaming on/off";
             break;
         case BrainTreeMetaItemTypes::RTDataNumberAverages:
-            sToolTip = "The number of samples waited to average the activity estimation";
+            sToolTip = "The number of samples averaged together (downsampling)";
             break;
         case BrainTreeMetaItemTypes::RTDataNormalizationValue:
             sToolTip = "The value to normalize the source localization result";
@@ -140,42 +140,47 @@ void  BrainTreeMetaItem::setData(const QVariant& value, int role)
 
     switch(role) {
         case BrainTreeMetaItemRoles::SurfaceColorSulci: {
-            emit curvColorsUpdated();
+            emit curvColorsChanged();
             break;
         }
 
         case BrainTreeMetaItemRoles::SurfaceColorGyri: {
-            emit curvColorsUpdated();
+            emit curvColorsChanged();
             break;
         }
 
         case BrainTreeMetaItemRoles::SurfaceColorInfoOrigin: {
-            emit colorInfoOriginUpdated();
+            emit colorInfoOriginChanged();
             break;
         }
 
         case BrainTreeMetaItemRoles::RTDataTimeInterval: {
-            emit rtDataTimeIntervalUpdated(value.toInt());
+            emit rtDataTimeIntervalChanged(value.toInt());
             break;
         }
 
         case BrainTreeMetaItemRoles::RTDataNormalizationValue: {
-            emit rtDataNormalizationValueUpdated(value.toDouble());
+            emit rtDataNormalizationValueChanged(value.toDouble());
             break;
         }
 
         case BrainTreeMetaItemRoles::RTDataColormapType: {
-            emit rtDataColormapTypeUpdated(value.toString());
+            emit rtDataColormapTypeChanged(value.toString());
             break;
         }
 
         case BrainTreeMetaItemRoles::RTDataVisualizationType: {
-            emit rtDataVisualizationTypeUpdated(value.toString());
+            emit rtDataVisualizationTypeChanged(value.toString());
             break;
         }
 
         case BrainTreeMetaItemRoles::SurfaceColor: {
-            emit surfaceColorUpdated(value.value<QColor>());
+            emit surfaceColorChanged(value.value<QColor>());
+            break;
+        }
+
+        case BrainTreeMetaItemRoles::RTDataNumberAverages: {
+            emit rtDataNumberAveragesChanged(value.toInt());
             break;
         }
     }

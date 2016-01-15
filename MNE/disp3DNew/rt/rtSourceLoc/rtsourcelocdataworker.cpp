@@ -97,7 +97,10 @@ void RtSourceLocDataWorker::addData(const MatrixXd& data)
     if(data.size() == 0)
         return;
 
-    m_matData = data;
+    //Transform from matrix to list for easier handling in non loop mode
+    for(int i = 0; i<data.cols(); i++) {
+        m_lData.append(data.col(i));
+    }
 }
 
 
@@ -150,10 +153,10 @@ void RtSourceLocDataWorker::setAnnotationData(const VectorXi& vecLabelIds, const
 
 //*************************************************************************************************************
 
-void RtSourceLocDataWorker::setAverage(qint32 samples)
+void RtSourceLocDataWorker::setNumberAverages(const int &iNumAvr)
 {
     QMutexLocker locker(&m_qMutex);
-    m_iAverageSamples = samples;
+    m_iAverageSamples = iNumAvr;
 }
 
 
@@ -234,10 +237,9 @@ void RtSourceLocDataWorker::run()
 
     m_bIsRunning = true;
 
-    while(true)
-    {
-//        QTime timer;
-//        timer.start();
+    while(true) {
+        QTime timer;
+        timer.start();
 
         {
             QMutexLocker locker(&m_qMutex);
@@ -246,51 +248,54 @@ void RtSourceLocDataWorker::run()
         }
 
         bool doProcessing = false;
+
         {
             QMutexLocker locker(&m_qMutex);
-            if(m_matData.cols() > 0)
+            if(m_lData.size() > 0)
                 doProcessing = true;
         }
 
-        if(doProcessing)
-        {
-            if(m_bIsLooping)
-            {
+        if(doProcessing) {
+            if(m_bIsLooping) {
                 m_qMutex.lock();
-                //Down sampling in loop mode
-                if(t_vecAverage.rows() != m_matData.rows())
-                    t_vecAverage = m_matData.col(m_iCurrentSample%m_matData.cols());
-                else
-                    t_vecAverage += m_matData.col(m_iCurrentSample%m_matData.cols());
-                m_qMutex.unlock();
-            }
-            else
-            {
-                m_qMutex.lock();
-                //Down sampling in stream mode
-                if(t_vecAverage.rows() != m_matData.rows())
-                    t_vecAverage = m_matData.col(0);
-                else
-                    t_vecAverage += m_matData.col(0);
 
-                m_matData = m_matData.block(0,1,m_matData.rows(),m_matData.cols()-1);
+                //Down sampling in loop mode
+                if(t_vecAverage.rows() != m_lData.front().rows()) {
+                    t_vecAverage = m_lData[m_iCurrentSample%m_lData.size()];
+                } else {
+                    t_vecAverage += m_lData[m_iCurrentSample%m_lData.size()];
+                }
+
+                m_qMutex.unlock();
+            } else {
+                m_qMutex.lock();
+
+                //Down sampling in stream mode
+                if(t_vecAverage.rows() != m_lData.front().rows()) {
+                    t_vecAverage = m_lData.front();
+                } else {
+                    t_vecAverage += m_lData.front();
+                }
+
+                m_lData.pop_front();
+
                 m_qMutex.unlock();
             }
 
             m_qMutex.lock();
             m_iCurrentSample++;
 
-            if((m_iCurrentSample/1)%m_iAverageSamples == 0)
-            {
+            if((m_iCurrentSample/1)%m_iAverageSamples == 0) {
                 t_vecAverage /= (double)m_iAverageSamples;
 
                 emit newRtData(performVisualizationTypeCalculation(t_vecAverage));
                 t_vecAverage = VectorXd::Zero(t_vecAverage.rows());
             }
+
             m_qMutex.unlock();
         }
 
-//        qDebug()<<"RtSourceLocDataWorker::run()"<<timer.elapsed()<<"msecs";
+        qDebug()<<"RtSourceLocDataWorker::run()"<<timer.elapsed()<<"msecs";
         QThread::msleep(m_iMSecIntervall);
     }
 }

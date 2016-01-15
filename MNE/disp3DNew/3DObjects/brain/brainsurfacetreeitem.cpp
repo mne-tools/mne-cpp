@@ -163,23 +163,23 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
 
     //Add surface meta information as item children
     m_pItemSurfColorInfoOrigin = new BrainTreeMetaItem(BrainTreeMetaItemTypes::SurfaceColorInfoOrigin, "Color from curvature");
-    connect(m_pItemSurfColorInfoOrigin, &BrainTreeMetaItem::colorInfoOriginUpdated,
-            this, &BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorUpdated);
+    connect(m_pItemSurfColorInfoOrigin, &BrainTreeMetaItem::colorInfoOriginChanged,
+            this, &BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged);
     *this<<m_pItemSurfColorInfoOrigin;
     data.setValue(QString("Color from curvature"));
     m_pItemSurfColorInfoOrigin->setData(data, BrainTreeMetaItemRoles::SurfaceColorInfoOrigin);
 
     m_pItemSurfColSulci = new BrainTreeMetaItem(BrainTreeMetaItemTypes::SurfaceColorSulci, "Sulci color");
-    connect(m_pItemSurfColSulci, &BrainTreeMetaItem::curvColorsUpdated,
-            this, &BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorUpdated);
+    connect(m_pItemSurfColSulci, &BrainTreeMetaItem::curvColorsChanged,
+            this, &BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged);
     *this<<m_pItemSurfColSulci;
     data.setValue(QColor(50,50,50));
     m_pItemSurfColSulci->setData(data, BrainTreeMetaItemRoles::SurfaceColorSulci);
     m_pItemSurfColSulci->setData(data, Qt::DecorationRole);
 
     m_pItemSurfColGyri = new BrainTreeMetaItem(BrainTreeMetaItemTypes::SurfaceColorGyri, "Gyri color");
-    connect(m_pItemSurfColGyri, &BrainTreeMetaItem::curvColorsUpdated,
-            this, &BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorUpdated);
+    connect(m_pItemSurfColGyri, &BrainTreeMetaItem::curvColorsChanged,
+            this, &BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged);
     *this<<m_pItemSurfColGyri;
     data.setValue(QColor(125,125,125));
     m_pItemSurfColGyri->setData(data, BrainTreeMetaItemRoles::SurfaceColorGyri);
@@ -209,7 +209,7 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
 
 //*************************************************************************************************************
 
-void BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorUpdated()
+void BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
 {
     if(this->hasChildren()) {
         QString sColorInfoOrigin = m_pItemSurfColorInfoOrigin->data(BrainTreeMetaItemRoles::SurfaceColorInfoOrigin).toString();
@@ -227,7 +227,7 @@ void BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorUpdated()
             this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurvatureColorVert);
             this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert);
 
-            emit colorInfoOriginUpdated(arrayNewVertColor);
+            emit colorInfoOriginChanged(arrayNewVertColor);
 
             //Return here because the new colors will be set to the renderable entity in the setData() function with the role BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert
             return;
@@ -244,7 +244,7 @@ void BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorUpdated()
                     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceAnnotationColorVert);
                     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert);
 
-                    emit colorInfoOriginUpdated(arrayNewVertColor);
+                    emit colorInfoOriginChanged(arrayNewVertColor);
 
                     //Return here because the new colors will be set to the renderable entity in the setData() function with the role BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert
                     return;
@@ -257,7 +257,7 @@ void BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorUpdated()
 
 //*************************************************************************************************************
 
-void BrainSurfaceTreeItem::onRtVertColorUpdated(const QByteArray& sourceColorSamples)
+void BrainSurfaceTreeItem::onRtVertColorChanged(const QByteArray& sourceColorSamples)
 {
     //Set new data.
     //In setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert) we pass the new color values to the renderer (see setData function).

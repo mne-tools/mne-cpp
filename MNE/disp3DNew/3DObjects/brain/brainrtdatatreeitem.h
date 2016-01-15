@@ -168,7 +168,7 @@ public:
     inline bool isInit() const;
 
 public slots:
-    void onColorInfoOriginUpdated(const QByteArray& arrayVertColor);
+    void onColorInfoOriginChanged(const QByteArray& arrayVertColor);
 
 private slots:
     //=========================================================================================================
@@ -219,10 +219,26 @@ private slots:
     */
     void onVisualizationTypeChanged(const QString& sVisType);
 
-private:
-    bool                        m_bInit;                /**< The init flag. */
+    //=========================================================================================================
+    /**
+    * This slot gets called whenever the check/actiation state of the looped streaming state changed.
+    *
+    * @param[in] checkState     The check state of the looped streaming state.
+    */
+    void onCheckStateLoopedStateChanged(const Qt::CheckState& checkState);
 
-    RtSourceLocDataWorker*      m_pSourceLocRtDataWorker;        /**< The source data worker. This worker streams the rt data to this item.*/
+    //=========================================================================================================
+    /**
+    * This slot gets called whenever the number of averages of the streamed samples changed.
+    *
+    * @param[in] iNumAvr     The new number of averages.
+    */
+    void onNumberAveragesChanged(const int& iNumAvr);
+
+private:
+    bool                        m_bInit;                        /**< The init flag. */
+
+    RtSourceLocDataWorker*      m_pSourceLocRtDataWorker;       /**< The source data worker. This worker streams the rt data to this item.*/
 
 signals:
     //=========================================================================================================
@@ -232,7 +248,7 @@ signals:
     * @param[in] sourceColorSamples     The color values for each estimated source.
     * @param[in] vertexIndex            The vertex idnex of each estiamted source.
     */
-    void rtVertColorUpdated(QByteArray sourceColorSamples, VectorXi vertexIndex);
+    void rtVertColorChanged(QByteArray sourceColorSamples, VectorXi vertexIndex);
 };
 
 //*************************************************************************************************************
