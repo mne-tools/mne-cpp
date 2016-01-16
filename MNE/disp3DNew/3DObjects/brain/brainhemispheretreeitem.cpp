@@ -131,7 +131,6 @@ bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation&
 bool BrainHemisphereTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Set name of BrainHemisphereTreeItem based on the hemisphere information
-    qDebug()<<"tHemisphere.id"<<tHemisphere.id;
     switch (tHemisphere.id) {
     case 101:
         this->setText("Left");
@@ -167,26 +166,29 @@ BrainRTDataTreeItem* BrainHemisphereTreeItem::addData(const MNESourceEstimate& t
 {
     if(!tSourceEstimate.isEmpty()) {
         //Add source estimation data as child
-        m_pBrainRtDataTreeItem = new BrainRTDataTreeItem(BrainTreeModelItemTypes::RTDataItem);
-        connect(m_pBrainRtDataTreeItem, &BrainRTDataTreeItem::rtVertColorChanged,
-                m_pSurfaceItem, &BrainSurfaceTreeItem::onRtVertColorChanged);
-        connect(m_pSurfaceItem, &BrainSurfaceTreeItem::colorInfoOriginChanged,
-                m_pBrainRtDataTreeItem, &BrainRTDataTreeItem::onColorInfoOriginChanged);
-
-        *this<<m_pBrainRtDataTreeItem;
-
         if(this->findChildren(BrainTreeModelItemTypes::RTDataItem).size() == 0) {
-            m_pBrainRtDataTreeItem->addData(tSourceEstimate,
-                                            tForwardSolution,
-                                            m_pSurfaceItem->data(BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
-                                            this->text());
+            //If rt data item does not exists yet, create it here!
+            if(!tForwardSolution.isEmpty()) {
+                m_pBrainRtDataTreeItem = new BrainRTDataTreeItem(BrainTreeModelItemTypes::RTDataItem);
+                *this<<m_pBrainRtDataTreeItem;
+
+                connect(m_pBrainRtDataTreeItem, &BrainRTDataTreeItem::rtVertColorChanged,
+                        m_pSurfaceItem, &BrainSurfaceTreeItem::onRtVertColorChanged);
+                connect(m_pSurfaceItem, &BrainSurfaceTreeItem::colorInfoOriginChanged,
+                        m_pBrainRtDataTreeItem, &BrainRTDataTreeItem::onColorInfoOriginChanged);
+
+                m_pBrainRtDataTreeItem->init(tForwardSolution,
+                                                m_pSurfaceItem->data(BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
+                                                this->data(BrainHemisphereTreeItemRoles::SurfaceHemi).toInt(),
+                                                m_pAnnotItem->data(BrainAnnotationTreeItemRoles::LabeIds).value<VectorXi>(),
+                                                m_pAnnotItem->data(BrainAnnotationTreeItemRoles::LabeList).value<QList<FSLIB::Label>>());
+
+                m_pBrainRtDataTreeItem->addData(tSourceEstimate);
+            } else {
+                qDebug()<<"BrainHemisphereTreeItem::addData - Cannot add real time data since the forwad solution was not provided and therefore the rt data item has not been initilaized yet. Returning...";
+            }
         } else {
-            m_pBrainRtDataTreeItem->addData(tSourceEstimate,
-                                            tForwardSolution,
-                                            m_pSurfaceItem->data(BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
-                                            this->text(),
-                                            m_pAnnotItem->data(BrainAnnotationTreeItemRoles::LabeIds).value<VectorXi>(),
-                                            m_pAnnotItem->data(BrainAnnotationTreeItemRoles::LabeList).value<QList<FSLIB::Label>>());
+            m_pBrainRtDataTreeItem->addData(tSourceEstimate);
         }
 
         return m_pBrainRtDataTreeItem;

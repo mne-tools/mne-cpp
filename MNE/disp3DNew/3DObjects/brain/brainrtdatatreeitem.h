@@ -136,9 +136,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on annotation information to this item.
+    * Initializes the rt data item with neccessary information for visualization computations.
     *
-    * @param[in] tSourceEstimate        The MNESourceEstimate.
     * @param[in] tForwardSolution       The MNEForwardSolution.
     * @param[in] hemi                   The hemispehre of this brain rt data item. This information is important in order to cut out the wanted source estimations from the MNESourceEstimate
     * @param[in] arraySurfaceVertColor  The vertex colors for the surface where the data is to be plotted on.
@@ -147,17 +146,17 @@ public:
     *
     * @return                           Returns true if successful.
     */
-    bool addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QByteArray &arraySurfaceVertColor, const QString& hemi = "Unknown", const VectorXi& vecLabelIds = VectorXi(0), const QList<FSLIB::Label>& lLabels = QList<FSLIB::Label>());
+    bool init(const MNEForwardSolution& tForwardSolution, const QByteArray &arraySurfaceVertColor, const int& iHemi, const VectorXi& vecLabelIds = VectorXi(0), const QList<FSLIB::Label>& lLabels = QList<FSLIB::Label>());
 
     //=========================================================================================================
     /**
-    * Updates the rt data which is streamed by this item's worker thread item.
+    * Adds actual rt data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
     *
-    * @param[in] tSourceEstimate    The MNESourceEstimate.
+    * @param[in] tSourceEstimate    The MNESourceEstimate data.
     *
     * @return                       Returns true if successful.
     */
-    bool updateData(const MNESourceEstimate& tSourceEstimate);
+    bool addData(const MNESourceEstimate& tSourceEstimate);
 
     //=========================================================================================================
     /**
@@ -236,7 +235,7 @@ private slots:
     void onNumberAveragesChanged(const int& iNumAvr);
 
 private:
-    bool                        m_bInit;                        /**< The init flag. */
+    bool                        m_bIsInit;                      /**< The init flag. */
 
     RtSourceLocDataWorker*      m_pSourceLocRtDataWorker;       /**< The source data worker. This worker streams the rt data to this item.*/
 
@@ -258,7 +257,7 @@ signals:
 
 inline bool BrainRTDataTreeItem::isInit() const
 {
-    return m_bInit;
+    return m_bIsInit;
 }
 
 } //NAMESPACE DISP3DNEWLIB

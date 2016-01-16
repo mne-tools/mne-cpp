@@ -61,6 +61,8 @@
 
 #include <iostream>
 
+#include <stdlib.h>     //for using the function sleep
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -114,6 +116,7 @@ int main(int argc, char *argv[])
     QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
 
     QString t_sFileClusteredInverse("");//QFile t_fileClusteredInverse("./clusteredInverse-inv.fif");
+    AnnotationSet t_annotationSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
 
     double snr = 1.0;
     double lambda2 = 1.0 / pow(snr, 2);
@@ -185,7 +188,7 @@ int main(int argc, char *argv[])
 
     std::cout<<"Creating BrainView"<<std::endl;
 
-    SurfaceSet tSurfSet ("sample", 2, "orig", "./MNE-sample-data/subjects");
+    SurfaceSet tSurfSet ("sample", 2, "inflated", "./MNE-sample-data/subjects");
     AnnotationSet tAnnotSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
     //Surface tSurfRight ("sample", 1, "inflated", "./MNE-sample-data/subjects");
     //Annotation tAnnotRight ("sample", 1, "aparc.a2009s", "./MNE-sample-data/subjects");
@@ -201,8 +204,10 @@ int main(int argc, char *argv[])
 //    MNEForwardSolution t_forwardSolution(t_File);
     //testWindow->addBrainData("HemiLRSet", t_forwardSolution);
 
-    QList<BrainRTDataTreeItem*> rtItemList = testWindow->addSourceEstimate("HemiLRSet", sourceEstimate, t_clusteredFwd);
-    //rtItemList.at(0)->updateData();
+    QList<BrainRTDataTreeItem*> rtItemList = testWindow->addRtBrainData("HemiLRSet", sourceEstimate, t_clusteredFwd);
+
+    //testWindow->addRtBrainData("HemiLRSet", sourceEstimate);
+    //rtItemList.at(0)->addData(sourceEstimate);
 
     testWindow->show();    
 
