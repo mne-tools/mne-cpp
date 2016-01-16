@@ -132,10 +132,6 @@ int main(int argc, char *argv[])
 
 //    qDebug() << "[5]";
 
-
-
-//    BrainView t_brainView("sample", 2, "pial", "./MNE-sample-data/subjects");
-
     SurfaceSet tSurfSet ("sample", 2, "orig", "./MNE-sample-data/subjects");
     AnnotationSet tAnnotSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
 
