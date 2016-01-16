@@ -131,6 +131,25 @@ int main(int argc, char *argv[])
         MNESourceEstimate::read(t_fileClusteredStc, sourceEstimateClustered);
     }
 
+    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+    testWindow->addBrainData("mind006", t_surfSet, t_annotationSet);
+
+    QList<BrainRTDataTreeItem*> rtItemList = testWindow->addSourceEstimate("HemiLRSet", sourceEstimateClustered, t_clusteredFwd);
+
+    testWindow->show();
+
+    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
+    control3DWidget->setView3D(testWindow);
+    control3DWidget->show();
+
+
+
+
+
+
+
+
+
 //    qDebug() << "sourceEstimateClustered" << sourceEstimateClustered.data.rows() << "x" << sourceEstimateClustered.data.cols();
 
     ClustStcModel* pClustStcModel = new ClustStcModel;

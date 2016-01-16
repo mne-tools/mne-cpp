@@ -185,7 +185,7 @@ public:
     *
     * @return                           Returns a list of the BrainRTDataTreeItem where the data was appended to.
     */
-    QList<BrainRTDataTreeItem*> addSourceEstimate(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution);
+    QList<BrainRTDataTreeItem*> addRtBrainData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution = MNEForwardSolution());
 
     //=========================================================================================================
     /**

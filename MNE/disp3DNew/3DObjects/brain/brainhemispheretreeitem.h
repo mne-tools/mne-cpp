@@ -172,7 +172,7 @@ public:
     *
     * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
     */
-    BrainRTDataTreeItem* addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution);
+    BrainRTDataTreeItem* addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution = MNEForwardSolution());
 
 private:
     BrainSurfaceTreeItem*       m_pSurfaceItem;             /**< The surface item of this hemisphere item. Only one surface item may exists under a hemisphere item. */

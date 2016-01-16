@@ -56,7 +56,7 @@ using namespace DISP3DNEWLIB;
 
 BrainRTDataTreeItem::BrainRTDataTreeItem(const int &iType, const QString &text)
 : AbstractTreeItem(iType, text)
-, m_bInit(false)
+, m_bIsInit(false)
 , m_pSourceLocRtDataWorker(new RtSourceLocDataWorker(this))
 {
     connect(m_pSourceLocRtDataWorker, &RtSourceLocDataWorker::newRtData,
@@ -92,10 +92,9 @@ void  BrainRTDataTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QByteArray& arraySurfaceVertColor, const QString& hemi, const VectorXi& vecLabelIds, const QList<FSLIB::Label>& lLabels)
+bool BrainRTDataTreeItem::init(const MNEForwardSolution& tForwardSolution, const QByteArray& arraySurfaceVertColor, const int& iHemi, const VectorXi& vecLabelIds, const QList<FSLIB::Label>& lLabels)
 {   
-    //Find out which hemisphere we are working with and set as item's data
-    int iHemi = hemi == "Left" ? 0 : hemi == "Right" ? 1 : -1;
+    //Set hemisphere information as item's data
     this->setData(iHemi, BrainRTDataTreeItemRoles::RTHemi);
 
     //Set data based on clusterd or full source space
@@ -129,13 +128,7 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
         }
     }
 
-    int iStartIdx = this->data(BrainRTDataTreeItemRoles::RTStartIdx).toInt();
-    int iEndIdx = this->data(BrainRTDataTreeItemRoles::RTEndIdx).toInt();
     QVariant data;
-
-    MatrixXd matHemisphereData = tSourceEstimate.data.block(iStartIdx, 0, iEndIdx-iStartIdx+1, tSourceEstimate.data.cols());
-    data.setValue(matHemisphereData);
-    this->setData(data, BrainRTDataTreeItemRoles::RTData);
 
     if(iHemi != -1 && iHemi < tForwardSolution.src.size()) {
         if(isClustered) {
@@ -214,9 +207,8 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
     //set rt data corresponding to the hemisphere
     m_pSourceLocRtDataWorker->setSurfaceData(arraySurfaceVertColor, this->data(BrainRTDataTreeItemRoles::RTVertNo).value<VectorXi>());
     m_pSourceLocRtDataWorker->setAnnotationData(vecLabelIds, lLabels);
-    m_pSourceLocRtDataWorker->addData(matHemisphereData);
 
-    m_bInit = true;
+    m_bIsInit = true;
 
     return true;
 }
@@ -224,21 +216,21 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate, cons
 
 //*************************************************************************************************************
 
-bool BrainRTDataTreeItem::updateData(const MNESourceEstimate& tSourceEstimate)
+bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate)
 {
-    if(!m_bInit) {
-        qDebug()<<"BrainRTDataTreeItem::updateData - Item was not initialized/filled with data yet!";
+    if(!m_bIsInit) {
+        qDebug()<<"BrainRTDataTreeItem::updateData - Rt Item has not been initialized yet!";
         return false;
     }
 
+    qDebug()<<"Adding rt data";
+
     int iStartIdx = this->data(BrainRTDataTreeItemRoles::RTStartIdx).toInt();
     int iEndIdx = this->data(BrainRTDataTreeItemRoles::RTEndIdx).toInt();
-    m_pSourceLocRtDataWorker->addData(tSourceEstimate.data.block(iStartIdx, 0, iEndIdx-iStartIdx+1, 3));
 
-    QVariant data;
-    MatrixXd subData = tSourceEstimate.data.block(iStartIdx, 0, iEndIdx-iStartIdx+1, 3);
-    data.setValue(subData);
-    this->setData(data, BrainRTDataTreeItemRoles::RTData);
+    MatrixXd subData = tSourceEstimate.data.block(iStartIdx, 0, iEndIdx-iStartIdx+1, tSourceEstimate.data.cols());
+
+    m_pSourceLocRtDataWorker->addData(subData);
 
     return true;
 }
@@ -334,7 +326,6 @@ void BrainRTDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& c
 
 void BrainRTDataTreeItem::onNumberAveragesChanged(const int& iNumAvr)
 {
-    qDebug()<<"iNumAvr"<<iNumAvr;
     m_pSourceLocRtDataWorker->setNumberAverages(iNumAvr);
 }
 

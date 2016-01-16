@@ -94,7 +94,7 @@ RtSourceLocDataWorker::~RtSourceLocDataWorker()
 void RtSourceLocDataWorker::addData(const MatrixXd& data)
 {
     QMutexLocker locker(&m_qMutex);
-    if(data.size() == 0)
+    if(data.rows() == 0)
         return;
 
     //Transform from matrix to list for easier handling in non loop mode
@@ -251,7 +251,7 @@ void RtSourceLocDataWorker::run()
 
         {
             QMutexLocker locker(&m_qMutex);
-            if(m_lData.size() > 0)
+            if(!m_lData.isEmpty() && m_lData.size() > 0)
                 doProcessing = true;
         }
 
@@ -260,7 +260,7 @@ void RtSourceLocDataWorker::run()
                 m_qMutex.lock();
 
                 //Down sampling in loop mode
-                if(t_vecAverage.rows() != m_lData.front().rows()) {
+                if(t_vecAverage.rows() != m_lData[0].rows()) {
                     t_vecAverage = m_lData[m_iCurrentSample%m_lData.size()];
                 } else {
                     t_vecAverage += m_lData[m_iCurrentSample%m_lData.size()];
@@ -271,7 +271,7 @@ void RtSourceLocDataWorker::run()
                 m_qMutex.lock();
 
                 //Down sampling in stream mode
-                if(t_vecAverage.rows() != m_lData.front().rows()) {
+                if(t_vecAverage.rows() != m_lData[0].rows()) {
                     t_vecAverage = m_lData.front();
                 } else {
                     t_vecAverage += m_lData.front();
