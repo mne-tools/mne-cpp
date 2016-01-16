@@ -9,16 +9,15 @@ function Component()
 Component.prototype.createOperations = function()
 {
 
-    try {
+//    try {
         component.createOperations();
 
         // create mne library shortcuts
         if (installer.value("os") === "win") {
-            component.addOperation("CreateShortcut", "@TargetDir@/MNECppMaintenanceTool.exe", "@StartMenuDir@/MNE-CPP/MNECppMaintenanceTool.exe.lnk");
+//        if (systemInfo.productType === "windows") {
+            component.addOperation("CreateShortcut", "@TargetDir@/MNECppMaintenanceTool.exe", "@StartMenuDir@/MNE-CPP/MNECppMaintenanceTool.exe.lnk", "workingDirectory=@TargetDir@");//"iconPath=@TargetDir@/App.ico");
         }
-    } catch (e) {
-        print(e);
-    }
-
-
+//    } catch (e) {
+//        print(e);
+//    }
 }
