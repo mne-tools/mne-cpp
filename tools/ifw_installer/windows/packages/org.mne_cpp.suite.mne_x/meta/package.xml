@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>MNE-X</DisplayName>
+    <Description>MNE-X is an open-source and cross platform application built with tools provided by the MNE-CPP framework. Currently, it is in active clinical use at the Boston Children’s Hospital. With its acquisition and algorithmic plugin architecture it is the ideal tool for acquiring and processing data of the novel babyMEG system in real-time. Next to the babyMEG MNE-X is also able to connect to the Neuromag VectorView system and EEG amplifiers (TMSI Refa, eegosports, gtec) and provide real-time MEG/EEG data streams.</Description>
+    <Default>script</Default>
+    <Version>1.0.0-1</Version>
+    <ReleaseDate>2016-02-28</ReleaseDate>
+    <Name>org.mne_cpp.suite.mne_x</Name>
+    <Licenses>
+        <License name="MNE-X License (BSD 3-Clause)" file="license_mne-x.txt" />
+    </Licenses>
+    <Script>installscript.qs</Script>
+    <SortingPriority>80</SortingPriority>
+</Package>

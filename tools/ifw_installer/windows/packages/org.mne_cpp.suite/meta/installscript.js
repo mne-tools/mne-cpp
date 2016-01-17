@@ -1,173 +1,91 @@
-var ComponentSelectionPage = null;
+//--------------------------------------------------------------------------------------------------------------
+//
+// @file     installscript.qs
+// @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+// @version  1.0
+// @date     January, 2016
+//
+// @section  LICENSE
+//
+// Copyright (C) 2016, Christoph Dinh. All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+// the following conditions are met:
+//     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+//       following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+//       the following disclaimer in the documentation and/or other materials provided with the distribution.
+//     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+//       to endorse or promote products derived from this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+// WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+// PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+// INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+// HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+//
+// @brief    MNE-CPP installer script
+//
+//--------------------------------------------------------------------------------------------------------------
+
+function Component()
+{
+    // default constructor
+
+
+    installer.installationFinished.connect(this, Component.prototype.installationFinishedPageIsShown);
+    installer.finishButtonClicked.connect(this, Component.prototype.installationFinished);
+}
 
 
 //*************************************************************************************************************
 
-var Dir = new function () {
-    this.toNativeSparator = function (path) {
-        if (installer.value("os") == "win")
-            return path.replace(/\//g, '\\');
-        return path;
-    }
-};
+Component.prototype.createOperations = function()
+{
+    try {
+        component.createOperations();
 
-
-//*************************************************************************************************************
-
-function Component() {
-    if (installer.isInstaller()) {
-        component.loaded.connect(this, Component.prototype.installerLoaded);
-        ComponentSelectionPage = gui.pageById(QInstaller.ComponentSelection);
-
-        installer.setDefaultPageVisible(QInstaller.TargetDirectory, false);
-        installer.setDefaultPageVisible(QInstaller.ComponentSelection, false);
-//        installer.setDefaultPageVisible(QInstaller.LicenseCheck, false);
-        if (installer.value("os") == "win")
-            installer.setDefaultPageVisible(QInstaller.StartMenuSelection, false);
-        installer.setDefaultPageVisible(QInstaller.ReadyForInstallation, false);
+        // create mne library shortcuts
+        if (installer.value("os") === "win") {
+            //Shortcuts
+            component.addOperation("CreateShortcut", "@TargetDir@/MNECppMaintenanceTool.exe", "@StartMenuDir@/MNECppMaintenanceTool.exe.lnk", "workingDirectory=@TargetDir@");//"iconPath=@TargetDir@/App.ico");
+        }
+    } catch (e) {
+        print(e);
     }
 }
 
 
 //*************************************************************************************************************
 
-Component.prototype.installerLoaded = function () {
-    if (installer.addWizardPage(component, "TargetWidget", QInstaller.TargetDirectory)) {
-        var widget = gui.pageWidgetByObjectName("DynamicTargetWidget");
-        if (widget != null) {
-            widget.targetChooser.clicked.connect(this, Component.prototype.chooseTarget);
-            widget.targetDirectory.textChanged.connect(this, Component.prototype.targetChanged);
-
-            widget.windowTitle = "Installation Folder";
-            widget.targetDirectory.text = Dir.toNativeSparator(installer.value("TargetDir"));
+Component.prototype.installationFinishedPageIsShown = function()
+{
+    try {
+        if (installer.isInstaller() && installer.status == QInstaller.Success) {
+            installer.addWizardPageItem( component, "VCRedistCheckBoxForm", QInstaller.InstallationFinished );
         }
-    }
-
-    if (installer.addWizardPage(component, "InstallationWidget", QInstaller.ComponentSelection)) {
-        var widget = gui.pageWidgetByObjectName("DynamicInstallationWidget");
-        if (widget != null) {
-            widget.customInstall.toggled.connect(this, Component.prototype.customInstallToggled);
-            widget.defaultInstall.toggled.connect(this, Component.prototype.defaultInstallToggled);
-            widget.completeInstall.toggled.connect(this, Component.prototype.completeInstallToggled);
-
-            widget.defaultInstall.checked = true;
-            widget.windowTitle = "Please select a installation type";
-        }
-
-//        if (installer.addWizardPage(component, "LicenseWidget", QInstaller.LicenseCheck)) {
-//            var widget = gui.pageWidgetByObjectName("DynamicLicenseWidget");
-//            if (widget != null) {
-//                widget.acceptLicenseRB.toggled.connect(this, Component.prototype.checkAccepted);
-
-//                widget.next.button.enabled = false;
-//                widget.complete = false;
-//                widget.declineLicenseRB.checked = true;
-//                widget.windowTitle = "BSD 3-Clause License";
-//            }
-//        }
-
-        if (installer.addWizardPage(component, "ReadyToInstallWidget", QInstaller.ReadyForInstallation)) {
-            var widget = gui.pageWidgetByObjectName("DynamicReadyToInstallWidget");
-            if (widget != null) {
-                widget.showDetails.checked = false;
-                widget.windowTitle = "Ready to Install";
-            }
-            var page = gui.pageByObjectName("DynamicReadyToInstallWidget");
-            if (page != null) {
-                page.entered.connect(this, Component.prototype.readyToInstallWidgetEntered);
-            }
-        }
+    } catch(e) {
+        console.log(e);
     }
 }
 
 
 //*************************************************************************************************************
 
-Component.prototype.targetChanged = function (text) {
-    var widget = gui.pageWidgetByObjectName("DynamicTargetWidget");
-    if (widget != null) {
-        if (text != "") {
-            if (!installer.fileExists(text + "/components.xml")) {
-                widget.complete = true;
-                installer.setValue("TargetDir", text);
-                return;
+Component.prototype.installationFinished = function()
+{
+    try {
+        if (installer.isInstaller() && installer.status === QInstaller.Success) {
+            var isVCRedistCheckBoxChecked = component.userInterface( "VCRedistCheckBoxForm" ).vcRedistCheckBox.checked;
+            if (isVCRedistCheckBoxChecked) {
+                QDesktopServices.openUrl("file:///" + installer.value("TargetDir") + "/vcredist_x64.exe");
             }
         }
-        widget.complete = false;
-    }
-}
-
-
-//*************************************************************************************************************
-
-Component.prototype.chooseTarget = function () {
-    var widget = gui.pageWidgetByObjectName("DynamicTargetWidget");
-    if (widget != null) {
-        var newTarget = QFileDialog.getExistingDirectory("Choose your target directory.", widget
-            .targetDirectory.text);
-        if (newTarget != "")
-            widget.targetDirectory.text = Dir.toNativeSparator(newTarget);
-    }
-}
-
-
-//*************************************************************************************************************
-
-Component.prototype.customInstallToggled = function (checked) {
-    if (checked) {
-        if (ComponentSelectionPage != null)
-            ComponentSelectionPage.selectDefault();
-        installer.setDefaultPageVisible(QInstaller.ComponentSelection, true);
-    }
-}
-
-
-//*************************************************************************************************************
-
-Component.prototype.defaultInstallToggled = function (checked) {
-    if (checked) {
-        if (ComponentSelectionPage != null)
-            ComponentSelectionPage.selectDefault();
-        installer.setDefaultPageVisible(QInstaller.ComponentSelection, false);
-    }
-}
-
-
-//*************************************************************************************************************
-
-Component.prototype.completeInstallToggled = function (checked) {
-    if (checked) {
-        if (ComponentSelectionPage != null)
-            ComponentSelectionPage.selectAll();
-        installer.setDefaultPageVisible(QInstaller.ComponentSelection, false);
-    }
-}
-
-
-//*************************************************************************************************************
-
-//Component.prototype.checkAccepted = function (checked) {
-//    var widget = gui.pageWidgetByObjectName("DynamicLicenseWidget");
-//    if (widget != null)
-//        widget.complete = checked;
-
-////    var result = QMessageBox["question"]("test.quit", "Installer", "Test " + checked, QMessageBox.Ok | QMessageBox.Cancel);
-
-//}
-
-
-//*************************************************************************************************************
-
-Component.prototype.readyToInstallWidgetEntered = function () {
-    var widget = gui.pageWidgetByObjectName("DynamicReadyToInstallWidget");
-    if (widget != null) {
-        var html = "<b>Components to install:</b><ul>";
-        var components = installer.components();
-        for (i = 0; i < components.length; ++i) {
-            if (components[i].installationRequested())
-                html = html + "<li>" + components[i].displayName + "</li>"
-        }
-        html = html + "</ul>";
-        widget.showDetailsBrowser.html = html;
+    } catch(e) {
+        console.log(e);
     }
 }
