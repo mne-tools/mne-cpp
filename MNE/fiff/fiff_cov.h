@@ -205,6 +205,7 @@ public:
 
 public:
     fiff_int_t  kind;       /**< Covariance kind -> fiff_constants.h */
+    VectorXi    chClass;
     bool diag;              /**< If the covariance is stored in a diagonal order. */
     fiff_int_t dim;         /**< Dimension of the covariance (dim x dim). */
     QStringList names;      /**< Channel names. */
