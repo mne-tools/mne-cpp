@@ -10,5 +10,5 @@
         <License name="MNE Analyze Qt License (BSD 3-Clause)" file="license_mne_analyze_qt.txt" />
     </Licenses>
     <Script>installscript.qs</Script>
-    <SortingPriority>70</SortingPriority>
+    <SortingPriority>90</SortingPriority>
 </Package>
