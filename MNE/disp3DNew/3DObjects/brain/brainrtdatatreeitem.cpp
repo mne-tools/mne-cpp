@@ -71,6 +71,10 @@ BrainRTDataTreeItem::BrainRTDataTreeItem(const int &iType, const QString &text)
 
 BrainRTDataTreeItem::~BrainRTDataTreeItem()
 {
+    if(m_pSourceLocRtDataWorker->isRunning()) {
+        m_pSourceLocRtDataWorker->stop();
+        qDebug()<<"m_pSourceLocRtDataWorker stopped";
+    }
 }
 
 

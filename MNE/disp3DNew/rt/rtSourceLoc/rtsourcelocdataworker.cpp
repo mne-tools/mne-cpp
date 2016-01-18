@@ -84,8 +84,9 @@ RtSourceLocDataWorker::RtSourceLocDataWorker(QObject* parent)
 
 RtSourceLocDataWorker::~RtSourceLocDataWorker()
 {
-    if(this->isRunning())
+    if(this->isRunning()) {
         stop();
+    }
 }
 
 
@@ -238,8 +239,8 @@ void RtSourceLocDataWorker::run()
     m_bIsRunning = true;
 
     while(true) {
-        QTime timer;
-        timer.start();
+//        QTime timer;
+//        timer.start();
 
         {
             QMutexLocker locker(&m_qMutex);
@@ -295,7 +296,7 @@ void RtSourceLocDataWorker::run()
             m_qMutex.unlock();
         }
 
-        qDebug()<<"RtSourceLocDataWorker::run()"<<timer.elapsed()<<"msecs";
+//        qDebug()<<"RtSourceLocDataWorker::run()"<<timer.elapsed()<<"msecs";
         QThread::msleep(m_iMSecIntervall);
     }
 }
