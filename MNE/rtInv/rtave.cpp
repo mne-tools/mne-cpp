@@ -336,7 +336,7 @@ void RtAve::run()
                     fillFrontBuffer(rawSegment);
                 }
 
-                qDebug()<<"Trigger channel "<<m_iTriggerIndex<<" found at "<<m_iTriggerPos;
+                //qDebug()<<"Trigger channel "<<m_iTriggerIndex<<" found at "<<m_iTriggerPos;
             }
         }
     }
