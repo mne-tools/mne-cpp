@@ -129,6 +129,7 @@ void MNE::init()
 
     m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
     m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
+    m_pRTSEOutput->data()->setFwdSolution(m_pFwd);
 
     // start clustering
     QFuture<void> future = QtConcurrent::run(this, &MNE::doClustering);

@@ -51,6 +51,7 @@
 #include <fiff/fiff_info.h>
 #include <mne/mne_sourcespace.h>
 #include <mne/mne_sourceestimate.h>
+#include <mne/mne_forwardsolution.h>
 
 
 //*************************************************************************************************************
@@ -144,6 +145,22 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the forward solution.
+    *
+    * @param[in] fwdSolution   the forward solution to set
+    */
+    inline void setFwdSolution(MNEForwardSolution::SPtr& fwdSolution);
+
+    //=========================================================================================================
+    /**
+    * Returns the forward solution.
+    *
+    * @return the forward solution
+    */
+    inline MNEForwardSolution::SPtr& getFwdSolution();
+
+    //=========================================================================================================
+    /**
     * Attaches a value to the sample array vector.
     * This method is inherited by Measurement.
     *
@@ -179,13 +196,14 @@ public:
     bool m_bStcSend; /**< dirty hack */
 
 private:
-    mutable QMutex          m_qMutex;       /**< Mutex to ensure thread safety */
+    mutable QMutex              m_qMutex;       /**< Mutex to ensure thread safety */
 
-    AnnotationSet::SPtr     m_pAnnotSet;    /**< Annotation set. */
-    SurfaceSet::SPtr        m_pSurfSet;     /**< Surface set. */
+    AnnotationSet::SPtr         m_pAnnotSet;    /**< Annotation set. */
+    SurfaceSet::SPtr            m_pSurfSet;     /**< Surface set. */
+    MNEForwardSolution::SPtr    m_pFwdSolution; /**< Forward solution. */
 
-    MNESourceEstimate::SPtr m_pMNEStc;      /**< The source estimate. */
-    bool m_bInitialized;                    /**< Is initialized */
+    MNESourceEstimate::SPtr     m_pMNEStc;      /**< The source estimate. */
+    bool                        m_bInitialized; /**< Is initialized */
 };
 
 
@@ -225,6 +243,24 @@ inline SurfaceSet::SPtr& RealTimeSourceEstimate::getSurfSet()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pSurfSet;
+}
+
+
+//*************************************************************************************************************
+
+inline void RealTimeSourceEstimate::setFwdSolution(MNEForwardSolution::SPtr& fwdSolution)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_pFwdSolution = fwdSolution;
+}
+
+
+//*************************************************************************************************************
+
+inline MNEForwardSolution::SPtr& RealTimeSourceEstimate::getFwdSolution()
+{
+    QMutexLocker locker(&m_qMutex);
+    return m_pFwdSolution;
 }
 
 
