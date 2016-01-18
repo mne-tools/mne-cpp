@@ -98,6 +98,14 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
     m_p3DView = new View3D();
     m_pControl3DView = new Control3DWidget();
 
+    QGridLayout *mainLayoutView = new QGridLayout;
+
+    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView);
+
+    mainLayoutView->addWidget(pWidgetContainer);
+
+    this->setLayout(mainLayoutView);
+
     getData();
 }
 
