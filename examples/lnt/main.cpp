@@ -166,7 +166,6 @@ int main(int argc, char *argv[])
     testWindow->addBrainData("HemiLRSet", t_surfSet, t_annotationSet);
 
     QList<BrainRTDataTreeItem*> rtItemList = testWindow->addRtBrainData("HemiLRSet", sourceEstimate, t_clusteredFwd);
-    //rtItemList.at(0)->updateData();
 
     testWindow->show();
 
