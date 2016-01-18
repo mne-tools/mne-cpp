@@ -71,12 +71,12 @@ else {
             -lmne_x
 }
 
-qtHaveModule(3d) {
+qtHaveModule(3dcore, 3drender, 3dinput) {
     CONFIG(debug, debug|release) {
-        LIBS += -lMNE$${MNE_LIB_VERSION}Disp3Dd
+        LIBS += -lMNE$${MNE_LIB_VERSION}Disp3DNewd
     }
     else {
-        LIBS += -lMNE$${MNE_LIB_VERSION}Disp3D
+        LIBS += -lMNE$${MNE_LIB_VERSION}Disp3DNew
     }
 }
 

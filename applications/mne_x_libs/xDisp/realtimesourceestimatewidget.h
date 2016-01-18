@@ -48,9 +48,6 @@
 #include <disp3DNew/view3D.h>
 #include <disp3DNew/control/control3dwidget.h>
 
-//OLD
-#include <mne/mne_forwardsolution.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -167,12 +164,9 @@ private:
     AnnotationSet m_annotationSet;
     SurfaceSet m_surfSet;
 
-    View3D* m_p3DView;
-    Control3DWidget* m_pControl3DView;
+    View3D::SPtr m_p3DView;
+    Control3DWidget::SPtr m_pControl3DView;
     QList<BrainRTDataTreeItem*> m_lRtItem;
-
-    QSlider* m_pSliderNormView;
-    QSlider* m_pSliderAverageView;
 };
 
 } // NAMESPACE

@@ -95,13 +95,14 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
 , m_pRTSE(pRTSE)
 , m_bInitialized(false)
 {
-    m_p3DView = new View3D();
-    m_pControl3DView = new Control3DWidget();
+    m_p3DView = View3D::SPtr(new View3D());
+
+    m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this));
+    m_pControl3DView->setView3D(m_p3DView);
+    m_pControl3DView->show();
 
     QGridLayout *mainLayoutView = new QGridLayout;
-
-    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView);
-
+    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
     mainLayoutView->addWidget(pWidgetContainer);
 
     this->setLayout(mainLayoutView);
@@ -119,11 +120,6 @@ RealTimeSourceEstimateWidget::~RealTimeSourceEstimateWidget()
     //
     if(!m_pRTSE->getName().isEmpty())
     {
-        QString t_sRTSEName = m_pRTSE->getName();
-
-        QSettings settings;
-        settings.setValue(QString("RTSEW/%1/norm").arg(t_sRTSEName), m_pSliderNormView->value());
-        settings.setValue(QString("RTSEW/%1/average").arg(t_sRTSEName), m_pSliderAverageView->value());
     }
 }
 
@@ -161,10 +157,10 @@ void RealTimeSourceEstimateWidget::getData()
             m_lRtItem = m_p3DView->addRtBrainData("HemiLRSet", *m_pRTSE->getValue(), *m_pRTSE->getFwdSolution());
 
             for(int i = 0; i<m_lRtItem.size(); i++) {
-                m_lRtItem.at(i)->onCheckStateLoopedStateChanged(false);
-                m_lRtItem.at(i)->onTimeIntervalChanged(*m_pRTSE->getValue()->tstep*1000000);
+                m_lRtItem.at(i)->onCheckStateLoopedStateChanged(Qt::Checked);
+                m_lRtItem.at(i)->onTimeIntervalChanged(m_pRTSE->getValue()->tstep*1000000);
                 m_lRtItem.at(i)->onNumberAveragesChanged(10);
-                m_lRtItem.at(i)->onCheckStateWorkerChanged(true);
+                m_lRtItem.at(i)->onCheckStateWorkerChanged(Qt::Checked);
             }
         }
     }
@@ -175,11 +171,6 @@ void RealTimeSourceEstimateWidget::getData()
 
 void RealTimeSourceEstimateWidget::init()
 {
-    QString t_sRTSEName = m_pRTSE->getName();
-    QSettings settings;
-    m_pSliderNormView->setValue(settings.value(QString("RTSEW/%1/norm").arg(t_sRTSEName), 2000).toInt());
-    m_pSliderAverageView->setValue(settings.value(QString("RTSEW/%1/average").arg(t_sRTSEName), 100).toInt());
-
     m_p3DView->addBrainData("HemiLRSet", *m_pRTSE->getSurfSet(), *m_pRTSE->getAnnotSet());
     m_bInitialized = true;
     m_pRTSE->m_bStcSend = true;
