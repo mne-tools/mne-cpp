@@ -167,9 +167,14 @@ public:
     inline bool isInit() const;
 
 public slots:
+    //=========================================================================================================
+    /**
+    * This slot gets called whenever the origin of the surface vertex color (curvature, annoation, etc.) changed.
+    *
+    * @param[in] arrayVertColor     The new vertex colors.
+    */
     void onColorInfoOriginChanged(const QByteArray& arrayVertColor);
 
-private slots:
     //=========================================================================================================
     /**
     * This slot gets called whenever the check/actiation state of the rt data worker changed.
