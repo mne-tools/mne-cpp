@@ -49,7 +49,8 @@
 #include <mne/mne_sourceestimate.h>
 #include <inverse/rapMusic/pwlrapmusic.h>
 
-#include <disp3D/inverseview.h>
+#include <disp3DNew/view3D.h>
+#include <disp3DNew/control/control3dwidget.h>
 
 #include <utils/mnemath.h>
 
@@ -61,7 +62,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGuiApplication>
+#include <QApplication>
 
 
 //*************************************************************************************************************
@@ -74,7 +75,7 @@ using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
 using namespace UTILSLIB;
-using namespace DISP3DLIB;
+using namespace DISP3DNEWLIB;
 
 
 //*************************************************************************************************************
@@ -93,7 +94,7 @@ using namespace DISP3DLIB;
 */
 int main(int argc, char *argv[])
 {
-    QGuiApplication a(argc, argv);
+    QApplication a(argc, argv);
 
     //########################################################################################
     // Source Estimate
@@ -107,7 +108,7 @@ int main(int argc, char *argv[])
 
     qint32 numDipolePairs = 7;
 
-    bool doMovie = true;//false;
+    bool doMovie = false;//false;
 
     // Parse command line parameters
     for(qint32 i = 0; i < argc; ++i)
@@ -155,7 +156,6 @@ int main(int argc, char *argv[])
     if(doMovie)
         t_pwlRapMusic.setStcAttr(200,0.5);
 
-
     MNESourceEstimate sourceEstimate = t_pwlRapMusic.calculateInverse(pickedEvoked);
 
     std::cout << "source estimated" << std::endl;
@@ -163,45 +163,16 @@ int main(int argc, char *argv[])
     if(sourceEstimate.isEmpty())
         return 1;
 
-    QList<Label> t_qListLabels;
-    QList<RowVector4i> t_qListRGBAs;
+    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+    testWindow->addBrainData("HemiLRSet", t_surfSet, t_annotationSet);
 
-    //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
-    t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
+    QList<BrainRTDataTreeItem*> rtItemList = testWindow->addRtBrainData("HemiLRSet", sourceEstimate, t_clusteredFwd);
 
-    InverseView view(t_pwlRapMusic.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false, false);//true);
+    testWindow->show();
 
-
-    if (view.stereoType() != QGLView::RedCyanAnaglyph)
-        view.camera()->setEyeSeparation(0.3f);
-    QStringList args = QCoreApplication::arguments();
-    int w_pos = args.indexOf("-width");
-    int h_pos = args.indexOf("-height");
-    if (w_pos >= 0 && h_pos >= 0)
-    {
-        bool ok = true;
-        int w = args.at(w_pos + 1).toInt(&ok);
-        if (!ok)
-        {
-            qWarning() << "Could not parse width argument:" << args;
-            return 1;
-        }
-        int h = args.at(h_pos + 1).toInt(&ok);
-        if (!ok)
-        {
-            qWarning() << "Could not parse height argument:" << args;
-            return 1;
-        }
-        view.resize(w, h);
-    }
-    else
-    {
-        view.resize(800, 600);
-    }
-    view.show();
-
-    //Push Estimate
-    view.pushSourceEstimate(sourceEstimate);
+    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
+    control3DWidget->setView3D(testWindow);
+    control3DWidget->show();
 
     if(!t_sFileNameStc.isEmpty())
     {
