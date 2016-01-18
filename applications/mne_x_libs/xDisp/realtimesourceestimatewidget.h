@@ -49,7 +49,6 @@
 #include <disp3D/helpers/cluststcmodel.h>
 
 //OLD
-#include <disp3D/inverseview.h>
 #include <mne/mne_forwardsolution.h>
 
 

@@ -90,8 +90,6 @@ else {
 }
 
 SOURCES += \
-    inverseview.cpp \
-    inverseviewproducer.cpp \
     helpers/cluststcmodel.cpp \
     helpers/cluststcview.cpp \
     helpers/cluststcworker.cpp \
@@ -99,8 +97,6 @@ SOURCES += \
 
 HEADERS += \
     disp3D_global.h \
-    inverseview.h \
-    inverseviewproducer.h \
     helpers/cluststcmodel.h \
     helpers/cluststctabledelegate.h \
     helpers/cluststcview.h \
