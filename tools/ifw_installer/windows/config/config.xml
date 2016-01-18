@@ -4,7 +4,7 @@
     <Version>1.0.0</Version>
     <Title>MNE-CPP</Title>
     <Publisher>MNE-CPP Project</Publisher>
-    <ProductUrl>http://www.mne-cpp.com</ProductUrl>
+    <ProductUrl>http://www.mne-cpp.org</ProductUrl>
     <!-- Directory name is used in component.xml -->
     <StartMenuDir>MNE-CPP</StartMenuDir>
     <MaintenanceToolName>MNECppMaintenanceTool</MaintenanceToolName>
