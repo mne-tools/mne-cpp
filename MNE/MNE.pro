@@ -54,7 +54,7 @@ contains(MNECPP_CONFIG, withGui) {
     qtHaveModule(3dcore,3drender,3dinput) {
         message(Examples.pro - Qt3D 3DCore available!)
         SUBDIRS += \
-            disp3DNew \
+            disp3D \
     }
 }
 

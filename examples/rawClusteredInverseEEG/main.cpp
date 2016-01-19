@@ -53,8 +53,8 @@
 #include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
 
-#include <disp3DNew/view3D.h>
-#include <disp3DNew/control/control3dwidget.h>
+#include <disp3D/view3D.h>
+#include <disp3D/control/control3dwidget.h>
 
 #include <utils/mnemath.h>
 
@@ -80,7 +80,7 @@ using namespace MNELIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
-using namespace DISP3DNEWLIB;
+using namespace DISP3DLIB;
 using namespace UTILSLIB;
 
 
