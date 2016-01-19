@@ -43,8 +43,8 @@
 #include <fs/surface.h>
 #include <fs/annotationset.h>
 
-#include <disp3DNew/view3D.h>
-#include <disp3DNew/control/control3dwidget.h>
+#include <disp3D/view3D.h>
+#include <disp3D/control/control3dwidget.h>
 
 #include <iostream>
 
@@ -62,7 +62,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISP3DNEWLIB;
+using namespace DISP3DLIB;
 using namespace FSLIB;
 
 

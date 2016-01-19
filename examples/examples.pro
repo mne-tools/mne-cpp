@@ -62,7 +62,7 @@ contains(MNECPP_CONFIG, withGui) {
     qtHaveModule(3dcore,3drender,3dinput) {
     message(Examples.pro - Qt3D available!)
     SUBDIRS += \
-        disp3DNewTutorial \
+        disp3DTutorial \
     }
 
     qtHaveModule(3dcore,3drender,3dinput) {

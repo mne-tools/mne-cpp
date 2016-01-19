@@ -48,8 +48,8 @@
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 
-#include <disp3DNew/view3D.h>
-#include <disp3DNew/control/control3dwidget.h>
+#include <disp3D/view3D.h>
+#include <disp3D/control/control3dwidget.h>
 
 #include <mne/mne_epoch_data_list.h>
 

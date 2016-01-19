@@ -77,7 +77,7 @@
 //=============================================================================================================
 
 using namespace XDISPLIB;
-using namespace DISP3DNEWLIB;
+using namespace DISP3DLIB;
 using namespace MNELIB;
 using namespace XMEASLIB;
 

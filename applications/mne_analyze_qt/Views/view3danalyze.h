@@ -55,7 +55,7 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QPushButton>
 
-#include "disp3DNew/view3d.h"
+#include "disp3D/view3d.h"
 
 #include <fs/surfaceset.h>
 
@@ -73,7 +73,7 @@
 //=============================================================================================================
 
 using namespace FSLIB;
-using namespace DISP3DNEWLIB;
+using namespace DISP3DLIB;
 
 
 //*************************************************************************************************************

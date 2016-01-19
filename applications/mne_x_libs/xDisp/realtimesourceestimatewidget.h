@@ -45,8 +45,8 @@
 #include "xdisp_global.h"
 #include "newmeasurementwidget.h"
 
-#include <disp3DNew/view3D.h>
-#include <disp3DNew/control/control3dwidget.h>
+#include <disp3D/view3D.h>
+#include <disp3D/control/control3dwidget.h>
 
 
 //*************************************************************************************************************
@@ -85,7 +85,7 @@ namespace XDISPLIB
 //=============================================================================================================
 
 using namespace XMEASLIB;
-using namespace DISP3DNEWLIB;
+using namespace DISP3DLIB;
 using namespace MNELIB;
 
 
