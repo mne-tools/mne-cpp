@@ -82,16 +82,6 @@
 namespace DISP3DLIB
 {
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-using namespace FSLIB;
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -119,7 +109,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainAnnotationTreeItem(const int& iType = BrainTreeModelItemTypes::AnnotationItem, const QString& text = "Annotation");
+    explicit BrainAnnotationTreeItem( int iType = BrainTreeModelItemTypes::AnnotationItem, const QString& text = "Annotation" );
 
     //=========================================================================================================
     /**
@@ -143,7 +133,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const Surface& tSurface, const Annotation& tAnnotation);
+    bool addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation);
 
 private:
 };

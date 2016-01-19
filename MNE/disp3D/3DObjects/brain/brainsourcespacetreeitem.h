@@ -87,16 +87,6 @@
 namespace DISP3DLIB
 {
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-using namespace MNELIB;
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -124,7 +114,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainSourceSpaceTreeItem(const int& iType = BrainTreeModelItemTypes::SourceSpaceItem, const QString& text = "Source space");
+    explicit BrainSourceSpaceTreeItem(int iType = BrainTreeModelItemTypes::SourceSpaceItem, const QString& text = "Source space");
 
     //=========================================================================================================
     /**
@@ -148,7 +138,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const MNEHemisphere& tHemisphere, Qt3DCore::QEntity* parent);
+    bool addData(const MNELIB::MNEHemisphere& tHemisphere, Qt3DCore::QEntity* parent);
 
 private slots:
     //=========================================================================================================
@@ -167,7 +157,7 @@ private:
     * @param[in] vertices       The vertices information.
     * @param[in] color          The vertex color information.
     */
-    QByteArray createVertColor(const MatrixXf& vertices, const QColor& color = QColor(100,100,100));
+    QByteArray createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100));
 
     Renderable3DEntity*     m_pRenderable3DEntity;                      /**< The renderable 3D entity. */
 

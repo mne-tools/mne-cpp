@@ -46,6 +46,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace Eigen;
+using namespace MNELIB;
 using namespace DISP3DLIB;
 
 
@@ -54,7 +56,7 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainRTDataTreeItem::BrainRTDataTreeItem(const int &iType, const QString &text)
+BrainRTDataTreeItem::BrainRTDataTreeItem(int iType, const QString &text)
 : AbstractTreeItem(iType, text)
 , m_bIsInit(false)
 , m_pSourceLocRtDataWorker(new RtSourceLocDataWorker(this))
@@ -264,7 +266,7 @@ void BrainRTDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkS
 
 //*************************************************************************************************************
 
-void BrainRTDataTreeItem::onNewRtData(QByteArray sourceColorSamples)
+void BrainRTDataTreeItem::onNewRtData(const QByteArray& sourceColorSamples)
 {
     emit rtVertColorChanged(sourceColorSamples, this->data(BrainRTDataTreeItemRoles::RTVertNo).value<VectorXi>());
 }
@@ -280,7 +282,7 @@ void BrainRTDataTreeItem::onColormapTypeChanged(const QString& sColormapType)
 
 //*************************************************************************************************************
 
-void BrainRTDataTreeItem::onTimeIntervalChanged(const int& iMSec)
+void BrainRTDataTreeItem::onTimeIntervalChanged(int iMSec)
 {
     m_pSourceLocRtDataWorker->setInterval(iMSec);
 }
@@ -288,7 +290,7 @@ void BrainRTDataTreeItem::onTimeIntervalChanged(const int& iMSec)
 
 //*************************************************************************************************************
 
-void BrainRTDataTreeItem::onDataNormalizationValueChanged(const double& dValue)
+void BrainRTDataTreeItem::onDataNormalizationValueChanged(double dValue)
 {
     m_pSourceLocRtDataWorker->setNormalization(dValue);
 }
@@ -328,7 +330,7 @@ void BrainRTDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& c
 
 //*************************************************************************************************************
 
-void BrainRTDataTreeItem::onNumberAveragesChanged(const int& iNumAvr)
+void BrainRTDataTreeItem::onNumberAveragesChanged(int iNumAvr)
 {
     m_pSourceLocRtDataWorker->setNumberAverages(iNumAvr);
 }

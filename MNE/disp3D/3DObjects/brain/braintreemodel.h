@@ -163,7 +163,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const QString& text, const MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent);
+    bool addData(const QString& text, const MNELIB::MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent);
 
     //=========================================================================================================
     /**
@@ -175,7 +175,7 @@ public:
     *
     * @return                       Returns a list of the rt data tree items. These items should be used to efficienelty update the rt data.
     */
-    QList<BrainRTDataTreeItem*> addData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution = MNEForwardSolution());
+    QList<BrainRTDataTreeItem*> addData(const QString& text, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
 
 private:
     QStandardItem*     m_pRootItem;     /**< The root item of the tree model. */

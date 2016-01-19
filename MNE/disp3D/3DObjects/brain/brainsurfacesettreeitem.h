@@ -80,16 +80,6 @@
 namespace DISP3DLIB
 {
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-using namespace FSLIB;
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -117,7 +107,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainSurfaceSetTreeItem(const int& iType = BrainTreeModelItemTypes::SurfaceSetItem, const QString& text = "");
+    explicit BrainSurfaceSetTreeItem(int iType = BrainTreeModelItemTypes::SurfaceSetItem, const QString& text = "");
 
     //=========================================================================================================
     /**
@@ -142,7 +132,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent = 0);
+    bool addData(const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -154,7 +144,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
+    bool addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -165,7 +155,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent = 0);
+    bool addData(const MNELIB::MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent = 0);
 
 private:
 };

@@ -46,6 +46,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace MNELIB;
 using namespace DISP3DLIB;
 
 
@@ -297,8 +298,8 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
         m_vecCameraRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * 0.1f) + m_vecCameraRotationOld.x());
         m_vecCameraRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.1f) + m_vecCameraRotationOld.y());
 
-        m_pCameraTransform->setRotationX(m_vecCameraRotation.x());
-        m_pCameraTransform->setRotationY(m_vecCameraRotation.y());
+//        m_pCameraTransform->setRotationX(m_vecCameraRotation.x());
+//        m_pCameraTransform->setRotationY(m_vecCameraRotation.y());
     }
 
     if(m_bCameraTransMode) {

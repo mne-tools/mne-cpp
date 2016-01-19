@@ -54,7 +54,7 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainTreeMetaItem::BrainTreeMetaItem(const int& iType, const QString& text)
+BrainTreeMetaItem::BrainTreeMetaItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
     QString sToolTip;
