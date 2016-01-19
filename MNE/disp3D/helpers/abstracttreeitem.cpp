@@ -2,7 +2,7 @@
 
 using namespace DISP3DLIB;
 
-AbstractTreeItem::AbstractTreeItem(const int& iType, const QString& text)
+AbstractTreeItem::AbstractTreeItem( int iType, const QString& text)
 : QStandardItem(text)
 , m_iType(iType)
 {
@@ -50,7 +50,7 @@ int  AbstractTreeItem::type() const
 
 //*************************************************************************************************************
 
-QList<QStandardItem*> AbstractTreeItem::findChildren(const int& type)
+QList<QStandardItem*> AbstractTreeItem::findChildren(int type)
 {
     QList<QStandardItem*> itemList;
 

@@ -54,7 +54,7 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainSurfaceTreeItem::BrainSurfaceTreeItem(const int& iType, const QString& text)
+BrainSurfaceTreeItem::BrainSurfaceTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 , m_pRenderable3DEntity(new Renderable3DEntity())
 , m_pRenderable3DEntityActivationOverlay(new Renderable3DEntity())

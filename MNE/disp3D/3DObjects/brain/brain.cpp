@@ -46,6 +46,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace FSLIB;
+using namespace MNELIB;
 using namespace DISP3DLIB;
 
 

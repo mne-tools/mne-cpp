@@ -97,7 +97,7 @@ public :
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    AbstractTreeItem(const int& iType, const QString& text = "");
+    AbstractTreeItem( int iType, const QString& text = "");
     virtual ~AbstractTreeItem();
 
     //=========================================================================================================
@@ -116,7 +116,7 @@ public :
     *
     * @return           List with all found items.
     */
-    QList<QStandardItem*> findChildren(const int& type);
+    QList<QStandardItem*> findChildren( int type);
 
     //=========================================================================================================
     /**

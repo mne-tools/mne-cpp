@@ -87,17 +87,6 @@
 namespace DISP3DLIB
 {
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-using namespace FSLIB;
-using namespace MNELIB;
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -125,7 +114,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainHemisphereTreeItem(const int& iType = BrainTreeModelItemTypes::HemisphereItem, const QString& text = "Unknown");
+    explicit BrainHemisphereTreeItem(int iType = BrainTreeModelItemTypes::HemisphereItem, const QString& text = "Unknown");
 
     //=========================================================================================================
     /**
@@ -150,7 +139,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
+    bool addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -161,7 +150,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const MNEHemisphere& tHemisphere, Qt3DCore::QEntity* p3DEntityParent = 0);
+    bool addData(const MNELIB::MNEHemisphere& tHemisphere, Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -172,7 +161,7 @@ public:
     *
     * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
     */
-    BrainRTDataTreeItem* addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution = MNEForwardSolution());
+    BrainRTDataTreeItem* addData(const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
 
 private:
     BrainSurfaceTreeItem*       m_pSurfaceItem;             /**< The surface item of this hemisphere item. Only one surface item may exists under a hemisphere item. */

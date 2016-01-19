@@ -47,6 +47,8 @@
 //=============================================================================================================
 
 using namespace DISP3DLIB;
+using namespace Eigen;
+using namespace FSLIB;
 
 
 //*************************************************************************************************************
@@ -54,7 +56,7 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainAnnotationTreeItem::BrainAnnotationTreeItem(const int & iType, const QString & text)
+BrainAnnotationTreeItem::BrainAnnotationTreeItem( int iType, const QString & text)
 : AbstractTreeItem(iType, text)
 {
     this->setEditable(false);
