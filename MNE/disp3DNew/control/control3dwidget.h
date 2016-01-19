@@ -109,7 +109,7 @@ public:
     *
     * @param[in] parent      The parent of the QObject.
     */
-    explicit Control3DWidget(QWidget* parent = 0);
+    explicit Control3DWidget(QWidget* parent = 0, Qt::WindowType type = Qt::Window);
 
     //=========================================================================================================
     /**

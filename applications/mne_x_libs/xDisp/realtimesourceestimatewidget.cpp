@@ -95,11 +95,18 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
 , m_pRTSE(pRTSE)
 , m_bInitialized(false)
 {
+    m_pAction3DControl = new QAction(QIcon(":/images/3DControl.png"), tr("Shows the 3D control widget (F9)"),this);
+    m_pAction3DControl->setShortcut(tr("F9"));
+    m_pAction3DControl->setToolTip(tr("Shows the 3D control widget (F9)"));
+    connect(m_pAction3DControl, &QAction::triggered,
+            this, &RealTimeSourceEstimateWidget::show3DControlWidget);
+    addDisplayAction(m_pAction3DControl);
+    m_pAction3DControl->setVisible(true);
+
     m_p3DView = View3D::SPtr(new View3D());
 
     m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this));
     m_pControl3DView->setView3D(m_p3DView);
-    m_pControl3DView->show();
 
     QGridLayout *mainLayoutView = new QGridLayout;
     QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
@@ -154,6 +161,7 @@ void RealTimeSourceEstimateWidget::getData()
             //
             // Add Data
             //
+            m_p3DView->addBrainData("HemiLRSet", *m_pRTSE->getSurfSet(), *m_pRTSE->getAnnotSet());
             m_lRtItem = m_p3DView->addRtBrainData("HemiLRSet", *m_pRTSE->getValue(), *m_pRTSE->getFwdSolution());
 
             for(int i = 0; i<m_lRtItem.size(); i++) {
@@ -171,9 +179,23 @@ void RealTimeSourceEstimateWidget::getData()
 
 void RealTimeSourceEstimateWidget::init()
 {
-    m_p3DView->addBrainData("HemiLRSet", *m_pRTSE->getSurfSet(), *m_pRTSE->getAnnotSet());
     m_bInitialized = true;
     m_pRTSE->m_bStcSend = true;
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeSourceEstimateWidget::show3DControlWidget()
+{
+    qDebug()<<"RealTimeSourceEstimateWidget::show3DControlWidget()";
+
+    if(m_pControl3DView->isActiveWindow())
+        m_pControl3DView->hide();
+    else {
+        m_pControl3DView->activateWindow();
+        m_pControl3DView->show();
+    }
 }
 
 

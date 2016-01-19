@@ -55,6 +55,7 @@
 //=============================================================================================================
 
 #include <QSlider>
+#include <QAction>
 
 
 //*************************************************************************************************************
@@ -154,19 +155,29 @@ public:
     */
     virtual void init();
 
-signals:
-    void startInit();
+protected slots:
+    //=========================================================================================================
+    /**
+    * Shows the 3D control widget
+    */
+    void show3DControlWidget();
 
 private:
     QSharedPointer<RealTimeSourceEstimate> m_pRTSE;     /**< The real-time source estimate measurement. */
-    bool m_bInitialized;                                /**< Whether init was processed successfully. */
 
-    AnnotationSet m_annotationSet;
-    SurfaceSet m_surfSet;
+    bool                            m_bInitialized;     /**< Whether init was processed successfully. */
 
-    View3D::SPtr m_p3DView;
-    Control3DWidget::SPtr m_pControl3DView;
-    QList<BrainRTDataTreeItem*> m_lRtItem;
+    AnnotationSet                   m_annotationSet;
+    SurfaceSet                      m_surfSet;
+
+    View3D::SPtr                    m_p3DView;
+    Control3DWidget::SPtr           m_pControl3DView;
+    QList<BrainRTDataTreeItem*>     m_lRtItem;
+
+    QAction*                        m_pAction3DControl; /**< show 3D View control widget */
+
+signals:
+    void startInit();
 };
 
 } // NAMESPACE
