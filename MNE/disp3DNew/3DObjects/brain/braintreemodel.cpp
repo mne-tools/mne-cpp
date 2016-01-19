@@ -120,6 +120,26 @@ bool BrainTreeModel::addData(const QString& text, const Surface& tSurface, const
 
 //*************************************************************************************************************
 
+bool BrainTreeModel::addData(const QString& text, const MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent)
+{
+    QList<QStandardItem*> itemList = this->findItems(text);
+    bool state = false;
+
+    if(!itemList.isEmpty() && (itemList.at(0)->type() == BrainTreeModelItemTypes::SurfaceSetItem)) {
+        BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
+        state = pSurfaceSetItem->addData(tSourceSpace, p3DEntityParent);
+    } else {
+        BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, text);
+        m_pRootItem->appendRow(pSurfaceSetItem);
+        state = pSurfaceSetItem->addData(tSourceSpace, p3DEntityParent);
+    }
+
+    return state;
+}
+
+
+//*************************************************************************************************************
+
 QList<BrainRTDataTreeItem*> BrainTreeModel::addData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
     QList<BrainRTDataTreeItem*> returnList;

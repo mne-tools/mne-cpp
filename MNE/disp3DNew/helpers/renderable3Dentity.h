@@ -44,9 +44,6 @@
 #include "disp3dnew_global.h"
 #include "custommesh.h"
 
-#include <fs/surfaceset.h>
-#include <fs/annotationset.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -83,8 +80,6 @@ namespace DISP3DNEWLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FSLIB;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -108,7 +103,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor for freesurfer mesh.
+    * Default constructor for freesurfer mesh.#
+    *
+    * @param[in] parent         The parent of this entity.
     */
     Renderable3DEntity(Qt3DCore::QEntity* parent = 0);
 
@@ -134,9 +131,9 @@ public:
     /**
     * Refresh the vertices colors of the mesh.
     *
-    * @param[in] tMatColors     New color information for the vertices.
+    * @param[in] tArrayColors     New color information for the vertices.
     */
-    bool setVertColor(const Matrix<float, Dynamic, 3, RowMajor>& tMatColors);
+    bool setVertColor(const QByteArray &tArrayColors);
 
     //=========================================================================================================
     /**
@@ -149,10 +146,26 @@ public:
     *
     * @return If successful returns true, false otherwise.
     */
-    bool setMeshData(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset, const Matrix<float, Dynamic, 3, RowMajor>& tMatColors = Matrix<float, Dynamic, 3, RowMajor>(0,3));
+    bool setMeshData(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset, const QByteArray &tArrayColors = QByteArray());
 
+    //=========================================================================================================
+    /**
+    * Sets the entity's transformation.
+    *
+    * @param[in] pTransform     The new entity's transform.
+    *
+    * @return If successful returns true, false otherwise.
+    */
     bool setTransform(QSharedPointer<Qt3DCore::QTransform> pTransform);
 
+    //=========================================================================================================
+    /**
+    * Sets the entity's material.
+    *
+    * @param[in] pMaterial      The new entity's material.
+    *
+    * @return If successful returns true, false otherwise.
+    */
     bool setMaterial(QSharedPointer<Qt3DRender::QMaterial> pMaterial);
 
 protected:

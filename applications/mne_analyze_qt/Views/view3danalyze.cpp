@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     view3d.cpp
+* @file     view3danalyze.cpp
 * @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
 *			Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
@@ -35,14 +35,14 @@
 * @brief
 *
 *@file
-*       view3d.h
+*       view3danalyze.h
 */
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "view3d.h"
+#include "view3danalyze.h"
 
 
 //*************************************************************************************************************
@@ -51,7 +51,7 @@
 // View3D constructor
 //=============================================================================================================
 
-View3D::View3D(int surface_type)
+View3DAnalyze::View3DAnalyze(int surface_type)
 {
     //Resizing the created QMdiSubwindow to fit the minimun size of the container used later
     this->resize(256,256);
@@ -68,25 +68,29 @@ View3D::View3D(int surface_type)
     //
     // pial
     //
-        m_BrainView = new BrainView("sample", 2, "pial", "./MNE-sample-data/subjects");
+        m_BrainView = new View3D();
+        m_BrainView->addBrainData("Set", SurfaceSet("sample", 2, "orig", "./MNE-sample-data/subjects"));
         break;
     case 2:
     //
     // inflated
     //
-        m_BrainView = new BrainView("sample", 2, "inflated", "./MNE-sample-data/subjects");
+        m_BrainView = new View3D();
+        m_BrainView->addBrainData("Set", SurfaceSet("sample", 2, "inflated", "./MNE-sample-data/subjects"));
         break;
     case 3:
     //
     // orig
     //
-        m_BrainView = new BrainView("sample", 2, "orig", "./MNE-sample-data/subjects");
+        m_BrainView = new View3D();
+        m_BrainView->addBrainData("Set", SurfaceSet("sample", 2, "orig", "./MNE-sample-data/subjects"));
         break;
     case 4:
     //
     // white
     //
-        m_BrainView = new BrainView("sample", 2, "white", "./MNE-sample-data/subjects");
+        m_BrainView = new View3D();
+        m_BrainView->addBrainData("Set", SurfaceSet("sample", 2, "white", "./MNE-sample-data/subjects"));
         break;
     }
     //A container is created to contain the QWindow that comes from BrainView, then a minimum size is set
@@ -99,10 +103,10 @@ View3D::View3D(int surface_type)
 }
 //*************************************************************************************************************
 //=============================================================================================================
-// View3D destructor
+// View3DAnalyze destructor
 //=============================================================================================================
 
-View3D::~View3D()
+View3DAnalyze::~View3DAnalyze()
 {
 
 }

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     braintreeitem.h
+* @file     BrainTreeMetaItem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BrainTreeItem class declaration.
+* @brief     BrainTreeMetaItem class declaration.
 *
 */
 
-#ifndef BRAINTREEITEM_H
-#define BRAINTREEITEM_H
+#ifndef BRAINTREEMETAITEM_H
+#define BRAINTREEMETAITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -91,29 +91,32 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* BrainTreeItem provides a generic brain tree item to hold meta information about the surface and annoation item.
+* BrainTreeMetaItem provides a generic brain tree item to hold meta information about other brain tree items.
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT BrainTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT BrainTreeMetaItem : public AbstractTreeItem
 {
     Q_OBJECT;
 
 public:
-    typedef QSharedPointer<BrainTreeItem> SPtr;             /**< Shared pointer type for BrainTreeItem class. */
-    typedef QSharedPointer<const BrainTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainTreeItem class. */
+    typedef QSharedPointer<BrainTreeMetaItem> SPtr;             /**< Shared pointer type for BrainTreeMetaItem class. */
+    typedef QSharedPointer<const BrainTreeMetaItem> ConstSPtr;  /**< Const shared pointer type for BrainTreeMetaItem class. */
 
     //=========================================================================================================
     /**
     * Default constructor.
+    *
+    * @param[in] iType      The type of the item. See types.h for declaration and definition.
+    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "");
+    explicit BrainTreeMetaItem(const int& iType = BrainTreeMetaItemTypes::UnknownItem, const QString& text = "");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~BrainTreeItem();
+    ~BrainTreeMetaItem();
 
     //=========================================================================================================
     /**
@@ -122,14 +125,70 @@ public:
     QVariant data(int role = Qt::UserRole + 1) const;
     void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
-signals:
-    void updateSurfaceVertColors();
-    void rtDataTimeIntervalUpdated(const int& usec);
-
 private:
 
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the color of the curvature data changed.
+    */
+    void curvColorsChanged();
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the color origin (curvature or annotation) changed.
+    */
+    void colorInfoOriginChanged();
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the time interval of the data streaming changed.
+    *
+    * @param[in] iMSec     The time interval in mSecs.
+    */
+    void rtDataTimeIntervalChanged(const int& iMSec);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the normalization value of the data streaming changed.
+    *
+    * @param[in] dValue     The new normalization value.
+    */
+    void rtDataNormalizationValueChanged(const double& dValue);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the colormap type of the data streaming changed.
+    *
+    * @param[in] sColormapType     The new colormap type.
+    */
+    void rtDataColormapTypeChanged(const QString& sColormapType);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the visualization type of the data streaming changed (single vertex, smoothing, annotation based).
+    *
+    * @param[in] sVisualizationType     The new visualization type.
+    */
+    void rtDataVisualizationTypeChanged(const QString& sVisualizationType);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the surface color changed.
+    *
+    * @param[in] color     The new surface color.
+    */
+    void surfaceColorChanged(const QColor& color);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the number of averages of the data streaming changed.
+    *
+    * @param[in] iMSec     The new number of averages.
+    */
+    void rtDataNumberAveragesChanged(const int& iNumAvr);
 };
 
 } //NAMESPACE DISP3DNEWLIB
 
-#endif // BRAINTREEITEM_H
+#endif // BRAINTREEMETAITEM_H

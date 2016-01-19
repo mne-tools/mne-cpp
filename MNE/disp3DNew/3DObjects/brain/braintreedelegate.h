@@ -75,6 +75,8 @@ namespace DISP3DNEWLIB
 //=============================================================================================================
 /**
 * DECLARE CLASS BrainTreeDelegate
+*
+* @brief Provides a delegate to render user specific input methods in the tree model.
 */
 class DISP3DNEWSHARED_EXPORT BrainTreeDelegate : public QItemDelegate
 {
@@ -85,15 +87,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Reimplemented virtual functions
-    *
+    * QItemDelegate functions
     */
     QWidget *createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const;
     void setEditorData(QWidget* editor, const QModelIndex& index) const;
     void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const;
     void updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 
-private:
+protected slots:
+    void onEditorEdited();
+
+protected:
 };
 
 } //NAMESPACE DISP3DNEWLIB

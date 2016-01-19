@@ -467,7 +467,7 @@ void Averaging::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
                     t_mat.block(0,samp+1,m_iTestStimCh, t_mat.cols()-(samp+1)) = MatrixXd::Ones(m_iTestStimCh, t_mat.cols()-(samp+1));
 
-                    qDebug() << "Pos:" << samp;
+                    //qDebug() << "Pos:" << samp;
                     ++m_iTestCount2;
                 }
                 ++m_iTestCount;

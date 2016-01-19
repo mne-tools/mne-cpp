@@ -55,8 +55,8 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Control3DWidget::Control3DWidget(QWidget* parent)
-: RoundedEdgesWidget(parent)
+Control3DWidget::Control3DWidget(QWidget* parent, Qt::WindowType type)
+: RoundedEdgesWidget(parent, type)
 , ui(new Ui::Control3DWidget)
 , m_colCurrentSceneColor(QColor(0,0,0))
 {
@@ -75,7 +75,7 @@ Control3DWidget::Control3DWidget(QWidget* parent)
     //Init's
     ui->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(0, 0, 0);"));
 
-    this->setWindowFlags(Qt::WindowStaysOnTopHint);
+    //this->setWindowFlags(Qt::WindowStaysOnTopHint);
     this->adjustSize();
     this->setWindowOpacity(1/(100.0/90.0));
 
@@ -86,6 +86,7 @@ Control3DWidget::Control3DWidget(QWidget* parent)
     BrainTreeDelegate* pBrainTreeDelegate = new BrainTreeDelegate(this);
     ui->m_treeView_loadedData->setItemDelegate(pBrainTreeDelegate);
     ui->m_treeView_loadedData->setHeaderHidden(true);
+    ui->m_treeView_loadedData->setEditTriggers(QAbstractItemView::CurrentChanged);
 }
 
 
@@ -141,13 +142,17 @@ void Control3DWidget::onSceneColorPicker()
 {
     QColorDialog* pDialog = new QColorDialog(this);
     pDialog->setCurrentColor(m_colCurrentSceneColor);
+
+    //Update all connected View3D's scene colors
+    for(int i = 0; i<m_lView3D.size(); i++) {
+        connect(pDialog, &QColorDialog::currentColorChanged,
+                m_lView3D.at(i).data(), &View3D::setSceneColor);
+    }
+
     pDialog->exec();
     m_colCurrentSceneColor = pDialog->currentColor();
 
     ui->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(m_colCurrentSceneColor.red()).arg(m_colCurrentSceneColor.green()).arg(m_colCurrentSceneColor.blue()));
 
-    //Update all connected View3D's scene colors
-    for(int i = 0; i<m_lView3D.size(); i++) {
-        m_lView3D.at(i)->changeSceneColor(m_colCurrentSceneColor);
-    }
+
 }

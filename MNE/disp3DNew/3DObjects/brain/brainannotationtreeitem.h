@@ -44,11 +44,13 @@
 #include "../../disp3DNew_global.h"
 
 #include "../../helpers/abstracttreeitem.h"
-#include "braintreeitem.h"
+#include "braintreemetaitem.h"
 
 #include "../../helpers/types.h"
 
 #include "fs/label.h"
+#include "fs/surface.h"
+#include "fs/annotation.h"
 
 
 //*************************************************************************************************************
@@ -87,6 +89,7 @@ namespace DISP3DNEWLIB
 //=============================================================================================================
 
 using namespace Eigen;
+using namespace FSLIB;
 
 
 //*************************************************************************************************************
@@ -112,8 +115,11 @@ public:
     //=========================================================================================================
     /**
     * Default constructor.
+    *
+    * @param[in] iType      The type of the item. See types.h for declaration and definition.
+    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainAnnotationTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "Annotation");
+    explicit BrainAnnotationTreeItem(const int& iType = BrainTreeModelItemTypes::AnnotationItem, const QString& text = "Annotation");
 
     //=========================================================================================================
     /**
@@ -130,7 +136,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on annotation information to this model.
+    * Adds FreeSurfer data based on annotation information to this item.
     *
     * @param[in] tSurface           FreeSurfer surface.
     * @param[in] tAnnotation        FreeSurfer annotation.
@@ -140,7 +146,6 @@ public:
     bool addData(const Surface& tSurface, const Annotation& tAnnotation);
 
 private:
-
 };
 
 } //NAMESPACE DISP3DNEWLIB

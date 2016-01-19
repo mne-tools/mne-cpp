@@ -48,20 +48,13 @@ SUBDIRS += \
     rtClient \
     rtInv\
 
-
 contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += disp
 
     qtHaveModule(3dcore) {
-    message(Examples.pro - Qt3D 3DCore available!)
-    SUBDIRS += \
-        disp3DNew \
-    }
-
-    qtHaveModule(3d) {
-        message(Qt3D available: disp3D library configured!)
-        SUBDIRS +=  \
-            disp3D \
+        message(Examples.pro - Qt3D 3DCore available!)
+        SUBDIRS += \
+            disp3DNew \
     }
 }
 

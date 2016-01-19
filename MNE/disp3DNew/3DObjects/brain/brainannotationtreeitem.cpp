@@ -57,6 +57,8 @@ using namespace DISP3DNEWLIB;
 BrainAnnotationTreeItem::BrainAnnotationTreeItem(const int & iType, const QString & text)
 : AbstractTreeItem(iType, text)
 {
+    this->setEditable(false);
+    this->setToolTip("Brain annotation");
 }
 
 
@@ -89,7 +91,10 @@ bool BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation&
 {
     //Create color from annotation data if annotation is not empty
     if(!tAnnotation.isEmpty()) {
-        MatrixX3f matColorsAnnot(tAnnotation.getVertices().rows(), 3);
+        QByteArray arrayColorsAnnot;
+        arrayColorsAnnot.resize(tAnnotation.getVertices().rows() * 3 * (int)sizeof(float));
+        float *rawArrayColors = reinterpret_cast<float *>(arrayColorsAnnot.data());
+
         QList<FSLIB::Label> qListLabels;
         QList<RowVector4i> qListLabelRGBAs;
 
@@ -98,24 +103,32 @@ bool BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation&
         for(int i = 0; i<qListLabels.size(); i++) {
             FSLIB::Label label = qListLabels.at(i);
             for(int j = 0; j<label.vertices.rows(); j++) {
-                matColorsAnnot(label.vertices(j), 0) = qListLabelRGBAs.at(i)(0)/255.0;
-                matColorsAnnot(label.vertices(j), 1) = qListLabelRGBAs.at(i)(1)/255.0;
-                matColorsAnnot(label.vertices(j), 2) = qListLabelRGBAs.at(i)(2)/255.0;
+                rawArrayColors[label.vertices(j)*3+0] = qListLabelRGBAs.at(i)(0)/255.0;
+                rawArrayColors[label.vertices(j)*3+1] = qListLabelRGBAs.at(i)(1)/255.0;
+                rawArrayColors[label.vertices(j)*3+2] = qListLabelRGBAs.at(i)(2)/255.0;
             }
         }
 
         //Add data which is held by this BrainAnnotationTreeItem
         QVariant data;
-        data.setValue(matColorsAnnot);
+        data.setValue(arrayColorsAnnot);
         this->setData(data, BrainAnnotationTreeItemRoles::AnnotColors);
 
+        data.setValue(qListLabels);
+        this->setData(data, BrainAnnotationTreeItemRoles::LabeList);
+
+        data.setValue(tAnnotation.getLabelIds());
+        this->setData(data, BrainAnnotationTreeItemRoles::LabeIds);
+
         //Add annotation meta information as item children
-        BrainTreeItem *itemAnnotFileName = new BrainTreeItem(BrainTreeModelItemTypes::AnnotFileName, tAnnotation.fileName());
+        BrainTreeMetaItem *itemAnnotFileName = new BrainTreeMetaItem(BrainTreeMetaItemTypes::AnnotFileName, tAnnotation.fileName());
+        itemAnnotFileName->setEditable(false);
         *this<<itemAnnotFileName;
         data.setValue(tAnnotation.fileName());
         itemAnnotFileName->setData(data, BrainAnnotationTreeItemRoles::AnnotFileName);
 
-        BrainTreeItem *itemAnnotPath = new BrainTreeItem(BrainTreeModelItemTypes::AnnotFilePath, tAnnotation.filePath());
+        BrainTreeMetaItem *itemAnnotPath = new BrainTreeMetaItem(BrainTreeMetaItemTypes::AnnotFilePath, tAnnotation.filePath());
+        itemAnnotPath->setEditable(false);
         *this<<itemAnnotPath;
         data.setValue(tAnnotation.filePath());
         itemAnnotFileName->setData(data, BrainAnnotationTreeItemRoles::AnnotFilePath);

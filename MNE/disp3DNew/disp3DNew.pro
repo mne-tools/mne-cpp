@@ -18,7 +18,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -91,7 +91,7 @@ SOURCES += \
     view3d.cpp \
     3DObjects/brain/brain.cpp \
     3DObjects/brain/braintreemodel.cpp \
-    3DObjects/brain/braintreeitem.cpp \
+    3DObjects/brain/braintreemetaitem.cpp \
     3DObjects/brain/brainsurfacetreeitem.cpp \
     3DObjects/brain/brainsurfacesettreeitem.cpp \
     3DObjects/brain/brainannotationtreeitem.cpp \
@@ -103,13 +103,14 @@ SOURCES += \
     helpers/custommesh.cpp \
     helpers/window.cpp \
     control/control3dwidget.cpp \
-    rt/sourcelevel/stcdataworker.cpp \
+    rt/rtSourceLoc/rtsourcelocdataworker.cpp \
+    3DObjects/brain/brainsourcespacetreeitem.cpp
 
 HEADERS += \
     view3d.h \
     3DObjects/brain/brain.h \
     3DObjects/brain/braintreemodel.h \
-    3DObjects/brain/braintreeitem.h \
+    3DObjects/brain/braintreemetaitem.h \
     3DObjects/brain/brainsurfacetreeitem.h \
     3DObjects/brain/brainsurfacesettreeitem.h \
     3DObjects/brain/brainannotationtreeitem.h \
@@ -123,7 +124,8 @@ HEADERS += \
     helpers/types.h \
     control/control3dwidget.h \
     disp3dnew_global.h \
-    rt/sourcelevel/stcdataworker.h \
+    rt/rtSourceLoc/rtsourcelocdataworker.h \
+    3DObjects/brain/brainsourcespacetreeitem.h
 
 FORMS += \
     control/control3dwidget.ui \

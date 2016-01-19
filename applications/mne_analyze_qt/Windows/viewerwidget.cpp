@@ -69,39 +69,41 @@ ViewerWidget::ViewerWidget(QWidget *parent) :
     //Pial surface
     //
     //A new View3D object is created, in charge of the subwindow and the displaying of the 3D surface
-    m_view3d_pial = new View3D(1);
+    m_view3d_pial = new View3DAnalyze(1);
     //A new subwindow is created
     m_MdiArea->addSubWindow(m_view3d_pial);
     m_view3d_pial->setWindowTitle("Pial surface");
 
 
-    //
-    //Inflated surface
-    //
-    //A new View3D object is created, in charge of the subwindow and the displaying of the 3D surface
-    m_view3d_inflated = new View3D(2);
-    //A new subwindow is created
-    m_MdiArea->addSubWindow(m_view3d_inflated);
-    m_view3d_inflated->setWindowTitle("Inflated surface");
 
-
+    //Commented this out since multiple widgets with new disp 3d content result in weird flashing.
 //    //
-//    //Original surface
+//    //Inflated surface
 //    //
 //    //A new View3D object is created, in charge of the subwindow and the displaying of the 3D surface
-//    m_view3d_original = new View3D(3);
+//    m_view3d_inflated = new View3DAnalyze(2);
 //    //A new subwindow is created
-//    m_MdiArea->addSubWindow(m_view3d_original);
-//    m_view3d_original->setWindowTitle("Original surface");
+//    m_MdiArea->addSubWindow(m_view3d_inflated);
+//    m_view3d_inflated->setWindowTitle("Inflated surface");
 
-    //
-    //White matter
-    //
-    //A new View3D object is created, in charge of the subwindow and the displaying of the 3D surface
-    m_vie3d_white = new View3D(4);
-    //A new subwindow is created
-    m_MdiArea->addSubWindow(m_vie3d_white);
-    m_vie3d_white->setWindowTitle("White matter");
+
+////    //
+////    //Original surface
+////    //
+////    //A new View3D object is created, in charge of the subwindow and the displaying of the 3D surface
+////    m_view3d_original = new View3D(3);
+////    //A new subwindow is created
+////    m_MdiArea->addSubWindow(m_view3d_original);
+////    m_view3d_original->setWindowTitle("Original surface");
+
+//    //
+//    //White matter
+//    //
+//    //A new View3D object is created, in charge of the subwindow and the displaying of the 3D surface
+//    m_vie3d_white = new View3DAnalyze(4);
+//    //A new subwindow is created
+//    m_MdiArea->addSubWindow(m_vie3d_white);
+//    m_vie3d_white->setWindowTitle("White matter");
 
     //Cascade subwindows
     this->m_MdiArea->cascadeSubWindows();

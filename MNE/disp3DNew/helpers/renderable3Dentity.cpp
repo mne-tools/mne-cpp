@@ -92,17 +92,17 @@ Renderable3DEntity::~Renderable3DEntity()
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::setVertColor(const Matrix<float, Dynamic, 3, RowMajor>& tMatColors)
+bool Renderable3DEntity::setVertColor(const QByteArray& tArrayColors)
 {
-    return m_pCustomMesh->setVertColor(tMatColors);
+    return m_pCustomMesh->setVertColor(tArrayColors);
 }
 
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::setMeshData(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset,  const Matrix<float, Dynamic, 3, RowMajor>& tMatColors)
+bool Renderable3DEntity::setMeshData(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset,  const QByteArray& tArrayColors)
 {
-    return m_pCustomMesh->setMeshData(tMatVert, tMatNorm, tMatTris, tVecOffset, tMatColors);
+    return m_pCustomMesh->setMeshData(tMatVert, tMatNorm, tMatTris, tVecOffset, tArrayColors);
 }
 
 
