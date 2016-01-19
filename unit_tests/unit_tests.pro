@@ -55,7 +55,7 @@ contains(MNECPP_CONFIG, withGui) {
         test_rap_eval \
 #       test_orig_rap_cluster_eval \
 
-    qtHaveModule(3d) {
+    qtHaveModule(3dcore,3drender,3dinput) {
         isEqual(QT_MAJOR_VERSION, 5){
 #            isEqual(QT_MINOR_VERSION, 1){
                 message(Qt3D available && QTVersion >= Qt 5.1: mne 3D tests configured!)
