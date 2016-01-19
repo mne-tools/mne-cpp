@@ -55,8 +55,8 @@ using namespace DISP3DNEWLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Control3DWidget::Control3DWidget(QWidget* parent)
-: RoundedEdgesWidget(parent)
+Control3DWidget::Control3DWidget(QWidget* parent, Qt::WindowType type)
+: RoundedEdgesWidget(parent, type)
 , ui(new Ui::Control3DWidget)
 , m_colCurrentSceneColor(QColor(0,0,0))
 {
@@ -75,7 +75,7 @@ Control3DWidget::Control3DWidget(QWidget* parent)
     //Init's
     ui->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(0, 0, 0);"));
 
-    this->setWindowFlags(Qt::WindowStaysOnTopHint);
+    //this->setWindowFlags(Qt::WindowStaysOnTopHint);
     this->adjustSize();
     this->setWindowOpacity(1/(100.0/90.0));
 
