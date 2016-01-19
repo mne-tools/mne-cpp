@@ -125,12 +125,6 @@ contains(MNECPP_CONFIG, BuildBasicMNEXVersion) {
 }
 
 
-#    qtHaveModule(3d) {
-#        message(Qt3D available: brainmonitor library configured!)
-#        SUBDIRS += brainmonitor \
-#    }
-
-
 #    filtertoolbox \
 #    gaborparticletoolbox \
 #    megchannelsimulator \
