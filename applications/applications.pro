@@ -52,7 +52,7 @@ contains(MNECPP_CONFIG, withGui) {
             mne_browse_raw_qt \
     }
 
-    qtHaveModule(3d) {
+    qtHaveModule(3dcore,3drender,3dinput) {
         message(Qt3D available: disp3D library configured!)
         SUBDIRS += \
             mne_viewer \
