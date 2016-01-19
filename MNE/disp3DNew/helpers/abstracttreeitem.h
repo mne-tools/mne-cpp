@@ -90,28 +90,71 @@ class AbstractTreeItem : public QObject, public QStandardItem
     Q_OBJECT;
 
 public :
-
+    //=========================================================================================================
+    /**
+    * Default constructor.
+    *
+    * @param[in] iType      The type of the item. See types.h for declaration and definition.
+    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+    */
     AbstractTreeItem(const int& iType, const QString& text = "");
     virtual ~AbstractTreeItem();
 
+    //=========================================================================================================
+    /**
+    * QStandardItem functions
+    */
     QVariant data(int role = Qt::UserRole + 1) const;
     void setData(const QVariant& value, int role = Qt::UserRole + 1);
-
     int type() const;
 
+    //=========================================================================================================
+    /**
+    * Returns all children of this item based on their type.
+    *
+    * @param[in] type    The type of the child items which should be looked for.
+    *
+    * @return           List with all found items.
+    */
     QList<QStandardItem*> findChildren(const int& type);
+
+    //=========================================================================================================
+    /**
+    * Returns all children of this item based on their text.
+    *
+    * @param[in] text    The text of the child items which should be looked for.
+    *
+    * @return           List with all found items.
+    */
     QList<QStandardItem*> findChildren(const QString& text);
 
+    //=========================================================================================================
+    /**
+    * Overloaded stream operator to add a child to this item based on a pointer.
+    *
+    * @param[in] newItem    The new item as a pointer.
+    */
     AbstractTreeItem &operator<<(AbstractTreeItem* newItem);
+
+    //=========================================================================================================
+    /**
+    * Overloaded stream operator to add a child to this item based on a reference.
+    *
+    * @param[in] newItem    The new item as a reference.
+    */
     AbstractTreeItem &operator<<(AbstractTreeItem& newItem);
 
+protected:
+    int     m_iType;        /**< This item's type. */
+
 signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever this item's check state changed.
+    *
+    * @param[in] checkState     The current check state.
+    */
     void checkStateChanged(const Qt::CheckState& checkState);
-
-protected :
-    void createToolTip();
-
-    int     m_iType;
 };
 
 } //NAMESPACE DISP3DNEWLIB

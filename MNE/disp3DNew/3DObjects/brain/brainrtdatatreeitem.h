@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brainrtdata.h
+* @file     brainrtdatatreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -45,9 +45,9 @@
 
 #include "../../helpers/abstracttreeitem.h"
 #include "../../helpers/types.h"
-#include "../../rt/sourcelevel/stcdataworker.h"
+#include "../../rt/rtSourceLoc/rtsourcelocdataworker.h"
 
-#include "braintreeitem.h"
+#include "braintreemetaitem.h"
 
 #include "mne/mne_sourceestimate.h"
 #include "mne/mne_forwardsolution.h"
@@ -64,7 +64,6 @@
 #include <QColor>
 #include <QStandardItem>
 #include <QStandardItemModel>
-#include <QTime>
 
 
 //*************************************************************************************************************
@@ -116,8 +115,11 @@ public:
     //=========================================================================================================
     /**
     * Default constructor.
+    *
+    * @param[in] iType      The type of the item. See types.h for declaration and definition.
+    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainRTDataTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "RT Data");
+    explicit BrainRTDataTreeItem(const int& iType = BrainTreeModelItemTypes::RTDataItem, const QString& text = "RT Data");
 
     //=========================================================================================================
     /**
@@ -134,34 +136,123 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on annotation information to this model.
+    * Initializes the rt data item with neccessary information for visualization computations.
     *
-    * @param[in] tSurface           FreeSurfer surface.
-    * @param[in] tAnnotation        FreeSurfer annotation.
+    * @param[in] tForwardSolution       The MNEForwardSolution.
+    * @param[in] hemi                   The hemispehre of this brain rt data item. This information is important in order to cut out the wanted source estimations from the MNESourceEstimate
+    * @param[in] arraySurfaceVertColor  The vertex colors for the surface where the data is to be plotted on.
+    * @param[in] vecLabelIds            The label ids for each surface vertex index.
+    * @param[in] lLabels                The label list.
+    *
+    * @return                           Returns true if successful.
+    */
+    bool init(const MNEForwardSolution& tForwardSolution, const QByteArray &arraySurfaceVertColor, const int& iHemi, const VectorXi& vecLabelIds = VectorXi(0), const QList<FSLIB::Label>& lLabels = QList<FSLIB::Label>());
+
+    //=========================================================================================================
+    /**
+    * Adds actual rt data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
+    *
+    * @param[in] tSourceEstimate    The MNESourceEstimate data.
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution, const QString& hemi = "Unknown");
+    bool addData(const MNESourceEstimate& tSourceEstimate);
 
-    bool updateData(const MNESourceEstimate& tSourceEstimate);
-
+    //=========================================================================================================
+    /**
+    * Updates the rt data which is streamed by this item's worker thread item.
+    *
+    * @return                       Returns true if this item is initialized.
+    */
     inline bool isInit() const;
 
-signals:
-    void rtDataUpdated(VectorXd sourceSamples, VectorXi vertexIndex, QString sColorMapType);
+public slots:
+    //=========================================================================================================
+    /**
+    * This slot gets called whenever the origin of the surface vertex color (curvature, annoation, etc.) changed.
+    *
+    * @param[in] arrayVertColor     The new vertex colors.
+    */
+    void onColorInfoOriginChanged(const QByteArray& arrayVertColor);
+
+    //=========================================================================================================
+    /**
+    * This slot gets called whenever the check/actiation state of the rt data worker changed.
+    *
+    * @param[in] checkState     The check state of the worker.
+    */
+    void onCheckStateWorkerChanged(const Qt::CheckState& checkState);
+
+    //=========================================================================================================
+    /**
+    * This slot gets called whenever this item receives new color values for each estimated source.
+    *
+    * @param[in] sourceColorSamples     The color values for each estimated source.
+    */
+    void onNewRtData(QByteArray sourceColorSamples);
+
+    //=========================================================================================================
+    /**
+    * This slot gets called whenever the used colormap type changed.
+    *
+    * @param[in] sColormapType     The name of the new colormap type.
+    */
+    void onColormapTypeChanged(const QString& sColormapType);
+
+    //=========================================================================================================
+    /**
+    * This slot gets called whenever the time interval in between the streamed samples changed.
+    *
+    * @param[in] iMSec     The new time in milliseconds waited in between each streamed sample.
+    */
+    void onTimeIntervalChanged(const int& iMSec);
+
+    //=========================================================================================================
+    /**
+    * This slot gets called whenever the normaization value changed. The normalization value is used to normalize the estimated source activation.
+    *
+    * @param[in] iMSec     The new time normalization value.
+    */
+    void onDataNormalizationValueChanged(const double& dValue);
+
+    //=========================================================================================================
+    /**
+    * This slot gets called whenever the preferred visualization type changes (single vertex, smoothing, annotation based). This functions translates from QString to m_iVisualizationType.
+    *
+    * @param[in] sVisType     The new visualization type.
+    */
+    void onVisualizationTypeChanged(const QString& sVisType);
+
+    //=========================================================================================================
+    /**
+    * This slot gets called whenever the check/actiation state of the looped streaming state changed.
+    *
+    * @param[in] checkState     The check state of the looped streaming state.
+    */
+    void onCheckStateLoopedStateChanged(const Qt::CheckState& checkState);
+
+    //=========================================================================================================
+    /**
+    * This slot gets called whenever the number of averages of the streamed samples changed.
+    *
+    * @param[in] iNumAvr     The new number of averages.
+    */
+    void onNumberAveragesChanged(const int& iNumAvr);
 
 private:
-    void onCheckStateChanged(const Qt::CheckState& checkState);
-    void onStcSample(VectorXd sourceSamples);
-    void onStreamingIntervalChanged(const int& usec);
+    bool                        m_bIsInit;                      /**< The init flag. */
 
-    bool        m_bInit;
+    RtSourceLocDataWorker*      m_pSourceLocRtDataWorker;       /**< The source data worker. This worker streams the rt data to this item.*/
 
-    double      m_dStcNormMax;
-
-    StcDataWorker*      m_pStcDataWorker;
-    BrainTreeItem*      m_pItemSourceLocNormValue;
-    BrainTreeItem*      m_pItemColormapType;
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever you want to provide newly generated colors from the stream rt data.
+    *
+    * @param[in] sourceColorSamples     The color values for each estimated source.
+    * @param[in] vertexIndex            The vertex idnex of each estiamted source.
+    */
+    void rtVertColorChanged(QByteArray sourceColorSamples, VectorXi vertexIndex);
 };
 
 //*************************************************************************************************************
@@ -171,7 +262,7 @@ private:
 
 inline bool BrainRTDataTreeItem::isInit() const
 {
-    return m_bInit;
+    return m_bIsInit;
 }
 
 } //NAMESPACE DISP3DNEWLIB

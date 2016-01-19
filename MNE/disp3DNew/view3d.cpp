@@ -64,9 +64,8 @@ View3D::View3D()
 , m_pBrain(Brain::SPtr(new Brain(m_pRootEntity)))
 , m_bCameraRotationMode(false)
 , m_bCameraTransMode(false)
-, m_fCameraScale(0.0f)
-, m_vecCameraTrans(QVector3D(0.0,0.0,0.0))
-, m_vecCameraTransOld(QVector3D(0.0,0.0,0.0))
+, m_vecCameraTrans(QVector3D(0.0,0.0,-0.5))
+, m_vecCameraTransOld(QVector3D(0.0,0.0,-0.5))
 , m_vecCameraRotation(QVector3D(0.0,0.0,0.0))
 , m_vecCameraRotationOld(QVector3D(0.0,0.0,0.0))
 {
@@ -86,6 +85,8 @@ View3D::~View3D()
 
 void View3D::initMetatypes()
 {
+    qRegisterMetaType<QByteArray>();
+
     qRegisterMetaType<Eigen::MatrixX3i>();
     qRegisterMetaType<Eigen::MatrixXd>();
     qRegisterMetaType<Eigen::MatrixX3f>();
@@ -159,6 +160,7 @@ void View3D::initTransformations()
 {
     // Initialize camera transforms
     m_pCameraTransform = new Qt3DCore::QTransform;
+    m_pCameraTransform->setTranslation(m_vecCameraTrans);
     m_pCameraEntity->addComponent(m_pCameraTransform);
 }
 
@@ -181,7 +183,23 @@ bool View3D::addBrainData(const QString& text, const Surface& tSurface, const An
 
 //*************************************************************************************************************
 
-QList<BrainRTDataTreeItem*> View3D::addSourceEstimate(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
+bool View3D::addBrainData(const QString& text, const MNESourceSpace& tSourceSpace)
+{
+    return m_pBrain->addData(text, tSourceSpace);
+}
+
+
+//*************************************************************************************************************
+
+bool View3D::addBrainData(const QString& text, const MNEForwardSolution& tForwardSolution)
+{
+    return m_pBrain->addData(text, tForwardSolution.src);
+}
+
+
+//*************************************************************************************************************
+
+QList<BrainRTDataTreeItem*> View3D::addRtBrainData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
     return m_pBrain->addData(text, tSourceEstimate, tForwardSolution);
 }
@@ -197,7 +215,7 @@ BrainTreeModel* View3D::getBrainTreeModel()
 
 //*************************************************************************************************************
 
-void View3D::changeSceneColor(const QColor& colSceneColor)
+void View3D::setSceneColor(const QColor& colSceneColor)
 {
     m_pForwardRenderer->setClearColor(colSceneColor);
 }
@@ -247,12 +265,11 @@ void View3D::mousePressEvent(QMouseEvent* e)
 void View3D::wheelEvent(QWheelEvent* e)
 {
     if(e->angleDelta().y() > 0)
-        m_fCameraScale += 0.1f;
+        m_vecCameraTrans.setZ(m_vecCameraTrans.z() + 0.05f);
     else
-        m_fCameraScale -= 0.1f;
+        m_vecCameraTrans.setZ(m_vecCameraTrans.z() - 0.05f);
 
     // Transform
-    m_vecCameraTrans.setZ(m_fCameraScale);
     m_pCameraTransform->setTranslation(m_vecCameraTrans);
 
     Window::wheelEvent(e);
@@ -285,8 +302,8 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
     }
 
     if(m_bCameraTransMode) {
-        m_vecCameraTrans.setX(((e->pos().x() - m_mousePressPositon.x()) * 0.001f) + m_vecCameraTransOld.x());
-        m_vecCameraTrans.setY(((e->pos().y() - m_mousePressPositon.y()) * -0.001f) + m_vecCameraTransOld.y());
+        m_vecCameraTrans.setX(((e->pos().x() - m_mousePressPositon.x()) * 0.0001f) + m_vecCameraTransOld.x());
+        m_vecCameraTrans.setY(((e->pos().y() - m_mousePressPositon.y()) * -0.0001f) + m_vecCameraTransOld.y());
 
         // Camera translation transform
         m_pCameraTransform->setTranslation(m_vecCameraTrans);

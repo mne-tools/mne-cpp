@@ -133,6 +133,7 @@ public:
     /**
     * Adds FreeSurfer brain data SET.
     *
+    * @param[in] text               The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
     * @param[in] tSurfaceSet        FreeSurfer surface set.
     * @param[in] tAnnotationSet     FreeSurfer annotation set.
     *
@@ -144,6 +145,7 @@ public:
     /**
     * Adds FreeSurfer single brain data.
     *
+    * @param[in] text               The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
     * @param[in] tSurface           FreeSurfer surface.
     * @param[in] tAnnotation        FreeSurfer annotation.
     *
@@ -151,11 +153,55 @@ public:
     */
     bool addBrainData(const QString& text, const Surface& tSurface, const Annotation& tAnnotation = Annotation());
 
-    QList<BrainRTDataTreeItem*> addSourceEstimate(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution);
+    //=========================================================================================================
+    /**
+    * Adds source space data to the brain tree model.
+    *
+    * @param[in] text               The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
+    * @param[in] tSourceSpace       The source space information.
+    *
+    * @return                       Returns true if successful.
+    */
+    bool addBrainData(const QString& text, const MNESourceSpace& tSourceSpace);
 
+    //=========================================================================================================
+    /**
+    * Adds a forward solution data to the brain tree model. Convenient function to addBrainData(const QString& text, const MNESourceSpace& tSourceSpace).
+    *
+    * @param[in] text               The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
+    * @param[in] tForwardSolution   The forward solution information.
+    *
+    * @return                       Returns true if successful.
+    */
+    bool addBrainData(const QString& text, const MNEForwardSolution& tForwardSolution);
+
+    //=========================================================================================================
+    /**
+    * Adds source activity data to the brain tree model.
+    *
+    * @param[in] text                   The name of the hemisphere surface set to which this data should be added.
+    * @param[in] tSourceEstimate        The MNESourceEstimate data.
+    * @param[in] tForwardSolution       The MNEForwardSolution data.
+    *
+    * @return                           Returns a list of the BrainRTDataTreeItem where the data was appended to.
+    */
+    QList<BrainRTDataTreeItem*> addRtBrainData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution = MNEForwardSolution());
+
+    //=========================================================================================================
+    /**
+    * Return the tree model which holds the brain information.
+    *
+    * @return          The BrainTreeModel pointer.
+    */
     BrainTreeModel* getBrainTreeModel();
 
-    void changeSceneColor(const QColor& colSceneColor);
+    //=========================================================================================================
+    /**
+    * Set the background color of the scene.
+    *
+    * @param[in] colSceneColor          The new background color of the view.
+    */
+    void setSceneColor(const QColor& colSceneColor);
 
 protected:
     Qt3DCore::QAspectEngine             m_aspectEngine;                 /**< The aspect engine. */
@@ -178,33 +224,32 @@ protected:
 
     QPoint          m_mousePressPositon;        /**< Position when the mouse was pressed. */
 
-    float           m_fCameraScale;             /**< The current camera scaling factor. */
-
     QVector3D       m_vecCameraTrans;           /**< The camera translation vector. */
     QVector3D       m_vecCameraTransOld;        /**< The camera old translation vector. */
     QVector3D       m_vecCameraRotation;        /**< The camera rotation vector. */
     QVector3D       m_vecCameraRotationOld;     /**< The camera old rotation vector. */
 
+    //=========================================================================================================
+    /**
+    * Init the meta types
+    */
     void initMetatypes();
 
     //=========================================================================================================
     /**
     * Init the 3D view
-    *
     */
     void init();
 
     //=========================================================================================================
     /**
     * Init the 3D views transformation matrices
-    *
     */
     void initTransformations();
 
     //=========================================================================================================
     /**
-    * Virtual functions for mouse and keyboard control
-    *
+    * Window functions
     */
     void keyPressEvent(QKeyEvent* e);
     void mousePressEvent(QMouseEvent* e);

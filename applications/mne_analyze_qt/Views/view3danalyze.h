@@ -1,14 +1,17 @@
 //=============================================================================================================
 /**
-* @file     braintreeitem.cpp
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     view3danalyze.h
+* @author   Franco Polo <Franco-Joel.Polo@tu-ilmenau.de>;
+*			Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     November, 2015
+* @date     January, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Franco Polo, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,78 +32,72 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BrainTreeItem class definition.
+* @brief
 *
+* @file
+*       view3danalyze.cpp
 */
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE
+//=============================================================================================================
+
+#ifndef VIEW3DANALYZE_H
+#define VIEW3DANALYZE_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QWidget>
+#include <QtWidgets/QHBoxLayout>
+#include <QPushButton>
+
+#include "disp3DNew/view3d.h"
+
+#include <fs/surfaceset.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "braintreeitem.h"
-
+#include "baseview.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// NAMESPACES
 //=============================================================================================================
 
+using namespace FSLIB;
 using namespace DISP3DNEWLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-BrainTreeItem::BrainTreeItem(const int& iType, const QString& text)
-: AbstractTreeItem(iType, text)
+class View3DAnalyze : public BaseView
 {
-}
+//=============================================================================================================
+public:
+    //int surface_type is only for testing purposes, to show every surface
+    View3DAnalyze(int surface_type);
+    ~View3DAnalyze();
 
+//=============================================================================================================
 
-//*************************************************************************************************************
+private:
+    //Layout
+    QWidget *m_view3d_container;
+    QGridLayout *m_view3d_gridlayout;
+    //Surface
+    View3D *m_BrainView;
 
-BrainTreeItem::~BrainTreeItem()
-{
-}
+};
 
-
-//*************************************************************************************************************
-
-QVariant BrainTreeItem::data(int role) const
-{
-    return AbstractTreeItem::data(role);
-}
-
-
-//*************************************************************************************************************
-
-void  BrainTreeItem::setData(const QVariant& value, int role)
-{
-    AbstractTreeItem::setData(value, role);
-
-    switch(role) {
-        case BrainTreeItemRoles::SurfaceColorSulci: {
-            emit updateSurfaceVertColors();
-            break;
-        }
-
-        case BrainTreeItemRoles::SurfaceColorGyri: {
-            emit updateSurfaceVertColors();
-            break;
-        }
-
-        case BrainTreeItemRoles::SurfaceColorInfoOrigin: {
-            emit updateSurfaceVertColors();
-            break;
-        }
-
-        case BrainTreeItemRoles::RTDataTimeInterval: {
-            emit rtDataTimeIntervalUpdated(value.toInt());
-            break;
-        }
-    }
-}
-
+#endif // VIEW3DANALYZE_H

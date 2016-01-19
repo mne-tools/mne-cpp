@@ -44,14 +44,14 @@
 #include "../../disp3DNew_global.h"
 
 #include "../../helpers/abstracttreeitem.h"
-#include "braintreeitem.h"
+#include "braintreemetaitem.h"
 
 #include "../../helpers/types.h"
 #include "../../helpers/renderable3Dentity.h"
 
 #include "fs/label.h"
+#include "fs/surface.h"
 
-#include <disp/helpers/colormap.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -64,7 +64,6 @@
 #include <QColor>
 #include <QStandardItem>
 #include <QStandardItemModel>
-#include <QTime>
 
 
 //*************************************************************************************************************
@@ -90,7 +89,7 @@ namespace DISP3DNEWLIB
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace DISPLIB;
+using namespace FSLIB;
 
 
 //*************************************************************************************************************
@@ -116,8 +115,11 @@ public:
     //=========================================================================================================
     /**
     * Default constructor.
+    *
+    * @param[in] iType      The type of the item. See types.h for declaration and definition.
+    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainSurfaceTreeItem(const int& iType = BrainTreeModelItemTypes::UnknownItem, const QString& text = "Surface");
+    explicit BrainSurfaceTreeItem(const int& iType = BrainTreeModelItemTypes::SurfaceItem, const QString& text = "Surface");
 
     //=========================================================================================================
     /**
@@ -130,30 +132,62 @@ public:
     * AbstractTreeItem functions
     */
     QVariant data(int role = Qt::UserRole + 1) const;
-    void  setData(const QVariant& value, int role = Qt::UserRole + 1);
+    void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on surfaces and annotation SETS to this model.
+    * Adds FreeSurfer data based on surface and annotation data to this item.
     *
     * @param[in] tSurface           FreeSurfer surface.
+    * @param[in] parent             The Qt3D entity parent of the new item.
     *
     * @return                       Returns true if successful.
     */
     bool addData(const Surface& tSurface, Qt3DCore::QEntity* parent);
 
-    void updateVertColor();
+public slots:
+    //=========================================================================================================
+    /**
+    * Call this slot whenever new colors for the activation data plotting are available.
+    *
+    * @param[in] sourceColorSamples     The color values for each estimated source.
+    */
+    void onRtVertColorChanged(const QByteArray& sourceColorSamples);
 
-    void updateRtVertColor(const VectorXd &sourceSamples, const VectorXi &vertexIndex, const QString &sColorMapType);
+private slots:
+    //=========================================================================================================
+    /**
+    * Call this slot whenever the curvature color or origin of color information (curvature or annotation) changed.
+    */
+    void onColorInfoOriginOrCurvColorChanged();
 
 private:
-    MatrixX3f createCurvatureVertColor(const VectorXf& curvature, const QColor& colSulci = QColor(50,50,50), const QColor& colGyri = QColor(125,125,125));
+    //=========================================================================================================
+    /**
+    * Creates a QByteArray of colors for given curvature and color data.
+    *
+    * @param[in] curvature      The curvature information.
+    * @param[in] colSulci       The sulci color information.
+    * @param[in] colGyri        The gyri color information.
+    */
+    QByteArray createCurvatureVertColor(const VectorXf& curvature, const QColor& colSulci = QColor(50,50,50), const QColor& colGyri = QColor(125,125,125));
 
-    Renderable3DEntity*     m_pRenderable3DEntity;
+    Renderable3DEntity*     m_pRenderable3DEntity;                      /**< The renderable 3D entity. */
+    Renderable3DEntity*     m_pRenderable3DEntityActivationOverlay;     /**< The renderable 3D entity used as an overlay for activity plotting. */
 
-    BrainTreeItem*          m_pItemSurfColorInfoOrigin; //These are stored as member variables because we do not wat to look for them everytime we call updateVertColor(), especially not whe nwe perform rt source loc
-    BrainTreeItem*          m_pItemSurfColSulci;
-    BrainTreeItem*          m_pItemSurfColGyri;
+    //These are stored as member variables because we do not wat to look for them everytime we call functions, especially not when we perform rt source loc
+    BrainTreeMetaItem*      m_pItemSurfColorInfoOrigin;                 /**< The item which holds the information of the color origin (curvature or annotation). */
+    BrainTreeMetaItem*      m_pItemSurfColSulci;                        /**< The item which holds the sulci color information. */
+    BrainTreeMetaItem*      m_pItemSurfColGyri;                         /**< The item which holds the gyri color information. */
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the origin of the vertex color (from curvature, from annotation) changed.
+    *
+    * @param[in] arrayVertColor      The new vertex colors.
+    */
+    void colorInfoOriginChanged(const QByteArray& arrayVertColor);
 };
 
 } //NAMESPACE DISP3DNEWLIB

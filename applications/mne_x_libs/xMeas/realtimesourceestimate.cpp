@@ -65,6 +65,9 @@ RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
 : NewMeasurement(QMetaType::type("RealTimeSourceEstimate::SPtr"), parent)
 , m_bStcSend(true)
 , m_pMNEStc(new MNESourceEstimate)
+, m_pAnnotSet(AnnotationSet::SPtr(new AnnotationSet))
+, m_pSurfSet(SurfaceSet::SPtr(new SurfaceSet))
+, m_pFwdSolution(MNEForwardSolution::SPtr(new MNEForwardSolution))
 , m_bInitialized(false)
 {
 

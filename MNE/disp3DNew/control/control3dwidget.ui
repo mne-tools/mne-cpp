@@ -67,6 +67,12 @@
            <property name="toolTip">
             <string/>
            </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::SingleSelection</enum>
+           </property>
+           <property name="selectionBehavior">
+            <enum>QAbstractItemView::SelectItems</enum>
+           </property>
           </widget>
          </item>
         </layout>
