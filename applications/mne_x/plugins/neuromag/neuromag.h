@@ -220,6 +220,7 @@ private:
     */
     void initConnector();
 
+    bool readHeader();
 
     QMutex rtServerMutex;
 
@@ -235,6 +236,7 @@ private:
     bool m_bCmdClientIsConnected;               /**< If the command client is connected.*/
 
     QString     m_sNeuromagIP;               /**< The IP Adress of mne_rt_server.*/
+    QString     m_sFiffHeader;  /**< Fiff header information */
 
     QSharedPointer<NeuromagProducer> m_pNeuromagProducer;     /**< Holds the NeuromagnProducer.*/
 
