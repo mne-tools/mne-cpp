@@ -46,6 +46,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace Eigen;
+using namespace MNELIB;
 using namespace DISP3DLIB;
 using namespace Eigen;
 using namespace MNELIB;
@@ -56,7 +58,7 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainRTDataTreeItem::BrainRTDataTreeItem(const int &iType, const QString &text)
+BrainRTDataTreeItem::BrainRTDataTreeItem(int iType, const QString &text)
 : AbstractTreeItem(iType, text)
 , m_bIsInit(false)
 , m_pSourceLocRtDataWorker(new RtSourceLocDataWorker(this))
@@ -98,7 +100,7 @@ void  BrainRTDataTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-bool BrainRTDataTreeItem::init(const MNEForwardSolution& tForwardSolution, const QByteArray& arraySurfaceVertColor, const int& iHemi, const VectorXi& vecLabelIds, const QList<FSLIB::Label>& lLabels)
+bool BrainRTDataTreeItem::init(const MNEForwardSolution& tForwardSolution, const QByteArray& arraySurfaceVertColor, int iHemi, const VectorXi& vecLabelIds, const QList<FSLIB::Label>& lLabels)
 {   
     //Set hemisphere information as item's data
     this->setData(iHemi, BrainRTDataTreeItemRoles::RTHemi);
@@ -266,7 +268,7 @@ void BrainRTDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkS
 
 //*************************************************************************************************************
 
-void BrainRTDataTreeItem::onNewRtData(QByteArray sourceColorSamples)
+void BrainRTDataTreeItem::onNewRtData(const QByteArray& sourceColorSamples)
 {
     emit rtVertColorChanged(sourceColorSamples);
 }
@@ -282,7 +284,7 @@ void BrainRTDataTreeItem::onColormapTypeChanged(const QString& sColormapType)
 
 //*************************************************************************************************************
 
-void BrainRTDataTreeItem::onTimeIntervalChanged(const int& iMSec)
+void BrainRTDataTreeItem::onTimeIntervalChanged(int iMSec)
 {
     m_pSourceLocRtDataWorker->setInterval(iMSec);
 }
@@ -290,7 +292,7 @@ void BrainRTDataTreeItem::onTimeIntervalChanged(const int& iMSec)
 
 //*************************************************************************************************************
 
-void BrainRTDataTreeItem::onDataNormalizationValueChanged(const double& dValue)
+void BrainRTDataTreeItem::onDataNormalizationValueChanged(double dValue)
 {
     m_pSourceLocRtDataWorker->setNormalization(dValue);
 }
@@ -330,7 +332,7 @@ void BrainRTDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& c
 
 //*************************************************************************************************************
 
-void BrainRTDataTreeItem::onNumberAveragesChanged(const int& iNumAvr)
+void BrainRTDataTreeItem::onNumberAveragesChanged(int iNumAvr)
 {
     m_pSourceLocRtDataWorker->setNumberAverages(iNumAvr);
 }

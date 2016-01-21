@@ -49,6 +49,8 @@
 
 #include "braintreemetaitem.h"
 
+#include "fiff/fiff_types.h"
+
 #include "mne/mne_sourceestimate.h"
 #include "mne/mne_forwardsolution.h"
 
@@ -110,7 +112,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainRTDataTreeItem(const int& iType = BrainTreeModelItemTypes::RTDataItem, const QString& text = "RT Data");
+    explicit BrainRTDataTreeItem(int iType = BrainTreeModelItemTypes::RTDataItem, const QString& text = "RT Data");
 
     //=========================================================================================================
     /**
@@ -137,7 +139,7 @@ public:
     *
     * @return                           Returns true if successful.
     */
-    bool init(const MNELIB::MNEForwardSolution& tForwardSolution, const QByteArray &arraySurfaceVertColor, const int& iHemi, const Eigen::VectorXi& vecLabelIds = VectorXi(0), const QList<FSLIB::Label>& lLabels = QList<FSLIB::Label>());
+    bool init(const MNELIB::MNEForwardSolution& tForwardSolution, const QByteArray &arraySurfaceVertColor, int iHemi, const Eigen::VectorXi& vecLabelIds = VectorXi(0), const QList<FSLIB::Label>& lLabels = QList<FSLIB::Label>());
 
     //=========================================================================================================
     /**
@@ -180,7 +182,7 @@ public slots:
     *
     * @param[in] sourceColorSamples     The color values for each estimated source.
     */
-    void onNewRtData(QByteArray sourceColorSamples);
+    void onNewRtData(const QByteArray& sourceColorSamples);
 
     //=========================================================================================================
     /**
@@ -196,7 +198,7 @@ public slots:
     *
     * @param[in] iMSec     The new time in milliseconds waited in between each streamed sample.
     */
-    void onTimeIntervalChanged(const int& iMSec);
+    void onTimeIntervalChanged(int iMSec);
 
     //=========================================================================================================
     /**
@@ -204,7 +206,7 @@ public slots:
     *
     * @param[in] iMSec     The new time normalization value.
     */
-    void onDataNormalizationValueChanged(const double& dValue);
+    void onDataNormalizationValueChanged(double dValue);
 
     //=========================================================================================================
     /**
@@ -228,7 +230,7 @@ public slots:
     *
     * @param[in] iNumAvr     The new number of averages.
     */
-    void onNumberAveragesChanged(const int& iNumAvr);
+    void onNumberAveragesChanged(int iNumAvr);
 
 private:
     bool                        m_bIsInit;                      /**< The init flag. */

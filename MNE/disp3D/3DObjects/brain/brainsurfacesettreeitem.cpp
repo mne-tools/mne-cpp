@@ -46,6 +46,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace Eigen;
+using namespace FSLIB;
+using namespace MNELIB;
 using namespace DISP3DLIB;
 using namespace FSLIB;
 using namespace MNELIB;
@@ -55,7 +58,7 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainSurfaceSetTreeItem::BrainSurfaceSetTreeItem(const int& iType, const QString& text)
+BrainSurfaceSetTreeItem::BrainSurfaceSetTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
     this->setEditable(false);
@@ -152,7 +155,7 @@ bool BrainSurfaceSetTreeItem::addData(const MNESourceSpace& tSourceSpace, Qt3DCo
     bool hemiItemFound = false;
 
     //Search for already created hemi items and add source space data respectivley
-    for(int i = 0; i<tSourceSpace.size(); i++) {
+    for(int i = 0; i < tSourceSpace.size(); i++) {
         for(int j = 0; j<itemList.size(); j++) {
             BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j));
 
