@@ -247,7 +247,7 @@ void IOUtils::write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QS
     if(file.open(QIODevice::WriteOnly|QIODevice::Truncate))
     {
         QTextStream stream(&file);
-        stream<<"Dimensions (rows x cols): "<<in.rows()<<" x "<<in.cols()<<"\n";
+        stream<<"Dim "<<in.rows()<<" "<<in.cols()<<"\n";
         for(int row = 0; row<in.rows(); row++) {
             for(int col = 0; col<in.cols(); col++)
                 stream << in(row, col)<<" ";
@@ -258,4 +258,54 @@ void IOUtils::write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QS
     }
 
     file.close();
+}
+
+
+//*************************************************************************************************************
+
+MatrixXd IOUtils::read_eigen_matrix(const QString &path)
+{
+    MatrixXd out;
+    QFile file(path);
+
+    if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+
+    //Start reading from file
+    QTextStream in(&file);
+    int i=0;
+    QList<VectorXd> help;
+
+    while(!in.atEnd())
+    {
+        QString line = in.readLine();
+        QStringList fields = line.split(QRegExp("\\s+"));
+
+        //Delete last element if it is a blank character
+        if(fields.at(fields.size()-1) == "")
+            fields.removeLast();
+
+        VectorXd x (fields.size());
+        //Read actual electrode position
+        for (int j=0; j<fields.size(); j++)
+        {
+            x(j)=fields.at(j).toDouble();
+        }
+
+        help.append(x);
+
+        i++;
+    }
+
+    out.resize(help.length(),3);
+    for (int i=0; i<help.length(); i++)
+    {
+        out.row(i)=help[i].transpose();
+    }
+
+
+    }else {
+        qWarning()<<"Could not read Eigen element from file! Path does not exist!";
+    }
+
+    return out;
 }

@@ -209,6 +209,17 @@ public:
     */
     template<typename T>
     static void write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QString& path);
+
+    //=========================================================================================================
+    /**
+    * Read Eigen Matrix from file
+    *
+    * @param[in] path       path and file name to write to
+    *
+    * @return   output Eigen Matrix
+    */
+    static MatrixXd read_eigen_matrix(const QString &path);
+
 };
 
 //*************************************************************************************************************
