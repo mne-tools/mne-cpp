@@ -46,6 +46,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace Eigen;
+using namespace MNELIB;
 using namespace DISP3DLIB;
 using namespace Eigen;
 using namespace MNELIB;
@@ -56,7 +58,7 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainSourceSpaceTreeItem::BrainSourceSpaceTreeItem(const int& iType, const QString& text)
+BrainSourceSpaceTreeItem::BrainSourceSpaceTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 , m_pRenderable3DEntity(new Renderable3DEntity())
 {

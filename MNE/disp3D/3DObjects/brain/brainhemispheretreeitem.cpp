@@ -46,6 +46,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace Eigen;
+using namespace FSLIB;
+using namespace MNELIB;
 using namespace DISP3DLIB;
 using namespace Eigen;
 using namespace FSLIB;
@@ -57,7 +60,7 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainHemisphereTreeItem::BrainHemisphereTreeItem(const int& iType, const QString& text)
+BrainHemisphereTreeItem::BrainHemisphereTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
     this->setEditable(false);

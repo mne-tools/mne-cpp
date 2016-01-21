@@ -55,7 +55,7 @@ using namespace FSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainAnnotationTreeItem::BrainAnnotationTreeItem(const int & iType, const QString & text)
+BrainAnnotationTreeItem::BrainAnnotationTreeItem(int iType, const QString & text)
 : AbstractTreeItem(iType, text)
 {
     this->setEditable(false);
