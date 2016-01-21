@@ -77,11 +77,12 @@ Neuromag::Neuromag()
 : m_sNeuromagClientAlias("mne-x")
 , m_pRtCmdClient(NULL)
 , m_bCmdClientIsConnected(false)
-, m_sNeuromagIP("172.21.16.88")//("127.0.0.1")
+, m_sNeuromagIP("141.35.69.116")//("127.0.0.1")
 , m_pNeuromagProducer(new NeuromagProducer(this))
 , m_iBufferSize(-1)
 , m_pRawMatrixBuffer_In(0)
 , m_bIsRunning(false)
+, m_sFiffHeader(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/neuromag/header.fif")
 {
 
 }
@@ -230,6 +231,9 @@ void Neuromag::connectCmdClient()
             //
             if(!m_pFiffInfo)
                 requestInfo();
+
+            if(m_pFiffInfo)
+                readHeader();
 
             //
             // Read Connectors
@@ -381,6 +385,49 @@ QWidget* Neuromag::setupWidget()
     NeuromagSetupWidget* widget = new NeuromagSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
 
     return widget;
+}
+
+
+//*************************************************************************************************************
+
+bool Neuromag::readHeader()
+{
+    QFile t_headerFiffFile(m_sFiffHeader);
+
+    //
+    //   Open the file
+    //
+    FiffStream::SPtr t_pStream(new FiffStream(&t_headerFiffFile));
+    QString t_sFileName = t_pStream->streamName();
+
+    printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
+
+    FiffDirTree t_Tree;
+    QList<FiffDirEntry> t_Dir;
+
+    if(!t_pStream->open(t_Tree, t_Dir))
+        return false;
+
+    QList<FiffProj> q_ListProj = t_pStream->read_proj(t_Tree);
+
+    if (q_ListProj.size() == 0)
+    {
+        printf("Could not find projectors\n");
+        return false;
+    }
+
+    m_pFiffInfo->projs = q_ListProj;
+
+    //
+    //   Activate the projection items
+    //
+    for (qint32 k = 0; k < m_pFiffInfo->projs.size(); ++k)
+        m_pFiffInfo->projs[k].active = true;
+
+    //garbage collecting
+    t_pStream->device()->close();
+
+    return true;
 }
 
 
