@@ -242,7 +242,7 @@ signals:
     *
     * @param[in] sourceColorSamples     The color values for each estimated source.
     */
-    void rtVertColorChanged(QByteArray sourceColorSamples);
+    void rtVertColorChanged(const QByteArray& sourceColorSamples);
 };
 
 //*************************************************************************************************************
