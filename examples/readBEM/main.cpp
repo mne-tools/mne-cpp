@@ -42,6 +42,7 @@
 
 #include <iostream>
 #include <mne/mne.h>
+#include <utils/ioutils.h>
 
 
 //*************************************************************************************************************
@@ -79,21 +80,62 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
 //    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-all-src.fif");
 //    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-bem-sol.fif");
 //    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif");
-    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
 
 
     MNEBem t_Bem (t_fileBem) ;
+
+    QString folder = "C:/Users/Jana/Documents/MATLAB/AVG4-0Years_segmented_BEM3/";
+
+    MNEBem t_BemIso2Mesh;
+    MNEBemSurface  p_Brain;
+    p_Brain.id = FIFFV_BEM_SURF_ID_BRAIN;
+    QString path=folder;
+//    MatrixXd rr = IOUtils::read_eigen_matrix(path.append("brain_vert.txt"));
+    p_Brain.rr = IOUtils::read_eigen_matrix(path.append("brain_vert.txt")).cast<float>();
+    path=folder;
+//    MatrixXd tris = IOUtils::read_eigen_matrix(path.append("brain_tri.txt"));
+    p_Brain.tris = IOUtils::read_eigen_matrix(path.append("brain_tri.txt")).cast<int>();
+    p_Brain.np = p_Brain.rr.rows();
+    p_Brain.ntri = p_Brain.tris.rows();
+    p_Brain.addTriangleData();
+    p_Brain.addVertexNormals();
+    t_BemIso2Mesh<<p_Brain;
+
+    MNEBemSurface  p_Skull;
+    p_Skull.id = FIFFV_BEM_SURF_ID_SKULL;
+    path=folder;
+    p_Skull.rr = IOUtils::read_eigen_matrix(path.append("skull_vert.txt")).cast<float>();
+    path=folder;
+    p_Skull.tris = IOUtils::read_eigen_matrix(path.append("skull_tri.txt")).cast<int>();
+    p_Skull.np = p_Skull.rr.rows();
+    p_Skull.ntri = p_Skull.tris.rows();
+    p_Skull.addTriangleData();
+    p_Skull.addVertexNormals();
+    t_BemIso2Mesh<<p_Skull;
+
+    MNEBemSurface  p_Head;
+    p_Head.id = FIFFV_BEM_SURF_ID_HEAD;
+    path=folder;
+    p_Head.rr = IOUtils::read_eigen_matrix(path.append("head_vert.txt")).cast<float>();
+    path=folder;
+    p_Head.tris = IOUtils::read_eigen_matrix(path.append("head_tri.txt")).cast<int>();
+    p_Head.np = p_Head.rr.rows();
+    p_Head.ntri = p_Head.tris.rows();
+    p_Head.addTriangleData();
+    p_Head.addVertexNormals();
+    t_BemIso2Mesh<<p_Head;
 
     QFile t_fileBemTest("./MNE-sample-data/subjects/sample/bem/sample-head-test.fif");
     t_Bem.write(t_fileBemTest);
     t_fileBemTest.close();
 
 
-    MNELIB::MNEBem t_BemTest (t_fileBemTest) ;
+    MNEBem t_BemTest (t_fileBemTest) ;
 
     qDebug() << "Put your stuff your interest in here";
 

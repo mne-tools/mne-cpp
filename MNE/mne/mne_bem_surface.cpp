@@ -164,8 +164,6 @@ bool MNEBemSurface::addTriangleData()
 
         this->tri_area(i) = size/2.0f;
         this->tri_nn.row(i) /= size;
-
-
     }
 
     std::fstream doc("./Output/tri_area.dat", std::ofstream::out | std::ofstream::trunc);
@@ -196,6 +194,8 @@ bool MNEBemSurface::addVertexNormals()
       //
       //   Accumulate the vertex normals
       //
+
+    this->nn.resize(this->np,3);
 
         for (qint32 p = 0; p < this->ntri; p++)         //check each triangle
         {
