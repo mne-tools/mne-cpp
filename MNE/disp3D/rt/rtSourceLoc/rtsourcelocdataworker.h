@@ -253,8 +253,8 @@ private:
 
     QString                 m_sColormap;            /**< The type of colormap ("Hot", "Hot Negative 1", etc.). */
 
-    QList<FSLIB::Label>     m_lLabels;
-    QMap<qint32, qint32>    m_mapLabelIdSources;
+    QList<FSLIB::Label>     m_lLabels;              /**< The list of current labels. */
+    QMap<qint32, qint32>    m_mapLabelIdSources;    /**< The sources mapped to their corresponding labels. */
 
 signals:
     //=========================================================================================================
