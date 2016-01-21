@@ -75,11 +75,6 @@
 namespace DISP3DLIB
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -119,7 +114,7 @@ public:
     * @param[in] tVecOffset     The offset which is to be used on all the vertices.
     * @param[in] parent         The parent of this class.
     */
-    Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset, Qt3DCore::QEntity* parent = 0);
+    Renderable3DEntity(const Eigen::MatrixX3f& tMatVert, const Eigen::MatrixX3f& tMatNorm, const Eigen::MatrixX3i& tMatTris, const Eigen::Vector3f& tVecOffset, Qt3DCore::QEntity* parent = 0);
 
     //=========================================================================================================
     /**
@@ -146,7 +141,7 @@ public:
     *
     * @return If successful returns true, false otherwise.
     */
-    bool setMeshData(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset, const QByteArray &tArrayColors = QByteArray());
+    bool setMeshData(const Eigen::MatrixX3f& tMatVert, const Eigen::MatrixX3f& tMatNorm, const Eigen::MatrixX3i& tMatTris, const Eigen::Vector3f& tVecOffset, const QByteArray &tArrayColors = QByteArray());
 
     //=========================================================================================================
     /**

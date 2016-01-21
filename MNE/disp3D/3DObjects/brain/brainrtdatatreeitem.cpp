@@ -47,6 +47,8 @@
 //=============================================================================================================
 
 using namespace DISP3DLIB;
+using namespace Eigen;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -266,7 +268,7 @@ void BrainRTDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkS
 
 void BrainRTDataTreeItem::onNewRtData(QByteArray sourceColorSamples)
 {
-    emit rtVertColorChanged(sourceColorSamples, this->data(BrainRTDataTreeItemRoles::RTVertNo).value<VectorXi>());
+    emit rtVertColorChanged(sourceColorSamples);
 }
 
 

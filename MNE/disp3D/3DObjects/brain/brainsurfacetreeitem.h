@@ -85,15 +85,6 @@ namespace DISP3DLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-using namespace FSLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -143,7 +134,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const Surface& tSurface, Qt3DCore::QEntity* parent);
+    bool addData(const FSLIB::Surface& tSurface, Qt3DCore::QEntity* parent);
 
 public slots:
     //=========================================================================================================
@@ -170,7 +161,7 @@ private:
     * @param[in] colSulci       The sulci color information.
     * @param[in] colGyri        The gyri color information.
     */
-    QByteArray createCurvatureVertColor(const VectorXf& curvature, const QColor& colSulci = QColor(50,50,50), const QColor& colGyri = QColor(125,125,125));
+    QByteArray createCurvatureVertColor(const Eigen::VectorXf& curvature, const QColor& colSulci = QColor(50,50,50), const QColor& colGyri = QColor(125,125,125));
 
     Renderable3DEntity*     m_pRenderable3DEntity;                      /**< The renderable 3D entity. */
     Renderable3DEntity*     m_pRenderable3DEntityActivationOverlay;     /**< The renderable 3D entity used as an overlay for activity plotting. */

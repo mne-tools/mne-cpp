@@ -90,11 +90,6 @@
 namespace DISP3DLIB
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -139,7 +134,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addBrainData(const QString& text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet = AnnotationSet());
+    bool addBrainData(const QString& text, const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet = FSLIB::AnnotationSet());
 
     //=========================================================================================================
     /**
@@ -151,7 +146,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addBrainData(const QString& text, const Surface& tSurface, const Annotation& tAnnotation = Annotation());
+    bool addBrainData(const QString& text, const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation = FSLIB::Annotation());
 
     //=========================================================================================================
     /**
@@ -162,7 +157,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addBrainData(const QString& text, const MNESourceSpace& tSourceSpace);
+    bool addBrainData(const QString& text, const MNELIB::MNESourceSpace& tSourceSpace);
 
     //=========================================================================================================
     /**
@@ -173,7 +168,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addBrainData(const QString& text, const MNEForwardSolution& tForwardSolution);
+    bool addBrainData(const QString& text, const MNELIB::MNEForwardSolution& tForwardSolution);
 
     //=========================================================================================================
     /**
@@ -185,7 +180,7 @@ public:
     *
     * @return                           Returns a list of the BrainRTDataTreeItem where the data was appended to.
     */
-    QList<BrainRTDataTreeItem*> addRtBrainData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution = MNEForwardSolution());
+    QList<BrainRTDataTreeItem*> addRtBrainData(const QString& text, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
 
     //=========================================================================================================
     /**
