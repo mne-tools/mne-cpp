@@ -6,8 +6,8 @@ MNE cross-platform standalone MEG/EEG (real-time) applications using [Qt5](http:
 For more information please visit http://wwww.mne-cpp.org.
 
 
-Getting and building the latest code
-====================================
+Get and build the latest code
+=============================
 
 To get the latest code and build it follow this [guide](http://wiki.mne-cpp.org/index.php/Step_by_Step_Setup_Guide). 
 
