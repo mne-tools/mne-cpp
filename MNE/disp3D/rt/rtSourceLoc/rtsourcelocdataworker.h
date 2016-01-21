@@ -123,7 +123,7 @@ public:
     *
     * @param[in] data         The new data.
     */
-    void addData(const MatrixXd& data);
+    void addData(const Eigen::MatrixXd& data);
 
     //=========================================================================================================
     /**
@@ -138,7 +138,7 @@ public:
     * @param[in] arraySurfaceVertColor  The vertex colors for the surface where the data is to be plotted on.
     * @param[in] vecVertNo              The vertex indexes.
     */
-    void setSurfaceData(const QByteArray& arraySurfaceVertColor, const VectorXi& vecVertNo);
+    void setSurfaceData(const QByteArray& arraySurfaceVertColor, const Eigen::VectorXi& vecVertNo);
 
     //=========================================================================================================
     /**
@@ -147,7 +147,7 @@ public:
     * @param[in] vecLabelIds            The labels ids for each of the surface vertex idx.
     * @param[in] lLabels                The label information.
     */
-    void setAnnotationData(const VectorXi& vecLabelIds, const QList<FSLIB::Label>& lLabels);
+    void setAnnotationData(const Eigen::VectorXi& vecLabelIds, const QList<FSLIB::Label>& lLabels);
 
     //=========================================================================================================
     /**
@@ -220,7 +220,7 @@ private:
     *
     * @return                               Returns the final colors in form of a QByteArray.
     */
-    QByteArray performVisualizationTypeCalculation(const VectorXd& sourceColorSamples);
+    QByteArray performVisualizationTypeCalculation(const Eigen::VectorXd& sourceColorSamples);
 
     //=========================================================================================================
     /**
@@ -230,31 +230,31 @@ private:
     *
     * @return                       Returns the colors in form of a QByteArray.
     */
-    QByteArray transformDataToColor(const VectorXd& data);
+    QByteArray transformDataToColor(const Eigen::VectorXd& data);
 
-    QMutex          m_qMutex;               /**< The thread's mutex. */
+    QMutex                  m_qMutex;               /**< The thread's mutex. */
 
-    QByteArray      m_arraySurfaceVertColor;/**< The vertex colors for the surface where the data is to be plotted on. */
-    QList<VectorXd> m_lData;                /**< List that holds the fiff matrix data <n_channels x n_samples>. */
-    VectorXi        m_vecVertNo;            /**< Vector with the source vertx indexes. */
+    QByteArray              m_arraySurfaceVertColor;/**< The vertex colors for the surface where the data is to be plotted on. */
+    QList<Eigen::VectorXd>  m_lData;                /**< List that holds the fiff matrix data <n_channels x n_samples>. */
+    VectorXi                m_vecVertNo;            /**< Vector with the source vertx indexes. */
 
-    bool            m_bIsRunning;           /**< Flag if this thread is running. */
-    bool            m_bIsLooping;           /**< Flag if this thread should repeat sending the same data over and over again. */
-    bool            m_bSurfaceDataIsInit;   /**< Flag if this thread's surface data was initialized. This flag is used to decide whether specific visualization types can be computed. */
-    bool            m_bAnnotationDataIsInit;/**< Flag if this thread's annotation data was initialized. This flag is used to decide whether specific visualization types can be computed. */
+    bool                    m_bIsRunning;           /**< Flag if this thread is running. */
+    bool                    m_bIsLooping;           /**< Flag if this thread should repeat sending the same data over and over again. */
+    bool                    m_bSurfaceDataIsInit;   /**< Flag if this thread's surface data was initialized. This flag is used to decide whether specific visualization types can be computed. */
+    bool                    m_bAnnotationDataIsInit;/**< Flag if this thread's annotation data was initialized. This flag is used to decide whether specific visualization types can be computed. */
 
-    int             m_iAverageSamples;      /**< Number of average to compute. */
-    int             m_iCurrentSample;       /**< Number of the current sample which is/was streamed. */
-    int             m_iMSecIntervall;       /**< Length in milli Seconds to wait inbetween data samples. */
-    int             m_iVisualizationType;   /**< The visualization type (single vertex, smoothing, annotation based). */
+    int                     m_iAverageSamples;      /**< Number of average to compute. */
+    int                     m_iCurrentSample;       /**< Number of the current sample which is/was streamed. */
+    int                     m_iMSecIntervall;       /**< Length in milli Seconds to wait inbetween data samples. */
+    int                     m_iVisualizationType;   /**< The visualization type (single vertex, smoothing, annotation based). */
 
-    double          m_dNormalization;       /**< Normalization value. */
-    double          m_dNormalizationMax;    /**< Value to normalize to. */
+    double                  m_dNormalization;       /**< Normalization value. */
+    double                  m_dNormalizationMax;    /**< Value to normalize to. */
 
-    QString         m_sColormap;            /**< The type of colormap ("Hot", "Hot Negative 1", etc.). */
+    QString                 m_sColormap;            /**< The type of colormap ("Hot", "Hot Negative 1", etc.). */
 
-    QList<FSLIB::Label>         m_lLabels;
-    QMap<qint32, qint32>        m_mapLabelIdSources;
+    QList<FSLIB::Label>     m_lLabels;
+    QMap<qint32, qint32>    m_mapLabelIdSources;
 
 signals:
     //=========================================================================================================

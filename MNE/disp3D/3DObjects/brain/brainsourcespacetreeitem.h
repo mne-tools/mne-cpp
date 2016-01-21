@@ -90,15 +90,6 @@ namespace DISP3DLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-using namespace MNELIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -148,7 +139,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const MNEHemisphere& tHemisphere, Qt3DCore::QEntity* parent);
+    bool addData(const MNELIB::MNEHemisphere& tHemisphere, Qt3DCore::QEntity* parent);
 
 private slots:
     //=========================================================================================================
@@ -167,7 +158,7 @@ private:
     * @param[in] vertices       The vertices information.
     * @param[in] color          The vertex color information.
     */
-    QByteArray createVertColor(const MatrixXf& vertices, const QColor& color = QColor(100,100,100));
+    QByteArray createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100));
 
     Renderable3DEntity*     m_pRenderable3DEntity;                      /**< The renderable 3D entity. */
 

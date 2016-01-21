@@ -85,15 +85,6 @@ namespace DISP3DLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-using namespace MNELIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -146,7 +137,7 @@ public:
     *
     * @return                           Returns true if successful.
     */
-    bool init(const MNEForwardSolution& tForwardSolution, const QByteArray &arraySurfaceVertColor, const int& iHemi, const VectorXi& vecLabelIds = VectorXi(0), const QList<FSLIB::Label>& lLabels = QList<FSLIB::Label>());
+    bool init(const MNELIB::MNEForwardSolution& tForwardSolution, const QByteArray &arraySurfaceVertColor, const int& iHemi, const Eigen::VectorXi& vecLabelIds = VectorXi(0), const QList<FSLIB::Label>& lLabels = QList<FSLIB::Label>());
 
     //=========================================================================================================
     /**
@@ -156,7 +147,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const MNESourceEstimate& tSourceEstimate);
+    bool addData(const MNELIB::MNESourceEstimate& tSourceEstimate);
 
     //=========================================================================================================
     /**
@@ -250,9 +241,8 @@ signals:
     * Emit this signal whenever you want to provide newly generated colors from the stream rt data.
     *
     * @param[in] sourceColorSamples     The color values for each estimated source.
-    * @param[in] vertexIndex            The vertex idnex of each estiamted source.
     */
-    void rtVertColorChanged(QByteArray sourceColorSamples, VectorXi vertexIndex);
+    void rtVertColorChanged(QByteArray sourceColorSamples);
 };
 
 //*************************************************************************************************************

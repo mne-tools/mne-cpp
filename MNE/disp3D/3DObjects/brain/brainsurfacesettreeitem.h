@@ -83,15 +83,6 @@ namespace DISP3DLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-using namespace FSLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -142,7 +133,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent = 0);
+    bool addData(const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -154,7 +145,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
+    bool addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
@@ -165,7 +156,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent = 0);
+    bool addData(const MNELIB::MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent = 0);
 
 private:
 };

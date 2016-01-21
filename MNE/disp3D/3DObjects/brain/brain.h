@@ -73,13 +73,6 @@
 namespace DISP3DLIB
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FSLIB;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -125,7 +118,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const QString& text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet);
+    bool addData(const QString& text, const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet);
 
     //=========================================================================================================
     /**
@@ -137,7 +130,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const QString& text, const Surface& tSurface, const Annotation& tAnnotation);
+    bool addData(const QString& text, const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation);
 
     //=========================================================================================================
     /**
@@ -148,7 +141,7 @@ public:
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const QString& text, const MNESourceSpace& tSourceSpace);
+    bool addData(const QString& text, const MNELIB::MNESourceSpace& tSourceSpace);
 
     //=========================================================================================================
     /**
@@ -160,7 +153,7 @@ public:
     *
     * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
     */
-    QList<BrainRTDataTreeItem*> addData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution = MNEForwardSolution());
+    QList<BrainRTDataTreeItem*> addData(const QString& text, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
 
     //=========================================================================================================
     /**
