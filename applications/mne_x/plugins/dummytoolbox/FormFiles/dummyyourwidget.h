@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     dummytoolbox.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     January, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,16 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ECGSetupWidget class.
+* @brief    Contains the declaration of the DummyYourWidget class.
 *
 */
+
+#ifndef DUMMYYOURWIDGET_H
+#define DUMMYYOURWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "dummysetupwidget.h"
+#include "../ui_dummyyourtoolbarwidget.h"
 
 
 //*************************************************************************************************************
@@ -46,44 +49,53 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
+#include <QWidget>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE DummyToolboxPlugin
 //=============================================================================================================
 
-using namespace DummyToolboxPlugin;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-DummySetupWidget::DummySetupWidget(DummyToolbox* toolbox, QWidget *parent)
-: QWidget(parent)
-, m_pDummyToolbox(toolbox)
-{
-    ui.setupUi(this);
-
-    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
-}
-
-
-//*************************************************************************************************************
-
-DummySetupWidget::~DummySetupWidget()
+namespace DummyToolboxPlugin
 {
 
-}
-
 
 //*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
-void DummySetupWidget::showAboutDialog()
-{
-    DummyAboutWidget aboutDialog(this);
-    aboutDialog.exec();
+
+//=============================================================================================================
+/**
+* DECLARE CLASS DummyYourWidget
+*
+* @brief The DummyToolbox class provides a dummy toolbar widget structure.
+*/
 }
+class DummyYourWidget : public QWidget
+{
+    Q_OBJECT
+
+public:
+    typedef QSharedPointer<DummyYourWidget> SPtr;         /**< Shared pointer type for DummyYourWidget. */
+    typedef QSharedPointer<DummyYourWidget> ConstSPtr;    /**< Const shared pointer type for DummyYourWidget. */
+
+    //=========================================================================================================
+    /**
+    * Constructs a DummyToolbox.
+    */
+    explicit DummyYourWidget(QWidget *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Destroys the DummyToolbox.
+    */
+    ~DummyYourWidget();
+
+private:
+    Ui::DummyYourToolbarWidget* ui;        /**< The UI class specified in the designer. */
+};
+
+#endif // DUMMYYOURWIDGET_H

@@ -45,8 +45,10 @@
 #include "dummytoolbox_global.h"
 
 #include <mne_x/Interfaces/IAlgorithm.h>
-#include <generics/circularbuffer.h>
-#include <xMeas/newrealtimesamplearray.h>
+#include <generics/circularmatrixbuffer.h>
+#include <xMeas/newrealtimemultisamplearray.h>
+#include "FormFiles/dummysetupwidget.h"
+#include "FormFiles/dummyyourwidget.h"
 
 
 //*************************************************************************************************************
@@ -55,6 +57,8 @@
 //=============================================================================================================
 
 #include <QtWidgets>
+#include <QtCore/QtPlugin>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -64,16 +68,6 @@
 
 namespace DummyToolboxPlugin
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace MNEX;
-using namespace XMEASLIB;
-using namespace IOBuffer;
 
 
 //*************************************************************************************************************
@@ -88,7 +82,7 @@ using namespace IOBuffer;
 *
 * @brief The DummyToolbox class provides a dummy algorithm structure.
 */
-class DUMMYTOOLBOXSHARED_EXPORT DummyToolbox : public IAlgorithm
+class DUMMYTOOLBOXSHARED_EXPORT DummyToolbox : public MNEX::IAlgorithm
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "dummytoolbox.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
@@ -110,42 +104,52 @@ public:
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
+    * IAlgorithm functions
     */
+    virtual QSharedPointer<MNEX::IPlugin> clone() const;
     virtual void init();
-
-    //=========================================================================================================
-    /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
     virtual void unload();
-
-    //=========================================================================================================
-    /**
-    * Clone the plugin
-    */
-    virtual QSharedPointer<IPlugin> clone() const;
-
     virtual bool start();
     virtual bool stop();
-
-    virtual IPlugin::PluginType getType() const;
+    virtual MNEX::IPlugin::PluginType getType() const;
     virtual QString getName() const;
-
     virtual QWidget* setupWidget();
 
+    //=========================================================================================================
+    /**
+    * Udates the pugin with new (incoming) data.
+    *
+    * @param[in] pMeasurement    The incoming data in form of a generalized NewMeasurement.
+    */
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
 protected:
+    //=========================================================================================================
+    /**
+    * IAlgorithm function
+    */
     virtual void run();
 
+    void showYourWidget();
+
 private:
-    bool m_bIsRunning;
+    bool                                            m_bIsRunning;           /**< Flag whether thread is running.*/
 
-    PluginInputData<NewRealTimeSampleArray>::SPtr   m_pDummyInput;      /**< The RealTimeSampleArray of the DummyToolbox input.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pDummyOutput;    /**< The RealTimeSampleArray of the DummyToolbox output.*/
+    FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;            /**< Fiff measurement info.*/
+    QSharedPointer<DummyYourWidget>                 m_pYourWidget;          /**< flag whether thread is running.*/
+    QAction*                                        m_pActionShowYourWidget;/**< flag whether thread is running.*/
 
-    dBuffer::SPtr   m_pDummyBuffer;      /**< Holds incoming data.*/
+    IOBuffer::CircularMatrixBuffer<double>::SPtr    m_pDummyBuffer;         /**< Holds incoming data.*/
+
+    MNEX::PluginInputData<XMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pDummyInput;      /**< The NewRealTimeMultiSampleArray of the DummyToolbox input.*/
+    MNEX::PluginOutputData<XMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pDummyOutput;     /**< The NewRealTimeMultiSampleArray of the DummyToolbox output.*/
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emitted when fiffInfo is available
+    */
+    void fiffInfoAvailable();
 };
 
 } // NAMESPACE

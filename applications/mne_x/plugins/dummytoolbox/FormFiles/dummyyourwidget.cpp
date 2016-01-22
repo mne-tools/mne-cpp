@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.cpp
+* @file     dummytoolbox.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ECGSetupWidget class.
+* @brief    Contains the implementation of the DummyYourWidget class.
 *
 */
 
@@ -38,15 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "dummysetupwidget.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
+#include "dummyyourwidget.h"
 
 
 //*************************************************************************************************************
@@ -62,28 +54,17 @@ using namespace DummyToolboxPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DummySetupWidget::DummySetupWidget(DummyToolbox* toolbox, QWidget *parent)
+DummyYourWidget::DummyYourWidget(QWidget *parent)
 : QWidget(parent)
-, m_pDummyToolbox(toolbox)
+, ui(new Ui::DummyYourToolbarWidget)
 {
-    ui.setupUi(this);
-
-    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
+    ui->setupUi(this);
 }
 
 
 //*************************************************************************************************************
 
-DummySetupWidget::~DummySetupWidget()
+DummyYourWidget::~DummyYourWidget()
 {
-
-}
-
-
-//*************************************************************************************************************
-
-void DummySetupWidget::showAboutDialog()
-{
-    DummyAboutWidget aboutDialog(this);
-    aboutDialog.exec();
+    delete ui;
 }
