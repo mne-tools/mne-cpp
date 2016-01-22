@@ -36,7 +36,7 @@ include (../../../mne-cpp.pri)
 
 TEMPLATE = aux
 
-INSTALLER_TARGET = mne-cpp-windows-x86_64_1.0.0
+INSTALLER_TARGET = mne-cpp-windows-x86_64-1.0.0-beta
 
 OTHER_FILES = \
     readme.txt \
