@@ -1,6 +1,6 @@
 # ###startdir### %WORKSPACE%/mne-cpp/..
 # %0 Build Number
-arg0=%0
+# arg0=%0
 
 echo Starting MNE-CPP Linux Ubuntu Build
 
