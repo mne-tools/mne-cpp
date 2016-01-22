@@ -141,6 +141,15 @@ bool RtCov::stop()
 
 void RtCov::run()
 {
+    //SETUP
+    QStringList exclude;
+    for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
+        if(m_pFiffInfo->chs.at(i).kind == FIFFV_STIM_CH) {
+            exclude << m_pFiffInfo->chs.at(i).ch_name;
+        }
+    }
+    bool doProj = true;
+
     quint32 n_samples = 0;
 
     FiffCov::SPtr cov(new FiffCov());
@@ -181,7 +190,7 @@ void RtCov::run()
                 cov->nfree = n_samples;
 
                 // regularize noise covariance
-                *cov.data() = cov->regularize(*m_pFiffInfo, 0.05, 0.05, 0.1, true);
+                *cov.data() = cov->regularize(*m_pFiffInfo, 0.05, 0.05, 0.1, doProj, exclude);
 
                 emit covCalculated(cov);
 

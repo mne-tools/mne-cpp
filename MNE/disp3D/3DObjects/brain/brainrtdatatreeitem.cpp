@@ -229,10 +229,13 @@ bool BrainRTDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate)
         return false;
     }
 
-    qDebug()<<"Adding rt data";
-
     int iStartIdx = this->data(BrainRTDataTreeItemRoles::RTStartIdx).toInt();
     int iEndIdx = this->data(BrainRTDataTreeItemRoles::RTEndIdx).toInt();
+
+    if(iStartIdx >= tSourceEstimate.data.rows() || iEndIdx >= tSourceEstimate.data.rows()) {
+        qDebug()<<"BrainRTDataTreeItem::addData - Start and/or end index do not match with incoming data";
+        return false;
+    }
 
     MatrixXd subData = tSourceEstimate.data.block(iStartIdx, 0, iEndIdx-iStartIdx+1, tSourceEstimate.data.cols());
 

@@ -148,8 +148,19 @@ void RealTimeSourceEstimateWidget::getData()
         //
         // Add Data
         //
-        for(int i = 0; i<m_lRtItem.size(); i++) {
-            m_lRtItem.at(i)->addData(*m_pRTSE->getValue());
+        if(m_lRtItem.isEmpty()) {
+            m_lRtItem = m_p3DView->addRtBrainData("HemiLRSet", *m_pRTSE->getValue(), *m_pRTSE->getFwdSolution());
+
+            for(int i = 0; i<m_lRtItem.size(); i++) {
+                m_lRtItem.at(i)->onCheckStateLoopedStateChanged(Qt::Checked);
+                m_lRtItem.at(i)->onTimeIntervalChanged(m_pRTSE->getValue()->tstep*1000000);
+                m_lRtItem.at(i)->onNumberAveragesChanged(10);
+                m_lRtItem.at(i)->onCheckStateWorkerChanged(Qt::Checked);
+            }
+        } else {
+            for(int i = 0; i<m_lRtItem.size(); i++) {
+                m_lRtItem.at(i)->addData(*m_pRTSE->getValue());
+            }
         }
     }
     else
@@ -162,14 +173,6 @@ void RealTimeSourceEstimateWidget::getData()
             // Add Data
             //
             m_p3DView->addBrainData("HemiLRSet", *m_pRTSE->getSurfSet(), *m_pRTSE->getAnnotSet());
-            m_lRtItem = m_p3DView->addRtBrainData("HemiLRSet", *m_pRTSE->getValue(), *m_pRTSE->getFwdSolution());
-
-            for(int i = 0; i<m_lRtItem.size(); i++) {
-                m_lRtItem.at(i)->onCheckStateLoopedStateChanged(Qt::Checked);
-                m_lRtItem.at(i)->onTimeIntervalChanged(m_pRTSE->getValue()->tstep*1000000);
-                m_lRtItem.at(i)->onNumberAveragesChanged(10);
-                m_lRtItem.at(i)->onCheckStateWorkerChanged(Qt::Checked);
-            }
         }
     }
 }
