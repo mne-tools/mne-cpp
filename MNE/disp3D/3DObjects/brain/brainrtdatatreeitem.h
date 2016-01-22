@@ -139,7 +139,7 @@ public:
     *
     * @return                           Returns true if successful.
     */
-    bool init(const MNELIB::MNEForwardSolution& tForwardSolution, const QByteArray &arraySurfaceVertColor, int iHemi, const Eigen::VectorXi& vecLabelIds = VectorXi(0), const QList<FSLIB::Label>& lLabels = QList<FSLIB::Label>());
+    bool init(const MNELIB::MNEForwardSolution& tForwardSolution, const QByteArray &arraySurfaceVertColor, int iHemi, const Eigen::VectorXi& vecLabelIds = FIFFLIB::defaultVectorXi, const QList<FSLIB::Label>& lLabels = QList<FSLIB::Label>());
 
     //=========================================================================================================
     /**
