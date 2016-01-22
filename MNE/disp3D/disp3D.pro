@@ -88,7 +88,7 @@ else {
 }
 
 SOURCES += \
-    view3d.cpp \
+    view3D.cpp \
     3DObjects/brain/brain.cpp \
     3DObjects/brain/braintreemodel.cpp \
     3DObjects/brain/braintreemetaitem.cpp \
@@ -107,7 +107,7 @@ SOURCES += \
     3DObjects/brain/brainsourcespacetreeitem.cpp
 
 HEADERS += \
-    view3d.h \
+    view3D.h \
     3DObjects/brain/brain.h \
     3DObjects/brain/braintreemodel.h \
     3DObjects/brain/braintreemetaitem.h \
@@ -123,7 +123,7 @@ HEADERS += \
     helpers/window.h \
     helpers/types.h \
     control/control3dwidget.h \
-    disp3d_global.h \
+    disp3D_global.h \
     rt/rtSourceLoc/rtsourcelocdataworker.h \
     3DObjects/brain/brainsourcespacetreeitem.h
 

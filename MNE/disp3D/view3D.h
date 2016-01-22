@@ -43,7 +43,7 @@
 
 #include <iostream>
 
-#include "disp3d_global.h"
+#include "disp3D_global.h"
 #include "3DObjects/brain/brain.h"
 #include "helpers/window.h"
 #include "helpers/types.h"
