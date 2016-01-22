@@ -55,7 +55,7 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QPushButton>
 
-#include "disp3D/view3d.h"
+#include <disp3D/view3D.h>
 
 #include <fs/surfaceset.h>
 

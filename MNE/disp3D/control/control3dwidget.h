@@ -41,10 +41,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3d_global.h"
+#include "../disp3D_global.h"
 
 #include "disp/helpers/roundededgeswidget.h"
-#include "../view3d.h"
+#include "../view3D.h"
 #include "../3DObjects/brain/braintreedelegate.h"
 
 
