@@ -66,4 +66,4 @@ nmake clean
 nmake
 
 cd ..
-copy ".\mne-cpp_installer_shadow_build\mne-cpp-windows-x86_64_1.0.0.exe" ".\"
+copy ".\mne-cpp_installer_shadow_build\mne-cpp-windows-x86_64-1.0.0-beta.exe" ".\"
