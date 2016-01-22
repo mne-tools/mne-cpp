@@ -182,7 +182,7 @@ private:
 
     RtCov::SPtr m_pRtCov;                       /**< Real-time covariance. */
 
-    QVector<FiffCov::SPtr>   m_qVecCovData;     /**< Evoked data set */
+    QVector<FiffCov::SPtr>   m_qVecCovData;     /**< Covariance data set */
 
     bool m_bIsRunning;                          /**< If source lab is running */
     bool m_bProcessData;                        /**< If data should be received for processing */

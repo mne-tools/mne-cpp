@@ -195,6 +195,8 @@ BrainRTDataTreeItem* BrainHemisphereTreeItem::addData(const MNESourceEstimate& t
         }
 
         return m_pBrainRtDataTreeItem;
+    } else {
+        qDebug()<<"BrainHemisphereTreeItem::addData - tSourceEstimate is empty";
     }
 
     return new BrainRTDataTreeItem();

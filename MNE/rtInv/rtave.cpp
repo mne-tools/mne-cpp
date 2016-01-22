@@ -464,6 +464,7 @@ void RtAve::reset()
     m_matDataPost.setZero();
 
     //Full real-time evoked response
+    m_pStimEvoked->setInfo(*m_pFiffInfo.data());
     m_pStimEvoked->baseline = m_pairBaselineSec;
     m_pStimEvoked->times.resize(m_iPreStimSamples+m_iPostStimSamples);
     m_pStimEvoked->times[0] = -T*m_iPreStimSamples;

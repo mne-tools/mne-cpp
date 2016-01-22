@@ -341,6 +341,11 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
                 p_exclude << cov.bads[i];
     }
 
+    //Allways exclude all STI channels from covariance computation
+    for(int i=0; i<p_info.chs.size(); i++)
+        if(p_info.chs[i].kind == FIFFV_STIM_CH)
+            p_exclude << p_info.chs[i].ch_name;
+
     RowVectorXi sel_eeg = p_info.pick_types(false, true, false, defaultQStringList, p_exclude);
     RowVectorXi sel_mag = p_info.pick_types(QString("mag"), false, false, defaultQStringList, p_exclude);
     RowVectorXi sel_grad = p_info.pick_types(QString("grad"), false, false, defaultQStringList, p_exclude);
