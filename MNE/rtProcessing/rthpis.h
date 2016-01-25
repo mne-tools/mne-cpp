@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rtinv_global.h"
+#include "rtprocessing_global.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -125,7 +125,7 @@ struct sens {
 *
 * @brief Real-time HPI estimation
 */
-class RTINVSHARED_EXPORT RtHPIS : public QThread
+class RTPROCESSINGSHARED_EXPORT RtHPIS : public QThread
 {
     Q_OBJECT
 public:

@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     rtinv_global.h
+* @file     rtprocessing_global.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     January, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     rtinv library export/import macros.
+* @brief     rtProcessing library export/import macros.
 *
 */
 
-#ifndef RTINV_GLOBAL_H
-#define RTINV_GLOBAL_H
+#ifndef RTPROCESSING_GLOBAL_H
+#define RTPROCESSING_GLOBAL_H
 
 
 //*************************************************************************************************************
@@ -51,17 +52,17 @@
 //=============================================================================================================
 
 #if defined(BUILD_MNECPP_STATIC_LIB)
-#  define RTINVSHARED_EXPORT
-#elif defined(RTINV_LIBRARY)
-#  define RTINVSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#  define RTPROCESSINGSHARED_EXPORT
+#elif defined(RTPROCESSING_LIBRARY)
+#  define RTPROCESSINGSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define RTINVSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define RTPROCESSINGSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-//#if defined(RTINV_LIBRARY)
-//#  define RTINVSHARED_EXPORT Q_DECL_EXPORT  /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+//#if defined(RTPROCESSING_LIBRARY)
+//#  define RTPROCESSINGSHARED_EXPORT Q_DECL_EXPORT  /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 //#else
-//#  define RTINVSHARED_EXPORT Q_DECL_IMPORT  /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+//#  define RTPROCESSINGSHARED_EXPORT Q_DECL_IMPORT  /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 //#endif
 
-#endif // RTINV_GLOBAL_H
+#endif // RTPROCESSING_GLOBAL_H

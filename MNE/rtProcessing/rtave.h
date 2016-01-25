@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rtinv_global.h"
+#include "rtprocessing_global.h"
 #include "utils/detecttrigger.h"
 #include "utils/mnemath.h"
 
@@ -110,7 +110,7 @@ using namespace FIFFLIB;
 *
 * @brief Real-time averaging helper
 */
-class RTINVSHARED_EXPORT RtAve : public QThread
+class RTPROCESSINGSHARED_EXPORT RtAve : public QThread
 {
     Q_OBJECT
 public:

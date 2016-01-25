@@ -48,7 +48,7 @@
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 #include <xMeas/realtimeevoked.h>
-#include <rtInv/rtave.h>
+#include <rtProcessing/rtave.h>
 
 
 //*************************************************************************************************************
