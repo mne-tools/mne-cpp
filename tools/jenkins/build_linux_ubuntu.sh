@@ -15,7 +15,7 @@ make clean
 make -j4
 
 # user package
-# tar cfvz binaries_only_linux.tar.gz bin lib
+tar cfvz mne-cpp-linux-x86_64-1.0.0-beta.tar.gz ../mne-cpp/bin ../mne-cpp/lib
 
 # development package
-# tar cfvz binaries_all_linux.tar.gz *
+# tar cfvz mne-cpp-linux-x86_64-1.0.0-beta_dev.tar.gz *
