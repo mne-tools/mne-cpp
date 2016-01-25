@@ -34,6 +34,10 @@
 *
 */
 
+
+
+
+
 #ifndef GUSBAMPDRIVER_H
 #define GUSBAMPDRIVER_H
 
@@ -43,6 +47,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <windows.h>        //windows.h-library for LPSTR-,UCHAR-, and HANDLE-files
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -59,6 +64,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+
 
 
 //*************************************************************************************************************
@@ -101,6 +107,12 @@ class GUSBAmpProducer;
 */
 class GUSBAmpDriver
 {
+private:
+
+    LPSTR       _masterSerial;
+    const int   SAMPLE_RATE_HZ;
+    const int   NUMBER_OF_SCANS;
+    const UCHAR NUMBER_OF_CHANNELS;
 
 public:
     //=========================================================================================================
@@ -140,6 +152,7 @@ public:
 
 protected:
     GUSBAmpProducer*       m_pGUSBAmpProducer;                /**< A pointer to the corresponding GUSBAmpProducer class.*/
+
 };
 
 } // NAMESPACE

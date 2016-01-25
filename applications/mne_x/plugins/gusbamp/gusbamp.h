@@ -34,6 +34,9 @@
 *
 */
 
+
+
+
 #ifndef GUSBAMP_H
 #define GUSBAMP_H
 
@@ -101,7 +104,7 @@ class GUSBAmpProducer;
 /**
 * GUSBAmp...
 *
-* @brief The GUSBAmp class provides an EEG connector for the gTrec USBAmp device.
+* @brief The GUSBAmp class provides an EEG connector for the gTec USBAmp device.
 */
 class GUSBAMPSHARED_EXPORT GUSBAmp : public ISensor
 {

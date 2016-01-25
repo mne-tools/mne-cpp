@@ -58,7 +58,18 @@ using namespace GUSBAmpPlugin;
 
 GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
 : m_pGUSBAmpProducer(pGUSBAmpProducer)
-{    
+,_masterSerial(LPSTR("UA-2006.00.00"))
+,SAMPLE_RATE_HZ(256)
+,NUMBER_OF_SCANS(8)
+,NUMBER_OF_CHANNELS(16)
+{
+    //Linking the specific API-library to the project
+    #ifdef _WIN64
+        #pragma comment(lib, __FILE__"\\..\\gUSBamp_x64.lib")
+    #else
+        #pragma comment(lib, __FILE__"\\..\\gUSBamp_x86.lib")
+    #endif
+
 }
 
 
@@ -74,6 +85,9 @@ GUSBAmpDriver::~GUSBAmpDriver()
 
 bool GUSBAmpDriver::initDevice()
 {
+
+
+
     qDebug() << "Plugin GUSBAmp - INFO - initDevice() - The device has been connected and initialised successfully" << endl;
     return true;
 }
