@@ -55,7 +55,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}RtInvd \
+            -lMNE$${MNE_LIB_VERSION}RtProcessingd \
             -lxMeasd \
             -lxDispd \
             -lmne_xd
@@ -66,7 +66,7 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}RtInv \
+            -lMNE$${MNE_LIB_VERSION}RtProcessing \
             -lxMeas \
             -lxDisp \
             -lmne_x

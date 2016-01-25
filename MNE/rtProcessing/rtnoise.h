@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     rtcov.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     rtnoise.h
+* @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     August, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Limin Sun, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,19 +30,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     RtCov class declaration.
+* @brief     RtNoise class declaration.
 *
 */
 
-#ifndef RTCOV_H
-#define RTCOV_H
+#ifndef RTNOISE_H
+#define RTNOISE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "rtinv_global.h"
+#include "rtprocessing_global.h"
 
 
 //*************************************************************************************************************
@@ -77,7 +78,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
-
+#include <unsupported/Eigen/FFT>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -100,16 +101,16 @@ using namespace FIFFLIB;
 
 //=============================================================================================================
 /**
-* Real-time covariance estimation
+* Real-time noise Spectrum estimation
 *
-* @brief Real-time covariance estimation
+* @brief Real-time Noise estimation
 */
-class RTINVSHARED_EXPORT RtCov : public QThread
+class RTPROCESSINGSHARED_EXPORT RtNoise : public QThread
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<RtCov> SPtr;             /**< Shared pointer type for RtCov. */
-    typedef QSharedPointer<const RtCov> ConstSPtr;  /**< Const shared pointer type for RtCov. */
+    typedef QSharedPointer<RtNoise> SPtr;             /**< Shared pointer type for RtNoise. */
+    typedef QSharedPointer<const RtNoise> ConstSPtr;  /**< Const shared pointer type for RtNoise. */
 
     //=========================================================================================================
     /**
@@ -119,19 +120,19 @@ public:
     * @param[in] p_pFiffInfo        Associated Fiff Information
     * @param[in] parent     Parent QObject (optional)
     */
-    explicit RtCov(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
+    explicit RtNoise(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, qint32 p_dataLen, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the Real-time covariance estimation object.
+    * Destroys the Real-time noise estimation object.
     */
-    ~RtCov();
+    ~RtNoise();
 
     //=========================================================================================================
     /**
     * Slot to receive incoming data.
     *
-    * @param[in] p_DataSegment  Data to estimate the covariance from -> ToDo Replace this by shared data pointer
+    * @param[in] p_DataSegment  Data to estimate the spectrum from -> ToDo Replace this by shared data pointer
     */
     void append(const MatrixXd &p_DataSegment);
 
@@ -143,17 +144,10 @@ public:
     */
     inline bool isRunning();
 
-    //=========================================================================================================
-    /**
-    * Set number of estimation samples
-    *
-    * @param[in] samples    estimation samples to set
-    */
-    void setSamples(qint32 samples);
 
     //=========================================================================================================
     /**
-    * Starts the RtCov by starting the producer's thread.
+    * Starts the RtNoise by starting the producer's thread.
     *
     * @return true if succeeded, false otherwise
     */
@@ -161,7 +155,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Stops the RtCov by stopping the producer's thread.
+    * Stops the RtNoise by stopping the producer's thread.
     *
     * @return true if succeeded, false otherwise
     */
@@ -170,11 +164,11 @@ public:
 signals:
     //=========================================================================================================
     /**
-    * Signal which is emitted when a new covariance Matrix is estimated.
+    * Signal which is emitted when a new data Matrix is estimated.
     *
-    * @param[out] p_pCov  The covariance matrix
+    * @param[out]
     */
-    void covCalculated(FIFFLIB::FiffCov::SPtr p_pCov);
+    void SpecCalculated(Eigen::MatrixXd);
 
 protected:
     //=========================================================================================================
@@ -184,6 +178,8 @@ protected:
     * Pure virtual method inherited by QThread.
     */
     virtual void run();
+
+    QVector <float> hanning(int N, short itype);
 
 private:
     QMutex      mutex;                  /**< Provides access serialization between threads*/
@@ -197,6 +193,28 @@ private:
     bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
 
     CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
+
+    QVector <float> m_fWin;
+
+    double m_Fs;
+
+    qint32 m_iFFTlength;
+    qint32 m_dataLength;
+
+protected:
+    int NumOfBlocks;
+    int BlockSize  ;
+    int Sensors    ;
+    int BlockIndex ;
+
+    MatrixXd CircBuf;
+
+public:
+    MatrixXd SpecData;
+    QMutex ReadMutex;
+
+    bool SendDataToBuffer;
+
 };
 
 //*************************************************************************************************************
@@ -204,16 +222,16 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool RtCov::isRunning()
+inline bool RtNoise::isRunning()
 {
     return m_bIsRunning;
 }
 
 } // NAMESPACE
 
-#ifndef metatype_fiffcovsptr
-#define metatype_fiffcovsptr
-Q_DECLARE_METATYPE(FIFFLIB::FiffCov::SPtr); /**< Provides QT META type declaration of the FIFFLIB::FiffCov type. For signal/slot usage.*/
+#ifndef metatype_matrix
+#define metatype_matrix
+Q_DECLARE_METATYPE(Eigen::MatrixXd); /**< Provides QT META type declaration of the MatrixXd type. For signal/slot usage.*/
 #endif
 
-#endif // RTCOV_H
+#endif // RtNoise_H
