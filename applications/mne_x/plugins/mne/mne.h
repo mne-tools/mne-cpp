@@ -54,7 +54,7 @@
 #include <mne/mne_forwardsolution.h>
 #include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
-#include <rtInv/rtinvop.h>
+#include <rtProcessing/rtinvop.h>
 
 #include <xMeas/realtimesourceestimate.h>
 #include <xMeas/realtimecov.h>

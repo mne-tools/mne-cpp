@@ -49,7 +49,9 @@
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 #include <xMeas/frequencyspectrum.h>
-#include <rtInv/rtnoise.h>
+#include <rtProcessing/rtnoise.h>
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
