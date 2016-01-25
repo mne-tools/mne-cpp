@@ -48,7 +48,7 @@
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 #include <xMeas/realtimecov.h>
-#include <rtInv/rtcov.h>
+#include <rtProcessing/rtcov.h>
 
 
 //*************************************************************************************************************

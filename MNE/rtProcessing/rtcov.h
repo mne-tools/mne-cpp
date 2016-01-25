@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtinvop.h
+* @file     rtcov.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,19 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     RtInvOp class declaration.
+* @brief     RtCov class declaration.
 *
 */
 
-#ifndef RTINVOP_H
-#define RTINVOP_H
+#ifndef RTCOV_H
+#define RTCOV_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "rtinv_global.h"
+#include "rtprocessing_global.h"
 
 
 //*************************************************************************************************************
@@ -49,15 +49,16 @@
 // FIFF INCLUDES
 //=============================================================================================================
 
+#include <fiff/fiff_cov.h>
 #include <fiff/fiff_info.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MNE INCLUDES
+// Generics INCLUDES
 //=============================================================================================================
 
-#include <mne/mne_forwardsolution.h>
-#include <mne/mne_inverse_operator.h>
+#include <generics/circularmatrixbuffer.h>
 
 
 //*************************************************************************************************************
@@ -80,7 +81,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RtInvLIB
+// DEFINE NAMESPACE INVRTLIB
 //=============================================================================================================
 
 namespace RTINVLIB
@@ -93,54 +94,46 @@ namespace RTINVLIB
 //=============================================================================================================
 
 using namespace Eigen;
+using namespace IOBuffer;
 using namespace FIFFLIB;
-using namespace MNELIB;
 
 
 //=============================================================================================================
 /**
-* Real-time inverse dSPM, sLoreta inverse operator estimation
+* Real-time covariance estimation
 *
-* @brief Real-time inverse operator estimation
+* @brief Real-time covariance estimation
 */
-class RTINVSHARED_EXPORT RtInvOp : public QThread
+class RTPROCESSINGSHARED_EXPORT RtCov : public QThread
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<RtInvOp> SPtr;             /**< Shared pointer type for RtInvOp. */
-    typedef QSharedPointer<const RtInvOp> ConstSPtr;  /**< Const shared pointer type for RtInvOp. */
+    typedef QSharedPointer<RtCov> SPtr;             /**< Shared pointer type for RtCov. */
+    typedef QSharedPointer<const RtCov> ConstSPtr;  /**< Const shared pointer type for RtCov. */
 
     //=========================================================================================================
     /**
-    * Creates the real-time inverse operator estimation object
+    * Creates the real-time covariance estimation object.
     *
-    * @param[in] p_pFiffInfo    Fiff measurement info
-    * @param[in] p_pFwd         Forward solution
-    * @param[in] parent         Parent QObject (optional)
+    * @param[in] p_iMaxSamples      Number of samples to use for each data chunk
+    * @param[in] p_pFiffInfo        Associated Fiff Information
+    * @param[in] parent     Parent QObject (optional)
     */
-    explicit RtInvOp(FiffInfo::SPtr &p_pFiffInfo, MNEForwardSolution::SPtr &p_pFwd, QObject *parent = 0);
+    explicit RtCov(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the inverse operator estimation object.
+    * Destroys the Real-time covariance estimation object.
     */
-    ~RtInvOp();
+    ~RtCov();
 
     //=========================================================================================================
     /**
-    * Slot to receive incoming noise covariance estimations.
+    * Slot to receive incoming data.
     *
-    * @param[in] p_NoiseCov     Noise covariance estimation
+    * @param[in] p_DataSegment  Data to estimate the covariance from -> ToDo Replace this by shared data pointer
     */
-    void appendNoiseCov(FiffCov &p_NoiseCov);
-
-    //=========================================================================================================
-    /**
-    * Stops the RtInv by stopping the producer's thread.
-    *
-    * @return true if succeeded, false otherwise
-    */
-    virtual bool stop();
+    void append(const MatrixXd &p_DataSegment);
 
     //=========================================================================================================
     /**
@@ -150,14 +143,38 @@ public:
     */
     inline bool isRunning();
 
+    //=========================================================================================================
+    /**
+    * Set number of estimation samples
+    *
+    * @param[in] samples    estimation samples to set
+    */
+    void setSamples(qint32 samples);
+
+    //=========================================================================================================
+    /**
+    * Starts the RtCov by starting the producer's thread.
+    *
+    * @return true if succeeded, false otherwise
+    */
+    virtual bool start();
+
+    //=========================================================================================================
+    /**
+    * Stops the RtCov by stopping the producer's thread.
+    *
+    * @return true if succeeded, false otherwise
+    */
+    virtual bool stop();
+
 signals:
     //=========================================================================================================
     /**
-    * Signal which is emitted when a inverse operator is calculated.
+    * Signal which is emitted when a new covariance Matrix is estimated.
     *
-    * @param[out] p_InvOp  The inverse operator
+    * @param[out] p_pCov  The covariance matrix
     */
-    void invOperatorCalculated(MNELIB::MNEInverseOperator::SPtr p_pInvOp);
+    void covCalculated(FIFFLIB::FiffCov::SPtr p_pCov);
 
 protected:
     //=========================================================================================================
@@ -169,13 +186,17 @@ protected:
     virtual void run();
 
 private:
-    QMutex      mutex;                  /**< Provides access serialization between threads. */
-    bool        m_bIsRunning;           /**< Whether RtInv is running. */
+    QMutex      mutex;                  /**< Provides access serialization between threads*/
 
-    QVector<FiffCov> m_vecNoiseCov;     /**< Noise covariance matrices. */
+    quint32      m_iMaxSamples;         /**< Maximal amount of samples received, before covariance is estimated.*/
 
-    FiffInfo::SPtr m_pFiffInfo;         /**< The fiff measurement information. */
-    MNEForwardSolution::SPtr m_pFwd;    /**< The forward solution. */
+    quint32      m_iNewMaxSamples;      /**< New maximal amount of samples received, before covariance is estimated.*/
+
+    FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
+
+    bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
+
+    CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
 };
 
 //*************************************************************************************************************
@@ -183,16 +204,16 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool RtInvOp::isRunning()
+inline bool RtCov::isRunning()
 {
     return m_bIsRunning;
 }
 
 } // NAMESPACE
 
-#ifndef metatype_mneinverseoperatorsptr
-#define metatype_mneinverseoperatorsptr
-Q_DECLARE_METATYPE(MNELIB::MNEInverseOperator::SPtr); /**< Provides QT META type declaration of the MNELIB::MNEInverseOperator type. For signal/slot usage.*/
+#ifndef metatype_fiffcovsptr
+#define metatype_fiffcovsptr
+Q_DECLARE_METATYPE(FIFFLIB::FiffCov::SPtr); /**< Provides QT META type declaration of the FIFFLIB::FiffCov type. For signal/slot usage.*/
 #endif
 
-#endif // RTINV_H
+#endif // RTCOV_H
