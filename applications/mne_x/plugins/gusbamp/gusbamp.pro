@@ -103,7 +103,8 @@ HEADERS += \
         gusbampproducer.h \
         gusbampdriver.h \
         FormFiles/gusbampsetupwidget.h \
-        FormFiles/gusbampaboutwidget.h
+        FormFiles/gusbampaboutwidget.h \
+    gtec_gUSBamp.h
 
 FORMS += \
         FormFiles/gusbampsetupwidget.ui \

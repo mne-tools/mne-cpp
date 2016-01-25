@@ -41,6 +41,7 @@
 
 #include "gusbamp.h"
 #include "gusbampproducer.h"
+#include "gtec_gusbamp.h"       /**< heder-file from gTec for gubamp amplifier*/
 
 
 //*************************************************************************************************************
