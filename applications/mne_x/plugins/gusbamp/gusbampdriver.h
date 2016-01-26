@@ -47,7 +47,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <windows.h>        //windows.h-library for LPSTR-,UCHAR-, and HANDLE-files
+#include <Windows.h>        //windows.h-library for LPSTR-,UCHAR-, and HANDLE-files
+#include <deque>
+#include "gtec_gUSBamp.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -109,10 +111,21 @@ class GUSBAmpDriver
 {
 private:
 
-    LPSTR       _masterSerial;
-    const int   SAMPLE_RATE_HZ;
-    const int   NUMBER_OF_SCANS;
-    const UCHAR NUMBER_OF_CHANNELS;
+    LPSTR           _masterSerial;
+    LPSTR           _slaveSerials[3];
+    deque<LPSTR>    callSequenceSerials;
+    deque<HANDLE>   openedDevicesHandles;
+    const int       SLAVE_SERIALS_SIZE;
+    const int       SAMPLE_RATE_HZ;
+    const int       NUMBER_OF_SCANS;
+    const UCHAR     NUMBER_OF_CHANNELS;
+    UCHAR           _channelsToAcquire[16];
+    const BOOL      TRIGGER;
+    UCHAR           _mode;
+    CHANNEL         _bipolarSettings;
+    REF             _commonReference;
+    GND             _commonGround;
+
 
 public:
     //=========================================================================================================
@@ -149,6 +162,8 @@ public:
     * @return       returns true if device was successfully uninitialised, false otherwise.
     */
     bool uninitDevice();
+
+    //=========================================================================================================
 
 protected:
     GUSBAmpProducer*       m_pGUSBAmpProducer;                /**< A pointer to the corresponding GUSBAmpProducer class.*/
