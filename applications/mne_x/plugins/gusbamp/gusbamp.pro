@@ -104,7 +104,8 @@ HEADERS += \
         gusbampdriver.h \
         FormFiles/gusbampsetupwidget.h \
         FormFiles/gusbampaboutwidget.h \
-    gtec_gUSBamp.h
+    gtec_gUSBamp.h \
+    ringbuffer.h
 
 FORMS += \
         FormFiles/gusbampsetupwidget.ui \

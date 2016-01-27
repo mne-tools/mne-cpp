@@ -52,6 +52,7 @@
 
 #include <QThread>
 #include <QDebug>
+#include "ringbuffer.h"
 
 
 //*************************************************************************************************************
@@ -117,6 +118,7 @@ public:
     void stop();
 
 protected:
+    CRingBuffer<float> _buffer;
     //=========================================================================================================
     /**
     * The starting point for the thread. After calling start(), the newly created thread calls this function.
