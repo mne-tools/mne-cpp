@@ -50,6 +50,7 @@
 #include <Windows.h>        //windows.h-library for LPSTR-,UCHAR-, and HANDLE-files
 #include <deque>
 #include "gtec_gUSBamp.h"
+#include "ringbuffer.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -111,20 +112,27 @@ class GUSBAmpDriver
 {
 private:
 
-    LPSTR           _masterSerial;
-    LPSTR           _slaveSerials[3];
-    deque<LPSTR>    callSequenceSerials;
-    deque<HANDLE>   openedDevicesHandles;
-    const int       SLAVE_SERIALS_SIZE;
-    const int       SAMPLE_RATE_HZ;
-    const int       NUMBER_OF_SCANS;
-    const UCHAR     NUMBER_OF_CHANNELS;
-    UCHAR           _channelsToAcquire[16];
-    const BOOL      TRIGGER;
-    UCHAR           _mode;
-    CHANNEL         _bipolarSettings;
-    REF             _commonReference;
-    GND             _commonGround;
+//device-settings
+    LPSTR               _masterSerial;
+    LPSTR               _slaveSerials[3];
+    deque<LPSTR>        callSequenceSerials;
+    deque<HANDLE>       openedDevicesHandles;
+    deque<HANDLE>       _callSequenceHandles;
+    const int           SLAVE_SERIALS_SIZE;
+    const int           SAMPLE_RATE_HZ;
+    const int           NUMBER_OF_SCANS;
+    const UCHAR         NUMBER_OF_CHANNELS;
+    UCHAR               _channelsToAcquire[16];
+    const BOOL          TRIGGER;
+    UCHAR               _mode;
+    CHANNEL             _bipolarSettings;
+    REF                 _commonReference;
+    GND                 _commonGround;
+    CRingBuffer<float>  _buffer;                    //the application buffer where received data will be stored for each device
+//main-settings
+    const int           BUFFER_SIZE_SECONDS;		//the size of the application buffer in seconds
+    const int           QUEUE_SIZE;                 //the number of GT_GetData calls that will be queued during acquisition to avoid loss of data
+
 
 
 public:
