@@ -440,7 +440,7 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
     //increment circular queueIndex to process the next queue at the next loop repitition (on overrun start at index 0 again)
     queueIndex = (queueIndex + 1) % QUEUE_SIZE;
 
-     return true;
+    return true;
  }
 
 
