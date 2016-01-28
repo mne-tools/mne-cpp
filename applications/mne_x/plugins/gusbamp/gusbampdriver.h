@@ -129,9 +129,19 @@ private:
     REF                 _commonReference;
     GND                 _commonGround;
     CRingBuffer<float>  _buffer;                    //the application buffer where received data will be stored for each device
-//main-settings
+    bool                _bufferOverrun;             //flag indicating if an overrun occurred at the application buffer
     const int           BUFFER_SIZE_SECONDS;		//the size of the application buffer in seconds
     const int           QUEUE_SIZE;                 //the number of GT_GetData calls that will be queued during acquisition to avoid loss of data
+//buffer-settings
+    bool                first_run;
+    int                 queueIndex;
+    int                 nPoints;
+    DWORD               bufferSizeBytes;
+    int                 numDevices;
+    DWORD               numBytesReceived = 0;
+//create the temporary data buffers (the device will write data into those)
+    BYTE***             buffers;
+    OVERLAPPED**        overlapped;
 
 
 
