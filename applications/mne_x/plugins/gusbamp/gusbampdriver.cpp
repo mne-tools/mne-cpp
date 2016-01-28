@@ -79,8 +79,6 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
 ,nPoints(NUMBER_OF_SCANS * (NUMBER_OF_CHANNELS + TRIGGER))
 ,bufferSizeBytes(HEADER_SIZE + nPoints * sizeof(float))
 ,numBytesReceived(0)
-,buffers(new BYTE**[numDevices])
-,overlapped(new OVERLAPPED*[numDevices])
 {
 
     //Linking the specific API-library to the project
@@ -133,9 +131,7 @@ bool GUSBAmpDriver::initDevice()
     */
 
 
-    //initialize application data buffer to the specified number of seconds
-    _bufferOverrun = false;
-    _buffer.Initialize(BUFFER_SIZE_SECONDS * SAMPLE_RATE_HZ * (NUMBER_OF_CHANNELS + TRIGGER) * (unsigned int) _callSequenceHandles.size());
+
 
 
 
@@ -240,6 +236,13 @@ bool GUSBAmpDriver::initDevice()
         _callSequenceHandles = openedDevicesHandles;
         numDevices = (int) _callSequenceHandles.size();
 
+        buffers     = new BYTE**[numDevices];
+        overlapped  = new OVERLAPPED*[numDevices];
+
+        //initialize application data buffer to the specified number of seconds
+        _bufferOverrun = false;
+        _buffer.Initialize(BUFFER_SIZE_SECONDS * SAMPLE_RATE_HZ * (NUMBER_OF_CHANNELS + TRIGGER) * (unsigned int) _callSequenceHandles.size());
+
         qDebug() << "Plugin GUSBAmp - INFO - initDevice() - The device has been connected and initialised successfully" << endl;
         return true;
 
@@ -322,6 +325,7 @@ bool GUSBAmpDriver::uninitDevice()
 
 
 //*************************************************************************************************************
+
 
 bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
 {
@@ -436,22 +440,55 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
     //increment circular queueIndex to process the next queue at the next loop repitition (on overrun start at index 0 again)
     queueIndex = (queueIndex + 1) % QUEUE_SIZE;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
      return true;
  }
 
 
  //*************************************************************************************************************
+
+
+bool GUSBAmpDriver::ReadData(float* destBuffer, int numberOfScans, int *errorCode, string *errorMessage)
+{
+//  int numDevices = (int) _callSequenceHandles.size();
+    int validPoints = (NUMBER_OF_CHANNELS + TRIGGER) * numberOfScans * numDevices;
+
+    //wait until requested amount of data is ready
+    if (_buffer.GetSize() < validPoints)
+    {
+        *errorCode = 2;
+        *errorMessage = "Not enough data available";
+        return false;
+    }
+
+//    //acquire lock on the application buffer for reading
+//    _bufferLock.Lock();
+
+    __try
+    {
+        //if buffer run over report error and reset buffer
+        if (_bufferOverrun)
+        {
+            _buffer.Reset();
+            *errorCode = 1;
+            *errorMessage = "Error on reading data from the application data buffer: buffer overrun.";
+            _bufferOverrun = false;
+            return false;
+        }
+
+        //copy the data from the application buffer into the destination buffer
+        _buffer.Read(destBuffer, validPoints);
+    }
+    __finally
+    {
+//        _bufferLock.Unlock();
+    }
+
+    *errorCode = 0;
+    *errorMessage = "No error occurred.";
+    return true;
+}
+
+
+
+
 
