@@ -113,35 +113,35 @@ class GUSBAmpDriver
 private:
 
 //device-settings
-    LPSTR               _masterSerial;
-    LPSTR               _slaveSerials[3];
-    deque<LPSTR>        callSequenceSerials;
-    deque<HANDLE>       openedDevicesHandles;
-    deque<HANDLE>       _callSequenceHandles;
-    const int           SLAVE_SERIALS_SIZE;
-    const int           SAMPLE_RATE_HZ;
-    const int           NUMBER_OF_SCANS;
-    const UCHAR         NUMBER_OF_CHANNELS;
-    UCHAR               _channelsToAcquire[16];
-    const BOOL          TRIGGER;
-    UCHAR               _mode;
-    CHANNEL             _bipolarSettings;
-    REF                 _commonReference;
-    GND                 _commonGround;
+    LPSTR               _masterSerial;              //specify the serial number of the device used as master
+    LPSTR               _slaveSerials[3];           //specify the serial numbers of the devices used as slaves (max. three slave devices)
+    deque<LPSTR>        callSequenceSerials;        //list of the call sequence (master must be the last device in the call sequence)
+    deque<HANDLE>       openedDevicesHandles;       //list of handles in the order of the opened devices
+    deque<HANDLE>       _callSequenceHandles;       //list of handles in the order of the opened devices
+    const int           SLAVE_SERIALS_SIZE;         //the number of slave serials specified in slaveSerials
+    const int           SAMPLE_RATE_HZ;             //the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!)
+    const int           NUMBER_OF_SCANS;            //the number of scans that should be received simultaneously (depending on the _sampleRate; see C-API documentation for this value!)
+    const UCHAR         NUMBER_OF_CHANNELS;         //the number of channels per device that should be acquired (must equal the size of the _channelsToAcquire array)
+    UCHAR               _channelsToAcquire[16];     //the channels that should be acquired from each device
+    const BOOL          TRIGGER;                    //TRUE to acquire the trigger line in an additional channel
+    UCHAR               _mode;                      //use normal acquisition mode
+    CHANNEL             _bipolarSettings;           //don't use bipolar derivation (all values will be initialized to zero)
+    REF                 _commonReference;           //don't connect groups to common reference
+    GND                 _commonGround;              //don't connect groups to common ground
     CRingBuffer<float>  _buffer;                    //the application buffer where received data will be stored for each device
     bool                _bufferOverrun;             //flag indicating if an overrun occurred at the application buffer
     const int           BUFFER_SIZE_SECONDS;		//the size of the application buffer in seconds
     const int           QUEUE_SIZE;                 //the number of GT_GetData calls that will be queued during acquisition to avoid loss of data
 //buffer-settings
-    bool                first_run;
-    int                 queueIndex;
-    int                 nPoints;
-    DWORD               bufferSizeBytes;
-    int                 numDevices;
-    DWORD               numBytesReceived = 0;
+    bool                first_run;                  //indicates the first run of data acquisition (in the first run GT_Start() has to be executed)
+    int                 queueIndex;                 //the index of GT_GetData calls that will be queued during acquisition
+    int                 nPoints;                    //number of points which are received from one chanel simultaneously
+    DWORD               bufferSizeBytes;            //Size of buffer
+    int                 numDevices;                 //number of connected devices (master and slaves)
+    DWORD               numBytesReceived = 0;       //num of Bytes whicht are received during one measuring procedure
 //create the temporary data buffers (the device will write data into those)
-    BYTE***             buffers;
-    OVERLAPPED**        overlapped;
+    BYTE***             buffers;                    //pointer to the buffer
+    OVERLAPPED**        overlapped;                 //storage in case of overlapping
 
 
 
