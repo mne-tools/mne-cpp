@@ -43,8 +43,9 @@
 #include "gusbampproducer.h"
 #include <iostream>
 #include <Windows.h>
-#include <string>
 #include <deque>
+
+
 
 
 //*************************************************************************************************************
@@ -73,6 +74,13 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
 ,_commonGround({ FALSE, FALSE, FALSE, FALSE })
 ,BUFFER_SIZE_SECONDS(5)
 ,QUEUE_SIZE(4)
+,first_run(true)
+,queueIndex(0)
+,nPoints(NUMBER_OF_SCANS * (NUMBER_OF_CHANNELS + TRIGGER))
+,bufferSizeBytes(HEADER_SIZE + nPoints * sizeof(float))
+,numBytesReceived(0)
+,buffers(new BYTE**[numDevices])
+,overlapped(new OVERLAPPED*[numDevices])
 {
 
     //Linking the specific API-library to the project
@@ -98,6 +106,8 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
     for(int i = 0; i < NUMBER_OF_CHANNELS; i++)
         _channelsToAcquire[i] = UCHAR(i+1);
 
+
+
 }
 
 
@@ -114,6 +124,22 @@ GUSBAmpDriver::~GUSBAmpDriver()
 
 bool GUSBAmpDriver::initDevice()
 {
+
+
+    /*Space for setting Main-variables
+    *
+    *
+    *
+    */
+
+
+    //initialize application data buffer to the specified number of seconds
+    _bufferOverrun = false;
+    _buffer.Initialize(BUFFER_SIZE_SECONDS * SAMPLE_RATE_HZ * (NUMBER_OF_CHANNELS + TRIGGER) * (unsigned int) _callSequenceHandles.size());
+
+
+
+
     try
     {
         for (deque<LPSTR>::iterator serialNumber = callSequenceSerials.begin(); serialNumber != callSequenceSerials.end(); serialNumber++)
@@ -212,6 +238,7 @@ bool GUSBAmpDriver::initDevice()
         }
 
         _callSequenceHandles = openedDevicesHandles;
+        numDevices = (int) _callSequenceHandles.size();
 
         qDebug() << "Plugin GUSBAmp - INFO - initDevice() - The device has been connected and initialised successfully" << endl;
         return true;
@@ -228,6 +255,7 @@ bool GUSBAmpDriver::initDevice()
         }
         //...and rethrow the exception to notify the caller of this method about the error
         throw exception;
+        return false;
     }
 
 
@@ -238,6 +266,48 @@ bool GUSBAmpDriver::initDevice()
 
 bool GUSBAmpDriver::uninitDevice()
 {
+
+
+        cout << "Stopping devices and cleaning up..." << "\n";
+
+        //clean up allocated resources for each device
+        for (int i=0; i<numDevices; i++)
+        {
+            HANDLE hDevice = _callSequenceHandles[i];
+
+            //clean up allocated resources for each queue per device
+            for (int j=0; j<QUEUE_SIZE; j++)
+            {
+                WaitForSingleObject(overlapped[i][queueIndex].hEvent, 1000);
+                CloseHandle(overlapped[i][queueIndex].hEvent);
+
+                delete [] buffers[i][queueIndex];
+
+                //increment queue index
+                queueIndex = (queueIndex + 1) % QUEUE_SIZE;
+            }
+
+            //stop device
+            GT_Stop(hDevice);
+
+            //reset device
+            GT_ResetTransfer(hDevice);
+
+            delete [] overlapped[i];
+            delete [] buffers[i];
+        }
+
+        delete [] buffers;
+        delete [] overlapped;
+
+//        //reset _isRunning flag
+//        _isRunning = false;
+
+//        //signal event
+//        _dataAcquisitionStopped.SetEvent();
+
+
+
 
     while (!_callSequenceHandles.empty())
     {
@@ -253,168 +323,125 @@ bool GUSBAmpDriver::uninitDevice()
 
 //*************************************************************************************************************
 
- bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
- {
-     sampleMatrix.setZero(); // Clear matrix - set all elements to zero
-
-     int queueIndex = 0;
-         int nPoints = NUMBER_OF_SCANS * (NUMBER_OF_CHANNELS + TRIGGER);
-         DWORD bufferSizeBytes = HEADER_SIZE + nPoints * sizeof(float);
-         int numDevices = (int) _callSequenceHandles.size();
-         DWORD numBytesReceived = 0;
-
-         //create the temporary data buffers (the device will write data into those)
-         BYTE*** buffers = new BYTE**[numDevices];
-         OVERLAPPED** overlapped = new OVERLAPPED*[numDevices];
-
-         __try
-         {
-             //for each device create a number of QUEUE_SIZE data buffers
-             for (int deviceIndex=0; deviceIndex<numDevices; deviceIndex++)
-             {
-                 buffers[deviceIndex] = new BYTE*[QUEUE_SIZE];
-                 overlapped[deviceIndex] = new OVERLAPPED[QUEUE_SIZE];
-
-                 //for each data buffer allocate a number of bufferSizeBytes bytes
-                 for (queueIndex=0; queueIndex<QUEUE_SIZE; queueIndex++)
-                 {
-                     buffers[deviceIndex][queueIndex] = new BYTE[bufferSizeBytes];
-                     memset(&(overlapped[deviceIndex][queueIndex]), 0, sizeof(OVERLAPPED));
-
-                     //create a windows event handle that will be signalled when new data from the device has been received for each data buffer
-                     overlapped[deviceIndex][queueIndex].hEvent = CreateEvent(NULL, false, false, NULL);
-                 }
-             }
-
-             //start the devices (master device must be started at last)
-             for (int deviceIndex=0; deviceIndex<numDevices; deviceIndex++)
-             {
-                 HANDLE hDevice = _callSequenceHandles[deviceIndex];
-
-                 if (!GT_Start(hDevice))
-                 {
-                     //throw string("Error on GT_Start: Couldn't start data acquisition of device.");
-                     cout << "\tError on GT_Start: Couldn't start data acquisition of device.\n";
-                     return 0;
-                 }
-
-                 //queue-up the first batch of transfer requests
-                 for (queueIndex=0; queueIndex<QUEUE_SIZE; queueIndex++)
-                 {
-                     if (!GT_GetData(hDevice, buffers[deviceIndex][queueIndex], bufferSizeBytes, &overlapped[deviceIndex][queueIndex]))
-                     {
-                         cout << "\tError on GT_GetData.\n";
-                         return 0;
-                     }
-                 }
-             }
-
-             queueIndex = 0;
-
-             //continouos data acquisition
-             while (_isRunning)
-             {
-                 //receive data from each device
-                 for (int deviceIndex = 0; deviceIndex < numDevices; deviceIndex++)
-                 {
-                     HANDLE hDevice = _callSequenceHandles[deviceIndex];
-
-                     //wait for notification from the system telling that new data is available
-                     if (WaitForSingleObject(overlapped[deviceIndex][queueIndex].hEvent, 1000) == WAIT_TIMEOUT)
-                     {
-                         //throw string("Error on data transfer: timeout occurred.");
-                         cout << "Error on data transfer: timeout occurred." << "\n";
-                         return 0;
-                     }
-
-                     //get number of received bytes...
-                     GetOverlappedResult(hDevice, &overlapped[deviceIndex][queueIndex], &numBytesReceived, false);
-
-                     //...and check if we lost something (number of received bytes must be equal to the previously allocated buffer size)
-                     if (numBytesReceived != bufferSizeBytes)
-                     {
-                         //throw string("Error on data transfer: samples lost.");
-                         cout << "Error on data transfer: samples lost." << "\n";
-                         return 0;
-                     }
-                 }
-
-                 //to store the received data into the application data buffer at once, lock it
-                 _bufferLock.Lock();
-
-                 __try
-                 {
-                     //if we are going to overrun on writing the received data into the buffer, set the appropriate flag; the reading thread will handle the overrun
-                     _bufferOverrun = (_buffer.GetFreeSize() < (nPoints * numDevices));
-
-                     //store received data from each device in the correct order (that is scan-wise, where one scan includes all channels of all devices) ignoring the header
-                     for (int scanIndex = 0; scanIndex < NUMBER_OF_SCANS; scanIndex++)
-                         for (int deviceIndex = 0; deviceIndex < numDevices; deviceIndex++)
-                             _buffer.Write((float*) (buffers[deviceIndex][queueIndex] + scanIndex * (NUMBER_OF_CHANNELS + TRIGGER) * sizeof(float) + HEADER_SIZE), NUMBER_OF_CHANNELS + TRIGGER);
-                 }
-                 __finally
-                 {
-                     //release the previously acquired lock
-                     _bufferLock.Unlock();
-                 }
-
-                 //add new GetData call to the queue replacing the currently received one
-                 for (int deviceIndex = 0; deviceIndex < numDevices; deviceIndex++)
-                     if (!GT_GetData(_callSequenceHandles[deviceIndex], buffers[deviceIndex][queueIndex], bufferSizeBytes, &overlapped[deviceIndex][queueIndex]))
-                     {
-                         cout << "\tError on GT_GetData.\n";
-                         return 0;
-                     }
-
-                 //signal processing (main) thread that new data is available
-                 _newDataAvailable.SetEvent();
-
-                 //increment circular queueIndex to process the next queue at the next loop repitition (on overrun start at index 0 again)
-                 queueIndex = (queueIndex + 1) % QUEUE_SIZE;
-             }
-         }
-         __finally
-         {
-             cout << "Stopping devices and cleaning up..." << "\n";
-
-             //clean up allocated resources for each device
-             for (int i=0; i<numDevices; i++)
-             {
-                 HANDLE hDevice = _callSequenceHandles[i];
-
-                 //clean up allocated resources for each queue per device
-                 for (int j=0; j<QUEUE_SIZE; j++)
-                 {
-                     WaitForSingleObject(overlapped[i][queueIndex].hEvent, 1000);
-                     CloseHandle(overlapped[i][queueIndex].hEvent);
-
-                     delete [] buffers[i][queueIndex];
-
-                     //increment queue index
-                     queueIndex = (queueIndex + 1) % QUEUE_SIZE;
-                 }
-
-                 //stop device
-                 GT_Stop(hDevice);
-
-                 //reset device
-                 GT_ResetTransfer(hDevice);
-
-                 delete [] overlapped[i];
-                 delete [] buffers[i];
-             }
-
-             delete [] buffers;
-             delete [] overlapped;
-
-             //reset _isRunning flag
-             _isRunning = false;
-
-             //signal event
-             _dataAcquisitionStopped.SetEvent();
+bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
+{
+    sampleMatrix.setZero(); // Clear matrix - set all elements to zero
 
 
-         }
+
+//first run of data aquisition
+    if(first_run)
+    {
+        //for each device create a number of QUEUE_SIZE data buffers
+        for (int deviceIndex=0; deviceIndex<numDevices; deviceIndex++)
+        {
+            buffers[deviceIndex] = new BYTE*[QUEUE_SIZE];
+            overlapped[deviceIndex] = new OVERLAPPED[QUEUE_SIZE];
+
+            //for each data buffer allocate a number of bufferSizeBytes bytes
+            for (queueIndex=0; queueIndex<QUEUE_SIZE; queueIndex++)
+            {
+                buffers[deviceIndex][queueIndex] = new BYTE[bufferSizeBytes];
+                memset(&(overlapped[deviceIndex][queueIndex]), 0, sizeof(OVERLAPPED));
+
+                //create a windows event handle that will be signalled when new data from the device has been received for each data buffer
+                overlapped[deviceIndex][queueIndex].hEvent = CreateEvent(NULL, false, false, NULL);
+            }
+        }
+
+        //start the devices (master device must be started at last)
+        for (int deviceIndex=0; deviceIndex<numDevices; deviceIndex++)
+        {
+            HANDLE hDevice = _callSequenceHandles[deviceIndex];
+
+            if (!GT_Start(hDevice))
+            {
+                //throw string("Error on GT_Start: Couldn't start data acquisition of device.");
+                cout << "\tError on GT_Start: Couldn't start data acquisition of device.\n";
+                return 0;
+            }
+
+            //queue-up the first batch of transfer requests
+            for (queueIndex=0; queueIndex<QUEUE_SIZE; queueIndex++)
+            {
+                if (!GT_GetData(hDevice, buffers[deviceIndex][queueIndex], bufferSizeBytes, &overlapped[deviceIndex][queueIndex]))
+                {
+                    cout << "\tError on GT_GetData.\n";
+                    return 0;
+                }
+            }
+
+
+            queueIndex = 0;
+        }
+        first_run = false;
+    }
+    //continouos data acquisition
+
+    //receive data from each device
+    for (int deviceIndex = 0; deviceIndex < numDevices; deviceIndex++)
+    {
+        HANDLE hDevice = _callSequenceHandles[deviceIndex];
+
+        //wait for notification from the system telling that new data is available
+        if (WaitForSingleObject(overlapped[deviceIndex][queueIndex].hEvent, 1000) == WAIT_TIMEOUT)
+        {
+            //throw string("Error on data transfer: timeout occurred.");
+            cout << "Error on data transfer: timeout occurred." << "\n";
+            return 0;
+        }
+
+        //get number of received bytes...
+        GetOverlappedResult(hDevice, &overlapped[deviceIndex][queueIndex], &numBytesReceived, false);
+
+        //...and check if we lost something (number of received bytes must be equal to the previously allocated buffer size)
+        if (numBytesReceived != bufferSizeBytes)
+        {
+            //throw string("Error on data transfer: samples lost.");
+            cout << "Error on data transfer: samples lost." << "\n";
+            return 0;
+        }
+    }
+
+//    //to store the received data into the application data buffer at once, lock it
+//    _bufferLock.Lock();
+
+    __try
+    {
+        //if we are going to overrun on writing the received data into the buffer, set the appropriate flag; the reading thread will handle the overrun
+        _bufferOverrun = (_buffer.GetFreeSize() < (nPoints * numDevices));
+
+        //store received data from each device in the correct order (that is scan-wise, where one scan includes all channels of all devices) ignoring the header
+        for (int scanIndex = 0; scanIndex < NUMBER_OF_SCANS; scanIndex++)
+            for (int deviceIndex = 0; deviceIndex < numDevices; deviceIndex++)
+                _buffer.Write((float*) (buffers[deviceIndex][queueIndex] + scanIndex * (NUMBER_OF_CHANNELS + TRIGGER) * sizeof(float) + HEADER_SIZE), NUMBER_OF_CHANNELS + TRIGGER);
+    }
+    __finally
+    {
+//        //release the previously acquired lock
+//        _bufferLock.Unlock();
+    }
+
+    //add new GetData call to the queue replacing the currently received one
+    for (int deviceIndex = 0; deviceIndex < numDevices; deviceIndex++)
+        if (!GT_GetData(_callSequenceHandles[deviceIndex], buffers[deviceIndex][queueIndex], bufferSizeBytes, &overlapped[deviceIndex][queueIndex]))
+        {
+            cout << "\tError on GT_GetData.\n";
+            return 0;
+        }
+
+//    //signal processing (main) thread that new data is available
+//    _newDataAvailable.SetEvent();
+
+    //increment circular queueIndex to process the next queue at the next loop repitition (on overrun start at index 0 again)
+    queueIndex = (queueIndex + 1) % QUEUE_SIZE;
+
+
+
+
+
+
+
 
 
 
