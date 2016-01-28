@@ -183,6 +183,18 @@ public:
 
     //=========================================================================================================
 
+    /**
+     * Reads the received numberOfScans scans from all devices. If not enough data is available (errorCode == 2) or the application buffer overruns (errorCode == 1), this method returns false.
+     * @return                      returns true if Reading procedure was sucessfull
+     * @param float* destBuffer:	the array that returns the received data from the application data buffer.
+                                    Data is aligned as follows: element at position destBuffer[scanIndex * (numberOfChannelsPerDevice * numDevices) + channelIndex] is sample of channel channelIndex (zero-based) of the scan with zero-based scanIndex.
+                                    channelIndex ranges from 0..numDevices*numChannelsPerDevices where numDevices equals the number of recorded devices and numChannelsPerDevice the number of channels from each of those devices.
+                                    It is assumed that all devices provide the same number of channels.
+     * @param int numberOfScans:	the number of scans to retrieve from the application buffer.
+     */
+    bool GUSBAmpDriver::ReadData(float* destBuffer, int numberOfScans, int *errorCode, string *errorMessage);
+
+
 protected:
     GUSBAmpProducer*       m_pGUSBAmpProducer;                /**< A pointer to the corresponding GUSBAmpProducer class.*/
 
