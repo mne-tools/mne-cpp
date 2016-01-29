@@ -138,7 +138,7 @@ private:
     int                 nPoints;                    //number of points which are received from one chanel simultaneously
     DWORD               bufferSizeBytes;            //Size of buffer
     int                 numDevices;                 //number of connected devices (master and slaves)
-    DWORD               numBytesReceived = 0;       //num of Bytes whicht are received during one measuring procedure
+    DWORD               numBytesReceived;           //num of Bytes whicht are received during one measuring procedure
 //create the temporary data buffers (the device will write data into those)
     BYTE***             buffers;                    //pointer to the buffer
     OVERLAPPED**        overlapped;                 //storage in case of overlapping
