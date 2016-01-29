@@ -2,10 +2,10 @@
 #
 # @file     GUSBAmp.pro
 # @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+#           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     September, 2013
+# @date     Oktober 2016
 #
 # @section  LICENSE
 #
