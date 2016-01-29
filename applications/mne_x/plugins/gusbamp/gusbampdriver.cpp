@@ -309,6 +309,8 @@ bool GUSBAmpDriver::uninitDevice()
 //        //signal event
 //        _dataAcquisitionStopped.SetEvent();
 
+        first_run = true;
+
 
 
 
@@ -330,7 +332,6 @@ bool GUSBAmpDriver::uninitDevice()
 bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
 {
     sampleMatrix.setZero(); // Clear matrix - set all elements to zero
-
 
 
 //first run of data aquisition
@@ -444,7 +445,7 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
  }
 
 
- //*************************************************************************************************************
+//*************************************************************************************************************
 
 
 bool GUSBAmpDriver::ReadData(float* destBuffer, int numberOfScans, int *errorCode, string *errorMessage)
