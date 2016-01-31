@@ -66,7 +66,7 @@ contains(MNECPP_CONFIG, withGui) {
     }
 
     qtHaveModule(3dcore,3drender,3dinput) {
-    message(Examples.pro - Qt3D available!)
+    message(examples.pro - Qt3D available)
     SUBDIRS += \
         clusteredInverse \
         rawClusteredInverse \
