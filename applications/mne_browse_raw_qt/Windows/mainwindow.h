@@ -84,7 +84,7 @@
 #include "averagewindow.h"
 #include "scalewindow.h"
 #include "chinfowindow.h"
-#include "NoiseReductionWindow.h"
+#include "noisereductionwindow.h"
 
 
 //*************************************************************************************************************

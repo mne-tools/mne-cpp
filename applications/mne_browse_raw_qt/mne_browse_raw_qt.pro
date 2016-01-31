@@ -129,7 +129,7 @@ HEADERS += \
     Windows/averagewindow.h \
     Windows/scalewindow.h \
     Windows/chinfowindow.h \
-    Windows/NoiseReductionWindow.h \
+    Windows/noisereductionwindow.h \
     Utils/datapackage.h \
 
 FORMS += \
