@@ -409,6 +409,7 @@ void Averaging::showAveragingWidget()
 
 void Averaging::resetAverage(bool state)
 {
+    Q_UNUSED(state)
     QMutexLocker locker(&m_qMutex);
     if(m_pRtAve)
         m_pRtAve->reset();

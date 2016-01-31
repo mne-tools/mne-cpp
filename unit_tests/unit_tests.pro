@@ -43,7 +43,7 @@ SUBDIRS += \
     mne_x_plugin_com \
     test_mne_future \
     test_ssp \
-	test_fiff_rwr
+    test_fiff_rwr
 
 contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += \
@@ -56,16 +56,13 @@ contains(MNECPP_CONFIG, withGui) {
 #       test_orig_rap_cluster_eval \
 
     qtHaveModule(3dcore,3drender,3dinput) {
-        isEqual(QT_MAJOR_VERSION, 5){
-#            isEqual(QT_MINOR_VERSION, 1){
-                message(Qt3D available && QTVersion >= Qt 5.1: mne 3D tests configured!)
-                SUBDIRS += \
-                    mne_3d_widget \
-                    test_mne_cluster \
-                    test_mne_surface \
-                    test_mne_stc \
-#            }
-        }
+        message(unit_tets.pro - Qt3D available)
+        message(Qt3D available && QTVersion >= Qt 5.6: mne 3D tests configured!)
+        SUBDIRS += \
+            mne_3d_widget \
+            test_mne_cluster \
+            test_mne_surface \
+            test_mne_stc \
     }
 }
 
