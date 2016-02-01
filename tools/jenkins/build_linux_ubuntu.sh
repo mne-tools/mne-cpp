@@ -1,3 +1,4 @@
+#!/bin/bash
 # ===startdir=== %WORKSPACE%/mne-cpp/..
 # %0 Build Number
 # arg0=%0
