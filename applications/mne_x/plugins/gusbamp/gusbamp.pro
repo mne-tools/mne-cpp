@@ -63,7 +63,7 @@ DEFINES += GUSBAMP_LIBRARY
 
 QT += core widgets svg
 
-TARGET = gusbamp
+TARGET = gusbamp_temp
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }

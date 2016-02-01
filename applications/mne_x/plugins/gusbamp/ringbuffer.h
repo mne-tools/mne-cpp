@@ -3,11 +3,12 @@
 #pragma once
 
 #include <Windows.h>
+#include "gusbamp_global.h"
 
 /*
  * Class representing a ring buffer with elements of type float.
  */
-template <typename T> class CRingBuffer
+template <typename T> class GUSBAMPSHARED_EXPORT CRingBuffer
 {
 public:
 
