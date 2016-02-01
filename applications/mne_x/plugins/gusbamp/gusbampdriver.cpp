@@ -233,15 +233,33 @@ bool GUSBAmpDriver::initDevice()
 
         }
 
+        //create _callSequenceHandles for the sequence of calling the devices (Master has to be the last device to be called!)
         _callSequenceHandles = openedDevicesHandles;
         numDevices = (int) _callSequenceHandles.size();
 
         buffers     = new BYTE**[numDevices];
         overlapped  = new OVERLAPPED*[numDevices];
 
-        //initialize application data buffer to the specified number of seconds
-        _bufferOverrun = false;
-        _buffer.Initialize(BUFFER_SIZE_SECONDS * SAMPLE_RATE_HZ * (NUMBER_OF_CHANNELS + TRIGGER) * (unsigned int) _callSequenceHandles.size());
+        //for each device create a number of QUEUE_SIZE data buffers
+        for (int deviceIndex=0; deviceIndex<numDevices; deviceIndex++)
+        {
+            buffers[deviceIndex] = new BYTE*[QUEUE_SIZE];
+            overlapped[deviceIndex] = new OVERLAPPED[QUEUE_SIZE];
+
+            //for each data buffer allocate a number of bufferSizeBytes bytes
+            for (queueIndex=0; queueIndex<QUEUE_SIZE; queueIndex++)
+            {
+                buffers[deviceIndex][queueIndex] = new BYTE[bufferSizeBytes];
+                memset(&(overlapped[deviceIndex][queueIndex]), 0, sizeof(OVERLAPPED));
+
+                //create a windows event handle that will be signalled when new data from the device has been received for each data buffer
+                overlapped[deviceIndex][queueIndex].hEvent = CreateEvent(NULL, false, false, NULL);
+            }
+        }
+
+//        //initialize application data buffer to the specified number of seconds
+//        _bufferOverrun = false;
+//        _buffer.Initialize(BUFFER_SIZE_SECONDS * SAMPLE_RATE_HZ * (NUMBER_OF_CHANNELS + TRIGGER) * (unsigned int) _callSequenceHandles.size());
 
         qDebug() << "Plugin GUSBAmp - INFO - initDevice() - The device has been connected and initialised successfully" << endl;
         return true;
@@ -337,22 +355,6 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
 //first run of data aquisition
     if(first_run)
     {
-        //for each device create a number of QUEUE_SIZE data buffers
-        for (int deviceIndex=0; deviceIndex<numDevices; deviceIndex++)
-        {
-            buffers[deviceIndex] = new BYTE*[QUEUE_SIZE];
-            overlapped[deviceIndex] = new OVERLAPPED[QUEUE_SIZE];
-
-            //for each data buffer allocate a number of bufferSizeBytes bytes
-            for (queueIndex=0; queueIndex<QUEUE_SIZE; queueIndex++)
-            {
-                buffers[deviceIndex][queueIndex] = new BYTE[bufferSizeBytes];
-                memset(&(overlapped[deviceIndex][queueIndex]), 0, sizeof(OVERLAPPED));
-
-                //create a windows event handle that will be signalled when new data from the device has been received for each data buffer
-                overlapped[deviceIndex][queueIndex].hEvent = CreateEvent(NULL, false, false, NULL);
-            }
-        }
 
         //start the devices (master device must be started at last)
         for (int deviceIndex=0; deviceIndex<numDevices; deviceIndex++)
@@ -365,81 +367,89 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
                 cout << "\tError on GT_Start: Couldn't start data acquisition of device.\n";
                 return 0;
             }
-
-            //queue-up the first batch of transfer requests
-            for (queueIndex=0; queueIndex<QUEUE_SIZE; queueIndex++)
-            {
-                if (!GT_GetData(hDevice, buffers[deviceIndex][queueIndex], bufferSizeBytes, &overlapped[deviceIndex][queueIndex]))
-                {
-                    cout << "\tError on GT_GetData.\n";
-                    return 0;
-                }
-            }
-
-
-            queueIndex = 0;
         }
         first_run = false;
     }
-    //continouos data acquisition
 
-    //receive data from each device
-    for (int deviceIndex = 0; deviceIndex < numDevices; deviceIndex++)
+    for (int deviceIndex=0; deviceIndex<numDevices; deviceIndex++)
     {
+
         HANDLE hDevice = _callSequenceHandles[deviceIndex];
 
-        //wait for notification from the system telling that new data is available
-        if (WaitForSingleObject(overlapped[deviceIndex][queueIndex].hEvent, 1000) == WAIT_TIMEOUT)
+        //queue-up the first batch of transfer requests
+        for (queueIndex=0; queueIndex<QUEUE_SIZE; queueIndex++)
         {
-            //throw string("Error on data transfer: timeout occurred.");
-            cout << "Error on data transfer: timeout occurred." << "\n";
-            return 0;
+            if (!GT_GetData(hDevice, buffers[deviceIndex][queueIndex], bufferSizeBytes, &overlapped[deviceIndex][queueIndex]))
+            {
+                cout << "\tError on GT_GetData.\n";
+                return 0;
+            }
         }
 
-        //get number of received bytes...
-        GetOverlappedResult(hDevice, &overlapped[deviceIndex][queueIndex], &numBytesReceived, false);
 
-        //...and check if we lost something (number of received bytes must be equal to the previously allocated buffer size)
-        if (numBytesReceived != bufferSizeBytes)
-        {
-            //throw string("Error on data transfer: samples lost.");
-            cout << "Error on data transfer: samples lost." << "\n";
-            return 0;
-        }
+        queueIndex = 0;
     }
 
-//    //to store the received data into the application data buffer at once, lock it
-//    _bufferLock.Lock();
 
-    __try
-    {
-        //if we are going to overrun on writing the received data into the buffer, set the appropriate flag; the reading thread will handle the overrun
-        _bufferOverrun = (_buffer.GetFreeSize() < (nPoints * numDevices));
+    //continouos data acquisition
 
-        //store received data from each device in the correct order (that is scan-wise, where one scan includes all channels of all devices) ignoring the header
-        for (int scanIndex = 0; scanIndex < NUMBER_OF_SCANS; scanIndex++)
-            for (int deviceIndex = 0; deviceIndex < numDevices; deviceIndex++)
-                _buffer.Write((float*) (buffers[deviceIndex][queueIndex] + scanIndex * (NUMBER_OF_CHANNELS + TRIGGER) * sizeof(float) + HEADER_SIZE), NUMBER_OF_CHANNELS + TRIGGER);
-    }
-    __finally
-    {
-//        //release the previously acquired lock
-//        _bufferLock.Unlock();
-    }
+//    //receive data from each device
+//    for (int deviceIndex = 0; deviceIndex < numDevices; deviceIndex++)
+//    {
+//        HANDLE hDevice = _callSequenceHandles[deviceIndex];
 
-    //add new GetData call to the queue replacing the currently received one
-    for (int deviceIndex = 0; deviceIndex < numDevices; deviceIndex++)
-        if (!GT_GetData(_callSequenceHandles[deviceIndex], buffers[deviceIndex][queueIndex], bufferSizeBytes, &overlapped[deviceIndex][queueIndex]))
-        {
-            cout << "\tError on GT_GetData.\n";
-            return 0;
-        }
+//        //wait for notification from the system telling that new data is available
+//        if (WaitForSingleObject(overlapped[deviceIndex][queueIndex].hEvent, 1000) == WAIT_TIMEOUT)
+//        {
+//            //throw string("Error on data transfer: timeout occurred.");
+//            cout << "Error on data transfer: timeout occurred." << "\n";
+//            return 0;
+//        }
 
-//    //signal processing (main) thread that new data is available
-//    _newDataAvailable.SetEvent();
+//        //get number of received bytes...
+//        GetOverlappedResult(hDevice, &overlapped[deviceIndex][queueIndex], &numBytesReceived, false);
 
-    //increment circular queueIndex to process the next queue at the next loop repitition (on overrun start at index 0 again)
-    queueIndex = (queueIndex + 1) % QUEUE_SIZE;
+//        //...and check if we lost something (number of received bytes must be equal to the previously allocated buffer size)
+//        if (numBytesReceived != bufferSizeBytes)
+//        {
+//            //throw string("Error on data transfer: samples lost.");
+//            cout << "Error on data transfer: samples lost." << "\n";
+//            return 0;
+//        }
+//    }
+
+////    //to store the received data into the application data buffer at once, lock it
+////    _bufferLock.Lock();
+
+//    __try
+//    {
+//        //if we are going to overrun on writing the received data into the buffer, set the appropriate flag; the reading thread will handle the overrun
+//        _bufferOverrun = (_buffer.GetFreeSize() < (nPoints * numDevices));
+
+//        //store received data from each device in the correct order (that is scan-wise, where one scan includes all channels of all devices) ignoring the header
+//        for (int scanIndex = 0; scanIndex < NUMBER_OF_SCANS; scanIndex++)
+//            for (int deviceIndex = 0; deviceIndex < numDevices; deviceIndex++)
+//                _buffer.Write((float*) (buffers[deviceIndex][queueIndex] + scanIndex * (NUMBER_OF_CHANNELS + TRIGGER) * sizeof(float) + HEADER_SIZE), NUMBER_OF_CHANNELS + TRIGGER);
+//    }
+//    __finally
+//    {
+////        //release the previously acquired lock
+////        _bufferLock.Unlock();
+//    }
+
+//    //add new GetData call to the queue replacing the currently received one
+//    for (int deviceIndex = 0; deviceIndex < numDevices; deviceIndex++)
+//        if (!GT_GetData(_callSequenceHandles[deviceIndex], buffers[deviceIndex][queueIndex], bufferSizeBytes, &overlapped[deviceIndex][queueIndex]))
+//        {
+//            cout << "\tError on GT_GetData.\n";
+//            return 0;
+//        }
+
+////    //signal processing (main) thread that new data is available
+////    _newDataAvailable.SetEvent();
+
+//    //increment circular queueIndex to process the next queue at the next loop repitition (on overrun start at index 0 again)
+//    queueIndex = (queueIndex + 1) % QUEUE_SIZE;
 
     return true;
  }
@@ -448,46 +458,46 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
 //*************************************************************************************************************
 
 
-bool GUSBAmpDriver::ReadData(float* destBuffer, int numberOfScans, int *errorCode, string *errorMessage)
-{
-//  int numDevices = (int) _callSequenceHandles.size();
-    int validPoints = (NUMBER_OF_CHANNELS + TRIGGER) * numberOfScans * numDevices;
+//bool GUSBAmpDriver::ReadData(float* destBuffer, int numberOfScans, int *errorCode, string *errorMessage)
+//{
+////  int numDevices = (int) _callSequenceHandles.size();
+//    int validPoints = (NUMBER_OF_CHANNELS + TRIGGER) * numberOfScans * numDevices;
 
-    //wait until requested amount of data is ready
-    if (_buffer.GetSize() < validPoints)
-    {
-        *errorCode = 2;
-        *errorMessage = "Not enough data available";
-        return false;
-    }
+//    //wait until requested amount of data is ready
+//    if (_buffer.GetSize() < validPoints)
+//    {
+//        *errorCode = 2;
+//        *errorMessage = "Not enough data available";
+//        return false;
+//    }
 
-//    //acquire lock on the application buffer for reading
-//    _bufferLock.Lock();
+////    //acquire lock on the application buffer for reading
+////    _bufferLock.Lock();
 
-    __try
-    {
-        //if buffer run over report error and reset buffer
-        if (_bufferOverrun)
-        {
-            _buffer.Reset();
-            *errorCode = 1;
-            *errorMessage = "Error on reading data from the application data buffer: buffer overrun.";
-            _bufferOverrun = false;
-            return false;
-        }
+//    __try
+//    {
+//        //if buffer run over report error and reset buffer
+//        if (_bufferOverrun)
+//        {
+//            _buffer.Reset();
+//            *errorCode = 1;
+//            *errorMessage = "Error on reading data from the application data buffer: buffer overrun.";
+//            _bufferOverrun = false;
+//            return false;
+//        }
 
-        //copy the data from the application buffer into the destination buffer
-        _buffer.Read(destBuffer, validPoints);
-    }
-    __finally
-    {
-//        _bufferLock.Unlock();
-    }
+//        //copy the data from the application buffer into the destination buffer
+//        _buffer.Read(destBuffer, validPoints);
+//    }
+//    __finally
+//    {
+////        _bufferLock.Unlock();
+//    }
 
-    *errorCode = 0;
-    *errorMessage = "No error occurred.";
-    return true;
-}
+//    *errorCode = 0;
+//    *errorMessage = "No error occurred.";
+//    return true;
+//}
 
 
 

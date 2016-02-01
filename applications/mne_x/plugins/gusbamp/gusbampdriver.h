@@ -128,8 +128,8 @@ private:
     CHANNEL             _bipolarSettings;           //don't use bipolar derivation (all values will be initialized to zero)
     REF                 _commonReference;           //don't connect groups to common reference
     GND                 _commonGround;              //don't connect groups to common ground
-    CRingBuffer<float>  _buffer;                    //the application buffer where received data will be stored for each device
-    bool                _bufferOverrun;             //flag indicating if an overrun occurred at the application buffer
+//    CRingBuffer<float>  _buffer;                    //the application buffer where received data will be stored for each device
+//    bool                _bufferOverrun;             //flag indicating if an overrun occurred at the application buffer
     const int           BUFFER_SIZE_SECONDS;		//the size of the application buffer in seconds
     const int           QUEUE_SIZE;                 //the number of GT_GetData calls that will be queued during acquisition to avoid loss of data
 //buffer-settings
