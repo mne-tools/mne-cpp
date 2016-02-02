@@ -104,6 +104,10 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
     for(int i = 0; i < NUMBER_OF_CHANNELS; i++)
         _channelsToAcquire[i] = UCHAR(i+1);
 
+    float version = float(GT_GetDriverVersion());
+
+    qDebug() <<endl<< "gUSBampdriver-contructor build successfully " << endl;
+    qDebug() << "gUSBamp-driver version:" << version << "was found";
 
 
 }
@@ -132,7 +136,7 @@ bool GUSBAmpDriver::initDevice()
 
 
 
-
+    qDebug() << "starting initializing gUSBamp devices" << endl;
 
 
 
@@ -144,8 +148,11 @@ bool GUSBAmpDriver::initDevice()
             HANDLE hDevice = GT_OpenDeviceEx(*serialNumber);
 
             if (hDevice == NULL)
+            {
+                qDebug() << "opening the device " << QString(*serialNumber)<< "failed" << endl;
                 throw string("Error on GT_OpenDeviceEx: Couldn't open device ").append(*serialNumber);
 
+            }
             //add the device handle to the list of opened devices
             openedDevicesHandles.push_back(hDevice);
 
@@ -267,16 +274,23 @@ bool GUSBAmpDriver::initDevice()
     }
     catch (string& exception)
     {
+        qDebug() << "error occurred - chatch{}-was started" << endl;
 
         //in case an exception occurred, close all opened devices...
         while(!openedDevicesHandles.empty())
         {
             GT_CloseDevice(&openedDevicesHandles.front());
+            qDebug() << "error occurred - Device " << &openedDevicesHandles.front()  << "was closed" << endl;
             openedDevicesHandles.pop_front();
         }
-        //...and rethrow the exception to notify the caller of this method about the error
-        throw exception;
+
+        std::cout << exception << '\n';
+
+
         return false;
+
+
+
     }
 
 
