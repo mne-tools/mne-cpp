@@ -84,6 +84,7 @@ QVariant BrainTreeModel::data(const QModelIndex& index, int role) const
 
 bool BrainTreeModel::addData(const QString& text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
 {
+    //Find already existing surface items and add the new data to the first search result
     QList<QStandardItem*> itemList = this->findItems(text);
     bool state = false;
 
@@ -104,6 +105,7 @@ bool BrainTreeModel::addData(const QString& text, const SurfaceSet& tSurfaceSet,
 
 bool BrainTreeModel::addData(const QString& text, const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
 {
+    //Find already existing surface items and add the new data to the first search result
     QList<QStandardItem*> itemList = this->findItems(text);
     bool state = false;
 
@@ -124,6 +126,7 @@ bool BrainTreeModel::addData(const QString& text, const Surface& tSurface, const
 
 bool BrainTreeModel::addData(const QString& text, const MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent)
 {
+    //Find already existing surface items and add the new data to the first search result
     QList<QStandardItem*> itemList = this->findItems(text);
     bool state = false;
 

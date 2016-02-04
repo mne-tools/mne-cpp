@@ -202,7 +202,7 @@ int main(int argc, char *argv[])
 //    MNEForwardSolution t_forwardSolution(t_File);
     //testWindow->addBrainData("HemiLRSet", t_forwardSolution);
 
-    QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("HemiLRSet", sourceEstimate, t_clusteredFwd);
+    QList<BrainRTDataTreeItem*> rtItemList = testWindow->addRtBrainData("HemiLRSet", sourceEstimate, t_clusteredFwd);
 
     //testWindow->addRtBrainData("HemiLRSet", sourceEstimate);
     //rtItemList.at(0)->addData(sourceEstimate);

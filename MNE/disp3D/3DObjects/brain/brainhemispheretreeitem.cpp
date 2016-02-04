@@ -134,20 +134,22 @@ bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation&
 bool BrainHemisphereTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Set name of BrainHemisphereTreeItem based on the hemisphere information
+    QVariant data;
+
     switch (tHemisphere.id) {
     case 101:
         this->setText("Left");
+        data.setValue(0);
         break;
     case 102:
         this->setText("Right");
+        data.setValue(1);
         break;
     default:
         this->setText("Unknown");
+        data.setValue(-1);
         break;
     }
-
-    QVariant data;
-    data.setValue(tHemisphere.id);
 
     this->setData(data, BrainHemisphereTreeItemRoles::SurfaceHemi);
 

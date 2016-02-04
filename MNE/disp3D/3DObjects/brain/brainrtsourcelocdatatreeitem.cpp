@@ -65,7 +65,7 @@ BrainRTSourceLocDataTreeItem::BrainRTSourceLocDataTreeItem(int iType, const QStr
             this, &BrainRTSourceLocDataTreeItem::onNewRtData);
 
     this->setEditable(false);
-    this->setToolTip("Real time data");
+    this->setToolTip("Real time source localization data");
 }
 
 
