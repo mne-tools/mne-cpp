@@ -74,7 +74,6 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
 ,_commonGround({ FALSE, FALSE, FALSE, FALSE })
 ,BUFFER_SIZE_SECONDS(5)
 ,QUEUE_SIZE(4)
-,first_run(true)
 ,queueIndex(0)
 ,nPoints(NUMBER_OF_SCANS * (NUMBER_OF_CHANNELS + TRIGGER))
 ,bufferSizeBytes(HEADER_SIZE + nPoints * sizeof(float))
@@ -90,7 +89,7 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
 
 
     //initializing a deque-list of the serial numbers to be called (LPSTR)
-    _masterSerial       = LPSTR("UA-2006.00.00");
+    _masterSerial       = LPSTR("UB-2015.05.16");
     _slaveSerials[0]    = LPSTR("UB-2010.03.43");
     _slaveSerials[1]    = LPSTR("UB-2010.03.44");
     _slaveSerials[2]    = LPSTR("UB-2010.03.47");
@@ -274,7 +273,7 @@ bool GUSBAmpDriver::initDevice()
     }
     catch (string& exception)
     {
-        qDebug() << "error occurred - chatch{}-was started" << endl;
+        qDebug() << "error occurred - catch{}-instruction was started" << endl;
 
         //in case an exception occurred, close all opened devices...
         while(!openedDevicesHandles.empty())
@@ -284,13 +283,26 @@ bool GUSBAmpDriver::initDevice()
             openedDevicesHandles.pop_front();
         }
 
-        std::cout << exception << '\n';
+        cout << exception << '\n';
 
 
         return false;
 
 
 
+    }
+
+    //start the devices (master device must be started at last)
+    for (int deviceIndex=0; deviceIndex<numDevices; deviceIndex++)
+    {
+        HANDLE hDevice = _callSequenceHandles[deviceIndex];
+
+        if (!GT_Start(hDevice))
+        {
+            //throw string("Error on GT_Start: Couldn't start data acquisition of device.");
+            cout << "\tError on GT_Start: Couldn't start data acquisition of device.\n";
+            return 0;
+        }
     }
 
 
@@ -303,49 +315,38 @@ bool GUSBAmpDriver::uninitDevice()
 {
 
 
-        cout << "Stopping devices and cleaning up..." << "\n";
+    cout << "Stopping devices and cleaning up..." << "\n";
 
-        //clean up allocated resources for each device
-        for (int i=0; i<numDevices; i++)
+    //clean up allocated resources for each device
+    for (int i=0; i<numDevices; i++)
+    {
+        HANDLE hDevice = _callSequenceHandles[i];
+
+        //clean up allocated resources for each queue per device
+        for (int j=0; j<QUEUE_SIZE; j++)
         {
-            HANDLE hDevice = _callSequenceHandles[i];
-
-            //clean up allocated resources for each queue per device
-            for (int j=0; j<QUEUE_SIZE; j++)
-            {
-                WaitForSingleObject(overlapped[i][queueIndex].hEvent, 1000);
-                CloseHandle(overlapped[i][queueIndex].hEvent);
-
-                delete [] buffers[i][queueIndex];
-
-                //increment queue index
-                queueIndex = (queueIndex + 1) % QUEUE_SIZE;
-            }
-
-            //stop device
-            GT_Stop(hDevice);
-
-            //reset device
-            GT_ResetTransfer(hDevice);
-
-            delete [] overlapped[i];
-            delete [] buffers[i];
+            WaitForSingleObject(overlapped[i][j].hEvent, 1000);
+            CloseHandle(overlapped[i][j].hEvent);
+            delete [] buffers[i][j];
+            qDebug()<< "deleted queue buffer" << j << "successfully";
         }
 
-        delete [] buffers;
-        delete [] overlapped;
+        //stop device
+        GT_Stop(hDevice);
+        qDebug() << "stopped " << QString(callSequenceSerials[i])<< " successfully" << endl;
 
-//        //reset _isRunning flag
-//        _isRunning = false;
+        //reset device
+        GT_ResetTransfer(hDevice);
+        qDebug() << "reseted Transfer of " << QString(callSequenceSerials[i])<< " successfully" << endl;
 
-//        //signal event
-//        _dataAcquisitionStopped.SetEvent();
+        delete [] overlapped[i];
+        delete [] buffers[i];
+    }
 
-        first_run = true;
+    delete [] buffers;
+    delete [] overlapped;
 
-
-
-
+    //closing all devices
     while (!_callSequenceHandles.empty())
     {
         //closes each opened device and removes it from the call sequence
@@ -366,24 +367,6 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
     sampleMatrix.setZero(); // Clear matrix - set all elements to zero
 
 
-//first run of data aquisition
-    if(first_run)
-    {
-
-        //start the devices (master device must be started at last)
-        for (int deviceIndex=0; deviceIndex<numDevices; deviceIndex++)
-        {
-            HANDLE hDevice = _callSequenceHandles[deviceIndex];
-
-            if (!GT_Start(hDevice))
-            {
-                //throw string("Error on GT_Start: Couldn't start data acquisition of device.");
-                cout << "\tError on GT_Start: Couldn't start data acquisition of device.\n";
-                return 0;
-            }
-        }
-        first_run = false;
-    }
 
     for (int deviceIndex=0; deviceIndex<numDevices; deviceIndex++)
     {
@@ -399,11 +382,11 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
                 return 0;
             }
         }
-
-
-        queueIndex = 0;
     }
 
+
+    qDebug() << buffers[0][0] << endl;
+    return true;
 
     //continouos data acquisition
 

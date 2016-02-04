@@ -133,7 +133,6 @@ private:
     const int           BUFFER_SIZE_SECONDS;		//the size of the application buffer in seconds
     const int           QUEUE_SIZE;                 //the number of GT_GetData calls that will be queued during acquisition to avoid loss of data
 //buffer-settings
-    bool                first_run;                  //indicates the first run of data acquisition (in the first run GT_Start() has to be executed)
     int                 queueIndex;                 //the index of GT_GetData calls that will be queued during acquisition
     int                 nPoints;                    //number of points which are received from one chanel simultaneously
     DWORD               bufferSizeBytes;            //Size of buffer
@@ -181,18 +180,18 @@ public:
     */
     bool uninitDevice();
 
-    //=========================================================================================================
+//    //=========================================================================================================
 
-    /**
-     * Reads the received numberOfScans scans from all devices. If not enough data is available (errorCode == 2) or the application buffer overruns (errorCode == 1), this method returns false.
-     * @return                      returns true if Reading procedure was sucessfull
-     * @param float* destBuffer:	the array that returns the received data from the application data buffer.
-                                    Data is aligned as follows: element at position destBuffer[scanIndex * (numberOfChannelsPerDevice * numDevices) + channelIndex] is sample of channel channelIndex (zero-based) of the scan with zero-based scanIndex.
-                                    channelIndex ranges from 0..numDevices*numChannelsPerDevices where numDevices equals the number of recorded devices and numChannelsPerDevice the number of channels from each of those devices.
-                                    It is assumed that all devices provide the same number of channels.
-     * @param int numberOfScans:	the number of scans to retrieve from the application buffer.
-     */
-    bool GUSBAmpDriver::ReadData(float* destBuffer, int numberOfScans, int *errorCode, string *errorMessage);
+//    /**
+//     * Reads the received numberOfScans scans from all devices. If not enough data is available (errorCode == 2) or the application buffer overruns (errorCode == 1), this method returns false.
+//     * @return                      returns true if Reading procedure was sucessfull
+//     * @param float* destBuffer:	the array that returns the received data from the application data buffer.
+//                                    Data is aligned as follows: element at position destBuffer[scanIndex * (numberOfChannelsPerDevice * numDevices) + channelIndex] is sample of channel channelIndex (zero-based) of the scan with zero-based scanIndex.
+//                                    channelIndex ranges from 0..numDevices*numChannelsPerDevices where numDevices equals the number of recorded devices and numChannelsPerDevice the number of channels from each of those devices.
+//                                    It is assumed that all devices provide the same number of channels.
+//     * @param int numberOfScans:	the number of scans to retrieve from the application buffer.
+//     */
+//    bool GUSBAmpDriver::ReadData(float* destBuffer, int numberOfScans, int *errorCode, string *errorMessage);
 
 
 protected:
