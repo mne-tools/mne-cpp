@@ -55,6 +55,7 @@
 //=============================================================================================================
 
 #include <QtCore/QCoreApplication>
+#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
@@ -82,10 +83,18 @@ using namespace MNELIB;
 */
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    QCoreApplication app(argc, argv);
+
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Cancel Noise Example");
+    parser.addHelpOption();
+    QCommandLineOption sampleFileOption("f", "Path to averaged sample <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    parser.addOption(sampleFileOption);
+    parser.process(app);
 
     //generate FiffEvokedSet
-    QFile t_sampleFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QFile t_sampleFile(parser.value(sampleFileOption));
     FiffEvokedSet p_FiffEvokedSet(t_sampleFile);
 
     //cancelNoise example
@@ -109,7 +118,7 @@ int main(int argc, char *argv[])
     //Do the projection
     //this was already performed with the FiffEvoked instantiation
 
-    return a.exec();
+    return app.exec();
 }
 
 //*************************************************************************************************************
