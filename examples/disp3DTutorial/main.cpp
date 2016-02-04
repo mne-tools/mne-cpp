@@ -42,8 +42,6 @@
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
 
-#include "disp/helpers/roundededgeswidget.h"
-
 #include <fs/label.h>
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
@@ -143,7 +141,7 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-    MNEForwardSolution t_clusteredFwd = t_Fwd;//.cluster_forward_solution(t_annotationSet, 40);
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 40);
 
     //
     // make an inverse operators
