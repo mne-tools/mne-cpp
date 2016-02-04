@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     brainrtsourcelocdatatreeitem.h
+* @file     brainrtconnectivitydatatreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015
+* @date     January, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BrainRTSourceLocDataTreeItem class declaration.
+* @brief     BrainRTConnectivityDataTreeItem class declaration.
 *
 */
 
-#ifndef BRAINRTSOURCELOCDATATREEITEM_H
-#define BRAINRTSOURCELOCDATATREEITEM_H
+#ifndef BRAINRTCONNECTIVITYDATATREEITEM_H
+#define BRAINRTCONNECTIVITYDATATREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -93,17 +93,17 @@ namespace DISP3DLIB
 
 //=============================================================================================================
 /**
-* BrainRTSourceLocDataTreeItem provides a generic item to hold information about real time source localization data to plot onto the brain surface.
+* BrainRTConnectivityDataTreeItem provides a generic item to hold information about real time connectivity data to plot onto the brain surface.
 *
 * @brief Provides a generic brain tree item to hold real time data.
 */
-class DISP3DNEWSHARED_EXPORT BrainRTSourceLocDataTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT BrainRTConnectivityDataTreeItem : public AbstractTreeItem
 {
     Q_OBJECT;
 
 public:
-    typedef QSharedPointer<BrainRTSourceLocDataTreeItem> SPtr;             /**< Shared pointer type for BrainRTSourceLocDataTreeItem class. */
-    typedef QSharedPointer<const BrainRTSourceLocDataTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainRTSourceLocDataTreeItem class. */
+    typedef QSharedPointer<BrainRTConnectivityDataTreeItem> SPtr;             /**< Shared pointer type for BrainRTConnectivityDataTreeItem class. */
+    typedef QSharedPointer<const BrainRTConnectivityDataTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainRTConnectivityDataTreeItem class. */
 
     //=========================================================================================================
     /**
@@ -112,13 +112,13 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainRTSourceLocDataTreeItem(int iType = BrainTreeModelItemTypes::RTSourceLocDataItem, const QString& text = "RT Source Loc Data");
+    explicit BrainRTConnectivityDataTreeItem(int iType = BrainTreeModelItemTypes::RTConnectivityDataItem, const QString& text = "RT Connectivity Data");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~BrainRTSourceLocDataTreeItem();
+    ~BrainRTConnectivityDataTreeItem();
 
     //=========================================================================================================
     /**
@@ -129,118 +129,42 @@ public:
 
     //=========================================================================================================
     /**
-    * Initializes the rt data item with neccessary information for visualization computations.
+    * Initializes the rt connectivity data item with neccessary information for visualization computations.
     *
     * @param[in] tForwardSolution       The MNEForwardSolution.
-    * @param[in] hemi                   The hemispehre of this brain rt data item. This information is important in order to cut out the wanted source estimations from the MNESourceEstimate
-    * @param[in] arraySurfaceVertColor  The vertex colors for the surface where the data is to be plotted on.
-    * @param[in] vecLabelIds            The label ids for each surface vertex index.
-    * @param[in] lLabels                The label list.
+    * @param[in] hemi                   The hemispehre of this brain rt connectivity data item.
     *
     * @return                           Returns true if successful.
     */
-    bool init(const MNELIB::MNEForwardSolution& tForwardSolution, const QByteArray &arraySurfaceVertColor, int iHemi, const Eigen::VectorXi& vecLabelIds = FIFFLIB::defaultVectorXi, const QList<FSLIB::Label>& lLabels = QList<FSLIB::Label>());
+    bool init(const MNELIB::MNEForwardSolution& tForwardSolution, int iHemi);
 
     //=========================================================================================================
     /**
-    * Adds actual rt data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
+    * Adds actual rt connectivity data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
     *
-    * @param[in] tSourceEstimate    The MNESourceEstimate data.
+    * @param[in] matNewConnection    The new connectivity data.
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const MNELIB::MNESourceEstimate& tSourceEstimate);
+    bool addData(const Eigen::MatrixXd& matNewConnection);
 
     //=========================================================================================================
     /**
-    * Updates the rt data which is streamed by this item's worker thread item.
+    * Updates the rt connectivity data which is streamed by this item's worker thread item.
     *
     * @return                       Returns true if this item is initialized.
     */
     inline bool isInit() const;
 
 public slots:
-    //=========================================================================================================
-    /**
-    * This slot gets called whenever the origin of the surface vertex color (curvature, annoation, etc.) changed.
-    *
-    * @param[in] arrayVertColor     The new vertex colors.
-    */
-    void onColorInfoOriginChanged(const QByteArray& arrayVertColor);
-
-    //=========================================================================================================
-    /**
-    * This slot gets called whenever the check/actiation state of the rt data worker changed.
-    *
-    * @param[in] checkState     The check state of the worker.
-    */
-    void onCheckStateWorkerChanged(const Qt::CheckState& checkState);
-
-    //=========================================================================================================
-    /**
-    * This slot gets called whenever this item receives new color values for each estimated source.
-    *
-    * @param[in] sourceColorSamples     The color values for each estimated source.
-    */
-    void onNewRtData(const QByteArray& sourceColorSamples);
-
-    //=========================================================================================================
-    /**
-    * This slot gets called whenever the used colormap type changed.
-    *
-    * @param[in] sColormapType     The name of the new colormap type.
-    */
-    void onColormapTypeChanged(const QString& sColormapType);
-
-    //=========================================================================================================
-    /**
-    * This slot gets called whenever the time interval in between the streamed samples changed.
-    *
-    * @param[in] iMSec     The new time in milliseconds waited in between each streamed sample.
-    */
-    void onTimeIntervalChanged(int iMSec);
-
-    //=========================================================================================================
-    /**
-    * This slot gets called whenever the normaization value changed. The normalization value is used to normalize the estimated source activation.
-    *
-    * @param[in] iMSec     The new time normalization value.
-    */
-    void onDataNormalizationValueChanged(double dValue);
-
-    //=========================================================================================================
-    /**
-    * This slot gets called whenever the preferred visualization type changes (single vertex, smoothing, annotation based). This functions translates from QString to m_iVisualizationType.
-    *
-    * @param[in] sVisType     The new visualization type.
-    */
-    void onVisualizationTypeChanged(const QString& sVisType);
-
-    //=========================================================================================================
-    /**
-    * This slot gets called whenever the check/actiation state of the looped streaming state changed.
-    *
-    * @param[in] checkState     The check state of the looped streaming state.
-    */
-    void onCheckStateLoopedStateChanged(const Qt::CheckState& checkState);
-
-    //=========================================================================================================
-    /**
-    * This slot gets called whenever the number of averages of the streamed samples changed.
-    *
-    * @param[in] iNumAvr     The new number of averages.
-    */
-    void onNumberAveragesChanged(int iNumAvr);
 
 private:
     bool                        m_bIsInit;                      /**< The init flag. */
 
-    RtSourceLocDataWorker*      m_pSourceLocRtDataWorker;       /**< The source data worker. This worker streams the rt data to this item.*/
-
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever you want to provide newly generated colors from the stream rt data.
+    * Emit this signal whenever you want to provide newly generated colors from the stream rt connectivity data.
     *
     * @param[in] sourceColorSamples     The color values for each estimated source.
     */
@@ -252,11 +176,11 @@ signals:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool BrainRTSourceLocDataTreeItem::isInit() const
+inline bool BrainRTConnectivityDataTreeItem::isInit() const
 {
     return m_bIsInit;
 }
 
 } //NAMESPACE DISP3DLIB
 
-#endif // BRAINRTSOURCELOCDATATREEITEM_H
+#endif // BRAINRTCONNECTIVITYDATATREEITEM_H

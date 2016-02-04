@@ -171,10 +171,10 @@ BrainRTSourceLocDataTreeItem* BrainHemisphereTreeItem::addData(const MNESourceEs
 {
     if(!tSourceEstimate.isEmpty()) {
         //Add source estimation data as child
-        if(this->findChildren(BrainTreeModelItemTypes::RTDataItem).size() == 0) {
+        if(this->findChildren(BrainTreeModelItemTypes::RTSourceLocDataItem).size() == 0) {
             //If rt data item does not exists yet, create it here!
             if(!tForwardSolution.isEmpty()) {
-                m_pBrainRTSourceLocDataTreeItem = new BrainRTSourceLocDataTreeItem(BrainTreeModelItemTypes::RTDataItem);
+                m_pBrainRTSourceLocDataTreeItem = new BrainRTSourceLocDataTreeItem();
                 *this<<m_pBrainRTSourceLocDataTreeItem;
 
                 connect(m_pBrainRTSourceLocDataTreeItem, &BrainRTSourceLocDataTreeItem::rtVertColorChanged,
