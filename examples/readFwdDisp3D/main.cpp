@@ -80,20 +80,20 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    AnnotationSet t_annotationSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
     QFile t_File("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     MNEForwardSolution t_forwardSolution(t_File);
-    MNEForwardSolution t_clusteredFwd = t_forwardSolution.cluster_forward_solution(t_annotationSet, 40);
-
-    Surface tSurfRight ("sample", 1, "pial", "./MNE-sample-data/subjects");
-    Annotation tAnnotRight ("sample", 1, "aparc.a2009s", "./MNE-sample-data/subjects");
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addBrainData("ForwardSolution", t_clusteredFwd);
-    testWindow->addBrainData("ForwardSolution", tSurfRight, tAnnotRight);
+
+    //Option 1 - Visualize full source space
+    testWindow->addBrainData("ForwardSolution", t_forwardSolution);
+
+    //Option 2 - Visualize clustered source space
+    //AnnotationSet t_annotationSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
+    //MNEForwardSolution t_clusteredFwd = t_forwardSolution.cluster_forward_solution(t_annotationSet, 40);
+    //testWindow->addBrainData("ForwardSolution", t_clusteredFwd);
 
     testWindow->show();
-
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
     control3DWidget->setView3D(testWindow);
     control3DWidget->show();
