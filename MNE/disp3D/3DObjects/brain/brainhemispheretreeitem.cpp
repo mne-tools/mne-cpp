@@ -190,7 +190,7 @@ BrainRTSourceLocDataTreeItem* BrainHemisphereTreeItem::addData(const MNESourceEs
 
                 m_pBrainRTSourceLocDataTreeItem->addData(tSourceEstimate);
             } else {
-                qDebug()<<"BrainHemisphereTreeItem::addData - Cannot add real time data since the forwad solution was not provided and therefore the rt data item has not been initilaized yet. Returning...";
+                qDebug()<<"BrainHemisphereTreeItem::addData - Cannot add real time data since the forwad solution was not provided and therefore the rt source localization data item has not been initilaized yet. Returning...";
             }
         } else {
             m_pBrainRTSourceLocDataTreeItem->addData(tSourceEstimate);
