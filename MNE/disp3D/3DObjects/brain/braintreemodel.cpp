@@ -142,9 +142,9 @@ bool BrainTreeModel::addData(const QString& text, const MNESourceSpace& tSourceS
 
 //*************************************************************************************************************
 
-QList<BrainRTDataTreeItem*> BrainTreeModel::addData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
+QList<BrainRTSourceLocDataTreeItem*> BrainTreeModel::addData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
-    QList<BrainRTDataTreeItem*> returnList;
+    QList<BrainRTSourceLocDataTreeItem*> returnList;
     QList<QStandardItem*> itemList = this->findItems(text);
 
     //Find the all the hemispheres of the set "text" and add the source estimates as items

@@ -201,7 +201,7 @@ bool View3D::addBrainData(const QString& text, const MNEForwardSolution& tForwar
 
 //*************************************************************************************************************
 
-QList<BrainRTDataTreeItem*> View3D::addRtBrainData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
+QList<BrainRTSourceLocDataTreeItem*> View3D::addRtBrainData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
     return m_pBrain->addData(text, tSourceEstimate, tForwardSolution);
 }

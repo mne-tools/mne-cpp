@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     brainrtdatatreeitem.h
+* @file     brainrtsourcelocdatatreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BrainRTDataTreeItem class declaration.
+* @brief     BrainRTSourceLocDataTreeItem class declaration.
 *
 */
 
-#ifndef BRAINRTDATATREEITEM_H
-#define BRAINRTDATATREEITEM_H
+#ifndef BRAINRTSOURCELOCDATATREEITEM_H
+#define BRAINRTSOURCELOCDATATREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -93,17 +93,17 @@ namespace DISP3DLIB
 
 //=============================================================================================================
 /**
-* BrainRTDataTreeItem provides a generic item to hold information about real time data to plot onto the brain surface.
+* BrainRTSourceLocDataTreeItem provides a generic item to hold information about real time data to plot onto the brain surface.
 *
 * @brief Provides a generic brain tree item to hold real time data.
 */
-class DISP3DNEWSHARED_EXPORT BrainRTDataTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT BrainRTSourceLocDataTreeItem : public AbstractTreeItem
 {
     Q_OBJECT;
 
 public:
-    typedef QSharedPointer<BrainRTDataTreeItem> SPtr;             /**< Shared pointer type for BrainRTDataTreeItem class. */
-    typedef QSharedPointer<const BrainRTDataTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainRTDataTreeItem class. */
+    typedef QSharedPointer<BrainRTSourceLocDataTreeItem> SPtr;             /**< Shared pointer type for BrainRTSourceLocDataTreeItem class. */
+    typedef QSharedPointer<const BrainRTSourceLocDataTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainRTSourceLocDataTreeItem class. */
 
     //=========================================================================================================
     /**
@@ -112,13 +112,13 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainRTDataTreeItem(int iType = BrainTreeModelItemTypes::RTDataItem, const QString& text = "RT Data");
+    explicit BrainRTSourceLocDataTreeItem(int iType = BrainTreeModelItemTypes::RTDataItem, const QString& text = "RT Data");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~BrainRTDataTreeItem();
+    ~BrainRTSourceLocDataTreeItem();
 
     //=========================================================================================================
     /**
@@ -252,11 +252,11 @@ signals:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool BrainRTDataTreeItem::isInit() const
+inline bool BrainRTSourceLocDataTreeItem::isInit() const
 {
     return m_bIsInit;
 }
 
 } //NAMESPACE DISP3DLIB
 
-#endif // BRAINRTDATATREEITEM_H
+#endif // BrainRTSourceLocDataTreeItem_H

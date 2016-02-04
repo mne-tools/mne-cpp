@@ -96,7 +96,7 @@ bool Brain::addData(const QString& text, const MNESourceSpace& tSourceSpace)
 
 //*************************************************************************************************************
 
-QList<BrainRTDataTreeItem*> Brain::addData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
+QList<BrainRTSourceLocDataTreeItem*> Brain::addData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
     return m_pBrainTreeModel->addData(text, tSourceEstimate, tForwardSolution);
 }
