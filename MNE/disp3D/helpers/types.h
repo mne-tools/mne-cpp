@@ -180,7 +180,7 @@ namespace BrainAnnotationTreeItemRoles
                     LabeIds = Qt::UserRole + 404};
 }
 
-namespace BrainRTDataTreeItemRoles
+namespace BrainRTSourceLocDataTreeItemRoles
 {
     enum ItemRole{RTData = Qt::UserRole + 500,
                     RTVertNo = Qt::UserRole + 501,

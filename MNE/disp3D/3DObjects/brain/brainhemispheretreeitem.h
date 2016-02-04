@@ -47,7 +47,7 @@
 
 #include "brainsurfacetreeitem.h"
 #include "brainannotationtreeitem.h"
-#include "brainrtdatatreeitem.h"
+#include "brainrtsourcelocdatatreeitem.h"
 #include "brainsourcespacetreeitem.h"
 
 #include "fs/label.h"
@@ -161,12 +161,12 @@ public:
     *
     * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
     */
-    BrainRTDataTreeItem* addData(const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+    BrainRTSourceLocDataTreeItem* addData(const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
 
 private:
-    BrainSurfaceTreeItem*       m_pSurfaceItem;             /**< The surface item of this hemisphere item. Only one surface item may exists under a hemisphere item. */
-    BrainAnnotationTreeItem*    m_pAnnotItem;               /**< The annotation item of this hemisphere item. Only one annotation item may exists under a hemisphere item. */
-    BrainRTDataTreeItem*        m_pBrainRtDataTreeItem;     /**< The rt data item of this hemisphere item. Multiple rt data item's can be added to this hemipshere item. */
+    BrainSurfaceTreeItem*           m_pSurfaceItem;                     /**< The surface item of this hemisphere item. Only one surface item may exists under a hemisphere item. */
+    BrainAnnotationTreeItem*        m_pAnnotItem;                       /**< The annotation item of this hemisphere item. Only one annotation item may exists under a hemisphere item. */
+    BrainRTSourceLocDataTreeItem*   m_pBrainRTSourceLocDataTreeItem;    /**< The rt data item of this hemisphere item. Multiple rt data item's can be added to this hemipshere item. */
 };
 
 } //NAMESPACE DISP3DLIB

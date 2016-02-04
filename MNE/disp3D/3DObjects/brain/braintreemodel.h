@@ -167,7 +167,7 @@ public:
     *
     * @return                       Returns a list of the rt data tree items. These items should be used to efficienelty update the rt data.
     */
-    QList<BrainRTDataTreeItem*> addData(const QString& text, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+    QList<BrainRTSourceLocDataTreeItem*> addData(const QString& text, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
 
 private:
     QStandardItem*     m_pRootItem;     /**< The root item of the tree model. */
