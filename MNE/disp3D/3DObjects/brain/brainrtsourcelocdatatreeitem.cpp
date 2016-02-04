@@ -151,7 +151,7 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
         this->setData(data, BrainRTSourceLocDataTreeItemRoles::RTVertNo);
     }
 
-    //Add surface meta information as item children
+    //Add meta information as item children
     BrainTreeMetaItem* pItemRTDataStreamStatus = new BrainTreeMetaItem(BrainTreeMetaItemTypes::RTDataStreamStatus, "Stream data on/off");
     connect(pItemRTDataStreamStatus, &BrainTreeMetaItem::checkStateChanged,
             this, &BrainRTSourceLocDataTreeItem::onCheckStateWorkerChanged);

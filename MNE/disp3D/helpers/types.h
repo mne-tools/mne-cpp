@@ -87,8 +87,9 @@ namespace BrainTreeModelItemTypes
                     HemisphereItem = QStandardItem::UserType + 2,
                     SurfaceItem = QStandardItem::UserType + 3,
                     AnnotationItem = QStandardItem::UserType + 4,
-                    RTDataItem = QStandardItem::UserType + 5,
-                    SourceSpaceItem = QStandardItem::UserType + 6};
+                    RTSourceLocDataItem = QStandardItem::UserType + 5,
+                    SourceSpaceItem = QStandardItem::UserType + 6,
+                    RTConnectivityDataItem = QStandardItem::UserType + 7};
 }
 
 namespace BrainTreeMetaItemTypes
@@ -195,6 +196,11 @@ namespace BrainRTDataVisualizationTypes
     enum ItemRole{VertexBased = Qt::UserRole + 600,
                     SmoothingBased = Qt::UserRole + 601,
                     AnnotationBased = Qt::UserRole + 602};
+}
+
+namespace BrainRTConnectivityDataTreeItemRoles
+{
+    enum ItemRole{RTHemi = Qt::UserRole + 700};
 }
 
 } //NAMESPACE DISP3DLIB
