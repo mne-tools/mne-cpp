@@ -156,19 +156,11 @@ public:
     */
     inline bool isInit() const;
 
-public slots:
-
 private:
     bool                        m_bIsInit;                      /**< The init flag. */
 
 signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever you want to provide newly generated colors from the stream rt connectivity data.
-    *
-    * @param[in] sourceColorSamples     The color values for each estimated source.
-    */
-    void rtVertColorChanged(const QByteArray& sourceColorSamples);
+
 };
 
 //*************************************************************************************************************

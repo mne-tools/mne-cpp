@@ -61,7 +61,7 @@ BrainRTConnectivityDataTreeItem::BrainRTConnectivityDataTreeItem(int iType, cons
 , m_bIsInit(false)
 {
     this->setEditable(false);
-    this->setToolTip("Real time source localization data");
+    this->setToolTip("Real time connectivity data");
 }
 
 
