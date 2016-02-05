@@ -172,7 +172,7 @@ private:
 
     View3D::SPtr                    m_p3DView;
     Control3DWidget::SPtr           m_pControl3DView;
-    QList<BrainRTDataTreeItem*>     m_lRtItem;
+    QList<BrainRTSourceLocDataTreeItem*>     m_lRtItem;
 
     QAction*                        m_pAction3DControl; /**< show 3D View control widget */
 
