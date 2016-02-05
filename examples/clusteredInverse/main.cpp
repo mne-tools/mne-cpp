@@ -293,7 +293,7 @@ int main(int argc, char *argv[])
 //    View3D::SPtr testWindow = View3D::SPtr(new View3D());
 //    testWindow->addBrainData("HemiLRSet", t_surfSet, t_annotationSet);
 
-//    QList<BrainRTDataTreeItem*> rtItemList = testWindow->addRtBrainData("HemiLRSet", sourceEstimate, t_clusteredFwd);
+//    QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("HemiLRSet", sourceEstimate, t_clusteredFwd);
 
 //    testWindow->show();
 
