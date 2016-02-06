@@ -133,9 +133,9 @@ private:
     const int           BUFFER_SIZE_SECONDS;		//the size of the application buffer in seconds
     const int           QUEUE_SIZE;                 //the number of GT_GetData calls that will be queued during acquisition to avoid loss of data
 //buffer-settings
-    int                 queueIndex;                 //the index of GT_GetData calls that will be queued during acquisition
+    bool                firstRun;
     int                 nPoints;                    //number of points which are received from one chanel simultaneously
-    DWORD               bufferSizeBytes;            //Size of buffer
+    DWORD                bufferSizeBytes;            //Size of buffer
     int                 numDevices;                 //number of connected devices (master and slaves)
     DWORD               numBytesReceived;           //num of Bytes whicht are received during one measuring procedure
 //create the temporary data buffers (the device will write data into those)
