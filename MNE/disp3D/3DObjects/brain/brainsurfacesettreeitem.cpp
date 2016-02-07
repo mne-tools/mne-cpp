@@ -99,20 +99,49 @@ bool BrainSurfaceSetTreeItem::addData(const SurfaceSet& tSurfaceSet, const Annot
     //Generate child items based on surface set input parameters
     bool state = false;
 
-    for(int i = 0; i < tSurfaceSet.size(); i++) {
-        BrainHemisphereTreeItem* pHemisphereItem = new BrainHemisphereTreeItem(BrainTreeModelItemTypes::HemisphereItem);
+    QList<QStandardItem*> itemList = this->findChildren(BrainTreeModelItemTypes::HemisphereItem);
 
-        if(i < tAnnotationSet.size()) {
-            if(tAnnotationSet[i].hemi() == tSurfaceSet[i].hemi()) {
-                state = pHemisphereItem->addData(tSurfaceSet[i], tAnnotationSet[i], p3DEntityParent);
-            } else {
-                state = pHemisphereItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent);
+    //If there are more hemispheres in tSourceSpace than in the tree model
+    bool hemiItemFound = false;
+
+    //Search for already created hemi items and add source space data respectivley
+    for(int i = 0; i < tSurfaceSet.size(); i++) {
+        for(int j = 0; j<itemList.size(); j++) {
+            BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j));
+
+            if(pHemiItem->data(BrainHemisphereTreeItemRoles::SurfaceHemi).toInt() == tSurfaceSet[i].hemi()) {
+                hemiItemFound = true;
+
+                if(i < tAnnotationSet.size()) {
+                    if(tAnnotationSet[i].hemi() == tSurfaceSet[i].hemi()) {
+                        state = pHemiItem->addData(tSurfaceSet[i], tAnnotationSet[i], p3DEntityParent);
+                    } else {
+                        state = pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent);
+                    }
+                } else {
+                    state = pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent);
+                }
             }
-        } else {
-            state = pHemisphereItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent);
         }
 
-        *this<<pHemisphereItem; //same as this->appendRow(pSurfaceItem)
+        if(!hemiItemFound) {
+            //Item does not exist yet, create it here.
+            BrainHemisphereTreeItem* pHemiItem = new BrainHemisphereTreeItem(BrainTreeModelItemTypes::HemisphereItem);
+
+            if(i < tAnnotationSet.size()) {
+                if(tAnnotationSet[i].hemi() == tSurfaceSet[i].hemi()) {
+                    state = pHemiItem->addData(tSurfaceSet[i], tAnnotationSet[i], p3DEntityParent);
+                } else {
+                    state = pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent);
+                }
+            } else {
+                state = pHemiItem->addData(tSurfaceSet[i], Annotation(), p3DEntityParent);
+            }
+
+            *this<<pHemiItem; //same as this->appendRow(pSurfaceItem)
+        }
+
+        hemiItemFound = false;
     }
 
     return state;
@@ -126,15 +155,37 @@ bool BrainSurfaceSetTreeItem::addData(const Surface& tSurface, const Annotation&
     //Generate child items based on surface set input parameters
     bool state = false;
 
-    BrainHemisphereTreeItem* pHemisphereItem = new BrainHemisphereTreeItem(BrainTreeModelItemTypes::HemisphereItem);
+    QList<QStandardItem*> itemList = this->findChildren(BrainTreeModelItemTypes::HemisphereItem);
 
-    if(tAnnotation.hemi() == tSurface.hemi()) {
-        state = pHemisphereItem->addData(tSurface, tAnnotation, p3DEntityParent);
-    } else {
-        state = pHemisphereItem->addData(tSurface, Annotation(), p3DEntityParent);
+    bool hemiItemFound = false;
+
+    //Search for already created hemi items and add source space data respectivley
+    for(int j = 0; j<itemList.size(); j++) {
+        BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j));
+
+        if(pHemiItem->data(BrainHemisphereTreeItemRoles::SurfaceHemi).toInt() == tSurface.hemi()) {
+            hemiItemFound = true;
+
+            if(tAnnotation.hemi() == tSurface.hemi()) {
+                state = pHemiItem->addData(tSurface, tAnnotation, p3DEntityParent);
+            } else {
+                state = pHemiItem->addData(tSurface, Annotation(), p3DEntityParent);
+            }
+        }
     }
 
-    *this<<pHemisphereItem; //same as this->appendRow(pSurfaceItem)
+    if(!hemiItemFound) {
+        //Item does not exist yet, create it here.
+        BrainHemisphereTreeItem* pHemiItem = new BrainHemisphereTreeItem(BrainTreeModelItemTypes::HemisphereItem);
+
+        if(tAnnotation.hemi() == tSurface.hemi()) {
+            state = pHemiItem->addData(tSurface, tAnnotation, p3DEntityParent);
+        } else {
+            state = pHemiItem->addData(tSurface, Annotation(), p3DEntityParent);
+        }
+
+        *this<<pHemiItem; //same as this->appendRow(pSurfaceItem)
+    }
 
     return state;
 }
