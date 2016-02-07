@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     brain.cpp
+* @file     brainrtconnectivitydatatreeitem.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015
+* @date     January, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Brain class definition.
+* @brief    BrainRTConnectivityDataTreeItem class definition.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "brain.h"
+#include "brainrtconnectivitydatatreeitem.h"
 
 
 //*************************************************************************************************************
@@ -46,7 +46,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FSLIB;
+using namespace Eigen;
 using namespace MNELIB;
 using namespace DISP3DLIB;
 
@@ -56,56 +56,73 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Brain::Brain(Qt3DCore::QEntity* parent)
-: Qt3DCore::QEntity(parent)
-, m_pBrainTreeModel(new BrainTreeModel(this))
+BrainRTConnectivityDataTreeItem::BrainRTConnectivityDataTreeItem(int iType, const QString &text)
+: AbstractTreeItem(iType, text)
+, m_bIsInit(false)
+{
+    this->setEditable(false);
+    this->setToolTip("Real time connectivity data");
+}
+
+
+//*************************************************************************************************************
+
+BrainRTConnectivityDataTreeItem::~BrainRTConnectivityDataTreeItem()
 {
 }
 
 
 //*************************************************************************************************************
 
-Brain::~Brain()
+QVariant BrainRTConnectivityDataTreeItem::data(int role) const
 {
+    return AbstractTreeItem::data(role);
 }
 
 
 //*************************************************************************************************************
 
-bool Brain::addData(const QString& text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
+void  BrainRTConnectivityDataTreeItem::setData(const QVariant& value, int role)
 {
-    return m_pBrainTreeModel->addData(text, tSurfaceSet, tAnnotationSet, this);
+    AbstractTreeItem::setData(value, role);
 }
 
 
 //*************************************************************************************************************
 
-bool Brain::addData(const QString& text, const Surface& tSurface, const Annotation &tAnnotation)
-{
-    return m_pBrainTreeModel->addData(text, tSurface, tAnnotation, this);
+bool BrainRTConnectivityDataTreeItem::init(const MNEForwardSolution& tForwardSolution, int iHemi)
+{   
+    //Set hemisphere information as item's data
+    this->setData(iHemi, BrainRTConnectivityDataTreeItemRoles::RTHemi);
+
+    //Set data based on clusterd or full source space
+    bool isClustered = tForwardSolution.src[iHemi].isClustered();
+
+    QVariant data;
+
+    //Add meta information as item children
+    QString sIsClustered = isClustered ? "Clustered" : "Full";
+    BrainTreeMetaItem* pItemSourceSpaceType = new BrainTreeMetaItem(BrainTreeMetaItemTypes::RTDataSourceSpaceType, sIsClustered);
+    pItemSourceSpaceType->setEditable(false);
+    *this<<pItemSourceSpaceType;
+    data.setValue(sIsClustered);
+    pItemSourceSpaceType->setData(data, BrainTreeMetaItemRoles::RTDataSourceSpaceType);
+
+    m_bIsInit = true;
+
+    return true;
 }
 
 
 //*************************************************************************************************************
 
-bool Brain::addData(const QString& text, const MNESourceSpace& tSourceSpace)
+bool BrainRTConnectivityDataTreeItem::addData(const MatrixXd& matNewConnection)
 {
-    return m_pBrainTreeModel->addData(text, tSourceSpace, this);
-}
+    if(!m_bIsInit) {
+        qDebug()<<"BrainRTConnectivityDataTreeItem::updateData - Rt Item has not been initialized yet!";
+        return false;
+    }
 
-
-//*************************************************************************************************************
-
-QList<BrainRTSourceLocDataTreeItem*> Brain::addData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
-{
-    return m_pBrainTreeModel->addData(text, tSourceEstimate, tForwardSolution);
-}
-
-
-//*************************************************************************************************************
-
-BrainTreeModel* Brain::getBrainTreeModel()
-{
-    return m_pBrainTreeModel;
+    return true;
 }
 

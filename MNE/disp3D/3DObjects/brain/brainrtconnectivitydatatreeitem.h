@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     brainhemispheretreeitem.h
+* @file     brainrtconnectivitydatatreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015
+* @date     January, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BrainHemisphereTreeItem class declaration.
+* @brief     BrainRTConnectivityDataTreeItem class declaration.
 *
 */
 
-#ifndef BRAINHEMISPHERETREEITEM_H
-#define BRAINHEMISPHERETREEITEM_H
+#ifndef BRAINRTCONNECTIVITYDATATREEITEM_H
+#define BRAINRTCONNECTIVITYDATATREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -44,18 +44,15 @@
 #include "../../disp3D_global.h"
 
 #include "../../helpers/abstracttreeitem.h"
+#include "../../helpers/types.h"
+#include "../../rt/rtSourceLoc/rtsourcelocdataworker.h"
 
-#include "brainsurfacetreeitem.h"
-#include "brainannotationtreeitem.h"
-#include "brainrtsourcelocdatatreeitem.h"
-#include "brainsourcespacetreeitem.h"
+#include "braintreemetaitem.h"
 
-#include "fs/label.h"
-#include "fs/annotationset.h"
-#include "fs/surfaceset.h"
+#include "fiff/fiff_types.h"
 
-#include "mne/mne_forwardsolution.h"
 #include "mne/mne_sourceestimate.h"
+#include "mne/mne_forwardsolution.h"
 
 
 //*************************************************************************************************************
@@ -87,6 +84,7 @@
 namespace DISP3DLIB
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -95,32 +93,32 @@ namespace DISP3DLIB
 
 //=============================================================================================================
 /**
-* BrainHemisphereTreeItem provides a generic brain tree item to hold of brain data (hemi, vertices, tris, etc.) from different sources (FreeSurfer, etc.).
+* BrainRTConnectivityDataTreeItem provides a generic item to hold information about real time connectivity data to plot onto the brain surface.
 *
-* @brief Provides a generic brain tree item.
+* @brief Provides a generic brain tree item to hold real time data.
 */
-class DISP3DNEWSHARED_EXPORT BrainHemisphereTreeItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT BrainRTConnectivityDataTreeItem : public AbstractTreeItem
 {
     Q_OBJECT;
 
 public:
-    typedef QSharedPointer<BrainHemisphereTreeItem> SPtr;             /**< Shared pointer type for BrainHemisphereTreeItem class. */
-    typedef QSharedPointer<const BrainHemisphereTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainHemisphereTreeItem class. */
+    typedef QSharedPointer<BrainRTConnectivityDataTreeItem> SPtr;             /**< Shared pointer type for BrainRTConnectivityDataTreeItem class. */
+    typedef QSharedPointer<const BrainRTConnectivityDataTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainRTConnectivityDataTreeItem class. */
 
     //=========================================================================================================
     /**
-    * Default constructor from single surface.
+    * Default constructor.
     *
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainHemisphereTreeItem(int iType = BrainTreeModelItemTypes::HemisphereItem, const QString& text = "Unknown");
+    explicit BrainRTConnectivityDataTreeItem(int iType = BrainTreeModelItemTypes::RTConnectivityDataItem, const QString& text = "RT Connectivity Data");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~BrainHemisphereTreeItem();
+    ~BrainRTConnectivityDataTreeItem();
 
     //=========================================================================================================
     /**
@@ -131,44 +129,50 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on surfaces and annotation data to this item.
+    * Initializes the rt connectivity data item with neccessary information for visualization computations.
     *
-    * @param[in] tSurface           FreeSurfer surface.
-    * @param[in] tAnnotation        FreeSurfer annotation.
-    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+    * @param[in] tForwardSolution       The MNEForwardSolution.
+    * @param[in] hemi                   The hemispehre of this brain rt connectivity data item.
     *
-    * @return                       Returns true if successful.
+    * @return                           Returns true if successful.
     */
-    bool addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent = 0);
+    bool init(const MNELIB::MNEForwardSolution& tForwardSolution, int iHemi);
 
     //=========================================================================================================
     /**
-    * Adds source space information.
+    * Adds actual rt connectivity data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
     *
-    * @param[in] tHemisphere        The MNEHemisphere.
-    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+    * @param[in] matNewConnection    The new connectivity data.
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const MNELIB::MNEHemisphere& tHemisphere, Qt3DCore::QEntity* p3DEntityParent = 0);
+    bool addData(const Eigen::MatrixXd& matNewConnection);
 
     //=========================================================================================================
     /**
-    * Adds source estimated activation data.
+    * Updates the rt connectivity data which is streamed by this item's worker thread item.
     *
-    * @param[in] tSourceEstimate    The MNESourceEstimate.
-    * @param[in] tForwardSolution   The MNEForwardSolution.
-    *
-    * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
+    * @return                       Returns true if this item is initialized.
     */
-    BrainRTSourceLocDataTreeItem* addData(const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+    inline bool isInit() const;
 
 private:
-    BrainSurfaceTreeItem*           m_pSurfaceItem;                     /**< The surface item of this hemisphere item. Only one surface item may exists under a hemisphere item. */
-    BrainAnnotationTreeItem*        m_pAnnotItem;                       /**< The annotation item of this hemisphere item. Only one annotation item may exists under a hemisphere item. */
-    BrainRTSourceLocDataTreeItem*   m_pBrainRTSourceLocDataTreeItem;    /**< The rt data item of this hemisphere item. Multiple rt data item's can be added to this hemipshere item. */
+    bool                        m_bIsInit;                      /**< The init flag. */
+
+signals:
+
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool BrainRTConnectivityDataTreeItem::isInit() const
+{
+    return m_bIsInit;
+}
 
 } //NAMESPACE DISP3DLIB
 
-#endif // BRAINHEMISPHERETREEITEM_H
+#endif // BRAINRTCONNECTIVITYDATATREEITEM_H

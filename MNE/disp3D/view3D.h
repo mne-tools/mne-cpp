@@ -178,9 +178,9 @@ public:
     * @param[in] tSourceEstimate        The MNESourceEstimate data.
     * @param[in] tForwardSolution       The MNEForwardSolution data.
     *
-    * @return                           Returns a list of the BrainRTDataTreeItem where the data was appended to.
+    * @return                           Returns a list of the BrainRTSourceLocDataTreeItem where the data was appended to.
     */
-    QList<BrainRTDataTreeItem*> addRtBrainData(const QString& text, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+    QList<BrainRTSourceLocDataTreeItem*> addRtBrainData(const QString& text, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
 
     //=========================================================================================================
     /**
