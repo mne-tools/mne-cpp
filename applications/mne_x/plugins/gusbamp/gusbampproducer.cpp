@@ -114,12 +114,12 @@ void GUSBAmpProducer::run()
 {
     MatrixXf matRawBuffer(128,100);
 
- //   while(m_bIsRunning) {
+    while(m_bIsRunning) {
         //qDebug()<<"GUSBAmpProducer::run()"<<endl;
         //Get the GUSBAmp EEG data out of the device buffer and write received data to circular buffer
         if(m_pGUSBAmpDriver->getSampleMatrixValue(matRawBuffer))
             m_pGUSBAmp->m_pRawMatrixBuffer_In->push(&matRawBuffer);
- //   }
+   }
 
     //std::qDebug()<<"EXITING - GUSBAmpProducer::run()"<<std::endl;
 }
