@@ -169,24 +169,29 @@ RC_FILE = Resources/Images/ApplicationIcons/browse_raw.rc
 unix:!macx {
     #ToDo Unix
 }
-else {
+macx {
+    #ToDo Mac
+    #macdeployqt is done in an separate deploy script
+#    isEmpty(TARGET_EXT) {
+#        TARGET_CUSTOM_EXT = .app
+#    } else {
+#        TARGET_CUSTOM_EXT = $${TARGET_EXT}
+#    }
+#
+#    DEPLOY_COMMAND = macdeployqt
+#
+#    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
+#
+#    QMAKE_POST_LINK = $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+}
+win32 {
     isEmpty(TARGET_EXT) {
-        win32 {
-            TARGET_CUSTOM_EXT = .exe
-        }
-        macx {
-            TARGET_CUSTOM_EXT = .app
-        }
+        TARGET_CUSTOM_EXT = .exe
     } else {
         TARGET_CUSTOM_EXT = $${TARGET_EXT}
     }
 
-    win32 {
-        DEPLOY_COMMAND = windeployqt
-    }
-    macx {
-        DEPLOY_COMMAND = macdeployqt
-    }
+    DEPLOY_COMMAND = windeployqt
 
     DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
 
