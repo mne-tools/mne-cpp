@@ -45,9 +45,6 @@ QT += network core widgets concurrent
 QT += xml
 
 CONFIG   += console
-CONFIG   -= app_bundle
-
-
 
 TARGET = mne_matching_pursuit
 

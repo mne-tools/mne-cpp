@@ -43,7 +43,6 @@ VERSION = $${MNE_CPP_VERSION}
 QT += widgets 3dcore 3drender 3dinput
 
 CONFIG   += console
-CONFIG   -= app_bundle
 
 TARGET = mne_viewer
 
