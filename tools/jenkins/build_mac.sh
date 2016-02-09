@@ -11,6 +11,11 @@ cd mne-cpp_shadow_build
 QT_BIN_DIR='/Users/Shared/Jenkins/Qt5.6.0/5.6/clang_64/bin'
 QT_LIB_DIR='/Users/Shared/Jenkins/Qt5.6.0/5.6/clang_64/lib'
 
-$QT_BIN_DIR/qmake ../mne-cpp/mne-cpp.pro -r
+PATH=$QT_BIN_DIR:$PATH
+export PATH
+
+qmake -v
+
+qmake ../mne-cpp/mne-cpp.pro -r
 make clean
 make -j4
