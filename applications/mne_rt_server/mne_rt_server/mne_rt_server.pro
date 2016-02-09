@@ -97,24 +97,18 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 unix:!macx {
     #ToDo Unix
 }
-else {
+macx {
+    #ToDo Mac
+}
+win32 {
+    message(Deploy mne_rt_server)
     isEmpty(TARGET_EXT) {
-        win32 {
-            TARGET_CUSTOM_EXT = .exe
-        }
-        macx {
-            TARGET_CUSTOM_EXT = .app
-        }
+        TARGET_CUSTOM_EXT = .exe
     } else {
         TARGET_CUSTOM_EXT = $${TARGET_EXT}
     }
 
-    win32 {
-        DEPLOY_COMMAND = windeployqt
-    }
-    macx {
-        DEPLOY_COMMAND = macdeployqt
-    }
+    DEPLOY_COMMAND = windeployqt
 
     DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
 
