@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
 * @file     noisereductionaboutwidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     February, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummyAboutWidget class.
+* @brief    Contains the declaration of the NoiseReductionAboutWidget class.
 *
 */
 
-#ifndef DUMMYABOUTWIDGET_H
-#define DUMMYABOUTWIDGET_H
+#ifndef NOISEREDUCTIONABOUTWIDGET_H
+#define NOISEREDUCTIONABOUTWIDGET_H
 
 
 //*************************************************************************************************************
@@ -64,11 +64,11 @@ namespace NoiseReductionPlugin
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DummyAboutWidget
+* DECLARE CLASS NoiseReductionAboutWidget
 *
-* @brief The DummyAboutWidget class provides the about dialog for the NoiseReduction.
+* @brief The NoiseReductionAboutWidget class provides the about dialog for the NoiseReduction.
 */
-class DummyAboutWidget : public QDialog
+class NoiseReductionAboutWidget : public QDialog
 {
     Q_OBJECT
 
@@ -76,25 +76,25 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a DummyAboutWidget dialog which is a child of parent.
+    * Constructs a NoiseReductionAboutWidget dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummyAboutWidget becomes a window. If parent is another widget, DummyAboutWidget becomes a child window inside parent. DummyAboutWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new NoiseReductionAboutWidget becomes a window. If parent is another widget, NoiseReductionAboutWidget becomes a child window inside parent. NoiseReductionAboutWidget is deleted when its parent is deleted.
     */
-    DummyAboutWidget(QWidget *parent = 0);
+    NoiseReductionAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the DummyAboutWidget.
-    * All DummyAboutWidget's children are deleted first. The application exits if DummyAboutWidget is the main widget.
+    * Destroys the NoiseReductionAboutWidget.
+    * All NoiseReductionAboutWidget's children are deleted first. The application exits if NoiseReductionAboutWidget is the main widget.
     */
-    ~DummyAboutWidget();
+    ~NoiseReductionAboutWidget();
 
 private:
 
-    Ui::DummyAboutWidgetClass ui;		/**< Holds the user interface for the DummyAboutWidget.*/
+    Ui::NoiseReductionAboutWidgetClass ui;		/**< Holds the user interface for the NoiseReductionAboutWidget.*/
 
 };
 
 } // NAMESPACE
 
-#endif // DUMMYABOUTWIDGET_H
+#endif // NoiseReductionABOUTWIDGET_H

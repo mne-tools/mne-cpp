@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
 * @file     noisereductionsetupwidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     February, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummySetupWidget class.
+* @brief    Contains the declaration of the NoiseReductionSetupWidget class.
 *
 */
 
-#ifndef DUMMYSETUPWIDGET_H
-#define DUMMYSETUPWIDGET_H
+#ifndef NOISEREDUCTIONSETUPWIDGET_H
+#define NOISEREDUCTIONSETUPWIDGET_H
 
 
 //*************************************************************************************************************
@@ -74,11 +74,11 @@ class NoiseReduction;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DummySetupWidget
+* DECLARE CLASS NoiseReductionSetupWidget
 *
-* @brief The DummySetupWidget class provides the NoiseReduction configuration window.
+* @brief The NoiseReductionSetupWidget class provides the NoiseReduction configuration window.
 */
-class DummySetupWidget : public QWidget
+class NoiseReductionSetupWidget : public QWidget
 {
     Q_OBJECT
 
@@ -86,19 +86,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a DummySetupWidget which is a child of parent.
+    * Constructs a NoiseReductionSetupWidget which is a child of parent.
     *
     * @param [in] toolbox a pointer to the corresponding NoiseReduction.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummySetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new NoiseReductionSetupWidget becomes a window. If parent is another widget, NoiseReductionSetupWidget becomes a child window inside parent. NoiseReductionSetupWidget is deleted when its parent is deleted.
     */
-    DummySetupWidget(NoiseReduction* toolbox, QWidget *parent = 0);
+    NoiseReductionSetupWidget(NoiseReduction* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the DummySetupWidget.
-    * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
+    * Destroys the NoiseReductionSetupWidget.
+    * All NoiseReductionSetupWidget's children are deleted first. The application exits if NoiseReductionSetupWidget is the main widget.
     */
-    ~DummySetupWidget();
+    ~NoiseReductionSetupWidget();
 
 
 private slots:
@@ -113,9 +113,9 @@ private:
 
     NoiseReduction* m_pNoiseReduction;	/**< Holds a pointer to corresponding NoiseReduction.*/
 
-    Ui::DummySetupWidgetClass ui;	/**< Holds the user interface for the DummySetupWidget.*/
+    Ui::NoiseReductionSetupWidgetClass ui;	/**< Holds the user interface for the NoiseReductionSetupWidget.*/
 };
 
 } // NAMESPACE
 
-#endif // DUMMYSETUPWIDGET_H
+#endif // NOISEREDUCTIONSETUPWIDGET_H
