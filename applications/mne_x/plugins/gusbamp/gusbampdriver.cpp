@@ -67,7 +67,7 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
 ,SLAVE_SERIALS_SIZE(0)
 ,SAMPLE_RATE_HZ(128)
 ,NUMBER_OF_SCANS(8)
-,NUMBER_OF_CHANNELS(2)
+,NUMBER_OF_CHANNELS(3)
 ,TRIGGER(FALSE)
 ,_mode(M_NORMAL)
 ,_commonReference({ FALSE, FALSE, FALSE, FALSE })
@@ -238,6 +238,8 @@ bool GUSBAmpDriver::initDevice()
 
         }
 
+
+
         //create _callSequenceHandles for the sequence of calling the devices (Master has to be the last device to be called!)
         _callSequenceHandles = openedDevicesHandles;
         numDevices = (int) _callSequenceHandles.size();
@@ -262,11 +264,32 @@ bool GUSBAmpDriver::initDevice()
             }
         }
 
-//        //initialize application data buffer to the specified number of seconds
-//        _bufferOverrun = false;
-//        _buffer.Initialize(BUFFER_SIZE_SECONDS * SAMPLE_RATE_HZ * (NUMBER_OF_CHANNELS + TRIGGER) * (unsigned int) _callSequenceHandles.size());
+        //start the devices (master device must be started at last)
+        for (int deviceIndex=0; deviceIndex<numDevices; deviceIndex++)
+        {
+            HANDLE hDevice = _callSequenceHandles[deviceIndex];
+
+            if (!GT_Start(hDevice))
+            {
+                //throw string("Error on GT_Start: Couldn't start data acquisition of device.");
+                cout << "\tError on GT_Start: Couldn't start data acquisition of device.\n";
+                return 0;
+
+            }
+            //queue-up the first batch of transfer requests
+            for (int queueIndex=0; queueIndex<QUEUE_SIZE; queueIndex++)
+            {
+                if (!GT_GetData(hDevice, buffers[deviceIndex][queueIndex], bufferSizeBytes, &overlapped[deviceIndex][queueIndex]))
+                {
+                    cout << "\tError on GT_GetData.\n";
+                    return 0;
+                }
+            }
+        }
+
 
         qDebug() << "Plugin GUSBAmp - INFO - initDevice() - The device has been connected and initialised successfully" << endl;
+
         return true;
 
     }
@@ -282,38 +305,14 @@ bool GUSBAmpDriver::initDevice()
             openedDevicesHandles.pop_front();
         }
 
+
+
         cout << exception << '\n';
 
 
         return false;
 
     }
-
-
-    //start the devices (master device must be started at last)
-    for (int deviceIndex=0; deviceIndex<numDevices; deviceIndex++)
-    {
-        HANDLE hDevice = _callSequenceHandles[deviceIndex];
-
-        if (!GT_Start(hDevice))
-        {
-            //throw string("Error on GT_Start: Couldn't start data acquisition of device.");
-            cout << "\tError on GT_Start: Couldn't start data acquisition of device.\n";
-            return 0;
-
-        }
-        //queue-up the first batch of transfer requests
-        for (int queueIndex=0; queueIndex<QUEUE_SIZE; queueIndex++)
-        {
-            if (!GT_GetData(hDevice, buffers[deviceIndex][queueIndex], bufferSizeBytes, &overlapped[deviceIndex][queueIndex]))
-            {
-                cout << "\tError on GT_GetData.\n";
-                return 0;
-            }
-        }
-    }
-
-
 }
 
 
@@ -362,7 +361,17 @@ bool GUSBAmpDriver::uninitDevice()
         _callSequenceHandles.pop_front();
     }
 
+    //closes all openend Device Handles
+    while(!openedDevicesHandles.empty())
+    {
+        GT_CloseDevice(&openedDevicesHandles.front());
+        qDebug() << "error occurred - Device " << &openedDevicesHandles.front()  << "was closed" << endl;
+        openedDevicesHandles.pop_front();
+    }
+
+
     qDebug() << "Plugin GUSBAmp - INFO - uninitDevice() - Successfully uninitialised the device" << endl;
+
     return true;
 }
 
@@ -374,50 +383,6 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
 {
     sampleMatrix.setZero(); // Clear matrix - set all elements to zero
 
-    if(firstRun)
-    {
-        //for each device create a number of QUEUE_SIZE data buffers
-        for (int deviceIndex=0; deviceIndex<numDevices; deviceIndex++)
-        {
-            buffers[deviceIndex] = new BYTE*[QUEUE_SIZE];
-            overlapped[deviceIndex] = new OVERLAPPED[QUEUE_SIZE];
-
-            //for each data buffer allocate a number of bufferSizeBytes bytes
-            for (int queueIndex=0; queueIndex<QUEUE_SIZE; queueIndex++)
-            {
-                buffers[deviceIndex][queueIndex] = new BYTE[bufferSizeBytes];
-                memset(&(overlapped[deviceIndex][queueIndex]), 0, sizeof(OVERLAPPED));
-
-                //create a windows event handle that will be signalled when new data from the device has been received for each data buffer
-                overlapped[deviceIndex][queueIndex].hEvent = CreateEvent(NULL, false, false, NULL);
-            }
-        }
-
-        //start the devices (master device must be started at last)
-        for (int deviceIndex=0; deviceIndex<numDevices; deviceIndex++)
-        {
-            HANDLE hDevice = _callSequenceHandles[deviceIndex];
-
-            if (!GT_Start(hDevice))
-            {
-                //throw string("Error on GT_Start: Couldn't start data acquisition of device.");
-                cout << "\tError on GT_Start: Couldn't start data acquisition of device.\n";
-                return 0;
-            }
-
-            //queue-up the first batch of transfer requests
-            for (int queueIndex=0; queueIndex<QUEUE_SIZE; queueIndex++)
-            {
-                if (!GT_GetData(hDevice, buffers[deviceIndex][queueIndex], bufferSizeBytes, &overlapped[deviceIndex][queueIndex]))
-                {
-                    cout << "\tError on GT_GetData.\n";
-                    return 0;
-                }
-
-            }
-        }
-        firstRun = false;
-    }
 
     for(int queueIndex=0; queueIndex<QUEUE_SIZE; queueIndex++)
     {
