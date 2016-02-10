@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
 * @file     noisereductionsetupwidget.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     February, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ECGSetupWidget class.
+* @brief    Contains the implementation of the NoiseReductionSetupWidget class.
 *
 */
 
@@ -62,7 +62,7 @@ using namespace NoiseReductionPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DummySetupWidget::DummySetupWidget(NoiseReduction* toolbox, QWidget *parent)
+NoiseReductionSetupWidget::NoiseReductionSetupWidget(NoiseReduction* toolbox, QWidget *parent)
 : QWidget(parent)
 , m_pNoiseReduction(toolbox)
 {
@@ -74,7 +74,7 @@ DummySetupWidget::DummySetupWidget(NoiseReduction* toolbox, QWidget *parent)
 
 //*************************************************************************************************************
 
-DummySetupWidget::~DummySetupWidget()
+NoiseReductionSetupWidget::~NoiseReductionSetupWidget()
 {
 
 }
@@ -82,8 +82,8 @@ DummySetupWidget::~DummySetupWidget()
 
 //*************************************************************************************************************
 
-void DummySetupWidget::showAboutDialog()
+void NoiseReductionSetupWidget::showAboutDialog()
 {
-    DummyAboutWidget aboutDialog(this);
+    NoiseReductionAboutWidget aboutDialog(this);
     aboutDialog.exec();
 }

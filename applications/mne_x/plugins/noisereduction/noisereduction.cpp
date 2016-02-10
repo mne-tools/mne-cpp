@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
 * @file     noisereduction.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     February, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -59,9 +59,9 @@ using namespace IOBuffer;
 
 NoiseReduction::NoiseReduction()
 : m_bIsRunning(false)
-, m_pDummyInput(NULL)
-, m_pDummyOutput(NULL)
-, m_pDummyBuffer(CircularMatrixBuffer<double>::SPtr())
+, m_pNoiseReductionInput(NULL)
+, m_pNoiseReductionOutput(NULL)
+, m_pNoiseReductionBuffer(CircularMatrixBuffer<double>::SPtr())
 {
     //Add action which will be visible in the plugin's toolbar
 }
@@ -90,18 +90,18 @@ QSharedPointer<IPlugin> NoiseReduction::clone() const
 void NoiseReduction::init()
 {
     // Input
-    m_pDummyInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "DummyIn", "Dummy input data");
-    connect(m_pDummyInput.data(), &PluginInputConnector::notify, this, &NoiseReduction::update, Qt::DirectConnection);
-    m_inputConnectors.append(m_pDummyInput);
+    m_pNoiseReductionInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "NoiseReductionIn", "NoiseReduction input data");
+    connect(m_pNoiseReductionInput.data(), &PluginInputConnector::notify, this, &NoiseReduction::update, Qt::DirectConnection);
+    m_inputConnectors.append(m_pNoiseReductionInput);
 
     // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
     // Also, this output stream will generate an online display in your plugin
-    m_pDummyOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "DummyOut", "Dummy output data");
-    m_outputConnectors.append(m_pDummyOutput);
+    m_pNoiseReductionOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "NoiseReductionOut", "NoiseReduction output data");
+    m_outputConnectors.append(m_pNoiseReductionOutput);
 
     //Delete Buffer - will be initailzed with first incoming data
-    if(!m_pDummyBuffer.isNull())
-        m_pDummyBuffer = CircularMatrixBuffer<double>::SPtr();
+    if(!m_pNoiseReductionBuffer.isNull())
+        m_pNoiseReductionBuffer = CircularMatrixBuffer<double>::SPtr();
 }
 
 
@@ -136,10 +136,10 @@ bool NoiseReduction::stop()
 {
     m_bIsRunning = false;
 
-    m_pDummyBuffer->releaseFromPop();
-    m_pDummyBuffer->releaseFromPush();
+    m_pNoiseReductionBuffer->releaseFromPop();
+    m_pNoiseReductionBuffer->releaseFromPush();
 
-    m_pDummyBuffer->clear();
+    m_pNoiseReductionBuffer->clear();
 
     return true;
 }
@@ -157,7 +157,7 @@ IPlugin::PluginType NoiseReduction::getType() const
 
 QString NoiseReduction::getName() const
 {
-    return "Dummy Toolbox";
+    return "NoiseReduction Toolbox";
 }
 
 
@@ -165,7 +165,7 @@ QString NoiseReduction::getName() const
 
 QWidget* NoiseReduction::setupWidget()
 {
-    DummySetupWidget* setupWidget = new DummySetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    NoiseReductionSetupWidget* setupWidget = new NoiseReductionSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
     return setupWidget;
 }
 
@@ -178,25 +178,25 @@ void NoiseReduction::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
     if(pRTMSA) {
         //Check if buffer initialized
-        if(!m_pDummyBuffer) {
-            m_pDummyBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
+        if(!m_pNoiseReductionBuffer) {
+            m_pNoiseReductionBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
         }
 
         //Fiff information
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
 
-            //Init output - Unocmment this if you also uncommented the m_pDummyOutput in the constructor above
-            m_pDummyOutput->data()->initFromFiffInfo(m_pFiffInfo);
-            m_pDummyOutput->data()->setMultiArraySize(1);
-            m_pDummyOutput->data()->setVisibility(true);
+            //Init output - Unocmment this if you also uncommented the m_pNoiseReductionOutput in the constructor above
+            m_pNoiseReductionOutput->data()->initFromFiffInfo(m_pFiffInfo);
+            m_pNoiseReductionOutput->data()->setMultiArraySize(1);
+            m_pNoiseReductionOutput->data()->setVisibility(true);
         }
 
         MatrixXd t_mat;
 
         for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i) {
             t_mat = pRTMSA->getMultiSampleArray()[i];
-            m_pDummyBuffer->push(&t_mat);
+            m_pNoiseReductionBuffer->push(&t_mat);
         }
     }
 }
@@ -216,13 +216,13 @@ void NoiseReduction::run()
     while(m_bIsRunning)
     {
         //Dispatch the inputs
-        MatrixXd t_mat = m_pDummyBuffer->pop();
+        MatrixXd t_mat = m_pNoiseReductionBuffer->pop();
 
         //ToDo: Implement your algorithm here
 
         //Send the data to the connected plugins and the online display
-        //Unocmment this if you also uncommented the m_pDummyOutput in the constructor above
-        m_pDummyOutput->data()->setValue(t_mat);
+        //Unocmment this if you also uncommented the m_pNoiseReductionOutput in the constructor above
+        m_pNoiseReductionOutput->data()->setValue(t_mat);
     }
 }
 

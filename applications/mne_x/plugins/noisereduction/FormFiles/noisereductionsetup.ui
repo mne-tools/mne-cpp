@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DummySetupWidgetClass</class>
- <widget class="QWidget" name="DummySetupWidgetClass">
+ <class>NoiseReductionSetupWidgetClass</class>
+ <widget class="QWidget" name="NoiseReductionSetupWidgetClass">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -23,7 +23,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Dummy Toolbox Configuration</string>
+      <string>Noise Reduction Configuration</string>
      </property>
     </widget>
    </item>
