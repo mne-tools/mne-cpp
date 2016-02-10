@@ -65,9 +65,9 @@ using namespace std;
 GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
 : m_pGUSBAmpProducer(pGUSBAmpProducer)
 ,SLAVE_SERIALS_SIZE(0)
-,SAMPLE_RATE_HZ(256)
+,SAMPLE_RATE_HZ(128)
 ,NUMBER_OF_SCANS(8)
-,NUMBER_OF_CHANNELS(16)
+,NUMBER_OF_CHANNELS(2)
 ,TRIGGER(FALSE)
 ,_mode(M_NORMAL)
 ,_commonReference({ FALSE, FALSE, FALSE, FALSE })
@@ -455,20 +455,24 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
         //channelIndex ranges from 0..numDevices*numChannelsPerDevices where numDevices equals the number of recorded devices and numChannelsPerDevice the number of channels from each of those devices.
         //It is assumed that all devices provide the same number of channels.
         for (int scanIndex = 0; scanIndex < NUMBER_OF_SCANS; scanIndex++)
+        {
             for (int deviceIndex = 0; deviceIndex < numDevices; deviceIndex++)
             {
-                //                        _buffer.Write((float*) (buffers[deviceIndex][queueIndex] + scanIndex * (NUMBER_OF_CHANNELS + TRIGGER) * sizeof(float) + HEADER_SIZE), NUMBER_OF_CHANNELS + TRIGGER);
-                //                        sampleMatrix[1][scanIndex] = float(buffers[deviceIndex][queueIndex]);
                 for(int channelIndex = 0; channelIndex<NUMBER_OF_CHANNELS; channelIndex++)
                 {
+                    BYTE ByteValue[sizeof(float)];
+                    float FloatValue;
 
-
-                    cout << float((buffers[deviceIndex][queueIndex][(scanIndex * (NUMBER_OF_CHANNELS + TRIGGER) + channelIndex) * sizeof(float) + HEADER_SIZE]))<< "\t";
+                    for(int i=0;i<sizeof(float);i++)
+                    {
+                        ByteValue[i] = buffers[deviceIndex][queueIndex][(scanIndex * (NUMBER_OF_CHANNELS + TRIGGER) + channelIndex) * sizeof(float) + HEADER_SIZE + i];
+                    }
+                    memcpy(&FloatValue, &ByteValue, sizeof(FloatValue));
+                    cout << FloatValue<< "\t";
                 }
-
-                cout << "\n";
-
             }
+            cout << "\n";
+        }
 
 
 
