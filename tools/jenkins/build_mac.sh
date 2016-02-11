@@ -11,10 +11,16 @@ cd mne-cpp_shadow_build
 QT_BIN_DIR='/Users/Shared/Jenkins/Qt5.6.0/5.6/clang_64/bin'
 QT_LIB_DIR='/Users/Shared/Jenkins/Qt5.6.0/5.6/clang_64/lib'
 
+MNECPP_LIB_WORKSPACE='/Users/Shared/Jenkins/Home/jobs/MNE-CPP/workspace/mne-cpp/lib'
+
 TANGIBLES=(mne_x mne_browse_raw_qt mne_analyze_qt)
 
 PATH=$QT_BIN_DIR:$PATH
 export PATH
+
+DYLD_LIBRARY_PATH=$MNECPP_LIB_WORKSPACE:$DYLD_LIBRARY_PATH
+export DYLD_LIBRARY_PATH 
+
 
 # === Clean Up ===
 n_elements=${#TANGIBLES[@]}
