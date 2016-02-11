@@ -62,8 +62,16 @@ NoiseReduction::NoiseReduction()
 , m_pNoiseReductionInput(NULL)
 , m_pNoiseReductionOutput(NULL)
 , m_pNoiseReductionBuffer(CircularMatrixBuffer<double>::SPtr())
+, m_iNBaseFcts(500)
+, m_bSpharaActive(false)
 {
     //Add action which will be visible in the plugin's toolbar
+    m_pActionShowOptionsWidget = new QAction(QIcon(":/images/options.png"), tr("Noise reduction options"),this);
+    m_pActionShowOptionsWidget->setShortcut(tr("F12"));
+    m_pActionShowOptionsWidget->setStatusTip(tr("Noise reduction options"));
+    connect(m_pActionShowOptionsWidget, &QAction::triggered,
+            this, &NoiseReduction::showOptionsWidget);
+    addPluginAction(m_pActionShowOptionsWidget);
 }
 
 
@@ -137,7 +145,7 @@ bool NoiseReduction::stop()
     m_bIsRunning = false;
 
     m_pNoiseReductionBuffer->releaseFromPop();
-    m_pNoiseReductionBuffer->releaseFromPush();
+    m_pNoiseReductionBuffer->clear();
 
     m_pNoiseReductionBuffer->clear();
 
@@ -202,6 +210,25 @@ void NoiseReduction::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 }
 
 
+//*************************************************************************************************************
+
+void NoiseReduction::setSpharaMode(bool state)
+{
+    m_mutex.lock();
+    m_bSpharaActive = state;
+    m_mutex.unlock();
+}
+
+
+//*************************************************************************************************************
+
+void NoiseReduction::setSpharaNBaseFcts(int nBaseFcts)
+{
+    m_mutex.lock();
+    m_iNBaseFcts = nBaseFcts;
+    m_mutex.unlock();
+}
+
 
 //*************************************************************************************************************
 
@@ -218,7 +245,14 @@ void NoiseReduction::run()
         //Dispatch the inputs
         MatrixXd t_mat = m_pNoiseReductionBuffer->pop();
 
-        //ToDo: Implement your algorithm here
+        m_mutex.lock();
+        //To all the noise reduction steps here
+        //SPHARA calculations
+        if(m_bSpharaActive) {
+
+        }
+
+        m_mutex.unlock();
 
         //Send the data to the connected plugins and the online display
         //Unocmment this if you also uncommented the m_pNoiseReductionOutput in the constructor above
@@ -226,3 +260,11 @@ void NoiseReduction::run()
     }
 }
 
+
+//*************************************************************************************************************
+
+void NoiseReduction::showOptionsWidget()
+{
+    m_pOptionsWidget = NoiseReductionOptionsWidget::SPtr(new NoiseReductionOptionsWidget(this));
+    m_pOptionsWidget->show();
+}

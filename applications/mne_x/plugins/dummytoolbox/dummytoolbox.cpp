@@ -64,7 +64,7 @@ DummyToolbox::DummyToolbox()
 , m_pDummyBuffer(CircularMatrixBuffer<double>::SPtr())
 {
     //Add action which will be visible in the plugin's toolbar
-    m_pActionShowYourWidget = new QAction(QIcon(":/images/covadjustments.png"), tr("Your Toolbar Widget"),this);
+    m_pActionShowYourWidget = new QAction(QIcon(":/images/options.png"), tr("Your Toolbar Widget"),this);
     m_pActionShowYourWidget->setShortcut(tr("F12"));
     m_pActionShowYourWidget->setStatusTip(tr("Your Toolbar Widget"));
     connect(m_pActionShowYourWidget, &QAction::triggered,

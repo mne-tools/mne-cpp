@@ -68,16 +68,19 @@ SOURCES += \
         noisereduction.cpp \
         FormFiles/noisereductionsetupwidget.cpp \
         FormFiles/noisereductionaboutwidget.cpp \
+        FormFiles/noisereductionoptionswidget.cpp
 
 HEADERS += \
         noisereduction.h\
         noisereduction_global.h \
         FormFiles/noisereductionsetupwidget.h \
         FormFiles/noisereductionaboutwidget.h \
+        FormFiles/noisereductionoptionswidget.h
 
 FORMS += \
         FormFiles/noisereductionsetup.ui \
         FormFiles/noisereductionabout.ui \
+        FormFiles/noisereductionoptionswidget.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

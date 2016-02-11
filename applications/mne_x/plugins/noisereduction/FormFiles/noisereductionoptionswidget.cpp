@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     noisereductionaboutwidget.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     dummytoolbox.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2016
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,71 +29,52 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the NoiseReductionAboutWidget class.
+* @brief    Contains the implementation of the NoiseReductionOptionsWidget class.
 *
 */
-
-#ifndef NOISEREDUCTIONABOUTWIDGET_H
-#define NOISEREDUCTIONABOUTWIDGET_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_noisereductionabout.h"
+#include "NoiseReductionOptionswidget.h"
+#include "../noisereduction.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QtWidgets>
+using namespace NoiseReductionPlugin;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE NoiseReductionPlugin
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace NoiseReductionPlugin
+NoiseReductionOptionsWidget::NoiseReductionOptionsWidget(NoiseReduction* toolbox, QWidget* parent)
+: QWidget(parent, Qt::Window)
+, ui(new Ui::NoiseReductionOptionsWidgetClass)
+, m_pNoiseReductionToolbox(toolbox)
 {
+    this->setWindowTitle("Noise reduction options");
+
+    ui->setupUi(this);
+
+    //Do the connects. Always connect GUI elemts after ui.setpUi has been called
+    connect(ui->m_checkBox_activateSphara, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            m_pNoiseReductionToolbox, &NoiseReduction::setSpharaMode);
+    connect(ui->m_horizontalSlider_nBaseFcts, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
+            m_pNoiseReductionToolbox, &NoiseReduction::setSpharaNBaseFcts);
+}
 
 
-//=============================================================================================================
-/**
-* DECLARE CLASS NoiseReductionAboutWidget
-*
-* @brief The NoiseReductionAboutWidget class provides the about dialog for the NoiseReduction.
-*/
-class NoiseReductionAboutWidget : public QDialog
+//*************************************************************************************************************
+
+NoiseReductionOptionsWidget::~NoiseReductionOptionsWidget()
 {
-    Q_OBJECT
-
-public:
-
-    //=========================================================================================================
-    /**
-    * Constructs a NoiseReductionAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new NoiseReductionAboutWidget becomes a window. If parent is another widget, NoiseReductionAboutWidget becomes a child window inside parent. NoiseReductionAboutWidget is deleted when its parent is deleted.
-    */
-    NoiseReductionAboutWidget(QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the NoiseReductionAboutWidget.
-    * All NoiseReductionAboutWidget's children are deleted first. The application exits if NoiseReductionAboutWidget is the main widget.
-    */
-    ~NoiseReductionAboutWidget();
-
-private:
-
-    Ui::NoiseReductionAboutWidgetClass ui;		/**< Holds the user interface for the NoiseReductionAboutWidget.*/
-};
-
-} // NAMESPACE
-
-#endif // NOISEREDUCTIONABOUTWIDGET_H
+    delete ui;
+}
