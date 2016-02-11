@@ -216,7 +216,6 @@ void NoiseReduction::setSpharaMode(bool state)
 {
     m_mutex.lock();
     m_bSpharaActive = state;
-    qDebug()<<"NoiseReduction::setSpharaMode:"<<state;
     m_mutex.unlock();
 }
 
@@ -225,10 +224,9 @@ void NoiseReduction::setSpharaMode(bool state)
 
 void NoiseReduction::setSpharaNBaseFcts(int nBaseFcts)
 {
-    //m_mutex.lock();
+    m_mutex.lock();
     m_iNBaseFcts = nBaseFcts;
-    qDebug()<<"NoiseReduction::setSpharaNBaseFcts:"<<nBaseFcts;
-    //m_mutex.unlock();
+    m_mutex.unlock();
 }
 
 
