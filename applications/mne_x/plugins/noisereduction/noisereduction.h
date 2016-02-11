@@ -89,6 +89,8 @@ class NOISEREDUCTIONSHARED_EXPORT NoiseReduction : public MNEX::IAlgorithm
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::IAlgorithm)
 
+    friend class NoiseReductionOptionsWidget;
+
 public:
     //=========================================================================================================
     /**
@@ -123,6 +125,10 @@ public:
     */
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
+    void setSpharaMode(bool state);
+
+    void setSpharaNBaseFcts(int nBaseFcts);
+
 protected:
     //=========================================================================================================
     /**
@@ -133,7 +139,12 @@ protected:
     void showOptionsWidget();
 
 private:
+    QMutex                                          m_mutex;                    /**< The threads mutex.*/
+
     bool                                            m_bIsRunning;               /**< Flag whether thread is running.*/
+    bool                                            m_bSpharaActive;            /**< Flag whether thread is running.*/
+
+    int                                             m_iNBaseFcts;               /**< the number of base functions to use for calculating the sphara opreator.*/
 
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                /**< Fiff measurement info.*/
 

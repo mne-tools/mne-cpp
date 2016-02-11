@@ -210,6 +210,26 @@ void NoiseReduction::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
+void NoiseReduction::setSpharaMode(bool state)
+{
+    m_mutex.lock();
+    m_bSpharaActive = state;
+    m_mutex.unlock();
+}
+
+
+//*************************************************************************************************************
+
+void NoiseReduction::setSpharaNBaseFcts(int nBaseFcts)
+{
+    m_mutex.lock();
+    m_iNBaseFcts = nBaseFcts;
+    m_mutex.unlock();
+}
+
+
+//*************************************************************************************************************
+
 void NoiseReduction::run()
 {
     //
@@ -223,7 +243,11 @@ void NoiseReduction::run()
         //Dispatch the inputs
         MatrixXd t_mat = m_pNoiseReductionBuffer->pop();
 
-        //ToDo: Implement your algorithm here
+        //To all the noise reduction steps here
+        //SPHARA calculations
+        if(m_bSpharaActive) {
+
+        }
 
         //Send the data to the connected plugins and the online display
         //Unocmment this if you also uncommented the m_pNoiseReductionOutput in the constructor above
