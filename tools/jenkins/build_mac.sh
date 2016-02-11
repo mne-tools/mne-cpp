@@ -16,13 +16,27 @@ TANGIBLES=(mne_x mne_browse_raw_qt mne_analyze_qt)
 PATH=$QT_BIN_DIR:$PATH
 export PATH
 
+# === Clean Up ===
+n_elements=${#TANGIBLES[@]}
+for ((i = 0; i < n_elements; i++)); do
+    tangible="../mne-cpp/bin/${TANGIBLES[i]}.app"
+    rm -rf $tangible
+done
+
+# === Build ===
 qmake ../mne-cpp/mne-cpp.pro -r
 make clean
 make -j4
 
 # === Deployment ===
 n_elements=${#TANGIBLES[@]}
+installpath=“../Frameworks/“
 for ((i = 0; i < n_elements; i++)); do
-    tangible="../mne-cpp/bin/${TANGIBLES[i]}.app"
-    macdeployqt $tangible
+    fixfile="../mne-cpp/bin/${TANGIBLES[i]}.app/Contents/MacOS/${TANGIBLES[i]}"
+    destdir="../mne-cpp/bin/${TANGIBLES[i]}.app/Contents/Frameworks"
+
+#    echo "Fix File: $fixfile"
+#    echo "Dest Dir: $destdir"
+
+    dylibbundler -od —cd -b -x $fixfile -d $destdir -p $installpath
 done
