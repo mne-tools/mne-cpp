@@ -64,6 +64,12 @@ NoiseReduction::NoiseReduction()
 , m_pNoiseReductionBuffer(CircularMatrixBuffer<double>::SPtr())
 {
     //Add action which will be visible in the plugin's toolbar
+    m_pActionShowOptionsWidget = new QAction(QIcon(":/images/options.png"), tr("Noise reduction options"),this);
+    m_pActionShowOptionsWidget->setShortcut(tr("F12"));
+    m_pActionShowOptionsWidget->setStatusTip(tr("Noise reduction options"));
+    connect(m_pActionShowOptionsWidget, &QAction::triggered,
+            this, &NoiseReduction::showOptionsWidget);
+    addPluginAction(m_pActionShowOptionsWidget);
 }
 
 
@@ -202,7 +208,6 @@ void NoiseReduction::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 }
 
 
-
 //*************************************************************************************************************
 
 void NoiseReduction::run()
@@ -226,3 +231,11 @@ void NoiseReduction::run()
     }
 }
 
+
+//*************************************************************************************************************
+
+void NoiseReduction::showOptionsWidget()
+{
+    m_pOptionsWidget = NoiseReductionOptionsWidget::SPtr(new NoiseReductionOptionsWidget());
+    m_pOptionsWidget->show();
+}
