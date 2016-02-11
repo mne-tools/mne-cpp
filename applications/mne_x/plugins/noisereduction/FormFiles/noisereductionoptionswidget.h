@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     noisereductionaboutwidget.h
+* @file     dummytoolbox.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2016
+* @date     January, 2016
 *
 * @section  LICENSE
 *
@@ -29,20 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the NoiseReductionAboutWidget class.
+* @brief    Contains the declaration of the NoiseReductionOptionsWidget class.
 *
 */
 
-#ifndef NOISEREDUCTIONABOUTWIDGET_H
-#define NOISEREDUCTIONABOUTWIDGET_H
-
+#ifndef NOISEREDUCTIONOPTIONSWIDGET_H
+#define NOISEREDUCTIONOPTIONSWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_noisereductionabout.h"
+#include "../ui_noisereductionoptionswidget.h"
 
 
 //*************************************************************************************************************
@@ -50,7 +49,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QWidget>
 
 
 //*************************************************************************************************************
@@ -62,38 +61,41 @@ namespace NoiseReductionPlugin
 {
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
 //=============================================================================================================
 /**
-* DECLARE CLASS NoiseReductionAboutWidget
+* DECLARE CLASS NoiseReductionOptionsWidget
 *
-* @brief The NoiseReductionAboutWidget class provides the about dialog for the NoiseReduction.
+* @brief The NoiseReductionOptionsWidget class provides a NoiseReduction option toolbar widget structure.
 */
-class NoiseReductionAboutWidget : public QDialog
+}
+class NoiseReductionOptionsWidget : public QWidget
 {
     Q_OBJECT
 
 public:
+    typedef QSharedPointer<NoiseReductionOptionsWidget> SPtr;         /**< Shared pointer type for NoiseReductionOptionsWidget. */
+    typedef QSharedPointer<NoiseReductionOptionsWidget> ConstSPtr;    /**< Const shared pointer type for NoiseReductionOptionsWidget. */
 
     //=========================================================================================================
     /**
-    * Constructs a NoiseReductionAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new NoiseReductionAboutWidget becomes a window. If parent is another widget, NoiseReductionAboutWidget becomes a child window inside parent. NoiseReductionAboutWidget is deleted when its parent is deleted.
+    * Constructs a DummyToolbox.
     */
-    NoiseReductionAboutWidget(QWidget *parent = 0);
+    explicit NoiseReductionOptionsWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the NoiseReductionAboutWidget.
-    * All NoiseReductionAboutWidget's children are deleted first. The application exits if NoiseReductionAboutWidget is the main widget.
+    * Destroys the DummyToolbox.
     */
-    ~NoiseReductionAboutWidget();
+    ~NoiseReductionOptionsWidget();
 
 private:
-
-    Ui::NoiseReductionAboutWidgetClass ui;		/**< Holds the user interface for the NoiseReductionAboutWidget.*/
+    Ui::NoiseReductionOptionsWidgetClass* ui;        /**< The UI class specified in the designer. */
 };
 
-} // NAMESPACE
-
-#endif // NOISEREDUCTIONABOUTWIDGET_H
+#endif // NOISEREDUCTIONOPTIONSWIDGET_H
