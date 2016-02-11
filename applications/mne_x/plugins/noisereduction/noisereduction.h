@@ -48,6 +48,7 @@
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 #include "FormFiles/noisereductionsetupwidget.h"
+#include "FormFiles/noisereductionoptionswidget.h"
 
 
 //*************************************************************************************************************
@@ -88,6 +89,8 @@ class NOISEREDUCTIONSHARED_EXPORT NoiseReduction : public MNEX::IAlgorithm
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::IAlgorithm)
 
+    friend class NoiseReductionOptionsWidget;
+
 public:
     //=========================================================================================================
     /**
@@ -122,6 +125,11 @@ public:
     */
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
+public slots:
+    void setSpharaMode(bool state);
+
+    void setSpharaNBaseFcts(int nBaseFcts);
+
 protected:
     //=========================================================================================================
     /**
@@ -129,16 +137,26 @@ protected:
     */
     virtual void run();
 
+    void showOptionsWidget();
+
 private:
-    bool                                            m_bIsRunning;           /**< Flag whether thread is running.*/
+    QMutex                                          m_mutex;                    /**< The threads mutex.*/
 
-    FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;            /**< Fiff measurement info.*/
-    QAction*                                        m_pActionShowYourWidget;/**< flag whether thread is running.*/
+    bool                                            m_bIsRunning;               /**< Flag whether thread is running.*/
+    bool                                            m_bSpharaActive;            /**< Flag whether thread is running.*/
 
-    IOBuffer::CircularMatrixBuffer<double>::SPtr    m_pNoiseReductionBuffer;         /**< Holds incoming data.*/
+    int                                             m_iNBaseFcts;               /**< the number of base functions to use for calculating the sphara opreator.*/
+
+    FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                /**< Fiff measurement info.*/
+
+    IOBuffer::CircularMatrixBuffer<double>::SPtr    m_pNoiseReductionBuffer;    /**< Holds incoming data.*/
+
+    QSharedPointer<NoiseReductionOptionsWidget>     m_pOptionsWidget;           /**< flag whether thread is running.*/
+    QAction*                                        m_pActionShowOptionsWidget; /**< flag whether thread is running.*/
 
     MNEX::PluginInputData<XMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pNoiseReductionInput;      /**< The NewRealTimeMultiSampleArray of the NoiseReduction input.*/
     MNEX::PluginOutputData<XMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pNoiseReductionOutput;     /**< The NewRealTimeMultiSampleArray of the NoiseReduction output.*/
+
 
 signals:
     //=========================================================================================================
