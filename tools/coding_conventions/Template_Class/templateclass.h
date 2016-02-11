@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) Month, Your name and Matti Hamalainen. All rights reserved.
+* Copyright (C) Year, Your name and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -46,7 +46,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 //Put all Qt includes here
@@ -68,14 +68,7 @@
 namespace YOURNAMESPACE
 {
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-//Put all used namespaces here
-
+//PLEAS DO NOT USE ""using namespace"" IN HEDER FILES
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -123,8 +116,8 @@ public:
     /**
     * The function doSomething takes parameterOne and parameterTwo as inputs, writes something to parameterTwo and returns a result as an integer value.
     *
-    * @param[in]  parameterOne  TemplateClass which should be copied
-    * @param[out] paramterTwo   TemplateClass which should be copied
+    * @param[in]  parameterOne  Description goes here.
+    * @param[out] paramterTwo   Description goes here.
     *
     * @return calculated result as an integer
     */
@@ -134,7 +127,7 @@ public:
     /**
     * The function doSomethingInline takes parameterOne as input and returns a result as an integer value. This function is defined as an inline function (see below)
     *
-    * @param[in]  parameterOne  TemplateClass which should be copied
+    * @param[in]  parameterOne  Description goes here.
     *
     * @return calculated result as an integer
     */
@@ -142,30 +135,35 @@ public:
 
     //Put your other public member functions here
 
-    int     m_iParamterOne;         /**< m_iParamterOne description */
-    double  m_dParamterTwo;         /**< m_dParamterTwo description */
-    bool    m_bParamterThree;       /**< m_bParamterThree description */
+    int     m_iParamterOne;         /**< m_iParamterOne description goes here. */
+    double  m_dParamterTwo;         /**< m_dParamterTwo description goes here. */
+    bool    m_bParamterThree;       /**< m_bParamterThree description goes here. */
 
-    OtherClass*    m_pOtherClassObject;       /**< m_pOtherClassObject description */
+    OtherClass*    m_pOtherClassObject;       /**< m_pOtherClassObject description goes here. */
 
-    //Put your other public members here. Try NOT to define mamber variables as public. It is always more safe to declare them under protected or private.
+    //Put your other public members here. Try NOT to define member variables as public. It is always more safe to declare them under protected or private.
 
-signals: //If you want to use signals you need to specify the Q_Object flag above
-    //Put your signals which you want to emit from this class here
+	public slots:
+    ///Put your public slots
 
-slots:
-    //Put your slots which are called by emitted signals here
-
+protected slots:
+	//Put your protected slots
+	
 protected:
     //Put your protected member functions here
 
     //Put your protected members here
 
+private slots:
+	//Put your private slots
+	
 private:
     //Put your private member functions here
 
     //Put your private members here
-
+	
+signals: //If you want to use signal/slot system you need to specify the Q_Object flag above
+    //Put your signals which you want to emit from this class here
 };
 
 

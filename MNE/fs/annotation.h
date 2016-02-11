@@ -53,6 +53,7 @@
 
 #include <QString>
 #include <QSharedPointer>
+#include <QFileInfo>
 
 
 //*************************************************************************************************************
@@ -114,6 +115,29 @@ public:
     * @param[in] p_sFileName    Annotation file
     */
     explicit Annotation(const QString& p_sFileName);
+
+    //=========================================================================================================
+    /**
+    * Construts the annotation by reading it of the given file.
+    *
+    * @param[in] subject_id         Name of subject
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
+    * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...)
+    * @param[in] subjects_dir       Subjects directory
+    */
+    explicit Annotation(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
+
+    //=========================================================================================================
+    /**
+    * Construts the annotation by reading it of the given file.
+    *
+    * @param[in] path               path to surface directory
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
+    * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...)
+    *
+    * @return true if read sucessful, false otherwise
+    */
+    explicit Annotation(const QString &path, qint32 hemi, const QString &surf);
 
     //=========================================================================================================
     /**
@@ -243,8 +267,25 @@ public:
     */
     bool toLabels(const Surface &p_surf, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListLabelRGBAs) const;
 
+    //=========================================================================================================
+    /**
+    * annotation file path
+    *
+    * @return the surf file path
+    */
+    inline QString filePath() const;
+
+    //=========================================================================================================
+    /**
+    * annotation file name
+    *
+    * @return the surf file name
+    */
+    inline QString fileName() const;
+
 private:
-    QString m_sFileName;        /**< Annotation file */
+    QString m_sFileName;        /**< Annotation file name */
+    QString m_sFilePath;        /**< Annotation file path */
 
     qint32 m_iHemi;             /**< Hemisphere (lh = 0; rh = 1) */
     VectorXi m_Vertices;        /**< Vertice indeces */
@@ -315,6 +356,22 @@ inline Colortable& Annotation::getColortable()
 inline const Colortable Annotation::getColortable() const
 {
     return m_Colortable;
+}
+
+
+//*************************************************************************************************************
+
+inline QString Annotation::filePath() const
+{
+    return m_sFilePath;
+}
+
+
+//*************************************************************************************************************
+
+inline QString Annotation::fileName() const
+{
+    return m_sFileName;
 }
 
 } // NAMESPACE

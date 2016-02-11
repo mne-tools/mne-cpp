@@ -58,9 +58,9 @@ using namespace MNEBrowseRawQt;
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
-, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
-, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
-, m_qEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
+//, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+//, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
+//, m_qEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
 , m_qSettings()
 , m_rawSettings()
 , ui(new Ui::MainWindowWidget)
@@ -136,10 +136,10 @@ void MainWindow::setupWindowWidgets()
     addDockWidget(Qt::BottomDockWidgetArea, m_pFilterWindow);
     m_pFilterWindow->hide();
 
-    //Create filter window - QTDesigner used - see / FormFiles
-    m_pProjectionWindow = new ProjectionWindow(this);
-    addDockWidget(Qt::LeftDockWidgetArea, m_pProjectionWindow);
-    m_pProjectionWindow->hide();
+    //Create noise reduction window - QTDesigner used - see / FormFiles
+    m_pNoiseReductionWindow = new NoiseReductionWindow(this);
+    addDockWidget(Qt::LeftDockWidgetArea, m_pNoiseReductionWindow);
+    m_pNoiseReductionWindow->hide();
 
     //Init windows - TODO: get rid of this here, do this inside the window classes
     m_pDataWindow->init();
@@ -195,9 +195,15 @@ void MainWindow::setupWindowWidgets()
     connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
             m_pFilterWindow, &FilterWindow::newFileLoaded);
 
-    //Connect projection manager with fif file loading
+    //Connect noise reduction manager with fif file loading
     connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
-            m_pProjectionWindow->getDataModel(), static_cast<void (ProjectionModel::*)(FiffInfo::SPtr)>(&ProjectionModel::addProjections));
+            m_pNoiseReductionWindow, &NoiseReductionWindow::setFiffInfo);
+
+    connect(m_pNoiseReductionWindow, &NoiseReductionWindow::projSelectionChanged,
+            m_pDataWindow->getDataModel(), &RawModel::updateProjections);
+
+    connect(m_pNoiseReductionWindow, &NoiseReductionWindow::compSelectionChanged,
+            m_pDataWindow->getDataModel(), &RawModel::updateCompensator);
 
     //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels - TODO: dirty move get rid of this here
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
@@ -207,7 +213,7 @@ void MainWindow::setupWindowWidgets()
         m_pSelectionManagerWindow->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
         m_pSelectionManagerWindow->newFiffFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);
         m_pFilterWindow->newFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);
-        m_pProjectionWindow->getDataModel()->addProjections(m_pDataWindow->getDataModel()->m_pFiffInfo);
+        m_pNoiseReductionWindow->setFiffInfo(m_pDataWindow->getDataModel()->m_pFiffInfo);
     }
 }
 
@@ -303,13 +309,13 @@ void MainWindow::createToolBar()
     });
     toolBar->addAction(showAverageManager);
 
-    //Toggle visibility of the projection manager
-    QAction* showProjectionManager = new QAction(QIcon(":/Resources/Images/showProjectionWindow.png"),tr("Toggle projection manager"), this);
-    showProjectionManager->setStatusTip(tr("Toggle the projection manager"));
-    connect(showProjectionManager, &QAction::triggered, this, [=](){
-        showWindow(m_pProjectionWindow);
+    //Toggle visibility of the noise reduction manager
+    QAction* showNoiseReductionManager = new QAction(QIcon(":/Resources/Images/showNoiseReductionWindow.png"),tr("Toggle noise reduction manager"), this);
+    showNoiseReductionManager->setStatusTip(tr("Toggle the noise reduction manager"));
+    connect(showNoiseReductionManager, &QAction::triggered, this, [=](){
+        showWindow(m_pNoiseReductionWindow);
     });
-    toolBar->addAction(showProjectionManager);
+    toolBar->addAction(showNoiseReductionManager);
 
     toolBar->addSeparator();
 
@@ -338,12 +344,12 @@ void MainWindow::createToolBar()
 void MainWindow::connectMenus()
 {
     //File
-    connect(ui->m_openAction, SIGNAL(triggered()), this, SLOT(openFile()));
-    connect(ui->m_writeAction, SIGNAL(triggered()), this, SLOT(writeFile()));
-    connect(ui->m_loadEvents, SIGNAL(triggered()), this, SLOT(loadEvents()));
-    connect(ui->m_saveEvents, SIGNAL(triggered()), this, SLOT(saveEvents()));
-    connect(ui->m_loadEvokedAction, SIGNAL(triggered()), this, SLOT(loadEvoked()));
-    connect(ui->m_quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));    
+    connect(ui->m_openAction, &QAction::triggered, this, &MainWindow::openFile);
+    connect(ui->m_writeAction, &QAction::triggered, this, &MainWindow::writeFile);
+    connect(ui->m_loadEvents, &QAction::triggered, this, &MainWindow::loadEvents);
+    connect(ui->m_saveEvents, &QAction::triggered, this, &MainWindow::saveEvents);
+    connect(ui->m_loadEvokedAction, &QAction::triggered, this, &MainWindow::loadEvoked);
+    connect(ui->m_quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
     //Adjust
     connect(ui->m_filterAction, &QAction::triggered, this, [=](){
@@ -369,8 +375,8 @@ void MainWindow::connectMenus()
     connect(ui->m_ChInformationAction, &QAction::triggered, this, [=](){
         showWindow(m_pChInfoWindow);
     });
-    connect(ui->m_projectionManagerAction, &QAction::triggered, this, [=](){
-        showWindow(m_pProjectionWindow);
+    connect(ui->m_noiseReductionManagerAction, &QAction::triggered, this, [=](){
+        showWindow(m_pNoiseReductionWindow);
     });
 
     //Help
@@ -480,9 +486,6 @@ void MainWindow::openFile()
 
     m_qFileRaw.setFileName(filename);
 
-    //Clear projection manager model
-    m_pProjectionWindow->getDataModel()->clearModel();
-
     //Clear event model
     m_pEventWindow->getEventModel()->clearModel();
 
@@ -528,7 +531,7 @@ void MainWindow::openFile()
     m_pDataWindow->initMVCSettings();
 
     //Set fiffInfo in event model
-    //m_pEventWindow->getEventModel()->setFiffInfo(m_pDataWindow->getDataModel()->m_pFiffInfo);
+    m_pEventWindow->getEventModel()->setFiffInfo(m_pDataWindow->getDataModel()->m_pFiffInfo);
     m_pEventWindow->getEventModel()->setFirstLastSample(m_pDataWindow->getDataModel()->firstSample(),
                                                         m_pDataWindow->getDataModel()->lastSample());
 

@@ -41,18 +41,12 @@
 //=============================================================================================================
 
 #include "realtimesourceestimatewidget.h"
-//#include "annotationwindow.h"
-
 #include <xMeas/realtimesourceestimate.h>
 
-#include <disp3D/geometryview.h>
 #include <mne/mne_forwardsolution.h>
-
-
-
 #include <mne/mne_inverse_operator.h>
-#include <inverse/minimumNorm/minimumnorm.h>
 
+#include <inverse/minimumNorm/minimumnorm.h>
 
 #include <Eigen/Core>
 
@@ -101,42 +95,22 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
 , m_pRTSE(pRTSE)
 , m_bInitialized(false)
 {
-    m_pClustStcModel = new ClustStcModel(this);
-//    m_pClustStcModel->init(t_annotationSet, t_surfSet);
-    m_pClustStcModel->setLoop(false);
+    m_pAction3DControl = new QAction(QIcon(":/images/3DControl.png"), tr("Shows the 3D control widget (F9)"),this);
+    m_pAction3DControl->setShortcut(tr("F9"));
+    m_pAction3DControl->setToolTip(tr("Shows the 3D control widget (F9)"));
+    connect(m_pAction3DControl, &QAction::triggered,
+            this, &RealTimeSourceEstimateWidget::show3DControlWidget);
+    addDisplayAction(m_pAction3DControl);
+    m_pAction3DControl->setVisible(true);
 
-    //
-    // STC view
-    //
+    m_p3DView = View3D::SPtr(new View3D());
+
+    m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this));
+    m_pControl3DView->setView3D(m_p3DView);
+
     QGridLayout *mainLayoutView = new QGridLayout;
-
-    QLabel * pLabelNormView = new QLabel("Norm");
-    m_pSliderNormView = new QSlider(Qt::Vertical);
-    QObject::connect(m_pSliderNormView, &QSlider::valueChanged, m_pClustStcModel, &ClustStcModel::setNormalization);
-    m_pSliderNormView->setMinimum(1);
-    m_pSliderNormView->setMaximum(20000);
-    m_pSliderNormView->setValue(2000);
-
-    QLabel* pLabelAverageView = new QLabel("Average");
-    m_pSliderAverageView = new QSlider(Qt::Horizontal);
-    QObject::connect(m_pSliderAverageView, &QSlider::valueChanged, m_pClustStcModel, &ClustStcModel::setAverage);
-    m_pSliderAverageView->setMinimum(1);
-    m_pSliderAverageView->setMaximum(500);
-    m_pSliderAverageView->setValue(100);
-
-    m_pClustView = new ClustStcView(false, true, QGLView::RedCyanAnaglyph);//(false); (true, QGLView::StretchedLeftRight); (true, QGLView::RedCyanAnaglyph);
-    m_pClustView->setModel(m_pClustStcModel);
-
-    if (m_pClustView->stereoType() != QGLView::RedCyanAnaglyph)
-        m_pClustView->camera()->setEyeSeparation(0.3f);
-
-    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_pClustView);
-
-    mainLayoutView->addWidget(pWidgetContainer,0,0,2,2);
-    mainLayoutView->addWidget(pLabelNormView,0,3);
-    mainLayoutView->addWidget(m_pSliderNormView,1,3);
-    mainLayoutView->addWidget(pLabelAverageView,3,0);
-    mainLayoutView->addWidget(m_pSliderAverageView,3,1);
+    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
+    mainLayoutView->addWidget(pWidgetContainer);
 
     this->setLayout(mainLayoutView);
 
@@ -153,11 +127,6 @@ RealTimeSourceEstimateWidget::~RealTimeSourceEstimateWidget()
     //
     if(!m_pRTSE->getName().isEmpty())
     {
-        QString t_sRTSEName = m_pRTSE->getName();
-
-        QSettings settings;
-        settings.setValue(QString("RTSEW/%1/norm").arg(t_sRTSEName), m_pSliderNormView->value());
-        settings.setValue(QString("RTSEW/%1/average").arg(t_sRTSEName), m_pSliderAverageView->value());
     }
 }
 
@@ -179,7 +148,20 @@ void RealTimeSourceEstimateWidget::getData()
         //
         // Add Data
         //
-        m_pClustStcModel->addData(*m_pRTSE->getValue());
+        if(m_lRtItem.isEmpty()) {
+            m_lRtItem = m_p3DView->addRtBrainData("HemiLRSet", *m_pRTSE->getValue(), *m_pRTSE->getFwdSolution());
+
+            for(int i = 0; i<m_lRtItem.size(); i++) {
+                m_lRtItem.at(i)->onCheckStateLoopedStateChanged(Qt::Checked);
+                m_lRtItem.at(i)->onTimeIntervalChanged(m_pRTSE->getValue()->tstep*1000000);
+                m_lRtItem.at(i)->onNumberAveragesChanged(10);
+                m_lRtItem.at(i)->onCheckStateWorkerChanged(Qt::Checked);
+            }
+        } else {
+            for(int i = 0; i<m_lRtItem.size(); i++) {
+                m_lRtItem.at(i)->addData(*m_pRTSE->getValue());
+            }
+        }
     }
     else
     {
@@ -190,7 +172,7 @@ void RealTimeSourceEstimateWidget::getData()
             //
             // Add Data
             //
-            m_pClustStcModel->addData(*m_pRTSE->getValue());
+            m_p3DView->addBrainData("HemiLRSet", *m_pRTSE->getSurfSet(), *m_pRTSE->getAnnotSet());
         }
     }
 }
@@ -200,14 +182,23 @@ void RealTimeSourceEstimateWidget::getData()
 
 void RealTimeSourceEstimateWidget::init()
 {
-    QString t_sRTSEName = m_pRTSE->getName();
-    QSettings settings;
-    m_pSliderNormView->setValue(settings.value(QString("RTSEW/%1/norm").arg(t_sRTSEName), 2000).toInt());
-    m_pSliderAverageView->setValue(settings.value(QString("RTSEW/%1/average").arg(t_sRTSEName), 100).toInt());
-
-    m_pClustStcModel->init(*m_pRTSE->getAnnotSet(), *m_pRTSE->getSurfSet());
     m_bInitialized = true;
     m_pRTSE->m_bStcSend = true;
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeSourceEstimateWidget::show3DControlWidget()
+{
+    qDebug()<<"RealTimeSourceEstimateWidget::show3DControlWidget()";
+
+    if(m_pControl3DView->isActiveWindow())
+        m_pControl3DView->hide();
+    else {
+        m_pControl3DView->activateWindow();
+        m_pControl3DView->show();
+    }
 }
 
 

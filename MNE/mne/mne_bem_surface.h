@@ -152,6 +152,14 @@ public:
     */
     bool addVertexNormals();
 
+    //=========================================================================================================
+    /**
+    * Writes the bem surface to a FIFF stream
+    *
+    * @param[in] p_pStream  The stream to write to.
+    */
+    void writeToStream(FiffStream* p_pStream);
+
 public:
     fiff_int_t id;              /**< Id information */
     fiff_int_t np;              /**< Number of vertices of the whole/original surface used to create the source locations. */

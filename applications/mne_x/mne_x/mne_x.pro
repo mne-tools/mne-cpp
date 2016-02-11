@@ -71,7 +71,7 @@ else {
             -lmne_x
 }
 
-qtHaveModule(3d) {
+qtHaveModule(3dcore, 3drender, 3dinput) {
     CONFIG(debug, debug|release) {
         LIBS += -lMNE$${MNE_LIB_VERSION}Disp3Dd
     }
@@ -121,24 +121,32 @@ unix: QMAKE_CXXFLAGS += -Wno-attributes
 unix:!macx {
     #ToDo Unix
 }
-else {
+macx {
+    # === Mac ===
+
     isEmpty(TARGET_EXT) {
-        win32 {
-            TARGET_CUSTOM_EXT = .exe
-        }
-        macx {
-            TARGET_CUSTOM_EXT = .app
-        }
+        TARGET_CUSTOM_EXT = .app
     } else {
         TARGET_CUSTOM_EXT = $${TARGET_EXT}
     }
 
-    win32 {
-        DEPLOY_COMMAND = windeployqt
+    # Copy libs
+    BUNDLEFRAMEDIR = $$shell_quote($${DESTDIR}/$${TARGET}$${TARGET_CUSTOM_EXT}/Contents/Frameworks)
+    QMAKE_POST_LINK = $${QMAKE_MKDIR} $${BUNDLEFRAMEDIR} &
+    QMAKE_POST_LINK += $${QMAKE_COPY} $${MNE_LIBRARY_DIR}/{libMNE1Generics.*,libMNE1Utils.*,libMNE1Fs.*,libMNE1Fiff.*,libMNE1Mne*,libMNE1Disp.*} $${BUNDLEFRAMEDIR}
+
+#    DEPLOY_COMMAND = macdeployqt
+#    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
+#    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -verbose=0
+}
+win32 {
+    isEmpty(TARGET_EXT) {
+        TARGET_CUSTOM_EXT = .exe
+    } else {
+        TARGET_CUSTOM_EXT = $${TARGET_EXT}
     }
-    macx {
-        DEPLOY_COMMAND = macdeployqt
-    }
+
+    DEPLOY_COMMAND = windeployqt
 
     DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
 

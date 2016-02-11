@@ -58,6 +58,7 @@ using namespace XDISPLIB;
 RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 : QAbstractTableModel(parent)
 , m_bProjActivated(false)
+, m_bCompActivated(false)
 , m_fSps(1024.0f)
 , m_iT(10)
 , m_iDownsampling(10)
@@ -293,6 +294,7 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
     else {
         m_vecBadIdcs = RowVectorXi(0,0);
         m_matProj = MatrixXd(0,0);
+        m_matComp = MatrixXd(0,0);
     }
 }
 
@@ -327,6 +329,9 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
     //SSP
     bool doProj = m_bProjActivated && m_matDataRaw.cols() > 0 && m_matDataRaw.rows() == m_matProj.cols() ? true : false;
 
+    //Compensator
+    bool doComp = m_bCompActivated && m_matDataRaw.cols() > 0 && m_matDataRaw.rows() == m_matComp.cols() ? true : false;
+
     //Copy new data into the global data matrix
     for(qint32 b = 0; b < data.size(); ++b) {
         if(data.at(b).rows() != m_matDataRaw.rows()) {
@@ -345,10 +350,19 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
 //            std::cout<<"m_matDataRaw.cols(): "<<m_matDataRaw.cols()<<std::endl;
 //            std::cout<<"data.at(b).cols()-m_iResidual: "<<data.at(b).cols()-m_iResidual<<std::endl<<std::endl;
 
-            if(doProj)
-                m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseProj * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-            else
-                m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
+            if(doComp) {
+                if(doProj) {
+                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseFull * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
+                } else {
+                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseComp * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
+                }
+            } else {
+                if(doProj) {
+                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseProj * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
+                } else {
+                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
+                }
+            }
 
             m_iCurrentSample = 0;
 
@@ -372,10 +386,19 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
             m_iResidual = 0;
 
         //std::cout<<"incoming data is ok"<<std::endl;
-        if(doProj)
-            m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseProj * data.at(b);
-        else
-            m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = data.at(b);
+        if(doComp) {
+            if(doProj) {
+                m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseFull * data.at(b);
+            } else {
+                m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseComp * data.at(b);
+            }
+        } else {
+            if(doProj) {
+                m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseProj * data.at(b);
+            } else {
+                m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = data.at(b);
+            }
+        }
 
         //Filter if neccessary else set to zero
         if(!m_filterData.isEmpty())
@@ -554,8 +577,6 @@ void RealTimeMultiSampleArrayModel::updateProjection()
         //If a minimum of one projector is active set m_bProjActivated to true so that this model applies the ssp to the incoming data
         m_bProjActivated = false;
         for(qint32 i = 0; i < this->m_pFiffInfo->projs.size(); ++i) {
-            std::cout<<this->m_pFiffInfo->projs[i].desc.toStdString()<<" is active: "<<this->m_pFiffInfo->projs[i].active<<std::endl;
-
             if(this->m_pFiffInfo->projs[i].active) {
                 m_bProjActivated = true;
                 break;
@@ -566,13 +587,16 @@ void RealTimeMultiSampleArrayModel::updateProjection()
         qDebug() << "updateProjection :: New projection calculated.";
 
         //set columns of matrix to zero depending on bad channels indexes
-//        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
-//            m_matProj.col(m_vecBadIdcs[j]).setZero();
+        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
+            m_matProj.col(m_vecBadIdcs[j]).setZero();
 
 //        std::cout << "Bads\n" << m_vecBadIdcs << std::endl;
 //        std::cout << "Proj\n";
 //        std::cout << m_matProj.block(0,0,10,10) << std::endl;
 
+        //
+        // Make proj sparse
+        //
         qint32 nchan = this->m_pFiffInfo->nchan;
         qint32 i, k;
 
@@ -580,9 +604,6 @@ void RealTimeMultiSampleArrayModel::updateProjection()
         std::vector<T> tripletList;
         tripletList.reserve(nchan);
 
-        //
-        // Make proj sparse
-        //
         tripletList.clear();
         tripletList.reserve(m_matProj.rows()*m_matProj.cols());
         for(i = 0; i < m_matProj.rows(); ++i)
@@ -593,6 +614,60 @@ void RealTimeMultiSampleArrayModel::updateProjection()
         m_matSparseProj = SparseMatrix<double>(m_matProj.rows(),m_matProj.cols());
         if(tripletList.size() > 0)
             m_matSparseProj.setFromTriplets(tripletList.begin(), tripletList.end());
+
+        //Create full multiplication matrix
+        m_matSparseFull = m_matSparseProj * m_matSparseComp;
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::updateCompensator(int to)
+{
+    //
+    //  Update the compensator
+    //
+    if(m_pFiffInfo)
+    {
+        if(to == 0)
+            m_bCompActivated = false;
+        else
+            m_bCompActivated = true;
+
+//        qDebug()<<"to"<<to;
+//        qDebug()<<"from"<<from;
+//        qDebug()<<"m_bCompActivated"<<m_bCompActivated;
+
+        FiffCtfComp newComp;
+        this->m_pFiffInfo->make_compensator(0, to, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
+
+        this->m_pFiffInfo->set_current_comp(to);
+        m_matComp = newComp.data->data;
+
+        //
+        // Make proj sparse
+        //
+        qint32 nchan = this->m_pFiffInfo->nchan;
+        qint32 i, k;
+
+        typedef Eigen::Triplet<double> T;
+        std::vector<T> tripletList;
+        tripletList.reserve(nchan);
+
+        tripletList.clear();
+        tripletList.reserve(m_matComp.rows()*m_matComp.cols());
+        for(i = 0; i < m_matComp.rows(); ++i)
+            for(k = 0; k < m_matComp.cols(); ++k)
+                if(m_matComp(i,k) != 0)
+                    tripletList.push_back(T(i, k, m_matComp(i,k)));
+
+        m_matSparseComp = SparseMatrix<double>(m_matComp.rows(),m_matComp.cols());
+        if(tripletList.size() > 0)
+            m_matSparseComp.setFromTriplets(tripletList.begin(), tripletList.end());
+
+        //Create full multiplication matrix
+        m_matSparseFull = m_matSparseProj * m_matSparseComp;
     }
 }
 
@@ -781,7 +856,6 @@ void RealTimeMultiSampleArrayModel::resetTriggerCounter()
 {
     m_iDetectedTriggers = 0;
 }
-
 
 
 //*************************************************************************************************************

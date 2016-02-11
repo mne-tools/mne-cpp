@@ -39,9 +39,6 @@
 //=============================================================================================================
 
 #include "dummysetupwidget.h"
-#include "dummyaboutwidget.h"
-
-#include "../dummytoolbox.h"
 
 
 //*************************************************************************************************************
@@ -71,6 +68,7 @@ DummySetupWidget::DummySetupWidget(DummyToolbox* toolbox, QWidget *parent)
 {
     ui.setupUi(this);
 
+    //Always connect GUI elemts after ui.setpUi has been called
     connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
 }
 

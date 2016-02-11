@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     disp3D.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+# @author   Lorenz Esch <Lorenz.Esch@tu-ilmenauu.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2012
+# @date     November, 2015
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -18,7 +18,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the display 3D library.
+# @brief    This project file builds the new display 3D library which depends on the qt3d module.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -37,9 +37,9 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       += widgets 3d concurrent
+QT       += widgets 3dcore 3drender 3dinput
 
-DEFINES += DISP3D_LIBRARY
+DEFINES += DISP3DNEW_LIBRARY
 
 TARGET = Disp3D
 TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
@@ -50,7 +50,6 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
@@ -59,7 +58,6 @@ CONFIG(debug, debug|release) {
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
-            -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
@@ -90,29 +88,49 @@ else {
 }
 
 SOURCES += \
-    geometryview.cpp \
-    labelview.cpp \
-    inverseview.cpp \
-    inverseviewproducer.cpp \
-    brainview.cpp \
-    newbrainview.cpp \
-    helpers/cluststcmodel.cpp \
-    helpers/cluststcview.cpp \
-    helpers/cluststcworker.cpp \
-    helpers/cluststctabledelegate.cpp
+    view3D.cpp \
+    3DObjects/brain/brain.cpp \
+    3DObjects/brain/braintreemodel.cpp \
+    3DObjects/brain/braintreemetaitem.cpp \
+    3DObjects/brain/brainsurfacetreeitem.cpp \
+    3DObjects/brain/brainsurfacesettreeitem.cpp \
+    3DObjects/brain/brainannotationtreeitem.cpp \
+    3DObjects/brain/brainhemispheretreeitem.cpp \
+    3DObjects/brain/braintreedelegate.cpp \
+    3DObjects/brain/brainrtsourcelocdatatreeitem.cpp \
+    3DObjects/brain/brainrtconnectivitydatatreeitem.cpp \
+    helpers/abstracttreeitem.cpp \
+    helpers/renderable3Dentity.cpp \
+    helpers/custommesh.cpp \
+    helpers/window.cpp \
+    control/control3dwidget.cpp \
+    rt/rtSourceLoc/rtsourcelocdataworker.cpp \
+    3DObjects/brain/brainsourcespacetreeitem.cpp
 
 HEADERS += \
+    view3D.h \
+    3DObjects/brain/brain.h \
+    3DObjects/brain/braintreemodel.h \
+    3DObjects/brain/braintreemetaitem.h \
+    3DObjects/brain/brainsurfacetreeitem.h \
+    3DObjects/brain/brainsurfacesettreeitem.h \
+    3DObjects/brain/brainannotationtreeitem.h \
+    3DObjects/brain/brainhemispheretreeitem.h \
+    3DObjects/brain/braintreedelegate.h \
+    3DObjects/brain/brainrtsourcelocdatatreeitem.h \
+    3DObjects/brain/brainrtconnectivitydatatreeitem.h \
+    helpers/abstracttreeitem.h \
+    helpers/renderable3Dentity.h \
+    helpers/custommesh.h \
+    helpers/window.h \
+    helpers/types.h \
+    control/control3dwidget.h \
     disp3D_global.h \
-    geometryview.h \
-    labelview.h \
-    inverseview.h \
-    inverseviewproducer.h \
-    brainview.h \
-    newbrainview.h \
-    helpers/cluststcmodel.h \
-    helpers/cluststctabledelegate.h \
-    helpers/cluststcview.h \
-    helpers/cluststcworker.h
+    rt/rtSourceLoc/rtsourcelocdataworker.h \
+    3DObjects/brain/brainsourcespacetreeitem.h
+
+FORMS += \
+    control/control3dwidget.ui \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -124,3 +142,4 @@ header_files.path = $${MNE_INCLUDE_DIR}/disp3D
 INSTALLS += header_files
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+

@@ -116,7 +116,7 @@ public:
     * @param[in] subject_id         Name of subject
     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
     * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
-    * @param[in] subjects_dir       True if the curvature should be read (optional, default = true)
+    * @param[in] subjects_dir       Subjects directory
     */
     explicit Surface(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
 
@@ -131,7 +131,6 @@ public:
     * @return true if read sucessful, false otherwise
     */
     explicit Surface(const QString &path, qint32 hemi, const QString &surf);
-
 
     //=========================================================================================================
     /**

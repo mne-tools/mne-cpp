@@ -111,6 +111,23 @@ public:
     QList<qreal> max_scalar_list;
     qint32 bm_channel;
 
+    //=========================================================================================================
+    /**
+    * Atom_make_tf
+    *
+    * ### MP toolbox root function ###
+    *
+    * calculates time frequency representation of the atom
+    *
+    * @param[in] sample_count   number of samples in the atom
+    * @param[in] scale          scale of atom
+    * @param[in] translation    translation of atom
+    * @param[in] modulation     modulation of atom
+    *
+    * @return Matrix with t-f information
+    */
+    MatrixXd make_tf (qint32 sample_count, qreal scale, quint32 translation, qreal modulation);
+
 };
 
 //=============================================================================================================

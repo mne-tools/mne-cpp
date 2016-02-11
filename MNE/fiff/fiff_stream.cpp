@@ -566,6 +566,10 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(const FiffDirTree& p_Node, const QL
             one.kind = 2;
         else if (one.ctfkind == 1194541650) //hex2dec('47334252')
             one.kind = 3;
+        else if (one.ctfkind == 1194479433)
+            one.kind = 4;
+        else if (one.ctfkind == 1194544969)
+            one.kind = 5;
         else
             one.kind = one.ctfkind;
 
@@ -1540,7 +1544,7 @@ FiffStream::SPtr FiffStream::start_file(QIODevice& p_IODevice)
 
 //*************************************************************************************************************
 
-FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const FiffInfo& info, RowVectorXd& cals, MatrixXi sel)
+FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const FiffInfo& info, RowVectorXd& cals, MatrixXi sel, bool resetRange)
 {
     //
     //   We will always write floats
@@ -1674,15 +1678,28 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
     //
     cals = RowVectorXd(nchan);
 
-    for(k = 0; k < nchan; ++k)
+    if(resetRange)
     {
-        //
-        //    Scan numbers may have been messed up
-        //
-        chs[k].scanno = k+1;//+1 because
-        //chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
-        cals[k] = chs[k].cal;
-        t_pStream->write_ch_info(&chs[k]);
+        for(k = 0; k < nchan; ++k)
+        {
+            //
+            //    Scan numbers may have been messed up
+            //
+            chs[k].scanno = k+1;//+1 because
+            chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
+            cals[k] = chs[k].cal;
+            t_pStream->write_ch_info(&chs[k]);
+        }
+    } else {
+        for(k = 0; k < nchan; ++k)
+        {
+            //
+            //    Scan numbers may have been messed up
+            //
+            chs[k].scanno = k+1;//+1 because
+            cals[k] = chs[k].cal;
+            t_pStream->write_ch_info(&chs[k]);
+        }
     }
     //
     //
@@ -1926,9 +1943,13 @@ void FiffStream::write_ctf_comp(const QList<FiffCtfComp>& comps)
         qint32 save_calibrated = comp.save_calibrated;
         this->write_int(FIFF_MNE_CTF_COMP_CALIBRATED, &save_calibrated);
         //
-        //    Write an uncalibrated or calibrated matrix
+        //  Write an uncalibrated or calibrated matrix
+        //  If compensators where calibrated undo this here
         //
-        comp.data->data = (comp.rowcals.diagonal()).inverse()* comp.data->data * (comp.colcals.diagonal()).inverse();
+        if(comps[k].save_calibrated) {
+            comp.data->data = (comp.rowcals.asDiagonal()).inverse()* comp.data->data * (comp.colcals.asDiagonal()).inverse();
+        }
+
         this->write_named_matrix(FIFF_MNE_CTF_COMP_DATA,*comp.data.data());
         this->end_block(FIFFB_MNE_CTF_COMP_DATA);
     }
@@ -2018,9 +2039,11 @@ void FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXf& mat)
     *this << (qint32)datasize;
     *this << (qint32)FIFFV_NEXT_SEQ;
 
-    qint32 i;
-    for(i = 0; i < numel; ++i)
-        *this << mat.data()[i];
+    qint32 i, j;
+    // Storage order: row-major
+    for(i = 0; i < mat.rows(); ++i)
+        for(j = 0; j < mat.cols(); ++j)
+            *this << mat(i,j);
 
     qint32 dims[3];
     dims[0] = mat.cols();
@@ -2298,7 +2321,7 @@ void FiffStream::write_info_base(const FiffInfoBase & p_FiffInfoBase)
         //    Scan numbers may have been messed up
         //
         chs[k].scanno = k+1;//+1 because
-        //chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
+        chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
         this->write_ch_info(&chs[k]);
     }
 
@@ -2364,9 +2387,11 @@ void FiffStream::write_int_matrix(fiff_int_t kind, const MatrixXi& mat)
     *this << (qint32)datasize;
     *this << (qint32)FIFFV_NEXT_SEQ;
 
-    qint32 i;
-    for(i = 0; i < numel; ++i)
-        *this << mat.data()[i];
+    qint32 i, j;
+    // Storage order: row-major
+    for(i = 0; i < mat.rows(); ++i)
+        for(j = 0; j < mat.cols(); ++j)
+            *this << mat(i,j);
 
     qint32 dims[3];
     dims[0] = mat.cols();

@@ -48,7 +48,6 @@
 #include <generics/circularbuffer.h>
 #include <generics/circularmatrixbuffer.h>
 
-#include <xMeas/realtimesourceestimate.h>
 #include <xMeas/newrealtimesamplearray.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 

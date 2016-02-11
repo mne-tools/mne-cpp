@@ -62,6 +62,7 @@
 
 #include <fiff/fiff_info.h>
 #include <fiff/fiff.h>
+#include <fiff/fiff_types.h>
 
 
 //*************************************************************************************************************
@@ -388,6 +389,14 @@ private:
 
     //=========================================================================================================
     /**
+    * Read compensators from fiff file.
+    *
+    * @return true if successful, false otherwise
+    */
+    bool readCompensators();
+
+    //=========================================================================================================
+    /**
     * Read bad channels from fiff file.
     *
     * @return true if successful, false otherwise
@@ -443,7 +452,8 @@ private:
     QString     m_sCurrentSubject;      /**< The current subject which is part of the filename to be recorded.*/
     QString     m_sCurrentParadigm;     /**< The current paradigm which is part of the filename to be recorded.*/
     QString     m_sRecordFile;          /**< Current record file. */
-    QString     m_sFiffHeader;          /**< Fiff header information */
+    QString     m_sFiffProjections;     /**< Fiff projection information */
+    QString     m_sFiffCompensators;    /**< Fiff compensator information */
     QString     m_sBadChannels;         /**< Filename which contains a list of bad channels */
 
     QFile       m_qFileOut;             /**< QFile for writing to fif file.*/

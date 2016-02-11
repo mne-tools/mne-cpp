@@ -111,7 +111,7 @@ void MNE::init()
     // Inits
     m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_qFileFwdSolution));
     m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
-    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.white", m_sSurfaceDir+"/rh.white"));
+    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.inflated", m_sSurfaceDir+"/rh.inflated"));
 
     // Input
     m_pRTEInput = PluginInputData<RealTimeEvoked>::create(this, "MNE RTE In", "MNE real-time evoked input data");
@@ -129,6 +129,7 @@ void MNE::init()
 
     m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
     m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
+    m_pRTSEOutput->data()->setFwdSolution(m_pFwd);
 
     // start clustering
     QFuture<void> future = QtConcurrent::run(this, &MNE::doClustering);
@@ -149,10 +150,70 @@ void MNE::unload()
 void MNE::calcFiffInfo()
 {
     QMutexLocker locker(&m_qMutex);
+
     if(m_qListCovChNames.size() > 0 && m_pFiffInfoEvoked && m_pFiffInfoForward)
     {
         qDebug() << "Fiff Infos available";
 
+//        qDebug() << "m_qListCovChNames" << m_qListCovChNames;
+//        qDebug() << "m_pFiffInfoForward->ch_names" << m_pFiffInfoForward->ch_names;
+//        qDebug() << "m_pFiffInfoEvoked->ch_names" << m_pFiffInfoEvoked->ch_names;
+
+        // Align channel names of the forward solution to the incoming averaged (currently acquired) data
+        // Find out whether the forward solution depends on only MEG, EEG or both MEG and EEG channels
+        QStringList forwardChannelsTypes;
+        m_pFiffInfoForward->ch_names.clear();
+        int counter = 0;
+
+        for(qint32 x = 0; x < m_pFiffInfoForward->chs.size(); ++x) {
+            if(forwardChannelsTypes.contains("MEG") && forwardChannelsTypes.contains("EEG"))
+                break;
+
+            if(m_pFiffInfoForward->chs[x].kind == FIFFV_MEG_CH && !forwardChannelsTypes.contains("MEG"))
+                forwardChannelsTypes<<"MEG";
+
+            if(m_pFiffInfoForward->chs[x].kind == FIFFV_EEG_CH && !forwardChannelsTypes.contains("EEG"))
+                forwardChannelsTypes<<"EEG";
+        }
+
+        //If only MEG channels are used
+        if(forwardChannelsTypes.contains("MEG") && !forwardChannelsTypes.contains("EEG")) {
+            for(qint32 x = 0; x < m_pFiffInfoEvoked->chs.size(); ++x)
+            {
+                if(m_pFiffInfoForward->chs[x].kind == FIFFV_MEG_CH) {
+                    m_pFiffInfoForward->chs[counter].ch_name = m_pFiffInfoEvoked->chs[x].ch_name;
+                    m_pFiffInfoForward->ch_names << m_pFiffInfoEvoked->chs[x].ch_name;
+                    counter++;
+                }
+            }
+        }
+
+        //If only EEG channels are used
+        if(!forwardChannelsTypes.contains("MEG") && forwardChannelsTypes.contains("EEG")) {
+            for(qint32 x = 0; x < m_pFiffInfoEvoked->chs.size(); ++x)
+            {
+                if(m_pFiffInfoForward->chs[x].kind == FIFFV_EEG_CH) {
+                    m_pFiffInfoForward->chs[counter].ch_name = m_pFiffInfoEvoked->chs[x].ch_name;
+                    m_pFiffInfoForward->ch_names << m_pFiffInfoEvoked->chs[x].ch_name;
+                    counter++;
+                }
+            }
+        }
+
+        //If both MEG and EEG channels are used
+        if(forwardChannelsTypes.contains("MEG") && forwardChannelsTypes.contains("EEG")) {
+            qDebug()<<"MEG EEG fwd solution";
+            for(qint32 x = 0; x < m_pFiffInfoEvoked->chs.size(); ++x)
+            {
+                if(m_pFiffInfoEvoked->chs[x].kind == FIFFV_MEG_CH || m_pFiffInfoEvoked->chs[x].kind == FIFFV_EEG_CH) {
+                    m_pFiffInfoForward->chs[counter].ch_name = m_pFiffInfoEvoked->chs[x].ch_name;
+                    m_pFiffInfoForward->ch_names << m_pFiffInfoEvoked->chs[x].ch_name;
+                    counter++;
+                }
+            }
+        }
+
+        //Pick only channels which are present in all data structures (covariance, evoked and forward)
         QStringList tmp_pick_ch_names;
         foreach (const QString &ch, m_pFiffInfoForward->ch_names)
         {
@@ -170,9 +231,12 @@ void MNE::calcFiffInfo()
 
         RowVectorXi sel = m_pFiffInfoEvoked->pick_channels(m_qListPickChannels);
 
-        m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(m_pFiffInfoEvoked->pick_info(sel)));
-    }
+        //qDebug() << "m_qListPickChannels" << m_qListPickChannels;
 
+        m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(m_pFiffInfoEvoked->pick_info(sel)));
+
+        //qDebug() << "m_pFiffInfo" << m_pFiffInfo->ch_names;
+    }
 }
 
 
@@ -185,6 +249,9 @@ void MNE::doClustering()
     m_qMutex.lock();
     m_bFinishedClustering = false;
     m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
+    //m_pClusteredFwd = m_pFwd;
+    m_pRTSEOutput->data()->setFwdSolution(m_pClusteredFwd);
+
     m_qMutex.unlock();
 
     finishedClustering();
@@ -371,12 +438,14 @@ void MNE::run()
         msleep(10);// Wait for fiff Info
     }
 
+    //qDebug() << "m_pClusteredFwd->info.ch_names" << m_pClusteredFwd->info.ch_names;
+    //qDebug() << "m_pFiffInfo->ch_names" << m_pFiffInfo->ch_names;
+
     //
     // Init Real-Time inverse estimator
     //
     m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd));
     connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated, this, &MNE::updateInvOp);
-
     m_pMinimumNorm.reset();
 
     //
