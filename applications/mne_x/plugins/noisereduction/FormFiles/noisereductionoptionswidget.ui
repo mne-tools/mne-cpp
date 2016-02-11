@@ -27,17 +27,43 @@
       <string>SPHARA</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="1">
+      <item row="2" column="1">
        <widget class="QSlider" name="m_horizontalSlider_nBaseFcts">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>500</number>
+        </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
+        <property name="tickPosition">
+         <enum>QSlider::NoTicks</enum>
+        </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="m_label_nBaseFct">
+      <item row="0" column="0" colspan="2">
+       <widget class="QCheckBox" name="m_checkBox_activateSphara">
         <property name="text">
-         <string/>
+         <string>Activate SPHARA</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QSpinBox" name="m_spinBox_nBaseFcts">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>500</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="2">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Number of used base functions (upper limit):</string>
         </property>
        </widget>
       </item>
@@ -61,5 +87,22 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>m_horizontalSlider_nBaseFcts</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>m_spinBox_nBaseFcts</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>105</x>
+     <y>106</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>36</x>
+     <y>107</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

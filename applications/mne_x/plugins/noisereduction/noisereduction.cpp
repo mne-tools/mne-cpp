@@ -62,6 +62,8 @@ NoiseReduction::NoiseReduction()
 , m_pNoiseReductionInput(NULL)
 , m_pNoiseReductionOutput(NULL)
 , m_pNoiseReductionBuffer(CircularMatrixBuffer<double>::SPtr())
+, m_iNBaseFcts(500)
+, m_bSpharaActive(false)
 {
     //Add action which will be visible in the plugin's toolbar
     m_pActionShowOptionsWidget = new QAction(QIcon(":/images/options.png"), tr("Noise reduction options"),this);
@@ -214,6 +216,7 @@ void NoiseReduction::setSpharaMode(bool state)
 {
     m_mutex.lock();
     m_bSpharaActive = state;
+    qDebug()<<"NoiseReduction::setSpharaMode:"<<state;
     m_mutex.unlock();
 }
 
@@ -222,9 +225,10 @@ void NoiseReduction::setSpharaMode(bool state)
 
 void NoiseReduction::setSpharaNBaseFcts(int nBaseFcts)
 {
-    m_mutex.lock();
+    //m_mutex.lock();
     m_iNBaseFcts = nBaseFcts;
-    m_mutex.unlock();
+    qDebug()<<"NoiseReduction::setSpharaNBaseFcts:"<<nBaseFcts;
+    //m_mutex.unlock();
 }
 
 
@@ -243,11 +247,14 @@ void NoiseReduction::run()
         //Dispatch the inputs
         MatrixXd t_mat = m_pNoiseReductionBuffer->pop();
 
+        m_mutex.lock();
         //To all the noise reduction steps here
         //SPHARA calculations
         if(m_bSpharaActive) {
 
         }
+
+        m_mutex.unlock();
 
         //Send the data to the connected plugins and the online display
         //Unocmment this if you also uncommented the m_pNoiseReductionOutput in the constructor above
@@ -260,6 +267,6 @@ void NoiseReduction::run()
 
 void NoiseReduction::showOptionsWidget()
 {
-    m_pOptionsWidget = NoiseReductionOptionsWidget::SPtr(new NoiseReductionOptionsWidget());
+    m_pOptionsWidget = NoiseReductionOptionsWidget::SPtr(new NoiseReductionOptionsWidget(this));
     m_pOptionsWidget->show();
 }
