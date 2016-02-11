@@ -38,5 +38,5 @@ for ((i = 0; i < n_elements; i++)); do
 #    echo "Fix File: $fixfile"
 #    echo "Dest Dir: $destdir"
 
-    /usr/local/bin/dylibbundler -od —cd -b -x $fixfile -d $destdir -p $installpath
+    /usr/local/bin/dylibbundler -od -b -x $fixfile —cd $destdir -d $destdir -p $installpath
 done
