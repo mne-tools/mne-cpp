@@ -125,6 +125,7 @@ public:
     */
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
+public slots:
     void setSpharaMode(bool state);
 
     void setSpharaNBaseFcts(int nBaseFcts);

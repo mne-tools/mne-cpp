@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "NoiseReductionOptionswidget.h"
+#include "../noisereduction.h"
 
 
 //*************************************************************************************************************
@@ -54,11 +55,20 @@ using namespace NoiseReductionPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NoiseReductionOptionsWidget::NoiseReductionOptionsWidget(QWidget *parent)
-: QWidget(parent)
+NoiseReductionOptionsWidget::NoiseReductionOptionsWidget(NoiseReduction* toolbox, QWidget* parent)
+: QWidget(parent, Qt::Window)
 , ui(new Ui::NoiseReductionOptionsWidgetClass)
+, m_pNoiseReductionToolbox(toolbox)
 {
+    this->setWindowTitle("Noise reduction options");
+
     ui->setupUi(this);
+
+    //Do the connects. Always connect GUI elemts after ui.setpUi has been called
+    connect(ui->m_checkBox_activateSphara, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            m_pNoiseReductionToolbox, &NoiseReduction::setSpharaMode);
+    connect(ui->m_horizontalSlider_nBaseFcts, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
+            m_pNoiseReductionToolbox, &NoiseReduction::setSpharaNBaseFcts);
 }
 
 

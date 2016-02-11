@@ -66,6 +66,8 @@ namespace NoiseReductionPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class NoiseReduction;
+
 
 //=============================================================================================================
 /**
@@ -86,7 +88,7 @@ public:
     /**
     * Constructs a DummyToolbox.
     */
-    explicit NoiseReductionOptionsWidget(QWidget *parent = 0);
+    explicit NoiseReductionOptionsWidget(NoiseReductionPlugin::NoiseReduction* toolbox, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -95,7 +97,9 @@ public:
     ~NoiseReductionOptionsWidget();
 
 private:
-    Ui::NoiseReductionOptionsWidgetClass* ui;        /**< The UI class specified in the designer. */
+    Ui::NoiseReductionOptionsWidgetClass*   ui;                         /**< The UI class specified in the designer. */
+
+    NoiseReductionPlugin::NoiseReduction*   m_pNoiseReductionToolbox;
 };
 
 #endif // NOISEREDUCTIONOPTIONSWIDGET_H
