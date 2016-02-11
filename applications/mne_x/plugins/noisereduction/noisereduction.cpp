@@ -145,7 +145,7 @@ bool NoiseReduction::stop()
     m_bIsRunning = false;
 
     m_pNoiseReductionBuffer->releaseFromPop();
-    m_pNoiseReductionBuffer->releaseFromPush();
+    m_pNoiseReductionBuffer->clear();
 
     m_pNoiseReductionBuffer->clear();
 
