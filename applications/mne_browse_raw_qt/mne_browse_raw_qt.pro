@@ -61,20 +61,20 @@ CONFIG += static console #DEBUG console
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lMNE$${MNE_LIB_VERSION}Genericsd \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Mned
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Dispd
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Disp \
-            -lMNE$${MNE_LIB_VERSION}Generics \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Disp
 }
 
 DESTDIR = $${MNE_BINARY_DIR}
@@ -170,19 +170,22 @@ unix:!macx {
     #ToDo Unix
 }
 macx {
-    #ToDo Mac
-    #macdeployqt is done in an separate deploy script
-#    isEmpty(TARGET_EXT) {
-#        TARGET_CUSTOM_EXT = .app
-#    } else {
-#        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-#    }
-#
+    # === Mac ===
+
+    isEmpty(TARGET_EXT) {
+        TARGET_CUSTOM_EXT = .app
+    } else {
+        TARGET_CUSTOM_EXT = $${TARGET_EXT}
+    }
+
+    # Copy libs
+    BUNDLEFRAMEDIR = $$shell_quote($${DESTDIR}/$${TARGET}$${TARGET_CUSTOM_EXT}/Contents/Frameworks)
+    QMAKE_POST_LINK = $${QMAKE_MKDIR} $${BUNDLEFRAMEDIR} &
+    QMAKE_POST_LINK += $${QMAKE_COPY} $${MNE_LIBRARY_DIR}/{libMNE1Generics.*,libMNE1Utils.*,libMNE1Fs.*,libMNE1Fiff.*,libMNE1Mne*,libMNE1Disp.*} $${BUNDLEFRAMEDIR}
+
 #    DEPLOY_COMMAND = macdeployqt
-#
 #    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-#
-#    QMAKE_POST_LINK = $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+#    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -verbose=0
 }
 win32 {
     isEmpty(TARGET_EXT) {
