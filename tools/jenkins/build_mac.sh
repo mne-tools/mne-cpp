@@ -36,7 +36,7 @@ make -j4
 installpath="@executable_path/../libs-mnecpp"
 for ((i = 0; i < n_elements; i++)); do
     fixfile="../mne-cpp/bin/${TANGIBLES[i]}.app/Contents/MacOS/${TANGIBLES[i]}"
-    destdir="../mne-cpp/bin/${TANGIBLES[i]}.app/Contents/libs-mnecpp”
+    destdir="../mne-cpp/bin/${TANGIBLES[i]}.app/Contents/libs-mnecpp"
 
     mkdir $destdir
 
