@@ -36,7 +36,7 @@ make -j4
 
 # === Deployment ===
 n_elements=${#TANGIBLES[@]}
-installpath=“../Frameworks“
+installpath="../Frameworks"
 for ((i = 0; i < n_elements; i++)); do
 
     tangible="../mne-cpp/bin/${TANGIBLES[i]}.app"
