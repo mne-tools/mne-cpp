@@ -32,7 +32,6 @@ make -j4
 # === Deployment ===
 installpath="../Frameworks"
 for ((i = 0; i < n_elements; i++)); do
-
     tangible="../mne-cpp/bin/${TANGIBLES[i]}.app"
     macdeployqt $tangible
 
@@ -42,4 +41,4 @@ for ((i = 0; i < n_elements; i++)); do
     mkdir $destdir
 
     /usr/local/bin/dylibbundler -od -b -x $fixfile -d $destdir -p $installpath
-done
+done
