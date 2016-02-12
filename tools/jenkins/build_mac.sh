@@ -33,12 +33,12 @@ make clean
 make -j4
 
 # === Deployment ===
-installpath="../Frameworks"
+installpath="@executable_path/../libs-mnecpp”
 for ((i = 0; i < n_elements; i++)); do
-    mkdir $destdir
-
     fixfile="../mne-cpp/bin/${TANGIBLES[i]}.app/Contents/MacOS/${TANGIBLES[i]}"
-    destdir="../mne-cpp/bin/${TANGIBLES[i]}.app/Contents/Frameworks"
+    destdir="../mne-cpp/bin/${TANGIBLES[i]}.app/Contents/libs-mnecpp”
+
+    mkdir $destdir
 
     /usr/local/bin/dylibbundler -od -b -x $fixfile -d $destdir -p $installpath
 
