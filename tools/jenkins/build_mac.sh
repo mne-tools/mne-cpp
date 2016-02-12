@@ -11,17 +11,12 @@ cd mne-cpp_shadow_build
 QT_BIN_DIR='/Users/Shared/Jenkins/Qt5.6.0/5.6/clang_64/bin'
 QT_LIB_DIR='/Users/Shared/Jenkins/Qt5.6.0/5.6/clang_64/lib'
 
-MNECPP_LIB_WORKSPACE='/Users/Shared/Jenkins/Home/jobs/MNE-CPP/workspace/mne-cpp/lib'
-
 TANGIBLES=(mne_x mne_browse_raw_qt mne_analyze_qt)
 
 PATH=$QT_BIN_DIR:$PATH
 export PATH
 
-DYLD_LIBRARY_PATH=$MNECPP_LIB_WORKSPACE:$DYLD_LIBRARY_PATH
-export DYLD_LIBRARY_PATH 
-
-
+export DYLD_LIBRARY_PATH="/Users/Shared/Jenkins/Home/jobs/MNE-CPP/workspace/mne-cpp/lib"
 # === Clean Up ===
 n_elements=${#TANGIBLES[@]}
 for ((i = 0; i < n_elements; i++)); do
@@ -35,7 +30,6 @@ make clean
 make -j4
 
 # === Deployment ===
-n_elements=${#TANGIBLES[@]}
 installpath="../Frameworks"
 for ((i = 0; i < n_elements; i++)); do
 
@@ -44,9 +38,6 @@ for ((i = 0; i < n_elements; i++)); do
 
     fixfile="../mne-cpp/bin/${TANGIBLES[i]}.app/Contents/MacOS/${TANGIBLES[i]}"
     destdir="../mne-cpp/bin/${TANGIBLES[i]}.app/Contents/Frameworks"
-
-#    echo "Fix File: $fixfile"
-#    echo "Dest Dir: $destdir"
 
     mkdir $destdir
 
