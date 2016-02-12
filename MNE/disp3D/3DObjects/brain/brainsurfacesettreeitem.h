@@ -157,7 +157,14 @@ public:
     */
     bool addData(const MNELIB::MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent = 0);
 
-private:
+private slots:
+    //=========================================================================================================
+    /**
+    * Call this slot whenever the check box of this item was checked.
+    *
+    * @param[in] checkState        The current checkstate.
+    */
+    void onCheckStateChanged(const Qt::CheckState& checkState);
 };
 
 } //NAMESPACE DISP3DLIB
