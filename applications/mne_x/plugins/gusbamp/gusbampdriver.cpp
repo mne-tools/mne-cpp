@@ -39,6 +39,9 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <QtCore>
+#include <QtCore/QcoreApplication>
+#include <QDebug>
 #include "gusbampdriver.h"
 #include "gusbampproducer.h"
 #include <iostream>
@@ -65,14 +68,13 @@ using namespace std;
 GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
 : m_pGUSBAmpProducer(pGUSBAmpProducer)
 ,SLAVE_SERIALS_SIZE(0)
-,SAMPLE_RATE_HZ(128)
-,NUMBER_OF_SCANS(8)
-,NUMBER_OF_CHANNELS(3)
+,SAMPLE_RATE_HZ(1200)
+,NUMBER_OF_SCANS(256)
+,NUMBER_OF_CHANNELS(5)
 ,TRIGGER(FALSE)
 ,_mode(M_NORMAL)
 ,_commonReference({ FALSE, FALSE, FALSE, FALSE })
 ,_commonGround({ FALSE, FALSE, FALSE, FALSE })
-,BUFFER_SIZE_SECONDS(5)
 ,QUEUE_SIZE(4)
 ,nPoints(NUMBER_OF_SCANS * (NUMBER_OF_CHANNELS + TRIGGER))
 ,bufferSizeBytes(HEADER_SIZE + nPoints * sizeof(float))
@@ -102,11 +104,12 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
     for(int i = 0; i < NUMBER_OF_CHANNELS; i++)
         _channelsToAcquire[i] = UCHAR(i+1);
 
-    float version = float(GT_GetDriverVersion());
+//    float version = float(GT_GetDriverVersion());
 
-    qDebug() <<endl<< "gUSBampdriver-contructor build successfully " << endl;
-    qDebug() << "gUSBamp-driver version:" << version << "was found";
+//    qDebug() << "gUSBamp-driver version " << version << "was found";
+//    qDebug() <<endl<< "gUSBampdriver-contructor build successfully " << endl;
 
+     file.setFileName("d:/Clouds/OneDrive/Studium/Master/Masterarbeit/testing/gUSBamp/driver/data.txt");
 
 }
 
@@ -134,10 +137,6 @@ bool GUSBAmpDriver::initDevice()
 
 
 
-    qDebug() << "starting initializing gUSBamp devices" << endl;
-
-
-
     try
     {
         for (deque<LPSTR>::iterator serialNumber = callSequenceSerials.begin(); serialNumber != callSequenceSerials.end(); serialNumber++)
@@ -146,11 +145,8 @@ bool GUSBAmpDriver::initDevice()
             HANDLE hDevice = GT_OpenDeviceEx(*serialNumber);
 
             if (hDevice == NULL)
-            {
-                qDebug() << "opening the device " << QString(*serialNumber)<< "failed" << endl;
                 throw string("Error on GT_OpenDeviceEx: Couldn't open device ").append(*serialNumber);
 
-            }
             //add the device handle to the list of opened devices
             openedDevicesHandles.push_back(hDevice);
 
@@ -238,8 +234,7 @@ bool GUSBAmpDriver::initDevice()
 
         }
 
-
-
+        //define the buffer variables and start the device:
         //create _callSequenceHandles for the sequence of calling the devices (Master has to be the last device to be called!)
         _callSequenceHandles = openedDevicesHandles;
         numDevices = (int) _callSequenceHandles.size();
@@ -263,6 +258,10 @@ bool GUSBAmpDriver::initDevice()
                 overlapped[deviceIndex][queueIndex].hEvent = CreateEvent(NULL, false, false, NULL);
             }
         }
+
+        //opening the file and prepare it for data-stream
+        file.open(QIODevice::WriteOnly | QIODevice::Text );
+        stream.setDevice(&file);
 
         //start the devices (master device must be started at last)
         for (int deviceIndex=0; deviceIndex<numDevices; deviceIndex++)
@@ -288,6 +287,10 @@ bool GUSBAmpDriver::initDevice()
         }
 
 
+
+
+
+
         qDebug() << "Plugin GUSBAmp - INFO - initDevice() - The device has been connected and initialised successfully" << endl;
 
         return true;
@@ -295,7 +298,6 @@ bool GUSBAmpDriver::initDevice()
     }
     catch (string& exception)
     {
-        qDebug() << "error occurred - catch{}-instruction was started" << endl;
 
         //in case an exception occurred, close all opened devices...
         while(!openedDevicesHandles.empty())
@@ -305,10 +307,7 @@ bool GUSBAmpDriver::initDevice()
             openedDevicesHandles.pop_front();
         }
 
-
-
         cout << exception << '\n';
-
 
         return false;
 
@@ -320,6 +319,7 @@ bool GUSBAmpDriver::initDevice()
 
 bool GUSBAmpDriver::uninitDevice()
 {
+
 
 
     cout << "Stopping devices and cleaning up..." << "\n";
@@ -353,7 +353,7 @@ bool GUSBAmpDriver::uninitDevice()
     delete [] buffers;
     delete [] overlapped;
 
-    //closing all devices
+    //closing all devices from the Call-Sequence-Handle
     while (!_callSequenceHandles.empty())
     {
         //closes each opened device and removes it from the call sequence
@@ -361,13 +361,17 @@ bool GUSBAmpDriver::uninitDevice()
         _callSequenceHandles.pop_front();
     }
 
-    //closes all openend Device Handles
+    //closes all openend Device-Handles
     while(!openedDevicesHandles.empty())
     {
         GT_CloseDevice(&openedDevicesHandles.front());
-        qDebug() << "error occurred - Device " << &openedDevicesHandles.front()  << "was closed" << endl;
         openedDevicesHandles.pop_front();
     }
+
+    //close the data file
+    file.close();
+
+
 
 
     qDebug() << "Plugin GUSBAmp - INFO - uninitDevice() - Successfully uninitialised the device" << endl;
@@ -382,6 +386,7 @@ bool GUSBAmpDriver::uninitDevice()
 bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
 {
     sampleMatrix.setZero(); // Clear matrix - set all elements to zero
+
 
 
     for(int queueIndex=0; queueIndex<QUEUE_SIZE; queueIndex++)
@@ -426,24 +431,18 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
                 for(int channelIndex = 0; channelIndex<NUMBER_OF_CHANNELS; channelIndex++)
                 {
                     BYTE ByteValue[sizeof(float)];
-                    float FloatValue;
+                    float   FloatValue;
 
                     for(int i=0;i<sizeof(float);i++)
                     {
                         ByteValue[i] = buffers[deviceIndex][queueIndex][(scanIndex * (NUMBER_OF_CHANNELS + TRIGGER) + channelIndex) * sizeof(float) + HEADER_SIZE + i];
                     }
-                    memcpy(&FloatValue, &ByteValue, sizeof(FloatValue));
-                    cout << FloatValue<< "\t";
+                    memcpy(&FloatValue, &ByteValue, sizeof(float));
+                    stream << FloatValue<< "\t";
                 }
             }
-            cout << "\n";
+            stream << "\n";
         }
-
-
-
-
-
-
 
         //add new GetData call to the queue replacing the currently received one
         for (int deviceIndex = 0; deviceIndex < numDevices; deviceIndex++)
@@ -452,8 +451,9 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
                 cout << "\tError on GT_GetData.\n";
                 return 0;
             }
-
     }
+
+
 
     return true;
 }

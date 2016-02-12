@@ -44,6 +44,8 @@
 #include "gusbampdriver.h"
 
 #include <QDebug>
+#include <QtCore>
+#include <QtCore/QCoreApplication>
 
 
 //*************************************************************************************************************
@@ -105,6 +107,7 @@ void GUSBAmpProducer::stop()
 
     //Unitialise device only after the thread stopped
     m_pGUSBAmpDriver->uninitDevice();
+
 }
 
 
@@ -114,12 +117,25 @@ void GUSBAmpProducer::run()
 {
     MatrixXf matRawBuffer(128,100);
 
-    while(m_bIsRunning) {
-        //qDebug()<<"GUSBAmpProducer::run()"<<endl;
-        //Get the GUSBAmp EEG data out of the device buffer and write received data to circular buffer
-        if(m_pGUSBAmpDriver->getSampleMatrixValue(matRawBuffer))
-            m_pGUSBAmp->m_pRawMatrixBuffer_In->push(&matRawBuffer);
-   }
+
+
+
+
+
+        while(m_bIsRunning) {
+            //qDebug()<<"GUSBAmpProducer::run()"<<endl;
+            //Get the GUSBAmp EEG data out of the device buffer and write received data to circular buffer
+            if(m_pGUSBAmpDriver->getSampleMatrixValue(matRawBuffer))
+                m_pGUSBAmp->m_pRawMatrixBuffer_In->push(&matRawBuffer);
+
+        }
+
+
+
+
+
+
+
 
     //std::qDebug()<<"EXITING - GUSBAmpProducer::run()"<<std::endl;
 }
