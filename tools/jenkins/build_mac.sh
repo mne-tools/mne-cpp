@@ -16,8 +16,8 @@ TANGIBLES=(mne_x mne_browse_raw_qt mne_analyze_qt)
 PATH=$QT_BIN_DIR:$PATH
 export PATH
 
-DYLD_LIBRARY_PATH="/Users/Shared/Jenkins/Home/jobs/MNE-CPP/workspace/mne-cpp/lib"
-export DYLD_LIBRARY_PATH
+DYLD_FALLBACK_LIBRARY_PATH="/Users/Shared/Jenkins/Home/jobs/MNE-CPP/workspace/mne-cpp/lib"
+export DYLD_FALLBACK_LIBRARY_PATH
 # === Clean Up ===
 n_elements=${#TANGIBLES[@]}
 for ((i = 0; i < n_elements; i++)); do
@@ -33,11 +33,14 @@ make -j4
 # === Deployment ===
 installpath="../Frameworks"
 for ((i = 0; i < n_elements; i++)); do
-    tangible="../mne-cpp/bin/${TANGIBLES[i]}.app"
-    macdeployqt $tangible
+    mkdir $destdir
 
     fixfile="../mne-cpp/bin/${TANGIBLES[i]}.app/Contents/MacOS/${TANGIBLES[i]}"
     destdir="../mne-cpp/bin/${TANGIBLES[i]}.app/Contents/Frameworks"
 
-#    /usr/local/bin/dylibbundler -od -b -x $fixfile -d $destdir -p $installpath
+    /usr/local/bin/dylibbundler -od -b -x $fixfile -d $destdir -p $installpath
+
+    tangible="../mne-cpp/bin/${TANGIBLES[i]}.app"
+    macdeployqt $tangible
+
 done
