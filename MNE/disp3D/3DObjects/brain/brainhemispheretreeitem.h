@@ -163,6 +163,15 @@ public:
     */
     BrainRTSourceLocDataTreeItem* addData(const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
 
+private slots:
+    //=========================================================================================================
+    /**
+    * Call this slot whenever the check box of this item was checked.
+    *
+    * @param[in] checkState        The current checkstate.
+    */
+    void onCheckStateChanged(const Qt::CheckState& checkState);
+
 private:
     BrainSurfaceTreeItem*           m_pSurfaceItem;                     /**< The surface item of this hemisphere item. Only one surface item may exists under a hemisphere item. */
     BrainAnnotationTreeItem*        m_pAnnotItem;                       /**< The annotation item of this hemisphere item. Only one annotation item may exists under a hemisphere item. */

@@ -58,6 +58,7 @@ using namespace FSLIB;
 
 BrainSurfaceTreeItem::BrainSurfaceTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
+, m_pParentEntity(new Qt3DCore::QEntity())
 , m_pRenderable3DEntity(new Renderable3DEntity())
 , m_pRenderable3DEntityActivationOverlay(new Renderable3DEntity())
 , m_pItemSurfColorInfoOrigin(new BrainTreeMetaItem())
@@ -107,6 +108,7 @@ void  BrainSurfaceTreeItem::setData(const QVariant& value, int role)
 bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
+    m_pParentEntity = parent;
     m_pRenderable3DEntity = new Renderable3DEntity(parent);
     m_pRenderable3DEntityActivationOverlay = new Renderable3DEntity(parent);
 
@@ -267,6 +269,14 @@ void BrainSurfaceTreeItem::onRtVertColorChanged(const QByteArray& sourceColorSam
     data.setValue(sourceColorSamples);
     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceRTSourceLocColor);
     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert);
+}
+
+
+//*************************************************************************************************************
+
+void BrainSurfaceTreeItem::setVisible(bool state)
+{
+    m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
 }
 
 
