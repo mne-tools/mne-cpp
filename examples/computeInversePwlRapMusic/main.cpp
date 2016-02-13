@@ -63,6 +63,7 @@
 //=============================================================================================================
 
 #include <QApplication>
+#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
@@ -94,21 +95,44 @@ using namespace DISP3DLIB;
 */
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QApplication app(argc, argv);
+
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Compute Inverse Powell RAP-MUSIC Example");
+    parser.addHelpOption();
+    QCommandLineOption sampleFwdFileOption("f", "Path to forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption sampleEvokedFileOption("e", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption sampleSubjectDirectoryOption("d", "Path to subject <directory>.", "directory", "./MNE-sample-data/subjects");
+    QCommandLineOption sampleSubjectOption("s", "Selected <subject>.", "subject", "sample");
+    QCommandLineOption stcFileOption("t", "Path to <target> where stc is stored to.", "target", "");//"RapMusic.stc");
+    QCommandLineOption numDipolePairsOption("n", "<number> of dipole pairs to localize.", "number", "7");
+    QCommandLineOption doMovieOption("m", "Create overlapping movie.");
+
+    parser.addOption(sampleFwdFileOption);
+    parser.addOption(sampleEvokedFileOption);
+    parser.addOption(sampleSubjectDirectoryOption);
+    parser.addOption(sampleSubjectOption);
+    parser.addOption(stcFileOption);
+    parser.addOption(numDipolePairsOption);
+    parser.addOption(doMovieOption);
+    parser.process(app);
+
 
     //########################################################################################
     // Source Estimate
 
-    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
-    SurfaceSet t_surfSet("sample", 2, "white", "./MNE-sample-data/subjects");
+    QFile t_fileFwd(parser.value(sampleFwdFileOption));
+    QFile t_fileEvoked(parser.value(sampleEvokedFileOption));
+    QString subject(parser.value(sampleSubjectOption)); QString subjectDir(parser.value(sampleSubjectDirectoryOption));
+    AnnotationSet t_annotationSet(subject, 2, "aparc.a2009s", subjectDir);
+    SurfaceSet t_surfSet(subject, 2, "white", subjectDir);
 
-    QString t_sFileNameStc("");//"RapMusic.stc");
+    QString t_sFileNameStc(parser.value(stcFileOption));
 
-    qint32 numDipolePairs = 7;
+    qint32 numDipolePairs = parser.value(numDipolePairsOption).toInt();
 
-    bool doMovie = false;//false;
+    bool doMovie = parser.isSet(doMovieOption);
 
     // Parse command line parameters
     for(qint32 i = 0; i < argc; ++i)
@@ -180,5 +204,5 @@ int main(int argc, char *argv[])
         sourceEstimate.write(t_fileClusteredStc);
     }
 
-    return a.exec();
+    return app.exec();
 }
