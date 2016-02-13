@@ -80,6 +80,7 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
 ,m_nPoints(m_NUMBER_OF_SCANS * (m_NUMBER_OF_CHANNELS + m_TRIGGER))
 ,m_bufferSizeBytes(HEADER_SIZE + m_nPoints * sizeof(float))
 ,m_numBytesReceived(0)
+,m_isRunning(false)
 {
 
     //Linking the specific API-library to the project
@@ -138,6 +139,7 @@ bool GUSBAmpDriver::initDevice()
     */
 
 
+    m_isRunning =true;
 
     try
     {
@@ -366,6 +368,8 @@ bool GUSBAmpDriver::uninitDevice()
     //close the data file
     m_file.close();
 
+    m_isRunning = false;
+
     qDebug() << "Plugin GUSBAmp - INFO - uninitDevice() - Successfully uninitialised the device" << endl;
 
     return true;
@@ -457,6 +461,7 @@ void GUSBAmpDriver::setSerials(LPSTR master,
                                LPSTR slave2 = LPSTR("is_empty"),
                                LPSTR slave3 = LPSTR("is_empty"))
 {
+
     //closes the call-sequence-list
     while (!m_callSequenceSerials.empty())
     {
@@ -483,41 +488,80 @@ void GUSBAmpDriver::setSerials(LPSTR master,
 
 //*************************************************************************************************************
 
-bool setSampleRate(int sampleRate)
+bool GUSBAmpDriver::setSampleRate(int sampleRate)
 {
     try
     {
+        if(m_isRunning)
+            throw string("Do not change device-parameters while running the device!\n");
+
 
         switch(sampleRate)
         {
-//        case 32:    m_NUMBER_OF_SCANS = 1;      break;
-//        case 64:    m_NUMBER_OF_SCANS = 2;      break;
-//        case 128:   m_NUMBER_OF_SCANS = 4;      break;
-//        case 256:   m_NUMBER_OF_SCANS = 8;      break;
-//        case 512:   m_NUMBER_OF_SCANS = 16;     break;
-//        case 600:   m_NUMBER_OF_SCANS = 32;     break;
-//        case 1200:  m_NUMBER_OF_SCANS = 64;     break;
-//        case 2400:  m_NUMBER_OF_SCANS = 128;    break;
-//        case 4800:  m_NUMBER_OF_SCANS = 256;    break;
-//        case 9600:  m_NUMBER_OF_SCANS = 512;    break;
-//        case 19200: m_NUMBER_OF_SCANS = 512;    break;
-//        case 38400: m_NUMBER_OF_SCANS = 512;    break;
-//        default: throw string("Error on setSampleRate: please chosse between following options:\n32, 64, 128, 256, 512, 600, 1200, 2400, 4800, 9600, 19200 and 38400 ");
-
-
+        case 32:    m_NUMBER_OF_SCANS = 1;      break;
+        case 64:    m_NUMBER_OF_SCANS = 2;      break;
+        case 128:   m_NUMBER_OF_SCANS = 4;      break;
+        case 256:   m_NUMBER_OF_SCANS = 8;      break;
+        case 512:   m_NUMBER_OF_SCANS = 16;     break;
+        case 600:   m_NUMBER_OF_SCANS = 32;     break;
+        case 1200:  m_NUMBER_OF_SCANS = 64;     break;
+        case 2400:  m_NUMBER_OF_SCANS = 128;    break;
+        case 4800:  m_NUMBER_OF_SCANS = 256;    break;
+        case 9600:  m_NUMBER_OF_SCANS = 512;    break;
+        case 19200: m_NUMBER_OF_SCANS = 512;    break;
+        case 38400: m_NUMBER_OF_SCANS = 512;    break;
+        default: throw string("Error on setSampleRate: please choose between following options:\n32, 64, 128, 256, 512, 600, 1200, 2400, 4800, 9600, 19200 and 38400\n\n:"); break;
         }
-
+        m_SAMPLE_RATE_HZ = sampleRate;
+        qDebug()<<"Sample Rate is setted"<<endl;
     }
     catch(string& exception)
     {
         cout << exception << '\n';
-
         return false;
-
     }
 
     return true;
 
 }
+
+//*************************************************************************************************************
+
+bool GUSBAmpDriver::setChannels(vector<int> &list)
+{
+    if(m_isRunning)
+    {
+        cout << "Do not change device-parameters while running the device!\n";
+        return false;
+    }
+
+    int numargin = list.size();
+    if (numargin > 16)
+    {
+        cout << "ERROR: Could not set channels. Size of channel-vector has to be less then 16\n";
+        return false;
+    }
+
+
+    //checking if value values of vector are ascending
+    int i = 0;
+    do
+        i++;
+    while ((i < numargin) && (list[i] > list[i - 1]));
+    if (i != numargin)
+    {
+        cout << "ERROR: values of the channels in the vector have to be ascending\n";
+        return false;
+    }
+
+    for(int i = 0; i < numargin; i++)
+         m_channelsToAcquire[i] = UCHAR(list[i]);
+
+    m_NUMBER_OF_CHANNELS = numargin;
+
+    return true;
+
+}
+
 
 
