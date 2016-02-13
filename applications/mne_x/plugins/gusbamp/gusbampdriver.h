@@ -125,7 +125,7 @@ private:
     int                 m_SLAVE_SERIALS_SIZE;       //the number of slave serials specified in slaveSerials
     int                 m_SAMPLE_RATE_HZ;           //the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!)
     int                 m_NUMBER_OF_SCANS;          //the number of scans that should be received simultaneously (depending on the _sampleRate; see C-API documentation for this value!)
-    const UCHAR         m_NUMBER_OF_CHANNELS;       //the number of channels per device that should be acquired (must equal the size of the _channelsToAcquire array)
+    UCHAR               m_NUMBER_OF_CHANNELS;       //the number of channels per device that should be acquired (must equal the size of the _channelsToAcquire array)
     UCHAR               m_channelsToAcquire[16];    //the channels that should be acquired from each device
     const BOOL          m_TRIGGER;                  //TRUE to acquire the trigger line in an additional channel
     UCHAR               m_mode;                     //use normal acquisition mode
@@ -136,13 +136,14 @@ private:
 //    bool                _bufferOverrun;           //flag indicating if an overrun occurred at the application buffer
 //    const int           BUFFER_SIZE_SECONDS;		//the size of the application buffer in seconds
     const int           m_QUEUE_SIZE;               //the number of GT_GetData calls that will be queued during acquisition to avoid loss of data
+    bool                m_isRunning;                //flag for data acquisition
 //buffer
     int                 m_nPoints;                  //number of points which are received from one chanel simultaneously
     DWORD               m_bufferSizeBytes;          //Size of buffer
     DWORD               m_numBytesReceived;         //num of Bytes whicht are received during one measuring procedure
     BYTE***             m_buffers;                  //pointer to the buffer
     OVERLAPPED**        m_overlapped;               //storage in case of overlapping
-//file
+//file writing
     QFile               m_file;                     //file to which data is written
     QTextStream         m_stream;                   //stream from m_buffers to m_file
 
@@ -198,13 +199,27 @@ public:
 
     //=========================================================================================================
     /**
-    * Setting the sampling rate of the amplifier
+    * Setting the sampling rate of the amplifier and defining the Number of Scans
     *
-    * @param[in] samplingRate   sampling rate of the amplifier in [Hz] possible settings for the sample rate are:
-    *                           32, 64, 128, 256, 512, 600, 1200, 2400, 4800, 9600, 19200 and 38400
+    * @param[in]    samplingRate    sampling rate of the amplifier in [Hz] possible settings for the sample rate are:
+    *                               32, 64, 128, 256, 512, 600, 1200, 2400, 4800, 9600, 19200 and 38400
+    * @return[out]                  true if suceeded
     *
     */
-    void setSamplingRate(int sampleRate);
+    bool setSampleRate(int sampleRate);
+
+    //=========================================================================================================
+    /**
+    * Setting the channels and the Number of channels
+    *
+    * @param[in]    channels        Vecotr which behold the values of Channels as integer. The values have to be
+    *                               ascending and in number must not exceed 16
+    *
+    * @return[out]                  true if suceeded
+    *
+    */
+    bool setChannels(vector<int> &channels);
+
 
 
 protected:
