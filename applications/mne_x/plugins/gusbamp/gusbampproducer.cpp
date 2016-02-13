@@ -44,8 +44,6 @@
 #include "gusbampdriver.h"
 
 #include <QDebug>
-#include <QtCore>
-#include <QtCore/QCoreApplication>
 
 
 //*************************************************************************************************************
@@ -115,7 +113,7 @@ void GUSBAmpProducer::stop()
 
 void GUSBAmpProducer::run()
 {
-    MatrixXf matRawBuffer(128,100);
+    MatrixXf matRawBuffer(16,1024);
 
 
 

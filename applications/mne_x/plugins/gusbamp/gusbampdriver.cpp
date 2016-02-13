@@ -47,6 +47,7 @@
 #include <iostream>
 #include <Windows.h>
 #include <deque>
+#include <stdarg.h>
 
 
 
@@ -67,18 +68,18 @@ using namespace std;
 
 GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
 : m_pGUSBAmpProducer(pGUSBAmpProducer)
-,SLAVE_SERIALS_SIZE(0)
-,SAMPLE_RATE_HZ(1200)
-,NUMBER_OF_SCANS(256)
-,NUMBER_OF_CHANNELS(5)
-,TRIGGER(FALSE)
-,_mode(M_NORMAL)
-,_commonReference({ FALSE, FALSE, FALSE, FALSE })
-,_commonGround({ FALSE, FALSE, FALSE, FALSE })
-,QUEUE_SIZE(4)
-,nPoints(NUMBER_OF_SCANS * (NUMBER_OF_CHANNELS + TRIGGER))
-,bufferSizeBytes(HEADER_SIZE + nPoints * sizeof(float))
-,numBytesReceived(0)
+,m_SLAVE_SERIALS_SIZE(0)
+,m_SAMPLE_RATE_HZ(1200)
+,m_NUMBER_OF_SCANS(256)
+,m_NUMBER_OF_CHANNELS(5)
+,m_TRIGGER(FALSE)
+,m_QUEUE_SIZE(4)
+,m_mode(M_NORMAL)
+,m_commonReference({ FALSE, FALSE, FALSE, FALSE })
+,m_commonGround({ FALSE, FALSE, FALSE, FALSE })
+,m_nPoints(m_NUMBER_OF_SCANS * (m_NUMBER_OF_CHANNELS + m_TRIGGER))
+,m_bufferSizeBytes(HEADER_SIZE + m_nPoints * sizeof(float))
+,m_numBytesReceived(0)
 {
 
     //Linking the specific API-library to the project
@@ -90,26 +91,27 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
 
 
     //initializing a deque-list of the serial numbers to be called (LPSTR)
-    _masterSerial       = LPSTR("UB-2015.05.16");
-    _slaveSerials[0]    = LPSTR("UB-2010.03.43");
-    _slaveSerials[1]    = LPSTR("UB-2010.03.44");
-    _slaveSerials[2]    = LPSTR("UB-2010.03.47");
-    for (int i=0; i<SLAVE_SERIALS_SIZE; i++)
-        callSequenceSerials.push_back(_slaveSerials[i]);
+    m_masterSerial       = LPSTR("UB-2015.05.16");
+    m_slaveSerials[0]    = LPSTR("UB-2010.03.43");
+    m_slaveSerials[1]    = LPSTR("UB-2010.03.44");
+    m_slaveSerials[2]    = LPSTR("UB-2010.03.47");
+    for (int i=0; i<m_SLAVE_SERIALS_SIZE; i++)
+        m_callSequenceSerials.push_back(m_slaveSerials[i]);
     //add the master device at the end of the list!
-    callSequenceSerials.push_back(_masterSerial);
+    m_callSequenceSerials.push_back(m_masterSerial);
 
 
     //initializing UCHAR-list of channels to acquire
-    for(int i = 0; i < NUMBER_OF_CHANNELS; i++)
-        _channelsToAcquire[i] = UCHAR(i+1);
+    for(int i = 0; i < m_NUMBER_OF_CHANNELS; i++)
+        m_channelsToAcquire[i] = UCHAR(i+1);
 
 //    float version = float(GT_GetDriverVersion());
 
 //    qDebug() << "gUSBamp-driver version " << version << "was found";
 //    qDebug() <<endl<< "gUSBampdriver-contructor build successfully " << endl;
 
-     file.setFileName("d:/Clouds/OneDrive/Studium/Master/Masterarbeit/testing/gUSBamp/driver/data.txt");
+    //define Name and place of written data-file
+     m_file.setFileName("d:/Clouds/OneDrive/Studium/Master/Masterarbeit/testing/gUSBamp/driver/data.txt");
 
 }
 
@@ -139,7 +141,7 @@ bool GUSBAmpDriver::initDevice()
 
     try
     {
-        for (deque<LPSTR>::iterator serialNumber = callSequenceSerials.begin(); serialNumber != callSequenceSerials.end(); serialNumber++)
+        for (deque<LPSTR>::iterator serialNumber = m_callSequenceSerials.begin(); serialNumber != m_callSequenceSerials.end(); serialNumber++)
         {
             //open the device
             HANDLE hDevice = GT_OpenDeviceEx(*serialNumber);
@@ -148,38 +150,38 @@ bool GUSBAmpDriver::initDevice()
                 throw string("Error on GT_OpenDeviceEx: Couldn't open device ").append(*serialNumber);
 
             //add the device handle to the list of opened devices
-            openedDevicesHandles.push_back(hDevice);
+            m_openedDevicesHandles.push_back(hDevice);
 
             //set the channels from that data should be acquired
-            if (!GT_SetChannels(hDevice, _channelsToAcquire, NUMBER_OF_CHANNELS))
+            if (!GT_SetChannels(hDevice, m_channelsToAcquire, m_NUMBER_OF_CHANNELS))
                 throw string("Error on GT_SetChannels: Couldn't set channels to acquire for device ").append(*serialNumber);
 
             //set the sample rate
-            if (!GT_SetSampleRate(hDevice, SAMPLE_RATE_HZ))
+            if (!GT_SetSampleRate(hDevice, m_SAMPLE_RATE_HZ))
                 throw string("Error on GT_SetSampleRate: Couldn't set sample rate for device ").append(*serialNumber);
 
             //disable the trigger line
-            if (!GT_EnableTriggerLine(hDevice, TRIGGER))
+            if (!GT_EnableTriggerLine(hDevice, m_TRIGGER))
                 throw string("Error on GT_EnableTriggerLine: Couldn't enable/disable trigger line for device ").append(*serialNumber);
 
             //set the number of scans that should be received simultaneously
-            if (!GT_SetBufferSize(hDevice, NUMBER_OF_SCANS))
+            if (!GT_SetBufferSize(hDevice, m_NUMBER_OF_SCANS))
                 throw string("Error on GT_SetBufferSize: Couldn't set the buffer size for device ").append(*serialNumber);
 
             //don't use bandpass and notch for each channel
-            for (int i=0; i<NUMBER_OF_CHANNELS; i++)
+            for (int i=0; i<m_NUMBER_OF_CHANNELS; i++)
             {
                 //don't use a bandpass filter for any channel
-                if (!GT_SetBandPass(hDevice, _channelsToAcquire[i], -1))
+                if (!GT_SetBandPass(hDevice, m_channelsToAcquire[i], -1))
                     throw string("Error on GT_SetBandPass: Couldn't set no bandpass filter for device ").append(*serialNumber);
 
                 //don't use a notch filter for any channel
-                if (!GT_SetNotch(hDevice, _channelsToAcquire[i], -1))
+                if (!GT_SetNotch(hDevice, m_channelsToAcquire[i], -1))
                     throw string("Error on GT_SetNotch: Couldn't set no notch filter for device ").append(*serialNumber);
             }
 
             //determine master device as the last device in the list
-            bool isSlave = (*serialNumber != callSequenceSerials.back());
+            bool isSlave = (*serialNumber != m_callSequenceSerials.back());
 
             //set slave/master mode of the device
             if (!GT_SetSlave(hDevice, isSlave))
@@ -190,83 +192,83 @@ bool GUSBAmpDriver::initDevice()
                 throw string("Error on GT_EnableSC: Couldn't disable shortcut function for device ").append(*serialNumber);
 
             //set unipolar derivation
-            _bipolarSettings.Channel1 = 0;
-            _bipolarSettings.Channel2 = 0;
-            _bipolarSettings.Channel3 = 0;
-            _bipolarSettings.Channel4 = 0;
-            _bipolarSettings.Channel5 = 0;
-            _bipolarSettings.Channel6 = 0;
-            _bipolarSettings.Channel7 = 0;
-            _bipolarSettings.Channel8 = 0;
-            _bipolarSettings.Channel9 = 0;
-            _bipolarSettings.Channel10 = 0;
-            _bipolarSettings.Channel11 = 0;
-            _bipolarSettings.Channel12 = 0;
-            _bipolarSettings.Channel13 = 0;
-            _bipolarSettings.Channel14 = 0;
-            _bipolarSettings.Channel15 = 0;
-            _bipolarSettings.Channel16 = 0;
+            m_bipolarSettings.Channel1 = 0;
+            m_bipolarSettings.Channel2 = 0;
+            m_bipolarSettings.Channel3 = 0;
+            m_bipolarSettings.Channel4 = 0;
+            m_bipolarSettings.Channel5 = 0;
+            m_bipolarSettings.Channel6 = 0;
+            m_bipolarSettings.Channel7 = 0;
+            m_bipolarSettings.Channel8 = 0;
+            m_bipolarSettings.Channel9 = 0;
+            m_bipolarSettings.Channel10 = 0;
+            m_bipolarSettings.Channel11 = 0;
+            m_bipolarSettings.Channel12 = 0;
+            m_bipolarSettings.Channel13 = 0;
+            m_bipolarSettings.Channel14 = 0;
+            m_bipolarSettings.Channel15 = 0;
+            m_bipolarSettings.Channel16 = 0;
 
-            if (!GT_SetBipolar(hDevice, _bipolarSettings))
+            if (!GT_SetBipolar(hDevice, m_bipolarSettings))
                 throw string("Error on GT_SetBipolar: Couldn't set unipolar derivation for device ").append(*serialNumber);
 
-            if (_mode == M_COUNTER)
+            if (m_mode == M_COUNTER)
                 if (!GT_SetMode(hDevice, M_NORMAL))
                     throw string("Error on GT_SetMode: Couldn't set mode M_NORMAL (before mode M_COUNTER) for device ").append(*serialNumber);
 
             //set acquisition mode
-            if (!GT_SetMode(hDevice, _mode))
+            if (!GT_SetMode(hDevice, m_mode))
                 throw string("Error on GT_SetMode: Couldn't set mode for device ").append(*serialNumber);
 
             //for g.USBamp devices set common ground and common reference
-            if (strncmp(*serialNumber, "U", 1) == 0 && (_mode == M_NORMAL || _mode == M_COUNTER))
+            if (strncmp(*serialNumber, "U", 1) == 0 && (m_mode == M_NORMAL || m_mode == M_COUNTER))
             {
                 //don't connect the 4 groups to common reference
-                if (!GT_SetReference(hDevice, _commonReference))
+                if (!GT_SetReference(hDevice, m_commonReference))
                     throw string("Error on GT_SetReference: Couldn't set common reference for device ").append(*serialNumber);
 
                 //don't connect the 4 groups to common ground
-                if (!GT_SetGround(hDevice, _commonGround))
+                if (!GT_SetGround(hDevice, m_commonGround))
                     throw string("Error on GT_SetGround: Couldn't set common ground for device ").append(*serialNumber);
             }
 
-            printf("\tg.USBamp %s initialized as %s (#%d in the call sequence)!\n", *serialNumber, (isSlave) ? "slave" : "master", openedDevicesHandles.size());
+            printf("\tg.USBamp %s initialized as %s (#%d in the call sequence)!\n", *serialNumber, (isSlave) ? "slave" : "master", m_openedDevicesHandles.size());
 
         }
 
         //define the buffer variables and start the device:
         //create _callSequenceHandles for the sequence of calling the devices (Master has to be the last device to be called!)
-        _callSequenceHandles = openedDevicesHandles;
-        numDevices = (int) _callSequenceHandles.size();
+        m_callSequenceHandles = m_openedDevicesHandles;
+        m_numDevices = (int) m_callSequenceHandles.size();
 
-        buffers     = new BYTE**[numDevices];
-        overlapped  = new OVERLAPPED*[numDevices];
+        m_buffers     = new BYTE**[m_numDevices];
+        m_overlapped  = new OVERLAPPED*[m_numDevices];
 
         //for each device create a number of QUEUE_SIZE data buffers
-        for (int deviceIndex=0; deviceIndex<numDevices; deviceIndex++)
+        for (int deviceIndex=0; deviceIndex<m_numDevices; deviceIndex++)
         {
-            buffers[deviceIndex] = new BYTE*[QUEUE_SIZE];
-            overlapped[deviceIndex] = new OVERLAPPED[QUEUE_SIZE];
+            m_buffers[deviceIndex] = new BYTE*[m_QUEUE_SIZE];
+            m_overlapped[deviceIndex] = new OVERLAPPED[m_QUEUE_SIZE];
 
             //for each data buffer allocate a number of bufferSizeBytes bytes
-            for (int queueIndex=0; queueIndex<QUEUE_SIZE; queueIndex++)
+            for (int queueIndex=0; queueIndex<m_QUEUE_SIZE; queueIndex++)
             {
-                buffers[deviceIndex][queueIndex] = new BYTE[bufferSizeBytes];
-                memset(&(overlapped[deviceIndex][queueIndex]), 0, sizeof(OVERLAPPED));
+                m_buffers[deviceIndex][queueIndex] = new BYTE[m_bufferSizeBytes];
+                memset(&(m_overlapped[deviceIndex][queueIndex]), 0, sizeof(OVERLAPPED));
 
                 //create a windows event handle that will be signalled when new data from the device has been received for each data buffer
-                overlapped[deviceIndex][queueIndex].hEvent = CreateEvent(NULL, false, false, NULL);
+                m_overlapped[deviceIndex][queueIndex].hEvent = CreateEvent(NULL, false, false, NULL);
             }
         }
 
-        //opening the file and prepare it for data-stream
-        file.open(QIODevice::WriteOnly | QIODevice::Text );
-        stream.setDevice(&file);
+        //opening the file for data writing and establish data-stream
+        m_file.open(QIODevice::WriteOnly | QIODevice::Text );
+        m_stream.setDevice(&m_file);
 
         //start the devices (master device must be started at last)
-        for (int deviceIndex=0; deviceIndex<numDevices; deviceIndex++)
+        for (int deviceIndex=0; deviceIndex<m_numDevices; deviceIndex++)
         {
-            HANDLE hDevice = _callSequenceHandles[deviceIndex];
+            HANDLE hDevice = m_callSequenceHandles[deviceIndex];
 
             if (!GT_Start(hDevice))
             {
@@ -276,20 +278,15 @@ bool GUSBAmpDriver::initDevice()
 
             }
             //queue-up the first batch of transfer requests
-            for (int queueIndex=0; queueIndex<QUEUE_SIZE; queueIndex++)
+            for (int queueIndex=0; queueIndex<m_QUEUE_SIZE; queueIndex++)
             {
-                if (!GT_GetData(hDevice, buffers[deviceIndex][queueIndex], bufferSizeBytes, &overlapped[deviceIndex][queueIndex]))
+                if (!GT_GetData(hDevice, m_buffers[deviceIndex][queueIndex], m_bufferSizeBytes, &m_overlapped[deviceIndex][queueIndex]))
                 {
                     cout << "\tError on GT_GetData.\n";
                     return 0;
                 }
             }
         }
-
-
-
-
-
 
         qDebug() << "Plugin GUSBAmp - INFO - initDevice() - The device has been connected and initialised successfully" << endl;
 
@@ -300,11 +297,11 @@ bool GUSBAmpDriver::initDevice()
     {
 
         //in case an exception occurred, close all opened devices...
-        while(!openedDevicesHandles.empty())
+        while(!m_openedDevicesHandles.empty())
         {
-            GT_CloseDevice(&openedDevicesHandles.front());
-            qDebug() << "error occurred - Device " << &openedDevicesHandles.front()  << "was closed" << endl;
-            openedDevicesHandles.pop_front();
+            GT_CloseDevice(&m_openedDevicesHandles.front());
+            qDebug() << "error occurred - Device " << &m_openedDevicesHandles.front()  << "was closed" << endl;
+            m_openedDevicesHandles.pop_front();
         }
 
         cout << exception << '\n';
@@ -320,59 +317,54 @@ bool GUSBAmpDriver::initDevice()
 bool GUSBAmpDriver::uninitDevice()
 {
 
-
-
     cout << "Stopping devices and cleaning up..." << "\n";
 
     //clean up allocated resources for each device
-    for (int i=0; i<numDevices; i++)
+    for (int i=0; i<m_numDevices; i++)
     {
-        HANDLE hDevice = _callSequenceHandles[i];
+        HANDLE hDevice = m_callSequenceHandles[i];
 
         //clean up allocated resources for each queue per device
-        for (int j=0; j<QUEUE_SIZE; j++)
+        for (int j=0; j<m_QUEUE_SIZE; j++)
         {
-            WaitForSingleObject(overlapped[i][j].hEvent, 1000);
-            CloseHandle(overlapped[i][j].hEvent);
-            delete [] buffers[i][j];
+            WaitForSingleObject(m_overlapped[i][j].hEvent, 1000);
+            CloseHandle(m_overlapped[i][j].hEvent);
+            delete [] m_buffers[i][j];
             qDebug()<< "deleted queue buffer" << j << "successfully";
         }
 
         //stop device
         GT_Stop(hDevice);
-        qDebug() << "stopped " << QString(callSequenceSerials[i])<< " successfully" << endl;
+        qDebug() << "stopped " << QString(m_callSequenceSerials[i])<< " successfully" << endl;
 
         //reset device
         GT_ResetTransfer(hDevice);
-        qDebug() << "reseted Transfer of " << QString(callSequenceSerials[i])<< " successfully" << endl;
+        qDebug() << "reseted Transfer of " << QString(m_callSequenceSerials[i])<< " successfully" << endl;
 
-        delete [] overlapped[i];
-        delete [] buffers[i];
+        delete [] m_overlapped[i];
+        delete [] m_buffers[i];
     }
 
-    delete [] buffers;
-    delete [] overlapped;
+    delete [] m_buffers;
+    delete [] m_overlapped;
 
     //closing all devices from the Call-Sequence-Handle
-    while (!_callSequenceHandles.empty())
+    while (!m_callSequenceHandles.empty())
     {
         //closes each opened device and removes it from the call sequence
-        GT_CloseDevice(&_callSequenceHandles.front());
-        _callSequenceHandles.pop_front();
+        GT_CloseDevice(&m_callSequenceHandles.front());
+        m_callSequenceHandles.pop_front();
     }
 
     //closes all openend Device-Handles
-    while(!openedDevicesHandles.empty())
+    while(!m_openedDevicesHandles.empty())
     {
-        GT_CloseDevice(&openedDevicesHandles.front());
-        openedDevicesHandles.pop_front();
+        GT_CloseDevice(&m_openedDevicesHandles.front());
+        m_openedDevicesHandles.pop_front();
     }
 
     //close the data file
-    file.close();
-
-
-
+    m_file.close();
 
     qDebug() << "Plugin GUSBAmp - INFO - uninitDevice() - Successfully uninitialised the device" << endl;
 
@@ -387,30 +379,27 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
 {
     sampleMatrix.setZero(); // Clear matrix - set all elements to zero
 
-
-
-    for(int queueIndex=0; queueIndex<QUEUE_SIZE; queueIndex++)
+    for(int queueIndex=0; queueIndex<m_QUEUE_SIZE; queueIndex++)
     {
 
         //receive data from each device
-        for (int deviceIndex = 0; deviceIndex < numDevices; deviceIndex++)
+        for (int deviceIndex = 0; deviceIndex < m_numDevices; deviceIndex++)
         {
-            HANDLE hDevice = _callSequenceHandles[deviceIndex];
+            HANDLE hDevice = m_callSequenceHandles[deviceIndex];
 
             //wait for notification from the system telling that new data is available
-            if (WaitForSingleObject(overlapped[deviceIndex][queueIndex].hEvent, 1000) == WAIT_TIMEOUT)
+            if (WaitForSingleObject(m_overlapped[deviceIndex][queueIndex].hEvent, 1000) == WAIT_TIMEOUT)
             {
                 //throw string("Error on data transfer: timeout occurred.");
                 cout << "Error on data transfer: timeout occurred." << "\n";
                 return 0;
             }
-            //qDebug() << "Waiting procedure succeeded ";
 
             //get number of received bytes...
-            GetOverlappedResult(hDevice, &overlapped[deviceIndex][queueIndex], &numBytesReceived, false);
+            GetOverlappedResult(hDevice, &m_overlapped[deviceIndex][queueIndex], &m_numBytesReceived, false);
 
             //...and check if we lost something (number of received bytes must be equal to the previously allocated buffer size)
-            if (numBytesReceived != bufferSizeBytes)
+            if (m_numBytesReceived != m_bufferSizeBytes)
             {
                 //throw string("Error on data transfer: samples lost.");
                 cout << "Error on data transfer: samples lost." << "\n";
@@ -418,35 +407,37 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
             }
         }
 
-
-
         //store received data from each device in the correct order (that is scan-wise, where one scan includes all channels of all devices) ignoring the header
         //Data is aligned as follows: element at position destBuffer[scanIndex * (numberOfChannelsPerDevice * numDevices) + channelIndex] is sample of channel channelIndex (zero-based) of the scan with zero-based scanIndex.
         //channelIndex ranges from 0..numDevices*numChannelsPerDevices where numDevices equals the number of recorded devices and numChannelsPerDevice the number of channels from each of those devices.
         //It is assumed that all devices provide the same number of channels.
-        for (int scanIndex = 0; scanIndex < NUMBER_OF_SCANS; scanIndex++)
+        for (int scanIndex = 0; scanIndex < m_NUMBER_OF_SCANS; scanIndex++)
         {
-            for (int deviceIndex = 0; deviceIndex < numDevices; deviceIndex++)
+            for (int deviceIndex = 0; deviceIndex < m_numDevices; deviceIndex++)
             {
-                for(int channelIndex = 0; channelIndex<NUMBER_OF_CHANNELS; channelIndex++)
+                for(int channelIndex = 0; channelIndex<m_NUMBER_OF_CHANNELS; channelIndex++)
                 {
                     BYTE ByteValue[sizeof(float)];
                     float   FloatValue;
 
                     for(int i=0;i<sizeof(float);i++)
                     {
-                        ByteValue[i] = buffers[deviceIndex][queueIndex][(scanIndex * (NUMBER_OF_CHANNELS + TRIGGER) + channelIndex) * sizeof(float) + HEADER_SIZE + i];
+                        ByteValue[i] = m_buffers[deviceIndex][queueIndex][(scanIndex * (m_NUMBER_OF_CHANNELS + m_TRIGGER) + channelIndex) * sizeof(float) + HEADER_SIZE + i];
                     }
                     memcpy(&FloatValue, &ByteValue, sizeof(float));
-                    stream << FloatValue<< "\t";
+
+                    //FloatValue im stream ablegen
+                    m_stream << FloatValue<< "\t";
+                    //FloatValue in Matrix abspeichern
+                    sampleMatrix(channelIndex*(1+deviceIndex),scanIndex*(1+queueIndex)) = FloatValue;
                 }
             }
-            stream << "\n";
+            m_stream << "\n";
         }
 
         //add new GetData call to the queue replacing the currently received one
-        for (int deviceIndex = 0; deviceIndex < numDevices; deviceIndex++)
-            if (!GT_GetData(_callSequenceHandles[deviceIndex], buffers[deviceIndex][queueIndex], bufferSizeBytes, &overlapped[deviceIndex][queueIndex]))
+        for (int deviceIndex = 0; deviceIndex < m_numDevices; deviceIndex++)
+            if (!GT_GetData(m_callSequenceHandles[deviceIndex], m_buffers[deviceIndex][queueIndex], m_bufferSizeBytes, &m_overlapped[deviceIndex][queueIndex]))
             {
                 cout << "\tError on GT_GetData.\n";
                 return 0;
@@ -454,14 +445,79 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
     }
 
 
-
     return true;
 }
 
 
+//*************************************************************************************************************
 
 
+void GUSBAmpDriver::setSerials(LPSTR master,
+                               LPSTR slave1 = LPSTR("is_empty"),
+                               LPSTR slave2 = LPSTR("is_empty"),
+                               LPSTR slave3 = LPSTR("is_empty"))
+{
+    //closes the call-sequence-list
+    while (!m_callSequenceSerials.empty())
+    {
+        m_callSequenceSerials.pop_front();
+    }
+
+    //defining the new serials
+    m_masterSerial      = master;
+    m_slaveSerials[0]   = slave1;
+    m_slaveSerials[1]   = slave2;
+    m_slaveSerials[2]   = slave3;
+
+    //defining the size of the slave serials
+    for (int i = 0; (m_slaveSerials[i] !=LPSTR("is_empty")) && (i<3); i++)
+        m_SLAVE_SERIALS_SIZE = i;
+
+    //defining the new deque-list for data acquisition
+    for (int i=0; i<m_SLAVE_SERIALS_SIZE; i++)
+        m_callSequenceSerials.push_back(m_slaveSerials[i]);
+    //add the master device at the end of the list!
+    m_callSequenceSerials.push_back(m_masterSerial);
+
+}
+
+//*************************************************************************************************************
+
+bool setSampleRate(int sampleRate)
+{
+    try
+    {
+
+        switch(sampleRate)
+        {
+//        case 32:    m_NUMBER_OF_SCANS = 1;      break;
+//        case 64:    m_NUMBER_OF_SCANS = 2;      break;
+//        case 128:   m_NUMBER_OF_SCANS = 4;      break;
+//        case 256:   m_NUMBER_OF_SCANS = 8;      break;
+//        case 512:   m_NUMBER_OF_SCANS = 16;     break;
+//        case 600:   m_NUMBER_OF_SCANS = 32;     break;
+//        case 1200:  m_NUMBER_OF_SCANS = 64;     break;
+//        case 2400:  m_NUMBER_OF_SCANS = 128;    break;
+//        case 4800:  m_NUMBER_OF_SCANS = 256;    break;
+//        case 9600:  m_NUMBER_OF_SCANS = 512;    break;
+//        case 19200: m_NUMBER_OF_SCANS = 512;    break;
+//        case 38400: m_NUMBER_OF_SCANS = 512;    break;
+//        default: throw string("Error on setSampleRate: please chosse between following options:\n32, 64, 128, 256, 512, 600, 1200, 2400, 4800, 9600, 19200 and 38400 ");
 
 
+        }
+
+    }
+    catch(string& exception)
+    {
+        cout << exception << '\n';
+
+        return false;
+
+    }
+
+    return true;
+
+}
 
 
