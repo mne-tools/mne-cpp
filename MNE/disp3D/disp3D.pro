@@ -47,6 +47,9 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
+RESOURCES += $$PWD/disp3d.qrc \
+
+
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
@@ -105,7 +108,8 @@ SOURCES += \
     helpers/window.cpp \
     control/control3dwidget.cpp \
     rt/rtSourceLoc/rtsourcelocdataworker.cpp \
-    3DObjects/brain/brainsourcespacetreeitem.cpp
+    3DObjects/brain/brainsourcespacetreeitem.cpp \
+    materials/shadermaterial.cpp
 
 HEADERS += \
     view3D.h \
@@ -127,7 +131,8 @@ HEADERS += \
     control/control3dwidget.h \
     disp3D_global.h \
     rt/rtSourceLoc/rtsourcelocdataworker.h \
-    3DObjects/brain/brainsourcespacetreeitem.h
+    3DObjects/brain/brainsourcespacetreeitem.h \
+    materials/shadermaterial.h
 
 FORMS += \
     control/control3dwidget.ui \

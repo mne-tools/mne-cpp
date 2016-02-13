@@ -43,6 +43,7 @@
 
 #include "../disp3D_global.h"
 #include "custommesh.h"
+#include "../materials/shadermaterial.h"
 
 
 //*************************************************************************************************************
