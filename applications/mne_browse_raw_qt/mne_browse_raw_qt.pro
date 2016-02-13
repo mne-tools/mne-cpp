@@ -169,8 +169,12 @@ RC_FILE = Resources/Images/ApplicationIcons/browse_raw.rc
 unix:!macx {
     #ToDo Unix
 }
+
 macx {
     # === Mac ===
+    QMAKE_RPATHDIR += @executable_path/../Frameworks
+    QMAKE_RPATHDIR += @executable_path/../libs
+
 #    isEmpty(TARGET_EXT) {
 #        TARGET_CUSTOM_EXT = .app
 #    } else {
