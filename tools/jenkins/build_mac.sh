@@ -33,15 +33,11 @@ make clean
 make -j4
 
 # === Deployment ===
-#installpath="@executable_path/../libs-mnecpp"
 for ((i = 0; i < n_elements; i++)); do
     fixfile="../mne-cpp/bin/${TANGIBLES[i]}.app/Contents/MacOS/${TANGIBLES[i]}"
     destdir="../mne-cpp/bin/${TANGIBLES[i]}.app/Contents/libs/"
 
-    mkdir $destdir
-
     /usr/local/bin/dylibbundler -od -b -x $fixfile -d $destdir
-#-p $installpath
 
     tangible="../mne-cpp/bin/${TANGIBLES[i]}.app"
     macdeployqt $tangible
