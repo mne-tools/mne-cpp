@@ -89,6 +89,88 @@ GUSBAmp::~GUSBAmp()
 
 //*************************************************************************************************************
 
+
+//void TMSI::setUpFiffInfo()
+//{
+//    // Only works for ANT Neuro Waveguard Duke caps
+//    //
+//    //Clear old fiff info data
+//    //
+//    m_pFiffInfo->clear();
+
+//    //
+//    //Set number of channels, sampling frequency and high/-lowpass
+//    //
+//    m_pFiffInfo->nchan = m_iNumberOfChannels;
+//    m_pFiffInfo->sfreq = m_iSamplingFreq;
+//    m_pFiffInfo->highpass = (float)0.001;
+//    m_pFiffInfo->lowpass = m_iSamplingFreq/2;
+
+//    //
+//    //Set up the channel info
+//    //
+//    QStringList QSLChNames;
+//    m_pFiffInfo->chs.clear();
+
+//    for(int i=0; i<m_iNumberOfChannels; i++)
+//    {
+//        //Create information for each channel
+//        QString sChType;
+//        FiffChInfo fChInfo;
+
+//        //EEG Channels
+//        if(i<=numberEEGCh-1)
+//        {
+//            //Set channel name
+//            //fChInfo.ch_name = elcChannelNames.at(i);
+//            sChType = QString("EEG ");
+//            if(i<10)
+//                sChType.append("00");
+
+//            if(i>=10 && i<100)
+//                sChType.append("0");
+
+//            fChInfo.ch_name = sChType.append(sChType.number(i));
+
+//            //Set channel type
+//            fChInfo.kind = FIFFV_EEG_CH;
+
+//            //Set coil type
+//            fChInfo.coil_type = FIFFV_COIL_EEG;
+
+//            //Set logno
+//            fChInfo.logno = i;
+
+//            //Set coord frame
+//            fChInfo.coord_frame = FIFFV_COORD_HEAD;
+
+//            //Set unit
+//            fChInfo.unit = FIFF_UNIT_V;
+//            fChInfo.unit_mul = 0;
+
+//            //cout<<i<<endl<<fChInfo.eeg_loc<<endl;
+//        }
+
+//        QSLChNames << sChType;
+
+//        m_pFiffInfo->chs.append(fChInfo);
+//    }
+
+//    //Set channel names in fiff_info_base
+//    m_pFiffInfo->ch_names = QSLChNames;
+
+//    //
+//    //Set head projection
+//    //
+//    m_pFiffInfo->dev_head_t.from = FIFFV_COORD_DEVICE;
+//    m_pFiffInfo->dev_head_t.to = FIFFV_COORD_HEAD;
+//    m_pFiffInfo->ctf_head_t.from = FIFFV_COORD_DEVICE;
+//    m_pFiffInfo->ctf_head_t.to = FIFFV_COORD_HEAD;
+//}
+
+//*************************************************************************************************************
+
+
 QSharedPointer<IPlugin> GUSBAmp::clone() const
 {
     QSharedPointer<GUSBAmp> pGUSBAmpClone(new GUSBAmp());
@@ -124,8 +206,16 @@ bool GUSBAmp::start()
     if(this->isRunning())
         QThread::wait();
 
+//    //Setup fiff info
+//    setUpFiffInfo();
+
+//    //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
+//    m_pRMTSA_TMSI->data()->initFromFiffInfo(m_pFiffInfo);
+//    m_pRMTSA_TMSI->data()->setMultiArraySize(m_iSamplesPerBlock);
+//    m_pRMTSA_TMSI->data()->setSamplingRate(m_iSamplingFreq);
+
     //Buffer
-    m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, 128, 100));
+    m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, 16, 1024));
 
     m_pGUSBAmpProducer->start();
 
@@ -140,6 +230,8 @@ bool GUSBAmp::start()
         qWarning() << "Plugin GUSBAmp - ERROR - GUSBAmpProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (GUSBAmpSDK.dll / GUSBAmpSDK32bit.dll) is not installed in the system32 / SysWOW64 directory" << endl;
         return false;
     }
+
+
 }
 
 

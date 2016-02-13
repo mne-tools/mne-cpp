@@ -49,6 +49,7 @@
 
 #include <Windows.h>        //windows.h-library for LPSTR-,UCHAR-, and HANDLE-files
 #include <deque>
+#include <stdarg.h>
 #include "gtec_gUSBamp.h"
 //#include "ringbuffer.h"
 
@@ -115,35 +116,35 @@ class GUSBAmpDriver
 private:
 
 //device-settings
-    LPSTR               _masterSerial;              //specify the serial number of the device used as master
-    LPSTR               _slaveSerials[3];           //specify the serial numbers of the devices used as slaves (max. three slave devices)
-    int                 numDevices;                 //number of connected devices (master and slaves)
-    deque<LPSTR>        callSequenceSerials;        //list of the call sequence (master must be the last device in the call sequence)
-    deque<HANDLE>       openedDevicesHandles;       //list of handles in the order of the opened devices
-    deque<HANDLE>       _callSequenceHandles;       //list of handles in the order of the opened devices
-    const int           SLAVE_SERIALS_SIZE;         //the number of slave serials specified in slaveSerials
-    const int           SAMPLE_RATE_HZ;             //the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!)
-    const int           NUMBER_OF_SCANS;            //the number of scans that should be received simultaneously (depending on the _sampleRate; see C-API documentation for this value!)
-    const UCHAR         NUMBER_OF_CHANNELS;         //the number of channels per device that should be acquired (must equal the size of the _channelsToAcquire array)
-    UCHAR               _channelsToAcquire[16];     //the channels that should be acquired from each device
-    const BOOL          TRIGGER;                    //TRUE to acquire the trigger line in an additional channel
-    UCHAR               _mode;                      //use normal acquisition mode
-    CHANNEL             _bipolarSettings;           //don't use bipolar derivation (all values will be initialized to zero)
-    REF                 _commonReference;           //don't connect groups to common reference
-    GND                 _commonGround;              //don't connect groups to common ground
-//    CRingBuffer<float>  _buffer;                    //the application buffer where received data will be stored for each device
-//    bool                _bufferOverrun;             //flag indicating if an overrun occurred at the application buffer
+    LPSTR               m_masterSerial;             //specify the serial number of the device used as master
+    LPSTR               m_slaveSerials[3];          //specify the serial numbers of the devices used as slaves (max. three slave devices)
+    int                 m_numDevices;               //number of connected devices (master and slaves)
+    deque<LPSTR>        m_callSequenceSerials;      //list of the call sequence (master must be the last device in the call sequence)
+    deque<HANDLE>       m_openedDevicesHandles;     //list of handles in the order of the opened devices
+    deque<HANDLE>       m_callSequenceHandles;      //list of handles in the order of the opened devices
+    int                 m_SLAVE_SERIALS_SIZE;       //the number of slave serials specified in slaveSerials
+    int                 m_SAMPLE_RATE_HZ;           //the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!)
+    int                 m_NUMBER_OF_SCANS;          //the number of scans that should be received simultaneously (depending on the _sampleRate; see C-API documentation for this value!)
+    const UCHAR         m_NUMBER_OF_CHANNELS;       //the number of channels per device that should be acquired (must equal the size of the _channelsToAcquire array)
+    UCHAR               m_channelsToAcquire[16];    //the channels that should be acquired from each device
+    const BOOL          m_TRIGGER;                  //TRUE to acquire the trigger line in an additional channel
+    UCHAR               m_mode;                     //use normal acquisition mode
+    CHANNEL             m_bipolarSettings;          //don't use bipolar derivation (all values will be initialized to zero)
+    REF                 m_commonReference;          //don't connect groups to common reference
+    GND                 m_commonGround;             //don't connect groups to common ground
+//    CRingBuffer<float>  _buffer;                  //the application buffer where received data will be stored for each device
+//    bool                _bufferOverrun;           //flag indicating if an overrun occurred at the application buffer
 //    const int           BUFFER_SIZE_SECONDS;		//the size of the application buffer in seconds
-    const int           QUEUE_SIZE;                 //the number of GT_GetData calls that will be queued during acquisition to avoid loss of data
-//buffer-settings
-    int                 nPoints;                    //number of points which are received from one chanel simultaneously
-    DWORD               bufferSizeBytes;            //Size of buffer
-    DWORD               numBytesReceived;           //num of Bytes whicht are received during one measuring procedure
-//create the temporary data buffers (the device will write data into those)
-    BYTE***             buffers;                    //pointer to the buffer
-    OVERLAPPED**        overlapped;                 //storage in case of overlapping
-    QFile               file;
-    QTextStream         stream;
+    const int           m_QUEUE_SIZE;               //the number of GT_GetData calls that will be queued during acquisition to avoid loss of data
+//buffer
+    int                 m_nPoints;                  //number of points which are received from one chanel simultaneously
+    DWORD               m_bufferSizeBytes;          //Size of buffer
+    DWORD               m_numBytesReceived;         //num of Bytes whicht are received during one measuring procedure
+    BYTE***             m_buffers;                  //pointer to the buffer
+    OVERLAPPED**        m_overlapped;               //storage in case of overlapping
+//file
+    QFile               m_file;                     //file to which data is written
+    QTextStream         m_stream;                   //stream from m_buffers to m_file
 
 
 public:
@@ -171,7 +172,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Initialise device.    
+    * Initialise and starts device with the set parameters . After that getSampleMatrixValue() has to be started
+    * immediatly and be executed continously. Otherwise there will be a buffer overrun.
     */
     bool initDevice();
 
@@ -182,18 +184,27 @@ public:
     */
     bool uninitDevice();
 
-//    //=========================================================================================================
+    //=========================================================================================================
+    /**
+    * Setting the adresses of the master amplifer and the slaves. The selections of the slaves are optional.
+    *
+    * @param[in]    master      Serial Number of the master device
+    * @param[in]    slave1      Serial Number of first slave device (optional)
+    * @param[in]    slave2      Serial Number of second slave device (optional)
+    * @param[in]    slave3      Serial Number of third slave device (optional)
+    *
+    */
+    void setSerials(LPSTR master,LPSTR slave1, LPSTR slave2, LPSTR slave3);
 
-//    /**
-//     * Reads the received numberOfScans scans from all devices. If not enough data is available (errorCode == 2) or the application buffer overruns (errorCode == 1), this method returns false.
-//     * @return                      returns true if Reading procedure was sucessfull
-//     * @param float* destBuffer:	the array that returns the received data from the application data buffer.
-//                                    Data is aligned as follows: element at position destBuffer[scanIndex * (numberOfChannelsPerDevice * numDevices) + channelIndex] is sample of channel channelIndex (zero-based) of the scan with zero-based scanIndex.
-//                                    channelIndex ranges from 0..numDevices*numChannelsPerDevices where numDevices equals the number of recorded devices and numChannelsPerDevice the number of channels from each of those devices.
-//                                    It is assumed that all devices provide the same number of channels.
-//     * @param int numberOfScans:	the number of scans to retrieve from the application buffer.
-//     */
-//    bool GUSBAmpDriver::ReadData(float* destBuffer, int numberOfScans, int *errorCode, string *errorMessage);
+    //=========================================================================================================
+    /**
+    * Setting the sampling rate of the amplifier
+    *
+    * @param[in] samplingRate   sampling rate of the amplifier in [Hz] possible settings for the sample rate are:
+    *                           32, 64, 128, 256, 512, 600, 1200, 2400, 4800, 9600, 19200 and 38400
+    *
+    */
+    void setSamplingRate(int sampleRate);
 
 
 protected:
