@@ -63,6 +63,7 @@
 //=============================================================================================================
 
 #include <QtCore/QCoreApplication>
+#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
@@ -91,11 +92,25 @@ using namespace INVERSELIB;
 */
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    QCoreApplication app(argc, argv);
 
-//  fname_data  - Name of the data file
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Compute Inverse Example");
+    parser.addHelpOption();
+    QCommandLineOption sampleEvokedFileOption("e", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption sampleInvFileOption("i", "Path to inverse operator <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
+    QCommandLineOption snrOption("s", "<snr> of the given evoked file.", "snr", "1.0");
+    QCommandLineOption methodOption("m", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
+    QCommandLineOption stcFileOption("t", "Path to <target> where stc is stored to.", "target", "");
+    parser.addOption(sampleEvokedFileOption);
+    parser.addOption(sampleInvFileOption);
+    parser.addOption(snrOption);
+    parser.addOption(methodOption);
+    parser.addOption(stcFileOption);
+    parser.process(app);
+
 //  setno       - Data set number
-//  fname_inv   - Inverse operator file name
 //  nave        - Number of averages (scales the noise covariance)
 //             If negative, the number of averages in the data will be
 //             used
@@ -103,15 +118,12 @@ int main(int argc, char *argv[])
 //  dSPM        - do dSPM?
 //  sLORETA     - do sLORETA?
 
-//    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-//    QFile t_fileInv("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
+    QFile t_fileEvoked(parser.value(sampleEvokedFileOption));
+    QFile t_fileInv(parser.value(sampleInvFileOption));
 
-    QFile t_fileEvoked("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
-    QFile t_fileInv("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-meg-inv.fif");
-
-    float snr = 1.0f;
-    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
-    QString t_sFileNameStc("");
+    float snr = parser.value(snrOption).toFloat();
+    QString method(parser.value(methodOption)); //"MNE" | "dSPM" | "sLORETA"
+    QString t_sFileNameStc(parser.value(stcFileOption));
 
     // Parse command line parameters
     for(qint32 i = 0; i < argc; ++i)
@@ -177,5 +189,5 @@ int main(int argc, char *argv[])
         printf("tstep = %f s\n", readSourceEstimate.tstep);
     }
 
-    return 0;//a.exec();
+    return 0;//app.exec();
 }
