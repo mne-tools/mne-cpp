@@ -430,9 +430,9 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
                     }
                     memcpy(&FloatValue, &ByteValue, sizeof(float));
 
-                    //FloatValue im stream ablegen
+                    //attach float value to stream
                     m_stream << FloatValue<< "\t";
-                    //FloatValue in Matrix abspeichern
+                    //store float-value to Matrix
                     sampleMatrix(channelIndex*(1+deviceIndex),scanIndex*(1+queueIndex)) = FloatValue;
                 }
             }
@@ -462,7 +462,7 @@ void GUSBAmpDriver::setSerials(LPSTR master,
                                LPSTR slave3 = LPSTR("is_empty"))
 {
 
-    //closes the call-sequence-list
+    //closes the former call-sequence-list
     while (!m_callSequenceSerials.empty())
     {
         m_callSequenceSerials.pop_front();
@@ -495,7 +495,7 @@ bool GUSBAmpDriver::setSampleRate(int sampleRate)
         if(m_isRunning)
             throw string("Do not change device-parameters while running the device!\n");
 
-
+        //choose the number of scans according to the sample rate (see documentation for further hints)
         switch(sampleRate)
         {
         case 32:    m_NUMBER_OF_SCANS = 1;      break;
@@ -538,26 +538,30 @@ bool GUSBAmpDriver::setChannels(vector<int> &list)
     int numargin = list.size();
     if (numargin > 16)
     {
-        cout << "ERROR: Could not set channels. Size of channel-vector has to be less then 16\n";
+        cout << "ERROR in GUSBAmpDriver::setChannels: Could not set channels. Size of channel-vector has to be less then 16\n";
         return false;
     }
 
 
-    //checking if value values of vector are ascending
+    //checking if value values of vector are ascending and smalller then 17
     int i = 0;
     do
         i++;
-    while ((i < numargin) && (list[i] > list[i - 1]));
+    while ((i < numargin) && (list[i] > list[i - 1]) && (list[i] < 17));
     if (i != numargin)
     {
-        cout << "ERROR: values of the channels in the vector have to be ascending\n";
+        cout << "ERROR in GUSBAmpDriver::setChannels: values of the channels in the vector have to be ascending & less then 16\n";
         return false;
     }
 
     for(int i = 0; i < numargin; i++)
+    {
          m_channelsToAcquire[i] = UCHAR(list[i]);
+         qDebug()<< m_channelsToAcquire[i];
+    }
 
     m_NUMBER_OF_CHANNELS = numargin;
+
 
     return true;
 
