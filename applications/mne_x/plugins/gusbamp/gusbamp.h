@@ -131,6 +131,12 @@ public:
 
     //=========================================================================================================
     /**
+    * building all setting for the FIFF-data-stream
+    */
+    void setUpFiffInfo();
+
+    //=========================================================================================================
+    /**
     * Clone the plugin
     */
     virtual QSharedPointer<IPlugin> clone() const;
@@ -183,6 +189,12 @@ private:
     QSharedPointer<RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/
 
     QSharedPointer<GUSBAmpProducer>     m_pGUSBAmpProducer;                 /**< the GUSBAmpProducer.*/
+
+    LPSTR               m_masterSerial;             /**< specify the serial number of the device used as master.*/
+    LPSTR               m_slaveSerials[3];          /**< specify the serial numbers of the devices used as slaves (max. three slave devices)*/
+    int                 m_SAMPLE_RATE_HZ;           /**< the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!)*/
+    UCHAR               m_channelsToAcquire[16];    /**< the channels that should be acquired from each device*/
+
 };
 
 } // NAMESPACE

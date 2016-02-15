@@ -90,7 +90,7 @@ GUSBAmp::~GUSBAmp()
 //*************************************************************************************************************
 
 
-//void TMSI::setUpFiffInfo()
+//void GUSBAmp::setUpFiffInfo()
 //{
 //    // Only works for ANT Neuro Waveguard Duke caps
 //    //
