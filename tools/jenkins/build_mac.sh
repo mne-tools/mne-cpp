@@ -40,6 +40,6 @@ for ((i = 0; i < n_elements; i++)); do
     /usr/local/bin/dylibbundler -od -b -x $fixfile -d $destdir
 
     tangible="../mne-cpp/bin/${TANGIBLES[i]}.app"
-    macdeployqt $tangible
+    macdeployqt $tangible -dmg
 
 done
