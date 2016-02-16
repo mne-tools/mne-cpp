@@ -237,8 +237,8 @@ private:
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
     int                                 m_iSamplingFreq;                    /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
-    int                                 m_iNumberOfChannels;                /**< The samples per block defined by the user via the GUI.*/
-    int                                 m_iSamplesPerBlock;                 /**< The number of channels defined by the user via the GUI.*/
+    int                                 m_iNumberOfChannels;                /**< The number of channels defined by the user via the GUI.*/
+    int                                 m_iSamplesPerBlock;                 /**< The samples per block defined by the user via the GUI.*/
     qint32                              m_iSplitCount;                      /**< File split count */
 
     int                                 m_iTriggerInterval;                 /**< The gap between the trigger signals which request the subject to do something (in ms).*/

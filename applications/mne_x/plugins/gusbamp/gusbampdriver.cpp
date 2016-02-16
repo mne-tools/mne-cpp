@@ -70,8 +70,8 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
 : m_pGUSBAmpProducer(pGUSBAmpProducer)
 ,m_SLAVE_SERIALS_SIZE(0)
 ,m_SAMPLE_RATE_HZ(1200)
-,m_NUMBER_OF_SCANS(256)
-,m_NUMBER_OF_CHANNELS(5)
+,m_NUMBER_OF_SCANS(128)
+//,m_NUMBER_OF_CHANNELS(16)
 ,m_TRIGGER(FALSE)
 ,m_QUEUE_SIZE(4)
 ,m_mode(M_NORMAL)
@@ -89,22 +89,39 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
     #else
         #pragma comment(lib, __FILE__"\\..\\gUSBamp_x86.lib")
     #endif
+    m_NUMBER_OF_CHANNELS = 16;
 
 
-    //initializing a deque-list of the serial numbers to be called (LPSTR)
-    m_masterSerial       = LPSTR("UB-2015.05.16");
-    m_slaveSerials[0]    = LPSTR("UB-2010.03.43");
-    m_slaveSerials[1]    = LPSTR("UB-2010.03.44");
-    m_slaveSerials[2]    = LPSTR("UB-2010.03.47");
-    for (int i=0; i<m_SLAVE_SERIALS_SIZE; i++)
-        m_callSequenceSerials.push_back(m_slaveSerials[i]);
-    //add the master device at the end of the list!
-    m_callSequenceSerials.push_back(m_masterSerial);
+//    //initializing a deque-list of the serial numbers to be called (LPSTR)
+//    m_masterSerial       = LPSTR("UB-2015.05.16");
+//    m_slaveSerials[0]    = LPSTR("UB-2010.03.43");
+//    m_slaveSerials[1]    = LPSTR("UB-2010.03.44");
+//    m_slaveSerials[2]    = LPSTR("UB-2010.03.47");
+//    for (int i=0; i<m_SLAVE_SERIALS_SIZE; i++)
+//        m_callSequenceSerials.push_back(m_slaveSerials[i]);
+//    //add the master device at the end of the list!
+//    m_callSequenceSerials.push_back(m_masterSerial);
+
+    //setting a deque-list of the serial numbers to be called (LPSTR)
+    setSerials(LPSTR("UB-2015.05.16"));
 
 
+//    //m_NUMBER_OF_CHANNELS = 5;
     //initializing UCHAR-list of channels to acquire
     for(int i = 0; i < m_NUMBER_OF_CHANNELS; i++)
+    {
         m_channelsToAcquire[i] = UCHAR(i+1);
+        cout << "channel:" << int(m_channelsToAcquire[i]);
+    }
+
+//    //initializing UCHAR-list of channels to acquire
+//    //vector<int> channels = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+//    vector<int> channels = {5};
+//    setChannels(channels);
+
+
+    //setting Sample parameters and Number of Scans
+    setSampleRate(m_SAMPLE_RATE_HZ);
 
 //    float version = float(GT_GetDriverVersion());
 
@@ -131,13 +148,11 @@ GUSBAmpDriver::~GUSBAmpDriver()
 bool GUSBAmpDriver::initDevice()
 {
 
-
     /*Space for setting Main-variables
     *
     *
     *
     */
-
 
     m_isRunning =true;
 
@@ -456,10 +471,7 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
 //*************************************************************************************************************
 
 
-void GUSBAmpDriver::setSerials(LPSTR master,
-                               LPSTR slave1 = LPSTR("is_empty"),
-                               LPSTR slave2 = LPSTR("is_empty"),
-                               LPSTR slave3 = LPSTR("is_empty"))
+void GUSBAmpDriver::setSerials(LPSTR master, LPSTR slave1, LPSTR slave2, LPSTR slave3)
 {
 
     //closes the former call-sequence-list
@@ -500,17 +512,18 @@ bool GUSBAmpDriver::setSampleRate(int sampleRate)
         {
         case 32:    m_NUMBER_OF_SCANS = 1;      break;
         case 64:    m_NUMBER_OF_SCANS = 2;      break;
-        case 128:   m_NUMBER_OF_SCANS = 4;      break;
-        case 256:   m_NUMBER_OF_SCANS = 8;      break;
-        case 512:   m_NUMBER_OF_SCANS = 16;     break;
-        case 600:   m_NUMBER_OF_SCANS = 32;     break;
-        case 1200:  m_NUMBER_OF_SCANS = 64;     break;
+        case 128:   m_NUMBER_OF_SCANS = 8;      break;
+        case 256:   m_NUMBER_OF_SCANS = 16;     break;
+        case 512:   m_NUMBER_OF_SCANS = 32;     break;
+        case 600:   m_NUMBER_OF_SCANS = 64;     break;
+        case 1200:  m_NUMBER_OF_SCANS = 128;    break;
         case 2400:  m_NUMBER_OF_SCANS = 128;    break;
         case 4800:  m_NUMBER_OF_SCANS = 256;    break;
         case 9600:  m_NUMBER_OF_SCANS = 512;    break;
         case 19200: m_NUMBER_OF_SCANS = 512;    break;
         case 38400: m_NUMBER_OF_SCANS = 512;    break;
-        default: throw string("Error on setSampleRate: please choose between following options:\n32, 64, 128, 256, 512, 600, 1200, 2400, 4800, 9600, 19200 and 38400\n\n:"); break;
+        default: throw string("Error on setSampleRate(choosed default sample rate of 1200 Hz): please choose between following options:\n"
+                              "32, 64, 128, 256, 512, 600, 1200, 2400, 4800, 9600, 19200 and 38400\n\n:"); break;
         }
         m_SAMPLE_RATE_HZ = sampleRate;
         qDebug()<<"Sample Rate is setted"<<endl;
@@ -520,6 +533,8 @@ bool GUSBAmpDriver::setSampleRate(int sampleRate)
         cout << exception << '\n';
         return false;
     }
+
+    cout <<"sample rate [HZ]: \t" <<  m_SAMPLE_RATE_HZ << "\n" << "number of scans [/]:\t" << m_NUMBER_OF_SCANS << "\n";
 
     return true;
 
@@ -557,10 +572,12 @@ bool GUSBAmpDriver::setChannels(vector<int> &list)
     for(int i = 0; i < numargin; i++)
     {
          m_channelsToAcquire[i] = UCHAR(list[i]);
-         qDebug()<< m_channelsToAcquire[i];
+         cout<< "channel " << int( m_channelsToAcquire[i]) << " setted \n";
     }
 
-    m_NUMBER_OF_CHANNELS = numargin;
+    m_NUMBER_OF_CHANNELS = UCHAR(numargin);
+
+    cout<< "number of channels [/]: \t" << int(m_NUMBER_OF_CHANNELS) << "\n";
 
 
     return true;
