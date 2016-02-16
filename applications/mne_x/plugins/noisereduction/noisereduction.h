@@ -44,6 +44,8 @@
 
 #include "noisereduction_global.h"
 
+#include <utils/ioutils.h>
+
 #include <mne_x/Interfaces/IAlgorithm.h>
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
@@ -138,6 +140,26 @@ protected:
     virtual void run();
 
     void showOptionsWidget();
+
+    //=========================================================================================================
+    /**
+    * Read Eigen Matrix from file
+    *
+    * @param[out] out       output eigen value
+    * @param[in] path       path and file name to read from
+    */
+    template<typename T>
+    void read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& out, const QString& path);
+
+    //=========================================================================================================
+    /**
+    * Write Eigen Matrix to file
+    *
+    * @param[in] in         input eigen value which is to be written to file
+    * @param[in] path       path and file name to write to
+    */
+    template<typename T>
+    static void write_eigen_matrix(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& in, const QString& path);
 
 private:
     QMutex                                          m_mutex;                    /**< The threads mutex.*/
