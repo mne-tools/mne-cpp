@@ -66,7 +66,7 @@ NoiseReduction::NoiseReduction()
 , m_pNoiseReductionBuffer(CircularMatrixBuffer<double>::SPtr())
 , m_iNBaseFcts(10)
 , m_bSpharaActive(false)
-, m_sCurrentSystem("VectorView")
+, m_sCurrentSystem("BabyMEG")
 {
     //Create toolbar widgets
     m_pOptionsWidget = NoiseReductionOptionsWidget::SPtr(new NoiseReductionOptionsWidget(this));
@@ -393,20 +393,19 @@ void NoiseReduction::creatSpharaOperator()
         MatrixXd matSpharaMultInner = matSpharaInnerCut * matSpharaInnerCut.transpose().eval();
 
         //Create full gradiometer SPHARA operator
-        for(int r = 0; r<matSpharaMultInner.rows(); r++) {
-            for(int c = 0; c<matSpharaMultInner.cols(); c++) {
-                MatrixXd triplet(3,3);
-                if(r != c) {
-                    triplet <<  matSpharaMultInner(r,c), 0, 0,
-                                0, matSpharaMultInner(r,c), 0,
-                                0, 0, 0;
-                } else {
-                    triplet <<  matSpharaMultInner(r,c), 0, 0,
-                                0, matSpharaMultInner(r,c), 0,
-                                0, 0, 1;
+        int rowIndex = 0;
+        int colIndex = 0;
+        for(int r = 0; r<m_matSpharaMultBMInner.rows(); r++) {
+            //Scan for inner layer channels
+            if(m_pFiffInfo->chs.at(r).coil_type == 7002) {
+                for(int c = 0; c<m_matSpharaMultBMInner.cols(); c++) {
+                    if(m_pFiffInfo->chs.at(c).coil_type == 7002) {
+                        m_matSpharaMultBMInner(r,c) = matSpharaMultInner(rowIndex,colIndex);
+                        colIndex++;
+                    }
                 }
-
-                m_matSpharaMultBMInner.block(r*3,c*3,3,3) = triplet;
+                colIndex = 0;
+                rowIndex++;
             }
         }
 
