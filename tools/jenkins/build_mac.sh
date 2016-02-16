@@ -48,4 +48,5 @@ done
 cd ..
 for ((i = 0; i < n_elements; i++)); do
 	cp "./mne-cpp/bin/${TANGIBLES[i]}.dmg" "./"
+	mv "./${TANGIBLES[i]}.dmg" "./${TANGIBLES[i]}-1.0.0-beta.dmg"
 done
