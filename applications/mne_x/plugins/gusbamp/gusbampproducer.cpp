@@ -126,6 +126,7 @@ void GUSBAmpProducer::run()
             if(m_pGUSBAmpDriver->getSampleMatrixValue(matRawBuffer))
                 m_pGUSBAmp->m_pRawMatrixBuffer_In->push(&matRawBuffer);
 
+
         }
 
 
