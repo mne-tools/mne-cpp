@@ -96,6 +96,14 @@ public:
     */
     ~NoiseReductionOptionsWidget();
 
+    //=========================================================================================================
+    /**
+    * Set the maximum number of basis functions.
+    *
+    * @param[in] max    The new maximum number of basis functions.
+    */
+    void setMaxNumberBasisFunctions(int max);
+
 private:
     Ui::NoiseReductionOptionsWidgetClass*   ui;                         /**< The UI class specified in the designer. */
 

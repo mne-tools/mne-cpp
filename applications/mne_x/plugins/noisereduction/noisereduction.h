@@ -159,6 +159,12 @@ protected:
 
     //=========================================================================================================
     /**
+    * Read the SPHARA matrices.
+    */
+    void readSpharaMatrix();
+
+    //=========================================================================================================
+    /**
     * Create/Update the SPHARA projection operator.
     */
     void creatSpharaOperator();
@@ -192,8 +198,15 @@ private:
     int                 m_iNBaseFcts;               /**< the number of base functions to use for calculating the sphara opreator.*/
     QString             m_sCurrentSystem;           /**< The current acquisition system (EEG, babyMEG, VectorView).*/
 
-    Eigen::MatrixXd     m_matSpharaMultMag;         /**< The threads mutex.*/
-    Eigen::MatrixXd     m_matSpharaMultGrad;        /**< The threads mutex.*/
+    Eigen::MatrixXd     m_matSpharaMultVVMag;       /**< The VectorView gradiometer SPHARA operator.*/
+    Eigen::MatrixXd     m_matSpharaMultVVGrad;      /**< The VectorView magnetometer SPHARA operator.*/
+    Eigen::MatrixXd     m_matSpharaMultBMInner;     /**< The babyMEG inner layer SPHARA operator.*/
+    Eigen::MatrixXd     m_matSpharaMultBMOuter;     /**< The babyMEG outer layer SPHARA operator.*/
+
+    Eigen::MatrixXd     m_matSpharaVVGradFull;      /**< The VectorView gradiometer basis functions.*/
+    Eigen::MatrixXd     m_matSpharaVVMagFull;       /**< The VectorView magnetometer basis functions.*/
+    Eigen::MatrixXd     m_matSpharaBabyMEGInnerFull;/**< The babyMEG inner layer basis functions.*/
+    Eigen::MatrixXd     m_matSpharaBabyMEGOuterFull;/**< The babyMEG outer layer basis functions.*/
 
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                /**< Fiff measurement info.*/
 
