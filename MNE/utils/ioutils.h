@@ -205,10 +205,19 @@ public:
     *
     * @param[in] in         input eigen value which is to be written to file
     * @param[in] path       path and file name to write to
-    *
     */
     template<typename T>
     static void write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QString& path);
+
+    //=========================================================================================================
+    /**
+    * Read Eigen Matrix from file
+    *
+    * @param[out] out       output eigen value
+    * @param[in] path       path and file name to read from
+    */
+    template<typename T>
+    static void read_eigen_matrix(Matrix<T, Dynamic, Dynamic>& out, const QString& path);
 };
 
 //*************************************************************************************************************

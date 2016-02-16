@@ -259,3 +259,50 @@ void IOUtils::write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QS
 
     file.close();
 }
+
+
+//*************************************************************************************************************
+
+template<typename T>
+void IOUtils::read_eigen_matrix(Matrix<T, Dynamic, Dynamic>& out, const QString& path)
+{
+    QFile file(path);
+
+    if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        //Start reading from file
+        QTextStream in(&file);
+        int i=0;
+        QList<VectorXd> help;
+
+        while(!in.atEnd())
+        {
+            QString line = in.readLine();
+            QStringList fields = line.split(QRegExp("\\s+"));
+
+            //Delete last element if it is a blank character
+            if(fields.at(fields.size()-1) == "")
+                fields.removeLast();
+
+            VectorXd x (fields.size());
+            //Read actual electrode position
+            for (int j=0; j<fields.size(); j++) {
+                x(j)=fields.at(j).toDouble();
+            }
+
+            help.append(x);
+
+            i++;
+        }
+
+        int rows = help.size();
+        int cols = rows<=0 ? 0 : help.at(0).rows();
+
+        out.resize(rows, cols);
+
+        for (int i=0; i<help.length(); i++) {
+            out.row(i)=help[i].transpose();
+        }
+    } else {
+        qWarning()<<"IOUtils::read_eigen_matrix - Could not read Eigen element from file! Path does not exist!";
+    }
+}
