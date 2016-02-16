@@ -47,6 +47,7 @@
 //=============================================================================================================
 #include "gusbamp_global.h"
 
+#include <fstream>
 #include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
@@ -190,10 +191,14 @@ private:
 
     QSharedPointer<GUSBAmpProducer>     m_pGUSBAmpProducer;                 /**< the GUSBAmpProducer.*/
 
+    QSharedPointer<FiffInfo>            m_pFiffInfo;                        /**< Fiff measurement info.*/
+
     LPSTR               m_masterSerial;             /**< specify the serial number of the device used as master.*/
     LPSTR               m_slaveSerials[3];          /**< specify the serial numbers of the devices used as slaves (max. three slave devices)*/
-    int                 m_SAMPLE_RATE_HZ;           /**< the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!)*/
-    UCHAR               m_channelsToAcquire[16];    /**< the channels that should be acquired from each device*/
+    int                 m_iSampleRate;              /**< the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!)*/
+    int                 m_iSamplesPerBlock;         /**< The samples per block defined by the user via the GUI. */
+    UCHAR               m_iNumberOfChannels;        /**< the channels that should be acquired from each device*/
+
 
 };
 

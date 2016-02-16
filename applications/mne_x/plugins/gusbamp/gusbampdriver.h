@@ -195,7 +195,10 @@ public:
     * @param[in]    slave3      Serial Number of third slave device (optional)
     *
     */
-    void setSerials(LPSTR master,LPSTR slave1, LPSTR slave2, LPSTR slave3);
+    void setSerials(LPSTR master,
+                    LPSTR slave1 = LPSTR("is_empty"),
+                    LPSTR slave2 = LPSTR("is_empty"),
+                    LPSTR slave3 = LPSTR("is_empty"));
 
     //=========================================================================================================
     /**

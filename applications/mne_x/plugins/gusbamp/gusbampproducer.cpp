@@ -113,7 +113,7 @@ void GUSBAmpProducer::stop()
 
 void GUSBAmpProducer::run()
 {
-    MatrixXf matRawBuffer(16,1024);
+    MatrixXf matRawBuffer(16,512);
 
 
 

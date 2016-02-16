@@ -71,6 +71,9 @@ GUSBAmp::GUSBAmp()
 , m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/gusbamp/")
 , m_pRawMatrixBuffer_In(0)
 , m_pGUSBAmpProducer(new GUSBAmpProducer(this))
+, m_iSampleRate(1200)
+, m_iNumberOfChannels(16)
+, m_iSamplesPerBlock(512)
 {
 }
 
@@ -90,83 +93,85 @@ GUSBAmp::~GUSBAmp()
 //*************************************************************************************************************
 
 
-//void GUSBAmp::setUpFiffInfo()
-//{
-//    // Only works for ANT Neuro Waveguard Duke caps
-//    //
-//    //Clear old fiff info data
-//    //
-//    m_pFiffInfo->clear();
+void GUSBAmp::setUpFiffInfo()
+{
+    // Only works for ANT Neuro Waveguard Duke caps
+    //
+    //Clear old fiff info data
+    //
+    m_pFiffInfo->clear();
 
-//    //
-//    //Set number of channels, sampling frequency and high/-lowpass
-//    //
-//    m_pFiffInfo->nchan = m_iNumberOfChannels;
-//    m_pFiffInfo->sfreq = m_iSamplingFreq;
-//    m_pFiffInfo->highpass = (float)0.001;
-//    m_pFiffInfo->lowpass = m_iSamplingFreq/2;
+    //
+    //Set number of channels, sampling frequency and high/-lowpass
+    //
+    m_pFiffInfo->nchan = m_iNumberOfChannels;
+    m_pFiffInfo->sfreq = m_iSampleRate;
+    m_pFiffInfo->highpass = (float)0.001;
+    m_pFiffInfo->lowpass = m_iSampleRate/2;
 
-//    //
-//    //Set up the channel info
-//    //
-//    QStringList QSLChNames;
-//    m_pFiffInfo->chs.clear();
+    int numberEEGCh = m_iNumberOfChannels;
 
-//    for(int i=0; i<m_iNumberOfChannels; i++)
-//    {
-//        //Create information for each channel
-//        QString sChType;
-//        FiffChInfo fChInfo;
+    //
+    //Set up the channel info
+    //
+    QStringList QSLChNames;
+    m_pFiffInfo->chs.clear();
 
-//        //EEG Channels
-//        if(i<=numberEEGCh-1)
-//        {
-//            //Set channel name
-//            //fChInfo.ch_name = elcChannelNames.at(i);
-//            sChType = QString("EEG ");
-//            if(i<10)
-//                sChType.append("00");
+    for(int i=0; i<m_iNumberOfChannels; i++)
+    {
+        //Create information for each channel
+        QString sChType;
+        FiffChInfo fChInfo;
 
-//            if(i>=10 && i<100)
-//                sChType.append("0");
+        //EEG Channels
+        if(i<=numberEEGCh-1)
+        {
+            //Set channel name
+            //fChInfo.ch_name = elcChannelNames.at(i);
+            sChType = QString("EEG ");
+            if(i<10)
+                sChType.append("00");
 
-//            fChInfo.ch_name = sChType.append(sChType.number(i));
+            if(i>=10 && i<100)
+                sChType.append("0");
 
-//            //Set channel type
-//            fChInfo.kind = FIFFV_EEG_CH;
+            fChInfo.ch_name = sChType.append(sChType.number(i));
 
-//            //Set coil type
-//            fChInfo.coil_type = FIFFV_COIL_EEG;
+            //Set channel type
+            fChInfo.kind = FIFFV_EEG_CH;
 
-//            //Set logno
-//            fChInfo.logno = i;
+            //Set coil type
+            fChInfo.coil_type = FIFFV_COIL_EEG;
 
-//            //Set coord frame
-//            fChInfo.coord_frame = FIFFV_COORD_HEAD;
+            //Set logno
+            fChInfo.logno = i;
 
-//            //Set unit
-//            fChInfo.unit = FIFF_UNIT_V;
-//            fChInfo.unit_mul = 0;
+            //Set coord frame
+            fChInfo.coord_frame = FIFFV_COORD_HEAD;
 
-//            //cout<<i<<endl<<fChInfo.eeg_loc<<endl;
-//        }
+            //Set unit
+            fChInfo.unit = FIFF_UNIT_V;
+            fChInfo.unit_mul = 0;
 
-//        QSLChNames << sChType;
+            //cout<<i<<endl<<fChInfo.eeg_loc<<endl;
+        }
 
-//        m_pFiffInfo->chs.append(fChInfo);
-//    }
+        QSLChNames << sChType;
 
-//    //Set channel names in fiff_info_base
-//    m_pFiffInfo->ch_names = QSLChNames;
+        m_pFiffInfo->chs.append(fChInfo);
+    }
 
-//    //
-//    //Set head projection
-//    //
-//    m_pFiffInfo->dev_head_t.from = FIFFV_COORD_DEVICE;
-//    m_pFiffInfo->dev_head_t.to = FIFFV_COORD_HEAD;
-//    m_pFiffInfo->ctf_head_t.from = FIFFV_COORD_DEVICE;
-//    m_pFiffInfo->ctf_head_t.to = FIFFV_COORD_HEAD;
-//}
+    //Set channel names in fiff_info_base
+    m_pFiffInfo->ch_names = QSLChNames;
+
+    //
+    //Set head projection
+    //
+    m_pFiffInfo->dev_head_t.from = FIFFV_COORD_DEVICE;
+    m_pFiffInfo->dev_head_t.to = FIFFV_COORD_HEAD;
+    m_pFiffInfo->ctf_head_t.from = FIFFV_COORD_DEVICE;
+    m_pFiffInfo->ctf_head_t.to = FIFFV_COORD_HEAD;
+}
 
 //*************************************************************************************************************
 
@@ -185,6 +190,8 @@ void GUSBAmp::init()
     m_pRMTSA_GUSBAmp = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "GUSBAmp", "EEG output data");
 
     //m_outputConnectors.append(m_pRMTSA_GUSBAmp);
+
+    m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 
     m_bIsRunning = false;
 }
@@ -209,13 +216,13 @@ bool GUSBAmp::start()
 //    //Setup fiff info
 //    setUpFiffInfo();
 
-//    //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
-//    m_pRMTSA_TMSI->data()->initFromFiffInfo(m_pFiffInfo);
-//    m_pRMTSA_TMSI->data()->setMultiArraySize(m_iSamplesPerBlock);
-//    m_pRMTSA_TMSI->data()->setSamplingRate(m_iSamplingFreq);
+    //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
+    m_pRMTSA_GUSBAmp->data()->initFromFiffInfo(m_pFiffInfo);
+    m_pRMTSA_GUSBAmp->data()->setMultiArraySize(m_iSamplesPerBlock);
+    m_pRMTSA_GUSBAmp->data()->setSamplingRate(m_iSampleRate);
 
     //Buffer
-    m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, 16, 1024));
+    m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, 16, 512));
 
     m_pGUSBAmpProducer->start();
 
