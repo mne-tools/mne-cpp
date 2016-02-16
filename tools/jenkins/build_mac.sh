@@ -19,7 +19,8 @@ export PATH
 DYLD_LIBRARY_PATH="/Users/Shared/Jenkins/Home/jobs/MNE-CPP/workspace/mne-cpp/lib":$DYLD_LIBRARY_PATH
 export DYLD_LIBRARY_PATH
 DYLD_FALLBACK_LIBRARY_PATH="/Users/Shared/Jenkins/Home/jobs/MNE-CPP/workspace/mne-cpp/lib"
-export DYLD_FALLBACK_LIBRARY_PATH
+export DYLD_FALLBACK_LIBRARY_PATH
+
 # === Clean Up ===
 n_elements=${#TANGIBLES[@]}
 for ((i = 0; i < n_elements; i++)); do
@@ -41,5 +42,10 @@ for ((i = 0; i < n_elements; i++)); do
 
     tangible="../mne-cpp/bin/${TANGIBLES[i]}.app"
     macdeployqt $tangible -dmg
+done
 
+# === Copy Tangibles ===
+cd ..
+for ((i = 0; i < n_elements; i++)); do
+	cp "./mne-cpp/bin/${TANGIBLES[i]}.dmg" "./"
 done
