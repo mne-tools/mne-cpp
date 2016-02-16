@@ -246,7 +246,7 @@ void NoiseReduction::run()
     MatrixXd matSpharaGrad;
     read_eigen_matrix(matSpharaGrad, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
     MatrixXd matSpharaMag;
-    read_eigen_matrix(matSpharaMag, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_mag.txt"));
+    read_eigen_matrix(matSpharaMag, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt"));
     qDebug()<<"NoiseReduction::run - Read mag matrix "<<matSpharaMag.rows()<<matSpharaMag.cols()<<"and grad matrix"<<matSpharaGrad.rows()<<matSpharaGrad.cols();
 
     MatrixXd matSpharaMult = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
