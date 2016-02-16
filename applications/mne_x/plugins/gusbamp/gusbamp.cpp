@@ -171,6 +171,8 @@ void GUSBAmp::setUpFiffInfo()
     m_pFiffInfo->dev_head_t.to = FIFFV_COORD_HEAD;
     m_pFiffInfo->ctf_head_t.from = FIFFV_COORD_DEVICE;
     m_pFiffInfo->ctf_head_t.to = FIFFV_COORD_HEAD;
+
+
 }
 
 //*************************************************************************************************************
@@ -189,7 +191,7 @@ void GUSBAmp::init()
 {
     m_pRMTSA_GUSBAmp = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "GUSBAmp", "EEG output data");
 
-    //m_outputConnectors.append(m_pRMTSA_GUSBAmp);
+    m_outputConnectors.append(m_pRMTSA_GUSBAmp);
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 
@@ -213,8 +215,8 @@ bool GUSBAmp::start()
     if(this->isRunning())
         QThread::wait();
 
-//    //Setup fiff info
-//    setUpFiffInfo();
+    //Setup fiff info
+    setUpFiffInfo();
 
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
     m_pRMTSA_GUSBAmp->data()->initFromFiffInfo(m_pFiffInfo);
@@ -296,6 +298,7 @@ QWidget* GUSBAmp::setupWidget()
 
 void GUSBAmp::run()
 {
+    qDebug()<<m_pFiffInfo->chs.size();
     while(m_bIsRunning)
     {
         //pop matrix only if the producer thread is running
@@ -303,6 +306,7 @@ void GUSBAmp::run()
         {
             //qDebug()<<"GUSBAmp is running";
             MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
+            qDebug() << matValue.rows()<< matValue.cols();
 
             //emit values to real time multi sample array
             m_pRMTSA_GUSBAmp->data()->setValue(matValue.cast<double>());

@@ -71,7 +71,7 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
 ,m_SLAVE_SERIALS_SIZE(0)
 ,m_SAMPLE_RATE_HZ(1200)
 ,m_NUMBER_OF_SCANS(128)
-//,m_NUMBER_OF_CHANNELS(16)
+,m_NUMBER_OF_CHANNELS(16)
 ,m_TRIGGER(FALSE)
 ,m_QUEUE_SIZE(4)
 ,m_mode(M_NORMAL)
@@ -89,7 +89,7 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
     #else
         #pragma comment(lib, __FILE__"\\..\\gUSBamp_x86.lib")
     #endif
-    m_NUMBER_OF_CHANNELS = 16;
+    //m_NUMBER_OF_CHANNELS = UCHAR(16);
 
 
 //    //initializing a deque-list of the serial numbers to be called (LPSTR)
