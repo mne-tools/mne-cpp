@@ -128,8 +128,20 @@ public:
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
 public slots:
+    //=========================================================================================================
+    /**
+    * Set the active flag for SPHARA processing.
+    *
+    * @param[in] state    The new activity flag.
+    */
     void setSpharaMode(bool state);
 
+    //=========================================================================================================
+    /**
+    * Set the number of base functions to keep for SPHARA processing.
+    *
+    * @param[in] nBaseFcts    The number of base functions to keep.
+    */
     void setSpharaNBaseFcts(int nBaseFcts);
 
 protected:
@@ -139,7 +151,17 @@ protected:
     */
     virtual void run();
 
+    //=========================================================================================================
+    /**
+    * Toggle visibilty the visibility of the options toolbar widget.
+    */
     void showOptionsWidget();
+
+    //=========================================================================================================
+    /**
+    * Create/Update the SPHARA projection operator.
+    */
+    void creatSpharaOperator();
 
     //=========================================================================================================
     /**
@@ -162,12 +184,16 @@ protected:
     static void write_eigen_matrix(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& in, const QString& path);
 
 private:
-    QMutex                                          m_mutex;                    /**< The threads mutex.*/
+    QMutex              m_mutex;                    /**< The threads mutex.*/
 
-    bool                                            m_bIsRunning;               /**< Flag whether thread is running.*/
-    bool                                            m_bSpharaActive;            /**< Flag whether thread is running.*/
+    bool                m_bIsRunning;               /**< Flag whether thread is running.*/
+    bool                m_bSpharaActive;            /**< Flag whether thread is running.*/
 
-    int                                             m_iNBaseFcts;               /**< the number of base functions to use for calculating the sphara opreator.*/
+    int                 m_iNBaseFcts;               /**< the number of base functions to use for calculating the sphara opreator.*/
+    QString             m_sCurrentSystem;           /**< The current acquisition system (EEG, babyMEG, VectorView).*/
+
+    Eigen::MatrixXd     m_matSpharaMultMag;         /**< The threads mutex.*/
+    Eigen::MatrixXd     m_matSpharaMultGrad;        /**< The threads mutex.*/
 
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                /**< Fiff measurement info.*/
 
