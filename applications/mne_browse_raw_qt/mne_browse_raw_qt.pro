@@ -170,6 +170,7 @@ win32 {
 macx {
     ICON = Resources/Images/ApplicationIcons/mne_browse_raw.icns
 }
+
 # Deploy Qt Dependencies
 win32 {
     isEmpty(TARGET_EXT) {
