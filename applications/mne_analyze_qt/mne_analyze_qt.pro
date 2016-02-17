@@ -123,9 +123,14 @@ macx {
 RESOURCES += \
     mneanalyzeqt.qrc
 
-RC_FILE = resources/images/appIcons/mne-analyze.rc
+# Icon
+win32 {
+    RC_FILE = resources/images/appIcons/mne-analyze.rc
+}
+macx {
+    ICON = resources/images/appIcons/mne_analyze.icns
+}
 
-# Deploy Qt Dependencies
 # Deploy Qt Dependencies
 unix:!macx {
     #ToDo Unix

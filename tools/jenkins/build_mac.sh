@@ -24,8 +24,12 @@ export DYLD_FALLBACK_LIBRARY_PATH
 # === Clean Up ===
 n_elements=${#TANGIBLES[@]}
 for ((i = 0; i < n_elements; i++)); do
-    tangible="../mne-cpp/bin/${TANGIBLES[i]}.app"
-    rm -rf $tangible
+    tangibleapp="../mne-cpp/bin/${TANGIBLES[i]}.app"
+    tangibledmgbin="../mne-cpp/bin/${TANGIBLES[i]}.dmg"
+    tangibledmg="../${TANGIBLES[i]}-1.0.0-beta.dmg"
+    rm -rf $tangibleapp
+	rm $tangibledmgbin
+	rm $tangibledmg
 done
 
 # === Build ===
