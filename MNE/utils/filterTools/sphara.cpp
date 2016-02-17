@@ -4,11 +4,11 @@
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     Februaray, 2016
+* @date     February, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -87,34 +87,6 @@ MatrixXd Sphara::makeSpharaProjector(const MatrixXd& matBaseFct, const VectorXi&
 
         rowIndex = 0;
     }
-
-
-
-
-//    int rowIndex = 0;
-//    int colIndex = 0;
-//    int repeatIndex = 0;
-
-//    for(int r = 0; r<vecIndices.rows(); r++) {
-//        if(repeatIndex < repeat) {
-//            for(int c = 0; c<vecIndices.rows(); c+=1+repeat) {
-//                matSpharaOperator(vecIndices(r),vecIndices(c)) = matSpharaMultGrad(rowIndex,colIndex);
-//                colIndex++;
-//            }
-
-//            repeatIndex++;
-//        } else {
-//            for(int c = 0; c<vecIndices.rows(); c+=1+repeat) {
-//                matSpharaOperator(vecIndices(r),vecIndices(c)+repeat) = matSpharaMultGrad(rowIndex,colIndex);
-//                colIndex++;
-//            }
-
-//            repeatIndex = 0;
-//        }
-
-//        colIndex = 0;
-//        rowIndex++;
-//    }
 
     return matSpharaOperator;
 }
