@@ -77,7 +77,12 @@ MatrixXd Sphara::makeSpharaProjector(const MatrixXd& matBaseFct, const VectorXi&
     for(int i = 0; i<=skip; i++) {
         for(int r = i; r<vecIndices.rows(); r+=1+skip) {
             for(int c = i; c<vecIndices.rows(); c+=1+skip) {
-                matSpharaOperator(vecIndices(r),vecIndices(c)) = matSpharaMultGrad(rowIndex,colIndex);
+                if((r < vecIndices.rows() || c < vecIndices.rows()) && (rowIndex < matSpharaMultGrad.rows() || colIndex < matSpharaMultGrad.cols())) {
+                    matSpharaOperator(vecIndices(r),vecIndices(c)) = matSpharaMultGrad(rowIndex,colIndex);
+                } else {
+                    qWarning()<<"Sphara::makeSpharaProjector - Index is out of range";
+                }
+
                 colIndex++;
             }
 
