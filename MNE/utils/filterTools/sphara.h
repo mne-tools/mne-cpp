@@ -99,9 +99,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a Sphara object.
+    * Constructs a SPHARA operator.
     */
-    Sphara();
+    static MatrixXd makeSpharaProjector(const MatrixXd& matBaseFct, const VectorXi& vecIndices, int iOperatorDim, int iNBaseFct);
 };
 
 } // NAMESPACE UTILSLIB

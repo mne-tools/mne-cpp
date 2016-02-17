@@ -44,7 +44,7 @@
 
 #include "noisereduction_global.h"
 
-#include <utils/ioutils.h>
+#include <utils/filterTools/sphara.h>
 
 #include <mne_x/Interfaces/IAlgorithm.h>
 #include <generics/circularmatrixbuffer.h>
