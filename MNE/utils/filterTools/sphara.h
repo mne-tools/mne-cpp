@@ -101,7 +101,7 @@ public:
     /**
     * Constructs a SPHARA operator.
     */
-    static MatrixXd makeSpharaProjector(const MatrixXd& matBaseFct, const VectorXi& vecIndices, int iOperatorDim, int iNBaseFct);
+    static MatrixXd makeSpharaProjector(const MatrixXd& matBaseFct, const VectorXi& vecIndices, int iOperatorDim, int iNBaseFct, int skip = 0);
 };
 
 } // NAMESPACE UTILSLIB
