@@ -62,7 +62,7 @@ Sphara::Sphara()
 
 //*************************************************************************************************************
 
-MatrixXd Sphara::makeSpharaProjector(const MatrixXd& matBaseFct, const VectorXi& vecIndices, int iOperatorDim, int iNBaseFct)
+MatrixXd Sphara::makeSpharaProjector(const MatrixXd& matBaseFct, const VectorXi& vecIndices, int iOperatorDim, int iNBaseFct, int skip)
 {
     MatrixXd matSpharaOperator = MatrixXd::Identity(iOperatorDim, iOperatorDim);
 
@@ -74,14 +74,47 @@ MatrixXd Sphara::makeSpharaProjector(const MatrixXd& matBaseFct, const VectorXi&
     int rowIndex = 0;
     int colIndex = 0;
 
-    for(int r = 0; r<vecIndices.rows(); r++) {
-        for(int c = 0; c<vecIndices.rows(); c++) {
-            matSpharaOperator(vecIndices(r),vecIndices(c)) = matSpharaMultGrad(rowIndex,colIndex);
-            colIndex++;
+    for(int i = 0; i<=skip; i++) {
+        for(int r = i; r<vecIndices.rows(); r+=1+skip) {
+            for(int c = i; c<vecIndices.rows(); c+=1+skip) {
+                matSpharaOperator(vecIndices(r),vecIndices(c)) = matSpharaMultGrad(rowIndex,colIndex);
+                colIndex++;
+            }
+
+            colIndex = 0;
+            rowIndex++;
         }
-        colIndex = 0;
-        rowIndex++;
+
+        rowIndex = 0;
     }
+
+
+
+
+//    int rowIndex = 0;
+//    int colIndex = 0;
+//    int repeatIndex = 0;
+
+//    for(int r = 0; r<vecIndices.rows(); r++) {
+//        if(repeatIndex < repeat) {
+//            for(int c = 0; c<vecIndices.rows(); c+=1+repeat) {
+//                matSpharaOperator(vecIndices(r),vecIndices(c)) = matSpharaMultGrad(rowIndex,colIndex);
+//                colIndex++;
+//            }
+
+//            repeatIndex++;
+//        } else {
+//            for(int c = 0; c<vecIndices.rows(); c+=1+repeat) {
+//                matSpharaOperator(vecIndices(r),vecIndices(c)+repeat) = matSpharaMultGrad(rowIndex,colIndex);
+//                colIndex++;
+//            }
+
+//            repeatIndex = 0;
+//        }
+
+//        colIndex = 0;
+//        rowIndex++;
+//    }
 
     return matSpharaOperator;
 }
