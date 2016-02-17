@@ -200,8 +200,8 @@ private:
     int                 m_iNBaseFctsMag;            /**< The number of grad/outer base functions to use for calculating the sphara opreator.*/
     QString             m_sCurrentSystem;           /**< The current acquisition system (EEG, babyMEG, VectorView).*/
 
-    Eigen::MatrixXd     m_matSpharaMultVVMag;       /**< The VectorView gradiometer SPHARA operator.*/
-    Eigen::MatrixXd     m_matSpharaMultVVGrad;      /**< The VectorView magnetometer SPHARA operator.*/
+    Eigen::MatrixXd     m_matSpharaMultSecond;       /**< The VectorView gradiometer SPHARA operator.*/
+    Eigen::MatrixXd     m_matSpharaMultFirst;      /**< The VectorView magnetometer SPHARA operator.*/
     Eigen::MatrixXd     m_matSpharaMultBMInner;     /**< The babyMEG inner layer SPHARA operator.*/
     Eigen::MatrixXd     m_matSpharaMultBMOuter;     /**< The babyMEG outer layer SPHARA operator.*/
 
