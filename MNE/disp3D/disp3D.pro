@@ -47,7 +47,7 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-#RESOURCES += $$PWD/disp3d.qrc \
+RESOURCES += $$PWD/disp3d.qrc \
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
