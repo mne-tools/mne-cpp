@@ -102,7 +102,7 @@ public:
     *
     * @param[in] sSystem    The type of the acquisition system.
     */
-    void setAcquisitionSystem(QString sSystem);
+    void setAcquisitionSystem(const QString &sSystem);
 
 protected slots:
     //=========================================================================================================

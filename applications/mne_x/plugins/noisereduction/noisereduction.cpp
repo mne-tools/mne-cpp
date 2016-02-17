@@ -65,7 +65,7 @@ NoiseReduction::NoiseReduction()
 , m_pNoiseReductionOutput(NULL)
 , m_pNoiseReductionBuffer(CircularMatrixBuffer<double>::SPtr())
 , m_bSpharaActive(false)
-, m_sCurrentSystem("BabyMEG")
+, m_sCurrentSystem("VectorView")
 {
     if(m_sCurrentSystem == "BabyMEG") {
         m_iNBaseFctsFirst = 270;
@@ -228,6 +228,17 @@ void NoiseReduction::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
+void NoiseReduction::setAcquisitionSystem(const QString& sSystem)
+{
+    m_mutex.lock();
+    m_sCurrentSystem = sSystem;
+    m_mutex.unlock();
+
+    createSpharaOperator();
+}
+
+//*************************************************************************************************************
+
 void NoiseReduction::setSpharaMode(bool state)
 {
     m_mutex.lock();
@@ -240,10 +251,12 @@ void NoiseReduction::setSpharaMode(bool state)
 
 void NoiseReduction::setSpharaNBaseFcts(int nBaseFctsGrad, int nBaseFctsMag)
 {
+    m_mutex.lock();
     m_iNBaseFctsFirst = nBaseFctsGrad;
     m_iNBaseFctsSecond = nBaseFctsMag;
+    m_mutex.unlock();
 
-    creatSpharaOperator();
+    createSpharaOperator();
 }
 
 
@@ -259,7 +272,7 @@ void NoiseReduction::run()
 
     //Read and create SPHARA operator for the first time
     readSpharaMatrix();
-    creatSpharaOperator();
+    createSpharaOperator();
 
     while(m_bIsRunning)
     {
@@ -305,21 +318,22 @@ void NoiseReduction::readSpharaMatrix()
     read_eigen_matrix(m_matSpharaBabyMEGInnerLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt"));
     read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
 
-//    qDebug()<<"NoiseReduction::creatSpharaOperator - Read VectorView mag matrix "<<m_matSpharaVVMagLoaded.rows()<<m_matSpharaVVMagLoaded.cols()<<"and grad matrix"<<m_matSpharaVVGradLoaded.rows()<<m_matSpharaVVGradLoaded.cols();
-//    qDebug()<<"NoiseReduction::creatSpharaOperator - Read BabyMEG inner layer matrix "<<m_matSpharaBabyMEGInnerLoaded.rows()<<m_matSpharaBabyMEGInnerLoaded.cols()<<"and outer layer matrix"<<m_matSpharaBabyMEGOuterFull.rows()<<m_matSpharaBabyMEGOuterFull.cols();
+//    qDebug()<<"NoiseReduction::createSpharaOperator - Read VectorView mag matrix "<<m_matSpharaVVMagLoaded.rows()<<m_matSpharaVVMagLoaded.cols()<<"and grad matrix"<<m_matSpharaVVGradLoaded.rows()<<m_matSpharaVVGradLoaded.cols();
+//    qDebug()<<"NoiseReduction::createSpharaOperator - Read BabyMEG inner layer matrix "<<m_matSpharaBabyMEGInnerLoaded.rows()<<m_matSpharaBabyMEGInnerLoaded.cols()<<"and outer layer matrix"<<m_matSpharaBabyMEGOuterFull.rows()<<m_matSpharaBabyMEGOuterFull.cols();
 }
 
 
 //*************************************************************************************************************
 
-void NoiseReduction::creatSpharaOperator()
+void NoiseReduction::createSpharaOperator()
 {
+    qDebug()<<"NoiseReduction::createSpharaOperator - Creating SPHARA oerpator for"<<m_sCurrentSystem;
     m_mutex.lock();
     VectorXi indicesFirst, indicesSecond;
 
     if(m_sCurrentSystem == "VectorView") {
-        indicesFirst.resize(0,0);
-        indicesSecond.resize(0,0);
+        indicesFirst.resize(0);
+        indicesSecond.resize(0);
 
         for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
             //Find GRADIOMETERS
@@ -336,11 +350,11 @@ void NoiseReduction::creatSpharaOperator()
         }
 
         m_matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaVVGradLoaded, indicesFirst, m_pFiffInfo->nchan, m_iNBaseFctsFirst, 1); //GRADIOMETERS
-        m_matSpharaMultSecond = Sphara::makeSpharaProjector(m_matSpharaVVMagLoaded, indicesSecond, m_pFiffInfo->nchan, m_iNBaseFctsFirst, 0); //Magnetometers
+        m_matSpharaMultSecond = Sphara::makeSpharaProjector(m_matSpharaVVMagLoaded, indicesSecond, m_pFiffInfo->nchan, m_iNBaseFctsSecond, 0); //Magnetometers
     }
 
     if(m_sCurrentSystem == "BabyMEG") {
-        indicesFirst.resize(0,0);
+        indicesFirst.resize(0);
          for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
             //Find INNER LAYER
             if(m_pFiffInfo->chs.at(r).coil_type == 7002) {
