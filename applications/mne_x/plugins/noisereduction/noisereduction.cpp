@@ -271,13 +271,7 @@ void NoiseReduction::run()
         //Do all the noise reduction steps here
         //SPHARA calculations
         if(m_bSpharaActive) {
-            if(m_sCurrentSystem == "VectorView") {
-                t_mat = m_matSpharaMultVVGrad * m_matSpharaMultVVMag * t_mat;
-            }
-
-            if(m_sCurrentSystem == "BabyMEG") {
-                t_mat = m_matSpharaMultBMInner * m_matSpharaMultBMOuter * t_mat;
-            }
+            t_mat = m_matSpharaMultFirst * m_matSpharaMultSecond * t_mat;
         }
 
         m_mutex.unlock();
@@ -301,10 +295,8 @@ void NoiseReduction::showOptionsWidget()
 
 void NoiseReduction::readSpharaMatrix()
 {
-    m_matSpharaMultVVGrad = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
-    m_matSpharaMultVVMag = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
-    m_matSpharaMultBMInner = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
-    m_matSpharaMultBMOuter = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+    m_matSpharaMultFirst = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+    m_matSpharaMultSecond = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
     //Read SPHARA matrix
     read_eigen_matrix(m_matSpharaVVGradFull, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
@@ -313,8 +305,8 @@ void NoiseReduction::readSpharaMatrix()
     read_eigen_matrix(m_matSpharaBabyMEGInnerFull, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt"));
     read_eigen_matrix(m_matSpharaBabyMEGOuterFull, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
 
-    qDebug()<<"NoiseReduction::creatSpharaOperator - Read VectorView mag matrix "<<m_matSpharaVVMagFull.rows()<<m_matSpharaVVMagFull.cols()<<"and grad matrix"<<m_matSpharaVVGradFull.rows()<<m_matSpharaVVGradFull.cols();
-    qDebug()<<"NoiseReduction::creatSpharaOperator - Read BabyMEG inner layer matrix "<<m_matSpharaBabyMEGInnerFull.rows()<<m_matSpharaBabyMEGInnerFull.cols()<<"and outer layer matrix"<<m_matSpharaBabyMEGOuterFull.rows()<<m_matSpharaBabyMEGOuterFull.cols();
+//    qDebug()<<"NoiseReduction::creatSpharaOperator - Read VectorView mag matrix "<<m_matSpharaVVMagFull.rows()<<m_matSpharaVVMagFull.cols()<<"and grad matrix"<<m_matSpharaVVGradFull.rows()<<m_matSpharaVVGradFull.cols();
+//    qDebug()<<"NoiseReduction::creatSpharaOperator - Read BabyMEG inner layer matrix "<<m_matSpharaBabyMEGInnerFull.rows()<<m_matSpharaBabyMEGInnerFull.cols()<<"and outer layer matrix"<<m_matSpharaBabyMEGOuterFull.rows()<<m_matSpharaBabyMEGOuterFull.cols();
 }
 
 
@@ -323,95 +315,46 @@ void NoiseReduction::readSpharaMatrix()
 void NoiseReduction::creatSpharaOperator()
 {
     m_mutex.lock();
+    VectorXi indicesFirst, indicesSecond;
 
     if(m_sCurrentSystem == "VectorView") {
-        //GRADIOMETERS
-        //Remove unwanted base functions
-        qDebug()<<"NoiseReduction::creatSpharaOperator - Removing"<<m_matSpharaVVGradFull.cols() - m_iNBaseFctsGrad<<"SPHARA grad base functions";
+        indicesFirst.resize(0,0);
+        indicesSecond.resize(0,0);
 
-        VectorXi indices;
         for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
+            //Find GRADIOMETERS
             if(m_pFiffInfo->chs.at(r).coil_type == 3012) {
-                indices.conservativeResize(indices.rows()+1);
-                indices(indices.rows()-1) = r;
+                indicesFirst.conservativeResize(indicesFirst.rows()+1);
+                indicesFirst(indicesFirst.rows()-1) = r;
+            }
+
+            //Find Magnetometers
+            if(m_pFiffInfo->chs.at(r).coil_type == 3024) {
+                indicesSecond.conservativeResize(indicesSecond.rows()+1);
+                indicesSecond(indicesSecond.rows()-1) = r;
             }
         }
 
-        m_matSpharaMultVVGrad = Sphara::makeSpharaProjector(m_matSpharaVVGradFull, indices, m_pFiffInfo->nchan, m_iNBaseFctsGrad, 1);
-
-
-
-
-//        MatrixXd matSpharaGradCut = m_matSpharaVVGradFull.block(0,0,m_matSpharaVVGradFull.rows(),m_iNBaseFctsGrad);
-//        MatrixXd matSpharaMultGrad = matSpharaGradCut * matSpharaGradCut.transpose().eval();
-
-//        //Create gradiometer SPHARA operator
-//        for(int r = 0; r<matSpharaMultGrad.rows(); r++) {
-//            for(int c = 0; c<matSpharaMultGrad.cols(); c++) {
-//                MatrixXd triplet(3,3);
-//                if(r != c) {
-//                    triplet <<  matSpharaMultGrad(r,c), 0, 0,
-//                                0, matSpharaMultGrad(r,c), 0,
-//                                0, 0, 0;
-//                } else {
-//                    triplet <<  matSpharaMultGrad(r,c), 0, 0,
-//                                0, matSpharaMultGrad(r,c), 0,
-//                                0, 0, 1;
-//                }
-
-//                m_matSpharaMultVVGrad.block(r*3,c*3,3,3) = triplet;
-//            }
-//        }
-
-        //Write final operator matrices to file
-        write_eigen_matrix(m_matSpharaMultVVGrad, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/m_matSpharaMultVVGrad.txt"));
-
-        //Magnetometers
-        //Remove unwanted base functions
-        qDebug()<<"NoiseReduction::creatSpharaOperator - Removing"<<m_matSpharaVVMagFull.cols() - m_iNBaseFctsMag<<"SPHARA mag base functions";
-
-        MatrixXd matSpharaMagCut = m_matSpharaVVMagFull.block(0,0,m_matSpharaVVMagFull.rows(),m_iNBaseFctsMag);
-        MatrixXd matSpharaMultMag = matSpharaMagCut * matSpharaMagCut.transpose().eval();
-
-        //Create full magnetometer SPHARA operator
-        for(int r = 0; r<matSpharaMultMag.rows(); r++) {
-            for(int c = 0; c<matSpharaMultMag.cols(); c++) {
-                MatrixXd triplet(3,3);
-                if(r != c) {
-                    triplet <<  0, 0, 0,
-                                0, 0, 0,
-                                0, 0, matSpharaMultMag(r,c);
-                } else {
-                    triplet <<  1, 0, 0,
-                                0, 1, 0,
-                                0, 0, matSpharaMultMag(r,c);
-                }
-
-                m_matSpharaMultVVMag.block(r*3,c*3,3,3) = triplet;
-            }
-        }
-
-        //Write final operator matrices to file
-        write_eigen_matrix(m_matSpharaVVMagFull, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/m_matSpharaBMagFull.txt"));
+        m_matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaVVGradFull, indicesFirst, m_pFiffInfo->nchan, m_iNBaseFctsGrad, 1); //GRADIOMETERS
+        m_matSpharaMultSecond = Sphara::makeSpharaProjector(m_matSpharaVVMagFull, indicesSecond, m_pFiffInfo->nchan, m_iNBaseFctsGrad, 0); //Magnetometers
     }
 
     if(m_sCurrentSystem == "BabyMEG") {
-        //INNER LAYER
-        qDebug()<<"NoiseReduction::creatSpharaOperator - Removing"<<m_matSpharaBabyMEGInnerFull.cols() - m_iNBaseFctsGrad<<"SPHARA grad base functions";
-
-        VectorXi indices;
-        for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
+        indicesFirst.resize(0,0);
+         for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
+            //Find INNER LAYER
             if(m_pFiffInfo->chs.at(r).coil_type == 7002) {
-                indices.conservativeResize(indices.rows()+1);
-                indices(indices.rows()-1) = r;
+                indicesFirst.conservativeResize(indicesFirst.rows()+1);
+                indicesFirst(indicesFirst.rows()-1) = r;
             }
         }
 
-        m_matSpharaMultBMInner = Sphara::makeSpharaProjector(m_matSpharaBabyMEGInnerFull, indices, m_pFiffInfo->nchan, m_iNBaseFctsGrad, 0);
-
-        //Write final operator matrices to file
-        write_eigen_matrix(m_matSpharaMultBMInner, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/m_matSpharaMultBMInner.txt"));
+        m_matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaBabyMEGInnerFull, indicesFirst, m_pFiffInfo->nchan, m_iNBaseFctsGrad, 0); //InnerLayer
     }
+
+    //Write final operator matrices to file
+    write_eigen_matrix(m_matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/m_matSpharaMultFirst.txt"));
+    write_eigen_matrix(m_matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/m_matSpharaMultSecond.txt"));
 
     m_mutex.unlock();
 }
