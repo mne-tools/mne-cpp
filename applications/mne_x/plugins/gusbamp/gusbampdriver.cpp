@@ -68,19 +68,17 @@ using namespace std;
 
 GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
 : m_pGUSBAmpProducer(pGUSBAmpProducer)
+,m_NUMBER_OF_CHANNELS(0)
+,m_NUMBER_OF_SCANS(0)
 ,m_SLAVE_SERIALS_SIZE(0)
-,m_SAMPLE_RATE_HZ(1200)
-,m_NUMBER_OF_SCANS(128)
-,m_NUMBER_OF_CHANNELS(16)
-,m_TRIGGER(FALSE)
 ,m_QUEUE_SIZE(4)
+,m_TRIGGER(FALSE)
 ,m_mode(M_NORMAL)
 ,m_commonReference({ FALSE, FALSE, FALSE, FALSE })
 ,m_commonGround({ FALSE, FALSE, FALSE, FALSE })
-,m_nPoints(m_NUMBER_OF_SCANS * (m_NUMBER_OF_CHANNELS + m_TRIGGER))
-,m_bufferSizeBytes(HEADER_SIZE + m_nPoints * sizeof(float))
 ,m_numBytesReceived(0)
 ,m_isRunning(false)
+,m_filePath("data")
 {
 
     //Linking the specific API-library to the project
@@ -89,48 +87,29 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
     #else
         #pragma comment(lib, __FILE__"\\..\\gUSBamp_x86.lib")
     #endif
-    //m_NUMBER_OF_CHANNELS = UCHAR(16);
 
+    //initialize vector m_sizeOfMatrix
+    m_sizeOfMatrix.resize(2,0);
 
-//    //initializing a deque-list of the serial numbers to be called (LPSTR)
-//    m_masterSerial       = LPSTR("UB-2015.05.16");
-//    m_slaveSerials[0]    = LPSTR("UB-2010.03.43");
-//    m_slaveSerials[1]    = LPSTR("UB-2010.03.44");
-//    m_slaveSerials[2]    = LPSTR("UB-2010.03.47");
-//    for (int i=0; i<m_SLAVE_SERIALS_SIZE; i++)
-//        m_callSequenceSerials.push_back(m_slaveSerials[i]);
-//    //add the master device at the end of the list!
-//    m_callSequenceSerials.push_back(m_masterSerial);
+    m_vsSerials.resize(1,0);
+    m_vsSerials[0]=(LPSTR("UB-2015.05.16"));
 
     //setting a deque-list of the serial numbers to be called (LPSTR)
-    setSerials(LPSTR("UB-2015.05.16"));
+    setSerials(m_vsSerials);
 
-
-//    //m_NUMBER_OF_CHANNELS = 5;
     //initializing UCHAR-list of channels to acquire
-    for(int i = 0; i < m_NUMBER_OF_CHANNELS; i++)
-    {
-        m_channelsToAcquire[i] = UCHAR(i+1);
-        cout << "channel:" << int(m_channelsToAcquire[i]);
-    }
-
-//    //initializing UCHAR-list of channels to acquire
-//    //vector<int> channels = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
-//    vector<int> channels = {5};
-//    setChannels(channels);
-
+    vector<int> channels = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    //vector<int> channels = {5};
+    //vector<int> channels = {4, 5, 6};
+    setChannels(channels);
 
     //setting Sample parameters and Number of Scans
-    setSampleRate(m_SAMPLE_RATE_HZ);
+    setSampleRate(1200);
 
 //    float version = float(GT_GetDriverVersion());
-
 //    qDebug() << "gUSBamp-driver version " << version << "was found";
+
 //    qDebug() <<endl<< "gUSBampdriver-contructor build successfully " << endl;
-
-    //define Name and place of written data-file
-     m_file.setFileName("d:/Clouds/OneDrive/Studium/Master/Masterarbeit/testing/gUSBamp/driver/data.txt");
-
 }
 
 
@@ -148,13 +127,27 @@ GUSBAmpDriver::~GUSBAmpDriver()
 bool GUSBAmpDriver::initDevice()
 {
 
-    /*Space for setting Main-variables
-    *
-    *
-    *
-    */
-
     m_isRunning =true;
+
+    //define Name and place of written data-file
+    m_sFileName = m_filePath;
+    m_sFileName.append(QString("_%1Hz.txt").arg(m_SAMPLE_RATE_HZ));
+    m_file.setFileName(m_sFileName);
+
+    //after m_isRunning = true following variables can be setted:
+    m_nPoints           = m_NUMBER_OF_SCANS * (m_NUMBER_OF_CHANNELS + m_TRIGGER);
+    m_bufferSizeBytes   = HEADER_SIZE + m_nPoints * sizeof(float);
+
+
+    //output of the setted parameters:
+    qDebug() << "Following parameters were setted:\n";
+    qDebug() << "sample rate:\n" <<m_SAMPLE_RATE_HZ << "Hz" ;
+    qDebug() << "called device(s):";
+    for(deque<LPSTR>::iterator serialNumber = m_callSequenceSerials.begin(); serialNumber != m_callSequenceSerials.end(); serialNumber++)
+        qDebug() <<QString(*serialNumber);
+    qDebug()<<"size of output Matrix:\n" << m_sizeOfMatrix[0]<<" rows (channels) and "<< m_sizeOfMatrix[1] <<"columns (samples)";
+    qDebug()<<"File will be stored under the follwing path:\n" << m_sFileName << endl;
+
 
     try
     {
@@ -282,6 +275,7 @@ bool GUSBAmpDriver::initDevice()
         m_file.open(QIODevice::WriteOnly | QIODevice::Text );
         m_stream.setDevice(&m_file);
 
+
         //start the devices (master device must be started at last)
         for (int deviceIndex=0; deviceIndex<m_numDevices; deviceIndex++)
         {
@@ -320,6 +314,8 @@ bool GUSBAmpDriver::initDevice()
             qDebug() << "error occurred - Device " << &m_openedDevicesHandles.front()  << "was closed" << endl;
             m_openedDevicesHandles.pop_front();
         }
+
+        m_isRunning = false;
 
         cout << exception << '\n';
 
@@ -396,6 +392,7 @@ bool GUSBAmpDriver::uninitDevice()
 
 bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
 {
+
     sampleMatrix.setZero(); // Clear matrix - set all elements to zero
 
     for(int queueIndex=0; queueIndex<m_QUEUE_SIZE; queueIndex++)
@@ -448,7 +445,7 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
                     //attach float value to stream
                     m_stream << FloatValue<< "\t";
                     //store float-value to Matrix
-                    sampleMatrix(channelIndex*(1+deviceIndex),scanIndex*(1+queueIndex)) = FloatValue;
+                    sampleMatrix(channelIndex  + deviceIndex*int(m_NUMBER_OF_CHANNELS), scanIndex + queueIndex * m_NUMBER_OF_SCANS) = FloatValue;
                 }
             }
             m_stream << "\n";
@@ -471,8 +468,14 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
 //*************************************************************************************************************
 
 
-void GUSBAmpDriver::setSerials(LPSTR master, LPSTR slave1, LPSTR slave2, LPSTR slave3)
+bool GUSBAmpDriver::setSerials(vector<LPSTR> &list)
 {
+
+    if(m_isRunning)
+    {
+        cout << "Do not change device-parameters while running the device!\n";
+        return false;
+    }
 
     //closes the former call-sequence-list
     while (!m_callSequenceSerials.empty())
@@ -480,21 +483,31 @@ void GUSBAmpDriver::setSerials(LPSTR master, LPSTR slave1, LPSTR slave2, LPSTR s
         m_callSequenceSerials.pop_front();
     }
 
-    //defining the new serials
-    m_masterSerial      = master;
-    m_slaveSerials[0]   = slave1;
-    m_slaveSerials[1]   = slave2;
-    m_slaveSerials[2]   = slave3;
+    int size = list.size();
+    //qDebug() << "size of list:" <<size;
 
-    //defining the size of the slave serials
-    for (int i = 0; (m_slaveSerials[i] !=LPSTR("is_empty")) && (i<3); i++)
-        m_SLAVE_SERIALS_SIZE = i;
+    if(size>4)
+    {
+        cout << "ERROR serSerials: max. for serial numbers can be setted!";
+        return false;
+    }
+
+    m_vsSerials.resize(size);
+    m_vsSerials = list;
+
+    m_SLAVE_SERIALS_SIZE = size - 1;
 
     //defining the new deque-list for data acquisition
-    for (int i=0; i<m_SLAVE_SERIALS_SIZE; i++)
-        m_callSequenceSerials.push_back(m_slaveSerials[i]);
+    for (int i=1; i<=m_SLAVE_SERIALS_SIZE; i++)
+        m_callSequenceSerials.push_back(m_vsSerials[i]);
     //add the master device at the end of the list!
-    m_callSequenceSerials.push_back(m_masterSerial);
+    m_callSequenceSerials.push_back(m_vsSerials[0]);
+
+    //refresh size of output matrix
+    m_sizeOfMatrix[0] = (int(m_NUMBER_OF_CHANNELS)*int(1 + m_SLAVE_SERIALS_SIZE));    //number of channels * number of devices (number of channels)
+    m_sizeOfMatrix[1] = (int(m_NUMBER_OF_SCANS)*int(m_QUEUE_SIZE));                   //number of the scanned samples * number of the queues (nummber of samples)
+
+    return true;
 
 }
 
@@ -526,7 +539,7 @@ bool GUSBAmpDriver::setSampleRate(int sampleRate)
                               "32, 64, 128, 256, 512, 600, 1200, 2400, 4800, 9600, 19200 and 38400\n\n:"); break;
         }
         m_SAMPLE_RATE_HZ = sampleRate;
-        qDebug()<<"Sample Rate is setted"<<endl;
+        //qDebug()<<"Sample Rate is setted"<<endl;
     }
     catch(string& exception)
     {
@@ -534,7 +547,15 @@ bool GUSBAmpDriver::setSampleRate(int sampleRate)
         return false;
     }
 
-    cout <<"sample rate [HZ]: \t" <<  m_SAMPLE_RATE_HZ << "\n" << "number of scans [/]:\t" << m_NUMBER_OF_SCANS << "\n";
+    cout<< "slave serial size:" << m_SLAVE_SERIALS_SIZE << "\n";
+
+    //refresh size of output matrix
+    m_sizeOfMatrix[0] = (int(m_NUMBER_OF_CHANNELS)*int(1 + m_SLAVE_SERIALS_SIZE));    //number of channels * number of devices (number of channels)
+    m_sizeOfMatrix[1] = (int(m_NUMBER_OF_SCANS)*int(m_QUEUE_SIZE));                   //number of the scanned samples * number of the queues (nummber of samples)
+
+
+
+    //cout <<"sample rate [HZ]: \t" <<  m_SAMPLE_RATE_HZ << "\n" << "number of scans [/]:\t" << m_NUMBER_OF_SCANS << "\n";
 
     return true;
 
@@ -569,20 +590,59 @@ bool GUSBAmpDriver::setChannels(vector<int> &list)
         return false;
     }
 
+//    //m_NUMBER_OF_CHANNELS = 5;
+//    //initializing UCHAR-list of channels to acquire
+//    for(int i = 0; i < m_NUMBER_OF_CHANNELS; i++)
+//    {
+//        m_channelsToAcquire[i] = UCHAR(i+1);
+//        cout << "channel:" << int(m_channelsToAcquire[i]);
+//    }
+
     for(int i = 0; i < numargin; i++)
     {
          m_channelsToAcquire[i] = UCHAR(list[i]);
-         cout<< "channel " << int( m_channelsToAcquire[i]) << " setted \n";
+         //cout<< "channel " << int( m_channelsToAcquire[i]) << " setted \n";
     }
 
-    m_NUMBER_OF_CHANNELS = UCHAR(numargin);
+    m_NUMBER_OF_CHANNELS    = UCHAR(numargin);
+
 
     cout<< "number of channels [/]: \t" << int(m_NUMBER_OF_CHANNELS) << "\n";
+
+    //refresh size of output matrix
+    m_sizeOfMatrix[0] = (int(m_NUMBER_OF_CHANNELS)*int(1 + m_SLAVE_SERIALS_SIZE));    //number of channels * number of devices (number of channels)
+    m_sizeOfMatrix[1] = (int(m_NUMBER_OF_SCANS)*int(m_QUEUE_SIZE));                   //number of the scanned samples * number of the queues (number of samples)
+
 
 
     return true;
 
 }
+
+//*************************************************************************************************************
+
+bool GUSBAmpDriver::setFilePath(QString FilePath)
+{
+    if(m_isRunning)
+    {
+        cout << "Do not change device-parameters while running the device!\n";
+        return false;
+    }
+
+    //writing the new file-path
+    m_filePath = FilePath;
+
+    return true;
+
+}
+
+//*************************************************************************************************************
+
+vector<int> GUSBAmpDriver::getSizeOfSampleMatrix(void)
+{
+    return m_sizeOfMatrix;
+}
+
 
 
 

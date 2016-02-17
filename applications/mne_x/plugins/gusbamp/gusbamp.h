@@ -46,6 +46,7 @@
 // INCLUDES
 //=============================================================================================================
 #include "gusbamp_global.h"
+#include <Windows.h>
 
 #include <fstream>
 #include <mne_x/Interfaces/ISensor.h>
@@ -193,11 +194,12 @@ private:
 
     QSharedPointer<FiffInfo>            m_pFiffInfo;                        /**< Fiff measurement info.*/
 
-    LPSTR               m_masterSerial;             /**< specify the serial number of the device used as master.*/
-    LPSTR               m_slaveSerials[3];          /**< specify the serial numbers of the devices used as slaves (max. three slave devices)*/
+    vector<LPSTR>       m_vsSerials;                /**< vector of all Serials (the first one is the master) */
     int                 m_iSampleRate;              /**< the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!)*/
     int                 m_iSamplesPerBlock;         /**< The samples per block defined by the user via the GUI. */
-    UCHAR               m_iNumberOfChannels;        /**< the channels that should be acquired from each device*/
+    UCHAR               m_iNumberOfChannels;        /**< the channels that should be acquired from each device */
+    QString             m_sFilePath;                /**< String of the Filepath where acquisition data will be stored */
+    vector<int>         m_viSizeOfSampleMatrix;     /**< vector including the size of the two dimensional sample Matrix */
 
 
 };
