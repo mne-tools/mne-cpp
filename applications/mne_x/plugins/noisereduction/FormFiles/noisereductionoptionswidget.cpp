@@ -78,3 +78,12 @@ NoiseReductionOptionsWidget::~NoiseReductionOptionsWidget()
 {
     delete ui;
 }
+
+
+//*************************************************************************************************************
+
+void NoiseReductionOptionsWidget::setMaxNumberBasisFunctions(int max)
+{
+    ui->m_horizontalSlider_nBaseFcts->setMaximum(max);
+    ui->m_horizontalSlider_nBaseFcts->setValue(max);
+}
