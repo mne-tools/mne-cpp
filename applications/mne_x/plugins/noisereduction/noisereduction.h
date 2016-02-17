@@ -140,9 +140,10 @@ public slots:
     /**
     * Set the number of base functions to keep for SPHARA processing.
     *
-    * @param[in] nBaseFcts    The number of base functions to keep.
+    * @param[in] nBaseFctsGrad    The number of grad/mag base functions to keep.
+    * @param[in] nBaseFctsMag     The number of grad/mag base functions to keep.
     */
-    void setSpharaNBaseFcts(int nBaseFcts);
+    void setSpharaNBaseFcts(int nBaseFctsGrad, int nBaseFctsMag);
 
 protected:
     //=========================================================================================================
@@ -195,7 +196,8 @@ private:
     bool                m_bIsRunning;               /**< Flag whether thread is running.*/
     bool                m_bSpharaActive;            /**< Flag whether thread is running.*/
 
-    int                 m_iNBaseFcts;               /**< the number of base functions to use for calculating the sphara opreator.*/
+    int                 m_iNBaseFctsGrad;           /**< The number of grad/inner base functions to use for calculating the sphara opreator.*/
+    int                 m_iNBaseFctsMag;            /**< The number of grad/outer base functions to use for calculating the sphara opreator.*/
     QString             m_sCurrentSystem;           /**< The current acquisition system (EEG, babyMEG, VectorView).*/
 
     Eigen::MatrixXd     m_matSpharaMultVVMag;       /**< The VectorView gradiometer SPHARA operator.*/
