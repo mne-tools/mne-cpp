@@ -163,13 +163,29 @@ macx {
 RESOURCES += \
     mnebrowserawqt.qrc
 
-RC_FILE = Resources/Images/ApplicationIcons/browse_raw.rc
-
-# Deploy Qt Dependencies
-unix:!macx {
-    #ToDo Unix
+# Icon
+win32 {
+    RC_FILE = Resources/Images/ApplicationIcons/browse_raw.rc
 }
+macx {
+    ICON = Resources/Images/ApplicationIcons/mne_browse_raw.icns
+}
+# Deploy Qt Dependencies
+win32 {
+    isEmpty(TARGET_EXT) {
+        TARGET_CUSTOM_EXT = .exe
+    } else {
+        TARGET_CUSTOM_EXT = $${TARGET_EXT}
+    }
 
+    DEPLOY_COMMAND = windeployqt
+
+    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
+
+    #  # Uncomment the following line to help debug the deploy command when running qmake
+    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
+    QMAKE_POST_LINK = $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+}
 macx {
     # === Mac ===
     QMAKE_RPATHDIR += @executable_path/../Frameworks
@@ -190,18 +206,6 @@ macx {
 #    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
 #    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -verbose=0
 }
-win32 {
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .exe
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-    }
-
-    DEPLOY_COMMAND = windeployqt
-
-    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-
-    #  # Uncomment the following line to help debug the deploy command when running qmake
-    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
-    QMAKE_POST_LINK = $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+unix:!macx {
+    #ToDo Unix
 }
