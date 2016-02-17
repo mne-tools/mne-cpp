@@ -116,8 +116,7 @@ class GUSBAmpDriver
 private:
 
 //device-settings
-    LPSTR               m_masterSerial;             //specify the serial number of the device used as master
-    LPSTR               m_slaveSerials[3];          //specify the serial numbers of the devices used as slaves (max. three slave devices)
+    vector<LPSTR>       m_vsSerials;                //specify the serial number of the device used as master
     int                 m_numDevices;               //number of connected devices (master and slaves)
     deque<LPSTR>        m_callSequenceSerials;      //list of the call sequence (master must be the last device in the call sequence)
     deque<HANDLE>       m_openedDevicesHandles;     //list of handles in the order of the opened devices
@@ -132,9 +131,6 @@ private:
     CHANNEL             m_bipolarSettings;          //don't use bipolar derivation (all values will be initialized to zero)
     REF                 m_commonReference;          //don't connect groups to common reference
     GND                 m_commonGround;             //don't connect groups to common ground
-//    CRingBuffer<float>  _buffer;                  //the application buffer where received data will be stored for each device
-//    bool                _bufferOverrun;           //flag indicating if an overrun occurred at the application buffer
-//    const int           BUFFER_SIZE_SECONDS;		//the size of the application buffer in seconds
     const int           m_QUEUE_SIZE;               //the number of GT_GetData calls that will be queued during acquisition to avoid loss of data
     bool                m_isRunning;                //flag for data acquisition
 //buffer
@@ -143,9 +139,12 @@ private:
     DWORD               m_numBytesReceived;         //num of Bytes whicht are received during one measuring procedure
     BYTE***             m_buffers;                  //pointer to the buffer
     OVERLAPPED**        m_overlapped;               //storage in case of overlapping
-//file writing
+//file writing and outputmatrix
+    QString             m_filePath;                 //path of the file for data acquisition
+    QString             m_sFileName;                //file name of the data-file
     QFile               m_file;                     //file to which data is written
     QTextStream         m_stream;                   //stream from m_buffers to m_file
+    vector<int>         m_sizeOfMatrix;             //number of rows and collums of output matrix [rows collums]
 
 
 public:
@@ -189,16 +188,12 @@ public:
     /**
     * Setting the adresses of the master amplifer and the slaves. The selections of the slaves are optional.
     *
-    * @param[in]    master      Serial Number of the master device
-    * @param[in]    slave1      Serial Number of first slave device (optional)
-    * @param[in]    slave2      Serial Number of second slave device (optional)
-    * @param[in]    slave3      Serial Number of third slave device (optional)
+    * @param[in]    list        Serial Number of the master device
+    *
+    * @return[out]              true if suceeded
     *
     */
-    void setSerials(LPSTR master,
-                    LPSTR slave1 = LPSTR("is_empty"),
-                    LPSTR slave2 = LPSTR("is_empty"),
-                    LPSTR slave3 = LPSTR("is_empty"));
+    bool setSerials(vector<LPSTR> &list);
 
     //=========================================================================================================
     /**
@@ -215,13 +210,33 @@ public:
     /**
     * Setting the channels and the Number of channels
     *
-    * @param[in]    channels        Vecotr which behold the values of Channels as integer. The values have to be
+    * @param[in]    channels        Vector which behold the values of Channels as integer. The values have to be
     *                               ascending and in number must not exceed 16
     *
     * @return[out]                  true if suceeded
     *
     */
     bool setChannels(vector<int> &channels);
+
+    //=========================================================================================================
+    /**
+    * Setting the path of the file
+    *
+    * @param[in]    QString         QString which beholds the the path of the File in which data will be stored
+    *
+    * @return[out]                  true if suceeded
+    *
+    */
+    bool setFilePath(QString FilePath);
+
+    //=========================================================================================================
+    /**
+    * Getting the size of the Sample Matrix
+    *
+    * @return[out]                  vector with the size of the matrix. first value = columns. second value rows.
+    *
+    */
+    vector<int> getSizeOfSampleMatrix(void);
 
 
 

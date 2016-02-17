@@ -43,6 +43,10 @@
 //=============================================================================================================
 
 #include <generics/circularbuffer.h>
+#include <vector>
+
+#include <Windows.h>
+
 
 
 //*************************************************************************************************************
@@ -52,8 +56,6 @@
 
 #include <QThread>
 #include <QDebug>
-#include "ringbuffer.h"
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -70,6 +72,7 @@ namespace GUSBAmpPlugin
 //=============================================================================================================
 
 using namespace IOBuffer;
+using namespace std;
 
 
 //*************************************************************************************************************
@@ -90,6 +93,8 @@ class GUSBAmpDriver;
 class GUSBAmpProducer : public QThread
 {
 public:
+
+
     //=========================================================================================================
     /**
     * Constructs a GUSBAmpProducer.
@@ -109,7 +114,7 @@ public:
     * Starts the GUSBAmpProducer by starting the producer's thread and initialising the device.
     *
     */
-    virtual void start();
+    virtual void start(vector<LPSTR> &serials, int sampleRate, QString filePath);
 
     //=========================================================================================================
     /**
@@ -117,8 +122,13 @@ public:
     */
     void stop();
 
+    //=========================================================================================================
+    /**
+    * @return           returns the size of the sample Matrix
+    */
+    vector<int> getSizeOfSampleMatrix(void);
+
 protected:
-    CRingBuffer<float> _buffer;
     //=========================================================================================================
     /**
     * The starting point for the thread. After calling start(), the newly created thread calls this function.
@@ -128,10 +138,15 @@ protected:
     virtual void run();
 
 private:
-    GUSBAmp*                       m_pGUSBAmp;            /**< A pointer to the corresponding GUSBAmp class.*/
-    QSharedPointer<GUSBAmpDriver>  m_pGUSBAmpDriver;      /**< A pointer to the corresponding GUSBAmp driver class.*/
+    GUSBAmp*                        m_pGUSBAmp;            /**< A pointer to the corresponding GUSBAmp class.*/
+    QSharedPointer<GUSBAmpDriver>   m_pGUSBAmpDriver;      /**< A pointer to the corresponding GUSBAmp driver class.*/
 
-    bool                        m_bIsRunning;       /**< Whether GUSBAmpProducer is running.*/
+    bool                            m_bIsRunning;           /**< Whether GUSBAmpProducer is running.*/
+
+    int                 m_iSampleRate;          /**< sample rate of the device */
+    QString             m_sFilePath;            /**< path of the file of written data */
+    vector<LPSTR>       m_vsSerials;            /**< vector with the serial numbers of the devices*/
+    vector<int>         m_viSizeOfSampleMatrix; /**< size of the sample matrix [rows columns] */
 
 };
 

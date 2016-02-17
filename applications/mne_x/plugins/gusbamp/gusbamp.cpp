@@ -42,6 +42,7 @@
 #include "gusbamp.h"
 #include "gusbampproducer.h"
 #include "gtec_gusbamp.h"       /**< heder-file from gTec for gubamp amplifier*/
+#include <Windows.h>
 
 
 //*************************************************************************************************************
@@ -59,6 +60,7 @@
 //=============================================================================================================
 
 using namespace GUSBAmpPlugin;
+using namespace std;
 
 
 //*************************************************************************************************************
@@ -71,10 +73,18 @@ GUSBAmp::GUSBAmp()
 , m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/gusbamp/")
 , m_pRawMatrixBuffer_In(0)
 , m_pGUSBAmpProducer(new GUSBAmpProducer(this))
-, m_iSampleRate(1200)
-, m_iNumberOfChannels(16)
-, m_iSamplesPerBlock(512)
+, m_iNumberOfChannels(0)
+, m_iSamplesPerBlock(0)
+, m_iSampleRate(38400)
+, m_sFilePath("d:/Clouds/OneDrive/Studium/Master/Masterarbeit/testing/gUSBamp/driver/data")
 {
+    m_viSizeOfSampleMatrix.resize(2,0);
+
+
+    m_vsSerials.resize(1,0);
+    m_vsSerials[0]=(LPSTR("UB-2015.05.16"));
+
+
 }
 
 
@@ -215,6 +225,18 @@ bool GUSBAmp::start()
     if(this->isRunning())
         QThread::wait();
 
+
+
+
+    m_pGUSBAmpProducer->start(m_vsSerials, m_iSampleRate, m_sFilePath);
+
+    //Buffer
+    m_viSizeOfSampleMatrix = m_pGUSBAmpProducer->getSizeOfSampleMatrix();
+    m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, m_viSizeOfSampleMatrix[0], m_viSizeOfSampleMatrix[1]));
+
+    m_iNumberOfChannels = m_viSizeOfSampleMatrix[0];
+    m_iSamplesPerBlock  = m_viSizeOfSampleMatrix[1];
+
     //Setup fiff info
     setUpFiffInfo();
 
@@ -222,11 +244,6 @@ bool GUSBAmp::start()
     m_pRMTSA_GUSBAmp->data()->initFromFiffInfo(m_pFiffInfo);
     m_pRMTSA_GUSBAmp->data()->setMultiArraySize(m_iSamplesPerBlock);
     m_pRMTSA_GUSBAmp->data()->setSamplingRate(m_iSampleRate);
-
-    //Buffer
-    m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, 16, 512));
-
-    m_pGUSBAmpProducer->start();
 
     if(m_pGUSBAmpProducer->isRunning())
     {
@@ -298,7 +315,6 @@ QWidget* GUSBAmp::setupWidget()
 
 void GUSBAmp::run()
 {
-    qDebug()<<m_pFiffInfo->chs.size();
     while(m_bIsRunning)
     {
         //pop matrix only if the producer thread is running
@@ -306,7 +322,7 @@ void GUSBAmp::run()
         {
             //qDebug()<<"GUSBAmp is running";
             MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
-            qDebug() << matValue.rows()<< matValue.cols();
+            //qDebug() << matValue.rows()<< matValue.cols();
 
             //emit values to real time multi sample array
             m_pRMTSA_GUSBAmp->data()->setValue(matValue.cast<double>());
