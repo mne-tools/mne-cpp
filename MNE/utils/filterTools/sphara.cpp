@@ -61,3 +61,35 @@ Sphara::Sphara()
 
 
 //*************************************************************************************************************
+
+MatrixXd Sphara::makeSpharaProjector(const MatrixXd& matBaseFct, const VectorXi& vecIndices, int iOperatorDim, int iNBaseFct)
+{
+    MatrixXd matSpharaOperator = MatrixXd::Identity(iOperatorDim, iOperatorDim);
+
+    //Remove unwanted base functions
+    MatrixXd matSpharaGradCut = matBaseFct.block(0,0,matBaseFct.rows(),iNBaseFct);
+    MatrixXd matSpharaMultGrad = matSpharaGradCut * matSpharaGradCut.transpose().eval();
+
+    //Create the SPHARA operator
+    int rowIndex = 0;
+    int colIndex = 0;
+
+    for(int r = 0; r<vecIndices.rows(); r++) {
+        for(int c = 0; c<vecIndices.rows(); c++) {
+            matSpharaOperator(vecIndices(r),vecIndices(c)) = matSpharaMultGrad(rowIndex,colIndex);
+            colIndex++;
+        }
+        colIndex = 0;
+        rowIndex++;
+    }
+
+    return matSpharaOperator;
+}
+
+
+
+
+
+
+
+
