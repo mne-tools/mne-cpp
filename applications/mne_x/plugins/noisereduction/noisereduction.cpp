@@ -319,36 +319,33 @@ void NoiseReduction::initSphara()
     read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
 
     //Generate indices used to create the SPHARA operators.
-    if(m_sCurrentSystem == "VectorView") {
-        indicesFirstVV.resize(0);
-        indicesSecondVV.resize(0);
+    indicesFirstVV.resize(0);
+    indicesSecondVV.resize(0);
 
-        for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
-            //Find GRADIOMETERS
-            if(m_pFiffInfo->chs.at(r).coil_type == 3012) {
-                indicesFirstVV.conservativeResize(indicesFirstVV.rows()+1);
-                indicesFirstVV(indicesFirstVV.rows()-1) = r;
-            }
+    for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
+        //Find GRADIOMETERS
+        if(m_pFiffInfo->chs.at(r).coil_type == 3012) {
+            indicesFirstVV.conservativeResize(indicesFirstVV.rows()+1);
+            indicesFirstVV(indicesFirstVV.rows()-1) = r;
+        }
 
-            //Find Magnetometers
-            if(m_pFiffInfo->chs.at(r).coil_type == 3024) {
-                indicesSecondVV.conservativeResize(indicesSecondVV.rows()+1);
-                indicesSecondVV(indicesSecondVV.rows()-1) = r;
-            }
+        //Find Magnetometers
+        if(m_pFiffInfo->chs.at(r).coil_type == 3024) {
+            indicesSecondVV.conservativeResize(indicesSecondVV.rows()+1);
+            indicesSecondVV(indicesSecondVV.rows()-1) = r;
         }
     }
 
-    if(m_sCurrentSystem == "BabyMEG") {
-        indicesFirstBabyMEG.resize(0);
-        for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
-            //Find INNER LAYER
-            if(m_pFiffInfo->chs.at(r).coil_type == 7002) {
-                indicesFirstBabyMEG.conservativeResize(indicesFirstBabyMEG.rows()+1);
-                indicesFirstBabyMEG(indicesFirstBabyMEG.rows()-1) = r;
-            }
 
-            //TODO: Find outer layer
+    indicesFirstBabyMEG.resize(0);
+    for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
+        //Find INNER LAYER
+        if(m_pFiffInfo->chs.at(r).coil_type == 7002) {
+            indicesFirstBabyMEG.conservativeResize(indicesFirstBabyMEG.rows()+1);
+            indicesFirstBabyMEG(indicesFirstBabyMEG.rows()-1) = r;
         }
+
+        //TODO: Find outer layer
     }
 
 //    qDebug()<<"NoiseReduction::createSpharaOperator - Read VectorView mag matrix "<<m_matSpharaVVMagLoaded.rows()<<m_matSpharaVVMagLoaded.cols()<<"and grad matrix"<<m_matSpharaVVGradLoaded.rows()<<m_matSpharaVVGradLoaded.cols();
