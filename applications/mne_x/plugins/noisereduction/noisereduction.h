@@ -130,6 +130,14 @@ public:
 public slots:
     //=========================================================================================================
     /**
+    * Set the acquisition system type (BabyMEG, VecotrView, EEG).
+    *
+    * @param[in] sSystem    The type of the acquisition system.
+    */
+    void setAcquisitionSystem(const QString &sSystem);
+
+    //=========================================================================================================
+    /**
     * Set the active flag for SPHARA processing.
     *
     * @param[in] state    The new activity flag.
@@ -168,7 +176,7 @@ protected:
     /**
     * Create/Update the SPHARA projection operator.
     */
-    void creatSpharaOperator();
+    void createSpharaOperator();
 
     //=========================================================================================================
     /**

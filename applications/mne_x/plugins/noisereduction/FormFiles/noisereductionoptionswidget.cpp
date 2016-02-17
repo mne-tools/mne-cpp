@@ -71,6 +71,10 @@ NoiseReductionOptionsWidget::NoiseReductionOptionsWidget(NoiseReduction* toolbox
             this, &NoiseReductionOptionsWidget::onNBaseFctsChanged);
     connect(ui->m_spinBox_nBaseFctsGrad, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &NoiseReductionOptionsWidget::onNBaseFctsChanged);
+    connect(ui->m_comboBox_acquisitionSystem, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged),
+            m_pNoiseReductionToolbox, &NoiseReduction::setAcquisitionSystem);
+    connect(ui->m_comboBox_acquisitionSystem, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged),
+            this, &NoiseReductionOptionsWidget::setAcquisitionSystem);
 }
 
 
@@ -92,7 +96,7 @@ void NoiseReductionOptionsWidget::onNBaseFctsChanged()
 
 //*************************************************************************************************************
 
-void NoiseReductionOptionsWidget::setAcquisitionSystem(QString sSystem)
+void NoiseReductionOptionsWidget::setAcquisitionSystem(const QString &sSystem)
 {
     if(sSystem == "VectorView") {
         ui->m_label_nBaseFctsMag->setText("Mag");
