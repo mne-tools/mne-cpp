@@ -168,9 +168,9 @@ protected:
 
     //=========================================================================================================
     /**
-    * Read the SPHARA matrices.
+    * Init the SPHARA method.
     */
-    void readSpharaMatrix();
+    void initSphara();
 
     //=========================================================================================================
     /**
@@ -207,6 +207,11 @@ private:
     int                 m_iNBaseFctsFirst;          /**< The number of grad/inner base functions to use for calculating the sphara opreator.*/
     int                 m_iNBaseFctsSecond;         /**< The number of grad/outer base functions to use for calculating the sphara opreator.*/
     QString             m_sCurrentSystem;           /**< The current acquisition system (EEG, babyMEG, VectorView).*/
+
+    Eigen::VectorXi     indicesFirstVV;
+    Eigen::VectorXi     indicesSecondVV;
+    Eigen::VectorXi     indicesFirstBabyMEG;
+    Eigen::VectorXi     indicesSecondBabyMEG;
 
     Eigen::MatrixXd     m_matSpharaMultFirst;      /**< The final first SPHARA operator (in case of babymeg this is the inner layer, in case of vector view these are the gradiometers).*/
     Eigen::MatrixXd     m_matSpharaMultSecond;     /**< The final second magnetometer SPHARA operator (in case of babymeg this is the outer layer, in case of vector view these are the magnetometers).*/
