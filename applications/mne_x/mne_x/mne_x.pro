@@ -113,9 +113,15 @@ INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 RESOURCES += \
     mainApp.qrc
 
-RC_FILE = images/appIcons/mne-x.rc
-
 unix: QMAKE_CXXFLAGS += -Wno-attributes
+
+# Icon
+win32 {
+    RC_FILE = images/appIcons/mne-x.rc
+}
+macx {
+    ICON = images/appIcons/mne-x.icns
+}
 
 # Deploy Qt Dependencies
 unix:!macx {
