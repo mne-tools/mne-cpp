@@ -196,19 +196,17 @@ private:
     bool                m_bIsRunning;               /**< Flag whether thread is running.*/
     bool                m_bSpharaActive;            /**< Flag whether thread is running.*/
 
-    int                 m_iNBaseFctsGrad;           /**< The number of grad/inner base functions to use for calculating the sphara opreator.*/
-    int                 m_iNBaseFctsMag;            /**< The number of grad/outer base functions to use for calculating the sphara opreator.*/
+    int                 m_iNBaseFctsFirst;          /**< The number of grad/inner base functions to use for calculating the sphara opreator.*/
+    int                 m_iNBaseFctsSecond;         /**< The number of grad/outer base functions to use for calculating the sphara opreator.*/
     QString             m_sCurrentSystem;           /**< The current acquisition system (EEG, babyMEG, VectorView).*/
 
-    Eigen::MatrixXd     m_matSpharaMultSecond;       /**< The VectorView gradiometer SPHARA operator.*/
-    Eigen::MatrixXd     m_matSpharaMultFirst;      /**< The VectorView magnetometer SPHARA operator.*/
-    Eigen::MatrixXd     m_matSpharaMultBMInner;     /**< The babyMEG inner layer SPHARA operator.*/
-    Eigen::MatrixXd     m_matSpharaMultBMOuter;     /**< The babyMEG outer layer SPHARA operator.*/
+    Eigen::MatrixXd     m_matSpharaMultFirst;      /**< The final first SPHARA operator (in case of babymeg this is the inner layer, in case of vector view these are the gradiometers).*/
+    Eigen::MatrixXd     m_matSpharaMultSecond;     /**< The final second magnetometer SPHARA operator (in case of babymeg this is the outer layer, in case of vector view these are the magnetometers).*/
 
-    Eigen::MatrixXd     m_matSpharaVVGradFull;      /**< The VectorView gradiometer basis functions.*/
-    Eigen::MatrixXd     m_matSpharaVVMagFull;       /**< The VectorView magnetometer basis functions.*/
-    Eigen::MatrixXd     m_matSpharaBabyMEGInnerFull;/**< The babyMEG inner layer basis functions.*/
-    Eigen::MatrixXd     m_matSpharaBabyMEGOuterFull;/**< The babyMEG outer layer basis functions.*/
+    Eigen::MatrixXd     m_matSpharaVVGradLoaded;        /**< The loaded VectorView gradiometer basis functions.*/
+    Eigen::MatrixXd     m_matSpharaVVMagLoaded;         /**< The loaded VectorView magnetometer basis functions.*/
+    Eigen::MatrixXd     m_matSpharaBabyMEGInnerLoaded;  /**< The loaded babyMEG inner layer basis functions.*/
+    Eigen::MatrixXd     m_matSpharaBabyMEGOuterLoaded;  /**< The loaded babyMEG outer layer basis functions.*/
 
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                /**< Fiff measurement info.*/
 
