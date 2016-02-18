@@ -132,7 +132,7 @@ QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const
         m_bModalitiy = false;
     }
 
-    //Create the scaling group
+    //Decide whether to complete hide some groups
     if(!m_bFilter && !m_bProjections && !m_bCompensator) {
         ui->m_groupBox_noise->hide();
     }
