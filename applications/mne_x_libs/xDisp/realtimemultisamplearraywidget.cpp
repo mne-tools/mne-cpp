@@ -406,13 +406,17 @@ void RealTimeMultiSampleArrayWidget::init()
         m_pSelectionManagerWindow->setCurrentLayoutFile(settings.value(QString("RTMSAW/%1/selectedLayoutFile").arg(t_sRTMSAWName), "babymeg-mag-inner-layer.lout").toString());
 
         //-------- Init quick control widget --------
+        QStringList slFlags;
+
         #ifdef BUILD_BASIC_MNEX_VERSION
             std::cout<<"BUILD_BASIC_MNEX_VERSION Defined"<<std::endl;
-            m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display", 0, true, false, true, false, false, false));
+            slFlags << "projections" << "view" << "scaling";
         #else
             std::cout<<"BUILD_BASIC_MNEX_VERSION Undefined"<<std::endl;
-            m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display"));
+            slFlags << "compensators" << "projections" << "filter" << "view" << "triggerdetection" << "scaling";
         #endif
+
+        m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display", slFlags));
 
         m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
