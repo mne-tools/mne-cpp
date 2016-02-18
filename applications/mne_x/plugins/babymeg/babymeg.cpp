@@ -761,7 +761,7 @@ bool BabyMEG::readCompensators()
     FiffStream::SPtr t_pStream(new FiffStream(&t_compFiffFile));
     QString t_sFileName = t_pStream->streamName();
 
-    printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
+    printf("Opening compensator data %s...\n",t_sFileName.toUtf8().constData());
 
     FiffDirTree t_Tree;
     QList<FiffDirEntry> t_Dir;

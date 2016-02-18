@@ -54,18 +54,12 @@ using namespace XDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const FiffInfo::SPtr pFiffInfo, QString name, QWidget *parent, bool bScaling, bool bProjections, bool bView, bool bFilter, bool bModalities, bool bCompensator, bool bTriggerDetection)
+QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const FiffInfo::SPtr pFiffInfo, QString name, QStringList slFlags, QWidget *parent)
 : RoundedEdgesWidget(parent, Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint)
 , ui(new Ui::QuickControlWidget)
 , m_qMapChScaling(qMapChScaling)
 , m_pFiffInfo(pFiffInfo)
-, m_bScaling(bScaling)
-, m_bProjections(bProjections)
-, m_bView(bView)
-, m_bFilter(bFilter)
-, m_bModalitiy(bModalities)
-, m_bCompensator(bCompensator)
-, m_bTriggerDetection(bTriggerDetection)
+, m_slFlags(slFlags)
 , m_sName(name)
 {
     ui->setupUi(this);
@@ -86,31 +80,66 @@ QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const
             m_qMapTriggerColor.insert(pFiffInfo->chs[i].ch_name, QColor(170,0,0));
     }
 
-    //Create different quick control groups
-    if(m_bScaling)
+    //Init bool flags from string list and create groups respectivley
+    if(m_slFlags.contains("scaling", Qt::CaseInsensitive)) {
         createScalingGroup();
-    else
-        ui->m_groupBox_scaling->hide();
+        m_bScaling = true;
+    } else {
+        m_bScaling = false;
+    }
 
-    if(m_bProjections)
+    if(m_slFlags.contains("projections", Qt::CaseInsensitive)) {
         createProjectorGroup();
-    else
-        ui->m_groupBox_projections->hide();
+        m_bProjections = true;
+    } else {
+        m_bProjections = false;
+    }
 
-    if(m_bView)
-        createOtherGroup();
-    else
-        ui->m_groupBox_view->hide();
-
-    if(m_bModalitiy)
-        createModalityGroup();
-
-    if(m_bCompensator)
+    if(m_slFlags.contains("compensators", Qt::CaseInsensitive)) {
         createCompensatorGroup();
-    else
-        ui->m_groupBox_compensators->hide();
+        m_bCompensator = true;
+    } else {
+        m_bCompensator = false;
+    }
 
-    ui->m_groupBox_filter->hide();
+    if(m_slFlags.contains("view", Qt::CaseInsensitive)) {
+        createViewGroup();
+        m_bView = true;
+    } else {
+        ui->m_tabWidget_viewOptions->removeTab(0);
+        m_bView = false;
+    }
+
+    if(m_slFlags.contains("filter", Qt::CaseInsensitive)) {
+        m_bFilter = true;
+    } else {
+        m_bFilter = false;
+    }
+
+    if(m_slFlags.contains("triggerdetection", Qt::CaseInsensitive)) {
+        createTriggerDetectionGroup();
+        m_bTriggerDetection = true;
+    } else {
+        ui->m_tabWidget_viewOptions->removeTab(ui->m_tabWidget_viewOptions->count()-1);
+        m_bTriggerDetection = false;
+    }
+
+    if(m_slFlags.contains("modalities", Qt::CaseInsensitive)) {
+        createModalityGroup();
+        m_bModalitiy = true;
+    } else {
+        ui->m_groupBox_modalities->hide();
+        m_bModalitiy = false;
+    }
+
+    //Decide whether to complete hide some groups
+    if(!m_bFilter && !m_bProjections && !m_bCompensator) {
+        ui->m_groupBox_noise->hide();
+    }
+
+    if(!m_bView && !m_bTriggerDetection) {
+        ui->m_groupBox_other->hide();
+    }
 
     this->adjustSize();
 }
@@ -129,8 +158,6 @@ QuickControlWidget::~QuickControlWidget()
 void QuickControlWidget::filterGroupChanged(QList<QCheckBox*> list)
 {
     if(m_bFilter) {
-        ui->m_groupBox_filter->show();
-
         m_qFilterListCheckBox.clear();
 
         for(int u = 0; u<list.size(); u++) {
@@ -151,17 +178,24 @@ void QuickControlWidget::filterGroupChanged(QList<QCheckBox*> list)
         }
 
         //Delete all widgets in the filter layout
-        QGridLayout* topLayout = static_cast<QGridLayout*>(ui->m_groupBox_filter->layout());
-        if(!topLayout)
-           topLayout = new QGridLayout();
-
-        QLayoutItem *child;
-        while ((child = topLayout->takeAt(0)) != 0) {
-            delete child->widget();
-            delete child;
+        for(int i = 0; i<ui->m_tabWidget_noiseReduction->count(); i++) {
+            if(ui->m_tabWidget_noiseReduction->tabText(i) == "Filter") {
+                ui->m_tabWidget_noiseReduction->removeTab(i);
+            }
         }
 
+//        QGridLayout* topLayout = static_cast<QGridLayout*>(ui->m_groupBox_filter->layout());
+//        if(!topLayout)
+//           topLayout = new QGridLayout();
+
+//        QLayoutItem *child;
+//        while ((child = topLayout->takeAt(0)) != 0) {
+//            delete child->widget();
+//            delete child;
+//        }
+
         //Add filters
+        QGridLayout* topLayout = new QGridLayout();
         int u = 0;
 
         for(u; u<m_qFilterListCheckBox.size(); u++)
@@ -177,11 +211,12 @@ void QuickControlWidget::filterGroupChanged(QList<QCheckBox*> list)
 
         topLayout->addWidget(m_pShowFilterOptions, u+1, 0);
 
-        ui->m_groupBox_filter->setLayout(topLayout);
+        QWidget* tempWidget = new QWidget();
+        tempWidget->setLayout(topLayout);
+        ui->m_tabWidget_noiseReduction->addTab(tempWidget, QIcon(), QString("Filter"));
 
         //createViewGroup();
-    } else
-        ui->m_groupBox_filter->hide();
+    }
 }
 
 
@@ -496,7 +531,9 @@ void QuickControlWidget::createProjectorGroup()
         connect(m_enableDisableProjectors, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &QuickControlWidget::enableDisableAllProj);
 
-        ui->m_groupBox_projections->setLayout(topLayout);
+        QWidget* tempWidget = new QWidget();
+        tempWidget->setLayout(topLayout);
+        ui->m_tabWidget_noiseReduction->addTab(tempWidget, QIcon(), QString("SSP"));
 
         //Set default activation to true
         enableDisableAllProj(true);
@@ -506,7 +543,7 @@ void QuickControlWidget::createProjectorGroup()
 
 //*************************************************************************************************************
 
-void QuickControlWidget::createOtherGroup()
+void QuickControlWidget::createViewGroup()
 {
     //Number of visible channels
     connect(ui->m_doubleSpinBox_numberVisibleChannels, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
@@ -516,6 +553,20 @@ void QuickControlWidget::createOtherGroup()
     connect(ui->m_spinBox_windowSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &QuickControlWidget::timeWindowChanged);
 
+    //opacity
+    connect(ui->m_horizontalSlider_opacity, &QSlider::valueChanged,
+            this, &QuickControlWidget::onOpacityChange);
+
+    //Distance for timer spacer
+    connect(ui->m_comboBox_distaceTimeSpacer, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this, &QuickControlWidget::onDistanceTimeSpacerChanged);
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::createTriggerDetectionGroup()
+{
     //Trigger detection
     connect(ui->m_checkBox_activateTriggerDetection, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
             this, &QuickControlWidget::realTimeTriggerActiveChanged);
@@ -546,17 +597,6 @@ void QuickControlWidget::createOtherGroup()
 
     connect(ui->m_pushButton_resetNumberTriggers, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             this, &QuickControlWidget::onResetTriggerNumbers);
-
-    if(!m_bTriggerDetection)
-        ui->m_tabWidget_viewOptions->removeTab(1);
-
-    //opacity
-    connect(ui->m_horizontalSlider_opacity, &QSlider::valueChanged,
-            this, &QuickControlWidget::onOpacityChange);
-
-    //Distance for timer spacer
-    connect(ui->m_comboBox_distaceTimeSpacer, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &QuickControlWidget::onDistanceTimeSpacerChanged);
 }
 
 
@@ -564,9 +604,6 @@ void QuickControlWidget::createOtherGroup()
 
 void QuickControlWidget::createModalityGroup()
 {
-    m_pModalityGroupBox = new QGroupBox;
-    m_pModalityGroupBox->setTitle("Modalities");
-
     m_qListModalities.clear();
     bool hasMag = false;
     bool hasGrad = false;
@@ -623,17 +660,7 @@ void QuickControlWidget::createModalityGroup()
 
     }
 
-    m_pModalityGroupBox->setLayout(t_pGridLayout);
-
-    //Decide where to put the group box depending on already available group boxes
-    if(!m_bView && m_bFilter)
-        ui->m_gridLayout_masterLayout->addWidget(m_pModalityGroupBox, ui->m_gridLayout_masterLayout->rowCount()-1, 0, 1, 1);
-
-    if((m_bView && m_bFilter) || (!m_bView && !m_bFilter))
-        ui->m_gridLayout_masterLayout->addWidget(m_pModalityGroupBox, ui->m_gridLayout_masterLayout->rowCount(), 0, 1, 2);
-
-    if(m_bView && !m_bFilter)
-        ui->m_gridLayout_masterLayout->addWidget(m_pModalityGroupBox, ui->m_gridLayout_masterLayout->rowCount()-1, 1, 1, 1);
+    ui->m_groupBox_modalities->setLayout(t_pGridLayout);
 }
 
 
@@ -674,7 +701,9 @@ void QuickControlWidget::createCompensatorGroup()
         connect(this, &QuickControlWidget::compClicked,
                 this, &QuickControlWidget::checkCompStatusChanged);
 
-        ui->m_groupBox_compensators->setLayout(topLayout);
+        QWidget* tempWidget = new QWidget();
+        tempWidget->setLayout(topLayout);
+        ui->m_tabWidget_noiseReduction->addTab(tempWidget, QIcon(), QString("Comp"));
     }
 }
 
@@ -954,41 +983,34 @@ void QuickControlWidget::realTimeTriggerCurrentChChanged(const QString &value)
 void QuickControlWidget::toggleHideAll(bool state)
 {
     if(!state) {
-        ui->m_groupBox_projections->hide();
-        ui->m_groupBox_filter->hide();
+        //ui->m_widget_master->hide();
+        ui->m_groupBox_modalities->hide();
+        ui->m_groupBox_noise->hide();
+        ui->m_groupBox_other->hide();
         ui->m_groupBox_scaling->hide();
-        ui->m_groupBox_view->hide();
-        ui->m_groupBox_compensators->hide();
-
-        if(m_bModalitiy)
-            m_pModalityGroupBox->hide();
 
         ui->m_pushButton_hideAll->setText(QString("Maximize - Quick Control - %1").arg(m_sName));
     }
     else {
-        if(m_bProjections)
-            ui->m_groupBox_projections->show();
+        ui->m_groupBox_scaling->show();
 
-        if(m_bFilter)
-            ui->m_groupBox_filter->show();
+        if(m_bFilter || m_bProjections || m_bCompensator) {
+            ui->m_groupBox_noise->show();
+        }
 
-        if(m_bScaling)
-            ui->m_groupBox_scaling->show();
+        if(m_bView || m_bTriggerDetection) {
+            ui->m_groupBox_other->show();
+        }
 
-        if(m_bView)
-            ui->m_groupBox_view->show();
-
-        if(m_bModalitiy)
-            m_pModalityGroupBox->show();
-
-        if(m_bCompensator)
-            ui->m_groupBox_compensators->show();
+        if(m_bModalitiy) {
+            ui->m_groupBox_modalities->show();
+        }
 
         ui->m_pushButton_hideAll->setText(QString("Minimize - Quick Control - %1").arg(m_sName));
     }
 
     this->adjustSize();
-    this->resize(width(), ui->m_pushButton_hideAll->height()-50);
+    this->resize(width(), ui->m_pushButton_hideAll->height()-150);
 }
 
 

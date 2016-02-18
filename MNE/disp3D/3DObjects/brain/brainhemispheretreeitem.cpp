@@ -60,8 +60,14 @@ using namespace DISP3DLIB;
 BrainHemisphereTreeItem::BrainHemisphereTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
-    this->setEditable(false);
+    this->setEditable(false);    
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
     this->setToolTip("Brain hemisphere");
+
+    //Do the connects
+    connect(this, &BrainHemisphereTreeItem::checkStateChanged,
+            this, &BrainHemisphereTreeItem::onCheckStateChanged);
 }
 
 
@@ -202,5 +208,13 @@ BrainRTSourceLocDataTreeItem* BrainHemisphereTreeItem::addData(const MNESourceEs
     }
 
     return new BrainRTSourceLocDataTreeItem();
+}
+
+
+//*************************************************************************************************************
+
+void BrainHemisphereTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+{
+    m_pSurfaceItem->setVisible(checkState==Qt::Unchecked ? false : true);
 }
 
