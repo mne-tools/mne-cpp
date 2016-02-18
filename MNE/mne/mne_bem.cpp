@@ -343,7 +343,7 @@ void MNEBem::write(QIODevice &p_IODevice)
 
     // Create the file and save the essentials
     FiffStream::SPtr t_pStream = FiffStream::start_file(p_IODevice);
-    printf("Write BEM surface in %s...", t_pStream->streamName().toUtf8().constData(), "\n");
+    printf("Write BEM surface in %s...\n", t_pStream->streamName().toUtf8().constData());
     this->writeToStream(t_pStream.data());
 }
 
