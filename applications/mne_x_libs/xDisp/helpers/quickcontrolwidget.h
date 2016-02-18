@@ -130,7 +130,7 @@ public:
     * @param [in] parent    parent of widget
     * @param [in] qMapChScaling    pointer to scaling information
     */
-    QuickControlWidget(QMap<qint32, float> qMapChScaling, const FiffInfo::SPtr pFiffInfo, QString name = "", QWidget *parent = 0, bool bScaling = true, bool bProjections = true, bool bView = true, bool bFilter = true, bool bModalities = false, bool bCompensator = true, bool bTriggerDetection = true);
+    QuickControlWidget(QMap<qint32, float> qMapChScaling, const FiffInfo::SPtr pFiffInfo, QString name = "", QStringList slFlags = QStringList("Scaling"), QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -276,9 +276,15 @@ protected:
 
     //=========================================================================================================
     /**
-    * Create the widgets used in the other group
+    * Create the widgets used in the view group
     */
-    void createOtherGroup();
+    void createViewGroup();
+
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the trigger detection group
+    */
+    void createTriggerDetectionGroup();
 
     //=========================================================================================================
     /**
@@ -409,6 +415,8 @@ protected:
     void userFilterToggled(bool state);
 
 private:
+    QStringList m_slFlags;
+
     bool        m_bScaling;         /**< Flag for drawing the scaling group box */
     bool        m_bProjections;     /**< Flag for drawing the projection group box */
     bool        m_bView;            /**< Flag for drawing the view group box */
@@ -432,7 +440,6 @@ private:
     QString             m_sName;                        /**< Name of the widget which uses this quick control. */
     QCheckBox *         m_enableDisableProjectors;      /**< Holds the enable disable all check box. */
     QPushButton*        m_pShowFilterOptions;           /**< Holds the show filter options button. */
-    QGroupBox*          m_pModalityGroupBox;            /**< Holds the modality group box. */
 
     QSignalMapper*      m_pCompSignalMapper;
 
