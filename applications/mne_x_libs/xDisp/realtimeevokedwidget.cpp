@@ -444,7 +444,12 @@ void RealTimeEvokedWidget::init()
         m_pActionSelectSensors->setVisible(true);
 
         //-------- Init quick control widget --------
-        m_pQuickControlWidget = QuickControlWidget::SPtr(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Averaging", 0, true, true, false, true, true, false));
+        QStringList slFlags;
+        slFlags <<  "projections" << "filter" << "triggerdetection" << "scaling" << "modalities";
+
+        m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Averaging", slFlags));
+
+        //m_pQuickControlWidget = QuickControlWidget::SPtr(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Averaging", 0, true, true, false, true, true, false));
         m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
         //Handle scaling

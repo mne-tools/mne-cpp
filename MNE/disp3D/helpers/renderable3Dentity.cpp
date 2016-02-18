@@ -59,7 +59,8 @@ Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
 : Qt3DCore::QEntity(parent)
 , m_pCustomMesh(CustomMesh::SPtr(new CustomMesh()))
 , m_pTransform(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
-, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPerVertexColorMaterial))
+, m_pMaterial(new ShaderMaterial(this))
+//, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPerVertexColorMaterial))
 //, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPhongMaterial(this)))
 {
     this->addComponent(m_pCustomMesh.data());

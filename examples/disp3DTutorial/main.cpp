@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 40);
+    MNEForwardSolution t_clusteredFwd = t_Fwd;//.cluster_forward_solution(t_annotationSet, 40);
 
     //
     // make an inverse operators

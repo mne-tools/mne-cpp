@@ -205,17 +205,99 @@ public:
     *
     * @param[in] in         input eigen value which is to be written to file
     * @param[in] path       path and file name to write to
-    *
     */
     template<typename T>
-    static void write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QString& path);
+    static bool write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QString& path);
+
+    //=========================================================================================================
+    /**
+    * Read Eigen Matrix from file
+    *
+    * @param[out] out       output eigen value
+    * @param[in] path       path and file name to read from
+    */
+    template<typename T>
+    static bool read_eigen_matrix(Matrix<T, Dynamic, Dynamic>& out, const QString& path);
 };
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+//*************************************************************************************************************
 
+template<typename T>
+bool IOUtils::write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QString& path)
+{
+    QFile file(path);
+    if(file.open(QIODevice::WriteOnly|QIODevice::Truncate))
+    {
+        QTextStream stream(&file);
+        stream<<"Dimensions (rows x cols): "<<in.rows()<<" x "<<in.cols()<<"\n";
+        for(int row = 0; row<in.rows(); row++) {
+            for(int col = 0; col<in.cols(); col++)
+                stream << in(row, col)<<" ";
+            stream<<"\n";
+        }
+    } else {
+        qWarning()<<"Could not write Eigen element to file! Path does not exist!";
+        return false;
+    }
+
+    file.close();
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+template<typename T>
+bool IOUtils::read_eigen_matrix(Matrix<T, Dynamic, Dynamic>& out, const QString& path)
+{
+    QFile file(path);
+
+    if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        //Start reading from file
+        QTextStream in(&file);
+        int i=0;
+        QList<VectorXd> help;
+
+        while(!in.atEnd())
+        {
+            QString line = in.readLine();
+            QStringList fields = line.split(QRegExp("\\s+"));
+
+            //Delete last element if it is a blank character
+            if(fields.at(fields.size()-1) == "")
+                fields.removeLast();
+
+            VectorXd x (fields.size());
+            //Read actual electrode position
+            for (int j=0; j<fields.size(); j++) {
+                x(j)=fields.at(j).toDouble();
+            }
+
+            help.append(x);
+
+            i++;
+        }
+
+        int rows = help.size();
+        int cols = rows<=0 ? 0 : help.at(0).rows();
+
+        out.resize(rows, cols);
+
+        for (int i=0; i<help.length(); i++) {
+            out.row(i)=help[i].transpose();
+        }
+    } else {
+        qWarning()<<"IOUtils::read_eigen_matrix - Could not read Eigen element from file! Path does not exist!";
+        return false;
+    }
+
+    return true;
+}
 
 } // NAMESPACE
 
