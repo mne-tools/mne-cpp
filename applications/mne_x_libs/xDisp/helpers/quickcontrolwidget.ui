@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>411</width>
-    <height>273</height>
+    <width>456</width>
+    <height>447</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -31,30 +31,46 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="0" colspan="2">
     <layout class="QGridLayout" name="m_gridLayout_masterLayout">
-     <item row="0" column="1">
-      <widget class="QGroupBox" name="m_groupBox_projections">
+     <item row="1" column="0">
+      <widget class="QGroupBox" name="m_groupBox_noise">
        <property name="title">
-        <string>Projections</string>
+        <string>Noise</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QTabWidget" name="m_tabWidget_noiseReduction">
+          <property name="currentIndex">
+           <number>-1</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QGroupBox" name="m_groupBox_modalities">
+       <property name="title">
+        <string>Modalities</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="QGroupBox" name="m_groupBox_filter">
+     <item row="0" column="0">
+      <widget class="QGroupBox" name="m_groupBox_scaling">
        <property name="title">
-        <string>Filter</string>
+        <string>Scaling</string>
        </property>
       </widget>
      </item>
      <item row="2" column="0">
-      <widget class="QGroupBox" name="m_groupBox_view">
+      <widget class="QGroupBox" name="m_groupBox_other">
        <property name="title">
         <string>Other</string>
        </property>
-       <layout class="QHBoxLayout" name="horizontalLayout">
+       <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <widget class="QTabWidget" name="m_tabWidget_viewOptions">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab">
            <attribute name="title">
@@ -288,40 +304,7 @@
        </layout>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QGroupBox" name="m_groupBox_compensators">
-       <property name="title">
-        <string>Compensators</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0" rowspan="2">
-      <widget class="QGroupBox" name="m_groupBox_scaling">
-       <property name="minimumSize">
-        <size>
-         <width>220</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="title">
-        <string>Scaling</string>
-       </property>
-      </widget>
-     </item>
     </layout>
-   </item>
-   <item row="0" column="0">
-    <widget class="QPushButton" name="m_pushButton_hideAll">
-     <property name="text">
-      <string>Minimize - Quick Control</string>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
    </item>
    <item row="0" column="1">
     <widget class="QPushButton" name="m_pushButton_close">
@@ -333,6 +316,19 @@
      </property>
      <property name="text">
       <string>Close</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QPushButton" name="m_pushButton_hideAll">
+     <property name="text">
+      <string>Minimize - Quick Control</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
