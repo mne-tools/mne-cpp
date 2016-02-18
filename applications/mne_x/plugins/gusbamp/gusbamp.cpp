@@ -69,21 +69,21 @@ using namespace std;
 //=============================================================================================================
 
 GUSBAmp::GUSBAmp()
-: m_pRMTSA_GUSBAmp(0)
+: m_pRTMSA_GUSBAmp(0)
 , m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/gusbamp/")
 , m_pRawMatrixBuffer_In(0)
 , m_pGUSBAmpProducer(new GUSBAmpProducer(this))
 , m_iNumberOfChannels(0)
 , m_iSamplesPerBlock(0)
-, m_iSampleRate(38400)
+, m_iSampleRate(1200)
 , m_sFilePath("d:/Clouds/OneDrive/Studium/Master/Masterarbeit/testing/gUSBamp/driver/data")
 {
-    m_viSizeOfSampleMatrix.resize(2,0);
+    m_viChannelsToAcquired = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
 
+    m_viSizeOfSampleMatrix.resize(2,0);
 
     m_vsSerials.resize(1,0);
     m_vsSerials[0]=(LPSTR("UB-2015.05.16"));
-
 
 }
 
@@ -199,9 +199,9 @@ QSharedPointer<IPlugin> GUSBAmp::clone() const
 
 void GUSBAmp::init()
 {
-    m_pRMTSA_GUSBAmp = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "GUSBAmp", "EEG output data");
+    m_pRTMSA_GUSBAmp = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "GUSBAmp", "EEG output data");
 
-    m_outputConnectors.append(m_pRMTSA_GUSBAmp);
+    m_outputConnectors.append(m_pRTMSA_GUSBAmp);
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 
@@ -228,7 +228,7 @@ bool GUSBAmp::start()
 
 
 
-    m_pGUSBAmpProducer->start(m_vsSerials, m_iSampleRate, m_sFilePath);
+    m_pGUSBAmpProducer->start(m_vsSerials, m_viChannelsToAcquired, m_iSampleRate, m_sFilePath);
 
     //Buffer
     m_viSizeOfSampleMatrix = m_pGUSBAmpProducer->getSizeOfSampleMatrix();
@@ -240,10 +240,10 @@ bool GUSBAmp::start()
     //Setup fiff info
     setUpFiffInfo();
 
-    //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
-    m_pRMTSA_GUSBAmp->data()->initFromFiffInfo(m_pFiffInfo);
-    m_pRMTSA_GUSBAmp->data()->setMultiArraySize(m_iSamplesPerBlock);
-    m_pRMTSA_GUSBAmp->data()->setSamplingRate(m_iSampleRate);
+    //Set the channel size of the RTMSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
+    m_pRTMSA_GUSBAmp->data()->initFromFiffInfo(m_pFiffInfo);
+    m_pRTMSA_GUSBAmp->data()->setMultiArraySize(m_iSamplesPerBlock);
+    m_pRTMSA_GUSBAmp->data()->setSamplingRate(m_iSampleRate);
 
     if(m_pGUSBAmpProducer->isRunning())
     {
@@ -276,7 +276,7 @@ bool GUSBAmp::stop()
 
     m_pRawMatrixBuffer_In->clear();
 
-    m_pRMTSA_GUSBAmp->data()->clear();
+    m_pRTMSA_GUSBAmp->data()->clear();
 
     return true;
 }
@@ -325,7 +325,7 @@ void GUSBAmp::run()
             //qDebug() << matValue.rows()<< matValue.cols();
 
             //emit values to real time multi sample array
-            m_pRMTSA_GUSBAmp->data()->setValue(matValue.cast<double>());
+            m_pRTMSA_GUSBAmp->data()->setValue(matValue.cast<double>());
         }
     }
 }

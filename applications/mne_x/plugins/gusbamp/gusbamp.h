@@ -182,7 +182,7 @@ protected:
     virtual void run();
 
 private:
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRMTSA_GUSBAmp;   /**< The RealTimeSampleArray to provide the EEG data.*/
+    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_GUSBAmp;   /**< The RealTimeSampleArray to provide the EEG data.*/
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
@@ -200,6 +200,7 @@ private:
     UCHAR               m_iNumberOfChannels;        /**< the channels that should be acquired from each device */
     QString             m_sFilePath;                /**< String of the Filepath where acquisition data will be stored */
     vector<int>         m_viSizeOfSampleMatrix;     /**< vector including the size of the two dimensional sample Matrix */
+    vector<int>         m_viChannelsToAcquired;     /**< vector of the calling numbers of the channels to be acquired */
 
 
 };

@@ -88,9 +88,10 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
         #pragma comment(lib, __FILE__"\\..\\gUSBamp_x86.lib")
     #endif
 
-    //initialize vector m_sizeOfMatrix
+    //initialize vector m_sizeOfMatrix with zeros
     m_sizeOfMatrix.resize(2,0);
 
+    //initialize the serial list and setting "UB-2015.05.16" for default
     m_vsSerials.resize(1,0);
     m_vsSerials[0]=(LPSTR("UB-2015.05.16"));
 
@@ -100,7 +101,7 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
     //initializing UCHAR-list of channels to acquire
     vector<int> channels = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
     //vector<int> channels = {5};
-    //vector<int> channels = {4, 5, 6};
+    //vector<int> channels = {4, 5};
     setChannels(channels);
 
     //setting Sample parameters and Number of Scans
@@ -140,7 +141,7 @@ bool GUSBAmpDriver::initDevice()
 
 
     //output of the setted parameters:
-    qDebug() << "Following parameters were setted:\n";
+    qDebug() << "\nFollowing parameters were setted:\n";
     qDebug() << "sample rate:\n" <<m_SAMPLE_RATE_HZ << "Hz" ;
     qDebug() << "called device(s):";
     for(deque<LPSTR>::iterator serialNumber = m_callSequenceSerials.begin(); serialNumber != m_callSequenceSerials.end(); serialNumber++)
@@ -536,7 +537,7 @@ bool GUSBAmpDriver::setSampleRate(int sampleRate)
         case 19200: m_NUMBER_OF_SCANS = 512;    break;
         case 38400: m_NUMBER_OF_SCANS = 512;    break;
         default: throw string("Error on setSampleRate(choosed default sample rate of 1200 Hz): please choose between following options:\n"
-                              "32, 64, 128, 256, 512, 600, 1200, 2400, 4800, 9600, 19200 and 38400\n\n:"); break;
+                              "32, 64, 128, 256, 512, 600, 1200, 2400, 4800, 9600, 19200 and 38400:\n"); break;
         }
         m_SAMPLE_RATE_HZ = sampleRate;
         //qDebug()<<"Sample Rate is setted"<<endl;
@@ -547,13 +548,9 @@ bool GUSBAmpDriver::setSampleRate(int sampleRate)
         return false;
     }
 
-    cout<< "slave serial size:" << m_SLAVE_SERIALS_SIZE << "\n";
-
     //refresh size of output matrix
     m_sizeOfMatrix[0] = (int(m_NUMBER_OF_CHANNELS)*int(1 + m_SLAVE_SERIALS_SIZE));    //number of channels * number of devices (number of channels)
     m_sizeOfMatrix[1] = (int(m_NUMBER_OF_SCANS)*int(m_QUEUE_SIZE));                   //number of the scanned samples * number of the queues (nummber of samples)
-
-
 
     //cout <<"sample rate [HZ]: \t" <<  m_SAMPLE_RATE_HZ << "\n" << "number of scans [/]:\t" << m_NUMBER_OF_SCANS << "\n";
 
@@ -571,48 +568,39 @@ bool GUSBAmpDriver::setChannels(vector<int> &list)
         return false;
     }
 
-    int numargin = list.size();
-    if (numargin > 16)
+    int size = list.size();
+    if (size > 16)
     {
         cout << "ERROR in GUSBAmpDriver::setChannels: Could not set channels. Size of channel-vector has to be less then 16\n";
         return false;
     }
 
-
-    //checking if value values of vector are ascending and smalller then 17
+    //checking if values of vector are ascending and smalller then 17
     int i = 0;
     do
         i++;
-    while ((i < numargin) && (list[i] > list[i - 1]) && (list[i] < 17));
-    if (i != numargin)
+    while ((i < size) && (list[i] > list[i - 1]) && (list[i] < 17));
+
+    if (i != size)
     {
         cout << "ERROR in GUSBAmpDriver::setChannels: values of the channels in the vector have to be ascending & less then 16\n";
         return false;
     }
 
-//    //m_NUMBER_OF_CHANNELS = 5;
-//    //initializing UCHAR-list of channels to acquire
-//    for(int i = 0; i < m_NUMBER_OF_CHANNELS; i++)
-//    {
-//        m_channelsToAcquire[i] = UCHAR(i+1);
-//        cout << "channel:" << int(m_channelsToAcquire[i]);
-//    }
-
-    for(int i = 0; i < numargin; i++)
+    //filling the UCHAR array with the values from the list
+    for(int i = 0; i < size; i++)
     {
-         m_channelsToAcquire[i] = UCHAR(list[i]);
-         //cout<< "channel " << int( m_channelsToAcquire[i]) << " setted \n";
+        m_channelsToAcquire[i] = UCHAR(list[i]);
+        //cout<< "channel " << int( m_channelsToAcquire[i]) << " setted \n";
     }
 
-    m_NUMBER_OF_CHANNELS    = UCHAR(numargin);
+    m_NUMBER_OF_CHANNELS    = UCHAR(size);
 
-
-    cout<< "number of channels [/]: \t" << int(m_NUMBER_OF_CHANNELS) << "\n";
+    //cout<< "number of channels [/]: \t" << int(m_NUMBER_OF_CHANNELS) << "\n";
 
     //refresh size of output matrix
     m_sizeOfMatrix[0] = (int(m_NUMBER_OF_CHANNELS)*int(1 + m_SLAVE_SERIALS_SIZE));    //number of channels * number of devices (number of channels)
     m_sizeOfMatrix[1] = (int(m_NUMBER_OF_SCANS)*int(m_QUEUE_SIZE));                   //number of the scanned samples * number of the queues (number of samples)
-
 
 
     return true;
