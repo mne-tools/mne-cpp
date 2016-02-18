@@ -127,8 +127,10 @@ public:
     /**
     * Constructs a QuickControlWidget which is a child of parent.
     *
-    * @param [in] parent    parent of widget
-    * @param [in] qMapChScaling    pointer to scaling information
+    * @param [in] qMapChScaling     The pointer to scaling information.
+    * @param [in] name              The name to be displayed on the minimize button.
+    * @param [in] slFlags           The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: projections, compensators, view,filter, triggerdetection, modalities, scaling.
+    * @param [in] parent            The parent of widget.
     */
     QuickControlWidget(QMap<qint32, float> qMapChScaling, const FiffInfo::SPtr pFiffInfo, QString name = "", QStringList slFlags = QStringList("Scaling"), QWidget *parent = 0);
 
@@ -415,35 +417,35 @@ protected:
     void userFilterToggled(bool state);
 
 private:
-    QStringList m_slFlags;
+    QStringList                     m_slFlags;                      /**< The list holding the current flags. */
 
-    bool        m_bScaling;         /**< Flag for drawing the scaling group box */
-    bool        m_bProjections;     /**< Flag for drawing the projection group box */
-    bool        m_bView;            /**< Flag for drawing the view group box */
-    bool        m_bFilter;          /**< Flag for drawing the filter group box */
-    bool        m_bModalitiy;       /**< Flag for drawing the modality group box */
-    bool        m_bCompensator;     /**< Flag for drawing the compensator group box */
-    bool        m_bTriggerDetection;/**< Flag for drawing the trigger detection tab in the view group box */
+    bool                            m_bScaling;                     /**< Flag for drawing the scaling group box. */
+    bool                            m_bProjections;                 /**< Flag for drawing the projection group box. */
+    bool                            m_bView;                        /**< Flag for drawing the view group box. */
+    bool                            m_bFilter;                      /**< Flag for drawing the filter group box. */
+    bool                            m_bModalitiy;                   /**< Flag for drawing the modality group box. */
+    bool                            m_bCompensator;                 /**< Flag for drawing the compensator group box. */
+    bool                            m_bTriggerDetection;            /**< Flag for drawing the trigger detection tab in the view group box. */
 
     QMap<qint32,float>              m_qMapChScaling;                /**< Channel scaling values. */
-    QMap<qint32, QDoubleSpinBox*>   m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits */
-    QMap<qint32, QSlider*>          m_qMapScalingSlider;            /**< Map of types and channel scaling line edits */
+    QMap<qint32, QDoubleSpinBox*>   m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits. */
+    QMap<qint32, QSlider*>          m_qMapScalingSlider;            /**< Map of types and channel scaling line edits. */
     QMap<QString, QColor>           m_qMapTriggerColor;             /**< Trigger channel colors. */
 
-    QList<Modality>     m_qListModalities;              /**< List of different modalities. */
-    QList<QCheckBox*>   m_qListProjCheckBox;            /**< List of projection CheckBox. */
-    QList<QCheckBox*>   m_qListCompCheckBox;            /**< List of compensator CheckBox. */
-    QList<QCheckBox*>   m_qFilterListCheckBox;          /**< List of filter CheckBox. */
-    QList<QCheckBox*>   m_qListModalityCheckBox;        /**< List of modality checkboxes */
-    FiffInfo::SPtr      m_pFiffInfo;                    /**< Connected fiff info. */
+    QList<Modality>                 m_qListModalities;              /**< List of different modalities. */
+    QList<QCheckBox*>               m_qListProjCheckBox;            /**< List of projection CheckBox. */
+    QList<QCheckBox*>               m_qListCompCheckBox;            /**< List of compensator CheckBox. */
+    QList<QCheckBox*>               m_qFilterListCheckBox;          /**< List of filter CheckBox. */
+    QList<QCheckBox*>               m_qListModalityCheckBox;        /**< List of modality checkboxes. */
+    FiffInfo::SPtr                  m_pFiffInfo;                    /**< Connected fiff info. */
 
-    QString             m_sName;                        /**< Name of the widget which uses this quick control. */
-    QCheckBox *         m_enableDisableProjectors;      /**< Holds the enable disable all check box. */
-    QPushButton*        m_pShowFilterOptions;           /**< Holds the show filter options button. */
+    QString                         m_sName;                        /**< Name of the widget which uses this quick control. */
+    QCheckBox *                     m_enableDisableProjectors;      /**< Holds the enable disable all check box. */
+    QPushButton*                    m_pShowFilterOptions;           /**< Holds the show filter options button. */
 
-    QSignalMapper*      m_pCompSignalMapper;
+    QSignalMapper*                  m_pCompSignalMapper;            /**< The signal mapper. */
 
-    Ui::QuickControlWidget *ui;                         /**< The generated UI file */
+    Ui::QuickControlWidget *        ui;                             /**< The generated UI file. */
 };
 
 } // NAMESPACE XDISPLIB
