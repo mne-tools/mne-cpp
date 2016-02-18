@@ -241,7 +241,7 @@ void IOUtils::swap_doublep(double *source)
 //*************************************************************************************************************
 
 template<typename T>
-void IOUtils::write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QString& path)
+bool IOUtils::write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QString& path)
 {
     QFile file(path);
     if(file.open(QIODevice::WriteOnly|QIODevice::Truncate))
@@ -255,16 +255,19 @@ void IOUtils::write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QS
         }
     } else {
         qWarning()<<"Could not write Eigen element to file! Path does not exist!";
+        return false;
     }
 
     file.close();
+
+    return true;
 }
 
 
 //*************************************************************************************************************
 
 template<typename T>
-void IOUtils::read_eigen_matrix(Matrix<T, Dynamic, Dynamic>& out, const QString& path)
+bool IOUtils::read_eigen_matrix(Matrix<T, Dynamic, Dynamic>& out, const QString& path)
 {
     QFile file(path);
 
@@ -304,5 +307,8 @@ void IOUtils::read_eigen_matrix(Matrix<T, Dynamic, Dynamic>& out, const QString&
         }
     } else {
         qWarning()<<"IOUtils::read_eigen_matrix - Could not read Eigen element from file! Path does not exist!";
+        return false;
     }
+
+    return true;
 }
