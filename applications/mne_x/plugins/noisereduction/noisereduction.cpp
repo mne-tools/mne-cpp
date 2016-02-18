@@ -312,11 +312,11 @@ void NoiseReduction::initSphara()
     m_matSpharaMultSecond = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
     //Load SPHARA matrix
-    read_eigen_matrix(m_matSpharaVVGradLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
-    read_eigen_matrix(m_matSpharaVVMagLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaVVGradLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaVVMagLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt"));
 
-    read_eigen_matrix(m_matSpharaBabyMEGInnerLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt"));
-    read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGInnerLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
 
     //Generate indices used to create the SPHARA operators.
     indicesFirstVV.resize(0);
@@ -371,76 +371,8 @@ void NoiseReduction::createSpharaOperator()
     }
 
     //Write final operator matrices to file
-    write_eigen_matrix(m_matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/m_matSpharaMultFirst.txt"));
-    write_eigen_matrix(m_matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/m_matSpharaMultSecond.txt"));
+    IOUtils::write_eigen_matrix(m_matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/m_matSpharaMultFirst.txt"));
+    IOUtils::write_eigen_matrix(m_matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/m_matSpharaMultSecond.txt"));
 
     m_mutex.unlock();
 }
-
-
-//*************************************************************************************************************
-
-template<typename T>
-void NoiseReduction::read_eigen_matrix(Matrix<T, Dynamic, Dynamic>& out, const QString& path)
-{
-    QFile file(path);
-
-    if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        //Start reading from file
-        QTextStream in(&file);
-        int i=0;
-        QList<VectorXd> help;
-
-        while(!in.atEnd())
-        {
-            QString line = in.readLine();
-            QStringList fields = line.split(QRegExp("\\s+"));
-
-            VectorXd x (fields.size());
-            //Read actual electrode position
-            for (int j=0; j<fields.size(); j++) {
-                x(j)=fields.at(j).toDouble();
-            }
-
-            help.append(x);
-
-            i++;
-        }
-
-        int rows = help.size();
-        int cols = rows<=0 ? 0 : help.at(0).rows();
-
-        out.resize(rows, cols);
-
-        for (int i=0; i<help.length(); i++) {
-            out.row(i) = help[i].transpose();
-        }
-    } else {
-        qWarning()<<"IOUtils::read_eigen_matrix - Could not read Eigen element from file! Path does not exist!";
-    }
-}
-
-
-
-//*************************************************************************************************************
-
-template<typename T>
-void NoiseReduction::write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QString& path)
-{
-    QFile file(path);
-    if(file.open(QIODevice::WriteOnly|QIODevice::Truncate))
-    {
-        QTextStream stream(&file);
-        stream<<"Dimensions (rows x cols): "<<in.rows()<<" x "<<in.cols()<<"\n";
-        for(int row = 0; row<in.rows(); row++) {
-            for(int col = 0; col<in.cols(); col++)
-                stream << in(row, col)<<" ";
-            stream<<"\n";
-        }
-    } else {
-        qWarning()<<"Could not write Eigen element to file! Path does not exist!";
-    }
-
-    file.close();
-}
-
