@@ -113,8 +113,13 @@ public:
     /**
     * Starts the GUSBAmpProducer by starting the producer's thread and initialising the device.
     *
+    * @param [in] serials       string array of all Serial names
+    * @param [in] channels      int field of calling number of the channels to be acquired
+    * @param [in] sampleRate    sample Rate as an integer
+    * @param [in] filePath      string of the filepath where data will be stored
+    *
     */
-    virtual void start(vector<LPSTR> &serials, int sampleRate, QString filePath);
+    virtual void start(vector<LPSTR> &serials, vector<int> channels, int sampleRate, QString filePath);
 
     //=========================================================================================================
     /**
