@@ -84,11 +84,11 @@ MatrixXd Sphara::makeSpharaProjector(const MatrixXd& matBaseFct, const VectorXi&
                     qWarning()<<"Sphara::makeSpharaProjector - Index is out of range";
                 }
 
-                colIndex++;
+                ++colIndex;
             }
 
             colIndex = 0;
-            rowIndex++;
+            ++rowIndex;
         }
 
         rowIndex = 0;
