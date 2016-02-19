@@ -590,7 +590,10 @@ private:
     Eigen::MatrixXd                 m_matSpharaMultSecond;              /**< The final second magnetometer SPHARA operator (in case of babymeg this is the outer layer, in case of vector view these are the magnetometers).*/
     Eigen::SparseMatrix<double>     m_matSparseSpharaMultFirst;         /**< The sparse first SPHARA operator (in case of babymeg this is the inner layer, in case of vector view these are the gradiometers).*/
     Eigen::SparseMatrix<double>     m_matSparseSpharaMultSecond;        /**< The sparse second magnetometer SPHARA operator (in case of babymeg this is the outer layer, in case of vector view these are the magnetometers).*/
-    Eigen::SparseMatrix<double>     m_matSparseSpharaMult;              /**< The final sparse SPHARA operator (in case of babymeg this is the inner layer, in case of vector view these are the gradiometers).*/
+    Eigen::SparseMatrix<double>     m_matSparseSpharaMult;              /**< The final sparse SPHARA operator .*/
+    Eigen::SparseMatrix<double>     m_matSparseSpharaProjMult;          /**< The final sparse SPHARA + projection operator.*/
+    Eigen::SparseMatrix<double>     m_matSparseSpharaCompMult;          /**< The final sparse SPHARA + compensator operator.*/
+    Eigen::SparseMatrix<double>     m_matSparseProjCompMult;            /**< The final sparse projection + compensator operator.*/
 
     Eigen::MatrixXd         m_matSpharaVVGradLoaded;                    /**< The loaded VectorView gradiometer basis functions.*/
     Eigen::MatrixXd         m_matSpharaVVMagLoaded;                     /**< The loaded VectorView magnetometer basis functions.*/

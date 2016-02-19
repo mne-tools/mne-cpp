@@ -323,14 +323,20 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
         m_matSparseProj = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
         m_matSparseComp = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
         m_matSparseSpharaMultFirst = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-        m_matSparseSpharaMultSecond = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+        m_matSparseSpharaMultSecond = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());        
         m_matSparseSpharaMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+        m_matSparseSpharaProjMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+        m_matSparseSpharaCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+        m_matSparseProjCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
 
         m_matSparseProj.setIdentity();
         m_matSparseComp.setIdentity();
         m_matSparseSpharaMultFirst.setIdentity();
         m_matSparseSpharaMultSecond.setIdentity();
         m_matSparseSpharaMult.setIdentity();
+        m_matSparseSpharaProjMult.setIdentity();
+        m_matSparseSpharaCompMult.setIdentity();
+        m_matSparseProjCompMult.setIdentity();
 
         //Create the initial SSP projector
         updateProjection();
@@ -431,12 +437,12 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
                         m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseFull * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
                     } else {
                         //Comp + Proj
-                        m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseProj * m_matSparseComp * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
+                        m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseProjCompMult * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
                     }
                 } else {
                     if(doSphara) {
                         //Comp + Sphara
-                        m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseSpharaMult * m_matSparseComp * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
+                        m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseSpharaCompMult * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
                     } else {
                         //Comp
                         m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseComp * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
@@ -446,7 +452,7 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
                 if(doProj) {
                     if(doSphara) {
                         //Proj + Sphara
-                        m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseSpharaMult * m_matSparseProj * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
+                        m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseSpharaProjMult * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
                     } else {
                         //Proj
                         m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseProj * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
@@ -492,12 +498,12 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
                     m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseFull * data.at(b);
                 } else {
                     //Comp + Proj
-                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseProj * m_matSparseComp * data.at(b);
+                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseProjCompMult * data.at(b);
                 }
             } else {
                 if(doSphara) {
                     //Comp + Sphara
-                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseSpharaMult * m_matSparseComp * data.at(b);
+                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseSpharaCompMult * data.at(b);
                 } else {
                     //Comp
                     m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseComp * data.at(b);
@@ -507,7 +513,7 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
             if(doProj) {
                 if(doSphara) {
                     //Proj + Sphara
-                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseSpharaMult * m_matSparseProj * data.at(b);
+                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseSpharaProjMult * data.at(b);
                 } else {
                     //Proj
                     m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseProj * data.at(b);
@@ -739,6 +745,9 @@ void RealTimeMultiSampleArrayModel::updateProjection()
             m_matSparseProj.setFromTriplets(tripletList.begin(), tripletList.end());
 
         //Create full multiplication matrix
+        m_matSparseSpharaProjMult = m_matSparseSpharaMult * m_matSparseProj;
+        m_matSparseProjCompMult = m_matSparseProj * m_matSparseComp;
+
         m_matSparseFull = m_matSparseSpharaMult * m_matSparseProj * m_matSparseComp;
     }
 }
@@ -790,6 +799,9 @@ void RealTimeMultiSampleArrayModel::updateCompensator(int to)
             m_matSparseComp.setFromTriplets(tripletList.begin(), tripletList.end());
 
         //Create full multiplication matrix
+        m_matSparseSpharaCompMult = m_matSparseSpharaMult * m_matSparseComp;
+        m_matSparseProjCompMult = m_matSparseProj * m_matSparseComp;
+
         m_matSparseFull = m_matSparseSpharaMult * m_matSparseProj * m_matSparseComp;
     }
 }
@@ -860,6 +872,8 @@ void RealTimeMultiSampleArrayModel::updateSpharaOptions(const QString& sSytemTyp
 
         //Create full multiplication matrix
         m_matSparseSpharaMult = m_matSparseSpharaMultFirst * m_matSparseSpharaMultSecond;
+        m_matSparseSpharaProjMult = m_matSparseSpharaMult * m_matSparseProj;
+        m_matSparseSpharaCompMult = m_matSparseSpharaMult * m_matSparseComp;
 
         m_matSparseFull = m_matSparseSpharaMult * m_matSparseProj * m_matSparseComp;
     }
