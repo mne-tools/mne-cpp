@@ -445,8 +445,11 @@ void RealTimeMultiSampleArrayWidget::init()
                 this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::updateCompensator);
 
         //Handle SPHARA
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::spharaActivationChanged,
+                this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::updateSpharaActivation);
+
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::spharaOptionsChanged,
-                this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::updateSphara);
+                this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::updateSpharaOptions);
 
         //Handle view changes
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::zoomChanged,
