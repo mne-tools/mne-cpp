@@ -101,35 +101,38 @@ QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const
         createCompensatorGroup();
         m_bCompensator = true;
     } else {
+        ui->m_tabWidget_noiseReduction->removeTab(ui->m_tabWidget_noiseReduction->indexOf(this->findTabWidgetByText(ui->m_tabWidget_noiseReduction, "Comp")));
         m_bCompensator = false;
-    }
-
-    if(m_slFlags.contains("view", Qt::CaseInsensitive)) {
-        createViewGroup();
-        m_bView = true;
-    } else {
-        ui->m_tabWidget_viewOptions->removeTab(0);
-        m_bView = false;
     }
 
     if(m_slFlags.contains("sphara", Qt::CaseInsensitive)) {
         m_bSphara = true;
         createSpharaGroup();
     } else {
+        ui->m_tabWidget_noiseReduction->removeTab(ui->m_tabWidget_noiseReduction->indexOf(this->findTabWidgetByText(ui->m_tabWidget_noiseReduction, "SPHARA")));
         m_bSphara = false;
     }
 
     if(m_slFlags.contains("filter", Qt::CaseInsensitive)) {
         m_bFilter = true;
     } else {
+        ui->m_tabWidget_noiseReduction->removeTab(ui->m_tabWidget_noiseReduction->indexOf(this->findTabWidgetByText(ui->m_tabWidget_noiseReduction, "Filter")));
         m_bFilter = false;
+    }
+
+    if(m_slFlags.contains("view", Qt::CaseInsensitive)) {
+        createViewGroup();
+        m_bView = true;
+    } else {
+        ui->m_tabWidget_viewOptions->removeTab(ui->m_tabWidget_viewOptions->indexOf(this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "View")));
+        m_bView = false;
     }
 
     if(m_slFlags.contains("triggerdetection", Qt::CaseInsensitive)) {
         createTriggerDetectionGroup();
         m_bTriggerDetection = true;
     } else {
-        ui->m_tabWidget_viewOptions->removeTab(ui->m_tabWidget_viewOptions->count()-1);
+        ui->m_tabWidget_viewOptions->removeTab(ui->m_tabWidget_viewOptions->indexOf(this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Trigger detection")));
         m_bTriggerDetection = false;
     }
 
@@ -187,14 +190,17 @@ void QuickControlWidget::filterGroupChanged(QList<QCheckBox*> list)
         }
 
         //Delete all widgets in the filter layout
-        for(int i = 0; i<ui->m_tabWidget_noiseReduction->count(); i++) {
-            if(ui->m_tabWidget_noiseReduction->tabText(i) == "Filter") {
-                ui->m_tabWidget_noiseReduction->removeTab(i);
-            }
+        QGridLayout* topLayout = static_cast<QGridLayout*>(this->findTabWidgetByText(ui->m_tabWidget_noiseReduction, "Filter")->layout());
+        if(!topLayout)
+           topLayout = new QGridLayout();
+
+        QLayoutItem *child;
+        while ((child = topLayout->takeAt(0)) != 0) {
+            delete child->widget();
+            delete child;
         }
 
         //Add filters
-        QGridLayout* topLayout = new QGridLayout();
         int u = 0;
 
         for(u; u<m_qFilterListCheckBox.size(); u++)
@@ -210,9 +216,8 @@ void QuickControlWidget::filterGroupChanged(QList<QCheckBox*> list)
 
         topLayout->addWidget(m_pShowFilterOptions, u+1, 0);
 
-        QWidget* tempWidget = new QWidget();
-        tempWidget->setLayout(topLayout);
-        ui->m_tabWidget_noiseReduction->addTab(tempWidget, QIcon(), QString("Filter"));
+        //Find Filter tab and add current layout
+        this->findTabWidgetByText(ui->m_tabWidget_noiseReduction, "Filter")->setLayout(topLayout);
 
         //createViewGroup();
     }
@@ -946,6 +951,9 @@ void QuickControlWidget::createSpharaGroup()
     //SPHARA tools
     QGridLayout *topLayout = new QGridLayout;
 
+
+    //Find SPHARA tab and add current layout
+    this->findTabWidgetByText(ui->m_tabWidget_noiseReduction, "SPHARA")->setLayout(topLayout);
 }
 
 
@@ -1109,9 +1117,8 @@ void QuickControlWidget::createCompensatorGroup()
         connect(this, &QuickControlWidget::compClicked,
                 this, &QuickControlWidget::checkCompStatusChanged);
 
-        QWidget* tempWidget = new QWidget();
-        tempWidget->setLayout(topLayout);
-        ui->m_tabWidget_noiseReduction->addTab(tempWidget, QIcon(), QString("Comp"));
+        //Find Comp tab and add current layout
+        this->findTabWidgetByText(ui->m_tabWidget_noiseReduction, "Comp")->setLayout(topLayout);
     }
 }
 

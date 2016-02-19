@@ -47,6 +47,21 @@
             <string>SSP</string>
            </attribute>
           </widget>
+          <widget class="QWidget" name="Comp">
+           <attribute name="title">
+            <string>Comp</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="Filter">
+           <attribute name="title">
+            <string>Filter</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="SPHARA">
+           <attribute name="title">
+            <string>SPHARA</string>
+           </attribute>
+          </widget>
          </widget>
         </item>
        </layout>
@@ -75,9 +90,9 @@
         <item>
          <widget class="QTabWidget" name="m_tabWidget_viewOptions">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
-          <widget class="QWidget" name="tab">
+          <widget class="QWidget" name="View">
            <attribute name="title">
             <string>View</string>
            </attribute>
@@ -193,7 +208,7 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tab_2">
+          <widget class="QWidget" name="TriggerDetection">
            <attribute name="title">
             <string>Trigger detection</string>
            </attribute>

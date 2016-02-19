@@ -425,7 +425,8 @@ void RealTimeMultiSampleArrayWidget::init()
             slFlags << "projections" << "view" << "scaling";
         #else
             std::cout<<"BUILD_BASIC_MNEX_VERSION Undefined"<<std::endl;
-            slFlags << "compensators" << "projections" << "filter" << "view" << "triggerdetection" << "scaling";
+            //slFlags << "compensators" << "projections" << "filter" << "view" << "triggerdetection" << "scaling";
+            slFlags << "projections" << "filter" ;
         #endif
 
         m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display", slFlags));
