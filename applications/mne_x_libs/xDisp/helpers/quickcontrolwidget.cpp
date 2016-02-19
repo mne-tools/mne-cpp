@@ -686,21 +686,17 @@ void QuickControlWidget::onSpharaOptionsChanged()
     if(ui->m_comboBox_spharaSystem->currentText() == "VectorView") {
         ui->m_label_spharaFirst->setText("Mag");
         ui->m_spinBox_spharaFirst->setMaximum(102);
-        ui->m_spinBox_spharaFirst->setValue(102);
 
         ui->m_label_spharaSecond->setText("Grad");
         ui->m_spinBox_spharaSecond->setMaximum(102);
-        ui->m_spinBox_spharaSecond->setValue(102);
     }
 
     if(ui->m_comboBox_spharaSystem->currentText() == "BabyMEG") {
-        ui->m_label_spharaFirst->setText("Outer layer");
-        ui->m_spinBox_spharaFirst->setMaximum(105);
-        ui->m_spinBox_spharaFirst->setValue(105);
+        ui->m_label_spharaFirst->setText("Inner layer");
+        ui->m_spinBox_spharaFirst->setMaximum(270);
 
-        ui->m_label_spharaSecond->setText("Inner layer");
-        ui->m_spinBox_spharaSecond->setMaximum(270);
-        ui->m_spinBox_spharaSecond->setValue(270);
+        ui->m_label_spharaSecond->setText("Outer layer");
+        ui->m_spinBox_spharaSecond->setMaximum(105);
     }
 
     emit spharaOptionsChanged(ui->m_comboBox_spharaSystem->currentText(), ui->m_spinBox_spharaFirst->value(), ui->m_spinBox_spharaSecond->value());
@@ -990,6 +986,12 @@ void QuickControlWidget::createSpharaGroup()
 
     //Sphara options changed
     connect(ui->m_comboBox_spharaSystem, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
+            this, &QuickControlWidget::onSpharaOptionsChanged);
+
+    connect(ui->m_spinBox_spharaFirst, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+            this, &QuickControlWidget::onSpharaOptionsChanged);
+
+    connect(ui->m_spinBox_spharaSecond, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &QuickControlWidget::onSpharaOptionsChanged);
 }
 

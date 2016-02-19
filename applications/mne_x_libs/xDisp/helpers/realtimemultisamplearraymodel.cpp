@@ -48,6 +48,7 @@
 //=============================================================================================================
 
 using namespace XDISPLIB;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -57,6 +58,7 @@ using namespace XDISPLIB;
 
 RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 : QAbstractTableModel(parent)
+, m_bSpharaActivated(false)
 , m_bProjActivated(false)
 , m_bCompActivated(false)
 , m_fSps(1024.0f)
@@ -220,6 +222,55 @@ QVariant RealTimeMultiSampleArrayModel::headerData(int section, Qt::Orientation 
 void RealTimeMultiSampleArrayModel::init()
 {
     m_pFiffInfo = FiffInfo::SPtr(new FiffInfo());
+}
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::initSphara()
+{
+    m_matSpharaMultFirst = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+    m_matSpharaMultSecond = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+
+    //Load SPHARA matrix
+    IOUtils::read_eigen_matrix(m_matSpharaVVGradLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaVVMagLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt"));
+
+    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGInnerLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
+
+    //Generate indices used to create the SPHARA operators.
+    indicesFirstVV.resize(0);
+    indicesSecondVV.resize(0);
+
+    for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
+        //Find GRADIOMETERS
+        if(m_pFiffInfo->chs.at(r).coil_type == 3012) {
+            indicesFirstVV.conservativeResize(indicesFirstVV.rows()+1);
+            indicesFirstVV(indicesFirstVV.rows()-1) = r;
+        }
+
+        //Find Magnetometers
+        if(m_pFiffInfo->chs.at(r).coil_type == 3024) {
+            indicesSecondVV.conservativeResize(indicesSecondVV.rows()+1);
+            indicesSecondVV(indicesSecondVV.rows()-1) = r;
+        }
+    }
+
+
+    indicesFirstBabyMEG.resize(0);
+    for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
+        //Find INNER LAYER
+        if(m_pFiffInfo->chs.at(r).coil_type == 7002) {
+            indicesFirstBabyMEG.conservativeResize(indicesFirstBabyMEG.rows()+1);
+            indicesFirstBabyMEG(indicesFirstBabyMEG.rows()-1) = r;
+        }
+
+        //TODO: Find outer layer
+    }
+
+//    qDebug()<<"NoiseReduction::createSpharaOperator - Read VectorView mag matrix "<<m_matSpharaVVMagLoaded.rows()<<m_matSpharaVVMagLoaded.cols()<<"and grad matrix"<<m_matSpharaVVGradLoaded.rows()<<m_matSpharaVVGradLoaded.cols();
+//    qDebug()<<"NoiseReduction::createSpharaOperator - Read BabyMEG inner layer matrix "<<m_matSpharaBabyMEGInnerLoaded.rows()<<m_matSpharaBabyMEGInnerLoaded.cols()<<"and outer layer matrix"<<m_matSpharaBabyMEGOuterFull.rows()<<m_matSpharaBabyMEGOuterFull.cols();
+
 }
 
 
@@ -674,10 +725,21 @@ void RealTimeMultiSampleArrayModel::updateCompensator(int to)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::updateSphara(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond)
+void RealTimeMultiSampleArrayModel::updateSpharaActivation(bool state)
+{
+    m_bSpharaActivated = state;
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::updateSpharaOptions(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond)
 {
     qDebug()<<"RealTimeMultiSampleArrayModel::updateSphara - updating SPHARA operator";
 
+    if(m_bSpharaActivated) {
+        m_matSparseFull = m_matSparseProj * m_matSparseComp;
+    }
 }
 
 
