@@ -190,116 +190,7 @@ public:
     */
     void setNumberDetectedTriggers(int numberDetections);
 
-signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the scaling sliders or spin boxes changed.
-    */
-    void scalingChanged(QMap<qint32, float> scalingMap);
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user changes the projections.
-    */
-    void projSelectionChanged();
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user changes the compensator.
-    */
-    void compSelectionChanged(int to);
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user changes the window size.
-    */
-    void timeWindowChanged(int value);
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user changes the row height (zoom) of the channels.
-    */
-    void zoomChanged(double value);
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the trigger infomration changed.
-    */
-    void triggerInfoChanged(const QMap<QString, QColor>& value, bool active, QString triggerCh, double threshold);
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user is supposed to see the filter option window.
-    */
-    void showFilterOptions(bool state);
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user changed the modality.
-    */
-    void settingsChanged(QList<Modality> modalityList);
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user changed the time spacer distance.
-    */
-    void distanceTimeSpacerChanged(int value);
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user pressed the trigger counter.
-    */
-    void resetTriggerCounter();
-
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever you want to cople this control widget to updating a view for which it is providing control.
-    */
-    void updateConnectedView();
-
-    //=========================================================================================================
-    /**
-    * Signal mapper signal for compensator changes.
-    */
-    void compClicked(const QString &text);
-
-protected:
-    //=========================================================================================================
-    /**
-    * Create the widgets used in the scaling group
-    */
-    void createScalingGroup();
-
-    //=========================================================================================================
-    /**
-    * Create the widgets used in the projector group
-    */
-    void createProjectorGroup();
-
-    //=========================================================================================================
-    /**
-    * Create the widgets used in the view group
-    */
-    void createViewGroup();
-
-    //=========================================================================================================
-    /**
-    * Create the widgets used in the trigger detection group
-    */
-    void createTriggerDetectionGroup();
-
-    //=========================================================================================================
-    /**
-    * Create the widgets used in the modality group
-    */
-    void createModalityGroup();
-
-    //=========================================================================================================
-    /**
-    * Create the widgets used in the compensator group
-    */
-    void createCompensatorGroup();
-
+protected slots:
     //=========================================================================================================
     /**
     * Slot called when time window size changes
@@ -416,16 +307,71 @@ protected:
     */
     void userFilterToggled(bool state);
 
+protected:
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the scaling group
+    */
+    void createScalingGroup();
+
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the projector group
+    */
+    void createProjectorGroup();
+
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the sphara group
+    */
+    void createSpharaGroup();
+
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the view group
+    */
+    void createViewGroup();
+
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the trigger detection group
+    */
+    void createTriggerDetectionGroup();
+
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the modality group
+    */
+    void createModalityGroup();
+
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the compensator group
+    */
+    void createCompensatorGroup();
+
+    //=========================================================================================================
+    /**
+    * Slot called when the user designed filter was toggled
+    *
+    * @param [in] pTabWidget    pointer to the tab widget of interest
+    * @param [in] sTabText      text of the tab to find
+    *
+    * @return The found tab widget.
+    */
+    QWidget* findTabWidgetByText(const QTabWidget *pTabWidget, const QString& sTabText);
+
 private:
     QStringList                     m_slFlags;                      /**< The list holding the current flags. */
 
-    bool                            m_bScaling;                     /**< Flag for drawing the scaling group box. */
-    bool                            m_bProjections;                 /**< Flag for drawing the projection group box. */
-    bool                            m_bView;                        /**< Flag for drawing the view group box. */
-    bool                            m_bFilter;                      /**< Flag for drawing the filter group box. */
-    bool                            m_bModalitiy;                   /**< Flag for drawing the modality group box. */
-    bool                            m_bCompensator;                 /**< Flag for drawing the compensator group box. */
-    bool                            m_bTriggerDetection;            /**< Flag for drawing the trigger detection tab in the view group box. */
+    bool                            m_bScaling;                     /**< Flag for displaying the scaling group box. */
+    bool                            m_bProjections;                 /**< Flag for displaying the projection group box. */
+    bool                            m_bSphara;                      /**< Flag for displaying teh SPHARA group box. */
+    bool                            m_bView;                        /**< Flag for displaying the view group box. */
+    bool                            m_bFilter;                      /**< Flag for displaying the filter group box. */
+    bool                            m_bModalitiy;                   /**< Flag for displaying the modality group box. */
+    bool                            m_bCompensator;                 /**< Flag for displaying the compensator group box. */
+    bool                            m_bTriggerDetection;            /**< Flag for displaying the trigger detection tab in the view group box. */
 
     QMap<qint32,float>              m_qMapChScaling;                /**< Channel scaling values. */
     QMap<qint32, QDoubleSpinBox*>   m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits. */
@@ -446,6 +392,85 @@ private:
     QSignalMapper*                  m_pCompSignalMapper;            /**< The signal mapper. */
 
     Ui::QuickControlWidget *        ui;                             /**< The generated UI file. */
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the scaling sliders or spin boxes changed.
+    */
+    void scalingChanged(QMap<qint32, float> scalingMap);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changes the projections.
+    */
+    void projSelectionChanged();
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changes the compensator.
+    */
+    void compSelectionChanged(int to);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changes the SPHARA operator.
+    */
+    void spharaSelectionChanged(const QString& sSytemType, int nBaseFcts);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changes the window size.
+    */
+    void timeWindowChanged(int value);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changes the row height (zoom) of the channels.
+    */
+    void zoomChanged(double value);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the trigger infomration changed.
+    */
+    void triggerInfoChanged(const QMap<QString, QColor>& value, bool active, QString triggerCh, double threshold);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user is supposed to see the filter option window.
+    */
+    void showFilterOptions(bool state);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changed the modality.
+    */
+    void settingsChanged(QList<Modality> modalityList);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changed the time spacer distance.
+    */
+    void distanceTimeSpacerChanged(int value);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user pressed the trigger counter.
+    */
+    void resetTriggerCounter();
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever you want to cople this control widget to updating a view for which it is providing control.
+    */
+    void updateConnectedView();
+
+    //=========================================================================================================
+    /**
+    * Signal mapper signal for compensator changes.
+    */
+    void compClicked(const QString &text);
 };
 
 } // NAMESPACE XDISPLIB

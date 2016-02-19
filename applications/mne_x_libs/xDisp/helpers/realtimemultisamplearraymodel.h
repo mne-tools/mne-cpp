@@ -411,6 +411,15 @@ public:
 
     //=========================================================================================================
     /**
+    * Update the SPHARA operator
+    *
+    * @param[in] sSystemType    The current acquisition system type (VectorView, BabyMEG, EEG)
+    * @param[in] nBaseFcts      The ner number of basis function to use
+    */
+    void updateSphara(const QString& sSytemType, int nBaseFcts);
+
+    //=========================================================================================================
+    /**
     * Filter parameters changed
     *
     * @param[in] filterData    list of the currently active filter
