@@ -319,6 +319,16 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
 
         m_matOverlap.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxFilterLength);
 
+        m_matSparseProj = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+        m_matSparseComp = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+        m_matSparseSpharaMultFirst = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+        m_matSparseSpharaMultSecond = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+
+        m_matSparseProj.setIdentity();
+        m_matSparseComp.setIdentity();
+        m_matSparseSpharaMultFirst.setIdentity();
+        m_matSparseSpharaMultSecond.setIdentity();
+
         //  Create the initial SSP projector
         updateProjection();
 
@@ -344,7 +354,7 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
         }
 
         //Init the sphara operators
-        initSphara();
+        //initSphara();
     }
     else {
         m_vecBadIdcs = RowVectorXi(0,0);
@@ -739,7 +749,7 @@ void RealTimeMultiSampleArrayModel::updateSpharaActivation(bool state)
 
 void RealTimeMultiSampleArrayModel::updateSpharaOptions(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond)
 {
-    if(m_bSpharaActivated) {
+    if(m_bSpharaActivated && m_pFiffInfo) {
         qDebug()<<"RealTimeMultiSampleArrayModel::updateSpharaOptions - Creating SPHARA oerpator for"<<sSytemType;
 
         if(sSytemType == "VectorView") {
