@@ -11,4 +11,10 @@
         <file alias="showBad.png">images/showBad.png</file>
         <file alias="quickControl.png">images/quickControl.png</file>
     </qresource>
+    <qresource prefix="/sphara">
+        <file>SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt</file>
+        <file>SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt</file>
+        <file>SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt</file>
+        <file>SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt</file>
+    </qresource>
 </RCC>
