@@ -322,8 +322,6 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
 
         m_matSparseProj = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
         m_matSparseComp = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-        m_matSparseSpharaMultFirst = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-        m_matSparseSpharaMultSecond = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());        
         m_matSparseSpharaMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
         m_matSparseSpharaProjMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
         m_matSparseSpharaCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
@@ -331,8 +329,6 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
 
         m_matSparseProj.setIdentity();
         m_matSparseComp.setIdentity();
-        m_matSparseSpharaMultFirst.setIdentity();
-        m_matSparseSpharaMultSecond.setIdentity();
         m_matSparseSpharaMult.setIdentity();
         m_matSparseSpharaProjMult.setIdentity();
         m_matSparseSpharaCompMult.setIdentity();
@@ -853,9 +849,11 @@ void RealTimeMultiSampleArrayModel::updateSpharaOptions(const QString& sSytemTyp
                 if(m_matSpharaMultFirst(i,k) != 0)
                     tripletList.push_back(T(i, k, m_matSpharaMultFirst(i,k)));
 
-        m_matSparseSpharaMultFirst = SparseMatrix<double>(m_matSpharaMultFirst.rows(),m_matSpharaMultFirst.cols());
+        Eigen::SparseMatrix<double> matSparseSpharaMultFirst = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+
+        matSparseSpharaMultFirst = SparseMatrix<double>(m_matSpharaMultFirst.rows(),m_matSpharaMultFirst.cols());
         if(tripletList.size() > 0)
-            m_matSparseSpharaMultFirst.setFromTriplets(tripletList.begin(), tripletList.end());
+            matSparseSpharaMultFirst.setFromTriplets(tripletList.begin(), tripletList.end());
 
         //Second operator
         tripletList.clear();
@@ -866,12 +864,13 @@ void RealTimeMultiSampleArrayModel::updateSpharaOptions(const QString& sSytemTyp
                 if(m_matSpharaMultSecond(i,k) != 0)
                     tripletList.push_back(T(i, k, m_matSpharaMultSecond(i,k)));
 
-        m_matSparseSpharaMultSecond = SparseMatrix<double>(m_matSpharaMultSecond.rows(),m_matSpharaMultSecond.cols());
+        Eigen::SparseMatrix<double>matSparseSpharaMultSecond = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+
         if(tripletList.size() > 0)
-            m_matSparseSpharaMultSecond.setFromTriplets(tripletList.begin(), tripletList.end());
+            matSparseSpharaMultSecond.setFromTriplets(tripletList.begin(), tripletList.end());
 
         //Create full multiplication matrix
-        m_matSparseSpharaMult = m_matSparseSpharaMultFirst * m_matSparseSpharaMultSecond;
+        m_matSparseSpharaMult = matSparseSpharaMultFirst * matSparseSpharaMultSecond;
         m_matSparseSpharaProjMult = m_matSparseSpharaMult * m_matSparseProj;
         m_matSparseSpharaCompMult = m_matSparseSpharaMult * m_matSparseComp;
 
