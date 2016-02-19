@@ -674,6 +674,14 @@ void RealTimeMultiSampleArrayModel::updateCompensator(int to)
 
 //*************************************************************************************************************
 
+void RealTimeMultiSampleArrayModel::updateSphara(const QString& sSytemType, int nBaseFcts)
+{
+
+}
+
+
+//*************************************************************************************************************
+
 void RealTimeMultiSampleArrayModel::filterChanged(QList<FilterData> filterData)
 {
     m_filterData = filterData;
