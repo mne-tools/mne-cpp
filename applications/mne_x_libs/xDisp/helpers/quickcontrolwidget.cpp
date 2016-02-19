@@ -948,12 +948,9 @@ void QuickControlWidget::createProjectorGroup()
 
 void QuickControlWidget::createSpharaGroup()
 {
-    //SPHARA tools
-    QGridLayout *topLayout = new QGridLayout;
-
-
-    //Find SPHARA tab and add current layout
-    this->findTabWidgetByText(ui->m_tabWidget_noiseReduction, "SPHARA")->setLayout(topLayout);
+    //Number of visible channels
+    connect(ui->m_doubleSpinBox_numberVisibleChannels, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &QuickControlWidget::zoomChanged);
 }
 
 
