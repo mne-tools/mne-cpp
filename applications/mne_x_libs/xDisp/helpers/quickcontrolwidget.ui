@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>456</width>
-    <height>447</height>
+    <height>448</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -70,7 +70,7 @@
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QComboBox" name="m_comboBox_system">
+             <widget class="QComboBox" name="m_comboBox_spharaSystem">
               <item>
                <property name="text">
                 <string>BabyMEG</string>
@@ -84,14 +84,14 @@
              </widget>
             </item>
             <item row="1" column="0">
-             <widget class="QLabel" name="m_label_First">
+             <widget class="QLabel" name="m_label_spharaFirst">
               <property name="text">
                <string>Inner layer:</string>
               </property>
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QSpinBox" name="m_spinBox_First">
+             <widget class="QSpinBox" name="m_spinBox_spharaFirst">
               <property name="minimum">
                <number>1</number>
               </property>
@@ -104,14 +104,14 @@
              </widget>
             </item>
             <item row="2" column="0">
-             <widget class="QLabel" name="m_label_Second">
+             <widget class="QLabel" name="m_label_spharaSecond">
               <property name="text">
                <string>Outer layer:</string>
               </property>
              </widget>
             </item>
             <item row="2" column="1">
-             <widget class="QSpinBox" name="m_spinBox_Second">
+             <widget class="QSpinBox" name="m_spinBox_spharaSecond">
               <property name="minimum">
                <number>1</number>
               </property>

@@ -413,10 +413,11 @@ public:
     /**
     * Update the SPHARA operator
     *
-    * @param[in] sSystemType    The current acquisition system type (VectorView, BabyMEG, EEG)
-    * @param[in] nBaseFcts      The ner number of basis function to use
+    * @param[in] sSystemType            The current acquisition system type (VectorView, BabyMEG, EEG)
+    * @param[in] nBaseFctsFirst         The new number of basis function to use for the first SPHARA operator
+    * @param[in] nBaseFctsSecond        The new number of basis function to use for the second SPHARA operator
     */
-    void updateSphara(const QString& sSytemType, int nBaseFcts);
+    void updateSphara(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond);
 
     //=========================================================================================================
     /**

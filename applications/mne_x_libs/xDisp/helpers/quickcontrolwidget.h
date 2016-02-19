@@ -129,7 +129,7 @@ public:
     *
     * @param [in] qMapChScaling     The pointer to scaling information.
     * @param [in] name              The name to be displayed on the minimize button.
-    * @param [in] slFlags           The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: projections, compensators, view,filter, triggerdetection, modalities, scaling.
+    * @param [in] slFlags           The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: projections, compensators, view,filter, triggerdetection, modalities, scaling, sphara.
     * @param [in] parent            The parent of widget.
     */
     QuickControlWidget(QMap<qint32, float> qMapChScaling, const FiffInfo::SPtr pFiffInfo, QString name = "", QStringList slFlags = QStringList("Scaling"), QWidget *parent = 0);
@@ -207,55 +207,55 @@ protected slots:
     /**
     * Slot called when the projector check state changes
     */
-    void checkProjStatusChanged(bool state);
+    void onCheckProjStatusChanged(bool state);
 
     //=========================================================================================================
     /**
     * Slot called when user enables/disables all projectors
     */
-    void enableDisableAllProj(bool status);
+    void onEnableDisableAllProj(bool status);
 
     //=========================================================================================================
     /**
     * Slot called when the compensator check state changes
     */
-    void checkCompStatusChanged(const QString & compName);
+    void onCheckCompStatusChanged(const QString & compName);
 
     //=========================================================================================================
     /**
     * Slot called when scaling spin boxes change
     */
-    void updateSpinBoxScaling(double value);
+    void onUpdateSpinBoxScaling(double value);
 
     //=========================================================================================================
     /**
     * Slot called when slider scaling change
     */
-    void updateSliderScaling(int value);
+    void onUpdateSliderScaling(int value);
 
     //=========================================================================================================
     /**
     * Slot called when trigger detection check box was toggled
     */
-    void realTimeTriggerActiveChanged(int state);
+    void onRealTimeTriggerActiveChanged(int state);
 
     //=========================================================================================================
     /**
     * Slot called when trigger detection color button was clicked
     */
-    void realTimeTriggerColorChanged(bool state);
+    void onRealTimeTriggerColorChanged(bool state);
 
     //=========================================================================================================
     /**
     * Slot called when trigger detection color button was clicked
     */
-    void realTimeTriggerThresholdChanged(double value);
+    void onRealTimeTriggerThresholdChanged(double value);
 
     //=========================================================================================================
     /**
     * Slot called when trigger detection color button was clicked
     */
-    void realTimeTriggerCurrentChChanged(const QString& value);
+    void onRealTimeTriggerCurrentChChanged(const QString& value);
 
     //=========================================================================================================
     /**
@@ -263,7 +263,7 @@ protected slots:
     *
     * @param [in] state toggle state.
     */
-    void toggleHideAll(bool state);
+    void onToggleHideAll(bool state);
 
     //=========================================================================================================
     /**
@@ -277,7 +277,7 @@ protected slots:
     /**
     * Slot called when modality check boxes were changed
     */
-    void updateModalityCheckbox(qint32 state);
+    void onUpdateModalityCheckbox(qint32 state);
 
     //=========================================================================================================
     /**
@@ -305,7 +305,20 @@ protected slots:
     /**
     * Slot called when the user designed filter was toggled
     */
-    void userFilterToggled(bool state);
+    void onUserFilterToggled(bool state);
+
+
+    //=========================================================================================================
+    /**
+    * Slot called when the sphara tool was toggled
+    */
+    void onSpharaButtonClicked(bool state);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the user changes the sphara options
+    */
+    void onSpharaOptionsChanged();
 
 protected:
     //=========================================================================================================
@@ -414,9 +427,15 @@ signals:
 
     //=========================================================================================================
     /**
+    * Emit this signal whenever the user toggled the SPHARA operator.
+    */
+    void spharaActivationChanged(bool state);
+
+    //=========================================================================================================
+    /**
     * Emit this signal whenever the user changes the SPHARA operator.
     */
-    void spharaSelectionChanged(const QString& sSytemType, int nBaseFcts);
+    void spharaOptionsChanged(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond);
 
     //=========================================================================================================
     /**

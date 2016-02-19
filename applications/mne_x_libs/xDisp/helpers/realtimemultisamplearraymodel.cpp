@@ -674,8 +674,9 @@ void RealTimeMultiSampleArrayModel::updateCompensator(int to)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::updateSphara(const QString& sSytemType, int nBaseFcts)
+void RealTimeMultiSampleArrayModel::updateSphara(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond)
 {
+    qDebug()<<"RealTimeMultiSampleArrayModel::updateSphara - updating SPHARA operator";
 
 }
 

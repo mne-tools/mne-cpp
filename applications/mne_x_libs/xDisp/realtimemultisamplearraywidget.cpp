@@ -425,8 +425,7 @@ void RealTimeMultiSampleArrayWidget::init()
             slFlags << "projections" << "view" << "scaling";
         #else
             std::cout<<"BUILD_BASIC_MNEX_VERSION Undefined"<<std::endl;
-            //slFlags << "compensators" << "projections" << "filter" << "view" << "triggerdetection" << "scaling";
-            slFlags << "projections" << "filter" ;
+            slFlags << "compensators" << "projections" << "filter" << "view" << "triggerdetection" << "scaling" << "sphara";
         #endif
 
         m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display", slFlags));
@@ -446,7 +445,7 @@ void RealTimeMultiSampleArrayWidget::init()
                 this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::updateCompensator);
 
         //Handle SPHARA
-        connect(m_pQuickControlWidget.data(), &QuickControlWidget::spharaSelectionChanged,
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::spharaOptionsChanged,
                 this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::updateSphara);
 
         //Handle view changes

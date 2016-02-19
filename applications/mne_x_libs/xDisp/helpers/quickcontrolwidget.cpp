@@ -67,7 +67,7 @@ QuickControlWidget::QuickControlWidget(QMap< qint32,float > qMapChScaling, const
     //Init and connect hide all group (minimize) button
     ui->m_pushButton_hideAll->setText(ui->m_pushButton_hideAll->text().append(QString(" - %1").arg(m_sName)));
     connect(ui->m_pushButton_hideAll, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &QuickControlWidget::toggleHideAll);
+            this, &QuickControlWidget::onToggleHideAll);
 
     connect(ui->m_pushButton_close, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             this, &QuickControlWidget::hide);
@@ -181,7 +181,7 @@ void QuickControlWidget::filterGroupChanged(QList<QCheckBox*> list)
 
             if(tempCheckBox->text() == "Activate user designed filter")
                 connect(tempCheckBox, &QCheckBox::toggled,
-                        this, &QuickControlWidget::userFilterToggled);
+                        this, &QuickControlWidget::onUserFilterToggled);
 
             connect(list[u], &QCheckBox::toggled,
                     tempCheckBox, &QCheckBox::setChecked);
@@ -289,7 +289,7 @@ void QuickControlWidget::onZoomChanged(double value)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::checkProjStatusChanged(bool status)
+void QuickControlWidget::onCheckProjStatusChanged(bool status)
 {
     Q_UNUSED(status)
 
@@ -312,7 +312,7 @@ void QuickControlWidget::checkProjStatusChanged(bool status)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::enableDisableAllProj(bool status)
+void QuickControlWidget::onEnableDisableAllProj(bool status)
 {
     //Set all checkboxes to status
     for(int i=0; i<m_qListProjCheckBox.size(); i++)
@@ -332,7 +332,7 @@ void QuickControlWidget::enableDisableAllProj(bool status)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::checkCompStatusChanged(const QString & compName)
+void QuickControlWidget::onCheckCompStatusChanged(const QString & compName)
 {
     qDebug()<<compName;
 
@@ -355,7 +355,7 @@ void QuickControlWidget::checkCompStatusChanged(const QString & compName)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::updateSpinBoxScaling(double value)
+void QuickControlWidget::onUpdateSpinBoxScaling(double value)
 {
     Q_UNUSED(value)
 
@@ -423,7 +423,7 @@ void QuickControlWidget::updateSpinBoxScaling(double value)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::updateSliderScaling(int value)
+void QuickControlWidget::onUpdateSliderScaling(int value)
 {
     Q_UNUSED(value)
 
@@ -489,7 +489,7 @@ void QuickControlWidget::updateSliderScaling(int value)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::realTimeTriggerActiveChanged(int state)
+void QuickControlWidget::onRealTimeTriggerActiveChanged(int state)
 {
     Q_UNUSED(state);
 
@@ -499,7 +499,7 @@ void QuickControlWidget::realTimeTriggerActiveChanged(int state)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::realTimeTriggerColorChanged(bool state)
+void QuickControlWidget::onRealTimeTriggerColorChanged(bool state)
 {
     Q_UNUSED(state);
 
@@ -519,7 +519,7 @@ void QuickControlWidget::realTimeTriggerColorChanged(bool state)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::realTimeTriggerThresholdChanged(double value)
+void QuickControlWidget::onRealTimeTriggerThresholdChanged(double value)
 {
     Q_UNUSED(value);
 
@@ -529,7 +529,7 @@ void QuickControlWidget::realTimeTriggerThresholdChanged(double value)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::realTimeTriggerCurrentChChanged(const QString &value)
+void QuickControlWidget::onRealTimeTriggerCurrentChChanged(const QString &value)
 {
     //Change color of pushbutton
     QPalette* palette1 = new QPalette();
@@ -543,7 +543,7 @@ void QuickControlWidget::realTimeTriggerCurrentChChanged(const QString &value)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::toggleHideAll(bool state)
+void QuickControlWidget::onToggleHideAll(bool state)
 {
     if(!state) {
         //ui->m_widget_master->hide();
@@ -597,7 +597,7 @@ void QuickControlWidget::onShowFilterOptions(bool state)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::updateModalityCheckbox(qint32 state)
+void QuickControlWidget::onUpdateModalityCheckbox(qint32 state)
 {
     Q_UNUSED(state)
 
@@ -663,11 +663,47 @@ void QuickControlWidget::onResetTriggerNumbers()
 
 //*************************************************************************************************************
 
-void QuickControlWidget::userFilterToggled(bool state)
+void QuickControlWidget::onUserFilterToggled(bool state)
 {
     Q_UNUSED(state);
-    //qDebug()<<"userFilterToggled";
+    //qDebug()<<"onUserFilterToggled";
     emit updateConnectedView();
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::onSpharaButtonClicked(bool state)
+{
+    emit spharaActivationChanged(state);
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::onSpharaOptionsChanged()
+{
+    if(ui->m_comboBox_spharaSystem->currentText() == "VectorView") {
+        ui->m_label_spharaFirst->setText("Mag");
+        ui->m_spinBox_spharaFirst->setMaximum(102);
+        ui->m_spinBox_spharaFirst->setValue(102);
+
+        ui->m_label_spharaSecond->setText("Grad");
+        ui->m_spinBox_spharaSecond->setMaximum(102);
+        ui->m_spinBox_spharaSecond->setValue(102);
+    }
+
+    if(ui->m_comboBox_spharaSystem->currentText() == "BabyMEG") {
+        ui->m_label_spharaFirst->setText("Outer layer");
+        ui->m_spinBox_spharaFirst->setMaximum(105);
+        ui->m_spinBox_spharaFirst->setValue(105);
+
+        ui->m_label_spharaSecond->setText("Inner layer");
+        ui->m_spinBox_spharaSecond->setMaximum(270);
+        ui->m_spinBox_spharaSecond->setValue(270);
+    }
+
+    emit spharaOptionsChanged(ui->m_comboBox_spharaSystem->currentText(), ui->m_spinBox_spharaFirst->value(), ui->m_spinBox_spharaSecond->value());
 }
 
 
@@ -694,7 +730,7 @@ void QuickControlWidget::createScalingGroup()
         t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFF_UNIT_T)/(1e-12));
         m_qMapScalingDoubleSpinBox.insert(FIFF_UNIT_T,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this,&QuickControlWidget::updateSpinBoxScaling);
+                this,&QuickControlWidget::onUpdateSpinBoxScaling);
         t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
@@ -705,7 +741,7 @@ void QuickControlWidget::createScalingGroup()
         t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFF_UNIT_T)/(1e-12)*10);
         m_qMapScalingSlider.insert(FIFF_UNIT_T,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
-                this,&QuickControlWidget::updateSliderScaling);
+                this,&QuickControlWidget::onUpdateSliderScaling);
         t_pGridLayout->addWidget(t_pHorizontalSlider,i+1,1,1,1);
 
         i+=2;
@@ -728,7 +764,7 @@ void QuickControlWidget::createScalingGroup()
         t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFF_UNIT_T_M)/(1e-15 * 100));
         m_qMapScalingDoubleSpinBox.insert(FIFF_UNIT_T_M,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this,&QuickControlWidget::updateSpinBoxScaling);
+                this,&QuickControlWidget::onUpdateSpinBoxScaling);
         t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
@@ -739,7 +775,7 @@ void QuickControlWidget::createScalingGroup()
         t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFF_UNIT_T_M)/(1e-15*100));
         m_qMapScalingSlider.insert(FIFF_UNIT_T_M,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
-                this,&QuickControlWidget::updateSliderScaling);
+                this,&QuickControlWidget::onUpdateSliderScaling);
         t_pGridLayout->addWidget(t_pHorizontalSlider,i+1,1,1,1);
 
         i+=2;
@@ -762,7 +798,7 @@ void QuickControlWidget::createScalingGroup()
         t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFFV_EEG_CH)/(1e-06));
         m_qMapScalingDoubleSpinBox.insert(FIFFV_EEG_CH,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this,&QuickControlWidget::updateSpinBoxScaling);
+                this,&QuickControlWidget::onUpdateSpinBoxScaling);
         t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
@@ -773,7 +809,7 @@ void QuickControlWidget::createScalingGroup()
         t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_EEG_CH)/(1e-06)*10);
         m_qMapScalingSlider.insert(FIFFV_EEG_CH,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
-                this,&QuickControlWidget::updateSliderScaling);
+                this,&QuickControlWidget::onUpdateSliderScaling);
         t_pGridLayout->addWidget(t_pHorizontalSlider,i+1,1,1,1);
 
         i+=2;
@@ -796,7 +832,7 @@ void QuickControlWidget::createScalingGroup()
         t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFFV_EOG_CH)/(1e-06));
         m_qMapScalingDoubleSpinBox.insert(FIFFV_EOG_CH,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this,&QuickControlWidget::updateSpinBoxScaling);
+                this,&QuickControlWidget::onUpdateSpinBoxScaling);
         t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
@@ -807,7 +843,7 @@ void QuickControlWidget::createScalingGroup()
         t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_EOG_CH)/(1e-06)*10);
         m_qMapScalingSlider.insert(FIFFV_EOG_CH,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
-                this,&QuickControlWidget::updateSliderScaling);
+                this,&QuickControlWidget::onUpdateSliderScaling);
         t_pGridLayout->addWidget(t_pHorizontalSlider,i+1,1,1,1);
 
         i+=2;
@@ -830,7 +866,7 @@ void QuickControlWidget::createScalingGroup()
         t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFFV_STIM_CH));
         m_qMapScalingDoubleSpinBox.insert(FIFFV_STIM_CH,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this,&QuickControlWidget::updateSpinBoxScaling);
+                this,&QuickControlWidget::onUpdateSpinBoxScaling);
         t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
@@ -841,7 +877,7 @@ void QuickControlWidget::createScalingGroup()
         t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_STIM_CH)/10);
         m_qMapScalingSlider.insert(FIFFV_STIM_CH,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
-                this,&QuickControlWidget::updateSliderScaling);
+                this,&QuickControlWidget::onUpdateSliderScaling);
         t_pGridLayout->addWidget(t_pHorizontalSlider,i+1,1,1,1);
 
 
@@ -865,7 +901,7 @@ void QuickControlWidget::createScalingGroup()
         t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFFV_MISC_CH));
         m_qMapScalingDoubleSpinBox.insert(FIFFV_MISC_CH,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this,&QuickControlWidget::updateSpinBoxScaling);
+                this,&QuickControlWidget::onUpdateSpinBoxScaling);
         t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
@@ -876,7 +912,7 @@ void QuickControlWidget::createScalingGroup()
         t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_MISC_CH)/10);
         m_qMapScalingSlider.insert(FIFFV_MISC_CH,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
-                this,&QuickControlWidget::updateSliderScaling);
+                this,&QuickControlWidget::onUpdateSliderScaling);
         t_pGridLayout->addWidget(t_pHorizontalSlider,i+1,1,1,1);
 
         i+=2;
@@ -911,7 +947,7 @@ void QuickControlWidget::createProjectorGroup()
             m_qListProjCheckBox.append(checkBox);
 
             connect(checkBox, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-                    this, &QuickControlWidget::checkProjStatusChanged);
+                    this, &QuickControlWidget::onCheckProjStatusChanged);
 
             topLayout->addWidget(checkBox, i, 0); //+2 because we already added two widgets before the first projector check box
 
@@ -933,13 +969,13 @@ void QuickControlWidget::createProjectorGroup()
         m_enableDisableProjectors->setChecked(bAllActivated);
         topLayout->addWidget(m_enableDisableProjectors, i+2, 0);
         connect(m_enableDisableProjectors, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &QuickControlWidget::enableDisableAllProj);
+            this, &QuickControlWidget::onEnableDisableAllProj);
 
         //Find SSP tab and add current layout
         this->findTabWidgetByText(ui->m_tabWidget_noiseReduction, "SSP")->setLayout(topLayout);
 
         //Set default activation to true
-        enableDisableAllProj(true);
+        onEnableDisableAllProj(true);
     }
 }
 
@@ -948,9 +984,13 @@ void QuickControlWidget::createProjectorGroup()
 
 void QuickControlWidget::createSpharaGroup()
 {
-    //Number of visible channels
-    connect(ui->m_doubleSpinBox_numberVisibleChannels, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &QuickControlWidget::zoomChanged);
+    //Sphara activation changed
+    connect(ui->m_checkBox_activateSphara, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &QuickControlWidget::onSpharaButtonClicked);
+
+    //Sphara options changed
+    connect(ui->m_comboBox_spharaSystem, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
+            this, &QuickControlWidget::onSpharaOptionsChanged);
 }
 
 
@@ -982,7 +1022,7 @@ void QuickControlWidget::createTriggerDetectionGroup()
 {
     //Trigger detection
     connect(ui->m_checkBox_activateTriggerDetection, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
-            this, &QuickControlWidget::realTimeTriggerActiveChanged);
+            this, &QuickControlWidget::onRealTimeTriggerActiveChanged);
 
     QMapIterator<QString, QColor> i(m_qMapTriggerColor);
     while(i.hasNext()) {
@@ -990,10 +1030,10 @@ void QuickControlWidget::createTriggerDetectionGroup()
         ui->m_comboBox_triggerChannels->addItem(i.key());
     }
     connect(ui->m_comboBox_triggerChannels, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
-            this, &QuickControlWidget::realTimeTriggerCurrentChChanged);
+            this, &QuickControlWidget::onRealTimeTriggerCurrentChChanged);
 
     connect(ui->m_pushButton_triggerColor, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &QuickControlWidget::realTimeTriggerColorChanged);
+            this, &QuickControlWidget::onRealTimeTriggerColorChanged);
 
     ui->m_pushButton_triggerColor->setAutoFillBackground(true);
     ui->m_pushButton_triggerColor->setFlat(true);
@@ -1003,10 +1043,10 @@ void QuickControlWidget::createTriggerDetectionGroup()
     ui->m_pushButton_triggerColor->update();
 
     connect(ui->m_doubleSpinBox_detectionThresholdFirst, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &QuickControlWidget::realTimeTriggerThresholdChanged);
+            this, &QuickControlWidget::onRealTimeTriggerThresholdChanged);
 
     connect(ui->m_spinBox_detectionThresholdSecond, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                this, &QuickControlWidget::realTimeTriggerThresholdChanged);
+                this, &QuickControlWidget::onRealTimeTriggerThresholdChanged);
 
     connect(ui->m_pushButton_resetNumberTriggers, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             this, &QuickControlWidget::onResetTriggerNumbers);
@@ -1068,7 +1108,7 @@ void QuickControlWidget::createModalityGroup()
         t_pCheckBoxModality->setChecked(m_qListModalities[i].m_bActive);
         m_qListModalityCheckBox << t_pCheckBoxModality;
         connect(t_pCheckBoxModality,&QCheckBox::stateChanged,
-                this,&QuickControlWidget::updateModalityCheckbox);
+                this,&QuickControlWidget::onUpdateModalityCheckbox);
         t_pGridLayout->addWidget(t_pCheckBoxModality,i,1,1,1);
 
     }
@@ -1112,7 +1152,7 @@ void QuickControlWidget::createCompensatorGroup()
                     this, SIGNAL(compClicked(const QString &)));
 
         connect(this, &QuickControlWidget::compClicked,
-                this, &QuickControlWidget::checkCompStatusChanged);
+                this, &QuickControlWidget::onCheckCompStatusChanged);
 
         //Find Comp tab and add current layout
         this->findTabWidgetByText(ui->m_tabWidget_noiseReduction, "Comp")->setLayout(topLayout);
@@ -1129,6 +1169,8 @@ QWidget* QuickControlWidget::findTabWidgetByText(const QTabWidget* pTabWidget, c
             return pTabWidget->widget(i);
         }
     }
+
+    return new QWidget();
 }
 
 
