@@ -233,7 +233,7 @@ void RealTimeMultiSampleArrayModel::initSphara()
     m_matSpharaMultSecond = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
     //Load SPHARA matrices for babymeg and vectorview
-    IOUtils::read_eigen_matrix(m_matSpharaVVGradLoaded, QString(":/sphara/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaVVGradLoaded, QString(":/sphara/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
     IOUtils::read_eigen_matrix(m_matSpharaVVMagLoaded, QString(":/sphara/Vectorview_SPHARA_InvEuclidean_Mag.txt"));
 
     IOUtils::read_eigen_matrix(m_matSpharaBabyMEGInnerLoaded, QString(":/sphara/BabyMEG_SPHARA_InvEuclidean_Inner.txt"));
