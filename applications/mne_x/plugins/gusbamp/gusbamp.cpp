@@ -225,15 +225,14 @@ bool GUSBAmp::start()
     if(this->isRunning())
         QThread::wait();
 
-
-
-
+    //tell the producer to load the running parameter onto the device and start data acquisition
     m_pGUSBAmpProducer->start(m_vsSerials, m_viChannelsToAcquired, m_iSampleRate, m_sFilePath);
 
-    //Buffer
+    //after device was started: ask for size of SampleMatrix to set the buffer matrix (bevor setUpFiffInfo() is started)
     m_viSizeOfSampleMatrix = m_pGUSBAmpProducer->getSizeOfSampleMatrix();
     m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, m_viSizeOfSampleMatrix[0], m_viSizeOfSampleMatrix[1]));
 
+    //set the parameters for number of channels (rows of matrix) and samples (columns of matrix)
     m_iNumberOfChannels = m_viSizeOfSampleMatrix[0];
     m_iSamplesPerBlock  = m_viSizeOfSampleMatrix[1];
 
@@ -245,6 +244,7 @@ bool GUSBAmp::start()
     m_pRTMSA_GUSBAmp->data()->setMultiArraySize(m_iSamplesPerBlock);
     m_pRTMSA_GUSBAmp->data()->setSamplingRate(m_iSampleRate);
 
+    //start the thread for ring buffer
     if(m_pGUSBAmpProducer->isRunning())
     {
         m_bIsRunning = true;

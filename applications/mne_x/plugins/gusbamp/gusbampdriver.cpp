@@ -49,9 +49,6 @@
 #include <deque>
 #include <stdarg.h>
 
-
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -60,7 +57,6 @@
 using namespace GUSBAmpPlugin;
 using namespace std;
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -68,17 +64,17 @@ using namespace std;
 
 GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
 : m_pGUSBAmpProducer(pGUSBAmpProducer)
-,m_NUMBER_OF_CHANNELS(0)
-,m_NUMBER_OF_SCANS(0)
-,m_SLAVE_SERIALS_SIZE(0)
-,m_QUEUE_SIZE(4)
-,m_TRIGGER(FALSE)
-,m_mode(M_NORMAL)
-,m_commonReference({ FALSE, FALSE, FALSE, FALSE })
-,m_commonGround({ FALSE, FALSE, FALSE, FALSE })
-,m_numBytesReceived(0)
-,m_isRunning(false)
-,m_filePath("data")
+, m_NUMBER_OF_CHANNELS(0)
+, m_NUMBER_OF_SCANS(0)
+, m_SLAVE_SERIALS_SIZE(0)
+, m_QUEUE_SIZE(4)
+, m_TRIGGER(FALSE)
+, m_mode(M_NORMAL)
+, m_commonReference({ FALSE, FALSE, FALSE, FALSE })
+, m_commonGround({ FALSE, FALSE, FALSE, FALSE })
+, m_numBytesReceived(0)
+, m_isRunning(false)
+, m_filePath("data")
 {
 
     //Linking the specific API-library to the project
@@ -135,7 +131,7 @@ bool GUSBAmpDriver::initDevice()
     m_sFileName.append(QString("_%1Hz.txt").arg(m_SAMPLE_RATE_HZ));
     m_file.setFileName(m_sFileName);
 
-    //after m_isRunning = true following variables can be setted:
+    //after start is initialized, buffer variables can be setted:
     m_nPoints           = m_NUMBER_OF_SCANS * (m_NUMBER_OF_CHANNELS + m_TRIGGER);
     m_bufferSizeBytes   = HEADER_SIZE + m_nPoints * sizeof(float);
 
@@ -150,6 +146,7 @@ bool GUSBAmpDriver::initDevice()
     qDebug()<<"File will be stored under the follwing path:\n" << m_sFileName << endl;
 
 
+    //load parameters on the device(s)
     try
     {
         for (deque<LPSTR>::iterator serialNumber = m_callSequenceSerials.begin(); serialNumber != m_callSequenceSerials.end(); serialNumber++)
@@ -276,7 +273,6 @@ bool GUSBAmpDriver::initDevice()
         m_file.open(QIODevice::WriteOnly | QIODevice::Text );
         m_stream.setDevice(&m_file);
 
-
         //start the devices (master device must be started at last)
         for (int deviceIndex=0; deviceIndex<m_numDevices; deviceIndex++)
         {
@@ -287,8 +283,8 @@ bool GUSBAmpDriver::initDevice()
                 //throw string("Error on GT_Start: Couldn't start data acquisition of device.");
                 cout << "\tError on GT_Start: Couldn't start data acquisition of device.\n";
                 return 0;
-
             }
+
             //queue-up the first batch of transfer requests
             for (int queueIndex=0; queueIndex<m_QUEUE_SIZE; queueIndex++)
             {

@@ -114,36 +114,36 @@ class GUSBAmpDriver
 {
 private:
 
-//device-settings
-    vector<LPSTR>       m_vsSerials;                //specify the serial number of the device used as master
-    int                 m_numDevices;               //number of connected devices (master and slaves)
-    deque<LPSTR>        m_callSequenceSerials;      //list of the call sequence (master must be the last device in the call sequence)
-    deque<HANDLE>       m_openedDevicesHandles;     //list of handles in the order of the opened devices
-    deque<HANDLE>       m_callSequenceHandles;      //list of handles in the order of the opened devices
-    int                 m_SLAVE_SERIALS_SIZE;       //the number of slave serials specified in slaveSerials
-    int                 m_SAMPLE_RATE_HZ;           //the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!)
-    int                 m_NUMBER_OF_SCANS;          //the number of scans that should be received simultaneously (depending on the _sampleRate; see C-API documentation for this value!)
-    UCHAR               m_NUMBER_OF_CHANNELS;       //the number of channels per device that should be acquired (must equal the size of the _channelsToAcquire array)
-    UCHAR               m_channelsToAcquire[16];    //the channels that should be acquired from each device
-    const BOOL          m_TRIGGER;                  //TRUE to acquire the trigger line in an additional channel
-    UCHAR               m_mode;                     //use normal acquisition mode
-    CHANNEL             m_bipolarSettings;          //don't use bipolar derivation (all values will be initialized to zero)
-    REF                 m_commonReference;          //don't connect groups to common reference
-    GND                 m_commonGround;             //don't connect groups to common ground
-    const int           m_QUEUE_SIZE;               //the number of GT_GetData calls that will be queued during acquisition to avoid loss of data
-    bool                m_isRunning;                //flag for data acquisition
+//device parameters
+    vector<LPSTR>       m_vsSerials;                /**< specify the serial number of the device used as master */
+    int                 m_numDevices;               /**< number of connected devices (master and slaves) */
+    deque<LPSTR>        m_callSequenceSerials;      /**< list of the call sequence (master must be the last device in the call sequence) */
+    deque<HANDLE>       m_openedDevicesHandles;     /**< list of handles in the order of the opened devices */
+    deque<HANDLE>       m_callSequenceHandles;      /**< list of handles in the order of the opened devices */
+    int                 m_SLAVE_SERIALS_SIZE;       /**< the number of slave serials specified in slaveSerials */
+    int                 m_SAMPLE_RATE_HZ;           /**< the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!) */
+    int                 m_NUMBER_OF_SCANS;          /**< the number of scans that should be received simultaneously (depending on the _sampleRate; see C-API documentation for this value!) */
+    UCHAR               m_NUMBER_OF_CHANNELS;       /**< the number of channels per device that should be acquired (must equal the size of the _channelsToAcquire array) */
+    UCHAR               m_channelsToAcquire[16];    /**< the channels that should be acquired from each device */
+    const BOOL          m_TRIGGER;                  /**< TRUE to acquire the trigger line in an additional channel */
+    UCHAR               m_mode;                     /**< use normal acquisition mode */
+    CHANNEL             m_bipolarSettings;          /**< don't use bipolar derivation (all values will be initialized to zero) */
+    REF                 m_commonReference;          /**< don't connect groups to common reference */
+    GND                 m_commonGround;             /**< don't connect groups to common ground */
+    const int           m_QUEUE_SIZE;               /**< the number of GT_GetData calls that will be queued during acquisition to avoid loss of data */
+    bool                m_isRunning;                /**< flag for data acquisition */
 //buffer
-    int                 m_nPoints;                  //number of points which are received from one chanel simultaneously
-    DWORD               m_bufferSizeBytes;          //Size of buffer
-    DWORD               m_numBytesReceived;         //num of Bytes whicht are received during one measuring procedure
-    BYTE***             m_buffers;                  //pointer to the buffer
-    OVERLAPPED**        m_overlapped;               //storage in case of overlapping
+    int                 m_nPoints;                  /**< number of points which are received from one chanel simultaneously */
+    DWORD               m_bufferSizeBytes;          /**< Size of buffer */
+    DWORD               m_numBytesReceived;         /**< num of Bytes whicht are received during one measuring procedure */
+    BYTE***             m_buffers;                  /**< pointer to the buffer */
+    OVERLAPPED**        m_overlapped;               /**< storage in case of overlapping */
 //file writing and outputmatrix
-    QString             m_filePath;                 //path of the file for data acquisition
-    QString             m_sFileName;                //file name of the data-file
-    QFile               m_file;                     //file to which data is written
-    QTextStream         m_stream;                   //stream from m_buffers to m_file
-    vector<int>         m_sizeOfMatrix;             //number of rows and collums of output matrix [rows collums]
+    QString             m_filePath;                 /**< path of the file for data acquisition */
+    QString             m_sFileName;                /**< file name of the data-file */
+    QFile               m_file;                     /**< file to which data is written */
+    QTextStream         m_stream;                   /**< stream from m_buffers to m_file */
+    vector<int>         m_sizeOfMatrix;             /**< number of rows and collums of output matrix [rows collums] */
 
 
 public:
@@ -164,21 +164,25 @@ public:
     //=========================================================================================================
     /**
     * Get sample from the device in form of a mtrix.
-    * @param [in]   MatrixXf the block sample values in form of a matrix.
-    * @return       returns true if sample was successfully written to the input variable, false otherwise.
+    * @param [in]   MatrixXf    the block sample values in form of a matrix.
+    *
+    * @return                   returns true if sample was successfully written to the input variable, false otherwise.
     */
     bool getSampleMatrixValue(MatrixXf& sampleMatrix);
 
     //=========================================================================================================
     /**
     * Initialise and starts device with the set parameters . After that getSampleMatrixValue() has to be started
-    * immediatly and be executed continously. Otherwise there will be a buffer overrun.
+    * immediatly and be executed continously. Otherwise a buffer overrun will occur.
+    *
+    * @return       returns true if succeeded
     */
     bool initDevice();
 
     //=========================================================================================================
     /**
     * Uninitialise device.
+    *
     * @return       returns true if device was successfully uninitialised, false otherwise.
     */
     bool uninitDevice();
@@ -187,9 +191,9 @@ public:
     /**
     * Setting the adresses of the master amplifer and the slaves. The selections of the slaves are optional.
     *
-    * @param[in]    list        Serial Number of the master device
+    * @param[in]    list        list of serial numbers of the devices. Master is first serialnumber in the list
     *
-    * @return[out]              true if suceeded
+    * @return                   true if suceeded
     *
     */
     bool setSerials(vector<LPSTR> &list);
@@ -200,7 +204,8 @@ public:
     *
     * @param[in]    samplingRate    sampling rate of the amplifier in [Hz] possible settings for the sample rate are:
     *                               32, 64, 128, 256, 512, 600, 1200, 2400, 4800, 9600, 19200 and 38400
-    * @return[out]                  true if suceeded
+    *
+    * @return                       true if suceeded
     *
     */
     bool setSampleRate(int sampleRate);
@@ -212,7 +217,7 @@ public:
     * @param[in]    channels        Vector which behold the values of Channels as integer. The values have to be
     *                               ascending and in number must not exceed 16
     *
-    * @return[out]                  true if suceeded
+    * @return                       true if suceeded
     *
     */
     bool setChannels(vector<int> &channels);
@@ -223,7 +228,7 @@ public:
     *
     * @param[in]    QString         QString which beholds the the path of the File in which data will be stored
     *
-    * @return[out]                  true if suceeded
+    * @return                       true if suceeded
     *
     */
     bool setFilePath(QString FilePath);
@@ -232,15 +237,15 @@ public:
     /**
     * Getting the size of the Sample Matrix
     *
-    * @return[out]                  vector with the size of the matrix. first value = columns. second value rows.
+    * @return                       vector which beholds the size of the matrix. first value refers to columns.
+    *                               second value refers to rows.
     *
     */
     vector<int> getSizeOfSampleMatrix(void);
 
 
-
 protected:
-    GUSBAmpProducer*       m_pGUSBAmpProducer;                /**< A pointer to the corresponding GUSBAmpProducer class.*/
+    GUSBAmpProducer*       m_pGUSBAmpProducer;      /**< A pointer to the corresponding GUSBAmpProducer class.*/
 
 };
 
