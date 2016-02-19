@@ -224,6 +224,7 @@ void RealTimeMultiSampleArrayModel::init()
     m_pFiffInfo = FiffInfo::SPtr(new FiffInfo());
 }
 
+
 //*************************************************************************************************************
 
 void RealTimeMultiSampleArrayModel::initSphara()
@@ -231,7 +232,7 @@ void RealTimeMultiSampleArrayModel::initSphara()
     m_matSpharaMultFirst = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
     m_matSpharaMultSecond = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
-    //Load SPHARA matrix
+    //Load SPHARA matrices for babymeg and vectorview
     IOUtils::read_eigen_matrix(m_matSpharaVVGradLoaded, QString(":/sphara/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
     IOUtils::read_eigen_matrix(m_matSpharaVVMagLoaded, QString(":/sphara/Vectorview_SPHARA_InvEuclidean_Mag.txt"));
 
@@ -329,8 +330,11 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
         m_matSparseSpharaMultFirst.setIdentity();
         m_matSparseSpharaMultSecond.setIdentity();
 
-        //  Create the initial SSP projector
+        //Create the initial SSP projector
         updateProjection();
+
+        //Create the initial Compensator projector
+        updateCompensator(0);
 
         //Initialize filter channel names
         int visibleInit = 20;
@@ -354,7 +358,7 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
         }
 
         //Init the sphara operators
-        //initSphara();
+        initSphara();
     }
     else {
         m_vecBadIdcs = RowVectorXi(0,0);
@@ -749,8 +753,8 @@ void RealTimeMultiSampleArrayModel::updateSpharaActivation(bool state)
 
 void RealTimeMultiSampleArrayModel::updateSpharaOptions(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond)
 {
-    if(m_bSpharaActivated && m_pFiffInfo) {
-        qDebug()<<"RealTimeMultiSampleArrayModel::updateSpharaOptions - Creating SPHARA oerpator for"<<sSytemType;
+    if(m_pFiffInfo) {
+        qDebug()<<"RealTimeMultiSampleArrayModel::updateSpharaOptions - Creating SPHARA operator for"<<sSytemType;
 
         if(sSytemType == "VectorView") {
             m_matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaVVGradLoaded, indicesFirstVV, m_pFiffInfo->nchan, nBaseFctsFirst, 1); //GRADIOMETERS
