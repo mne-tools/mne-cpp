@@ -50,6 +50,7 @@
 #include <utils/mnemath.h>
 #include <utils/detecttrigger.h>
 #include <utils/ioutils.h>
+#include <utils/filterTools/sphara.h>
 
 
 //*************************************************************************************************************
@@ -585,8 +586,10 @@ private:
     Eigen::VectorXi         indicesFirstBabyMEG;                        /**< The indices of the channels to pick for the first SPHARA oerpator in case of a BabyMEG system.*/
     Eigen::VectorXi         indicesSecondBabyMEG;                       /**< The indices of the channels to pick for the second SPHARA oerpator in case of a BabyMEG system.*/
 
-    Eigen::MatrixXd         m_matSpharaMultFirst;                       /**< The final first SPHARA operator (in case of babymeg this is the inner layer, in case of vector view these are the gradiometers).*/
-    Eigen::MatrixXd         m_matSpharaMultSecond;                      /**< The final second magnetometer SPHARA operator (in case of babymeg this is the outer layer, in case of vector view these are the magnetometers).*/
+    Eigen::MatrixXd                 m_matSpharaMultFirst;               /**< The final first SPHARA operator (in case of babymeg this is the inner layer, in case of vector view these are the gradiometers).*/
+    Eigen::MatrixXd                 m_matSpharaMultSecond;              /**< The final second magnetometer SPHARA operator (in case of babymeg this is the outer layer, in case of vector view these are the magnetometers).*/
+    Eigen::SparseMatrix<double>     m_matSparseSpharaMultFirst;         /**< The final sparse first SPHARA operator (in case of babymeg this is the inner layer, in case of vector view these are the gradiometers).*/
+    Eigen::SparseMatrix<double>     m_matSparseSpharaMultSecond;        /**< The final sparse second magnetometer SPHARA operator (in case of babymeg this is the outer layer, in case of vector view these are the magnetometers).*/
 
     Eigen::MatrixXd         m_matSpharaVVGradLoaded;                    /**< The loaded VectorView gradiometer basis functions.*/
     Eigen::MatrixXd         m_matSpharaVVMagLoaded;                     /**< The loaded VectorView magnetometer basis functions.*/
