@@ -195,7 +195,7 @@ macx {
 
     # Copy Resource folder to app bundle
     RCDIR = $${DESTDIR}/MNE_Browse_Raw_Resources
-    APPDIR = $${DESTDIR}/$${TARGET}.app/Contents/MacOS
+    APPDIR = $${DESTDIR}/$${TARGET}.app/Contents/MacOS/MNE_Browse_Raw_Resources
     copydata.commands = $(COPY_DIR) $$RCDIR $$APPDIR
     first.depends = $(first) copydata
     export(first.depends)
