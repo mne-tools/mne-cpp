@@ -193,14 +193,15 @@ macx {
     QMAKE_RPATHDIR += @executable_path/../libs
 
 
-    # Copy Resource folder to app bundle
-    RCDIR = $${DESTDIR}/MNE_Browse_Raw_Resources
-    APPDIR = $${DESTDIR}/$${TARGET}.app/Contents/MacOS/MNE_Browse_Raw_Resources
-    copydata.commands = $(COPY_DIR) $$RCDIR $$APPDIR
-    first.depends = $(first) copydata
-    export(first.depends)
-    export(copydata.commands)
-    QMAKE_EXTRA_TARGETS += first copydata
+#    # Copy Resource folder to app bundle
+#    RCDIR = $${DESTDIR}/MNE_Browse_Raw_Resources
+#    APPDIR = $${DESTDIR}/$${TARGET}.app/Contents/MacOS/MNE_Browse_Raw_Resources
+#    copydata.commands = $(COPY_DIR) $$RCDIR $$APPDIR
+#    first.depends = $(first) copydata
+#    export(first.depends)
+#    export(copydata.commands)
+#    QMAKE_EXTRA_TARGETS += first copydata
+
 
 #    isEmpty(TARGET_EXT) {
 #        TARGET_CUSTOM_EXT = .app
