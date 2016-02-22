@@ -194,9 +194,13 @@ macx {
 
 
     # Copy Resource folder to app bundle
-    APPDIR = $${DESTDIR}/mne_browse_raw_qt.app/Contents/MacOS
-    RCDIR = $${DESTDIR}/bin/MNE_Browse_Raw_Resources
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${RCDIR}) $$quote($${APPDIR})
+    RCDIR = $${DESTDIR}/MNE_Browse_Raw_Resources
+    APPDIR = $${DESTDIR}/$${TARGET}.app/Contents/MacOS
+    copydata.commands = $(COPY_DIR) $$RCDIR $$APPDIR
+    first.depends = $(first) copydata
+    export(first.depends)
+    export(copydata.commands)
+    QMAKE_EXTRA_TARGETS += first copydata
 
 #    isEmpty(TARGET_EXT) {
 #        TARGET_CUSTOM_EXT = .app
