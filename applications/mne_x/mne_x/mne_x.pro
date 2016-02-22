@@ -137,10 +137,12 @@ macx {
     SRCLIB = $${DESTDIR}/mne_x_libs
     DESTLIB = $${DESTDIR}/$${TARGET}.app/Contents/MacOS/mne_x_libs
 
-    SRCPLUGIN = $${DESTDIR}/mne_x_plugins
-    DESTPLUGIN = $${DESTDIR}/$${TARGET}.app/Contents/MacOS/mne_x_plugins
+    QMAKE_POST_LINK += ${COPY_DIR} $$quote($${SRCLIB}) $$quote($${DESTLIB}) $$escape_expand(\\n\\t)
 
-    QMAKE_POST_LINK += ${COPY_DIR} $$quote($${SRCLIB}) $$quote($${DESTLIB}) $$escape_expand(\\n\\t) && ${COPY_DIR} $$quote($${SRCPLUGIN}) $$quote($${DESTPLUGIN}) $$escape_expand(\\n\\t)
+    SRCPLUGINS = $${DESTDIR}/mne_x_plugins
+    DESTPLUGINS = $${DESTDIR}/$${TARGET}.app/Contents/MacOS/mne_x_plugins
+
+    QMAKE_POST_LINK += ${COPY_DIR} $$quote($${SRCPLUGINS}) $$quote($${DESTPLUGINS}) $$escape_expand(\\n\\t)
 
 #    isEmpty(TARGET_EXT) {
 #        TARGET_CUSTOM_EXT = .app
