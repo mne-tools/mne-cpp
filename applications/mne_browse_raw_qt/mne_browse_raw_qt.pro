@@ -199,13 +199,6 @@ macx {
 
     QMAKE_POST_LINK += ${COPY_DIR} $$quote($${RCDIR}) $$quote($${APPDIR}) $$escape_expand(\\n\\t)
 
-#    copydata.commands = $(COPY_DIR) $$RCDIR $$APPDIR
-#    first.depends = $(first) copydata
-#    export(first.depends)
-#    export(copydata.commands)
-#    QMAKE_EXTRA_TARGETS += first copydata
-
-
 #    isEmpty(TARGET_EXT) {
 #        TARGET_CUSTOM_EXT = .app
 #    } else {
