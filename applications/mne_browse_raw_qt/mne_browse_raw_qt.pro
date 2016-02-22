@@ -192,6 +192,12 @@ macx {
     QMAKE_RPATHDIR += @executable_path/../Frameworks
     QMAKE_RPATHDIR += @executable_path/../libs
 
+
+    # Copy Resource folder to app bundle
+    APPDIR = $${DESTDIR}/mne_browse_raw_qt.app/Contents/MacOS
+    RCDIR = $${DESTDIR}/bin/MNE_Browse_Raw_Resources
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${RCDIR}) $$quote($${APPDIR})
+
 #    isEmpty(TARGET_EXT) {
 #        TARGET_CUSTOM_EXT = .app
 #    } else {
