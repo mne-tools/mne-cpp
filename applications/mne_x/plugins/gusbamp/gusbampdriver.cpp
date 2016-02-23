@@ -131,13 +131,12 @@ bool GUSBAmpDriver::initDevice()
     m_sFileName.append(QString("_%1Hz.txt").arg(m_SAMPLE_RATE_HZ));
     m_file.setFileName(m_sFileName);
 
-    //after start is initialized, buffer variables can be setted:
+    //after start is initialized, buffer parameters can be calculated:
     m_nPoints           = m_NUMBER_OF_SCANS * (m_NUMBER_OF_CHANNELS + m_TRIGGER);
     m_bufferSizeBytes   = HEADER_SIZE + m_nPoints * sizeof(float);
 
-
-    //output of the setted parameters:
-    qDebug() << "\nFollowing parameters were setted:\n";
+    //output of the adjusted parameters:
+    qDebug() << "\nFollowing parameters were adjusted:\n";
     qDebug() << "sample rate:\n" <<m_SAMPLE_RATE_HZ << "Hz" ;
     qDebug() << "called device(s):";
     for(deque<LPSTR>::iterator serialNumber = m_callSequenceSerials.begin(); serialNumber != m_callSequenceSerials.end(); serialNumber++)
@@ -474,12 +473,6 @@ bool GUSBAmpDriver::setSerials(vector<LPSTR> &list)
         return false;
     }
 
-    //closes the former call-sequence-list
-    while (!m_callSequenceSerials.empty())
-    {
-        m_callSequenceSerials.pop_front();
-    }
-
     int size = list.size();
     //qDebug() << "size of list:" <<size;
 
@@ -489,10 +482,17 @@ bool GUSBAmpDriver::setSerials(vector<LPSTR> &list)
         return false;
     }
 
+
     m_vsSerials.resize(size);
     m_vsSerials = list;
 
     m_SLAVE_SERIALS_SIZE = size - 1;
+
+    //closes the former call-sequence-list
+    while (!m_callSequenceSerials.empty())
+    {
+        m_callSequenceSerials.pop_front();
+    }
 
     //defining the new deque-list for data acquisition
     for (int i=1; i<=m_SLAVE_SERIALS_SIZE; i++)
@@ -617,7 +617,6 @@ bool GUSBAmpDriver::setFilePath(QString FilePath)
     m_filePath = FilePath;
 
     return true;
-
 }
 
 //*************************************************************************************************************

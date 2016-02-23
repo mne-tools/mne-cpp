@@ -87,7 +87,6 @@ GUSBAmpProducer::~GUSBAmpProducer()
 
 void GUSBAmpProducer::start(vector<LPSTR> &serials, vector<int> channels, int sampleRate, QString filePath)
 {
-
     //setting the new parameters of the gUSBamp device
     m_pGUSBAmpDriver->setSerials(serials);
     m_pGUSBAmpDriver->setSampleRate(sampleRate);

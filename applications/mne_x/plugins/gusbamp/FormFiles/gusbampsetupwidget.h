@@ -104,13 +104,23 @@ public:
     */
     void initGui();
 
+private slots:
+
+    void on_comboBox_activated(const QString &arg1);
+
+
+
+
+
+    void on_pushButton_clicked();
+
 private:
     //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
+//    /**
+//    * Shows the About Dialog
+//    *
+//    */
+//    void showAboutDialog();
 
     GUSBAmp*               m_pGUSBAmp;                 /**< a pointer to corresponding GUSBAmp.*/
 
