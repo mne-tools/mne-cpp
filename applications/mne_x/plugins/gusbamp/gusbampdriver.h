@@ -133,8 +133,8 @@ private:
     const int           m_QUEUE_SIZE;               /**< the number of GT_GetData calls that will be queued during acquisition to avoid loss of data */
     bool                m_isRunning;                /**< flag for data acquisition */
 //buffer
-    int                 m_nPoints;                  /**< number of points which are received from one chanel simultaneously */
-    DWORD               m_bufferSizeBytes;          /**< Size of buffer */
+    int                 m_nPoints;                  /**< number of points which are received from one channel simultaneously */
+    DWORD               m_bufferSizeBytes;          /**< Size of buffer in Bytes */
     DWORD               m_numBytesReceived;         /**< num of Bytes whicht are received during one measuring procedure */
     BYTE***             m_buffers;                  /**< pointer to the buffer */
     OVERLAPPED**        m_overlapped;               /**< storage in case of overlapping */
@@ -143,7 +143,7 @@ private:
     QString             m_sFileName;                /**< file name of the data-file */
     QFile               m_file;                     /**< file to which data is written */
     QTextStream         m_stream;                   /**< stream from m_buffers to m_file */
-    vector<int>         m_sizeOfMatrix;             /**< number of rows and collums of output matrix [rows collums] */
+    vector<int>         m_sizeOfMatrix;             /**< number of rows and column of output matrix [rows columns] */
 
 
 public:
@@ -193,7 +193,7 @@ public:
     *
     * @param[in]    list        list of serial numbers of the devices. Master is first serialnumber in the list
     *
-    * @return                   true if suceeded
+    * @return                   true if executed successfully, false otherwise
     *
     */
     bool setSerials(vector<LPSTR> &list);
@@ -205,7 +205,7 @@ public:
     * @param[in]    samplingRate    sampling rate of the amplifier in [Hz] possible settings for the sample rate are:
     *                               32, 64, 128, 256, 512, 600, 1200, 2400, 4800, 9600, 19200 and 38400
     *
-    * @return                       true if suceeded
+    * @return                       true if executed successfully, false otherwise
     *
     */
     bool setSampleRate(int sampleRate);
@@ -217,7 +217,7 @@ public:
     * @param[in]    channels        Vector which behold the values of Channels as integer. The values have to be
     *                               ascending and in number must not exceed 16
     *
-    * @return                       true if suceeded
+    * @return                       true if executed successfully, false otherwise
     *
     */
     bool setChannels(vector<int> &channels);
@@ -228,7 +228,7 @@ public:
     *
     * @param[in]    QString         QString which beholds the the path of the File in which data will be stored
     *
-    * @return                       true if suceeded
+    * @return                       true if executed successfully, false otherwise
     *
     */
     bool setFilePath(QString FilePath);

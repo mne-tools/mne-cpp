@@ -44,6 +44,8 @@
 #include "../gusbamp.h"
 
 
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -70,6 +72,7 @@ GUSBAmpSetupWidget::GUSBAmpSetupWidget(GUSBAmp* pGUSBAmp, QWidget* parent)
 , m_pGUSBAmp(pGUSBAmp)
 {
     ui.setupUi(this);
+
 }
 
 
@@ -91,8 +94,60 @@ void GUSBAmpSetupWidget::initGui()
 
 //*************************************************************************************************************
 
-void GUSBAmpSetupWidget::showAboutDialog()
+//void GUSBAmpSetupWidget::showDialog()
+//{
+//    GUSBAmpAboutWidget aboutDialog(this);
+//    aboutDialog.exec();
+//}
+
+//*************************************************************************************************************
+
+
+
+void GUSBAmpPlugin::GUSBAmpSetupWidget::on_comboBox_activated(const QString &arg1)
 {
-    GUSBAmpAboutWidget aboutDialog(this);
-    aboutDialog.exec();
+
+    QMessageBox::information(this,"Sample Rate", arg1 );
+    m_pGUSBAmp->m_iSampleRate = arg1.toInt();
+
+
+
+
+}
+
+
+
+
+void GUSBAmpPlugin::GUSBAmpSetupWidget::on_pushButton_clicked()
+{
+    int serialSize = 1;
+
+    QString master = (ui.master->text());
+    QString slave1 = (ui.slave1->text());
+    QString slave2 = (ui.slave2->text());
+    QString slave3 = (ui.slave3->text());
+
+    ui.label->setText(master);
+    ui.label1->setText(slave1);
+    ui.label2->setText(slave2);
+    ui.label3->setText(slave3);
+
+    if(master.isEmpty())
+    {
+        QMessageBox::information(this,"ERROR - master serial", "ERROR set master: field master is not supposed to be empty!");
+        return;
+    }
+
+    serialSize += !slave1.isEmpty() + !slave2.isEmpty() + !slave3.isEmpty();
+
+
+
+
+
+
+
+
+
+
+
 }

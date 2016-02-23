@@ -241,7 +241,7 @@ bool GUSBAmp::start()
 
     //Set the channel size of the RTMSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
     m_pRTMSA_GUSBAmp->data()->initFromFiffInfo(m_pFiffInfo);
-    m_pRTMSA_GUSBAmp->data()->setMultiArraySize(m_iSamplesPerBlock);
+    m_pRTMSA_GUSBAmp->data()->setMultiArraySize(1);
     m_pRTMSA_GUSBAmp->data()->setSamplingRate(m_iSampleRate);
 
     //start the thread for ring buffer
@@ -315,6 +315,7 @@ QWidget* GUSBAmp::setupWidget()
 
 void GUSBAmp::run()
 {
+
     while(m_bIsRunning)
     {
         //pop matrix only if the producer thread is running
@@ -322,7 +323,8 @@ void GUSBAmp::run()
         {
             //qDebug()<<"GUSBAmp is running";
             MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
-            //qDebug() << matValue.rows()<< matValue.cols();
+            matValue = matValue/1000000;
+            qDebug() << matValue.rows()<< matValue.cols();
 
             //emit values to real time multi sample array
             m_pRTMSA_GUSBAmp->data()->setValue(matValue.cast<double>());
