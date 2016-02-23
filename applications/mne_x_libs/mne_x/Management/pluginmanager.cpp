@@ -53,7 +53,6 @@
 
 #include <QDir>
 #include <QDebug>
-#include <QMessageBox>
 
 
 //*************************************************************************************************************
@@ -89,15 +88,20 @@ void PluginManager::loadPlugins(const QString& dir)
 {
     QDir PluginsDir(dir);
 
+    QFile file("test.txt");
+    if (!file.open(QFile::WriteOnly)) {
+        qWarning() << "Cannot open file for writing.";
+        return;
+    }
+
+    QTextStream out(&file);
+
     foreach(QString file, PluginsDir.entryList(QDir::Files))
     {
         this->setFileName(PluginsDir.absoluteFilePath(file));
-
-        QMessageBox msgBox;
-        msgBox.setText(QString("Loading Plugin: %1").arg(this->fileName()));
-        msgBox.exec();
-
         QObject *pPlugin = this->instance();
+
+        out << this->fileName() << endl;
 
         // IPlugin
         if(pPlugin)
