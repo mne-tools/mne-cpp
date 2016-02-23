@@ -116,7 +116,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     setUnifiedTitleAndToolBarOnMac(true);
 
-    m_pPluginManager->loadPlugins(QCoreApplication::applicationDirPath()+pluginDir);//qApp->applicationDirPath()
+    m_pPluginManager->loadPlugins(qApp->applicationDirPath()+pluginDir);
 
     createActions();
     createMenus();
