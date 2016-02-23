@@ -88,20 +88,10 @@ void PluginManager::loadPlugins(const QString& dir)
 {
     QDir PluginsDir(dir);
 
-    QFile file("test.txt");
-    if (!file.open(QFile::WriteOnly)) {
-        qWarning() << "Cannot open file for writing.";
-        return;
-    }
-
-    QTextStream out(&file);
-
     foreach(QString file, PluginsDir.entryList(QDir::Files))
     {
         this->setFileName(PluginsDir.absoluteFilePath(file));
         QObject *pPlugin = this->instance();
-
-        out << this->fileName() << endl;
 
         // IPlugin
         if(pPlugin)
