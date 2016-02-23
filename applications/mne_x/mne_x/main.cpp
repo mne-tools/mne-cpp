@@ -174,11 +174,11 @@ int main(int argc, char *argv[])
     splashscreen->show();
 
     //ToDo Debug Some waiting stuff to see splash screen -> remove this in final release
-    int time = 100000;
+    int time = 100;
     for(int i=0; i < time;++i)
     {
         int p = (i*100)/time;
-        splashscreen->showMessage("Loading modules.."+ QString::number(p)+"%; Debug: " + qApp->applicationDirPath() + "/mne_x_plugins");
+        splashscreen->showMessage("Loading modules.."+ QString::number(p)+"%");
     }
 
     mainWin = QSharedPointer<MainWindow>(new MainWindow);
