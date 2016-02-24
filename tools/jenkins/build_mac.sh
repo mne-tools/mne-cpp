@@ -40,10 +40,10 @@ make -j4
 # === Deployment ===
 for ((i = 0; i < n_elements; i++)); do
     fixfile="../mne-cpp/bin/${TANGIBLES[i]}.app/Contents/MacOS/${TANGIBLES[i]}"
-    destdir="../mne-cpp/bin/${TANGIBLES[i]}.app/Contents/libs/"
+    destdir="../mne-cpp/bin/${TANGIBLES[i]}.app/Contents/Frameworks/"
 
-    /usr/local/bin/dylibbundler -od -b -x $fixfile -d $destdir
-
+	dylibbundler -od -b -x $fixfile -d $destdir -p @executable_path/../Frameworks/
+	
     tangible="../mne-cpp/bin/${TANGIBLES[i]}.app"
     macdeployqt $tangible -dmg
 done
