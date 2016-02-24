@@ -132,6 +132,18 @@ macx {
     QMAKE_RPATHDIR += @executable_path/../Frameworks
     QMAKE_RPATHDIR += @executable_path/../libs
 
+
+    # Copy Resource folder to app bundle
+    SRCLIB = $${DESTDIR}/mne_x_libs
+    DESTLIB = $${DESTDIR}/$${TARGET}.app/Contents/MacOS/mne_x_libs
+
+    QMAKE_POST_LINK += ${COPY_DIR} $$quote($${SRCLIB}) $$quote($${DESTLIB}) $$escape_expand(\\n\\t)
+
+    SRCPLUGINS = $${DESTDIR}/mne_x_plugins
+    DESTPLUGINS = $${DESTDIR}/$${TARGET}.app/Contents/MacOS/mne_x_plugins
+
+    QMAKE_POST_LINK += ${COPY_DIR} $$quote($${SRCPLUGINS}) $$quote($${DESTPLUGINS}) $$escape_expand(\\n\\t)
+
 #    isEmpty(TARGET_EXT) {
 #        TARGET_CUSTOM_EXT = .app
 #    } else {
