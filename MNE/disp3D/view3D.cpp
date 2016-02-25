@@ -125,10 +125,10 @@ void View3D::init()
     m_aspectEngine.setData(data);
 
     //Light source
-    Qt3DRender::QPointLight *light1 = new Qt3DRender::QPointLight();
-    light1->setColor(Qt::white);
-    light1->setIntensity(0.1f);
-    m_pRootEntity->addComponent(light1);
+//    Qt3DRender::QPointLight *light1 = new Qt3DRender::QPointLight();
+//    light1->setColor(Qt::white);
+//    light1->setIntensity(0.1f);
+//    m_pRootEntity->addComponent(light1);
 
     // Camera
     m_pCameraEntity->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
