@@ -1,3 +1,5 @@
+#define FP highp
+
 const int MAX_LIGHTS = 8;
 const int TYPE_DIRECTIONAL = 1;
 const int TYPE_SPOT = 2;
@@ -16,6 +18,8 @@ uniform int lightCount;
 in vec3 vWorldPosition;
 in vec3 vWorldNormal;
 in vec3 vColor;
+
+out vec4 fFragColor;
 
 uniform float alpha;
 
@@ -55,5 +59,5 @@ void main()
     vec3 diffuseColor;
 	
     adModel(vWorldPosition, vWorldNormal, diffuseColor);
-    gl_FragColor = vec4( vColor + vColor * diffuseColor, alpha );
+	fFragColor = vec4( vColor , alpha );
 }
