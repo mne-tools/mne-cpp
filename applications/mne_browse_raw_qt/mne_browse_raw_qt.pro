@@ -163,30 +163,15 @@ macx {
 RESOURCES += \
     mnebrowserawqt.qrc
 
-RC_FILE = Resources/Images/ApplicationIcons/browse_raw.rc
-
-# Deploy Qt Dependencies
-unix:!macx {
-    #ToDo Unix
+# Icon
+win32 {
+    RC_FILE = Resources/Images/ApplicationIcons/browse_raw.rc
 }
 macx {
-    # === Mac ===
-
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .app
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-    }
-
-    # Copy libs
-    BUNDLEFRAMEDIR = $$shell_quote($${DESTDIR}/$${TARGET}$${TARGET_CUSTOM_EXT}/Contents/Frameworks)
-    QMAKE_POST_LINK = $${QMAKE_MKDIR} $${BUNDLEFRAMEDIR} &
-    QMAKE_POST_LINK += $${QMAKE_COPY} $${MNE_LIBRARY_DIR}/{libMNE1Generics.*,libMNE1Utils.*,libMNE1Fs.*,libMNE1Fiff.*,libMNE1Mne*,libMNE1Disp.*} $${BUNDLEFRAMEDIR}
-
-#    DEPLOY_COMMAND = macdeployqt
-#    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-#    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -verbose=0
+    ICON = Resources/Images/ApplicationIcons/mne_browse_raw.icns
 }
+
+# Deploy Qt Dependencies
 win32 {
     isEmpty(TARGET_EXT) {
         TARGET_CUSTOM_EXT = .exe
@@ -201,4 +186,31 @@ win32 {
     #  # Uncomment the following line to help debug the deploy command when running qmake
     #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
     QMAKE_POST_LINK = $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+}
+macx {
+    # === Mac ===
+    QMAKE_RPATHDIR += @executable_path/../Frameworks
+
+    # Copy Resource folder to app bundle
+    brrc.path = Contents/MacOS
+    brrc.files = $${DESTDIR}/MNE_Browse_Raw_Resources
+    QMAKE_BUNDLE_DATA += brrc
+
+#    isEmpty(TARGET_EXT) {
+#        TARGET_CUSTOM_EXT = .app
+#    } else {
+#        TARGET_CUSTOM_EXT = $${TARGET_EXT}
+#    }
+
+#    # Copy libs
+#    BUNDLEFRAMEDIR = $$shell_quote($${DESTDIR}/$${TARGET}$${TARGET_CUSTOM_EXT}/Contents/Frameworks)
+#    QMAKE_POST_LINK = $${QMAKE_MKDIR} $${BUNDLEFRAMEDIR} &
+#    QMAKE_POST_LINK += $${QMAKE_COPY} $${MNE_LIBRARY_DIR}/{libMNE1Generics.*,libMNE1Utils.*,libMNE1Fs.*,libMNE1Fiff.*,libMNE1Mne*,libMNE1Disp.*} $${BUNDLEFRAMEDIR}
+
+#    DEPLOY_COMMAND = macdeployqt
+#    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
+#    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -verbose=0
+}
+unix:!macx {
+    #ToDo Unix
 }

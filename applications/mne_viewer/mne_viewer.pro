@@ -87,7 +87,10 @@ unix:!macx {
     #ToDo Unix
 }
 macx {
-    #ToDo Mac
+    # === Mac ===
+    QMAKE_RPATHDIR += @executable_path/../Frameworks
+    QMAKE_RPATHDIR += @executable_path/../libs
+
     #macdeployqt is done in an separate deploy script
 #    isEmpty(TARGET_EXT) {
 #        TARGET_CUSTOM_EXT = .app

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Noise Reduction Options</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="1">
@@ -27,22 +27,6 @@
       <string>SPHARA</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="2" column="1">
-       <widget class="QSlider" name="m_horizontalSlider_nBaseFcts">
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>500</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="tickPosition">
-         <enum>QSlider::NoTicks</enum>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0" colspan="2">
        <widget class="QCheckBox" name="m_checkBox_activateSphara">
         <property name="text">
@@ -50,8 +34,8 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="2">
-       <widget class="QSpinBox" name="m_spinBox_nBaseFcts">
+      <item row="4" column="1">
+       <widget class="QSpinBox" name="m_spinBox_nBaseFctsGrad">
         <property name="minimum">
          <number>1</number>
         </property>
@@ -60,10 +44,52 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1" colspan="2">
+      <item row="5" column="1">
+       <widget class="QSpinBox" name="m_spinBox_nBaseFctsMag">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="m_label_nBaseFctsMag">
+        <property name="text">
+         <string>Mag:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
        <widget class="QLabel" name="label">
         <property name="text">
          <string>Number of used base functions (upper limit):</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="m_label_nBaseFctsGrad">
+        <property name="text">
+         <string>Grad:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QComboBox" name="m_comboBox_acquisitionSystem">
+        <item>
+         <property name="text">
+          <string>VectorView</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>BabyMEG</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>AcquisitionSystem:</string>
         </property>
        </widget>
       </item>
@@ -87,22 +113,5 @@
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>m_horizontalSlider_nBaseFcts</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>m_spinBox_nBaseFcts</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>105</x>
-     <y>106</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>36</x>
-     <y>107</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

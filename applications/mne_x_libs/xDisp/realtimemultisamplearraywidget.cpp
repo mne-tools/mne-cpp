@@ -253,14 +253,18 @@ void RealTimeMultiSampleArrayWidget::init()
         m_pRTMSAModel->setChannelInfo(m_qListChInfo);//ToDo Obsolete
         m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, m_iT);
 
+        //
         //-------- Init the delegate --------
+        //
         m_pRTMSADelegate = RealTimeMultiSampleArrayDelegate::SPtr(new RealTimeMultiSampleArrayDelegate(this));
         m_pRTMSADelegate->initPainterPaths(m_pRTMSAModel.data());
 
         connect(this, &RealTimeMultiSampleArrayWidget::markerMoved,
                 m_pRTMSADelegate.data(), &RealTimeMultiSampleArrayDelegate::markerMoved);
 
+        //
         //-------- Init the view --------
+        //
         m_pTableView->setModel(m_pRTMSAModel.data());
         m_pTableView->setItemDelegate(m_pRTMSADelegate.data());
 
@@ -296,7 +300,9 @@ void RealTimeMultiSampleArrayWidget::init()
         connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),
                 this,SLOT(channelContextMenu(QPoint)));
 
+        //
         //-------- Init scaling --------
+        //
         //Show only spin boxes and labels which type are present in the current loaded fiffinfo
         QList<FiffChInfo> channelList = m_pFiffInfo->chs;
         QList<int> availabeChannelTypes;
@@ -350,7 +356,9 @@ void RealTimeMultiSampleArrayWidget::init()
             m_pRTMSAModel->setScaling(m_qMapChScaling);
 //        }
 
+        //
         //-------- Init bad channel list --------
+        //
         m_qListBadChannels.clear();
         for(int i = 0; i<m_pRTMSAModel->rowCount(); i++)
             if(m_pRTMSAModel->data(m_pRTMSAModel->index(i,2)).toBool())
@@ -382,7 +390,9 @@ void RealTimeMultiSampleArrayWidget::init()
                                                 settings.value(QString("RTMSAW/%1/filterTransition").arg(t_sRTMSAWName), 5.0).toDouble(),
                                                 settings.value(QString("RTMSAW/%1/filterUserDesignActive").arg(t_sRTMSAWName), false).toBool());
 
+        //
         //-------- Init channel selection manager --------
+        //
         m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(m_pFiffInfo.data(), this));
 
         m_pSelectionManagerWindow = SelectionManagerWindow::SPtr(new SelectionManagerWindow(this, m_pChInfoModel));
@@ -405,14 +415,20 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pSelectionManagerWindow->setCurrentLayoutFile(settings.value(QString("RTMSAW/%1/selectedLayoutFile").arg(t_sRTMSAWName), "babymeg-mag-inner-layer.lout").toString());
 
+        //
         //-------- Init quick control widget --------
+        //
+        QStringList slFlags;
+
         #ifdef BUILD_BASIC_MNEX_VERSION
             std::cout<<"BUILD_BASIC_MNEX_VERSION Defined"<<std::endl;
-            m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display", 0, true, false, true, false, false, false));
+            slFlags << "projections" << "view" << "scaling";
         #else
             std::cout<<"BUILD_BASIC_MNEX_VERSION Undefined"<<std::endl;
-            m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display"));
+            slFlags << "compensators" << "projections" << "filter" << "view" << "triggerdetection" << "scaling" << "sphara";
         #endif
+
+        m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display", slFlags));
 
         m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
@@ -427,6 +443,13 @@ void RealTimeMultiSampleArrayWidget::init()
         //Handle compensators
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::compSelectionChanged,
                 this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::updateCompensator);
+
+        //Handle SPHARA
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::spharaActivationChanged,
+                this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::updateSpharaActivation);
+
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::spharaOptionsChanged,
+                this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::updateSpharaOptions);
 
         //Handle view changes
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::zoomChanged,

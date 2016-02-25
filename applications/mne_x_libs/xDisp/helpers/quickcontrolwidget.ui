@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>411</width>
-    <height>273</height>
+    <width>456</width>
+    <height>454</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -31,32 +31,131 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="0" colspan="2">
     <layout class="QGridLayout" name="m_gridLayout_masterLayout">
-     <item row="0" column="1">
-      <widget class="QGroupBox" name="m_groupBox_projections">
+     <item row="1" column="0">
+      <widget class="QGroupBox" name="m_groupBox_noise">
        <property name="title">
-        <string>Projections</string>
+        <string>Noise</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QTabWidget" name="m_tabWidget_noiseReduction">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="SSP">
+           <attribute name="title">
+            <string>SSP</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="Comp">
+           <attribute name="title">
+            <string>Comp</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="Filter">
+           <attribute name="title">
+            <string>Filter</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="SPHARA">
+           <attribute name="title">
+            <string>SPHARA</string>
+           </attribute>
+           <layout class="QFormLayout" name="formLayout_2">
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="m_checkBox_activateSphara">
+              <property name="text">
+               <string>Activate SPHARA</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="m_comboBox_spharaSystem">
+              <item>
+               <property name="text">
+                <string>BabyMEG</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>VectorView</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="m_label_spharaSecond">
+              <property name="text">
+               <string>Outer layer:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QSpinBox" name="m_spinBox_spharaSecond">
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>105</number>
+              </property>
+              <property name="value">
+               <number>105</number>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="m_label_spharaFirst">
+              <property name="text">
+               <string>Inner layer:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QSpinBox" name="m_spinBox_spharaFirst">
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>270</number>
+              </property>
+              <property name="value">
+               <number>270</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QGroupBox" name="m_groupBox_modalities">
+       <property name="title">
+        <string>Modalities</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="QGroupBox" name="m_groupBox_filter">
+     <item row="0" column="0">
+      <widget class="QGroupBox" name="m_groupBox_scaling">
        <property name="title">
-        <string>Filter</string>
+        <string>Scaling</string>
        </property>
       </widget>
      </item>
      <item row="2" column="0">
-      <widget class="QGroupBox" name="m_groupBox_view">
+      <widget class="QGroupBox" name="m_groupBox_other">
        <property name="title">
         <string>Other</string>
        </property>
-       <layout class="QHBoxLayout" name="horizontalLayout">
+       <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <widget class="QTabWidget" name="m_tabWidget_viewOptions">
           <property name="currentIndex">
            <number>1</number>
           </property>
-          <widget class="QWidget" name="tab">
+          <widget class="QWidget" name="View">
            <attribute name="title">
             <string>View</string>
            </attribute>
@@ -172,7 +271,7 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tab_2">
+          <widget class="QWidget" name="TriggerDetection">
            <attribute name="title">
             <string>Trigger detection</string>
            </attribute>
@@ -288,40 +387,7 @@
        </layout>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QGroupBox" name="m_groupBox_compensators">
-       <property name="title">
-        <string>Compensators</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0" rowspan="2">
-      <widget class="QGroupBox" name="m_groupBox_scaling">
-       <property name="minimumSize">
-        <size>
-         <width>220</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="title">
-        <string>Scaling</string>
-       </property>
-      </widget>
-     </item>
     </layout>
-   </item>
-   <item row="0" column="0">
-    <widget class="QPushButton" name="m_pushButton_hideAll">
-     <property name="text">
-      <string>Minimize - Quick Control</string>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
    </item>
    <item row="0" column="1">
     <widget class="QPushButton" name="m_pushButton_close">
@@ -333,6 +399,19 @@
      </property>
      <property name="text">
       <string>Close</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QPushButton" name="m_pushButton_hideAll">
+     <property name="text">
+      <string>Minimize - Quick Control</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

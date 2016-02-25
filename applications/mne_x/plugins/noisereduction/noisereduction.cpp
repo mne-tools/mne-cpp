@@ -49,7 +49,9 @@
 using namespace NoiseReductionPlugin;
 using namespace MNEX;
 using namespace XMEASLIB;
+using namespace UTILSLIB;
 using namespace IOBuffer;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -62,9 +64,23 @@ NoiseReduction::NoiseReduction()
 , m_pNoiseReductionInput(NULL)
 , m_pNoiseReductionOutput(NULL)
 , m_pNoiseReductionBuffer(CircularMatrixBuffer<double>::SPtr())
-, m_iNBaseFcts(500)
 , m_bSpharaActive(false)
+, m_sCurrentSystem("VectorView")
 {
+    if(m_sCurrentSystem == "BabyMEG") {
+        m_iNBaseFctsFirst = 270;
+        m_iNBaseFctsSecond = 105;
+    }
+
+    if(m_sCurrentSystem == "VectorView") {
+        m_iNBaseFctsFirst = 102;
+        m_iNBaseFctsSecond = 102;
+    }
+
+    //Create toolbar widgets
+    m_pOptionsWidget = NoiseReductionOptionsWidget::SPtr(new NoiseReductionOptionsWidget(this));
+    m_pOptionsWidget->setAcquisitionSystem(m_sCurrentSystem);
+
     //Add action which will be visible in the plugin's toolbar
     m_pActionShowOptionsWidget = new QAction(QIcon(":/images/options.png"), tr("Noise reduction options"),this);
     m_pActionShowOptionsWidget->setShortcut(tr("F12"));
@@ -212,6 +228,17 @@ void NoiseReduction::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
+void NoiseReduction::setAcquisitionSystem(const QString& sSystem)
+{
+    m_mutex.lock();
+    m_sCurrentSystem = sSystem;
+    m_mutex.unlock();
+
+    createSpharaOperator();
+}
+
+//*************************************************************************************************************
+
 void NoiseReduction::setSpharaMode(bool state)
 {
     m_mutex.lock();
@@ -222,11 +249,14 @@ void NoiseReduction::setSpharaMode(bool state)
 
 //*************************************************************************************************************
 
-void NoiseReduction::setSpharaNBaseFcts(int nBaseFcts)
+void NoiseReduction::setSpharaNBaseFcts(int nBaseFctsGrad, int nBaseFctsMag)
 {
     m_mutex.lock();
-    m_iNBaseFcts = nBaseFcts;
+    m_iNBaseFctsFirst = nBaseFctsGrad;
+    m_iNBaseFctsSecond = nBaseFctsMag;
     m_mutex.unlock();
+
+    createSpharaOperator();
 }
 
 
@@ -240,16 +270,21 @@ void NoiseReduction::run()
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
+    //Read and create SPHARA operator for the first time
+    initSphara();
+    createSpharaOperator();
+
     while(m_bIsRunning)
     {
         //Dispatch the inputs
         MatrixXd t_mat = m_pNoiseReductionBuffer->pop();
 
         m_mutex.lock();
-        //To all the noise reduction steps here
+
+        //Do all the noise reduction steps here
         //SPHARA calculations
         if(m_bSpharaActive) {
-
+            t_mat = m_matSpharaMultFirst * m_matSpharaMultSecond * t_mat;
         }
 
         m_mutex.unlock();
@@ -265,6 +300,79 @@ void NoiseReduction::run()
 
 void NoiseReduction::showOptionsWidget()
 {
-    m_pOptionsWidget = NoiseReductionOptionsWidget::SPtr(new NoiseReductionOptionsWidget(this));
     m_pOptionsWidget->show();
+}
+
+
+//*************************************************************************************************************
+
+void NoiseReduction::initSphara()
+{
+    m_matSpharaMultFirst = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+    m_matSpharaMultSecond = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+
+    //Load SPHARA matrix
+    IOUtils::read_eigen_matrix(m_matSpharaVVGradLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaVVMagLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt"));
+
+    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGInnerLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
+
+    //Generate indices used to create the SPHARA operators.
+    indicesFirstVV.resize(0);
+    indicesSecondVV.resize(0);
+
+    for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
+        //Find GRADIOMETERS
+        if(m_pFiffInfo->chs.at(r).coil_type == 3012) {
+            indicesFirstVV.conservativeResize(indicesFirstVV.rows()+1);
+            indicesFirstVV(indicesFirstVV.rows()-1) = r;
+        }
+
+        //Find Magnetometers
+        if(m_pFiffInfo->chs.at(r).coil_type == 3024) {
+            indicesSecondVV.conservativeResize(indicesSecondVV.rows()+1);
+            indicesSecondVV(indicesSecondVV.rows()-1) = r;
+        }
+    }
+
+
+    indicesFirstBabyMEG.resize(0);
+    for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
+        //Find INNER LAYER
+        if(m_pFiffInfo->chs.at(r).coil_type == 7002) {
+            indicesFirstBabyMEG.conservativeResize(indicesFirstBabyMEG.rows()+1);
+            indicesFirstBabyMEG(indicesFirstBabyMEG.rows()-1) = r;
+        }
+
+        //TODO: Find outer layer
+    }
+
+//    qDebug()<<"NoiseReduction::createSpharaOperator - Read VectorView mag matrix "<<m_matSpharaVVMagLoaded.rows()<<m_matSpharaVVMagLoaded.cols()<<"and grad matrix"<<m_matSpharaVVGradLoaded.rows()<<m_matSpharaVVGradLoaded.cols();
+//    qDebug()<<"NoiseReduction::createSpharaOperator - Read BabyMEG inner layer matrix "<<m_matSpharaBabyMEGInnerLoaded.rows()<<m_matSpharaBabyMEGInnerLoaded.cols()<<"and outer layer matrix"<<m_matSpharaBabyMEGOuterFull.rows()<<m_matSpharaBabyMEGOuterFull.cols();
+}
+
+
+//*************************************************************************************************************
+
+void NoiseReduction::createSpharaOperator()
+{
+    qDebug()<<"NoiseReduction::createSpharaOperator - Creating SPHARA oerpator for"<<m_sCurrentSystem;
+
+    m_mutex.lock();
+
+    if(m_sCurrentSystem == "VectorView") {
+        m_matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaVVGradLoaded, indicesFirstVV, m_pFiffInfo->nchan, m_iNBaseFctsFirst, 1); //GRADIOMETERS
+        m_matSpharaMultSecond = Sphara::makeSpharaProjector(m_matSpharaVVMagLoaded, indicesSecondVV, m_pFiffInfo->nchan, m_iNBaseFctsSecond, 0); //Magnetometers
+    }
+
+    if(m_sCurrentSystem == "BabyMEG") {
+        m_matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaBabyMEGInnerLoaded, indicesFirstBabyMEG, m_pFiffInfo->nchan, m_iNBaseFctsFirst, 0); //InnerLayer
+    }
+
+    //Write final operator matrices to file
+    IOUtils::write_eigen_matrix(m_matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/m_matSpharaMultFirst.txt"));
+    IOUtils::write_eigen_matrix(m_matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/m_matSpharaMultSecond.txt"));
+
+    m_mutex.unlock();
 }

@@ -145,6 +145,14 @@ public slots:
     */
     void onRtVertColorChanged(const QByteArray& sourceColorSamples);
 
+    //=========================================================================================================
+    /**
+    * Call this slot whenever you want to change the visibilty of the 3D rendered content.
+    *
+    * @param[in] state     The visiblity flag.
+    */
+    void setVisible(bool state);
+
 private slots:
     //=========================================================================================================
     /**
@@ -163,6 +171,7 @@ private:
     */
     QByteArray createCurvatureVertColor(const Eigen::VectorXf& curvature, const QColor& colSulci = QColor(50,50,50), const QColor& colGyri = QColor(125,125,125));
 
+    Qt3DCore::QEntity*      m_pParentEntity;                            /**< The parent 3D entity. */
     Renderable3DEntity*     m_pRenderable3DEntity;                      /**< The renderable 3D entity. */
     Renderable3DEntity*     m_pRenderable3DEntityActivationOverlay;     /**< The renderable 3D entity used as an overlay for activity plotting. */
 

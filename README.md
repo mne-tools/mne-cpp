@@ -1,9 +1,9 @@
 MNE-CPP [![DOI](https://zenodo.org/badge/8729/mne-tools/mne-cpp.svg)](http://dx.doi.org/10.5281/zenodo.17216)
 =============================================================================================================
 
-MNE cross-platform standalone MEG/EEG (real-time) applications using [Qt5](http://download.qt.io/development_releases/qt/)'s and [Eigen](http://eigen.tuxfamily.org)'s C++ libraries.
+Cross-platform medical (real-time) applications for EEG and MEG data analysis.
 
-For more information please visit http://wwww.mne-cpp.org.
+For more information please visit http://www.mne-cpp.org.
 
 
 Get and build the latest code
@@ -62,7 +62,7 @@ MNE-CPP is **BSD-licensed** (3 clause):
     This software is OSI Certified Open Source Software.
     OSI Certified is a certification mark of the Open Source Initiative.
 
-    Copyright (C) 2010-2015, authors of MNE-CPP.
+    Copyright (C) 2010-2016, authors of MNE-CPP.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without

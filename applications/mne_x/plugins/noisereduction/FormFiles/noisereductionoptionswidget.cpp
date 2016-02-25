@@ -67,8 +67,14 @@ NoiseReductionOptionsWidget::NoiseReductionOptionsWidget(NoiseReduction* toolbox
     //Do the connects. Always connect GUI elemts after ui.setpUi has been called
     connect(ui->m_checkBox_activateSphara, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             m_pNoiseReductionToolbox, &NoiseReduction::setSpharaMode);
-    connect(ui->m_horizontalSlider_nBaseFcts, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
-            m_pNoiseReductionToolbox, &NoiseReduction::setSpharaNBaseFcts);
+    connect(ui->m_spinBox_nBaseFctsMag, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+            this, &NoiseReductionOptionsWidget::onNBaseFctsChanged);
+    connect(ui->m_spinBox_nBaseFctsGrad, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+            this, &NoiseReductionOptionsWidget::onNBaseFctsChanged);
+    connect(ui->m_comboBox_acquisitionSystem, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged),
+            m_pNoiseReductionToolbox, &NoiseReduction::setAcquisitionSystem);
+    connect(ui->m_comboBox_acquisitionSystem, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged),
+            this, &NoiseReductionOptionsWidget::setAcquisitionSystem);
 }
 
 
@@ -77,4 +83,38 @@ NoiseReductionOptionsWidget::NoiseReductionOptionsWidget(NoiseReduction* toolbox
 NoiseReductionOptionsWidget::~NoiseReductionOptionsWidget()
 {
     delete ui;
+}
+
+
+//*************************************************************************************************************
+
+void NoiseReductionOptionsWidget::onNBaseFctsChanged()
+{
+    m_pNoiseReductionToolbox->setSpharaNBaseFcts(ui->m_spinBox_nBaseFctsGrad->value(), ui->m_spinBox_nBaseFctsMag->value());
+}
+
+
+//*************************************************************************************************************
+
+void NoiseReductionOptionsWidget::setAcquisitionSystem(const QString &sSystem)
+{
+    if(sSystem == "VectorView") {
+        ui->m_label_nBaseFctsMag->setText("Mag");
+        ui->m_spinBox_nBaseFctsMag->setMaximum(102);
+        ui->m_spinBox_nBaseFctsMag->setValue(102);
+
+        ui->m_label_nBaseFctsGrad->setText("Grad");
+        ui->m_spinBox_nBaseFctsGrad->setMaximum(102);
+        ui->m_spinBox_nBaseFctsGrad->setValue(102);
+    }
+
+    if(sSystem == "BabyMEG") {
+        ui->m_label_nBaseFctsMag->setText("Outer layer");
+        ui->m_spinBox_nBaseFctsMag->setMaximum(105);
+        ui->m_spinBox_nBaseFctsMag->setValue(105);
+
+        ui->m_label_nBaseFctsGrad->setText("Inner layer");
+        ui->m_spinBox_nBaseFctsGrad->setMaximum(270);
+        ui->m_spinBox_nBaseFctsGrad->setValue(270);
+    }
 }

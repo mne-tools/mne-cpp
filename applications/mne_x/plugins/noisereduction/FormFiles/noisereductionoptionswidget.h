@@ -96,6 +96,21 @@ public:
     */
     ~NoiseReductionOptionsWidget();
 
+    //=========================================================================================================
+    /**
+    * Set the acquisition system type (BabyMEG, VecotrView, EEG).
+    *
+    * @param[in] sSystem    The type of the acquisition system.
+    */
+    void setAcquisitionSystem(const QString &sSystem);
+
+protected slots:
+    //=========================================================================================================
+    /**
+    * Call this slot whenever the number basis functions changed.
+    */
+    void onNBaseFctsChanged();
+
 private:
     Ui::NoiseReductionOptionsWidgetClass*   ui;                         /**< The UI class specified in the designer. */
 
