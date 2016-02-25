@@ -1,12 +1,64 @@
+//=============================================================================================================
+/**
+* @file     shadermaterial.cpp
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @version  1.0
+* @date     Februaray, 2016
+*
+* @section  LICENSE
+*
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    ShaderMaterial class definition
+*/
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
 
 #include "shadermaterial.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
 
 using namespace DISP3DLIB;
 using namespace Qt3DRender;
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
 ShaderMaterial::ShaderMaterial(QNode *parent)
 : QMaterial(parent)
 , m_vertexEffect(new QEffect())
+, m_alphaParameter(new QParameter(QStringLiteral("alpha"), 0.5f))
 , m_vertexGL3Technique(new QTechnique())
 , m_vertexGL2Technique(new QTechnique())
 , m_vertexES2Technique(new QTechnique())
@@ -19,11 +71,16 @@ ShaderMaterial::ShaderMaterial(QNode *parent)
     this->init();
 }
 
+
+//*************************************************************************************************************
+
 ShaderMaterial::~ShaderMaterial()
 {
 }
 
-// TODO: Define how lights are proties are set in the shaders. Ideally using a QShaderData
+
+//*************************************************************************************************************
+
 void ShaderMaterial::init()
 {
     m_vertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/brain.vert"))));
@@ -58,7 +115,24 @@ void ShaderMaterial::init()
     m_vertexEffect->addTechnique(m_vertexGL2Technique);
     m_vertexEffect->addTechnique(m_vertexES2Technique);
 
+    m_vertexEffect->addParameter(m_alphaParameter);
+
     this->setEffect(m_vertexEffect);
 }
 
-QT_END_NAMESPACE
+
+//*************************************************************************************************************
+
+float ShaderMaterial::alpha()
+{
+    return m_alphaParameter->value().toFloat();
+}
+
+
+//*************************************************************************************************************
+
+void ShaderMaterial::setAlpha(float alpha)
+{
+    m_alphaParameter->setValue(alpha);
+}
+
