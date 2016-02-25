@@ -189,6 +189,14 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     m_pItemSurfColGyri->setData(data, BrainTreeMetaItemRoles::SurfaceColorGyri);
     m_pItemSurfColGyri->setData(data, Qt::DecorationRole);
 
+    BrainTreeMetaItem *itemAlpha = new BrainTreeMetaItem(BrainTreeMetaItemTypes::SurfaceAlpha, "0.5");
+    connect(itemAlpha, &BrainTreeMetaItem::surfaceAlphaChanged,
+            this, &BrainSurfaceTreeItem::onSurfaceAlphaChanged);
+    itemAlpha->setEditable(true);
+    *this<<itemAlpha;
+    data.setValue(0.5);
+    itemAlpha->setData(data, BrainTreeMetaItemRoles::SurfaceAlpha);
+
     BrainTreeMetaItem *itemSurfFileName = new BrainTreeMetaItem(BrainTreeMetaItemTypes::SurfaceFileName, tSurface.fileName());
     itemSurfFileName->setEditable(false);
     *this<<itemSurfFileName;
@@ -256,6 +264,15 @@ void BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
             }
         }
     }
+}
+
+
+//*************************************************************************************************************
+
+void BrainSurfaceTreeItem::onSurfaceAlphaChanged(float fAlpha)
+{
+    m_pRenderable3DEntity->setAlpha(fAlpha);
+    m_pRenderable3DEntityActivationOverlay->setAlpha(fAlpha);
 }
 
 

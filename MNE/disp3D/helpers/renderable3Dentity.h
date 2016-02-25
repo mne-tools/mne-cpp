@@ -164,10 +164,22 @@ public:
     */
     bool setMaterial(QSharedPointer<Qt3DRender::QMaterial> pMaterial);
 
+    //=========================================================================================================
+    /**
+    * Sets the entity's alpha value.
+    *
+    * @param[in] fAlpha     The new alpha value.
+    *
+    * @return If successful returns true, false otherwise.
+    */
+   bool setAlpha(float fAlpha);
+
 protected:
     CustomMesh::SPtr                                m_pCustomMesh;          /**< The actual mesh information (vertices, normals, colors). */
     QSharedPointer<Qt3DCore::QTransform>            m_pTransform;           /**< The main transformation. */
     QSharedPointer<Qt3DRender::QMaterial>           m_pMaterial;            /**< The material to be used for this entity. */
+
+    float                                           m_fAlpha;               /**< The alpha value. */
 };
 
 } // NAMESPACE
