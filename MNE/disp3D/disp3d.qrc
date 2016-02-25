@@ -2,8 +2,6 @@
     <qresource prefix="/">
         <file>materials/shaders/gl3/brain.frag</file>
         <file>materials/shaders/gl3/brain.vert</file>
-        <file>materials/shaders/es2/brain.frag</file>
-        <file>materials/shaders/es2/brain.vert</file>
         <file>materials/shaders/gl3/pervertexphongalpha.frag</file>
         <file>materials/shaders/gl3/pervertexphongalpha.vert</file>
     </qresource>
