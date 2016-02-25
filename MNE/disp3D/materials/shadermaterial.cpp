@@ -58,15 +58,14 @@ using namespace Qt3DRender;
 ShaderMaterial::ShaderMaterial(QNode *parent)
 : QMaterial(parent)
 , m_vertexEffect(new QEffect())
+, m_ambientParameter(new QParameter(QStringLiteral("ka"), QColor::fromRgbF(0.05f, 0.05f, 0.05f, 1.0f)))
+, m_diffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
+, m_specularParameter(new QParameter(QStringLiteral("ks"), QColor::fromRgbF(0.1f, 0.1f, 0.1f, 1.0f)))
+, m_shininessParameter(new QParameter(QStringLiteral("shininess"), 10.0f))
 , m_alphaParameter(new QParameter("alpha", 0.5f))
 , m_vertexGL3Technique(new QTechnique())
-, m_vertexGL2Technique(new QTechnique())
-, m_vertexES2Technique(new QTechnique())
 , m_vertexGL3RenderPass(new QRenderPass())
-, m_vertexGL2RenderPass(new QRenderPass())
-, m_vertexES2RenderPass(new QRenderPass())
 , m_vertexGL3Shader(new QShaderProgram())
-, m_vertexGL2ES2Shader(new QShaderProgram())
 {
     this->init();
 }
@@ -83,29 +82,18 @@ ShaderMaterial::~ShaderMaterial()
 
 void ShaderMaterial::init()
 {
-    m_vertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/brain.vert"))));
-    m_vertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/brain.frag"))));
-    m_vertexGL2ES2Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/es2/brain.vert"))));
-    m_vertexGL2ES2Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/es2/brain.frag"))));
+//    m_vertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/brain.vert"))));
+//    m_vertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/brain.frag"))));
+
+    m_vertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/pervertexphongalpha.vert"))));
+    m_vertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/materials/shaders/gl3/pervertexphongalpha.frag"))));
 
     m_vertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
     m_vertexGL3Technique->graphicsApiFilter()->setMajorVersion(3);
     m_vertexGL3Technique->graphicsApiFilter()->setMinorVersion(1);
     m_vertexGL3Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
 
-    m_vertexGL2Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
-    m_vertexGL2Technique->graphicsApiFilter()->setMajorVersion(2);
-    m_vertexGL2Technique->graphicsApiFilter()->setMinorVersion(0);
-    m_vertexGL2Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::NoProfile);
-
-    m_vertexES2Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGLES);
-    m_vertexES2Technique->graphicsApiFilter()->setMajorVersion(2);
-    m_vertexES2Technique->graphicsApiFilter()->setMinorVersion(0);
-    m_vertexES2Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::NoProfile);
-
     m_vertexGL3RenderPass->setShaderProgram(m_vertexGL3Shader);
-    m_vertexGL2RenderPass->setShaderProgram(m_vertexGL2ES2Shader);
-    m_vertexES2RenderPass->setShaderProgram(m_vertexGL2ES2Shader);
 
     QBlendState* pBlendState = new QBlendState();
     pBlendState->setSrcRGB(QBlendState::Src1Alpha);
@@ -123,21 +111,20 @@ void ShaderMaterial::init()
     QBlendEquation* pBlendEquation = new QBlendEquation();
     pBlendEquation->setMode(QBlendEquation::FuncAdd);
 
-    QRenderPass* pRenderPass = new QRenderPass();
-    m_vertexGL3RenderPass->addRenderState(pBlendState);
-    m_vertexGL3RenderPass->addRenderState(pCullFace);
-    m_vertexGL3RenderPass->addRenderState(pDepthTest);
-    m_vertexGL3RenderPass->addRenderState(pDepthMask);
-    m_vertexGL3RenderPass->addRenderState(pBlendEquation);
+//    m_vertexGL3RenderPass->addRenderState(pBlendState);
+//    m_vertexGL3RenderPass->addRenderState(pCullFace);
+//    m_vertexGL3RenderPass->addRenderState(pDepthTest);
+//    m_vertexGL3RenderPass->addRenderState(pDepthMask);
+//    m_vertexGL3RenderPass->addRenderState(pBlendEquation);
 
     m_vertexGL3Technique->addPass(m_vertexGL3RenderPass);
-    m_vertexGL2Technique->addPass(m_vertexGL2RenderPass);
-    m_vertexES2Technique->addPass(m_vertexES2RenderPass);
 
     m_vertexEffect->addTechnique(m_vertexGL3Technique);
-    m_vertexEffect->addTechnique(m_vertexGL2Technique);
-    m_vertexEffect->addTechnique(m_vertexES2Technique);
 
+    m_vertexEffect->addParameter(m_ambientParameter);
+    m_vertexEffect->addParameter(m_diffuseParameter);
+    m_vertexEffect->addParameter(m_specularParameter);
+    m_vertexEffect->addParameter(m_shininessParameter);
     m_vertexEffect->addParameter(m_alphaParameter);
 
     this->setEffect(m_vertexEffect);

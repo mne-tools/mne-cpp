@@ -146,15 +146,15 @@ private:
 
     Qt3DRender::QEffect*            m_vertexEffect;
 
+    Qt3DRender::QParameter*         m_ambientParameter;
+    Qt3DRender::QParameter*         m_diffuseParameter;
+    Qt3DRender::QParameter*         m_specularParameter;
+    Qt3DRender::QParameter*         m_shininessParameter;
     Qt3DRender::QParameter*         m_alphaParameter;
+
     Qt3DRender::QTechnique*         m_vertexGL3Technique;
-    Qt3DRender::QTechnique*         m_vertexGL2Technique;
-    Qt3DRender::QTechnique*         m_vertexES2Technique;
     Qt3DRender::QRenderPass*        m_vertexGL3RenderPass;
-    Qt3DRender::QRenderPass*        m_vertexGL2RenderPass;
-    Qt3DRender::QRenderPass*        m_vertexES2RenderPass;
     Qt3DRender::QShaderProgram*     m_vertexGL3Shader;
-    Qt3DRender::QShaderProgram*     m_vertexGL2ES2Shader;
 };
 
 } // namespace DISP3DLIB
