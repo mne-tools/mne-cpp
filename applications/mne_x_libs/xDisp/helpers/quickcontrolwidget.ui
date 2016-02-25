@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>456</width>
-    <height>447</height>
+    <height>454</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -40,8 +40,91 @@
         <item>
          <widget class="QTabWidget" name="m_tabWidget_noiseReduction">
           <property name="currentIndex">
-           <number>-1</number>
+           <number>0</number>
           </property>
+          <widget class="QWidget" name="SSP">
+           <attribute name="title">
+            <string>SSP</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="Comp">
+           <attribute name="title">
+            <string>Comp</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="Filter">
+           <attribute name="title">
+            <string>Filter</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="SPHARA">
+           <attribute name="title">
+            <string>SPHARA</string>
+           </attribute>
+           <layout class="QFormLayout" name="formLayout_2">
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="m_checkBox_activateSphara">
+              <property name="text">
+               <string>Activate SPHARA</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="m_comboBox_spharaSystem">
+              <item>
+               <property name="text">
+                <string>BabyMEG</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>VectorView</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="m_label_spharaSecond">
+              <property name="text">
+               <string>Outer layer:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QSpinBox" name="m_spinBox_spharaSecond">
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>105</number>
+              </property>
+              <property name="value">
+               <number>105</number>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="m_label_spharaFirst">
+              <property name="text">
+               <string>Inner layer:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QSpinBox" name="m_spinBox_spharaFirst">
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>270</number>
+              </property>
+              <property name="value">
+               <number>270</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </widget>
         </item>
        </layout>
@@ -70,9 +153,9 @@
         <item>
          <widget class="QTabWidget" name="m_tabWidget_viewOptions">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
-          <widget class="QWidget" name="tab">
+          <widget class="QWidget" name="View">
            <attribute name="title">
             <string>View</string>
            </attribute>
@@ -188,7 +271,7 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tab_2">
+          <widget class="QWidget" name="TriggerDetection">
            <attribute name="title">
             <string>Trigger detection</string>
            </attribute>
