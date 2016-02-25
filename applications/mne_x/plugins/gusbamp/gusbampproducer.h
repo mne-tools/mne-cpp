@@ -119,7 +119,7 @@ public:
     * @param [in] filePath      string of the filepath where data will be stored
     *
     */
-    virtual void start(vector<LPSTR> &serials, vector<int> channels, int sampleRate, QString filePath);
+    virtual void start(vector<QString> &serials, vector<int> channels, int sampleRate, QString filePath);
 
     //=========================================================================================================
     /**
@@ -150,7 +150,7 @@ private:
 
     int                 m_iSampleRate;          /**< sample rate of the device */
     QString             m_sFilePath;            /**< path of the file of written data */
-    vector<LPSTR>       m_vsSerials;            /**< vector with the serial numbers of the devices*/
+    vector<QString>     m_vSerials;            /**< vector with the serial numbers of the devices*/
     vector<int>         m_viSizeOfSampleMatrix; /**< size of the sample matrix [rows columns] */
 
 };

@@ -82,8 +82,10 @@ GUSBAmp::GUSBAmp()
 
     m_viSizeOfSampleMatrix.resize(2,0);
 
-    m_vsSerials.resize(1,0);
-    m_vsSerials[0]=(LPSTR("UB-2015.05.16"));
+    m_vSerials.resize(1);
+    m_vSerials[0]= "UB-2015.05.16";
+
+
 
 }
 
@@ -225,8 +227,10 @@ bool GUSBAmp::start()
     if(this->isRunning())
         QThread::wait();
 
+
     //tell the producer to load the running parameter onto the device and start data acquisition
-    m_pGUSBAmpProducer->start(m_vsSerials, m_viChannelsToAcquired, m_iSampleRate, m_sFilePath);
+    qDebug()<< "gusbamp:"<< m_vSerials.size() << "serial:" << m_vSerials[0];
+    m_pGUSBAmpProducer->start(m_vSerials, m_viChannelsToAcquired, m_iSampleRate, m_sFilePath);
 
     //after device was started: ask for size of SampleMatrix to set the buffer matrix (bevor setUpFiffInfo() is started)
     m_viSizeOfSampleMatrix = m_pGUSBAmpProducer->getSizeOfSampleMatrix();
