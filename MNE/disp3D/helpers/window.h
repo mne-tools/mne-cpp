@@ -107,7 +107,6 @@ public:
     //=========================================================================================================
     /**
     * Default destructor.
-    *
     */
     ~Window();
 
@@ -115,7 +114,6 @@ protected:
     //=========================================================================================================
     /**
     * Virtual functions for mouse and keyboard control
-    *
     */
     virtual void keyPressEvent(QKeyEvent* e);
     virtual void mousePressEvent(QMouseEvent* e);
