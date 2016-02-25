@@ -1,7 +1,7 @@
 MNE-CPP [![DOI](https://zenodo.org/badge/8729/mne-tools/mne-cpp.svg)](http://dx.doi.org/10.5281/zenodo.17216)
 =============================================================================================================
 
-Cross-platform medical (real-time) applications for MEG and EEG data analysis.
+Cross-platform medical (real-time) applications for EEG and MEG data analysis.
 
 For more information please visit http://www.mne-cpp.org.
 
