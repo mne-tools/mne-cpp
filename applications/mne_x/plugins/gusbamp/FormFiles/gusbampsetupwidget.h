@@ -111,8 +111,10 @@ private slots:
 
 
 
-
     void on_pushButton_clicked();
+
+
+
 
 private:
     //=========================================================================================================
@@ -125,6 +127,8 @@ private:
     GUSBAmp*               m_pGUSBAmp;                 /**< a pointer to corresponding GUSBAmp.*/
 
     Ui::GUSBAmpSetupClass  ui;                      /**< the user interface for the GUSBAmpSetupWidget.*/
+
+
 };
 
 } // NAMESPACE

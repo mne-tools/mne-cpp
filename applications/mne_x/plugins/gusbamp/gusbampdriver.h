@@ -115,7 +115,9 @@ class GUSBAmpDriver
 private:
 
 //device parameters
-    vector<LPSTR>       m_vsSerials;                /**< specify the serial number of the device used as master */
+    vector<QString>     m_vsSerials;                /**< vector of serial number as String vector (first one is master) */
+    vector<QByteArray>  m_vbSerials;                /**< vector of serial number as ByteArray vector (first one is master) */
+    vector<LPSTR>       m_vpSerials;                /**< pointer to the serial numbers  */
     int                 m_numDevices;               /**< number of connected devices (master and slaves) */
     deque<LPSTR>        m_callSequenceSerials;      /**< list of the call sequence (master must be the last device in the call sequence) */
     deque<HANDLE>       m_openedDevicesHandles;     /**< list of handles in the order of the opened devices */
@@ -196,7 +198,7 @@ public:
     * @return                   true if executed successfully, false otherwise
     *
     */
-    bool setSerials(vector<LPSTR> &list);
+    bool setSerials(vector<QString> &list);
 
     //=========================================================================================================
     /**

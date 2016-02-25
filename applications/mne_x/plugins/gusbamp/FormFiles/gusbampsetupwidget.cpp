@@ -73,6 +73,9 @@ GUSBAmpSetupWidget::GUSBAmpSetupWidget(GUSBAmp* pGUSBAmp, QWidget* parent)
 {
     ui.setupUi(this);
 
+    ui.comboBox->setCurrentIndex(6);
+
+
 }
 
 
@@ -118,19 +121,14 @@ void GUSBAmpPlugin::GUSBAmpSetupWidget::on_comboBox_activated(const QString &arg
 
 
 
-void GUSBAmpPlugin::GUSBAmpSetupWidget::on_pushButton_clicked()
+void GUSBAmpSetupWidget::on_pushButton_clicked()
 {
-    int serialSize = 1;
+    vector<QString> serials;
 
-    QString master = (ui.master->text());
-    QString slave1 = (ui.slave1->text());
-    QString slave2 = (ui.slave2->text());
-    QString slave3 = (ui.slave3->text());
-
-    ui.label->setText(master);
-    ui.label1->setText(slave1);
-    ui.label2->setText(slave2);
-    ui.label3->setText(slave3);
+    QString master = ui.master->text();
+    QString slave1 = ui.slave1->text();
+    QString slave2 = ui.slave2->text();
+    QString slave3 = ui.slave3->text();
 
     if(master.isEmpty())
     {
@@ -138,16 +136,42 @@ void GUSBAmpPlugin::GUSBAmpSetupWidget::on_pushButton_clicked()
         return;
     }
 
-    serialSize += !slave1.isEmpty() + !slave2.isEmpty() + !slave3.isEmpty();
+    //master has to be first in the list
+    ui.label->setText(master);
+    serials.push_back(master);
+
+    if(!slave1.isEmpty())
+    {
+        ui.label1->setText(slave1);
+        serials.push_back(slave1);
+    }
+    if(!slave2.isEmpty())
+    {
+        ui.label2->setText(slave2);
+        serials.push_back(slave2);
+    }
+    if(!slave3.isEmpty())
+    {
+        ui.label3->setText(slave3);
+        serials.push_back(slave3);
+    }
+
+    int size = serials.size();
 
 
-
-
-
-
-
-
-
+    m_pGUSBAmp->m_vSerials.resize(size);
+    m_pGUSBAmp->m_vSerials = serials;
 
 
 }
+
+
+
+
+
+
+
+
+
+
+

@@ -194,7 +194,7 @@ private:
 
     QSharedPointer<FiffInfo>            m_pFiffInfo;                        /**< Fiff measurement info.*/
 
-    vector<LPSTR>       m_vsSerials;                /**< vector of all Serials (the first one is the master) */
+    vector<QString>     m_vSerials;                /**< vector of all Serials (the first one is the master) */
     int                 m_iSampleRate;              /**< the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!)*/
     int                 m_iSamplesPerBlock;         /**< The samples per block defined by the user via the GUI. */
     UCHAR               m_iNumberOfChannels;        /**< the channels that should be acquired from each device */

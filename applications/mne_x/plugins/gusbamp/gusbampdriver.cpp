@@ -88,11 +88,15 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
     m_sizeOfMatrix.resize(2,0);
 
     //initialize the serial list and setting "UB-2015.05.16" for default
-    m_vsSerials.resize(1,0);
-    m_vsSerials[0]=(LPSTR("UB-2015.05.16"));
+    m_vsSerials.resize(1);
+    m_vsSerials[0] = "UB-2015.05.16";
+
 
     //setting a deque-list of the serial numbers to be called (LPSTR)
     setSerials(m_vsSerials);
+
+    //qDebug()<<"character:"<< m_vcSerials[0];
+    //qDebug()<<"LPSTR:"<< m_vpSerials[0];
 
     //initializing UCHAR-list of channels to acquire
     vector<int> channels = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
@@ -123,6 +127,10 @@ GUSBAmpDriver::~GUSBAmpDriver()
 
 bool GUSBAmpDriver::initDevice()
 {
+
+//    qDebug()<<"character:"<< m_vcSerials[0];
+//    qDebug()<<"LPSTR:"<< m_vpSerials[0];
+//    qDebug()<< "call sequence" << m_callSequenceSerials[0];
 
     m_isRunning =true;
 
@@ -464,8 +472,12 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
 //*************************************************************************************************************
 
 
-bool GUSBAmpDriver::setSerials(vector<LPSTR> &list)
+bool GUSBAmpDriver::setSerials(vector<QString> &list)
 {
+
+    int size = list.size();
+//    m_vcSerials.resize(size);
+//    m_vcSerials = list;
 
     if(m_isRunning)
     {
@@ -473,8 +485,8 @@ bool GUSBAmpDriver::setSerials(vector<LPSTR> &list)
         return false;
     }
 
-    int size = list.size();
-    //qDebug() << "size of list:" <<size;
+
+    qDebug() << "size of list:" <<size;
 
     if(size>4)
     {
@@ -483,8 +495,23 @@ bool GUSBAmpDriver::setSerials(vector<LPSTR> &list)
     }
 
 
-    m_vsSerials.resize(size);
-    m_vsSerials = list;
+    m_vbSerials.resize(size);
+    m_vpSerials.resize(size);
+    for(int i = 0; i <size; i++)
+    {
+        m_vbSerials[i] = list.at(i).toLocal8Bit();
+        m_vpSerials[i] = m_vbSerials.at(i).data();
+    }
+
+    qDebug() <<"blabla"<< m_vpSerials[0];
+
+
+
+
+
+
+
+
 
     m_SLAVE_SERIALS_SIZE = size - 1;
 
@@ -496,9 +523,14 @@ bool GUSBAmpDriver::setSerials(vector<LPSTR> &list)
 
     //defining the new deque-list for data acquisition
     for (int i=1; i<=m_SLAVE_SERIALS_SIZE; i++)
-        m_callSequenceSerials.push_back(m_vsSerials[i]);
+        m_callSequenceSerials.push_back(m_vpSerials[i]);
     //add the master device at the end of the list!
-    m_callSequenceSerials.push_back(m_vsSerials[0]);
+    m_callSequenceSerials.push_back(m_vpSerials[0]);
+
+    qDebug()<< "call sequence" << m_callSequenceSerials[0];
+
+
+    qDebug()<< "SLAVE SERIAL SIZE"<< m_SLAVE_SERIALS_SIZE;
 
     //refresh size of output matrix
     m_sizeOfMatrix[0] = (int(m_NUMBER_OF_CHANNELS)*int(1 + m_SLAVE_SERIALS_SIZE));    //number of channels * number of devices (number of channels)
