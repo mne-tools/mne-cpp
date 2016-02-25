@@ -172,7 +172,7 @@ public:
     *
     * @param [in] chInfo        The corresponding channel information list
     */
-    void setChannelInfo(QList<RealTimeSampleArrayChInfo> &chInfo);
+    void setChannelInfo(const QList<RealTimeSampleArrayChInfo>& chInfo);
 
     //=========================================================================================================
     /**
@@ -617,7 +617,7 @@ signals:
     *
     * @param [in] selection     list of all selected channels
     */
-    void newSelection(QList<qint32> selection);
+    void newSelection(const QList<qint32>& selection);
 
     //=========================================================================================================
     /**

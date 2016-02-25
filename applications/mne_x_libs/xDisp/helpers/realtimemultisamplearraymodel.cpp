@@ -278,7 +278,7 @@ void RealTimeMultiSampleArrayModel::initSphara()
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::setChannelInfo(QList<RealTimeSampleArrayChInfo> &chInfo)
+void RealTimeMultiSampleArrayModel::setChannelInfo(const QList<RealTimeSampleArrayChInfo>& chInfo)
 {
     beginResetModel();
 
