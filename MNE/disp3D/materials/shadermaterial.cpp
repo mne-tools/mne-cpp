@@ -58,7 +58,7 @@ using namespace Qt3DRender;
 ShaderMaterial::ShaderMaterial(QNode *parent)
 : QMaterial(parent)
 , m_vertexEffect(new QEffect())
-, m_alphaParameter(new QParameter(QStringLiteral("alpha"), 0.25f))
+, m_alphaParameter(new QParameter("alpha", 0.5f))
 , m_vertexGL3Technique(new QTechnique())
 , m_vertexGL2Technique(new QTechnique())
 , m_vertexES2Technique(new QTechnique())
@@ -107,9 +107,6 @@ void ShaderMaterial::init()
     m_vertexGL2RenderPass->setShaderProgram(m_vertexGL2ES2Shader);
     m_vertexES2RenderPass->setShaderProgram(m_vertexGL2ES2Shader);
 
-
-
-
     QBlendState* pBlendState = new QBlendState();
     pBlendState->setSrcRGB(QBlendState::Src1Alpha);
     pBlendState->setDstRGB(QBlendState::OneMinusSrcAlpha);
@@ -132,8 +129,6 @@ void ShaderMaterial::init()
     m_vertexGL3RenderPass->addRenderState(pDepthTest);
     m_vertexGL3RenderPass->addRenderState(pDepthMask);
     m_vertexGL3RenderPass->addRenderState(pBlendEquation);
-
-
 
     m_vertexGL3Technique->addPass(m_vertexGL3RenderPass);
     m_vertexGL2Technique->addPass(m_vertexGL2RenderPass);

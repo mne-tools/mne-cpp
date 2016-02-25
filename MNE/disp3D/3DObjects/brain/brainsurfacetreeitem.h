@@ -160,6 +160,14 @@ private slots:
     */
     void onColorInfoOriginOrCurvColorChanged();
 
+    //=========================================================================================================
+    /**
+    * Call this slot whenever the curvature color or origin of color information (curvature or annotation) changed.
+    *
+    * @param[in] fAlpha     The new alpha value.
+    */
+    void onSurfaceAlphaChanged(float fAlpha);
+
 private:
     //=========================================================================================================
     /**

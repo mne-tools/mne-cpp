@@ -177,6 +177,14 @@ signals:
     * @param[in] iMSec     The new number of averages.
     */
     void rtDataNumberAveragesChanged(const int& iNumAvr);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the surface alpha value has changed.
+    *
+    * @param[in] fAlpha     The new alpha value.
+    */
+    void surfaceAlphaChanged(float fAlpha);
 };
 
 } //NAMESPACE DISP3DLIB

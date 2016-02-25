@@ -158,7 +158,20 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
             return pSpinBox;
             break;
         }
+
+        case BrainTreeMetaItemTypes::SurfaceAlpha: {
+            QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
+            connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                    this, &BrainTreeDelegate::onEditorEdited);
+            pDoubleSpinBox->setMinimum(0.1);
+            pDoubleSpinBox->setMaximum(1.0);
+            pDoubleSpinBox->setSingleStep(0.01);
+            pDoubleSpinBox->setValue(index.model()->data(index, BrainTreeMetaItemRoles::SurfaceAlpha).toDouble());
+            return pDoubleSpinBox;
+            break;
+        }
     }
+
 
     return QItemDelegate::createEditor(parent, option, index);
 }
@@ -230,6 +243,13 @@ void BrainTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index)
 
         case BrainTreeMetaItemTypes::RTDataNumberAverages: {
             int value = index.model()->data(index, BrainTreeMetaItemRoles::RTDataNumberAverages).toInt();
+            QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
+            pSpinBox->setValue(value);
+            break;
+        }
+
+        case BrainTreeMetaItemTypes::SurfaceAlpha: {
+            int value = index.model()->data(index, BrainTreeMetaItemRoles::SurfaceAlpha).toDouble();
             QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
             pSpinBox->setValue(value);
             break;
@@ -339,6 +359,16 @@ void BrainTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
             data.setValue(pSpinBox->value());
 
             model->setData(index, data, BrainTreeMetaItemRoles::RTDataNumberAverages);
+            model->setData(index, data, Qt::DisplayRole);
+            break;
+        }
+
+        case BrainTreeMetaItemTypes::SurfaceAlpha: {
+            QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
+            QVariant data;
+            data.setValue(pDoubleSpinBox->value());
+
+            model->setData(index, data, BrainTreeMetaItemRoles::SurfaceAlpha);
             model->setData(index, data, Qt::DisplayRole);
             break;
         }
