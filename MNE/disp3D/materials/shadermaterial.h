@@ -58,6 +58,12 @@
 #include <Qt3DRender/qparameter.h>
 #include <Qt3DRender/qrenderpass.h>
 #include <Qt3DRender/qgraphicsapifilter.h>
+#include <Qt3DRender/qblendstate.h>
+#include <Qt3DRender/qcullface.h>
+#include <Qt3DRender/qdepthtest.h>
+#include <Qt3DRender/qdepthmask.h>
+#include <Qt3DRender/qblendequation.h>
+
 #include <QUrl>
 #include <QVector3D>
 #include <QVector4D>
