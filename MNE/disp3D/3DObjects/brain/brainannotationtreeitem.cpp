@@ -59,6 +59,8 @@ BrainAnnotationTreeItem::BrainAnnotationTreeItem(int iType, const QString & text
 : AbstractTreeItem(iType, text)
 {
     this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Unchecked);
     this->setToolTip("Brain annotation");
 }
 
@@ -136,5 +138,13 @@ bool BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation&
     }
 
     return true;
+}
+
+
+//*************************************************************************************************************
+
+void BrainAnnotationTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+{
+    emit annotationVisibiltyChanged(checkState==Qt::Unchecked ? false : true);
 }
 

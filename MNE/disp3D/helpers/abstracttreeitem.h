@@ -138,6 +138,15 @@ public :
     */
     AbstractTreeItem &operator<<(AbstractTreeItem& newItem);
 
+protected slots:
+    //=========================================================================================================
+    /**
+    * Call this slot whenever the check box of this item was checked.
+    *
+    * @param[in] checkState        The current checkstate.
+    */
+    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
+
 protected:
     int     m_iType;        /**< This item's type. */
 

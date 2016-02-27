@@ -140,6 +140,14 @@ public:
     */
     bool addData(const MNELIB::MNEHemisphere& tHemisphere, Qt3DCore::QEntity* parent);
 
+    //=========================================================================================================
+    /**
+    * Call this slot whenever you want to change the visibilty of the 3D rendered content.
+    *
+    * @param[in] state     The visiblity flag.
+    */
+    void setVisible(bool state);
+
 private slots:
     //=========================================================================================================
     /**
@@ -148,6 +156,14 @@ private slots:
     * @param[in] color        The new surface color.
     */
     void onSurfaceColorChanged(const QColor &color);
+
+    //=========================================================================================================
+    /**
+    * Call this slot whenever the check box of this item was checked.
+    *
+    * @param[in] checkState        The current checkstate.
+    */
+    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
 private:
     //=========================================================================================================
@@ -159,6 +175,7 @@ private:
     */
     QByteArray createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100));
 
+    Qt3DCore::QEntity*      m_pParentEntity;                            /**< The parent 3D entity. */
     Renderable3DEntity*     m_pRenderable3DEntity;                      /**< The renderable 3D entity. */
 
 signals:
