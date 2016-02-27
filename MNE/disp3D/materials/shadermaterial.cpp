@@ -61,7 +61,7 @@ ShaderMaterial::ShaderMaterial(QNode *parent)
 , m_ambientParameter(new QParameter(QStringLiteral("ka"), QColor::fromRgbF(0.05f, 0.05f, 0.05f, 1.0f)))
 , m_diffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
 , m_specularParameter(new QParameter(QStringLiteral("ks"), QColor::fromRgbF(0.1f, 0.1f, 0.1f, 1.0f)))
-, m_shininessParameter(new QParameter(QStringLiteral("shininess"), 10.0f))
+, m_shininessParameter(new QParameter(QStringLiteral("shininess"), 1.0f))
 , m_alphaParameter(new QParameter("alpha", 0.5f))
 , m_vertexGL3Technique(new QTechnique())
 , m_vertexGL3RenderPass(new QRenderPass())
@@ -96,7 +96,7 @@ void ShaderMaterial::init()
     m_vertexGL3RenderPass->setShaderProgram(m_vertexGL3Shader);
 
     QBlendState* pBlendState = new QBlendState();
-    pBlendState->setSrcRGB(QBlendState::Src1Alpha);
+    pBlendState->setSrcRGB(QBlendState::SrcAlpha);
     pBlendState->setDstRGB(QBlendState::OneMinusSrcAlpha);
 
     QCullFace* pCullFace = new QCullFace();
@@ -111,11 +111,11 @@ void ShaderMaterial::init()
     QBlendEquation* pBlendEquation = new QBlendEquation();
     pBlendEquation->setMode(QBlendEquation::FuncAdd);
 
-//    m_vertexGL3RenderPass->addRenderState(pBlendState);
-//    m_vertexGL3RenderPass->addRenderState(pCullFace);
-//    m_vertexGL3RenderPass->addRenderState(pDepthTest);
-//    m_vertexGL3RenderPass->addRenderState(pDepthMask);
-//    m_vertexGL3RenderPass->addRenderState(pBlendEquation);
+    m_vertexGL3RenderPass->addRenderState(pBlendState);
+    m_vertexGL3RenderPass->addRenderState(pCullFace);
+    m_vertexGL3RenderPass->addRenderState(pDepthTest);
+    m_vertexGL3RenderPass->addRenderState(pDepthMask);
+    m_vertexGL3RenderPass->addRenderState(pBlendEquation);
 
     m_vertexGL3Technique->addPass(m_vertexGL3RenderPass);
 

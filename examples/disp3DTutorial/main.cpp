@@ -103,74 +103,85 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    bool bAddRtSourceLoc = true;
+
+    //Inits
+    SurfaceSet tSurfSet ("sample", 2, "pial", "./MNE-sample-data/subjects");
+    AnnotationSet tAnnotSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
+
+    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    MNEForwardSolution t_Fwd(t_fileFwd);
+    MNEForwardSolution t_clusteredFwd;
+
+    QString t_sFileClusteredInverse("");//QFile t_fileClusteredInverse("./clusteredInverse-inv.fif");
+
+    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+
+    MNESourceEstimate sourceEstimate;
+
     //########################################################################################
     //
     // Source Estimate START
     //
     //########################################################################################
 
-//    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-//    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-//    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    if(bAddRtSourceLoc) {
+        double snr = 1.0;
+        double lambda2 = 1.0 / pow(snr, 2);
+        QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
-//    QString t_sFileClusteredInverse("");//QFile t_fileClusteredInverse("./clusteredInverse-inv.fif");
-//    AnnotationSet t_annotationSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
+        // Load data
+        fiff_int_t setno = 1;
+        QPair<QVariant, QVariant> baseline(QVariant(), 0);
+        FiffEvoked evoked(t_fileEvoked, setno, baseline);
+        if(evoked.isEmpty())
+            return 1;
 
-//    double snr = 1.0;
-//    double lambda2 = 1.0 / pow(snr, 2);
-//    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
+        std::cout << "Evoked description: " << evoked.comment.toLatin1().constData() << std::endl;
 
-//    // Load data
-//    fiff_int_t setno = 1;
-//    QPair<QVariant, QVariant> baseline(QVariant(), 0);
-//    FiffEvoked evoked(t_fileEvoked, setno, baseline);
-//    if(evoked.isEmpty())
-//        return 1;
+        if(t_Fwd.isEmpty())
+            return 1;
 
-//    std::cout << "Evoked description: " << evoked.comment.toLatin1().constData() << std::endl;
+        FiffCov noise_cov(t_fileCov);
 
-//    MNEForwardSolution t_Fwd(t_fileFwd);
-//    if(t_Fwd.isEmpty())
-//        return 1;
+        // regularize noise covariance
+        noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
 
-//    FiffCov noise_cov(t_fileCov);
+        //
+        // Cluster forward solution;
+        //
+        t_clusteredFwd = t_Fwd;//.cluster_forward_solution(tAnnotSet, 40);
 
-//    // regularize noise covariance
-//    noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
+        //
+        // make an inverse operators
+        //
+        FiffInfo info = evoked.info;
 
-//    //
-//    // Cluster forward solution;
-//    //
-//    MNEForwardSolution t_clusteredFwd = t_Fwd;//.cluster_forward_solution(t_annotationSet, 40);
+        MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
 
-//    //
-//    // make an inverse operators
-//    //
-//    FiffInfo info = evoked.info;
+        if(!t_sFileClusteredInverse.isEmpty())
+        {
+            QFile t_fileClusteredInverse(t_sFileClusteredInverse);
+            inverse_operator.write(t_fileClusteredInverse);
+        }
 
-//    MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
+        //
+        // Compute inverse solution
+        //
+        MinimumNorm minimumNorm(inverse_operator, lambda2, method);
+        sourceEstimate = minimumNorm.calculateInverse(evoked);
 
-//    if(!t_sFileClusteredInverse.isEmpty())
-//    {
-//        QFile t_fileClusteredInverse(t_sFileClusteredInverse);
-//        inverse_operator.write(t_fileClusteredInverse);
-//    }
+        if(sourceEstimate.isEmpty())
+            return 1;
 
-//    //
-//    // Compute inverse solution
-//    //
-//    MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-//    MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
-
-//    if(sourceEstimate.isEmpty())
-//        return 1;
-
-//    // View activation time-series
-//    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
-//    std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
-//    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
-//    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
-//    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
+        // View activation time-series
+        std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
+        std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
+        std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
+        std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
+        std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
+    }
 
     //########################################################################################
     //
@@ -186,8 +197,6 @@ int main(int argc, char *argv[])
 
     std::cout<<"Creating BrainView"<<std::endl;
 
-    SurfaceSet tSurfSet ("sample", 2, "pial", "./MNE-sample-data/subjects");
-    AnnotationSet tAnnotSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
     //Surface tSurfRight ("sample", 1, "inflated", "./MNE-sample-data/subjects");
     //Annotation tAnnotRight ("sample", 1, "aparc.a2009s", "./MNE-sample-data/subjects");
     //Surface tSurfLeft ("sample", 0, "inflated", "./MNE-sample-data/subjects");
@@ -198,14 +207,13 @@ int main(int argc, char *argv[])
     //testWindow->addBrainData("HemiLR", tSurfRight, tAnnotRight);
     testWindow->addBrainData("HemiLRSet", tSurfSet, tAnnotSet);
 
-//    QFile t_File("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-//    MNEForwardSolution t_forwardSolution(t_File);
-    //testWindow->addBrainData("HemiLRSet", t_forwardSolution);
+    if(bAddRtSourceLoc) {
+        QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("HemiLRSet", sourceEstimate, t_clusteredFwd);
+        testWindow->addBrainData("HemiLRSet", t_clusteredFwd);
 
-//    QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("HemiLRSet", sourceEstimate, t_clusteredFwd);
-
-    //testWindow->addRtBrainData("HemiLRSet", sourceEstimate);
-    //rtItemList.at(0)->addData(sourceEstimate);
+        //testWindow->addRtBrainData("HemiLRSet", sourceEstimate);
+        //rtItemList.at(0)->addData(sourceEstimate);
+    }
 
     testWindow->show();    
 

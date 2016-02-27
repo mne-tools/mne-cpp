@@ -156,7 +156,7 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
             QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
             connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                     this, &BrainTreeDelegate::onEditorEdited);
-            pDoubleSpinBox->setMinimum(0.1);
+            pDoubleSpinBox->setMinimum(0.01);
             pDoubleSpinBox->setMaximum(1.0);
             pDoubleSpinBox->setSingleStep(0.01);
             pDoubleSpinBox->setValue(index.model()->data(index, BrainTreeMetaItemRoles::SurfaceAlpha).toDouble());
