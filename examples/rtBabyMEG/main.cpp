@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
     std::cout<<"Creating BrainView"<<std::endl;
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addBrainData("HemiLRSet", tSurfSet, tAnnotSet);
+    //testWindow->addBrainData("HemiLRSet", tSurfSet, tAnnotSet);
     testWindow->addBrainData("HemiLRSet", t_fileFwd);
 
     //QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("HemiLRSet", sourceEstimate, t_clusteredFwd);

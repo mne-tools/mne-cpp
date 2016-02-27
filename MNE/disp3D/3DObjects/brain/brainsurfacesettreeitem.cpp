@@ -236,7 +236,6 @@ bool BrainSurfaceSetTreeItem::addData(const MNESourceSpace& tSourceSpace, Qt3DCo
 
 void BrainSurfaceSetTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
-    qDebug()<<"BrainSurfaceSetTreeItem::onCheckStateChanged - checked";
     for(int i = 0; i<this->rowCount(); i++) {
         if(this->child(i)->isCheckable()) {
             this->child(i)->setCheckState(checkState);
