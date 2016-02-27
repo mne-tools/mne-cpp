@@ -58,9 +58,12 @@ using namespace DISP3DLIB;
 
 BrainSourceSpaceTreeItem::BrainSourceSpaceTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
+, m_pParentEntity(new Qt3DCore::QEntity())
 , m_pRenderable3DEntity(new Renderable3DEntity())
 {
     this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
     this->setToolTip("Source space");
 }
 
@@ -99,6 +102,7 @@ void  BrainSourceSpaceTreeItem::setData(const QVariant& value, int role)
 bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore::QEntity* parent)
 {
     //Create renderable 3D entity
+    m_pParentEntity = parent;
     m_pRenderable3DEntity = new Renderable3DEntity(parent);
 
     QMatrix4x4 m;
@@ -212,6 +216,14 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
 
 //*************************************************************************************************************
 
+void BrainSourceSpaceTreeItem::setVisible(bool state)
+{
+    m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
+}
+
+
+//*************************************************************************************************************
+
 void BrainSourceSpaceTreeItem::onSurfaceColorChanged(const QColor& color)
 {
     QVariant data;
@@ -219,6 +231,14 @@ void BrainSourceSpaceTreeItem::onSurfaceColorChanged(const QColor& color)
 
     data.setValue(arrayNewVertColor);
     this->setData(data, BrainSourceSpaceTreeItemRoles::SurfaceCurrentColorVert);
+}
+
+
+//*************************************************************************************************************
+
+void BrainSourceSpaceTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+{
+    this->setVisible(checkState==Qt::Unchecked ? false : true);
 }
 
 

@@ -110,10 +110,9 @@ int main(int argc, char *argv[])
     //########################################################################################
 
     QFile t_fileFwd("D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721/160125_133250_4841721_Spontaneous_raw-oct-6-fwd.fif");
-//    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+//    QFile t_fileCov("D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721/160125_133250_4841721_Spontaneous_raw-cov.fif");
 //    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
 
-    QString t_sFileClusteredInverse("");//QFile t_fileClusteredInverse("./clusteredInverse-inv.fif");
     AnnotationSet tAnnotSet ("ID_4841721_act", 2, "aparc.a2009s", "D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721");
     SurfaceSet tSurfSet ("ID_4841721_act", 2, "pial", "D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721");
 

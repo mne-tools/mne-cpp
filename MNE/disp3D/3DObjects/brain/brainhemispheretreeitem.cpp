@@ -64,10 +64,6 @@ BrainHemisphereTreeItem::BrainHemisphereTreeItem(int iType, const QString& text)
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
     this->setToolTip("Brain hemisphere");
-
-    //Do the connects
-    connect(this, &BrainHemisphereTreeItem::checkStateChanged,
-            this, &BrainHemisphereTreeItem::onCheckStateChanged);
 }
 
 
@@ -127,6 +123,9 @@ bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation&
     //Add annotation child
     if(!tAnnotation.isEmpty()) {
         m_pAnnotItem = new BrainAnnotationTreeItem(BrainTreeModelItemTypes::AnnotationItem);
+        connect(m_pAnnotItem, &BrainAnnotationTreeItem::annotationVisibiltyChanged,
+                m_pSurfaceItem, &BrainSurfaceTreeItem::onAnnotationVisibilityChanged);
+
         *this<<m_pAnnotItem;
         state = m_pAnnotItem->addData(tSurface, tAnnotation);
     }
@@ -215,6 +214,12 @@ BrainRTSourceLocDataTreeItem* BrainHemisphereTreeItem::addData(const MNESourceEs
 
 void BrainHemisphereTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
-    m_pSurfaceItem->setVisible(checkState==Qt::Unchecked ? false : true);
+    qDebug()<<"BrainHemisphereTreeItem::onCheckStateChanged - checked";
+
+    for(int i = 0; i<this->rowCount(); i++) {
+        if(this->child(i)->isCheckable()) {
+            this->child(i)->setCheckState(checkState);
+        }
+    }
 }
 

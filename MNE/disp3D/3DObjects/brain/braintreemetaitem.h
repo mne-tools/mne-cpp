@@ -126,12 +126,6 @@ signals:
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the color origin (curvature or annotation) changed.
-    */
-    void colorInfoOriginChanged();
-
-    //=========================================================================================================
-    /**
     * Emit this signal whenever the time interval of the data streaming changed.
     *
     * @param[in] iMSec     The time interval in mSecs.

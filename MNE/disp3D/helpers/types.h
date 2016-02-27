@@ -102,7 +102,7 @@ namespace BrainTreeMetaItemTypes
                     SurfaceColorGyri = QStandardItem::UserType + 105,
                     SurfaceColorSulci = QStandardItem::UserType + 106,
                     SurfaceColorVert = QStandardItem::UserType + 107,
-                    SurfaceColorInfoOrigin = QStandardItem::UserType + 108,
+                    SurfaceAlpha = QStandardItem::UserType + 108,
                     RTDataStreamStatus = QStandardItem::UserType + 109,
                     RTDataSourceSpaceType = QStandardItem::UserType + 110,
                     RTDataColormapType = QStandardItem::UserType + 111,
@@ -112,8 +112,7 @@ namespace BrainTreeMetaItemTypes
                     RTDataNormalizationValue = QStandardItem::UserType + 115,
                     RTDataVisualizationType = QStandardItem::UserType + 116,
                     SurfaceColorItem = QStandardItem::UserType + 117,
-                    UnknownItem = QStandardItem::UserType + 118,
-                    SurfaceAlpha = QStandardItem::UserType + 119};
+                    UnknownItem = QStandardItem::UserType + 118};
 }
 
 // Model item roles
@@ -126,7 +125,7 @@ namespace BrainTreeMetaItemRoles
                     SurfaceFilePath = Qt::UserRole + 5,
                     AnnotName = Qt::UserRole + 6,
                     AnnotFilePath = Qt::UserRole + 7,
-                    SurfaceColorInfoOrigin = Qt::UserRole + 8,
+                    SurfaceAlpha = Qt::UserRole + 8,
                     RTDataStreamStatus = Qt::UserRole + 9,
                     RTDataSourceSpaceType = Qt::UserRole + 10,
                     RTDataColormapType = Qt::UserRole + 11,
@@ -135,8 +134,7 @@ namespace BrainTreeMetaItemRoles
                     RTDataNumberAverages = Qt::UserRole + 14,
                     RTDataNormalizationValue = Qt::UserRole + 15,
                     RTDataVisualizationType = Qt::UserRole + 16,
-                    SurfaceColor = Qt::UserRole + 17,
-                    SurfaceAlpha = Qt::UserRole + 18};
+                    SurfaceColor = Qt::UserRole + 17};
 }
 
 namespace BrainSurfaceTreeItemRoles

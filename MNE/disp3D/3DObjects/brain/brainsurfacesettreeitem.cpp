@@ -63,10 +63,6 @@ BrainSurfaceSetTreeItem::BrainSurfaceSetTreeItem(int iType, const QString& text)
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
     this->setToolTip("Brain surface set");
-
-    //Do the connects
-    connect(this, &BrainSurfaceSetTreeItem::checkStateChanged,
-            this, &BrainSurfaceSetTreeItem::onCheckStateChanged);
 }
 
 
@@ -240,6 +236,7 @@ bool BrainSurfaceSetTreeItem::addData(const MNESourceSpace& tSourceSpace, Qt3DCo
 
 void BrainSurfaceSetTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
+    qDebug()<<"BrainSurfaceSetTreeItem::onCheckStateChanged - checked";
     for(int i = 0; i<this->rowCount(); i++) {
         if(this->child(i)->isCheckable()) {
             this->child(i)->setCheckState(checkState);
