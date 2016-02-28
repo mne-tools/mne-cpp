@@ -66,6 +66,14 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/SparseCore>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE NAMESPACE NoiseReductionPlugin
 //=============================================================================================================
 
@@ -154,6 +162,13 @@ public slots:
     */
     void setSpharaNBaseFcts(int nBaseFctsGrad, int nBaseFctsMag);
 
+protected slots:
+    //=========================================================================================================
+    /**
+    * Update the SSP projection
+    */
+    void updateProjection();
+
 protected:
     //=========================================================================================================
     /**
@@ -184,6 +199,7 @@ private:
 
     bool                m_bIsRunning;                   /**< Flag whether thread is running.*/
     bool                m_bSpharaActive;                /**< Flag whether thread is running.*/
+    bool                m_bProjActivated;               /**< Projections activated */
 
     int                 m_iNBaseFctsFirst;              /**< The number of grad/inner base functions to use for calculating the sphara opreator.*/
     int                 m_iNBaseFctsSecond;             /**< The number of grad/outer base functions to use for calculating the sphara opreator.*/
@@ -201,6 +217,9 @@ private:
     Eigen::MatrixXd     m_matSpharaVVMagLoaded;         /**< The loaded VectorView magnetometer basis functions.*/
     Eigen::MatrixXd     m_matSpharaBabyMEGInnerLoaded;  /**< The loaded babyMEG inner layer basis functions.*/
     Eigen::MatrixXd     m_matSpharaBabyMEGOuterLoaded;  /**< The loaded babyMEG outer layer basis functions.*/
+
+    Eigen::MatrixXd                m_matProj;                                  /**< SSP projector */
+    Eigen::SparseMatrix<double>    m_matSparseProj;                            /**< Sparse SSP projector */
 
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                /**< Fiff measurement info.*/
 

@@ -95,7 +95,7 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
 , m_pRTSE(pRTSE)
 , m_bInitialized(false)
 {
-    m_pAction3DControl = new QAction(QIcon(":/images/images/3DControl.png"), tr("Shows the 3D control widget (F9)"),this);
+    m_pAction3DControl = new QAction(QIcon(":/images/3DControl.png"), tr("Shows the 3D control widget (F9)"),this);
     m_pAction3DControl->setShortcut(tr("F9"));
     m_pAction3DControl->setToolTip(tr("Shows the 3D control widget (F9)"));
     connect(m_pAction3DControl, &QAction::triggered,

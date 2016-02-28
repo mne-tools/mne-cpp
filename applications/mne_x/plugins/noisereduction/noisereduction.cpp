@@ -65,6 +65,7 @@ NoiseReduction::NoiseReduction()
 , m_pNoiseReductionOutput(NULL)
 , m_pNoiseReductionBuffer(CircularMatrixBuffer<double>::SPtr())
 , m_bSpharaActive(false)
+, m_bProjActivated(false)
 , m_sCurrentSystem("VectorView")
 {
     if(m_sCurrentSystem == "BabyMEG") {
@@ -81,6 +82,10 @@ NoiseReduction::NoiseReduction()
     m_pOptionsWidget = NoiseReductionOptionsWidget::SPtr(new NoiseReductionOptionsWidget(this));
     m_pOptionsWidget->setAcquisitionSystem(m_sCurrentSystem);
 
+    //Handle projections
+    connect(m_pOptionsWidget.data(), &NoiseReductionOptionsWidget::projSelectionChanged,
+            this, &NoiseReduction::updateProjection);
+
     //Add action which will be visible in the plugin's toolbar
     m_pActionShowOptionsWidget = new QAction(QIcon(":/images/options.png"), tr("Noise reduction options"),this);
     m_pActionShowOptionsWidget->setShortcut(tr("F12"));
@@ -88,6 +93,7 @@ NoiseReduction::NoiseReduction()
     connect(m_pActionShowOptionsWidget, &QAction::triggered,
             this, &NoiseReduction::showOptionsWidget);
     addPluginAction(m_pActionShowOptionsWidget);
+    m_pActionShowOptionsWidget->setVisible(false);
 }
 
 
@@ -126,6 +132,9 @@ void NoiseReduction::init()
     //Delete Buffer - will be initailzed with first incoming data
     if(!m_pNoiseReductionBuffer.isNull())
         m_pNoiseReductionBuffer = CircularMatrixBuffer<double>::SPtr();
+
+    //Set visibility of options tool to true
+    m_pActionShowOptionsWidget->setVisible(true);
 }
 
 
@@ -210,6 +219,8 @@ void NoiseReduction::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
 
+            m_pOptionsWidget->setFiffInfo(m_pFiffInfo);
+
             //Init output - Unocmment this if you also uncommented the m_pNoiseReductionOutput in the constructor above
             m_pNoiseReductionOutput->data()->initFromFiffInfo(m_pFiffInfo);
             m_pNoiseReductionOutput->data()->setMultiArraySize(1);
@@ -262,6 +273,74 @@ void NoiseReduction::setSpharaNBaseFcts(int nBaseFctsGrad, int nBaseFctsMag)
 
 //*************************************************************************************************************
 
+void NoiseReduction::updateProjection()
+{
+    //
+    //  Update the SSP projector
+    //
+    if(m_pFiffInfo)
+    {
+        m_mutex.lock();
+        //If a minimum of one projector is active set m_bProjActivated to true so that this model applies the ssp to the incoming data
+        m_bProjActivated = false;
+        for(qint32 i = 0; i < this->m_pFiffInfo->projs.size(); ++i) {
+            if(this->m_pFiffInfo->projs[i].active) {
+                m_bProjActivated = true;
+                break;
+            }
+        }
+
+        this->m_pFiffInfo->make_projector(m_matProj);
+        qDebug() << "NoiseReduction::updateProjection - New projection calculated.";
+
+        //set columns of matrix to zero depending on bad channels indexes
+        qDebug()<<"NoiseReduction::updateProjection - m_matProj size:"<<m_matProj.rows()<<m_matProj.cols();
+        qDebug()<<"NoiseReduction::updateProjection - m_pFiffInfo->bads.size():"<<m_pFiffInfo->bads.size();
+
+        for(qint32 j = 0; j < m_pFiffInfo->bads.size(); ++j) {
+            int index = m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(j));
+            if(index >= 0 && index<m_pFiffInfo->ch_names.size()) {
+                m_matProj.col(index).setZero();
+            }
+        }
+
+//        std::cout << "Bads\n" << m_vecBadIdcs << std::endl;
+//        std::cout << "Proj\n";
+//        std::cout << m_matProj.block(0,0,10,10) << std::endl;
+
+        //
+        // Make proj sparse
+        //
+        qint32 nchan = this->m_pFiffInfo->nchan;
+        qint32 i, k;
+
+        typedef Eigen::Triplet<double> T;
+        std::vector<T> tripletList;
+        tripletList.reserve(nchan);
+
+        tripletList.clear();
+        tripletList.reserve(m_matProj.rows()*m_matProj.cols());
+        for(i = 0; i < m_matProj.rows(); ++i)
+            for(k = 0; k < m_matProj.cols(); ++k)
+                if(m_matProj(i,k) != 0)
+                    tripletList.push_back(T(i, k, m_matProj(i,k)));
+
+        m_matSparseProj = SparseMatrix<double>(m_matProj.rows(),m_matProj.cols());
+        if(tripletList.size() > 0)
+            m_matSparseProj.setFromTriplets(tripletList.begin(), tripletList.end());
+
+        //Create full multiplication matrix
+//        m_matSparseSpharaProjMult = m_matSparseSpharaMult * m_matSparseProj;
+//        m_matSparseProjCompMult = m_matSparseProj * m_matSparseComp;
+
+//        m_matSparseFull = m_matSparseSpharaMult * m_matSparseProj * m_matSparseComp;
+        m_mutex.unlock();
+    }
+}
+
+
+//*************************************************************************************************************
+
 void NoiseReduction::run()
 {
     //
@@ -285,6 +364,11 @@ void NoiseReduction::run()
         //SPHARA calculations
         if(m_bSpharaActive) {
             t_mat = m_matSpharaMultFirst * m_matSpharaMultSecond * t_mat;
+        }
+
+        //Projectors
+        if(m_bProjActivated) {
+            t_mat = m_matSparseProj * t_mat;
         }
 
         m_mutex.unlock();
