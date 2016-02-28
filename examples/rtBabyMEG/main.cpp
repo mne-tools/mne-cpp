@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
 //    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
 
     AnnotationSet tAnnotSet ("ID_4841721_act", 2, "aparc.a2009s", "D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721");
-    SurfaceSet tSurfSet ("ID_4841721_act", 2, "pial", "D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721");
+    SurfaceSet tSurfSet ("ID_4841721_act", 2, "white", "D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721");
 
 //    double snr = 1.0;
 //    double lambda2 = 1.0 / pow(snr, 2);
@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
     std::cout<<"Creating BrainView"<<std::endl;
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    //testWindow->addBrainData("HemiLRSet", tSurfSet, tAnnotSet);
+    testWindow->addBrainData("HemiLRSet", tSurfSet, tAnnotSet);
     testWindow->addBrainData("HemiLRSet", t_fileFwd);
 
     //QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("HemiLRSet", sourceEstimate, t_clusteredFwd);
