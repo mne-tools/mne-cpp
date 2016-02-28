@@ -485,8 +485,10 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pQuickControlWidget->setDistanceTimeSpacerIndex(settings.value(QString("RTMSAW/%1/distanceTimeSpacerIndex").arg(t_sRTMSAWName), 3).toInt());
 
-        //Activate projections as default
-        m_pRTMSAModel->updateProjection();
+        //If projections are watned activate projections as default
+        if(slFlags.contains("projections")) {
+            m_pRTMSAModel->updateProjection();
+        }
 
         //Initialized
         m_bInitialized = true;

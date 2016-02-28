@@ -126,19 +126,16 @@ void NoiseReduction::init()
     m_inputConnectors.append(m_pNoiseReductionInput);
 
     // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
-    // Also, this output stream will generate an online display in your plugin
     m_pNoiseReductionOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "NoiseReductionOut", "NoiseReduction output data");
     m_outputConnectors.append(m_pNoiseReductionOutput);
+
     QStringList slFlags;
-    slFlags << "filter" << "view" << "triggerdetection" << "scaling";
+    slFlags << "view" << "triggerdetection" << "scaling";
     m_pNoiseReductionOutput->data()->setDisplayFlags(slFlags);
 
     //Delete Buffer - will be initailzed with first incoming data
     if(!m_pNoiseReductionBuffer.isNull())
         m_pNoiseReductionBuffer = CircularMatrixBuffer<double>::SPtr();
-
-    //Set visibility of options tool to true
-    m_pActionShowOptionsWidget->setVisible(true);
 }
 
 
@@ -296,11 +293,9 @@ void NoiseReduction::updateProjection()
 
         this->m_pFiffInfo->make_projector(m_matProj);
         qDebug() << "NoiseReduction::updateProjection - New projection calculated.";
+        qDebug() << "NoiseReduction::updateProjection - m_bProjActivated:"<<m_bProjActivated;
 
         //set columns of matrix to zero depending on bad channels indexes
-        qDebug()<<"NoiseReduction::updateProjection - m_matProj size:"<<m_matProj.rows()<<m_matProj.cols();
-        qDebug()<<"NoiseReduction::updateProjection - m_pFiffInfo->bads.size():"<<m_pFiffInfo->bads.size();
-
         for(qint32 j = 0; j < m_pFiffInfo->bads.size(); ++j) {
             int index = m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(j));
             if(index >= 0 && index<m_pFiffInfo->ch_names.size()) {
@@ -353,6 +348,9 @@ void NoiseReduction::run()
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
+    //Set visibility of options tool to true
+    m_pActionShowOptionsWidget->setVisible(true);
+
     //Read and create SPHARA operator for the first time
     initSphara();
     createSpharaOperator();
@@ -366,14 +364,14 @@ void NoiseReduction::run()
 
         //Do all the noise reduction steps here
         //SPHARA calculations
-        if(m_bSpharaActive) {
-            t_mat = m_matSpharaMultFirst * m_matSpharaMultSecond * t_mat;
-        }
+//        if(m_bSpharaActive) {
+//            t_mat = m_matSpharaMultFirst * m_matSpharaMultSecond * t_mat;
+//        }
 
         //Projectors
-        if(m_bProjActivated) {
-            t_mat = m_matSparseProj * t_mat;
-        }
+//        if(m_bProjActivated) {
+//            t_mat = m_matSparseProj * t_mat;
+//        }
 
         m_mutex.unlock();
 
