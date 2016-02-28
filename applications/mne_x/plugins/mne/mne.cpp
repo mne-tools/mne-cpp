@@ -155,13 +155,13 @@ void MNE::calcFiffInfo()
 {
     QMutexLocker locker(&m_qMutex);
 
-    if(m_qListCovChNames.size() > 0 && m_pFiffInfoEvoked && m_pFiffInfoForward)
+    if(m_qListCovChNames.size() > 0 && m_pFiffInfoInput && m_pFiffInfoForward)
     {
         qDebug() << "Fiff Infos available";
 
 //        qDebug() << "m_qListCovChNames" << m_qListCovChNames;
 //        qDebug() << "m_pFiffInfoForward->ch_names" << m_pFiffInfoForward->ch_names;
-//        qDebug() << "m_pFiffInfoEvoked->ch_names" << m_pFiffInfoEvoked->ch_names;
+//        qDebug() << "m_pFiffInfoInput->ch_names" << m_pFiffInfoInput->ch_names;
 
         // Align channel names of the forward solution to the incoming averaged (currently acquired) data
         // Find out whether the forward solution depends on only MEG, EEG or both MEG and EEG channels
@@ -182,11 +182,11 @@ void MNE::calcFiffInfo()
 
         //If only MEG channels are used
         if(forwardChannelsTypes.contains("MEG") && !forwardChannelsTypes.contains("EEG")) {
-            for(qint32 x = 0; x < m_pFiffInfoEvoked->chs.size(); ++x)
+            for(qint32 x = 0; x < m_pFiffInfoInput->chs.size(); ++x)
             {
                 if(m_pFiffInfoForward->chs[x].kind == FIFFV_MEG_CH) {
-                    m_pFiffInfoForward->chs[counter].ch_name = m_pFiffInfoEvoked->chs[x].ch_name;
-                    m_pFiffInfoForward->ch_names << m_pFiffInfoEvoked->chs[x].ch_name;
+                    m_pFiffInfoForward->chs[counter].ch_name = m_pFiffInfoInput->chs[x].ch_name;
+                    m_pFiffInfoForward->ch_names << m_pFiffInfoInput->chs[x].ch_name;
                     counter++;
                 }
             }
@@ -194,11 +194,11 @@ void MNE::calcFiffInfo()
 
         //If only EEG channels are used
         if(!forwardChannelsTypes.contains("MEG") && forwardChannelsTypes.contains("EEG")) {
-            for(qint32 x = 0; x < m_pFiffInfoEvoked->chs.size(); ++x)
+            for(qint32 x = 0; x < m_pFiffInfoInput->chs.size(); ++x)
             {
                 if(m_pFiffInfoForward->chs[x].kind == FIFFV_EEG_CH) {
-                    m_pFiffInfoForward->chs[counter].ch_name = m_pFiffInfoEvoked->chs[x].ch_name;
-                    m_pFiffInfoForward->ch_names << m_pFiffInfoEvoked->chs[x].ch_name;
+                    m_pFiffInfoForward->chs[counter].ch_name = m_pFiffInfoInput->chs[x].ch_name;
+                    m_pFiffInfoForward->ch_names << m_pFiffInfoInput->chs[x].ch_name;
                     counter++;
                 }
             }
@@ -207,11 +207,11 @@ void MNE::calcFiffInfo()
         //If both MEG and EEG channels are used
         if(forwardChannelsTypes.contains("MEG") && forwardChannelsTypes.contains("EEG")) {
             qDebug()<<"MEG EEG fwd solution";
-            for(qint32 x = 0; x < m_pFiffInfoEvoked->chs.size(); ++x)
+            for(qint32 x = 0; x < m_pFiffInfoInput->chs.size(); ++x)
             {
-                if(m_pFiffInfoEvoked->chs[x].kind == FIFFV_MEG_CH || m_pFiffInfoEvoked->chs[x].kind == FIFFV_EEG_CH) {
-                    m_pFiffInfoForward->chs[counter].ch_name = m_pFiffInfoEvoked->chs[x].ch_name;
-                    m_pFiffInfoForward->ch_names << m_pFiffInfoEvoked->chs[x].ch_name;
+                if(m_pFiffInfoInput->chs[x].kind == FIFFV_MEG_CH || m_pFiffInfoInput->chs[x].kind == FIFFV_EEG_CH) {
+                    m_pFiffInfoForward->chs[counter].ch_name = m_pFiffInfoInput->chs[x].ch_name;
+                    m_pFiffInfoForward->ch_names << m_pFiffInfoInput->chs[x].ch_name;
                     counter++;
                 }
             }
@@ -221,7 +221,7 @@ void MNE::calcFiffInfo()
         QStringList tmp_pick_ch_names;
         foreach (const QString &ch, m_pFiffInfoForward->ch_names)
         {
-            if(m_pFiffInfoEvoked->ch_names.contains(ch))
+            if(m_pFiffInfoInput->ch_names.contains(ch))
                 tmp_pick_ch_names << ch;
         }
 
@@ -233,11 +233,11 @@ void MNE::calcFiffInfo()
                 m_qListPickChannels << ch;
         }
 
-        RowVectorXi sel = m_pFiffInfoEvoked->pick_channels(m_qListPickChannels);
+        RowVectorXi sel = m_pFiffInfoInput->pick_channels(m_qListPickChannels);
 
         qDebug() << "m_qListPickChannels" << m_qListPickChannels;
 
-        m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(m_pFiffInfoEvoked->pick_info(sel)));
+        m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(m_pFiffInfoInput->pick_info(sel)));
 
         qDebug() << "m_pFiffInfo" << m_pFiffInfo->ch_names;
     }
@@ -358,10 +358,14 @@ void MNE::updateRTMSA(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
     QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
 
-    if(pRTMSA) {
+    if(pRTMSA && m_bReceiveData) {
         //Check if buffer initialized
         if(!m_pMatrixDataBuffer)
             m_pMatrixDataBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
+
+        //Fiff Information of the evoked
+        if(!m_pFiffInfoInput)
+            m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(*(pRTMSA->info())));
 
         if(m_bProcessData)
         {
@@ -411,8 +415,8 @@ void MNE::updateRTE(XMEASLIB::NewMeasurement::SPtr pMeasurement)
     if(pRTE && m_bReceiveData)
     {
         //Fiff Information of the evoked
-        if(!m_pFiffInfoEvoked)
-            m_pFiffInfoEvoked = QSharedPointer<FiffInfo>(new FiffInfo(pRTE->getValue()->info));
+        if(!m_pFiffInfoInput)
+            m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pRTE->getValue()->info));
 
         if(m_bProcessData)
             m_qVecFiffEvoked.push_back(pRTE->getValue()->pick_channels(m_qListPickChannels));

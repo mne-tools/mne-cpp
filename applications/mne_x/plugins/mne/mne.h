@@ -241,7 +241,7 @@ private:
 
 
     FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff information. */
-    FiffInfo::SPtr              m_pFiffInfoEvoked;  /**< Fiff information of the evoked. */
+    FiffInfo::SPtr              m_pFiffInfoInput;  /**< Fiff information of the evoked. */
     QStringList                 m_qListCovChNames;  /**< Covariance channel names. */
     FiffInfoBase::SPtr          m_pFiffInfoForward; /**< Fiff information of the forward solution. */
 
