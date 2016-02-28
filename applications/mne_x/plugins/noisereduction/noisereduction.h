@@ -195,31 +195,34 @@ protected:
     void createSpharaOperator();
 
 private:
-    QMutex              m_mutex;                        /**< The threads mutex.*/
+    QMutex                          m_mutex;                                    /**< The threads mutex.*/
 
-    bool                m_bIsRunning;                   /**< Flag whether thread is running.*/
-    bool                m_bSpharaActive;                /**< Flag whether thread is running.*/
-    bool                m_bProjActivated;               /**< Projections activated */
+    bool                            m_bCompActivated;                           /**< Compensator activated */
+    bool                            m_bIsRunning;                               /**< Flag whether thread is running.*/
+    bool                            m_bSpharaActive;                            /**< Flag whether thread is running.*/
+    bool                            m_bProjActivated;                           /**< Projections activated */
 
-    int                 m_iNBaseFctsFirst;              /**< The number of grad/inner base functions to use for calculating the sphara opreator.*/
-    int                 m_iNBaseFctsSecond;             /**< The number of grad/outer base functions to use for calculating the sphara opreator.*/
-    QString             m_sCurrentSystem;               /**< The current acquisition system (EEG, babyMEG, VectorView).*/
+    int                             m_iNBaseFctsFirst;                          /**< The number of grad/inner base functions to use for calculating the sphara opreator.*/
+    int                             m_iNBaseFctsSecond;                         /**< The number of grad/outer base functions to use for calculating the sphara opreator.*/
+    QString                         m_sCurrentSystem;                           /**< The current acquisition system (EEG, babyMEG, VectorView).*/
 
-    Eigen::VectorXi     indicesFirstVV;                 /**< The indices of the channels to pick for the first SPHARA oerpator in case of a VectorView system.*/
-    Eigen::VectorXi     indicesSecondVV;                /**< The indices of the channels to pick for the second SPHARA oerpator in case of a VectorView system.*/
-    Eigen::VectorXi     indicesFirstBabyMEG;            /**< The indices of the channels to pick for the first SPHARA oerpator in case of a BabyMEG system.*/
-    Eigen::VectorXi     indicesSecondBabyMEG;           /**< The indices of the channels to pick for the second SPHARA oerpator in case of a BabyMEG system.*/
+    Eigen::VectorXi                 m_vecIndicesFirstVV;                        /**< The indices of the channels to pick for the first SPHARA oerpator in case of a VectorView system.*/
+    Eigen::VectorXi                 m_vecIndicesSecondVV;                       /**< The indices of the channels to pick for the second SPHARA oerpator in case of a VectorView system.*/
+    Eigen::VectorXi                 m_vecIndicesFirstBabyMEG;                   /**< The indices of the channels to pick for the first SPHARA oerpator in case of a BabyMEG system.*/
+    Eigen::VectorXi                 m_vecIndicesSecondBabyMEG;                  /**< The indices of the channels to pick for the second SPHARA oerpator in case of a BabyMEG system.*/
 
-    Eigen::MatrixXd     m_matSpharaMultFirst;           /**< The final first SPHARA operator (in case of babymeg this is the inner layer, in case of vector view these are the gradiometers).*/
-    Eigen::MatrixXd     m_matSpharaMultSecond;          /**< The final second magnetometer SPHARA operator (in case of babymeg this is the outer layer, in case of vector view these are the magnetometers).*/
+    Eigen::SparseMatrix<double>     m_matSparseSpharaMult;                      /**< The final sparse SPHARA operator .*/
+    Eigen::SparseMatrix<double>     m_matSparseSpharaProjMult;                  /**< The final sparse SPHARA + projection operator.*/
+    Eigen::SparseMatrix<double>     m_matSparseSpharaCompMult;                  /**< The final sparse SPHARA + compensator operator.*/
+    Eigen::SparseMatrix<double>     m_matSparseProjCompMult;                    /**< The final sparse projection + compensator operator.*/
+    Eigen::SparseMatrix<double>     m_matSparseProj;                            /**< Sparse SSP projector */
+    Eigen::SparseMatrix<double>     m_matSparseComp;                            /**< Sparse compensator matrix */
+    Eigen::SparseMatrix<double>     m_matSparseFull;                            /**< Full multiplication matrix  */
 
-    Eigen::MatrixXd     m_matSpharaVVGradLoaded;        /**< The loaded VectorView gradiometer basis functions.*/
-    Eigen::MatrixXd     m_matSpharaVVMagLoaded;         /**< The loaded VectorView magnetometer basis functions.*/
-    Eigen::MatrixXd     m_matSpharaBabyMEGInnerLoaded;  /**< The loaded babyMEG inner layer basis functions.*/
-    Eigen::MatrixXd     m_matSpharaBabyMEGOuterLoaded;  /**< The loaded babyMEG outer layer basis functions.*/
-
-    Eigen::MatrixXd                m_matProj;                                  /**< SSP projector */
-    Eigen::SparseMatrix<double>    m_matSparseProj;                            /**< Sparse SSP projector */
+    Eigen::MatrixXd                 m_matSpharaVVGradLoaded;                    /**< The loaded VectorView gradiometer basis functions.*/
+    Eigen::MatrixXd                 m_matSpharaVVMagLoaded;                     /**< The loaded VectorView magnetometer basis functions.*/
+    Eigen::MatrixXd                 m_matSpharaBabyMEGInnerLoaded;              /**< The loaded babyMEG inner layer basis functions.*/
+    Eigen::MatrixXd                 m_matSpharaBabyMEGOuterLoaded;              /**< The loaded babyMEG outer layer basis functions.*/
 
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                /**< Fiff measurement info.*/
 
