@@ -418,14 +418,12 @@ void RealTimeMultiSampleArrayWidget::init()
         //
         //-------- Init quick control widget --------
         //
-        QStringList slFlags;
+        QStringList slFlags = m_pRTMSA->getDisplayFlags();
 
         #ifdef BUILD_BASIC_MNEX_VERSION
             std::cout<<"BUILD_BASIC_MNEX_VERSION Defined"<<std::endl;
+            slFlags.clear();
             slFlags << "projections" << "view" << "scaling";
-        #else
-            std::cout<<"BUILD_BASIC_MNEX_VERSION Undefined"<<std::endl;
-            slFlags << "compensators" << "projections" << "filter" << "view" << "triggerdetection" << "scaling" << "sphara";
         #endif
 
         m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display", slFlags));

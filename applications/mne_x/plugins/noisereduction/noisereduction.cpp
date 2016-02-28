@@ -121,13 +121,17 @@ void NoiseReduction::init()
 {
     // Input
     m_pNoiseReductionInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "NoiseReductionIn", "NoiseReduction input data");
-    connect(m_pNoiseReductionInput.data(), &PluginInputConnector::notify, this, &NoiseReduction::update, Qt::DirectConnection);
+    connect(m_pNoiseReductionInput.data(), &PluginInputConnector::notify,
+            this, &NoiseReduction::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pNoiseReductionInput);
 
     // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
     // Also, this output stream will generate an online display in your plugin
     m_pNoiseReductionOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "NoiseReductionOut", "NoiseReduction output data");
     m_outputConnectors.append(m_pNoiseReductionOutput);
+    QStringList slFlags;
+    slFlags << "filter" << "view" << "triggerdetection" << "scaling";
+    m_pNoiseReductionOutput->data()->setDisplayFlags(slFlags);
 
     //Delete Buffer - will be initailzed with first incoming data
     if(!m_pNoiseReductionBuffer.isNull())
