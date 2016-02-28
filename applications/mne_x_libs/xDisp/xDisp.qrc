@@ -10,7 +10,7 @@
         <file alias="hideBad.png">images/hideBad.png</file>
         <file alias="showBad.png">images/showBad.png</file>
         <file alias="quickControl.png">images/quickControl.png</file>
-        <file>images/3DControl.png</file>
+        <file alias="3DControl.jpg">images/3DControl.png</file>
     </qresource>
     <qresource prefix="/sphara">
         <file>SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt</file>

@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include "../ui_noisereductionoptionswidget.h"
+#include "fiff/fiff_info.h"
 
 
 //*************************************************************************************************************
@@ -98,6 +99,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Set the fiff info.
+    *
+    * @param[in] pFiffInfo    The new FiffInfo.
+    */
+    void setFiffInfo(const FIFFLIB::FiffInfo::SPtr pFiffInfo);
+
+    //=========================================================================================================
+    /**
     * Set the acquisition system type (BabyMEG, VecotrView, EEG).
     *
     * @param[in] sSystem    The type of the acquisition system.
@@ -107,14 +116,47 @@ public:
 protected slots:
     //=========================================================================================================
     /**
+    * Slot called when the projector check state changes
+    */
+    void onCheckProjStatusChanged(bool state);
+
+    //=========================================================================================================
+    /**
+    * Slot called when user enables/disables all projectors
+    */
+    void onEnableDisableAllProj(bool status);
+
+    //=========================================================================================================
+    /**
     * Call this slot whenever the number basis functions changed.
     */
     void onNBaseFctsChanged();
 
+protected:
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the projector group
+    */
+    void createProjectorGroup();
+
 private:
-    Ui::NoiseReductionOptionsWidgetClass*   ui;                         /**< The UI class specified in the designer. */
+    Ui::NoiseReductionOptionsWidgetClass*   ui;                             /**< The UI class specified in the designer. */
 
     NoiseReductionPlugin::NoiseReduction*   m_pNoiseReductionToolbox;
+
+    FIFFLIB::FiffInfo::SPtr                 m_pFiffInfo;                    /**< Connected fiff info. */
+
+    QList<QCheckBox*>                       m_qListProjCheckBox;            /**< List of projection CheckBox. */
+
+    QCheckBox *                             m_enableDisableProjectors;      /**< Holds the enable disable all check box. */
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changes the projections.
+    */
+    void projSelectionChanged();
+
 };
 
 #endif // NOISEREDUCTIONOPTIONSWIDGET_H
