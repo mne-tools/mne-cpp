@@ -57,6 +57,7 @@
 #include <rtProcessing/rtinvop.h>
 
 #include <xMeas/realtimesourceestimate.h>
+#include <xMeas/newrealtimemultisamplearray.h>
 #include <xMeas/realtimecov.h>
 #include <xMeas/realtimeevoked.h>
 
@@ -162,6 +163,13 @@ public:
 
     //=========================================================================================================
     /**
+    * Slot to update the real time multi sample array data
+    *
+    */
+    void updateRTMSA(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+
+    //=========================================================================================================
+    /**
     * Slot to update the fiff covariance
     *
     */
@@ -200,10 +208,13 @@ protected:
     virtual void run();
 
 private:
-    PluginInputData<RealTimeEvoked>::SPtr   m_pRTEInput;    /**< The RealTimeEvoked input.*/
-    PluginInputData<RealTimeCov>::SPtr      m_pRTCInput;    /**< The RealTimeCov input.*/
+    PluginInputData<NewRealTimeMultiSampleArray>::SPtr      m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
+    PluginInputData<RealTimeEvoked>::SPtr                   m_pRTEInput;            /**< The RealTimeEvoked input.*/
+    PluginInputData<RealTimeCov>::SPtr                      m_pRTCInput;            /**< The RealTimeCov input.*/
 
-    PluginOutputData<RealTimeSourceEstimate>::SPtr      m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
+    PluginOutputData<RealTimeSourceEstimate>::SPtr          m_pRTSEOutput;          /**< The RealTimeSourceEstimate output.*/
+
+    CircularMatrixBuffer<double>::SPtr                      m_pMatrixDataBuffer;    /**< Holds incoming RealTimeMultiSampleArray data.*/
 
     QMutex m_qMutex;
 
