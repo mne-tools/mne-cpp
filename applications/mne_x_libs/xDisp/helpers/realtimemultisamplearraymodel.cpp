@@ -334,9 +334,6 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
         m_matSparseSpharaCompMult.setIdentity();
         m_matSparseProjCompMult.setIdentity();
 
-        //Create the initial SSP projector
-        updateProjection();
-
         //Create the initial Compensator projector
         updateCompensator(0);
 
@@ -709,7 +706,7 @@ void RealTimeMultiSampleArrayModel::updateProjection()
         }
 
         this->m_pFiffInfo->make_projector(m_matProj);
-        qDebug() << "updateProjection :: New projection calculated.";
+        qDebug() << "RealTimeMultiSampleArrayModel::updateProjection - New projection calculated.";
 
         //set columns of matrix to zero depending on bad channels indexes
         for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
