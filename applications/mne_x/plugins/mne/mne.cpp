@@ -73,9 +73,12 @@ MNE::MNE()
 , m_bReceiveData(false)
 , m_bProcessData(false)
 , m_bFinishedClustering(false)
-, m_qFileFwdSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
-, m_sAtlasDir("./MNE-sample-data/subjects/sample/label")
-, m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
+//, m_qFileFwdSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
+//, m_sAtlasDir("./MNE-sample-data/subjects/sample/label")
+//, m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
+, m_qFileFwdSolution("D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721/160125_133250_4841721_Spontaneous_raw-oct-6-fwd.fif")
+, m_sAtlasDir("D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721/ID_4841721_act/label")
+, m_sSurfaceDir("D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721/ID_4841721_act/surf")
 , m_iNumAverages(10)
 , m_iDownSample(4)
 {
@@ -131,9 +134,12 @@ void MNE::init()
     m_outputConnectors.append(m_pRTSEOutput);
     m_pRTSEOutput->data()->setName(this->getName());//Provide name to auto store widget settings
 
+    //
+    // Set the fwd, annotation and surface data
+    //
     m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
     m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
-    m_pRTSEOutput->data()->setFwdSolution(m_pFwd);
+    m_pRTSEOutput->data()->setFwdSolution(m_pClusteredFwd);
 
     // start clustering
     QFuture<void> future = QtConcurrent::run(this, &MNE::doClustering);
@@ -184,26 +190,24 @@ void MNE::calcFiffInfo()
         if(forwardChannelsTypes.contains("MEG") && !forwardChannelsTypes.contains("EEG")) {
             for(qint32 x = 0; x < m_pFiffInfoInput->chs.size(); ++x)
             {
-                if(m_pFiffInfoForward->chs[x].kind == FIFFV_MEG_CH) {
+                if(m_pFiffInfoInput->chs[x].kind == FIFFV_MEG_CH) {
                     m_pFiffInfoForward->chs[counter].ch_name = m_pFiffInfoInput->chs[x].ch_name;
                     m_pFiffInfoForward->ch_names << m_pFiffInfoInput->chs[x].ch_name;
                     counter++;
                 }
             }
         }
-
         //If only EEG channels are used
         if(!forwardChannelsTypes.contains("MEG") && forwardChannelsTypes.contains("EEG")) {
             for(qint32 x = 0; x < m_pFiffInfoInput->chs.size(); ++x)
             {
-                if(m_pFiffInfoForward->chs[x].kind == FIFFV_EEG_CH) {
+                if(m_pFiffInfoInput->chs[x].kind == FIFFV_EEG_CH) {
                     m_pFiffInfoForward->chs[counter].ch_name = m_pFiffInfoInput->chs[x].ch_name;
                     m_pFiffInfoForward->ch_names << m_pFiffInfoInput->chs[x].ch_name;
                     counter++;
                 }
             }
         }
-
         //If both MEG and EEG channels are used
         if(forwardChannelsTypes.contains("MEG") && forwardChannelsTypes.contains("EEG")) {
             qDebug()<<"MEG EEG fwd solution";
@@ -216,7 +220,6 @@ void MNE::calcFiffInfo()
                 }
             }
         }
-
         //Pick only channels which are present in all data structures (covariance, evoked and forward)
         QStringList tmp_pick_ch_names;
         foreach (const QString &ch, m_pFiffInfoForward->ch_names)
@@ -224,7 +227,6 @@ void MNE::calcFiffInfo()
             if(m_pFiffInfoInput->ch_names.contains(ch))
                 tmp_pick_ch_names << ch;
         }
-
         m_qListPickChannels.clear();
 
         foreach (const QString &ch, tmp_pick_ch_names)
@@ -232,7 +234,6 @@ void MNE::calcFiffInfo()
             if(m_qListCovChNames.contains(ch))
                 m_qListPickChannels << ch;
         }
-
         RowVectorXi sel = m_pFiffInfoInput->pick_channels(m_qListPickChannels);
 
         qDebug() << "m_qListPickChannels" << m_qListPickChannels;
@@ -364,8 +365,11 @@ void MNE::updateRTMSA(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             m_pMatrixDataBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
 
         //Fiff Information of the evoked
-        if(!m_pFiffInfoInput)
-            m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(*(pRTMSA->info())));
+        if(!m_pFiffInfoInput) {
+            qDebug()<<"MNE::updateRTMSA - Creating m_pFiffInfoInput";
+            //m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pRTMSA->info().data()));
+            m_pFiffInfoInput = pRTMSA->info();
+        }
 
         if(m_bProcessData)
         {
