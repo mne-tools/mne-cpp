@@ -71,7 +71,6 @@ GUSBAmpProducer::GUSBAmpProducer(GUSBAmp* pGUSBAmp)
 
     m_vSerials.resize(1);
     m_vSerials[0]= "UB-2015.05.16";
-    cout << "here";
 }
 
 
@@ -92,8 +91,6 @@ void GUSBAmpProducer::start(vector<QString> &serials, vector<int> channels, int 
     m_pGUSBAmpDriver->setSampleRate(sampleRate);
     m_pGUSBAmpDriver->setChannels(channels);
     m_pGUSBAmpDriver->setFilePath(filePath);
-
-    qDebug() << "Producer:" << serials.size() << "serial" << serials[0];
 
     //asking for the size of the sample Matrix which will be acquired
     m_viSizeOfSampleMatrix = m_pGUSBAmpDriver->getSizeOfSampleMatrix();

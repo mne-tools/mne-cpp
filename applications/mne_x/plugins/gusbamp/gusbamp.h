@@ -200,7 +200,8 @@ private:
     UCHAR               m_iNumberOfChannels;        /**< the channels that should be acquired from each device */
     QString             m_sFilePath;                /**< String of the Filepath where acquisition data will be stored */
     vector<int>         m_viSizeOfSampleMatrix;     /**< vector including the size of the two dimensional sample Matrix */
-    vector<int>         m_viChannelsToAcquired;     /**< vector of the calling numbers of the channels to be acquired */
+    vector<int>         m_viChannelsToAcquire;     /**< vector of the calling numbers of the channels to be acquired */
+    GUSBAmpSetupWidget* m_pWidget;
 
 
 };

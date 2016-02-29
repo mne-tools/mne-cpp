@@ -140,12 +140,14 @@ private:
     DWORD               m_numBytesReceived;         /**< num of Bytes whicht are received during one measuring procedure */
     BYTE***             m_buffers;                  /**< pointer to the buffer */
     OVERLAPPED**        m_overlapped;               /**< storage in case of overlapping */
+    vector<int>         m_sizeOfMatrix;             /**< number of rows and column of output matrix [rows columns] */
 //file writing and outputmatrix
+    bool                m_bIsWriting;               /**< flag for file writing */
     QString             m_filePath;                 /**< path of the file for data acquisition */
     QString             m_sFileName;                /**< file name of the data-file */
     QFile               m_file;                     /**< file to which data is written */
     QTextStream         m_stream;                   /**< stream from m_buffers to m_file */
-    vector<int>         m_sizeOfMatrix;             /**< number of rows and column of output matrix [rows columns] */
+
 
 
 public:
@@ -223,6 +225,17 @@ public:
     *
     */
     bool setChannels(vector<int> &channels);
+
+    //=========================================================================================================
+    /**
+    * Setting Flag for Filewriting
+    *
+    * @param[in]    doFileWriting   Boolian, which indicates whether Filewriting should be done or not
+    *
+    * @return                       true if executed successfully, false otherwise
+    *
+    */
+    bool setFileWriting(bool doFileWriting);
 
     //=========================================================================================================
     /**

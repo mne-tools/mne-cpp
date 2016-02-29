@@ -75,7 +75,6 @@ GUSBAmpSetupWidget::GUSBAmpSetupWidget(GUSBAmp* pGUSBAmp, QWidget* parent)
 
     ui.comboBox->setCurrentIndex(6);
 
-
 }
 
 
@@ -109,13 +108,7 @@ void GUSBAmpSetupWidget::initGui()
 
 void GUSBAmpPlugin::GUSBAmpSetupWidget::on_comboBox_activated(const QString &arg1)
 {
-
-    QMessageBox::information(this,"Sample Rate", arg1 );
     m_pGUSBAmp->m_iSampleRate = arg1.toInt();
-
-
-
-
 }
 
 
@@ -175,3 +168,84 @@ void GUSBAmpSetupWidget::on_pushButton_clicked()
 
 
 
+
+void GUSBAmpSetupWidget::checkBoxes()
+{
+    vector<int> list;
+
+    if(ui.checkBox->isChecked())
+        list.push_back(1);
+
+    if(ui.checkBox_2->isChecked())
+        list.push_back(2);
+
+    if(ui.checkBox_3->isChecked())
+        list.push_back(3);
+
+    if(ui.checkBox_4->isChecked())
+        list.push_back(4);
+
+    if(ui.checkBox_5->isChecked())
+        list.push_back(5);
+
+    if(ui.checkBox_6->isChecked())
+        list.push_back(6);
+
+    if(ui.checkBox_7->isChecked())
+        list.push_back(7);
+
+    if(ui.checkBox_8->isChecked())
+        list.push_back(8);
+
+    if(ui.checkBox_9->isChecked())
+        list.push_back(9);
+
+    if(ui.checkBox_10->isChecked())
+        list.push_back(10);
+
+    if(ui.checkBox_11->isChecked())
+        list.push_back(11);
+
+    if(ui.checkBox_12->isChecked())
+        list.push_back(12);
+
+    if(ui.checkBox_13->isChecked())
+        list.push_back(13);
+
+    if(ui.checkBox_14->isChecked())
+        list.push_back(14);
+
+    if(ui.checkBox_15->isChecked())
+        list.push_back(15);
+
+    if(ui.checkBox_16->isChecked())
+        list.push_back(16);
+
+
+    m_pGUSBAmp->m_viChannelsToAcquire.resize(list.size());
+    m_pGUSBAmp->m_viChannelsToAcquire = list;
+}
+
+
+void GUSBAmpPlugin::GUSBAmpSetupWidget::on_ChannelSelect_clicked(bool checked)
+{
+    if(!checked)
+    {
+        ui.checkBox->setChecked(true);
+        ui.checkBox_2->setChecked(true);
+        ui.checkBox_3->setChecked(true);
+        ui.checkBox_4->setChecked(true);
+        ui.checkBox_5->setChecked(true);
+        ui.checkBox_6->setChecked(true);
+        ui.checkBox_7->setChecked(true);
+        ui.checkBox_8->setChecked(true);
+        ui.checkBox_9->setChecked(true);
+        ui.checkBox_10->setChecked(true);
+        ui.checkBox_11->setChecked(true);
+        ui.checkBox_12->setChecked(true);
+        ui.checkBox_13->setChecked(true);
+        ui.checkBox_14->setChecked(true);
+        ui.checkBox_15->setChecked(true);
+        ui.checkBox_16->setChecked(true);
+    }
+}
