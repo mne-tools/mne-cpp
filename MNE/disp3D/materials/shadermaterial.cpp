@@ -75,6 +75,16 @@ ShaderMaterial::ShaderMaterial(QNode *parent)
 
 ShaderMaterial::~ShaderMaterial()
 {
+    delete m_vertexEffect;
+    delete m_ambientParameter;
+    delete m_diffuseParameter;
+    delete m_specularParameter;
+    delete m_specularParameter;
+    delete m_shininessParameter;
+    delete m_alphaParameter;
+    delete m_vertexGL3Technique;
+    delete m_vertexGL3RenderPass;
+    delete m_vertexGL3Shader;
 }
 
 
