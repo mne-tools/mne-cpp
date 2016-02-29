@@ -51,6 +51,7 @@
 //=============================================================================================================
 
 #include <QWidget>
+#include <QSignalMapper>
 
 
 //*************************************************************************************************************
@@ -128,6 +129,12 @@ protected slots:
 
     //=========================================================================================================
     /**
+    * Slot called when the compensator check state changes
+    */
+    void onCheckCompStatusChanged(const QString & compName);
+
+    //=========================================================================================================
+    /**
     * Call this slot whenever the number basis functions changed.
     */
     void onNBaseFctsChanged();
@@ -137,7 +144,13 @@ protected:
     /**
     * Create the widgets used in the projector group
     */
-    void createProjectorGroup();
+    void createProjectorGroup();    
+
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the compensator group
+    */
+    void createCompensatorGroup();
 
 private:
     Ui::NoiseReductionOptionsWidgetClass*   ui;                             /**< The UI class specified in the designer. */
@@ -147,8 +160,11 @@ private:
     FIFFLIB::FiffInfo::SPtr                 m_pFiffInfo;                    /**< Connected fiff info. */
 
     QList<QCheckBox*>                       m_qListProjCheckBox;            /**< List of projection CheckBox. */
+    QList<QCheckBox*>                       m_qListCompCheckBox;            /**< List of compensator CheckBox. */
 
     QCheckBox *                             m_enableDisableProjectors;      /**< Holds the enable disable all check box. */
+
+    QSignalMapper*                          m_pCompSignalMapper;            /**< The signal mapper. */
 
 signals:
     //=========================================================================================================
@@ -157,6 +173,17 @@ signals:
     */
     void projSelectionChanged();
 
+    //=========================================================================================================
+    /**
+    * Signal mapper signal for compensator changes.
+    */
+    void compClicked(const QString& text);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changes the compensator.
+    */
+    void compSelectionChanged(int to);
 };
 
 #endif // NOISEREDUCTIONOPTIONSWIDGET_H

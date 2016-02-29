@@ -83,10 +83,6 @@ NoiseReduction::NoiseReduction()
     m_pOptionsWidget = NoiseReductionOptionsWidget::SPtr(new NoiseReductionOptionsWidget(this));
     m_pOptionsWidget->setAcquisitionSystem(m_sCurrentSystem);
 
-    //Handle projections
-    connect(m_pOptionsWidget.data(), &NoiseReductionOptionsWidget::projSelectionChanged,
-            this, &NoiseReduction::updateProjection);
-
     //Add action which will be visible in the plugin's toolbar
     m_pActionShowOptionsWidget = new QAction(QIcon(":/images/options.png"), tr("Noise reduction options"),this);
     m_pActionShowOptionsWidget->setShortcut(tr("F12"));
@@ -137,6 +133,14 @@ void NoiseReduction::init()
     //Delete Buffer - will be initailzed with first incoming data
     if(!m_pNoiseReductionBuffer.isNull())
         m_pNoiseReductionBuffer = CircularMatrixBuffer<double>::SPtr();
+
+    //Handle projections
+    connect(m_pOptionsWidget.data(), &NoiseReductionOptionsWidget::projSelectionChanged,
+            this, &NoiseReduction::updateProjection);
+
+    //Handle compensators
+    connect(m_pOptionsWidget.data(), &NoiseReductionOptionsWidget::compSelectionChanged,
+            this, &NoiseReduction::updateCompensator);
 }
 
 
@@ -359,6 +363,60 @@ void NoiseReduction::updateProjection()
 
 //*************************************************************************************************************
 
+void NoiseReduction::updateCompensator(int to)
+{
+    //
+    //  Update the compensator
+    //
+    if(m_pFiffInfo)
+    {
+        if(to == 0)
+            m_bCompActivated = false;
+        else
+            m_bCompActivated = true;
+
+//        qDebug()<<"to"<<to;
+//        qDebug()<<"from"<<from;
+//        qDebug()<<"m_bCompActivated"<<m_bCompActivated;
+
+        FiffCtfComp newComp;
+        this->m_pFiffInfo->make_compensator(0, to, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
+
+        this->m_pFiffInfo->set_current_comp(to);
+        MatrixXd matComp = newComp.data->data;
+
+        //
+        // Make proj sparse
+        //
+        qint32 nchan = this->m_pFiffInfo->nchan;
+        qint32 i, k;
+
+        typedef Eigen::Triplet<double> T;
+        std::vector<T> tripletList;
+        tripletList.reserve(nchan);
+
+        tripletList.clear();
+        tripletList.reserve(matComp.rows()*matComp.cols());
+        for(i = 0; i < matComp.rows(); ++i)
+            for(k = 0; k < matComp.cols(); ++k)
+                if(matComp(i,k) != 0)
+                    tripletList.push_back(T(i, k, matComp(i,k)));
+
+        m_matSparseComp = SparseMatrix<double>(matComp.rows(),matComp.cols());
+        if(tripletList.size() > 0)
+            m_matSparseComp.setFromTriplets(tripletList.begin(), tripletList.end());
+
+        //Create full multiplication matrix
+        m_matSparseSpharaCompMult = m_matSparseSpharaMult * m_matSparseComp;
+        m_matSparseProjCompMult = m_matSparseProj * m_matSparseComp;
+
+        m_matSparseFull = m_matSparseSpharaMult * m_matSparseProj * m_matSparseComp;
+    }
+}
+
+
+//*************************************************************************************************************
+
 void NoiseReduction::run()
 {
     //
@@ -523,7 +581,7 @@ void NoiseReduction::createSpharaOperator()
             if(matSpharaMultFirst(i,k) != 0)
                 tripletList.push_back(T(i, k, matSpharaMultFirst(i,k)));
 
-    Eigen::SparseMatrix<double> matSparseSpharaMultFirst = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+    SparseMatrix<double> matSparseSpharaMultFirst = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
 
     if(tripletList.size() > 0)
         matSparseSpharaMultFirst.setFromTriplets(tripletList.begin(), tripletList.end());
@@ -537,7 +595,7 @@ void NoiseReduction::createSpharaOperator()
             if(matSpharaMultSecond(i,k) != 0)
                 tripletList.push_back(T(i, k, matSpharaMultSecond(i,k)));
 
-    Eigen::SparseMatrix<double>matSparseSpharaMultSecond = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+    SparseMatrix<double>matSparseSpharaMultSecond = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
 
     if(tripletList.size() > 0)
         matSparseSpharaMultSecond.setFromTriplets(tripletList.begin(), tripletList.end());

@@ -734,13 +734,6 @@ void RealTimeMultiSampleArrayModel::updateProjection()
         if(tripletList.size() > 0)
             m_matSparseProj.setFromTriplets(tripletList.begin(), tripletList.end());
 
-        qDebug()<<"RealTimeMultiSampleArrayModel::updateProjection - m_matSparseSpharaProjMult"<<m_matSparseSpharaProjMult.rows()<<m_matSparseSpharaProjMult.cols();
-        qDebug()<<"RealTimeMultiSampleArrayModel::updateProjection - m_matSparseSpharaMult"<<m_matSparseSpharaMult.rows()<<m_matSparseSpharaMult.cols();
-        qDebug()<<"RealTimeMultiSampleArrayModel::updateProjection - m_matSparseProj"<<m_matSparseProj.rows()<<m_matSparseProj.cols();
-        qDebug()<<"RealTimeMultiSampleArrayModel::updateProjection - m_matSparseComp"<<m_matSparseComp.rows()<<m_matSparseComp.cols();
-        qDebug()<<"RealTimeMultiSampleArrayModel::updateProjection - m_matSparseFull"<<m_matSparseFull.rows()<<m_matSparseFull.cols();
-        qDebug()<<"RealTimeMultiSampleArrayModel::updateProjection - m_matSparseProjCompMult"<<m_matSparseProjCompMult.rows()<<m_matSparseProjCompMult.cols();
-
         //Create full multiplication matrix
         m_matSparseSpharaProjMult = m_matSparseSpharaMult * m_matSparseProj;
         m_matSparseProjCompMult = m_matSparseProj * m_matSparseComp;
