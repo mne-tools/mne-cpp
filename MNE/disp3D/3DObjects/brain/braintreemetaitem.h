@@ -130,7 +130,7 @@ signals:
     *
     * @param[in] iMSec     The time interval in mSecs.
     */
-    void rtDataTimeIntervalChanged(const int& iMSec);
+    void rtDataTimeIntervalChanged(int iMSec);
 
     //=========================================================================================================
     /**
@@ -138,7 +138,7 @@ signals:
     *
     * @param[in] dValue     The new normalization value.
     */
-    void rtDataNormalizationValueChanged(const double& dValue);
+    void rtDataNormalizationValueChanged(double dValue);
 
     //=========================================================================================================
     /**
@@ -170,7 +170,7 @@ signals:
     *
     * @param[in] iMSec     The new number of averages.
     */
-    void rtDataNumberAveragesChanged(const int& iNumAvr);
+    void rtDataNumberAveragesChanged(int iNumAvr);
 
     //=========================================================================================================
     /**
