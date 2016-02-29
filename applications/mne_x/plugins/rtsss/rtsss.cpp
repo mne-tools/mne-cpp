@@ -291,7 +291,6 @@ void RtSss::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
-
 MatrixXd rt_sss(const MatrixXd &p_mat)
 {
     MatrixXd out;
