@@ -196,7 +196,7 @@ IPlugin::PluginType RtSss::getType() const
 
 QString RtSss::getName() const
 {
-    return "RtSss Toolbox";
+    return "RtSss";
 }
 
 
