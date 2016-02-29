@@ -197,6 +197,7 @@ void MNE::calcFiffInfo()
                 }
             }
         }
+
         //If only EEG channels are used
         if(!forwardChannelsTypes.contains("MEG") && forwardChannelsTypes.contains("EEG")) {
             for(qint32 x = 0; x < m_pFiffInfoInput->chs.size(); ++x)
@@ -208,6 +209,7 @@ void MNE::calcFiffInfo()
                 }
             }
         }
+
         //If both MEG and EEG channels are used
         if(forwardChannelsTypes.contains("MEG") && forwardChannelsTypes.contains("EEG")) {
             qDebug()<<"MEG EEG fwd solution";
@@ -220,6 +222,7 @@ void MNE::calcFiffInfo()
                 }
             }
         }
+
         //Pick only channels which are present in all data structures (covariance, evoked and forward)
         QStringList tmp_pick_ch_names;
         foreach (const QString &ch, m_pFiffInfoForward->ch_names)
