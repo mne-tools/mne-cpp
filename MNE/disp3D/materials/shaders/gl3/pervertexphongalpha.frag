@@ -1,6 +1,5 @@
-#define FP highp
-
 const int MAX_LIGHTS = 8;
+const int TYPE_POINT = 0;
 const int TYPE_DIRECTIONAL = 1;
 const int TYPE_SPOT = 2;
 struct Light {
@@ -12,20 +11,25 @@ struct Light {
     vec3 attenuation;
     float cutOffAngle;
 };
+
 uniform Light lights[MAX_LIGHTS];
 uniform int lightCount;
+uniform vec3 ka;            // Ambient reflectivity
+uniform vec3 kd;            // Diffuse reflectivity
+uniform vec3 ks;            // Specular reflectivity
+uniform float shininess;    // Specular shininess factor
+uniform float alpha;
+uniform vec3 eyePosition;
 
-in vec3 vWorldPosition;
-in vec3 vWorldNormal;
+in vec3 worldPosition;
+in vec3 worldNormal;
 in vec3 vColor;
 
-out vec4 fFragColor;
-
-uniform float alpha;
-
-void adModel(const in vec3 vpos, const in vec3 vnormal, out vec3 diffuseColor)
+void adsModel(const in vec3 vpos, const in vec3 vnormal, const in vec3 eye, const in float shininess,
+              out vec3 diffuseColor, out vec3 specularColor)
 {
     diffuseColor = vec3(0.0);
+    specularColor = vec3(0.0);
 
     vec3 n = normalize( vnormal );
 
@@ -50,14 +54,23 @@ void adModel(const in vec3 vpos, const in vec3 vnormal, out vec3 diffuseColor)
 
         float diffuse = max( dot( s, n ), 0.0 );
 
+        float specular = 0.0;
+        if (diffuse > 0.0 && shininess > 0.0 && att > 0.0) {
+            vec3 r = reflect( -s, n );
+            vec3 v = normalize( eye - vpos );
+            float normFactor = ( shininess + 2.0 ) / 2.0;
+            specular = normFactor * pow( max( dot( r, v ), 0.0 ), shininess );
+        }
+
         diffuseColor += att * lights[i].intensity * diffuse * lights[i].color;
+        specularColor += att * specular;
     }
 }
 
 void main()
 {
-    vec3 diffuseColor;
-	
-    adModel(vWorldPosition, vWorldNormal, diffuseColor);
-	fFragColor = vec4( vColor , alpha );
+    vec3 diffuseColor, specularColor;
+    adsModel(worldPosition, worldNormal, eyePosition, shininess, diffuseColor, specularColor);
+	gl_FragColor = vec4( vColor + vColor * diffuseColor + ks * specularColor, alpha );
 }
+

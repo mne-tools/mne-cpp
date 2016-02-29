@@ -111,6 +111,9 @@ BrainTreeMetaItem::BrainTreeMetaItem(int iType, const QString& text)
         case BrainTreeMetaItemTypes::SurfaceColorItem:
             sToolTip = "Surface color item";
             break;
+        case BrainTreeMetaItemTypes::SurfaceAlpha:
+            sToolTip = "Surface alpha value";
+            break;
     }
 
     this->setToolTip(sToolTip);
@@ -181,6 +184,11 @@ void  BrainTreeMetaItem::setData(const QVariant& value, int role)
 
         case BrainTreeMetaItemRoles::RTDataNumberAverages: {
             emit rtDataNumberAveragesChanged(value.toInt());
+            break;
+        }
+
+        case BrainTreeMetaItemRoles::SurfaceAlpha: {
+            emit surfaceAlphaChanged(value.toFloat());
             break;
         }
     }

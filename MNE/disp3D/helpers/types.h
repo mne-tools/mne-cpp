@@ -112,7 +112,8 @@ namespace BrainTreeMetaItemTypes
                     RTDataNormalizationValue = QStandardItem::UserType + 115,
                     RTDataVisualizationType = QStandardItem::UserType + 116,
                     SurfaceColorItem = QStandardItem::UserType + 117,
-                    UnknownItem = QStandardItem::UserType + 118};
+                    UnknownItem = QStandardItem::UserType + 118,
+                    SurfaceAlpha = QStandardItem::UserType + 119};
 }
 
 // Model item roles
@@ -134,7 +135,8 @@ namespace BrainTreeMetaItemRoles
                     RTDataNumberAverages = Qt::UserRole + 14,
                     RTDataNormalizationValue = Qt::UserRole + 15,
                     RTDataVisualizationType = Qt::UserRole + 16,
-                    SurfaceColor = Qt::UserRole + 17};
+                    SurfaceColor = Qt::UserRole + 17,
+                    SurfaceAlpha = Qt::UserRole + 18};
 }
 
 namespace BrainSurfaceTreeItemRoles

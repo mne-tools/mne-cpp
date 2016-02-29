@@ -153,7 +153,6 @@ void Control3DWidget::onSceneColorPicker()
     pDialog->exec();
     m_colCurrentSceneColor = pDialog->currentColor();
 
+    //Set color of button new new scene color
     ui->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(m_colCurrentSceneColor.red()).arg(m_colCurrentSceneColor.green()).arg(m_colCurrentSceneColor.blue()));
-
-
 }
