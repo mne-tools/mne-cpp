@@ -78,14 +78,15 @@ GUSBAmp::GUSBAmp()
 , m_iSampleRate(1200)
 , m_sFilePath("d:/Clouds/OneDrive/Studium/Master/Masterarbeit/testing/gUSBamp/driver/data")
 {
-    m_viChannelsToAcquired = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    m_viChannelsToAcquire = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
 
     m_viSizeOfSampleMatrix.resize(2,0);
 
     m_vSerials.resize(1);
     m_vSerials[0]= "UB-2015.05.16";
 
-
+    //Initialize dates from the Widget
+    setupWidget();
 
 }
 
@@ -228,9 +229,11 @@ bool GUSBAmp::start()
         QThread::wait();
 
 
+
     //tell the producer to load the running parameter onto the device and start data acquisition
-    qDebug()<< "gusbamp:"<< m_vSerials.size() << "serial:" << m_vSerials[0];
-    m_pGUSBAmpProducer->start(m_vSerials, m_viChannelsToAcquired, m_iSampleRate, m_sFilePath);
+    m_pWidget->checkBoxes();    //set m_viChannelsToAcquire with the checked Boxes in the GUI
+    m_pGUSBAmpProducer->start(m_vSerials, m_viChannelsToAcquire, m_iSampleRate, m_sFilePath);
+
 
     //after device was started: ask for size of SampleMatrix to set the buffer matrix (bevor setUpFiffInfo() is started)
     m_viSizeOfSampleMatrix = m_pGUSBAmpProducer->getSizeOfSampleMatrix();
@@ -306,12 +309,12 @@ QString GUSBAmp::getName() const
 
 QWidget* GUSBAmp::setupWidget()
 {
-    GUSBAmpSetupWidget* widget = new GUSBAmpSetupWidget(this);//widget is later destroyed by CentralWidget - so it has to be created everytime new
+    m_pWidget = new GUSBAmpSetupWidget(this);//widget is later destroyed by CentralWidget - so it has to be created everytime new
 
     //init properties dialog
-    widget->initGui();
+    m_pWidget->initGui();
 
-    return widget;
+    return m_pWidget;
 }
 
 

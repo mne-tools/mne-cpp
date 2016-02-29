@@ -104,14 +104,19 @@ public:
     */
     void initGui();
 
+
+    void checkBoxes();
+
+
+
 private slots:
 
     void on_comboBox_activated(const QString &arg1);
 
-
-
-
     void on_pushButton_clicked();
+
+    void on_ChannelSelect_clicked(bool checked);
+
 
 
 
@@ -124,7 +129,7 @@ private:
 //    */
 //    void showAboutDialog();
 
-    GUSBAmp*               m_pGUSBAmp;                 /**< a pointer to corresponding GUSBAmp.*/
+    GUSBAmp*               m_pGUSBAmp;              /**< a pointer to corresponding GUSBAmp.*/
 
     Ui::GUSBAmpSetupClass  ui;                      /**< the user interface for the GUSBAmpSetupWidget.*/
 
