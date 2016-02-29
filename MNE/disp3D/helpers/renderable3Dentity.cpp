@@ -135,14 +135,14 @@ bool Renderable3DEntity::setAlpha(float fAlpha)
 {
     m_fAlpha = fAlpha;
 
-    for(int i = 0; i<m_pMaterial->effect()->parameters().size(); i++) {
+    for(int i = 0; i < m_pMaterial->effect()->parameters().size(); i++) {
         if(m_pMaterial->effect()->parameters().at(i)->name() == "alpha") {
             m_pMaterial->effect()->parameters().at(i)->setValue(m_fAlpha);
             return true;
         }
     }
 
-    qDebug()<<"Renderable3DEntity::setAlpha - Could not set alpha value to material, since it does not support it (use i.e ShaderMaterial).";
+    qWarning()<<"Renderable3DEntity::setAlpha - Could not set alpha value to material, since it does not support it (use i.e ShaderMaterial).";
 
     return false;
 }
