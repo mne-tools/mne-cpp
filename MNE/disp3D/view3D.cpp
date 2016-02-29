@@ -124,7 +124,7 @@ void View3D::init()
     data.insert(QStringLiteral("eventSource"), QVariant::fromValue(this));
     m_aspectEngine.setData(data);
 
-    // Light source
+    //Light source
 //    Qt3DRender::QPointLight *light1 = new Qt3DRender::QPointLight();
 //    light1->setColor(Qt::white);
 //    light1->setIntensity(0.1f);
@@ -139,7 +139,7 @@ void View3D::init()
 
     // FrameGraph
     m_pForwardRenderer = new Qt3DRender::QForwardRenderer();
-    m_pForwardRenderer->setClearColor(QColor::fromRgbF(0.0, 0.0, 0.0, 1.0));
+    m_pForwardRenderer->setClearColor(QColor::fromRgbF(0.0, 0.0, 0.0, 0.5));
     m_pForwardRenderer->setCamera(m_pCameraEntity);
     m_pFrameGraph->setActiveFrameGraph(m_pForwardRenderer);
 

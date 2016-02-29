@@ -75,7 +75,8 @@ Renderable3DEntity::Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3
 : Qt3DCore::QEntity(parent)
 , m_pCustomMesh(new CustomMesh(tMatVert, tMatNorm, tMatTris, tVecOffset))
 , m_pTransform(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
-, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPerVertexColorMaterial(this)))
+, m_pMaterial(new ShaderMaterial(this))
+//, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPerVertexColorMaterial))
 //, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPhongMaterial(this)))
 {
     this->addComponent(m_pCustomMesh.data());
@@ -125,6 +126,25 @@ bool Renderable3DEntity::setMaterial(QSharedPointer<Qt3DRender::QMaterial> pMate
     m_pMaterial = pMaterial;
 
     return true;
+}
+
+
+//*************************************************************************************************************
+
+bool Renderable3DEntity::setAlpha(float fAlpha)
+{
+    m_fAlpha = fAlpha;
+
+    for(int i = 0; i < m_pMaterial->effect()->parameters().size(); i++) {
+        if(m_pMaterial->effect()->parameters().at(i)->name() == "alpha") {
+            m_pMaterial->effect()->parameters().at(i)->setValue(m_fAlpha);
+            return true;
+        }
+    }
+
+    qWarning()<<"Renderable3DEntity::setAlpha - Could not set alpha value to material, since it does not support it (use i.e ShaderMaterial).";
+
+    return false;
 }
 
 

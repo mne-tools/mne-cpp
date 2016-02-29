@@ -165,12 +165,12 @@ int main(int argc, char *argv[])
     if(sourceEstimate.isEmpty())
         return 1;
 
-//    // View activation time-series
-//    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
-//    std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
-//    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
-//    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
-//    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
+    // View activation time-series
+    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
+    std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
+    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
+    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
+    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
 
     //########################################################################################
     //
@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
 
     std::cout<<"Creating BrainView"<<std::endl;
 
-    SurfaceSet tSurfSet ("sample", 2, "inflated", "./MNE-sample-data/subjects");
+    SurfaceSet tSurfSet ("sample", 2, "pial", "./MNE-sample-data/subjects");
     AnnotationSet tAnnotSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
     //Surface tSurfRight ("sample", 1, "inflated", "./MNE-sample-data/subjects");
     //Annotation tAnnotRight ("sample", 1, "aparc.a2009s", "./MNE-sample-data/subjects");
