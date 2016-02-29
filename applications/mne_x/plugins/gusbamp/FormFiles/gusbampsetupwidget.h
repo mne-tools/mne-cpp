@@ -104,30 +104,44 @@ public:
     */
     void initGui();
 
-
+    //=========================================================================================================
+    /**
+    * checks all the checkBoxes for their corresponding channels and sets the the vector for the
+    * cannel-selection
+    *
+    */
     void checkBoxes();
 
-
+    //=========================================================================================================
+    /**
+    * gets the Sample Matrix from the combo Box
+    *
+    */
+    void getSampleRate();
 
 private slots:
 
-    void on_comboBox_activated(const QString &arg1);
-
+    //=========================================================================================================
+    /**
+    * push-button-click for setting the serial adresses for master and slaves
+    *
+    */
     void on_pushButton_clicked();
 
+    //=========================================================================================================
+    /**
+    * activate or deactivate groupbox for singel-channel-select
+    *
+    */
     void on_ChannelSelect_clicked(bool checked);
-
-
-
-
 
 private:
     //=========================================================================================================
-//    /**
-//    * Shows the About Dialog
-//    *
-//    */
-//    void showAboutDialog();
+    /**
+    * Shows the About Dialog
+    *
+    */
+    void showAboutDialog();
 
     GUSBAmp*               m_pGUSBAmp;              /**< a pointer to corresponding GUSBAmp.*/
 

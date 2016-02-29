@@ -76,7 +76,7 @@ GUSBAmp::GUSBAmp()
 , m_iNumberOfChannels(0)
 , m_iSamplesPerBlock(0)
 , m_iSampleRate(1200)
-, m_sFilePath("d:/Clouds/OneDrive/Studium/Master/Masterarbeit/testing/gUSBamp/driver/data")
+, m_sFilePath("")
 {
     m_viChannelsToAcquire = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
 
@@ -228,9 +228,8 @@ bool GUSBAmp::start()
     if(this->isRunning())
         QThread::wait();
 
-
-
-    //tell the producer to load the running parameter onto the device and start data acquisition
+    //get the values from the GUI and start GUSBAmpProducer
+    m_pWidget->getSampleRate();
     m_pWidget->checkBoxes();    //set m_viChannelsToAcquire with the checked Boxes in the GUI
     m_pGUSBAmpProducer->start(m_vSerials, m_viChannelsToAcquire, m_iSampleRate, m_sFilePath);
 
@@ -331,7 +330,6 @@ void GUSBAmp::run()
             //qDebug()<<"GUSBAmp is running";
             MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
             matValue = matValue/1000000;
-            qDebug() << matValue.rows()<< matValue.cols();
 
             //emit values to real time multi sample array
             m_pRTMSA_GUSBAmp->data()->setValue(matValue.cast<double>());
