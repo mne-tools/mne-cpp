@@ -148,7 +148,11 @@ private:
     QFile               m_file;                     /**< file to which data is written */
     QTextStream         m_stream;                   /**< stream from m_buffers to m_file */
 
-
+    //=========================================================================================================
+    /**
+    * Refreshes the size-values of the ouput Matrix
+    */
+    void refreshSizeOutputMatrix(void);
 
 public:
     //=========================================================================================================

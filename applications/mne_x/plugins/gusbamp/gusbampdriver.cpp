@@ -142,7 +142,6 @@ bool GUSBAmpDriver::initDevice()
     qDebug()<<"size of output Matrix:\n" << m_sizeOfMatrix[0]<<" rows (channels) and "<< m_sizeOfMatrix[1] <<"columns (samples)";
     qDebug()<<"File will be stored under the follwing path:\n" << m_sFileName << endl;
 
-
     //load parameters on the device(s)
     try
     {
@@ -509,9 +508,7 @@ bool GUSBAmpDriver::setSerials(vector<QString> &list)
     //add the master device at the end of the list!
     m_callSequenceSerials.push_back(m_vpSerials[0]);
 
-    //refresh size of output matrix
-    m_sizeOfMatrix[0] = (int(m_NUMBER_OF_CHANNELS)*int(1 + m_SLAVE_SERIALS_SIZE));    //number of channels * number of devices (number of channels)
-    m_sizeOfMatrix[1] = (int(m_NUMBER_OF_SCANS)*int(m_QUEUE_SIZE));                   //number of the scanned samples * number of the queues (nummber of samples)
+    refreshSizeOutputMatrix();
 
     return true;
 
@@ -553,9 +550,7 @@ bool GUSBAmpDriver::setSampleRate(int sampleRate)
         return false;
     }
 
-    //refresh size of output matrix
-    m_sizeOfMatrix[0] = (int(m_NUMBER_OF_CHANNELS)*int(1 + m_SLAVE_SERIALS_SIZE));    //number of channels * number of devices (number of channels)
-    m_sizeOfMatrix[1] = (int(m_NUMBER_OF_SCANS)*int(m_QUEUE_SIZE));                   //number of the scanned samples * number of the queues (nummber of samples)
+    refreshSizeOutputMatrix();
 
     //cout <<"sample rate [HZ]: \t" <<  m_SAMPLE_RATE_HZ << "\n" << "number of scans [/]:\t" << m_NUMBER_OF_SCANS << "\n";
 
@@ -601,10 +596,7 @@ bool GUSBAmpDriver::setChannels(vector<int> &list)
 
     m_NUMBER_OF_CHANNELS    = UCHAR(size);
 
-    //refresh size of output matrix
-    m_sizeOfMatrix[0] = (int(m_NUMBER_OF_CHANNELS)*int(1 + m_SLAVE_SERIALS_SIZE));    //number of channels * number of devices (number of channels)
-    m_sizeOfMatrix[1] = (int(m_NUMBER_OF_SCANS)*int(m_QUEUE_SIZE));                   //number of the scanned samples * number of the queues (number of samples)
-
+    refreshSizeOutputMatrix();
 
     return true;
 
@@ -652,5 +644,12 @@ vector<int> GUSBAmpDriver::getSizeOfSampleMatrix(void)
 }
 
 
+//*************************************************************************************************************
 
+void GUSBAmpDriver::refreshSizeOutputMatrix(void)
+{
+    //refresh size of output matrix
+    m_sizeOfMatrix[0] = (int(m_NUMBER_OF_CHANNELS)*int(1 + m_SLAVE_SERIALS_SIZE));    //number of channels * number of devices (number of channels)
+    m_sizeOfMatrix[1] = (int(m_NUMBER_OF_SCANS)*int(m_QUEUE_SIZE));                   //number of the scanned samples * number of the queues (number of samples)
+}
 
