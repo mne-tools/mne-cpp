@@ -362,10 +362,10 @@ void GUSBAmp::run()
                 size = 0;
                 splitRecordingFile();
             }
-        } else
+        }
+        else
             size = 0;
     }
-
 
 }
 

@@ -433,7 +433,7 @@
        <property name="checked">
         <bool>false</bool>
        </property>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>12</x>
@@ -463,11 +463,19 @@
         </layout>
        </widget>
       </widget>
-      <zorder>SetSerials</zorder>
-      <zorder>SetSerials</zorder>
-      <zorder>ChannelSelect</zorder>
-      <zorder>groupBox_2</zorder>
-      <zorder>groupBox_3</zorder>
+     </widget>
+     <widget class="QPushButton" name="m_qPushButton_About">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>420</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>About</string>
+      </property>
      </widget>
     </widget>
    </item>
