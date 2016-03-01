@@ -119,7 +119,7 @@ public:
     * @param [in] filePath      string of the filepath where data will be stored
     *
     */
-    virtual void start(vector<QString> &serials, vector<int> channels, int sampleRate, QString filePath);
+    virtual void start(vector<QString> &serials, vector<int> channels, int sampleRate);
 
     //=========================================================================================================
     /**
@@ -145,12 +145,11 @@ protected:
 private:
     GUSBAmp*                        m_pGUSBAmp;            /**< A pointer to the corresponding GUSBAmp class.*/
     QSharedPointer<GUSBAmpDriver>   m_pGUSBAmpDriver;      /**< A pointer to the corresponding GUSBAmp driver class.*/
+    bool                            m_bIsRunning;          /**< Whether GUSBAmpProducer is running.*/
 
-    bool                            m_bIsRunning;           /**< Whether GUSBAmpProducer is running.*/
-
-    int                 m_iSampleRate;          /**< sample rate of the device */
+    int                 m_iSampRate;            /**< sample rate of the device */
     QString             m_sFilePath;            /**< path of the file of written data */
-    vector<QString>     m_vSerials;            /**< vector with the serial numbers of the devices*/
+    vector<QString>     m_vSerials;             /**< vector with the serial numbers of the devices*/
     vector<int>         m_viSizeOfSampleMatrix; /**< size of the sample matrix [rows columns] */
 
 };

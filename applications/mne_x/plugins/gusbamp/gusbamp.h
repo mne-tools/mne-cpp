@@ -167,6 +167,8 @@ public:
     */
     virtual bool stop();
 
+    void splitRecordingFile();
+
     virtual IPlugin::PluginType getType() const;
     virtual QString getName() const;
 
@@ -198,10 +200,19 @@ private:
     int                 m_iSampleRate;              /**< the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!)*/
     int                 m_iSamplesPerBlock;         /**< The samples per block defined by the user via the GUI. */
     UCHAR               m_iNumberOfChannels;        /**< the channels that should be acquired from each device */
-    QString             m_sFilePath;                /**< String of the Filepath where acquisition data will be stored */
     vector<int>         m_viSizeOfSampleMatrix;     /**< vector including the size of the two dimensional sample Matrix */
     vector<int>         m_viChannelsToAcquire;      /**< vector of the calling numbers of the channels to be acquired */
     GUSBAmpSetupWidget* m_pWidget;
+    bool                m_bWriteToFile;             /**< Flag for File writing*/
+//write data to fiff-file
+    FiffStream::SPtr    m_pOutfid;                  /**< QFile for writing to fif file.*/
+    RowVectorXd         m_cals;
+    bool                m_bSplitFile;               /**< Flag for splitting the recorded file.*/
+    int                 m_iSplitFileSizeMs;         /**< Holds the size of the splitted files in ms.*/
+    int                 m_iSplitCount;              /**< File split count */
+    QString             m_sOutputFilePath;          /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
+    QFile               m_fileOut;                  /**< QFile for writing to fiff file.*/
+
 };
 
 } // NAMESPACE
