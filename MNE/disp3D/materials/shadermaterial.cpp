@@ -116,16 +116,16 @@ void ShaderMaterial::init()
     pDepthTest->setFunc(QDepthTest::Less);
 
     QDepthMask* pDepthMask = new QDepthMask();
-    pDepthMask->setMask(false);
+    pDepthMask->setMask(true);
 
     QBlendEquation* pBlendEquation = new QBlendEquation();
     pBlendEquation->setMode(QBlendEquation::FuncAdd);
 
-//    m_vertexGL3RenderPass->addRenderState(pBlendState);
-//    m_vertexGL3RenderPass->addRenderState(pCullFace);
-//    m_vertexGL3RenderPass->addRenderState(pDepthTest);
-//    m_vertexGL3RenderPass->addRenderState(pDepthMask);
-//    m_vertexGL3RenderPass->addRenderState(pBlendEquation);
+    m_vertexGL3RenderPass->addRenderState(pBlendState);
+    m_vertexGL3RenderPass->addRenderState(pCullFace);
+    m_vertexGL3RenderPass->addRenderState(pDepthTest);
+    m_vertexGL3RenderPass->addRenderState(pDepthMask);
+    m_vertexGL3RenderPass->addRenderState(pBlendEquation);
 
     m_vertexGL3Technique->addPass(m_vertexGL3RenderPass);
 

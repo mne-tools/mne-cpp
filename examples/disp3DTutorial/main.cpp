@@ -197,19 +197,19 @@ int main(int argc, char *argv[])
 
     std::cout<<"Creating BrainView"<<std::endl;
 
-    //Surface tSurfRight ("sample", 1, "inflated", "./MNE-sample-data/subjects");
-    //Annotation tAnnotRight ("sample", 1, "aparc.a2009s", "./MNE-sample-data/subjects");
-    //Surface tSurfLeft ("sample", 0, "inflated", "./MNE-sample-data/subjects");
-    //Annotation tAnnotLeft ("sample", 0, "aparc.a2009s", "./MNE-sample-data/subjects");
+    Surface tSurfRight ("sample", 1, "pial", "./MNE-sample-data/subjects");
+    Annotation tAnnotRight ("sample", 1, "aparc.a2009s", "./MNE-sample-data/subjects");
+    Surface tSurfLeft ("sample", 0, "orig", "./MNE-sample-data/subjects");
+    Annotation tAnnotLeft ("sample", 0, "aparc.a2009s", "./MNE-sample-data/subjects");
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    //testWindow->addBrainData("HemiLR", tSurfLeft, tAnnotLeft);
-    //testWindow->addBrainData("HemiLR", tSurfRight, tAnnotRight);
-    testWindow->addBrainData("HemiLRSet", tSurfSet, tAnnotSet);
+    testWindow->addBrainData("HemiLRSet", tSurfLeft, tAnnotLeft);
+    testWindow->addBrainData("HemiLRSet", tSurfRight, tAnnotRight);
+    //testWindow->addBrainData("HemiLRSet", tSurfSet, tAnnotSet);
 
     if(bAddRtSourceLoc) {
         QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("HemiLRSet", sourceEstimate, t_clusteredFwd);
-        testWindow->addBrainData("HemiLRSet", t_clusteredFwd);
+        //testWindow->addBrainData("HemiLRSet", t_clusteredFwd);
 
         //testWindow->addRtBrainData("HemiLRSet", sourceEstimate);
         //rtItemList.at(0)->addData(sourceEstimate);
