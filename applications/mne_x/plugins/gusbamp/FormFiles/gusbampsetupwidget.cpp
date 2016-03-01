@@ -73,6 +73,10 @@ GUSBAmpSetupWidget::GUSBAmpSetupWidget(GUSBAmp* pGUSBAmp, QWidget* parent)
 {
     ui.setupUi(this);
 
+    //Connect about button
+    connect(ui.m_qPushButton_About, &QPushButton::released, this, &GUSBAmpSetupWidget::showAboutDialog);
+
+
     ui.comboBox->setCurrentIndex(6);
 
 }
