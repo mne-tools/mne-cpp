@@ -63,7 +63,7 @@ GUSBAmpProducer::GUSBAmpProducer(GUSBAmp* pGUSBAmp)
 : m_pGUSBAmp(pGUSBAmp)
 , m_pGUSBAmpDriver(new GUSBAmpDriver(this))
 , m_bIsRunning(true)
-, m_iSampleRate(1200)
+, m_iSampRate(1200)
 , m_sFilePath("data")
 {
 
@@ -84,13 +84,12 @@ GUSBAmpProducer::~GUSBAmpProducer()
 
 //*************************************************************************************************************
 
-void GUSBAmpProducer::start(vector<QString> &serials, vector<int> channels, int sampleRate, QString filePath)
+void GUSBAmpProducer::start(vector<QString> &serials, vector<int> channels, int sampleRate)
 {
     //setting the new parameters of the gUSBamp device
     m_pGUSBAmpDriver->setSerials(serials);
     m_pGUSBAmpDriver->setSampleRate(sampleRate);
     m_pGUSBAmpDriver->setChannels(channels);
-    m_pGUSBAmpDriver->setFilePath(filePath);
 
     //asking for the size of the sample Matrix which will be acquired
     m_viSizeOfSampleMatrix = m_pGUSBAmpDriver->getSizeOfSampleMatrix();

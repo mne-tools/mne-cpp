@@ -76,7 +76,7 @@ GUSBAmp::GUSBAmp()
 , m_iNumberOfChannels(0)
 , m_iSamplesPerBlock(0)
 , m_iSampleRate(1200)
-, m_sFilePath("")
+, m_bWriteToFile(false)
 {
     m_viChannelsToAcquire = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
 
@@ -100,6 +100,8 @@ GUSBAmp::~GUSBAmp()
     //If the program is closed while the sampling is in process
     if(this->isRunning())
         this->stop();
+
+    delete m_pWidget;
 }
 
 
@@ -202,6 +204,12 @@ QSharedPointer<IPlugin> GUSBAmp::clone() const
 
 void GUSBAmp::init()
 {
+    m_iSplitFileSizeMs = 10;
+    m_iSplitCount = 0;
+
+    QDate date;
+    m_sOutputFilePath = QString ("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day());
+
     m_pRTMSA_GUSBAmp = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "GUSBAmp", "EEG output data");
 
     m_outputConnectors.append(m_pRTMSA_GUSBAmp);
@@ -229,9 +237,9 @@ bool GUSBAmp::start()
         QThread::wait();
 
     //get the values from the GUI and start GUSBAmpProducer
-    m_pWidget->getSampleRate();
+    m_pWidget->getSampleRate(); //get sample rate from the combo box
     m_pWidget->checkBoxes();    //set m_viChannelsToAcquire with the checked Boxes in the GUI
-    m_pGUSBAmpProducer->start(m_vSerials, m_viChannelsToAcquire, m_iSampleRate, m_sFilePath);
+    m_pGUSBAmpProducer->start(m_vSerials, m_viChannelsToAcquire, m_iSampleRate);
 
 
     //after device was started: ask for size of SampleMatrix to set the buffer matrix (bevor setUpFiffInfo() is started)
@@ -284,6 +292,8 @@ bool GUSBAmp::stop()
 
     m_pRTMSA_GUSBAmp->data()->clear();
 
+
+
     return true;
 }
 
@@ -321,7 +331,9 @@ QWidget* GUSBAmp::setupWidget()
 
 void GUSBAmp::run()
 {
+    qint32 size = 0;
 
+    //get Matrix from the producer
     while(m_bIsRunning)
     {
         //pop matrix only if the producer thread is running
@@ -334,7 +346,57 @@ void GUSBAmp::run()
             //emit values to real time multi sample array
             m_pRTMSA_GUSBAmp->data()->setValue(matValue.cast<double>());
         }
+
+        //Write raw data to fif file
+        if(m_bWriteToFile)
+        {
+            MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
+
+            m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
+            size += matValue.cols();
+
+            //                qDebug()<<"size"<<size;
+            //                qDebug()<<"(m_iSplitFileSizeMs/1000)*m_pFiffInfo->sfreq"<<(double(m_iSplitFileSizeMs)/1000.0)*m_pFiffInfo->sfreq;
+            if(size > (double(m_iSplitFileSizeMs)/1000.0)*m_pFiffInfo->sfreq && m_bSplitFile)
+            {
+                size = 0;
+                splitRecordingFile();
+            }
+        } else
+            size = 0;
     }
+
+
 }
 
+//*************************************************************************************************************
 
+void GUSBAmp::splitRecordingFile()
+{
+    qDebug() << "Split recording file";
+    ++m_iSplitCount;
+    QString nextFileName = m_sOutputFilePath.remove("_raw.fif");
+    nextFileName += QString("-%1_raw.fif").arg(m_iSplitCount);
+
+    /*
+    * Write the link to the next file
+    */
+    qint32 data;
+    m_pOutfid->start_block(FIFFB_REF);
+    data = FIFFV_ROLE_NEXT_FILE;
+    m_pOutfid->write_int(FIFF_REF_ROLE,&data);
+    m_pOutfid->write_string(FIFF_REF_FILE_NAME, nextFileName);
+    m_pOutfid->write_id(FIFF_REF_FILE_ID);//ToDo meas_id
+    data = m_iSplitCount - 1;
+    m_pOutfid->write_int(FIFF_REF_FILE_NUM, &data);
+    m_pOutfid->end_block(FIFFB_REF);
+
+    //finish file
+    m_pOutfid->finish_writing_raw();
+
+    //start next file
+    m_fileOut.setFileName(nextFileName);
+    m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
+    fiff_int_t first = 0;
+    m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
+}
