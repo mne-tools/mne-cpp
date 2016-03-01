@@ -114,13 +114,26 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     m_pRenderable3DEntity = new Renderable3DEntity(parent);
     m_pRenderable3DEntityActivationOverlay = new Renderable3DEntity(parent);
 
-    QMatrix4x4 m;
-    Qt3DCore::QTransform* transform =  new Qt3DCore::QTransform();
-    m.rotate(180, QVector3D(0.0f, 1.0f, 0.0f));
-    m.rotate(-90, QVector3D(1.0f, 0.0f, 0.0f));
-    transform->setMatrix(m);
-    m_pRenderable3DEntity->addComponent(transform);
-    m_pRenderable3DEntityActivationOverlay->addComponent(transform);
+    if(tSurface.hemi() == -1) {
+        QMatrix4x4 m;
+        Qt3DCore::QTransform* transform =  new Qt3DCore::QTransform();
+        m.rotate(180, QVector3D(0.0f, 1.0f, 0.0f));
+        m.rotate(-90, QVector3D(1.0f, 0.0f, 0.0f));
+        m.translate(-0.035,-0.01,0.04);
+        m.scale(0.65);
+        transform->setMatrix(m);
+        m_pRenderable3DEntity->addComponent(transform);
+        m_pRenderable3DEntityActivationOverlay->addComponent(transform);
+    } else {
+        QMatrix4x4 m;
+        Qt3DCore::QTransform* transform =  new Qt3DCore::QTransform();
+        m.rotate(180, QVector3D(0.0f, 1.0f, 0.0f));
+        m.rotate(-90, QVector3D(1.0f, 0.0f, 0.0f));
+        transform->setMatrix(m);
+        m_pRenderable3DEntity->addComponent(transform);
+        m_pRenderable3DEntityActivationOverlay->addComponent(transform);
+    }
+
 
     //Create color from curvature information with default gyri and sulcus colors
     QByteArray arrayCurvatureColor = createCurvatureVertColor(tSurface.curv());
