@@ -74,8 +74,6 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
 , m_commonGround({ FALSE, FALSE, FALSE, FALSE })
 , m_numBytesReceived(0)
 , m_isRunning(false)
-, m_bIsWriting(false)
-, m_filePath("")
 {
 
     //Linking the specific API-library to the project
@@ -121,13 +119,6 @@ bool GUSBAmpDriver::initDevice()
 
     m_isRunning =true;
 
-    //define Name and place of written data-file
-    if(m_bIsWriting)
-    {
-        m_sFileName = m_filePath;
-        m_sFileName.append(QString("data_%1Hz.txt").arg(m_SAMPLE_RATE_HZ));
-        m_file.setFileName(m_sFileName);
-    }
 
     //after start is initialized, buffer parameters can be calculated:
     m_nPoints           = m_NUMBER_OF_SCANS * (m_NUMBER_OF_CHANNELS + m_TRIGGER);
@@ -140,7 +131,6 @@ bool GUSBAmpDriver::initDevice()
     for(deque<LPSTR>::iterator serialNumber = m_callSequenceSerials.begin(); serialNumber != m_callSequenceSerials.end(); serialNumber++)
         qDebug() <<QString(*serialNumber);
     qDebug()<<"size of output Matrix:\n" << m_sizeOfMatrix[0]<<" rows (channels) and "<< m_sizeOfMatrix[1] <<"columns (samples)";
-    qDebug()<<"File will be stored under the follwing path:\n" << m_sFileName << endl;
 
     //load parameters on the device(s)
     try
@@ -266,12 +256,6 @@ bool GUSBAmpDriver::initDevice()
         }
 
 
-        //opening the file for data writing and establish data-stream
-        if(m_bIsWriting)
-        {
-            m_file.open(QIODevice::WriteOnly | QIODevice::Text );
-            m_stream.setDevice(&m_file);
-        }
 
         //start the devices (master device must be started at last)
         for (int deviceIndex=0; deviceIndex<m_numDevices; deviceIndex++)
@@ -373,9 +357,6 @@ bool GUSBAmpDriver::uninitDevice()
         m_openedDevicesHandles.pop_front();
     }
 
-    //close the data file
-    if(m_bIsWriting)
-        m_file.close();
 
     m_isRunning = false;
 
@@ -440,15 +421,10 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
                     }
                     memcpy(&FloatValue, &ByteValue, sizeof(float));
 
-                    //attach float value to stream
-                    if(m_bIsWriting)
-                        m_stream << FloatValue<< "\t";
                     //store float-value to Matrix
                     sampleMatrix(channelIndex  + deviceIndex*int(m_NUMBER_OF_CHANNELS), scanIndex + queueIndex * m_NUMBER_OF_SCANS) = FloatValue;
                 }
             }
-            if(m_bIsWriting)
-                m_stream << "\n";
         }
 
         //add new GetData call to the queue replacing the currently received one
@@ -602,39 +578,6 @@ bool GUSBAmpDriver::setChannels(vector<int> &list)
 
 }
 
-//*************************************************************************************************************
-
-bool GUSBAmpDriver::setFileWriting(bool doFileWriting)
-{
-    if(m_isRunning)
-    {
-        cout << "Do not change device-parameters while running the device!\n";
-        return false;
-    }
-
-    m_bIsWriting = doFileWriting;
-
-    return true;
-}
-
-
-
-//*************************************************************************************************************
-
-bool GUSBAmpDriver::setFilePath(QString FilePath)
-{
-    if(m_isRunning)
-    {
-        cout << "Do not change device-parameters while running the device!\n";
-        return false;
-    }
-
-    //writing the new file-path and settint the flag for writing
-    m_filePath      = FilePath;
-    m_bIsWriting    = true;
-
-    return true;
-}
 
 //*************************************************************************************************************
 

@@ -141,12 +141,6 @@ private:
     BYTE***             m_buffers;                  /**< pointer to the buffer */
     OVERLAPPED**        m_overlapped;               /**< storage in case of overlapping */
     vector<int>         m_sizeOfMatrix;             /**< number of rows and column of output matrix [rows columns] */
-//file writing and outputmatrix
-    bool                m_bIsWriting;               /**< flag for file writing */
-    QString             m_filePath;                 /**< path of the file for data acquisition */
-    QString             m_sFileName;                /**< file name of the data-file */
-    QFile               m_file;                     /**< file to which data is written */
-    QTextStream         m_stream;                   /**< stream from m_buffers to m_file */
 
     //=========================================================================================================
     /**

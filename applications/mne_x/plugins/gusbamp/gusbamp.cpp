@@ -40,9 +40,7 @@
 //=============================================================================================================
 
 #include "gusbamp.h"
-#include "gusbampproducer.h"
-#include "gtec_gusbamp.h"       /**< heder-file from gTec for gubamp amplifier*/
-#include <Windows.h>
+#include "gusbampproducer.h"   
 
 
 //*************************************************************************************************************
@@ -85,8 +83,20 @@ GUSBAmp::GUSBAmp()
     m_vSerials.resize(1);
     m_vSerials[0]= "UB-2015.05.16";
 
-    //Initialize dates from the Widget
+    //Initialize dates of the Widget
     setupWidget();
+
+    // Create record file option action bar item/button
+    m_pActionSetupProject = new QAction(QIcon(":/images/icons/database.png"), tr("Setup project"), this);
+    m_pActionSetupProject->setStatusTip(tr("Setup project"));
+    connect(m_pActionSetupProject, &QAction::triggered, this, &GUSBAmp::showSetupProjectDialog);
+    addPluginAction(m_pActionSetupProject);
+
+    // Create start recordin action bar item/button
+    m_pActionStartRecording = new QAction(QIcon(":/images/icons/record.png"), tr("Start recording data to fif file"), this);
+    m_pActionStartRecording->setStatusTip(tr("Start recording data to fif file"));
+    connect(m_pActionStartRecording, &QAction::triggered, this, &GUSBAmp::showStartRecording);
+    addPluginAction(m_pActionStartRecording);
 
 }
 
@@ -341,30 +351,29 @@ void GUSBAmp::run()
         {
             //qDebug()<<"GUSBAmp is running";
             MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
-            matValue = matValue/1000000;
+            MatrixXf matValue_show = matValue/1000000; //matvalue for showing
 
             //emit values to real time multi sample array
-            m_pRTMSA_GUSBAmp->data()->setValue(matValue.cast<double>());
-        }
+            m_pRTMSA_GUSBAmp->data()->setValue(matValue_show.cast<double>());
 
-        //Write raw data to fif file
-        if(m_bWriteToFile)
-        {
-            MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
-
-            m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
-            size += matValue.cols();
-
-            //                qDebug()<<"size"<<size;
-            //                qDebug()<<"(m_iSplitFileSizeMs/1000)*m_pFiffInfo->sfreq"<<(double(m_iSplitFileSizeMs)/1000.0)*m_pFiffInfo->sfreq;
-            if(size > (double(m_iSplitFileSizeMs)/1000.0)*m_pFiffInfo->sfreq && m_bSplitFile)
+            //Write raw data to fif file
+            if(m_bWriteToFile)
             {
-                size = 0;
-                splitRecordingFile();
+                m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
+                size += matValue.cols();
+
+                //                qDebug()<<"size"<<size;
+                //                qDebug()<<"(m_iSplitFileSizeMs/1000)*m_pFiffInfo->sfreq"<<(double(m_iSplitFileSizeMs)/1000.0)*m_pFiffInfo->sfreq;
+                if(size > (double(m_iSplitFileSizeMs)/1000.0)*m_pFiffInfo->sfreq && m_bSplitFile)
+                {
+                    size = 0;
+                    splitRecordingFile();
+                }
             }
+            else
+                size = 0;
         }
-        else
-            size = 0;
+
     }
 
 }
@@ -399,4 +408,119 @@ void GUSBAmp::splitRecordingFile()
     m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
     fiff_int_t first = 0;
     m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
+}
+//*************************************************************************************************************
+
+void GUSBAmp::showSetupProjectDialog()
+{
+    // Open setup project widget
+    if(m_pGUSBampSetupProjectWidget == NULL)
+        m_pGUSBampSetupProjectWidget = QSharedPointer<GUSBAmpSetupProjectWidget>(new GUSBAmpSetupProjectWidget(this));
+
+    if(!m_pGUSBampSetupProjectWidget->isVisible())
+    {
+        m_pGUSBampSetupProjectWidget->setWindowTitle("GUSBAmp EEG Connector - Setup project");
+        m_pGUSBampSetupProjectWidget->initGui();
+        m_pGUSBampSetupProjectWidget->show();
+        m_pGUSBampSetupProjectWidget->raise();
+    }
+}
+
+//*************************************************************************************************************
+
+void GUSBAmp::showStartRecording()
+{
+    m_iSplitCount = 0;
+
+    //Setup writing to file
+    if(m_bWriteToFile)
+    {
+        m_pOutfid->finish_writing_raw();
+        m_bWriteToFile = false;
+        m_pTimerRecordingChange->stop();
+        m_pActionStartRecording->setIcon(QIcon(":/images/icons/record.png"));
+    }
+    else
+    {
+        if(!m_bIsRunning)
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Start data acquisition first!");
+            msgBox.exec();
+            return;
+        }
+
+        if(!m_pFiffInfo)
+        {
+            QMessageBox msgBox;
+            msgBox.setText("FiffInfo missing!");
+            msgBox.exec();
+            return;
+        }
+
+        //Initiate the stream for writing to the fif file
+        m_fileOut.setFileName(m_sOutputFilePath);
+        if(m_fileOut.exists())
+        {
+            QMessageBox msgBox;
+            msgBox.setText("The file you want to write already exists.");
+            msgBox.setInformativeText("Do you want to overwrite this file?");
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            int ret = msgBox.exec();
+            if(ret == QMessageBox::No)
+                return;
+        }
+
+        // Check if path exists -> otherwise create it
+        QStringList list = m_sOutputFilePath.split("/");
+        list.removeLast(); // remove file name
+        QString fileDir = list.join("/");
+
+        if(!dirExists(fileDir.toStdString()))
+        {
+            QDir dir;
+            dir.mkpath(fileDir);
+        }
+
+        m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
+        fiff_int_t first = 0;
+        m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
+
+        m_bWriteToFile = true;
+
+        m_pTimerRecordingChange = QSharedPointer<QTimer>(new QTimer);
+        connect(m_pTimerRecordingChange.data(), &QTimer::timeout, this, &GUSBAmp::changeRecordingButton);
+        m_pTimerRecordingChange->start(500);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void GUSBAmp::changeRecordingButton()
+{
+    if(m_iBlinkStatus == 0)
+    {
+        m_pActionStartRecording->setIcon(QIcon(":/images/icons/record.png"));
+        m_iBlinkStatus = 1;
+    }
+    else
+    {
+        m_pActionStartRecording->setIcon(QIcon(":/images/icons/record_active.png"));
+        m_iBlinkStatus = 0;
+    }
+}
+
+//*************************************************************************************************************
+
+bool GUSBAmp::dirExists(const std::string& dirName_in)
+{
+    DWORD ftyp = GetFileAttributesA(dirName_in.c_str());
+    if (ftyp == INVALID_FILE_ATTRIBUTES)
+        return false;  //something is wrong with your path!
+
+    if (ftyp & FILE_ATTRIBUTE_DIRECTORY)
+        return true;   // this is a directory!
+
+    return false;    // this is not a directory!
 }

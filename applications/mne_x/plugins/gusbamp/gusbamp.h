@@ -46,12 +46,11 @@
 // INCLUDES
 //=============================================================================================================
 #include "gusbamp_global.h"
-#include <Windows.h>
-
-#include <fstream>
 #include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
+
+
 
 
 //*************************************************************************************************************
@@ -62,6 +61,9 @@
 #include <QtWidgets>
 
 #include "FormFiles/gusbampsetupwidget.h"
+#include "FormFiles/gusbampsetupprojectwidget.h"
+
+
 
 
 //*************************************************************************************************************
@@ -167,12 +169,36 @@ public:
     */
     virtual bool stop();
 
-    void splitRecordingFile();
+    //=========================================================================================================
+    /**
+    * Opens a dialog to setup the project to check the impedance values
+    */
+    void showSetupProjectDialog();
+
+    //=========================================================================================================
+    /**
+    * Starts data recording
+    */
+    void showStartRecording();
+
+    //=========================================================================================================
+    /**
+    * Implements blinking recording button
+    */
+    void changeRecordingButton();
+
+    //=========================================================================================================
+    /**
+    * Checks if a dir exists
+    */
+    bool dirExists(const std::string& dirName_in);
 
     virtual IPlugin::PluginType getType() const;
     virtual QString getName() const;
 
     virtual QWidget* setupWidget();
+
+    void splitRecordingFile();
 
 protected:
     //=========================================================================================================
@@ -184,7 +210,8 @@ protected:
     virtual void run();
 
 private:
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_GUSBAmp;   /**< The RealTimeSampleArray to provide the EEG data.*/
+    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_GUSBAmp;               /**< The RealTimeSampleArray to provide the EEG data.*/
+    QSharedPointer<GUSBAmpSetupProjectWidget>           m_pGUSBampSetupProjectWidget;   /**< Widget for setup the project file*/
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
@@ -212,6 +239,12 @@ private:
     int                 m_iSplitCount;              /**< File split count */
     QString             m_sOutputFilePath;          /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
     QFile               m_fileOut;                  /**< QFile for writing to fiff file.*/
+
+    QSharedPointer<QTimer>  m_pTimerRecordingChange;    /**< timer to control blinking of the recording icon */
+    qint16                  m_iBlinkStatus;             /**< flag for recording icon blinking */
+
+    QAction*            m_pActionStartRecording;    /**< starts to record data */
+    QAction*            m_pActionSetupProject;      /**< shows setup project dialog */
 
 };
 
