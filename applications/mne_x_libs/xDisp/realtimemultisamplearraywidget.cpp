@@ -304,11 +304,11 @@ void RealTimeMultiSampleArrayWidget::init()
         //
         QColor signalDefault = Qt::darkBlue;
         QColor backgroundDefault = Qt::white;
-        QColor signal = settings.value(QString("RTMSAW/%1/backgroundColor").arg(t_sRTMSAWName), signalDefault).value<QColor>();
-        QColor background = settings.value(QString("RTMSAW/%1/signalColor").arg(t_sRTMSAWName), backgroundDefault).value<QColor>();
+        QColor signal = settings.value(QString("RTMSAW/%1/signalColor").arg(t_sRTMSAWName), signalDefault).value<QColor>();
+        QColor background = settings.value(QString("RTMSAW/%1/backgroundColor").arg(t_sRTMSAWName), backgroundDefault).value<QColor>();
 
-        this->onTableViewBackgroundColorChanged(signal);
-        m_pRTMSADelegate->setSignalColor(background);
+        this->onTableViewBackgroundColorChanged(background);
+        m_pRTMSADelegate->setSignalColor(signal);
 
         //
         //-------- Init context menu --------
@@ -511,9 +511,9 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pQuickControlWidget->setDistanceTimeSpacerIndex(settings.value(QString("RTMSAW/%1/distanceTimeSpacerIndex").arg(t_sRTMSAWName), 3).toInt());
 
-        m_pQuickControlWidget->setSignalBackgroundColros(signal, background);
+        m_pQuickControlWidget->setSignalBackgroundColors(signal, background);
 
-        //If projections are watned activate projections as default
+        //If projections are wanted activate projections as default
         if(slFlags.contains("projections")) {
             m_pRTMSAModel->updateProjection();
         }

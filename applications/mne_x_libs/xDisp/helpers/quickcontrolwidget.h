@@ -190,7 +190,7 @@ public:
     * @param [in] signalColor       The new signal color.
     * @param [in] backgroundColor   The new background color.
     */
-    void setSignalBackgroundColros(const QColor& signalColor, const QColor& backgroundColor);
+    void setSignalBackgroundColors(const QColor& signalColor, const QColor& backgroundColor);
 
     //=========================================================================================================
     /**
@@ -376,6 +376,12 @@ protected:
     * Create the widgets used in the view group
     */
     void createViewGroup();
+
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the color group
+    */
+    void createColorsGroup();
 
     //=========================================================================================================
     /**
