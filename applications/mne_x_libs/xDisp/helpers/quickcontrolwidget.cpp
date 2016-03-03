@@ -782,7 +782,8 @@ void QuickControlWidget::onViewColorButtonClicked()
 
 void QuickControlWidget::onMakeScreenshot()
 {
-    emit makeScreenshot();
+    qDebug()<<ui->m_comboBox_imageType->currentText();
+    emit makeScreenshot(ui->m_comboBox_imageType->currentText());
 }
 
 
