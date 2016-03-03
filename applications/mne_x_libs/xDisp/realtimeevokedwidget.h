@@ -252,6 +252,12 @@ private slots:
     */
     void onTableViewBackgroundColorChanged(const QColor& backgroundColor);
 
+    //=========================================================================================================
+    /**
+    * Call this slot whenever you want to make a screenshot of the butterfly or layout view.
+    */
+    void onMakeScreenshot();
+
 private:
     //=========================================================================================================
     /**

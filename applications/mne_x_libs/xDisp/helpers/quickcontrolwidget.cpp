@@ -80,6 +80,10 @@ QuickControlWidget::QuickControlWidget(const QMap<qint32, float>& qMapChScaling,
             m_qMapTriggerColor.insert(pFiffInfo->chs[i].ch_name, QColor(170,0,0));
     }
 
+    //Connect screenshot button
+    connect(ui->m_pushButton_makeScreenshot, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+            this, &QuickControlWidget::onMakeScreenshot);
+
     //Init bool flags from string list and create groups respectivley
     if(m_slFlags.contains("scaling", Qt::CaseInsensitive)) {
         createScalingGroup();
@@ -771,6 +775,14 @@ void QuickControlWidget::onViewColorButtonClicked()
 
         emit backgroundColorChanged(m_colCurrentBackgroundColor);
     }
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlWidget::onMakeScreenshot()
+{
+    emit makeScreenshot();
 }
 
 

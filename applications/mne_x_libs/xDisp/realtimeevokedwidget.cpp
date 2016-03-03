@@ -481,6 +481,11 @@ void RealTimeEvokedWidget::init()
         //Handle background color changes
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::backgroundColorChanged,
                 this, &RealTimeEvokedWidget::onTableViewBackgroundColorChanged);
+
+        //Handle screenshot signals
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::makeScreenshot,
+                this, &RealTimeEvokedWidget::onMakeScreenshot);
+
         //Handle projections
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
                 m_pRTEModel.data(), &RealTimeEvokedModel::updateProjection);
@@ -708,6 +713,69 @@ void RealTimeEvokedWidget::onTableViewBackgroundColorChanged(const QColor& backg
 
 //*************************************************************************************************************
 
+void RealTimeEvokedWidget::onMakeScreenshot()
+{
+    // Create file name
+    QString sDate = QDate::currentDate().toString("yyyy_MM_dd");
+    QString sTime = QTime::currentTime().toString("hh_mm_ss");
+
+    if(!QDir("./Screenshots").exists()) {
+        QDir().mkdir("./Screenshots");
+    }
+
+    //Handle the butterfly plot and 2d layout plot differently
+    if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "2D Layout plot") {
+        QString fileName = QString("./Screenshots/%1-%2-LayoutScreenshot.svg").arg(sDate).arg(sTime);
+
+        if(fileName.contains(".svg"))
+        {
+            // Generate screenshot
+            QSvgGenerator svgGen;
+            svgGen.setFileName(fileName);
+            QRectF rect = m_pAverageScene->itemsBoundingRect();
+            svgGen.setSize(QSize(rect.width(), rect.height()));
+            //svgGen.setViewBox(QRect(0, 0, rect.width(), rect.height()));
+
+            QPainter painter(&svgGen);
+            m_pAverageScene->render(&painter);
+        }
+
+        if(fileName.contains(".png"))
+        {
+            QPixmap pixMap = QPixmap::grabWidget(m_pAverageLayoutView);
+            pixMap.save(fileName);
+        }
+    }
+
+    if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "Butterfly plot") {
+        QString fileName = QString("./Screenshots/%1-%2-ButterflyScreenshot.svg").arg(sDate).arg(sTime);
+
+        if(fileName.contains(".svg"))
+        {
+            // Generate screenshot
+            QSvgGenerator svgGen;
+            svgGen.setFileName(fileName);
+            svgGen.setSize(m_pButterflyPlot->size());
+            svgGen.setViewBox(m_pButterflyPlot->rect());
+
+            m_pButterflyPlot->render(&svgGen);
+        }
+
+        if(fileName.contains(".png"))
+        {
+            QImage image(m_pButterflyPlot->size(), QImage::Format_ARGB32);
+            image.fill(Qt::transparent);
+
+            QPainter painter(&image);
+            m_pButterflyPlot->render(&painter);
+            image.save(fileName);
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
 void RealTimeEvokedWidget::wheelEvent(QWheelEvent * event)
 {
     Q_UNUSED(event)
@@ -723,3 +791,4 @@ bool RealTimeEvokedWidget::eventFilter(QObject *object, QEvent *event)
     }
     return false;
 }
+

@@ -352,6 +352,12 @@ protected slots:
     */
     void onViewColorButtonClicked();
 
+    //=========================================================================================================
+    /**
+    * Call this slot whenever you want to make a screenshot of the butterfly or layout view.
+    */
+    void onMakeScreenshot();
+
 protected:
     //=========================================================================================================
     /**
@@ -544,6 +550,11 @@ signals:
     */
     void backgroundColorChanged(const QColor& backgroundColor);
 
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user wants to make a screenshot.
+    */
+    void makeScreenshot();
 };
 
 } // NAMESPACE XDISPLIB
