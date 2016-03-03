@@ -56,13 +56,14 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AverageSceneItem::AverageSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor defaultColors)
+AverageSceneItem::AverageSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, const QColor &color)
 : m_sChannelName(channelName)
 , m_iChannelNumber(channelNumber)
 , m_qpChannelPosition(channelPosition)
 , m_iChannelKind(channelKind)
 , m_iChannelUnit(channelUnit)
 {
+    m_lAverageColors.append(color);
 }
 
 
@@ -107,10 +108,25 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->save();
     QPen pen;
     pen.setColor(Qt::yellow);
+    if(!m_lAverageColors.isEmpty()) {
+        pen.setColor(m_lAverageColors.first());
+    }
     pen.setWidthF(5);
     painter->setPen(pen);
     painter->drawStaticText(boundingRect().x(), boundingRect().y(), staticElectrodeName);
     painter->restore();
+}
+
+
+//*************************************************************************************************************
+
+void AverageSceneItem::setSignalColorForAllChannels(const QColor& color)
+{
+    for(int i = 0; i<m_lAverageColors.size(); i++) {
+        m_lAverageColors[i] = color;
+    }
+
+    update();
 }
 
 
@@ -195,9 +211,10 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
         QPainterPath path = QPainterPath(QPointF(boundingRect.x(), boundingRect.y() + boundingRect.height()/2));
         QPen pen;
         pen.setStyle(Qt::SolidLine);
-        pen.setColor(Qt::yellow);
-        if(!m_cAverageColors.isEmpty() && !(dataIndex<m_cAverageColors.size()))
-            pen.setColor(m_cAverageColors.at(dataIndex));
+        if(!m_lAverageColors.isEmpty() && dataIndex<m_lAverageColors.size()) {
+            pen.setColor(m_lAverageColors.at(dataIndex));
+        }
+
         pen.setWidthF(5);
         painter->setPen(pen);
 

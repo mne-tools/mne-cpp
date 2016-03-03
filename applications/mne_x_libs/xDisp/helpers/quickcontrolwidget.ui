@@ -149,8 +149,8 @@
        <property name="title">
         <string>Other</string>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <item>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
          <widget class="QTabWidget" name="m_tabWidget_viewOptions">
           <property name="currentIndex">
            <number>0</number>
@@ -181,31 +181,10 @@
               </property>
              </widget>
             </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="label_10">
-              <property name="text">
-               <string>Change color:</string>
-              </property>
-             </widget>
-            </item>
             <item row="3" column="0">
              <widget class="QLabel" name="label_7">
               <property name="text">
                <string>Opcaity:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="1">
-             <widget class="QPushButton" name="m_pushButton_signalColor">
-              <property name="text">
-               <string>Signal</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="2">
-             <widget class="QPushButton" name="m_pushButton_backgroundColor">
-              <property name="text">
-               <string>Background</string>
               </property>
              </widget>
             </item>
@@ -403,9 +382,44 @@
             </item>
            </layout>
           </widget>
+          <widget class="QWidget" name="tab">
+           <attribute name="title">
+            <string>Colors</string>
+           </attribute>
+           <layout class="QFormLayout" name="formLayout">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_10">
+              <property name="text">
+               <string>Change background color:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_11">
+              <property name="text">
+               <string>Change signal color:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QPushButton" name="m_pushButton_backgroundColor">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QPushButton" name="m_pushButton_signalColor">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </widget>
         </item>
-        <item>
+        <item row="2" column="0" colspan="2">
          <widget class="QPushButton" name="m_pushButton_makeScreenshot">
           <property name="text">
            <string>Make screenshot</string>

@@ -128,6 +128,14 @@ QuickControlWidget::QuickControlWidget(const QMap<qint32, float>& qMapChScaling,
         m_bView = false;
     }
 
+    if(m_slFlags.contains("colors", Qt::CaseInsensitive)) {
+        createColorsGroup();
+        m_bView = true;
+    } else {
+        ui->m_tabWidget_viewOptions->removeTab(ui->m_tabWidget_viewOptions->indexOf(this->findTabWidgetByText(ui->m_tabWidget_viewOptions, "Colors")));
+        m_bView = false;
+    }
+
     if(m_slFlags.contains("triggerdetection", Qt::CaseInsensitive)) {
         createTriggerDetectionGroup();
         m_bTriggerDetection = true;
@@ -264,7 +272,7 @@ void QuickControlWidget::setDistanceTimeSpacerIndex(int index)
 
 //*************************************************************************************************************
 
-void QuickControlWidget::setSignalBackgroundColros(const QColor& signalColor, const QColor& backgroundColor)
+void QuickControlWidget::setSignalBackgroundColors(const QColor& signalColor, const QColor& backgroundColor)
 {
     ui->m_pushButton_backgroundColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(backgroundColor.red()).arg(backgroundColor.green()).arg(backgroundColor.blue()));
     ui->m_pushButton_signalColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(signalColor.red()).arg(signalColor.green()).arg(signalColor.blue()));
@@ -1078,7 +1086,13 @@ void QuickControlWidget::createViewGroup()
     //Distance for timer spacer
     connect(ui->m_comboBox_distaceTimeSpacer, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             this, &QuickControlWidget::onDistanceTimeSpacerChanged);
+}
 
+
+//*************************************************************************************************************
+
+void QuickControlWidget::createColorsGroup()
+{
     //Colors
     connect(ui->m_pushButton_backgroundColor, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             this, &QuickControlWidget::onViewColorButtonClicked);

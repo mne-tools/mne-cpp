@@ -100,7 +100,7 @@ public:
     /**
     * Constructs a AverageSceneItem.
     */
-    AverageSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, QColor defaultColors = Qt::red);
+    AverageSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, const QColor& color = Qt::yellow);
 
     //=========================================================================================================
     /**
@@ -114,6 +114,14 @@ public:
     */
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
+    //=========================================================================================================
+    /**
+    * Set the complete color list to one color
+    *
+    * @param [in] color     The new color for all channels.
+    */
+    void setSignalColorForAllChannels(const QColor& color);
+
     QString                 m_sChannelName;             /**< The channel name.*/
     int                     m_iChannelNumber;           /**< The channel number.*/
     int                     m_iChannelKind;             /**< The channel kind.*/
@@ -121,7 +129,7 @@ public:
     int                     m_iTotalNumberChannels;     /**< The total number of channels loaded in the curent evoked data set.*/
 
     QPointF                 m_qpChannelPosition;        /**< The channels 2D position in the scene.*/
-    QList<QColor>           m_cAverageColors;           /**< The current average color.*/
+    QList<QColor>           m_lAverageColors;           /**< The current average color.*/
     QList<RowVectorPair>    m_lAverageData;             /**< The channels average data which is to be plotted.*/
     QPair<int,int>          m_firstLastSample;          /**< The first and last sample.*/
     QMap<qint32,float>      m_scaleMap;                 /**< Map with all channel types and their current scaling value.*/

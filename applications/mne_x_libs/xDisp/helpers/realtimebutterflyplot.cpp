@@ -41,6 +41,7 @@ RealTimeButterflyPlot::RealTimeButterflyPlot(QWidget *parent)
 , showEEG(true)
 , showEOG(true)
 , showMISC(true)
+, m_colCurrentBackgroundColor(Qt::white)
 {
 }
 
@@ -65,12 +66,12 @@ void RealTimeButterflyPlot::dataUpdate(const QModelIndex& topLeft, const QModelI
 
 //*************************************************************************************************************
 
-void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
+void RealTimeButterflyPlot::paintEvent(QPaintEvent* paintEvent)
 {
     QPainter painter(this);
 
     painter.save();
-    painter.setBrush(QBrush(Qt::white));
+    painter.setBrush(QBrush(m_colCurrentBackgroundColor));
     painter.drawRect(QRect(0,0,this->width()-1,this->height()-1));
     painter.restore();
 
@@ -232,6 +233,8 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
             }
         }
     }
+
+    return QWidget::paintEvent(paintEvent);
 }
 
 
@@ -424,4 +427,22 @@ void RealTimeButterflyPlot::setSelectedChannels(const QList<int> &selectedChanne
 void RealTimeButterflyPlot::updateView()
 {
     update();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeButterflyPlot::setBackgroundColor(const QColor& backgroundColor)
+{
+    m_colCurrentBackgroundColor = backgroundColor;
+
+    update();
+}
+
+
+//*************************************************************************************************************
+
+const QColor& RealTimeButterflyPlot::getBackgroundColor()
+{
+    return m_colCurrentBackgroundColor;
 }

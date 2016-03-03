@@ -127,7 +127,7 @@ void NoiseReduction::init()
     m_outputConnectors.append(m_pNoiseReductionOutput);
 
     QStringList slFlags;
-    slFlags << "view" << "triggerdetection" << "scaling";
+    slFlags << "view" << "triggerdetection" << "scaling" << "colors";
     m_pNoiseReductionOutput->data()->setDisplayFlags(slFlags);
 
     //Delete Buffer - will be initailzed with first incoming data

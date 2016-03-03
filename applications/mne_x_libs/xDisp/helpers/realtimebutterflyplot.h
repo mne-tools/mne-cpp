@@ -53,6 +53,10 @@ public:
 
     void updateView();
 
+    void setBackgroundColor(const QColor& backgroundColor);
+
+    const QColor& getBackgroundColor();
+
 protected:
     //=========================================================================================================
     /**
@@ -61,7 +65,7 @@ protected:
     *
     * @param [in] event pointer to PaintEvent -> not used.
     */
-    virtual void paintEvent( QPaintEvent* event );
+    virtual void paintEvent(QPaintEvent* paintEvent );
 
 private:
     //=========================================================================================================
@@ -73,23 +77,24 @@ private:
     */
     void createPlotPath(qint32 row, QPainterPath& path) const;
 
-    bool showMAG;       /**< Show Magnetometers channels */
-    bool showGRAD;      /**< Show Gradiometers channels */
-    bool showEEG;       /**< Show EEG channels */
-    bool showEOG;       /**< Show EEG channels */
-    bool showMISC;      /**< Show Miscellaneous channels */
+    bool                    showMAG;                            /**< Show Magnetometers channels */
+    bool                    showGRAD;                           /**< Show Gradiometers channels */
+    bool                    showEEG;                            /**< Show EEG channels */
+    bool                    showEOG;                            /**< Show EEG channels */
+    bool                    showMISC;                           /**< Show Miscellaneous channels */
+    bool                    m_bIsInit;
 
-    float fMaxMAG;       /**< Scale for Magnetometers channels */
-    float fMaxGRAD;      /**< Scale for Gradiometers channels */
-    float fMaxEEG;       /**< Scale for EEG channels */
-    float fMaxEOG;       /**< Scale for EEG channels */
-    float fMaxMISC;      /**< Scale for Miscellaneous channels */
+    float                   fMaxMAG;                            /**< Scale for Magnetometers channels */
+    float                   fMaxGRAD;                           /**< Scale for Gradiometers channels */
+    float                   fMaxEEG;                            /**< Scale for EEG channels */
+    float                   fMaxEOG;                            /**< Scale for EEG channels */
+    float                   fMaxMISC;                           /**< Scale for Miscellaneous channels */
 
     RealTimeEvokedModel*    m_pRealTimeEvokedModel;
 
     qint32                  m_iNumChannels;
 
-    bool                    m_bIsInit;
+    QColor                  m_colCurrentBackgroundColor;
 
     QList<int>              m_lSelectedChannels;
 };
