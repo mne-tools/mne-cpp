@@ -264,10 +264,38 @@ void QuickControlWidget::setDistanceTimeSpacerIndex(int index)
 
 //*************************************************************************************************************
 
+void QuickControlWidget::setSignalBackgroundColros(const QColor& signalColor, const QColor& backgroundColor)
+{
+    ui->m_pushButton_backgroundColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(backgroundColor.red()).arg(backgroundColor.green()).arg(backgroundColor.blue()));
+    ui->m_pushButton_signalColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(signalColor.red()).arg(signalColor.green()).arg(signalColor.blue()));
+
+    m_colCurrentBackgroundColor = backgroundColor;
+    m_colCurrentSignalColor = signalColor;
+}
+
+
+//*************************************************************************************************************
+
 void QuickControlWidget::setNumberDetectedTriggers(int numberDetections)
 {
     if(m_bTriggerDetection)
         ui->m_label_numberDetectedTriggers->setText(QString("%1").arg(numberDetections));
+}
+
+
+//*************************************************************************************************************
+
+const QColor& QuickControlWidget::getSignalColor()
+{
+    return m_colCurrentSignalColor;
+}
+
+
+//*************************************************************************************************************
+
+const QColor& QuickControlWidget::getBackgroundColor()
+{
+    return m_colCurrentBackgroundColor;
 }
 
 
@@ -705,6 +733,41 @@ void QuickControlWidget::onSpharaOptionsChanged()
 
 //*************************************************************************************************************
 
+void QuickControlWidget::onViewColorButtonClicked()
+{
+    QColorDialog* pDialog = new QColorDialog(this);
+
+    QObject* obj = sender();
+    if(obj == ui->m_pushButton_signalColor) {
+        pDialog->setCurrentColor(m_colCurrentSignalColor);
+        pDialog->setWindowTitle("Select Signal Color");
+
+        pDialog->exec();
+        m_colCurrentSignalColor = pDialog->currentColor();
+
+        //Set color of button new new scene color
+        ui->m_pushButton_signalColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(m_colCurrentSignalColor.red()).arg(m_colCurrentSignalColor.green()).arg(m_colCurrentSignalColor.blue()));
+
+        emit signalColorChanged(m_colCurrentSignalColor);
+    }
+
+    if( obj == ui->m_pushButton_backgroundColor ) {
+        pDialog->setCurrentColor(m_colCurrentBackgroundColor);
+        pDialog->setWindowTitle("Select Background Color");
+
+        pDialog->exec();
+        m_colCurrentBackgroundColor = pDialog->currentColor();
+
+        //Set color of button new new scene color
+        ui->m_pushButton_backgroundColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(m_colCurrentBackgroundColor.red()).arg(m_colCurrentBackgroundColor.green()).arg(m_colCurrentBackgroundColor.blue()));
+
+        emit backgroundColorChanged(m_colCurrentBackgroundColor);
+    }
+}
+
+
+//*************************************************************************************************************
+
 void QuickControlWidget::createScalingGroup()
 {
     QGridLayout* t_pGridLayout = new QGridLayout;
@@ -1015,6 +1078,13 @@ void QuickControlWidget::createViewGroup()
     //Distance for timer spacer
     connect(ui->m_comboBox_distaceTimeSpacer, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             this, &QuickControlWidget::onDistanceTimeSpacerChanged);
+
+    //Colors
+    connect(ui->m_pushButton_backgroundColor, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+            this, &QuickControlWidget::onViewColorButtonClicked);
+
+    connect(ui->m_pushButton_signalColor, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+            this, &QuickControlWidget::onViewColorButtonClicked);
 }
 
 

@@ -93,6 +93,7 @@
 #include <QScroller>
 #include <QScrollBar>
 #include <QDebug>
+#include <QColor>
 
 
 //*************************************************************************************************************
@@ -290,7 +291,7 @@ signals:
     */
     void markerMoved(QPoint position, int activeRow);
 
-private:
+private slots:
     //=========================================================================================================
     /**
     * Broadcast channel scaling
@@ -386,6 +387,16 @@ private:
     * Shows quick control widget
     */
     void showQuickControlWidget();
+
+    //=========================================================================================================
+    /**
+    * Broadcast the background color changes made in the QuickControl widget
+    *
+    * @param [in] backgroundColor  The new background color.
+    */
+    void onTableViewBackgroundColorChanged(const QColor& backgroundColor);
+
+private:
 
     RealTimeMultiSampleArrayModel::SPtr         m_pRTMSAModel;                  /**< RTMSA data model */
     RealTimeMultiSampleArrayDelegate::SPtr      m_pRTMSADelegate;               /**< RTMSA data delegate */
