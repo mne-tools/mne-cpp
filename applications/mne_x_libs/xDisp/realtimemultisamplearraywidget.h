@@ -396,6 +396,12 @@ private slots:
     */
     void onTableViewBackgroundColorChanged(const QColor& backgroundColor);
 
+    //=========================================================================================================
+    /**
+    * Call this slot whenever you want to make a screenshot current view.
+    */
+    void onMakeScreenshot();
+
 private:
 
     RealTimeMultiSampleArrayModel::SPtr         m_pRTMSAModel;                  /**< RTMSA data model */

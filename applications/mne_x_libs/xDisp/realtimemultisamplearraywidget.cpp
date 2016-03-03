@@ -460,6 +460,10 @@ void RealTimeMultiSampleArrayWidget::init()
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::backgroundColorChanged,
                 this, &RealTimeMultiSampleArrayWidget::onTableViewBackgroundColorChanged);
 
+        //Handle screenshot signals
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::makeScreenshot,
+                this, &RealTimeMultiSampleArrayWidget::onMakeScreenshot);
+
         //Handle projections
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
                 this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::updateProjection);
@@ -875,3 +879,35 @@ void RealTimeMultiSampleArrayWidget::onTableViewBackgroundColorChanged(const QCo
     m_pTableView->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(backgroundColor.red()).arg(backgroundColor.green()).arg(backgroundColor.blue()));
 }
 
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayWidget::onMakeScreenshot()
+{
+    // Create file name
+    QString sDate = QDate::currentDate().toString("yyyy_MM_dd");
+    QString sTime = QTime::currentTime().toString("hh_mm_ss");
+
+    if(!QDir("./Screenshots").exists()) {
+        QDir().mkdir("./Screenshots");
+    }
+
+    QString fileName = QString("./Screenshots/%1-%2-DataView.png").arg(sDate).arg(sTime);
+
+    if(fileName.contains(".svg"))
+    {
+        // Generate screenshot
+        QSvgGenerator svgGen;
+        svgGen.setFileName(fileName);
+        svgGen.setSize(m_pTableView->size());
+        svgGen.setViewBox(m_pTableView->rect());
+
+        m_pTableView->render(&svgGen);
+    }
+
+    if(fileName.contains(".png"))
+    {
+        QPixmap pixMap = QPixmap::grabWidget(m_pTableView);
+        pixMap.save(fileName);
+    }
+}

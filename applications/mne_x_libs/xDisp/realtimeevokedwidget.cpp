@@ -725,7 +725,7 @@ void RealTimeEvokedWidget::onMakeScreenshot()
 
     //Handle the butterfly plot and 2d layout plot differently
     if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "2D Layout plot") {
-        QString fileName = QString("./Screenshots/%1-%2-LayoutScreenshot.svg").arg(sDate).arg(sTime);
+        QString fileName = QString("./Screenshots/%1-%2-LayoutScreenshot.png").arg(sDate).arg(sTime);
 
         if(fileName.contains(".svg"))
         {
@@ -734,7 +734,6 @@ void RealTimeEvokedWidget::onMakeScreenshot()
             svgGen.setFileName(fileName);
             QRectF rect = m_pAverageScene->itemsBoundingRect();
             svgGen.setSize(QSize(rect.width(), rect.height()));
-            //svgGen.setViewBox(QRect(0, 0, rect.width(), rect.height()));
 
             QPainter painter(&svgGen);
             m_pAverageScene->render(&painter);
@@ -748,7 +747,7 @@ void RealTimeEvokedWidget::onMakeScreenshot()
     }
 
     if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "Butterfly plot") {
-        QString fileName = QString("./Screenshots/%1-%2-ButterflyScreenshot.svg").arg(sDate).arg(sTime);
+        QString fileName = QString("./Screenshots/%1-%2-ButterflyScreenshot.png").arg(sDate).arg(sTime);
 
         if(fileName.contains(".svg"))
         {
