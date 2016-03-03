@@ -110,7 +110,7 @@ public :
     *
     * @return           List with all found items.
     */
-    QList<QStandardItem*> findChildren( int type);
+    QList<QStandardItem*> findChildren(int type);
 
     //=========================================================================================================
     /**
