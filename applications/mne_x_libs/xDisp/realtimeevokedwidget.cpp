@@ -713,7 +713,7 @@ void RealTimeEvokedWidget::onTableViewBackgroundColorChanged(const QColor& backg
 
 //*************************************************************************************************************
 
-void RealTimeEvokedWidget::onMakeScreenshot()
+void RealTimeEvokedWidget::onMakeScreenshot(const QString& imageType)
 {
     // Create file name
     QString sDate = QDate::currentDate().toString("yyyy_MM_dd");
@@ -725,10 +725,9 @@ void RealTimeEvokedWidget::onMakeScreenshot()
 
     //Handle the butterfly plot and 2d layout plot differently
     if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "2D Layout plot") {
-        QString fileName = QString("./Screenshots/%1-%2-LayoutScreenshot.png").arg(sDate).arg(sTime);
-
-        if(fileName.contains(".svg"))
+        if(imageType.contains("SVG"))
         {
+            QString fileName = QString("./Screenshots/%1-%2-LayoutScreenshot.svg").arg(sDate).arg(sTime);
             // Generate screenshot
             QSvgGenerator svgGen;
             svgGen.setFileName(fileName);
@@ -739,18 +738,19 @@ void RealTimeEvokedWidget::onMakeScreenshot()
             m_pAverageScene->render(&painter);
         }
 
-        if(fileName.contains(".png"))
+        if(imageType.contains("PNG"))
         {
+            QString fileName = QString("./Screenshots/%1-%2-LayoutScreenshot.png").arg(sDate).arg(sTime);
             QPixmap pixMap = QPixmap::grabWidget(m_pAverageLayoutView);
             pixMap.save(fileName);
         }
     }
 
     if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "Butterfly plot") {
-        QString fileName = QString("./Screenshots/%1-%2-ButterflyScreenshot.png").arg(sDate).arg(sTime);
-
-        if(fileName.contains(".svg"))
+        if(imageType.contains("SVG"))
         {
+            QString fileName = QString("./Screenshots/%1-%2-ButterflyScreenshot.svg").arg(sDate).arg(sTime);
+
             // Generate screenshot
             QSvgGenerator svgGen;
             svgGen.setFileName(fileName);
@@ -760,8 +760,10 @@ void RealTimeEvokedWidget::onMakeScreenshot()
             m_pButterflyPlot->render(&svgGen);
         }
 
-        if(fileName.contains(".png"))
+        if(imageType.contains("PNG"))
         {
+            QString fileName = QString("./Screenshots/%1-%2-ButterflyScreenshot.png").arg(sDate).arg(sTime);
+
             QImage image(m_pButterflyPlot->size(), QImage::Format_ARGB32);
             image.fill(Qt::transparent);
 

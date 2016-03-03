@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>325</width>
+    <width>303</width>
     <height>503</height>
    </rect>
   </property>
@@ -31,6 +31,20 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="0" colspan="2">
     <layout class="QGridLayout" name="m_gridLayout_masterLayout">
+     <item row="0" column="0">
+      <widget class="QGroupBox" name="m_groupBox_scaling">
+       <property name="title">
+        <string>Scaling</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QGroupBox" name="m_groupBox_modalities">
+       <property name="title">
+        <string>Modalities</string>
+       </property>
+      </widget>
+     </item>
      <item row="1" column="0">
       <widget class="QGroupBox" name="m_groupBox_noise">
        <property name="title">
@@ -46,6 +60,7 @@
            <attribute name="title">
             <string>SSP</string>
            </attribute>
+           <zorder>m_groupBox_other</zorder>
           </widget>
           <widget class="QWidget" name="Comp">
            <attribute name="title">
@@ -130,27 +145,40 @@
        </layout>
       </widget>
      </item>
-     <item row="3" column="0">
-      <widget class="QGroupBox" name="m_groupBox_modalities">
-       <property name="title">
-        <string>Modalities</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QGroupBox" name="m_groupBox_scaling">
-       <property name="title">
-        <string>Scaling</string>
-       </property>
-      </widget>
-     </item>
      <item row="2" column="0">
       <widget class="QGroupBox" name="m_groupBox_other">
        <property name="title">
         <string>Other</string>
        </property>
        <layout class="QGridLayout" name="gridLayout_4">
-        <item row="0" column="0">
+        <item row="2" column="0">
+         <widget class="QPushButton" name="m_pushButton_makeScreenshot">
+          <property name="text">
+           <string>Make screenshot</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QComboBox" name="m_comboBox_imageType">
+          <property name="maximumSize">
+           <size>
+            <width>50</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <item>
+           <property name="text">
+            <string>PNG</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>SVG</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="2">
          <widget class="QTabWidget" name="m_tabWidget_viewOptions">
           <property name="currentIndex">
            <number>0</number>
@@ -417,13 +445,6 @@
             </item>
            </layout>
           </widget>
-         </widget>
-        </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QPushButton" name="m_pushButton_makeScreenshot">
-          <property name="text">
-           <string>Make screenshot</string>
-          </property>
          </widget>
         </item>
        </layout>

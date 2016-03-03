@@ -399,8 +399,10 @@ private slots:
     //=========================================================================================================
     /**
     * Call this slot whenever you want to make a screenshot current view.
+    *
+    * @param[in] imageType  The current iamge type: png, svg.
     */
-    void onMakeScreenshot();
+    void onMakeScreenshot(const QString& imageType);
 
 private:
 

@@ -553,8 +553,10 @@ signals:
     //=========================================================================================================
     /**
     * Emit this signal whenever the user wants to make a screenshot.
+    *
+    * @param[out] imageType     The current iamge type: png, svg.
     */
-    void makeScreenshot();
+    void makeScreenshot(const QString& imageType);
 };
 
 } // NAMESPACE XDISPLIB
