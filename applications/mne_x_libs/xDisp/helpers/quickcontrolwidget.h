@@ -185,11 +185,36 @@ public:
 
     //=========================================================================================================
     /**
+    * Set current signal and background colors.
+    *
+    * @param [in] signalColor       The new signal color.
+    * @param [in] backgroundColor   The new background color.
+    */
+    void setSignalBackgroundColros(const QColor& signalColor, const QColor& backgroundColor);
+
+    //=========================================================================================================
+    /**
     * Set number of detected triggers.
     *
     * @param [in] numberDetections     the numger of detected triggers
     */
     void setNumberDetectedTriggers(int numberDetections);
+
+    //=========================================================================================================
+    /**
+    * Returns the current signal color.
+    *
+    * @return The current signal color.
+    */
+    const QColor& getSignalColor();
+
+    //=========================================================================================================
+    /**
+    * Returns the current background color.
+    *
+    * @return The current background color.
+    */
+    const QColor& getBackgroundColor();
 
 protected slots:
     //=========================================================================================================
@@ -321,6 +346,12 @@ protected slots:
     */
     void onSpharaOptionsChanged();
 
+    //=========================================================================================================
+    /**
+    * Slot called when the user changes the signal or background color.
+    */
+    void onViewColorButtonClicked();
+
 protected:
     //=========================================================================================================
     /**
@@ -391,6 +422,9 @@ private:
     QMap<qint32, QDoubleSpinBox*>   m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits. */
     QMap<qint32, QSlider*>          m_qMapScalingSlider;            /**< Map of types and channel scaling line edits. */
     QMap<QString, QColor>           m_qMapTriggerColor;             /**< Trigger channel colors. */
+
+    QColor                          m_colCurrentSignalColor;        /**< Current color of the scene in all View3D's. */
+    QColor                          m_colCurrentBackgroundColor;    /**< Current color of the scene in all View3D's. */
 
     QList<Modality>                 m_qListModalities;              /**< List of different modalities. */
     QList<QCheckBox*>               m_qListProjCheckBox;            /**< List of projection CheckBox. */
@@ -491,6 +525,19 @@ signals:
     * Signal mapper signal for compensator changes.
     */
     void compClicked(const QString& text);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changed the signal color.
+    */
+    void signalColorChanged(const QColor& signalColor);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changed the background color.
+    */
+    void backgroundColorChanged(const QColor& backgroundColor);
+
 };
 
 } // NAMESPACE XDISPLIB

@@ -199,6 +199,11 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
         if(m_pQuickControlWidget != 0)
             settings.setValue(QString("RTMSAW/%1/distanceTimeSpacerIndex").arg(t_sRTMSAWName), m_pQuickControlWidget->getDistanceTimeSpacerIndex());
 
+        //Store signal and background colors
+        if(m_pQuickControlWidget != 0) {
+            settings.setValue(QString("RTMSAW/%1/signalColor").arg(t_sRTMSAWName), m_pQuickControlWidget->getSignalColor());
+            settings.setValue(QString("RTMSAW/%1/backgroundColor").arg(t_sRTMSAWName), m_pQuickControlWidget->getBackgroundColor());
+        }
     }
 }
 
@@ -294,7 +299,20 @@ void RealTimeMultiSampleArrayWidget::init()
         if(settings.value(QString("RTMSAW/%1/showHideBad").arg(t_sRTMSAWName), false).toBool())
             hideBadChannels();
 
+        //
+        //-------- Init signal and background colors --------
+        //
+        QColor signalDefault = Qt::darkBlue;
+        QColor backgroundDefault = Qt::white;
+        QColor signal = settings.value(QString("RTMSAW/%1/backgroundColor").arg(t_sRTMSAWName), signalDefault).value<QColor>();
+        QColor background = settings.value(QString("RTMSAW/%1/signalColor").arg(t_sRTMSAWName), backgroundDefault).value<QColor>();
+
+        this->onTableViewBackgroundColorChanged(signal);
+        m_pRTMSADelegate->setSignalColor(background);
+
+        //
         //-------- Init context menu --------
+        //
         m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
 
         connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),
@@ -434,6 +452,14 @@ void RealTimeMultiSampleArrayWidget::init()
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
                 this, &RealTimeMultiSampleArrayWidget::broadcastScaling);
 
+        //Handle signal color changes
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::signalColorChanged,
+                m_pRTMSADelegate.data(), &RealTimeMultiSampleArrayDelegate::setSignalColor);
+
+        //Handle background color changes
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::backgroundColorChanged,
+                this, &RealTimeMultiSampleArrayWidget::onTableViewBackgroundColorChanged);
+
         //Handle projections
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
                 this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::updateProjection);
@@ -484,6 +510,8 @@ void RealTimeMultiSampleArrayWidget::init()
                                                  settings.value(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), 95).toInt());
 
         m_pQuickControlWidget->setDistanceTimeSpacerIndex(settings.value(QString("RTMSAW/%1/distanceTimeSpacerIndex").arg(t_sRTMSAWName), 3).toInt());
+
+        m_pQuickControlWidget->setSignalBackgroundColros(signal, background);
 
         //If projections are watned activate projections as default
         if(slFlags.contains("projections")) {
@@ -837,5 +865,13 @@ void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
 void RealTimeMultiSampleArrayWidget::showQuickControlWidget()
 {
     m_pQuickControlWidget->show();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayWidget::onTableViewBackgroundColorChanged(const QColor& backgroundColor)
+{
+    m_pTableView->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(backgroundColor.red()).arg(backgroundColor.green()).arg(backgroundColor.blue()));
 }
 
