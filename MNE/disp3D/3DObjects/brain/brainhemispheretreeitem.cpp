@@ -71,6 +71,9 @@ BrainHemisphereTreeItem::BrainHemisphereTreeItem(int iType, const QString& text)
 
 BrainHemisphereTreeItem::~BrainHemisphereTreeItem()
 {
+    delete m_pSurfaceItem;
+    delete m_pAnnotItem;
+    delete m_pBrainRTSourceLocDataTreeItem;
 }
 
 
@@ -214,7 +217,7 @@ BrainRTSourceLocDataTreeItem* BrainHemisphereTreeItem::addData(const MNESourceEs
 
 void BrainHemisphereTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
-    for(int i = 0; i<this->rowCount(); i++) {
+    for(int i = 0; i < this->rowCount(); i++) {
         if(this->child(i)->isCheckable()) {
             this->child(i)->setCheckState(checkState);
         }

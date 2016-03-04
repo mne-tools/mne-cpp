@@ -244,7 +244,7 @@ void BrainSourceSpaceTreeItem::onCheckStateChanged(const Qt::CheckState& checkSt
 
 //*************************************************************************************************************
 
-QByteArray BrainSourceSpaceTreeItem::createVertColor(const MatrixXf& vertices, const QColor& color)
+QByteArray BrainSourceSpaceTreeItem::createVertColor(const MatrixXf& vertices, const QColor& color) const
 {
     QByteArray arrayCurvatureColor;
     arrayCurvatureColor.resize(vertices.rows() * 3 * (int)sizeof(float));
