@@ -75,7 +75,6 @@ contains(MNECPP_CONFIG, withGui) {
         stClusteredInversePwlRapMusic  \
         roiClusteredInversePwlRapMusic \
         fsSurface \
-        rtBabyMEG \
         disp3DTutorial \
     }
 }
