@@ -69,6 +69,7 @@
 
 #include <QApplication>
 #include <QMainWindow>
+#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
@@ -103,17 +104,43 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    bool bAddRtSourceLoc = true;
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Start disp3D tutorial");
+    parser.addHelpOption();
+    QCommandLineOption sampleSurfOption("surfType", "Surface type <type>.", "type", "pial");
+    QCommandLineOption sampleAnnotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
+    QCommandLineOption sampleHemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
+    QCommandLineOption sampleSubjectOption("subject", "Selected subject <subject>.", "subject", "sample");
+    QCommandLineOption sampleSubjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
+    QCommandLineOption sampleSourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "true");
+    QCommandLineOption sampleFwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption sampleInvOpOption("invOp", "Path to inverse operator <file>.", "file", "");
+    QCommandLineOption sampleClustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");
+
+    parser.addOption(sampleSurfOption);
+    parser.addOption(sampleAnnotOption);
+    parser.addOption(sampleHemiOption);
+    parser.addOption(sampleSubjectOption);
+    parser.addOption(sampleSubjectPathOption);
+    parser.addOption(sampleSourceLocOption);
+    parser.addOption(sampleFwdOption);
+    parser.addOption(sampleInvOpOption);
+    parser.addOption(sampleClustOption);
+    parser.process(a);
+
+    bool bAddRtSourceLoc = parser.value(sampleSourceLocOption) == "false" ? false : true;
+    bool bDoClustering = parser.value(sampleClustOption) == "false" ? false : true;
 
     //Inits
-    SurfaceSet tSurfSet ("sample", 2, "pial", "./MNE-sample-data/subjects");
-    AnnotationSet tAnnotSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
+    SurfaceSet tSurfSet (parser.value(sampleSubjectOption), parser.value(sampleHemiOption).toInt(), parser.value(sampleSurfOption), parser.value(sampleSubjectPathOption));
+    AnnotationSet tAnnotSet (parser.value(sampleSubjectOption), parser.value(sampleHemiOption).toInt(), parser.value(sampleAnnotOption), parser.value(sampleSubjectPathOption));
 
-    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QFile t_fileFwd(parser.value(sampleFwdOption));
     MNEForwardSolution t_Fwd(t_fileFwd);
     MNEForwardSolution t_clusteredFwd;
 
-    QString t_sFileClusteredInverse("");//QFile t_fileClusteredInverse("./clusteredInverse-inv.fif");
+    QString t_sFileClusteredInverse(parser.value(sampleInvOpOption));//QFile t_fileClusteredInverse("./clusteredInverse-inv.fif");
 
     QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
@@ -151,7 +178,11 @@ int main(int argc, char *argv[])
         //
         // Cluster forward solution;
         //
-        t_clusteredFwd = t_Fwd;//.cluster_forward_solution(tAnnotSet, 40);
+        if(bDoClustering) {
+            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 40);
+        } else {
+            t_clusteredFwd = t_Fwd;
+        }
 
         //
         // make an inverse operators
@@ -197,15 +228,15 @@ int main(int argc, char *argv[])
 
     std::cout<<"Creating BrainView"<<std::endl;
 
-    Surface tSurfRight ("sample", 1, "pial", "./MNE-sample-data/subjects");
-    Annotation tAnnotRight ("sample", 1, "aparc.a2009s", "./MNE-sample-data/subjects");
-    Surface tSurfLeft ("sample", 0, "orig", "./MNE-sample-data/subjects");
-    Annotation tAnnotLeft ("sample", 0, "aparc.a2009s", "./MNE-sample-data/subjects");
+//    Surface tSurfRight ("sample", 1, "pial", "./MNE-sample-data/subjects");
+//    Annotation tAnnotRight ("sample", 1, "aparc.a2009s", "./MNE-sample-data/subjects");
+//    Surface tSurfLeft ("sample", 0, "orig", "./MNE-sample-data/subjects");
+//    Annotation tAnnotLeft ("sample", 0, "aparc.a2009s", "./MNE-sample-data/subjects");
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addBrainData("HemiLRSet", tSurfLeft, tAnnotLeft);
-    testWindow->addBrainData("HemiLRSet", tSurfRight, tAnnotRight);
-    //testWindow->addBrainData("HemiLRSet", tSurfSet, tAnnotSet);
+//    testWindow->addBrainData("HemiLRSet", tSurfLeft, tAnnotLeft);
+//    testWindow->addBrainData("HemiLRSet", tSurfRight, tAnnotRight);
+    testWindow->addBrainData("HemiLRSet", tSurfSet, tAnnotSet);
 
     if(bAddRtSourceLoc) {
         QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("HemiLRSet", sourceEstimate, t_clusteredFwd);
