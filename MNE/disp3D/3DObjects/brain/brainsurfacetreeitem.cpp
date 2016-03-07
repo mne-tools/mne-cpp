@@ -270,7 +270,7 @@ void BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
         QVariant data;
         QByteArray arrayNewVertColor;
 
-        if(m_sColorInfoOrigin == "Color from curvature") {
+        if(m_sColorInfoOrigin.contains("Color from curvature")) {
             //Create color from curvature information with default gyri and sulcus colors
             QColor colorSulci = m_pItemSurfColSulci->data(BrainTreeMetaItemRoles::SurfaceColorSulci).value<QColor>();
             QColor colorGyri = m_pItemSurfColGyri->data(BrainTreeMetaItemRoles::SurfaceColorGyri).value<QColor>();
@@ -288,7 +288,7 @@ void BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
             return;
         }
 
-        if(m_sColorInfoOrigin == "Color from annotation") {
+        if(m_sColorInfoOrigin.contains("Color from annotation")) {
             //Find the BrainAnnotationTreeItem
             for(int i = 0; i<this->QStandardItem::parent()->rowCount(); i++) {
                 if(this->QStandardItem::parent()->child(i,0)->type() == BrainTreeModelItemTypes::AnnotationItem) {

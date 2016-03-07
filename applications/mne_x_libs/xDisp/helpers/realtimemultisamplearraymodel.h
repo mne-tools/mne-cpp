@@ -581,10 +581,10 @@ private:
     MatrixXdR                           m_matDataFilteredFreeze;                    /**< The raw filtered data in freeze mode */
     MatrixXd                            m_matOverlap;                               /**< Last overlap block for the back */
 
-    Eigen::VectorXi                     indicesFirstVV;                             /**< The indices of the channels to pick for the first SPHARA oerpator in case of a VectorView system.*/
-    Eigen::VectorXi                     indicesSecondVV;                            /**< The indices of the channels to pick for the second SPHARA oerpator in case of a VectorView system.*/
-    Eigen::VectorXi                     indicesFirstBabyMEG;                        /**< The indices of the channels to pick for the first SPHARA oerpator in case of a BabyMEG system.*/
-    Eigen::VectorXi                     indicesSecondBabyMEG;                       /**< The indices of the channels to pick for the second SPHARA oerpator in case of a BabyMEG system.*/
+    Eigen::VectorXi                     m_vecIndicesFirstVV;                        /**< The indices of the channels to pick for the first SPHARA oerpator in case of a VectorView system.*/
+    Eigen::VectorXi                     m_vecIndicesSecondVV;                       /**< The indices of the channels to pick for the second SPHARA oerpator in case of a VectorView system.*/
+    Eigen::VectorXi                     m_vecIndicesFirstBabyMEG;                   /**< The indices of the channels to pick for the first SPHARA oerpator in case of a BabyMEG system.*/
+    Eigen::VectorXi                     m_vecIndicesSecondBabyMEG;                  /**< The indices of the channels to pick for the second SPHARA oerpator in case of a BabyMEG system.*/
 
     Eigen::SparseMatrix<double>         m_matSparseSpharaMult;                      /**< The final sparse SPHARA operator .*/
     Eigen::SparseMatrix<double>         m_matSparseSpharaProjMult;                  /**< The final sparse SPHARA + projection operator.*/
