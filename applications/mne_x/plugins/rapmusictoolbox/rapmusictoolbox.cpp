@@ -248,7 +248,7 @@ IPlugin::PluginType RapMusicToolbox::getType() const
 
 QString RapMusicToolbox::getName() const
 {
-    return "RAP MUSIC Toolbox";
+    return "RAP MUSIC";
 }
 
 
