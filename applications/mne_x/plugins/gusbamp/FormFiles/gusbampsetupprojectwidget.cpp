@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     tmsisetupprojectwidget.cpp
+* @file     gusbampsetupprojectwidget.cpp
 * @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
@@ -100,7 +100,7 @@ void GUSBAmpSetupProjectWidget::initGui()
     ui->m_qLineEdit_FiffRecordFile->setText(m_pGUSBAmp->m_sOutputFilePath);
 
     // Init location of layout file
-    ui->m_qLineEdit_EEGCap->setText(m_pGUSBAmp->m_sElcFilePath);
+    //ui->m_qLineEdit_EEGCap->setText(m_pGUSBAmp->m_sElcFilePath);
 
     // Init project and subject menus
     ui->m_qComboBox_ProjectSelection->addItem("Sequence_01");
@@ -156,7 +156,7 @@ void GUSBAmpSetupProjectWidget::changeOutputFile()
     QString path = QFileDialog::getSaveFileName(
                 this,
                 "Save to fif file",
-                "mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif",
+                "mne_x_plugins/resources/gusbamp/EEG_data_001_raw.fif",
                  tr("Fif files (*.fif)"));
 
     if(path==NULL)
@@ -173,14 +173,14 @@ void GUSBAmpSetupProjectWidget::changeCap()
 {
     QString path = QFileDialog::getOpenFileName(this,
                                                 "Change EEG cap layout",
-                                                "mne_x_plugins/resources/tmsi/loc_files",
+                                                "mne_x_plugins/resources/gusbamp/loc_files",
                                                  tr("Electrode location files (*.elc)"));
 
     if(path==NULL)
         path = ui->m_qLineEdit_EEGCap->text();
 
     ui->m_qLineEdit_EEGCap->setText(path);
-    m_pGUSBAmp->m_sElcFilePath = ui->m_qLineEdit_EEGCap->text();
+    //m_pGUSBAmp->m_sElcFilePath = ui->m_qLineEdit_EEGCap->text();
 }
 
 
@@ -211,6 +211,6 @@ void GUSBAmpSetupProjectWidget::generateFilePath(int index)
 
 void GUSBAmpSetupProjectWidget::changeQLineEdits()
 {
-    m_pGUSBAmp->m_sElcFilePath = ui->m_qLineEdit_EEGCap->text();
+    //m_pGUSBAmp->m_sElcFilePath = ui->m_qLineEdit_EEGCap->text();
     m_pGUSBAmp->m_sOutputFilePath = ui->m_qLineEdit_FiffRecordFile->text();
 }

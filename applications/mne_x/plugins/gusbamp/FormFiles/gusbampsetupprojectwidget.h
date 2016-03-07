@@ -114,6 +114,7 @@ private:
 
     Ui::GUSBAmpSetupProjectWidget*  ui;                 /**< the user interface for the GUSBAmpSetupProjectWidget.*/
 
+
     //=========================================================================================================
     /**
     * Sets the project dir
