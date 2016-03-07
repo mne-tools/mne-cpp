@@ -81,9 +81,6 @@ BrainTreeMetaItem::BrainTreeMetaItem(int iType, const QString& text)
         case BrainTreeMetaItemTypes::SurfaceColorSulci:
             sToolTip = "Color Sulci";
             break;
-        case BrainTreeMetaItemTypes::SurfaceColorInfoOrigin:
-            sToolTip = "Information used to color the surface";
-            break;
         case BrainTreeMetaItemTypes::RTDataStreamStatus:
             sToolTip = "Turn real time data streaming on/off";
             break;
@@ -110,6 +107,9 @@ BrainTreeMetaItem::BrainTreeMetaItem(int iType, const QString& text)
             break;
         case BrainTreeMetaItemTypes::SurfaceColorItem:
             sToolTip = "Surface color item";
+            break;
+        case BrainTreeMetaItemTypes::SurfaceAlpha:
+            sToolTip = "Surface alpha value";
             break;
     }
 
@@ -149,11 +149,6 @@ void  BrainTreeMetaItem::setData(const QVariant& value, int role)
             break;
         }
 
-        case BrainTreeMetaItemRoles::SurfaceColorInfoOrigin: {
-            emit colorInfoOriginChanged();
-            break;
-        }
-
         case BrainTreeMetaItemRoles::RTDataTimeInterval: {
             emit rtDataTimeIntervalChanged(value.toInt());
             break;
@@ -181,6 +176,11 @@ void  BrainTreeMetaItem::setData(const QVariant& value, int role)
 
         case BrainTreeMetaItemRoles::RTDataNumberAverages: {
             emit rtDataNumberAveragesChanged(value.toInt());
+            break;
+        }
+
+        case BrainTreeMetaItemRoles::SurfaceAlpha: {
+            emit surfaceAlphaChanged(value.toFloat());
             break;
         }
     }

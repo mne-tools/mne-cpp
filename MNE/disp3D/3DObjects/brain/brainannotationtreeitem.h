@@ -136,7 +136,23 @@ public:
     */
     bool addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation);
 
-private:
+private slots:
+    //=========================================================================================================
+    /**
+    * Call this slot whenever the check box of this item was checked.
+    *
+    * @param[in] checkState        The current checkstate.
+    */
+    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the visibilty of the annotation set was changed.
+    *
+    * @param[in] isVisible      The visibility flag.
+    */
+    void annotationVisibiltyChanged(bool isVisible);
 };
 
 } //NAMESPACE DISP3DLIB

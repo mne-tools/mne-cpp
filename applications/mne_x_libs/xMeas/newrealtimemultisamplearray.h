@@ -151,6 +151,22 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the flags used in the QuickControl widget.
+    *
+    * @param[in] layout which should be set.
+    */
+    inline void setDisplayFlags(const QStringList& slFlags);
+
+    //=========================================================================================================
+    /**
+    * Sets the flags used in the QuickControl widget.
+    *
+    * @param[in] layout which should be set.
+    */
+    inline const QStringList& getDisplayFlags();
+
+    //=========================================================================================================
+    /**
     * Sets the sampling rate of the RealTimeMultiSampleArrayNew Measurement.
     *
     * @param[in] dSamplingRate the sampling rate of the RealTimeMultiSampleArrayNew.
@@ -234,6 +250,7 @@ private:
 
     FiffInfo::SPtr              m_pFiffInfo_orig;   /**< Original Fiff Info if initialized by fiff info. */
 
+    QStringList                 m_slDisplayFlag;    /**< The flags to use in the displays quick control widget. Possible flags are: projections, compensators, view,filter, triggerdetection, modalities, scaling, sphara. */
     QString                     m_sXMLLayoutFile;   /**< Layout file name. */
     double                      m_dSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
 //    MatrixXd                    m_vecValue;         /**< The current attached sample vector.*/
@@ -280,6 +297,24 @@ inline void NewRealTimeMultiSampleArray::setXMLLayoutFile(const QString& layout)
 {
     QMutexLocker locker(&m_qMutex);
     m_sXMLLayoutFile = layout;
+}
+
+
+//*************************************************************************************************************
+
+inline void NewRealTimeMultiSampleArray::setDisplayFlags(const QStringList& slFlags)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_slDisplayFlag = slFlags;
+}
+
+
+//*************************************************************************************************************
+
+inline const QStringList& NewRealTimeMultiSampleArray::getDisplayFlags()
+{
+    QMutexLocker locker(&m_qMutex);
+    return m_slDisplayFlag;
 }
 
 

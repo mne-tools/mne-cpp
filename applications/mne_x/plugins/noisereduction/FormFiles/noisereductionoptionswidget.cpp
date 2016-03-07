@@ -48,6 +48,7 @@
 //=============================================================================================================
 
 using namespace NoiseReductionPlugin;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -88,9 +89,15 @@ NoiseReductionOptionsWidget::~NoiseReductionOptionsWidget()
 
 //*************************************************************************************************************
 
-void NoiseReductionOptionsWidget::onNBaseFctsChanged()
+void NoiseReductionOptionsWidget::setFiffInfo(const FiffInfo::SPtr pFiffInfo)
 {
-    m_pNoiseReductionToolbox->setSpharaNBaseFcts(ui->m_spinBox_nBaseFctsGrad->value(), ui->m_spinBox_nBaseFctsMag->value());
+    m_pFiffInfo = pFiffInfo;
+
+    //Create projectors
+    createProjectorGroup();
+
+    //Create compensators
+    createCompensatorGroup();
 }
 
 
@@ -116,5 +123,166 @@ void NoiseReductionOptionsWidget::setAcquisitionSystem(const QString &sSystem)
         ui->m_label_nBaseFctsGrad->setText("Inner layer");
         ui->m_spinBox_nBaseFctsGrad->setMaximum(270);
         ui->m_spinBox_nBaseFctsGrad->setValue(270);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void NoiseReductionOptionsWidget::onCheckProjStatusChanged(bool status)
+{
+    Q_UNUSED(status)
+
+    bool bAllActivated = true;
+
+    for(qint32 i = 0; i < m_qListProjCheckBox.size(); ++i) {
+        if(m_qListProjCheckBox[i]->isChecked() == false)
+            bAllActivated = false;
+
+        this->m_pFiffInfo->projs[i].active = m_qListProjCheckBox[i]->isChecked();
+    }
+
+    m_enableDisableProjectors->setChecked(bAllActivated);
+
+    emit projSelectionChanged();
+}
+
+
+//*************************************************************************************************************
+
+void NoiseReductionOptionsWidget::onEnableDisableAllProj(bool status)
+{
+    //Set all checkboxes to status
+    for(int i=0; i<m_qListProjCheckBox.size(); i++)
+        m_qListProjCheckBox.at(i)->setChecked(status);
+
+    //Set all projection activation states to status
+    for(int i=0; i < m_pFiffInfo->projs.size(); ++i)
+        m_pFiffInfo->projs[i].active = status;
+
+    m_enableDisableProjectors->setChecked(status);
+
+    emit projSelectionChanged();
+}
+
+//*************************************************************************************************************
+
+void NoiseReductionOptionsWidget::onCheckCompStatusChanged(const QString & compName)
+{
+    //qDebug()<<compName;
+
+    bool currentState;
+
+    for(int i = 0; i < m_qListCompCheckBox.size(); ++i)
+        if(m_qListCompCheckBox[i]->text() != compName)
+            m_qListCompCheckBox[i]->setChecked(false);
+        else
+            currentState = m_qListCompCheckBox[i]->isChecked();
+
+    if(currentState)
+        emit compSelectionChanged(compName.toInt());
+    else //If none selected
+        emit compSelectionChanged(0);
+}
+
+
+//*************************************************************************************************************
+
+void NoiseReductionOptionsWidget::onNBaseFctsChanged()
+{
+    m_pNoiseReductionToolbox->setSpharaNBaseFcts(ui->m_spinBox_nBaseFctsGrad->value(), ui->m_spinBox_nBaseFctsMag->value());
+}
+
+
+//*************************************************************************************************************
+
+void NoiseReductionOptionsWidget::createProjectorGroup()
+{
+    if(m_pFiffInfo)
+    {
+        m_qListProjCheckBox.clear();
+        // Projection Selection
+        QGridLayout *topLayout = new QGridLayout;
+
+        bool bAllActivated = true;
+
+        qint32 i=0;
+
+        for(i; i < m_pFiffInfo->projs.size(); ++i)
+        {
+            QCheckBox* checkBox = new QCheckBox(m_pFiffInfo->projs[i].desc);
+            checkBox->setChecked(m_pFiffInfo->projs[i].active);
+
+            if(m_pFiffInfo->projs[i].active == false)
+                bAllActivated = false;
+
+            m_qListProjCheckBox.append(checkBox);
+
+            connect(checkBox, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+                    this, &NoiseReductionOptionsWidget::onCheckProjStatusChanged);
+
+            topLayout->addWidget(checkBox, i, 0); //+2 because we already added two widgets before the first projector check box
+        }
+
+        QFrame* line = new QFrame();
+        line->setFrameShape(QFrame::HLine);
+        line->setFrameShadow(QFrame::Sunken);
+
+        topLayout->addWidget(line, i+1, 0);
+
+        m_enableDisableProjectors = new QCheckBox("Enable all");
+        m_enableDisableProjectors->setChecked(bAllActivated);
+        topLayout->addWidget(m_enableDisableProjectors, i+2, 0);
+        connect(m_enableDisableProjectors, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &NoiseReductionOptionsWidget::onEnableDisableAllProj);
+
+        //Find SSP tab and add current layout
+        ui->m_groupBox_projectors->setLayout(topLayout);
+
+        //Set default activation to true
+        onEnableDisableAllProj(true);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void NoiseReductionOptionsWidget::createCompensatorGroup()
+{
+    if(m_pFiffInfo)
+    {
+        m_pCompSignalMapper = new QSignalMapper(this);
+
+        m_qListCompCheckBox.clear();
+
+        // Compensation Selection
+        QGridLayout *topLayout = new QGridLayout;
+
+        qint32 i=0;
+
+        for(i; i < m_pFiffInfo->comps.size(); ++i)
+        {
+            QString numStr;
+            QCheckBox* checkBox = new QCheckBox(numStr.setNum(m_pFiffInfo->comps[i].kind));
+
+            m_qListCompCheckBox.append(checkBox);
+
+            connect(checkBox, SIGNAL(clicked()),
+                        m_pCompSignalMapper, SLOT(map()));
+
+            m_pCompSignalMapper->setMapping(checkBox, numStr);
+
+            topLayout->addWidget(checkBox, i, 0);
+
+        }
+
+        connect(m_pCompSignalMapper, SIGNAL(mapped(const QString &)),
+                    this, SIGNAL(compClicked(const QString &)));
+
+        connect(this, &NoiseReductionOptionsWidget::compClicked,
+                this, &NoiseReductionOptionsWidget::onCheckCompStatusChanged);
+
+        //Find Comp tab and add current layout
+        ui->m_groupBox_compensators->setLayout(topLayout);
     }
 }
