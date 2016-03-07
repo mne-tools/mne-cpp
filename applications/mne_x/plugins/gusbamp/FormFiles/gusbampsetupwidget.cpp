@@ -76,8 +76,7 @@ GUSBAmpSetupWidget::GUSBAmpSetupWidget(GUSBAmp* pGUSBAmp, QWidget* parent)
     //Connect about button
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &GUSBAmpSetupWidget::showAboutDialog);
 
-
-    ui.comboBox->setCurrentIndex(6);
+    ui.comboBox->setCurrentIndex(2);
 
 }
 
@@ -108,17 +107,14 @@ void GUSBAmpSetupWidget::showAboutDialog()
 
 //*************************************************************************************************************
 
-
-
-void GUSBAmpSetupWidget::getSampleRate()
+void GUSBAmpPlugin::GUSBAmpSetupWidget::on_comboBox_currentIndexChanged(const QString &arg1)
 {
     bool ok;
-    QString sampleRate = ui.comboBox->currentText();
-    m_pGUSBAmp->m_iSampleRate = sampleRate.toInt(&ok,10);
+    QString sampleRate = arg1;
+    m_pGUSBAmp->m_iSampleRate = sampleRate.toInt(&ok,10); //QString to int
 }
 
-
-
+//*************************************************************************************************************
 
 void GUSBAmpSetupWidget::on_pushButton_clicked()
 {
@@ -144,16 +140,22 @@ void GUSBAmpSetupWidget::on_pushButton_clicked()
         ui.label1->setText(slave1);
         serials.push_back(slave1);
     }
+    else
+        ui.label1->clear();
     if(!slave2.isEmpty())
     {
         ui.label2->setText(slave2);
         serials.push_back(slave2);
     }
+    else
+        ui.label2->clear();
     if(!slave3.isEmpty())
     {
         ui.label3->setText(slave3);
         serials.push_back(slave3);
     }
+    else
+        ui.label3->clear();
 
     int size = serials.size();
 
@@ -163,6 +165,8 @@ void GUSBAmpSetupWidget::on_pushButton_clicked()
 
 
 }
+
+//*************************************************************************************************************
 
 void GUSBAmpSetupWidget::checkBoxes()
 {
@@ -216,7 +220,7 @@ void GUSBAmpSetupWidget::checkBoxes()
     if(ui.checkBox_16->isChecked())
         list.push_back(16);
 
-
+    //store the channels-to-acquire-list in the according member variable
     m_pGUSBAmp->m_viChannelsToAcquire.resize(list.size());
     m_pGUSBAmp->m_viChannelsToAcquire = list;
 }
@@ -263,4 +267,84 @@ void GUSBAmpSetupWidget::on_ChannelSelect_clicked(bool checked)
         ui.checkBox_15->setChecked(false);
         ui.checkBox_16->setChecked(false);
     }
+}
+
+void GUSBAmpPlugin::GUSBAmpSetupWidget::on_checkBox_clicked()
+{
+    checkBoxes();
+}
+
+void GUSBAmpPlugin::GUSBAmpSetupWidget::on_checkBox_2_clicked()
+{
+    checkBoxes();
+}
+
+void GUSBAmpPlugin::GUSBAmpSetupWidget::on_checkBox_3_clicked()
+{
+    checkBoxes();
+}
+
+void GUSBAmpPlugin::GUSBAmpSetupWidget::on_checkBox_4_clicked()
+{
+    checkBoxes();
+}
+
+void GUSBAmpPlugin::GUSBAmpSetupWidget::on_checkBox_5_clicked()
+{
+    checkBoxes();
+}
+
+void GUSBAmpPlugin::GUSBAmpSetupWidget::on_checkBox_6_clicked()
+{
+    checkBoxes();
+}
+
+void GUSBAmpPlugin::GUSBAmpSetupWidget::on_checkBox_7_clicked()
+{
+    checkBoxes();
+}
+
+void GUSBAmpPlugin::GUSBAmpSetupWidget::on_checkBox_8_clicked()
+{
+    checkBoxes();
+}
+
+void GUSBAmpPlugin::GUSBAmpSetupWidget::on_checkBox_9_clicked()
+{
+    checkBoxes();
+}
+
+void GUSBAmpPlugin::GUSBAmpSetupWidget::on_checkBox_10_clicked()
+{
+    checkBoxes();
+}
+
+void GUSBAmpPlugin::GUSBAmpSetupWidget::on_checkBox_11_clicked()
+{
+    checkBoxes();
+}
+
+void GUSBAmpPlugin::GUSBAmpSetupWidget::on_checkBox_12_clicked()
+{
+    checkBoxes();
+}
+
+void GUSBAmpPlugin::GUSBAmpSetupWidget::on_checkBox_13_clicked()
+{
+    checkBoxes();
+}
+
+void GUSBAmpPlugin::GUSBAmpSetupWidget::on_checkBox_14_clicked()
+{
+    checkBoxes();
+}
+
+void GUSBAmpPlugin::GUSBAmpSetupWidget::on_checkBox_15_clicked()
+{
+    checkBoxes();
+}
+
+void GUSBAmpPlugin::GUSBAmpSetupWidget::on_checkBox_16_clicked()
+{
+    checkBoxes();
 }

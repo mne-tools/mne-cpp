@@ -119,6 +119,7 @@ class GUSBAMPSHARED_EXPORT GUSBAmp : public ISensor
 
     friend class GUSBAmpProducer;
     friend class GUSBAmpSetupWidget;
+    friend class GUSBAmpSetupProjectWidget;
 
 public:
     //=========================================================================================================
@@ -229,7 +230,6 @@ private:
     UCHAR               m_iNumberOfChannels;        /**< the channels that should be acquired from each device */
     vector<int>         m_viSizeOfSampleMatrix;     /**< vector including the size of the two dimensional sample Matrix */
     vector<int>         m_viChannelsToAcquire;      /**< vector of the calling numbers of the channels to be acquired */
-    GUSBAmpSetupWidget* m_pWidget;
     bool                m_bWriteToFile;             /**< Flag for File writing*/
 //write data to fiff-file
     FiffStream::SPtr    m_pOutfid;                  /**< QFile for writing to fif file.*/

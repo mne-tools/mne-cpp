@@ -73,7 +73,7 @@ GUSBAmp::GUSBAmp()
 , m_pGUSBAmpProducer(new GUSBAmpProducer(this))
 , m_iNumberOfChannels(0)
 , m_iSamplesPerBlock(0)
-, m_iSampleRate(1200)
+, m_iSampleRate(128)
 , m_bWriteToFile(false)
 {
     m_viChannelsToAcquire = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
@@ -83,17 +83,15 @@ GUSBAmp::GUSBAmp()
     m_vSerials.resize(1);
     m_vSerials[0]= "UB-2015.05.16";
 
-    //Initialize dates of the Widget
-    setupWidget();
 
     // Create record file option action bar item/button
-    m_pActionSetupProject = new QAction(QIcon(":/images/icons/database.png"), tr("Setup project"), this);
+    m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup project"), this);
     m_pActionSetupProject->setStatusTip(tr("Setup project"));
     connect(m_pActionSetupProject, &QAction::triggered, this, &GUSBAmp::showSetupProjectDialog);
     addPluginAction(m_pActionSetupProject);
 
     // Create start recordin action bar item/button
-    m_pActionStartRecording = new QAction(QIcon(":/images/icons/record.png"), tr("Start recording data to fif file"), this);
+    m_pActionStartRecording = new QAction(QIcon(":/images/record.png"), tr("Start recording data to fif file"), this);
     m_pActionStartRecording->setStatusTip(tr("Start recording data to fif file"));
     connect(m_pActionStartRecording, &QAction::triggered, this, &GUSBAmp::showStartRecording);
     addPluginAction(m_pActionStartRecording);
@@ -111,12 +109,9 @@ GUSBAmp::~GUSBAmp()
     if(this->isRunning())
         this->stop();
 
-    delete m_pWidget;
 }
 
-
 //*************************************************************************************************************
-
 
 void GUSBAmp::setUpFiffInfo()
 {
@@ -196,12 +191,9 @@ void GUSBAmp::setUpFiffInfo()
     m_pFiffInfo->dev_head_t.to = FIFFV_COORD_HEAD;
     m_pFiffInfo->ctf_head_t.from = FIFFV_COORD_DEVICE;
     m_pFiffInfo->ctf_head_t.to = FIFFV_COORD_HEAD;
-
-
 }
 
 //*************************************************************************************************************
-
 
 QSharedPointer<IPlugin> GUSBAmp::clone() const
 {
@@ -209,13 +201,13 @@ QSharedPointer<IPlugin> GUSBAmp::clone() const
     return pGUSBAmpClone;
 }
 
-
 //*************************************************************************************************************
 
 void GUSBAmp::init()
 {
     m_iSplitFileSizeMs = 10;
     m_iSplitCount = 0;
+    m_bSplitFile = false;
 
     QDate date;
     m_sOutputFilePath = QString ("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day());
@@ -229,14 +221,12 @@ void GUSBAmp::init()
     m_bIsRunning = false;
 }
 
-
 //*************************************************************************************************************
 
 void GUSBAmp::unload()
 {
 
 }
-
 
 //*************************************************************************************************************
 
@@ -247,8 +237,6 @@ bool GUSBAmp::start()
         QThread::wait();
 
     //get the values from the GUI and start GUSBAmpProducer
-    m_pWidget->getSampleRate(); //get sample rate from the combo box
-    m_pWidget->checkBoxes();    //set m_viChannelsToAcquire with the checked Boxes in the GUI
     m_pGUSBAmpProducer->start(m_vSerials, m_viChannelsToAcquire, m_iSampleRate);
 
 
@@ -302,11 +290,8 @@ bool GUSBAmp::stop()
 
     m_pRTMSA_GUSBAmp->data()->clear();
 
-
-
     return true;
 }
-
 
 //*************************************************************************************************************
 
@@ -315,7 +300,6 @@ IPlugin::PluginType GUSBAmp::getType() const
     return _ISensor;
 }
 
-
 //*************************************************************************************************************
 
 QString GUSBAmp::getName() const
@@ -323,19 +307,17 @@ QString GUSBAmp::getName() const
     return "GUSBAmp EEG";
 }
 
-
 //*************************************************************************************************************
 
 QWidget* GUSBAmp::setupWidget()
 {
-    m_pWidget = new GUSBAmpSetupWidget(this);//widget is later destroyed by CentralWidget - so it has to be created everytime new
+    GUSBAmpSetupWidget* pWidget = new GUSBAmpSetupWidget(this);//widget is later destroyed by CentralWidget - so it has to be created everytime new
 
     //init properties dialog
-    m_pWidget->initGui();
+    pWidget->initGui();
 
-    return m_pWidget;
+    return pWidget;
 }
-
 
 //*************************************************************************************************************
 
@@ -438,7 +420,7 @@ void GUSBAmp::showStartRecording()
         m_pOutfid->finish_writing_raw();
         m_bWriteToFile = false;
         m_pTimerRecordingChange->stop();
-        m_pActionStartRecording->setIcon(QIcon(":/images/icons/record.png"));
+        m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
     }
     else
     {
@@ -501,12 +483,12 @@ void GUSBAmp::changeRecordingButton()
 {
     if(m_iBlinkStatus == 0)
     {
-        m_pActionStartRecording->setIcon(QIcon(":/images/icons/record.png"));
+        m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
         m_iBlinkStatus = 1;
     }
     else
     {
-        m_pActionStartRecording->setIcon(QIcon(":/images/icons/record_active.png"));
+        m_pActionStartRecording->setIcon(QIcon(":/images/record_active.png"));
         m_iBlinkStatus = 0;
     }
 }
