@@ -237,29 +237,29 @@ void RealTimeMultiSampleArrayModel::initSphara()
     IOUtils::read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QString(":/sphara/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
 
     //Generate indices used to create the SPHARA operators.
-    indicesFirstVV.resize(0);
-    indicesSecondVV.resize(0);
+    m_vecIndicesFirstVV.resize(0);
+    m_vecIndicesSecondVV.resize(0);
 
     for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
         //Find GRADIOMETERS
         if(m_pFiffInfo->chs.at(r).coil_type == 3012) {
-            indicesFirstVV.conservativeResize(indicesFirstVV.rows()+1);
-            indicesFirstVV(indicesFirstVV.rows()-1) = r;
+            m_vecIndicesFirstVV.conservativeResize(m_vecIndicesFirstVV.rows()+1);
+            m_vecIndicesFirstVV(m_vecIndicesFirstVV.rows()-1) = r;
         }
 
         //Find Magnetometers
         if(m_pFiffInfo->chs.at(r).coil_type == 3024) {
-            indicesSecondVV.conservativeResize(indicesSecondVV.rows()+1);
-            indicesSecondVV(indicesSecondVV.rows()-1) = r;
+            m_vecIndicesSecondVV.conservativeResize(m_vecIndicesSecondVV.rows()+1);
+            m_vecIndicesSecondVV(m_vecIndicesSecondVV.rows()-1) = r;
         }
     }
 
-    indicesFirstBabyMEG.resize(0);
+    m_vecIndicesFirstBabyMEG.resize(0);
     for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
         //Find INNER LAYER
         if(m_pFiffInfo->chs.at(r).coil_type == 7002) {
-            indicesFirstBabyMEG.conservativeResize(indicesFirstBabyMEG.rows()+1);
-            indicesFirstBabyMEG(indicesFirstBabyMEG.rows()-1) = r;
+            m_vecIndicesFirstBabyMEG.conservativeResize(m_vecIndicesFirstBabyMEG.rows()+1);
+            m_vecIndicesFirstBabyMEG(m_vecIndicesFirstBabyMEG.rows()-1) = r;
         }
 
         //TODO: Find outer layer
@@ -816,12 +816,12 @@ void RealTimeMultiSampleArrayModel::updateSpharaOptions(const QString& sSytemTyp
         MatrixXd matSpharaMultSecond = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
         if(sSytemType == "VectorView") {
-            matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaVVGradLoaded, indicesFirstVV, m_pFiffInfo->nchan, nBaseFctsFirst, 1); //GRADIOMETERS
-            matSpharaMultSecond = Sphara::makeSpharaProjector(m_matSpharaVVMagLoaded, indicesSecondVV, m_pFiffInfo->nchan, nBaseFctsSecond, 0); //Magnetometers
+            matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaVVGradLoaded, m_vecIndicesFirstVV, m_pFiffInfo->nchan, nBaseFctsFirst, 1); //GRADIOMETERS
+            matSpharaMultSecond = Sphara::makeSpharaProjector(m_matSpharaVVMagLoaded, m_vecIndicesSecondVV, m_pFiffInfo->nchan, nBaseFctsSecond, 0); //Magnetometers
         }
 
         if(sSytemType == "BabyMEG") {
-            matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaBabyMEGInnerLoaded, indicesFirstBabyMEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
+            matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaBabyMEGInnerLoaded, m_vecIndicesFirstBabyMEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
         }
 
         //Write final operator matrices to file

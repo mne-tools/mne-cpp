@@ -251,7 +251,7 @@ void BrainRTSourceLocDataTreeItem::setLoopState(bool state)
 {
     QList<QStandardItem*> lItems = this->findChildren(BrainTreeMetaItemTypes::RTDataLoopedStreaming);
 
-    for(int i = 0; i<lItems.size(); i++) {
+    for(int i = 0; i < lItems.size(); i++) {
         if(BrainTreeMetaItem* pAbstractItem = dynamic_cast<BrainTreeMetaItem*>(lItems.at(i))) {
             pAbstractItem->setCheckState(state == true ? Qt::Checked : Qt::Unchecked);
             QVariant data;
@@ -268,7 +268,7 @@ void BrainRTSourceLocDataTreeItem::setStreamingActive(bool state)
 {
     QList<QStandardItem*> lItems = this->findChildren(BrainTreeMetaItemTypes::RTDataStreamStatus);
 
-    for(int i = 0; i<lItems.size(); i++) {
+    for(int i = 0; i < lItems.size(); i++) {
         if(BrainTreeMetaItem* pAbstractItem = dynamic_cast<BrainTreeMetaItem*>(lItems.at(i))) {
             pAbstractItem->setCheckState(state == true ? Qt::Checked : Qt::Unchecked);
             QVariant data;
@@ -285,7 +285,7 @@ void BrainRTSourceLocDataTreeItem::setTimeInterval(int iMSec)
 {
     QList<QStandardItem*> lItems = this->findChildren(BrainTreeMetaItemTypes::RTDataTimeInterval);
 
-    for(int i = 0; i<lItems.size(); i++) {
+    for(int i = 0; i < lItems.size(); i++) {
         if(BrainTreeMetaItem* pAbstractItem = dynamic_cast<BrainTreeMetaItem*>(lItems.at(i))) {
             qDebug()<<"BrainRTSourceLocDataTreeItem::setTimeInterval";
             QVariant data;
@@ -303,7 +303,7 @@ void BrainRTSourceLocDataTreeItem::setNumberAverages(int iNumberAverages)
 {
     QList<QStandardItem*> lItems = this->findChildren(BrainTreeMetaItemTypes::RTDataNumberAverages);
 
-    for(int i = 0; i<lItems.size(); i++) {
+    for(int i = 0; i < lItems.size(); i++) {
         if(BrainTreeMetaItem* pAbstractItem = dynamic_cast<BrainTreeMetaItem*>(lItems.at(i))) {
             QVariant data;
             data.setValue(iNumberAverages);

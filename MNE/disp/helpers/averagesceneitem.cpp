@@ -56,7 +56,7 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AverageSceneItem::AverageSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, const QColor &color)
+AverageSceneItem::AverageSceneItem(const QString& channelName, int channelNumber, const QPointF &channelPosition, int channelKind, int channelUnit, const QColor &color)
 : m_sChannelName(channelName)
 , m_iChannelNumber(channelNumber)
 , m_qpChannelPosition(channelPosition)

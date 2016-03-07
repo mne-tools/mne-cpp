@@ -100,7 +100,7 @@ public:
     /**
     * Constructs a AverageSceneItem.
     */
-    AverageSceneItem(QString channelName, int channelNumber, QPointF channelPosition, int channelKind, int channelUnit, const QColor& color = Qt::yellow);
+    AverageSceneItem(const QString& channelName, int channelNumber, const QPointF& channelPosition, int channelKind, int channelUnit, const QColor& color = Qt::yellow);
 
     //=========================================================================================================
     /**
