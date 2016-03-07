@@ -538,77 +538,75 @@ private:
     */
     void clearModel();
 
-    bool    m_bProjActivated;           /**< Projections activated */
-    bool    m_bCompActivated;           /**< Compensator activated */
-    bool    m_bSpharaActivated;         /**< Sphara activated */
-    bool    m_bIsFreezed;               /**< Display is freezed */
-    bool    m_bDrawFilterFront;         /**< Flag whether to plot/write the delayed frontal part of the filtered signal. This flag is necessary to get rid of nasty signal jumps when changing the filter parameters. */
-    bool    m_bTriggerDetectionActive;  /**< Trigger detection activation state */
-    float   m_fSps;                     /**< Sampling rate */
-    double  m_dTriggerThreshold;        /**< Trigger detection threshold */
-    qint32  m_iT;                       /**< Time window */
-    qint32  m_iDownsampling;            /**< Down sampling factor */
-    qint32  m_iMaxSamples;              /**< Max samples per window */
-    qint32  m_iCurrentSample;           /**< Current sample which holds the current position in the data matrix */
-    qint32  m_iCurrentSampleFreeze;     /**< Current sample which holds the current position in the data matrix when freezing tool is active */
-    qint32  m_iMaxFilterLength;         /**< Max order of the current filters */
-    qint32  m_iCurrentBlockSize;        /**< Current block size */
-    qint32  m_iResidual;                /**< Current amount of samples which were to size */
-    int     m_iCurrentTriggerChIndex;   /**< The index of the current trigger channel */
-    int     m_iDistanceTimerSpacer;     /**< The distance for the horizontal time spacers in the view in ms */
-    int     m_iDetectedTriggers;        /**< Detected triggers since the last reset */
+    bool                                m_bProjActivated;                           /**< Projections activated */
+    bool                                m_bCompActivated;                           /**< Compensator activated */
+    bool                                m_bSpharaActivated;                         /**< Sphara activated */
+    bool                                m_bIsFreezed;                               /**< Display is freezed */
+    bool                                m_bDrawFilterFront;                         /**< Flag whether to plot/write the delayed frontal part of the filtered signal. This flag is necessary to get rid of nasty signal jumps when changing the filter parameters. */
+    bool                                m_bTriggerDetectionActive;                  /**< Trigger detection activation state */
+    float                               m_fSps;                                     /**< Sampling rate */
+    double                              m_dTriggerThreshold;                        /**< Trigger detection threshold */
+    qint32                              m_iT;                                       /**< Time window */
+    qint32                              m_iDownsampling;                            /**< Down sampling factor */
+    qint32                              m_iMaxSamples;                              /**< Max samples per window */
+    qint32                              m_iCurrentSample;                           /**< Current sample which holds the current position in the data matrix */
+    qint32                              m_iCurrentSampleFreeze;                     /**< Current sample which holds the current position in the data matrix when freezing tool is active */
+    qint32                              m_iMaxFilterLength;                         /**< Max order of the current filters */
+    qint32                              m_iCurrentBlockSize;                        /**< Current block size */
+    qint32                              m_iResidual;                                /**< Current amount of samples which were to size */
+    int                                 m_iCurrentTriggerChIndex;                   /**< The index of the current trigger channel */
+    int                                 m_iDistanceTimerSpacer;                     /**< The distance for the horizontal time spacers in the view in ms */
+    int                                 m_iDetectedTriggers;                        /**< Detected triggers since the last reset */
 
-    QString m_sCurrentTriggerCh;        /**< Current trigger channel which is beeing scanned */
-    QString m_sFilterChannelType;       /**< Kind of channel which is to be filtered */
+    QString                             m_sCurrentTriggerCh;                        /**< Current trigger channel which is beeing scanned */
+    QString                             m_sFilterChannelType;                       /**< Kind of channel which is to be filtered */
 
-    FiffInfo::SPtr          m_pFiffInfo;                                /**< Fiff info */
+    FiffInfo::SPtr                      m_pFiffInfo;                                /**< Fiff info */
 
-    RowVectorXi             m_vecBadIdcs;                               /**< Idcs of bad channels */
-    VectorXd                m_vecLastBlockFirstValuesFiltered;          /**< The first value of the last complete filtered data display block */
-    VectorXd                m_vecLastBlockFirstValuesRaw;               /**< The first value of the last complete raw data display block */
+    RowVectorXi                         m_vecBadIdcs;                               /**< Idcs of bad channels */
+    VectorXd                            m_vecLastBlockFirstValuesFiltered;          /**< The first value of the last complete filtered data display block */
+    VectorXd                            m_vecLastBlockFirstValuesRaw;               /**< The first value of the last complete raw data display block */
 
-    MatrixXd                m_matProj;                                  /**< SSP projector */
-    SparseMatrix<double>    m_matSparseProj;                            /**< Sparse SSP projector */
+    MatrixXd                            m_matProj;                                  /**< SSP projector */
+    SparseMatrix<double>                m_matSparseProj;                            /**< Sparse SSP projector */
 
-    MatrixXd                m_matComp;                                  /**< Compensator */
-    SparseMatrix<double>    m_matSparseComp;                            /**< Sparse compensator matrix */
+    MatrixXd                            m_matComp;                                  /**< Compensator */
+    SparseMatrix<double>                m_matSparseComp;                            /**< Sparse compensator matrix */
 
-    SparseMatrix<double>    m_matSparseFull;                            /**< Full multiplication matrix  */
+    SparseMatrix<double>                m_matSparseFull;                            /**< Full multiplication matrix  */
 
-    MatrixXdR               m_matDataRaw;                               /**< The raw data */
-    MatrixXdR               m_matDataFiltered;                          /**< The filtered data */
-    MatrixXdR               m_matDataRawFreeze;                         /**< The raw data in freeze mode */
-    MatrixXdR               m_matDataFilteredFreeze;                    /**< The raw filtered data in freeze mode */
-    MatrixXd                m_matOverlap;                               /**< Last overlap block for the back */
+    MatrixXdR                           m_matDataRaw;                               /**< The raw data */
+    MatrixXdR                           m_matDataFiltered;                          /**< The filtered data */
+    MatrixXdR                           m_matDataRawFreeze;                         /**< The raw data in freeze mode */
+    MatrixXdR                           m_matDataFilteredFreeze;                    /**< The raw filtered data in freeze mode */
+    MatrixXd                            m_matOverlap;                               /**< Last overlap block for the back */
 
-    Eigen::VectorXi         indicesFirstVV;                             /**< The indices of the channels to pick for the first SPHARA oerpator in case of a VectorView system.*/
-    Eigen::VectorXi         indicesSecondVV;                            /**< The indices of the channels to pick for the second SPHARA oerpator in case of a VectorView system.*/
-    Eigen::VectorXi         indicesFirstBabyMEG;                        /**< The indices of the channels to pick for the first SPHARA oerpator in case of a BabyMEG system.*/
-    Eigen::VectorXi         indicesSecondBabyMEG;                       /**< The indices of the channels to pick for the second SPHARA oerpator in case of a BabyMEG system.*/
+    Eigen::VectorXi                     m_vecIndicesFirstVV;                        /**< The indices of the channels to pick for the first SPHARA oerpator in case of a VectorView system.*/
+    Eigen::VectorXi                     m_vecIndicesSecondVV;                       /**< The indices of the channels to pick for the second SPHARA oerpator in case of a VectorView system.*/
+    Eigen::VectorXi                     m_vecIndicesFirstBabyMEG;                   /**< The indices of the channels to pick for the first SPHARA oerpator in case of a BabyMEG system.*/
+    Eigen::VectorXi                     m_vecIndicesSecondBabyMEG;                  /**< The indices of the channels to pick for the second SPHARA oerpator in case of a BabyMEG system.*/
 
-    Eigen::MatrixXd                 m_matSpharaMultFirst;               /**< The final first SPHARA operator (in case of babymeg this is the inner layer, in case of vector view these are the gradiometers).*/
-    Eigen::MatrixXd                 m_matSpharaMultSecond;              /**< The final second magnetometer SPHARA operator (in case of babymeg this is the outer layer, in case of vector view these are the magnetometers).*/
-    Eigen::SparseMatrix<double>     m_matSparseSpharaMult;              /**< The final sparse SPHARA operator .*/
-    Eigen::SparseMatrix<double>     m_matSparseSpharaProjMult;          /**< The final sparse SPHARA + projection operator.*/
-    Eigen::SparseMatrix<double>     m_matSparseSpharaCompMult;          /**< The final sparse SPHARA + compensator operator.*/
-    Eigen::SparseMatrix<double>     m_matSparseProjCompMult;            /**< The final sparse projection + compensator operator.*/
+    Eigen::SparseMatrix<double>         m_matSparseSpharaMult;                      /**< The final sparse SPHARA operator .*/
+    Eigen::SparseMatrix<double>         m_matSparseSpharaProjMult;                  /**< The final sparse SPHARA + projection operator.*/
+    Eigen::SparseMatrix<double>         m_matSparseSpharaCompMult;                  /**< The final sparse SPHARA + compensator operator.*/
+    Eigen::SparseMatrix<double>         m_matSparseProjCompMult;                    /**< The final sparse projection + compensator operator.*/
 
-    Eigen::MatrixXd         m_matSpharaVVGradLoaded;                    /**< The loaded VectorView gradiometer basis functions.*/
-    Eigen::MatrixXd         m_matSpharaVVMagLoaded;                     /**< The loaded VectorView magnetometer basis functions.*/
-    Eigen::MatrixXd         m_matSpharaBabyMEGInnerLoaded;              /**< The loaded babyMEG inner layer basis functions.*/
-    Eigen::MatrixXd         m_matSpharaBabyMEGOuterLoaded;              /**< The loaded babyMEG outer layer basis functions.*/
+    Eigen::MatrixXd                     m_matSpharaVVGradLoaded;                    /**< The loaded VectorView gradiometer basis functions.*/
+    Eigen::MatrixXd                     m_matSpharaVVMagLoaded;                     /**< The loaded VectorView magnetometer basis functions.*/
+    Eigen::MatrixXd                     m_matSpharaBabyMEGInnerLoaded;              /**< The loaded babyMEG inner layer basis functions.*/
+    Eigen::MatrixXd                     m_matSpharaBabyMEGOuterLoaded;              /**< The loaded babyMEG outer layer basis functions.*/
 
-    QMap<QString, QColor>               m_qMapTriggerColor;             /**< Current colors for all trigger channels. */
-    QMap<int,QList<int> >               m_qMapDetectedTrigger;          /**< Detected trigger for each trigger channel. */
-    QMap<int,QList<int> >               m_qMapDetectedTriggerFreeze;    /**< Detected trigger for each trigger channel while display is freezed. */
-    QMap<int,QList<int> >               m_qMapDetectedTriggerOld;       /**< Old detected trigger for each trigger channel. */
-    QMap<int,QList<int> >               m_qMapDetectedTriggerOldFreeze; /**< Old detected trigger for each trigger channel while display is freezed. */
-    QMap<qint32,float>                  m_qMapChScaling;                /**< Channel scaling map. */
-    QList<FilterData>                   m_filterData;                   /**< List of currently active filters. */
-    QList<RealTimeSampleArrayChInfo>    m_qListChInfo;                  /**< Channel info list. ToDo: Obsolete*/
-    QStringList                         m_filterChannelList;            /**< List of channels which are to be filtered.*/
-    QStringList                         m_visibleChannelList;           /**< List of currently visible channels in the view.*/
-    QMap<qint32,qint32>                 m_qMapIdxRowSelection;          /**< Selection mapping.*/
+    QMap<QString, QColor>               m_qMapTriggerColor;                         /**< Current colors for all trigger channels. */
+    QMap<int,QList<int> >               m_qMapDetectedTrigger;                      /**< Detected trigger for each trigger channel. */
+    QMap<int,QList<int> >               m_qMapDetectedTriggerFreeze;                /**< Detected trigger for each trigger channel while display is freezed. */
+    QMap<int,QList<int> >               m_qMapDetectedTriggerOld;                   /**< Old detected trigger for each trigger channel. */
+    QMap<int,QList<int> >               m_qMapDetectedTriggerOldFreeze;             /**< Old detected trigger for each trigger channel while display is freezed. */
+    QMap<qint32,float>                  m_qMapChScaling;                            /**< Channel scaling map. */
+    QList<FilterData>                   m_filterData;                               /**< List of currently active filters. */
+    QList<RealTimeSampleArrayChInfo>    m_qListChInfo;                              /**< Channel info list. ToDo: Obsolete*/
+    QStringList                         m_filterChannelList;                        /**< List of channels which are to be filtered.*/
+    QStringList                         m_visibleChannelList;                       /**< List of currently visible channels in the view.*/
+    QMap<qint32,qint32>                 m_qMapIdxRowSelection;                      /**< Selection mapping.*/
 
 signals:
     //=========================================================================================================

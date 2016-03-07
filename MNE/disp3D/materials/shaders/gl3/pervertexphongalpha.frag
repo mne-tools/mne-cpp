@@ -71,6 +71,6 @@ void main()
 {
     vec3 diffuseColor, specularColor;
     adsModel(worldPosition, worldNormal, eyePosition, shininess, diffuseColor, specularColor);
-	gl_FragColor = vec4( vColor + vColor * diffuseColor + ks * specularColor, alpha );
+        gl_FragColor = vec4( vColor + vColor * diffuseColor + ks * specularColor, alpha );
 }
 

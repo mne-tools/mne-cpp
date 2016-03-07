@@ -129,10 +129,11 @@ public:
     *
     * @param [in] qMapChScaling     The pointer to scaling information.
     * @param [in] name              The name to be displayed on the minimize button.
-    * @param [in] slFlags           The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: projections, compensators, view,filter, triggerdetection, modalities, scaling, sphara.
+    * @param [in] pFiffInfo         The fiff info.
+    * @param [in] slFlags           The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: projections, compensators, view, filter, triggerdetection, modalities, scaling, sphara.
     * @param [in] parent            The parent of widget.
     */
-    QuickControlWidget(const QMap<qint32, float>& qMapChScaling, const FiffInfo::SPtr pFiffInfo, const QString& name = "", const QStringList& slFlags = QStringList("Scaling"), QWidget *parent = 0);
+    QuickControlWidget(const QMap<qint32, float>& qMapChScaling, const FiffInfo::SPtr pFiffInfo, const QString& name = "", const QStringList& slFlags = QStringList("Scaling"), QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -184,11 +185,36 @@ public:
 
     //=========================================================================================================
     /**
+    * Set current signal and background colors.
+    *
+    * @param [in] signalColor       The new signal color.
+    * @param [in] backgroundColor   The new background color.
+    */
+    void setSignalBackgroundColors(const QColor& signalColor, const QColor& backgroundColor);
+
+    //=========================================================================================================
+    /**
     * Set number of detected triggers.
     *
     * @param [in] numberDetections     the numger of detected triggers
     */
     void setNumberDetectedTriggers(int numberDetections);
+
+    //=========================================================================================================
+    /**
+    * Returns the current signal color.
+    *
+    * @return The current signal color.
+    */
+    const QColor& getSignalColor();
+
+    //=========================================================================================================
+    /**
+    * Returns the current background color.
+    *
+    * @return The current background color.
+    */
+    const QColor& getBackgroundColor();
 
 protected slots:
     //=========================================================================================================
@@ -320,6 +346,18 @@ protected slots:
     */
     void onSpharaOptionsChanged();
 
+    //=========================================================================================================
+    /**
+    * Slot called when the user changes the signal or background color.
+    */
+    void onViewColorButtonClicked();
+
+    //=========================================================================================================
+    /**
+    * Call this slot whenever you want to make a screenshot of the butterfly or layout view.
+    */
+    void onMakeScreenshot();
+
 protected:
     //=========================================================================================================
     /**
@@ -344,6 +382,12 @@ protected:
     * Create the widgets used in the view group
     */
     void createViewGroup();
+
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the color group
+    */
+    void createColorsGroup();
 
     //=========================================================================================================
     /**
@@ -390,6 +434,9 @@ private:
     QMap<qint32, QDoubleSpinBox*>   m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits. */
     QMap<qint32, QSlider*>          m_qMapScalingSlider;            /**< Map of types and channel scaling line edits. */
     QMap<QString, QColor>           m_qMapTriggerColor;             /**< Trigger channel colors. */
+
+    QColor                          m_colCurrentSignalColor;        /**< Current color of the scene in all View3D's. */
+    QColor                          m_colCurrentBackgroundColor;    /**< Current color of the scene in all View3D's. */
 
     QList<Modality>                 m_qListModalities;              /**< List of different modalities. */
     QList<QCheckBox*>               m_qListProjCheckBox;            /**< List of projection CheckBox. */
@@ -490,6 +537,26 @@ signals:
     * Signal mapper signal for compensator changes.
     */
     void compClicked(const QString& text);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changed the signal color.
+    */
+    void signalColorChanged(const QColor& signalColor);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changed the background color.
+    */
+    void backgroundColorChanged(const QColor& backgroundColor);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user wants to make a screenshot.
+    *
+    * @param[out] imageType     The current iamge type: png, svg.
+    */
+    void makeScreenshot(const QString& imageType);
 };
 
 } // NAMESPACE XDISPLIB
