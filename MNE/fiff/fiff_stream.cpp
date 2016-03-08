@@ -1147,6 +1147,18 @@ bool FiffStream::read_named_matrix(const FiffDirTree& p_Node, fiff_int_t matkind
     if (!col_names.isEmpty())
         mat.col_names = split_name_list(col_names);
 
+    if (mat.row_names.size() != mat.nrow)
+    {
+        printf("Number of rows in matrix data and row names do not match");
+        return false;
+    }
+
+    if (mat.col_names.size() != mat.ncol)
+    {
+        printf("Number of columns in matrix data and column names do not match");
+        return false;
+    }
+
     return true;
 }
 
