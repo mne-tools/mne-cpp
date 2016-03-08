@@ -119,6 +119,15 @@ bool GUSBAmpDriver::initDevice()
 
     m_isRunning =true;
 
+    //allocating a new UCHAR pointer on the _channelsToAcquire array
+    const int size = m_NUMBER_OF_CHANNELS;
+    UCHAR *_channelsToAcquire = new UCHAR[size];
+    //filling the UCHAR array with the values from the list
+    for(int i = 0; i < m_NUMBER_OF_CHANNELS; i++)
+    {
+        _channelsToAcquire[i] = UCHAR(m_channelsToAcquire[i]);
+        //cout<< "channel " << int( m_channelsToAcquire[i]) << " setted \n";
+    }
 
     //after start is initialized, buffer parameters can be calculated:
     m_nPoints           = m_NUMBER_OF_SCANS * (m_NUMBER_OF_CHANNELS + m_TRIGGER);
@@ -147,7 +156,7 @@ bool GUSBAmpDriver::initDevice()
             m_openedDevicesHandles.push_back(hDevice);
 
             //set the channels from that data should be acquired
-            if (!GT_SetChannels(hDevice, m_channelsToAcquire, m_NUMBER_OF_CHANNELS))
+            if (!GT_SetChannels(hDevice, _channelsToAcquire, m_NUMBER_OF_CHANNELS))
                 throw string("Error on GT_SetChannels: Couldn't set channels to acquire for device ").append(*serialNumber);
 
             //set the sample rate
@@ -166,11 +175,11 @@ bool GUSBAmpDriver::initDevice()
             for (int i=0; i<m_NUMBER_OF_CHANNELS; i++)
             {
                 //don't use a bandpass filter for any channel
-                if (!GT_SetBandPass(hDevice, m_channelsToAcquire[i], -1))
+                if (!GT_SetBandPass(hDevice, _channelsToAcquire[i], -1))
                     throw string("Error on GT_SetBandPass: Couldn't set no bandpass filter for device ").append(*serialNumber);
 
                 //don't use a notch filter for any channel
-                if (!GT_SetNotch(hDevice, m_channelsToAcquire[i], -1))
+                if (!GT_SetNotch(hDevice, _channelsToAcquire[i], -1))
                     throw string("Error on GT_SetNotch: Couldn't set no notch filter for device ").append(*serialNumber);
             }
 
@@ -280,6 +289,8 @@ bool GUSBAmpDriver::initDevice()
             }
         }
 
+        delete [] _channelsToAcquire;
+
         qDebug() << "Plugin GUSBAmp - INFO - initDevice() - The device has been connected and initialised successfully" << endl;
 
         return true;
@@ -295,6 +306,8 @@ bool GUSBAmpDriver::initDevice()
             qDebug() << "error occurred - Device " << &m_openedDevicesHandles.front()  << "was closed" << endl;
             m_openedDevicesHandles.pop_front();
         }
+
+        delete [] _channelsToAcquire;
 
         m_isRunning = false;
 
@@ -563,12 +576,8 @@ bool GUSBAmpDriver::setChannels(vector<int> &list)
         return false;
     }
 
-    //filling the UCHAR array with the values from the list
-    for(int i = 0; i < size; i++)
-    {
-        m_channelsToAcquire[i] = UCHAR(list[i]);
-        //cout<< "channel " << int( m_channelsToAcquire[i]) << " setted \n";
-    }
+    m_channelsToAcquire.resize(size);
+    m_channelsToAcquire = list;
 
     m_NUMBER_OF_CHANNELS    = UCHAR(size);
 

@@ -246,6 +246,8 @@ void GUSBAmpSetupWidget::on_ChannelSelect_clicked(bool checked)
         ui.checkBox_14->setChecked(true);
         ui.checkBox_15->setChecked(true);
         ui.checkBox_16->setChecked(true);
+
+        checkBoxes();
     }
 
     if(checked)
@@ -266,6 +268,8 @@ void GUSBAmpSetupWidget::on_ChannelSelect_clicked(bool checked)
         ui.checkBox_14->setChecked(false);
         ui.checkBox_15->setChecked(false);
         ui.checkBox_16->setChecked(false);
+
+        checkBoxes();
     }
 }
 
