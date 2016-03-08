@@ -187,6 +187,10 @@ win32 {
     #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
     QMAKE_POST_LINK = $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
 }
+unix:!macx {
+    # === Unix ===
+    QMAKE_RPATHDIR += $ORIGIN/../lib
+}
 macx {
     # === Mac ===
     QMAKE_RPATHDIR += @executable_path/../Frameworks
@@ -211,6 +215,4 @@ macx {
 #    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
 #    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -verbose=0
 }
-unix:!macx {
-    #ToDo Unix
-}
+
