@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>560</width>
+    <width>814</width>
     <height>476</height>
    </rect>
   </property>
@@ -14,7 +14,7 @@
    <string>GUSBAmp EEG Connector Setup</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_3">
-   <item row="0" column="0">
+   <item row="0" column="1">
     <widget class="QFrame" name="DriverSetup">
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
@@ -22,24 +22,120 @@
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
+     <widget class="QPushButton" name="m_qPushButton_About">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>425</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>About</string>
+      </property>
+     </widget>
      <widget class="QGroupBox" name="groupBox">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>511</width>
-        <height>231</height>
+        <width>776</width>
+        <height>409</height>
        </rect>
       </property>
       <property name="title">
        <string>gUSBamp Setup</string>
       </property>
+      <widget class="QGroupBox" name="groupBox_2">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>30</y>
+         <width>191</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Sample Rate [Hz]</string>
+       </property>
+       <widget class="QComboBox" name="comboBox">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>20</y>
+          <width>101</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <item>
+         <property name="text">
+          <string>32</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>64</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>128</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>256</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>512</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>600</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>1200</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>2400</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>4800</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>9600</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>19200</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>38400</string>
+         </property>
+        </item>
+       </widget>
+      </widget>
       <widget class="QGroupBox" name="SetSerials">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>20</y>
-         <width>251</width>
+         <x>10</x>
+         <y>23</y>
+         <width>261</width>
          <height>191</height>
         </rect>
        </property>
@@ -143,7 +239,7 @@
         <rect>
          <x>290</x>
          <y>90</y>
-         <width>201</width>
+         <width>191</width>
          <height>121</height>
         </rect>
        </property>
@@ -332,106 +428,16 @@
         </layout>
        </widget>
       </widget>
-      <widget class="QGroupBox" name="groupBox_2">
-       <property name="geometry">
-        <rect>
-         <x>290</x>
-         <y>20</y>
-         <width>201</width>
-         <height>62</height>
-        </rect>
-       </property>
-       <property name="title">
-        <string>Sample Rate [Hz]</string>
-       </property>
-       <widget class="QComboBox" name="comboBox">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>20</y>
-          <width>101</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <item>
-         <property name="text">
-          <string>32</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>64</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>128</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>256</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>512</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>600</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>1200</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>2400</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>4800</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>9600</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>19200</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>38400</string>
-         </property>
-        </item>
-       </widget>
-      </widget>
-     </widget>
-     <widget class="QPushButton" name="m_qPushButton_About">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>420</y>
-        <width>75</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>About</string>
-      </property>
+      <zorder>groupBox_2</zorder>
+      <zorder>SetSerials</zorder>
+      <zorder>ChannelSelect</zorder>
+      <zorder>m_qPushButton_About</zorder>
      </widget>
     </widget>
    </item>
   </layout>
+  <zorder>DriverSetup</zorder>
+  <zorder>m_qPushButton_About</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
