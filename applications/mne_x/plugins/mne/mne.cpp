@@ -76,11 +76,11 @@ MNE::MNE()
 //, m_qFileFwdSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
 //, m_sAtlasDir("./MNE-sample-data/subjects/sample/label")
 //, m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
-, m_qFileFwdSolution("D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721/160125_133250_4841721_Spontaneous_filtered_1_40_raw-oct-6-fwd.fif")
+, m_qFileFwdSolution("D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721/160125_133250_4841721_Spontaneous_raw-oct-6-fwd.fif")
 , m_sAtlasDir("D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721/ID_4841721_act/label")
 , m_sSurfaceDir("D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721/ID_4841721_act/surf")
-, m_iNumAverages(10)
-, m_iDownSample(4)
+, m_iNumAverages(1)
+, m_iDownSample(1)
 {
 
 }
@@ -114,7 +114,7 @@ void MNE::init()
     // Inits
     m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_qFileFwdSolution));
     m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
-    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.inflated", m_sSurfaceDir+"/rh.inflated"));
+    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.pial", m_sSurfaceDir+"/rh.pial"));
 
     // Input
     m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "MNE RTMSA In", "MNE real-time multi sample array input data");
@@ -256,8 +256,8 @@ void MNE::doClustering()
 
     m_qMutex.lock();
     m_bFinishedClustering = false;
-    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
-    //m_pClusteredFwd = m_pFwd;
+    //m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
+    m_pClusteredFwd = m_pFwd;
     m_pRTSEOutput->data()->setFwdSolution(m_pClusteredFwd);
 
     m_qMutex.unlock();
@@ -443,6 +443,7 @@ void MNE::updateInvOp(MNEInverseOperator::SPtr p_pInvOp)
     QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
     m_qMutex.lock();
+
     m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(*m_pInvOp.data(), lambda2, method));
     //
     //   Set up the inverse according to the parameters
@@ -484,13 +485,13 @@ void MNE::run()
     // Init Real-Time inverse estimator
     //
     m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd));
-    connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated, this, &MNE::updateInvOp);
+    //connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated, this, &MNE::updateInvOp);
     m_pMinimumNorm.reset();
 
     //
     // Start the rt helpers
     //
-    m_pRtInvOp->start();
+    //m_pRtInvOp->start();
 
     //
     // start processing data
@@ -498,6 +499,15 @@ void MNE::run()
     m_bProcessData = true;
 
     qint32 skip_count = 0;
+
+    QFile file("D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721/160125_133250_4841721_Spontaneous_raw-inv.fif");
+    MNEInverseOperator::SPtr invOp = MNEInverseOperator::SPtr(new MNEInverseOperator(file));
+
+    double snr = 3.0;
+    double lambda2 = 1.0 / pow(snr, 2); //ToDO estimate lambda using covariance
+    QString method("MNE"); //"MNE" | "dSPM" | "sLORETA"
+    m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(*invOp.data(), lambda2, method));
+    m_pMinimumNorm->doInverseSetup(m_iNumAverages,false);
 
     while(m_bIsRunning)
     {
@@ -520,7 +530,7 @@ void MNE::run()
         {
             MatrixXd rawSegment = m_pMatrixDataBuffer->pop();
             qDebug()<<"MNE::run - Processing RTMSA data";
-            if(m_pMinimumNorm && ((skip_count % 4) == 0))
+            if(m_pMinimumNorm && ((skip_count % m_iDownSample) == 0))
             {
                 float tmin = 1 / m_pFiffInfo->sfreq;
                 float tstep = 1 / m_pFiffInfo->sfreq;
@@ -543,7 +553,7 @@ void MNE::run()
         if(t_evokedSize > 0)
         {
             qDebug()<<"MNE::run - Processing RTE data";
-            if(m_pMinimumNorm && ((skip_count % 4) == 0))
+            if(m_pMinimumNorm && ((skip_count % m_iDownSample) == 0))
             {
                 m_qMutex.lock();
                 FiffEvoked t_fiffEvoked = m_qVecFiffEvoked[0];
