@@ -335,8 +335,12 @@ void GUSBAmp::run()
             MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
             MatrixXf matValue_show = matValue/1000000; //matvalue for showing
 
+            for(int i = 0; i < matValue.cols(); i++)
+                qDebug() << matValue(0,i);
+
             //emit values to real time multi sample array
             m_pRTMSA_GUSBAmp->data()->setValue(matValue_show.cast<double>());
+            qDebug() << "PUSH!";
 
             //Write raw data to fif file
             if(m_bWriteToFile)

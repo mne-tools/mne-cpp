@@ -78,6 +78,8 @@ GUSBAmpSetupWidget::GUSBAmpSetupWidget(GUSBAmp* pGUSBAmp, QWidget* parent)
 
     ui.comboBox->setCurrentIndex(2);
 
+    checkBoxes();
+
 }
 
 
