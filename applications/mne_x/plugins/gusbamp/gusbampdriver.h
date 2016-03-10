@@ -126,7 +126,7 @@ private:
     int                 m_SAMPLE_RATE_HZ;           /**< the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!) */
     int                 m_NUMBER_OF_SCANS;          /**< the number of scans that should be received simultaneously (depending on the _sampleRate; see C-API documentation for this value!) */
     UCHAR               m_NUMBER_OF_CHANNELS;       /**< the number of channels per device that should be acquired (must equal the size of the _channelsToAcquire array) */
-    vector<int>         m_channelsToAcquire;        /**< the channels that should be acquired from each device */
+    UCHAR*              m_channelsToAcquire;        /**< the channels that should be acquired from each device */
     const BOOL          m_TRIGGER;                  /**< TRUE to acquire the trigger line in an additional channel */
     UCHAR               m_mode;                     /**< use normal acquisition mode */
     CHANNEL             m_bipolarSettings;          /**< don't use bipolar derivation (all values will be initialized to zero) */

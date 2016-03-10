@@ -129,7 +129,6 @@ void GUSBAmpProducer::stop()
 void GUSBAmpProducer::run()
 {
     MatrixXf matRawBuffer(m_viSizeOfSampleMatrix[0],m_viSizeOfSampleMatrix[1]);
-    qDebug()<<"Sammple Matrix dimension: "<< m_viSizeOfSampleMatrix[0] << m_viSizeOfSampleMatrix [1]<< endl;
 
         while(m_bIsRunning)
         {
