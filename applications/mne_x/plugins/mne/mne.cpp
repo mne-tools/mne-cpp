@@ -425,8 +425,11 @@ void MNE::updateRTE(XMEASLIB::NewMeasurement::SPtr pMeasurement)
         if(!m_pFiffInfoInput)
             m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pRTE->getValue()->info));
 
-        if(m_bProcessData)
+        if(m_bProcessData) {
+            m_iNumAverages = pRTE->getValue()->nave;
+            qDebug()<<"MNE::updateRTE - m_iNumAverages"<<m_iNumAverages;
             m_qVecFiffEvoked.push_back(pRTE->getValue()->pick_channels(m_qListPickChannels));
+        }
     }
 }
 
