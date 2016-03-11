@@ -11,7 +11,7 @@ cd mne-cpp_shadow_build
 QT_BIN_DIR='/opt/Qt5.6.0/5.6/gcc_64/bin'
 QT_LIB_DIR='/opt/Qt5.6.0/5.6/gcc_64/lib'
 
-QT_LIBS=(libQt5Core libQt5Gui libQt5Concurrent)
+QT_LIBS=(libQt5Core libQt5Concurrent libQt5Gui libQt5Svg libQt5Widgets libQt5Xml)
 
 $QT_BIN_DIR/qmake ../mne-cpp/mne-cpp.pro -r
 make clean
