@@ -73,14 +73,11 @@ MNE::MNE()
 , m_bReceiveData(false)
 , m_bProcessData(false)
 , m_bFinishedClustering(false)
-//, m_qFileFwdSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
-//, m_sAtlasDir("./MNE-sample-data/subjects/sample/label")
-//, m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
-, m_qFileFwdSolution("D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721/160125_133250_4841721_Spontaneous_raw-oct-6-fwd.fif")
-, m_sAtlasDir("D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721/ID_4841721_act/label")
-, m_sSurfaceDir("D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721/ID_4841721_act/surf")
+, m_qFileFwdSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
+, m_sAtlasDir("./MNE-sample-data/subjects/sample/label")
+, m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
 , m_iNumAverages(1)
-, m_iDownSample(1)
+, m_iDownSample(4)
 {
 
 }
@@ -239,11 +236,11 @@ void MNE::calcFiffInfo()
         }
         RowVectorXi sel = m_pFiffInfoInput->pick_channels(m_qListPickChannels);
 
-        qDebug() << "m_qListPickChannels" << m_qListPickChannels;
+        //qDebug() << "m_qListPickChannels" << m_qListPickChannels;
 
         m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(m_pFiffInfoInput->pick_info(sel)));
 
-        qDebug() << "m_pFiffInfo" << m_pFiffInfo->ch_names;
+        //qDebug() << "m_pFiffInfo" << m_pFiffInfo->ch_names;
     }
 }
 
@@ -256,8 +253,8 @@ void MNE::doClustering()
 
     m_qMutex.lock();
     m_bFinishedClustering = false;
-    //m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
-    m_pClusteredFwd = m_pFwd;
+    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
+    //m_pClusteredFwd = m_pFwd;
     m_pRTSEOutput->data()->setFwdSolution(m_pClusteredFwd);
 
     m_qMutex.unlock();
@@ -478,20 +475,20 @@ void MNE::run()
         msleep(10);// Wait for fiff Info
     }
 
-    qDebug() << "m_pClusteredFwd->info.ch_names" << m_pClusteredFwd->info.ch_names;
-    qDebug() << "m_pFiffInfo->ch_names" << m_pFiffInfo->ch_names;
+    //qDebug() << "m_pClusteredFwd->info.ch_names" << m_pClusteredFwd->info.ch_names;
+    //qDebug() << "m_pFiffInfo->ch_names" << m_pFiffInfo->ch_names;
 
     //
     // Init Real-Time inverse estimator
     //
     m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd));
-    //connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated, this, &MNE::updateInvOp);
+    connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated, this, &MNE::updateInvOp);
     m_pMinimumNorm.reset();
 
     //
     // Start the rt helpers
     //
-    //m_pRtInvOp->start();
+    m_pRtInvOp->start();
 
     //
     // start processing data
@@ -499,15 +496,6 @@ void MNE::run()
     m_bProcessData = true;
 
     qint32 skip_count = 0;
-
-    QFile file("D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721/160125_133250_4841721_Spontaneous_raw-inv.fif");
-    MNEInverseOperator::SPtr invOp = MNEInverseOperator::SPtr(new MNEInverseOperator(file));
-
-    double snr = 3.0;
-    double lambda2 = 1.0 / pow(snr, 2); //ToDO estimate lambda using covariance
-    QString method("MNE"); //"MNE" | "dSPM" | "sLORETA"
-    m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(*invOp.data(), lambda2, method));
-    m_pMinimumNorm->doInverseSetup(m_iNumAverages,false);
 
     while(m_bIsRunning)
     {
