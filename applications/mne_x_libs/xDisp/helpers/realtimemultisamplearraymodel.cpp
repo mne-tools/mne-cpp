@@ -764,7 +764,9 @@ void RealTimeMultiSampleArrayModel::updateCompensator(int to)
         FiffCtfComp newComp;
         this->m_pFiffInfo->make_compensator(0, to, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
 
-        this->m_pFiffInfo->set_current_comp(to);
+        //We do not need to call this->m_pFiffInfo->set_current_comp(to);
+        //Because we will set the compensators to the coil in the same FiffInfo which is already used to write to file.
+        //Note that the data is written in raw form not in compensated form.
         m_matComp = newComp.data->data;
 
         //

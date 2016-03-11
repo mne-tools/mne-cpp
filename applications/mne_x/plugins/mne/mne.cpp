@@ -76,10 +76,7 @@ MNE::MNE()
 , m_qFileFwdSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
 , m_sAtlasDir("./MNE-sample-data/subjects/sample/label")
 , m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
-//, m_qFileFwdSolution("D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721/160125_133250_4841721_Spontaneous_filtered_1_40_raw-oct-6-fwd.fif")
-//, m_sAtlasDir("D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721/ID_4841721_act/label")
-//, m_sSurfaceDir("D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721/ID_4841721_act/surf")
-, m_iNumAverages(10)
+, m_iNumAverages(1)
 , m_iDownSample(4)
 {
 
@@ -114,7 +111,7 @@ void MNE::init()
     // Inits
     m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_qFileFwdSolution));
     m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
-    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.inflated", m_sSurfaceDir+"/rh.inflated"));
+    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.pial", m_sSurfaceDir+"/rh.pial"));
 
     // Input
     m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "MNE RTMSA In", "MNE real-time multi sample array input data");
@@ -239,11 +236,11 @@ void MNE::calcFiffInfo()
         }
         RowVectorXi sel = m_pFiffInfoInput->pick_channels(m_qListPickChannels);
 
-        qDebug() << "m_qListPickChannels" << m_qListPickChannels;
+        //qDebug() << "m_qListPickChannels" << m_qListPickChannels;
 
         m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(m_pFiffInfoInput->pick_info(sel)));
 
-        qDebug() << "m_pFiffInfo" << m_pFiffInfo->ch_names;
+        //qDebug() << "m_pFiffInfo" << m_pFiffInfo->ch_names;
     }
 }
 
@@ -443,6 +440,7 @@ void MNE::updateInvOp(MNEInverseOperator::SPtr p_pInvOp)
     QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
     m_qMutex.lock();
+
     m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(*m_pInvOp.data(), lambda2, method));
     //
     //   Set up the inverse according to the parameters
@@ -477,8 +475,8 @@ void MNE::run()
         msleep(10);// Wait for fiff Info
     }
 
-    qDebug() << "m_pClusteredFwd->info.ch_names" << m_pClusteredFwd->info.ch_names;
-    qDebug() << "m_pFiffInfo->ch_names" << m_pFiffInfo->ch_names;
+    //qDebug() << "m_pClusteredFwd->info.ch_names" << m_pClusteredFwd->info.ch_names;
+    //qDebug() << "m_pFiffInfo->ch_names" << m_pFiffInfo->ch_names;
 
     //
     // Init Real-Time inverse estimator
@@ -520,7 +518,7 @@ void MNE::run()
         {
             MatrixXd rawSegment = m_pMatrixDataBuffer->pop();
             qDebug()<<"MNE::run - Processing RTMSA data";
-            if(m_pMinimumNorm && ((skip_count % 4) == 0))
+            if(m_pMinimumNorm && ((skip_count % m_iDownSample) == 0))
             {
                 float tmin = 1 / m_pFiffInfo->sfreq;
                 float tstep = 1 / m_pFiffInfo->sfreq;
@@ -543,7 +541,7 @@ void MNE::run()
         if(t_evokedSize > 0)
         {
             qDebug()<<"MNE::run - Processing RTE data";
-            if(m_pMinimumNorm && ((skip_count % 4) == 0))
+            if(m_pMinimumNorm && ((skip_count % m_iDownSample) == 0))
             {
                 m_qMutex.lock();
                 FiffEvoked t_fiffEvoked = m_qVecFiffEvoked[0];
