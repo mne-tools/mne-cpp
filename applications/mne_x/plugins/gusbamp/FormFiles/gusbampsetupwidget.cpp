@@ -78,7 +78,7 @@ GUSBAmpSetupWidget::GUSBAmpSetupWidget(GUSBAmp* pGUSBAmp, QWidget* parent)
 
     ui.comboBox->setCurrentIndex(2);
 
-    checkBoxes();
+
 
 }
 
@@ -87,7 +87,6 @@ GUSBAmpSetupWidget::GUSBAmpSetupWidget(GUSBAmp* pGUSBAmp, QWidget* parent)
 
 GUSBAmpSetupWidget::~GUSBAmpSetupWidget()
 {
-
 }
 
 
@@ -95,7 +94,7 @@ GUSBAmpSetupWidget::~GUSBAmpSetupWidget()
 
 void GUSBAmpSetupWidget::initGui()
 {
-
+    checkBoxes();
 }
 
 
@@ -222,9 +221,12 @@ void GUSBAmpSetupWidget::checkBoxes()
     if(ui.checkBox_16->isChecked())
         list.push_back(16);
 
+    if(!list.empty())
+    {
     //store the channels-to-acquire-list in the according member variable
     m_pGUSBAmp->m_viChannelsToAcquire.resize(list.size());
     m_pGUSBAmp->m_viChannelsToAcquire = list;
+    }
 }
 
 
