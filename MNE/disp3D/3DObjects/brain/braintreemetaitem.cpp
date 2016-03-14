@@ -81,9 +81,6 @@ BrainTreeMetaItem::BrainTreeMetaItem(int iType, const QString& text)
         case BrainTreeMetaItemTypes::SurfaceColorSulci:
             sToolTip = "Color Sulci";
             break;
-        case BrainTreeMetaItemTypes::SurfaceColorInfoOrigin:
-            sToolTip = "Information used to color the surface";
-            break;
         case BrainTreeMetaItemTypes::RTDataStreamStatus:
             sToolTip = "Turn real time data streaming on/off";
             break;
@@ -149,11 +146,6 @@ void  BrainTreeMetaItem::setData(const QVariant& value, int role)
 
         case BrainTreeMetaItemRoles::SurfaceColorGyri: {
             emit curvColorsChanged();
-            break;
-        }
-
-        case BrainTreeMetaItemRoles::SurfaceColorInfoOrigin: {
-            emit colorInfoOriginChanged();
             break;
         }
 

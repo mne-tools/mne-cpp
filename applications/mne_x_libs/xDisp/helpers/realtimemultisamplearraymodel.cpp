@@ -229,9 +229,6 @@ void RealTimeMultiSampleArrayModel::init()
 
 void RealTimeMultiSampleArrayModel::initSphara()
 {
-    m_matSpharaMultFirst = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
-    m_matSpharaMultSecond = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
-
     //Load SPHARA matrices for babymeg and vectorview
     IOUtils::read_eigen_matrix(m_matSpharaVVGradLoaded, QString(":/sphara/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
     IOUtils::read_eigen_matrix(m_matSpharaVVMagLoaded, QString(":/sphara/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt"));
@@ -240,29 +237,29 @@ void RealTimeMultiSampleArrayModel::initSphara()
     IOUtils::read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QString(":/sphara/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
 
     //Generate indices used to create the SPHARA operators.
-    indicesFirstVV.resize(0);
-    indicesSecondVV.resize(0);
+    m_vecIndicesFirstVV.resize(0);
+    m_vecIndicesSecondVV.resize(0);
 
     for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
         //Find GRADIOMETERS
         if(m_pFiffInfo->chs.at(r).coil_type == 3012) {
-            indicesFirstVV.conservativeResize(indicesFirstVV.rows()+1);
-            indicesFirstVV(indicesFirstVV.rows()-1) = r;
+            m_vecIndicesFirstVV.conservativeResize(m_vecIndicesFirstVV.rows()+1);
+            m_vecIndicesFirstVV(m_vecIndicesFirstVV.rows()-1) = r;
         }
 
         //Find Magnetometers
         if(m_pFiffInfo->chs.at(r).coil_type == 3024) {
-            indicesSecondVV.conservativeResize(indicesSecondVV.rows()+1);
-            indicesSecondVV(indicesSecondVV.rows()-1) = r;
+            m_vecIndicesSecondVV.conservativeResize(m_vecIndicesSecondVV.rows()+1);
+            m_vecIndicesSecondVV(m_vecIndicesSecondVV.rows()-1) = r;
         }
     }
 
-    indicesFirstBabyMEG.resize(0);
+    m_vecIndicesFirstBabyMEG.resize(0);
     for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
         //Find INNER LAYER
         if(m_pFiffInfo->chs.at(r).coil_type == 7002) {
-            indicesFirstBabyMEG.conservativeResize(indicesFirstBabyMEG.rows()+1);
-            indicesFirstBabyMEG(indicesFirstBabyMEG.rows()-1) = r;
+            m_vecIndicesFirstBabyMEG.conservativeResize(m_vecIndicesFirstBabyMEG.rows()+1);
+            m_vecIndicesFirstBabyMEG(m_vecIndicesFirstBabyMEG.rows()-1) = r;
         }
 
         //TODO: Find outer layer
@@ -334,9 +331,6 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
         m_matSparseSpharaCompMult.setIdentity();
         m_matSparseProjCompMult.setIdentity();
 
-        //Create the initial SSP projector
-        updateProjection();
-
         //Create the initial Compensator projector
         updateCompensator(0);
 
@@ -406,7 +400,7 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
     bool doComp = m_bCompActivated && m_matDataRaw.cols() > 0 && m_matDataRaw.rows() == m_matComp.cols() ? true : false;
 
     //SPHARA
-    bool doSphara = m_bSpharaActivated && m_matSpharaMultFirst.cols() > 0 && m_matSpharaMultFirst.rows() == m_matComp.cols() && m_matSpharaMultSecond.cols() > 0 && m_matSpharaMultSecond.rows() == m_matComp.cols() ? true : false;
+    bool doSphara = m_bSpharaActivated && m_matSparseSpharaMult.cols() > 0 && m_matDataRaw.rows() == m_matSparseSpharaMult.cols() ? true : false;
 
     //Copy new data into the global data matrix
     for(qint32 b = 0; b < data.size(); ++b) {
@@ -709,7 +703,7 @@ void RealTimeMultiSampleArrayModel::updateProjection()
         }
 
         this->m_pFiffInfo->make_projector(m_matProj);
-        qDebug() << "updateProjection :: New projection calculated.";
+        qDebug() << "RealTimeMultiSampleArrayModel::updateProjection - New projection calculated.";
 
         //set columns of matrix to zero depending on bad channels indexes
         for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
@@ -770,7 +764,9 @@ void RealTimeMultiSampleArrayModel::updateCompensator(int to)
         FiffCtfComp newComp;
         this->m_pFiffInfo->make_compensator(0, to, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
 
-        this->m_pFiffInfo->set_current_comp(to);
+        //We do not need to call this->m_pFiffInfo->set_current_comp(to);
+        //Because we will set the compensators to the coil in the same FiffInfo which is already used to write to file.
+        //Note that the data is written in raw form not in compensated form.
         m_matComp = newComp.data->data;
 
         //
@@ -818,18 +814,21 @@ void RealTimeMultiSampleArrayModel::updateSpharaOptions(const QString& sSytemTyp
     if(m_pFiffInfo) {
         qDebug()<<"RealTimeMultiSampleArrayModel::updateSpharaOptions - Creating SPHARA operator for"<<sSytemType;
 
+        MatrixXd matSpharaMultFirst = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+        MatrixXd matSpharaMultSecond = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+
         if(sSytemType == "VectorView") {
-            m_matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaVVGradLoaded, indicesFirstVV, m_pFiffInfo->nchan, nBaseFctsFirst, 1); //GRADIOMETERS
-            m_matSpharaMultSecond = Sphara::makeSpharaProjector(m_matSpharaVVMagLoaded, indicesSecondVV, m_pFiffInfo->nchan, nBaseFctsSecond, 0); //Magnetometers
+            matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaVVGradLoaded, m_vecIndicesFirstVV, m_pFiffInfo->nchan, nBaseFctsFirst, 1); //GRADIOMETERS
+            matSpharaMultSecond = Sphara::makeSpharaProjector(m_matSpharaVVMagLoaded, m_vecIndicesSecondVV, m_pFiffInfo->nchan, nBaseFctsSecond, 0); //Magnetometers
         }
 
         if(sSytemType == "BabyMEG") {
-            m_matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaBabyMEGInnerLoaded, indicesFirstBabyMEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
+            matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaBabyMEGInnerLoaded, m_vecIndicesFirstBabyMEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
         }
 
         //Write final operator matrices to file
-        IOUtils::write_eigen_matrix(m_matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/m_matSpharaMultFirst.txt"));
-        IOUtils::write_eigen_matrix(m_matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/m_matSpharaMultSecond.txt"));
+        IOUtils::write_eigen_matrix(matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/matSpharaMultFirst.txt"));
+        IOUtils::write_eigen_matrix(matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/matSpharaMultSecond.txt"));
 
         //
         // Make operators sparse
@@ -843,26 +842,26 @@ void RealTimeMultiSampleArrayModel::updateSpharaOptions(const QString& sSytemTyp
 
         //First operator
         tripletList.clear();
-        tripletList.reserve(m_matSpharaMultFirst.rows()*m_matSpharaMultFirst.cols());
-        for(i = 0; i < m_matSpharaMultFirst.rows(); ++i)
-            for(k = 0; k < m_matSpharaMultFirst.cols(); ++k)
-                if(m_matSpharaMultFirst(i,k) != 0)
-                    tripletList.push_back(T(i, k, m_matSpharaMultFirst(i,k)));
+        tripletList.reserve(matSpharaMultFirst.rows()*matSpharaMultFirst.cols());
+        for(i = 0; i < matSpharaMultFirst.rows(); ++i)
+            for(k = 0; k < matSpharaMultFirst.cols(); ++k)
+                if(matSpharaMultFirst(i,k) != 0)
+                    tripletList.push_back(T(i, k, matSpharaMultFirst(i,k)));
 
         Eigen::SparseMatrix<double> matSparseSpharaMultFirst = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
 
-        matSparseSpharaMultFirst = SparseMatrix<double>(m_matSpharaMultFirst.rows(),m_matSpharaMultFirst.cols());
+        matSparseSpharaMultFirst = SparseMatrix<double>(matSpharaMultFirst.rows(),matSpharaMultFirst.cols());
         if(tripletList.size() > 0)
             matSparseSpharaMultFirst.setFromTriplets(tripletList.begin(), tripletList.end());
 
         //Second operator
         tripletList.clear();
-        tripletList.reserve(m_matSpharaMultSecond.rows()*m_matSpharaMultSecond.cols());
+        tripletList.reserve(matSpharaMultSecond.rows()*matSpharaMultSecond.cols());
 
-        for(i = 0; i < m_matSpharaMultSecond.rows(); ++i)
-            for(k = 0; k < m_matSpharaMultSecond.cols(); ++k)
-                if(m_matSpharaMultSecond(i,k) != 0)
-                    tripletList.push_back(T(i, k, m_matSpharaMultSecond(i,k)));
+        for(i = 0; i < matSpharaMultSecond.rows(); ++i)
+            for(k = 0; k < matSpharaMultSecond.cols(); ++k)
+                if(matSpharaMultSecond(i,k) != 0)
+                    tripletList.push_back(T(i, k, matSpharaMultSecond(i,k)));
 
         Eigen::SparseMatrix<double>matSparseSpharaMultSecond = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
 

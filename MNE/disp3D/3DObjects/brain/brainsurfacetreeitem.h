@@ -147,6 +147,14 @@ public slots:
 
     //=========================================================================================================
     /**
+    * Call this slot whenever visibilty of teh annoation has changed.
+    *
+    * @param[in] isVisible     The visibility flag.
+    */
+    void onAnnotationVisibilityChanged(bool isVisible);
+
+    //=========================================================================================================
+    /**
     * Call this slot whenever you want to change the visibilty of the 3D rendered content.
     *
     * @param[in] state     The visiblity flag.
@@ -168,6 +176,14 @@ private slots:
     */
     void onSurfaceAlphaChanged(float fAlpha);
 
+    //=========================================================================================================
+    /**
+    * Call this slot whenever the check box of this item was checked.
+    *
+    * @param[in] checkState        The current checkstate.
+    */
+    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
+
 private:
     //=========================================================================================================
     /**
@@ -179,12 +195,12 @@ private:
     */
     QByteArray createCurvatureVertColor(const Eigen::VectorXf& curvature, const QColor& colSulci = QColor(50,50,50), const QColor& colGyri = QColor(125,125,125));
 
+    QString                 m_sColorInfoOrigin;                         /**< The surface color origin. */
     Qt3DCore::QEntity*      m_pParentEntity;                            /**< The parent 3D entity. */
     Renderable3DEntity*     m_pRenderable3DEntity;                      /**< The renderable 3D entity. */
     Renderable3DEntity*     m_pRenderable3DEntityActivationOverlay;     /**< The renderable 3D entity used as an overlay for activity plotting. */
 
     //These are stored as member variables because we do not wat to look for them everytime we call functions, especially not when we perform rt source loc
-    BrainTreeMetaItem*      m_pItemSurfColorInfoOrigin;                 /**< The item which holds the information of the color origin (curvature or annotation). */
     BrainTreeMetaItem*      m_pItemSurfColSulci;                        /**< The item which holds the sulci color information. */
     BrainTreeMetaItem*      m_pItemSurfColGyri;                         /**< The item which holds the gyri color information. */
 

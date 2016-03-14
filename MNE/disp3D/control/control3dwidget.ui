@@ -7,8 +7,20 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>625</height>
+    <height>1000</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>1000</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>3D Control</string>
@@ -31,6 +43,12 @@
      </item>
      <item>
       <widget class="QToolBox" name="m_toolBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="currentIndex">
         <number>0</number>
        </property>
@@ -39,8 +57,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>380</width>
-          <height>522</height>
+          <width>363</width>
+          <height>1018</height>
          </rect>
         </property>
         <attribute name="label">
@@ -50,7 +68,7 @@
          <item row="0" column="0">
           <widget class="QTreeView" name="m_treeView_loadedData">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -58,7 +76,7 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>250</height>
+             <height>1000</height>
             </size>
            </property>
            <property name="mouseTracking">
@@ -82,8 +100,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>380</width>
-          <height>522</height>
+          <width>172</width>
+          <height>69</height>
          </rect>
         </property>
         <attribute name="label">

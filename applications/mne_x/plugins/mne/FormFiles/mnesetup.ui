@@ -32,7 +32,7 @@
         <item row="1" column="0" colspan="2">
          <widget class="QLabel" name="m_qLabel_surface">
           <property name="text">
-           <string>(lh + rh).white</string>
+           <string>(lh + rh).inflated</string>
           </property>
          </widget>
         </item>

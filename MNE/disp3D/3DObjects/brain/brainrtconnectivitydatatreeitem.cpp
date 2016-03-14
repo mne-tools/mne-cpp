@@ -118,6 +118,7 @@ bool BrainRTConnectivityDataTreeItem::init(const MNEForwardSolution& tForwardSol
 
 bool BrainRTConnectivityDataTreeItem::addData(const MatrixXd& matNewConnection)
 {
+    Q_UNUSED(matNewConnection)
     if(!m_bIsInit) {
         qDebug()<<"BrainRTConnectivityDataTreeItem::updateData - Rt Item has not been initialized yet!";
         return false;

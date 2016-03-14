@@ -140,6 +140,15 @@ public:
     */
     void markerMoved(QPoint position, int activeRow);
 
+public slots:
+    //=========================================================================================================
+    /**
+    * Set the signal color.
+    *
+    * @param [in] signalColor  The new signal color.
+    */
+    void setSignalColor(const QColor& signalColor);
+
 private:
     //=========================================================================================================
     /**
@@ -217,8 +226,6 @@ private:
     * @param[in,out] path   The QPointerPath to create for the data plot.
     */
     void createMarkerPath(const QStyleOptionViewItem &option, QPainterPath& path) const;
-
-
 
     //Settings
 //    QSettings m_qSettings;
