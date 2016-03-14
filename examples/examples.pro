@@ -54,7 +54,8 @@ SUBDIRS += \
     makeLayout\
     readBEM\
     patientManager \
-    testWarp
+    testWarp \
+    histogram
 
 contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += \
