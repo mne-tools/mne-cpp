@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include "../ui_noisereductionoptionswidget.h"
+#include "fiff/fiff_info.h"
 
 
 //*************************************************************************************************************
@@ -50,6 +51,7 @@
 //=============================================================================================================
 
 #include <QWidget>
+#include <QSignalMapper>
 
 
 //*************************************************************************************************************
@@ -98,6 +100,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Set the fiff info.
+    *
+    * @param[in] pFiffInfo    The new FiffInfo.
+    */
+    void setFiffInfo(const FIFFLIB::FiffInfo::SPtr pFiffInfo);
+
+    //=========================================================================================================
+    /**
     * Set the acquisition system type (BabyMEG, VecotrView, EEG).
     *
     * @param[in] sSystem    The type of the acquisition system.
@@ -107,14 +117,73 @@ public:
 protected slots:
     //=========================================================================================================
     /**
+    * Slot called when the projector check state changes
+    */
+    void onCheckProjStatusChanged(bool state);
+
+    //=========================================================================================================
+    /**
+    * Slot called when user enables/disables all projectors
+    */
+    void onEnableDisableAllProj(bool status);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the compensator check state changes
+    */
+    void onCheckCompStatusChanged(const QString & compName);
+
+    //=========================================================================================================
+    /**
     * Call this slot whenever the number basis functions changed.
     */
     void onNBaseFctsChanged();
 
+protected:
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the projector group
+    */
+    void createProjectorGroup();    
+
+    //=========================================================================================================
+    /**
+    * Create the widgets used in the compensator group
+    */
+    void createCompensatorGroup();
+
 private:
-    Ui::NoiseReductionOptionsWidgetClass*   ui;                         /**< The UI class specified in the designer. */
+    Ui::NoiseReductionOptionsWidgetClass*   ui;                             /**< The UI class specified in the designer. */
 
     NoiseReductionPlugin::NoiseReduction*   m_pNoiseReductionToolbox;
+
+    FIFFLIB::FiffInfo::SPtr                 m_pFiffInfo;                    /**< Connected fiff info. */
+
+    QList<QCheckBox*>                       m_qListProjCheckBox;            /**< List of projection CheckBox. */
+    QList<QCheckBox*>                       m_qListCompCheckBox;            /**< List of compensator CheckBox. */
+
+    QCheckBox *                             m_enableDisableProjectors;      /**< Holds the enable disable all check box. */
+
+    QSignalMapper*                          m_pCompSignalMapper;            /**< The signal mapper. */
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changes the projections.
+    */
+    void projSelectionChanged();
+
+    //=========================================================================================================
+    /**
+    * Signal mapper signal for compensator changes.
+    */
+    void compClicked(const QString& text);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user changes the compensator.
+    */
+    void compSelectionChanged(int to);
 };
 
 #endif // NOISEREDUCTIONOPTIONSWIDGET_H

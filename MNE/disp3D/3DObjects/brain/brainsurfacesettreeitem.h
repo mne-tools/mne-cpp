@@ -164,7 +164,7 @@ private slots:
     *
     * @param[in] checkState        The current checkstate.
     */
-    void onCheckStateChanged(const Qt::CheckState& checkState);
+    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 };
 
 } //NAMESPACE DISP3DLIB

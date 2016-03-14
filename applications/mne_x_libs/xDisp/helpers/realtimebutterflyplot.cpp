@@ -36,11 +36,12 @@ RealTimeButterflyPlot::RealTimeButterflyPlot(QWidget *parent)
 , m_pRealTimeEvokedModel(NULL)
 , m_bIsInit(false)
 , m_iNumChannels(-1)
-, showMAG(true)
-, showGRAD(true)
-, showEEG(true)
-, showEOG(true)
-, showMISC(true)
+, m_bShowMAG(true)
+, m_bShowGRAD(true)
+, m_bShowEEG(true)
+, m_bShowEOG(true)
+, m_bShowMISC(true)
+, m_colCurrentBackgroundColor(Qt::white)
 {
 }
 
@@ -65,12 +66,12 @@ void RealTimeButterflyPlot::dataUpdate(const QModelIndex& topLeft, const QModelI
 
 //*************************************************************************************************************
 
-void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
+void RealTimeButterflyPlot::paintEvent(QPaintEvent* paintEvent)
 {
     QPainter painter(this);
 
     painter.save();
-    painter.setBrush(QBrush(Qt::white));
+    painter.setBrush(QBrush(m_colCurrentBackgroundColor));
     painter.drawRect(QRect(0,0,this->width()-1,this->height()-1));
     painter.restore();
 
@@ -178,14 +179,14 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
                     case FIFFV_MEG_CH: {
                         qint32 unit = m_pRealTimeEvokedModel->getUnit(r);
                         if(unit == FIFF_UNIT_T_M) {
-                            if(showGRAD)
+                            if(m_bShowGRAD)
                                 break;
                             else
                                 continue;
                         }
                         else if(unit == FIFF_UNIT_T)
                         {
-                            if(showMAG)
+                            if(m_bShowMAG)
                                 break;
                             else
                                 continue;
@@ -193,19 +194,19 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
                         continue;
                     }
                     case FIFFV_EEG_CH: {
-                        if(showEEG)
+                        if(m_bShowEEG)
                             break;
                         else
                             continue;
                     }
                     case FIFFV_EOG_CH: {
-                        if(showEOG)
+                        if(m_bShowEOG)
                             break;
                         else
                             continue;
                     }
                     case FIFFV_MISC_CH: {
-                        if(showMISC)
+                        if(m_bShowMISC)
                             break;
                         else
                             continue;
@@ -232,6 +233,8 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
             }
         }
     }
+
+    return QWidget::paintEvent(paintEvent);
 }
 
 
@@ -377,31 +380,31 @@ void RealTimeButterflyPlot::setSettings(const QList< Modality >& p_qListModaliti
     {
         if(p_qListModalities[i].m_sName == ("GRAD"))
         {
-            showGRAD = p_qListModalities[i].m_bActive;
-            fMaxGRAD = p_qListModalities[i].m_fNorm;
+            m_bShowGRAD = p_qListModalities[i].m_bActive;
+            m_fMaxGRAD = p_qListModalities[i].m_fNorm;
         }
 
         if(p_qListModalities[i].m_sName == ("MAG"))
         {
-            showMAG = p_qListModalities[i].m_bActive;
-            fMaxMAG = p_qListModalities[i].m_fNorm;
+            m_bShowMAG = p_qListModalities[i].m_bActive;
+            m_fMaxGRAD = p_qListModalities[i].m_fNorm;
         }
         if(p_qListModalities[i].m_sName == ("EEG"))
         {
-            showEEG = p_qListModalities[i].m_bActive;
-            fMaxEEG = p_qListModalities[i].m_fNorm;
+            m_bShowEEG = p_qListModalities[i].m_bActive;
+            m_fMaxEEG = p_qListModalities[i].m_fNorm;
 
         }
         if(p_qListModalities[i].m_sName == ("EOG"))
         {
-            showEOG = p_qListModalities[i].m_bActive;
-            fMaxEOG = p_qListModalities[i].m_fNorm;
+            m_bShowEOG = p_qListModalities[i].m_bActive;
+            m_fMaxEOG = p_qListModalities[i].m_fNorm;
 
         }
         if(p_qListModalities[i].m_sName == ("MISC"))
         {
-            showMISC = p_qListModalities[i].m_bActive;
-            fMaxMISC = p_qListModalities[i].m_fNorm;
+            m_bShowMISC = p_qListModalities[i].m_bActive;
+            m_fMaxMISC = p_qListModalities[i].m_fNorm;
 
         }
     }
@@ -424,4 +427,22 @@ void RealTimeButterflyPlot::setSelectedChannels(const QList<int> &selectedChanne
 void RealTimeButterflyPlot::updateView()
 {
     update();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeButterflyPlot::setBackgroundColor(const QColor& backgroundColor)
+{
+    m_colCurrentBackgroundColor = backgroundColor;
+
+    update();
+}
+
+
+//*************************************************************************************************************
+
+const QColor& RealTimeButterflyPlot::getBackgroundColor()
+{
+    return m_colCurrentBackgroundColor;
 }

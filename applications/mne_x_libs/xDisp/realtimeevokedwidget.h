@@ -189,7 +189,7 @@ public:
     */
     void scaleAveragedData(const QMap<qint32, float> &scaleMap);
 
-private:
+private slots:
     //=========================================================================================================
     /**
     * Shows sensor selection widget
@@ -226,12 +226,6 @@ private:
 
     //=========================================================================================================
     /**
-    * Reimplemented eventFilter
-    */
-    bool virtual eventFilter(QObject *object, QEvent *event);
-
-    //=========================================================================================================
-    /**
     * call this function whenever a selection was made in teh evoked data set list
     */
     void onSelectionChanged();
@@ -244,9 +238,40 @@ private:
 
     //=========================================================================================================
     /**
+    * Broadcast the signal color changes made in the QuickControl widget
+    *
+    * @param [in] backgroundColor  The new signal color.
+    */
+    void onSignalColorChanged(const QColor& signalColor);
+
+    //=========================================================================================================
+    /**
+    * Broadcast the background color changes made in the QuickControl widget
+    *
+    * @param [in] backgroundColor  The new background color.
+    */
+    void onTableViewBackgroundColorChanged(const QColor& backgroundColor);
+
+    //=========================================================================================================
+    /**
+    * Call this slot whenever you want to make a screenshot of the butterfly or layout view.
+    *
+    * @param[out] imageType     The current iamge type: png, svg.
+    */
+    void onMakeScreenshot(const QString& imageType);
+
+private:
+    //=========================================================================================================
+    /**
     * Reimplemented mouseWheelEvent
     */
-    virtual void wheelEvent(QWheelEvent * event);
+    virtual void wheelEvent(QWheelEvent * event);    
+
+    //=========================================================================================================
+    /**
+    * Reimplemented eventFilter
+    */
+    bool virtual eventFilter(QObject *object, QEvent *event);
 
     RealTimeEvokedModel::SPtr           m_pRTEModel;                /**< RTE data model */
     RealTimeButterflyPlot::SPtr         m_pButterflyPlot;           /**< Butterfly plot */

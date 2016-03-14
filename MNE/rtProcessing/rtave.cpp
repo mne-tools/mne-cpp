@@ -302,14 +302,25 @@ void RtAve::run()
 
                     m_bFillingBackBuffer = false;
 
-                    qDebug()<<"Number of calculated averages:"<<m_iNumberCalcAverages;
-                } else
+                    qDebug()<<"RtAve::run() - Number of calculated averages:"<<m_iNumberCalcAverages;
+                    qDebug()<<"RtAve::run() - m_qListStimAve.size():"<<m_qListStimAve.size();
+                } else {
                     fillBackBuffer(rawSegment);
+                }
             } else {
                 clearDetectedTriggers();
 
-                //Detect trigger for all stim channels. If detected turn on filling of the back / post stim buffer
-                if(DetectTrigger::detectTriggerFlanksGrad(rawSegment, m_iTriggerIndex, m_iTriggerPos, 0, m_fTriggerThreshold, true, "Rising")) {
+                //Detect trigger for all stim channels.
+                m_iTriggerPos = -1;
+                DetectTrigger::detectTriggerFlanksGrad(rawSegment, m_iTriggerIndex, m_iTriggerPos, 0, m_fTriggerThreshold, true, "Rising");
+
+                //If number of averages is equals zero do not perform averages
+                if(m_iNumAverages == 0) {
+                    m_iTriggerPos = rawSegment.cols()-1;
+                }
+
+                //If detected turn on filling of the back / post stim buffer
+                if(m_iTriggerPos != -1) {
                     //Do front buffer stuff
                     MatrixXd tempMat;
 
@@ -398,8 +409,14 @@ void RtAve::mergeData()
 
     //Add cut data to average buffer
     m_qListStimAve.append(mergedData);
-    if(m_qListStimAve.size()>m_iNumAverages)
+    if(m_qListStimAve.size()>m_iNumAverages && m_iNumAverages >= 1) {
         m_qListStimAve.pop_front();
+    }
+
+    //Proceed a bit different if we use zero number of averages
+    if(m_qListStimAve.size() > 1 && m_iNumAverages == 0) {
+        m_qListStimAve.pop_front();
+    }
 }
 
 
