@@ -221,6 +221,9 @@ void RealTimeMultiSampleArrayWidget::broadcastScaling(QMap<qint32,float> scaleMa
 
 void RealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
+    qDebug()<<"RealTimeMultiSampleArrayWidget::update";
+
+
     if(!m_bInitialized)
     {
         if(m_pRTMSA->isChInit())
@@ -228,6 +231,7 @@ void RealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
             m_qListChInfo = m_pRTMSA->chInfo(); //ToDo Obsolete -> use fiffInfo instead
             m_pFiffInfo = m_pRTMSA->info();
 
+            qDebug()<<"RealTimeMultiSampleArrayWidget::update - m_pFiffInfo->chs.size()"<<m_pFiffInfo->chs.size();
             emit fiffFileUpdated(*m_pFiffInfo.data());
 
             m_fSamplingRate = m_pRTMSA->getSamplingRate();
