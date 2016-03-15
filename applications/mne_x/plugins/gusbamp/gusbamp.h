@@ -34,6 +34,9 @@
 *
 */
 
+
+
+
 #ifndef GUSBAMP_H
 #define GUSBAMP_H
 
@@ -43,10 +46,11 @@
 // INCLUDES
 //=============================================================================================================
 #include "gusbamp_global.h"
-
 #include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
+
+
 
 
 //*************************************************************************************************************
@@ -57,6 +61,9 @@
 #include <QtWidgets>
 
 #include "FormFiles/gusbampsetupwidget.h"
+#include "FormFiles/gusbampsetupprojectwidget.h"
+
+
 
 
 //*************************************************************************************************************
@@ -101,7 +108,7 @@ class GUSBAmpProducer;
 /**
 * GUSBAmp...
 *
-* @brief The GUSBAmp class provides an EEG connector for the gTrec USBAmp device.
+* @brief The GUSBAmp class provides an EEG connector for the gTec USBAmp device.
 */
 class GUSBAMPSHARED_EXPORT GUSBAmp : public ISensor
 {
@@ -112,6 +119,7 @@ class GUSBAMPSHARED_EXPORT GUSBAmp : public ISensor
 
     friend class GUSBAmpProducer;
     friend class GUSBAmpSetupWidget;
+    friend class GUSBAmpSetupProjectWidget;
 
 public:
     //=========================================================================================================
@@ -125,6 +133,12 @@ public:
     * Destroys the GUSBAmp.
     */
     virtual ~GUSBAmp();
+
+    //=========================================================================================================
+    /**
+    * building all setting for the FIFF-data-stream
+    */
+    void setUpFiffInfo();
 
     //=========================================================================================================
     /**
@@ -156,10 +170,36 @@ public:
     */
     virtual bool stop();
 
+    //=========================================================================================================
+    /**
+    * Opens a dialog to setup the project to check the impedance values
+    */
+    void showSetupProjectDialog();
+
+    //=========================================================================================================
+    /**
+    * Starts data recording
+    */
+    void showStartRecording();
+
+    //=========================================================================================================
+    /**
+    * Implements blinking recording button
+    */
+    void changeRecordingButton();
+
+    //=========================================================================================================
+    /**
+    * Checks if a dir exists
+    */
+    bool dirExists(const std::string& dirName_in);
+
     virtual IPlugin::PluginType getType() const;
     virtual QString getName() const;
 
     virtual QWidget* setupWidget();
+
+    void splitRecordingFile();
 
 protected:
     //=========================================================================================================
@@ -171,7 +211,8 @@ protected:
     virtual void run();
 
 private:
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRMTSA_GUSBAmp;   /**< The RealTimeSampleArray to provide the EEG data.*/
+    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_GUSBAmp;               /**< The RealTimeSampleArray to provide the EEG data.*/
+    QSharedPointer<GUSBAmpSetupProjectWidget>           m_pGUSBampSetupProjectWidget;   /**< Widget for setup the project file*/
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
@@ -180,6 +221,31 @@ private:
     QSharedPointer<RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/
 
     QSharedPointer<GUSBAmpProducer>     m_pGUSBAmpProducer;                 /**< the GUSBAmpProducer.*/
+
+    QSharedPointer<FiffInfo>            m_pFiffInfo;                        /**< Fiff measurement info.*/
+
+    vector<QString>     m_vSerials;                 /**< vector of all Serials (the first one is the master) */
+    int                 m_iSampleRate;              /**< the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!)*/
+    int                 m_iSamplesPerBlock;         /**< The samples per block defined by the user via the GUI. */
+    UCHAR               m_iNumberOfChannels;        /**< the channels that should be acquired from each device */
+    vector<int>         m_viSizeOfSampleMatrix;     /**< vector including the size of the two dimensional sample Matrix */
+    vector<int>         m_viChannelsToAcquire;      /**< vector of the calling numbers of the channels to be acquired */
+    bool                m_bWriteToFile;             /**< Flag for File writing*/
+//write data to fiff-file
+    FiffStream::SPtr    m_pOutfid;                  /**< QFile for writing to fif file.*/
+    RowVectorXd         m_cals;
+    bool                m_bSplitFile;               /**< Flag for splitting the recorded file.*/
+    int                 m_iSplitFileSizeMs;         /**< Holds the size of the splitted files in ms.*/
+    int                 m_iSplitCount;              /**< File split count */
+    QString             m_sOutputFilePath;          /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
+    QFile               m_fileOut;                  /**< QFile for writing to fiff file.*/
+
+    QSharedPointer<QTimer>  m_pTimerRecordingChange;    /**< timer to control blinking of the recording icon */
+    qint16                  m_iBlinkStatus;             /**< flag for recording icon blinking */
+
+    QAction*            m_pActionStartRecording;    /**< starts to record data */
+    QAction*            m_pActionSetupProject;      /**< shows setup project dialog */
+
 };
 
 } // NAMESPACE
