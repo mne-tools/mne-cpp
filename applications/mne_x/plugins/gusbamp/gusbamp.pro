@@ -2,10 +2,10 @@
 #
 # @file     GUSBAmp.pro
 # @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+#           Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     September, 2013
+# @date     Oktober 2016
 #
 # @section  LICENSE
 #
@@ -63,7 +63,7 @@ DEFINES += GUSBAMP_LIBRARY
 
 QT += core widgets svg
 
-TARGET = gusbamp
+TARGET = gusbamp_temp
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -95,7 +95,8 @@ SOURCES += \
         gusbampproducer.cpp \
         gusbampdriver.cpp \
         FormFiles/gusbampsetupwidget.cpp \
-        FormFiles/gusbampaboutwidget.cpp
+        FormFiles/gusbampaboutwidget.cpp \
+    FormFiles/gusbampsetupprojectwidget.cpp
 
 HEADERS += \
         gusbamp.h\
@@ -103,11 +104,15 @@ HEADERS += \
         gusbampproducer.h \
         gusbampdriver.h \
         FormFiles/gusbampsetupwidget.h \
-        FormFiles/gusbampaboutwidget.h
+        FormFiles/gusbampaboutwidget.h \
+    gtec_gUSBamp.h \
+    ringbuffer.h \
+    FormFiles/gusbampsetupprojectwidget.h
 
 FORMS += \
         FormFiles/gusbampsetupwidget.ui \
-        FormFiles/gusbampabout.ui
+        FormFiles/gusbampabout.ui \
+    FormFiles/gusbampsetupprojectwidget.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

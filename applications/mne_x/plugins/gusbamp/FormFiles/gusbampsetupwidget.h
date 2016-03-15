@@ -104,6 +104,65 @@ public:
     */
     void initGui();
 
+    //=========================================================================================================
+    /**
+    * checks all the checkBoxes for their corresponding channels and sets the the vector for the
+    * cannel-selection
+    *
+    */
+    void checkBoxes();
+
+
+private slots:
+
+    //=========================================================================================================
+    /**
+    * push-button-click for setting the serial adresses for master and slaves
+    *
+    */
+    void on_pushButton_clicked();
+
+    //=========================================================================================================
+    /**
+    * activate or deactivate groupbox for singel-channel-select
+    *
+    */
+    void on_ChannelSelect_clicked(bool checked);
+
+    void on_checkBox_clicked();
+
+    void on_checkBox_2_clicked();
+
+    void on_checkBox_3_clicked();
+
+    void on_checkBox_4_clicked();
+
+    void on_checkBox_5_clicked();
+
+    void on_checkBox_6_clicked();
+
+    void on_checkBox_7_clicked();
+
+    void on_checkBox_8_clicked();
+
+    void on_checkBox_9_clicked();
+
+    void on_checkBox_10_clicked();
+
+    void on_checkBox_11_clicked();
+
+    void on_checkBox_12_clicked();
+
+    void on_checkBox_13_clicked();
+
+    void on_checkBox_14_clicked();
+
+    void on_checkBox_15_clicked();
+
+    void on_checkBox_16_clicked();
+
+    void on_comboBox_currentIndexChanged(const QString &arg1);
+
 private:
     //=========================================================================================================
     /**
@@ -112,9 +171,11 @@ private:
     */
     void showAboutDialog();
 
-    GUSBAmp*               m_pGUSBAmp;                 /**< a pointer to corresponding GUSBAmp.*/
+    GUSBAmp*               m_pGUSBAmp;              /**< a pointer to corresponding GUSBAmp.*/
 
     Ui::GUSBAmpSetupClass  ui;                      /**< the user interface for the GUSBAmpSetupWidget.*/
+
+
 };
 
 } // NAMESPACE
