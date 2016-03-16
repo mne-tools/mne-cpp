@@ -106,7 +106,6 @@ HEADERS += \
         FormFiles/gusbampsetupwidget.h \
         FormFiles/gusbampaboutwidget.h \
     gtec_gUSBamp.h \
-    ringbuffer.h \
     FormFiles/gusbampsetupprojectwidget.h
 
 FORMS += \
