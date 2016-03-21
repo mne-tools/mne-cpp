@@ -1,8 +1,14 @@
-echo off
-:: %0 Build Number
-set arg0=%0
+:: ###startdir### %WORKSPACE%/mne-cpp/..
 
-echo Starting MNE-CPP Windows Installer Build %arg0%
+echo off
+:: ### %0 Batch filename itself ###
+set arg0=%0
+:: ### %1 First command line parameter - suffix ###
+set arg1=%1
+if "%arg1%"=="" set arg1=default
+set filename=mne-cpp-windows-x86_64-%arg1%.exe
+
+echo Starting MNE-CPP Windows Installer Build; file name: %filename%
 
 mkdir mne-cpp_installer_shadow_build
 cd mne-cpp_installer_shadow_build
@@ -66,4 +72,7 @@ nmake clean
 nmake
 
 cd ..
-copy ".\mne-cpp_installer_shadow_build\mne-cpp-windows-x86_64-1.0.0-beta.exe" ".\"
+cd ".\mne-cpp_installer_shadow_build\"
+ren mne-cpp-windows-x86_64.exe %filename%
+cd ..
+copy ".\mne-cpp_installer_shadow_build\%filename%" ".\"
