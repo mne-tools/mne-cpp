@@ -55,7 +55,8 @@ SUBDIRS += \
     readBEM\
     patientManager \
     testWarp \
-    histogram
+    histogram \
+    Histogram_chart
 
 contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += \
