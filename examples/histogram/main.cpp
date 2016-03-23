@@ -79,33 +79,24 @@ using namespace std;
 * @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
 * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
 */
-struct matrixRange
-{
-    double rawMin;
-    double rawMax;
-    double localMin;
-    double localMax;
-    double globalMin;
-    double globalMax;
-};
-    matrixRange temp_MatrixRange = {0.0,0.0,0.0,0.0,-0.1,0.1};   // initial value of 0.0 for the variables in matrixRange
 
-struct classInformation
+struct vecResultClassLimits
 {
     QVector<double> upperClassLimit;
-    QVector<int> classFrequency;
+};
+struct vecResultFrequency
+{
+    QVector<int> frequencyNumber;
 };
 
 // This function finds the minimum and maximum value from the data matrix and returns the range of raw data
-matrixRange findRawLocalMinMax(const MatrixXd& data, bool transposeOption, matrixRange range = temp_MatrixRange)
+std::vector<double> findRawLocalMinMax(const MatrixXd& data, bool bTransposeOption)
 {
-    double rawMin = range.rawMin,
-           rawMax = range.rawMax,
-           localMin = range.localMin,
-           localMax = range.localMax,
-           globalMin = range.globalMin,
-           globalMax = range.globalMax;
-    bool doTranspose = transposeOption;
+    std::vector<double> rawLocalMinMax(4,0.0);
+    double rawMin = rawLocalMinMax[0],
+           rawMax = rawLocalMinMax[1],
+           localMin = rawLocalMinMax[2],
+           localMax = rawLocalMinMax[3];
 
     rawMin = data.minCoeff();    //finds the raw matrix minimum value
     rawMax = data.maxCoeff();    //finds the raw matrix maximum value
@@ -114,7 +105,7 @@ matrixRange findRawLocalMinMax(const MatrixXd& data, bool transposeOption, matri
     std::cout << "rawMin =" << rawMin << "\n";
     std::cout << "rawMax =" << rawMax << "\n";
 
-    if (doTranspose == true)             //if user chooses to transpose, negative values will be turned into positive
+    if (bTransposeOption == true)             //if user chooses to transpose, negative values will be turned into positive
 {
         if (rawMin < 0.0)               //in case the raw minimum is a negative value, turn it to positive
         {
@@ -145,12 +136,11 @@ matrixRange findRawLocalMinMax(const MatrixXd& data, bool transposeOption, matri
             localMin = 0.0;
             localMax = rawMax;
         }
-
 }
-                                        //if user chooses not to transpose, the raw values will be left as the original
+
     else
     {
-        //the following conditional statements are used to ensure that the minimum and maximum
+        //if bTransposeOption = false, do the following
         if (abs(rawMin) > rawMax)       //in case the negative side is larger than the positive side
         {
             localMax = abs(rawMin);     //positive side is "stretched" to the exact length as negative side
@@ -168,22 +158,17 @@ matrixRange findRawLocalMinMax(const MatrixXd& data, bool transposeOption, matri
             localMax = rawMax;
         }
     }
-
-
-    std::cout << "localMin =" << localMin << "\n";
-    std::cout << "localMax =" << localMax << "\n";
-    std::cout << "globalMin =" << globalMin << "\n";
-    std::cout << "globalMax =" << globalMax << "\n";
-    matrixRange matrixInfo ={rawMin, rawMax, localMin, localMax, globalMin, globalMax};
-    return matrixInfo;
+    rawLocalMinMax = {rawMin, rawMax, localMin, localMax};
+    return rawLocalMinMax;
 }
 
-// This function normalizes the data matrix into desired range before sorting
-MatrixXd normalize(const MatrixXd& rawMatrix, matrixRange range, std::string transposeOption)
+// This function normalizes the data matrix into desired range before sorting [***untested and not used***]
+/**MatrixXd normalize(const MatrixXd& rawMatrix, matrixRange range, std::string transposeOption, vector temp_MatrixRange)
 {
     MatrixXd normalizedValue;
     bool doLocalScale = false;
-    std::string doTranspose = transposeOption;
+    std::string bTransposeOption = transposeOption;
+    std::vector range = findRawLocalMinMax(rawMatrix, transposeOption, temp_MatrixRange);
     if (range.globalMin == 0.0 && range.globalMax == 0.0)       //if global range is NOT given by the user, use local scaling
     {
         doLocalScale = true;
@@ -214,110 +199,91 @@ MatrixXd normalize(const MatrixXd& rawMatrix, matrixRange range, std::string tra
     }
     return normalizedValue;  //returns the normalized matrix to main();
 }
+*/
 
-// This function sorts the data matrix into classes with width and frequency
-void sort(const MatrixXd& matPresortedData, matrixRange rawLocalGlobalRange, bool transposeOption, int iClassAmount)
+
+// This function sorts the data matrix and returns 2 vectors; one is filled with the class limits, the other with class frequency
+void sort(const MatrixXd& matPresortedData, bool bTransposeOption, int iClassAmount, QVector<double>& vecResultClassLimits, QVector<int>& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0)
 {
-    int numberOfClass = iClassAmount;
-    QVector <double>classInformation((2 * numberOfClass)+1);    //dynamically initialize amount of classes and class frequency, position 0 is used for the minimum point
+    vecResultClassLimits.clear();
+    vecResultFrequency.clear();
+    vecResultClassLimits.resize(iClassAmount + 1);
+    vecResultFrequency.resize(iClassAmount);
+
     double desiredMin,
            desiredMax,
            tempValue;
-    bool doTranspose = transposeOption;
     int ir{0}, jr{0}, kr{0};
-
+    std::vector<double> rawLocalMinMax = findRawLocalMinMax(matPresortedData, bTransposeOption);
     //This if and else function selects either local or global range (according to user preference and input)
-    if (rawLocalGlobalRange.globalMin == 0.0 && rawLocalGlobalRange.globalMax == 0.0)       //if global range is NOT given by the user, use local ranges
+    if (dGlobalMin == 0.0 && dGlobalMax == 0.0)       //if global range is NOT given by the user, use local ranges
     {
-        desiredMin = rawLocalGlobalRange.localMin;
-        desiredMax = rawLocalGlobalRange.localMax;
-        classInformation[0] = rawLocalGlobalRange.localMin;                 //replace default value with local minimum at position 0
-        classInformation[numberOfClass + 1] = rawLocalGlobalRange.localMax; //replace default value with local maximum at position n
+        desiredMin = rawLocalMinMax.at(2);
+        desiredMax = rawLocalMinMax.at(3);
+        vecResultClassLimits[0] = desiredMin;                 //replace default value with local minimum at position 0
+        vecResultClassLimits[iClassAmount] = desiredMax;     //replace default value with local maximum at position n
         std::cout << "Local Range chosen! \n";
-        std::cout << "desiredMin =" << classInformation[0] <<"\n";
-        std::cout << "desiredMax =" << classInformation[numberOfClass + 1] <<"\n";
+        std::cout << "desiredMin =" << vecResultClassLimits[0] <<"\n";
+        std::cout << "desiredMax =" << vecResultClassLimits[iClassAmount] <<"\n";
     }
     else
     {
-        desiredMin = rawLocalGlobalRange.globalMin;
-        desiredMax = rawLocalGlobalRange.globalMax;
-        classInformation[0]= rawLocalGlobalRange.globalMin;                 //replace default value with global minimum at position 0
-        classInformation[numberOfClass + 1]= rawLocalGlobalRange.globalMax; //replace default value with global maximum at position n
+        desiredMin = dGlobalMin;
+        desiredMax = dGlobalMax;
+        vecResultClassLimits[0]= desiredMin;                 //replace default value with global minimum at position 0
+        vecResultClassLimits[iClassAmount]= desiredMax;     //replace default value with global maximum at position n
         std::cout << "Global Range chosen!\n";
-        std::cout << "desiredMin =" << classInformation[0] <<"\n";
-        std::cout << "desiredMax =" << classInformation[numberOfClass + 1] <<"\n";
+        std::cout << "desiredMin =" << vecResultClassLimits[0] <<"\n";
+        std::cout << "desiredMax =" << vecResultClassLimits[iClassAmount] <<"\n";
     }
-
-    if (doTranspose == true)     //sort the matrix after turning negative values to positive
-    {
-        double	range = (classInformation[numberOfClass + 1] - classInformation[0]),                                    //calculates the length from maximum positive value to zero
+        double	range = (vecResultClassLimits[iClassAmount] - vecResultClassLimits[0]),                                    //calculates the length from maximum positive value to zero
                 dynamicUpperClassLimit;
-        for (kr = 0; kr <= numberOfClass; ++kr)                                          //dynamically initialize the upper class limit values prior to the sorting mecahnism
+        for (kr = 0; kr < iClassAmount; kr++)                                          //dynamically initialize the upper class limit values prior to the sorting mecahnism
         {
-            dynamicUpperClassLimit = (classInformation[0] + (kr*(range/numberOfClass))); //generic formula to determine the upper class limit with respect to range and number of class
-            classInformation[kr] = dynamicUpperClassLimit;                               //places the appropriate upper class limit value to the right position in the QVector
+            dynamicUpperClassLimit = (vecResultClassLimits[0] + (kr*(range/iClassAmount))); //generic formula to determine the upper class limit with respect to range and number of class
+            vecResultClassLimits[kr] = dynamicUpperClassLimit;                               //places the appropriate upper class limit value to the right position in the QVector
         }
 
-        for (ir = 0; ir < matPresortedData.cols(); ir++)              //iterates through all columns of the data matrix
+        if (bTransposeOption == true)     //sort the matrix after turning negative values to positive
         {
-            for (jr = 0; jr<matPresortedData.rows(); jr++)            //iterates through all rows of the data matrix
+            for (ir = 0; ir < matPresortedData.cols(); ir++)              //iterates through all columns of the data matrix
             {
-                tempValue = abs(matPresortedData(ir,jr));       //turns all values in the matrix into positive
-                for (kr = 0; kr <= numberOfClass; ++kr)         //starts iteration from 1 to numberOfClass
+                for (jr = 0; jr<matPresortedData.rows(); jr++)            //iterates through all rows of the data matrix
                 {
-                    if (tempValue >= classInformation.at(kr - 1) && tempValue < classInformation.at(kr))    //compares value in the matrix with lower and upper limit of each class
+                    tempValue = abs(matPresortedData(ir,jr));       //turns all values in the matrix into positive
+                    for (kr = 0; kr < iClassAmount; kr++)         //starts iteration from 1 to iClassAmount
                     {
-                        (classInformation[(numberOfClass + kr)])++ ; //if the value fits both arguments, the appropriate class frequency is increased by 1
+                        if (tempValue >= vecResultClassLimits.at(kr) && tempValue < vecResultClassLimits.at(kr + 1))    //compares value in the matrix with lower and upper limit of each class
+                        {
+                            (vecResultFrequency[kr])++ ; //if the value fits both arguments, the appropriate class frequency is increased by 1
+                        }
                     }
                 }
             }
         }
-    }
-    else if (doTranspose == false)        //sort the matrix without transposing negative values to positive
-    {
-        double	range = (classInformation[numberOfClass + 1] - classInformation[0]),                                      //calculates the length from maximum positive value to zero
-                dynamicUpperClassLimit;
 
-        for (kr = 0; kr <= numberOfClass; ++kr)                                          //dynamically initialize the upper class limit values prior to the sorting mecahnism
+        else if (bTransposeOption == false)        //sort the matrix without transposing negative values to positive
         {
-            dynamicUpperClassLimit = (classInformation[0] + (kr*(range/numberOfClass))); //generic formula to determine the upper class limit with respect to range and number of class
-            classInformation[kr] = dynamicUpperClassLimit;                               //places the appropriate upper class limit value to the right position in the QVector
-        }
-
-        for (ir = 0; ir < matPresortedData.cols(); ir++)        //iterates through every column of the data matrix
-        {
-            for (jr = 0; jr<matPresortedData.rows(); jr++)      //iterates through every row of the data matrix
+            for (ir = 0; ir < matPresortedData.cols(); ir++)        //iterates through every column of the data matrix
             {
-                for (kr = 0; kr <= numberOfClass; ++kr)         //starts iteration from 1 to numberOfClass
+                for (jr = 0; jr < matPresortedData.rows(); jr++)      //iterates through every row of the data matrix
                 {
-                    if (matPresortedData(ir,jr) >= classInformation.at(kr - 1) && matPresortedData(ir,jr) < classInformation.at(kr))    //compares value in the matrix with lower and upper limit of each class
+                    for (kr = 0; kr < iClassAmount; kr++)         //starts iteration from 1 to iClassAmount
                     {
-                        classInformation[(numberOfClass + kr)]++ ; //if the value fits both arguments, the appropriate class frequency is increased by 1
+                        if (matPresortedData(ir,jr) >= vecResultClassLimits.at(kr) && matPresortedData(ir,jr) < vecResultClassLimits.at(kr + 1))    //compares value in the matrix with lower and upper limit of each class
+                        {
+                            vecResultFrequency[(kr)]++ ; //if the value fits both arguments, the appropriate class frequency is increased by 1
+                        }
                     }
                 }
             }
         }
-    }
 
     else
     {
         std::cout << "Something went wrong during the sort function.";
     }
-    //below is the function for printing the results on command prompt (for debugging purposes)
-    double lowerClassLimit,
-           upperClassLimit;
-    int    classFreq,
-           totalFreq{0};
-    std::cout << "Lower Class Limit\t Upper Class Limit \t Frequency " << std::endl;
-    for (int kr=0; kr < numberOfClass; kr++)
-    {
-        lowerClassLimit = classInformation.at(kr);
-        upperClassLimit = classInformation.at(kr + 1);
-        classFreq = classInformation.at(kr + numberOfClass);
-        std::cout << lowerClassLimit << " \t\t " << upperClassLimit << "\t\t" << classFreq <<std::endl;
-        totalFreq = totalFreq + classFreq;
-    }
-    std::cout << "Total Frequency = " << totalFreq << std::endl;
+
 }
 
 int main(int argc, char *argv[])
@@ -326,8 +292,8 @@ int main(int argc, char *argv[])
 
     QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
 
-    float from = 44.956f;
-    float to = 46.123f;
+    float from = 35.956f;
+    float to = 45.123f;
 
     bool in_samples = false;
 
@@ -424,21 +390,35 @@ int main(int argc, char *argv[])
 
     //
     // histogram calculation
-    std::cout << "Starting histogram calculation...\n";
-    std::cout << "Initializing values...\n";
-
     //User input below
     bool transposeOption;
-    transposeOption = true;    //transpose option: false means data is unchanged, but true means changing negative values to positive
-    int iClassAmount = 1;     //initialize the amount of classes and class frequencies
-
-
-    matrixRange rawLocalGlobalRange = findRawLocalMinMax(data, transposeOption, temp_MatrixRange);
-
-//    MatrixXd matPresortedData = normalize(data, rawLocalGlobalRange);
-    sort(data, rawLocalGlobalRange, transposeOption,iClassAmount);                 //user input to normalize and sort the data matrix
+    transposeOption = true;    //transpose option: false means data is unchanged, true means changing negative values to positive
+    int ClassAmount = 100;        //initialize the amount of classes and class frequencies
+    double inputGlobalMin = 0.0,
+           inputGlobalMax = 0.0;
+    QVector<double> resultClassLimits;
+    QVector<int> resultFrequency;
+    sort(data,transposeOption, ClassAmount, resultClassLimits, resultFrequency, inputGlobalMin, inputGlobalMax );   //user input to normalize and sort the data matrix
     std::cout << "data successfully sorted into desired range and class width...\n";
-//    printHistogram(iClassAmount);
+
+    //below is the function for printing the results on command prompt (for debugging purposes)
+    double lowerClassLimit,
+           upperClassLimit;
+    int    classFreq,
+           totalFreq{0};
+    std::cout << "Lower Class Limit\t Upper Class Limit \t Frequency " << std::endl;
+    for (int kr=0; kr < resultClassLimits.size()-1; kr++)
+    {
+        lowerClassLimit = resultClassLimits.at(kr);
+        upperClassLimit = resultClassLimits.at(kr+1);
+        classFreq = resultFrequency.at(kr);
+        std::cout << lowerClassLimit << " \t\t " << upperClassLimit << "\t\t" << classFreq <<std::endl;
+        totalFreq = totalFreq + classFreq;
+    }
+
+    std::cout << "Total Frequency = " << totalFreq << std::endl;
+
+
     return 0;
 
 
