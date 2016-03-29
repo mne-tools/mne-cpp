@@ -90,7 +90,7 @@ struct vecResultFrequency
 };
 
 // This function finds the minimum and maximum value from the data matrix and returns the range of raw data
-std::vector<double> findRawLocalMinMax(const MatrixXd& data, bool bTransposeOption)
+std::vector<double> findRawLocalMinMax(const MatrixXd& matData, bool bTransposeOption)
 {
     std::vector<double> rawLocalMinMax(4,0.0);
     double rawMin = rawLocalMinMax[0],
@@ -98,8 +98,8 @@ std::vector<double> findRawLocalMinMax(const MatrixXd& data, bool bTransposeOpti
            localMin = rawLocalMinMax[2],
            localMax = rawLocalMinMax[3];
 
-    rawMin = data.minCoeff();    //finds the raw matrix minimum value
-    rawMax = data.maxCoeff();    //finds the raw matrix maximum value
+    rawMin = matData.minCoeff();    //finds the raw matrix minimum value
+    rawMax = matData.maxCoeff();    //finds the raw matrix maximum value
 
     std::cout << "Data range found!" << "\n";
     std::cout << "rawMin =" << rawMin << "\n";
@@ -393,7 +393,7 @@ int main(int argc, char *argv[])
     //User input below
     bool transposeOption;
     transposeOption = true;    //transpose option: false means data is unchanged, true means changing negative values to positive
-    int ClassAmount = 100;        //initialize the amount of classes and class frequencies
+    int ClassAmount = 1;        //initialize the amount of classes and class frequencies
     double inputGlobalMin = 0.0,
            inputGlobalMax = 0.0;
     QVector<double> resultClassLimits;
