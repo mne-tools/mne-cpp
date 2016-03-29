@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Martin Henfling and Daniel Knobl. All rights reserved.
+* Copyright (C) 2016, Ricky Tjen and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -74,8 +74,8 @@ void Histogram::sort(const Eigen::MatrixXd& matPresortedData, bool bTransposeOpt
         vecResultClassLimits[0] = desiredMin;                 //replace default value with local minimum at position 0
         vecResultClassLimits[iClassAmount] = desiredMax;     //replace default value with local maximum at position n
         qDebug() << "Local Range chosen! \n";
-        qDebug() << "desiredMin =" << vecResultClassLimits[0] <<"\n";
-        qDebug() << "desiredMax =" << vecResultClassLimits[iClassAmount] <<"\n";
+        qDebug() << "desiredMin =" << vecResultClassLimits[0];
+        qDebug() << "desiredMax =" << vecResultClassLimits[iClassAmount];
     }
     else
     {
@@ -84,8 +84,8 @@ void Histogram::sort(const Eigen::MatrixXd& matPresortedData, bool bTransposeOpt
         vecResultClassLimits[0]= desiredMin;                 //replace default value with global minimum at position 0
         vecResultClassLimits[iClassAmount]= desiredMax;     //replace default value with global maximum at position n
         qDebug() << "Global Range chosen!\n";
-        qDebug() << "desiredMin =" << vecResultClassLimits[0] <<"\n";
-        qDebug() << "desiredMax =" << vecResultClassLimits[iClassAmount] <<"\n";
+        qDebug() << "desiredMin =" << vecResultClassLimits[0];
+        qDebug() << "desiredMax =" << vecResultClassLimits[iClassAmount];
     }
         double	range = (vecResultClassLimits[iClassAmount] - vecResultClassLimits[0]),                                    //calculates the length from maximum positive value to zero
                 dynamicUpperClassLimit;
@@ -151,23 +151,23 @@ QVector<double> Histogram::findRawLocalMinMax(const Eigen::MatrixXd& matData, bo
     rawMin = matData.minCoeff();    //finds the raw matrix minimum value
     rawMax = matData.maxCoeff();    //finds the raw matrix maximum value
 
-    qDebug() << "Data range found!" << "\n";
-    qDebug() << "rawMin =" << rawMin << "\n";
-    qDebug() << "rawMax =" << rawMax << "\n";
+    qDebug() << "Data range found";
+    qDebug() << "rawMin =" << rawMin;
+    qDebug() << "rawMax =" << rawMax;
 
     if (bTransposeOption == true)             //if user chooses to transpose, negative values will be turned into positive
 {
         if (rawMin < 0.0)               //in case the raw minimum is a negative value, turn it to positive
         {
             rawMin = abs(rawMin);
-            qDebug() << "Data transposed!" << "\n";
-            qDebug() << "New rawMin =" << rawMin << "\n";
+            qDebug() << "Data transposed!";
+            qDebug() << "New rawMin =" << rawMin;
         }
         if (rawMax < 0.0)               //in case the raw maximum is a negative value, turn it to positive aswell
         {
             rawMax = abs(rawMax);
-            qDebug() << "Data transposed!" << "\n";
-            qDebug() << "New rawMax =" << rawMax << "\n";
+            qDebug() << "Data transposed!";
+            qDebug() << "New rawMax =" << rawMax;
         }
         //the following conditional statements are used to ensure that the minimum and maximum are equivalent in length
         if ((rawMin) > rawMax)       //in case the negative side is larger than the positive side

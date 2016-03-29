@@ -2,12 +2,13 @@
 /**
 * @file     histogram.cpp
 * @author   Ricky Tjen <ricky270@student.sgu.ac.id>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     March, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Ricky Tjen. All rights reserved.
+* Copyright (C) 2016, Ricky Tjen and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -38,15 +39,15 @@
 //=============================================================================================================
 
 #include <iostream>
-#include <vector>
 #include <math.h>
-#include <cstdlib>
 #include <ctime>
+#include <cstdlib>
 #include <Eigen/Dense>
 #include <string>
 #include <fiff/fiff.h>
 #include <mne/mne.h>
-#include <QVector>
+#include <utils/histogram.h>
+#include <QDebug>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -54,6 +55,7 @@
 //=============================================================================================================
 
 #include <QtCore/QCoreApplication>
+#include <QVector>
 
 
 //*************************************************************************************************************
@@ -80,211 +82,44 @@ using namespace std;
 * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
 */
 
-struct vecResultClassLimits
-{
-    QVector<double> upperClassLimit;
-};
-struct vecResultFrequency
-{
-    QVector<int> frequencyNumber;
-};
-
-// This function finds the minimum and maximum value from the data matrix and returns the range of raw data
-std::vector<double> findRawLocalMinMax(const MatrixXd& matData, bool bTransposeOption)
-{
-    std::vector<double> rawLocalMinMax(4,0.0);
-    double rawMin = rawLocalMinMax[0],
-           rawMax = rawLocalMinMax[1],
-           localMin = rawLocalMinMax[2],
-           localMax = rawLocalMinMax[3];
-
-    rawMin = matData.minCoeff();    //finds the raw matrix minimum value
-    rawMax = matData.maxCoeff();    //finds the raw matrix maximum value
-
-    std::cout << "Data range found!" << "\n";
-    std::cout << "rawMin =" << rawMin << "\n";
-    std::cout << "rawMax =" << rawMax << "\n";
-
-    if (bTransposeOption == true)             //if user chooses to transpose, negative values will be turned into positive
-{
-        if (rawMin < 0.0)               //in case the raw minimum is a negative value, turn it to positive
-        {
-            rawMin = abs(rawMin);
-            std::cout << "Data transposed!" << "\n";
-            std::cout << "New rawMin =" << rawMin << "\n";
-        }
-        if (rawMax < 0.0)               //in case the raw maximum is a negative value, turn it to positive aswell
-        {
-            rawMax = abs(rawMax);
-            std::cout << "Data transposed!" << "\n";
-            std::cout << "New rawMax =" << rawMax << "\n";
-        }
-        //the following conditional statements are used to ensure that the minimum and maximum are equivalent in length
-        if ((rawMin) > rawMax)       //in case the negative side is larger than the positive side
-        {
-            localMax = rawMin;     //positive side is "stretched" to the exact length as negative side
-            localMin = 0.0;
-        }
-
-        else if (rawMax > rawMin)  //in case the positive side is larger than the negative side
-        {
-            localMin = 0.0;       //negative side is "stretched" to the exact length as positive side
-            localMax = rawMax;
-        }
-        else                            //in case both sides are exactly the same
-        {
-            localMin = 0.0;
-            localMax = rawMax;
-        }
-}
-
-    else
-    {
-        //if bTransposeOption = false, do the following
-        if (abs(rawMin) > rawMax)       //in case the negative side is larger than the positive side
-        {
-            localMax = abs(rawMin);     //positive side is "stretched" to the exact length as negative side
-            localMin = rawMin;
-        }
-
-        else if (rawMax > abs(rawMin))  //in case the positive side is larger than the negative side
-        {
-            localMin = -(rawMax);       //negative side is "stretched" to the exact length as positive side
-            localMax = rawMax;
-        }
-        else                            //in case both sides are exactly the same
-        {
-            localMin = rawMin;
-            localMax = rawMax;
-        }
-    }
-    rawLocalMinMax = {rawMin, rawMax, localMin, localMax};
-    return rawLocalMinMax;
-}
-
 // This function normalizes the data matrix into desired range before sorting [***untested and not used***]
 /**MatrixXd normalize(const MatrixXd& rawMatrix, matrixRange range, std::string transposeOption, vector temp_MatrixRange)
-{
-    MatrixXd normalizedValue;
-    bool doLocalScale = false;
-    std::string bTransposeOption = transposeOption;
-    std::vector range = findRawLocalMinMax(rawMatrix, transposeOption, temp_MatrixRange);
-    if (range.globalMin == 0.0 && range.globalMax == 0.0)       //if global range is NOT given by the user, use local scaling
-    {
-        doLocalScale = true;
-    }
-
-    if (doLocalScale = false)                       //in case global range is given, use global scaling
-    {
-        for (int ir = 0; ir < rawMatrix.cols(); ir++)
-        {
-            for (int jr = 0; jr< rawMatrix.rows(); jr++)
-            {
-             //formula for normalizing values in range [rawMin,rawMax] to range [globalMin,globalMax]
-             normalizedValue(ir,jr) = (((range.globalMax - range.globalMin) * rawMatrix(ir,jr))/(range.rawMax - range.rawMin)) + (((range.rawMax * range.globalMin)- (range.rawMin * range.globalMax))/(range.rawMax - range.rawMin));
-            }
-        }
-    }
-
-    if (doLocalScale = true)
-    {
-        for (int ir = 0; ir < rawMatrix.cols(); ir++)
-        {
-            for (int jr = 0; jr<rawMatrix.rows(); jr++)
-            {
-             //formula for normalizing values in range [rawMin,rawMax] to range [localMin,localMax]
-             normalizedValue(ir,jr) = (((range.localMax - range.localMin) * rawMatrix(ir,jr))/(range.rawMax - range.rawMin)) + (((range.rawMax * range.localMin)- (range.rawMin * range.localMax))/(range.rawMax - range.rawMin));
-            }
-        }
-    }
-    return normalizedValue;  //returns the normalized matrix to main();
-}
-*/
-
-
-// This function sorts the data matrix and returns 2 vectors; one is filled with the class limits, the other with class frequency
-void sort(const MatrixXd& matPresortedData, bool bTransposeOption, int iClassAmount, QVector<double>& vecResultClassLimits, QVector<int>& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0)
-{
-    vecResultClassLimits.clear();
-    vecResultFrequency.clear();
-    vecResultClassLimits.resize(iClassAmount + 1);
-    vecResultFrequency.resize(iClassAmount);
-
-    double desiredMin,
-           desiredMax,
-           tempValue;
-    int ir{0}, jr{0}, kr{0};
-    std::vector<double> rawLocalMinMax = findRawLocalMinMax(matPresortedData, bTransposeOption);
-    //This if and else function selects either local or global range (according to user preference and input)
-    if (dGlobalMin == 0.0 && dGlobalMax == 0.0)       //if global range is NOT given by the user, use local ranges
-    {
-        desiredMin = rawLocalMinMax.at(2);
-        desiredMax = rawLocalMinMax.at(3);
-        vecResultClassLimits[0] = desiredMin;                 //replace default value with local minimum at position 0
-        vecResultClassLimits[iClassAmount] = desiredMax;     //replace default value with local maximum at position n
-        std::cout << "Local Range chosen! \n";
-        std::cout << "desiredMin =" << vecResultClassLimits[0] <<"\n";
-        std::cout << "desiredMax =" << vecResultClassLimits[iClassAmount] <<"\n";
-    }
-    else
-    {
-        desiredMin = dGlobalMin;
-        desiredMax = dGlobalMax;
-        vecResultClassLimits[0]= desiredMin;                 //replace default value with global minimum at position 0
-        vecResultClassLimits[iClassAmount]= desiredMax;     //replace default value with global maximum at position n
-        std::cout << "Global Range chosen!\n";
-        std::cout << "desiredMin =" << vecResultClassLimits[0] <<"\n";
-        std::cout << "desiredMax =" << vecResultClassLimits[iClassAmount] <<"\n";
-    }
-        double	range = (vecResultClassLimits[iClassAmount] - vecResultClassLimits[0]),                                    //calculates the length from maximum positive value to zero
-                dynamicUpperClassLimit;
-        for (kr = 0; kr < iClassAmount; kr++)                                          //dynamically initialize the upper class limit values prior to the sorting mecahnism
-        {
-            dynamicUpperClassLimit = (vecResultClassLimits[0] + (kr*(range/iClassAmount))); //generic formula to determine the upper class limit with respect to range and number of class
-            vecResultClassLimits[kr] = dynamicUpperClassLimit;                               //places the appropriate upper class limit value to the right position in the QVector
-        }
-
-        if (bTransposeOption == true)     //sort the matrix after turning negative values to positive
-        {
-            for (ir = 0; ir < matPresortedData.cols(); ir++)              //iterates through all columns of the data matrix
-            {
-                for (jr = 0; jr<matPresortedData.rows(); jr++)            //iterates through all rows of the data matrix
-                {
-                    tempValue = abs(matPresortedData(ir,jr));       //turns all values in the matrix into positive
-                    for (kr = 0; kr < iClassAmount; kr++)         //starts iteration from 1 to iClassAmount
-                    {
-                        if (tempValue >= vecResultClassLimits.at(kr) && tempValue < vecResultClassLimits.at(kr + 1))    //compares value in the matrix with lower and upper limit of each class
-                        {
-                            (vecResultFrequency[kr])++ ; //if the value fits both arguments, the appropriate class frequency is increased by 1
-                        }
-                    }
-                }
-            }
-        }
-
-        else if (bTransposeOption == false)        //sort the matrix without transposing negative values to positive
-        {
-            for (ir = 0; ir < matPresortedData.cols(); ir++)        //iterates through every column of the data matrix
-            {
-                for (jr = 0; jr < matPresortedData.rows(); jr++)      //iterates through every row of the data matrix
-                {
-                    for (kr = 0; kr < iClassAmount; kr++)         //starts iteration from 1 to iClassAmount
-                    {
-                        if (matPresortedData(ir,jr) >= vecResultClassLimits.at(kr) && matPresortedData(ir,jr) < vecResultClassLimits.at(kr + 1))    //compares value in the matrix with lower and upper limit of each class
-                        {
-                            vecResultFrequency[(kr)]++ ; //if the value fits both arguments, the appropriate class frequency is increased by 1
-                        }
-                    }
-                }
-            }
-        }
-
-    else
-    {
-        std::cout << "Something went wrong during the sort function.";
-    }
-
-}
+*{
+*    MatrixXd normalizedValue;
+*    bool doLocalScale = false;
+*    std::string bTransposeOption = transposeOption;
+*    std::vector range = findRawLocalMinMax(rawMatrix, transposeOption, temp_MatrixRange);
+*    if (range.globalMin == 0.0 && range.globalMax == 0.0)       //if global range is NOT given by the user, use local scaling
+*    {
+*        doLocalScale = true;
+*    }
+*
+*    if (doLocalScale = false)                       //in case global range is given, use global scaling
+*    {
+*        for (int ir = 0; ir < rawMatrix.cols(); ir++)
+*        {
+*            for (int jr = 0; jr< rawMatrix.rows(); jr++)
+*            {
+*             //formula for normalizing values in range [rawMin,rawMax] to range [globalMin,globalMax]
+*            normalizedValue(ir,jr) = (((range.globalMax - range.globalMin) * rawMatrix(ir,jr))/(range.rawMax - range.rawMin)) + (((range.rawMax * range.globalMin)- (range.rawMin * range.globalMax))/(range.rawMax - range.rawMin));
+*            }
+*        }
+*    }
+*
+*    if (doLocalScale = true)
+*    {
+*        for (int ir = 0; ir < rawMatrix.cols(); ir++)
+*        {
+*            for (int jr = 0; jr<rawMatrix.rows(); jr++)
+*            {
+*             //formula for normalizing values in range [rawMin,rawMax] to range [localMin,localMax]
+*             normalizedValue(ir,jr) = (((range.localMax - range.localMin) * rawMatrix(ir,jr))/(range.rawMax - range.rawMin)) + (((range.rawMax * range.localMin)- (range.rawMin * range.localMax))/(range.rawMax - range.rawMin));
+*            }
+*        }
+*    }
+*    return normalizedValue;  //returns the normalized matrix to main();
+*}
+**/
 
 int main(int argc, char *argv[])
 {
@@ -388,41 +223,39 @@ int main(int argc, char *argv[])
 
     printf("Read %d samples.\n",(qint32)data.cols());
 
-    //
     // histogram calculation
-    //User input below
     bool transposeOption;
-    transposeOption = true;    //transpose option: false means data is unchanged, true means changing negative values to positive
-    int ClassAmount = 1;        //initialize the amount of classes and class frequencies
+    transposeOption = false;    //transpose option: false means data is unchanged, true means changing negative values to positive
+    int ClassAmount = 20;        //initialize the amount of classes and class frequencies
     double inputGlobalMin = 0.0,
            inputGlobalMax = 0.0;
     QVector<double> resultClassLimits;
     QVector<int> resultFrequency;
-    sort(data,transposeOption, ClassAmount, resultClassLimits, resultFrequency, inputGlobalMin, inputGlobalMax );   //user input to normalize and sort the data matrix
-    std::cout << "data successfully sorted into desired range and class width...\n";
+    Histogram::sort(data,transposeOption, ClassAmount, resultClassLimits, resultFrequency, inputGlobalMin, inputGlobalMax );   //user input to normalize and sort the data matrix
+    qDebug() << "data successfully sorted into desired range and class width...\n";
 
     //below is the function for printing the results on command prompt (for debugging purposes)
     double lowerClassLimit,
            upperClassLimit;
     int    classFreq,
            totalFreq{0};
-    std::cout << "Lower Class Limit\t Upper Class Limit \t Frequency " << std::endl;
+    qDebug() << "Lower Class Limit\t Upper Class Limit \t Frequency ";
     for (int kr=0; kr < resultClassLimits.size()-1; kr++)
     {
         lowerClassLimit = resultClassLimits.at(kr);
         upperClassLimit = resultClassLimits.at(kr+1);
         classFreq = resultFrequency.at(kr);
-        std::cout << lowerClassLimit << " \t\t " << upperClassLimit << "\t\t" << classFreq <<std::endl;
+        qDebug() << lowerClassLimit << " \t\t " << upperClassLimit << "\t\t" << classFreq;
         totalFreq = totalFreq + classFreq;
     }
 
-    std::cout << "Total Frequency = " << totalFreq << std::endl;
+    qDebug() << "Total Frequency = " << totalFreq;
 
 
     return 0;
 
 
-    std::cout << data.block(0,0,10,10) << std::endl;
+    std::cout << data.block(0,0,10,10);
 
     return a.exec();
 }
