@@ -2,7 +2,7 @@
 /**
 * @file     histogram.cpp
 * @author   Ricky Tjen <ricky270@student.sgu.ac.id>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
 * @date     March, 2016
 *
@@ -47,15 +47,23 @@
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 #include <utils/histogram.h>
-#include <QDebug>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/QCoreApplication>
 #include <QVector>
+#include <QDebug>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QMainWindow>
+#include <QtCharts/QChartView>
+#include <QtCharts/QBarSeries>
+#include <QtCharts/QBarSet>
+#include <QtCharts/QLegend>
+#include <QtCharts/QBarCategoryAxis>
+#include <QtCharts>
 
 
 //*************************************************************************************************************
@@ -66,6 +74,7 @@
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace std;
+QT_CHARTS_USE_NAMESPACE
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -123,12 +132,12 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    QApplication a(argc, argv);
 
     QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
 
-    float from = 35.956f;
-    float to = 45.123f;
+    float from = 45.0f;
+    float to = 46.0f;
 
     bool in_samples = false;
 
@@ -225,7 +234,7 @@ int main(int argc, char *argv[])
 
     // histogram calculation
     bool transposeOption;
-    transposeOption = false;    //transpose option: false means data is unchanged, true means changing negative values to positive
+    transposeOption = true;    //transpose option: false means data is unchanged, true means changing negative values to positive
     int ClassAmount = 20;        //initialize the amount of classes and class frequencies
     double inputGlobalMin = 0.0,
            inputGlobalMax = 0.0;
@@ -240,23 +249,65 @@ int main(int argc, char *argv[])
     int    classFreq,
            totalFreq{0};
     qDebug() << "Lower Class Limit\t Upper Class Limit \t Frequency ";
+
+    //  Start of Qtchart histogram display
+    QBarSet *set = new QBarSet("Class");
+    QStringList categories;
     for (int kr=0; kr < resultClassLimits.size()-1; kr++)
     {
-        lowerClassLimit = resultClassLimits.at(kr);
-        upperClassLimit = resultClassLimits.at(kr+1);
-        classFreq = resultFrequency.at(kr);
-        qDebug() << lowerClassLimit << " \t\t " << upperClassLimit << "\t\t" << classFreq;
-        totalFreq = totalFreq + classFreq;
+        if (kr==0)                             //initialize class limit for the lowest class limit (once only)
+        {
+            lowerClassLimit = resultClassLimits.at(kr);
+            upperClassLimit = resultClassLimits.at(kr+1);
+            classFreq = resultFrequency.at(kr);
+            qDebug() << lowerClassLimit << " \t\t " << upperClassLimit << "\t\t" << classFreq;
+            totalFreq = totalFreq + classFreq;
+            *set << classFreq;
+            categories << QString::number(lowerClassLimit) << QString::number(upperClassLimit);
+        }
+        else
+        {
+            lowerClassLimit = resultClassLimits.at(kr);
+            upperClassLimit = resultClassLimits.at(kr+1);
+            classFreq = resultFrequency.at(kr);
+            qDebug() << lowerClassLimit << " \t\t " << upperClassLimit << "\t\t" << classFreq;
+            totalFreq = totalFreq + classFreq;
+            *set << classFreq;
+            categories << QString::number(upperClassLimit);
+        }
     }
-
+    qDebug() << "Categories = " << categories;
     qDebug() << "Total Frequency = " << totalFreq;
 
+    //  Start of Qtchart histogram display
+    QBarSeries *series = new QBarSeries();
+    series->append(set);
+    qDebug() << "Finished appending series";
 
-    return 0;
+    QChart *chart = new QChart();
+    qDebug() <<"Finished creating chart";
+    chart->addSeries(series);
+    chart->setTitle("Histogram Example");
+    chart->setAnimationOptions(QChart::SeriesAnimations);
 
+
+    QBarCategoryAxis *axis = new QBarCategoryAxis();
+    axis->append(categories);
+    chart->createDefaultAxes();
+    chart->setAxisX(axis, series);
+
+    chart->legend()->setVisible(true);
+    chart->legend()->setAlignment(Qt::AlignBottom);
+
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+    QMainWindow window;
+    window.setCentralWidget(chartView);
+    window.resize(420, 300);
+    window.show();
 
     std::cout << data.block(0,0,10,10);
-
     return a.exec();
 }
 

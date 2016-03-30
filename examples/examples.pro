@@ -56,7 +56,6 @@ SUBDIRS += \
     patientManager \
     testWarp \
     histogram \
-    Histogram_chart
 
 contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += \
