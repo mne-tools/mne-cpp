@@ -87,54 +87,49 @@ void Histogram::sort(const Eigen::MatrixXd& matPresortedData, bool bTransposeOpt
         qDebug() << "desiredMin =" << vecResultClassLimits[0];
         qDebug() << "desiredMax =" << vecResultClassLimits[iClassAmount];
     }
-        double	range = (vecResultClassLimits[iClassAmount] - vecResultClassLimits[0]),                                    //calculates the length from maximum positive value to zero
-                dynamicUpperClassLimit;
-        for (kr = 0; kr < iClassAmount; kr++)                                          //dynamically initialize the upper class limit values prior to the sorting mecahnism
-        {
-            dynamicUpperClassLimit = (vecResultClassLimits[0] + (kr*(range/iClassAmount))); //generic formula to determine the upper class limit with respect to range and number of class
-            vecResultClassLimits[kr] = dynamicUpperClassLimit;                               //places the appropriate upper class limit value to the right position in the QVector
-        }
 
-        if (bTransposeOption == true)     //sort the matrix after turning negative values to positive
-        {
-            for (ir = 0; ir < matPresortedData.cols(); ir++)              //iterates through all columns of the data matrix
-            {
-                for (jr = 0; jr<matPresortedData.rows(); jr++)            //iterates through all rows of the data matrix
-                {
-                    tempValue = abs(matPresortedData(ir,jr));       //turns all values in the matrix into positive
-                    for (kr = 0; kr < iClassAmount; kr++)         //starts iteration from 1 to iClassAmount
-                    {
-                        if (tempValue >= vecResultClassLimits.at(kr) && tempValue < vecResultClassLimits.at(kr + 1))    //compares value in the matrix with lower and upper limit of each class
-                        {
-                            (vecResultFrequency[kr])++ ; //if the value fits both arguments, the appropriate class frequency is increased by 1
-                        }
-                    }
-                }
-            }
-        }
+    double	range = (vecResultClassLimits[iClassAmount] - vecResultClassLimits[0]),                                    //calculates the length from maximum positive value to zero
+            dynamicUpperClassLimit;
 
-        else if (bTransposeOption == false)        //sort the matrix without transposing negative values to positive
-        {
-            for (ir = 0; ir < matPresortedData.cols(); ir++)        //iterates through every column of the data matrix
-            {
-                for (jr = 0; jr < matPresortedData.rows(); jr++)      //iterates through every row of the data matrix
-                {
-                    for (kr = 0; kr < iClassAmount; kr++)         //starts iteration from 1 to iClassAmount
-                    {
-                        if (matPresortedData(ir,jr) >= vecResultClassLimits.at(kr) && matPresortedData(ir,jr) < vecResultClassLimits.at(kr + 1))    //compares value in the matrix with lower and upper limit of each class
-                        {
-                            vecResultFrequency[(kr)]++ ; //if the value fits both arguments, the appropriate class frequency is increased by 1
-                        }
-                    }
-                }
-            }
-        }
-
-    else
+    for (kr = 0; kr < iClassAmount; kr++)                                          //dynamically initialize the upper class limit values prior to the sorting mecahnism
     {
-        qDebug() << "Something went wrong during the sort function.";
+        dynamicUpperClassLimit = (vecResultClassLimits[0] + (kr*(range/iClassAmount))); //generic formula to determine the upper class limit with respect to range and number of class
+        vecResultClassLimits[kr] = dynamicUpperClassLimit;                               //places the appropriate upper class limit value to the right position in the QVector
     }
 
+    if (bTransposeOption == true)     //sort the matrix after turning negative values to positive
+    {
+        for (ir = 0; ir < matPresortedData.rows(); ir++)              //iterates through all columns of the data matrix
+        {
+            for (jr = 0; jr<matPresortedData.cols(); jr++)            //iterates through all rows of the data matrix
+            {
+                tempValue = abs(matPresortedData(ir,jr));       //turns all values in the matrix into positive
+                for (kr = 0; kr < iClassAmount; kr++)         //starts iteration from 1 to iClassAmount
+                {
+                   if (tempValue >= vecResultClassLimits.at(kr) && tempValue < vecResultClassLimits.at(kr + 1))    //compares value in the matrix with lower and upper limit of each class
+                   {
+                        (vecResultFrequency[kr])++ ; //if the value fits both arguments, the appropriate class frequency is increased by 1
+                   }
+                }
+            }
+        }
+    }
+    else
+    {
+         for (ir = 0; ir < matPresortedData.rows(); ir++)              //iterates through all columns of the data matrix
+         {
+             for (jr = 0; jr<matPresortedData.cols(); jr++)            //iterates through all rows of the data matrix
+             {
+                 for (kr = 0; kr < iClassAmount; kr++)         //starts iteration from 1 to iClassAmount
+                 {
+                    if (matPresortedData(ir,jr) >= vecResultClassLimits.at(kr) && matPresortedData(ir,jr) < vecResultClassLimits.at(kr + 1))    //compares value in the matrix with lower and upper limit of each class
+                    {
+                         (vecResultFrequency[kr])++ ; //if the value fits both arguments, the appropriate class frequency is increased by 1
+                    }
+                 }
+             }
+         }
+     }
 }
 
 
