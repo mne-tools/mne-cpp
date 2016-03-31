@@ -130,14 +130,35 @@ QT_CHARTS_USE_NAMESPACE
 *}
 **/
 
+//sineWaveGenerator used for debugging purposes only
+#ifndef M_PI
+const double M_PI = 3.14159265358979323846;
+#endif
+
+Eigen::VectorXd sineWaveGenerator(double amplitude, double xStep, int xNow, int xEnd)
+{
+    int iterateAmount = (xEnd-xNow)/xStep;
+    Eigen::VectorXd sineWaveResult(iterateAmount);
+    double sineResult;
+    double omega = 2.0*M_PI;
+    int iterateCount = 0;
+    for (double step = xNow; step < xEnd; step +=xStep)
+    {
+        sineResult = amplitude*sin(omega * step);
+        sineWaveResult(iterateCount) = sineResult;
+        iterateCount++;
+    }
+    return sineWaveResult;
+}
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
     QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
 
-    float from = 45.0f;
-    float to = 46.0f;
+    float from = 41.0f;
+    float to = 45.01f;
 
     bool in_samples = false;
 
@@ -231,16 +252,18 @@ int main(int argc, char *argv[])
     }
 
     printf("Read %d samples.\n",(qint32)data.cols());
+    Eigen::VectorXd dataSine;
+    dataSine = sineWaveGenerator(2.0,(5.0/20000), 0.0, 5.0);
 
     // histogram calculation
     bool transposeOption;
-    transposeOption = true;    //transpose option: false means data is unchanged, true means changing negative values to positive
-    int ClassAmount = 20;        //initialize the amount of classes and class frequencies
+    transposeOption = false;      //transpose option: false means data is unchanged, true means changing negative values to positive
+    int ClassAmount = 1000;        //initialize the amount of classes and class frequencies
     double inputGlobalMin = 0.0,
            inputGlobalMax = 0.0;
     QVector<double> resultClassLimits;
     QVector<int> resultFrequency;
-    Histogram::sort(data,transposeOption, ClassAmount, resultClassLimits, resultFrequency, inputGlobalMin, inputGlobalMax );   //user input to normalize and sort the data matrix
+    Histogram::sort(dataSine,transposeOption, ClassAmount, resultClassLimits, resultFrequency, inputGlobalMin, inputGlobalMax );   //user input to normalize and sort the data matrix
     qDebug() << "data successfully sorted into desired range and class width...\n";
 
     //below is the function for printing the results on command prompt (for debugging purposes)
@@ -276,7 +299,6 @@ int main(int argc, char *argv[])
             categories << QString::number(upperClassLimit);
         }
     }
-    qDebug() << "Categories = " << categories;
     qDebug() << "Total Frequency = " << totalFreq;
 
     //  Start of Qtchart histogram display
@@ -314,6 +336,3 @@ int main(int argc, char *argv[])
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// STATIC DEFINITIONS
-//=============================================================================================================
