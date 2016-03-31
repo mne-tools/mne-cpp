@@ -45,7 +45,7 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     MNE \
-    unit_tests \
+    testframes \
     examples \
     applications
 
