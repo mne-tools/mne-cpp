@@ -58,6 +58,7 @@ using namespace std;
 
 AverageScene::AverageScene(QGraphicsView* view, QObject* parent)
 : LayoutScene(view, parent)
+, m_colGlobalItemSignalColor(Qt::yellow)
 {
 }
 
@@ -91,10 +92,35 @@ void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelIte
                                                                       selectionSceneItemTemp->m_iChannelNumber,
                                                                       selectionSceneItemTemp->m_qpChannelPosition,
                                                                       selectionSceneItemTemp->m_iChannelKind,
-                                                                      selectionSceneItemTemp->m_iChannelUnit);
+                                                                      selectionSceneItemTemp->m_iChannelUnit,
+                                                                      m_colGlobalItemSignalColor);
 
         this->addItem(averageSceneItemTemp);
     }
+}
+
+
+//*************************************************************************************************************
+
+void AverageScene::setSignalColorForAllItems(const QColor& color)
+{
+    m_colGlobalItemSignalColor = color;
+
+    QList<QGraphicsItem*> items = this->items();
+    QListIterator<QGraphicsItem*> i(items);
+    while (i.hasNext()) {
+        if(AverageSceneItem* averageSceneItemTemp = dynamic_cast<AverageSceneItem*>(i.next())) {
+            averageSceneItemTemp->setSignalColorForAllChannels(color);
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+const QColor& AverageScene::getSignalColorForAllItems()
+{
+    return m_colGlobalItemSignalColor;
 }
 
 

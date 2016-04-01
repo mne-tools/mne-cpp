@@ -124,25 +124,37 @@ macx {
 }
 
 # Deploy Qt Dependencies
+win32 {
+    isEmpty(TARGET_EXT) {
+        TARGET_CUSTOM_EXT = .exe
+    } else {
+        TARGET_CUSTOM_EXT = $${TARGET_EXT}
+    }
+
+    DEPLOY_COMMAND = windeployqt
+
+    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
+
+    #  # Uncomment the following line to help debug the deploy command when running qmake
+    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
+    QMAKE_POST_LINK = $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+}
 unix:!macx {
-    #ToDo Unix
+    # === Unix ===
+    QMAKE_RPATHDIR += $ORIGIN/../lib
 }
 macx {
     # === Mac ===
     QMAKE_RPATHDIR += @executable_path/../Frameworks
-    QMAKE_RPATHDIR += @executable_path/../libs
-
 
     # Copy Resource folder to app bundle
-    SRCLIB = $${DESTDIR}/mne_x_libs
-    DESTLIB = $${DESTDIR}/$${TARGET}.app/Contents/MacOS/mne_x_libs
+    mnexrc.path = Contents/MacOS
+    mnexrc.files = $${DESTDIR}/mne_x_libs
+    QMAKE_BUNDLE_DATA += mnexrc
 
-    QMAKE_POST_LINK += ${COPY_DIR} $$quote($${SRCLIB}) $$quote($${DESTLIB}) $$escape_expand(\\n\\t)
-
-    SRCPLUGINS = $${DESTDIR}/mne_x_plugins
-    DESTPLUGINS = $${DESTDIR}/$${TARGET}.app/Contents/MacOS/mne_x_plugins
-
-    QMAKE_POST_LINK += ${COPY_DIR} $$quote($${SRCPLUGINS}) $$quote($${DESTPLUGINS}) $$escape_expand(\\n\\t)
+    plugins.path = Contents/MacOS
+    plugins.files = $${DESTDIR}/mne_x_plugins
+    QMAKE_BUNDLE_DATA += plugins
 
 #    isEmpty(TARGET_EXT) {
 #        TARGET_CUSTOM_EXT = .app
@@ -158,19 +170,4 @@ macx {
 #    DEPLOY_COMMAND = macdeployqt
 #    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
 #    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -verbose=0
-}
-win32 {
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .exe
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-    }
-
-    DEPLOY_COMMAND = windeployqt
-
-    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-
-    #  # Uncomment the following line to help debug the deploy command when running qmake
-    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
-    QMAKE_POST_LINK = $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
 }

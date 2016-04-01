@@ -196,7 +196,7 @@ IPlugin::PluginType RtSss::getType() const
 
 QString RtSss::getName() const
 {
-    return "RtSss Toolbox";
+    return "RtSss";
 }
 
 
@@ -290,7 +290,6 @@ void RtSss::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 
 //*************************************************************************************************************
-
 
 MatrixXd rt_sss(const MatrixXd &p_mat)
 {

@@ -187,17 +187,18 @@ win32 {
     #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
     QMAKE_POST_LINK = $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
 }
+unix:!macx {
+    # === Unix ===
+    QMAKE_RPATHDIR += $ORIGIN/../lib
+}
 macx {
     # === Mac ===
     QMAKE_RPATHDIR += @executable_path/../Frameworks
-    QMAKE_RPATHDIR += @executable_path/../libs
-
 
     # Copy Resource folder to app bundle
-    RCDIR = $${DESTDIR}/MNE_Browse_Raw_Resources
-    APPDIR = $${DESTDIR}/$${TARGET}.app/Contents/MacOS/MNE_Browse_Raw_Resources
-
-    QMAKE_POST_LINK += ${COPY_DIR} $$quote($${RCDIR}) $$quote($${APPDIR}) $$escape_expand(\\n\\t)
+    brrc.path = Contents/MacOS
+    brrc.files = $${DESTDIR}/MNE_Browse_Raw_Resources
+    QMAKE_BUNDLE_DATA += brrc
 
 #    isEmpty(TARGET_EXT) {
 #        TARGET_CUSTOM_EXT = .app
@@ -214,6 +215,4 @@ macx {
 #    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
 #    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -verbose=0
 }
-unix:!macx {
-    #ToDo Unix
-}
+

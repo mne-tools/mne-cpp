@@ -170,7 +170,7 @@ private slots:
     *
     * @param[in] checkState        The current checkstate.
     */
-    void onCheckStateChanged(const Qt::CheckState& checkState);
+    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
 private:
     BrainSurfaceTreeItem*           m_pSurfaceItem;                     /**< The surface item of this hemisphere item. Only one surface item may exists under a hemisphere item. */
