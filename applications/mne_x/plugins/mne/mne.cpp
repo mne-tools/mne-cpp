@@ -76,9 +76,6 @@ MNE::MNE()
 , m_qFileFwdSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
 , m_sAtlasDir("./MNE-sample-data/subjects/sample/label")
 , m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
-//, m_qFileFwdSolution("D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721/160125_133250_4841721_Spontaneous_raw-oct-6-fwd.fif")
-//, m_sAtlasDir("D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721/ID_4841721_act/label")
-//, m_sSurfaceDir("D:/SoersStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/babyMEG/Patient_data/4841721/ID_4841721_act/surf")
 , m_iNumAverages(1)
 , m_iDownSample(4)
 {
@@ -114,7 +111,7 @@ void MNE::init()
     // Inits
     m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_qFileFwdSolution));
     m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
-    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.inflated", m_sSurfaceDir+"/rh.inflated"));
+    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.pial", m_sSurfaceDir+"/rh.pial"));
 
     // Input
     m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "MNE RTMSA In", "MNE real-time multi sample array input data");
@@ -139,7 +136,7 @@ void MNE::init()
     //
     m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
     m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
-    m_pRTSEOutput->data()->setFwdSolution(m_pFwd);
+    m_pRTSEOutput->data()->setFwdSolution(m_pClusteredFwd);
 
     // start clustering
     QFuture<void> future = QtConcurrent::run(this, &MNE::doClustering);
@@ -163,7 +160,7 @@ void MNE::calcFiffInfo()
 
     if(m_qListCovChNames.size() > 0 && m_pFiffInfoInput && m_pFiffInfoForward)
     {
-        qDebug() << "MNE::calcFiffInfo - Fiff Infos available";
+        qDebug() << "Fiff Infos available";
 
 //        qDebug() << "m_qListCovChNames" << m_qListCovChNames;
 //        qDebug() << "m_pFiffInfoForward->ch_names" << m_pFiffInfoForward->ch_names;
@@ -244,36 +241,6 @@ void MNE::calcFiffInfo()
         m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(m_pFiffInfoInput->pick_info(sel)));
 
         //qDebug() << "m_pFiffInfo" << m_pFiffInfo->ch_names;
-
-
-
-
-        QString filenamea="m_pFiffInfoInput.txt";
-        QFile filea( filenamea );
-        if ( filea.open(QIODevice::ReadWrite) )
-        {
-            QTextStream  streama( &filea );
-            for(int i = 0; i<m_pFiffInfoInput->ch_names.size() ;i++)
-                streama << m_pFiffInfoInput->ch_names.at(i) << "\n";
-        }
-
-        QString filenameb="m_pFiffInfo.txt";
-        QFile fileb( filenameb );
-        if ( fileb.open(QIODevice::ReadWrite) )
-        {
-            QTextStream  streamb( &fileb );
-            for(int i = 0; i<m_pFiffInfo->ch_names.size() ;i++)
-                streamb << m_pFiffInfo->ch_names.at(i) << "\n";
-        }
-
-        QString filenamec="m_pFiffInfoForward.txt";
-        QFile filec( filenamec );
-        if ( filec.open(QIODevice::ReadWrite) )
-        {
-            QTextStream  streamc( &filec );
-            for(int i = 0; i<m_pFiffInfoForward->ch_names.size() ;i++)
-                streamc << m_pFiffInfoForward->ch_names.at(i) << "\n";
-        }
     }
 }
 
@@ -286,8 +253,8 @@ void MNE::doClustering()
 
     m_qMutex.lock();
     m_bFinishedClustering = false;
-    //m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
-    m_pClusteredFwd = m_pFwd;
+    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
+    //m_pClusteredFwd = m_pFwd;
     m_pRTSEOutput->data()->setFwdSolution(m_pClusteredFwd);
 
     m_qMutex.unlock();
@@ -455,11 +422,8 @@ void MNE::updateRTE(XMEASLIB::NewMeasurement::SPtr pMeasurement)
         if(!m_pFiffInfoInput)
             m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pRTE->getValue()->info));
 
-        if(m_bProcessData) {
-            m_iNumAverages = pRTE->getValue()->nave;
-            qDebug()<<"MNE::updateRTE - m_iNumAverages"<<m_iNumAverages;
+        if(m_bProcessData)
             m_qVecFiffEvoked.push_back(pRTE->getValue()->pick_channels(m_qListPickChannels));
-        }
     }
 }
 
@@ -509,7 +473,7 @@ void MNE::run()
         }
         calcFiffInfo();
         msleep(10);// Wait for fiff Info
-    }    
+    }
 
     //qDebug() << "m_pClusteredFwd->info.ch_names" << m_pClusteredFwd->info.ch_names;
     //qDebug() << "m_pFiffInfo->ch_names" << m_pFiffInfo->ch_names;
@@ -518,13 +482,13 @@ void MNE::run()
     // Init Real-Time inverse estimator
     //
     m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd));
-    //connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated, this, &MNE::updateInvOp);
+    connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated, this, &MNE::updateInvOp);
     m_pMinimumNorm.reset();
 
     //
     // Start the rt helpers
     //
-    //m_pRtInvOp->start();
+    m_pRtInvOp->start();
 
     //
     // start processing data
@@ -532,35 +496,6 @@ void MNE::run()
     m_bProcessData = true;
 
     qint32 skip_count = 0;
-
-
-
-
-    //
-    // TEMP INV LOADING
-    //
-
-    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-    FiffCov noise_cov(t_fileCov);
-
-    // regularize noise covariance
-    noise_cov = noise_cov.regularize(*m_pFiffInfoInput.data(), 0.05, 0.05, 0.1, true);
-
-    //
-    // make an inverse operators
-    //
-    MNEInverseOperator inverse_operator(*m_pFiffInfoInput.data(), *m_pClusteredFwd.data(), noise_cov, 0.2f, 0.8f);
-
-    double snr = 3.0;
-    double lambda2 = 1.0 / pow(snr, 2); //ToDO estimate lambda using covariance
-    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
-    m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(inverse_operator, lambda2, method));
-    m_pMinimumNorm->doInverseSetup(50,false);
-
-
-
-
-
 
     while(m_bIsRunning)
     {
@@ -574,6 +509,10 @@ void MNE::run()
             m_qVecFiffCov.pop_front();
             m_qMutex.unlock();
         }
+
+        m_qMutex.lock();
+        qint32 t_evokedSize = m_qVecFiffEvoked.size();
+        m_qMutex.unlock();
 
         if(m_pMatrixDataBuffer)
         {
@@ -598,10 +537,6 @@ void MNE::run()
             }
             ++skip_count;
         }
-
-        m_qMutex.lock();
-        qint32 t_evokedSize = m_qVecFiffEvoked.size();
-        m_qMutex.unlock();
 
         if(t_evokedSize > 0)
         {
