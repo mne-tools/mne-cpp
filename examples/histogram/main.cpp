@@ -1,4 +1,5 @@
 //=============================================================================================================
+
 /**
 * @file     histogram.cpp
 * @author   Ricky Tjen <ricky270@student.sgu.ac.id>;
@@ -33,6 +34,7 @@
 *
 */
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
@@ -46,7 +48,7 @@
 #include <string>
 #include <fiff/fiff.h>
 #include <mne/mne.h>
-#include <utils/histogram.h>
+#include <utils/mnemath.h>
 
 
 //*************************************************************************************************************
@@ -65,7 +67,6 @@
 #include <QtCharts/QBarCategoryAxis>
 #include <QtCharts>
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -76,59 +77,13 @@ using namespace MNELIB;
 using namespace std;
 QT_CHARTS_USE_NAMESPACE
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
 
 //=============================================================================================================
-/**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
-*
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
-*/
-
-// This function normalizes the data matrix into desired range before sorting [***untested and not used***]
-/**MatrixXd normalize(const MatrixXd& rawMatrix, matrixRange range, std::string transposeOption, vector temp_MatrixRange)
-*{
-*    MatrixXd normalizedValue;
-*    bool doLocalScale = false;
-*    std::string bTransposeOption = transposeOption;
-*    std::vector range = findRawLocalMinMax(rawMatrix, transposeOption, temp_MatrixRange);
-*    if (range.globalMin == 0.0 && range.globalMax == 0.0)       //if global range is NOT given by the user, use local scaling
-*    {
-*        doLocalScale = true;
-*    }
-*
-*    if (doLocalScale = false)                       //in case global range is given, use global scaling
-*    {
-*        for (int ir = 0; ir < rawMatrix.cols(); ir++)
-*        {
-*            for (int jr = 0; jr< rawMatrix.rows(); jr++)
-*            {
-*             //formula for normalizing values in range [rawMin,rawMax] to range [globalMin,globalMax]
-*            normalizedValue(ir,jr) = (((range.globalMax - range.globalMin) * rawMatrix(ir,jr))/(range.rawMax - range.rawMin)) + (((range.rawMax * range.globalMin)- (range.rawMin * range.globalMax))/(range.rawMax - range.rawMin));
-*            }
-*        }
-*    }
-*
-*    if (doLocalScale = true)
-*    {
-*        for (int ir = 0; ir < rawMatrix.cols(); ir++)
-*        {
-*            for (int jr = 0; jr<rawMatrix.rows(); jr++)
-*            {
-*             //formula for normalizing values in range [rawMin,rawMax] to range [localMin,localMax]
-*             normalizedValue(ir,jr) = (((range.localMax - range.localMin) * rawMatrix(ir,jr))/(range.rawMax - range.rawMin)) + (((range.rawMax * range.localMin)- (range.rawMin * range.localMax))/(range.rawMax - range.rawMin));
-*            }
-*        }
-*    }
-*    return normalizedValue;  //returns the normalized matrix to main();
-*}
-**/
 
 //sineWaveGenerator used for debugging purposes only
 #ifndef M_PI
@@ -138,13 +93,14 @@ const double M_PI = 3.14159265358979323846;
 Eigen::VectorXd sineWaveGenerator(double amplitude, double xStep, int xNow, int xEnd)
 {
     int iterateAmount = (xEnd-xNow)/xStep;
-    Eigen::VectorXd sineWaveResult(iterateAmount);
+    Eigen::VectorXd sineWaveResultOriginal(iterateAmount);
+    Eigen::VectorXd sineWaveResult = sineWaveResultOriginal.transpose();
     double sineResult;
     double omega = 2.0*M_PI;
     int iterateCount = 0;
     for (double step = xNow; step < xEnd; step +=xStep)
     {
-        sineResult = amplitude*sin(omega * step);
+        sineResult = amplitude* (sin(omega * step));
         sineWaveResult(iterateCount) = sineResult;
         iterateCount++;
     }
@@ -157,8 +113,8 @@ int main(int argc, char *argv[])
 
     QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
 
-    float from = 41.0f;
-    float to = 45.01f;
+    float from = 40.0f;
+    float to = 46.01f;
 
     bool in_samples = false;
 
@@ -253,17 +209,17 @@ int main(int argc, char *argv[])
 
     printf("Read %d samples.\n",(qint32)data.cols());
     Eigen::VectorXd dataSine;
-    dataSine = sineWaveGenerator(2.0,(5.0/20000), 0.0, 5.0);
+    dataSine = sineWaveGenerator(1.0,(1.0/1000), 0.0, 1.0);
 
     // histogram calculation
-    bool transposeOption;
-    transposeOption = false;      //transpose option: false means data is unchanged, true means changing negative values to positive
-    int ClassAmount = 1000;        //initialize the amount of classes and class frequencies
+    bool bMakeSymmetrical;
+    bMakeSymmetrical = false;      //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
+    int ClassAmount = 100;          //initialize the amount of classes and class frequencies
     double inputGlobalMin = 0.0,
            inputGlobalMax = 0.0;
     QVector<double> resultClassLimits;
     QVector<int> resultFrequency;
-    Histogram::sort(dataSine,transposeOption, ClassAmount, resultClassLimits, resultFrequency, inputGlobalMin, inputGlobalMax );   //user input to normalize and sort the data matrix
+    MNEMath::histcounts(dataSine,bMakeSymmetrical, ClassAmount, resultClassLimits, resultFrequency, inputGlobalMin, inputGlobalMax );   //user input to normalize and sort the data matrix
     qDebug() << "data successfully sorted into desired range and class width...\n";
 
     //below is the function for printing the results on command prompt (for debugging purposes)
@@ -309,7 +265,7 @@ int main(int argc, char *argv[])
     QChart *chart = new QChart();
     qDebug() <<"Finished creating chart";
     chart->addSeries(series);
-    chart->setTitle("Histogram Example");
+    chart->setTitle("MNE-CPP Histogram Example");
     chart->setAnimationOptions(QChart::SeriesAnimations);
 
 
