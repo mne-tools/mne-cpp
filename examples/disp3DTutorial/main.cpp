@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
     QCommandLineOption sampleSourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "true");
     QCommandLineOption sampleFwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption sampleInvOpOption("invOp", "Path to inverse operator <file>.", "file", "");
-    QCommandLineOption sampleClustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");
+    QCommandLineOption sampleClustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "false");
 
     parser.addOption(sampleSurfOption);
     parser.addOption(sampleAnnotOption);
@@ -154,12 +154,12 @@ int main(int argc, char *argv[])
     //########################################################################################
 
     if(bAddRtSourceLoc) {
-        double snr = 1.0;
+        double snr = 3.0;
         double lambda2 = 1.0 / pow(snr, 2);
         QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
         // Load data
-        fiff_int_t setno = 1;
+        fiff_int_t setno = 3;
         QPair<QVariant, QVariant> baseline(QVariant(), 0);
         FiffEvoked evoked(t_fileEvoked, setno, baseline);
         if(evoked.isEmpty())

@@ -232,6 +232,10 @@ bool BrainRTSourceLocDataTreeItem::addData(const MNESourceEstimate& tSourceEstim
     int iStartIdx = this->data(BrainRTSourceLocDataTreeItemRoles::RTStartIdx).toInt();
     int iEndIdx = this->data(BrainRTSourceLocDataTreeItemRoles::RTEndIdx).toInt();
 
+    qDebug()<<"BrainRTSourceLocDataTreeItem::addData - iStartIdx"<<iStartIdx;
+    qDebug()<<"BrainRTSourceLocDataTreeItem::addData - iEndIdx"<<iEndIdx;
+    qDebug()<<"BrainRTSourceLocDataTreeItem::addData - tSourceEstimate.data.rows()"<<tSourceEstimate.data.rows();
+
     if(iStartIdx >= tSourceEstimate.data.rows() || iEndIdx >= tSourceEstimate.data.rows()) {
         qDebug()<<"BrainRTSourceLocDataTreeItem::addData - Start and/or end index do not match with incoming data";
         return false;

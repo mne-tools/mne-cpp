@@ -69,6 +69,7 @@
 
 #include <QtWidgets>
 #include <QFile>
+#include <QDataStream >
 
 
 //*************************************************************************************************************
@@ -238,7 +239,6 @@ private:
     AnnotationSet::SPtr         m_pAnnotationSet;   /**< Annotation set. */
     QString                     m_sSurfaceDir;      /**< File to Surface. */
     SurfaceSet::SPtr            m_pSurfaceSet;      /**< Surface set. */
-
 
     FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff information. */
     FiffInfo::SPtr              m_pFiffInfoInput;  /**< Fiff information of the evoked. */
