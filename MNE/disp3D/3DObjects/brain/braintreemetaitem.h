@@ -126,17 +126,11 @@ signals:
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the color origin (curvature or annotation) changed.
-    */
-    void colorInfoOriginChanged();
-
-    //=========================================================================================================
-    /**
     * Emit this signal whenever the time interval of the data streaming changed.
     *
     * @param[in] iMSec     The time interval in mSecs.
     */
-    void rtDataTimeIntervalChanged(const int& iMSec);
+    void rtDataTimeIntervalChanged(int iMSec);
 
     //=========================================================================================================
     /**
@@ -144,7 +138,7 @@ signals:
     *
     * @param[in] dValue     The new normalization value.
     */
-    void rtDataNormalizationValueChanged(const double& dValue);
+    void rtDataNormalizationValueChanged(double dValue);
 
     //=========================================================================================================
     /**
@@ -176,7 +170,15 @@ signals:
     *
     * @param[in] iMSec     The new number of averages.
     */
-    void rtDataNumberAveragesChanged(const int& iNumAvr);
+    void rtDataNumberAveragesChanged(int iNumAvr);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the surface alpha value has changed.
+    *
+    * @param[in] fAlpha     The new alpha value.
+    */
+    void surfaceAlphaChanged(float fAlpha);
 };
 
 } //NAMESPACE DISP3DLIB

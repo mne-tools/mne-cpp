@@ -152,10 +152,11 @@ void RealTimeSourceEstimateWidget::getData()
             m_lRtItem = m_p3DView->addRtBrainData("HemiLRSet", *m_pRTSE->getValue(), *m_pRTSE->getFwdSolution());
 
             for(int i = 0; i<m_lRtItem.size(); i++) {
-                m_lRtItem.at(i)->onCheckStateLoopedStateChanged(Qt::Checked);
-                m_lRtItem.at(i)->onTimeIntervalChanged(m_pRTSE->getValue()->tstep*1000000);
-                m_lRtItem.at(i)->onNumberAveragesChanged(10);
-                m_lRtItem.at(i)->onCheckStateWorkerChanged(Qt::Checked);
+                m_lRtItem.at(i)->setLoopState(false);
+                m_lRtItem.at(i)->setTimeInterval(1);
+                //m_lRtItem.at(i)->onTimeIntervalChanged(m_pRTSE->getValue()->tstep*1000000);
+                m_lRtItem.at(i)->setNumberAverages(1);
+                m_lRtItem.at(i)->setStreamingActive(true);
             }
         } else {
             for(int i = 0; i<m_lRtItem.size(); i++) {

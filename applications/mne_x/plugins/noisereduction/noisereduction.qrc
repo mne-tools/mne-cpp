@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/images">
+        <file alias="options.png">images/icons/options.png</file>
+    </qresource>
+</RCC>

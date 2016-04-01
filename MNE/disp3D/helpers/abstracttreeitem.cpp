@@ -59,6 +59,10 @@ AbstractTreeItem::AbstractTreeItem( int iType, const QString& text)
 , m_iType(iType)
 {
     this->setToolTip("Unknown");
+
+    //Do the connects
+    connect(this, &AbstractTreeItem::checkStateChanged,
+            this, &AbstractTreeItem::onCheckStateChanged);
 }
 
 
@@ -157,4 +161,16 @@ AbstractTreeItem& AbstractTreeItem::operator<<(AbstractTreeItem& newItem)
     this->appendRow(&newItem);
 
     return *this;
+}
+
+
+//*************************************************************************************************************
+
+void AbstractTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+{
+    for(int i = 0; i<this->rowCount(); i++) {
+        if(this->child(i)->isCheckable()) {
+            this->child(i)->setCheckState(checkState);
+        }
+    }
 }

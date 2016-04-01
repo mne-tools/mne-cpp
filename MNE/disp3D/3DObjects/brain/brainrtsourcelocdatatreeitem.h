@@ -160,6 +160,14 @@ public:
     inline bool isInit() const;
 
 public slots:
+    void setLoopState(bool state);
+
+    void setStreamingActive(bool state);
+
+    void setTimeInterval(int iMSec);
+
+    void setNumberAverages(int iNumberAverages);
+
     //=========================================================================================================
     /**
     * This slot gets called whenever the origin of the surface vertex color (curvature, annoation, etc.) changed.
@@ -168,6 +176,7 @@ public slots:
     */
     void onColorInfoOriginChanged(const QByteArray& arrayVertColor);
 
+private slots:
     //=========================================================================================================
     /**
     * This slot gets called whenever the check/actiation state of the rt data worker changed.

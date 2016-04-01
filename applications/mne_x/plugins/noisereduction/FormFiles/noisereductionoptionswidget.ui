@@ -97,7 +97,7 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QGroupBox" name="m_groupBox_ssp">
+    <widget class="QGroupBox" name="m_groupBox_projectors">
      <property name="title">
       <string>SSP</string>
      </property>

@@ -456,6 +456,14 @@ void RealTimeMultiSampleArrayDelegate::markerMoved(QPoint position, int activeRo
 
 //*************************************************************************************************************
 
+void RealTimeMultiSampleArrayDelegate::setSignalColor(const QColor& signalColor)
+{
+    m_penNormal.setColor(signalColor);
+}
+
+
+//*************************************************************************************************************
+
 void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPointF &ellipsePos, QString &amplitude, RowVectorPair &data) const
 {
     const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
