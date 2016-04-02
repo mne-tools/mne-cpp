@@ -117,15 +117,13 @@ void EEGoSports::init()
 
     //default values used by the setupGUI class must be set here
     m_iSamplingFreq = 1024;
-    m_iNumberOfChannels = 64;
+    m_iNumberOfChannels = 90;
     m_iSamplesPerBlock = 16;
-    m_iTriggerInterval = 5000;
     m_bUseChExponent = true;
     m_bWriteToFile = false;
     m_bWriteDriverDebugToFile = false;
     m_bUseFiltering = false;
     m_bIsRunning = false;
-    m_bBeepTrigger = false;
     m_bCheckImpedances = false;
 
     QDate date;
@@ -168,142 +166,144 @@ void EEGoSports::setUpFiffInfo()
     //
     //Read electrode positions from .elc file
     //
-    QVector< QVector<double> > elcLocation3D;
-    QVector< QVector<double> > elcLocation2D;
-    QString unit;
-    QStringList elcChannelNames;
+//    QVector< QVector<double> > elcLocation3D;
+//    QVector< QVector<double> > elcLocation2D;
+//    QString unit;
+//    QStringList elcChannelNames;
 
-    if(!LayoutLoader::readAsaElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
-        qDebug() << "Error: Reading elc file.";
+//    if(!LayoutLoader::readAsaElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
+//        qDebug() << "Error: Reading elc file.";
 
-    //qDebug() << elcLocation3D;
-    //qDebug() << elcLocation2D;
-    //qDebug() << elcChannelNames;
+//    //qDebug() << elcLocation3D;
+//    //qDebug() << elcLocation2D;
+//    //qDebug() << elcChannelNames;
 
-    //The positions read from the asa elc file do not correspond to a RAS coordinate system - use a simple 90° z transformation to fix this
-    Matrix3f rotation_z;
-    rotation_z = AngleAxisf((float)M_PI/2, Vector3f::UnitZ()); //M_PI/2 = 90°
-    QVector3D center_pos;
+//    //The positions read from the asa elc file do not correspond to a RAS coordinate system - use a simple 90° z transformation to fix this
+//    Matrix3f rotation_z;
+//    rotation_z = AngleAxisf((float)M_PI/2, Vector3f::UnitZ()); //M_PI/2 = 90°
+//    QVector3D center_pos;
 
-    for(int i = 0; i<elcLocation3D.size(); i++)
-    {
-        Vector3f point;
-        point << elcLocation3D[i][0], elcLocation3D[i][1] , elcLocation3D[i][2];
-        Vector3f point_rot = rotation_z * point;
-//        cout<<"point: "<<endl<<point<<endl<<endl;
-//        cout<<"matrix: "<<endl<<rotation_z<<endl<<endl;
-//        cout<<"point_rot: "<<endl<<point_rot<<endl<<endl;
-//        cout<<"-----------------------------"<<endl;
-        elcLocation3D[i][0] = point_rot[0];
-        elcLocation3D[i][1] = point_rot[1];
-        elcLocation3D[i][2] = point_rot[2];
+//    for(int i = 0; i<elcLocation3D.size(); i++)
+//    {
+//        Vector3f point;
+//        point << elcLocation3D[i][0], elcLocation3D[i][1] , elcLocation3D[i][2];
+//        Vector3f point_rot = rotation_z * point;
+////        cout<<"point: "<<endl<<point<<endl<<endl;
+////        cout<<"matrix: "<<endl<<rotation_z<<endl<<endl;
+////        cout<<"point_rot: "<<endl<<point_rot<<endl<<endl;
+////        cout<<"-----------------------------"<<endl;
+//        elcLocation3D[i][0] = point_rot[0];
+//        elcLocation3D[i][1] = point_rot[1];
+//        elcLocation3D[i][2] = point_rot[2];
 
-        //Also calculate the center position of the electrode positions in this for routine
-        center_pos.setX(center_pos.x() + elcLocation3D[i][0]);
-        center_pos.setY(center_pos.y() + elcLocation3D[i][1]);
-        center_pos.setZ(center_pos.z() + elcLocation3D[i][2]);
-    }
+//        //Also calculate the center position of the electrode positions in this for routine
+//        center_pos.setX(center_pos.x() + elcLocation3D[i][0]);
+//        center_pos.setY(center_pos.y() + elcLocation3D[i][1]);
+//        center_pos.setZ(center_pos.z() + elcLocation3D[i][2]);
+//    }
 
-    center_pos.setX(center_pos.x()/elcLocation3D.size());
-    center_pos.setY(center_pos.y()/elcLocation3D.size());
-    center_pos.setZ(center_pos.z()/elcLocation3D.size());
+//    center_pos.setX(center_pos.x()/elcLocation3D.size());
+//    center_pos.setY(center_pos.y()/elcLocation3D.size());
+//    center_pos.setZ(center_pos.z()/elcLocation3D.size());
 
-    //
-    //Write electrode positions to the digitizer info in the fiffinfo
-    //
-    QList<FiffDigPoint> digitizerInfo;
+//    //
+//    //Write electrode positions to the digitizer info in the fiffinfo
+//    //
+//    QList<FiffDigPoint> digitizerInfo;
 
-    //Only write the EEG channel positions to the fiff info. The Refa devices have next to the EEG input channels 10 other input channels (Bipolar, Auxilary, Digital, Test)
-    int numberEEGCh;
-    if(m_iNumberOfChannels>128)
-        numberEEGCh = 138 - (m_iNumberOfChannels-128);
-    else
-        numberEEGCh = m_iNumberOfChannels;
+//    //Only write the EEG channel positions to the fiff info. The Refa devices have next to the EEG input channels 10 other input channels (Bipolar, Auxilary, Digital, Test)
+//    int numberEEGCh;
+//    if(m_iNumberOfChannels>128)
+//        numberEEGCh = 138 - (m_iNumberOfChannels-128);
+//    else
+//        numberEEGCh = m_iNumberOfChannels;
 
-    //Check if channel size by user corresponds with read channel informations from the elc file. If not append zeros and string 'unknown' until the size matches.
-    if(numberEEGCh > elcLocation3D.size())
-    {
-        qDebug()<<"Warning: setUpFiffInfo() - Not enough positions read from the elc file. Filling missing channel names and positions with zeroes and 'unknown' strings.";
-        QVector<double> tempA(3, 0.0);
-        QVector<double> tempB(2, 0.0);
-        int size = numberEEGCh-elcLocation3D.size();
-        for(int i = 0; i<size; i++)
-        {
-            elcLocation3D.push_back(tempA);
-            elcLocation2D.push_back(tempB);
-            elcChannelNames.append(QString("Unknown"));
-        }
-    }
+//    //Check if channel size by user corresponds with read channel informations from the elc file. If not append zeros and string 'unknown' until the size matches.
+//    if(numberEEGCh > elcLocation3D.size())
+//    {
+//        qDebug()<<"Warning: setUpFiffInfo() - Not enough positions read from the elc file. Filling missing channel names and positions with zeroes and 'unknown' strings.";
+//        QVector<double> tempA(3, 0.0);
+//        QVector<double> tempB(2, 0.0);
+//        int size = numberEEGCh-elcLocation3D.size();
+//        for(int i = 0; i<size; i++)
+//        {
+//            elcLocation3D.push_back(tempA);
+//            elcLocation2D.push_back(tempB);
+//            elcChannelNames.append(QString("Unknown"));
+//        }
+//    }
 
-    //Append LAP value to digitizer data. Take location of LE2 electrode minus 1 cm as approximation.
-    FiffDigPoint digPoint;
-    int indexLE2 = elcChannelNames.indexOf("LE2");
-    digPoint.kind = FIFFV_POINT_CARDINAL;
-    digPoint.ident = FIFFV_POINT_LPA;//digitizerInfo.size();
+//    //Append LAP value to digitizer data. Take location of LE2 electrode minus 1 cm as approximation.
+//    FiffDigPoint digPoint;
+//    int indexLE2 = elcChannelNames.indexOf("LE2");
+//    digPoint.kind = FIFFV_POINT_CARDINAL;
+//    digPoint.ident = FIFFV_POINT_LPA;//digitizerInfo.size();
 
-    //Set EEG electrode location - Convert from mm to m
-    if(indexLE2!=-1)
-    {
-        digPoint.r[0] = elcLocation3D[indexLE2][0]*0.001;
-        digPoint.r[1] = elcLocation3D[indexLE2][1]*0.001;
-        digPoint.r[2] = (elcLocation3D[indexLE2][2]-10)*0.001;
-        digitizerInfo.push_back(digPoint);
-    }
-    else
-        cout<<"Plugin TMSI - ERROR - LE2 not found. Check loaded layout."<<endl;
+//    //Set EEG electrode location - Convert from mm to m
+//    if(indexLE2!=-1)
+//    {
+//        digPoint.r[0] = elcLocation3D[indexLE2][0]*0.001;
+//        digPoint.r[1] = elcLocation3D[indexLE2][1]*0.001;
+//        digPoint.r[2] = (elcLocation3D[indexLE2][2]-10)*0.001;
+//        digitizerInfo.push_back(digPoint);
+//    }
+//    else
+//        cout<<"Plugin TMSI - ERROR - LE2 not found. Check loaded layout."<<endl;
 
-    //Append nasion value to digitizer data. Take location of Z1 electrode minus 6 cm as approximation.
-    int indexZ1 = elcChannelNames.indexOf("Z1");
-    digPoint.kind = FIFFV_POINT_CARDINAL;//FIFFV_POINT_NASION;
-    digPoint.ident = FIFFV_POINT_NASION;//digitizerInfo.size();
+//    //Append nasion value to digitizer data. Take location of Z1 electrode minus 6 cm as approximation.
+//    int indexZ1 = elcChannelNames.indexOf("Z1");
+//    digPoint.kind = FIFFV_POINT_CARDINAL;//FIFFV_POINT_NASION;
+//    digPoint.ident = FIFFV_POINT_NASION;//digitizerInfo.size();
 
-    //Set EEG electrode location - Convert from mm to m
-    if(indexZ1!=-1)
-    {
-        digPoint.r[0] = elcLocation3D[indexZ1][0]*0.001;
-        digPoint.r[1] = elcLocation3D[indexZ1][1]*0.001;
-        digPoint.r[2] = (elcLocation3D[indexZ1][2]-60)*0.001;
-        digitizerInfo.push_back(digPoint);
-    }
-    else
-        cout<<"Plugin TMSI - ERROR - Z1 not found. Check loaded layout."<<endl;
+//    //Set EEG electrode location - Convert from mm to m
+//    if(indexZ1!=-1)
+//    {
+//        digPoint.r[0] = elcLocation3D[indexZ1][0]*0.001;
+//        digPoint.r[1] = elcLocation3D[indexZ1][1]*0.001;
+//        digPoint.r[2] = (elcLocation3D[indexZ1][2]-60)*0.001;
+//        digitizerInfo.push_back(digPoint);
+//    }
+//    else
+//        cout<<"Plugin TMSI - ERROR - Z1 not found. Check loaded layout."<<endl;
 
-    //Append RAP value to digitizer data. Take location of RE2 electrode minus 1 cm as approximation.
-    int indexRE2 = elcChannelNames.indexOf("RE2");
-    digPoint.kind = FIFFV_POINT_CARDINAL;
-    digPoint.ident = FIFFV_POINT_RPA;//digitizerInfo.size();
+//    //Append RAP value to digitizer data. Take location of RE2 electrode minus 1 cm as approximation.
+//    int indexRE2 = elcChannelNames.indexOf("RE2");
+//    digPoint.kind = FIFFV_POINT_CARDINAL;
+//    digPoint.ident = FIFFV_POINT_RPA;//digitizerInfo.size();
 
-    //Set EEG electrode location - Convert from mm to m
-    if(indexRE2!=-1)
-    {
-        digPoint.r[0] = elcLocation3D[indexRE2][0]*0.001;
-        digPoint.r[1] = elcLocation3D[indexRE2][1]*0.001;
-        digPoint.r[2] = (elcLocation3D[indexRE2][2]-10)*0.001;
-        digitizerInfo.push_back(digPoint);
-    }
-    else
-        cout<<"Plugin TMSI - ERROR - RE2 not found. Check loaded layout."<<endl;
+//    //Set EEG electrode location - Convert from mm to m
+//    if(indexRE2!=-1)
+//    {
+//        digPoint.r[0] = elcLocation3D[indexRE2][0]*0.001;
+//        digPoint.r[1] = elcLocation3D[indexRE2][1]*0.001;
+//        digPoint.r[2] = (elcLocation3D[indexRE2][2]-10)*0.001;
+//        digitizerInfo.push_back(digPoint);
+//    }
+//    else
+//        cout<<"Plugin TMSI - ERROR - RE2 not found. Check loaded layout."<<endl;
 
-    //Add EEG electrode positions as digitizers
-    for(int i=0; i<numberEEGCh; i++)
-    {
-        FiffDigPoint digPoint;
-        digPoint.kind = FIFFV_POINT_EEG;
-        digPoint.ident = i;
+//    //Add EEG electrode positions as digitizers
+//    for(int i=0; i<numberEEGCh; i++)
+//    {
+//        FiffDigPoint digPoint;
+//        digPoint.kind = FIFFV_POINT_EEG;
+//        digPoint.ident = i;
 
-        //Set EEG electrode location - Convert from mm to m
-        digPoint.r[0] = elcLocation3D[i][0]*0.001;
-        digPoint.r[1] = elcLocation3D[i][1]*0.001;
-        digPoint.r[2] = elcLocation3D[i][2]*0.001;
-        digitizerInfo.push_back(digPoint);
-    }
+//        //Set EEG electrode location - Convert from mm to m
+//        digPoint.r[0] = elcLocation3D[i][0]*0.001;
+//        digPoint.r[1] = elcLocation3D[i][1]*0.001;
+//        digPoint.r[2] = elcLocation3D[i][2]*0.001;
+//        digitizerInfo.push_back(digPoint);
+//    }
 
-    //Set the final digitizer values to the fiff info
-    m_pFiffInfo->dig = digitizerInfo;
+//    //Set the final digitizer values to the fiff info
+//    m_pFiffInfo->dig = digitizerInfo;
 
     //
     //Set up the channel info
     //
+    int numberEEGCh = 64;
+
     QStringList QSLChNames;
     m_pFiffInfo->chs.clear();
 
@@ -343,24 +343,24 @@ void EEGoSports::setUpFiffInfo()
             fChInfo.unit = FIFF_UNIT_V;
             fChInfo.unit_mul = 0;
 
-            //Set EEG electrode location - Convert from mm to m
-            fChInfo.eeg_loc(0,0) = elcLocation3D[i][0]*0.001;
-            fChInfo.eeg_loc(1,0) = elcLocation3D[i][1]*0.001;
-            fChInfo.eeg_loc(2,0) = elcLocation3D[i][2]*0.001;
+//            //Set EEG electrode location - Convert from mm to m
+//            fChInfo.eeg_loc(0,0) = elcLocation3D[i][0]*0.001;
+//            fChInfo.eeg_loc(1,0) = elcLocation3D[i][1]*0.001;
+//            fChInfo.eeg_loc(2,0) = elcLocation3D[i][2]*0.001;
 
-            //Set EEG electrode direction - Convert from mm to m
-            fChInfo.eeg_loc(0,1) = center_pos.x()*0.001;
-            fChInfo.eeg_loc(1,1) = center_pos.y()*0.001;
-            fChInfo.eeg_loc(2,1) = center_pos.z()*0.001;
+//            //Set EEG electrode direction - Convert from mm to m
+//            fChInfo.eeg_loc(0,1) = center_pos.x()*0.001;
+//            fChInfo.eeg_loc(1,1) = center_pos.y()*0.001;
+//            fChInfo.eeg_loc(2,1) = center_pos.z()*0.001;
 
-            //Also write the eeg electrode locations into the meg loc variable (mne_ex_read_raw() matlab function wants this)
-            fChInfo.loc(0,0) = elcLocation3D[i][0]*0.001;
-            fChInfo.loc(1,0) = elcLocation3D[i][1]*0.001;
-            fChInfo.loc(2,0) = elcLocation3D[i][2]*0.001;
+//            //Also write the eeg electrode locations into the meg loc variable (mne_ex_read_raw() matlab function wants this)
+//            fChInfo.loc(0,0) = elcLocation3D[i][0]*0.001;
+//            fChInfo.loc(1,0) = elcLocation3D[i][1]*0.001;
+//            fChInfo.loc(2,0) = elcLocation3D[i][2]*0.001;
 
-            fChInfo.loc(3,0) = center_pos.x()*0.001;
-            fChInfo.loc(4,0) = center_pos.y()*0.001;
-            fChInfo.loc(5,0) = center_pos.z()*0.001;
+//            fChInfo.loc(3,0) = center_pos.x()*0.001;
+//            fChInfo.loc(4,0) = center_pos.y()*0.001;
+//            fChInfo.loc(5,0) = center_pos.z()*0.001;
 
             fChInfo.loc(6,0) = 0;
             fChInfo.loc(7,0) = 1;
@@ -371,6 +371,36 @@ void EEGoSports::setUpFiffInfo()
             fChInfo.loc(11,0) = 1;
 
             //cout<<i<<endl<<fChInfo.eeg_loc<<endl;
+        }
+
+        //Bipolar channels
+        if(i>=64 && i<=87)
+        {
+            //Set channel type
+            fChInfo.kind = FIFFV_MISC_CH;
+
+            sChType = QString("BIPO ");
+            fChInfo.ch_name = sChType.append(sChType.number(i-64));
+        }
+
+        //Digital input channel
+        if(i==88)
+        {
+            //Set channel type
+            fChInfo.kind = FIFFV_STIM_CH;
+
+            sChType = QString("STIM");
+            fChInfo.ch_name = sChType;
+        }
+
+        //Internally generated test signal - ramp signal
+        if(i==89)
+        {
+            //Set channel type
+            fChInfo.kind = FIFFV_MISC_CH;
+
+            sChType = QString("TEST");
+            fChInfo.ch_name = sChType;
         }
 
         QSLChNames << sChType;
@@ -437,9 +467,6 @@ bool EEGoSports::start()
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
     if(this->isRunning())
         QThread::wait();
-
-    if(m_bBeepTrigger)
-        m_qTimerTrigger.start();
 
     //Setup fiff info
     setUpFiffInfo();
@@ -542,47 +569,29 @@ void EEGoSports::run()
 {
     while(m_bIsRunning)
     {
-        //std::cout<<"EEGoSports::run(s)"<<std::endl;
-
-        //pop matrix only if the producer thread is running
         if(m_pEEGoSportsProducer->isRunning())
         {
-            //MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
-            MatrixXf matValue;
-
             m_mutex.lock();
+
             if(m_qListReceivedSamples.isEmpty() == false)
             {
+                //MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
+                MatrixXf matValue;
+
                 //cout<<m_qListReceivedSamples.size()<<endl;
                 matValue = m_qListReceivedSamples.first();
                 m_qListReceivedSamples.removeFirst();
-            }
-            m_mutex.unlock();
 
-            // Set Beep trigger (if activated)
-            if(m_bBeepTrigger && m_qTimerTrigger.elapsed() >= m_iTriggerInterval)
-            {
-                QtConcurrent::run(Beep, 450, 700);
-                //Set trigger in received data samples - just for one sample, so that this event is easy to detect
-                //matValue(136, m_iSamplesPerBlock-1) = 252;
-                m_qTimerTrigger.restart();
+                //Write raw data to fif file
+                if(m_bWriteToFile)
+                    m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
+
+                //emit values to real time multi sample array
+                qDebug()<<"EEGoSports::run() - mat size"<<matValue.rows()<<"x"<<matValue.cols();
+                m_pRMTSA_EEGoSports->data()->setValue(matValue.cast<double>());
             }
 
-            //Write raw data to fif file
-            if(m_bWriteToFile)
-                m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
-
-            // Use preprocessing if wanted by the user
-            if(m_bUseFiltering)
-            {
-                MatrixXf temp = matValue;
-
-                matValue = matValue - m_matOldMatrix;
-                m_matOldMatrix = temp;
-            }
-
-            //emit values to real time multi sample array
-            m_pRMTSA_EEGoSports->data()->setValue(matValue.cast<double>());
+            m_mutex.unlock();            
         }
     }
 
