@@ -134,18 +134,20 @@ public:
     * @param [in] MatrixXf the block sample values in form of a matrix.
     * @param [out] bool returns true if sample was successfully written to the input variable, false otherwise.
     */
-    bool getSampleMatrixValue(Eigen::MatrixXf& sampleMatrix);
+    bool getSampleMatrixValue(Eigen::MatrixXd& sampleMatrix);
 
     //=========================================================================================================
     /**
     * Initialise device.
     * @param [in] iNumberOfChannels number of channels specified by the user.
+    * @param [in] iSamplesPerBlock samples per block specified by the user.
     * @param [in] iSamplingFrequency sampling frequency specified by the user.
     * @param [in] bWriteDriverDebugToFile Flag for writing driver debug information to a file. Defined by the user via the GUI.
     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
     * @param [in] bMeasureImpedance Flag for measuring impedances.
     */
     bool initDevice(int iNumberOfChannels,
+                    int iSamplesPerBlock,
                     int iSamplingFrequency,
                     bool bWriteDriverDebugToFile,
                     QString sOutpuFilePath,
@@ -166,10 +168,13 @@ private:
 
     uint                        m_uiNumberOfChannels;           /**< The number of channels defined by the user via the GUI.*/
     uint                        m_uiSamplingFrequency;          /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
+    uint                        m_uiSamplesPerBlock;            /**< The samples per block defined by the user via the GUI.*/
     bool                        m_bWriteDriverDebugToFile;      /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
     bool                        m_bUsePreprocessing;            /**< Flag for using preprocessing actions for the EEG data. Defined by the user via the GUI.*/
     QString                     m_sOutputFilePath;              /**< Holds the path for the output file. Defined by the user via the GUI.*/
     bool                        m_bMeasureImpedances;           /**< Flag for impedance measuring mode.*/
+
+    QVector<Eigen::VectorXd>    m_vecSampleBlockBuffer;         /**< Buffer to store all the incoming smaples. This is the buffer which is getting read from.*/
 
     eemagine::sdk::stream*      m_pDataStream;                  /**< The EEG/Impedance data stream.*/
     eemagine::sdk::amplifier*   m_pAmplifier;                   /**< Interface to the amplifier.*/

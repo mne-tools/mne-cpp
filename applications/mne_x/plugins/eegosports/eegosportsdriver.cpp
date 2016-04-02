@@ -65,6 +65,7 @@ EEGoSportsDriver::EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer)
 , m_bInitDeviceSuccess(false)
 , m_uiNumberOfChannels(64)
 , m_uiSamplingFrequency(1024)
+, m_uiSamplesPerBlock(100)
 , m_bWriteDriverDebugToFile(false)
 , m_sOutputFilePath("/mne_x_plugins/resources/eegosports")
 , m_bMeasureImpedances(false)
@@ -84,6 +85,7 @@ EEGoSportsDriver::~EEGoSportsDriver()
 //*************************************************************************************************************
 
 bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
+                            int iSamplesPerBlock,
                             int iSamplingFrequency,
                             bool bWriteDriverDebugToFile,
                             QString sOutpuFilePath,
@@ -95,6 +97,7 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
 
     //Set global variables
     m_uiNumberOfChannels = iNumberOfChannels;
+    m_uiSamplesPerBlock = iSamplesPerBlock;
     m_uiSamplingFrequency = iSamplingFrequency;
     m_bWriteDriverDebugToFile = bWriteDriverDebugToFile;
     m_sOutputFilePath = sOutpuFilePath;
@@ -163,7 +166,7 @@ bool EEGoSportsDriver::uninitDevice()
 
 //*************************************************************************************************************
 
-bool EEGoSportsDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
+bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
 {
     //Check if device was initialised and connected correctly
     if(!m_bInitDeviceSuccess)
@@ -172,72 +175,81 @@ bool EEGoSportsDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
         return false;
     }
 
-    buffer buf = m_pDataStream->getData();
-    std::cout << "EEGoSportsDriver::getSampleMatrixValue - Samples read: " << buf.getSampleCount() << std::endl;
-    std::cout << "EEGoSportsDriver::getSampleMatrixValue - Channel count: " << buf.getChannelCount() << std::endl;
-    std::cout << "EEGoSportsDriver::getSampleMatrixValue - size: " << buf.size() << std::endl;
+    sampleMatrix = MatrixXd(90, m_uiSamplesPerBlock);
+    sampleMatrix.setZero(); // Clear matrix - set all elements to zero
 
-    int iReceivedSamples = buf.getSampleCount();
-    int iChannelCount = buf.getChannelCount();
+    uint iSamplesWrittenToMatrix = 0;
+    int sampleMax = 0;
+    int sampleIterator = 0;
 
-    sampleMatrix = MatrixXf(iChannelCount, iReceivedSamples);
+    //get samples from device until the complete matrix is filled, i.e. the samples per block size is met
+    while(iSamplesWrittenToMatrix < m_uiSamplesPerBlock)
+    {
+        //Get sample block from device
+        buffer buf = m_pDataStream->getData();
 
-    if(iReceivedSamples > 0) {
-        //Write data to matrix
+        int iReceivedSamples = buf.getSampleCount();
+        int iChannelCount = buf.getChannelCount();
 
+        //Only do the next steps if there was at least one sample received, otherwise skip and wait until at least one sample was received
+        if(iReceivedSamples > 0)
+        {
+            int actualSamplesWritten = 0; //Holds the number of samples which are actually written to the matrix in this while procedure
 
-        for(int sample = 0; sample < iReceivedSamples; sample++)
-            for(int channel = 0; channel < iChannelCount; channel++)
-                sampleMatrix(channel, sample) = buf.getSample(channel, sample);
+            //Write the received samples to an extra buffer, so that they are not getting lost if too many samples were received. These are then written to the next matrix (block)
+            for(int i=0; i<iReceivedSamples; i++) {
+                VectorXd vec(iChannelCount);
+
+                for(uint j=0; j<iChannelCount; j++) {
+                    vec(j) = buf.getSample(j,i);
+                }
+
+                m_vecSampleBlockBuffer.push_back(vec);
+            }
+
+            //If the number of the samples which were already written to the matrix plus the last received number of samples is larger then the defined block size
+            //-> only fill until the matrix is completeley filled with samples. The other (unused) samples are still stored in the vector buffer m_vSampleBlockBuffer and will be used in the next matrix which is to be sent to the circular buffer
+            if(iSamplesWrittenToMatrix + iReceivedSamples > m_uiSamplesPerBlock)
+                sampleMax = m_uiSamplesPerBlock - iSamplesWrittenToMatrix + sampleIterator;
+            else
+                sampleMax = iReceivedSamples + sampleIterator;
+
+            //Read the needed number of samples from the vector buffer to store them in the matrix
+            for(; sampleIterator < sampleMax; sampleIterator++)
+            {
+                sampleMatrix.col(sampleIterator) = m_vecSampleBlockBuffer.first();
+                m_vecSampleBlockBuffer.pop_front();
+
+                actualSamplesWritten ++;
+            }
+
+            iSamplesWrittenToMatrix = iSamplesWrittenToMatrix + actualSamplesWritten;
+        }
+
+//        std::cout << "buf.getSampleCount(): " << buf.getSampleCount() << std::endl;
+//        std::cout << "buf.getChannelCount(): " << buf.getChannelCount() << std::endl;
+//        std::cout << "buf.size(): " << buf.size() << std::endl;
+//        std::cout << "iReceivedSamples: " << iReceivedSamples << std::endl;
+//        std::cout << "sampleMax: " << sampleMax << std::endl;
+//        std::cout << "sampleIterator: " << sampleIterator << std::endl;
+//        std::cout << "iSamplesWrittenToMatrix: " << iSamplesWrittenToMatrix << std::endl;
+//        std::cout << "m_uiSamplesPerBlock: " << m_uiSamplesPerBlock << std::endl;
+//        std::cout << "m_uiSamplesPerBlock: " << m_uiSamplesPerBlock << std::endl << std::endl;
+
+        if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile)
+        {
+            m_outputFileStream << "buf.getSampleCount(): " << buf.getSampleCount() << std::endl;
+            m_outputFileStream << "buf.getChannelCount(): " << buf.getChannelCount() << std::endl;
+            m_outputFileStream << "buf.size(): " << buf.size() << std::endl;
+            m_outputFileStream << "iReceivedSamples: " << iReceivedSamples << std::endl;
+            m_outputFileStream << "sampleMax: " << sampleMax << std::endl;
+            m_outputFileStream << "sampleIterator: " << sampleIterator << std::endl;
+            m_outputFileStream << "iSamplesWrittenToMatrix: " << iSamplesWrittenToMatrix << std::endl << std::endl;
+            m_outputFileStream << "m_vecSampleBlockBuffer.size(): " << m_vecSampleBlockBuffer.size() << std::endl;
+        }
     }
 
     Sleep(100);
 
     return true;
-
-//    // Init stuff
-//    int channelMax = 0;
-//    IBuffer* pBuffer; // The data storage
-
-//    //Fetch data from device/driver like this:
-//    m_pAmplifier->GetData(&pBuffer);
-
-//    //Get sample and channel infos from device
-//    m_uiNumberOfAvailableChannels = pBuffer->GetChannelCount();
-//    int ulNumSamplesReceived = pBuffer->GetSampleCount();
-
-//    //Only do the next steps if there was at least one sample received, otherwise skip and wait until at least one sample was received
-//    if(ulNumSamplesReceived>0)
-//    {
-//        //If the number of available channels is smaller than the number defined by the user -> set the channelMax to the smaller number
-//        if(m_uiNumberOfAvailableChannels < m_uiNumberOfChannels)
-//            channelMax = m_uiNumberOfAvailableChannels;
-//        else
-//            channelMax = m_uiNumberOfChannels;
-
-//        sampleMatrix = MatrixXf (channelMax, ulNumSamplesReceived);
-
-//        // Write data to matrix
-//        for(int sample = 0; sample < ulNumSamplesReceived; sample++)
-//            for(int channel = 0; channel < channelMax; channel++)
-//                sampleMatrix(channel, sample) = m_bUseChExponent ? pBuffer->GetBuffer(channel, sample) * 1e-6 : pBuffer->GetBuffer(channel, sample);
-
-//        // Memory cleanup
-//        pBuffer->Release();
-//        pBuffer = NULL;
-
-//        if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile)
-//            m_outputFileStream << "ulNumSamplesReceived: " << ulNumSamplesReceived << endl;
-
-//        return true;
-//    }
-
-//    if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile)
-//        m_outputFileStream << "ulNumSamplesReceived: " << ulNumSamplesReceived << endl;
-
-//    // Memory cleanup
-//    pBuffer->Release();
-//    pBuffer = NULL;
-
-    return false;
 }
