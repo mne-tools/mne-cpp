@@ -141,15 +141,12 @@ public:
     * Initialise device.
     * @param [in] iNumberOfChannels number of channels specified by the user.
     * @param [in] iSamplingFrequency sampling frequency specified by the user.
-    * @param [in] bUseChExponent Flag for using the channels exponent. Defined by the user via the GUI.
     * @param [in] bWriteDriverDebugToFile Flag for writing driver debug information to a file. Defined by the user via the GUI.
     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
-    * @param [out] bool returns true if device was successfully initialised, false otherwise.
     * @param [in] bMeasureImpedance Flag for measuring impedances.
     */
     bool initDevice(int iNumberOfChannels,
                     int iSamplingFrequency,
-                    bool bUseChExponent,
                     bool bWriteDriverDebugToFile,
                     QString sOutpuFilePath,
                     bool bMeasureImpedance);
@@ -169,7 +166,6 @@ private:
 
     uint                        m_uiNumberOfChannels;           /**< The number of channels defined by the user via the GUI.*/
     uint                        m_uiSamplingFrequency;          /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
-    bool                        m_bUseChExponent;               /**< Flag for using the channels exponent. Defined by the user via the GUI.*/
     bool                        m_bWriteDriverDebugToFile;      /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
     bool                        m_bUsePreprocessing;            /**< Flag for using preprocessing actions for the EEG data. Defined by the user via the GUI.*/
     QString                     m_sOutputFilePath;              /**< Holds the path for the output file. Defined by the user via the GUI.*/
