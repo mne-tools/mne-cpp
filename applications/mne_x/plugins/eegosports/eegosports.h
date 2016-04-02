@@ -232,15 +232,11 @@ private:
     int                                 m_iNumberOfChannels;                /**< The samples per block defined by the user via the GUI.*/
     int                                 m_iSamplesPerBlock;                 /**< The number of channels defined by the user via the GUI.*/
 
-    int                                 m_iTriggerInterval;                 /**< The gap between the trigger signals which request the subject to do something (in ms).*/
-    QTime                               m_qTimerTrigger;                    /**< Time stemp of the last trigger event (in ms).*/
-
     bool                                m_bUseChExponent;                   /**< Flag for using the channels exponent. Defined by the user via the GUI.*/
     bool                                m_bWriteToFile;                     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                m_bWriteDriverDebugToFile;          /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
     bool                                m_bUseFiltering;                    /**< Flag for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                m_bIsRunning;                       /**< Whether EEGoSports is running.*/
-    bool                                m_bBeepTrigger;                     /**< Flag for using a trigger input.*/
     bool                                m_bCheckImpedances;                 /**< Flag for checking the impedances of the EEG amplifier.*/
 
     ofstream                            m_outputFileStream;                 /**< fstream for writing the samples values to txt file.*/
@@ -254,8 +250,6 @@ private:
     QSharedPointer<RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/
 
     QSharedPointer<EEGoSportsProducer>  m_pEEGoSportsProducer;              /**< the EEGoSportsProducer.*/
-
-    MatrixXf                            m_matOldMatrix;                     /**< Last received sample matrix by the tmsiproducer/tmsidriver class. Used for simple HP filtering.*/
 
     QMutex                              m_qMutex;                           /**< Holds the threads mutex.*/
 

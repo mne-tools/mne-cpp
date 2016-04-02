@@ -89,14 +89,6 @@ EEGoSportsSetupWidget::EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget* p
     connect(ui.m_checkBox_WriteDriverDebugToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &EEGoSportsSetupWidget::setWriteToFile);
 
-    //Connect trigger properties
-    connect(ui.m_spinBox_BeepLength, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &EEGoSportsSetupWidget::setTriggerProperties);
-    connect(ui.m_checkBox_EnableBeep, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &EEGoSportsSetupWidget::setTriggerProperties);
-    connect(ui.m_checkBox_EnableKeyboardTrigger, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &EEGoSportsSetupWidget::setTriggerProperties);
-
     //Connect about button
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &EEGoSportsSetupWidget::showAboutDialog);
 
@@ -139,10 +131,6 @@ void EEGoSportsSetupWidget::initGui()
 
     //Init write to file
     ui.m_checkBox_WriteDriverDebugToFile->setChecked(m_pEEGoSports->m_bWriteDriverDebugToFile);
-
-    //Init trigger properties
-    ui.m_spinBox_BeepLength->setValue(m_pEEGoSports->m_iTriggerInterval);
-    ui.m_checkBox_EnableBeep->setChecked(m_pEEGoSports->m_bBeepTrigger);
 }
 
 
@@ -177,14 +165,6 @@ void EEGoSportsSetupWidget::setPostprocessing()
 void EEGoSportsSetupWidget::setWriteToFile()
 {
     m_pEEGoSports->m_bWriteDriverDebugToFile = ui.m_checkBox_WriteDriverDebugToFile->isChecked();
-}
-
-//*************************************************************************************************************
-
-void EEGoSportsSetupWidget::setTriggerProperties()
-{
-    m_pEEGoSports->m_iTriggerInterval = ui.m_spinBox_BeepLength->value();
-    m_pEEGoSports->m_bBeepTrigger = ui.m_checkBox_EnableBeep->isChecked();
 }
 
 

@@ -42,25 +42,6 @@ CONFIG += plugin
 
 DEFINES += EEGOSPORTS_LIBRARY
 
-contains(QMAKE_HOST.arch, x86_64) { #Compiling MNE-X FOR a 64bit system
-    exists(C:/Windows/System32/eego.dll) {
-        DEFINES += TAKE_EEGOSPORTSSDK_DLL
-    }
-}
-else {
-    exists(C:/Windows/SysWOW64/eego.dll) { #Compiling MNE-X FOR a 32bit system ON a 64bit system
-        DEFINES += TAKE_EEGOSPORTSSDK_32_DLL
-    }
-    else {
-        exists(C:/Windows/System32/eego.dll) { #Compiling MNE-X FOR a 32bit system ON a 32bit system
-            DEFINES += TAKE_EEGOSPORTSSDK_DLL
-        }
-        else {
-            message(EEGOSPORTS.pro warning: EEGoSports Driver DLL not found!)
-        }
-    }
-}
-
 QT += core widgets svg
 
 TARGET = EEGoSports
