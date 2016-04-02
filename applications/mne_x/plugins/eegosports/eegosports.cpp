@@ -132,9 +132,6 @@ void EEGoSports::init()
     m_sElcFilePath = QString("./mne_x_plugins/resources/eegosports/loc_files/standard_waveguard64.elc");
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
-
-    //Initialise matrix used to perform a very simple high pass filter operation
-    //m_matOldMatrix = MatrixXf::Zero(m_iNumberOfChannels, m_iSamplesPerBlock);
 }
 
 
@@ -418,45 +415,6 @@ void EEGoSports::setUpFiffInfo()
     m_pFiffInfo->dev_head_t.to = FIFFV_COORD_HEAD;
     m_pFiffInfo->ctf_head_t.from = FIFFV_COORD_DEVICE;
     m_pFiffInfo->ctf_head_t.to = FIFFV_COORD_HEAD;
-
-    //
-    //Set projection data
-    //
-    m_pFiffInfo->projs.clear();
-    FiffProj proj;
-    proj.kind = 1;
-    proj.active = false;
-
-    FiffNamedMatrix::SDPtr namedMatrix = proj.data;
-    namedMatrix->ncol = numberEEGCh/3;
-    namedMatrix->nrow = 1;
-    namedMatrix->data = MatrixXd::Ones(1, namedMatrix->ncol);
-
-    //Set projection 1
-    for(int i=0; i<namedMatrix->ncol; i++)
-        namedMatrix->col_names << QSLChNames.at(i);
-
-    proj.data = namedMatrix;
-    proj.desc = QString("PCA-v1");
-    m_pFiffInfo->projs.append(proj);
-
-    //Set projection 2
-    namedMatrix->col_names.clear();
-    for(int i=0; i<namedMatrix->ncol; i++)
-        namedMatrix->col_names << QSLChNames.at(i+namedMatrix->ncol);
-
-    proj.data = namedMatrix;
-    proj.desc = QString("PCA-v2");
-    m_pFiffInfo->projs.append(proj);
-
-    //Set projection 3
-    namedMatrix->col_names.clear();
-    for(int i=0; i<namedMatrix->ncol; i++)
-        namedMatrix->col_names << QSLChNames.at(i+(2*namedMatrix->ncol));
-
-    proj.data = namedMatrix;
-    proj.desc = QString("PCA-v3");
-    m_pFiffInfo->projs.append(proj);
 }
 
 
@@ -482,7 +440,6 @@ bool EEGoSports::start()
 
     m_pEEGoSportsProducer->start(m_iNumberOfChannels,
                        m_iSamplingFreq,
-                       m_bUseChExponent,
                        m_bWriteDriverDebugToFile,
                        m_sOutputFilePath,
                        m_bCheckImpedances);

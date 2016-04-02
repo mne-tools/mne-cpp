@@ -74,16 +74,6 @@ EEGoSportsSetupWidget::EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget* p
     //Connect device sampling properties
     connect(ui.m_spinBox_SamplingFreq, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
-    connect(ui.m_spinBox_NumberOfChannels, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
-
-    //Connect channel corrections
-    connect(ui.m_checkBox_UseChExponent, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
-
-    //Connect preprocessing
-    connect(ui.m_checkBox_UseFiltering, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &EEGoSportsSetupWidget::setPreprocessing);
 
     //Connect debug file
     connect(ui.m_checkBox_WriteDriverDebugToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
@@ -121,13 +111,6 @@ void EEGoSportsSetupWidget::initGui()
 {
     //Init device sampling properties
     ui.m_spinBox_SamplingFreq->setValue(m_pEEGoSports->m_iSamplingFreq);
-    ui.m_spinBox_NumberOfChannels->setValue(m_pEEGoSports->m_iNumberOfChannels);
-
-    //Init channel corrections
-    ui.m_checkBox_UseChExponent->setChecked(m_pEEGoSports->m_bUseChExponent);
-
-    //Init preprocessing
-    ui.m_checkBox_UseFiltering->setChecked(m_pEEGoSports->m_bUseFiltering);
 
     //Init write to file
     ui.m_checkBox_WriteDriverDebugToFile->setChecked(m_pEEGoSports->m_bWriteDriverDebugToFile);
@@ -139,24 +122,6 @@ void EEGoSportsSetupWidget::initGui()
 void EEGoSportsSetupWidget::setDeviceSamplingProperties()
 {
     m_pEEGoSports->m_iSamplingFreq = ui.m_spinBox_SamplingFreq->value();
-    m_pEEGoSports->m_iNumberOfChannels = ui.m_spinBox_NumberOfChannels->value();
-
-    m_pEEGoSports->m_bUseChExponent = ui.m_checkBox_UseChExponent->isChecked();
-}
-
-
-//*************************************************************************************************************
-
-void EEGoSportsSetupWidget::setPreprocessing()
-{
-    m_pEEGoSports->m_bUseFiltering = ui.m_checkBox_UseFiltering->isChecked();
-}
-
-
-//*************************************************************************************************************
-
-void EEGoSportsSetupWidget::setPostprocessing()
-{
 }
 
 

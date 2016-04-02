@@ -65,7 +65,6 @@ EEGoSportsDriver::EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer)
 , m_bInitDeviceSuccess(false)
 , m_uiNumberOfChannels(64)
 , m_uiSamplingFrequency(1024)
-, m_bUseChExponent(false)
 , m_bWriteDriverDebugToFile(false)
 , m_sOutputFilePath("/mne_x_plugins/resources/eegosports")
 , m_bMeasureImpedances(false)
@@ -86,7 +85,6 @@ EEGoSportsDriver::~EEGoSportsDriver()
 
 bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
                             int iSamplingFrequency,
-                            bool bUseChExponent,
                             bool bWriteDriverDebugToFile,
                             QString sOutpuFilePath,
                             bool bMeasureImpedance)
@@ -98,7 +96,6 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     //Set global variables
     m_uiNumberOfChannels = iNumberOfChannels;
     m_uiSamplingFrequency = iSamplingFrequency;
-    m_bUseChExponent = bUseChExponent;
     m_bWriteDriverDebugToFile = bWriteDriverDebugToFile;
     m_sOutputFilePath = sOutpuFilePath;
     m_bMeasureImpedances = bMeasureImpedance;
@@ -178,13 +175,19 @@ bool EEGoSportsDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
     buffer buf = m_pDataStream->getData();
     std::cout << "EEGoSportsDriver::getSampleMatrixValue - Samples read: " << buf.getSampleCount() << std::endl;
     std::cout << "EEGoSportsDriver::getSampleMatrixValue - Channel count: " << buf.getChannelCount() << std::endl;
-//    std::cout << "EEGoSportsDriver::getSampleMatrixValue - size: " << buf.size() << std::endl;
-    if(buf.getSampleCount() > 0) {
-        //Write data to matrix
-        sampleMatrix = MatrixXf (buf.getChannelCount(), buf.getSampleCount());
+    std::cout << "EEGoSportsDriver::getSampleMatrixValue - size: " << buf.size() << std::endl;
 
-        for(int sample = 0; sample < buf.getSampleCount(); sample++)
-            for(int channel = 0; channel < buf.getChannelCount(); channel++)
+    int iReceivedSamples = buf.getSampleCount();
+    int iChannelCount = buf.getChannelCount();
+
+    sampleMatrix = MatrixXf(iChannelCount, iReceivedSamples);
+
+    if(iReceivedSamples > 0) {
+        //Write data to matrix
+
+
+        for(int sample = 0; sample < iReceivedSamples; sample++)
+            for(int channel = 0; channel < iChannelCount; channel++)
                 sampleMatrix(channel, sample) = buf.getSample(channel, sample);
     }
 
