@@ -118,8 +118,7 @@ void EEGoSports::init()
     //default values used by the setupGUI class must be set here
     m_iSamplingFreq = 1024;
     m_iNumberOfChannels = 90;
-    m_iSamplesPerBlock = 16;
-    m_bUseChExponent = true;
+    m_iSamplesPerBlock = 1024;
     m_bWriteToFile = false;
     m_bWriteDriverDebugToFile = false;
     m_bUseFiltering = false;
@@ -439,6 +438,7 @@ bool EEGoSports::start()
     m_qListReceivedSamples.clear();
 
     m_pEEGoSportsProducer->start(m_iNumberOfChannels,
+                       m_iSamplesPerBlock,
                        m_iSamplingFreq,
                        m_bWriteDriverDebugToFile,
                        m_sOutputFilePath,
@@ -483,7 +483,7 @@ bool EEGoSports::stop()
 
 //*************************************************************************************************************
 
-void EEGoSports::setSampleData(MatrixXf &matRawBuffer)
+void EEGoSports::setSampleData(MatrixXd &matRawBuffer)
 {
     m_mutex.lock();
         m_qListReceivedSamples.append(matRawBuffer);
@@ -532,20 +532,18 @@ void EEGoSports::run()
 
             if(m_qListReceivedSamples.isEmpty() == false)
             {
-                //MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
-                MatrixXf matValue;
-
-                //cout<<m_qListReceivedSamples.size()<<endl;
+                MatrixXd matValue;
                 matValue = m_qListReceivedSamples.first();
                 m_qListReceivedSamples.removeFirst();
 
                 //Write raw data to fif file
-                if(m_bWriteToFile)
-                    m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
+                if(m_bWriteToFile) {
+                    m_pOutfid->write_raw_buffer(matValue, m_cals);
+                }
 
                 //emit values to real time multi sample array
-                qDebug()<<"EEGoSports::run() - mat size"<<matValue.rows()<<"x"<<matValue.cols();
-                m_pRMTSA_EEGoSports->data()->setValue(matValue.cast<double>());
+                //qDebug()<<"EEGoSports::run() - mat size"<<matValue.rows()<<"x"<<matValue.cols();
+                m_pRMTSA_EEGoSports->data()->setValue(matValue);
             }
 
             m_mutex.unlock();            

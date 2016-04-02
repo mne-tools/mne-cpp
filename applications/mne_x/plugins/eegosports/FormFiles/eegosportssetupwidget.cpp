@@ -74,6 +74,8 @@ EEGoSportsSetupWidget::EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget* p
     //Connect device sampling properties
     connect(ui.m_spinBox_SamplingFreq, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
+    connect(ui.m_spinBox_BlockSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
 
     //Connect debug file
     connect(ui.m_checkBox_WriteDriverDebugToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
@@ -122,6 +124,7 @@ void EEGoSportsSetupWidget::initGui()
 void EEGoSportsSetupWidget::setDeviceSamplingProperties()
 {
     m_pEEGoSports->m_iSamplingFreq = ui.m_spinBox_SamplingFreq->value();
+    m_pEEGoSports->m_iSamplesPerBlock = ui.m_spinBox_BlockSize->value();
 }
 
 

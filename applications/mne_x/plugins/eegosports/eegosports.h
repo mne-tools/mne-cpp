@@ -182,7 +182,7 @@ public:
     /**
     * Set/Add received samples to a QList.
     */
-    void setSampleData(MatrixXf &matRawBuffer);
+    void setSampleData(MatrixXd &matRawBuffer);
 
     virtual IPlugin::PluginType getType() const;
     virtual QString getName() const;
@@ -232,7 +232,6 @@ private:
     int                                 m_iNumberOfChannels;                /**< The samples per block defined by the user via the GUI.*/
     int                                 m_iSamplesPerBlock;                 /**< The number of channels defined by the user via the GUI.*/
 
-    bool                                m_bUseChExponent;                   /**< Flag for using the channels exponent. Defined by the user via the GUI.*/
     bool                                m_bWriteToFile;                     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                m_bWriteDriverDebugToFile;          /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
     bool                                m_bUseFiltering;                    /**< Flag for writing the received samples to a file. Defined by the user via the GUI.*/
@@ -259,7 +258,7 @@ private:
     QSharedPointer<QTimer>              m_pTimerRecordingChange;            /**< timer to control blinking of the recording icon */
     qint16                              m_iBlinkStatus;                     /**< flag for recording icon blinking */
 
-    QList<MatrixXf>                     m_qListReceivedSamples;             /**< list with alle the received samples in form of differentley sized matrices. */
+    QList<MatrixXd>                     m_qListReceivedSamples;             /**< list with alle the received samples in form of differentley sized matrices. */
 
     QMutex                              m_mutex;
 
