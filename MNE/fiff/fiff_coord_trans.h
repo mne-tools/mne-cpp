@@ -50,6 +50,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
+#include <QFile>
 #include <QSharedPointer>
 
 
@@ -98,6 +99,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Constructs a coordinate transformation, by reading from a IO device.
+    *
+    * @param[in] p_IODevice     IO device to read from the coordinate transform.
+    */
+    FiffCoordTrans(QIODevice &p_IODevice);
+
+    //=========================================================================================================
+    /**
     * Copy constructor.
     *
     * @param[in] p_FiffCoordTrans   Coordinate transformation description which should be copied
@@ -137,6 +146,21 @@ public:
     {
         return this->from < 0;
     }
+
+
+    //=========================================================================================================
+    /**
+    * ### MNE toolbox root function ###: Implementation of the mne_transform_coordinates function
+    *
+    * Reads a coordinate transform from a fif file
+    *
+    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[out] p_Trans      A coordinate transform from a fif file
+    *
+    * @return true if succeeded, false otherwise
+    */
+    static bool read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans);
+
 
     //=========================================================================================================
     /**
