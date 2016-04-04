@@ -90,6 +90,27 @@ QT_CHARTS_USE_NAMESPACE
 const double M_PI = 3.14159265358979323846;
 #endif
 
+QStringList findExponent (QStringList rawStringList, int precisionValue, int classAmount)
+{
+    QStringList displayValueList,
+                exponentValueList;
+    QString displayValue,
+            exponentValue;
+    for (int ir = 0; ir < classAmount-1; ir++)
+    {
+        displayValue = rawStringList[ir];
+        displayValue = displayValue::left(precisionValue);
+        displayValueList[ir] << displayValue;
+    }
+    for (int ir = 0; ir < classAmount-1; ir++)
+    {
+        exponentValue = rawStringList(ir).right(precisionValue+1);
+        exponentValueList(ir) << exponentValue;
+    }
+
+
+}
+
 Eigen::VectorXd sineWaveGenerator(double amplitude, double xStep, int xNow, int xEnd)
 {
     int iterateAmount = (xEnd-xNow)/xStep;
@@ -110,7 +131,6 @@ Eigen::VectorXd sineWaveGenerator(double amplitude, double xStep, int xNow, int 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-
     QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
 
     float from = 40.0f;
@@ -124,7 +144,7 @@ int main(int argc, char *argv[])
     //   Setup for reading the raw data
     //
     FiffRawData raw(t_fileRaw);
-    
+
     //
     //   Set up pick list: MEG + STI 014 - bad channels
     //
@@ -214,46 +234,37 @@ int main(int argc, char *argv[])
     // histogram calculation
     bool bMakeSymmetrical;
     bMakeSymmetrical = false;      //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
-    int ClassAmount = 100;          //initialize the amount of classes and class frequencies
+    int ClassAmount = 14;          //initialize the amount of classes and class frequencies
     double inputGlobalMin = 0.0,
            inputGlobalMax = 0.0;
     QVector<double> resultClassLimits;
     QVector<int> resultFrequency;
-    MNEMath::histcounts(dataSine,bMakeSymmetrical, ClassAmount, resultClassLimits, resultFrequency, inputGlobalMin, inputGlobalMax );   //user input to normalize and sort the data matrix
+    MNEMath::histcounts(data,bMakeSymmetrical, ClassAmount, resultClassLimits, resultFrequency, inputGlobalMin, inputGlobalMax );   //user input to normalize and sort the data matrix
     qDebug() << "data successfully sorted into desired range and class width...\n";
 
     //below is the function for printing the results on command prompt (for debugging purposes)
     double lowerClassLimit,
            upperClassLimit;
+    char format = 'e';              //format for the histogram for better readability
     int    classFreq,
-           totalFreq{0};
+           totalFreq{0},
+           precision = 1;           //format for the significant figure in the histogram
     qDebug() << "Lower Class Limit\t Upper Class Limit \t Frequency ";
 
     //  Start of Qtchart histogram display
     QBarSet *set = new QBarSet("Class");
+    QString currentLimits;
     QStringList categories;
     for (int kr=0; kr < resultClassLimits.size()-1; kr++)
     {
-        if (kr==0)                             //initialize class limit for the lowest class limit (once only)
-        {
-            lowerClassLimit = resultClassLimits.at(kr);
-            upperClassLimit = resultClassLimits.at(kr+1);
-            classFreq = resultFrequency.at(kr);
-            qDebug() << lowerClassLimit << " \t\t " << upperClassLimit << "\t\t" << classFreq;
-            totalFreq = totalFreq + classFreq;
-            *set << classFreq;
-            categories << QString::number(lowerClassLimit) << QString::number(upperClassLimit);
-        }
-        else
-        {
-            lowerClassLimit = resultClassLimits.at(kr);
-            upperClassLimit = resultClassLimits.at(kr+1);
-            classFreq = resultFrequency.at(kr);
-            qDebug() << lowerClassLimit << " \t\t " << upperClassLimit << "\t\t" << classFreq;
-            totalFreq = totalFreq + classFreq;
-            *set << classFreq;
-            categories << QString::number(upperClassLimit);
-        }
+        lowerClassLimit = resultClassLimits.at(kr);
+        upperClassLimit = resultClassLimits.at(kr+1);
+        classFreq = resultFrequency.at(kr);
+        qDebug() << lowerClassLimit << " \t\t " << upperClassLimit << "\t\t" << classFreq;
+        totalFreq = totalFreq + classFreq;
+        *set << classFreq;
+        currentLimits = ((QString::number(lowerClassLimit, format, precision) + " to " + (QString::number(upperClassLimit, format, precision))));
+        categories << currentLimits;
     }
     qDebug() << "Total Frequency = " << totalFreq;
 
@@ -267,7 +278,6 @@ int main(int argc, char *argv[])
     chart->addSeries(series);
     chart->setTitle("MNE-CPP Histogram Example");
     chart->setAnimationOptions(QChart::SeriesAnimations);
-
 
     QBarCategoryAxis *axis = new QBarCategoryAxis();
     axis->append(categories);
