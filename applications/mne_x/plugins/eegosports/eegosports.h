@@ -53,6 +53,7 @@
 #include <xMeas/newrealtimemultisamplearray.h>
 
 #include <utils/layoutloader.h>
+#include "utils/layoutmaker.h"
 
 #include <unsupported/Eigen/FFT>
 #include <Eigen/Geometry>
