@@ -124,6 +124,8 @@ void SelectionManagerWindow::initComboBoxes()
         << QApplication::translate("SelectionManagerWindow", "Vectorview-grad.lout", 0)
         << QApplication::translate("SelectionManagerWindow", "Vectorview-all.lout", 0)
         << QApplication::translate("SelectionManagerWindow", "Vectorview-mag.lout", 0)
+        << QApplication::translate("SelectionManagerWindow", "dukeEEG64dry.lout", 0)
+
 //     << QApplication::translate("SelectionManagerWindow", "CTF-275.lout", 0)
 //     << QApplication::translate("SelectionManagerWindow", "magnesWH3600.lout", 0)
     );
@@ -346,7 +348,7 @@ bool SelectionManagerWindow::loadLayout(QString path)
     QList<QVector<double> > inputPoints;
     QList<QVector<double> > outputPoints;
     QStringList names;
-    QFile out;//(/*"./MNE_Browse_Raw_Resources/Templates/ChannelSelection/*/"manualLayout.lout");
+    QFile out("manualLayout.lout");//(/*"./MNE_Browse_Raw_Resources/Templates/ChannelSelection/*/"manualLayout.lout");
 
     for(int i = 0; i<m_pChInfoModel->rowCount(); i++) {
         QModelIndex digIndex = m_pChInfoModel->index(i,1);
@@ -384,6 +386,8 @@ bool SelectionManagerWindow::loadLayout(QString path)
                                        prad,
                                        width,
                                        height,
+                                       true,
+                                       true,
                                        false) == -1)
                 numberTries++;
             else
@@ -391,8 +395,11 @@ bool SelectionManagerWindow::loadLayout(QString path)
         }
 
     //Add new EEG points to Layout Map
-    for(int i = 0; i<outputPoints.size(); i++)
-        m_layoutMap[names.at(i)] = QPointF(outputPoints.at(i)[0],outputPoints.at(i)[1]);
+    for(int i = 0; i<outputPoints.size(); i++) {
+        if(!m_layoutMap.contains(names.at(i))) {
+            m_layoutMap[names.at(i)] = QPointF(outputPoints.at(i)[0],outputPoints.at(i)[1]);
+        }
+    }
 
     QStringList bad;
     m_pSelectionScene->repaintItems(m_layoutMap, bad);
