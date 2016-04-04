@@ -110,14 +110,13 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     // Get device handler
     factory factoryObj ("eego-SDK.dll"); // Make sure that eego-SDK.dll resides in the working directory
     m_pAmplifier = factoryObj.getAmplifier(); // Get an amplifier
-    std::cout<<"EEGoSportsDriver::initDevice - Serial number of connected eegosports device: "<<m_pAmplifier->getSerialNumber()<<std::endl;
+    //std::cout<<"EEGoSportsDriver::initDevice - Serial number of connected eegosports device: "<<m_pAmplifier->getSerialNumber()<<std::endl;
 
     //Start the stream
     if(bMeasureImpedance) {
         m_pDataStream = m_pAmplifier->OpenImpedanceStream(m_uiSamplingFrequency);
     } else {
         m_pDataStream = m_pAmplifier->OpenEegStream(m_uiSamplingFrequency);
-
     }
 
     Sleep(100);
@@ -202,6 +201,7 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
 
                 for(uint j=0; j<iChannelCount; j++) {
                     vec(j) = buf.getSample(j,i);
+                    //std::cout<<vec(j)<<std::endl;
                 }
 
                 m_vecSampleBlockBuffer.push_back(vec);
