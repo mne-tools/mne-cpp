@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     unit_tests.pro
+# @file     testframes.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -47,7 +47,6 @@ SUBDIRS += \
 
 contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += \
-        test_mne_disp \
         test_mne_graph \
         test_mne_cluster_eval \
         test_rap_cluster_eval \
@@ -56,7 +55,7 @@ contains(MNECPP_CONFIG, withGui) {
 #       test_orig_rap_cluster_eval \
 
     qtHaveModule(3dcore,3drender,3dinput) {
-        message(unit_tets.pro - Qt3D available)
+        message(testframes.pro - Qt3D available)
         message(Qt3D available && QTVersion >= Qt 5.6: mne 3D tests configured!)
         SUBDIRS += \
             mne_3d_widget \
