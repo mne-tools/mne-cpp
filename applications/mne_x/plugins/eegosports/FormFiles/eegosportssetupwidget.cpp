@@ -72,7 +72,7 @@ EEGoSportsSetupWidget::EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget* p
     ui.setupUi(this);
 
     //Connect device sampling properties
-    connect(ui.m_spinBox_SamplingFreq, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(ui.m_comboBox_SamplingFreq, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
     connect(ui.m_spinBox_BlockSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
@@ -112,7 +112,7 @@ EEGoSportsSetupWidget::~EEGoSportsSetupWidget()
 void EEGoSportsSetupWidget::initGui()
 {
     //Init device sampling properties
-    ui.m_spinBox_SamplingFreq->setValue(m_pEEGoSports->m_iSamplingFreq);
+    ui.m_comboBox_SamplingFreq->setCurrentText(QString::number(m_pEEGoSports->m_iSamplingFreq));
 
     //Init write to file
     ui.m_checkBox_WriteDriverDebugToFile->setChecked(m_pEEGoSports->m_bWriteDriverDebugToFile);
@@ -123,7 +123,7 @@ void EEGoSportsSetupWidget::initGui()
 
 void EEGoSportsSetupWidget::setDeviceSamplingProperties()
 {
-    m_pEEGoSports->m_iSamplingFreq = ui.m_spinBox_SamplingFreq->value();
+    m_pEEGoSports->m_iSamplingFreq = ui.m_comboBox_SamplingFreq->currentText().toInt();
     m_pEEGoSports->m_iSamplesPerBlock = ui.m_spinBox_BlockSize->value();
 }
 
