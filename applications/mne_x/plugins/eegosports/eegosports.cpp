@@ -121,7 +121,6 @@ void EEGoSports::init()
     m_iSamplesPerBlock = 1024;
     m_bWriteToFile = false;
     m_bWriteDriverDebugToFile = false;
-    m_bUseFiltering = false;
     m_bIsRunning = false;
     m_bCheckImpedances = false;
 
