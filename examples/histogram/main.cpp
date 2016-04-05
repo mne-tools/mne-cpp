@@ -67,6 +67,7 @@
 #include <QtCharts/QBarCategoryAxis>
 #include <QtCharts>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -90,25 +91,60 @@ QT_CHARTS_USE_NAMESPACE
 const double M_PI = 3.14159265358979323846;
 #endif
 
-QStringList findExponent (QStringList rawStringList, int precisionValue, int classAmount)
+void findDisplayAndExponent (QVector<double> resultClassLimits, QVector<double> resultDisplayValues, QVector<int> resultExponentValues, int classAmount)
 {
-    QStringList displayValueList,
-                exponentValueList;
-    QString displayValue,
-            exponentValue;
-    for (int ir = 0; ir < classAmount-1; ir++)
+    resultDisplayValues.clear();
+    resultDisplayValues.resize(classAmount+1);
+    resultExponentValues.clear();
+    resultExponentValues.resize(classAmount+1);
+    double classLimit{0.0},
+           limitDisplayValue{0.0},
+           doubleExponentValue{0.0};
+    int    limitExponentValue{0};
+    for (int ir=0; ir <= classAmount; ir++)
     {
-        displayValue = rawStringList[ir];
-        displayValue = displayValue::left(precisionValue);
-        displayValueList[ir] << displayValue;
+        classLimit = resultClassLimits.at(ir);
+        qDebug() << "classLimit = " <<classLimit;
+        if (classLimit == 0.0)      //mechanism to guard against evaluation of log(0.0) which is negative infinity
+        {
+            doubleExponentValue = 0.0;
+        }
+        else
+        {
+            doubleExponentValue = log10(abs(classLimit));                             //return the exponent value in double
+            qDebug()<< "doubleExponentValue" << doubleExponentValue;
+        }
+        limitExponentValue = round(doubleExponentValue);                   //round the exponent value to the nearest signed integer
+        qDebug()<< "limitExponentValue" << limitExponentValue;
+        limitDisplayValue = classLimit * (pow(10,-(limitExponentValue)));    //display value is derived from multiplying class limit with inverse 10 to the power of negative exponent
+        qDebug()<< "limitDisplayValue" << limitDisplayValue;
+        resultDisplayValues[ir] = limitDisplayValue;                  //append the display value to the return vector
+        resultExponentValues[ir] = limitExponentValue;                //append the exponent value to the return vector
+        qDebug() << "Display Value = " << resultDisplayValues[ir];
+        qDebug() << "Exponent Value = " << resultExponentValues[ir];
     }
-    for (int ir = 0; ir < classAmount-1; ir++)
+    qDebug() << "Raw Display Value Vector" << resultDisplayValues;
+    qDebug() << "Raw Exponent Value Vector" << resultExponentValues;
+
+    int lowestExponentValue{0};
+    for (int ir=0; ir <= classAmount; ir++)
     {
-        exponentValue = rawStringList(ir).right(precisionValue+1);
-        exponentValueList(ir) << exponentValue;
+        if (resultExponentValues[ir] < lowestExponentValue)
+        {
+            lowestExponentValue = resultExponentValues.at(ir);  //find lowest exponent value to normalize the other display values
+        }
     }
-
-
+    qDebug() << "lowestExponentValue =" << lowestExponentValue;
+    for (int ir=0; ir <= classAmount; ir++)
+    {
+        while (resultExponentValues[ir] > lowestExponentValue)     //normalize the values by multiplying the display value by 10 and reducing the exponentValue by 1 until exponentValue reach the lowestExponentValue
+        {
+            resultDisplayValues[ir] = resultDisplayValues[ir] * 10;
+            resultExponentValues[ir]--;
+        }
+    }
+    qDebug() << "Final Display Value Vector" << resultDisplayValues;
+    qDebug() << "Final Exponent Value Vector" << resultExponentValues;
 }
 
 Eigen::VectorXd sineWaveGenerator(double amplitude, double xStep, int xNow, int xEnd)
@@ -229,42 +265,47 @@ int main(int argc, char *argv[])
 
     printf("Read %d samples.\n",(qint32)data.cols());
     Eigen::VectorXd dataSine;
-    dataSine = sineWaveGenerator(1.0,(1.0/1000), 0.0, 1.0);
+    dataSine = sineWaveGenerator(1.0e-12,(1.0/1000), 0.0, 1.0);
 
     // histogram calculation
     bool bMakeSymmetrical;
     bMakeSymmetrical = false;      //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
-    int ClassAmount = 14;          //initialize the amount of classes and class frequencies
+    int classAmount = 10;          //initialize the amount of classes and class frequencies
     double inputGlobalMin = 0.0,
            inputGlobalMax = 0.0;
     QVector<double> resultClassLimits;
     QVector<int> resultFrequency;
-    MNEMath::histcounts(data,bMakeSymmetrical, ClassAmount, resultClassLimits, resultFrequency, inputGlobalMin, inputGlobalMax );   //user input to normalize and sort the data matrix
-    qDebug() << "data successfully sorted into desired range and class width...\n";
+    MNEMath::histcounts(dataSine,bMakeSymmetrical, classAmount, resultClassLimits, resultFrequency, inputGlobalMin, inputGlobalMax );   //user input to normalize and sort the data matrix
 
     //below is the function for printing the results on command prompt (for debugging purposes)
     double lowerClassLimit,
            upperClassLimit;
-    char format = 'e';              //format for the histogram for better readability
+    char format = 'g';              //format for the histogram for better readability
     int    classFreq,
            totalFreq{0},
-           precision = 1;           //format for the significant figure in the histogram
-    qDebug() << "Lower Class Limit\t Upper Class Limit \t Frequency ";
+           precision = 1;           //format for the amount digits shown in the histogram
+
+    QVector<double> resultDisplayValues;
+    QVector<int> resultExponentValues;
+    qDebug() << "resultClassLimits = " <<resultClassLimits;
+    findDisplayAndExponent (resultClassLimits, resultDisplayValues, resultExponentValues, classAmount);
 
     //  Start of Qtchart histogram display
     QBarSet *set = new QBarSet("Class");
-    QString currentLimits;
     QStringList categories;
+    QString currentLimits;
+        qDebug() << "Lower Class Limit\t Upper Class Limit \t Frequency ";
     for (int kr=0; kr < resultClassLimits.size()-1; kr++)
     {
         lowerClassLimit = resultClassLimits.at(kr);
         upperClassLimit = resultClassLimits.at(kr+1);
         classFreq = resultFrequency.at(kr);
         qDebug() << lowerClassLimit << " \t\t " << upperClassLimit << "\t\t" << classFreq;
+        currentLimits = ((QString::number(resultDisplayValues[kr], format, precision) + " to " + (QString::number(resultDisplayValues[kr+1], format, precision))));
+        qDebug() << "currentLimits" << currentLimits;
+        categories << currentLimits;
         totalFreq = totalFreq + classFreq;
         *set << classFreq;
-        currentLimits = ((QString::number(lowerClassLimit, format, precision) + " to " + (QString::number(upperClassLimit, format, precision))));
-        categories << currentLimits;
     }
     qDebug() << "Total Frequency = " << totalFreq;
 
@@ -284,7 +325,7 @@ int main(int argc, char *argv[])
     chart->createDefaultAxes();
     chart->setAxisX(axis, series);
 
-    chart->legend()->setVisible(true);
+    chart->legend()->setVisible(false);
     chart->legend()->setAlignment(Qt::AlignBottom);
 
     QChartView *chartView = new QChartView(chart);
