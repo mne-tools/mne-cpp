@@ -88,7 +88,8 @@ SOURCES += \
     filterTools/filterio.cpp \
     detecttrigger.cpp \
     spectrogram.cpp \
-    warp.cpp
+    warp.cpp \
+    filterTools/sphara.cpp
 
 HEADERS += \
     kmeans.h\
@@ -109,7 +110,8 @@ HEADERS += \
     filterTools/filterio.h \
     detecttrigger.h \
     spectrogram.h \
-    warp.h
+    warp.h \
+    filterTools/sphara.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

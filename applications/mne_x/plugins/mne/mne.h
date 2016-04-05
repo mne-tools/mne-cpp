@@ -54,9 +54,10 @@
 #include <mne/mne_forwardsolution.h>
 #include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
-#include <rtInv/rtinvop.h>
+#include <rtProcessing/rtinvop.h>
 
 #include <xMeas/realtimesourceestimate.h>
+#include <xMeas/newrealtimemultisamplearray.h>
 #include <xMeas/realtimecov.h>
 #include <xMeas/realtimeevoked.h>
 
@@ -162,6 +163,13 @@ public:
 
     //=========================================================================================================
     /**
+    * Slot to update the real time multi sample array data
+    *
+    */
+    void updateRTMSA(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+
+    //=========================================================================================================
+    /**
     * Slot to update the fiff covariance
     *
     */
@@ -200,10 +208,13 @@ protected:
     virtual void run();
 
 private:
-    PluginInputData<RealTimeEvoked>::SPtr   m_pRTEInput;    /**< The RealTimeEvoked input.*/
-    PluginInputData<RealTimeCov>::SPtr      m_pRTCInput;    /**< The RealTimeCov input.*/
+    PluginInputData<NewRealTimeMultiSampleArray>::SPtr      m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
+    PluginInputData<RealTimeEvoked>::SPtr                   m_pRTEInput;            /**< The RealTimeEvoked input.*/
+    PluginInputData<RealTimeCov>::SPtr                      m_pRTCInput;            /**< The RealTimeCov input.*/
 
-    PluginOutputData<RealTimeSourceEstimate>::SPtr      m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
+    PluginOutputData<RealTimeSourceEstimate>::SPtr          m_pRTSEOutput;          /**< The RealTimeSourceEstimate output.*/
+
+    CircularMatrixBuffer<double>::SPtr                      m_pMatrixDataBuffer;    /**< Holds incoming RealTimeMultiSampleArray data.*/
 
     QMutex m_qMutex;
 
@@ -230,7 +241,7 @@ private:
 
 
     FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff information. */
-    FiffInfo::SPtr              m_pFiffInfoEvoked;  /**< Fiff information of the evoked. */
+    FiffInfo::SPtr              m_pFiffInfoInput;  /**< Fiff information of the evoked. */
     QStringList                 m_qListCovChNames;  /**< Covariance channel names. */
     FiffInfoBase::SPtr          m_pFiffInfoForward; /**< Fiff information of the forward solution. */
 

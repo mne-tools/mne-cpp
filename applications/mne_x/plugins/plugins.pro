@@ -67,7 +67,8 @@ contains(MNECPP_CONFIG, BuildBasicMNEXVersion) {
         noise \
         #    bci \
         rtsss \
-        rthpi
+        rthpi \
+        noisereduction \
 
     win32 { #Only compile the TMSI plugin if a windows system is used - TMSi driver is not available for linux yet
         contains(QMAKE_HOST.arch, x86_64) { #Compiling MNE-X FOR a 64bit system
@@ -123,12 +124,6 @@ contains(MNECPP_CONFIG, BuildBasicMNEXVersion) {
         message(EEGoSports plugin was not configured due to wrong OS (win32 needed)!)
     }
 }
-
-
-#    qtHaveModule(3d) {
-#        message(Qt3D available: brainmonitor library configured!)
-#        SUBDIRS += brainmonitor \
-#    }
 
 
 #    filtertoolbox \

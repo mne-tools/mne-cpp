@@ -40,7 +40,6 @@ TEMPLATE = subdirs
 SUBDIRS += \
     mne_rt_server\
 
-
 contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += \
         mne_x_libs \
@@ -52,8 +51,8 @@ contains(MNECPP_CONFIG, withGui) {
             mne_browse_raw_qt \
     }
 
-    qtHaveModule(3d) {
-        message(Qt3D available: disp3D library configured!)
+    qtHaveModule(3dcore,3drender,3dinput) {
+        message(applications.pro - Qt3D available)
         SUBDIRS += \
             mne_viewer \
             mne_viewer_parent \

@@ -68,6 +68,7 @@ NewRealTimeMultiSampleArray::NewRealTimeMultiSampleArray(QObject *parent)
 , m_iMultiArraySize(10)
 , m_bChInfoIsInit(false)
 {
+    m_slDisplayFlag << "compensators" << "projections" << "filter" << "view" << "triggerdetection" << "scaling" << "sphara" << "colors";
 }
 
 

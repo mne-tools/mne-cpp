@@ -49,7 +49,8 @@
 #include <mne/mne_sourceestimate.h>
 #include <inverse/rapMusic/pwlrapmusic.h>
 
-#include <disp3D/inverseview.h>
+#include <disp3D/view3D.h>
+#include <disp3D/control/control3dwidget.h>
 
 #include <utils/mnemath.h>
 
@@ -61,7 +62,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGuiApplication>
+#include <QApplication>
+#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
@@ -93,21 +95,44 @@ using namespace DISP3DLIB;
 */
 int main(int argc, char *argv[])
 {
-    QGuiApplication a(argc, argv);
+    QApplication app(argc, argv);
+
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Compute Inverse Powell RAP-MUSIC Example");
+    parser.addHelpOption();
+    QCommandLineOption sampleFwdFileOption("f", "Path to forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption sampleEvokedFileOption("e", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption sampleSubjectDirectoryOption("d", "Path to subject <directory>.", "directory", "./MNE-sample-data/subjects");
+    QCommandLineOption sampleSubjectOption("s", "Selected <subject>.", "subject", "sample");
+    QCommandLineOption stcFileOption("t", "Path to <target> where stc is stored to.", "target", "");//"RapMusic.stc");
+    QCommandLineOption numDipolePairsOption("n", "<number> of dipole pairs to localize.", "number", "7");
+    QCommandLineOption doMovieOption("m", "Create overlapping movie.");
+
+    parser.addOption(sampleFwdFileOption);
+    parser.addOption(sampleEvokedFileOption);
+    parser.addOption(sampleSubjectDirectoryOption);
+    parser.addOption(sampleSubjectOption);
+    parser.addOption(stcFileOption);
+    parser.addOption(numDipolePairsOption);
+    parser.addOption(doMovieOption);
+    parser.process(app);
+
 
     //########################################################################################
     // Source Estimate
 
-    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
-    SurfaceSet t_surfSet("sample", 2, "white", "./MNE-sample-data/subjects");
+    QFile t_fileFwd(parser.value(sampleFwdFileOption));
+    QFile t_fileEvoked(parser.value(sampleEvokedFileOption));
+    QString subject(parser.value(sampleSubjectOption)); QString subjectDir(parser.value(sampleSubjectDirectoryOption));
+    AnnotationSet t_annotationSet(subject, 2, "aparc.a2009s", subjectDir);
+    SurfaceSet t_surfSet(subject, 2, "white", subjectDir);
 
-    QString t_sFileNameStc("");//"RapMusic.stc");
+    QString t_sFileNameStc(parser.value(stcFileOption));
 
-    qint32 numDipolePairs = 7;
+    qint32 numDipolePairs = parser.value(numDipolePairsOption).toInt();
 
-    bool doMovie = true;//false;
+    bool doMovie = parser.isSet(doMovieOption);
 
     // Parse command line parameters
     for(qint32 i = 0; i < argc; ++i)
@@ -155,7 +180,6 @@ int main(int argc, char *argv[])
     if(doMovie)
         t_pwlRapMusic.setStcAttr(200,0.5);
 
-
     MNESourceEstimate sourceEstimate = t_pwlRapMusic.calculateInverse(pickedEvoked);
 
     std::cout << "source estimated" << std::endl;
@@ -163,45 +187,16 @@ int main(int argc, char *argv[])
     if(sourceEstimate.isEmpty())
         return 1;
 
-    QList<Label> t_qListLabels;
-    QList<RowVector4i> t_qListRGBAs;
+    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+    testWindow->addBrainData("HemiLRSet", t_surfSet, t_annotationSet);
 
-    //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
-    t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
+    QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("HemiLRSet", sourceEstimate, t_clusteredFwd);
 
-    InverseView view(t_pwlRapMusic.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false, false);//true);
+    testWindow->show();
 
-
-    if (view.stereoType() != QGLView::RedCyanAnaglyph)
-        view.camera()->setEyeSeparation(0.3f);
-    QStringList args = QCoreApplication::arguments();
-    int w_pos = args.indexOf("-width");
-    int h_pos = args.indexOf("-height");
-    if (w_pos >= 0 && h_pos >= 0)
-    {
-        bool ok = true;
-        int w = args.at(w_pos + 1).toInt(&ok);
-        if (!ok)
-        {
-            qWarning() << "Could not parse width argument:" << args;
-            return 1;
-        }
-        int h = args.at(h_pos + 1).toInt(&ok);
-        if (!ok)
-        {
-            qWarning() << "Could not parse height argument:" << args;
-            return 1;
-        }
-        view.resize(w, h);
-    }
-    else
-    {
-        view.resize(800, 600);
-    }
-    view.show();
-
-    //Push Estimate
-    view.pushSourceEstimate(sourceEstimate);
+    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
+    control3DWidget->setView3D(testWindow);
+    control3DWidget->show();
 
     if(!t_sFileNameStc.isEmpty())
     {
@@ -209,5 +204,5 @@ int main(int argc, char *argv[])
         sourceEstimate.write(t_fileClusteredStc);
     }
 
-    return a.exec();
+    return app.exec();
 }

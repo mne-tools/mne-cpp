@@ -46,7 +46,7 @@
    <item>
     <layout class="QGridLayout" name="m_qGridLayout_main">
      <item row="0" column="0">
-      <widget class="QGroupBox" name="m_qGroupBox_Properties">
+      <widget class="QGroupBox" name="m_qGroupBox_yourGroupBox">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -60,7 +60,7 @@
         </size>
        </property>
        <property name="title">
-        <string>Properties</string>
+        <string>Your group box</string>
        </property>
        <property name="flat">
         <bool>false</bool>
@@ -68,27 +68,19 @@
        <layout class="QGridLayout" name="m_qGridLayout_Properties"/>
       </widget>
      </item>
-     <item row="1" column="0">
-      <widget class="QGroupBox" name="m_qGroupBox_Channels">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>200</height>
-        </size>
-       </property>
+     <item row="0" column="1" rowspan="2" colspan="2">
+      <widget class="QGroupBox" name="m_qGroupBox_Information">
        <property name="title">
-        <string>Channels</string>
+        <string>Information</string>
        </property>
-       <layout class="QGridLayout" name="m_qGridLayout_Channels"/>
+       <layout class="QGridLayout" name="m_qGridLayout_Information">
+        <item row="0" column="0">
+         <widget class="QTextBrowser" name="m_qTextBrowser_Information"/>
+        </item>
+       </layout>
       </widget>
      </item>
-     <item row="3" column="1">
+     <item row="2" column="1">
       <spacer name="m_qHorizontalSpacer_About">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -101,26 +93,7 @@
        </property>
       </spacer>
      </item>
-     <item row="0" column="1" rowspan="3" colspan="2">
-      <widget class="QGroupBox" name="m_qGroupBox_Information">
-       <property name="title">
-        <string>Information</string>
-       </property>
-       <layout class="QGridLayout" name="m_qGridLayout_Information">
-        <item row="0" column="0">
-         <widget class="QTextBrowser" name="m_qTextBrowser_Information"/>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="3" column="2">
-      <widget class="QPushButton" name="m_qPushButton_About">
-       <property name="text">
-        <string>About</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
+     <item row="1" column="0">
       <spacer name="m_qVerticalSpacer_LeftRow">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
@@ -132,6 +105,13 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item row="2" column="2">
+      <widget class="QPushButton" name="m_qPushButton_About">
+       <property name="text">
+        <string>About</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

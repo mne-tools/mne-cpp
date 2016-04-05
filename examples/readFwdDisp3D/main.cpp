@@ -38,7 +38,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/geometryview.h>
+#include <disp3D/view3D.h>
+#include <disp3D/control/control3dwidget.h>
 
 #include <mne/mne_forwardsolution.h>
 
@@ -48,7 +49,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGuiApplication>
+#include <QApplication>
 
 
 //*************************************************************************************************************
@@ -56,7 +57,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace MNELIB;
 using namespace DISP3DLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -75,40 +78,25 @@ using namespace DISP3DLIB;
 */
 int main(int argc, char *argv[])
 {
-    QGuiApplication app(argc, argv);
+    QApplication a(argc, argv);
 
     QFile t_File("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     MNEForwardSolution t_forwardSolution(t_File);
 
-    GeometryView view(t_forwardSolution.src);
+    View3D::SPtr testWindow = View3D::SPtr(new View3D());
 
-    if (view.stereoType() != QGLView::RedCyanAnaglyph)
-        view.camera()->setEyeSeparation(0.3f);
-    QStringList args = QCoreApplication::arguments();
-    int w_pos = args.indexOf("-width");
-    int h_pos = args.indexOf("-height");
-    if (w_pos >= 0 && h_pos >= 0)
-    {
-        bool ok = true;
-        int w = args.at(w_pos + 1).toInt(&ok);
-        if (!ok)
-        {
-            qWarning() << "Could not parse width argument:" << args;
-            return 1;
-        }
-        int h = args.at(h_pos + 1).toInt(&ok);
-        if (!ok)
-        {
-            qWarning() << "Could not parse height argument:" << args;
-            return 1;
-        }
-        view.resize(w, h);
-    }
-    else
-    {
-        view.resize(800, 600);
-    }
-    view.show();
+    //Option 1 - Visualize full source space
+    testWindow->addBrainData("ForwardSolution", t_forwardSolution);
 
-    return app.exec();
+    //Option 2 - Visualize clustered source space
+    //AnnotationSet t_annotationSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
+    //MNEForwardSolution t_clusteredFwd = t_forwardSolution.cluster_forward_solution(t_annotationSet, 40);
+    //testWindow->addBrainData("ForwardSolution", t_clusteredFwd);
+
+    testWindow->show();
+    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
+    control3DWidget->setView3D(testWindow);
+    control3DWidget->show();
+
+    return a.exec();
 }

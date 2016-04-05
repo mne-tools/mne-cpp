@@ -199,6 +199,11 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
         if(m_pQuickControlWidget != 0)
             settings.setValue(QString("RTMSAW/%1/distanceTimeSpacerIndex").arg(t_sRTMSAWName), m_pQuickControlWidget->getDistanceTimeSpacerIndex());
 
+        //Store signal and background colors
+        if(m_pQuickControlWidget != 0) {
+            settings.setValue(QString("RTMSAW/%1/signalColor").arg(t_sRTMSAWName), m_pQuickControlWidget->getSignalColor());
+            settings.setValue(QString("RTMSAW/%1/backgroundColor").arg(t_sRTMSAWName), m_pQuickControlWidget->getBackgroundColor());
+        }
     }
 }
 
@@ -253,14 +258,18 @@ void RealTimeMultiSampleArrayWidget::init()
         m_pRTMSAModel->setChannelInfo(m_qListChInfo);//ToDo Obsolete
         m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, m_iT);
 
+        //
         //-------- Init the delegate --------
+        //
         m_pRTMSADelegate = RealTimeMultiSampleArrayDelegate::SPtr(new RealTimeMultiSampleArrayDelegate(this));
         m_pRTMSADelegate->initPainterPaths(m_pRTMSAModel.data());
 
         connect(this, &RealTimeMultiSampleArrayWidget::markerMoved,
                 m_pRTMSADelegate.data(), &RealTimeMultiSampleArrayDelegate::markerMoved);
 
+        //
         //-------- Init the view --------
+        //
         m_pTableView->setModel(m_pRTMSAModel.data());
         m_pTableView->setItemDelegate(m_pRTMSADelegate.data());
 
@@ -290,13 +299,28 @@ void RealTimeMultiSampleArrayWidget::init()
         if(settings.value(QString("RTMSAW/%1/showHideBad").arg(t_sRTMSAWName), false).toBool())
             hideBadChannels();
 
+        //
+        //-------- Init signal and background colors --------
+        //
+        QColor signalDefault = Qt::darkBlue;
+        QColor backgroundDefault = Qt::white;
+        QColor signal = settings.value(QString("RTMSAW/%1/signalColor").arg(t_sRTMSAWName), signalDefault).value<QColor>();
+        QColor background = settings.value(QString("RTMSAW/%1/backgroundColor").arg(t_sRTMSAWName), backgroundDefault).value<QColor>();
+
+        this->onTableViewBackgroundColorChanged(background);
+        m_pRTMSADelegate->setSignalColor(signal);
+
+        //
         //-------- Init context menu --------
+        //
         m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
 
         connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),
                 this,SLOT(channelContextMenu(QPoint)));
 
+        //
         //-------- Init scaling --------
+        //
         //Show only spin boxes and labels which type are present in the current loaded fiffinfo
         QList<FiffChInfo> channelList = m_pFiffInfo->chs;
         QList<int> availabeChannelTypes;
@@ -350,7 +374,9 @@ void RealTimeMultiSampleArrayWidget::init()
             m_pRTMSAModel->setScaling(m_qMapChScaling);
 //        }
 
+        //
         //-------- Init bad channel list --------
+        //
         m_qListBadChannels.clear();
         for(int i = 0; i<m_pRTMSAModel->rowCount(); i++)
             if(m_pRTMSAModel->data(m_pRTMSAModel->index(i,2)).toBool())
@@ -382,7 +408,9 @@ void RealTimeMultiSampleArrayWidget::init()
                                                 settings.value(QString("RTMSAW/%1/filterTransition").arg(t_sRTMSAWName), 5.0).toDouble(),
                                                 settings.value(QString("RTMSAW/%1/filterUserDesignActive").arg(t_sRTMSAWName), false).toBool());
 
+        //
         //-------- Init channel selection manager --------
+        //
         m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(m_pFiffInfo.data(), this));
 
         m_pSelectionManagerWindow = SelectionManagerWindow::SPtr(new SelectionManagerWindow(this, m_pChInfoModel));
@@ -405,20 +433,36 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pSelectionManagerWindow->setCurrentLayoutFile(settings.value(QString("RTMSAW/%1/selectedLayoutFile").arg(t_sRTMSAWName), "babymeg-mag-inner-layer.lout").toString());
 
+        //
         //-------- Init quick control widget --------
+        //
+        QStringList slFlags = m_pRTMSA->getDisplayFlags();
+
         #ifdef BUILD_BASIC_MNEX_VERSION
             std::cout<<"BUILD_BASIC_MNEX_VERSION Defined"<<std::endl;
-            m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display", 0, true, false, true, false, false, false));
-        #else
-            std::cout<<"BUILD_BASIC_MNEX_VERSION Undefined"<<std::endl;
-            m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display"));
+            slFlags.clear();
+            slFlags << "projections" << "view" << "scaling";
         #endif
+
+        m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Display", slFlags));
 
         m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
         //Handle scaling
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
                 this, &RealTimeMultiSampleArrayWidget::broadcastScaling);
+
+        //Handle signal color changes
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::signalColorChanged,
+                m_pRTMSADelegate.data(), &RealTimeMultiSampleArrayDelegate::setSignalColor);
+
+        //Handle background color changes
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::backgroundColorChanged,
+                this, &RealTimeMultiSampleArrayWidget::onTableViewBackgroundColorChanged);
+
+        //Handle screenshot signals
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::makeScreenshot,
+                this, &RealTimeMultiSampleArrayWidget::onMakeScreenshot);
 
         //Handle projections
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
@@ -427,6 +471,13 @@ void RealTimeMultiSampleArrayWidget::init()
         //Handle compensators
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::compSelectionChanged,
                 this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::updateCompensator);
+
+        //Handle SPHARA
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::spharaActivationChanged,
+                this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::updateSpharaActivation);
+
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::spharaOptionsChanged,
+                this->m_pRTMSAModel.data(), &RealTimeMultiSampleArrayModel::updateSpharaOptions);
 
         //Handle view changes
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::zoomChanged,
@@ -464,8 +515,12 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pQuickControlWidget->setDistanceTimeSpacerIndex(settings.value(QString("RTMSAW/%1/distanceTimeSpacerIndex").arg(t_sRTMSAWName), 3).toInt());
 
-        //Activate projections as default
-        m_pRTMSAModel->updateProjection();
+        m_pQuickControlWidget->setSignalBackgroundColors(signal, background);
+
+        //If projections are wanted activate projections as default
+        if(slFlags.contains("projections")) {
+            m_pRTMSAModel->updateProjection();
+        }
 
         //Initialized
         m_bInitialized = true;
@@ -816,3 +871,43 @@ void RealTimeMultiSampleArrayWidget::showQuickControlWidget()
     m_pQuickControlWidget->show();
 }
 
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayWidget::onTableViewBackgroundColorChanged(const QColor& backgroundColor)
+{
+    m_pTableView->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(backgroundColor.red()).arg(backgroundColor.green()).arg(backgroundColor.blue()));
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayWidget::onMakeScreenshot(const QString& imageType)
+{
+    // Create file name
+    QString sDate = QDate::currentDate().toString("yyyy_MM_dd");
+    QString sTime = QTime::currentTime().toString("hh_mm_ss");
+
+    if(!QDir("./Screenshots").exists()) {
+        QDir().mkdir("./Screenshots");
+    }
+
+    if(imageType.contains("SVG"))
+    {
+        QString fileName = QString("./Screenshots/%1-%2-DataView.svg").arg(sDate).arg(sTime);
+        // Generate screenshot
+        QSvgGenerator svgGen;
+        svgGen.setFileName(fileName);
+        svgGen.setSize(m_pTableView->size());
+        svgGen.setViewBox(m_pTableView->rect());
+
+        m_pTableView->render(&svgGen);
+    }
+
+    if(imageType.contains("PNG"))
+    {
+        QString fileName = QString("./Screenshots/%1-%2-DataView.png").arg(sDate).arg(sTime);
+        QPixmap pixMap = QPixmap::grabWidget(m_pTableView);
+        pixMap.save(fileName);
+    }
+}

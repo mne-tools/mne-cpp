@@ -59,14 +59,8 @@ SUBDIRS += \
 contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += \
 
-    qtHaveModule(3dcore) {
-    message(Examples.pro - Qt3D 3DCore available!)
-    SUBDIRS += \
-        disp3DNewTutorial \
-    }
-
-    qtHaveModule(3d) {
-    message(Examples.pro - Qt3D available!)
+    qtHaveModule(3dcore,3drender,3dinput) {
+    message(examples.pro - Qt3D available)
     SUBDIRS += \
         clusteredInverse \
         rawClusteredInverse \
@@ -81,5 +75,6 @@ contains(MNECPP_CONFIG, withGui) {
         stClusteredInversePwlRapMusic  \
         roiClusteredInversePwlRapMusic \
         fsSurface \
+        disp3DTutorial \
     }
 }

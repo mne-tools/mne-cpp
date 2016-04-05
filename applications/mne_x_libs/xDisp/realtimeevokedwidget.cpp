@@ -224,8 +224,16 @@ RealTimeEvokedWidget::~RealTimeEvokedWidget()
             settings.setValue(QString("RTEW/%1/scaleMISC").arg(t_sRTEWName), m_qMapChScaling[FIFFV_MISC_CH]);
 
         //Store selected layout file
-        if(!m_pSelectionManagerWindow == 0)
+        if(!m_pSelectionManagerWindow == 0) {
             settings.setValue(QString("RTEW/%1/selectedLayoutFile").arg(t_sRTEWName), m_pSelectionManagerWindow->getCurrentLayoutFile());
+        }
+
+        //Store signal and background colors
+        if(m_pQuickControlWidget != 0) {
+            settings.setValue(QString("RTEW/%1/signalColor").arg(t_sRTEWName), m_pQuickControlWidget->getSignalColor());
+            settings.setValue(QString("RTEW/%1/butterflyBackgroundColor").arg(t_sRTEWName), m_pButterflyPlot->getBackgroundColor());
+            settings.setValue(QString("RTEW/%1/layoutBackgroundColor").arg(t_sRTEWName), m_pAverageScene->backgroundBrush().color());
+        }
     }
 }
 
@@ -285,7 +293,9 @@ void RealTimeEvokedWidget::init()
 
         m_pButterflyPlot->setModel(m_pRTEModel.data());
 
+        //
         //-------- Init modalities --------
+        //
         m_qListModalities.clear();
         bool hasMag = false;
         bool hasGrad = false;
@@ -339,7 +349,9 @@ void RealTimeEvokedWidget::init()
 
         m_pButterflyPlot->setSettings(m_qListModalities);
 
+        //
         //-------- Init scaling --------
+        //
         //Show only spin boxes and labels which type are present in the current loaded fiffinfo
         QList<FiffChInfo> channelList = m_pFiffInfo->chs;
         QList<int> availabeChannelTypes;
@@ -397,7 +409,9 @@ void RealTimeEvokedWidget::init()
             m_pRTEModel->setScaling(m_qMapChScaling);
         }
 
+        //
         //-------- Init filter window --------
+        //
         m_pFilterWindow = FilterWindow::SPtr(new FilterWindow(this, Qt::Window));
         //m_pFilterWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
 
@@ -423,7 +437,9 @@ void RealTimeEvokedWidget::init()
                                                 settings.value(QString("RTEW/%1/filterTransition").arg(t_sRTEWName), 5.0).toDouble(),
                                                 settings.value(QString("RTEW/%1/filterUserDesignActive").arg(t_sRTEWName), false).toBool());
 
+        //
         //-------- Init channel selection manager --------
+        //
         m_pChInfoModel = QSharedPointer<ChInfoModel>(new ChInfoModel(m_pFiffInfo.data(), this));
         m_pSelectionManagerWindow = QSharedPointer<SelectionManagerWindow>(new SelectionManagerWindow(this, m_pChInfoModel));
 
@@ -443,13 +459,32 @@ void RealTimeEvokedWidget::init()
 
         m_pActionSelectSensors->setVisible(true);
 
+        //
         //-------- Init quick control widget --------
-        m_pQuickControlWidget = QuickControlWidget::SPtr(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Averaging", 0, true, true, false, true, true, false));
+        //
+        QStringList slFlags;
+        slFlags <<  "projections" << "filter" << "triggerdetection" << "scaling" << "modalities" << "colors";
+
+        m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Averaging", slFlags));
+
+        //m_pQuickControlWidget = QuickControlWidget::SPtr(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Averaging", 0, true, true, false, true, true, false));
         m_pQuickControlWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
 
         //Handle scaling
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
                 this, &RealTimeEvokedWidget::broadcastScaling);
+
+        //Handle signal color changes
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::signalColorChanged,
+                this, &RealTimeEvokedWidget::onSignalColorChanged);
+
+        //Handle background color changes
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::backgroundColorChanged,
+                this, &RealTimeEvokedWidget::onTableViewBackgroundColorChanged);
+
+        //Handle screenshot signals
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::makeScreenshot,
+                this, &RealTimeEvokedWidget::onMakeScreenshot);
 
         //Handle projections
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,
@@ -478,12 +513,19 @@ void RealTimeEvokedWidget::init()
 
         m_pQuickControlWidget->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
 
+        QColor signalDefault = Qt::darkBlue;
+        QColor butterflyBackgroundDefault = Qt::white;
+        QColor layoutBackgroundDefault = Qt::black;
+        m_pQuickControlWidget->setSignalBackgroundColors(settings.value(QString("RTEW/%1/signalColor").arg(t_sRTEWName), signalDefault).value<QColor>(), settings.value(QString("RTEW/%1/butterflyBackgroundColor").arg(t_sRTEWName), butterflyBackgroundDefault).value<QColor>());
+
         m_pActionQuickControl->setVisible(true);
 
         //Activate projections as default
         m_pRTEModel->updateProjection();
 
+        //
         //-------- Init average scene --------
+        //
         m_pAverageScene = AverageScene::SPtr(new AverageScene(m_pAverageLayoutView, this));
         m_pAverageLayoutView->setScene(m_pAverageScene.data());
         QBrush brush(Qt::black);
@@ -498,6 +540,17 @@ void RealTimeEvokedWidget::init()
 
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::scalingChanged,
                 this, &RealTimeEvokedWidget::scaleAveragedData);
+
+        //
+        //-------- Init signal and background colors --------
+        //
+        QBrush backgroundBrush = m_pAverageScene->backgroundBrush();
+        backgroundBrush.setColor(settings.value(QString("RTEW/%1/layoutBackgroundColor").arg(t_sRTEWName), layoutBackgroundDefault).value<QColor>());
+        m_pAverageScene->setBackgroundBrush(backgroundBrush);
+
+        m_pButterflyPlot->setBackgroundColor(settings.value(QString("RTEW/%1/butterflyBackgroundColor").arg(t_sRTEWName), butterflyBackgroundDefault).value<QColor>());
+
+        m_pAverageScene->setSignalColorForAllItems(settings.value(QString("RTEW/%1/signalColor").arg(t_sRTEWName), signalDefault).value<QColor>());
 
         //Initialized
         m_bInitialized = true;
@@ -581,17 +634,6 @@ void RealTimeEvokedWidget::showQuickControlWidget()
 
 //*************************************************************************************************************
 
-bool RealTimeEvokedWidget::eventFilter(QObject *object, QEvent *event)
-{
-    if ((object == m_pButterflyPlot || object == m_pAverageLayoutView) && event->type() == QEvent::MouseButtonDblClick) {
-        m_pRTEModel->toggleFreeze();
-    }
-    return false;
-}
-
-
-//*************************************************************************************************************
-
 void RealTimeEvokedWidget::onSelectionChanged()
 {
     //Get current items from the average scene
@@ -643,7 +685,111 @@ void RealTimeEvokedWidget::showFilterWidget(bool state)
 
 //*************************************************************************************************************
 
+void RealTimeEvokedWidget::onSignalColorChanged(const QColor& signalColor)
+{
+    //Only change the signal colors in the 2D layout plot
+    if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "2D Layout plot") {
+        m_pAverageScene->setSignalColorForAllItems(signalColor);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeEvokedWidget::onTableViewBackgroundColorChanged(const QColor& backgroundColor)
+{
+    //Handle the butterfly plot and 2d layout plot differently
+    if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "2D Layout plot") {
+        QBrush backgroundBrush = m_pAverageScene->backgroundBrush();
+        backgroundBrush.setColor(backgroundColor);
+        m_pAverageScene->setBackgroundBrush(backgroundBrush);
+    }
+
+    if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "Butterfly plot") {
+        m_pButterflyPlot->setBackgroundColor(backgroundColor);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeEvokedWidget::onMakeScreenshot(const QString& imageType)
+{
+    // Create file name
+    QString sDate = QDate::currentDate().toString("yyyy_MM_dd");
+    QString sTime = QTime::currentTime().toString("hh_mm_ss");
+
+    if(!QDir("./Screenshots").exists()) {
+        QDir().mkdir("./Screenshots");
+    }
+
+    //Handle the butterfly plot and 2d layout plot differently
+    if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "2D Layout plot") {
+        if(imageType.contains("SVG"))
+        {
+            QString fileName = QString("./Screenshots/%1-%2-LayoutScreenshot.svg").arg(sDate).arg(sTime);
+            // Generate screenshot
+            QSvgGenerator svgGen;
+            svgGen.setFileName(fileName);
+            QRectF rect = m_pAverageScene->itemsBoundingRect();
+            svgGen.setSize(QSize(rect.width(), rect.height()));
+
+            QPainter painter(&svgGen);
+            m_pAverageScene->render(&painter);
+        }
+
+        if(imageType.contains("PNG"))
+        {
+            QString fileName = QString("./Screenshots/%1-%2-LayoutScreenshot.png").arg(sDate).arg(sTime);
+            QPixmap pixMap = QPixmap::grabWidget(m_pAverageLayoutView);
+            pixMap.save(fileName);
+        }
+    }
+
+    if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "Butterfly plot") {
+        if(imageType.contains("SVG"))
+        {
+            QString fileName = QString("./Screenshots/%1-%2-ButterflyScreenshot.svg").arg(sDate).arg(sTime);
+
+            // Generate screenshot
+            QSvgGenerator svgGen;
+            svgGen.setFileName(fileName);
+            svgGen.setSize(m_pButterflyPlot->size());
+            svgGen.setViewBox(m_pButterflyPlot->rect());
+
+            m_pButterflyPlot->render(&svgGen);
+        }
+
+        if(imageType.contains("PNG"))
+        {
+            QString fileName = QString("./Screenshots/%1-%2-ButterflyScreenshot.png").arg(sDate).arg(sTime);
+
+            QImage image(m_pButterflyPlot->size(), QImage::Format_ARGB32);
+            image.fill(Qt::transparent);
+
+            QPainter painter(&image);
+            m_pButterflyPlot->render(&painter);
+            image.save(fileName);
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
 void RealTimeEvokedWidget::wheelEvent(QWheelEvent * event)
 {
     Q_UNUSED(event)
 }
+
+
+//*************************************************************************************************************
+
+bool RealTimeEvokedWidget::eventFilter(QObject *object, QEvent *event)
+{
+    if ((object == m_pButterflyPlot || object == m_pAverageLayoutView) && event->type() == QEvent::MouseButtonDblClick) {
+        m_pRTEModel->toggleFreeze();
+    }
+    return false;
+}
+

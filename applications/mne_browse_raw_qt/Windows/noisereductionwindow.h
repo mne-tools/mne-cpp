@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "ui_NoiseReductionWindow.h"
+#include "ui_noisereductionwindow.h"
 
 #include "fiff/fiff_info.h"
 
