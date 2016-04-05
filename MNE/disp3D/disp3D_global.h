@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef DISP3D_GLOBAL_H
-#define DISP3D_GLOBAL_H
+#ifndef DISP3DNEW_GLOBAL_H
+#define DISP3DNEW_GLOBAL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -50,17 +50,17 @@
 //=============================================================================================================
 
 #if defined(BUILD_MNECPP_STATIC_LIB)
-#  define DISP3DSHARED_EXPORT
-#elif defined(DISP3D_LIBRARY)
-#  define DISP3DSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#  define DISP3DNEWSHARED_EXPORT
+#elif defined(DISP3DNEW_LIBRARY)
+#  define DISP3DNEWSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define DISP3DSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define DISP3DNEWSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-//#if defined(DISP3D_LIBRARY)
-//#  define DISP3DSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+//#if defined(DISP3DNEW_LIBRARY)
+//#  define DISP3DNEWSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 //#else
-//#  define DISP3DSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+//#  define DISP3DNEWSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 //#endif
 
-#endif // DISP3D_GLOBAL_H
+#endif // DISP3DNEW_GLOBAL_H

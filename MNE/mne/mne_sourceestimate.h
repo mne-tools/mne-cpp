@@ -190,7 +190,7 @@ public:
 
 public:
     MatrixXd data;          /**< Matrix of shape [n_dipoles x n_times] which contains the data in source space. */
-    VectorXi vertices;      /**< The indices of the dipoles in the different source spaces. */ //ToDo define is_clustered_result; change vertno to ROI idcs
+    VectorXi vertices;      /**< The indices of the dipoles in the different source spaces. */ //ToDo define is_clustered_result; in clustered case vertices holds the ROI idcs
     RowVectorXf times;      /**< The time vector with n_times steps. */
     float tmin;             /**< Time starting point. */
     float tstep;            /**< Time steps within the times vector. */

@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/brainview.h>
+#include <disp3D/view3D.h>
 
 
 //*************************************************************************************************************
@@ -47,7 +47,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGuiApplication>
+#include <QApplication>
 
 
 //*************************************************************************************************************
@@ -75,7 +75,7 @@ using namespace DISP3DLIB;
 */
 int main(int argc, char *argv[])
 {
-    QGuiApplication a(argc, argv);
+    QApplication a(argc, argv);
 
     QStringList args = QCoreApplication::arguments();
     int w_pos = args.indexOf("-width");
@@ -101,63 +101,38 @@ int main(int argc, char *argv[])
     //
     // pial
     //
-    BrainView t_pialBrainView("sample", 2, "pial", "./MNE-sample-data/subjects");
+    SurfaceSet tSurfSetPial ("sample", 2, "orig", "./MNE-sample-data/subjects");
 
-    if (t_pialBrainView.stereoType() != QGLView::RedCyanAnaglyph)
-        t_pialBrainView.camera()->setEyeSeparation(0.3f);
-
-    if (w_pos >= 0 && h_pos >= 0)
-        t_pialBrainView.resize(w, h);
-    else
-        t_pialBrainView.resize(800, 600);
-
-    t_pialBrainView.setTitle(QString("Pial surface"));
-    t_pialBrainView.show();
+    View3D::SPtr t_pialBrainView = View3D::SPtr(new View3D());
+    t_pialBrainView->addBrainData("orig", tSurfSetPial);
+    t_pialBrainView->show();
 
     //
     // inflated
     //
-    BrainView t_inflatedBrainView("sample", 2, "inflated", "./MNE-sample-data/subjects");
+    SurfaceSet tSurfSetInflated ("sample", 2, "inflated", "./MNE-sample-data/subjects");
 
-    if (t_inflatedBrainView.stereoType() != QGLView::RedCyanAnaglyph)
-        t_inflatedBrainView.camera()->setEyeSeparation(0.3f);
-    if (w_pos >= 0 && h_pos >= 0)
-        t_inflatedBrainView.resize(w, h);
-    else
-        t_inflatedBrainView.resize(800, 600);
-
-    t_inflatedBrainView.setTitle(QString("Inflated surface"));
-    t_inflatedBrainView.show();
+    View3D::SPtr t_inflatedBrainView = View3D::SPtr(new View3D());
+    t_inflatedBrainView->addBrainData("orig", tSurfSetInflated);
+    t_inflatedBrainView->show();
 
     //
     // orig
     //
-    BrainView t_originBrainView("sample", 2, "orig", "./MNE-sample-data/subjects");
+    SurfaceSet tSurfSetOrig ("sample", 2, "orig", "./MNE-sample-data/subjects");
 
-    if (t_originBrainView.stereoType() != QGLView::RedCyanAnaglyph)
-        t_originBrainView.camera()->setEyeSeparation(0.3f);
-    if (w_pos >= 0 && h_pos >= 0)
-        t_originBrainView.resize(w, h);
-    else
-        t_originBrainView.resize(800, 600);
-
-    t_originBrainView.setTitle(QString("Orig surface"));
-    t_originBrainView.show();
+    View3D::SPtr t_origBrainView = View3D::SPtr(new View3D());
+    t_origBrainView->addBrainData("orig", tSurfSetOrig);
+    t_origBrainView->show();
 
     //
     // white
     //
-    BrainView t_whiteBrainView("sample", 2, "white", "./MNE-sample-data/subjects");
+    SurfaceSet tSurfSetWhite ("sample", 2, "orig", "./MNE-sample-data/subjects");
 
-    if (t_whiteBrainView.stereoType() != QGLView::RedCyanAnaglyph)
-        t_whiteBrainView.camera()->setEyeSeparation(0.3f);
-    if (w_pos >= 0 && h_pos >= 0)
-        t_whiteBrainView.resize(w, h);
-    else
-        t_whiteBrainView.resize(800, 600);
-
-    t_whiteBrainView.setTitle(QString("White surface"));
-    t_whiteBrainView.show();
+    View3D::SPtr t_whiteBrainView = View3D::SPtr(new View3D());
+    t_whiteBrainView->addBrainData("orig", tSurfSetWhite);
+    t_whiteBrainView->show();
 
     return a.exec();
 }

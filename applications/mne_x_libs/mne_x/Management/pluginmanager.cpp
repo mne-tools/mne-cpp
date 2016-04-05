@@ -88,15 +88,15 @@ void PluginManager::loadPlugins(const QString& dir)
 {
     QDir PluginsDir(dir);
 
-    foreach(QString fileName, PluginsDir.entryList(QDir::Files))
+    foreach(QString file, PluginsDir.entryList(QDir::Files))
     {
-        this->setFileName(PluginsDir.absoluteFilePath(fileName));
+        this->setFileName(PluginsDir.absoluteFilePath(file));
         QObject *pPlugin = this->instance();
 
         // IPlugin
         if(pPlugin)
         {
-            qDebug() << "try to load Plugin " << fileName;
+            qDebug() << "try to load Plugin " << file;
 
             // plugins are always disabled when they are first loaded
             m_qVecPlugins.push_back(qobject_cast<IPlugin*>(pPlugin));
@@ -138,7 +138,7 @@ void PluginManager::loadPlugins(const QString& dir)
 
         }
         else
-            qDebug() << "Plugin " << fileName << " could not be instantiated!";
+            qDebug() << "Plugin " << file << " could not be instantiated!";
     }
 
 }

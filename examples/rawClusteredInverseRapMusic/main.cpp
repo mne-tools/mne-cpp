@@ -52,7 +52,8 @@
 #include <mne/mne_sourceestimate.h>
 #include <inverse/rapMusic/rapmusic.h>
 
-#include <disp3D/inverseview.h>
+#include <disp3D/view3D.h>
+#include <disp3D/control/control3dwidget.h>
 
 #include <utils/mnemath.h>
 
@@ -64,7 +65,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGuiApplication>
+#include <QApplication>
 #include <QSet>
 
 
@@ -97,13 +98,13 @@ using namespace UTILSLIB;
 */
 int main(int argc, char *argv[])
 {
-    QGuiApplication a(argc, argv);
+    QApplication a(argc, argv);
 
-//    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-//    QString t_sEventName = "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
-//    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-//    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
-//    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
+    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QString t_sEventName = "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
+    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
+    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
 
 //    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw.fif");
 //    QString t_sEventName = "E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
@@ -111,11 +112,11 @@ int main(int argc, char *argv[])
 //    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
 //    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
 
-    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw.fif");
-    QString t_sEventName = "E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw-eve.fif";
-    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw-oct-6-fwd.fif");
-    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
+//    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw.fif");
+//    QString t_sEventName = "E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw-eve.fif";
+//    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw-oct-6-fwd.fif");
+//    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
+//    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
 
     QString t_sFileNameStc("");//("mind006_051209_auditory01.stc");
 
@@ -484,44 +485,16 @@ int main(int argc, char *argv[])
 //    sample += (qint32)ceil(0.106/sourceEstimate.tstep); //100ms
 //    sourceEstimate = sourceEstimate.reduce(sample, 1);
 
-    QList<Label> t_qListLabels;
-    QList<RowVector4i> t_qListRGBAs;
+    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+    testWindow->addBrainData("HemiLRSet", t_surfSet, t_annotationSet);
 
-    //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
-    t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
+    QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("HemiLRSet", sourceEstimate, t_clusteredFwd);
 
-    InverseView view(t_rapMusic.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false, false);//true);
+    testWindow->show();
 
-    if (view.stereoType() != QGLView::RedCyanAnaglyph)
-        view.camera()->setEyeSeparation(0.3f);
-    QStringList args = QCoreApplication::arguments();
-    int w_pos = args.indexOf("-width");
-    int h_pos = args.indexOf("-height");
-    if (w_pos >= 0 && h_pos >= 0)
-    {
-        bool ok = true;
-        int w = args.at(w_pos + 1).toInt(&ok);
-        if (!ok)
-        {
-            qWarning() << "Could not parse width argument:" << args;
-            return 1;
-        }
-        int h = args.at(h_pos + 1).toInt(&ok);
-        if (!ok)
-        {
-            qWarning() << "Could not parse height argument:" << args;
-            return 1;
-        }
-        view.resize(w, h);
-    }
-    else
-    {
-        view.resize(800, 600);
-    }
-    view.show();
-
-    //Push Estimate
-    view.pushSourceEstimate(sourceEstimate);
+    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
+    control3DWidget->setView3D(testWindow);
+    control3DWidget->show();
 
     if(!t_sFileNameStc.isEmpty())
     {

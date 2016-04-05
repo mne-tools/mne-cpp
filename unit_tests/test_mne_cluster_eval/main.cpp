@@ -41,6 +41,7 @@
 
 #include <fs/label.h>
 #include <fs/surface.h>
+#include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 
 #include <fiff/fiff_evoked.h>
@@ -51,8 +52,6 @@
 
 #include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
-
-#include <disp3D/inverseview.h>
 
 #include <utils/mnemath.h>
 
@@ -83,7 +82,6 @@ using namespace MNELIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
-using namespace DISP3DLIB;
 using namespace UTILSLIB;
 
 

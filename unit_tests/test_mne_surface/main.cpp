@@ -51,7 +51,8 @@
 #include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
 
-#include <disp3D/brainview.h>
+#include <disp3D/view3D.h>
+#include <disp3D/control/control3dwidget.h>
 
 #include <utils/mnemath.h>
 
@@ -65,7 +66,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGuiApplication>
+#include <QApplication>
 #include <QSet>
 #include <QElapsedTimer>
 
@@ -101,7 +102,7 @@ using namespace UTILSLIB;
 */
 int main(int argc, char *argv[])
 {
-    QGuiApplication a(argc, argv);
+    QApplication a(argc, argv);
 
 //    Vector3f v1, v2;
 //    v1 << 1, 2, 5;
@@ -131,38 +132,16 @@ int main(int argc, char *argv[])
 
 //    qDebug() << "[5]";
 
+    SurfaceSet tSurfSet ("sample", 2, "orig", "./MNE-sample-data/subjects");
+    AnnotationSet tAnnotSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
 
+    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+    testWindow->addBrainData("HemiLRSet", tSurfSet, tAnnotSet);
+    testWindow->show();
 
-//    BrainView t_brainView("sample", 2, "pial", "./MNE-sample-data/subjects");
-    BrainView t_brainView("sample", 2, "pial", "aparc.a2009s", "./MNE-sample-data/subjects");
-
-    if (t_brainView.stereoType() != QGLView::RedCyanAnaglyph)
-        t_brainView.camera()->setEyeSeparation(0.3f);
-    QStringList args = QCoreApplication::arguments();
-    int w_pos = args.indexOf("-width");
-    int h_pos = args.indexOf("-height");
-    if (w_pos >= 0 && h_pos >= 0)
-    {
-        bool ok = true;
-        int w = args.at(w_pos + 1).toInt(&ok);
-        if (!ok)
-        {
-            qWarning() << "Could not parse width argument:" << args;
-            return 1;
-        }
-        int h = args.at(h_pos + 1).toInt(&ok);
-        if (!ok)
-        {
-            qWarning() << "Could not parse height argument:" << args;
-            return 1;
-        }
-        t_brainView.resize(w, h);
-    }
-    else
-    {
-        t_brainView.resize(800, 600);
-    }
-    t_brainView.show();
+    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
+    control3DWidget->setView3D(testWindow);
+    control3DWidget->show();
 
     return a.exec();
 }

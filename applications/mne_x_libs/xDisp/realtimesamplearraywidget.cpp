@@ -600,7 +600,7 @@ void RealTimeSampleArrayWidget::wheelEvent(QWheelEvent* wheelEvent)
     if(wheelEvent->delta() < 0)
     {
         if(m_ucToolIndex == 0)
-            m_ucToolIndex = m_vecTool.size()-1;
+            m_ucToolIndex = (unsigned char)m_vecTool.size()-1;
         else
             --m_ucToolIndex;
     }

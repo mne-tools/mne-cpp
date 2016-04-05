@@ -124,6 +124,7 @@ void RapMusicToolbox::init()
     m_pRTSEOutput->data()->setName("Real-Time Source Estimate");
     m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
     m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
+    m_pRTSEOutput->data()->setFwdSolution(m_pFwd);
 
     // start clustering
     QFuture<void> future = QtConcurrent::run(this, &RapMusicToolbox::doClustering);
@@ -247,7 +248,7 @@ IPlugin::PluginType RapMusicToolbox::getType() const
 
 QString RapMusicToolbox::getName() const
 {
-    return "RAP MUSIC Toolbox";
+    return "RAP MUSIC";
 }
 
 

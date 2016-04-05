@@ -46,21 +46,14 @@ SUBDIRS += \
     inverse \
     rtCommand \
     rtClient \
-    rtInv\
-
+    rtProcessing\
 
 contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += disp
 
-    qtHaveModule(3dcore) {
-    message(Examples.pro - Qt3D 3DCore available!)
-    SUBDIRS += \
-        disp3DNew \
-    }
-
-    qtHaveModule(3d) {
-        message(Qt3D available: disp3D library configured!)
-        SUBDIRS +=  \
+    qtHaveModule(3dcore,3drender,3dinput) {
+        message(MNE.pro - Qt3D available)
+        SUBDIRS += \
             disp3D \
     }
 }

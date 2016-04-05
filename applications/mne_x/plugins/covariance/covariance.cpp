@@ -273,6 +273,9 @@ void Covariance::run()
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
+    //Set m_iEstimationSamples so that we alwyas wait for 5 secs
+    m_iEstimationSamples = m_pFiffInfo->sfreq * 5;
+
 //    m_pActionShowAdjustment->setVisible(true);
 
     //

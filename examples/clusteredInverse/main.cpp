@@ -47,7 +47,8 @@
 #include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
 
-#include <disp3D/inverseview.h>
+#include <disp3D/view3D.h>
+#include <disp3D/control/control3dwidget.h>
 
 #include <utils/mnemath.h>
 
@@ -59,7 +60,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGuiApplication>
+#include <QApplication>
+#include <QCommandLineParser>
 #include <QSet>
 
 
@@ -92,23 +94,25 @@ using namespace UTILSLIB;
 */
 int main(int argc, char *argv[])
 {
-    QGuiApplication a(argc, argv);
+    QApplication app(argc, argv);
+
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Clustered Inverse Example");
+    parser.addHelpOption();
+    QCommandLineOption sampleFwdFileOption("f", "Path to forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption sampleCovFileOption("c", "Path to covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QCommandLineOption sampleEvokedFileOption("e", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    parser.addOption(sampleFwdFileOption);
+    parser.addOption(sampleCovFileOption);
+    parser.addOption(sampleEvokedFileOption);
+    parser.process(app);
 
     //########################################################################################
     // Source Estimate
-
-//    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-//    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-//    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-
-//    QFile t_fileFwd("/home/chdinh/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
-//    QFile t_fileCov("/home/chdinh/sl_data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
-//    QFile t_fileEvoked("/home/chdinh/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
-
-    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
-    QFile t_fileCov("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
-    QFile t_fileEvoked("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
-
+    QFile t_fileFwd(parser.value(sampleFwdFileOption));
+    QFile t_fileCov(parser.value(sampleCovFileOption));
+    QFile t_fileEvoked(parser.value(sampleEvokedFileOption));
 
     double snr = 1.0f;//3.0f;//0.1f;//3.0f;
     QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
@@ -289,44 +293,12 @@ int main(int argc, char *argv[])
 //    sample += (qint32)ceil(0.106/sourceEstimate.tstep); //100ms
 //    sourceEstimate = sourceEstimate.reduce(sample, 1);
 
-    QList<Label> t_qListLabels;
-    QList<RowVector4i> t_qListRGBAs;
+//    View3D::SPtr testWindow = View3D::SPtr(new View3D());
+//    testWindow->addBrainData("HemiLRSet", t_surfSet, t_annotationSet);
 
-    //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
-    t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
+//    QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("HemiLRSet", sourceEstimate, t_clusteredFwd);
 
-//    InverseView view(minimumNorm.getSourceSpace(), t_qListLabels, t_qListRGBAs);
-
-//    if (view.stereoType() != QGLView::RedCyanAnaglyph)
-//        view.camera()->setEyeSeparation(0.3f);
-//    QStringList args = QCoreApplication::arguments();
-//    int w_pos = args.indexOf("-width");
-//    int h_pos = args.indexOf("-height");
-//    if (w_pos >= 0 && h_pos >= 0)
-//    {
-//        bool ok = true;
-//        int w = args.at(w_pos + 1).toInt(&ok);
-//        if (!ok)
-//        {
-//            qWarning() << "Could not parse width argument:" << args;
-//            return 1;
-//        }
-//        int h = args.at(h_pos + 1).toInt(&ok);
-//        if (!ok)
-//        {
-//            qWarning() << "Could not parse height argument:" << args;
-//            return 1;
-//        }
-//        view.resize(w, h);
-//    }
-//    else
-//    {
-//        view.resize(800, 600);
-//    }
-//    view.show();
-
-//    //Push Estimate
-//    view.pushSourceEstimate(sourceEstimate);
+//    testWindow->show();
 
     if(!t_sFileNameStc.isEmpty())
     {
@@ -335,5 +307,5 @@ int main(int argc, char *argv[])
     }
 
 //*/
-    return a.exec();//1;//a.exec();
+    return app.exec();//1;
 }

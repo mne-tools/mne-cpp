@@ -67,17 +67,20 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 SOURCES += \
         dummytoolbox.cpp \
         FormFiles/dummysetupwidget.cpp \
-        FormFiles/dummyaboutwidget.cpp
+        FormFiles/dummyaboutwidget.cpp \
+    FormFiles/dummyyourwidget.cpp
 
 HEADERS += \
         dummytoolbox.h\
         dummytoolbox_global.h \
         FormFiles/dummysetupwidget.h \
-        FormFiles/dummyaboutwidget.h
+        FormFiles/dummyaboutwidget.h \
+    FormFiles/dummyyourwidget.h
 
 FORMS += \
         FormFiles/dummysetup.ui \
-        FormFiles/dummyabout.ui
+        FormFiles/dummyabout.ui \
+    FormFiles/dummyyourtoolbarwidget.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

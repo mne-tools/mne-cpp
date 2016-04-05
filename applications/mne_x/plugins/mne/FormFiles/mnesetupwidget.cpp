@@ -204,7 +204,9 @@ void MNESetupWidget::showSurfaceDirDialog()
                                                                 QFileDialog::ShowDirsOnly
                                                                 | QFileDialog::DontResolveSymlinks);
 
-    SurfaceSet::SPtr t_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(t_sSurfaceDir+"/lh.white", t_sSurfaceDir+"/rh.white"));
+    SurfaceSet::SPtr t_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(t_sSurfaceDir+"/lh.inflated", t_sSurfaceDir+"/rh.inflated"));
+
+    ui.m_qLineEdit_SurfaceDirName->setText(t_sSurfaceDir);
 
     if(!t_pSurfaceSet->isEmpty() && t_pSurfaceSet->size() == 2)
     {

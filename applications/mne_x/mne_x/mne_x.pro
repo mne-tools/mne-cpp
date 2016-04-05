@@ -71,7 +71,7 @@ else {
             -lmne_x
 }
 
-qtHaveModule(3d) {
+qtHaveModule(3dcore, 3drender, 3dinput) {
     CONFIG(debug, debug|release) {
         LIBS += -lMNE$${MNE_LIB_VERSION}Disp3Dd
     }
@@ -113,36 +113,61 @@ INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 RESOURCES += \
     mainApp.qrc
 
-RC_FILE = images/appIcons/mne-x.rc
-
 unix: QMAKE_CXXFLAGS += -Wno-attributes
 
-# Deploy Qt Dependencies
-unix:!macx {
-    #ToDo Unix
+# Icon
+win32 {
+    RC_FILE = images/appIcons/mne-x.rc
 }
-else {
+macx {
+    ICON = images/appIcons/mne-x.icns
+}
+
+# Deploy Qt Dependencies
+win32 {
     isEmpty(TARGET_EXT) {
-        win32 {
-            TARGET_CUSTOM_EXT = .exe
-        }
-        macx {
-            TARGET_CUSTOM_EXT = .app
-        }
+        TARGET_CUSTOM_EXT = .exe
     } else {
         TARGET_CUSTOM_EXT = $${TARGET_EXT}
     }
 
-    win32 {
-        DEPLOY_COMMAND = windeployqt
-    }
-    macx {
-        DEPLOY_COMMAND = macdeployqt
-    }
+    DEPLOY_COMMAND = windeployqt
 
     DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
 
     #  # Uncomment the following line to help debug the deploy command when running qmake
     #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
     QMAKE_POST_LINK = $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+}
+unix:!macx {
+    # === Unix ===
+    QMAKE_RPATHDIR += $ORIGIN/../lib
+}
+macx {
+    # === Mac ===
+    QMAKE_RPATHDIR += @executable_path/../Frameworks
+
+    # Copy Resource folder to app bundle
+    mnexrc.path = Contents/MacOS
+    mnexrc.files = $${DESTDIR}/mne_x_libs
+    QMAKE_BUNDLE_DATA += mnexrc
+
+    plugins.path = Contents/MacOS
+    plugins.files = $${DESTDIR}/mne_x_plugins
+    QMAKE_BUNDLE_DATA += plugins
+
+#    isEmpty(TARGET_EXT) {
+#        TARGET_CUSTOM_EXT = .app
+#    } else {
+#        TARGET_CUSTOM_EXT = $${TARGET_EXT}
+#    }
+
+#    # Copy libs
+#    BUNDLEFRAMEDIR = $$shell_quote($${DESTDIR}/$${TARGET}$${TARGET_CUSTOM_EXT}/Contents/Frameworks)
+#    QMAKE_POST_LINK = $${QMAKE_MKDIR} $${BUNDLEFRAMEDIR} &
+#    QMAKE_POST_LINK += $${QMAKE_COPY} $${MNE_LIBRARY_DIR}/{libMNE1Generics.*,libMNE1Utils.*,libMNE1Fs.*,libMNE1Fiff.*,libMNE1Mne*,libMNE1Disp.*} $${BUNDLEFRAMEDIR}
+
+#    DEPLOY_COMMAND = macdeployqt
+#    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
+#    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -verbose=0
 }

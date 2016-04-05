@@ -130,8 +130,8 @@ int main(int argc, char *argv[])
     p_Head.addVertexNormals();
     t_BemIso2Mesh<<p_Head;
 
-    QFile t_fileBemTest("./MNE-sample-data/subjects/sample/bem/sample-head-test.fif");
-    t_Bem.write(t_fileBemTest);
+    QFile t_fileBemTest("D:/Studium/Master/Masterarbeit/Programming/Iso2MeshBem/AVG4-0Years_segmented_BEM3.fif");
+    t_BemIso2Mesh.write(t_fileBemTest);
     t_fileBemTest.close();
 
 

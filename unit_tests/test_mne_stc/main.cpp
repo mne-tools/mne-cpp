@@ -53,10 +53,10 @@
 #include <inverse/minimumNorm/minimumnorm.h>
 
 
-#include <disp3D/newbrainview.h>
-#include <disp3D/helpers/cluststcview.h>
-#include <disp3D/helpers/cluststcmodel.h>
-#include <disp3D/helpers/cluststctabledelegate.h>
+//#include <disp3D/newbrainview.h>
+//#include <disp3D/helpers/cluststcview.h>
+//#include <disp3D/helpers/cluststcmodel.h>
+//#include <disp3D/helpers/cluststctabledelegate.h>
 
 #include <utils/mnemath.h>
 
@@ -87,7 +87,7 @@ using namespace MNELIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
-using namespace DISP3DLIB;
+//using namespace DISP3DLIB;
 using namespace UTILSLIB;
 
 
@@ -109,127 +109,114 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    //TODO: NEEDS PORTING TO NEW DISP3D LIBRARY !!!
 
-//    NewBrainView *pBrainView = new NewBrainView("mind006", 2, "inflated", "aparc.a2009s", "D:/Data/subjects");
-//    pBrainView->show();
-//    pBrainView->resize(800,600);
+////    NewBrainView *pBrainView = new NewBrainView("mind006", 2, "inflated", "aparc.a2009s", "D:/Data/subjects");
+////    pBrainView->show();
+////    pBrainView->resize(800,600);
 
-//    pBrainView->showDebugTable();
-
-
-
-
-    AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "D:/Data/subjects");
-    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Data/subjects");
-
-    QString t_sFileNameStc("test_mind006_051209_auditory01.stc");//"mind006_051209_auditory01_test.stc");
-    MNESourceEstimate sourceEstimateClustered;
-
-    if(!t_sFileNameStc.isEmpty())
-    {
-        QFile t_fileClusteredStc(t_sFileNameStc);
-        MNESourceEstimate::read(t_fileClusteredStc, sourceEstimateClustered);
-    }
-
-//    qDebug() << "sourceEstimateClustered" << sourceEstimateClustered.data.rows() << "x" << sourceEstimateClustered.data.cols();
-
-    ClustStcModel* pClustStcModel = new ClustStcModel;
-    pClustStcModel->init(t_annotationSet, t_surfSet);
-    pClustStcModel->setLoop(true);
-
-    //
-    // QDebugTable
-    //
-    QWidget* pWidgetTable = new QWidget;
-    QGridLayout *mainLayoutTable = new QGridLayout;
-
-    QTableView* pTableView = new QTableView;
-    ClustStcTableDelegate* pClustStcTableDelegate = new ClustStcTableDelegate;
-    pTableView->setModel(pClustStcModel);
-    pTableView->setItemDelegate(pClustStcTableDelegate);
-    pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
-
-    QLabel * pLabelNorm = new QLabel("Norm");
-    QSlider* pSliderNorm = new QSlider(Qt::Vertical);
-    QObject::connect(pSliderNorm, &QSlider::valueChanged, pClustStcModel, &ClustStcModel::setNormalization);
-    pSliderNorm->setMinimum(1);
-    pSliderNorm->setMaximum(100);
-    pSliderNorm->setValue(60);
-
-    QLabel * pLabelAverage = new QLabel("Average");
-    QSlider* pSliderAverage = new QSlider(Qt::Horizontal);
-    QObject::connect(pSliderAverage, &QSlider::valueChanged, pClustStcModel, &ClustStcModel::setAverage);
-    pSliderAverage->setMinimum(1);
-    pSliderAverage->setMaximum(500);
-    pSliderAverage->setValue(100);
-
-    mainLayoutTable->addWidget(pTableView,0,0,2,2);
-    mainLayoutTable->addWidget(pLabelNorm,0,3);
-    mainLayoutTable->addWidget(pSliderNorm,1,3);
-    mainLayoutTable->addWidget(pLabelAverage,3,0);
-    mainLayoutTable->addWidget(pSliderAverage,3,1);
-
-    pWidgetTable->setLayout(mainLayoutTable);
-    pWidgetTable->show();
-    pWidgetTable->resize(800,600);
-    pWidgetTable->setWindowTitle("Stc Table");
+////    pBrainView->showDebugTable();
 
 
-    //
-    // STC view
-    //
-    QWidget* pWidgetView = new QWidget;
-    QGridLayout *mainLayoutView = new QGridLayout;
+////    qDebug() << "sourceEstimateClustered" << sourceEstimateClustered.data.rows() << "x" << sourceEstimateClustered.data.cols();
 
-    QLabel * pLabelNormView = new QLabel("Norm");
-    QSlider* pSliderNormView = new QSlider(Qt::Vertical);
-    QObject::connect(pSliderNormView, &QSlider::valueChanged, pClustStcModel, &ClustStcModel::setNormalization);
-    pSliderNormView->setMinimum(1);
-    pSliderNormView->setMaximum(100);
-    pSliderNormView->setValue(60);
+//    ClustStcModel* pClustStcModel = new ClustStcModel;
+//    pClustStcModel->init(t_annotationSet, t_surfSet);
+//    pClustStcModel->setLoop(true);
 
-    QLabel * pLabelAverageView = new QLabel("Average");
-    QSlider* pSliderAverageView = new QSlider(Qt::Horizontal);
-    QObject::connect(pSliderAverageView, &QSlider::valueChanged, pClustStcModel, &ClustStcModel::setAverage);
-    pSliderAverageView->setMinimum(1);
-    pSliderAverageView->setMaximum(500);
-    pSliderAverageView->setValue(100);
+//    //
+//    // QDebugTable
+//    //
+//    QWidget* pWidgetTable = new QWidget;
+//    QGridLayout *mainLayoutTable = new QGridLayout;
 
-    ClustStcView* clustView = new ClustStcView(false, true, QGLView::RedCyanAnaglyph);//(false); (true, QGLView::StretchedLeftRight); (true, QGLView::RedCyanAnaglyph);
-    clustView->setModel(pClustStcModel);
+//    QTableView* pTableView = new QTableView;
+//    ClustStcTableDelegate* pClustStcTableDelegate = new ClustStcTableDelegate;
+//    pTableView->setModel(pClustStcModel);
+//    pTableView->setItemDelegate(pClustStcTableDelegate);
+//    pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
 
-    if (clustView->stereoType() != QGLView::RedCyanAnaglyph)
-        clustView->camera()->setEyeSeparation(0.3f);
+//    QLabel * pLabelNorm = new QLabel("Norm");
+//    QSlider* pSliderNorm = new QSlider(Qt::Vertical);
+//    QObject::connect(pSliderNorm, &QSlider::valueChanged, pClustStcModel, &ClustStcModel::setNormalization);
+//    pSliderNorm->setMinimum(1);
+//    pSliderNorm->setMaximum(100);
+//    pSliderNorm->setValue(60);
 
-    QWidget *pWidgetContainer = QWidget::createWindowContainer(clustView);
+//    QLabel * pLabelAverage = new QLabel("Average");
+//    QSlider* pSliderAverage = new QSlider(Qt::Horizontal);
+//    QObject::connect(pSliderAverage, &QSlider::valueChanged, pClustStcModel, &ClustStcModel::setAverage);
+//    pSliderAverage->setMinimum(1);
+//    pSliderAverage->setMaximum(500);
+//    pSliderAverage->setValue(100);
 
-    mainLayoutView->addWidget(pWidgetContainer,0,0,2,2);
-    mainLayoutView->addWidget(pLabelNormView,0,3);
-    mainLayoutView->addWidget(pSliderNormView,1,3);
-    mainLayoutView->addWidget(pLabelAverageView,3,0);
-    mainLayoutView->addWidget(pSliderAverageView,3,1);
+//    mainLayoutTable->addWidget(pTableView,0,0,2,2);
+//    mainLayoutTable->addWidget(pLabelNorm,0,3);
+//    mainLayoutTable->addWidget(pSliderNorm,1,3);
+//    mainLayoutTable->addWidget(pLabelAverage,3,0);
+//    mainLayoutTable->addWidget(pSliderAverage,3,1);
 
-    pWidgetView->setLayout(mainLayoutView);
+//    pWidgetTable->setLayout(mainLayoutTable);
+//    pWidgetTable->show();
+//    pWidgetTable->resize(800,600);
+//    pWidgetTable->setWindowTitle("Stc Table");
 
-    //connect the sliders
 
-    QObject::connect(pSliderNorm, &QSlider::valueChanged, pSliderNormView, &QSlider::setValue);
-    QObject::connect(pSliderAverage, &QSlider::valueChanged, pSliderAverageView, &QSlider::setValue);
+//    //
+//    // STC view
+//    //
+//    QWidget* pWidgetView = new QWidget;
+//    QGridLayout *mainLayoutView = new QGridLayout;
 
-    QObject::connect(pSliderNormView, &QSlider::valueChanged, pSliderNorm, &QSlider::setValue);
-    QObject::connect(pSliderAverageView, &QSlider::valueChanged, pSliderAverage, &QSlider::setValue);
+//    QLabel * pLabelNormView = new QLabel("Norm");
+//    QSlider* pSliderNormView = new QSlider(Qt::Vertical);
+//    QObject::connect(pSliderNormView, &QSlider::valueChanged, pClustStcModel, &ClustStcModel::setNormalization);
+//    pSliderNormView->setMinimum(1);
+//    pSliderNormView->setMaximum(100);
+//    pSliderNormView->setValue(60);
 
-    pWidgetView->show();
-    pWidgetView->resize(800,600);
+//    QLabel * pLabelAverageView = new QLabel("Average");
+//    QSlider* pSliderAverageView = new QSlider(Qt::Horizontal);
+//    QObject::connect(pSliderAverageView, &QSlider::valueChanged, pClustStcModel, &ClustStcModel::setAverage);
+//    pSliderAverageView->setMinimum(1);
+//    pSliderAverageView->setMaximum(500);
+//    pSliderAverageView->setValue(100);
 
-    //
-    // Add Data
-    //
-    pClustStcModel->addData(sourceEstimateClustered);
+//    ClustStcView* clustView = new ClustStcView(false, true, QGLView::RedCyanAnaglyph);//(false); (true, QGLView::StretchedLeftRight); (true, QGLView::RedCyanAnaglyph);
+//    clustView->setModel(pClustStcModel);
 
-//    clustView->setStereoType(QGLView::StretchedLeftRight);
+//    if (clustView->stereoType() != QGLView::RedCyanAnaglyph)
+//        clustView->camera()->setEyeSeparation(0.3f);
 
-//*/
+//    QWidget *pWidgetContainer = QWidget::createWindowContainer(clustView);
+
+//    mainLayoutView->addWidget(pWidgetContainer,0,0,2,2);
+//    mainLayoutView->addWidget(pLabelNormView,0,3);
+//    mainLayoutView->addWidget(pSliderNormView,1,3);
+//    mainLayoutView->addWidget(pLabelAverageView,3,0);
+//    mainLayoutView->addWidget(pSliderAverageView,3,1);
+
+//    pWidgetView->setLayout(mainLayoutView);
+
+//    //connect the sliders
+
+//    QObject::connect(pSliderNorm, &QSlider::valueChanged, pSliderNormView, &QSlider::setValue);
+//    QObject::connect(pSliderAverage, &QSlider::valueChanged, pSliderAverageView, &QSlider::setValue);
+
+//    QObject::connect(pSliderNormView, &QSlider::valueChanged, pSliderNorm, &QSlider::setValue);
+//    QObject::connect(pSliderAverageView, &QSlider::valueChanged, pSliderAverage, &QSlider::setValue);
+
+//    pWidgetView->show();
+//    pWidgetView->resize(800,600);
+
+//    //
+//    // Add Data
+//    //
+//    pClustStcModel->addData(sourceEstimateClustered);
+
+////    clustView->setStereoType(QGLView::StretchedLeftRight);
+
+////*/
 
     return a.exec();//1;//a.exec();
 }

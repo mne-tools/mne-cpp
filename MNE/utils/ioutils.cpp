@@ -238,8 +238,8 @@ void IOUtils::swap_doublep(double *source)
 }
 
 
-//*************************************************************************************************************
 
+<<<<<<< HEAD
 template<typename T>
 void IOUtils::write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QString& path)
 {
@@ -309,3 +309,5 @@ MatrixXd IOUtils::read_eigen_matrix(const QString &path)
 
     return out;
 }
+=======
+>>>>>>> 082b4cc83b1bcc7950a3e1495610ad813a501177

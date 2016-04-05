@@ -122,7 +122,25 @@ public:
     */
     void updateScene();
 
+    //=========================================================================================================
+    /**
+    * Set the signal color for all items in the scene
+    *
+    * @param [in] color     The new signal color for all items.
+    */
+    void setSignalColorForAllItems(const QColor& color);
+
+    //=========================================================================================================
+    /**
+    * Set the signal color for all items in the scene
+    *
+    * @return   The color used for all the itmes' signal paths.
+    */
+    const QColor& getSignalColorForAllItems();
+
 private:
+    QColor                          m_colGlobalItemSignalColor;     /**< The color used in all items to draw the signals.*/
+
     QList<SelectionSceneItem*>      m_lSelectedChannelItems;        /**< Holds the selected channels from the selection manager.*/
 };
 

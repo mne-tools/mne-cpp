@@ -48,7 +48,8 @@
 #include <mne_x/Interfaces/IAlgorithm.h>
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
-#include <rtInv/rthpis.h>
+#include <rtProcessing/rthpis.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================

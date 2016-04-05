@@ -201,7 +201,7 @@ IPlugin::PluginType RtHpi::getType() const
 
 QString RtHpi::getName() const
 {
-    return "RtHpi Toolbox";
+    return "RtHpi";
 }
 
 
