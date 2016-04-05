@@ -170,7 +170,6 @@ private:
     uint                        m_uiSamplingFrequency;          /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
     uint                        m_uiSamplesPerBlock;            /**< The samples per block defined by the user via the GUI.*/
     bool                        m_bWriteDriverDebugToFile;      /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
-    bool                        m_bUsePreprocessing;            /**< Flag for using preprocessing actions for the EEG data. Defined by the user via the GUI.*/
     QString                     m_sOutputFilePath;              /**< Holds the path for the output file. Defined by the user via the GUI.*/
     bool                        m_bMeasureImpedances;           /**< Flag for impedance measuring mode.*/
 
