@@ -107,19 +107,25 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     if(m_bWriteDriverDebugToFile)
         m_outputFileStream.open("mne_x_plugins/resources/eegosports/EEGoSports_Driver_Debug.txt", std::ios::trunc); //ios::trunc deletes old file data
 
-    // Get device handler
-    factory factoryObj ("eego-SDK.dll"); // Make sure that eego-SDK.dll resides in the working directory
-    m_pAmplifier = factoryObj.getAmplifier(); // Get an amplifier
-    //std::cout<<"EEGoSportsDriver::initDevice - Serial number of connected eegosports device: "<<m_pAmplifier->getSerialNumber()<<std::endl;
+    try {
+        // Get device handler
+        factory factoryObj ("eego-SDK.dll"); // Make sure that eego-SDK.dll resides in the working directory
+        m_pAmplifier = factoryObj.getAmplifier(); // Get an amplifier
 
-    //Start the stream
-    if(bMeasureImpedance) {
-        m_pDataStream = m_pAmplifier->OpenImpedanceStream(m_uiSamplingFrequency);
-    } else {
-        m_pDataStream = m_pAmplifier->OpenEegStream(m_uiSamplingFrequency);
+        //std::cout<<"EEGoSportsDriver::initDevice - Serial number of connected eegosports device: "<<m_pAmplifier->getSerialNumber()<<std::endl;
+
+        //Start the stream
+        if(bMeasureImpedance) {
+            m_pDataStream = m_pAmplifier->OpenImpedanceStream(m_uiSamplingFrequency);
+        } else {
+            m_pDataStream = m_pAmplifier->OpenEegStream(m_uiSamplingFrequency);
+        }
+
+        Sleep(100);
+    } catch (std::runtime_error& e) {
+        std::cout <<"EEGoSportsDriver::initDevice - error " << e.what() << std::endl;
+        return false;
     }
-
-    Sleep(100);
 
     std::cout << "EEGoSportsDriver::initDevice - Successfully initialised the device." << std::endl;
 
