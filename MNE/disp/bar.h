@@ -111,11 +111,7 @@ class DISPSHARED_EXPORT
     * @param[in]  iPrecisionValue        user input to determine the amount of digits of coefficient shown in the histogram
     */
     template<typename T>
-    void bar(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassFrequencyData, int iClassAmount, int iPrecisionValue);
-    template<typename T>
-    void bar(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassFrequencyData, int iClassAmount, int iPrecisionValue);
-    template<typename T>
-    void bar(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassFrequencyData, int iClassAmount, int iPrecisionValue);
+    void bar(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassFrequencyData, int iClassAmount, int iPrecisionValue);
     template<typename T>
     void bar(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassFrequencyData, int iClassAmount, int iPrecisionValue);
 
@@ -134,9 +130,9 @@ class DISPSHARED_EXPORT
     * @param[out] vecExponentResults     vector filled with values of exponent only
     */
     template<typename T>
-    void splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, int iClassAmount, QVector<double>& vecCoefficientResults, QVector<int>& vecExponentValues);
+    void splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
     template<typename T>
-    void splitCoefficientAndExponent (const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, int iClassAmount, QVector<double>& vecCoefficientResults, QVector<int>& vecExponentValues);
+    void splitCoefficientAndExponent (const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
 
 
     //=========================================================================================================
@@ -202,7 +198,7 @@ void bar (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitD
 //=========================================================================================================
 
 template< typename T>
-void splitCoefficientAndExponent (Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, QVector<double>& vecCoefficientResults, QVector<int>& vecExponentValues, int iClassAmount)
+void splitCoefficientAndExponent (Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
 {
     vecCoefficientResults.clear();
     vecCoefficientResults.resize(iClassAmount + 1);
