@@ -37,7 +37,9 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
+QT  += core gui widgets
 QT  += core widgets svg
+QT  += charts
 
 DEFINES += DISP_LIBRARY
 
@@ -106,7 +108,8 @@ SOURCES += \
     selectionmanagerwindow.cpp \
     helpers/chinfomodel.cpp \
     helpers/mneoperator.cpp \
-    helpers/roundededgeswidget.cpp
+    helpers/roundededgeswidget.cpp \
+    bar.cpp
 
 HEADERS += \
     disp_global.h \
@@ -128,7 +131,8 @@ HEADERS += \
     helpers/selectionsceneitem.h \
     helpers/chinfomodel.h \
     helpers/mneoperator.h \
-    helpers/roundededgeswidget.h
+    helpers/roundededgeswidget.h \
+    bar.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
