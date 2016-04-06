@@ -1008,6 +1008,11 @@ void QuickControlWidget::createProjectorGroup()
 {
     if(m_pFiffInfo)
     {
+        //If no projectors are defined return here
+        if(m_pFiffInfo->projs.empty()) {
+            return;
+        }
+
         m_qListProjCheckBox.clear();
         // Projection Selection
         QGridLayout *topLayout = new QGridLayout;
