@@ -146,7 +146,7 @@ class DISPSHARED_EXPORT
 //=============================================================================================================
 
 template< typename T>
-void bar (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassFrequencyData, int iClassAmount, int iPrecisionValue)
+void bar (const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassFrequencyData, int iClassAmount, int iPrecisionValue)
 {
     QVector<double> resultDisplayValues;
     QVector<int> resultExponentValues;
@@ -198,7 +198,7 @@ void bar (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitD
 //=========================================================================================================
 
 template< typename T>
-void splitCoefficientAndExponent (Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
+void splitCoefficientAndExponent (Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
 {
     vecCoefficientResults.clear();
     vecCoefficientResults.resize(iClassAmount + 1);
