@@ -53,6 +53,7 @@
 #include <xMeas/newrealtimemultisamplearray.h>
 
 #include <utils/layoutloader.h>
+#include "utils/layoutmaker.h"
 
 #include <unsupported/Eigen/FFT>
 #include <Eigen/Geometry>
@@ -182,7 +183,7 @@ public:
     /**
     * Set/Add received samples to a QList.
     */
-    void setSampleData(MatrixXf &matRawBuffer);
+    void setSampleData(MatrixXd &matRawBuffer);
 
     virtual IPlugin::PluginType getType() const;
     virtual QString getName() const;
@@ -232,15 +233,9 @@ private:
     int                                 m_iNumberOfChannels;                /**< The samples per block defined by the user via the GUI.*/
     int                                 m_iSamplesPerBlock;                 /**< The number of channels defined by the user via the GUI.*/
 
-    int                                 m_iTriggerInterval;                 /**< The gap between the trigger signals which request the subject to do something (in ms).*/
-    QTime                               m_qTimerTrigger;                    /**< Time stemp of the last trigger event (in ms).*/
-
-    bool                                m_bUseChExponent;                   /**< Flag for using the channels exponent. Defined by the user via the GUI.*/
     bool                                m_bWriteToFile;                     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                m_bWriteDriverDebugToFile;          /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
-    bool                                m_bUseFiltering;                    /**< Flag for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                m_bIsRunning;                       /**< Whether EEGoSports is running.*/
-    bool                                m_bBeepTrigger;                     /**< Flag for using a trigger input.*/
     bool                                m_bCheckImpedances;                 /**< Flag for checking the impedances of the EEG amplifier.*/
 
     ofstream                            m_outputFileStream;                 /**< fstream for writing the samples values to txt file.*/
@@ -255,8 +250,6 @@ private:
 
     QSharedPointer<EEGoSportsProducer>  m_pEEGoSportsProducer;              /**< the EEGoSportsProducer.*/
 
-    MatrixXf                            m_matOldMatrix;                     /**< Last received sample matrix by the tmsiproducer/tmsidriver class. Used for simple HP filtering.*/
-
     QMutex                              m_qMutex;                           /**< Holds the threads mutex.*/
 
     QAction*                            m_pActionSetupProject;              /**< shows setup project dialog */
@@ -265,7 +258,7 @@ private:
     QSharedPointer<QTimer>              m_pTimerRecordingChange;            /**< timer to control blinking of the recording icon */
     qint16                              m_iBlinkStatus;                     /**< flag for recording icon blinking */
 
-    QList<MatrixXf>                     m_qListReceivedSamples;             /**< list with alle the received samples in form of differentley sized matrices. */
+    QList<MatrixXd>                     m_qListReceivedSamples;             /**< list with alle the received samples in form of differentley sized matrices. */
 
     QMutex                              m_mutex;
 
