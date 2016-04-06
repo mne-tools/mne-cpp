@@ -66,7 +66,6 @@
 
 #include <QStringList>
 #include <QVariant>
-#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -367,17 +366,18 @@ public:
     * @param[in]  matRawData             raw data matrix that needs to be analyzed
     * @param[in]  bMakeSymmetrical       user input to turn the x-axis symmetric
     * @param[in]  iClassCount            user input to determine the amount of classes in the histogram
-    * @param[out] vecResultClassLimits   the upper limit of each individual class
-    * @param[out] vecResultFrequency     the amount of data that fits in the appropriate class ranges
     * @param[in]  dGlobalMin             user input to determine the maximum value allowed in the histogram
     * @param[in]  dGlobalMax             user input to determine the minimum value allowed in the histogram
+    * @param[out] vecResultClassLimits   the upper limit of each individual class
+    * @param[out] vecResultFrequency     the amount of data that fits in the appropriate class ranges
+
     */
     template<typename T>
-    static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, QVector<double>& vecResultClassLimits, QVector<int>& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
+    static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
     template<typename T>
-    static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData, bool bMakeSymmetrical, int iClassAmount, QVector<double>& vecResultClassLimits, QVector<int>& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
+    static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
     template<typename T>
-    static void histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, QVector<double>& vecResultClassLimits, QVector<int>& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
+    static void histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
 
 
     //=========================================================================================================
@@ -505,7 +505,7 @@ inline double MNEMath::log2( const T d)
 
 //*************************************************************************************************************
 template<typename T>
-void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData, bool bMakeSymmetrical, int iClassAmount, QVector<double>& vecResultClassLimits, QVector<int>& vecResultFrequency, double dGlobalMin, double dGlobalMax)
+void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin, double dGlobalMax)
 {
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matRawData.rows(),1);
     matrixName.col(0)= matRawData;
@@ -516,7 +516,7 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData, 
 //*************************************************************************************************************
 
 template<typename T>
-void MNEMath::histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, QVector<double>& vecResultClassLimits, QVector<int>& vecResultFrequency, double dGlobalMin, double dGlobalMax)
+void MNEMath::histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin, double dGlobalMax)
 {
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1,matRawData.cols());
     matrixName.row(0)= matRawData;
@@ -527,7 +527,7 @@ void MNEMath::histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData, 
 //*************************************************************************************************************
 
 template<typename T>
-void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, QVector<double>& vecResultClassLimits, QVector<int>& vecResultFrequency, double dGlobalMin, double dGlobalMax)
+void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin, double dGlobalMax)
 {
     vecResultClassLimits.clear();
     vecResultFrequency.clear();
@@ -537,7 +537,7 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
     double desiredMin,
            desiredMax;
     int ir{0}, jr{0}, kr{0};
-    QVector<double> rawLocalMinMax(4,0.0);
+    Eigen::VectorXd rawLocalMinMax(4,0.0);
     double rawMin = rawLocalMinMax[0],
            rawMax = rawLocalMinMax[1],
            localMin = rawLocalMinMax[2],
@@ -545,10 +545,6 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
 
     rawMin = matRawData.minCoeff();        //finds the raw matrix minimum value
     rawMax = matRawData.maxCoeff();        //finds the raw matrix maximum value
-
-    qDebug() << "Data range found";
-    qDebug() << "rawMin =" << rawMin;
-    qDebug() << "rawMax =" << rawMax;
 
     if (bMakeSymmetrical == true)       //in case the user wants the histogram to be symmetrical
     {
@@ -583,9 +579,6 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
         desiredMax = rawLocalMinMax.at(3);
         vecResultClassLimits[0] = desiredMin;                 //replace default value with local minimum at position 0
         vecResultClassLimits[iClassAmount] = desiredMax;      //replace default value with local maximum at position n
-        qDebug() << "Local Range chosen! \n";
-        qDebug() << "desiredMin =" << vecResultClassLimits[0];
-        qDebug() << "desiredMax =" << vecResultClassLimits[iClassAmount];
     }
     else
     {
@@ -593,9 +586,6 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
         desiredMax = dGlobalMax;
         vecResultClassLimits[0]= desiredMin;                 //replace default value with global minimum at position 0
         vecResultClassLimits[iClassAmount]= desiredMax;      //replace default value with global maximum at position n
-        qDebug() << "Global Range chosen!\n";
-        qDebug() << "desiredMin =" << vecResultClassLimits[0];
-        qDebug() << "desiredMax =" << vecResultClassLimits[iClassAmount];
     }
 
     double	range = (vecResultClassLimits[iClassAmount] - vecResultClassLimits[0]),      //calculates the length from maximum positive value to zero
