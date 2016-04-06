@@ -131,16 +131,15 @@ void MNE::init()
     m_outputConnectors.append(m_pRTSEOutput);
     m_pRTSEOutput->data()->setName(this->getName());//Provide name to auto store widget settings
 
+    // start clustering
+    QFuture<void> future = QtConcurrent::run(this, &MNE::doClustering);
+
     //
     // Set the fwd, annotation and surface data
     //
     m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
     m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
     m_pRTSEOutput->data()->setFwdSolution(m_pClusteredFwd);
-
-    // start clustering
-    QFuture<void> future = QtConcurrent::run(this, &MNE::doClustering);
-
 }
 
 
@@ -482,13 +481,13 @@ void MNE::run()
     // Init Real-Time inverse estimator
     //
     m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd));
-    connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated, this, &MNE::updateInvOp);
+    //connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated, this, &MNE::updateInvOp);
     m_pMinimumNorm.reset();
 
     //
     // Start the rt helpers
     //
-    m_pRtInvOp->start();
+    //m_pRtInvOp->start();
 
     //
     // start processing data
@@ -496,6 +495,39 @@ void MNE::run()
     m_bProcessData = true;
 
     qint32 skip_count = 0;
+
+
+
+
+
+    //
+    // TEMP INV LOADING START
+    //
+
+    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    FiffCov noise_cov(t_fileCov);
+
+    // regularize noise covariance
+    noise_cov = noise_cov.regularize(*m_pFiffInfoInput.data(), 0.05, 0.05, 0.1, true);
+
+    //
+    // make an inverse operators
+    //
+    MNEInverseOperator inverse_operator(*m_pFiffInfoInput.data(), *m_pClusteredFwd.data(), noise_cov, 0.2f, 0.8f);
+
+    double snr = 3.0;
+    double lambda2 = 1.0 / pow(snr, 2); //ToDO estimate lambda using covariance
+    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
+    m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(inverse_operator, lambda2, method));
+    m_pMinimumNorm->doInverseSetup(20,false);
+
+    //
+    // TEMP INV LOADING END
+    //
+
+
+
+
 
     while(m_bIsRunning)
     {
