@@ -89,7 +89,7 @@ Eigen::VectorXd sineWaveGenerator(double amplitude, double xStep, int xNow, int 
 {
     int iterateAmount = (xEnd-xNow)/xStep;
     Eigen::VectorXd sineWaveResultOriginal(iterateAmount);
-    Eigen::VectorXd sineWaveResult = sineWaveResultOriginal.transpose();
+    Eigen::VectorXd sineWaveResult = sineWaveResultOriginal;
     double sineResult;
     double omega = 2.0*M_PI;
     int iterateCount = 0;
@@ -217,7 +217,7 @@ int main(int argc, char *argv[])
 
     //below is the function for printing the results on command prompt (for debugging purposes)
     int precision = 2;           //format for the amount digits of coefficient shown in the histogram
-    DISPLIB::bar(resultClassLimit, resultFrequency, classAmount, precision);
+    Bar* barObj = new Bar(resultClassLimit, resultFrequency, classAmount, precision);
 
     std::cout << data.block(0,0,10,10);
     return a.exec();

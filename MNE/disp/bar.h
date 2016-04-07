@@ -42,7 +42,7 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
+#include "disp_global.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -51,7 +51,9 @@
 
 #include <QWidget>
 #include <QString>
+#include <QGridLayout>
 #include <QSharedPointer>
+#include <QMainWindow>
 #include <QtCharts/QChartView>
 #include <QtCharts/QBarSeries>
 #include <QtCharts/QBarSet>
@@ -97,7 +99,7 @@ QT_CHARTS_USE_NAMESPACE
 *
 * @brief bar class for histogram display using Qtcharts
 */
-class DISPSHARED_EXPORT
+class DISPSHARED_EXPORT Bar
 {
     public:
     //=========================================================================================================
@@ -110,10 +112,10 @@ class DISPSHARED_EXPORT
     * @param[in]  iClassCount            user input to determine the amount of classes in the histogram
     * @param[in]  iPrecisionValue        user input to determine the amount of digits of coefficient shown in the histogram
     */
-    template<typename T>
-    void bar(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassFrequencyData, int iClassAmount, int iPrecisionValue);
-    template<typename T>
-    void bar(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassFrequencyData, int iClassAmount, int iPrecisionValue);
+//    template<typename T>
+     Bar(const VectorXd& matClassLimitData, const VectorXi& matClassFrequencyData, int iClassAmount, int iPrecisionValue);
+//    template<typename T>
+//    explicit bar(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassFrequencyData, int iClassAmount, int iPrecisionValue);
 
 
     //=========================================================================================================
@@ -129,10 +131,10 @@ class DISPSHARED_EXPORT
     * @param[out] vecCoefficientResults  vector filled with values of coefficient only
     * @param[out] vecExponentResults     vector filled with values of exponent only
     */
-    template<typename T>
-    void splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
-    template<typename T>
-    void splitCoefficientAndExponent (const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
+//    template<typename T>
+    void splitCoefficientAndExponent (const VectorXd& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
+//    template<typename T>
+//    void splitCoefficientAndExponent (const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
 
 
     //=========================================================================================================
@@ -145,123 +147,123 @@ class DISPSHARED_EXPORT
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-template< typename T>
-void bar (const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassFrequencyData, int iClassAmount, int iPrecisionValue)
-{
-    QVector<double> resultDisplayValues;
-    QVector<int> resultExponentValues;
-    splitCoefficientAndExponent (matClassLimitData, iClassAmount, resultDisplayValues, resultExponentValues);
+//template< typename T>
+// bar::bar (const VectorXd& matClassLimitData, const VectorXi& matClassFrequencyData, int iClassAmount, int iPrecisionValue)
+//{
+//    QVector<double> resultDisplayValues;
+//    QVector<int> resultExponentValues;
+//    splitCoefficientAndExponent (matClassLimitData, iClassAmount, resultDisplayValues, resultExponentValues);
 
-    //  Start of Qtchart histogram display
-    QString histogramExponent;
-    histogramExponent = "X-axis scale: 10e" + QString::number(resultExponentValues[0]);
-    qDebug() <<"Exponent Value =" << histogramExponent;
-    QBarSet *set = new QBarSet(histogramExponent);
-    QStringList categories;
-    QString currentLimits;
-    int classFreq;
+//    //  Start of Qtchart histogram display
+//    QString histogramExponent;
+//    histogramExponent = "X-axis scale: 10e" + QString::number(resultExponentValues[0]);
+//    qDebug() <<"Exponent Value =" << histogramExponent;
+//    QBarSet *set = new QBarSet(histogramExponent);
+//    QStringList categories;
+//    QString currentLimits;
+//    int classFreq;
 
-    for (int kr=0; kr < classAmount; kr++)
-    {
-        classFreq = matClassFrequencyData.at(kr);
-        currentLimits = ((QString::number(resultDisplayValues[kr], iPrecisionValue) + " to " + (QString::number(resultDisplayValues[kr+1], iPrecisionValue))));
-        categories << currentLimits;
-        *set << classFreq;
-    }
+//    for (int kr=0; kr < classAmount; kr++)
+//    {
+//        classFreq = matClassFrequencyData.at(kr);
+//        currentLimits = ((QString::number(resultDisplayValues[kr], iPrecisionValue) + " to " + (QString::number(resultDisplayValues[kr+1], iPrecisionValue))));
+//        categories << currentLimits;
+//        *set << classFreq;
+//    }
 
-    //  Start of Qtchart histogram display
-    QBarSeries *series = new QBarSeries();
-    series->append(set);
+//    //  Start of Qtchart histogram display
+//    QBarSeries *series = new QBarSeries();
+//    series->append(set);
 
-    QChart *chart = new QChart();
-    chart->addSeries(series);
-    chart->setTitle("MNE-CPP Histogram Example");
-    chart->setAnimationOptions(QChart::SeriesAnimations);
+//    QChart *chart = new QChart();
+//    chart->addSeries(series);
+//    chart->setTitle("MNE-CPP Histogram Example");
+//    chart->setAnimationOptions(QChart::SeriesAnimations);
 
-    QBarCategoryAxis *axis = new QBarCategoryAxis();
-    axis->append(categories);
-    chart->createDefaultAxes();
-    chart->setAxisX(axis, series);
+//    QBarCategoryAxis *axis = new QBarCategoryAxis();
+//    axis->append(categories);
+//    chart->createDefaultAxes();
+//    chart->setAxisX(axis, series);
 
-    chart->legend()->setVisible(true);
-    chart->legend()->setAlignment(Qt::AlignBottom);
+//    chart->legend()->setVisible(true);
+//    chart->legend()->setAlignment(Qt::AlignBottom);
 
-    QChartView *chartView = new QChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
+//    QChartView *chartView = new QChartView(chart);
+//    chartView->setRenderHint(QPainter::Antialiasing);
 
-    QMainWindow window;
-    window.setCentralWidget(chartView);
-    window.resize(420, 300);
-    window.show();
-}
+//    QMainWindow window;
+//    window.setCentralWidget(chartView);
+//    window.resize(420, 300);
+//    window.show();
+//}
 
 //=========================================================================================================
 
-template< typename T>
-void splitCoefficientAndExponent (Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
-{
-    vecCoefficientResults.clear();
-    vecCoefficientResults.resize(iClassAmount + 1);
-    vecExponentValues.clear();
-    vecExponentValues.resize(iClassAmount + 1);
-    double originalValue{0.0},
-           limitDisplayValue{0.0},
-           doubleExponentValue{0.0};
-    int    limitExponentValue{0};
-    for (int ir=0; ir <= iClassAmount; ir++)
-    {
-        originalValue = matClassLimitData.at(ir);
-        if (originalValue == 0.0)                          //mechanism to guard against evaluation of log(0.0) which is infinity
-        {
-            doubleExponentValue = 0.0;
-        }
-        else
-        {
-            doubleExponentValue = log10(abs(originalValue));                    //return the exponent value in double
-        }
-        limitExponentValue = round(doubleExponentValue);                        //round the exponent value to the nearest signed integer
-        limitDisplayValue = originalValue * (pow(10,-(limitExponentValue)));    //display value is derived from multiplying class limit with inverse 10 to the power of negative exponent
-        vecCoefficientResults[ir] = limitDisplayValue;                         //append the display value to the return vector
-        vecExponentValues[ir] = limitExponentValue;                            //append the exponent value to the return vector
-    }
+//template< typename T>
+//void splitCoefficientAndExponent (Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
+//{
+//    vecCoefficientResults.clear();
+//    vecCoefficientResults.resize(iClassAmount + 1);
+//    vecExponentValues.clear();
+//    vecExponentValues.resize(iClassAmount + 1);
+//    double originalValue{0.0},
+//           limitDisplayValue{0.0},
+//           doubleExponentValue{0.0};
+//    int    limitExponentValue{0};
+//    for (int ir=0; ir <= iClassAmount; ir++)
+//    {
+//        originalValue = matClassLimitData.at(ir);
+//        if (originalValue == 0.0)                          //mechanism to guard against evaluation of log(0.0) which is infinity
+//        {
+//            doubleExponentValue = 0.0;
+//        }
+//        else
+//        {
+//            doubleExponentValue = log10(abs(originalValue));                    //return the exponent value in double
+//        }
+//        limitExponentValue = round(doubleExponentValue);                        //round the exponent value to the nearest signed integer
+//        limitDisplayValue = originalValue * (pow(10,-(limitExponentValue)));    //display value is derived from multiplying class limit with inverse 10 to the power of negative exponent
+//        vecCoefficientResults[ir] = limitDisplayValue;                         //append the display value to the return vector
+//        vecExponentValues[ir] = limitExponentValue;                            //append the exponent value to the return vector
+//    }
 
-    int lowestExponentValue{0},
-        highestExponentValue{0};
-    for (int ir=0; ir <= iClassAmount; ir++)
-    {
-        if (vecExponentValues[ir] < lowestExponentValue)
-        {
-            lowestExponentValue = vecExponentValues.at(ir);     //find lowest exponent value to normalize display values for negative exponent
-        }
-        if (vecExponentValues[ir] > highestExponentValue)       //find highest exponent value to normalize display values for positive exponent
-        {
-            highestExponentValue = vecExponentValues.at(ir);
-        }
-    }
+//    int lowestExponentValue{0},
+//        highestExponentValue{0};
+//    for (int ir=0; ir <= iClassAmount; ir++)
+//    {
+//        if (vecExponentValues[ir] < lowestExponentValue)
+//        {
+//            lowestExponentValue = vecExponentValues.at(ir);     //find lowest exponent value to normalize display values for negative exponent
+//        }
+//        if (vecExponentValues[ir] > highestExponentValue)       //find highest exponent value to normalize display values for positive exponent
+//        {
+//            highestExponentValue = vecExponentValues.at(ir);
+//        }
+//    }
 
-    if (highestExponentValue == 0)
-    {
-        for (int ir=0; ir <= iClassAmount; ir++)
-        {
-            while (vecExponentValues[ir] > lowestExponentValue)     //normalize the values by multiplying the display value by 10 and reducing the exponentValue by 1 until exponentValue reach the lowestExponentValue
-            {
-                vecCoefficientResults[ir] = vecCoefficientResults[ir] * 10;
-                vecExponentValues[ir]--;
-            }
-        }
-    }
-    if (lowestExponentValue == 0)
-    {
-        for (int ir=0; ir <= iClassAmount; ir++)
-        {
-            while (vecExponentValues[ir] < highestExponentValue)
-            {
-                vecCoefficientResults[ir] = vecCoefficientResults[ir] / 10;
-                vecExponentValues[ir]++;
-            }
-        }
-    }
-}
+//    if (highestExponentValue == 0)
+//    {
+//        for (int ir=0; ir <= iClassAmount; ir++)
+//        {
+//            while (vecExponentValues[ir] > lowestExponentValue)     //normalize the values by multiplying the display value by 10 and reducing the exponentValue by 1 until exponentValue reach the lowestExponentValue
+//            {
+//                vecCoefficientResults[ir] = vecCoefficientResults[ir] * 10;
+//                vecExponentValues[ir]--;
+//            }
+//        }
+//    }
+//    if (lowestExponentValue == 0)
+//    {
+//        for (int ir=0; ir <= iClassAmount; ir++)
+//        {
+//            while (vecExponentValues[ir] < highestExponentValue)
+//            {
+//                vecCoefficientResults[ir] = vecCoefficientResults[ir] / 10;
+//                vecExponentValues[ir]++;
+//            }
+//        }
+//    }
+//}
 }
 
 

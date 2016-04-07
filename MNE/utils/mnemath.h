@@ -529,8 +529,7 @@ void MNEMath::histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData, 
 template<typename T>
 void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin, double dGlobalMax)
 {
-    vecResultClassLimits.clear();
-    vecResultFrequency.clear();
+
     vecResultClassLimits.resize(iClassAmount + 1);
     vecResultFrequency.resize(iClassAmount);
 
@@ -575,8 +574,8 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
     //selects either local or global range (according to user preference and input)
     if (dGlobalMin == 0.0 && dGlobalMax == 0.0)               //if global range is NOT given by the user, use local ranges
     {
-        desiredMin = rawLocalMinMax.at(2);
-        desiredMax = rawLocalMinMax.at(3);
+        desiredMin = rawLocalMinMax(2);
+        desiredMax = rawLocalMinMax(3);
         vecResultClassLimits[0] = desiredMin;                 //replace default value with local minimum at position 0
         vecResultClassLimits[iClassAmount] = desiredMax;      //replace default value with local maximum at position n
     }
@@ -605,14 +604,14 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
             {
                 if (kr == iClassAmount-1)                    //used for the final iteration; if the data value is exactly the same as the final upper class limit, it will be included in the histogram
                 {
-                    if (matRawData(ir,jr) >= vecResultClassLimits.at(kr) && matRawData(ir,jr) <= vecResultClassLimits.at(kr + 1))    //compares value in the matrix with lower and upper limit of each class
+                    if (matRawData(ir,jr) >= vecResultClassLimits(kr) && matRawData(ir,jr) <= vecResultClassLimits(kr + 1))    //compares value in the matrix with lower and upper limit of each class
                     {
                          (vecResultFrequency[kr])++ ;           //if the value fits both arguments, the appropriate class frequency is increased by 1
                     }
                 }
                 else
                 {
-                    if (matRawData(ir,jr) >= vecResultClassLimits.at(kr) && matRawData(ir,jr) < vecResultClassLimits.at(kr + 1))    //compares value in the matrix with lower and upper limit of each class
+                    if (matRawData(ir,jr) >= vecResultClassLimits(kr) && matRawData(ir,jr) < vecResultClassLimits(kr + 1))    //compares value in the matrix with lower and upper limit of each class
                     {
                         (vecResultFrequency[kr])++ ;           //if the value fits both arguments, the appropriate class frequency is increased by 1
                     }
