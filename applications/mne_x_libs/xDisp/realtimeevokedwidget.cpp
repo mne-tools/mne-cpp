@@ -463,7 +463,7 @@ void RealTimeEvokedWidget::init()
         //-------- Init quick control widget --------
         //
         QStringList slFlags;
-        slFlags <<  "projections" << "filter" << "triggerdetection" << "scaling" << "modalities" << "colors";
+        slFlags <<  "projections" << "filter" << "scaling" << "modalities" << "colors";
 
         m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Averaging", slFlags));
 
