@@ -195,8 +195,13 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
 
         outputPoints.append(point);
 
-        if(writeFile)
-            out << k+1 << " " << point[0] << " " << point[1] << " " << w << " " << h << " " << names.at(k)<<endl;
+        if(writeFile) {
+            if(k < names.size()) {
+                out << k+1 << " " << point[0] << " " << point[1] << " " << w << " " << h << " " << names.at(k)<<endl;
+            } else {
+                out << k+1 << " " << point[0] << " " << point[1] << " " << w << " " << h <<endl;
+            }
+        }
     }
 
     if(writeFile) {

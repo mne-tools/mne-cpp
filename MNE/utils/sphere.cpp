@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
-* @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     sphere.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Mai, 2015
+* @date     April, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Jana Kiesel, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,18 +29,29 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of reading BEM data
+* @brief    Implementation of the MNEMath Class.
 *
 */
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
+#include "sphere.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
 #include <iostream>
-#include <mne/mne.h>
+#include <algorithm>    // std::sort
+#include <vector>       // std::vector
+
+//DEBUG fstream
+//#include <fstream>
 
 
 //*************************************************************************************************************
@@ -49,8 +59,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/QCoreApplication>
-#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
@@ -58,65 +66,61 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MAIN
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-//=============================================================================================================
-/**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
-*
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
-*/
-
-int main(int argc, char *argv[])
+Sphere::Sphere( double radius, Vector3d center )
+: m_r(radius)
+, m_center(center)
 {
-    QCoreApplication app(argc, argv);
+}
 
-    // Command Line Parser
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Read BEM Example");
-    parser.addHelpOption();
-    QCommandLineOption sampleBEMFileOption("f", "Path to BEM <file>.", "file", "./MNE-sample-data/subjects/sample/bem/sample-head.fif");
-//    "./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif"
-//    "./MNE-sample-data/subjects/sample/bem/sample-all-src.fif"
-//    "./MNE-sample-data/subjects/sample/bem/sample-5120-bem-sol.fif"
-//    "./MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif"
-    parser.addOption(sampleBEMFileOption);
-    parser.process(app);
 
-    //########################################################################################
-    // Read the BEM
-    QFile t_fileBem(parser.value(sampleBEMFileOption));
-    MNEBem t_Bem(t_fileBem);
+//*************************************************************************************************************
 
-    if( t_Bem.size() > 0 )
-    {
-        qDebug() << "t_Bem[0].tri_nn:" << t_Bem[0].tri_nn(0,0) << t_Bem[0].tri_nn(0,1) << t_Bem[0].tri_nn(0,2);
-        qDebug() << "t_Bem[0].tri_nn:" << t_Bem[0].tri_nn(2,0) << t_Bem[0].tri_nn(2,1) << t_Bem[0].tri_nn(2,2);
-    }
+void Sphere::fit_sphere(const Matrix3d& points)
+{
 
-    // Write the BEM
-    QFile t_fileBemTest("./MNE-sample-data/subjects/sample/bem/sample-head-test.fif");
-    t_Bem.write(t_fileBemTest);
-    t_fileBemTest.close();
 
-    MNEBem t_BemTest (t_fileBemTest) ;
+//    function [Center,Radius] = sphereFit(X)
+//    % this fits a sphere to a collection of data using a closed form for the
+//    % solution (opposed to using an array the size of the data set).
+//    % Minimizes Sum((x-xc)^2+(y-yc)^2+(z-zc)^2-r^2)^2
+//    % x,y,z are the data, xc,yc,zc are the sphere's center, and r is the radius
 
-    if( t_BemTest.size() > 0 )
-    {
-        qDebug() << "t_BemTest[0].tri_nn:" << t_BemTest[0].tri_nn(0,0) << t_BemTest[0].tri_nn(0,1) << t_BemTest[0].tri_nn(0,2);
-        qDebug() << "t_BemTest[0].tri_nn:" << t_BemTest[0].tri_nn(2,0) << t_BemTest[0].tri_nn(2,1) << t_BemTest[0].tri_nn(2,2);
-    }
+//    % Assumes that points are not in a singular configuration, real numbers, ...
+//    % if you have coplanar data, use a circle fit with svd for determining the
+//    % plane, recommended Circle Fit (Pratt method), by Nikolai Chernov
+//    % http://www.mathworks.com/matlabcentral/fileexchange/22643
 
-    qDebug() << "Put your stuff your interest in here";
+//    % Input:
+//    % X: n x 3 matrix of cartesian data
+//    % Outputs:
+//    % Center: Center of sphere
+//    % Radius: Radius of sphere
+//    % Author:
+//    % Alan Jennings, University of Dayton
 
-    return app.exec();
+//    A=[mean(X(:,1).*(X(:,1)-mean(X(:,1)))), ...
+//        2*mean(X(:,1).*(X(:,2)-mean(X(:,2)))), ...
+//        2*mean(X(:,1).*(X(:,3)-mean(X(:,3)))); ...
+//        0, ...
+//        mean(X(:,2).*(X(:,2)-mean(X(:,2)))), ...
+//        2*mean(X(:,2).*(X(:,3)-mean(X(:,3)))); ...
+//        0, ...
+//        0, ...
+//        mean(X(:,3).*(X(:,3)-mean(X(:,3))))];
+//    A=A+A.';
+//    B=[mean((X(:,1).^2+X(:,2).^2+X(:,3).^2).*(X(:,1)-mean(X(:,1))));...
+//        mean((X(:,1).^2+X(:,2).^2+X(:,3).^2).*(X(:,2)-mean(X(:,2))));...
+//        mean((X(:,1).^2+X(:,2).^2+X(:,3).^2).*(X(:,3)-mean(X(:,3))))];
+//    Center=(A\B).';
+//    Radius=sqrt(mean(sum([X(:,1)-Center(1),X(:,2)-Center(2),X(:,3)-Center(3)].^2,2)));
+
+    return Sphere(0, Vector3d());
 }

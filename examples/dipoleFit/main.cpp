@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
 * @file     main.cpp
-* @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Mai, 2015
+* @date     April, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Jana Kiesel, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of reading BEM data
+* @brief    Example of dipole fit
 *
 */
 
@@ -41,7 +40,13 @@
 //=============================================================================================================
 
 #include <iostream>
+#include <vector>
+#include <math.h>
+
+
+#include <fiff/fiff.h>
 #include <mne/mne.h>
+#include <utils/sphere.h>
 
 
 //*************************************************************************************************************
@@ -58,6 +63,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace FIFFLIB;
 using namespace MNELIB;
 
 
@@ -75,48 +81,79 @@ using namespace MNELIB;
 * @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
 * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
 */
-
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
 
+
+
+
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Read BEM Example");
+    parser.setApplicationDescription("Clustered Inverse Example");
     parser.addHelpOption();
-    QCommandLineOption sampleBEMFileOption("f", "Path to BEM <file>.", "file", "./MNE-sample-data/subjects/sample/bem/sample-head.fif");
-//    "./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif"
-//    "./MNE-sample-data/subjects/sample/bem/sample-all-src.fif"
-//    "./MNE-sample-data/subjects/sample/bem/sample-5120-bem-sol.fif"
-//    "./MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif"
-    parser.addOption(sampleBEMFileOption);
+
+    QCommandLineOption sampleEvokedFileOption("e", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption sampleCovFileOption("c", "Path to covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QCommandLineOption sampleBemFileOption("b", "Path to BEM <file>.", "file", "./MNE-sample-data/subjects/sample/bem/sample-5120-bem-sol.fif");
+    QCommandLineOption sampleTransFileOption("t", "Path to trans <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif");
+    parser.addOption(sampleEvokedFileOption);
+    parser.addOption(sampleCovFileOption);
+    parser.addOption(sampleBemFileOption);
+    parser.addOption(sampleTransFileOption);
     parser.process(app);
 
     //########################################################################################
-    // Read the BEM
-    QFile t_fileBem(parser.value(sampleBEMFileOption));
-    MNEBem t_Bem(t_fileBem);
+    // Source Estimate
+    QFile fileEvoked(parser.value(sampleEvokedFileOption));
+    QFile fileCov(parser.value(sampleCovFileOption));
+    QFile fileBem(parser.value(sampleBemFileOption));
+    QFile fileTrans(parser.value(sampleTransFileOption));
 
-    if( t_Bem.size() > 0 )
-    {
-        qDebug() << "t_Bem[0].tri_nn:" << t_Bem[0].tri_nn(0,0) << t_Bem[0].tri_nn(0,1) << t_Bem[0].tri_nn(0,2);
-        qDebug() << "t_Bem[0].tri_nn:" << t_Bem[0].tri_nn(2,0) << t_Bem[0].tri_nn(2,1) << t_Bem[0].tri_nn(2,2);
+    // === Load data ===
+    // Evoked
+    std::cout << std::endl << "### Evoked ###" << std::endl;
+    fiff_int_t setno = 0;
+    QPair<QVariant, QVariant> baseline(QVariant(), 0);
+    FiffEvoked evoked(fileEvoked, setno, baseline);
+    if(evoked.isEmpty())
+        return 1;
+
+    // Cov
+    std::cout << std::endl << "### Covariance ###" << std::endl;
+    FiffCov noise_cov(fileCov);
+
+    // BEM
+    std::cout << std::endl << "### BEM ###" << std::endl;
+    MNEBem bem(fileBem);
+    if( bem.isEmpty() ) {
+        return -1;
     }
 
-    // Write the BEM
-    QFile t_fileBemTest("./MNE-sample-data/subjects/sample/bem/sample-head-test.fif");
-    t_Bem.write(t_fileBemTest);
-    t_fileBemTest.close();
-
-    MNEBem t_BemTest (t_fileBemTest) ;
-
-    if( t_BemTest.size() > 0 )
+    // Trans
+    std::cout << std::endl << "### Transformation ###" << std::endl;
+    FiffCoordTrans trans(fileTrans);
+    if( trans.isEmpty() )
     {
-        qDebug() << "t_BemTest[0].tri_nn:" << t_BemTest[0].tri_nn(0,0) << t_BemTest[0].tri_nn(0,1) << t_BemTest[0].tri_nn(0,2);
-        qDebug() << "t_BemTest[0].tri_nn:" << t_BemTest[0].tri_nn(2,0) << t_BemTest[0].tri_nn(2,1) << t_BemTest[0].tri_nn(2,2);
+        trans.from = FIFFV_COORD_HEAD;
+        trans.to = FIFFV_COORD_MRI;
     }
 
-    qDebug() << "Put your stuff your interest in here";
+    // === Dipole Fit ===
+
+    //FIFFV_BEM_SURF_ID_BRAIN      1 -> Inner Skull
+    //FIFFV_BEM_SURF_ID_SKULL      3 -> Outer Skull
+    //FIFFV_BEM_SURF_ID_HEAD       4 -> Head
+    qDebug() << "bem" << bem[0].id;
+
+
+//    Sphere::fit_sphere(bem[0].rr);
+
 
     return app.exec();
 }
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
