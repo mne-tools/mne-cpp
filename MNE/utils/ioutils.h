@@ -217,22 +217,7 @@ public:
     * @param[in] path       path and file name to read from
     */
     template<typename T>
-<<<<<<< HEAD
-    static void write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QString& path);
-
-    //=========================================================================================================
-    /**
-    * Read Eigen Matrix from file
-    *
-    * @param[in] path       path and file name to write to
-    *
-    * @return   output Eigen Matrix
-    */
-    static MatrixXd read_eigen_matrix(const QString &path);
-
-=======
     static bool read_eigen_matrix(Matrix<T, Dynamic, Dynamic>& out, const QString& path);
->>>>>>> 082b4cc83b1bcc7950a3e1495610ad813a501177
 };
 
 //*************************************************************************************************************
