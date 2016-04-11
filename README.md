@@ -37,7 +37,7 @@ Requirements
 Dependencies
 ============
 
-[>= Qt5.6](http://download.qt.io/development_releases/qt/)
+[>= Qt5.6](http://download.qt.io/official_releases/qt/)
 
 
 Contact information
