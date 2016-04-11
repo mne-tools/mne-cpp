@@ -54,6 +54,7 @@
 //=============================================================================================================
 
 #include <QtCore/QCoreApplication>
+#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
@@ -81,9 +82,17 @@ using namespace MNELIB;
 */
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    QCoreApplication app(argc, argv);
 
-    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Read Raw Example");
+    parser.addHelpOption();
+    QCommandLineOption sampleRawFileOption("f", "Path to raw <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    parser.addOption(sampleRawFileOption);
+    parser.process(app);
+
+    QFile t_fileRaw(parser.value(sampleRawFileOption));
 
     float from = 42.956f;
     float to = 320.670f;
@@ -185,7 +194,7 @@ int main(int argc, char *argv[])
     std::cout << data.block(0,0,10,10) << std::endl;
 
 
-    return a.exec();
+    return app.exec();
 }
 
 //*************************************************************************************************************

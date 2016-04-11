@@ -78,19 +78,19 @@ EEGoSportsProducer::~EEGoSportsProducer()
 //*************************************************************************************************************
 
 void EEGoSportsProducer::start(int iNumberOfChannels,
-                     int iSamplingFrequency,
-                     bool bUseChExponent,
-                     bool bWriteDriverDebugToFile,
-                     QString sOutputFilePath,
-                     bool bMeasureImpedance)
+                        int iSamplesPerBlock,
+                        int iSamplingFrequency,
+                        bool bWriteDriverDebugToFile,
+                        QString sOutputFilePath,
+                        bool bMeasureImpedance)
 {
     //Initialise device
     if(m_pEEGoSportsDriver->initDevice(iNumberOfChannels,
-                              iSamplingFrequency,
-                              bUseChExponent,
-                              bWriteDriverDebugToFile,
-                              sOutputFilePath,
-                              bMeasureImpedance))
+                                iSamplesPerBlock,
+                                iSamplingFrequency,
+                                bWriteDriverDebugToFile,
+                                sOutputFilePath,
+                                bMeasureImpedance))
     {
         m_bIsRunning = true;
         QThread::start();
@@ -126,13 +126,13 @@ void EEGoSportsProducer::run()
     {
         //std::cout<<"EEGoSportsProducer::run()"<<std::endl;
         //Get the TMSi EEG data out of the device buffer and write received data to a QList
-        MatrixXf matRawBuffer;
+        MatrixXd matRawBuffer;
 
         if(m_pEEGoSportsDriver->getSampleMatrixValue(matRawBuffer))
             m_pEEGoSports->setSampleData(matRawBuffer);
     }
 
-    //std::cout<<"EXITING - EEGoSportsProducer::run()"<<std::endl;
+    std::cout<<"EXITING - EEGoSportsProducer::run()"<<std::endl;
 }
 
 
