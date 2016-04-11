@@ -529,7 +529,6 @@ void MNEMath::histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData, 
 template<typename T>
 void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin, double dGlobalMax)
 {
-
     vecResultClassLimits.resize(iClassAmount + 1);
     vecResultFrequency.resize(iClassAmount);
 
@@ -606,14 +605,14 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
                 {
                     if (matRawData(ir,jr) >= vecResultClassLimits(kr) && matRawData(ir,jr) <= vecResultClassLimits(kr + 1))    //compares value in the matrix with lower and upper limit of each class
                     {
-                         (vecResultFrequency[kr])++ ;           //if the value fits both arguments, the appropriate class frequency is increased by 1
+                         vecResultFrequency[kr]++ ;           //if the value fits both arguments, the appropriate class frequency is increased by 1
                     }
                 }
                 else
                 {
                     if (matRawData(ir,jr) >= vecResultClassLimits(kr) && matRawData(ir,jr) < vecResultClassLimits(kr + 1))    //compares value in the matrix with lower and upper limit of each class
                     {
-                        (vecResultFrequency[kr])++ ;           //if the value fits both arguments, the appropriate class frequency is increased by 1
+                        vecResultFrequency[kr]++ ;           //if the value fits both arguments, the appropriate class frequency is increased by 1
                     }
                 }
              }

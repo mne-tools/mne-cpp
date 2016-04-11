@@ -1,5 +1,4 @@
 //=============================================================================================================
-
 /**
 * @file     histogram.cpp
 * @author   Ricky Tjen <ricky270@student.sgu.ac.id>;
@@ -89,7 +88,7 @@ Eigen::VectorXd sineWaveGenerator(double amplitude, double xStep, int xNow, int 
 {
     int iterateAmount = (xEnd-xNow)/xStep;
     Eigen::VectorXd sineWaveResultOriginal(iterateAmount);
-    Eigen::VectorXd sineWaveResult = sineWaveResultOriginal;
+    Eigen::VectorXd sineWaveResult = sineWaveResultOriginal.transpose();
     double sineResult;
     double omega = 2.0*M_PI;
     int iterateCount = 0;
@@ -203,9 +202,9 @@ int main(int argc, char *argv[])
 
     printf("Read %d samples.\n",(qint32)data.cols());
     Eigen::VectorXd dataSine;
-    dataSine = sineWaveGenerator(1.0e12,(1.0/1000), 0.0, 1.0);
-
-    // histogram calculation
+    dataSine = sineWaveGenerator(1.0e2,(1.0e2/100), 0.0, 1.0);
+    std::cout << "DataSine =" << dataSine;
+   // histogram calculation
     bool bMakeSymmetrical;
     bMakeSymmetrical = false;      //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
     int classAmount = 14;          //initialize the amount of classes and class frequencies
@@ -213,11 +212,11 @@ int main(int argc, char *argv[])
            inputGlobalMax = 0.0;
     Eigen::VectorXd resultClassLimit;
     Eigen::VectorXi resultFrequency;
-    MNEMath::histcounts(data,bMakeSymmetrical, classAmount, resultClassLimit, resultFrequency, inputGlobalMin, inputGlobalMax);   //user input to normalize and sort the data matrix
-
+    MNEMath::histcounts(data, bMakeSymmetrical, classAmount, resultClassLimit, resultFrequency, inputGlobalMin, inputGlobalMax);   //user input to normalize and sort the data matrix
     //below is the function for printing the results on command prompt (for debugging purposes)
     int precision = 2;           //format for the amount digits of coefficient shown in the histogram
-    Bar* barObj = new Bar(resultClassLimit, resultFrequency, classAmount, precision);
+//    Bar* barObj = new Bar(resultClassLimit, resultFrequency, classAmount, precision);
+//    qDebug()<< barObj;
 
     std::cout << data.block(0,0,10,10);
     return a.exec();
