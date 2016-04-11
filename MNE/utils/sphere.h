@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
-* @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     mnemath.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     Mai, 2015
+* @date     April, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Jana Kiesel, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,18 +29,31 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of reading BEM data
+* @brief    MNEMath class declaration.
 *
 */
+
+#ifndef SPHERE_H
+#define SPHERE_H
+
+//ToDo move this to the new MNE math library
+
+//*************************************************************************************************************
+//=============================================================================================================
+// MNE INCLUDES
+//=============================================================================================================
+
+#include "utils_global.h"
+
+#include <iostream>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INCLUDES
+// Eigen INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-#include <mne/mne.h>
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -49,74 +61,79 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/QCoreApplication>
-#include <QCommandLineParser>
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE UTILSLIB
+//=============================================================================================================
+
+namespace UTILSLIB
+{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MAIN
+// FORWARD DECLARATIONS
 //=============================================================================================================
+
 
 //=============================================================================================================
 /**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
+* Sphere descritpion
 *
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+* @brief Describes a 3D sphere object
 */
-
-int main(int argc, char *argv[])
+class UTILSSHARED_EXPORT Sphere
 {
-    QCoreApplication app(argc, argv);
+public:
 
-    // Command Line Parser
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Read BEM Example");
-    parser.addHelpOption();
-    QCommandLineOption sampleBEMFileOption("f", "Path to BEM <file>.", "file", "./MNE-sample-data/subjects/sample/bem/sample-head.fif");
-//    "./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif"
-//    "./MNE-sample-data/subjects/sample/bem/sample-all-src.fif"
-//    "./MNE-sample-data/subjects/sample/bem/sample-5120-bem-sol.fif"
-//    "./MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif"
-    parser.addOption(sampleBEMFileOption);
-    parser.process(app);
+    //=========================================================================================================
+    /**
+    * Constructs the Sphere
+    *
+    * @param[in] radius     The sphere's radius
+    * @param[in] center     The sphere's center
+    */
+    Sphere( double radius, Vector3d center );
 
-    //########################################################################################
-    // Read the BEM
-    QFile t_fileBem(parser.value(sampleBEMFileOption));
-    MNEBem t_Bem(t_fileBem);
+    //=========================================================================================================
+    /**
+    * Fits a sphere to a point cloud.
+    *
+    * @return the fitted sphere.
+    */
+    static Sphere fit_sphere(const Matrix3d& points);
 
-    if( t_Bem.size() > 0 )
-    {
-        qDebug() << "t_Bem[0].tri_nn:" << t_Bem[0].tri_nn(0,0) << t_Bem[0].tri_nn(0,1) << t_Bem[0].tri_nn(0,2);
-        qDebug() << "t_Bem[0].tri_nn:" << t_Bem[0].tri_nn(2,0) << t_Bem[0].tri_nn(2,1) << t_Bem[0].tri_nn(2,2);
-    }
+    //=========================================================================================================
+    /**
+    * The radius of the sphere.
+    *
+    * @return the fitted sphere.
+    */
+    double& radius() { return m_r; }
 
-    // Write the BEM
-    QFile t_fileBemTest("./MNE-sample-data/subjects/sample/bem/sample-head-test.fif");
-    t_Bem.write(t_fileBemTest);
-    t_fileBemTest.close();
+    //=========================================================================================================
+    /**
+    * The radius of the sphere.
+    *
+    * @return the fitted sphere.
+    */
+    Vector3d& center() { return m_center; }
 
-    MNEBem t_BemTest (t_fileBemTest) ;
 
-    if( t_BemTest.size() > 0 )
-    {
-        qDebug() << "t_BemTest[0].tri_nn:" << t_BemTest[0].tri_nn(0,0) << t_BemTest[0].tri_nn(0,1) << t_BemTest[0].tri_nn(0,2);
-        qDebug() << "t_BemTest[0].tri_nn:" << t_BemTest[0].tri_nn(2,0) << t_BemTest[0].tri_nn(2,1) << t_BemTest[0].tri_nn(2,2);
-    }
+private:
+    double m_r;             /**< Sphere's radius */
+    Vector3d m_center;      /**< Sphere's center */
+};
 
-    qDebug() << "Put your stuff your interest in here";
+} // NAMESPACE
 
-    return app.exec();
-}
+#endif // SPHERE_H
