@@ -534,12 +534,10 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
 
     double desiredMin,
            desiredMax;
-    int ir{0}, jr{0}, kr{0};
-    Eigen::VectorXd rawLocalMinMax(4,0.0);
-    double rawMin = rawLocalMinMax[0],
-           rawMax = rawLocalMinMax[1],
-           localMin = rawLocalMinMax[2],
-           localMax = rawLocalMinMax[3];
+    double rawMin(0.0),
+           rawMax(0.0),
+           localMin(0.0),
+           localMax(0.0);
 
     rawMin = matRawData.minCoeff();        //finds the raw matrix minimum value
     rawMax = matRawData.maxCoeff();        //finds the raw matrix maximum value
@@ -561,20 +559,13 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
         localMin = rawMin;
         localMax = rawMax;
     }
-    rawLocalMinMax = {rawMin, rawMax, localMin, localMax};
-    }
-    else
-    {
-        localMin = rawMin;
-        localMax = rawMax;
-    rawLocalMinMax = {rawMin, rawMax, localMin, localMax};
     }
 
     //selects either local or global range (according to user preference and input)
     if (dGlobalMin == 0.0 && dGlobalMax == 0.0)               //if global range is NOT given by the user, use local ranges
     {
-        desiredMin = rawLocalMinMax(2);
-        desiredMax = rawLocalMinMax(3);
+        desiredMin = rawMin;
+        desiredMax = rawMax;
         vecResultClassLimits[0] = desiredMin;                 //replace default value with local minimum at position 0
         vecResultClassLimits[iClassAmount] = desiredMax;      //replace default value with local maximum at position n
     }
@@ -582,37 +573,37 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
     {
         desiredMin = dGlobalMin;
         desiredMax = dGlobalMax;
-        vecResultClassLimits[0]= desiredMin;                 //replace default value with global minimum at position 0
-        vecResultClassLimits[iClassAmount]= desiredMax;      //replace default value with global maximum at position n
+        vecResultClassLimits(0)= desiredMin;                 //replace default value with global minimum at position 0
+        vecResultClassLimits(iClassAmount)= desiredMax;      //replace default value with global maximum at position n
     }
 
-    double	range = (vecResultClassLimits[iClassAmount] - vecResultClassLimits[0]),      //calculates the length from maximum positive value to zero
+    double	range = (vecResultClassLimits(iClassAmount) - vecResultClassLimits(0)),      //calculates the length from maximum positive value to zero
             dynamicUpperClassLimit;
 
-    for (kr = 0; kr < iClassAmount; kr++)                                               //dynamically initialize the upper class limit values
+    for (int kr = 0; kr < iClassAmount; kr++)                                               //dynamically initialize the upper class limit values
     {
-        dynamicUpperClassLimit = (vecResultClassLimits[0] + (kr*(range/iClassAmount)));  //generic formula to determine the upper class limit with respect to range and number of class
-        vecResultClassLimits[kr] = dynamicUpperClassLimit;                               //places the appropriate upper class limit value to the right position in the QVector
+        dynamicUpperClassLimit = (vecResultClassLimits(0) + (kr*(range/iClassAmount)));  //generic formula to determine the upper class limit with respect to range and number of class
+        vecResultClassLimits(kr) = dynamicUpperClassLimit;                               //places the appropriate upper class limit value to the right position in the QVector
     }
 
-    for (ir = 0; ir < matRawData.rows(); ir++)       //iterates through all columns of the data matrix
+    for (int ir = 0; ir < matRawData.rows(); ir++)       //iterates through all columns of the data matrix
     {
-        for (jr = 0; jr<matRawData.cols(); jr++)     //iterates through all rows of the data matrix
+        for (int jr = 0; jr<matRawData.cols(); jr++)     //iterates through all rows of the data matrix
         {
-            for (kr = 0; kr < iClassAmount; kr++)          //starts iteration from 1 to iClassAmount
+            for (int kr = 0; kr < iClassAmount; kr++)          //starts iteration from 1 to iClassAmount
             {
                 if (kr == iClassAmount-1)                    //used for the final iteration; if the data value is exactly the same as the final upper class limit, it will be included in the histogram
                 {
                     if (matRawData(ir,jr) >= vecResultClassLimits(kr) && matRawData(ir,jr) <= vecResultClassLimits(kr + 1))    //compares value in the matrix with lower and upper limit of each class
                     {
-                         vecResultFrequency[kr]++ ;           //if the value fits both arguments, the appropriate class frequency is increased by 1
+                         vecResultFrequency(kr)++ ;           //if the value fits both arguments, the appropriate class frequency is increased by 1
                     }
                 }
                 else
                 {
                     if (matRawData(ir,jr) >= vecResultClassLimits(kr) && matRawData(ir,jr) < vecResultClassLimits(kr + 1))    //compares value in the matrix with lower and upper limit of each class
                     {
-                        vecResultFrequency[kr]++ ;           //if the value fits both arguments, the appropriate class frequency is increased by 1
+                        vecResultFrequency(kr)++ ;           //if the value fits both arguments, the appropriate class frequency is increased by 1
                     }
                 }
              }
