@@ -52,14 +52,20 @@
 #include <tchar.h>
 #include <string.h>
 #include <windows.h>
-#include <Eigen/Core>
-
-#include <eego.h>
+#include <eemagine/sdk/factory.h> // SDK header
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT STL INCLUDES
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
@@ -79,20 +85,8 @@ namespace EEGoSportsPlugin
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Method Typedefs - method defines as used in the RTINST.DLL
-//=============================================================================================================
-
-// define a pointer CREATEAMPLIFIER to a function which is taking a void HANDLE and returns a HRESULT value
-typedef HRESULT         (* CREATEAMPLIFIER)            (IAmplifier** ppObject);
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
-
-using namespace std;
-using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -108,13 +102,7 @@ class EEGoSportsProducer;
 // DEFINES
 //=============================================================================================================
 
-#define MAX_BUFFER_SIZE 0xFFFFFFFF
-
-//DLL Function loader define
-#define __load_dll_func__(var, type, name) \
-    var = (type)::GetProcAddress(m_oLibHandle, name); \
-    if(!var) \
-        cout<< "Plugin EEGoSports - ERROR - Error loading method " << name << "\n"; \
+#define EEGO_SDK_BIND_DYNAMIC // How to bind
 
 
 //=============================================================================================================
@@ -146,22 +134,21 @@ public:
     * @param [in] MatrixXf the block sample values in form of a matrix.
     * @param [out] bool returns true if sample was successfully written to the input variable, false otherwise.
     */
-    bool getSampleMatrixValue(MatrixXf& sampleMatrix);
+    bool getSampleMatrixValue(Eigen::MatrixXd& sampleMatrix);
 
     //=========================================================================================================
     /**
     * Initialise device.
     * @param [in] iNumberOfChannels number of channels specified by the user.
+    * @param [in] iSamplesPerBlock samples per block specified by the user.
     * @param [in] iSamplingFrequency sampling frequency specified by the user.
-    * @param [in] bUseChExponent Flag for using the channels exponent. Defined by the user via the GUI.
     * @param [in] bWriteDriverDebugToFile Flag for writing driver debug information to a file. Defined by the user via the GUI.
     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
-    * @param [out] bool returns true if device was successfully initialised, false otherwise.
     * @param [in] bMeasureImpedance Flag for measuring impedances.
     */
     bool initDevice(int iNumberOfChannels,
+                    int iSamplesPerBlock,
                     int iSamplingFrequency,
-                    bool bUseChExponent,
                     bool bWriteDriverDebugToFile,
                     QString sOutpuFilePath,
                     bool bMeasureImpedance);
@@ -174,41 +161,24 @@ public:
     bool uninitDevice();
 
 private:
-    EEGoSportsProducer* m_pEEGoSportsProducer;          /**< A pointer to the corresponding EEGoSportsProducer class.*/
+    EEGoSportsProducer*         m_pEEGoSportsProducer;          /**< A pointer to the corresponding EEGoSportsProducer class.*/
 
-    //Flags
-    bool                m_bInitDeviceSuccess;           /**< Flag which defines if the device initialisation was successfull.*/
-    bool                m_bDllLoaded;                   /**< Flag which defines if the driver DLL was loaded successfully.*/
+    bool                        m_bInitDeviceSuccess;           /**< Flag which defines if the device initialisation was successfull.*/
+    bool                        m_bDllLoaded;                   /**< Flag which defines if the driver DLL was loaded successfully.*/
 
-    //User definitons
-    uint                m_uiNumberOfChannels;           /**< The number of channels defined by the user via the GUI.*/
-    uint                m_uiSamplingFrequency;          /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
-    bool                m_bUseChExponent;               /**< Flag for using the channels exponent. Defined by the user via the GUI.*/
-    bool                m_bWriteDriverDebugToFile;      /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
-    bool                m_bUsePreprocessing;            /**< Flag for using preprocessing actions for the EEG data. Defined by the user via the GUI.*/
-    QString             m_sOutputFilePath;              /**< Holds the path for the output file. Defined by the user via the GUI.*/
-    bool                m_bMeasureImpedances;           /**< Flag for impedance measuring mode.*/
+    uint                        m_uiNumberOfChannels;           /**< The number of channels defined by the user via the GUI.*/
+    uint                        m_uiSamplingFrequency;          /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
+    uint                        m_uiSamplesPerBlock;            /**< The samples per block defined by the user via the GUI.*/
+    bool                        m_bWriteDriverDebugToFile;      /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
+    QString                     m_sOutputFilePath;              /**< Holds the path for the output file. Defined by the user via the GUI.*/
+    bool                        m_bMeasureImpedances;           /**< Flag for impedance measuring mode.*/
 
-    //Handler
-    HINSTANCE           m_oLibHandle;                   /**< The handler used to load the driver dll/lib.*/
+    QVector<Eigen::VectorXd>    m_vecSampleBlockBuffer;         /**< Buffer to store all the incoming smaples. This is the buffer which is getting read from.*/
 
-    //Device info
-    ULONG               m_uiNumberOfAvailableChannels;  /**< Holds the available number of channels offered by the device.*/
+    eemagine::sdk::stream*      m_pDataStream;                  /**< The EEG/Impedance data stream.*/
+    eemagine::sdk::amplifier*   m_pAmplifier;                   /**< Interface to the amplifier.*/
 
-    //Signal info
-    ofstream            m_outputFileStream;             /**< fstream for writing the driver debug informations to a txt file.*/
-    IAmplifier*         m_pAmplifier;                   /**< Interface to the driver.*/
-    uint                m_nLastTriggerValue;            /**< Important if you want to use triggers; The last TTL value.*/
-
-    //Variables used for loading the TMSiSDK.dll methods. Note: Not all functions are used by this class at the moment.
-    CREATEAMPLIFIER       m_oFpCreateAmplifier;
-
-    //=========================================================================================================
-    /**
-    * Sets the gain.
-    * @param [in] range .
-    */
-    EEGoSportsPlugin::EEGO_GAIN GetGainForSignalRange(int range);
+    std::ofstream               m_outputFileStream;             /**< fstream for writing the driver debug informations to a txt file.*/
 };
 
 } // NAMESPACE

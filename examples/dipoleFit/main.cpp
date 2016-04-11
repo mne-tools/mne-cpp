@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     eegosportssetupwidget.cpp
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     main.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July 2014
+* @date     April, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,18 +29,23 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the EEGoSportsSetupWidget class.
+* @brief    Example of dipole fit
 *
 */
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "eegosportssetupwidget.h"
-#include "eegosportsaboutwidget.h"
-#include "../eegosports.h"
+#include <iostream>
+#include <vector>
+#include <math.h>
+
+
+#include <fiff/fiff.h>
+#include <mne/mne.h>
 
 
 //*************************************************************************************************************
@@ -49,7 +53,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
+#include <QtCore/QCoreApplication>
+#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
@@ -57,89 +62,71 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EEGoSportsPlugin;
+using namespace FIFFLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// MAIN
 //=============================================================================================================
 
-EEGoSportsSetupWidget::EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget* parent)
-: QWidget(parent)
-, m_pEEGoSports(pEEGoSports)
+//=============================================================================================================
+/**
+* The function main marks the entry point of the program.
+* By default, main has the storage class extern.
+*
+* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+*/
+int main(int argc, char *argv[])
 {
-    ui.setupUi(this);
+    QCoreApplication app(argc, argv);
 
-    //Connect device sampling properties
-    connect(ui.m_comboBox_SamplingFreq, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
-    connect(ui.m_spinBox_BlockSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
 
-    //Connect debug file
-    connect(ui.m_checkBox_WriteDriverDebugToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &EEGoSportsSetupWidget::setWriteToFile);
 
-    //Connect about button
-    connect(ui.m_qPushButton_About, &QPushButton::released, this, &EEGoSportsSetupWidget::showAboutDialog);
 
-    //Fill info box
-    QFile file(m_pEEGoSports->m_qStringResourcePath+"readme.txt");
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Clustered Inverse Example");
+    parser.addHelpOption();
+    QCommandLineOption sampleFwdFileOption("f", "Path to forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption sampleCovFileOption("c", "Path to covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QCommandLineOption sampleEvokedFileOption("e", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption sampleTransFileOption("t", "Path to trans <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif");
+    parser.addOption(sampleFwdFileOption);
+    parser.addOption(sampleCovFileOption);
+    parser.addOption(sampleEvokedFileOption);
+    parser.addOption(sampleTransFileOption);
+    parser.process(app);
 
-    QTextStream in(&file);
-    while (!in.atEnd())
-    {
-        QString line = in.readLine();
-        ui.m_qTextBrowser_Information->insertHtml(line);
-        ui.m_qTextBrowser_Information->insertHtml("<br>");
-    }
+    //########################################################################################
+    // Source Estimate
+    QFile fileFwd(parser.value(sampleFwdFileOption));
+    QFile fileCov(parser.value(sampleCovFileOption));
+    QFile fileEvoked(parser.value(sampleEvokedFileOption));
+    QFile fileTrans(parser.value(sampleTransFileOption));
+
+    // Load data
+    fiff_int_t setno = 0;
+    QPair<QVariant, QVariant> baseline(QVariant(), 0);
+    FiffEvoked evoked(fileEvoked, setno, baseline);
+    if(evoked.isEmpty())
+        return 1;
+
+    std::cout << "evoked first " << evoked.first << "; last " << evoked.last << std::endl;
+
+    MNEForwardSolution fwd(fileFwd);
+    if(fwd.isEmpty())
+        return 1;
+
+    FiffCoordTrans trans(fileTrans);
+
+    return app.exec();
 }
-
 
 //*************************************************************************************************************
-
-EEGoSportsSetupWidget::~EEGoSportsSetupWidget()
-{
-
-}
-
-
-//*************************************************************************************************************
-
-void EEGoSportsSetupWidget::initGui()
-{
-    //Init device sampling properties
-    ui.m_comboBox_SamplingFreq->setCurrentText(QString::number(m_pEEGoSports->m_iSamplingFreq));
-
-    //Init write to file
-    ui.m_checkBox_WriteDriverDebugToFile->setChecked(m_pEEGoSports->m_bWriteDriverDebugToFile);
-}
-
-
-//*************************************************************************************************************
-
-void EEGoSportsSetupWidget::setDeviceSamplingProperties()
-{
-    m_pEEGoSports->m_iSamplingFreq = ui.m_comboBox_SamplingFreq->currentText().toInt();
-    m_pEEGoSports->m_iSamplesPerBlock = ui.m_spinBox_BlockSize->value();
-}
-
-
-//*************************************************************************************************************
-
-void EEGoSportsSetupWidget::setWriteToFile()
-{
-    m_pEEGoSports->m_bWriteDriverDebugToFile = ui.m_checkBox_WriteDriverDebugToFile->isChecked();
-}
-
-
-//*************************************************************************************************************
-
-void EEGoSportsSetupWidget::showAboutDialog()
-{
-    EEGoSportsAboutWidget aboutDialog(this);
-    aboutDialog.exec();
-}
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
