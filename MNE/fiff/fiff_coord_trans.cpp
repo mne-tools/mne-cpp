@@ -40,6 +40,10 @@
 
 #include "fiff_coord_trans.h"
 
+#include "fiff_stream.h"
+#include "fiff_tag.h"
+#include "fiff_dir_tree.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -60,6 +64,22 @@ FiffCoordTrans::FiffCoordTrans()
 , trans(MatrixXf::Identity(4,4))
 , invtrans(MatrixXf::Identity(4,4))
 {
+}
+
+
+//*************************************************************************************************************
+
+FiffCoordTrans::FiffCoordTrans(QIODevice &p_IODevice)
+: from(-1)
+, to(-1)
+, trans(MatrixXf::Identity(4,4))
+, invtrans(MatrixXf::Identity(4,4))
+{
+    if(!read(p_IODevice, *this))
+    {
+        printf("\tCoordindate transform not found.\n");//ToDo Throw here
+        return;
+    }
 }
 
 
@@ -103,4 +123,39 @@ bool FiffCoordTrans::invert_transform()
     this->invtrans = this->invtrans.inverse();
 
     return true;
+}
+
+
+//*************************************************************************************************************
+
+bool FiffCoordTrans::read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans)
+{
+    FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
+    FiffDirTree t_Tree;
+    QList<FiffDirEntry> t_Dir;
+
+    printf("Reading coordinate transform from %s...\n", t_pStream->streamName().toUtf8().constData());
+    if(!t_pStream->open(t_Tree, t_Dir))
+        return false;
+
+    //
+    //   Locate and read the coordinate transformation
+    //
+    FiffTag::SPtr t_pTag;
+    bool success = false;
+
+    //
+    //   Get the MRI <-> head coordinate transformation
+    //
+    for ( qint32 k = 0; k < t_Dir.size(); ++k )
+    {
+        if ( t_Dir[k].kind == FIFF_COORD_TRANS )
+        {
+            FiffTag::read_tag(t_pStream.data(),t_pTag,t_Dir[k].pos);
+            p_Trans = t_pTag->toCoordTrans();
+            success = true;
+        }
+    }
+
+    return success;
 }
