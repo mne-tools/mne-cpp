@@ -532,6 +532,11 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
     vecResultClassLimits.resize(iClassAmount + 1);
     vecResultFrequency.resize(iClassAmount);
 
+    for (int count = 0; count < iClassAmount; count++)
+    {
+        vecResultFrequency(count) = 0;
+    }
+
     double desiredMin,
            desiredMax;
     double rawMin(0.0),
@@ -596,14 +601,14 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
                 {
                     if (matRawData(ir,jr) >= vecResultClassLimits(kr) && matRawData(ir,jr) <= vecResultClassLimits(kr + 1))    //compares value in the matrix with lower and upper limit of each class
                     {
-                         vecResultFrequency(kr)++ ;           //if the value fits both arguments, the appropriate class frequency is increased by 1
+                         vecResultFrequency(kr) = vecResultFrequency(kr) + 1 ;           //if the value fits both arguments, the appropriate class frequency is increased by 1
                     }
                 }
                 else
                 {
                     if (matRawData(ir,jr) >= vecResultClassLimits(kr) && matRawData(ir,jr) < vecResultClassLimits(kr + 1))    //compares value in the matrix with lower and upper limit of each class
                     {
-                        vecResultFrequency(kr)++ ;           //if the value fits both arguments, the appropriate class frequency is increased by 1
+                        vecResultFrequency(kr) = vecResultFrequency(kr) + 1 ;           //if the value fits both arguments, the appropriate class frequency is increased by 1
                     }
                 }
              }

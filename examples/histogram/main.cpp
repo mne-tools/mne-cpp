@@ -86,8 +86,9 @@ const double M_PI = 3.14159265358979323846;
 #endif
 Eigen::VectorXd sineWaveGenerator(double amplitude, double xStep, int xNow, int xEnd)
 {
-    int iterateAmount = (xEnd-xNow)/xStep;
-    Eigen::VectorXd sineWaveResultOriginal(iterateAmount);
+    unsigned int iterateAmount = ceil((xEnd-xNow)/xStep);
+    Eigen::VectorXd sineWaveResultOriginal;
+    sineWaveResultOriginal.resize(iterateAmount+1);
     Eigen::VectorXd sineWaveResult = sineWaveResultOriginal.transpose();
     double sineResult;
     double omega = 2.0*M_PI;
@@ -202,11 +203,10 @@ int main(int argc, char *argv[])
 
     printf("Read %d samples.\n",(qint32)data.cols());
     Eigen::VectorXd dataSine;
-    dataSine = sineWaveGenerator(1.0e-12,(1.0e-12/100), 0.0, 1.0);
-    std::cout << "DataSine =" << dataSine;
+    dataSine = sineWaveGenerator(1.0e-300,(1.0/1e6), 0.0, 1.0);
    // histogram calculation
     bool bMakeSymmetrical;
-    bMakeSymmetrical = false;      //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
+    bMakeSymmetrical = true;      //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
     int classAmount = 14;          //initialize the amount of classes and class frequencies
     double inputGlobalMin = 0.0,
            inputGlobalMax = 0.0;
@@ -216,7 +216,6 @@ int main(int argc, char *argv[])
     //below is the function for printing the results on command prompt (for debugging purposes)
     int precision = 2;           //format for the amount digits of coefficient shown in the histogram
     Bar* barObj = new Bar(resultClassLimit, resultFrequency, classAmount, precision);
-    qDebug()<< barObj;
 
     std::cout << data.block(0,0,10,10);
     return a.exec();
