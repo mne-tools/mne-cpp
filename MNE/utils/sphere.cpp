@@ -46,7 +46,7 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-#include <Eigen/LU>
+#include <Eigen/Dense>
 
 
 //*************************************************************************************************************
@@ -91,10 +91,6 @@ Sphere::Sphere( Vector3d center, double radius )
 
 //*************************************************************************************************************
 
-Sphere Sphere::fit_sphere(const MatrixX3d& points)
-{
-
-
 //    function [Center,Radius] = sphereFit(X)
 //    % this fits a sphere to a collection of data using a closed form for the
 //    % solution (opposed to using an array the size of the data set).
@@ -130,48 +126,40 @@ Sphere Sphere::fit_sphere(const MatrixX3d& points)
 //    Center=(A\B).';
 //    Radius=sqrt(mean(sum([X(:,1)-Center(1),X(:,2)-Center(2),X(:,3)-Center(3)].^2,2)));
 
-    VectorXd x = points.col(0);
-    VectorXd y = points.col(1);
-    VectorXd z = points.col(2);
-
-    std::cout << "x" << std::endl << x << std::endl;
-    std::cout << "y" << std::endl << y << std::endl;
-    std::cout << "z" << std::endl << z << std::endl;
+Sphere Sphere::fit_sphere(const MatrixX3d& points)
+{
+    const VectorXd& x = points.col(0);
+    const VectorXd& y = points.col(1);
+    const VectorXd& z = points.col(2);
 
     VectorXd point_means = points.colwise().mean();
-    std::cout << "point means" << std::endl << point_means << std::endl;
 
-    std::cout << "x - mean" << std::endl << x.array() - point_means(0) << std::endl;
-    VectorXd x_rem_mean = x.array() - point_means(0);
-    VectorXd y_rem_mean = y.array() - point_means(1);
-    VectorXd z_rem_mean = z.array() - point_means(2);
+    VectorXd x_mean_free = x.array() - point_means(0);
+    VectorXd y_mean_free = y.array() - point_means(1);
+    VectorXd z_mean_free = z.array() - point_means(2);
 
     Matrix3d A;
-    A << (x.cwiseProduct(x_rem_mean)).mean(), 2*(x.cwiseProduct(y_rem_mean)).mean(), 2*(x.cwiseProduct(z_rem_mean)).mean(),
-                                           0,   (y.cwiseProduct(y_rem_mean)).mean(), 2*(y.cwiseProduct(z_rem_mean)).mean(),
-                                           0,                                     0,   (z.cwiseProduct(z_rem_mean)).mean();
+    A << (x.cwiseProduct(x_mean_free)).mean(), 2*(x.cwiseProduct(y_mean_free)).mean(), 2*(x.cwiseProduct(z_mean_free)).mean(),
+                                            0,   (y.cwiseProduct(y_mean_free)).mean(), 2*(y.cwiseProduct(z_mean_free)).mean(),
+                                            0,                                      0,   (z.cwiseProduct(z_mean_free)).mean();
 
-    A += A.transpose();
-    std::cout << "A" << std::endl << A << std::endl;
+    Matrix3d A_T = A.transpose();
+    A += A_T;
 
     Vector3d b;
     VectorXd sq_sum = x.array().pow(2)+y.array().pow(2)+z.array().pow(2);
-    b << (sq_sum.cwiseProduct(x_rem_mean)).mean(),
-         (sq_sum.cwiseProduct(y_rem_mean)).mean(),
-         (sq_sum.cwiseProduct(z_rem_mean)).mean();
+    b << (sq_sum.cwiseProduct(x_mean_free)).mean(),
+         (sq_sum.cwiseProduct(y_mean_free)).mean(),
+         (sq_sum.cwiseProduct(z_mean_free)).mean();
 
+    Vector3d center = A.ldlt().solve(b);
 
-    std::cout << "b" << std::endl << b << std::endl;
-    Vector3d center = A.lu().solve(b);
-    std::cout << "center" << std::endl << center << std::endl;
+    MatrixX3d tmp(points.rows(),3);
+    tmp.col(0) = x.array() - center(0);
+    tmp.col(1) = y.array() - center(1);
+    tmp.col(2) = z.array() - center(2);
 
-    VectorXd x_rem_cent = x.array() - center(0);
-    VectorXd y_rem_cent = y.array() - center(1);
-    VectorXd z_rem_cent = z.array() - center(2);
-
-    double r = sqrt((x_rem_cent.array().pow(2).sum() +  y_rem_cent.array().pow(2).sum() +  z_rem_cent.array().pow(2).sum())/3);
-
-    std::cout << "radius" << std::endl << r << std::endl;
+    double r = sqrt(tmp.array().pow(2).rowwise().sum().mean());
 
     return Sphere(center, r);
 }
