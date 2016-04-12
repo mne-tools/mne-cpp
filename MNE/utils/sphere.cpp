@@ -43,6 +43,14 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/LU>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
@@ -74,9 +82,9 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Sphere::Sphere( double radius, Vector3d center )
-: m_r(radius)
-, m_center(center)
+Sphere::Sphere( Vector3d center, double radius )
+: m_center(center)
+, m_r(radius)
 {
 }
 
@@ -135,8 +143,33 @@ Sphere Sphere::fit_sphere(const MatrixX3d& points)
 
     std::cout << "x - mean" << std::endl << x.array() - point_means(0) << std::endl;
     VectorXd x_rem_mean = x.array() - point_means(0);
+    VectorXd y_rem_mean = y.array() - point_means(1);
+    VectorXd z_rem_mean = z.array() - point_means(2);
 
-    std::cout << "(x.cwiseProduct(x_rem_mean)).mean()" << std::endl << (x.cwiseProduct(x_rem_mean)).mean() << std::endl;
+    Matrix3d A;
+    A << (x.cwiseProduct(x_rem_mean)).mean(), 2*(x.cwiseProduct(y_rem_mean)).mean(), 2*(x.cwiseProduct(z_rem_mean)).mean(),
+                                           0,   (y.cwiseProduct(y_rem_mean)).mean(), 2*(y.cwiseProduct(z_rem_mean)).mean(),
+                                           0,                                     0,   (z.cwiseProduct(z_rem_mean)).mean();
 
-    return Sphere(0, Vector3d());
+    A += A.transpose();
+    std::cout << "A" << std::endl << A << std::endl;
+
+    Vector3d b;
+    VectorXd sq_sum = x.array().pow(2)+y.array().pow(2)+z.array().pow(2);
+    b << (sq_sum.cwiseProduct(x_rem_mean)).mean(),
+         (sq_sum.cwiseProduct(y_rem_mean)).mean(),
+         (sq_sum.cwiseProduct(z_rem_mean)).mean();
+
+
+    std::cout << "b" << std::endl << b << std::endl;
+    Vector3d center = A.lu().solve(b);
+    std::cout << "center" << std::endl << center << std::endl;
+
+    VectorXd x_rem_cent = x.array() - center(0);
+    VectorXd y_rem_cent = y.array() - center(1);
+    VectorXd z_rem_cent = z.array() - center(2);
+
+//    double r =sqrt(mean(sum([X(:,1)-Center(1),X(:,2)-Center(2),X(:,3)-Center(3)].^2,2)));
+
+    return Sphere(center, 0);
 }
