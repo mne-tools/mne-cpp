@@ -144,7 +144,7 @@ void Bar::splitCoefficientAndExponent (const Eigen::VectorXd& matClassLimitData,
     {
         if (vecExponentValues(ir) < lowestExponentValue)
         {
-            lowestExponentValue = vecExponentValues(ir);     //find lowest exponent value to normalize display values for negative exponent
+            lowestExponentValue = vecExponentValues(ir);        //find lowest exponent value to normalize display values for negative exponent
         }
         if (vecExponentValues(ir) > highestExponentValue)       //find highest exponent value to normalize display values for positive exponent
         {
