@@ -147,7 +147,15 @@ int main(int argc, char *argv[])
     qDebug() << "bem" << bem[0].id;
 
 
-//    Sphere::fit_sphere(bem[0].rr);
+    Eigen::MatrixX3d testMat(3,3);
+    testMat << 1, 2, 6,
+               3, 7, 2,
+               4, 2, 1;
+
+    std::cout << "testMat" << std::endl << testMat << std::endl;
+
+
+    Sphere::fit_sphere(testMat);
 
 
     return app.exec();
