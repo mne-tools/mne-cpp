@@ -88,63 +88,63 @@ int main(int argc, char *argv[])
 
 
 
-    // Command Line Parser
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Clustered Inverse Example");
-    parser.addHelpOption();
+//    // Command Line Parser
+//    QCommandLineParser parser;
+//    parser.setApplicationDescription("Clustered Inverse Example");
+//    parser.addHelpOption();
 
-    QCommandLineOption sampleEvokedFileOption("e", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QCommandLineOption sampleCovFileOption("c", "Path to covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-    QCommandLineOption sampleBemFileOption("b", "Path to BEM <file>.", "file", "./MNE-sample-data/subjects/sample/bem/sample-5120-bem-sol.fif");
-    QCommandLineOption sampleTransFileOption("t", "Path to trans <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif");
-    parser.addOption(sampleEvokedFileOption);
-    parser.addOption(sampleCovFileOption);
-    parser.addOption(sampleBemFileOption);
-    parser.addOption(sampleTransFileOption);
-    parser.process(app);
+//    QCommandLineOption sampleEvokedFileOption("e", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+//    QCommandLineOption sampleCovFileOption("c", "Path to covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+//    QCommandLineOption sampleBemFileOption("b", "Path to BEM <file>.", "file", "./MNE-sample-data/subjects/sample/bem/sample-5120-bem-sol.fif");
+//    QCommandLineOption sampleTransFileOption("t", "Path to trans <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif");
+//    parser.addOption(sampleEvokedFileOption);
+//    parser.addOption(sampleCovFileOption);
+//    parser.addOption(sampleBemFileOption);
+//    parser.addOption(sampleTransFileOption);
+//    parser.process(app);
 
-    //########################################################################################
-    // Source Estimate
-    QFile fileEvoked(parser.value(sampleEvokedFileOption));
-    QFile fileCov(parser.value(sampleCovFileOption));
-    QFile fileBem(parser.value(sampleBemFileOption));
-    QFile fileTrans(parser.value(sampleTransFileOption));
+//    //########################################################################################
+//    // Source Estimate
+//    QFile fileEvoked(parser.value(sampleEvokedFileOption));
+//    QFile fileCov(parser.value(sampleCovFileOption));
+//    QFile fileBem(parser.value(sampleBemFileOption));
+//    QFile fileTrans(parser.value(sampleTransFileOption));
 
-    // === Load data ===
-    // Evoked
-    std::cout << std::endl << "### Evoked ###" << std::endl;
-    fiff_int_t setno = 0;
-    QPair<QVariant, QVariant> baseline(QVariant(), 0);
-    FiffEvoked evoked(fileEvoked, setno, baseline);
-    if(evoked.isEmpty())
-        return 1;
+//    // === Load data ===
+//    // Evoked
+//    std::cout << std::endl << "### Evoked ###" << std::endl;
+//    fiff_int_t setno = 0;
+//    QPair<QVariant, QVariant> baseline(QVariant(), 0);
+//    FiffEvoked evoked(fileEvoked, setno, baseline);
+//    if(evoked.isEmpty())
+//        return 1;
 
-    // Cov
-    std::cout << std::endl << "### Covariance ###" << std::endl;
-    FiffCov noise_cov(fileCov);
+//    // Cov
+//    std::cout << std::endl << "### Covariance ###" << std::endl;
+//    FiffCov noise_cov(fileCov);
 
-    // BEM
-    std::cout << std::endl << "### BEM ###" << std::endl;
-    MNEBem bem(fileBem);
-    if( bem.isEmpty() ) {
-        return -1;
-    }
+//    // BEM
+//    std::cout << std::endl << "### BEM ###" << std::endl;
+//    MNEBem bem(fileBem);
+//    if( bem.isEmpty() ) {
+//        return -1;
+//    }
 
-    // Trans
-    std::cout << std::endl << "### Transformation ###" << std::endl;
-    FiffCoordTrans trans(fileTrans);
-    if( trans.isEmpty() )
-    {
-        trans.from = FIFFV_COORD_HEAD;
-        trans.to = FIFFV_COORD_MRI;
-    }
+//    // Trans
+//    std::cout << std::endl << "### Transformation ###" << std::endl;
+//    FiffCoordTrans trans(fileTrans);
+//    if( trans.isEmpty() )
+//    {
+//        trans.from = FIFFV_COORD_HEAD;
+//        trans.to = FIFFV_COORD_MRI;
+//    }
 
-    // === Dipole Fit ===
+//    // === Dipole Fit ===
 
-    //FIFFV_BEM_SURF_ID_BRAIN      1 -> Inner Skull
-    //FIFFV_BEM_SURF_ID_SKULL      3 -> Outer Skull
-    //FIFFV_BEM_SURF_ID_HEAD       4 -> Head
-    qDebug() << "bem" << bem[0].id;
+//    //FIFFV_BEM_SURF_ID_BRAIN      1 -> Inner Skull
+//    //FIFFV_BEM_SURF_ID_SKULL      3 -> Outer Skull
+//    //FIFFV_BEM_SURF_ID_HEAD       4 -> Head
+//    qDebug() << "bem" << bem[0].id;
 
 
     Eigen::MatrixX3d testMat(3,3);

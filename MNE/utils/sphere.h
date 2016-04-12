@@ -99,10 +99,10 @@ public:
     /**
     * Constructs the Sphere
     *
-    * @param[in] radius     The sphere's radius
     * @param[in] center     The sphere's center
+    * @param[in] radius     The sphere's radius
     */
-    Sphere( double radius, Vector3d center );
+    Sphere( Vector3d center, double radius );
 
     //=========================================================================================================
     /**
@@ -118,7 +118,7 @@ public:
     *
     * @return the fitted sphere.
     */
-    double& radius() { return m_r; }
+    Vector3d& center() { return m_center; }
 
     //=========================================================================================================
     /**
@@ -126,12 +126,11 @@ public:
     *
     * @return the fitted sphere.
     */
-    Vector3d& center() { return m_center; }
-
+    double& radius() { return m_r; }
 
 private:
-    double m_r;             /**< Sphere's radius */
     Vector3d m_center;      /**< Sphere's center */
+    double m_r;             /**< Sphere's radius */
 };
 
 } // NAMESPACE
