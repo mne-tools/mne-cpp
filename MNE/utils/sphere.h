@@ -110,7 +110,7 @@ public:
     *
     * @return the fitted sphere.
     */
-    static Sphere fit_sphere(const Matrix3d& points);
+    static Sphere fit_sphere(const MatrixX3d& points);
 
     //=========================================================================================================
     /**

@@ -83,7 +83,7 @@ Sphere::Sphere( double radius, Vector3d center )
 
 //*************************************************************************************************************
 
-void Sphere::fit_sphere(const Matrix3d& points)
+Sphere Sphere::fit_sphere(const MatrixX3d& points)
 {
 
 
@@ -121,6 +121,22 @@ void Sphere::fit_sphere(const Matrix3d& points)
 //        mean((X(:,1).^2+X(:,2).^2+X(:,3).^2).*(X(:,3)-mean(X(:,3))))];
 //    Center=(A\B).';
 //    Radius=sqrt(mean(sum([X(:,1)-Center(1),X(:,2)-Center(2),X(:,3)-Center(3)].^2,2)));
+
+    VectorXd x = points.col(0);
+    VectorXd y = points.col(1);
+    VectorXd z = points.col(2);
+
+    std::cout << "x" << std::endl << x << std::endl;
+    std::cout << "y" << std::endl << y << std::endl;
+    std::cout << "z" << std::endl << z << std::endl;
+
+    VectorXd point_means = points.colwise().mean();
+    std::cout << "point means" << std::endl << point_means << std::endl;
+
+    std::cout << "x - mean" << std::endl << x.array() - point_means(0) << std::endl;
+    VectorXd x_rem_mean = x.array() - point_means(0);
+
+    std::cout << "(x.cwiseProduct(x_rem_mean)).mean()" << std::endl << (x.cwiseProduct(x_rem_mean)).mean() << std::endl;
 
     return Sphere(0, Vector3d());
 }
