@@ -169,7 +169,9 @@ Sphere Sphere::fit_sphere(const MatrixX3d& points)
     VectorXd y_rem_cent = y.array() - center(1);
     VectorXd z_rem_cent = z.array() - center(2);
 
-//    double r =sqrt(mean(sum([X(:,1)-Center(1),X(:,2)-Center(2),X(:,3)-Center(3)].^2,2)));
+    double r = sqrt((x_rem_cent.array().pow(2).sum() +  y_rem_cent.array().pow(2).sum() +  z_rem_cent.array().pow(2).sum())/3);
 
-    return Sphere(center, 0);
+    std::cout << "radius" << std::endl << r << std::endl;
+
+    return Sphere(center, r);
 }
