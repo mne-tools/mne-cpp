@@ -581,10 +581,11 @@ private:
     MatrixXdR                           m_matDataFilteredFreeze;                    /**< The raw filtered data in freeze mode */
     MatrixXd                            m_matOverlap;                               /**< Last overlap block for the back */
 
-    Eigen::VectorXi                     m_vecIndicesFirstVV;                        /**< The indices of the channels to pick for the first SPHARA oerpator in case of a VectorView system.*/
-    Eigen::VectorXi                     m_vecIndicesSecondVV;                       /**< The indices of the channels to pick for the second SPHARA oerpator in case of a VectorView system.*/
-    Eigen::VectorXi                     m_vecIndicesFirstBabyMEG;                   /**< The indices of the channels to pick for the first SPHARA oerpator in case of a BabyMEG system.*/
-    Eigen::VectorXi                     m_vecIndicesSecondBabyMEG;                  /**< The indices of the channels to pick for the second SPHARA oerpator in case of a BabyMEG system.*/
+    Eigen::VectorXi                     m_vecIndicesFirstVV;                        /**< The indices of the channels to pick for the first SPHARA operator in case of a VectorView system.*/
+    Eigen::VectorXi                     m_vecIndicesSecondVV;                       /**< The indices of the channels to pick for the second SPHARA operator in case of a VectorView system.*/
+    Eigen::VectorXi                     m_vecIndicesFirstBabyMEG;                   /**< The indices of the channels to pick for the first SPHARA operator in case of a BabyMEG system.*/
+    Eigen::VectorXi                     m_vecIndicesSecondBabyMEG;                  /**< The indices of the channels to pick for the second SPHARA operator in case of a BabyMEG system.*/
+    Eigen::VectorXi                     m_vecIndicesFirstEEG;                       /**< The indices of the channels to pick for the second SPHARA operator in case of an EEG system.*/
 
     Eigen::SparseMatrix<double>         m_matSparseSpharaMult;                      /**< The final sparse SPHARA operator .*/
     Eigen::SparseMatrix<double>         m_matSparseSpharaProjMult;                  /**< The final sparse SPHARA + projection operator.*/
@@ -595,6 +596,7 @@ private:
     Eigen::MatrixXd                     m_matSpharaVVMagLoaded;                     /**< The loaded VectorView magnetometer basis functions.*/
     Eigen::MatrixXd                     m_matSpharaBabyMEGInnerLoaded;              /**< The loaded babyMEG inner layer basis functions.*/
     Eigen::MatrixXd                     m_matSpharaBabyMEGOuterLoaded;              /**< The loaded babyMEG outer layer basis functions.*/
+    Eigen::MatrixXd                     m_matSpharaEEGLoaded;                       /**< The loaded EEG basis functions.*/
 
     QMap<QString, QColor>               m_qMapTriggerColor;                         /**< Current colors for all trigger channels. */
     QMap<int,QList<int> >               m_qMapDetectedTrigger;                      /**< Detected trigger for each trigger channel. */
