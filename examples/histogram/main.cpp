@@ -206,7 +206,7 @@ int main(int argc, char *argv[])
     dataSine = sineWaveGenerator(1.0e-300,(1.0/1e6), 0.0, 1.0);
    // histogram calculation
     bool bMakeSymmetrical;
-    bMakeSymmetrical = true;      //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
+    bMakeSymmetrical = false;      //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
     int classAmount = 14;          //initialize the amount of classes and class frequencies
     double inputGlobalMin = 0.0,
            inputGlobalMax = 0.0;
@@ -215,7 +215,9 @@ int main(int argc, char *argv[])
     MNEMath::histcounts(data, bMakeSymmetrical, classAmount, resultClassLimit, resultFrequency, inputGlobalMin, inputGlobalMax);   //user input to normalize and sort the data matrix
     //below is the function for printing the results on command prompt (for debugging purposes)
     int precision = 2;           //format for the amount digits of coefficient shown in the histogram
-    Bar* barObj = new Bar(resultClassLimit, resultFrequency, classAmount, precision);
+    Bar* barObj = new Bar(resultClassLimit, resultFrequency, precision);
+    barObj->resize(400,300);
+    barObj->show();
 
     std::cout << data.block(0,0,10,10);
     return a.exec();
