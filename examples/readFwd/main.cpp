@@ -40,6 +40,7 @@
 
 #include <iostream>
 #include <mne/mne.h>
+#include <utils/ioutils.h>
 
 
 //*************************************************************************************************************
@@ -75,17 +76,38 @@ using namespace MNELIB;
 */
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    QCoreApplication app(argc, argv);
 
     QFile t_fileForwardSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    MNEForwardSolution t_ForwardSolution(t_fileForwardSolution);
+    MNEForwardSolution t_Fwd(t_fileForwardSolution);
 
-    if(t_ForwardSolution.source_ori != -1)
+    if(t_Fwd.source_ori != -1)
     {
-        std::cout << "\nfirst 10 rows and columns of the Gain Matrix:\n" << t_ForwardSolution.sol->data.block(0,0,10,10) << std::endl;
-        std::cout << "\nfirst 10 dipole coordinates:\n" << t_ForwardSolution.source_rr.block(0,0,10,3) << std::endl ;
-        std::cout << "\nfirst 10 dipole normales:\n" << t_ForwardSolution.source_nn.block(0,0,10,3) << std::endl ;
+        std::cout << "\nfirst 10 rows and columns of the Gain Matrix:\n" << t_Fwd.sol->data.block(0,0,10,10) << std::endl;
+        std::cout << "\nfirst 10 dipole coordinates:\n" << t_Fwd.source_rr.block(0,0,10,3) << std::endl ;
+        std::cout << "\nfirst 10 dipole normales:\n" << t_Fwd.source_nn.block(0,0,10,3) << std::endl ;
     }
 
-    return a.exec();
+
+    // === Option to cluster forward solution ===
+
+    AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
+
+    //
+    // Cluster forward solution;
+    //
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20);//40);
+
+    qDebug() << "==== Results ====";
+    qDebug() << "nrow: " << t_clusteredFwd.sol->nrow;
+    qDebug() << "ncol: " << t_clusteredFwd.sol->ncol;
+    qDebug() << "row_names:";
+    qDebug() << t_clusteredFwd.sol->row_names;
+    qDebug() << "col_names:";
+    qDebug() << t_clusteredFwd.sol->col_names;
+    qDebug() << "write fwd data to ./test_fwd.txt ...";
+    IOUtils::write_eigen_matrix(t_clusteredFwd.sol->data,"./test_fwd.txt");
+    qDebug() << "[done]";
+
+    return app.exec();
 }
