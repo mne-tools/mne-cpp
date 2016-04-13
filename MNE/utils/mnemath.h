@@ -370,7 +370,6 @@ public:
     * @param[in]  dGlobalMax             user input to determine the minimum value allowed in the histogram
     * @param[out] vecResultClassLimits   the upper limit of each individual class
     * @param[out] vecResultFrequency     the amount of data that fits in the appropriate class ranges
-
     */
     template<typename T>
     static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
@@ -378,10 +377,6 @@ public:
     static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
     template<typename T>
     static void histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
-
-
-    //=========================================================================================================
-
 };
 
 //*************************************************************************************************************

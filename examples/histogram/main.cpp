@@ -207,12 +207,12 @@ int main(int argc, char *argv[])
    // histogram calculation
     bool bMakeSymmetrical;
     bMakeSymmetrical = false;      //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
-    int classAmount = 14;          //initialize the amount of classes and class frequencies
+    int classAmount = 20;          //initialize the amount of classes and class frequencies
     double inputGlobalMin = 0.0,
            inputGlobalMax = 0.0;
     Eigen::VectorXd resultClassLimit;
     Eigen::VectorXi resultFrequency;
-    MNEMath::histcounts(data, bMakeSymmetrical, classAmount, resultClassLimit, resultFrequency, inputGlobalMin, inputGlobalMax);   //user input to normalize and sort the data matrix
+    MNEMath::histcounts(dataSine, bMakeSymmetrical, classAmount, resultClassLimit, resultFrequency, inputGlobalMin, inputGlobalMax);   //user input to normalize and sort the data matrix
     //below is the function for printing the results on command prompt (for debugging purposes)
     int precision = 2;           //format for the amount digits of coefficient shown in the histogram
     Bar* barObj = new Bar(resultClassLimit, resultFrequency, precision);
