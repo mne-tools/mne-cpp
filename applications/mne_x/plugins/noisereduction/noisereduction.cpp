@@ -504,7 +504,9 @@ void NoiseReduction::initSphara()
     IOUtils::read_eigen_matrix(m_matSpharaBabyMEGInnerLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt"));
     IOUtils::read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
 
-    //Generate indices used to create the SPHARA operators.
+    IOUtils::read_eigen_matrix(m_matSpharaEEGLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/Current_SPHARA_EEG.txt"));
+
+    //Generate indices used to create the SPHARA operators for VectorView
     m_vecIndicesFirstVV.resize(0);
     m_vecIndicesSecondVV.resize(0);
 
@@ -522,7 +524,7 @@ void NoiseReduction::initSphara()
         }
     }
 
-
+    //Generate indices used to create the SPHARA operators for babyMEG
     m_vecIndicesFirstBabyMEG.resize(0);
     for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
         //Find INNER LAYER
@@ -532,6 +534,16 @@ void NoiseReduction::initSphara()
         }
 
         //TODO: Find outer layer
+    }
+
+    //Generate indices used to create the SPHARA operators for EEG layouts
+    m_vecIndicesFirstEEG.resize(0);
+    for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
+        //Find EEG
+        if(m_pFiffInfo->chs.at(r).kind == FIFFV_EEG_CH) {
+            m_vecIndicesFirstEEG.conservativeResize(m_vecIndicesFirstEEG.rows()+1);
+            m_vecIndicesFirstEEG(m_vecIndicesFirstEEG.rows()-1) = r;
+        }
     }
 
 //    qDebug()<<"NoiseReduction::createSpharaOperator - Read VectorView mag matrix "<<m_matSpharaVVMagLoaded.rows()<<m_matSpharaVVMagLoaded.cols()<<"and grad matrix"<<m_matSpharaVVGradLoaded.rows()<<m_matSpharaVVGradLoaded.cols();
@@ -559,9 +571,13 @@ void NoiseReduction::createSpharaOperator()
         matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaBabyMEGInnerLoaded, m_vecIndicesFirstBabyMEG, m_pFiffInfo->nchan, m_iNBaseFctsFirst, 0); //InnerLayer
     }
 
+    if(m_sCurrentSystem == "EEG") {
+        matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaEEGLoaded, m_vecIndicesFirstEEG, m_pFiffInfo->nchan, m_iNBaseFctsFirst, 0); //InnerLayer
+    }
+
     //Write final operator matrices to file
-    IOUtils::write_eigen_matrix(matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/matSpharaMultFirst.txt"));
-    IOUtils::write_eigen_matrix(matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/matSpharaMultSecond.txt"));
+//    IOUtils::write_eigen_matrix(matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/matSpharaMultFirst.txt"));
+//    IOUtils::write_eigen_matrix(matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/matSpharaMultSecond.txt"));
 
     //
     // Make operators sparse
