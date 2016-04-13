@@ -54,13 +54,12 @@
         <item>
          <widget class="QTabWidget" name="m_tabWidget_noiseReduction">
           <property name="currentIndex">
-           <number>0</number>
+           <number>3</number>
           </property>
           <widget class="QWidget" name="SSP">
            <attribute name="title">
             <string>SSP</string>
            </attribute>
-           <zorder>m_groupBox_other</zorder>
           </widget>
           <widget class="QWidget" name="Comp">
            <attribute name="title">
@@ -94,6 +93,11 @@
               <item>
                <property name="text">
                 <string>VectorView</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>EEG</string>
                </property>
               </item>
              </widget>
