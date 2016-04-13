@@ -937,11 +937,11 @@ void QuickControlWidget::createScalingGroup()
         t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
-        t_pDoubleSpinBoxScale->setMinimum(0.1);
+        t_pDoubleSpinBoxScale->setMinimum(0.001);
         t_pDoubleSpinBoxScale->setMaximum(1000);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
-        t_pDoubleSpinBoxScale->setSingleStep(0.1);
-        t_pDoubleSpinBoxScale->setDecimals(1);
+        t_pDoubleSpinBoxScale->setSingleStep(0.001);
+        t_pDoubleSpinBoxScale->setDecimals(3);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
         t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFFV_STIM_CH));
         m_qMapScalingDoubleSpinBox.insert(FIFFV_STIM_CH,t_pDoubleSpinBoxScale);
