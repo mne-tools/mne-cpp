@@ -236,7 +236,9 @@ void RealTimeMultiSampleArrayModel::initSphara()
     IOUtils::read_eigen_matrix(m_matSpharaBabyMEGInnerLoaded, QString(":/sphara/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt"));
     IOUtils::read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QString(":/sphara/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
 
-    //Generate indices used to create the SPHARA operators.
+    IOUtils::read_eigen_matrix(m_matSpharaEEGLoaded, QString(":/sphara/SPHARA/GlobalEEG.txt"));
+
+    //Generate indices used to create the SPHARA operators for VectorView
     m_vecIndicesFirstVV.resize(0);
     m_vecIndicesSecondVV.resize(0);
 
@@ -254,6 +256,7 @@ void RealTimeMultiSampleArrayModel::initSphara()
         }
     }
 
+    //Generate indices used to create the SPHARA operators for babyMEG
     m_vecIndicesFirstBabyMEG.resize(0);
     for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
         //Find INNER LAYER
@@ -263,6 +266,16 @@ void RealTimeMultiSampleArrayModel::initSphara()
         }
 
         //TODO: Find outer layer
+    }
+
+    //Generate indices used to create the SPHARA operators for EEG layouts
+    m_vecIndicesFirstEEG.resize(0);
+    for(int r = 0; r<m_pFiffInfo->chs.size(); r++) {
+        //Find EEG
+        if(m_pFiffInfo->chs.at(r).kind == FIFFV_EEG_CH) {
+            m_vecIndicesFirstEEG.conservativeResize(m_vecIndicesFirstEEG.rows()+1);
+            m_vecIndicesFirstEEG(m_vecIndicesFirstEEG.rows()-1) = r;
+        }
     }
 
     //Create Sphara operator for the first time
@@ -824,6 +837,10 @@ void RealTimeMultiSampleArrayModel::updateSpharaOptions(const QString& sSytemTyp
 
         if(sSytemType == "BabyMEG") {
             matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaBabyMEGInnerLoaded, m_vecIndicesFirstBabyMEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
+        }
+
+        if(sSytemType == "EEG") {
+            matSpharaMultFirst = Sphara::makeSpharaProjector(m_matSpharaEEGLoaded, m_vecIndicesFirstEEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
         }
 
         //Write final operator matrices to file
