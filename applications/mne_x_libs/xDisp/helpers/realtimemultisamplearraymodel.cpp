@@ -230,13 +230,13 @@ void RealTimeMultiSampleArrayModel::init()
 void RealTimeMultiSampleArrayModel::initSphara()
 {
     //Load SPHARA matrices for babymeg and vectorview
-    IOUtils::read_eigen_matrix(m_matSpharaVVGradLoaded, QString(":/sphara/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
-    IOUtils::read_eigen_matrix(m_matSpharaVVMagLoaded, QString(":/sphara/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaVVGradLoaded, QString("./mne_x_plugins/resources/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaVVMagLoaded, QString("./mne_x_plugins/resources/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt"));
 
-    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGInnerLoaded, QString(":/sphara/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt"));
-    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QString(":/sphara/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGInnerLoaded, QString("./mne_x_plugins/resources/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QString("./mne_x_plugins/resources/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
 
-    IOUtils::read_eigen_matrix(m_matSpharaEEGLoaded, QString(":/sphara/SPHARA/GlobalEEG.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaEEGLoaded, QString("./mne_x_plugins/resources/noisereduction/SPHARA/Current_SPHARA_EEG.txt"));
 
     //Generate indices used to create the SPHARA operators for VectorView
     m_vecIndicesFirstVV.resize(0);
@@ -846,6 +846,7 @@ void RealTimeMultiSampleArrayModel::updateSpharaOptions(const QString& sSytemTyp
         //Write final operator matrices to file
         IOUtils::write_eigen_matrix(matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/matSpharaMultFirst.txt"));
         IOUtils::write_eigen_matrix(matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/matSpharaMultSecond.txt"));
+        IOUtils::write_eigen_matrix(m_matSpharaEEGLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_x_plugins/resources/noisereduction/SPHARA/m_matSpharaEEGLoaded.txt"));
 
         //
         // Make operators sparse
