@@ -117,26 +117,19 @@ void EEGoSports::init()
 
     //default values used by the setupGUI class must be set here
     m_iSamplingFreq = 1024;
-    m_iNumberOfChannels = 64;
-    m_iSamplesPerBlock = 16;
-    m_iTriggerInterval = 5000;
-    m_bUseChExponent = true;
+    m_iNumberOfChannels = 90;
+    m_iSamplesPerBlock = 1024;
     m_bWriteToFile = false;
     m_bWriteDriverDebugToFile = false;
-    m_bUseFiltering = false;
     m_bIsRunning = false;
-    m_bBeepTrigger = false;
     m_bCheckImpedances = false;
 
     QDate date;
     m_sOutputFilePath = QString ("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day());
 
-    m_sElcFilePath = QString("./mne_x_plugins/resources/eegosports/loc_files/standard_waveguard64.elc");
+    m_sElcFilePath = QString("./mne_x_plugins/resources/eegosports/loc_files/dry64duke.elc");
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
-
-    //Initialise matrix used to perform a very simple high pass filter operation
-    //m_matOldMatrix = MatrixXf::Zero(m_iNumberOfChannels, m_iSamplesPerBlock);
 }
 
 
@@ -173,8 +166,25 @@ void EEGoSports::setUpFiffInfo()
     QString unit;
     QStringList elcChannelNames;
 
-    if(!LayoutLoader::readAsaElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
+    if(LayoutLoader::readAsaElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit)) {
+        if(elcLocation2D.isEmpty()) {
+            QList<QVector<double> > outputPoints;
+            QList<QVector<double> > inPointsList;
+
+            for(int i = 0; i<elcLocation3D.size(); i++) {
+                inPointsList.append(elcLocation3D[i]);
+            }
+
+            QFile out = "./MNE_Browse_Raw_Resources/Templates/Layouts/manualLayout.lout";
+            float prad = 60.0;
+            float width = 5.0;
+            float height = 4.0;
+
+            LayoutMaker::makeLayout(inPointsList, outputPoints, elcChannelNames, out, true, prad, width, height, true);
+        }
+    } else {
         qDebug() << "Error: Reading elc file.";
+    }
 
     //qDebug() << elcLocation3D;
     //qDebug() << elcLocation2D;
@@ -214,11 +224,7 @@ void EEGoSports::setUpFiffInfo()
     QList<FiffDigPoint> digitizerInfo;
 
     //Only write the EEG channel positions to the fiff info. The Refa devices have next to the EEG input channels 10 other input channels (Bipolar, Auxilary, Digital, Test)
-    int numberEEGCh;
-    if(m_iNumberOfChannels>128)
-        numberEEGCh = 138 - (m_iNumberOfChannels-128);
-    else
-        numberEEGCh = m_iNumberOfChannels;
+    int numberEEGCh = 64;
 
     //Check if channel size by user corresponds with read channel informations from the elc file. If not append zeros and string 'unknown' until the size matches.
     if(numberEEGCh > elcLocation3D.size())
@@ -317,15 +323,20 @@ void EEGoSports::setUpFiffInfo()
         if(i<=numberEEGCh-1)
         {
             //Set channel name
-            //fChInfo.ch_name = elcChannelNames.at(i);
-            sChType = QString("EEG ");
-            if(i<10)
-                sChType.append("00");
+            if(!elcChannelNames.empty() && i<elcChannelNames.size()) {
+                sChType = QString("EEG ");
+                sChType.append(elcChannelNames.at(i));
+                fChInfo.ch_name = sChType;
+            } else {
+                sChType = QString("EEG ");
+                if(i<10)
+                    sChType.append("00");
 
-            if(i>=10 && i<100)
-                sChType.append("0");
+                if(i>=10 && i<100)
+                    sChType.append("0");
 
-            fChInfo.ch_name = sChType.append(sChType.number(i));
+                fChInfo.ch_name = sChType.append(sChType.number(i));
+            }
 
             //Set channel type
             fChInfo.kind = FIFFV_EEG_CH;
@@ -373,6 +384,36 @@ void EEGoSports::setUpFiffInfo()
             //cout<<i<<endl<<fChInfo.eeg_loc<<endl;
         }
 
+        //Bipolar channels
+        if(i>=64 && i<=87)
+        {
+            //Set channel type
+            fChInfo.kind = FIFFV_MISC_CH;
+
+            sChType = QString("BIPO ");
+            fChInfo.ch_name = sChType.append(sChType.number(i-64));
+        }
+
+        //Digital input channel
+        if(i==88)
+        {
+            //Set channel type
+            fChInfo.kind = FIFFV_STIM_CH;
+
+            sChType = QString("STIM");
+            fChInfo.ch_name = sChType;
+        }
+
+        //Internally generated test signal - ramp signal
+        if(i==89)
+        {
+            //Set channel type
+            fChInfo.kind = FIFFV_MISC_CH;
+
+            sChType = QString("TEST");
+            fChInfo.ch_name = sChType;
+        }
+
         QSLChNames << sChType;
 
         m_pFiffInfo->chs.append(fChInfo);
@@ -388,45 +429,6 @@ void EEGoSports::setUpFiffInfo()
     m_pFiffInfo->dev_head_t.to = FIFFV_COORD_HEAD;
     m_pFiffInfo->ctf_head_t.from = FIFFV_COORD_DEVICE;
     m_pFiffInfo->ctf_head_t.to = FIFFV_COORD_HEAD;
-
-    //
-    //Set projection data
-    //
-    m_pFiffInfo->projs.clear();
-    FiffProj proj;
-    proj.kind = 1;
-    proj.active = false;
-
-    FiffNamedMatrix::SDPtr namedMatrix = proj.data;
-    namedMatrix->ncol = numberEEGCh/3;
-    namedMatrix->nrow = 1;
-    namedMatrix->data = MatrixXd::Ones(1, namedMatrix->ncol);
-
-    //Set projection 1
-    for(int i=0; i<namedMatrix->ncol; i++)
-        namedMatrix->col_names << QSLChNames.at(i);
-
-    proj.data = namedMatrix;
-    proj.desc = QString("PCA-v1");
-    m_pFiffInfo->projs.append(proj);
-
-    //Set projection 2
-    namedMatrix->col_names.clear();
-    for(int i=0; i<namedMatrix->ncol; i++)
-        namedMatrix->col_names << QSLChNames.at(i+namedMatrix->ncol);
-
-    proj.data = namedMatrix;
-    proj.desc = QString("PCA-v2");
-    m_pFiffInfo->projs.append(proj);
-
-    //Set projection 3
-    namedMatrix->col_names.clear();
-    for(int i=0; i<namedMatrix->ncol; i++)
-        namedMatrix->col_names << QSLChNames.at(i+(2*namedMatrix->ncol));
-
-    proj.data = namedMatrix;
-    proj.desc = QString("PCA-v3");
-    m_pFiffInfo->projs.append(proj);
 }
 
 
@@ -437,9 +439,6 @@ bool EEGoSports::start()
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
     if(this->isRunning())
         QThread::wait();
-
-    if(m_bBeepTrigger)
-        m_qTimerTrigger.start();
 
     //Setup fiff info
     setUpFiffInfo();
@@ -454,8 +453,8 @@ bool EEGoSports::start()
     m_qListReceivedSamples.clear();
 
     m_pEEGoSportsProducer->start(m_iNumberOfChannels,
+                       m_iSamplesPerBlock,
                        m_iSamplingFreq,
-                       m_bUseChExponent,
                        m_bWriteDriverDebugToFile,
                        m_sOutputFilePath,
                        m_bCheckImpedances);
@@ -468,7 +467,7 @@ bool EEGoSports::start()
     }
     else
     {
-        qWarning() << "Plugin EEGoSports - ERROR - EEGoSportsProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (TMSiSDK.dll / TMSiSDK32bit.dll) is not installed in the system32 / SysWOW64 directory" << endl;
+        qWarning() << "Plugin EEGoSports - ERROR - EEGoSportsProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (EEGO-SDK.dll) is not installed in one of the monitored dll path." << endl;
         return false;
     }
 }
@@ -499,7 +498,7 @@ bool EEGoSports::stop()
 
 //*************************************************************************************************************
 
-void EEGoSports::setSampleData(MatrixXf &matRawBuffer)
+void EEGoSports::setSampleData(MatrixXd &matRawBuffer)
 {
     m_mutex.lock();
         m_qListReceivedSamples.append(matRawBuffer);
@@ -542,47 +541,27 @@ void EEGoSports::run()
 {
     while(m_bIsRunning)
     {
-        //std::cout<<"EEGoSports::run(s)"<<std::endl;
-
-        //pop matrix only if the producer thread is running
         if(m_pEEGoSportsProducer->isRunning())
         {
-            //MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
-            MatrixXf matValue;
-
             m_mutex.lock();
+
             if(m_qListReceivedSamples.isEmpty() == false)
             {
-                //cout<<m_qListReceivedSamples.size()<<endl;
+                MatrixXd matValue;
                 matValue = m_qListReceivedSamples.first();
                 m_qListReceivedSamples.removeFirst();
-            }
-            m_mutex.unlock();
 
-            // Set Beep trigger (if activated)
-            if(m_bBeepTrigger && m_qTimerTrigger.elapsed() >= m_iTriggerInterval)
-            {
-                QtConcurrent::run(Beep, 450, 700);
-                //Set trigger in received data samples - just for one sample, so that this event is easy to detect
-                //matValue(136, m_iSamplesPerBlock-1) = 252;
-                m_qTimerTrigger.restart();
-            }
+                //Write raw data to fif file
+                if(m_bWriteToFile) {
+                    m_pOutfid->write_raw_buffer(matValue, m_cals);
+                }
 
-            //Write raw data to fif file
-            if(m_bWriteToFile)
-                m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
-
-            // Use preprocessing if wanted by the user
-            if(m_bUseFiltering)
-            {
-                MatrixXf temp = matValue;
-
-                matValue = matValue - m_matOldMatrix;
-                m_matOldMatrix = temp;
+                //emit values to real time multi sample array
+                //qDebug()<<"EEGoSports::run() - mat size"<<matValue.rows()<<"x"<<matValue.cols();
+                m_pRMTSA_EEGoSports->data()->setValue(matValue);
             }
 
-            //emit values to real time multi sample array
-            m_pRMTSA_EEGoSports->data()->setValue(matValue.cast<double>());
+            m_mutex.unlock();            
         }
     }
 
