@@ -109,7 +109,8 @@ SOURCES += \
     helpers/chinfomodel.cpp \
     helpers/mneoperator.cpp \
     helpers/roundededgeswidget.cpp \
-    bar.cpp
+    bar.cpp \
+    spline.cpp
 
 HEADERS += \
     disp_global.h \
@@ -132,7 +133,8 @@ HEADERS += \
     helpers/chinfomodel.h \
     helpers/mneoperator.h \
     helpers/roundededgeswidget.h \
-    bar.h
+    bar.h \
+    spline.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

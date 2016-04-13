@@ -1,6 +1,3 @@
-//=============================================================================================================
-//=============================================================================================================
-
 /**
 * @file     bar.cpp
 * @author   Ricky Tjen <ricky270@student.sgu.ac.id>;
@@ -57,10 +54,11 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
- Bar::Bar(const VectorXd& matClassLimitData, const VectorXi& matClassFrequencyData, int iClassAmount, int iPrecisionValue)
+ Bar::Bar(const VectorXd& matClassLimitData, const VectorXi& matClassFrequencyData, int iPrecisionValue)
 {
     Eigen::VectorXd resultDisplayValues;
     Eigen::VectorXi resultExponentValues;
+    int iClassAmount = matClassFrequencyData.rows();
     splitCoefficientAndExponent (matClassLimitData, iClassAmount, resultDisplayValues, resultExponentValues);
 
     //  Start of Qtchart histogram display
@@ -99,14 +97,11 @@ using namespace DISPLIB;
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
 
-    QWidget* widget = new QWidget();
     QGridLayout* layout = new QGridLayout();
 
     layout->addWidget(chartView,0,0);
 
-    widget->setLayout(layout);
-    widget->resize(420, 300);
-    widget->show();
+    this->setLayout(layout);
 }
 
 

@@ -99,7 +99,7 @@ QT_CHARTS_USE_NAMESPACE
 *
 * @brief bar class for histogram display using Qtcharts
 */
-class DISPSHARED_EXPORT Bar
+class DISPSHARED_EXPORT Bar : public QWidget
 {
     public:
     //=========================================================================================================
@@ -113,7 +113,7 @@ class DISPSHARED_EXPORT Bar
     * @param[in]  iPrecisionValue        user input to determine the amount of digits of coefficient shown in the histogram
     */
 //    template<typename T>
-     Bar(const VectorXd& matClassLimitData, const VectorXi& matClassFrequencyData, int iClassAmount, int iPrecisionValue);
+     Bar(const VectorXd& matClassLimitData, const VectorXi& matClassFrequencyData, int iPrecisionValue);
 //    template<typename T>
 //    explicit bar(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassFrequencyData, int iClassAmount, int iPrecisionValue);
 
