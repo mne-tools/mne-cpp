@@ -335,15 +335,20 @@ void TMSI::setUpFiffInfo()
         if(i<=numberEEGCh-1)
         {
             //Set channel name
-            //fChInfo.ch_name = elcChannelNames.at(i);
-            sChType = QString("EEG ");
-            if(i<10)
-                sChType.append("00");
+            if(!elcChannelNames.empty() && i<elcChannelNames.size()) {
+                sChType = QString("EEG ");
+                sChType.append(elcChannelNames.at(i));
+                fChInfo.ch_name = sChType;
+            } else {
+                sChType = QString("EEG ");
+                if(i<10)
+                    sChType.append("00");
 
-            if(i>=10 && i<100)
-                sChType.append("0");
+                if(i>=10 && i<100)
+                    sChType.append("0");
 
-            fChInfo.ch_name = sChType.append(sChType.number(i));
+                fChInfo.ch_name = sChType.append(sChType.number(i));
+            }
 
             //Set channel type
             fChInfo.kind = FIFFV_EEG_CH;

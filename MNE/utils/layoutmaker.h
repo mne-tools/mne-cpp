@@ -140,11 +140,18 @@ public:
     //=========================================================================================================
     /**
     * Reads the specified ANT elc-layout file.
-    * @param [in] inputPoints the input points in 3D space.
-    * @param [in] outputPoints the output layout points in 2D space.
-    * @param [in] names the channel names.
-    * @param [in] mirrorXAxis mirror points at x axis.
-    * @param [in] mirrorYAxis mirror points at y axis.
+    * @param [in] inputPoints       The input points in 3D space.
+    * @param [out] outputPoints     The output layout points in 2D space.
+    * @param [in] names             The channel names.
+    * @param [in] outFile           The outout file.
+    * @param [in] do_fit            The flag whether to do a sphere fitting.
+    * @param [in] prad
+    * @param [in] w
+    * @param [in] h
+    * @param [in] writeFile         The flag whether to write to file.
+    * @param [in] mirrorXAxis       Mirror points at x axis.
+    * @param [in] mirrorYAxis       Mirror points at y axis.
+    *
     * @return true if making layout was successful, false otherwise.
     */
     static bool makeLayout(const QList<QVector<double> > &inputPoints,

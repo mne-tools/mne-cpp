@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     test_mne_disp.pro
+# @file     dipoleFit.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2012
+# @date     April, 2016
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2016, Christoph Dinh and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -18,7 +18,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-#
+# 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile to build the mne_disp_test app.
+# @brief    ToDo Documentation...
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -37,11 +37,14 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += core gui
-QT += widgets
-QT += printsupport
+VERSION = $${MNE_CPP_VERSION}
 
-TARGET = test_mne_disp
+QT -= gui
+
+CONFIG   += console
+CONFIG   -= app_bundle
+
+TARGET = dipoleFit
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -54,7 +57,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned
-
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
@@ -64,17 +66,14 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne
 }
 
-DESTDIR = $${MNE_BINARY_DIR}
+DESTDIR =  $${MNE_BINARY_DIR}
 
-SOURCES += main.cpp \
-        3rdParty/QCustomPlot/qcustomplot.cpp \
-        mnedisptest.cpp
+SOURCES += \
+        main.cpp \
 
-HEADERS  += \
-        3rdParty/QCustomPlot/qcustomplot.h \
-        mnedisptest.h
+HEADERS += \
 
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-FORMS    += \
-    mnedisptest.ui
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
