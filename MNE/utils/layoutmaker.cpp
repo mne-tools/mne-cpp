@@ -315,7 +315,7 @@ float LayoutMaker::opt_rad(VectorXf &r0,fitUser user)
 
 //*************************************************************************************************************
 
-void LayoutMaker::calculate_cm_ave_dist(MatrixXf &rr,
+void LayoutMaker::calculate_cm_ave_dist(const MatrixXf &rr,
                                         int np,
                                         VectorXf &cm,
                                         float &avep)
@@ -369,7 +369,7 @@ MatrixXf LayoutMaker::make_initial_simplex(VectorXf &pars,
 
 //*************************************************************************************************************
 
-int LayoutMaker::fit_sphere_to_points(MatrixXf &rr,
+int LayoutMaker::fit_sphere_to_points(const MatrixXf &rr,
                                      int   np,
                                      float simplex_size,
                                      VectorXf &r0,

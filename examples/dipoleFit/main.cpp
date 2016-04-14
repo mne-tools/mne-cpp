@@ -144,10 +144,18 @@ int main(int argc, char *argv[])
     //FIFFV_BEM_SURF_ID_HEAD       4 -> Head
     qDebug() << "bem" << bem[0].id;
 
-    Sphere sp = Sphere::fit_sphere(bem[0].rr.cast<double>() );
+    Sphere sp = Sphere::fit_sphere( bem[0].rr.cast<double>() );
 
-    std::cout << "center" << std::endl << sp.center() << std::endl;
-    std::cout << "radius" << std::endl << sp.radius() << std::endl;
+    Sphere sp_simplex = Sphere::simplex_fit_sphere( bem[0].rr );
+
+    std::cout << "sp center" << std::endl << sp.center() << std::endl;
+    std::cout << "sp radius" << std::endl << sp.radius() << std::endl;
+
+
+    qDebug() << "bem rr.rows()" << bem[0].rr.rows() << "bem np" << bem[0].np;
+
+    std::cout << "sp simplex center" << std::endl << sp_simplex.center() << std::endl;
+    std::cout << "sp simplex radius" << std::endl << sp_simplex.radius() << std::endl;
 
     return app.exec();
 }

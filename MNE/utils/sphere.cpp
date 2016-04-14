@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "sphere.h"
+#include "layoutmaker.h"
 
 
 //*************************************************************************************************************
@@ -163,3 +164,22 @@ Sphere Sphere::fit_sphere(const MatrixX3d& points)
 
     return Sphere(center, r);
 }
+
+
+//*************************************************************************************************************
+
+Sphere Sphere::simplex_fit_sphere(const MatrixX3f& points, double simplex_size)
+{
+    VectorXf r0;
+    float R;
+    LayoutMaker::fit_sphere_to_points( points, points.rows(), simplex_size, r0, R);
+
+    Vector3d center;
+
+    center[0] = r0[0];
+    center[1] = r0[1];
+    center[2] = r0[2];
+
+    return Sphere(center, R);
+}
+
