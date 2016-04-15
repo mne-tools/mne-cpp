@@ -200,6 +200,7 @@ RealTimeEvokedWidget::~RealTimeEvokedWidget()
             settings.setValue(QString("RTEW/%1/filterDesignMethod").arg(t_sRTEWName), (int)filter.m_designMethod);
             settings.setValue(QString("RTEW/%1/filterTransition").arg(t_sRTEWName), filter.m_dParksWidth*(filter.m_sFreq/2));
             settings.setValue(QString("RTEW/%1/filterUserDesignActive").arg(t_sRTEWName), m_pFilterWindow->userDesignedFiltersIsActive());
+            settings.setValue(QString("RTEW/%1/filterChannelType").arg(t_sRTEWName), m_pFilterWindow->getChannelType());
         }
 
         //Store scaling
@@ -435,7 +436,8 @@ void RealTimeEvokedWidget::init()
                                                 settings.value(QString("RTEW/%1/filterType").arg(t_sRTEWName), 2).toInt(),
                                                 settings.value(QString("RTEW/%1/filterDesignMethod").arg(t_sRTEWName), 0).toInt(),
                                                 settings.value(QString("RTEW/%1/filterTransition").arg(t_sRTEWName), 5.0).toDouble(),
-                                                settings.value(QString("RTEW/%1/filterUserDesignActive").arg(t_sRTEWName), false).toBool());
+                                                settings.value(QString("RTEW/%1/filterUserDesignActive").arg(t_sRTEWName), false).toBool(),
+                                                settings.value(QString("RTEW/%1/filterChannelType").arg(t_sRTEWName), "MEG").toString());
 
         //
         //-------- Init channel selection manager --------
