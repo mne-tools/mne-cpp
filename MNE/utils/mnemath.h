@@ -372,11 +372,11 @@ public:
     * @param[out] vecResultFrequency     the amount of data that fits in the appropriate class ranges
     */
     template<typename T>
-    static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
+    static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& vecResultClassLimits, Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic>& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
     template<typename T>
-    static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
+    static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::Matrix<double, Eigen::Dynamic, 1>& vecResultClassLimits, Eigen::Matrix<int, Eigen::Dynamic, 1>& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
     template<typename T>
-    static void histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
+    static void histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::Matrix<double, 1, Eigen::Dynamic>& vecResultClassLimits, Eigen::Matrix<int, 1, Eigen::Dynamic>& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
 };
 
 //*************************************************************************************************************
@@ -500,34 +500,42 @@ inline double MNEMath::log2( const T d)
 
 //*************************************************************************************************************
 template<typename T>
-void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin, double dGlobalMax)
+void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::Matrix<double, Eigen::Dynamic, 1>& vecResultClassLimits, Eigen::Matrix<int, Eigen::Dynamic, 1>& vecResultFrequency, double dGlobalMin, double dGlobalMax)
 {
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matRawData.rows(),1);
     matrixName.col(0)= matRawData;
-    MNEMath::histcounts(matrixName, bMakeSymmetrical, iClassAmount, vecResultClassLimits, vecResultFrequency, dGlobalMin, dGlobalMax);
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> matrixClassLimits(vecResultClassLimits.rows(),1);
+    matrixClassLimits.col(0)= vecResultClassLimits;
+    Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> matrixFrequency(vecResultFrequency.rows(),1);
+    matrixFrequency.col(0)= vecResultFrequency;
+    MNEMath::histcounts(matrixName, bMakeSymmetrical, iClassAmount, matrixClassLimits, matrixFrequency, dGlobalMin, dGlobalMax);
 }
 
 
 //*************************************************************************************************************
 
 template<typename T>
-void MNEMath::histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin, double dGlobalMax)
+void MNEMath::histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::Matrix<double, 1, Eigen::Dynamic>& vecResultClassLimits, Eigen::Matrix<int, 1, Eigen::Dynamic>& vecResultFrequency, double dGlobalMin, double dGlobalMax)
 {
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1,matRawData.cols());
     matrixName.row(0)= matRawData;
-    MNEMath::histcounts(matrixName, bMakeSymmetrical, iClassAmount, vecResultClassLimits, vecResultFrequency, dGlobalMin, dGlobalMax);
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> matrixClassLimits(1,vecResultClassLimits.cols());
+    matrixName.row(0)= vecResultClassLimits;
+    Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> matrixFrequency(1,vecResultFrequency.cols());
+    matrixName.row(0)= vecResultFrequency;
+    MNEMath::histcounts(matrixName, bMakeSymmetrical, iClassAmount, matrixClassLimits, matrixFrequency, dGlobalMin, dGlobalMax);
 }
 
 
 //*************************************************************************************************************
 
 template<typename T>
-void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin, double dGlobalMax)
+void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& vecResultClassLimits, Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic>& vecResultFrequency, double dGlobalMin, double dGlobalMax)
 {
     vecResultClassLimits.resize(iClassAmount + 1);
     vecResultFrequency.resize(iClassAmount);
 
-    for (int count = 0; count < iClassAmount; count++)
+    for (int count = 0; count < iClassAmount; count++) //initialize the vector with zero values
     {
         vecResultFrequency(count) = 0;
     }

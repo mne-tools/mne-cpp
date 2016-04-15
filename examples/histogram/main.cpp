@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
 
     printf("Read %d samples.\n",(qint32)data.cols());
     Eigen::VectorXd dataSine;
-    dataSine = sineWaveGenerator(1.0e-300,(1.0/1e6), 0.0, 1.0);
+    dataSine = sineWaveGenerator(1.0e-30,(1.0/1e6), 0.0, 1.0);
    // histogram calculation
     bool bMakeSymmetrical;
     bMakeSymmetrical = false;      //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
@@ -215,7 +215,7 @@ int main(int argc, char *argv[])
     MNEMath::histcounts(dataSine, bMakeSymmetrical, classAmount, resultClassLimit, resultFrequency, inputGlobalMin, inputGlobalMax);   //user input to normalize and sort the data matrix
     //below is the function for printing the results on command prompt (for debugging purposes)
     int precision = 2;           //format for the amount digits of coefficient shown in the histogram
-    Bar* barObj = new Bar(resultClassLimit, resultFrequency, precision);
+    Bar<double>* barObj = new Bar<double>(resultClassLimit, resultFrequency, precision);
     barObj->resize(400,300);
     barObj->show();
 
