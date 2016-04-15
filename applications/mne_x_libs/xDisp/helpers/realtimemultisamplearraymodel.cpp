@@ -330,18 +330,14 @@ void RealTimeMultiSampleArrayModel::setFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
 
         m_matOverlap.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxFilterLength);
 
-        m_matSparseProj = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-        m_matSparseComp = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+        m_matSparseProjMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+        m_matSparseCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
         m_matSparseSpharaMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-        m_matSparseSpharaProjMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-        m_matSparseSpharaCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
         m_matSparseProjCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
 
-        m_matSparseProj.setIdentity();
-        m_matSparseComp.setIdentity();
+        m_matSparseProjMult.setIdentity();
+        m_matSparseCompMult.setIdentity();
         m_matSparseSpharaMult.setIdentity();
-        m_matSparseSpharaProjMult.setIdentity();
-        m_matSparseSpharaCompMult.setIdentity();
         m_matSparseProjCompMult.setIdentity();
 
         //Create the initial Compensator projector
@@ -417,57 +413,43 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
 
     //Copy new data into the global data matrix
     for(qint32 b = 0; b < data.size(); ++b) {
-        if(data.at(b).rows() != m_matDataRaw.rows()) {
+        int nCol = data.at(b).cols();
+        int nRow = data.at(b).rows();
+
+        if(nRow != m_matDataRaw.rows()) {
             std::cout<<"incoming data does not match internal data row size. Returning..."<<std::endl;
             return;
         }
 
-        //Reset m_iCurrentSample and start filling the data matrix from the beginning again. Also add residual  amount of data to the end of the matrix.
-        if(m_iCurrentSample+data.at(b).cols() > m_matDataRaw.cols()) {
-            m_iResidual = data.at(b).cols() - ((m_iCurrentSample+data.at(b).cols()) % m_matDataRaw.cols());
-            if(m_iResidual == data.at(b).cols())
-                m_iResidual = 0;
+        //Reset m_iCurrentSample and start filling the data matrix from the beginning again. Also add residual amount of data to the end of the matrix.
+        if(m_iCurrentSample+nCol > m_matDataRaw.cols()) {
+            m_iResidual = nCol - ((m_iCurrentSample+nCol) % m_matDataRaw.cols());
 
-//            std::cout<<"incoming data exceeds internal data cols by: "<<(m_iCurrentSample+data.at(b).cols()) % m_matDataRaw.cols()<<std::endl;
-//            std::cout<<"m_iCurrentSample+data.at(b).cols(): "<<m_iCurrentSample+data.at(b).cols()<<std::endl;
+            if(m_iResidual == nCol) {
+                m_iResidual = 0;
+            }
+
+//            std::cout<<"incoming data exceeds internal data cols by: "<<(m_iCurrentSample+nCol) % m_matDataRaw.cols()<<std::endl;
+//            std::cout<<"m_iCurrentSample+nCol: "<<m_iCurrentSample+nCol<<std::endl;
 //            std::cout<<"m_matDataRaw.cols(): "<<m_matDataRaw.cols()<<std::endl;
-//            std::cout<<"data.at(b).cols()-m_iResidual: "<<data.at(b).cols()-m_iResidual<<std::endl<<std::endl;
+//            std::cout<<"nCol-m_iResidual: "<<nCol-m_iResidual<<std::endl<<std::endl;
 
             if(doComp) {
                 if(doProj) {
-                    if(doSphara) {
-                        //Comp + Proj + Sphara
-                        m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseFull * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-                    } else {
-                        //Comp + Proj
-                        m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseProjCompMult * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-                    }
+                    //Comp + Proj
+                    m_matDataRaw.block(0, m_iCurrentSample, nRow, m_iResidual) = m_matSparseProjCompMult * data.at(b).block(0,0,nRow,m_iResidual);
                 } else {
-                    if(doSphara) {
-                        //Comp + Sphara
-                        m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseSpharaCompMult * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-                    } else {
-                        //Comp
-                        m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseComp * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-                    }
+                    //Comp
+                    m_matDataRaw.block(0, m_iCurrentSample, nRow, m_iResidual) = m_matSparseCompMult * data.at(b).block(0,0,nRow,m_iResidual);
                 }
             } else {
-                if(doProj) {
-                    if(doSphara) {
-                        //Proj + Sphara
-                        m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseSpharaProjMult * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-                    } else {
-                        //Proj
-                        m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseProj * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-                    }
+                if(doProj)
+                {
+                    //Proj
+                    m_matDataRaw.block(0, m_iCurrentSample, nRow, m_iResidual) = m_matSparseProjMult * data.at(b).block(0,0,nRow,m_iResidual);
                 } else {
-                    if(doSphara) {
-                        //Sphara
-                        m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = m_matSparseSpharaMult * data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-                    } else {
-                        //None - Raw
-                        m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), m_iResidual) = data.at(b).block(0,0,data.at(b).rows(),m_iResidual);
-                    }
+                    //None - Raw
+                    m_matDataRaw.block(0, m_iCurrentSample, nRow, m_iResidual) = data.at(b).block(0,0,nRow,m_iResidual);
                 }
             }
 
@@ -489,65 +471,65 @@ void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
                     i.value().clear();
                 }
             }
-        } else
+        } else {
             m_iResidual = 0;
+        }
 
         //std::cout<<"incoming data is ok"<<std::endl;
 
         if(doComp) {
             if(doProj) {
-                if(doSphara) {
-                    //Comp + Proj + Sphara
-                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseFull * data.at(b);
-                } else {
-                    //Comp + Proj
-                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseProjCompMult * data.at(b);
-                }
+                //Comp + Proj
+                m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol) = m_matSparseProjCompMult * data.at(b);
             } else {
-                if(doSphara) {
-                    //Comp + Sphara
-                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseSpharaCompMult * data.at(b);
-                } else {
-                    //Comp
-                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseComp * data.at(b);
-                }
+                //Comp
+                m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol) = m_matSparseCompMult * data.at(b);
             }
         } else {
             if(doProj) {
-                if(doSphara) {
-                    //Proj + Sphara
-                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseSpharaProjMult * data.at(b);
-                } else {
-                    //Proj
-                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseProj * data.at(b);
-                }
+                //Proj
+                m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol) = m_matSparseProjMult * data.at(b);
             } else {
-                if(doSphara) {
-                    //Sphara
-                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = m_matSparseSpharaMult * data.at(b);
-                } else {
-                    //None - Raw
-                    m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()) = data.at(b);
-                }
+                //None - Raw
+                m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol) = data.at(b);
             }
         }
 
-        //Filter if neccessary else set to zero
-        if(!m_filterData.isEmpty())
-            filterChannelsConcurrently(m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()), m_iCurrentSample);
-        else
-            m_matDataFiltered.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols()).setZero();// = m_matDataRaw.block(0, m_iCurrentSample, data.at(b).rows(), data.at(b).cols());
+        //Filter if neccessary else set filtered data matrix to zero
+        if(!m_filterData.isEmpty()) {
+            filterChannelsConcurrently(m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol), m_iCurrentSample);
 
-        m_iCurrentSample += data.at(b).cols();
+            //Perform SPHARA on filtered data after actual filtering - SPHARA should be applied on the best possible data
+            if(doSphara) {
+                if(m_iCurrentSample-m_iMaxFilterLength/2 >= 0) {
+                    m_matDataFiltered.block(0, m_iCurrentSample-m_iMaxFilterLength/2, nRow, nCol) = m_matSparseSpharaMult * m_matDataFiltered.block(0, m_iCurrentSample-m_iMaxFilterLength/2, nRow, nCol);
+                }
+                else {
+                    if(m_iCurrentSample-m_iMaxFilterLength/2 < 0) {
+                        m_matDataFiltered.block(0, 0, nRow, nCol) = m_matSparseSpharaMult * m_matDataFiltered.block(0, 0, nRow, nCol);
+                        int iResidual = m_iResidual+m_iMaxFilterLength/2;
+                        m_matDataFiltered.block(0, m_matDataFiltered.cols()-iResidual, nRow, iResidual) = m_matSparseSpharaMult * m_matDataFiltered.block(0, m_matDataFiltered.cols()-iResidual, nRow, iResidual);
+                    }
+                }
+            }
+        } else {
+            m_matDataFiltered.block(0, m_iCurrentSample, nRow, nCol).setZero();// = m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol);
 
-        m_iCurrentBlockSize = data.at(b).cols();
+            //Perform SPHARA on raw data data
+            if(doSphara) {
+                m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol) = m_matSparseSpharaMult * m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol);
+            }
+        }
+
+        m_iCurrentSample += nCol;
+        m_iCurrentBlockSize = nCol;
 
         //detect the trigger flanks in the trigger channels
         if(m_bTriggerDetectionActive) {
             int iOldDetectedTriggers = m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].size();
 
-            //DetectTrigger::detectTriggerFlanksMax(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-data.at(b).cols(), m_dTriggerThreshold, true);
-            DetectTrigger::detectTriggerFlanksGrad(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-data.at(b).cols(), m_dTriggerThreshold, "Falling");
+            //DetectTrigger::detectTriggerFlanksMax(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-nCol, m_dTriggerThreshold, true);
+            DetectTrigger::detectTriggerFlanksGrad(data.at(b), m_qMapDetectedTrigger, m_iCurrentSample-nCol, m_dTriggerThreshold, "Falling");
 
             //Compute newly counted triggers
             int newTriggers = m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].size() - iOldDetectedTriggers;
@@ -743,15 +725,14 @@ void RealTimeMultiSampleArrayModel::updateProjection()
                 if(m_matProj(i,k) != 0)
                     tripletList.push_back(T(i, k, m_matProj(i,k)));
 
-        m_matSparseProj = SparseMatrix<double>(m_matProj.rows(),m_matProj.cols());
+        m_matSparseProjMult = SparseMatrix<double>(m_matProj.rows(),m_matProj.cols());
         if(tripletList.size() > 0)
-            m_matSparseProj.setFromTriplets(tripletList.begin(), tripletList.end());
+            m_matSparseProjMult.setFromTriplets(tripletList.begin(), tripletList.end());
 
         //Create full multiplication matrix
-        m_matSparseSpharaProjMult = m_matSparseSpharaMult * m_matSparseProj;
-        m_matSparseProjCompMult = m_matSparseProj * m_matSparseComp;
+        m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
 
-        m_matSparseFull = m_matSparseSpharaMult * m_matSparseProj * m_matSparseComp;
+        m_matSparseFull = m_matSparseProjMult * m_matSparseCompMult;
     }
 }
 
@@ -799,15 +780,14 @@ void RealTimeMultiSampleArrayModel::updateCompensator(int to)
                 if(m_matComp(i,k) != 0)
                     tripletList.push_back(T(i, k, m_matComp(i,k)));
 
-        m_matSparseComp = SparseMatrix<double>(m_matComp.rows(),m_matComp.cols());
+        m_matSparseCompMult = SparseMatrix<double>(m_matComp.rows(),m_matComp.cols());
         if(tripletList.size() > 0)
-            m_matSparseComp.setFromTriplets(tripletList.begin(), tripletList.end());
+            m_matSparseCompMult.setFromTriplets(tripletList.begin(), tripletList.end());
 
         //Create full multiplication matrix
-        m_matSparseSpharaCompMult = m_matSparseSpharaMult * m_matSparseComp;
-        m_matSparseProjCompMult = m_matSparseProj * m_matSparseComp;
+        m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
 
-        m_matSparseFull = m_matSparseSpharaMult * m_matSparseProj * m_matSparseComp;
+        m_matSparseFull = m_matSparseProjMult * m_matSparseCompMult;
     }
 }
 
@@ -888,10 +868,6 @@ void RealTimeMultiSampleArrayModel::updateSpharaOptions(const QString& sSytemTyp
 
         //Create full multiplication matrix
         m_matSparseSpharaMult = matSparseSpharaMultFirst * matSparseSpharaMultSecond;
-        m_matSparseSpharaProjMult = m_matSparseSpharaMult * m_matSparseProj;
-        m_matSparseSpharaCompMult = m_matSparseSpharaMult * m_matSparseComp;
-
-        m_matSparseFull = m_matSparseSpharaMult * m_matSparseProj * m_matSparseComp;
     }
 }
 
@@ -943,7 +919,7 @@ void RealTimeMultiSampleArrayModel::setFilterChannelType(QString channelType)
     for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
         if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
             m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
-            m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH) && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
+            m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH)/* && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)*/) {
             if(m_sFilterChannelType == "All")
                 m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
             else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType))
@@ -991,7 +967,7 @@ void RealTimeMultiSampleArrayModel::createFilterChannelList(QStringList channelN
     for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
         if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
             m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
-            m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH) && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
+            m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH)/* && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)*/) {
             if(m_sFilterChannelType == "All")
                 m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
             else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType))

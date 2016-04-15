@@ -567,14 +567,6 @@ private:
     VectorXd                            m_vecLastBlockFirstValuesFiltered;          /**< The first value of the last complete filtered data display block */
     VectorXd                            m_vecLastBlockFirstValuesRaw;               /**< The first value of the last complete raw data display block */
 
-    MatrixXd                            m_matProj;                                  /**< SSP projector */
-    SparseMatrix<double>                m_matSparseProj;                            /**< Sparse SSP projector */
-
-    MatrixXd                            m_matComp;                                  /**< Compensator */
-    SparseMatrix<double>                m_matSparseComp;                            /**< Sparse compensator matrix */
-
-    SparseMatrix<double>                m_matSparseFull;                            /**< Full multiplication matrix  */
-
     MatrixXdR                           m_matDataRaw;                               /**< The raw data */
     MatrixXdR                           m_matDataFiltered;                          /**< The filtered data */
     MatrixXdR                           m_matDataRawFreeze;                         /**< The raw data in freeze mode */
@@ -588,9 +580,13 @@ private:
     Eigen::VectorXi                     m_vecIndicesFirstEEG;                       /**< The indices of the channels to pick for the second SPHARA operator in case of an EEG system.*/
 
     Eigen::SparseMatrix<double>         m_matSparseSpharaMult;                      /**< The final sparse SPHARA operator .*/
-    Eigen::SparseMatrix<double>         m_matSparseSpharaProjMult;                  /**< The final sparse SPHARA + projection operator.*/
-    Eigen::SparseMatrix<double>         m_matSparseSpharaCompMult;                  /**< The final sparse SPHARA + compensator operator.*/
     Eigen::SparseMatrix<double>         m_matSparseProjCompMult;                    /**< The final sparse projection + compensator operator.*/
+    Eigen::SparseMatrix<double>         m_matSparseProjMult;                        /**< The final sparse SSP projector */
+    Eigen::SparseMatrix<double>         m_matSparseCompMult;                        /**< The final sparse compensator matrix */
+    Eigen::SparseMatrix<double>         m_matSparseFull;                            /**< The final full multiplication matrix  */
+
+    Eigen::MatrixXd                     m_matProj;                                  /**< SSP projector */
+    Eigen::MatrixXd                     m_matComp;                                  /**< Compensator */
 
     Eigen::MatrixXd                     m_matSpharaVVGradLoaded;                    /**< The loaded VectorView gradiometer basis functions.*/
     Eigen::MatrixXd                     m_matSpharaVVMagLoaded;                     /**< The loaded VectorView magnetometer basis functions.*/
