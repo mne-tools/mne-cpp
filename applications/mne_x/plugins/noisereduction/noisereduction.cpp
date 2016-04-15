@@ -226,19 +226,15 @@ void NoiseReduction::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             m_pFiffInfo = pRTMSA->info();
 
             //Init the multiplication matrices
-            m_matSparseProj = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-            m_matSparseComp = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+            m_matSparseProjMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+            m_matSparseCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
             m_matSparseSpharaMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-            m_matSparseSpharaProjMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-            m_matSparseSpharaCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
             m_matSparseProjCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
             m_matSparseFull = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
 
-            m_matSparseProj.setIdentity();
-            m_matSparseComp.setIdentity();
+            m_matSparseProjMult.setIdentity();
+            m_matSparseCompMult.setIdentity();
             m_matSparseSpharaMult.setIdentity();
-            m_matSparseSpharaProjMult.setIdentity();
-            m_matSparseSpharaCompMult.setIdentity();
             m_matSparseProjCompMult.setIdentity();
             m_matSparseFull.setIdentity();
 
@@ -347,15 +343,14 @@ void NoiseReduction::updateProjection()
                 if(matProj(i,k) != 0)
                     tripletList.push_back(T(i, k, matProj(i,k)));
 
-        m_matSparseProj = SparseMatrix<double>(matProj.rows(),matProj.cols());
+        m_matSparseProjMult = SparseMatrix<double>(matProj.rows(),matProj.cols());
         if(tripletList.size() > 0)
-            m_matSparseProj.setFromTriplets(tripletList.begin(), tripletList.end());
+            m_matSparseProjMult.setFromTriplets(tripletList.begin(), tripletList.end());
 
         //Create full multiplication matrix
-        m_matSparseSpharaProjMult = m_matSparseSpharaMult * m_matSparseProj;
-        m_matSparseProjCompMult = m_matSparseProj * m_matSparseComp;
+        m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
 
-        m_matSparseFull = m_matSparseSpharaMult * m_matSparseProj * m_matSparseComp;
+        m_matSparseFull = m_matSparseProjMult * m_matSparseCompMult;
         m_mutex.unlock();
     }
 }
@@ -402,85 +397,14 @@ void NoiseReduction::updateCompensator(int to)
                 if(matComp(i,k) != 0)
                     tripletList.push_back(T(i, k, matComp(i,k)));
 
-        m_matSparseComp = SparseMatrix<double>(matComp.rows(),matComp.cols());
+        m_matSparseCompMult = SparseMatrix<double>(matComp.rows(),matComp.cols());
         if(tripletList.size() > 0)
-            m_matSparseComp.setFromTriplets(tripletList.begin(), tripletList.end());
+            m_matSparseCompMult.setFromTriplets(tripletList.begin(), tripletList.end());
 
         //Create full multiplication matrix
-        m_matSparseSpharaCompMult = m_matSparseSpharaMult * m_matSparseComp;
-        m_matSparseProjCompMult = m_matSparseProj * m_matSparseComp;
+        m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
 
-        m_matSparseFull = m_matSparseSpharaMult * m_matSparseProj * m_matSparseComp;
-    }
-}
-
-
-//*************************************************************************************************************
-
-void NoiseReduction::run()
-{
-    //
-    // Wait for Fiff Info
-    //
-    while(!m_pFiffInfo)
-        msleep(10);// Wait for fiff Info
-
-    //Set visibility of options tool to true
-    m_pActionShowOptionsWidget->setVisible(true);
-
-    //Read and create SPHARA operator for the first time
-    initSphara();
-    createSpharaOperator();
-
-    while(m_bIsRunning)
-    {
-        //Dispatch the inputs
-        MatrixXd t_mat = m_pNoiseReductionBuffer->pop();
-
-        m_mutex.lock();
-
-        //Do all the noise reduction steps here
-        if(m_bCompActivated) {
-            if(m_bProjActivated) {
-                if(m_bSpharaActive) {
-                    //Comp + Proj + Sphara
-                    t_mat = m_matSparseFull * t_mat;
-                } else {
-                    //Comp + Proj
-                    t_mat = m_matSparseProjCompMult * t_mat;
-                }
-            } else {
-                if(m_bSpharaActive) {
-                    //Comp + Sphara
-                    t_mat = m_matSparseSpharaCompMult * t_mat;
-                } else {
-                    //Comp
-                    t_mat = m_matSparseComp * t_mat;
-                }
-            }
-        } else {
-            if(m_bProjActivated) {
-                if(m_bSpharaActive) {
-                    //Proj + Sphara
-                    t_mat = m_matSparseSpharaProjMult * t_mat;
-                } else {
-                    //Proj
-                    t_mat = m_matSparseProj * t_mat;
-                }
-            } else {
-                if(m_bSpharaActive) {
-                    //Sphara
-                    t_mat = m_matSparseSpharaMult * t_mat;
-                } else {
-                    //None - Raw
-                }
-            }
-        }
-
-        m_mutex.unlock();
-
-        //Send the data to the connected plugins and the online display
-        m_pNoiseReductionOutput->data()->setValue(t_mat);
+        m_matSparseFull = m_matSparseProjMult * m_matSparseCompMult;
     }
 }
 
@@ -618,10 +542,66 @@ void NoiseReduction::createSpharaOperator()
 
     //Create full multiplication matrix
     m_matSparseSpharaMult = matSparseSpharaMultFirst * matSparseSpharaMultSecond;
-    m_matSparseSpharaProjMult = m_matSparseSpharaMult * m_matSparseProj;
-    m_matSparseSpharaCompMult = m_matSparseSpharaMult * m_matSparseComp;
 
-    m_matSparseFull = m_matSparseSpharaMult * m_matSparseProj * m_matSparseComp;
+    m_matSparseFull = m_matSparseProjMult * m_matSparseCompMult;
 
     m_mutex.unlock();
+}
+
+
+//*************************************************************************************************************
+
+void NoiseReduction::run()
+{
+    //
+    // Wait for Fiff Info
+    //
+    while(!m_pFiffInfo)
+        msleep(10);// Wait for fiff Info
+
+    //Set visibility of options tool to true
+    m_pActionShowOptionsWidget->setVisible(true);
+
+    //Read and create SPHARA operator for the first time
+    initSphara();
+    createSpharaOperator();
+
+    while(m_bIsRunning)
+    {
+        //Dispatch the inputs
+        MatrixXd t_mat = m_pNoiseReductionBuffer->pop();
+
+        m_mutex.lock();
+
+        //Do SSP's and compensators here
+        if(m_bCompActivated) {
+            if(m_bProjActivated) {
+                //Comp + Proj
+                t_mat = m_matSparseProjCompMult * t_mat;
+            } else {
+                //Comp
+                t_mat = m_matSparseCompMult * t_mat;
+
+            }
+        } else {
+            if(m_bProjActivated) {
+                //Proj
+                t_mat = m_matSparseProjMult * t_mat;
+            } else {
+                //None - Raw
+            }
+        }
+
+        //Do temporal filtering here
+
+        //Do SPHARA here
+        if(m_bSpharaActive) {
+            t_mat = m_matSparseSpharaMult * t_mat;
+        }
+
+        m_mutex.unlock();
+
+        //Send the data to the connected plugins and the online display
+        m_pNoiseReductionOutput->data()->setValue(t_mat);
+    }
 }
