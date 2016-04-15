@@ -97,7 +97,9 @@ Mgh::Mgh()
 Mri Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int frame, bool headerOnly)
 {
     Mri mri;
-    QList<MatrixXd> sliceDataList;
+    //QList<MatrixXd> sliceDataList;
+    QList<FSLIB::SliceData> sliceDataList;
+
     int sliceCount = 0;
 
     // get file extension
@@ -258,6 +260,7 @@ Mri Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int frame, bool headerOn
         // define further temporal vars to save read data
         int x, y, z, i;
         MatrixXd slice(nDimX, nDimY);
+        SliceData sliceData(slice);
 
         for (frame=start_frame; frame<=end_frame; frame++)
         {
@@ -270,6 +273,7 @@ Mri Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int frame, bool headerOn
                     qDebug() << "loadMGH(" << fName << "): could not read "
                              << nBytesPerSlice << "at slice" << z;
                 }
+                sliceData.setSliceIdx(z);
 
                 // ------ Read in the entire volume -------
                 switch (type)
@@ -288,7 +292,8 @@ Mri Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int frame, bool headerOn
                           }
                       }
                     ++sliceCount;
-                    sliceDataList.append(slice);
+                    sliceData.setSliceMatrix(slice); // maybe fill already "sliceData" instead of "slice" above
+                    sliceDataList.append(sliceData);
                     break ;
                 case MRI_SHORT:
                     qDebug() << "### Debug watch out Shorts are coming! "
@@ -304,7 +309,8 @@ Mri Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int frame, bool headerOn
                           }
                       }
                     ++sliceCount;
-                    sliceDataList.append(slice);
+                    sliceData.setSliceMatrix(slice);
+                    sliceDataList.append(sliceData);
                     break ;
                 case MRI_TENSOR:
                 case MRI_FLOAT:
@@ -323,7 +329,8 @@ Mri Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int frame, bool headerOn
                        }
                     }
                     ++sliceCount;
-                    sliceDataList.append(slice);
+                    sliceData.setSliceMatrix(slice);
+                    sliceDataList.append(sliceData);
                     break;
                 case MRI_UCHAR:
                     //local_buffer_to_image(buf, mri, z, frame-start_frame); // todo
@@ -401,8 +408,8 @@ Mri Mgh::loadMGH(QString fName, Eigen::VectorXi slices, int frame, bool headerOn
     mri.fName = fName;
 
     mri.slices = sliceDataList;
-    //mri.slices.
     //mri.slices.getNewCube(sliceDataList);
+    //mri.cubeData.appendSlice
 
     return mri;
 //    return sliceDataList;

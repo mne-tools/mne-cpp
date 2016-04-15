@@ -61,26 +61,26 @@ SliceData::SliceData()
 
 SliceData::SliceData(MatrixXd slice)
 {
-    setDataAsMatrix(slice);
+    setSliceMatrix(slice);
     m_idx = 0; // first and only slice
 }
 
 SliceData::SliceData(MatrixXd slice, quint32 idx)
 {
-    setDataAsMatrix(slice);
+    setSliceMatrix(slice);
     m_idx = idx;
 }
 
 //*************************************************************************************************************
 
-inline MatrixXd SliceData::getDataAsMatrix()
+inline MatrixXd SliceData::getSliceMatrix()
 {
     return m_slice;
 }
 
 //*************************************************************************************************************
 
-inline void SliceData::setDataAsMatrix(MatrixXd slice)
+inline void SliceData::setSliceMatrix(MatrixXd slice)
 {
     // eventually clean m_slice before
     m_slice = slice;
@@ -109,6 +109,15 @@ inline double SliceData::getVoxel(int x, int y)
 }
 
 //*************************************************************************************************************
+
+void SliceData::setVoxel(int x, int y, double val)
+{
+   m_slice(x,y) = val;
+}
+
+//*************************************************************************************************************
+
+//todo: function to get dims of matrix
 
 SliceData::~SliceData()
 {

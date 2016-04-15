@@ -111,8 +111,8 @@ void MriViewer::loadMriFile(QString filePath)
 //*************************************************************************************************************
 
 void MriViewer::getPixmapFromSlice()
-{
-    MatrixXd t_mat = mri.slices[sliceIdx-1]; // chosen slice index
+{ 
+    MatrixXd t_mat = mri.slices[sliceIdx-1].getSliceMatrix(); // chosen slice index
     ImageSc imagesc(t_mat);
     imagesc.setColorMap("Bone");
     mriPixmap = imagesc.getPixmap();

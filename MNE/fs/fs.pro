@@ -89,10 +89,9 @@ SOURCES += \
     mgh.cpp \
     blendian.cpp \
     slicedata.cpp \
+    cubedata.cpp \
     3rdParty/miniz.c \
     3rdParty/tinfl.c \
-    cubedata.cpp
-
 
 HEADERS += \
     annotation.h\
@@ -106,7 +105,7 @@ HEADERS += \
     mgh.h \
     blendian.h \
     slicedata.h \
-    cubedata.h
+    cubedata.h \
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

@@ -70,10 +70,11 @@ public:
     SliceData(Eigen::MatrixXd slice);
     SliceData(Eigen::MatrixXd slice, quint32 idx);
     ~SliceData();
-    Eigen::MatrixXd getDataAsMatrix();
-    void setDataAsMatrix(Eigen::MatrixXd slice);
+    Eigen::MatrixXd getSliceMatrix();
     void setSliceIdx(quint32 idx);
+    void setSliceMatrix(Eigen::MatrixXd slice);
     double getVoxel(int x, int y);
+    void setVoxel(int x, int y, double val);
 
 private:
     Eigen::MatrixXd m_slice;
