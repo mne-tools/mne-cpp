@@ -238,7 +238,7 @@ QString FilterWindow::getChannelType()
 
 bool FilterWindow::userDesignedFiltersIsActive()
 {
-    for(int i=0; i<m_lActivationCheckBoxList.size(); i++) {
+    for(int i = 0; i < m_lActivationCheckBoxList.size(); i++) {
         if(m_lActivationCheckBoxList.at(i)->text() == "Activate user designed filter")
             return m_lActivationCheckBoxList.at(i)->isChecked();
     }
