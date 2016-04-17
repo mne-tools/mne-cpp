@@ -68,11 +68,11 @@
 // QT INCLUDES
 //=============================================================================================================
 
-
-
 #ifndef OK
 #define OK 0
 #endif
+
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -177,7 +177,7 @@ Sphere Sphere::fit_sphere_simplex(const MatrixX3f& points, double simplex_size)
 {
     VectorXf r0;
     float R;
-    fit_sphere_to_points_new( points, points.rows(), simplex_size, r0, R);
+    fit_sphere_to_points_new( points, simplex_size, r0, R);
 
     Vector3d center;
 
@@ -191,18 +191,19 @@ Sphere Sphere::fit_sphere_simplex(const MatrixX3f& points, double simplex_size)
 
 //*************************************************************************************************************
 //ToDo Replace LayoutMaker::fit_sphere_to_points
-bool Sphere::fit_sphere_to_points_new(const MatrixXf &rr,
-                                     int   np,
-                                     float simplex_size,
-                                     VectorXf &r0,
-                                     float &R)
+bool Sphere::fit_sphere_to_points_new ( const MatrixXf &rr,
+                                        float simplex_size,
+                                        VectorXf &r0,
+                                        float &R )
 {
+//    int   np = rr.rows();
+
     /*
     * Find the optimal sphere origin
     */
     fitUserRecNew user;
-    float      ftol            = (float) 1e-3;
-    int        max_eval        = 5000;
+    float      ftol            = (float) 1e-5;
+    int        max_eval        = 500;
     int        report_interval = -1;
     int        neval;
     MatrixXf   init_simplex;
@@ -215,19 +216,20 @@ bool Sphere::fit_sphere_to_points_new(const MatrixXf &rr,
     bool        res = false;
 
     user.rr = rr;
-    user.np = np;
 
     R0 = (float) 0.1;
-    calculate_cm_ave_dist_new(rr,np,cm,R0);
+    calculate_cm_ave_dist_new(rr, cm, R0);// [done]
+    qDebug() << "R0" << R0;
 
-    init_simplex = make_initial_simplex_new(cm,3,simplex_size);
+    init_simplex = make_initial_simplex_new( cm, simplex_size );
 
-    std::cout << "sphere origin calcuated" << cm[0] << " " << cm[1] << " " << cm[2] << std::endl;
+    std::cout << "sphere origin calcuated: " << cm[0] << ", " << cm[1] << ", " << cm[2] << std::endl;
 
-    user.report = false;
+    user.report = true;
 
-    for (k = 0; k < 4; k++)
-        init_vals[k] = fit_eval_new(static_cast<VectorXf>(init_simplex.row(k)),3,&user);
+    for (k = 0; k < 4; k++) {
+        init_vals[k] = fit_eval_new( static_cast<VectorXf>(init_simplex.row(k)), 3, &user );
+    }
 
     user.report = false;
 
@@ -269,49 +271,91 @@ int Sphere::report_func_new(int loop,
     */
     VectorXf r0 = fitpar;
 
-    std::cout<<"loop: "<<loop<<"r0: "<<1000*r0[0]<<1000*r0[1]<<1000*r0[2]<<"fval: "<<fval<<std::endl;
+    std::cout << "loop: " << loop << "; r0: " << 1000*r0[0] << ", r1: " << 1000*r0[1] << ", r2: " << 1000*r0[2] << "; fval: " << fval << std::endl;
 
     return OK;
 }
 
 //*************************************************************************************************************
 //ToDo Replace LayoutMaker::calculate_cm_ave_dist
-void Sphere::calculate_cm_ave_dist_new(const MatrixXf &rr,
-                                        int np,
+
+//void Sphere::calculate_cm_ave_dist_new (const MatrixXf &rr,
+//                                        VectorXf &cm,
+//                                        float &avep)
+//{
+//    int np = rr.rows();
+
+//    qDebug() << "rr:" << rr.rows() << "; np:" << np;
+
+//    int k,q;
+//    float ave;
+//    VectorXf diff(3);
+
+////    cm = VectorXf::Zero(cm.size());//Not needed
+//////    for (q = 0; q < 3; q++)
+//////        cm[q] = 0.0;
+
+
+////    cm = rr.colwise().sum(); //Not needed make directly mean
+//////    for (k = 0; k < np; k++)
+//////        for (q = 0; q < 3; q++)
+//////            cm[q] += rr(k,q);
+
+
+//    cm = rr.colwise().mean();
+
+//////    if (np > 0) {
+//////        for (q = 0; q < 3; q++)
+//////            cm[q] = cm[q]/np;
+////        std::cout << "cm " << cm << std::endl;
+
+//        for (k = 0, ave = 0.0; k < rr.rows(); k++) {
+
+////            for (q = 0; q < 3; q++)
+////                diff[q] = rr(k,q) - cm[q];
+
+//            VectorXf row = rr.row(k);
+//            diff = row - cm;
+
+//            ave += diff.norm();
+////            ave += sqrt(pow(diff(0),2) + pow(diff(1),2) + pow(diff(2),2));
+//        }
+
+//    if (np > 0) {
+//        avep = ave/np;
+
+//        qDebug() << "avep" << avep;
+//    }
+//}
+
+void Sphere::calculate_cm_ave_dist_new (const MatrixXf &rr,
                                         VectorXf &cm,
                                         float &avep)
 {
-    int k,q;
-    float ave;
+    float ave = 0.0;
     VectorXf diff(3);
 
-    for (q = 0; q < 3; q++)
-        cm[q] = 0.0;
+    cm = rr.colwise().mean();
 
-    for (k = 0; k < np; k++)
-        for (q = 0; q < 3; q++)
-            cm[q] += rr(k,q);
+    for (int k = 0; k < rr.rows(); ++k) {
+        VectorXf row = rr.row(k);
+        diff = row - cm;
+        ave += diff.norm();
+    }
 
-    if (np > 0) {
-        for (q = 0; q < 3; q++)
-        cm[q] = cm[q]/np;
-
-        for (k = 0, ave = 0.0; k < np; k++) {
-            for (q = 0; q < 3; q++)
-                diff[q] = rr(k,q) - cm[q];
-            ave += sqrt(pow(diff(0),2) + pow(diff(1),2) + pow(diff(2),2));
-        }
-        avep = ave/np;
+    if (rr.rows() > 0) {
+        avep = ave/rr.rows();
     }
 }
 
 
 //*************************************************************************************************************
 //ToDo Replace LayoutMaker::make_initial_simplex
-MatrixXf Sphere::make_initial_simplex_new(VectorXf &pars,
-                                        int    npar,
-                                        float  size)
+MatrixXf Sphere::make_initial_simplex_new(  VectorXf &pars,
+                                            float  size)
 {
+    int npar = pars.size();
+
     /*
     * Make the initial tetrahedron
     */
@@ -346,16 +390,16 @@ float Sphere::fit_eval_new(const VectorXf &fitpar,
     int   k;
     float sum,sum2,one,F;
 
-    for (k = 0, sum = sum2 = 0.0; k < user->np; k++) {
+    for (k = 0, sum = sum2 = 0.0; k < user->rr.rows(); k++) {
         diff = r0 - static_cast<VectorXf>(user->rr.row(k));
         one = sqrt(pow(diff(0),2) + pow(diff(1),2) + pow(diff(2),2));
         sum  += one;
         sum2 += one*one;
     }
-    F = sum2 - sum*sum/user->np;
+    F = sum2 - sum*sum/user->rr.rows();
 
     if(user->report)
-        std::cout<<"r0: "<<1000*r0[0]<<1000*r0[1]<<1000*r0[2]<<"R: "<<1000*sum/user->np<<"fval: "<<F<<std::endl;
+        std::cout << "r0: " << 1000*r0[0] << ", r1: " << 1000*r0[1] << ", r2: " << 1000*r0[2] << "; R: " << 1000*sum/user->rr.rows() << "; fval: "<<F<<std::endl;
 
     return F;
 }
@@ -369,11 +413,11 @@ float Sphere::opt_rad_new(VectorXf &r0,fitUserNew user)
   VectorXf diff(3);
   int   k;
 
-  for (k = 0, sum = 0.0; k < user->np; k++) {
+  for (k = 0, sum = 0.0; k < user->rr.rows(); k++) {
     diff = r0 - static_cast<VectorXf>(user->rr.row(k));
     one = sqrt(pow(diff(0),2) + pow(diff(1),2) + pow(diff(2),2));
     sum  += one;
   }
 
-  return sum/user->np;
+  return sum/user->rr.rows();
 }

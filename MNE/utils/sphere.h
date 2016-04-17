@@ -94,7 +94,6 @@ using namespace Eigen;
 
 typedef struct {
   MatrixXf rr;
-  int   np;
   bool   report;
 } *fitUserNew,fitUserRecNew;
 
@@ -166,20 +165,17 @@ private:
 
 
     //ToDo Replace LayoutMaker fit_sphere_to_points
-    static bool fit_sphere_to_points_new(const MatrixXf &rr,
-                                         int   np,
-                                         float simplex_size,
-                                         VectorXf &r0,
-                                         float &R);
+    static bool fit_sphere_to_points_new (  const MatrixXf &rr,
+                                            float simplex_size,
+                                            VectorXf &r0,
+                                            float &R );
 
-    static void calculate_cm_ave_dist_new(const MatrixXf &rr,
-                                      int np,
-                                      VectorXf &cm,
-                                      float &avep);
+    static void calculate_cm_ave_dist_new(  const MatrixXf &rr,
+                                            VectorXf &cm,
+                                            float &avep );
 
-    static MatrixXf make_initial_simplex_new(VectorXf &pars,
-                                            int    npar,
-                                            float  size);
+    static MatrixXf make_initial_simplex_new(   VectorXf &pars,
+                                                float  size);
 
     static float fit_eval_new(const VectorXf &fitpar,
                   int   npar,
