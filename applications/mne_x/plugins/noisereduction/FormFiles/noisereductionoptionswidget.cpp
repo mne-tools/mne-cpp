@@ -105,6 +105,14 @@ void NoiseReductionOptionsWidget::setFiffInfo(const FiffInfo::SPtr pFiffInfo)
 
 void NoiseReductionOptionsWidget::setAcquisitionSystem(const QString &sSystem)
 {
+    ui->m_label_nBaseFctsMag->show();
+    ui->m_spinBox_nBaseFctsMag->show();
+    ui->m_spinBox_nBaseFctsMag->show();
+
+    ui->m_label_nBaseFctsGrad->show();
+    ui->m_spinBox_nBaseFctsGrad->show();
+    ui->m_spinBox_nBaseFctsGrad->show();
+
     if(sSystem == "VectorView") {
         ui->m_label_nBaseFctsMag->setText("Mag");
         ui->m_spinBox_nBaseFctsMag->setMaximum(102);
@@ -123,6 +131,16 @@ void NoiseReductionOptionsWidget::setAcquisitionSystem(const QString &sSystem)
         ui->m_label_nBaseFctsGrad->setText("Inner layer");
         ui->m_spinBox_nBaseFctsGrad->setMaximum(270);
         ui->m_spinBox_nBaseFctsGrad->setValue(270);
+    }
+
+    if(sSystem == "EEG") {
+        ui->m_label_nBaseFctsMag->hide();
+        ui->m_spinBox_nBaseFctsMag->hide();
+        ui->m_spinBox_nBaseFctsMag->hide();
+
+        ui->m_label_nBaseFctsGrad->setText("EEG");
+        ui->m_spinBox_nBaseFctsGrad->setMaximum(256);
+        ui->m_spinBox_nBaseFctsGrad->setValue(256);
     }
 }
 
@@ -200,6 +218,11 @@ void NoiseReductionOptionsWidget::createProjectorGroup()
 {
     if(m_pFiffInfo)
     {
+        //If no projectors are defined return here
+        if(m_pFiffInfo->projs.empty()) {
+            return;
+        }
+
         m_qListProjCheckBox.clear();
         // Projection Selection
         QGridLayout *topLayout = new QGridLayout;
