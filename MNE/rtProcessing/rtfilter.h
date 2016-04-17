@@ -71,7 +71,7 @@
 // DEFINE NAMESPACE INVRTLIB
 //=============================================================================================================
 
-namespace RTINVLIB
+namespace RTPROCLIB
 {
 
 
