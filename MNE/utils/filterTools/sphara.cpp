@@ -81,8 +81,9 @@ MatrixXd Sphara::makeSpharaProjector(const MatrixXd& matBaseFct, const VectorXi&
                 if((r < vecIndices.rows() || c < vecIndices.rows()) && (rowIndex < matSpharaMultGrad.rows() || colIndex < matSpharaMultGrad.cols())) {
                     matSpharaOperator(vecIndices(r),vecIndices(c)) = matSpharaMultGrad(rowIndex,colIndex);
                 } else {
-                    qWarning()<<"Sphara::makeSpharaProjector - Index is out of range. Returning Zero matrix.";
-                    matSpharaOperator.setZero();
+                    qWarning()<<"Sphara::makeSpharaProjector - Index is out of range. Returning identity matrix.";
+                    //matSpharaOperator.setZero();
+                    matSpharaOperator = MatrixXd::Identity(iOperatorDim, iOperatorDim);
                     return matSpharaOperator;
                 }
 
