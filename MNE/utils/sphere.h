@@ -85,6 +85,25 @@ using namespace Eigen;
 //=============================================================================================================
 
 
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// TYPEDEFS
+//=============================================================================================================
+
+typedef struct {
+  MatrixXf rr;
+  int   np;
+  bool   report;
+} *fitUserNew,fitUserRecNew;
+
+
+
+
+
+
+
 //=============================================================================================================
 /**
 * Sphere descritpion
@@ -123,7 +142,7 @@ public:
     *
     * @return the fitted sphere.
     */
-    static Sphere simplex_fit_sphere(const MatrixX3f& points, double simplex_size = 2e-2);
+    static Sphere fit_sphere_simplex(const MatrixX3f& points, double simplex_size = 2e-2);
 
     //=========================================================================================================
     /**
@@ -144,6 +163,35 @@ public:
 private:
     Vector3d m_center;      /**< Sphere's center */
     double m_r;             /**< Sphere's radius */
+
+
+    //ToDo Replace LayoutMaker fit_sphere_to_points
+    static bool fit_sphere_to_points_new(const MatrixXf &rr,
+                                         int   np,
+                                         float simplex_size,
+                                         VectorXf &r0,
+                                         float &R);
+
+    static void calculate_cm_ave_dist_new(const MatrixXf &rr,
+                                      int np,
+                                      VectorXf &cm,
+                                      float &avep);
+
+    static MatrixXf make_initial_simplex_new(VectorXf &pars,
+                                            int    npar,
+                                            float  size);
+
+    static float fit_eval_new(const VectorXf &fitpar,
+                  int   npar,
+                  void  *user_data);
+
+    static int report_func_new(int loop,
+                   const VectorXf &fitpar,
+                   int npar,
+                   double fval);
+
+    static float opt_rad_new(VectorXf &r0,
+                  fitUserNew user);
 
 
 
