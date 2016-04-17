@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "sphere.h"
-#include "layoutmaker.h"
+#include "minimizersimplex.h"
 
 
 //*************************************************************************************************************
@@ -68,6 +68,11 @@
 // QT INCLUDES
 //=============================================================================================================
 
+
+
+#ifndef OK
+#define OK 0
+#endif
 
 
 //*************************************************************************************************************
@@ -168,11 +173,11 @@ Sphere Sphere::fit_sphere(const MatrixX3d& points)
 
 //*************************************************************************************************************
 
-Sphere Sphere::simplex_fit_sphere(const MatrixX3f& points, double simplex_size)
+Sphere Sphere::fit_sphere_simplex(const MatrixX3f& points, double simplex_size)
 {
     VectorXf r0;
     float R;
-    LayoutMaker::fit_sphere_to_points( points, points.rows(), simplex_size, r0, R);
+    fit_sphere_to_points_new( points, points.rows(), simplex_size, r0, R);
 
     Vector3d center;
 
@@ -183,3 +188,192 @@ Sphere Sphere::simplex_fit_sphere(const MatrixX3f& points, double simplex_size)
     return Sphere(center, R);
 }
 
+
+//*************************************************************************************************************
+//ToDo Replace LayoutMaker::fit_sphere_to_points
+bool Sphere::fit_sphere_to_points_new(const MatrixXf &rr,
+                                     int   np,
+                                     float simplex_size,
+                                     VectorXf &r0,
+                                     float &R)
+{
+    /*
+    * Find the optimal sphere origin
+    */
+    fitUserRecNew user;
+    float      ftol            = (float) 1e-3;
+    int        max_eval        = 5000;
+    int        report_interval = -1;
+    int        neval;
+    MatrixXf   init_simplex;
+    VectorXf   init_vals(4);
+
+    VectorXf   cm(3);
+    float      R0;
+    int        k;
+
+    bool        res = false;
+
+    user.rr = rr;
+    user.np = np;
+
+    R0 = (float) 0.1;
+    calculate_cm_ave_dist_new(rr,np,cm,R0);
+
+    init_simplex = make_initial_simplex_new(cm,3,simplex_size);
+
+    std::cout << "sphere origin calcuated" << cm[0] << " " << cm[1] << " " << cm[2] << std::endl;
+
+    user.report = false;
+
+    for (k = 0; k < 4; k++)
+        init_vals[k] = fit_eval_new(static_cast<VectorXf>(init_simplex.row(k)),3,&user);
+
+    user.report = false;
+
+    //Start the minimization
+    if(MinimizerSimplex::mne_simplex_minimize(init_simplex, /* The initial simplex */
+                            init_vals,                      /* Function values at the vertices */
+                            3,                              /* Number of variables */
+                            ftol,                           /* Relative convergence tolerance */
+                            fit_eval_new,                       /* The function to be evaluated */
+                            &user,                          /* Data to be passed to the above function in each evaluation */
+                            max_eval,                       /* Maximum number of function evaluations */
+                            neval,                          /* Number of function evaluations */
+                            report_interval,                /* How often to report (-1 = no_reporting) */
+                            report_func_new) != OK)             /* The function to be called when reporting */
+        return false;
+
+    r0[0] = init_simplex(0,0);
+    r0[1] = init_simplex(0,1);
+    r0[2] = init_simplex(0,2);
+    R = opt_rad_new(r0,&user);
+
+    res = true;
+
+    return res;
+}
+
+
+//*************************************************************************************************************
+//ToDo Replace LayoutMaker::report_func
+int Sphere::report_func_new(int loop,
+                             const VectorXf &fitpar,
+                             int npar,
+                             double fval)
+{
+    Q_UNUSED(npar);
+
+    /*
+    * Report periodically
+    */
+    VectorXf r0 = fitpar;
+
+    std::cout<<"loop: "<<loop<<"r0: "<<1000*r0[0]<<1000*r0[1]<<1000*r0[2]<<"fval: "<<fval<<std::endl;
+
+    return OK;
+}
+
+//*************************************************************************************************************
+//ToDo Replace LayoutMaker::calculate_cm_ave_dist
+void Sphere::calculate_cm_ave_dist_new(const MatrixXf &rr,
+                                        int np,
+                                        VectorXf &cm,
+                                        float &avep)
+{
+    int k,q;
+    float ave;
+    VectorXf diff(3);
+
+    for (q = 0; q < 3; q++)
+        cm[q] = 0.0;
+
+    for (k = 0; k < np; k++)
+        for (q = 0; q < 3; q++)
+            cm[q] += rr(k,q);
+
+    if (np > 0) {
+        for (q = 0; q < 3; q++)
+        cm[q] = cm[q]/np;
+
+        for (k = 0, ave = 0.0; k < np; k++) {
+            for (q = 0; q < 3; q++)
+                diff[q] = rr(k,q) - cm[q];
+            ave += sqrt(pow(diff(0),2) + pow(diff(1),2) + pow(diff(2),2));
+        }
+        avep = ave/np;
+    }
+}
+
+
+//*************************************************************************************************************
+//ToDo Replace LayoutMaker::make_initial_simplex
+MatrixXf Sphere::make_initial_simplex_new(VectorXf &pars,
+                                        int    npar,
+                                        float  size)
+{
+    /*
+    * Make the initial tetrahedron
+    */
+    MatrixXf simplex(npar+1,npar);
+    int k;
+
+    for (k = 0; k < npar+1; k++)
+        simplex.row(k) = pars;
+
+    for (k = 1; k < npar+1; k++)
+        simplex(k,k-1) = simplex(k,k-1) + size;
+
+    return simplex;
+}
+
+
+//*************************************************************************************************************
+//ToDo Replace LayoutMaker::fit_eval
+float Sphere::fit_eval_new(const VectorXf &fitpar,
+                          int   npar,
+                          void  *user_data)
+{
+    Q_UNUSED(npar);
+
+    /*
+    * Calculate the cost function value
+    * Optimize for the radius inside here
+    */
+    fitUserNew user = (fitUserNew)user_data;
+    VectorXf r0 = fitpar;
+    VectorXf diff(3);
+    int   k;
+    float sum,sum2,one,F;
+
+    for (k = 0, sum = sum2 = 0.0; k < user->np; k++) {
+        diff = r0 - static_cast<VectorXf>(user->rr.row(k));
+        one = sqrt(pow(diff(0),2) + pow(diff(1),2) + pow(diff(2),2));
+        sum  += one;
+        sum2 += one*one;
+    }
+    F = sum2 - sum*sum/user->np;
+
+    if(user->report)
+        std::cout<<"r0: "<<1000*r0[0]<<1000*r0[1]<<1000*r0[2]<<"R: "<<1000*sum/user->np<<"fval: "<<F<<std::endl;
+
+    return F;
+}
+
+
+//*************************************************************************************************************
+//ToDo Replace LayoutMaker::opt_rad
+float Sphere::opt_rad_new(VectorXf &r0,fitUserNew user)
+{
+  float sum, one;
+  VectorXf diff(3);
+  int   k;
+
+  for (k = 0, sum = 0.0; k < user->np; k++) {
+    diff = r0 - static_cast<VectorXf>(user->rr.row(k));
+    one = sqrt(pow(diff(0),2) + pow(diff(1),2) + pow(diff(2),2));
+    sum  += one;
+  }
+
+  return sum/user->np;
+}

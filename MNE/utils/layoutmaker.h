@@ -42,7 +42,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "minimizersimplex.h"
 #include "utils_global.h"
 #include <iostream>
 
@@ -166,13 +165,6 @@ public:
                            bool mirrorXAxis = false,
                            bool mirrorYAxis = false);
 
-
-    static int fit_sphere_to_points(const MatrixXf &rr,
-                             int   np,
-                             float simplex_size,
-                             VectorXf &r0,
-                             float &R);
-
 private:
     static void sphere_coord(float x,
                       float y,
@@ -201,6 +193,12 @@ private:
     static MatrixXf  make_initial_simplex(VectorXf &pars,
                                 int    npar,
                                 float  size);
+
+    static int fit_sphere_to_points(const MatrixXf &rr,
+                             int   np,
+                             float simplex_size,
+                             VectorXf &r0,
+                             float &R);
 };
 
 } //NAMESPACE
