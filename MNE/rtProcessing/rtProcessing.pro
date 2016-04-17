@@ -89,7 +89,8 @@ SOURCES += \
         rtinvop.cpp \
         rtave.cpp \
         rtnoise.cpp \
-        rthpis.cpp
+        rthpis.cpp \
+    rtfilter.cpp
 
 HEADERS +=  \
         rtprocessing_global.h \
@@ -97,7 +98,8 @@ HEADERS +=  \
         rtinvop.h \
         rtave.h \
         rtnoise.h \
-        rthpis.h
+        rthpis.h \
+    rtfilter.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
