@@ -372,11 +372,11 @@ public:
     * @param[out] vecResultFrequency     the amount of data that fits in the appropriate class ranges
     */
     template<typename T>
-    static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& vecResultClassLimits, Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic>& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
+    static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
     template<typename T>
-    static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::Matrix<double, Eigen::Dynamic, 1>& vecResultClassLimits, Eigen::Matrix<int, Eigen::Dynamic, 1>& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
+    static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
     template<typename T>
-    static void histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::Matrix<double, 1, Eigen::Dynamic>& vecResultClassLimits, Eigen::Matrix<int, 1, Eigen::Dynamic>& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
+    static void histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin = 0.0, double dGlobalMax= 0.0);
 };
 
 //*************************************************************************************************************
@@ -499,41 +499,34 @@ inline double MNEMath::log2( const T d)
 
 
 //*************************************************************************************************************
+
 template<typename T>
-void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::Matrix<double, Eigen::Dynamic, 1>& vecResultClassLimits, Eigen::Matrix<int, Eigen::Dynamic, 1>& vecResultFrequency, double dGlobalMin, double dGlobalMax)
+void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin, double dGlobalMax)
 {
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matRawData.rows(),1);
     matrixName.col(0)= matRawData;
-    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> matrixClassLimits(vecResultClassLimits.rows(),1);
-    matrixClassLimits.col(0)= vecResultClassLimits;
-    Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> matrixFrequency(vecResultFrequency.rows(),1);
-    matrixFrequency.col(0)= vecResultFrequency;
-    MNEMath::histcounts(matrixName, bMakeSymmetrical, iClassAmount, matrixClassLimits, matrixFrequency, dGlobalMin, dGlobalMax);
+    MNEMath::histcounts(matrixName, bMakeSymmetrical, iClassAmount, vecResultClassLimits, vecResultFrequency, dGlobalMin, dGlobalMax);
 }
 
 
 //*************************************************************************************************************
 
 template<typename T>
-void MNEMath::histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::Matrix<double, 1, Eigen::Dynamic>& vecResultClassLimits, Eigen::Matrix<int, 1, Eigen::Dynamic>& vecResultFrequency, double dGlobalMin, double dGlobalMax)
+void MNEMath::histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin, double dGlobalMax)
 {
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1,matRawData.cols());
     matrixName.row(0)= matRawData;
-    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> matrixClassLimits(1,vecResultClassLimits.cols());
-    matrixName.row(0)= vecResultClassLimits;
-    Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> matrixFrequency(1,vecResultFrequency.cols());
-    matrixName.row(0)= vecResultFrequency;
-    MNEMath::histcounts(matrixName, bMakeSymmetrical, iClassAmount, matrixClassLimits, matrixFrequency, dGlobalMin, dGlobalMax);
+    MNEMath::histcounts(matrixName, bMakeSymmetrical, iClassAmount, vecResultClassLimits, vecResultFrequency, dGlobalMin, dGlobalMax);
 }
 
 
 //*************************************************************************************************************
 
 template<typename T>
-void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& vecResultClassLimits, Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic>& vecResultFrequency, double dGlobalMin, double dGlobalMax)
+void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData, bool bMakeSymmetrical, int iClassAmount, Eigen::VectorXd& vecResultClassLimits, Eigen::VectorXi& vecResultFrequency, double dGlobalMin, double dGlobalMax)
 {
-    vecResultClassLimits.resize(iClassAmount + 1);
-    vecResultFrequency.resize(iClassAmount);
+   vecResultClassLimits.resize(iClassAmount + 1);
+   vecResultFrequency.resize(iClassAmount);
 
     for (int count = 0; count < iClassAmount; count++) //initialize the vector with zero values
     {
@@ -550,30 +543,34 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
     rawMin = matRawData.minCoeff();        //finds the raw matrix minimum value
     rawMax = matRawData.maxCoeff();        //finds the raw matrix maximum value
 
-    if (bMakeSymmetrical == true)       //in case the user wants the histogram to be symmetrical
+    if (bMakeSymmetrical == true)           //in case the user wants the histogram to have symmetrical class ranges
     {
-        if (abs(rawMin) > rawMax)       //in case the negative side is larger than the positive side
+            if (abs(rawMin) > rawMax)       //in case the negative side is larger than the positive side
+            {
+                localMax = abs(rawMin);     //positive side is "stretched" to the exact length as negative side
+                localMin = rawMin;
+            }
+        else if (rawMax > abs(rawMin))      //in case the positive side is larger than the negative side
         {
-            localMax = abs(rawMin);     //positive side is "stretched" to the exact length as negative side
-            localMin = rawMin;
+            localMin = -(rawMax);           //negative side is "stretched" to the exact length as positive side
+            localMax = rawMax;
         }
-    else if (rawMax > abs(rawMin))      //in case the positive side is larger than the negative side
-    {
-        localMin = -(rawMax);           //negative side is "stretched" to the exact length as positive side
-        localMax = rawMax;
+        else                                //in case both sides are exactly the same
+        {
+            localMin = rawMin;
+            localMax = rawMax;
+        }
     }
-    else                                //in case both sides are exactly the same
+    else                                    //in case bMakeSymmetrical == false
     {
         localMin = rawMin;
         localMax = rawMax;
     }
-    }
-
     //selects either local or global range (according to user preference and input)
     if (dGlobalMin == 0.0 && dGlobalMax == 0.0)               //if global range is NOT given by the user, use local ranges
     {
-        desiredMin = rawMin;
-        desiredMax = rawMax;
+        desiredMin = localMin;
+        desiredMax = localMax;
         vecResultClassLimits[0] = desiredMin;                 //replace default value with local minimum at position 0
         vecResultClassLimits[iClassAmount] = desiredMax;      //replace default value with local maximum at position n
     }
