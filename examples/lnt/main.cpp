@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
     QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
     // Load data
-    fiff_int_t setno = 1;
+    fiff_int_t setno = 3;
     QPair<QVariant, QVariant> baseline(QVariant(), 0);
     FiffEvoked evoked(t_fileEvoked, setno, baseline);
     if(evoked.isEmpty())
