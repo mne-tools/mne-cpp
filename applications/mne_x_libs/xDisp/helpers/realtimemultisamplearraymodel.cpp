@@ -1169,11 +1169,11 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently()
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &data, int dataIndex)
+void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &data, int iDataIndex)
 {
     //std::cout<<"START RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
 
-    if(dataIndex >= m_matDataFiltered.cols() || data.cols()<m_iMaxFilterLength)
+    if(iDataIndex >= m_matDataFiltered.cols() || data.cols()<m_iMaxFilterLength)
         return;
 
     if(data.rows() != m_matDataFiltered.rows()) {
@@ -1204,7 +1204,7 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
         int iFilteredNumberCols = timeData.at(0).second.second.cols();
 
         for(int r = 0; r<timeData.size(); r++) {
-            if(m_iCurrentSample+2*data.cols() > m_matDataRaw.cols()) {
+            if(iDataIndex+2*data.cols() > m_matDataRaw.cols()) {
                 //Handle last data block
                 //std::cout<<"Handle last data block"<<std::endl;
 
@@ -1216,17 +1216,17 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
                     tempData.head(m_iMaxFilterLength) += m_matOverlap.row(timeData.at(r).second.first);
 
                     //Write the newly calulated filtered data to the filter data matrix. Keep in mind that the current block also effect last part of the last block (begin at dataIndex-iFilterDelay).
-                    int start = dataIndex-iFilterDelay < 0 ? 0 : dataIndex-iFilterDelay;
+                    int start = iDataIndex-iFilterDelay < 0 ? 0 : iDataIndex-iFilterDelay;
                     m_matDataFiltered.row(timeData.at(r).second.first).segment(start,iFilteredNumberCols-m_iMaxFilterLength) = tempData.head(iFilteredNumberCols-m_iMaxFilterLength);
                 } else {
                     //Perform this else case everytime the filter was changed. Do not begin to plot from dataIndex-iFilterDelay because the impsulse response and m_matOverlap do not match with the new filter anymore.
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength);
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex+iFilterDelay,iFilteredNumberCols-2*m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,iFilteredNumberCols-2*m_iMaxFilterLength);
+                    m_matDataFiltered.row(timeData.at(r).second.first).segment(iDataIndex-iFilterDelay,m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength);
+                    m_matDataFiltered.row(timeData.at(r).second.first).segment(iDataIndex+iFilterDelay,iFilteredNumberCols-2*m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,iFilteredNumberCols-2*m_iMaxFilterLength);
                 }
 
                 //Refresh the m_matOverlap with the new calculated filtered data.
                 m_matOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
-            } else if(m_iCurrentSample == 0) {
+            } else if(iDataIndex == 0) {
                 //Handle first data block
                 //std::cout<<"Handle first data block"<<std::endl;
 
@@ -1263,11 +1263,11 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
                     tempData.head(m_iMaxFilterLength) += m_matOverlap.row(timeData.at(r).second.first);
 
                     //Write the newly calulated filtered data to the filter data matrix. Keep in mind that the current block also effect last part of the last block (begin at dataIndex-iFilterDelay).
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength) = tempData.head(iFilteredNumberCols-m_iMaxFilterLength);
+                    m_matDataFiltered.row(timeData.at(r).second.first).segment(iDataIndex-iFilterDelay,iFilteredNumberCols-m_iMaxFilterLength) = tempData.head(iFilteredNumberCols-m_iMaxFilterLength);
                 } else {
                     //Perform this else case everytime the filter was changed. Do not begin to plot from dataIndex-iFilterDelay because the impsulse response and m_matOverlap do not match with the new filter anymore.
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex-iFilterDelay,m_iMaxFilterLength).setZero();// = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength);
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(dataIndex+iFilterDelay,iFilteredNumberCols-2*m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,iFilteredNumberCols-2*m_iMaxFilterLength);
+                    m_matDataFiltered.row(timeData.at(r).second.first).segment(iDataIndex-iFilterDelay,m_iMaxFilterLength).setZero();// = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength);
+                    m_matDataFiltered.row(timeData.at(r).second.first).segment(iDataIndex+iFilterDelay,iFilteredNumberCols-2*m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength,iFilteredNumberCols-2*m_iMaxFilterLength);
                 }
 
                 //Refresh the m_matOverlap with the new calculated filtered data.
@@ -1280,7 +1280,7 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
 
     //Fill filtered data with raw data if the channel was not filtered
     for(int i = 0; i<notFilterChannelIndex.size(); i++)
-        m_matDataFiltered.row(notFilterChannelIndex.at(i)).segment(dataIndex,data.row(notFilterChannelIndex.at(i)).cols()) = data.row(notFilterChannelIndex.at(i));
+        m_matDataFiltered.row(notFilterChannelIndex.at(i)).segment(iDataIndex,data.row(notFilterChannelIndex.at(i)).cols()) = data.row(notFilterChannelIndex.at(i));
 
     //std::cout<<"END RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
 }

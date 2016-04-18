@@ -7,7 +7,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -48,6 +48,8 @@
 // FIFF INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Core>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -55,6 +57,8 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QtConcurrent/QtConcurrent>
+#include <QFuture>
 
 
 //*************************************************************************************************************
@@ -105,6 +109,15 @@ public:
     * Destroys the Real-time noise estimation object.
     */
     ~RtFilter();
+
+    //=========================================================================================================
+    /**
+    * Calculates the filtered version of the raw input data
+    *
+    * @param [in] data          data which is to be filtered
+    * @param [in] iDataIndex    current position in the global data matrix
+    */
+    void filterChannelsConcurrently(const Eigen::MatrixXd &data, int iDataIndex);
 
 protected:
 
