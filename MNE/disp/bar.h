@@ -105,21 +105,33 @@ class Bar : public QWidget
     public:
     //=========================================================================================================
     /**
-    * creates a bar chart histogram from 2 vectors: class limits and class frequency
+    * main function to create the histogram; calls function createPlot and splitCoefficient
     *
     * @param[in]  matClassLimitData      vector input filled with class limits
     * @param[in]  matClassFrequencyData  vector input filled with class frequency to the corresponding class
     * @param[in]  iClassCount            user input to determine the amount of classes in the histogram
     * @param[in]  iPrecisionValue        user input to determine the amount of digits of coefficient shown in the histogram
     */
-      Bar(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue);
-      Bar(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue);
+      Bar(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData, int iPrecisionValue);
+      Bar(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue);
 
 
     //=========================================================================================================
 
     private:
+    /**
+    * display a bar chart using Qtcharts
+    *
+    * @param[in]  matClassLimitData      vector input filled with class limits
+    * @param[in]  matClassFrequencyData  vector input filled with class frequency to the corresponding class
+    * @param[in]  iClassCount            user input to determine the amount of classes in the histogram
+    * @param[in]  iPrecisionValue        user input to determine the amount of digits of coefficient shown in the histogram
+    */
     void createPlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData, int iPrecisionValue);
+
+
+    //=========================================================================================================
+
     /**
     * splitCoefficientAndExponent takes in QVector value of coefficient and exponent (example: 1.2e-10) and finds the coefficient (1.2) and the appropriate exponent (-12), normalize the exponents to either the lowest or highest exponent in the list then places the values in two separate QVectors
     *
@@ -148,7 +160,7 @@ class Bar : public QWidget
 //=============================================================================================================
 
 template <class T>
-Bar<T>::Bar(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue)
+Bar<T>::Bar(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData, int iPrecisionValue)
 {
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matClassLimitData.rows(),1);
     matrixName.col(0)= matClassLimitData;
@@ -159,7 +171,7 @@ Bar<T>::Bar(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const 
 
 ////*************************************************************************************************************
 template <class T>
-Bar<T>::Bar(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue)
+Bar<T>::Bar(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue)
 {
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1, matClassLimitData.cols());
     matrixName.row(0)= matClassLimitData;

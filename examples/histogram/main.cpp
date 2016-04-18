@@ -80,10 +80,11 @@ using namespace DISPLIB;
 
 //=============================================================================================================
 
-//sineWaveGenerator used for debugging purposes only
+//sineWaveGenerator function - used to create synthetic data to test histogram functionality
 #ifndef M_PI
 const double M_PI = 3.14159265358979323846;
 #endif
+
 Eigen::VectorXd sineWaveGenerator(double amplitude, double xStep, int xNow, int xEnd)
 {
     unsigned int iterateAmount = ceil((xEnd-xNow)/xStep);
@@ -104,6 +105,7 @@ Eigen::VectorXd sineWaveGenerator(double amplitude, double xStep, int xNow, int 
 
 int main(int argc, char *argv[])
 {
+    //code to read sample data copied from readRaw example by Christoph Dinh
     QApplication a(argc, argv);
     QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
 
@@ -202,19 +204,21 @@ int main(int argc, char *argv[])
     }
 
     printf("Read %d samples.\n",(qint32)data.cols());
+
     Eigen::VectorXd dataSine;
-    dataSine = sineWaveGenerator(1.0e-30,(1.0/1e6), 0.0, 1.0);
-   // histogram calculation
+    dataSine = sineWaveGenerator(1.0e-30,(1.0/1e6), 0.0, 1.0);  //creates synthetic data using sineWaveGenerator function
+
     bool bMakeSymmetrical;
-    bMakeSymmetrical = false;      //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
-    int classAmount = 20;          //initialize the amount of classes and class frequencies
+    bMakeSymmetrical = true;       //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
+    int classAmount = 14;          //initialize the amount of classes and class frequencies
     double inputGlobalMin = 0.0,
            inputGlobalMax = 0.0;
     Eigen::VectorXd resultClassLimit;
     Eigen::VectorXi resultFrequency;
+    //start of the histogram calculation, similar to matlab function of the same name
     MNEMath::histcounts(dataSine, bMakeSymmetrical, classAmount, resultClassLimit, resultFrequency, inputGlobalMin, inputGlobalMax);   //user input to normalize and sort the data matrix
-    //below is the function for printing the results on command prompt (for debugging purposes)
-    int precision = 2;           //format for the amount digits of coefficient shown in the histogram
+    int precision = 2;             //format for the amount digits of coefficient shown in the histogram
+    //start of the histogram display function using Qtcharts
     Bar<double>* barObj = new Bar<double>(resultClassLimit, resultFrequency, precision);
     barObj->resize(400,300);
     barObj->show();
@@ -222,7 +226,6 @@ int main(int argc, char *argv[])
     std::cout << data.block(0,0,10,10);
     return a.exec();
 }
-
 
 
 //*************************************************************************************************************
