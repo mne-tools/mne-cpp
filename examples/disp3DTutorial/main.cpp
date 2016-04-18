@@ -246,7 +246,7 @@ int main(int argc, char *argv[])
         //rtItemList.at(0)->addData(sourceEstimate);
 
         //Init some rt related values
-        for(int i = 0; i<rtItemList.size(); i++) {
+        for(int i = 0; i < rtItemList.size(); ++i) {
             rtItemList.at(i)->setLoopState(true);
             rtItemList.at(i)->setTimeInterval(10);
             rtItemList.at(i)->setNumberAverages(1);
