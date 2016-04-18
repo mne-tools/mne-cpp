@@ -152,10 +152,14 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
     }
 
     //Add meta information as item children
+    QList<QStandardItem*> list;
+
     BrainTreeMetaItem* pItemRTDataStreamStatus = new BrainTreeMetaItem(BrainTreeMetaItemTypes::RTDataStreamStatus, "Stream data on/off");
     connect(pItemRTDataStreamStatus, &BrainTreeMetaItem::checkStateChanged,
             this, &BrainRTSourceLocDataTreeItem::onCheckStateWorkerChanged);
-    *this<<pItemRTDataStreamStatus;
+    list<<pItemRTDataStreamStatus;
+    list<<new QStandardItem(pItemRTDataStreamStatus->toolTip());
+    this->appendRow(list);
     pItemRTDataStreamStatus->setCheckable(true);
     pItemRTDataStreamStatus->setCheckState(Qt::Unchecked);
     data.setValue(false);
@@ -164,35 +168,50 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
     BrainTreeMetaItem* pItemVisuaizationType = new BrainTreeMetaItem(BrainTreeMetaItemTypes::RTDataVisualizationType, "Vertex based");
     connect(pItemVisuaizationType, &BrainTreeMetaItem::rtDataVisualizationTypeChanged,
             this, &BrainRTSourceLocDataTreeItem::onVisualizationTypeChanged);
-    *this<<pItemVisuaizationType;
+    list.clear();
+    list<<pItemVisuaizationType;
+    list<<new QStandardItem(pItemVisuaizationType->toolTip());
+    this->appendRow(list);
     data.setValue(QString("Single Vertex"));
     pItemVisuaizationType->setData(data, BrainTreeMetaItemRoles::RTDataVisualizationType);
 
     QString sIsClustered = isClustered ? "Clustered" : "Full";
     BrainTreeMetaItem* pItemSourceSpaceType = new BrainTreeMetaItem(BrainTreeMetaItemTypes::RTDataSourceSpaceType, sIsClustered);
     pItemSourceSpaceType->setEditable(false);
-    *this<<pItemSourceSpaceType;
+    list.clear();
+    list<<pItemSourceSpaceType;
+    list<<new QStandardItem(pItemSourceSpaceType->toolTip());
+    this->appendRow(list);
     data.setValue(sIsClustered);
     pItemSourceSpaceType->setData(data, BrainTreeMetaItemRoles::RTDataSourceSpaceType);
 
     BrainTreeMetaItem* pItemColormapType = new BrainTreeMetaItem(BrainTreeMetaItemTypes::RTDataColormapType, "Hot Negative 2");
     connect(pItemColormapType, &BrainTreeMetaItem::rtDataColormapTypeChanged,
             this, &BrainRTSourceLocDataTreeItem::onColormapTypeChanged);
-    *this<<pItemColormapType;
+    list.clear();
+    list<<pItemColormapType;
+    list<<new QStandardItem(pItemColormapType->toolTip());
+    this->appendRow(list);
     data.setValue(QString("Hot Negative 2"));
     pItemColormapType->setData(data, BrainTreeMetaItemRoles::RTDataColormapType);
 
     BrainTreeMetaItem* pItemSourceLocNormValue = new BrainTreeMetaItem(BrainTreeMetaItemTypes::RTDataNormalizationValue, "10.0");
     connect(pItemSourceLocNormValue, &BrainTreeMetaItem::rtDataNormalizationValueChanged,
             this, &BrainRTSourceLocDataTreeItem::onDataNormalizationValueChanged);
-    *this<<pItemSourceLocNormValue;
+    list.clear();
+    list<<pItemSourceLocNormValue;
+    list<<new QStandardItem(pItemSourceLocNormValue->toolTip());
+    this->appendRow(list);
     data.setValue(10.0);
     pItemSourceLocNormValue->setData(data, BrainTreeMetaItemRoles::RTDataNormalizationValue);
 
     BrainTreeMetaItem *pItemStreamingInterval = new BrainTreeMetaItem(BrainTreeMetaItemTypes::RTDataTimeInterval, "1000");
     connect(pItemStreamingInterval, &BrainTreeMetaItem::rtDataTimeIntervalChanged,
             this, &BrainRTSourceLocDataTreeItem::onTimeIntervalChanged);
-    *this<<pItemStreamingInterval;
+    list.clear();
+    list<<pItemStreamingInterval;
+    list<<new QStandardItem(pItemStreamingInterval->toolTip());
+    this->appendRow(list);
     data.setValue(1000);
     pItemStreamingInterval->setData(data, BrainTreeMetaItemRoles::RTDataTimeInterval);
 
@@ -201,12 +220,18 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
             this, &BrainRTSourceLocDataTreeItem::onCheckStateLoopedStateChanged);
     pItemLoopedStreaming->setCheckable(true);
     pItemLoopedStreaming->setCheckState(Qt::Checked);
-    *this<<pItemLoopedStreaming;
+    list.clear();
+    list<<pItemLoopedStreaming;
+    list<<new QStandardItem(pItemLoopedStreaming->toolTip());
+    this->appendRow(list);
 
     BrainTreeMetaItem *pItemAveragedStreaming = new BrainTreeMetaItem(BrainTreeMetaItemTypes::RTDataNumberAverages, "1");
     connect(pItemAveragedStreaming, &BrainTreeMetaItem::rtDataNumberAveragesChanged,
             this, &BrainRTSourceLocDataTreeItem::onNumberAveragesChanged);
-    *this<<pItemAveragedStreaming;
+    list.clear();
+    list<<pItemAveragedStreaming;
+    list<<new QStandardItem(pItemAveragedStreaming->toolTip());
+    this->appendRow(list);
     data.setValue(1);
     pItemAveragedStreaming->setData(data, BrainTreeMetaItemRoles::RTDataNumberAverages);
 
