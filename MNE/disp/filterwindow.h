@@ -158,6 +158,21 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the new filter parameters.
+    *
+    * @param[in] hp                 Highpass frequency.
+    * @param[in] lp                 Lowpass frequency.
+    * @param[in] order              The order of the.
+    * @param[in] type               The filter type.
+    * @param[in] designMethod       The filter design method.
+    * @param[in] transition         The transition frequency.
+    * @param[in] activateFilter     The filter activation flag.
+    * @param[in] channelType        the channel Type.
+    */
+    void setFilterParameters(double hp, double lp, int order, int type, int designMethod, double transition, bool activateFilter, const QString &sChannelType);
+
+    //=========================================================================================================
+    /**
     * Returns the current filter.
     *
     * @return returns the list with the currently active filters
@@ -182,11 +197,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the new samplingRate.
+    * Returns the current channel type which is to be filtered.
     *
-    * @param[in] dSamplingRate the new sampling rate
+    * @return returns the channel type.
     */
-    void setFilterParameters(double hp, double lp, int order, int type, int designMethod, double transition, bool activateFilter);
+    QString getChannelType();
 
     //=========================================================================================================
     /**
