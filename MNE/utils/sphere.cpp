@@ -223,7 +223,11 @@ bool Sphere::fit_sphere_to_points_new ( const MatrixXf &rr,
 
     init_simplex = make_initial_simplex_new( cm, simplex_size );
 
-    std::cout << "sphere origin calcuated: " << cm[0] << ", " << cm[1] << ", " << cm[2] << std::endl;
+    std::cout << "sphere origin calcuated: " << std::endl << cm << std::endl;
+
+    std::cout << "init_simplex: " << std::endl << init_simplex << std::endl;
+
+    std::cout << "simplex_size: " << std::endl << simplex_size << std::endl;
 
     user.report = true;
 
@@ -291,22 +295,22 @@ void Sphere::calculate_cm_ave_dist_new (const MatrixXf &rr,
 
 //*************************************************************************************************************
 //ToDo Replace LayoutMaker::make_initial_simplex
-MatrixXf Sphere::make_initial_simplex_new(  VectorXf &pars,
-                                            float  size)
+MatrixXf Sphere::make_initial_simplex_new(  const VectorXf &pars,
+                                            float size )
 {
-    int npar = pars.size();
-
     /*
     * Make the initial tetrahedron
     */
-    MatrixXf simplex(npar+1,npar);
-    int k;
 
-    for (k = 0; k < npar+1; k++)
-        simplex.row(k) = pars;
+    int npar = pars.size();
 
-    for (k = 1; k < npar+1; k++)
-        simplex(k,k-1) = simplex(k,k-1) + size;
+    MatrixXf simplex = MatrixXf::Zero(npar+1,npar);
+
+    simplex.rowwise() += pars.transpose();
+
+    for (int k = 1; k < npar+1; k++) {
+        simplex(k,k-1) += size;
+    }
 
     return simplex;
 }
