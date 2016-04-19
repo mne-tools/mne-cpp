@@ -139,6 +139,7 @@ void FilterWindow::setMaxFilterTaps(int iMaxNumberFilterTaps)
         iMaxNumberFilterTaps = 512;
 
     ui->m_spinBox_filterTaps->setMaximum(iMaxNumberFilterTaps);
+    ui->m_spinBox_filterTaps->setMinimum(16);
 
     //Update filter depending on new window size
     filterParametersChanged();
@@ -156,6 +157,43 @@ void FilterWindow::setSamplingRate(double dSamplingRate)
 
     if(ui->m_doubleSpinBox_lowpass->value()>m_dSFreq/2)
         ui->m_doubleSpinBox_lowpass->setValue(m_dSFreq/2);
+
+    filterParametersChanged();
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::setFilterParameters(double hp, double lp, int order, int type, int designMethod, double transition, bool activateFilter, const QString &sChannelType)
+{
+    ui->m_doubleSpinBox_highpass->setValue(lp);
+    ui->m_doubleSpinBox_lowpass->setValue(hp);
+    ui->m_spinBox_filterTaps->setValue(order);
+
+    if(type == 0)
+        ui->m_comboBox_filterType->setCurrentText("Lowpass");
+    if(type == 1)
+        ui->m_comboBox_filterType->setCurrentText("Highpass");
+    if(type == 2)
+        ui->m_comboBox_filterType->setCurrentText("Bandpass");
+    if(type == 3)
+        ui->m_comboBox_filterType->setCurrentText("Notch");
+
+    if(designMethod == 0)
+        ui->m_comboBox_designMethod->setCurrentText("Tschebyscheff");
+    if(designMethod == 1)
+        ui->m_comboBox_designMethod->setCurrentText("Cosine");
+
+    ui->m_doubleSpinBox_transitionband->setValue(transition);
+
+    for(int i=0; i<m_lActivationCheckBoxList.size(); i++) {
+        if(m_lActivationCheckBoxList.at(i)->text() == "Activate user designed filter")
+            m_lActivationCheckBoxList.at(i)->setChecked(activateFilter);
+    }
+
+    ui->m_comboBox_filterApplyTo->setCurrentText(sChannelType);
+
+    filterActivated(activateFilter);
 
     filterParametersChanged();
 }
@@ -190,36 +228,9 @@ QList<QCheckBox*> FilterWindow::getActivationCheckBoxList()
 
 //*************************************************************************************************************
 
-void FilterWindow::setFilterParameters(double hp, double lp, int order, int type, int designMethod, double transition, bool activateFilter)
+QString FilterWindow::getChannelType()
 {
-    ui->m_doubleSpinBox_highpass->setValue(lp);
-    ui->m_doubleSpinBox_lowpass->setValue(hp);
-    ui->m_spinBox_filterTaps->setValue(order);
-
-    if(type == 0)
-        ui->m_comboBox_filterType->setCurrentText("Lowpass");
-    if(type == 1)
-        ui->m_comboBox_filterType->setCurrentText("Highpass");
-    if(type == 2)
-        ui->m_comboBox_filterType->setCurrentText("Bandpass");
-    if(type == 3)
-        ui->m_comboBox_filterType->setCurrentText("Notch");
-
-    if(designMethod == 0)
-        ui->m_comboBox_designMethod->setCurrentText("Tschebyscheff");
-    if(designMethod == 1)
-        ui->m_comboBox_designMethod->setCurrentText("Cosine");
-
-    ui->m_doubleSpinBox_transitionband->setValue(transition);
-
-    for(int i=0; i<m_lActivationCheckBoxList.size(); i++) {
-        if(m_lActivationCheckBoxList.at(i)->text() == "Activate user designed filter")
-            m_lActivationCheckBoxList.at(i)->setChecked(activateFilter);
-    }
-
-    filterActivated(activateFilter);
-
-    filterParametersChanged();
+    return ui->m_comboBox_filterApplyTo->currentText();
 }
 
 
@@ -227,7 +238,7 @@ void FilterWindow::setFilterParameters(double hp, double lp, int order, int type
 
 bool FilterWindow::userDesignedFiltersIsActive()
 {
-    for(int i=0; i<m_lActivationCheckBoxList.size(); i++) {
+    for(int i = 0; i < m_lActivationCheckBoxList.size(); i++) {
         if(m_lActivationCheckBoxList.at(i)->text() == "Activate user designed filter")
             return m_lActivationCheckBoxList.at(i)->isChecked();
     }

@@ -180,12 +180,6 @@ protected slots:
 protected:
     //=========================================================================================================
     /**
-    * IAlgorithm function
-    */
-    virtual void run();
-
-    //=========================================================================================================
-    /**
     * Toggle visibilty the visibility of the options toolbar widget.
     */
     void showOptionsWidget();
@@ -201,6 +195,12 @@ protected:
     * Create/Update the SPHARA projection operator.
     */
     void createSpharaOperator();
+
+    //=========================================================================================================
+    /**
+    * IAlgorithm function
+    */
+    virtual void run();
 
 private:
     QMutex                          m_mutex;                                    /**< The threads mutex.*/
@@ -218,19 +218,19 @@ private:
     Eigen::VectorXi                 m_vecIndicesSecondVV;                       /**< The indices of the channels to pick for the second SPHARA oerpator in case of a VectorView system.*/
     Eigen::VectorXi                 m_vecIndicesFirstBabyMEG;                   /**< The indices of the channels to pick for the first SPHARA oerpator in case of a BabyMEG system.*/
     Eigen::VectorXi                 m_vecIndicesSecondBabyMEG;                  /**< The indices of the channels to pick for the second SPHARA oerpator in case of a BabyMEG system.*/
+    Eigen::VectorXi                 m_vecIndicesFirstEEG;                       /**< The indices of the channels to pick for the second SPHARA operator in case of an EEG system.*/
 
     Eigen::SparseMatrix<double>     m_matSparseSpharaMult;                      /**< The final sparse SPHARA operator .*/
-    Eigen::SparseMatrix<double>     m_matSparseSpharaProjMult;                  /**< The final sparse SPHARA + projection operator.*/
-    Eigen::SparseMatrix<double>     m_matSparseSpharaCompMult;                  /**< The final sparse SPHARA + compensator operator.*/
     Eigen::SparseMatrix<double>     m_matSparseProjCompMult;                    /**< The final sparse projection + compensator operator.*/
-    Eigen::SparseMatrix<double>     m_matSparseProj;                            /**< Sparse SSP projector */
-    Eigen::SparseMatrix<double>     m_matSparseComp;                            /**< Sparse compensator matrix */
-    Eigen::SparseMatrix<double>     m_matSparseFull;                            /**< Full multiplication matrix  */
+    Eigen::SparseMatrix<double>     m_matSparseProjMult;                        /**< The final sparse SSP projector */
+    Eigen::SparseMatrix<double>     m_matSparseCompMult;                        /**< The final sparse compensator matrix */
+    Eigen::SparseMatrix<double>     m_matSparseFull;                            /**< The final sparse full multiplication matrix  */
 
     Eigen::MatrixXd                 m_matSpharaVVGradLoaded;                    /**< The loaded VectorView gradiometer basis functions.*/
     Eigen::MatrixXd                 m_matSpharaVVMagLoaded;                     /**< The loaded VectorView magnetometer basis functions.*/
     Eigen::MatrixXd                 m_matSpharaBabyMEGInnerLoaded;              /**< The loaded babyMEG inner layer basis functions.*/
     Eigen::MatrixXd                 m_matSpharaBabyMEGOuterLoaded;              /**< The loaded babyMEG outer layer basis functions.*/
+    Eigen::MatrixXd                 m_matSpharaEEGLoaded;                       /**< The loaded EEG basis functions.*/
 
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                /**< Fiff measurement info.*/
 
