@@ -95,6 +95,14 @@ void  BrainHemisphereTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
+int  BrainHemisphereTreeItem::columnCount() const
+{
+    return 2;
+}
+
+
+//*************************************************************************************************************
+
 bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Set name of BrainHemisphereTreeItem based on the hemisphere information
@@ -120,7 +128,12 @@ bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation&
 
     //Add surface child
     m_pSurfaceItem = new BrainSurfaceTreeItem(BrainTreeModelItemTypes::SurfaceItem);
-    *this<<m_pSurfaceItem;
+
+    QList<QStandardItem*> list;
+    list<<m_pSurfaceItem;
+    list<<new QStandardItem(m_pSurfaceItem->toolTip());
+    this->appendRow(list);
+
     state = m_pSurfaceItem->addData(tSurface, p3DEntityParent);
 
     //Add annotation child
@@ -129,7 +142,11 @@ bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation&
         connect(m_pAnnotItem, &BrainAnnotationTreeItem::annotationVisibiltyChanged,
                 m_pSurfaceItem, &BrainSurfaceTreeItem::onAnnotationVisibilityChanged);
 
-        *this<<m_pAnnotItem;
+        list.clear();
+        list<<m_pAnnotItem;
+        list<<new QStandardItem(m_pAnnotItem->toolTip());
+        this->appendRow(list);
+
         state = m_pAnnotItem->addData(tSurface, tAnnotation);
     }
 
@@ -166,7 +183,12 @@ bool BrainHemisphereTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore
 
     //Add surface child
     BrainSourceSpaceTreeItem* pSourceSpaceItem = new BrainSourceSpaceTreeItem(BrainTreeModelItemTypes::SourceSpaceItem);
-    *this<<pSourceSpaceItem;
+
+    QList<QStandardItem*> list;
+    list<<pSourceSpaceItem;
+    list<<new QStandardItem(pSourceSpaceItem->toolTip());
+    this->appendRow(list);
+
     state = pSourceSpaceItem->addData(tHemisphere, p3DEntityParent);
 
     return state;
@@ -183,7 +205,11 @@ BrainRTSourceLocDataTreeItem* BrainHemisphereTreeItem::addData(const MNESourceEs
             //If rt data item does not exists yet, create it here!
             if(!tForwardSolution.isEmpty()) {
                 m_pBrainRTSourceLocDataTreeItem = new BrainRTSourceLocDataTreeItem();
-                *this<<m_pBrainRTSourceLocDataTreeItem;
+
+                QList<QStandardItem*> list;
+                list<<m_pBrainRTSourceLocDataTreeItem;
+                list<<new QStandardItem(m_pBrainRTSourceLocDataTreeItem->toolTip());
+                this->appendRow(list);
 
                 connect(m_pBrainRTSourceLocDataTreeItem, &BrainRTSourceLocDataTreeItem::rtVertColorChanged,
                         m_pSurfaceItem, &BrainSurfaceTreeItem::onRtVertColorChanged);
