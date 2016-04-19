@@ -1,5 +1,5 @@
 /**
-* @file     bar.cpp
+* @file     spline.cpp
 * @author   Ricky Tjen <ricky270@student.sgu.ac.id>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
@@ -28,7 +28,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    implementation of bar class
+* @brief    implementation of spline class
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "bar.h"
+#include "spline.h"
 
 
 //*************************************************************************************************************
