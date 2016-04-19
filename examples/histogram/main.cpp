@@ -49,6 +49,7 @@
 #include <mne/mne.h>
 #include <utils/mnemath.h>
 #include <disp/bar.h>
+#include <disp/spline.h>
 
 
 //*************************************************************************************************************
@@ -209,17 +210,20 @@ int main(int argc, char *argv[])
     dataSine = sineWaveGenerator(1.0e-30,(1.0/1e6), 0.0, 1.0);  //creates synthetic data using sineWaveGenerator function
 
     bool bMakeSymmetrical;
-    bMakeSymmetrical = true;       //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
-    int classAmount = 14;          //initialize the amount of classes and class frequencies
+    bMakeSymmetrical = false;       //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
+    int classAmount = 50;          //initialize the amount of classes and class frequencies
     double inputGlobalMin = 0.0,
            inputGlobalMax = 0.0;
     Eigen::VectorXd resultClassLimit;
     Eigen::VectorXi resultFrequency;
     //start of the histogram calculation, similar to matlab function of the same name
-    MNEMath::histcounts(dataSine, bMakeSymmetrical, classAmount, resultClassLimit, resultFrequency, inputGlobalMin, inputGlobalMax);   //user input to normalize and sort the data matrix
+    MNEMath::histcounts(data, bMakeSymmetrical, classAmount, resultClassLimit, resultFrequency, inputGlobalMin, inputGlobalMax);   //user input to normalize and sort the data matrix
+    std::cout << "resultClassLimits = " << resultClassLimit << std::endl;
+    std::cout << "resultFrequency = " << resultFrequency << std::endl;
     int precision = 2;             //format for the amount digits of coefficient shown in the histogram
     //start of the histogram display function using Qtcharts
-    Bar<double>* barObj = new Bar<double>(resultClassLimit, resultFrequency, precision);
+    Spline<double>* barObj = new Spline<double>(resultClassLimit, resultFrequency, precision);
+    //Bar<double>* barObj = new Bar<double>(resultClassLimit, resultFrequency, precision);
     barObj->resize(400,300);
     barObj->show();
 
