@@ -279,73 +279,13 @@ int Sphere::report_func_new(int loop,
 //*************************************************************************************************************
 //ToDo Replace LayoutMaker::calculate_cm_ave_dist
 
-//void Sphere::calculate_cm_ave_dist_new (const MatrixXf &rr,
-//                                        VectorXf &cm,
-//                                        float &avep)
-//{
-//    int np = rr.rows();
-
-//    qDebug() << "rr:" << rr.rows() << "; np:" << np;
-
-//    int k,q;
-//    float ave;
-//    VectorXf diff(3);
-
-////    cm = VectorXf::Zero(cm.size());//Not needed
-//////    for (q = 0; q < 3; q++)
-//////        cm[q] = 0.0;
-
-
-////    cm = rr.colwise().sum(); //Not needed make directly mean
-//////    for (k = 0; k < np; k++)
-//////        for (q = 0; q < 3; q++)
-//////            cm[q] += rr(k,q);
-
-
-//    cm = rr.colwise().mean();
-
-//////    if (np > 0) {
-//////        for (q = 0; q < 3; q++)
-//////            cm[q] = cm[q]/np;
-////        std::cout << "cm " << cm << std::endl;
-
-//        for (k = 0, ave = 0.0; k < rr.rows(); k++) {
-
-////            for (q = 0; q < 3; q++)
-////                diff[q] = rr(k,q) - cm[q];
-
-//            VectorXf row = rr.row(k);
-//            diff = row - cm;
-
-//            ave += diff.norm();
-////            ave += sqrt(pow(diff(0),2) + pow(diff(1),2) + pow(diff(2),2));
-//        }
-
-//    if (np > 0) {
-//        avep = ave/np;
-
-//        qDebug() << "avep" << avep;
-//    }
-//}
-
 void Sphere::calculate_cm_ave_dist_new (const MatrixXf &rr,
                                         VectorXf &cm,
                                         float &avep)
 {
-    float ave = 0.0;
-    VectorXf diff(3);
-
     cm = rr.colwise().mean();
-
-    for (int k = 0; k < rr.rows(); ++k) {
-        VectorXf row = rr.row(k);
-        diff = row - cm;
-        ave += diff.norm();
-    }
-
-    if (rr.rows() > 0) {
-        avep = ave/rr.rows();
-    }
+    MatrixXf diff = rr.rowwise() - cm.transpose();
+    avep = diff.rowwise().norm().mean();
 }
 
 
