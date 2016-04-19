@@ -186,7 +186,7 @@ float MinimizerSimplex::tryit(MatrixXf p,
         ptry[j] = psum[j]*fac1-p(ihi,j)*fac2;
 
     ytry = (*func)(ptry,ndim,user_data);
-    ++(neval);
+    ++neval;
 
     if (ytry < y[ihi]) {
         y[ihi] = ytry;

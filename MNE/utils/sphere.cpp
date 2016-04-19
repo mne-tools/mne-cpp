@@ -219,20 +219,14 @@ bool Sphere::fit_sphere_to_points_new ( const MatrixXf &rr,
 
     R0 = (float) 0.1;
     calculate_cm_ave_dist_new(rr, cm, R0);// [done]
-    qDebug() << "R0" << R0;
 
     init_simplex = make_initial_simplex_new( cm, simplex_size );
-
-    std::cout << "sphere origin calcuated: " << std::endl << cm << std::endl;
-
-    std::cout << "init_simplex: " << std::endl << init_simplex << std::endl;
-
-    std::cout << "simplex_size: " << std::endl << simplex_size << std::endl;
 
     user.report = true;
 
     for (k = 0; k < 4; k++) {
         init_vals[k] = fit_eval_new( static_cast<VectorXf>(init_simplex.row(k)), 3, &user );
+        qDebug() << "k" << k << "; init_vals" << init_vals[k];
     }
 
     user.report = false;
@@ -242,7 +236,7 @@ bool Sphere::fit_sphere_to_points_new ( const MatrixXf &rr,
                             init_vals,                      /* Function values at the vertices */
                             3,                              /* Number of variables */
                             ftol,                           /* Relative convergence tolerance */
-                            fit_eval_new,                       /* The function to be evaluated */
+                            fit_eval_new,                   /* The function to be evaluated */
                             &user,                          /* Data to be passed to the above function in each evaluation */
                             max_eval,                       /* Maximum number of function evaluations */
                             neval,                          /* Number of function evaluations */
@@ -318,28 +312,27 @@ MatrixXf Sphere::make_initial_simplex_new(  const VectorXf &pars,
 
 //*************************************************************************************************************
 //ToDo Replace LayoutMaker::fit_eval
-float Sphere::fit_eval_new(const VectorXf &fitpar,
-                          int   npar,
-                          void  *user_data)
+float Sphere::fit_eval_new (    const VectorXf &fitpar,
+                                int   npar,
+                                void  *user_data)
 {
-    Q_UNUSED(npar);
+    Q_UNUSED(npar)
 
     /*
     * Calculate the cost function value
     * Optimize for the radius inside here
     */
     fitUserNew user = (fitUserNew)user_data;
-    VectorXf r0 = fitpar;
-    VectorXf diff(3);
-    int   k;
-    float sum,sum2,one,F;
+    const VectorXf& r0 = fitpar;
 
-    for (k = 0, sum = sum2 = 0.0; k < user->rr.rows(); k++) {
-        diff = r0 - static_cast<VectorXf>(user->rr.row(k));
-        one = sqrt(pow(diff(0),2) + pow(diff(1),2) + pow(diff(2),2));
-        sum  += one;
-        sum2 += one*one;
-    }
+    float F;
+
+    MatrixXf diff = (user->rr.rowwise() - r0.transpose())*-1;
+    VectorXf one = diff.rowwise().norm();
+
+    float sum = one.sum();
+    float sum2 = one.dot(one);
+
     F = sum2 - sum*sum/user->rr.rows();
 
     if(user->report)
