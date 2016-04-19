@@ -103,10 +103,10 @@ signals:
 public slots:
 
 private:
-    void changePreStim(qint32 mSeconds);
-    void changePostStim(qint32 mSeconds);
-    void changeBaselineFrom(qint32 mSeconds);
-    void changeBaselineTo(qint32 mSeconds);
+    void changePreStim();
+    void changePostStim();
+    void changeBaselineFrom();
+    void changeBaselineTo();
 
     Ui::AverageSettingsWidgetClass ui;		/**< Holds the user interface for the AverageSettingsWidgetClass.*/
 

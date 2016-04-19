@@ -4,11 +4,11 @@
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     April, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of an lnt application
+* @brief    Example of dipole fit
 *
 */
 
@@ -39,18 +39,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/view3D.h>
-#include <disp3D/control/control3dwidget.h>
-
-#include <fs/label.h>
-#include <fs/surface.h>
-#include <fs/annotationset.h>
-
-#include <fiff/fiff_evoked.h>
-#include <mne/mne_sourceestimate.h>
-#include <inverse/minimumNorm/minimumnorm.h>
-
 #include <iostream>
+#include <vector>
+#include <math.h>
+
+
+#include <fiff/fiff.h>
+#include <mne/mne.h>
 
 
 //*************************************************************************************************************
@@ -58,8 +53,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
-#include <QSet>
+#include <QtCore/QCoreApplication>
+#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
@@ -67,11 +62,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FSLIB;
 using namespace FIFFLIB;
-using namespace INVERSELIB;
-using namespace DISP3DLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -90,88 +82,51 @@ using namespace DISP3DLIB;
 */
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QCoreApplication app(argc, argv);
+
+
+
+
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Clustered Inverse Example");
+    parser.addHelpOption();
+    QCommandLineOption sampleFwdFileOption("f", "Path to forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption sampleCovFileOption("c", "Path to covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QCommandLineOption sampleEvokedFileOption("e", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption sampleTransFileOption("t", "Path to trans <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif");
+    parser.addOption(sampleFwdFileOption);
+    parser.addOption(sampleCovFileOption);
+    parser.addOption(sampleEvokedFileOption);
+    parser.addOption(sampleTransFileOption);
+    parser.process(app);
 
     //########################################################################################
     // Source Estimate
-
-    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
-    SurfaceSet t_surfSet("sample", 2, "white", "./MNE-sample-data/subjects");
-
-    QString t_sFileClusteredInverse("");//QFile t_fileClusteredInverse("./clusteredInverse-inv.fif");
-
-    double snr = 1.0;
-    double lambda2 = 1.0 / pow(snr, 2);
-    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
+    QFile fileFwd(parser.value(sampleFwdFileOption));
+    QFile fileCov(parser.value(sampleCovFileOption));
+    QFile fileEvoked(parser.value(sampleEvokedFileOption));
+    QFile fileTrans(parser.value(sampleTransFileOption));
 
     // Load data
-    fiff_int_t setno = 3;
+    fiff_int_t setno = 0;
     QPair<QVariant, QVariant> baseline(QVariant(), 0);
-    FiffEvoked evoked(t_fileEvoked, setno, baseline);
+    FiffEvoked evoked(fileEvoked, setno, baseline);
     if(evoked.isEmpty())
         return 1;
 
-    std::cout << "Evoked description: " << evoked.comment.toLatin1().constData() << std::endl;
+    std::cout << "evoked first " << evoked.first << "; last " << evoked.last << std::endl;
 
-    MNEForwardSolution t_Fwd(t_fileFwd);
-    if(t_Fwd.isEmpty())
+    MNEForwardSolution fwd(fileFwd);
+    if(fwd.isEmpty())
         return 1;
 
-    FiffCov noise_cov(t_fileCov);
+    FiffCoordTrans trans(fileTrans);
 
-    // regularize noise covariance
-    noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
-
-    //
-    // Cluster forward solution;
-    //
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 40);
-
-    //
-    // make an inverse operators
-    //
-    FiffInfo info = evoked.info;
-
-    MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
-
-    if(!t_sFileClusteredInverse.isEmpty())
-    {
-        QFile t_fileClusteredInverse(t_sFileClusteredInverse);
-        inverse_operator.write(t_fileClusteredInverse);
-    }
-
-    //
-    // Compute inverse solution
-    //
-    MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-    MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
-
-    if(sourceEstimate.isEmpty())
-        return 1;
-
-//    // View activation time-series
-//    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
-//    std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
-//    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
-//    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
-//    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
-
-    //Source Estimate end
-    //########################################################################################
-
-    View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addBrainData("HemiLRSet", t_surfSet, t_annotationSet);
-
-    QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("HemiLRSet", sourceEstimate, t_clusteredFwd);
-
-    testWindow->show();
-
-    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->setView3D(testWindow);
-    control3DWidget->show();
-
-    return a.exec();
+    return app.exec();
 }
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
