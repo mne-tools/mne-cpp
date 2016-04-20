@@ -213,8 +213,6 @@ bool Sphere::fit_sphere_to_points_new ( const MatrixXf &rr,
     float      R0;
     int        k;
 
-    bool        res = false;
-
     user.rr = rr;
 
     R0 = (float) 0.1;
@@ -222,36 +220,31 @@ bool Sphere::fit_sphere_to_points_new ( const MatrixXf &rr,
 
     init_simplex = make_initial_simplex_new( cm, simplex_size );
 
-    user.report = true;
+    user.report = false;
 
     for (k = 0; k < 4; k++) {
         init_vals[k] = fit_eval_new( static_cast<VectorXf>(init_simplex.row(k)), 3, &user );
-        qDebug() << "k" << k << "; init_vals" << init_vals[k];
     }
 
     user.report = false;
 
     //Start the minimization
-    if(MinimizerSimplex::mne_simplex_minimize(init_simplex, /* The initial simplex */
-                            init_vals,                      /* Function values at the vertices */
-                            3,                              /* Number of variables */
-                            ftol,                           /* Relative convergence tolerance */
-                            fit_eval_new,                   /* The function to be evaluated */
-                            &user,                          /* Data to be passed to the above function in each evaluation */
-                            max_eval,                       /* Maximum number of function evaluations */
-                            neval,                          /* Number of function evaluations */
-                            report_interval,                /* How often to report (-1 = no_reporting) */
-                            report_func_new) != OK)             /* The function to be called when reporting */
+    if(!MinimizerSimplex::mne_simplex_minimize( init_simplex,   /* The initial simplex */
+                                                init_vals,      /* Function values at the vertices */
+                                                3,              /* Number of variables */
+                                                ftol,           /* Relative convergence tolerance */
+                                                fit_eval_new,   /* The function to be evaluated */
+                                                &user,          /* Data to be passed to the above function in each evaluation */
+                                                max_eval,       /* Maximum number of function evaluations */
+                                                neval,          /* Number of function evaluations */
+                                                report_interval,/* How often to report (-1 = no_reporting) */
+                                                report_func_new)) /* The function to be called when reporting */
         return false;
 
-    r0[0] = init_simplex(0,0);
-    r0[1] = init_simplex(0,1);
-    r0[2] = init_simplex(0,2);
-    R = opt_rad_new(r0,&user);
+    r0 = init_simplex.row(0);
+    R = opt_rad_new(r0, &user);
 
-    res = true;
-
-    return res;
+    return true;
 }
 
 
@@ -314,7 +307,7 @@ MatrixXf Sphere::make_initial_simplex_new(  const VectorXf &pars,
 //ToDo Replace LayoutMaker::fit_eval
 float Sphere::fit_eval_new (    const VectorXf &fitpar,
                                 int   npar,
-                                void  *user_data)
+                                const void  *user_data)
 {
     Q_UNUSED(npar)
 
@@ -322,7 +315,7 @@ float Sphere::fit_eval_new (    const VectorXf &fitpar,
     * Calculate the cost function value
     * Optimize for the radius inside here
     */
-    fitUserNew user = (fitUserNew)user_data;
+    const fitUserNew& user = (fitUserNew)user_data;
     const VectorXf& r0 = fitpar;
 
     float F;
@@ -344,17 +337,8 @@ float Sphere::fit_eval_new (    const VectorXf &fitpar,
 
 //*************************************************************************************************************
 //ToDo Replace LayoutMaker::opt_rad
-float Sphere::opt_rad_new(VectorXf &r0,fitUserNew user)
+float Sphere::opt_rad_new(const VectorXf &r0,const fitUserNew user)
 {
-  float sum, one;
-  VectorXf diff(3);
-  int   k;
-
-  for (k = 0, sum = 0.0; k < user->rr.rows(); k++) {
-    diff = r0 - static_cast<VectorXf>(user->rr.row(k));
-    one = sqrt(pow(diff(0),2) + pow(diff(1),2) + pow(diff(2),2));
-    sum  += one;
-  }
-
-  return sum/user->rr.rows();
+  MatrixXf diff = ( user->rr.rowwise() - r0.transpose() ) * -1;
+  return diff.rowwise().norm().mean();
 }

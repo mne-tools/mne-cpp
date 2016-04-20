@@ -173,17 +173,17 @@ private:
                       float *theta,
                       float *phi);
 
-    static int report_func(int loop,
-                   const VectorXf &fitpar,
-                   int npar,
-                   double fval);
+    static int report_func( int loop,
+                            const VectorXf &fitpar,
+                            int npar,
+                            double fval);
 
-    static float fit_eval(const VectorXf &fitpar,
-                  int   npar,
-                  void  *user_data);
+    static float fit_eval(  const VectorXf &fitpar,
+                            int   npar,
+                            const void  *user_data);
 
-    static float opt_rad(VectorXf &r0,
-                  fitUser user);
+    static float opt_rad(   const VectorXf &r0,
+                            fitUser user);
 
     static void calculate_cm_ave_dist(const MatrixXf &rr,
                                int np,

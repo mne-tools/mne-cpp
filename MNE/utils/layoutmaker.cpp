@@ -266,8 +266,8 @@ int LayoutMaker::report_func(int loop,
 //*************************************************************************************************************
 
 float LayoutMaker::fit_eval(const VectorXf &fitpar,
-                          int   npar,
-                          void  *user_data)
+                            int   npar,
+                            const void  *user_data)
 {
     Q_UNUSED(npar);
 
@@ -275,7 +275,7 @@ float LayoutMaker::fit_eval(const VectorXf &fitpar,
     * Calculate the cost function value
     * Optimize for the radius inside here
     */
-    fitUser user = (fitUser)user_data;
+    const fitUser& user = (fitUser)user_data;
     VectorXf r0 = fitpar;
     VectorXf diff(3);
     int   k;
@@ -298,7 +298,7 @@ float LayoutMaker::fit_eval(const VectorXf &fitpar,
 
 //*************************************************************************************************************
 
-float LayoutMaker::opt_rad(VectorXf &r0,fitUser user)
+float LayoutMaker::opt_rad( const VectorXf &r0,fitUser user)
 {
   float sum, one;
   VectorXf diff(3);
@@ -411,16 +411,16 @@ int LayoutMaker::fit_sphere_to_points(const MatrixXf &rr,
     user.report = FALSE;
 
     //Start the minimization
-    if(MinimizerSimplex::mne_simplex_minimize(init_simplex, /* The initial simplex */
-                            init_vals,                      /* Function values at the vertices */
-                            3,                              /* Number of variables */
-                            ftol,                           /* Relative convergence tolerance */
-                            fit_eval,                       /* The function to be evaluated */
-                            &user,                          /* Data to be passed to the above function in each evaluation */
-                            max_eval,                       /* Maximum number of function evaluations */
-                            neval,                          /* Number of function evaluations */
-                            report_interval,                /* How often to report (-1 = no_reporting) */
-                            report_func) != OK)             /* The function to be called when reporting */
+    if( !MinimizerSimplex::mne_simplex_minimize(init_simplex,   /* The initial simplex */
+                                                init_vals,      /* Function values at the vertices */
+                                                3,              /* Number of variables */
+                                                ftol,           /* Relative convergence tolerance */
+                                                fit_eval,       /* The function to be evaluated */
+                                                &user,          /* Data to be passed to the above function in each evaluation */
+                                                max_eval,       /* Maximum number of function evaluations */
+                                                neval,          /* Number of function evaluations */
+                                                report_interval,/* How often to report (-1 = no_reporting) */
+                                                report_func))   /* The function to be called when reporting */
         return FALSE;
 
     r0[0] = init_simplex(0,0);
