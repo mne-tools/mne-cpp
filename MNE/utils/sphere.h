@@ -174,8 +174,8 @@ private:
                                             VectorXf &cm,
                                             float &avep );
 
-    static MatrixXf make_initial_simplex_new(   VectorXf &pars,
-                                                float  size);
+    static MatrixXf make_initial_simplex_new(   const VectorXf &pars,
+                                                float  size );
 
     static float fit_eval_new(const VectorXf &fitpar,
                   int   npar,
