@@ -60,6 +60,7 @@ RealTimeEvokedModel::RealTimeEvokedModel(QObject *parent)
 , m_fSps(1024.0f)
 , m_bIsFreezed(false)
 , m_bProjActivated(false)
+, m_bCompActivated(false)
 {
 
 }
@@ -278,10 +279,25 @@ void RealTimeEvokedModel::updateData()
 
     bool doProj = m_bProjActivated && m_matData.cols() > 0 && m_matData.rows() == m_matProj.cols() ? true : false;
 
-    if(!doProj)
-        m_matData = m_pRTE->getValue()->data;
-    else
-        m_matData = m_matSparseProj * m_pRTE->getValue()->data;
+    bool doComp = m_bCompActivated && m_matData.cols() > 0 && m_matData.rows() == m_matComp.cols() ? true : false;
+
+    if(doComp) {
+        if(doProj) {
+            //Comp + Proj
+            m_matData = m_matSparseProjCompMult * m_pRTE->getValue()->data;
+        } else {
+            //Comp
+            m_matData = m_matSparseCompMult * m_pRTE->getValue()->data;
+        }
+    } else {
+        if(doProj) {
+            //Proj
+            m_matData = m_matSparseProjMult * m_pRTE->getValue()->data;
+        } else {
+            //None - Raw
+            m_matData = m_pRTE->getValue()->data;
+        }
+    }
 
     m_pairBaseline = m_pRTE->getValue()->baseline;
 
@@ -453,9 +469,65 @@ void RealTimeEvokedModel::updateProjection()
                 if(m_matProj(i,k) != 0)
                     tripletList.push_back(T(i, k, m_matProj(i,k)));
 
-        m_matSparseProj = SparseMatrix<double>(m_matProj.rows(),m_matProj.cols());
+        m_matSparseProjMult = SparseMatrix<double>(m_matProj.rows(),m_matProj.cols());
         if(tripletList.size() > 0)
-            m_matSparseProj.setFromTriplets(tripletList.begin(), tripletList.end());
+            m_matSparseProjMult.setFromTriplets(tripletList.begin(), tripletList.end());
+
+        //Create full multiplication matrix
+        m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeEvokedModel::updateCompensator(int to)
+{
+    //
+    //  Update the compensator
+    //
+    if(m_pRTE->info())
+    {
+        if(to == 0)
+            m_bCompActivated = false;
+        else
+            m_bCompActivated = true;
+
+//        qDebug()<<"to"<<to;
+//        qDebug()<<"from"<<from;
+//        qDebug()<<"m_bCompActivated"<<m_bCompActivated;
+
+        FiffCtfComp newComp;
+        m_pRTE->info()->make_compensator(0, to, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
+
+        //We do not need to call this->m_pFiffInfo->set_current_comp(to);
+        //Because we will set the compensators to the coil in the same FiffInfo which is already used to write to file.
+        //Note that the data is written in raw form not in compensated form.
+        m_matComp = newComp.data->data;
+
+        //
+        // Make proj sparse
+        //
+        qint32 nchan = m_pRTE->info()->nchan;
+        qint32 i, k;
+
+        typedef Eigen::Triplet<double> T;
+        std::vector<T> tripletList;
+        tripletList.reserve(nchan);
+
+        tripletList.clear();
+        tripletList.reserve(m_matComp.rows()*m_matComp.cols());
+        for(i = 0; i < m_matComp.rows(); ++i)
+            for(k = 0; k < m_matComp.cols(); ++k)
+                if(m_matComp(i,k) != 0)
+                    tripletList.push_back(T(i, k, m_matComp(i,k)));
+
+        m_matSparseCompMult = SparseMatrix<double>(m_matComp.rows(),m_matComp.cols());
+        if(tripletList.size() > 0)
+            m_matSparseCompMult.setFromTriplets(tripletList.begin(), tripletList.end());
+
+        //Create full multiplication matrix
+        m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
     }
 }
 
