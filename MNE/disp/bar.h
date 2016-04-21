@@ -1,6 +1,4 @@
 //=============================================================================================================
-//=============================================================================================================
-
 /**
 * @file     bar.h
 * @author   Ricky Tjen <ricky270@student.sgu.ac.id>;
@@ -31,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    bar class declaration
+* @brief    Bar class declaration
 *
 */
 
@@ -42,7 +40,9 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+
 #include "disp_global.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -71,7 +71,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
 namespace DISPLIB
@@ -83,8 +83,8 @@ namespace DISPLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
 QT_CHARTS_USE_NAMESPACE
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -93,45 +93,53 @@ QT_CHARTS_USE_NAMESPACE
 
 
 //=============================================================================================================
-
-/** histogram display using Qtcharts, similar to matlab bar graph
+/**
+* Histogram display using Qtcharts, similar to matlab bar graph
 *
-*
-* @brief bar class for histogram display using Qtcharts
+* @brief Bar class for histogram display using QtCharts
 */
-template <class T>
-class Bar : public QWidget
+class DISPSHARED_EXPORT Bar : public QWidget
 {
-    public:
+
+public:
+    typedef QSharedPointer<Bar> SPtr;            /**< Shared pointer type for Bar. */
+    typedef QSharedPointer<const Bar> ConstSPtr; /**< Const shared pointer type for Bar. */
+
     //=========================================================================================================
     /**
-    * main function to create the histogram; calls function createPlot and splitCoefficient
+    * The constructor.
+    */
+    Bar(const QString& title = "", QWidget* parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Sets new data to the bar chart using QtCharts
     *
     * @param[in]  matClassLimitData      vector input filled with class limits
     * @param[in]  matClassFrequencyData  vector input filled with class frequency to the corresponding class
-    * @param[in]  iClassCount            user input to determine the amount of classes in the histogram
     * @param[in]  iPrecisionValue        user input to determine the amount of digits of coefficient shown in the histogram
     */
-      Bar(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData, int iPrecisionValue);
-      Bar(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue);
+    template<typename T>
+    void setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData, int iPrecisionValue);
+    template<typename T>
+    void setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue);
 
+private:
+    QChart*             m_pChart;
+    QBarCategoryAxis*   m_pAxis;
 
     //=========================================================================================================
-
-    private:
     /**
-    * display a bar chart using Qtcharts
+    * Updates the bar plot with the new data
     *
     * @param[in]  matClassLimitData      vector input filled with class limits
     * @param[in]  matClassFrequencyData  vector input filled with class frequency to the corresponding class
-    * @param[in]  iClassCount            user input to determine the amount of classes in the histogram
     * @param[in]  iPrecisionValue        user input to determine the amount of digits of coefficient shown in the histogram
     */
-    void createPlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData, int iPrecisionValue);
-
+    template<typename T>
+    void updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue);
 
     //=========================================================================================================
-
     /**
     * splitCoefficientAndExponent takes in QVector value of coefficient and exponent (example: 1.2e-10) and finds the coefficient (1.2) and the appropriate exponent (-12), normalize the exponents to either the lowest or highest exponent in the list then places the values in two separate QVectors
     *
@@ -140,16 +148,14 @@ class Bar : public QWidget
     * @param[out] vecCoefficientResults  vector filled with values of coefficient only
     * @param[out] vecExponentResults     vector filled with values of exponent only
     */
-//      template<typename T>
+
 //      void splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
 //      template<typename T>
 //      void splitCoefficientAndExponent (const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
 //      template<typename T>
 //      void splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
-      void splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
-
-
-    //=========================================================================================================
+    template<typename T>
+    void splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
 
 };
 
@@ -159,40 +165,42 @@ class Bar : public QWidget
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-template <class T>
-Bar<T>::Bar(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData, int iPrecisionValue)
+template<typename T>
+void Bar::setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData, int iPrecisionValue)
 {
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matClassLimitData.rows(),1);
     matrixName.col(0)= matClassLimitData;
-    this->createPlot(matrixName, matClassFrequencyData, iPrecisionValue);
 
+    this->updatePlot(matrixName, matClassFrequencyData, iPrecisionValue);
 }
 
 
-////*************************************************************************************************************
-template <class T>
-Bar<T>::Bar(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue)
+//*************************************************************************************************************
+
+template<typename T>
+void Bar::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue)
 {
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1, matClassLimitData.cols());
     matrixName.row(0)= matClassLimitData;
-    this->createPlot(matrixName, matClassFrequencyData, iPrecisionValue);
+
+    this->updatePlot(matrixName, matClassFrequencyData, iPrecisionValue);
 }
 
 
-////*************************************************************************************************************
+//*************************************************************************************************************
 
-template<class T>
-void Bar<T>::createPlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData, int iPrecisionValue)
+template<typename T>
+void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue)
 {
     Eigen::VectorXd resultDisplayValues;
     Eigen::VectorXi resultExponentValues;
     int iClassAmount = matClassFrequencyData.rows();
-    Bar::splitCoefficientAndExponent (matClassLimitData, iClassAmount, resultDisplayValues, resultExponentValues);
+    this->splitCoefficientAndExponent (matClassLimitData, iClassAmount, resultDisplayValues, resultExponentValues);
 
-    //  Start of Qtchart histogram display
+    //Setup legends
     QString histogramExponent;
     histogramExponent = "X-axis scale: 10e" + QString::number(resultExponentValues(0));
-    QBarSet *set = new QBarSet(histogramExponent);
+    QBarSet* set = new QBarSet(histogramExponent);
     QStringList categories;
     QString currentLimits;
     int classFreq;
@@ -205,30 +213,17 @@ void Bar<T>::createPlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
         *set << classFreq;
     }
 
-    //  Start of Qtchart histogram display
+    //Create new series, then clear the plot and update with new data
     QBarSeries *series = new QBarSeries();
     series->append(set);
 
-    QChart *chart = new QChart();
-    chart->addSeries(series);
-    chart->setTitle("MNE-CPP Histogram Example");
-    chart->setAnimationOptions(QChart::SeriesAnimations);
+    m_pChart->removeAllSeries();
+    m_pChart->addSeries(series);
 
-    QBarCategoryAxis *axis = new QBarCategoryAxis();
-    axis->append(categories);
-    chart->createDefaultAxes();
-    chart->setAxisX(axis, series);
-
-    chart->legend()->setVisible(true);
-    chart->legend()->setAlignment(Qt::AlignBottom);
-
-    QChartView *chartView = new QChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
-
-    QGridLayout* layout = new QGridLayout();
-
-    layout->addWidget(chartView,0,0);
-    this->setLayout(layout);
+    m_pAxis->clear();
+    m_pAxis->append(categories);
+    m_pChart->createDefaultAxes();
+    m_pChart->setAxisX(m_pAxis, series);
 }
 
 
@@ -256,8 +251,8 @@ void Bar<T>::createPlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
 
 //*************************************************************************************************************
 
-template <class T>
-void Bar<T>::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
+template <typename T>
+void Bar::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
 {
     vecCoefficientResults.resize(iClassAmount + 1);
     vecExponentValues.resize(iClassAmount + 1);
