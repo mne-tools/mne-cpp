@@ -98,11 +98,6 @@ typedef struct {
 } *fitUserNew,fitUserRecNew;
 
 
-
-
-
-
-
 //=============================================================================================================
 /**
 * Sphere descritpion
@@ -120,7 +115,7 @@ public:
     * @param[in] center     The sphere's center
     * @param[in] radius     The sphere's radius
     */
-    Sphere( Vector3d center, double radius );
+    Sphere( const Vector3f& center, float radius );
 
     //=========================================================================================================
     /**
@@ -130,7 +125,7 @@ public:
     *
     * @return the fitted sphere.
     */
-    static Sphere fit_sphere(const MatrixX3d& points);
+    static Sphere fit_sphere(const MatrixX3f& points);
 
     //=========================================================================================================
     /**
@@ -149,7 +144,7 @@ public:
     *
     * @return the fitted sphere.
     */
-    Vector3d& center() { return m_center; }
+    Vector3f& center() { return m_center; }
 
     //=========================================================================================================
     /**
@@ -157,11 +152,11 @@ public:
     *
     * @return the fitted sphere.
     */
-    double& radius() { return m_r; }
+    float& radius() { return m_r; }
 
 private:
-    Vector3d m_center;      /**< Sphere's center */
-    double m_r;             /**< Sphere's radius */
+    Vector3f m_center;      /**< Sphere's center */
+    float m_r;             /**< Sphere's radius */
 
 
     //ToDo Replace LayoutMaker fit_sphere_to_points
