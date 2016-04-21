@@ -53,7 +53,7 @@
 #include <QMainWindow>
 #include <QtCharts/QChartView>
 #include <QtCharts/QSplineSeries>
-
+#include <QtCharts/QBarCategoryAxis>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -91,12 +91,23 @@ QT_CHARTS_USE_NAMESPACE
 /** histogram display using Qtcharts/QSpline
 *
 *
-* @brief class template for histogram display using Qtcharts/QSpline
+* @brief Spline class for histogram display using Qtcharts/QSpline
 */
-template <class T>
-class Spline: public QWidget
+class DISPSHARED_EXPORT Spline: public QWidget
 {
-    public:
+public:
+    typedef QSharedPointer<Spline> SPtr;            /**< Shared pointer type for Spline. */
+    typedef QSharedPointer<const Spline> ConstSPtr; /**< Const shared pointer type for Spline. */
+
+
+    //=========================================================================================================
+
+    /**
+    * The constructor for Spline
+    */
+    Spline(const QString& title = "Spline Histogram", QWidget* parent = 0);
+
+
     //=========================================================================================================
 
     /**
@@ -104,27 +115,30 @@ class Spline: public QWidget
     *
     * @param[in]  matClassLimitData      vector input filled with class limits
     * @param[in]  matClassFrequencyData  vector input filled with class frequency to the corresponding class
-    * @param[in]  iClassCount            user input to determine the amount of classes in the histogram
     * @param[in]  iPrecisionValue        user input to determine the amount of digits of coefficient shown in the histogram
     */
-    Spline(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData, int iPrecisionValue);
-    Spline(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue);
+    template<typename T>
+    void setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData, int iPrecisionValue);
+    template<typename T>
+    void setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue);
 
-
-    //=========================================================================================================
 
     private:
 
+    QChart*             m_pChart;
+    QBarCategoryAxis*   m_pAxis;
+
+
     //=========================================================================================================
     /**
-    * display a chart using QSpline
+    * Updates the spline with new data
     *
     * @param[in]  matClassLimitData      vector input filled with class limits
     * @param[in]  matClassFrequencyData  vector input filled with class frequency to the corresponding class
-    * @param[in]  iClassCount            user input to determine the amount of classes in the histogram
     * @param[in]  iPrecisionValue        user input to determine the amount of digits of coefficient shown in the histogram
     */
-    void createSpline(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData, int iPrecisionValue);
+    template<typename T>
+    void updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData, int iPrecisionValue);
 
 
     //=========================================================================================================
@@ -137,11 +151,8 @@ class Spline: public QWidget
     * @param[out] vecCoefficientResults  vector filled with values of coefficient only
     * @param[out] vecExponentResults     vector filled with values of exponent only
     */
+    template<typename T>
     void splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
-
-
-
-//=========================================================================================================
 
 };
 
@@ -151,39 +162,41 @@ class Spline: public QWidget
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-  template <class T>
-  Spline<T>::Spline(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData, int iPrecisionValue)
+template <typename T>
+void Spline::setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData, int iPrecisionValue)
   {
       Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matClassLimitData.rows(),1);
       matrixName.col(0)= matClassLimitData;
-      this->createSpline(matrixName, matClassFrequencyData, iPrecisionValue);
+
+      this->updatePlot(matrixName, matClassFrequencyData, iPrecisionValue);
   }
 
 
   ////*************************************************************************************************************
-  template <class T>
-  Spline<T>::Spline(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue)
+
+template <typename T>
+void Spline::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue)
   {
       Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1, matClassLimitData.cols());
       matrixName.row(0)= matClassLimitData;
-      this->createSpline(matrixName, matClassFrequencyData, iPrecisionValue);
+
+      this->updatePlot(matrixName, matClassFrequencyData, iPrecisionValue);
   }
 
 
   ////*************************************************************************************************************
 
-  template<class T>
-  void Spline<T>::createSpline(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData, int iPrecisionValue)
+template<typename T>
+  void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData, int iPrecisionValue)
   {
       Eigen::VectorXd resultDisplayValues;
       Eigen::VectorXi resultExponentValues;
       int iClassAmount = matClassFrequencyData.rows();
-      Spline::splitCoefficientAndExponent (matClassLimitData, iClassAmount, resultDisplayValues, resultExponentValues);
+      this->splitCoefficientAndExponent (matClassLimitData, iClassAmount, resultDisplayValues, resultExponentValues);
 
       //  Start of Qtchart histogram display
       QString histogramExponent;
       histogramExponent = "X-axis scale: 10e" + QString::number(resultExponentValues(0));   //used to tell the user the exponential scale used in the histogram
-      int classFreq;
 
       QSplineSeries *series = new QSplineSeries();
       series->setName(histogramExponent);
@@ -191,7 +204,7 @@ class Spline: public QWidget
       double minAxisX = resultDisplayValues(0),
              maxAxisX = resultDisplayValues(iClassAmount),
              classMark;                         //class mark is the middle point between lower and upper class limit
-      int maximumFrequency = 0;                     //maximumFrequency used to create an intuitive histogram
+      int maximumFrequency = 0;                 //maximumFrequency used to create an intuitive histogram
       for (int ir=0; ir < iClassAmount; ir++)
       {
           classMark = (resultDisplayValues(ir) + resultDisplayValues(ir+1))/2;
@@ -202,30 +215,21 @@ class Spline: public QWidget
               maximumFrequency = matClassFrequencyData(ir);
           }
       }
-      std::cout << "Maximum Frequency = " << maximumFrequency <<std::endl;
-      QChart *chart = new QChart();
-      chart->addSeries(series);
-      chart->legend()->setVisible(true);
-      chart->legend()->setAlignment(Qt::AlignBottom);
-      chart->setTitle("Spline Histogram");
-      chart->createDefaultAxes();
-      chart->axisX()->setRange(minAxisX, maxAxisX);
-      chart->axisY()->setRange(0, maximumFrequency);
 
-      QChartView *chartView = new QChartView(chart);
-      chartView->setRenderHint(QPainter::Antialiasing);
+      //create new series and then clear the plot and update with new data
+      m_pChart->removeAllSeries();
+      m_pChart->addSeries(series);
 
-      QGridLayout* layout = new QGridLayout();
-
-      layout->addWidget(chartView,0,0);
-      this->setLayout(layout);
+      m_pChart->createDefaultAxes();
+      m_pChart->axisX()->setRange(minAxisX, maxAxisX);
+      m_pChart->axisY()->setRange(0,maximumFrequency);
   }
 
 
  //*************************************************************************************************************
 
-  template <class T>
-  void Spline<T>::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
+template <typename T>
+  void Spline::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
   {
       vecCoefficientResults.resize(iClassAmount + 1);
       vecExponentValues.resize(iClassAmount + 1);

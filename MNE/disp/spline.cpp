@@ -54,6 +54,24 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================Bar::Bar(const VectorXd& matClassLimitData, VectorXi& matClassFrequencyData, int iPrecisionValue)
 
+Spline::Spline(const QString& title, QWidget* parent) : QWidget(parent)
+{
+    m_pChart = new QChart();
+    m_pChart->setTitle(title);
+    m_pChart->setAnimationOptions(QChart::SeriesAnimations);
+
+    m_pAxis = new QBarCategoryAxis();
+    m_pChart->legend()->setVisible(true);
+    m_pChart->legend()->setAlignment(Qt::AlignBottom);
+
+    QChartView *chartView = new QChartView(m_pChart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+    QGridLayout* layout = new QGridLayout();
+
+    layout->addWidget(chartView, 0, 0);
+    this->setLayout(layout);
+}
 
 
 //*************************************************************************************************************
