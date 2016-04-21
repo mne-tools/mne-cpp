@@ -62,8 +62,11 @@ AverageSceneItem::AverageSceneItem(const QString& channelName, int channelNumber
 , m_qpChannelPosition(channelPosition)
 , m_iChannelKind(channelKind)
 , m_iChannelUnit(channelUnit)
+, m_iFontTextSize(15)
 {
     m_lAverageColors.append(color);
+
+    this->setAcceptHoverEvents(true);
 }
 
 
@@ -71,9 +74,29 @@ AverageSceneItem::AverageSceneItem(const QString& channelName, int channelNumber
 
 QRectF AverageSceneItem::boundingRect() const
 {
-    int height = 80;
+    int height = 200;
     int width = 1000;
     return QRectF(-width/2, -height/2, width, height);
+}
+
+
+//*************************************************************************************************************
+
+void AverageSceneItem::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
+{
+    m_iFontTextSize = 150;
+    qDebug()<<"AverageSceneItem::hoverEnterEvent";
+    this->update();
+}
+
+
+//*************************************************************************************************************
+
+void AverageSceneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
+{
+    m_iFontTextSize = 15;
+    qDebug()<<"AverageSceneItem::hoverLeaveEvent";
+    this->update();
 }
 
 
@@ -112,8 +135,13 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         pen.setColor(m_lAverageColors.first());
     }
     pen.setWidthF(5);
+
+    QFont f = painter->font();
+    f.setPointSizeF(m_iFontTextSize);
+    painter->setFont(f);
+
     painter->setPen(pen);
-    painter->drawStaticText(boundingRect().x(), boundingRect().y(), staticElectrodeName);
+    painter->drawStaticText(boundingRect().x(), boundingRect().y()+boundingRect().height()/2, staticElectrodeName);
     painter->restore();
 }
 
@@ -265,4 +293,5 @@ void AverageSceneItem::paintStimLine(QPainter *painter)
 
     painter->drawPath(path);
 }
+
 

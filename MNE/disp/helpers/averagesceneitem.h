@@ -104,9 +104,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
+    * Reimplemented virtual functions
     */
     QRectF boundingRect() const;
+    void hoverEnterEvent(QGraphicsSceneHoverEvent* event);
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent* event);
 
     //=========================================================================================================
     /**
@@ -127,6 +129,7 @@ public:
     int                     m_iChannelKind;             /**< The channel kind.*/
     int                     m_iChannelUnit;             /**< The channel unit.*/
     int                     m_iTotalNumberChannels;     /**< The total number of channels loaded in the curent evoked data set.*/
+    int                     m_iFontTextSize;            /**< The font text size of the electrode names.*/
 
     QPointF                 m_qpChannelPosition;        /**< The channels 2D position in the scene.*/
     QList<QColor>           m_lAverageColors;           /**< The current average color.*/
