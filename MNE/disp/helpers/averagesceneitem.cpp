@@ -87,7 +87,7 @@ QRectF AverageSceneItem::boundingRect() const
 void AverageSceneItem::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 {
     m_iFontTextSize = 150;
-    this->update();
+    emit sceneUpdateRequested();
 }
 
 
@@ -96,7 +96,7 @@ void AverageSceneItem::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 void AverageSceneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
 {
     m_iFontTextSize = 15;
-    this->update();
+    emit sceneUpdateRequested();
 }
 
 
@@ -127,7 +127,6 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     // Plot channel name
     QStaticText staticElectrodeName = QStaticText(m_sChannelName);
-    QSizeF sizeText = staticElectrodeName.size();
     painter->save();
     QPen pen;
     pen.setColor(Qt::yellow);
@@ -141,14 +140,15 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->setFont(f);
 
     painter->setPen(pen);
-    painter->drawStaticText(boundingRect().x(), boundingRect().y()+boundingRect().height()/4, staticElectrodeName);
+    painter->drawStaticText(boundingRect().x(), boundingRect().y(), staticElectrodeName);
     painter->restore();
 
-    painter->save();
-    pen.setColor(Qt::red);
-    painter->setPen(pen);
-    painter->drawRect(this->boundingRect());
-    painter->restore();
+    //Plot bounding rect
+//    painter->save();
+//    pen.setColor(Qt::red);
+//    painter->setPen(pen);
+//    painter->drawRect(this->boundingRect());
+//    painter->restore();
 }
 
 
