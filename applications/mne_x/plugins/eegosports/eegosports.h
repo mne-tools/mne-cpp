@@ -71,6 +71,7 @@
 
 #include "FormFiles/eegosportssetupwidget.h"
 #include "FormFiles/eegosportssetupprojectwidget.h"
+#include "FormFiles/eegosportssetupstimuluswidget.h"
 
 
 //*************************************************************************************************************
@@ -129,6 +130,7 @@ class EEGOSPORTSSHARED_EXPORT EEGoSports : public ISensor
     friend class EEGoSportsSetupWidget;
     friend class EEGoSportsImpedanceWidget;
     friend class EEGoSportsSetupProjectWidget;
+    friend class EEGoSportsSetupStimulusWidget;
 
 public:
     //=========================================================================================================
@@ -213,6 +215,12 @@ protected:
 
     //=========================================================================================================
     /**
+    * Starts data recording
+    */
+    void showSetupStimulus();
+
+    //=========================================================================================================
+    /**
     * Implements blinking recording button
     */
     void changeRecordingButton();
@@ -226,6 +234,7 @@ protected:
 private:
     PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRMTSA_EEGoSports;      /**< The RealTimeSampleArray to provide the EEG data.*/
     QSharedPointer<EEGoSportsSetupProjectWidget> m_pEEGoSportsSetupProjectWidget; /**< Widget for checking the impedances*/
+    QSharedPointer<EEGoSportsSetupStimulusWidget> m_pEEGoSportsSetupStimulusWidget; /**< Widget for stimulus setup */
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
@@ -254,6 +263,7 @@ private:
 
     QAction*                            m_pActionSetupProject;              /**< shows setup project dialog */
     QAction*                            m_pActionStartRecording;            /**< starts to record data */
+    QAction*                            m_pActionSetupStimulus;             /**< starts stimulus feature */
 
     QSharedPointer<QTimer>              m_pTimerRecordingChange;            /**< timer to control blinking of the recording icon */
     qint16                              m_iBlinkStatus;                     /**< flag for recording icon blinking */
