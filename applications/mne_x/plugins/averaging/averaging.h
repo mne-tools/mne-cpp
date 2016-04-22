@@ -130,15 +130,22 @@ public:
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
+    * Reimplemented virtual functions
     */
-    virtual void init();
+    virtual void unload();
+    virtual QSharedPointer<IPlugin> clone() const;
+    virtual bool start();
+    virtual bool stop();
+    virtual IPlugin::PluginType getType() const;
+    virtual QString getName() const;
+    virtual QWidget* setupWidget();
+    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    * Initialise input and output connectors.
     */
-    virtual void unload();
+    virtual void init();
 
     //=========================================================================================================
     /**
@@ -155,18 +162,6 @@ public:
     * @param[in] mode     average mode (0-running or 1-cumulative)
     */
     void changeAverageMode(qint32 mode);
-
-    //=========================================================================================================
-    /**
-    * Clone the plugin
-    */
-    virtual QSharedPointer<IPlugin> clone() const;
-
-    virtual bool start();
-    virtual bool stop();
-
-    virtual IPlugin::PluginType getType() const;
-    virtual QString getName() const;
 
     void changeStimChannel(qint32 index);
 
@@ -186,20 +181,9 @@ public:
 
     void appendEvoked(FiffEvoked::SPtr p_pEvoked);
 
-    virtual QWidget* setupWidget();
-
-    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
-
     void showAveragingWidget();
 
     void resetAverage(bool state);
-
-signals:
-    //=========================================================================================================
-    /**
-    * Emitted when fiffInfo is available
-    */
-    void fiffInfoAvailable();
 
 protected:
     virtual void run();
@@ -211,45 +195,43 @@ private:
     */
     void initConnector();
 
-    QMutex m_qMutex;        /**< Provides access serialization between threads*/
+    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pAveragingInput;      /**< The RealTimeSampleArray of the Averaging input.*/
+    PluginOutputData<RealTimeEvoked>::SPtr              m_pAveragingOutput;     /**< The RealTimeEvoked of the Averaging output.*/
 
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pAveragingInput;     /**< The RealTimeSampleArray of the Averaging input.*/
-    PluginOutputData<RealTimeEvoked>::SPtr  m_pAveragingOutput;                 /**< The RealTimeEvoked of the Averaging output.*/
+    CircularMatrixBuffer<double>::SPtr                  m_pAveragingBuffer;     /**< Holds incoming data.*/
 
-    FiffInfo::SPtr  m_pFiffInfo;        /**< Fiff measurement info.*/
-    QList<qint32> m_qListStimChs;       /**< Stimulus channels.*/
+    QSharedPointer<AveragingSettingsWidget>             m_pAveragingWidget;
 
-    CircularMatrixBuffer<double>::SPtr   m_pAveragingBuffer;      /**< Holds incoming data.*/
+    QVector<FiffEvoked::SPtr>   m_qVecEvokedData;               /**< Evoked data set */
 
-    bool m_bIsRunning;      /**< If source lab is running */
-    bool m_bProcessData;    /**< If data should be received for processing */
+    QMutex                      m_qMutex;                       /**< Provides access serialization between threads*/
 
-    RtAve::SPtr m_pRtAve;   /**< Real-time average. */
+    FiffInfo::SPtr              m_pFiffInfo;                    /**< Fiff measurement info.*/
+    QList<qint32>               m_qListStimChs;                 /**< Stimulus channels.*/
 
-    qint32 m_iPreStimSamples;
-    qint32 m_iPostStimSamples;
-    qint32 m_iPreStimSeconds;
-    qint32 m_iPostStimSeconds;
-    qint32 m_iBaselineFromSeconds;
-    qint32 m_iBaselineFromSamples;
-    qint32 m_iBaselineToSeconds;
-    qint32 m_iBaselineToSamples;
-    qint32 m_iStimChanIdx;
-    qint32 m_iAverageMode;
-    qint32 m_iNumAverages;
-    qint32 m_iStimChan;
-    qint32 m_iArtifactThresholdSecond;
-    double m_dArtifactThresholdFirst;
+    RtAve::SPtr                 m_pRtAve;                       /**< Real-time average. */
 
-    bool m_bDoArtifactReduction;
-    bool m_bDoBaselineCorrection;
+    bool                        m_bIsRunning;                   /**< If source lab is running */
+    bool                        m_bProcessData;                 /**< If data should be received for processing */
+    bool                        m_bDoArtifactReduction;
+    bool                        m_bDoBaselineCorrection;
 
-    QVector<FiffEvoked::SPtr>   m_qVecEvokedData;   /**< Evoked data set */
+    qint32                      m_iPreStimSamples;
+    qint32                      m_iPostStimSamples;
+    qint32                      m_iPreStimSeconds;
+    qint32                      m_iPostStimSeconds;
+    qint32                      m_iBaselineFromSeconds;
+    qint32                      m_iBaselineFromSamples;
+    qint32                      m_iBaselineToSeconds;
+    qint32                      m_iBaselineToSamples;
+    qint32                      m_iStimChanIdx;
+    qint32                      m_iAverageMode;
+    qint32                      m_iNumAverages;
+    qint32                      m_iStimChan;
+    qint32                      m_iArtifactThresholdSecond;
+    double                      m_dArtifactThresholdFirst;
 
-    QSharedPointer<AveragingSettingsWidget> m_pAveragingWidget;
-
-    QAction* m_pActionShowAdjustment;
-
+    QAction*                    m_pActionShowAdjustment;
 
 #ifdef DEBUG_AVERAGING
     //
@@ -259,6 +241,13 @@ private:
     qint32 m_iTestCount;
     qint32 m_iTestCount2;
 #endif
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emitted when fiffInfo is available
+    */
+    void fiffInfoAvailable();
 };
 
 } // NAMESPACE
