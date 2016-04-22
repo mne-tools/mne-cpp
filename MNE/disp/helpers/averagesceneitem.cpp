@@ -69,8 +69,6 @@ AverageSceneItem::AverageSceneItem(const QString& channelName, int channelNumber
     m_lAverageColors.append(color);
 
     m_rectBoundingRect = QRectF(-m_iMaxWidth/2, -m_iMaxHeigth/2, m_iMaxWidth, m_iMaxHeigth);
-
-    this->setAcceptHoverEvents(true);
 }
 
 
@@ -84,16 +82,17 @@ QRectF AverageSceneItem::boundingRect() const
 
 //*************************************************************************************************************
 
-void AverageSceneItem::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
+void AverageSceneItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     m_iFontTextSize = 150;
+    qDebug();
     emit sceneUpdateRequested();
 }
 
 
 //*************************************************************************************************************
 
-void AverageSceneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
+void AverageSceneItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     m_iFontTextSize = 15;
     emit sceneUpdateRequested();

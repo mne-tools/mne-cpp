@@ -108,13 +108,8 @@ public:
     * Reimplemented virtual functions
     */
     QRectF boundingRect() const;
-    void hoverEnterEvent(QGraphicsSceneHoverEvent* event);
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent* event);
-
-    //=========================================================================================================
-    /**
-    * Reimplemented paint function.
-    */
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
     //=========================================================================================================
