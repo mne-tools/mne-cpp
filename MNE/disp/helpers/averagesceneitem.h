@@ -53,7 +53,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGraphicsItem>
+#include <QGraphicsObject>
 #include <QString>
 #include <QColor>
 #include <QPainter>
@@ -92,8 +92,9 @@ typedef QPair<const double*,qint32> RowVectorPair;
 *
 * @brief The AverageSceneItem class provides a new data structure for visualizing averages in a 2D layout.
 */
-class DISPSHARED_EXPORT AverageSceneItem : public QGraphicsItem
+class DISPSHARED_EXPORT AverageSceneItem : public QGraphicsObject
 {
+    Q_OBJECT;
 
 public:
     //=========================================================================================================
@@ -157,6 +158,9 @@ protected:
     * @param [in] painter The painter used to plot in this item.
     */
     void paintStimLine(QPainter *painter);
+
+signals:
+    void sceneUpdateRequested();
 };
 
 } // NAMESPACE DISPLIB
