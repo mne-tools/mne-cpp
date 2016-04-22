@@ -174,6 +174,10 @@ public:
 
     void changePostStim(qint32 mseconds);
 
+    void changeArtifactThreshold(double thresholdFirst, int thresholdSecond);
+
+    void changeArtifactReductionActive(bool state);
+
     void changeBaselineFrom(qint32 fromMSeconds);
 
     void changeBaselineTo(qint32 toMSeconds);
@@ -234,7 +238,10 @@ private:
     qint32 m_iAverageMode;
     qint32 m_iNumAverages;
     qint32 m_iStimChan;
+    qint32 m_iArtifactThresholdSecond;
+    double m_dArtifactThresholdFirst;
 
+    bool m_bDoArtifactReduction;
     bool m_bDoBaselineCorrection;
 
     QVector<FiffEvoked::SPtr>   m_qVecEvokedData;   /**< Evoked data set */
