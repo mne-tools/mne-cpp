@@ -94,14 +94,8 @@ using namespace Eigen;
 
 typedef struct {
   MatrixXf rr;
-  int   np;
   bool   report;
 } *fitUserNew,fitUserRecNew;
-
-
-
-
-
 
 
 //=============================================================================================================
@@ -121,7 +115,7 @@ public:
     * @param[in] center     The sphere's center
     * @param[in] radius     The sphere's radius
     */
-    Sphere( Vector3d center, double radius );
+    Sphere( const Vector3f& center, float radius );
 
     //=========================================================================================================
     /**
@@ -131,7 +125,7 @@ public:
     *
     * @return the fitted sphere.
     */
-    static Sphere fit_sphere(const MatrixX3d& points);
+    static Sphere fit_sphere(const MatrixX3f& points);
 
     //=========================================================================================================
     /**
@@ -150,7 +144,7 @@ public:
     *
     * @return the fitted sphere.
     */
-    Vector3d& center() { return m_center; }
+    Vector3f& center() { return m_center; }
 
     //=========================================================================================================
     /**
@@ -158,128 +152,37 @@ public:
     *
     * @return the fitted sphere.
     */
-    double& radius() { return m_r; }
+    float& radius() { return m_r; }
 
 private:
-    Vector3d m_center;      /**< Sphere's center */
-    double m_r;             /**< Sphere's radius */
+    Vector3f m_center;      /**< Sphere's center */
+    float m_r;             /**< Sphere's radius */
 
 
     //ToDo Replace LayoutMaker fit_sphere_to_points
-    static bool fit_sphere_to_points_new(const MatrixXf &rr,
-                                         int   np,
-                                         float simplex_size,
-                                         VectorXf &r0,
-                                         float &R);
+    static bool fit_sphere_to_points_new (  const MatrixXf &rr,
+                                            float simplex_size,
+                                            VectorXf &r0,
+                                            float &R );
 
-    static void calculate_cm_ave_dist_new(const MatrixXf &rr,
-                                      int np,
-                                      VectorXf &cm,
-                                      float &avep);
+    static void calculate_cm_ave_dist_new(  const MatrixXf &rr,
+                                            VectorXf &cm,
+                                            float &avep );
 
-    static MatrixXf make_initial_simplex_new(VectorXf &pars,
-                                            int    npar,
-                                            float  size);
+    static MatrixXf make_initial_simplex_new(   const VectorXf &pars,
+                                                float  size );
 
-    static float fit_eval_new(const VectorXf &fitpar,
-                  int   npar,
-                  void  *user_data);
+    static float fit_eval_new(  const VectorXf &fitpar,
+                                int   npar,
+                                const void  *user_data);
 
     static int report_func_new(int loop,
                    const VectorXf &fitpar,
                    int npar,
                    double fval);
 
-    static float opt_rad_new(VectorXf &r0,
-                  fitUserNew user);
-
-
-
-
-
-//    static void calculate_cm_ave_dist(const MatrixX3f& rr, int np, Vector3f& cm, float *avep)
-//    {
-//      int k,q;
-//      float ave,diff[3];
-
-//      for (q = 0; q < 3; q++)
-//        cm[q] = 0.0;
-
-//      for (k = 0; k < np; k++)
-//        for (q = 0; q < 3; q++)
-//          cm[q] += rr(k,q);
-
-//      if (np > 0) {
-//        for (q = 0; q < 3; q++)
-//          cm[q] = cm[q]/np;
-
-//        for (k = 0, ave = 0.0; k < np; k++) {
-//          for (q = 0; q < 3; q++)
-//            diff[q] = rr(k,q) - cm[q];
-//          ave += sqrt(diff[0]*diff[0]+diff[1]*diff[1]+diff[2]*diff[2]);//VEC_LEN(diff);
-//        }
-//        *avep = ave/np;
-//      }
-//      return;
-//    }
-
-//    static MatrixXf make_initial_simplex(const VectorXf& pars,
-//                        float  size)
-//         /*
-//          * Make the initial tetrahedron
-//          */
-//    {
-//      int npar = pars.size();
-//      MatrixXf simplex = MatrixXf(npar+1,npar);
-//      int k;
-
-//      for (k = 0; k < npar+1; k++)
-//        simplex.row(k) = pars;
-
-//      for (k = 1; k < npar+1; k++)
-//        simplex(k,k-1) = simplex(k,k-1) + size;
-//      return simplex;
-//    }
-
-
-//#define VEC_DOT(x,y) ((x)[X]*(y)[X] + (x)[Y]*(y)[Y] + (x)[Z]*(y)[Z])
-//#define VEC_LEN(x) sqrt(VEC_DOT(x,x))
-
-//#define VEC_DIFF(from,to,diff) {\
-//(diff)[X] = (to)[X] - (from)[X];\
-//(diff)[Y] = (to)[Y] - (from)[Y];\
-//(diff)[Z] = (to)[Z] - (from)[Z];\
-//}
-
-//    static float fit_eval(const Vector3f& fitpar,
-//                  const MatrixX3f& rr)
-//         /*
-//          * Calculate the cost function value
-//          * Optimize for the radius inside here
-//          */
-//    {
-//      int np = rr.rows();
-//      int   npar = fitpar.size();
-//      Vector3f r0 = fitpar;
-//      Vector3f diff, tmp;
-//      int   k;
-//      float sum,sum2,one,F;
-
-//      for (k = 0, sum = sum2 = 0.0; k < np; k++) {
-//        tmp = rr.row(k);
-//        diff = tmp - r0;
-//        one = diff.norm();
-//        sum  += one;
-//        sum2 += one*one;
-//      }
-//      F = sum2 - sum*sum/np;
-
-//      fprintf(stderr,"r0 %7.1f %7.1f %7.1f R %7.1f fval %g\n",
-//            1000*r0[0],1000*r0[1],1000*r0[2],1000*sum/np,F);
-
-//      return F;
-//    }
-
+    static float opt_rad_new(   const VectorXf &r0,
+                                const fitUserNew user);
 
 };
 
