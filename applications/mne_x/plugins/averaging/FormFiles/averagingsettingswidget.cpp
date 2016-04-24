@@ -87,11 +87,11 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
 
     //Pre Post stimulus
     ui.m_pSpinBoxPreStimSamples->setValue(m_pAveragingToolbox->m_iPreStimSeconds);
-    connect(ui.m_pSpinBoxPreStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(ui.m_pSpinBoxPreStimSamples, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &AveragingSettingsWidget::changePreStim);
 
     ui.m_pSpinBoxPostStimSamples->setValue(m_pAveragingToolbox->m_iPostStimSeconds);
-    connect(ui.m_pSpinBoxPostStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(ui.m_pSpinBoxPostStimSamples, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &AveragingSettingsWidget::changePostStim);
 
     //Baseline Correction
@@ -102,13 +102,13 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
     ui.m_pSpinBoxBaselineFrom->setMinimum(ui.m_pSpinBoxPreStimSamples->value()*-1);
     ui.m_pSpinBoxBaselineFrom->setMaximum(ui.m_pSpinBoxPostStimSamples->value());
     ui.m_pSpinBoxBaselineFrom->setValue(m_pAveragingToolbox->m_iBaselineFromSeconds);
-    connect(ui.m_pSpinBoxBaselineFrom, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(ui.m_pSpinBoxBaselineFrom, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &AveragingSettingsWidget::changeBaselineFrom);
 
     ui.m_pSpinBoxBaselineTo->setMinimum(ui.m_pSpinBoxPreStimSamples->value()*-1);
     ui.m_pSpinBoxBaselineTo->setMaximum(ui.m_pSpinBoxPostStimSamples->value());
     ui.m_pSpinBoxBaselineTo->setValue(m_pAveragingToolbox->m_iBaselineToSeconds);
-    connect(ui.m_pSpinBoxBaselineTo, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(ui.m_pSpinBoxBaselineTo, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &AveragingSettingsWidget::changeBaselineTo);
 
     connect(ui.m_pushButton_reset, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
@@ -129,8 +129,9 @@ int AveragingSettingsWidget::getStimChannelIdx()
 
 //*************************************************************************************************************
 
-void AveragingSettingsWidget::changePreStim(qint32 mSeconds)
+void AveragingSettingsWidget::changePreStim()
 {
+    qint32 mSeconds = ui.m_pSpinBoxPreStimSamples->value();
     ui.m_pSpinBoxBaselineTo->setMinimum(ui.m_pSpinBoxPreStimSamples->value()*-1);
     ui.m_pSpinBoxBaselineFrom->setMinimum(ui.m_pSpinBoxPreStimSamples->value()*-1);
 
@@ -140,8 +141,9 @@ void AveragingSettingsWidget::changePreStim(qint32 mSeconds)
 
 //*************************************************************************************************************
 
-void AveragingSettingsWidget::changePostStim(qint32 mSeconds)
+void AveragingSettingsWidget::changePostStim()
 {
+    qint32 mSeconds = ui.m_pSpinBoxPostStimSamples->value();
     ui.m_pSpinBoxBaselineTo->setMaximum(ui.m_pSpinBoxPostStimSamples->value());
     ui.m_pSpinBoxBaselineFrom->setMaximum(ui.m_pSpinBoxPostStimSamples->value());
 
@@ -151,8 +153,9 @@ void AveragingSettingsWidget::changePostStim(qint32 mSeconds)
 
 //*************************************************************************************************************
 
-void AveragingSettingsWidget::changeBaselineFrom(qint32 mSeconds)
+void AveragingSettingsWidget::changeBaselineFrom()
 {
+    qint32 mSeconds = ui.m_pSpinBoxBaselineFrom->value();
     ui.m_pSpinBoxBaselineTo->setMinimum(mSeconds);
 
     m_pAveragingToolbox->changeBaselineFrom(mSeconds);
@@ -161,8 +164,9 @@ void AveragingSettingsWidget::changeBaselineFrom(qint32 mSeconds)
 
 //*************************************************************************************************************
 
-void AveragingSettingsWidget::changeBaselineTo(qint32 mSeconds)
+void AveragingSettingsWidget::changeBaselineTo()
 {
+    qint32 mSeconds = ui.m_pSpinBoxBaselineTo->value();
     ui.m_pSpinBoxBaselineFrom->setMaximum(mSeconds);
 
     m_pAveragingToolbox->changeBaselineTo(mSeconds);
