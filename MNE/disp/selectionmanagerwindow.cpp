@@ -118,16 +118,16 @@ void SelectionManagerWindow::initComboBoxes()
 {
     ui->m_comboBox_layoutFile->clear();
     ui->m_comboBox_layoutFile->insertItems(0, QStringList()
-        << QApplication::tr("SelectionManagerWindow", "babymeg-mag-inner-layer.lout", 0)
-        << QApplication::tr("SelectionManagerWindow", "babymeg-mag-outer-layer.lout", 0)
-//        << QApplication::tr("SelectionManagerWindow", "babymeg-mag-ref.lout", 0)
-        << QApplication::tr("SelectionManagerWindow", "Vectorview-grad.lout", 0)
-        << QApplication::tr("SelectionManagerWindow", "Vectorview-all.lout", 0)
-        << QApplication::tr("SelectionManagerWindow", "Vectorview-mag.lout", 0)
-        << QApplication::tr("SelectionManagerWindow", "dukeEEG64dry.lout", 0)
+        << "babymeg-mag-inner-layer.lout"
+        << "babymeg-mag-outer-layer.lout"
+//        << "babymeg-mag-ref.lout"
+        << "Vectorview-grad.lout"
+        << "Vectorview-all.lout"
+        << "Vectorview-mag.lout"
+        << "dukeEEG64dry.lout"
 
-//     << QApplication::tr("SelectionManagerWindow", "CTF-275.lout", 0)
-//     << QApplication::tr("SelectionManagerWindow", "magnesWH3600.lout", 0)
+//     << "CTF-275.lout"
+//     << "magnesWH3600.lout"
     );
 
     connect(ui->m_comboBox_layoutFile, &QComboBox::currentTextChanged,

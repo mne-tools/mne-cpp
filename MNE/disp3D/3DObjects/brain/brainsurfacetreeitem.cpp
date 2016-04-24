@@ -181,10 +181,14 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     this->setData(data, BrainSurfaceTreeItemRoles::SurfaceRenderable3DEntityAcivationOverlay);
 
     //Add surface meta information as item children
+    QList<QStandardItem*> list;
+
     m_pItemSurfColSulci = new BrainTreeMetaItem(BrainTreeMetaItemTypes::SurfaceColorSulci, "Sulci color");
     connect(m_pItemSurfColSulci, &BrainTreeMetaItem::curvColorsChanged,
             this, &BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged);
-    *this<<m_pItemSurfColSulci;
+    list<<m_pItemSurfColSulci;
+    list<<new QStandardItem(m_pItemSurfColSulci->toolTip());
+    this->appendRow(list);
     data.setValue(QColor(50,50,50));
     m_pItemSurfColSulci->setData(data, BrainTreeMetaItemRoles::SurfaceColorSulci);
     m_pItemSurfColSulci->setData(data, Qt::DecorationRole);
@@ -192,7 +196,10 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     m_pItemSurfColGyri = new BrainTreeMetaItem(BrainTreeMetaItemTypes::SurfaceColorGyri, "Gyri color");
     connect(m_pItemSurfColGyri, &BrainTreeMetaItem::curvColorsChanged,
             this, &BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged);
-    *this<<m_pItemSurfColGyri;
+    list.clear();
+    list<<m_pItemSurfColGyri;
+    list<<new QStandardItem(m_pItemSurfColGyri->toolTip());
+    this->appendRow(list);
     data.setValue(QColor(125,125,125));
     m_pItemSurfColGyri->setData(data, BrainTreeMetaItemRoles::SurfaceColorGyri);
     m_pItemSurfColGyri->setData(data, Qt::DecorationRole);
@@ -200,26 +207,37 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     BrainTreeMetaItem *itemAlpha = new BrainTreeMetaItem(BrainTreeMetaItemTypes::SurfaceAlpha, "0.5");
     connect(itemAlpha, &BrainTreeMetaItem::surfaceAlphaChanged,
             this, &BrainSurfaceTreeItem::onSurfaceAlphaChanged);
-    itemAlpha->setEditable(true);
-    *this<<itemAlpha;
+    list.clear();
+    list<<itemAlpha;
+    list<<new QStandardItem(itemAlpha->toolTip());
+    this->appendRow(list);
     data.setValue(0.5);
     itemAlpha->setData(data, BrainTreeMetaItemRoles::SurfaceAlpha);
 
     BrainTreeMetaItem *itemSurfFileName = new BrainTreeMetaItem(BrainTreeMetaItemTypes::SurfaceFileName, tSurface.fileName());
     itemSurfFileName->setEditable(false);
-    *this<<itemSurfFileName;
+    list.clear();
+    list<<itemSurfFileName;
+    list<<new QStandardItem(itemSurfFileName->toolTip());
+    this->appendRow(list);
     data.setValue(tSurface.fileName());
     itemSurfFileName->setData(data, BrainTreeMetaItemRoles::SurfaceFileName);
 
     BrainTreeMetaItem *itemSurfType = new BrainTreeMetaItem(BrainTreeMetaItemTypes::SurfaceType, tSurface.surf());
     itemSurfType->setEditable(false);
-    *this<<itemSurfType;
+    list.clear();
+    list<<itemSurfType;
+    list<<new QStandardItem(itemSurfType->toolTip());
+    this->appendRow(list);
     data.setValue(tSurface.surf());
     itemSurfType->setData(data, BrainTreeMetaItemRoles::SurfaceType);
 
     BrainTreeMetaItem *itemSurfPath = new BrainTreeMetaItem(BrainTreeMetaItemTypes::SurfaceFilePath, tSurface.filePath());
     itemSurfPath->setEditable(false);
-    *this<<itemSurfPath;
+    list.clear();
+    list<<itemSurfPath;
+    list<<new QStandardItem(itemSurfPath->toolTip());
+    this->appendRow(list);
     data.setValue(tSurface.filePath());
     itemSurfPath->setData(data, BrainTreeMetaItemRoles::SurfaceFilePath);
 

@@ -47,6 +47,7 @@
 #include <iostream>
 #include <fiff/fiff_cov.h>
 
+#include <fstream>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -148,7 +149,9 @@ void RtHPIS::run()
     int numLoc = 1, numBlock, samLoc; // numLoc : Number of times to localize in a second
     samLoc = samF/numLoc; // minimum samples required to localize numLoc times in a second
     Eigen::VectorXd coilfreq(numCoils);
-    coilfreq[0] = 154;coilfreq[1] = 158;coilfreq[2] = 162;coilfreq[3] = 166;
+    coilfreq[0] = 155;  coilfreq[1] = 160;  coilfreq[2] = 165;  coilfreq[3] = 150;
+//    coilfreq[0] = 154;coilfreq[1] = 158;coilfreq[2] = 162;coilfreq[3] = 166;
+//    coilfreq[0] = 140;coilfreq[1] = 150;coilfreq[2] = 160;coilfreq[3] = 170;
 
     // Initialize HPI coils location and moment
     coil.pos = Eigen::MatrixXd::Zero(numCoils,3);
@@ -160,13 +163,25 @@ void RtHPIS::run()
 
     for (int i = 0;i < samLoc;i++) time[i] = i*1.0/samF;
 
+    std::ofstream outsin;
+    outsin.open ("C:/Users/babyMEG/Desktop/Seok/sin.txt");
+    std::ofstream outcos;
+    outcos.open ("C:/Users/babyMEG/Desktop/Seok/cos.txt");
+
     for(int i=0;i<numCoils;i++) {
         for(int j=0;j<samLoc;j++) {
             simsig(j,i) = sin(2*M_PI*coilfreq[i]*time[j]);
             simsig(j,i+numCoils) = cos(2*M_PI*coilfreq[i]*time[j]);
+
+            outsin <<simsig(j,i)<<" ";
+            outcos <<simsig(j,i+numCoils) << " ";
         }
+            outsin <<"\n";
+            outcos <<"\n";
     }
 
+    outsin.close();
+    outcos.close();
 
     // Get the indices of inner layer channels
     QVector<int> innerind(0);
@@ -176,6 +191,27 @@ void RtHPIS::run()
             if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) innerind.append(i);
         }
     }
+
+    qDebug() << "innerind (number of inlayer channels): " << innerind.size();
+
+    //====== Seok 2016. 3.25 ==========================================
+    // Get the indices of trigger channels
+    QVector<int> trigind(0);
+    for (int i = 0, k = 0 ;i < numCh;i++) {
+        if(m_pFiffInfo->chs[i].coil_type == 3) {
+            k++;
+            if (k >= 9 && k <= 12) {
+                qDebug() << "trigger channel found ..."  << i;
+                trigind.append(i);
+            }
+/*            if (k >=9 && k <=12) {
+                qDebug() << "HPI trigger channel found ..."  << i;
+                trigind.append(i);
+            }
+*/        }
+    }
+    qDebug() << "trigind: " << trigind.length();
+    //==================================================================
 
     // Initialize inner layer sensors
     sensors.coilpos = Eigen::MatrixXd::Zero(innerind.size(),3);
@@ -198,7 +234,9 @@ void RtHPIS::run()
     if (m_pFiffInfo->dig.size()>0)
     {
         for (int i=0;i<numCoils;i++) {
-            headHPI(i,0) = m_pFiffInfo->dig.at(i+3).r[0];headHPI(i,1) = m_pFiffInfo->dig.at(i+3).r[1];headHPI(i,2) = m_pFiffInfo->dig.at(i+3).r[2];
+            headHPI(i,0) = m_pFiffInfo->dig.at(i+3).r[0];
+            headHPI(i,1) = m_pFiffInfo->dig.at(i+3).r[1];
+            headHPI(i,2) = m_pFiffInfo->dig.at(i+3).r[2];
         }
     }
     else
@@ -206,16 +244,49 @@ void RtHPIS::run()
         for (int i=0;i<numCoils;i++) {
             headHPI(i,0) = 0;headHPI(i,1) = 0;headHPI(i,2) = 0;
         }
-        qDebug()<< "Forget to load polhemus HPI! Please stop running and load it again!";
+        qDebug() << "\n \n \n";
+        qDebug()<< "    **********************************************************";
+        qDebug()<< "   *************************************************************";
+        qDebug()<< "  ***************************************************************";
+        qDebug()<< "******************************************************************";
+        qDebug()<< "***************    You forget to load polhemus HPI!   **************";
+        qDebug()<< "***************  Please stop running and load it again!  ***********";
+        qDebug()<< "******************************************************************";
+        qDebug()<< " ****************************************************************";
+        qDebug()<< "  **************************************************************";
+        qDebug()<< "   ************************************************************";
+        qDebug()<< "    **********************************************************";
+        qDebug() << "\n \n \n";
+
     }
 
     Eigen::MatrixXd topo(innerind.size(),numCoils*2);
     Eigen::MatrixXd amp(innerind.size(),numCoils);
     Eigen::Matrix4d trans;
 
-
     QVector<MatrixXd> buffer;
     double phase;
+
+    // Seok ---------------------------------
+//    qDebug() << "samLoc (1024): " << samLoc;
+    int OUT_FLAG = 1;
+    int OUT_RAW = 1;
+    std::ofstream outinnerdata;
+    outinnerdata.open ("C:/Users/babyMEG/Desktop/Seok/innerdata.txt");
+    std::ofstream outtrigdata;
+    outtrigdata.open ("C:/Users/babyMEG/Desktop/Seok/trigdata.txt");
+
+    std::ofstream outtopo;
+    outtopo.open ("C:/Users/babyMEG/Desktop/Seok/topo.txt");
+    std::ofstream outamp;
+    outamp.open ("C:/Users/babyMEG/Desktop/Seok/amp.txt");
+    std::ofstream outphase;
+    outphase.open ("C:/Users/babyMEG/Desktop/Seok/phase.txt");
+    std::ofstream outxfm;
+    outxfm.open ("C:/Users/babyMEG/Desktop/Seok/xfm.txt");
+    std::ofstream outcoilp;
+    outcoilp.open ("C:/Users/babyMEG/Desktop/Seok/coilp.txt");
+    // --------------------------------------
 
     while(m_bIsRunning)
     {
@@ -224,9 +295,11 @@ void RtHPIS::run()
             MatrixXd t_mat = m_pRawMatrixBuffer->pop();
 
             buffer.append(t_mat);
+            qDebug() << "buffer(size): " << buffer.length();
+            qDebug() << "t_mat(size): " << t_mat.rows() << " x " << t_mat.cols();
 
-            if(buffer.size()*t_mat.cols() >= samLoc) {
-
+            if(buffer.size()*t_mat.cols() >= samLoc)
+            {
                 Eigen::MatrixXd alldata(t_mat.rows(),buffer.size()*t_mat.cols());
 
                 // Concatenate data into a matrix
@@ -234,19 +307,54 @@ void RtHPIS::run()
 
                 // Get the data from inner layer channels
                 Eigen::MatrixXd innerdata(innerind.size(),samLoc);
+                Eigen::MatrixXd trigdata(trigind.size(),samLoc);
 
                 numBlock = alldata.cols()/samLoc;
 
                 // Loop for localizing coils
                 for(int i = 0;i<numBlock;i++) {
-                    for(int j = 0;j < innerind.size();j++)
+                    for(int j = 0;j < innerind.size();j++){
                         innerdata.row(j) << alldata.block(innerind[j],i*samLoc,1,samLoc);
+                        if (OUT_RAW == 1) {
+                            for (int k = 0; k < innerdata.cols(); k++)
+                                outinnerdata << innerdata(j,k) << " ";
+                        }
+                   }
+                    for(int j = 0;j < trigind.size();j++){
+                        trigdata.row(j) << alldata.block(trigind[j],i*samLoc,1,samLoc);
+                        if (OUT_RAW == 1) {
+                            for (int k = 0; k < trigdata.cols(); k++)
+                                outtrigdata << trigdata(j,k) << " ";
+                        }
+                   }
+                    if (OUT_RAW == 1) {
+                       outinnerdata << "\n";
+                       outtrigdata << "\n";
+                   }
+                }
 
+                    qDebug() << "numBlock: " << numBlock;
+                    qDebug() << "alldata: " << alldata.rows() << " x " << alldata.cols();
+                    qDebug() << "innerdata: " << innerdata.rows() << " x " << innerdata.cols();
+                    qDebug() << "trigdata: " << trigdata.rows() << " x " << trigdata.cols();
 
+                    // topo 247 x 8
                     topo = innerdata * pinv(simsig).transpose();
+                    //topo = innerdata * pinv(trigdata.transpose()).transpose();
+                    qDebug() << "topo: " << topo.rows() << " " << topo.cols();
 
+                    for (int i =0; i<numCoils; i++) {
+                        for (int j =0; j< innerind.size(); j++)
+                            outtopo << topo(j,i) << " ";
+
+                        outtopo << "\n";
+                    }
+
+
+                    // amp 247 x 4
                     amp = (topo.leftCols(numCoils).array().square() + topo.rightCols(numCoils).array().square()).array().sqrt();
-
+                    //amp = (topo.array().square()).array().sqrt();
+                    qDebug() << "amp: " << amp.rows() << " " << amp.cols();
 
                     for (int i = 0;i < numCoils;i++) {
                         for (int j = 0;j < innerind.size();j++) {
@@ -258,39 +366,70 @@ void RtHPIS::run()
 
                             amp(j,i) = amp(j,i) * phase;
 
+                            if (OUT_FLAG == 1) {
+                                outamp << amp(j,i) << " ";
+                                outphase << phase << " ";
+                            }
+                        }
+                        if (OUT_FLAG == 1) {
+                            outamp << "\n";
+                            outphase << "\n";
                         }
                     }
 
-
                     coil = dipfit(coil, sensors, amp, numCoils);
 
-                    qDebug()<<"HPI head "<<headHPI(0,0)<<" "<<headHPI(0,1)<<" "<<headHPI(0,2);
-                    qDebug()<<"HPI head "<<headHPI(1,0)<<" "<<headHPI(1,1)<<" "<<headHPI(1,2);
-                    qDebug()<<"HPI head "<<headHPI(2,0)<<" "<<headHPI(2,1)<<" "<<headHPI(2,2);
-                    qDebug()<<"HPI head "<<headHPI(3,0)<<" "<<headHPI(3,1)<<" "<<headHPI(3,2);
+//                    qDebug()<<"HPI head "<<headHPI(0,0)<<" "<<headHPI(0,1)<<" "<<headHPI(0,2);
+//                    qDebug()<<"HPI head "<<headHPI(1,0)<<" "<<headHPI(1,1)<<" "<<headHPI(1,2);
+//                    qDebug()<<"HPI head "<<headHPI(2,0)<<" "<<headHPI(2,1)<<" "<<headHPI(2,2);
+//                    qDebug()<<"HPI head "<<headHPI(3,0)<<" "<<headHPI(3,1)<<" "<<headHPI(3,2);
 
 
-                    qDebug()<<"HPI device "<<coil.pos(0,0)<<" "<<coil.pos(0,1)<<" "<<coil.pos(0,2);
-                    qDebug()<<"HPI device "<<coil.pos(1,0)<<" "<<coil.pos(1,1)<<" "<<coil.pos(1,2);
-                    qDebug()<<"HPI device "<<coil.pos(2,0)<<" "<<coil.pos(2,1)<<" "<<coil.pos(2,2);
-                    qDebug()<<"HPI device "<<coil.pos(3,0)<<" "<<coil.pos(3,1)<<" "<<coil.pos(3,2);
+                    qDebug()<<"HPI device "<<1e3*coil.pos(0,0)<<" "<<1e3*coil.pos(0,1)<<" "<<1e3*coil.pos(0,2);
+                    qDebug()<<"HPI device "<<1e3*coil.pos(1,0)<<" "<<1e3*coil.pos(1,1)<<" "<<1e3*coil.pos(1,2);
+                    qDebug()<<"HPI device "<<1e3*coil.pos(2,0)<<" "<<1e3*coil.pos(2,1)<<" "<<1e3*coil.pos(2,2);
+                    qDebug()<<"HPI device "<<1e3*coil.pos(3,0)<<" "<<1e3*coil.pos(3,1)<<" "<<1e3*coil.pos(3,2);
 
+                    //outcoilp << "   coil position" << "\n";
+                    if (OUT_FLAG == 1) {
+                        outcoilp <<coil.pos(0,0)<<" "<<coil.pos(0,1)<<" "<<coil.pos(0,2) <<"\n";
+                        outcoilp <<coil.pos(1,0)<<" "<<coil.pos(1,1)<<" "<<coil.pos(1,2) <<"\n";
+                        outcoilp <<coil.pos(2,0)<<" "<<coil.pos(2,1)<<" "<<coil.pos(2,2) <<"\n";
+                        outcoilp <<coil.pos(3,0)<<" "<<coil.pos(3,1)<<" "<<coil.pos(3,2) <<"\n";
+                    }
                     trans = computeTransformation(coil.pos,headHPI);
 
                     for(int ti =0; ti<4;ti++)
                         for(int tj=0;tj<4;tj++)
                     m_pFiffInfo->dev_head_t.trans(ti,tj) = trans(ti,tj);
 
+                    qDebug()<<"**** rotation ------- dev2head transformation ************";
+                    qDebug()<< trans(0,0)<<" "<<trans(0,1)<<" "<<trans(0,2);
+                    qDebug()<< trans(1,0)<<" "<<trans(1,1)<<" "<<trans(1,2);
+                    qDebug()<< trans(2,0)<<" "<<trans(2,1)<<" "<<trans(2,2);
+                    qDebug()<<"**** translation(dx,dy,dz) - dev2head transformation ***********";
+                    qDebug()<< 1e3*trans(0,3)<<" "<<1e3*trans(1,3)<<" "<<1e3*trans(2,3);
+
+/*                     if (OUT_FLAG == 1) {
+                    //outxfm << "   rotation" << "\n";
+                    outxfm << trans(0,0)<<" "<<trans(0,1)<<" "<<trans(0,2) <<" "<< trans(0,3)<<"\n";
+                    outxfm << trans(1,0)<<" "<<trans(1,1)<<" "<<trans(1,2) <<" "<< trans(1,3)<<"\n";
+                    outxfm << trans(2,0)<<" "<<trans(2,1)<<" "<<trans(2,2) <<" "<< trans(2,3)<<"\n";
+                    }
+*/
                 }
                 buffer.clear();
-            }
-
 
         }//m_pRawMatrixBuffer
 
-
-
     } //m_bIsRunning
+    outinnerdata.close();
+    outtrigdata.close();
+    outtopo.close();
+    outamp.close();
+    outphase.close();
+    outxfm.close();
+    outcoilp.close();
 
 }
 
@@ -399,10 +538,6 @@ void RtHPIS::test()
         if(m_pRawMatrixBuffer)
         {
             MatrixXd t_mat = m_pRawMatrixBuffer->pop();
-
-
-
-
 
             buffer.append(t_mat);
 

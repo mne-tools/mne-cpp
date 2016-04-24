@@ -154,12 +154,12 @@ int main(int argc, char *argv[])
     //########################################################################################
 
     if(bAddRtSourceLoc) {
-        double snr = 1.0;
+        double snr = 3.0;
         double lambda2 = 1.0 / pow(snr, 2);
         QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
         // Load data
-        fiff_int_t setno = 1;
+        fiff_int_t setno = 3;
         QPair<QVariant, QVariant> baseline(QVariant(), 0);
         FiffEvoked evoked(t_fileEvoked, setno, baseline);
         if(evoked.isEmpty())
@@ -244,6 +244,17 @@ int main(int argc, char *argv[])
 
         //testWindow->addRtBrainData("HemiLRSet", sourceEstimate);
         //rtItemList.at(0)->addData(sourceEstimate);
+
+        //Init some rt related values
+        for(int i = 0; i < rtItemList.size(); ++i) {
+            rtItemList.at(i)->setLoopState(true);
+            rtItemList.at(i)->setTimeInterval(10);
+            rtItemList.at(i)->setNumberAverages(1);
+            rtItemList.at(i)->setStreamingActive(true);
+            rtItemList.at(i)->setNormalization(1.0);
+            rtItemList.at(i)->setVisualizationType("Annotation based");
+            rtItemList.at(i)->setColortable("Hot Negative 2");
+        }
     }
 
     testWindow->show();    
