@@ -242,12 +242,12 @@ void Averaging::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
     if(pRTMSA) {
         //Check if buffer initialized
-        if(!m_pAveragingBuffer)
+        if(!m_pAveragingBuffer) {
             m_pAveragingBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
+        }
 
         //Fiff information
-        if(!m_pFiffInfo)
-        {
+        if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
             emit fiffInfoAvailable();
 
