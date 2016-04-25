@@ -75,6 +75,7 @@
 #include <QSet>
 #include <QList>
 #include <QVariant>
+#include "Windows.h"
 
 
 //*************************************************************************************************************
@@ -99,7 +100,6 @@ namespace RTINVLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
 using namespace IOBuffer;
 using namespace FIFFLIB;
 
@@ -144,7 +144,7 @@ public:
     *
     * @param[in] p_DataSegment  Data to estimate the covariance from -> ToDo Replace this by shared data pointer
     */
-    void append(const MatrixXd &p_DataSegment);
+    void append(const Eigen::MatrixXd &p_DataSegment);
 
     //=========================================================================================================
     /**
@@ -187,6 +187,15 @@ public:
     * @param[in] idx    trigger channel index
     */
     void setTriggerChIndx(qint32 idx);
+
+    //=========================================================================================================
+    /**
+    * Sets the artifact reduction
+    *
+    * @param[in] bActivate      Whether to activate artifact reduction or not
+    * @param[in] dThreshold     The artifact threshold
+    */
+    void setArtifactReduction(bool bActivate, double dThreshold);
 
     //=========================================================================================================
     /**
@@ -242,21 +251,6 @@ public:
     */
     void reset();
 
-signals:
-    //=========================================================================================================
-    /**
-    * Signal which is emitted when new evoked stimulus data are available.
-    *
-    * @param[out] p_pEvokedStim     The evoked stimulus data
-    */
-    void evokedStim(FIFFLIB::FiffEvoked::SPtr p_pEvokedStim);
-
-    //=========================================================================================================
-    /**
-    * Emitted when number of averages changed
-    */
-    void numAveragesChanged();
-
 protected:
     //=========================================================================================================
     /**
@@ -267,13 +261,51 @@ protected:
     virtual void run();
 
 private:
-    void clearDetectedTriggers();               /**< Clears already detected trigger*/
+    //=========================================================================================================
+    /**
+    * Clears already detected trigger.
+    */
+    void clearDetectedTriggers();
 
-    void fillFrontBuffer(MatrixXd &data);       /**< Prepends incoming data to front/pre stim buffer*/
-    void fillBackBuffer(MatrixXd &data);        /**< Prepends incoming data to back/post stim buffer*/
-    void mergeData();                           /**< Packs the buffers togehter as one and calcualtes the current running average and emits the result if number of averages has been reached*/
-    void generateEvoked();                      /**< Generates the final evoke variable*/
+    //=========================================================================================================
+    /**
+    * Prepends incoming data to front/pre stim buffer.
+    */
+    void fillFrontBuffer(Eigen::MatrixXd& data);
 
+    //=========================================================================================================
+    /**
+    * Prepends incoming data to back/post stim buffer.
+    */
+    void fillBackBuffer(Eigen::MatrixXd& data);
+
+    //=========================================================================================================
+    /**
+    * Packs the buffers togehter as one and calcualtes the current running average and emits the result if number of averages has been reached.
+    */
+    void mergeData();
+
+    //=========================================================================================================
+    /**
+    * Generates the final evoke variable.
+    */
+    void generateEvoked();
+
+    //=========================================================================================================
+    /**
+    * Checks the givven matrix for artifacts beyond a threshold value.
+    *
+    * @param[in] data           The data matrix.
+    * @param[in] dThreshold     The threshold value.
+    *
+    * @return   Whether a thresold artifact was detected.
+    */
+    bool checkForArtifact(Eigen::MatrixXd& data, double dThreshold);
+
+    //=========================================================================================================
+    /**
+    * Clears already detected trigger.
+    */
     void init();
 
     QMutex  m_qMutex;                   /**< Provides access serialization between threads*/
@@ -297,25 +329,43 @@ private:
 
     float   m_fTriggerThreshold;        /**< Threshold to detect trigger */
 
+    double  m_dArtifactThreshold;       /**< Threshold to detect artifacts */
+
+    bool    m_bDoArtifactReduction;     /**< Whether to do artifact reduction or not. */
     bool    m_bIsRunning;               /**< Holds if real-time Covariance estimation is running.*/
     bool    m_bAutoAspect;              /**< Auto aspect detection on or off. */
     bool    m_bFillingBackBuffer;       /**< Whether the back buffer is currently getting filled. */
     bool    m_bDoBaselineCorrection;    /**< Whether to perform baseline correction. */
 
-    QPair<QVariant,QVariant>    m_pairBaselineSec;     /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
-    QPair<QVariant,QVariant>    m_pairBaselineSamp;     /**< Baseline information in samples form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
+    QPair<QVariant,QVariant>                m_pairBaselineSec;              /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
+    QPair<QVariant,QVariant>                m_pairBaselineSamp;             /**< Baseline information in samples form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
 
-    FiffInfo::SPtr          m_pFiffInfo;            /**< Holds the fiff measurement information. */
-    FiffEvoked::SPtr        m_pStimEvoked;          /**< Holds the evoked information. */
+    FiffInfo::SPtr                          m_pFiffInfo;                    /**< Holds the fiff measurement information. */
+    FiffEvoked::SPtr                        m_pStimEvoked;                  /**< Holds the evoked information. */
 
-    CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;      /**< The Circular Raw Matrix Buffer. */
+    CircularMatrixBuffer<double>::SPtr      m_pRawMatrixBuffer;             /**< The Circular Raw Matrix Buffer. */
 
-    QMap<int,QList<int> >   m_qMapDetectedTrigger;              /**< Detected trigger for each trigger channel. */
+    QMap<int,QList<int> >                   m_qMapDetectedTrigger;          /**< Detected trigger for each trigger channel. */
 
-    MatrixXd                m_matDataPre;                       /**< The matrix holding the pre stim data. */
-    MatrixXd                m_matDataPost;                      /**< The matrix holding the post stim data. */
+    Eigen::MatrixXd                         m_matDataPre;                   /**< The matrix holding the pre stim data. */
+    Eigen::MatrixXd                         m_matDataPost;                  /**< The matrix holding the post stim data. */
 
-    QList<MatrixXd>         m_qListStimAve;                     /**< the current stimulus average buffer. Holds m_iNumAverages vectors */
+    QList<Eigen::MatrixXd>                  m_qListStimAve;                 /**< the current stimulus average buffer. Holds m_iNumAverages vectors */
+
+signals:
+    //=========================================================================================================
+    /**
+    * Signal which is emitted when new evoked stimulus data are available.
+    *
+    * @param[out] p_pEvokedStim     The evoked stimulus data
+    */
+    void evokedStim(FIFFLIB::FiffEvoked::SPtr p_pEvokedStim);
+
+    //=========================================================================================================
+    /**
+    * Emitted when number of averages changed
+    */
+    void numAveragesChanged();
 };
 
 //*************************************************************************************************************
