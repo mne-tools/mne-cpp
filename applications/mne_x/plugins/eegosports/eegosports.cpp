@@ -127,7 +127,7 @@ void EEGoSports::init()
     QDate date;
     m_sOutputFilePath = QString ("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day());
 
-    m_sElcFilePath = QString("./mne_x_plugins/resources/eegosports/loc_files/dry64duke.elc");
+    m_sElcFilePath = QString("./Resources/3DLayouts/standard_waveguard64_duke.elc");
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 }
@@ -161,28 +161,12 @@ void EEGoSports::setUpFiffInfo()
     //
     //Read electrode positions from .elc file
     //
-    QVector< QVector<double> > elcLocation3D;
-    QVector< QVector<double> > elcLocation2D;
+    QList<QVector<double> > elcLocation3D;
+    QList<QVector<double> > elcLocation2D;
     QString unit;
     QStringList elcChannelNames;
 
     if(LayoutLoader::readAsaElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit)) {
-        if(elcLocation2D.isEmpty()) {
-            QList<QVector<double> > outputPoints;
-            QList<QVector<double> > inPointsList;
-
-            for(int i = 0; i<elcLocation3D.size(); i++) {
-                inPointsList.append(elcLocation3D[i]);
-            }
-
-            QFile out = "./MNE_Browse_Raw_Resources/Templates/Layouts/manualLayout.lout";
-            float prad = 60.0;
-            float width = 5.0;
-            float height = 4.0;
-
-            LayoutMaker::makeLayout(inPointsList, outputPoints, elcChannelNames, out, true, prad, width, height, true);
-        }
-    } else {
         qDebug() << "Error: Reading elc file.";
     }
 
