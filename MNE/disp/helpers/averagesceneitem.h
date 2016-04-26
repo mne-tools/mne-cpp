@@ -53,7 +53,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGraphicsItem>
+#include <QGraphicsObject>
 #include <QString>
 #include <QColor>
 #include <QPainter>
@@ -92,8 +92,9 @@ typedef QPair<const double*,qint32> RowVectorPair;
 *
 * @brief The AverageSceneItem class provides a new data structure for visualizing averages in a 2D layout.
 */
-class DISPSHARED_EXPORT AverageSceneItem : public QGraphicsItem
+class DISPSHARED_EXPORT AverageSceneItem : public QGraphicsObject
 {
+    Q_OBJECT;
 
 public:
     //=========================================================================================================
@@ -104,14 +105,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
+    * Reimplemented virtual functions
     */
     QRectF boundingRect() const;
-
-    //=========================================================================================================
-    /**
-    * Reimplemented paint function.
-    */
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
     //=========================================================================================================
@@ -127,12 +125,17 @@ public:
     int                     m_iChannelKind;             /**< The channel kind.*/
     int                     m_iChannelUnit;             /**< The channel unit.*/
     int                     m_iTotalNumberChannels;     /**< The total number of channels loaded in the curent evoked data set.*/
+    int                     m_iFontTextSize;            /**< The font text size of the electrode names.*/
+    int                     m_iMaxWidth;
+    int                     m_iMaxHeigth;
 
     QPointF                 m_qpChannelPosition;        /**< The channels 2D position in the scene.*/
     QList<QColor>           m_lAverageColors;           /**< The current average color.*/
     QList<RowVectorPair>    m_lAverageData;             /**< The channels average data which is to be plotted.*/
     QPair<int,int>          m_firstLastSample;          /**< The first and last sample.*/
     QMap<qint32,float>      m_scaleMap;                 /**< Map with all channel types and their current scaling value.*/
+
+    QRectF                  m_rectBoundingRect;
 
 protected:
     //=========================================================================================================
@@ -150,6 +153,9 @@ protected:
     * @param [in] painter The painter used to plot in this item.
     */
     void paintStimLine(QPainter *painter);
+
+signals:
+    void sceneUpdateRequested();
 };
 
 } // NAMESPACE DISPLIB
