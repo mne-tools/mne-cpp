@@ -208,11 +208,11 @@ int main(int argc, char *argv[])
     printf("Read %d samples.\n",(qint32)data.cols());
 
     Eigen::VectorXd dataSine;
-    dataSine = sineWaveGenerator(1.0e-30,(1.0/1e7), 0.0, 1.0);  //creates synthetic data using sineWaveGenerator function
+    dataSine = sineWaveGenerator(1.0e-30,(1.0/1e6), 0.0, 1.0);  //creates synthetic data using sineWaveGenerator function
 
     bool bMakeSymmetrical;
     bMakeSymmetrical = false;       //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
-    int classAmount = 50;          //initialize the amount of classes and class frequencies
+    int classAmount = 14;          //initialize the amount of classes and class frequencies
     double inputGlobalMin = 0.0,
            inputGlobalMax = 0.0;
     Eigen::VectorXd resultClassLimit;
@@ -227,8 +227,8 @@ int main(int argc, char *argv[])
     int precision = 2;             //format for the amount digits of coefficient shown in the histogram
     //start of the histogram display function using Qtcharts
 
-    Spline* displayObj = new Spline("MNE-CPP Histogram Example (Spline)");
-    //Bar* displayObj = new Bar("MNE-CPP Histogram Example (Bar)");
+    //Spline* displayObj = new Spline("MNE-CPP Histogram Example (Spline)");
+    Bar* displayObj = new Bar("MNE-CPP Histogram Example (Bar)");
 
     QTime myTimerHistogram;
     myTimerHistogram.start();
@@ -244,62 +244,3 @@ int main(int argc, char *argv[])
 
 
 //*************************************************************************************************************
-//#include <stdlib.h>
-//#include <QVector>
-//#include <QDebug>
-//#include <QtWidgets/QApplication>
-//#include <QtWidgets/QMainWindow>
-//#include <QtCharts/QChartView>
-//#include <QtCharts/QSplineSeries>
-//#include <iostream>
-//QT_CHARTS_USE_NAMESPACE
-
-//using namespace std;
-//int main(int argc, char *argv[])
-//  {
-//      QApplication a(argc, argv);
-//      std::vector<double> xAxisData;
-//      std::vector<int> matClassFrequencyData;
-//      int iClassAmount = 50;
-
-//     xAxisData = {-3.86, -3.68, -3.50, -3.32, -3.14, -2.96, -2.78, -2.59, -2.41, -2.23, -2.05, -1.87, -1.69, -1.51, -1.33, -1.14, -0.96, -0.78, -0.60, -0.42, -0.24, -0.06, 0.11, 0.30, 0.48, 0.66, 0.84, 1.02, 1.20, 1.38, 1.56, 1.75, 1.93, 2.11, 2.29, 2.47, 2.29, 2.47, 2.65, 2.83, 3.02, 3.20, 3.38, 3.56, 3.74, 3.92, 4.10, 4.28, 4.47, 4.65, 4.83, 5.01} ;
-//     matClassFrequencyData = {1, 6, 8, 22, 41, 41, 57, 83, 49, 199, 494, 1192, 2515, 5083, 8362, 9537, 5083, 11451, 13713, 28515, 46887, 58029, 243666, 45902, 17001, 19831, 10600, 9167, 7870, 7056, 4508, 2326, 1111, 319, 407, 142, 129, 99, 85, 72, 57, 19, 27, 28, 11, 4, 4, 2, 4, 1};
-
-//      QSplineSeries *series = new QSplineSeries();
-//      series->setName("Histogram");
-
-//      double minAxisX,
-//             maxAxisX,
-//             classMark;                                                   //class mark is the middle point between lower and upper class limit
-//      minAxisX = xAxisData[0];
-//      maxAxisX = xAxisData[iClassAmount];
-//      int maximumFrequency = 0;                                  //maximumFrequency used to scale the y-axis
-//      for (int ir=0; ir < iClassAmount; ir++)
-//      {
-//          classMark = (xAxisData[ir] + xAxisData[ir+1])/2;
-//          series->append(classMark, matClassFrequencyData[ir]);
-
-//          if (matClassFrequencyData[ir] > maximumFrequency)    //used to find the maximum y-axis
-//          {
-//              maximumFrequency = matClassFrequencyData[ir];
-//          }
-//      }
-//      QChart *chart = new QChart();
-//      chart->addSeries(series);
-//      chart->legend()->setVisible(true);
-//      chart->legend()->setAlignment(Qt::AlignBottom);
-//      chart->setTitle("Spline Histogram");
-//      chart->createDefaultAxes();
-//      chart->axisX()->setRange(minAxisX, maxAxisX);
-//      chart->axisY()->setRange(0, maximumFrequency);
-
-//      QChartView *chartView = new QChartView(chart);
-//      chartView->setRenderHint(QPainter::Antialiasing);
-
-//      QMainWindow window;
-//      window.setCentralWidget(chartView);
-//      window.resize(400, 300);
-//      window.show();
-
-//      return a.exec();
-//}
