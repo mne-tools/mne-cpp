@@ -186,8 +186,8 @@ void TMSI::setUpFiffInfo()
     //
     //Read electrode positions from .elc file
     //
-    QVector< QVector<double> > elcLocation3D;
-    QVector< QVector<double> > elcLocation2D;
+    QList<QVector<double> > elcLocation3D;
+    QList<QVector<double> > elcLocation2D;
     QString unit;
     QStringList elcChannelNames;
 
