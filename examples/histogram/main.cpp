@@ -50,6 +50,7 @@
 #include <utils/mnemath.h>
 #include <disp/bar.h>
 #include <disp/spline.h>
+#include <disp/view.h>
 
 
 //*************************************************************************************************************
@@ -227,8 +228,8 @@ int main(int argc, char *argv[])
     int precision = 2;             //format for the amount digits of coefficient shown in the histogram
     //start of the histogram display function using Qtcharts
 
-    //Spline* displayObj = new Spline("MNE-CPP Histogram Example (Spline)");
-    Bar* displayObj = new Bar("MNE-CPP Histogram Example (Bar)");
+    Spline* displayObj = new Spline("MNE-CPP Histogram Example (Spline)");
+    //Bar* displayObj = new Bar("MNE-CPP Histogram Example (Bar)");
 
     QTime myTimerHistogram;
     myTimerHistogram.start();
@@ -237,6 +238,9 @@ int main(int argc, char *argv[])
 
     displayObj->resize(400,300);
     displayObj->show();
+
+    View* w;
+    w->show();
 
     std::cout << data.block(0,0,10,10);
     return a.exec();

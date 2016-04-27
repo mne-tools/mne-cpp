@@ -55,6 +55,7 @@
 #include <QtCharts/QSplineSeries>
 #include <QtCharts/QBarCategoryAxis>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
@@ -80,12 +81,10 @@ namespace DISPLIB
 using namespace Eigen;
 QT_CHARTS_USE_NAMESPACE
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
-//=============================================================================================================
-
-
 //=============================================================================================================
 
 /** histogram display using Qtcharts/QSpline
@@ -122,9 +121,7 @@ public:
     template<typename T>
     void setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue);
 
-
-    private:
-
+private:
     QChart*             m_pChart;
     QBarCategoryAxis*   m_pAxis;
 
@@ -223,6 +220,7 @@ template<typename T>
       m_pChart->createDefaultAxes();
       m_pChart->axisX()->setRange(minAxisX, maxAxisX);
       m_pChart->axisY()->setRange(0,maximumFrequency);
+
   }
 
 
