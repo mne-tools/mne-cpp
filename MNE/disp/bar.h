@@ -229,28 +229,6 @@ void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat
 
 //*************************************************************************************************************
 
-//template<typename T>
-//void Bar::splitCoefficientAndExponent(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
-//{
-//    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matClassLimitData.rows(), 1);
-//    matrixName.col(0)= matClassLimitData;
-//    Bar::splitCoefficientAndExponent(matrixName, iClassAmount, vecCoefficientResults, vecExponentValues);
-//}
-
-
-//*************************************************************************************************************
-
-//template<typename T>
-//void Bar::splitCoefficientAndExponent(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
-//{
-//    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1, matClassLimitData.cols());
-//    matrixName.row(0)= matClassLimitData;
-//    Bar::splitCoefficientAndExponent(matrixName, iClassAmount, vecCoefficientResults, vecExponentValues);
-//}
-
-
-//*************************************************************************************************************
-
 template <typename T>
 void Bar::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
 {

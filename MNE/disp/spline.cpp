@@ -39,13 +39,7 @@
 //=============================================================================================================
 
 #include "spline.h"
-#include <QtGui/QResizeEvent>
-#include <QtWidgets/QGraphicsScene>
-#include <QtCharts/QChart>
-#include <QtCharts/QLineSeries>
-#include <QtCharts/QSplineSeries>
-#include <QtWidgets/QGraphicsTextItem>
-#include <QtGui/QMouseEvent>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -60,7 +54,8 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================Bar::Bar(const VectorXd& matClassLimitData, VectorXi& matClassFrequencyData, int iPrecisionValue)
 
-Spline::Spline(const QString& title, QWidget* parent) : QWidget(parent)
+Spline::Spline(const QString& title, QWidget* parent)
+: QWidget(parent)
 {
     m_pChart = new QChart();
     m_pChart->setTitle(title);
@@ -81,3 +76,21 @@ Spline::Spline(const QString& title, QWidget* parent) : QWidget(parent)
 
 
 //*************************************************************************************************************
+
+void Spline::mousePressEvent(QMouseEvent *event)
+{
+    qDebug() << "Output global position:" << event->globalPos();
+    qDebug() << "Output window position:" << event->windowPos();
+    qDebug() << "Output m_pChart position:" << m_pChart->pos();
+    qDebug() << "Output m_pChart margins:" << m_pChart->margins();
+
+    QWidget::mousePressEvent(event);
+}
+
+
+//*************************************************************************************************************
+
+void Spline::keepCallout()
+{
+    qDebug()<< "Output";
+}
