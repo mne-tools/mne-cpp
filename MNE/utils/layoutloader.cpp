@@ -62,7 +62,7 @@ LayoutLoader::LayoutLoader()
 
 //*************************************************************************************************************
 
-bool LayoutLoader::readAsaElcFile(QString path, QStringList &channelNames, QList<QVector<double> > &location3D, QList<QVector<double> > &location2D, QString &unit)
+bool LayoutLoader::readAsaElcFile(const QString& path, QStringList &channelNames, QList<QVector<double> > &location3D, QList<QVector<double> > &location2D, QString &unit)
 {
     //Open .elc file
     if(!path.contains(".elc"))
@@ -148,7 +148,7 @@ bool LayoutLoader::readAsaElcFile(QString path, QStringList &channelNames, QList
 
 //*************************************************************************************************************
 
-bool LayoutLoader::readMNELoutFile(QString path, QMap<QString, QPointF> &channelData)
+bool LayoutLoader::readMNELoutFile(const QString &path, QMap<QString, QPointF> &channelData)
 {
     //Open .elc file
     if(!path.contains(".lout"))
