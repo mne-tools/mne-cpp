@@ -212,8 +212,8 @@ int main(int argc, char *argv[])
     dataSine = sineWaveGenerator(1.0e-30,(1.0/1e6), 0.0, 1.0);  //creates synthetic data using sineWaveGenerator function
 
     bool bMakeSymmetrical;
-    bMakeSymmetrical = false;       //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
-    int classAmount = 14;          //initialize the amount of classes and class frequencies
+    bMakeSymmetrical = true;       //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
+    int classAmount = 100;          //initialize the amount of classes and class frequencies
     double inputGlobalMin = 0.0,
            inputGlobalMax = 0.0;
     Eigen::VectorXd resultClassLimit;
@@ -238,9 +238,6 @@ int main(int argc, char *argv[])
 
     displayObj->resize(400,300);
     displayObj->show();
-
-    View* w;
-    w->show();
 
     std::cout << data.block(0,0,10,10);
     return a.exec();

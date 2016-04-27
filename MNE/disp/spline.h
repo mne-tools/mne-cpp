@@ -54,6 +54,14 @@
 #include <QtCharts/QChartView>
 #include <QtCharts/QSplineSeries>
 #include <QtCharts/QBarCategoryAxis>
+#include <QtGui/QResizeEvent>
+#include <QtWidgets/QGraphicsScene>
+#include <QtCharts/QChart>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QSplineSeries>
+#include <QtWidgets/QGraphicsTextItem>
+#include <QtGui/QMouseEvent>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -94,21 +102,21 @@ QT_CHARTS_USE_NAMESPACE
 */
 class DISPSHARED_EXPORT Spline: public QWidget
 {
+    Q_OBJECT
+
 public:
     typedef QSharedPointer<Spline> SPtr;            /**< Shared pointer type for Spline. */
     typedef QSharedPointer<const Spline> ConstSPtr; /**< Const shared pointer type for Spline. */
 
-
     //=========================================================================================================
-
     /**
     * The constructor for Spline
     */
     Spline(const QString& title = "Spline Histogram", QWidget* parent = 0);
 
+    void mousePressEvent(QMouseEvent *event);
 
     //=========================================================================================================
-
     /**
     * creates a qspline chart histogram from 2 vectors: class limits and class frequency
     *
@@ -139,7 +147,6 @@ private:
 
 
     //=========================================================================================================
-
     /**
     * splitCoefficientAndExponent takes in QVector value of coefficient and exponent (example: 1.2e-10) and finds the coefficient (1.2) and the appropriate exponent (-12), normalize the exponents to either the lowest or highest exponent in the list then places the values in two separate QVectors
     *
@@ -150,6 +157,11 @@ private:
     */
     template<typename T>
     void splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
+
+    //=========================================================================================================
+
+public slots:
+    void keepCallout();
 
 };
 
@@ -169,7 +181,7 @@ void Spline::setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitDat
   }
 
 
-  ////*************************************************************************************************************
+////*************************************************************************************************************
 
 template <typename T>
 void Spline::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue)
@@ -212,6 +224,8 @@ template<typename T>
               maximumFrequency = matClassFrequencyData(ir);
           }
       }
+      connect(series, SIGNAL(clicked(QPointF)), this, SLOT(keepCallout()));
+      connect(series, SIGNAL(hovered(QPointF, bool)), this, SLOT(tooltip(QPointF,bool)));
 
       //create new series and then clear the plot and update with new data
       m_pChart->removeAllSeries();
