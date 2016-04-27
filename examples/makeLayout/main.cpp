@@ -164,7 +164,7 @@ int main(int argc, char *argv[])
         QFile out(parser.value(outputOption));
 
         int numberTries = 0;
-        while(numberTries<10) {
+        while(numberTries < 10) {
             if(LayoutMaker::makeLayout(inputPoints,
                                        outputPoints,
                                        names,
