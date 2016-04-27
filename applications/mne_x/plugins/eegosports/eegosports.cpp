@@ -619,18 +619,17 @@ void EEGoSports::showSetupStimulus()
 //    }
 
     QDesktopWidget Desktop; // Desktop Widget for getting the number of accessible screens
-
-    // Open setup stimulus widget
-    if(m_pEEGoSportsSetupStimulusWidget == NULL)
-        m_pEEGoSportsSetupStimulusWidget = QSharedPointer<EEGoSportsSetupStimulusWidget>(new EEGoSportsSetupStimulusWidget(this));
-
     if(Desktop.numScreens()> 1){
+        // Open setup stimulus widget
+        if(m_pEEGoSportsSetupStimulusWidget == NULL)
+            m_pEEGoSportsSetupStimulusWidget = QSharedPointer<EEGoSportsSetupStimulusWidget>(new EEGoSportsSetupStimulusWidget(this));
+
         if(!m_pEEGoSportsSetupStimulusWidget->isVisible()){
-                m_pEEGoSportsSetupStimulusWidget->setWindowTitle("EEGoSports EEG Connector - Setup project");
-                //m_pEEGoSportsSetupStimulusWidget->initGui();
-                m_pEEGoSportsSetupStimulusWidget->show();
-                m_pEEGoSportsSetupStimulusWidget->raise();
-            }
+            m_pEEGoSportsSetupStimulusWidget->setWindowTitle("EEGoSports EEG Connector - Setups Stimulus");
+            //m_pEEGoSportsSetupStimulusWidget->initGui();
+            m_pEEGoSportsSetupStimulusWidget->show();
+            m_pEEGoSportsSetupStimulusWidget->raise();
+        }
     }
     else{
         QMessageBox msgBox;
@@ -638,8 +637,6 @@ void EEGoSports::showSetupStimulus()
         msgBox.exec();
         return;
     }
-
-    qDebug() << Desktop.numScreens();
 }
 
 //*************************************************************************************************************
