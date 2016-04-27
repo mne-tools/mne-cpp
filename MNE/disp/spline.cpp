@@ -39,7 +39,13 @@
 //=============================================================================================================
 
 #include "spline.h"
-
+#include <QtGui/QResizeEvent>
+#include <QtWidgets/QGraphicsScene>
+#include <QtCharts/QChart>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QSplineSeries>
+#include <QtWidgets/QGraphicsTextItem>
+#include <QtGui/QMouseEvent>
 
 //*************************************************************************************************************
 //=============================================================================================================
