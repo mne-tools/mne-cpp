@@ -56,7 +56,7 @@ contains(MNECPP_CONFIG, BuildBasicMNEXVersion) {
         babymeg \
         triggercontrol \
         eegosports \
-        gusbamp
+        # gusbamp
 
 
     #Algorithms
@@ -71,6 +71,7 @@ contains(MNECPP_CONFIG, BuildBasicMNEXVersion) {
         rtsss \
         rthpi \
         noisereduction \
+        noise \
 
 
     win32 { #Only compile the TMSI plugin if a windows system is used - TMSi driver is not available for linux yet
