@@ -606,26 +606,15 @@ void EEGoSports::showSetupProjectDialog()
 
 void EEGoSports::showSetupStimulus()
 {
-//    // Open setup project widget
-//    if(m_pEEGoSportsSetupProjectWidget == NULL)
-//        m_pEEGoSportsSetupProjectWidget = QSharedPointer<EEGoSportsSetupProjectWidget>(new EEGoSportsSetupProjectWidget(this));
-
-//    if(!m_pEEGoSportsSetupProjectWidget->isVisible())
-//    {
-//        m_pEEGoSportsSetupProjectWidget->setWindowTitle("EEGoSports EEG Connector - Setup project");
-//        m_pEEGoSportsSetupProjectWidget->initGui();
-//        m_pEEGoSportsSetupProjectWidget->show();
-//        m_pEEGoSportsSetupProjectWidget->raise();
-//    }
-
     QDesktopWidget Desktop; // Desktop Widget for getting the number of accessible screens
+
     if(Desktop.numScreens()> 1){
         // Open setup stimulus widget
         if(m_pEEGoSportsSetupStimulusWidget == NULL)
             m_pEEGoSportsSetupStimulusWidget = QSharedPointer<EEGoSportsSetupStimulusWidget>(new EEGoSportsSetupStimulusWidget(this));
 
         if(!m_pEEGoSportsSetupStimulusWidget->isVisible()){
-            m_pEEGoSportsSetupStimulusWidget->setWindowTitle("EEGoSports EEG Connector - Setups Stimulus");
+            m_pEEGoSportsSetupStimulusWidget->setWindowTitle("EEGoSports EEG Connector - Setup Stimulus");
             //m_pEEGoSportsSetupStimulusWidget->initGui();
             m_pEEGoSportsSetupStimulusWidget->show();
             m_pEEGoSportsSetupStimulusWidget->raise();
