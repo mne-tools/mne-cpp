@@ -181,6 +181,8 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
         out.setDevice(&outFile);
     }
 
+    out << "0.000000 0.000000 0.000000 0.000000" << endl;
+
     for(k = 0; k < nchan; k++) {
         point.clear();
 
@@ -198,7 +200,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
 
         if(writeFile) {
             if(k < names.size()) {
-                out << k+1 << " " << point[0] << " " << point[1] << " " << w << " " << h << " " << names.at(k)<<endl;
+                out << k+1 << " " << point[0] << " " << point[1] << " " << w << " " << h << " " << names.at(k) << endl;
             } else {
                 out << k+1 << " " << point[0] << " " << point[1] << " " << w << " " << h <<endl;
             }
