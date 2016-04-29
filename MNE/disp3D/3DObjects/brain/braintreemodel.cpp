@@ -156,8 +156,8 @@ bool BrainTreeModel::addData(const QString& text, const Surface& tSurface, const
         BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, text);
 
         QList<QStandardItem*> list;
-        list<<new QStandardItem(pSurfaceSetItem->toolTip());
         list<<pSurfaceSetItem;
+        list<<new QStandardItem(pSurfaceSetItem->toolTip());
         m_pRootItem->appendRow(list);
 
         state = pSurfaceSetItem->addData(tSurface, tAnnotation, p3DEntityParent);
@@ -182,8 +182,8 @@ bool BrainTreeModel::addData(const QString& text, const MNESourceSpace& tSourceS
         BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, text);
 
         QList<QStandardItem*> list;
-        list<<new QStandardItem(pSurfaceSetItem->toolTip());
         list<<pSurfaceSetItem;
+        list<<new QStandardItem(pSurfaceSetItem->toolTip());
         m_pRootItem->appendRow(list);
 
         state = pSurfaceSetItem->addData(tSourceSpace, p3DEntityParent);
