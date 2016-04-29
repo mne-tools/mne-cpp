@@ -124,7 +124,7 @@ void SelectionManagerWindow::initComboBoxes()
         << "Vectorview-grad.lout"
         << "Vectorview-all.lout"
         << "Vectorview-mag.lout"
-        << "dukeEEG64dry.lout"
+        << "standard_waveguard64_duke.lout"
 
 //     << "CTF-275.lout"
 //     << "magnesWH3600.lout"
@@ -135,11 +135,11 @@ void SelectionManagerWindow::initComboBoxes()
 
     //Initialise layout as neuromag vectorview with all channels
     QString selectionName("babymeg-mag-inner-layer.lout");
-    loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/MNE_Browse_Raw_Resources/Templates/Layouts/"));
+    loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/Resources/Layouts/"));
 
     //Load selection groups again because they need to be reinitialised every time a new layout hase been loaded
     selectionName = QString("mne_browse_raw_babyMEG.sel");
-    loadSelectionGroups(QCoreApplication::applicationDirPath() + selectionName.prepend("/MNE_Browse_Raw_Resources/Templates/ChannelSelection/"));
+    loadSelectionGroups(QCoreApplication::applicationDirPath() + selectionName.prepend("/Resources/SelectionGroups/"));
 }
 
 
@@ -348,7 +348,7 @@ bool SelectionManagerWindow::loadLayout(QString path)
     QList<QVector<double> > inputPoints;
     QList<QVector<double> > outputPoints;
     QStringList names;
-    QFile out("manualLayout.lout");//(/*"./MNE_Browse_Raw_Resources/Templates/ChannelSelection/*/"manualLayout.lout");
+    QFile out("manualLayout.lout");//(/*"./Resources/SelectionGroups/*/"manualLayout.lout");
 
     for(int i = 0; i < m_pChInfoModel->rowCount(); i++) {
         QModelIndex digIndex = m_pChInfoModel->index(i,1);
@@ -376,7 +376,7 @@ bool SelectionManagerWindow::loadLayout(QString path)
     float height = 4.0;
     int numberTries = 0;
 
-    if(inputPoints.size()>0)
+    if(inputPoints.size()>0) {
         while(numberTries<10) {
             if(LayoutMaker::makeLayout(inputPoints,
                                        outputPoints,
@@ -386,13 +386,14 @@ bool SelectionManagerWindow::loadLayout(QString path)
                                        prad,
                                        width,
                                        height,
-                                       true,
+                                       false,
                                        true,
                                        false) == -1)
                 numberTries++;
             else
                 numberTries = 11;
         }
+    }
 
     //Add new EEG points to Layout Map
     for(int i = 0;  i < outputPoints.size(); i++) {
@@ -427,7 +428,7 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
     ui->m_listWidget_selectionGroups->clear();
 
     //Read selection from file and store to map
-    QString newPath = path; //QCoreApplication::applicationDirPath() + path.prepend("/MNE_Browse_Raw_Resources/Templates/ChannelSelection/");
+    QString newPath = path; //QCoreApplication::applicationDirPath() + path.prepend("/Resources/SelectionGroups/");
 
     m_selectionGroupsMap.clear();
 
@@ -617,7 +618,7 @@ void SelectionManagerWindow::onBtnLoadUserSelection()
 {
     QString path = QFileDialog::getOpenFileName(this,
                                                 QString("Open selection file"),
-                                                QString("./MNE_Browse_Raw_Resources/Templates/ChannelSelection/"),
+                                                QString("./Resources/SelectionGroups/"),
                                                 tr("Selection files (*.sel *.mon)"));
 
     if(path.isEmpty())
@@ -634,7 +635,7 @@ void SelectionManagerWindow::onBtnSaveUserSelection()
     QDate date;
     QString path = QFileDialog::getSaveFileName(this,
                                                 "Save user channel selection",
-                                                QString("./MNE_Browse_Raw_Resources/Templates/ChannelSelection/%1_%2_%3_UserSelection").arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
+                                                QString("./Resources/SelectionGroups/%1_%2_%3_UserSelection").arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
                                                 tr("MNE selection file(*.sel);; Brainstorm montage file(*.mon)"));
 
     QMap<QString, QStringList> tempMap = m_selectionGroupsMap;
@@ -668,7 +669,7 @@ void SelectionManagerWindow::onBtnAddToSelectionGroups()
 void SelectionManagerWindow::onComboBoxLayoutChanged()
 {
     QString selectionName(ui->m_comboBox_layoutFile->currentText());
-    loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/MNE_Browse_Raw_Resources/Templates/Layouts/"));
+    loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/Resources/2DLayouts/"));
 }
 
 

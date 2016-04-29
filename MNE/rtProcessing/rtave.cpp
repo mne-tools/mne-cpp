@@ -179,6 +179,17 @@ void RtAve::setTriggerChIndx(qint32 idx)
 
 //*************************************************************************************************************
 
+void RtAve::setArtifactReduction(bool bActivate, double dThreshold)
+{
+    m_qMutex.lock();
+    m_dArtifactThreshold = dThreshold;
+    m_bDoArtifactReduction = bActivate;
+    m_qMutex.unlock();
+}
+
+
+//*************************************************************************************************************
+
 void RtAve::setBaselineActive(bool activate)
 {
     m_qMutex.lock();
@@ -310,7 +321,7 @@ void RtAve::run()
             } else {
                 clearDetectedTriggers();
 
-                //Detect trigger for all stim channels.
+                //Detect trigger
                 m_iTriggerPos = -1;
                 DetectTrigger::detectTriggerFlanksGrad(rawSegment, m_iTriggerIndex, m_iTriggerPos, 0, m_fTriggerThreshold, true, "Rising");
 
@@ -407,16 +418,68 @@ void RtAve::mergeData()
 
     mergedData << m_matDataPre, m_matDataPost;
 
-    //Add cut data to average buffer
-    m_qListStimAve.append(mergedData);
-    if(m_qListStimAve.size()>m_iNumAverages && m_iNumAverages >= 1) {
-        m_qListStimAve.pop_front();
+    //Perform artifact threshold
+    bool bArtifactedDetected = false;
+
+    if(m_bDoArtifactReduction) {
+       bArtifactedDetected = checkForArtifact(mergedData, m_dArtifactThreshold);
     }
 
-    //Proceed a bit different if we use zero number of averages
-    if(m_qListStimAve.size() > 1 && m_iNumAverages == 0) {
-        m_qListStimAve.pop_front();
+    if(bArtifactedDetected == false) {
+        //Add cut data to average buffer
+        m_qListStimAve.append(mergedData);
+
+        //Pop data from buffer
+        if(m_qListStimAve.size() > m_iNumAverages && m_iNumAverages >= 1) {
+            m_qListStimAve.pop_front();
+        }
+
+        //Proceed a bit different if we use zero number of averages
+        if(m_qListStimAve.size() > 1 && m_iNumAverages == 0) {
+            m_qListStimAve.pop_front();
+        }
     }
+}
+
+
+//*************************************************************************************************************
+
+bool RtAve::checkForArtifact(MatrixXd& data, double dThreshold)
+{
+    double min = 0;
+    double max = 0;
+//    double sub = 0;
+
+//    VectorXd subs;
+
+//    for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
+//        if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH)
+//           && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
+//            min = data.row(i).minCoeff();
+//            max = data.row(i).maxCoeff();
+//            sub = max - min;
+
+//            subs.resize(subs.rows() + 1);
+//            subs(i) = abs(sub);
+//        }
+//    }
+
+    int i = 5;
+
+    min = data.row(i).minCoeff();
+    max = data.row(i).maxCoeff();
+    double maxSubs = max - min;
+
+    //qDebug()<<"RtAve::checkForArtifact - maxSubs"<<maxSubs;
+
+    bool bArtifactDetected = false;
+
+    if(maxSubs > dThreshold) {
+        std::cout << '\a';
+        bArtifactDetected = true;
+    }
+
+    return bArtifactDetected;
 }
 
 
