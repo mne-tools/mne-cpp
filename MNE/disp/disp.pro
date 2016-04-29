@@ -111,8 +111,7 @@ SOURCES += \
     helpers/roundededgeswidget.cpp \
     bar.cpp \
     spline.cpp \
-    callout.cpp \
-    view.cpp
+    callout.cpp
 
 HEADERS += \
     disp_global.h \
@@ -137,8 +136,7 @@ HEADERS += \
     helpers/roundededgeswidget.h \
     bar.h \
     spline.h \
-    callout.h \
-    view.h
+    callout.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

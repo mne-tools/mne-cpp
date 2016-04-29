@@ -62,6 +62,19 @@
 #include <QtWidgets/QGraphicsTextItem>
 #include <QtGui/QMouseEvent>
 #include <QDebug>
+#include <QtCharts/QChartGlobal>
+#include "callout.h"
+
+//QT_BEGIN_NAMESPACE
+//class QGraphicsScene;
+//class QMouseEvent;
+//class QResizeEvent;
+//QT_END_NAMESPACE
+
+//QT_CHARTS_BEGIN_NAMESPACE
+//class QChart;
+//QT_CHARTS_END_NAMESPACE
+class Callout;
 
 
 //*************************************************************************************************************
@@ -100,11 +113,16 @@ QT_CHARTS_USE_NAMESPACE
 *
 * @brief Spline class for histogram display using Qtcharts/QSpline
 */
-class DISPSHARED_EXPORT Spline: public QWidget
+
+class DISPSHARED_EXPORT Spline
+: public QWidget
+//public QWidget,
+
 {
     Q_OBJECT
 
 public:
+
     typedef QSharedPointer<Spline> SPtr;            /**< Shared pointer type for Spline. */
     typedef QSharedPointer<const Spline> ConstSPtr; /**< Const shared pointer type for Spline. */
 
@@ -114,7 +132,6 @@ public:
     */
     Spline(const QString& title = "Spline Histogram", QWidget* parent = 0);
 
-    void mousePressEvent(QMouseEvent *event);
 
     //=========================================================================================================
     /**
@@ -129,9 +146,23 @@ public:
     template<typename T>
     void setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue);
 
+
+    //=========================================================================================================
+
+public slots:
+    void keepCallout();
+    void tooltip(QPointF point, bool state);
+
+protected:
+    void resizeEvent(QResizeEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+
 private:
     QChart*             m_pChart;
     QBarCategoryAxis*   m_pAxis;
+    QGraphicsSimpleTextItem *m_coordX;
+    QGraphicsSimpleTextItem *m_coordY;
+    Callout *m_tooltip;
 
 
     //=========================================================================================================
@@ -160,9 +191,8 @@ private:
 
     //=========================================================================================================
 
-public slots:
-    void keepCallout();
-
+signals:
+    void borderChanged(double left, double middle, double right);
 };
 
 
@@ -197,7 +227,7 @@ void Spline::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitDat
 
 template<typename T>
   void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData, int iPrecisionValue)
-  {
+{
       Eigen::VectorXd resultDisplayValues;
       Eigen::VectorXi resultExponentValues;
       int iClassAmount = matClassFrequencyData.rows();
@@ -224,6 +254,18 @@ template<typename T>
               maximumFrequency = matClassFrequencyData(ir);
           }
       }
+
+//      setDragMode(QWidget::NoDrag);
+//      setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+//      setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+      m_coordX = new QGraphicsSimpleTextItem(m_pChart);
+      m_coordX->setPos(m_pChart->size().width()/2 - 50, m_pChart->size().height());
+      m_coordX->setText("X: ");
+      m_coordY = new QGraphicsSimpleTextItem(m_pChart);
+      m_coordY->setPos(m_pChart->size().width()/2 + 50, m_pChart->size().height());
+      m_coordY->setText("Y: ");
+
       connect(series, SIGNAL(clicked(QPointF)), this, SLOT(keepCallout()));
       connect(series, SIGNAL(hovered(QPointF, bool)), this, SLOT(tooltip(QPointF,bool)));
 
