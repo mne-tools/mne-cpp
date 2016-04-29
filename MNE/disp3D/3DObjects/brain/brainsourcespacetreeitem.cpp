@@ -112,7 +112,7 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
     transform->setMatrix(m);
     m_pRenderable3DEntity->addComponent(transform);
 
-    //Create sources as small 3D spheres
+//    //Create sources as small 3D spheres
 //    RowVector3f sourcePos;
 //    QVector3D pos;
 //    Qt3DCore::QEntity* sourceSphereEntity;
@@ -139,7 +139,7 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
 //            sourceSphereEntity->addComponent(transform);
 
 //            material = new Qt3DRender::QPhongMaterial();
-//            material->setAmbient(QColor(255,0,0));
+//            material->setAmbient(Qt::yellow);
 //            sourceSphereEntity->addComponent(material);
 
 //            sourceSphereEntity->setParent(m_pRenderable3DEntity);
@@ -164,19 +164,21 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
 //            sourceSphereEntity->addComponent(transform);
 
 //            material = new Qt3DRender::QPhongMaterial();
-//            material->setAmbient(QColor(255,0,0));
+//            material->setAmbient(Qt::yellow);
 //            sourceSphereEntity->addComponent(material);
 
 //            sourceSphereEntity->setParent(m_pRenderable3DEntity);
 //        }
 //    }
 
+//    m_lChildren = m_pRenderable3DEntity->children();
+
     //Create color from curvature information with default gyri and sulcus colors
     QByteArray arrayVertColor = createVertColor(tHemisphere.rr);
 
     //Set renderable 3D entity mesh and color data
     Vector3f offset(3);
-    offset<<0.0, 0.0, 0.0;
+    offset << 0.0, 0.0, 0.0;
 
     m_pRenderable3DEntity->setMeshData(tHemisphere.rr, tHemisphere.nn, tHemisphere.tris, offset, arrayVertColor);
 
@@ -223,6 +225,10 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
 void BrainSourceSpaceTreeItem::setVisible(bool state)
 {
     m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
+
+//    for(int i = 0; i<m_lChildren.size(); i++) {
+//        m_lChildren.at(i)->setParent(state ? m_pRenderable3DEntity : Q_NULLPTR);
+//    }
 }
 
 
