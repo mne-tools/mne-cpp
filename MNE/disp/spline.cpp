@@ -38,8 +38,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "spline.h"
-
+#include <spline.h>
+#include <callout.h>
+#include <QtGui/QResizeEvent>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsTextItem>
+#include <QtGui/QMouseEvent>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -55,7 +59,11 @@ using namespace DISPLIB;
 //=============================================================================================================Bar::Bar(const VectorXd& matClassLimitData, VectorXi& matClassFrequencyData, int iPrecisionValue)
 
 Spline::Spline(const QString& title, QWidget* parent)
-: QWidget(parent)
+:  QWidget(parent),
+   m_coordX(0),
+   m_coordY(0),
+   m_tooltip(0)
+
 {
     m_pChart = new QChart();
     m_pChart->setTitle(title);
@@ -77,20 +85,92 @@ Spline::Spline(const QString& title, QWidget* parent)
 
 //*************************************************************************************************************
 
-void Spline::mousePressEvent(QMouseEvent *event)
-{
-    qDebug() << "Output global position:" << event->globalPos();
-    qDebug() << "Output window position:" << event->windowPos();
-    qDebug() << "Output m_pChart position:" << m_pChart->pos();
-    qDebug() << "Output m_pChart margins:" << m_pChart->margins();
+//Spline::View(QWidget *parent, m_pChart)
+//: QWidget(new QGraphicsScene, parent),
+//  m_coordX(0),
+//  m_coordY(0),
+//  m_tooltip(0)
+//{
+//    setDragMode(QWidget::NoDrag);
+//    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+//    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    QWidget::mousePressEvent(event);
-}
+//    m_coordX = new QGraphicsSimpleTextItem(m_pChart);
+//    m_coordX->setPos(m_pChart->size().width()/2 - 50, m_pChart->size().height());
+//    m_coordX->setText("X: ");
+//    m_coordY = new QGraphicsSimpleTextItem(m_pChart);
+//    m_coordY->setPos(m_pChart->size().width()/2 + 50, m_pChart->size().height());
+//    m_coordY->setText("Y: ");
+
+//    connect(series, SIGNAL(clicked(QPointF)), this, SLOT(keepCallout()));
+//    connect(series, SIGNAL(hovered(QPointF, bool)), this, SLOT(tooltip(QPointF,bool)));
+
+//}
+
+
+//*************************************************************************************************************
+
+//void Spline::mousePressEvent(QMouseEvent *event)
+//{
+//    qDebug() << "Output global position:" << event->globalPos();
+//    qDebug() << "Output window position:" << event->windowPos();
+//    qDebug() << "Output m_pChart position:" << m_pChart->pos();
+//    qDebug() << "Output m_pChart margins:" << m_pChart->margins();
+
+//    QWidget::mousePressEvent(event);
+//}
 
 
 //*************************************************************************************************************
 
 void Spline::keepCallout()
 {
-    qDebug()<< "Output";
+    m_tooltip = new Callout(m_pChart);
+
+    emit borderChanged(1.0, 1.0, 1.0);
 }
+
+
+//*************************************************************************************************************
+
+void Spline::tooltip(QPointF point, bool state)
+{
+    if (m_tooltip == 0)
+        m_tooltip = new Callout(m_pChart);
+
+    if (state) {
+        m_tooltip->setText(QString("X: %1 \nY: %2 ").arg(point.x()).arg(point.y()));
+        QXYSeries *series = qobject_cast<QXYSeries *>(sender());
+        m_tooltip->setAnchor(m_pChart->mapToPosition(point, series));
+        m_tooltip->setPos(m_pChart->mapToPosition(point, series) + QPoint(10, -50));
+        m_tooltip->setZValue(11);
+        m_tooltip->show();
+    } else {
+        m_tooltip->hide();
+    }
+}
+
+
+//*************************************************************************************************************
+
+
+void Spline::mouseMoveEvent(QMouseEvent *event)
+{
+    m_coordX->setText(QString("X: %1").arg(m_pChart->mapToValue(event->pos()).x()));
+    m_coordY->setText(QString("Y: %1").arg(m_pChart->mapToValue(event->pos()).y()));
+    QWidget::mouseMoveEvent(event);
+}
+
+
+//*************************************************************************************************************
+
+void Spline::resizeEvent(QResizeEvent *event)
+{
+    m_pChart->resize(event->size());
+    m_coordX->setPos(m_pChart->size().width()/2 - 50, m_pChart->size().height() - 20);
+    m_coordY->setPos(m_pChart->size().width()/2 + 50, m_pChart->size().height() - 20);
+    QWidget::resizeEvent(event);
+}
+
+
+//*************************************************************************************************************
