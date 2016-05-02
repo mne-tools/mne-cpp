@@ -197,7 +197,7 @@ macx {
 
     # Copy Resource folder to app bundle
     brrc.path = Contents/MacOS
-    brrc.files = $${DESTDIR}/MNE_Browse_Raw_Resources
+    brrc.files = $${DESTDIR}/Resources
     QMAKE_BUNDLE_DATA += brrc
 
 #    isEmpty(TARGET_EXT) {
