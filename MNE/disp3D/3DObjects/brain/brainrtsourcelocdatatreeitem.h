@@ -159,15 +159,63 @@ public:
     */
     inline bool isInit() const;
 
-public slots:
+    //=========================================================================================================
+    /**
+    * This function sets the loop flag.
+    *
+    * @param[in] state     Whether to loop the data or not.
+    */
     void setLoopState(bool state);
 
+    //=========================================================================================================
+    /**
+    * This function sets the data streaming.
+    *
+    * @param[in] state     Whether to stream the data to the display or not.
+    */
     void setStreamingActive(bool state);
 
+    //=========================================================================================================
+    /**
+    * This function sets the time interval for streaming.
+    *
+    * @param[in] iMSec     The waiting time inbetween samples.
+    */
     void setTimeInterval(int iMSec);
 
+    //=========================================================================================================
+    /**
+    * This function sets the number of averages.
+    *
+    * @param[in] iNumberAverages     The new number of averages.
+    */
     void setNumberAverages(int iNumberAverages);
 
+    //=========================================================================================================
+    /**
+    * This function sets the colortable type.
+    *
+    * @param[in] sColortable     The new colortable ("Hot Negative 1" etc.).
+    */
+    void setColortable(const QString& sColortable);
+
+    //=========================================================================================================
+    /**
+    * This function sets the visualization type.
+    *
+    * @param[in] sVisualizationType     The new visualization type ("Annotation based" etc.).
+    */
+    void setVisualizationType(const QString& sVisualizationType);
+
+    //=========================================================================================================
+    /**
+    * This function set the normalization value.
+    *
+    * @param[in] dNormalization     The new normalization value.
+    */
+    void setNormalization(double dNormalization);
+
+public slots:
     //=========================================================================================================
     /**
     * This slot gets called whenever the origin of the surface vertex color (curvature, annoation, etc.) changed.

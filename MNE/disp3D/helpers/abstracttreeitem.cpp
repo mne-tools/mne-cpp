@@ -54,7 +54,7 @@ using namespace DISP3DLIB;
 //=============================================================================================================
 
 
-AbstractTreeItem::AbstractTreeItem( int iType, const QString& text)
+AbstractTreeItem::AbstractTreeItem(int iType, const QString& text)
 : QStandardItem(text)
 , m_iType(iType)
 {
@@ -83,7 +83,7 @@ QVariant AbstractTreeItem::data(int role) const
 
 //*************************************************************************************************************
 
-void  AbstractTreeItem::setData(const QVariant& value, int role)
+void AbstractTreeItem::setData(const QVariant& value, int role)
 {
     QStandardItem::setData(value, role);
 
@@ -98,7 +98,7 @@ void  AbstractTreeItem::setData(const QVariant& value, int role)
 
 //*************************************************************************************************************
 
-int  AbstractTreeItem::type() const
+int AbstractTreeItem::type() const
 {
     return m_iType;
 }
