@@ -41,6 +41,7 @@
 
 #include "layoutmaker.h"
 #include "minimizersimplex.h"
+#include "sphere.h"
 
 
 //*************************************************************************************************************
@@ -87,7 +88,6 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
     * Automatically make a layout according to the
     * channel locations in inputPoints
     */
-    int         res = FAIL;
     VectorXf    r0(3);
     VectorXf    rr(3);
     float       rad,th,phi;
@@ -101,7 +101,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
     VectorXf yy(nchan);
 
     if (nchan <= 0) {
-        std::cout<<"No input points to lay out.";
+        std::cout << "No input points to lay out." << std::endl;
         return false;
     }
 
@@ -112,19 +112,20 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
         rrs(k,2) = inputPoints.at(k)[2]; //z
     }
 
-    std::cout<<"Channels found for layout: "<<nchan<<std::endl;
+    std::cout << "Channels found for layout: " << nchan << std::endl;
 
     //Fit to sphere if wanted by the user
-    if (!do_fit)
-        std::cout<<"Using default origin:"<<r0[0]<<r0[1]<<r0[2]<<std::endl;
+    if (!do_fit) {
+        std::cout << "Using default origin:" << r0[0] << ", " << r0[1] << ", " << r0[2] << std::endl;
+    }
     else {
-        if(fit_sphere_to_points(rrs,nchan,(float)0.05,r0,rad) == FAIL) {
-            std::cout<<"Using default origin:"<<r0[0]<<r0[1]<<r0[2]<<std::endl;
-        }
-        else{
-            std::cout<<"best fitting sphere:"<<std::endl;
-            std::cout<<"torigin: "<<r0[0]<<r0[1]<<r0[2]<<rad<<std::endl<<"tradius: "<<rad<<std::endl;
-        }
+        Sphere sphere = Sphere::fit_sphere_simplex(rrs, 0.05);
+
+        r0 = sphere.center();
+        rad = sphere.radius();
+
+        std::cout << "best fitting sphere:" << std::endl;
+        std::cout << "torigin: " << r0[0] << ", " << r0[1] << ", " << r0[2] << std::endl << "; tradius: " << rad << std::endl;
     }
 
     /*
@@ -156,7 +157,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
 
     if(xmin == xmax || ymin == ymax) {
         std::cout<<"Cannot make a layout. All positions are identical"<<std::endl;
-        return res;
+        return false;
     }
 
     xmax = xmax + 0.6*w;
@@ -173,8 +174,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
 
     if(writeFile) {
         if (!outFile.open(QIODevice::WriteOnly)) {
-            std::cout<<"could not open output file";
-            qDebug()<<"could not open output file";
+            std::cout << "Could not open output file!" << std::endl;
             return false;
         }
 
@@ -208,14 +208,12 @@ bool LayoutMaker::makeLayout(const QList<QVector<double> > &inputPoints,
     }
 
     if(writeFile) {
-        std::cout<<"success while wrtiting to output file";
+        std::cout << "Success while wrtiting to output file." << std::endl;
 
         outFile.close();
     }
 
-    res = OK;
-
-    return res;
+    return true;
 }
 
 
