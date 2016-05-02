@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
     //FIFFV_BEM_SURF_ID_HEAD       4 -> Head
     qDebug() << "bem" << bem[0].id;
 
-    Sphere sp = Sphere::fit_sphere( bem[0].rr.cast<double>() );
+    Sphere sp = Sphere::fit_sphere( bem[0].rr );
 
     std::cout << "sp center" << std::endl << sp.center() << std::endl;
     std::cout << "sp radius" << std::endl << sp.radius() << std::endl;
