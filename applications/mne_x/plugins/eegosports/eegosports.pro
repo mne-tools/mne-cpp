@@ -79,7 +79,7 @@ SOURCES += \
         eegosportsdriver.cpp \
         FormFiles/eegosportssetupprojectwidget.cpp \
         FormFiles/eegosportssetupstimuluswidget.cpp \
-    flashobject.cpp
+        flashobject.cpp
 
 HEADERS += \
         eegosports.h\
@@ -90,7 +90,7 @@ HEADERS += \
         eegosportsdriver.h \
         FormFiles/eegosportssetupprojectwidget.h \
         FormFiles/eegosportssetupstimuluswidget.h \
-    flashobject.h
+        flashobject.h
 
 FORMS += \
         FormFiles/eegosportssetup.ui \
