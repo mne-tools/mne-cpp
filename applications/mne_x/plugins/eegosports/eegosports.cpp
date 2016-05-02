@@ -225,9 +225,9 @@ void EEGoSports::setUpFiffInfo()
         }
     }
 
-    //Append LAP value to digitizer data. Take location of LE2 electrode minus 1 cm as approximation.
+    //Append LAP value to digitizer data. Take location of 2LD electrode minus 1 cm as approximation.
     FiffDigPoint digPoint;
-    int indexLE2 = elcChannelNames.indexOf("LE2");
+    int indexLE2 = elcChannelNames.indexOf("2LD");
     digPoint.kind = FIFFV_POINT_CARDINAL;
     digPoint.ident = FIFFV_POINT_LPA;//digitizerInfo.size();
 
@@ -242,8 +242,8 @@ void EEGoSports::setUpFiffInfo()
     else
         cout<<"Plugin TMSI - ERROR - LE2 not found. Check loaded layout."<<endl;
 
-    //Append nasion value to digitizer data. Take location of Z1 electrode minus 6 cm as approximation.
-    int indexZ1 = elcChannelNames.indexOf("Z1");
+    //Append nasion value to digitizer data. Take location of 0Z electrode minus 6 cm as approximation.
+    int indexZ1 = elcChannelNames.indexOf("0Z");
     digPoint.kind = FIFFV_POINT_CARDINAL;//FIFFV_POINT_NASION;
     digPoint.ident = FIFFV_POINT_NASION;//digitizerInfo.size();
 
@@ -258,8 +258,8 @@ void EEGoSports::setUpFiffInfo()
     else
         cout<<"Plugin TMSI - ERROR - Z1 not found. Check loaded layout."<<endl;
 
-    //Append RAP value to digitizer data. Take location of RE2 electrode minus 1 cm as approximation.
-    int indexRE2 = elcChannelNames.indexOf("RE2");
+    //Append RAP value to digitizer data. Take location of 2RD electrode minus 1 cm as approximation.
+    int indexRE2 = elcChannelNames.indexOf("2RD");
     digPoint.kind = FIFFV_POINT_CARDINAL;
     digPoint.ident = FIFFV_POINT_RPA;//digitizerInfo.size();
 
