@@ -244,6 +244,17 @@ int main(int argc, char *argv[])
 
         //testWindow->addRtBrainData("HemiLRSet", sourceEstimate);
         //rtItemList.at(0)->addData(sourceEstimate);
+
+        //Init some rt related values
+        for(int i = 0; i < rtItemList.size(); ++i) {
+            rtItemList.at(i)->setLoopState(true);
+            rtItemList.at(i)->setTimeInterval(10);
+            rtItemList.at(i)->setNumberAverages(1);
+            rtItemList.at(i)->setStreamingActive(true);
+            rtItemList.at(i)->setNormalization(1.0);
+            rtItemList.at(i)->setVisualizationType("Annotation based");
+            rtItemList.at(i)->setColortable("Hot Negative 2");
+        }
     }
 
     testWindow->show();    

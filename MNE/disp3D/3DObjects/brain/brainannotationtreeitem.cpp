@@ -124,15 +124,22 @@ bool BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation&
         this->setData(data, BrainAnnotationTreeItemRoles::LabeIds);
 
         //Add annotation meta information as item children
+        QList<QStandardItem*> list;
+
         BrainTreeMetaItem *itemAnnotFileName = new BrainTreeMetaItem(BrainTreeMetaItemTypes::AnnotFileName, tAnnotation.fileName());
         itemAnnotFileName->setEditable(false);
-        *this<<itemAnnotFileName;
+        list<<itemAnnotFileName;
+        list<<new QStandardItem(itemAnnotFileName->toolTip());
+        this->appendRow(list);
         data.setValue(tAnnotation.fileName());
         itemAnnotFileName->setData(data, BrainAnnotationTreeItemRoles::AnnotFileName);
 
+        list.clear();
         BrainTreeMetaItem *itemAnnotPath = new BrainTreeMetaItem(BrainTreeMetaItemTypes::AnnotFilePath, tAnnotation.filePath());
         itemAnnotPath->setEditable(false);
-        *this<<itemAnnotPath;
+        list<<itemAnnotPath;
+        list<<new QStandardItem(itemAnnotPath->toolTip());
+        this->appendRow(list);
         data.setValue(tAnnotation.filePath());
         itemAnnotFileName->setData(data, BrainAnnotationTreeItemRoles::AnnotFilePath);
     }
