@@ -731,8 +731,6 @@ void RealTimeMultiSampleArrayModel::updateProjection()
 
         //Create full multiplication matrix
         m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
-
-        m_matSparseFull = m_matSparseProjMult * m_matSparseCompMult;
     }
 }
 
@@ -786,8 +784,6 @@ void RealTimeMultiSampleArrayModel::updateCompensator(int to)
 
         //Create full multiplication matrix
         m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
-
-        m_matSparseFull = m_matSparseProjMult * m_matSparseCompMult;
     }
 }
 
