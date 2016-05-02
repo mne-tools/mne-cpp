@@ -465,7 +465,7 @@ void RealTimeEvokedWidget::init()
         //-------- Init quick control widget --------
         //
         QStringList slFlags;
-        slFlags <<  "projections" << "filter" << "scaling" << "modalities" << "colors";
+        slFlags <<  "projections" << "compensators" << "filter" << "scaling" << "modalities" << "colors";
 
         m_pQuickControlWidget = QSharedPointer<QuickControlWidget>(new QuickControlWidget(m_qMapChScaling, m_pFiffInfo, "RT Averaging", slFlags));
 
@@ -487,6 +487,10 @@ void RealTimeEvokedWidget::init()
         //Handle screenshot signals
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::makeScreenshot,
                 this, &RealTimeEvokedWidget::onMakeScreenshot);
+
+        //Handle compensators
+        connect(m_pQuickControlWidget.data(), &QuickControlWidget::compSelectionChanged,
+                m_pRTEModel.data(), &RealTimeEvokedModel::updateCompensator);
 
         //Handle projections
         connect(m_pQuickControlWidget.data(), &QuickControlWidget::projSelectionChanged,

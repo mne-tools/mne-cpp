@@ -95,6 +95,19 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
             this, &AveragingSettingsWidget::changePostStim);
 
     //Baseline Correction
+    ui.m_pcheckBoxArtifactReduction->setChecked(m_pAveragingToolbox->m_bDoArtifactReduction);
+    connect(ui.m_pcheckBoxArtifactReduction, &QCheckBox::clicked,
+            m_pAveragingToolbox, &Averaging::changeArtifactReductionActive);
+
+    ui.m_pSpinBox_artifactThresholdFirst->setValue(m_pAveragingToolbox->m_dArtifactThresholdFirst);
+    connect(ui.m_pSpinBox_artifactThresholdFirst, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &AveragingSettingsWidget::changeArtifactThreshold);
+
+    ui.m_pSpinBox_artifactThresholdSecond->setValue(m_pAveragingToolbox->m_iArtifactThresholdSecond);
+    connect(ui.m_pSpinBox_artifactThresholdSecond, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &AveragingSettingsWidget::changeArtifactThreshold);
+
+    //Baseline Correction
     ui.m_pcheckBoxBaselineCorrection->setChecked(m_pAveragingToolbox->m_bDoBaselineCorrection);
     connect(ui.m_pcheckBoxBaselineCorrection, &QCheckBox::clicked,
             m_pAveragingToolbox, &Averaging::changeBaselineActive);
@@ -171,4 +184,14 @@ void AveragingSettingsWidget::changeBaselineTo()
 
     m_pAveragingToolbox->changeBaselineTo(mSeconds);
 }
+
+
+//*************************************************************************************************************
+
+void AveragingSettingsWidget::changeArtifactThreshold()
+{
+    m_pAveragingToolbox->changeArtifactThreshold(ui.m_pSpinBox_artifactThresholdFirst->value(), ui.m_pSpinBox_artifactThresholdSecond->value());
+}
+
+
 
