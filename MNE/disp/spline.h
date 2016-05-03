@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include "disp_global.h"
+#include "helpers/callout.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -63,7 +64,6 @@
 #include <QtGui/QMouseEvent>
 #include <QDebug>
 #include <QtCharts/QChartGlobal>
-#include "callout.h"
 
 //QT_BEGIN_NAMESPACE
 //class QGraphicsScene;
@@ -156,6 +156,21 @@ public slots:
 protected:
     void resizeEvent(QResizeEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
+//    void mouseReleaseEvent(QMouseEvent *e)
+//    {
+//        if (e->button() == Qt::LeftButton)
+//        {
+//            emit leftClicked();
+//        }
+//        else if (e->button() == Qt::RightButton)
+//        {
+//            emit rightClicked();
+//        }
+//        else if (e->button() == Qt::MiddleButton)
+//        {
+//            emit middleClicked();
+//        }
+//    }
 
 private:
     QChart*             m_pChart;
@@ -192,6 +207,9 @@ private:
     //=========================================================================================================
 
 signals:
+//    void leftClicked();
+//    void rightClicked();
+//    void middleClicked();
     void borderChanged(double left, double middle, double right);
 };
 
@@ -266,7 +284,7 @@ template<typename T>
       m_coordY->setPos(m_pChart->size().width()/2 + 50, m_pChart->size().height());
       //m_coordY->setText("Y: ");
 
-      connect(series, SIGNAL(clicked(QPointF)), this, SLOT(keepCallout()));
+      connect(series, SIGNAL(released(QPointF)), this, SLOT(keepCallout()));
       connect(series, SIGNAL(hovered(QPointF, bool)), this, SLOT(tooltip(QPointF,bool)));
 
       //create new series and then clear the plot and update with new data
