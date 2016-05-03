@@ -118,7 +118,7 @@ public:
     * @param [in] location2D holds the vector to which the read 2D positions are stored.
     * @return true if reading was successful, false otherwise.
     */
-    static bool readAsaElcFile(QString path, QStringList &channelNames, QVector<QVector<double> > &location3D, QVector<QVector<double> > &location2D, QString &unit);
+    static bool readAsaElcFile(const QString &path, QStringList &channelNames, QList<QVector<double> > &location3D, QList<QVector<double> > &location2D, QString &unit);
 
     //=========================================================================================================
     /**
@@ -127,7 +127,7 @@ public:
     * @param [in] channel data holds the x,y and channel number for every channel. The map keys are the channel names (i.e. 'MEG 0113').
     * @return bool true if reading was successful, false otherwise.
     */
-    static bool readMNELoutFile(QString path, QMap<QString, QPointF> &channelData);
+    static bool readMNELoutFile(const QString &path, QMap<QString, QPointF> &channelData);
 
 private:
 
