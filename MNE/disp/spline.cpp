@@ -126,8 +126,8 @@ Spline::Spline(const QString& title, QWidget* parent)
 void Spline::keepCallout()
 {
     m_tooltip = new Callout(m_pChart);
-
-    emit borderChanged(1.0, 1.0, 1.0);
+    //emit borderChanged(left, middle, right);
+    //qDebug() << "Left Mouse Button: " << left;
 }
 
 
