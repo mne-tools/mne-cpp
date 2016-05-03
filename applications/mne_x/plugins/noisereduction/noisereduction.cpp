@@ -52,6 +52,8 @@ using namespace XMEASLIB;
 using namespace UTILSLIB;
 using namespace IOBuffer;
 using namespace Eigen;
+using namespace DISPLIB;
+using namespace RTPROCLIB;
 
 
 //*************************************************************************************************************
@@ -64,6 +66,7 @@ NoiseReduction::NoiseReduction()
 , m_pNoiseReductionInput(NULL)
 , m_pNoiseReductionOutput(NULL)
 , m_pNoiseReductionBuffer(CircularMatrixBuffer<double>::SPtr())
+, m_iMaxFilterTapSize(0)
 , m_bSpharaActive(false)
 , m_bProjActivated(false)
 , m_bCompActivated(false)
@@ -243,7 +246,11 @@ void NoiseReduction::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             //Init output - Unocmment this if you also uncommented the m_pNoiseReductionOutput in the constructor above
             m_pNoiseReductionOutput->data()->initFromFiffInfo(m_pFiffInfo);
             m_pNoiseReductionOutput->data()->setMultiArraySize(1);
-            m_pNoiseReductionOutput->data()->setVisibility(true);
+            m_pNoiseReductionOutput->data()->setVisibility(true);            
+
+            //Init the filter
+            initFilter();
+            m_iMaxFilterTapSize = pRTMSA->getMultiSampleArray().at(pRTMSA->getMultiSampleArray().size()-1).cols();
         }
 
         MatrixXd t_mat;
@@ -411,6 +418,42 @@ void NoiseReduction::updateCompensator(int to)
 
 //*************************************************************************************************************
 
+void NoiseReduction::setFilterChannelType(QString sType)
+{
+    m_sFilterChannelType = sType;
+
+    //This version is for when all channels of a type are to be filtered (not only the visible ones).
+    //Create channel filter list independent from channelNames
+    m_lFilterChannelList.clear();
+
+    for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
+        if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
+            m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
+            m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH)/* && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)*/) {
+            if(m_sFilterChannelType == "All")
+                m_lFilterChannelList << i;
+            else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType))
+                m_lFilterChannelList << i;
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void NoiseReduction::filterChanged(QList<FilterData> filterData)
+{
+    m_filterData = filterData;
+
+    m_iMaxFilterLength = 1;
+    for(int i=0; i<filterData.size(); i++)
+        if(m_iMaxFilterLength<filterData.at(i).m_iFilterOrder)
+            m_iMaxFilterLength = filterData.at(i).m_iFilterOrder;
+}
+
+
+//*************************************************************************************************************
+
 void NoiseReduction::showOptionsWidget()
 {
     m_pOptionsWidget->show();
@@ -472,6 +515,63 @@ void NoiseReduction::initSphara()
 
 //    qDebug()<<"NoiseReduction::createSpharaOperator - Read VectorView mag matrix "<<m_matSpharaVVMagLoaded.rows()<<m_matSpharaVVMagLoaded.cols()<<"and grad matrix"<<m_matSpharaVVGradLoaded.rows()<<m_matSpharaVVGradLoaded.cols();
 //    qDebug()<<"NoiseReduction::createSpharaOperator - Read BabyMEG inner layer matrix "<<m_matSpharaBabyMEGInnerLoaded.rows()<<m_matSpharaBabyMEGInnerLoaded.cols()<<"and outer layer matrix"<<m_matSpharaBabyMEGOuterFull.rows()<<m_matSpharaBabyMEGOuterFull.cols();
+}
+
+
+//*************************************************************************************************************
+
+void NoiseReduction::initFilter()
+{
+    m_pFilterWindow = FilterWindow::SPtr(new FilterWindow(m_pOptionsWidget.data(), Qt::Window/*0, Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint*/));
+    //m_pFilterWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
+
+    m_pFilterWindow->setFiffInfo(m_pFiffInfo);
+    m_pFilterWindow->setWindowSize(m_iMaxFilterTapSize);
+    m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
+
+    connect(m_pFilterWindow.data(), static_cast<void (FilterWindow::*)(QString)>(&FilterWindow::applyFilter),
+            this, static_cast<void (NoiseReduction::*)(QString)>(&NoiseReduction::setFilterChannelType));
+
+    connect(m_pFilterWindow.data(), &FilterWindow::filterChanged,
+            this, &NoiseReduction::filterChanged);
+
+    //Handle Filtering
+    connect(m_pFilterWindow.data(), &FilterWindow::activationCheckBoxListChanged,
+            m_pOptionsWidget.data(), &NoiseReductionOptionsWidget::filterGroupChanged);
+
+    connect(m_pOptionsWidget.data(), &NoiseReductionOptionsWidget::showFilterOptions,
+            this, &NoiseReduction::showFilterWidget);
+
+    m_pOptionsWidget->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
+
+    m_pRtFilter = RtFilter::SPtr(new RtFilter());
+
+//    //Set stored filter settings from last session
+//    m_pFilterWindow->setFilterParameters(settings.value(QString("RTMSAW/%1/filterHP").arg(t_sRTMSAWName), 5.0).toDouble(),
+//                                            settings.value(QString("RTMSAW/%1/filterLP").arg(t_sRTMSAWName), 40.0).toDouble(),
+//                                            settings.value(QString("RTMSAW/%1/filterOrder").arg(t_sRTMSAWName), 128).toInt(),
+//                                            settings.value(QString("RTMSAW/%1/filterType").arg(t_sRTMSAWName), 2).toInt(),
+//                                            settings.value(QString("RTMSAW/%1/filterDesignMethod").arg(t_sRTMSAWName), 0).toInt(),
+//                                            settings.value(QString("RTMSAW/%1/filterTransition").arg(t_sRTMSAWName), 5.0).toDouble(),
+//                                            settings.value(QString("RTMSAW/%1/filterUserDesignActive").arg(t_sRTMSAWName), false).toBool(),
+//                                            settings.value(QString("RTMSAW/%1/filterChannelType").arg(t_sRTMSAWName), "MEG").toString());
+}
+
+
+//*************************************************************************************************************
+
+void NoiseReduction::showFilterWidget(bool state)
+{
+    if(state) {
+        if(m_pFilterWindow->isActiveWindow())
+            m_pFilterWindow->hide();
+        else {
+            m_pFilterWindow->activateWindow();
+            m_pFilterWindow->show();
+        }
+    } else {
+        m_pFilterWindow->hide();
+    }
 }
 
 
@@ -593,6 +693,12 @@ void NoiseReduction::run()
         }
 
         //Do temporal filtering here
+        t_mat = m_pRtFilter->filterChannelsConcurrently(t_mat, m_iMaxFilterTapSize, m_lFilterChannelList, m_filterData);
+
+        //qDebug()<<"data dim:"<<data.rows()<<"x"<<data.cols();
+        qDebug()<<"t_mat dim:"<<t_mat.rows()<<"x"<<t_mat.cols();
+        qDebug()<<"m_lFilterChannelList.size():"<<m_lFilterChannelList.size();
+        qDebug()<<"m_filterData.size():"<<m_filterData.size();
 
         //Do SPHARA here
         if(m_bSpharaActive) {

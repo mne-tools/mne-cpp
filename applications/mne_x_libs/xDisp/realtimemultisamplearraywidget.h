@@ -414,31 +414,30 @@ private:
     SelectionManagerWindow::SPtr                m_pSelectionManagerWindow;      /**< SelectionManagerWindow. */
     FilterWindow::SPtr                          m_pFilterWindow;                /**< Filter window. */
 
-    bool            m_bInitialized;                                     /**< Is Initialized */
-    bool            m_bHideBadChannels;                                 /**< hide bad channels flag. */
-    qint32          m_iMaxFilterTapSize;                                /**< maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
-    float           m_fDefaultSectionSize;                              /**< Default row height */
-    float           m_fZoomFactor;                                      /**< Zoom factor */
-    float           m_fSamplingRate;                                    /**< Sampling rate */
-    qint32          m_iT;                                               /**< Display window size in seconds */
+    bool                                        m_bInitialized;                 /**< Is Initialized */
+    bool                                        m_bHideBadChannels;             /**< hide bad channels flag. */
+    qint32                                      m_iMaxFilterTapSize;            /**< maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
+    float                                       m_fDefaultSectionSize;          /**< Default row height */
+    float                                       m_fZoomFactor;                  /**< Zoom factor */
+    float                                       m_fSamplingRate;                /**< Sampling rate */
+    qint32                                      m_iT;                           /**< Display window size in seconds */
 
-    QStringList     m_slSelectedChannels;                               /**< the currently selected channels from the selection manager window. */
-    QList<qint32>   m_qListCurrentSelection;                            /**< Current selection list -> hack around C++11 lambda  */
-    QList<qint32>   m_qListBadChannels;                                 /**< Current list of bad channels  */
-    QList<RealTimeSampleArrayChInfo> m_qListChInfo;                     /**< Channel info list. ToDo: check if this is obsolete later on -> ToDo use fiff Info instead*/
-    QMap<qint32,float> m_qMapChScaling;                                 /**< Channel scaling values. */
+    QStringList                                 m_slSelectedChannels;           /**< the currently selected channels from the selection manager window. */
+    QList<qint32>                               m_qListCurrentSelection;        /**< Current selection list -> hack around C++11 lambda  */
+    QList<qint32>                               m_qListBadChannels;             /**< Current list of bad channels  */
+    QList<RealTimeSampleArrayChInfo>            m_qListChInfo;                  /**< Channel info list. ToDo: check if this is obsolete later on -> ToDo use fiff Info instead*/
+    QMap<qint32,float>                          m_qMapChScaling;                /**< Channel scaling values. */
 
-    FiffInfo::SPtr  m_pFiffInfo;                                        /**< FiffInfo, which is used insteadd of ListChInfo*/
+    FiffInfo::SPtr                              m_pFiffInfo;                    /**< FiffInfo, which is used insteadd of ListChInfo*/
 
-    QDoubleSpinBox* m_pDoubleSpinBoxZoom;                               /**< Adjust Zoom Factor */
-    QSpinBox*       m_pSpinBoxTimeScale;                                /**< Time scale spin box */
-    QSpinBox*       m_pSpinBoxDSFactor;                                 /**< downsampling factor */
-    QTableView*     m_pTableView;                                       /**< the QTableView being part of the model/view framework of Qt */
+    QDoubleSpinBox*                             m_pDoubleSpinBoxZoom;           /**< Adjust Zoom Factor */
+    QSpinBox*                                   m_pSpinBoxTimeScale;            /**< Time scale spin box */
+    QSpinBox*                                   m_pSpinBoxDSFactor;             /**< downsampling factor */
+    QTableView*                                 m_pTableView;                   /**< the QTableView being part of the model/view framework of Qt */
 
-    QAction*        m_pActionSelectSensors;                             /**< show roi select widget */
-    QAction*        m_pActionFiltering;                                 /**< show filter window */
-    QAction*        m_pActionHideBad;                                   /**< Hide bad channels. */
-    QAction*        m_pActionQuickControl;                              /**< Show quick control widget. */
+    QAction*                                    m_pActionSelectSensors;         /**< show roi select widget */
+    QAction*                                    m_pActionHideBad;               /**< Hide bad channels. */
+    QAction*                                    m_pActionQuickControl;          /**< Show quick control widget. */
  };
 
 } // NAMESPACE XDISPLIB

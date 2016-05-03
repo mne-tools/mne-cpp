@@ -1172,11 +1172,6 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
     if(iDataIndex >= m_matDataFiltered.cols() || data.cols()<m_iMaxFilterLength)
         return;
 
-    if(data.rows() != m_matDataFiltered.rows()) {
-        m_matDataFiltered = m_matDataRaw;
-        return;
-    }
-
     //Generate QList structure which can be handled by the QConcurrent framework
     QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;
     QList<int> notFilterChannelIndex;

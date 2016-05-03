@@ -42,6 +42,9 @@
 
 #include "rtprocessing_global.h"
 
+#include <utils/filterTools/filterdata.h>
+#include <fiff/fiff_info.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -114,12 +117,14 @@ public:
     /**
     * Calculates the filtered version of the raw input data
     *
-    * @param [in] data          data which is to be filtered
+    * @param [in] matDataIn     data which is to be filtered
+    * @param [out] matDataOut    data which is to be filtered
     * @param [in] iDataIndex    current position in the global data matrix
     */
-    void filterChannelsConcurrently(const Eigen::MatrixXd &data, int iDataIndex);
+    Eigen::MatrixXd filterChannelsConcurrently(const Eigen::MatrixXd& matDataIn, int iMaxFilterLength, const QVector<int>& lFilterChannelList, const QList<UTILSLIB::FilterData> &lFilterData);
 
 protected:
+    Eigen::MatrixXd                 m_matOverlap;                               /**< Last overlap block for the back */
 
 private:
 

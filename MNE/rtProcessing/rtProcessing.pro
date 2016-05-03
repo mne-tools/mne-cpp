@@ -38,6 +38,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
+QT       += concurrent
 QT       -= gui
 
 DEFINES += RTPROCESSING_LIBRARY
@@ -90,7 +91,7 @@ SOURCES += \
         rtave.cpp \
         rtnoise.cpp \
         rthpis.cpp \
-    rtfilter.cpp
+        rtfilter.cpp
 
 HEADERS +=  \
         rtprocessing_global.h \
@@ -99,7 +100,7 @@ HEADERS +=  \
         rtave.h \
         rtnoise.h \
         rthpis.h \
-    rtfilter.h
+        rtfilter.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
