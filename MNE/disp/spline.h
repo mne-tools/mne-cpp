@@ -261,10 +261,10 @@ template<typename T>
 
       m_coordX = new QGraphicsSimpleTextItem(m_pChart);
       m_coordX->setPos(m_pChart->size().width()/2 - 50, m_pChart->size().height());
-      m_coordX->setText("X: ");
+      //m_coordX->setText("X: ");
       m_coordY = new QGraphicsSimpleTextItem(m_pChart);
       m_coordY->setPos(m_pChart->size().width()/2 + 50, m_pChart->size().height());
-      m_coordY->setText("Y: ");
+      //m_coordY->setText("Y: ");
 
       connect(series, SIGNAL(clicked(QPointF)), this, SLOT(keepCallout()));
       connect(series, SIGNAL(hovered(QPointF, bool)), this, SLOT(tooltip(QPointF,bool)));
