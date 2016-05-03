@@ -72,6 +72,7 @@ contains(MNECPP_CONFIG, BuildBasicMNEXVersion) {
         rthpi \
         noisereduction \
         noise \
+        ssvepbci \
 
 
     win32 { #Only compile the TMSI plugin if a windows system is used - TMSi driver is not available for linux yet
