@@ -32,6 +32,7 @@
 
 #include <QtWidgets/QGraphicsItem>
 #include <QtGui/QFont>
+#include <QtCharts/QChartView>
 
 QT_BEGIN_NAMESPACE
 class QGraphicsSceneMouseEvent;
@@ -40,7 +41,10 @@ QT_END_NAMESPACE
 class Callout : public QGraphicsItem
 {
 public:
+
     Callout(QGraphicsItem * parent = 0);
+
+    //void makeVerticalLine(QPointF point, QChart *m_pChart);
 
     void setText(const QString &text);
     void setAnchor(QPointF point);

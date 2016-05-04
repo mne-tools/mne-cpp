@@ -92,47 +92,53 @@ Spline::Spline(const QString& title, QWidget* parent)
 
 //*************************************************************************************************************
 
-//Spline::View(QWidget *parent, m_pChart)
-//: QWidget(new QGraphicsScene, parent),
-//  m_coordX(0),
-//  m_coordY(0),
-//  m_tooltip(0)
-//{
-//    setDragMode(QWidget::NoDrag);
-//    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-//    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-//    m_coordX = new QGraphicsSimpleTextItem(m_pChart);
-//    m_coordX->setPos(m_pChart->size().width()/2 - 50, m_pChart->size().height());
-//    m_coordX->setText("X: ");
-//    m_coordY = new QGraphicsSimpleTextItem(m_pChart);
-//    m_coordY->setPos(m_pChart->size().width()/2 + 50, m_pChart->size().height());
-//    m_coordY->setText("Y: ");
-
-//    connect(series, SIGNAL(clicked(QPointF)), this, SLOT(keepCallout()));
-//    connect(series, SIGNAL(hovered(QPointF, bool)), this, SLOT(tooltip(QPointF,bool)));
-
-//}
-
-
-//*************************************************************************************************************
-
-//void Spline::mousePressEvent(QMouseEvent *event)
-//{
+void Spline::mousePressEvent(QMouseEvent *event)
+{
+    qDebug() << "Press event = " << event;
+    if (event->buttons() == Qt::LeftButton)
+    {
+        //setPos(mapToParent(event->pos() - event->buttonDownPos(Qt::LeftButton)));
+        qDebug() << "Mouse Press Event = Left Mouse Button";
+        event->setAccepted(true);
+    }
+    if (event->buttons() == Qt::MiddleButton)
+    {
+        //setPos(mapToParent(event->pos() - event->buttonDownPos(Qt::MiddleButton)));
+        qDebug() << "Mouse Press Event = Middle Mouse Button";
+        event->setAccepted(true);
+    }
+    if (event->buttons() == Qt::RightButton)
+    {
+        //setPos(mapToParent(event->pos() - event->buttonDownPos(Qt::RightButton)));
+        qDebug() << "Mouse Press Event = Right Mouse Button";
+        event->setAccepted(true);
+    }
+    else
+    {
+        event->setAccepted(false);
+    }
 //    qDebug() << "Output global position:" << event->globalPos();
 //    qDebug() << "Output window position:" << event->windowPos();
 //    qDebug() << "Output m_pChart position:" << m_pChart->pos();
 //    qDebug() << "Output m_pChart margins:" << m_pChart->margins();
-
-//    QWidget::mousePressEvent(event);
-//}
+}
 
 
 //*************************************************************************************************************
 
-void Spline::keepCallout()
+void Spline::keepCallout(QPointF point)
 {
     m_tooltip = new Callout(m_pChart);
+    QXYSeries *series = qobject_cast<QXYSeries *>(sender());
+    QPointF pos = m_pChart->mapToPosition(point, series);
+    QLineSeries *verticalLine = new QLineSeries();
+    qDebug() << "point.x = " << point.x();
+    verticalLine -> append(point.x(), 0);
+    verticalLine -> append(point.x(), 240000);
+    m_pChart->addSeries(verticalLine);
+    m_pChart->createDefaultAxes();
+    m_pChart->axisX()->setRange(minAxisX, maxAxisX);
+    m_pChart->axisY()->setRange(0,maximumFrequency);
     //emit borderChanged(left, middle, right);
     //qDebug() << "Left Mouse Button: " << left;
 }
@@ -150,8 +156,11 @@ void Spline::tooltip(QPointF point, bool state)
         QXYSeries *series = qobject_cast<QXYSeries *>(sender());
         m_tooltip->setAnchor(m_pChart->mapToPosition(point, series));
         m_tooltip->setPos(m_pChart->mapToPosition(point, series) + QPoint(10, -50));
+        qDebug() << "series = " << series;
+        qDebug() << "m_pchart maptoposition= " << m_pChart->mapToPosition(point, series);
         m_tooltip->setZValue(11);
         m_tooltip->show();
+        qDebug()<< "Point =" << point;
     } else {
         m_tooltip->hide();
     }
