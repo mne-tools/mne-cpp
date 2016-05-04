@@ -110,10 +110,22 @@ private:
 
     Ui::EEGoSportsSetupProjectWidget*     ui;             /**< the user interface for the EEGoSportsSetupWidget.*/
 
+
     //=========================================================================================================
     /**
     * Sets the project dir
-    *
+    */
+    void onCardinalComboBoxChanged();
+
+    //=========================================================================================================
+    /**
+    * Sets the project dir
+    */
+    void updateCardinalComboBoxes(const QString& sPath);
+
+    //=========================================================================================================
+    /**
+    * Sets the project dir
     */
     void addProject();
 
@@ -151,6 +163,10 @@ private:
     *
     */
     void changeQLineEdits();
+
+signals:
+    void cardinalPointsChanged(const QString& sLPA, double dLPA, const QString& sRPA, double dRPA, const QString& sNasion, double dNasion);
+
 };
 
 } // NAMESPACE
