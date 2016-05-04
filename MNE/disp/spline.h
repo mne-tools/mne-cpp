@@ -65,15 +65,6 @@
 #include <QDebug>
 #include <QtCharts/QChartGlobal>
 
-//QT_BEGIN_NAMESPACE
-//class QGraphicsScene;
-//class QMouseEvent;
-//class QResizeEvent;
-//QT_END_NAMESPACE
-
-//QT_CHARTS_BEGIN_NAMESPACE
-//class QChart;
-//QT_CHARTS_END_NAMESPACE
 class Callout;
 
 
@@ -116,15 +107,20 @@ QT_CHARTS_USE_NAMESPACE
 
 class DISPSHARED_EXPORT Spline
 : public QWidget
-//public QWidget,
-
 {
     Q_OBJECT
-
+    double minAxisX,
+           maxAxisX;
+    int maximumFrequency;
 public:
 
     typedef QSharedPointer<Spline> SPtr;            /**< Shared pointer type for Spline. */
     typedef QSharedPointer<const Spline> ConstSPtr; /**< Const shared pointer type for Spline. */
+
+
+    //=========================================================================================================
+
+    void Spline::mousePressEvent(QMouseEvent *event);
 
     //=========================================================================================================
     /**
@@ -150,7 +146,7 @@ public:
     //=========================================================================================================
 
 public slots:
-    void keepCallout();
+    void keepCallout(QPointF point);
     void tooltip(QPointF point, bool state);
 
 protected:
@@ -258,10 +254,10 @@ template<typename T>
       QSplineSeries *series = new QSplineSeries();
       series->setName(histogramExponent);
 
-      double minAxisX = resultDisplayValues(0),
-             maxAxisX = resultDisplayValues(iClassAmount),
-             classMark;                         //class mark is the middle point between lower and upper class limit
-      int maximumFrequency = 0;                 //maximumFrequency used to create an intuitive histogram
+      minAxisX = resultDisplayValues(0);
+      maxAxisX = resultDisplayValues(iClassAmount);
+      double classMark;                         //class mark is the middle point between lower and upper class limit
+      maximumFrequency = 0;                     //maximumFrequency used to create an intuitive histogram
       for (int ir=0; ir < iClassAmount; ir++)
       {
           classMark = (resultDisplayValues(ir) + resultDisplayValues(ir+1))/2;
@@ -284,17 +280,15 @@ template<typename T>
       m_coordY->setPos(m_pChart->size().width()/2 + 50, m_pChart->size().height());
       //m_coordY->setText("Y: ");
 
-      connect(series, SIGNAL(released(QPointF)), this, SLOT(keepCallout()));
+      connect(series, SIGNAL(released(QPointF)), this, SLOT(keepCallout(QPointF)));
       connect(series, SIGNAL(hovered(QPointF, bool)), this, SLOT(tooltip(QPointF,bool)));
 
       //create new series and then clear the plot and update with new data
       m_pChart->removeAllSeries();
       m_pChart->addSeries(series);
-
       m_pChart->createDefaultAxes();
       m_pChart->axisX()->setRange(minAxisX, maxAxisX);
       m_pChart->axisY()->setRange(0,maximumFrequency);
-
   }
 
 

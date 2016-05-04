@@ -34,10 +34,13 @@
 #include <QtGui/QMouseEvent>
 #include <QDebug>
 
-Callout::Callout(QGraphicsItem * parent):
-    QGraphicsItem(parent)
+Callout::Callout(QGraphicsItem * parent)
+:    QGraphicsItem(parent)
 {
 }
+
+
+//*************************************************************************************************************
 
 QRectF Callout::boundingRect() const
 {
@@ -49,6 +52,9 @@ QRectF Callout::boundingRect() const
     rect.setBottom(qMax(m_rect.bottom(), anchor.y()));
     return rect;
 }
+
+
+//*************************************************************************************************************
 
 void Callout::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
@@ -98,11 +104,15 @@ void Callout::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
     painter->drawText(m_textRect, m_text);
 }
 
+
+//*************************************************************************************************************
+
 void Callout::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     qDebug()<<event->button();
 
-    switch(event->button()) {
+    switch(event->button())
+    {
 
     case Qt::LeftButton:
         qDebug()<< "Left clicked";
@@ -121,6 +131,9 @@ void Callout::mousePressEvent(QGraphicsSceneMouseEvent *event)
     }
 }
 
+
+//*************************************************************************************************************
+
 void Callout::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     qDebug() << "Move event = " << event;
@@ -129,21 +142,14 @@ void Callout::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         setPos(mapToParent(event->pos() - event->buttonDownPos(Qt::LeftButton)));
         event->setAccepted(true);
     }
-    if (event->buttons() & Qt::MiddleButton)
-    {
-        setPos(mapToParent(event->pos() - event->buttonDownPos(Qt::MiddleButton)));
-        event->setAccepted(true);
-    }
-    if (event->buttons() & Qt::RightButton)
-    {
-        setPos(mapToParent(event->pos() - event->buttonDownPos(Qt::RightButton)));
-        event->setAccepted(true);
-    }
     else
     {
         event->setAccepted(false);
     }
 }
+
+
+//*************************************************************************************************************
 
 void Callout::setText(const QString &text)
 {
@@ -155,7 +161,13 @@ void Callout::setText(const QString &text)
     m_rect = m_textRect.adjusted(-5, -5, 5, 5);
 }
 
+
+//*************************************************************************************************************
+
 void Callout::setAnchor(QPointF point)
 {
     m_anchor = point;
 }
+
+
+//*************************************************************************************************************
