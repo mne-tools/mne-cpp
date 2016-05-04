@@ -140,6 +140,9 @@
         <property name="suffix">
          <string>cm/z</string>
         </property>
+        <property name="minimum">
+         <double>-99.989999999999995</double>
+        </property>
        </widget>
       </item>
       <item row="5" column="2">
@@ -147,12 +150,18 @@
         <property name="suffix">
          <string>cm/z</string>
         </property>
+        <property name="minimum">
+         <double>-99.989999999999995</double>
+        </property>
        </widget>
       </item>
       <item row="6" column="2">
        <widget class="QDoubleSpinBox" name="m_doubleSpinBox_Nasion">
         <property name="suffix">
          <string>cm/z</string>
+        </property>
+        <property name="minimum">
+         <double>-99.989999999999995</double>
         </property>
        </widget>
       </item>
