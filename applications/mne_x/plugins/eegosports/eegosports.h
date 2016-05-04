@@ -190,6 +190,13 @@ public:
 
     virtual QWidget* setupWidget();
 
+protected slots:
+    //=========================================================================================================
+    /**
+    * Update cardinal points
+    */
+    void onUpdateCardinalPoints(const QString& sLPA, double dLPA, const QString& sRPA, double dRPA, const QString& sNasion, double dNasion);
+
 protected:
     //=========================================================================================================
     /**
@@ -232,6 +239,14 @@ private:
     int                                 m_iSamplingFreq;                    /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
     int                                 m_iNumberOfChannels;                /**< The samples per block defined by the user via the GUI.*/
     int                                 m_iSamplesPerBlock;                 /**< The number of channels defined by the user via the GUI.*/
+
+    double                              m_dLPAShift;                        /**< The shift in m in to generate the LPA.*/
+    double                              m_dRPAShift;                        /**< The shift in m in to generate the RPA.*/
+    double                              m_dNasionShift;                     /**< The shift in m in to generate the Nasion.*/
+
+    QString                             m_sLPA;                             /**< The electrode to take to function as the LPA.*/
+    QString                             m_sRPA;                             /**< The electrode to take to function as the RPA.*/
+    QString                             m_sNasion;                          /**< The electrode to take to function as the Nasion.*/
 
     bool                                m_bWriteToFile;                     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                m_bWriteDriverDebugToFile;          /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
