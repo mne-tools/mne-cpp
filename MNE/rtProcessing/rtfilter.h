@@ -124,7 +124,8 @@ public:
     Eigen::MatrixXd filterChannelsConcurrently(const Eigen::MatrixXd& matDataIn, int iMaxFilterLength, const QVector<int>& lFilterChannelList, const QList<UTILSLIB::FilterData> &lFilterData);
 
 protected:
-    Eigen::MatrixXd                 m_matOverlap;                               /**< Last overlap block for the back */
+    Eigen::MatrixXd                 m_matOverlap;                   /**< Last overlap block */
+    Eigen::MatrixXd                 m_matDelay;                     /**< Last delay block */
 
 private:
 

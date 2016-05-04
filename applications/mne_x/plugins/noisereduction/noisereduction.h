@@ -69,6 +69,8 @@
 #include <QtWidgets>
 #include <QtCore/QtPlugin>
 #include <QDebug>
+#include <QSettings>
+#include <QElapsedTimer>
 
 
 //*************************************************************************************************************
@@ -200,6 +202,14 @@ protected slots:
     */
     void filterChanged(QList<FilterData> filterData);
 
+    //=========================================================================================================
+    /**
+    * Filter avtivated
+    *
+    * @param[in] state    filter on/off flag
+    */
+    void filterActivated(bool state);
+
 protected:
     //=========================================================================================================
     /**
@@ -244,6 +254,7 @@ private:
     bool                            m_bIsRunning;                               /**< Flag whether thread is running.*/
     bool                            m_bSpharaActive;                            /**< Flag whether thread is running.*/
     bool                            m_bProjActivated;                           /**< Projections activated */
+    bool                            m_bFilterActivated;                         /**< Projections activated */
 
     int                             m_iNBaseFctsFirst;                          /**< The number of grad/inner base functions to use for calculating the sphara opreator.*/
     int                             m_iNBaseFctsSecond;                         /**< The number of grad/outer base functions to use for calculating the sphara opreator.*/
@@ -285,6 +296,8 @@ private:
 
     DISPLIB::FilterWindow::SPtr                     m_pFilterWindow;            /**< Filter window. */
     RTPROCLIB::RtFilter::SPtr                       m_pRtFilter;                /**< Real time filter object. */
+
+    XMEASLIB::NewRealTimeMultiSampleArray::SPtr     m_pRTMSA;
 
     MNEX::PluginInputData<XMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pNoiseReductionInput;      /**< The NewRealTimeMultiSampleArray of the NoiseReduction input.*/
     MNEX::PluginOutputData<XMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pNoiseReductionOutput;     /**< The NewRealTimeMultiSampleArray of the NoiseReduction output.*/

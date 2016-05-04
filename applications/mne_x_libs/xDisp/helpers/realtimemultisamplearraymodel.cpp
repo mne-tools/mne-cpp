@@ -1270,8 +1270,9 @@ void RealTimeMultiSampleArrayModel::filterChannelsConcurrently(const MatrixXd &d
     m_bDrawFilterFront = true;
 
     //Fill filtered data with raw data if the channel was not filtered
-    for(int i = 0; i<notFilterChannelIndex.size(); i++)
+    for(int i = 0; i<notFilterChannelIndex.size(); i++) {
         m_matDataFiltered.row(notFilterChannelIndex.at(i)).segment(iDataIndex,data.row(notFilterChannelIndex.at(i)).cols()) = data.row(notFilterChannelIndex.at(i));
+    }
 
     //std::cout<<"END RealTimeMultiSampleArrayModel::filterChannelsConcurrently"<<std::endl;
 }

@@ -90,6 +90,11 @@ MatrixXd RtFilter::filterChannelsConcurrently(const MatrixXd& matDataIn, int iMa
         m_matOverlap.setZero();
     }
 
+    if(m_matDelay.cols() != iMaxFilterLength/2 || m_matOverlap.rows() < matDataIn.rows()) {
+        m_matDelay.resize(matDataIn.rows(), iMaxFilterLength/2);
+        m_matDelay.setZero();
+    }
+
     //Resize output matrix to match input matrix
     MatrixXd matDataOut(matDataIn.rows(), matDataIn.cols());
 
@@ -98,9 +103,10 @@ MatrixXd RtFilter::filterChannelsConcurrently(const MatrixXd& matDataIn, int iMa
     QList<int> notFilterChannelIndex;
 
     //Only select channels specified in lFilterChannelList
-    for(qint32 i = 0; i < lFilterChannelList.size(); ++i) {
-        if(lFilterChannelList.at(i) < matDataIn.rows()) {
-            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(lFilterData,QPair<int,RowVectorXd>(i,matDataIn.row(lFilterChannelList.at(i)))));
+    for(qint32 i = 0; i < matDataIn.rows(); ++i) {
+        int pos = lFilterChannelList.indexOf(i);
+        if(pos != -1 && pos < matDataIn.rows()) {
+            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(lFilterData,QPair<int,RowVectorXd>(pos,matDataIn.row(pos))));
         } else {
             notFilterChannelIndex.append(i);
         }
@@ -133,9 +139,13 @@ MatrixXd RtFilter::filterChannelsConcurrently(const MatrixXd& matDataIn, int iMa
     }
 
     //Fill filtered data with raw data if the channel was not filtered
-    for(int i = 0; i < notFilterChannelIndex.size(); i++) {
-        matDataOut.row(notFilterChannelIndex.at(i)).segment(0, matDataIn.row(notFilterChannelIndex.at(i)).cols()) = matDataIn.row(notFilterChannelIndex.at(i));
+    for(int i = 0; i < notFilterChannelIndex.size(); ++i) {
+        matDataOut.row(notFilterChannelIndex.at(i)) << m_matDelay.row(notFilterChannelIndex.at(i)), matDataIn.row(notFilterChannelIndex.at(i)).head(matDataIn.cols() - iMaxFilterLength/2);
+
+        //matDataOut.row(notFilterChannelIndex.at(i)).segment(0, matDataIn.row(notFilterChannelIndex.at(i)).cols()) = matDataIn.row(notFilterChannelIndex.at(i));
     }
+
+    m_matDelay = matDataIn.block(0, matDataIn.cols()-iMaxFilterLength/2, matDataIn.rows(), iMaxFilterLength/2);
 
     return matDataOut;
 }
