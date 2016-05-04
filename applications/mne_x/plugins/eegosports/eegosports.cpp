@@ -245,8 +245,9 @@ void EEGoSports::setUpFiffInfo()
         digPoint.r[2] = (elcLocation3D[indexLE2][2]-m_dLPAShift*10)*0.001;
         digitizerInfo.push_back(digPoint);
     }
-    else
-        cout<<"Plugin TMSI - ERROR - LE2 not found. Check loaded layout."<<endl;
+    else {
+        qDebug() << "Plugin EEGOSPORTS - ERROR creating LPA - " << m_sLPA << " not found. Check loaded layout.";
+    }
 
     //Append nasion value to digitizer data. Take location of electrode minus 6 cm as approximation.
     int indexZ1 = elcChannelNames.indexOf(m_sNasion);
@@ -261,8 +262,9 @@ void EEGoSports::setUpFiffInfo()
         digPoint.r[2] = (elcLocation3D[indexZ1][2]-m_dNasionShift*10)*0.001;
         digitizerInfo.push_back(digPoint);
     }
-    else
-        cout<<"Plugin TMSI - ERROR - Z1 not found. Check loaded layout."<<endl;
+    else {
+        qDebug() << "Plugin EEGOSPORTS - ERROR creating Nasion - " << m_sNasion << " not found. Check loaded layout.";
+    }
 
     //Append RAP value to digitizer data. Take location of electrode minus 1 cm as approximation.
     int indexRE2 = elcChannelNames.indexOf(m_sRPA);
@@ -277,8 +279,9 @@ void EEGoSports::setUpFiffInfo()
         digPoint.r[2] = (elcLocation3D[indexRE2][2]-m_dRPAShift*10)*0.001;
         digitizerInfo.push_back(digPoint);
     }
-    else
-        cout<<"Plugin TMSI - ERROR - RE2 not found. Check loaded layout."<<endl;
+    else {
+        qDebug() << "Plugin EEGOSPORTS - ERROR creating RPA - " << m_sRPA << " not found. Check loaded layout.";
+    }
 
     //Add EEG electrode positions as digitizers
     for(int i=0; i<numberEEGCh; i++)
