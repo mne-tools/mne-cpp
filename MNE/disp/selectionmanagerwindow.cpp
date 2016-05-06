@@ -388,7 +388,7 @@ bool SelectionManagerWindow::loadLayout(QString path)
                                        height,
                                        false,
                                        true,
-                                       false)){
+                                       false)) {
                 numberTries++;
             }
             else {
