@@ -154,6 +154,9 @@ int main(int argc, char *argv[])
     std::cout << "sp simplex center" << std::endl << sp_simplex.center() << std::endl;
     std::cout << "sp simplex radius" << std::endl << sp_simplex.radius() << std::endl;
 
+
+
+
     return app.exec();
 }
 
