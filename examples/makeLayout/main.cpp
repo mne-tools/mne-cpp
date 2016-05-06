@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
 
         int numberTries = 0;
         while(numberTries < 10) {
-            if(LayoutMaker::makeLayout(inputPoints,
+            if(!LayoutMaker::makeLayout(inputPoints,
                                        outputPoints,
                                        names,
                                        out,
@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
                                        height,
                                        true,
                                        (bool)parser.value(mirrorxOption).toInt(),
-                                       (bool)parser.value(mirrorxOption).toInt()) == -1) {
+                                       (bool)parser.value(mirrorxOption).toInt())) {
                 numberTries++;
             } else {
                 numberTries = 11;

@@ -86,32 +86,6 @@ using namespace Eigen;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINES
-//=============================================================================================================
-#ifndef FAIL
-#define FAIL -1
-#endif
-
-#ifndef OK
-#define OK 0
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-#define EPS 1e-6
-
-#ifndef M_PI
-#define  M_PI   3.14159265358979323846  /* pi */
-#endif
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // TYPEDEFS
 //=============================================================================================================
 
@@ -173,32 +147,6 @@ private:
                       float *theta,
                       float *phi);
 
-    static int report_func( int loop,
-                            const VectorXf &fitpar,
-                            int npar,
-                            double fval);
-
-    static float fit_eval(  const VectorXf &fitpar,
-                            int   npar,
-                            const void  *user_data);
-
-    static float opt_rad(   const VectorXf &r0,
-                            fitUser user);
-
-    static void calculate_cm_ave_dist(const MatrixXf &rr,
-                               int np,
-                               VectorXf &cm,
-                               float &avep);
-
-    static MatrixXf  make_initial_simplex(VectorXf &pars,
-                                int    npar,
-                                float  size);
-
-    static int fit_sphere_to_points(const MatrixXf &rr,
-                             int   np,
-                             float simplex_size,
-                             VectorXf &r0,
-                             float &R);
 };
 
 } //NAMESPACE
