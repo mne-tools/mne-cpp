@@ -177,7 +177,7 @@ Sphere Sphere::fit_sphere_simplex(const MatrixX3f& points, double simplex_size)
 {
     VectorXf center;
     float R;
-    fit_sphere_to_points_new( points, simplex_size, center, R);
+    fit_sphere_to_points( points, simplex_size, center, R);
 
     return Sphere(center, R);
 }
@@ -185,7 +185,7 @@ Sphere Sphere::fit_sphere_simplex(const MatrixX3f& points, double simplex_size)
 
 //*************************************************************************************************************
 //ToDo Replace LayoutMaker::fit_sphere_to_points
-bool Sphere::fit_sphere_to_points_new ( const MatrixXf &rr,
+bool Sphere::fit_sphere_to_points ( const MatrixXf &rr,
                                         float simplex_size,
                                         VectorXf &r0,
                                         float &R )
@@ -210,14 +210,14 @@ bool Sphere::fit_sphere_to_points_new ( const MatrixXf &rr,
     user.rr = rr;
 
     R0 = (float) 0.1;
-    calculate_cm_ave_dist_new(rr, cm, R0);// [done]
+    calculate_cm_ave_dist(rr, cm, R0);// [done]
 
-    init_simplex = make_initial_simplex_new( cm, simplex_size );
+    init_simplex = make_initial_simplex( cm, simplex_size );
 
     user.report = false;
 
     for (k = 0; k < 4; k++) {
-        init_vals[k] = fit_eval_new( static_cast<VectorXf>(init_simplex.row(k)), 3, &user );
+        init_vals[k] = fit_eval( static_cast<VectorXf>(init_simplex.row(k)), 3, &user );
     }
 
     user.report = false;
@@ -227,16 +227,16 @@ bool Sphere::fit_sphere_to_points_new ( const MatrixXf &rr,
                                                 init_vals,      /* Function values at the vertices */
                                                 3,              /* Number of variables */
                                                 ftol,           /* Relative convergence tolerance */
-                                                fit_eval_new,   /* The function to be evaluated */
+                                                fit_eval,   /* The function to be evaluated */
                                                 &user,          /* Data to be passed to the above function in each evaluation */
                                                 max_eval,       /* Maximum number of function evaluations */
                                                 neval,          /* Number of function evaluations */
                                                 report_interval,/* How often to report (-1 = no_reporting) */
-                                                report_func_new)) /* The function to be called when reporting */
+                                                report_func)) /* The function to be called when reporting */
         return false;
 
     r0 = init_simplex.row(0);
-    R = opt_rad_new(r0, &user);
+    R = opt_rad(r0, &user);
 
     return true;
 }
@@ -244,7 +244,7 @@ bool Sphere::fit_sphere_to_points_new ( const MatrixXf &rr,
 
 //*************************************************************************************************************
 //ToDo Replace LayoutMaker::report_func
-int Sphere::report_func_new(int loop,
+int Sphere::report_func(int loop,
                              const VectorXf &fitpar,
                              int npar,
                              double fval)
@@ -264,7 +264,7 @@ int Sphere::report_func_new(int loop,
 //*************************************************************************************************************
 //ToDo Replace LayoutMaker::calculate_cm_ave_dist
 
-void Sphere::calculate_cm_ave_dist_new (const MatrixXf &rr,
+void Sphere::calculate_cm_ave_dist (const MatrixXf &rr,
                                         VectorXf &cm,
                                         float &avep)
 {
@@ -276,7 +276,7 @@ void Sphere::calculate_cm_ave_dist_new (const MatrixXf &rr,
 
 //*************************************************************************************************************
 //ToDo Replace LayoutMaker::make_initial_simplex
-MatrixXf Sphere::make_initial_simplex_new(  const VectorXf &pars,
+MatrixXf Sphere::make_initial_simplex(  const VectorXf &pars,
                                             float size )
 {
     /*
@@ -299,7 +299,7 @@ MatrixXf Sphere::make_initial_simplex_new(  const VectorXf &pars,
 
 //*************************************************************************************************************
 //ToDo Replace LayoutMaker::fit_eval
-float Sphere::fit_eval_new (    const VectorXf &fitpar,
+float Sphere::fit_eval (    const VectorXf &fitpar,
                                 int   npar,
                                 const void  *user_data)
 {
@@ -331,7 +331,7 @@ float Sphere::fit_eval_new (    const VectorXf &fitpar,
 
 //*************************************************************************************************************
 //ToDo Replace LayoutMaker::opt_rad
-float Sphere::opt_rad_new(const VectorXf &r0,const fitUserNew user)
+float Sphere::opt_rad(const VectorXf &r0,const fitUserNew user)
 {
   MatrixXf diff = ( user->rr.rowwise() - r0.transpose() ) * -1;
   return diff.rowwise().norm().mean();

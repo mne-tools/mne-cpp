@@ -155,34 +155,33 @@ public:
     float& radius() { return m_r; }
 
 private:
-    Vector3f m_center;      /**< Sphere's center */
-    float m_r;             /**< Sphere's radius */
+    Vector3f m_center;  /**< Sphere's center */
+    float m_r;          /**< Sphere's radius */
 
 
-    //ToDo Replace LayoutMaker fit_sphere_to_points
-    static bool fit_sphere_to_points_new (  const MatrixXf &rr,
-                                            float simplex_size,
-                                            VectorXf &r0,
-                                            float &R );
+    static bool fit_sphere_to_points (  const MatrixXf &rr,
+                                        float simplex_size,
+                                        VectorXf &r0,
+                                        float &R );
 
-    static void calculate_cm_ave_dist_new(  const MatrixXf &rr,
-                                            VectorXf &cm,
-                                            float &avep );
+    static void calculate_cm_ave_dist(  const MatrixXf &rr,
+                                        VectorXf &cm,
+                                        float &avep );
 
-    static MatrixXf make_initial_simplex_new(   const VectorXf &pars,
-                                                float  size );
+    static MatrixXf make_initial_simplex(   const VectorXf &pars,
+                                            float  size );
 
-    static float fit_eval_new(  const VectorXf &fitpar,
-                                int   npar,
-                                const void  *user_data);
+    static float fit_eval(  const VectorXf &fitpar,
+                            int   npar,
+                            const void  *user_data);
 
-    static int report_func_new(int loop,
-                   const VectorXf &fitpar,
-                   int npar,
-                   double fval);
+    static int report_func( int loop,
+                            const VectorXf &fitpar,
+                            int npar,
+                            double fval);
 
-    static float opt_rad_new(   const VectorXf &r0,
-                                const fitUserNew user);
+    static float opt_rad(   const VectorXf &r0,
+                            const fitUserNew user);
 
 };
 
