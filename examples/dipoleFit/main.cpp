@@ -46,6 +46,7 @@
 
 #include <fiff/fiff.h>
 #include <mne/mne.h>
+#include <utils/sphere.h>
 
 
 //*************************************************************************************************************
@@ -85,43 +86,76 @@ int main(int argc, char *argv[])
     QCoreApplication app(argc, argv);
 
 
-
-
     // Command Line Parser
     QCommandLineParser parser;
     parser.setApplicationDescription("Clustered Inverse Example");
     parser.addHelpOption();
-    QCommandLineOption sampleFwdFileOption("f", "Path to forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption sampleCovFileOption("c", "Path to covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+
     QCommandLineOption sampleEvokedFileOption("e", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption sampleCovFileOption("c", "Path to covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QCommandLineOption sampleBemFileOption("b", "Path to BEM <file>.", "file", "./MNE-sample-data/subjects/sample/bem/sample-5120-bem-sol.fif");
     QCommandLineOption sampleTransFileOption("t", "Path to trans <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif");
-    parser.addOption(sampleFwdFileOption);
-    parser.addOption(sampleCovFileOption);
     parser.addOption(sampleEvokedFileOption);
+    parser.addOption(sampleCovFileOption);
+    parser.addOption(sampleBemFileOption);
     parser.addOption(sampleTransFileOption);
     parser.process(app);
 
     //########################################################################################
     // Source Estimate
-    QFile fileFwd(parser.value(sampleFwdFileOption));
-    QFile fileCov(parser.value(sampleCovFileOption));
     QFile fileEvoked(parser.value(sampleEvokedFileOption));
+    QFile fileCov(parser.value(sampleCovFileOption));
+    QFile fileBem(parser.value(sampleBemFileOption));
     QFile fileTrans(parser.value(sampleTransFileOption));
 
-    // Load data
+    // === Load data ===
+    // Evoked
+    std::cout << std::endl << "### Evoked ###" << std::endl;
     fiff_int_t setno = 0;
     QPair<QVariant, QVariant> baseline(QVariant(), 0);
     FiffEvoked evoked(fileEvoked, setno, baseline);
     if(evoked.isEmpty())
         return 1;
 
-    std::cout << "evoked first " << evoked.first << "; last " << evoked.last << std::endl;
+    // Cov
+    std::cout << std::endl << "### Covariance ###" << std::endl;
+    FiffCov noise_cov(fileCov);
 
-    MNEForwardSolution fwd(fileFwd);
-    if(fwd.isEmpty())
-        return 1;
+    // BEM
+    std::cout << std::endl << "### BEM ###" << std::endl;
+    MNEBem bem(fileBem);
+    if( bem.isEmpty() ) {
+        return -1;
+    }
 
+    // Trans
+    std::cout << std::endl << "### Transformation ###" << std::endl;
     FiffCoordTrans trans(fileTrans);
+    if( trans.isEmpty() )
+    {
+        trans.from = FIFFV_COORD_HEAD;
+        trans.to = FIFFV_COORD_MRI;
+    }
+
+    // === Dipole Fit ===
+
+    //FIFFV_BEM_SURF_ID_BRAIN      1 -> Inner Skull
+    //FIFFV_BEM_SURF_ID_SKULL      3 -> Outer Skull
+    //FIFFV_BEM_SURF_ID_HEAD       4 -> Head
+    qDebug() << "bem" << bem[0].id;
+
+    Sphere sp = Sphere::fit_sphere( bem[0].rr );
+
+    std::cout << "sp center" << std::endl << sp.center() << std::endl;
+    std::cout << "sp radius" << std::endl << sp.radius() << std::endl;
+
+    Sphere sp_simplex = Sphere::fit_sphere_simplex( bem[0].rr );
+
+    std::cout << "sp simplex center" << std::endl << sp_simplex.center() << std::endl;
+    std::cout << "sp simplex radius" << std::endl << sp_simplex.radius() << std::endl;
+
+
+
 
     return app.exec();
 }

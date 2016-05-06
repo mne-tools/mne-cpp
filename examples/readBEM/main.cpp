@@ -50,6 +50,7 @@
 //=============================================================================================================
 
 #include <QtCore/QCoreApplication>
+#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
@@ -77,25 +78,45 @@ using namespace MNELIB;
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    QCoreApplication app(argc, argv);
 
-//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
-//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-all-src.fif");
-//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-bem-sol.fif");
-//    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif");
-    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Read BEM Example");
+    parser.addHelpOption();
+    QCommandLineOption sampleBEMFileOption("f", "Path to BEM <file>.", "file", "./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+//    "./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif"
+//    "./MNE-sample-data/subjects/sample/bem/sample-all-src.fif"
+//    "./MNE-sample-data/subjects/sample/bem/sample-5120-bem-sol.fif"
+//    "./MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif"
+    parser.addOption(sampleBEMFileOption);
+    parser.process(app);
 
+    //########################################################################################
+    // Read the BEM
+    QFile t_fileBem(parser.value(sampleBEMFileOption));
+    MNEBem t_Bem(t_fileBem);
 
-    MNEBem t_Bem (t_fileBem) ;
+    if( t_Bem.size() > 0 )
+    {
+        qDebug() << "t_Bem[0].tri_nn:" << t_Bem[0].tri_nn(0,0) << t_Bem[0].tri_nn(0,1) << t_Bem[0].tri_nn(0,2);
+        qDebug() << "t_Bem[0].tri_nn:" << t_Bem[0].tri_nn(2,0) << t_Bem[0].tri_nn(2,1) << t_Bem[0].tri_nn(2,2);
+    }
 
+    // Write the BEM
     QFile t_fileBemTest("./MNE-sample-data/subjects/sample/bem/sample-head-test.fif");
     t_Bem.write(t_fileBemTest);
     t_fileBemTest.close();
 
+    MNEBem t_BemTest (t_fileBemTest) ;
 
-    MNELIB::MNEBem t_BemTest (t_fileBemTest) ;
+    if( t_BemTest.size() > 0 )
+    {
+        qDebug() << "t_BemTest[0].tri_nn:" << t_BemTest[0].tri_nn(0,0) << t_BemTest[0].tri_nn(0,1) << t_BemTest[0].tri_nn(0,2);
+        qDebug() << "t_BemTest[0].tri_nn:" << t_BemTest[0].tri_nn(2,0) << t_BemTest[0].tri_nn(2,1) << t_BemTest[0].tri_nn(2,2);
+    }
 
     qDebug() << "Put your stuff your interest in here";
 
-    return a.exec();
+    return app.exec();
 }
