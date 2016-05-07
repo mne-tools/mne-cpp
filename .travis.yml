@@ -1,6 +1,7 @@
 language: cpp
 
-compiler: 
+compiler:
+    - clang
     - gcc
 
 sudo: required
@@ -13,9 +14,6 @@ before_install:
 install:
     - sudo apt-get install -qq qt56base qt563d qt56svg qt56serialport
     - source /opt/qt56/bin/qt56-env.sh
-
-before_script:
-    - qmake -v
 
 script:
     - qmake -r
