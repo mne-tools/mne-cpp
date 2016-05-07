@@ -10,6 +10,7 @@ install:
     - set QTDIR=C:\Qt\5.6\msvc2015_64
     - set PATH=%PATH%;%QTDIR%\bin
 build_script:
+    - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
     - qmake -r
     - nmake
 
