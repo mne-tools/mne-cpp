@@ -1,5 +1,6 @@
-MNE-CPP [![Travis](https://api.travis-ci.org/mne-tools/mne-cpp.png?branch=master)](https://travis-ci.org/mne-tools/mne-cpp) [![AppVeyor](https://ci.appveyor.com/api/projects/status/b63nawx8mnmmr9rv?svg=true)](https://ci.appveyor.com/project/chdinh/mne-cpp) [![DOI](https://zenodo.org/badge/8729/mne-tools/mne-cpp.svg)](http://dx.doi.org/10.5281/zenodo.17216)
+MNE-CPP [![AppVeyor](https://ci.appveyor.com/api/projects/status/b63nawx8mnmmr9rv?svg=true)](https://ci.appveyor.com/project/chdinh/mne-cpp) [![Travis](https://api.travis-ci.org/mne-tools/mne-cpp.png?branch=master)](https://travis-ci.org/mne-tools/mne-cpp) [![DOI](https://zenodo.org/badge/8729/mne-tools/mne-cpp.svg)](http://dx.doi.org/10.5281/zenodo.17216)
 =============================================================================================================
+
 
 Cross-platform medical (real-time) applications for EEG and MEG data analysis.
 
