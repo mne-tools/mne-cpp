@@ -22,7 +22,7 @@ install:
 
 before_build:
     - cd ..
-    - mkdir mne-cpp_shadow_build
+    - if not exist "mne-cpp_shadow_build" mkdir mne-cpp_shadow_build
     - cd mne-cpp_shadow_build
     - qmake ../mne-cpp/mne-cpp.pro -r
 
