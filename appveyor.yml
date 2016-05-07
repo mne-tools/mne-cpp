@@ -10,16 +10,18 @@ configuration: Release
 build:
   parallel: true
   #quiet|minimal|normal|detailed
-  verbosity: normal 
+  verbosity: minimal 
 
 install:
     - set QTDIR=C:\Qt\5.6\msvc2015_64
-    - set PATH=%PATH%;%QTDIR%\bin
+    - set PATH=%PATH%;%QTDIR%\bin;C:\Qt\Tools\QtCreator\bin
+    - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+
+before_build:
+    - qmake -r
 
 build_script:
-    - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
-    - qmake -r
-    - nmake
+    - jom
 
 notifications: 
   - provider: Email 
