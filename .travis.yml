@@ -17,7 +17,7 @@ install:
 
 script:
     - qmake -r
-    - make
+    - make -j2
 
 after_success:
     - echo "MNE-CPP build was successful!";
