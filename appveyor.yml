@@ -4,7 +4,14 @@
 version: 1.0.0-{build} 
 
 os: Visual Studio 2015
-platform: x64 
+platform: x64
+configuration: Release
+
+build:
+  parallel: true
+  
+  #quiet|minimal|normal|detailed
+  verbosity: normal 
 
 install:
     - choco install -y jom
