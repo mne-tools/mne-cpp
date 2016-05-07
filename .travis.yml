@@ -1,3 +1,4 @@
+# MNE-CPP Travis CI for Linux and OS-X
 language: cpp
 
 compiler:
