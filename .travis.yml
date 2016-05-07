@@ -11,7 +11,7 @@ before_install:
     - sudo apt-get update -qq
 
 install:
-    - sudo apt-get install -qq qt56base qt563d qt56svg
+    - sudo apt-get install -qq qt56base qt563d qt56svg qt56serialport
     - source /opt/qt56/bin/qt56-env.sh
 
 before_script:
