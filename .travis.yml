@@ -21,7 +21,7 @@ script:
 
 after_success:
     - echo "MNE-CPP build was successful!";
-	
+
 notifications:
   email:
     - christoph.dinh@mne-cpp.org
