@@ -20,4 +20,9 @@ script:
     - make
 
 after_success:
-    - echo "MNE-CPP build successful!";
+    - echo "MNE-CPP build was successful!";
+	
+notifications:
+  email:
+    - christoph.dinh@mne-cpp.org
+    - lorenz.esch@mne-cpp.org
