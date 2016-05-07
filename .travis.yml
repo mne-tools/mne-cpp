@@ -5,7 +5,7 @@ compiler:
 
 before_install:
     - sudo add-apt-repository ppa:beineri/opt-qt56-trusty -y
-	- sudo apt-get update -qq
+    - sudo apt-get update -qq
 
 install:
     - sudo apt-get install -qq qt56base qt563d; source /opt/qt56/bin/qt56-env.sh
