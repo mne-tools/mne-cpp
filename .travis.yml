@@ -13,10 +13,10 @@ install:
 
 before_script:
     - qmake -v
-	
+
 script:
-   - qmake -r
-   - make
+    - qmake -r
+    - make
 
 after_success:
     - echo "MNE-CPP build successful!";
