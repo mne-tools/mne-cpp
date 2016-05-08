@@ -1,6 +1,5 @@
 # MNE-CPP AppVeyor CI for Windows
 
-# version format 
 version: 1.0.0-{build} 
 pull_requests:
   do_not_increment_build_number: true
@@ -12,12 +11,13 @@ configuration: Release
 build:
   parallel: true
   #quiet|minimal|normal|detailed
-  verbosity: minimal 
+  verbosity: normal 
   
 cache: 
     - C:\projects\mne-cpp_shadow_build\MNE
     - C:\projects\mne-cpp_shadow_build\testframes
     - C:\projects\mne-cpp_shadow_build\examples
+    - C:\projects\mne-cpp_shadow_build\applications
    
 install:
     - set QTDIR=C:\Qt\5.6\msvc2015_64
