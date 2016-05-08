@@ -47,6 +47,6 @@ SUBDIRS += \
     MNE \
     testframes \
     examples \
-#    applications
+    applications
 
 CONFIG += ordered
