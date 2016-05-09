@@ -41,7 +41,7 @@ CONFIG += plugin
 
 DEFINES += NOISEREDUCTION_LIBRARY
 
-QT += core widgets
+QT += core widgets svg
 
 TARGET = noisereduction
 CONFIG(debug, debug|release) {
@@ -53,6 +53,8 @@ CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lMNE$${MNE_LIB_VERSION}RtProcessingd \
             -lxMeasd \
             -lxDispd \
             -lmne_xd
@@ -61,6 +63,8 @@ else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Disp \
+            -lMNE$${MNE_LIB_VERSION}RtProcessing \
             -lxMeas \
             -lxDisp \
             -lmne_x \

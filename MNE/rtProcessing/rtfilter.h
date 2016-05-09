@@ -1,15 +1,13 @@
 //=============================================================================================================
 /**
-* @file     rthpi.h
-* @author   Chiran Doshi <chiran.doshi@childrens.harvard.edu>;
-*           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     rtfilter.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 * @version  1.0
-* @date     June, 2014
+* @date     April, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Chiran Doshi, Limin Sun and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,32 +28,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RTHPI class.
+* @brief     RtFilter class declaration.
 *
 */
 
-#ifndef RTHPI_H
-#define RTHPI_H
-
+#ifndef RTFILTER_H
+#define RTFILTER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "rthpi_global.h"
+#include "rtprocessing_global.h"
 
-#include <mne_x/Interfaces/IAlgorithm.h>
-#include <generics/circularmatrixbuffer.h>
-#include <xMeas/newrealtimemultisamplearray.h>
-#include <rtProcessing/rthpis.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
-
+#include <utils/filterTools/filterdata.h>
 #include <fiff/fiff_info.h>
 
 
@@ -64,15 +51,26 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QSharedPointer>
+#include <QtConcurrent/QtConcurrent>
+#include <QFuture>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RtHpiPlugin
+// Eigen INCLUDES
 //=============================================================================================================
 
-namespace RtHpiPlugin
+#include <Eigen/Core>
+#include <unsupported/Eigen/FFT>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE RTPROCLIB
+//=============================================================================================================
+
+namespace RTPROCLIB
 {
 
 
@@ -81,125 +79,55 @@ namespace RtHpiPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEX;
-using namespace XMEASLIB;
-using namespace IOBuffer;
-using namespace RTPROCLIB;
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Declare all structures to be used
-//=============================================================================================================
-
-struct coilParam {
-    Eigen::MatrixXd pos;
-    Eigen::MatrixXd mom;
-};
-
-struct dipError {
-    double error;
-    Eigen::MatrixXd moment;
-};
-
-struct sens {
-    Eigen::MatrixXd coilpos;
-    Eigen::MatrixXd coilori;
-    Eigen::MatrixXd tra;
-};
-
-
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RTHPI
+* Real-time noise Spectrum estimation
 *
-* @brief The RtHpi class provides a RtHpi algorithm structure.
+* @brief Real-time Noise estimation
 */
-//class DUMMYTOOLBOXSHARED_EXPORT DummyToolbox : public IAlgorithm
-class RTHPISHARED_EXPORT RtHpi : public IAlgorithm
+class RTPROCESSINGSHARED_EXPORT RtFilter
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "rthpi.json") //NEW Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::IAlgorithm)
 
 public:
-    //=========================================================================================================
-    /**
-    * Constructs a RtHpi.
-    */
-    RtHpi();
+    typedef QSharedPointer<RtFilter> SPtr;             /**< Shared pointer type for RtFilter. */
+    typedef QSharedPointer<const RtFilter> ConstSPtr;  /**< Const shared pointer type for RtFilter. */
 
     //=========================================================================================================
     /**
-    * Destroys the RtHpi.
+    * Creates the real-time covariance estimation object.
     */
-    ~RtHpi();
+    explicit RtFilter();
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
+    * Destroys the Real-time noise estimation object.
     */
-    virtual void init();
+    ~RtFilter();
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    * Calculates the filtered version of the raw input data
+    *
+    * @param [in] matDataIn     data which is to be filtered
+    * @param [out] matDataOut    data which is to be filtered
+    * @param [in] iDataIndex    current position in the global data matrix
     */
-    virtual void unload();
-
-    //=========================================================================================================
-    /**
-    * Clone the plugin
-    */
-    virtual QSharedPointer<IPlugin> clone() const;
-
-    virtual bool start();
-    virtual bool stop();
-
-    virtual IPlugin::PluginType getType() const;
-    virtual QString getName() const;
-
-    virtual QWidget* setupWidget();
-
-    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
-
-
-
-signals:
-    //=========================================================================================================
-    /**
-    * Emitted when fiffInfo is available
-    */
-    void fiffInfoAvailable();
+    Eigen::MatrixXd filterChannelsConcurrently(const Eigen::MatrixXd& matDataIn, int iMaxFilterLength, const QVector<int>& lFilterChannelList, const QList<UTILSLIB::FilterData> &lFilterData);
 
 protected:
-    virtual void run();
+    Eigen::MatrixXd                 m_matOverlap;                   /**< Last overlap block */
+    Eigen::MatrixXd                 m_matDelay;                     /**< Last delay block */
 
 private:
-    //=========================================================================================================
-    /**
-    * Initialises the output connector.
-    */
-    void initConnector();
-
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pRTMSAInput;      /**< The NewRealTimeMultiSampleArray of the RtHpi input.*/
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAOutput;    /**< The NewRealTimeMultiSampleArray of the RtHpi output.*/
-
-
-    FiffInfo::SPtr  m_pFiffInfo;                            /**< Fiff measurement info.*/
-
-    CircularMatrixBuffer<double>::SPtr   m_pRtHpiBuffer;    /**< Holds incoming data.*/
-
-    bool m_bIsRunning;      /**< If source lab is running */
-    bool m_bProcessData;    /**< If data should be received for processing */
-    QMutex m_qMutex;       /**< mutex for hpi */
-
-    RtHPIS::SPtr m_pRtHPIS;                       /**< Real-time HPI Estimation. */
-
 
 };
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
 } // NAMESPACE
 
-#endif // RTHPI_H
+#endif // RTFILTER_H
