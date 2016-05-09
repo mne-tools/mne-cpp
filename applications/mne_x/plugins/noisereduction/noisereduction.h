@@ -51,7 +51,7 @@
 
 #include <mne_x/Interfaces/IAlgorithm.h>
 
-#include <rtprocessing/rtfilter.h>
+#include <rtProcessing/rtfilter.h>
 
 #include <generics/circularmatrixbuffer.h>
 
