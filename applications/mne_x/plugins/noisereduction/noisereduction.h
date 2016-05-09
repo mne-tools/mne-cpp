@@ -47,9 +47,16 @@
 #include <utils/filterTools/sphara.h>
 #include <utils/ioutils.h>
 
+#include "disp/filterwindow.h"
+
 #include <mne_x/Interfaces/IAlgorithm.h>
+
+#include <rtprocessing/rtfilter.h>
+
 #include <generics/circularmatrixbuffer.h>
+
 #include <xMeas/newrealtimemultisamplearray.h>
+
 #include "FormFiles/noisereductionsetupwidget.h"
 #include "FormFiles/noisereductionoptionswidget.h"
 
@@ -62,6 +69,8 @@
 #include <QtWidgets>
 #include <QtCore/QtPlugin>
 #include <QDebug>
+#include <QSettings>
+#include <QElapsedTimer>
 
 
 //*************************************************************************************************************
@@ -96,7 +105,7 @@ namespace NoiseReductionPlugin
 class NOISEREDUCTIONSHARED_EXPORT NoiseReduction : public MNEX::IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "noisereduction.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "noisereduction.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::IAlgorithm)
 
@@ -177,6 +186,30 @@ protected slots:
     */
     void updateCompensator(int to);
 
+    //=========================================================================================================
+    /**
+    * Sets the type of channel which are to be filtered
+    *
+    * @param[in] sType    the channel type which is to be filtered (EEG, MEG, All)
+    */
+    void setFilterChannelType(QString sType);
+
+    //=========================================================================================================
+    /**
+    * Filter parameters changed
+    *
+    * @param[in] filterData    list of the currently active filter
+    */
+    void filterChanged(QList<FilterData> filterData);
+
+    //=========================================================================================================
+    /**
+    * Filter avtivated
+    *
+    * @param[in] state    filter on/off flag
+    */
+    void filterActivated(bool state);
+
 protected:
     //=========================================================================================================
     /**
@@ -189,6 +222,18 @@ protected:
     * Init the SPHARA method.
     */
     void initSphara();
+
+    //=========================================================================================================
+    /**
+    * Init the temporal filtering.
+    */
+    void initFilter();
+
+    //=========================================================================================================
+    /**
+    * Shows the filter widget
+    */
+    void showFilterWidget(bool state = true);
 
     //=========================================================================================================
     /**
@@ -209,10 +254,18 @@ private:
     bool                            m_bIsRunning;                               /**< Flag whether thread is running.*/
     bool                            m_bSpharaActive;                            /**< Flag whether thread is running.*/
     bool                            m_bProjActivated;                           /**< Projections activated */
+    bool                            m_bFilterActivated;                         /**< Projections activated */
 
     int                             m_iNBaseFctsFirst;                          /**< The number of grad/inner base functions to use for calculating the sphara opreator.*/
     int                             m_iNBaseFctsSecond;                         /**< The number of grad/outer base functions to use for calculating the sphara opreator.*/
+    int                             m_iMaxFilterLength;                         /**< Max order of the current filters */
+    int                             m_iMaxFilterTapSize;                        /**< maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
+
     QString                         m_sCurrentSystem;                           /**< The current acquisition system (EEG, babyMEG, VectorView).*/
+    QString                         m_sFilterChannelType;                       /**< Kind of channel which is to be filtered */
+
+    QPushButton*                    m_pShowFilterOptions;                       /**< Holds the show filter options button. */
+    QList<FilterData>               m_filterData;                               /**< List of currently active filters. */
 
     Eigen::VectorXi                 m_vecIndicesFirstVV;                        /**< The indices of the channels to pick for the first SPHARA oerpator in case of a VectorView system.*/
     Eigen::VectorXi                 m_vecIndicesSecondVV;                       /**< The indices of the channels to pick for the second SPHARA oerpator in case of a VectorView system.*/
@@ -232,12 +285,19 @@ private:
     Eigen::MatrixXd                 m_matSpharaBabyMEGOuterLoaded;              /**< The loaded babyMEG outer layer basis functions.*/
     Eigen::MatrixXd                 m_matSpharaEEGLoaded;                       /**< The loaded EEG basis functions.*/
 
+    QVector<int>                    m_lFilterChannelList;                       /**< The indices of the channels to be filtered.*/
+
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                /**< Fiff measurement info.*/
 
     IOBuffer::CircularMatrixBuffer<double>::SPtr    m_pNoiseReductionBuffer;    /**< Holds incoming data.*/
 
-    QSharedPointer<NoiseReductionOptionsWidget>     m_pOptionsWidget;           /**< flag whether thread is running.*/
-    QAction*                                        m_pActionShowOptionsWidget; /**< flag whether thread is running.*/
+    NoiseReductionOptionsWidget::SPtr               m_pOptionsWidget;           /**< The noise reduction option widget object.*/
+    QAction*                                        m_pActionShowOptionsWidget; /**< The noise reduction option widget action.*/
+
+    DISPLIB::FilterWindow::SPtr                     m_pFilterWindow;            /**< Filter window. */
+    RTPROCLIB::RtFilter::SPtr                       m_pRtFilter;                /**< Real time filter object. */
+
+    XMEASLIB::NewRealTimeMultiSampleArray::SPtr     m_pRTMSA;                   /**< the real time multi sample array object. */
 
     MNEX::PluginInputData<XMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pNoiseReductionInput;      /**< The NewRealTimeMultiSampleArray of the NoiseReduction input.*/
     MNEX::PluginOutputData<XMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pNoiseReductionOutput;     /**< The NewRealTimeMultiSampleArray of the NoiseReduction output.*/
@@ -248,6 +308,7 @@ signals:
     * Emitted when fiffInfo is available
     */
     void fiffInfoAvailable();
+
 };
 
 } // NAMESPACE
