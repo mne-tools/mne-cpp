@@ -71,6 +71,12 @@ EEGoSports::EEGoSports()
 , m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/eegosports/")
 , m_pRawMatrixBuffer_In(0)
 , m_pEEGoSportsProducer(new EEGoSportsProducer(this))
+, m_dLPAShift(0.01)
+, m_dRPAShift(0.01)
+, m_dNasionShift(0.06)
+, m_sLPA("2LD")
+, m_sRPA("2RD")
+, m_sNasion("0Z")
 {
     // Create record file option action bar item/button
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup project"), this);
@@ -166,7 +172,7 @@ void EEGoSports::setUpFiffInfo()
     QString unit;
     QStringList elcChannelNames;
 
-    if(LayoutLoader::readAsaElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit)) {
+    if(!LayoutLoader::readAsaElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit)) {
         qDebug() << "Error: Reading elc file.";
     }
 
@@ -225,9 +231,9 @@ void EEGoSports::setUpFiffInfo()
         }
     }
 
-    //Append LAP value to digitizer data. Take location of LE2 electrode minus 1 cm as approximation.
+    //Append LAP value to digitizer data. Take location of electrode minus 1 cm as approximation.
     FiffDigPoint digPoint;
-    int indexLE2 = elcChannelNames.indexOf("LE2");
+    int indexLE2 = elcChannelNames.indexOf(m_sLPA);
     digPoint.kind = FIFFV_POINT_CARDINAL;
     digPoint.ident = FIFFV_POINT_LPA;//digitizerInfo.size();
 
@@ -236,14 +242,15 @@ void EEGoSports::setUpFiffInfo()
     {
         digPoint.r[0] = elcLocation3D[indexLE2][0]*0.001;
         digPoint.r[1] = elcLocation3D[indexLE2][1]*0.001;
-        digPoint.r[2] = (elcLocation3D[indexLE2][2]-10)*0.001;
+        digPoint.r[2] = (elcLocation3D[indexLE2][2]-m_dLPAShift*10)*0.001;
         digitizerInfo.push_back(digPoint);
     }
-    else
-        cout<<"Plugin TMSI - ERROR - LE2 not found. Check loaded layout."<<endl;
+    else {
+        qDebug() << "Plugin EEGOSPORTS - ERROR creating LPA - " << m_sLPA << " not found. Check loaded layout.";
+    }
 
-    //Append nasion value to digitizer data. Take location of Z1 electrode minus 6 cm as approximation.
-    int indexZ1 = elcChannelNames.indexOf("Z1");
+    //Append nasion value to digitizer data. Take location of electrode minus 6 cm as approximation.
+    int indexZ1 = elcChannelNames.indexOf(m_sNasion);
     digPoint.kind = FIFFV_POINT_CARDINAL;//FIFFV_POINT_NASION;
     digPoint.ident = FIFFV_POINT_NASION;//digitizerInfo.size();
 
@@ -252,14 +259,15 @@ void EEGoSports::setUpFiffInfo()
     {
         digPoint.r[0] = elcLocation3D[indexZ1][0]*0.001;
         digPoint.r[1] = elcLocation3D[indexZ1][1]*0.001;
-        digPoint.r[2] = (elcLocation3D[indexZ1][2]-60)*0.001;
+        digPoint.r[2] = (elcLocation3D[indexZ1][2]-m_dNasionShift*10)*0.001;
         digitizerInfo.push_back(digPoint);
     }
-    else
-        cout<<"Plugin TMSI - ERROR - Z1 not found. Check loaded layout."<<endl;
+    else {
+        qDebug() << "Plugin EEGOSPORTS - ERROR creating Nasion - " << m_sNasion << " not found. Check loaded layout.";
+    }
 
-    //Append RAP value to digitizer data. Take location of RE2 electrode minus 1 cm as approximation.
-    int indexRE2 = elcChannelNames.indexOf("RE2");
+    //Append RAP value to digitizer data. Take location of electrode minus 1 cm as approximation.
+    int indexRE2 = elcChannelNames.indexOf(m_sRPA);
     digPoint.kind = FIFFV_POINT_CARDINAL;
     digPoint.ident = FIFFV_POINT_RPA;//digitizerInfo.size();
 
@@ -268,11 +276,12 @@ void EEGoSports::setUpFiffInfo()
     {
         digPoint.r[0] = elcLocation3D[indexRE2][0]*0.001;
         digPoint.r[1] = elcLocation3D[indexRE2][1]*0.001;
-        digPoint.r[2] = (elcLocation3D[indexRE2][2]-10)*0.001;
+        digPoint.r[2] = (elcLocation3D[indexRE2][2]-m_dRPAShift*10)*0.001;
         digitizerInfo.push_back(digPoint);
     }
-    else
-        cout<<"Plugin TMSI - ERROR - RE2 not found. Check loaded layout."<<endl;
+    else {
+        qDebug() << "Plugin EEGOSPORTS - ERROR creating RPA - " << m_sRPA << " not found. Check loaded layout.";
+    }
 
     //Add EEG electrode positions as digitizers
     for(int i=0; i<numberEEGCh; i++)
@@ -521,6 +530,22 @@ QWidget* EEGoSports::setupWidget()
 
 //*************************************************************************************************************
 
+void EEGoSports::onUpdateCardinalPoints(const QString& sLPA, double dLPA, const QString& sRPA, double dRPA, const QString& sNasion, double dNasion)
+{
+    qDebug()<<"onUpdateCardinalPoints()";
+
+    m_dLPAShift = dLPA;
+    m_dRPAShift = dRPA;
+    m_dNasionShift = dNasion;
+
+    m_sLPA = sLPA;
+    m_sRPA = sRPA;
+    m_sNasion = sNasion;
+}
+
+
+//*************************************************************************************************************
+
 void EEGoSports::run()
 {
     while(m_bIsRunning)
@@ -567,13 +592,16 @@ void EEGoSports::run()
 void EEGoSports::showSetupProjectDialog()
 {
     // Open setup project widget
-    if(m_pEEGoSportsSetupProjectWidget == NULL)
+    if(m_pEEGoSportsSetupProjectWidget == Q_NULLPTR) {
         m_pEEGoSportsSetupProjectWidget = QSharedPointer<EEGoSportsSetupProjectWidget>(new EEGoSportsSetupProjectWidget(this));
+
+        connect(m_pEEGoSportsSetupProjectWidget.data(), &EEGoSportsSetupProjectWidget::cardinalPointsChanged,
+                this, &EEGoSports::onUpdateCardinalPoints);
+    }
 
     if(!m_pEEGoSportsSetupProjectWidget->isVisible())
     {
-        m_pEEGoSportsSetupProjectWidget->setWindowTitle("EEGoSports EEG Connector - Setup project");
-        m_pEEGoSportsSetupProjectWidget->initGui();
+        m_pEEGoSportsSetupProjectWidget->setWindowTitle("EEGoSports EEG Connector - Setup project");        
         m_pEEGoSportsSetupProjectWidget->show();
         m_pEEGoSportsSetupProjectWidget->raise();
     }

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mnemath.h
+* @file     sphere.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,23 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MNEMath class declaration.
+* @brief    Sphere class declaration.
 *
 */
 
 #ifndef SPHERE_H
 #define SPHERE_H
 
-//ToDo move this to the new MNE math library
-
 //*************************************************************************************************************
 //=============================================================================================================
-// MNE INCLUDES
+// INCLUDES
 //=============================================================================================================
 
 #include "utils_global.h"
-
-#include <iostream>
 
 
 //*************************************************************************************************************
@@ -58,33 +54,11 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
 namespace UTILSLIB
 {
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
 
 
 //*************************************************************************************************************
@@ -93,7 +67,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 typedef struct {
-  MatrixXf rr;
+  Eigen::MatrixXf rr;
   bool   report;
 } *fitUserNew,fitUserRecNew;
 
@@ -115,28 +89,28 @@ public:
     * @param[in] center     The sphere's center
     * @param[in] radius     The sphere's radius
     */
-    Sphere( const Vector3f& center, float radius );
+    Sphere( const Eigen::Vector3f& center, float radius );
 
     //=========================================================================================================
     /**
-    * Fits a sphere to a point cloud.
+    * Fits a sphere to a point cloud. Algorithm by Alan Jennings, University of Dayton
     *
-    * @param[in] points     Three dimensional coordinates of the points to fit the sphere to.
+    * @param[in] points     n x 3 matrix of cartesian data to fit the sphere to.
     *
     * @return the fitted sphere.
     */
-    static Sphere fit_sphere(const MatrixX3f& points);
+    static Sphere fit_sphere(const Eigen::MatrixX3f& points);
 
     //=========================================================================================================
     /**
     * Fits a sphere to a point cloud.
     *
-    * @param[in] points         Three dimensional coordinates of the points to fit the sphere to.
+    * @param[in] points         n x 3 matrix of cartesian data to fit the sphere to.
     * @param[in] simplex_size   The simplex size
     *
     * @return the fitted sphere.
     */
-    static Sphere fit_sphere_simplex(const MatrixX3f& points, double simplex_size = 2e-2);
+    static Sphere fit_sphere_simplex(const Eigen::MatrixX3f& points, double simplex_size = 2e-2);
 
     //=========================================================================================================
     /**
@@ -144,7 +118,7 @@ public:
     *
     * @return the fitted sphere.
     */
-    Vector3f& center() { return m_center; }
+    Eigen::Vector3f& center() { return m_center; }
 
     //=========================================================================================================
     /**
@@ -155,35 +129,76 @@ public:
     float& radius() { return m_r; }
 
 private:
-    Vector3f m_center;      /**< Sphere's center */
-    float m_r;             /**< Sphere's radius */
+    Eigen::Vector3f m_center;  /**< Sphere's center */
+    float m_r;          /**< Sphere's radius */
 
+    //=========================================================================================================
+    /**
+    * Fits a sphere to a point cloud.
+    *
+    * @param[in] rr             n x 3 matrix of cartesian data to fit the sphere to.
+    * @param[in] simplex_size   The simplex size
+    * @param[out] r0            center (1 x 3 matrix) of the sphere.
+    * @param[out] R             Radius
+    *
+    * @return true if successful.
+    */
+    static bool fit_sphere_to_points ( const Eigen::MatrixXf &rr, float simplex_size, Eigen::VectorXf &r0, float &R );
 
-    //ToDo Replace LayoutMaker fit_sphere_to_points
-    static bool fit_sphere_to_points_new (  const MatrixXf &rr,
-                                            float simplex_size,
-                                            VectorXf &r0,
-                                            float &R );
+    //=========================================================================================================
+    /**
+    * Calculates the average
+    *
+    * @param[in] rr     n x 3 matrix of cartesian data to fit the sphere to.
+    * @param[out] cm    The average center of the caretsian data (1 x 3 matrix)
+    * @param[out] avep  The average distance to the average center.
+    */
+    static void calculate_cm_ave_dist(  const Eigen::MatrixXf &rr, Eigen::VectorXf &cm, float &avep );
 
-    static void calculate_cm_ave_dist_new(  const MatrixXf &rr,
-                                            VectorXf &cm,
-                                            float &avep );
+    //=========================================================================================================
+    /**
+    * Creates the initial simplex.
+    *
+    * @param[in] pars   The simplex center (1 x 3 matrix).
+    * @param[in] size   The simplex size
+    *
+    * @return the inital simplex.
+    */
+    static Eigen::MatrixXf make_initial_simplex( const Eigen::VectorXf &pars,  float size );
 
-    static MatrixXf make_initial_simplex_new(   const VectorXf &pars,
-                                                float  size );
+    //=========================================================================================================
+    /**
+    * The simplex cost function
+    *
+    * @param[in] fitpar     A simplex vertex to evaluate.
+    * @param[in] user_data  The user data containing the n x 3 matrix of cartesian data
+    *
+    * @return the distance (cost) of the given vertex (sphere center).
+    */
+    static float fit_eval( const Eigen::VectorXf &fitpar, const void  *user_data );
 
-    static float fit_eval_new(  const VectorXf &fitpar,
-                                int   npar,
-                                const void  *user_data);
+    //=========================================================================================================
+    /**
+    * The report function, called to rpeort the optimization status
+    *
+    * @param[in] loop       The current iteration loop
+    * @param[in] fitpar     The currently best fitting simplex vertex.
+    * @param[in] fval       The optimization value
+    *
+    * @return true if reporting was successful.
+    */
+    static bool report_func( int loop, const Eigen::VectorXf &fitpar, double fval);
 
-    static int report_func_new(int loop,
-                   const VectorXf &fitpar,
-                   int npar,
-                   double fval);
-
-    static float opt_rad_new(   const VectorXf &r0,
-                                const fitUserNew user);
-
+    //=========================================================================================================
+    /**
+    * Calculates the optimal radius based on a given center.
+    *
+    * @param[in] r0      The center
+    * @param[in] user    The user data containing the n x 3 matrix of cartesian data
+    *
+    * @return the optimal radius
+    */
+    static float opt_rad( const Eigen::VectorXf &r0, const fitUserNew user);
 };
 
 } // NAMESPACE

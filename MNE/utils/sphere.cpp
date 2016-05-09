@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MNEMath Class.
+* @brief    Implementation of the Sphere Class.
 *
 */
 
@@ -56,23 +56,6 @@
 //=============================================================================================================
 
 #include <iostream>
-#include <algorithm>    // std::sort
-#include <vector>       // std::vector
-
-//DEBUG fstream
-//#include <fstream>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#ifndef OK
-#define OK 0
-#endif
-
-#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -81,6 +64,7 @@
 //=============================================================================================================
 
 using namespace UTILSLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -96,41 +80,6 @@ Sphere::Sphere( const Vector3f& center, float radius )
 
 
 //*************************************************************************************************************
-
-//    function [Center,Radius] = sphereFit(X)
-//    % this fits a sphere to a collection of data using a closed form for the
-//    % solution (opposed to using an array the size of the data set).
-//    % Minimizes Sum((x-xc)^2+(y-yc)^2+(z-zc)^2-r^2)^2
-//    % x,y,z are the data, xc,yc,zc are the sphere's center, and r is the radius
-
-//    % Assumes that points are not in a singular configuration, real numbers, ...
-//    % if you have coplanar data, use a circle fit with svd for determining the
-//    % plane, recommended Circle Fit (Pratt method), by Nikolai Chernov
-//    % http://www.mathworks.com/matlabcentral/fileexchange/22643
-
-//    % Input:
-//    % X: n x 3 matrix of cartesian data
-//    % Outputs:
-//    % Center: Center of sphere
-//    % Radius: Radius of sphere
-//    % Author:
-//    % Alan Jennings, University of Dayton
-
-//    A=[mean(X(:,1).*(X(:,1)-mean(X(:,1)))), ...
-//        2*mean(X(:,1).*(X(:,2)-mean(X(:,2)))), ...
-//        2*mean(X(:,1).*(X(:,3)-mean(X(:,3)))); ...
-//        0, ...
-//        mean(X(:,2).*(X(:,2)-mean(X(:,2)))), ...
-//        2*mean(X(:,2).*(X(:,3)-mean(X(:,3)))); ...
-//        0, ...
-//        0, ...
-//        mean(X(:,3).*(X(:,3)-mean(X(:,3))))];
-//    A=A+A.';
-//    B=[mean((X(:,1).^2+X(:,2).^2+X(:,3).^2).*(X(:,1)-mean(X(:,1))));...
-//        mean((X(:,1).^2+X(:,2).^2+X(:,3).^2).*(X(:,2)-mean(X(:,2))));...
-//        mean((X(:,1).^2+X(:,2).^2+X(:,3).^2).*(X(:,3)-mean(X(:,3))))];
-//    Center=(A\B).';
-//    Radius=sqrt(mean(sum([X(:,1)-Center(1),X(:,2)-Center(2),X(:,3)-Center(3)].^2,2)));
 
 Sphere Sphere::fit_sphere(const MatrixX3f& points)
 {
@@ -177,18 +126,15 @@ Sphere Sphere::fit_sphere_simplex(const MatrixX3f& points, double simplex_size)
 {
     VectorXf center;
     float R;
-    fit_sphere_to_points_new( points, simplex_size, center, R);
+    fit_sphere_to_points( points, simplex_size, center, R);
 
     return Sphere(center, R);
 }
 
 
 //*************************************************************************************************************
-//ToDo Replace LayoutMaker::fit_sphere_to_points
-bool Sphere::fit_sphere_to_points_new ( const MatrixXf &rr,
-                                        float simplex_size,
-                                        VectorXf &r0,
-                                        float &R )
+
+bool Sphere::fit_sphere_to_points ( const MatrixXf &rr, float simplex_size, VectorXf &r0, float &R )
 {
 //    int   np = rr.rows();
 
@@ -210,14 +156,14 @@ bool Sphere::fit_sphere_to_points_new ( const MatrixXf &rr,
     user.rr = rr;
 
     R0 = (float) 0.1;
-    calculate_cm_ave_dist_new(rr, cm, R0);// [done]
+    calculate_cm_ave_dist(rr, cm, R0);// [done]
 
-    init_simplex = make_initial_simplex_new( cm, simplex_size );
+    init_simplex = make_initial_simplex( cm, simplex_size );
 
     user.report = false;
 
     for (k = 0; k < 4; k++) {
-        init_vals[k] = fit_eval_new( static_cast<VectorXf>(init_simplex.row(k)), 3, &user );
+        init_vals[k] = fit_eval( static_cast<VectorXf>(init_simplex.row(k)), &user );
     }
 
     user.report = false;
@@ -225,48 +171,40 @@ bool Sphere::fit_sphere_to_points_new ( const MatrixXf &rr,
     //Start the minimization
     if(!MinimizerSimplex::mne_simplex_minimize( init_simplex,   /* The initial simplex */
                                                 init_vals,      /* Function values at the vertices */
-                                                3,              /* Number of variables */
                                                 ftol,           /* Relative convergence tolerance */
-                                                fit_eval_new,   /* The function to be evaluated */
+                                                fit_eval,       /* The function to be evaluated */
                                                 &user,          /* Data to be passed to the above function in each evaluation */
                                                 max_eval,       /* Maximum number of function evaluations */
                                                 neval,          /* Number of function evaluations */
                                                 report_interval,/* How often to report (-1 = no_reporting) */
-                                                report_func_new)) /* The function to be called when reporting */
+                                                report_func)) /* The function to be called when reporting */
         return false;
 
     r0 = init_simplex.row(0);
-    R = opt_rad_new(r0, &user);
+    R = opt_rad(r0, &user);
 
     return true;
 }
 
 
 //*************************************************************************************************************
-//ToDo Replace LayoutMaker::report_func
-int Sphere::report_func_new(int loop,
-                             const VectorXf &fitpar,
-                             int npar,
-                             double fval)
-{
-    Q_UNUSED(npar);
 
+bool Sphere::report_func(int loop, const VectorXf &fitpar, double fval)
+{
     /*
     * Report periodically
     */
-    VectorXf r0 = fitpar;
+    const VectorXf& r0 = fitpar;
 
     std::cout << "loop: " << loop << "; r0: " << 1000*r0[0] << ", r1: " << 1000*r0[1] << ", r2: " << 1000*r0[2] << "; fval: " << fval << std::endl;
 
-    return OK;
+    return true;
 }
 
-//*************************************************************************************************************
-//ToDo Replace LayoutMaker::calculate_cm_ave_dist
 
-void Sphere::calculate_cm_ave_dist_new (const MatrixXf &rr,
-                                        VectorXf &cm,
-                                        float &avep)
+//*************************************************************************************************************
+
+void Sphere::calculate_cm_ave_dist (const MatrixXf &rr, VectorXf &cm, float &avep)
 {
     cm = rr.colwise().mean();
     MatrixXf diff = rr.rowwise() - cm.transpose();
@@ -275,14 +213,12 @@ void Sphere::calculate_cm_ave_dist_new (const MatrixXf &rr,
 
 
 //*************************************************************************************************************
-//ToDo Replace LayoutMaker::make_initial_simplex
-MatrixXf Sphere::make_initial_simplex_new(  const VectorXf &pars,
-                                            float size )
+
+MatrixXf Sphere::make_initial_simplex( const VectorXf &pars, float size )
 {
     /*
     * Make the initial tetrahedron
     */
-
     int npar = pars.size();
 
     MatrixXf simplex = MatrixXf::Zero(npar+1,npar);
@@ -298,13 +234,9 @@ MatrixXf Sphere::make_initial_simplex_new(  const VectorXf &pars,
 
 
 //*************************************************************************************************************
-//ToDo Replace LayoutMaker::fit_eval
-float Sphere::fit_eval_new (    const VectorXf &fitpar,
-                                int   npar,
-                                const void  *user_data)
-{
-    Q_UNUSED(npar)
 
+float Sphere::fit_eval ( const VectorXf &fitpar, const void  *user_data)
+{
     /*
     * Calculate the cost function value
     * Optimize for the radius inside here
@@ -314,7 +246,7 @@ float Sphere::fit_eval_new (    const VectorXf &fitpar,
 
     float F;
 
-    MatrixXf diff = (user->rr.rowwise() - r0.transpose())*-1;
+    MatrixXf diff = user->rr.rowwise() - r0.transpose();
     VectorXf one = diff.rowwise().norm();
 
     float sum = one.sum();
@@ -330,9 +262,9 @@ float Sphere::fit_eval_new (    const VectorXf &fitpar,
 
 
 //*************************************************************************************************************
-//ToDo Replace LayoutMaker::opt_rad
-float Sphere::opt_rad_new(const VectorXf &r0,const fitUserNew user)
+
+float Sphere::opt_rad(const VectorXf &r0,const fitUserNew user)
 {
-  MatrixXf diff = ( user->rr.rowwise() - r0.transpose() ) * -1;
+  MatrixXf diff = user->rr.rowwise() - r0.transpose();
   return diff.rowwise().norm().mean();
 }

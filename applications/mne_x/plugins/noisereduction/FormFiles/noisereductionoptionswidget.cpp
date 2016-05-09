@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "NoiseReductionOptionswidget.h"
+#include "noisereductionoptionswidget.h"
 #include "../noisereduction.h"
 
 
