@@ -76,12 +76,23 @@ EEGoSportsSetupProjectWidget::EEGoSportsSetupProjectWidget(EEGoSports* pEEGoSpor
 
     // Connect EEG hat
     connect(ui->m_qPushButton_EEGCap, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::changeCap);
+    connect(ui->m_qLineEdit_EEGCap, &QLineEdit::textChanged, this, &EEGoSportsSetupProjectWidget::updateCardinalComboBoxes);
+
+    // Connect cardinal combo boxes and shift spin boxes
+    connect(ui->m_comboBox_LPA, &QComboBox::currentTextChanged, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
+    connect(ui->m_comboBox_RPA, &QComboBox::currentTextChanged, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
+    connect(ui->m_comboBox_Nasion, &QComboBox::currentTextChanged, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
+    connect(ui->m_doubleSpinBox_LPA, &QDoubleSpinBox::editingFinished, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
+    connect(ui->m_doubleSpinBox_RPA, &QDoubleSpinBox::editingFinished, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
+    connect(ui->m_doubleSpinBox_Nasion, &QDoubleSpinBox::editingFinished, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
 
     // Connect QLineEdit's
     connect(ui->m_qLineEdit_EEGCap, static_cast<void (QLineEdit::*)(const QString &)>(&QLineEdit::textEdited),
             this, &EEGoSportsSetupProjectWidget::changeQLineEdits);
     connect(ui->m_qLineEdit_FiffRecordFile, static_cast<void (QLineEdit::*)(const QString &)>(&QLineEdit::textEdited),
             this, &EEGoSportsSetupProjectWidget::changeQLineEdits);
+
+    initGui();
 }
 
 
@@ -91,6 +102,7 @@ EEGoSportsSetupProjectWidget::~EEGoSportsSetupProjectWidget()
 {
     delete ui;
 }
+
 
 //*************************************************************************************************************
 
@@ -102,6 +114,16 @@ void EEGoSportsSetupProjectWidget::initGui()
     // Init location of layout file
     ui->m_qLineEdit_EEGCap->setText(m_pEEGoSports->m_sElcFilePath);
 
+    updateCardinalComboBoxes(m_pEEGoSports->m_sElcFilePath);
+
+    ui->m_doubleSpinBox_LPA->setValue(1e2*m_pEEGoSports->m_dLPAShift);
+    ui->m_doubleSpinBox_RPA->setValue(1e2*m_pEEGoSports->m_dRPAShift);
+    ui->m_doubleSpinBox_Nasion->setValue(1e2*m_pEEGoSports->m_dNasionShift);
+
+    ui->m_comboBox_LPA->setCurrentText(m_pEEGoSports->m_sLPA);
+    ui->m_comboBox_RPA->setCurrentText(m_pEEGoSports->m_sRPA);
+    ui->m_comboBox_Nasion->setCurrentText(m_pEEGoSports->m_sNasion);
+
     // Init project and subject menus
     ui->m_qComboBox_ProjectSelection->addItem("Sequence_01");
     ui->m_qComboBox_SubjectSelection->addItem("Subject_01");
@@ -110,6 +132,45 @@ void EEGoSportsSetupProjectWidget::initGui()
 
     // Init file name
     generateFilePath();
+}
+
+
+//*************************************************************************************************************
+
+void EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged()
+{
+    QString sLPA = ui->m_comboBox_LPA->currentText();
+    double dLPAShift = ui->m_doubleSpinBox_LPA->value()*1e-2;
+    QString sRPA = ui->m_comboBox_RPA->currentText();
+    double dRPAShift = ui->m_doubleSpinBox_RPA->value()*1e-2;
+    QString sNasion = ui->m_comboBox_Nasion->currentText();
+    double dNasionShift = ui->m_doubleSpinBox_Nasion->value()*1e-2;
+
+    emit cardinalPointsChanged(sLPA, dLPAShift, sRPA, dRPAShift, sNasion, dNasionShift);
+}
+
+
+//*************************************************************************************************************
+
+void EEGoSportsSetupProjectWidget::updateCardinalComboBoxes(const QString& sPath)
+{
+    QList<QVector<double> > elcLocation3D;
+    QList<QVector<double> > elcLocation2D;
+    QString unit;
+    QStringList elcChannelNames;
+
+    if(!LayoutLoader::readAsaElcFile(sPath, elcChannelNames, elcLocation3D, elcLocation2D, unit)) {
+        qDebug() << "Error: Reading elc file.";
+        return;
+    }
+
+    ui->m_comboBox_LPA->clear();
+    ui->m_comboBox_RPA->clear();
+    ui->m_comboBox_Nasion->clear();
+
+    ui->m_comboBox_LPA->addItems(elcChannelNames);
+    ui->m_comboBox_RPA->addItems(elcChannelNames);
+    ui->m_comboBox_Nasion->addItems(elcChannelNames);
 }
 
 
