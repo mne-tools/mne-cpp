@@ -99,7 +99,7 @@ namespace DISP3DLIB
 */
 class DISP3DNEWSHARED_EXPORT BrainRTSourceLocDataTreeItem : public AbstractTreeItem
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     typedef QSharedPointer<BrainRTSourceLocDataTreeItem> SPtr;             /**< Shared pointer type for BrainRTSourceLocDataTreeItem class. */

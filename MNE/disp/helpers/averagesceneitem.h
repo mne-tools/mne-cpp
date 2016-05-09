@@ -94,7 +94,7 @@ typedef QPair<const double*,qint32> RowVectorPair;
 */
 class DISPSHARED_EXPORT AverageSceneItem : public QGraphicsObject
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     //=========================================================================================================
