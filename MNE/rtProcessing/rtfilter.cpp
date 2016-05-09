@@ -54,6 +54,20 @@ using namespace FIFFLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
+// DEFINE GLOBAL METHODS
+//=============================================================================================================
+
+void doFilterPerChannelRTMSA(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
+{
+    for(int i = 0; i < channelDataTime.first.size(); ++i) {
+        //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true, FilterData::ZeroPad);
+        channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, true, FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
+    }
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
@@ -66,17 +80,6 @@ RtFilter::RtFilter()
 
 RtFilter::~RtFilter()
 {
-}
-
-
-//*************************************************************************************************************
-
-void doFilterPerChannelRTMSA(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
-{
-    for(int i=0; i<channelDataTime.first.size(); i++) {
-        //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true, FilterData::ZeroPad);
-        channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, true, FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
-    }
 }
 
 

@@ -105,7 +105,7 @@ namespace NoiseReductionPlugin
 class NOISEREDUCTIONSHARED_EXPORT NoiseReduction : public MNEX::IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "noisereduction.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "noisereduction.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::IAlgorithm)
 
@@ -291,13 +291,13 @@ private:
 
     IOBuffer::CircularMatrixBuffer<double>::SPtr    m_pNoiseReductionBuffer;    /**< Holds incoming data.*/
 
-    NoiseReductionOptionsWidget::SPtr               m_pOptionsWidget;           /**< flag whether thread is running.*/
-    QAction*                                        m_pActionShowOptionsWidget; /**< flag whether thread is running.*/
+    NoiseReductionOptionsWidget::SPtr               m_pOptionsWidget;           /**< The noise reduction option widget object.*/
+    QAction*                                        m_pActionShowOptionsWidget; /**< The noise reduction option widget action.*/
 
     DISPLIB::FilterWindow::SPtr                     m_pFilterWindow;            /**< Filter window. */
     RTPROCLIB::RtFilter::SPtr                       m_pRtFilter;                /**< Real time filter object. */
 
-    XMEASLIB::NewRealTimeMultiSampleArray::SPtr     m_pRTMSA;
+    XMEASLIB::NewRealTimeMultiSampleArray::SPtr     m_pRTMSA;                   /**< the real time multi sample array object. */
 
     MNEX::PluginInputData<XMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pNoiseReductionInput;      /**< The NewRealTimeMultiSampleArray of the NoiseReduction input.*/
     MNEX::PluginOutputData<XMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pNoiseReductionOutput;     /**< The NewRealTimeMultiSampleArray of the NoiseReduction output.*/
