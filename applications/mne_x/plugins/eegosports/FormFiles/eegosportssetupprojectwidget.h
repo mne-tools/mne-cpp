@@ -108,8 +108,7 @@ public:
 private:
     EEGoSports*                           m_pEEGoSports;        /**< a pointer to corresponding EEGoSports.*/
 
-    Ui::EEGoSportsSetupProjectWidget*     ui;             /**< the user interface for the EEGoSportsSetupWidget.*/
-
+    Ui::EEGoSportsSetupProjectWidget*     ui;                   /**< the user interface for the EEGoSportsSetupWidget.*/
 
     //=========================================================================================================
     /**
@@ -120,6 +119,8 @@ private:
     //=========================================================================================================
     /**
     * Sets the project dir
+    *
+    * @param[in] sPath  The file path of the 3D layout file.
     */
     void updateCardinalComboBoxes(const QString& sPath);
 
@@ -132,41 +133,46 @@ private:
     //=========================================================================================================
     /**
     * Sets the subject dir
-    *
     */
     void addSubject();
 
     //=========================================================================================================
     /**
     * Sets the dir where the output file is saved
-    *
     */
     void changeOutputFile();
 
     //=========================================================================================================
     /**
     * Sets the dir where the eeg cap file is located
-    *
     */
     void changeCap();
 
     //=========================================================================================================
     /**
     * Generates new file path based onthe project and subject parameters
-    *
     */
     void generateFilePath(int index = 0);
 
     //=========================================================================================================
     /**
     * Changes the EEG cap and file path variables in the EEGoSports class
-    *
     */
     void changeQLineEdits();
 
-signals:
+signals:    
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the cardinal points changed.
+    *
+    * @param[in] sLPA       The channel name to take as the LPA.
+    * @param[in] dLPA       The amount (in m) to translate the LPA channel position on the z axis.
+    * @param[in] sRPA       The channel name to take as the RPA.
+    * @param[in] dRPA       The amount (in m) to translate the RPA channel position on the z axis.
+    * @param[in] sNasion    The channel name to take as the Nasion.
+    * @param[in] dNasion    The amount (in m) to translate the Nasion channel position on the z axis.
+    */
     void cardinalPointsChanged(const QString& sLPA, double dLPA, const QString& sRPA, double dRPA, const QString& sNasion, double dNasion);
-
 };
 
 } // NAMESPACE

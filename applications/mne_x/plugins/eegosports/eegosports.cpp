@@ -592,7 +592,7 @@ void EEGoSports::run()
 void EEGoSports::showSetupProjectDialog()
 {
     // Open setup project widget
-    if(m_pEEGoSportsSetupProjectWidget == NULL) {
+    if(m_pEEGoSportsSetupProjectWidget == Q_NULLPTR) {
         m_pEEGoSportsSetupProjectWidget = QSharedPointer<EEGoSportsSetupProjectWidget>(new EEGoSportsSetupProjectWidget(this));
 
         connect(m_pEEGoSportsSetupProjectWidget.data(), &EEGoSportsSetupProjectWidget::cardinalPointsChanged,

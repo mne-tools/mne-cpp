@@ -194,6 +194,14 @@ protected slots:
     //=========================================================================================================
     /**
     * Update cardinal points
+    *
+    * @param[in] sLPA  The channel name to take as the LPA.
+    * @param[in] dLPA  The amount (in m) to translate the LPA channel position on the z axis.
+    * @param[in] sRPA  The channel name to take as the RPA.
+    * @param[in] dRPA  The amount (in m) to translate the RPA channel position on the z axis.
+    * @param[in] sNasion  The channel name to take as the Nasion.
+    * @param[in] dNasion  The amount (in m) to translate the Nasion channel position on the z axis.
+    */
     */
     void onUpdateCardinalPoints(const QString& sLPA, double dLPA, const QString& sRPA, double dRPA, const QString& sNasion, double dNasion);
 
