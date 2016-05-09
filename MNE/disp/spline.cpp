@@ -128,17 +128,25 @@ void Spline::mousePressEvent(QMouseEvent *event)
 
 void Spline::keepCallout(QPointF point)
 {
-    m_tooltip = new Callout(m_pChart);
-    QXYSeries *series = qobject_cast<QXYSeries *>(sender());
-    QPointF pos = m_pChart->mapToPosition(point, series);
     QLineSeries *verticalLine = new QLineSeries();
-    qDebug() << "point.x = " << point.x();
-    verticalLine -> append(point.x(), 0);
-    verticalLine -> append(point.x(), 240000);
+    qDebug() << "local coord. x = " << point.x();
+    qDebug() << "local coord. y = " << point.y();
+
+    QXYSeries *series = qobject_cast<QXYSeries *>(sender());
+    //qDebug() << "QAbstractAxis = " << xAxis;
+
+    QPointF localX = m_pChart->mapToValue(point, series);
+    qDebug() << "local X = " << localX;
+    QPointF seriesX = m_pChart->mapToPosition(localX, series);
+    qDebug() << "series X = " << seriesX;
+    verticalLine -> append(seriesX.x(), 0);
+    verticalLine -> append(seriesX.x(), maximumFrequency);
+    verticalLine->setName("T");
     m_pChart->addSeries(verticalLine);
     m_pChart->createDefaultAxes();
     m_pChart->axisX()->setRange(minAxisX, maxAxisX);
     m_pChart->axisY()->setRange(0,maximumFrequency);
+
     //emit borderChanged(left, middle, right);
     //qDebug() << "Left Mouse Button: " << left;
 }
@@ -149,9 +157,12 @@ void Spline::keepCallout(QPointF point)
 void Spline::tooltip(QPointF point, bool state)
 {
     if (m_tooltip == 0)
+    {
         m_tooltip = new Callout(m_pChart);
+    }
 
-    if (state) {
+    if (state)
+    {
         m_tooltip->setText(QString("X: %1 \nY: %2 ").arg(point.x()).arg(point.y()));
         QXYSeries *series = qobject_cast<QXYSeries *>(sender());
         m_tooltip->setAnchor(m_pChart->mapToPosition(point, series));
@@ -161,14 +172,16 @@ void Spline::tooltip(QPointF point, bool state)
         m_tooltip->setZValue(11);
         m_tooltip->show();
         qDebug()<< "Point =" << point;
-    } else {
+    }
+
+    else
+    {
         m_tooltip->hide();
     }
 }
 
 
 //*************************************************************************************************************
-
 
 void Spline::mouseMoveEvent(QMouseEvent *event)
 {

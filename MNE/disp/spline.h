@@ -275,13 +275,8 @@ template<typename T>
 
       m_coordX = new QGraphicsSimpleTextItem(m_pChart);
       m_coordX->setPos(m_pChart->size().width()/2 - 50, m_pChart->size().height());
-      //m_coordX->setText("X: ");
       m_coordY = new QGraphicsSimpleTextItem(m_pChart);
       m_coordY->setPos(m_pChart->size().width()/2 + 50, m_pChart->size().height());
-      //m_coordY->setText("Y: ");
-
-      connect(series, SIGNAL(released(QPointF)), this, SLOT(keepCallout(QPointF)));
-      connect(series, SIGNAL(hovered(QPointF, bool)), this, SLOT(tooltip(QPointF,bool)));
 
       //create new series and then clear the plot and update with new data
       m_pChart->removeAllSeries();
@@ -289,6 +284,10 @@ template<typename T>
       m_pChart->createDefaultAxes();
       m_pChart->axisX()->setRange(minAxisX, maxAxisX);
       m_pChart->axisY()->setRange(0,maximumFrequency);
+
+      connect(m_pChart, SIGNAL(pressed(QPointF)), this, SLOT(keepCallout(QPointF)));
+      connect(series, SIGNAL(pressed(QPointF)), this, SLOT(keepCallout(QPointF)));
+      connect(series, SIGNAL(hovered(QPointF, bool)), this, SLOT(tooltip(QPointF,bool)));
   }
 
 
