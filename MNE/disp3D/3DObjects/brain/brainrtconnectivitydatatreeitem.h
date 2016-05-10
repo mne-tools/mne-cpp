@@ -99,7 +99,7 @@ namespace DISP3DLIB
 */
 class DISP3DNEWSHARED_EXPORT BrainRTConnectivityDataTreeItem : public AbstractTreeItem
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     typedef QSharedPointer<BrainRTConnectivityDataTreeItem> SPtr;             /**< Shared pointer type for BrainRTConnectivityDataTreeItem class. */

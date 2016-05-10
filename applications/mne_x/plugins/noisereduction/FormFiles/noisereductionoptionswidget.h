@@ -52,6 +52,7 @@
 
 #include <QWidget>
 #include <QSignalMapper>
+#include <QPushButton>
 
 
 //*************************************************************************************************************
@@ -114,6 +115,14 @@ public:
     */
     void setAcquisitionSystem(const QString &sSystem);
 
+    //=========================================================================================================
+    /**
+    * Call this whenever the current filters have changed.
+    *
+    * @param [in] list    list of QCheckBoxes which are to be added to the filter group
+    */
+    void filterGroupChanged(QList<QCheckBox*> list);
+
 protected slots:
     //=========================================================================================================
     /**
@@ -139,6 +148,20 @@ protected slots:
     */
     void onNBaseFctsChanged();
 
+    //=========================================================================================================
+    /**
+    * Show the filter option screen to the user.
+    *
+    * @param [in] state toggle state.
+    */
+    void onShowFilterOptions(bool state);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the user designed filter was toggled
+    */
+    void onUserFilterToggled(bool state);
+
 protected:
     //=========================================================================================================
     /**
@@ -161,8 +184,10 @@ private:
 
     QList<QCheckBox*>                       m_qListProjCheckBox;            /**< List of projection CheckBox. */
     QList<QCheckBox*>                       m_qListCompCheckBox;            /**< List of compensator CheckBox. */
+    QList<QCheckBox*>                       m_qFilterListCheckBox;          /**< List of filter CheckBox. */
 
     QCheckBox *                             m_enableDisableProjectors;      /**< Holds the enable disable all check box. */
+    QPushButton*                            m_pShowFilterOptions;           /**< Holds the show filter options button. */
 
     QSignalMapper*                          m_pCompSignalMapper;            /**< The signal mapper. */
 
@@ -184,6 +209,18 @@ signals:
     * Emit this signal whenever the user changes the compensator.
     */
     void compSelectionChanged(int to);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the user is supposed to see the filter option window.
+    */
+    void showFilterOptions(bool state);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever you want to cople this control widget to updating a view for which it is providing control.
+    */
+    void updateConnectedView();
 };
 
 #endif // NOISEREDUCTIONOPTIONSWIDGET_H

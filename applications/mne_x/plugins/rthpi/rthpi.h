@@ -84,7 +84,7 @@ namespace RtHpiPlugin
 using namespace MNEX;
 using namespace XMEASLIB;
 using namespace IOBuffer;
-using namespace RTINVLIB;
+using namespace RTPROCLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================

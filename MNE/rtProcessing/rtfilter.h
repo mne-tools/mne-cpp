@@ -1,15 +1,13 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     rtfilter.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 * @version  1.0
-* @date     July, 2012
+* @date     April, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,28 +28,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of an lnt application
+* @brief     RtFilter class declaration.
 *
 */
 
+#ifndef RTFILTER_H
+#define RTFILTER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <fs/label.h>
-#include <fs/surface.h>
-#include <fs/annotationset.h>
+#include "rtprocessing_global.h"
 
-#include <fiff/fiff_evoked.h>
-#include <mne/mne_sourceestimate.h>
-#include <inverse/minimumNorm/minimumnorm.h>
-
-#include <disp3D/view3D.h>
-#include <disp3D/control/control3dwidget.h>
-
-#include <iostream>
+#include <utils/filterTools/filterdata.h>
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -59,8 +51,27 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
-#include <QSet>
+#include <QSharedPointer>
+#include <QtConcurrent/QtConcurrent>
+#include <QFuture>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+#include <unsupported/Eigen/FFT>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE RTPROCLIB
+//=============================================================================================================
+
+namespace RTPROCLIB
+{
 
 
 //*************************************************************************************************************
@@ -68,53 +79,55 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FSLIB;
-using namespace FIFFLIB;
-using namespace INVERSELIB;
-using namespace DISP3DLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MAIN
-//=============================================================================================================
 
 //=============================================================================================================
 /**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
+* Real-time noise Spectrum estimation
 *
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+* @brief Real-time Noise estimation
 */
-int main(int argc, char *argv[])
+class RTPROCESSINGSHARED_EXPORT RtFilter
 {
-    QApplication a(argc, argv);
 
-    //########################################################################################
-    // Source Estimate
+public:
+    typedef QSharedPointer<RtFilter> SPtr;             /**< Shared pointer type for RtFilter. */
+    typedef QSharedPointer<const RtFilter> ConstSPtr;  /**< Const shared pointer type for RtFilter. */
 
-    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    //=========================================================================================================
+    /**
+    * Creates the real-time covariance estimation object.
+    */
+    explicit RtFilter();
 
-    MNEForwardSolution t_Fwd(t_fileFwd);
-    if(t_Fwd.isEmpty())
-        return 1;
+    //=========================================================================================================
+    /**
+    * Destroys the Real-time noise estimation object.
+    */
+    ~RtFilter();
 
-    AnnotationSet t_annotSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot","./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
-    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
+    //=========================================================================================================
+    /**
+    * Calculates the filtered version of the raw input data
+    *
+    * @param [in] matDataIn     data which is to be filtered
+    * @param [out] matDataOut    data which is to be filtered
+    * @param [in] iDataIndex    current position in the global data matrix
+    */
+    Eigen::MatrixXd filterChannelsConcurrently(const Eigen::MatrixXd& matDataIn, int iMaxFilterLength, const QVector<int>& lFilterChannelList, const QList<UTILSLIB::FilterData> &lFilterData);
 
-    View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addBrainData("HemiLRSet", t_surfSet, t_annotSet);
+protected:
+    Eigen::MatrixXd                 m_matOverlap;                   /**< Last overlap block */
+    Eigen::MatrixXd                 m_matDelay;                     /**< Last delay block */
 
-//    QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("HemiLRSet", sourceEstimate, t_Fwd);
+private:
 
-    testWindow->show();
+};
 
-    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->setView3D(testWindow);
-    control3DWidget->show();
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
 
-    return a.exec();
-}
+} // NAMESPACE
+
+#endif // RTFILTER_H

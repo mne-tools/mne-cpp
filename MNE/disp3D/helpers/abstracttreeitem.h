@@ -81,7 +81,7 @@ namespace DISP3DLIB
 */
 class AbstractTreeItem : public QObject, public QStandardItem
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public :
     //=========================================================================================================
