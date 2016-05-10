@@ -94,29 +94,49 @@ Spline::Spline(const QString& title, QWidget* parent)
 
 void Spline::mousePressEvent(QMouseEvent *event)
 {
-    qDebug() << "Press event = " << event;
+    QXYSeries *shadowSeries = qobject_cast<QXYSeries *>(sender());
+    QLineSeries *verticalLine = new QLineSeries();
+    QPointF point = event->pos();
+    point.setX(point.x()-10);               // -10 needed to correctly position the line at mouse position
+    point.setY(0);
+    qDebug() << "Point after zero Y = " << point;
+    QPointF localX = m_pChart->mapToValue(point, shadowSeries);
+    qDebug() << "local X = " << localX;
+    verticalLine -> append(localX.x(), 0);
+    verticalLine -> append(localX.x(), maximumFrequency);
+
     if (event->buttons() == Qt::LeftButton)
     {
-        //setPos(mapToParent(event->pos() - event->buttonDownPos(Qt::LeftButton)));
-        qDebug() << "Mouse Press Event = Left Mouse Button";
-        event->setAccepted(true);
+        if (leftThreshold.isVisible())
+        {
+            m_pChart->removeAllSeries();
+        }
+        verticalLine->setName("L-T");
+        //m_pChart->addSeries(series);
+        m_pChart->addSeries(verticalLine);
+        m_pChart->createDefaultAxes();
+        m_pChart->axisX()->setRange(minAxisX, maxAxisX);
+        m_pChart->axisY()->setRange(0,maximumFrequency);
     }
+
     if (event->buttons() == Qt::MiddleButton)
     {
-        //setPos(mapToParent(event->pos() - event->buttonDownPos(Qt::MiddleButton)));
-        qDebug() << "Mouse Press Event = Middle Mouse Button";
-        event->setAccepted(true);
+        verticalLine->setName("M-T");
+        m_pChart->addSeries(verticalLine);
+        m_pChart->createDefaultAxes();
+        m_pChart->axisX()->setRange(minAxisX, maxAxisX);
+        m_pChart->axisY()->setRange(0,maximumFrequency);
     }
+
     if (event->buttons() == Qt::RightButton)
     {
-        //setPos(mapToParent(event->pos() - event->buttonDownPos(Qt::RightButton)));
-        qDebug() << "Mouse Press Event = Right Mouse Button";
-        event->setAccepted(true);
+        verticalLine->setName("R-T");
+        m_pChart->addSeries(verticalLine);
+        m_pChart->createDefaultAxes();
+        m_pChart->axisX()->setRange(minAxisX, maxAxisX);
+        m_pChart->axisY()->setRange(0,maximumFrequency);
     }
-    else
-    {
-        event->setAccepted(false);
-    }
+
 //    qDebug() << "Output global position:" << event->globalPos();
 //    qDebug() << "Output window position:" << event->windowPos();
 //    qDebug() << "Output m_pChart position:" << m_pChart->pos();
@@ -126,21 +146,11 @@ void Spline::mousePressEvent(QMouseEvent *event)
 
 //*************************************************************************************************************
 
-void Spline::keepCallout(QPointF point)
+void Spline::keepCalloutSpline(QPointF point)
 {
     QLineSeries *verticalLine = new QLineSeries();
-    qDebug() << "local coord. x = " << point.x();
-    qDebug() << "local coord. y = " << point.y();
-
-    QXYSeries *series = qobject_cast<QXYSeries *>(sender());
-    //qDebug() << "QAbstractAxis = " << xAxis;
-
-    QPointF localX = m_pChart->mapToValue(point, series);
-    qDebug() << "local X = " << localX;
-    QPointF seriesX = m_pChart->mapToPosition(localX, series);
-    qDebug() << "series X = " << seriesX;
-    verticalLine -> append(seriesX.x(), 0);
-    verticalLine -> append(seriesX.x(), maximumFrequency);
+    verticalLine -> append(point.x(), 0);
+    verticalLine -> append(point.x(), maximumFrequency);
     verticalLine->setName("T");
     m_pChart->addSeries(verticalLine);
     m_pChart->createDefaultAxes();

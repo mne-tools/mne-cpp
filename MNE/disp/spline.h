@@ -146,27 +146,12 @@ public:
     //=========================================================================================================
 
 public slots:
-    void keepCallout(QPointF point);
+    void keepCalloutSpline(QPointF point);
     void tooltip(QPointF point, bool state);
 
 protected:
     void resizeEvent(QResizeEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
-//    void mouseReleaseEvent(QMouseEvent *e)
-//    {
-//        if (e->button() == Qt::LeftButton)
-//        {
-//            emit leftClicked();
-//        }
-//        else if (e->button() == Qt::RightButton)
-//        {
-//            emit rightClicked();
-//        }
-//        else if (e->button() == Qt::MiddleButton)
-//        {
-//            emit middleClicked();
-//        }
-//    }
 
 private:
     QChart*             m_pChart;
@@ -174,6 +159,9 @@ private:
     QGraphicsSimpleTextItem *m_coordX;
     QGraphicsSimpleTextItem *m_coordY;
     Callout *m_tooltip;
+    QLineSeries leftThreshold,
+                middleThreshold,
+                rightThreshold;
 
 
     //=========================================================================================================
@@ -203,9 +191,6 @@ private:
     //=========================================================================================================
 
 signals:
-//    void leftClicked();
-//    void rightClicked();
-//    void middleClicked();
     void borderChanged(double left, double middle, double right);
 };
 
@@ -252,6 +237,8 @@ template<typename T>
       histogramExponent = "X-axis scale: 10e" + QString::number(resultExponentValues(0));   //used to tell the user the exponential scale used in the histogram
 
       QSplineSeries *series = new QSplineSeries();
+      QSplineSeries *shadowSeries = new QSplineSeries();
+
       series->setName(histogramExponent);
 
       minAxisX = resultDisplayValues(0);
@@ -262,6 +249,7 @@ template<typename T>
       {
           classMark = (resultDisplayValues(ir) + resultDisplayValues(ir+1))/2;
           series->append(classMark, matClassFrequencyData(ir));
+          shadowSeries->append(classMark, 0);
           std::cout << "Spline data points = " << classMark << ", " << matClassFrequencyData(ir) << std::endl;
           if (matClassFrequencyData(ir) > maximumFrequency)
           {
@@ -281,13 +269,14 @@ template<typename T>
       //create new series and then clear the plot and update with new data
       m_pChart->removeAllSeries();
       m_pChart->addSeries(series);
+      m_pChart->addSeries(shadowSeries);
+      shadowSeries->setVisible(true);
       m_pChart->createDefaultAxes();
       m_pChart->axisX()->setRange(minAxisX, maxAxisX);
       m_pChart->axisY()->setRange(0,maximumFrequency);
 
-      connect(m_pChart, SIGNAL(pressed(QPointF)), this, SLOT(keepCallout(QPointF)));
-      connect(series, SIGNAL(pressed(QPointF)), this, SLOT(keepCallout(QPointF)));
-      connect(series, SIGNAL(hovered(QPointF, bool)), this, SLOT(tooltip(QPointF,bool)));
+      //connect(series, SIGNAL(pressed(QPointF)), this, SLOT(keepCalloutSpline(QPointF)));
+      //connect(series, SIGNAL(hovered(QPointF, bool)), this, SLOT(tooltip(QPointF,bool)));
   }
 
 
