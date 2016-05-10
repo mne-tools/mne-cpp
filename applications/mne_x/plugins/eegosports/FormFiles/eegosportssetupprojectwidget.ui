@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>389</width>
+    <height>335</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,10 +27,10 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0" colspan="3">
-       <widget class="Line" name="line_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>File:</string>
         </property>
        </widget>
       </item>
@@ -38,6 +38,13 @@
        <widget class="QPushButton" name="m_qPushButton_NewProject">
         <property name="text">
          <string>New Project</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QPushButton" name="m_qPushButton_FiffRecordFile">
+        <property name="text">
+         <string>...</string>
         </property>
        </widget>
       </item>
@@ -51,19 +58,8 @@
         </property>
        </widget>
       </item>
-      <item row="8" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>File:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="2">
-       <widget class="QPushButton" name="m_qPushButton_FiffRecordFile">
-        <property name="text">
-         <string>...</string>
-        </property>
-       </widget>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="m_qComboBox_SubjectSelection"/>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="m_qLabel_SubjectDescription">
@@ -72,67 +68,81 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QComboBox" name="m_qComboBox_SubjectSelection"/>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="m_qLineEdit_FiffRecordFile"/>
       </item>
-      <item row="3" column="2">
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Layout</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Layout file:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="m_qLineEdit_EEGCap"/>
+      </item>
+      <item row="0" column="2">
        <widget class="QPushButton" name="m_qPushButton_EEGCap">
         <property name="text">
          <string>...</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>EEG cap:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="0" colspan="3">
-       <widget class="Line" name="line">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Cardinal points</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="2" column="1">
+       <widget class="QComboBox" name="m_comboBox_LPA"/>
       </item>
       <item row="3" column="1">
-       <widget class="QLineEdit" name="m_qLineEdit_EEGCap"/>
+       <widget class="QComboBox" name="m_comboBox_RPA"/>
       </item>
-      <item row="8" column="1">
-       <widget class="QLineEdit" name="m_qLineEdit_FiffRecordFile"/>
+      <item row="4" column="1">
+       <widget class="QComboBox" name="m_comboBox_Nasion"/>
       </item>
       <item row="4" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>LPA:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>RPA:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0">
        <widget class="QLabel" name="label_5">
         <property name="text">
          <string>Nasion:</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
-       <widget class="QComboBox" name="m_comboBox_LPA"/>
-      </item>
-      <item row="5" column="1">
-       <widget class="QComboBox" name="m_comboBox_RPA"/>
-      </item>
-      <item row="6" column="1">
-       <widget class="QComboBox" name="m_comboBox_Nasion"/>
+      <item row="3" column="2">
+       <widget class="QDoubleSpinBox" name="m_doubleSpinBox_RPA">
+        <property name="suffix">
+         <string>cm/z</string>
+        </property>
+        <property name="minimum">
+         <double>-99.989999999999995</double>
+        </property>
+       </widget>
       </item>
       <item row="4" column="2">
+       <widget class="QDoubleSpinBox" name="m_doubleSpinBox_Nasion">
+        <property name="suffix">
+         <string>cm/z</string>
+        </property>
+        <property name="minimum">
+         <double>-99.989999999999995</double>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
        <widget class="QDoubleSpinBox" name="m_doubleSpinBox_LPA">
         <property name="prefix">
          <string/>
@@ -145,23 +155,41 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="2">
-       <widget class="QDoubleSpinBox" name="m_doubleSpinBox_RPA">
-        <property name="suffix">
-         <string>cm/z</string>
-        </property>
-        <property name="minimum">
-         <double>-99.989999999999995</double>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>LPA:</string>
         </property>
        </widget>
       </item>
-      <item row="6" column="2">
-       <widget class="QDoubleSpinBox" name="m_doubleSpinBox_Nasion">
-        <property name="suffix">
-         <string>cm/z</string>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>RPA:</string>
         </property>
-        <property name="minimum">
-         <double>-99.989999999999995</double>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="m_pushButton_cardinalFile">
+        <property name="text">
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Cardinal file:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="m_lineEdit_cardinalFile"/>
+      </item>
+      <item row="1" column="0" colspan="3">
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>

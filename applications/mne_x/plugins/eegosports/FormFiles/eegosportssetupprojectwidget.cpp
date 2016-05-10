@@ -84,7 +84,9 @@ EEGoSportsSetupProjectWidget::EEGoSportsSetupProjectWidget(EEGoSports* pEEGoSpor
     connect(ui->m_comboBox_Nasion, &QComboBox::currentTextChanged, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
     connect(ui->m_doubleSpinBox_LPA, &QDoubleSpinBox::editingFinished, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
     connect(ui->m_doubleSpinBox_RPA, &QDoubleSpinBox::editingFinished, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
-    connect(ui->m_doubleSpinBox_Nasion, &QDoubleSpinBox::editingFinished, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
+    connect(ui->m_doubleSpinBox_Nasion, &QDoubleSpinBox::editingFinished, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);    
+
+    connect(ui->m_pushButton_cardinalFile, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::changeCardinalFile);
 
     // Connect QLineEdit's
     connect(ui->m_qLineEdit_EEGCap, static_cast<void (QLineEdit::*)(const QString &)>(&QLineEdit::textEdited),
@@ -123,6 +125,8 @@ void EEGoSportsSetupProjectWidget::initGui()
     ui->m_comboBox_LPA->setCurrentText(m_pEEGoSports->m_sLPA);
     ui->m_comboBox_RPA->setCurrentText(m_pEEGoSports->m_sRPA);
     ui->m_comboBox_Nasion->setCurrentText(m_pEEGoSports->m_sNasion);
+
+    ui->m_lineEdit_cardinalFile->setText(m_pEEGoSports->m_sCardinalFilePath);
 
     // Init project and subject menus
     ui->m_qComboBox_ProjectSelection->addItem("Sequence_01");
@@ -242,6 +246,23 @@ void EEGoSportsSetupProjectWidget::changeCap()
 
     ui->m_qLineEdit_EEGCap->setText(path);
     m_pEEGoSports->m_sElcFilePath = ui->m_qLineEdit_EEGCap->text();
+}
+
+
+//*************************************************************************************************************
+
+void EEGoSportsSetupProjectWidget::changeCardinalFile()
+{
+    QString path = QFileDialog::getOpenFileName(this,
+                                                "Change cardinal file",
+                                                "mne_x_plugins/resources/tmsi/loc_files",
+                                                 tr("Electrode location files (*.elc)"));
+
+    if(path==NULL)
+        path = ui->m_lineEdit_cardinalFile->text();
+
+    ui->m_lineEdit_cardinalFile->setText(path);
+    m_pEEGoSports->m_sCardinalFilePath = ui->m_lineEdit_cardinalFile->text();
 }
 
 

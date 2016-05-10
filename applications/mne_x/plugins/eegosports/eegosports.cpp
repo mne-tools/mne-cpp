@@ -134,6 +134,7 @@ void EEGoSports::init()
     m_sOutputFilePath = QString ("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day());
 
     m_sElcFilePath = QString("./Resources/3DLayouts/standard_waveguard64_duke.elc");
+    m_sCardinalFilePath = QString("");
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 }
@@ -231,56 +232,98 @@ void EEGoSports::setUpFiffInfo()
         }
     }
 
-    //Append LAP value to digitizer data. Take location of electrode minus 1 cm as approximation.
+    //Append cardinal points LPA RPA Nasion
+    QList<QVector<double> > cardinals3D;
+    QList<QVector<double> > cardinals2D;
+    QStringList cardinalNames;
+
+    if(!LayoutLoader::readAsaElcFile(m_sCardinalFilePath, cardinalNames, cardinals3D, cardinals2D, unit)) {
+        qDebug() << "Error: Reading elc cardinal file.";
+    }
+
+
+        qDebug()<<"cardinals3D"<<cardinals3D;
+        qDebug()<<"cardinals2D"<<cardinals2D;
+        qDebug()<<"cardinalNames"<<cardinalNames;
+
+
+    //Append LAP value to digitizer data.
     FiffDigPoint digPoint;
-    int indexLE2 = elcChannelNames.indexOf(m_sLPA);
+    int indexLPA = elcChannelNames.indexOf(m_sLPA);
     digPoint.kind = FIFFV_POINT_CARDINAL;
     digPoint.ident = FIFFV_POINT_LPA;//digitizerInfo.size();
 
     //Set EEG electrode location - Convert from mm to m
-    if(indexLE2!=-1)
-    {
-        digPoint.r[0] = elcLocation3D[indexLE2][0]*0.001;
-        digPoint.r[1] = elcLocation3D[indexLE2][1]*0.001;
-        digPoint.r[2] = (elcLocation3D[indexLE2][2]-m_dLPAShift*10)*0.001;
+    if(!m_sCardinalFilePath.isEmpty() && cardinals3D.size() == 3 && cardinalNames.contains("LPA")) {
+        indexLPA = cardinalNames.indexOf("LPA");
+
+        digPoint.r[0] = elcLocation3D[indexLPA][0]*0.001;
+        digPoint.r[1] = elcLocation3D[indexLPA][1]*0.001;
+        digPoint.r[2] = elcLocation3D[indexLPA][2]*0.001;
         digitizerInfo.push_back(digPoint);
-    }
-    else {
-        qDebug() << "Plugin EEGOSPORTS - ERROR creating LPA - " << m_sLPA << " not found. Check loaded layout.";
+    } else {
+        if(indexLPA != -1)
+        {
+            digPoint.r[0] = elcLocation3D[indexLPA][0]*0.001;
+            digPoint.r[1] = elcLocation3D[indexLPA][1]*0.001;
+            digPoint.r[2] = (elcLocation3D[indexLPA][2]-m_dLPAShift*10)*0.001;
+            digitizerInfo.push_back(digPoint);
+        }
+        else {
+            qDebug() << "Plugin EEGOSPORTS - ERROR creating LPA - " << m_sLPA << " not found. Check loaded layout.";
+        }
     }
 
-    //Append nasion value to digitizer data. Take location of electrode minus 6 cm as approximation.
-    int indexZ1 = elcChannelNames.indexOf(m_sNasion);
+    //Append nasion value to digitizer data.
+    int indexNasion = elcChannelNames.indexOf(m_sNasion);
     digPoint.kind = FIFFV_POINT_CARDINAL;//FIFFV_POINT_NASION;
     digPoint.ident = FIFFV_POINT_NASION;//digitizerInfo.size();
 
     //Set EEG electrode location - Convert from mm to m
-    if(indexZ1!=-1)
-    {
-        digPoint.r[0] = elcLocation3D[indexZ1][0]*0.001;
-        digPoint.r[1] = elcLocation3D[indexZ1][1]*0.001;
-        digPoint.r[2] = (elcLocation3D[indexZ1][2]-m_dNasionShift*10)*0.001;
+    if(!m_sCardinalFilePath.isEmpty() && cardinals3D.size() == 3 && cardinalNames.contains("Nasion")) {
+        indexNasion = cardinalNames.indexOf("Nasion");
+
+        digPoint.r[0] = elcLocation3D[indexNasion][0]*0.001;
+        digPoint.r[1] = elcLocation3D[indexNasion][1]*0.001;
+        digPoint.r[2] = elcLocation3D[indexNasion][2]*0.001;
         digitizerInfo.push_back(digPoint);
-    }
-    else {
-        qDebug() << "Plugin EEGOSPORTS - ERROR creating Nasion - " << m_sNasion << " not found. Check loaded layout.";
+    } else {
+        if(indexNasion != -1)
+        {
+            digPoint.r[0] = elcLocation3D[indexNasion][0]*0.001;
+            digPoint.r[1] = elcLocation3D[indexNasion][1]*0.001;
+            digPoint.r[2] = (elcLocation3D[indexNasion][2]-m_dNasionShift*10)*0.001;
+            digitizerInfo.push_back(digPoint);
+        }
+        else {
+            qDebug() << "Plugin EEGOSPORTS - ERROR creating Nasion - " << m_sNasion << " not found. Check loaded layout.";
+        }
     }
 
-    //Append RAP value to digitizer data. Take location of electrode minus 1 cm as approximation.
-    int indexRE2 = elcChannelNames.indexOf(m_sRPA);
+    //Append RAP value to digitizer data.
+    int indexRPA = elcChannelNames.indexOf(m_sRPA);
     digPoint.kind = FIFFV_POINT_CARDINAL;
     digPoint.ident = FIFFV_POINT_RPA;//digitizerInfo.size();
 
     //Set EEG electrode location - Convert from mm to m
-    if(indexRE2!=-1)
-    {
-        digPoint.r[0] = elcLocation3D[indexRE2][0]*0.001;
-        digPoint.r[1] = elcLocation3D[indexRE2][1]*0.001;
-        digPoint.r[2] = (elcLocation3D[indexRE2][2]-m_dRPAShift*10)*0.001;
+    if(!m_sCardinalFilePath.isEmpty() && cardinals3D.size() == 3 && cardinalNames.contains("RPA")) {
+        indexRPA = cardinalNames.indexOf("RPA");
+
+        digPoint.r[0] = elcLocation3D[indexRPA][0]*0.001;
+        digPoint.r[1] = elcLocation3D[indexRPA][1]*0.001;
+        digPoint.r[2] = elcLocation3D[indexRPA][2]*0.001;
         digitizerInfo.push_back(digPoint);
-    }
-    else {
-        qDebug() << "Plugin EEGOSPORTS - ERROR creating RPA - " << m_sRPA << " not found. Check loaded layout.";
+    } else {
+        if(indexRPA != -1)
+        {
+            digPoint.r[0] = elcLocation3D[indexRPA][0]*0.001;
+            digPoint.r[1] = elcLocation3D[indexRPA][1]*0.001;
+            digPoint.r[2] = (elcLocation3D[indexRPA][2]-m_dRPAShift*10)*0.001;
+            digitizerInfo.push_back(digPoint);
+        }
+        else {
+            qDebug() << "Plugin EEGOSPORTS - ERROR creating RPA - " << m_sRPA << " not found. Check loaded layout.";
+        }
     }
 
     //Add EEG electrode positions as digitizers
@@ -532,8 +575,6 @@ QWidget* EEGoSports::setupWidget()
 
 void EEGoSports::onUpdateCardinalPoints(const QString& sLPA, double dLPA, const QString& sRPA, double dRPA, const QString& sNasion, double dNasion)
 {
-    qDebug()<<"onUpdateCardinalPoints()";
-
     m_dLPAShift = dLPA;
     m_dRPAShift = dRPA;
     m_dNasionShift = dNasion;
