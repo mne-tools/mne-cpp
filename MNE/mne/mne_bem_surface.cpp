@@ -178,12 +178,6 @@ bool MNEBemSurface::addTriangleData()
 
     printf("[done]\n");
 
-//        qDebug() << "this->tri_cent:" << this->tri_cent(0,0) << this->tri_cent(0,1) << this->tri_cent(0,2);
-//        qDebug() << "this->tri_cent:" << this->tri_cent(2,0) << this->tri_cent(2,1) << this->tri_cent(2,2);
-
-        qDebug() << "this->tri_nn:" << this->tri_nn(0,0) << this->tri_nn(0,1) << this->tri_nn(0,2);
-        qDebug() << "this->tri_nn:" << this->tri_nn(2,0) << this->tri_nn(2,1) << this->tri_nn(2,2);
-
     return true;
 }
 

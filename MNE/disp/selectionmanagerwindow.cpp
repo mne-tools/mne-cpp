@@ -378,7 +378,7 @@ bool SelectionManagerWindow::loadLayout(QString path)
 
     if(inputPoints.size()>0) {
         while(numberTries<10) {
-            if(LayoutMaker::makeLayout(inputPoints,
+            if(!LayoutMaker::makeLayout(inputPoints,
                                        outputPoints,
                                        names,
                                        out,
@@ -388,10 +388,12 @@ bool SelectionManagerWindow::loadLayout(QString path)
                                        height,
                                        false,
                                        true,
-                                       false) == -1)
+                                       false)) {
                 numberTries++;
-            else
+            }
+            else {
                 numberTries = 11;
+            }
         }
     }
 

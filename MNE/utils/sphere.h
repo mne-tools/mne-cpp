@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     brainsourcespacetreeitem.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     sphere.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     January, 2016
+* @date     April, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,46 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BrainSourceSpaceTreeItem class declaration.
+* @brief    Sphere class declaration.
 *
 */
 
-#ifndef BRAINSOURCESPACETREEITEM_H
-#define BRAINSOURCESPACETREEITEM_H
+#ifndef SPHERE_H
+#define SPHERE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../disp3D_global.h"
-
-#include "../../helpers/abstracttreeitem.h"
-#include "braintreemetaitem.h"
-
-#include "../../helpers/types.h"
-#include "../../helpers/renderable3Dentity.h"
-
-#include "fs/label.h"
-#include "fs/surface.h"
-
-#include "mne/mne_hemisphere.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QList>
-#include <QVariant>
-#include <QStringList>
-#include <QColor>
-#include <QStandardItem>
-#include <QStandardItemModel>
-
-#include <Qt3DRender/QSphereMesh>
-#include <Qt3DRender/QPhongMaterial>
+#include "utils_global.h"
 
 
 //*************************************************************************************************************
@@ -81,115 +54,153 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
+// DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace UTILSLIB
 {
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// TYPEDEFS
 //=============================================================================================================
+
+typedef struct {
+  Eigen::MatrixXf rr;
+  bool   report;
+} *fitUserNew,fitUserRecNew;
 
 
 //=============================================================================================================
 /**
-* BrainSourceSpaceTreeItem provides a generic brain tree item to hold data about the source space.
+* Sphere descritpion
 *
-* @brief Provides a generic brain tree item.
+* @brief Describes a 3D sphere object
 */
-class DISP3DNEWSHARED_EXPORT BrainSourceSpaceTreeItem : public AbstractTreeItem
+class UTILSSHARED_EXPORT Sphere
 {
-    Q_OBJECT
-
 public:
-    typedef QSharedPointer<BrainSourceSpaceTreeItem> SPtr;             /**< Shared pointer type for BrainSourceSpaceTreeItem class. */
-    typedef QSharedPointer<const BrainSourceSpaceTreeItem> ConstSPtr;  /**< Const shared pointer type for BrainSourceSpaceTreeItem class. */
 
     //=========================================================================================================
     /**
-    * Default constructor.
+    * Constructs the Sphere
     *
-    * @param[in] iType      The type of the item. See types.h for declaration and definition.
-    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+    * @param[in] center     The sphere's center
+    * @param[in] radius     The sphere's radius
     */
-    explicit BrainSourceSpaceTreeItem(int iType = BrainTreeModelItemTypes::SourceSpaceItem, const QString& text = "Source space");
+    Sphere( const Eigen::Vector3f& center, float radius );
 
     //=========================================================================================================
     /**
-    * Default destructor
-    */
-    ~BrainSourceSpaceTreeItem();
-
-    //=========================================================================================================
-    /**
-    * AbstractTreeItem functions
-    */
-    QVariant data(int role = Qt::UserRole + 1) const;
-    void setData(const QVariant& value, int role = Qt::UserRole + 1);
-
-    //=========================================================================================================
-    /**
-    * Adds FreeSurfer data based on surface and annotation data to this item.
+    * Fits a sphere to a point cloud. Algorithm by Alan Jennings, University of Dayton
     *
-    * @param[in] tHemisphere        The hemisphere data of the source space.
-    * @param[in] parent             The Qt3D entity parent of the new item.
+    * @param[in] points     n x 3 matrix of cartesian data to fit the sphere to.
     *
-    * @return                       Returns true if successful.
+    * @return the fitted sphere.
     */
-    bool addData(const MNELIB::MNEHemisphere& tHemisphere, Qt3DCore::QEntity* parent);
+    static Sphere fit_sphere(const Eigen::MatrixX3f& points);
 
     //=========================================================================================================
     /**
-    * Call this slot whenever you want to change the visibilty of the 3D rendered content.
+    * Fits a sphere to a point cloud.
     *
-    * @param[in] state     The visiblity flag.
-    */
-    void setVisible(bool state);
-
-private slots:
-    //=========================================================================================================
-    /**
-    * Call this slot whenever the surface color was changed.
+    * @param[in] points         n x 3 matrix of cartesian data to fit the sphere to.
+    * @param[in] simplex_size   The simplex size
     *
-    * @param[in] color        The new surface color.
+    * @return the fitted sphere.
     */
-    void onSurfaceColorChanged(const QColor &color);
+    static Sphere fit_sphere_simplex(const Eigen::MatrixX3f& points, double simplex_size = 2e-2);
 
     //=========================================================================================================
     /**
-    * Call this slot whenever the check box of this item was checked.
+    * The radius of the sphere.
     *
-    * @param[in] checkState        The current checkstate.
+    * @return the fitted sphere.
     */
-    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
+    Eigen::Vector3f& center() { return m_center; }
+
+    //=========================================================================================================
+    /**
+    * The radius of the sphere.
+    *
+    * @return the fitted sphere.
+    */
+    float& radius() { return m_r; }
 
 private:
+    Eigen::Vector3f m_center;  /**< Sphere's center */
+    float m_r;          /**< Sphere's radius */
+
     //=========================================================================================================
     /**
-    * Creates a QByteArray of colors for given color for the input vertices.
+    * Fits a sphere to a point cloud.
     *
-    * @param[in] vertices       The vertices information.
-    * @param[in] color          The vertex color information.
+    * @param[in] rr             n x 3 matrix of cartesian data to fit the sphere to.
+    * @param[in] simplex_size   The simplex size
+    * @param[out] r0            center (1 x 3 matrix) of the sphere.
+    * @param[out] R             Radius
+    *
+    * @return true if successful.
     */
-    QByteArray createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100)) const;
+    static bool fit_sphere_to_points ( const Eigen::MatrixXf &rr, float simplex_size, Eigen::VectorXf &r0, float &R );
 
-    Qt3DCore::QEntity*      m_pParentEntity;                            /**< The parent 3D entity. */
-    Renderable3DEntity*     m_pRenderable3DEntity;                      /**< The renderable 3D entity. */
-
-    QObjectList             m_lChildren;
-
-signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever the origin of the vertex color (from curvature, from annotation) changed.
+    * Calculates the average
     *
-    * @param[in] arrayVertColor      The new vertex colors.
+    * @param[in] rr     n x 3 matrix of cartesian data to fit the sphere to.
+    * @param[out] cm    The average center of the caretsian data (1 x 3 matrix)
+    * @param[out] avep  The average distance to the average center.
     */
-    void colorInfoOriginChanged(const QByteArray& arrayVertColor);
+    static void calculate_cm_ave_dist(  const Eigen::MatrixXf &rr, Eigen::VectorXf &cm, float &avep );
+
+    //=========================================================================================================
+    /**
+    * Creates the initial simplex.
+    *
+    * @param[in] pars   The simplex center (1 x 3 matrix).
+    * @param[in] size   The simplex size
+    *
+    * @return the inital simplex.
+    */
+    static Eigen::MatrixXf make_initial_simplex( const Eigen::VectorXf &pars,  float size );
+
+    //=========================================================================================================
+    /**
+    * The simplex cost function
+    *
+    * @param[in] fitpar     A simplex vertex to evaluate.
+    * @param[in] user_data  The user data containing the n x 3 matrix of cartesian data
+    *
+    * @return the distance (cost) of the given vertex (sphere center).
+    */
+    static float fit_eval( const Eigen::VectorXf &fitpar, const void  *user_data );
+
+    //=========================================================================================================
+    /**
+    * The report function, called to rpeort the optimization status
+    *
+    * @param[in] loop       The current iteration loop
+    * @param[in] fitpar     The currently best fitting simplex vertex.
+    * @param[in] fval       The optimization value
+    *
+    * @return true if reporting was successful.
+    */
+    static bool report_func( int loop, const Eigen::VectorXf &fitpar, double fval);
+
+    //=========================================================================================================
+    /**
+    * Calculates the optimal radius based on a given center.
+    *
+    * @param[in] r0      The center
+    * @param[in] user    The user data containing the n x 3 matrix of cartesian data
+    *
+    * @return the optimal radius
+    */
+    static float opt_rad( const Eigen::VectorXf &r0, const fitUserNew user);
 };
 
-} //NAMESPACE DISP3DLIB
+} // NAMESPACE
 
-#endif // BRAINSOURCESPACETREEITEM_H
+#endif // SPHERE_H
