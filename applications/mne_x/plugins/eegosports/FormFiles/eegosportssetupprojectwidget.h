@@ -150,6 +150,12 @@ private:
 
     //=========================================================================================================
     /**
+    * Sets the dir where the cardinal file is located
+    */
+    void changeCardinalFile();
+
+    //=========================================================================================================
+    /**
     * Generates new file path based onthe project and subject parameters
     */
     void generateFilePath(int index = 0);

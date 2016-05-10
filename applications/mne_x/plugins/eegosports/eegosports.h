@@ -251,18 +251,20 @@ private:
     double                              m_dRPAShift;                        /**< The shift in m in to generate the RPA.*/
     double                              m_dNasionShift;                     /**< The shift in m in to generate the Nasion.*/
 
-    QString                             m_sLPA;                             /**< The electrode to take to function as the LPA.*/
-    QString                             m_sRPA;                             /**< The electrode to take to function as the RPA.*/
-    QString                             m_sNasion;                          /**< The electrode to take to function as the Nasion.*/
-
     bool                                m_bWriteToFile;                     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                m_bWriteDriverDebugToFile;          /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
     bool                                m_bIsRunning;                       /**< Whether EEGoSports is running.*/
     bool                                m_bCheckImpedances;                 /**< Flag for checking the impedances of the EEG amplifier.*/
 
     ofstream                            m_outputFileStream;                 /**< fstream for writing the samples values to txt file.*/
+
     QString                             m_sOutputFilePath;                  /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
     QString                             m_sElcFilePath;                     /**< Holds the path for the .elc file (electrode positions). Defined by the user via the GUI.*/
+    QString                             m_sCardinalFilePath;                /**< Holds the path for the .elc file holding the cardinals/fiducials (electrode positions). Defined by the user via the GUI.*/
+    QString                             m_sLPA;                             /**< The electrode to take to function as the LPA.*/
+    QString                             m_sRPA;                             /**< The electrode to take to function as the RPA.*/
+    QString                             m_sNasion;                          /**< The electrode to take to function as the Nasion.*/
+
     QFile                               m_fileOut;                          /**< QFile for writing to fif file.*/
     FiffStream::SPtr                    m_pOutfid;                          /**< QFile for writing to fif file.*/
     QSharedPointer<FiffInfo>            m_pFiffInfo;                        /**< Fiff measurement info.*/
