@@ -10,9 +10,3 @@ sh -e /etc/init.d/xvfb start
 # Install Qt
 sudo add-apt-repository ppa:beineri/opt-qt56-trusty -y
 sudo apt-get update -qq
-
-# Prepare build environment
-cd ..
-mkdir mne-cpp_shadow_build
-cd mne-cpp_shadow_build
-
