@@ -3,23 +3,24 @@ language: cpp
 
 os:
     - linux
-#    - osx
 
-matrix:
-  include:
-    - os: linux
-      sudo: required
-      dist: trusty
-#    - os: osx
-#      osx_image: xcode7.3
+sudo: required
+dist: trusty
 
-before_install: . tools/travis/$TRAVIS_OS_NAME/before_install.sh
+before_install:
+    - sudo add-apt-repository ppa:beineri/opt-qt56-trusty -y
+    - sudo apt-get update -qq
 
-install: . tools/travis/$TRAVIS_OS_NAME/install.sh
+install:
+    - sudo apt-get install -qq qt56base qt563d qt56svg qt56serialport
+    - source /opt/qt56/bin/qt56-env.sh
 
-script: . tools/travis/$TRAVIS_OS_NAME/script.sh
+script:
+    - qmake -r
+    - make -j2
 
-after_success: . tools/travis/$TRAVIS_OS_NAME/after_success.sh
+after_success:
+    - echo "MNE-CPP build was successful!";
 
 notifications:
   email:
