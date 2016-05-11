@@ -23,14 +23,13 @@ install:
 #    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew link --force qt5; fi
 
 script:
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cppcheck --version; fi
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cppcheck ./MNE ./applications ./testframes ./examples; fi
 #    - qmake -r
 #    - make -j2
 
 after_success:
 #    - echo "MNE-CPP build was successful!";
-#    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cppcheck -v; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cppcheck --version; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cppcheck --enable=all -I./include/3rdParty/eigen3 ./MNE ./applications ./testframes ./examples; fi
 
 #notifications:
 #  email:
