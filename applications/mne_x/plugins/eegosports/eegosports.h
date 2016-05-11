@@ -255,6 +255,8 @@ private:
     bool                                m_bWriteDriverDebugToFile;          /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
     bool                                m_bIsRunning;                       /**< Whether EEGoSports is running.*/
     bool                                m_bCheckImpedances;                 /**< Flag for checking the impedances of the EEG amplifier.*/
+    bool                                m_bUseTrackedCardinalMode;          /**< Flag for using the tracked cardinal mode.*/
+    bool                                m_bUseElectrodeShiftMode;           /**< Flag for using the electrode shift mode.*/
 
     ofstream                            m_outputFileStream;                 /**< fstream for writing the samples values to txt file.*/
 
