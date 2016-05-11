@@ -25,11 +25,11 @@ install:
 script:
 #    - qmake -r
 #    - make -j2
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cppcheck --version; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cppcheck --enable=all -I./include/3rdParty/eigen3 ./MNE ./applications ./testframes ./examples; fi
 
 after_success:
 #    - echo "MNE-CPP build was successful!";
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cppcheck --version; fi
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cppcheck --enable=all -I./include/3rdParty/eigen3 ./MNE ./applications ./testframes ./examples; fi
 
 #notifications:
 #  email:
