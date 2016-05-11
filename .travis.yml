@@ -24,7 +24,7 @@ install:
 
 script:
     # QA: Before build do static code analysis with CppCheck
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cppcheck --library=./tools/travis/cppcheck/qt.cfg --enable=all -f -q -i./include/3rdParty/eigen3 -i/opt/qt56/include ./MNE ./applications ./testframes ./examples; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cppcheck --enable=all -f -q -i./include/3rdParty/eigen3 -i/opt/qt56/include ./MNE ./applications ./testframes ./examples; fi
 #    - qmake -r
 #    - make -j2
 
