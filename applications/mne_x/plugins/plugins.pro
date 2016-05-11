@@ -56,7 +56,7 @@ contains(MNECPP_CONFIG, BuildBasicMNEXVersion) {
         babymeg \
         triggercontrol \
         #gusbamp \
-        eegosports
+        #eegosports
 
     #Algorithms
     SUBDIRS += \

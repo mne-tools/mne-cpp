@@ -74,6 +74,8 @@ EEGoSports::EEGoSports()
 , m_dLPAShift(0.01)
 , m_dRPAShift(0.01)
 , m_dNasionShift(0.06)
+, m_bUseTrackedCardinalMode(true)
+, m_bUseElectrodeShiftMode(false)
 , m_sLPA("2LD")
 , m_sRPA("2RD")
 , m_sNasion("0Z")
@@ -100,7 +102,23 @@ EEGoSports::~EEGoSports()
 
     //If the program is closed while the sampling is in process
     if(this->isRunning())
-        this->stop();
+        this->stop();    
+
+    //Store settings for next use
+    QSettings settings;
+    settings.setValue(QString("EEGOSPORTS/sFreq"), m_iSamplingFreq);
+    settings.setValue(QString("EEGOSPORTS/samplesPerBlock"), m_iSamplesPerBlock);
+    settings.setValue(QString("EEGOSPORTS/LPAShift"), m_dLPAShift);
+    settings.setValue(QString("EEGOSPORTS/RPAShift"), m_dRPAShift);
+    settings.setValue(QString("EEGOSPORTS/NasionShift"), m_dNasionShift);
+    settings.setValue(QString("EEGOSPORTS/LPAElectrode"), m_sLPA);
+    settings.setValue(QString("EEGOSPORTS/RPAElectrode"), m_sRPA);
+    settings.setValue(QString("EEGOSPORTS/NasionElectrode"), m_sNasion);
+    settings.setValue(QString("EEGOSPORTS/outputFilePath"), m_sOutputFilePath);
+    settings.setValue(QString("EEGOSPORTS/elcFilePath"), m_sElcFilePath);
+    settings.setValue(QString("EEGOSPORTS/cardinalFilePath"), m_sCardinalFilePath);
+    settings.setValue(QString("EEGOSPORTS/useTrackedCardinalsMode"), m_bUseTrackedCardinalMode);
+    settings.setValue(QString("EEGOSPORTS/useElectrodeshiftMode"), m_bUseElectrodeShiftMode);
 }
 
 
@@ -122,19 +140,31 @@ void EEGoSports::init()
     m_outputConnectors.append(m_pRMTSA_EEGoSports);
 
     //default values used by the setupGUI class must be set here
-    m_iSamplingFreq = 1024;
+
+    QSettings settings;
+    m_iSamplingFreq = settings.value(QString("EEGOSPORTS/sFreq"), 1024).toInt();
     m_iNumberOfChannels = 90;
-    m_iSamplesPerBlock = 1024;
+    m_iSamplesPerBlock = settings.value(QString("EEGOSPORTS/samplesPerBlock"), 1024).toInt();
     m_bWriteToFile = false;
     m_bWriteDriverDebugToFile = false;
     m_bIsRunning = false;
     m_bCheckImpedances = false;
 
     QDate date;
-    m_sOutputFilePath = QString ("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day());
+    m_sOutputFilePath = settings.value(QString("EEGOSPORTS/outputFilePath"), QString("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day())).toString();
 
-    m_sElcFilePath = QString("./Resources/3DLayouts/standard_waveguard64_duke.elc");
-    m_sCardinalFilePath = QString("");
+    m_sElcFilePath = settings.value(QString("EEGOSPORTS/elcFilePath"), QString("./Resources/3DLayouts/standard_waveguard64_duke.elc")).toString();
+
+    m_sCardinalFilePath = settings.value(QString("EEGOSPORTS/cardinalFilePath"), QString("")).toString();
+
+    m_dLPAShift = settings.value(QString("EEGOSPORTS/LPAShift"), 0.0).toFloat();
+    m_dRPAShift = settings.value(QString("EEGOSPORTS/RPAShift"), 0.0).toFloat();
+    m_dNasionShift = settings.value(QString("EEGOSPORTS/NasionShift"), 0.0).toFloat();
+    m_sLPA = settings.value(QString("EEGOSPORTS/LPAElectrode"), QString("")).toString();
+    m_sRPA = settings.value(QString("EEGOSPORTS/RPAElectrode"), QString("")).toString();
+    m_sNasion = settings.value(QString("EEGOSPORTS/NasionElectrode"), QString("")).toString();
+    m_bUseTrackedCardinalMode = settings.value(QString("EEGOSPORTS/useTrackedCardinalsMode"), true).toBool();
+    m_bUseElectrodeShiftMode = settings.value(QString("EEGOSPORTS/useElectrodeshiftMode"), false).toBool();
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 }
@@ -232,7 +262,9 @@ void EEGoSports::setUpFiffInfo()
         }
     }
 
+    //
     //Append cardinal points LPA RPA Nasion
+    //
     QList<QVector<double> > cardinals3D;
     QList<QVector<double> > cardinals2D;
     QStringList cardinalNames;
@@ -253,10 +285,9 @@ void EEGoSports::setUpFiffInfo()
         cardinals3D[i][2] = point_rot[2];
     }
 
-        qDebug()<<"cardinals3D"<<cardinals3D;
-        qDebug()<<"cardinals2D"<<cardinals2D;
-        qDebug()<<"cardinalNames"<<cardinalNames;
-
+    qDebug()<<"cardinals3D"<<cardinals3D;
+    qDebug()<<"cardinals2D"<<cardinals2D;
+    qDebug()<<"cardinalNames"<<cardinalNames;
 
     //Append LAP value to digitizer data.
     FiffDigPoint digPoint;
@@ -265,14 +296,14 @@ void EEGoSports::setUpFiffInfo()
     digPoint.ident = FIFFV_POINT_LPA;//digitizerInfo.size();
 
     //Set EEG electrode location - Convert from mm to m
-    if(!m_sCardinalFilePath.isEmpty() && cardinals3D.size() == 3 && cardinalNames.contains("LPA")) {
+    if(m_bUseTrackedCardinalMode && !m_sCardinalFilePath.isEmpty() && cardinals3D.size() == 3 && cardinalNames.contains("LPA")) {
         indexLPA = cardinalNames.indexOf("LPA");
 
         digPoint.r[0] = elcLocation3D[indexLPA][0]*0.001;
         digPoint.r[1] = elcLocation3D[indexLPA][1]*0.001;
         digPoint.r[2] = elcLocation3D[indexLPA][2]*0.001;
         digitizerInfo.push_back(digPoint);
-    } else {
+    } else if(m_bUseElectrodeShiftMode) {
         if(indexLPA != -1)
         {
             digPoint.r[0] = elcLocation3D[indexLPA][0]*0.001;
@@ -291,14 +322,14 @@ void EEGoSports::setUpFiffInfo()
     digPoint.ident = FIFFV_POINT_NASION;//digitizerInfo.size();
 
     //Set EEG electrode location - Convert from mm to m
-    if(!m_sCardinalFilePath.isEmpty() && cardinals3D.size() == 3 && cardinalNames.contains("Nasion")) {
+    if(m_bUseTrackedCardinalMode && !m_sCardinalFilePath.isEmpty() && cardinals3D.size() == 3 && cardinalNames.contains("Nasion")) {
         indexNasion = cardinalNames.indexOf("Nasion");
 
         digPoint.r[0] = elcLocation3D[indexNasion][0]*0.001;
         digPoint.r[1] = elcLocation3D[indexNasion][1]*0.001;
         digPoint.r[2] = elcLocation3D[indexNasion][2]*0.001;
         digitizerInfo.push_back(digPoint);
-    } else {
+    } else if(m_bUseElectrodeShiftMode) {
         if(indexNasion != -1)
         {
             digPoint.r[0] = elcLocation3D[indexNasion][0]*0.001;
@@ -317,14 +348,14 @@ void EEGoSports::setUpFiffInfo()
     digPoint.ident = FIFFV_POINT_RPA;//digitizerInfo.size();
 
     //Set EEG electrode location - Convert from mm to m
-    if(!m_sCardinalFilePath.isEmpty() && cardinals3D.size() == 3 && cardinalNames.contains("RPA")) {
+    if(m_bUseTrackedCardinalMode && !m_sCardinalFilePath.isEmpty() && cardinals3D.size() == 3 && cardinalNames.contains("RPA")) {
         indexRPA = cardinalNames.indexOf("RPA");
 
         digPoint.r[0] = elcLocation3D[indexRPA][0]*0.001;
         digPoint.r[1] = elcLocation3D[indexRPA][1]*0.001;
         digPoint.r[2] = elcLocation3D[indexRPA][2]*0.001;
         digitizerInfo.push_back(digPoint);
-    } else {
+    } else if(m_bUseElectrodeShiftMode) {
         if(indexRPA != -1)
         {
             digPoint.r[0] = elcLocation3D[indexRPA][0]*0.001;
