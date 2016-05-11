@@ -23,7 +23,7 @@ install:
 #    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew link --force qt5; fi
 
 script:
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cppcheck --enable=all -f -I./include/3rdParty/eigen3 ./MNE ./applications ./testframes ./examples; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cppcheck --enable=all -q -I./include/3rdParty/eigen3 -I/opt/qt56/include ./MNE ./applications ./testframes ./examples; fi
 #    - qmake -r
 #    - make -j2
 
