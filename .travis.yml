@@ -28,6 +28,7 @@ script:
 
 after_success:
     - echo "MNE-CPP build was successful!";
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cppcheck -v; fi
 
 notifications:
   email:
