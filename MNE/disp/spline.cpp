@@ -39,7 +39,6 @@
 //=============================================================================================================
 
 #include <spline.h>
-#include <helpers/callout.h>
 
 
 //*************************************************************************************************************
@@ -51,6 +50,7 @@
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsTextItem>
 #include <QtGui/QMouseEvent>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -68,17 +68,25 @@ using namespace DISPLIB;
 Spline::Spline(const QString& title, QWidget* parent)
 :  QWidget(parent),
    m_coordX(0),
-   m_coordY(0),
-   m_tooltip(0)
+   m_coordY(0)
 
 {
     m_pChart = new QChart();
     m_pChart->setTitle(title);
     m_pChart->setAnimationOptions(QChart::SeriesAnimations);
+    m_pChart->setAcceptHoverEvents(false);
 
-    m_pAxis = new QBarCategoryAxis();
-    m_pChart->legend()->setVisible(true);
+    //m_pAxis = new QBarCategoryAxis();
+    m_pChart->legend()->setVisible(false);
     m_pChart->legend()->setAlignment(Qt::AlignBottom);
+
+    m_coordX = new QGraphicsSimpleTextItem(m_pChart);
+    m_coordX->setPos(m_pChart->size().width()/2 + 20, m_pChart->size().height());
+    m_coordX->setText("X-axis: ");
+    m_coordY = new QGraphicsSimpleTextItem(m_pChart);
+    m_coordY->setPos(m_pChart->size().width()/2 + 20, m_pChart->size().height() + 20);
+    m_coordY->setText("Y-axis: ");
+    this->setMouseTracking(true);
 
     QChartView *chartView = new QChartView(m_pChart);
     chartView->setRenderHint(QPainter::Antialiasing);
@@ -94,100 +102,44 @@ Spline::Spline(const QString& title, QWidget* parent)
 
 void Spline::mousePressEvent(QMouseEvent *event)
 {
+    qDebug() << "Mousepressevent!";
     QXYSeries *shadowSeries = qobject_cast<QXYSeries *>(sender());
     QLineSeries *verticalLine = new QLineSeries();
     QPointF point = event->pos();
-    point.setX(point.x()-10);               // -10 needed to correctly position the line at mouse position
+    point.setX(point.x()-10);               //-10 needed to correctly position the line at mouse position
     point.setY(0);
-    qDebug() << "Point after zero Y = " << point;
     QPointF localX = m_pChart->mapToValue(point, shadowSeries);
-    qDebug() << "local X = " << localX;
     verticalLine -> append(localX.x(), 0);
     verticalLine -> append(localX.x(), maximumFrequency);
+    double test = double(localX.x());       //casting localX.x() from float to double for comparison with minAxisX and maxAxisX
 
-    if (event->buttons() == Qt::LeftButton)
+    if((test >= float(minAxisX)) && (test <= float(maxAxisX)))  //this condition ensures that
     {
-        if (leftThreshold.isVisible())
+        if (event->buttons() == Qt::LeftButton)
         {
-            m_pChart->removeAllSeries();
+            m_pChart->removeSeries(leftThreshold);
+            leftThreshold=verticalLine;
+            m_pChart->addSeries(leftThreshold);
+            m_pChart->createDefaultAxes();
         }
-        verticalLine->setName("L-T");
-        //m_pChart->addSeries(series);
-        m_pChart->addSeries(verticalLine);
-        m_pChart->createDefaultAxes();
-        m_pChart->axisX()->setRange(minAxisX, maxAxisX);
-        m_pChart->axisY()->setRange(0,maximumFrequency);
+
+        if (event->buttons() == Qt::MiddleButton)
+        {
+            m_pChart->removeSeries(middleThreshold);
+            middleThreshold=verticalLine;
+            m_pChart->addSeries(middleThreshold);
+            m_pChart->createDefaultAxes();
+        }
+
+        if (event->buttons() == Qt::RightButton)
+        {
+            m_pChart->removeSeries(rightThreshold);
+            rightThreshold=verticalLine;
+            m_pChart->addSeries(rightThreshold);
+            m_pChart->createDefaultAxes();
+        }
     }
-
-    if (event->buttons() == Qt::MiddleButton)
-    {
-        verticalLine->setName("M-T");
-        m_pChart->addSeries(verticalLine);
-        m_pChart->createDefaultAxes();
-        m_pChart->axisX()->setRange(minAxisX, maxAxisX);
-        m_pChart->axisY()->setRange(0,maximumFrequency);
-    }
-
-    if (event->buttons() == Qt::RightButton)
-    {
-        verticalLine->setName("R-T");
-        m_pChart->addSeries(verticalLine);
-        m_pChart->createDefaultAxes();
-        m_pChart->axisX()->setRange(minAxisX, maxAxisX);
-        m_pChart->axisY()->setRange(0,maximumFrequency);
-    }
-
-//    qDebug() << "Output global position:" << event->globalPos();
-//    qDebug() << "Output window position:" << event->windowPos();
-//    qDebug() << "Output m_pChart position:" << m_pChart->pos();
-//    qDebug() << "Output m_pChart margins:" << m_pChart->margins();
-}
-
-
-//*************************************************************************************************************
-
-void Spline::keepCalloutSpline(QPointF point)
-{
-    QLineSeries *verticalLine = new QLineSeries();
-    verticalLine -> append(point.x(), 0);
-    verticalLine -> append(point.x(), maximumFrequency);
-    verticalLine->setName("T");
-    m_pChart->addSeries(verticalLine);
-    m_pChart->createDefaultAxes();
-    m_pChart->axisX()->setRange(minAxisX, maxAxisX);
-    m_pChart->axisY()->setRange(0,maximumFrequency);
-
-    //emit borderChanged(left, middle, right);
-    //qDebug() << "Left Mouse Button: " << left;
-}
-
-
-//*************************************************************************************************************
-
-void Spline::tooltip(QPointF point, bool state)
-{
-    if (m_tooltip == 0)
-    {
-        m_tooltip = new Callout(m_pChart);
-    }
-
-    if (state)
-    {
-        m_tooltip->setText(QString("X: %1 \nY: %2 ").arg(point.x()).arg(point.y()));
-        QXYSeries *series = qobject_cast<QXYSeries *>(sender());
-        m_tooltip->setAnchor(m_pChart->mapToPosition(point, series));
-        m_tooltip->setPos(m_pChart->mapToPosition(point, series) + QPoint(10, -50));
-        qDebug() << "series = " << series;
-        qDebug() << "m_pchart maptoposition= " << m_pChart->mapToPosition(point, series);
-        m_tooltip->setZValue(11);
-        m_tooltip->show();
-        qDebug()<< "Point =" << point;
-    }
-
-    else
-    {
-        m_tooltip->hide();
-    }
+    //emit borderChanged(leftThreshold, middleThreshold, rightThreshold);
 }
 
 
@@ -195,20 +147,9 @@ void Spline::tooltip(QPointF point, bool state)
 
 void Spline::mouseMoveEvent(QMouseEvent *event)
 {
-    m_coordX->setText(QString("X: %1").arg(m_pChart->mapToValue(event->pos()).x()));
-    m_coordY->setText(QString("Y: %1").arg(m_pChart->mapToValue(event->pos()).y()));
+    m_coordX->setText(QString("X-axis: %1").arg(m_pChart->mapToValue(event->pos()).x()));
+    m_coordY->setText(QString("Y-axis: %1").arg(m_pChart->mapToValue(event->pos()).y()));
     QWidget::mouseMoveEvent(event);
-}
-
-
-//*************************************************************************************************************
-
-void Spline::resizeEvent(QResizeEvent *event)
-{
-    m_pChart->resize(event->size());
-    m_coordX->setPos(m_pChart->size().width()/2 - 50, m_pChart->size().height() - 20);
-    m_coordY->setPos(m_pChart->size().width()/2 + 50, m_pChart->size().height() - 20);
-    QWidget::resizeEvent(event);
 }
 
 
