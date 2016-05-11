@@ -110,8 +110,7 @@ SOURCES += \
     helpers/mneoperator.cpp \
     helpers/roundededgeswidget.cpp \
     bar.cpp \
-    spline.cpp \
-    helpers/callout.cpp
+    spline.cpp
 
 HEADERS += \
     disp_global.h \
@@ -135,8 +134,7 @@ HEADERS += \
     helpers/mneoperator.h \
     helpers/roundededgeswidget.h \
     bar.h \
-    spline.h \
-    helpers/callout.h
+    spline.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

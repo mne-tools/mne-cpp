@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include "disp_global.h"
-#include "helpers/callout.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -64,8 +64,6 @@
 #include <QtGui/QMouseEvent>
 #include <QDebug>
 #include <QtCharts/QChartGlobal>
-
-class Callout;
 
 
 //*************************************************************************************************************
@@ -114,15 +112,12 @@ class DISPSHARED_EXPORT Spline
     int maximumFrequency;
 public:
 
-    typedef QSharedPointer<Spline> SPtr;            /**< Shared pointer type for Spline. */
-    typedef QSharedPointer<const Spline> ConstSPtr; /**< Const shared pointer type for Spline. */
-
-
     //=========================================================================================================
 
     void Spline::mousePressEvent(QMouseEvent *event);
 
     //=========================================================================================================
+
     /**
     * The constructor for Spline
     */
@@ -130,6 +125,7 @@ public:
 
 
     //=========================================================================================================
+
     /**
     * creates a qspline chart histogram from 2 vectors: class limits and class frequency
     *
@@ -145,26 +141,21 @@ public:
 
     //=========================================================================================================
 
-public slots:
-    void keepCalloutSpline(QPointF point);
-    void tooltip(QPointF point, bool state);
-
 protected:
-    void resizeEvent(QResizeEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent* event);
 
 private:
     QChart*             m_pChart;
     QBarCategoryAxis*   m_pAxis;
+    QLineSeries *leftThreshold;
+    QLineSeries *middleThreshold;
+    QLineSeries *rightThreshold;
     QGraphicsSimpleTextItem *m_coordX;
     QGraphicsSimpleTextItem *m_coordY;
-    Callout *m_tooltip;
-    QLineSeries leftThreshold,
-                middleThreshold,
-                rightThreshold;
 
 
     //=========================================================================================================
+
     /**
     * Updates the spline with new data
     *
@@ -177,6 +168,7 @@ private:
 
 
     //=========================================================================================================
+
     /**
     * splitCoefficientAndExponent takes in QVector value of coefficient and exponent (example: 1.2e-10) and finds the coefficient (1.2) and the appropriate exponent (-12), normalize the exponents to either the lowest or highest exponent in the list then places the values in two separate QVectors
     *
@@ -191,7 +183,7 @@ private:
     //=========================================================================================================
 
 signals:
-    void borderChanged(double left, double middle, double right);
+    void borderChanged(double leftThreshold, double middleThreshold, double rightThreshold);
 };
 
 
@@ -257,26 +249,21 @@ template<typename T>
           }
       }
 
-//      setDragMode(QWidget::NoDrag);
-//      setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-//      setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-      m_coordX = new QGraphicsSimpleTextItem(m_pChart);
-      m_coordX->setPos(m_pChart->size().width()/2 - 50, m_pChart->size().height());
-      m_coordY = new QGraphicsSimpleTextItem(m_pChart);
-      m_coordY->setPos(m_pChart->size().width()/2 + 50, m_pChart->size().height());
-
       //create new series and then clear the plot and update with new data
       m_pChart->removeAllSeries();
       m_pChart->addSeries(series);
       m_pChart->addSeries(shadowSeries);
-      shadowSeries->setVisible(true);
+      shadowSeries->setVisible(false);
+      leftThreshold = new QLineSeries();
+      middleThreshold = new QLineSeries();
+      rightThreshold = new QLineSeries();
+      m_pChart->addSeries(leftThreshold);
+      m_pChart->addSeries(middleThreshold);
+      m_pChart->addSeries(rightThreshold);
       m_pChart->createDefaultAxes();
       m_pChart->axisX()->setRange(minAxisX, maxAxisX);
       m_pChart->axisY()->setRange(0,maximumFrequency);
 
-      //connect(series, SIGNAL(pressed(QPointF)), this, SLOT(keepCalloutSpline(QPointF)));
-      //connect(series, SIGNAL(hovered(QPointF, bool)), this, SLOT(tooltip(QPointF,bool)));
   }
 
 
@@ -304,8 +291,8 @@ template <typename T>
           }
           limitExponentValue = round(doubleExponentValue);                        //round the exponent value to the nearest signed integer
           limitDisplayValue = originalValue * (pow(10,-(limitExponentValue)));    //display value is derived from multiplying class limit with inverse 10 to the power of negative exponent
-          vecCoefficientResults(ir) = limitDisplayValue;                         //append the display value to the return vector
-          vecExponentValues(ir) = limitExponentValue;                            //append the exponent value to the return vector
+          vecCoefficientResults(ir) = limitDisplayValue;                          //append the display value to the return vector
+          vecExponentValues(ir) = limitExponentValue;                             //append the exponent value to the return vector
       }
 
       int lowestExponentValue{0},
@@ -346,7 +333,6 @@ template <typename T>
       }
   }
 }
-
 
 //=========================================================================================================
 // NAMESPACE
