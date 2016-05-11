@@ -140,7 +140,13 @@ void EEGoSportsSetupProjectWidget::initGui()
     generateFilePath();
 
     //Init cardinal support
-    changeCardinalMode("Use tracked cardinals");
+    if(m_pEEGoSports->m_bUseTrackedCardinalMode) {
+        ui->m_comboBox_cardinalMode->setCurrentText("Use tracked cardinals");
+        changeCardinalMode("Use tracked cardinals");
+    } else if (m_pEEGoSports->m_bUseElectrodeShiftMode) {
+        ui->m_comboBox_cardinalMode->setCurrentText("Use electrode shift");
+        changeCardinalMode("Use electrode shift");
+    }
 }
 
 
@@ -162,6 +168,9 @@ void EEGoSportsSetupProjectWidget::changeCardinalMode(const QString& text)
         ui->m_label_Nasion->hide();
         ui->m_doubleSpinBox_Nasion->hide();
         ui->m_comboBox_Nasion->hide();
+
+        m_pEEGoSports->m_bUseTrackedCardinalMode = true;
+        m_pEEGoSports->m_bUseElectrodeShiftMode = false;
     } else if(text == "Use electrode shift") {
         ui->m_label_cardinal->hide();
         ui->m_lineEdit_cardinalFile->hide();
@@ -176,7 +185,12 @@ void EEGoSportsSetupProjectWidget::changeCardinalMode(const QString& text)
         ui->m_label_Nasion->show();
         ui->m_doubleSpinBox_Nasion->show();
         ui->m_comboBox_Nasion->show();
+
+        m_pEEGoSports->m_bUseTrackedCardinalMode = false;
+        m_pEEGoSports->m_bUseElectrodeShiftMode = true;
     }
+
+    this->adjustSize();
 }
 
 
