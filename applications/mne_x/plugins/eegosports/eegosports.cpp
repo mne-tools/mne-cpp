@@ -241,6 +241,17 @@ void EEGoSports::setUpFiffInfo()
         qDebug() << "Error: Reading elc cardinal file.";
     }
 
+    //Rotate cardinal points
+    for(int i = 0; i < cardinals3D.size(); i++)
+    {
+        Vector3f point;
+        point << cardinals3D[i][0], cardinals3D[i][1] , cardinals3D[i][2];
+        Vector3f point_rot = rotation_z * point;
+
+        cardinals3D[i][0] = point_rot[0];
+        cardinals3D[i][1] = point_rot[1];
+        cardinals3D[i][2] = point_rot[2];
+    }
 
         qDebug()<<"cardinals3D"<<cardinals3D;
         qDebug()<<"cardinals2D"<<cardinals2D;
