@@ -114,6 +114,12 @@ private:
     /**
     * Sets the project dir
     */
+    void changeCardinalMode(const QString &text);
+
+    //=========================================================================================================
+    /**
+    * Sets the project dir
+    */
     void onCardinalComboBoxChanged();
 
     //=========================================================================================================
@@ -147,6 +153,12 @@ private:
     * Sets the dir where the eeg cap file is located
     */
     void changeCap();
+
+    //=========================================================================================================
+    /**
+    * Sets the dir where the cardinal file is located
+    */
+    void changeCardinalFile();
 
     //=========================================================================================================
     /**
