@@ -299,9 +299,9 @@ void EEGoSports::setUpFiffInfo()
     if(m_bUseTrackedCardinalMode && !m_sCardinalFilePath.isEmpty() && cardinals3D.size() == 3 && cardinalNames.contains("LPA")) {
         indexLPA = cardinalNames.indexOf("LPA");
 
-        digPoint.r[0] = elcLocation3D[indexLPA][0]*0.001;
-        digPoint.r[1] = elcLocation3D[indexLPA][1]*0.001;
-        digPoint.r[2] = elcLocation3D[indexLPA][2]*0.001;
+        digPoint.r[0] = cardinals3D[indexLPA][0]*0.001;
+        digPoint.r[1] = cardinals3D[indexLPA][1]*0.001;
+        digPoint.r[2] = cardinals3D[indexLPA][2]*0.001;
         digitizerInfo.push_back(digPoint);
     } else if(m_bUseElectrodeShiftMode) {
         if(indexLPA != -1)
@@ -325,9 +325,9 @@ void EEGoSports::setUpFiffInfo()
     if(m_bUseTrackedCardinalMode && !m_sCardinalFilePath.isEmpty() && cardinals3D.size() == 3 && cardinalNames.contains("Nasion")) {
         indexNasion = cardinalNames.indexOf("Nasion");
 
-        digPoint.r[0] = elcLocation3D[indexNasion][0]*0.001;
-        digPoint.r[1] = elcLocation3D[indexNasion][1]*0.001;
-        digPoint.r[2] = elcLocation3D[indexNasion][2]*0.001;
+        digPoint.r[0] = cardinals3D[indexNasion][0]*0.001;
+        digPoint.r[1] = cardinals3D[indexNasion][1]*0.001;
+        digPoint.r[2] = cardinals3D[indexNasion][2]*0.001;
         digitizerInfo.push_back(digPoint);
     } else if(m_bUseElectrodeShiftMode) {
         if(indexNasion != -1)
@@ -351,9 +351,9 @@ void EEGoSports::setUpFiffInfo()
     if(m_bUseTrackedCardinalMode && !m_sCardinalFilePath.isEmpty() && cardinals3D.size() == 3 && cardinalNames.contains("RPA")) {
         indexRPA = cardinalNames.indexOf("RPA");
 
-        digPoint.r[0] = elcLocation3D[indexRPA][0]*0.001;
-        digPoint.r[1] = elcLocation3D[indexRPA][1]*0.001;
-        digPoint.r[2] = elcLocation3D[indexRPA][2]*0.001;
+        digPoint.r[0] = cardinals3D[indexRPA][0]*0.001;
+        digPoint.r[1] = cardinals3D[indexRPA][1]*0.001;
+        digPoint.r[2] = cardinals3D[indexRPA][2]*0.001;
         digitizerInfo.push_back(digPoint);
     } else if(m_bUseElectrodeShiftMode) {
         if(indexRPA != -1)
