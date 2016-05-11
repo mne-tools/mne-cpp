@@ -24,6 +24,7 @@ install:
 
 script:
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cppcheck --version; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cppcheck ./MNE ./applications ./testframes ./examples; fi
 #    - qmake -r
 #    - make -j2
 
