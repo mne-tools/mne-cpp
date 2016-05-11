@@ -113,6 +113,7 @@ void EEGoSportsSetupWidget::initGui()
 {
     //Init device sampling properties
     ui.m_comboBox_SamplingFreq->setCurrentText(QString::number(m_pEEGoSports->m_iSamplingFreq));
+    ui.m_spinBox_BlockSize->setValue(m_pEEGoSports->m_iSamplesPerBlock);
 
     //Init write to file
     ui.m_checkBox_WriteDriverDebugToFile->setChecked(m_pEEGoSports->m_bWriteDriverDebugToFile);

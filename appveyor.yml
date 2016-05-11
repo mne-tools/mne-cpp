@@ -11,13 +11,7 @@ configuration: Release
 build:
   parallel: true
   #quiet|minimal|normal|detailed
-  verbosity: normal 
-  
-cache: 
-    - C:\projects\mne-cpp_shadow_build\MNE
-    - C:\projects\mne-cpp_shadow_build\testframes
-    - C:\projects\mne-cpp_shadow_build\examples
-    - C:\projects\mne-cpp_shadow_build\applications
+  verbosity: detailed 
    
 install:
     - set QTDIR=C:\Qt\5.6\msvc2015_64
