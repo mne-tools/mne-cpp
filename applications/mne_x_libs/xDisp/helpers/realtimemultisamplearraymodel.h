@@ -528,9 +528,9 @@ private:
     * Calculates the filtered version of the raw input data
     *
     * @param [in] data          data which is to be filtered
-    * @param [in] dataIndex     current position in the global data matrix
+    * @param [in] iDataIndex    current position in the global data matrix
     */
-    void filterChannelsConcurrently(const MatrixXd &data, int dataIndex);
+    void filterChannelsConcurrently(const MatrixXd &data, int iDataIndex);
 
     //=========================================================================================================
     /**
@@ -583,7 +583,6 @@ private:
     Eigen::SparseMatrix<double>         m_matSparseProjCompMult;                    /**< The final sparse projection + compensator operator.*/
     Eigen::SparseMatrix<double>         m_matSparseProjMult;                        /**< The final sparse SSP projector */
     Eigen::SparseMatrix<double>         m_matSparseCompMult;                        /**< The final sparse compensator matrix */
-    Eigen::SparseMatrix<double>         m_matSparseFull;                            /**< The final full multiplication matrix  */
 
     Eigen::MatrixXd                     m_matProj;                                  /**< SSP projector */
     Eigen::MatrixXd                     m_matComp;                                  /**< Compensator */

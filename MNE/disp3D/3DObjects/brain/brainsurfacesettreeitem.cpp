@@ -190,8 +190,8 @@ bool BrainSurfaceSetTreeItem::addData(const Surface& tSurface, const Annotation&
         }
 
         QList<QStandardItem*> list;
-        list<<new QStandardItem(pHemiItem->toolTip());
         list<<pHemiItem;
+        list<<new QStandardItem(pHemiItem->toolTip());
         this->appendRow(list);
     }
 
@@ -229,8 +229,8 @@ bool BrainSurfaceSetTreeItem::addData(const MNESourceSpace& tSourceSpace, Qt3DCo
             state = pHemiItem->addData(tSourceSpace[i], p3DEntityParent);
 
             QList<QStandardItem*> list;
-            list<<new QStandardItem(pHemiItem->toolTip());
             list<<pHemiItem;
+            list<<new QStandardItem(pHemiItem->toolTip());
             this->appendRow(list);
         }
 

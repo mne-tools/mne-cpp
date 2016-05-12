@@ -101,7 +101,7 @@ namespace DISP3DLIB
 */
 class DISP3DNEWSHARED_EXPORT BrainSourceSpaceTreeItem : public AbstractTreeItem
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     typedef QSharedPointer<BrainSourceSpaceTreeItem> SPtr;             /**< Shared pointer type for BrainSourceSpaceTreeItem class. */
@@ -177,6 +177,8 @@ private:
 
     Qt3DCore::QEntity*      m_pParentEntity;                            /**< The parent 3D entity. */
     Renderable3DEntity*     m_pRenderable3DEntity;                      /**< The renderable 3D entity. */
+
+    QObjectList             m_lChildren;
 
 signals:
     //=========================================================================================================

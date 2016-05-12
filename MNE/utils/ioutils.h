@@ -207,7 +207,7 @@ public:
     * @param[in] path       path and file name to write to
     */
     template<typename T>
-    static bool write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QString& sPath, const QString& sDescription);
+    static bool write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QString& sPath, const QString& sDescription = QString());
 
     //=========================================================================================================
     /**

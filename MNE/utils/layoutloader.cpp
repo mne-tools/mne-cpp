@@ -62,7 +62,7 @@ LayoutLoader::LayoutLoader()
 
 //*************************************************************************************************************
 
-bool LayoutLoader::readAsaElcFile(QString path, QStringList &channelNames, QVector<QVector<double> > &location3D, QVector<QVector<double> > &location2D, QString &unit)
+bool LayoutLoader::readAsaElcFile(const QString& path, QStringList &channelNames, QList<QVector<double> > &location3D, QList<QVector<double> > &location2D, QString &unit)
 {
     //Open .elc file
     if(!path.contains(".elc"))
@@ -112,7 +112,7 @@ bool LayoutLoader::readAsaElcFile(QString path, QStringList &channelNames, QVect
                 posTemp.push_back(fields.at(fields.size()-2).toDouble());    //y
                 posTemp.push_back(fields.at(fields.size()-1).toDouble());    //z
 
-                location3D.push_back(posTemp);
+                location3D.append(posTemp);
             }
 
             if(line.contains(":") && read2D) //Read 2D positions
@@ -120,7 +120,7 @@ bool LayoutLoader::readAsaElcFile(QString path, QStringList &channelNames, QVect
                 QVector<double> posTemp;
                 posTemp.push_back(fields.at(fields.size()-2).toDouble());    //x
                 posTemp.push_back(fields.at(fields.size()-1).toDouble());    //y
-                location2D.push_back(posTemp);
+                location2D.append(posTemp);
             }
 
             //Read channel names
@@ -148,7 +148,7 @@ bool LayoutLoader::readAsaElcFile(QString path, QStringList &channelNames, QVect
 
 //*************************************************************************************************************
 
-bool LayoutLoader::readMNELoutFile(QString path, QMap<QString, QPointF> &channelData)
+bool LayoutLoader::readMNELoutFile(const QString &path, QMap<QString, QPointF> &channelData)
 {
     //Open .elc file
     if(!path.contains(".lout"))

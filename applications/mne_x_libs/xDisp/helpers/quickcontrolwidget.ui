@@ -54,7 +54,7 @@
         <item>
          <widget class="QTabWidget" name="m_tabWidget_noiseReduction">
           <property name="currentIndex">
-           <number>3</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="SSP">
            <attribute name="title">
