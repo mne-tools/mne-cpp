@@ -64,6 +64,9 @@
 #include <QtGui/QMouseEvent>
 #include <QDebug>
 #include <QtCharts/QChartGlobal>
+#include <QtCharts/QLegendMarker>
+#include <QtCharts/QLegend>
+#include <QtCharts/QXYLegendMarker>
 
 
 //*************************************************************************************************************
@@ -140,6 +143,10 @@ public:
 
 
     //=========================================================================================================
+
+public slots:
+void connectMarkers();
+void handleMarker();
 
 protected:
     void mouseMoveEvent(QMouseEvent* event);
@@ -252,18 +259,21 @@ template<typename T>
       //create new series and then clear the plot and update with new data
       m_pChart->removeAllSeries();
       m_pChart->addSeries(series);
-      m_pChart->addSeries(shadowSeries);
-      shadowSeries->setVisible(false);
       leftThreshold = new QLineSeries();
       middleThreshold = new QLineSeries();
       rightThreshold = new QLineSeries();
+      leftThreshold->setVisible(false);
+      middleThreshold->setVisible(false);
+      rightThreshold->setVisible(false);
+      //connectMarkers();
+      m_pChart->legend()->setVisible(true);
+      m_pChart->legend()->setAlignment(Qt::AlignBottom);
       m_pChart->addSeries(leftThreshold);
       m_pChart->addSeries(middleThreshold);
       m_pChart->addSeries(rightThreshold);
       m_pChart->createDefaultAxes();
       m_pChart->axisX()->setRange(minAxisX, maxAxisX);
       m_pChart->axisY()->setRange(0,maximumFrequency);
-
   }
 
 
