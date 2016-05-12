@@ -335,6 +335,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Update the compensator
+    *
+    * @param[in] to    Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind)
+    */
+    void updateCompensator(int to);
+
+    //=========================================================================================================
+    /**
     * Toggle freeze for all channels when a channel is double clicked
     */
     void toggleFreeze();
@@ -379,32 +387,39 @@ private:
     */
     void filterChannelsConcurrently();
 
-    QSharedPointer<RealTimeEvoked> m_pRTE;          /**< The real-time evoked measurement. */
+    QSharedPointer<RealTimeEvoked>      m_pRTE;          /**< The real-time evoked measurement. */
 
-    QMap<qint32,qint32>     m_qMapIdxRowSelection;  /**< Selection mapping.*/
-    QMap<qint32,float>      m_qMapChScaling;        /**< Channel scaling map. */
+    QMap<qint32,qint32>                 m_qMapIdxRowSelection;          /**< Selection mapping.*/
+    QMap<qint32,float>                  m_qMapChScaling;                /**< Channel scaling map. */
 
-    MatrixXd                m_matData;              /**< List that holds the data*/
-    MatrixXd                m_matDataFreeze;        /**< List that holds the data when freezed*/
-    MatrixXd                m_matProj;              /**< SSP projector */
-    MatrixXd                m_matDataFiltered;      /**< The filtered data */
-    MatrixXd                m_matDataFilteredFreeze;/**< The raw filtered data in freeze mode */
-    SparseMatrix<double>    m_matSparseProj;        /**< Sparse SSP projector */
+    MatrixXd                            m_matData;                      /**< List that holds the data*/
+    MatrixXd                            m_matDataFreeze;                /**< List that holds the data when freezed*/
 
-    RowVectorXi             m_vecBadIdcs;           /**< Idcs of bad channels */
+    Eigen::MatrixXd                     m_matProj;                      /**< SSP projector */
+    Eigen::MatrixXd                     m_matComp;                      /**< Compensator */
 
-    QPair<QVariant,QVariant>    m_pairBaseline;     /**< Baseline information */
+    MatrixXd                            m_matDataFiltered;              /**< The filtered data */
+    MatrixXd                            m_matDataFilteredFreeze;        /**< The raw filtered data in freeze mode */
 
-    bool    m_bIsInit;              /**< Init flag */
-    bool    m_bIsFreezed;           /**< Display is freezed */
-    bool    m_bProjActivated;       /**< Doo projections flag */
-    float   m_fSps;                 /**< Sampling rate */
-    qint32  m_iMaxFilterLength;     /**< Max order of the current filters */
+    Eigen::SparseMatrix<double>         m_matSparseProjCompMult;        /**< The final sparse projection + compensator operator.*/
+    Eigen::SparseMatrix<double>         m_matSparseProjMult;            /**< The final sparse SSP projector */
+    Eigen::SparseMatrix<double>         m_matSparseCompMult;            /**< The final sparse compensator matrix */
 
-    QString                             m_sFilterChannelType;   /**< Kind of channel which is to be filtered */
-    QList<FilterData>                   m_filterData;           /**< List of currently active filters. */
-    QStringList                         m_filterChannelList;    /**< List of channels which are to be filtered.*/
-    QStringList                         m_visibleChannelList;   /**< List of currently visible channels in the view.*/
+    RowVectorXi                         m_vecBadIdcs;                   /**< Idcs of bad channels */
+
+    QPair<QVariant,QVariant>            m_pairBaseline;                 /**< Baseline information */
+
+    bool                                m_bIsInit;                      /**< Init flag */
+    bool                                m_bIsFreezed;                   /**< Display is freezed */
+    bool                                m_bProjActivated;               /**< Doo projections flag */
+    bool                                m_bCompActivated;               /**< Compensator activated */
+    float                               m_fSps;                         /**< Sampling rate */
+    qint32                              m_iMaxFilterLength;             /**< Max order of the current filters */
+
+    QString                             m_sFilterChannelType;           /**< Kind of channel which is to be filtered */
+    QList<FilterData>                   m_filterData;                   /**< List of currently active filters. */
+    QStringList                         m_filterChannelList;            /**< List of channels which are to be filtered.*/
+    QStringList                         m_visibleChannelList;           /**< List of currently visible channels in the view.*/
 };
 
 

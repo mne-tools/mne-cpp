@@ -96,14 +96,6 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     addDisplayAction(m_pActionSelectSensors);
     m_pActionSelectSensors->setVisible(true);
 
-    m_pActionFiltering = new QAction(QIcon(":/images/showFilterWindow.png"), tr("Shows the filter window (F11)"),this);
-    m_pActionFiltering->setShortcut(tr("F11"));
-    m_pActionFiltering->setStatusTip(tr("Shows the filter window (F11)"));
-    connect(m_pActionFiltering, &QAction::triggered,
-            this, &RealTimeMultiSampleArrayWidget::showFilterWidget);
-    addDisplayAction(m_pActionFiltering);
-    m_pActionFiltering->setVisible(false);
-
     m_pActionHideBad = new QAction(QIcon(":/images/hideBad.png"), tr("Toggle all bad channels"),this);
     m_pActionHideBad->setStatusTip(tr("Toggle all bad channels"));
     connect(m_pActionHideBad, &QAction::triggered,

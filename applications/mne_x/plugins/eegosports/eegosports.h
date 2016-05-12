@@ -192,6 +192,20 @@ public:
 
     virtual QWidget* setupWidget();
 
+protected slots:
+    //=========================================================================================================
+    /**
+    * Update cardinal points
+    *
+    * @param[in] sLPA  The channel name to take as the LPA.
+    * @param[in] dLPA  The amount (in m) to translate the LPA channel position on the z axis.
+    * @param[in] sRPA  The channel name to take as the RPA.
+    * @param[in] dRPA  The amount (in m) to translate the RPA channel position on the z axis.
+    * @param[in] sNasion  The channel name to take as the Nasion.
+    * @param[in] dNasion  The amount (in m) to translate the Nasion channel position on the z axis.
+    */
+    void onUpdateCardinalPoints(const QString& sLPA, double dLPA, const QString& sRPA, double dRPA, const QString& sNasion, double dNasion);
+
 protected:
     //=========================================================================================================
     /**
@@ -242,14 +256,26 @@ private:
     int                                 m_iNumberOfChannels;                /**< The samples per block defined by the user via the GUI.*/
     int                                 m_iSamplesPerBlock;                 /**< The number of channels defined by the user via the GUI.*/
 
+    double                              m_dLPAShift;                        /**< The shift in m in to generate the LPA.*/
+    double                              m_dRPAShift;                        /**< The shift in m in to generate the RPA.*/
+    double                              m_dNasionShift;                     /**< The shift in m in to generate the Nasion.*/
+
     bool                                m_bWriteToFile;                     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                m_bWriteDriverDebugToFile;          /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
     bool                                m_bIsRunning;                       /**< Whether EEGoSports is running.*/
     bool                                m_bCheckImpedances;                 /**< Flag for checking the impedances of the EEG amplifier.*/
+    bool                                m_bUseTrackedCardinalMode;          /**< Flag for using the tracked cardinal mode.*/
+    bool                                m_bUseElectrodeShiftMode;           /**< Flag for using the electrode shift mode.*/
 
     ofstream                            m_outputFileStream;                 /**< fstream for writing the samples values to txt file.*/
+
     QString                             m_sOutputFilePath;                  /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
     QString                             m_sElcFilePath;                     /**< Holds the path for the .elc file (electrode positions). Defined by the user via the GUI.*/
+    QString                             m_sCardinalFilePath;                /**< Holds the path for the .elc file holding the cardinals/fiducials (electrode positions). Defined by the user via the GUI.*/
+    QString                             m_sLPA;                             /**< The electrode to take to function as the LPA.*/
+    QString                             m_sRPA;                             /**< The electrode to take to function as the RPA.*/
+    QString                             m_sNasion;                          /**< The electrode to take to function as the Nasion.*/
+
     QFile                               m_fileOut;                          /**< QFile for writing to fif file.*/
     FiffStream::SPtr                    m_pOutfid;                          /**< QFile for writing to fif file.*/
     QSharedPointer<FiffInfo>            m_pFiffInfo;                        /**< Fiff measurement info.*/

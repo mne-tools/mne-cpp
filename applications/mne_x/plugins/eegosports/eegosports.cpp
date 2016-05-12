@@ -72,6 +72,14 @@ EEGoSports::EEGoSports()
 , m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/eegosports/")
 , m_pRawMatrixBuffer_In(0)
 , m_pEEGoSportsProducer(new EEGoSportsProducer(this))
+, m_dLPAShift(0.01)
+, m_dRPAShift(0.01)
+, m_dNasionShift(0.06)
+, m_bUseTrackedCardinalMode(true)
+, m_bUseElectrodeShiftMode(false)
+, m_sLPA("2LD")
+, m_sRPA("2RD")
+, m_sNasion("0Z")
 {
     // Create record file option action bar item/button
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup project"), this);
@@ -101,7 +109,23 @@ EEGoSports::~EEGoSports()
 
     //If the program is closed while the sampling is in process
     if(this->isRunning())
-        this->stop();
+        this->stop();    
+
+    //Store settings for next use
+    QSettings settings;
+    settings.setValue(QString("EEGOSPORTS/sFreq"), m_iSamplingFreq);
+    settings.setValue(QString("EEGOSPORTS/samplesPerBlock"), m_iSamplesPerBlock);
+    settings.setValue(QString("EEGOSPORTS/LPAShift"), m_dLPAShift);
+    settings.setValue(QString("EEGOSPORTS/RPAShift"), m_dRPAShift);
+    settings.setValue(QString("EEGOSPORTS/NasionShift"), m_dNasionShift);
+    settings.setValue(QString("EEGOSPORTS/LPAElectrode"), m_sLPA);
+    settings.setValue(QString("EEGOSPORTS/RPAElectrode"), m_sRPA);
+    settings.setValue(QString("EEGOSPORTS/NasionElectrode"), m_sNasion);
+    settings.setValue(QString("EEGOSPORTS/outputFilePath"), m_sOutputFilePath);
+    settings.setValue(QString("EEGOSPORTS/elcFilePath"), m_sElcFilePath);
+    settings.setValue(QString("EEGOSPORTS/cardinalFilePath"), m_sCardinalFilePath);
+    settings.setValue(QString("EEGOSPORTS/useTrackedCardinalsMode"), m_bUseTrackedCardinalMode);
+    settings.setValue(QString("EEGOSPORTS/useElectrodeshiftMode"), m_bUseElectrodeShiftMode);
 }
 
 
@@ -123,18 +147,31 @@ void EEGoSports::init()
     m_outputConnectors.append(m_pRMTSA_EEGoSports);
 
     //default values used by the setupGUI class must be set here
-    m_iSamplingFreq = 1024;
+
+    QSettings settings;
+    m_iSamplingFreq = settings.value(QString("EEGOSPORTS/sFreq"), 1024).toInt();
     m_iNumberOfChannels = 90;
-    m_iSamplesPerBlock = 1024;
+    m_iSamplesPerBlock = settings.value(QString("EEGOSPORTS/samplesPerBlock"), 1024).toInt();
     m_bWriteToFile = false;
     m_bWriteDriverDebugToFile = false;
     m_bIsRunning = false;
     m_bCheckImpedances = false;
 
     QDate date;
-    m_sOutputFilePath = QString ("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day());
+    m_sOutputFilePath = settings.value(QString("EEGOSPORTS/outputFilePath"), QString("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day())).toString();
 
-    m_sElcFilePath = QString("./mne_x_plugins/resources/eegosports/loc_files/dry64duke.elc");
+    m_sElcFilePath = settings.value(QString("EEGOSPORTS/elcFilePath"), QString("./Resources/3DLayouts/standard_waveguard64_duke.elc")).toString();
+
+    m_sCardinalFilePath = settings.value(QString("EEGOSPORTS/cardinalFilePath"), QString("")).toString();
+
+    m_dLPAShift = settings.value(QString("EEGOSPORTS/LPAShift"), 0.0).toFloat();
+    m_dRPAShift = settings.value(QString("EEGOSPORTS/RPAShift"), 0.0).toFloat();
+    m_dNasionShift = settings.value(QString("EEGOSPORTS/NasionShift"), 0.0).toFloat();
+    m_sLPA = settings.value(QString("EEGOSPORTS/LPAElectrode"), QString("")).toString();
+    m_sRPA = settings.value(QString("EEGOSPORTS/RPAElectrode"), QString("")).toString();
+    m_sNasion = settings.value(QString("EEGOSPORTS/NasionElectrode"), QString("")).toString();
+    m_bUseTrackedCardinalMode = settings.value(QString("EEGOSPORTS/useTrackedCardinalsMode"), true).toBool();
+    m_bUseElectrodeShiftMode = settings.value(QString("EEGOSPORTS/useElectrodeshiftMode"), false).toBool();
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 }
@@ -168,28 +205,12 @@ void EEGoSports::setUpFiffInfo()
     //
     //Read electrode positions from .elc file
     //
-    QVector< QVector<double> > elcLocation3D;
-    QVector< QVector<double> > elcLocation2D;
+    QList<QVector<double> > elcLocation3D;
+    QList<QVector<double> > elcLocation2D;
     QString unit;
     QStringList elcChannelNames;
 
-    if(LayoutLoader::readAsaElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit)) {
-        if(elcLocation2D.isEmpty()) {
-            QList<QVector<double> > outputPoints;
-            QList<QVector<double> > inPointsList;
-
-            for(int i = 0; i<elcLocation3D.size(); i++) {
-                inPointsList.append(elcLocation3D[i]);
-            }
-
-            QFile out = "./MNE_Browse_Raw_Resources/Templates/Layouts/manualLayout.lout";
-            float prad = 60.0;
-            float width = 5.0;
-            float height = 4.0;
-
-            LayoutMaker::makeLayout(inPointsList, outputPoints, elcChannelNames, out, true, prad, width, height, true);
-        }
-    } else {
+    if(!LayoutLoader::readAsaElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit)) {
         qDebug() << "Error: Reading elc file.";
     }
 
@@ -248,54 +269,111 @@ void EEGoSports::setUpFiffInfo()
         }
     }
 
-    //Append LAP value to digitizer data. Take location of LE2 electrode minus 1 cm as approximation.
+    //
+    //Append cardinal points LPA RPA Nasion
+    //
+    QList<QVector<double> > cardinals3D;
+    QList<QVector<double> > cardinals2D;
+    QStringList cardinalNames;
+
+    if(!LayoutLoader::readAsaElcFile(m_sCardinalFilePath, cardinalNames, cardinals3D, cardinals2D, unit)) {
+        qDebug() << "Error: Reading elc cardinal file.";
+    }
+
+    //Rotate cardinal points
+    for(int i = 0; i < cardinals3D.size(); i++)
+    {
+        Vector3f point;
+        point << cardinals3D[i][0], cardinals3D[i][1] , cardinals3D[i][2];
+        Vector3f point_rot = rotation_z * point;
+
+        cardinals3D[i][0] = point_rot[0];
+        cardinals3D[i][1] = point_rot[1];
+        cardinals3D[i][2] = point_rot[2];
+    }
+
+    qDebug()<<"cardinals3D"<<cardinals3D;
+    qDebug()<<"cardinals2D"<<cardinals2D;
+    qDebug()<<"cardinalNames"<<cardinalNames;
+
+    //Append LAP value to digitizer data.
     FiffDigPoint digPoint;
-    int indexLE2 = elcChannelNames.indexOf("LE2");
+    int indexLPA = elcChannelNames.indexOf(m_sLPA);
     digPoint.kind = FIFFV_POINT_CARDINAL;
     digPoint.ident = FIFFV_POINT_LPA;//digitizerInfo.size();
 
     //Set EEG electrode location - Convert from mm to m
-    if(indexLE2!=-1)
-    {
-        digPoint.r[0] = elcLocation3D[indexLE2][0]*0.001;
-        digPoint.r[1] = elcLocation3D[indexLE2][1]*0.001;
-        digPoint.r[2] = (elcLocation3D[indexLE2][2]-10)*0.001;
-        digitizerInfo.push_back(digPoint);
-    }
-    else
-        cout<<"Plugin TMSI - ERROR - LE2 not found. Check loaded layout."<<endl;
+    if(m_bUseTrackedCardinalMode && !m_sCardinalFilePath.isEmpty() && cardinals3D.size() == 3 && cardinalNames.contains("LPA")) {
+        indexLPA = cardinalNames.indexOf("LPA");
 
-    //Append nasion value to digitizer data. Take location of Z1 electrode minus 6 cm as approximation.
-    int indexZ1 = elcChannelNames.indexOf("Z1");
+        digPoint.r[0] = cardinals3D[indexLPA][0]*0.001;
+        digPoint.r[1] = cardinals3D[indexLPA][1]*0.001;
+        digPoint.r[2] = cardinals3D[indexLPA][2]*0.001;
+        digitizerInfo.push_back(digPoint);
+    } else if(m_bUseElectrodeShiftMode) {
+        if(indexLPA != -1)
+        {
+            digPoint.r[0] = elcLocation3D[indexLPA][0]*0.001;
+            digPoint.r[1] = elcLocation3D[indexLPA][1]*0.001;
+            digPoint.r[2] = (elcLocation3D[indexLPA][2]-m_dLPAShift*10)*0.001;
+            digitizerInfo.push_back(digPoint);
+        }
+        else {
+            qDebug() << "Plugin EEGOSPORTS - ERROR creating LPA - " << m_sLPA << " not found. Check loaded layout.";
+        }
+    }
+
+    //Append nasion value to digitizer data.
+    int indexNasion = elcChannelNames.indexOf(m_sNasion);
     digPoint.kind = FIFFV_POINT_CARDINAL;//FIFFV_POINT_NASION;
     digPoint.ident = FIFFV_POINT_NASION;//digitizerInfo.size();
 
     //Set EEG electrode location - Convert from mm to m
-    if(indexZ1!=-1)
-    {
-        digPoint.r[0] = elcLocation3D[indexZ1][0]*0.001;
-        digPoint.r[1] = elcLocation3D[indexZ1][1]*0.001;
-        digPoint.r[2] = (elcLocation3D[indexZ1][2]-60)*0.001;
-        digitizerInfo.push_back(digPoint);
-    }
-    else
-        cout<<"Plugin TMSI - ERROR - Z1 not found. Check loaded layout."<<endl;
+    if(m_bUseTrackedCardinalMode && !m_sCardinalFilePath.isEmpty() && cardinals3D.size() == 3 && cardinalNames.contains("Nasion")) {
+        indexNasion = cardinalNames.indexOf("Nasion");
 
-    //Append RAP value to digitizer data. Take location of RE2 electrode minus 1 cm as approximation.
-    int indexRE2 = elcChannelNames.indexOf("RE2");
+        digPoint.r[0] = cardinals3D[indexNasion][0]*0.001;
+        digPoint.r[1] = cardinals3D[indexNasion][1]*0.001;
+        digPoint.r[2] = cardinals3D[indexNasion][2]*0.001;
+        digitizerInfo.push_back(digPoint);
+    } else if(m_bUseElectrodeShiftMode) {
+        if(indexNasion != -1)
+        {
+            digPoint.r[0] = elcLocation3D[indexNasion][0]*0.001;
+            digPoint.r[1] = elcLocation3D[indexNasion][1]*0.001;
+            digPoint.r[2] = (elcLocation3D[indexNasion][2]-m_dNasionShift*10)*0.001;
+            digitizerInfo.push_back(digPoint);
+        }
+        else {
+            qDebug() << "Plugin EEGOSPORTS - ERROR creating Nasion - " << m_sNasion << " not found. Check loaded layout.";
+        }
+    }
+
+    //Append RAP value to digitizer data.
+    int indexRPA = elcChannelNames.indexOf(m_sRPA);
     digPoint.kind = FIFFV_POINT_CARDINAL;
     digPoint.ident = FIFFV_POINT_RPA;//digitizerInfo.size();
 
     //Set EEG electrode location - Convert from mm to m
-    if(indexRE2!=-1)
-    {
-        digPoint.r[0] = elcLocation3D[indexRE2][0]*0.001;
-        digPoint.r[1] = elcLocation3D[indexRE2][1]*0.001;
-        digPoint.r[2] = (elcLocation3D[indexRE2][2]-10)*0.001;
+    if(m_bUseTrackedCardinalMode && !m_sCardinalFilePath.isEmpty() && cardinals3D.size() == 3 && cardinalNames.contains("RPA")) {
+        indexRPA = cardinalNames.indexOf("RPA");
+
+        digPoint.r[0] = cardinals3D[indexRPA][0]*0.001;
+        digPoint.r[1] = cardinals3D[indexRPA][1]*0.001;
+        digPoint.r[2] = cardinals3D[indexRPA][2]*0.001;
         digitizerInfo.push_back(digPoint);
+    } else if(m_bUseElectrodeShiftMode) {
+        if(indexRPA != -1)
+        {
+            digPoint.r[0] = elcLocation3D[indexRPA][0]*0.001;
+            digPoint.r[1] = elcLocation3D[indexRPA][1]*0.001;
+            digPoint.r[2] = (elcLocation3D[indexRPA][2]-m_dRPAShift*10)*0.001;
+            digitizerInfo.push_back(digPoint);
+        }
+        else {
+            qDebug() << "Plugin EEGOSPORTS - ERROR creating RPA - " << m_sRPA << " not found. Check loaded layout.";
+        }
     }
-    else
-        cout<<"Plugin TMSI - ERROR - RE2 not found. Check loaded layout."<<endl;
 
     //Add EEG electrode positions as digitizers
     for(int i=0; i<numberEEGCh; i++)
@@ -544,6 +622,20 @@ QWidget* EEGoSports::setupWidget()
 
 //*************************************************************************************************************
 
+void EEGoSports::onUpdateCardinalPoints(const QString& sLPA, double dLPA, const QString& sRPA, double dRPA, const QString& sNasion, double dNasion)
+{
+    m_dLPAShift = dLPA;
+    m_dRPAShift = dRPA;
+    m_dNasionShift = dNasion;
+
+    m_sLPA = sLPA;
+    m_sRPA = sRPA;
+    m_sNasion = sNasion;
+}
+
+
+//*************************************************************************************************************
+
 void EEGoSports::run()
 {
     while(m_bIsRunning)
@@ -590,13 +682,16 @@ void EEGoSports::run()
 void EEGoSports::showSetupProjectDialog()
 {
     // Open setup project widget
-    if(m_pEEGoSportsSetupProjectWidget == NULL)
+    if(m_pEEGoSportsSetupProjectWidget == Q_NULLPTR) {
         m_pEEGoSportsSetupProjectWidget = QSharedPointer<EEGoSportsSetupProjectWidget>(new EEGoSportsSetupProjectWidget(this));
+
+        connect(m_pEEGoSportsSetupProjectWidget.data(), &EEGoSportsSetupProjectWidget::cardinalPointsChanged,
+                this, &EEGoSports::onUpdateCardinalPoints);
+    }
 
     if(!m_pEEGoSportsSetupProjectWidget->isVisible())
     {
-        m_pEEGoSportsSetupProjectWidget->setWindowTitle("EEGoSports EEG Connector - Setup project");
-        m_pEEGoSportsSetupProjectWidget->initGui();
+        m_pEEGoSportsSetupProjectWidget->setWindowTitle("EEGoSports EEG Connector - Setup project");        
         m_pEEGoSportsSetupProjectWidget->show();
         m_pEEGoSportsSetupProjectWidget->raise();
     }
