@@ -110,7 +110,8 @@ class SSVEPBCISHARED_EXPORT ssvepBCI : public IAlgorithm
 
     friend class BCISetupWidget;
     friend class BCIFeatureWindow;
-    friend class ssvepBCIStimulusWidget;
+    friend class ssvepBCISetupStimulusWidget;
+    friend class ssvepBCISetupWidget;
 
 public:
     //=========================================================================================================
@@ -228,7 +229,7 @@ signals:
 private:
     QAction*                                            m_pActionSetupStimulus;             /**< starts stimulus feature */
 
-    QSharedPointer<ssvepBCISetupStimulusWidget> m_pssvepBCISetupStimulusWidget; /**< Widget for stimulus setup */
+    QSharedPointer<ssvepBCISetupStimulusWidget>         m_pssvepBCISetupStimulusWidget; /**< Widget for stimulus setup */
 
 
 
