@@ -66,7 +66,7 @@
 #include <QtConcurrent/QtConcurrent>
 
 #include "FormFiles/ssvepbcisetupwidget.h"
-//#include "FormFiles/ssvepbcifeaturewindow.h"
+#include "FormFiles/ssvepbcisetupstimuluswidget.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -110,6 +110,7 @@ class SSVEPBCISHARED_EXPORT ssvepBCI : public IAlgorithm
 
     friend class BCISetupWidget;
     friend class BCIFeatureWindow;
+    friend class ssvepBCIStimulusWidget;
 
 public:
     //=========================================================================================================
@@ -135,6 +136,12 @@ public:
     * Initialise input and output connectors.
     */
     virtual void init();
+
+    //=========================================================================================================
+    /**
+    * Starts data recording
+    */
+    void showSetupStimulus();
 
     //=========================================================================================================
     /**
@@ -219,6 +226,16 @@ signals:
     void paintFeatures(MyQList features, bool bTrigerActivated);
 
 private:
+    QAction*                                            m_pActionSetupStimulus;             /**< starts stimulus feature */
+
+    QSharedPointer<ssvepBCISetupStimulusWidget> m_pssvepBCISetupStimulusWidget; /**< Widget for stimulus setup */
+
+
+
+
+
+
+    // old privates
     PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputOne;        /**< The first RealTimeSampleArray of the BCI output.*/
     PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputTwo;        /**< The second RealTimeSampleArray of the BCI output.*/
     PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputThree;      /**< The third RealTimeSampleArray of the BCI output.*/

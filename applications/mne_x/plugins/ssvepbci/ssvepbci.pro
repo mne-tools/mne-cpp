@@ -72,21 +72,24 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += \
         ssvepbci.cpp \
+        flashobject.cpp \
         FormFiles/ssvepbcisetupwidget.cpp \
         FormFiles/ssvepbciaboutwidget.cpp \
- #       FormFiles/bcifeaturewindow.cpp
+        FormFiles/ssvepbcisetupstimuluswidget.cpp \
+
 
 HEADERS += \
         ssvepbci.h\
+        flashobject.h \
         ssvepbci_global.h \
         FormFiles/ssvepbcisetupwidget.h \
         FormFiles/ssvepbciaboutwidget.h \
-#        FormFiles/bcifeaturewindow.h
+        FormFiles/ssvepbcisetupstimuluswidget.h
 
 FORMS += \
         FormFiles/ssvepbcisetup.ui \
         FormFiles/ssvepbciabout.ui \
-#    FormFiles/bcifeaturewindow.ui
+        FormFiles/ssvepbcisetupstimuluswidget.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -108,3 +111,7 @@ OTHER_FILES += ssvepbci.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $${PWD}
+
+
+RESOURCES += \
+        ssvepbci.qrc

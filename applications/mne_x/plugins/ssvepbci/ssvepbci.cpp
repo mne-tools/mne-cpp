@@ -71,6 +71,11 @@ ssvepBCI::ssvepBCI()
 : m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/ssvepbci/")
 , m_bProcessData(false)
 {
+    // Create start Stimuli action bar item/button
+    m_pActionSetupStimulus = new QAction(QIcon(":/images/stimulus.png"),tr("Setup stimulus feature"),this);
+    m_pActionSetupStimulus->setStatusTip(tr("Setup stimulus feature"));
+    connect(m_pActionSetupStimulus, &QAction::triggered, this, &ssvepBCI::showSetupStimulus);
+    addPluginAction(m_pActionSetupStimulus);
 }
 
 
@@ -484,6 +489,32 @@ bool ssvepBCI::lookForTrigger(const MatrixXd &data)
     return false;
 }
 
+//*************************************************************************************************************
+
+void ssvepBCI::showSetupStimulus()
+{
+    QDesktopWidget Desktop; // Desktop Widget for getting the number of accessible screens
+
+    if(Desktop.numScreens()> 1){
+        // Open setup stimulus widget
+        if(m_pssvepBCISetupStimulusWidget == NULL)
+            m_pssvepBCISetupStimulusWidget = QSharedPointer<ssvepBCISetupStimulusWidget>(new ssvepBCISetupStimulusWidget(this));
+
+        if(!m_pssvepBCISetupStimulusWidget->isVisible()){
+            m_pssvepBCISetupStimulusWidget->setWindowTitle("EEGoSports EEG Connector - Setup Stimulus");
+            //m_pEEGoSportsSetupStimulusWidget->initGui();
+            m_pssvepBCISetupStimulusWidget->show();
+            m_pssvepBCISetupStimulusWidget->raise();
+        }
+    }
+    else{
+        QMessageBox msgBox;
+        msgBox.setText("Only one screen detected! For stimulus visualization attach one more.");
+        msgBox.exec();
+        return;
+    }
+}
+
 
 //*************************************************************************************************************
 
@@ -508,6 +539,5 @@ void ssvepBCI::BCIOnSensorLevel()
 {
 
 }
-
 
 
