@@ -35,8 +35,8 @@
 *
 */
 
-#ifndef EEGOSPORTSSETUPSTIMULUSWIDGET_H
-#define EEGOSPORTSSETUPSTIMULUSWIDGET_H
+#ifndef SSVEPBCISETUPSTIMULUSWIDGET_H
+#define SSVEPBCISETUPSTIMULUSWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -190,8 +190,8 @@ private slots:
     void on_comboBox_currentIndexChanged(int index);
 
 private:
-    Ui::ssvepBCISetupStimulusWidget      *ui;
-    ssvepBCI                             *m_pssvepBCI;          /**< a pointer to corresponding EEGoSports.*/
+    Ui::ssvepBCISetupStimulusWidget        *ui;
+    ssvepBCI                               *m_pssvepBCI;          /**< a pointer to corresponding EEGoSports.*/
     QWidget                                *m_pTestScreen;          /**< Widget of the test screen */
     QGraphicsScene                         *m_pScene;               /**< Graphic Scene of the test screen */
     QLayout                                *m_pLayout;              /**< Layout of the test screen */
