@@ -76,14 +76,15 @@ Spline::Spline(const QString& title, QWidget* parent)
     m_pChart->setAnimationOptions(QChart::SeriesAnimations);
     m_pChart->setAcceptHoverEvents(false);
 
-//    m_coordX = new QGraphicsSimpleTextItem(m_pChart);
-//    m_coordX->setPos(m_pChart->size().width()/2 + 20, m_pChart->size().height());
-//    m_coordX->setText("X-axis: ");
-//    m_coordY = new QGraphicsSimpleTextItem(m_pChart);
-//    m_coordY->setPos(m_pChart->size().width()/2 + 20, m_pChart->size().height() + 20);
-//    m_coordY->setText("Y-axis: ");
-//    this->setMouseTracking(true);
-
+/** The following contains the code to track mouse position and return the value of X and Y axis (does not work as intended as of 13 May 2016)
+*    m_coordX = new QGraphicsSimpleTextItem(m_pChart);
+*    m_coordX->setPos(m_pChart->size().width()/2 + 20, m_pChart->size().height());
+*    m_coordX->setText("X-axis: ");
+*   m_coordY = new QGraphicsSimpleTextItem(m_pChart);
+*    m_coordY->setPos(m_pChart->size().width()/2 + 20, m_pChart->size().height() + 20);
+*    m_coordY->setText("Y-axis: ");
+*    this->setMouseTracking(true);
+**/
     QChartView *chartView = new QChartView(m_pChart);
     chartView->setRenderHint(QPainter::Antialiasing);
 
@@ -110,31 +111,57 @@ void Spline::mousePressEvent(QMouseEvent *event)
 
     if((boundaryX >= float(minAxisX)) && (boundaryX <= float(maxAxisX)))  //this condition ensures that threshold lines can only be created within the boundary of the chart
     {
+        QVector<QPointF> middlePoint = middleThreshold->pointsVector(); //leftThreshold value need to be updated before tested and displayed on the widget
+        QVector<QPointF> rightPoint = rightThreshold->pointsVector();
+        QVector<QPointF> leftPoint = leftThreshold->pointsVector();
         if (event->buttons() == Qt::LeftButton)
         {
             m_pChart->removeSeries(leftThreshold);
             leftThreshold=verticalLine;
-            m_pChart->addSeries(leftThreshold);
-            connectMarkers();
-            m_pChart->createDefaultAxes();
+            leftPoint = leftThreshold->pointsVector();
+            if((leftPoint[0].x() < middlePoint[0].x()) && (leftPoint[0].x()  < rightPoint[0].x()))
+            {
+                leftThreshold->setColor("red");
+                m_pChart->removeSeries(leftThreshold);
+                m_pChart->addSeries(leftThreshold);
+                connectMarkers();
+                m_pChart->createDefaultAxes();
+            }
+            else
+            {
+                leftThreshold->append(minAxisX, 0);       //reinitialize left threshold
+            }
         }
-
         if (event->buttons() == Qt::MiddleButton)
         {
             m_pChart->removeSeries(middleThreshold);
             middleThreshold=verticalLine;
-            m_pChart->addSeries(middleThreshold);
-            connectMarkers();
-            m_pChart->createDefaultAxes();
+            middlePoint = middleThreshold->pointsVector();
+            if((middlePoint[0].x() > leftPoint[0].x()) && (middlePoint[0].x()  <= rightPoint[0].x()))
+            {
+                middleThreshold->setColor("green");
+                m_pChart->addSeries(middleThreshold);
+                connectMarkers();
+                m_pChart->createDefaultAxes();
+            }
         }
 
         if (event->buttons() == Qt::RightButton)
         {
             m_pChart->removeSeries(rightThreshold);
             rightThreshold=verticalLine;
-            m_pChart->addSeries(rightThreshold);
-            connectMarkers();
-            m_pChart->createDefaultAxes();
+            rightPoint = rightThreshold->pointsVector();
+            if((rightPoint[0].x() > leftPoint[0].x()) && (rightPoint[0].x()  >= middlePoint[0].x()))
+            {
+                rightThreshold->setColor("blue");
+                m_pChart->addSeries(rightThreshold);
+                connectMarkers();
+                m_pChart->createDefaultAxes();
+            }
+            else
+            {
+                rightThreshold->append(maxAxisX, 0);       //reinitialize right threshold
+            }
         }
     }
     //emit borderChanged(leftThreshold, middleThreshold, rightThreshold);
@@ -186,3 +213,6 @@ void Spline::handleMarker()
         }
     }
 }
+
+
+//*************************************************************************************************************
