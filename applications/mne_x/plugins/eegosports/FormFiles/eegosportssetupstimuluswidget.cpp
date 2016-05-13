@@ -295,11 +295,11 @@ void EEGoSportsPlugin::EEGoSportsSetupStimulusWidget::on_pushButton_6_clicked()
     obj_1->setFreq(3);
     obj_2->setFreq(3.75);
     //set dimensions
-    obj_1->setDim(0.3*m_pView->width(),0.8*m_pView->height());
-    obj_2->setDim(0.3*m_pView->width(),0.8*m_pView->height());
+    obj_1->setDim(0.2*m_pView->width(),0.2*m_pView->height());
+    obj_2->setDim(0.2*m_pView->width(),0.2*m_pView->height());
     //set positions
-    obj_1->setPos(0,(0.5-0.8/2)*m_pView->height());
-    obj_2->setPos((1-0.3)*m_pView->width(), (0.5-0.8/2)*m_pView->height());
+    obj_1->setPos(0.2*m_pView->width(),(0.5-0.2/2)*m_pView->height());
+    obj_2->setPos((1-0.5)*m_pView->width(), (0.5-0.2/2)*m_pView->height());
     //ad Items to scene
     m_pScene->addItem(obj_1);m_pFlashList.append(obj_1);
     m_pScene->addItem(obj_2);m_pFlashList.append(obj_2);
