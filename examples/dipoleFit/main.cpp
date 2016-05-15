@@ -154,7 +154,13 @@ int main(int argc, char *argv[])
     std::cout << "sp simplex center" << std::endl << sp_simplex.center() << std::endl;
     std::cout << "sp simplex radius" << std::endl << sp_simplex.radius() << std::endl;
 
+    //<< TODO: Apply transform function move to class
+    std::cout << "rr.rows\n" << bem[0].rr.block(0,0,5,3) << std::endl;
+    std::cout << "trans.trans\n" << trans.trans << std::endl;
 
+    MatrixX3f rr_trans = trans.apply_trans(bem[0].rr);
+
+    std::cout << "rr_trans.rows\n" << rr_trans.block(0,0,5,3) << std::endl;
 
 
     return app.exec();
