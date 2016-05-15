@@ -159,3 +159,13 @@ bool FiffCoordTrans::read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans)
 
     return success;
 }
+
+
+//*************************************************************************************************************
+
+MatrixX3f FiffCoordTrans::apply_trans (const MatrixX3f& rr) const
+{
+    MatrixX4f rr_ones = MatrixX4f::Ones(rr.rows(),4);
+    rr_ones.block(0,0,rr.rows(),3) = rr;
+    return rr_ones*trans.block<3,4>(0,0).transpose();
+}

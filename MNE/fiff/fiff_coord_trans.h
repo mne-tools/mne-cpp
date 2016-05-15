@@ -147,7 +147,6 @@ public:
         return this->from < 0;
     }
 
-
     //=========================================================================================================
     /**
     * ### MNE toolbox root function ###: Implementation of the mne_transform_coordinates function
@@ -161,6 +160,19 @@ public:
     */
     static bool read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans);
 
+    //=========================================================================================================
+    /**
+    * ### MNE toolbox root function ###: Implementation of the mne_transform_source_space_to function
+    *
+    * TODO: dest       - The id of the destination coordinate system (FIFFV_COORD_...)
+    *
+    * Applies the coordinate transform to given coordinates and returns the transformed coordinates
+    *
+    * @param[in] rr     The coordinates
+    *
+    * @return Transformed coordinates
+    */
+    MatrixX3f apply_trans (const MatrixX3f& rr) const;
 
     //=========================================================================================================
     /**
