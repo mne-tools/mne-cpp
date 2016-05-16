@@ -169,3 +169,38 @@ MatrixX3f FiffCoordTrans::apply_trans (const MatrixX3f& rr) const
     rr_ones.block(0,0,rr.rows(),3) = rr;
     return rr_ones*trans.block<3,4>(0,0).transpose();
 }
+
+
+//*************************************************************************************************************
+
+QString FiffCoordTrans::frame_name (int frame)
+{
+    switch(frame) {
+        case FIFFV_COORD_UNKNOWN: return "unknown";
+        case FIFFV_COORD_DEVICE: return "MEG device";
+        case FIFFV_COORD_ISOTRAK: return "isotrak";
+        case FIFFV_COORD_HPI: return "hpi";
+        case FIFFV_COORD_HEAD: return "head";
+        case FIFFV_COORD_MRI: return "MRI (surface RAS)";
+        case FIFFV_MNE_COORD_MRI_VOXEL: return "MRI voxel";
+        case FIFFV_COORD_MRI_SLICE: return "MRI slice";
+        case FIFFV_COORD_MRI_DISPLAY: return "MRI display";
+        case FIFFV_MNE_COORD_CTF_DEVICE: return "CTF MEG device";
+        case FIFFV_MNE_COORD_CTF_HEAD: return "CTF/4D/KIT head";
+        case FIFFV_MNE_COORD_RAS: return "RAS (non-zero origin)";
+        case FIFFV_MNE_COORD_MNI_TAL: return "MNI Talairach";
+        case FIFFV_MNE_COORD_FS_TAL_GTZ: return "Talairach (MNI z > 0)";
+        case FIFFV_MNE_COORD_FS_TAL_LTZ: return "Talairach (MNI z < 0)";
+        default: return "unknown";
+    }
+}
+
+
+//*************************************************************************************************************
+
+void FiffCoordTrans::print() const
+{
+    std::cout << "Coordinate transformation:\n";
+    std::cout << (QString("%1 -> %2\n").arg(frame_name(this->from)).arg(frame_name(this->to))).toLatin1().data();
+    std::cout << trans << std::endl;
+}
