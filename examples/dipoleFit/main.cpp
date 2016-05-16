@@ -67,98 +67,451 @@ using namespace FIFFLIB;
 using namespace MNELIB;
 
 
-//guessData new_guess_data()
-//{
-//  guessData res = MALLOC(1,guessDataRec);
 
-//  res->rr        = NULL;
-//  res->guess_fwd = NULL;
-//  res->nguess    = 0;
-//  return res;
-//}
+#ifndef TRUE
+#define TRUE 1
+#endif
 
-//static void free_guess_data(guessData g)
-
-//{
-//  int k;
-//  if (!g)
-//    return;
-
-//  FREE_CMATRIX(g->rr);
-//  if (g->guess_fwd) {
-//    for (k = 0; k < g->nguess; k++)
-//      free_dipole_forward(g->guess_fwd[k]);
-//    FREE(g->guess_fwd);
-//  }
-//  FREE(g);
-//  return;
-//}
-
-//static dipoleFitFuncs new_dipole_fit_funcs()
-
-//{
-//  dipoleFitFuncs f = MALLOC(1,dipoleFitFuncsRec);
-
-//  f->meg_field     = NULL;
-//  f->eeg_pot       = NULL;
-//  f->meg_vec_field = NULL;
-//  f->eeg_vec_pot   = NULL;
-//  f->meg_client      = NULL;
-//  f->meg_client_free = NULL;
-//  f->eeg_client      = NULL;
-//  f->eeg_client_free = NULL;
-
-//  return f;
-//}
-
-//static void free_dipole_fit_funcs(dipoleFitFuncs f)
-
-//{
-//  if (!f)
-//    return;
-
-//  if (f->meg_client_free && f->meg_client)
-//    f->meg_client_free(f->meg_client);
-//  if (f->eeg_client_free && f->eeg_client)
-//    f->eeg_client_free(f->eeg_client);
-
-//  FREE(f);
-//  return;
-//}
+#ifndef FALSE
+#define FALSE 0
+#endif
 
 
-//dipoleFitData new_dipole_fit_data()
-//{
-//  dipoleFitData res = MALLOC(1,dipoleFitDataRec);
+//============================= mne_allocs.h =============================
+
+/*
+ * Basics...
+ */
+#define MALLOC(x,t) (t *)malloc((x)*sizeof(t))
+
+#define FREE(x) if ((char *)(x) != NULL) free((char *)(x))
+
+
+//============================= mne_allocs.c =============================
+
+void mne_free_cmatrix (float **m)
+
+{
+  if (m) {
+    FREE(*m);
+    FREE(m);
+  }
+}
+
+/*
+ * float matrices
+ */
+
+#define FREE_CMATRIX(m) mne_free_cmatrix((m))
+
+
+//============================= mne_types.h =============================
+
+typedef void (*mneUserFreeFunc)(void *);  /* General purpose */
+
+
+
+
+
+
+
+typedef struct {		/* Matrix specification with a channel list */
+  int   nrow;			/* Number of rows */
+  int   ncol;			/* Number of columns */
+  char  **rowlist;		/* Name list for the rows (may be NULL) */
+  char  **collist;		/* Name list for the columns (may be NULL) */
+  float **data;                  /* The data itself (dense) */
+} *mneNamedMatrix,mneNamedMatrixRec;
+
+//typedef struct {		/* Matrix specification with a channel list */
+//  int   nrow;			/* Number of rows (same as in data) */
+//  int   ncol;			/* Number of columns (same as in data) */
+//  char  **rowlist;		/* Name list for the rows (may be NULL) */
+//  char  **collist;		/* Name list for the columns (may be NULL) */
+//  mneSparseMatrix data;		/* The data itself (sparse) */
+//} *mneSparseNamedMatrix,mneSparseNamedMatrixRec;
+
+//typedef struct {		/* Vector specification with a channel list */
+//  int    nvec;			/* Number of elements */
+//  char   **names;		/* Name list for the elements */
+//  float  *data;			/* The data itself */
+//} *mneNamedVector,mneNamedVectorRec;
+
+typedef struct {		/* One linear projection item */
+  mneNamedMatrix vecs;          /* The original projection vectors */
+  int            nvec;          /* Number of vectors = vecs->nrow */
+  char           *desc;	        /* Projection item description */
+  int            kind;          /* Projection item kind */
+  int            active;	/* Is this item active now? */
+  int            active_file;	/* Was this item active when loaded from file? */
+  int            has_meg;	/* Does it have MEG channels? */
+  int            has_eeg;	/* Does it have EEG channels? */
+} *mneProjItem,mneProjItemRec;
+
+typedef struct {		/* Collection of projection items and the projector itself */
+  mneProjItem    *items;        /* The projection items */
+  int            nitems;        /* Number of items */
+  char           **names;	/* Names of the channels in the final projector */
+  int            nch;	        /* Number of channels in the final projector */
+  int            nvec;          /* Number of vectors in the final projector */
+  float          **proj_data;	/* The orthogonalized projection vectors picked and orthogonalized from the original data */
+} *mneProjOp,mneProjOpRec;
+
+
+
+
+
+
+//============================= fwd_types.h =============================
+
+#define FWD_COIL_UNKNOWN      0
+
+#define FWD_COILC_UNKNOWN     0
+#define FWD_COILC_EEG         1000
+#define FWD_COILC_MAG         1
+#define FWD_COILC_AXIAL_GRAD  2
+#define FWD_COILC_PLANAR_GRAD 3
+#define FWD_COILC_AXIAL_GRAD2 4
+
+#define FWD_COIL_ACCURACY_POINT    0
+#define FWD_COIL_ACCURACY_NORMAL   1
+#define FWD_COIL_ACCURACY_ACCURATE 2
+
+#define FWD_IS_MEG_COIL(x) ((x) != FWD_COILC_EEG && (x) != FWD_COILC_UNKNOWN)
+
+typedef void (*fwdUserFreeFunc)(void *);  /* General purpose */
+
+typedef struct {
+  char         *chname;		/* Name of this channel */
+  int          coord_frame;	/* Which coordinate frame are we in? */
+  char         *desc;	        /* Description for this type of a coil */
+  int          coil_class;	/* Coil class */
+  int          type;		/* Coil type */
+  int          accuracy;	/* Accuracy */
+  float        size;		/* Coil size */
+  float        base;		/* Baseline */
+  float        r0[3];		/* Coil coordinate system origin */
+  float        ex[3];		/* Coil coordinate system unit vectors */
+  float        ey[3];		/* This stupid construction needs to be replaced with */
+  float        ez[3];		/* a coordinate transformation */
+  int          np;		/* Number of integration points */
+  float        **rmag;		/* The field point locations */
+  float        **cosmag;	/* The corresponding direction cosines */
+  float        *w;		/* The weighting coefficients */
+} *fwdCoil,fwdCoilRec;
+
+
+typedef struct {
+  fwdCoil *coils;		/* The coil or electrode positions */
+  int     ncoil;
+  int     coord_frame;		/* Common coordinate frame */
+  void    *user_data;		/* We can put whatever in here */
+  fwdUserFreeFunc user_data_free;
+} *fwdCoilSet,fwdCoilSetRec;	/* A collection of the above */
+
+/*
+ * This is a convenient generic field / potential computation function
+ */
+typedef int (*fwdFieldFunc)(float *rd,float *Q,fwdCoilSet coils,float *res,void *client);
+typedef int (*fwdVecFieldFunc)(float *rd,fwdCoilSet coils,float **res,void *client);
+typedef int (*fwdFieldGradFunc)(float *rd,float *Q,fwdCoilSet coils, float *res,
+                float *xgrad, float *ygrad, float *zgrad, void *client);
+
+
+/*
+ * This is used in the function which evaluates integrals over triangles
+ */
+
+typedef struct {
+  double **xyz; 	         /* The coordinates */
+  double *w;			 /* Weights */
+  int    np;			 /* How many */
+} *fwdIntPoints,fwdIntPointsRec; /* Integration points in a triangle */
+
+typedef double (*fwdIntApproxEvalFunc)(fwdIntPoints int_points, double *r0, void *user);
+
+/*
+ * Definitions for the EEG sphere model
+ */
+
+typedef struct {
+  float rad;			/* The actual rads */
+  float rel_rad;		/* Relative rads */
+  float sigma;			/* Conductivity */
+} *fwdEegSphereLayer,fwdEegSphereLayerRec;
+
+
+typedef struct {
+  char  *name;			/* Textual identifier */
+  int   nlayer;			/* Number of layers */
+  fwdEegSphereLayer layers;	/* An array of layers */
+  float  r0[3];			/* The origin */
+
+  double *fn;		        /* Coefficients saved to speed up the computations */
+  int    nterms;		/* How many? */
+
+  float  *mu;			/* The Berg-Scherg equivalence parameters */
+  float  *lambda;
+  int    nfit;			/* How many? */
+  int    scale_pos;		/* Scale the positions to the surface of the sphere? */
+} *fwdEegSphereModel,fwdEegSphereModelRec;
+
+typedef struct {
+  fwdEegSphereModel *models;	/* Set of EEG sphere model definitions */
+  int               nmodel;
+} *fwdEegSphereModelSet,fwdEegSphereModelSetRec;
+
+#define FWD_BEM_UNKNOWN           -1
+#define FWD_BEM_CONSTANT_COLL     1
+#define FWD_BEM_LINEAR_COLL       2
+
+#define FWD_BEM_IP_APPROACH_LIMIT 0.1
+
+#define FWD_BEM_LIN_FIELD_SIMPLE    1
+#define FWD_BEM_LIN_FIELD_FERGUSON  2
+#define FWD_BEM_LIN_FIELD_URANKAR   3
+
+typedef struct {		      /* Space to store a solution matrix */
+  float **solution;		      /* The solution matrix */
+  int   ncoil;			      /* Number of sensors */
+  int   np;		              /* Number of potential solution points */
+} *fwdBemSolution,fwdBemSolutionRec;  /* Mapping from infinite medium potentials to a particular set of coils or electrodes */
+
+
+
+
+
+
+
+
+
+typedef struct {
+  char       *surf_name;	/* Name of the file where surfaces were loaded from */
+  MNESurface *surfs;		/* The interface surfaces from outside towards inside */
+  int        *ntri;		/* Number of triangles on each surface */
+  int        *np;		/* Number of vertices on each surface */
+  int        nsurf;		/* How many */
+  float      *sigma;		/* The conductivities */
+  float      **gamma;		/* The gamma factors */
+  float      *source_mult;	/* These multiply the infinite medium potentials */
+  float      *field_mult;	/* Multipliers for the magnetic field */
+  int        bem_method;	/* Which approximation method is used */
+  char       *sol_name;		/* Name of the file where the solution was loaded from */
+
+  float      **solution;	/* The potential solution matrix */
+  float      *v0;		/* Space for the infinite-medium potentials */
+  int        nsol;		/* Size of the solution matrix */
+
+  FiffCoordTrans head_mri_t;	/* Coordinate transformation from head to MRI coordinates */
+
+  float      ip_approach_limit;	/* Controls whether we need to use the isolated problem approach */
+  int        use_ip_approach;	/* Do we need it */
+} *fwdBemModel,fwdBemModelRec;	/* Holds the BEM model definition */
+
+
+
+
+//============================= fit_types.h =============================
+
+/*
+ * These are the type definitions for dipole fitting
+ */
+typedef void (*fitUserFreeFunc)(void *);
+
+typedef struct {
+  float **rd;       /* Dipole locations */
+  int   ndip;       /* How many dipoles */
+  float **fwd;      /* The forward solution (projected and whitened) */
+  float *scales;    /* Scales applied to the columns of fwd */
+  float **uu;       /* The left singular vectors of the forward matrix */
+  float **vv;       /* The right singular vectors of the forward matrix */
+  float *sing;      /* The singular values */
+  int   nch;        /* Number of channels */
+} *dipoleForward,dipoleForwardRec;
+
+typedef struct {
+    float          **rr;        /* These are the guess dipole locations */
+    dipoleForward  *guess_fwd;  /* Forward solutions for the guesses */
+    int            nguess;      /* How many sources */
+} *guessData,guessDataRec;
+
+
+typedef struct {
+    fwdFieldFunc    meg_field;          /* MEG forward calculation functions */
+    fwdVecFieldFunc meg_vec_field;
+    void            *meg_client;        /* Client data for MEG field computations */
+    mneUserFreeFunc meg_client_free;
+
+    fwdFieldFunc    eeg_pot;            /* EEG forward calculation functions */
+    fwdVecFieldFunc eeg_vec_pot;
+    void            *eeg_client;        /* Client data for EEG field computations */
+    mneUserFreeFunc eeg_client_free;
+} *dipoleFitFuncs,dipoleFitFuncsRec;
+
+#define COLUMN_NORM_NONE 0	    /* No column normalization requested */
+#define COLUMN_NORM_COMP 1	    /* Componentwise normalization */
+#define COLUMN_NORM_LOC  2	    /* Dipole locationwise normalization */
+
+typedef struct {                        /* This structure holds all fitting-related data */
+    FiffCoordTrans    mri_head_t;       /* MRI <-> head coordinate transformation */
+    FiffCoordTrans    meg_head_t;       /* MEG <-> head coordinate transformation */
+    int               coord_frame;      /* Common coordinate frame */
+    FiffChInfo        chs;              /* Channels */
+    int               nmeg;             /* How many MEG */
+    int               neeg;             /* How many EEG */
+    char              **ch_names;       /* List of all channel names */
+    RowVectorXf       pick;             /* Matrix to pick data from the
+                                           full data set which may contain channels
+                                           we are not interested in */
+    fwdCoilSet        meg_coils;        /* MEG coil definitions */
+    fwdCoilSet        eeg_els;          /* EEG electrode definitions */
+    float             r0[3];            /* Sphere model origin */
+    char              *bemname;         /* Using a BEM? */
+
+    fwdEegSphereModel eeg_model;        /* EEG sphere model definition */
+    fwdBemModel       bem_model;        /* BEM model definition */
+
+    dipoleFitFuncs    sphere_funcs;     /* These are the sphere model forward functions */
+    dipoleFitFuncs    bem_funcs;        /* These are the BEM forward functions */
+    dipoleFitFuncs    funcs;            /* Points to one of the two above */
+    dipoleFitFuncs    mag_dipole_funcs; /* Functions to fit a magnetic dipole */
+
+    int               fixed_noise;      /* Were fixed noise values used rather than a noise-covariance
+                                         * matrix read from a file */
+    FiffCov           noise_orig;       /* Noise covariance matrix (original) */
+    FiffCov           noise;            /* Noise covariance matrix (weighted to take the selection into account) */
+    int               nave;             /* How many averages does this correspond to? */
+    mneProjOp         proj;             /* The projection operator to use */
+    int               column_norm;      /* What kind of column normalization to apply to the forward solution */
+    int               fit_mag_dipoles;  /* Fit magnetic dipoles? */
+    void              *user;            /* User data for anything we need */
+    fitUserFreeFunc   user_free;        /* Function to free the above */
+} *dipoleFitData,dipoleFitDataRec;
+
+
+
+
+
+
+//============================= dipole_forward.c =============================
+
+
+void free_dipole_forward(dipoleForward f)
+
+{
+  if (!f)
+    return;
+  FREE_CMATRIX(f->rd);
+  FREE_CMATRIX(f->fwd);
+  FREE_CMATRIX(f->uu);
+  FREE_CMATRIX(f->vv);
+  FREE(f->sing);
+  FREE(f->scales);
+  FREE(f);
+  return;
+}
+
+
+
+
+
+
+
+
+//============================= setup.c =============================
+
+
+guessData new_guess_data()
+{
+  guessData res = MALLOC(1,guessDataRec);
+
+  res->rr        = NULL;
+  res->guess_fwd = NULL;
+  res->nguess    = 0;
+  return res;
+}
+
+static void free_guess_data(guessData g)
+
+{
+  int k;
+  if (!g)
+    return;
+
+  FREE_CMATRIX(g->rr);
+  if (g->guess_fwd) {
+    for (k = 0; k < g->nguess; k++)
+      free_dipole_forward(g->guess_fwd[k]);
+    FREE(g->guess_fwd);
+  }
+  FREE(g);
+  return;
+}
+
+static dipoleFitFuncs new_dipole_fit_funcs()
+{
+  dipoleFitFuncs f = MALLOC(1,dipoleFitFuncsRec);
+
+  f->meg_field     = NULL;
+  f->eeg_pot       = NULL;
+  f->meg_vec_field = NULL;
+  f->eeg_vec_pot   = NULL;
+  f->meg_client      = NULL;
+  f->meg_client_free = NULL;
+  f->eeg_client      = NULL;
+  f->eeg_client_free = NULL;
+
+  return f;
+}
+
+
+static void free_dipole_fit_funcs(dipoleFitFuncs f)
+{
+  if (!f)
+    return;
+
+  if (f->meg_client_free && f->meg_client)
+    f->meg_client_free(f->meg_client);
+  if (f->eeg_client_free && f->eeg_client)
+    f->eeg_client_free(f->eeg_client);
+
+  FREE(f);
+  return;
+}
+
+
+dipoleFitData new_dipole_fit_data()
+{
+  dipoleFitData res = MALLOC(1,dipoleFitDataRec);
 
 //  res->mri_head_t    = NULL;
 //  res->meg_head_t    = NULL;
 //  res->chs           = NULL;
-//  res->meg_coils     = NULL;
-//  res->eeg_els       = NULL;
-//  res->nmeg          = 0;
-//  res->neeg          = 0;
-//  res->r0[0]         = 0.0;
-//  res->r0[1]         = 0.0;
-//  res->r0[2]         = 0.0;
-//  res->bemname       = NULL;
-//  res->bem_model     = NULL;
-//  res->eeg_model     = NULL;
+  res->meg_coils     = NULL;
+  res->eeg_els       = NULL;
+  res->nmeg          = 0;
+  res->neeg          = 0;
+  res->r0[0]         = 0.0;
+  res->r0[1]         = 0.0;
+  res->r0[2]         = 0.0;
+  res->bemname       = NULL;
+  res->bem_model     = NULL;
+  res->eeg_model     = NULL;
 //  res->noise         = NULL;
-//  res->nave          = 1;
-//  res->user          = NULL;
-//  res->user_free     = NULL;
-//  res->proj          = NULL;
+  res->nave          = 1;
+  res->user          = NULL;
+  res->user_free     = NULL;
+  res->proj          = NULL;
 
-//  res->sphere_funcs     = NULL;
-//  res->bem_funcs        = NULL;
-//  res->mag_dipole_funcs = NULL;
-//  res->funcs            = NULL;
-//  res->column_norm      = COLUMN_NORM_NONE;
-//  res->fit_mag_dipoles  = FALSE;
+  res->sphere_funcs     = NULL;
+  res->bem_funcs        = NULL;
+  res->mag_dipole_funcs = NULL;
+  res->funcs            = NULL;
+  res->column_norm      = COLUMN_NORM_NONE;
+  res->fit_mag_dipoles  = FALSE;
 
-//  return res;
-//}
+  return res;
+}
 
 
 //void free_dipole_fit_data(dipoleFitData d)
@@ -188,6 +541,13 @@ using namespace MNELIB;
 //  FREE(d);
 //  return;
 //}
+
+
+
+
+
+
+
 
 
 
