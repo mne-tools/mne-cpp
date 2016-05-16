@@ -176,6 +176,26 @@ public:
 
     //=========================================================================================================
     /**
+    * ### MNE C root function ###: Implementation of the mne_coord_frame_name function
+    *
+    * Map coordinate frame integers to human-readable names
+    *
+    * @param[in] frame  The coordinate frame integer
+    *
+    * @return Human readable form of the coordinate frame.
+    */
+    static QString frame_name (int frame);
+
+    //=========================================================================================================
+    /**
+    * ### MNE C root function ###: Implementation of the mne_print_coord_transform & mne_print_coord_transform_label function
+    *
+    * Prints the coordinate transform. TODO: overload stream operator
+    */
+    void print() const;
+
+    //=========================================================================================================
+    /**
     * Size of the old struct (fiffCoordTransRec) 26*int = 26*4 = 104
     *
     * @return the size of the old struct fiffCoordTransRec.
