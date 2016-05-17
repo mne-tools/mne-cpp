@@ -146,19 +146,22 @@ void RealTimeSourceEstimateWidget::getData()
     if(m_bInitialized)
     {
         //
-        // Add Data
+        // Add rt brain data
         //
         if(m_lRtItem.isEmpty()) {
+            qDebug()<<"RealTimeSourceEstimateWidget::getData - Creating m_lRtItem list";
             m_lRtItem = m_p3DView->addRtBrainData("HemiLRSet", *m_pRTSE->getValue(), *m_pRTSE->getFwdSolution());
 
             for(int i = 0; i<m_lRtItem.size(); i++) {
                 m_lRtItem.at(i)->setLoopState(false);
-                m_lRtItem.at(i)->setTimeInterval(1);
+                m_lRtItem.at(i)->setTimeInterval(10);
                 //m_lRtItem.at(i)->onTimeIntervalChanged(m_pRTSE->getValue()->tstep*1000000);
                 m_lRtItem.at(i)->setNumberAverages(1);
                 m_lRtItem.at(i)->setStreamingActive(true);
             }
         } else {
+            qDebug()<<"RealTimeSourceEstimateWidget::getData - Working with m_lRtItem list";
+
             for(int i = 0; i<m_lRtItem.size(); i++) {
                 m_lRtItem.at(i)->addData(*m_pRTSE->getValue());
             }
@@ -170,8 +173,9 @@ void RealTimeSourceEstimateWidget::getData()
         {
             m_pRTSE->m_bStcSend = false;
             init();
+
             //
-            // Add Data
+            // Add brain data
             //
             m_p3DView->addBrainData("HemiLRSet", *m_pRTSE->getSurfSet(), *m_pRTSE->getAnnotSet());
         }

@@ -38,14 +38,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
 #include <vector>
 #include <math.h>
 
-
 #include <utils/layoutmaker.h>
+#include <utils/layoutloader.h>
 #include <fiff/fiff.h>
-#include <mne/mne.h>
 
 
 //*************************************************************************************************************
@@ -54,6 +52,8 @@
 //=============================================================================================================
 
 #include <QtCore/QCoreApplication>
+#include <QCommandLineParser>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -62,7 +62,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
-using namespace MNELIB;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -87,67 +87,101 @@ int main(int argc, char *argv[])
     //
     QCoreApplication a(argc, argv);
 
-    // Get fiff info
-    QFile t_fileRaw("./MNE-sample-data/baby_meg/150401_121310_TestSubject_raw.fif");
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Start disp3D tutorial");
+    parser.addHelpOption();
+    QCommandLineOption inputOption("in", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    //QCommandLineOption inputOption("in", "The input file <in>.", "in", "./mne_x_plugins/resources/tmsi/loc_files/standard_waveguard128.elc");
+    QCommandLineOption chKindOption("coilType", "The coil type <out>.", "coilType", "3012"); // 3012 = FIFFV_COIL_VV_PLANAR_T1, use coil type instead of kind because this way we can distinguish between different layers (outer, inner, etc.), see fiff_constants for details FIFFV_REF_MEG_CH FIFFV_COIL_BABY_REF_MAG FIFFV_COIL_BABY_MAG
+    QCommandLineOption outputOption("out", "The output file <out>.", "out", "makeLayout_default.lout");
+    QCommandLineOption mirrorxOption("mirrorX", "Mirror final layout along x-axis <mirrorX>.", "mirrorX", "0");
+    QCommandLineOption mirroryOption("mirrorY", "Mirror final layout along <-axis <mirrorY>.", "mirrorY", "0");
 
-    FiffRawData raw(t_fileRaw);
+    parser.addOption(inputOption);
+    parser.addOption(outputOption);
+    parser.addOption(chKindOption);
+    parser.addOption(mirrorxOption);
+    parser.addOption(mirroryOption);
+    parser.process(a);
 
-    FiffInfo fiffInfo = raw.info;
-
-    //get 3d locations from fiff file
-    QList<QVector<double> > inputPoints;
-    QList<QVector<double> > outputPoints;
-    QStringList names;
-    QFile out("./MNE_Browse_Raw_Resources/Templates/Layouts/babymeg-mag-inner-layer-x-mirrored.lout");
-    QFile out_file_3d("./MNE_Browse_Raw_Resources/Templates/Layouts/3D_points_all.lout");
-    QTextStream out3D(&out_file_3d);
-
-    if (!out_file_3d.open(QIODevice::WriteOnly)) {
-        std::cout<<"could not open out_file_3d file";
-        qDebug()<<"could not open out_file_3d file";
+    //Read 3D locations
+    if(!parser.value(inputOption).contains(".fif") && !parser.value(inputOption).contains(".elc")) {
+        qDebug()<<"MakeLayout::Main - Input file type not supported";
+        return 0;
     }
 
-    for(int i = 0; i<fiffInfo.ch_names.size(); i++) {
-        int type = fiffInfo.chs.at(i).coil_type;
+    QList<QVector<double> > inputPoints;
+    QList<QVector<double> > outputPoints;
+    QList<QVector<double> > channel2DData;
+    QStringList names;
 
-        if(type == FIFFV_COIL_BABY_MAG) { //FIFFV_MEG_CH FIFFV_EEG_CH FIFFV_REF_MEG_CH FIFFV_COIL_BABY_REF_MAG FIFFV_COIL_BABY_MAG
-            QVector<double> temp;
-            double x = fiffInfo.chs.at(i).loc(0,0) * 100;
-            double y = fiffInfo.chs.at(i).loc(1,0) * 100;
-            double z = fiffInfo.chs.at(i).loc(2,0) * 100;
+    if(parser.value(inputOption).contains(".fif")) {
+        QFile t_fileRaw(parser.value(inputOption));
 
-            temp.append(x);
-            temp.append(y);
-            temp.append(-z);
-            inputPoints.append(temp);
+        FiffRawData raw(t_fileRaw);
+        FiffInfo fiffInfo = raw.info;
 
-            std::cout << x << " " << y << " " << z <<std::endl;
+        int chKind = parser.value(chKindOption).toInt();
 
-            out3D << i+1 << " " << fiffInfo.ch_names.at(i) << " " << x << " " << y << " " << z << endl;
-            names<<fiffInfo.ch_names.at(i);
+        for(int i = 0; i<fiffInfo.ch_names.size(); i++) {
+            int type = fiffInfo.chs.at(i).coil_type;
+
+            if(type == chKind) {
+                QVector<double> temp;
+                double x = fiffInfo.chs.at(i).loc(0,0) * 100;
+                double y = fiffInfo.chs.at(i).loc(1,0) * 100;
+                double z = fiffInfo.chs.at(i).loc(2,0) * 100;
+
+                temp.append(x);
+                temp.append(y);
+                temp.append(-z);
+                inputPoints.append(temp);
+
+                qDebug() << x << " " << y << " " << z;
+
+                names << fiffInfo.ch_names.at(i);
+            }
         }
     }
 
-    std::cout<<"could not open out_file_3d file";
-    out_file_3d.close();
+    if(parser.value(inputOption).contains(".elc")) {
+        QString unit;
 
-    float prad = 60.0;
-    float width = 5.0;
-    float height = 4.0;
+        LayoutLoader::readAsaElcFile(parser.value(inputOption), names, inputPoints, channel2DData, unit);
+    }
 
-    // convert 3d points to layout
-    if(inputPoints.size()>0)
-        LayoutMaker::makeLayout(inputPoints,
-                                outputPoints,
-                                names,
-                                out,
-                                true,
-                                prad,
-                                width,
-                                height,
-                                true,
-                                true,
-                                true);
+    qDebug() << "Read the following 3D coordinates from file:";
+    qDebug() << names;
+    qDebug() << inputPoints;
+
+    // convert 3D points to layout and write to file
+    if(inputPoints.size() > 0) {
+        float prad = 60.0;
+        float width = 5.0;
+        float height = 4.0;
+
+        QFile out(parser.value(outputOption));
+
+        int numberTries = 0;
+        while(numberTries < 10) {
+            if(!LayoutMaker::makeLayout(inputPoints,
+                                       outputPoints,
+                                       names,
+                                       out,
+                                       true,
+                                       prad,
+                                       width,
+                                       height,
+                                       true,
+                                       (bool)parser.value(mirrorxOption).toInt(),
+                                       (bool)parser.value(mirrorxOption).toInt())) {
+                numberTries++;
+            } else {
+                numberTries = 11;
+            }
+        }
+    }
 
     return a.exec();
 }

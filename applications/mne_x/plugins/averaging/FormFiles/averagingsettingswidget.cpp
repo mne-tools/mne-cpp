@@ -87,12 +87,25 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
 
     //Pre Post stimulus
     ui.m_pSpinBoxPreStimSamples->setValue(m_pAveragingToolbox->m_iPreStimSeconds);
-    connect(ui.m_pSpinBoxPreStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(ui.m_pSpinBoxPreStimSamples, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &AveragingSettingsWidget::changePreStim);
 
     ui.m_pSpinBoxPostStimSamples->setValue(m_pAveragingToolbox->m_iPostStimSeconds);
-    connect(ui.m_pSpinBoxPostStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(ui.m_pSpinBoxPostStimSamples, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &AveragingSettingsWidget::changePostStim);
+
+    //Baseline Correction
+    ui.m_pcheckBoxArtifactReduction->setChecked(m_pAveragingToolbox->m_bDoArtifactReduction);
+    connect(ui.m_pcheckBoxArtifactReduction, &QCheckBox::clicked,
+            m_pAveragingToolbox, &Averaging::changeArtifactReductionActive);
+
+    ui.m_pSpinBox_artifactThresholdFirst->setValue(m_pAveragingToolbox->m_dArtifactThresholdFirst);
+    connect(ui.m_pSpinBox_artifactThresholdFirst, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &AveragingSettingsWidget::changeArtifactThreshold);
+
+    ui.m_pSpinBox_artifactThresholdSecond->setValue(m_pAveragingToolbox->m_iArtifactThresholdSecond);
+    connect(ui.m_pSpinBox_artifactThresholdSecond, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &AveragingSettingsWidget::changeArtifactThreshold);
 
     //Baseline Correction
     ui.m_pcheckBoxBaselineCorrection->setChecked(m_pAveragingToolbox->m_bDoBaselineCorrection);
@@ -102,13 +115,13 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
     ui.m_pSpinBoxBaselineFrom->setMinimum(ui.m_pSpinBoxPreStimSamples->value()*-1);
     ui.m_pSpinBoxBaselineFrom->setMaximum(ui.m_pSpinBoxPostStimSamples->value());
     ui.m_pSpinBoxBaselineFrom->setValue(m_pAveragingToolbox->m_iBaselineFromSeconds);
-    connect(ui.m_pSpinBoxBaselineFrom, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(ui.m_pSpinBoxBaselineFrom, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &AveragingSettingsWidget::changeBaselineFrom);
 
     ui.m_pSpinBoxBaselineTo->setMinimum(ui.m_pSpinBoxPreStimSamples->value()*-1);
     ui.m_pSpinBoxBaselineTo->setMaximum(ui.m_pSpinBoxPostStimSamples->value());
     ui.m_pSpinBoxBaselineTo->setValue(m_pAveragingToolbox->m_iBaselineToSeconds);
-    connect(ui.m_pSpinBoxBaselineTo, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(ui.m_pSpinBoxBaselineTo, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &AveragingSettingsWidget::changeBaselineTo);
 
     connect(ui.m_pushButton_reset, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
@@ -129,8 +142,9 @@ int AveragingSettingsWidget::getStimChannelIdx()
 
 //*************************************************************************************************************
 
-void AveragingSettingsWidget::changePreStim(qint32 mSeconds)
+void AveragingSettingsWidget::changePreStim()
 {
+    qint32 mSeconds = ui.m_pSpinBoxPreStimSamples->value();
     ui.m_pSpinBoxBaselineTo->setMinimum(ui.m_pSpinBoxPreStimSamples->value()*-1);
     ui.m_pSpinBoxBaselineFrom->setMinimum(ui.m_pSpinBoxPreStimSamples->value()*-1);
 
@@ -140,8 +154,9 @@ void AveragingSettingsWidget::changePreStim(qint32 mSeconds)
 
 //*************************************************************************************************************
 
-void AveragingSettingsWidget::changePostStim(qint32 mSeconds)
+void AveragingSettingsWidget::changePostStim()
 {
+    qint32 mSeconds = ui.m_pSpinBoxPostStimSamples->value();
     ui.m_pSpinBoxBaselineTo->setMaximum(ui.m_pSpinBoxPostStimSamples->value());
     ui.m_pSpinBoxBaselineFrom->setMaximum(ui.m_pSpinBoxPostStimSamples->value());
 
@@ -151,8 +166,9 @@ void AveragingSettingsWidget::changePostStim(qint32 mSeconds)
 
 //*************************************************************************************************************
 
-void AveragingSettingsWidget::changeBaselineFrom(qint32 mSeconds)
+void AveragingSettingsWidget::changeBaselineFrom()
 {
+    qint32 mSeconds = ui.m_pSpinBoxBaselineFrom->value();
     ui.m_pSpinBoxBaselineTo->setMinimum(mSeconds);
 
     m_pAveragingToolbox->changeBaselineFrom(mSeconds);
@@ -161,10 +177,21 @@ void AveragingSettingsWidget::changeBaselineFrom(qint32 mSeconds)
 
 //*************************************************************************************************************
 
-void AveragingSettingsWidget::changeBaselineTo(qint32 mSeconds)
+void AveragingSettingsWidget::changeBaselineTo()
 {
+    qint32 mSeconds = ui.m_pSpinBoxBaselineTo->value();
     ui.m_pSpinBoxBaselineFrom->setMaximum(mSeconds);
 
     m_pAveragingToolbox->changeBaselineTo(mSeconds);
 }
+
+
+//*************************************************************************************************************
+
+void AveragingSettingsWidget::changeArtifactThreshold()
+{
+    m_pAveragingToolbox->changeArtifactThreshold(ui.m_pSpinBox_artifactThresholdFirst->value(), ui.m_pSpinBox_artifactThresholdSecond->value());
+}
+
+
 

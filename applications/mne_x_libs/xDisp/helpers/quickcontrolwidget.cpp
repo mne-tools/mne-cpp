@@ -723,6 +723,12 @@ void QuickControlWidget::onSpharaButtonClicked(bool state)
 
 void QuickControlWidget::onSpharaOptionsChanged()
 {
+    ui->m_label_spharaFirst->show();
+    ui->m_spinBox_spharaFirst->show();
+
+    ui->m_label_spharaSecond->show();
+    ui->m_spinBox_spharaSecond->show();
+
     if(ui->m_comboBox_spharaSystem->currentText() == "VectorView") {
         ui->m_label_spharaFirst->setText("Mag");
         ui->m_spinBox_spharaFirst->setMaximum(102);
@@ -737,6 +743,14 @@ void QuickControlWidget::onSpharaOptionsChanged()
 
         ui->m_label_spharaSecond->setText("Outer layer");
         ui->m_spinBox_spharaSecond->setMaximum(105);
+    }
+
+    if(ui->m_comboBox_spharaSystem->currentText() == "EEG") {
+        ui->m_label_spharaFirst->setText("EEG");
+        ui->m_spinBox_spharaFirst->setMaximum(256);
+
+        ui->m_label_spharaSecond->hide();
+        ui->m_spinBox_spharaSecond->hide();
     }
 
     emit spharaOptionsChanged(ui->m_comboBox_spharaSystem->currentText(), ui->m_spinBox_spharaFirst->value(), ui->m_spinBox_spharaSecond->value());
@@ -937,11 +951,11 @@ void QuickControlWidget::createScalingGroup()
         t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
-        t_pDoubleSpinBoxScale->setMinimum(0.1);
+        t_pDoubleSpinBoxScale->setMinimum(0.001);
         t_pDoubleSpinBoxScale->setMaximum(1000);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
-        t_pDoubleSpinBoxScale->setSingleStep(0.1);
-        t_pDoubleSpinBoxScale->setDecimals(1);
+        t_pDoubleSpinBoxScale->setSingleStep(0.001);
+        t_pDoubleSpinBoxScale->setDecimals(3);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
         t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFFV_STIM_CH));
         m_qMapScalingDoubleSpinBox.insert(FIFFV_STIM_CH,t_pDoubleSpinBoxScale);
