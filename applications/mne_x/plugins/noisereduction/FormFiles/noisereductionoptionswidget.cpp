@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "NoiseReductionOptionswidget.h"
+#include "noisereductionoptionswidget.h"
 #include "../noisereduction.h"
 
 
@@ -105,6 +105,14 @@ void NoiseReductionOptionsWidget::setFiffInfo(const FiffInfo::SPtr pFiffInfo)
 
 void NoiseReductionOptionsWidget::setAcquisitionSystem(const QString &sSystem)
 {
+    ui->m_label_nBaseFctsMag->show();
+    ui->m_spinBox_nBaseFctsMag->show();
+    ui->m_spinBox_nBaseFctsMag->show();
+
+    ui->m_label_nBaseFctsGrad->show();
+    ui->m_spinBox_nBaseFctsGrad->show();
+    ui->m_spinBox_nBaseFctsGrad->show();
+
     if(sSystem == "VectorView") {
         ui->m_label_nBaseFctsMag->setText("Mag");
         ui->m_spinBox_nBaseFctsMag->setMaximum(102);
@@ -124,6 +132,77 @@ void NoiseReductionOptionsWidget::setAcquisitionSystem(const QString &sSystem)
         ui->m_spinBox_nBaseFctsGrad->setMaximum(270);
         ui->m_spinBox_nBaseFctsGrad->setValue(270);
     }
+
+    if(sSystem == "EEG") {
+        ui->m_label_nBaseFctsMag->hide();
+        ui->m_spinBox_nBaseFctsMag->hide();
+        ui->m_spinBox_nBaseFctsMag->hide();
+
+        ui->m_label_nBaseFctsGrad->setText("EEG");
+        ui->m_spinBox_nBaseFctsGrad->setMaximum(256);
+        ui->m_spinBox_nBaseFctsGrad->setValue(256);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void NoiseReductionOptionsWidget::filterGroupChanged(QList<QCheckBox*> list)
+{
+    m_qFilterListCheckBox.clear();
+
+    qDebug() << "list.size(): " << list.size();
+
+    for(int u = 0; u < list.size(); u++) {
+        QCheckBox* tempCheckBox = new QCheckBox(list[u]->text());
+        tempCheckBox->setChecked(list[u]->isChecked());
+
+        connect(tempCheckBox, &QCheckBox::toggled,
+                list[u], &QCheckBox::setChecked);
+
+        if(tempCheckBox->text() == "Activate user designed filter")
+            connect(tempCheckBox, &QCheckBox::toggled,
+                    this, &NoiseReductionOptionsWidget::onUserFilterToggled);
+
+        connect(list[u], &QCheckBox::toggled,
+                tempCheckBox, &QCheckBox::setChecked);
+
+        m_qFilterListCheckBox.append(tempCheckBox);
+    }
+
+    //Delete all widgets in the filter layout
+    //QGridLayout* topLayout = static_cast<QGridLayout*>(ui->m_groupBox_temporalFiltering->layout());
+    //if(!topLayout) {
+       QGridLayout* topLayout = new QGridLayout();
+    //}
+
+//    QLayoutItem *child;
+//    while((child = topLayout->takeAt(0)) != 0) {
+//        delete child->widget();
+//        delete child;
+//    }
+
+    //Add filters
+    int u = 0;
+
+    qDebug() << "m_qFilterListCheckBox.size(): " << m_qFilterListCheckBox.size();
+
+    for(u; u < m_qFilterListCheckBox.size(); ++u) {
+        topLayout->addWidget(m_qFilterListCheckBox[u], u, 0);
+    }
+
+    //Add push button for filter options
+    m_pShowFilterOptions = new QPushButton();
+//        m_pShowFilterOptions->setText("Open Filter options");
+    m_pShowFilterOptions->setText("Filter options");
+    m_pShowFilterOptions->setCheckable(false);
+    connect(m_pShowFilterOptions, &QPushButton::clicked,
+            this, &NoiseReductionOptionsWidget::onShowFilterOptions);
+
+    topLayout->addWidget(m_pShowFilterOptions, u+1, 0);
+
+    //Find Filter tab and add current layout
+    ui->m_groupBox_temporalFiltering->setLayout(topLayout);
 }
 
 
@@ -196,10 +275,43 @@ void NoiseReductionOptionsWidget::onNBaseFctsChanged()
 
 //*************************************************************************************************************
 
+void NoiseReductionOptionsWidget::onShowFilterOptions(bool state)
+{
+//    if(state)
+//        m_pShowFilterOptions->setText("Close filter options");
+//    else
+//        m_pShowFilterOptions->setText("Open filter options");
+
+//    m_pShowFilterOptions->setChecked(state);
+
+//    emit showFilterOptions(state);
+
+    Q_UNUSED(state);
+    emit showFilterOptions(true);
+}
+
+
+//*************************************************************************************************************
+
+void NoiseReductionOptionsWidget::onUserFilterToggled(bool state)
+{
+    Q_UNUSED(state);
+    //qDebug()<<"onUserFilterToggled";
+    emit updateConnectedView();
+}
+
+
+//*************************************************************************************************************
+
 void NoiseReductionOptionsWidget::createProjectorGroup()
 {
     if(m_pFiffInfo)
     {
+        //If no projectors are defined return here
+        if(m_pFiffInfo->projs.empty()) {
+            return;
+        }
+
         m_qListProjCheckBox.clear();
         // Projection Selection
         QGridLayout *topLayout = new QGridLayout;
@@ -286,3 +398,5 @@ void NoiseReductionOptionsWidget::createCompensatorGroup()
         ui->m_groupBox_compensators->setLayout(topLayout);
     }
 }
+
+

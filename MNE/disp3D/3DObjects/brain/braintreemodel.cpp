@@ -76,7 +76,42 @@ BrainTreeModel::~BrainTreeModel()
 
 QVariant BrainTreeModel::data(const QModelIndex& index, int role) const
 {
+//    qDebug()<<"BrainTreeModel::data - index.column(): "<<index.column();
+
+//    if(index.column() == 1) {
+//        QVariant data;
+//        data.setValue(QString("test"));
+//        return data;
+//    }
+
     return QStandardItemModel::data(index, role);
+}
+
+
+//*************************************************************************************************************
+
+int BrainTreeModel::columnCount(const QModelIndex &parent) const
+{
+    return 2;
+}
+
+
+//*************************************************************************************************************
+
+QVariant BrainTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
+        QVariant data;
+        if(section == 0) {
+            data.setValue(QString("Data"));
+        } else if(section == 1) {
+            data.setValue(QString("Description"));
+        }
+
+        return data;
+    }
+
+    return QVariant();
 }
 
 
@@ -93,7 +128,12 @@ bool BrainTreeModel::addData(const QString& text, const SurfaceSet& tSurfaceSet,
         state = pSurfaceSetItem->addData(tSurfaceSet, tAnnotationSet, p3DEntityParent);
     } else {
         BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, text);
-        m_pRootItem->appendRow(pSurfaceSetItem);
+
+        QList<QStandardItem*> list;
+        list<<pSurfaceSetItem;
+        list<<new QStandardItem(pSurfaceSetItem->toolTip());
+        m_pRootItem->appendRow(list);
+
         state = pSurfaceSetItem->addData(tSurfaceSet, tAnnotationSet, p3DEntityParent);
     }
 
@@ -114,7 +154,12 @@ bool BrainTreeModel::addData(const QString& text, const Surface& tSurface, const
         state = pSurfaceSetItem->addData(tSurface, tAnnotation, p3DEntityParent);
     } else {
         BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, text);
-        m_pRootItem->appendRow(pSurfaceSetItem);
+
+        QList<QStandardItem*> list;
+        list<<pSurfaceSetItem;
+        list<<new QStandardItem(pSurfaceSetItem->toolTip());
+        m_pRootItem->appendRow(list);
+
         state = pSurfaceSetItem->addData(tSurface, tAnnotation, p3DEntityParent);
     }
 
@@ -135,7 +180,12 @@ bool BrainTreeModel::addData(const QString& text, const MNESourceSpace& tSourceS
         state = pSurfaceSetItem->addData(tSourceSpace, p3DEntityParent);
     } else {
         BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, text);
-        m_pRootItem->appendRow(pSurfaceSetItem);
+
+        QList<QStandardItem*> list;
+        list<<pSurfaceSetItem;
+        list<<new QStandardItem(pSurfaceSetItem->toolTip());
+        m_pRootItem->appendRow(list);
+
         state = pSurfaceSetItem->addData(tSourceSpace, p3DEntityParent);
     }
 

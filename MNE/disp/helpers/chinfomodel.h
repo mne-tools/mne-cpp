@@ -129,7 +129,6 @@ public:
     //=========================================================================================================
     /**
     * Reimplemented virtual functions
-    *
     */
     virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;

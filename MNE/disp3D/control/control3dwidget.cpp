@@ -57,7 +57,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 Control3DWidget::Control3DWidget(QWidget* parent, Qt::WindowType type)
-: RoundedEdgesWidget(parent, type)
+: QWidget(parent, type)/*RoundedEdgesWidget(parent, type)*/
 , ui(new Ui::Control3DWidget)
 , m_colCurrentSceneColor(QColor(0,0,0))
 {
@@ -73,10 +73,12 @@ Control3DWidget::Control3DWidget(QWidget* parent, Qt::WindowType type)
     connect(ui->m_pushButton_sceneColorPicker, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             this, &Control3DWidget::onSceneColorPicker);
 
+    connect(ui->m_checkBox_alwaysOnTop, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &Control3DWidget::onAlwaysOnTop);
+
     //Init's
     ui->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(0, 0, 0);"));
 
-    //this->setWindowFlags(Qt::WindowStaysOnTopHint);
     this->adjustSize();
     this->setWindowOpacity(1/(100.0/90.0));
 
@@ -86,8 +88,13 @@ Control3DWidget::Control3DWidget(QWidget* parent, Qt::WindowType type)
     //Init tree view properties
     BrainTreeDelegate* pBrainTreeDelegate = new BrainTreeDelegate(this);
     ui->m_treeView_loadedData->setItemDelegate(pBrainTreeDelegate);
-    ui->m_treeView_loadedData->setHeaderHidden(true);
+    ui->m_treeView_loadedData->setHeaderHidden(false);
     ui->m_treeView_loadedData->setEditTriggers(QAbstractItemView::CurrentChanged);
+
+    //set context menu
+    ui->m_treeView_loadedData->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->m_treeView_loadedData, &QWidget::customContextMenuRequested,
+            this, &Control3DWidget::onCustomContextMenuRequested);
 }
 
 
@@ -155,4 +162,63 @@ void Control3DWidget::onSceneColorPicker()
 
     //Set color of button new new scene color
     ui->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(m_colCurrentSceneColor.red()).arg(m_colCurrentSceneColor.green()).arg(m_colCurrentSceneColor.blue()));
+}
+
+
+//*************************************************************************************************************
+
+void Control3DWidget::onCustomContextMenuRequested(QPoint pos)
+{
+    //create custom context menu and actions
+    QMenu *menu = new QMenu(this);
+
+    //**************** Hide header ****************
+    QAction* pHideHeader = menu->addAction(tr("Toggle header"));
+    connect(pHideHeader, &QAction::triggered,
+            this, &Control3DWidget::onTreeViewHeaderHide);
+
+    QAction* pHideDesc = menu->addAction(tr("Toggle description"));
+    connect(pHideDesc, &QAction::triggered,
+            this, &Control3DWidget::onTreeViewDescriptionHide);
+
+    //show context menu
+    menu->popup(ui->m_treeView_loadedData->viewport()->mapToGlobal(pos));
+}
+
+
+//*************************************************************************************************************
+
+void Control3DWidget::onTreeViewHeaderHide()
+{
+    if(!ui->m_treeView_loadedData->isHeaderHidden()) {
+        ui->m_treeView_loadedData->setHeaderHidden(true);
+    } else {
+        ui->m_treeView_loadedData->setHeaderHidden(false);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void Control3DWidget::onTreeViewDescriptionHide()
+{
+    if(ui->m_treeView_loadedData->isColumnHidden(1)) {
+        ui->m_treeView_loadedData->setColumnHidden(1, false);
+    } else {
+        ui->m_treeView_loadedData->setColumnHidden(1, true);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void Control3DWidget::onAlwaysOnTop(bool state)
+{
+    if(state) {
+        this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
+        this->show();
+    } else {
+        this->setWindowFlags(this->windowFlags() & ~Qt::WindowStaysOnTopHint);
+        this->show();
+    }
 }

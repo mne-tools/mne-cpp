@@ -111,7 +111,7 @@ void MNE::init()
     // Inits
     m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_qFileFwdSolution));
     m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
-    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.pial", m_sSurfaceDir+"/rh.pial"));
+    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.inflated", m_sSurfaceDir+"/rh.inflated"));
 
     // Input
     m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "MNE RTMSA In", "MNE real-time multi sample array input data");
@@ -131,16 +131,15 @@ void MNE::init()
     m_outputConnectors.append(m_pRTSEOutput);
     m_pRTSEOutput->data()->setName(this->getName());//Provide name to auto store widget settings
 
+    // start clustering
+    QFuture<void> future = QtConcurrent::run(this, &MNE::doClustering);
+
     //
     // Set the fwd, annotation and surface data
     //
     m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
     m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
     m_pRTSEOutput->data()->setFwdSolution(m_pClusteredFwd);
-
-    // start clustering
-    QFuture<void> future = QtConcurrent::run(this, &MNE::doClustering);
-
 }
 
 
@@ -366,7 +365,7 @@ void MNE::updateRTMSA(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
         //Fiff Information of the evoked
         if(!m_pFiffInfoInput) {
-            qDebug()<<"MNE::updateRTMSA - Creating m_pFiffInfoInput";
+            //qDebug()<<"MNE::updateRTMSA - Creating m_pFiffInfoInput";
             //m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pRTMSA->info().data()));
             m_pFiffInfoInput = pRTMSA->info();
         }
@@ -407,7 +406,6 @@ void MNE::updateRTC(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 }
 
 
-
 //*************************************************************************************************************
 
 void MNE::updateRTE(XMEASLIB::NewMeasurement::SPtr pMeasurement)
@@ -442,6 +440,7 @@ void MNE::updateInvOp(MNEInverseOperator::SPtr p_pInvOp)
     m_qMutex.lock();
 
     m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(*m_pInvOp.data(), lambda2, method));
+
     //
     //   Set up the inverse according to the parameters
     //
@@ -497,6 +496,33 @@ void MNE::run()
 
     qint32 skip_count = 0;
 
+//    //
+//    // TEMP INV LOADING START
+//    //
+
+//    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+//    FiffCov noise_cov(t_fileCov);
+
+//    // regularize noise covariance
+//    noise_cov = noise_cov.regularize(*m_pFiffInfoInput.data(), 0.05, 0.05, 0.1, true);
+
+//    //
+//    // make an inverse operators
+//    //
+//    MNEInverseOperator inverse_operator(*m_pFiffInfoInput.data(), *m_pClusteredFwd.data(), noise_cov, 0.2f, 0.8f, false);
+
+//    m_pInvOp = MNEInverseOperator::SPtr(&inverse_operator);
+
+//    double snr = 1.0;
+//    double lambda2 = 1.0 / pow(snr, 2); //ToDO estimate lambda using covariance
+//    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
+//    m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(inverse_operator, lambda2, method));
+//    m_pMinimumNorm->doInverseSetup(20,false);
+
+//    //
+//    // TEMP INV LOADING END
+//    //
+
     while(m_bIsRunning)
     {
         m_qMutex.lock();
@@ -516,15 +542,19 @@ void MNE::run()
 
         if(m_pMatrixDataBuffer)
         {
-            MatrixXd rawSegment = m_pMatrixDataBuffer->pop();
-            qDebug()<<"MNE::run - Processing RTMSA data";
+            //qDebug()<<"MNE::run - Processing RTMSA data";
             if(m_pMinimumNorm && ((skip_count % m_iDownSample) == 0))
             {
+                MatrixXd rawSegment = m_pMatrixDataBuffer->pop();
+
                 float tmin = 1 / m_pFiffInfo->sfreq;
                 float tstep = 1 / m_pFiffInfo->sfreq;
 
                 m_qMutex.lock();
+
+                //TODO: Add picking here. See evoked part as input.
                 MNESourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(rawSegment, tmin, tstep);
+
                 m_qMutex.unlock();
 
                 m_pRTSEOutput->data()->setValue(sourceEstimate);
@@ -540,7 +570,7 @@ void MNE::run()
 
         if(t_evokedSize > 0)
         {
-            qDebug()<<"MNE::run - Processing RTE data";
+            //qDebug()<<"MNE::run - Processing RTE data";
             if(m_pMinimumNorm && ((skip_count % m_iDownSample) == 0))
             {
                 m_qMutex.lock();
@@ -552,7 +582,11 @@ void MNE::run()
                 float tstep = 1/t_fiffEvoked.info.sfreq;
 
                 m_qMutex.lock();
+
+                t_fiffEvoked = t_fiffEvoked.pick_channels(m_pInvOp->noise_cov->names);
+
                 MNESourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_fiffEvoked.data, tmin, tstep);
+
                 m_qMutex.unlock();
 
                 m_pRTSEOutput->data()->setValue(sourceEstimate);

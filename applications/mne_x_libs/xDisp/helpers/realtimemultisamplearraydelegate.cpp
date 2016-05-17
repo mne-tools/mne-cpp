@@ -459,6 +459,7 @@ void RealTimeMultiSampleArrayDelegate::markerMoved(QPoint position, int activeRo
 void RealTimeMultiSampleArrayDelegate::setSignalColor(const QColor& signalColor)
 {
     m_penNormal.setColor(signalColor);
+    m_penNormalBad.setColor(signalColor);
 }
 
 
