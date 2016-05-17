@@ -49,6 +49,21 @@
 #include <utils/sphere.h>
 
 
+
+
+
+
+
+
+
+
+
+
+#include <stdio.h>
+#include <string.h>
+
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -77,20 +92,91 @@ using namespace MNELIB;
 #endif
 
 
+#ifndef FAIL
+#define FAIL -1
+#endif
+
+#ifndef OK
+#define OK 0
+#endif
+
+
+
+//============================= dot.h =============================
+
+#define X 0
+#define Y 1
+#define Z 2
+/*
+ * Dot product and length
+ */
+#define VEC_DOT(x,y) ((x)[X]*(y)[X] + (x)[Y]*(y)[Y] + (x)[Z]*(y)[Z])
+#define VEC_LEN(x) sqrt(VEC_DOT(x,x))
+
+
+
 //============================= mne_allocs.h =============================
 
 /*
  * Basics...
  */
 #define MALLOC(x,t) (t *)malloc((x)*sizeof(t))
-
+#define REALLOC(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
 #define FREE(x) if ((char *)(x) != NULL) free((char *)(x))
+/*
+ * Float, double, and int arrays
+ */
+#define ALLOC_FLOAT(x) MALLOC(x,float)
+#define ALLOC_DOUBLE(x) MALLOC(x,double)
+#define ALLOC_INT(x) MALLOC(x,int)
+#define REALLOC_FLOAT(x,y) REALLOC(x,y,float)
+#define REALLOC_DOUBLE(x,y) REALLOC(x,y,double)
+#define REALLOC_INT(x,y) REALLOC(x,y,int)
+/*
+ * float matrices
+ */
+#define ALLOC_CMATRIX(x,y) mne_cmatrix((x),(y))
+#define FREE_CMATRIX(m) mne_free_cmatrix((m))
+#define CMATRIX ALLOC_CMATRIX
 
 
 //============================= mne_allocs.c =============================
 
-void mne_free_cmatrix (float **m)
+static void matrix_error(int kind, int nr, int nc)
 
+{
+  if (kind == 1)
+    fprintf(stderr,"Failed to allocate memory pointers for a %d x %d matrix\n",nr,nc);
+  else if (kind == 2)
+    fprintf(stderr,"Failed to allocate memory for a %d x %d matrix\n",nr,nc);
+  else
+    fprintf(stderr,"Allocation error for a %d x %d matrix\n",nr,nc);
+  if (sizeof(void *) == 4) {
+    fprintf(stderr,"This is probably because you seem to be using a computer with 32-bit architecture.\n");
+    fprintf(stderr,"Please consider moving to a 64-bit platform.");
+  }
+  fprintf(stderr,"Cannot continue. Sorry.\n");
+  exit(1);
+}
+
+float **mne_cmatrix(int nr,int nc)
+
+{
+  int i;
+  float **m;
+  float *whole;
+
+  m = MALLOC(nr,float *);
+  if (!m) matrix_error(1,nr,nc);
+  whole = MALLOC(nr*nc,float);
+  if (!whole) matrix_error(2,nr,nc);
+
+  for(i=0;i<nr;i++)
+    m[i] = whole + i*nc;
+  return m;
+}
+
+void mne_free_cmatrix (float **m)
 {
   if (m) {
     FREE(*m);
@@ -159,6 +245,18 @@ typedef struct {		/* Collection of projection items and the projector itself */
 
 
 
+//============================= misc_util.c =============================
+
+char *mne_strdup(const char *s)
+{
+  char *res;
+  if (s == NULL)
+    return NULL;
+  res = (char*) malloc(strlen(s)+1);
+  strcpy(res,s);
+  return res;
+}
+
 
 
 
@@ -182,32 +280,32 @@ typedef struct {		/* Collection of projection items and the projector itself */
 typedef void (*fwdUserFreeFunc)(void *);  /* General purpose */
 
 typedef struct {
-  char         *chname;		/* Name of this channel */
-  int          coord_frame;	/* Which coordinate frame are we in? */
-  char         *desc;	        /* Description for this type of a coil */
-  int          coil_class;	/* Coil class */
-  int          type;		/* Coil type */
-  int          accuracy;	/* Accuracy */
-  float        size;		/* Coil size */
-  float        base;		/* Baseline */
-  float        r0[3];		/* Coil coordinate system origin */
-  float        ex[3];		/* Coil coordinate system unit vectors */
-  float        ey[3];		/* This stupid construction needs to be replaced with */
-  float        ez[3];		/* a coordinate transformation */
-  int          np;		/* Number of integration points */
-  float        **rmag;		/* The field point locations */
-  float        **cosmag;	/* The corresponding direction cosines */
-  float        *w;		/* The weighting coefficients */
+    char         *chname;       /* Name of this channel */
+    int          coord_frame;   /* Which coordinate frame are we in? */
+    char         *desc;         /* Description for this type of a coil */
+    int          coil_class;    /* Coil class */
+    int          type;          /* Coil type */
+    int          accuracy;      /* Accuracy */
+    float        size;          /* Coil size */
+    float        base;          /* Baseline */
+    float        r0[3];         /* Coil coordinate system origin */
+    float        ex[3];         /* Coil coordinate system unit vectors */
+    float        ey[3];         /* This stupid construction needs to be replaced with */
+    float        ez[3];         /* a coordinate transformation */
+    int          np;            /* Number of integration points */
+    float        **rmag;        /* The field point locations */
+    float        **cosmag;      /* The corresponding direction cosines */
+    float        *w;            /* The weighting coefficients */
 } *fwdCoil,fwdCoilRec;
 
 
 typedef struct {
-  fwdCoil *coils;		/* The coil or electrode positions */
+  fwdCoil *coils;                   /* The coil or electrode positions */
   int     ncoil;
-  int     coord_frame;		/* Common coordinate frame */
-  void    *user_data;		/* We can put whatever in here */
+  int     coord_frame;              /* Common coordinate frame */
+  void    *user_data;               /* We can put whatever in here */
   fwdUserFreeFunc user_data_free;
-} *fwdCoilSet,fwdCoilSetRec;	/* A collection of the above */
+} *fwdCoilSet,fwdCoilSetRec;        /* A collection of the above */
 
 /*
  * This is a convenient generic field / potential computation function
@@ -223,10 +321,10 @@ typedef int (*fwdFieldGradFunc)(float *rd,float *Q,fwdCoilSet coils, float *res,
  */
 
 typedef struct {
-  double **xyz; 	         /* The coordinates */
-  double *w;			 /* Weights */
-  int    np;			 /* How many */
-} *fwdIntPoints,fwdIntPointsRec; /* Integration points in a triangle */
+    double **xyz;                   /* The coordinates */
+    double *w;                      /* Weights */
+    int    np;                      /* How many */
+} *fwdIntPoints,fwdIntPointsRec;    /* Integration points in a triangle */
 
 typedef double (*fwdIntApproxEvalFunc)(fwdIntPoints int_points, double *r0, void *user);
 
@@ -235,29 +333,29 @@ typedef double (*fwdIntApproxEvalFunc)(fwdIntPoints int_points, double *r0, void
  */
 
 typedef struct {
-  float rad;			/* The actual rads */
-  float rel_rad;		/* Relative rads */
-  float sigma;			/* Conductivity */
+    float rad;                              /* The actual rads */
+    float rel_rad;                          /* Relative rads */
+    float sigma;                            /* Conductivity */
 } *fwdEegSphereLayer,fwdEegSphereLayerRec;
 
 
 typedef struct {
-  char  *name;			/* Textual identifier */
-  int   nlayer;			/* Number of layers */
-  fwdEegSphereLayer layers;	/* An array of layers */
-  float  r0[3];			/* The origin */
+  char  *name;              /* Textual identifier */
+  int   nlayer;             /* Number of layers */
+  fwdEegSphereLayer layers; /* An array of layers */
+  float  r0[3];             /* The origin */
 
-  double *fn;		        /* Coefficients saved to speed up the computations */
-  int    nterms;		/* How many? */
+  double *fn;           /* Coefficients saved to speed up the computations */
+  int    nterms;        /* How many? */
 
-  float  *mu;			/* The Berg-Scherg equivalence parameters */
+  float  *mu;           /* The Berg-Scherg equivalence parameters */
   float  *lambda;
-  int    nfit;			/* How many? */
-  int    scale_pos;		/* Scale the positions to the surface of the sphere? */
+  int    nfit;          /* How many? */
+  int    scale_pos;     /* Scale the positions to the surface of the sphere? */
 } *fwdEegSphereModel,fwdEegSphereModelRec;
 
 typedef struct {
-  fwdEegSphereModel *models;	/* Set of EEG sphere model definitions */
+  fwdEegSphereModel *models;    /* Set of EEG sphere model definitions */
   int               nmodel;
 } *fwdEegSphereModelSet,fwdEegSphereModelSetRec;
 
@@ -271,11 +369,11 @@ typedef struct {
 #define FWD_BEM_LIN_FIELD_FERGUSON  2
 #define FWD_BEM_LIN_FIELD_URANKAR   3
 
-typedef struct {		      /* Space to store a solution matrix */
-  float **solution;		      /* The solution matrix */
-  int   ncoil;			      /* Number of sensors */
-  int   np;		              /* Number of potential solution points */
-} *fwdBemSolution,fwdBemSolutionRec;  /* Mapping from infinite medium potentials to a particular set of coils or electrodes */
+typedef struct {                    /* Space to store a solution matrix */
+    float **solution;               /* The solution matrix */
+    int   ncoil;                    /* Number of sensors */
+    int   np;                       /* Number of potential solution points */
+} *fwdBemSolution,fwdBemSolutionRec;/* Mapping from infinite medium potentials to a particular set of coils or electrodes */
 
 
 
@@ -286,27 +384,27 @@ typedef struct {		      /* Space to store a solution matrix */
 
 
 typedef struct {
-  char       *surf_name;	/* Name of the file where surfaces were loaded from */
-  MNESurface *surfs;		/* The interface surfaces from outside towards inside */
-  int        *ntri;		/* Number of triangles on each surface */
-  int        *np;		/* Number of vertices on each surface */
-  int        nsurf;		/* How many */
-  float      *sigma;		/* The conductivities */
-  float      **gamma;		/* The gamma factors */
-  float      *source_mult;	/* These multiply the infinite medium potentials */
-  float      *field_mult;	/* Multipliers for the magnetic field */
-  int        bem_method;	/* Which approximation method is used */
-  char       *sol_name;		/* Name of the file where the solution was loaded from */
+  char       *surf_name;    /* Name of the file where surfaces were loaded from */
+  MNESurface *surfs;        /* The interface surfaces from outside towards inside */
+  int        *ntri;         /* Number of triangles on each surface */
+  int        *np;           /* Number of vertices on each surface */
+  int        nsurf;         /* How many */
+  float      *sigma;        /* The conductivities */
+  float      **gamma;       /* The gamma factors */
+  float      *source_mult;  /* These multiply the infinite medium potentials */
+  float      *field_mult;   /* Multipliers for the magnetic field */
+  int        bem_method;    /* Which approximation method is used */
+  char       *sol_name;     /* Name of the file where the solution was loaded from */
 
-  float      **solution;	/* The potential solution matrix */
-  float      *v0;		/* Space for the infinite-medium potentials */
-  int        nsol;		/* Size of the solution matrix */
+  float      **solution;    /* The potential solution matrix */
+  float      *v0;           /* Space for the infinite-medium potentials */
+  int        nsol;          /* Size of the solution matrix */
 
-  FiffCoordTrans head_mri_t;	/* Coordinate transformation from head to MRI coordinates */
+  FiffCoordTrans head_mri_t;    /* Coordinate transformation from head to MRI coordinates */
 
-  float      ip_approach_limit;	/* Controls whether we need to use the isolated problem approach */
-  int        use_ip_approach;	/* Do we need it */
-} *fwdBemModel,fwdBemModelRec;	/* Holds the BEM model definition */
+  float      ip_approach_limit; /* Controls whether we need to use the isolated problem approach */
+  int        use_ip_approach;   /* Do we need it */
+} *fwdBemModel,fwdBemModelRec;  /* Holds the BEM model definition */
 
 
 
@@ -348,15 +446,15 @@ typedef struct {
     mneUserFreeFunc eeg_client_free;
 } *dipoleFitFuncs,dipoleFitFuncsRec;
 
-#define COLUMN_NORM_NONE 0	    /* No column normalization requested */
-#define COLUMN_NORM_COMP 1	    /* Componentwise normalization */
-#define COLUMN_NORM_LOC  2	    /* Dipole locationwise normalization */
+#define COLUMN_NORM_NONE 0      /* No column normalization requested */
+#define COLUMN_NORM_COMP 1      /* Componentwise normalization */
+#define COLUMN_NORM_LOC  2      /* Dipole locationwise normalization */
 
 typedef struct {                        /* This structure holds all fitting-related data */
     FiffCoordTrans    mri_head_t;       /* MRI <-> head coordinate transformation */
     FiffCoordTrans    meg_head_t;       /* MEG <-> head coordinate transformation */
     int               coord_frame;      /* Common coordinate frame */
-    FiffChInfo        chs;              /* Channels */
+    QList<FiffChInfo> chs;              /* Channels */
     int               nmeg;             /* How many MEG */
     int               neeg;             /* How many EEG */
     char              **ch_names;       /* List of all channel names */
@@ -390,26 +488,611 @@ typedef struct {                        /* This structure holds all fitting-rela
 
 
 
-
-
-
 //============================= dipole_forward.c =============================
 
+void free_dipole_forward ( dipoleForward f )
+{
+    if (!f)
+        return;
+    FREE_CMATRIX(f->rd);
+    FREE_CMATRIX(f->fwd);
+    FREE_CMATRIX(f->uu);
+    FREE_CMATRIX(f->vv);
+    FREE(f->sing);
+    FREE(f->scales);
+    FREE(f);
+    return;
+}
 
-void free_dipole_forward(dipoleForward f)
+
+
+
+
+
+
+//============================= fiff_trans.c =============================
+
+
+void fiff_coord_trans (float r[3],FiffCoordTrans* t,int do_move)
+     /*
+      * Apply coordinate transformation
+      */
+{
+  int j,k;
+  float res[3];
+
+  for (j = 0; j < 3; j++) {
+    res[j] = (do_move ? t->trans(j,3) :  0.0);
+    for (k = 0; k < 3; k++)
+      res[j] += t->trans(j,k)*r[k];
+  }
+  for (j = 0; j < 3; j++)
+    r[j] = res[j];
+}
+
+
+//============================= fwd_coil_def.c =============================
+
+#define MAXWORD 1000
+
+#define BIG 0.5
+
+
+
+/*
+ * This is the old interface which should be eventually deleted
+ */
+static fwdCoil    fwd_new_coil(int np)
 
 {
-  if (!f)
+  fwdCoil res = MALLOC(1,fwdCoilRec);
+  int     k;
+
+  res->chname     = NULL;
+  res->desc       = NULL;
+  res->coil_class = FWD_COILC_UNKNOWN;
+  res->accuracy   = FWD_COIL_ACCURACY_POINT;
+  res->base       = 0.0;
+  res->size       = 0.0;
+  res->np         = np;
+  res->rmag       = ALLOC_CMATRIX(np,3);
+  res->cosmag     = ALLOC_CMATRIX(np,3);
+  res->w          = MALLOC(np,float);
+  /*
+   * Reasonable defaults
+   */
+  for (k = 0; k < 3; k++) {
+    res->r0[k] = 0.0;
+    res->ex[k] = 0.0;
+    res->ey[k] = 0.0;
+    res->ez[k] = 0.0;
+  }
+  res->ex[0] = 1.0;
+  res->ey[1] = 1.0;
+  res->ez[2] = 1.0;
+
+  return res;
+}
+
+static void fwd_free_coil(fwdCoil coil)
+
+{
+  if (!coil)
     return;
-  FREE_CMATRIX(f->rd);
-  FREE_CMATRIX(f->fwd);
-  FREE_CMATRIX(f->uu);
-  FREE_CMATRIX(f->vv);
-  FREE(f->sing);
-  FREE(f->scales);
-  FREE(f);
+
+  FREE(coil->chname);
+  FREE(coil->desc);
+  FREE_CMATRIX(coil->rmag);
+  FREE_CMATRIX(coil->cosmag);
+  FREE(coil->w);
+  FREE(coil);
+}
+
+
+fwdCoilSet fwd_new_coil_set()
+
+{
+  fwdCoilSet s = MALLOC(1,fwdCoilSetRec);
+
+  s->coils = NULL;
+  s->ncoil = 0;
+  s->coord_frame = FIFFV_COORD_UNKNOWN;
+  s->user_data = NULL;
+  s->user_data_free = NULL;
+  return s;
+}
+
+void fwd_free_coil_set_user_data(fwdCoilSet set)
+
+{
+  if (!set)
+    return;
+  if (set->user_data_free && set->user_data)
+    set->user_data_free(set->user_data);
+  set->user_data = NULL;
   return;
 }
+
+void fwd_free_coil_set(fwdCoilSet set)
+
+{
+  int k;
+
+  if (!set)
+    return;
+
+  for (k = 0; k < set->ncoil; k++)
+    fwd_free_coil(set->coils[k]);
+  FREE(set->coils);
+
+  fwd_free_coil_set_user_data(set);
+
+  FREE(set);
+  return;
+}
+
+int fwd_is_axial_coil(fwdCoil coil)
+
+{
+  return (coil->coil_class == FWD_COILC_MAG ||
+      coil->coil_class == FWD_COILC_AXIAL_GRAD ||
+      coil->coil_class == FWD_COILC_AXIAL_GRAD2);
+}
+
+int fwd_is_magnetometer_coil(fwdCoil coil)
+
+{
+  return coil->coil_class == FWD_COILC_MAG;
+}
+
+int fwd_is_planar_coil(fwdCoil coil)
+
+{
+  return coil->coil_class == FWD_COILC_PLANAR_GRAD;
+}
+
+int fwd_is_eeg_electrode(fwdCoil coil)
+
+{
+  return coil->coil_class == FWD_COILC_EEG;
+}
+
+int fwd_is_planar_coil_type(int type,            /* This is the coil type we are interested in */
+                fwdCoilSet set)	 /* Set of templates */
+
+{
+  int k;
+
+  if (type == FIFFV_COIL_EEG)
+    return FALSE;
+  if (!set)
+    return FALSE;
+  for (k = 0; k < set->ncoil; k++)
+    if (set->coils[k]->type == type)
+      return set->coils[k]->coil_class == FWD_COILC_PLANAR_GRAD;
+  return FALSE;
+}
+
+
+int fwd_is_axial_coil_type(int type,             /* This is the coil type we are interested in */
+               fwdCoilSet set)	 /* Set of templates */
+
+{
+  int k;
+
+  if (type == FIFFV_COIL_EEG)
+    return FALSE;
+  if (!set)
+    return FALSE;
+  for (k = 0; k < set->ncoil; k++)
+    if (set->coils[k]->type == type)
+      return (set->coils[k]->coil_class == FWD_COILC_MAG ||
+          set->coils[k]->coil_class == FWD_COILC_AXIAL_GRAD ||
+          set->coils[k]->coil_class == FWD_COILC_AXIAL_GRAD2);
+  return FALSE;
+}
+
+int fwd_is_magnetometer_coil_type(int type,             /* This is the coil type we are interested in */
+                  fwdCoilSet set)	/* Set of templates */
+
+{
+  int k;
+
+  if (type == FIFFV_COIL_EEG)
+    return FALSE;
+  if (!set)
+    return FALSE;
+  for (k = 0; k < set->ncoil; k++)
+    if (set->coils[k]->type == type)
+      return set->coils[k]->coil_class == FWD_COILC_MAG;
+  return FALSE;
+}
+
+int fwd_is_eeg_electrode_type(int type,		 /*  */
+                  fwdCoilSet set)	 /* Templates are included for symmetry */
+
+{
+  return type == FIFFV_COIL_EEG;
+}
+
+
+static void normalize(float *rr)
+     /*
+      * Scale vector to unit length
+      */
+{
+  float ll = VEC_LEN(rr);
+  int k;
+  if (ll > 0) {
+    for (k = 0; k < 3; k++)
+      rr[k] = rr[k]/ll;
+  }
+  return;
+}
+
+static fwdCoil fwd_add_coil_to_set(fwdCoilSet set,
+                   int type, int coil_class, int acc, int np, float size, float base, char *desc)
+
+{
+  fwdCoil def;
+
+  if (set == NULL) {
+    qDebug() << "err_set_error(No coil definition set to augment.)";
+    return NULL;
+  }
+  if (np <= 0) {
+    qDebug() << "err_printf_set_error(Number of integration points should be positive (type = %d acc = %d),type,acc)";
+    return NULL;
+  }
+  if (! (acc == FWD_COIL_ACCURACY_POINT ||
+     acc == FWD_COIL_ACCURACY_NORMAL ||
+     acc == FWD_COIL_ACCURACY_ACCURATE) ) {
+    qDebug() << "err_printf_set_error(Illegal accuracy (type = %d acc = %d),type,acc)";
+    return NULL;
+  }
+  if (! (coil_class == FWD_COILC_MAG ||
+     coil_class == FWD_COILC_AXIAL_GRAD ||
+     coil_class == FWD_COILC_PLANAR_GRAD ||
+     coil_class == FWD_COILC_AXIAL_GRAD2) ) {
+    qDebug() << "err_printf_set_error(Illegal coil class (type = %d acc = %d class = %d),type,acc,coil_class)";
+    return NULL;
+  }
+
+  set->coils = REALLOC(set->coils,set->ncoil+1,fwdCoil);
+  def = set->coils[set->ncoil++] = fwd_new_coil(np);
+
+  def->type       = type;
+  def->coil_class = coil_class;
+  def->accuracy   = acc;
+  def->np         = np;
+  def->base       = size;
+  def->base       = base;
+  if (desc)
+    def->desc = mne_strdup(desc);
+  return def;
+}
+
+
+
+static void skip_comments(FILE *in)
+
+{
+  int c;
+
+  while (1) {
+    c = fgetc(in);
+    if (c == '#') {
+      for (c = fgetc(in); c != EOF && c != '\n'; c = fgetc(in))
+    ;
+    }
+    else {
+      ungetc(c,in);
+      return;
+    }
+  }
+}
+
+static int whitespace(int c)
+
+{
+  if (c == '\t' || c == '\n' || c == ' ')
+    return TRUE;
+  else
+    return FALSE;
+}
+
+static int whitespace_quote(int c, int inquote)
+
+{
+  if (inquote)
+    return (c == '"');
+  else
+    return (c == '\t' || c == '\n' || c == ' ');
+}
+
+static char *next_word(FILE *in)
+
+{
+  char *next = MALLOC(MAXWORD,char);
+  int c;
+  int  p,k;
+  int  inquote;
+
+  skip_comments(in);
+
+  inquote = FALSE;
+  for (k = 0, p = 0, c = fgetc(in); c != EOF && !whitespace_quote(c,inquote) ; c = fgetc(in), k++) {
+    if (k == 0 && c == '"')
+      inquote = TRUE;
+    else
+      next[p++] = c;
+  }
+  if (c == EOF && k == 0) {
+    FREE(next);
+    return NULL;
+  }
+  else
+    next[p] = '\0';
+  if (c != EOF) {
+    for (k = 0, c = fgetc(in); whitespace(c) ; c = fgetc(in), k++)
+      ;
+    if (c != EOF)
+      ungetc(c,in);
+  }
+#ifdef DEBUG
+  if (next)
+    printf("<%s>\n",next);
+#endif
+  return next;
+}
+
+static int get_ival(FILE *in, int *ival)
+
+{
+  char *next = next_word(in);
+  if (next == NULL) {
+    qDebug() << "err_printf_set_error(missing integer)";
+    return FAIL;
+  }
+  else if (sscanf(next,"%d",ival) != 1) {
+    qDebug() << "err_printf_set_error(bad integer : %s,next)";
+    FREE(next);
+    return FAIL;
+  }
+  FREE(next);
+  return OK;
+}
+
+static int get_fval(FILE *in, float *fval)
+
+{
+  char *next = next_word(in);
+  if (next == NULL) {
+    qDebug() << "err_set_error(bad integer)";
+    return FAIL;
+  }
+  else if (sscanf(next,"%g",fval) != 1) {
+    qDebug() << "err_printf_set_error(bad floating point number : %s,next)";
+    FREE(next);
+    return FAIL;
+  }
+  FREE(next);
+  return OK;
+}
+
+
+
+
+
+
+fwdCoilSet fwd_read_coil_defs(char *name)
+     /*
+      * Read a coil definition file
+      */
+{
+  FILE    *in = fopen(name,"r");
+  char    *desc = NULL;
+  int     type,coil_class,acc,np;
+  int     p;
+  float   size,base;
+  fwdCoilSet res = NULL;
+  fwdCoil def;
+
+  if (in == NULL) {
+    qDebug() << "err_set_sys_error(name)";
+    goto bad;
+  }
+
+  res = fwd_new_coil_set();
+  while (1) {
+    /*
+     * Read basic info
+     */
+    if (get_ival(in,&coil_class) != OK)
+      break;
+    if (get_ival(in,&type) != OK)
+      goto bad;
+    if (get_ival(in,&acc) != OK)
+      goto bad;
+    if (get_ival(in,&np) != OK)
+      goto bad;
+    if (get_fval(in,&size) != OK)
+      goto bad;
+    if (get_fval(in,&base) != OK)
+      goto bad;
+    desc = next_word(in);
+    if (!desc)
+      goto bad;
+
+    def = fwd_add_coil_to_set(res,type,coil_class,acc,np,size,base,desc);
+    if (!def)
+      goto bad;
+    FREE(desc); desc = NULL;
+
+    for (p = 0; p < def->np; p++) {
+      /*
+       * Read and verify data for each integration point
+       */
+      if (get_fval(in,def->w+p) != OK)
+    goto bad;
+      if (get_fval(in,def->rmag[p]+X) != OK)
+    goto bad;
+      if (get_fval(in,def->rmag[p]+Y) != OK)
+    goto bad;
+      if (get_fval(in,def->rmag[p]+Z) != OK)
+    goto bad;
+      if (get_fval(in,def->cosmag[p]+X) != OK)
+    goto bad;
+      if (get_fval(in,def->cosmag[p]+Y) != OK)
+    goto bad;
+      if (get_fval(in,def->cosmag[p]+Z) != OK)
+    goto bad;
+
+    if (VEC_LEN(def->rmag[p]) > BIG) {
+        qDebug() << "err_printf_set_error(Unreasonable integration point: %f %f %f mm (coil type = %d acc = %d), 1000*def->rmag[p][X],1000*def->rmag[p][Y],1000*def->rmag[p][Z], def->type,def->accuracy)";
+    goto bad;
+      }
+      size = VEC_LEN(def->cosmag[p]);
+      if (size <= 0) {
+        qDebug() << "err_printf_set_error(Unreasonable normal: %f %f %f (coil type = %d acc = %d), def->cosmag[p][X],def->cosmag[p][Y],def->cosmag[p][Z], def->type,def->accuracy)";
+    goto bad;
+      }
+      normalize(def->cosmag[p]);
+    }
+  }
+  fprintf(stderr,"%d coil definitions read\n",res->ncoil);
+  return res;
+
+  bad : {
+    fwd_free_coil_set(res);
+    FREE(desc);
+    return NULL;
+  }
+}
+
+
+fwdCoil fwd_create_meg_coil(fwdCoilSet     set,      /* These are the available coil definitions */
+                FiffChInfo     ch,       /* Channel information to use */
+                int            acc,	     /* Required accuracy */
+                FiffCoordTrans* t)	     /* Transform the points using this */
+     /*
+      * Create a MEG coil definition using a database of templates
+      * Change the coordinate frame if so desired
+      */
+{
+  int        k,p,c;
+  fwdCoil    def;
+  fwdCoil    res = NULL;
+
+  if (ch.kind != FIFFV_MEG_CH && ch.kind != FIFFV_REF_MEG_CH) {
+    qDebug() << "err_printf_set_error(%s is not a MEG channel. Cannot create a coil definition.,ch->ch_name)";
+    goto bad;
+  }
+  /*
+   * Simple linear search from the coil definitions
+   */
+  for (k = 0, def = NULL; k < set->ncoil; k++) {
+    if ((set->coils[k]->type == (ch.coil_type & 0xFFFF)) &&
+    set->coils[k]->accuracy == acc) {
+      def = set->coils[k];
+    }
+  }
+  if (!def) {
+    qDebug() << "err_printf_set_error(Desired coil definition not found (type = %d acc = %d),ch->chpos.coil_type,acc)";
+    goto bad;
+  }
+  /*
+   * Create the result
+   */
+  res = fwd_new_coil(def->np);
+
+  res->chname   = mne_strdup(ch.ch_name.toLatin1().data());
+  if (def->desc)
+    res->desc   = mne_strdup(def->desc);
+  res->coil_class = def->coil_class;
+  res->accuracy   = def->accuracy;
+  res->base       = def->base;
+  res->size       = def->size;
+  res->type       = ch.coil_type;
+
+  res->r0[0] = ch.loc[0];
+  res->r0[1] = ch.loc[1];
+  res->r0[2] = ch.loc[2];
+  res->ex[0] = ch.loc[3];
+  res->ex[1] = ch.loc[4];
+  res->ex[2] = ch.loc[5];
+  res->ey[0] = ch.loc[6];
+  res->ey[1] = ch.loc[7];
+  res->ey[2] = ch.loc[8];
+  res->ez[0] = ch.loc[9];
+  res->ez[1] = ch.loc[10];
+  res->ez[2] = ch.loc[11];
+//  VEC_COPY(res->r0,ch->chpos.r0);
+//  VEC_COPY(res->ex,ch->chpos.ex);
+//  VEC_COPY(res->ey,ch->chpos.ey);
+//  VEC_COPY(res->ez,ch->chpos.ez);
+  /*
+   * Apply a coordinate transformation if so desired
+   */
+  if (t) {
+    fiff_coord_trans(res->r0,t,FIFFV_MOVE);
+    fiff_coord_trans(res->ex,t,FIFFV_NO_MOVE);
+    fiff_coord_trans(res->ey,t,FIFFV_NO_MOVE);
+    fiff_coord_trans(res->ez,t,FIFFV_NO_MOVE);
+    res->coord_frame = t->to;
+  }
+  else
+    res->coord_frame = FIFFV_COORD_DEVICE;
+
+  for (p = 0; p < res->np; p++) {
+    res->w[p] = def->w[p];
+    for (c = 0; c < 3; c++) {
+      res->rmag[p][c]   = res->r0[c] + def->rmag[p][X]*res->ex[c] + def->rmag[p][Y]*res->ey[c] + def->rmag[p][Z]*res->ez[c];
+      res->cosmag[p][c] = def->cosmag[p][X]*res->ex[c] + def->cosmag[p][Y]*res->ey[c] + def->cosmag[p][Z]*res->ez[c];
+    }
+  }
+  return res;
+
+  bad : {
+    return NULL;
+  }
+}
+
+fwdCoilSet fwd_create_meg_coils(fwdCoilSet      set,      /* These are the available coil definitions */
+                QList<FiffChInfo>   chs,      /* Channel information to use */
+                int             nch,
+                int             acc,	  /* Required accuracy */
+                FiffCoordTrans* t)	  /* Transform the points using this */
+
+{
+  fwdCoilSet res = fwd_new_coil_set();
+  fwdCoil    next;
+  int        k;
+
+  qDebug() << "[1]";
+
+  for (k = 0; k < nch; k++) {
+    if ((next = fwd_create_meg_coil(set,chs[k],acc,t)) == NULL)
+      goto bad;
+    res->coils = REALLOC(res->coils,res->ncoil+1,fwdCoil);
+    res->coils[res->ncoil++] = next;
+  }
+  if (t)
+    res->coord_frame = t->to;
+  return res;
+
+ bad : {
+    fwd_free_coil_set(res);
+    return NULL;
+  }
+}
+
+
+
+
+
+
+
 
 
 
@@ -423,60 +1106,60 @@ void free_dipole_forward(dipoleForward f)
 
 guessData new_guess_data()
 {
-  guessData res = MALLOC(1,guessDataRec);
+    guessData res = MALLOC(1,guessDataRec);
 
-  res->rr        = NULL;
-  res->guess_fwd = NULL;
-  res->nguess    = 0;
-  return res;
+    res->rr        = NULL;
+    res->guess_fwd = NULL;
+    res->nguess    = 0;
+    return res;
 }
 
 static void free_guess_data(guessData g)
 
 {
-  int k;
-  if (!g)
-    return;
+    int k;
+    if (!g)
+        return;
 
-  FREE_CMATRIX(g->rr);
-  if (g->guess_fwd) {
+    FREE_CMATRIX(g->rr);
+    if (g->guess_fwd) {
     for (k = 0; k < g->nguess; k++)
-      free_dipole_forward(g->guess_fwd[k]);
+        free_dipole_forward(g->guess_fwd[k]);
     FREE(g->guess_fwd);
-  }
-  FREE(g);
-  return;
+    }
+    FREE(g);
+    return;
 }
 
 static dipoleFitFuncs new_dipole_fit_funcs()
 {
-  dipoleFitFuncs f = MALLOC(1,dipoleFitFuncsRec);
+    dipoleFitFuncs f = MALLOC(1,dipoleFitFuncsRec);
 
-  f->meg_field     = NULL;
-  f->eeg_pot       = NULL;
-  f->meg_vec_field = NULL;
-  f->eeg_vec_pot   = NULL;
-  f->meg_client      = NULL;
-  f->meg_client_free = NULL;
-  f->eeg_client      = NULL;
-  f->eeg_client_free = NULL;
+    f->meg_field     = NULL;
+    f->eeg_pot       = NULL;
+    f->meg_vec_field = NULL;
+    f->eeg_vec_pot   = NULL;
+    f->meg_client      = NULL;
+    f->meg_client_free = NULL;
+    f->eeg_client      = NULL;
+    f->eeg_client_free = NULL;
 
-  return f;
+    return f;
 }
 
 
 static void free_dipole_fit_funcs(dipoleFitFuncs f)
 {
-  if (!f)
+    if (!f)
+        return;
+
+    if (f->meg_client_free && f->meg_client)
+        f->meg_client_free(f->meg_client);
+    if (f->eeg_client_free && f->eeg_client)
+        f->eeg_client_free(f->eeg_client);
+
+    FREE(f);
     return;
-
-  if (f->meg_client_free && f->meg_client)
-    f->meg_client_free(f->meg_client);
-  if (f->eeg_client_free && f->eeg_client)
-    f->eeg_client_free(f->eeg_client);
-
-  FREE(f);
-  return;
 }
 
 
@@ -487,30 +1170,30 @@ dipoleFitData new_dipole_fit_data()
 //  res->mri_head_t    = NULL;
 //  res->meg_head_t    = NULL;
 //  res->chs           = NULL;
-  res->meg_coils     = NULL;
-  res->eeg_els       = NULL;
-  res->nmeg          = 0;
-  res->neeg          = 0;
-  res->r0[0]         = 0.0;
-  res->r0[1]         = 0.0;
-  res->r0[2]         = 0.0;
-  res->bemname       = NULL;
-  res->bem_model     = NULL;
-  res->eeg_model     = NULL;
+    res->meg_coils     = NULL;
+    res->eeg_els       = NULL;
+    res->nmeg          = 0;
+    res->neeg          = 0;
+    res->r0[0]         = 0.0;
+    res->r0[1]         = 0.0;
+    res->r0[2]         = 0.0;
+    res->bemname       = NULL;
+    res->bem_model     = NULL;
+    res->eeg_model     = NULL;
 //  res->noise         = NULL;
-  res->nave          = 1;
-  res->user          = NULL;
-  res->user_free     = NULL;
-  res->proj          = NULL;
+    res->nave          = 1;
+    res->user          = NULL;
+    res->user_free     = NULL;
+    res->proj          = NULL;
 
-  res->sphere_funcs     = NULL;
-  res->bem_funcs        = NULL;
-  res->mag_dipole_funcs = NULL;
-  res->funcs            = NULL;
-  res->column_norm      = COLUMN_NORM_NONE;
-  res->fit_mag_dipoles  = FALSE;
+    res->sphere_funcs     = NULL;
+    res->bem_funcs        = NULL;
+    res->mag_dipole_funcs = NULL;
+    res->funcs            = NULL;
+    res->column_norm      = COLUMN_NORM_NONE;
+    res->fit_mag_dipoles  = FALSE;
 
-  return res;
+    return res;
 }
 
 
@@ -567,39 +1250,39 @@ dipoleFitData new_dipole_fit_data()
 
 
 
-//dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head transform */
-//                    char  *measname,		 /* This gives the MEG/head transform and
-//                                  * sensor locations */
-//                    char  *bemname,		 /* BEM model */
-//                    float *r0,			 /* Sphere model origin in head coordinates (optional) */
-//                    fwdEegSphereModel eeg_model, /* EEG sphere model definition */
-//                    int   accurate_coils,	 /* Use accurate coil definitions? */
-//                    char  *badname,		 /* Bad channels list */
-//                    char  *noisename,		 /* Noise covariance matrix */
-//                    float grad_std,              /* Standard deviations for the ad-hoc noise cov (planar gradiometers) */
-//                    float mag_std,               /* Ditto for magnetometers */
-//                    float eeg_std,               /* Ditto for EEG */
-//                    float mag_reg,               /* Noise-covariance regularization factors */
-//                    float grad_reg,
-//                    float eeg_reg,
-//                    int   diagnoise,		 /* Use only the diagonal elements of the noise-covariance matrix */
-//                    char  **projnames,           /* SSP file names */
-//                    int   nproj,                 /* How many of them */
-//                    int   include_meg,           /* Include MEG in the fitting? */
-//                    int   include_eeg)           /* Include EEG in the fitting? */
-//     /*
-//      * Background work for modelling
-//      */
-//{
-//    dipoleFitData  res = new_dipole_fit_data();
-//    int            k;
-//    char           **badlist = NULL;
-//    int            nbad      = 0;
-//    char           **file_bads;
-//    int            file_nbad;
-//    int            coord_frame = FIFFV_COORD_HEAD;
+dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head transform */
+                    char  *measname,		 /* This gives the MEG/head transform and
+                                  * sensor locations */
+                    char  *bemname,		 /* BEM model */
+                    float *r0,			 /* Sphere model origin in head coordinates (optional) */
+                    fwdEegSphereModel eeg_model, /* EEG sphere model definition */
+                    int   accurate_coils,	 /* Use accurate coil definitions? */
+                    char  *badname,		 /* Bad channels list */
+                    char  *noisename,		 /* Noise covariance matrix */
+                    float grad_std,              /* Standard deviations for the ad-hoc noise cov (planar gradiometers) */
+                    float mag_std,               /* Ditto for magnetometers */
+                    float eeg_std,               /* Ditto for EEG */
+                    float mag_reg,               /* Noise-covariance regularization factors */
+                    float grad_reg,
+                    float eeg_reg,
+                    int   diagnoise,		 /* Use only the diagonal elements of the noise-covariance matrix */
+                    char  **projnames,           /* SSP file names */
+                    int   nproj,                 /* How many of them */
+                    int   include_meg,           /* Include MEG in the fitting? */
+                    int   include_eeg)           /* Include EEG in the fitting? */
+     /*
+      * Background work for modelling
+      */
+{
+    dipoleFitData  res = new_dipole_fit_data();
+    int            k;
+    char           **badlist = NULL;
+    int            nbad      = 0;
+    char           **file_bads;
+    int            file_nbad;
+    int            coord_frame = FIFFV_COORD_HEAD;
 //    mneCovMatrix cov;
-//    fwdCoilSet     templates = NULL;
+    fwdCoilSet     templates = NULL;
 //    mneCTFcompDataSet comp_data  = NULL;
 //    fwdCoilSet        comp_coils = NULL;
 //    /*
@@ -833,7 +1516,7 @@ dipoleFitData new_dipole_fit_data()
 //    fwd_free_coil_set(templates);
 //    fwd_free_coil_set(comp_coils);
 //    mne_free_ctf_comp_data_set(comp_data);
-//    return res;
+    return res;
 
 
 //    bad : {
@@ -844,7 +1527,7 @@ dipoleFitData new_dipole_fit_data()
 //    free_dipole_fit_data(res);
 //    return NULL;
 //    }
-//}
+}
 
 
 
@@ -960,17 +1643,84 @@ int main(int argc, char *argv[])
     MatrixX3f rr_trans = mri_head_t.apply_trans(bem[0].rr);
     std::cout << "rr_trans.rows\n" << rr_trans.block(0,0,5,3) << std::endl;
 
+    //==== setup.c
+
+    fwdCoilSet templates = NULL;
+    dipoleFitData  res = new_dipole_fit_data();
+    int coord_frame = FIFFV_COORD_HEAD;
+
+    int accurate_coils = TRUE;
+
     float guess_grid = 0.01;
     float guess_mindist = 0.005;//max(0.005, min_dist_to_inner_skull)
     float guess_exclude = 0.02;
 
-
     mri_head_t.print();
     evoked.info.dev_head_t.print();
 
-    if(include_eeg) {
+    /*
+    * Read the bad channel lists
+    */
+    QStringList badlist = evoked.info.bads;
+
+    printf((QString("%1 bad channels total\n").arg(badlist.size())).toLatin1().data());
+
+    /*
+    * Read the channel information
+    */
+
+    qDebug() << "[-1]";
+
+
+    qDebug() << "evoked.info.chs.size" << evoked.info.chs.size();
+
+    res->chs = evoked.info.chs;
+
+    /*
+    * Make coil definitions
+    */
+
+
+    qDebug() << "[0.0]";
+
+    res->coord_frame = coord_frame;
+    if (coord_frame == FIFFV_COORD_HEAD) {
+
+        QString coilfile("D:/GitHub/mne-cpp/bin/Resources/CoilDefinitions/coil_def.dat");
+
+        qDebug() << "[0.1]";
+
+        if ((templates = fwd_read_coil_defs(coilfile.toLatin1().data())) == NULL) {
+//            FREE(coilfile);
+            return 0;
+        }
+
+//    qDebug() << "ncoil" << templates->ncoil;
+//    qDebug() << "coord_frame" << templates->coord_frame;
+//    for (qint32 i = 0; i < templates->ncoil; ++i) {
+//        printf ("Channel Name: %s\n",templates->coils[i]->chname);
+//        qDebug() << "coil_class" << templates->coils[i]->coil_class;
+//    }
+
+        qDebug() << "[0.2]";
+
+        if ((res->meg_coils = fwd_create_meg_coils(templates,res->chs,res->nmeg,
+                       accurate_coils ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
+                       &res->meg_head_t)) == NULL) {
+            return 0;
+        }
+
 
     }
+
+
+
+
+
+
+//    if(include_eeg) {
+
+//    }
 
 
 
