@@ -148,9 +148,6 @@ public slots:
 void connectMarkers();
 void handleMarker();
 
-protected:
-    void mouseMoveEvent(QMouseEvent* event);
-
 private:
     QChart*             m_pChart;
     QBarCategoryAxis*   m_pAxis;
@@ -262,13 +259,12 @@ template<typename T>
       leftThreshold = new QLineSeries();
       middleThreshold = new QLineSeries();
       rightThreshold = new QLineSeries();
-      leftThreshold->append(maxAxisX, 0);       //initialize threshold lines
+      leftThreshold->append(minAxisX, 0);       //initialize threshold lines
       middleThreshold->append(maxAxisX, 0);
       rightThreshold->append(maxAxisX, 0);
       leftThreshold->setVisible(false);
       middleThreshold->setVisible(false);
       rightThreshold->setVisible(false);
-      //connectMarkers();
       m_pChart->legend()->setVisible(true);
       m_pChart->legend()->setAlignment(Qt::AlignBottom);
       m_pChart->addSeries(leftThreshold);

@@ -108,73 +108,54 @@ void Spline::mousePressEvent(QMouseEvent *event)
     verticalLine -> append(localX.x(), 0);
     verticalLine -> append(localX.x(), maximumFrequency);
     double boundaryX = double(localX.x());       //casting localX.x() from float to double for comparison with minAxisX and maxAxisX
+    //QLineSeries *temporaryValue = new QLineSeries();
 
     if((boundaryX >= float(minAxisX)) && (boundaryX <= float(maxAxisX)))  //this condition ensures that threshold lines can only be created within the boundary of the chart
     {
-        QVector<QPointF> middlePoint = middleThreshold->pointsVector(); //leftThreshold value need to be updated before tested and displayed on the widget
+        QVector<QPointF> middlePoint = middleThreshold->pointsVector(); //Point values need to be updated before tested and displayed on the widget
         QVector<QPointF> rightPoint = rightThreshold->pointsVector();
         QVector<QPointF> leftPoint = leftThreshold->pointsVector();
         if (event->buttons() == Qt::LeftButton)
         {
-            m_pChart->removeSeries(leftThreshold);
-            leftThreshold=verticalLine;
-            leftPoint = leftThreshold->pointsVector();
+            leftPoint = verticalLine->pointsVector();
             if((leftPoint[0].x() < middlePoint[0].x()) && (leftPoint[0].x()  < rightPoint[0].x()))
             {
-                leftThreshold->setColor("red");
                 m_pChart->removeSeries(leftThreshold);
+                leftThreshold=verticalLine;
+                leftThreshold->setColor("red");
                 m_pChart->addSeries(leftThreshold);
                 connectMarkers();
                 m_pChart->createDefaultAxes();
-            }
-            else
-            {
-                leftThreshold->append(minAxisX, 0);       //reinitialize left threshold
+                emit borderChanged(leftPoint[0].x(), middlePoint[0].x(), rightPoint[0].x());
             }
         }
         if (event->buttons() == Qt::MiddleButton)
         {
-            m_pChart->removeSeries(middleThreshold);
-            middleThreshold=verticalLine;
-            middlePoint = middleThreshold->pointsVector();
+            middlePoint = verticalLine->pointsVector();
             if((middlePoint[0].x() > leftPoint[0].x()) && (middlePoint[0].x()  <= rightPoint[0].x()))
             {
+                m_pChart->removeSeries(middleThreshold);
+                middleThreshold=verticalLine;
                 middleThreshold->setColor("green");
                 m_pChart->addSeries(middleThreshold);
                 connectMarkers();
                 m_pChart->createDefaultAxes();
             }
         }
-
         if (event->buttons() == Qt::RightButton)
         {
-            m_pChart->removeSeries(rightThreshold);
-            rightThreshold=verticalLine;
-            rightPoint = rightThreshold->pointsVector();
+            rightPoint = verticalLine->pointsVector();
             if((rightPoint[0].x() > leftPoint[0].x()) && (rightPoint[0].x()  >= middlePoint[0].x()))
             {
+                m_pChart->removeSeries(rightThreshold);
+                rightThreshold=verticalLine;
                 rightThreshold->setColor("blue");
                 m_pChart->addSeries(rightThreshold);
                 connectMarkers();
                 m_pChart->createDefaultAxes();
             }
-            else
-            {
-                rightThreshold->append(maxAxisX, 0);       //reinitialize right threshold
-            }
         }
     }
-    //emit borderChanged(leftThreshold, middleThreshold, rightThreshold);
-}
-
-
-//*************************************************************************************************************
-
-void Spline::mouseMoveEvent(QMouseEvent *event)
-{
-//    m_coordX->setText(QString("X-axis: %1").arg(m_pChart->mapToValue(event->pos()).x()));
-//    m_coordY->setText(QString("Y-axis: %1").arg(m_pChart->mapToValue(event->pos()).y()));
-//    QWidget::mouseMoveEvent(event);
 }
 
 
@@ -183,7 +164,6 @@ void Spline::mouseMoveEvent(QMouseEvent *event)
 void Spline::connectMarkers()
 {
     // Connect line thresholds to handler
-
     foreach (QLegendMarker* marker, m_pChart->legend()->markers())
     {
     // Disconnect possible existing connection to avoid multiple connections
@@ -204,9 +184,6 @@ void Spline::handleMarker()
     {
         case QLegendMarker::LegendMarkerTypeXY:
         {
-        // Toggle visibility of series
-        //marker->series()->setVisible(!marker->series()->isVisible());
-
         // Turn legend marker back to visible, since hiding series also hides the marker
         // and we don't want it to happen now.
         marker->setVisible(false);
