@@ -115,6 +115,11 @@ void Spline::mousePressEvent(QMouseEvent *event)
         QVector<QPointF> middlePoint = middleThreshold->pointsVector(); //Point values need to be updated before tested and displayed on the widget
         QVector<QPointF> rightPoint = rightThreshold->pointsVector();
         QVector<QPointF> leftPoint = leftThreshold->pointsVector();
+
+        double emitLeft = (leftPoint[0].x() * (pow(10, resultExponentValues[0])));
+        double emitMiddle = (middlePoint[0].x() * (pow(10, resultExponentValues[0])));
+        double emitRight = (rightPoint[0].x() * (pow(10, resultExponentValues[0])));
+
         if (event->buttons() == Qt::LeftButton)
         {
             leftPoint = verticalLine->pointsVector();
@@ -126,13 +131,15 @@ void Spline::mousePressEvent(QMouseEvent *event)
                 m_pChart->addSeries(leftThreshold);
                 connectMarkers();
                 m_pChart->createDefaultAxes();
-                emit borderChanged(leftPoint[0].x(), middlePoint[0].x(), rightPoint[0].x());
+                emitLeft = (leftPoint[0].x() * (pow(10, resultExponentValues[0])));
+                emit borderChanged(emitLeft, emitMiddle, emitRight);
+                qDebug()<< "Border changed = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
             }
         }
         if (event->buttons() == Qt::MiddleButton)
         {
             middlePoint = verticalLine->pointsVector();
-            if((middlePoint[0].x() > leftPoint[0].x()) && (middlePoint[0].x()  <= rightPoint[0].x()))
+            if((middlePoint[0].x() > leftPoint[0].x()) && (middlePoint[0].x()  < rightPoint[0].x()))
             {
                 m_pChart->removeSeries(middleThreshold);
                 middleThreshold=verticalLine;
@@ -140,12 +147,15 @@ void Spline::mousePressEvent(QMouseEvent *event)
                 m_pChart->addSeries(middleThreshold);
                 connectMarkers();
                 m_pChart->createDefaultAxes();
+                emitMiddle = (middlePoint[0].x() * (pow(10, resultExponentValues[0])));
+                emit borderChanged(emitLeft, emitMiddle, emitRight);
+                qDebug()<< "Border changed = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
             }
         }
         if (event->buttons() == Qt::RightButton)
         {
             rightPoint = verticalLine->pointsVector();
-            if((rightPoint[0].x() > leftPoint[0].x()) && (rightPoint[0].x()  >= middlePoint[0].x()))
+            if((rightPoint[0].x() > leftPoint[0].x()) && (rightPoint[0].x()  > middlePoint[0].x()))
             {
                 m_pChart->removeSeries(rightThreshold);
                 rightThreshold=verticalLine;
@@ -153,6 +163,9 @@ void Spline::mousePressEvent(QMouseEvent *event)
                 m_pChart->addSeries(rightThreshold);
                 connectMarkers();
                 m_pChart->createDefaultAxes();
+                emitRight = (rightPoint[0].x() * (pow(10, resultExponentValues[0])));
+                emit borderChanged(emitLeft, emitMiddle, emitRight);
+                qDebug()<< "Border changed = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
             }
         }
     }
@@ -163,14 +176,20 @@ void Spline::mousePressEvent(QMouseEvent *event)
 
 void Spline::connectMarkers()
 {
-    // Connect line thresholds to handler
-    foreach (QLegendMarker* marker, m_pChart->legend()->markers())
+//    QLegendMarker* leftMarker = m_pChart->legend()->markers(leftThreshold);
+//    QLegendMarker* middleMarker = m_pChart->legend()->markers(middleThreshold);
+//    QLegendMarker* rightMarker = m_pChart->legend()->markers(rightThreshold);
+    foreach(QLegendMarker* marker, m_pChart->legend()->markers())
     {
-    // Disconnect possible existing connection to avoid multiple connections
-    QObject::disconnect(marker, SIGNAL(clicked()), this, SLOT(handleMarker()));
-    QObject::connect(marker, SIGNAL(clicked()), this, SLOT(handleMarker()));
-    m_pChart->legend()->isVisible();
+        QObject::disconnect(marker, SIGNAL(clicked()), this, SLOT(handleMarker()));
+        QObject::connect(marker, SIGNAL(clicked()), SLOT(handleMarker()));
     }
+
+//    QObject::disconnect(middleMarker, 0, this, SLOT(handleMarker()));
+//    QObject::connect(middleMarker, 0, this, SLOT(handleMarker()));
+//    QObject::disconnect(rightMarker, 0, this, SLOT(handleMarker()));
+//    QObject::connect(rightMarker, 0, this, SLOT(handleMarker()));
+
 }
 
 
@@ -184,9 +203,7 @@ void Spline::handleMarker()
     {
         case QLegendMarker::LegendMarkerTypeXY:
         {
-        // Turn legend marker back to visible, since hiding series also hides the marker
-        // and we don't want it to happen now.
-        marker->setVisible(false);
+            marker->setVisible(false);
         }
     }
 }

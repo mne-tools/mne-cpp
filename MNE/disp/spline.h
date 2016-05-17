@@ -113,6 +113,7 @@ class DISPSHARED_EXPORT Spline
     double minAxisX,
            maxAxisX;
     int maximumFrequency;
+    Eigen::VectorXi resultExponentValues;
 public:
 
     //=========================================================================================================
@@ -224,7 +225,6 @@ template<typename T>
   void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData, int iPrecisionValue)
 {
       Eigen::VectorXd resultDisplayValues;
-      Eigen::VectorXi resultExponentValues;
       int iClassAmount = matClassFrequencyData.rows();
       this->splitCoefficientAndExponent (matClassLimitData, iClassAmount, resultDisplayValues, resultExponentValues);
 
@@ -262,7 +262,7 @@ template<typename T>
       leftThreshold->append(minAxisX, 0);       //initialize threshold lines
       middleThreshold->append(maxAxisX, 0);
       rightThreshold->append(maxAxisX, 0);
-      leftThreshold->setVisible(false);
+      leftThreshold->setVisible(false);         //create a clean histogram
       middleThreshold->setVisible(false);
       rightThreshold->setVisible(false);
       m_pChart->legend()->setVisible(true);
