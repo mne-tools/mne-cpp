@@ -113,6 +113,8 @@ class DISPSHARED_EXPORT Spline
     double minAxisX,
            maxAxisX;
     int maximumFrequency;
+    int i = 0;
+    QLegendMarker* marker;
     Eigen::VectorXi resultExponentValues;
 public:
 
@@ -144,10 +146,6 @@ public:
 
 
     //=========================================================================================================
-
-public slots:
-void connectMarkers();
-void handleMarker();
 
 private:
     QChart*             m_pChart;
