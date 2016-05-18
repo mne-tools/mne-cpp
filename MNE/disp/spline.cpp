@@ -63,7 +63,7 @@ using namespace DISPLIB;
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
-//=============================================================================================================Bar::Bar(const VectorXd& matClassLimitData, VectorXi& matClassFrequencyData, int iPrecisionValue)
+//=============================================================================================================
 
 Spline::Spline(const QString& title, QWidget* parent)
 :  QWidget(parent),
@@ -76,15 +76,6 @@ Spline::Spline(const QString& title, QWidget* parent)
     m_pChart->setAnimationOptions(QChart::SeriesAnimations);
     m_pChart->setAcceptHoverEvents(false);
 
-/** The following contains the code to track mouse position and return the value of X and Y axis (does not work as intended as of 13 May 2016)
-*    m_coordX = new QGraphicsSimpleTextItem(m_pChart);
-*    m_coordX->setPos(m_pChart->size().width()/2 + 20, m_pChart->size().height());
-*    m_coordX->setText("X-axis: ");
-*   m_coordY = new QGraphicsSimpleTextItem(m_pChart);
-*    m_coordY->setPos(m_pChart->size().width()/2 + 20, m_pChart->size().height() + 20);
-*    m_coordY->setText("Y-axis: ");
-*    this->setMouseTracking(true);
-**/
     QChartView *chartView = new QChartView(m_pChart);
     chartView->setRenderHint(QPainter::Antialiasing);
 
@@ -108,7 +99,6 @@ void Spline::mousePressEvent(QMouseEvent *event)
     verticalLine -> append(localX.x(), 0);
     verticalLine -> append(localX.x(), maximumFrequency);
     double boundaryX = double(localX.x());       //casting localX.x() from float to double for comparison with minAxisX and maxAxisX
-    //QLineSeries *temporaryValue = new QLineSeries();
 
     if((boundaryX >= float(minAxisX)) && (boundaryX <= float(maxAxisX)))  //this condition ensures that threshold lines can only be created within the boundary of the chart
     {
@@ -128,8 +118,9 @@ void Spline::mousePressEvent(QMouseEvent *event)
                 m_pChart->removeSeries(leftThreshold);
                 leftThreshold=verticalLine;
                 leftThreshold->setColor("red");
+                leftThreshold->setName("left threshold");
                 m_pChart->addSeries(leftThreshold);
-                connectMarkers();
+                m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
                 m_pChart->createDefaultAxes();
                 emitLeft = (leftPoint[0].x() * (pow(10, resultExponentValues[0])));
                 emit borderChanged(emitLeft, emitMiddle, emitRight);
@@ -145,7 +136,9 @@ void Spline::mousePressEvent(QMouseEvent *event)
                 middleThreshold=verticalLine;
                 middleThreshold->setColor("green");
                 m_pChart->addSeries(middleThreshold);
-                connectMarkers();
+
+                m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
+
                 m_pChart->createDefaultAxes();
                 emitMiddle = (middlePoint[0].x() * (pow(10, resultExponentValues[0])));
                 emit borderChanged(emitLeft, emitMiddle, emitRight);
@@ -161,7 +154,9 @@ void Spline::mousePressEvent(QMouseEvent *event)
                 rightThreshold=verticalLine;
                 rightThreshold->setColor("blue");
                 m_pChart->addSeries(rightThreshold);
-                connectMarkers();
+
+                m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
+
                 m_pChart->createDefaultAxes();
                 emitRight = (rightPoint[0].x() * (pow(10, resultExponentValues[0])));
                 emit borderChanged(emitLeft, emitMiddle, emitRight);
@@ -169,43 +164,8 @@ void Spline::mousePressEvent(QMouseEvent *event)
             }
         }
     }
-}
 
-
-//*************************************************************************************************************
-
-void Spline::connectMarkers()
-{
-//    QLegendMarker* leftMarker = m_pChart->legend()->markers(leftThreshold);
-//    QLegendMarker* middleMarker = m_pChart->legend()->markers(middleThreshold);
-//    QLegendMarker* rightMarker = m_pChart->legend()->markers(rightThreshold);
-    foreach(QLegendMarker* marker, m_pChart->legend()->markers())
-    {
-        QObject::disconnect(marker, SIGNAL(clicked()), this, SLOT(handleMarker()));
-        QObject::connect(marker, SIGNAL(clicked()), SLOT(handleMarker()));
-    }
-
-//    QObject::disconnect(middleMarker, 0, this, SLOT(handleMarker()));
-//    QObject::connect(middleMarker, 0, this, SLOT(handleMarker()));
-//    QObject::disconnect(rightMarker, 0, this, SLOT(handleMarker()));
-//    QObject::connect(rightMarker, 0, this, SLOT(handleMarker()));
-
-}
-
-
-//*************************************************************************************************************
-
-void Spline::handleMarker()
-{
-    QLegendMarker* marker = qobject_cast<QLegendMarker*> (sender());
-    Q_ASSERT(marker);
-    switch (marker->type())
-    {
-        case QLegendMarker::LegendMarkerTypeXY:
-        {
-            marker->setVisible(false);
-        }
-    }
+    QWidget::mousePressEvent(event);
 }
 
 
