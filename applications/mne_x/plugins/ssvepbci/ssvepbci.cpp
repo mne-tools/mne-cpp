@@ -90,13 +90,6 @@ ssvepBCI::~ssvepBCI()
         this->stop();
 }
 
-//*************************************************************************************************************
-
-//QSharedPointer<IPlugin> ssvepBCI::clone() const
-//{
-//    QSharedPointer<ssvepBCI> pTMSIClone(new ssvepBCI());
-//    return pTMSIClone;
-//}
 
 //*************************************************************************************************************
 
@@ -114,14 +107,14 @@ void ssvepBCI::init()
     m_bIsRunning = false;
     m_bTriggerActivated = false;
 
-//    // Inputs - Source estimates and sensor level
-//    m_pRTSEInput = PluginInputData<RealTimeSourceEstimate>::create(this, "BCIInSource", "BCI source input data");
-//    connect(m_pRTSEInput.data(), &PluginInputConnector::notify, this, &BCI::updateSource, Qt::DirectConnection);
-//    m_inputConnectors.append(m_pRTSEInput);
+    // Inputs - Source estimates and sensor level
+    m_pRTSEInput = PluginInputData<RealTimeSourceEstimate>::create(this, "BCIInSource", "BCI source input data");
+    connect(m_pRTSEInput.data(), &PluginInputConnector::notify, this, &ssvepBCI::updateSource, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTSEInput);
 
-//    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "BCIInSensor", "SourceLab sensor input data");
-//    connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &BCI::updateSensor, Qt::DirectConnection);
-//    m_inputConnectors.append(m_pRTMSAInput);
+    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "BCIInSensor", "SourceLab sensor input data");
+    connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &ssvepBCI::updateSensor, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTMSAInput);
 
 //    // Output streams
 //    m_pBCIOutputOne = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data One");
@@ -149,17 +142,17 @@ void ssvepBCI::init()
 //    m_pBCIOutputFive->data()->setName("Right electrode");
 //    m_outputConnectors.append(m_pBCIOutputFive);
 
-//    // Delete Buffer - will be initailzed with first incoming data
-//    m_pBCIBuffer_Sensor = CircularMatrixBuffer<double>::SPtr();
-//    m_pBCIBuffer_Source = CircularMatrixBuffer<double>::SPtr();
+    // Delete Buffer - will be initailzed with first incoming data
+    m_pBCIBuffer_Sensor = CircularMatrixBuffer<double>::SPtr();
+    m_pBCIBuffer_Source = CircularMatrixBuffer<double>::SPtr();
 
-//    // Delete fiff info because the initialisation of the fiff info is seen as the first data acquisition from the input stream
-//    m_pFiffInfo_Sensor = FiffInfo::SPtr();
+    // Delete fiff info because the initialisation of the fiff info is seen as the first data acquisition from the input stream
+    m_pFiffInfo_Sensor = FiffInfo::SPtr();
 
 //    // Intitalise GUI stuff
 //    m_bSubtractMean = true;
 //    m_bUseFilter = true;
-//    m_bUseSensorData = true;
+    m_bUseSensorData = true;
 //    m_bUseSourceData = false;
 //    m_bDisplayFeatures = true;
 //    m_bUseArtefactThresholdReduction = false;
@@ -179,13 +172,13 @@ void ssvepBCI::init()
 //    // Initalise sliding window stuff
 //    m_bFillSensorWindowFirstTime = true;
 
-//    // Initialise filter stuff
-//    m_filterOperator = QSharedPointer<FilterData>(new FilterData());
+    // Initialise filter stuff
+    m_filterOperator = QSharedPointer<FilterData>(new FilterData());
 
-//    m_dFilterLowerBound = 7.0;
-//    m_dFilterUpperBound = 14.0;
-//    m_dParcksWidth = m_dFilterLowerBound-1; // (m_dFilterUpperBound-m_dFilterLowerBound)/2;
-//    m_iFilterOrder = 256;
+    m_dFilterLowerBound = 7.0;
+    m_dFilterUpperBound = 14.0;
+    m_dParcksWidth = m_dFilterLowerBound-1; // (m_dFilterUpperBound-m_dFilterLowerBound)/2;
+    m_iFilterOrder = 256;
 
 //    // Init BCIFeatureWindow for visualization
 //    m_BCIFeatureWindow = QSharedPointer<BCIFeatureWindow>(new BCIFeatureWindow(this));
@@ -229,12 +222,12 @@ bool ssvepBCI::start()
 //        m_BCIFeatureWindow->show();
 //    }
 
-//    // Init debug output stream
-//    QString path("BCIDebugFile.txt");
-//    path.prepend(m_qStringResourcePath);
-//    m_outStreamDebug.open(path.toStdString(), ios::trunc);
+    // Init debug output stream
+    QString path("BCIDebugFile.txt");
+    path.prepend(m_qStringResourcePath);
+    m_outStreamDebug.open(path.toStdString(), ios::trunc);
 
-//    m_pFiffInfo_Sensor = FiffInfo::SPtr();
+    m_pFiffInfo_Sensor = FiffInfo::SPtr();
 
 //    m_bFillSensorWindowFirstTime = true;
 
@@ -286,9 +279,9 @@ bool ssvepBCI::start()
 ////    m_pBCIOutputFive->data()->setMaxValue(10e-04);
 ////    m_pBCIOutputFive->data()->setMinValue(-10e-04);
 
-//    m_bIsRunning = true;
+    m_bIsRunning = true;
 
-//    QThread::start();
+    QThread::start();
 
     return true;
 }
@@ -300,34 +293,34 @@ bool ssvepBCI::stop()
 {
     m_bIsRunning = false;
 
-//    // Get data buffers out of idle state if they froze in the acquire or release function
-//    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
+    // Get data buffers out of idle state if they froze in the acquire or release function
+    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
 
-//    if(m_bProcessData) // Only clear if buffers have been initialised
-//    {
-//        m_pBCIBuffer_Sensor->releaseFromPop();
-//        m_pBCIBuffer_Sensor->releaseFromPush();
-//        //    m_pBCIBuffer_Source->releaseFromPop();
-//        //    m_pBCIBuffer_Source->releaseFromPush();
-//    }
+    if(m_bProcessData) // Only clear if buffers have been initialised
+    {
+        m_pBCIBuffer_Sensor->releaseFromPop();
+        m_pBCIBuffer_Sensor->releaseFromPush();
+        //    m_pBCIBuffer_Source->releaseFromPop();
+        //    m_pBCIBuffer_Source->releaseFromPush();
+    }
 
-//    // Stop filling buffers with data from the inputs
-//    m_bProcessData = false;
+    // Stop filling buffers with data from the inputs
+    m_bProcessData = false;
 
 //    // Reset trigger
 //    m_bTriggerActivated = false;
 
-//    // Clear stream
-//    m_outStreamDebug.close();
-//    m_outStreamDebug.clear();
+    // Clear stream
+    m_outStreamDebug.close();
+    m_outStreamDebug.clear();
 
 //    // Hide feature visualization window
 //    if(m_bDisplayFeatures)
 //        m_BCIFeatureWindow->hide();
 
-//    // Delete all features and classification results
-//    clearFeatures();
-//    clearClassifications();
+    // Delete all features and classification results
+    clearFeatures();
+    clearClassifications();
 
     return true;
 }
@@ -366,69 +359,73 @@ QWidget* ssvepBCI::setupWidget()
 
 void ssvepBCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
-//    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
-//    if(pRTMSA)
-//    {
-//        //Check if buffer initialized
-//        if(!m_pBCIBuffer_Sensor)
-//            m_pBCIBuffer_Sensor = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
+    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+    if(pRTMSA)
+    {
+        //Check if buffer initialized
+        if(!m_pBCIBuffer_Sensor)
+            m_pBCIBuffer_Sensor = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
 
-//        // Load Fiff information on sensor level
-//        if(!m_pFiffInfo_Sensor)
-//        {
-//            m_pFiffInfo_Sensor = pRTMSA->getFiffInfo();
+        // Load Fiff information on sensor level
+        if(!m_pFiffInfo_Sensor)
+        {
+            //m_pFiffInfo_Sensor = pRTMSA->getFiffInfo();
+            m_pFiffInfo_Sensor = pRTMSA->info(); //new command is called info() instead of getFiffInfo() ?
 
-//            // Adjust working matrixes (sliding window and time between windows matrix) size so that the samples from the tmsi plugin stream fit in the matrix perfectly
-//            int arraySize = pRTMSA->getMultiArraySize();
-//            int modulo = int(m_pFiffInfo_Sensor->sfreq*m_dSlidingWindowSize) % arraySize;
-//            int rows = m_slChosenFeatureSensor.size();
-//            int cols = m_pFiffInfo_Sensor->sfreq*m_dSlidingWindowSize-modulo;
-//            m_matSlidingWindowSensor.resize(rows, cols);
+            // Adjust working matrixes (sliding window and time between windows matrix) size so that the samples from the tmsi plugin stream fit in the matrix perfectly
+            int arraySize = pRTMSA->getMultiArraySize();
+            int modulo = int(m_pFiffInfo_Sensor->sfreq*m_dSlidingWindowSize) % arraySize;
+            int rows = m_slChosenFeatureSensor.size();
+            int cols = m_pFiffInfo_Sensor->sfreq*m_dSlidingWindowSize-modulo;
+            m_matSlidingWindowSensor.resize(rows, cols);
 
-//            m_matStimChannelSensor.resize(1,cols);
+            m_matStimChannelSensor.resize(1,cols);
 
-//            modulo = int(m_pFiffInfo_Sensor->sfreq*m_dTimeBetweenWindows) % arraySize;
-//            rows = m_slChosenFeatureSensor.size();
-//            cols = m_pFiffInfo_Sensor->sfreq*m_dTimeBetweenWindows-modulo;
-//            m_matTimeBetweenWindowsSensor.resize(rows, cols);
+            modulo = int(m_pFiffInfo_Sensor->sfreq*m_dTimeBetweenWindows) % arraySize;
+            rows = m_slChosenFeatureSensor.size();
+            cols = m_pFiffInfo_Sensor->sfreq*m_dTimeBetweenWindows-modulo;
+            m_matTimeBetweenWindowsSensor.resize(rows, cols);
 
-//            m_matTimeBetweenWindowsStimSensor.resize(1,cols);
+            m_matTimeBetweenWindowsStimSensor.resize(1,cols);
 
-//            // Build filter operator
-//            double dCenterFreqNyq = (m_dFilterLowerBound+((m_dFilterUpperBound - m_dFilterLowerBound)/2))/(m_pFiffInfo_Sensor->sfreq/2);
-//            double dBandwidthNyq = (m_dFilterUpperBound - m_dFilterLowerBound)/(m_pFiffInfo_Sensor->sfreq/2);
-//            double dParksWidth = m_dParcksWidth/(m_pFiffInfo_Sensor->sfreq/2);
+            // Build filter operator
+            double dCenterFreqNyq = (m_dFilterLowerBound+((m_dFilterUpperBound - m_dFilterLowerBound)/2))/(m_pFiffInfo_Sensor->sfreq/2);
+            double dBandwidthNyq = (m_dFilterUpperBound - m_dFilterLowerBound)/(m_pFiffInfo_Sensor->sfreq/2);
+            double dParksWidth = m_dParcksWidth/(m_pFiffInfo_Sensor->sfreq/2);
 
 ////            // Calculate needed fft length
 ////            int exponent = ceil(log10(m_matSlidingWindowSensor.cols())/log10(2));
 ////            int fftLength = pow(2,exponent+1);
 
-//            // Initialise filter operator
-//            m_filterOperator = QSharedPointer<FilterData>(new FilterData(QString("BPF"),FilterData::BPF,m_iFilterOrder,dCenterFreqNyq,dBandwidthNyq,dParksWidth,m_matSlidingWindowSensor.cols()+m_iFilterOrder)); // letztes Argument muss 2er potenz sein - fft länge
+            // Initialise filter operator
+            m_filterOperator = QSharedPointer<FilterData>(new FilterData(QString("BPF"),FilterData::BPF,m_iFilterOrder,dCenterFreqNyq,dBandwidthNyq,dParksWidth,m_matSlidingWindowSensor.cols()+m_iFilterOrder)); // letztes Argument muss 2er potenz sein - fft länge
 
-//            // Write filter coefficients to debug file
-//            for(int i = 0; i<m_filterOperator->m_dCoeffA.cols(); i++)
-//                m_outStreamDebug << m_filterOperator->m_dFFTCoeffA(0,i).real() <<"+" << m_filterOperator->m_dFFTCoeffA(0,i).imag() << "i "  << endl;
+            // Write filter coefficients to debug file
+            for(int i = 0; i<m_filterOperator->m_dCoeffA.cols(); i++)
+                m_outStreamDebug << m_filterOperator->m_dFFTCoeffA(0,i).real() <<"+" << m_filterOperator->m_dFFTCoeffA(0,i).imag() << "i "  << endl;
 
-//            m_outStreamDebug << endl << endl;
+            m_outStreamDebug << endl << endl;
 
-//            for(int i = 0; i<m_filterOperator->m_dCoeffA.cols(); i++)
-//                m_outStreamDebug << m_filterOperator->m_dCoeffA(0,i) << endl;
+            for(int i = 0; i<m_filterOperator->m_dCoeffA.cols(); i++)
+                m_outStreamDebug << m_filterOperator->m_dCoeffA(0,i) << endl;
 
-//            m_outStreamDebug << "---------------------------------------------------------------------" << endl;
-//        }
+            m_outStreamDebug << "---------------------------------------------------------------------" << endl;
+        }
 
-//        // Only process data when fiff info has been initialised in run() method
-//        if(m_bProcessData)
-//        {
-//            MatrixXd t_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
+        // Only process data when fiff info has been initialised in run() method
+        if(m_bProcessData)
+        {
+            MatrixXd t_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
 
-//            for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i)
-//                t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
+            for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i)
+                t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
 
-//            m_pBCIBuffer_Sensor->push(&t_mat);
-//        }
-//    }
+
+            m_pBCIBuffer_Sensor->push(&t_mat);
+            qDebug()<< "here";
+        }
+
+    }
 }
 
 
@@ -537,6 +534,16 @@ void ssvepBCI::run()
 
 void ssvepBCI::BCIOnSensorLevel()
 {
+    // Wait for fiff Info if not yet received - this is needed because we have to wait until the buffers are firstly initiated in the update functions
+    while(!m_pFiffInfo_Sensor)
+        msleep(10);
+
+    // Start filling buffers with data from the inputs
+    m_bProcessData = true;
+
+    MatrixXd t_mat = m_pBCIBuffer_Sensor->pop();
+
+    qDebug()<< "hola";
 
 }
 
