@@ -102,6 +102,7 @@ ssvepBCISetupStimulusWidget::ssvepBCISetupStimulusWidget(ssvepBCI* pssvepBCI, QW
     //set Black as scene background color and show Test Screen
     m_pView->setBackgroundBrush(QBrush(Qt::black, Qt::SolidPattern));
     m_pTestScreen->showFullScreen();
+
 }
 
 //*************************************************************************************************************

@@ -154,8 +154,9 @@ void FlashObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
+    painter->fillRect(m_iPosX, m_iPosY, this->boundingRect().width(), this->boundingRect().height(),Qt::white);
     //Plot shadow
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(Qt::white);
-    painter->drawRect(m_iPosX, m_iPosY, this->boundingRect().width(), this->boundingRect().height());
+//    painter->setPen(Qt::NoPen);
+//    painter->setBrush(Qt::white);
+//    painter->drawRect(m_iPosX, m_iPosY, this->boundingRect().width(), this->boundingRect().height());
 }

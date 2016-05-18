@@ -53,7 +53,7 @@
 #include <xMeas/newrealtimemultisamplearray.h>
 #include <xMeas/realtimesourceestimate.h>
 
-//#include <utils/filterdata.h>
+#include <utils/FilterTools/filterdata.h>
 
 #include <fstream>
 
@@ -231,35 +231,8 @@ private:
 
     QSharedPointer<ssvepBCISetupStimulusWidget>         m_pssvepBCISetupStimulusWidget; /**< Widget for stimulus setup */
 
-
-
-
-
-
-    // old privates
-    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputOne;        /**< The first RealTimeSampleArray of the BCI output.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputTwo;        /**< The second RealTimeSampleArray of the BCI output.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputThree;      /**< The third RealTimeSampleArray of the BCI output.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputFour;       /**< The fourth RealTimeSampleArray of the BCI output.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputFive;       /**< The fifth RealTimeSampleArray of the BCI output.*/
-
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
     PluginInputData<RealTimeSourceEstimate>::SPtr       m_pRTSEInput;           /**< The RealTimeSourceEstimate input.*/
-
-    CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Sensor;    /**< Holds incoming sensor level data.*/
-    CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Source;    /**< Holds incoming source level data.*/
-
-//    QSharedPointer<FilterData>                          m_filterOperator;       /**< Holds filter with specified properties by the user.*/
-
-//    QSharedPointer<BCIFeatureWindow>                    m_BCIFeatureWindow;     /**< Holds pointer to BCIFeatureWindow for visualization purposes.*/
-
-    ofstream                m_outStreamDebug;                   /**< Outputstream to generate debug file.*/
-
-    bool                    m_bIsRunning;                       /**< Whether BCI is running.*/
-    QString                 m_qStringResourcePath;              /**< The path to the BCI resource directory.*/
-    bool                    m_bProcessData;                     /**< Whether BCI is to get data out of the continous input data stream, i.e. the EEG data from sensor level.*/
-    bool                    m_bTriggerActivated;                /**< Whether the trigger was activated.*/
-    QMutex                  m_qMutex;                           /**< QMutex to guarantee thread safety.*/
 
     // Sensor level
     FiffInfo::SPtr          m_pFiffInfo_Sensor;                 /**< Sensor level: Fiff information for sensor data. */
@@ -276,6 +249,34 @@ private:
     QList<double>           m_lClassResultsSensor;              /**< Sensor level: Classification results on sensor level. */
     MatrixXd                m_matStimChannelSensor;             /**< Sensor level: Stim channel. */
     MatrixXd                m_matTimeBetweenWindowsStimSensor;  /**< Sensor level: Stim channel. */
+
+
+
+
+
+    // old privates
+    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputOne;        /**< The first RealTimeSampleArray of the BCI output.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputTwo;        /**< The second RealTimeSampleArray of the BCI output.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputThree;      /**< The third RealTimeSampleArray of the BCI output.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputFour;       /**< The fourth RealTimeSampleArray of the BCI output.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputFive;       /**< The fifth RealTimeSampleArray of the BCI output.*/
+
+
+    CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Sensor;    /**< Holds incoming sensor level data.*/
+    CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Source;    /**< Holds incoming source level data.*/
+
+    QSharedPointer<FilterData>                          m_filterOperator;       /**< Holds filter with specified properties by the user.*/
+
+//    QSharedPointer<BCIFeatureWindow>                    m_BCIFeatureWindow;     /**< Holds pointer to BCIFeatureWindow for visualization purposes.*/
+
+    ofstream                m_outStreamDebug;                   /**< Outputstream to generate debug file.*/
+
+    bool                    m_bIsRunning;                       /**< Whether BCI is running.*/
+    QString                 m_qStringResourcePath;              /**< The path to the BCI resource directory.*/
+    bool                    m_bProcessData;                     /**< Whether BCI is to get data out of the continous input data stream, i.e. the EEG data from sensor level.*/
+    bool                    m_bTriggerActivated;                /**< Whether the trigger was activated.*/
+    QMutex                  m_qMutex;                           /**< QMutex to guarantee thread safety.*/
+
 
     // Source level
     QVector< VectorXd >     m_vLoadedSourceBoundary;            /**< Source level: Loaded decision boundary on source level. */
