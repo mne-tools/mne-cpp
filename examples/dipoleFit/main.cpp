@@ -1065,27 +1065,138 @@ fwdCoilSet fwd_create_meg_coils(fwdCoilSet      set,      /* These are the avail
                 FiffCoordTrans* t)	  /* Transform the points using this */
 
 {
-  fwdCoilSet res = fwd_new_coil_set();
-  fwdCoil    next;
-  int        k;
 
-  qDebug() << "[1]";
+    fwdCoilSet res = fwd_new_coil_set();
+    fwdCoil    next;
+    int        k;
 
-  for (k = 0; k < nch; k++) {
-    if ((next = fwd_create_meg_coil(set,chs[k],acc,t)) == NULL)
-      goto bad;
-    res->coils = REALLOC(res->coils,res->ncoil+1,fwdCoil);
-    res->coils[res->ncoil++] = next;
-  }
-  if (t)
-    res->coord_frame = t->to;
-  return res;
+    for (k = 0; k < nch; k++) {
+        if ((next = fwd_create_meg_coil(set,chs[k],acc,t)) == NULL)
+            goto bad;
 
- bad : {
-    fwd_free_coil_set(res);
-    return NULL;
-  }
+        res->coils = REALLOC(res->coils,res->ncoil+1,fwdCoil);
+        res->coils[res->ncoil++] = next;
+    }
+    if (t)
+        res->coord_frame = t->to;
+    return res;
+
+    bad : {
+        fwd_free_coil_set(res);
+        return NULL;
+    }
 }
+
+
+
+fwdCoil fwd_create_eeg_el(  FiffChInfo*     ch,         /* Channel information to use */
+                            FiffCoordTrans* t)     /* Transform the points using this */
+/*
+* Create an electrode definition. Transform coordinate frame if so desired.
+*/
+{
+    fwdCoil    res = NULL;
+    int        c;
+
+    if (ch->kind != FIFFV_EEG_CH) {
+        qDebug() << "(%s is not an EEG channel. Cannot create an electrode definition.,ch->ch_name)" << ch->ch_name;
+        goto bad;
+    }
+    if (t && t->from != FIFFV_COORD_HEAD) {
+        qDebug() << "err_printf_set_error(Inappropriate coordinate transformation in fwd_create_eeg_el)";
+        goto bad;
+    }
+
+    float vec_len = sqrt(ch->loc[3]*ch->loc[3] + ch->loc[4]*ch->loc[4] + ch->loc[5]*ch->loc[5]); //VEC_LEN(ch->chpos.ex)
+    if ( vec_len < 1e-4)
+        res = fwd_new_coil(1);          /* No reference electrode */
+    else
+        res = fwd_new_coil(2);          /* Reference electrode present */
+
+    res->chname     = mne_strdup(ch->ch_name.toLatin1().data());
+    res->desc       = mne_strdup("EEG electrode");
+    res->coil_class = FWD_COILC_EEG;
+    res->accuracy   = FWD_COIL_ACCURACY_NORMAL;
+    res->type       = ch->coil_type;//ch->chpos.coil_type;
+//    VEC_COPY(res->r0,ch->chpos.r0);
+    res->r0[0] = ch->loc(0);
+    res->r0[1] = ch->loc(1);
+    res->r0[2] = ch->loc(2);
+//    VEC_COPY(res->ex,ch->chpos.ex);
+    res->ex[0] = ch->loc(3);
+    res->ex[1] = ch->loc(4);
+    res->ex[2] = ch->loc(5);
+    /*
+    * Optional coordinate transformation
+    */
+    if (t) {
+        fiff_coord_trans(res->r0,t,FIFFV_MOVE);
+        fiff_coord_trans(res->ex,t,FIFFV_MOVE);
+        res->coord_frame = t->to;
+    }
+    else
+        res->coord_frame = FIFFV_COORD_HEAD;
+    /*
+    * The electrode location
+    */
+    for (c = 0; c < 3; c++)
+        res->rmag[0][c] = res->cosmag[0][c] = res->r0[c];
+    normalize(res->cosmag[0]);
+    res->w[0] = 1.0;
+    /*
+    * Add the reference electrode, if appropriate
+    */
+    if (res->np == 2) {
+        for (c = 0; c < 3; c++)
+            res->rmag[1][c] = res->cosmag[1][c] = res->ex[c];
+        normalize(res->cosmag[1]);
+        res->w[1] = -1.0;
+    }
+    return res;
+
+    bad : {
+        return NULL;
+    }
+}
+
+
+fwdCoilSet fwd_create_eeg_els(  QList<FiffChInfo> chs,      /* Channel information to use */
+                                int start,
+                                int             nch,
+                                FiffCoordTrans* t )     /* Transform the points using this */
+
+{
+    fwdCoilSet res = fwd_new_coil_set();
+    fwdCoil    next;
+    int        k;
+
+    for (k = start; k < start+nch; k++) {
+        if ((next = fwd_create_eeg_el(&chs[k],t)) == NULL)
+            goto bad;
+        res->coils = REALLOC(res->coils,res->ncoil+1,fwdCoil);
+        res->coils[res->ncoil++] = next;
+    }
+    if (t)
+        res->coord_frame = t->to;
+    return res;
+
+    bad : {
+        fwd_free_coil_set(res);
+        return NULL;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1165,7 +1276,7 @@ static void free_dipole_fit_funcs(dipoleFitFuncs f)
 
 dipoleFitData new_dipole_fit_data()
 {
-  dipoleFitData res = MALLOC(1,dipoleFitDataRec);
+  dipoleFitData res = new dipoleFitDataRec();//MALLOC(1,dipoleFitDataRec);
 
 //  res->mri_head_t    = NULL;
 //  res->meg_head_t    = NULL;
@@ -1246,6 +1357,42 @@ dipoleFitData new_dipole_fit_data()
 
 
 
+//fwdEegSphereModel setup_eeg_sphere_model(char  *eeg_model_file,   /* Contains the model specifications */
+//					 char  *eeg_model_name,	  /* Name of the model to use */
+//					 float eeg_sphere_rad)    /* Outer surface radius */
+//     /*
+//      * Set up the desired sphere model for EEG
+//      */
+//{
+//  fwdEegSphereModelSet eeg_models = NULL;
+//  fwdEegSphereModel    eeg_model  = NULL;
+
+//  if (!eeg_model_name)
+//    eeg_model_name = mne_strdup("Default");
+//  else
+//    eeg_model_name = mne_strdup(eeg_model_name);
+
+//  eeg_models = fwd_load_eeg_sphere_models(eeg_model_file,NULL);
+//  fwd_list_eeg_sphere_models(stderr,eeg_models);
+
+//  if ((eeg_model = fwd_select_eeg_sphere_model(eeg_model_name,eeg_models)) == NULL)
+//    goto bad;
+//  if (fwd_setup_eeg_sphere_model(eeg_model,eeg_sphere_rad,TRUE,3) == FAIL)
+//    goto bad;
+//  fprintf(stderr,"Using EEG sphere model \"%s\" with scalp radius %7.1f mm\n",
+//	  eeg_model->name,1000*eeg_sphere_rad);
+//  fprintf(stderr,"\n");
+//  FREE(eeg_model_name);
+//  fwd_free_eeg_sphere_model_set(eeg_models);
+//  return eeg_model;
+
+//  bad : {
+//    fwd_free_eeg_sphere_model_set(eeg_models);
+//    fwd_free_eeg_sphere_model(eeg_model);
+//    FREE(eeg_model_name);
+//    return NULL;
+//  }
+//}
 
 
 
@@ -1334,43 +1481,43 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
 //    goto bad;
 
 //    if (res->nmeg > 0)
-//    fprintf(stderr,"Will use %3d MEG channels from %s\n",res->nmeg,measname);
+//        fprintf(stderr,"Will use %3d MEG channels from %s\n",res->nmeg,measname);
 //    if (res->neeg > 0)
-//    fprintf(stderr,"Will use %3d EEG channels from %s\n",res->neeg,measname);
+//        fprintf(stderr,"Will use %3d EEG channels from %s\n",res->neeg,measname);
 //    {
-//    char *s = mne_channel_names_to_string(res->chs,res->nmeg+res->neeg);
-//    int  n;
-//    mne_string_to_name_list(s,&res->ch_names,&n);
+//        char *s = mne_channel_names_to_string(res->chs,res->nmeg+res->neeg);
+//        int  n;
+//        mne_string_to_name_list(s,&res->ch_names,&n);
 //    }
 //    /*
 //    * Make coil definitions
 //    */
 //    res->coord_frame = coord_frame;
 //    if (coord_frame == FIFFV_COORD_HEAD) {
-//    #ifdef USE_SHARE_PATH
-//    char *coilfile = mne_compose_mne_name("share/mne","coil_def.dat");
-//    #else
-//    char *coilfile = mne_compose_mne_name("setup/mne","coil_def.dat");
-//    #endif
+//        #ifdef USE_SHARE_PATH
+//            char *coilfile = mne_compose_mne_name("share/mne","coil_def.dat");
+//        #else
+//            char *coilfile = mne_compose_mne_name("setup/mne","coil_def.dat");
+//        #endif
 
-//    if (!coilfile)
-//    goto bad;
-//    if ((templates = fwd_read_coil_defs(coilfile)) == NULL) {
-//    FREE(coilfile);
-//    goto bad;
-//    }
+//        if (!coilfile)
+//            goto bad;
+//        if ((templates = fwd_read_coil_defs(coilfile)) == NULL) {
+//            FREE(coilfile);
+//            goto bad;
+//        }
 
-//    if ((res->meg_coils = fwd_create_meg_coils(templates,res->chs,res->nmeg,
-//                       accurate_coils ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
-//                       res->meg_head_t)) == NULL)
-//    goto bad;
-//    if ((res->eeg_els = fwd_create_eeg_els(res->chs+res->nmeg,res->neeg,NULL)) == NULL)
-//    goto bad;
-//    fprintf(stderr,"Head coordinate coil definitions created.\n");
+//        if ((res->meg_coils = fwd_create_meg_coils(templates,res->chs,res->nmeg,
+//                           accurate_coils ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
+//                           res->meg_head_t)) == NULL)
+//            goto bad;
+//        if ((res->eeg_els = fwd_create_eeg_els(res->chs+res->nmeg,res->neeg,NULL)) == NULL)
+//            goto bad;
+//        fprintf(stderr,"Head coordinate coil definitions created.\n");
 //    }
 //    else {
-//    err_printf_set_error("Cannot handle computations in %s coordinates",mne_coord_frame_name(coord_frame));
-//    goto bad;
+//        err_printf_set_error("Cannot handle computations in %s coordinates",mne_coord_frame_name(coord_frame));
+//        goto bad;
 //    }
 //    /*
 //    * Forward model setup
@@ -1386,47 +1533,47 @@ dipoleFitData setup_dipole_fit_data(char  *mriname,		 /* This gives the MRI/head
 //    * Compensation data
 //    */
 //    if ((comp_data = mne_read_ctf_comp_data(measname)) == NULL)
-//    goto bad;
+//        goto bad;
 //    if (comp_data->ncomp > 0) {	/* Compensation channel information may be needed */
-//    fiffChInfo comp_chs = NULL;
-//    int        ncomp    = 0;
+//        fiffChInfo comp_chs = NULL;
+//        int        ncomp    = 0;
 
-//    fprintf(stderr,"%d compensation data sets in %s\n",comp_data->ncomp,measname);
-//    if (mne_read_meg_comp_eeg_ch_info(measname,NULL,0,&comp_chs,&ncomp,NULL,NULL,NULL,NULL) == FAIL)
-//    goto bad;
-//    if (ncomp > 0) {
-//    if ((comp_coils = fwd_create_meg_coils(templates,comp_chs,ncomp,
+//        fprintf(stderr,"%d compensation data sets in %s\n",comp_data->ncomp,measname);
+//        if (mne_read_meg_comp_eeg_ch_info(measname,NULL,0,&comp_chs,&ncomp,NULL,NULL,NULL,NULL) == FAIL)
+//            goto bad;
+//        if (ncomp > 0) {
+//            if ((comp_coils = fwd_create_meg_coils(templates,comp_chs,ncomp,
 //                     FWD_COIL_ACCURACY_NORMAL,res->meg_head_t)) == NULL) {
-//    FREE(comp_chs);
-//    goto bad;
-//    }
-//    fprintf(stderr,"%d compensation channels in %s\n",comp_coils->ncoil,measname);
-//    }
-//    FREE(comp_chs);
+//                FREE(comp_chs);
+//                goto bad;
+//            }
+//            fprintf(stderr,"%d compensation channels in %s\n",comp_coils->ncoil,measname);
+//        }
+//        FREE(comp_chs);
 //    }
 //    else {			/* Get rid of the empty data set */
-//    mne_free_ctf_comp_data_set(comp_data);
-//    comp_data = NULL;
+//        mne_free_ctf_comp_data_set(comp_data);
+//        comp_data = NULL;
 //    }
 //    /*
 //    * Ready to set up the forward model
 //    */
 //    if (setup_forward_model(res,comp_data,comp_coils) == FAIL)
-//    goto bad;
+//        goto bad;
 //    res->column_norm = COLUMN_NORM_LOC;
 //    /*
 //    * Projection data should go here
 //    */
 //    if (make_projection(projnames,nproj,res->chs,res->nmeg+res->neeg,&res->proj) == FAIL)
-//    goto bad;
+//        goto bad;
 //    if (res->proj && res->proj->nitems > 0) {
-//    fprintf(stderr,"Final projection operator is:\n");
-//    mne_proj_op_report(stderr,"\t",res->proj);
+//        fprintf(stderr,"Final projection operator is:\n");
+//        mne_proj_op_report(stderr,"\t",res->proj);
 
-//    if (mne_proj_op_chs(res->proj,res->ch_names,res->nmeg+res->neeg) == FAIL)
-//    goto bad;
-//    if (mne_proj_op_make_proj(res->proj) == FAIL)
-//    goto bad;
+//        if (mne_proj_op_chs(res->proj,res->ch_names,res->nmeg+res->neeg) == FAIL)
+//            goto bad;
+//        if (mne_proj_op_make_proj(res->proj) == FAIL)
+//            goto bad;
 //    }
 //    /*
 //    * Noise covariance
@@ -1637,6 +1784,8 @@ int main(int argc, char *argv[])
     std::cout << "sp simplex center" << std::endl << sp_simplex.center() << std::endl;
     std::cout << "sp simplex radius" << std::endl << sp_simplex.radius() << std::endl;
 
+//    fwdEegSphereModel eeg_model, /* EEG sphere model definition */
+
     //<< TODO: Apply transform function move to class
     std::cout << "rr.rows\n" << bem[0].rr.block(0,0,5,3) << std::endl;
     std::cout << "trans.trans\n" << mri_head_t.trans << std::endl;
@@ -1669,26 +1818,37 @@ int main(int argc, char *argv[])
     * Read the channel information
     */
 
-    qDebug() << "[-1]";
+//    if (read_meg_eeg_ch_info(measname,include_meg,include_eeg,badlist,nbad,
+//           &res->chs,&res->nmeg,&res->neeg) != OK)
+//    goto bad;
 
+    res->nmeg = 0;
+    res->neeg = 0;
 
-    qDebug() << "evoked.info.chs.size" << evoked.info.chs.size();
+    QList<FiffChInfo> meg;
+    QList<FiffChInfo> eeg;
+    for (int k = 0; k < evoked.info.chs.size(); k++)
+    {
+        if (evoked.info.chs[k].kind == FIFFV_MEG_CH) {
+            res->nmeg++;
+            meg << evoked.info.chs[k];
+        }
+        else if (evoked.info.chs[k].kind == FIFFV_EEG_CH)/*&& is_valid_eeg_ch(chs+k))*/ {
+            res->neeg++;
+            eeg << evoked.info.chs[k];
+        }
+    }
 
-    res->chs = evoked.info.chs;
+//      mne_merge_channels(meg,nmeg,eeg,neeg,chsp,&nch);
+    res->chs << meg << eeg;
 
     /*
     * Make coil definitions
     */
-
-
-    qDebug() << "[0.0]";
-
     res->coord_frame = coord_frame;
     if (coord_frame == FIFFV_COORD_HEAD) {
 
         QString coilfile("D:/GitHub/mne-cpp/bin/Resources/CoilDefinitions/coil_def.dat");
-
-        qDebug() << "[0.1]";
 
         if ((templates = fwd_read_coil_defs(coilfile.toLatin1().data())) == NULL) {
 //            FREE(coilfile);
@@ -1702,25 +1862,196 @@ int main(int argc, char *argv[])
 //        qDebug() << "coil_class" << templates->coils[i]->coil_class;
 //    }
 
-        qDebug() << "[0.2]";
-
         if ((res->meg_coils = fwd_create_meg_coils(templates,res->chs,res->nmeg,
                        accurate_coils ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
                        &res->meg_head_t)) == NULL) {
             return 0;
         }
 
-
+        if ((res->eeg_els = fwd_create_eeg_els(res->chs,res->nmeg,res->neeg,NULL)) == NULL) {
+            return 0;
+        }
+        printf("Head coordinate coil definitions created.\n");
     }
-
-
-
-
-
-
-//    if(include_eeg) {
-
+    else {
+        qDebug() << "err_printf_set_error(Cannot handle computations in %s coordinates,mne_coord_frame_name(coord_frame))";
+        return 0;
+    }
+    /*
+    * Forward model setup
+    */
+    res->bemname   = mne_strdup(fileBem.fileName().toLatin1().data());
+//    if (sp_simplex.radius() > 0){ //(r0) {
+//        res->r0[0]     = sp_simplex.center()[0];//r0[0];
+//        res->r0[1]     = sp_simplex.center()[1];//r0[1];
+//        res->r0[2]     = sp_simplex.center()[2];//r0[2];
 //    }
+//    res->eeg_model = eeg_model;
+//    /*
+//    * Compensation data
+//    */
+//    if ((comp_data = mne_read_ctf_comp_data(measname)) == NULL)
+//        goto bad;
+//    if (comp_data->ncomp > 0) {	/* Compensation channel information may be needed */
+//        fiffChInfo comp_chs = NULL;
+//        int        ncomp    = 0;
+
+//        fprintf(stderr,"%d compensation data sets in %s\n",comp_data->ncomp,measname);
+//        if (mne_read_meg_comp_eeg_ch_info(measname,NULL,0,&comp_chs,&ncomp,NULL,NULL,NULL,NULL) == FAIL)
+//            goto bad;
+//        if (ncomp > 0) {
+//            if ((comp_coils = fwd_create_meg_coils(templates,comp_chs,ncomp,
+//                     FWD_COIL_ACCURACY_NORMAL,res->meg_head_t)) == NULL) {
+//                FREE(comp_chs);
+//                goto bad;
+//            }
+//            fprintf(stderr,"%d compensation channels in %s\n",comp_coils->ncoil,measname);
+//        }
+//        FREE(comp_chs);
+//    }
+//    else {			/* Get rid of the empty data set */
+//        mne_free_ctf_comp_data_set(comp_data);
+//        comp_data = NULL;
+//    }
+//    /*
+//    * Ready to set up the forward model
+//    */
+//    if (setup_forward_model(res,comp_data,comp_coils) == FAIL)
+//        goto bad;
+//    res->column_norm = COLUMN_NORM_LOC;
+//    /*
+//    * Projection data should go here
+//    */
+//    if (make_projection(projnames,nproj,res->chs,res->nmeg+res->neeg,&res->proj) == FAIL)
+//        goto bad;
+//    if (res->proj && res->proj->nitems > 0) {
+//        fprintf(stderr,"Final projection operator is:\n");
+//        mne_proj_op_report(stderr,"\t",res->proj);
+
+//        if (mne_proj_op_chs(res->proj,res->ch_names,res->nmeg+res->neeg) == FAIL)
+//            goto bad;
+//        if (mne_proj_op_make_proj(res->proj) == FAIL)
+//            goto bad;
+//    }
+
+
+
+//    /*
+//    * Noise covariance
+//    */
+//    if (noisename) {
+//        if ((cov = mne_read_cov(noisename,FIFFV_MNE_SENSOR_COV)) == NULL)
+//            goto bad;
+//        fprintf(stderr,"Read a %s noise-covariance matrix from %s\n",
+//        cov->cov_diag ? "diagonal" : "full", noisename);
+//    }
+//    else {
+//        if ((cov = ad_hoc_noise(res->meg_coils,res->eeg_els,grad_std,mag_std,eeg_std)) == NULL)
+//            goto bad;
+//    }
+//    res->noise = mne_pick_chs_cov_omit(cov,res->ch_names,res->nmeg+res->neeg,TRUE,res->chs);
+//    if (res->noise == NULL) {
+//        mne_free_cov(cov);
+//        goto bad;
+//    }
+//    fprintf(stderr,"Picked appropriate channels from the noise-covariance matrix.\n");
+//    mne_free_cov(cov);
+
+
+
+//    /*
+//    * Apply the projection operator to the noise-covariance matrix
+//    */
+//    if (res->proj && res->proj->nitems > 0 && res->proj->nvec > 0) {
+//        if (mne_proj_op_apply_cov(res->proj,res->noise) == FAIL)
+//            goto bad;
+//        fprintf(stderr,"Projection applied to the covariance matrix.\n");
+//    }
+
+
+
+//    /*
+//    * Force diagonal noise covariance?
+//    */
+//    if (diagnoise) {
+//        mne_revert_to_diag_cov(res->noise);
+//        fprintf(stderr,"Using only the main diagonal of the noise-covariance matrix.\n");
+//    }
+
+
+
+//    /*
+//    * Regularize the possibly deficient noise-covariance matrix
+//    */
+//    if (res->noise->cov) {
+//    float regs[3];
+//    int   do_it;
+
+//    regs[MNE_COV_CH_MEG_MAG]  = mag_reg;
+//    regs[MNE_COV_CH_MEG_GRAD] = grad_reg;
+//    regs[MNE_COV_CH_EEG]      = eeg_reg;
+
+
+
+//    /*
+//    * Classify the channels
+//    */
+//    if (mne_classify_channels_cov(res->noise,res->chs,res->nmeg+res->neeg) == FAIL)
+//        goto bad;
+
+
+
+//    /*
+//    * Do we need to do anything?
+//    */
+//    for (k = 0, do_it = 0; k < res->noise->ncov; k++) {
+//    if (res->noise->ch_class[k] != MNE_COV_CH_UNKNOWN &&
+//    regs[res->noise->ch_class[k]] > 0.0)
+//    do_it++;
+//    }
+
+
+
+
+//    /*
+//    * Apply regularization if necessary
+//    */
+//    if (do_it > 0)
+//    mne_regularize_cov(res->noise,regs);
+//    else
+//    fprintf(stderr,"No regularization applied to the noise-covariance matrix\n");
+//    }
+
+
+
+
+//    /*
+//    * Do the decomposition and check that the matrix is positive definite
+//    */
+//    fprintf(stderr,"Decomposing the noise covariance...\n");
+//    if (res->noise->cov) {
+//    if (mne_decompose_eigen_cov(res->noise) == FAIL)
+//    goto bad;
+//    fprintf(stderr,"Eigenvalue decomposition done.\n");
+//    for (k = 0; k < res->noise->ncov; k++) {
+//    if (res->noise->lambda[k] < 0.0)
+//    res->noise->lambda[k] = 0.0;
+//    }
+//    }
+//    else {
+//    fprintf(stderr,"Decomposition not needed for a diagonal covariance matrix.\n");
+//    if (mne_add_inv_cov(res->noise) == FAIL)
+//    goto bad;
+//    }
+//    mne_free_name_list(badlist,nbad);
+//    fwd_free_coil_set(templates);
+//    fwd_free_coil_set(comp_coils);
+//    mne_free_ctf_comp_data_set(comp_data);
+
+
+
+
+
 
 
 
