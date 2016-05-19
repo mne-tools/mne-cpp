@@ -1,3 +1,4 @@
+//=============================================================================================================
 /**
 * @file     spline.h
 * @author   Ricky Tjen <ricky270@student.sgu.ac.id>;
@@ -30,9 +31,9 @@
 *
 * @brief    spline class declaration
 */
+
 #ifndef SPLINE_H
 #define SPLINE_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -66,8 +67,6 @@
 #include <QtCharts/QChartGlobal>
 #include <QtCharts/QLegendMarker>
 #include <QtCharts/QLegend>
-#include <QtCharts/QXYLegendMarker>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -232,6 +231,7 @@ template<typename T>
 
       QSplineSeries *series = new QSplineSeries();
       QSplineSeries *shadowSeries = new QSplineSeries();
+      QSplineSeries *shadowSeriesY = new QSplineSeries();
 
       series->setName(histogramExponent);
 
@@ -244,6 +244,7 @@ template<typename T>
           classMark = (resultDisplayValues(ir) + resultDisplayValues(ir+1))/2;
           series->append(classMark, matClassFrequencyData(ir));
           shadowSeries->append(classMark, 0);
+          shadowSeriesY->append(minAxisX, matClassFrequencyData(ir));
           std::cout << "Spline data points = " << classMark << ", " << matClassFrequencyData(ir) << std::endl;
           if (matClassFrequencyData(ir) > maximumFrequency)
           {
