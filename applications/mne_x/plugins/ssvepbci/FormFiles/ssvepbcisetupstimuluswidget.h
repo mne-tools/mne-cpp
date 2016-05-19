@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     eegosportssetupstimuluswidget.h
+* @file     ssvepbcisetupstimulus.h
 * @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the EEGoSportsSetupProjectWidget class.
+* @brief    Contains the declaration of the ssvepbcisetupstimulus class.
 *
 */
 
@@ -44,7 +44,6 @@
 //=============================================================================================================
 
 #include "../ssvepbci.h"
-#include "../flashobject.h"
 #include "ssvepbciscreen.h"
 
 
@@ -171,11 +170,11 @@ private slots:
 
 private:
     Ui::ssvepBCISetupStimulusWidget        *ui;
-    ssvepBCI                               *m_pssvepBCI;          /**< a pointer to corresponding EEGoSports.*/
-    ssvepBCIScreen                         *m_pssvepBCIScreen;
-    bool                                    m_bIsRunning;           /**< Flag for running test >**/
-    bool                                    m_bReadFreq;            /**< Flag for reading the adjusted frequency >**/
-    QMap<int, double>                       m_idFreqMap;
+    ssvepBCI                               *m_pssvepBCI;            /**< a pointer to corresponding EEGoSports */
+    ssvepBCIScreen                         *m_pssvepBCIScreen;      /**< pointer to the screen class of the subject (friend class) */
+    bool                                    m_bIsRunning;           /**< Flag for running test */
+    bool                                    m_bReadFreq;            /**< Flag for reading the adjusted frequency */
+    QMap<int, double>                       m_idFreqMap;            /**< containing frequencies and their corresponding key */
 
     //=========================================================================================================
     /**
