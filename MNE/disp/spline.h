@@ -68,6 +68,7 @@
 #include <QtCharts/QLegendMarker>
 #include <QtCharts/QLegend>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
@@ -101,7 +102,6 @@ QT_CHARTS_USE_NAMESPACE
 
 /** histogram display using Qtcharts/QSpline
 *
-*
 * @brief Spline class for histogram display using Qtcharts/QSpline
 */
 
@@ -119,15 +119,10 @@ public:
 
     //=========================================================================================================
 
-    void Spline::mousePressEvent(QMouseEvent *event);
-
-    //=========================================================================================================
-
     /**
     * The constructor for Spline
     */
     Spline(const QString& title = "Spline Histogram", QWidget* parent = 0);
-
 
     //=========================================================================================================
 
@@ -136,25 +131,21 @@ public:
     *
     * @param[in]  matClassLimitData      vector input filled with class limits
     * @param[in]  matClassFrequencyData  vector input filled with class frequency to the corresponding class
-    * @param[in]  iPrecisionValue        user input to determine the amount of digits of coefficient shown in the histogram
+    * @param[in]  iPrecisionValue        user input to determine the amount of digits of coefficient shown in the bar histogram
     */
     template<typename T>
     void setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData, int iPrecisionValue);
     template<typename T>
     void setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue);
 
-
     //=========================================================================================================
 
-private:
-    QChart*             m_pChart;
-    QBarCategoryAxis*   m_pAxis;
-    QLineSeries *leftThreshold;
-    QLineSeries *middleThreshold;
-    QLineSeries *rightThreshold;
-    QGraphicsSimpleTextItem *m_coordX;
-    QGraphicsSimpleTextItem *m_coordY;
-
+    /**
+    * constructor for mouse press event behaviour to create threshold lines and signal emit
+    *
+    * @param[in]  event      mouse press input
+    */
+    void Spline::mousePressEvent(QMouseEvent *event);
 
     //=========================================================================================================
 
@@ -163,11 +154,10 @@ private:
     *
     * @param[in]  matClassLimitData      vector input filled with class limits
     * @param[in]  matClassFrequencyData  vector input filled with class frequency to the corresponding class
-    * @param[in]  iPrecisionValue        user input to determine the amount of digits of coefficient shown in the histogram
+    * @param[in]  iPrecisionValue        user input to determine the amount of digits of coefficient shown in the bar histogram
     */
     template<typename T>
     void updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData, int iPrecisionValue);
-
 
     //=========================================================================================================
 
@@ -183,6 +173,15 @@ private:
     void splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
 
     //=========================================================================================================
+
+private:
+    QChart                  *m_pChart;
+    QBarCategoryAxis        *m_pAxis;
+    QLineSeries             *leftThreshold;
+    QLineSeries             *middleThreshold;
+    QLineSeries             *rightThreshold;
+    QGraphicsSimpleTextItem *m_coordX;
+    QGraphicsSimpleTextItem *m_coordY;
 
 signals:
     void borderChanged(double leftThreshold, double middleThreshold, double rightThreshold);
@@ -204,7 +203,7 @@ void Spline::setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitDat
   }
 
 
-////*************************************************************************************************************
+//=========================================================================================================
 
 template <typename T>
 void Spline::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue)
@@ -216,10 +215,10 @@ void Spline::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitDat
   }
 
 
-  ////*************************************************************************************************************
+//=========================================================================================================
 
 template<typename T>
-  void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData, int iPrecisionValue)
+void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData, int iPrecisionValue)
 {
       Eigen::VectorXd resultDisplayValues;
       int iClassAmount = matClassFrequencyData.rows();
@@ -239,6 +238,7 @@ template<typename T>
       maxAxisX = resultDisplayValues(iClassAmount);
       double classMark;                         //class mark is the middle point between lower and upper class limit
       maximumFrequency = 0;                     //maximumFrequency used to create an intuitive histogram
+
       for (int ir=0; ir < iClassAmount; ir++)
       {
           classMark = (resultDisplayValues(ir) + resultDisplayValues(ir+1))/2;
@@ -252,18 +252,19 @@ template<typename T>
           }
       }
 
-      //create new series and then clear the plot and update with new data
-      m_pChart->removeAllSeries();
+      m_pChart->removeAllSeries();              //create new series and then clear the plot and update with new data
       m_pChart->addSeries(series);
+
       leftThreshold = new QLineSeries();
       middleThreshold = new QLineSeries();
       rightThreshold = new QLineSeries();
       leftThreshold->append(minAxisX, 0);       //initialize threshold lines
       middleThreshold->append(maxAxisX, 0);
       rightThreshold->append(maxAxisX, 0);
-      leftThreshold->setVisible(false);         //create a clean histogram
+      leftThreshold->setVisible(false);         //threshold lines intially invisible
       middleThreshold->setVisible(false);
       rightThreshold->setVisible(false);
+
       m_pChart->legend()->setVisible(true);
       m_pChart->legend()->setAlignment(Qt::AlignBottom);
       m_pChart->addSeries(leftThreshold);
@@ -278,8 +279,8 @@ template<typename T>
  //*************************************************************************************************************
 
 template <typename T>
-  void Spline::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
-  {
+void Spline::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
+{
       vecCoefficientResults.resize(iClassAmount + 1);
       vecExponentValues.resize(iClassAmount + 1);
       double originalValue(0.0),
@@ -293,10 +294,12 @@ template <typename T>
           {
               doubleExponentValue = 0.0;
           }
+
           else
           {
               doubleExponentValue = log10(abs(originalValue));                    //return the exponent value in double
           }
+
           limitExponentValue = round(doubleExponentValue);                        //round the exponent value to the nearest signed integer
           limitDisplayValue = originalValue * (pow(10,-(limitExponentValue)));    //display value is derived from multiplying class limit with inverse 10 to the power of negative exponent
           vecCoefficientResults(ir) = limitDisplayValue;                          //append the display value to the return vector
@@ -305,6 +308,7 @@ template <typename T>
 
       int lowestExponentValue{0},
           highestExponentValue{0};
+
       for (int ir=0; ir <= iClassAmount; ir++)
       {
           if (vecExponentValues(ir) < lowestExponentValue)

@@ -1,3 +1,4 @@
+//=============================================================================================================
 /**
 * @file     spline.cpp
 * @author   Ricky Tjen <ricky270@student.sgu.ac.id>;
@@ -32,7 +33,6 @@
 *
 */
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
@@ -66,10 +66,9 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 Spline::Spline(const QString& title, QWidget* parent)
-:  QWidget(parent),
-   m_coordX(0),
-   m_coordY(0)
-
+:  QWidget(parent)
+,  m_coordX(0)
+,  m_coordY(0)
 {
     m_pChart = new QChart();
     m_pChart->setTitle(title);
@@ -95,10 +94,12 @@ void Spline::mousePressEvent(QMouseEvent *event)
     QLineSeries *verticalLine = new QLineSeries();
     QPointF point = event->pos();
     QPointF pointY = point;
+
     pointY.setX(minAxisX);
     pointY.setY(pointY.y()-10.5);   //-10.5 needed to correctly position the line at mouse position
     point.setX(point.x()-10.5);
     point.setY(0);
+
     QPointF localX = m_pChart->mapToValue(point, shadowSeriesX);
     QPointF localY = m_pChart->mapToValue(pointY, shadowSeriesY);
     verticalLine -> append(localX.x(), 0);
@@ -173,7 +174,7 @@ void Spline::mousePressEvent(QMouseEvent *event)
             }
         }
     }
-    QWidget::mousePressEvent(event);
+    QWidget::mousePressEvent(event);    //calls the predefined mousepressevent from QWidget
 }
 
 
