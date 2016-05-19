@@ -136,8 +136,8 @@ ssvepBCISetupWidget::ssvepBCISetupWidget(ssvepBCI* pBCI, QWidget* parent)
 //    connect(ui.m_doubleSpinBox_ParcksWidth, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
 //            this, &BCISetupWidget::setFilterOptions);
 
-//    //Connect about button
-//    connect(ui.m_qPushButton_About, &QPushButton::released, this, &BCISetupWidget::showAboutDialog);
+    //Connect about button
+    connect(ui.m_qPushButton_About, &QPushButton::released, this, &ssvepBCISetupWidget::showAboutDialog);
 
 //    //Fill info box
 //    QFile file(m_pBCI->m_qStringResourcePath+"readme.txt");
@@ -441,8 +441,8 @@ void ssvepBCISetupWidget::setClassificationOptions()
 
 void ssvepBCISetupWidget::showAboutDialog()
 {
-//    BCIAboutWidget aboutDialog(this);
-//    aboutDialog.exec();
+    ssvepBCIAboutWidget aboutDialog(this);
+    aboutDialog.exec();
 }
 
 

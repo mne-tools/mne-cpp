@@ -1,16 +1,16 @@
 //=============================================================================================================
 /**
-* @file     ssvepbciaboutwidget.h
+* @file     ssvepBCIScreen.h
 * @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
-*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-* 			Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     May, 2016
+* @date     May 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -18,12 +18,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -31,44 +31,34 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ssvepBCIAboutWidget class.
+* @brief    Contains the declaration of the ssvepBCIScreen class.
 *
 */
 
-#ifndef SSVEPBCIABOUTWIDGET_H
-#define SSVEPBCIABOUTWIDGET_H
-
+#ifndef SSVEPBCISCREEN_H
+#define SSVEPBCISCREEN_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_ssvepbciabout.h"
-
+#include "ssvepbciflickeringitem.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-
+#include <QOpenGLWidget>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
+// DEFINE NAMESPACE ssvepBCIScreen
 //=============================================================================================================
 
 namespace ssvepBCIPlugin
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -78,35 +68,39 @@ namespace ssvepBCIPlugin
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ssvepBCIAboutWidget
+* DECLARE CLASS ssvepBCIScreen
 *
-* @brief The BCIAboutWidget class provides the about dialog for the BCI.
+* @brief The ssvepBCIScreen class provides the subject screen. Contains the list of items which will be painted
+* to screen automatically
 */
-class ssvepBCIAboutWidget : public QDialog
+class ssvepBCIScreen : public QOpenGLWidget
 {
     Q_OBJECT
 
+    friend class ssvepBCISetupStimulusWidget;           /**< permit ssvepBCISetupStimulusWidget getting full access */
+
 public:
-
     //=========================================================================================================
     /**
-    * Constructs a BCIAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new BCIAboutWidget becomes a window. If parent is another widget, BCIAboutWidget becomes a child window inside parent. TMSIAboutWidget is deleted when its parent is deleted.
-    */
-    ssvepBCIAboutWidget(QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the BCIAboutWidget.
-    * All BCIAboutWidget's children are deleted first. The application exits if BCIAboutWidget is the main widget.
-    */
-    ~ssvepBCIAboutWidget();
+     * constructs the ssvepBCIScreen object
+     *
+     */
+    ssvepBCIScreen(QOpenGLWidget *parent = 0 );
 
 private:
-    Ui::BCIAboutWidgetClass ui;    /**< Holds the user interface for the BCIAboutWidgetClass.*/
+    QList<ssvepBCIFlickeringItem>   m_Items;            /**< QList containing all flickering Items to be painted */
+
+protected:
+    //=========================================================================================================
+    /**
+     * overwritten functions from the QOpenGLWidget class which will be called automatically
+     *
+     */
+    void resizeGL(int w, int h);
+    void paintGL();
+    void initializeGL();
 };
 
-} // NAMESPACE
 
-#endif // SSVEPABOUTWIDGET_H
+}//Namescpace
+#endif // SSVEPBCISCREEN_H

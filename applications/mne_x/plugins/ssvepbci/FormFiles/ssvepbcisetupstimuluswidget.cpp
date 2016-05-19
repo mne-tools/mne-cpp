@@ -42,7 +42,6 @@
 
 #include "ssvepbcisetupstimuluswidget.h"
 #include "ui_ssvepbcisetupstimuluswidget.h"
-#include "../flashobject.h"
 #include "../ssvepbci.h"
 
 //*************************************************************************************************************
@@ -79,7 +78,7 @@ ssvepBCISetupStimulusWidget::ssvepBCISetupStimulusWidget(ssvepBCI* pssvepBCI, QW
     m_idFreqMap.insert(2,  7.05);
     m_idFreqMap.insert(3,  7.5 );
     m_idFreqMap.insert(4,  8   );
-    m_idFreqMap.insert(5,  8.75);
+    m_idFreqMap.insert(5,  8.57);
     m_idFreqMap.insert(6,  9.23);
     m_idFreqMap.insert(7, 10   );
     m_idFreqMap.insert(8, 10.91);
@@ -95,6 +94,7 @@ ssvepBCISetupStimulusWidget::ssvepBCISetupStimulusWidget(ssvepBCI* pssvepBCI, QW
     foreach(int i, m_idFreqMap.keys())
         ui->comboBox_2->addItem(QString().number(m_idFreqMap[i]));
 
+    //getting refreshrate of the subject's screen and add it to the setupWidget
     ui->label_6->setText(QString().number(screen->refreshRate()));
     delete screen;
 }
@@ -176,16 +176,22 @@ void ssvepBCISetupStimulusWidget::on_pushButton_4_clicked()
     ssvepBCIFlickeringItem item3;
     ssvepBCIFlickeringItem item4;
 
+    //set Frequencies
     setFreq(item1,1);
     setFreq(item2,5);
-    item2.setPos(1-0.4,0);
     setFreq(item3,9);
-    item3.setPos(1-0.4,1-0.4);
     setFreq(item4,13);
-    item4.setPos(0,1-0.4);
+    //set dimensions and positions
+    item1.setDim(0.2,0.2);
+    item2.setDim(0.2,0.2);
+    item3.setDim(0.2,0.2);
+    item4.setDim(0.2,0.2);
+    item1.setPos(0.2,0.2);
+    item2.setPos(1-0.4,0.2);
+    item3.setPos(1-0.4,1-0.4);
+    item4.setPos(0.2,1-0.4);
 
     m_pssvepBCIScreen->m_Items <<item1<<item2<<item3<<item4 ;
-
     changeComboBox();
 }
 
@@ -220,42 +226,40 @@ void ssvepBCISetupStimulusWidget::on_pushButton_6_clicked()
     ssvepBCIFlickeringItem item3;
     ssvepBCIFlickeringItem item4;
 
+    //set frequencies
     setFreq(item1,0);
     setFreq(item2,3);
-    item2.setPos(1-0.4,0);
     setFreq(item3,7);
-    item3.setPos(1-0.4,1-0.4);
     setFreq(item4,11);
-    item4.setPos(0,1-0.4);
-
+    //set dimensions and positions
+    item1.setDim(0.2,0.2);
+    item2.setDim(0.2,0.2);
+    item3.setDim(0.2,0.2);
+    item4.setDim(0.2,0.2);
+    item1.setPos(0.2,0.2);
+    item2.setPos(1-0.4,0.2);
+    item3.setPos(1-0.4,1-0.4);
+    item4.setPos(0.2,1-0.4);
+    //add items to List
     m_pssvepBCIScreen->m_Items <<item1<<item2<<item3<<item4 ;
 
     changeComboBox();
 
-
 }
+
+//*************************************************************************************************************
 
 void ssvepBCIPlugin::ssvepBCISetupStimulusWidget::on_pushButton_7_clicked()
 {
     // TEST 4
-
     //clear  Items from screen
     clear();
 
     ssvepBCIFlickeringItem item1;
-    ssvepBCIFlickeringItem item2;
-    ssvepBCIFlickeringItem item3;
-    ssvepBCIFlickeringItem item4;
-
-    setFreq(item1,2);
-    setFreq(item2,4);
-    item2.setPos(1-0.4,0);
-    setFreq(item3,6);
-    item3.setPos(1-0.4,1-0.4);
-    setFreq(item4,8);
-    item4.setPos(0,1-0.4);
-
-    m_pssvepBCIScreen->m_Items <<item1<<item2<<item3<<item4 ;
+    //whole screen with 15 Hz
+    setFreq(item1,3);
+    item1.setDim(1,1);
+    m_pssvepBCIScreen->m_Items <<item1 ;
 
     changeComboBox();
 
