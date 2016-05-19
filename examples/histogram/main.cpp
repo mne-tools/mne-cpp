@@ -81,8 +81,6 @@ using namespace DISPLIB;
 // MAIN
 //=============================================================================================================
 
-//=============================================================================================================
-
 //sineWaveGenerator function - used to create synthetic data to test histogram functionality
 #ifndef M_PI
 const double M_PI = 3.14159265358979323846;
@@ -208,25 +206,24 @@ int main(int argc, char *argv[])
 
     printf("Read %d samples.\n",(qint32)data.cols());
 
-    Eigen::VectorXd dataSine;
-    dataSine = sineWaveGenerator(1.0e-30,(1.0/1e6), 0.0, 1.0);  //creates synthetic data using sineWaveGenerator function
-
     bool bMakeSymmetrical;
     bMakeSymmetrical = false;       //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
-    int classAmount = 50;          //initialize the amount of classes and class frequencies
+    int classAmount = 50;           //initialize the amount of classes and class frequencies
     double inputGlobalMin = 0.0,
            inputGlobalMax = 0.0;
     Eigen::VectorXd resultClassLimit;
     Eigen::VectorXi resultFrequency;
+
     //start of the histogram calculation, similar to matlab function of the same name
     QTime myTimerHistCounts;
     myTimerHistCounts.start();
+    Eigen::VectorXd dataSine;
+    dataSine = sineWaveGenerator(1.0e-30,(1.0/1e6), 0.0, 1.0);  //creates synthetic data using sineWaveGenerator function
     MNEMath::histcounts(data, bMakeSymmetrical, classAmount, resultClassLimit, resultFrequency, inputGlobalMin, inputGlobalMax);   //user input to normalize and sort the data matrix
     qDebug()<<"HistCounts timer:"<<myTimerHistCounts.elapsed();
     std::cout << "resultClassLimits = " << resultClassLimit << std::endl;
     std::cout << "resultFrequency = " << resultFrequency << std::endl;
-    int precision = 2;             //format for the amount digits of coefficient shown in the histogram
-    //start of the histogram display function using Qtcharts
+    int precision = 2;             //format for the amount digits of coefficient shown in the Bar Histogram (does not affect Spline)
 
     Spline* displayObj = new Spline("MNE-CPP Histogram Example (Spline)");
     //Bar* displayObj = new Bar("MNE-CPP Histogram Example (Bar)");
@@ -242,5 +239,6 @@ int main(int argc, char *argv[])
     std::cout << data.block(0,0,10,10);
     return a.exec();
 }
+
 
 //*************************************************************************************************************

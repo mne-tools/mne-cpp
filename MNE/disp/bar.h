@@ -92,6 +92,7 @@ QT_CHARTS_USE_NAMESPACE
 //=============================================================================================================
 
 
+
 //=============================================================================================================
 /**
 * Histogram display using Qtcharts, similar to matlab bar graph
@@ -102,12 +103,10 @@ class DISPSHARED_EXPORT Bar : public QWidget
 {
 
 public:
-    typedef QSharedPointer<Bar> SPtr;            /**< Shared pointer type for Bar. */
-    typedef QSharedPointer<const Bar> ConstSPtr; /**< Const shared pointer type for Bar. */
 
     //=========================================================================================================
     /**
-    * The constructor.
+    * The constructor for Bar.
     */
     Bar(const QString& title = "", QWidget* parent = 0);
 
@@ -123,10 +122,6 @@ public:
     void setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData, int iPrecisionValue);
     template<typename T>
     void setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue);
-
-private:
-    QChart*             m_pChart;
-    QBarCategoryAxis*   m_pAxis;
 
     //=========================================================================================================
     /**
@@ -149,14 +144,14 @@ private:
     * @param[out] vecExponentResults     vector filled with values of exponent only
     */
 
-//      void splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
-//      template<typename T>
-//      void splitCoefficientAndExponent (const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
-//      template<typename T>
-//      void splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
     template<typename T>
     void splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
 
+    //=========================================================================================================
+
+private:
+    QChart*             m_pChart;
+    QBarCategoryAxis*   m_pAxis;
 };
 
 
