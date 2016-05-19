@@ -76,6 +76,8 @@ SOURCES += \
         FormFiles/ssvepbcisetupwidget.cpp \
         FormFiles/ssvepbciaboutwidget.cpp \
         FormFiles/ssvepbcisetupstimuluswidget.cpp \
+        FormFiles/ssvepbciscreen.cpp \
+    FormFiles/ssvepbciflickeringitem.cpp
 
 
 HEADERS += \
@@ -84,7 +86,9 @@ HEADERS += \
         ssvepbci_global.h \
         FormFiles/ssvepbcisetupwidget.h \
         FormFiles/ssvepbciaboutwidget.h \
-        FormFiles/ssvepbcisetupstimuluswidget.h
+        FormFiles/ssvepbcisetupstimuluswidget.h \
+        FormFiles/ssvepbciscreen.h \
+        FormFiles/ssvepbciflickeringitem.h
 
 FORMS += \
         FormFiles/ssvepbcisetup.ui \

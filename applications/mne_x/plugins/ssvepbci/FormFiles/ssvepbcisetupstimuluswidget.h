@@ -45,6 +45,8 @@
 
 #include "../ssvepbci.h"
 #include "../flashobject.h"
+#include "ssvepbciscreen.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -52,7 +54,9 @@
 //=============================================================================================================
 
 #include <QDialog>
+#include <QScreen>
 #include <QWidget>
+#include <QOpenGLWidget>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -111,15 +115,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns a List of all QGraphicsItems on screen.
-    *
-    * @return QList of all all Items on screen
-    *
-    */
-    QList<QGraphicsItem*> getTopLevelItems();
-
-    //=========================================================================================================
-    /**
     * close event, when setup-stimulus window is closed.
     *
     * @param [in] QClosEvent for clsoing the window
@@ -129,12 +124,6 @@ public:
 
 
 private slots:
-    //=========================================================================================================
-    /**
-    * slot for refreshiing the screen
-    *
-    */
-    void ScreenTrigger();
 
 
     void on_pushButton_clicked();
@@ -143,12 +132,6 @@ private slots:
 
     void on_pushButton_3_clicked();
 
-    //=========================================================================================================
-    /**
-    * Adapts the view of QGraphcisScene automatically if there are canges in the scene.
-    *
-    */
-    void changeView();
 
     //=========================================================================================================
     /**
@@ -173,15 +156,6 @@ private slots:
 
     //=========================================================================================================
     /**
-    * acjust blinking frequency
-    *
-    * @param [in] frquency value in [Hz]
-    *
-    */
-    void on_doubleSpinBox_valueChanged(double arg);
-
-    //=========================================================================================================
-    /**
     * choose Item for frequency reaading and writing
     *
     * @param [in] index value of the Item List
@@ -189,18 +163,19 @@ private slots:
     */
     void on_comboBox_currentIndexChanged(int index);
 
+    void on_comboBox_2_currentIndexChanged(int index);
+
+    void setFreq(ssvepBCIFlickeringItem &item, int freqKey);
+
+    void on_pushButton_7_clicked();
+
 private:
     Ui::ssvepBCISetupStimulusWidget        *ui;
     ssvepBCI                               *m_pssvepBCI;          /**< a pointer to corresponding EEGoSports.*/
-    QWidget                                *m_pTestScreen;          /**< Widget of the test screen */
-    QGraphicsScene                         *m_pScene;               /**< Graphic Scene of the test screen */
-    QLayout                                *m_pLayout;              /**< Layout of the test screen */
-    QGraphicsView                          *m_pView;                /**< QGraphicsScene of the test screen */
-    QTimer                                 *m_pTimer;               /**< Timer for refreshing the test screen */
-    QList<QGraphicsItem*>                   m_pItems;               /**< list of the added graphic items on the QGraphicsScene >**/
-    QList<FlashObject*>                     m_pFlashList;           /**< list of all flashing objects >**/
+    ssvepBCIScreen                         *m_pssvepBCIScreen;
     bool                                    m_bIsRunning;           /**< Flag for running test >**/
     bool                                    m_bReadFreq;            /**< Flag for reading the adjusted frequency >**/
+    QMap<int, double>                       m_idFreqMap;
 
     //=========================================================================================================
     /**
@@ -209,7 +184,7 @@ private:
     * @param [in] QList of all FlashObject on screen
     *
     */
-    void changeComboBox(QList<QGraphicsItem *> &List);
+    void changeComboBox();
 };
 
 } //NAMESPACE

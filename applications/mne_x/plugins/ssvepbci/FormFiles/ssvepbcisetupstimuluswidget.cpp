@@ -67,42 +67,36 @@ ssvepBCISetupStimulusWidget::ssvepBCISetupStimulusWidget(ssvepBCI* pssvepBCI, QW
 {
     ui->setupUi(this);
 
-    //create QGraphicsView with QGraphcisScene in a new Widget for the Test Screen
-    m_pTestScreen   = new QWidget;
-    m_pLayout       = new QVBoxLayout();
-    m_pView         = new QGraphicsView();
-    m_pScene        = new QGraphicsScene(m_pView);
+    //setup the test screen and initialize screen for subject
+    m_pssvepBCIScreen = new ssvepBCIScreen;
+    QScreen *screen  = QGuiApplication::screens()[1]; // specify which screen to use
+    m_pssvepBCIScreen->move(screen->geometry().x(), screen->geometry().y());
+    m_pssvepBCIScreen->showFullScreen();
 
-    //setup the Widget for the test-screen
-    m_pLayout->setSpacing(0);
-    m_pLayout->setMargin(0);
-    m_pLayout->setContentsMargins(0,0,0,0);
-    m_pLayout->addWidget(m_pView);
-    m_pTestScreen->setLayout(m_pLayout);
-    m_pTestScreen->setStyleSheet("QWidget { border-style: none; }");
+    //Map for all frequencies according to their key
+    m_idFreqMap.insert(0,  6   );
+    m_idFreqMap.insert(1,  6.66);
+    m_idFreqMap.insert(2,  7.05);
+    m_idFreqMap.insert(3,  7.5 );
+    m_idFreqMap.insert(4,  8   );
+    m_idFreqMap.insert(5,  8.75);
+    m_idFreqMap.insert(6,  9.23);
+    m_idFreqMap.insert(7, 10   );
+    m_idFreqMap.insert(8, 10.91);
+    m_idFreqMap.insert(9, 12   );
+    m_idFreqMap.insert(10,13.33);
+    m_idFreqMap.insert(11,15   );
+    m_idFreqMap.insert(12,17.14);
+    m_idFreqMap.insert(13,20   );
+    m_idFreqMap.insert(14,24   );
+    m_idFreqMap.insert(15,30   );
 
-    //setting full-screen on second monitor
-    QScreen *screen = QGuiApplication::screens()[1]; // specify which screen to use
-    m_pTestScreen->move(screen->geometry().x(), screen->geometry().y());
+    //initialize combobox for frequencies
+    foreach(int i, m_idFreqMap.keys())
+        ui->comboBox_2->addItem(QString().number(m_idFreqMap[i]));
 
-    //connecting View with Scene
-    m_pView->setScene(m_pScene);
-    m_pView->setStyleSheet("QGraphicsView { border-style: none; }");
-
-    //Setup a Timer for a continous refresh of the Test Screen (60 Hz)
-    m_pTimer = new QTimer();
-    connect(m_pTimer,SIGNAL(timeout()),this,SLOT(ScreenTrigger()));
-    m_pTimer->setTimerType(Qt::PreciseTimer);
-    m_pTimer->start(16.67);
-
-    //connect the changedView slot to the Scene for refreshing function of the test screen view
-    connect(m_pScene,SIGNAL(changed(QList<QRectF>)),this,SLOT(changeView()));
-    m_pView->installEventFilter(this);
-
-    //set Black as scene background color and show Test Screen
-    m_pView->setBackgroundBrush(QBrush(Qt::black, Qt::SolidPattern));
-    m_pTestScreen->showFullScreen();
-
+    ui->label_6->setText(QString().number(screen->refreshRate()));
+    delete screen;
 }
 
 //*************************************************************************************************************
@@ -110,35 +104,16 @@ ssvepBCISetupStimulusWidget::ssvepBCISetupStimulusWidget(ssvepBCI* pssvepBCI, QW
 ssvepBCISetupStimulusWidget::~ssvepBCISetupStimulusWidget()
 {
     delete ui;
-
-    delete m_pTestScreen;
-    delete m_pLayout;
-    delete m_pView;
-    delete m_pScene;
+    delete m_pssvepBCIScreen;
 }
 
-//*************************************************************************************************************
-
-void ssvepBCISetupStimulusWidget::ScreenTrigger(){
-    //m_pView->viewport()->repaint();
-    m_pView->viewport()->update();
-}
-
-//*************************************************************************************************************
-
-void ssvepBCISetupStimulusWidget::changeView(){
-    //Calculates and returns the bounding rect of all items on the scene.
-    //This function works by iterating over all items, and because if this, it can be slow for large scenes.
-    QRectF rect = m_pScene->itemsBoundingRect();
-    m_pScene->setSceneRect(rect);
-}
 
 //*************************************************************************************************************
 
 void ssvepBCISetupStimulusWidget::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event)
-    m_pTestScreen->close();
+    m_pssvepBCIScreen->close();
 }
 
 //*************************************************************************************************************
@@ -146,47 +121,22 @@ void ssvepBCISetupStimulusWidget::closeEvent(QCloseEvent *event)
 void ssvepBCISetupStimulusWidget::clear()
 {
     m_bIsRunning = false;
-
-    QList <QGraphicsItem*> itemList = getTopLevelItems();
-    while(!itemList.isEmpty()){
-        delete itemList.first();
-        itemList = m_pScene->items();
-    }
-
+    m_pssvepBCIScreen->m_Items.clear();
 }
+
 
 //*************************************************************************************************************
 
-QList<QGraphicsItem*> ssvepBCISetupStimulusWidget::getTopLevelItems()
-{
-    int numItems, iItem;
-    QList<QGraphicsItem*> topLevel;
-    QList<QGraphicsItem*> itemList = m_pScene->items();
-
-    numItems = itemList.size();
-    for (iItem = 0; iItem < numItems; iItem++) {
-        QGraphicsItem *item = itemList.at(iItem);
-        if (item->parentItem() == NULL)
-            topLevel.append(item);
-    }
-    return topLevel;
-}
-
-//*************************************************************************************************************
-
-void ssvepBCISetupStimulusWidget::changeComboBox(QList<QGraphicsItem*> &List)
+void ssvepBCISetupStimulusWidget::changeComboBox()
 {
 
     //clear ComboBox
     ui->comboBox->clear();
 
-    //refresh Items on the QList
-    m_pItems.clear();
-    m_pItems = getTopLevelItems();
-
     //create new comobBox list
-    for(int i = 1; i <= List.size(); i++ )
+    for(int i = 1; i <= m_pssvepBCIScreen->m_Items.size(); i++ )
         ui->comboBox->addItem(QString().number(i));
+
 
     m_bIsRunning = true;
     on_comboBox_currentIndexChanged(0);
@@ -194,141 +144,199 @@ void ssvepBCISetupStimulusWidget::changeComboBox(QList<QGraphicsItem*> &List)
 
 //*************************************************************************************************************
 
-void ssvepBCIPlugin::ssvepBCISetupStimulusWidget::on_pushButton_clicked()
+void ssvepBCISetupStimulusWidget::on_pushButton_clicked()
 {
-    m_pTestScreen->showFullScreen();
+    m_pssvepBCIScreen->showFullScreen();
 }
 
 //*************************************************************************************************************
 
-void ssvepBCIPlugin::ssvepBCISetupStimulusWidget::on_pushButton_2_clicked()
+void ssvepBCISetupStimulusWidget::on_pushButton_2_clicked()
 {
     clear();
 }
 
 //*************************************************************************************************************
 
-void ssvepBCIPlugin::ssvepBCISetupStimulusWidget::on_pushButton_3_clicked()
+void ssvepBCISetupStimulusWidget::on_pushButton_3_clicked()
 {
-    m_pTestScreen->close();
+    m_pssvepBCIScreen->close();
 }
 
 //*************************************************************************************************************
 
-void ssvepBCIPlugin::ssvepBCISetupStimulusWidget::on_pushButton_4_clicked()
+void ssvepBCISetupStimulusWidget::on_pushButton_4_clicked()
 {
+    // TEST 3
     //clear  Items from screen
     clear();
-    m_pFlashList.clear();
 
-    //define dimensions of items
-    int dimx_x = (0.33*double(m_pView->width()));
-    int dimx_y = int(0.2*double(m_pView->height()));
-    int dimy_x = int(0.125*double(m_pView->width()));
-    int dimy_y = int(0.4*double(m_pView->height()));
+    ssvepBCIFlickeringItem item1;
+    ssvepBCIFlickeringItem item2;
+    ssvepBCIFlickeringItem item3;
+    ssvepBCIFlickeringItem item4;
 
-    //create new flashing objects
-    QPointer<FlashObject> obj_1 = new FlashObject();
-    QPointer<FlashObject> obj_2 = new FlashObject();
-    QPointer<FlashObject> obj_3 = new FlashObject();
-    QPointer<FlashObject> obj_4 = new FlashObject();
-    QPointer<FlashObject> obj_5 = new FlashObject();
-    //set starting-flashing frequencies
-    obj_1->setFreq(6);
-    obj_2->setFreq(7.5);
-    obj_3->setFreq(10);
-    obj_4->setFreq(15);
-    obj_5->setFreq(30);
-    //set item dimesnions
-    obj_1->setDim(dimx_x,dimx_y);
-    obj_2->setDim(dimy_x,dimy_y);
-    obj_3->setDim(dimx_x,dimx_y);
-    obj_4->setDim(dimy_x,dimy_y);
-    obj_5->setDim(dimx_x,dimy_y);
-    //set postitions of flashing object
-    obj_1->setPos(0.5*m_pView->width() - 0.5*dimx_x , 0);
-    obj_2->setPos(m_pView->width() - dimy_x         , +0.5*m_pView->height() - 0.5*dimy_y );
-    obj_3->setPos(0.5*m_pView->width() - 0.5*dimx_x , +m_pView->height() - dimx_y);
-    obj_4->setPos(0                                 , +0.5*m_pView->height() - 0.5*dimy_y);
-    obj_5->setPos(0.5*m_pView->width() - 0.5*dimx_x , +0.5*m_pView->height() - 0.5*dimy_y);
-    //add items to scene and to FlashList
-    m_pScene->addItem(obj_1);m_pFlashList.append(obj_1);
-    m_pScene->addItem(obj_2);m_pFlashList.append(obj_2);
-    m_pScene->addItem(obj_3);m_pFlashList.append(obj_3);
-    m_pScene->addItem(obj_4);m_pFlashList.append(obj_4);
-    m_pScene->addItem(obj_5);m_pFlashList.append(obj_5);
+    setFreq(item1,1);
+    setFreq(item2,5);
+    item2.setPos(1-0.4,0);
+    setFreq(item3,9);
+    item3.setPos(1-0.4,1-0.4);
+    setFreq(item4,13);
+    item4.setPos(0,1-0.4);
 
-    //add Items to ComboBox
-    changeComboBox(m_pItems);
+    m_pssvepBCIScreen->m_Items <<item1<<item2<<item3<<item4 ;
+
+    changeComboBox();
 }
 
 //*************************************************************************************************************
 
-void ssvepBCIPlugin::ssvepBCISetupStimulusWidget::on_pushButton_5_clicked()
+void ssvepBCISetupStimulusWidget::on_pushButton_5_clicked()
 {
+    // TEST 1
     //clear  Items from screen
     clear();
-    m_pFlashList.clear();
 
+    ssvepBCIFlickeringItem item1;
+    //whole screen with 15 Hz
+    setFreq(item1,11);
+    item1.setDim(1,1);
+    m_pssvepBCIScreen->m_Items <<item1 ;
 
-    QPointer<FlashObject> obj_1 = new FlashObject();
-    obj_1->setFreq(1);
-    obj_1->setDim(m_pView->width(),m_pView->height());
-    m_pScene->addItem(obj_1);m_pFlashList.append(obj_1);
-
-    obj_1->setFreq(15);
-
-    //add Items to ComboBox
-    changeComboBox(m_pItems);
+    changeComboBox();
 }
 
 //*************************************************************************************************************
 
-void ssvepBCIPlugin::ssvepBCISetupStimulusWidget::on_pushButton_6_clicked()
+void ssvepBCISetupStimulusWidget::on_pushButton_6_clicked()
 {
+    // TEST 2
+
     //clear  Items from screen
     clear();
-    m_pFlashList.clear();
 
-    QPointer<FlashObject> obj_1 = new FlashObject;
-    QPointer<FlashObject> obj_2 = new FlashObject;
-    //set Frequencies
-    obj_1->setFreq(3);
-    obj_2->setFreq(3.75);
-    //set dimensions
-    obj_1->setDim(0.2*m_pView->width(),0.2*m_pView->height());
-    obj_2->setDim(0.2*m_pView->width(),0.2*m_pView->height());
-    //set positions
-    obj_1->setPos(0.2*m_pView->width(),(0.5-0.2/2)*m_pView->height());
-    obj_2->setPos((1-0.5)*m_pView->width(), (0.5-0.2/2)*m_pView->height());
-    //ad Items to scene
-    m_pScene->addItem(obj_1);m_pFlashList.append(obj_1);
-    m_pScene->addItem(obj_2);m_pFlashList.append(obj_2);
+    ssvepBCIFlickeringItem item1;
+    ssvepBCIFlickeringItem item2;
+    ssvepBCIFlickeringItem item3;
+    ssvepBCIFlickeringItem item4;
 
-    //add Items to ComboBox
-    changeComboBox(m_pItems);
+    setFreq(item1,0);
+    setFreq(item2,3);
+    item2.setPos(1-0.4,0);
+    setFreq(item3,7);
+    item3.setPos(1-0.4,1-0.4);
+    setFreq(item4,11);
+    item4.setPos(0,1-0.4);
+
+    m_pssvepBCIScreen->m_Items <<item1<<item2<<item3<<item4 ;
+
+    changeComboBox();
+
+
 }
+
+void ssvepBCIPlugin::ssvepBCISetupStimulusWidget::on_pushButton_7_clicked()
+{
+    // TEST 4
+
+    //clear  Items from screen
+    clear();
+
+    ssvepBCIFlickeringItem item1;
+    ssvepBCIFlickeringItem item2;
+    ssvepBCIFlickeringItem item3;
+    ssvepBCIFlickeringItem item4;
+
+    setFreq(item1,2);
+    setFreq(item2,4);
+    item2.setPos(1-0.4,0);
+    setFreq(item3,6);
+    item3.setPos(1-0.4,1-0.4);
+    setFreq(item4,8);
+    item4.setPos(0,1-0.4);
+
+    m_pssvepBCIScreen->m_Items <<item1<<item2<<item3<<item4 ;
+
+    changeComboBox();
+
+}
+
 
 //*************************************************************************************************************
 
-void ssvepBCIPlugin::ssvepBCISetupStimulusWidget::on_doubleSpinBox_valueChanged(double arg)
+void ssvepBCISetupStimulusWidget::on_comboBox_currentIndexChanged(int index)
 {
-    if(m_bReadFreq)
-        m_bReadFreq=false;
-    else{
-        //get selected Item from comboBox
-        int ItemSelect = ui->comboBox->currentIndex();
-        //adjust the Frequency of the selected Plugin
-        m_pFlashList.at(ItemSelect)->setFreq(arg);
-    }
-}
 
-//*************************************************************************************************************
-
-void ssvepBCIPlugin::ssvepBCISetupStimulusWidget::on_comboBox_currentIndexChanged(int index)
-{
     if(m_bIsRunning){
         m_bReadFreq = true;
-        ui->doubleSpinBox->setValue(m_pFlashList.at(index)->getFreq());
+        ui->comboBox_2->setCurrentIndex(m_pssvepBCIScreen->m_Items.at(index).m_iFreqKey);//get key of frequency
     }
 }
+
+//*************************************************************************************************************
+
+void ssvepBCIPlugin::ssvepBCISetupStimulusWidget::on_comboBox_2_currentIndexChanged(int index)
+{
+    if(m_bIsRunning){
+        if(m_bReadFreq)
+            m_bReadFreq=false;
+        else{
+
+            //get selected Item from comboBox
+            int ItemSelect = ui->comboBox->currentIndex();
+            //adjust the rendering order of the selected Plugin
+            setFreq(m_pssvepBCIScreen->m_Items[ItemSelect],index);
+        }
+    }
+
+}
+
+//*************************************************************************************************************
+
+void ssvepBCISetupStimulusWidget::setFreq(ssvepBCIFlickeringItem &item, int freqKey)
+{
+
+    QList<bool> renderOrder;
+
+    //choose the rendereing orders according to evoked flickerfrequency (being valid for a 60 Hz monitor)
+    switch(freqKey){
+    case 15:
+        renderOrder<< 0 << 1;                                                                                break;  // 30 Hz
+    case 14:
+        renderOrder<< 0 << 1 << 0 << 1 << 1;                                                                 break;  // 24 Hz
+    case 13:
+        renderOrder<< 0 << 1 << 1;                                                                           break;  // 20 Hz
+    case 12:
+        renderOrder<< 0 << 0 << 1 << 1 << 0 << 1 << 1;                                                       break;  // 17.14 Hz
+    case 11:
+        renderOrder<< 0 << 0 << 1 << 1;                                                                      break;  // 15 Hz
+    case 10:
+        renderOrder<< 0 << 0 << 1 << 1 << 0 << 0 << 1 << 1 << 1;                                             break;  // 13.33 Hz
+    case 9:
+        renderOrder<< 0 << 0 << 1 << 1 << 1;                                                                 break;  // 12 Hz
+    case 8:
+        renderOrder<< 0 << 0 << 1 << 1 << 1 << 0 << 0 << 0 << 1 << 1 << 1;                                   break;  // 10.91 Hz
+    case 7:
+        renderOrder<< 0 << 0 << 0 << 1 << 1 << 1;                                                            break;  // 10 Hz
+    case 6:
+        renderOrder<< 0 << 0 << 0 << 1 << 1 << 1 << 0 << 0 << 0 << 1 << 1 << 1 << 1;                         break;  // 9.23 Hz
+    case 5:
+        renderOrder<< 0 << 0 << 0 << 1 << 1 << 1 << 1;                                                       break;  // 8.57 Hz
+    case 4:
+        renderOrder<< 0 << 0 << 0 << 1 << 1 << 1 << 1 << 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1;               break;  // 8 Hz
+    case 3:
+        renderOrder<< 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1;                                                  break;  // 7.5 Hz
+    case 2:
+        renderOrder<< 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1 << 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1 << 1;     break;  // 7.05 Hz
+    case 1:
+        renderOrder<< 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1 << 1;                                             break;  // 6.66 Hz
+    case 0:
+        renderOrder<< 0 << 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1 << 1;                                        break;  // 6 Hz
+    default:{
+        renderOrder<< 0 << 1 ;
+        qDebug()<< "SSVEPBCI-SETUP: Could not set up rendering order. 30 Hz have been chosen instead for flicker frequency!";break;
+    }
+    }
+    item.setRenderOrder(renderOrder, freqKey);
+}
+

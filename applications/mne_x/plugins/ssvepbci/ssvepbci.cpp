@@ -72,7 +72,7 @@ ssvepBCI::ssvepBCI()
 , m_bProcessData(false)
 {
     // Create start Stimuli action bar item/button
-    m_pActionSetupStimulus = new QAction(QIcon(":/images/stimulus.png"),tr("Setup stimulus feature"),this);
+    m_pActionSetupStimulus = new QAction(QIcon(":/images/stimulus.png"),tr("setup stimulus feature"),this);
     m_pActionSetupStimulus->setStatusTip(tr("Setup stimulus feature"));
     connect(m_pActionSetupStimulus, &QAction::triggered, this, &ssvepBCI::showSetupStimulus);
     addPluginAction(m_pActionSetupStimulus);
@@ -422,7 +422,6 @@ void ssvepBCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 
             m_pBCIBuffer_Sensor->push(&t_mat);
-            qDebug()<< "here";
         }
 
     }
@@ -498,10 +497,12 @@ void ssvepBCI::showSetupStimulus()
             m_pssvepBCISetupStimulusWidget = QSharedPointer<ssvepBCISetupStimulusWidget>(new ssvepBCISetupStimulusWidget(this));
 
         if(!m_pssvepBCISetupStimulusWidget->isVisible()){
-            m_pssvepBCISetupStimulusWidget->setWindowTitle("EEGoSports EEG Connector - Setup Stimulus");
+
+            m_pssvepBCISetupStimulusWidget->setWindowTitle("ssvepBCI - Setup Stimulus");
             //m_pEEGoSportsSetupStimulusWidget->initGui();
             m_pssvepBCISetupStimulusWidget->show();
             m_pssvepBCISetupStimulusWidget->raise();
+
         }
     }
     else{
@@ -543,7 +544,6 @@ void ssvepBCI::BCIOnSensorLevel()
 
     MatrixXd t_mat = m_pBCIBuffer_Sensor->pop();
 
-    qDebug()<< "hola";
 
 }
 
