@@ -94,7 +94,7 @@ namespace BrainTreeModelItemTypes
 
 namespace BrainTreeMetaItemTypes
 {
-  enum ItemType{SurfaceFileName = QStandardItem::UserType + 100,
+    enum ItemType{SurfaceFileName = QStandardItem::UserType + 100,
                     SurfaceFilePath = QStandardItem::UserType + 101,
                     AnnotFileName = QStandardItem::UserType + 102,
                     AnnotFilePath = QStandardItem::UserType + 103,
@@ -113,6 +113,11 @@ namespace BrainTreeMetaItemTypes
                     RTDataVisualizationType = QStandardItem::UserType + 116,
                     SurfaceColorItem = QStandardItem::UserType + 117,
                     UnknownItem = QStandardItem::UserType + 118};
+}
+
+namespace SubjectTreeMetaItemTypes
+{
+    enum ItemType{UnknownItem = QStandardItem::UserType + 1};
 }
 
 // Model item roles
