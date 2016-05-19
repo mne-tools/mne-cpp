@@ -45,6 +45,7 @@
 
 #include "disp3D_global.h"
 #include "3DObjects/brain/brain.h"
+#include "3DObjects/subject/subject.h"
 #include "helpers/window.h"
 #include "helpers/types.h"
 
@@ -212,7 +213,8 @@ protected:
 
     Qt3DCore::QTransform*               m_pCameraTransform;             /**< The main camera transform. */
 
-    Brain::SPtr                         m_pBrain;                       /**< Pointer to the Brain class, which holds all BrainObjects. */
+    Brain::SPtr                         m_pBrain;                       /**< Pointer to the Brain class, which holds all brain data. */
+    Subject::SPtr                       m_pSubject;                     /**< Pointer to the Subject class, which holds all subject data. */
 
     bool            m_bCameraTransMode;         /**< Flag for activating/deactivating the translation camera mode. */
     bool            m_bCameraRotationMode;      /**< Flag for activating/deactivating the rotation camera mode. */

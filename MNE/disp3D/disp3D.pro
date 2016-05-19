@@ -91,6 +91,10 @@ else {
 
 SOURCES += \
     view3D.cpp \
+    3DObjects/subject/subject.cpp \
+    3DObjects/subject/subjecttreeitem.cpp \
+    3DObjects/subject/subjecttreemetaitem.cpp \
+    3DObjects/subject/subjecttreemodel.cpp \
     3DObjects/brain/brain.cpp \
     3DObjects/brain/braintreemodel.cpp \
     3DObjects/brain/braintreemetaitem.cpp \
@@ -112,6 +116,10 @@ SOURCES += \
 
 HEADERS += \
     view3D.h \
+    3DObjects/subject/subject.h \
+    3DObjects/subject/subjecttreeitem.h \
+    3DObjects/subject/subjecttreemetaitem.h \
+    3DObjects/subject/subjecttreemodel.h \
     3DObjects/brain/brain.h \
     3DObjects/brain/braintreemodel.h \
     3DObjects/brain/braintreemetaitem.h \
