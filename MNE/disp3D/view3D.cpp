@@ -63,7 +63,7 @@ View3D::View3D()
 , m_pCameraEntity(new Qt3DCore::QCamera(m_pRootEntity))
 , m_pFrameGraph(new Qt3DRender::QFrameGraph())
 , m_pForwardRenderer(new Qt3DRender::QForwardRenderer())
-, m_pData3D(Data3D::SPtr(new Data3D(m_pRootEntity)))
+, m_pData3DTreeModel(Data3DTreeModel::SPtr(new Data3DTreeModel(0, m_pRootEntity)))
 , m_bCameraRotationMode(false)
 , m_bCameraTransMode(false)
 , m_vecCameraTrans(QVector3D(0.0,0.0,-0.5))
@@ -171,7 +171,7 @@ void View3D::initTransformations()
 
 bool View3D::addBrainData(const QString& subject, const QString& set, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
 {
-    return m_pData3D->addData(subject, set, tSurfaceSet, tAnnotationSet);
+    return m_pData3DTreeModel->addData(subject, set, tSurfaceSet, tAnnotationSet);
 }
 
 
@@ -179,7 +179,7 @@ bool View3D::addBrainData(const QString& subject, const QString& set, const Surf
 
 bool View3D::addBrainData(const QString& subject, const QString& set, const Surface& tSurface, const Annotation& tAnnotation)
 {
-    return m_pData3D->addData(subject, set, tSurface, tAnnotation);
+    return m_pData3DTreeModel->addData(subject, set, tSurface, tAnnotation);
 }
 
 
@@ -187,7 +187,7 @@ bool View3D::addBrainData(const QString& subject, const QString& set, const Surf
 
 bool View3D::addBrainData(const QString& subject, const QString& set, const MNESourceSpace& tSourceSpace)
 {
-    return m_pData3D->addData(subject, set, tSourceSpace);
+    return m_pData3DTreeModel->addData(subject, set, tSourceSpace);
 }
 
 
@@ -195,7 +195,7 @@ bool View3D::addBrainData(const QString& subject, const QString& set, const MNES
 
 bool View3D::addBrainData(const QString& subject, const QString& set, const MNEForwardSolution& tForwardSolution)
 {
-    return m_pData3D->addData(subject, set, tForwardSolution.src);
+    return m_pData3DTreeModel->addData(subject, set, tForwardSolution.src);
 }
 
 
@@ -203,15 +203,15 @@ bool View3D::addBrainData(const QString& subject, const QString& set, const MNEF
 
 QList<BrainRTSourceLocDataTreeItem*> View3D::addRtBrainData(const QString& subject, const QString& set, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
-    return m_pData3D->addData(subject, set, tSourceEstimate, tForwardSolution);
+    return m_pData3DTreeModel->addData(subject, set, tSourceEstimate, tForwardSolution);
 }
 
 
 //*************************************************************************************************************
 
-SubjectTreeModel* View3D::getSubjectTreeModel()
+Data3DTreeModel* View3D::getData3DTreeModel()
 {
-    return m_pData3D->getSubjectTreeModel();
+    return m_pData3DTreeModel.data();
 }
 
 
@@ -378,5 +378,3 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
     phongMaterialX->setShininess(50.0f);
     m_XAxisEntity->addComponent(phongMaterialX);
 }
-
-

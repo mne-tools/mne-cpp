@@ -44,7 +44,8 @@
 #include <iostream>
 
 #include "disp3D_global.h"
-#include "3DObjects/data3D.h"
+#include "3DObjects/data3Dtreemodel.h"
+
 #include "helpers/window.h"
 #include "helpers/types.h"
 
@@ -193,7 +194,7 @@ public:
     *
     * @return          The SubjectTreeModel pointer.
     */
-    SubjectTreeModel *getSubjectTreeModel();
+    Data3DTreeModel* getData3DTreeModel();
 
     //=========================================================================================================
     /**
@@ -217,7 +218,7 @@ protected:
 
     Qt3DCore::QTransform*               m_pCameraTransform;             /**< The main camera transform. */
 
-    Data3D::SPtr                        m_pData3D;                      /**< Pointer to the data3D class, which holds all 3D data. */
+    Data3DTreeModel::SPtr               m_pData3DTreeModel;             /**< Pointer to the data3D class, which holds all 3D data. */
 
     bool            m_bCameraTransMode;         /**< Flag for activating/deactivating the translation camera mode. */
     bool            m_bCameraRotationMode;      /**< Flag for activating/deactivating the rotation camera mode. */

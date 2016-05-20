@@ -115,9 +115,15 @@ namespace BrainTreeMetaItemTypes
                     UnknownItem = QStandardItem::UserType + 118};
 }
 
+namespace SubjectTreeModelItemTypes
+{
+    enum ItemType{UnknownItem = QStandardItem::UserType + 200,
+                    SubjectItem = QStandardItem::UserType + 201};
+}
+
 namespace SubjectTreeMetaItemTypes
 {
-    enum ItemType{UnknownItem = QStandardItem::UserType + 1};
+    enum ItemType{UnknownItem = QStandardItem::UserType + 300};
 }
 
 // Model item roles
