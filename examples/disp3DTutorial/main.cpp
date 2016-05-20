@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
     QCommandLineOption sampleHemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption sampleSubjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption sampleSubjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
-    QCommandLineOption sampleSourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "true");
+    QCommandLineOption sampleSourceLocOption("doSourceLoc", "Do real time source localization <doSourceLoc>.", "doSourceLoc", "false");
     QCommandLineOption sampleFwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption sampleInvOpOption("invOp", "Path to inverse operator <file>.", "file", "");
     QCommandLineOption sampleClustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");
@@ -240,7 +240,8 @@ int main(int argc, char *argv[])
 
     if(bAddRtSourceLoc) {
         QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("Subject01", "HemiLRSet", sourceEstimate, t_clusteredFwd);
-        testWindow->addBrainData("Subject01", "HemiLRSet", t_clusteredFwd);
+
+        //testWindow->addBrainData("Subject01", "HemiLRSet", t_clusteredFwd);
 
         //testWindow->addRtBrainData("Subject01", "HemiLRSet", sourceEstimate);
         //rtItemList.at(0)->addData(sourceEstimate);

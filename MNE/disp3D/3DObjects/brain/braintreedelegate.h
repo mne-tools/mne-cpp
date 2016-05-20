@@ -45,7 +45,7 @@
 
 #include "../../disp3D_global.h"
 
-#include "braintreemodel.h"
+#include "../data3Dtreemodel.h"
 #include "../../helpers/abstracttreeitem.h"
 
 
