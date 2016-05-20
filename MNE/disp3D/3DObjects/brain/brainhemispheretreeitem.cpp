@@ -124,8 +124,6 @@ bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation&
     this->setData(data, BrainHemisphereTreeItemRoles::SurfaceHemi);
 
     //Add childs
-    bool state = false;
-
     //Add surface child
     m_pSurfaceItem = new BrainSurfaceTreeItem(BrainTreeModelItemTypes::SurfaceItem);
 
@@ -134,7 +132,7 @@ bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation&
     list<<new QStandardItem(m_pSurfaceItem->toolTip());
     this->appendRow(list);
 
-    state = m_pSurfaceItem->addData(tSurface, p3DEntityParent);
+    bool state = m_pSurfaceItem->addData(tSurface, p3DEntityParent);
 
     //Add annotation child
     if(!tAnnotation.isEmpty()) {
@@ -179,8 +177,6 @@ bool BrainHemisphereTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore
     this->setData(data, BrainHemisphereTreeItemRoles::SurfaceHemi);
 
     //Add childs
-    bool state = false;
-
     //Add surface child
     BrainSourceSpaceTreeItem* pSourceSpaceItem = new BrainSourceSpaceTreeItem(BrainTreeModelItemTypes::SourceSpaceItem);
 
@@ -189,7 +185,7 @@ bool BrainHemisphereTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore
     list<<new QStandardItem(pSourceSpaceItem->toolTip());
     this->appendRow(list);
 
-    state = pSourceSpaceItem->addData(tHemisphere, p3DEntityParent);
+    bool state = pSourceSpaceItem->addData(tHemisphere, p3DEntityParent);
 
     return state;
 }

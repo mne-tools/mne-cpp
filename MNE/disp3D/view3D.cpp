@@ -63,8 +63,7 @@ View3D::View3D()
 , m_pCameraEntity(new Qt3DCore::QCamera(m_pRootEntity))
 , m_pFrameGraph(new Qt3DRender::QFrameGraph())
 , m_pForwardRenderer(new Qt3DRender::QForwardRenderer())
-, m_pBrain(Brain::SPtr(new Brain(m_pRootEntity)))
-, m_pSubject(Subject::SPtr(new Subject(m_pRootEntity)))
+, m_pData3D(Data3D::SPtr(new Data3D(m_pRootEntity)))
 , m_bCameraRotationMode(false)
 , m_bCameraTransMode(false)
 , m_vecCameraTrans(QVector3D(0.0,0.0,-0.5))
@@ -170,49 +169,49 @@ void View3D::initTransformations()
 
 //*************************************************************************************************************
 
-bool View3D::addBrainData(const QString& text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
+bool View3D::addBrainData(const QString& subject, const QString& set, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
 {
-    return m_pBrain->addData(text, tSurfaceSet, tAnnotationSet);
+    return m_pData3D->addData(subject, set, tSurfaceSet, tAnnotationSet);
 }
 
 
 //*************************************************************************************************************
 
-bool View3D::addBrainData(const QString& text, const Surface& tSurface, const Annotation& tAnnotation)
+bool View3D::addBrainData(const QString& subject, const QString& set, const Surface& tSurface, const Annotation& tAnnotation)
 {
-    return m_pBrain->addData(text, tSurface, tAnnotation);
+    return m_pData3D->addData(subject, set, tSurface, tAnnotation);
 }
 
 
 //*************************************************************************************************************
 
-bool View3D::addBrainData(const QString& text, const MNESourceSpace& tSourceSpace)
+bool View3D::addBrainData(const QString& subject, const QString& set, const MNESourceSpace& tSourceSpace)
 {
-    return m_pBrain->addData(text, tSourceSpace);
+    return m_pData3D->addData(subject, set, tSourceSpace);
 }
 
 
 //*************************************************************************************************************
 
-bool View3D::addBrainData(const QString& text, const MNEForwardSolution& tForwardSolution)
+bool View3D::addBrainData(const QString& subject, const QString& set, const MNEForwardSolution& tForwardSolution)
 {
-    return m_pBrain->addData(text, tForwardSolution.src);
+    return m_pData3D->addData(subject, set, tForwardSolution.src);
 }
 
 
 //*************************************************************************************************************
 
-QList<BrainRTSourceLocDataTreeItem*> View3D::addRtBrainData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
+QList<BrainRTSourceLocDataTreeItem*> View3D::addRtBrainData(const QString& subject, const QString& set, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
-    return m_pBrain->addData(text, tSourceEstimate, tForwardSolution);
+    return m_pData3D->addData(subject, set, tSourceEstimate, tForwardSolution);
 }
 
 
 //*************************************************************************************************************
 
-BrainTreeModel* View3D::getBrainTreeModel()
+SubjectTreeModel* View3D::getSubjectTreeModel()
 {
-    return m_pBrain->getBrainTreeModel();
+    return m_pData3D->getSubjectTreeModel();
 }
 
 

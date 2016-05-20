@@ -92,6 +92,7 @@ QVariant BrainTreeModel::data(const QModelIndex& index, int role) const
 
 int BrainTreeModel::columnCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent);
     return 2;
 }
 
@@ -117,17 +118,17 @@ QVariant BrainTreeModel::headerData(int section, Qt::Orientation orientation, in
 
 //*************************************************************************************************************
 
-bool BrainTreeModel::addData(const QString& text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
+bool BrainTreeModel::addData(const QString& set, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Find already existing surface items and add the new data to the first search result
-    QList<QStandardItem*> itemList = this->findItems(text);
+    QList<QStandardItem*> itemList = this->findItems(set);
     bool state = false;
 
     if(!itemList.isEmpty() && (itemList.at(0)->type() == BrainTreeModelItemTypes::SurfaceSetItem)) {
         BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
         state = pSurfaceSetItem->addData(tSurfaceSet, tAnnotationSet, p3DEntityParent);
     } else {
-        BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, text);
+        BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, set);
 
         QList<QStandardItem*> list;
         list<<pSurfaceSetItem;
@@ -143,17 +144,17 @@ bool BrainTreeModel::addData(const QString& text, const SurfaceSet& tSurfaceSet,
 
 //*************************************************************************************************************
 
-bool BrainTreeModel::addData(const QString& text, const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
+bool BrainTreeModel::addData(const QString& set, const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Find already existing surface items and add the new data to the first search result
-    QList<QStandardItem*> itemList = this->findItems(text);
+    QList<QStandardItem*> itemList = this->findItems(set);
     bool state = false;
 
     if(!itemList.isEmpty() && (itemList.at(0)->type() == BrainTreeModelItemTypes::SurfaceSetItem)) {
         BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
         state = pSurfaceSetItem->addData(tSurface, tAnnotation, p3DEntityParent);
     } else {
-        BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, text);
+        BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, set);
 
         QList<QStandardItem*> list;
         list<<pSurfaceSetItem;
@@ -169,17 +170,17 @@ bool BrainTreeModel::addData(const QString& text, const Surface& tSurface, const
 
 //*************************************************************************************************************
 
-bool BrainTreeModel::addData(const QString& text, const MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent)
+bool BrainTreeModel::addData(const QString& set, const MNESourceSpace& tSourceSpace, Qt3DCore::QEntity* p3DEntityParent)
 {
     //Find already existing surface items and add the new data to the first search result
-    QList<QStandardItem*> itemList = this->findItems(text);
+    QList<QStandardItem*> itemList = this->findItems(set);
     bool state = false;
 
     if(!itemList.isEmpty() && (itemList.at(0)->type() == BrainTreeModelItemTypes::SurfaceSetItem)) {
         BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
         state = pSurfaceSetItem->addData(tSourceSpace, p3DEntityParent);
     } else {
-        BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, text);
+        BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, set);
 
         QList<QStandardItem*> list;
         list<<pSurfaceSetItem;
@@ -195,12 +196,12 @@ bool BrainTreeModel::addData(const QString& text, const MNESourceSpace& tSourceS
 
 //*************************************************************************************************************
 
-QList<BrainRTSourceLocDataTreeItem*> BrainTreeModel::addData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
+QList<BrainRTSourceLocDataTreeItem*> BrainTreeModel::addData(const QString& set, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
 {
     QList<BrainRTSourceLocDataTreeItem*> returnList;
-    QList<QStandardItem*> itemList = this->findItems(text);
+    QList<QStandardItem*> itemList = this->findItems(set);
 
-    //Find the all the hemispheres of the set "text" and add the source estimates as items
+    //Find the all the hemispheres of the set "set" and add the source estimates as items
     if(!itemList.isEmpty()) {
         for(int i = 0; i<itemList.size(); i++) {
             for(int j = 0; j<itemList.at(i)->rowCount(); j++) {

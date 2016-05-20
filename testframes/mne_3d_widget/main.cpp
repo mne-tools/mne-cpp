@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
     MNEForwardSolution t_forwardSolution(t_File);
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addBrainData("ForwardSolution", t_forwardSolution);
+    testWindow->addBrainData("Subject01", "ForwardSolution", t_forwardSolution);
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
     control3DWidget->setView3D(testWindow);

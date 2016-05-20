@@ -83,7 +83,7 @@ class DISP3DNEWSHARED_EXPORT BrainTreeDelegate : public QItemDelegate
     Q_OBJECT
 
 public:
-    BrainTreeDelegate(QObject *parent = 0);
+    explicit BrainTreeDelegate(QObject *parent = 0);
 
     //=========================================================================================================
     /**

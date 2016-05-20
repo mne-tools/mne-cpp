@@ -100,7 +100,7 @@ public:
     *
     * @param[in] parent         The parent of this class.
     */
-    Brain(QEntity * parent = 0);
+    explicit Brain(QEntity * parent = 0);
 
     //=========================================================================================================
     /**

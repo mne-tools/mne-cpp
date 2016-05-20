@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
     AnnotationSet tAnnotSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addBrainData("HemiLRSet", tSurfSet, tAnnotSet);
+    testWindow->addBrainData("Subject01", "HemiLRSet", tSurfSet, tAnnotSet);
     testWindow->show();
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());

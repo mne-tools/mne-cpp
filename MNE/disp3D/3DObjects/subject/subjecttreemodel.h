@@ -122,8 +122,8 @@ public:
     int columnCount(const QModelIndex &parent) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
-    QStandardItem*     m_pRootItem;     /**< The root item of the tree model. */
 private:
+    QStandardItem*     m_pRootItem;     /**< The root item of the tree model. */
 
 };
 

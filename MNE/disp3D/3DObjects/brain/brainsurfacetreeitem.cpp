@@ -119,8 +119,8 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
         Qt3DCore::QTransform* transform =  new Qt3DCore::QTransform();
         m.rotate(180, QVector3D(0.0f, 1.0f, 0.0f));
         m.rotate(-90, QVector3D(1.0f, 0.0f, 0.0f));
-        m.translate(-0.035,-0.01,0.04);
-        m.scale(0.65);
+        m.translate(-0.035f,-0.01f,0.04f);
+        m.scale(0.65f);
         transform->setMatrix(m);
         m_pRenderable3DEntity->addComponent(transform);
         m_pRenderable3DEntityActivationOverlay->addComponent(transform);
