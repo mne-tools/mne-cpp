@@ -43,8 +43,11 @@
 
 #include "../disp3D_global.h"
 
-#include "brain/braintreemodel.h"
 #include "subject/subjecttreeitem.h"
+#include "brain/brainsurfacetreeitem.h"
+#include "brain/brainsurfacesettreeitem.h"
+
+#include "../helpers/renderable3Dentity.h"
 
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
@@ -112,6 +115,14 @@ public:
 
     //=========================================================================================================
     /**
+    * QStandardItemModel functions
+    */
+    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+    int columnCount(const QModelIndex &parent) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+
+    //=========================================================================================================
+    /**
     * Adds FreeSurfer brain data SETS.
     *
     * @param[in] subject            The name of the subject.
@@ -164,8 +175,6 @@ public:
 protected:
     QStandardItem*          m_pRootItem;            /**< The root item of the tree model. */
     Qt3DCore::QEntity*      m_pParentEntity;        /**< The parent 3D entity. */
-
-    BrainTreeModel * m_pBrainTreeModel;
 };
 
 } // NAMESPACE

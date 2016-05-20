@@ -61,7 +61,7 @@ SubjectTreeItem::SubjectTreeItem(int iType, const QString& text)
     this->setEditable(false);
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
-    this->setToolTip("Brain surface set");
+    this->setToolTip("Subject");
 }
 
 
