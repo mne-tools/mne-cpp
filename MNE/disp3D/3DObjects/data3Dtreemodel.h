@@ -86,9 +86,9 @@ namespace DISP3DLIB
 
 //=============================================================================================================
 /**
-* Visualizes a data in 3D.
+* Data3DTreeModel provides a tree based data model to hold all information about data which was added to the View 3D.
 *
-* @brief Visualizes a data in 3D.
+* @brief Data3DTreeModel provides a tree based data model to hold all information about data which was added to the View 3D.
 */
 class DISP3DNEWSHARED_EXPORT Data3DTreeModel : public QStandardItemModel
 {
