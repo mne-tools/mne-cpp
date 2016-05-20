@@ -92,7 +92,6 @@ QT_CHARTS_USE_NAMESPACE
 //=============================================================================================================
 
 
-
 //=============================================================================================================
 /**
 * Histogram display using Qtcharts, similar to matlab bar graph
@@ -103,7 +102,6 @@ class DISPSHARED_EXPORT Bar : public QWidget
 {
 
 public:
-
     //=========================================================================================================
     /**
     * The constructor for Bar.
@@ -147,11 +145,9 @@ public:
     template<typename T>
     void splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
 
-    //=========================================================================================================
-
 private:
-    QChart*             m_pChart;
-    QBarCategoryAxis*   m_pAxis;
+    QChart*             m_pChart;   //m_pChart is the name of the Qobject that will be shown as a graphical widget for the histogram
+    QBarCategoryAxis*   m_pAxis;    //m_pAxis is customized x-axis to be used in m_pChart
 };
 
 
@@ -200,7 +196,7 @@ void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat
     QString currentLimits;
     int classFreq;
 
-    for (int kr=0; kr < iClassAmount; kr++)
+    for (int kr=0; kr < iClassAmount; ++kr)
     {
         classFreq = matClassFrequencyData(kr);
         currentLimits = ((QString::number(resultDisplayValues(kr), 'g' ,iPrecisionValue) + " to " + (QString::number(resultDisplayValues(kr+1), 'g', iPrecisionValue))));
@@ -233,7 +229,7 @@ void Bar::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Ei
            limitDisplayValue(0.0),
            doubleExponentValue(0.0);
     int    limitExponentValue(0);
-    for (int ir=0; ir <= iClassAmount; ir++)
+    for (int ir=0; ir <= iClassAmount; ++ir)
     {
         originalValue = matClassLimitData(ir);
         if (originalValue == 0.0)                          //mechanism to guard against evaluation of log(0.0) which is infinity
@@ -252,7 +248,7 @@ void Bar::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Ei
 
     int lowestExponentValue{0},
         highestExponentValue{0};
-    for (int ir=0; ir <= iClassAmount; ir++)
+    for (int ir=0; ir <= iClassAmount; ++ir)
     {
         if (vecExponentValues(ir) < lowestExponentValue)
         {
@@ -266,7 +262,7 @@ void Bar::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Ei
 
     if (highestExponentValue == 0)
     {
-        for (int ir=0; ir <= iClassAmount; ir++)
+        for (int ir=0; ir <= iClassAmount; ++ir)
         {
             while (vecExponentValues(ir) > lowestExponentValue)     //normalize the values by multiplying the display value by 10 and reducing the exponentValue by 1 until exponentValue reach the lowestExponentValue
             {
@@ -277,7 +273,7 @@ void Bar::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Ei
     }
     if (lowestExponentValue == 0)
     {
-        for (int ir=0; ir <= iClassAmount; ir++)
+        for (int ir=0; ir <= iClassAmount; ++ir)
         {
             while (vecExponentValues(ir) < highestExponentValue)
             {

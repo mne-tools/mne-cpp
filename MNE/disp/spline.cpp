@@ -133,7 +133,6 @@ void Spline::mousePressEvent(QMouseEvent *event)
                     m_pChart->createDefaultAxes();
                     emitLeft = (leftPoint[0].x() * (pow(10, resultExponentValues[0])));
                     emit borderChanged(emitLeft, emitMiddle, emitRight);
-                    qDebug() << "Border = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
                 }
             }
 
