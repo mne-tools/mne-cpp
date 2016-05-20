@@ -119,6 +119,19 @@ QVariant Data3DTreeModel::headerData(int section, Qt::Orientation orientation, i
 
 //*************************************************************************************************************
 
+Qt::ItemFlags Data3DTreeModel::flags(const QModelIndex &index) const
+{
+    //Do not allow items from column 1 (0 based counting) to be edited
+    if(index.column() == 1) {
+        return Qt::ItemIsEnabled;
+    }
+
+    return QStandardItemModel::flags(index);
+}
+
+
+//*************************************************************************************************************
+
 bool Data3DTreeModel::addData(const QString& subject, const QString& set, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
 {
     //Find the subject
@@ -128,7 +141,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
     if(itemSubjectList.size() == 0) {
         SubjectTreeItem* subjectItem = new SubjectTreeItem(SubjectTreeModelItemTypes::SubjectItem, subject);
         itemSubjectList << subjectItem;
-        itemSubjectList<<new QStandardItem(subjectItem->toolTip());
+        itemSubjectList << new QStandardItem(subjectItem->toolTip());
         m_pRootItem->appendRow(itemSubjectList);
     }
 
@@ -150,8 +163,8 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
                 BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, set);
 
                 QList<QStandardItem*> list;
-                list<<pSurfaceSetItem;
-                list<<new QStandardItem(pSurfaceSetItem->toolTip());
+                list << pSurfaceSetItem;
+                list << new QStandardItem(pSurfaceSetItem->toolTip());
                 pSubjectItem->appendRow(list);
 
                 state = pSurfaceSetItem->addData(tSurfaceSet, tAnnotationSet, m_pParentEntity);
@@ -174,7 +187,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
     if(itemSubjectList.size() == 0) {
         SubjectTreeItem* subjectItem = new SubjectTreeItem(SubjectTreeModelItemTypes::SubjectItem, subject);
         itemSubjectList << subjectItem;
-        itemSubjectList<<new QStandardItem(subjectItem->toolTip());
+        itemSubjectList << new QStandardItem(subjectItem->toolTip());
         m_pRootItem->appendRow(itemSubjectList);
     }
 
@@ -196,8 +209,8 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
                 BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, set);
 
                 QList<QStandardItem*> list;
-                list<<pSurfaceSetItem;
-                list<<new QStandardItem(pSurfaceSetItem->toolTip());
+                list << pSurfaceSetItem;
+                list << new QStandardItem(pSurfaceSetItem->toolTip());
                 pSubjectItem->appendRow(list);
 
                 state = pSurfaceSetItem->addData(tSurface, tAnnotation, m_pParentEntity);
@@ -220,7 +233,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
     if(itemSubjectList.size() == 0) {
         SubjectTreeItem* subjectItem = new SubjectTreeItem(SubjectTreeModelItemTypes::SubjectItem, subject);
         itemSubjectList << subjectItem;
-        itemSubjectList<<new QStandardItem(subjectItem->toolTip());
+        itemSubjectList << new QStandardItem(subjectItem->toolTip());
         m_pRootItem->appendRow(itemSubjectList);
     }
 
@@ -242,8 +255,8 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
                 BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, set);
 
                 QList<QStandardItem*> list;
-                list<<pSurfaceSetItem;
-                list<<new QStandardItem(pSurfaceSetItem->toolTip());
+                list << pSurfaceSetItem;
+                list << new QStandardItem(pSurfaceSetItem->toolTip());
                 pSubjectItem->appendRow(list);
 
                 state = pSurfaceSetItem->addData(tSourceSpace, m_pParentEntity);
