@@ -60,7 +60,6 @@ Data3DTreeModel::Data3DTreeModel(QObject* parent, Qt3DCore::QEntity* parentEntit
 : QStandardItemModel(parent)
 , m_pParentEntity(parentEntity)
 {
-    m_pBrainTreeModel = new BrainTreeModel(parent);
     m_pRootItem = this->invisibleRootItem();
     m_pRootItem->setText("Loaded 3D Data");
 }
@@ -76,6 +75,50 @@ Data3DTreeModel::~Data3DTreeModel()
 
 //*************************************************************************************************************
 
+QVariant Data3DTreeModel::data(const QModelIndex& index, int role) const
+{
+//    qDebug()<<"Data3DTreeModel::data - index.column(): "<<index.column();
+
+//    if(index.column() == 1) {
+//        QVariant data;
+//        data.setValue(QString("test"));
+//        return data;
+//    }
+
+    return QStandardItemModel::data(index, role);
+}
+
+
+//*************************************************************************************************************
+
+int Data3DTreeModel::columnCount(const QModelIndex &parent) const
+{
+    Q_UNUSED(parent);
+    return 2;
+}
+
+
+//*************************************************************************************************************
+
+QVariant Data3DTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
+        QVariant data;
+        if(section == 0) {
+            data.setValue(QString("Data"));
+        } else if(section == 1) {
+            data.setValue(QString("Description"));
+        }
+
+        return data;
+    }
+
+    return QVariant();
+}
+
+
+//*************************************************************************************************************
+
 bool Data3DTreeModel::addData(const QString& subject, const QString& set, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
 {
     //Find the subject
@@ -85,6 +128,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
     if(itemSubjectList.size() == 0) {
         SubjectTreeItem* subjectItem = new SubjectTreeItem(SubjectTreeModelItemTypes::SubjectItem, subject);
         itemSubjectList << subjectItem;
+        itemSubjectList<<new QStandardItem(subjectItem->toolTip());
         m_pRootItem->appendRow(itemSubjectList);
     }
 
@@ -130,6 +174,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
     if(itemSubjectList.size() == 0) {
         SubjectTreeItem* subjectItem = new SubjectTreeItem(SubjectTreeModelItemTypes::SubjectItem, subject);
         itemSubjectList << subjectItem;
+        itemSubjectList<<new QStandardItem(subjectItem->toolTip());
         m_pRootItem->appendRow(itemSubjectList);
     }
 
@@ -143,7 +188,6 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
 
             //Find already existing surface items and add the new data to the first search result
             QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
-            bool state = false;
 
             if(!itemList.isEmpty() && (itemList.at(0)->type() == BrainTreeModelItemTypes::SurfaceSetItem)) {
                 BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
@@ -176,6 +220,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
     if(itemSubjectList.size() == 0) {
         SubjectTreeItem* subjectItem = new SubjectTreeItem(SubjectTreeModelItemTypes::SubjectItem, subject);
         itemSubjectList << subjectItem;
+        itemSubjectList<<new QStandardItem(subjectItem->toolTip());
         m_pRootItem->appendRow(itemSubjectList);
     }
 
@@ -189,7 +234,6 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
 
             //Find already existing surface items and add the new data to the first search result
             QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
-            bool state = false;
 
             if(!itemList.isEmpty() && (itemList.at(0)->type() == BrainTreeModelItemTypes::SurfaceSetItem)) {
                 BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
@@ -220,15 +264,7 @@ QList<BrainRTSourceLocDataTreeItem*> Data3DTreeModel::addData(const QString& sub
     //Find the subject
     QList<QStandardItem*> itemSubjectList = this->findItems(subject);
 
-    //If subject does not exist, create a new one
-    if(itemSubjectList.size() == 0) {
-        SubjectTreeItem* subjectItem = new SubjectTreeItem(SubjectTreeModelItemTypes::SubjectItem, subject);
-        itemSubjectList << subjectItem;
-        m_pRootItem->appendRow(itemSubjectList);
-    }
-
     //Iterate through subject items and add new data respectivley
-    bool state = false;
 
     for(int i = 0; i < itemSubjectList.size(); ++i) {
         //Check if it is really a subject tree item
