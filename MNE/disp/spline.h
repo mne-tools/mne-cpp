@@ -105,27 +105,18 @@ QT_CHARTS_USE_NAMESPACE
 * @brief Spline class for histogram display using Qtcharts/QSpline
 */
 
-class DISPSHARED_EXPORT Spline
-: public QWidget
+class DISPSHARED_EXPORT Spline: public QWidget
 {
     Q_OBJECT
-    double minAxisX,
-           maxAxisX;
-    int maximumFrequency;
-    int i = 0;
-    QLegendMarker* marker;
-    Eigen::VectorXi resultExponentValues;
 public:
 
     //=========================================================================================================
-
     /**
     * The constructor for Spline
     */
     Spline(const QString& title = "Spline Histogram", QWidget* parent = 0);
 
     //=========================================================================================================
-
     /**
     * creates a qspline chart histogram from 2 vectors: class limits and class frequency
     *
@@ -139,7 +130,6 @@ public:
     void setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue);
 
     //=========================================================================================================
-
     /**
     * constructor for mouse press event behaviour to create threshold lines and signal emit
     *
@@ -148,7 +138,6 @@ public:
     void Spline::mousePressEvent(QMouseEvent *event);
 
     //=========================================================================================================
-
     /**
     * Updates the spline with new data
     *
@@ -160,7 +149,6 @@ public:
     void updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData, int iPrecisionValue);
 
     //=========================================================================================================
-
     /**
     * splitCoefficientAndExponent takes in QVector value of coefficient and exponent (example: 1.2e-10) and finds the coefficient (1.2) and the appropriate exponent (-12), normalize the exponents to either the lowest or highest exponent in the list then places the values in two separate QVectors
     *
@@ -172,18 +160,26 @@ public:
     template<typename T>
     void splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
 
-    //=========================================================================================================
-
-private:
-    QChart                  *m_pChart;
-    QBarCategoryAxis        *m_pAxis;
-    QLineSeries             *leftThreshold;
-    QLineSeries             *middleThreshold;
-    QLineSeries             *rightThreshold;
-    QGraphicsSimpleTextItem *m_coordX;
-    QGraphicsSimpleTextItem *m_coordY;
+    private:
+        QChart                  *m_pChart;          //Qchart object that will be shown in the widget
+        QLineSeries             *leftThreshold;     //Vertical line series for the left threshold
+        QLineSeries             *middleThreshold;   //Vertical line series for the middle threshold
+        QLineSeries             *rightThreshold;    //Vertical line series for the right threshold
+        double minAxisX,                            //Value of the smallest point of the series in x-axis
+               maxAxisX;                            //Value of the largest point on the series in x-axis
+        int maximumFrequency;                       //Highest value of frequency (y-axis)
+        QLegendMarker *marker;                      //Variable to specify the legend of the threshold lines
+        Eigen::VectorXi resultExponentValues;       //Common exponent values for the entire
 
 signals:
+    //=========================================================================================================
+    /**
+    * emit signal consisting of three threshold lines x-axis value if any one of them is changed
+    *
+    * @param[out]  leftThreshold      value of the left threshold line (initialized as minAxisX)
+    * @param[out]  middleThreshold    value of the middle threshold line (initialized as maxAxisX)
+    * @param[out]  rightThreshold     value of the right threshold line (initialized as maxAxisX)
+    */
     void borderChanged(double leftThreshold, double middleThreshold, double rightThreshold);
 };
 
@@ -195,24 +191,22 @@ signals:
 
 template <typename T>
 void Spline::setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData, int iPrecisionValue)
-  {
-      Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matClassLimitData.rows(),1);
-      matrixName.col(0)= matClassLimitData;
-
-      this->updatePlot(matrixName, matClassFrequencyData, iPrecisionValue);
-  }
+{
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matClassLimitData.rows(),1);
+    matrixName.col(0)= matClassLimitData;
+    this->updatePlot(matrixName, matClassFrequencyData, iPrecisionValue);
+}
 
 
 //=========================================================================================================
 
 template <typename T>
 void Spline::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData, int iPrecisionValue)
-  {
-      Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1, matClassLimitData.cols());
-      matrixName.row(0)= matClassLimitData;
-
-      this->updatePlot(matrixName, matClassFrequencyData, iPrecisionValue);
-  }
+{
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1, matClassLimitData.cols());
+    matrixName.row(0)= matClassLimitData;
+    this->updatePlot(matrixName, matClassFrequencyData, iPrecisionValue);
+}
 
 
 //=========================================================================================================
@@ -220,130 +214,130 @@ void Spline::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitDat
 template<typename T>
 void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData, int iPrecisionValue)
 {
-      Eigen::VectorXd resultDisplayValues;
-      int iClassAmount = matClassFrequencyData.rows();
-      this->splitCoefficientAndExponent (matClassLimitData, iClassAmount, resultDisplayValues, resultExponentValues);
+    Eigen::VectorXd resultDisplayValues;
+    int iClassAmount = matClassFrequencyData.rows();
+    this->splitCoefficientAndExponent (matClassLimitData, iClassAmount, resultDisplayValues, resultExponentValues);
 
-      //  Start of Qtchart histogram display
-      QString histogramExponent;
-      histogramExponent = "X-axis scale: 10e" + QString::number(resultExponentValues(0));   //used to tell the user the exponential scale used in the histogram
+    //  Start of Qtchart histogram display
+    QString histogramExponent;
+    histogramExponent = "X-axis scale: 10e" + QString::number(resultExponentValues(0));   //used to tell the user the exponential scale used in the histogram
 
-      QSplineSeries *series = new QSplineSeries();
-      QSplineSeries *shadowSeries = new QSplineSeries();
-      QSplineSeries *shadowSeriesY = new QSplineSeries();
+    QSplineSeries *series = new QSplineSeries();
+    QSplineSeries *shadowSeries = new QSplineSeries();
+    QSplineSeries *shadowSeriesY = new QSplineSeries();
 
-      series->setName(histogramExponent);
+    series->setName(histogramExponent);
 
-      minAxisX = resultDisplayValues(0);
-      maxAxisX = resultDisplayValues(iClassAmount);
-      double classMark;                         //class mark is the middle point between lower and upper class limit
-      maximumFrequency = 0;                     //maximumFrequency used to create an intuitive histogram
+    minAxisX = resultDisplayValues(0);
+    maxAxisX = resultDisplayValues(iClassAmount);
+    double classMark;                         //class mark is the middle point between lower and upper class limit
+    maximumFrequency = 0;                     //maximumFrequency used to create an intuitive histogram
 
-      for (int ir=0; ir < iClassAmount; ir++)
-      {
-          classMark = (resultDisplayValues(ir) + resultDisplayValues(ir+1))/2;
-          series->append(classMark, matClassFrequencyData(ir));
-          shadowSeries->append(classMark, 0);
-          shadowSeriesY->append(minAxisX, matClassFrequencyData(ir));
-          std::cout << "Spline data points = " << classMark << ", " << matClassFrequencyData(ir) << std::endl;
-          if (matClassFrequencyData(ir) > maximumFrequency)
-          {
-              maximumFrequency = matClassFrequencyData(ir);
-          }
-      }
+    for (int ir=0; ir < iClassAmount; ++ir)
+    {
+        classMark = (resultDisplayValues(ir) + resultDisplayValues(ir+1))/2;
+        series->append(classMark, matClassFrequencyData(ir));
+        shadowSeries->append(classMark, 0);
+        shadowSeriesY->append(minAxisX, matClassFrequencyData(ir));
+        std::cout << "Spline data points = " << classMark << ", " << matClassFrequencyData(ir) << std::endl;
+        if (matClassFrequencyData(ir) > maximumFrequency)
+        {
+            maximumFrequency = matClassFrequencyData(ir);
+        }
+    }
 
-      m_pChart->removeAllSeries();              //create new series and then clear the plot and update with new data
-      m_pChart->addSeries(series);
+    m_pChart->removeAllSeries();              //create new series and then clear the plot and update with new data
+    m_pChart->addSeries(series);
 
-      leftThreshold = new QLineSeries();
-      middleThreshold = new QLineSeries();
-      rightThreshold = new QLineSeries();
-      leftThreshold->append(minAxisX, 0);       //initialize threshold lines
-      middleThreshold->append(maxAxisX, 0);
-      rightThreshold->append(maxAxisX, 0);
-      leftThreshold->setVisible(false);         //threshold lines intially invisible
-      middleThreshold->setVisible(false);
-      rightThreshold->setVisible(false);
+    leftThreshold = new QLineSeries();
+    middleThreshold = new QLineSeries();
+    rightThreshold = new QLineSeries();
+    leftThreshold->append(minAxisX, 0);       //initialize threshold lines
+    middleThreshold->append(maxAxisX, 0);
+    rightThreshold->append(maxAxisX, 0);
+    leftThreshold->setVisible(false);         //threshold lines intially invisible
+    middleThreshold->setVisible(false);
+    rightThreshold->setVisible(false);
 
-      m_pChart->legend()->setVisible(true);
-      m_pChart->legend()->setAlignment(Qt::AlignBottom);
-      m_pChart->addSeries(leftThreshold);
-      m_pChart->addSeries(middleThreshold);
-      m_pChart->addSeries(rightThreshold);
-      m_pChart->createDefaultAxes();
-      m_pChart->axisX()->setRange(minAxisX, maxAxisX);
-      m_pChart->axisY()->setRange(0,maximumFrequency);
-  }
+    m_pChart->legend()->setVisible(true);
+    m_pChart->legend()->setAlignment(Qt::AlignBottom);
+    m_pChart->addSeries(leftThreshold);
+    m_pChart->addSeries(middleThreshold);
+    m_pChart->addSeries(rightThreshold);
+    m_pChart->createDefaultAxes();
+    m_pChart->axisX()->setRange(minAxisX, maxAxisX);
+    m_pChart->axisY()->setRange(0,maximumFrequency);
+}
 
 
- //*************************************************************************************************************
+//*************************************************************************************************************
 
 template <typename T>
 void Spline::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
 {
-      vecCoefficientResults.resize(iClassAmount + 1);
-      vecExponentValues.resize(iClassAmount + 1);
-      double originalValue(0.0),
-             limitDisplayValue(0.0),
-             doubleExponentValue(0.0);
-      int    limitExponentValue(0);
+    vecCoefficientResults.resize(iClassAmount + 1);
+    vecExponentValues.resize(iClassAmount + 1);
+    double originalValue(0.0),
+         limitDisplayValue(0.0),
+         doubleExponentValue(0.0);
+    int    limitExponentValue(0);
+    for (int ir=0; ir <= iClassAmount; ir++)
+    {
+        originalValue = matClassLimitData(ir);
+        if (originalValue == 0.0)                          //mechanism to guard against evaluation of log(0.0) which is infinity
+        {
+            doubleExponentValue = 0.0;
+        }
+
+        else
+        {
+            doubleExponentValue = log10(abs(originalValue));                    //return the exponent value in double
+        }
+
+        limitExponentValue = round(doubleExponentValue);                        //round the exponent value to the nearest signed integer
+        limitDisplayValue = originalValue * (pow(10,-(limitExponentValue)));    //display value is derived from multiplying class limit with inverse 10 to the power of negative exponent
+        vecCoefficientResults(ir) = limitDisplayValue;                          //append the display value to the return vector
+        vecExponentValues(ir) = limitExponentValue;                             //append the exponent value to the return vector
+    }
+
+    int lowestExponentValue{0},
+    highestExponentValue{0};
+
+    for (int ir=0; ir <= iClassAmount; ir++)
+    {
+        if (vecExponentValues(ir) < lowestExponentValue)
+        {
+            lowestExponentValue = vecExponentValues(ir);        //find lowest exponent value to normalize display values for negative exponent
+        }
+        if (vecExponentValues(ir) > highestExponentValue)       //find highest exponent value to normalize display values for positive exponent
+        {
+            highestExponentValue = vecExponentValues(ir);
+        }
+    }
+
+    if (highestExponentValue == 0)
+    {
+        for (int ir=0; ir <= iClassAmount; ir++)
+        {
+            while (vecExponentValues(ir) > lowestExponentValue)     //normalize the values by multiplying the display value by 10 and reducing the exponentValue by 1 until exponentValue reach the lowestExponentValue
+            {
+                vecCoefficientResults(ir) = vecCoefficientResults(ir) * 10;
+                vecExponentValues(ir)--;
+            }
+        }
+    }
+    if (lowestExponentValue == 0)
+    {
       for (int ir=0; ir <= iClassAmount; ir++)
       {
-          originalValue = matClassLimitData(ir);
-          if (originalValue == 0.0)                          //mechanism to guard against evaluation of log(0.0) which is infinity
+          while (vecExponentValues(ir) < highestExponentValue)
           {
-              doubleExponentValue = 0.0;
-          }
-
-          else
-          {
-              doubleExponentValue = log10(abs(originalValue));                    //return the exponent value in double
-          }
-
-          limitExponentValue = round(doubleExponentValue);                        //round the exponent value to the nearest signed integer
-          limitDisplayValue = originalValue * (pow(10,-(limitExponentValue)));    //display value is derived from multiplying class limit with inverse 10 to the power of negative exponent
-          vecCoefficientResults(ir) = limitDisplayValue;                          //append the display value to the return vector
-          vecExponentValues(ir) = limitExponentValue;                             //append the exponent value to the return vector
-      }
-
-      int lowestExponentValue{0},
-          highestExponentValue{0};
-
-      for (int ir=0; ir <= iClassAmount; ir++)
-      {
-          if (vecExponentValues(ir) < lowestExponentValue)
-          {
-              lowestExponentValue = vecExponentValues(ir);        //find lowest exponent value to normalize display values for negative exponent
-          }
-          if (vecExponentValues(ir) > highestExponentValue)       //find highest exponent value to normalize display values for positive exponent
-          {
-              highestExponentValue = vecExponentValues(ir);
+              vecCoefficientResults(ir) = vecCoefficientResults(ir) / 10;
+              vecExponentValues(ir)++;
           }
       }
-
-      if (highestExponentValue == 0)
-      {
-          for (int ir=0; ir <= iClassAmount; ir++)
-          {
-              while (vecExponentValues(ir) > lowestExponentValue)     //normalize the values by multiplying the display value by 10 and reducing the exponentValue by 1 until exponentValue reach the lowestExponentValue
-              {
-                  vecCoefficientResults(ir) = vecCoefficientResults(ir) * 10;
-                  vecExponentValues(ir)--;
-              }
-          }
-      }
-      if (lowestExponentValue == 0)
-      {
-          for (int ir=0; ir <= iClassAmount; ir++)
-          {
-              while (vecExponentValues(ir) < highestExponentValue)
-              {
-                  vecCoefficientResults(ir) = vecCoefficientResults(ir) / 10;
-                  vecExponentValues(ir)++;
-              }
-          }
-      }
-  }
+    }
+}
 }
 
 //=========================================================================================================

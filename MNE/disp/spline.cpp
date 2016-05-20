@@ -65,10 +65,7 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Spline::Spline(const QString& title, QWidget* parent)
-:  QWidget(parent)
-,  m_coordX(0)
-,  m_coordY(0)
+Spline::Spline(const QString& title, QWidget* parent):  QWidget(parent)
 {
     m_pChart = new QChart();
     m_pChart->setTitle(title);

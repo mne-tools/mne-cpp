@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of reading raw data and presenting the result in histogram form
+* @brief    Example application of reading raw data and presenting the result in histogram form
 *
 */
 
