@@ -66,8 +66,8 @@ BrainTreeDelegate::BrainTreeDelegate(QObject* parent)
 
 QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option , const QModelIndex& index) const
 {
-    const BrainTreeModel* pBrainTreeModel = static_cast<const BrainTreeModel*>(index.model());
-    const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pBrainTreeModel->itemFromIndex(index));
+    const Data3DTreeModel* pData3DTreeModel = static_cast<const Data3DTreeModel*>(index.model());
+    const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pData3DTreeModel->itemFromIndex(index));
 
     switch(pAbstractItem->type()) {
         case BrainTreeMetaItemTypes::SurfaceColorGyri: {
@@ -170,8 +170,8 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
 
 void BrainTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
 {
-    const BrainTreeModel* pBrainTreeModel = static_cast<const BrainTreeModel*>(index.model());
-    const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pBrainTreeModel->itemFromIndex(index));
+    const Data3DTreeModel* pData3DTreeModel = static_cast<const Data3DTreeModel*>(index.model());
+    const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pData3DTreeModel->itemFromIndex(index));
 
     switch(pAbstractItem->type()) {
         case BrainTreeMetaItemTypes::SurfaceColorGyri: {
@@ -246,8 +246,8 @@ void BrainTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index)
 
 void BrainTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
 {
-    const BrainTreeModel* pBrainTreeModel = static_cast<const BrainTreeModel*>(index.model());
-    const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pBrainTreeModel->itemFromIndex(index));
+    const Data3DTreeModel* pData3DTreeModel = static_cast<const Data3DTreeModel*>(index.model());
+    const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pData3DTreeModel->itemFromIndex(index));
 
     switch(pAbstractItem->type()) {
         case BrainTreeMetaItemTypes::SurfaceColorGyri: {
