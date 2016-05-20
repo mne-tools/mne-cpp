@@ -86,8 +86,8 @@ Control3DWidget::Control3DWidget(QWidget* parent, Qt::WindowType type)
     ui->m_pushButton_minimize->setText(QString("Minimize - %1").arg(this->windowTitle()));
 
     //Init tree view properties
-    BrainTreeDelegate* pBrainTreeDelegate = new BrainTreeDelegate(this);
-    ui->m_treeView_loadedData->setItemDelegate(pBrainTreeDelegate);
+    Data3DTreeDelegate* pData3DTreeDelegate = new Data3DTreeDelegate(this);
+    ui->m_treeView_loadedData->setItemDelegate(pData3DTreeDelegate);
     ui->m_treeView_loadedData->setHeaderHidden(false);
     ui->m_treeView_loadedData->setEditTriggers(QAbstractItemView::CurrentChanged);
 

@@ -92,6 +92,7 @@ else {
 SOURCES += \
     view3D.cpp \
     3DObjects/data3Dtreemodel.cpp \
+    3DObjects/data3Dtreedelegate.cpp \
     3DObjects/subject/subjecttreeitem.cpp \
     3DObjects/subject/subjecttreemetaitem.cpp \
     3DObjects/brain/braintreemetaitem.cpp \
@@ -99,7 +100,6 @@ SOURCES += \
     3DObjects/brain/brainsurfacesettreeitem.cpp \
     3DObjects/brain/brainannotationtreeitem.cpp \
     3DObjects/brain/brainhemispheretreeitem.cpp \
-    3DObjects/brain/braintreedelegate.cpp \
     3DObjects/brain/brainrtsourcelocdatatreeitem.cpp \
     3DObjects/brain/brainrtconnectivitydatatreeitem.cpp \
     helpers/abstracttreeitem.cpp \
@@ -114,6 +114,7 @@ SOURCES += \
 HEADERS += \
     view3D.h \
     3DObjects/data3Dtreemodel.h \
+    3DObjects/data3Dtreedelegate.h \
     3DObjects/subject/subjecttreeitem.h \
     3DObjects/subject/subjecttreemetaitem.h \
     3DObjects/brain/braintreemetaitem.h \
@@ -121,7 +122,6 @@ HEADERS += \
     3DObjects/brain/brainsurfacesettreeitem.h \
     3DObjects/brain/brainannotationtreeitem.h \
     3DObjects/brain/brainhemispheretreeitem.h \
-    3DObjects/brain/braintreedelegate.h \
     3DObjects/brain/brainrtsourcelocdatatreeitem.h \
     3DObjects/brain/brainrtconnectivitydatatreeitem.h \
     helpers/abstracttreeitem.h \

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     braintreedelegate.cpp
+* @file     data3Dtreedelegate.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BrainTreeDelegate class definition.
+* @brief    Data3DTreeDelegate class definition.
 *
 */
 
@@ -40,7 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "braintreedelegate.h"
+#include "data3Dtreedelegate.h"
 
 
 //*************************************************************************************************************
@@ -56,7 +56,7 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainTreeDelegate::BrainTreeDelegate(QObject* parent)
+Data3DTreeDelegate::Data3DTreeDelegate(QObject* parent)
 : QItemDelegate(parent)
 {
 }
@@ -64,7 +64,7 @@ BrainTreeDelegate::BrainTreeDelegate(QObject* parent)
 
 //*************************************************************************************************************
 
-QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option , const QModelIndex& index) const
+QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option , const QModelIndex& index) const
 {
     const Data3DTreeModel* pData3DTreeModel = static_cast<const Data3DTreeModel*>(index.model());
     const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pData3DTreeModel->itemFromIndex(index));
@@ -73,7 +73,7 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
         case BrainTreeMetaItemTypes::SurfaceColorGyri: {
             QColorDialog *pColorDialog = new QColorDialog(parent);
             connect(pColorDialog, &QColorDialog::currentColorChanged,
-                    this, &BrainTreeDelegate::onEditorEdited);
+                    this, &Data3DTreeDelegate::onEditorEdited);
             pColorDialog->setWindowTitle("Select Gyri Color");
             pColorDialog->show();
             return pColorDialog;
@@ -82,7 +82,7 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
         case BrainTreeMetaItemTypes::SurfaceColorSulci: {
             QColorDialog *pColorDialog = new QColorDialog();
             connect(pColorDialog, &QColorDialog::currentColorChanged,
-                    this, &BrainTreeDelegate::onEditorEdited);
+                    this, &Data3DTreeDelegate::onEditorEdited);
             pColorDialog->setWindowTitle("Select Sulci Color");
             pColorDialog->show();
             return pColorDialog;
@@ -91,7 +91,7 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
         case BrainTreeMetaItemTypes::RTDataColormapType: {
             QComboBox* pComboBox = new QComboBox(parent);
             connect(pComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-                    this, &BrainTreeDelegate::onEditorEdited);
+                    this, &Data3DTreeDelegate::onEditorEdited);
             pComboBox->addItem("Hot Negative 1");
             pComboBox->addItem("Hot Negative 2");
             pComboBox->addItem("Hot");
@@ -101,7 +101,7 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
         case BrainTreeMetaItemTypes::RTDataNormalizationValue: {
             QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
             connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                    this, &BrainTreeDelegate::onEditorEdited);
+                    this, &Data3DTreeDelegate::onEditorEdited);
             pDoubleSpinBox->setMinimum(0.0001);
             pDoubleSpinBox->setMaximum(10000.0);
             pDoubleSpinBox->setSingleStep(0.01);
@@ -112,7 +112,7 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
         case BrainTreeMetaItemTypes::RTDataTimeInterval: {
             QSpinBox* pSpinBox = new QSpinBox(parent);
             connect(pSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                    this, &BrainTreeDelegate::onEditorEdited);
+                    this, &Data3DTreeDelegate::onEditorEdited);
             pSpinBox->setSuffix(" mSec");
             pSpinBox->setMinimum(1);
             pSpinBox->setMaximum(5000);
@@ -132,7 +132,7 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
         case BrainTreeMetaItemTypes::SurfaceColorItem: {
             QColorDialog *pColorDialog = new QColorDialog();
             connect(pColorDialog, &QColorDialog::currentColorChanged,
-                    this, &BrainTreeDelegate::onEditorEdited);
+                    this, &Data3DTreeDelegate::onEditorEdited);
             pColorDialog->setWindowTitle("Select Surface Color");
             pColorDialog->show();
             return pColorDialog;
@@ -141,7 +141,7 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
         case BrainTreeMetaItemTypes::RTDataNumberAverages: {
             QSpinBox* pSpinBox = new QSpinBox(parent);
             connect(pSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                    this, &BrainTreeDelegate::onEditorEdited);
+                    this, &Data3DTreeDelegate::onEditorEdited);
             pSpinBox->setMinimum(1);
             pSpinBox->setMaximum(100);
             pSpinBox->setSingleStep(1);
@@ -152,7 +152,7 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
         case BrainTreeMetaItemTypes::SurfaceAlpha: {
             QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
             connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                    this, &BrainTreeDelegate::onEditorEdited);
+                    this, &Data3DTreeDelegate::onEditorEdited);
             pDoubleSpinBox->setMinimum(0.01);
             pDoubleSpinBox->setMaximum(1.0);
             pDoubleSpinBox->setSingleStep(0.01);
@@ -168,7 +168,7 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
 
 //*************************************************************************************************************
 
-void BrainTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
+void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
 {
     const Data3DTreeModel* pData3DTreeModel = static_cast<const Data3DTreeModel*>(index.model());
     const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pData3DTreeModel->itemFromIndex(index));
@@ -244,7 +244,7 @@ void BrainTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index)
 
 //*************************************************************************************************************
 
-void BrainTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
+void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
 {
     const Data3DTreeModel* pData3DTreeModel = static_cast<const Data3DTreeModel*>(index.model());
     const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pData3DTreeModel->itemFromIndex(index));
@@ -352,7 +352,7 @@ void BrainTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
 
 //*************************************************************************************************************
 
-void BrainTreeDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
+void Data3DTreeDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
 {
     editor->setGeometry(option.rect);
 }
@@ -360,7 +360,7 @@ void BrainTreeDelegate::updateEditorGeometry(QWidget* editor, const QStyleOption
 
 //*************************************************************************************************************
 
-void BrainTreeDelegate::onEditorEdited()
+void Data3DTreeDelegate::onEditorEdited()
 {
     QWidget* editor = qobject_cast<QWidget*>(QObject::sender());
     emit commitData(editor);
