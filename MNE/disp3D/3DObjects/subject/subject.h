@@ -97,7 +97,7 @@ public:
     *
     * @param[in] parent         The parent of this class.
     */
-    Subject(QEntity * parent = 0);
+    explicit Subject(QEntity * parent = 0);
 
     //=========================================================================================================
     /**

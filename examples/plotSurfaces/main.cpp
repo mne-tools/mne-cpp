@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
     SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addBrainData("HemiLRSet", t_surfSet, t_annotSet);
+    testWindow->addBrainData("Subject01", "HemiLRSet", t_surfSet, t_annotSet);
 
     testWindow->show();
 

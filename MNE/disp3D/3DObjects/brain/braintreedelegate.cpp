@@ -107,7 +107,6 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
             pDoubleSpinBox->setSingleStep(0.01);
             pDoubleSpinBox->setValue(index.model()->data(index, BrainTreeMetaItemRoles::RTDataNormalizationValue).toDouble());
             return pDoubleSpinBox;
-            break;
         }
 
         case BrainTreeMetaItemTypes::RTDataTimeInterval: {
@@ -120,7 +119,6 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
             pSpinBox->setSingleStep(10);
             pSpinBox->setValue(index.model()->data(index, BrainTreeMetaItemRoles::RTDataTimeInterval).toInt());
             return pSpinBox;
-            break;
         }
 
         case BrainTreeMetaItemTypes::RTDataVisualizationType: {
@@ -149,7 +147,6 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
             pSpinBox->setSingleStep(1);
             pSpinBox->setValue(index.model()->data(index, BrainTreeMetaItemRoles::RTDataNumberAverages).toInt());
             return pSpinBox;
-            break;
         }
 
         case BrainTreeMetaItemTypes::SurfaceAlpha: {
@@ -161,7 +158,6 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
             pDoubleSpinBox->setSingleStep(0.01);
             pDoubleSpinBox->setValue(index.model()->data(index, BrainTreeMetaItemRoles::SurfaceAlpha).toDouble());
             return pDoubleSpinBox;
-            break;
         }
     }
 

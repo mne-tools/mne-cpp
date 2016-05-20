@@ -150,7 +150,7 @@ void RealTimeSourceEstimateWidget::getData()
         //
         if(m_lRtItem.isEmpty()) {
             qDebug()<<"RealTimeSourceEstimateWidget::getData - Creating m_lRtItem list";
-            m_lRtItem = m_p3DView->addRtBrainData("HemiLRSet", *m_pRTSE->getValue(), *m_pRTSE->getFwdSolution());
+            m_lRtItem = m_p3DView->addRtBrainData("Subject01", "HemiLRSet", *m_pRTSE->getValue(), *m_pRTSE->getFwdSolution());
 
             for(int i = 0; i<m_lRtItem.size(); i++) {
                 m_lRtItem.at(i)->setLoopState(false);
@@ -177,7 +177,7 @@ void RealTimeSourceEstimateWidget::getData()
             //
             // Add brain data
             //
-            m_p3DView->addBrainData("HemiLRSet", *m_pRTSE->getSurfSet(), *m_pRTSE->getAnnotSet());
+            m_p3DView->addBrainData("Subject01", "HemiLRSet", *m_pRTSE->getSurfSet(), *m_pRTSE->getAnnotSet());
         }
     }
 }
