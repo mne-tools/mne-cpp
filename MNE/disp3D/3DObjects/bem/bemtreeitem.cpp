@@ -78,7 +78,7 @@ BemTreeItem::~BemTreeItem()
 QVariant BemTreeItem::data(int role) const
 {
     switch(role) {
-        case BemTreeItemRoles::BemName:
+        case Data3DTreeModelItemRoles::BemName:
             return QVariant();
     }
 

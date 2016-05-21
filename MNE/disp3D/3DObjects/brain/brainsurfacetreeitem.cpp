@@ -94,11 +94,11 @@ void  BrainSurfaceTreeItem::setData(const QVariant& value, int role)
     AbstractTreeItem::setData(value, role);
 
     switch(role) {
-    case BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert:
+    case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
         m_pRenderable3DEntity->setVertColor(value.value<QByteArray>());
         break;
 
-//    case BrainSurfaceTreeItemRoles::SurfaceRTSourceLocColor:
+//    case Data3DTreeModelItemRoles::SurfaceRTSourceLocColor:
 //        m_pRenderable3DEntityActivationOverlay->setVertColor(value.value<MatrixX3f>());
 //        break;
     }
@@ -156,29 +156,29 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     QVariant data;
 
     data.setValue(arrayCurvatureColor);
-    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert);
-    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurvatureColorVert);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurvatureColorVert);
 
     data.setValue(tSurface.rr());
-    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceVert);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
 
     data.setValue(tSurface.tris());
-    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceTris);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceTris);
 
     data.setValue(tSurface.nn());
-    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceNorm);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceNorm);
 
     data.setValue(tSurface.curv());
-    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurv);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurv);
 
     data.setValue(tSurface.offset());
-    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceOffset);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceOffset);
 
     data.setValue(m_pRenderable3DEntity);
-    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceRenderable3DEntity);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceRenderable3DEntity);
 
     data.setValue(m_pRenderable3DEntityActivationOverlay);
-    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceRenderable3DEntityAcivationOverlay);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceRenderable3DEntityAcivationOverlay);
 
     //Add surface meta information as item children
     QList<QStandardItem*> list;
@@ -250,11 +250,11 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
 void BrainSurfaceTreeItem::onRtVertColorChanged(const QByteArray& sourceColorSamples)
 {
     //Set new data.
-    //In setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert) we pass the new color values to the renderer (see setData function).
+    //In setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert) we pass the new color values to the renderer (see setData function).
     QVariant data;
     data.setValue(sourceColorSamples);
-    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceRTSourceLocColor);
-    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceRTSourceLocColor);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 }
 
 
@@ -293,16 +293,16 @@ void BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
             QColor colorSulci = m_pItemSurfColSulci->data(MetaTreeItemRoles::SurfaceColorSulci).value<QColor>();
             QColor colorGyri = m_pItemSurfColGyri->data(MetaTreeItemRoles::SurfaceColorGyri).value<QColor>();
 
-            arrayNewVertColor = createCurvatureVertColor(this->data(BrainSurfaceTreeItemRoles::SurfaceCurv).value<VectorXf>(), colorSulci, colorGyri);
+            arrayNewVertColor = createCurvatureVertColor(this->data(Data3DTreeModelItemRoles::SurfaceCurv).value<VectorXf>(), colorSulci, colorGyri);
 
             data.setValue(arrayNewVertColor);
-            this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurvatureColorVert);
-            this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert);
+            this->setData(data, Data3DTreeModelItemRoles::SurfaceCurvatureColorVert);
+            this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 
             //Emit the new colors which are to be used during rt source loc plotting
             emit colorInfoOriginChanged(arrayNewVertColor);
 
-            //Return here because the new colors will be set to the renderable entity in the setData() function with the role BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert
+            //Return here because the new colors will be set to the renderable entity in the setData() function with the role Data3DTreeModelItemRoles::SurfaceCurrentColorVert
             return;
         }
 
@@ -310,17 +310,17 @@ void BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
             //Find the BrainAnnotationTreeItem
             for(int i = 0; i<this->QStandardItem::parent()->rowCount(); i++) {
                 if(this->QStandardItem::parent()->child(i,0)->type() == Data3DTreeModelItemTypes::AnnotationItem) {
-                    arrayNewVertColor = this->QStandardItem::parent()->child(i,0)->data(BrainAnnotationTreeItemRoles::AnnotColors).value<QByteArray>();
+                    arrayNewVertColor = this->QStandardItem::parent()->child(i,0)->data(Data3DTreeModelItemRoles::AnnotColors).value<QByteArray>();
 
                     //Set renderable 3D entity mesh and color data
                     data.setValue(arrayNewVertColor);
-                    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceAnnotationColorVert);
-                    this->setData(data, BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert);
+                    this->setData(data, Data3DTreeModelItemRoles::SurfaceAnnotationColorVert);
+                    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 
                     //Emit the new colors which are to be used during rt source loc plotting
                     emit colorInfoOriginChanged(arrayNewVertColor);
 
-                    //Return here because the new colors will be set to the renderable entity in the setData() function with the role BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert
+                    //Return here because the new colors will be set to the renderable entity in the setData() function with the role Data3DTreeModelItemRoles::SurfaceCurrentColorVert
                     return;
                 }
             }

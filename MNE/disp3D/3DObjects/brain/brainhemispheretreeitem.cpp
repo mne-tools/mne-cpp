@@ -121,7 +121,7 @@ bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation&
     QVariant data;
     data.setValue(tSurface.hemi());
 
-    this->setData(data, BrainHemisphereTreeItemRoles::SurfaceHemi);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceHemi);
 
     //Add childs
     //Add surface child
@@ -174,7 +174,7 @@ bool BrainHemisphereTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore
         break;
     }
 
-    this->setData(data, BrainHemisphereTreeItemRoles::SurfaceHemi);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceHemi);
 
     //Add childs
     //Add surface child
@@ -213,10 +213,10 @@ BrainRTSourceLocDataTreeItem* BrainHemisphereTreeItem::addData(const MNESourceEs
                         m_pBrainRTSourceLocDataTreeItem, &BrainRTSourceLocDataTreeItem::onColorInfoOriginChanged);
 
                 m_pBrainRTSourceLocDataTreeItem->init(tForwardSolution,
-                                                m_pSurfaceItem->data(BrainSurfaceTreeItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
-                                                this->data(BrainHemisphereTreeItemRoles::SurfaceHemi).toInt(),
-                                                m_pAnnotItem->data(BrainAnnotationTreeItemRoles::LabeIds).value<VectorXi>(),
-                                                m_pAnnotItem->data(BrainAnnotationTreeItemRoles::LabeList).value<QList<FSLIB::Label>>());
+                                                m_pSurfaceItem->data(Data3DTreeModelItemRoles::SurfaceCurrentColorVert).value<QByteArray>(),
+                                                this->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt(),
+                                                m_pAnnotItem->data(Data3DTreeModelItemRoles::LabeIds).value<VectorXi>(),
+                                                m_pAnnotItem->data(Data3DTreeModelItemRoles::LabeList).value<QList<FSLIB::Label>>());
 
                 m_pBrainRTSourceLocDataTreeItem->addData(tSourceEstimate);
             } else {

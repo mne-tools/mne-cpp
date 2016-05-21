@@ -93,7 +93,7 @@ void  BrainRTConnectivityDataTreeItem::setData(const QVariant& value, int role)
 bool BrainRTConnectivityDataTreeItem::init(const MNEForwardSolution& tForwardSolution, int iHemi)
 {   
     //Set hemisphere information as item's data
-    this->setData(iHemi, BrainRTConnectivityDataTreeItemRoles::RTHemi);
+    this->setData(iHemi, Data3DTreeModelItemRoles::RTHemi);
 
     //Set data based on clusterd or full source space
     bool isClustered = tForwardSolution.src[iHemi].isClustered();

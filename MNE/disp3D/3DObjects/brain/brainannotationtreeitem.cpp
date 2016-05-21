@@ -115,13 +115,13 @@ bool BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation&
         //Add data which is held by this BrainAnnotationTreeItem
         QVariant data;
         data.setValue(arrayColorsAnnot);
-        this->setData(data, BrainAnnotationTreeItemRoles::AnnotColors);
+        this->setData(data, Data3DTreeModelItemRoles::AnnotColors);
 
         data.setValue(qListLabels);
-        this->setData(data, BrainAnnotationTreeItemRoles::LabeList);
+        this->setData(data, Data3DTreeModelItemRoles::LabeList);
 
         data.setValue(tAnnotation.getLabelIds());
-        this->setData(data, BrainAnnotationTreeItemRoles::LabeIds);
+        this->setData(data, Data3DTreeModelItemRoles::LabeIds);
 
         //Add annotation meta information as item children
         QList<QStandardItem*> list;
@@ -132,7 +132,7 @@ bool BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation&
         list<<new QStandardItem(itemAnnotFileName->toolTip());
         this->appendRow(list);
         data.setValue(tAnnotation.fileName());
-        itemAnnotFileName->setData(data, BrainAnnotationTreeItemRoles::AnnotFileName);
+        itemAnnotFileName->setData(data, Data3DTreeModelItemRoles::FileName);
 
         list.clear();
         MetaTreeItem *itemAnnotPath = new MetaTreeItem(MetaTreeItemTypes::FilePath, tAnnotation.filePath());
@@ -141,7 +141,7 @@ bool BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation&
         list<<new QStandardItem(itemAnnotPath->toolTip());
         this->appendRow(list);
         data.setValue(tAnnotation.filePath());
-        itemAnnotFileName->setData(data, BrainAnnotationTreeItemRoles::AnnotFilePath);
+        itemAnnotFileName->setData(data, Data3DTreeModelItemRoles::FilePath);
     }
 
     return true;
