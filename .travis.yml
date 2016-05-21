@@ -26,11 +26,13 @@ script:
     # QA: static code analysis with CppCheck
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cppcheck --enable=all -f -q -i./include/3rdParty/eigen3 -i/opt/qt56/include ./MNE ./applications ./testframes ./examples; fi
     # Build
-    - qmake -r
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then qmake -r MNECPP_CONFIG+=withCodeCov; fi
+    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then qmake -r; fi
     - make -j2
+	
 
 after_success:
-    - echo "MNE-CPP build was successful!";
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then bash <(curl -s https://codecov.io/bash); fi
 
 notifications:
   email:

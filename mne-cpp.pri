@@ -30,12 +30,21 @@ isEmpty( MNE_BINARY_DIR ) {
 }
 
 #QT Packages use new qtHaveModule(<package>):
+
 ### MNE cpp config ###
 MNECPP_CONFIG += withGui
-#MNECPP_CONFIG += withPython
+## To set CodeCov coverage compiler flag run: qmake MNECPP_CONFIG+=withCodeCov
+## To disable tests run: qmake MNECPP_CONFIG+=noTests
+contains(MNECPP_CONFIG, noTests) {
+    message(Exclude Tests)
+}
+else {
+    MNECPP_CONFIG += withTests
+}
+## To build basic MNE-X version run: qmake MNECPP_CONFIG+=BuildBasicMNEXVersion
 #MNECPP_CONFIG += BuildBasicMNEXVersion
 
-#Build MNE-CPP libraries as static libs
+## Build MNE-CPP libraries as static libs
 #MNECPP_CONFIG += build_MNECPP_Static_Lib
 
 linux-g++ {
@@ -45,27 +54,9 @@ linux-g++ {
     }
 }
 
-contains(MNECPP_CONFIG, withPython) {
-    message(Configure Python!)
-
-    PYTHON_DIR = $$system(python $${PWD}/tools/pytools/python.pwd.py)
-
-    # include
-    PYTHON_INCLUDE_DIR = $$PYTHON_INCLUDE_DIR
-    isEmpty( PYTHON_INCLUDE_DIR ) {
-        PYTHON_INCLUDE_DIR = $$system(python $${PWD}/tools/pytools/python.include.py)
-    }
-
-    # lib
-    PYTHON_LIBRARY_DIR = $$PYTHON_LIBRARY_DIR
-    isEmpty( PYTHON_LIBRARY_DIR ) {
-        PYTHON_LIBRARY_DIR = $${PYTHON_DIR}/libs
-    }
-}
-
 QMAKE_TARGET_PRODUCT = mne-cpp
 QMAKE_TARGET_DESCRIPTION = MNE Qt 5 based C++ library.
-QMAKE_TARGET_COPYRIGHT = Copyright (C) 2014 Authors of mne-cpp. All rights reserved.
+QMAKE_TARGET_COPYRIGHT = Copyright (C) 2016 Authors of mne-cpp. All rights reserved.
 
 #Define minQtVersion Test
 defineTest(minQtVersion) {
