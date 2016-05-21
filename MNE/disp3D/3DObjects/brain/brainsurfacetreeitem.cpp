@@ -183,7 +183,7 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     //Add surface meta information as item children
     QList<QStandardItem*> list;
 
-    m_pItemSurfColSulci = new BrainTreeMetaItem(BrainTreeMetaItemTypes::SurfaceColorSulci, "Sulci color");
+    m_pItemSurfColSulci = new BrainTreeMetaItem(Data3DTreeMetaItemTypes::SurfaceColorSulci, "Sulci color");
     connect(m_pItemSurfColSulci, &BrainTreeMetaItem::curvColorsChanged,
             this, &BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged);
     list<<m_pItemSurfColSulci;
@@ -193,7 +193,7 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     m_pItemSurfColSulci->setData(data, BrainTreeMetaItemRoles::SurfaceColorSulci);
     m_pItemSurfColSulci->setData(data, Qt::DecorationRole);
 
-    m_pItemSurfColGyri = new BrainTreeMetaItem(BrainTreeMetaItemTypes::SurfaceColorGyri, "Gyri color");
+    m_pItemSurfColGyri = new BrainTreeMetaItem(Data3DTreeMetaItemTypes::SurfaceColorGyri, "Gyri color");
     connect(m_pItemSurfColGyri, &BrainTreeMetaItem::curvColorsChanged,
             this, &BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged);
     list.clear();
@@ -204,7 +204,7 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     m_pItemSurfColGyri->setData(data, BrainTreeMetaItemRoles::SurfaceColorGyri);
     m_pItemSurfColGyri->setData(data, Qt::DecorationRole);
 
-    BrainTreeMetaItem *itemAlpha = new BrainTreeMetaItem(BrainTreeMetaItemTypes::SurfaceAlpha, "0.5");
+    BrainTreeMetaItem *itemAlpha = new BrainTreeMetaItem(Data3DTreeMetaItemTypes::SurfaceAlpha, "0.5");
     connect(itemAlpha, &BrainTreeMetaItem::surfaceAlphaChanged,
             this, &BrainSurfaceTreeItem::onSurfaceAlphaChanged);
     list.clear();
@@ -214,7 +214,7 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     data.setValue(0.5);
     itemAlpha->setData(data, BrainTreeMetaItemRoles::SurfaceAlpha);
 
-    BrainTreeMetaItem *itemSurfFileName = new BrainTreeMetaItem(BrainTreeMetaItemTypes::SurfaceFileName, tSurface.fileName());
+    BrainTreeMetaItem *itemSurfFileName = new BrainTreeMetaItem(Data3DTreeMetaItemTypes::SurfaceFileName, tSurface.fileName());
     itemSurfFileName->setEditable(false);
     list.clear();
     list<<itemSurfFileName;
@@ -223,7 +223,7 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     data.setValue(tSurface.fileName());
     itemSurfFileName->setData(data, BrainTreeMetaItemRoles::SurfaceFileName);
 
-    BrainTreeMetaItem *itemSurfType = new BrainTreeMetaItem(BrainTreeMetaItemTypes::SurfaceType, tSurface.surf());
+    BrainTreeMetaItem *itemSurfType = new BrainTreeMetaItem(Data3DTreeMetaItemTypes::SurfaceType, tSurface.surf());
     itemSurfType->setEditable(false);
     list.clear();
     list<<itemSurfType;
@@ -232,7 +232,7 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     data.setValue(tSurface.surf());
     itemSurfType->setData(data, BrainTreeMetaItemRoles::SurfaceType);
 
-    BrainTreeMetaItem *itemSurfPath = new BrainTreeMetaItem(BrainTreeMetaItemTypes::SurfaceFilePath, tSurface.filePath());
+    BrainTreeMetaItem *itemSurfPath = new BrainTreeMetaItem(Data3DTreeMetaItemTypes::SurfaceFilePath, tSurface.filePath());
     itemSurfPath->setEditable(false);
     list.clear();
     list<<itemSurfPath;
@@ -309,7 +309,7 @@ void BrainSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
         if(m_sColorInfoOrigin.contains("Color from annotation")) {
             //Find the BrainAnnotationTreeItem
             for(int i = 0; i<this->QStandardItem::parent()->rowCount(); i++) {
-                if(this->QStandardItem::parent()->child(i,0)->type() == BrainTreeModelItemTypes::AnnotationItem) {
+                if(this->QStandardItem::parent()->child(i,0)->type() == Data3DTreeModelItemTypes::AnnotationItem) {
                     arrayNewVertColor = this->QStandardItem::parent()->child(i,0)->data(BrainAnnotationTreeItemRoles::AnnotColors).value<QByteArray>();
 
                     //Set renderable 3D entity mesh and color data

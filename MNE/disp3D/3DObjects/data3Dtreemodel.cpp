@@ -139,7 +139,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
 
     //If subject does not exist, create a new one
     if(itemSubjectList.size() == 0) {
-        SubjectTreeItem* subjectItem = new SubjectTreeItem(SubjectTreeModelItemTypes::SubjectItem, subject);
+        SubjectTreeItem* subjectItem = new SubjectTreeItem(Data3DTreeModelItemTypes::SubjectItem, subject);
         itemSubjectList << subjectItem;
         itemSubjectList << new QStandardItem(subjectItem->toolTip());
         m_pRootItem->appendRow(itemSubjectList);
@@ -150,17 +150,17 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
 
     for(int i = 0; i < itemSubjectList.size(); ++i) {
         //Check if it is really a subject tree item
-        if((itemSubjectList.at(i)->type() == SubjectTreeModelItemTypes::SubjectItem)) {
+        if((itemSubjectList.at(i)->type() == Data3DTreeModelItemTypes::SubjectItem)) {
             SubjectTreeItem* pSubjectItem = dynamic_cast<SubjectTreeItem*>(itemSubjectList.at(i));
 
             //Find already existing set items and add the new data to the first search result
             QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
 
-            if(!itemList.isEmpty() && (itemList.at(0)->type() == BrainTreeModelItemTypes::SurfaceSetItem)) {
+            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::SurfaceSetItem)) {
                 BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
                 state = pSurfaceSetItem->addData(tSurfaceSet, tAnnotationSet, m_pParentEntity);
             } else {
-                BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, set);
+                BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(Data3DTreeModelItemTypes::SurfaceSetItem, set);
 
                 QList<QStandardItem*> list;
                 list << pSurfaceSetItem;
@@ -185,7 +185,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
 
     //If subject does not exist, create a new one
     if(itemSubjectList.size() == 0) {
-        SubjectTreeItem* subjectItem = new SubjectTreeItem(SubjectTreeModelItemTypes::SubjectItem, subject);
+        SubjectTreeItem* subjectItem = new SubjectTreeItem(Data3DTreeModelItemTypes::SubjectItem, subject);
         itemSubjectList << subjectItem;
         itemSubjectList << new QStandardItem(subjectItem->toolTip());
         m_pRootItem->appendRow(itemSubjectList);
@@ -196,17 +196,17 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
 
     for(int i = 0; i < itemSubjectList.size(); ++i) {
         //Check if it is really a subject tree item
-        if((itemSubjectList.at(i)->type() == SubjectTreeModelItemTypes::SubjectItem)) {
+        if((itemSubjectList.at(i)->type() == Data3DTreeModelItemTypes::SubjectItem)) {
             SubjectTreeItem* pSubjectItem = dynamic_cast<SubjectTreeItem*>(itemSubjectList.at(i));
 
             //Find already existing surface items and add the new data to the first search result
             QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
 
-            if(!itemList.isEmpty() && (itemList.at(0)->type() == BrainTreeModelItemTypes::SurfaceSetItem)) {
+            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::SurfaceSetItem)) {
                 BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
                 state = pSurfaceSetItem->addData(tSurface, tAnnotation, m_pParentEntity);
             } else {
-                BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, set);
+                BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(Data3DTreeModelItemTypes::SurfaceSetItem, set);
 
                 QList<QStandardItem*> list;
                 list << pSurfaceSetItem;
@@ -231,7 +231,7 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
 
     //If subject does not exist, create a new one
     if(itemSubjectList.size() == 0) {
-        SubjectTreeItem* subjectItem = new SubjectTreeItem(SubjectTreeModelItemTypes::SubjectItem, subject);
+        SubjectTreeItem* subjectItem = new SubjectTreeItem(Data3DTreeModelItemTypes::SubjectItem, subject);
         itemSubjectList << subjectItem;
         itemSubjectList << new QStandardItem(subjectItem->toolTip());
         m_pRootItem->appendRow(itemSubjectList);
@@ -242,17 +242,17 @@ bool Data3DTreeModel::addData(const QString& subject, const QString& set, const 
 
     for(int i = 0; i < itemSubjectList.size(); ++i) {
         //Check if it is really a subject tree item
-        if((itemSubjectList.at(i)->type() == SubjectTreeModelItemTypes::SubjectItem)) {
+        if((itemSubjectList.at(i)->type() == Data3DTreeModelItemTypes::SubjectItem)) {
             SubjectTreeItem* pSubjectItem = dynamic_cast<SubjectTreeItem*>(itemSubjectList.at(i));
 
             //Find already existing surface items and add the new data to the first search result
             QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
 
-            if(!itemList.isEmpty() && (itemList.at(0)->type() == BrainTreeModelItemTypes::SurfaceSetItem)) {
+            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::SurfaceSetItem)) {
                 BrainSurfaceSetTreeItem* pSurfaceSetItem = dynamic_cast<BrainSurfaceSetTreeItem*>(itemList.at(0));
                 state = pSurfaceSetItem->addData(tSourceSpace, m_pParentEntity);
             } else {
-                BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(BrainTreeModelItemTypes::SurfaceSetItem, set);
+                BrainSurfaceSetTreeItem* pSurfaceSetItem = new BrainSurfaceSetTreeItem(Data3DTreeModelItemTypes::SurfaceSetItem, set);
 
                 QList<QStandardItem*> list;
                 list << pSurfaceSetItem;
@@ -281,7 +281,7 @@ QList<BrainRTSourceLocDataTreeItem*> Data3DTreeModel::addData(const QString& sub
 
     for(int i = 0; i < itemSubjectList.size(); ++i) {
         //Check if it is really a subject tree item
-        if((itemSubjectList.at(i)->type() == SubjectTreeModelItemTypes::SubjectItem)) {
+        if((itemSubjectList.at(i)->type() == Data3DTreeModelItemTypes::SubjectItem)) {
             SubjectTreeItem* pSubjectItem = dynamic_cast<SubjectTreeItem*>(itemSubjectList.at(i));
 
             //Find already existing surface items and add the new data to the first search result
@@ -291,7 +291,7 @@ QList<BrainRTSourceLocDataTreeItem*> Data3DTreeModel::addData(const QString& sub
             if(!itemList.isEmpty()) {
                 for(int i = 0; i<itemList.size(); i++) {
                     for(int j = 0; j<itemList.at(i)->rowCount(); j++) {
-                        if(itemList.at(i)->child(j,0)->type() == BrainTreeModelItemTypes::HemisphereItem) {
+                        if(itemList.at(i)->child(j,0)->type() == Data3DTreeModelItemTypes::HemisphereItem) {
                             BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(i)->child(j,0));
                             returnList.append(pHemiItem->addData(tSourceEstimate, tForwardSolution));
                         }
@@ -302,4 +302,50 @@ QList<BrainRTSourceLocDataTreeItem*> Data3DTreeModel::addData(const QString& sub
     }
 
     return returnList;
+}
+
+
+//*************************************************************************************************************
+
+bool Data3DTreeModel::addData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem)
+{
+    //Find the subject
+    QList<QStandardItem*> itemSubjectList = this->findItems(subject);
+
+    //If subject does not exist, create a new one
+    if(itemSubjectList.size() == 0) {
+        SubjectTreeItem* subjectItem = new SubjectTreeItem(Data3DTreeModelItemTypes::SubjectItem, subject);
+        itemSubjectList << subjectItem;
+        itemSubjectList << new QStandardItem(subjectItem->toolTip());
+        m_pRootItem->appendRow(itemSubjectList);
+    }
+
+    //Iterate through subject items and add new data respectivley
+    bool state = false;
+
+    for(int i = 0; i < itemSubjectList.size(); ++i) {
+        //Check if it is really a subject tree item
+        if((itemSubjectList.at(i)->type() == Data3DTreeModelItemTypes::SubjectItem)) {
+            SubjectTreeItem* pSubjectItem = dynamic_cast<SubjectTreeItem*>(itemSubjectList.at(i));
+
+            //Find already existing surface items and add the new data to the first search result
+            QList<QStandardItem*> itemList = pSubjectItem->findChildren(set);
+
+            if(!itemList.isEmpty() && (itemList.at(0)->type() == Data3DTreeModelItemTypes::BemItem)) {
+                BemTreeItem* pBemItem = dynamic_cast<BemTreeItem*>(itemList.at(0));
+                state = pBemItem->addData(tBem, m_pParentEntity);
+            } else {
+                BemTreeItem* pBemItem = new BemTreeItem(Data3DTreeModelItemTypes::BemItem, set);
+
+                QList<QStandardItem*> list;
+                list << pBemItem;
+                list << new QStandardItem(pBemItem->toolTip());
+                pSubjectItem->appendRow(list);
+
+                state = pBemItem->addData(tBem, m_pParentEntity);
+            }
+        }
+    }
+
+    return state;
 }

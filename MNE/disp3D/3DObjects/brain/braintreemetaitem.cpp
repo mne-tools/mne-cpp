@@ -60,55 +60,55 @@ BrainTreeMetaItem::BrainTreeMetaItem(int iType, const QString& text)
     QString sToolTip;
 
     switch(m_iType) {
-        case BrainTreeMetaItemTypes::SurfaceFileName:
+        case Data3DTreeMetaItemTypes::SurfaceFileName:
             sToolTip = "Surface file name";
             break;
-        case BrainTreeMetaItemTypes::SurfaceFilePath:
+        case Data3DTreeMetaItemTypes::SurfaceFilePath:
             sToolTip = "Surface file path";
             break;
-        case BrainTreeMetaItemTypes::AnnotFileName:
+        case Data3DTreeMetaItemTypes::AnnotFileName:
             sToolTip = "Annotation file name";
             break;
-        case BrainTreeMetaItemTypes::AnnotFilePath:
+        case Data3DTreeMetaItemTypes::AnnotFilePath:
             sToolTip = "Annotation file path";
             break;
-        case BrainTreeMetaItemTypes::SurfaceType:
+        case Data3DTreeMetaItemTypes::SurfaceType:
             sToolTip = "Surface type";
             break;
-        case BrainTreeMetaItemTypes::SurfaceColorGyri:
+        case Data3DTreeMetaItemTypes::SurfaceColorGyri:
             sToolTip = "Color Gyri";
             break;
-        case BrainTreeMetaItemTypes::SurfaceColorSulci:
+        case Data3DTreeMetaItemTypes::SurfaceColorSulci:
             sToolTip = "Color Sulci";
             break;
-        case BrainTreeMetaItemTypes::RTDataStreamStatus:
+        case Data3DTreeMetaItemTypes::RTDataStreamStatus:
             sToolTip = "Turn real time data streaming on/off";
             break;
-        case BrainTreeMetaItemTypes::RTDataSourceSpaceType:
+        case Data3DTreeMetaItemTypes::RTDataSourceSpaceType:
             sToolTip = "The source space type";
             break;
-        case BrainTreeMetaItemTypes::RTDataColormapType:
+        case Data3DTreeMetaItemTypes::RTDataColormapType:
             sToolTip = "The color map type";
             break;
-        case BrainTreeMetaItemTypes::RTDataTimeInterval:
+        case Data3DTreeMetaItemTypes::RTDataTimeInterval:
             sToolTip = "The m seconds waited in between each sample";
             break;
-        case BrainTreeMetaItemTypes::RTDataLoopedStreaming:
+        case Data3DTreeMetaItemTypes::RTDataLoopedStreaming:
             sToolTip = "Turn looped streaming on/off";
             break;
-        case BrainTreeMetaItemTypes::RTDataNumberAverages:
+        case Data3DTreeMetaItemTypes::RTDataNumberAverages:
             sToolTip = "The number of samples averaged together (downsampling)";
             break;
-        case BrainTreeMetaItemTypes::RTDataNormalizationValue:
+        case Data3DTreeMetaItemTypes::RTDataNormalizationValue:
             sToolTip = "The value to normalize the source localization result";
             break;
-        case BrainTreeMetaItemTypes::RTDataVisualizationType:
+        case Data3DTreeMetaItemTypes::RTDataVisualizationType:
             sToolTip = "The visualization type";
             break;
-        case BrainTreeMetaItemTypes::SurfaceColorItem:
+        case Data3DTreeMetaItemTypes::SurfaceColorItem:
             sToolTip = "Surface color item";
             break;
-        case BrainTreeMetaItemTypes::SurfaceAlpha:
+        case Data3DTreeMetaItemTypes::SurfaceAlpha:
             sToolTip = "Surface alpha value";
             break;
     }

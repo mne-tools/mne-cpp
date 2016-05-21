@@ -60,7 +60,7 @@ SubjectTreeMetaItem::SubjectTreeMetaItem(int iType, const QString& text)
     QString sToolTip;
 
     switch(m_iType) {
-        case SubjectTreeMetaItemTypes::UnknownItem:
+        case Data3DTreeMetaItemTypes::UnknownItem:
             sToolTip = "Unknown item";
             break;
     }

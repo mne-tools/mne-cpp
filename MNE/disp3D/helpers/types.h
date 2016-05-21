@@ -80,7 +80,7 @@ namespace DISP3DLIB
 // Typedefs
 
 // Model item types
-namespace BrainTreeModelItemTypes
+namespace Data3DTreeModelItemTypes
 {
     enum ItemType{UnknownItem = QStandardItem::UserType,
                     SurfaceSetItem = QStandardItem::UserType + 1,
@@ -89,10 +89,13 @@ namespace BrainTreeModelItemTypes
                     AnnotationItem = QStandardItem::UserType + 4,
                     RTSourceLocDataItem = QStandardItem::UserType + 5,
                     SourceSpaceItem = QStandardItem::UserType + 6,
-                    RTConnectivityDataItem = QStandardItem::UserType + 7};
+                    RTConnectivityDataItem = QStandardItem::UserType + 7,
+                    SubjectItem = QStandardItem::UserType + 8,
+                    BemItem = QStandardItem::UserType + 9,
+                    BemSurfaceItem = QStandardItem::UserType + 10};
 }
 
-namespace BrainTreeMetaItemTypes
+namespace Data3DTreeMetaItemTypes
 {
     enum ItemType{SurfaceFileName = QStandardItem::UserType + 100,
                     SurfaceFilePath = QStandardItem::UserType + 101,
@@ -115,16 +118,6 @@ namespace BrainTreeMetaItemTypes
                     UnknownItem = QStandardItem::UserType + 118};
 }
 
-namespace SubjectTreeModelItemTypes
-{
-    enum ItemType{UnknownItem = QStandardItem::UserType + 200,
-                    SubjectItem = QStandardItem::UserType + 201};
-}
-
-namespace SubjectTreeMetaItemTypes
-{
-    enum ItemType{UnknownItem = QStandardItem::UserType + 300};
-}
 
 // Model item roles
 namespace BrainTreeMetaItemRoles
@@ -212,6 +205,22 @@ namespace BrainRTDataVisualizationTypes
 namespace BrainRTConnectivityDataTreeItemRoles
 {
     enum ItemRole{RTHemi = Qt::UserRole + 700};
+}
+
+namespace BemSurfaceTreeItemRoles
+{
+    enum ItemRole{SurfaceCurrentColorVert = Qt::UserRole + 800,
+                  SurfaceVert = Qt::UserRole + 801,
+                  SurfaceTris = Qt::UserRole + 802,
+                  SurfaceNorm = Qt::UserRole + 803,
+                  SurfaceCurv = Qt::UserRole + 804,
+                  SurfaceOffset = Qt::UserRole + 805,
+                  SurfaceRenderable3DEntity = Qt::UserRole + 806};
+}
+
+namespace BemTreeItemRoles
+{
+    enum ItemRole{BemName = Qt::UserRole + 900};
 }
 
 } //NAMESPACE DISP3DLIB
