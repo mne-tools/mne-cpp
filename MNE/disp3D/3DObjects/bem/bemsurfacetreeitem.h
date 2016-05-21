@@ -44,6 +44,7 @@
 #include "../../disp3D_global.h"
 
 #include "../../helpers/abstracttreeitem.h"
+#include "../common/metatreeitem.h"
 
 #include "../../helpers/types.h"
 #include "../../helpers/renderable3Dentity.h"
@@ -143,6 +144,14 @@ public:
     void setVisible(bool state);
 
 private slots:
+    //=========================================================================================================
+    /**
+    * Call this slot whenever the curvature color or origin of color information (curvature or annotation) changed.
+    *
+    * @param[in] fAlpha     The new alpha value.
+    */
+    void onSurfaceAlphaChanged(float fAlpha);
+
     //=========================================================================================================
     /**
     * Call this slot whenever the surface color was changed.

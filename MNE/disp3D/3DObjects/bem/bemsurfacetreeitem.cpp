@@ -144,17 +144,28 @@ bool BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
     this->setData(data, Data3DTreeModelItemRoles::SurfaceRenderable3DEntity);
 
     //Add surface meta information as item children
-//    QList<QStandardItem*> list;
+    QList<QStandardItem*> list;
 
-//    BrainTreeMetaItem* pItemSurfCol = new BrainTreeMetaItem(MetaTreeItemTypes::SurfaceColorItem, "Surface color");
-//    connect(pItemSurfCol, &BrainTreeMetaItem::surfaceColorChanged,
-//            this, &BemSurfaceTreeItem::onSurfaceColorChanged);
-//    list<<pItemSurfCol;
-//    list<<new QStandardItem(pItemSurfCol->toolTip());
-//    this->appendRow(list);
-//    data.setValue(QColor(100,100,100));
-//    pItemSurfCol->setData(data, MetaTreeItemRoles::SurfaceColor);
-//    pItemSurfCol->setData(data, Qt::DecorationRole);
+    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::SurfaceAlpha, "0.5");
+    connect(itemAlpha, &MetaTreeItem::surfaceAlphaChanged,
+            this, &BemSurfaceTreeItem::onSurfaceAlphaChanged);
+    list.clear();
+    list<<itemAlpha;
+    list<<new QStandardItem(itemAlpha->toolTip());
+    this->appendRow(list);
+    data.setValue(0.5);
+    itemAlpha->setData(data, MetaTreeItemRoles::SurfaceAlpha);
+
+    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::SurfaceColor, "Surface color");
+    connect(pItemSurfCol, &MetaTreeItem::surfaceColorChanged,
+            this, &BemSurfaceTreeItem::onSurfaceColorChanged);
+    list.clear();
+    list<<pItemSurfCol;
+    list<<new QStandardItem(pItemSurfCol->toolTip());
+    this->appendRow(list);
+    data.setValue(QColor(100,100,100));
+    pItemSurfCol->setData(data, MetaTreeItemRoles::SurfaceColor);
+    pItemSurfCol->setData(data, Qt::DecorationRole);
 
     return true;
 }
@@ -165,6 +176,14 @@ bool BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
 void BemSurfaceTreeItem::setVisible(bool state)
 {
     m_pRenderable3DEntity->setParent(state ? m_pParentEntity : Q_NULLPTR);
+}
+
+
+//*************************************************************************************************************
+
+void BemSurfaceTreeItem::onSurfaceAlphaChanged(float fAlpha)
+{
+    m_pRenderable3DEntity->setAlpha(fAlpha);
 }
 
 
