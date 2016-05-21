@@ -31,7 +31,7 @@ script:
     - make -j2
 
 after_success:
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./bin/test_codecov.exe; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./bin/test_codecov; fi
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then bash <(curl -s https://codecov.io/bash); fi
 
 notifications:
