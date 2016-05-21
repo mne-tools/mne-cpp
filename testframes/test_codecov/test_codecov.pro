@@ -61,5 +61,5 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 contains(MNECPP_CONFIG, withCodeCov) {
-    DEFINES += coverage
+    QMAKE_CXXFLAGS += -coverage
 }
