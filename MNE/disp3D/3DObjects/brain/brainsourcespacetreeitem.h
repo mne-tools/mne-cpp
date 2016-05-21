@@ -44,7 +44,7 @@
 #include "../../disp3D_global.h"
 
 #include "../../helpers/abstracttreeitem.h"
-#include "braintreemetaitem.h"
+#include "../common/metatreeitem.h"
 
 #include "../../helpers/types.h"
 #include "../../helpers/renderable3Dentity.h"

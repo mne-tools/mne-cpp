@@ -126,7 +126,7 @@ bool BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation&
         //Add annotation meta information as item children
         QList<QStandardItem*> list;
 
-        BrainTreeMetaItem *itemAnnotFileName = new BrainTreeMetaItem(Data3DTreeMetaItemTypes::AnnotFileName, tAnnotation.fileName());
+        MetaTreeItem *itemAnnotFileName = new MetaTreeItem(MetaTreeItemTypes::FileName, tAnnotation.fileName());
         itemAnnotFileName->setEditable(false);
         list<<itemAnnotFileName;
         list<<new QStandardItem(itemAnnotFileName->toolTip());
@@ -135,7 +135,7 @@ bool BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation&
         itemAnnotFileName->setData(data, BrainAnnotationTreeItemRoles::AnnotFileName);
 
         list.clear();
-        BrainTreeMetaItem *itemAnnotPath = new BrainTreeMetaItem(Data3DTreeMetaItemTypes::AnnotFilePath, tAnnotation.filePath());
+        MetaTreeItem *itemAnnotPath = new MetaTreeItem(MetaTreeItemTypes::FilePath, tAnnotation.filePath());
         itemAnnotPath->setEditable(false);
         list<<itemAnnotPath;
         list<<new QStandardItem(itemAnnotPath->toolTip());
