@@ -58,8 +58,4 @@ contains(MNECPP_CONFIG, withGui) {
     }
 }
 
-contains(MNECPP_CONFIG, withPython) {
-    SUBDIRS += pyio
-}
-
 CONFIG += ordered

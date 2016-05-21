@@ -43,7 +43,8 @@ SUBDIRS += \
     mne_x_plugin_com \
     test_mne_future \
     test_ssp \
-    test_fiff_rwr
+    test_fiff_rwr \
+    test_codecov
 
 contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += \
