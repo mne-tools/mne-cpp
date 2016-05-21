@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     pyio.h
+* @file     testqstring.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     June, 2014
+* @date     May, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,19 +29,14 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Python I/O interface declaration.
+* @brief    Example of codecov coverage analyser
 *
 */
-
-#ifndef PYIO_H
-#define PYIO_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
-#include "pyio_global.h"
 
 
 //*************************************************************************************************************
@@ -49,37 +44,38 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QObject>
+#include <QtTest>
+#include <QString>
 
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE PYIOLIB
+// TEST CLASS
 //=============================================================================================================
 
-namespace PYIOLIB
-{
-
-
-//=============================================================================================================
-/**
-* A PyIO communication class
-*
-* @brief PyIO Python Qt communication
-*/
-class PYIOSHARED_EXPORT PyIO : public QObject
+class TestQString: public QObject
 {
     Q_OBJECT
-public:
-    explicit PyIO(QObject *parent = 0);
-
-signals:
-
-public slots:
-
+private slots:
+    void toUpper();
 };
 
-} // NAMESPACE
+void TestQString::toUpper()
+{
+    QString str = "Hello";
+    QCOMPARE(str.toUpper(), QString("HELLO"));
+}
 
-#endif // PYIO_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// MAIN
+//=============================================================================================================
+
+QTEST_MAIN(TestQString)
+#include "testqstring.moc"
