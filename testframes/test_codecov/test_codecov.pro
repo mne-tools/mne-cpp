@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     pyio.pro
+# @file     test_codecov.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     June, 2013
+# @date     May, 2016
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2016, Christoph Dinh and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -29,89 +29,37 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the pyio library.
+# @brief    Builds test codecov
 #
 #--------------------------------------------------------------------------------------------------------------
 
 include(../../mne-cpp.pri)
 
-TEMPLATE = lib
+TEMPLATE = app
 
-QT  -= gui
+VERSION = $${MNE_CPP_VERSION}
 
-DEFINES += PYIO_LIBRARY
+QT += testlib
 
-TARGET = PyIO
-TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
+CONFIG   += console
+CONFIG   -= app_bundle
+
+TARGET = test_codecov
+
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-LIBS += -L$${MNE_LIBRARY_DIR}
-CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd
-}
-else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utils
-}
-
-DESTDIR = $${MNE_LIBRARY_DIR}
-
-contains(MNECPP_CONFIG, build_MNECPP_Static_Lib) {
-    CONFIG += staticlib
-    DEFINES += BUILD_MNECPP_STATIC_LIB
-}
-else {
-    CONFIG += dll
-
-    #
-    # win32: copy dll's to bin dir
-    # unix: add lib folder to LD_LIBRARY_PATH
-    #
-    win32 {
-        FILE = $${DESTDIR}/$${TARGET}.dll
-        BINDIR = $${DESTDIR}/../bin
-        FILE ~= s,/,\\,g
-        BINDIR ~= s,/,\\,g
-        QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
-    }
-}
+DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
-    pyio.cpp
+        testqstring.cpp \
 
 HEADERS += \
-    pyio_global.h \
-    pyio.h \
-    swig/numpy.i
-
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-# Install headers to include directory
-header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/pyio
-
-INSTALLS += header_files
-
-FORMS +=
-
-unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
-
-# Deploy Qt Dependencies
-win32 {
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .dll
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-    }
-
-    DEPLOY_COMMAND = windeployqt
-
-    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-
-    #  # Uncomment the following line to help debug the deploy command when running qmake
-    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
-    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+contains(MNECPP_CONFIG, withCodeCov) {
+    QMAKE_CXXFLAGS += -coverage
 }
