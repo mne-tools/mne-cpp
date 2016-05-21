@@ -50,6 +50,7 @@
 #include "../../helpers/renderable3Dentity.h"
 
 #include "mne/mne_bem.h"
+#include "fiff/fiff_constants.h"
 
 
 //*************************************************************************************************************
