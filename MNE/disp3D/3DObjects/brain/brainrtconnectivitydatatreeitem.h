@@ -47,7 +47,7 @@
 #include "../../helpers/types.h"
 #include "../../rt/rtSourceLoc/rtsourcelocdataworker.h"
 
-#include "braintreemetaitem.h"
+#include "../common/metatreeitem.h"
 
 #include "fiff/fiff_types.h"
 

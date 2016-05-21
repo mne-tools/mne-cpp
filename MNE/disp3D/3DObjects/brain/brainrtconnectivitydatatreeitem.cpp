@@ -102,11 +102,11 @@ bool BrainRTConnectivityDataTreeItem::init(const MNEForwardSolution& tForwardSol
 
     //Add meta information as item children
     QString sIsClustered = isClustered ? "Clustered" : "Full";
-    BrainTreeMetaItem* pItemSourceSpaceType = new BrainTreeMetaItem(Data3DTreeMetaItemTypes::RTDataSourceSpaceType, sIsClustered);
+    MetaTreeItem* pItemSourceSpaceType = new MetaTreeItem(MetaTreeItemTypes::RTDataSourceSpaceType, sIsClustered);
     pItemSourceSpaceType->setEditable(false);
     *this<<pItemSourceSpaceType;
     data.setValue(sIsClustered);
-    pItemSourceSpaceType->setData(data, BrainTreeMetaItemRoles::RTDataSourceSpaceType);
+    pItemSourceSpaceType->setData(data, MetaTreeItemRoles::RTDataSourceSpaceType);
 
     m_bIsInit = true;
 

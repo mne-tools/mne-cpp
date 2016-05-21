@@ -206,14 +206,14 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
     //Add surface meta information as item children
     QList<QStandardItem*> list;
 
-    BrainTreeMetaItem* pItemSurfCol = new BrainTreeMetaItem(Data3DTreeMetaItemTypes::SurfaceColorItem, "Surface color");
-    connect(pItemSurfCol, &BrainTreeMetaItem::surfaceColorChanged,
+    MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::SurfaceColor, "Surface color");
+    connect(pItemSurfCol, &MetaTreeItem::surfaceColorChanged,
             this, &BrainSourceSpaceTreeItem::onSurfaceColorChanged);
     list<<pItemSurfCol;
     list<<new QStandardItem(pItemSurfCol->toolTip());
     this->appendRow(list);
     data.setValue(QColor(100,100,100));
-    pItemSurfCol->setData(data, BrainTreeMetaItemRoles::SurfaceColor);
+    pItemSurfCol->setData(data, MetaTreeItemRoles::SurfaceColor);
     pItemSurfCol->setData(data, Qt::DecorationRole);
 
     return true;

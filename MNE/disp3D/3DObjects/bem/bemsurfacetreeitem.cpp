@@ -146,14 +146,14 @@ bool BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
     //Add surface meta information as item children
 //    QList<QStandardItem*> list;
 
-//    BrainTreeMetaItem* pItemSurfCol = new BrainTreeMetaItem(Data3DTreeMetaItemTypes::SurfaceColorItem, "Surface color");
+//    BrainTreeMetaItem* pItemSurfCol = new BrainTreeMetaItem(MetaTreeItemTypes::SurfaceColorItem, "Surface color");
 //    connect(pItemSurfCol, &BrainTreeMetaItem::surfaceColorChanged,
 //            this, &BemSurfaceTreeItem::onSurfaceColorChanged);
 //    list<<pItemSurfCol;
 //    list<<new QStandardItem(pItemSurfCol->toolTip());
 //    this->appendRow(list);
 //    data.setValue(QColor(100,100,100));
-//    pItemSurfCol->setData(data, BrainTreeMetaItemRoles::SurfaceColor);
+//    pItemSurfCol->setData(data, MetaTreeItemRoles::SurfaceColor);
 //    pItemSurfCol->setData(data, Qt::DecorationRole);
 
     return true;

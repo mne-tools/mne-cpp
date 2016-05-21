@@ -95,32 +95,29 @@ namespace Data3DTreeModelItemTypes
                     BemSurfaceItem = QStandardItem::UserType + 10};
 }
 
-namespace Data3DTreeMetaItemTypes
+namespace MetaTreeItemTypes
 {
-    enum ItemType{SurfaceFileName = QStandardItem::UserType + 100,
-                    SurfaceFilePath = QStandardItem::UserType + 101,
-                    AnnotFileName = QStandardItem::UserType + 102,
-                    AnnotFilePath = QStandardItem::UserType + 103,
-                    SurfaceType = QStandardItem::UserType + 104,
-                    SurfaceColorGyri = QStandardItem::UserType + 105,
-                    SurfaceColorSulci = QStandardItem::UserType + 106,
-                    SurfaceColorVert = QStandardItem::UserType + 107,
-                    SurfaceAlpha = QStandardItem::UserType + 108,
-                    RTDataStreamStatus = QStandardItem::UserType + 109,
-                    RTDataSourceSpaceType = QStandardItem::UserType + 110,
-                    RTDataColormapType = QStandardItem::UserType + 111,
-                    RTDataTimeInterval = QStandardItem::UserType + 112,
-                    RTDataLoopedStreaming = QStandardItem::UserType + 113,
-                    RTDataNumberAverages = QStandardItem::UserType + 114,
-                    RTDataNormalizationValue = QStandardItem::UserType + 115,
-                    RTDataVisualizationType = QStandardItem::UserType + 116,
-                    SurfaceColorItem = QStandardItem::UserType + 117,
-                    UnknownItem = QStandardItem::UserType + 118};
+    enum ItemType{FileName = QStandardItem::UserType + 100,
+                    FilePath = QStandardItem::UserType + 101,
+                    SurfaceType = QStandardItem::UserType + 102,
+                    SurfaceColorGyri = QStandardItem::UserType + 103,
+                    SurfaceColorSulci = QStandardItem::UserType + 104,
+                    SurfaceColorVert = QStandardItem::UserType + 105,
+                    SurfaceAlpha = QStandardItem::UserType + 106,
+                    RTDataStreamStatus = QStandardItem::UserType + 107,
+                    RTDataSourceSpaceType = QStandardItem::UserType + 108,
+                    RTDataColormapType = QStandardItem::UserType + 109,
+                    RTDataTimeInterval = QStandardItem::UserType + 110,
+                    RTDataLoopedStreaming = QStandardItem::UserType + 111,
+                    RTDataNumberAverages = QStandardItem::UserType + 112,
+                    RTDataNormalizationValue = QStandardItem::UserType + 113,
+                    RTDataVisualizationType = QStandardItem::UserType + 114,
+                    SurfaceColor = QStandardItem::UserType + 115,
+                    UnknownItem = QStandardItem::UserType + 116};
 }
 
-
 // Model item roles
-namespace BrainTreeMetaItemRoles
+namespace MetaTreeItemRoles
 {
     enum ItemRole{SurfaceFileName = Qt::UserRole,
                     SurfaceType = Qt::UserRole + 1,

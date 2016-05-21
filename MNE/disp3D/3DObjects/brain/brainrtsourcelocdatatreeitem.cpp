@@ -154,8 +154,8 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
     //Add meta information as item children
     QList<QStandardItem*> list;
 
-    BrainTreeMetaItem* pItemRTDataStreamStatus = new BrainTreeMetaItem(Data3DTreeMetaItemTypes::RTDataStreamStatus, "Stream data on/off");
-    connect(pItemRTDataStreamStatus, &BrainTreeMetaItem::checkStateChanged,
+    MetaTreeItem* pItemRTDataStreamStatus = new MetaTreeItem(MetaTreeItemTypes::RTDataStreamStatus, "Stream data on/off");
+    connect(pItemRTDataStreamStatus, &MetaTreeItem::checkStateChanged,
             this, &BrainRTSourceLocDataTreeItem::onCheckStateWorkerChanged);
     list<<pItemRTDataStreamStatus;
     list<<new QStandardItem(pItemRTDataStreamStatus->toolTip());
@@ -163,60 +163,60 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
     pItemRTDataStreamStatus->setCheckable(true);
     pItemRTDataStreamStatus->setCheckState(Qt::Unchecked);
     data.setValue(false);
-    pItemRTDataStreamStatus->setData(data, BrainTreeMetaItemRoles::RTDataStreamStatus);
+    pItemRTDataStreamStatus->setData(data, MetaTreeItemRoles::RTDataStreamStatus);
 
-    BrainTreeMetaItem* pItemVisuaizationType = new BrainTreeMetaItem(Data3DTreeMetaItemTypes::RTDataVisualizationType, "Vertex based");
-    connect(pItemVisuaizationType, &BrainTreeMetaItem::rtDataVisualizationTypeChanged,
+    MetaTreeItem* pItemVisuaizationType = new MetaTreeItem(MetaTreeItemTypes::RTDataVisualizationType, "Vertex based");
+    connect(pItemVisuaizationType, &MetaTreeItem::rtDataVisualizationTypeChanged,
             this, &BrainRTSourceLocDataTreeItem::onVisualizationTypeChanged);
     list.clear();
     list<<pItemVisuaizationType;
     list<<new QStandardItem(pItemVisuaizationType->toolTip());
     this->appendRow(list);
     data.setValue(QString("Single Vertex"));
-    pItemVisuaizationType->setData(data, BrainTreeMetaItemRoles::RTDataVisualizationType);
+    pItemVisuaizationType->setData(data, MetaTreeItemRoles::RTDataVisualizationType);
 
     QString sIsClustered = isClustered ? "Clustered" : "Full";
-    BrainTreeMetaItem* pItemSourceSpaceType = new BrainTreeMetaItem(Data3DTreeMetaItemTypes::RTDataSourceSpaceType, sIsClustered);
+    MetaTreeItem* pItemSourceSpaceType = new MetaTreeItem(MetaTreeItemTypes::RTDataSourceSpaceType, sIsClustered);
     pItemSourceSpaceType->setEditable(false);
     list.clear();
     list<<pItemSourceSpaceType;
     list<<new QStandardItem(pItemSourceSpaceType->toolTip());
     this->appendRow(list);
     data.setValue(sIsClustered);
-    pItemSourceSpaceType->setData(data, BrainTreeMetaItemRoles::RTDataSourceSpaceType);
+    pItemSourceSpaceType->setData(data, MetaTreeItemRoles::RTDataSourceSpaceType);
 
-    BrainTreeMetaItem* pItemColormapType = new BrainTreeMetaItem(Data3DTreeMetaItemTypes::RTDataColormapType, "Hot Negative 2");
-    connect(pItemColormapType, &BrainTreeMetaItem::rtDataColormapTypeChanged,
+    MetaTreeItem* pItemColormapType = new MetaTreeItem(MetaTreeItemTypes::RTDataColormapType, "Hot Negative 2");
+    connect(pItemColormapType, &MetaTreeItem::rtDataColormapTypeChanged,
             this, &BrainRTSourceLocDataTreeItem::onColormapTypeChanged);
     list.clear();
     list<<pItemColormapType;
     list<<new QStandardItem(pItemColormapType->toolTip());
     this->appendRow(list);
     data.setValue(QString("Hot Negative 2"));
-    pItemColormapType->setData(data, BrainTreeMetaItemRoles::RTDataColormapType);
+    pItemColormapType->setData(data, MetaTreeItemRoles::RTDataColormapType);
 
-    BrainTreeMetaItem* pItemSourceLocNormValue = new BrainTreeMetaItem(Data3DTreeMetaItemTypes::RTDataNormalizationValue, "10.0");
-    connect(pItemSourceLocNormValue, &BrainTreeMetaItem::rtDataNormalizationValueChanged,
+    MetaTreeItem* pItemSourceLocNormValue = new MetaTreeItem(MetaTreeItemTypes::RTDataNormalizationValue, "10.0");
+    connect(pItemSourceLocNormValue, &MetaTreeItem::rtDataNormalizationValueChanged,
             this, &BrainRTSourceLocDataTreeItem::onDataNormalizationValueChanged);
     list.clear();
     list<<pItemSourceLocNormValue;
     list<<new QStandardItem(pItemSourceLocNormValue->toolTip());
     this->appendRow(list);
     data.setValue(10.0);
-    pItemSourceLocNormValue->setData(data, BrainTreeMetaItemRoles::RTDataNormalizationValue);
+    pItemSourceLocNormValue->setData(data, MetaTreeItemRoles::RTDataNormalizationValue);
 
-    BrainTreeMetaItem *pItemStreamingInterval = new BrainTreeMetaItem(Data3DTreeMetaItemTypes::RTDataTimeInterval, "1000");
-    connect(pItemStreamingInterval, &BrainTreeMetaItem::rtDataTimeIntervalChanged,
+    MetaTreeItem *pItemStreamingInterval = new MetaTreeItem(MetaTreeItemTypes::RTDataTimeInterval, "1000");
+    connect(pItemStreamingInterval, &MetaTreeItem::rtDataTimeIntervalChanged,
             this, &BrainRTSourceLocDataTreeItem::onTimeIntervalChanged);
     list.clear();
     list<<pItemStreamingInterval;
     list<<new QStandardItem(pItemStreamingInterval->toolTip());
     this->appendRow(list);
     data.setValue(1000);
-    pItemStreamingInterval->setData(data, BrainTreeMetaItemRoles::RTDataTimeInterval);
+    pItemStreamingInterval->setData(data, MetaTreeItemRoles::RTDataTimeInterval);
 
-    BrainTreeMetaItem *pItemLoopedStreaming = new BrainTreeMetaItem(Data3DTreeMetaItemTypes::RTDataLoopedStreaming, "Looping on/off");
-    connect(pItemLoopedStreaming, &BrainTreeMetaItem::checkStateChanged,
+    MetaTreeItem *pItemLoopedStreaming = new MetaTreeItem(MetaTreeItemTypes::RTDataLoopedStreaming, "Looping on/off");
+    connect(pItemLoopedStreaming, &MetaTreeItem::checkStateChanged,
             this, &BrainRTSourceLocDataTreeItem::onCheckStateLoopedStateChanged);
     pItemLoopedStreaming->setCheckable(true);
     pItemLoopedStreaming->setCheckState(Qt::Checked);
@@ -225,15 +225,15 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
     list<<new QStandardItem(pItemLoopedStreaming->toolTip());
     this->appendRow(list);
 
-    BrainTreeMetaItem *pItemAveragedStreaming = new BrainTreeMetaItem(Data3DTreeMetaItemTypes::RTDataNumberAverages, "1");
-    connect(pItemAveragedStreaming, &BrainTreeMetaItem::rtDataNumberAveragesChanged,
+    MetaTreeItem *pItemAveragedStreaming = new MetaTreeItem(MetaTreeItemTypes::RTDataNumberAverages, "1");
+    connect(pItemAveragedStreaming, &MetaTreeItem::rtDataNumberAveragesChanged,
             this, &BrainRTSourceLocDataTreeItem::onNumberAveragesChanged);
     list.clear();
     list<<pItemAveragedStreaming;
     list<<new QStandardItem(pItemAveragedStreaming->toolTip());
     this->appendRow(list);
     data.setValue(1);
-    pItemAveragedStreaming->setData(data, BrainTreeMetaItemRoles::RTDataNumberAverages);
+    pItemAveragedStreaming->setData(data, MetaTreeItemRoles::RTDataNumberAverages);
 
     //set rt data corresponding to the hemisphere
     m_pSourceLocRtDataWorker->setSurfaceData(arraySurfaceVertColor, this->data(BrainRTSourceLocDataTreeItemRoles::RTVertNo).value<VectorXi>());
@@ -278,14 +278,14 @@ bool BrainRTSourceLocDataTreeItem::addData(const MNESourceEstimate& tSourceEstim
 
 void BrainRTSourceLocDataTreeItem::setLoopState(bool state)
 {
-    QList<QStandardItem*> lItems = this->findChildren(Data3DTreeMetaItemTypes::RTDataLoopedStreaming);
+    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::RTDataLoopedStreaming);
 
     for(int i = 0; i < lItems.size(); i++) {
-        if(BrainTreeMetaItem* pAbstractItem = dynamic_cast<BrainTreeMetaItem*>(lItems.at(i))) {
+        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
             pAbstractItem->setCheckState(state == true ? Qt::Checked : Qt::Unchecked);
             QVariant data;
             data.setValue(state);
-            pAbstractItem->setData(data, BrainTreeMetaItemRoles::RTDataLoopedStreaming);
+            pAbstractItem->setData(data, MetaTreeItemRoles::RTDataLoopedStreaming);
         }
     }
 }
@@ -295,14 +295,14 @@ void BrainRTSourceLocDataTreeItem::setLoopState(bool state)
 
 void BrainRTSourceLocDataTreeItem::setStreamingActive(bool state)
 {
-    QList<QStandardItem*> lItems = this->findChildren(Data3DTreeMetaItemTypes::RTDataStreamStatus);
+    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::RTDataStreamStatus);
 
     for(int i = 0; i < lItems.size(); i++) {
-        if(BrainTreeMetaItem* pAbstractItem = dynamic_cast<BrainTreeMetaItem*>(lItems.at(i))) {
+        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
             pAbstractItem->setCheckState(state == true ? Qt::Checked : Qt::Unchecked);
             QVariant data;
             data.setValue(state);
-            pAbstractItem->setData(data, BrainTreeMetaItemRoles::RTDataStreamStatus);
+            pAbstractItem->setData(data, MetaTreeItemRoles::RTDataStreamStatus);
         }
     }
 }
@@ -312,14 +312,14 @@ void BrainRTSourceLocDataTreeItem::setStreamingActive(bool state)
 
 void BrainRTSourceLocDataTreeItem::setTimeInterval(int iMSec)
 {
-    QList<QStandardItem*> lItems = this->findChildren(Data3DTreeMetaItemTypes::RTDataTimeInterval);
+    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::RTDataTimeInterval);
 
     for(int i = 0; i < lItems.size(); i++) {
-        if(BrainTreeMetaItem* pAbstractItem = dynamic_cast<BrainTreeMetaItem*>(lItems.at(i))) {
+        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
             qDebug()<<"BrainRTSourceLocDataTreeItem::setTimeInterval";
             QVariant data;
             data.setValue(iMSec);
-            pAbstractItem->setData(data, BrainTreeMetaItemRoles::RTDataTimeInterval);
+            pAbstractItem->setData(data, MetaTreeItemRoles::RTDataTimeInterval);
             pAbstractItem->setData(data, Qt::DisplayRole);
         }
     }
@@ -330,13 +330,13 @@ void BrainRTSourceLocDataTreeItem::setTimeInterval(int iMSec)
 
 void BrainRTSourceLocDataTreeItem::setNumberAverages(int iNumberAverages)
 {
-    QList<QStandardItem*> lItems = this->findChildren(Data3DTreeMetaItemTypes::RTDataNumberAverages);
+    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::RTDataNumberAverages);
 
     for(int i = 0; i < lItems.size(); i++) {
-        if(BrainTreeMetaItem* pAbstractItem = dynamic_cast<BrainTreeMetaItem*>(lItems.at(i))) {
+        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
             QVariant data;
             data.setValue(iNumberAverages);
-            pAbstractItem->setData(data, BrainTreeMetaItemRoles::RTDataNumberAverages);
+            pAbstractItem->setData(data, MetaTreeItemRoles::RTDataNumberAverages);
             pAbstractItem->setData(data, Qt::DisplayRole);
         }
     }
@@ -347,13 +347,13 @@ void BrainRTSourceLocDataTreeItem::setNumberAverages(int iNumberAverages)
 
 void BrainRTSourceLocDataTreeItem::setColortable(const QString& sColortable)
 {
-    QList<QStandardItem*> lItems = this->findChildren(Data3DTreeMetaItemTypes::RTDataColormapType);
+    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::RTDataColormapType);
 
     for(int i = 0; i < lItems.size(); i++) {
-        if(BrainTreeMetaItem* pAbstractItem = dynamic_cast<BrainTreeMetaItem*>(lItems.at(i))) {
+        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
             QVariant data;
             data.setValue(sColortable);
-            pAbstractItem->setData(data, BrainTreeMetaItemRoles::RTDataColormapType);
+            pAbstractItem->setData(data, MetaTreeItemRoles::RTDataColormapType);
             pAbstractItem->setData(data, Qt::DisplayRole);
         }
     }
@@ -364,13 +364,13 @@ void BrainRTSourceLocDataTreeItem::setColortable(const QString& sColortable)
 
 void BrainRTSourceLocDataTreeItem::setVisualizationType(const QString& sVisualizationType)
 {
-    QList<QStandardItem*> lItems = this->findChildren(Data3DTreeMetaItemTypes::RTDataVisualizationType);
+    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::RTDataVisualizationType);
 
     for(int i = 0; i < lItems.size(); i++) {
-        if(BrainTreeMetaItem* pAbstractItem = dynamic_cast<BrainTreeMetaItem*>(lItems.at(i))) {
+        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
             QVariant data;
             data.setValue(sVisualizationType);
-            pAbstractItem->setData(data, BrainTreeMetaItemRoles::RTDataVisualizationType);
+            pAbstractItem->setData(data, MetaTreeItemRoles::RTDataVisualizationType);
             pAbstractItem->setData(data, Qt::DisplayRole);
         }
     }
@@ -381,13 +381,13 @@ void BrainRTSourceLocDataTreeItem::setVisualizationType(const QString& sVisualiz
 
 void BrainRTSourceLocDataTreeItem::setNormalization(double dNormalization)
 {
-    QList<QStandardItem*> lItems = this->findChildren(Data3DTreeMetaItemTypes::RTDataNormalizationValue);
+    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::RTDataNormalizationValue);
 
     for(int i = 0; i < lItems.size(); i++) {
-        if(BrainTreeMetaItem* pAbstractItem = dynamic_cast<BrainTreeMetaItem*>(lItems.at(i))) {
+        if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
             QVariant data;
             data.setValue(dNormalization);
-            pAbstractItem->setData(data, BrainTreeMetaItemRoles::RTDataNormalizationValue);
+            pAbstractItem->setData(data, MetaTreeItemRoles::RTDataNormalizationValue);
             pAbstractItem->setData(data, Qt::DisplayRole);
         }
     }
