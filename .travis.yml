@@ -28,7 +28,8 @@ script:
     # Build
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then qmake -r MNECPP_CONFIG+=withCodeCov; fi
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then qmake -r MNECPP_CONFIG+=noTests; fi
-    - make -j2
+    - nproc
+    - make -j$(nproc)
 
 after_success:
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./bin/test_codecov; fi
