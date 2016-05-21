@@ -27,11 +27,12 @@ script:
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cppcheck --enable=all -f -q -i./include/3rdParty/eigen3 -i/opt/qt56/include ./MNE ./applications ./testframes ./examples; fi
     # Build
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then qmake -r MNECPP_CONFIG+=withCodeCov; fi
-    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then qmake -r; fi
+    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then qmake -r MNECPP_CONFIG+=noTests; fi
     - make -j2
 	
 
 after_success:
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./bin/test_codecov.exe; fi
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then bash <(curl -s https://codecov.io/bash); fi
 
 notifications:
