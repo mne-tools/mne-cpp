@@ -63,5 +63,5 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 contains(MNECPP_CONFIG, withCodeCov) {
     LIBS += -lgcov
     QMAKE_CXXFLAGS += -ftest-coverage
-    QMAKE_LFLAGS += -ftest-coverage
+    QMAKE_LDFLAGS += -ftest-coverage
 }
