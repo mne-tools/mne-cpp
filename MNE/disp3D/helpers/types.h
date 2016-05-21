@@ -117,8 +117,6 @@ namespace MetaTreeItemTypes
 }
 
 // Model item roles
-
-
 namespace Data3DTreeModelItemRoles
 {
     enum ItemRole{SurfaceCurrentColorVert = Qt::UserRole + 100,
