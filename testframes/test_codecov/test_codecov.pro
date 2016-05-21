@@ -40,6 +40,7 @@ TEMPLATE = app
 VERSION = $${MNE_CPP_VERSION}
 
 QT += testlib
+QT -= gui
 
 CONFIG   += console
 CONFIG   -= app_bundle
@@ -61,5 +62,7 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 contains(MNECPP_CONFIG, withCodeCov) {
-    QMAKE_CXXFLAGS += -coverage
+    LIBS += -lgcov
+    QMAKE_CXXFLAGS += -ftest-coverage
+#    QMAKE_LDFLAGS += -ftest-coverage
 }
