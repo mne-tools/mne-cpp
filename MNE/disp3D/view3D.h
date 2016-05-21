@@ -190,6 +190,18 @@ public:
 
     //=========================================================================================================
     /**
+    * Adds BEM data.
+    *
+    * @param[in] subject            The name of the subject.
+    * @param[in] set                The name of the bem set to which the data is to be added.
+    * @param[in] tSourceSpace       The source space information.
+    *
+    * @return                       Returns true if successful.
+    */
+    bool addBemData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem);
+
+    //=========================================================================================================
+    /**
     * Return the tree model which holds the subject information.
     *
     * @return          The SubjectTreeModel pointer.

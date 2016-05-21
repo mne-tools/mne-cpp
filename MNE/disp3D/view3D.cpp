@@ -209,6 +209,14 @@ QList<BrainRTSourceLocDataTreeItem*> View3D::addRtBrainData(const QString& subje
 
 //*************************************************************************************************************
 
+bool View3D::addBemData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem)
+{
+    return m_pData3DTreeModel->addData(subject, set, tBem);
+}
+
+
+//*************************************************************************************************************
+
 Data3DTreeModel* View3D::getData3DTreeModel()
 {
     return m_pData3DTreeModel.data();

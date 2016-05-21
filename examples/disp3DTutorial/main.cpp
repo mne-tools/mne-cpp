@@ -59,8 +59,6 @@
 
 #include <iostream>
 
-#include <stdlib.h>     //for using the function sleep
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -237,6 +235,11 @@ int main(int argc, char *argv[])
 //    testWindow->addBrainData("Subject01", "HemiLRSet", tSurfLeft, tAnnotLeft);
 //    testWindow->addBrainData("Subject01", "HemiLRSet", tSurfRight, tAnnotRight);
     testWindow->addBrainData("Subject01", "HemiLRSet", tSurfSet, tAnnotSet);
+
+    //Read & show BEM
+    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    MNEBem t_Bem(t_fileBem);
+    testWindow->addBemData("Subject01", "BEM", t_Bem);
 
     if(bAddRtSourceLoc) {
         QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("Subject01", "HemiLRSet", sourceEstimate, t_clusteredFwd);

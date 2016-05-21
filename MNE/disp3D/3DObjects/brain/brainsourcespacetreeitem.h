@@ -114,7 +114,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainSourceSpaceTreeItem(int iType = BrainTreeModelItemTypes::SourceSpaceItem, const QString& text = "Source space");
+    explicit BrainSourceSpaceTreeItem(int iType = Data3DTreeModelItemTypes::SourceSpaceItem, const QString& text = "Source space");
 
     //=========================================================================================================
     /**

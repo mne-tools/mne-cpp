@@ -102,6 +102,8 @@ SOURCES += \
     3DObjects/brain/brainhemispheretreeitem.cpp \
     3DObjects/brain/brainrtsourcelocdatatreeitem.cpp \
     3DObjects/brain/brainrtconnectivitydatatreeitem.cpp \
+    3DObjects/bem/bemtreeitem.cpp \
+    3DObjects/bem/bemsurfacetreeitem.cpp \
     helpers/abstracttreeitem.cpp \
     helpers/renderable3Dentity.cpp \
     helpers/custommesh.cpp \
@@ -124,6 +126,8 @@ HEADERS += \
     3DObjects/brain/brainhemispheretreeitem.h \
     3DObjects/brain/brainrtsourcelocdatatreeitem.h \
     3DObjects/brain/brainrtconnectivitydatatreeitem.h \
+    3DObjects/bem/bemtreeitem.h \
+    3DObjects/bem/bemsurfacetreeitem.h \
     helpers/abstracttreeitem.h \
     helpers/renderable3Dentity.h \
     helpers/custommesh.h \

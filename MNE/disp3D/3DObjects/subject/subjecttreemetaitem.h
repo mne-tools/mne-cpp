@@ -102,7 +102,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit SubjectTreeMetaItem(int iType = SubjectTreeMetaItemTypes::UnknownItem, const QString& text = "");
+    explicit SubjectTreeMetaItem(int iType = Data3DTreeMetaItemTypes::UnknownItem, const QString& text = "");
 
     //=========================================================================================================
     /**

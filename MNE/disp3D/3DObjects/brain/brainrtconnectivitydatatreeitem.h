@@ -112,7 +112,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainRTConnectivityDataTreeItem(int iType = BrainTreeModelItemTypes::RTConnectivityDataItem, const QString& text = "RT Connectivity Data");
+    explicit BrainRTConnectivityDataTreeItem(int iType = Data3DTreeModelItemTypes::RTConnectivityDataItem, const QString& text = "RT Connectivity Data");
 
     //=========================================================================================================
     /**

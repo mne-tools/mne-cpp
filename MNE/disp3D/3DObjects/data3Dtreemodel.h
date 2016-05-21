@@ -43,12 +43,14 @@
 
 #include "../disp3D_global.h"
 
+#include "bem/bemtreeitem.h"
 #include "subject/subjecttreeitem.h"
 #include "brain/brainsurfacetreeitem.h"
 #include "brain/brainsurfacesettreeitem.h"
 
 #include "../helpers/renderable3Dentity.h"
 
+#include <mne/mne_bem.h>
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 
@@ -172,6 +174,18 @@ public:
     * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
     */
     QList<BrainRTSourceLocDataTreeItem*> addData(const QString& subject, const QString& set, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+
+    //=========================================================================================================
+    /**
+    * Adds BEM data.
+    *
+    * @param[in] subject            The name of the subject.
+    * @param[in] set                The name of the bem set to which the data is to be added.
+    * @param[in] tSourceSpace       The source space information.
+    *
+    * @return                       Returns true if successful.
+    */
+    bool addData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem);
 
 protected:
     QStandardItem*          m_pRootItem;            /**< The root item of the tree model. */
