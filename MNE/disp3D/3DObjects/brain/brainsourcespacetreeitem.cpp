@@ -90,7 +90,7 @@ void  BrainSourceSpaceTreeItem::setData(const QVariant& value, int role)
     AbstractTreeItem::setData(value, role);
 
     switch(role) {
-    case BrainSourceSpaceTreeItemRoles::SurfaceCurrentColorVert:
+    case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
         m_pRenderable3DEntity->setVertColor(value.value<QByteArray>());
         break;
     }
@@ -186,22 +186,22 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
     QVariant data;
 
     data.setValue(arrayVertColor);
-    this->setData(data, BrainSourceSpaceTreeItemRoles::SurfaceCurrentColorVert);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 
     data.setValue(tHemisphere.rr);
-    this->setData(data, BrainSourceSpaceTreeItemRoles::SurfaceVert);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
 
     data.setValue(tHemisphere.tris);
-    this->setData(data, BrainSourceSpaceTreeItemRoles::SurfaceTris);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceTris);
 
     data.setValue(tHemisphere.nn);
-    this->setData(data, BrainSourceSpaceTreeItemRoles::SurfaceNorm);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceNorm);
 
     data.setValue(offset);
-    this->setData(data, BrainSourceSpaceTreeItemRoles::SurfaceOffset);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceOffset);
 
     data.setValue(m_pRenderable3DEntity);
-    this->setData(data, BrainSourceSpaceTreeItemRoles::SurfaceRenderable3DEntity);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceRenderable3DEntity);
 
     //Add surface meta information as item children
     QList<QStandardItem*> list;
@@ -237,10 +237,10 @@ void BrainSourceSpaceTreeItem::setVisible(bool state)
 void BrainSourceSpaceTreeItem::onSurfaceColorChanged(const QColor& color)
 {
     QVariant data;
-    QByteArray arrayNewVertColor = createVertColor(this->data(BrainSourceSpaceTreeItemRoles::SurfaceVert).value<MatrixX3f>(), color);
+    QByteArray arrayNewVertColor = createVertColor(this->data(Data3DTreeModelItemRoles::SurfaceVert).value<MatrixX3f>(), color);
 
     data.setValue(arrayNewVertColor);
-    this->setData(data, BrainSourceSpaceTreeItemRoles::SurfaceCurrentColorVert);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 }
 
 

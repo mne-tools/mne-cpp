@@ -78,7 +78,7 @@ BrainSurfaceSetTreeItem::~BrainSurfaceSetTreeItem()
 QVariant BrainSurfaceSetTreeItem::data(int role) const
 {
     switch(role) {
-        case BrainSurfaceSetTreeItemRoles::SurfaceSetName:
+        case Data3DTreeModelItemRoles::SurfaceSetName:
             return QVariant();
     }
 
@@ -111,7 +111,7 @@ bool BrainSurfaceSetTreeItem::addData(const SurfaceSet& tSurfaceSet, const Annot
         for(int j = 0; j<itemList.size(); j++) {
             BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j));
 
-            if(pHemiItem->data(BrainHemisphereTreeItemRoles::SurfaceHemi).toInt() == tSurfaceSet[i].hemi()) {
+            if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == tSurfaceSet[i].hemi()) {
                 hemiItemFound = true;
 
                 if(i < tAnnotationSet.size()) {
@@ -168,7 +168,7 @@ bool BrainSurfaceSetTreeItem::addData(const Surface& tSurface, const Annotation&
     for(int j = 0; j<itemList.size(); j++) {
         BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j));
 
-        if(pHemiItem->data(BrainHemisphereTreeItemRoles::SurfaceHemi).toInt() == tSurface.hemi()) {
+        if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == tSurface.hemi()) {
             hemiItemFound = true;
 
             if(tAnnotation.hemi() == tSurface.hemi()) {
@@ -216,7 +216,7 @@ bool BrainSurfaceSetTreeItem::addData(const MNESourceSpace& tSourceSpace, Qt3DCo
         for(int j = 0; j<itemList.size(); j++) {
             BrainHemisphereTreeItem* pHemiItem = dynamic_cast<BrainHemisphereTreeItem*>(itemList.at(j));
 
-            if(pHemiItem->data(BrainHemisphereTreeItemRoles::SurfaceHemi).toInt() == i) {
+            if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == i) {
                 hemiItemFound = true;
                 state = pHemiItem->addData(tSourceSpace[i], p3DEntityParent);
             }

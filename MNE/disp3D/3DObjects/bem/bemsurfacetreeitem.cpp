@@ -91,7 +91,7 @@ void  BemSurfaceTreeItem::setData(const QVariant& value, int role)
     AbstractTreeItem::setData(value, role);
 
     switch(role) {
-    case BemSurfaceTreeItemRoles::SurfaceCurrentColorVert:
+    case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
         m_pRenderable3DEntity->setVertColor(value.value<QByteArray>());
         break;
     }
@@ -126,22 +126,22 @@ bool BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
     QVariant data;
 
     data.setValue(arrayVertColor);
-    this->setData(data, BemSurfaceTreeItemRoles::SurfaceCurrentColorVert);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 
     data.setValue(tBemSurface.rr);
-    this->setData(data, BemSurfaceTreeItemRoles::SurfaceVert);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceVert);
 
     data.setValue(tBemSurface.tris);
-    this->setData(data, BemSurfaceTreeItemRoles::SurfaceTris);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceTris);
 
     data.setValue(tBemSurface.nn);
-    this->setData(data, BemSurfaceTreeItemRoles::SurfaceNorm);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceNorm);
 
     data.setValue(offset);
-    this->setData(data, BemSurfaceTreeItemRoles::SurfaceOffset);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceOffset);
 
     data.setValue(m_pRenderable3DEntity);
-    this->setData(data, BemSurfaceTreeItemRoles::SurfaceRenderable3DEntity);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceRenderable3DEntity);
 
     //Add surface meta information as item children
 //    QList<QStandardItem*> list;
@@ -173,10 +173,10 @@ void BemSurfaceTreeItem::setVisible(bool state)
 void BemSurfaceTreeItem::onSurfaceColorChanged(const QColor& color)
 {
     QVariant data;
-    QByteArray arrayNewVertColor = createVertColor(this->data(BemSurfaceTreeItemRoles::SurfaceVert).value<MatrixX3f>(), color);
+    QByteArray arrayNewVertColor = createVertColor(this->data(Data3DTreeModelItemRoles::SurfaceVert).value<MatrixX3f>(), color);
 
     data.setValue(arrayNewVertColor);
-    this->setData(data, BemSurfaceTreeItemRoles::SurfaceCurrentColorVert);
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 }
 
 

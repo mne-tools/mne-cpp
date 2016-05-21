@@ -101,7 +101,7 @@ void BrainRTSourceLocDataTreeItem::setData(const QVariant& value, int role)
 bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSolution, const QByteArray& arraySurfaceVertColor, int iHemi, const VectorXi& vecLabelIds, const QList<FSLIB::Label>& lLabels)
 {   
     //Set hemisphere information as item's data
-    this->setData(iHemi, BrainRTSourceLocDataTreeItemRoles::RTHemi);
+    this->setData(iHemi, Data3DTreeModelItemRoles::RTHemi);
 
     //Set data based on clusterd or full source space
     bool isClustered = tForwardSolution.src[iHemi].isClustered();
@@ -110,26 +110,26 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
         //Source Space IS clustered
         switch(iHemi) {
             case 0:
-                this->setData(0, BrainRTSourceLocDataTreeItemRoles::RTStartIdx);
-                this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() - 1, BrainRTSourceLocDataTreeItemRoles::RTEndIdx);
+                this->setData(0, Data3DTreeModelItemRoles::RTStartIdx);
+                this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() - 1, Data3DTreeModelItemRoles::RTEndIdx);
                 break;
 
             case 1:
-                this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size(), BrainRTSourceLocDataTreeItemRoles::RTStartIdx);
-                this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() + tForwardSolution.src[1].cluster_info.centroidSource_rr.size() - 1, BrainRTSourceLocDataTreeItemRoles::RTEndIdx);
+                this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size(), Data3DTreeModelItemRoles::RTStartIdx);
+                this->setData(tForwardSolution.src[0].cluster_info.centroidSource_rr.size() + tForwardSolution.src[1].cluster_info.centroidSource_rr.size() - 1, Data3DTreeModelItemRoles::RTEndIdx);
                 break;
         }
     } else {
         //Source Space is NOT clustered
         switch(iHemi) {
             case 0:
-                this->setData(0, BrainRTSourceLocDataTreeItemRoles::RTStartIdx);
-                this->setData(tForwardSolution.src[0].nuse - 1, BrainRTSourceLocDataTreeItemRoles::RTEndIdx);
+                this->setData(0, Data3DTreeModelItemRoles::RTStartIdx);
+                this->setData(tForwardSolution.src[0].nuse - 1, Data3DTreeModelItemRoles::RTEndIdx);
                 break;
 
             case 1:
-                this->setData(tForwardSolution.src[0].nuse, BrainRTSourceLocDataTreeItemRoles::RTStartIdx);
-                this->setData(tForwardSolution.src[0].nuse + tForwardSolution.src[1].nuse - 1, BrainRTSourceLocDataTreeItemRoles::RTEndIdx);
+                this->setData(tForwardSolution.src[0].nuse, Data3DTreeModelItemRoles::RTStartIdx);
+                this->setData(tForwardSolution.src[0].nuse + tForwardSolution.src[1].nuse - 1, Data3DTreeModelItemRoles::RTEndIdx);
                 break;
         }
     }
@@ -148,7 +148,7 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
             data.setValue(tForwardSolution.src[iHemi].vertno);
         }
 
-        this->setData(data, BrainRTSourceLocDataTreeItemRoles::RTVertNo);
+        this->setData(data, Data3DTreeModelItemRoles::RTVertNo);
     }
 
     //Add meta information as item children
@@ -236,7 +236,7 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
     pItemAveragedStreaming->setData(data, MetaTreeItemRoles::RTDataNumberAverages);
 
     //set rt data corresponding to the hemisphere
-    m_pSourceLocRtDataWorker->setSurfaceData(arraySurfaceVertColor, this->data(BrainRTSourceLocDataTreeItemRoles::RTVertNo).value<VectorXi>());
+    m_pSourceLocRtDataWorker->setSurfaceData(arraySurfaceVertColor, this->data(Data3DTreeModelItemRoles::RTVertNo).value<VectorXi>());
     m_pSourceLocRtDataWorker->setAnnotationData(vecLabelIds, lLabels);
 
     m_bIsInit = true;
@@ -254,8 +254,8 @@ bool BrainRTSourceLocDataTreeItem::addData(const MNESourceEstimate& tSourceEstim
         return false;
     }
 
-    int iStartIdx = this->data(BrainRTSourceLocDataTreeItemRoles::RTStartIdx).toInt();
-    int iEndIdx = this->data(BrainRTSourceLocDataTreeItemRoles::RTEndIdx).toInt();
+    int iStartIdx = this->data(Data3DTreeModelItemRoles::RTStartIdx).toInt();
+    int iEndIdx = this->data(Data3DTreeModelItemRoles::RTEndIdx).toInt();
 
 //    qDebug()<<"BrainRTSourceLocDataTreeItem::addData - iStartIdx"<<iStartIdx;
 //    qDebug()<<"BrainRTSourceLocDataTreeItem::addData - iEndIdx"<<iEndIdx;
@@ -398,7 +398,7 @@ void BrainRTSourceLocDataTreeItem::setNormalization(double dNormalization)
 
 void BrainRTSourceLocDataTreeItem::onColorInfoOriginChanged(const QByteArray& arrayVertColor)
 {
-    m_pSourceLocRtDataWorker->setSurfaceData(arrayVertColor, this->data(BrainRTSourceLocDataTreeItemRoles::RTVertNo).value<VectorXi>());
+    m_pSourceLocRtDataWorker->setSurfaceData(arrayVertColor, this->data(Data3DTreeModelItemRoles::RTVertNo).value<VectorXi>());
 }
 
 
@@ -454,14 +454,14 @@ void BrainRTSourceLocDataTreeItem::onDataNormalizationValueChanged(double dValue
 
 void BrainRTSourceLocDataTreeItem::onVisualizationTypeChanged(const QString& sVisType)
 {
-    int iVisType = BrainRTDataVisualizationTypes::VertexBased;
+    int iVisType = Data3DTreeModelItemRoles::VertexBased;
 
     if(sVisType == "Annotation based") {
-        iVisType = BrainRTDataVisualizationTypes::AnnotationBased;
+        iVisType = Data3DTreeModelItemRoles::AnnotationBased;
     }
 
     if(sVisType == "Smoothing based") {
-        iVisType = BrainRTDataVisualizationTypes::SmoothingBased;
+        iVisType = Data3DTreeModelItemRoles::SmoothingBased;
     }
 
     m_pSourceLocRtDataWorker->setVisualizationType(iVisType);

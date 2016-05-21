@@ -72,7 +72,7 @@ RtSourceLocDataWorker::RtSourceLocDataWorker(QObject* parent)
 , m_bIsLooping(true)
 , m_iAverageSamples(1)
 , m_iCurrentSample(0)
-, m_iVisualizationType(BrainRTDataVisualizationTypes::VertexBased)
+, m_iVisualizationType(Data3DTreeModelItemRoles::VertexBased)
 , m_iMSecIntervall(1000)
 , m_sColormap("Hot Negative 2")
 , m_dNormalization(1.0)
@@ -317,7 +317,7 @@ QByteArray RtSourceLocDataWorker::performVisualizationTypeCalculation(const Vect
 
     //Generate color data for vertices
     switch(m_iVisualizationType) {
-        case BrainRTDataVisualizationTypes::VertexBased: {
+        case Data3DTreeModelItemRoles::VertexBased: {
             if(!m_bSurfaceDataIsInit) {
                 qDebug()<<"RtSourceLocDataWorker::performVisualizationTypeCalculation - Surface data was not initialized. Returning ...";
                 return m_arraySurfaceVertColor;
@@ -340,7 +340,7 @@ QByteArray RtSourceLocDataWorker::performVisualizationTypeCalculation(const Vect
             return arrayCurrentVertColor;
         }
 
-        case BrainRTDataVisualizationTypes::AnnotationBased: {
+        case Data3DTreeModelItemRoles::AnnotationBased: {
             if(!m_bAnnotationDataIsInit) {
                 qDebug()<<"RtSourceLocDataWorker::performVisualizationTypeCalculation - Annotation data was not initialized. Returning ...";
                 return m_arraySurfaceVertColor;
@@ -383,7 +383,7 @@ QByteArray RtSourceLocDataWorker::performVisualizationTypeCalculation(const Vect
             return arrayCurrentVertColor;
         }        
 
-        case BrainRTDataVisualizationTypes::SmoothingBased: {
+        case Data3DTreeModelItemRoles::SmoothingBased: {
             //TODO: Smooth here!
             break;
         }
