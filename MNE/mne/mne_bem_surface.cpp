@@ -235,3 +235,15 @@ void MNEBemSurface::writeToStream(FiffStream *p_pStream)
 }
 
 
+//*************************************************************************************************************
+
+QString MNEBemSurface::id_name(int id)
+{
+    switch(id) {
+        case FIFFV_BEM_SURF_ID_BRAIN: return "Brain";
+        case FIFFV_BEM_SURF_ID_SKULL: return "Skull";
+        case FIFFV_BEM_SURF_ID_HEAD: return "Head";
+        case FIFFV_BEM_SURF_ID_UNKNOWN: return "Unknown";
+        default: return "Unknown";
+    }
+}
