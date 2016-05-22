@@ -4,6 +4,9 @@
 # Clone MNE-CPP test data
 git clone https://github.com/mne-tools/mne-cpp-test-data.git mne-cpp-test-data
 
+# Set Environment variable
+export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH 
+
 #tbd: later on do a grep of all cpps within testframe
 # Create Code Coverage
 ./bin/test_codecov
