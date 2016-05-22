@@ -12,6 +12,11 @@ matrix:
       osx_image: xcode7.3
       compiler: clang
       env: BUILD=osx_release
+    - os: linux
+      dist: trusty
+      sudo: required
+      compiler: gcc
+      env: BUILD=linux_tests
 
 before_install: . tools/travis/$BUILD/before_install.sh
 install: . tools/travis/$BUILD/install.sh
