@@ -123,23 +123,7 @@ bool BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
     m_pRenderable3DEntity->setMeshData(tBemSurface.rr, tBemSurface.nn, tBemSurface.tris, offset, arrayVertColor);
 
     //Find out BEM layer type and change items name
-    QString sItemName = this->text();
-
-    switch(tBemSurface.id) {
-        case FIFFV_BEM_SURF_ID_BRAIN:
-            sItemName = "Brain";
-        break;
-
-        case FIFFV_BEM_SURF_ID_SKULL:
-            sItemName = "Skull";
-        break;
-
-        case FIFFV_BEM_SURF_ID_HEAD:
-            sItemName = "Head";
-        break;
-    }
-
-    this->setText(sItemName);
+    this->setText(MNEBemSurface::id_name(tBemSurface.id));
 
     //Add data which is held by this BemSurfaceTreeItem
     QVariant data;
