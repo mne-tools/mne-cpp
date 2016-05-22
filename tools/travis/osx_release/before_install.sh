@@ -1,5 +1,4 @@
 #!/bin/bash
-set -ev
 
 ## Setup display; Start virtual X server, from https://docs.travis-ci.com/user/gui-and-headless-browsers/
 #export DISPLAY=:99.0

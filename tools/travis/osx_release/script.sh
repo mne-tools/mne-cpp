@@ -1,5 +1,4 @@
 #!/bin/bash
-set -ev
 
 # Configure without tests
 qmake -r MNECPP_CONFIG+=noTests

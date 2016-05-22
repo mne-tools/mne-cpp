@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ev
+#set -ev
 
 # QA: static code analysis with CppCheck
 cppcheck --enable=all -f -q -i./include/3rdParty/eigen3 -i/opt/qt56/include ./MNE ./applications ./testframes ./examples
