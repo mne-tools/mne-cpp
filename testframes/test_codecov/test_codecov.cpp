@@ -78,4 +78,4 @@ void TestQString::toUpper()
 //=============================================================================================================
 
 QTEST_MAIN(TestQString)
-#include "testqstring.moc"
+#include "test_codecov.moc"
