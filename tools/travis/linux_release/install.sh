@@ -2,7 +2,7 @@
 set -ev
 
 # Install Qt 5.6, cppcheck, lcov
-sudo apt-get install -qq qt56base qt563d qt56svg qt56serialport cppcheck lcov
+sudo apt-get install -qq qt56base qt563d qt56svg qt56serialport
 
 # Define Qt environment explicitly instead of "source /opt/qt56/bin/qt56-env.sh" 
 QT_BASE_DIR=/opt/qt56
@@ -16,5 +16,3 @@ fi
 uname -m
 export PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
 
-# Install Codecov
-sudo pip install codecov
