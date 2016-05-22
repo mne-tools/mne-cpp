@@ -54,7 +54,7 @@ CONFIG(debug, debug|release) {
 DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
-        testqstring.cpp \
+        test_codecov.cpp \
 
 HEADERS += \
 
@@ -63,6 +63,5 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 contains(MNECPP_CONFIG, withCodeCov) {
     LIBS += -lgcov
-    QMAKE_CXXFLAGS += -ftest-coverage
-#    QMAKE_LDFLAGS += -ftest-coverage
+    QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
 }

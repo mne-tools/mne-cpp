@@ -19,8 +19,15 @@ before_install:
 install:
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -qq qt56base qt563d qt56svg qt56serialport cppcheck lcov; fi
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then source /opt/qt56/bin/qt56-env.sh                                             ; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo pip install codecov; fi
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install qt5     ; fi
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew link --force qt5; fi
+
+## Start virtual X server, from https://docs.travis-ci.com/user/gui-and-headless-browsers/ 
+#before_script: 
+#    - "export DISPLAY=:99.0" 
+#    - "sh -e /etc/init.d/xvfb start" 
+#    - sleep 3 # give xvfb some time to start 
 
 script:
     # QA: static code analysis with CppCheck
@@ -32,7 +39,12 @@ script:
 
 after_success:
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./bin/test_codecov; fi
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then bash <(curl -s https://codecov.io/bash); fi
+    #tbd: later on do a grep of all cpps within testframe
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then gcov ./testframes/test_codecov/test_codecov.cpp; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ls; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ls ./bin/; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then codecov; fi
+#    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then bash <(curl -s https://codecov.io/bash); fi
 
 notifications:
   email:
