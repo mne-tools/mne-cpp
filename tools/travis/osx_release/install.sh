@@ -1,5 +1,4 @@
 #!/bin/bash
-set -ev
 
 # Install Qt 5.6
 brew install qt5

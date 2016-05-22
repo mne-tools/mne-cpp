@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ev
+#set -ev
 
 # Create Code Coverage
 ./bin/test_codecov
