@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     test_mne_python.pro
+# @file     test_codecov.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2014
+# @date     May, 2016
 #
 # @section  LICENSE
 #
-# Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2016, Christoph Dinh and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    Builds mne python test
+# @brief    Builds test codecov
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,45 +39,29 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
+QT += testlib
+QT -= gui
+
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = test_mne_python
+TARGET = test_codecov
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-LIBS += -L$${MNE_LIBRARY_DIR}
-CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
-            -lMNE$${MNE_LIB_VERSION}Fsd \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}PyIOd
-}
-else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
-            -lMNE$${MNE_LIB_VERSION}Utils \
-            -lMNE$${MNE_LIB_VERSION}Fs \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}PyIO
-}
-
-LIBS += -L$${PYTHON_LIBRARY_DIR}
-LIBS += -lpython33
-
-
-
 DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
-        main.cpp \
+        test_codecov.cpp \
 
 HEADERS += \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-INCLUDEPATH += $${PYTHON_INCLUDE_DIR}
+
+contains(MNECPP_CONFIG, withCodeCov) {
+    LIBS += -lgcov
+    QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
+}
