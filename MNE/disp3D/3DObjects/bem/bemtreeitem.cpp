@@ -80,6 +80,8 @@ QVariant BemTreeItem::data(int role) const
     switch(role) {
         case Data3DTreeModelItemRoles::BemName:
             return QVariant();
+        default: // do nothing;
+            break;
     }
 
     return AbstractTreeItem::data(role);
@@ -108,8 +110,8 @@ bool BemTreeItem::addData(const MNEBem &tBem, Qt3DCore::QEntity* p3DEntityParent
         pSurfItem->addData(tBem[i], p3DEntityParent);
 
         QList<QStandardItem*> list;
-        list<<pSurfItem;
-        list<<new QStandardItem(pSurfItem->toolTip());
+        list << pSurfItem;
+        list << new QStandardItem(pSurfItem->toolTip());
         this->appendRow(list);
     }
 
@@ -121,7 +123,7 @@ bool BemTreeItem::addData(const MNEBem &tBem, Qt3DCore::QEntity* p3DEntityParent
 
 void BemTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
-    for(int i = 0; i<this->rowCount(); i++) {
+    for(int i = 0; i < this->rowCount(); ++i) {
         if(this->child(i)->isCheckable()) {
             this->child(i)->setCheckState(checkState);
         }

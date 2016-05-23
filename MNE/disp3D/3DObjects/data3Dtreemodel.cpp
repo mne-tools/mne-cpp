@@ -77,7 +77,7 @@ Data3DTreeModel::~Data3DTreeModel()
 
 QVariant Data3DTreeModel::data(const QModelIndex& index, int role) const
 {
-//    qDebug()<<"Data3DTreeModel::data - index.column(): "<<index.column();
+//    qDebug() << "Data3DTreeModel::data - index.column(): " << index.column();
 
 //    if(index.column() == 1) {
 //        QVariant data;

@@ -91,9 +91,11 @@ void  BemSurfaceTreeItem::setData(const QVariant& value, int role)
     AbstractTreeItem::setData(value, role);
 
     switch(role) {
-    case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
-        m_pRenderable3DEntity->setVertColor(value.value<QByteArray>());
-        break;
+        case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
+            m_pRenderable3DEntity->setVertColor(value.value<QByteArray>());
+            break;
+        default: // do nothing;
+            break;
     }
 }
 
@@ -153,8 +155,8 @@ bool BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
     connect(itemAlpha, &MetaTreeItem::surfaceAlphaChanged,
             this, &BemSurfaceTreeItem::onSurfaceAlphaChanged);
     list.clear();
-    list<<itemAlpha;
-    list<<new QStandardItem(itemAlpha->toolTip());
+    list << itemAlpha;
+    list << new QStandardItem(itemAlpha->toolTip());
     this->appendRow(list);
     data.setValue(0.5);
     itemAlpha->setData(data, MetaTreeItemRoles::SurfaceAlpha);
@@ -163,8 +165,8 @@ bool BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
     connect(pItemSurfCol, &MetaTreeItem::surfaceColorChanged,
             this, &BemSurfaceTreeItem::onSurfaceColorChanged);
     list.clear();
-    list<<pItemSurfCol;
-    list<<new QStandardItem(pItemSurfCol->toolTip());
+    list << pItemSurfCol;
+    list << new QStandardItem(pItemSurfCol->toolTip());
     this->appendRow(list);
     data.setValue(QColor(100,100,100));
     pItemSurfCol->setData(data, MetaTreeItemRoles::SurfaceColor);
@@ -219,7 +221,7 @@ QByteArray BemSurfaceTreeItem::createVertColor(const MatrixXf& vertices, const Q
     float *rawColorArray = reinterpret_cast<float *>(arrayCurvatureColor.data());
     int idxColor = 0;
 
-    for(int i = 0; i<vertices.rows(); i++) {
+    for(int i = 0; i < vertices.rows(); ++i) {
         rawColorArray[idxColor++] = color.redF();
         rawColorArray[idxColor++] = color.greenF();
         rawColorArray[idxColor++] = color.blueF();

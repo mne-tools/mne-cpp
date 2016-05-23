@@ -104,7 +104,7 @@ bool BrainRTConnectivityDataTreeItem::init(const MNEForwardSolution& tForwardSol
     QString sIsClustered = isClustered ? "Clustered" : "Full";
     MetaTreeItem* pItemSourceSpaceType = new MetaTreeItem(MetaTreeItemTypes::RTDataSourceSpaceType, sIsClustered);
     pItemSourceSpaceType->setEditable(false);
-    *this<<pItemSourceSpaceType;
+    *this << pItemSourceSpaceType;
     data.setValue(sIsClustered);
     pItemSourceSpaceType->setData(data, MetaTreeItemRoles::RTDataSourceSpaceType);
 
@@ -120,7 +120,7 @@ bool BrainRTConnectivityDataTreeItem::addData(const MatrixXd& matNewConnection)
 {
     Q_UNUSED(matNewConnection)
     if(!m_bIsInit) {
-        qDebug()<<"BrainRTConnectivityDataTreeItem::updateData - Rt Item has not been initialized yet!";
+        qDebug() << "BrainRTConnectivityDataTreeItem::updateData - Rt Item has not been initialized yet!";
         return false;
     }
 

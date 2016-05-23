@@ -103,7 +103,7 @@ bool BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation&
 
         tAnnotation.toLabels(tSurface, qListLabels, qListLabelRGBAs);
 
-        for(int i = 0; i<qListLabels.size(); i++) {
+        for(int i = 0; i < qListLabels.size(); ++i) {
             FSLIB::Label label = qListLabels.at(i);
             for(int j = 0; j<label.vertices.rows(); j++) {
                 rawArrayColors[label.vertices(j)*3+0] = qListLabelRGBAs.at(i)(0)/255.0;
@@ -128,8 +128,8 @@ bool BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation&
 
         MetaTreeItem *itemAnnotFileName = new MetaTreeItem(MetaTreeItemTypes::FileName, tAnnotation.fileName());
         itemAnnotFileName->setEditable(false);
-        list<<itemAnnotFileName;
-        list<<new QStandardItem(itemAnnotFileName->toolTip());
+        list << itemAnnotFileName;
+        list << new QStandardItem(itemAnnotFileName->toolTip());
         this->appendRow(list);
         data.setValue(tAnnotation.fileName());
         itemAnnotFileName->setData(data, Data3DTreeModelItemRoles::FileName);
@@ -137,8 +137,8 @@ bool BrainAnnotationTreeItem::addData(const Surface& tSurface, const Annotation&
         list.clear();
         MetaTreeItem *itemAnnotPath = new MetaTreeItem(MetaTreeItemTypes::FilePath, tAnnotation.filePath());
         itemAnnotPath->setEditable(false);
-        list<<itemAnnotPath;
-        list<<new QStandardItem(itemAnnotPath->toolTip());
+        list << itemAnnotPath;
+        list << new QStandardItem(itemAnnotPath->toolTip());
         this->appendRow(list);
         data.setValue(tAnnotation.filePath());
         itemAnnotFileName->setData(data, Data3DTreeModelItemRoles::FilePath);

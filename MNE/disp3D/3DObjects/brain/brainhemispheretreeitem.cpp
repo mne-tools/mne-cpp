@@ -128,8 +128,8 @@ bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation&
     m_pSurfaceItem = new BrainSurfaceTreeItem(Data3DTreeModelItemTypes::SurfaceItem);
 
     QList<QStandardItem*> list;
-    list<<m_pSurfaceItem;
-    list<<new QStandardItem(m_pSurfaceItem->toolTip());
+    list << m_pSurfaceItem;
+    list << new QStandardItem(m_pSurfaceItem->toolTip());
     this->appendRow(list);
 
     bool state = m_pSurfaceItem->addData(tSurface, p3DEntityParent);
@@ -141,8 +141,8 @@ bool BrainHemisphereTreeItem::addData(const Surface& tSurface, const Annotation&
                 m_pSurfaceItem, &BrainSurfaceTreeItem::onAnnotationVisibilityChanged);
 
         list.clear();
-        list<<m_pAnnotItem;
-        list<<new QStandardItem(m_pAnnotItem->toolTip());
+        list << m_pAnnotItem;
+        list << new QStandardItem(m_pAnnotItem->toolTip());
         this->appendRow(list);
 
         state = m_pAnnotItem->addData(tSurface, tAnnotation);
@@ -181,8 +181,8 @@ bool BrainHemisphereTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCore
     BrainSourceSpaceTreeItem* pSourceSpaceItem = new BrainSourceSpaceTreeItem(Data3DTreeModelItemTypes::SourceSpaceItem);
 
     QList<QStandardItem*> list;
-    list<<pSourceSpaceItem;
-    list<<new QStandardItem(pSourceSpaceItem->toolTip());
+    list << pSourceSpaceItem;
+    list << new QStandardItem(pSourceSpaceItem->toolTip());
     this->appendRow(list);
 
     bool state = pSourceSpaceItem->addData(tHemisphere, p3DEntityParent);
@@ -203,8 +203,8 @@ BrainRTSourceLocDataTreeItem* BrainHemisphereTreeItem::addData(const MNESourceEs
                 m_pBrainRTSourceLocDataTreeItem = new BrainRTSourceLocDataTreeItem();
 
                 QList<QStandardItem*> list;
-                list<<m_pBrainRTSourceLocDataTreeItem;
-                list<<new QStandardItem(m_pBrainRTSourceLocDataTreeItem->toolTip());
+                list << m_pBrainRTSourceLocDataTreeItem;
+                list << new QStandardItem(m_pBrainRTSourceLocDataTreeItem->toolTip());
                 this->appendRow(list);
 
                 connect(m_pBrainRTSourceLocDataTreeItem, &BrainRTSourceLocDataTreeItem::rtVertColorChanged,
@@ -220,7 +220,7 @@ BrainRTSourceLocDataTreeItem* BrainHemisphereTreeItem::addData(const MNESourceEs
 
                 m_pBrainRTSourceLocDataTreeItem->addData(tSourceEstimate);
             } else {
-                qDebug()<<"BrainHemisphereTreeItem::addData - Cannot add real time data since the forwad solution was not provided and therefore the rt source localization data item has not been initilaized yet. Returning...";
+                qDebug() << "BrainHemisphereTreeItem::addData - Cannot add real time data since the forwad solution was not provided and therefore the rt source localization data item has not been initilaized yet. Returning...";
             }
         } else {
             m_pBrainRTSourceLocDataTreeItem->addData(tSourceEstimate);
@@ -228,7 +228,7 @@ BrainRTSourceLocDataTreeItem* BrainHemisphereTreeItem::addData(const MNESourceEs
 
         return m_pBrainRTSourceLocDataTreeItem;
     } else {
-        qDebug()<<"BrainHemisphereTreeItem::addData - tSourceEstimate is empty";
+        qDebug() << "BrainHemisphereTreeItem::addData - tSourceEstimate is empty";
     }
 
     return new BrainRTSourceLocDataTreeItem();

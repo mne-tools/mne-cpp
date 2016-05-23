@@ -75,7 +75,7 @@ BrainRTSourceLocDataTreeItem::~BrainRTSourceLocDataTreeItem()
 {
     if(m_pSourceLocRtDataWorker->isRunning()) {
         m_pSourceLocRtDataWorker->stop();
-        qDebug()<<"m_pSourceLocRtDataWorker stopped";
+        qDebug() << "m_pSourceLocRtDataWorker stopped";
     }
 }
 
@@ -157,8 +157,8 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
     MetaTreeItem* pItemRTDataStreamStatus = new MetaTreeItem(MetaTreeItemTypes::RTDataStreamStatus, "Stream data on/off");
     connect(pItemRTDataStreamStatus, &MetaTreeItem::checkStateChanged,
             this, &BrainRTSourceLocDataTreeItem::onCheckStateWorkerChanged);
-    list<<pItemRTDataStreamStatus;
-    list<<new QStandardItem(pItemRTDataStreamStatus->toolTip());
+    list << pItemRTDataStreamStatus;
+    list << new QStandardItem(pItemRTDataStreamStatus->toolTip());
     this->appendRow(list);
     pItemRTDataStreamStatus->setCheckable(true);
     pItemRTDataStreamStatus->setCheckState(Qt::Unchecked);
@@ -169,8 +169,8 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
     connect(pItemVisuaizationType, &MetaTreeItem::rtDataVisualizationTypeChanged,
             this, &BrainRTSourceLocDataTreeItem::onVisualizationTypeChanged);
     list.clear();
-    list<<pItemVisuaizationType;
-    list<<new QStandardItem(pItemVisuaizationType->toolTip());
+    list << pItemVisuaizationType;
+    list << new QStandardItem(pItemVisuaizationType->toolTip());
     this->appendRow(list);
     data.setValue(QString("Single Vertex"));
     pItemVisuaizationType->setData(data, MetaTreeItemRoles::RTDataVisualizationType);
@@ -179,8 +179,8 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
     MetaTreeItem* pItemSourceSpaceType = new MetaTreeItem(MetaTreeItemTypes::RTDataSourceSpaceType, sIsClustered);
     pItemSourceSpaceType->setEditable(false);
     list.clear();
-    list<<pItemSourceSpaceType;
-    list<<new QStandardItem(pItemSourceSpaceType->toolTip());
+    list << pItemSourceSpaceType;
+    list << new QStandardItem(pItemSourceSpaceType->toolTip());
     this->appendRow(list);
     data.setValue(sIsClustered);
     pItemSourceSpaceType->setData(data, MetaTreeItemRoles::RTDataSourceSpaceType);
@@ -189,8 +189,8 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
     connect(pItemColormapType, &MetaTreeItem::rtDataColormapTypeChanged,
             this, &BrainRTSourceLocDataTreeItem::onColormapTypeChanged);
     list.clear();
-    list<<pItemColormapType;
-    list<<new QStandardItem(pItemColormapType->toolTip());
+    list << pItemColormapType;
+    list << new QStandardItem(pItemColormapType->toolTip());
     this->appendRow(list);
     data.setValue(QString("Hot Negative 2"));
     pItemColormapType->setData(data, MetaTreeItemRoles::RTDataColormapType);
@@ -199,8 +199,8 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
     connect(pItemSourceLocNormValue, &MetaTreeItem::rtDataNormalizationValueChanged,
             this, &BrainRTSourceLocDataTreeItem::onDataNormalizationValueChanged);
     list.clear();
-    list<<pItemSourceLocNormValue;
-    list<<new QStandardItem(pItemSourceLocNormValue->toolTip());
+    list << pItemSourceLocNormValue;
+    list << new QStandardItem(pItemSourceLocNormValue->toolTip());
     this->appendRow(list);
     data.setValue(10.0);
     pItemSourceLocNormValue->setData(data, MetaTreeItemRoles::RTDataNormalizationValue);
@@ -209,8 +209,8 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
     connect(pItemStreamingInterval, &MetaTreeItem::rtDataTimeIntervalChanged,
             this, &BrainRTSourceLocDataTreeItem::onTimeIntervalChanged);
     list.clear();
-    list<<pItemStreamingInterval;
-    list<<new QStandardItem(pItemStreamingInterval->toolTip());
+    list << pItemStreamingInterval;
+    list << new QStandardItem(pItemStreamingInterval->toolTip());
     this->appendRow(list);
     data.setValue(1000);
     pItemStreamingInterval->setData(data, MetaTreeItemRoles::RTDataTimeInterval);
@@ -221,16 +221,16 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
     pItemLoopedStreaming->setCheckable(true);
     pItemLoopedStreaming->setCheckState(Qt::Checked);
     list.clear();
-    list<<pItemLoopedStreaming;
-    list<<new QStandardItem(pItemLoopedStreaming->toolTip());
+    list << pItemLoopedStreaming;
+    list << new QStandardItem(pItemLoopedStreaming->toolTip());
     this->appendRow(list);
 
     MetaTreeItem *pItemAveragedStreaming = new MetaTreeItem(MetaTreeItemTypes::RTDataNumberAverages, "1");
     connect(pItemAveragedStreaming, &MetaTreeItem::rtDataNumberAveragesChanged,
             this, &BrainRTSourceLocDataTreeItem::onNumberAveragesChanged);
     list.clear();
-    list<<pItemAveragedStreaming;
-    list<<new QStandardItem(pItemAveragedStreaming->toolTip());
+    list << pItemAveragedStreaming;
+    list << new QStandardItem(pItemAveragedStreaming->toolTip());
     this->appendRow(list);
     data.setValue(1);
     pItemAveragedStreaming->setData(data, MetaTreeItemRoles::RTDataNumberAverages);
@@ -250,19 +250,19 @@ bool BrainRTSourceLocDataTreeItem::init(const MNEForwardSolution& tForwardSoluti
 bool BrainRTSourceLocDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate)
 {
     if(!m_bIsInit) {
-        qDebug()<<"BrainRTSourceLocDataTreeItem::updateData - Rt Item has not been initialized yet!";
+        qDebug() << "BrainRTSourceLocDataTreeItem::updateData - Rt Item has not been initialized yet!";
         return false;
     }
 
     int iStartIdx = this->data(Data3DTreeModelItemRoles::RTStartIdx).toInt();
     int iEndIdx = this->data(Data3DTreeModelItemRoles::RTEndIdx).toInt();
 
-//    qDebug()<<"BrainRTSourceLocDataTreeItem::addData - iStartIdx"<<iStartIdx;
-//    qDebug()<<"BrainRTSourceLocDataTreeItem::addData - iEndIdx"<<iEndIdx;
-//    qDebug()<<"BrainRTSourceLocDataTreeItem::addData - tSourceEstimate.data.rows()"<<tSourceEstimate.data.rows();
+//    qDebug() << "BrainRTSourceLocDataTreeItem::addData - iStartIdx" << iStartIdx;
+//    qDebug() << "BrainRTSourceLocDataTreeItem::addData - iEndIdx" << iEndIdx;
+//    qDebug() << "BrainRTSourceLocDataTreeItem::addData - tSourceEstimate.data.rows()" << tSourceEstimate.data.rows();
 
     if(iStartIdx >= tSourceEstimate.data.rows() || iEndIdx >= tSourceEstimate.data.rows()) {
-        qDebug()<<"BrainRTSourceLocDataTreeItem::addData - Start and/or end index do not match with incoming data";
+        qDebug() << "BrainRTSourceLocDataTreeItem::addData - Start and/or end index do not match with incoming data";
         return false;
     }
 
@@ -316,7 +316,7 @@ void BrainRTSourceLocDataTreeItem::setTimeInterval(int iMSec)
 
     for(int i = 0; i < lItems.size(); i++) {
         if(MetaTreeItem* pAbstractItem = dynamic_cast<MetaTreeItem*>(lItems.at(i))) {
-            qDebug()<<"BrainRTSourceLocDataTreeItem::setTimeInterval";
+            qDebug() << "BrainRTSourceLocDataTreeItem::setTimeInterval";
             QVariant data;
             data.setValue(iMSec);
             pAbstractItem->setData(data, MetaTreeItemRoles::RTDataTimeInterval);
@@ -407,10 +407,10 @@ void BrainRTSourceLocDataTreeItem::onColorInfoOriginChanged(const QByteArray& ar
 void BrainRTSourceLocDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState)
 {
     if(checkState == Qt::Checked) {
-        qDebug()<<"Start stc worker";
+        qDebug() << "Start stc worker";
         m_pSourceLocRtDataWorker->start();
     } else if(checkState == Qt::Unchecked) {
-        qDebug()<<"Stop stc worker";
+        qDebug() << "Stop stc worker";
         m_pSourceLocRtDataWorker->stop();
     }    
 }
@@ -473,10 +473,10 @@ void BrainRTSourceLocDataTreeItem::onVisualizationTypeChanged(const QString& sVi
 void BrainRTSourceLocDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& checkState)
 {
     if(checkState == Qt::Checked) {
-        qDebug()<<"Looped streaming active";
+        qDebug() << "Looped streaming active";
         m_pSourceLocRtDataWorker->setLoop(true);
     } else if(checkState == Qt::Unchecked) {
-        qDebug()<<"Looped streaming inactive";
+        qDebug() << "Looped streaming inactive";
         m_pSourceLocRtDataWorker->setLoop(false);
     }
 }

@@ -235,7 +235,7 @@ void View3D::setSceneColor(const QColor& colSceneColor)
 
 void View3D::keyPressEvent(QKeyEvent* e)
 {
-    qDebug()<<"key press";
+    qDebug() << "key press";
     switch ( e->key() )
     {
         case Qt::Key_Space:
