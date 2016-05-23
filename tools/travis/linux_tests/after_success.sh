@@ -19,7 +19,7 @@ cd ./testframes/test_codecov
 gcov ./testframes/test_codecov/test_codecov.cpp -r
 ls
 
-cd $(MNECPP_ROOT)
+cd $MNECPP_ROOT
 ls
 
 cd ./testframes/test_fiff_rwr
