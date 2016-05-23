@@ -12,8 +12,8 @@ export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH
 ./bin/test_codecov
 ./bin/test_fiff_rwr
 
-gcov ./testframes/test_codecov/test_codecov.cpp
-gcov ./testframes/test_fiff_rwr/test_fiff_rwr.cpp
+gcov ./testframes/test_codecov/test_codecov.cpp -p
+gcov ./testframes/test_fiff_rwr/test_fiff_rwr.cpp -p
 
 # Report code coverage; instead of "bash <(curl -s https://codecov.io/bash)" use python "codecov"
 codecov
