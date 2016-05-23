@@ -136,7 +136,21 @@ public:
     Matrix<double,3,2, DontAlign>   eeg_loc;        /**< Channel location */
     fiff_int_t                      coord_frame;    /**< Coordinate Frame */
 
-//    fiff_ch_pos_t chpos;        /**< Channel location 15*/
+
+//    /** Measurement channel position and coil type. */
+//    typedef struct _fiffChPosRec {
+//     fiff_int_t   coil_type;   /**< What kind of coil. */
+//     fiff_float_t r0[3];       /**< Coil coordinate system origin */
+//     fiff_float_t ex[3];       /**< Coil coordinate system x-axis unit vector */
+//     fiff_float_t ey[3];       /**< Coil coordinate system y-axis unit vector */
+//     fiff_float_t ez[3];       /**< Coil coordinate system z-axis unit vector */
+//    } fiffChPosRec,*fiffChPos; /**< Measurement channel position and coil type */
+
+//    typedef fiffChPosRec fiff_ch_pos_t;
+
+
+//    fiff_ch_pos_t chpos;        /**< Channel location 15 -> ToDo: read in*/
+
 
     fiff_int_t    unit;         /**< Unit of measurement 1*/
     fiff_int_t    unit_mul;     /**< Unit multiplier exponent 1*/
