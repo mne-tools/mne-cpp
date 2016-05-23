@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     window.cpp
-* @author   Qt Project (qt3D examples)
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     subjecttreeitem.cpp
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015
+* @date     May, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, QtProject, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,16 +29,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Window class definition
+* @brief    SubjectTreeItem class definition.
+*
 */
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "window.h"
+#include "subjecttreeitem.h"
 
 
 //*************************************************************************************************************
@@ -47,6 +46,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace FSLIB;
 using namespace DISP3DLIB;
 
 
@@ -55,72 +55,54 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Window::Window(QScreen* screen)
-: QWindow(screen)
+SubjectTreeItem::SubjectTreeItem(int iType, const QString& text)
+: AbstractTreeItem(iType, text)
 {
-    setSurfaceType(QSurface::OpenGLSurface);
+    this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
+    this->setToolTip("Subject");
+}
 
-    resize(1024, 768);
-//    QSurfaceFormat format;
-//    if (QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGL) {
-//        format.setVersion(4, 3);
-//        format.setProfile(QSurfaceFormat::CoreProfile);
+
+//*************************************************************************************************************
+
+SubjectTreeItem::~SubjectTreeItem()
+{
+}
+
+
+//*************************************************************************************************************
+
+QVariant SubjectTreeItem::data(int role) const
+{
+//    switch(role) {
+//        case SubjectTreeItemRoles::SurfaceSetName:
+//            return QVariant();
 //    }
-//    format.setDepthBufferSize(24);
-//    format.setSamples(4);
-//    format.setStencilBufferSize(8);
-//    setFormat(format);
 
-    create();
+    return AbstractTreeItem::data(role);
 }
 
 
 //*************************************************************************************************************
 
-Window::~Window()
+void  SubjectTreeItem::setData(const QVariant& value, int role)
 {
+    AbstractTreeItem::setData(value, role);
 }
 
 
 //*************************************************************************************************************
 
-void Window::keyPressEvent(QKeyEvent* e)
+void SubjectTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
-    //qDebug()<<"key press";
-    switch ( e->key() )
-    {
-        case Qt::Key_Escape:
-            QGuiApplication::quit();
-            break;
-
-        default:
-            QWindow::keyPressEvent(e);
+    for(int i = 0; i<this->rowCount(); i++) {
+        if(this->child(i)->isCheckable()) {
+            this->child(i)->setCheckState(checkState);
+        }
     }
 }
 
 
-//*************************************************************************************************************
 
-void Window::mousePressEvent(QMouseEvent* e)
-{
-    //qDebug() << "mouse press";
-    QWindow::mousePressEvent(e);
-}
-
-
-//*************************************************************************************************************
-
-void Window::wheelEvent(QWheelEvent* e)
-{
-    //qDebug() << "mouse wheel";
-    QWindow::wheelEvent(e);
-}
-
-
-//*************************************************************************************************************
-
-void Window::mouseMoveEvent(QMouseEvent* e)
-{
-    //qDebug() << "mouse move";
-    QWindow::mouseMoveEvent(e);
-}

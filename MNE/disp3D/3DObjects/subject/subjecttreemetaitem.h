@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     subjecttreemetaitem.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     May, 2014
+* @date     May, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,119 +29,104 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    mne Surface test
+* @brief     SubjectTreeMetaItem class declaration.
 *
 */
+
+#ifndef SUBJECTTREEMETAITEM_H
+#define SUBJECTTREEMETAITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <fs/label.h>
-#include <fs/surface.h>
-#include <fs/annotationset.h>
-
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff.h>
-#include <mne/mne.h>
-
-#include <mne/mne_epoch_data_list.h>
-
-#include <mne/mne_sourceestimate.h>
-#include <inverse/minimumNorm/minimumnorm.h>
-
-#include <disp3D/view3D.h>
-#include <disp3D/control/control3dwidget.h>
-
-#include <utils/mnemath.h>
-
-#include <iostream>
-
-#include <fstream>
+#include "../../disp3D_global.h"
+#include "../../helpers/abstracttreeitem.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
-#include <QSet>
-#include <QElapsedTimer>
-
-//#define BENCHMARK
+#include <QList>
+#include <QVariant>
+#include <QStringList>
+#include <QColor>
+#include <QStandardItem>
+#include <QStandardItemModel>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// Eigen INCLUDES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FSLIB;
-using namespace FIFFLIB;
-using namespace INVERSELIB;
-using namespace DISP3DLIB;
-using namespace UTILSLIB;
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MAIN
+// DEFINE NAMESPACE DISP3DLIB
 //=============================================================================================================
+
+namespace DISP3DLIB
+{
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
 
 //=============================================================================================================
 /**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
+* SubjectTreeMetaItem provides a generic brain tree item to hold meta information about other brain tree items.
 *
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+* @brief Provides a generic brain tree item.
 */
-int main(int argc, char *argv[])
+class DISP3DNEWSHARED_EXPORT SubjectTreeMetaItem : public AbstractTreeItem
 {
-    QApplication a(argc, argv);
+    Q_OBJECT
 
-//    Vector3f v1, v2;
-//    v1 << 1, 2, 5;
-//    v2 << 3, 2, 4;
-//    Vector3f v3 = v1.cwiseProduct(v2);
-//    std::cout << "v3: " << v3 << std::endl;
+public:
+    typedef QSharedPointer<SubjectTreeMetaItem> SPtr;             /**< Shared pointer type for SubjectTreeMetaItem class. */
+    typedef QSharedPointer<const SubjectTreeMetaItem> ConstSPtr;  /**< Const shared pointer type for SubjectTreeMetaItem class. */
 
+    //=========================================================================================================
+    /**
+    * Default constructor.
+    *
+    * @param[in] iType      The type of the item. See types.h for declaration and definition.
+    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+    */
+    explicit SubjectTreeMetaItem(int iType = MetaTreeItemTypes::UnknownItem, const QString& text = "");
 
-//    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
+    //=========================================================================================================
+    /**
+    * Default destructor
+    */
+    ~SubjectTreeMetaItem();
 
-//    VectorXf curv = Surface::read_curv("D:/Data/subjects/mind006/surf/lh.curv");
+    //=========================================================================================================
+    /**
+    * AbstractTreeItem functions
+    */
+    QVariant data(int role = Qt::UserRole + 1) const;
+    void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
-//    std::cout << "curv\n" << curv.block(curv.size()-10,0,10,1) << std::endl;
+signals:    
+//    //=========================================================================================================
+//    /**
+//    * Emit this signal whenever the surface alpha value has changed.
+//    *
+//    * @param[in] fAlpha     The new alpha value.
+//    */
+//    void surfaceAlphaChanged(float fAlpha);
+};
 
-//    Surface t_surf("D:/Data/subjects/mind006/surf/lh.pial");
+} //NAMESPACE DISP3DLIB
 
-//    std::cout << "Surface nn\n" << t_surf.nn().block(0,0,10,3) << std::endl;
-
-//    qDebug() << "[2]";
-//    SurfaceSet t_surfSet2("./MNE-sample-data/subjects/sample/surf", 2, "inflated");
-
-//    qDebug() << "[3]";
-//    SurfaceSet t_surfSet3("sample", 2, "inflated", "./MNE-sample-data/subjects");
-
-//    qDebug() << "[4]";
-//    AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
-
-//    qDebug() << "[5]";
-
-    SurfaceSet tSurfSet ("sample", 2, "orig", "./MNE-sample-data/subjects");
-    AnnotationSet tAnnotSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
-
-    View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    testWindow->addBrainData("Subject01", "HemiLRSet", tSurfSet, tAnnotSet);
-    testWindow->show();
-
-    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->setView3D(testWindow);
-    control3DWidget->show();
-
-    return a.exec();
-}
+#endif // SUBJECTTREEMETAITEM_H

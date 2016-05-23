@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     braintreemetaitem.cpp
+* @file     metatreeitem.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015
+* @date     May, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BrainTreeMetaItem class definition.
+* @brief    MetaTreeItem class definition.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "braintreemetaitem.h"
+#include "metatreeitem.h"
 
 
 //*************************************************************************************************************
@@ -54,62 +54,58 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainTreeMetaItem::BrainTreeMetaItem(int iType, const QString& text)
+MetaTreeItem::MetaTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
     QString sToolTip;
 
     switch(m_iType) {
-        case BrainTreeMetaItemTypes::SurfaceFileName:
-            sToolTip = "Surface file name";
+        case MetaTreeItemTypes::FileName:
+            sToolTip = "File name";
             break;
-        case BrainTreeMetaItemTypes::SurfaceFilePath:
-            sToolTip = "Surface file path";
+        case MetaTreeItemTypes::FilePath:
+            sToolTip = "File path";
             break;
-        case BrainTreeMetaItemTypes::AnnotFileName:
-            sToolTip = "Annotation file name";
-            break;
-        case BrainTreeMetaItemTypes::AnnotFilePath:
-            sToolTip = "Annotation file path";
-            break;
-        case BrainTreeMetaItemTypes::SurfaceType:
+        case MetaTreeItemTypes::SurfaceType:
             sToolTip = "Surface type";
             break;
-        case BrainTreeMetaItemTypes::SurfaceColorGyri:
+        case MetaTreeItemTypes::SurfaceColorGyri:
             sToolTip = "Color Gyri";
             break;
-        case BrainTreeMetaItemTypes::SurfaceColorSulci:
+        case MetaTreeItemTypes::SurfaceColorSulci:
             sToolTip = "Color Sulci";
             break;
-        case BrainTreeMetaItemTypes::RTDataStreamStatus:
+        case MetaTreeItemTypes::RTDataStreamStatus:
             sToolTip = "Turn real time data streaming on/off";
             break;
-        case BrainTreeMetaItemTypes::RTDataSourceSpaceType:
+        case MetaTreeItemTypes::RTDataSourceSpaceType:
             sToolTip = "The source space type";
             break;
-        case BrainTreeMetaItemTypes::RTDataColormapType:
+        case MetaTreeItemTypes::RTDataColormapType:
             sToolTip = "The color map type";
             break;
-        case BrainTreeMetaItemTypes::RTDataTimeInterval:
+        case MetaTreeItemTypes::RTDataTimeInterval:
             sToolTip = "The m seconds waited in between each sample";
             break;
-        case BrainTreeMetaItemTypes::RTDataLoopedStreaming:
+        case MetaTreeItemTypes::RTDataLoopedStreaming:
             sToolTip = "Turn looped streaming on/off";
             break;
-        case BrainTreeMetaItemTypes::RTDataNumberAverages:
+        case MetaTreeItemTypes::RTDataNumberAverages:
             sToolTip = "The number of samples averaged together (downsampling)";
             break;
-        case BrainTreeMetaItemTypes::RTDataNormalizationValue:
+        case MetaTreeItemTypes::RTDataNormalizationValue:
             sToolTip = "The value to normalize the source localization result";
             break;
-        case BrainTreeMetaItemTypes::RTDataVisualizationType:
+        case MetaTreeItemTypes::RTDataVisualizationType:
             sToolTip = "The visualization type";
             break;
-        case BrainTreeMetaItemTypes::SurfaceColorItem:
+        case MetaTreeItemTypes::SurfaceColor:
             sToolTip = "Surface color item";
             break;
-        case BrainTreeMetaItemTypes::SurfaceAlpha:
+        case MetaTreeItemTypes::SurfaceAlpha:
             sToolTip = "Surface alpha value";
+            break;
+        default: // do nothing;
             break;
     }
 
@@ -119,14 +115,14 @@ BrainTreeMetaItem::BrainTreeMetaItem(int iType, const QString& text)
 
 //*************************************************************************************************************
 
-BrainTreeMetaItem::~BrainTreeMetaItem()
+MetaTreeItem::~MetaTreeItem()
 {
 }
 
 
 //*************************************************************************************************************
 
-QVariant BrainTreeMetaItem::data(int role) const
+QVariant MetaTreeItem::data(int role) const
 {
     return AbstractTreeItem::data(role);
 }
@@ -134,52 +130,52 @@ QVariant BrainTreeMetaItem::data(int role) const
 
 //*************************************************************************************************************
 
-void  BrainTreeMetaItem::setData(const QVariant& value, int role)
+void  MetaTreeItem::setData(const QVariant& value, int role)
 {
     AbstractTreeItem::setData(value, role);
 
     switch(role) {
-        case BrainTreeMetaItemRoles::SurfaceColorSulci: {
+        case MetaTreeItemRoles::SurfaceColorSulci: {
             emit curvColorsChanged();
             break;
         }
 
-        case BrainTreeMetaItemRoles::SurfaceColorGyri: {
+        case MetaTreeItemRoles::SurfaceColorGyri: {
             emit curvColorsChanged();
             break;
         }
 
-        case BrainTreeMetaItemRoles::RTDataTimeInterval: {
+        case MetaTreeItemRoles::RTDataTimeInterval: {
             emit rtDataTimeIntervalChanged(value.toInt());
             break;
         }
 
-        case BrainTreeMetaItemRoles::RTDataNormalizationValue: {
+        case MetaTreeItemRoles::RTDataNormalizationValue: {
             emit rtDataNormalizationValueChanged(value.toDouble());
             break;
         }
 
-        case BrainTreeMetaItemRoles::RTDataColormapType: {
+        case MetaTreeItemRoles::RTDataColormapType: {
             emit rtDataColormapTypeChanged(value.toString());
             break;
         }
 
-        case BrainTreeMetaItemRoles::RTDataVisualizationType: {
+        case MetaTreeItemRoles::RTDataVisualizationType: {
             emit rtDataVisualizationTypeChanged(value.toString());
             break;
         }
 
-        case BrainTreeMetaItemRoles::SurfaceColor: {
+        case MetaTreeItemRoles::SurfaceColor: {
             emit surfaceColorChanged(value.value<QColor>());
             break;
         }
 
-        case BrainTreeMetaItemRoles::RTDataNumberAverages: {
+        case MetaTreeItemRoles::RTDataNumberAverages: {
             emit rtDataNumberAveragesChanged(value.toInt());
             break;
         }
 
-        case BrainTreeMetaItemRoles::SurfaceAlpha: {
+        case MetaTreeItemRoles::SurfaceAlpha: {
             emit surfaceAlphaChanged(value.toFloat());
             break;
         }

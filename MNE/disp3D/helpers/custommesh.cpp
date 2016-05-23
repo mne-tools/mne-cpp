@@ -91,7 +91,7 @@ bool CustomMesh::setVertColor(const QByteArray& tArrayColors)
 {
     //Check dimensions
     if(tArrayColors.size() != m_iNumVert * 3 * (int)sizeof(float)) {
-        qDebug()<<"CustomMesh::updateVertColors - new color and vertices dimensions do not match or mesh data was not set yet!";
+        qDebug() << "CustomMesh::updateVertColors - new color and vertices dimensions do not match or mesh data was not set yet!";
         return false;
     }
 

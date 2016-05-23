@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     brain.cpp
+* @file     subjecttreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015
+* @date     May, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,83 +29,104 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Brain class definition.
+* @brief     SubjectTreeItem class declaration.
 *
 */
+
+#ifndef SUBJECTTREEITEM_H
+#define SUBJECTTREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "brain.h"
+#include "../../disp3D_global.h"
+
+#include "../../helpers/abstracttreeitem.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// Qt INCLUDES
 //=============================================================================================================
 
-using namespace FSLIB;
-using namespace MNELIB;
-using namespace DISP3DLIB;
+#include <QList>
+#include <QVariant>
+#include <QStringList>
+#include <QColor>
+#include <QStandardItem>
+#include <QStandardItemModel>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// Eigen INCLUDES
 //=============================================================================================================
 
-Brain::Brain(Qt3DCore::QEntity* parent)
-: Qt3DCore::QEntity(parent)
-, m_pBrainTreeModel(new BrainTreeModel(this))
-{
-}
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISP3DLIB
+//=============================================================================================================
 
-Brain::~Brain()
+namespace DISP3DLIB
 {
-}
-
 
 //*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
-bool Brain::addData(const QString& text, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
+
+//=============================================================================================================
+/**
+* SubjectTreeItem provides a generic tree item to hold subject data (brain surface, annotation, BEM) from different sources (FreeSurfer, etc.).
+*
+* @brief Provides a generic SubjectTreeItem.
+*/
+class DISP3DNEWSHARED_EXPORT SubjectTreeItem : public AbstractTreeItem
 {
-    return m_pBrainTreeModel->addData(text, tSurfaceSet, tAnnotationSet, this);
-}
+    Q_OBJECT
 
+public:
+    typedef QSharedPointer<SubjectTreeItem> SPtr;             /**< Shared pointer type for SubjectTreeItem class. */
+    typedef QSharedPointer<const SubjectTreeItem> ConstSPtr;  /**< Const shared pointer type for SubjectTreeItem class. */
 
-//*************************************************************************************************************
+    //=========================================================================================================
+    /**
+    * Default constructor.
+    *
+    * @param[in] iType      The type of the item. See types.h for declaration and definition.
+    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+    */
+    explicit SubjectTreeItem(int iType = Data3DTreeModelItemTypes::SurfaceSetItem, const QString& text = "");
 
-bool Brain::addData(const QString& text, const Surface& tSurface, const Annotation &tAnnotation)
-{
-    return m_pBrainTreeModel->addData(text, tSurface, tAnnotation, this);
-}
+    //=========================================================================================================
+    /**
+    * Default destructor
+    */
+    ~SubjectTreeItem();
 
+    //=========================================================================================================
+    /**
+    * AbstractTreeItem functions
+    */
+    QVariant data(int role = Qt::UserRole + 1) const;
+    void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
-//*************************************************************************************************************
+private slots:
+    //=========================================================================================================
+    /**
+    * Call this slot whenever the check box of this item was checked.
+    *
+    * @param[in] checkState        The current checkstate.
+    */
+    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
+};
 
-bool Brain::addData(const QString& text, const MNESourceSpace& tSourceSpace)
-{
-    return m_pBrainTreeModel->addData(text, tSourceSpace, this);
-}
+} //NAMESPACE DISP3DLIB
 
-
-//*************************************************************************************************************
-
-QList<BrainRTSourceLocDataTreeItem*> Brain::addData(const QString& text, const MNESourceEstimate& tSourceEstimate, const MNEForwardSolution& tForwardSolution)
-{
-    return m_pBrainTreeModel->addData(text, tSourceEstimate, tForwardSolution);
-}
-
-
-//*************************************************************************************************************
-
-BrainTreeModel* Brain::getBrainTreeModel()
-{
-    return m_pBrainTreeModel;
-}
-
+#endif // SUBJECTTREEITEM_H

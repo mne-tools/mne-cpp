@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include <disp3D/view3D.h>
+#include <disp3D/control/control3dwidget.h>
 
 
 //*************************************************************************************************************
@@ -101,38 +102,36 @@ int main(int argc, char *argv[])
     //
     // pial
     //
-    SurfaceSet tSurfSetPial ("sample", 2, "orig", "./MNE-sample-data/subjects");
+    SurfaceSet tSurfSetPial ("sample", 2, "pial", "./MNE-sample-data/subjects");
 
-    View3D::SPtr t_pialBrainView = View3D::SPtr(new View3D());
-    t_pialBrainView->addBrainData("orig", tSurfSetPial);
-    t_pialBrainView->show();
+    View3D::SPtr t_BrainView = View3D::SPtr(new View3D());
+    t_BrainView->addBrainData("Subject01", "pial", tSurfSetPial);
 
     //
     // inflated
     //
-    SurfaceSet tSurfSetInflated ("sample", 2, "inflated", "./MNE-sample-data/subjects");
-
-    View3D::SPtr t_inflatedBrainView = View3D::SPtr(new View3D());
-    t_inflatedBrainView->addBrainData("orig", tSurfSetInflated);
-    t_inflatedBrainView->show();
+    SurfaceSet tSurfSetInflated ("sample", 2, "inflated", "./MNE-sample-data/subjects");  
+    t_BrainView->addBrainData("Subject01", "inflated", tSurfSetInflated);
 
     //
     // orig
     //
     SurfaceSet tSurfSetOrig ("sample", 2, "orig", "./MNE-sample-data/subjects");
-
-    View3D::SPtr t_origBrainView = View3D::SPtr(new View3D());
-    t_origBrainView->addBrainData("orig", tSurfSetOrig);
-    t_origBrainView->show();
+    t_BrainView->addBrainData("Subject01", "orig", tSurfSetOrig);
 
     //
     // white
     //
-    SurfaceSet tSurfSetWhite ("sample", 2, "orig", "./MNE-sample-data/subjects");
+    SurfaceSet tSurfSetWhite ("sample", 2, "white", "./MNE-sample-data/subjects");
+    t_BrainView->addBrainData("Subject01", "white", tSurfSetWhite);
 
-    View3D::SPtr t_whiteBrainView = View3D::SPtr(new View3D());
-    t_whiteBrainView->addBrainData("orig", tSurfSetWhite);
-    t_whiteBrainView->show();
+    t_BrainView->show();
+
+    //3D control
+    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
+    control3DWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
+    control3DWidget->setView3D(t_BrainView);
+    control3DWidget->show();
 
     return a.exec();
 }
