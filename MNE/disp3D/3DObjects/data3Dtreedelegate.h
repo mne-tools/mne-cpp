@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     braintreedelegate.h
+* @file     data3Dtreedelegate.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -31,22 +31,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief BrainTreeDelegate class declaration.
+* @brief Data3DTreeDelegate class declaration.
 *
 */
 
-#ifndef BRAINTREEDELEGATE_H
-#define BRAINTREEDELEGATE_H
+#ifndef DATA3DTREEDELEGATE_H
+#define DATA3DTREEDELEGATE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../disp3D_global.h"
+#include "../disp3D_global.h"
 
-#include "braintreemodel.h"
-#include "../../helpers/abstracttreeitem.h"
+#include "data3Dtreemodel.h"
+#include "../helpers/abstracttreeitem.h"
 
 
 //*************************************************************************************************************
@@ -74,16 +74,16 @@ namespace DISP3DLIB
 
 //=============================================================================================================
 /**
-* DECLARE CLASS BrainTreeDelegate
+* DECLARE CLASS Data3DTreeDelegate
 *
 * @brief Provides a delegate to render user specific input methods in the tree model.
 */
-class DISP3DNEWSHARED_EXPORT BrainTreeDelegate : public QItemDelegate
+class DISP3DNEWSHARED_EXPORT Data3DTreeDelegate : public QItemDelegate
 {
     Q_OBJECT
 
 public:
-    BrainTreeDelegate(QObject *parent = 0);
+    explicit Data3DTreeDelegate(QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -102,4 +102,4 @@ protected:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // BRAINTREEDELEGATE_H
+#endif // DATA3DTREEDELEGATE_H

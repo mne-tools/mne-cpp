@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     brain.h
+* @file     bemsurfacetreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015
+* @date     May, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Brain class declaration
+* @brief     BemSurfaceTreeItem class declaration.
 *
 */
 
-#ifndef BRAIN_H
-#define BRAIN_H
+#ifndef BEMSURFACETREEITEM_H
+#define BEMSURFACETREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -43,26 +43,35 @@
 
 #include "../../disp3D_global.h"
 
-#include "braintreemodel.h"
+#include "../../helpers/abstracttreeitem.h"
+#include "../common/metatreeitem.h"
 
-#include <fs/surfaceset.h>
-#include <fs/annotationset.h>
+#include "../../helpers/types.h"
+#include "../../helpers/renderable3Dentity.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QSharedPointer>
-
-#include <Qt3DCore/QEntity>
+#include "mne/mne_bem.h"
+#include "fiff/fiff_constants.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// Qt INCLUDES
 //=============================================================================================================
+
+#include <QList>
+#include <QVariant>
+#include <QStringList>
+#include <QColor>
+#include <QStandardItem>
+#include <QStandardItemModel>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -82,91 +91,109 @@ namespace DISP3DLIB
 
 //=============================================================================================================
 /**
-* Visualizes a brain in 3D.
+* BemSurfaceTreeItem provides a generic brain tree item to hold BEM surfaces.
 *
-* @brief Visualizes a brain in 3D.
+* @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT Brain : public Qt3DCore::QEntity
+class DISP3DNEWSHARED_EXPORT BemSurfaceTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<Brain> SPtr;             /**< Shared pointer type for Brain class. */
-    typedef QSharedPointer<const Brain> ConstSPtr;  /**< Const shared pointer type for Brain class. */
+    typedef QSharedPointer<BemSurfaceTreeItem> SPtr;             /**< Shared pointer type for BemSurfaceTreeItem class. */
+    typedef QSharedPointer<const BemSurfaceTreeItem> ConstSPtr;  /**< Const shared pointer type for BemSurfaceTreeItem class. */
 
     //=========================================================================================================
     /**
     * Default constructor.
     *
-    * @param[in] parent         The parent of this class.
+    * @param[in] iType      The type of the item. See types.h for declaration and definition.
+    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    Brain(QEntity * parent = 0);
+    explicit BemSurfaceTreeItem(int iType = Data3DTreeModelItemTypes::BemSurfaceItem, const QString& text = "BEM Surface");
 
     //=========================================================================================================
     /**
-    * Default destructor.
+    * Default destructor
     */
-    ~Brain();
+    ~BemSurfaceTreeItem();
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer brain data SETS.
+    * AbstractTreeItem functions
+    */
+    QVariant data(int role = Qt::UserRole + 1) const;
+    void setData(const QVariant& value, int role = Qt::UserRole + 1);
+
+    //=========================================================================================================
+    /**
+    * Adds BEM model data.
     *
-    * @param[in] text               The name of the surface set to which the data is to be added.
-    * @param[in] tSurfaceSet        FreeSurfer surface set.
-    * @param[in] tAnnotationSet     FreeSurfer annotation set.
+    * @param[in] tBemSurface        The bem data.
+    * @param[in] parent             The Qt3D entity parent of the new item.
     *
     * @return                       Returns true if successful.
     */
-    bool addData(const QString& text, const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet);
+    bool addData(const MNELIB::MNEBemSurface &tBemSurface, Qt3DCore::QEntity* parent);
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer brain data.
+    * Call this slot whenever you want to change the visibilty of the 3D rendered content.
     *
-    * @param[in] text               The name of the surface set to which the data is to be added.
-    * @param[in] pSurface           FreeSurfer surface.
-    * @param[in] pAnnotation        FreeSurfer annotation.
-    *
-    * @return                       Returns true if successful.
+    * @param[in] state     The visiblity flag.
     */
-    bool addData(const QString& text, const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation);
+    void setVisible(bool state);
+
+private slots:
+    //=========================================================================================================
+    /**
+    * Call this slot whenever the curvature color or origin of color information (curvature or annotation) changed.
+    *
+    * @param[in] fAlpha     The new alpha value.
+    */
+    void onSurfaceAlphaChanged(float fAlpha);
 
     //=========================================================================================================
     /**
-    * Adds source space brain data.
+    * Call this slot whenever the surface color was changed.
     *
-    * @param[in] text               The name of the surface set to which the data is to be added.
-    * @param[in] tSourceSpace       The source space information.
-    *
-    * @return                       Returns true if successful.
+    * @param[in] color        The new surface color.
     */
-    bool addData(const QString& text, const MNELIB::MNESourceSpace& tSourceSpace);
+    void onSurfaceColorChanged(const QColor &color);
 
     //=========================================================================================================
     /**
-    * Adds source estimated activation data.
+    * Call this slot whenever the check box of this item was checked.
     *
-    * @param[in] text               The name of the surface set to which the actiavtion data is to be added.
-    * @param[in] tSourceEstimate    The MNESourceEstimate.
-    * @param[in] tForwardSolution   The MNEForwardSolution.
-    *
-    * @return                       Returns a list with the tree items which now hold the activation data. Use this list to update the data, i.e. during real time applications.
+    * @param[in] checkState        The current checkstate.
     */
-    QList<BrainRTSourceLocDataTreeItem*> addData(const QString& text, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+    virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
+private:
     //=========================================================================================================
     /**
-    * Return the brain tree model.
+    * Creates a QByteArray of colors for given color for the input vertices.
     *
-    * @return returns a pointer to the brain tree model BrainTreeModel.
+    * @param[in] vertices       The vertices information.
+    * @param[in] color          The vertex color information.
     */
-    BrainTreeModel* getBrainTreeModel();    
+    QByteArray createVertColor(const Eigen::MatrixXf& vertices, const QColor& color = QColor(100,100,100)) const;
 
-protected:
-    BrainTreeModel*     m_pBrainTreeModel;  /**< The model which holds all of the loaded brain data. */
+    Qt3DCore::QEntity*      m_pParentEntity;                            /**< The parent 3D entity. */
+    Renderable3DEntity*     m_pRenderable3DEntity;                      /**< The renderable 3D entity. */
+
+    QObjectList             m_lChildren;
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the origin of the vertex color (from curvature, from annotation) changed.
+    *
+    * @param[in] arrayVertColor      The new vertex colors.
+    */
+    void colorInfoOriginChanged(const QByteArray& arrayVertColor);
 };
 
-} // NAMESPACE
+} //NAMESPACE DISP3DLIB
 
-#endif // BRAIN_H
+#endif // BEMSURFACETREEITEM_H
