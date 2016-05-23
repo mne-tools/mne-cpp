@@ -105,6 +105,8 @@ MetaTreeItem::MetaTreeItem(int iType, const QString& text)
         case MetaTreeItemTypes::SurfaceAlpha:
             sToolTip = "Surface alpha value";
             break;
+        default: // do nothing;
+            break;
     }
 
     this->setToolTip(sToolTip);

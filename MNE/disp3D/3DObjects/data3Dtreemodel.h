@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef Data3DTreeModel_H
-#define Data3DTreeModel_H
+#ifndef DATA3DTREEMODEL_H
+#define DATA3DTREEMODEL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -194,4 +194,4 @@ protected:
 
 } // NAMESPACE
 
-#endif // Data3DTreeModel_H
+#endif // DATA3DTREEMODEL_H

@@ -159,6 +159,9 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::SurfaceAlpha).toDouble());
             return pDoubleSpinBox;
         }
+
+        default: // do nothing;
+            break;
     }
 
 
