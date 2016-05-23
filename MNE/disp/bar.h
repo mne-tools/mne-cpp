@@ -60,6 +60,10 @@
 #include <QtCharts/QLegend>
 #include <QtCharts/QBarCategoryAxis>
 
+//includes below used for debugging purposes
+#include <QDebug>
+#include <iostream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -84,6 +88,7 @@ namespace DISPLIB
 //=============================================================================================================
 
 QT_CHARTS_USE_NAMESPACE
+using namespace std;
 
 
 //*************************************************************************************************************
@@ -100,7 +105,7 @@ QT_CHARTS_USE_NAMESPACE
 */
 class DISPSHARED_EXPORT Bar : public QWidget
 {
-
+    Q_OBJECT
 public:
     //=========================================================================================================
     /**
@@ -161,7 +166,6 @@ void Bar::setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData, 
 {
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matClassLimitData.rows(),1);
     matrixName.col(0)= matClassLimitData;
-
     this->updatePlot(matrixName, matClassFrequencyData, iPrecisionValue);
 }
 
@@ -173,7 +177,6 @@ void Bar::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData, 
 {
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1, matClassLimitData.cols());
     matrixName.row(0)= matClassLimitData;
-
     this->updatePlot(matrixName, matClassFrequencyData, iPrecisionValue);
 }
 
@@ -202,6 +205,7 @@ void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat
         currentLimits = ((QString::number(resultDisplayValues(kr), 'g' ,iPrecisionValue) + " to " + (QString::number(resultDisplayValues(kr+1), 'g', iPrecisionValue))));
         categories << currentLimits;
         *set << classFreq;
+        qDebug() << "Bar data points = " << currentLimits << " , " << classFreq;
     }
 
     //Create new series, then clear the plot and update with new data
@@ -226,8 +230,8 @@ void Bar::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Ei
     vecCoefficientResults.resize(iClassAmount + 1);
     vecExponentValues.resize(iClassAmount + 1);
     double originalValue(0.0),
-           limitDisplayValue(0.0),
-           doubleExponentValue(0.0);
+         limitDisplayValue(0.0),
+         doubleExponentValue(0.0);
     int    limitExponentValue(0);
     for (int ir=0; ir <= iClassAmount; ++ir)
     {
@@ -236,18 +240,21 @@ void Bar::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Ei
         {
             doubleExponentValue = 0.0;
         }
+
         else
         {
             doubleExponentValue = log10(abs(originalValue));                    //return the exponent value in double
         }
+
         limitExponentValue = round(doubleExponentValue);                        //round the exponent value to the nearest signed integer
         limitDisplayValue = originalValue * (pow(10,-(limitExponentValue)));    //display value is derived from multiplying class limit with inverse 10 to the power of negative exponent
-        vecCoefficientResults(ir) = limitDisplayValue;                         //append the display value to the return vector
-        vecExponentValues(ir) = limitExponentValue;                            //append the exponent value to the return vector
+        vecCoefficientResults(ir) = limitDisplayValue;                          //append the display value to the return vector
+        vecExponentValues(ir) = limitExponentValue;                             //append the exponent value to the return vector
     }
 
     int lowestExponentValue{0},
-        highestExponentValue{0};
+    highestExponentValue{0};
+
     for (int ir=0; ir <= iClassAmount; ++ir)
     {
         if (vecExponentValues(ir) < lowestExponentValue)
@@ -260,25 +267,26 @@ void Bar::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Ei
         }
     }
 
-    if (highestExponentValue == 0)
+    if (highestExponentValue > 0)
     {
         for (int ir=0; ir <= iClassAmount; ++ir)
         {
-            while (vecExponentValues(ir) > lowestExponentValue)     //normalize the values by multiplying the display value by 10 and reducing the exponentValue by 1 until exponentValue reach the lowestExponentValue
-            {
-                vecCoefficientResults(ir) = vecCoefficientResults(ir) * 10;
-                vecExponentValues(ir)--;
-            }
-        }
-    }
-    if (lowestExponentValue == 0)
-    {
-        for (int ir=0; ir <= iClassAmount; ++ir)
-        {
-            while (vecExponentValues(ir) < highestExponentValue)
+            while (vecExponentValues(ir) < highestExponentValue)     //normalize the values by multiplying the display value by 10 and reducing the exponentValue by 1 until exponentValue reach the lowestExponentValue
             {
                 vecCoefficientResults(ir) = vecCoefficientResults(ir) / 10;
                 vecExponentValues(ir)++;
+            }
+        }
+    }
+
+    if (lowestExponentValue < 0)
+    {
+        for (int ir=0; ir <= iClassAmount; ++ir)
+        {
+            while (vecExponentValues(ir) > lowestExponentValue)
+            {
+                vecCoefficientResults(ir) = vecCoefficientResults(ir) * 10;
+                vecExponentValues(ir)--;
             }
         }
     }

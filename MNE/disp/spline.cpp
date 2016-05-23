@@ -74,9 +74,7 @@ Spline::Spline(const QString& title, QWidget* parent):  QWidget(parent)
 
     QChartView *chartView = new QChartView(m_pChart);
     chartView->setRenderHint(QPainter::Antialiasing);
-
     QGridLayout* layout = new QGridLayout();
-
     layout->addWidget(chartView, 0, 0);
     this->setLayout(layout);
 }
@@ -86,8 +84,7 @@ Spline::Spline(const QString& title, QWidget* parent):  QWidget(parent)
 
 void Spline::mousePressEvent(QMouseEvent *event)
 {
-    QXYSeries *shadowSeriesX = qobject_cast<QXYSeries *>(sender());
-    QXYSeries *shadowSeriesY = qobject_cast<QXYSeries *>(sender());
+    QXYSeries *shadowSeries = qobject_cast<QXYSeries *>(sender());
     QLineSeries *verticalLine = new QLineSeries();
     QPointF point = event->pos();
     QPointF pointY = point;
@@ -97,8 +94,8 @@ void Spline::mousePressEvent(QMouseEvent *event)
     point.setX(point.x()-10.5);
     point.setY(0);
 
-    QPointF localX = m_pChart->mapToValue(point, shadowSeriesX);
-    QPointF localY = m_pChart->mapToValue(pointY, shadowSeriesY);
+    QPointF localX = m_pChart->mapToValue(point, shadowSeries);
+    QPointF localY = m_pChart->mapToValue(pointY, shadowSeries);
     verticalLine -> append(localX.x(), 0);
     verticalLine -> append(localX.x(), maximumFrequency);
     double boundaryX = double(localX.x());   //casting localX.x() from float to double for comparison with minAxisX and maxAxisX
@@ -130,6 +127,7 @@ void Spline::mousePressEvent(QMouseEvent *event)
                     m_pChart->createDefaultAxes();
                     emitLeft = (leftPoint[0].x() * (pow(10, resultExponentValues[0])));
                     emit borderChanged(emitLeft, emitMiddle, emitRight);
+                    qDebug() << "Border = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
                 }
             }
 
@@ -142,12 +140,11 @@ void Spline::mousePressEvent(QMouseEvent *event)
                     middleThreshold=verticalLine;
                     middleThreshold->setColor("green");
                     m_pChart->addSeries(middleThreshold);
-
                     m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
-
                     m_pChart->createDefaultAxes();
                     emitMiddle = (middlePoint[0].x() * (pow(10, resultExponentValues[0])));
                     emit borderChanged(emitLeft, emitMiddle, emitRight);
+                    qDebug() << "Border = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
                 }
             }
 
@@ -160,12 +157,11 @@ void Spline::mousePressEvent(QMouseEvent *event)
                     rightThreshold=verticalLine;
                     rightThreshold->setColor("blue");
                     m_pChart->addSeries(rightThreshold);
-
                     m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
-
                     m_pChart->createDefaultAxes();
                     emitRight = (rightPoint[0].x() * (pow(10, resultExponentValues[0])));
                     emit borderChanged(emitLeft, emitMiddle, emitRight);
+                    qDebug() << "Border = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
                 }
             }
         }
