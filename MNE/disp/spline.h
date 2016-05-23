@@ -60,13 +60,13 @@
 #include <QtWidgets/QGraphicsScene>
 #include <QtCharts/QChart>
 #include <QtCharts/QLineSeries>
-#include <QtCharts/QSplineSeries>
 #include <QtWidgets/QGraphicsTextItem>
 #include <QtGui/QMouseEvent>
 #include <QDebug>
 #include <QtCharts/QChartGlobal>
 #include <QtCharts/QLegendMarker>
 #include <QtCharts/QLegend>
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -131,14 +131,6 @@ public:
 
     //=========================================================================================================
     /**
-    * constructor for mouse press event behaviour to create threshold lines and signal emit
-    *
-    * @param[in]  event      mouse press input
-    */
-    void Spline::mousePressEvent(QMouseEvent *event);
-
-    //=========================================================================================================
-    /**
     * Updates the spline with new data
     *
     * @param[in]  matClassLimitData      vector input filled with class limits
@@ -147,6 +139,14 @@ public:
     */
     template<typename T>
     void updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, const Eigen::VectorXi& matClassFrequencyData, int iPrecisionValue);
+
+    //=========================================================================================================
+    /**
+    * constructor for mouse press event behaviour to create threshold lines and signal emit
+    *
+    * @param[in]  event      mouse press input
+    */
+    void Spline::mousePressEvent(QMouseEvent *event);
 
     //=========================================================================================================
     /**
@@ -161,15 +161,15 @@ public:
     void splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
 
     private:
-        QChart                  *m_pChart;          //Qchart object that will be shown in the widget
-        QLineSeries             *leftThreshold;     //Vertical line series for the left threshold
-        QLineSeries             *middleThreshold;   //Vertical line series for the middle threshold
-        QLineSeries             *rightThreshold;    //Vertical line series for the right threshold
-        double minAxisX,                            //Value of the smallest point of the series in x-axis
-               maxAxisX;                            //Value of the largest point on the series in x-axis
-        int maximumFrequency;                       //Highest value of frequency (y-axis)
-        QLegendMarker *marker;                      //Variable to specify the legend of the threshold lines
-        Eigen::VectorXi resultExponentValues;       //Common exponent values for the entire
+        QChart              *m_pChart;              //Qchart object that will be shown in the widget
+        QLineSeries         *leftThreshold;         //Vertical line series for the left threshold
+        QLineSeries         *middleThreshold;       //Vertical line series for the middle threshold
+        QLineSeries         *rightThreshold;        //Vertical line series for the right threshold
+        QLegendMarker       *marker;                //Variable to specify the legend of the threshold line
+        double              minAxisX;              //Value of the smallest point of the series in x-axis
+        double              maxAxisX;              //Value of the largest point on the series in x-axis
+        int                 maximumFrequency;      //Highest value of frequency (y-axis)
+        Eigen::VectorXi     resultExponentValues;  //Common exponent values for the entire
 
 signals:
     //=========================================================================================================
@@ -223,22 +223,18 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
     histogramExponent = "X-axis scale: 10e" + QString::number(resultExponentValues(0));   //used to tell the user the exponential scale used in the histogram
 
     QSplineSeries *series = new QSplineSeries();
-    QSplineSeries *shadowSeries = new QSplineSeries();
-    QSplineSeries *shadowSeriesY = new QSplineSeries();
-
     series->setName(histogramExponent);
 
     minAxisX = resultDisplayValues(0);
     maxAxisX = resultDisplayValues(iClassAmount);
+    std::cout << "resultDisplayValues = " << resultDisplayValues;
     double classMark;                         //class mark is the middle point between lower and upper class limit
     maximumFrequency = 0;                     //maximumFrequency used to create an intuitive histogram
 
     for (int ir=0; ir < iClassAmount; ++ir)
     {
-        classMark = (resultDisplayValues(ir) + resultDisplayValues(ir+1))/2;
+        classMark = (resultDisplayValues(ir) + resultDisplayValues(ir+1))/2 ;
         series->append(classMark, matClassFrequencyData(ir));
-        shadowSeries->append(classMark, 0);
-        shadowSeriesY->append(minAxisX, matClassFrequencyData(ir));
         std::cout << "Spline data points = " << classMark << ", " << matClassFrequencyData(ir) << std::endl;
         if (matClassFrequencyData(ir) > maximumFrequency)
         {
@@ -266,7 +262,7 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
     m_pChart->addSeries(rightThreshold);
     m_pChart->createDefaultAxes();
     m_pChart->axisX()->setRange(minAxisX, maxAxisX);
-    m_pChart->axisY()->setRange(0,maximumFrequency);
+    //m_pChart->axisY()->setRange(0,maximumFrequency);
 }
 
 
@@ -281,7 +277,7 @@ void Spline::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic,
          limitDisplayValue(0.0),
          doubleExponentValue(0.0);
     int    limitExponentValue(0);
-    for (int ir=0; ir <= iClassAmount; ir++)
+    for (int ir=0; ir <= iClassAmount; ++ir)
     {
         originalValue = matClassLimitData(ir);
         if (originalValue == 0.0)                          //mechanism to guard against evaluation of log(0.0) which is infinity
@@ -303,7 +299,7 @@ void Spline::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic,
     int lowestExponentValue{0},
     highestExponentValue{0};
 
-    for (int ir=0; ir <= iClassAmount; ir++)
+    for (int ir=0; ir <= iClassAmount; ++ir)
     {
         if (vecExponentValues(ir) < lowestExponentValue)
         {
@@ -314,28 +310,33 @@ void Spline::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic,
             highestExponentValue = vecExponentValues(ir);
         }
     }
+    qDebug() << "lowestExponentValue =" << lowestExponentValue;
+    qDebug() << "highestExponentValue =" << highestExponentValue;
 
-    if (highestExponentValue == 0)
+    if (highestExponentValue > 0)
     {
-        for (int ir=0; ir <= iClassAmount; ir++)
+        qDebug() << "addition entered!";
+        for (int ir=0; ir <= iClassAmount; ++ir)
         {
-            while (vecExponentValues(ir) > lowestExponentValue)     //normalize the values by multiplying the display value by 10 and reducing the exponentValue by 1 until exponentValue reach the lowestExponentValue
+            while (vecExponentValues(ir) < highestExponentValue)     //normalize the values by multiplying the display value by 10 and reducing the exponentValue by 1 until exponentValue reach the lowestExponentValue
+            {
+                vecCoefficientResults(ir) = vecCoefficientResults(ir) / 10;
+                vecExponentValues(ir)++;
+            }
+        }
+    }
+
+    if (lowestExponentValue < 0)
+    {
+        qDebug() << "reduction entered!";
+        for (int ir=0; ir <= iClassAmount; ++ir)
+        {
+            while (vecExponentValues(ir) > lowestExponentValue)
             {
                 vecCoefficientResults(ir) = vecCoefficientResults(ir) * 10;
                 vecExponentValues(ir)--;
             }
         }
-    }
-    if (lowestExponentValue == 0)
-    {
-      for (int ir=0; ir <= iClassAmount; ir++)
-      {
-          while (vecExponentValues(ir) < highestExponentValue)
-          {
-              vecCoefficientResults(ir) = vecCoefficientResults(ir) / 10;
-              vecExponentValues(ir)++;
-          }
-      }
     }
 }
 }

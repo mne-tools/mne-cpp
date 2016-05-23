@@ -59,11 +59,8 @@
 #include <fiff/fiff_evoked.h>
 #include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
-
 #include <disp3D/view3D.h>
 #include <disp3D/control/control3dwidget.h>
-
-#include <utils/mnemath.h>
 
 
 //*************************************************************************************************************
@@ -81,7 +78,6 @@
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QSet>
-
 
 
 //*************************************************************************************************************
@@ -103,7 +99,6 @@ using namespace UTILSLIB;
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
-
 
 #ifndef M_PI
 const double M_PI = 3.14159265358979323846; //Pi constant used in sineWaveGenerator function
@@ -231,7 +226,7 @@ int main(int argc, char *argv[])
 //    printf("Read %d samples.\n",(qint32)data.cols());
 
     //code to generate source localization data
-    QApplication app(argc, argv);
+    QApplication a(argc, argv);
 
     // Command Line Parser
     QCommandLineParser parser;
@@ -243,7 +238,7 @@ int main(int argc, char *argv[])
     parser.addOption(sampleFwdFileOption);
     parser.addOption(sampleCovFileOption);
     parser.addOption(sampleEvokedFileOption);
-    parser.process(app);
+    parser.process(a);
 
     //########################################################################################
     // Source Estimate
@@ -334,7 +329,7 @@ int main(int argc, char *argv[])
     //
     MinimumNorm minimumNorm(inverse_operator, lambda2, method);
     MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
-    MatrixXd sourceEstimateData = sourceEstimate.data;
+    VectorXd sourceEstimateData = sourceEstimate.data.col(10);
 
     bool bMakeSymmetrical;
     bMakeSymmetrical = false;       //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
@@ -368,7 +363,7 @@ int main(int argc, char *argv[])
     displayObj->show();
 
     //std::cout << data.block(0,0,10,10);
-    //return a.exec();
+    return a.exec();
 }
 
 
