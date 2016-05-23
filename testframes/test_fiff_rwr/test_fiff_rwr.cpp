@@ -111,8 +111,8 @@ void TestFiffRWR::initTestCase()
 {
     qDebug() << "Epsilon" << epsilon;
 
-    QFile t_fileIn("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    QFile t_fileOut("./MNE-test-data/test_output.fif");
+    QFile t_fileIn("./mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
+    QFile t_fileOut("./mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_test_rwr_out.fif");
 
     //
     //   Make sure test folder exists
@@ -161,8 +161,8 @@ void TestFiffRWR::initTestCase()
     //
     //   Set up the reading parameters
     //
-    qint32 num_of_junks = 1;
-    float quantum_sec = 10.0f;//read and write in 10 sec junks
+    qint32 num_of_junks = 5;
+    float quantum_sec = 1.0f;//read and write in 1 sec junks
     fiff_int_t from = first_in_raw.first_samp;
     fiff_int_t to = first_in_raw.first_samp + num_of_junks*quantum_sec*first_in_raw.info.sfreq;//raw.last_samp;
     fiff_int_t quantum = ceil(quantum_sec*first_in_raw.info.sfreq);
