@@ -209,8 +209,8 @@ bool BrainSourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere, Qt3DCor
     MetaTreeItem* pItemSurfCol = new MetaTreeItem(MetaTreeItemTypes::SurfaceColor, "Surface color");
     connect(pItemSurfCol, &MetaTreeItem::surfaceColorChanged,
             this, &BrainSourceSpaceTreeItem::onSurfaceColorChanged);
-    list<<pItemSurfCol;
-    list<<new QStandardItem(pItemSurfCol->toolTip());
+    list << pItemSurfCol;
+    list << new QStandardItem(pItemSurfCol->toolTip());
     this->appendRow(list);
     data.setValue(QColor(100,100,100));
     pItemSurfCol->setData(data, MetaTreeItemRoles::SurfaceColor);

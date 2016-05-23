@@ -95,6 +95,9 @@ Control3DWidget::Control3DWidget(QWidget* parent, Qt::WindowType type)
     ui->m_treeView_loadedData->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->m_treeView_loadedData, &QWidget::customContextMenuRequested,
             this, &Control3DWidget::onCustomContextMenuRequested);
+
+    //Set on top as default
+    onAlwaysOnTop(ui->m_checkBox_alwaysOnTop->isChecked());
 }
 
 
