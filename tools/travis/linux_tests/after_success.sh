@@ -1,6 +1,6 @@
 #!/bin/bash
 #set -ev
-set -ev
+set -e
 
 # Clone MNE-CPP test data
 git clone https://github.com/mne-tools/mne-cpp-test-data.git mne-cpp-test-data
@@ -9,17 +9,19 @@ git clone https://github.com/mne-tools/mne-cpp-test-data.git mne-cpp-test-data
 export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH
 MNECPP_ROOT=$(pwd)
 
-#tbd: later on do a grep of all cpps within testframe
-# Create Code Coverage
+# Tests to run - tbd: find required tests automatically with grep
 tests=( test_codecov test_fiff_rwr )
 
 for test in ${tests[*]};
 do
-    echo "$test"
-	./bin/$test
+    echo ">> Starting $test"
+    # Run Annotated Code
+    ./bin/$test
     cd "./testframes/$test"
+    # Analyze Code Coverage with gcov
     gcov "./$test.cpp" -r
     cd $MNECPP_ROOT
+    echo "<< Finished $test"
 done
 
 #./bin/test_codecov
