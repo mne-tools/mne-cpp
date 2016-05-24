@@ -13,12 +13,12 @@ MNECPP_ROOT=$(pwd)
 # Create Code Coverage
 tests=( test_codecov test_fiff_rwr )
 
-for test in "{tests[@]}"
+for test in ${tests[*]};
 do
-    echo $test
-	./bin/${test}
-    cd ./testframes/${test}
-    gcov ./${test}.cpp -r
+    echo "$test"
+	./bin/$test
+    cd "./testframes/$test"
+    gcov "./$test.cpp" -r
     cd $MNECPP_ROOT
 done
 
