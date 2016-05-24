@@ -3,7 +3,7 @@
 # Modified https://scan.coverity.com/scripts/travisci_build_coverity_scan.sh 
 set -e
 
-COVERITY_SCAN_PROJECT_NAME="MNE-CPP"
+COVERITY_SCAN_PROJECT_NAME="mne-tools/mne-cpp"
 COVERITY_SCAN_NOTIFICATION_EMAIL="christoph.dinh@mne-cpp.org"
 COVERITY_SCAN_BRANCH_PATTERN="master"
 COVERITY_SCAN_BUILD_COMMAND_PREPEND="qmake -r"
