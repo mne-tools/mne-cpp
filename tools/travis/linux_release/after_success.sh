@@ -3,4 +3,4 @@
 
 # Run Doxygen
 cd doc
-doxygen mne-cpp_doxyfile
+doxygen mne-cpp_doxyfile_release
