@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ev
+#set -ev
 
 # Run Doxygen
 cd doc
