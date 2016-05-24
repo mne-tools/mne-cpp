@@ -109,7 +109,7 @@ public:
     *
     * @param[in] parent      The parent of the QObject.
     */
-    RtSourceLocDataWorker(QObject* parent = 0);
+    explicit RtSourceLocDataWorker(QObject* parent = 0);
 
     //=========================================================================================================
     /**

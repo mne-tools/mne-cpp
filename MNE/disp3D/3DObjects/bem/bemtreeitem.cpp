@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     window.cpp
-* @author   Qt Project (qt3D examples)
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     bemtreeitem.cpp
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015
+* @date     May, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, QtProject, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,16 +29,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Window class definition
+* @brief    BemTreeItem class definition.
+*
 */
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "window.h"
+#include "bemtreeitem.h"
 
 
 //*************************************************************************************************************
@@ -47,6 +46,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace FSLIB;
+using namespace MNELIB;
 using namespace DISP3DLIB;
 
 
@@ -55,72 +56,79 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Window::Window(QScreen* screen)
-: QWindow(screen)
+BemTreeItem::BemTreeItem(int iType, const QString& text)
+: AbstractTreeItem(iType, text)
 {
-    setSurfaceType(QSurface::OpenGLSurface);
-
-    resize(1024, 768);
-//    QSurfaceFormat format;
-//    if (QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGL) {
-//        format.setVersion(4, 3);
-//        format.setProfile(QSurfaceFormat::CoreProfile);
-//    }
-//    format.setDepthBufferSize(24);
-//    format.setSamples(4);
-//    format.setStencilBufferSize(8);
-//    setFormat(format);
-
-    create();
+    this->setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Checked);
+    this->setToolTip("BEM model");
 }
 
 
 //*************************************************************************************************************
 
-Window::~Window()
+BemTreeItem::~BemTreeItem()
 {
 }
 
 
 //*************************************************************************************************************
 
-void Window::keyPressEvent(QKeyEvent* e)
+QVariant BemTreeItem::data(int role) const
 {
-    //qDebug()<<"key press";
-    switch ( e->key() )
-    {
-        case Qt::Key_Escape:
-            QGuiApplication::quit();
+    switch(role) {
+        case Data3DTreeModelItemRoles::BemName:
+            return QVariant();
+        default: // do nothing;
             break;
+    }
 
-        default:
-            QWindow::keyPressEvent(e);
+    return AbstractTreeItem::data(role);
+}
+
+
+//*************************************************************************************************************
+
+void  BemTreeItem::setData(const QVariant& value, int role)
+{
+    AbstractTreeItem::setData(value, role);
+}
+
+
+//*************************************************************************************************************
+
+bool BemTreeItem::addData(const MNEBem &tBem, Qt3DCore::QEntity* p3DEntityParent)
+{
+    //Generate child items based on BEM input parameters
+    bool state = false;
+
+    for(int i = 0; i < tBem.size(); ++i) {
+        QString sBemSurfName;
+        sBemSurfName = QString("%1").arg(tBem[i].id);
+        BemSurfaceTreeItem* pSurfItem = new BemSurfaceTreeItem(Data3DTreeModelItemTypes::BemSurfaceItem, sBemSurfName);
+        pSurfItem->addData(tBem[i], p3DEntityParent);
+
+        QList<QStandardItem*> list;
+        list << pSurfItem;
+        list << new QStandardItem(pSurfItem->toolTip());
+        this->appendRow(list);
+    }
+
+    return state;
+}
+
+
+//*************************************************************************************************************
+
+void BemTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
+{
+    for(int i = 0; i < this->rowCount(); ++i) {
+        if(this->child(i)->isCheckable()) {
+            this->child(i)->setCheckState(checkState);
+        }
     }
 }
 
 
-//*************************************************************************************************************
 
-void Window::mousePressEvent(QMouseEvent* e)
-{
-    //qDebug() << "mouse press";
-    QWindow::mousePressEvent(e);
-}
-
-
-//*************************************************************************************************************
-
-void Window::wheelEvent(QWheelEvent* e)
-{
-    //qDebug() << "mouse wheel";
-    QWindow::wheelEvent(e);
-}
-
-
-//*************************************************************************************************************
-
-void Window::mouseMoveEvent(QMouseEvent* e)
-{
-    //qDebug() << "mouse move";
-    QWindow::mouseMoveEvent(e);
-}

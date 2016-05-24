@@ -1,19 +1,38 @@
 #!/bin/bash
 #set -ev
+set -e
 
 # Clone MNE-CPP test data
 git clone https://github.com/mne-tools/mne-cpp-test-data.git mne-cpp-test-data
 
 # Set Environment variable
-export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH 
+export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH
+MNECPP_ROOT=$(pwd)
 
-#tbd: later on do a grep of all cpps within testframe
-# Create Code Coverage
-./bin/test_codecov
-./bin/test_fiff_rwr
+# Tests to run - tbd: find required tests automatically with grep
+tests=( test_codecov test_fiff_rwr )
 
-gcov ./testframes/test_codecov/test_codecov.cpp -p
-gcov ./testframes/test_fiff_rwr/test_fiff_rwr.cpp -p
+for test in ${tests[*]};
+do
+    echo ">> Starting $test"
+    # Run Annotated Code
+    ./bin/$test
+    cd "./testframes/$test"
+    # Analyze Code Coverage with gcov
+    gcov "./$test.cpp" -r
+    cd $MNECPP_ROOT
+    echo "<< Finished $test"
+done
+
+#./bin/test_codecov
+#cd ./testframes/test_codecov
+#gcov ./test_codecov.cpp -r
+#cd $MNECPP_ROOT
+
+#./bin/test_fiff_rwr
+#cd ./testframes/test_fiff_rwr
+#gcov ./test_fiff_rwr.cpp -r
+#cd $MNECPP_ROOT
 
 # Report code coverage; instead of "bash <(curl -s https://codecov.io/bash)" use python "codecov"
 codecov

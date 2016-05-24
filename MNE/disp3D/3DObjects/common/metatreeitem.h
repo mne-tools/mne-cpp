@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     BrainTreeMetaItem.h
+* @file     metatreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2015
+* @date     May, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     BrainTreeMetaItem class declaration.
+* @brief     MetaTreeItem class declaration.
 *
 */
 
-#ifndef BRAINTREEMETAITEM_H
-#define BRAINTREEMETAITEM_H
+#ifndef METATREEITEM_H
+#define METATREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -83,17 +83,17 @@ namespace DISP3DLIB
 
 //=============================================================================================================
 /**
-* BrainTreeMetaItem provides a generic brain tree item to hold meta information about other brain tree items.
+* MetaTreeItem provides a generic brain tree item to hold meta information about other brain tree items.
 *
 * @brief Provides a generic brain tree item.
 */
-class DISP3DNEWSHARED_EXPORT BrainTreeMetaItem : public AbstractTreeItem
+class DISP3DNEWSHARED_EXPORT MetaTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<BrainTreeMetaItem> SPtr;             /**< Shared pointer type for BrainTreeMetaItem class. */
-    typedef QSharedPointer<const BrainTreeMetaItem> ConstSPtr;  /**< Const shared pointer type for BrainTreeMetaItem class. */
+    typedef QSharedPointer<MetaTreeItem> SPtr;             /**< Shared pointer type for MetaTreeItem class. */
+    typedef QSharedPointer<const MetaTreeItem> ConstSPtr;  /**< Const shared pointer type for MetaTreeItem class. */
 
     //=========================================================================================================
     /**
@@ -102,13 +102,13 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainTreeMetaItem(int iType = BrainTreeMetaItemTypes::UnknownItem, const QString& text = "");
+    explicit MetaTreeItem(int iType = MetaTreeItemTypes::UnknownItem, const QString& text = "");
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~BrainTreeMetaItem();
+    ~MetaTreeItem();
 
     //=========================================================================================================
     /**
@@ -183,4 +183,4 @@ signals:
 
 } //NAMESPACE DISP3DLIB
 
-#endif // BRAINTREEMETAITEM_H
+#endif // METATREEITEM_H

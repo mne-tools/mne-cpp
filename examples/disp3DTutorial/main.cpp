@@ -59,8 +59,6 @@
 
 #include <iostream>
 
-#include <stdlib.h>     //for using the function sleep
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -234,15 +232,26 @@ int main(int argc, char *argv[])
 //    Annotation tAnnotLeft ("sample", 0, "aparc.a2009s", "./MNE-sample-data/subjects");
 
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
-//    testWindow->addBrainData("HemiLRSet", tSurfLeft, tAnnotLeft);
-//    testWindow->addBrainData("HemiLRSet", tSurfRight, tAnnotRight);
-    testWindow->addBrainData("HemiLRSet", tSurfSet, tAnnotSet);
+//    testWindow->addBrainData("Subject01", "HemiLRSet", tSurfLeft, tAnnotLeft);
+//    testWindow->addBrainData("Subject01", "HemiLRSet", tSurfRight, tAnnotRight);
+    testWindow->addBrainData("Subject01", "HemiLRSet", tSurfSet, tAnnotSet);
+
+    //Read & show BEM
+    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+    MNEBem t_Bem(t_fileBem);
+
+    QFile t_fileBem2("./MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    MNEBem t_Bem2(t_fileBem2);
+    testWindow->addBemData("Subject01", "BEM", t_Bem2);
+
+    testWindow->addBemData("Subject01", "BEM", t_Bem);
 
     if(bAddRtSourceLoc) {
-        QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("HemiLRSet", sourceEstimate, t_clusteredFwd);
-        //testWindow->addBrainData("HemiLRSet", t_clusteredFwd);
+        QList<BrainRTSourceLocDataTreeItem*> rtItemList = testWindow->addRtBrainData("Subject01", "HemiLRSet", sourceEstimate, t_clusteredFwd);
 
-        //testWindow->addRtBrainData("HemiLRSet", sourceEstimate);
+        //testWindow->addBrainData("Subject01", "HemiLRSet", t_clusteredFwd);
+
+        //testWindow->addRtBrainData("Subject01", "HemiLRSet", sourceEstimate);
         //rtItemList.at(0)->addData(sourceEstimate);
 
         //Init some rt related values
@@ -260,7 +269,6 @@ int main(int argc, char *argv[])
     testWindow->show();    
 
     Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
     control3DWidget->setView3D(testWindow);
     control3DWidget->show();
 

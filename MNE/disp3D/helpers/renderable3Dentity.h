@@ -103,7 +103,7 @@ public:
     *
     * @param[in] parent         The parent of this entity.
     */
-    Renderable3DEntity(Qt3DCore::QEntity* parent = 0);
+    explicit Renderable3DEntity(Qt3DCore::QEntity* parent = 0);
 
     //=========================================================================================================
     /**

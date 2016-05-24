@@ -160,6 +160,16 @@ public:
     */
     void writeToStream(FiffStream* p_pStream);
 
+    //=========================================================================================================
+    /**
+    * Map bem id integers to human-readable names
+    *
+    * @param[in] frame  The bem id integer
+    *
+    * @return Human readable form of the bem id.
+    */
+    static QString id_name(int id);
+
 public:
     fiff_int_t id;              /**< Id information */
     fiff_int_t np;              /**< Number of vertices of the whole/original surface used to create the source locations. */

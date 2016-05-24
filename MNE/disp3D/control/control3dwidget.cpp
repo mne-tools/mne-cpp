@@ -86,8 +86,8 @@ Control3DWidget::Control3DWidget(QWidget* parent, Qt::WindowType type)
     ui->m_pushButton_minimize->setText(QString("Minimize - %1").arg(this->windowTitle()));
 
     //Init tree view properties
-    BrainTreeDelegate* pBrainTreeDelegate = new BrainTreeDelegate(this);
-    ui->m_treeView_loadedData->setItemDelegate(pBrainTreeDelegate);
+    Data3DTreeDelegate* pData3DTreeDelegate = new Data3DTreeDelegate(this);
+    ui->m_treeView_loadedData->setItemDelegate(pData3DTreeDelegate);
     ui->m_treeView_loadedData->setHeaderHidden(false);
     ui->m_treeView_loadedData->setEditTriggers(QAbstractItemView::CurrentChanged);
 
@@ -95,6 +95,9 @@ Control3DWidget::Control3DWidget(QWidget* parent, Qt::WindowType type)
     ui->m_treeView_loadedData->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->m_treeView_loadedData, &QWidget::customContextMenuRequested,
             this, &Control3DWidget::onCustomContextMenuRequested);
+
+    //Set on top as default
+    onAlwaysOnTop(ui->m_checkBox_alwaysOnTop->isChecked());
 }
 
 
@@ -111,7 +114,7 @@ Control3DWidget::~Control3DWidget()
 void Control3DWidget::setView3D(View3D::SPtr view3D)
 {
     //Do the connects from this control widget to the View3D
-    ui->m_treeView_loadedData->setModel(view3D->getBrainTreeModel());
+    ui->m_treeView_loadedData->setModel(view3D->getData3DTreeModel());
 
     //Add the view3D to the list of connected view3D's
     m_lView3D.append(view3D);
@@ -123,12 +126,16 @@ void Control3DWidget::setView3D(View3D::SPtr view3D)
 void Control3DWidget::onMinimizeWidget(bool state)
 {
     if(!state) {
-        ui->m_toolBox->hide();
+        ui->m_treeView_loadedData->hide();
+        ui->m_groupBox_viewOptions->hide();
+        ui->m_groupBox_windowOptions->hide();
         ui->m_pushButton_minimize->setText(QString("Maximize - %1").arg(this->windowTitle()));        
         this->resize(width(), ui->m_pushButton_minimize->height());
     }
     else {
-        ui->m_toolBox->show();
+        ui->m_treeView_loadedData->show();
+        ui->m_groupBox_viewOptions->show();
+        ui->m_groupBox_windowOptions->show();
         ui->m_pushButton_minimize->setText(QString("Minimize - %1").arg(this->windowTitle()));
     }
 
