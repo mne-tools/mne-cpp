@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
     View3D::SPtr testWindow = View3D::SPtr(new View3D());
 
     //Option 1 - Visualize full source space
-    testWindow->addBrainData("ForwardSolution", t_forwardSolution);
+    testWindow->addBrainData("Subject01", "ForwardSolution", t_forwardSolution);
 
     //Option 2 - Visualize clustered source space
     //AnnotationSet t_annotationSet ("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");

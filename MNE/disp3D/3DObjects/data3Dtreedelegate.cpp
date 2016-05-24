@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     braintreedelegate.cpp
+* @file     data3Dtreedelegate.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BrainTreeDelegate class definition.
+* @brief    Data3DTreeDelegate class definition.
 *
 */
 
@@ -40,7 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "braintreedelegate.h"
+#include "data3Dtreedelegate.h"
 
 
 //*************************************************************************************************************
@@ -56,7 +56,7 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainTreeDelegate::BrainTreeDelegate(QObject* parent)
+Data3DTreeDelegate::Data3DTreeDelegate(QObject* parent)
 : QItemDelegate(parent)
 {
 }
@@ -64,66 +64,64 @@ BrainTreeDelegate::BrainTreeDelegate(QObject* parent)
 
 //*************************************************************************************************************
 
-QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option , const QModelIndex& index) const
+QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option , const QModelIndex& index) const
 {
-    const BrainTreeModel* pBrainTreeModel = static_cast<const BrainTreeModel*>(index.model());
-    const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pBrainTreeModel->itemFromIndex(index));
+    const Data3DTreeModel* pData3DTreeModel = static_cast<const Data3DTreeModel*>(index.model());
+    const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pData3DTreeModel->itemFromIndex(index));
 
     switch(pAbstractItem->type()) {
-        case BrainTreeMetaItemTypes::SurfaceColorGyri: {
+        case MetaTreeItemTypes::SurfaceColorGyri: {
             QColorDialog *pColorDialog = new QColorDialog(parent);
             connect(pColorDialog, &QColorDialog::currentColorChanged,
-                    this, &BrainTreeDelegate::onEditorEdited);
+                    this, &Data3DTreeDelegate::onEditorEdited);
             pColorDialog->setWindowTitle("Select Gyri Color");
             pColorDialog->show();
             return pColorDialog;
         }
 
-        case BrainTreeMetaItemTypes::SurfaceColorSulci: {
+        case MetaTreeItemTypes::SurfaceColorSulci: {
             QColorDialog *pColorDialog = new QColorDialog();
             connect(pColorDialog, &QColorDialog::currentColorChanged,
-                    this, &BrainTreeDelegate::onEditorEdited);
+                    this, &Data3DTreeDelegate::onEditorEdited);
             pColorDialog->setWindowTitle("Select Sulci Color");
             pColorDialog->show();
             return pColorDialog;
         }
 
-        case BrainTreeMetaItemTypes::RTDataColormapType: {
+        case MetaTreeItemTypes::RTDataColormapType: {
             QComboBox* pComboBox = new QComboBox(parent);
             connect(pComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-                    this, &BrainTreeDelegate::onEditorEdited);
+                    this, &Data3DTreeDelegate::onEditorEdited);
             pComboBox->addItem("Hot Negative 1");
             pComboBox->addItem("Hot Negative 2");
             pComboBox->addItem("Hot");
             return pComboBox;
         }
 
-        case BrainTreeMetaItemTypes::RTDataNormalizationValue: {
+        case MetaTreeItemTypes::RTDataNormalizationValue: {
             QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
             connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                    this, &BrainTreeDelegate::onEditorEdited);
+                    this, &Data3DTreeDelegate::onEditorEdited);
             pDoubleSpinBox->setMinimum(0.0001);
             pDoubleSpinBox->setMaximum(10000.0);
             pDoubleSpinBox->setSingleStep(0.01);
-            pDoubleSpinBox->setValue(index.model()->data(index, BrainTreeMetaItemRoles::RTDataNormalizationValue).toDouble());
+            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::RTDataNormalizationValue).toDouble());
             return pDoubleSpinBox;
-            break;
         }
 
-        case BrainTreeMetaItemTypes::RTDataTimeInterval: {
+        case MetaTreeItemTypes::RTDataTimeInterval: {
             QSpinBox* pSpinBox = new QSpinBox(parent);
             connect(pSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                    this, &BrainTreeDelegate::onEditorEdited);
+                    this, &Data3DTreeDelegate::onEditorEdited);
             pSpinBox->setSuffix(" mSec");
             pSpinBox->setMinimum(1);
             pSpinBox->setMaximum(5000);
             pSpinBox->setSingleStep(10);
-            pSpinBox->setValue(index.model()->data(index, BrainTreeMetaItemRoles::RTDataTimeInterval).toInt());
+            pSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::RTDataTimeInterval).toInt());
             return pSpinBox;
-            break;
         }
 
-        case BrainTreeMetaItemTypes::RTDataVisualizationType: {
+        case MetaTreeItemTypes::RTDataVisualizationType: {
             QComboBox* pComboBox = new QComboBox(parent);
             pComboBox->addItem("Vertex based");
             pComboBox->addItem("Smoothing based");
@@ -131,38 +129,39 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
             return pComboBox;
         }
 
-        case BrainTreeMetaItemTypes::SurfaceColorItem: {
+        case MetaTreeItemTypes::SurfaceColor: {
             QColorDialog *pColorDialog = new QColorDialog();
             connect(pColorDialog, &QColorDialog::currentColorChanged,
-                    this, &BrainTreeDelegate::onEditorEdited);
+                    this, &Data3DTreeDelegate::onEditorEdited);
             pColorDialog->setWindowTitle("Select Surface Color");
             pColorDialog->show();
             return pColorDialog;
         }
 
-        case BrainTreeMetaItemTypes::RTDataNumberAverages: {
+        case MetaTreeItemTypes::RTDataNumberAverages: {
             QSpinBox* pSpinBox = new QSpinBox(parent);
             connect(pSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                    this, &BrainTreeDelegate::onEditorEdited);
+                    this, &Data3DTreeDelegate::onEditorEdited);
             pSpinBox->setMinimum(1);
             pSpinBox->setMaximum(100);
             pSpinBox->setSingleStep(1);
-            pSpinBox->setValue(index.model()->data(index, BrainTreeMetaItemRoles::RTDataNumberAverages).toInt());
+            pSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::RTDataNumberAverages).toInt());
             return pSpinBox;
-            break;
         }
 
-        case BrainTreeMetaItemTypes::SurfaceAlpha: {
+        case MetaTreeItemTypes::SurfaceAlpha: {
             QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(parent);
             connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                    this, &BrainTreeDelegate::onEditorEdited);
+                    this, &Data3DTreeDelegate::onEditorEdited);
             pDoubleSpinBox->setMinimum(0.01);
             pDoubleSpinBox->setMaximum(1.0);
             pDoubleSpinBox->setSingleStep(0.01);
-            pDoubleSpinBox->setValue(index.model()->data(index, BrainTreeMetaItemRoles::SurfaceAlpha).toDouble());
+            pDoubleSpinBox->setValue(index.model()->data(index, MetaTreeItemRoles::SurfaceAlpha).toDouble());
             return pDoubleSpinBox;
-            break;
         }
+
+        default: // do nothing;
+            break;
     }
 
 
@@ -172,70 +171,70 @@ QWidget *BrainTreeDelegate::createEditor(QWidget* parent, const QStyleOptionView
 
 //*************************************************************************************************************
 
-void BrainTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
+void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
 {
-    const BrainTreeModel* pBrainTreeModel = static_cast<const BrainTreeModel*>(index.model());
-    const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pBrainTreeModel->itemFromIndex(index));
+    const Data3DTreeModel* pData3DTreeModel = static_cast<const Data3DTreeModel*>(index.model());
+    const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pData3DTreeModel->itemFromIndex(index));
 
     switch(pAbstractItem->type()) {
-        case BrainTreeMetaItemTypes::SurfaceColorGyri: {
-            QColor color = index.model()->data(index, BrainTreeMetaItemRoles::SurfaceColorGyri).value<QColor>();
+        case MetaTreeItemTypes::SurfaceColorGyri: {
+            QColor color = index.model()->data(index, MetaTreeItemRoles::SurfaceColorGyri).value<QColor>();
             QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
             pColorDialog->setCurrentColor(color);
             break;
         }
 
-        case BrainTreeMetaItemTypes::SurfaceColorSulci: {
-            QColor color = index.model()->data(index, BrainTreeMetaItemRoles::SurfaceColorSulci).value<QColor>();
+        case MetaTreeItemTypes::SurfaceColorSulci: {
+            QColor color = index.model()->data(index, MetaTreeItemRoles::SurfaceColorSulci).value<QColor>();
             QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
             pColorDialog->setCurrentColor(color);
             break;
         }
 
-        case BrainTreeMetaItemTypes::RTDataColormapType: {
-            QString colormap = index.model()->data(index, BrainTreeMetaItemRoles::RTDataColormapType).toString();
+        case MetaTreeItemTypes::RTDataColormapType: {
+            QString colormap = index.model()->data(index, MetaTreeItemRoles::RTDataColormapType).toString();
             QComboBox* pComboBox = static_cast<QComboBox*>(editor);
             pComboBox->setCurrentText(colormap);
             break;
         }
 
-        case BrainTreeMetaItemTypes::RTDataNormalizationValue: {
-            double value = index.model()->data(index, BrainTreeMetaItemRoles::RTDataNormalizationValue).toDouble();
+        case MetaTreeItemTypes::RTDataNormalizationValue: {
+            double value = index.model()->data(index, MetaTreeItemRoles::RTDataNormalizationValue).toDouble();
             QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
             pDoubleSpinBox->setValue(value);
             break;
         }
 
-        case BrainTreeMetaItemTypes::RTDataTimeInterval: {
-            int value = index.model()->data(index, BrainTreeMetaItemRoles::RTDataTimeInterval).toInt();
+        case MetaTreeItemTypes::RTDataTimeInterval: {
+            int value = index.model()->data(index, MetaTreeItemRoles::RTDataTimeInterval).toInt();
             QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
             pSpinBox->setValue(value);
             break;
         }
 
-        case BrainTreeMetaItemTypes::RTDataVisualizationType: {
-            QString visType = index.model()->data(index, BrainTreeMetaItemRoles::RTDataVisualizationType).toString();
+        case MetaTreeItemTypes::RTDataVisualizationType: {
+            QString visType = index.model()->data(index, MetaTreeItemRoles::RTDataVisualizationType).toString();
             QComboBox* pComboBox = static_cast<QComboBox*>(editor);
             pComboBox->setCurrentText(visType);
             break;
         }
 
-        case BrainTreeMetaItemTypes::SurfaceColorItem: {
-            QColor color = index.model()->data(index, BrainTreeMetaItemRoles::SurfaceColor).value<QColor>();
+        case MetaTreeItemTypes::SurfaceColor: {
+            QColor color = index.model()->data(index, MetaTreeItemRoles::SurfaceColor).value<QColor>();
             QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
             pColorDialog->setCurrentColor(color);
             break;
         }
 
-        case BrainTreeMetaItemTypes::RTDataNumberAverages: {
-            int value = index.model()->data(index, BrainTreeMetaItemRoles::RTDataNumberAverages).toInt();
+        case MetaTreeItemTypes::RTDataNumberAverages: {
+            int value = index.model()->data(index, MetaTreeItemRoles::RTDataNumberAverages).toInt();
             QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
             pSpinBox->setValue(value);
             break;
         }
 
-        case BrainTreeMetaItemTypes::SurfaceAlpha: {
-            int value = index.model()->data(index, BrainTreeMetaItemRoles::SurfaceAlpha).toDouble();
+        case MetaTreeItemTypes::SurfaceAlpha: {
+            int value = index.model()->data(index, MetaTreeItemRoles::SurfaceAlpha).toDouble();
             QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
             pSpinBox->setValue(value);
             break;
@@ -248,103 +247,103 @@ void BrainTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index)
 
 //*************************************************************************************************************
 
-void BrainTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
+void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
 {
-    const BrainTreeModel* pBrainTreeModel = static_cast<const BrainTreeModel*>(index.model());
-    const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pBrainTreeModel->itemFromIndex(index));
+    const Data3DTreeModel* pData3DTreeModel = static_cast<const Data3DTreeModel*>(index.model());
+    const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pData3DTreeModel->itemFromIndex(index));
 
     switch(pAbstractItem->type()) {
-        case BrainTreeMetaItemTypes::SurfaceColorGyri: {
+        case MetaTreeItemTypes::SurfaceColorGyri: {
             QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
             QColor color = pColorDialog->currentColor();
             QVariant data;
             data.setValue(color);
 
-            model->setData(index, data, BrainTreeMetaItemRoles::SurfaceColorGyri);
+            model->setData(index, data, MetaTreeItemRoles::SurfaceColorGyri);
             model->setData(index, data, Qt::DecorationRole);
             return;
         }
 
-        case BrainTreeMetaItemTypes::SurfaceColorSulci: {
+        case MetaTreeItemTypes::SurfaceColorSulci: {
             QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
             QColor color = pColorDialog->currentColor();
             QVariant data;
             data.setValue(color);
 
-            model->setData(index, data, BrainTreeMetaItemRoles::SurfaceColorSulci);
+            model->setData(index, data, MetaTreeItemRoles::SurfaceColorSulci);
             model->setData(index, data, Qt::DecorationRole);
             return;
         }
 
-        case BrainTreeMetaItemTypes::RTDataColormapType: {
+        case MetaTreeItemTypes::RTDataColormapType: {
             QComboBox* pColorMapType = static_cast<QComboBox*>(editor);
             QVariant data;
             data.setValue(pColorMapType->currentText());
 
-            model->setData(index, data, BrainTreeMetaItemRoles::RTDataColormapType);
+            model->setData(index, data, MetaTreeItemRoles::RTDataColormapType);
             model->setData(index, data, Qt::DisplayRole);
             return;
         }
 
-        case BrainTreeMetaItemTypes::RTDataNormalizationValue: {
+        case MetaTreeItemTypes::RTDataNormalizationValue: {
             QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
             QVariant data;
             data.setValue(pDoubleSpinBox->value());
 
-            model->setData(index, data, BrainTreeMetaItemRoles::RTDataNormalizationValue);
+            model->setData(index, data, MetaTreeItemRoles::RTDataNormalizationValue);
             model->setData(index, data, Qt::DisplayRole);
             break;
         }
 
-        case BrainTreeMetaItemTypes::RTDataTimeInterval: {
+        case MetaTreeItemTypes::RTDataTimeInterval: {
             QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
 
             QVariant data;
             data.setValue(pSpinBox->value());
 
-            model->setData(index, data, BrainTreeMetaItemRoles::RTDataTimeInterval);
+            model->setData(index, data, MetaTreeItemRoles::RTDataTimeInterval);
             model->setData(index, data, Qt::DisplayRole);
             break;
         }
 
-        case BrainTreeMetaItemTypes::RTDataVisualizationType: {
+        case MetaTreeItemTypes::RTDataVisualizationType: {
             QComboBox* pVisType = static_cast<QComboBox*>(editor);
             QVariant data;
             data.setValue(pVisType->currentText());
 
-            model->setData(index, data, BrainTreeMetaItemRoles::RTDataVisualizationType);
+            model->setData(index, data, MetaTreeItemRoles::RTDataVisualizationType);
             model->setData(index, data, Qt::DisplayRole);
             return;
         }
 
-        case BrainTreeMetaItemTypes::SurfaceColorItem: {
+        case MetaTreeItemTypes::SurfaceColor: {
             QColorDialog* pColorDialog = static_cast<QColorDialog*>(editor);
             QColor color = pColorDialog->currentColor();
             QVariant data;
             data.setValue(color);
 
-            model->setData(index, data, BrainTreeMetaItemRoles::SurfaceColor);
+            model->setData(index, data, MetaTreeItemRoles::SurfaceColor);
             model->setData(index, data, Qt::DecorationRole);
             return;
         }
 
-        case BrainTreeMetaItemTypes::RTDataNumberAverages: {
+        case MetaTreeItemTypes::RTDataNumberAverages: {
             QSpinBox* pSpinBox = static_cast<QSpinBox*>(editor);
 
             QVariant data;
             data.setValue(pSpinBox->value());
 
-            model->setData(index, data, BrainTreeMetaItemRoles::RTDataNumberAverages);
+            model->setData(index, data, MetaTreeItemRoles::RTDataNumberAverages);
             model->setData(index, data, Qt::DisplayRole);
             break;
         }
 
-        case BrainTreeMetaItemTypes::SurfaceAlpha: {
+        case MetaTreeItemTypes::SurfaceAlpha: {
             QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
             QVariant data;
             data.setValue(pDoubleSpinBox->value());
 
-            model->setData(index, data, BrainTreeMetaItemRoles::SurfaceAlpha);
+            model->setData(index, data, MetaTreeItemRoles::SurfaceAlpha);
             model->setData(index, data, Qt::DisplayRole);
             break;
         }
@@ -356,7 +355,7 @@ void BrainTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
 
 //*************************************************************************************************************
 
-void BrainTreeDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
+void Data3DTreeDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
 {
     editor->setGeometry(option.rect);
 }
@@ -364,7 +363,7 @@ void BrainTreeDelegate::updateEditorGeometry(QWidget* editor, const QStyleOption
 
 //*************************************************************************************************************
 
-void BrainTreeDelegate::onEditorEdited()
+void Data3DTreeDelegate::onEditorEdited()
 {
     QWidget* editor = qobject_cast<QWidget*>(QObject::sender());
     emit commitData(editor);

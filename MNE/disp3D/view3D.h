@@ -44,7 +44,8 @@
 #include <iostream>
 
 #include "disp3D_global.h"
-#include "3DObjects/brain/brain.h"
+#include "3DObjects/data3Dtreemodel.h"
+
 #include "helpers/window.h"
 #include "helpers/types.h"
 
@@ -128,67 +129,84 @@ public:
     /**
     * Adds FreeSurfer brain data SET.
     *
-    * @param[in] text               The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
+    * @param[in] subject            The name of the subject.
+    * @param[in] set                The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
     * @param[in] tSurfaceSet        FreeSurfer surface set.
     * @param[in] tAnnotationSet     FreeSurfer annotation set.
     *
     * @return                       Returns true if successful.
     */
-    bool addBrainData(const QString& text, const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet = FSLIB::AnnotationSet());
+    bool addBrainData(const QString& subject, const QString& set, const FSLIB::SurfaceSet& tSurfaceSet, const FSLIB::AnnotationSet& tAnnotationSet = FSLIB::AnnotationSet());
 
     //=========================================================================================================
     /**
     * Adds FreeSurfer single brain data.
     *
-    * @param[in] text               The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
+    * @param[in] subject            The name of the subject.
+    * @param[in] set                The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
     * @param[in] tSurface           FreeSurfer surface.
     * @param[in] tAnnotation        FreeSurfer annotation.
     *
     * @return                       Returns true if successful.
     */
-    bool addBrainData(const QString& text, const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation = FSLIB::Annotation());
+    bool addBrainData(const QString& subject, const QString& set, const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation = FSLIB::Annotation());
 
     //=========================================================================================================
     /**
     * Adds source space data to the brain tree model.
     *
-    * @param[in] text               The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
+    * @param[in] subject            The name of the subject.
+    * @param[in] set                The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
     * @param[in] tSourceSpace       The source space information.
     *
     * @return                       Returns true if successful.
     */
-    bool addBrainData(const QString& text, const MNELIB::MNESourceSpace& tSourceSpace);
+    bool addBrainData(const QString& subject, const QString& set, const MNELIB::MNESourceSpace& tSourceSpace);
 
     //=========================================================================================================
     /**
     * Adds a forward solution data to the brain tree model. Convenient function to addBrainData(const QString& text, const MNESourceSpace& tSourceSpace).
     *
-    * @param[in] text               The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
+    * @param[in] subject            The name of the subject.
+    * @param[in] set                The text of the surface set tree item which this data should be added to. If no item with text exists it will be created.
     * @param[in] tForwardSolution   The forward solution information.
     *
     * @return                       Returns true if successful.
     */
-    bool addBrainData(const QString& text, const MNELIB::MNEForwardSolution& tForwardSolution);
+    bool addBrainData(const QString& subject, const QString& set, const MNELIB::MNEForwardSolution& tForwardSolution);
 
     //=========================================================================================================
     /**
     * Adds source activity data to the brain tree model.
     *
-    * @param[in] text                   The name of the hemisphere surface set to which this data should be added.
+    * @param[in] subject                The name of the subject.
+    * @param[in] set                    The name of the hemisphere surface set to which this data should be added.
     * @param[in] tSourceEstimate        The MNESourceEstimate data.
     * @param[in] tForwardSolution       The MNEForwardSolution data.
     *
     * @return                           Returns a list of the BrainRTSourceLocDataTreeItem where the data was appended to.
     */
-    QList<BrainRTSourceLocDataTreeItem*> addRtBrainData(const QString& text, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
+    QList<BrainRTSourceLocDataTreeItem*> addRtBrainData(const QString& subject, const QString& set, const MNELIB::MNESourceEstimate& tSourceEstimate, const MNELIB::MNEForwardSolution& tForwardSolution = MNELIB::MNEForwardSolution());
 
     //=========================================================================================================
     /**
-    * Return the tree model which holds the brain information.
+    * Adds BEM data.
     *
-    * @return          The BrainTreeModel pointer.
+    * @param[in] subject            The name of the subject.
+    * @param[in] set                The name of the bem set to which the data is to be added.
+    * @param[in] tSourceSpace       The source space information.
+    *
+    * @return                       Returns true if successful.
     */
-    BrainTreeModel* getBrainTreeModel();
+    bool addBemData(const QString& subject, const QString& set, const MNELIB::MNEBem& tBem);
+
+    //=========================================================================================================
+    /**
+    * Return the tree model which holds the subject information.
+    *
+    * @return          The SubjectTreeModel pointer.
+    */
+    Data3DTreeModel* getData3DTreeModel();
 
     //=========================================================================================================
     /**
@@ -212,7 +230,7 @@ protected:
 
     Qt3DCore::QTransform*               m_pCameraTransform;             /**< The main camera transform. */
 
-    Brain::SPtr                         m_pBrain;                       /**< Pointer to the Brain class, which holds all BrainObjects. */
+    Data3DTreeModel::SPtr               m_pData3DTreeModel;             /**< Pointer to the data3D class, which holds all 3D data. */
 
     bool            m_bCameraTransMode;         /**< Flag for activating/deactivating the translation camera mode. */
     bool            m_bCameraRotationMode;      /**< Flag for activating/deactivating the rotation camera mode. */

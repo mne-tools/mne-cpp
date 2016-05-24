@@ -44,7 +44,7 @@
 #include "../../disp3D_global.h"
 
 #include "../../helpers/abstracttreeitem.h"
-#include "braintreemetaitem.h"
+#include "../common/metatreeitem.h"
 
 #include "../../helpers/types.h"
 #include "../../helpers/renderable3Dentity.h"
@@ -110,7 +110,7 @@ public:
     * @param[in] iType      The type of the item. See types.h for declaration and definition.
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     */
-    explicit BrainSurfaceTreeItem(int iType = BrainTreeModelItemTypes::SurfaceItem, const QString& text = "Surface");
+    explicit BrainSurfaceTreeItem(int iType = Data3DTreeModelItemTypes::SurfaceItem, const QString& text = "Surface");
 
     //=========================================================================================================
     /**
@@ -201,8 +201,8 @@ private:
     Renderable3DEntity*     m_pRenderable3DEntityActivationOverlay;     /**< The renderable 3D entity used as an overlay for activity plotting. */
 
     //These are stored as member variables because we do not wat to look for them everytime we call functions, especially not when we perform rt source loc
-    BrainTreeMetaItem*      m_pItemSurfColSulci;                        /**< The item which holds the sulci color information. */
-    BrainTreeMetaItem*      m_pItemSurfColGyri;                         /**< The item which holds the gyri color information. */
+    MetaTreeItem*           m_pItemSurfColSulci;                        /**< The item which holds the sulci color information. */
+    MetaTreeItem*           m_pItemSurfColGyri;                         /**< The item which holds the gyri color information. */
 
 signals:
     //=========================================================================================================
