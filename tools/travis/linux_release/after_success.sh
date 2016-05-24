@@ -1,6 +1,6 @@
 #!/bin/bash
-set -ev
+#set -ev
 
 # Run Doxygen
 cd doc
-doxygen mne-cpp_doxyfile
+doxygen mne-cpp_doxyfile_release
