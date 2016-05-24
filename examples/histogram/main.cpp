@@ -247,7 +247,7 @@ int main(int argc, char *argv[])
     QFile t_fileEvoked(parser.value(sampleEvokedFileOption));
 
     double snr = 1.0f;//3.0f;//0.1f;//3.0f;
-    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
+    QString method("MNE"); //"MNE" | "dSPM" | "sLORETA"
 
     QString t_sFileNameClusteredInv("");
     QString t_sFileNameStc("");
