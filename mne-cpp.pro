@@ -45,8 +45,8 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     MNE \
-#    examples \
-#    applications
+    examples \
+    applications
 
 contains(MNECPP_CONFIG, withTests) {
     SUBDIRS += testframes
