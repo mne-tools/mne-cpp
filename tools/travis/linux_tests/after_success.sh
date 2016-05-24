@@ -16,7 +16,7 @@ MNECPP_ROOT=$(pwd)
 
 ls
 cd ./testframes/test_codecov
-gcov ./testframes/test_codecov/test_codecov.cpp -r
+gcov ./test_codecov.cpp -r
 ls
 
 cd $MNECPP_ROOT
