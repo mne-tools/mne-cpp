@@ -545,11 +545,11 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
 
     if (bMakeSymmetrical == true)           //in case the user wants the histogram to have symmetrical class ranges
     {
-            if (abs(rawMin) > rawMax)       //in case the negative side is larger than the positive side
-            {
-                localMax = abs(rawMin);     //positive side is "stretched" to the exact length as negative side
-                localMin = rawMin;
-            }
+        if (abs(rawMin) > rawMax)       //in case the negative side is larger than the positive side
+        {
+            localMax = abs(rawMin);     //positive side is "stretched" to the exact length as negative side
+            localMin = rawMin;
+        }
         else if (rawMax > abs(rawMin))      //in case the positive side is larger than the negative side
         {
             localMin = -(rawMax);           //negative side is "stretched" to the exact length as positive side
