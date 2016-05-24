@@ -11,20 +11,26 @@ MNECPP_ROOT=$(pwd)
 
 #tbd: later on do a grep of all cpps within testframe
 # Create Code Coverage
-./bin/test_codecov
-./bin/test_fiff_rwr
+tests=( test_codecov test_fiff_rwr )
 
-ls
-cd ./testframes/test_codecov
-gcov ./test_codecov.cpp -r
-ls
+for test in "{tests[@]}"
+do
+    echo $test
+	./bin/${test}
+    cd ./testframes/${test}
+    gcov ./${test}.cpp -r
+    cd $MNECPP_ROOT
+done
 
-cd $MNECPP_ROOT
-ls
+#./bin/test_codecov
+#cd ./testframes/test_codecov
+#gcov ./test_codecov.cpp -r
+#cd $MNECPP_ROOT
 
-cd ./testframes/test_fiff_rwr
-gcov ./test_fiff_rwr.cpp -r
-ls
+#./bin/test_fiff_rwr
+#cd ./testframes/test_fiff_rwr
+#gcov ./test_fiff_rwr.cpp -r
+#cd $MNECPP_ROOT
 
 # Report code coverage; instead of "bash <(curl -s https://codecov.io/bash)" use python "codecov"
 codecov
