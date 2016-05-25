@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     ssvepBCIFlickeringItem.cpp
+* @file     ssvepbciscreen.cpp
 * @author   Viktor Klüber <viktor.klueber@tu-ilmenauz.de>;
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ssvepBCIFlickeringItem class.
+* @brief    Contains the implementation of the ssvepBCIScreen class.
 *
 */
 
@@ -40,14 +40,16 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "ssvepbciflickeringitem.h"
+#include "ssvepbciscreen.h"
+#include <QDebug>
+#include <QPainter>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ssvepBCIPlugin;
+using namespace EEGoSportsPlugin;
 
 
 //*************************************************************************************************************
@@ -55,70 +57,39 @@ using namespace ssvepBCIPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ssvepBCIFlickeringItem::ssvepBCIFlickeringItem()
-    : m_dPosX(0)
-    , m_dPosY(0)
-    , m_dWidth(0.4)
-    , m_dHeight(0.4)
-    , m_bFlickerState(true)
-    , m_bIter(m_bRenderOrder)
 
+ssvepBCIScreen::ssvepBCIScreen(QOpenGLWidget *parent)
 {
-    m_bRenderOrder << 0 << 0 << 1 << 1; //default
+    //set format of the QOpenGLWidget (enable vsync and setup buffers)
+    QSurfaceFormat format;
+    format.setDepthBufferSize(24);
+    format.setStencilBufferSize(8);
+    format.setSwapInterval(1);
+    setFormat(format);
 }
 
 //*************************************************************************************************************
 
-ssvepBCIFlickeringItem::~ssvepBCIFlickeringItem(){
+void ssvepBCIScreen::resizeGL(int w, int h) {
 }
 
 //*************************************************************************************************************
 
-void ssvepBCIFlickeringItem::setPos(double x, double y){
-        m_dPosX = x;
-        m_dPosY = y;
+void ssvepBCIScreen::initializeGL(){
 }
 
 //*************************************************************************************************************
 
-void ssvepBCIFlickeringItem::setDim(double w, double h){
-    m_dWidth    = w;
-    m_dHeight   = h;
+void ssvepBCIScreen::paintGL() {
+    //paint all items to the screen
+    for(int i = 0; i < m_Items.size(); i++)
+        m_Items[i].paint(this);
+    //painting red cross as a point of reference for the subject
+    QPainter p(this);
+    p.fillRect((0.5-0.01/2)*this->width(),(0.5-0.05/2)*this->height(),0.01*this->width(),0.05*this->height(),Qt::red);
+    p.fillRect(0.5*this->width()-0.05*this->height()/2,0.5*this->height()-0.01*this->width()/2,0.05*this->height(),0.01*this->width(),Qt::red);
+
+    update(); //schedules next update directly, without going through signal dispatching
 }
 
-//*************************************************************************************************************
 
-void ssvepBCIFlickeringItem::setRenderOrder(QList<bool> renderOrder, int freqKey){
-
-    //clear the old rendering order list
-    m_bRenderOrder.clear();
-
-    //setup the iterator and assign it to the new list
-    m_bRenderOrder  = renderOrder;
-    m_bIter         = m_bRenderOrder;
-    m_iFreqKey      = freqKey;
-}
-
-//*************************************************************************************************************
-
-void ssvepBCIFlickeringItem::paint(QPaintDevice *paintDevice)
-{
-    //setting the nex flicker state (moving iterater to front if necessary)
-    if(!m_bIter.hasNext())
-        m_bIter.toFront();
-    m_bFlickerState = m_bIter.next();
-
-    //painting the itme's shape
-    QPainter p(paintDevice);
-    if(m_bFlickerState)
-        p.fillRect(m_dPosX*paintDevice->width(),m_dPosY*paintDevice->height(),m_dWidth*paintDevice->width(),m_dHeight*paintDevice->height(),Qt::white);
-    else
-        p.fillRect(m_dPosX*paintDevice->width(),m_dPosY*paintDevice->height(),m_dWidth*paintDevice->width(),m_dHeight*paintDevice->height(),Qt::black);
-}
-
-//*************************************************************************************************************
-
-int ssvepBCIFlickeringItem::getFreq()
-{
-    return m_iFreqKey;
-}

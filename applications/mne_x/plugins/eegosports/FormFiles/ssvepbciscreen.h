@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
-* @file     ssvepBCIFlickeringItem.cpp
-* @author   Viktor Klüber <viktor.klueber@tu-ilmenauz.de>;
+* @file     ssvepBCIScreen.h
+* @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>;
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -31,9 +31,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ssvepBCIFlickeringItem class.
+* @brief    Contains the declaration of the ssvepBCIScreen class.
 *
 */
+
+#ifndef SSVEPBCISCREEN_H
+#define SSVEPBCISCREEN_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -44,81 +47,60 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// QT INCLUDES
 //=============================================================================================================
 
-using namespace ssvepBCIPlugin;
-
+#include <QOpenGLWidget>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE ssvepBCIScreen
 //=============================================================================================================
 
-ssvepBCIFlickeringItem::ssvepBCIFlickeringItem()
-    : m_dPosX(0)
-    , m_dPosY(0)
-    , m_dWidth(0.4)
-    , m_dHeight(0.4)
-    , m_bFlickerState(true)
-    , m_bIter(m_bRenderOrder)
-
+namespace EEGoSportsPlugin
 {
-    m_bRenderOrder << 0 << 0 << 1 << 1; //default
-}
 
 //*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
-ssvepBCIFlickeringItem::~ssvepBCIFlickeringItem(){
-}
 
-//*************************************************************************************************************
-
-void ssvepBCIFlickeringItem::setPos(double x, double y){
-        m_dPosX = x;
-        m_dPosY = y;
-}
-
-//*************************************************************************************************************
-
-void ssvepBCIFlickeringItem::setDim(double w, double h){
-    m_dWidth    = w;
-    m_dHeight   = h;
-}
-
-//*************************************************************************************************************
-
-void ssvepBCIFlickeringItem::setRenderOrder(QList<bool> renderOrder, int freqKey){
-
-    //clear the old rendering order list
-    m_bRenderOrder.clear();
-
-    //setup the iterator and assign it to the new list
-    m_bRenderOrder  = renderOrder;
-    m_bIter         = m_bRenderOrder;
-    m_iFreqKey      = freqKey;
-}
-
-//*************************************************************************************************************
-
-void ssvepBCIFlickeringItem::paint(QPaintDevice *paintDevice)
+//=============================================================================================================
+/**
+* DECLARE CLASS ssvepBCIScreen
+*
+* @brief The ssvepBCIScreen class provides the subject screen. Contains the list of items which will be painted
+* to screen automatically
+*/
+class ssvepBCIScreen : public QOpenGLWidget
 {
-    //setting the nex flicker state (moving iterater to front if necessary)
-    if(!m_bIter.hasNext())
-        m_bIter.toFront();
-    m_bFlickerState = m_bIter.next();
+    Q_OBJECT
 
-    //painting the itme's shape
-    QPainter p(paintDevice);
-    if(m_bFlickerState)
-        p.fillRect(m_dPosX*paintDevice->width(),m_dPosY*paintDevice->height(),m_dWidth*paintDevice->width(),m_dHeight*paintDevice->height(),Qt::white);
-    else
-        p.fillRect(m_dPosX*paintDevice->width(),m_dPosY*paintDevice->height(),m_dWidth*paintDevice->width(),m_dHeight*paintDevice->height(),Qt::black);
-}
+    friend class ssvepBCISetupStimulusWidget;           /**< permit ssvepBCISetupStimulusWidget getting full access */
 
-//*************************************************************************************************************
+public:
+    //=========================================================================================================
+    /**
+     * constructs the ssvepBCIScreen object
+     *
+     */
+    ssvepBCIScreen(QOpenGLWidget *parent = 0 );
 
-int ssvepBCIFlickeringItem::getFreq()
-{
-    return m_iFreqKey;
-}
+private:
+    QList<ssvepBCIFlickeringItem>   m_Items;            /**< QList containing all flickering Items to be painted */
+
+protected:
+    //=========================================================================================================
+    /**
+     * overwritten functions from the QOpenGLWidget class which will be called automatically
+     *
+     */
+    void resizeGL(int w, int h);
+    void paintGL();
+    void initializeGL();
+};
+
+
+}//Namescpace
+#endif // SSVEPBCISCREEN_H

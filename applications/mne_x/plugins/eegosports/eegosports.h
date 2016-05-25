@@ -72,6 +72,7 @@
 #include "FormFiles/eegosportssetupwidget.h"
 #include "FormFiles/eegosportssetupprojectwidget.h"
 #include "FormFiles/eegosportssetupstimuluswidget.h"
+#include "FormFiles/ssvepbcisetupstimuluswidget.h"
 
 
 //*************************************************************************************************************
@@ -131,6 +132,7 @@ class EEGOSPORTSSHARED_EXPORT EEGoSports : public ISensor
     friend class EEGoSportsImpedanceWidget;
     friend class EEGoSportsSetupProjectWidget;
     friend class EEGoSportsSetupStimulusWidget;
+    friend class ssvepBCISetupStimulusWidget;
 
 public:
     //=========================================================================================================
@@ -229,9 +231,15 @@ protected:
 
     //=========================================================================================================
     /**
-    * Starts data recording
+    * Starts time stimulus setup
     */
-    void showSetupStimulus();
+    void showSetupTimeStimulus();
+
+    //=========================================================================================================
+    /**
+    * Starts frame stimulus
+    */
+    void showSetupFrameStimulus();
 
     //=========================================================================================================
     /**
@@ -248,7 +256,8 @@ protected:
 private:
     PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRMTSA_EEGoSports;      /**< The RealTimeSampleArray to provide the EEG data.*/
     QSharedPointer<EEGoSportsSetupProjectWidget> m_pEEGoSportsSetupProjectWidget; /**< Widget for checking the impedances*/
-    QSharedPointer<EEGoSportsSetupStimulusWidget> m_pEEGoSportsSetupStimulusWidget; /**< Widget for stimulus setup */
+    QSharedPointer<EEGoSportsSetupStimulusWidget> m_pEEGoSportsSetupTimeStimulusWidget;     /**< Widget for time stimulus setup */
+    QSharedPointer<ssvepBCISetupStimulusWidget> m_pEEGoSportsSetupFrameStimulusWidget;    /**< Widget for frame stimulus setup */
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
