@@ -1,6 +1,10 @@
 # MNE-CPP Travis CI for Linux and OS-X
 language: cpp
 
+env:
+  global:
+    - secure: O7DzRo9YOK8YR/gNhVrYKZjOVTscbZI5WhSzNWl+PX8y+fFYBJ8z6s4SMC+NfOw1rK7DOXPbHbaVLFRmSHpBoQGzfbAtfgEOzVpdvSmZQCAr8wbYXatuSCr0X1DYLcVwjS2Nss+HUvcwUo7/UqF2Cc66Pa0E5U04RQDgxP3eff8=
+
 matrix:
   include:
     - os: linux
@@ -17,6 +21,11 @@ matrix:
       sudo: required
       compiler: gcc
       env: BUILD=linux_tests
+    - os: linux
+      dist: trusty
+      sudo: required
+      compiler: gcc
+      env: BUILD=coverity
 
 before_install: . tools/travis/$BUILD/before_install.sh
 install: . tools/travis/$BUILD/install.sh
