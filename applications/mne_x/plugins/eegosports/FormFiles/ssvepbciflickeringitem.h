@@ -54,7 +54,7 @@
 // DEFINE NAMESPACE ssvepBCIScreen
 //=============================================================================================================
 
-namespace ssvepBCIPlugin
+namespace EEGoSportsPlugin
 {
 
 
@@ -130,6 +130,9 @@ public:
     */
     int getFreq(void);
 
+public slots:
+    void chessDim(int rows);
+
 private:
     double m_dPosX;                         /**< realtive vertical position according to screen size; [0..1] */
     double m_dPosY;                         /**< realtive horizontal position according to screen size; [0..1] */
@@ -139,6 +142,9 @@ private:
     QList<bool>         m_bRenderOrder;     /**< render order of the Item */
     QListIterator<bool> m_bIter;            /**< Iterator of the m_bRenderOrder list */
     bool                m_bFlickerState;    /**< actual Flickerstate [0] paint black [1] paint white */
+
+    bool                m_bChessboard;      /**< enables chessboard feature */
+    int                 m_iRows;            /**< number of rows of the chessboard */
 
 };
 

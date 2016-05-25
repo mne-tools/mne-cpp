@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     bci.pro
+# @file     ssvepbci.pro
 # @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>
 #           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 #           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
@@ -72,7 +72,6 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += \
         ssvepbci.cpp \
-        flashobject.cpp \
         FormFiles/ssvepbcisetupwidget.cpp \
         FormFiles/ssvepbciaboutwidget.cpp \
         FormFiles/ssvepbcisetupstimuluswidget.cpp \
@@ -82,7 +81,6 @@ SOURCES += \
 
 HEADERS += \
         ssvepbci.h\
-        flashobject.h \
         ssvepbci_global.h \
         FormFiles/ssvepbcisetupwidget.h \
         FormFiles/ssvepbciaboutwidget.h \

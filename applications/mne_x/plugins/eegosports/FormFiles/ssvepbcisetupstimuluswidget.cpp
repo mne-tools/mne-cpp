@@ -42,14 +42,14 @@
 
 #include "ssvepbcisetupstimuluswidget.h"
 #include "ui_ssvepbcisetupstimuluswidget.h"
-#include "../ssvepbci.h"
+#include "../eegosports.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ssvepBCIPlugin;
+using namespace EEGoSportsPlugin;
 
 
 //*************************************************************************************************************
@@ -57,7 +57,7 @@ using namespace ssvepBCIPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ssvepBCISetupStimulusWidget::ssvepBCISetupStimulusWidget(ssvepBCI* pssvepBCI, QWidget *parent) :
+ssvepBCISetupStimulusWidget::ssvepBCISetupStimulusWidget(EEGoSports* pssvepBCI, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ssvepBCISetupStimulusWidget),
      m_pssvepBCI(pssvepBCI),
@@ -73,6 +73,9 @@ ssvepBCISetupStimulusWidget::ssvepBCISetupStimulusWidget(ssvepBCI* pssvepBCI, QW
     m_pssvepBCIScreen->showFullScreen();
 
     //Map for all frequencies according to their key
+    m_idFreqMap.insert(-3, 1   );
+    m_idFreqMap.insert(-2, 2   );
+    m_idFreqMap.insert(-1, 4   );
     m_idFreqMap.insert(0,  6   );
     m_idFreqMap.insert(1,  6.66);
     m_idFreqMap.insert(2,  7.05);
@@ -248,7 +251,7 @@ void ssvepBCISetupStimulusWidget::on_pushButton_6_clicked()
 
 //*************************************************************************************************************
 
-void ssvepBCIPlugin::ssvepBCISetupStimulusWidget::on_pushButton_7_clicked()
+void ssvepBCISetupStimulusWidget::on_pushButton_7_clicked()
 {
     // TEST 4
     //clear  Items from screen
@@ -278,7 +281,7 @@ void ssvepBCISetupStimulusWidget::on_comboBox_currentIndexChanged(int index)
 
 //*************************************************************************************************************
 
-void ssvepBCIPlugin::ssvepBCISetupStimulusWidget::on_comboBox_2_currentIndexChanged(int index)
+void ssvepBCISetupStimulusWidget::on_comboBox_2_currentIndexChanged(int index)
 {
     if(m_bIsRunning){
         if(m_bReadFreq)
@@ -335,6 +338,18 @@ void ssvepBCISetupStimulusWidget::setFreq(ssvepBCIFlickeringItem &item, int freq
         renderOrder<< 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1 << 1;                                             break;  // 6.66 Hz
     case 0:
         renderOrder<< 0 << 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1 << 1;                                        break;  // 6 Hz
+    case -1:
+        renderOrder<< 0 << 0 << 0 << 0 << 0 << 0 << 1 << 1 << 1 << 1 << 1 << 1;                              break;  // 4 Hz
+    case -2:
+        for(int i = 0; i<15; i++)
+            renderOrder << 0;
+        for(int i = 0; i<15; i++)
+            renderOrder << 1;                                                                                break;  // 2 Hz
+    case -3:
+        for(int i = 0; i<30; i++)
+            renderOrder << 0;
+        for(int i = 0; i<30; i++)
+            renderOrder << 1;                                                                                break;  // 1 Hz
     default:{
         renderOrder<< 0 << 1 ;
         qDebug()<< "SSVEPBCI-SETUP: Could not set up rendering order. 30 Hz have been chosen instead for flicker frequency!";break;
@@ -343,3 +358,20 @@ void ssvepBCISetupStimulusWidget::setFreq(ssvepBCIFlickeringItem &item, int freq
     item.setRenderOrder(renderOrder, freqKey);
 }
 
+//*************************************************************************************************************
+
+void ssvepBCISetupStimulusWidget::on_pushButton_8_clicked()
+{
+    // Chessboard
+    //clear  Items from screen
+    clear();
+
+    ssvepBCIFlickeringItem chessboard;
+    //whole screen with 15 Hz
+    setFreq(chessboard,-3);
+    chessboard.chessDim(10);
+    m_pssvepBCIScreen->m_Items <<chessboard ;
+
+    changeComboBox();
+
+}
