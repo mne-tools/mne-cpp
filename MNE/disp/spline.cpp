@@ -65,7 +65,7 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Spline::Spline(const QString& title, QWidget* parent):  QWidget(parent)
+Spline::Spline(const QString& title, QWidget* parent): QWidget(parent)
 {
     m_pChart = new QChart();
     m_pChart->setTitle(title);
@@ -96,8 +96,8 @@ void Spline::mousePressEvent(QMouseEvent *event)
 
     QPointF localX = m_pChart->mapToValue(point, shadowSeries);
     QPointF localY = m_pChart->mapToValue(pointY, shadowSeries);
-    verticalLine -> append(localX.x(), 0);
-    verticalLine -> append(localX.x(), maximumFrequency);
+    verticalLine->append(localX.x(), 0);
+    verticalLine->append(localX.x(), maximumFrequency);
     double boundaryX = double(localX.x());   //casting localX.x() from float to double for comparison with minAxisX and maxAxisX
     double boundaryY = double(localY.y());   //casting localY.y() from float to double for comparison with 0 and maximumFrequency
 
@@ -116,7 +116,7 @@ void Spline::mousePressEvent(QMouseEvent *event)
             if (event->buttons() == Qt::LeftButton)
             {
                 leftPoint = verticalLine->pointsVector();
-                if((leftPoint[0].x() < middlePoint[0].x()) && (leftPoint[0].x()  < rightPoint[0].x()))
+                if((leftPoint[0].x() < middlePoint[0].x()) && (leftPoint[0].x() < rightPoint[0].x()))
                 {
                     m_pChart->removeSeries(leftThreshold);
                     leftThreshold=verticalLine;
@@ -134,7 +134,7 @@ void Spline::mousePressEvent(QMouseEvent *event)
             if (event->buttons() == Qt::MiddleButton)
             {
                 middlePoint = verticalLine->pointsVector();
-                if((middlePoint[0].x() > leftPoint[0].x()) && (middlePoint[0].x()  < rightPoint[0].x()))
+                if((middlePoint[0].x() > leftPoint[0].x()) && (middlePoint[0].x() < rightPoint[0].x()))
                 {
                     m_pChart->removeSeries(middleThreshold);
                     middleThreshold=verticalLine;
@@ -151,7 +151,7 @@ void Spline::mousePressEvent(QMouseEvent *event)
             if (event->buttons() == Qt::RightButton)
             {
                 rightPoint = verticalLine->pointsVector();
-                if((rightPoint[0].x() > leftPoint[0].x()) && (rightPoint[0].x()  > middlePoint[0].x()))
+                if((rightPoint[0].x() > leftPoint[0].x()) && (rightPoint[0].x() > middlePoint[0].x()))
                 {
                     m_pChart->removeSeries(rightThreshold);
                     rightThreshold=verticalLine;
