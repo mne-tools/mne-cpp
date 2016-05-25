@@ -528,7 +528,7 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
    vecResultClassLimits.resize(iClassAmount + 1);
    vecResultFrequency.resize(iClassAmount);
 
-    for (int count = 0; count < iClassAmount; count++) //initialize the vector with zero values
+    for (int count = 0; count < iClassAmount; ++count) //initialize the vector with zero values
     {
         vecResultFrequency(count) = 0;
     }
@@ -585,17 +585,17 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
     double	range = (vecResultClassLimits(iClassAmount) - vecResultClassLimits(0)),      //calculates the length from maximum positive value to zero
             dynamicUpperClassLimit;
 
-    for (int kr = 0; kr < iClassAmount; kr++)                                               //dynamically initialize the upper class limit values
+    for (int kr = 0; kr < iClassAmount; ++kr)                                               //dynamically initialize the upper class limit values
     {
         dynamicUpperClassLimit = (vecResultClassLimits(0) + (kr*(range/iClassAmount)));  //generic formula to determine the upper class limit with respect to range and number of class
         vecResultClassLimits(kr) = dynamicUpperClassLimit;                               //places the appropriate upper class limit value to the right position in the QVector
     }
 
-    for (int ir = 0; ir < matRawData.rows(); ir++)       //iterates through all columns of the data matrix
+    for (int ir = 0; ir < matRawData.rows(); ++ir)       //iterates through all columns of the data matrix
     {
-        for (int jr = 0; jr<matRawData.cols(); jr++)     //iterates through all rows of the data matrix
+        for (int jr = 0; jr<matRawData.cols(); ++jr)     //iterates through all rows of the data matrix
         {
-            for (int kr = 0; kr < iClassAmount; kr++)          //starts iteration from 1 to iClassAmount
+            for (int kr = 0; kr < iClassAmount; ++kr)          //starts iteration from 1 to iClassAmount
             {
                 if (kr == iClassAmount-1)                    //used for the final iteration; if the data value is exactly the same as the final upper class limit, it will be included in the histogram
                 {

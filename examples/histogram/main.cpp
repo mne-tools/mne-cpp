@@ -351,8 +351,8 @@ int main(int argc, char *argv[])
     int precision = 2;             //format for the amount digits of coefficient shown in the Bar Histogram (does not affect Spline)
 
     //displayObj can be in either Bar or Spline form; uncomment the preferred one and comment the other
-    //Spline* displayObj = new Spline("MNE-CPP Histogram Example (Spline)");
-    Bar* displayObj = new Bar("MNE-CPP Histogram Example (Bar)");
+    Spline* displayObj = new Spline("MNE-CPP Histogram Example (Spline)");
+    //Bar* displayObj = new Bar("MNE-CPP Histogram Example (Bar)");
 
     QTime myTimerHistogram;
     myTimerHistogram.start();
