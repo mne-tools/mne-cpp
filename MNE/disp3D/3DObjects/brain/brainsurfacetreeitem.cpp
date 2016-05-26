@@ -114,35 +114,26 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
 {
     //Create renderable 3D entity
     m_pParentEntity = parent;
-    m_pRenderable3DEntity = new Renderable3DEntity(parent);
+    m_pRenderable3DEntity = new Renderable3DEntity(m_pParentEntity);
     m_pRenderable3DEntityActivationOverlay = new Renderable3DEntity(parent);
 
+    //Initial transformation also regarding the surface offset
     if(tSurface.hemi() == -1) {
-        QMatrix4x4 m;
-        Qt3DCore::QTransform* transform =  new Qt3DCore::QTransform();
-        m.rotate(180, QVector3D(0.0f, 1.0f, 0.0f));
-        m.rotate(-90, QVector3D(1.0f, 0.0f, 0.0f));
-        m.translate(-0.035f,-0.01f,0.04f);
-        m.scale(0.65f);
-        transform->setMatrix(m);
-        m_pRenderable3DEntity->addComponent(transform);
-        m_pRenderable3DEntityActivationOverlay->addComponent(transform);
+        m_pRenderable3DEntity->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
+        m_pRenderable3DEntity->setRotY(180);
+        m_pRenderable3DEntity->setRotX(90);
+        m_pRenderable3DEntity->setPosition(QVector3D(-0.035f,-0.01f,0.04f));
     } else {
-        QMatrix4x4 m;
-        Qt3DCore::QTransform* transform =  new Qt3DCore::QTransform();
-        m.rotate(180, QVector3D(0.0f, 1.0f, 0.0f));
-        m.rotate(-90, QVector3D(1.0f, 0.0f, 0.0f));
-        transform->setMatrix(m);
-        m_pRenderable3DEntity->addComponent(transform);
-        m_pRenderable3DEntityActivationOverlay->addComponent(transform);
+        m_pRenderable3DEntity->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
+        m_pRenderable3DEntity->setRotY(180);
+        m_pRenderable3DEntity->setRotX(90);
     }
-
 
     //Create color from curvature information with default gyri and sulcus colors
     QByteArray arrayCurvatureColor = createCurvatureVertColor(tSurface.curv());
 
     //Set renderable 3D entity mesh and color data
-    m_pRenderable3DEntity->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), -tSurface.offset(), arrayCurvatureColor);
+    m_pRenderable3DEntity->setMeshData(tSurface.rr(), tSurface.nn(), tSurface.tris(), arrayCurvatureColor);
 
     //Generate activation overlay surface
 //    MatrixX3f overlayAdds = tSurface.rr();

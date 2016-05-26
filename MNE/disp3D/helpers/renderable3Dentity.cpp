@@ -71,9 +71,9 @@ Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
 
 //*************************************************************************************************************
 
-Renderable3DEntity::Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset, Qt3DCore::QEntity* parent)
+Renderable3DEntity::Renderable3DEntity(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, Qt3DCore::QEntity* parent)
 : Qt3DCore::QEntity(parent)
-, m_pCustomMesh(new CustomMesh(tMatVert, tMatNorm, tMatTris, tVecOffset))
+, m_pCustomMesh(new CustomMesh(tMatVert, tMatNorm, tMatTris))
 , m_pTransform(QSharedPointer<Qt3DCore::QTransform>(new Qt3DCore::QTransform()))
 , m_pMaterial(new ShaderMaterial(this))
 //, m_pMaterial(QSharedPointer<Qt3DRender::QMaterial>(new Qt3DRender::QPerVertexColorMaterial))
@@ -103,9 +103,9 @@ bool Renderable3DEntity::setVertColor(const QByteArray& tArrayColors)
 
 //*************************************************************************************************************
 
-bool Renderable3DEntity::setMeshData(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const Vector3f& tVecOffset,  const QByteArray& tArrayColors)
+bool Renderable3DEntity::setMeshData(const MatrixX3f& tMatVert, const MatrixX3f& tMatNorm, const MatrixX3i& tMatTris, const QByteArray& tArrayColors)
 {
-    return m_pCustomMesh->setMeshData(tMatVert, tMatNorm, tMatTris, tVecOffset, tArrayColors);
+    return m_pCustomMesh->setMeshData(tMatVert, tMatNorm, tMatTris, tArrayColors);
 }
 
 
@@ -148,4 +148,98 @@ bool Renderable3DEntity::setAlpha(float fAlpha)
 }
 
 
+//*************************************************************************************************************
 
+float Renderable3DEntity::rotX() const
+{
+    return m_fRotX;
+}
+
+
+//*************************************************************************************************************
+
+float Renderable3DEntity::rotY() const
+{
+    return m_fRotY;
+}
+
+
+//*************************************************************************************************************
+
+float Renderable3DEntity::rotZ() const
+{
+    return m_fRotZ;
+}
+
+
+//*************************************************************************************************************
+
+QVector3D Renderable3DEntity::position() const
+{
+    return m_position;
+}
+
+
+//*************************************************************************************************************
+
+void Renderable3DEntity::setRotX(float rotX)
+{
+    if (m_fRotX == rotX)
+        return;
+
+    m_fRotX = rotX;
+    emit rotXChanged(rotX);
+    updateTransform();
+}
+
+
+//*************************************************************************************************************
+
+void Renderable3DEntity::setRotY(float rotY)
+{
+    if (m_fRotY == rotY)
+        return;
+
+    m_fRotY = rotY;
+    emit rotYChanged(rotY);
+    updateTransform();
+}
+
+
+//*************************************************************************************************************
+
+void Renderable3DEntity::setRotZ(float rotZ)
+{
+    if (m_fRotZ == rotZ)
+        return;
+
+    m_fRotZ = rotZ;
+    emit rotZChanged(rotZ);
+    updateTransform();
+}
+
+
+//*************************************************************************************************************
+
+void Renderable3DEntity::setPosition(QVector3D position)
+{
+    if (m_position == position)
+        return;
+
+    m_position = position;
+    emit positionChanged(position);
+    updateTransform();
+}
+
+
+//*************************************************************************************************************
+
+void Renderable3DEntity::updateTransform()
+{
+    QMatrix4x4 m;
+    m.translate(m_position);
+    m.rotate(m_fRotX, QVector3D(1.0f, 0.0f, 0.0f));
+    m.rotate(m_fRotY, QVector3D(0.0f, 1.0f, 0.0f));
+    m.rotate(m_fRotZ, QVector3D(0.0f, 0.0f, 1.0f));
+    m_pTransform->setMatrix(m);
+}

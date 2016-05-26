@@ -119,10 +119,7 @@ bool BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
     QByteArray arrayVertColor = createVertColor(tBemSurface.rr);
 
     //Set renderable 3D entity mesh and color data
-    Vector3f offset(3);
-    offset << 0.0, 0.0, 0.0;
-
-    m_pRenderable3DEntity->setMeshData(tBemSurface.rr, tBemSurface.nn, tBemSurface.tris, offset, arrayVertColor);
+    m_pRenderable3DEntity->setMeshData(tBemSurface.rr, tBemSurface.nn, tBemSurface.tris, arrayVertColor);
 
     //Find out BEM layer type and change items name
     this->setText(MNEBemSurface::id_name(tBemSurface.id));
@@ -141,9 +138,6 @@ bool BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
 
     data.setValue(tBemSurface.nn);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceNorm);
-
-    data.setValue(offset);
-    this->setData(data, Data3DTreeModelItemRoles::SurfaceOffset);
 
     data.setValue(m_pRenderable3DEntity);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceRenderable3DEntity);
