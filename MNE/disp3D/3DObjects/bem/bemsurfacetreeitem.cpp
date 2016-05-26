@@ -108,12 +108,9 @@ bool BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
     m_pParentEntity = parent;
     m_pRenderable3DEntity = new Renderable3DEntity(parent);
 
-    QMatrix4x4 m;
-    Qt3DCore::QTransform* transform =  new Qt3DCore::QTransform();
-    m.rotate(180, QVector3D(0.0f, 1.0f, 0.0f));
-    m.rotate(-90, QVector3D(1.0f, 0.0f, 0.0f));
-    transform->setMatrix(m);
-    m_pRenderable3DEntity->addComponent(transform);
+    //Initial transformation also regarding the surface offset
+    m_pRenderable3DEntity->setRotY(180);
+    m_pRenderable3DEntity->setRotX(90);
 
     //Create color from curvature information with default gyri and sulcus colors
     QByteArray arrayVertColor = createVertColor(tBemSurface.rr);

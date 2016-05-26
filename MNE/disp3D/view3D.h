@@ -218,6 +218,14 @@ public:
     */
     void setSceneColor(const QColor& colSceneColor);
 
+    //=========================================================================================================
+    /**
+    * Return the Qt3D root entity.
+    *
+    * @return          The SubjectTreeModel pointer.
+    */
+    Qt3DCore::QEntity* get3DRootEntity();
+
 protected:
     Qt3DCore::QAspectEngine             m_aspectEngine;                 /**< The aspect engine. */
     Qt3DCore::QEntity*                  m_pRootEntity;                  /**< The root/most top level entity buffer. */
