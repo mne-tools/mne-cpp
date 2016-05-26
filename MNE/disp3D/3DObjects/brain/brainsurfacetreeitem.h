@@ -64,7 +64,6 @@
 #include <QColor>
 #include <QStandardItem>
 #include <QStandardItemModel>
-#include <QPropertyAnimation>
 
 
 //*************************************************************************************************************
