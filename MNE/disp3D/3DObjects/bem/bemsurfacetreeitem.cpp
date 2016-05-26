@@ -163,6 +163,33 @@ bool BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface, Qt3DCore::QEn
     pItemSurfCol->setData(data, MetaTreeItemRoles::SurfaceColor);
     pItemSurfCol->setData(data, Qt::DecorationRole);
 
+    MetaTreeItem *itemXTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateX, QString::number(0));
+    itemXTrans->setEditable(true);
+    connect(itemXTrans, &MetaTreeItem::surfaceTranslationXChanged,
+            this, &BemSurfaceTreeItem::onSurfaceTranslationXChanged);
+    list.clear();
+    list << itemXTrans;
+    list << new QStandardItem(itemXTrans->toolTip());
+    this->appendRow(list);
+
+    MetaTreeItem *itemYTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateY, QString::number(0));
+    itemYTrans->setEditable(true);
+    connect(itemYTrans, &MetaTreeItem::surfaceTranslationYChanged,
+            this, &BemSurfaceTreeItem::onSurfaceTranslationYChanged);
+    list.clear();
+    list << itemYTrans;
+    list << new QStandardItem(itemYTrans->toolTip());
+    this->appendRow(list);
+
+    MetaTreeItem *itemZTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateZ, QString::number(0));
+    itemZTrans->setEditable(true);
+    connect(itemZTrans, &MetaTreeItem::surfaceTranslationZChanged,
+            this, &BemSurfaceTreeItem::onSurfaceTranslationZChanged);
+    list.clear();
+    list << itemZTrans;
+    list << new QStandardItem(itemZTrans->toolTip());
+    this->appendRow(list);
+
     return true;
 }
 
@@ -200,6 +227,36 @@ void BemSurfaceTreeItem::onSurfaceColorChanged(const QColor& color)
 void BemSurfaceTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     this->setVisible(checkState==Qt::Unchecked ? false : true);
+}
+
+
+//*************************************************************************************************************
+
+void BemSurfaceTreeItem::onSurfaceTranslationXChanged(float fTransX)
+{
+    QVector3D position = m_pRenderable3DEntity->position();
+    position.setX(fTransX);
+    m_pRenderable3DEntity->setPosition(position);
+}
+
+
+//*************************************************************************************************************
+
+void BemSurfaceTreeItem::onSurfaceTranslationYChanged(float fTransY)
+{
+    QVector3D position = m_pRenderable3DEntity->position();
+    position.setY(fTransY);
+    m_pRenderable3DEntity->setPosition(position);
+}
+
+
+//*************************************************************************************************************
+
+void BemSurfaceTreeItem::onSurfaceTranslationZChanged(float fTransZ)
+{
+    QVector3D position = m_pRenderable3DEntity->position();
+    position.setZ(fTransZ);
+    m_pRenderable3DEntity->setPosition(position);
 }
 
 

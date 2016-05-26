@@ -235,6 +235,33 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     data.setValue(tSurface.filePath());
     itemSurfPath->setData(data, MetaTreeItemRoles::SurfaceFilePath);
 
+    MetaTreeItem *itemXTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateX, QString::number(tSurface.offset()(0)));
+    itemXTrans->setEditable(true);
+    connect(itemXTrans, &MetaTreeItem::surfaceTranslationXChanged,
+            this, &BrainSurfaceTreeItem::onSurfaceTranslationXChanged);
+    list.clear();
+    list << itemXTrans;
+    list << new QStandardItem(itemXTrans->toolTip());
+    this->appendRow(list);
+
+    MetaTreeItem *itemYTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateY, QString::number(tSurface.offset()(1)));
+    itemYTrans->setEditable(true);
+    connect(itemYTrans, &MetaTreeItem::surfaceTranslationYChanged,
+            this, &BrainSurfaceTreeItem::onSurfaceTranslationYChanged);
+    list.clear();
+    list << itemYTrans;
+    list << new QStandardItem(itemYTrans->toolTip());
+    this->appendRow(list);
+
+    MetaTreeItem *itemZTrans = new MetaTreeItem(MetaTreeItemTypes::SurfaceTranslateZ, QString::number(tSurface.offset()(2)));
+    itemZTrans->setEditable(true);
+    connect(itemZTrans, &MetaTreeItem::surfaceTranslationZChanged,
+            this, &BrainSurfaceTreeItem::onSurfaceTranslationZChanged);
+    list.clear();
+    list << itemZTrans;
+    list << new QStandardItem(itemZTrans->toolTip());
+    this->appendRow(list);
+
     return true;
 }
 
@@ -337,6 +364,36 @@ void BrainSurfaceTreeItem::onSurfaceAlphaChanged(float fAlpha)
 void BrainSurfaceTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
 {
     this->setVisible(checkState == Qt::Unchecked ? false : true);
+}
+
+
+//*************************************************************************************************************
+
+void BrainSurfaceTreeItem::onSurfaceTranslationXChanged(float fTransX)
+{
+    QVector3D position = m_pRenderable3DEntity->position();
+    position.setX(fTransX);
+    m_pRenderable3DEntity->setPosition(position);
+}
+
+
+//*************************************************************************************************************
+
+void BrainSurfaceTreeItem::onSurfaceTranslationYChanged(float fTransY)
+{
+    QVector3D position = m_pRenderable3DEntity->position();
+    position.setY(fTransY);
+    m_pRenderable3DEntity->setPosition(position);
+}
+
+
+//*************************************************************************************************************
+
+void BrainSurfaceTreeItem::onSurfaceTranslationZChanged(float fTransZ)
+{
+    QVector3D position = m_pRenderable3DEntity->position();
+    position.setZ(fTransZ);
+    m_pRenderable3DEntity->setPosition(position);
 }
 
 

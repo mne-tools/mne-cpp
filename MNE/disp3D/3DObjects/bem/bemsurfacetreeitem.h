@@ -169,6 +169,30 @@ private slots:
     */
     virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
+    //=========================================================================================================
+    /**
+    * Call this slot whenever the the translation x of this item changed.
+    *
+    * @param[in] fTransX        The current x translation.
+    */
+    void onSurfaceTranslationXChanged(float fTransX);
+
+    //=========================================================================================================
+    /**
+    * Call this slot whenever the the translation y of this item changed.
+    *
+    * @param[in] fTransY        The current y translation.
+    */
+    void onSurfaceTranslationYChanged(float fTransY);
+
+    //=========================================================================================================
+    /**
+    * Call this slot whenever the the translation z of this item changed.
+    *
+    * @param[in] fTransZ        The current z translation.
+    */
+    void onSurfaceTranslationZChanged(float fTransZ);
+
 private:
     //=========================================================================================================
     /**

@@ -105,6 +105,15 @@ MetaTreeItem::MetaTreeItem(int iType, const QString& text)
         case MetaTreeItemTypes::SurfaceAlpha:
             sToolTip = "Surface alpha value";
             break;
+        case MetaTreeItemTypes::SurfaceTranslateX:
+            sToolTip = "Surface x translation value";
+            break;
+        case MetaTreeItemTypes::SurfaceTranslateY:
+            sToolTip = "Surface y translation value";
+            break;
+        case MetaTreeItemTypes::SurfaceTranslateZ:
+            sToolTip = "Surface z translation value";
+            break;
         default: // do nothing;
             break;
     }
@@ -177,6 +186,21 @@ void  MetaTreeItem::setData(const QVariant& value, int role)
 
         case MetaTreeItemRoles::SurfaceAlpha: {
             emit surfaceAlphaChanged(value.toFloat());
+            break;
+        }
+
+        case MetaTreeItemRoles::SurfaceTranslateX: {
+            emit surfaceTranslationXChanged(value.toFloat());
+            break;
+        }
+
+        case MetaTreeItemRoles::SurfaceTranslateY: {
+            emit surfaceTranslationYChanged(value.toFloat());
+            break;
+        }
+
+        case MetaTreeItemRoles::SurfaceTranslateZ: {
+            emit surfaceTranslationZChanged(value.toFloat());
             break;
         }
     }
