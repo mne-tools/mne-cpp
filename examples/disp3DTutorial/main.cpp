@@ -272,6 +272,20 @@ int main(int argc, char *argv[])
     control3DWidget->setView3D(testWindow);
     control3DWidget->show();
 
+    //Start animation
+    Qt3DCore::QEntity*  pRootEntity = testWindow->get3DRootEntity();
+
+    for(int i = 0; i < pRootEntity->children().size(); ++i) {
+        if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(pRootEntity->children().at(i))) {
+            QPropertyAnimation *anim = new QPropertyAnimation(pItem, QByteArrayLiteral("rotZ"));
+            anim->setDuration(15000);
+            anim->setStartValue(QVariant::fromValue(0.0f));
+            anim->setEndValue(QVariant::fromValue(360.0f));
+            anim->setLoopCount(-1);
+            anim->start();
+        }
+    }
+
     //########################################################################################
     //
     // Create the test view END
