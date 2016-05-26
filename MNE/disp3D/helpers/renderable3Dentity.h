@@ -176,15 +176,69 @@ public:
     */
     bool setAlpha(float fAlpha);
 
+    //=========================================================================================================
+    /**
+    * Returns the current rotation around the x-axis.
+    *
+    * @return The x-axis rotation value.
+    */
     float rotX() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the current rotation around the y-axis.
+    *
+    * @return The y-axis rotation value.
+    */
     float rotY() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the current rotation around the z-axis.
+    *
+    * @return The z-axis rotation value.
+    */
     float rotZ() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the current position/translation.
+    *
+    * @return The position/translation value.
+    */
     QVector3D position() const;
 
 public slots:
+    //=========================================================================================================
+    /**
+    * Sets the current rotation around the x-axis.
+    *
+    * @param[in] rotX     The x-axis rotation value.
+    */
     void setRotX(float rotX);
+
+    //=========================================================================================================
+    /**
+    * Sets the current rotation around the y-axis.
+    *
+    * @param[in] rotY     The y-axis rotation value.
+    */
     void setRotY(float rotY);
+
+    //=========================================================================================================
+    /**
+    * Sets the current rotation around the z-axis.
+    *
+    * @param[in] rotZ     The z-axis rotation value.
+    */
     void setRotZ(float rotZ);
+
+    //=========================================================================================================
+    /**
+    * Sets the current position/translation.
+    *
+    * @param[in] position     The position/translation value.
+    */
     void setPosition(QVector3D position);
 
 protected: 
@@ -198,12 +252,43 @@ protected:
     QVector3D                                       m_position;              /**< The position/translation value. */
     float                                           m_fAlpha;                /**< The alpha value. */
 
+    //=========================================================================================================
+    /**
+    * Update the set transformation with the currently set translation and rotation values.
+    */
     void updateTransform();
 
 signals:
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the x-axis rotation changed.
+    *
+    * @param[in] rotX     The x-axis rotation value.
+    */
     void rotXChanged(float rotX);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the y-axis rotation changed.
+    *
+    * @param[in] rotY     The y-axis rotation value.
+    */
     void rotYChanged(float rotY);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the z-axis rotation changed.
+    *
+    * @param[in] rotZ     The z-axis rotation value.
+    */
     void rotZChanged(float rotZ);
+
+    //=========================================================================================================
+    /**
+    * Emit this signal whenever the position/translation changed.
+    *
+    * @param[in] position     The position/translation value.
+    */
     void positionChanged(QVector3D position);
 
 };

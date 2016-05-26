@@ -105,9 +105,6 @@ Control3DWidget::Control3DWidget(QWidget* parent, Qt::WindowType type)
 
     //Set on top as default
     onAlwaysOnTop(ui->m_checkBox_alwaysOnTop->isChecked());
-
-    //Set description hidden as default
-    this->onTreeViewDescriptionHide();
 }
 
 
@@ -128,6 +125,9 @@ void Control3DWidget::setView3D(View3D::SPtr view3D)
 
     //Add the view3D to the list of connected view3D's
     m_lView3D.append(view3D);
+
+    //Set description hidden as default
+    this->onTreeViewDescriptionHide();
 }
 
 
