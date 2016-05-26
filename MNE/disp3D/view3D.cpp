@@ -241,6 +241,37 @@ Qt3DCore::QEntity* View3D::get3DRootEntity()
 
 //*************************************************************************************************************
 
+void View3D::startModelRotation()
+{
+    //Start animation
+    m_lPropertyAnimations.clear();
+
+    for(int i = 0; i < m_pRootEntity->children().size(); ++i) {
+        if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(m_pRootEntity->children().at(i))) {
+            QPropertyAnimation *anim = new QPropertyAnimation(pItem, QByteArrayLiteral("rotZ"));
+            anim->setDuration(15000);
+            anim->setStartValue(QVariant::fromValue(pItem->rotZ()));
+            anim->setEndValue(QVariant::fromValue(pItem->rotZ() + 360.0f));
+            anim->setLoopCount(-1);
+            anim->start();
+            m_lPropertyAnimations << anim;
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void View3D::stopModelRotation()
+{
+    for(int i = 0; i < m_lPropertyAnimations.size(); ++i) {
+        m_lPropertyAnimations.at(i)->stop();
+    }
+}
+
+
+//*************************************************************************************************************
+
 void View3D::keyPressEvent(QKeyEvent* e)
 {
     qDebug() << "key press";

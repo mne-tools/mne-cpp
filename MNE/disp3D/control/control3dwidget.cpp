@@ -76,6 +76,13 @@ Control3DWidget::Control3DWidget(QWidget* parent, Qt::WindowType type)
     connect(ui->m_checkBox_alwaysOnTop, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &Control3DWidget::onAlwaysOnTop);
 
+    //Connect animation and fullscreen
+    connect(ui->m_checkBox_showFullScreen, &QCheckBox::clicked,
+            this, &Control3DWidget::onShowFullScreen);
+
+    connect(ui->m_checkBox_rotate, &QCheckBox::clicked,
+            this, &Control3DWidget::onRotationClicked);
+
     //Init's
     ui->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(0, 0, 0);"));
 
@@ -98,6 +105,9 @@ Control3DWidget::Control3DWidget(QWidget* parent, Qt::WindowType type)
 
     //Set on top as default
     onAlwaysOnTop(ui->m_checkBox_alwaysOnTop->isChecked());
+
+    //Set description hidden as default
+    this->onTreeViewDescriptionHide();
 }
 
 
@@ -229,3 +239,34 @@ void Control3DWidget::onAlwaysOnTop(bool state)
         this->show();
     }
 }
+
+
+//*************************************************************************************************************
+
+void Control3DWidget::onShowFullScreen(bool checked)
+{
+    //Update all connected View3D's scene colors
+    for(int i = 0; i<m_lView3D.size(); i++) {
+        if(checked) {
+            m_lView3D.at(i)->showFullScreen();
+        } else {
+            m_lView3D.at(i)->showNormal();
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void Control3DWidget::onRotationClicked(bool checked)
+{
+    //Update all connected View3D's scene colors
+    for(int i = 0; i<m_lView3D.size(); i++) {
+        if(checked) {
+            m_lView3D.at(i)->startModelRotation();
+        } else {
+            m_lView3D.at(i)->stopModelRotation();
+        }
+    }
+}
+

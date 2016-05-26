@@ -166,6 +166,18 @@ protected slots:
     */
     void onAlwaysOnTop(bool state);
 
+    //=========================================================================================================
+    /**
+    * Slot called when the user wants to show the view in full screen.
+    */
+    void onShowFullScreen(bool checked);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the user wants to rotate the models.
+    */
+    void onRotationClicked(bool checked);
+
 protected:
     Ui::Control3DWidget*    ui;                         /**< The pointer to the QtDesigner ui class. */
 

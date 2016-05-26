@@ -226,6 +226,18 @@ public:
     */
     Qt3DCore::QEntity* get3DRootEntity();
 
+    //=========================================================================================================
+    /**
+    * Starts to rotate all loaded 3D models.
+    */
+    void startModelRotation();
+
+    //=========================================================================================================
+    /**
+    * Stops to rotate all loaded 3D models.
+    */
+    void stopModelRotation();
+
 protected:
     Qt3DCore::QAspectEngine             m_aspectEngine;                 /**< The aspect engine. */
     Qt3DCore::QEntity*                  m_pRootEntity;                  /**< The root/most top level entity buffer. */
@@ -242,15 +254,17 @@ protected:
 
     Data3DTreeModel::SPtr               m_pData3DTreeModel;             /**< Pointer to the data3D class, which holds all 3D data. */
 
-    bool            m_bCameraTransMode;         /**< Flag for activating/deactivating the translation camera mode. */
-    bool            m_bCameraRotationMode;      /**< Flag for activating/deactivating the rotation camera mode. */
+    bool                                m_bCameraTransMode;             /**< Flag for activating/deactivating the translation camera mode. */
+    bool                                m_bCameraRotationMode;          /**< Flag for activating/deactivating the rotation camera mode. */
 
-    QPoint          m_mousePressPositon;        /**< Position when the mouse was pressed. */
+    QPoint                              m_mousePressPositon;            /**< Position when the mouse was pressed. */
 
-    QVector3D       m_vecCameraTrans;           /**< The camera translation vector. */
-    QVector3D       m_vecCameraTransOld;        /**< The camera old translation vector. */
-    QVector3D       m_vecCameraRotation;        /**< The camera rotation vector. */
-    QVector3D       m_vecCameraRotationOld;     /**< The camera old rotation vector. */
+    QVector3D                           m_vecCameraTrans;               /**< The camera translation vector. */
+    QVector3D                           m_vecCameraTransOld;            /**< The camera old translation vector. */
+    QVector3D                           m_vecCameraRotation;            /**< The camera rotation vector. */
+    QVector3D                           m_vecCameraRotationOld;         /**< The camera old rotation vector. */
+
+    QList<QPropertyAnimation*>          m_lPropertyAnimations;          /**< The animations for each 3D object. */
 
     //=========================================================================================================
     /**
