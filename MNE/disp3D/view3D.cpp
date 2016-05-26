@@ -171,7 +171,26 @@ void View3D::initTransformations()
 
 bool View3D::addBrainData(const QString& subject, const QString& set, const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet)
 {
-    return m_pData3DTreeModel->addData(subject, set, tSurfaceSet, tAnnotationSet);
+    m_pData3DTreeModel->addData(subject, set, tSurfaceSet, tAnnotationSet);
+
+    qDebug()<<m_pRootEntity->children();
+
+    for(int i = 0; i < m_pRootEntity->children().size(); ++i) {
+        //Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(m_pRootEntity->children().at(i));
+
+        if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(m_pRootEntity->children().at(i))) {
+            qDebug()<<"adding rotation to child";
+
+            QPropertyAnimation *animZ = new QPropertyAnimation(pItem, QByteArrayLiteral("rotZ"));
+            animZ->setDuration(15000);
+            animZ->setStartValue(QVariant::fromValue(0.0f));
+            animZ->setEndValue(QVariant::fromValue(360.0f));
+            animZ->setLoopCount(-1);
+            animZ->start();
+        }
+    }
+
+    return true;
 }
 
 
