@@ -66,6 +66,7 @@ View3D::View3D()
 , m_pData3DTreeModel(Data3DTreeModel::SPtr(new Data3DTreeModel(0, m_pRootEntity)))
 , m_bCameraRotationMode(false)
 , m_bCameraTransMode(false)
+, m_bModelRotationMode(false)
 , m_vecCameraTrans(QVector3D(0.0,0.0,-0.5))
 , m_vecCameraTransOld(QVector3D(0.0,0.0,-0.5))
 , m_vecCameraRotation(QVector3D(0.0,0.0,0.0))
@@ -274,11 +275,26 @@ void View3D::stopModelRotation()
 
 void View3D::keyPressEvent(QKeyEvent* e)
 {
-    qDebug() << "key press";
     switch ( e->key() )
     {
         case Qt::Key_Space:
-            //Translate
+            m_bModelRotationMode = true;
+            break;
+
+        default:
+            Window::keyPressEvent(e);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void View3D::keyReleaseEvent(QKeyEvent* e)
+{
+    switch ( e->key() )
+    {
+        case Qt::Key_Space:
+            m_bModelRotationMode = false;
             break;
 
         default:
@@ -346,17 +362,19 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
         m_vecCameraRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * 0.1f) + m_vecCameraRotationOld.x());
         m_vecCameraRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.1f) + m_vecCameraRotationOld.y());
 
-        //Rotate all surface objects
-        for(int i = 0; i < m_pRootEntity->children().size(); ++i) {
-            if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(m_pRootEntity->children().at(i))) {
-                pItem->setRotZ(m_vecCameraRotation.y());
-                pItem->setRotX(90+m_vecCameraRotation.x());
+        if(!m_bModelRotationMode) {
+            //Rotate camera
+            m_pCameraTransform->setRotationX(m_vecCameraRotation.x());
+            m_pCameraTransform->setRotationY(m_vecCameraRotation.y());
+        } else {
+            //Rotate all surface objects
+            for(int i = 0; i < m_pRootEntity->children().size(); ++i) {
+                if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(m_pRootEntity->children().at(i))) {
+                    pItem->setRotZ(m_vecCameraRotation.y());
+                    pItem->setRotX(90+m_vecCameraRotation.x());
+                }
             }
         }
-
-        //Rotate camera
-//        m_pCameraTransform->setRotationX(m_vecCameraRotation.x());
-//        m_pCameraTransform->setRotationY(m_vecCameraRotation.y());
     }
 
     if(m_bCameraTransMode) {

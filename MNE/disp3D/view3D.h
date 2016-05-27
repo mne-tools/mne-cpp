@@ -256,6 +256,7 @@ protected:
 
     bool                                m_bCameraTransMode;             /**< Flag for activating/deactivating the translation camera mode. */
     bool                                m_bCameraRotationMode;          /**< Flag for activating/deactivating the rotation camera mode. */
+    bool                                m_bModelRotationMode;           /**< Flag for activating/deactivating the rotation model mode. */
 
     QPoint                              m_mousePressPositon;            /**< Position when the mouse was pressed. */
 
@@ -289,6 +290,7 @@ protected:
     * Window functions
     */
     void keyPressEvent(QKeyEvent* e);
+    void keyReleaseEvent(QKeyEvent* e);
     void mousePressEvent(QMouseEvent* e);
     void wheelEvent(QWheelEvent* e);
     void mouseReleaseEvent(QMouseEvent* e);
