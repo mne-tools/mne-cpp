@@ -2,5 +2,4 @@
 
 # Update Repositories
 sudo add-apt-repository ppa:beineri/opt-qt56-trusty -y
-sudo add-apt-repository ppa:libreoffice/ppa -y
 sudo apt-get update -qq
