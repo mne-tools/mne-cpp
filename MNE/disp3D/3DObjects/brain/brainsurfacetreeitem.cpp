@@ -198,14 +198,14 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
     m_pItemSurfColGyri->setData(data, MetaTreeItemRoles::SurfaceColorGyri);
     m_pItemSurfColGyri->setData(data, Qt::DecorationRole);
 
-    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::SurfaceAlpha, "0.5");
+    MetaTreeItem *itemAlpha = new MetaTreeItem(MetaTreeItemTypes::SurfaceAlpha, "1.0");
     connect(itemAlpha, &MetaTreeItem::surfaceAlphaChanged,
             this, &BrainSurfaceTreeItem::onSurfaceAlphaChanged);
     list.clear();
     list << itemAlpha;
     list << new QStandardItem(itemAlpha->toolTip());
     this->appendRow(list);
-    data.setValue(0.5);
+    data.setValue(1.0);
     itemAlpha->setData(data, MetaTreeItemRoles::SurfaceAlpha);
 
     MetaTreeItem *itemSurfFileName = new MetaTreeItem(MetaTreeItemTypes::FileName, tSurface.fileName());
