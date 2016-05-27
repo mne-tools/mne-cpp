@@ -124,9 +124,9 @@ bool BrainSurfaceTreeItem::addData(const Surface& tSurface, Qt3DCore::QEntity* p
         m_pRenderable3DEntity->setRotX(90);
         m_pRenderable3DEntity->setPosition(QVector3D(-0.035f,-0.01f,0.04f));
     } else {
-        m_pRenderable3DEntity->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
         m_pRenderable3DEntity->setRotY(180);
         m_pRenderable3DEntity->setRotX(90);
+        m_pRenderable3DEntity->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
     }
 
     //Create color from curvature information with default gyri and sulcus colors

@@ -246,17 +246,17 @@ void View3D::startModelRotation()
     //Start animation
     m_lPropertyAnimations.clear();
 
-//    for(int i = 0; i < m_pRootEntity->children().size(); ++i) {
-//        if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(m_pRootEntity->children().at(i))) {
-//            QPropertyAnimation *anim = new QPropertyAnimation(pItem, QByteArrayLiteral("rotZ"));
-//            anim->setDuration(20000);
-//            anim->setStartValue(QVariant::fromValue(pItem->rotZ()));
-//            anim->setEndValue(QVariant::fromValue(pItem->rotZ() + 360.0f));
-//            anim->setLoopCount(-1);
-//            anim->start();
-//            m_lPropertyAnimations << anim;
-//        }
-//    }
+    for(int i = 0; i < m_pRootEntity->children().size(); ++i) {
+        if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(m_pRootEntity->children().at(i))) {
+            QPropertyAnimation *anim = new QPropertyAnimation(pItem, QByteArrayLiteral("rotZ"));
+            anim->setDuration(20000);
+            anim->setStartValue(QVariant::fromValue(pItem->rotZ()));
+            anim->setEndValue(QVariant::fromValue(pItem->rotZ() + 360.0f));
+            anim->setLoopCount(-1);
+            anim->start();
+            m_lPropertyAnimations << anim;
+        }
+    }
 }
 
 
@@ -264,9 +264,9 @@ void View3D::startModelRotation()
 
 void View3D::stopModelRotation()
 {
-//    for(int i = 0; i < m_lPropertyAnimations.size(); ++i) {
-//        m_lPropertyAnimations.at(i)->stop();
-//    }
+    for(int i = 0; i < m_lPropertyAnimations.size(); ++i) {
+        m_lPropertyAnimations.at(i)->stop();
+    }
 }
 
 
@@ -346,8 +346,17 @@ void View3D::mouseMoveEvent(QMouseEvent* e)
         m_vecCameraRotation.setX(((e->pos().y() - m_mousePressPositon.y()) * 0.1f) + m_vecCameraRotationOld.x());
         m_vecCameraRotation.setY(((e->pos().x() - m_mousePressPositon.x()) * 0.1f) + m_vecCameraRotationOld.y());
 
-        m_pCameraTransform->setRotationX(m_vecCameraRotation.x());
-        m_pCameraTransform->setRotationY(m_vecCameraRotation.y());
+        //Rotate all surface objects
+        for(int i = 0; i < m_pRootEntity->children().size(); ++i) {
+            if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(m_pRootEntity->children().at(i))) {
+                pItem->setRotZ(m_vecCameraRotation.y());
+                pItem->setRotX(90+m_vecCameraRotation.x());
+            }
+        }
+
+        //Rotate camera
+//        m_pCameraTransform->setRotationX(m_vecCameraRotation.x());
+//        m_pCameraTransform->setRotationY(m_vecCameraRotation.y());
     }
 
     if(m_bCameraTransMode) {
