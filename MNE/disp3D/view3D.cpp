@@ -250,7 +250,7 @@ void View3D::startModelRotation()
     for(int i = 0; i < m_pRootEntity->children().size(); ++i) {
         if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(m_pRootEntity->children().at(i))) {
             QPropertyAnimation *anim = new QPropertyAnimation(pItem, QByteArrayLiteral("rotZ"));
-            anim->setDuration(20000);
+            anim->setDuration(30000);
             anim->setStartValue(QVariant::fromValue(pItem->rotZ()));
             anim->setEndValue(QVariant::fromValue(pItem->rotZ() + 360.0f));
             anim->setLoopCount(-1);
