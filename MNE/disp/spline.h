@@ -155,6 +155,15 @@ public:
     template<typename T>
     void splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData, int iClassAmount, Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues);
 
+    //=========================================================================================================
+    /**
+    * createThreshold takes in QVector value from outside sources and create the corresponding lines in the histogram
+    *
+    * @param[in]  vecThresholdValues      QVector3D consisting of 3 values corresponding to the x-axis value of the threshold lines
+    */
+    template<typename T>
+    void createThreshold (QVector3D<double> vecThresholdValues);
+
 private:
     //=========================================================================================================
     QChart          *m_pChart;              /**< Qchart object that will be shown in the widget */
@@ -218,7 +227,7 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
     //  Start of Qtchart histogram display
     QString histogramExponent;
     histogramExponent = "X-axis scale: 10e" + QString::number(resultExponentValues(0));   //used to tell the user the exponential scale used in the histogram
-
+    series->clear();
     series->setName(histogramExponent);
 
     minAxisX = resultDisplayValues(0);

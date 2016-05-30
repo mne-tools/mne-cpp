@@ -203,6 +203,8 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
 
         case MetaTreeItemTypes::RTDataNormalizationValue: {
 //            //Qvector3d cast to spline then set to spline
+            QVector3D<double> vecThresholdValues = index.model()->data(index, MetaTreeItemRoles::RTDataNormalizationValue());
+
 //            double value = index.model()->data(index, MetaTreeItemRoles::RTDataNormalizationValue).toDouble();
 //            QDoubleSpinBox* pDoubleSpinBox = static_cast<QDoubleSpinBox*>(editor);
 //            pDoubleSpinBox->setValue(value);

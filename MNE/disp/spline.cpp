@@ -86,7 +86,6 @@ void Spline::mousePressEvent(QMouseEvent *event)
 {
     if (series->count() == 0)               //protect integrity of the histogram widget in case series contain no data values
     {
-        qDebug()<< "No data set!";
         QWidget::mousePressEvent(event);    //calls the predefined mousepressevent from QWidget
     }
     else
@@ -178,3 +177,64 @@ void Spline::mousePressEvent(QMouseEvent *event)
 
 
 //*************************************************************************************************************
+
+void Spline::createThreshold(QVector3D<double> vecThresholdValues)
+{
+    double leftThresholdValue;
+    double middleThresholdValue;
+    double rightThresholdValue;
+
+    if (series->count() == 0)               //protect integrity of the histogram widget in case series contain no data values
+    {
+        //do nothing
+    }
+
+    else
+    {
+        if ((vecThresholdValues::x() < vecThresholdValues::y()) && (vecThresholdValues::x() < vecThresholdValues::z()))
+        {
+            leftThresholdValue = vecThresholdValues::x();
+
+            if(vecThresholdValues::y() < vecThresholdValues::z())
+            {
+                middleThresholdValue = vecThresholdValues::y();
+                rightThresholdValue = vecThresholdValues::z();
+            }
+            else
+            {
+                middleThresholdValue = vecThresholdValues::z();
+                rightThresholdValue = vecThresholdValues::y();
+            }
+        }
+        if ((vecThresholdValues::y() < vecThresholdValues::x()) && (vecThresholdValues::y() < vecThresholdValues::z()))
+        {
+            leftThresholdValue = vecThresholdValues::y();
+
+            if(vecThresholdValues::x() < vecThresholdValues::z())
+            {
+                middleThresholdValue = vecThresholdValues::x();
+                rightThresholdValue = vecThresholdValues::z();
+            }
+            else
+            {
+                middleThresholdValue = vecThresholdValues::z();
+                rightThresholdValue = vecThresholdValues::x();
+            }
+        }
+        if ((vecThresholdValues::z() < vecThresholdValues::x()) && (vecThresholdValues::z() < vecThresholdValues::y()))
+        {
+            leftThresholdValue = vecThresholdValues::z();
+
+            if(vecThresholdValues::x() < vecThresholdValues::y())
+            {
+                middleThresholdValue = vecThresholdValues::x();
+                rightThresholdValue = vecThresholdValues::y();
+            }
+            else
+            {
+                middleThresholdValue = vecThresholdValues::y();
+                rightThresholdValue = vecThresholdValues::x();
+            }
+        }
+    }
+}
