@@ -47,6 +47,7 @@
 
 #include "data3Dtreemodel.h"
 #include "../helpers/abstracttreeitem.h"
+#include "disp/spline.h"
 
 
 //*************************************************************************************************************
