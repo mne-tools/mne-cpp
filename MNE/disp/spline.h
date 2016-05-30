@@ -161,8 +161,7 @@ public:
     *
     * @param[in]  vecThresholdValues      QVector3D consisting of 3 values corresponding to the x-axis value of the threshold lines
     */
-    template<typename T>
-    void createThreshold (QVector3D<double> vecThresholdValues);
+    void createThreshold (QVector3D vecThresholdValues);
 
 private:
     //=========================================================================================================
