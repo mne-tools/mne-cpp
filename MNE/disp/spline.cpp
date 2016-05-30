@@ -178,7 +178,7 @@ void Spline::mousePressEvent(QMouseEvent *event)
 
 //*************************************************************************************************************
 
-void Spline::createThreshold(QVector3D<double> vecThresholdValues)
+void Spline::createThreshold(QVector3D vecThresholdValues)
 {
     double leftThresholdValue;
     double middleThresholdValue;
@@ -191,14 +191,14 @@ void Spline::createThreshold(QVector3D<double> vecThresholdValues)
 
     else
     {
-        if ((vecThresholdValues::x() < vecThresholdValues::y()) && (vecThresholdValues::x() < vecThresholdValues::z()))
+        if ((vecThresholdValues.x() < vecThresholdValues.y()) && (vecThresholdValues.x() < vecThresholdValues.z()))
         {
-            leftThresholdValue = vecThresholdValues::x();
+            leftThresholdValue = vecThresholdValues.x();
 
-            if(vecThresholdValues::y() < vecThresholdValues::z())
+            if(vecThresholdValues.y() < vecThresholdValues.z())
             {
-                middleThresholdValue = vecThresholdValues::y();
-                rightThresholdValue = vecThresholdValues::z();
+                middleThresholdValue = vecThresholdValues.y();
+                rightThresholdValue = vecThresholdValues.z();
             }
             else
             {
@@ -236,5 +236,26 @@ void Spline::createThreshold(QVector3D<double> vecThresholdValues)
                 rightThresholdValue = vecThresholdValues::x();
             }
         }
+        leftThreshold->append(leftThresholdValue, 0);
+        leftThreshold->append(leftThresholdValue, maximumFrequency);
+        middleThreshold->append(middleThresholdValue, 0);
+        middleThreshold->append(middleThresholdValue, maximumFrequency);
+        rightThreshold->append(rightThresholdValue, 0);
+        rightThreshold->append(rightThresholdValue, maximumFrequency);
+
+        m_pChart->removeSeries(leftThreshold);
+        m_pChart->removeSeries(middleThreshold);
+        m_pChart->removeSeries(rightThreshold);
+
+        leftThreshold->setColor("red");
+        middleThreshold->setColor("green");
+        rightThreshold->setColor("blue");
+        m_pChart->addSeries(leftThresholdLine);
+        m_pChart->addSeries(middleThresholdLine);
+        m_pChart->addSeries(rightThresholdLine);
+        m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
+        m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-2)->setVisible(false);
+        m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-3)->setVisible(false);
+        m_pChart->createDefaultAxes();
     }
 }
