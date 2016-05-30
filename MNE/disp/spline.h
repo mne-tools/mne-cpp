@@ -158,6 +158,7 @@ public:
 private:
     //=========================================================================================================
     QChart          *m_pChart;              /**< Qchart object that will be shown in the widget */
+    QSplineSeries   *series;                /**< Spline data series that will contain the histogram data*/
     QLineSeries     *leftThreshold;         /**< Vertical line series for the left threshold */
     QLineSeries     *middleThreshold;       /**< Vertical line series for the middle threshold */
     QLineSeries     *rightThreshold;        /**< Vertical line series for the right threshold */
@@ -218,7 +219,6 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
     QString histogramExponent;
     histogramExponent = "X-axis scale: 10e" + QString::number(resultExponentValues(0));   //used to tell the user the exponential scale used in the histogram
 
-    QSplineSeries *series = new QSplineSeries();
     series->setName(histogramExponent);
 
     minAxisX = resultDisplayValues(0);
@@ -240,7 +240,6 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
 
     m_pChart->removeAllSeries();              //create new series and then clear the plot and update with new data
     m_pChart->addSeries(series);
-
     leftThreshold = new QLineSeries();
     middleThreshold = new QLineSeries();
     rightThreshold = new QLineSeries();

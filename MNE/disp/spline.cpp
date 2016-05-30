@@ -71,7 +71,7 @@ Spline::Spline(const QString& title, QWidget* parent): QWidget(parent)
     m_pChart->setTitle(title);
     m_pChart->setAnimationOptions(QChart::SeriesAnimations);
     m_pChart->setAcceptHoverEvents(false);
-
+    series = new QSplineSeries();
     QChartView *chartView = new QChartView(m_pChart);
     chartView->setRenderHint(QPainter::Antialiasing);
     QGridLayout* layout = new QGridLayout();
@@ -84,89 +84,96 @@ Spline::Spline(const QString& title, QWidget* parent): QWidget(parent)
 
 void Spline::mousePressEvent(QMouseEvent *event)
 {
-    QXYSeries *shadowSeries = qobject_cast<QXYSeries *>(sender());
-    QLineSeries *verticalLine = new QLineSeries();
-    QPointF point = event->pos();
-    QPointF pointY = point;
-
-    pointY.setX(minAxisX);
-    pointY.setY(pointY.y()-10.5);   //-10.5 needed to correctly position the line at mouse position
-    point.setX(point.x()-10.5);
-    point.setY(0);
-
-    QPointF localX = m_pChart->mapToValue(point, shadowSeries);
-    QPointF localY = m_pChart->mapToValue(pointY, shadowSeries);
-    verticalLine->append(localX.x(), 0);
-    verticalLine->append(localX.x(), maximumFrequency);
-    double boundaryX = double(localX.x());   //casting localX.x() from float to double for comparison with minAxisX and maxAxisX
-    double boundaryY = double(localY.y());   //casting localY.y() from float to double for comparison with 0 and maximumFrequency
-
-    if((boundaryX >= float(minAxisX)) && (boundaryX <= float(maxAxisX)))  //this condition ensures that threshold lines can only be created within the boundary of the x-axis
+    if (series->count() == 0)               //protect integrity of the histogram widget in case series contain no data values
     {
-        if((boundaryY >= 0.0) && (boundaryY <= float(maximumFrequency)))  // this condition ensures that threshold lines can only be created within the boundary of the y-axis
+        qDebug()<< "No data set!";
+        QWidget::mousePressEvent(event);    //calls the predefined mousepressevent from QWidget
+    }
+    else
+    {
+        QXYSeries *shadowSeries = qobject_cast<QXYSeries *>(sender());
+        qDebug()<< "shadow series = " << shadowSeries;
+        QLineSeries *verticalLine = new QLineSeries();
+        QPointF point = event->pos();
+        QPointF pointY = point;
+        pointY.setX(minAxisX);
+        pointY.setY(pointY.y()-10.5);   //-10.5 needed to correctly position the line at mouse position
+        point.setX(point.x()-10.5);
+        point.setY(0);
+
+        QPointF localX = m_pChart->mapToValue(point, shadowSeries);
+        QPointF localY = m_pChart->mapToValue(pointY, shadowSeries);
+        verticalLine->append(localX.x(), 0);
+        verticalLine->append(localX.x(), maximumFrequency);
+        double boundaryX = double(localX.x());   //casting localX.x() from float to double for comparison with minAxisX and maxAxisX
+        double boundaryY = double(localY.y());   //casting localY.y() from float to double for comparison with 0 and maximumFrequency
+
+        if((boundaryX >= float(minAxisX)) && (boundaryX <= float(maxAxisX)))  //this condition ensures that threshold lines can only be created within the boundary of the x-axis
         {
-            QVector<QPointF> middlePoint = middleThreshold->pointsVector();   //Point values need to be updated before tested and displayed on the widget
-            QVector<QPointF> rightPoint = rightThreshold->pointsVector();
-            QVector<QPointF> leftPoint = leftThreshold->pointsVector();
-
-            double emitLeft = (leftPoint[0].x() * (pow(10, resultExponentValues[0])));
-            double emitMiddle = (middlePoint[0].x() * (pow(10, resultExponentValues[0])));
-            double emitRight = (rightPoint[0].x() * (pow(10, resultExponentValues[0])));
-
-            if (event->buttons() == Qt::LeftButton)
+            if((boundaryY >= 0.0) && (boundaryY <= float(maximumFrequency)))  // this condition ensures that threshold lines can only be created within the boundary of the y-axis
             {
-                leftPoint = verticalLine->pointsVector();
-                if((leftPoint[0].x() < middlePoint[0].x()) && (leftPoint[0].x() < rightPoint[0].x()))
+                QVector<QPointF> middlePoint = middleThreshold->pointsVector();   //Point values need to be updated before tested and displayed on the widget
+                QVector<QPointF> rightPoint = rightThreshold->pointsVector();
+                QVector<QPointF> leftPoint = leftThreshold->pointsVector();
+
+                double emitLeft = (leftPoint[0].x() * (pow(10, resultExponentValues[0])));
+                double emitMiddle = (middlePoint[0].x() * (pow(10, resultExponentValues[0])));
+                double emitRight = (rightPoint[0].x() * (pow(10, resultExponentValues[0])));
+
+                if (event->buttons() == Qt::LeftButton)
                 {
-                    m_pChart->removeSeries(leftThreshold);
-                    leftThreshold=verticalLine;
-                    leftThreshold->setColor("red");
-                    leftThreshold->setName("left threshold");
-                    m_pChart->addSeries(leftThreshold);
-                    m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
-                    m_pChart->createDefaultAxes();
-                    emitLeft = (leftPoint[0].x() * (pow(10, resultExponentValues[0])));
-                    emit borderChanged(emitLeft, emitMiddle, emitRight);
-                    qDebug() << "Border = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
+                    leftPoint = verticalLine->pointsVector();
+                    if((leftPoint[0].x() < middlePoint[0].x()) && (leftPoint[0].x() < rightPoint[0].x()))
+                    {
+                        m_pChart->removeSeries(leftThreshold);
+                        leftThreshold=verticalLine;
+                        leftThreshold->setColor("red");
+                        leftThreshold->setName("left threshold");
+                        m_pChart->addSeries(leftThreshold);
+                        m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
+                        m_pChart->createDefaultAxes();
+                        emitLeft = (leftPoint[0].x() * (pow(10, resultExponentValues[0])));
+                        emit borderChanged(emitLeft, emitMiddle, emitRight);
+                        qDebug() << "Border = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
+                    }
                 }
-            }
 
-            if (event->buttons() == Qt::MiddleButton)
-            {
-                middlePoint = verticalLine->pointsVector();
-                if((middlePoint[0].x() > leftPoint[0].x()) && (middlePoint[0].x() < rightPoint[0].x()))
+                if (event->buttons() == Qt::MiddleButton)
                 {
-                    m_pChart->removeSeries(middleThreshold);
-                    middleThreshold=verticalLine;
-                    middleThreshold->setColor("green");
-                    m_pChart->addSeries(middleThreshold);
-                    m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
-                    m_pChart->createDefaultAxes();
-                    emitMiddle = (middlePoint[0].x() * (pow(10, resultExponentValues[0])));
-                    emit borderChanged(emitLeft, emitMiddle, emitRight);
-                    qDebug() << "Border = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
+                    middlePoint = verticalLine->pointsVector();
+                    if((middlePoint[0].x() > leftPoint[0].x()) && (middlePoint[0].x() < rightPoint[0].x()))
+                    {
+                        m_pChart->removeSeries(middleThreshold);
+                        middleThreshold=verticalLine;
+                        middleThreshold->setColor("green");
+                        m_pChart->addSeries(middleThreshold);
+                        m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
+                        m_pChart->createDefaultAxes();
+                        emitMiddle = (middlePoint[0].x() * (pow(10, resultExponentValues[0])));
+                        emit borderChanged(emitLeft, emitMiddle, emitRight);
+                        qDebug() << "Border = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
+                    }
                 }
-            }
 
-            if (event->buttons() == Qt::RightButton)
-            {
-                rightPoint = verticalLine->pointsVector();
-                if((rightPoint[0].x() > leftPoint[0].x()) && (rightPoint[0].x() > middlePoint[0].x()))
+                if (event->buttons() == Qt::RightButton)
                 {
-                    m_pChart->removeSeries(rightThreshold);
-                    rightThreshold=verticalLine;
-                    rightThreshold->setColor("blue");
-                    m_pChart->addSeries(rightThreshold);
-                    m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
-                    m_pChart->createDefaultAxes();
-                    emitRight = (rightPoint[0].x() * (pow(10, resultExponentValues[0])));
-                    emit borderChanged(emitLeft, emitMiddle, emitRight);
-                    qDebug() << "Border = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
+                    rightPoint = verticalLine->pointsVector();
+                    if((rightPoint[0].x() > leftPoint[0].x()) && (rightPoint[0].x() > middlePoint[0].x()))
+                    {
+                        m_pChart->removeSeries(rightThreshold);
+                        rightThreshold=verticalLine;
+                        rightThreshold->setColor("blue");
+                        m_pChart->addSeries(rightThreshold);
+                        m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
+                        m_pChart->createDefaultAxes();
+                        emitRight = (rightPoint[0].x() * (pow(10, resultExponentValues[0])));
+                        emit borderChanged(emitLeft, emitMiddle, emitRight);
+                        qDebug() << "Border = " << emitLeft << " , " << emitMiddle << " , " << emitRight;
+                    }
                 }
             }
         }
     }
-    QWidget::mousePressEvent(event);    //calls the predefined mousepressevent from QWidget
 }
 
 
