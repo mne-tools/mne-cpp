@@ -379,7 +379,7 @@ void BrainRTSourceLocDataTreeItem::setVisualizationType(const QString& sVisualiz
 
 //*************************************************************************************************************
 
-void BrainRTSourceLocDataTreeItem::setNormalization(QVector3D<double> vecNormalization)
+void BrainRTSourceLocDataTreeItem::setNormalization(double vecNormalization)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::RTDataNormalizationValue);
 

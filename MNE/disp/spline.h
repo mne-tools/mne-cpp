@@ -59,6 +59,7 @@
 #include <QDebug>
 #include <QtCharts/QLegendMarker>
 #include <QtCharts/QLegend>
+#include <QVector3D>
 #include <iostream>
 
 
@@ -170,6 +171,10 @@ private:
     QLineSeries     *leftThreshold;         /**< Vertical line series for the left threshold */
     QLineSeries     *middleThreshold;       /**< Vertical line series for the middle threshold */
     QLineSeries     *rightThreshold;        /**< Vertical line series for the right threshold */
+    QLineSeries     *newLeftThreshold;         /**< Vertical line series for the left threshold */
+    QLineSeries     *newMiddleThreshold;       /**< Vertical line series for the middle threshold */
+    QLineSeries     *newRightThreshold;        /**< Vertical line series for the right threshold */
+
     QLegendMarker   *marker;                /**< Variable to specify the legend of the threshold line */
     double          minAxisX;               /**< Value of the smallest point of the series in x-axis */
     double          maxAxisX;               /**< Value of the largest point on the series in x-axis */
@@ -251,10 +256,10 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
     leftThreshold = new QLineSeries();
     middleThreshold = new QLineSeries();
     rightThreshold = new QLineSeries();
-    leftThreshold->append(minAxisX, 0);       //initialize threshold lines
+    leftThreshold->append(minAxisX, 0);                     //initialize threshold lines
     middleThreshold->append(maxAxisX, 0);
     rightThreshold->append(maxAxisX, 0);
-    leftThreshold->setVisible(false);         //threshold lines intially invisible
+    leftThreshold->setVisible(false);                       //threshold lines intially invisible
     middleThreshold->setVisible(false);
     rightThreshold->setVisible(false);
 
@@ -315,7 +320,6 @@ void Spline::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic,
 
     if (highestExponentValue > 0)
     {
-        qDebug() << "addition entered!";
         for (int ir = 0; ir <= iClassAmount; ++ir)
         {
             while (vecExponentValues(ir) < highestExponentValue)     //normalize the values by multiplying the display value by 10 and reducing the exponentValue by 1 until exponentValue reach the lowestExponentValue
@@ -328,7 +332,6 @@ void Spline::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic,
 
     if (lowestExponentValue < 0)
     {
-        qDebug() << "reduction entered!";
         for (int ir = 0; ir <= iClassAmount; ++ir)
         {
             while (vecExponentValues(ir) > lowestExponentValue)
