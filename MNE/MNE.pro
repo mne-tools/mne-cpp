@@ -46,7 +46,7 @@ SUBDIRS += \
     inverse \
     rtCommand \
     rtClient \
-    rtProcessing\
+    rtProcessing \
 
 contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += disp
@@ -56,10 +56,6 @@ contains(MNECPP_CONFIG, withGui) {
         SUBDIRS += \
             disp3D \
     }
-}
-
-contains(MNECPP_CONFIG, withPython) {
-    SUBDIRS += pyio
 }
 
 CONFIG += ordered

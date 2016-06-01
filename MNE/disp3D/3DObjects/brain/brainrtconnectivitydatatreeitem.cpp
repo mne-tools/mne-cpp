@@ -93,7 +93,7 @@ void  BrainRTConnectivityDataTreeItem::setData(const QVariant& value, int role)
 bool BrainRTConnectivityDataTreeItem::init(const MNEForwardSolution& tForwardSolution, int iHemi)
 {   
     //Set hemisphere information as item's data
-    this->setData(iHemi, BrainRTConnectivityDataTreeItemRoles::RTHemi);
+    this->setData(iHemi, Data3DTreeModelItemRoles::RTHemi);
 
     //Set data based on clusterd or full source space
     bool isClustered = tForwardSolution.src[iHemi].isClustered();
@@ -102,11 +102,11 @@ bool BrainRTConnectivityDataTreeItem::init(const MNEForwardSolution& tForwardSol
 
     //Add meta information as item children
     QString sIsClustered = isClustered ? "Clustered" : "Full";
-    BrainTreeMetaItem* pItemSourceSpaceType = new BrainTreeMetaItem(BrainTreeMetaItemTypes::RTDataSourceSpaceType, sIsClustered);
+    MetaTreeItem* pItemSourceSpaceType = new MetaTreeItem(MetaTreeItemTypes::RTDataSourceSpaceType, sIsClustered);
     pItemSourceSpaceType->setEditable(false);
-    *this<<pItemSourceSpaceType;
+    *this << pItemSourceSpaceType;
     data.setValue(sIsClustered);
-    pItemSourceSpaceType->setData(data, BrainTreeMetaItemRoles::RTDataSourceSpaceType);
+    pItemSourceSpaceType->setData(data, MetaTreeItemRoles::RTDataSourceSpaceType);
 
     m_bIsInit = true;
 
@@ -120,7 +120,7 @@ bool BrainRTConnectivityDataTreeItem::addData(const MatrixXd& matNewConnection)
 {
     Q_UNUSED(matNewConnection)
     if(!m_bIsInit) {
-        qDebug()<<"BrainRTConnectivityDataTreeItem::updateData - Rt Item has not been initialized yet!";
+        qDebug() << "BrainRTConnectivityDataTreeItem::updateData - Rt Item has not been initialized yet!";
         return false;
     }
 
